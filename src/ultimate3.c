@@ -22,6 +22,8 @@ const char version_protocol[] = "UltimateIRCd 3.0.0.a26+";
 const char flood_mode_char_set[] = "";  /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "";       /* mode char for FLOOD mode on remove */
 
+int UseTSMODE = 0;
+
 
 IRCDVar ircd[] = {
     {"UltimateIRCd 3.0.*",      /* ircd name */

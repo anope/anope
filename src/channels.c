@@ -866,7 +866,8 @@ void do_cmode(const char *source, int ac, char **av)
 
     if (ircdcap->tsmode) {
         /* TSMODE for bahamut - leave this code out to break MODEs. -GD */
-        if (uplink_capab & ircdcap->tsmode) {
+        /* if they don't send it in CAPAB check if we just want to enable it */
+        if (uplink_capab & ircdcap->tsmode || UseTSMODE) {
             for (i = 0; i < strlen(av[1]); i++) {
                 if (!isdigit(av[1][i]))
                     break;

@@ -1,4 +1,4 @@
-
+/* News functions.
 /* News functions.
  *
  * (C) 2003 Anope Team
@@ -496,8 +496,10 @@ static void do_news_del(User * u, int16 type, int *msgs,
             if (num > 0 && del_newsitem(num, type)) {
                 notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
                 /* Reset the order - #0000397 */
-                for (i = 0; i < nnews; i++)
-                    news[i].num = i + 1;
+                for (i = 0; i < nnews; i++) {
+                    if ((news[i].type == type) && (news[i].num > num))
+                        news[i].num--;
+                }
             } else
                 notice_lang(s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
         } else {
@@ -537,3 +539,4 @@ static int del_newsitem(int num, short type)
 
 /*************************************************************************/
 
+ 

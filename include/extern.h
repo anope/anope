@@ -26,6 +26,7 @@ E IRCDVar ircd[];
 E IRCDCAPAB ircdcap[];
 E const char flood_mode_char_set[];
 E const char flood_mode_char_remove[];
+E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
 
 /**** actions.c ****/
 

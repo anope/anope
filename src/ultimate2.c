@@ -21,6 +21,7 @@ const char version_protocol[] = "UltimateIRCd 2.8.2+";
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on remove */
+int UseTSMODE = 0;
 
 IRCDVar ircd[] = {
     {"UltimateIRCd 2.8.*",      /* ircd name */

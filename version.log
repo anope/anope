@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="376"
+VERSION_BUILD="378"
 
 # $Log$
+#
+# BUILD : 1.7.5 (378)
+# BUGS  : N/A
+# NOTES : News reodering - DrStein, TSMODE issues - TSL, NULL crash fixes - TSL
 #
 # BUILD : 1.7.5 (376)
 # BUGS  : N/A

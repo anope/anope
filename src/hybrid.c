@@ -21,7 +21,7 @@ const char version_protocol[] = "Hybrid IRCd 7.0";
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "";  /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "";       /* mode char for FLOOD mode on remove */
-
+int UseTSMODE = 0;
 
 IRCDVar ircd[] = {
     {"HybridIRCd 7.*",          /* ircd name */

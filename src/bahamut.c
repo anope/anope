@@ -23,6 +23,7 @@ const char version_protocol[] = "BahamutIRCd 1.4.*/1.8.*";
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "+j";        /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "-j";     /* mode char for FLOOD mode on remove */
+int UseTSMODE = 0;              /* does send TSMODE but if it doesn't means it won't so this is disabled */
 
 IRCDVar ircd[] = {
     {"BahamutIRCd 1.4.*/1.8.*", /* ircd name */

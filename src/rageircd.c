@@ -21,6 +21,7 @@ const char version_protocol[] = "RageIRCd 2.0.x";
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "";  /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "";       /* mode char for FLOOD mode on remove */
+int UseTSMODE = 1;              /* Rage beta 6 does not send TSMODE but uses it so we do this to enable it */
 
 
 IRCDVar ircd[] = {
@@ -718,6 +719,7 @@ void anope_cmd_svinfo()
 
 void anope_cmd_capab()
 {
+    /* future versions will support TSMODE */
     send_cmd(NULL, "CAPAB BURST UNCONNECT SSJ3 SN2 VHOST");
 }
 

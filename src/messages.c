@@ -112,6 +112,10 @@ int m_privmsg(char *source, char *receiver, char *msg)
     ChannelInfo *ci;
     User *u;
 
+    if (!source || !*source) {
+        return MOD_CONT;
+    }
+
     u = finduser(source);
 
     if (!u) {

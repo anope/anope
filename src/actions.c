@@ -24,6 +24,10 @@ void bad_password(User * u)
 {
     time_t now = time(NULL);
 
+    if (!u) {
+        return;
+    }
+
     if (!BadPassLimit)
         return;
 

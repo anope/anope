@@ -62,7 +62,14 @@ static User *new_user(const char *nick)
 static void change_user_nick(User * user, const char *nick)
 {
     User **list;
-    int is_same = (!stricmp(user->nick, nick) ? 1 : 0);
+    int is_same;
+
+    /* Sanity check to make sure we don't segfault */
+    if (!user || !nick || !*nick) {
+        return;
+    }
+
+    is_same = (!stricmp(user->nick, nick) ? 1 : 0);
 
     if (user->prev)
         user->prev->next = user->next;

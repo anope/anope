@@ -24,6 +24,8 @@ const char version_protocol[] = "UnrealIRCd 3.1.1+";
 const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on remove */
 
+int UseTSMODE = 0;
+
 IRCDVar ircd[] = {
     {"UnrealIRCd 3.1.x",        /* ircd name */
      "+oS",                     /* nickserv mode */

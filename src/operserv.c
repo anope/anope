@@ -3096,7 +3096,7 @@ static int do_sqline(User * u)
         if (mask && (reason = strtok(NULL, ""))) {
 
             /* We first do some sanity check on the proposed mask. */
-            if (strspn(mask, "*?") == strlen(mask)) {
+            if (strspn(mask, "*") == strlen(mask)) {
                 notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
                 return MOD_CONT;
             }

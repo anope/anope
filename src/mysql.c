@@ -1331,9 +1331,7 @@ void db_mysql_load_cs_dbase(void)
                 memos->time = atoi(row[2]);
                 snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
-                for (m = 0; m < MAX_CMD_HASH; m++) {
-                    memos->moduleData[m] = NULL;
-                }
+                memos->moduleData = NULL;
                 memos++;
             }
         }
@@ -1545,9 +1543,7 @@ void db_mysql_load_ns_dbase(void)
                 memos->time = atoi(row[2]);
                 snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
-                for (m = 0; m < MAX_CMD_HASH; m++) {
-                    memos->moduleData[m] = NULL;
-                }
+                memos->moduleData = NULL;
                 memos++;
             }
             mysql_free_result(res);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="350"
+VERSION_BUILD="351"
 
 # $Log$
+#
+# BUILD : 1.7.5 (351)
+# BUGS  : N/A
+# NOTES : Rewrote the internals of moduleData, this will save _lots_ of memory especially on larger networks.  The downside is modules using it need to make a tiny, tiny change... :/
 #
 # BUILD : 1.7.5 (350)
 # BUGS  : 

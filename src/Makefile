@@ -20,7 +20,7 @@ INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
 	../include/encrypt.h ../include/messages.h ../include/services.h \
 	../include/timeout.h ../include/datafiles.h ../include/extern.h \
-	../include/modules.h ../include/slist.h ../include/version.h \
+	../include/modules.h ../include/slist.h \
 	../include/dreamforge.h ../include/bahamut.h ../include/ultimate2.h \
 	../include/ultimate3.h ../include/hybrid.h ../include/ptlink.h ../include/unreal31.h \
 	../include/viagra.h ../include/rageircd.h ../include/unreal32.h

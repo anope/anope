@@ -38,17 +38,17 @@ cat >version.h <<EOF
  *
  */
 
-#define VERSION_MAJOR	"$VERSION_MAJOR"
-#define VERSION_MINOR	"$VERSION_MINOR"
-#define VERSION_PATCH	"$VERSION_PATCH"
-#define VERSION_EXTRA	"$VERSION_EXTRA"
-#define VERSION_BUILD	"$VERSION_BUILD"
+ #ifndef VERSION_H
+ #define VERSION_H
+ 
+#define VERSION_MAJOR	$VERSION_MAJOR
+#define VERSION_MINOR	$VERSION_MINOR
+#define VERSION_PATCH	$VERSION_PATCH
+#define VERSION_EXTRA	$VERSION_EXTRA
+#define VERSION_BUILD	$VERSION_BUILD
 
 #define BUILD	"$BUILD"
-
-const char version_number[] = "$VERSION";
-const char version_build[] =
-	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
+#define VERSION_STRING "$VERSION"
 
 #ifdef DEBUG_COMMANDS
 # define VER_DEBUG "D"
@@ -106,8 +106,7 @@ const char version_build[] =
 # define VER_MODULE
 #endif
 
-/* the space is needed cause if you build with nothing it will complain */
-const char version_flags[] = " " VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL VER_MODULE;
+#endif
 
 EOF
 

@@ -129,7 +129,6 @@ typedef struct server_ Server;
 typedef struct user_ User;
 typedef struct channel_ Channel;
 typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
-typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
 typedef struct memo_ Memo;
 typedef struct nickrequest_ NickRequest;
 typedef struct nickalias_ NickAlias;
@@ -301,19 +300,14 @@ struct ircdcapab_ {
  * ModuleData strucs used to allow modules to add / delete module Data from existing structs
  */
 
-struct ModuleDataItem_ {
-	char *key;							/* The key */
-	char *value;							/* The Value */
-	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
-};
-
-struct ModuleData_ {	
+struct ModuleData_ {
 	char *moduleName;						/* Which module we belong to */
-	ModuleDataItem *di;						/* The first Item they own */
+	char *key;								/* The key */
+	char *value;							/* The Value */
 	ModuleData *next;						/* The next ModuleData record */
 };
-
-/*************************************************************************/
+ 
+ /*************************************************************************/
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
@@ -324,7 +318,7 @@ struct memo_ {
     time_t time;	/* When it was sent */
     char sender[NICKMAX];
     char *text;
-    ModuleData *moduleData[1024]; 	/* Module saved data attached to the Memo */
+    ModuleData *moduleData; 	/* Module saved data attached to the Memo */
 };
 
 typedef struct {
@@ -358,7 +352,7 @@ struct nickalias_ {
         int16 status;				/* See NS_* below */
         NickCore *nc;				/* I'm an alias of this */
         /* Not saved */
-        ModuleData *moduleData[1024]; 		/* Module saved data attached to the nick alias */
+        ModuleData *moduleData; 		/* Module saved data attached to the nick alias */
     	User *u;				/* Current online user that has me */
 };
 
@@ -380,7 +374,7 @@ struct nickcore_ {
         uint16 channelmax;			/* Maximum number of channels allowed */
 
         /* Unsaved data */
-        ModuleData *moduleData[1024];	  	/* Module saved data attached to the NickCore */
+        ModuleData *moduleData;	  	/* Module saved data attached to the NickCore */
         time_t lastmail;			/* Last time this nick record got a mail */
         SList aliases;				/* List of aliases */
 };
@@ -514,7 +508,7 @@ struct chaninfo_ {
     struct channel_ *c;			/* Pointer to channel record (if   *
 					 			 *    channel is currently in use) */
 								 
-    ModuleData *moduleData[1024]; 	/* Module saved data attached to the ChannelInfo */
+    ModuleData *moduleData; 	/* Module saved data attached to the ChannelInfo */
 
     /* For BotServ */
 
@@ -695,7 +689,7 @@ struct user_ {
 
     NickAlias *na;
 
-    ModuleData *moduleData[1024];		/* defined for it, it should allow the module Add/Get */	
+    ModuleData *moduleData;		/* defined for it, it should allow the module Add/Get */	
     
     int isSuperAdmin;		/* is SuperAdmin on or off? */
 

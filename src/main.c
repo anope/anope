@@ -75,6 +75,15 @@ time_t start_time;
 /* Parameters and environment */
 char **my_av, **my_envp;
 
+/* Moved here from version.h */
+const char version_number[] = VERSION_STRING;
+const char version_build[] =
+    "build #" BUILD ", compiled " __DATE__ " " __TIME__;
+/* the space is needed cause if you build with nothing it will complain */
+const char version_flags[] =
+    " " VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL
+    VER_MODULE;
+
 /******** Local variables! ********/
 
 /* Set to 1 if we are waiting for input */

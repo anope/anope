@@ -558,9 +558,7 @@ void load_old_ns_dbase(void)
                         memos->time = tmp32;
                         SAFE(read_buffer(memos->sender, f));
                         SAFE(read_string(&memos->text, f));
-                        for (m = 0; m < MAX_CMD_HASH; m++) {
-                            memos->moduleData[m] = NULL;
-                        }
+                        memos->moduleData = NULL;
                     }
                 }
 
@@ -757,9 +755,7 @@ void load_ns_dbase(void)
                     memos->time = tmp32;
                     SAFE(read_buffer(memos->sender, f));
                     SAFE(read_string(&memos->text, f));
-                    for (m = 0; m < MAX_CMD_HASH; m++) {
-                        memos->moduleData[m] = NULL;
-                    }
+                    memos->moduleData = NULL;
                 }
             }
 
@@ -1562,13 +1558,13 @@ static int delcore(NickCore * nc)
     if (nc->memos.memos) {
         for (i = 0; i < nc->memos.memocount; i++) {
             if (nc->memos.memos[i].text)
-                moduleCleanStruct(nc->memos.memos[i].moduleData);
+                moduleCleanStruct(&nc->memos.memos[i].moduleData);
             free(nc->memos.memos[i].text);
         }
         free(nc->memos.memos);
     }
 
-    moduleCleanStruct(nc->moduleData);
+    moduleCleanStruct(&nc->moduleData);
 
     free(nc);
 
@@ -1666,7 +1662,7 @@ int delnick(NickAlias * na)
     if (na->last_quit)
         free(na->last_quit);
 
-    moduleCleanStruct(na->moduleData);
+    moduleCleanStruct(&na->moduleData);
 
     free(na);
 

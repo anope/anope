@@ -378,5 +378,8 @@ if [ "$UMASK" != "" ] ; then
     WITH_PERM=" --with-permissions=$UMASK"
 fi
 
+
+echo "./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM"
+
 ./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM
 

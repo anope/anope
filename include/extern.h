@@ -653,7 +653,7 @@ E u_int32_t getrandom32(void);
 
 /**** modules.c ****/
 E void moduleCallBackRun(void);
-E void moduleCleanStruct(ModuleData * moduleData[]);
+E void moduleCleanStruct(ModuleData **moduleData);
 
 /**** news.c ****/
 

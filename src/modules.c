@@ -14,6 +14,7 @@
  */
 #include "modules.h"
 #include "language.h"
+#include "version.h"
 
 #ifdef USE_MODULES
 #include <dlfcn.h>
@@ -1749,6 +1750,24 @@ void moduleDisplayHelp(int service, User * u)
 }
 
 /**
+ * Output module data information into the log file.
+ * This is a vwey "debug only" function to dump the whole contents
+ * of a moduleData struct into the log files.
+ * @param md The module data for the struct to be used
+ * @return 0 is always returned;
+ **/
+int moduleDataDebug(ModuleData **md) {
+	ModuleData *current = NULL;
+	alog("Dumping module data....");
+	for (current = *md; current; current = current->next) {
+	 	alog("Module: [%s]",current->moduleName);
+		alog(" Key [%s]\tValue [%s]",current->key, current->value);
+	}
+	alog("End of module data dump");
+	return 0;
+}
+
+/**
  * Add module data to a struct.
  * This allows module coders to add data to an existing struct
  * @param md The module data for the struct to be used
@@ -1756,72 +1775,40 @@ void moduleDisplayHelp(int service, User * u)
  * @param value The value for the key/value pair, this is what will be stored for you
  * @return MOD_ERR_OK will be returned on success
  **/
-int moduleAddData(ModuleData * md[], char *key, char *value)
+int moduleAddData(ModuleData **md, char *key, char *value)
 {
-    char *mod_name = sstrdup(mod_current_module_name);
+	char *mod_name = sstrdup(mod_current_module_name);
+	ModuleData *newData=NULL;
+	ModuleData *tmp = *md;
+	
+	if ( !key || !value ) {
+        	alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
+        	return MOD_ERR_PARAMS;		
+	}
+	
+	moduleDelData(md,key);  /* Remove any existing module data for this module with the same key */
+	
+	newData = malloc(sizeof(ModuleData));
+	if(!newData) {
+		return MOD_ERR_MEMORY;
+	}
+	
+        newData->moduleName = sstrdup(mod_name);
+	newData->key = sstrdup(key);
+	newData->value = sstrdup(value);
+	if(tmp) {
+		newData->next = tmp->next;
+	} else {
+		newData->next = NULL;
+	}
+	*md = newData;
 
-    int index = 0;
-    ModuleData *current = NULL;
-    ModuleData *newHash = NULL;
-    ModuleData *lastHash = NULL;
-    ModuleDataItem *item = NULL;
-    ModuleDataItem *itemCurrent = NULL;
-    ModuleDataItem *lastItem = NULL;
-    index = CMD_HASH(mod_name);
-
-    if (!key || !value) {
-        alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
-        return MOD_ERR_PARAMS;
-    }
-
-    for (current = md[index]; current; current = current->next) {
-        if (stricmp(current->moduleName, mod_name) == 0)
-            lastHash = current;
-    }
-
-    if (!lastHash) {
-        newHash = malloc(sizeof(ModuleData));
-        if (!newHash) {
-            return MOD_ERR_MEMORY;
-        }
-        newHash->next = NULL;
-        newHash->di = NULL;
-        newHash->moduleName = strdup(mod_name);
-        md[index] = newHash;
-        lastHash = newHash;
-    }
-
-        /**
-	 * Ok, at this point lastHash will always be a valid ModuleData struct, and will always be "our" module Data Struct
-	 **/
-    for (itemCurrent = lastHash->di; itemCurrent;
-         itemCurrent = itemCurrent->next) {
-        if (stricmp(itemCurrent->key, key) == 0) {
-            item = itemCurrent;
-        }
-        lastItem = itemCurrent;
-    }
-    if (!item) {
-        item = malloc(sizeof(ModuleDataItem));
-        if (!item) {
-            return MOD_ERR_MEMORY;
-        }
-        item->next = NULL;
-        item->key = strdup(key);
-        item->value = strdup(value);
-        if (lastItem)
-            lastItem->next = item;
-        else
-            lastHash->di = item;
-    } else {
-        free(item->key);
-        free(item->value);
-        item->key = strdup(key);
-        item->value = strdup(value);
-    }
-    free(mod_name);
-    return MOD_ERR_OK;
-
+	free(mod_name);
+	
+	if(debug) {
+		moduleDataDebug(md);
+	}
+	return MOD_ERR_OK;
 }
 
 /**
@@ -1831,33 +1818,17 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
  * @param key The key to find the data for
  * @return the value paired to the given key will be returned, or NULL 
  **/
-char *moduleGetData(ModuleData * md[], char *key)
+char *moduleGetData(ModuleData **md, char *key)
 {
     char *mod_name = sstrdup(mod_current_module_name);
-    int index = 0;
-    char *ret = NULL;
-    ModuleData *current = NULL;
-    ModuleData *lastHash = NULL;
-    ModuleDataItem *itemCurrent = NULL;
-    index = CMD_HASH(mod_name);
-    if (!md) {
-        return NULL;
-    }
-    for (current = md[index]; current; current = current->next) {
-        if (stricmp(current->moduleName, mod_name) == 0)
-            lastHash = current;
-    }
-
-    if (lastHash) {
-        for (itemCurrent = lastHash->di; itemCurrent;
-             itemCurrent = itemCurrent->next) {
-            if (strcmp(itemCurrent->key, key) == 0) {
-                ret = strdup(itemCurrent->value);
-            }
-        }
+    ModuleData *current = *md;
+    while(current) {
+    	if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {
+		return sstrdup(current->value);
+	}
     }
     free(mod_name);
-    return ret;
+    return NULL;
 }
 
 /**
@@ -1866,39 +1837,31 @@ char *moduleGetData(ModuleData * md[], char *key)
  * @param md The module data for the struct to be used
  * @param key The key to delete the key/value pair for
  **/
-void moduleDelData(ModuleData * md[], char *key)
+void moduleDelData(ModuleData **md, char *key)
 {
     char *mod_name = sstrdup(mod_current_module_name);
-    int index = 0;
-    ModuleData *current = NULL;
-    ModuleData *lastHash = NULL;
-
-    ModuleDataItem *itemCurrent = NULL;
-    ModuleDataItem *prev = NULL;
-    ModuleDataItem *next = NULL;
-    index = CMD_HASH(mod_name);
-
-    for (current = md[index]; current; current = current->next) {
-        if (stricmp(current->moduleName, mod_name) == 0)
-            lastHash = current;
-    }
-    if (lastHash) {
-        for (itemCurrent = lastHash->di; itemCurrent; itemCurrent = next) {
-            next = itemCurrent->next;
-            if (strcmp(key, itemCurrent->key) == 0) {
-                free(itemCurrent->key);
-                free(itemCurrent->value);
-                itemCurrent->next = NULL;
-                free(itemCurrent);
-                if (prev) {
-                    prev->next = next;
-                } else {
-                    lastHash->di = next;
-                }
-            } else {
-                prev = itemCurrent;
-            }
-        }
+    ModuleData *current = *md;
+    ModuleData *prev = NULL;
+    ModuleData *next = NULL;
+    
+    if(key) { 
+    	while(current) {
+		next = current->next;
+		if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {	
+			if(prev) {
+				prev->next  = current->next;
+			} else {
+				*md = current->next;
+			}
+	        	free(current->moduleName);
+			free(current->key);
+			free(current->value);
+			current->next = NULL;
+			free(current);
+		}
+		prev = current;;
+		current = next;
+    	}
     }
     free(mod_name);
 }
@@ -1909,35 +1872,29 @@ void moduleDelData(ModuleData * md[], char *key)
  * do just about anything and everything, its safe to use from inside the module.
  * @param md The module data for the struct to be used
  **/
-void moduleDelAllData(ModuleData * md[])
+void moduleDelAllData(ModuleData **md)
 {
     char *mod_name = sstrdup(mod_current_module_name);
-    int index = 0;
-    ModuleData *current = NULL;
-    ModuleData *lastHash = NULL;
-
-    ModuleDataItem *itemCurrent = NULL;
-    ModuleDataItem *prev = NULL;
-    ModuleDataItem *next = NULL;
-    index = CMD_HASH(mod_name);
-
-    for (current = md[index]; current; current = current->next) {
-        if (stricmp(current->moduleName, mod_name) == 0)
-            lastHash = current;
-    }
-    if (lastHash) {
-        for (itemCurrent = lastHash->di; itemCurrent; itemCurrent = next) {
-            next = itemCurrent->next;
-            free(itemCurrent->key);
-            free(itemCurrent->value);
-            itemCurrent->next = NULL;
-            free(itemCurrent);
-            if (prev) {
-                prev->next = next;
-            } else {
-                lastHash->di = next;
-            }
-        }
+    ModuleData *current = *md;
+    ModuleData *prev = NULL;
+    ModuleData *next = NULL;
+     
+    while(current) {
+	next = current->next;
+	if((stricmp(current->moduleName,mod_name)==0)) {	
+		if(prev) {
+			prev->next  = current->next;
+		} else {
+			*md = current->next;
+		}
+	        free(current->moduleName);
+		free(current->key);
+		free(current->value);
+		current->next = NULL;
+		free(current);
+	}
+	prev = current;;
+	current = next;
     }
     free(mod_name);
 }
@@ -1946,7 +1903,7 @@ void moduleDelAllData(ModuleData * md[])
  * This will delete all module data used in any struct by module m.
  * @param m The module to clear all data for
  **/
-void moduleDelAllDataMod(Module * m)
+void moduleDelAllDataMod(Module *m)
 {
     boolean freeme = false;
     int i, j;
@@ -1963,29 +1920,29 @@ void moduleDelAllDataMod(Module * m)
     for (i = 0; i < 1024; i++) {
         /* Remove the users */
         for (user = userlist[i]; user; user = user->next) {
-            moduleDelAllData(user->moduleData);
+            moduleDelAllData(&user->moduleData);
         }
         /* Remove the nick Cores */
         for (nc = nclists[i]; nc; nc = nc->next) {
-            moduleDelAllData(nc->moduleData);
+            moduleDelAllData(&nc->moduleData);
             /* Remove any memo data for this nick core */
             for (j = 0; j < nc->memos.memocount; j++) {
-                moduleCleanStruct(nc->memos.memos[j].moduleData);
+                moduleCleanStruct(&nc->memos.memos[j].moduleData);
             }
         }
         /* Remove the nick Aliases */
         for (na = nalists[i]; na; na = na->next) {
-            moduleDelAllData(na->moduleData);
+            moduleDelAllData(&na->moduleData);
         }
     }
 
     for (i = 0; i < 256; i++) {
         /* Remove any chan info data */
         for (ci = chanlists[i]; ci; ci = ci->next) {
-            moduleDelAllData(ci->moduleData);
+            moduleDelAllData(&ci->moduleData);
             /* Remove any memo data for this nick core */
             for (j = 0; j < ci->memos.memocount; j++) {
-                moduleCleanStruct(ci->memos.memos[j].moduleData);
+                moduleCleanStruct(&ci->memos.memos[j].moduleData);
             }
         }
     }
@@ -1997,30 +1954,56 @@ void moduleDelAllDataMod(Module * m)
 }
 
 /**
- * Remove any data fro many module used in the given struct.
+ * Remove any data from any module used in the given struct.
  * Useful for cleaning up when a User leave's the net, a NickCore is deleted, etc...
  * @param moduleData the moduleData struct to "clean"
  **/
-void moduleCleanStruct(ModuleData * moduleData[])
-{
-    ModuleData *md = NULL, *nextMd = NULL;
-    ModuleDataItem *item = NULL, *nextItem = NULL;
-    int i;
-
-    for (i = 0; i < 1024; i++) {
-        for (md = moduleData[i]; md; md = nextMd) {
-            nextMd = md->next;
-            for (item = md->di; item; item = nextItem) {
-                nextItem = item->next;
-                free(item->key);
-                free(item->value);
-                item->next = NULL;
-                free(item);
-            }
-            free(md->moduleName);
-            free(md);
-        }
+void moduleCleanStruct(ModuleData **moduleData) {
+    ModuleData *current = *moduleData;;
+    ModuleData *next = NULL;
+     
+    while(current) {
+	next = current->next;
+	free(current->moduleName);
+	free(current->key);
+	free(current->value);
+	current->next = NULL;
+	free(current);
+	current = next;
     }
+    *moduleData = NULL;
+}
+
+/**
+ * Check the current version of anope against a given version number
+ * Specifiying -1 for minor,patch or build 
+ * @param major The major version of anope, the first part of the verison number
+ * @param minor The minor version of anope, the second part of the version number
+ * @param patch The patch version of anope, the third part of the version number
+ * @param build The build revision of anope from SVN
+ * @return True if the version newer than the version specified.
+ **/
+boolean moduleMinVersion(int major,int minor,int patch,int build) {
+	boolean ret=false;
+	if(VERSION_MAJOR>major) {  // Def. new
+		ret = true;
+	} else if(VERSION_MAJOR == major) {  // Might be newer
+		if(minor == -1) { return true; }					// They dont care about minor
+		if(VERSION_MINOR > minor) { // Def. newer
+			ret = true;
+		} else if(VERSION_MINOR == minor) { // Might be newer
+			if(patch == -1) { return true; }				// They dont care about patch
+			if(VERSION_PATCH > patch) {
+				ret = true;
+			} else if(VERSION_PATCH == patch) {
+				if(build == -1) { return true; }			// They dont care about build
+				if(VERSION_BUILD >= build) {
+					ret = true;
+				}
+			}
+		}
+	}
+	return ret;
 }
 
 /* EOF */

@@ -242,7 +242,7 @@ void delete_user(User * user)
     if (user->nickTrack)
         free(user->nickTrack);
 
-    moduleCleanStruct(user->moduleData);
+    moduleCleanStruct(&user->moduleData);
 
     if (debug >= 2)
         alog("debug: delete_user(): delete from list");

@@ -556,6 +556,16 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         }
                         anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
                                           buf);
+                    } else if (na->nc == ci->founder) {
+                        /* User is the founder of the channel */
+                        char durastr[192];
+                        duration(u->na, durastr, sizeof(durastr),
+                                 time(NULL) - na->last_seen);
+                        snprintf(buf, sizeof(buf),
+                                 getstring(u->na, BOT_SEEN_ON), target,
+                                 durastr);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     } else {
                         /* All other cases */
                         snprintf(buf, sizeof(buf),

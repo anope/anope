@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="483"
+VERSION_BUILD="484"
 
 # $Log$
+#
+# BUILD : 1.7.6 (484)
+# BUGS  : 167
+# NOTES : Made BotServ !seen recognize the channel founder
 #
 # BUILD : 1.7.6 (483)
 # BUGS  : 240

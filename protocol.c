@@ -109,22 +109,8 @@ void s_sqline(char *mask, char *reason)
         }
     } else {
 #endif
-        /* int i;
-           User *u, *next; */
-
         send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 
-        /* for (i = 0; i < 1024; i++) {
-           for (u = userlist[i]; u; u = next) {
-           next = u->next;
-           if (match_wild_nocase(mask, u->nick))
-           #ifdef IRC_BAHAMUT
-           send_cmd(NULL, "SVSKILL %s :%s", u->nick, reason);
-           #else
-           kill_user(s_OperServ, u->nick, reason);                      
-           #endif
-           }
-           } */
 #ifdef IRC_BAHAMUT
     }
 #endif

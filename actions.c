@@ -33,12 +33,7 @@ void bad_password(User * u)
     u->invalid_pw_count++;
     u->invalid_pw_time = now;
     if (u->invalid_pw_count >= BadPassLimit)
-#ifdef IRC_BAHAMUT
-        send_cmd(NULL, "SVSKILL %s :%s", u->nick,
-                 "Too many invalid passwords");
-#else
         kill_user(NULL, u->nick, "Too many invalid passwords");
-#endif
 }
 
 /*************************************************************************/
@@ -73,6 +68,12 @@ void change_user_mode(User * u, char *modes, char *arg)
 
 void kill_user(const char *source, const char *user, const char *reason)
 {
+#ifdef IRC_BAHAMUT
+    /* Bahamut uses SVSKILL as a better way to kill users. It sends back
+     * a QUIT message that Anope uses to clean up after the kill is done.
+     */
+    send_cmd(NULL, "SVSKILL %s :%s", user, reason);
+#else
     char *av[2];
     char buf[BUFSIZE];
 
@@ -89,6 +90,7 @@ void kill_user(const char *source, const char *user, const char *reason)
     send_cmd(source, "KILL %s :%s", user, av[1]);
     do_kill(source, 2, av);
     free(av[0]);
+#endif
 }
 
 /*************************************************************************/

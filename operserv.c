@@ -4460,11 +4460,7 @@ static int do_noop(User * u)
             u3 = nextuser();
             if ((u2) && is_oper(u2) && (u2->server)
                 && !stricmp(u2->server, server)) {
-#ifdef IRC_BAHAMUT
-                send_cmd(ServerName, "SVSKILL %s :%s", u2->nick, reason);
-#else
                 kill_user(s_OperServ, u2->nick, reason);
-#endif
             }
         }
     } else if (!stricmp(cmd, "REVOKE")) {

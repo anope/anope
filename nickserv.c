@@ -3839,11 +3839,7 @@ static int do_ghost(User * u)
             char buf[NICKMAX + 32];
             snprintf(buf, sizeof(buf), "GHOST command used by %s",
                      u->nick);
-#ifdef IRC_BAHAMUT
-            send_cmd(NULL, "SVSKILL %s :%s", nick, buf);
-#else
             kill_user(s_NickServ, nick, buf);
-#endif
             notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
@@ -3859,11 +3855,7 @@ static int do_ghost(User * u)
             char buf[NICKMAX + 32];
             snprintf(buf, sizeof(buf), "GHOST command used by %s",
                      u->nick);
-#ifdef IRC_BAHAMUT
-            send_cmd(NULL, "SVSKILL %s :%s", nick, buf);
-#else
             kill_user(s_NickServ, nick, buf);
-#endif
             notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);

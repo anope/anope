@@ -88,7 +88,7 @@ elif [ "$1" = "stop" ] ; then
 	isAnopeRunning
 	echo "Terminating Anope"
 	PID=`cat $ANOPEBIN$PIDFILE`
-	kill -SIGTERM $PID
+	kill -15 $PID
 
 elif [ "$1" = "status" ] ; then
 	if [ -f $ANOPEBIN$PIDFILE ] ; then
@@ -105,13 +105,13 @@ elif [ "$1" = "restart" ] ; then
 	isAnopeRunning
 	echo "Restarting Anope"
 	PID=`cat $ANOPEBIN$PIDFILE`
-	kill -SIGHUP $PID
+	kill -1 $PID
 
 elif [ "$1" = "rehash" ] ; then
 	isAnopeRunning
 	echo "Saving Databases and Rehashing Configuration"
 	PID=`cat $ANOPEBIN$PIDFILE`
-	kill -SIGUSR2 $PID
+	kill -12 $PID
 
 elif [ "$1" = "version" ] ; then
 	$ANOPEBIN$ANOPROG -version

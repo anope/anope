@@ -167,6 +167,7 @@ static void delete_server(Server * serv, const char *quitreason)
                 unext = nextuser();
                 if (u->server == serv) {
                     if ((na = u->na) && !(na->status & NS_VERBOTEN)
+                        && (!(na->nc->flags & NI_SUSPENDED))
                         && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
                         na->last_seen = time(NULL);
                         if (na->last_quit)

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="643"
+VERSION_BUILD="644"
 
 # $Log$
+#
+# BUILD : 1.7.8 (644)
+# BUGS  : 330
+# NOTES : Fixed bugs with nickserv suspend
 #
 # BUILD : 1.7.8 (643)
 # BUGS  : 

@@ -3734,10 +3734,17 @@ NICK_SERVADMIN_HELP_FORBID
 	Limited to Services admins.
 
 NICK_SERVADMIN_HELP_SUSPEND
-	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+	Syntax: SUSPEND nickname reason
 
-	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
+	SUSPENDs a nickname from being used.
+
+	Limited to Services admins.
+
+NICK_SERVADMIN_HELP_UNSUSPEND
+	Syntax: UNSUSPEND nickname
+
+	UNSUSPENDS a nickname from being used.
+
 	Limited to Services admins.
 
 ###########################################################################

@@ -23,7 +23,7 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 NickRequest *nrlists[1024];
 
-static int guestnum;            /* Current guest number */
+int guestnum;                   /* Current guest number */
 
 #define TO_COLLIDE   0          /* Collide the user with this nick */
 #define TO_RELEASE   1          /* Release a collided nick */

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="128"
+VERSION_BUILD="129"
 
 # $Log$
+#
+# BUILD : 1.7.3 (129)
+# BUGS  : 
+# NOTES : Changed guestnum from static to extern (internal change)
 #
 # BUILD : 1.7.3 (128)
 # NOTES : Typo no Changes file.

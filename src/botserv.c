@@ -2412,7 +2412,7 @@ char *normalizeBuffer(char *buf)
     int i, len, j = 0;
 
     len = strlen(buf);
-    newbuf = (char *) malloc((len + 1) * sizeof(char));
+    newbuf = (char *) malloc(sizeof(char) * len + 1);
 
     for (i = 0; i < len; i++) {
         switch (buf[i]) {

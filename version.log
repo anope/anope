@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="396"
+VERSION_BUILD="398"
 
 # $Log$
+#
+# BUILD : 1.7.5 (398)
+# BUGS  : N/A
+# NOTES : Tiny change to save 1*len bytes per line said in a botserv channel - they are freeed anyway, so... :)
 #
 # BUILD : 1.7.5 (396)
 # BUGS  : N/A

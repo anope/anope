@@ -1723,7 +1723,7 @@ static void release(NickAlias * na, int from_timeout)
         del_ns_timeout(na, TO_RELEASE);
     if (ircd->svshold) {
         if (UseSVSHOLD) {
-            anope_cmd_relase_svshold(na->nick);
+            anope_cmd_release_svshold(na->nick);
         } else {
             anope_cmd_quit(na->nick, NULL);
         }

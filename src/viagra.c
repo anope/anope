@@ -1403,7 +1403,7 @@ void anope_cmd_svshold(char *nick)
 }
 
 /* SVSHOLD - release */
-void anope_cmd_relase_svshold(char *nick)
+void anope_cmd_release_svshold(char *nick)
 {
     /* Not Supported by this IRCD */
 }

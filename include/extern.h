@@ -978,7 +978,7 @@ extern void anope_cmd_szline(char *mask, char *reason);			  	  		  /* SZLINE */
 extern void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
 extern void anope_cmd_svinfo();						  	  		  /* SVINFO */
 extern void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
-extern void anope_cmd_relase_svshold(char *nick);				  		  /* SVSHOLD */
+extern void anope_cmd_release_svshold(char *nick);				  		  /* SVSHOLD */
 extern void anope_cmd_svsinfo();								  /* SVSINFO */
 extern void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
 extern void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="28"
+VERSION_BUILD="29"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (29)
+# BUGS  : http://bugs.anope.org/show_bug.cgi?id=9
+# NOTES : Updated en_us.l file to show MAIL as a valid option on notify syntax response
 #
 # BUILD : 1.7.0 (28)
 # BUGS  : http://bugs.anope.org/show_bug.cgi?id=7

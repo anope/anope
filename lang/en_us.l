@@ -1583,7 +1583,7 @@ MEMO_SET_UNKNOWN_OPTION
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
-	SET NOTIFY {ON | LOGON | NEW | OFF}
+	SET NOTIFY {ON | LOGON | NEW | MAIL | OFF }
 MEMO_SET_NOTIFY_ON
 	%s will now notify you of memos when you log on and when they are sent to you.
 MEMO_SET_NOTIFY_LOGON

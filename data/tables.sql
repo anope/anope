@@ -194,7 +194,7 @@ CREATE TABLE anope_ns_alias (
   nick varchar(255) NOT NULL default '',
   time_registered int(10) unsigned NOT NULL default '0',
   last_seen int(10) unsigned NOT NULL default '0',
-  status smallint(6) NOT NULL default '0',
+  status int(11) unsigned NOT NULL default '0',
   last_usermask text NOT NULL,
   last_realname text NOT NULL,
   last_quit text NOT NULL,

@@ -6587,4 +6587,5 @@ OPER_SVSO_UNSUPPORTED
 OPER_UMODE_UNSUPPORTED
 	Sorry, UMODE ist auf diesem Netzwerk nicht verfügbar.
 
-
+OPER_SUPER_ADMIN_NOT_ENABLED
+	SuperAdmin muss in der services.conf eingeschaltet werden

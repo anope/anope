@@ -350,7 +350,9 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout, "-forceload     -forceload\n");
                 fprintf(stdout, "-readonly      -readonly\n");
                 fprintf(stdout, "-noexpire      -noexpire\n");
+#ifdef IS44_CONVERTER
                 fprintf(stdout, "-is44          -is44\n");
+#endif
                 fprintf(stdout, "-version       -version\n");
                 fprintf(stdout, "-help          -help\n");
                 fprintf(stdout, "-log           -log logfilename\n");

@@ -526,7 +526,7 @@ Directive directives[] = {
     {"Numeric", {{PARAM_POSINT, PARAM_RELOAD, &Numeric}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
-    {"NickRegDelay", {{PARAM_INT, PARAM_RELOAD, &NickRegDelay}}},
+    {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NickServName", {{PARAM_STRING, 0, &s_NickServ},
                       {PARAM_STRING, 0, &desc_NickServ}}},
     {"NickServAlias", {{PARAM_STRING, 0, &s_NickServAlias},

@@ -6362,3 +6362,6 @@ OPER_SVSO_UNSUPPORTED
 OPER_UMODE_UNSUPPORTED
 	Lo siento, OLINE no esta disponible en esta red.
 
+OPER_SUPER_ADMIN_NOT_ENABLED
+	SuperAdmin setting not enabled in services.conf
+

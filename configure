@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT RM CP TOUCH INSTALL CPP EGREP MYSQL RDB MYSQLCLIENT_LDFLAGS MYSQLCLIENT_CFLAGS MYSQLCLIENT_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS ANOPELIBS RUNGROUP BINDEST DATDEST MODULE_PATH LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT RM CP TOUCH INSTALL CPP EGREP MYSQL RDB MYSQLCLIENT_LDFLAGS MYSQLCLIENT_CFLAGS MYSQLCLIENT_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS ANOPELIBS RUNGROUP BINDEST DATDEST MODULE_PATH IRCDFILE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -8513,17 +8513,13 @@ fi;
 if test "${with_ircd+set}" = set; then
   withval="$with_ircd"
 
-    if test "$withval" = "IRC_DREAMFORGE"; then
-
-cat >>confdefs.h <<\_ACEOF
-#define IRC_DREAMFORGE 1
-_ACEOF
-
-    elif test "$withval" = "IRC_BAHAMUT"; then
+    if test "$withval" = "IRC_BAHAMUT"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_BAHAMUT 1
 _ACEOF
+
+		IRCDFILE=" bahamut.c "
 
     elif test "$withval" = "IRC_UNREAL31"; then
 
@@ -8531,11 +8527,15 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_UNREAL31 1
 _ACEOF
 
+		IRCDFILE=" unreal31.c "
+
     elif test "$withval" = "IRC_ULTIMATE2"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_ULTIMATE2 1
 _ACEOF
+
+		IRCDFILE=" ultimate2.c "
 
     elif test "$withval" = "IRC_ULTIMATE3"; then
 
@@ -8543,11 +8543,15 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_ULTIMATE3 1
 _ACEOF
 
+		IRCDFILE=" ultimate3.c "
+
     elif test "$withval" = "IRC_HYBRID"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_HYBRID 1
 _ACEOF
+
+		IRCDFILE=" hybrid.c "
 
     elif test "$withval" = "IRC_VIAGRA"; then
 
@@ -8555,11 +8559,15 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_VIAGRA 1
 _ACEOF
 
+		IRCDFILE=" viagra.c "
+
     elif test "$withval" = "IRC_PTLINK"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_PTLINK 1
 _ACEOF
+
+		IRCDFILE=" ptlink.c "
 
     elif test "$withval" = "IRC_RAGE2"; then
 
@@ -8567,17 +8575,23 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_RAGE2 1
 _ACEOF
 
+		IRCDFILE=" rageircd.c "
+
     elif test "$withval" = "IRC_UNREAL32"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_UNREAL32 1
 _ACEOF
 
+		IRCDFILE=" unreal32.c "
+
     elif test "$withval" = "IRC_SOLID"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_SOLID 1
 _ACEOF
+
+		IRCDFILE=" solidircd.c "
 
 
     fi
@@ -9248,6 +9262,7 @@ s,@RUNGROUP@,$RUNGROUP,;t t
 s,@BINDEST@,$BINDEST,;t t
 s,@DATDEST@,$DATDEST,;t t
 s,@MODULE_PATH@,$MODULE_PATH,;t t
+s,@IRCDFILE@,$IRCDFILE,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

@@ -126,9 +126,7 @@ extern void expire_all(void)
         waiting = -27;
         expire_szlines();
     }
-#ifndef STREAMLINED
     expire_exceptions();
-#endif
 #ifdef USE_THREADS
     if (ProxyDetect)
         proxy_expire();
@@ -241,8 +239,10 @@ static void services_restart(void)
  **/
 void do_restart_services(void)
 {
-    expire_all();
-    save_databases();
+    if (!readonly) {
+        expire_all();
+        save_databases();
+    }
     services_restart();
     exit(1);
 }
@@ -446,16 +446,24 @@ int main(int ac, char **av, char **envp)
     else
         progname = av[0];
 
-    /* Were we run under "listnicks" or "listchans"?  Do appropriate stuff
-     * if so. */
-    if (strcmp(progname, "listnicks") == 0) {
+#ifdef __CYGWIN__
+    if (strcmp(progname, "listnicks.exe") == 0)
+#else
+    if (strcmp(progname, "listnicks") == 0)
+#endif
+    {
         do_listnicks(ac, av);
         return 0;
-    } else if (strcmp(progname, "listchans") == 0) {
+    }
+#ifdef __CYGWIN__
+    else if (strcmp(progname, "listchans.exe") == 0)
+#else
+    else if (strcmp(progname, "listchans") == 0)
+#endif
+    {
         do_listchans(ac, av);
         return 0;
     }
-
 
     /* Initialization stuff. */
     if ((i = init(ac, av)) != 0)

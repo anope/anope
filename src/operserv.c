@@ -190,10 +190,8 @@ void moduleAddOperServCmds(void) {
     c = createCommand("QUIT",       do_os_quit,    is_services_admin,OPER_HELP_QUIT, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SHUTDOWN",   do_shutdown,   is_services_admin,OPER_HELP_SHUTDOWN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("RESTART",    do_restart,    is_services_admin,OPER_HELP_RESTART, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#ifndef STREAMLINED
     c = createCommand("SESSION",    do_session,    is_services_admin,OPER_HELP_SESSION, -1,-1,-1, -1); addCoreCommand(OPERSERV,c);
     c = createCommand("EXCEPTION",  do_exception,  is_services_admin,OPER_HELP_EXCEPTION, -1,-1,-1, -1); addCoreCommand(OPERSERV,c);
-#endif
     c = createCommand("CHANLIST",   do_chanlist,   is_services_admin,OPER_HELP_CHANLIST,   -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("USERLIST",   do_userlist,   is_services_admin,OPER_HELP_USERLIST,   -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("CACHE",      do_cache,      is_services_admin,OPER_HELP_CACHE,      -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
@@ -876,7 +874,6 @@ int nick_is_services_oper(NickCore * nc)
 
 void check_clones(User * user)
 {
-#ifndef STREAMLINED
     int i, clone_count;
     long last_time;
 
@@ -925,7 +922,6 @@ void check_clones(User * user)
                 kill_user(s_OperServ, user->nick, "Clone kill");
         }
     }
-#endif                          /* !STREAMLINED */
 }
 
 /*************************************************************************/
@@ -4617,14 +4613,16 @@ static int do_set(User * u)
 	 * Rob
          **/
     } else if (stricmp(option, "SUPERADMIN") == 0) {
-        if (SuperAdmin && (stricmp(setting, "on") == 0)) {
+        if (!SuperAdmin) {
+            notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_NOT_ENABLED);
+        } else if (stricmp(setting, "on") == 0) {
             u->isSuperAdmin = 1;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
             alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
             anope_cmd_global(s_OperServ,
                              getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON),
                              u->nick);
-        } else if (SuperAdmin && (stricmp(setting, "off") == 0)) {
+        } else if (stricmp(setting, "off") == 0) {
             u->isSuperAdmin = 0;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
             alog("%s: %s is no longer a SuperAdmin", s_OperServ, u->nick);

@@ -13,6 +13,14 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/19 F Segfault if USERDB enabled and tables don't exist                 [#255]
+12/18 F Now only builds the ircd you selected.                            [ #00]
+12/17 F In some cases READONLY was not respected, and data was saved.     [#244] 
+12/17 F Corrected a few mistakes in example.conf.                         [#251]
+12/17 F Wrong column type in tables.sql for nick alias status fiag.       [#248]
+12/17 F listchans and listnicks work under Cygwin.                        [#247]
+12/17 F NickRegDelay no longer accepts negative values.                   [#250]
+12/17 F -is44 option not show if converter not built.                     [#249]
 12/11 F Fixed possible crashbug (NULL-free) in nickserv's delcore().      [ #00]
 12/09 F Hybrid crash on unsetting registration mode.                      [ #00]
 12/09 F BotServ !seen not recognizing founder.                            [#167]
@@ -53,6 +61,9 @@ Provided by DrStein <gacevedo@anope.org> - 2004
 11/26 F Memos sent as notification of receipt can't be cancelled.         [#192]
 11/23 F Moving Services Operators to Services Admins and vice-versa.      [#230]
 11/22 F HelpChan +h mode not being given if status was greater then op.   [#223]
+
+Provided by Jens Hoffrichter <joho@nickstories.de> - 2004
+12/17 F Provides clear message of SUPERADMIN is not enabled.              [#246]
 
 Anope Version 1.7.6
 -------------------

@@ -489,11 +489,9 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             if (check_szline(nick, ipbuf))
                 return NULL;
         }
-#ifndef STREAMLINED
         /* Now check for session limits */
         if (LimitSessions && !add_session(nick, host))
             return NULL;
-#endif
 
         /* And finally, for proxy ;) */
 #ifdef USE_THREADS
@@ -722,11 +720,9 @@ void do_quit(const char *source, int ac, char **av)
             free(na->last_quit);
         na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
     }
-#ifndef STREAMLINED
     if (LimitSessions) {
         del_session(user->host);
     }
-#endif
     delete_user(user);
 }
 
@@ -760,11 +756,9 @@ void do_kill(char *nick, char *msg)
         na->last_quit = *msg ? sstrdup(msg) : NULL;
 
     }
-#ifndef STREAMLINED
     if (LimitSessions) {
         del_session(user->host);
     }
-#endif
     delete_user(user);
 }
 

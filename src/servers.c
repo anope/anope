@@ -160,11 +160,9 @@ static void delete_server(Server * serv, const char *quitreason)
                         na->last_quit =
                             (quitreason ? sstrdup(quitreason) : NULL);
                     }
-#ifndef STREAMLINED
                     if (LimitSessions) {
                         del_session(u->host);
                     }
-#endif
                     delete_user(u);
                 }
                 u = unext;

@@ -900,6 +900,7 @@ void db_mysql_load_bs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -936,6 +937,7 @@ void db_mysql_load_hs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -970,6 +972,7 @@ void db_mysql_load_news(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     nnews = mysql_num_rows(mysql_res);
@@ -1009,6 +1012,7 @@ void db_mysql_load_exceptions(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     nexceptions = mysql_num_rows(mysql_res);
@@ -1044,6 +1048,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1065,6 +1070,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     slist_setcapacity(&akills, akc);
@@ -1089,6 +1095,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1107,6 +1114,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1125,6 +1133,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1143,6 +1152,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1183,6 +1193,7 @@ void db_mysql_load_cs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1242,6 +1253,7 @@ void db_mysql_load_cs_dbase(void)
         if (db_mysql_query(sqlcmd)) {
             log_perror("Can't create sql query: %s", sqlcmd);
             db_mysql_error(MYSQL_WARNING, "query");
+			return;
         }
         res = mysql_store_result(mysql);
         n_levels = mysql_num_rows(res);
@@ -1260,6 +1272,7 @@ void db_mysql_load_cs_dbase(void)
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
+				return;
             }
             res = mysql_store_result(mysql);
             j = 0;
@@ -1287,6 +1300,7 @@ void db_mysql_load_cs_dbase(void)
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
+				return;
             }
             res = mysql_store_result(mysql);
             j = 0;
@@ -1415,6 +1429,7 @@ void db_mysql_load_ns_req_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1451,6 +1466,7 @@ void db_mysql_load_ns_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
+		return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {

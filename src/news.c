@@ -428,13 +428,15 @@ static void do_news_add(User * u, int16 type, int *msgs,
         snprintf(buf, sizeof(buf), "%sNEWS", typename);
         syntax_error(s_OperServ, u, buf, msgs[MSG_ADD_SYNTAX]);
     } else {
+        if (readonly) {
+            notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			return;
+		}
         int n = add_newsitem(u, text, type);
         if (n < 0)
             notice_lang(s_OperServ, u, msgs[MSG_ADD_FULL]);
         else
             notice_lang(s_OperServ, u, msgs[MSG_ADDED], n);
-        if (readonly)
-            notice_lang(s_OperServ, u, READ_ONLY_MODE);
     }
 }
 
@@ -488,6 +490,10 @@ static void do_news_del(User * u, int16 type, int *msgs,
         snprintf(buf, sizeof(buf), "%sNEWS", typename);
         syntax_error(s_OperServ, u, buf, msgs[MSG_DEL_SYNTAX]);
     } else {
+        if (readonly) {
+            notice_lang(s_OperServ, u, READ_ONLY_MODE);
+			return;
+		}
         if (stricmp(text, "ALL") != 0) {
             int num = atoi(text);
             if (num > 0 && del_newsitem(num, type)) {
@@ -505,8 +511,6 @@ static void do_news_del(User * u, int16 type, int *msgs,
             else
                 notice_lang(s_OperServ, u, msgs[MSG_DEL_NONE]);
         }
-        if (readonly)
-            notice_lang(s_OperServ, u, READ_ONLY_MODE);
     }
 }
 

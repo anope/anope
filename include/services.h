@@ -339,7 +339,7 @@ struct memo_ {
 };
 
 typedef struct {
-    uint16 memocount, memomax;
+    int16 memocount, memomax;
     Memo *memos;
 } MemoInfo;
 

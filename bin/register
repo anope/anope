@@ -14,7 +14,7 @@ REGCACHE="register.cache"
 SENDMAIL="/usr/sbin/sendmail"
 
 # SCRIPT VERSION NUMBER (DO NOT ALTER)
-REGISTERVERSION="1.1"
+REGISTERVERSION="1.2"
 
 # DO NOT CHANGE IF YOU WANT TO REGISTER WITH ANOPE
 REGISTRYADDRESS="register@anope.org"
@@ -23,6 +23,11 @@ REGISTRYADDRESS="register@anope.org"
 # END OF CONFIGURATION
 # YOU ARE NOT REQUIRED TO CHANGE ANYTHING BELOW
 ################################################
+
+if [ $0 != "./register" ] ; then
+	echo "Warning: Run this file while in the /bin/ directory (e.g. ./register)"
+	exit 1
+fi
 
 if [ ! -f $CACHEFILE ] ; then
         echo "Warning: Configuration cache file missing. Run ./configure"

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="174"
+VERSION_BUILD="176"
 
 # $Log$
+#
+# BUILD : 1.7.3 (176)
+# BUGS  : 
+# NOTES : Added check to make sure register script was being run from within the bin/ directory. If ./bin/register was used, the path to cache file would be incorrect (../config.cache)
 #
 # BUILD : 1.7.3 (174)
 # BUGS  : 

@@ -2192,6 +2192,10 @@ static int do_confirm(User * u)
         notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
     }
 
+    /* Enable nick tracking if enabled*/
+    if (NSNickTracking)
+        nsStartNickTracking(u);
+
     return MOD_CONT;
 }
 
@@ -2414,6 +2418,10 @@ static int do_identify(User * u)
 
         if (!(na->status & NS_RECOGNIZED))
             check_memos(u);
+
+        /* Enable nick tracking if enabled*/
+        if (NSNickTracking)
+            nsStartNickTracking(u);
     }
     return MOD_CONT;
 }
@@ -2577,6 +2585,10 @@ static int do_logout(User * u)
             notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
         else
             notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
+
+        /* Stop nick tracking if enabled*/
+        if (NSNickTracking)
+            nsStopNickTracking(u);
     }
     return MOD_CONT;
 }
@@ -2749,6 +2761,11 @@ static int do_set_display(User * u, NickCore * nc, char *param)
 
     change_core_display(nc, param);
     notice_lang(s_NickServ, u, NICK_SET_DISPLAY_CHANGED, nc->display);
+
+    /* Enable nick tracking if enabled*/
+    if (NSNickTracking)
+        nsStartNickTracking(u);
+
     return MOD_CONT;
 }
 
@@ -4064,4 +4081,71 @@ static int do_forbid(User * u)
 int ns_do_register(User * u)
 {
     return do_register(u);
+}
+
+/*************************************************************************/
+/*               
+ * Nick tracking
+ */
+
+/**
+ * Start Nick tracking and store the nick core display under the user struct.
+ * @param u The user to track nicks for
+ **/
+void nsStartNickTracking(User * u)
+{
+    NickCore *nc;
+
+    /* We only track identified users */
+    if (nick_identified(u)) {
+        nc = u->na->nc;
+
+        /* Release memory if needed */
+        if (u->nickTrack)
+            free(u->nickTrack);
+
+        /* Copy the nick core displayed nick to
+           the user structure for further checks */
+        u->nickTrack = sstrdup(nc->display);
+    }
+}
+
+/**
+ * Stop Nick tracking and remove the nick core display under the user struct.
+ * @param u The user to stop tracking for
+ **/
+void nsStopNickTracking(User * u)
+{
+    /* Simple enough. If its there, release it */
+    if (u->nickTrack) {
+        free(u->nickTrack);
+        u->nickTrack = NULL;
+    }
+}
+
+/**
+ * Boolean function to check if the user requesting a nick has the tracking
+ * signature of that core in its structure.
+ * @param u The user whom to check tracking for
+ **/
+int nsCheckNickTracking(User *u)
+{
+    NickCore *nc;
+    NickAlias *na;
+    char* nick;
+
+    /* No nick alias or nick return false by default */
+    if((!(na = u->na)) || (!(nick = na->nick))) 
+        return 0;
+
+    /* Get the core for the requested nick */
+    nc = na->nc;
+
+    /* If the core and the tracking displayed nick are there,
+     * and they match, return true
+     */
+    if (nc && u->nickTrack && (strcmp(nc->display, u->nickTrack) == 0))
+        return 1;
+    else 
+        return 0;
 }

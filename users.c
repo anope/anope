@@ -712,6 +712,11 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             user->na->status |= NS_IDENTIFIED;
             check_memos(user);
             nc_changed = 0;
+
+            /* Start nick tracking if available */
+            if (NSNickTracking)
+                nsStartNickTracking(user);
+
         } else if (svid != 1) {
             /* Resets the svid because it doesn't match */
             user->svid = 1;
@@ -788,6 +793,12 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             return NULL;
 
     }                           /* if (!*source) */
+
+    /* Check for nick tracking to bypass identification */
+    if (NSNickTracking && nsCheckNickTracking(user)) {
+        user->na->status |= NS_IDENTIFIED;
+        nc_changed = 0;
+    }
 
     if (nc_changed || !nick_recognized(user)) {
         if (validate_user(user))

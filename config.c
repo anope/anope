@@ -175,6 +175,7 @@ int NSStrictPrivileges;
 int NSEmailReg;
 int NSModeOnID;
 int NSRestrictGetPass;
+int NSNickTracking;
 
 int CSDefNone;
 int CSDefKeepTopic;
@@ -542,6 +543,7 @@ Directive directives[] = {
     {"NSStrictPrivileges",
      {{PARAM_SET, PARAM_RELOAD, &NSStrictPrivileges}}},
     {"NSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &NSRestrictGetPass}}},
+    {"NSNickTracking", {{PARAM_SET, PARAM_RELOAD, &NSNickTracking}}},
     {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
     {"OperServName", {{PARAM_STRING, 0, &s_OperServ},
                       {PARAM_STRING, 0, &desc_OperServ}}},

@@ -329,6 +329,7 @@ E int   NSStrictPrivileges;
 E int   NSEmailReg;
 E int   NSModeOnID;
 E int   NSRestrictGetPass;
+E int   NSNickTracking;
 
 E int   CSDefFlags;
 E int   CSMaxReg;
@@ -660,6 +661,10 @@ E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickCore  *findcore(const char *nick);
 E void clean_ns_timeouts(NickAlias * na);
+
+E void nsStartNickTracking(User * u);
+E void nsStopNickTracking(User * u);
+E int nsCheckNickTracking(User *u);
 
 /**** helpserv.c  ****/
 E void helpserv(User * u, char *buf);

@@ -1,6 +1,8 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
+05/24 A New NSNickTracking directive to track nick cores when
+        changing nicks.
 05/21 A Auto enforce upon AKICK addition.                                 [ #63]
 05/21 A New file docs/OLDCHANGES contains all change history.             [ #65]
 05/24 F Cleaned up compile errors on older compilers.                     [ #69]

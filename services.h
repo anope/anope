@@ -711,6 +711,8 @@ struct user_ {
     char *realname;
     char *server;			/* Name of server user is on */
 
+    char *nickTrack;			/* Nick Tracking */
+
     time_t timestamp;		/* Timestamp of the nick */
     time_t my_signon;		/* When did _we_ see the user? */
     uint32 svid;			/* Services ID */

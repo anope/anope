@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="51"
+VERSION_BUILD="53"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (53)
+# BUGS  : 10
+# NOTES : Fixed previous MySQL fix for saving nick passwords.
 #
 # BUILD : 1.7.1 (51)
 # NOTES : SVN Framework.

@@ -208,11 +208,12 @@ void db_mysql_save_ns_req(NickRequest * nr)
 char *db_mysql_secure(char *pass)
 {
 
+    char epass[BUFSIZE];
+
 #ifdef USE_ENCRYPTION
     /* If we use the builtin encryption don't double encrypt! */
-    return sstrdup(pass);
+    snprintf(epass, sizeof(epass), "'%s'", pass);
 #else
-    char epass[BUFSIZE];
 
     if (!pass) {
         snprintf(epass, sizeof(epass), "''");
@@ -229,8 +230,9 @@ char *db_mysql_secure(char *pass)
                  MysqlSecure);
     }
 
-    return sstrdup(epass);
 #endif
+
+    return sstrdup(epass);
 
 }
 
@@ -256,7 +258,7 @@ void db_mysql_save_ns_core(NickCore * nc)
     /* Let's take care of the core itself */
     /* Update the existing records */
     snprintf(sqlcmd, MAX_SQL_BUF,
-             "UPDATE anope_ns_core SET pass='%s',email='%s',greet='%s',icq='%d',url='%s',flags='%d',"
+             "UPDATE anope_ns_core SET pass=%s,email='%s',greet='%s',icq='%d',url='%s',flags='%d',"
              "language='%d',accesscount='%d',memocount='%d',memomax='%d',channelcount='%d'"
              ",channelmax='%d',active='1' WHERE display='%s'",
              epass, cemail, cgreet, nc->icq, curl, nc->flags,
@@ -414,7 +416,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
 
     /* Let's take care of the core itself */
     snprintf(sqlcmd, MAX_SQL_BUF,
-             "UPDATE anope_cs_info SET founder='%s',successor='%s',founderpass='%s',"
+             "UPDATE anope_cs_info SET founder=%s,successor='%s',founderpass='%s',"
              "descr='%s',url='%s',email='%s',time_registered='%d',last_used='%d',"
              "last_topic='%s',last_topic_setter='%s',last_topic_time='%d',flags='%d',"
              "forbidby='%s',forbidreason='%s',bantype='%d',accesscount='%d',"

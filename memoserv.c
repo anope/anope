@@ -293,7 +293,8 @@ void memo_send(User * u, char *name, char *text, int z)
             notice_lang(s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, MSSendDelay);
 
         if (z == 3)
-            notice_lang(s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT, MSSendDelay);
+            notice_lang(s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT,
+                        MSSendDelay);
 
     } else if (mi->memomax == 0 && !is_servadmin) {
         if (z == 0 || z == 3)
@@ -325,7 +326,7 @@ void memo_send(User * u, char *name, char *text, int z)
         m->flags = MF_UNREAD;
         /* Set receipt request flag */
         if (z == 3)
-           m->flags |= MF_RECEIPT;
+            m->flags |= MF_RECEIPT;
         if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_SENT, name);
         if (!ischan) {
@@ -561,7 +562,7 @@ static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
 
     /* Check if a receipt notification was requested */
     if (m->flags && MF_RECEIPT) {
-       rsend_notify(u, m, chan);
+        rsend_notify(u, m, chan);
     }
 
     return 1;
@@ -1262,7 +1263,7 @@ static int do_rsend(User * u)
 /*************************************************************************/
 /* Send receipt notification to sender. */
 
-void rsend_notify(User *u, Memo *m, const char *chan)
+void rsend_notify(User * u, Memo * m, const char *chan)
 {
     NickAlias *na;
     NickCore *nc;

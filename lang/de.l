@@ -1742,6 +1742,27 @@ MEMO_MAIL_TEXT3
 ###########################################################################
 	
 # Standard responses
+MEMO_RSEND_PLEASE_WAIT
+	Please wait %d seconds before using the RSEND command again.
+MEMO_RSEND_DISABLED
+	Sorry, RSEND has been disabled on this network.
+MEMO_RSEND_SYNTAX
+	RSEND {nick | channel} memo-text
+MEMO_RSEND_NICK_MEMO_TEXT
+	[auto-memo] The memo you sent has been viewed.
+MEMO_RSEND_CHAN_MEMO_TEXT
+	[auto-memo] The memo you sent to %s has been viewed.
+MEMO_RSEND_USER_NOTIFICATION
+	A notification memo has been sent to %s informing him/her you have
+	read his/her memo.
+
+###########################################################################
+#
+# BotServ messages
+#
+###########################################################################
+	
+# Standard responses
 BOT_DOES_NOT_EXIST
 	Bot %s gibt es nicht.
 BOT_NOT_ASSIGNED
@@ -5140,6 +5161,23 @@ MEMO_HELP_SENDALL
 
 	Sends allen registrieten Usern eine Nachricht mit dem 
 	memo-text.
+
+###########################################################################
+#
+# OperServ help messages
+#
+###########################################################################
+
+MEMO_HELP_RSEND
+	Syntax: RSEND {nick | channel} memo-text
+	
+	Sends the named nick or channel a memo containing
+	memo-text.  When sending to a nickname, the recipient will
+	receive a notice that he/she has a new memo.  The target
+	nickname/channel must be registered.
+	Once the memo is read by its recepient, an automatic notification
+	memo will be sent to the sender informing him/her that the memo
+	has been read.
 
 ###########################################################################
 #

@@ -58,6 +58,7 @@ int db_mysql_init()
         do_mysql = 1;
         alog("MySQL has been enabled.");
     }
+
     if (!db_mysql_open())
         do_mysql = 0;
 

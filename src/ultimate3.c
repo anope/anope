@@ -103,6 +103,7 @@ IRCDVar ircd[] = {
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
+     1,                         /* Sglines are enforced */
      },
     {NULL}
 };

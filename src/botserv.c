@@ -1595,7 +1595,7 @@ static int do_assign(User * u)
             bot_join(ci);
         }
         notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
-        send_event(EVENT_BOT_ASSIGN, bi->nick);
+        send_event(EVENT_BOT_ASSIGN, ci->name);
     }
     return MOD_CONT;
 }

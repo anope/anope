@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="615"
+VERSION_BUILD="616"
 
 # $Log$
+#
+# BUILD : 1.7.8 (616)
+# BUGS  : 
+# NOTES : Added EVENT_DB_BACKUP and changed EVENT_BOT_ASSIGN to pass channel name instead of bot nick as argument
 #
 # BUILD : 1.7.8 (615)
 # BUGS  : N/A

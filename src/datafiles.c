@@ -674,6 +674,7 @@ void backup_databases(void)
 
         char ext[9];
 
+        send_event(EVENT_DB_BACKUP, EVENT_START);
         alog("Backing up databases");
 
         remove_backups();
@@ -695,5 +696,6 @@ void backup_databases(void)
         rename_database(OperDBName, ext);
         rename_database(NewsDBName, ext);
         rename_database(ExceptionDBName, ext);
+        send_event(EVENT_DB_BACKUP, EVENT_STOP);
     }
 }

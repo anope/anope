@@ -139,7 +139,7 @@ Anope Internal Events
 
     EVENT_BOT_ASSIGN
         A BotServ bot has been assigned to a channel.
-        The argument contains the nickname of the bot involved.
+        The argument contains the name of the channel has been assigned to.
 
     EVENT_BOT_CHANGE
         The properties of a BotServ bot have been changed.
@@ -205,6 +205,11 @@ Anope Internal Events
         This event is emitted when the databases are being saved.
         The argument is either EVENT_START or EVENT_STOP, to indicate if it's
         emitted before or after the saving routines.
+
+    EVENT_DB_BACKUP
+        This event is emitted when the databases are backed up.
+        The event will send EVENT_START when the backup commences, and
+        EVENT_STOP when it finishes.
 
     EVENT_DEFCON_LEVEL
         The DefCon level has just been changed. This event is emitted before

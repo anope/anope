@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="20"
+VERSION_BUILD="23"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (23)
+# BUGS  : none.
+# NOTES : Spelling error
 #
 # BUILD : 1.7.0 (20)
 # BUGS  : none

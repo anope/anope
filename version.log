@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="166"
+VERSION_BUILD="167"
 
 # $Log$
+#
+# BUILD : 1.7.3 (167)
+# BUGS  : 
+# NOTES : Fixed a typo in my last submit, which caused a compile error.
 #
 # BUILD : 1.7.3 (166)
 # BUGS  : #84

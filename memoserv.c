@@ -305,7 +305,7 @@ void memo_send(User * u, char *name, char *text, int z)
             notice_lang(s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
 
     } else if (mi->memomax > 0 && mi->memocount >= mi->memomax
-               && !is_servop) {
+               && !is_servoper) {
         if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
 

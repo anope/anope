@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="423"
+VERSION_BUILD="424"
 
 # $Log$
+#
+# BUILD : 1.7.5 (424)
+# BUGS  : N/A
+# NOTES : Updated de.l per crazytoon
 #
 # BUILD : 1.7.5 (423)
 # BUGS  : N/A

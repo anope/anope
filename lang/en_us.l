@@ -5374,7 +5374,7 @@ OPER_HELP_SET
 	    DEBUG      Activate or deactivate debug mode
 	    NOEXPIRE   Activate or deactivate no expire mode
 	    SUPERADMIN Activate or deactivate super-admin mode
-	    SQL   	 Activate or deactivate sql mode
+	    SQL        Activate or deactivate sql mode
 	    IGNORE     Activate or deactivate ignore mode
 	    LIST       List the options
 

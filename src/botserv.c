@@ -2570,14 +2570,30 @@ char *normalizeBuffer(char *buf)
             if (isdigit(buf[i + 1])) {
                 i++;
 
+                /* not the best way to remove colors
+                 * which are two digit but no worse then
+                 * how the Unreal does with +S - TSL
+                 */
+                if (isdigit(buf[i + 1])) {
+                    i++;
+                }
+
                 /* Check for background color code
                  * and remove it as well
                  */
                 if (buf[i + 1] == ',') {
                     i++;
 
-                    if (isdigit(buf[i + 1]))
+                    if (isdigit(buf[i + 1])) {
                         i++;
+                    }
+                    /* not the best way to remove colors
+                     * which are two digit but no worse then
+                     * how the Unreal does with +S - TSL
+                     */
+                    if (isdigit(buf[i + 1])) {
+                        i++;
+                    }
                 }
             }
 

@@ -326,6 +326,8 @@ long unsigned int UserKey3;
 
 int Numeric;
 
+int UnRestrictSAdmin;
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -631,6 +633,7 @@ Directive directives[] = {
     {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
     {"UseSVS2MODE", {{PARAM_SET, PARAM_RELOAD, &UseSVS2MODE}}},
     {"UseTokens", {{PARAM_SET, 0, &UseTokens}}},
+    {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
     {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
     {"WallDrop", {{PARAM_SET, PARAM_RELOAD, &WallDrop}}},

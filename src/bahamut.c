@@ -165,6 +165,9 @@ void anope_set_umode(User * user, int ac, char **av)
             add = 0;
             break;
         case 'a':
+            if (UnRestrictSAdmin) {
+                break;
+            }
             if (add && !is_services_admin(user)) {
                 common_svsmode(user, "-a", NULL);
                 user->mode &= ~UMODE_a;

@@ -31,7 +31,7 @@
 # In help messages, "%S" (capital S, not lowercase) refers to the name of
 # the service sending the message; for example, in NickServ help messages,
 # "%S" is replaced by "NickServ" (or whatever it is renamed to in
-# config.h).  The %S's do not count as sprintf() parameters, so they can be
+# services.conf).  The %S's do not count as sprintf() parameters, so they can be
 # rearranged, removed, or added as necessary.
 #
 # Also in help messages, please try to limit line lengths to 60 characters
@@ -555,7 +555,7 @@ NICK_SET_NOEXPIRE_OFF
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
-	ACCESS {ADD | DEL | LIST} [mask]
+	ACCESS {ADD | DEL | LIST} [Maske]
 NICK_ACCESS_ALREADY_PRESENT
 	Diese Hostmaske %s ist bereits auf der Access-Liste.
 NICK_ACCESS_REACHED_LIMIT
@@ -654,7 +654,7 @@ NICK_ALIST_HEADER
 	  Nummer  Channel              Level    Description 
 NICK_ALIST_HEADER_X
 	Die Channels auf die %s Zugriff hat:
-	  Nummmer  Channel              Level    Description 
+	  Nummer  Channel              Level    Description 
 NICK_ALIST_XOP_FORMAT
 	  %3d %c%-20s %-8s %s
 NICK_ALIST_ACCESS_FORMAT
@@ -1521,7 +1521,7 @@ CHAN_FORBID_REASON
 CHAN_SUSPEND_SYNTAX
 	SUSPEND Channel [Grund]
 CHAN_SUSPEND_SYNTAX_REASON
-	SUSPEND Channel Geason
+	SUSPEND Channel Grund
 CHAN_SUSPEND_SUCCEEDED
 	Der Channel %s ist jetzt auf SUSPENDED gesetzt.
 CHAN_SUSPEND_FAILED
@@ -1627,7 +1627,7 @@ MEMO_LIST_NEW_MEMOS
 MEMO_LIST_CHAN_MEMOS
 	Memos für %s.  Um sie zu lesen, tippe /msg %s READ %s Nummer
 MEMO_LIST_CHAN_NEW_MEMOS
-	Neue Memos für %s.  Um sie zu lesen, tippe /msg %s READ %s Nummmer
+	Neue Memos für %s.  Um sie zu lesen, tippe /msg %s READ %s Nummer
 MEMO_LIST_HEADER
 	 Nummer  Sender            Datum/Zeit
 MEMO_LIST_FORMAT
@@ -1818,9 +1818,9 @@ MEMO_RSEND_USER_NOTIFICATION
 MEMO_CHECK_SYNTAX
 	CHECK Nickname
 MEMO_CHECK_NOT_READ
-	Die letzte Memo die du zum %s gesendet hast (gesendet am %s) wurde nicht gelesen.
+	Die letzte Memo die du zu %s gesendet hast (gesendet am %s) wurde nicht gelesen.
 MEMO_CHECK_READ
-	Die letzte Memo die du zum %s gesendet hast (gesendet am %s) wurde gelesen.
+	Die letzte Memo die du zu %s gesendet hast (gesendet am %s) wurde gelesen.
 MEMO_CHECK_NO_MEMO
 	Nickname %s hat keine Memo von dir.
 
@@ -1919,7 +1919,7 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN chan
+	UNASSIGN channel
 BOT_UNASSIGN_UNASSIGNED
 	Der Bot von %s wurde entfernt.
 	
@@ -4091,9 +4091,9 @@ CHAN_HELP_SET
 	    SECUREFOUNDER Strengere Kontrolle des Founder-Status
 	    SIGNKICK      Kicks durch ChanServ in dem Channel
 	                     werden durch den Kicker signiert
-	    OPNOTICE      Sendet eine Notice wenn Op/Deop-Kommandos
+	    OPNOTICE      Sendet eine Notice wenn Op/Deop-Befehl
 	                     benutzt werden
-	    XOP           Toggle the user privilege system
+	    XOP           Schaltet das Listen System ein oder aus
 	
 	Tippe /msg %S HELP Option für weitere Informationen
 	zu einem bestimmten Befehl.
@@ -4364,7 +4364,7 @@ CHAN_HELP_AOP
 CHAN_HELP_HOP
 	Syntax: HOP Channel ADD Nickname
 	        HOP Channel DEL {Nickname | entry-num | Liste}
-	        HOP Channel LIST [Mask | Liste]
+	        HOP Channel LIST [Maske | Liste]
 	        HOP Channel CLEAR
 	
 	Verwaltet die HOP (HalfOP) Liste eines Channels. User auf
@@ -5671,7 +5671,7 @@ OPER_HELP_SQLINE
 
 	SQLINE VIEW ist eine ausführlichere Version von SQLINE LIST
 	und zeigt an, wer eine SQLINE gesetzt hat, das Datum und wann
-	diese ausläuft, ausserdem die Mask und den Grund.
+	diese ausläuft, ausserdem die Maske und den Grund.
 	
 	SQLINE CLEAR löscht alle Einträge der SQLINE Liste.
 	

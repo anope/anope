@@ -29,7 +29,7 @@
 # In help messages, "%S" (capital S, not lowercase) refers to the name of
 # the service sending the message; for example, in NickServ help messages,
 # "%S" is replaced by "NickServ" (or whatever it is renamed to in
-# config.h).  The %S's do not count as sprintf() parameters, so they can be
+# services.conf).  The %S's do not count as sprintf() parameters, so they can be
 # rearranged, removed, or added as necessary.
 #
 # Also in help messages, please try to limit line lengths to 60 characters

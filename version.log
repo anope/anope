@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="433"
+VERSION_BUILD="434"
 
 # $Log$
+#
+# BUILD : 1.7.5 (434)
+# BUGS  : N/A
+# NOTES : 1. fixed typo in the lang files, 2. updated de.l from Crazytoon, 3. UnRestrictSAdmin for Bahamut to allow them 
+# the usage of +a without being a Service Admin
 #
 # BUILD : 1.7.5 (433)
 # BUGS  : 182

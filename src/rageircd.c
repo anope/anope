@@ -93,6 +93,8 @@ IRCDVar ircd[] = {
      1,                         /* TOKENS are CASE inSensitive */
      0,                         /* TIME STAMPS are BASE64 */
      1,                         /* +I support */
+     0,                         /* SJOIN ban char */
+     0,                         /* SJOIN except char */
      },
     {NULL}
 };
@@ -459,11 +461,11 @@ int anope_event_436(char *source, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
-    m = createMessage("401",       NULL); addCoreMessage(IRCD,m);
+    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("482",       anope_event_482); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
     m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
     m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
@@ -479,34 +481,34 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      NULL); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     NULL); addCoreMessage(IRCD,m);
+    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("GLOBOPS",   anope_event_globops); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     NULL); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
+    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("CS",        anope_event_cs); addCoreMessage(IRCD,m);
     m = createMessage("HS",        anope_event_hs); addCoreMessage(IRCD,m);
     m = createMessage("MS",        anope_event_ms); addCoreMessage(IRCD,m);
     m = createMessage("NS",        anope_event_ns); addCoreMessage(IRCD,m);
     m = createMessage("OS",        anope_event_os); addCoreMessage(IRCD,m);
-    m = createMessage("RS",        NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SGLINE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("RS",        anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SGLINE",    anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SS",        NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SS",        anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("SZLINE",    NULL); addCoreMessage(IRCD,m);
-    m = createMessage("UNSGLINE",  NULL); addCoreMessage(IRCD,m);
-    m = createMessage("UNSZLINE",  NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SZLINE",    anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("UNSGLINE",  anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("UNSZLINE",  anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SNICK",	   anope_event_snick); addCoreMessage(IRCD,m);
     m = createMessage("VHOST",	   anope_event_vhost); addCoreMessage(IRCD,m);
     m = createMessage("MYID",	   anope_event_myid); addCoreMessage(IRCD,m);
@@ -516,7 +518,6 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("REHASH",     anope_event_rehash); addCoreMessage(IRCD,m);
     m = createMessage("ADMIN",      anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("CREDITS",    anope_event_credits); addCoreMessage(IRCD,m);
-
 }
 
 /* *INDENT-ON* */
@@ -697,6 +698,9 @@ void anope_cmd_connect(int servernum)
     else if (servernum == 3)
         anope_cmd_pass(RemotePassword3);
     anope_cmd_capab();
+    if (Numeric) {
+        send_cmd(NULL, "MYID !%d", Numeric);
+    }
     anope_cmd_server(ServerName, 1, ServerDesc);
     anope_cmd_svinfo();
     anope_cmd_burst();

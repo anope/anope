@@ -324,6 +324,8 @@ long unsigned int UserKey1;
 long unsigned int UserKey2;
 long unsigned int UserKey3;
 
+int Numeric;
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -514,6 +516,7 @@ Directive directives[] = {
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
     {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
+    {"Numeric", {{PARAM_POSINT, PARAM_RELOAD, &Numeric}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
     {"NickRegDelay", {{PARAM_INT, PARAM_RELOAD, &NickRegDelay}}},

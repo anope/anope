@@ -296,6 +296,7 @@ E int   UseSVS2MODE;
 E int   RestrictOperNicks;
 E int   UseTokens;
 E int   NewsCount;
+E int   Numeric;
 
 E char **HostSetters;
 E int HostNumber;

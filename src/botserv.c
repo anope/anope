@@ -456,7 +456,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
         if (cmd) {
             if (!stricmp(cmd, "!deowner") && ircd->owner) {
                 if (is_founder(u, ci))
-                    bot_raw_mode(u, ci, "-q", u->nick);
+                    bot_raw_mode(u, ci, ircd->ownerunset, u->nick);
             } else if (!stricmp(cmd, "!kb")) {
                 char *target = strtok(NULL, " ");
                 char *reason = strtok(NULL, "");
@@ -489,7 +489,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                 }
             } else if (!stricmp(cmd, "!owner") && ircd->owner) {
                 if (is_founder(u, ci))
-                    bot_raw_mode(u, ci, "+q", u->nick);
+                    bot_raw_mode(u, ci, ircd->ownerset, u->nick);
             } else if (!stricmp(cmd, "!seen")) {
                 char *target = strtok(NULL, " ");
                 char buf[BUFSIZE];

@@ -42,7 +42,7 @@ IRCDVar ircd[] = {
      "+ioS",                    /* Global alias mode   */
      "+qS",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
-     "-ckiflmnpstuzACGHKLNOQRSV",       /* Modes to Remove */
+     "-ckiflmnpstuzACGHKLMNOQRSTV",     /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -95,6 +95,8 @@ IRCDVar ircd[] = {
      0,                         /* TOKENS are CASE Sensitive */
      1,                         /* TIME STAMPS are BASE64 */
      0,                         /* +I support */
+     '&',                       /* SJOIN ban char */
+     '\"',                      /* SJOIN except char */
      },
     {NULL}
 };
@@ -1016,11 +1018,21 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
 void anope_cmd_capab()
 {
     if (UseTokens) {
-        send_cmd(NULL,
-                 "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
+        if (Numeric) {
+            send_cmd(NULL,
+                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
+        } else {
+            send_cmd(NULL,
+                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
+        }
     } else {
-        send_cmd(NULL,
-                 "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
+        if (Numeric) {
+            send_cmd(NULL,
+                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
+        } else {
+            send_cmd(NULL,
+                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
+        }
     }
 }
 
@@ -1034,7 +1046,12 @@ void anope_cmd_pass(char *pass)
 /* Unreal 3.2 actually sends some info about itself in the descript area */
 void anope_cmd_server(char *servname, int hop, char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+    if (Numeric) {
+        send_cmd(NULL, "SERVER %s %d :U0-*-%d %s", servname, hop, Numeric,
+                 descript);
+    } else {
+        send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+    }
 }
 
 /* PONG */

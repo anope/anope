@@ -250,6 +250,8 @@ struct ircdvars_ {
 	int tokencaseless;			/* TOKEN are not case senstive - most its Unreal that is case senstive */
 	int sjb64;				/* Base 64 encode TIMESTAMP */
         int invitemode;				/* +I  */
+        int sjoinbanchar;			/* use single quotes to define it */
+        int sjoinexchar;			/* use single quotes to define it */
 };
 
 struct ircdcapab_ {

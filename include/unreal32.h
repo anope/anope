@@ -97,7 +97,4 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-#define SJOINBANNCHAR '&'
-#define SJOINEXCEPTIONCHAR '\"'
-
 #endif

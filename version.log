@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="367"
+VERSION_BUILD="368"
 
 # $Log$
+#
+# BUILD : 1.7.5 (368)
+# BUGS  : N/A
+# NOTES : IRCD protocol clean up, and support for Numerics on Unreal32/RageIRCD
 #
 # BUILD : 1.7.5 (367)
 # BUGS  : 

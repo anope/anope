@@ -694,24 +694,26 @@ void do_sjoin(const char *source, int ac, char **av)
 
             end2 = cubuf + 1;
 
-#ifdef SJOINBANNCHAR
-            if (*s == SJOINBANNCHAR) {
-                add_ban(c, myStrGetToken(s, SJOINBANNCHAR, 1));
-                if (!end)
-                    break;
-                s = end + 1;
-                continue;
+
+            if (ircd->sjoinbanchar) {
+                if (*s == ircd->sjoinbanchar) {
+                    add_ban(c, myStrGetToken(s, ircd->sjoinbanchar, 1));
+                    if (!end)
+                        break;
+                    s = end + 1;
+                    continue;
+                }
             }
-#endif
-#ifdef SJOINEXCEPTIONCHAR
-            if (*s == SJOINEXCEPTIONCHAR) {
-                add_exception(c, myStrGetToken(s, SJOINEXCEPTIONCHAR, 1));
-                if (!end)
-                    break;
-                s = end + 1;
-                continue;
+            if (ircd->sjoinexchar) {
+                if (*s == ircd->sjoinexchar) {
+                    add_exception(c,
+                                  myStrGetToken(s, ircd->sjoinexchar, 1));
+                    if (!end)
+                        break;
+                    s = end + 1;
+                    continue;
+                }
             }
-#endif
 
             while (csmodes[(int) *s] != 0)
                 *end2++ = csmodes[(int) *s++];

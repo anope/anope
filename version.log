@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="88"
+VERSION_BUILD="89"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (89)
+# BUGS  : 
+# NOTES : Accidently commited config.c
 #
 # BUILD : 1.7.2 (88)
 # BUGS  : 13 and 14

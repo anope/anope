@@ -5216,6 +5216,8 @@ OPER_HELP_ADMIN_CMD
 	    USERLIST    Alle registrierten Nicks anzeigen
 	    OPER        Die Services Operatoren Liste bearbeiten
 	    LOGONNEWS   Logon News bearbeiten
+	    RANDOMNEWS  Definiert Nachrichten, die den Benutzern zufällig 
+	                   beim Logon angezeigt werden
 	    OPERNEWS    Oper News bearbeiten
 	    NOOP        Alle O:-Lines temporär deaktivieren
 	    JUPE        Einen Server "jupitern"

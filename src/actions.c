@@ -245,8 +245,12 @@ char *common_get_vident(User * u)
             /* ptlink hack since there is no user mode
                for vhost, simply compare the host to the
                vhost struct memember */
-        } else if (stricmp(u->vident, u->username)) {
-            return u->vident;
+        } else if (u->vident) {
+            if (stricmp(u->vident, u->username)) {
+                return u->vident;
+            } else {
+                return u->username;
+            }
         } else {
             return u->username;
         }

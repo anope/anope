@@ -510,6 +510,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user->my_signon = time(NULL);
         user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
         user->uid = uid;        /* p10 stuff */
+        user->vident = sstrdup(username);
 
         if (CheckClones) {
             /* Check to see if it looks like clones. */

@@ -16,6 +16,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.    [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+01/05 F BotServ's banning would trigger a TSMODE error on a capable IRCd. [ #00]
 01/05 F Not resetting the topic on channel creation with KEEPTOPIC off.   [#267]
 01/04 F Fixed up some alog() messages that were incorrect.                [#266]
 01/01 F Ultimate3 channel modes, which had been defined incorrectly.      [ #00]

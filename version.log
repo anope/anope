@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="523"
+VERSION_BUILD="524"
 
 # $Log$
+#
+# BUILD : 1.7.6 (524)
+# BUGS  : 
+# NOTES : bot_raw_ban was not adjusted for TSMODE capable IRCDs yet
 #
 # BUILD : 1.7.6 (523)
 # BUGS  : 267

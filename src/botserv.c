@@ -1061,8 +1061,10 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
                         char *reason)
 {
-    char *av[3];
+    int ac;
+    char *av[4];
     char mask[BUFSIZE];
+    char buf[BUFSIZE];
     User *u = finduser(nick);
 
     if (!u)
@@ -1088,13 +1090,30 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         }
     }
 
-    av[0] = ci->name;
-    av[1] = sstrdup("+b");
     get_idealban(ci, u, mask, sizeof(mask));
-    av[2] = mask;
-    anope_cmd_mode(ci->bi->nick, av[0], "+b %s", av[2]);
-    do_cmode(ci->bi->nick, 3, av);
-    free(av[1]);
+
+    if (ircdcap->tsmode) {
+        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+        av[0] = ci->name;
+        av[1] = buf;
+        av[2] = sstrdup("+b");
+        av[3] = mask;
+        ac = 4;
+    } else {
+        av[0] = ci->name;
+        av[1] = sstrdup("+b");
+        av[2] = mask;
+        ac = 3;
+    }
+
+    anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
+    do_cmode(ci->bi->nick, ac, av);
+
+    /* We need to free our sstrdup'd "+b" -GD */
+    if (ircdcap->tsmode)
+        free(av[2]);
+    else
+        free(av[1]);
 
     av[0] = ci->name;
     av[1] = nick;

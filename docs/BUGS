@@ -1,0 +1,17 @@
+Reported Bugs from Mantis: http://www.anope.org/bug
+===================================================
+
+.- Strange Segfault on expiring nicknames. Almost arbitrary, very hard
+   to reproduce.
+
+.- Clone detection can give false warnings if a user connects and then 
+   signs off several times in rapid succession. Clone detection also 
+   goes off wrongly if a server links and has a number of clients from 
+   the same hostname.
+
+.- If there is absolutely no activity on your network, Services may delay
+   timed events (nick kills, database saving, etc.) until the next message
+   comes in from Services' uplink server.
+
+.- Modules will not work on OpenBSD machines, due to limitations on libdl.
+

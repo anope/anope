@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+# $Id: checklang,v 1.1 2003/07/16 04:34:04 dane Exp $
+#
+
+if [ ! -f en_us.l ]; then
+	echo "*** You must run this script on the lang directory."
+	echo ""
+	exit 1
+fi
+
+for lang in $(ls *.l)
+do
+	echo "*** CHECKING $lang ***"
+	./obs.pl $lang
+done

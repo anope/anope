@@ -1,0 +1,1055 @@
+# (C) 2003 Anope 
+# Contact us at info@anope.org
+#
+# Please read COPYING and README for furhter details.
+#
+# $Id: version.log,v 1.102 2004/03/26 03:53:57 dane Exp $
+
+VERSION_MAJOR="1"
+VERSION_MINOR="6"
+VERSION_PATCH="0"
+VERSION_BUILD="0"
+VERSION_EXTRA=""
+
+# $Log: version.log,v $
+# Revision 1.102  2004/03/26 03:53:57  dane
+# Anope-1.6.0 Release
+#
+# Revision 1.101  2004/03/25 21:03:04  dane
+# BUILD : 1.5.15.15
+# BUGS  : none
+# NOTES : Typos on docs and new es.l (from DrStein)
+# VTAG  : cvs checkout -D "2004-03-25 16:03" anope-dev
+#
+# Revision 1.100  2004/03/23 02:57:52  dane
+# BUILD : 1.5.15.14
+# BUGS  : none
+# NOTES : Better tables.sql format
+# VTAG  : cvs checkout -D "2004-03-22 21:57" anope-dev
+#
+# Revision 1.99  2004/03/23 02:53:28  dane
+# BUILD : 1.5.15.13
+# BUGS  : none
+# NOTES : Added bin/dbgen to help MySQL db schema.
+# VTAG  : cvs checkout -D "2004-03-22 21:53" anope-dev
+#
+# Revision 1.98  2004/03/22 18:52:47  dane
+# BUILD : 1.5.15.12
+# BUGS  : 347
+# NOTES : Proposed fix for crash on channel memo
+# VTAG  : cvs checkout -D "2004-03-22 13:52" anope-dev
+#
+# Revision 1.97  2004/03/21 21:20:32  dane
+# BUILD : 1.5.15.11
+# BUGS  : none
+# NOTES : More documentation updates!
+# VTAG  : cvs checkout -D "2004-03-21 16:20" anope-dev
+#
+# Revision 1.96  2004/03/21 16:46:06  rob
+# BUILD : 1.5.15.10
+# BUGS  : N/A
+# NOTES : (g)make in modules dir will now use -Wall by default
+# VTAG  : cvs checkout -D "2004-03-21 16:58" anope-dev
+#
+# Revision 1.95  2004/03/21 16:30:15  dane
+# BUILD : 1.5.15.9
+# BUGS  : none
+# NOTES : Added docs/DEFCON documentation.
+# VTAG  : cvs checkout -D "2004-03-21 11:30" anope-dev
+#
+# Revision 1.94  2004/03/21 15:30:31  dane
+# BUILD : 1.5.15.8
+# BUGS  : none
+# NOTES : Added "Support" section to docs/MODULES
+# VTAG  : cvs checkout -D "2004-03-21 10:30" anope-dev
+#
+# Revision 1.93  2004/03/21 15:13:25  dane
+# BUILD : 1.5.15.7
+# BUGS  : none
+# NOTES : Added docs/MODULES
+# VTAG  : cvs checkout -D "2004-03-21 10:13" anope-dev
+#
+# Revision 1.92  2004/03/21 14:08:53  rob
+# BUILD : 1.5.15.6
+# BUGS  : N/A
+# NOTES : Made startup check for NSGuestNickPrefix as servcies will seg without it, it has always been marked as [REQUIERED] in the .conf, but.... :)
+# VTAG  : cvs checkout -D "2004-03-21 14:21" anope-dev
+#
+# Revision 1.91  2004/03/21 13:41:55  rob
+# BUILD : 1.5.15.5
+# BUGS  : 0000467
+# NOTES : Anope will only check the existance of defcon config settings, if any of the pre-set defcon levels actaully need them, e.g. if session limit is never used in a defcon level, then DefConSessionLimit does not need to be defined.
+# VTAG  : cvs checkout -D "2004-03-21 13:54" anope-dev
+#
+# Revision 1.90  2004/03/21 13:05:05  ribosome
+# BUILD : 1.5.15.4
+# BUGS  : 0000468
+# NOTES : Changed mkdir to mkdir -p in ./configure to create parent dirs
+# VTAG  : cvs checkout -D "2004-03-21 13:00" anope-dev
+#
+# Revision 1.89  2004/03/17 20:08:49  ribosome
+# BUILD : 1.5.15.3
+# BUGS  :
+# NOTES : Incorrect comment style (# rather than /* */) was resulting in compile warning
+# VTAG  : cvs checkout -D "2004-03-17 20:04" anope-dev
+#
+# Revision 1.88  2004/03/17 12:18:15  dane
+# BUILD : 1.5.15.2
+# BUGS  : none
+# NOTES : Fix attempt for chan drop.
+# VTAG  : cvs checkout -D "2004-03-17 07:18" anope-dev
+#
+# Revision 1.87  2004/03/14 22:44:47  dane
+# BUILD : 1.5.15.1
+# BUGS  : none
+# NOTES : 1.5.15 devel setup
+# VTAG  : cvs checkout -D "2004-03-14 17:44" anope-dev
+#
+# Revision 1.86  2004/03/14 21:39:18  dane
+# 1.5.15 prep
+#
+# Revision 1.85  2004/03/14 17:36:58  rob
+# BUILD : 1.5.14.12
+# BUGS  : 0000465
+# NOTES : Fixed _tiny_ typo-bug in fr.l
+# VTAG  : cvs checkout -D "2004-03-14 17:48" anope-dev
+#
+# Revision 1.84  2004/03/14 17:24:52  keeper
+# BUILD : 1.5.14.10
+# BUGS  : 0000462
+# NOTES : Fixed bug channelmode +r not being removed when nick is dropped.
+#
+# Revision 1.83  2004/03/14 14:15:34  certus
+# BUILD : 1.5.14.9
+# BUGS  : 437
+# NOTES : Fixed bug with logchan and logbot
+# VTAG  : cvs checkout -D "2004-03-14 09:15" anope-dev
+#
+# Revision 1.82  2004/03/14 13:02:53  rob
+# BUILD : 1.5.14.8
+# BUGS  : 0000450
+# NOTES : Fixed cvs (null) values
+# VTAG  : cvs checkout -D "2004-03-14 13:14" anope-dev
+#
+# Revision 1.81  2004/03/13 13:55:59  dane
+# BUILD : 1.5.14.7
+# BUGS  : none
+# NOTES : Added missing channel fields to MySQL table schema. Also
+# 	forced a db save just after the initial db load to populate
+# 	databases.
+# VTAG  : cvs checkout -D "2004-03-13 08:55" anope-dev
+#
+# Revision 1.80  2004/03/13 13:26:23  dane
+# BUILD : 1.5.14.6
+# BUGS  : none
+# NOTES : Added a check for do_mysql on mysql_open() to return 0 if
+# 	MySQL is disabled on the config file.
+# VTAG  : cvs checkout -D "2004-03-13 08:26" anope-dev
+#
+# Revision 1.79  2004/03/13 03:36:18  dane
+# BUILD : 1.5.14.5
+# BUGS  : 434
+# NOTES : Changed most varchars to text.
+# VTAG  : cvs checkout -D "2004-03-12 22:36" anope-dev
+#
+# Revision 1.78  2004/03/13 03:25:59  dane
+# BUILD : 1.5.14.4
+# BUGS  : 0000440
+# NOTES : Typo fixed.
+# VTAG  : cvs checkout -D "2004-03-12 22:25" anope-dev
+#
+# Revision 1.77  2004/03/11 17:37:31  rob
+# BUILD : 1.5.14.3
+# BUGS  : N/A
+# NOTES : Fixed my goof with Changes file, and added CLIST to the spanish
+# language file ( curtusy of DrStein )
+#
+# VTAG  : cvs checkout -D "2004-03-11 17:48" anope-dev
+#
+# Revision 1.76  2004/03/11 16:50:01  rob
+# BUILD : 1.5.14.2
+# BUGS  : 0000431 | 0000432
+# NOTES : Fixed a couple of module bugs, and incoperated dengel's patch for the malformed +b crash - YAY @ cvs being back :P
+#
+# VTAG  : cvs checkout -D "2004-03-11 17:01" anope-dev
+#
+# Revision 1.75  2004/02/19 19:35:30  dane
+# BUILD : 1.5.14.1
+# BUGS  : none
+# NOTES : Framework for development
+# VTAG  : cvs checkout -D "2004-02-19 14:35" anope-dev
+#
+# Revision 1.74  2004/02/19 18:51:04  dane
+# Release 1.5.14-rc3
+#
+# Revision 1.73  2004/02/19 16:46:29  ribosome
+# BUILD : 1.5.13.18
+# BUGS  : 0000406
+# NOTES : Fixed nickserv list bug where unconfirmed nicknames appear in the wrong place
+#         and changed [Hidden] to [Hostname Hidden] to make things a little clearer!
+# VTAG  : cvs checkout -D "2004-02-19 16:45" anope-dev
+#
+# Revision 1.72  2004/02/18 19:00:33  rob
+# BUILD : 1.5.13.17
+# BUGS  : 0000338
+# NOTES : user.c now has a UGLY hack to swap any %s in the real name to -s - this only effects anope when LOGUSERS is enabled in the .conf
+# VTAG  : cvs checkout -D "2004-02-18 19:10" anope-dev
+#
+# Revision 1.71  2004/02/17 22:16:40  joris
+# BUILD : 1.5.13.16
+# BUGS  :
+# NOTES : Completely disable the modules on OpenBSD until we fixed them.
+# VTAG  : cvs checkout -D "2004-02-17 23:17" anope-dev
+#
+# Revision 1.70  2004/02/17 02:51:24  dane
+# BUILD : 1.5.13.15
+# BUGS  : none
+# NOTES : Language context typo (thanx to alex323)
+# VTAG  : cvs checkout -D "2004-02-16 21:51" anope-dev
+#
+# Revision 1.69  2004/02/15 22:40:46  dane
+# BUILD : 1.5.13.14
+# BUGS  : 412
+# NOTES : Now is_host_setter() also validates aliases in a group.
+# VTAG  : cvs checkout -D "2004-02-15 17:40" anope-dev
+#
+# Revision 1.68  2004/02/15 18:34:40  dane
+# BUILD : 1.5.13.13
+# BUGS  : 404
+# NOTES : Added support for Viagra's "VS" command to make our vHost
+# 	system work with it.
+# VTAG  : cvs checkout -D "2004-02-15 13:34" anope-dev
+#
+# Revision 1.67  2004/02/14 22:50:32  dane
+# BUILD : 1.5.13.12
+# BUGS  : 407
+# NOTES : Completed some DefCon work.
+# VTAG  : cvs checkout -D "2004-02-14 17:50" anope-dev
+#
+# Revision 1.66  2004/02/14 21:22:55  dane
+# BUILD : 1.5.13.11
+# BUGS  : 441
+# NOTES : Changed all hardcoded "OperServ" to s_OperServ
+# VTAG  : cvs checkout -D "2004-02-14 16:22" anope-dev
+#
+# Revision 1.65  2004/02/14 15:37:05  dane
+# BUILD : 1.5.13.10
+# BUGS  : none
+# NOTES : Fixed compile error for CMODE_A (Thanx GeniusDex)
+# VTAG  : cvs checkout -D "2004-02-14 10:37" anope-dev
+#
+# Revision 1.64  2004/02/14 00:24:18  ribosome
+# BUILD : 1.5.13.9
+# BUGS  :
+# NOTES : Fixed errors in en_us.l NICK_HELP_DROP
+# VTAG  : cvs checkout -D "2004-02-14 00:25" anope-dev
+#
+# Revision 1.63  2004/02/09 19:05:42  ribosome
+# BUILD : 1.5.13.8
+# BUGS  : Fixed a couple of language file bugs
+# NOTES : Changed Services Admin -> Super Admin as required in language files
+# VTAG  : cvs checkout -D "2004-02-09 19:07" anope-dev
+#
+# Revision 1.62  2004/02/07 20:48:00  certus
+# BUILD : 1.5.13.7
+# BUGS  :
+# NOTES : replaced is_identified with is_founder to make it more effective (covers real founder and superadmin, not only pw identify)
+# VTAG  : cvs checkout -D "2004-02-07 15:47" anope-dev
+#
+# Revision 1.61  2004/02/07 20:36:46  certus
+# BUILD : 1.5.13.6
+# BUGS  :
+# NOTES : Fixed bug where you could /cs identify infinite times
+# VTAG  : cvs checkout -D "2004-02-07 15:36" anope-dev
+#
+# Revision 1.60  2004/02/07 20:11:14  ribosome
+# BUILD : 1.5.13.5
+# BUGS  : Fixed Bug 0000400
+# NOTES : Fixed registration via group on nicknames preconfirmation
+# VTAG  : cvs checkout -D "2004-02-07 13:10" anope-dev
+#
+# Revision 1.59  2004/02/07 18:53:59  dane
+# BUILD : 1.5.13.4
+# BUGS  : 403
+# NOTES : Only Admins are allowed to /OS MODE channels +A
+# VTAG  : cvs checkout -D "2004-02-07 13:53" anope-dev
+#
+# Revision 1.58  2004/02/07 18:38:47  certus
+# BUILD : 1.5.13.3
+# BUGS  : 0000030
+# NOTES : Channel '#' may no longer be registered due to several problems.
+# VTAG  : cvs checkout -D "2004-02-07 13:38" anope-dev
+#
+# Revision 1.57  2004/02/02 21:09:52  certus
+# BUILD : 1.5.13.2
+# BUGS  :
+# NOTES : Fixed bug where non-id'ed nicks could do /cs identify
+# VTAG  : cvs checkout -D "2004-02-02 16:09" anope-dev
+#
+# Revision 1.56  2004/02/01 00:11:09  dane
+# BUILD : 1.5.13.1
+# BUGS  : none
+# NOTES : Prep for 1.5.13.x
+# VTAG  : cvs checkout -D "2004-01-31 19:11" anope-dev
+#
+# Revision 1.55  2004/01/31 20:17:00  dane
+# Anope 1.5.13 (Release Candidate 2 for Anope 1.6.0)
+#
+# Revision 1.54  2004/01/31 18:57:18  dane
+# BUILD : 1.5.12.7
+# BUGS  : 398
+# NOTES : Improved on Certus fix for this bug. I used a less expensive
+# 	issp(c) inline function, and changed the name of the func.
+# 	Also, did some clean up around.
+#
+# VTAG  : cvs checkout -D "2004-01-31 13:57" anope-dev
+#
+# Revision 1.53  2004/01/31 17:03:52  dane
+# BUILD : 1.5.12.6
+# BUGS  : 396
+# NOTES : Forced a list reorder upon entry deletion for OS news system.
+# VTAG  : cvs checkout -D "2004-01-31 12:03" anope-dev
+#
+# Revision 1.52  2004/01/31 12:08:24  certus
+# BUILD : 1.5.12.5
+# BUGS  :
+# NOTES : Added notice_lang for chanserv's info so sadmins and users with access will now get something like "type /cs info #chan ALL" for more infos. I used NICK_INFO_FOR_MORE for that so we don't have to add a new string to all lang files with exactly (!!!) the same text: "For more verbose information, type /msg %s INFO %s ALL." I just used s_ChanServ and ci->name as params.
+# VTAG  : cvs checkout -D "2004-01-31 07:08" anope-dev
+#
+# Revision 1.51  2004/01/30 16:10:27  certus
+# BUILD : 1.5.12.4
+# BUGS  : fixed buffer bug
+# NOTES :
+# VTAG  : cvs checkout -D "2004-01-30 11:10" anope-dev
+#
+# Revision 1.50  2004/01/19 19:02:44  ribosome
+# BUILD : 1.5.12.3
+# BUGS  : #380 and #381
+# NOTES : Spelling Errors and Typos fixed.
+# VTAG  : cvs checkout -D "2004-01-19 12:02" anope-dev
+#
+# Revision 1.49  2004/01/18 20:15:28  ribosome
+# BUILD : 1.5.12.2
+# BUGS  : HostServ Set Bug for Non Registered Nicks
+# NOTES : For non registered nicks, would return syntax, now returns correct error
+# VTAG  : cvs checkout -D "2004-01-18 13:15" anope-dev
+#
+# Revision 1.48  2004/01/18 05:10:47  dane
+# BUILD : 1.5.12.1
+# BUGS  : none
+# NOTES : Framework for development.
+# VTAG  : cvs checkout -D "2004-01-18 00:10" anope-dev
+#
+# Revision 1.47  2004/01/18 04:33:25  dane
+# Preparations for 1.5.12
+#
+# Revision 1.46  2004/01/18 00:13:40  ribosome
+# BUILD : 1.5.11.26
+# BUGS  : Added SuperAdmin to FAQ
+# NOTES : Added SuperAdmin to FAQ, Read for more details.
+# VTAG  : cvs checkout -D "2004-01-17 17:13" anope-dev
+#
+# Revision 1.45  2004/01/18 00:12:22  ribosome
+# BUILD : 1.5.11.25
+# BUGS  : Added SuperAdmin to FAQ
+# NOTES : Read FAQ for details
+# VTAG  : cvs checkout -D "2004-01-17 17:12" anope-dev
+#
+# Revision 1.44  2004/01/13 21:26:46  ribosome
+# BUILD : 1.5.11.24
+# BUGS  : README file tweaking
+# NOTES : Updated Grammar errors, contact details, urls etc
+# VTAG  : cvs checkout -D "2004-01-13 14:26" anope-dev
+#
+# Revision 1.43  2004/01/13 15:35:23  ribosome
+# BUILD : 1.5.11.23
+# BUGS  : langtool.pl, was only checking en_us and was including bold & underline
+# NOTES : fixed above bug
+# VTAG  : cvs checkout -D "2004-01-13 08:34" anope-dev
+#
+# Revision 1.42  2004/01/13 14:21:58  ribosome
+# BUILD : 1.5.11.22
+# BUGS  : Added longline description in log
+# NOTES : It nows shows the first 30 characters of a long line in the log
+# VTAG  : cvs checkout -D "2004-01-13 07:21" anope-dev
+#
+# Revision 1.41  2004/01/13 13:48:42  ribosome
+# BUILD : 1.5.11.21
+# BUGS  : Added Line Length Check
+# NOTES : Added Line Length Check for Lines Longer than 60 characters
+# VTAG  : cvs checkout -D "2004-01-13 06:48" anope-dev
+#
+# Revision 1.40  2004/01/12 20:44:54  joris
+# BUILD : 1.5.11.20
+# BUGS  :
+# NOTES : 0 is NOT the terminating character of a string. \0 is.
+# 	Cleanup some sprintf() to snprintf() for safer usage.
+# VTAG  : cvs checkout -D "2004-01-12 21:44" anope-dev
+#
+# Revision 1.39  2004/01/12 19:25:28  ribosome
+# BUILD : 1.5.11.19
+# NOTES : Added langtool.pl, all in one language tool.
+# VTAG  : cvs checkout -D "2004-01-12 12:25" anope-dev
+#
+# Revision 1.38  2004/01/12 18:40:36  ribosome
+# BUILD : 1.5.11.18
+# BUGS  : General spelling/grammar tweaking
+# NOTES : Updated example.conf/chk
+# VTAG  : cvs checkout -D "2004-01-12 11:40" anope-dev
+#
+# Revision 1.37  2004/01/11 22:05:27  dane
+# BUILD : 1.5.11.17
+# BUGS  : none
+# NOTES : Fixed duplicate entries on /OS STAFF
+# VTAG  : cvs checkout -D "2004-01-11 17:05" anope-dev
+#
+# Revision 1.36  2004/01/11 21:37:31  dane
+# BUILD : 1.5.11.16
+# BUGS  : none
+# NOTES : Fixed previous MySQL booboo
+# VTAG  : cvs checkout -D "2004-01-11 16:37" anope-dev
+#
+# Revision 1.35  2004/01/11 21:03:00  dane
+# BUILD : 1.5.11.15
+# BUGS  : 0000368
+# NOTES : Better MySQL init patch by GeniusDex
+# VTAG  : cvs checkout -D "2004-01-11 16:03" anope-dev
+#
+# Revision 1.34  2004/01/11 20:38:55  dane
+# BUILD : 1.5.11.14
+# BUGS  : 0000346
+# NOTES : Changed notice to notice_lang. Also, did some work on the
+# 	/OS STAFF command. It looks better, and behaves properly
+# 	now.
+# VTAG  : cvs checkout -D "2004-01-11 15:38" anope-dev
+#
+# Revision 1.33  2004/01/11 20:32:39  ribosome
+# BUILD : 1.5.11.13
+# BUGS  : Bug 0000351
+# NOTES : Removed incorrect db conversion information from the INSTALL file
+# VTAG  : cvs checkout -D "2004-01-11 13:32" anope-dev
+#
+# Revision 1.32  2004/01/11 20:16:45  ribosome
+# BUILD : 1.5.11.12
+# BUGS  : Bug 0000374
+# NOTES : Added void moduleSetHelpHelp(void (*func) (User * u)); to modules.h
+# VTAG  : cvs checkout -D "2004-01-11 13:16" anope-dev
+#
+# Revision 1.31  2004/01/11 15:14:43  ribosome
+# BUILD : 1.5.11.11
+# BUGS  : Fixed bug 000348
+# NOTES : HostServAlias was left out last time
+# VTAG  : cvs checkout -D "2004-01-11 08:14" anope-dev
+#
+# Revision 1.30  2004/01/08 03:39:23  dane
+# BUILD : 1.5.11.10
+# BUGS  : 0000333
+# NOTES : Fixed broken /OS CHANKILL expiration.
+# VTAG  : cvs checkout -D "2004-01-07 22:39" anope-dev
+#
+# Revision 1.29  2004/01/07 20:24:19  certus
+# BUILD : 1.5.11.9
+# BUGS  :
+# NOTES : fixed a few small issues in de.l and en_us.l (botserv set syntax error displayed chan instead of botname)
+# VTAG  : cvs checkout -D "2004-01-07 15:24" anope-dev
+#
+# Revision 1.28  2004/01/07 14:54:14  certus
+# BUILD : 1.5.11.8
+# BUGS  : 0000370
+# NOTES : bugfix in modules.c
+# VTAG  : cvs checkout -D "2004-01-07 09:54" anope-dev
+#
+# Revision 1.27  2004/01/04 18:36:40  joris
+# BUILD : 1.5.11.7
+# BUGS  : none
+# NOTES : - Correct dates in Changes (we are 2004),
+# 	- in misc.c function strscpy() change *d = 0; to *d = '\0'; since '\0' is the end of string delim
+# VTAG  : cvs checkout -D "2004-01-04 19:39" anope-dev
+#
+# Revision 1.26  2004/01/04 18:17:00  joris
+# BUILD : 1.5.11.6
+# BUGS  : none
+# NOTES : more updates to the nl.l file from GeniusDex
+# VTAG  : cvs checkout -D "2004-01-04 19:19" anope-dev
+#
+# Revision 1.25  2004/01/04 15:54:27  joris
+# BUILD : 1.5.11.5
+# BUGS  : none
+# NOTES : more updates to the nl.l from GeniusDex, tnx!
+# VTAG  : cvs checkout -D "2004-01-04 16:57" anope-dev
+#
+# Revision 1.24  2004/01/02 23:59:21  certus
+# BUILD : 1.5.11.4
+# BUGS  : 0000356
+# NOTES : Added a if (text == NULL) check to do_staff
+# VTAG  : cvs checkout -D "2004-01-02 18:59" anope-dev
+#
+# Revision 1.23  2004/01/02 23:11:56  certus
+# BUILD : 1.5.11.3
+# BUGS  : 0000348
+# NOTES : also changed strcasecmp to stricmp
+# VTAG  : cvs checkout -D "2004-01-02 18:11" anope-dev
+#
+# Revision 1.22  2003/12/29 19:14:36  dane
+# BUILD : 1.5.11.2
+# BUGS  : none
+# NOTES : Added check on ./compile.sh for unconfigured source.
+# VTAG  : cvs checkout -D "2003-12-29 14:14" anope-dev
+#
+# Revision 1.21  2003/12/14 17:44:47  dane
+# BUILD : 1.5.11.1
+# BUGS  : none
+# NOTES : Framework for CVS development.
+# VTAG  : cvs checkout -D "2003-12-14 12:44" anope-dev
+#
+# Revision 1.20  2003/12/14 16:54:41  dane
+# Anope 1.5.11 Release
+#
+# Revision 1.19  2003/12/12 16:04:57  dane
+# BUILD : 1.5.10.14
+# BUGS  : none
+# NOTES : Added ru.l Russian language file.
+# 	Fixed all languages for proper printf parameters
+# 	Changed language header comments to standard Anope
+# VTAG  : cvs checkout -D "2003-12-12 11:04" anope-dev
+#
+# Revision 1.18  2003/12/10 21:57:49  rob
+# BUILD : 1.5.10.13
+# BUGS  : doh's IRC problem
+# NOTES : Chanserv's list decalres a couple of veriables mid-code, it always did, but it seems to care now for dohs compiler... moved to top of function
+#
+# VTAG  : cvs checkout -D "2003-12-10 21:58" anope-dev
+#
+# Revision 1.17  2003/12/09 19:15:25  certus
+# BUILD : 1.5.10.12
+# BUGS  :
+# NOTES : changed svsnick to kill on hybrid
+# VTAG  : cvs checkout -D "2003-12-09 14:15" anope-dev
+#
+# Revision 1.16  2003/12/08 21:33:59  rob
+# BUILD : 1.5.10.11
+# BUGS  : 0000340
+# NOTES : HOST_HELP for all languages has been updated for the correct position of LIST
+# VTAG  : cvs checkout -D "2003-12-08 21:31" anope-dev
+#
+# Revision 1.15  2003/12/08 20:14:51  rob
+# BUILD : 1.5.10.10
+# BUGS  : NS / CS LIST
+# NOTES : List's for NS and CS can now take #X-Y when displaying values
+# VTAG  : cvs checkout -D "2003-12-08 20:14" anope-dev
+#
+# Revision 1.14  2003/12/07 18:34:29  rob
+# BUILD : 1.5.10.9
+# BUGS  : N/A
+# NOTES : Added debug functions to display the message queue for modules, this means we can see how messages will be executed same as we can for commands - this also means that im happy module message's wont go tits up now :)
+# VTAG  : cvs checkout -D "2003-12-07 18:34" anope-dev
+#
+# Revision 1.13  2003/12/07 15:26:34  certus
+# BUILD : 1.5.10.8
+# BUGS  :
+# NOTES : Fixed various failures in de.l
+# VTAG  : cvs checkout -D "2003-12-07 10:26" anope-dev
+#
+# Revision 1.12  2003/12/07 14:30:49  certus
+# BUILD : 1.5.10.7
+# BUGS  :
+# NOTES : Updated de.l (by Stuff)
+# VTAG  : cvs checkout -D "2003-12-07 09:30" anope-dev
+#
+# Revision 1.11  2003/12/04 02:42:59  dane
+# BUILD : 1.5.10.6
+# BUGS  : none
+# NOTES : Fixed parameter issues on it.l
+# VTAG  : cvs checkout -D "2003-12-03 21:42" anope-dev
+#
+# Revision 1.10  2003/12/04 02:23:02  dane
+# BUILD : 1.5.10.5
+# BUGS  : none
+# NOTES : Fixed parameter issues on pt.l and a minor typo on us_en.l
+# VTAG  : cvs checkout -D "2003-12-03 21:23" anope-dev
+#
+# Revision 1.9  2003/12/03 12:24:26  joris
+# BUILD : 1.5.10.4
+# BUGS  : none
+# NOTES : more translating I missed
+# VTAG  : cvs checkout -D "2003-12-03 13:25" anope-dev
+#
+# Revision 1.8  2003/12/02 23:02:27  joris
+# BUILD : 1.5.10.3
+# BUGS  : none
+# NOTES : updates to the nl.l file, spelling and such. Also ran
+# 	obs.pl on it, and fixed some format errors.
+# VTAG  : cvs checkout -D "2003-12-03 00:03" anope-dev
+#
+# Revision 1.7  2003/12/02 16:41:01  dane
+# BUILD : 1.5.10.2
+# BUGS  : none
+# NOTES : Added printf format checking on obs.pl for language files.
+#         Note that this has uncovered several Language errors that
+#         need fixing. I've fixed a couple of lang files, but I rather
+#         wait until we have the updated translations to finish them
+#         off. You can check all languages with bin/checklang
+#
+# VTAG  : cvs checkout -D "2003-12-02 11:41" anope-dev
+#
+# Revision 1.6  2003/11/25 15:54:57  dane
+# BUILD : 1.5.10.1
+# BUGS  : none
+# NOTES : Framework update for CVS development
+# VTAG  : cvs checkout -D "2003-11-25 10:54" anope-dev
+#
+# Revision 1.5  2003/11/25 14:56:56  dane
+# Release 1.5.10
+#
+# Revision 1.4  2003/11/24 20:51:36  dane
+# BUILD : 1.5.10.23
+# BUGS  : none
+# NOTES : Added indent cleanup to putanope
+# VTAG  : cvs checkout -D "2003-11-24 15:51" anope-dev
+#
+# Revision 1.3  2003/11/24 20:49:50  dane
+# BUILD : 1.5.10.22
+# BUGS  : none
+# NOTES : Moved all document files to folder "docs". Note that due to
+# 	CVS limitations, all hostory has been lost.
+# VTAG  : cvs checkout -D "2003-11-24 15:49" anope-dev
+#
+# Revision 1.2  2003/11/24 20:29:58  dane
+# BUILD : 1.5.10.21
+# BUGS  : none
+# NOTES : Created docs directory
+# VTAG  : cvs checkout -D "2003-11-24 15:29" anope-dev
+#
+# Revision 1.1  2003/11/24 20:23:28  dane
+# BUILD : 1.5.10.20
+# BUGS  : none
+# NOTES : Changed version schema to major.minor.patch.build. Also
+#         worked on the putanope script to handle the change. And
+#         version.sh creates #defines for all version tokens.
+# VTAG  : cvs checkout -D "2003-11-24 15:23" anope-dev
+#
+# Revision 1.172  2003/11/17 21:34:33  dane
+# Fixed mlock +c on ultimate3 (0000320)
+#
+# Revision 1.171  2003/11/16 21:09:35  dane
+# make clean now cleans version.h as it should
+#
+# Revision 1.170  2003/11/16 19:11:06  dane
+# Fixing merge errors.
+#
+# Revision 1.169  2003/11/16 19:09:25  dane
+# New fix for BotServ +ao on PTLink (0000313)
+#
+# Revision 1.168  2003/11/16 18:43:48  rob
+# Added akill list footer even when viewing the whole list and not just a particualr search
+#
+# Revision 1.167  2003/11/16 18:33:22  certus
+# Fixed bug in de.l
+#
+# Revision 1.166  2003/11/16 18:03:43  dane
+# * All channel modes now supported on PTLink (0000311)
+#
+# * Absolute mode cleaning for /CS CLEAR #chan MODES. It uses the
+#   MODESTOREMOVE define instead or removing the modes programaticaly.
+#   It seems to be faster and more efficient on resources.
+#
+# * Formatted some perl scripts.
+#
+# Revision 1.165  2003/11/16 17:52:30  certus
+# lol, this is my lucky day :P I forgot a '}'
+#
+# Revision 1.164  2003/11/16 17:32:31  certus
+# fixed a bug with mysqlretries and mysqlretrygap on config reload
+#
+# Revision 1.163  2003/11/16 16:40:30  certus
+# PTLink BotServ fix (+o) in init.c
+#
+# Revision 1.162  2003/11/16 16:15:57  certus
+# Services will now kill users when introducing pseudo clients on hybrid
+#
+# Revision 1.161  2003/11/16 11:41:32  certus
+# Added config warning for too many format-strings
+#
+# Revision 1.160  2003/11/15 19:43:45  rob
+# fixed a bug with module message's - i didnt NULL the value of tail :/
+#
+# Revision 1.159  2003/11/15 16:42:44  certus
+# Added MysqlRetries and MysqlRetryGap to conf
+#
+# Revision 1.158  2003/11/15 14:39:29  rob
+# 2003/11/15  Added a generic footer to list's without (bug 0000222)
+# 2003/11/15  Adding a ./configure script to modules folder (removes compile.sh compatability issues)
+# 2003/11/15  Removed Exterimental status from module support and Viagra support
+#
+# Revision 1.157  2003/11/15 02:39:21  certus
+# Fixed bug in /ms staff: opers in several lists won't get the memo twice from now on
+#
+# Revision 1.156  2003/11/12 16:16:10  certus
+# BotServ bots will now get umode +o on PTLINK to set modes correctly
+#
+# Revision 1.155  2003/11/09 17:07:37  rob
+# compile.sh now works on bsd etc :)
+#
+# Revision 1.154  2003/11/09 16:35:21  rob
+# Fixed a bug in moduleDelCallback reproted by SGR
+#
+# Revision 1.153  2003/11/08 03:42:40  dane
+# Framework towards 1.5.10
+#
+# Revision 1.152  2003/11/08 01:20:15  dane
+# Release 1.5.9
+#
+# Revision 1.151  2003/11/07 03:31:23  dane
+# Added optional MysqlSecure password security directive. Please read
+# the SECURITY section on the MYSQL file for more details.
+#
+# Revision 1.150  2003/11/03 23:18:47  certus
+# lol, forgot to set #ifdef IRC_HYBRID :P
+#
+# Revision 1.149  2003/11/03 23:12:29  certus
+# Global pseudo client will now join logchan (hybrid) to override chmode +n
+#
+# Revision 1.148  2003/11/03 22:34:41  certus
+# Fixed bug in main.c (displaying db names when crashing) - I hope it works, really, I do :p
+#
+# Revision 1.147  2003/11/03 16:22:10  dane
+# Fixed case insensitive password fields on MySQL           (0000196)
+# Users must reload tables.sql for this change to take effect.
+#
+# Revision 1.146  2003/11/03 15:50:42  dane
+# Fixed /OS STAFF bug not showing online aliases (0000124)
+#
+# Revision 1.145  2003/11/03 14:47:06  dane
+# Different CHAN_HELP_ULTIMATE and CHAN_HELP_ULTIMATE3 (0000189)
+#
+# Revision 1.144  2003/11/03 02:41:06  dane
+# Fixed empty fields on cs_access MYSQL table (0000197)
+#
+# Revision 1.143  2003/11/02 14:43:12  dane
+# Allow SA's to /NS LOGOUT themselves (0000288)
+# Please the bugnote on Mantis for a caveat.
+#
+# Revision 1.142  2003/11/02 13:57:01  dane
+# Fixed SQLINE help syntax (0000291)
+#
+# Revision 1.141  2003/11/02 12:55:05  rob
+# Another fix to moduleDelCallback - reported by SGR (again) :)
+#
+# Revision 1.140  2003/11/02 12:29:55  rob
+# Fixed a bug with moduleDelCallback reported by SGR (what a shock) :)
+#
+# Revision 1.139  2003/11/01 22:59:48  rob
+# Convereted hs_moo.c and ircd_catserv to use int AnopeInit
+#
+# Added void moduleDelCallback(char *name);  - remove a callback for your module by name
+#
+# Revision 1.138  2003/11/01 12:38:20  rob
+# Converted AnopeInit to int AnopeInit(int argc, char **argv); - returning MOD_CONT will load the module, returning MOD_STOP will auto-unload the module - i've updated all the modules on the modules site which are marked as active.
+#
+# Revision 1.137  2003/11/01 11:14:30  rob
+# Applied a patch by GeniusDex - HelpServ has been converted to a "real" service, it now has a command hash and can load/unload modules etc...
+#
+# Revision 1.136  2003/11/01 00:11:45  rob
+# Fixed a segfualt with /msg memoserv help - the lang file had a %s it shouldnt have had in it :)
+#
+# Revision 1.135  2003/10/30 17:08:22  rob
+# Just can putanope to do version's etc, coz i forgot :/
+#
+# Revision 1.134  2003/10/29 17:45:26  rob
+# Fixed -h bug for valid halfop's when the room is empty (# 0000245 )
+#
+# Revision 1.133  2003/10/29 17:27:04  rob
+# Dont log non-existant user when channel is forbidden
+#
+# Revision 1.132  2003/10/24 17:27:56  dane
+# Framework towards 1.5.9
+#
+# Revision 1.131  2003/10/24 00:40:26  dane
+# Release 1.5.8
+#
+# Revision 1.130  2003/10/22 13:58:44  certus
+# CHAN_INFO_TIME_REGGED fix in pt.l
+#
+# Revision 1.129  2003/10/20 20:54:23  certus
+# fixed 0000280  - pt.l tab issue
+#
+# Revision 1.128  2003/10/19 21:42:23  rob
+# Added a very basic thread-safe tokenizer to misc.c - well added the most useful function which was missing from the existing ones.. .:)
+#
+# Revision 1.127  2003/10/17 20:00:39  dane
+# Normalized all language files.
+#
+# Revision 1.126  2003/10/17 19:59:56  dane
+# Fixed putanope script. Fixed double TAB on all languages (0000283)
+#
+# Revision 1.125  2003/10/08 16:23:32  rob
+# Fixed compile errors on PTLink and Ultimate3 (worth another release?)
+# Applied a patch ShadowMaster posted on the forums to support NickIP AKILL match's :)
+# Changed the -r tag to -rc for release candidate, as it appears were now using release candidates instead of revisions :)
+#
+# Revision 1.124  2003/10/07 02:25:50  dane
+# Setup for further cvs commits.
+#
+# Revision 1.123  2003/10/07 01:25:42  dane
+# Release 1.5.7 prep
+#
+# Revision 1.122  2003/10/06 11:48:32  keeper
+# Fixed botserv creation bug when using services-aliases (strcasecmp instead of !strcasecmp)
+#
+# Revision 1.121  2003/10/05 21:34:17  rob
+# Made the change to modules.c that i intended - guess my email wasnt very clear, i didnt have alot of time to write it and only had web cvs to look at the code on :)
+#
+# anyway - i've fix the obvious issue i could see which would make anope just seg after a command which was loaded, was unloaded and then called - i HAVE NOT tested this with keepers change's altho i cant see anything that i think will break.
+#
+# and im going to bed now :)
+#
+# Revision 1.120  2003/10/05 18:57:10  dane
+# Modunload fix asked by Rob.
+#
+# Revision 1.119  2003/10/05 18:41:39  dane
+# Updated es.l file
+#
+# Revision 1.118  2003/10/05 18:26:42  dane
+# Fixed the bug that would not make services use the vident internaly,
+# hence bans and shuch where against the real hostname. A new macro was
+# created, named GetIdent(u), use instead of u->username.
+#
+# Revision 1.117  2003/10/05 15:50:42  dane
+# Fixed bug 0000270 for memo order reset upon deletion.
+# Normalized language files again.
+#
+# Revision 1.116  2003/10/05 14:32:08  certus
+# Added /ns update to replace further identifies, /ns identify will now only work once
+#
+# Revision 1.115  2003/10/05 13:26:01  dane
+# Language file normalization. Minor change to putanope script.
+#
+# Revision 1.114  2003/10/05 13:20:27  dane
+# Cosmetic changes
+#
+# Revision 1.113  2003/10/03 13:47:52  keeper
+# Added check_unload function to modules so that they can unload themselves
+# after AnopeInit. Useful for on-error-unloading, see hs_moo for example.
+#
+# Revision 1.112  2003/10/03 13:29:08  keeper
+# Added MysqlPort directive.
+#
+# Revision 1.111  2003/09/27 15:34:06  rob
+# Corrected a moduleCallBack bug - if a module callback was added while acting on a message, and not a command, the module owner was not set, as such, if a module was unloaded while a callback was in the queue, it would not be deleted from the queue, so when it was time to execute it, it tried to execute a pointer to a function which no longer existed :)
+#
+# Revision 1.110  2003/09/25 19:29:03  rob
+# Some minor tidying up, ensured hs_moo.c and ircd_catserv.c compile witout warnings when using -W and -Wall
+#
+# Revision 1.109  2003/09/24 18:32:04  rob
+# Fixed a nasty bug with mod_tail unloading - and added a nifty if(debug) feature for dealing with modules - go on try it, (un)load a module in debug mode and read those logs, you know you want to.... :)
+#
+# Revision 1.108  2003/09/22 21:46:08  rob
+# Fixed a bug with putanope script, it was cvs-tagging my whole ./Anope/* dir instead of just ./Anope/anope-dev - so i might have attached some incorrect tags to anope-rel - it wont effect anyone tho so its ok... :/
+#
+# Revision 1.107  2003/09/22 21:40:25  rob
+# Added module help system, and updated hs_moo to show it in use! :)
+#
+# Revision 1.106  2003/09/22 17:05:19  rob
+# putanope will now (optional) tag all commits - pressing enter when asked will use the current version number as the tag, entering "NONE" will not tag the commit
+#
+# Revision 1.105  2003/09/21 21:34:46  rob
+# forgot to do version / indent, so i'll just run putanope with no changes :)
+#
+# Revision 1.104  2003/09/21 18:28:04  rob
+# Fixed a bug involving a module attaching to both MOD_HEAD and MOD_TAIL of the same command - added a new module command, " char *moduleGetLastBuffer(void); " this will allow module coders to request a pointer to a copy of the command that was sent to services, as the strtok() buffer will be modifed by strtok() :/
+#
+# Revision 1.103  2003/09/13 20:27:30  certus
+# I have noe idea why this shit isn't working how it should, but I'm gonna roll back to the last file version, so mlock +M won't work until I have found the problem. It's not a smart solution, but better than segfaults and DB crashs.
+#
+# Revision 1.102  2003/09/13 18:57:17  rob
+# Corrected a duplicate entry in fr.l :/
+#
+# Revision 1.101  2003/09/13 18:42:49  certus
+# okay guys, this is my last attempt to fix +M mlock, if it doesn't work, I'm gonna spend a beer :P
+#
+# Revision 1.100  2003/09/13 17:53:56  rob
+# Corrected an error in all lang files (cept en_us.l) which caused the oper help to be displayed twice, once in english, once in given language.
+#
+# Revision 1.99  2003/09/13 17:17:08  certus
+# ups, +R was already added :P
+#
+# Revision 1.98  2003/09/13 17:03:36  certus
+# Added mlockmodes +R and +M for unreal and removed +H
+#
+# Revision 1.97  2003/09/07 20:52:55  certus
+# Fixed a small bug where some parts of the hostserv help were not displayed to hostsetters
+#
+# Revision 1.96  2003/09/07 17:39:50  dane
+# Fixed proxy compile warning
+#
+# Revision 1.95  2003/09/07 17:10:31  dane
+# Fixed bug 121 where clearmodes does not work.
+#
+# Revision 1.94  2003/09/07 17:02:59  dane
+# Propagation of bug fixes for 194 and 217.
+#
+# Revision 1.93  2003/09/04 20:42:58  rob
+# ./configure will now check for the existance of RTLD_LOCAL and only try to enforce it if its present - this should let module support compile on openBSD
+#
+# Revision 1.92  2003/09/04 18:55:34  rob
+# Mirror'ed changes in anope-rel ref: http://www.anope.org/bug/bug_view_advanced_page.php?bug_id=0000170
+#
+# Revision 1.91  2003/09/02 11:32:02  dane
+# putanope test.
+#
+# Revision 1.90  2003/08/31 01:02:00  rob
+# Corrected an issue with moduleCallback's and paramaters - eugh 4 hrs and i was only missing a "=" sign... :)
+#
+# Revision 1.89  2003/08/30 20:48:14  rob
+# akilled client's joining the network now get a user_struct made, and then deleted when the quit is sent.  This is to allow for ircd's which have excmpt lines in the .conf, so instead of services just assuiming the gline will be honored, we build a user stuct and dont delete it until we know we can do so.
+#
+# Revision 1.88  2003/08/20 01:36:34  keeper
+# Fixed a little bug in german language file ("registriert and geschützt"
+# instead of "registriert und geschützt")
+#
+# Revision 1.87  2003/08/16 22:13:47  rob
+# Added moduleAddCallback command for module coders.
+#
+# Revision 1.86  2003/08/16 10:46:42  rob
+# Forgot version number :)
+#
+# Revision 1.85  2003/08/15 17:51:52  rob
+# Added module timmer call-back's - see hs_moo.c for a basic example.
+#
+# Revision 1.84  2003/08/04 01:09:43  dane
+# Another stab at the socket nick registration. Still not working properly.
+# Fixed Channel DROP then FORBID crash on MySQL (0000199)
+#
+# Revision 1.83  2003/07/28 20:45:03  dane
+# Expanded the extsocket feature a little. As a prototype it can take:
+# "register nick pass email" to register a nick with full error checking.
+# The reply is preceeded by the string numeric, and for now just sent
+# to the logchan, not back to the socket.
+#
+# Revision 1.82  2003/07/28 14:51:42  dane
+# Fixed HostServ launch on Viagra and PTlink (0000190)
+#
+# Revision 1.81  2003/07/28 00:54:54  dane
+# BotServ bots are now +S on ULTIMATE3 (0000159)
+#
+# Revision 1.80  2003/07/28 00:08:17  dane
+# Fixed NICK_IS_REGISTER dupe on Hybrid (0000184)
+#
+# Revision 1.79  2003/07/27 21:51:08  dane
+# Fixed previous compile error. Note that I added a new field on the user_
+# structure char * vident. I'm not sure where to use it yet...
+#
+# Revision 1.78  2003/07/27 20:45:18  dane
+# Fixed bug 0000187 and added vindent to the user structure.
+#
+# Revision 1.77  2003/07/27 17:08:59  dane
+# Fixed Bug 0000188 for PTlink /newmask support. Also, shuffled some nifty
+# functions from hostserv.c to misc.c so they can be used throughout.
+#
+# Revision 1.76  2003/07/25 19:47:46  atoledo
+# Added (VERY EXPERIMENTAL) external socket support.
+# To compile, enable using configure. To enable, there are 3 configuration entries that need to be set. See Changes.conf for an explanation.
+#
+# Revision 1.75  2003/07/25 08:57:31  rob
+# Moved veriable declares to the top of functions for some #ifdef'ed ircds - hopefully it'll sort out bug ref: http://www.anope.org/bug/bug_view_advanced_page.php?bug_id=0000183
+#
+# Revision 1.74  2003/07/24 02:13:36  dane
+# Fixed the INSERT duplicate key mysql error that flooded the log files.
+#
+# Revision 1.73  2003/07/22 20:10:17  dane
+# Fixed SENDALL from STAFF to SENDALL (0000179)
+#
+# Revision 1.72  2003/07/22 18:40:39  dane
+# Fixed minor badwords things.
+#
+# Revision 1.71  2003/07/22 16:59:59  atoledo
+# Added badwords to MySQL save. Note that a new anope_cs_badwords table is required.
+#
+# Revision 1.70  2003/07/22 04:24:09  dane
+# ChannelServ time. Made ci_id keep it's value across updates.
+# It also required a rtq on /CS DROP. Some performance changes,
+# and optimization of the table schema for anope_cs_info.
+#
+# Revision 1.69  2003/07/22 03:15:08  dane
+# Made nick aliases also preserve their id upon /OS RELOAD. This goes
+# with adding real time queries to /NS GROUP
+#
+# Revision 1.68  2003/07/21 20:49:30  dane
+# Well... another step to preserve the MySQL id. Now MySQL get's updated in
+# real time (part of phase 3) on /NS SET DISPLAY and /NS DROP. Note that on
+# the drop, it goes down to the Channel level to make appropiate changes.
+#
+# Revision 1.67  2003/07/21 15:05:04  dane
+# Better implementation of ns_id preservation. Also, some optimization
+# on the MySQL tables.sql schema (NickServ only, for now).
+#
+# Revision 1.66  2003/07/21 01:23:40  dane
+# Fixed /NS SET DISPLAY MySQL query.
+#
+# Revision 1.65  2003/07/21 00:57:46  dane
+# Made MySQL ns_id more meaningful by preserving its value across
+# updates. This is at a cost of one extra query per new record only.
+#
+# Revision 1.64  2003/07/20 23:55:24  dane
+# Fixed my previous PTlink sbuf fix :)
+#
+# Revision 1.63  2003/07/20 23:38:54  dane
+# Fixed PTlink sbuf compile error
+#
+# Revision 1.62  2003/07/20 14:23:04  dane
+# Added MySQL Optimizations
+#
+# Revision 1.61  2003/07/20 13:51:42  rob
+# Forgot version, now set to 1.5.6-r11
+#
+# Revision 1.60  2003/07/20 01:53:15  dane
+# Setup for development towards 1.5.7
+#
+# Revision 1.59  2003/07/20 01:45:48  dane
+# Release 1.5.6
+#
+# Revision 1.58  2003/07/20 01:45:10  dane
+# Fixed Changes files
+#
+# Revision 1.57  2003/07/20 01:39:05  dane
+# Fixed DEFCON_GLOBAL on all .l that where missing the %d
+#
+# Revision 1.56  2003/07/20 01:15:50  dane
+# Code cleanup, documentation update, things moved around. I also got
+# rid of the TODO files. I'll transfer all those to Mantis.
+#
+# Revision 1.55  2003/07/19 21:24:34  dane
+# Fixed +oa +qa to work on ModeOnId as well as net-joins.
+#
+# Revision 1.54  2003/07/18 00:47:50  keeper
+# Commited again after adding if's for checking if channel is forbidden.
+# (Unable to free if chan was forbidden, fixed now)
+#
+# Revision 1.53  2003/07/17 20:47:26  keeper
+# Fixed mysql.c for older gcc versions (2.95.4 tested).
+#
+# Revision 1.52  2003/07/17 16:08:43  keeper
+# Fixed mysql.c memory leak (db_mysql_quote results were'nt free'ed).
+# (That indent that putanope calls makes the "modified files" list look bigger :o)
+#
+# Revision 1.51  2003/07/16 18:51:56  dane
+# Fixed modules/Makefile.inc ... I'm considering removing this file from
+# CVS and make it local to the compilation, as to avoind unwanted modifications
+# to it.
+#
+# Revision 1.50  2003/07/16 18:49:10  dane
+# Implemented a less intrusive +oa and +qa. Also did a lot of cleanup, updated
+# all .c and .h headers, removed all stale debug blocks (THALES), and fixed
+# a few things here and there. Also, added a new script bin/makepatch
+#
+# Revision 1.49  2003/07/16 04:42:03  dane
+# Removed compression on new utilities.
+#
+# Revision 1.48  2003/07/16 04:33:57  dane
+# Added bin directory with misc tools.
+#
+# Revision 1.47  2003/07/16 03:26:20  dane
+# Added "getmods" target to modules/compile.sh.
+# Test of CVS Log substitution.
+#
+# EOF

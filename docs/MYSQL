@@ -1,0 +1,97 @@
+Anope MySQL Support
+-------------------
+
+Introduction:
+
+    Anope 1.6 onwards supports MySQL databases. On Anope 1.6.0 only PHASE 1 
+    has been implemented. Since the next phases require major changes in the 
+    core, we decided to save it for 2.0. However, having your db's easily 
+    accessible on your website is still a great feature.
+
+    PHASE 1:Anope will be able to save all it's databases to MySQL. It will 
+    happen in conjuction with the current FFF databases. This first step is 
+    nothing more than a MySQL dump of the databases (i.e. read-only), since 
+    Anope will not (for now) read from Mysql. (COMPLETED)
+
+    PHASE 2:The next step is load the databases from mysql, being able to 
+    replace the FFF completely as an archive method (since all changes to 
+    the mysql db would be lost on the next Services save). All, while keeping 
+    FFF intact. This is still not the final goal, but it's a milestone.
+
+    PHASE 3:The next step, and most convoluted of all (since we'll need to 
+    modify pretty much all the source) is to load/save (SELECT/INSERT) data 
+    in realtime. That way the mysql db could be modified externaly (web?).  
+    Again, the FFF will be kept intact.
+
+Requirements:
+
+    1. MySQL server version 3.23.32 or greater
+    2. MySQL libs and development files (usualy called mysql-dev).
+    3. A MySQL user account
+    4. A MySQL database
+
+Installation:
+
+    1. You need to configure Anope to be compiled with MySQL support. To 
+       do so you must run ./configure and answer "Yes" when asked for
+       MySQL Support.
+
+       Notes:
+
+       * MySQL is not supported on the following platforms: Windows.
+       * You might need to run "make distclean" prior to running ./configure
+
+    2. Compile Anope as usual. The gmake process will now compile MySQL
+       support into Anope.
+
+    3. Install Anope as usual. 
+
+Configuration:
+
+    1. Run bin/mydbgen to help on the schema creation and adjustments.
+
+    2. Edit services.conf and add your mysql data to the MySQL configuration
+       block. 
+
+    3. Start or restart services to make use of the new Anope executable.
+
+Security:
+
+   To add a layer of security you have the option of encrypting or encoding
+   all passwords for nicks and chans. Use the "MysqlSecure" directive on your
+   services.conf file to enable it. The availabe storage methods are:
+
+   #MysqlSecure "" or MysqlSecure ""
+
+      Disables security. All passwords will be saved on the MySQL database
+      as clear text, with no encryption or encoding. FASTEST
+
+   MysqlSecure "des"
+
+      Encrypts all passwords using a unix DES encription. This is a one way
+      encryption algorithm. You can only validate it agains another DES
+      encrypted string, using the same "salt" (the first two characters of
+      the encrypted string). FAST
+
+   MysqlSecure "md5"
+
+      Calculates an MD5 128-bit checksum for the password. The value is 
+      returned as a 32-digit hex number that may be used as a hash key.
+      SLOW
+
+   MysqlSecure "sha"
+
+      Calculates an SHA 160-bit checksum for the password. The value is 
+      returned as a 40-digit hex number. SLOWEST
+
+   MysqlSecure "mykey"
+
+      Encodes the passwords using "mykey" as the encryption password. It
+      produces a binary string and can be decoded using the MySQL builtit
+      function DECODE(crypt_str,mykey). VARIABLE
+
+   Caveat: Keep in mind that this if you use any method other than clear
+   text, services will need to encrypt/encode every single password on
+   every database save. On large networks, it may impact responsiveness
+   during the saves.
+

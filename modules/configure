@@ -1,0 +1,21 @@
+#!/bin/sh
+
+echo -n "SRCS=" > ./Makefile.inc
+FIRST=1
+for oldfile in *.c
+do
+	if [ "$FIRST" = 1 ] ; then
+		echo -n " "$oldfile >> ./Makefile.inc
+	else
+		echo "\\" >> ./Makefile.inc
+		echo -n "     " $oldfile >> ./Makefile.inc
+	fi
+	FIRST=0
+done
+echo "" >> ./Makefile.inc
+
+cat <<EOT
+All done!  Now run "make" (or possibly "gmake") to compile your modules.
+See the INSTALL, README and FAQ files if you have any problems.
+EOT
+exit 0

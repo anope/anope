@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
+06/22 F Changed strcasecmp to stricmp as it should be                     [ #00]
 06/20 F PTLink server support						  [ #00]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
 

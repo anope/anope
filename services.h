@@ -424,6 +424,7 @@ struct ModuleDataItem_ {
 	char *key;								/* The key */
 	char *value;							/* The Value */
 	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
+	int persistant;							/* Is this value persistant? */
 };
 
 struct ModuleData_ {	

@@ -185,7 +185,7 @@ int addModule(Module * m)
     index = CMD_HASH(m->name);
 
     for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (strcasecmp(m->name, current->name) == 0)
+        if (stricmp(m->name, current->name) == 0)
             return MOD_ERR_EXISTS;
         lastHash = current;
     }
@@ -223,7 +223,7 @@ int delModule(Module * m)
     index = CMD_HASH(m->name);
 
     for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (strcasecmp(m->name, current->name) == 0) {
+        if (stricmp(m->name, current->name) == 0) {
             if (!lastHash) {
                 MODULE_HASH[index] = current->next;
             } else {
@@ -749,7 +749,7 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
 
     for (cmd = c; cmd; cmd = cmd->next) {
         if (cmd->mod_name
-            && strcasecmp(cmd->mod_name, mod_current_module->name) == 0) {
+            && stricmp(cmd->mod_name, mod_current_module->name) == 0) {
             if (debug) {
                 displayCommandFromHash(cmdTable, name);
             }
@@ -778,7 +778,7 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name)
         alog("trying to display command %s", name);
     }
     for (current = cmdTable[index]; current; current = current->next) {
-        if (strcasecmp(name, current->name) == 0) {
+        if (stricmp(name, current->name) == 0) {
             displayCommand(current->c);
         }
     }
@@ -822,7 +822,7 @@ int displayMessageFromHash(char *name)
         alog("trying to display message %s", name);
     }
     for (current = IRCD[index]; current; current = current->next) {
-        if (strcasecmp(name, current->name) == 0) {
+        if (stricmp(name, current->name) == 0) {
             displayMessage(current->m);
         }
     }
@@ -881,7 +881,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
             && (!strcmp(c->service, current->c->service) == 0)) {
             continue;
         }
-        if ((strcasecmp(c->name, current->name) == 0)) {        /* the cmd exist's we are a addHead */
+        if ((stricmp(c->name, current->name) == 0)) {   /* the cmd exist's we are a addHead */
             if (pos == 1) {
                 c->next = current->c;
                 current->c = c;
@@ -940,7 +940,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
 
     index = CMD_HASH(c->name);
     for (current = cmdTable[index]; current; current = current->next) {
-        if (strcasecmp(c->name, current->name) == 0) {
+        if (stricmp(c->name, current->name) == 0) {
             if (!lastHash) {
                 tail = current->c;
                 if (tail->next) {
@@ -1089,7 +1089,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
     index = CMD_HASH(m->name);
 
     for (current = msgTable[index]; current; current = current->next) {
-        if (strcasecmp(m->name, current->name) == 0) {  /* the msg exist's we are a addHead */
+        if (stricmp(m->name, current->name) == 0) {     /* the msg exist's we are a addHead */
             if (pos == 1) {
                 m->next = current->m;
                 current->m = m;
@@ -1220,7 +1220,7 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
     index = CMD_HASH(m->name);
 
     for (current = msgTable[index]; current; current = current->next) {
-        if (strcasecmp(m->name, current->name) == 0) {
+        if (stricmp(m->name, current->name) == 0) {
             if (!lastHash) {
                 tail = current->m;
                 if (tail->next) {
@@ -1755,13 +1755,17 @@ void moduleDisplayHelp(int service, User * u)
 
 /**
  * Add module data to a struct.
- * This allows module coders to add data to an existing struct
+ * This actaully adds the request data to the moduleData structs, this should not be called directly from modules.
  * @param md The module data for the struct to be used
  * @param key The Key for the key/value pair
  * @param value The value for the key/value pair, this is what will be stored for you
+ * @param persistant Should the key/value pair be persistant?
  * @return MOD_ERR_OK will be returned on success
+ * @see moduleAddData
+ * @see moduleAddPersistantData
  **/
-int moduleAddData(ModuleData * md[], char *key, char *value)
+int moduleAddDataValue(ModuleData * md[], char *key, char *value,
+                       int persistant)
 {
     char *mod_name = sstrdup(mod_current_module_name);
 
@@ -1780,7 +1784,7 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
     }
 
     for (current = md[index]; current; current = current->next) {
-        if (strcasecmp(current->moduleName, mod_name) == 0)
+        if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;
     }
 
@@ -1801,7 +1805,7 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
 	 **/
     for (itemCurrent = lastHash->di; itemCurrent;
          itemCurrent = itemCurrent->next) {
-        if (strcasecmp(itemCurrent->key, key) == 0) {
+        if (stricmp(itemCurrent->key, key) == 0) {
             item = itemCurrent;
         }
         lastItem = itemCurrent;
@@ -1813,6 +1817,7 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
         }
         item->next = NULL;
         item->key = strdup(key);
+        item->persistant = persistant;
         item->value = strdup(value);
         if (lastItem)
             lastItem->next = item;
@@ -1827,6 +1832,32 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
     free(mod_name);
     return MOD_ERR_OK;
 
+}
+
+/**
+ * Add persistant module data to a struct.
+ * This allows module coders to add data to an existing struct, and have anope take care of loading/saving it!
+ * @param md The module data for the struct to be used
+ * @param key The Key for the key/value pair
+ * @param value The value for the key/value pair, this is what will be stored for you
+ * @return MOD_ERR_OK will be returned on success
+ **/
+int moduleAddPersistantData(ModuleData * md[], char *key, char *value)
+{
+    return moduleAddDataValue(md, key, value, 1);
+}
+
+/**
+ * Add module data to a struct.
+ * This allows module coders to add data to an existing struct
+ * @param md The module data for the struct to be used
+ * @param key The Key for the key/value pair
+ * @param value The value for the key/value pair, this is what will be stored for you
+ * @return MOD_ERR_OK will be returned on success
+ **/
+int moduleAddData(ModuleData * md[], char *key, char *value)
+{
+    return moduleAddDataValue(md, key, value, 0);
 }
 
 /**
@@ -1847,7 +1878,7 @@ char *moduleGetData(ModuleData * md[], char *key)
     index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
-        if (strcasecmp(current->moduleName, mod_name) == 0)
+        if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;
     }
 
@@ -1882,7 +1913,7 @@ void moduleDelData(ModuleData * md[], char *key)
     index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
-        if (strcasecmp(current->moduleName, mod_name) == 0)
+        if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;
     }
     if (lastHash) {
@@ -1925,7 +1956,7 @@ void moduleDelAllData(ModuleData * md[])
     index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
-        if (strcasecmp(current->moduleName, mod_name) == 0)
+        if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;
     }
     if (lastHash) {
@@ -2025,5 +2056,98 @@ void moduleCleanStruct(ModuleData * moduleData[])
         }
     }
 }
+
+/**
+ * Load any data relevant for this module
+ * @param m The module to Load the data for
+ **/
+void moduleLoadAllData(Module * m)
+{
+    FILE *in;
+    char buffer[2000];          /* will _never_ be this big thanks to the 512 limit of a message */
+    char filename[4096];
+    char *key = NULL;
+    char *value = NULL;
+    char *service = NULL;
+    char *str_key = NULL;
+    int len;
+    enum MODULE_DATA_TYPE struc;
+    NickCore *nc;
+    NickAlias *na;
+    Channel *c;
+
+    strncpy(filename, MODULE_PATH, 4095);
+    len = strlen(filename);
+    strncat(filename, "data/", 4095 - len);
+    len = strlen(filename);
+    strncat(filename, m->name, 4095 - len);
+    len = strlen(filename);
+    strncat(filename, ".db", 4095 - len);
+
+    if ((in = fopen(filename, "r")) == NULL) {
+        alog("unable to open module data file [%s] for reading, module data will not be loaded", filename);
+    } else {
+        while (!feof(in)) {
+            fgets(buffer, 1500, in);
+            service = myStrGetToken(buffer, ' ', 0);
+            str_key = myStrGetToken(buffer, ' ', 1);
+            key = myStrGetToken(buffer, ' ', 2);
+            value = myStrGetTokenRemainder(buffer, ' ', 3);
+            if (service) {
+                struc = atoi(service);
+                if (str_key) {
+                    if (key) {
+                        if (value) {
+                            switch (struc) {
+                            case MD_NICK_CORE:
+                                nc = findcore(str_key);
+                                if (nc) {
+                                    moduleAddPersistantData(nc->moduleData,
+                                                            key, value);
+                                }
+                                break;
+                            case MD_NICK_ALIAS:
+                                na = findnick(str_key);
+                                if (na) {
+                                    moduleAddPersistantData(na->moduleData,
+                                                            key, value);
+                                }
+                                break;
+                            case MD_NICK_MEMO:
+
+                                break;
+                            case MD_CHAN_MEMO:
+
+                                break;
+                            case MD_CHAN_INFO:
+                                c = findchan(name);
+                                if (c && c->ci) {
+                                    moduleAddPersistantData(c->ci->
+                                                            moduleData,
+                                                            key, value);
+                                }
+                                break;
+                            }
+                            free(value);
+                        }
+                        free(key);
+                    }
+                    free(str_key);
+                }
+                free(service);
+            }
+        }
+    }
+}
+
+/**
+ * Save any data relevant for this module
+ * @param m The module to Save the data for
+ **/
+void moduleSaveAllData(Module * m)
+{
+
+}
+
 
 /* EOF */

@@ -1457,7 +1457,7 @@ static void del_exception(Channel * chan, char *mask)
     int reset = 0;
 
     for (i = 0; i < chan->exceptcount; i++) {
-        if ((!reset) && (strcasecmp(chan->excepts[i], mask) == 0)) {
+        if ((!reset) && (stricmp(chan->excepts[i], mask) == 0)) {
             free(chan->excepts[i]);
             reset = 1;
         }

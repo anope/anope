@@ -74,6 +74,8 @@ extern CommandHash *HELPSERV[MAX_CMD_HASH];
 extern CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MessageHash *IRCD[MAX_CMD_HASH];
 
+enum MODULE_DATA_TYPE { MD_NICK_CORE = 1, MD_NICK_ALIAS = 2, MD_NICK_MEMO = 3, MD_CHAN_MEMO =4, MD_CHAN_INFO = 5};
+
 struct Module_ {
 	char *name;
 	char *filename;
@@ -221,12 +223,15 @@ void moduleDelCallback(char *name);
 void moduleCallBackRun(void);
 
 char *moduleGetData(ModuleData *md[], char *key);			/* Get the value for this key from this struct */
+int moduleAddDataValue(ModuleData * md[], char *key, char *value,int persistant); /* Store the value in the struct */
+int moduleAddPersistantData(ModuleData * md[], char *key, char *value); /* Set the value for this key for this struct to be saved*/
 int moduleAddData(ModuleData *md[], char *key, char *value);		/* Set the value for this key for this struct */
 void moduleDelData(ModuleData *md[], char *key);				/* Delete this key/value pair */
 void moduleDelAllData(ModuleData *md[]);					/* Delete all key/value pairs for this module for this struct */
 void moduleCleanStruct(ModuleData * moduleData[]);			/* Clean a moduleData hash */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
-
+void moduleLoadAllData(Module *m);						/* Load any persistant module data settings */
+void moduleSaveAllData(Module *m);						/* Save any persistant module data settings */
 /*************************************************************************/
 
 #endif

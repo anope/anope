@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="209"
+VERSION_BUILD="210"
 
 # $Log$
+#
+# BUILD : 1.7.4 (210)
+# BUGS  : N/A
+# NOTES : Changed strcasecmp to stricmp
+# 
 #
 # BUILD : 1.7.4 (209)
 # BUGS  : none

@@ -1,155 +1,162 @@
 Anope for Windows
+-----------------
 
-1. Building the source
-2. Installation
-3. Compiling modules
-4. Credits
+1) Building the Source
+2) Installation
+3) Compiling Modules
+4) Credits
 
-=========================================================================
-= 1. Building from the ground up                                        =
-=========================================================================
+1) Building the Source
 
-    If you want to build Anope on the Win32 system you will need to obtain
-the following items. 
+    If you want to build Anope from source on a Win32 system, you will need
+    to follow this instructions:
 
-1. Download the files required
+    1) Download the required files:
 
-- Current Anope source:
-	http://zero.org:7467/viewcvs/trunk.tar.gz
+        * Current Anope source:
+     http://zero.org:7467/viewcvs/trunk.tar.gz
 
-If you have Visual C++ 6, 7 or .NET skip ahead to step 2, else download
-the following free components from Microsoft. Once downloaded install these packages
+        If you have Visual C++ 6, 7 or .NET skip ahead to step 2, else you
+        need to download the following free components from Microsoft. Once
+        downloaded, install these packages.
 
-- VCToolKit:
-    http://download.microsoft.com/download/3/9/b/39bac755-0a1e-4d0b-b72c-3a158b7444c4/VCToolkitSetup.exe
+        * VCToolKit:
+            http://download.microsoft.com/download/3/9/b/39bac755-0a1e-4d0b-b72c-3a158b7444c4/VCToolkitSetup.exe
 
-- .NET Framework 1.1 Redistributable:
-    http://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe
+        * .NET Framework 1.1 Redistributable:
+            http://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe
 
-- .NET Framework SDK 1.1:
-    http://download.microsoft.com/download/5/2/0/5202f918-306e-426d-9637-d7ee26fbe507/setup.exe
+        * .NET Framework SDK 1.1:
+            http://download.microsoft.com/download/5/2/0/5202f918-306e-426d-9637-d7ee26fbe507/setup.exe
 
-- Core SDK for the needed libraries:
-   http://www.microsoft.com/msdownload/platformsdk/sdkupdate/
+        * Core SDK for the needed libraries:
+            http://www.microsoft.com/msdownload/platformsdk/sdkupdate/
 
-- MySQL for Windows - needed if building for mysql
-   http://www.mysql.com
+        * MySQL for Windows (only needed if building with MySQL enabled)
+            http://www.mysql.com/
 
 
-2. Unpack the Anope tarball with your favorite uncompression program (winzip or winrar)
+    2) Unpack the Anope tarball with your favorite uncompression program
+       (winzip or winrar).
 
-3. Open Makefile.inc.win32 in the main directory with a text editor (notepad or notepad clones)
+    3) Open Makefile.inc.win32 in the main directory with a text editor
+       (notepad or notepad clones).
    
-   A. change the line "IRCD=" to match the ircd that you want to build, and place that number
-      after the = so if your building Unreal 3.2 (#10), you would change the line to read
-      "IRCD=10"
+        A) Change the line "IRCD=" to match the ircd that you want to build,
+           and place that number after the =. So if you want to build for
+           Unreal 3.2 (#10), you would change the line to read "IRCD=10".
 
-   B. If you are building for MySQL change USE_MYSQL to equal 1 (ie.. USE_MYSQL=1), the next
-      two lines you must enter the path to the MySQL installation. MYSQL_INC, and MYSQL_LIB,
-      You can define the path one of two ways, either with \ or / if you use \ you must add
-      a secondary \ so c:\mysql would be c:\\mysql
+        B) If you are building for MySQL change USE_MYSQL to equal 1 (i.e.
+           USE_MYSQL=1). On the next two lines you must enter the path to the
+           MySQL installation. MYSQL_INC, and MYSQL_LIB. You can define the
+           path one of two ways, either with \ or /. If you use \ you must
+           add a secondary \; so c:\mysql would be c:\\mysql.
 
-   C. To use Anope build in Proxy scan you can change PROXY_SCANNER to be equal to 1
-      (ie.. PROXY_SCANNER=1), note the proxy scan is not the best and its recommended to use
-      another thrid party scanner.
+        C) To use Anope's built in Proxy scanner you need to change
+           PROXY_SCANNER to be equal to 1 (i.e. PROXY_SCANNER=1). Please note
+           that the Anope's built in proxy scanner is not the best available,
+           and that it's recommended to use another third party scanner.
 
-   D. Do you want to use the MD5 message-digest algorithm to encrypt passwords?
-	  (Selecting "yes" protects your passwords from being stolen if someone
-	  gains access to the Services databases, but makes it impossible to recover
-      forgotten passwords. There is no way to reverse this operation, so make
-	  sure you really want to enable it.). Change DB_ENCRYPTION to be equal to 1
+        D) Do you want to use the MD5 message-digest algorithm to encrypt
+           passwords? Selecting "yes" protects your passwords from being
+           stolen if someone gains access to the Services databases, but
+           makes it impossible to recover forgotten passwords. There is no
+           way to reverse this operation, so make sure you really want to
+           enable it. Change DB_ENCRYPTION to be equal to 1 to enable it.
 
-   E. If you are using Visual Studio 6, this next line can be very important. If you are an 
-      error during compile about "unresolved external symbol __ftol2", remove the # in front
-      of VC6=/QIfist and attempt to compile again.
+        E) If you are using Visual Studio 6, this next line can be very
+           important. If you are getting an error during compile about
+           "unresolved external symbol __ftol2", remove the # in front of
+           VC6=/QIfist and attempt to compile again.
 
-   F. When compiling if you get an error about 'Cannot find wsock32.lib' or 'Cannot find 
-      msvcrt.lib' You need to define the libpath, in the LIBPATH directive. You can define 
-      the path one of two ways, either with \ or / if you use \ you must add a secondary \ 
-      so c:\mysql would be c:\\sdk\lib be sure to remove the # in front of LFLAGS
+        F) If you get an error about "Cannot find wsock32.lib" or
+           "Cannot find msvcrt.lib" when compiling, you need to define the
+           libpath, in the LIBPATH directive. You can define the path in one
+           of two ways: either with \ or /. If you use \ you must add a
+           secondary \; so c:\sdk\lib would be c:\\sdk\\lib. Be sure to
+           remove the # in front of LFLAGS.
 
-   G. Most import is to set the DATDEST to be the folder name where data will be stored. 
-      This does not need to be the full path just the folder under the main executable 
-      in which data will exist. In our example we will use "data"
+        G) Most import is to set the DATDEST to be the folder name where the
+           database will be stored. This does not need to be the full path,
+           just the folder under the main executable in which data will
+           exist. In our example we will use "data"
  
-4. You are now ready to compile, bring up the Visual C++ toolkit command prompt, this 
-   will launch a dos command prompt like window, which will set the enviroment properties 
-   need to make Anope. Change directories to where you unpacked the source code in step 2. 
-   At the prompt type
+    4) You are now ready to compile. bring up the Visual C++ toolkit command
+       prompt; This will launch a dos command prompt like windows, which will
+       set the enviroment properties need to make Anope. Change directories
+       to where you unpacked the source code in step 2. At the prompt type:
 
-   nmake -f Makefile.win32
+        nmake -f Makefile.win32
 
-   Once you are back at the command prompt again, if there have been no 
-   errors, you are ready to go, should you encounter errors check how to adjust 
-   the makefile.inc.win32 to help resolve the issue.
+       Once you are back at the command prompt again, if there have been no
+       errors, you are ready to go. Should you encounter errors check how to
+       adjust the Makefile.inc.win32 to help resolve the issue. If those
+       changes in Makefile.inc.win32 didn't help, file a bug report.
 
-5. Anope will install the files where the belong. The only thing you need to do
-   is rename "data/example.conf" to be "services.conf"
+    5) Anope will install the files where the belong. The only thing you need
+       to do is rename "data/example.conf" to be "services.conf".
 
-You have now complete the building phase of Anope for Windows. Move to the 
-section related to setting up Anope.
+    You have now completed the building phase of Anope for Windows. You can
+    now move on to the next section, which is related to setting up Anope.
 
-=========================================================================
-= 2. Installation                                                       =
-=========================================================================
+2) Installation
 
-    Since Anope for Windows does not use a visual interface, you must do
-the configuration before getting to far into this.
+    Since Anope for Windows does not use a visual interface, you must do the
+    configuration with a texteditor before proceeding with running anope
+    itself.
 
-Open services.conf, and make the following edits
+    Open services.conf, and read through it carefully and adjust the settings
+    you think you need to adjust. Pay special attention to this settings:
 
-A. RemoteServer : this is the address to your ircd, along with the port
-                  and password. You should consult your ircd documentation
-                  on how to link ircds.
-B. ServicesRoot : Remove the # and change the names to your nick so you
-                  can take control of services once they are online.
+    A) RemoteServer: This is the address to your ircd, along with the port
+                     and password. You should consult your ircd
+                     documentation on how to link ircds.
+    B) ServicesRoot: Remove the # and change the names to your nick so you
+                     can take control of services once they are online.
 
-If you are unsure of the settings, You can go to the dos command prompt
-and run "anope.exe -nofork -debug" and watch the information as it
-attempts to connect.
+    If you are unsure of the settings, you can go to the dos command prompt
+    and run "anope.exe -nofork -debug" and watch the information as it
+    attempts to connect.
 
-To launch services you can do it one of two ways, if you are sure that the
-configuration information is correct, simply double clicking on it will 
-cause it to start, no window will come up. You can start at the dos prompt
-and type in "anope.exe" if services are successful in starting up
-the dos prompt will seem to hang, at this point you can close the dos
-window
+    You can launch services in two ways. If you are sure that the entered
+    configuration information is correct, simply double clicking the Anope
+    executable will cause it to start; no window will pop up. If you'd rather
+    have a more textual output, you can start at the dos prompt and type in
+    "anope.exe". If services are successfully started up the dos prompt will
+    seem to hang; at this point you can safely close the dos window.
 
-=========================================================================
-= 3. Compiling Modules                                                  =
-=========================================================================
+3) Compiling Modules
 
-    If you want to build other modules. You will need to modify the
-Makefile.inc.win32
+    If you want to build other modules than the ones shipped by default, you
+    will need to modify the Makefile.inc.win32 file.
 
-   A. When compiling if you get an error about 'Cannot find wsock32.lib' 
-      or 'Cannot find msvcrt.lib' You need to define the libpath, in the 
-      LIBPATH directive. You can define the path one of two ways, either 
-      with \ or / if you use \ you must add a secondary \ so c:\mysql 
-      would be c:\\sdk\lib be sure to remove the # in front of LFLAGS
+    A) If you get an error about "Cannot find wsock32.lib" or
+       "Cannot find msvcrt.lib" when compiling, you need to define the
+       libpath, in the LIBPATH directive. You can define the path in one
+       of two ways: either with \ or /. If you use \ you must add a
+       secondary \; so c:\sdk\lib would be c:\\sdk\\lib. Be sure to
+       remove the # in front of LFLAGS.
 
-   B. Add modules fine the line of "SRCS=" add the name of the file to
-      the end of the line. So if you have two files
+    B) Add modules; find the line stating "SRCS=" and add the name of the
+       file to the end of the line. So if you have two files:
 
-      "SRCS=file.c file2.c"
+        SRCS=file.c file2.c
 
-When that is done, use the same command prompt you set up in Part 1,
-change directores to the src/modules folder and type
+    C) When you've done this, use the same command prompt you set up in part
+       1, change directories to the src/modules folder, and type:
 
-nmake -f Makefile.win32
+        nmake -f Makefile.win32
 
-Copy the *.dll files that get created to the "data/modules/runtime"
-folder.
+    D) Copy the *.dll files that get created to the "data/modules/runtime"
+       folder.
 
-=========================================================================
-= 4. Credits                                                            =
-=========================================================================
+4) Credits
 
-    Anope is based on the code of Epona and IRCServices see README for
-full list of developers.
+    Anope is base on Epona and IRCServices. See README for more credits and
+    a complete list of all developers.
 
-    Anope Winodws code is provided by
+    Anope's Windows-specific code is provided by:
 
-    Dominick Meglio   <codemastr@unrealircd.com>
-    Trystan Scott Lee <trystan@nomadirc.net>
-    Chris Hogben	  <heinz@anope.org>
+        * Dominick Meglio       <codemastr@unrealircd.com>
+        * Trystan Scott Lee     <trystan@nomadirc.net>
+        * Chris Hogben          <heinz@anope.org>

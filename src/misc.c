@@ -4,7 +4,7 @@
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
  *
- * Please read COPYING and README for furhter details.
+ * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
@@ -896,7 +896,7 @@ char *host_resolve(char *host)
         memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
         addr.s_addr = ip;
         ntoa(addr, ipbuf, sizeof(ipbuf));
-        ipreturn = anopeStrDup(ipbuf);
+        ipreturn = sstrdup(ipbuf);
         if (debug) {
 	  alog("Resolved %s to %s",host, ipbuf);
         }
@@ -907,17 +907,4 @@ char *host_resolve(char *host)
     }
 }
 
-char *anopeStrDup(const char *src) {
-    char *ret=NULL;
-    if(src) {
-#ifdef __STRICT_ANSI__
-        if( (ret = (char *)malloc(strlen(src)+1)) ) {;
-            strcpy(ret,src);
-        }
-#else
-        ret = strdup(src); /* this way will prolly be faster, use it if we can */
-#endif
-    }
-    return ret;
-}
 

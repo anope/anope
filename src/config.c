@@ -3,7 +3,7 @@
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
  *
- * Please read COPYING and README for furhter details.
+ * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
@@ -825,7 +825,7 @@ int parse(char *buf, int linenum, int reload)
             case PARAM_STRING:
 /*	      if (reload && *(char **)d->params[i].ptr)
 	      	free(*(char **)d->params[i].ptr); */
-                *(char **) d->params[i].ptr = anopeStrDup(av[optind++]);
+                *(char **) d->params[i].ptr = sstrdup(av[optind++]);
                 if (!d->params[i].ptr) {
                     error(linenum, "%s: Out of memory", d->name);
                     return 0;
@@ -1182,7 +1182,7 @@ int read_config(int reload)
             RootNumber++;
             ServicesRoots =
                 realloc(ServicesRoots, sizeof(char *) * RootNumber);
-            ServicesRoots[RootNumber - 1] = anopeStrDup(s);
+            ServicesRoots[RootNumber - 1] = sstrdup(s);
         } while ((s = strtok(NULL, " ")));
     }
 
@@ -1195,7 +1195,7 @@ int read_config(int reload)
                 HostNumber++;
                 HostSetters =
                     realloc(HostSetters, sizeof(char *) * HostNumber);
-                HostSetters[HostNumber - 1] = anopeStrDup(s);
+                HostSetters[HostNumber - 1] = sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1210,7 +1210,7 @@ int read_config(int reload)
                 ModulesAutoload =
                     realloc(ModulesAutoload,
                             sizeof(char *) * ModulesNumber);
-                ModulesAutoload[ModulesNumber - 1] = anopeStrDup(s);
+                ModulesAutoload[ModulesNumber - 1] = sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1225,7 +1225,7 @@ int read_config(int reload)
                     realloc(ModulesDelayedAutoload,
                             sizeof(char *) * ModulesDelayedNumber);
                 ModulesDelayedAutoload[ModulesDelayedNumber - 1] =
-                    anopeStrDup(s);
+                    sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1365,7 +1365,7 @@ int read_config(int reload)
                 DomainNumber++;
                 NetworkDomains =
                     realloc(NetworkDomains, sizeof(char *) * DomainNumber);
-                NetworkDomains[DomainNumber - 1] = anopeStrDup(s);
+                NetworkDomains[DomainNumber - 1] = sstrdup(s);
             } while ((s = strtok(NULL, " ")));
         }
     }

@@ -3,7 +3,7 @@
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
  *
- * Please read COPYING and README for furhter details.
+ * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
@@ -75,16 +75,26 @@ void *srealloc(void *oldptr, long newsize)
     return buf;
 }
 
-char *sstrdup(const char *s)
+char *sstrdup(const char *src)
 {
-    char *t = anopeStrDup(s);
-    if (!t)
-#if !defined(USE_THREADS) || !defined(LINUX20)
-        raise(SIGUSR1);
+    char *ret = NULL;
+    if (src) {
+#ifdef __STRICT_ANSI__
+        if ((ret = (char *) malloc(strlen(src) + 1))) {;
+            strcpy(ret, src);
+        }
 #else
-        abort();
+        ret = strdup(src);
 #endif
-    return t;
+        if (!ret)
+#if !defined(USE_THREADS) || !defined(LINUX20)
+            raise(SIGUSR1);
+#else
+            abort();
+#endif
+    }
+
+    return ret;
 }
 
 /*************************************************************************/

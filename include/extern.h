@@ -1098,7 +1098,5 @@ extern long base64dects(char *ts);
 #define Anope_Free(x)       if ((x) != NULL) free(x)
 
 extern char *host_resolve(char *host);
-extern char *anopeStrDup(const char *src);
-
 
 #endif	/* EXTERN_H */

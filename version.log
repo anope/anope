@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="443"
+VERSION_BUILD="445"
 
 # $Log$
+#
+# BUILD : 1.7.6 (445)
+# NOTES : Setup for devel.
 #
 # BUILD : 1.7.6 (443)
 # BUGS  : 217

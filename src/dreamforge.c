@@ -1217,7 +1217,7 @@ void anope_cmd_unszline(char *mask)
 }
 
 /* SZLINE */
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
     /* Not Supported by this IRCD */
 }

@@ -8,9 +8,17 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="457"
+VERSION_BUILD="458"
 
 # $Log$
+#
+# BUILD : 1.7.6 (458)
+# BUGS  : N/A
+# NOTES : Updated our SGLINE/SZLINE support to all ircd where avaiable, this fixes some issues as well
+# 1. Unreal still doesnt do SGLINE well so its still disabled at this time
+# 2. We now enforce SZLINE on ircd with NICKIP
+# 3. Added check_szline() so we can check for szline matches
+# 4. Ultimate3 (s)zline work as documented, which is AKILL without the user part
 #
 # BUILD : 1.7.6 (457)
 # BUGS  : 

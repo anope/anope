@@ -659,9 +659,18 @@ void anope_cmd_unszline(char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
-void anope_cmd_szline(char *mask, char *reason)
+
+/* As of alpha27 (one after our offical support szline was removed */
+/* quote the changelog ---
+   Complete rewrite of the kline/akill/zline system. (s)zlines no longer exist.
+   K: lines set on IP addresses without username portions (or *) are treated as Z: lines used to be.
+*/
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
-    send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+    send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 86400 * 2, whom,
+             (long int) time(NULL), reason);
+    /* leaving this in here in case some legacy user asks for it */
+    /* send_cmd(NULL, "SZLINE %s :%s", mask, reason); */
 }
 
 void anope_cmd_svsnoop(char *server, int set)

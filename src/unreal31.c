@@ -60,7 +60,7 @@ IRCDVar ircd[] = {
      "-r+d",                    /* Mode on Nick Change  */
      0,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
-     0,                         /* Supports SZlines     */
+     1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      0,                         /* Join 2 Set           */
@@ -1433,13 +1433,16 @@ void anope_cmd_unsgline(char *mask)
 /* UNSZLINE */
 void anope_cmd_unszline(char *mask)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask,
+             s_OperServ);
 }
 
 /* SZLINE */
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"),
+             mask, whom, (long int) time(NULL) + 86400 * 2,
+             (long int) time(NULL), reason);
 }
 
 /* SGLINE */

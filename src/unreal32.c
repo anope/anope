@@ -59,7 +59,7 @@ IRCDVar ircd[] = {
      "-r+d",                    /* Mode on Nick Change  */
      0,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
-     0,                         /* Supports SZlines     */
+     1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      0,                         /* Join 2 Set           */
@@ -1896,27 +1896,46 @@ void anope_cmd_release_svshold(char *nick)
 }
 
 /* UNSGLINE */
+/*
+ * SVSNLINE - :realname mask
+*/
 void anope_cmd_unsgline(char *mask)
 {
-    /* Not Supported by this IRCD */
+    /* 
+       Although Unreal has SVSNLINE, it has not worked in older version of
+       Unreal 3.2 it confused the tokens, now with 3.2.2 it seems they don't
+       understand the command at all, leaving it disable till I figure out
+       what is going on with it.
+     */
 }
 
 /* UNSZLINE */
 void anope_cmd_unszline(char *mask)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask,
+             s_OperServ);
 }
 
 /* SZLINE */
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"),
+             mask, whom, (long int) time(NULL) + 86400 * 2,
+             (long int) time(NULL), reason);
 }
 
 /* SGLINE */
+/*
+ * SVSNLINE + reason_where_is_space :realname mask with spaces
+*/
 void anope_cmd_sgline(char *mask, char *reason)
 {
-    /* Not Supported by this IRCD */
+    /* 
+       Although Unreal has SVSNLINE, it has not worked the older version of
+       Unreal 3.2 it confused the tokens, now with 3.2.2 it seems they don't
+       understand the command at all, leaving it disable till I figure out
+       what is going on with it.
+     */
 }
 
 /* SVSMODE -b */

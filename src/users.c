@@ -466,14 +466,22 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 /*            return NULL; */
             }
         }
+
+        /* SGLINE */
         if (ircd->sgline) {
-            /* Next for SGLINEs */
             if (check_sgline(nick, realname))
                 return NULL;
         }
+
+        /* SQLINE */
         if (ircd->sqline) {
-            /* And for SQLINEs */
             if (check_sqline(nick, 0))
+                return NULL;
+        }
+
+        /* SZLINE */
+        if (ircd->szline && ircd->nickip) {
+            if (check_szline(nick, ipbuf))
                 return NULL;
         }
 #ifndef STREAMLINED

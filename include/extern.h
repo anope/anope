@@ -766,6 +766,7 @@ E int check_chan_sqline(const char *chan);
 E int add_szline(User * u, char *mask, const char *by,
                  const time_t expires, const char *reason);
 E void expire_szlines(void);
+E int check_szline(char *nick, char *ip);
 
 E void check_clones(User * user);
 E void delete_ignore(const char *nick);
@@ -1001,7 +1002,7 @@ extern void anope_cmd_remove_akill(char *user, char *host);			  		  /* RAKILL */
 extern void anope_cmd_server(char *servname, int hop, char *descript);    	  		  /* SERVER */
 extern void anope_cmd_sgline(char *mask, char *reason);			  	  		  /* SGLINE */
 extern void anope_cmd_sqline(char *mask, char *reason);                   	  		  /* SQLINE */
-extern void anope_cmd_szline(char *mask, char *reason);			  	  		  /* SZLINE */
+extern void anope_cmd_szline(char *mask, char *reason, char *whom);				  /* SZLINE */
 extern void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
 extern void anope_cmd_svinfo();						  	  		  /* SVINFO */
 extern void anope_cmd_svsadmin(char *server, int set);						  /* SVSADMIN */

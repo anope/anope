@@ -55,9 +55,9 @@ IRCDVar ircd[] = {
      "+r",                      /* Mode On Reg          */
      "-r",                      /* Mode on UnReg        */
      "+d",                      /* Mode on Nick Change  */
-     0,                         /* Supports SGlines     */
+     1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
-     0,                         /* Supports SZlines     */
+     1,                         /* Supports SZlines     */
      0,                         /* Supports Halfop +h   */
      4,                         /* Number of server args */
      0,                         /* Join 2 Set           */
@@ -511,6 +511,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
     m = createMessage("INVITE",    anope_event_invite); addCoreMessage(IRCD,m);
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
@@ -554,6 +555,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("NJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("NNICK",     anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("ZLINE",     anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("UNZLINE",   anope_event_null); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -1464,16 +1467,6 @@ void anope_cmd_release_svshold(char *nick)
     /* Not Supported by this IRCD */
 }
 
-/*  
-:%s UNSXLINE %s
-	parv[0] = sender 
-	parv[1] = info ban mask
-*/
-void anope_cmd_unsgline(char *mask)
-{
-    /* Not Supported by this IRCD */
-}
-
 /*
 :%s UNZLINE %s
 	parv[0] = sender 
@@ -1481,7 +1474,7 @@ void anope_cmd_unsgline(char *mask)
 */
 void anope_cmd_unszline(char *mask)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(s_OperServ, "UNZLINE %s", mask);
 }
 
 /*
@@ -1491,19 +1484,33 @@ void anope_cmd_unszline(char *mask)
 	parv[2] = time
 	parv[3] = reason
 */
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(s_OperServ, "ZLINE %s %ld :%s", mask,
+             (long int) time(NULL) + 86400 * 2, reason);
 }
 
-/* 
-:%s SXLINE :%s:%s
+/*  
+:%s UNSXLINE %s
 	parv[0] = sender 
-	parv[1] = info ban mask:reason
+	parv[1] = info ban mask
 */
+void anope_cmd_unsgline(char *mask)
+{
+    send_cmd(ServerName, "UNSXLINE :%s", mask);
+}
+
+
+/*
+ * sxline - add info ban line
+ *
+ *	parv[0] = sender prefix
+ *  	parv[1] = mask length
+ *	parv[2] = real name banned mask:reason
+ */
 void anope_cmd_sgline(char *mask, char *reason)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(ServerName, "SXLINE %d :%s:%s", strlen(mask), mask, reason);
 }
 
 /* SVSNICK */

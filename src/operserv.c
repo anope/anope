@@ -3482,10 +3482,34 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     entry->expires = expires;
 
     slist_add(&szlines, entry);
-    anope_cmd_szline(entry->mask, entry->reason);
+    anope_cmd_szline(entry->mask, entry->reason, entry->by);
 
     return deleted;
 }
+
+/* Check and enforce any Zlines that we have */
+int check_szline(char *nick, char *ip)
+{
+    int i;
+    SXLine *sx;
+
+    if (szlines.count == 0)
+        return 0;
+
+    for (i = 0; i < szlines.count; i++) {
+        sx = szlines.list[i];
+        if (!sx)
+            continue;
+
+        if (match_wild_nocase(sx->mask, ip)) {
+            anope_cmd_szline(sx->mask, sx->reason, sx->by);
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 
 /* Delete any expired SZLINEs. */
 

@@ -724,7 +724,7 @@ void anope_cmd_unszline(char *mask)
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }

@@ -661,7 +661,7 @@ void anope_cmd_unszline(char *mask)
 {
     /* Does not support */
 }
-void anope_cmd_szline(char *mask, char *reason)
+void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
     /* Does not support */
 }

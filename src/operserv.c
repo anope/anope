@@ -490,7 +490,7 @@ static void load_old_akill(void)
 void load_os_dbase(void)
 {
     dbFILE *f;
-    int16 i, ver, c;
+    int16 i, ver;
     uint16 tmp16, n;
     uint32 tmp32;
     char *s;

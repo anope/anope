@@ -25,7 +25,7 @@ install:
         cd lang && $(MAKE) install && cd ..
         cd src && $(MAKE) install && cd ..
         cd src\modules && $(MAKE) install && cd ..
-	cd src\modules && $(MAKE) subs-install && cd ..
+		cd src\modules && $(MAKE) subs-install && cd ..
         -@echo ---
         -@echo Anope has been insalled successfully!
         -@echo ---
@@ -33,14 +33,13 @@ install:
 clean:
         cd src && $(MAKE) spotless && cd ..
         cd lang && $(MAKE) spotless && cd ..
-        -@erase src\*.exe
         -@erase *.exe version.h *.obj
-        cd src/modules && $(MAKE) spotless && cd ../..
+        cd src\modules && $(MAKE) spotless && cd ..\..
 
 spotless:
         cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
-        cd src/modules && $(MAKE) spotless && cd ../..
+        cd src\modules && $(MAKE) spotless && cd ..\..
         -@erase include\language.h include\version.h *~ services.exe version.sh.exe *.obj anopesmtp.exe
 
 mypasql: 
@@ -133,7 +132,7 @@ languages: FRC
         cd lang && $(MAKE) && cd ..
 
 anopesmtp: FRC
-        $(CC) src/tools/anopesmtp.c /link wsock32.lib $(LFLAGS)
+        $(CC) src\tools\anopesmtp.c /link wsock32.lib $(LFLAGS)
 
 modules: FRC
         cd src\modules && $(MAKE) && cd ..\..
@@ -143,13 +142,13 @@ modules: FRC
 include\sysconf.h:
         copy include\sysconf.h.win32 include\sysconf.h
 
-lang/language.h: lang/Makefile lang/index
+lang\language.h: lang\Makefile lang\index
         cd lang && $(MAKE) language.h && cd ..
 
-lang/index:
+lang\index:
         cd lang && $(MAKE) index && cd ..
         
-include/language.h: lang/language.h
+include\language.h: lang\language.h
         cd lang && copy language.h ..\include\language.h && cd ..
         
 include\version.h: version.sh.exe version.log include\services.h include\pseudo.h include\messages.h include\pseudo.h include\messages.h
@@ -157,6 +156,6 @@ include\version.h: version.sh.exe version.log include\services.h include\pseudo.
                 copy version.h include\version.h
 
 version.sh.exe:
-        $(CC) include/version.sh.c
+        $(CC) include\version.sh.c
 
 FRC:

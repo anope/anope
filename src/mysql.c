@@ -644,7 +644,7 @@ void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
     Akill *t_ak;
     SXLine *t_sl;
     char *takuser, *takhost, *takby, *takreason, *tslmask, *tslby,
-        *tslreason, *thchost;
+        *tslreason;
 
     int i, j;
 
@@ -1016,7 +1016,7 @@ void db_mysql_load_os_dbase(void)
     char sqlcmd[MAX_SQL_BUF];
     Akill *ak;
     SXLine *sx;
-    int akc, sgc, sqc, szc, j;
+    int akc, sgc, sqc, szc;
 
     if (!do_mysql)
         return;

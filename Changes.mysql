@@ -1,5 +1,6 @@
 Anope Version S V N
 -------------------
+- DROP TABLE `anope_os_hcache`;
 
 Anope Version 1.7.8
 -------------------

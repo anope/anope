@@ -1,5 +1,5 @@
 #
-# Anope IRC Services 1.7.7 for Windows
+# Anope IRC Services 1.7.8 for Windows
 #
 #  Contact us at info@anope.org
 #
@@ -67,7 +67,7 @@ LFLAGS=/LIBPATH:"$(LIBPATH)"
 
 CC=cl
 RC=rc
-MAKE=nmake -f makefile.win32
+MAKE=nmake -f Makefile.win32
 BASE_CFLAGS=/O2 /MD
 LIBS=wsock32.lib advapi32.lib /NODEFAULTLIB:libcmtd.lib
 ELIBS=

@@ -297,19 +297,6 @@ CREATE TABLE anope_os_exceptions (
 ) TYPE=MyISAM;
 
 --
--- Table structure for table `anope_os_hcache`
---
-
-DROP TABLE IF EXISTS anope_os_hcache;
-CREATE TABLE anope_os_hcache (
-  oh_id int(11) NOT NULL auto_increment,
-  mask text NOT NULL,
-  status int(11) NOT NULL default '0',
-  used int(11) NOT NULL default '0',
-  PRIMARY KEY  (oh_id)
-) TYPE=MyISAM;
-
---
 -- Table structure for table `anope_os_news`
 --
 

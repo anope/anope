@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="573"
+VERSION_BUILD="574"
 
 # $Log$
+#
+# BUILD : 1.7.8 (574)
+# BUGS  : N/A
+# NOTES : Internal Events, Win32 can build with encryption, nickIsServices() works if format is nick@services
 #
 # BUILD : 1.7.8 (573)
 # BUGS  : 296

@@ -62,6 +62,8 @@ typedef void *	ano_module_t;
 #define OPERSERV OS_cmdTable
 #define IRCD IRCD_cmdTable
 #define MODULE_HASH Module_table
+#define EVENT EVENT_cmdTable
+#define EVENTHOOKS HOOK_cmdTable
 
 /**********************************************************************
  * Module Returns
@@ -103,7 +105,10 @@ typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
-
+typedef struct EvtMessage_ EvtMessage;
+typedef struct EvtMessageHash_ EvtMessageHash;
+typedef struct EvtHook_ EvtHook;
+typedef struct EvtHookHash_ EvtHookHash;
 
 extern MDE CommandHash *HOSTSERV[MAX_CMD_HASH];
 extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
@@ -113,6 +118,8 @@ extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
 extern MDE CommandHash *HELPSERV[MAX_CMD_HASH];
 extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MDE MessageHash *IRCD[MAX_CMD_HASH];
+extern EvtMessageHash *EVENT[MAX_CMD_HASH];
+extern EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
 struct Module_ {
 	char *name;
@@ -202,6 +209,36 @@ struct ModuleCallBack_ {
 	ModuleCallBack *next;
 };
 
+struct EvtMessage_ {
+    char *name;
+    int (*func)(char *source, int ac, char **av);
+    int core;
+    char *mod_name;
+    EvtMessage *next;
+};
+
+struct EvtMessageHash_ {
+        char *name;
+        EvtMessage *evm;
+        EvtMessageHash *next;
+};
+
+
+struct EvtHook_ {
+    int (*func)(char *source);
+    int core;
+	char *name;
+    char *mod_name;
+    EvtHook *next;
+};
+
+struct EvtHookHash_ {
+        char *name;
+        EvtHook *evh;
+        EvtHookHash *next;
+};
+
+
 /*************************************************************************/
 /* Module Managment Functions */
 Module *createModule(char *filename);	/* Create a new module, using the given name */
@@ -243,8 +280,9 @@ MDE int addCommand(CommandHash *cmdTable[], Command *c,int pos);
 MDE int delCommand(CommandHash *cmdTable[], Command *c,char *mod_name);		/* Del a command from a cmd table */
 MDE int moduleDelCommand(CommandHash *cmdTable[],char *name);		/* Del a command from a cmd table */
 Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
+
 /*************************************************************************/
-/*************************************************************************/
+
 /* Message Managment Functions */
 MDE Message *createMessage(char *name,int (*func)(char *source, int ac, char **av));
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
@@ -255,7 +293,29 @@ int delMessage(MessageHash *msgTable[], Message *m, char *mod_name);		/* Del a M
 MDE int moduleDelMessage(char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
 Message *findMessage(MessageHash *msgTable[], const char *name);
+
 /*************************************************************************/
+
+MDE EvtMessage *createEventHandler(char *name, int (*func) (char *source, int ac, char **av));
+EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
+int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
+MDE int moduleAddEventHandler(EvtMessage * evm);
+MDE int moduleEventDelHandler(char *name);
+int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, char *mod_name);
+int destroyEventHandler(EvtMessage * evm);
+int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
+
+MDE EvtHook *createEventHook(char *name, int (*func) (char *source));
+EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
+int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
+MDE int moduleAddEventHook(EvtHook * evh);
+MDE int moduleEventDelHook(const char *name);
+int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, char *mod_name);
+int destroyEventHook(EvtHook * evh);
+extern char *mod_current_evtbuffer;
+
+/*************************************************************************/
+
 MDE int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
 MDE void moduleDelCallback(char *name);
 MDE void moduleCallBackRun(void);

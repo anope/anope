@@ -53,16 +53,22 @@ the following free components from Microsoft. Once downloaded install these pack
       (ie.. PROXY_SCANNER=1), note the proxy scan is not the best and its recommended to use
       another thrid party scanner.
 
-   D. If you are using Visual Studio 6, this next line can be very important. If you are an 
+   D. Do you want to use the MD5 message-digest algorithm to encrypt passwords?
+	  (Selecting "yes" protects your passwords from being stolen if someone
+	  gains access to the Services databases, but makes it impossible to recover
+      forgotten passwords. There is no way to reverse this operation, so make
+	  sure you really want to enable it.). Change DB_ENCRYPTION to be equal to 1
+
+   E. If you are using Visual Studio 6, this next line can be very important. If you are an 
       error during compile about "unresolved external symbol __ftol2", remove the # in front
       of VC6=/QIfist and attempt to compile again.
 
-   E. When compiling if you get an error about 'Cannot find wsock32.lib' or 'Cannot find 
+   F. When compiling if you get an error about 'Cannot find wsock32.lib' or 'Cannot find 
       msvcrt.lib' You need to define the libpath, in the LIBPATH directive. You can define 
       the path one of two ways, either with \ or / if you use \ you must add a secondary \ 
       so c:\mysql would be c:\\sdk\lib be sure to remove the # in front of LFLAGS
 
-   F. Most import is to set the DATDEST to be the folder name where data will be stored. 
+   G. Most import is to set the DATDEST to be the folder name where data will be stored. 
       This does not need to be the full path just the folder under the main executable 
       in which data will exist. In our example we will use "data"
  

@@ -177,6 +177,7 @@ extern int toupper(char), tolower(char);
 /* Miscellaneous definitions. */
 #include "defs.h"
 #include "slist.h"
+#include "events.h"
 
 /*************************************************************************/
 

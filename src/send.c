@@ -58,11 +58,13 @@ void vsend_cmd(const char *source, const char *fmt, va_list args)
 
         if (source) {
             sockprintf(servsock, ":%s %s\r\n", source, buf);
+            eventprintf(":%s %s", source, buf);
             if (debug) {
                 alog("debug: Sent: :%s %s", source, buf);
             }
         } else {
             sockprintf(servsock, "%s\r\n", buf);
+            eventprintf("%s", buf);
             if (debug) {
                 alog("debug: Sent: %s", buf);
             }

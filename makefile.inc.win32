@@ -40,6 +40,9 @@ USE_MYSQL=0
 # Set this to 1 to enable the proxy scanner
 PROXY_SCANNER=0
 
+# Set this to 1 to enable the proxy scanner
+DB_ENCRYPTION=0
+
 # If you want to change the names/locations of files/folders, you
 # can do that here.
 PROGRAM=anope.exe
@@ -56,7 +59,7 @@ DATDEST=data
 LIBPATH=
 
 # If you edited the line above, uncomment the next line.
-#LFLAGS=/LIBPATH:"$(LIBPATH)"
+LFLAGS=/LIBPATH:"$(LIBPATH)"
 
 
 ###############################################################
@@ -154,6 +157,10 @@ LIBS=$(LIBS) libmysql.lib zlib.lib
 
 !IF $(PROXY_SCANNER) == 1
 BASE_CFLAGS=/D USE_THREADS $(BASE_CFLAGS)
+!ENDIF
+
+!IF $(DB_ENCRYPTION) == 1
+BASE_CFLAGS=/D USE_ENCRYPTION $(BASE_CFLAGS)
 !ENDIF
 
 # Note that changing any of these options (or, in fact, anything in this

@@ -645,6 +645,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         } else {
             user->svid = 1;
         }
+        send_event(EVENT_NEWNICK, nick);
 
     } else {
         /* An old user changing nicks. */
@@ -685,6 +686,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             }
 
             change_user_nick(user, nick);
+            send_event(EVENT_CHANGE_NICK, nick);
 
             if ((old_na ? old_na->nc : NULL) ==
                 (user->na ? user->na->nc : NULL))

@@ -849,6 +849,8 @@ BotInfo *findbot(char *nick)
 
 static void unassign(User * u, ChannelInfo * ci)
 {
+    send_event(EVENT_BOT_UNASSIGN, ci->name);
+
     if (ci->c && ci->c->usercount >= BSMinUsers) {
         anope_cmd_part(ci->bi->nick, ci->name, "UNASSIGN from %s",
                        u->nick);
@@ -995,6 +997,7 @@ void bot_join(ChannelInfo * ci)
     }
     anope_cmd_join(ci->bi->nick, ci->c->name, ci->c->creation_time);
     anope_cmd_bot_chan_mode(ci->bi->nick, ci->c->name);
+    send_event(EVENT_BOT_JOIN, ci->name);
 }
 
 /*************************************************************************/
@@ -1353,6 +1356,8 @@ static int do_bot(User * u)
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
                         bi->host, bi->real);
+
+            send_event(EVENT_BOT_CREATE, bi->nick);
         }
     } else if (!stricmp(cmd, "CHANGE")) {
         char *oldnick = strtok(NULL, " ");
@@ -1478,6 +1483,8 @@ static int do_bot(User * u)
 
             notice_lang(s_BotServ, u, BOT_BOT_CHANGED, oldnick, bi->nick,
                         bi->user, bi->host, bi->real);
+
+            send_event(EVENT_BOT_CHANGE, bi->nick);
         }
     } else if (!stricmp(cmd, "DEL")) {
         char *nick = strtok(NULL, " ");
@@ -1489,6 +1496,7 @@ static int do_bot(User * u)
         else if (!(bi = findbot(nick)))
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
         else {
+            send_event(EVENT_BOT_DEL, bi->nick);
             anope_cmd_quit(bi->nick,
                            "Quit: Help! I'm being deleted by %s!",
                            u->nick);
@@ -1587,6 +1595,7 @@ static int do_assign(User * u)
             bot_join(ci);
         }
         notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
+        send_event(EVENT_BOT_ASSIGN, bi->nick);
     }
     return MOD_CONT;
 }

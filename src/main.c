@@ -101,6 +101,7 @@ static int started = 0;
 
 extern void expire_all(void)
 {
+    send_event(EVENT_DB_EXPIRE, EVENT_START);
     waiting = -3;
     if (debug)
         alog("debug: Running expire routines");
@@ -131,12 +132,15 @@ extern void expire_all(void)
     if (ProxyDetect)
         proxy_expire();
 #endif
+    send_event(EVENT_DB_EXPIRE, EVENT_STOP);
 }
 
 /*************************************************************************/
 
 void save_databases(void)
 {
+    send_event(EVENT_DB_SAVING, EVENT_START);
+
     waiting = -2;
     if (debug)
         alog("debug: Saving FFF databases");
@@ -207,6 +211,7 @@ void save_databases(void)
         }
     }
 #endif
+    send_event(EVENT_DB_SAVING, EVENT_STOP);
 }
 
 /*************************************************************************/
@@ -216,6 +221,7 @@ void save_databases(void)
 static void services_restart(void)
 {
     alog("Restarting");
+    send_event(EVENT_RESTART, EVENT_START);
     if (!quitmsg)
         quitmsg = "Restarting";
     anope_cmd_squit(ServerName, quitmsg);
@@ -255,6 +261,8 @@ static void services_shutdown(void)
 {
     User *u, *next;
 
+    send_event(EVENT_SHUTDOWN, EVENT_START);
+
     if (!quitmsg)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);
@@ -272,6 +280,7 @@ static void services_shutdown(void)
             u = next;
         }
     }
+    send_event(EVENT_SHUTDOWN, EVENT_STOP);
     disconn(servsock);
 }
 
@@ -430,6 +439,7 @@ void sighandler(int signum)
     if (signum == SIGSEGV) {
         do_backtrace(1);
     }
+    send_event(EVENT_SIGNAL, quitmsg);
 
     if (started) {
         services_shutdown();

@@ -1168,4 +1168,9 @@ E int decode_ip(char *buf);
 
 E char *host_resolve(char *host);
 
+extern void event_message_process(char *eventbuf);
+extern void eventprintf(char *fmt, ...);
+extern void event_process_hook(char *name, char *eventbuf);
+extern void send_event(char *name, const char *fmt, ...);
+
 #endif	/* EXTERN_H */

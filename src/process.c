@@ -246,7 +246,7 @@ void process()
        av[0] to see if its a service nick if so assign mod_current_buffer the
        value from AV[1] else just assign av[0] - TSL */
     if (av[0]) {
-        if (nickIsServices(av[0], 0)) {
+        if (nickIsServices(av[0], 1)) {
             if (av[1]) {
                 mod_current_buffer = sstrdup(av[1]);
             } else {

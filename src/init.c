@@ -683,6 +683,8 @@ int init(int ac, char **av)
         alog("Info: Not reflecting database records.");
     }
 #endif
+    send_event(EVENT_CONNECT, EVENT_START);
+
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
     if (servsock < 0 && RemoteServer2) {
@@ -715,6 +717,7 @@ int init(int ac, char **av)
     }
 
     anope_cmd_connect(servernum);
+    send_event(EVENT_CONNECT, EVENT_STOP);
 
     sgets2(inbuf, sizeof(inbuf), servsock);
     if (strnicmp(inbuf, "ERROR", 5) == 0) {

@@ -1,2 +1,2 @@
-SRCS=hs_moo.c ircd_catserv.c
+SRCS=hs_moo.c ircd_catserv.c events.c
 

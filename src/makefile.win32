@@ -18,16 +18,16 @@ include ../Makefile.inc.win32
 ###########################################################################
 
 OBJS =  actions.obj base64.obj botserv.obj channels.obj chanserv.obj commands.obj compat.obj \
-        converter.obj config.obj datafiles.obj encrypt.obj helpserv.obj hostserv.obj \
+        converter.obj config.obj datafiles.obj encrypt.obj events.obj helpserv.obj hostserv.obj \
         init.obj language.obj list.obj log.obj mail.obj main.obj memory.obj memoserv.obj \
         messages.obj misc.obj modules.obj news.obj nickserv.obj operserv.obj \
         process.obj proxy.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
         timeout.obj users.obj $(RDB_O) $(MYSQL_O) $(CAPAB_O)
         
 SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
-        config.c datafiles.c encrypt.c helpserv.c hostserv.c init.c language.c list.c log.c mail.c main.c \
-        memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
-        process.c proxy.c send.c servers.obj sessions.c slist.c sockutil.c \
+        config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c language.c list.c \
+		log.c mail.c main.c memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c \
+		operserv.c process.c proxy.c send.c servers.obj sessions.c slist.c sockutil.c \
         timeout.c users.c $(RDB_C) $(MYSQL_C) $(CAPAB_C)
 
 ###########################################################################
@@ -69,6 +69,7 @@ config.obj:        config.c        ..\include\services.h
 converter.obj:    converter.c        ..\include\services.h ..\include\datafiles.h
 datafiles.obj:        datafiles.c        ..\include\services.h ..\include\datafiles.h
 encrypt.obj:        encrypt.c        ..\include\encrypt.h ..\include\sysconf.h
+events.obj:		 	events.c		 ..\include\modules.h ..\include\language.h ..\include\version.h
 init.obj:                init.c                ..\include\services.h
 hostserv.obj:     hostserv.c      ..\include\services.h ..\include\pseudo.h
 language.obj:        language.c        ..\include\services.h ..\include\language.h
@@ -79,6 +80,7 @@ main.obj:                main.c                ..\include\services.h ..\include\
 memory.obj:        memory.c        ..\include\services.h
 memoserv.obj:        memoserv.c        ..\include\services.h ..\include\pseudo.h
 messages.obj:        messages.c        ..\include\services.h ..\include\messages.h ..\include\language.h
+modules.obj:		 modules.c			..\include\modules.h ..\include\language.h ..\include\version.h
 misc.obj:                misc.c                ..\include\services.h ..\include\language.h
 news.obj:                news.c                ..\include\services.h ..\include\pseudo.h
 nickserv.obj:        nickserv.c        ..\include\services.h ..\include\pseudo.h

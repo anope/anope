@@ -814,9 +814,17 @@ void EnforceQlinedNick(char *nick, char *killer)
 int nickIsServices(char *nick, int bot)
 {
     int found = 0;
+    char *s;
 
     if (!nick) {
-	return found;
+    	return found;
+    }
+
+    s = strchr(nick, '@');
+    if (s) {
+     *s++ = 0;
+     if (stricmp(s, ServerName) != 0)
+        return found;
     }
 
     if (s_NickServ && (stricmp(nick, s_NickServ) == 0))

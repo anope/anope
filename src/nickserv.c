@@ -2306,6 +2306,7 @@ static int do_confirm(User * u)
             else
                 notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK,
                             u->nick);
+            send_event(EVENT_NICK_REGISTED, u->nick);
 #ifndef USE_ENCRYPTION
             notice_lang(s_NickServ, u, NICK_PASSWORD_IS, na->nc->pass);
 #endif
@@ -2803,6 +2804,8 @@ static int do_drop(User * u)
              na->nick, na->nc->display,
              (na->nc->email ? na->nc->email : "none"));
         delnick(na);
+
+        send_event(EVENT_NICK_DROPPED, nick);
 
         if (!is_mine) {
             if (WallDrop)
@@ -4282,6 +4285,7 @@ static int do_forbid(User * u)
 
         alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
         notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);
+        send_event(EVENT_NICK_FORBIDDEN, nick);
     } else {
         alog("%s: Valid FORBID for %s by %s failed", s_NickServ, nick,
              u->nick);

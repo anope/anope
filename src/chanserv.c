@@ -1740,6 +1740,7 @@ void record_topic(const char *chan)
         ci->last_topic = NULL;
     strscpy(ci->last_topic_setter, c->topic_setter, NICKMAX);
     ci->last_topic_time = c->topic_time;
+    send_event(EVENT_TOPIC_UPDATED, chan);
 }
 
 /*************************************************************************/
@@ -1871,6 +1872,7 @@ void expire_chans()
             next = ci->next;
             if (!ci->c && now - ci->last_used >= CSExpire
                 && !(ci->flags & (CI_VERBOTEN | CI_NO_EXPIRE))) {
+                send_event(EVENT_CHAN_EXPIRE, ci->name);
                 alog("Expiring channel %s (founder: %s)", ci->name,
                      (ci->founder ? ci->founder->display : "(none)"));
                 delchan(ci);
@@ -2789,6 +2791,7 @@ static int do_register(User * u)
             anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->ownerset,
                            u->nick);
         }
+        send_event(EVENT_CHAN_REGISTERED, chan);
     }
     return MOD_CONT;
 }
@@ -2945,6 +2948,7 @@ static int do_drop(User * u)
                              chan);
 
         notice_lang(s_ChanServ, u, CHAN_DROPPED, chan);
+        send_event(EVENT_CHAN_DROP, chan);
     }
     return MOD_CONT;
 }
@@ -6371,6 +6375,7 @@ static int do_forbid(User * u)
         alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick,
              ci->name);
         notice_lang(s_ChanServ, u, CHAN_FORBID_SUCCEEDED, chan);
+        send_event(EVENT_CHAN_FORBIDDEN, chan);
     } else {
         alog("%s: Valid FORBID for %s by %s failed", s_ChanServ, ci->name,
              u->nick);
@@ -6444,6 +6449,7 @@ static int do_suspend(User * u)
         alog("%s: %s set SUSPEND for channel %s", s_ChanServ, u->nick,
              ci->name);
         notice_lang(s_ChanServ, u, CHAN_SUSPEND_SUCCEEDED, chan);
+        send_event(EVENT_CHAN_SUSPENDED, chan);
     } else {
         alog("%s: Valid SUSPEND for %s by %s failed", s_ChanServ, ci->name,
              u->nick);
@@ -6486,6 +6492,7 @@ static int do_unsuspend(User * u)
         alog("%s: %s set UNSUSPEND for channel %s", s_ChanServ, u->nick,
              ci->name);
         notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_SUCCEEDED, chan);
+        send_event(EVENT_CHAN_UNSUSPEND, chan);
     } else {
         alog("%s: Valid UNSUSPEND for %s by %s failed", s_ChanServ,
              chan, u->nick);

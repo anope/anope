@@ -710,12 +710,6 @@ if [ "$USE_MODULES" = "USE_MODULES" ] ; then
 				ok=1
 			fi
 		fi
-		if [ ! -d "$INPUT/data/" ] ; then
-                        if mkdir -p $INPUT/data/ ; then
-                                ok=1
-                        fi
-                fi
-
 	done
 	MODULE_PATH=$INPUT
 	echo ""

@@ -1755,17 +1755,13 @@ void moduleDisplayHelp(int service, User * u)
 
 /**
  * Add module data to a struct.
- * This actaully adds the request data to the moduleData structs, this should not be called directly from modules.
+ * This allows module coders to add data to an existing struct
  * @param md The module data for the struct to be used
  * @param key The Key for the key/value pair
  * @param value The value for the key/value pair, this is what will be stored for you
- * @param persistant Should the key/value pair be persistant?
  * @return MOD_ERR_OK will be returned on success
- * @see moduleAddData
- * @see moduleAddPersistantData
  **/
-int moduleAddDataValue(ModuleData * md[], char *key, char *value,
-                       int persistant)
+int moduleAddData(ModuleData * md[], char *key, char *value)
 {
     char *mod_name = sstrdup(mod_current_module_name);
 
@@ -1817,7 +1813,6 @@ int moduleAddDataValue(ModuleData * md[], char *key, char *value,
         }
         item->next = NULL;
         item->key = strdup(key);
-        item->persistant = persistant;
         item->value = strdup(value);
         if (lastItem)
             lastItem->next = item;
@@ -1832,32 +1827,6 @@ int moduleAddDataValue(ModuleData * md[], char *key, char *value,
     free(mod_name);
     return MOD_ERR_OK;
 
-}
-
-/**
- * Add persistant module data to a struct.
- * This allows module coders to add data to an existing struct, and have anope take care of loading/saving it!
- * @param md The module data for the struct to be used
- * @param key The Key for the key/value pair
- * @param value The value for the key/value pair, this is what will be stored for you
- * @return MOD_ERR_OK will be returned on success
- **/
-int moduleAddPersistantData(ModuleData * md[], char *key, char *value)
-{
-    return moduleAddDataValue(md, key, value, 1);
-}
-
-/**
- * Add module data to a struct.
- * This allows module coders to add data to an existing struct
- * @param md The module data for the struct to be used
- * @param key The Key for the key/value pair
- * @param value The value for the key/value pair, this is what will be stored for you
- * @return MOD_ERR_OK will be returned on success
- **/
-int moduleAddData(ModuleData * md[], char *key, char *value)
-{
-    return moduleAddDataValue(md, key, value, 0);
 }
 
 /**
@@ -2056,98 +2025,5 @@ void moduleCleanStruct(ModuleData * moduleData[])
         }
     }
 }
-
-/**
- * Load any data relevant for this module
- * @param m The module to Load the data for
- **/
-void moduleLoadAllData(Module * m)
-{
-    FILE *in;
-    char buffer[2000];          /* will _never_ be this big thanks to the 512 limit of a message */
-    char filename[4096];
-    char *key = NULL;
-    char *value = NULL;
-    char *service = NULL;
-    char *str_key = NULL;
-    int len;
-    enum MODULE_DATA_TYPE struc;
-    NickCore *nc;
-    NickAlias *na;
-    Channel *c;
-
-    strncpy(filename, MODULE_PATH, 4095);
-    len = strlen(filename);
-    strncat(filename, "data/", 4095 - len);
-    len = strlen(filename);
-    strncat(filename, m->name, 4095 - len);
-    len = strlen(filename);
-    strncat(filename, ".db", 4095 - len);
-
-    if ((in = fopen(filename, "r")) == NULL) {
-        alog("unable to open module data file [%s] for reading, module data will not be loaded", filename);
-    } else {
-        while (!feof(in)) {
-            fgets(buffer, 1500, in);
-            service = myStrGetToken(buffer, ' ', 0);
-            str_key = myStrGetToken(buffer, ' ', 1);
-            key = myStrGetToken(buffer, ' ', 2);
-            value = myStrGetTokenRemainder(buffer, ' ', 3);
-            if (service) {
-                struc = atoi(service);
-                if (str_key) {
-                    if (key) {
-                        if (value) {
-                            switch (struc) {
-                            case MD_NICK_CORE:
-                                nc = findcore(str_key);
-                                if (nc) {
-                                    moduleAddPersistantData(nc->moduleData,
-                                                            key, value);
-                                }
-                                break;
-                            case MD_NICK_ALIAS:
-                                na = findnick(str_key);
-                                if (na) {
-                                    moduleAddPersistantData(na->moduleData,
-                                                            key, value);
-                                }
-                                break;
-                            case MD_NICK_MEMO:
-
-                                break;
-                            case MD_CHAN_MEMO:
-
-                                break;
-                            case MD_CHAN_INFO:
-                                c = findchan(name);
-                                if (c && c->ci) {
-                                    moduleAddPersistantData(c->ci->
-                                                            moduleData,
-                                                            key, value);
-                                }
-                                break;
-                            }
-                            free(value);
-                        }
-                        free(key);
-                    }
-                    free(str_key);
-                }
-                free(service);
-            }
-        }
-    }
-}
-
-/**
- * Save any data relevant for this module
- * @param m The module to Save the data for
- **/
-void moduleSaveAllData(Module * m)
-{
-
-}
-
 
 /* EOF */

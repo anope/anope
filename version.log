@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="38"
+VERSION_BUILD="39"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (39)
+# BUGS  : 10
+# NOTES : Fixed tables.sql detection on mydbgen script.
 #
 # BUILD : 1.7.0 (38)
 # BUGS  : 008

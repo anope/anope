@@ -1,8 +1,9 @@
 #!/bin/sh
 #
+# $Id$
 
 # Location of the .sql file with the schema
-DBFILE="data/tables.sql"
+DBSQL="tables.sql"
 
 # Schema Version
 SVER="1"
@@ -18,8 +19,16 @@ else
         n="-n"
 fi
 
-if [ ! -f $DBFILE ] ; then 
-	echo "Error: Required file $DBFILE is inaccessible!";
+# Fix for bug 10
+for try in HOME/services anope/data ../data data .. .
+do
+	if [ -f "$try/$DBSQL" ]; then
+		DBFILE="$try/$DBSQL"
+	fi
+done
+
+if [ ! -f "./$DBFILE" ] ; then 
+	echo "Error: Required file $DBSQL was not found!";
 	exit
 fi
 

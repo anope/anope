@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="257"
+VERSION_BUILD="258"
 
 # $Log$
+#
+# BUILD : 1.7.4 (258)
+# BUGS  : 
+# NOTES : Added CHECK to the /msg memoserv help menu
 #
 # BUILD : 1.7.4 (257)
 # BUGS  : N/A

@@ -4675,6 +4675,7 @@ MEMO_HELP
 	    SET    Set options related to memos
 	    INFO   Displays information about your memos
 	    RSEND  Sends a memo and requests a read receipt
+	    CHECK  Checks if last memo to a nick was read
 
 MEMO_HELP_ADMIN
 	    SENDALL  Send a memo to all registered users

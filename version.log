@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="409"
+VERSION_BUILD="410"
 
 # $Log$
+#
+# BUILD : 1.7.5 (410)
+# BUGS  : 
+# NOTES : Added shot note in example.conf regarding NsRestrictOperNick or whatever it is called.
 #
 # BUILD : 1.7.5 (409)
 # BUGS  : 

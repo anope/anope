@@ -1765,6 +1765,11 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
     ModuleDataItem *lastItem = NULL;
     index = CMD_HASH(mod_name);
 
+    if (!key || !value) {
+        alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
+        return MOD_ERR_PARAMS;
+    }
+
     for (current = md[index]; current; current = current->next) {
         if (strcasecmp(current->moduleName, mod_name) == 0)
             lastHash = current;

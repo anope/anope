@@ -107,11 +107,53 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
     return NULL;
 }
 
+/* new function to send memo mails */
+
+MailInfo *MailMemoBegin(NickCore * nc)
+{
+
+    if (!nc)
+        return NULL;
+
+    if (!UseMail || !nc->email) {
+        return NULL;
+
+    } else {
+        MailInfo *mail;
+
+        mail = scalloc(sizeof(MailInfo), 1);
+        mail->sender = NULL;
+        mail->recipient = nc;
+        mail->recip = NULL;
+
+        if (!(mail->pipe = popen(SendMailPath, "w"))) {
+            free(mail);
+            return NULL;
+        }
+
+        fprintf(mail->pipe, "From: %s\n", SendFrom);
+        if (DontQuoteAddresses) {
+            fprintf(mail->pipe, "To: %s <%s>\n", nc->display, nc->email);
+        } else {
+            fprintf(mail->pipe, "To: \"%s\" <%s>\n", nc->display,
+                    nc->email);
+        }
+        fprintf(mail->pipe, "Subject: %s\n",
+                getstring2(NULL, MEMO_MAIL_SUBJECT));
+        return mail;
+    }
+    return NULL;
+}
+
 /* Finish to send the mail. Cleanup everything. */
+
+/*  - param checking modified because we don't
+      have an user sending this mail.
+      Certus, 02.04.2004 */
 
 void MailEnd(MailInfo * mail)
 {
-    if (!mail || !mail->sender || !mail->pipe)
+    if (!mail || !mail->pipe)   /* removed sender check */
         return;
 
     if (!mail->recipient && !mail->recip)
@@ -119,7 +161,9 @@ void MailEnd(MailInfo * mail)
 
     pclose(mail->pipe);
 
-    mail->sender->lastmail = time(NULL);
+    if (mail->sender)           /* added sender check */
+        mail->sender->lastmail = time(NULL);
+
     if (mail->recipient)
         mail->recipient->lastmail = time(NULL);
     else

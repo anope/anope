@@ -519,6 +519,7 @@ E void fatal_perror(const char *fmt, ...)	FORMAT(printf,1,2);
 
 E MailInfo *MailBegin(User *u, NickCore *nc, char *subject, char *service);
 E MailInfo *MailRegBegin(User *u, NickRequest *nr, char *subject, char *service);
+E MailInfo *MailMemoBegin(NickCore * nc);
 E void MailEnd(MailInfo *mail);
 E void MailReset(User *u, NickCore *nc);
 E int MailValidate(const char *email);

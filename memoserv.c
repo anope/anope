@@ -1,16 +1,16 @@
-/* MemoServ functions.
- *
- * (C) 2003 Anope Team
- * Contact us at info@anope.org
- *
- * Please read COPYING and README for furhter details.
- *
- * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$
- *
- */
+#                               /* MemoServ functions.
+                                 *
+                                 * (C) 2003 Anope Team
+                                 * Contact us at info@anope.org
+                                 *
+                                 * Please read COPYING and README for furhter details.
+                                 *
+                                 * Based on the original code of Epona by Lara.
+                                 * Based on the original code of Services by Andy Church. 
+                                 * 
+                                 * $Id$
+                                 *
+                                 */
 
 #include "services.h"
 #include "pseudo.h"
@@ -34,6 +34,7 @@ static int do_info(User *u);
 static int do_staff(User *u);
 static int do_sendall(User *u);
 void moduleAddMemoServCmds(void);
+static void new_memo_mail(NickCore *nc, Memo *m);
 /*************************************************************************/
 
 void moduleAddMemoServCmds(void) {
@@ -335,7 +336,11 @@ void memo_send(User * u, char *name, char *text, int z)
                         notice_lang(s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
                                     source, s_MemoServ, m->number);
                 }               /* if (flags & MEMO_RECEIVE) */
-            }                   /* if (MSNotifyAll) */
+            }
+            /* if (MSNotifyAll) */
+            /* let's get out the mail if set in the nickcore - certus */
+            if (nc->flags & NI_MEMO_MAIL)
+                new_memo_mail(nc, m);
         } else {
             struct c_userlist *cu, *next;
             Channel *c;
@@ -812,6 +817,16 @@ static int do_set_notify(User * u, MemoInfo * mi, char *param)
         u->na->nc->flags &= ~NI_MEMO_SIGNON;
         u->na->nc->flags |= NI_MEMO_RECEIVE;
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NEW, s_MemoServ);
+    } else if (stricmp(param, "MAIL") == 0) {
+        if (u->na->nc->email) {
+            u->na->nc->flags |= NI_MEMO_MAIL;
+            notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_MAIL);
+        } else {
+            notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_INVALIDMAIL);
+        }
+    } else if (stricmp(param, "NOMAIL") == 0) {
+        u->na->nc->flags &= ~NI_MEMO_MAIL;
+        notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_NOMAIL);
     } else if (stricmp(param, "OFF") == 0) {
         u->na->nc->flags &= ~(NI_MEMO_SIGNON | NI_MEMO_RECEIVE);
         notice_lang(s_MemoServ, u, MEMO_SET_NOTIFY_OFF, s_MemoServ);
@@ -1170,6 +1185,32 @@ static int do_sendall(User * u)
 
     notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
     return MOD_CONT;
+}
+
+/*************************************************************************/
+
+static void new_memo_mail(NickCore * nc, Memo * m)
+{
+    MailInfo *mail = NULL;
+
+    if (!nc || !m)
+        return;
+
+    mail = MailMemoBegin(nc);
+    if (!mail) {
+        return;
+    }
+    fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT1), nc->display);
+    fprintf(mail->pipe, "\n");
+    fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT2), m->sender,
+            m->number);
+    fprintf(mail->pipe, "\n\n");
+    fprintf(mail->pipe, getstring2(NULL, MEMO_MAIL_TEXT3));
+    fprintf(mail->pipe, "\n\n");
+    fprintf(mail->pipe, "%s", m->text);
+    fprintf(mail->pipe, "\n");
+    MailEnd(mail);
+    return;
 }
 
 /*************************************************************************/

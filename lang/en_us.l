@@ -1592,6 +1592,12 @@ MEMO_SET_NOTIFY_NEW
 	%s will now notify you of memos when they are sent to you.
 MEMO_SET_NOTIFY_OFF
 	%s will not send you any notification of memos.
+MEMO_SET_NOTIFY_MAIL
+	You will now be informed about new memos via email.
+MEMO_SET_NOTIFY_NOMAIL
+	You will no longer be informed via email.
+MEMO_SET_NOTIFY_INVALIDMAIL
+	There's no email address set for your nick.
 
 # SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
@@ -1686,6 +1692,16 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 	%s is notified when new memos arrive.
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s is notified of news memos at logon.
+
+# Memo2Mail responses
+MEMO_MAIL_SUBJECT
+	New memo
+MEMO_MAIL_TEXT1
+	Hi %s
+MEMO_MAIL_TEXT2
+	You've just received a new memo from %s. This is memo number %d.
+MEMO_MAIL_TEXT3
+	Memo Text:
 
 ###########################################################################
 #

@@ -293,12 +293,12 @@ struct nickcore_ {
 
 /* Nickname setting flags: */
 #define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
-#define NI_SECURE			0x00000002  /* Don't recognize unless IDENTIFY'd */
-#define NI_MSG              0x00000004	/* Use PRIVMSGs instead of NOTICEs */
+#define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
+#define NI_MSG                  0x00000004	/* Use PRIVMSGs instead of NOTICEs */
 #define NI_MEMO_HARDMAX		0x00000008  /* Don't allow user to change memo limit */
 #define NI_MEMO_SIGNON		0x00000010  /* Notify of memos at signon and un-away */
 #define NI_MEMO_RECEIVE		0x00000020  /* Notify of new memos when sent */
-#define NI_PRIVATE			0x00000040  /* Don't show in LIST to non-servadmins */
+#define NI_PRIVATE		0x00000040  /* Don't show in LIST to non-servadmins */
 #define NI_HIDE_EMAIL		0x00000080  /* Don't show E-mail in INFO */
 #define NI_HIDE_MASK		0x00000100  /* Don't show last seen address in INFO */
 #define NI_HIDE_QUIT		0x00000200  /* Don't show last quit message in INFO */
@@ -307,7 +307,8 @@ struct nickcore_ {
 #define NI_SERVICES_OPER 	0x00001000	/* User is a Services operator */
 #define NI_SERVICES_ADMIN	0x00002000	/* User is a Services admin */
 #define NI_ENCRYPTEDPW		0x00004000	/* Nickname password is encrypted */
-#define NI_SERVICES_ROOT    0x00008000  /* User is a Services root */
+#define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
+#define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
 
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change

@@ -1616,6 +1616,12 @@ MEMO_SET_NOTIFY_NEW
 	%s wird dich benachrichtigen, sobald neue Memos für dich eintreffen.
 MEMO_SET_NOTIFY_OFF
 	%s wird dich nicht länger beim Eintreffen neuer Memos benachrichtigen.
+MEMO_SET_NOTIFY_MAIL
+	Du wirst nun per Email über neue Memos informiert.
+MEMO_SET_NOTIFY_NOMAIL
+	Du wirst nicht länger per Email über neue Memos benachrichtigt.
+MEMO_SET_NOTIFY_INVALIDMAIL
+	Du hast keine zulässige Email Adresse gesetzt.
 
 # SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
@@ -1710,7 +1716,17 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 	%s wird bei Ankunft neuer Memos benachrichtigt.
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s wird beim Logon über neuer Memos benachrichtigt.
-	
+
+# Memo2Mail
+MEMO_MAIL_SUBJECT
+	Neue Memo
+MEMO_MAIL_TEXT1
+	Hi %s
+MEMO_MAIL_TEXT2
+	Du hast gerade eine neue Memo von %s erhalten. Dies ist Memo Nummer %d.
+MEMO_MAIL_TEXT3
+	Memo Text:
+
 ###########################################################################
 #
 # BotServ messages

@@ -1207,6 +1207,7 @@ void expire_nicks()
     int i;
     NickAlias *na, *next;
     time_t now = time(NULL);
+    char *tmpnick;
 
     for (i = 0; i < 1024; i++) {
         for (na = nalists[i]; na; na = next) {
@@ -1227,7 +1228,10 @@ void expire_nicks()
                 alog("Expiring nickname %s (group: %s) (e-mail: %s)",
                      na->nick, na->nc->display,
                      (na->nc->email ? na->nc->email : "none"));
+                tmpnick = sstrdup(na->nick);
                 delnick(na);
+                send_event(EVENT_NICK_EXPIRE, tmpnick);
+                free(tmpnick);
             }
         }
     }

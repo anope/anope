@@ -2,8 +2,8 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
 12/30 A Warnings for NULL values with sstrdup/moduleData.                 [#261]
-12/26 A Services can enforce SGLINE and SQLINE by killing the user on set [#245]
-12/25 A Flag to tell if we need to enforce SGlines or not                 [ #00]
+12/26 A Services can enforce SGLINE/SQLINE by killing the user on set.    [#245]
+12/25 A Flag to tell if we need to enforce SGlines or not.                [ #00]
 12/02 A Support for other Ulines Servers (NeoStats/SolarStats).           [ #00]
 11/28 A Support for Unreal's version of SVSHOLD.                          [ #00]
 11/28 A /OS SET LIST to list the set options.                             [ #00]
@@ -16,6 +16,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.    [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/30 F Fixed moduleAddData using an old moduleData as list head.         [#261]
 12/30 F List handling of moduleData was bad on deletion.                  [#261]
 12/30 F Few memleaks with moduleData functions returning early.           [ #00]
 12/30 F Modules can no longer add commands with mod_name set.             [#261]

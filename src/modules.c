@@ -1825,7 +1825,6 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
      */
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *newData = NULL;
-    ModuleData *tmp = *md;
 
     if (!key || !value) {
         alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
@@ -1850,11 +1849,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
     newData->moduleName = sstrdup(mod_name);
     newData->key = sstrdup(key);
     newData->value = sstrdup(value);
-    if (tmp) {
-        newData->next = tmp;
-    } else {
-        newData->next = NULL;
-    }
+    newData->next = *md;
     *md = newData;
 
     free(mod_name);

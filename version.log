@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="515"
+VERSION_BUILD="516"
 
 # $Log$
+#
+# BUILD : 1.7.6 (516)
+# BUGS  : 261
+# NOTES : This should be it finally! The moduleAddData function was using the old head to append/prepend the new moduleData to, but it had to use the new head. Thanks to DrStein for finding the cause! :)
 #
 # BUILD : 1.7.6 (515)
 # BUGS  : 261

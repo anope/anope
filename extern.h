@@ -863,5 +863,9 @@ E void db_mysql_load_exceptions(void);
 E void db_mysql_load_news(void);
 #endif
 
+#ifdef USE_ENCRYPTION
+extern int encrypt_in_place(char *buf, int size);
+#endif
+
 
 #endif	/* EXTERN_H */

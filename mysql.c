@@ -208,6 +208,10 @@ void db_mysql_save_ns_req(NickRequest * nr)
 char *db_mysql_secure(char *pass)
 {
 
+#ifdef USE_ENCRYPTION
+    /* If we use the builtin encryption don't double encrypt! */
+    return sstrdup(pass);
+#else
     char epass[BUFSIZE];
 
     if (!pass) {
@@ -226,6 +230,7 @@ char *db_mysql_secure(char *pass)
     }
 
     return sstrdup(epass);
+#endif
 
 }
 

@@ -16,6 +16,10 @@
 #include "pseudo.h"
 #include <fcntl.h>
 
+#ifndef INADDR_NONE
+#define INADDR_NONE 0xFFFFFFFF
+#endif 
+
 /* Hashed list of HostCache; threads must not use it! */
 HostCache *hcache[1024];
 

@@ -14,12 +14,6 @@
 #include "modules.h"
 #include "language.h"
 
-#ifdef __OpenBSD__
-#define DL_PREFIX "_"           /* so OpenBSD can lookup the symbols */
-#else
-#define DL_PREFIX ""
-#endif                          /* __OpenBSD__ */
-
 #ifdef USE_MODULES
 #include <dlfcn.h>
 /* Define these for systems without them */
@@ -1845,7 +1839,7 @@ char *moduleGetData(ModuleData * md[], char *key)
     ModuleData *lastHash = NULL;
     ModuleDataItem *itemCurrent = NULL;
     index = CMD_HASH(mod_name);
-
+    if(!md) { return NULL; }
     for (current = md[index]; current; current = current->next) {
         if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;

@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: modules.h,v 1.16 2004/03/11 16:50:01 rob Exp $
+ * $Id$
  */
 
 #ifndef MODULES_H

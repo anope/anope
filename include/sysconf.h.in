@@ -1,0 +1,209 @@
+/* include/sysconf.h.in.  Generated from ./autoconf/configure.in by autoheader.  */
+
+/* "Default umask Permissions" */
+#undef DEFUMASK
+
+/* "Underscore needed for dlopen" */
+#undef DL_PREFIX
+
+/* "Has sys/types.h" */
+#undef HAS_SYS_TYPES_H
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `gethostbyname' function. */
+#undef HAVE_GETHOSTBYNAME
+
+/* Define to 1 if you have the `gethostbyname_r' function. */
+#undef HAVE_GETHOSTBYNAME_R
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* "We have the mysql Header file" */
+#undef HAVE_MYSQL_MYSQL_H
+
+/* Define if you have POSIX threads libraries and header files. */
+#undef HAVE_PTHREAD
+
+/* Define to 1 if you have the `setgrent' function. */
+#undef HAVE_SETGRENT
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the `stricmp' function. */
+#undef HAVE_STRICMP
+
+/* "" */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
+
+/* Define to 1 if you have the `strspn' function. */
+#undef HAVE_STRSPN
+
+/* Define to 1 if you have the `sys_errlist' function. */
+#undef HAVE_SYS_ERRLIST
+
+/* "" */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* "" */
+#undef HAVE_SYS_SYSPROTO_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the `umask' function. */
+#undef HAVE_UMASK
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* "First IRCD type" */
+#undef IRC_BAHAMUT
+
+/* "First IRCD type" */
+#undef IRC_DREAMFORGE
+
+/* "First IRCD type" */
+#undef IRC_HYBRID
+
+/* "First IRCD type" */
+#undef IRC_PTLINK
+
+/* "Second IRCD type" */
+#undef IRC_RAGE2
+
+/* "Second IRCD type" */
+#undef IRC_ULTIMATE
+
+/* "Second IRCD type" */
+#undef IRC_ULTIMATE3
+
+/* "Second IRCD type" */
+#undef IRC_UNREAL
+
+/* "Second IRCD type" */
+#undef IRC_VIAGRA
+
+/* "Module dir" */
+#undef MODULE_PATH
+
+/* "mysql.h is in a mysql/ folder" */
+#undef MYSQL_HEADER_PREFIX
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to the necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+/* "Run group" */
+#undef RUNGROUP
+
+/* "Binary Dir" */
+#undef SERVICES_BIN
+
+/* "services bin dir" */
+#undef SERVICES_DIR
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of a `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* "modules not available" */
+#undef STATIC_LINKING
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* "has encryption" */
+#undef USE_ENCRYPTION
+
+/* "Modules available" */
+#undef USE_MODULES
+
+/* "Use Mysql" */
+#undef USE_MYSQL
+
+/* "Use RDB" */
+#undef USE_RDB
+
+/* "Use threads" */
+#undef USE_THREADS
+
+/* Define to `short' if <sys/types.h> does not define. */
+#undef int16_t
+
+/* Define to `long' if <sys/types.h> does not define. */
+#undef int32_t
+
+/* Define to `unsigned short' if <sys/types.h> does not define. */
+#undef u_int16_t
+
+/* Define to `unsigned long' if <sys/types.h> does not define. */
+#undef u_int32_t
+
+/* Static config, copy from here to below before running autoheader! */
+#ifdef USE_ENCRYPTION
+#define ENCRYPT_MD5
+#endif
+
+#ifdef HAS_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+
+typedef int16_t int16;
+typedef u_int16_t uint16;
+typedef int32_t int32;
+typedef u_int32_t uint32;
+

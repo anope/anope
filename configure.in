@@ -1,0 +1,210 @@
+dnl autoconf.in for Services.
+dnl
+dnl Anope (c) 2003 Anope team
+dnl Contact us at anope@zero.org
+
+dnl This program is free but copyrighted software; see the file COPYING for
+dnl details.
+ 
+dnl Based heavily on the Unreal configure.in script, and extra thanks to
+dnl codemastr from UnrealIRCD.
+
+
+AC_INIT(src/actions.c)
+if test $# = 0; then
+   echo "You might want to run ./Config or provide some parameters to this script."
+   echo "./configure --help for information about this script"
+   exit 0
+fi
+
+AC_CONFIG_HEADER(include/sysconf.h)
+AC_PROG_CC
+if test "$ac_cv_prog_gcc" = "yes"; then
+    CFLAGS="$CFLAGS -funsigned-char"
+    AC_CACHE_CHECK(if gcc has a working -pipe, ac_cv_pipe, [
+    save_cflags="$CFLAGS"
+    CFLAGS="$CFLAGS -pipe"
+    AC_TRY_COMPILE(,, ac_cv_pipe="yes", ac_cv_pipe="no")
+    CFLAGS="$save_cflags"
+    ])
+    if test "$ac_cv_pipe" = "yes"; then
+        CFLAGS="-pipe $CFLAGS"
+    fi
+fi
+
+dnl CFLAGS="$CFLAGS -W -Wall"
+
+AC_PATH_PROG(RM,rm)
+AC_PATH_PROG(CP,cp)
+AC_PATH_PROG(TOUCH,touch)
+AC_PATH_PROG(INSTALL,install)
+AC_CHECK_LIB(nsl,inet_ntoa,ANOPELIBS="$ANOPELIBS-lnsl ")
+AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
+AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
+AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
+AC_CHECK_LIB(mysqlclient, mysql_real_connect,[
+    ANOPELIBS="$ANOPELIBS-lmysqlclient "
+    AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
+    AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
+    MYSQL=" mysql.c "
+    RDB=" rdb.c "
+    AC_SUBST(MYSQL)
+    AC_SUBST(RDB)
+    AC_CHECK_HEADER(mysql.h,[
+      AC_DEFINE(HAVE_MYSQL_MYSQL_H,"1","We have the mysql Header file")
+    ])
+    AC_CHECK_HEADER(mysql/mysql.h,[
+      AC_DEFINE(HAVE_MYSQL_MYSQL_H,"1","We have the mysql Header file")
+      AC_DEFINE(MYSQL_HEADER_PREFIX,"1","mysql.h is in a mysql/ folder")
+    ])
+])
+
+AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
+
+ACX_PTHREAD([
+    CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+    ANOPELIBS="$ANOPELIBS$PTHREAD_LIBS "
+    AC_DEFINE_UNQUOTED(USE_THREADS,1,"Use threads")    
+])
+
+AC_SUBST(ANOPELIBS)
+
+
+dnl module checking based on Unreal's module checking code
+AC_DEFUN(AC_ENABLE_DYN,
+[
+AC_CHECK_FUNC(dlopen,, AC_CHECK_LIB(dl,dlopen,[
+  ANOPELIBS="$ANOPELIBS -ldl"
+  AC_DEFINE(USE_MODULES,1,"Modules are available")
+  USE_MODULES="yes"
+],
+[
+AC_MSG_WARN(Dynamic linking is not enabled because dlopen was not found)
+AC_DEFINE(STATIC_LINKING,"NO_MODULES","modules not available")
+]))
+
+hold_cflags=$CFLAGS
+CFLAGS="$CFLAGS -export-dynamic"
+AC_CACHE_CHECK(if we need the -export-dynamic flag, ac_cv_export_dynamic, [
+AC_TRY_LINK(, [int i];, ac_cv_export_dynamic=yes, ac_cv_export_dynamic=no)])
+if test "$ac_cv_export_dynamic" = "no"; then
+CFLAGS=$hold_cflags
+fi
+
+AC_CACHE_CHECK(for compiler option to produce PIC,ac_cv_pic,[
+if test "$ac_cv_prog_gcc" = "yes"; then
+        ac_cv_pic="-fPIC -DPIC -shared"
+
+else
+case `uname -s` in
+    SunOS*[)]
+       ac_cv_pic="-KPIC -DPIC -G"
+    ;;
+esac
+
+fi
+])
+AC_CACHE_CHECK(if your system prepends an underscore on symbols,ac_cv_underscore,[
+cat >uscore.c << __EOF__
+int main() {
+return 0;
+}
+__EOF__
+$CC -o uscore $CFLAGS uscore.c 1>&5
+if test -z "`strings -a uscore |grep '^_main$'`"; then
+    ac_cv_underscore=no
+else
+    ac_cv_underscore=yes
+fi
+
+rm -f uscore uscore.c
+])
+if test "$ac_cv_underscore" = "yes"; then
+AC_DEFINE(DL_PREFIX,"_","Underscore needed for dlopen")
+else
+AC_DEFINE(DL_PREFIX,"","No prefix needed for dlopen")
+fi
+
+MODULEFLAGS=$ac_cv_pic
+AC_DEFINE(USE_MODULES,1,"Modules available")
+])
+
+AC_ENABLE_DYN
+unreal_CHECK_TYPE_SIZES
+
+AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H,1,""))
+AC_CHECK_HEADER(sys/select.h,AC_DEFINE(HAVE_SYS_SELECT_H,1,""))
+AC_CHECK_HEADER(sys/sysproto.h,AC_DEFINE(HAVE_SYS_SYSPROTO_H,1,""))
+
+AC_CHECK_FUNCS(strerror,AC_DEFINE(HAVE_STRERROR,1))
+AC_CHECK_FUNCS(sys_errlist,AC_DEFINE(HAVE_SYS_ERRLIST,1))
+AC_CHECK_FUNCS(snprintf,AC_DEFINE(HAVE_SNPRINTF,1))
+AC_CHECK_FUNCS(stricmp,AC_DEFINE(HAVE_STRICMP,1))
+AC_CHECK_FUNCS(strcasecmp,AC_DEFINE(HAVE_STRCASECMP,1))
+AC_CHECK_FUNCS(strdup,AC_DEFINE(HAVE_STRDUP,1))
+AC_CHECK_FUNCS(strspn,AC_DEFINE(HAVE_STRSPN,1))
+AC_CHECK_FUNCS(strsignal,AC_DEFINE(HAVE_STRSIGNAL,1))
+AC_CHECK_FUNCS(gettimeofday,AC_DEFINE(HAVE_GETTIMEOFDAY,1))
+AC_CHECK_FUNCS(setgrent,AC_DEFINE(HAVE_SETGRENT,1))
+AC_CHECK_FUNCS(umask,AC_DEFINE(HAVE_UMASK,1))
+AC_CHECK_FUNCS(fork,AC_DEFINE(HAVE_FORK,1))
+AC_CHECK_FUNCS(gethostbyname,AC_DEFINE(HAVE_GETHOSTBYNAME,1))
+AC_CHECK_FUNCS(gethostbyname_r,AC_DEFINE(HAVE_GETHOSTBYNAME_R,1))
+
+
+AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope], AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group"))
+
+dnl AC_DEFINE_UNQUOTED(MYOSNAME,"`uname -a`","uname")
+
+AC_ARG_WITH(permissions, [ --with-permissions=permissions     Specify the default permissions for anope], AC_DEFINE_UNQUOTED(DEFUMASK,$withval,"Default umask permissions"), AC_DEFINE(DEFUMASK, 007,"Default umask Permissions"))
+
+AC_ARG_WITH(bindir, [ --with-bindir=bindir     Specify the default binary dir for anope], [ 
+    AC_DEFINE_UNQUOTED(SERVICES_BIN,"${withval}/services","Binary Dir")
+    BINDEST=$withval
+    DATDEST=$withval
+    MODULE_PATH=${withval}/modules/
+])
+
+AC_SUBST(BINDEST)
+
+AC_ARG_WITH(datadir, [ --with-datadir=datadir     Specify the location of the services data folder], [
+ AC_DEFINE_UNQUOTED(SERVICES_DIR,"$withval","services bin dir")
+ AC_DEFINE_UNQUOTED(MODULE_PATH,"${withval}/modules/","Module dir")
+ DATDEST=$withval
+ MODULE_PATH=${withval}/modules/
+])
+
+AC_SUBST(DATDEST)
+AC_SUBST(MODULE_PATH)
+
+AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
+    if test "$withval" = "IRC_DREAMFORGE"; then
+	AC_DEFINE(IRC_DREAMFORGE,1,"Frist IRCD type")
+    elif test "$withval" = "IRC_BAHAMUT"; then
+    	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
+    elif test "$withval" = "IRC_UNREAL"; then
+    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
+	AC_DEFINE(IRC_UNREAL,1,"Second IRCD type")
+    elif test "$withval" = "IRC_ULTIMATE"; then
+    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
+	AC_DEFINE(IRC_ULTIMATE,1,"Second IRCD type")
+    elif test "$withval" = "IRC_ULTIMATE3"; then
+    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
+	AC_DEFINE(IRC_ULTIMATE3,1,"Second IRCD type")
+    elif test "$withval" = "IRC_HYBRID"; then
+    	AC_DEFINE(IRC_HYBRID,1,"First IRCD type")
+    elif test "$withval" = "IRC_VIAGRA"; then
+    	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
+	AC_DEFINE(IRC_VIAGRA,1,"Second IRCD type")
+    elif test "$withval" = "IRC_PTLINK"; then
+    	AC_DEFINE(IRC_PTLINK,1,"First IRCD type")
+    elif test "$withval" = "IRC_RAGE2"; then
+        AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
+	AC_DEFINE(IRC_RAGE2,1,"Second IRCD type")
+    fi
+])
+
+AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], AC_DEFINE_UNQUOTED(USE_ENCRYPTION,"USE_ENCRYPTION","has encryption"))
+
+AC_OUTPUT(Makefile)
+

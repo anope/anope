@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: timeout.h,v 1.4 2003/07/20 01:15:50 dane Exp $ 
+ * $Id$ 
  *
  */
 

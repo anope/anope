@@ -1,7 +1,10 @@
 # Makefile for language module
 
-include ../Makefile.inc
-
+MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
+	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+           'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
+     	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
+   	   'RUNGROUP=${RUNGROUP}' 'USE_MODULES=${USE_MODULES}'
 
 LANGOBJS = cat de en_us es fr gr nl pt tr it ru
 LANGSRCS = cat de en_us.l es fr.l gr.l nl.l pt.l tr.l it.l ru.l

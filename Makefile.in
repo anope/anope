@@ -1,0 +1,53 @@
+CC=@CC@
+INCLUDEDIR=../include
+ANOPELIBS=@ANOPELIBS@
+CFLAGS=@CFLAGS@
+SHELL=/bin/sh
+SUBDIRS=src
+BINDEST=@BINDEST@
+DATDEST=@DATDEST@
+INSTALL=@INSTALL@
+RM=@RM@
+CP=@CP@
+TOUCH=@TOUCH@
+MODULE_PATH=@MODULE_PATH@
+MYSQL=@MYSQL@
+RDB=@RDB@
+
+all:   language headers build modules
+
+MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
+	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
+           'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
+      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
+  	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'RDB=${RDB}'\
+	   'MYSQL=${MYSQL}'
+
+build:
+	@for i in $(SUBDIRS); do \
+            echo "Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \
+        done
+
+modules: build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all )
+
+language:
+	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; cp language.h ../include/)
+
+headers:
+	(cd include ; ${MAKE} ${MAKEARGS} )
+
+clean:
+	(cd lang ; ${MAKE} ${MAKEARGS} clean )
+	(cd include ; ${MAKE} ${MAKEARGS} clean )
+	(cd src ; ${MAKE} ${MAKEARGS} clean )
+
+distclean: clean
+	(cd include ; ${MAKE} ${MAKEARGS} distclean)
+	rm -f config.log config.status config.cache Makefile
+
+install: DUMMY
+	(cd src ; ${MAKE} ${MAKEARGS} install)
+
+DUMMY:

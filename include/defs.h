@@ -9,7 +9,7 @@
  * Based on the original code of Services by Andy Church. 
  * 
  * 
- * $Id: defs.h,v 1.4 2003/07/20 01:15:49 dane Exp $ 
+ * $Id$ 
  *
  */
 

@@ -4352,7 +4352,7 @@ static int do_suspend(User * u)
 
         alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
         notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
-        send_event(EVENT_NICK_FORBIDDEN, nick);
+        send_event(EVENT_NICK_SUSPENDED, nick);
 
     } else {
 

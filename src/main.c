@@ -43,9 +43,6 @@ int skeleton = 0;               /* -skeleton */
 int nofork = 0;                 /* -nofork */
 int forceload = 0;              /* -forceload */
 int noexpire = 0;               /* -noexpire */
-#ifdef IS44_CONVERTER
-int is44 = 0;                   /* -is44 */
-#endif
 
 #ifdef USE_RDB
 int do_mysql = 0;               /* use mysql ? */

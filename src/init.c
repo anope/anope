@@ -318,10 +318,6 @@ static int parse_options(int ac, char **av)
                 forceload = 1;
             } else if (!strcmp(s, "noexpire")) {
                 noexpire = 1;
-#ifdef IS44_CONVERTER
-            } else if (!strcmp(s, "is44")) {
-                is44 = 1;
-#endif
             } else if (!strcmp(s, "version")) {
                 fprintf(stdout, "Anope-%s %s %s -- %s\n", version_number,
                         ircd->name, version_flags, version_build);
@@ -350,9 +346,6 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout, "-forceload     -forceload\n");
                 fprintf(stdout, "-readonly      -readonly\n");
                 fprintf(stdout, "-noexpire      -noexpire\n");
-#ifdef IS44_CONVERTER
-                fprintf(stdout, "-is44          -is44\n");
-#endif
                 fprintf(stdout, "-version       -version\n");
                 fprintf(stdout, "-help          -help\n");
                 fprintf(stdout, "-log           -log logfilename\n");
@@ -598,16 +591,6 @@ int init(int ac, char **av)
     /* Initialize random number generator */
     rand_init();
     add_entropy_userkeys();
-
-#ifdef USE_CONVERTER
-    /* Convert the databases NOW! */
-# ifdef IS44_CONVERTER
-    if (is44) {
-        convert_ircservices_44();
-        alog("debug: Databases converted");
-    }
-# endif
-#endif
 
     /* Load up databases */
 #ifdef USE_RDB

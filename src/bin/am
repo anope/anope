@@ -377,7 +377,7 @@ NOTES : ";
 
     print "*** Running Indent...\n";
     my $prefix=".";
-    if (-d src) {
+    if (-d "src") {
 	    $prefix="src";
     }
     system("indent -kr -nut $prefix/*.c");

@@ -1115,6 +1115,7 @@ void do_cmode(const char *source, int ac, char **av)
 void do_topic(const char *source, int ac, char **av)
 {
     Channel *c = findchan(av[0]);
+    ChannelInfo *ci;
     int ts;
     time_t topic_time;
 
@@ -1139,6 +1140,15 @@ void do_topic(const char *source, int ac, char **av)
 
     /* We can be sure that the topic will be in sync here -GD */
     c->topic_sync = 1;
+
+    /* If the current topic we have matches the last known topic for this
+     * channel exactly, there's no need to update anything and we can as
+     * well just return silently without updating anything. -GD
+     */
+    if ((ac > 3) && *av[3] && (ci = c->ci) && ci->last_topic
+        && (strcmp(av[3], ci->last_topic) == 0)
+        && (strcmp(av[1], ci->last_topic_setter) == 0))
+        return;
 
     if (check_topiclock(c, topic_time))
         return;

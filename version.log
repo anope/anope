@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="635"
+VERSION_BUILD="636"
 
 # $Log$
+#
+# BUILD : 1.7.8 (636)
+# BUGS  : 
+# NOTES : When the topic was fully identical to the topiclocked one it still was being re-set, fixed that
 #
 # BUILD : 1.7.8 (635)
 # BUGS  : 

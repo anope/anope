@@ -238,25 +238,6 @@ void save_news()
 
 #undef SAFE
 
-void save_rdb_news()
-{
-#ifdef USE_RDB
-    int i;
-    NewsItem *ni;
-
-    if (!rdb_open())
-        return;
-
-    rdb_clear_table("anope_os_news");
-    for (i = 0; i < nnews; i++) {
-        ni = &news[i];
-        rdb_save_news(ni);
-    }
-
-    rdb_close();
-#endif
-}
-
 /*************************************************************************/
 /***************************** News display ******************************/
 /*************************************************************************/

@@ -443,25 +443,11 @@ int listOut(User * u)
 /*************************************************************************/
 void delHostCore(char *nick)
 {
-#ifdef USE_RDB
-    static char clause[128];
-#endif
     HostCore *tmp;
     boolean found = false;
     tmp = findHostCore(head, nick, &found);
     if (found) {
         head = deleteHostCore(head, tmp);
-
-#ifdef USE_RDB
-        /* Reflect this change in the database right away. */
-        if (rdb_open()) {
-
-            snprintf(clause, sizeof(clause), "nick='%s'", nick);
-            rdb_scrub_table("anope_hs_core", clause);
-            rdb_close();
-        }
-#endif
-
     }
 
 }
@@ -622,25 +608,6 @@ void save_hs_dbase(void)
 }
 
 #undef SAFE
-
-void save_hs_rdb_dbase(void)
-{
-#ifdef USE_RDB
-    HostCore *current;
-
-    if (!rdb_open())
-        return;
-
-    rdb_clear_table("anope_hs_core");
-
-    current = head;
-    while (current != NULL) {
-        rdb_save_hs_core(current);
-        current = current->next;
-    }
-    rdb_close();
-#endif
-}
 
 /*************************************************************************/
 /*	End of Load/Save Functions					 */

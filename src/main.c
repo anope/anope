@@ -48,7 +48,6 @@ int is44 = 0;                   /* -is44 */
 #endif
 
 #ifdef USE_RDB
-int do_mysql = 0;               /* use mysql ? */
 #endif
 
 /* Set to 1 if we are to quit */
@@ -154,40 +153,6 @@ void save_databases(void)
     save_news();
     waiting = -18;
     save_exceptions();
-
-#ifdef USE_RDB
-    if (do_mysql) {
-        if (debug)
-            alog("debug: Saving RDB databases");
-        waiting = -10;
-        if (!skeleton) {
-            waiting = -11;
-            save_ns_rdb_dbase();
-            waiting = -12;
-            save_cs_rdb_dbase();
-            if (PreNickDBName) {
-                save_ns_req_rdb_dbase();
-                waiting = -13;
-            }
-            /* Temporary fix to avoid unwanted timeouts... */
-            send_cmd(ServerName, "PONG %s", ServerName);
-            if (s_BotServ) {
-                waiting = -14;
-                save_bs_rdb_dbase();
-            }
-            if (s_HostServ) {
-                waiting = -15;
-                save_hs_rdb_dbase();
-            }
-            waiting = -16;
-            save_os_rdb_dbase();
-            waiting = -17;
-            save_rdb_news();
-            waiting = -18;
-            save_rdb_exceptions();
-        }
-    }
-#endif
 }
 
 /*************************************************************************/
@@ -232,6 +197,7 @@ void do_restart_services(void)
 
 static void services_shutdown(void)
 {
+    rdb_end();
     if (!quitmsg)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);

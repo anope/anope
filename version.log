@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="218"
+VERSION_BUILD="223"
 
 # $Log$
+#
+# BUILD : 1.7.4 (223)
+# BUGS  :
+# NOTES : Anope crontab failed because when path was too long the ps ux was cut short so grep failed. ps ux was changed to ps auwx to stop this problem (w is stops cutting the lines short) 
 #
 # BUILD : 1.7.4 (218)
 # BUGS  : 

@@ -2,10 +2,11 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
-06/28 F Fixed compiling bug with UltimateIRCd3, ViagraIRCd, Rage2IRCd     [ #00]
-06/26 F Removed TSMODE from usermodes for bahamut                         [#112]
-06/22 F Changed all strcasecmp's to stricmp's                             [ #00]
-06/20 F PTLink server support						  [ #00]
+06/30 F Fixed bug which caused failure in anope crontab script.           [ #00]
+06/28 F Fixed compiling bug with UltimateIRCd3, ViagraIRCd, Rage2IRCd.    [ #00]
+06/26 F Removed TSMODE from usermodes for bahamut.                        [#112]
+06/22 F Changed all strcasecmp's to stricmp's.                            [ #00]
+06/20 F PTLink server support.                                            [ #00]
 
 Anope Version 1.7.4
 -------------------

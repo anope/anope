@@ -34,7 +34,7 @@ cd $ANOPATH
 if [ -f $ANOPIDF ]
 then
 	ANOPID=`cat $ANOPIDF`
-	if [ `ps ux| grep $ANOPROG | grep $ANOPID | grep -v -c grep` = 1 ]
+	if [ `ps auwx | grep $ANOPROG | grep $ANOPID | grep -v -c grep` = 1 ]
 	then
 		exit	
 	fi

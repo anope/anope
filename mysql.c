@@ -275,7 +275,7 @@ void db_mysql_save_ns_core(NickCore * nc)
         snprintf(sqlcmd, MAX_SQL_BUF,
                  "INSERT DELAYED INTO anope_ns_core (display,pass,email,greet,icq,url,flags,"
                  "language,accesscount,memocount,memomax,channelcount,channelmax,active)"
-                 " VALUES ('%s',%s,'%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%d','1')",
+                 " VALUES ('%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%d','1')",
                  cnick, epass, cemail, cgreet, nc->icq, curl, nc->flags,
                  nc->language, nc->accesscount, nc->memos.memocount,
                  nc->memos.memomax, nc->channelcount, nc->channelmax);
@@ -466,7 +466,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
                  ",last_topic_time,flags,forbidby,forbidreason,bantype,accesscount,akickcount"
                  ",mlock_on,mlock_off,mlock_limit,mlock_key,mlock_flood,mlock_redirect,"
                  "entry_message,botnick,botflags,bwcount,capsmin,capspercent,floodlines,"
-                 "floodsecs,repeattimes,active) VALUES ('%s','%s','%s',%s,'%s','%s','%s'"
+                 "floodsecs,repeattimes,active) VALUES ('%s','%s','%s','%s','%s','%s','%s'"
                  ",'%d','%d','%s','%s','%d','%d','%s','%s','%d','%d','%d','%d','%d','%d',"
                  "'%s','%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','1')",
                  ciname,

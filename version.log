@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="40"
+VERSION_BUILD="42"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (42)
+# BUGS  : 11
+# NOTES : Fixed quoted MD5 password for MySQL use (again...)
 #
 # BUILD : 1.7.0 (40)
 # BUGS  : 11

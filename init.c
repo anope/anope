@@ -26,7 +26,6 @@ extern void moduleAddMsgs(void);
 #if defined(IRC_HYBRID)
 # define NICK(nick,name,modes) \
     do { \
-	kill_user(NULL, (nick), "Nick used by Services"); \
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", (nick), time(NULL), (modes), \
 		ServiceUser, ServiceHost, ServerName, (name)); \
 	} while (0)

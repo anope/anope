@@ -1227,6 +1227,7 @@ int read_config(int reload)
 
     if (GlobalOnCycle) {
         CHECK(GlobalOnCycleMessage);
+        CHECK(GlobalOnCycleUP);
     }
 
     /**

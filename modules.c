@@ -1787,7 +1787,6 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
 	 **/
     for (itemCurrent = lastHash->di; itemCurrent;
          itemCurrent = itemCurrent->next) {
-        alog("key: [%s] itemKey: [%s]", key, itemCurrent->key);
         if (strcasecmp(itemCurrent->key, key) == 0) {
             item = itemCurrent;
         }

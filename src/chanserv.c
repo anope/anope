@@ -2515,30 +2515,19 @@ static int do_register(User * u)
         return MOD_CONT;
     }
 
-    /* Confirm that the channel is in the RFC spec */
-    if (*chan != '#' || *chan == '&') {
-        /* RFC says channels start with & or # so if the first is not # complain */
-        notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
-        return MOD_CONT;
-    }
-
-    /* Throw a message that the channel is non existant */
-    if (!(c = findchan(chan))) {
-        alog("%s: %s attempted  to register a non-existant channel [%s] ",
-             s_ChanServ, u->nick, chan);
-        notice_lang(s_NickServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
-        return MOD_CONT;
-    }
-
     if (!desc) {
         syntax_error(s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
     } else if (*chan == '&') {
         notice_lang(s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
+    } else if (*chan != '#') {
+        notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
     } else if (!u->na || !(nc = u->na->nc)) {
         notice_lang(s_ChanServ, u, CHAN_MUST_REGISTER_NICK, s_NickServ);
     } else if (!nick_recognized(u)) {
         notice_lang(s_ChanServ, u, CHAN_MUST_IDENTIFY_NICK, s_NickServ,
                     s_NickServ);
+    } else if (!(c = findchan(chan))) {
+        notice_lang(s_NickServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
     } else if ((ci = cs_findchan(chan)) != NULL) {
         if (ci->flags & CI_VERBOTEN) {
             alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->username, common_get_vhost(u));

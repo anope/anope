@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="336"
+VERSION_BUILD="337"
 
 # $Log$
+#
+# BUILD : 1.7.5 (337)
+# BUGS  : N/A
+# NOTES : Moved new channel registeration checks
 #
 # BUILD : 1.7.5 (336)
 # BUGS  : 159

@@ -1388,6 +1388,11 @@ static int do_memocheck(User * u)
         return MOD_CONT;
     }
 
+    if ((na->status & NS_VERBOTEN)) {
+        notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
+        return MOD_CONT;
+    }
+
     mi = &na->nc->memos;
 
 /* Okay, I know this looks strange but we wanna get the LAST memo, so we

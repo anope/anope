@@ -1,6 +1,6 @@
 /* HelpServ functions
  *
- * (C) 2003 Anope Team / GeniusDex
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.

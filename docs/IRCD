@@ -3,8 +3,9 @@ HOW TO ADD IRCD SUPPORT
 1. Files to edit
 2. Modifing the header file
 3. The code
-4. Functions / Events
-5. CAPAB/PROTOCTL 
+4. Modes
+5. Functions / Events
+6. CAPAB/PROTOCTL 
 
 =============================================================================================
 
@@ -326,6 +327,14 @@ usage of each.
 
 77. SGline Enforce : the ircd enforces sglines for us we don't need to, 1 = yes  0 = no
 
+78. Vhost Character : the character used to represent the vhost mode
+
+79. TS6 : ircd supports TS6, 1 = yes  0 = no
+
+80. +h mode support, Helper Op mode supported by the ircd, 1 = yes  0 = no
+
+81. P10 : ircd is a P10 style of IRCD, 1 = yes  0 = no
+
 IRCDCAPAB ircdcap[] = { } 
 
 This struct is based of the CAPAB defines, you should review the the CAPAB table
@@ -366,7 +375,20 @@ CAPAB_TLKEXT    | 0x08000000  |  TLKEXT      |  This allows 10 instead of 8 para
 
 ===================================================================================================
 
-4. FUNCTIONS AND EVENTS
+4. Modes 
+
+	The next part that you come to is the user modes. You will want to have your .h file handy
+for this part as you being.
+
+unsigned long umodes[128] = { }
+
+	This starts from 0 to 127 in the ASCII character set. Insert the user modes at the slot 
+where the mode fits. If you are adding a the user mode of +i find the 105 character slot in
+the array, and place the UMODE_i into this slot.
+
+===================================================================================================
+
+5. FUNCTIONS AND EVENTS
 
 A brief word about functions and events. All events are captured via the 
 
@@ -399,7 +421,7 @@ they may take any number of arguments, and come to a send_cmd() this root functi
 commands are sent to the ircd. 
 
 
-4. CAPAB/PROTOCTL
+6. CAPAB/PROTOCTL
 
 Most IRCD send a CAPAB or PROTOCTL line so that they can work out what each is
 capable of doing. Anope has a function to read these lines and set itself up 

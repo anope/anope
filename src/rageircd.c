@@ -1,6 +1,6 @@
 /* Rage IRCD functions
  *
- * (C) 2003 Anope Team
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -106,6 +106,7 @@ IRCDVar ircd[] = {
      "x",                       /* vhost char */
      0,                         /* ts6 */
      1,                         /* support helper umode */
+     0,                         /* p10 */
      },
     {NULL}
 };

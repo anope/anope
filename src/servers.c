@@ -1,6 +1,6 @@
 /* Routines to maintain a list of connected servers
  *
- * (C) 2004 Anope Team / GeniusDex
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -98,7 +98,11 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     serv->desc = sstrdup(desc);
     serv->flags = flags;
     serv->uplink = uplink;
-    serv->suid = sstrdup(suid);
+    if (suid) {
+        serv->suid = sstrdup(suid);
+    } else {
+        serv->suid = NULL;
+    }
     serv->sync = -1;
     serv->links = NULL;
     serv->prev = NULL;

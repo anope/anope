@@ -1,4 +1,4 @@
-# (C) 2003 Anope 
+# (C) 2003-2005 Anope 
 # Contact us at info@anope.org
 #
 # Please read COPYING and README for furhter details.
@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="555"
+VERSION_BUILD="556"
 
 # $Log$
+#
+# BUILD : 1.7.7 (556)
+# BUGS  : N/A
+# NOTES : synced headers so our copyright is 2005, Solid IRCD compiles again, fixed sstrdup() error, 
+# updated the documentation a bit, cleaned up ratbox a bit.
 #
 # BUILD : 1.7.7 (555)
 # BUGS  : N/A

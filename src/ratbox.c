@@ -1,6 +1,6 @@
 /* Ratbox IRCD functions
  *
- * (C) 2003 Anope Team
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for furhter details.
@@ -107,6 +107,7 @@ IRCDVar ircd[] = {
      NULL,                      /* vhost char */
      1,                         /* ts6 */
      0,                         /* support helper umode */
+     0,                         /* p10 */
      }
     ,
     {NULL}
@@ -849,19 +850,9 @@ void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
     Uid *ud;
 
-    if (UseTS6) {
-        ud = find_uid(user);
-        if (ud) {
-            send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
-                     channel, ud->uid);
-        } else {
-            send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
-                     channel, user);
-        }
-    } else {
-        send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
-                 channel, user);
-    }
+    ud = find_uid(user);
+    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
+             channel, (UseTS6 ? (ud ? ud->uid : user) : user));
 }
 
 /*
@@ -876,7 +867,12 @@ reason:		the reason for the kline.
 void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
-    send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "KLINE * %ld %s %s :%s",
              (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
@@ -901,17 +897,10 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
         return;
     }
 
-    if (UseTS6) {
-        ud = find_uid(source);
-        ud2 = find_uid(user);
-        if (ud && ud2) {
-            send_cmd(ud->uid, "KILL %s :%s", ud2->uid, buf);
-        } else {
-            send_cmd(source, "KILL %s :%s", user, buf);
-        }
-    } else {
-        send_cmd(source, "KILL %s :%s", user, buf);
-    }
+    ud = find_uid(source);
+    ud2 = find_uid(user);
+    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "KILL %s :%s",
+             (UseTS6 ? (ud2 ? ud2->uid : user) : user), buf);
 }
 
 void anope_cmd_svsmode(User * u, int ac, char **av)
@@ -1113,17 +1102,10 @@ int anope_event_privmsg(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    if (UseTS6) {
-        u = find_byuid(source);
-        ud = find_nickuid(av[0]);
-        if (u) {
-            m_privmsg(u->nick, (ud ? ud->nick : av[0]), av[1]);
-        } else {
-            m_privmsg(source, av[0], av[1]);
-        }
-    } else {
-        m_privmsg(source, av[0], av[1]);
-    }
+    u = find_byuid(source);
+    ud = find_nickuid(av[0]);
+    m_privmsg((UseTS6 ? (u ? u->nick : source) : source),
+              (UseTS6 ? (ud ? ud->nick : av[0]) : av[0]), av[1]);
     return MOD_CONT;
 }
 
@@ -1174,9 +1156,6 @@ int anope_event_sid(char *source, int ac, char **av)
 
     /* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
 
-    /* do_server(const char *source, char *servername, char *hops,
-       char *descript, char *numeric) */
-
     s = findserver_uid(servlist, source);
 
     do_server(s->name, av[0], av[1], av[3], av[2]);
@@ -1201,11 +1180,7 @@ int anope_event_quit(char *source, int ac, char **av)
 
     u = find_byuid(source);
 
-    if (UseTS6 && u) {
-        do_quit(u->nick, ac, av);
-    } else {
-        do_quit(source, ac, av);
-    }
+    do_quit((UseTS6 ? (u ? u->nick : source) : source), ac, av);
     return MOD_CONT;
 }
 

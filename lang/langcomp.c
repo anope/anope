@@ -1,12 +1,14 @@
 /* Compiler for language definition files.
  *
- * Epona (c) 2000-2002 PegSoft
- * Contact us at epona@pegsoft.net
+ * (C) 2003-2005 Anope Team
+ * Contact us at info@anope.org
  *
- * This program is free but copyrighted software; see the file COPYING for
- * details.
+ * Please read COPYING and README for further details.
  *
+ * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
+ * 
+ * $Id$
  *
  */
 

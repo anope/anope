@@ -1,6 +1,6 @@
 /*
  *
- * (C) 2003 Anope Team
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for furhter details.
@@ -240,9 +240,9 @@ struct ircdvars_ {
 	int vident;				/* Supports vidents		*/
 	int svshold;				/* Supports svshold		*/
 	int tsonmode;				/* Timestamp on mode changes	*/
-	int nickip;				/* Sends IP on NICK		*/
-	int omode;				/* On the fly o:lines		*/
-	int umode;				/* change user modes		*/
+	int nickip;					/* Sends IP on NICK		*/
+	int omode;					/* On the fly o:lines		*/
+	int umode;					/* change user modes		*/
 	int nickvhost;				/* Users vhost sent during NICK */
 	int chgreal;				/* Change RealName		*/
 	int extrahelp;				/* Lang file entry for extra 	*/
@@ -257,17 +257,18 @@ struct ircdvars_ {
 	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
-	int token;				/* Does Anope support the tokens for the ircd */
+	int token;					/* Does Anope support the tokens for the ircd */
 	int tokencaseless;			/* TOKEN are not case senstive - most its Unreal that is case senstive */
-	int sjb64;				/* Base 64 encode TIMESTAMP */
-        int invitemode;				/* +I  */
-        int sjoinbanchar;			/* use single quotes to define it */
-        int sjoinexchar;			/* use single quotes to define it */
+	int sjb64;					/* Base 64 encode TIMESTAMP */
+    int invitemode;				/* +I  */
+    int sjoinbanchar;			/* use single quotes to define it */
+    int sjoinexchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	char *vhostchar;			/* char used for vhosting */
 	int ts6;					/* ircd is TS6 */
 	int supporthelper;			/* +h helper umodes */
+	int p10;					/* ircd is P10  */
 };
 
 struct ircdcapab_ {

@@ -1,6 +1,6 @@
 /* Solid-IRCD functions
  *
- * (C) 2003 Anope Team
+ * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -105,6 +105,9 @@ IRCDVar ircd[] = {
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "v",                       /* vhost char */
+     0,                         /* ts6 */
+     1,                         /* support helper umode */
+     0,                         /* p10 */
      }
     ,
     {NULL}
@@ -1567,7 +1570,7 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
         return;
     }
 
-    send_cmd(oldnick, "NICK %s", newnick);
+    send_cmd(oldnick, "NICK %s :%ld", newnick, (long int) time(NULL));
 }
 
 int anope_event_error(char *source, int ac, char **av)

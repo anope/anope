@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="441"
+VERSION_BUILD="442"
 
 # $Log$
+#
+# BUILD : 1.7.6 (442)
+# BUGS  : N/A
+# NOTES : padded RDB database updates with pongs to help prevent time outs
 #
 # BUILD : 1.7.6 (441)
 # BUGS  : 215, 216

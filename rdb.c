@@ -30,7 +30,7 @@ int rdb_open()
 {
 
 #ifdef USE_MYSQL
-    return 1;                   // db_mysql_open();
+    return do_mysql;            // db_mysql_open();
 #endif
 
 }

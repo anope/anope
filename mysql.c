@@ -159,7 +159,7 @@ char *db_mysql_quote(char *sql)
     char *quoted;
 
 
-    if (!sql || !do_mysql) {
+    if (!sql) {
         return sstrdup("");
     }
 

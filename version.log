@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="125"
+VERSION_BUILD="126"
 
 # $Log$
+#
+# BUILD : 1.7.3 (126)
+# BUGS  : 73
+# NOTES : Repaired /NS GROUP for compiled but disabled MySQL support.
 #
 # BUILD : 1.7.3 (125)
 # BUGS  : 72

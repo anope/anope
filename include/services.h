@@ -1074,6 +1074,7 @@ struct session_ {
 #define NS_MASTER	0x0200		/* Was a master nick; used to import old databases */
 #define NS_TRANSGROUP	0xC000		/* Status flags that can be passed to a nick of the
 									   same group during nick change */
+#define NS_SUSPENDED	0x0400		/* Nickname has been suspended */
 #define NS_TEMPORARY	0xFF00      /* All temporary status flags */
 /* These two are not used anymore */
 #define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
@@ -1097,7 +1098,6 @@ struct session_ {
 #define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
 #define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
 #define NI_HIDE_STATUS          0x00020000  /* Don't show services access status */
-
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change
  * the order the languages are displayed in for NickServ HELP SET LANGUAGE,

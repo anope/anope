@@ -86,6 +86,8 @@ static int do_getemail(User * u);
 static int do_sendpass(User * u);
 static int do_forbid(User * u);
 static int do_resend(User * u);
+static int do_suspend(User * u);
+static int do_unsuspend(User * u);
 
 /* Obsolete commands */
 static int do_link(User * u);
@@ -137,6 +139,8 @@ void moduleAddNickServCmds(void) {
     c = createCommand("GETPASS",  do_getpass,  is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_GETPASS, NICK_SERVADMIN_HELP_GETPASS); addCoreCommand(NICKSERV,c);
     c = createCommand("GETEMAIL", do_getemail, is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL); addCoreCommand(NICKSERV,c);
     c = createCommand("FORBID",   do_forbid,   is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID); addCoreCommand(NICKSERV,c);
+    c = createCommand("SUSPEND",  do_suspend,  is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_SUSPEND, NICK_SERVADMIN_HELP_SUSPEND); addCoreCommand(NICKSERV,c);
+    c = createCommand("UNSUSPEND",do_unsuspend,is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_SUSPEND, NICK_SERVADMIN_HELP_SUSPEND); addCoreCommand(NICKSERV,c);
 }
 /* *INDENT-ON* */
 /*************************************************************************/
@@ -2541,6 +2545,8 @@ static int do_identify(User * u)
         }
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
     } else if (!(res = check_password(pass, na->nc->pass))) {
@@ -2845,6 +2851,8 @@ static int do_set(User * u)
         notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (!is_servadmin && !nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
     } else if (stricmp(cmd, "DISPLAY") == 0) {
@@ -3283,6 +3291,12 @@ static int do_access(User * u)
             return MOD_CONT;
         }
 
+        if (na->status & NS_SUSPENDED) {
+            notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+            return MOD_CONT;
+        }
+
+
         notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X, mask);
         mask = strtok(NULL, " ");
         for (access = na->nc->access, i = 0; i < na->nc->accesscount;
@@ -3304,6 +3318,9 @@ static int do_access(User * u)
 
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
 
     } else if (!nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
@@ -3554,6 +3571,11 @@ static int do_info(User * u)
 
             notice_lang(s_NickServ, u, NICK_INFO_OPTIONS,
                         *buf ? buf : getstring(u->na, NICK_INFO_OPT_NONE));
+
+            if (na->status & NS_SUSPENDED) {
+                notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED,
+                            na->last_quit);
+            }
 
             if (na->status & NS_NO_EXPIRE) {
                 notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
@@ -3916,6 +3938,8 @@ static int do_recover(User * u)
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (stricmp(nick, u->nick) == 0) {
         notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
     } else if (pass) {
@@ -3960,6 +3984,8 @@ static int do_release(User * u)
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (!(na->status & NS_KILL_HELD)) {
         notice_lang(s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
     } else if (pass) {
@@ -4004,6 +4030,8 @@ static int do_ghost(User * u)
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (na->status & NS_SUSPENDED) {
+        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (stricmp(nick, u->nick) == 0) {
         notice_lang(s_NickServ, u, NICK_NO_GHOST_SELF);
     } else if (pass) {
@@ -4274,6 +4302,122 @@ static int do_forbid(User * u)
         notice_lang(s_NickServ, u, NICK_FORBID_FAILED, nick);
     }
     return MOD_CONT;
+}
+
+/*************************************************************************/
+
+static int do_suspend(User * u)
+{
+
+    NickAlias *na;
+    char *nick = strtok(NULL, " ");
+    char *reason = strtok(NULL, "");
+
+    if (!nick || !reason) {
+        syntax_error(s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
+        return MOD_CONT;
+    }
+
+    if (readonly) {
+        notice_lang(s_NickServ, u, READ_ONLY_MODE);
+        return MOD_CONT;
+    }
+
+    if ((na = findnick(nick)) == NULL) {
+        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+        return MOD_CONT;
+    }
+
+    if (na->status & NS_VERBOTEN) {
+        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+        return MOD_CONT;
+    }
+
+    if (NSSecureAdmins && nick_is_services_admin(na->nc)
+        && !is_services_root(u)) {
+        notice_lang(s_NickServ, u, PERMISSION_DENIED);
+        return MOD_CONT;
+    }
+
+    if (na) {
+        na->status |= NS_SUSPENDED;
+        na->nc->flags |= NI_SECURE;
+        na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+        na->nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+        na->last_quit = sstrdup(reason);
+
+        if (WallForbid)
+            anope_cmd_global(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2",
+                             u->nick, nick);
+
+        alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
+        notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
+        send_event(EVENT_NICK_FORBIDDEN, nick);
+
+    } else {
+
+        alog("%s: Valid SUSPEND for %s by %s failed", s_NickServ, nick,
+             u->nick);
+        notice_lang(s_NickServ, u, NICK_SUSPEND_FAILED, nick);
+
+    }
+    return MOD_CONT;
+}
+
+/*************************************************************************/
+
+static int do_unsuspend(User * u)
+{
+    NickAlias *na;
+    char *nick = strtok(NULL, " ");
+
+    if (!nick) {
+        syntax_error(s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
+        return MOD_CONT;
+    }
+
+    if (readonly) {
+        notice_lang(s_NickServ, u, READ_ONLY_MODE);
+        return MOD_CONT;
+    }
+
+    if ((na = findnick(nick)) == NULL) {
+        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+        return MOD_CONT;
+    }
+
+    if (na->status & NS_VERBOTEN) {
+        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+        return MOD_CONT;
+    }
+    if (NSSecureAdmins && nick_is_services_admin(na->nc)
+        && !is_services_root(u)) {
+        notice_lang(s_NickServ, u, PERMISSION_DENIED);
+        return MOD_CONT;
+    }
+
+    if (na) {
+        na->status &= ~NS_SUSPENDED;
+
+        if (WallForbid)
+            anope_cmd_global(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2",
+                             u->nick, nick);
+
+        alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick,
+             nick);
+        notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
+        send_event(EVENT_NICK_UNSUSPEND, nick);
+
+    } else {
+
+        alog("%s: Valid UNSUSPEND for %s by %s failed", s_NickServ, nick,
+             u->nick);
+        notice_lang(s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
+
+    }
+
+    return MOD_CONT;
+
 }
 
 /*************************************************************************/

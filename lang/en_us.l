@@ -206,6 +206,8 @@ NICK_X_ILLEGAL
 	Nick %s is an illegal nickname and cannot be used.
 NICK_X_TRUNCATED
 	Nick %s was truncated to %d characters.
+NICK_X_SUSPENDED
+	Nick %s is currently suspended.
 CHAN_X_NOT_REGISTERED
 	Channel %s isn't registered.
 CHAN_X_NOT_IN_USE
@@ -611,6 +613,8 @@ NICK_INFO_NO_EXPIRE
 	This nickname will not expire.
 NICK_INFO_FOR_MORE
 	For more verbose information, type /msg %s INFO %s ALL.
+NICK_INFO_SUSPENDED
+	This nickname is currently suspended, reason: %s
 
 # LIST responses
 NICK_LIST_SYNTAX
@@ -712,6 +716,22 @@ NICK_SENDPASS_LINE_5
 	%s administrators.
 NICK_SENDPASS_OK
 	Password of %s has been sent.
+
+# SUSPEND responses
+NICK_SUSPEND_SYNTAX
+	SUSPEND nickname reason
+NICK_SUSPEND_SUCCEEDED
+	Nick %s is now suspended.
+NICK_SUSPEND_FAILED
+	Couldn't suspend nick %s!
+
+# UNSUSPEND responses
+NICK_UNSUSPEND_SYNTAX
+	UNSUSPEND nickname
+NICK_UNSUSPEND_SUCCEEDED
+	Nick %s is now released.
+NICK_UNSUSPEND_FAILED
+	Couldn't release nick %s!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -3712,6 +3732,13 @@ NICK_SERVADMIN_HELP_FORBID
 	On certain networks, reason is required.
 	
 	Limited to Services admins.
+
+NICK_SERVADMIN_HELP_SUSPEND
+	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+
+	SUSPENDs / UNSUSPENDs a nickname from being identified to
+	
+	Limited to Services admins.
 
 ###########################################################################
 #

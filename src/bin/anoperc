@@ -47,6 +47,13 @@ if [ ! -f $ANOPEBIN$ANOPROG ] ; then
 	exit 1
 fi
 
+if [ "$UID" = "0" ] ; then
+  echo "**********************************";
+  echo "Warning: Do not run anope as root!";
+  echo "**********************************";
+  exit 1
+fi
+
 if [ "$1" = "start" ] ; then
 
 if [ -f $ANOPEBIN$PIDFILE ] ; then

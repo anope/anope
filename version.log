@@ -8,12 +8,16 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="122"
+VERSION_BUILD="123"
 
 # $Log$
 #
+# BUILD : 1.7.3 (123)
+# BUGS  : None
+# NOTES : Fixed Changes and version.log format and added reference bug number.
+#
 # BUILD : 1.7.3 (122)
-# BUGS  : None 
+# BUGS  : 71 
 # NOTES : New NSNickTracking directive to track nick cores when changing nicks.
 #
 # BUILD : 1.7.3 (121)

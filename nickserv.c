@@ -2192,7 +2192,7 @@ static int do_confirm(User * u)
         notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
     }
 
-    /* Enable nick tracking if enabled*/
+    /* Enable nick tracking if enabled */
     if (NSNickTracking)
         nsStartNickTracking(u);
 
@@ -2419,7 +2419,7 @@ static int do_identify(User * u)
         if (!(na->status & NS_RECOGNIZED))
             check_memos(u);
 
-        /* Enable nick tracking if enabled*/
+        /* Enable nick tracking if enabled */
         if (NSNickTracking)
             nsStartNickTracking(u);
     }
@@ -2586,7 +2586,7 @@ static int do_logout(User * u)
         else
             notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
-        /* Stop nick tracking if enabled*/
+        /* Stop nick tracking if enabled */
         if (NSNickTracking)
             nsStopNickTracking(u);
     }
@@ -2762,7 +2762,7 @@ static int do_set_display(User * u, NickCore * nc, char *param)
     change_core_display(nc, param);
     notice_lang(s_NickServ, u, NICK_SET_DISPLAY_CHANGED, nc->display);
 
-    /* Enable nick tracking if enabled*/
+    /* Enable nick tracking if enabled */
     if (NSNickTracking)
         nsStartNickTracking(u);
 
@@ -4128,14 +4128,14 @@ void nsStopNickTracking(User * u)
  * signature of that core in its structure.
  * @param u The user whom to check tracking for
  **/
-int nsCheckNickTracking(User *u)
+int nsCheckNickTracking(User * u)
 {
     NickCore *nc;
     NickAlias *na;
-    char* nick;
+    char *nick;
 
     /* No nick alias or nick return false by default */
-    if((!(na = u->na)) || (!(nick = na->nick))) 
+    if ((!(na = u->na)) || (!(nick = na->nick)))
         return 0;
 
     /* Get the core for the requested nick */
@@ -4146,6 +4146,6 @@ int nsCheckNickTracking(User *u)
      */
     if (nc && u->nickTrack && (strcmp(nc->display, u->nickTrack) == 0))
         return 1;
-    else 
+    else
         return 0;
 }

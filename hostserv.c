@@ -516,7 +516,6 @@ void load_hs_dbase_v1(dbFILE * f)
 
     tmp = time(NULL);
 
-    alog("Attempting to load V1 HS Database");
     while (!failed && (c = getc_db(f)) == 1) {
 
         if (c == 1) {
@@ -541,7 +540,6 @@ void load_hs_dbase_v2(dbFILE * f)
     char *creator;
     int32 time;
 
-    alog("Attempting to load V2 HS Database");
     while (!failed && (c = getc_db(f)) == 1) {
 
         if (c == 1) {
@@ -570,7 +568,6 @@ void load_hs_dbase_v3(dbFILE * f)
     char *vIdent;
     int32 time;
 
-    alog("Attempting to load V3 HS Database");
     while (!failed && (c = getc_db(f)) == 1) {
         if (c == 1) {
             SAFE(read_string(&nick, f));

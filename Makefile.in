@@ -26,13 +26,13 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 
 build:
 	@for i in $(SUBDIRS); do \
-            echo "Building $$i";\
+            echo "*** Building $$i";\
             ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \
         done
 
 modules: build
-	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all )
-	echo "all done, now (g)make install to install Anope/Modules";
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
 
 language:
 	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; cp language.h ../include/)

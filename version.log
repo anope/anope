@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="506"
+VERSION_BUILD="507"
 
 # $Log$
+#
+# BUILD : 1.7.6 (507)
+# BUGS  : N/A
+# NOTES : Fixed not freeing memory when a channel got deleted.
 #
 # BUILD : 1.7.6 (506)
 # BUGS  : 260

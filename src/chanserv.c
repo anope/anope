@@ -2132,6 +2132,13 @@ int delchan(ChannelInfo * ci)
         chanlists[(unsigned char) tolower(ci->name[1])] = ci->next;
     if (ci->desc)
         free(ci->desc);
+    if (ci->url)
+        free(ci->url);
+    if (ci->email)
+        free(ci->email);
+    if (ci->entry_message)
+        free(ci->entry_message);
+
     if (ci->mlock_key)
         free(ci->mlock_key);
     if (ircd->fmode) {

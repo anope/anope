@@ -3253,7 +3253,7 @@ NICK_HELP
 	    RELEASE    Retoma custodia de tu nick luego de RECOVER
 	    SENDPASS   Olvidaste tu clave? Intenta esto
 	
-	Otros comandos: GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
+	Otros comandos: ALIST, GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
 	
 	NOTESE: Este servicio intenta proveer una forma para
 	usuarios de IRC de asegurarse que su identidad no esta
@@ -3835,7 +3835,7 @@ CHAN_HELP
 	    DROP       Cancela la registracion de un canal
 	    SENDPASS   Ayuda a recuperar claves perdidas
 	
-	Otros comandos: ALIST, BAN, CLEAR, DEOP, DEVOICE, GETKEY,
+	Otros comandos: BAN, CLEAR, DEOP, DEVOICE, GETKEY,
 	                INFO, INVITE, KICK, LIST, LOGOUT, OP,
 	                UNBAN, VOICE, VOP
 	

@@ -468,6 +468,7 @@ void moduleAddIRCDMsgs(void) {
     Message *m;
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("482",       anope_event_482); addCoreMessage(IRCD,m);
     m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);
@@ -726,7 +727,7 @@ void anope_cmd_capab()
 
 void anope_cmd_server(char *servname, int hop, char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", ServerName, hop, ServerDesc);
+    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
 }
 
 void anope_set_umode(User * user, int ac, char **av)

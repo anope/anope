@@ -456,6 +456,7 @@ void moduleAddIRCDMsgs(void) {
     Message *m;
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("451",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);

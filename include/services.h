@@ -192,7 +192,8 @@ typedef struct channel_ Channel;
 #if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
 # define HAS_NICKIP
 # define HAS_EXCEPT
-# define HAS_SVSHOLD                                                            
+# define HAS_SVSHOLD
+# define HAS_JOINFLOOD
 # define NICKSERV_MODE "+o"
 # define CHANSERV_MODE "+o"
 # define MEMOSERV_MODE "+o"
@@ -730,6 +731,9 @@ struct chaninfo_ {
 #ifdef HAS_LMODE
     char *mlock_redirect;		/* NULL if no +L */
 #endif
+#ifdef HAS_JOINFLOOD
+    char *mlock_joinflood;		/* NULL if no +j */
+#endif
 
     char *entry_message;		/* Notice sent on entering channel */
 
@@ -1254,6 +1258,9 @@ struct channel_ {
 #ifdef HAS_FMODE
 	char *flood;			/* +f; NULL if none */
 #endif
+#ifdef HAS_JOINFLOOD
+	char *joinflood;		/* +j; NULL if none */
+#endif
 
     int32 bancount, bansize;
     char **bans;
@@ -1299,6 +1306,7 @@ struct channel_ {
 #define CMODE_c 0x00000400		/* Colors can't be used */
 #define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
 #define CMODE_O 0x00008000		/* Only opers can join */
+#define CMODE_j 0x02000000		/* Join flood protection */
 #endif
 
 /* This mode is for IRC_HYBRID servers only. */

@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="426"
+VERSION_BUILD="429"
 
 # $Log$
+#
+# BUILD : 1.7.5 (429)
+# NOTES : Minor fix on example.conf
 #
 # BUILD : 1.7.5 (426)
 # BUGS  : 133, 196, 200

@@ -2670,6 +2670,9 @@ OPER_SET_SQL_ERROR
 	Instelling voor SQL moet ON of OFF zijn.
 OPER_SET_SQL_ERROR_INIT
 	Fout tijdens het initialiseren van SQL. Controleer de logs om dit op te lossen.
+OPER_SET_SQL_ERROR_DISABLED
+	SQL is not configured for this network. Please edit the
+	configuration file (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s is ingeschakeld
 OPER_SET_LIST_OPTION_OFF

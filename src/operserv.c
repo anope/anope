@@ -4564,15 +4564,23 @@ static int do_set(User * u)
 #ifdef USE_MYSQL
     } else if (stricmp(option, "SQL") == 0) {
         if (stricmp(setting, "on") == 0) {
-            if (rdb_init()) {
-                notice_lang(s_OperServ, u, OPER_SET_SQL_ON);
+            if (!MysqlHost) {
+                notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_DISABLED);
             } else {
-                notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_INIT);
+                if (rdb_init()) {
+                    notice_lang(s_OperServ, u, OPER_SET_SQL_ON);
+                } else {
+                    notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_INIT);
+                }
             }
         } else if (stricmp(setting, "off") == 0) {
-            /* could call rdb_close() but that does nothing - TSL */
-            do_mysql = 0;
-            notice_lang(s_OperServ, u, OPER_SET_SQL_OFF);
+            if (!MysqlHost) {
+                notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_DISABLED);
+            } else {
+                /* could call rdb_close() but that does nothing - TSL */
+                do_mysql = 0;
+                notice_lang(s_OperServ, u, OPER_SET_SQL_OFF);
+            }
         } else {
             notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR);
         }

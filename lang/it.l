@@ -2699,6 +2699,9 @@ OPER_SET_SQL_ERROR
 	Setting for SQL must be ON or OFF.
 OPER_SET_SQL_ERROR_INIT
 	Error during init of SQL, check your logs to correct.
+OPER_SET_SQL_ERROR_DISABLED
+	SQL is not configured for this network. Please edit the
+	configuration file (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s is enable
 OPER_SET_LIST_OPTION_OFF

@@ -2667,17 +2667,20 @@ OPER_SET_NOEXPIRE_ERROR
 OPER_SET_UNKNOWN_OPTION
 	Opcion %s desconocida.
 OPER_SET_SQL_ON
-	SQL code will be used.
+	El codigo SQL sera usado.
 OPER_SET_SQL_OFF
-	SQL code will not be used.
+	El codigo SQL no sera usado.
 OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
+	Opciones para SQL son ON o OFF.
 OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
+	Error durante el inicio de SQL, revisa tus logs para corregir.
+OPER_SET_SQL_ERROR_DISABLED
+	SQL no esta configurado para esta red. Por favor edita
+	el archivo de configuracion (services.conf).
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s esta habilitado
 OPER_SET_LIST_OPTION_OFF
-	%s is disabled
+	%s esta deshabilitado
 
 # NOOP responses
 OPER_NOOP_SYNTAX

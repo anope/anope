@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="632"
+VERSION_BUILD="633"
 
 # $Log$
+#
+# BUILD : 1.7.8 (633)
+# BUGS  : none
+# NOTES : OS SET SQL ON shall warn about SQL disabled in services.conf
 #
 # BUILD : 1.7.8 (632)
 # BUGS  : 315

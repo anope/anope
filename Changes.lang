@@ -1,7 +1,7 @@
 Anope Version 1.7.7
 -------------------
 *** New Strings:
-
+    MEMO_NO_RSEND_SELF
     NICK_REGISTERED_NO_MASK
     OPER_ADMIN_MOVED
     OPER_OPER_MOVED

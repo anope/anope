@@ -1792,6 +1792,9 @@ MEMO_MAIL_TEXT2
 	Du hast gerade eine neue Memo von %s erhalten. Dies ist Memo Nummer %d.
 MEMO_MAIL_TEXT3
 	Memo Text:
+MEMO_NO_RSEND_SELF
+	Das Erhalten von Empfangsbestätigungen ist nur beim Senden
+	einer Memo an andere User möglich.
 
 ###########################################################################
 #

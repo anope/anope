@@ -1784,6 +1784,8 @@ MEMO_CHECK_READ
 	The last memo you sent to %s (sent on %s) has been read.
 MEMO_CHECK_NO_MEMO
 	Nick %s doesn't have a memo from you.
+MEMO_NO_RSEND_SELF
+	You can not request a receipt when sending a memo to yourself.
 
 ###########################################################################
 #

@@ -1763,6 +1763,9 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 	%s wordt geinformeerd over nieuwe memo's wanneer deze arriveren.
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s wordt geinformeerd over nieuwe memo's wanneer je inlogt.
+MEMO_NO_RSEND_SELF
+	Je kan geen ontvangstbevestiging aanvragen voor een
+	memo die je naar jezelf stuurt.
 	
 ###########################################################################
 #

@@ -1407,6 +1407,14 @@ static int do_rsend(User * u)
     char *name = strtok(NULL, " ");
     char *text = strtok(NULL, "");
     int z = 3;
+    NickAlias *na;
+
+    na = findnick(name);
+
+    if (stricmp(na->nc->display, u->na->nc->display) == 0) {
+        notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
+        return MOD_CONT;
+    }
 
     if (MSMemoReceipt == 1) {
         /* Services opers and above can use rsend */

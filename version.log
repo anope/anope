@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="526"
+VERSION_BUILD="527"
 
 # $Log$
+#
+# BUILD : 1.7.7 (527)
+# BUGS  : 269
+# NOTES : You can no longer request a reciept when sending a memo to yourself.
 #
 # BUILD : 1.7.7 (526)
 # NOTES : Anope 1.7.7 Release.

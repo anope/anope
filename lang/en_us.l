@@ -5870,9 +5870,9 @@ BOT_SERVADMIN_HELP_BOT
 	BOT LIST is an alias of BOTLIST and just lists all
 	bots available on the network.
 	
-	Note: if you create a bot that has a nick that is
-	registered, it will be dropped. Also, if an user is
-	currently using the nick, it will be killed.
+	Note: you cannot create a bot that has a nick that is
+	currently registered. If an unregistered user is currently
+	using the nick, they will be killed.
 
 BOT_SERVADMIN_HELP_SET
 	

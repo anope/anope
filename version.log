@@ -8,10 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="55"
+VERSION_BUILD="56"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (56)
+# NOTES : Fourth time is a charm? Fixinf MySQL password saves.
 #
 # BUILD : 1.7.1 (55)
 # NOTES : One last try to fix the MySQL password saves... omg.

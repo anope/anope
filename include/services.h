@@ -258,6 +258,8 @@ struct ircdvars_ {
         int invitemode;				/* +I  */
         int sjoinbanchar;			/* use single quotes to define it */
         int sjoinexchar;			/* use single quotes to define it */
+	uint32 servicesmode;			/* Services Mode +S */
+	int p10;			 	/* P10 ircd */
 };
 
 struct ircdcapab_ {
@@ -305,6 +307,7 @@ struct ircdcapab_ {
 #define NICK_VERSION 		13
 #define PRE_NICK_VERSION 	1
 #define OPER_VERSION 		13
+#define HELP_VERSION 		1
 
 /*************************************************************************/
 

@@ -16,13 +16,15 @@
 #include "services.h"
 #include "pseudo.h"
 
-#define HELP_VERSION 1
-
-void helpserv_init(void);
 static int do_help(User * u);
 void moduleAddHelpServCmds(void);
 
 /*************************************************************************/
+
+/**
+ * Setup the commands for HelpServ
+ * @return void
+ */
 void moduleAddHelpServCmds(void)
 {
     Command *c;
@@ -32,15 +34,23 @@ void moduleAddHelpServCmds(void)
 
 /*************************************************************************/
 
-/*************************************************************************/
-/* HelpServ initialization. */
+/**
+ * HelpServ initialization.
+ * @return void
+ */
 void helpserv_init(void)
 {
     moduleAddHelpServCmds();
 }
 
 /*************************************************************************/
-/* Main HelpServ routine. */
+
+/**
+ * Main HelpServ routine.
+ * @param u User Struct of the user sending the PRIVMSG
+ * @param buf Buffer containing the PRIVMSG data
+ * @return void
+ */
 void helpserv(User * u, char *buf)
 {
     char *cmd, *s;
@@ -60,11 +70,15 @@ void helpserv(User * u, char *buf)
 }
 
 /*************************************************************************/
-/* Display the HelpServ help. */
-/* This core function has been embed in the source for a long time, but  */
-/* it moved into it's own file so we now all can enjoy the joy of        */
-/* modules for HelpServ. */
 
+/**
+ * Display the HelpServ help.
+ * This core function has been embed in the source for a long time, but  
+ * it moved into it's own file so we now all can enjoy the joy of        
+ * modules for HelpServ.
+ * @param u User Struct of the user looking for help
+ * @return MOD_CONT
+ */
 static int do_help(User * u)
 {
     char *cmd = strtok(NULL, "");
@@ -72,10 +86,12 @@ static int do_help(User * u)
     if (!cmd) {
         notice_help(s_HelpServ, u, HELP_HELP, s_NickServ, s_ChanServ,
                     s_MemoServ);
-        if (s_BotServ)
+        if (s_BotServ) {
             notice_help(s_HelpServ, u, HELP_HELP_BOT, s_BotServ);
-        if (s_HostServ)
+        }
+        if (s_HostServ) {
             notice_help(s_HelpServ, u, HELP_HELP_HOST, s_HostServ);
+        }
         moduleDisplayHelp(7, u);
     } else {
         mod_help_cmd(s_HelpServ, u, HELPSERV, cmd);

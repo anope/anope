@@ -100,6 +100,8 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     UMODE_S,                   /* Services Client mode */
+     0,                         /* not p10 */
      }
     ,
     {NULL}
@@ -194,22 +196,20 @@ void anope_set_umode(User * user, int ac, char **av)
         case 'o':
             if (add) {
                 opcnt++;
-
-                if (WallOper)
+                if (WallOper) {
                     anope_cmd_global(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
+                }
                 display_news(user, NEWS_OPER);
                 if (is_services_oper(user)) {
                     common_svsmode(user, "+a", NULL);
                     user->mode |= UMODE_a;
                 }
-
                 if (is_services_admin(user)) {
                     common_svsmode(user, "+P", NULL);
                     user->mode |= UMODE_P;
                 }
-
                 if (is_services_root(user)) {
                     common_svsmode(user, "+R", NULL);
                     user->mode |= UMODE_R;

@@ -102,6 +102,8 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     0,                         /* Services Client mode */
+     0,                         /* not p10 */
      }
     ,
     {NULL}

@@ -8,6 +8,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+12/02 A Support for +S (services clients) mode to override channel modes  [ #00]
 11/28 A Support for Unreal's version of SVSHOLD				  [ #00]
 11/28 A /OS SET LIST to list the set options				  [ #00]
 11/27 A Solid IRCD support (Solid IRCD 3.4.6 or later)			  [ #00]
@@ -17,6 +18,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/21 A Opened SGLINE to all ircd that support GEOS bans		  [ #00]
 11/21 A Opened SZLINE to all ircd that support ZLINE's			  [ #00]
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+12/02 F Ultimate3 botserv bots were getting wrong modes			  [ #00]
 12/01 F ChanServ AKICK DEL (reordering) (pointed to freed memory)	  [ #00]
 12/01 F del_session() warning messages when LimitSessions is disabled	  [ #00]
 11/28 F NSSecureAdmins now restricts /NS SET EMAIL			  [#218]

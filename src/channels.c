@@ -235,6 +235,19 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                      mode, chan->name, user->nick);
 
             if (add) {
+                /*
+                   Okay everyones biggest complaint is that NeoStats or any other
+                   services clients are flagged as services but we still strip their
+                   channel modes when strict is enabled. This lets them keep the mode and
+                   we update our internal user/channel struct - TSL
+                 */
+                if (ircd->servicesmode) {
+                    if (user->mode & ircd->servicesmode) {
+                        chan_remove_user_status(chan, user, cum->status);
+                        continue;
+                    }
+                }
+
                 /* Fixes bug #68
                    - might be a bit ugly but it works, the idea is that since the 
                    is_valid function strips out all of the modes there is no point

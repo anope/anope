@@ -102,6 +102,8 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      '&',                       /* SJOIN ban char */
      '\"',                      /* SJOIN except char */
+     UMODE_S,                   /* Services Client mode */
+     0,                         /* not p10 */
      },
     {NULL}
 };
@@ -429,11 +431,21 @@ void anope_set_umode(User * user, int ac, char **av)
             if (add) {
                 opcnt++;
 
-                if (WallOper)
-                    anope_cmd_global(s_OperServ,
-                                     "\2%s\2 is now an IRC operator.",
-                                     user->nick);
-                display_news(user, NEWS_OPER);
+                /* No need to display news to a services client */
+                if (user->mode & ircd->servicesmode) {
+                    if (WallOper) {
+                        anope_cmd_global(s_OperServ,
+                                         "\2%s\2 is now a Network Service.",
+                                         user->nick);
+                    }
+                } else {
+                    if (WallOper) {
+                        anope_cmd_global(s_OperServ,
+                                         "\2%s\2 is now an IRC operator.",
+                                         user->nick);
+                    }
+                    display_news(user, NEWS_OPER);
+                }
             } else {
                 opcnt--;
             }

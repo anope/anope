@@ -18,33 +18,53 @@
 
 /*************************************************************************/
 
-/* Return the Command corresponding to the given name, or NULL if no such
+/**
+ * Return the Command corresponding to the given name, or NULL if no such
  * command exists.
+ * @param list Command struct
+ * @param cmd Command to look up
+ * @return Command Struct for the given cmd
  */
-
 Command *lookup_cmd(Command * list, char *cmd)
 {
     Command *c;
 
     for (c = list; c->name; c++) {
-        if (stricmp(c->name, cmd) == 0)
+        if (stricmp(c->name, cmd) == 0) {
             return c;
+        }
     }
     return NULL;
 }
 
 /*************************************************************************/
 
-/* Run the routine for the given command, if it exists and the user has
+/**
+ * Run the routine for the given command, if it exists and the user has
  * privilege to do so; if not, print an appropriate error message.
+ * @param services Services Client
+ * @param u User Struct
+ * @param list Command struct
+ * @param cmd Command
+ * @return void
  */
-
 void run_cmd(char *service, User * u, Command * list, char *cmd)
 {
     Command *c = lookup_cmd(list, cmd);
     do_run_cmd(service, u, c, cmd);
 }
 
+/*************************************************************************/
+
+/**
+ * Run the routine for the given command, if it exists and the user has
+ * privilege to do so; if not, print an appropriate error message.
+ * @param services Services Client
+ * @param u User Struct
+ * @param Command Hash Table
+ * @param cmd Command
+ * @return void
+ */
 void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
                  const char *cmd)
 {
@@ -52,6 +72,17 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
     do_run_cmd(service, u, c, cmd);
 }
 
+
+/*************************************************************************/
+
+/**
+ * Run the given command
+ * @param services Services Client
+ * @param u User Struct
+ * @param c Command Struct
+ * @param cmd Command
+ * @return void
+ */
 void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
 {
     int retVal = 0;
@@ -86,15 +117,22 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
             }
         }
     } else {
-        if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u))
+        if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u)) {
             notice_lang(service, u, UNKNOWN_COMMAND_HELP, cmd, service);
+        }
     }
 }
 
 /*************************************************************************/
 
-/* Print a help message for the given command. */
-
+/**
+ * Print a help message for the given command.
+ * @param services Services Client
+ * @param u User Struct
+ * @param c Command Struct
+ * @param cmd Command
+ * @return void
+ */
 void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
 {
     Command *current;
@@ -158,12 +196,32 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     }
 }
 
+/*************************************************************************/
+
+/**
+ * Find the Help Command
+ * @param services Services Client
+ * @param u User Struct
+ * @param c Command Struct
+ * @param cmd Command
+ * @return void
+ */
 void help_cmd(char *service, User * u, Command * list, char *cmd)
 {
     Command *c = lookup_cmd(list, cmd);
     do_help_cmd(service, u, c, cmd);
 }
 
+/*************************************************************************/
+
+/**
+ * Find the Help Command
+ * @param services Services Client
+ * @param u User Struct
+ * @param Command Hash Table
+ * @param cmd Command
+ * @return void
+ */
 void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
                   const char *cmd)
 {

@@ -16,9 +16,14 @@
 
 /*************************************************************************/
 
-/* Send a command to the server.  The two forms here are like
- * printf()/vprintf() and friends. */
-
+/**
+ * Send a command to the server.  The two forms here are like
+ * printf()/vprintf() and friends.
+ * @param source Orgin of the Message (some times NULL)
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void send_cmd(const char *source, const char *fmt, ...)
 {
     va_list args;
@@ -30,6 +35,15 @@ void send_cmd(const char *source, const char *fmt, ...)
     }
 }
 
+/*************************************************************************/
+
+/**
+ * actually Send a command to the server.
+ * @param source Orgin of the Message (some times NULL)
+ * @param fmt Format of the Message
+ * @param args List of the arguments
+ * @return void
+ */
 void vsend_cmd(const char *source, const char *fmt, va_list args)
 {
     char buf[BUFSIZE];
@@ -44,18 +58,28 @@ void vsend_cmd(const char *source, const char *fmt, va_list args)
 
         if (source) {
             sockprintf(servsock, ":%s %s\r\n", source, buf);
-            if (debug)
+            if (debug) {
                 alog("debug: Sent: :%s %s", source, buf);
+            }
         } else {
             sockprintf(servsock, "%s\r\n", buf);
-            if (debug)
+            if (debug) {
                 alog("debug: Sent: %s", buf);
+            }
         }
     }
 }
 
 /*************************************************************************/
 
+/**
+ * Send a server notice
+ * @param source Orgin of the Message
+ * @param s Server Struct
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void notice_server(char *source, Server * s, char *fmt, ...)
 {
     va_list args;
@@ -67,6 +91,7 @@ void notice_server(char *source, Server * s, char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (!buf) {
+            va_end(args);
             return;
         }
 
@@ -81,6 +106,14 @@ void notice_server(char *source, Server * s, char *fmt, ...)
 
 /*************************************************************************/
 
+/**
+ * Send a notice to a user
+ * @param source Orgin of the Message
+ * @param u User Struct
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void notice_user(char *source, User * u, const char *fmt, ...)
 {
     va_list args;
@@ -92,6 +125,7 @@ void notice_user(char *source, User * u, const char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (!buf) {
+            va_end(args);
             return;
         }
 
@@ -106,7 +140,13 @@ void notice_user(char *source, User * u, const char *fmt, ...)
 
 /*************************************************************************/
 
-/* Send a NULL-terminated array of text as NOTICEs. */
+/**
+ * Send a NULL-terminated array of text as NOTICEs.
+ * @param source Orgin of the Message
+ * @param dest Destination of the Notice
+ * @param text Array of text to send
+ * @return void
+ */
 void notice_list(char *source, char *dest, char **text)
 {
     while (*text) {
@@ -114,25 +154,34 @@ void notice_list(char *source, char *dest, char **text)
          * no text, it is ignored, so we replace blank lines by lines
          * with a single space.
          */
-        if (**text)
+        if (**text) {
             anope_cmd_notice2(source, dest, *text);
-        else
+        } else {
             anope_cmd_notice2(source, dest, " ");
+        }
         text++;
     }
 }
 
 /*************************************************************************/
 
-/* Send a message in the user's selected language to the user using NOTICE. */
+/**
+ * Send a message in the user's selected language to the user using NOTICE.
+ * @param source Orgin of the Message
+ * @param u User Struct
+ * @param int Index of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void notice_lang(char *source, User * dest, int message, ...)
 {
     va_list args;
     char buf[4096];             /* because messages can be really big */
     char *s, *t;
     const char *fmt;
-    if (!dest || !message)
+    if (!dest || !message) {
         return;
+    }
     va_start(args, message);
     fmt = getstring(dest->na, message);
     if (!fmt)
@@ -156,9 +205,15 @@ void notice_lang(char *source, User * dest, int message, ...)
 
 /*************************************************************************/
 
-/* Like notice_lang(), but replace %S by the source.  This is an ugly hack
+/**
+ * Like notice_lang(), but replace %S by the source.  This is an ugly hack
  * to simplify letting help messages display the name of the pseudoclient
  * that's sending them.
+ * @param source Orgin of the Message
+ * @param u User Struct
+ * @param int Index of the Message
+ * @param ... any number of parameters
+ * @return void
  */
 void notice_help(char *source, User * dest, int message, ...)
 {
@@ -167,8 +222,9 @@ void notice_help(char *source, User * dest, int message, ...)
     char *s, *t;
     const char *fmt;
 
-    if (!dest || !message)
+    if (!dest || !message) {
         return;
+    }
     va_start(args, message);
     fmt = getstring(dest->na, message);
     if (!fmt)
@@ -198,7 +254,14 @@ void notice_help(char *source, User * dest, int message, ...)
 
 /*************************************************************************/
 
-/* Send a NOTICE from the given source to the given nick. */
+/**
+ * Send a NOTICE from the given source to the given nick.
+ * @param source Orgin of the Message
+ * @param dest Destination of the Message
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void notice(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
@@ -210,6 +273,7 @@ void notice(char *source, char *dest, const char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (!buf) {
+            va_end(args);
             return;
         }
 
@@ -224,7 +288,14 @@ void notice(char *source, char *dest, const char *fmt, ...)
 
 /*************************************************************************/
 
-/* Send a PRIVMSG from the given source to the given nick. */
+/**
+ * Send a PRIVMSG from the given source to the given nick.
+ * @param source Orgin of the Message
+ * @param dest Destination of the Message
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
@@ -243,8 +314,15 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
     anope_cmd_privmsg2(source, dest, buf);
 }
 
-/* cause #defines just bitched to much, its back and hooks to 
-   a legacy in the ircd protocol files  - TSL */
+/*************************************************************************/
+
+/**
+ * Send out a WALLOP, this is here for legacy only, same day we will pull it out
+ * @param source Orgin of the Message
+ * @param fmt Format of the Message
+ * @param ... any number of parameters
+ * @return void
+ */
 void wallops(char *source, const char *fmt, ...)
 {
     va_list args;

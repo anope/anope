@@ -1021,6 +1021,7 @@ Server *server_global(Server * s, char *msg)
     Server *sl;
 
     while (s) {
+        notice_server(s_GlobalNoticer, s, "%s", msg);
         if (s->links) {
             sl = server_global(s->links, msg);
             if (sl)
@@ -1028,7 +1029,6 @@ Server *server_global(Server * s, char *msg)
             else
                 s = s->next;
         } else {
-            notice_server(s_GlobalNoticer, s, "%s", msg);
             s = s->next;
         }
     }

@@ -2855,13 +2855,18 @@ static int do_logout(User * u)
         if (u2) {
             make_unidentified(u2, ci);
             notice_lang(s_ChanServ, u, CHAN_LOGOUT_SUCCEEDED, nick, chan);
+            alog("%s: User %s!%s@%s has been logged out of channel %s.",
+                 s_ChanServ, u2->nick, u2->username, common_get_vhost(u2),
+                 chan);
         } else {
             int i;
             for (i = 0; i < 1024; i++)
                 for (u2 = userlist[i]; u2; u2 = u2->next)
                     make_unidentified(u2, ci);
             notice_lang(s_ChanServ, u, CHAN_LOGOUT_ALL_SUCCEEDED, chan);
+            alog("%s: All users identified have been logged out of channel %s.", s_ChanServ, chan);
         }
+
     }
     return MOD_CONT;
 }
@@ -5805,9 +5810,10 @@ static int do_cs_topic(User * u)
             c->topic_time = ci->last_topic_time;
         }
 
-        if (is_services_admin(u))
+        if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
             alog("%s: %s!%s@%s changed topic of %s as services admin.",
-                 s_ChanServ, u->nick, u->username, u->host, c->name);
+                 s_ChanServ, u->nick, u->username, common_get_vhost(u),
+                 c->name);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_cmd_join(s_ChanServ, c->name, time(NULL));

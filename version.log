@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="520"
+VERSION_BUILD="521"
 
 # $Log$
+#
+# BUILD : 1.7.6 (521)
+# BUGS  : 254, 266
+# NOTES : Fixed up some alog() messages, and MemoServ INFO showing -1 for no hard limit
 #
 # BUILD : 1.7.6 (520)
 # BUGS  : 265

@@ -2456,8 +2456,7 @@ static int do_say(User * u)
             ci->bi->lastmsg = time(NULL);
             if (logchan && LogBot)
                 anope_cmd_privmsg(ci->bi->nick, LogChannel,
-                                  ":SAY %s %s %s", u->nick, ci->name,
-                                  text);
+                                  "SAY %s %s %s", u->nick, ci->name, text);
         } else {
             syntax_error(s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
         }
@@ -2492,7 +2491,7 @@ static int do_act(User * u)
                           text, 1);
         ci->bi->lastmsg = time(NULL);
         if (logchan && LogBot)
-            anope_cmd_privmsg(ci->bi->nick, LogChannel, ":ACT %s %s %s",
+            anope_cmd_privmsg(ci->bi->nick, LogChannel, "ACT %s %s %s",
                               u->nick, ci->name, text);
     }
     return MOD_CONT;

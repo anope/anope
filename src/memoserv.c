@@ -62,8 +62,10 @@ void moduleAddMemoServCmds(void) {
 /*************************************************************************/
 /* *INDENT-ON* */
 
-/* MemoServ initialization. */
-
+/**
+ * MemoServ initialization.
+ * @return void
+ */
 void ms_init(void)
 {
     Command *cmd;
@@ -75,12 +77,15 @@ void ms_init(void)
 
 /*************************************************************************/
 
-/* memoserv:  Main MemoServ routine.
+/**
+ * memoserv:  Main MemoServ routine.
  *            Note that the User structure passed to the do_* routines will
  *            always be valid (non-NULL) and will always have a valid
  *            NickInfo pointer in the `ni' field.
+ * @param u User Struct
+ * @param buf Buffer containing the privmsg
+ * @return void
  */
-
 void memoserv(User * u, char *buf)
 {
     char *cmd, *s;
@@ -106,11 +111,13 @@ void memoserv(User * u, char *buf)
 
 /*************************************************************************/
 
-/* check_memos:  See if the given user has any unread memos, and send a
+/**
+ * check_memos:  See if the given user has any unread memos, and send a
  *               NOTICE to that user if so (and if the appropriate flag is
  *               set).
+ * @param u User Struct
+ * @return void
  */
-
 void check_memos(User * u)
 {
     NickCore *nc;
@@ -161,11 +168,14 @@ void check_memos(User * u)
 /*********************** MemoServ private routines ***********************/
 /*************************************************************************/
 
-/* Return the MemoInfo corresponding to the given nick or channel name.
- * Return in `ischan' 1 if the name was a channel name, else 0.
- * Return in `isforbid' 1 if the name is forbidden, else 0.
+/**
+ * Return the MemoInfo corresponding to the given nick or channel name.
+ * @param name Name to check
+ * @param ischan - the result its a channel will be stored in here
+ * @param isforbid - the result if its forbidden will be stored in here
+ * @return `ischan' 1 if the name was a channel name, else 0.
+ * @return `isforbid' 1 if the name is forbidden, else 0.
  */
-
 static MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 {
     if (*name == '#') {
@@ -207,8 +217,12 @@ static MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 
 /*************************************************************************/
 
-/* Delete a memo by number.  Return 1 if the memo was found, else 0. */
-
+/**
+ * Delete a memo by number.
+ * @param mi Memoinfo struct
+ * @param num Memo number to delete
+ * @return int 1 if the memo was found, else 0.
+ */
 static int delmemo(MemoInfo * mi, int num)
 {
     int i;
@@ -238,8 +252,11 @@ static int delmemo(MemoInfo * mi, int num)
 /*********************** MemoServ command routines ***********************/
 /*************************************************************************/
 
-/* Return a help message. */
-
+/**
+ * Return a help message.
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_help(User * u)
 {
     char *cmd = strtok(NULL, "");
@@ -262,8 +279,11 @@ static int do_help(User * u)
 
 /*************************************************************************/
 
-/* Send a memo to a nick/channel. */
-
+/**
+ * Send a memo to a nick/channel.
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_send(User * u)
 {
     char *name = strtok(NULL, " ");
@@ -273,17 +293,20 @@ static int do_send(User * u)
     return MOD_CONT;
 }
 
+/*************************************************************************/
+
 /**
- * Split from do_send, this way we can easily send a memo from any point :)
- * u - sender User
- * name - target name
- * text - memo Text
- * z - output level,
+ * Split from do_send, this way we can easily send a memo from any point
+ * @param u User Struct
+ * @param name Target of the memo
+ * @param text Memo Text
+ * @param z type see info
  *	0 - reply to user
  *	1 - silent
  *	2 - silent with no delay timer
  *	3 - reply to user and request read receipt
- **/
+ * @return void
+ */
 void memo_send(User * u, char *name, char *text, int z)
 {
     int ischan;
@@ -423,6 +446,11 @@ void memo_send(User * u, char *name, char *text, int z)
 
 /*************************************************************************/
 
+/**
+ * Cancel the memo
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_cancel(User * u)
 {
     int ischan;
@@ -466,8 +494,16 @@ static int do_cancel(User * u)
 
 /*************************************************************************/
 
-/* Display a single memo entry, possibly printing the header first. */
-
+/**
+ * Display a single memo entry, possibly printing the header first.
+ * @param u User Struct
+ * @param int Memo index
+ * @param mi MemoInfo Struct
+ * @param send_header If we are to send the headers
+ * @param new If we are listing new memos
+ * @param chan Channel name
+ * @return MOD_CONT
+ */
 static int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
                      int new, const char *chan)
 {
@@ -501,6 +537,15 @@ static int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
     return 1;
 }
 
+/*************************************************************************/
+
+/**
+ * list memno callback function
+ * @param u User Struct
+ * @param int Memo number
+ * @param va_list List of arguements
+ * @return result form list_memo()
+ */
 static int list_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
@@ -517,8 +562,13 @@ static int list_memo_callback(User * u, int num, va_list args)
 }
 
 
-/* List the memos (if any) for the source nick or given channel. */
+/*************************************************************************/
 
+/**
+ * List the memos (if any) for the source nick or given channel.
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_list(User * u)
 {
     char *param = strtok(NULL, " "), *chan = NULL;
@@ -587,8 +637,14 @@ static int do_list(User * u)
 
 /*************************************************************************/
 
-/* Send a single memo to the given user. */
-
+/**
+ * Read a memo
+ * @param u User Struct
+ * @param int Index number
+ * @param mi MemoInfo struct
+ * @param chan Channel Name
+ * @return 1 on success, 0 if failed
+ */
 static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
 {
     Memo *m;
@@ -619,6 +675,15 @@ static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
     return 1;
 }
 
+/*************************************************************************/
+
+/**
+ * Read a memo callback function
+ * @param u User Struct
+ * @param int Index number
+ * @param va_list variable arguements
+ * @return result of read_memo()
+ */
 static int read_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
@@ -634,8 +699,13 @@ static int read_memo_callback(User * u, int num, va_list args)
 }
 
 
-/* Read memos. */
+/*************************************************************************/
 
+/**
+ * Read memo command
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_read(User * u)
 {
     MemoInfo *mi;
@@ -714,8 +784,13 @@ static int do_read(User * u)
 
 /*************************************************************************/
 
-/* Delete a single memo from a MemoInfo. */
-
+/**
+ * Delete a single memo from a MemoInfo. callback function
+ * @param u User Struct
+ * @param int Number
+ * @param va_list Variable Arguemtns
+ * @return 1 if successful, 0 if it fails
+ */
 static int del_memo_callback(User * u, int num, va_list args)
 {
     MemoInfo *mi = va_arg(args, MemoInfo *);
@@ -744,9 +819,13 @@ static int del_memo_callback(User * u, int num, va_list args)
     }
 }
 
+/*************************************************************************/
 
-/* Delete memos. */
-
+/**
+ * Delete memos command.
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_del(User * u)
 {
     MemoInfo *mi;
@@ -849,6 +928,11 @@ static int do_del(User * u)
 
 /*************************************************************************/
 
+/**
+ * MS SET command.
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_set(User * u)
 {
     char *cmd = strtok(NULL, " ");
@@ -877,6 +961,13 @@ static int do_set(User * u)
 
 /*************************************************************************/
 
+/**
+ * MS SET notify
+ * @param u User Struct
+ * @param mi MemoInfo Struct
+ * @param param Parameter
+ * @return MOD_CONT
+ */
 static int do_set_notify(User * u, MemoInfo * mi, char *param)
 {
     if (stricmp(param, "ON") == 0) {
@@ -911,6 +1002,13 @@ static int do_set_notify(User * u, MemoInfo * mi, char *param)
 
 /*************************************************************************/
 
+/**
+ * MS SET limit
+ * @param u User Struct
+ * @param mi MemoInfo Struct
+ * @param param Parameter
+ * @return MOD_CONT
+ */
 static int do_set_limit(User * u, MemoInfo * mi, char *param)
 {
     char *p1 = strtok(param, " ");
@@ -1033,6 +1131,11 @@ static int do_set_limit(User * u, MemoInfo * mi, char *param)
 
 /*************************************************************************/
 
+/**
+ * MS INFO
+ * @param u User Struct
+ * @return MOD_CONT
+ */
 static int do_info(User * u)
 {
     MemoInfo *mi;
@@ -1107,7 +1210,7 @@ static int do_info(User * u)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD,
                             name, mi->memocount, count);
         }
-        if (mi->memomax) {
+        if (mi->memomax == 0) {
             if (hardmax)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name,
                             mi->memomax);

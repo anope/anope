@@ -3029,10 +3029,13 @@ static int do_set_email(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
-    alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.", s_NickServ,
-         u->nick, u->username, common_get_vhost(u),
-         (nc->email ? nc->email : "none"), (param ? param : "none"));
-
+    if (u->na && u->na->nc != nc && is_services_admin(u)) {
+        alog("%s: %s!%s@%s used SET EMAIL as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), nc->display, (nc->email ? nc->email : "none"));
+    } else {
+        alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.",
+             s_NickServ, u->nick, u->username, common_get_vhost(u),
+             (nc->email ? nc->email : "none"), (param ? param : "none"));
+    }
     if (nc->email)
         free(nc->email);
 

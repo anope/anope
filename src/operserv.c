@@ -2519,7 +2519,6 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
                const char *reason)
 {
     int deleted = 0, i;
-    int x;
     SXLine *entry;
     User *u2, *next;
     char buf[BUFSIZE];
@@ -2987,7 +2986,6 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
                const char *reason)
 {
     int deleted = 0, i;
-    int x;
     User *u2, *next;
     SXLine *entry;
     char buf[BUFSIZE];

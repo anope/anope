@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="39"
+VERSION_BUILD="40"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (40)
+# BUGS  : 11
+# NOTES : Fixed mysql query failure with md5 passwords
 #
 # BUILD : 1.7.0 (39)
 # BUGS  : 10

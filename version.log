@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="94"
+VERSION_BUILD="95"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (95)
+# BUGS  : 38
+# NOTES : Fixed xOP management inconsistency.
 #
 # BUILD : 1.7.2 (94)
 # BUGS  : 40 (partial)

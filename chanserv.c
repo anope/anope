@@ -3660,7 +3660,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
         ulev = get_access(u, ci);
 
-        if (!is_servadmin && (xlev >= ulev || ulev < ACCESS_AOP)) {
+        if (xlev >= ulev || ulev < ACCESS_AOP) {
             notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             return MOD_CONT;
         }

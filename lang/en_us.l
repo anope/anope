@@ -3,7 +3,7 @@
 # (C) 2003 Anope Team
 # Contact us at info@anope.org
 #   
-# Please read COPYING and README for furhter details.
+# Please read COPYING and README for further details.
 #     
 # Based on the original code of Epona by Lara.
 # Based on the original code of Services by Andy Church. 
@@ -1533,9 +1533,9 @@ MEMO_MASS_SENT
 MEMO_CANCEL_SYNTAX
 	CANCEL {nick | channel}
 MEMO_CANCEL_DISABLED
-	Sorry, memo cancelling is temporarily disabled.
+	Sorry, memo canceling is temporarily disabled.
 MEMO_CANCEL_NONE
-	No memo was cancellable.
+	No memo was cancelable.
 MEMO_CANCELLED
 	Last memo to %s has been cancelled.
 
@@ -2805,7 +2805,7 @@ OPER_SESSION_INVALID_THRESHOLD
 OPER_SESSION_NOT_FOUND
 	%s not found on session list.
 OPER_SESSION_LIST_HEADER
-	Hosts with atleast %d sessions:
+	Hosts with at least %d sessions:
 OPER_SESSION_LIST_COLHEAD
 	Sessions  Host
 # limit, host
@@ -2864,7 +2864,7 @@ OPER_HELP_SESSION
 	
 	Allows Services admins to view the session list.
 
-	SESSION LIST lists hosts with atleast threshold sessions.
+	SESSION LIST lists hosts with at least threshold sessions.
 	The threshold must be a number greater than 1. This is to 
 	prevent accidental listing of the large number of single 
 	session hosts.
@@ -2888,7 +2888,7 @@ OPER_HELP_DEFCON
 	Syntax: DEFCON [1|2|3|4|5]
 
 	The defcon system can be used to implement a pre-defined
-	set of restrictions to services useful during an attemtped
+	set of restrictions to services useful during an attempted
 	attack on the network.
 
 OPER_HELP_DEFCON_NO_NEW_CHANNELS
@@ -3590,7 +3590,7 @@ NICK_SERVADMIN_HELP_LIST
 	Lists all registered nicknames which match the given
 	pattern, in nick!user@host format.  Nicks with the PRIVATE
 	option set will only be displayed to Services admins.  Nicks
-	with the NOEXPIRE option set will have a ! prepended to the
+	with the NOEXPIRE option set will have a ! appended to the
 	nickname for Services admins.
 	
 	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
@@ -3674,7 +3674,7 @@ CHAN_HELP
 	%S allows you to register and control various
 	aspects of channels.  %S can often prevent
 	malicious users from "taking over" channels by limiting
-	who is allowed channel operator priviliges.  Available
+	who is allowed channel operator privileges.  Available
 	commands are listed below; to use them, type
 	/msg %S command.  For more information on a
 	specific command, type /msg %S HELP command.
@@ -3688,7 +3688,7 @@ CHAN_HELP
 	    LEVELS     Redefine the meanings of access levels
 	    AKICK      Maintain the AutoKick list
 	    DROP       Cancel the registration of a channel
-	    SENDPASS   Help retrive lost passwords
+	    SENDPASS   Help retrieve lost passwords
 	
 	Other commands: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
 	                INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
@@ -4589,7 +4589,7 @@ CHAN_SERVADMIN_HELP_LIST
 	Lists all registered channels matching the given pattern.
 	Channels with the PRIVATE option set will only be displayed
 	to Services admins. Channels with the NOEXPIRE option set 
-	will have a ! prepended to the channel name for Services admins.
+	will have a ! appended to the channel name for Services admins.
 	
 	If the FORBIDDEN, SUSPENDED or NOEXPIRE options are given, only 
 	channels which, respectively, are FORBIDden, SUSPENDed or have 
@@ -4829,7 +4829,7 @@ MEMO_HELP_STAFF
 
 	Sends all services staff a memo containing memo-text.
 	Note: If you have opers on both the oper list and the
-	admin list they will recive the memo twice.  The same
+	admin list they will receive the memo twice.  The same
 	applies for oper's on the Root list as well as other
 	lists.
 
@@ -4845,7 +4845,7 @@ MEMO_HELP_RSEND
 	memo-text.  When sending to a nickname, the recipient will
 	receive a notice that he/she has a new memo.  The target
 	nickname/channel must be registered.
-	Once the memo is read by its recepient, an automatic notification
+	Once the memo is read by its recipient, an automatic notification
 	memo will be sent to the sender informing him/her that the memo
 	has been read.
 
@@ -5336,7 +5336,7 @@ OPER_HELP_SET_NOEXPIRE
 OPER_HELP_SET_SUPERADMIN
 	Syntax: SET SUPERADMIN {ON | OFF}
 
-	Setting this will grant you extra privlages such as the
+	Setting this will grant you extra privileges such as the
 	ability to be "founder" on all channel's etc...
 
 	This option is not persistant, and should only be used when
@@ -5437,7 +5437,7 @@ OPER_HELP_KILLCLONES
 	prevent the offending clients from immediately 
 	reconnecting. A wallops is also sent indicating who 
 	used the command, which host was affected and how many
-	users were killed. It's usefull for removing numerous 
+	users were killed. It's useful for removing numerous 
 	clones from the network.
 
 	Limited to Services operators.

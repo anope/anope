@@ -7,6 +7,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 05/24 A New NSNickTracking directive to provide nick tracking.            [ #71]
 05/21 A Auto enforce upon AKICK addition.                                 [ #63]
 05/21 A New file docs/OLDCHANGES contains all change history.             [ #65]
+06/09 F Corrected a number of spelling errors in en_us.l.                 [ #94]
 06/09 F Corrected a large number of spelling and typing errors in docs.   [ #87]
 06/09 F Corrected compile warning for Hybrid support.                     [ #93]
 06/06 F Fixed a bug with long NSGuestNickPrefixes.                        [ #00]

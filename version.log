@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="181"
+VERSION_BUILD="182"
 
 # $Log$
+#
+# BUILD : 1.7.3 (182)
+# BUGS  : 94
+# NOTES : Fixed number of spelling errors in en_us.l. Thanks to Trystan for assisting corrections.
 #
 # BUILD : 1.7.3 (181)
 # BUGS  : 87 

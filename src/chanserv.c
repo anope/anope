@@ -4882,7 +4882,7 @@ static int do_levels(User * u)
     char *error;
 
     ChannelInfo *ci;
-    short level;
+    int level;
     int i;
 
     /* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="516"
+VERSION_BUILD="517"
 
 # $Log$
+#
+# BUILD : 1.7.6 (517)
+# BUGS  : 262
+# NOTES : Fixed integer overflow error with CS LEVELS.
 #
 # BUILD : 1.7.6 (516)
 # BUGS  : 261

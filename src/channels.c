@@ -22,6 +22,7 @@ Channel *chanlist[1024];
 void add_ban(Channel * chan, char *mask);
 void add_exception(Channel * chan, char *mask);
 void add_invite(Channel * chan, char *mask);
+void chan_set_correct_modes(User * user, Channel * c);
 void chan_adduser2(User * user, Channel * c);
 Channel *chan_create(char *chan);
 void chan_delete(Channel * c);
@@ -530,6 +531,7 @@ User *nc_on_chan(Channel * c, NickCore * nc)
 void do_join(const char *source, int ac, char **av)
 {
     User *user;
+    Channel *chan;
     char *s, *t;
     struct u_chanlist *c, *nextc;
 
@@ -571,16 +573,9 @@ void do_join(const char *source, int ac, char **av)
         if (check_kick(user, s))
             continue;
 
-/*	chan_adduser(user, s); */
-        join_user_update(user, findchan(s), s);
-
-
-/*        c = scalloc(sizeof(*c), 1);
-        c->next = user->chans;
-        if (user->chans)
-            user->chans->prev = c;
-        user->chans = c;
-        c->chan = findchan(s); */
+        chan = findchan(s);
+        join_user_update(user, chan, s);
+        chan_set_correct_modes(user, chan);
     }
 }
 
@@ -842,6 +837,8 @@ void do_sjoin(const char *source, int ac, char **av)
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
                                        cumodes, 1);
                     }
+
+                    chan_set_correct_modes(user, c);
                 }
             }
 
@@ -913,6 +910,8 @@ void do_sjoin(const char *source, int ac, char **av)
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
                                        cumodes, 1);
                     }
+
+                    chan_set_correct_modes(user, c);
                 }
             }
 
@@ -982,6 +981,8 @@ void do_sjoin(const char *source, int ac, char **av)
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
                                        cumodes, 1);
                     }
+
+                    chan_set_correct_modes(user, c);
                 }
             }
 
@@ -1022,6 +1023,7 @@ void do_sjoin(const char *source, int ac, char **av)
         } else {
             c = join_user_update(user, c, av[1]);
             c->creation_time = ts;
+            chan_set_correct_modes(user, c);
         }
     }
 }
@@ -1209,33 +1211,57 @@ void add_invite(Channel * chan, char *mask)
 
 /*************************************************************************/
 
+/* Set the correct modes for the given user on the given channel. Ignored
+ * users won't get any modes set this way. -GD
+ */
+
+void chan_set_correct_modes(User * user, Channel * c)
+{
+    char *chan;
+    int status;
+
+    chan = c->name;
+
+    if (get_ignore(user->nick) == NULL) {
+        status = chan_get_user_status(c, user);
+        /* This looks dirty. For every mode we first check if the IRCd
+         * supports it. If true, we check if the user already has the
+         * mode. If both are true, we check if they should get the mode,
+         * which sends the mode to the uplink and returns true. If the
+         * mode is sent, we internally update to finish it off. -GD
+         */
+        if (ircd->owner && !(status & CUS_OWNER)) {
+            if (check_should_owner(user, chan))
+                chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
+        } else if (ircd->protect && !(status & CUS_PROTECT)) {
+            if (check_should_protect(user, chan))
+                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+        } else if (ircd->admin && !(status & CUS_PROTECT)) {
+            if (check_should_protect(user, chan))
+                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+        } else if (!(status & CUS_OP)) {
+            if (check_should_op(user, chan))
+                chan_set_user_status(c, user, CUS_OP);
+        } else if (ircd->halfop && !(status & CUS_HALFOP)) {
+            if (check_should_halfop(user, chan))
+                chan_set_user_status(c, user, CUS_HALFOP);
+        } else if (!(status & CUS_VOICE)) {
+            if (check_should_voice(user, chan))
+                chan_set_user_status(c, user, CUS_VOICE);
+        }
+    }
+}
+
+/*************************************************************************/
+
 /* Add/remove a user to/from a channel, creating or deleting the channel as
  * necessary.  If creating the channel, restore mode lock and topic as
  * necessary.  Also check for auto-opping and auto-voicing.
- * Modified, so ignored users won't get any status via services -certus */
-
+ */
 
 void chan_adduser2(User * user, Channel * c)
 {
     struct c_userlist *u;
-    char *chan = c->name;
-
-    if (get_ignore(user->nick) == NULL) {
-
-        if (ircd->owner && check_should_owner(user, chan)) {
-            chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
-        } else if (ircd->protect && check_should_protect(user, chan)) {
-            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        } else if (ircd->admin && check_should_protect(user, chan)) {
-            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        } else if (check_should_op(user, chan)) {
-            chan_set_user_status(c, user, CUS_OP);
-        } else if (ircd->halfop && check_should_halfop(user, chan)) {
-            chan_set_user_status(c, user, CUS_HALFOP);
-        } else if (check_should_voice(user, chan)) {
-            chan_set_user_status(c, user, CUS_VOICE);
-        }
-    }
 
     u = scalloc(sizeof(struct c_userlist), 1);
     u->next = c->users;
@@ -1257,7 +1283,8 @@ void chan_adduser2(User * user, Channel * c)
             }
         }
         /* Added channelname to entrymsg - 30.03.2004, Certus */
-        if (c->ci && c->ci->entry_message)
+        /* Also, don't send the entrymsg when bursting -GD */
+        if (c->ci && c->ci->entry_message && (me_server->sync == 1))
             notice_user(whosends(c->ci), user, "[%s] %s", c->name,
                         c->ci->entry_message);
     }
@@ -1274,9 +1301,15 @@ void chan_adduser2(User * user, Channel * c)
         if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
             && user->na && user->na->nc->greet
             && check_access(user, c->ci, CA_GREET)) {
-            anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
-                              user->na->nick, user->na->nc->greet);
-            c->ci->bi->lastmsg = time(NULL);
+            /* Only display the greet if the main uplink we're connected
+             * to has synced, or we'll get greet-floods when the net
+             * recovers from a netsplit. -GD
+             */
+            if (me_server->sync == 1) {
+                anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
+                                  user->na->nick, user->na->nc->greet);
+                c->ci->bi->lastmsg = time(NULL);
+            }
         }
     }
 }

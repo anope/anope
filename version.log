@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="616"
+VERSION_BUILD="617"
 
 # $Log$
+#
+# BUILD : 1.7.8 (617)
+# BUGS  : 
+# NOTES : Fixed: [1] Will not set already set channel modes anymore [2] Do not display entrymsg/greet while syncing [3] Sync state for uplink not always set correctly
 #
 # BUILD : 1.7.8 (616)
 # BUGS  : 

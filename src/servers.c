@@ -15,7 +15,7 @@
 #include "services.h"
 
 Server *servlist = NULL;
-Server *me_server = NULL;
+Server *me_server = NULL;       /* Our uplink server */
 uint32 uplink_capab;
 char *uplink;
 char *TS6UPLINK;

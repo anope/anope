@@ -638,9 +638,14 @@ int anope_event_burst(char *source, int ac, char **av)
     if (!ac) {
         /* for future use  - start burst */
     } else {
-        if (s) {
+        /* If we found a server with the given source, that one just
+         * finished bursting. If there was no source, then our uplink
+         * server finished bursting. -GD
+         */
+        if (s)
             s->sync = 1;
-        }
+        else
+            me_server->sync = 1;
     }
     return MOD_CONT;
 }

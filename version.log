@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="479"
+VERSION_BUILD="480"
 
 # $Log$
+#
+# BUILD : 1.7.6 (480)
+# BUGS  : 
+# NOTES : Updated some formatting in the Changes file
 #
 # BUILD : 1.7.6 (479)
 # BUGS  : 239

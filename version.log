@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="334"
+VERSION_BUILD="335"
 
 # $Log$
+#
+# BUILD : 1.7.5 (335)
+# BUGS  : 142, 152, 154, 155, 156, 157, 158
+# NOTES : Applied bugfix bundle patch from Trystan.
 #
 # BUILD : 1.7.5 (334)
 # BUGS  : 

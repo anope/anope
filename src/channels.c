@@ -140,10 +140,15 @@ int chan_has_user_status(Channel * chan, User * user, int16 status)
 {
     struct u_chanlist *uc;
 
-    for (uc = user->chans; uc; uc = uc->next)
-        if (uc->chan == chan)
+    for (uc = user->chans; uc; uc = uc->next) {
+        if (uc->chan == chan) {
+            if (debug) {
+                alog("chan_has_user_status wanted %d the user is %d",
+                     status, uc->status);
+            }
             return (uc->status & status);
-
+        }
+    }
     return 0;
 }
 

@@ -41,16 +41,15 @@
 #define CMODE_t 0x00000020
 #define CMODE_k 0x00000040		/* These two used only by ChanServ */
 #define CMODE_l 0x00000080
-#define CMODE_A 0x00000800
+#define CMODE_R 0x00000100		/* Only identified users can join */
+#define CMODE_r 0x00000200		/* Set for all registered channels */
+#define CMODE_c 0x00000400		/* Colors can't be used */
+#define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
 #define CMODE_N 0x00001000
 #define CMODE_S 0x00002000
 #define CMODE_C 0x00004000
-#define CMODE_c 0x00000400		/* Colors can't be used */
-#define CMODE_M 0x00000800              /* Non-regged nicks can't send messages */
-#define CMODE_O 0x00008000		/* Only opers can join */
-#define CMODE_R 0x00000100		/* Only identified users can join */
-#define CMODE_r 0x00000200		/* Set for all registered channels */
-#define CMODE_I 0x08000000
+#define CMODE_A 0x00008000
+#define CMODE_O 0x00010000		/* Only opers can join */
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 

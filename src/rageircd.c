@@ -20,15 +20,15 @@ const char version_protocol[] = "RageIRCd 2.0.x";
 
 IRCDVar ircd[] = {
     {"RageIRCd 2.0.*",          /* ircd name */
-     "+dS",                     /* nickserv mode */
-     "+dS",                     /* chanserv mode */
-     "+dS",                     /* memoserv mode */
-     "+dS",                     /* hostserv mode */
-     "+diS",                    /* operserv mode */
-     "+dS",                     /* botserv mode  */
-     "+dSh",                    /* helpserv mode */
-     "+diS",                    /* Dev/Null mode */
-     "+diS",                    /* Global mode   */
+     "+d",                      /* nickserv mode */
+     "+d",                      /* chanserv mode */
+     "+d",                      /* memoserv mode */
+     "+d",                      /* hostserv mode */
+     "+di",                     /* operserv mode */
+     "+d",                      /* botserv mode  */
+     "+dh",                     /* helpserv mode */
+     "+di",                     /* Dev/Null mode */
+     "+di",                     /* Global mode   */
      "+o",                      /* nickserv alias mode */
      "+o",                      /* chanserv alias mode */
      "+o",                      /* memoserv alias mode */
@@ -38,9 +38,9 @@ IRCDVar ircd[] = {
      "+o",                      /* helpserv alias mode */
      "+i",                      /* Dev/Null alias mode */
      "+io",                     /* Global alias mode   */
-     "+S",                      /* Used by BotServ Bots */
+     "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-iklmnpRstcOASCNM",       /* Modes to Remove */
+     "-iklmnpRstcOACNM",        /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -52,38 +52,38 @@ IRCDVar ircd[] = {
      "-r+d",                    /* Mode on Nick Change  */
      1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
-     1,                         /* Supports SZlines     */
+     0,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      0,                         /* Join 2 Set           */
      0,                         /* Join 2 Message       */
      1,                         /* Has exceptions +e    */
      0,                         /* TS Topic Forward     */
-     0,                         /* TS Topci Backward    */
+     0,                         /* TS Topic Backward    */
      0,                         /* Protected Umode      */
      1,                         /* Has Admin            */
      1,                         /* Chan SQlines         */
      1,                         /* Quit on Kill         */
-     1,                         /* SVSMODE unban        */
+     0,                         /* SVSMODE unban        */
      0,                         /* Has Protect          */
      0,                         /* Reverse              */
      1,                         /* Chan Reg             */
      CMODE_r,                   /* Channel Mode         */
      0,                         /* vidents              */
-     0,                         /* svshold              */
+     1,                         /* svshold              */
      1,                         /* time stamp on mode   */
-     0,                         /* NICKIP               */
+     1,                         /* NICKIP               */
      0,                         /* UMODE                */
      0,                         /* O:LINE               */
      1,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     CHAN_HELP_ULTIMATE3,       /* ChanServ extra   */
-     0,                         /* No Knock            */
-     CMODE_A,                   /* Admin Only          */
-     DEFAULT_MLOCK,             /* Default MLOCK       */
-     UMODE_x,                   /* Vhost Mode          */
-     0,                         /* +f                  */
-     0,                         /* +L                  */
+     CHAN_HELP_ULTIMATE3,       /* ChanServ extra       */
+     CMODE_p,                   /* No Knock             */
+     CMODE_A,                   /* Admin Only           */
+     DEFAULT_MLOCK,             /* Default MLOCK        */
+     UMODE_x,                   /* Vhost Mode           */
+     0,                         /* +f                   */
+     0,                         /* +L                   */
      0,
      0,
      1,
@@ -282,7 +282,6 @@ CBModeInfo cbmodeinfos[] = {
     {'N', CMODE_N, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},
-    {'S', CMODE_S, 0, NULL, NULL},
     {0}
 };
 
@@ -534,9 +533,13 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (!nick || !chan) {
         return;
@@ -557,12 +560,12 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void anope_cmd_vhost_off(char *nick)
 {
-    send_cmd(s_HostServ, "SVSMODE %s -z", nick);
+    send_cmd(s_HostServ, "SVSMODE %s -x", nick);
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-    send_cmd(s_HostServ, "SVSMODE %s +z", nick);
+    send_cmd(s_HostServ, "SVSMODE %s +x", nick);
     send_cmd(ServerName, "VHOST %s %s", nick, vhost);
 }
 
@@ -587,12 +590,20 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
+
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     if (!source || !user) {
         return;
     }
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
 
     send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
@@ -711,9 +722,16 @@ void anope_cmd_global(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }
@@ -722,9 +740,17 @@ void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
@@ -733,9 +759,16 @@ void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     if (UsePrivmsg) {
         anope_cmd_privmsg2(source, dest, buf);
@@ -753,9 +786,16 @@ void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
@@ -806,9 +846,16 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     if (ircdcap->tsmode) {
         if (uplink_capab & ircdcap->tsmode) {
@@ -827,9 +874,13 @@ void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -884,9 +935,16 @@ void anope_cmd_250(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(NULL, "250 %s ", buf);
 }
@@ -896,9 +954,16 @@ void anope_cmd_307(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "307 %s ", buf);
 }
@@ -908,9 +973,16 @@ void anope_cmd_311(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "311 %s ", buf);
 }
@@ -920,9 +992,16 @@ void anope_cmd_312(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "312 %s ", buf);
 }
@@ -932,9 +1011,16 @@ void anope_cmd_317(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "317 %s ", buf);
 }
@@ -978,9 +1064,17 @@ void anope_cmd_242(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "242 %s ", buf);
 }
 
@@ -989,9 +1083,16 @@ void anope_cmd_243(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(NULL, "243 %s ", buf);
 }
@@ -1001,9 +1102,17 @@ void anope_cmd_211(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "211 %s ", buf);
 }
 
@@ -1060,9 +1169,13 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1208,13 +1321,14 @@ void anope_cmd_pass(char *pass)
 /* SVSHOLD - set */
 void anope_cmd_svshold(char *nick)
 {
-    /* Not supported */
+    send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
+             "Being held for registered user");
 }
 
 /* SVSHOLD - release */
 void anope_cmd_relase_svshold(char *nick)
 {
-    /* Not supported */
+    send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
 
 void anope_cmd_svsnick(char *source, char *guest, time_t when)
@@ -1228,8 +1342,8 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
-             user, host, ServerName, modes, real);
+    send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
+             time(NULL), user, host, ServerName, modes, real);
 }
 
 
@@ -1268,6 +1382,15 @@ void anope_cmd_svid_umode3(User * u, char *ts)
     }
 }
 
+/* NICK <newnick>  */
+void anope_cmd_chg_nick(char *oldnick, char *newnick)
+{
+    if (!oldnick || !newnick) {
+        return;
+    }
+
+    send_cmd(oldnick, "NICK %s", newnick);
+}
 
 
 #endif

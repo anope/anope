@@ -867,6 +867,11 @@ CHAN_REGISTERED
 	Il canale %s è stato registrato sotto il tuo nick: %s.
 CHAN_PASSWORD_IS
 	La tua password di canale è %s - non dimenticarla!
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

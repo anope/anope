@@ -257,6 +257,9 @@ int process_numlist(const char *numstr, int *count_ret,
     }
     if (count_ret)
         *count_ret = count;
+
+	va_end(args);
+
     return retval;
 }
 

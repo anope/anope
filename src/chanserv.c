@@ -2515,6 +2515,21 @@ static int do_register(User * u)
         return MOD_CONT;
     }
 
+    /* Confirm that the channel is in the RFC spec */
+    if (*chan != '#' || *chan == '&') {
+        /* RFC says channels start with & or # so if the first is not # complain */
+        notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+        return MOD_CONT;
+    }
+
+    /* Throw a message that the channel is non existant */
+    if (!(c = findchan(chan))) {
+        alog("%s: %s attempted  to register a non-existant channel [%s] ",
+             s_ChanServ, u->nick, chan);
+        notice_lang(s_NickServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
+        return MOD_CONT;
+    }
+
     if (!desc) {
         syntax_error(s_ChanServ, u, "REGISTER", CHAN_REGISTER_SYNTAX);
     } else if (*chan == '&') {
@@ -2533,8 +2548,7 @@ static int do_register(User * u)
         }
     } else if (!stricmp(chan, "#")) {
         notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
-    } else if (!(c = findchan(chan))
-               || !chan_has_user_status(c, u, CUS_OP)) {
+    } else if (!chan_has_user_status(c, u, CUS_OP)) {
         notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 
     } else if (!is_servadmin && nc->channelmax > 0

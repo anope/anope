@@ -943,6 +943,11 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	Has³o Twojego kana³u to %s 
 	Zapamiêtaj do przysz³ego u¿ytku.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

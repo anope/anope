@@ -125,6 +125,10 @@ void alog(const char *fmt, ...)
 
     checkday();
 
+    if (!fmt) {
+        return;
+    }
+
     va_start(args, fmt);
     time(&t);
     tm = *localtime(&t);
@@ -160,6 +164,7 @@ void alog(const char *fmt, ...)
         privmsg(s_GlobalNoticer, LogChannel, str);
     }
 
+    va_end(args);
     errno = errno_save;
 }
 
@@ -177,6 +182,10 @@ void log_perror(const char *fmt, ...)
     int errno_save = errno;
 
     checkday();
+
+    if (!fmt) {
+        return;
+    }
 
     va_start(args, fmt);
     time(&t);
@@ -207,6 +216,7 @@ void log_perror(const char *fmt, ...)
         fprintf(stderr, ": %s\n", strerror(errno_save));
     }
     errno = errno_save;
+    va_end(args);
 }
 
 /*************************************************************************/
@@ -249,6 +259,8 @@ void fatal(const char *fmt, ...)
         fprintf(stderr, "%sFATAL: %s\n", buf, buf2);
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s", buf2);
+
+    va_end(args);
     exit(1);
 }
 
@@ -293,6 +305,7 @@ void fatal_perror(const char *fmt, ...)
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
                          strerror(errno_save));
+    va_end(args);
     exit(1);
 }
 

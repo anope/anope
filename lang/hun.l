@@ -70,7 +70,6 @@ LANG_NAME
 #	%b = Hónap neve (rövid)	%M = perc
 #	%d = nap a hónapban		%S = másodperc
 #	%Y = év			%Z = idõ zóne
-#     %A = hónap neve			%B = nap neve
 
 # ezt a formát használd az strftime() mikor a dátum és idõ
 # együtt szükséges.
@@ -859,6 +858,11 @@ CHAN_REGISTERED
 	Regisztráltam a %s csatornát a (%s) nickre.
 CHAN_PASSWORD_IS
 	Csatorna jelszava: %s - Jegyezd fel a késõbbi használathoz.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY válaszok
 CHAN_IDENTIFY_SYNTAX

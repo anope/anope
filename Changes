@@ -6,6 +6,15 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
+08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+08/28 F Channel registration handling for non chanops.                    [#142]
+08/28 F Protection from accessing unavailable struct data.                [#152]
+08/28 F Rage2 mode +M/+A channel support.                                 [#154]
+08/28 F Rage2 Beta6 support.                                              [#155]
+08/28 F Undefined references on botserv.c upon compilation.               [#156]
+08/28 F Memory leaks taken care of.                                       [#157]
+08/28 F Buffer preparation for vsnprintf() call.                          [#158]
+
 
 Anope Version 1.7.5
 -------------------

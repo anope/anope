@@ -495,13 +495,19 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    if (!source || !user) {
+    if (!source || !user || !fmt) {
         return;
     }
 
     va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    vsnprintf(buf, BUFSIZE - 1, fmt, args);
+    va_end(args);
+
+    if (!buf) {
+        return;
+    }
 
     send_cmd(source, "KILL %s :%s", user, buf);
 }
@@ -553,9 +559,17 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(source, "MODE %s %s", dest, buf);
 }
 
@@ -572,9 +586,13 @@ void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -587,9 +605,17 @@ void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
@@ -598,9 +624,16 @@ void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     if (UsePrivmsg) {
         anope_cmd_privmsg2(source, dest, buf);
@@ -618,9 +651,16 @@ void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
@@ -657,9 +697,13 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -747,9 +791,13 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
     if (!nick || !chan) {
         return;
@@ -776,9 +824,16 @@ void anope_cmd_250(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(NULL, "250 %s ", buf);
 }
@@ -788,9 +843,16 @@ void anope_cmd_307(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "307 %s ", buf);
 }
@@ -800,9 +862,16 @@ void anope_cmd_311(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "311 %s ", buf);
 }
@@ -812,9 +881,16 @@ void anope_cmd_312(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "312 %s ", buf);
 }
@@ -824,9 +900,16 @@ void anope_cmd_317(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(ServerName, "317 %s ", buf);
 }
@@ -870,9 +953,17 @@ void anope_cmd_242(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "242 %s ", buf);
 }
 
@@ -881,9 +972,16 @@ void anope_cmd_243(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(NULL, "243 %s ", buf);
 }
@@ -893,9 +991,17 @@ void anope_cmd_211(const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
     send_cmd(NULL, "211 %s ", buf);
 }
 
@@ -904,9 +1010,16 @@ void anope_cmd_global(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
 
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }

@@ -6,7 +6,7 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
+ * Based on the original code of Services by Andy Church.
  * 
  * $Id$
  *
@@ -1025,6 +1025,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     if (!fmt)
         return;
     vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
 
     av[0] = ci->name;
     av[1] = u->nick;

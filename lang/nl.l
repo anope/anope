@@ -862,6 +862,11 @@ CHAN_REGISTERED
 	Kanaal %s is geregistreerd onder jouw nickname: %s
 CHAN_PASSWORD_IS
 	Het wachtwoord van je kanaal is %s - onthoudt dit voor later gebruik.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

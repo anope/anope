@@ -861,6 +861,11 @@ CHAN_REGISTERED
 	Канал %s зарегистрирован на Вас: %s
 CHAN_PASSWORD_IS
 	Пароль Вашего канала -  %s - не забывайте его!
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

@@ -191,24 +191,22 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
     elif test "$withval" = "IRC_BAHAMUT"; then
     	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
     elif test "$withval" = "IRC_UNREAL"; then
-    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
-	AC_DEFINE(IRC_UNREAL,1,"Second IRCD type")
+	AC_DEFINE(IRC_UNREAL31,1,"First IRCD type")
     elif test "$withval" = "IRC_ULTIMATE"; then
-    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
-	AC_DEFINE(IRC_ULTIMATE,1,"Second IRCD type")
+	AC_DEFINE(IRC_ULTIMATE,1,"First IRCD type")
     elif test "$withval" = "IRC_ULTIMATE3"; then
-    	AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
-	AC_DEFINE(IRC_ULTIMATE3,1,"Second IRCD type")
+	AC_DEFINE(IRC_ULTIMATE3,1,"First IRCD type")
     elif test "$withval" = "IRC_HYBRID"; then
     	AC_DEFINE(IRC_HYBRID,1,"First IRCD type")
     elif test "$withval" = "IRC_VIAGRA"; then
-    	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
-	AC_DEFINE(IRC_VIAGRA,1,"Second IRCD type")
+	AC_DEFINE(IRC_VIAGRA,1,"First IRCD type")
     elif test "$withval" = "IRC_PTLINK"; then
     	AC_DEFINE(IRC_PTLINK,1,"First IRCD type")
     elif test "$withval" = "IRC_RAGE2"; then
-        AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
-	AC_DEFINE(IRC_RAGE2,1,"Second IRCD type")
+	AC_DEFINE(IRC_RAGE2,1,"First IRCD type")
+    elif test "$withval" = "IRC_UNREAL32"; then
+	AC_DEFINE(IRC_UNREAL32,1,"First IRCD type")
+
     fi
 ])
 

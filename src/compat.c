@@ -43,6 +43,7 @@ int snprintf(char *buf, size_t len, const char *fmt, ...)
 
     va_start(args, fmt);
     return vsnprintf(buf, len, fmt, args);
+    /* Again should have va_end() here */
 }
 
 #endif                          /* !HAVE_SNPRINTF */

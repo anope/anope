@@ -1154,7 +1154,18 @@ void cancel_user(User * u)
 
 int nick_identified(User * u)
 {
-    return u->na && (u->na->status & NS_IDENTIFIED);
+    if (u) {
+        if (u->na) {
+            if (u->na->status) {
+                return (u->na->status & NS_IDENTIFIED);
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    return 0;
 }
 
 /*************************************************************************/
@@ -1163,7 +1174,18 @@ int nick_identified(User * u)
 
 int nick_recognized(User * u)
 {
-    return u->na && (u->na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
+    if (u) {
+        if (u->na) {
+            if (u->na->status) {
+                return (u->na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    return 0;
 }
 
 /*************************************************************************/

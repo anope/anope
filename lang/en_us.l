@@ -853,6 +853,11 @@ CHAN_REGISTERED
 	Channel %s registered under your nickname: %s
 CHAN_PASSWORD_IS
 	Your channel password is %s - remember it for later use.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

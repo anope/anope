@@ -871,6 +871,11 @@ CHAN_REGISTERED
 	%s kanalý bu nicke kayýt edildi: %s
 CHAN_PASSWORD_IS
 	Kanal þifreniz %s - ilerde kullanacaðýnýz için unutmayýnýz ve kimseye söylemeyiniz.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
+
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

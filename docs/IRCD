@@ -1,0 +1,309 @@
+HOW TO ADD IRCD SUPPORT
+
+1. Files to edit
+2. Structure
+3. Functions / Events
+4. CAPAB/PROTOCTL 
+
+1. FILES TO EDIT
+
+When preparing to add support to Anope for your ircd, you need to edit the 
+following files. 
+
+A. Make a copy of the .c and .h file of the IRCD that closely matches the ircd
+   that you are attempting to add support for.
+B. Make a backup copy of services.h 
+C. Make a backup copy of Config, and src/Makefile
+
+
+2. STRUCTURE 
+To allow for easy code change to support your ircd. There are two structs that 
+make up the simplest variables to allow you to quickly change out your ircd
+without much work.
+
+IRCDVar ircd[] = { }
+
+This contains your basic ircd functions, here is a brief description of the 
+usage of each.
+
+1. Name : this member tells Anope about the ircds name, it may contain text about its
+          name and version. This is used to identify the build on startup.
+
+2. NickServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag. 
+
+3. ChanServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+4. MemoServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.   
+
+5. HostServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag. - note if your ircd does not support hostserv, 
+   you can make this NULL or +, as there is a check used before bringing hostserv online
+
+6. OperServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+7. BotServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+8. HelpServ Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of helper flag, or service flag.
+
+9. Dev/Null Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of user flag, or service flag.
+
+10. Global Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+11. NickServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag. 
+
+12. ChanServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+13. MemoServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.   
+
+14. HostServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag. - note if your ircd does not support hostserv, 
+   you can make this NULL or +, as there is a check used before bringing hostserv online
+
+15. OperServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+16. BotServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+17. HelpServ Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of helper flag, or service flag.
+
+18. Dev/Null Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of user flag, or service flag.
+
+19. Global Alias Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of oper flag, or service flag.
+
+20. BotServ's Bots Mode : this is the user mode set by Anope, normally you want this to be a 
+   some form of service flag, you can use + for no mode at all
+
+20. Max Channel Mode Symbols : this is the total number of possible, channel modes that can
+    appears before a nick. Remember to count each possible mode, so +ov is 2
+
+21. Modes to Remove : this is every mode that Anope should remove when stripping channel modes
+
+22. Mode used by BotServ bots : When a BotServ bot joins a channel, this is the mode set on them
+    normally you want them to protected and oped (+o)
+
+23. SVSNICK : can the ircd use svsnick to change someones nick, otherwise kill is used, 1 = yes
+    0 = no
+
+24. VHOST : can change a users host on the fly - enabling this will allow hostserv online, 1 = yes
+    0 = no
+
+25. OWNER : has a channel umode for owning the channel, example Unreal has +q, 1 = yes
+    0 = no
+
+26. OWNER MODE SET : what mode to set to make someone the owner, if the ircd doesn't support owners, set
+    this to NULL
+
+27. OWNER MODE UNSET : what mode to unset to take away someone as owner, if the ircd doesn't support 
+    owners, set this to NULL
+
+28. Mode on Nick Register : what mode to set on NickServ registration if your ircd doesn't set a mode, set
+    this to NULL
+
+29. Mode on Nick Unregister : what mode to set on NickServ unregistration if your ircd doesn't set a mode, set
+    this to NULL
+
+30. Mode on Nick Change : what mode to set on nick change if your ircd doesn't set a mode, set
+    this to NULL
+
+31. SGLINE : realname (geocs) bans, 1 = yes  0 = no
+
+32. SQLINE : nick bans, 1 = yes  0 = no
+
+33. SZLINE : szline bans, 1 = yes  0 = no
+
+34. HALFOP : channel mode +h, 1 = yes  0 = no
+
+35. Number of Server Args : when an ircd connects this is the number of parameters that are passed
+
+36. Join to Set : services must join the channel to set modes, 1 = yes  0 = no
+
+37. Join to Message : services must join the channel to send messages (can not override +n), 1 = yes  0 = no
+
+38. Exceptions : channel mode +e, 1 = yes  0 = no
+
+39. Time Stamp on topics Forward : Unreal ircds like their topic ts set forward by +1, 1 = yes  0 = no
+
+40. Time Stamp on topics backwards : old dreamforge likes their topics with a ts that is set back by -1, 1 = yes  0 = no
+
+41. Protected Umode : UMODE_ that defines the protected Umode, 0 = no, or the UMODE_
+
+42. Admin : channel admin (Ultimate ircds), 1 = yes  0 = no
+
+43. SQline Channels : sqline to ban channel names, 1 = yes  0 = no
+
+44. Quit On Kill : when a user is killed a quit message is sent, 1 = yes  0 = no
+
+45. SVSMODE -b : can use svsmode to unban addresses, 1 = yes  0 = no
+
+46. Protect : channel protect +a (Unreal/Viagra ircds), 1 = yes  0 = no
+
+47. Reverse : can do a reverse check when unbanning, dreamforge based ircds, 1 = yes  0 = no
+
+48. Register Channels : supports setting a channel as registered, 1 = yes  0 = no
+
+49. Registered Mode : mode to set set when registered CMODE_ , 0 = No
+
+50. vident : vhost a users ident, 1 = yes  0 = no
+
+51. svshold : instead of svsnick or kill, we can hold the nick, 1 = yes  0 = no
+
+52. timestamp on mode : needs to send time stamp when modes are changed, 1 = yes  0 = no
+
+53. NICKIP : on NICK the users IP address is sent, 1 = yes  0 = no
+
+54. Umode : can use OperServ to change a users mode, 1 = yes  0 = no
+
+55. O:line : can use OperServ to give a temp oline, 1 = yes  0 = no
+
+56. Vhost On Nick : on NICK it sends the VHOST, 1 = yes  0 = no
+
+57. Change Realname : change real name, 1 = yes  0 = no
+
+58. Extra Help : if the ircd has more help use the language file value here,  0 = no
+
+59. No Knock  : CMODE_ that defines NO KNOCK, 0 = no
+
+60. Admin Only  : CMODE_ that defines Admin Only, 0 = no
+
+61. Default Mlock  : modes to default the mlock to, 0 = no
+
+62. Vhost Umode  : UMODE_ that defines vhost is enabled, 0 = no
+
+63. Flood Mode : has flood mode, 1 = yes  0 = no
+
+64. Link Mode : has linked mode, 1 = yes  0 = no
+
+65. Cmode F  : CMODE_ that defines flood mode, 0 = no
+
+66. Cmode L  : CMODE_ that defines Linked Mode, 0 = no
+
+
+IRCDCAPAB ircdcap[] = { } 
+
+This struct is based of the CAPAB defines, you should review the the CAPAB table
+below for how this to be done.
+
+
+3. FUNCTIONS AND EVENTS
+
+A brief word about functions and events. All events are captured via the 
+
+void moduleAddIRCDMsgs(void) { 
+    m = createMessage("NICK",      anope_event_nick); 
+    addCoreMessage(IRCD,m);
+}
+
+Each event should have a event handler if its important enough to process by services.
+All event functions should be formed like so
+
+int anope_event_capab(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+they will receive the source, this can be NULL at times depending on the event. AC is the
+number of arguments that are in the event. and AV holds the values for each, so av[0] is 
+the first variable. Events are likely to pass to various upper level event handlers, see
+the previous ircd source for how they handle these events.
+
+All commands are formed like so
+
+void anope_cmd_svsnoop(char *server, int set)
+{
+    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+}
+
+they may take any number of arguments, and come to a send_cmd() this root function is how
+commands are sent to the ircd. 
+
+
+4. CAPAB/PROTOCTL
+
+Most IRCD send a CAPAB or PROTOCTL line so that they can work out what each is
+capable of doing. Anope has a function to read these lines and set itself up 
+to to hand these events better. When adding support for your ircd. Take the
+following steps
+
+1. in the ircd.c find the function anope_cmd_capab() this function will send
+   the CAPAB/PROTOCTL line (consult your ircd documentation for which to send)
+   then in a single line type in the tokens that anope must send. Here is an
+   example of Hybrid's capab line
+
+   /* CAPAB */
+   void anope_cmd_capab()
+   {
+    send_cmd(NULL, "CAPAB TS5 EX IE HOPS HUB AOPS");
+   }
+
+2. in the ircd.h file make sure to place the defines (see below) that match your
+   ircds tokens, only use the ones that matter to your ircd. Should your ircd add
+   new features not covered in the defined, please contact the Anope Dev team 
+   before doing so.
+
+3. Ensure that the CAPAB/PROTOCTL event his handled correctly. 
+
+   a. in the function "moduleAddIRCDMsgs" making sure that you have the following
+      two lines
+   
+      m = createMessage("CAPAB",     anope_event_capab); 
+      addCoreMessage(IRCD,m);
+
+   b. Add the function to handle the event
+
+      int anope_event_capab(char *source, int ac, char **av)
+      {
+        capab_parse(ac, av);
+        return MOD_CONT;
+      }
+
+      this function 
+
+
+
+Define Table
+======================================================================================================
+DEFINE WORD     |  VALUE      |  TOKEN       |  IRCD Meaning
+======================================================================================================
+CAPAB_NOQUIT    | 0x00000001  |  NOQUIT      |  Supports NOQUIT
+CAPAB_TSMODE    | 0x00000002  |  TS	     |  Channel modes are TimeStamped (normal sent during PASS)
+CAPAB_UNCONNECT | 0x00000004  |  UNCONNECT   |  Supports UNCONNECT
+CAPAB_NICKIP    | 0x00000008  |  NICKIP      |  IP in the NICK line
+CAPAB_NSJOIN    | 0x00000010  |  SSJOIN      |  smart sjoin  SSJOIN
+CAPAB_ZIP	| 0x00000020  |  ZIP	     |  server supports gz'd links
+CAPAB_BURST     | 0x00000040  |  BURST       |  server supports BURST command
+CAPAB_TS3       | 0x00000080  |  TS3         |  Supports the TS3 Protocol
+CAPAB_TS5       | 0x00000100  |  TS5         |  Supports the TS5 Protocol
+CAPAB_DKEY      | 0x00000200  |  DKEY        |  server supports dh-key exchange using "DKEY"
+CAPAB_DOZIP	| 0x00000400  |  ZIP	     |  output to this link shall be gzipped
+CAPAB_DODKEY    | 0x00000800  |  DKEY        |  do I do dkey with this link?
+CAPAB_QS        | 0x00001000  |  QS          |  Can handle quit storm removal
+CAPAB_SCS       | 0x00002000  |  SCS         |  Supports String Cache System
+CAPAB_PT4       | 0x00004000  |  PT4         |  PT4 Protocol Support
+CAPAB_UID       | 0x00008000  |  UID         |  Can do UIDs
+CAPAB_KNOCK     | 0x00010000  |  KNOCK       |  supports KNOCK
+CAPAB_CLIENT    | 0x00020000  |  CLIENT      |  Supports CLIENT
+CAPAB_IPV6      | 0x00040000  |  IPV6        |  Server is able to handle ipv6 address masks
+CAPAB_SSJ5      | 0x00080000  |  SSJ5        |  Server supports smart join protocol 5
+CAPAB_SN2       | 0x00100000  |  SN2         |  Supports SN2 protocol (SNICK 2)
+CAPAB_VHOST     | 0x00200000  |  VHOST       |  Supports VHOST protocol
+CAPAB_TOKEN     | 0x00400000  |  TOKEN       |  Supports tokenized server<->server commands
+CAPAB_SSJ3      | 0x00800000  |  SSJ3        |  Server supports smart join protocol 3
+CAPAB_NICK2     | 0x01000000  |  NICK2       |  supports the extended NICK command (version 2)
+CAPAB_UMODE2    | 0x02000000  |  UMODE2      |  support for the UMODE2 command
+CAPAB_VL        | 0x04000000  |  VL          |  Vline information is included in the info field
+CAPAB_TLKEXT    | 0x08000000  |  TLKEXT      |  This allows 10 instead of 8 parameters in TKL's

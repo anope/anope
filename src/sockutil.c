@@ -439,6 +439,7 @@ int sockprintf(int s, char *fmt, ...)
 
     va_start(args, fmt);
     return buffered_write(s, buf, vsnprintf(buf, sizeof(buf), fmt, args));
+    /* no va_end() but not sure how to squeeze it in here */
 }
 
 /*************************************************************************/

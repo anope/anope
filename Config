@@ -220,7 +220,7 @@ echo "    5) UltimateIRCd 3.0.0 [alpha26 or later]"
 echo "    6) Hybrid IRCd 7.0    [experimental]"
 echo "    7) ViagraIRCd 1.3.x   [or later]"
 echo "    8) PTlink 6.15.0      [experimental]"
-echo "    9) RageIRCd 2.0       [beta-3 or later]"
+echo "    9) RageIRCd 2.0.0     [beta-6 or later]"
 echo "   10) Unreal 3.2         [Unreal 3.2 beta19 or later]"
 
 

@@ -655,6 +655,8 @@ void error(int linenum, char *message, ...)
 
     va_start(args, message);
     vsnprintf(buf, sizeof(buf), message, args);
+    va_end(args);
+
 #ifndef NOT_MAIN
     if (linenum)
         alog("%s:%d: %s", SERVICES_CONF, linenum, buf);

@@ -874,6 +874,10 @@ CHAN_REGISTERED
 	Channel %s ist registriert unter deinem Nicknamen: %s
 CHAN_PASSWORD_IS
 	Dein Channel-Passwort ist %s - behalte es für spätere Benutzung.
+CHAN_REGISTER_NONE_CHANNEL
+	You have attempted to register a none existant channel %s
+CHAN_SYMBOL_REQUIRED
+	Please use the symbol of # or & when attempting to register
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX

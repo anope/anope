@@ -23,24 +23,34 @@ void send_cmd(const char *source, const char *fmt, ...)
 {
     va_list args;
 
-    va_start(args, fmt);
-    vsend_cmd(source, fmt, args);
-    va_end(args);
+    if (fmt) {
+        va_start(args, fmt);
+        vsend_cmd(source, fmt, args);
+        va_end(args);
+    }
 }
 
 void vsend_cmd(const char *source, const char *fmt, va_list args)
 {
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    if (source) {
-        sockprintf(servsock, ":%s %s\r\n", source, buf);
-        if (debug)
-            alog("debug: Sent: :%s %s", source, buf);
-    } else {
-        sockprintf(servsock, "%s\r\n", buf);
-        if (debug)
-            alog("debug: Sent: %s", buf);
+    if (fmt) {
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+
+        if (!buf) {
+            return;
+        }
+
+        if (source) {
+            sockprintf(servsock, ":%s %s\r\n", source, buf);
+            if (debug)
+                alog("debug: Sent: :%s %s", source, buf);
+        } else {
+            sockprintf(servsock, "%s\r\n", buf);
+            if (debug)
+                alog("debug: Sent: %s", buf);
+        }
     }
 }
 
@@ -50,14 +60,22 @@ void notice_server(char *source, Server * s, char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    if (UsePrivmsg) {
-        anope_cmd_serv_privmsg(source, s->name, buf);
-    } else {
-        anope_cmd_serv_notice(source, s->name, buf);
+        if (!buf) {
+            return;
+        }
+
+        if (UsePrivmsg) {
+            anope_cmd_serv_privmsg(source, s->name, buf);
+        } else {
+            anope_cmd_serv_notice(source, s->name, buf);
+        }
+        va_end(args);
     }
 }
 
@@ -67,14 +85,22 @@ void notice_user(char *source, User * u, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    if (UsePrivmsg && (!u->na || (u->na->nc->flags & NI_MSG))) {
-        anope_cmd_privmsg2(source, u->nick, buf);
-    } else {
-        anope_cmd_notice2(source, u->nick, buf);
+        if (!buf) {
+            return;
+        }
+
+        if (UsePrivmsg && (!u->na || (u->na->nc->flags & NI_MSG))) {
+            anope_cmd_privmsg2(source, u->nick, buf);
+        } else {
+            anope_cmd_notice2(source, u->nick, buf);
+        }
+        va_end(args);
     }
 }
 
@@ -105,7 +131,7 @@ void notice_lang(char *source, User * dest, int message, ...)
     char buf[4096];             /* because messages can be really big */
     char *s, *t;
     const char *fmt;
-    if (!dest)
+    if (!dest || !message)
         return;
     va_start(args, message);
     fmt = getstring(dest->na, message);
@@ -125,6 +151,7 @@ void notice_lang(char *source, User * dest, int message, ...)
             anope_cmd_notice2(source, dest->nick, *t ? t : " ");
         }
     }
+    va_end(args);
 }
 
 /*************************************************************************/
@@ -140,7 +167,7 @@ void notice_help(char *source, User * dest, int message, ...)
     char *s, *t;
     const char *fmt;
 
-    if (!dest)
+    if (!dest || !message)
         return;
     va_start(args, message);
     fmt = getstring(dest->na, message);
@@ -166,6 +193,7 @@ void notice_help(char *source, User * dest, int message, ...)
             anope_cmd_notice2(source, dest->nick, *outbuf ? outbuf : " ");
         }
     }
+    va_end(args);
 }
 
 /*************************************************************************/
@@ -175,14 +203,22 @@ void notice(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    if (UsePrivmsg) {
-        anope_cmd_privmsg2(source, dest, buf);
-    } else {
-        anope_cmd_notice2(source, dest, buf);
+        if (!buf) {
+            return;
+        }
+
+        if (UsePrivmsg) {
+            anope_cmd_privmsg2(source, dest, buf);
+        } else {
+            anope_cmd_notice2(source, dest, buf);
+        }
+        va_end(args);
     }
 }
 
@@ -193,9 +229,16 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    *buf = '\0';
 
-    va_start(args, fmt);
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
 
-    vsnprintf(buf, sizeof(buf), fmt, args);
+    if (!buf) {
+        return;
+    }
     anope_cmd_privmsg2(source, dest, buf);
 }

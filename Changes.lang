@@ -2,6 +2,13 @@ Anope Version S V N
 -------------------
 *** New Strings:
 
+    CHAN_REGISTER_NONE_CHANNEL
+    CHAN_SYMBOL_REQUIRED
+    OPER_SVSNICK_UNSUPPORTED
+    OPER_SQLINE_UNSUPPORTED
+    OPER_SVSO_UNSUPPORTED
+    OPER_UMODE_UNSUPPORTED
+
 *** Mod Strings:
 
 *** Del Strings:

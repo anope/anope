@@ -22,6 +22,7 @@
 
 /**** modules.c ****/
 E void moduleCallBackRun(void);
+E void moduleCleanStruct(ModuleData * moduleData[]);
 
 /**** actions.c ****/
 

@@ -185,6 +185,26 @@ typedef struct channel_ Channel;
 #define PRE_NICK_VERSION 	1
 #define OPER_VERSION 		13
 
+/**
+ * ModuleData strucs used to allow modules to add / delete module Data from existing structs
+ */
+typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
+typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
+
+struct ModuleDataItem_ {
+	char *key;								/* The key */
+	char *value;							/* The Value */
+	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
+};
+
+struct ModuleData_ {	
+	char *moduleName;						/* Which module we belong to */
+	ModuleDataItem *di;						/* The first Item they own */
+	ModuleData *next;						/* The next ModuleData record */
+};
+
+
+
 typedef enum { false, true } boolean;
 
 /*************************************************************************/
@@ -222,6 +242,7 @@ struct nickrequest_ {
 	char *passcode;
 	char *password;
 	char *email;
+
 	time_t requested;
 
 	time_t lastmail;			/* Unsaved */
@@ -244,6 +265,7 @@ struct nickalias_ {
     NickCore *nc;					/* I'm an alias of this */
 
     /* Not saved */
+    ModuleData *moduleData[1024]; 	/* Module saved data attached to the nick alias */
     User *u;						/* Current online user that has me */
 };
 
@@ -270,7 +292,7 @@ struct nickcore_ {
     uint16 channelmax;				/* Maximum number of channels allowed */
 
     /* Unsaved data */
-
+    ModuleData *moduleData[1024];	/* Module saved data attached to the NickCore */
     time_t lastmail;				/* Last time this nick record got a mail */
     SList aliases;					/* List of aliases */
 };
@@ -643,23 +665,6 @@ struct csmodeutil_ {
 #define MUT_PROTECT     7
 #endif
 /*************************************************************************/
-
-typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
-typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
-
-struct ModuleDataItem_ {
-	char *key;								/* The key */
-	char *value;							/* The Value */
-	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
-};
-
-struct ModuleData_ {	
-	char *moduleName;						/* Which module we belong to */
-	ModuleDataItem *di;						/* The first Item they own */
-	ModuleData *next;						/* The next ModuleData record */
-};
-
-
 
 /* Online user and channel data. */
 struct user_ {

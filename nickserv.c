@@ -1519,6 +1519,9 @@ static int delcore(NickCore * nc)
         free(nc->memos.memos);
     }
 
+    moduleCleanStruct(nc->moduleData);
+
+
     free(nc);
 
     return 1;
@@ -1619,6 +1622,8 @@ int delnick(NickAlias * na)
         free(na->last_realname);
     if (na->last_quit)
         free(na->last_quit);
+
+    moduleCleanStruct(na->moduleData);
 
     free(na);
 

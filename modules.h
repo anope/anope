@@ -224,7 +224,7 @@ char *moduleGetData(ModuleData *md[], char *key);			/* Get the value for this ke
 int moduleAddData(ModuleData *md[], char *key, char *value);		/* Set the value for this key for this struct */
 void moduleDelData(ModuleData *md[], char *key);				/* Delete this key/value pair */
 void moduleDelAllData(ModuleData *md[]);					/* Delete all key/value pairs for this module for this struct */
-
+void moduleCleanStruct(ModuleData * moduleData[]);			/* Clean a moduleData hash */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 
 /*************************************************************************/

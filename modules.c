@@ -1941,23 +1941,59 @@ void moduleDelAllDataMod(Module * m)
     boolean freeme = false;
     int i;
     User *user;
+    NickAlias *na;
+    NickCore *nc;
     if (!mod_current_module_name) {
         mod_current_module_name = sstrdup(m->name);
         freeme = true;
     }
 
     for (i = 0; i < 1024; i++) {
+        /* Remove the users */
         for (user = userlist[i]; user; user = user->next) {
             moduleDelAllData(user->moduleData);
         }
+        /* Remove the nick Cores */
+        for (nc = nclists[i]; nc; nc = nc->next) {
+            moduleDelAllData(nc->moduleData);
+        }
+        /* Remove the nick Aliases */
+        for (na = nalists[i]; na; na = na->next) {
+            moduleDelAllData(na->moduleData);
+        }
     }
-
     if (freeme) {
         free(mod_current_module_name);
         mod_current_module_name = NULL;
     }
 }
 
+/**
+ * Remove any data fro many module used in the given struct.
+ * Useful for cleaning up when a User leave's the net, a NickCore is deleted, etc...
+ * @param moduleData the moduleData struct to "clean"
+ **/
+void moduleCleanStruct(ModuleData * moduleData[])
+{
+    ModuleData *md = NULL, *nextMd = NULL;
+    ModuleDataItem *item = NULL, *nextItem = NULL;
+    int i;
 
+
+    for (i = 0; i < 1024; i++) {
+        for (md = moduleData[i]; md; md = nextMd) {
+            nextMd = md->next;
+            for (item = md->di; item; item = nextItem) {
+                nextItem = item->next;
+                free(item->key);
+                free(item->value);
+                item->next = NULL;
+                free(item);
+            }
+            free(md->moduleName);
+            free(md);
+        }
+    }
+}
 
 /* EOF */

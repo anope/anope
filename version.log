@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="77"
+VERSION_BUILD="78"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (78)
+# BUGS  : N/A
+# NOTES : Added the ability to add module data to the NickCore and the NickAlias structs
 #
 # BUILD : 1.7.2 (77)
 # BUGS  : Compile errors on picky compilers

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="534"
+VERSION_BUILD="535"
 
 # $Log$
+#
+# BUILD : 1.7.7 (535)
+# BUGS  : N/A
+# NOTES : Added +h halfop support for plexus - plexus is now fully supported according to ThaPrince (plexus coder) :)
 #
 # BUILD : 1.7.7 (534)
 # BUGS  : N/A

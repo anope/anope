@@ -193,6 +193,69 @@ void anope_set_umode(User * user, int ac, char **av)
     }
 }
 
+/*  
+ * Local valid_op, and valid_halfop overrides.
+ * These are nessecary due to the way hybrid-based ircds handle halfops.
+ * hybrid-based ircds treat a -o as a -h as well. So if a user is set -o,
+ * the ircd will also set them -h if they have that mode. This breaks
+ * is_valid_op, as it always sends a -o. Breaking up the routines corrects this problem. - ThaPrince
+ */
+
+int plexus_check_valid_halfop(User * user, Channel * chan, int servermode)
+{
+    if (!chan || !chan->ci)
+        return 1;
+
+    /* They will be kicked; no need to deop, no need to update our internal struct too */
+    if (chan->ci->flags & CI_VERBOTEN)
+        return 0;
+
+    if (servermode && !check_access(user, chan->ci, CA_AUTOHALFOP)) {
+        notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
+        anope_cmd_mode(whosends(chan->ci), chan->name, "-h %s",
+                       user->nick);
+        return 0;
+    }
+
+    if (check_access(user, chan->ci, CA_AUTODEOP)) {
+        anope_cmd_mode(whosends(chan->ci), chan->name, "-h %s",
+                       user->nick);
+        return 0;
+    }
+
+    return 1;
+}
+
+int plexus_check_valid_op(User * user, Channel * chan, int servermode)
+{
+    if (!chan || !chan->ci)
+        return 1;
+
+    /* They will be kicked; no need to deop, no need to update our internal struct too */
+    if (chan->ci->flags & CI_VERBOTEN)
+        return 0;
+
+    if (servermode && !check_access(user, chan->ci, CA_AUTOOP)) {
+        notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
+        if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
+            anope_cmd_mode(whosends(chan->ci), chan->name,
+                           "-o+h %s %s", user->nick, user->nick);
+        } else {
+            anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
+                           user->nick);
+        }
+        return 0;
+    }
+
+    if (check_access(user, chan->ci, CA_AUTODEOP)) {
+        anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
+                       user->nick);
+        return 0;
+    }
+
+    return 1;
+}
+
 unsigned long umodes[128] = {
     0, 0, 0,                    /* Unused */
     0, 0, 0,                    /* Unused */
@@ -426,14 +489,14 @@ CUMode cumodes[128] = {
     {0},                        /* e */
     {0},                        /* f */
     {0},                        /* g */
-    {CUS_HALFOP, 0, check_valid_op},
+    {CUS_HALFOP, 0, plexus_check_valid_halfop},
     {0},                        /* i */
     {0},                        /* j */
     {0},                        /* k */
     {0},                        /* l */
     {0},                        /* m */
     {0},                        /* n */
-    {CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op},
+    {CUS_OP, CUF_PROTECT_BOTSERV, plexus_check_valid_op},
     {0},                        /* p */
     {0},                        /* q */
     {0},                        /* r */

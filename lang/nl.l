@@ -714,7 +714,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Je hebt het wachtwoord van nick %s via e-mail aangevraagd.
 NICK_SENDPASS_LINE_2
-	Het wachtwoord is %s. Wegens veiligheidsredenen kun je dit het beste zo snel mogelijk veranderen.
+	Het wachtwoord is %s Wegens veiligheidsredenen kun je dit het beste zo snel mogelijk veranderen.
 NICK_SENDPASS_LINE_3
 	Als je niet weet waarom deze email gestuurd is, negeer deze dan.
 NICK_SENDPASS_LINE_4

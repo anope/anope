@@ -703,7 +703,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	You have requested to receive the password of nickname %s by e-mail.
 NICK_SENDPASS_LINE_2
-	The password is %s. For security purposes, you should change it as soon as you receive this mail.
+	The password is %s for security purposes, you should change it as soon as you receive this mail.
 NICK_SENDPASS_LINE_3
 	If you don't know why this mail is sent to you, please ignore it silently.
 NICK_SENDPASS_LINE_4

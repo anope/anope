@@ -717,7 +717,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Tu has pedido recibir la clave para el nickname %s por e-mail.
 NICK_SENDPASS_LINE_2
-	La clave es %s. Por razones de seguridad deberas cambiarla en cuanto recibas este mail.
+	La clave es %s Por razones de seguridad deberas cambiarla en cuanto recibas este mail.
 NICK_SENDPASS_LINE_3
 	Si no sabes porque este mail ha sido enviado a ti, por favor ignoralo.
 NICK_SENDPASS_LINE_4

@@ -717,7 +717,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	%s nickinizin þifresinin e-mail adresinize yollanmasýný istemiþsiniz.
 NICK_SENDPASS_LINE_2
-	Nickinizin Þifresi %s. Güvenlik nedenlerinden dolayý, bu maili aldýktan sonra deðiþtirseniz iyi olur.
+	Nickinizin Þifresi %s Güvenlik nedenlerinden dolayý, bu maili aldýktan sonra deðiþtirseniz iyi olur.
 NICK_SENDPASS_LINE_3
 	Eðer bu mailin neden size gönderildiðini bilmiyorsanýz, maili ciddiye almayýn.
 NICK_SENDPASS_LINE_4

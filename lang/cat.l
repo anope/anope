@@ -713,7 +713,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	El teu has demanat rebre la clau pel nickname %s via e-mail.
 NICK_SENDPASS_LINE_2
-	La clau es %s. Per raons de seguretat hauries de canviar-la quant rebis aquest mail.
+	La clau es %s Per raons de seguretat hauries de canviar-la quant rebis aquest mail.
 NICK_SENDPASS_LINE_3
 	Si no saps per que aquest mail t'ha estat enviat, per favor ignora'l.
 NICK_SENDPASS_LINE_4

@@ -710,7 +710,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Azt kérted, hogy a %s nicknév jelszavát küldjük el e-mailben.
 NICK_SENDPASS_LINE_2
-	A jelszavad %s. Ezt a biztosnág miatt meg kell váltóztatni,	miután megkaptad ezt a levelet.
+	A jelszavad %s Ezt a biztosnág miatt meg kell váltóztatni,	miután megkaptad ezt a levelet.
 NICK_SENDPASS_LINE_3
 	Ha nem tudod miért kaptad ezt a levelet, akkor kérlek hagyd figyelmen kivül!
 NICK_SENDPASS_LINE_4

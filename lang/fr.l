@@ -715,7 +715,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Vous avez demandé à recevoir le mot de passe du nick %s par e-mail.
 NICK_SENDPASS_LINE_2
-	Le mot de passe est %s. Pour des raisons de sécurité, vous devriez le changer dès que vous lisez cet e-mail.
+	Le mot de passe est %s Pour des raisons de sécurité, vous devriez le changer dès que vous lisez cet e-mail.
 NICK_SENDPASS_LINE_3
 	Si vous ne savez pas de quoi il retourne dans cet e-mail, il s'agit probablement d'une erreur; nous vous prions de nous excuser et vous demandons d'ignorer cet e-mail.
 NICK_SENDPASS_LINE_4

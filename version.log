@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="492"
+VERSION_BUILD="493"
 
 # $Log$
+#
+# BUILD : 1.7.6 (493)
+# BUGS  : N/A
+# NOTES : Applied patch from mitch regarding unclear password emails.
 #
 # BUILD : 1.7.6 (492)
 # BUGS  : N/A

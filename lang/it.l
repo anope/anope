@@ -712,7 +712,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Hai richiesto di ricevere via e-mail la password del nick %s.
 NICK_SENDPASS_LINE_2
-	La password è %s. Per ragioni di sicurezza, ti invitiamo a cambiarla il più presto possibile con il comando "/ns set password".
+	La password è %s Per ragioni di sicurezza, ti invitiamo a cambiarla il più presto possibile con il comando "/ns set password".
 NICK_SENDPASS_LINE_3
 	Se non sai perché hai ricevuto questa mail, ignorala.
 NICK_SENDPASS_LINE_4

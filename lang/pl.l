@@ -769,7 +769,7 @@ NICK_SENDPASS_LINE_1
 	Zarz±da³e¶(a¶) przypomnenia has³a do Twojego nicka %s 
 	na e-mail.
 NICK_SENDPASS_LINE_2
-	Twoje has³o to: %s. 
+	Twoje has³o to: %s 
 	Ze wzglêdów bezpieczeñstwa zalecana jest natychmiastowa 
 	zmiana  tego has³a na inne zaraz po identyfikacji.
 NICK_SENDPASS_LINE_3

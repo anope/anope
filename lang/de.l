@@ -733,7 +733,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Du wolltest dir dein Passwort von dem Nicknamen %s via eMail schicken lassen.
 NICK_SENDPASS_LINE_2
-	Das Passwort ist %s. Aus Sicherheitsgründen solltest du das Passwort nach Erhalt dieser eMail ändern.
+	Das Passwort ist %s Aus Sicherheitsgründen solltest du das Passwort nach Erhalt dieser eMail ändern.
 NICK_SENDPASS_LINE_3
 	Wenn du nicht weisst, warum du diese Mail erhalten hast, ignoriere sie bitte.
 NICK_SENDPASS_LINE_4

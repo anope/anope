@@ -711,7 +711,7 @@ NICK_SENDPASS_HEAD
 NICK_SENDPASS_LINE_1
 	Você pediu para que a senha do nick %s fosse enviada por e-mail.
 NICK_SENDPASS_LINE_2
-	A senha é %s. Por motivos de segurança, recomendamos que você mude sua senha após ler este e-mail.
+	A senha é %s Por motivos de segurança, recomendamos que você mude sua senha após ler este e-mail.
 NICK_SENDPASS_LINE_3
 	Se você não souber porque este e-mail lhe foi enviado, por favor ignore-o.
 NICK_SENDPASS_LINE_4

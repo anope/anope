@@ -1,5 +1,5 @@
-OBJS =  anopesmtp.o
-SRCS =  anopesmtp.c
+OBJS =  $(SRCS:.c=.o)
+SRCS =  anopesmtp.c db-merger.c epona2anope.c
 
 INCLUDES = ../../include/services.h
 
@@ -12,7 +12,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 .c.o:
 	$(CC) $(CFLAGS) -I../include/ -c $<
 
-all: anopesmtp
+all: ${OBJS}
 
 distclean: clean spotless
 
@@ -20,15 +20,20 @@ anopesmpt:  $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
 
 $(OBJS): Makefile
-anopesmpt.o:    anopesmpt.c $(INCLUDES)
+anopesmtp.o:    anopesmtp.c $(INCLUDES)
+db-merger.o:    db-merger.c $(INCLUDES)
+epona2anope.o:  epona2anope.c $(INCLUDES)
 
 clean:
-	rm -f *.o anopesmtp a.out
+	rm -f *.o anopesmtp a.out db-merger epona2anope
 
 spotless: clean
 
-install: anopesmtp
+install: anopesmtp db-merger epona2anope
 	test -d ${BINDEST} || mkdir ${BINDEST}
-	$(INSTALL) anopesmtp $(BINDEST)/anopesmtp
+	test -d $(BINDEST)/tools || mkdir $(BINDEST)/tools
+	$(INSTALL) anopesmtp $(BINDEST)/tools/anopesmtp
+	$(INSTALL) db-merger $(BINDEST)/tools/db-merger
+	$(INSTALL) epona2anope $(BINDEST)/tools/epona2anope
 
 DUMMY:

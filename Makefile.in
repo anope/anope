@@ -95,5 +95,6 @@ distclean: clean
 install: DUMMY
 	(cd src ; ${MAKE} ${MAKEARGS} install)
 	(cd src/tools ; ${MAKE} ${MAKEARGS} install)
+	@echo "*** All done, Anope is now installed. Please read docs/INSTALL for details on what to do now.";
 
 DUMMY:

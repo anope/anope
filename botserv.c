@@ -2530,9 +2530,8 @@ char *normalizeBuffer(char *buf)
     char *newbuf;
     int i, len, j = 0;
 
-    newbuf = (char *) malloc(BUFSIZE);
-
     len = strlen(buf);
+    newbuf = (char *) malloc((len + 1) * sizeof(char));
 
     for (i = 0; i < len; i++) {
         switch (buf[i]) {

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="85"
+VERSION_BUILD="86"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (86)
+# BUGS  : 
+# NOTES : Changed the allocation of buffer for normalizeBuffer yet again
 #
 # BUILD : 1.7.2 (85)
 # BUGS  : 

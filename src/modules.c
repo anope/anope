@@ -1887,6 +1887,7 @@ void moduleDelData(ModuleData **md, char *key)
     
     if(key) { 
     	while(current) {
+		next = current->next;
 		if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {	
 			if(prev) {
 				prev->next  = current->next;
@@ -1900,7 +1901,6 @@ void moduleDelData(ModuleData **md, char *key)
 			free(current);
 		}
 		prev = current;
-		next = current->next;
 		current = next;
     	}
     }
@@ -1921,6 +1921,7 @@ void moduleDelAllData(ModuleData **md)
     ModuleData *next = NULL;
      
     while(current) {
+	next = current->next;
 	if((stricmp(current->moduleName,mod_name)==0)) {	
 		if(prev) {
 			prev->next  = current->next;
@@ -1934,7 +1935,6 @@ void moduleDelAllData(ModuleData **md)
 		free(current);
 	}
 	prev = current;
-	next = current->next;
 	current = next;
     }
     free(mod_name);

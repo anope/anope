@@ -579,9 +579,11 @@ struct nickcore_ {
 #define LANG_GR                11   /* Greek */
 #define LANG_NL                12   /* Dutch */
 #define LANG_RU                13   /* Russian */
+#define LANG_HUN               14   /* Hungarian */
+#define LANG_PL                15   /* Polish */
 
-#define NUM_LANGS              14	/* Number of languages */
-#define USED_LANGS             11	/* Number of languages provided */
+#define NUM_LANGS              16	/* Number of languages */
+#define USED_LANGS             13	/* Number of languages provided */
 
 #define DEF_LANGUAGE	LANG_EN_US
 

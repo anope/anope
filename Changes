@@ -1,10 +1,10 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
-07/23 F Fixed BotServ buffer                                              [#131]		
 07/17 A Switched to autoconf for configure script.                        [ #00]
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+07/23 F Fixed BotServ buffer                                              [#131]		
 07/22 F Free NSNickTracking when a user quits.                            [#126]
 07/22 F NOOP bug with wildcards.                                          [#115]
 07/22 F Removed RESTRICTED from incorrectly labeled lang file entry.      [#111]
@@ -24,6 +24,11 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 Provided by Trystan <trystan@nomadirc.net> - 2004
 07/22 A Added VIAGRA support for modes +A and +H.                         [ #99]
 
+Provided by Janos Kapitany <sarkanyka@cjbchat.hu>
+08/04 A New language file hun.l (Hungarian)                               [ #00]
+
+Provided by Mateusz Szczyrzyca <annihilator@ircnet.pl> - 2004
+08/04 A New language file pl.l (Polish)                                   [ #00]
 
 Anope Version 1.7.4
 -------------------

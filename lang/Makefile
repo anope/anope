@@ -6,8 +6,8 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'USE_MODULES=${USE_MODULES}'
 
-LANGOBJS = cat de en_us es fr gr nl pt tr it ru
-LANGSRCS = cat de en_us.l es fr.l gr.l nl.l pt.l tr.l it.l ru.l
+LANGOBJS = cat de en_us es fr gr hun it nl pl pt ru tr
+LANGSRCS = cat.l de.l en_us.l es.l fr.l gr.l hun.l it.l nl.l pl.l pt.l ru.l tr.l
 
 LANGCOMP = ./langcomp
 #LANGCOMP = ./langcomp -w
@@ -52,15 +52,19 @@ fr:       fr.l       langcomp index
 	./langcomp $@.l
 gr:       gr.l       langcomp index
 	./langcomp $@.l
-nl:       nl.l       langcomp index
-	./langcomp $@.l
-pt:       pt.l       langcomp index
-	./langcomp $@.l
-tr:       tr.l       langcomp index
+hun:      hun.l       langcomp index
 	./langcomp $@.l
 it:       it.l       langcomp index
 	./langcomp $@.l
+nl:       nl.l       langcomp index
+	./langcomp $@.l
+pl:       pl.l       langcomp index
+	./langcomp $@.l
+pt:       pt.l       langcomp index
+	./langcomp $@.l
 ru:       ru.l       langcomp index
+	./langcomp $@.l
+tr:       tr.l       langcomp index
 	./langcomp $@.l
 
 langcomp: langcomp.c

@@ -320,9 +320,9 @@ char *DefConOffMessage;
 char *DefconMessage;
 char *DefConAkillReason;
 
-unsigned int UserKey1;
-unsigned int UserKey2;
-unsigned int UserKey3;
+long unsigned int UserKey1;
+long unsigned int UserKey2;
+long unsigned int UserKey3;
 
 /*************************************************************************/
 

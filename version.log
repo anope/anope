@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="366"
+VERSION_BUILD="367"
 
 # $Log$
+#
+# BUILD : 1.7.5 (367)
+# BUGS  : 
+# NOTES : Changed UserKeys from uint to long uint.
 #
 # BUILD : 1.7.5 (366)
 # BUGS  : 

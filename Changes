@@ -4,6 +4,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 09/20 A Added RestrictOperNicks as new feature in services.conf.          [ #00]
 09/08 A Removed rand() and ported bsd's arc4random() to fit our needs.    [ #00]
 08/24 A New -l option for am script to list possible selectors.           [ #00]
+10/03 F Changed UserKeys from uint to long uint.                          [ #00]
 09/21 F An option to explicitly not use mysql is added to Config          [ #00]
 09/19 F Rewrote the internals of moduleData to save lots of memory.       [ #00]
 09/17 F Fixed MySQL error, whereby checks are only done if mysql is on.   [ #00]

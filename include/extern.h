@@ -498,9 +498,9 @@ E char *DefconMessage;
 E char *DefConAkillReason;
 E char *DefConOffMessage;
 
-E unsigned int UserKey1;
-E unsigned int UserKey2;     
-E unsigned int UserKey3;
+E long unsigned int UserKey1;
+E long unsigned int UserKey2;     
+E long unsigned int UserKey3;
 /**** converter.c ****/
 
 E int convert_ircservices_44(void);

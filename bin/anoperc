@@ -1,0 +1,131 @@
+#!/bin/sh
+
+###############################################
+# Set Variables
+###############################################
+
+# PID FILE NAME (e.g. services.pid)
+PIDFILE="services.pid"
+
+# FULL PATH TO ANOPE DIRECTORY e.g. /home/ribosome/services/
+# YOU MUST INCLUDE TRAILING SLASH
+ANOPEBIN=""
+
+# SERVICES EXECUTABLE NAME (e.g. services)
+ANOPROG="services"
+
+# SCRIPT VERSION NUMBER (DO NOT ALTER)
+ARCVERSION="1.0"
+
+
+################################################
+# END OF CONFIGURATION
+# YOU ARE NOT REQUIRED TO CHANGE ANYTHING BELOW
+################################################
+
+isAnopeRunning () {
+if [ ! -f $ANOPEBIN$PIDFILE ] ; then
+	echo "Warning: Anope is not currently running"
+	exit 1
+fi
+
+PID=`cat $ANOPEBIN$PIDFILE`
+
+if [ ! `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
+	echo "Warning: Anope is not currently running"
+	exit 1
+fi
+}
+
+if [ "$ANOPEBIN" = "" ] ; then
+	echo "Error: Please open this file set the variables correctly";
+	exit 1
+fi
+
+if [ "$1" = "start" ] ; then
+
+if [ -f $ANOPEBIN$PIDFILE ] ; then
+	PID=`cat $ANOPEBIN$PIDFILE`
+	if [ `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
+		echo "Warning! Anope is already running"
+		exit 1
+	fi
+fi
+	echo "Starting Anope"
+	shift
+	$ANOPEBIN$ANOPROG $*
+	sleep 1
+		if [ ! -f $ANOPEBIN$PIDFILE ] ; then
+	        echo "Unfortunatly it seems Anope did not start successfully"
+                echo "This error has been logged in your Anope Log file"
+                echo "Located in "$ANOPEBIN"logs/"
+                echo "This may help you diagnose the problem"
+                echo "Further help may be available from http://www.anope.org"
+		exit 1
+		fi
+		PID=`cat $ANOPEBIN$PIDFILE`
+		if [ ! `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
+		echo "Unfortunatly it seems Anope did not start successfully"
+		echo "This error has been logged in your Anope Log file"
+		echo "Located in "$ANOPEBIN"logs/"
+		echo "This may help you diagnose the problem"
+		echo "Further help may be available from http://www.anope.org"
+		exit 1
+		fi
+elif [ "$1" = "stop" ] ; then
+	isAnopeRunning
+	echo "Terminating Anope"
+	PID=`cat $ANOPEBIN$PIDFILE`
+	kill -SIGTERM $PID
+
+elif [ "$1" = "status" ] ; then
+	if [ -f $ANOPEBIN$PIDFILE ] ; then
+		PID=`cat $ANOPEBIN$PIDFILE`
+        	if [ `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
+		        echo "Anope is currently running"
+		        exit 1
+	        fi
+	fi
+
+	echo "Anope is not currently running"
+
+elif [ "$1" = "restart" ] ; then
+	isAnopeRunning
+	echo "Restarting Anope"
+	PID=`cat $ANOPEBIN$PIDFILE`
+	kill -SIGHUP $PID
+
+elif [ "$1" = "rehash" ] ; then
+	isAnopeRunning
+	echo "Saving Databases and Rehashing Configuration"
+	PID=`cat $ANOPEBIN$PIDFILE`
+	kill -SIGUSR2 $PID
+
+elif [ "$1" = "version" ] ; then
+	$ANOPEBIN$ANOPROG -version
+
+elif [ "$1" = "help" ] ; then
+	if [ "$2" = "paramlist" ] ; then
+		$ANOPEBIN$ANOPROG -help
+		else
+		echo "AnopeRC is a remote control script for easy"
+		echo "controlling of Anope from the command console"
+		echo "$0 start		Start Anope"
+		echo "			Additional parameters may be passed"
+		echo "			(e.g. $0 start -nofork)"
+		echo "			For a list of type $0 $1 paramlist"
+		echo "$0 stop		Shutdown Anope"
+		echo "$0 status		Show Anope's Status"
+		echo "$0 restart	Restart Anope (Databases will be saved"
+		echo "$0 rehash	Rehash Configuration and Save Databases"
+		echo "$0 version	Return Anope Version and Build Information"
+		echo "$0 help		Show this help menu"
+		echo "If you need further help please check the /docs/"
+		echo "folder or make use of our extensive online support at"
+		echo "http://www.anope.org"
+	fi
+	
+else
+	echo "Anope Remote Control ($ARCVERSION)"
+	echo "Usage: $0 [start|stop|status|restart|rehash|version|help]"
+fi

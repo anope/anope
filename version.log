@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="64"
+VERSION_BUILD="66"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (66)
+# BUGS  : 
+# NOTES : Added /bin/anoperc anope console control script
 #
 # BUILD : 1.7.2 (64)
 # NOTES : Anope 1.7.2 Release

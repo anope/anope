@@ -129,7 +129,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
-     CAPAB_CHANMODE             /* CHANMODE             */
+     CAPAB_CHANMODE,            /* CHANMODE             */
+     0,
      }
 };
 

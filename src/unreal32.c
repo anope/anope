@@ -130,6 +130,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
      CAPAB_CHANMODE,            /* CHANMODE             */
+     CAPAB_SJB64,
      }
 };
 
@@ -458,7 +459,7 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
      m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);
     }
-    m = createMessage("INVITE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("C",        anope_event_join); addCoreMessage(IRCD,m);
@@ -515,69 +516,69 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
      m = createMessage(")",        anope_event_topic); addCoreMessage(IRCD,m);
     }
-    m = createMessage("USER",      NULL); addCoreMessage(IRCD,m);
+    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("%",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("%",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("WALLOPS",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("=",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("=",        anope_event_null); addCoreMessage(IRCD,m);
     }
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("#",        anope_event_whois); addCoreMessage(IRCD,m);
     }
-    m = createMessage("AKILL",     NULL); addCoreMessage(IRCD,m);
+    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-      m = createMessage("V",        NULL); addCoreMessage(IRCD,m);
+      m = createMessage("V",       anope_event_null); addCoreMessage(IRCD,m);
     }
     m = createMessage("GLOBOPS",   anope_event_globops); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("]",        anope_event_globops); addCoreMessage(IRCD,m);
     }
-    m = createMessage("GNOTICE",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("GNOTICE",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("Z",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("Z",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("GOPER",     NULL); addCoreMessage(IRCD,m);
+    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("[",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("[",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("RAKILL",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("Y",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("Y",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SILENCE",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("U",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("U",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVSKILL",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("h",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("h",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVSMODE",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-      m = createMessage("n",        NULL); addCoreMessage(IRCD,m);
+      m = createMessage("n",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVS2MODE",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVS2MODE",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-      m = createMessage("v",        NULL); addCoreMessage(IRCD,m);
+      m = createMessage("v",       anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVSNICK",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("e",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("e",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVSNOOP",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("f",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("f",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SQLINE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SQLINE",    anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("c",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("c",        anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
+    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
-     m = createMessage("d",        NULL); addCoreMessage(IRCD,m);
+     m = createMessage("d",        anope_event_null); addCoreMessage(IRCD,m);
     }
     m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
     if (UseTokens) {
@@ -657,6 +658,32 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("AG",       anope_event_sdesc); addCoreMessage(IRCD,m);
     }
+
+    m = createMessage("HTM",        anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("BH",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("HELP",        anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("4",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("TRACE",        anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("b",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("LAG",        anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("AF",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("RPING",        anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("AM",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+
+
+
+
+
     /* The none token version of these is in messages.c */
     if (UseTokens) {
      m = createMessage("2",         m_stats); addCoreMessage(IRCD,m);
@@ -1371,7 +1398,7 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
     if (!source || !guest) {
         return;
     }
-    send_cmd(NULL, "%S %s %s :%ld", send_token("SVSNICK", "e"), source,
+    send_cmd(NULL, "%s %s %s :%ld", send_token("SVSNICK", "e"), source,
              guest, when);
 }
 

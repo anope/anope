@@ -295,6 +295,7 @@ E int   UseSVSHOLD;
 E int   UseSVS2MODE;
 E int   RestrictOperNicks;
 E int   UseTokens;
+E int   NewsCount;
 
 E char **HostSetters;
 E int HostNumber;
@@ -1074,6 +1075,7 @@ extern int anope_event_rehash(char *source, int ac, char **av);
 extern int anope_event_sdesc(char *source, int ac, char **av);
 extern int anope_event_netglobal(char *source, int ac, char **av);
 extern int anope_event_invite(char *source, int ac, char **av);
+extern int anope_event_null(char *source, int ac, char **av);
 
 extern void anope_set_umode(User * user, int ac, char **av);
 extern void anope_cmd_svid_umode(char *nick, time_t ts);

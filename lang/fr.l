@@ -1791,9 +1791,9 @@ MEMO_RSEND_USER_NOTIFICATION
 MEMO_CHECK_SYNTAX
 	CHECK nickname
 MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
+	Le dernier mémo que vous avez envoyé à %s (le %s) n'a pas encore été lu.
 MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
+	Le dernier mémo que vous avez envoyé à %s (le %s) a été lu.
 MEMO_CHECK_NO_MEMO
 	Nick %s doesn't have a memo from you.
 

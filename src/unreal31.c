@@ -129,7 +129,9 @@ IRCDCAPAB ircdcap[] = {
      CAPAB_TLKEXT,              /* TLKEXT       */
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
-     0}
+     0,
+     0,
+     }
 };
 
 unsigned long umodes[128] = {

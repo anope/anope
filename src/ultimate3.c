@@ -126,7 +126,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      CAPAB_DODKEY,              /* DODKEY       */
      CAPAB_DOZIP,               /* DOZIP        */
-     0}
+     0, 0}
 };
 
 void anope_set_umode(User * user, int ac, char **av)

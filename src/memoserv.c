@@ -154,28 +154,45 @@ void check_memos(User * u)
 
 /* Return the MemoInfo corresponding to the given nick or channel name.
  * Return in `ischan' 1 if the name was a channel name, else 0.
+ * Return in `isforbid' 1 if the name is forbidden, else 0.
  */
 
-static MemoInfo *getmemoinfo(const char *name, int *ischan)
+static MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid)
 {
     if (*name == '#') {
         ChannelInfo *ci;
         if (ischan)
             *ischan = 1;
         ci = cs_findchan(name);
-        if (ci && !(ci->flags & CI_VERBOTEN))
-            return &ci->memos;
-        else
+        if (ci) {
+            if (!(ci->flags & CI_VERBOTEN)) {
+                *isforbid = 0;
+                return &ci->memos;
+            } else {
+                *isforbid = 1;
+                return NULL;
+            }
+        } else {
+            *isforbid = 0;
             return NULL;
+        }
     } else {
         NickAlias *na;
         if (ischan)
             *ischan = 0;
         na = findnick(name);
-        if (na && !(na->status & NS_VERBOTEN))
-            return &na->nc->memos;
-        else
+        if (na) {
+            if (!(na->status & NS_VERBOTEN)) {
+                *isforbid = 0;
+                return &na->nc->memos;
+            } else {
+                *isforbid = 1;
+                return NULL;
+            }
+        } else {
+            *isforbid = 0;
             return NULL;
+        }
     }
 }
 
@@ -261,6 +278,7 @@ static int do_send(User * u)
 void memo_send(User * u, char *name, char *text, int z)
 {
     int ischan;
+    int isforbid;
     Memo *m;
     MemoInfo *mi;
     time_t now = time(NULL);
@@ -284,11 +302,17 @@ void memo_send(User * u, char *name, char *text, int z)
         if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 
-    } else if (!(mi = getmemoinfo(name, &ischan))) {
+    } else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
         if (z == 0 || z == 3)
-            notice_lang(s_MemoServ, u,
-                        ischan ? CHAN_X_NOT_REGISTERED :
-                        NICK_X_NOT_REGISTERED, name);
+            if (isforbid) {
+                notice_lang(s_MemoServ, u,
+                            ischan ? CHAN_X_FORBIDDEN :
+                            NICK_X_FORBIDDEN, name);
+            } else {
+                notice_lang(s_MemoServ, u,
+                            ischan ? CHAN_X_NOT_REGISTERED :
+                            NICK_X_NOT_REGISTERED, name);
+            }
 
     } else if (z != 2 && MSSendDelay > 0 &&
                u && u->lastmemosend + MSSendDelay > now && !is_servoper) {
@@ -390,6 +414,7 @@ void memo_send(User * u, char *name, char *text, int z)
 static int do_cancel(User * u)
 {
     int ischan;
+    int isforbid;
     char *name = strtok(NULL, " ");
     MemoInfo *mi;
 
@@ -399,10 +424,16 @@ static int do_cancel(User * u)
     } else if (!nick_recognized(u)) {
         notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 
-    } else if (!(mi = getmemoinfo(name, &ischan))) {
-        notice_lang(s_MemoServ, u,
-                    ischan ? CHAN_X_NOT_REGISTERED : NICK_X_NOT_REGISTERED,
-                    name);
+    } else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
+        if (isforbid) {
+            notice_lang(s_MemoServ, u,
+                        ischan ? CHAN_X_FORBIDDEN :
+                        NICK_X_FORBIDDEN, name);
+        } else {
+            notice_lang(s_MemoServ, u,
+                        ischan ? CHAN_X_NOT_REGISTERED :
+                        NICK_X_NOT_REGISTERED, name);
+        }
     } else {
         int i;
 
@@ -1335,8 +1366,9 @@ static int do_memocheck(User * u)
     NickAlias *na = NULL;
     MemoInfo *mi = NULL;
     int i, found = 0;
-    char *stime = NULL;
     char *recipient = strtok(NULL, "");
+    struct tm *tm;
+    char timebuf[64];
 
     if (!recipient) {
         syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
@@ -1358,24 +1390,22 @@ static int do_memocheck(User * u)
         if (!stricmp(mi->memos[i].sender, u->nick)) {
             found = 1;          /* Yes, we've found the memo */
 
-            stime = strdup(ctime(&mi->memos[i].time));
-            *(stime + strlen(stime) - 1) = ' '; /* cut the f*cking \0 terminator and replace it with a single space */
+            tm = localtime(&mi->memos[i].time);
+            strftime_lang(timebuf, sizeof(timebuf), u,
+                          STRFTIME_DATE_TIME_FORMAT, tm);
 
             if (mi->memos[i].flags & MF_UNREAD)
                 notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
-                            stime);
+                            timebuf);
             else
                 notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick,
-                            stime);
+                            timebuf);
             break;
         }
     }
 
     if (!found)
         notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
-
-    if (stime)
-        free(stime);
 
     return MOD_CONT;
 }

@@ -128,7 +128,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      CAPAB_DODKEY,              /* DODKEY       */
      CAPAB_DOZIP,               /* DOZIP        */
-     0}
+     0, 0}
 };
 
 

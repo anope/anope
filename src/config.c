@@ -119,6 +119,7 @@ int NickRegDelay;
 int UseSVSHOLD;
 int UseTokens;
 int UseSVS2MODE;
+int NewsCount;
 
 int UseMail;
 char *SendMailPath;
@@ -510,6 +511,7 @@ Directive directives[] = {
     {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
     {"NetworkDomain", {{PARAM_STRING, PARAM_RELOAD, &NetworkDomain}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
+    {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
     {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
@@ -1085,6 +1087,10 @@ int read_config(int reload)
                   USED_LANGS);
             retval = 0;
         }
+    }
+
+    if (!NewsCount) {
+        NewsCount = 3;
     }
 
     if (reload) {

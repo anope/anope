@@ -362,6 +362,11 @@ int m_whois(char *source, char *who)
     return MOD_CONT;
 }
 
+/* NULL route messages */
+int anope_event_null(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
 
 /* *INDENT-OFF* */
 void moduleAddMsgs(void) {

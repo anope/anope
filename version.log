@@ -8,9 +8,19 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="364"
+VERSION_BUILD="365"
 
 # $Log$
+#
+# BUILD : 1.7.5 (365)
+# BUGS  : 172
+# NOTES :  - New directive NewsCount
+#  - fr.l updated
+#  - do_memocheck() globalized the time display
+#  - getmemoinfo() improved to return info about being forbidden
+#  - fixes svsnick on Unreal
+#  - anope_event_null to allow ircd devs to point events that go to no where some where
+#  - fixed SQUIT
 #
 # BUILD : 1.7.5 (364)
 # NOTES : Added nullfix patch from Trystan.

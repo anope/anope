@@ -298,10 +298,10 @@ void display_news(User * u, int16 type)
             }
         }
     } else {
-        int i, count = 0;       /* Number we're going to show--not more than 3 */
+        int i, count = 0; 
 
         for (i = nnews - 1; i >= 0; i--) {
-            if (count >= 3)
+            if (count >= NewsCount)
                 break;
             if (news[i].type == type)
                 count++;

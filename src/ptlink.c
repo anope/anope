@@ -128,7 +128,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
-     0}
+     0, 0}
 };
 
 
@@ -544,7 +544,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("REHASH",     anope_event_rehash); addCoreMessage(IRCD,m);
     m = createMessage("ADMIN",      anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("CREDITS",    anope_event_credits); addCoreMessage(IRCD,m);
-
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -684,10 +684,19 @@ void anope_cmd_svsmode(User * u, int ac, char **av)
              (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
 }
 
+int anope_event_error(char *source, int ac, char **av)
+{
+    if (ac >= 1) {
+        if (debug) {
+            alog("ERROR: %s", av[0]);
+        }
+    }
+    return MOD_CONT;
+}
 
 void anope_cmd_squit(char *servname, char *message)
 {
-    send_cmd(servname, "SQUIT %s :%s", servname, message);
+    send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
 /* PONG */

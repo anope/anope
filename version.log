@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="439"
+VERSION_BUILD="440"
 
 # $Log$
+#
+# BUILD : 1.7.6 (440)
+# BUGS  : 211
+# NOTES : 1. Updated PTLink support, 2. OperServ takes +q/+a on CLEARMODES, 3. fixed a segfault in do_match_wild() 
+# reported by DJ
 #
 # BUILD : 1.7.6 (439)
 # BUGS  : 68, 170, 209

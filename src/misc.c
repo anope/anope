@@ -157,7 +157,7 @@ static int do_match_wild(const char *pattern, const char *str, int docase)
     char c;
     const char *s;
 
-    if (!str || !*str) { 
+    if (!str || !*str || !pattern || !*pattern) { 
 	return 0;
      }
 

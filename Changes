@@ -34,6 +34,8 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+11/11 F OS CLEARMODES now takes +q/+a					  [ #00]
+11/11 F Updated PTlink support			 			  [#211]
 11/06 F Fixed syntax error when NSForceEmail is disabled		  [ #00]
 11/06 F Fixed using "make" under some BSD systems			  [ #00]
 11/06 F Chanserv taking modes more than once.				  [ #68]

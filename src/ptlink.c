@@ -201,7 +201,7 @@ char csmodes[128] = {
     0, 0, 0, 0,
     0,
 
-    'v', 0, 0, 0, 0,
+    'v', 0, 0, 'a', 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
     'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -552,6 +552,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("CREDITS",   anope_event_credits); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("NJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
+    m = createMessage("NNICK",     anope_event_nick); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -731,12 +733,21 @@ void anope_cmd_connect(int servernum)
 /*
   SVINFO %d %d
 	parv[0] = server name
-	parv[1] = minimum supported protocol version (3)
-	parv[2] = current supported protocol version (6)
+	parv[1] = current supported protocol version
+	parv[2] = minimum supported protocol version
+
+  See the ptlink.h for information on PTLINK_TS_CURRENT, and
+  PTLINK_TS_MIN
 */
 void anope_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 3 6 %lu", (unsigned long int) time(NULL));
+#if defined(PTLINK_TS_CURRENT) && defined(PTLINK_TS_MIN)
+    send_cmd(NULL, "SVINFO %d %d %lu", PTLINK_TS_CURRENT, PTLINK_TS_MIN,
+             (unsigned long int) time(NULL));
+#else
+    /* hardwired if the defs some how go missing */
+    send_cmd(NULL, "SVINFO 6 3 %lu", (unsigned long int) time(NULL));
+#endif
 }
 
 /*

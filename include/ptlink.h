@@ -69,6 +69,25 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
+/*
+   The following variables are set to define the TS protocol version
+   that we support. 
+
+   PTLink 6.14 to 6.17  TS CURRENT is 6  and MIN is 3
+   PTlink 6.18          TS CURRENT is 9  and MIN is 3
+   PTLink 6.19 		TS CURRENT is 10 and MIN is 9
+
+   If you are running 6.18 or 6.19 do not touch these values as they will
+   allow you to connect
+
+   If you are running an older version of PTLink, first think about updating
+   your ircd, or changing the TS_CURRENT to 6 to allow services to connect
+*/
+
+#define PTLINK_TS_CURRENT 9
+#define PTLINK_TS_MIN 3
+
+
 #endif
 
 

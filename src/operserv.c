@@ -1678,6 +1678,46 @@ static int do_clearmodes(User * u)
                     free(argv[0]);
                 }
             }
+
+            /* Clear mode Owners */
+            if (ircd->owner) {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+
+                    if (!chan_has_user_status(c, cu->user, CUS_OWNER))
+                        continue;
+
+                    argv[0] = sstrdup(ircd->ownerunset);
+                    argv[1] = sstrdup(cu->user->nick);
+
+                    anope_cmd_mode(s_OperServ, c->name, "%s %s",
+                                   ircd->ownerunset, cu->user->nick);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+
+                    free(argv[0]);
+                }
+            }
+
+            /* Clear mode protected or admins */
+            if (ircd->protect || ircd->admin) {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+
+                    if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
+                        continue;
+
+                    argv[0] = sstrdup("-a");
+                    argv[1] = sstrdup(cu->user->nick);
+
+                    anope_cmd_mode(s_OperServ, c->name, "-a %s",
+                                   cu->user->nick);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+
+                    free(argv[0]);
+                }
+            }
+
+
         }
 
         if (c->mode) {

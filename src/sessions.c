@@ -286,10 +286,10 @@ void del_session(const char *host)
     session = findsession(host);
 
     if (!session) {
-        anope_cmd_global(s_OperServ,
-                         "WARNING: Tried to delete non-existant session: \2%s",
-                         host);
         if (debug) {
+            anope_cmd_global(s_OperServ,
+                             "WARNING: Tried to delete non-existant session: \2%s",
+                             host);
             alog("session: Tried to delete non-existant session: %s",
                  host);
         }

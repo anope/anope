@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="494"
+VERSION_BUILD="495"
 
 # $Log$
+#
+# BUILD : 1.7.6 (495)
+# BUGS  : N/A
+# NOTES : Moved global regarding the deletion of non-existing session toinside the if(debug) as anope will call that function when users ping out etc
+# 
 #
 # BUILD : 1.7.6 (494)
 # BUGS  : N/A

@@ -297,7 +297,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
                 if (bw->type == BW_ANY
                     && ((BSCaseSensitive && strstr(nbuf, bw->word))
-                        || stristr(nbuf, bw->word))) {
+                        || (!BSCaseSensitive && stristr(nbuf, bw->word)))) {
                     mustkick = 1;
                 } else if (bw->type == BW_SINGLE) {
                     int len = strlen(bw->word);
@@ -2361,9 +2361,9 @@ static int do_badwords(User * u)
         }
 
         for (bw = ci->badwords, i = 0; i < ci->bwcount; bw++, i++) {
-            if (bw->word &&
-                ((BSCaseSensitive && (!strcmp(bw->word, word)))
-                 || (!BSCaseSensitive && (!stricmp(bw->word, word))))) {
+            if (bw->word && ((BSCaseSensitive && (!strcmp(bw->word, word)))
+                             || (!BSCaseSensitive
+                                 && (!stricmp(bw->word, word))))) {
                 notice_lang(s_BotServ, u, BOT_BADWORDS_ALREADY_EXISTS,
                             bw->word, ci->name);
                 return MOD_CONT;

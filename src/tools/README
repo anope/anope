@@ -1,4 +1,5 @@
 Anope SMTP Client
+-----------------
 
 	- Provided with Anope is a simple SMTP client which can be used to replace programs like
 SendMail in some cases. 
@@ -17,3 +18,32 @@ generate a log file of what happened when it attempted to connect to the SMTP se
 Credits:
 Orginally written by  Dominick Meglio <codemastr@unrealircd.com>
 Ported to *nix by Trystan Scott Lee <trystan@nomadirc.net>
+
+
+
+Anope DB-Merger
+---------------
+
+	- This program tries to merge two standard anope-1.7.7+ database sets (chanserv, nickserv, botserv
+and memoserv).
+
+	- Put the two db sets in the folder where db-merger is located. The first db set must be in the form
+<name>1.db, e.g. nick1.db or hosts1.db, the second set must be in the form <name>2.db, e.g. nick2.db or
+chan2.db. Then execute the merger and follow the instructions.
+
+Credits:
+Written by Florian Schulze <Certus@anope.org>
+
+
+
+Epona to Anope DB Converter
+---------------------------
+
+	- This program tries to convert epona-1.4.15+ dbs to anope standard dbs. At the moment this only
+affects chanserv databases.
+
+	- Put your epona (chanserv) database in the folder where the epona2anope file is located. Rename this
+db file to chan1.db and run epona2anope, which will create a chan.db file. This new file is anope compatible.
+
+Credits:
+Written by Florian Schulze <Certus@anope.org>

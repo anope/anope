@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="58"
+VERSION_BUILD="59"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (59)
+# BUGS  : 10
+# NOTES : Fixed the second part of bug 10. The mydbgen script should 
+#         behave much better now.
 #
 # BUILD : 1.7.1 (58)
 # BUGS  : 

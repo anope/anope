@@ -86,24 +86,28 @@ while [ -z "$SQLDB" ] ; do
         fi
 done
 
+MYSQLDUMP="mysqldump -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB"
 MYSQLSHOW="mysqlshow -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB"
 MYSQL="mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB"
 
 echo ""
 
-$MYSQLHOW >/dev/null 2>&1
+$MYSQLSHOW | grep -q $SQLDB
 if test "$?" = "1" ; then
-	echo "It appears that database does not exist. Or that you don't have the"
-	echo "correct credentials to access it. Please verify that you have entered"
-	echo "the correct values."
-	exit
+	echo -n "Unable to find databse, creating... "
+	mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS -Bs -e "create database $SQLDB" >/dev/null 2>&1
+	if test "$?" = "0" ; then
+		echo "done!"
+	else
+		echo "failed!"
+		FAILED="$FAILED 'database creation'"
+	fi
 fi
 
-
-res="$($MYSQL -Bs -e "show tables like 'anope_os_core'" | wc -l)"
-if test "$res" = "0" ; then
+$MYSQL -Bs -e "show tables like 'anope_os_core'" | grep -q anope_os_core
+if test "$?" = "1" ; then
 	echo -n "Unable to find Anope schema, creating... "
-	mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $DBFILE
+	$MYSQL < $DBFILE
 	if test "$?" = "0" ; then
 		echo "done!"
 	else
@@ -112,8 +116,8 @@ if test "$res" = "0" ; then
 	fi
 else
 	# Introduced on Anope 1.6.0 -> Table anope_info
-	res="$($MYSQL -Bs -e "show tables like 'anope_info'" | wc -l)"
-	if test "$res" = "0" ; then
+	$MYSQL -Bs -e "show tables like 'anope_info'" | grep -q anope_info
+	if test "$?" = "1" ; then
 		echo -n "Unable to find Anope info table, creating... "
 		echo "CREATE TABLE anope_info (version int, date datetime) TYPE=MyISAM" > $TFILE
 		mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
@@ -132,8 +136,8 @@ else
 	fi
 
 	# Introduced on Anope 1.5.14.5 -> anope_cs_info.memomax
-	res="$($MYSQL -Bs -e "describe anope_cs_info memomax" 2> /dev/null | wc -l)"
-	if test "$res" = "0" ; then
+	$MYSQL -Bs -e "describe anope_cs_info memomax" 2> /dev/null | grep -q memomax
+	if test "$?" = "1" ; then
 		echo -n "Unable to find anope_cs_info.memomax, altering... "
 		echo "ALTER TABLE anope_cs_info ADD memomax smallint unsigned NOT NULL default 0" > $TFILE
 		mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
@@ -147,8 +151,8 @@ else
 	fi
 
 	# Introduced on Anope 1.5.14.5 -> anope_cs_info.ttb
-	res="$($MYSQL -Bs -e "describe anope_cs_info ttb" | wc -l)"
-	if test "$res" = "0" ; then
+	$MYSQL -Bs -e "describe anope_cs_info ttb" 2> /dev/null | grep -q ttb
+	if test "$?" = "1" ; then
 		echo -n "Unable to find anope_cs_info.ttb, altering... "
 		echo "ALTER TABLE anope_cs_info ADD ttb smallint NOT NULL default 0" > $TFILE
 		mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1

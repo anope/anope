@@ -1,418 +1,397 @@
-           Frequently Asked Questions (FAQ) concerning Anope
-           =================================================
+Frequently Asked Questions (FAQ) concerning Anope
+-------------------------------------------------
 
-Index:
+List of Questions
+-----------------
 
- 1. What is Anope?
+1) What is Anope?
 
- 2. Where can I find Anope?
+2) Where can I find Anope?
 
- 3. Does Anope run under Windows?
+3) Does Anope run under Windows?
 
- 4. Can I send you questions without reading the FAQ, INSTALL or 
+4) Can I send you questions without reading the FAQ, INSTALL or 
     README files?
 
- 5. When I run "make", I get an error message like "missing separator",
+5) When I run "make", I get an error message like "missing separator",
    "Unassociated shell command", "Unexpected end of line seen", etc.
 
- 6. I get an error like "Makefile.inc not found".
+6) I get an error like "Makefile.inc not found".
 
- 7. I typed "./services" at the command line, but nothing happened!
+7) I typed "./services" at the command line, but nothing happened!
 
- 8. I need support for the XYZ protocol.
+8) I need support for the XYZ protocol.
 
- 9. Whenever I start Anope, I get a message on my IRC server saying
-    "connection refused" or something similar, and Anope gives an error
-    message from the server saying "Closing Link: ...".
+9) Whenever I start Anope, I get a message on my IRC server saying
+   "connection refused" or something similar, and Anope gives an error
+   message from the server saying "Closing Link: ...".
 
-10. My IRC server is giving me messages like "Connection to
+10) My IRC server is giving me messages like "Connection to
     services.whatever.net[127.0.0.1] activated" and then "Access denied --
     no N line".  Why?
 
-11. When I say "/connect services.*", it doesn't work!
+11) When I say "/connect services.*", it doesn't work!
 
-12. Anope complains in the logfile about being unable to load the
+12) Anope complains in the logfile about being unable to load the
     default language.
 
-13. Anope always dies after about five minutes, saying "FATAL ERROR!
+13) Anope always dies after about five minutes, saying "FATAL ERROR!
     Can't back up nick.db".
 
-14. Anope starts up okay, but if I try to register a nickname, it comes
+14) Anope starts up okay, but if I try to register a nickname, it comes
     back with "Sorry, registration failed."
 
-15. Anope crashed with a segmentation fault.
+15) Anope crashed with a segmentation fault.
 
-16. Anope's channel mode setting doesn't work.  I can't set modes with
+16) Anope's channel mode setting doesn't work.  I can't set modes with
     OperServ, and every time ChanServ tries to set a mode, my server
     reverses the change.
 
-17. Using the OperServ JUPE command results in server messages like
+17) Using the OperServ JUPE command results in server messages like
     "Server juped.server introduced by non-hub server services.my.net".
 
-18. I can't use the ADMIN command to add Services admins--it tells me
+18) I can't use the ADMIN command to add Services admins--it tells me
     "Permission denied."
 
-19. When I add an AKILL, the users matching it don't get killed.
+19) When I add an AKILL, the users matching it don't get killed.
 
-20. Anope reports (via /stats u or /msg OperServ STATS) a different
+20) Anope reports (via /stats u or /msg OperServ STATS) a different
     number of users online than I get from doing /lusers.
 
-21. Anope ignored the SET SUCCESSOR setting and deleted a channel when
+21) Anope ignored the SET SUCCESSOR setting and deleted a channel when
     the founder expired.
 
-22. Trying to use OperServ gives me "Access denied", but my nick is in the
+22) Trying to use OperServ gives me "Access denied", but my nick is in the
     ServicesRoot directive and is registered, and I've identified for my
     nick.
 
-23. Anope spricht kein Deutsch!, etc.  (Anope doesn't speak my
+23) Anope spricht kein Deutsch!, etc.  (Anope doesn't speak my
     language!)
 
-24. I selected a language other than English, but sometimes Anope sends
+24) I selected a language other than English, but sometimes Anope sends
     responses in English instead.
 
-25. I've found a bug that's not mentioned here or in the
+25) I've found a bug that's not mentioned here or in the
     BUGS files.  What should I do?
 
-26. Your Services program doesn't do XYZ like DALnet Services.  What's
+26) Your Services program doesn't do XYZ like DALnet Services.  What's
     wrong?
 
-27. I've got a great new idea for Anope.  Do you want it?
+27) I've got a great new idea for Anope.  Do you want it?
 
-28. Examples of features I have been asked about and why we won't add (or
+28) Examples of features I have been asked about and why we won't add (or
       haven't yet added) them--so don't ask us about them.
       
-29. How do I add bots to BotServ?
+29) How do I add bots to BotServ?
 
-30. When I used the OperServ RAW command, Anope and/or my network
+30) When I used the OperServ RAW command, Anope and/or my network
     crashed, or did weird things! Please fix this bug!
 
-31. I would like to have the list of the different RAW on OperServ
+31) I would like to have the list of the different RAW on OperServ
 
-32. I can't get /OS UMODES and /OS SVSNICK do not work!
+32) I can't get /OS UMODES and /OS SVSNICK do not work!
 
-33. What is a Super-Admin? How does it work? Why might it not work?
+33) What is a Super-Admin? How does it work? Why might it not work?
 
-34. How to auto voice all those whom join my #channel?
-
----------------------------------------------------------------------------
-
-1. What is Anope?
-
-	Anope is a set of services for IRC networks.  See the README
-	file for more information. And in case you were wondering, 
-	Anope is Epona spelt backwards :)
+34) How to auto voice all those whom join my #channel?
 
 
-2. Where can I find Anope?
+List of answers
+---------------
 
-	The latest version can always be found at the official Anope
-	distribution site:
+1) What is Anope?
 
-	http://www.anope.org/
+    Anope is a set of services for IRC networks.  See the README
+    file for more information. And in case you were wondering, 
+    Anope is Epona spelt backwards :)
 
-	New version announcements can also be found at http://anope.zero.org/
-	in the Announcement section.
+2) Where can I find Anope?
 
+    The latest version can always be found at the official Anope
+    distribution site:
 
-3. Does Anope run under Windows?
+        * http://www.anope.org/
 
-	For more information visit http://windows.anope.org on how to obtain
-    the windows version of Anope.
+    New version announcements can also be found at http://www.anope.org/
+    in the main page.
 
-4. Can I send you questions without reading the FAQ, INSTALL or README 
-   files?
+3) Does Anope run under Windows?
 
-	No. If you don't read those files, your messages will most probably
-	be ignored. We don't mean to be rude, but if we took the time
-	to write down some documentation, we'd expect you to take some
-	time to read it.
+    Yes. For more information visit http://windows.anope.org on how to
+    obtain the windows version of Anope.
 
+4) Can I send you questions without reading the FAQ, INSTALL or README files?
 
-5. When I run "make", I get an error message like "missing separator",
-   "Unassociated shell command", "Unexpected end of line seen", etc.
+    No. If you don't read those files, your messages will most probably
+    be ignored. We don't mean to be rude, but if we took the time
+    to write down some documentation, we'd expect you to take some
+    time to read it.
 
-	Your make program isn't compatible with the Makefile for Anope.
-	The Makefile was designed to work with GNU make, and as such may
-	not work on other systems' "make" programs.  If you get an error
-	from "make", obtain GNU make from ftp://prep.ai.mit.edu/pub/gnu/
-	(or wherever you prefer) and use it instead of your system's
-	default "make".  Note that GNU make may already be installed on
-	your system; try using the command "gmake" instead of "make".
+5) When I run "make", I get an error message like "missing separator",
+  "Unassociated shell command", "Unexpected end of line seen", etc.
 
-	The make programs bundled with SunOS/Solaris and FreeBSD have been
-	reported not to work; you will need to use GNU make on these
-	systems.
+    Your make program isn't compatible with the Makefile for Anope.
+    The Makefile was designed to work with GNU make, and as such may
+    not work on other systems' "make" programs.  If you get an error
+    from "make", obtain GNU make from ftp://prep.ai.mit.edu/pub/gnu/
+    (or wherever you prefer) and use it instead of your system's
+    default "make".  Note that GNU make may already be installed on
+    your system; try using the command "gmake" instead of "make".
+    
+    The make programs bundled with SunOS/Solaris and FreeBSD have been
+    reported not to work; you will need to use GNU make on these
+    systems.
 
-6. I get an error like "Makefile.inc not found".
+6) I get an error like "Makefile.inc not found".
 
-	You forgot to run the configure script first.  See the INSTALL file
-	for compilation instructions.
+    You forgot to run the configure script first.  See the INSTALL file
+    for compilation instructions.
 
+7) I typed "./services" at the command line, but nothing happened!
 
-7. I typed "./services" at the command line, but nothing happened!
+    Anope puts itself in the background when it starts, so you get
+    your shell prompt right back.  Meanwhile, Anope will continue
+    setting up, then connect to the IRC server specified in
+    services.conf (or on the command line).  If it doesn't connect, you
+    probably specified the wrong server type when running the configure
+    script.  (Also make sure that you are actually running one of the
+    supported servers.  There are a gazillion different variations on
+    the basic IRC protocol out there, and I have neither the time nor
+    the desire to add support for them.)
+    
+    The recommended server, under which Epona (the original code base
+    used by Anope) was developed, is Bahamut. DreamForge 4.6.7 will also 
+    work fine, but it's a bit obsolete nowadays. Derivatives of Bahamut
+    and DreamForge may also work, if they don't change the server<->server 
+    protocol too much; contact their authors for more information.
+    Most people, though, are running Anope with UnrealIRCd, UltimateIRCd
+    or Bahamut.
+    
+    As always, you can check the log file (services.log by default) for
+    error messages.
 
-	Anope puts itself in the background when it starts, so you get
-	your shell prompt right back.  Meanwhile, Anope will continue
-	setting up, then connect to the IRC server specified in
-	services.conf (or on the command line).  If it doesn't connect, you
-	probably specified the wrong server type when running the configure
-	script.  (Also make sure that you are actually running one of the
-	supported servers.  There are a gazillion different variations on
-	the basic IRC protocol out there, and I have neither the time nor
-	the desire to add support for them.)
+8) I need support for the XYZ protocol.
 
-	The recommended server, under which Epona (the original code base
-	used by Anope) was developed, is Bahamut. DreamForge 4.6.7 will also 
-	work fine, but it's a bit obsolete nowadays. Derivatives of Bahamut
-	and DreamForge may also work, if they don't change the server<->server 
-	protocol too much; contact their authors for more information.
-	Most people, though, are running Anope with UnrealIRCd, UltimateIRCd
-	or Bahamut.
+    Hang in there! We are working on making Anope protocol independent.
+    It should show up sometime soon... more details to follow.
 
-	As always, you can check the log file (services.log by default) for
-	error messages.
+9) Whenever I start Anope, I get a message on my IRC server saying
+   "connection refused" or something similar, and Anope gives an error
+   message from the server saying "Closing Link: ...".
 
+    See section 3 of the INSTALL file.
 
-8. I need support for the XYZ protocol.
-
-	Hang in there! We are working on making Anope protocol independent.
-	It should show up sometime soon... more details to follow.
-
-
-9. Whenever I start Anope, I get a message on my IRC server saying
-    "connection refused" or something similar, and Anope gives an error
-    message from the server saying "Closing Link: ...".
-
-	See section 3 of the INSTALL file.
-
-
-10. My IRC server is giving me messages like "Connection to
+10) My IRC server is giving me messages like "Connection to
     services.whatever.net[127.0.0.1] activated" and then "Access denied --
     no N line".  Why?
 
-	This is typically caused by including a port number in the C:line
-	for services, which tells your server to try to autoconnect to it
-	(depending on the class (Y:line) settings).  This is not what you
-	want, because Anope will connect to the server itself, but does
-	not listen for servers to connect to it.  The solution is to remove
-	the port number from the C:line.
+    This is typically caused by including a port number in the C:line
+    for services, which tells your server to try to autoconnect to it
+    (depending on the class (Y:line) settings).  This is not what you
+    want, because Anope will connect to the server itself, but does
+    not listen for servers to connect to it.  The solution is to remove
+    the port number from the C:line.
 
+11) When I say "/connect services.*", it doesn't work!
 
-11. When I say "/connect services.*", it doesn't work!
+    Of course not.  RTFM (Read The Fine Manual), and see the previous
+    answer.
 
-	Of course not.  RTFM (Read The Fine Manual), and see the previous
-	answer.
-
-
-12. Anope complains in the logfile about being unable to load the
+12) Anope complains in the logfile about being unable to load the
     default language.
 
-	You forgot to run "make install".
+    You forgot to run "make install".
 
-13. Anope always dies after about five minutes, saying "FATAL ERROR!
+13) Anope always dies after about five minutes, saying "FATAL ERROR!
     Can't back up nick.db".
 
-	Make sure that the user Anope runs as has write access to the
-	data directory, and that the data directory actually exists (the
-	latter shouldn't be a problem if you ran the configure script).
-	This means Anope needs write and execute permission on the data
-	directory itself and execute permission on every parent directory
-	of the data directory.
+    Make sure that the user Anope runs as has write access to the
+    data directory, and that the data directory actually exists (the
+    latter shouldn't be a problem if you ran the configure script).
+    This means Anope needs write and execute permission on the data
+    directory itself and execute permission on every parent directory
+    of the data directory.
 
-
-14. Anope starts up okay, but if I try to register a nickname, it comes
+14) Anope starts up okay, but if I try to register a nickname, it comes
     back with "Sorry, registration failed."
 
-	Make sure you've selected the correct IRC server type in the
-	configure script; see question 9 for details.
+    Make sure you've selected the correct IRC server type in the
+    configure script; see question 9 for details.
 
+15) Anope crashed with a segmentation fault.
 
-15. Anope crashed with a segmentation fault.
+    See if you can reproduce this by doing a certain sequence of
+    things.  If so, please report it to us (see part 6 of README file).  If
+    not, you're probably out of luck; if you like, you can report it to
+    us anyway, but chances are it won't get fixed if we don't have
+    instructions on reproducing it.  If you do have such a problem, you
+    may find the crontab utility useful for dealing with it.
+    
+    Also, see the DumpCore directive in the configuration file. It allows
+    Anope to dump its core whenever it's segfaulting, usually calling it
+    core and placing it into Anope's main directory.
+    Open up gdb by issuing the following command at your shell:
 
-	See if you can reproduce this by doing a certain sequence of
-	things.  If so, please report it to us (see part 6 of README file).  If
-	not, you're probably out of luck; if you like, you can report it to
-	us anyway, but chances are it won't get fixed if we don't have
-	instructions on reproducing it.  If you do have such a problem, you
-	may find the crontab utility useful for dealing with it.
+        * gdb services core
 
-	Also, see the DumpCore directive in the configuration file. It allows
-	Anope to dump its core whenever it's segfaulting, usually calling it
-	core and placing it into Anope's main directory.
-	Open up gdb by issuing the following command at your shell:
-	   gdb services core
-	(of course replacing 'core' with the name of the core if different)
-	and type 'bt' at the gdb prompt. After that, send us the output you
-	got and keep the core file in a safe place, in case we need it to
-	dig deeper into the problem.
+    (of course replacing 'core' with the name of the core if different)
+    and type 'bt' at the gdb prompt. After that, send us the output you
+    got and keep the core file in a safe place, in case we need it to
+    dig deeper into the problem.
 
-16. Anope's channel mode setting doesn't work.  I can't set modes with
+16) Anope's channel mode setting doesn't work.  I can't set modes with
     OperServ, and every time ChanServ tries to set a mode, my server
     reverses the change.
 
-	Make sure EVERY servers on your network has a U: line for Services in
-	ircd.conf, for example:
+    Make sure EVERY servers on your network has a U: line for Services in
+    ircd.conf, for example:
 
-	U:services.whatever.net:*:*
+        U:services.whatever.net:*:*
 
-
-17. Using the OperServ JUPE command results in server messages like
+17) Using the OperServ JUPE command results in server messages like
     "Server juped.server introduced by non-hub server services.my.net".
 
-	Services' uplink must have an H: line for Services in the
-	ircd.conf file, which looks something like:
+    Services' uplink must have an H: line for Services in the
+    ircd.conf file, which looks something like:
 
-	H:*::services.whatever.net
+        H:*::services.whatever.net
 
-
-18. I can't use the ADMIN command to add Services admins--it tells me
+18) I can't use the ADMIN command to add Services admins, it tells me
     "Permission denied."
 
-	Did you define yourself as the Services root?  You need to insert
-	your nickname in the ServicesRoot directive in services.conf.
+    Did you define yourself as the Services root?  You need to insert
+    your nickname in the ServicesRoot directive in services.conf.
+    Also, you must be a global IRC Operator and your nickname must be
+    registered and properly indentified with NickServ.
 
+19) When I add an AKILL, the users matching it don't get killed.
 
-19. When I add an AKILL, the users matching it don't get killed.
+    Use the AkillOnAdd configuration directive.
 
-	Use the AkillOnAdd configuration directive.
-
-
-20. Anope reports (via /stats u or /msg OperServ STATS) a different
+20) Anope reports (via /stats u or /msg OperServ STATS) a different
     number of users online than I get from doing /lusers.
 
-	Anope doesn't count its own pseudo-clients (NickServ, ChanServ,
-	etc.) in its user count.
+    Anope doesn't count its own pseudo-clients (NickServ, ChanServ,
+    etc.) in its user count.
 
-
-21. Anope ignored the SET SUCCESSOR setting and deleted a channel when
+21) Anope ignored the SET SUCCESSOR setting and deleted a channel when
     the founder expired.
 
-	Normally, this is because the successor had too many channels
-	registered; in this case, you will see an entry in the log file
-	like the following:
+    Normally, this is because the successor had too many channels
+    registered; in this case, you will see an entry in the log file
+    like the following:
 
-	[date] Successor (SuccessorNick) of channel #somechannel owns too
-	       many channels, deleting channel #somechannel
+        [date] Successor (SuccessorNick) of channel #somechannel owns too
+              many channels, deleting channel #somechannel
 
-	If you don't get a message like this or you can verify that the
-	successor wasn't running into the channel limit, please report it
-	using the bug-reporting procedure below (see section 6 of the 
-	README file).
+    If you don't get a message like this or you can verify that the
+    successor wasn't running into the channel limit, please report it
+    using the bug-reporting procedure below (see section 6 of the 
+    README file).
 
-
-22. Trying to use OperServ gives me "Access denied", but my nick is in the
+22) Trying to use OperServ gives me "Access denied", but my nick is in the
     ServicesRoot directive and is registered, and I've identified for my
     nick.
 
-	You need to be opered (i.e. user mode +o) to access OperServ.
+    You need to be opered (i.e. user mode +o) to access OperServ.
 
-
-23. Anope spricht kein Deutsch!, etc.  (Anope doesn't speak my
+23) Anope spricht kein Deutsch!, etc.  (Anope doesn't speak my
     language!)
 
-	See section 5 of the README file.
+    See section 5 of the README file.
 
+24) I selected a language other than English, but sometimes Anope sends
+    responses in English instead.
 
-24. I selected a language other than English, but sometimes Anope sends
-     responses in English instead.
+    Some language files are not complete--in other words, they don't
+    have a translation of every message Anope uses, but only some of
+    them.  In this case, the missing messages will be displayed in
+    English.  You can either wait for the primary translator to provide
+    us with a translation, or do the translation yourself and send us
+    the messages translated into your language.
 
-	Some language files are not complete--in other words, they don't
-	have a translation of every message Anope uses, but only some of
-	them.  In this case, the missing messages will be displayed in
-	English.  You can either wait for the primary translator to provide
-	us with a translation, or do the translation yourself and send us
-	the messages translated into your language.
-
-
-25. I've found a bug that's not mentioned here or in the README or
+25) I've found a bug that's not mentioned here or in the README or
     BUGS files.  What should I do?
 
-	See section 6 of the README file.
+    See section 6 of the README file.
 
-
-26. Your Services program doesn't do XYZ like DALnet (or other) Services.  
+26) Your Services program doesn't do XYZ like DALnet (or other) Services.  
     What's wrong?
 
-	Nothing is wrong, except your expectations.  Anope is a
-	completely different program from that used on DALnet; they are
-	similar in concept only.
+    Nothing is wrong, except your expectations.  Anope is a
+    completely different program from that used on DALnet; they are
+    similar in concept only.
 
+27) I've got a great new idea for Services.  Do you want it?
 
-27. I've got a great new idea for Services.  Do you want it?
+    We are always interested in hearing new ideas.  HOWEVER, do not
+    expect your proposal to be in the next Anope release for sure.
+    As a rule, we usually don't add anything that can be equivalently
+    done by other means, or that we consider totally useless; see below
+    for examples of things we don't plan to add.
 
-	We are always interested in hearing new ideas.  HOWEVER, do not
-	expect your proposal to be in the next Anope release for sure.
-	As a rule, we usually don't add anything that can be equivalently
-	done by other means, or that we consider totally useless; see below
-	for examples of things we don't plan to add.
+    Our general intent is for Anope to provide as much functionality
+    as possible--while staying as lean as possible.  So features which 
+    are arguably beneficial will tend to be added, while features of
+    limited or no benefit or which can be equally provided by something
+    else already in use will tend to be passed over.
 
-	Our general intent is for Anope to provide as much functionality
-	as possible--while staying as lean as possible.  So features which 
-	are arguably beneficial will tend to be added, while features of
-	limited or no benefit or which can be equally provided by something
-	else already in use will tend to be passed over.
+    If you'd like to give us your idea, you can go to our website at
+    http://www.anope.org/ and add it on our online Forum, in the Feature
+    Requests section.
 
-	If you'd like to give us your idea, you can go to our website at
-	http://www.anope.org/ and add it as a Feature Request on our Bug
-	Tracking System. Or, if unsure, you can discuss it on our online
-	Forum, in the Ideas and Suggestions section.
+28) Examples of features we have been asked about and why we won't add (or
+    haven't yet added) them, so don't ask us about them:
 
-28. Examples of features we have been asked about and why we won't add (or
-    haven't yet added) them--so don't ask us about them:
+    * An option to make ChanServ stay in some/all registered channels:
+      we see absolutely no necessity for this feature, since BotServ
+      already does this anyway.
 
-	- An option to make ChanServ stay in some/all registered channels:
-	  we see absolutely no necessity for this feature, since BotServ
-	  already does this anyway.
+    * A "current time" field in NickServ and ChanServ INFO displays:
+      Most people have clocks of some sort either on their computer
+      screens or on their walls (or both), and all IRC servers, as well
+      as Services, have a command to return the server's current time.
+      Thus a current-time field in INFO displays would simply take up
+      extra space for no reason.
 
-	- A "current time" field in NickServ and ChanServ INFO displays:
-	  Most people have clocks of some sort either on their computer
-	  screens or on their walls (or both), and all IRC servers, as well
-	  as Services, have a command to return the server's current time.
-	  Thus a current-time field in INFO displays would simply take up
-	  extra space for no reason.
-	
+29) How do I add bots to BotServ?
 
-29. How do I add bots to BotServ?
+    Read /msg BotServ HELP and /msg BotServ HELP BOT.
 
-	Read /msg BotServ HELP and /msg BotServ HELP BOT.
-
-30. When I used the OperServ RAW command, Anope and/or my network
+30) When I used the OperServ RAW command, Anope and/or my network
     crashed, or did weird things! Please fix this bug!
 
-	"That's not a bug, it's a feature."
-	
-	Have you ever typed /msg OperServ HELP RAW? It's clearly stated
-	there that this command is dangerous and that its use may result
-	in very bad things.
-	
-	And that's why this command has been disabled by default. If you
-	enabled and used it, YOU'RE ON YOUR OWN. All help requests will 
-	be ignored, even if the problem happens not immediately.
+    "That's not a bug, it's a feature."
 
+    Have you ever typed /msg OperServ HELP RAW? It's clearly stated
+    there that this command is dangerous and that its use may result
+    in very bad things.
 
-31. I would like to have the list of the different RAW on OperServ
+    And that's why this command has been disabled by default. If you
+    enabled and used it, YOU'RE ON YOUR OWN. All help requests will 
+    be ignored, even if the problem happens not immediately.
 
-	If you have to ask, you should not be messing with RAW :)
+31) I would like to have the list of the different RAW on OperServ
 
+    If you have to ask, you should not be messing with RAW :)
 
-32. I can't get /OS UMODES and /OS SVSNICK do not work!
+32) I can't get /OS UMODES and /OS SVSNICK do not work!
 
-	Make sure you the USE_OSSVS is defined on config.h. Since these
-	are very controversial commands, they are turned off by default.
-	Then, make clean ; make ; make install
+    Make sure you the USE_OSSVS is defined on config.h. Since these
+    are very controversial commands, they are turned off by default.
+    Then, make clean ; make ; make install
 
+33) What is a Super-Admin? How does it work? Why might it not work?
 
-33. What is a Super-Admin? How does it work? Why might it not work?
+    Super-Admin's have extra privileges, including being founder on
+    all channels. It must be activated on a per user basis and is
+    only available to Services Admins and Services Roots.
+    It is set using OperServ and is not persistent.
+    It only works if SuperAdmin is not commented in the services
+    configuration file. This is commented by default.
+    Read /msg OperServ HELP SET SUPERADMIN for further help.
 
-	Super-Admin's have extra privileges, including being founder on
-	all channels. It must be activated on a per user basis and is
-	only available to Services Admins and Services Roots.
-	It is set using OperServ and is not persistent.
-	It only works if SuperAdmin is not commented in the services
-	configuration file. This is commented by default.
-	Read /msg OperServ HELP SET SUPERADMIN for further help.
-
-34. How to auto voice all those whom join my #channel?
+34) How to auto voice all those whom join my #channel?
 
     /cs set #channel secure off
     /cs set #channel xop off

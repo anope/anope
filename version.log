@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="622"
+VERSION_BUILD="623"
 
 # $Log$
+#
+# BUILD : 1.7.8 (623)
+# BUGS  : 
+# NOTES : FAQ update (thx DrS)
 #
 # BUILD : 1.7.8 (622)
 # BUGS  : 317

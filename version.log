@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="524"
+VERSION_BUILD="525"
 
 # $Log$
+#
+# BUILD : 1.7.6 (525)
+# BUGS  : 
+# NOTES : Updated nl.l a bit
 #
 # BUILD : 1.7.6 (524)
 # BUGS  : 

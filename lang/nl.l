@@ -330,7 +330,7 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Nickname %s is geregistreerd onder jouw account: %s
 NICK_REGISTERED_NO_MASK
-	Nickname %s registered.
+	Nickname %s is geregistreerd.
 NICK_PASSWORD_IS
 	Je wachtwoord is %s - onthoudt dit voor later gebruik.
 
@@ -2404,7 +2404,7 @@ OPER_ADMIN_LIST_FORMAT
 OPER_ADMIN_CLEAR
 	Services admin lijst is leeggemaakt.
 OPER_ADMIN_MOVED
-	%s has been moved to Services Administrators list.
+	%s is verplaatst naar de Services admin lijst.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2437,7 +2437,7 @@ OPER_OPER_LIST_FORMAT
 OPER_OPER_CLEAR
 	Services operator lijst is leeggemaakt.
 OPER_OPER_MOVED
-	%s has been moved to Services Operators list.
+	%s is verplaatst naar de Services operator lijst.
 
 # AKILL responses
 OPER_AKILL_SYNTAX
@@ -2646,17 +2646,17 @@ OPER_SET_NOEXPIRE_ERROR
 OPER_SET_UNKNOWN_OPTION
 	Onbekende optie %s.
 OPER_SET_SQL_ON
-	SQL code will be used.
+	SQL code wordt gebruikt.
 OPER_SET_SQL_OFF
-	SQL code will not be used.
+	SQL code wordt niet gebruikt.
 OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
+	Instelling voor SQL moet ON of OFF zijn.
 OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
+	Fout tijdens het initialiseren van SQL. Controleer de logs om dit op te lossen.
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s is ingeschakeld
 OPER_SET_LIST_OPTION_OFF
-	%s is disabled
+	%s is uitgeschakeld
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2908,9 +2908,9 @@ OPER_EXCEPTION_INVALID_LIMIT
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Ongeldige hostmask. Alleen echte hostmasks zijn geldig als uitzondering omdat deze niet worden vergeleken met nicks of usernames.
 OPER_EXCEPTION_EXISTS
-	%s already exists on the EXCEPTION list.
+	%s bestaat al op de uitzonderingenlijst.
 OPER_EXCEPTION_CHANGED
-	Exception for %s has been updated to %d.
+	Uitzondering voor %s is veranderd in %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX
@@ -5553,16 +5553,16 @@ OPER_HELP_SET_SUPERADMIN
 	niet meer nodig is.
 
 OPER_HELP_SET_SQL
-	Syntax: SET SQL {ON | OFF}
-
-	Setting this will toggle Anope's from usage of SQL, this should
-	be used to disable and enable SQL should your SQL server go down
-	while services are running.
+	Gebruik: SET SQL {ON | OFF}
+	
+	Deze instelling schakelt Anope's SQL gebruik. Zo kan al het SQL
+	verkeer worden uitgezet als de SQL server onbereikbaar wordt
+	terwijl services nog draaien.
 
 OPER_HELP_SET_LIST
-	Syntax: SET LIST
-
-	Display the various OperServ settings
+	Gebruik: SET LIST
+	
+	Geef de verschillende OperServ instellingen weer.
 
 OPER_HELP_NOOP
 	Gebruik: NOOP SET server
@@ -6273,5 +6273,5 @@ OPER_UMODE_UNSUPPORTED
 	Sorry, UMODE is niet beschikbaar op dit netwerk.
 
 OPER_SUPER_ADMIN_NOT_ENABLED
-	SuperAdmin setting not enabled in services.conf
+	SuperAdmin instelling is niet ingeschakeld in services.conf
 

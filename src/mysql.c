@@ -64,7 +64,7 @@ int db_mysql_init()
      * If missing disable MySQL to avoid any problems.   
      */
 
-    if (!MysqlName || !MysqlUser) {
+    if ((do_mysql) && (!MysqlName || !MysqlUser)) {
         do_mysql = 0;
         alog("MySQL Error: Set all required configuration options.");
     }

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="349"
+VERSION_BUILD="350"
 
 # $Log$
+#
+# BUILD : 1.7.5 (350)
+# BUGS  : 
+# NOTES : Changed mysql init checks so they are only done if mysql is 
+# enabled. Many Thanks to DrStein for the patch.
 #
 # BUILD : 1.7.5 (349)
 # BUGS  : 

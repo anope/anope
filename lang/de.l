@@ -87,7 +87,6 @@ LANG_NAME
 # This is used as the format string for strftime() for a date and time
 # together.
 STRFTIME_DATE_TIME_FORMAT
-#	%b %d %H:%M:%S %Y %Z
 	%d.%b.%Y, %H:%M:%S %Z
 
 # This is used as the format string for strftime() for a date alone in long
@@ -1792,9 +1791,6 @@ MEMO_MAIL_TEXT2
 	Du hast gerade eine neue Memo von %s erhalten. Dies ist Memo Nummer %d.
 MEMO_MAIL_TEXT3
 	Memo Text:
-MEMO_NO_RSEND_SELF
-	Das Erhalten von Empfangsbestätigungen ist nur beim Senden
-	einer Memo an andere User möglich.
 
 ###########################################################################
 #
@@ -1836,6 +1832,17 @@ MEMO_CHECK_NO_MEMO
 ###########################################################################
 #
 # BotServ messages  ## 18.10. 2004 ##
+#
+###########################################################################
+	
+# Standard responses
+MEMO_NO_RSEND_SELF
+	Das Erhalten von Empfangsbestätigungen ist nur beim Senden
+	einer Memo an andere User möglich.
+
+###########################################################################
+#
+# BotServ messages
 #
 ###########################################################################
 	

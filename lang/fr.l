@@ -1840,6 +1840,16 @@ MEMO_CHECK_NO_MEMO
 ###########################################################################
 	
 # Standard responses
+MEMO_NO_RSEND_SELF
+	You can not request a receipt when sending a memo to yourself.
+
+###########################################################################
+#
+# BotServ messages
+#
+###########################################################################
+	
+# Standard responses
 BOT_DOES_NOT_EXIST
 	Le bot %s n'existe pas.
 BOT_NOT_ASSIGNED

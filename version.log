@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="639"
+VERSION_BUILD="640"
 
 # $Log$
+#
+# BUILD : 1.7.8 (640)
+# BUGS  : 323
+# NOTES : Fixed /ns update setting +a if you had rights to get +q but already had it
 #
 # BUILD : 1.7.8 (639)
 # BUGS  : 

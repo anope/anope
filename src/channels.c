@@ -22,7 +22,6 @@ Channel *chanlist[1024];
 void add_ban(Channel * chan, char *mask);
 void add_exception(Channel * chan, char *mask);
 void add_invite(Channel * chan, char *mask);
-void chan_set_correct_modes(User * user, Channel * c);
 void chan_adduser2(User * user, Channel * c);
 Channel *chan_create(char *chan);
 void chan_delete(Channel * c);

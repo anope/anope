@@ -2659,35 +2659,11 @@ static int do_setmodes(User * u)
 {
     struct u_chanlist *uc;
     Channel *c;
-    char *chan;
 
     /* Walk users current channels */
     for (uc = u->chans; uc; uc = uc->next) {
-        if ((c = uc->chan)) {
-            chan = c->name;
-            if (ircd->owner && should_mode_change(uc->status, CUS_OWNER)
-                && check_should_owner(u, chan)) {
-                chan_set_user_status(c, u, CUS_OWNER);
-            } else if (ircd->protect
-                       && should_mode_change(uc->status, CUS_PROTECT)
-                       && check_should_protect(u, chan)) {
-                chan_set_user_status(c, u, CUS_PROTECT);
-            } else if (ircd->admin
-                       && should_mode_change(uc->status, CUS_PROTECT)
-                       && check_should_protect(u, chan)) {
-                chan_set_user_status(c, u, CUS_PROTECT);
-            } else if (should_mode_change(uc->status, CUS_OP)
-                       && check_should_op(u, chan)) {
-                chan_set_user_status(c, u, CUS_OP);
-            } else if (ircd->halfop
-                       && should_mode_change(uc->status, CUS_HALFOP)
-                       && check_should_halfop(u, chan)) {
-                chan_set_user_status(c, u, CUS_HALFOP);
-            } else if (should_mode_change(uc->status, CUS_VOICE)
-                       && check_should_voice(u, chan)) {
-                chan_set_user_status(c, u, CUS_VOICE);
-            }
-        }
+        if ((c = uc->chan))
+            chan_set_correct_modes(u, c);
     }
     return MOD_CONT;
 }

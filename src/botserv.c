@@ -191,7 +191,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
     int16 cstatus = 0;
     char *cmd, *buf;
     UserData *ud;
-    
+
     buf = sstrdup(buff);
 
     if (!u) {

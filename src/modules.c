@@ -1839,7 +1839,9 @@ char *moduleGetData(ModuleData * md[], char *key)
     ModuleData *lastHash = NULL;
     ModuleDataItem *itemCurrent = NULL;
     index = CMD_HASH(mod_name);
-    if(!md) { return NULL; }
+    if (!md) {
+        return NULL;
+    }
     for (current = md[index]; current; current = current->next) {
         if (stricmp(current->moduleName, mod_name) == 0)
             lastHash = current;

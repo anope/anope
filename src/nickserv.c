@@ -1518,7 +1518,7 @@ static int delcore(NickCore * nc)
         free(nc->greet);
     if (nc->url)
         free(nc->url);
-    
+
     if (nc->access) {
         for (i = 0; i < nc->accesscount; i++) {
             if (nc->access[i])

@@ -428,7 +428,7 @@ struct botinfo_ {
 /* Access levels for users. */
 typedef struct {
     uint16 in_use;	/* 1 if this entry is in use, else 0 */
-    uint16 level;
+    int16 level;
     NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
     time_t last_seen;
 } ChanAccess;

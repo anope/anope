@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="482"
+VERSION_BUILD="483"
 
 # $Log$
+#
+# BUILD : 1.7.6 (483)
+# BUGS  : 240
+# NOTES : 1. ChanServ ACCESS wrong when dealing negative numbers, 2. make strict under FreeBSD works again
 #
 # BUILD : 1.7.6 (482)
 # BUGS  : N/A

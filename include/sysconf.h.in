@@ -220,7 +220,7 @@ int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 FILE *popen(const char *command, const char *type);
 int pclose(FILE *stream);
 FILE *fdopen(int fildes, const char *mode);
-int fileno(FILE *stream);
+
 int ftruncate(int fd, off_t length);
 
 #ifdef HAVE_STRSIGNAL

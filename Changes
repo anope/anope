@@ -30,6 +30,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/15 F Fixed OS JUPE					                  [#147]
 10/14 F Fixed NickServ Logout				                  [#180]
 10/14 F Fixed HelpChannel with Unreal			                  [#180]
 10/09 F Bug in MySQL debug, possibly causing segfaults.                   [#149]
@@ -57,6 +58,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 Provided by DrStein <gacevedo@anope.org> - 2004
 10/05 A CS/NS INFO shows the expire time.                                 [ #00]
 10/05 A NS GLIST shows the expire time.                                   [ #00]
+10/15 F More Check and trap for forbidden nicks on HS.                    [#183]
 10/07 F NEWS reordering issue						  [ #00]
 10/05 F NS GLIST allows the owner of the nick to use the nickname param.  [ #00]
 09/17 F Fixed MySQL error, whereby checks are only done if mysql is on.   [ #00]

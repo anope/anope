@@ -1088,6 +1088,9 @@ extern void anope_cmd_svid_umode3(User *u, char *ts);
 extern void anope_cmd_nc_change(User *u);
 extern int anope_flood_mode_check(char *value);
 
+extern void anope_cmd_jupe(char *jserver, char *who, char *reason);
+
+
 extern char *common_get_vident(User *u);
 extern char *common_get_vhost(User *u);
 extern char *send_token(char *token1, char *token2);

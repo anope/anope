@@ -116,12 +116,14 @@ static void delete_server(Server * serv, const char *quitreason)
     NickAlias *na;
 
     if (!serv) {
-        alog("delete_server() called with NULL arg!");
+        if (debug) {
+            alog("debug: delete_server() called with NULL arg!");
+        }
         return;
     }
 
     if (debug)
-        alog("delete_server() called for %s", serv->name);
+        alog("debug: delete_server() called for %s", serv->name);
 
     if (ircdcap->noquit) {
         if (uplink_capab & ircdcap->noquit) {
@@ -146,7 +148,7 @@ static void delete_server(Server * serv, const char *quitreason)
                 u = unext;
             }
             if (debug >= 2)
-                alog("delete_server() cleared all users");
+                alog("debug: delete_server() cleared all users");
         }
     }
 
@@ -158,7 +160,7 @@ static void delete_server(Server * serv, const char *quitreason)
     }
 
     if (debug >= 2)
-        alog("delete_server() cleared all servers");
+        alog("debug: delete_server() cleared all servers");
 
     free(serv->name);
     free(serv->desc);
@@ -170,7 +172,7 @@ static void delete_server(Server * serv, const char *quitreason)
         serv->uplink->links = serv->next;
 
     if (debug)
-        alog("delete_server() completed");
+        alog("debug: delete_server() completed");
 }
 
 /*************************************************************************/
@@ -266,7 +268,7 @@ void do_squit(const char *source, int ac, char **av)
         if ((s->uplink == me_server)
             && (uplink_capab & ircdcap->unconnect)) {
             if (debug)
-                alog("debuf: Sending UNCONNECT SQUIT for %s", s->name);
+                alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
             /* need to fix */
             anope_cmd_squit(s->name, buf);
         }

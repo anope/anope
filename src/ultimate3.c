@@ -1508,7 +1508,7 @@ void anope_cmd_squit(char *servname, char *message)
         return;
     }
 
-    send_cmd(servname, "SQUIT %s :%s", servname, message);
+    send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
 /* SVSO */
@@ -1749,5 +1749,16 @@ int anope_flood_mode_check(char *value)
     return 0;
 }
 
+void anope_cmd_jupe(char *jserver, char *who, char *reason)
+{
+    char rbuf[256];
+
+    snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
+             reason ? ": " : "", reason ? reason : "");
+
+    anope_cmd_squit(jserver, rbuf);
+    anope_cmd_server(jserver, 2, rbuf);
+    new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+}
 
 #endif

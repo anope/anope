@@ -384,9 +384,8 @@ int listOut(User * u)
                     && (display_counter < NSListMax)) {
                     display_counter++;
                     tm = localtime(&current->time);
-                    strftime(buf, sizeof(buf),
-                             getstring(NULL,
-                                       STRFTIME_DATE_TIME_FORMAT), tm);
+                    strftime_lang(buf, sizeof(buf), u,
+                                  STRFTIME_DATE_TIME_FORMAT, tm);
                     if (current->vIdent) {
                         notice_lang(s_HostServ, u, HOST_IDENT_ENTRY,
                                     counter, current->nick,
@@ -408,9 +407,8 @@ int listOut(User * u)
                     && (display_counter < NSListMax)) {
                     display_counter++;
                     tm = localtime(&current->time);
-                    strftime(buf, sizeof(buf),
-                             getstring(NULL, STRFTIME_DATE_TIME_FORMAT),
-                             tm);
+                    strftime_lang(buf, sizeof(buf), u,
+                                  STRFTIME_DATE_TIME_FORMAT, tm);
                     if (current->vIdent) {
                         notice_lang(s_HostServ, u, HOST_IDENT_ENTRY,
                                     counter, current->nick,
@@ -707,6 +705,10 @@ int do_setall(User * u)
     tmp_time = time(NULL);
 
     if ((na = findnick(nick))) {
+        if (na->status & NS_VERBOTEN) {
+            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            return MOD_CONT;
+        }
         alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
         do_hs_sync(na->nc, vIdent, hostmask, u->nick, tmp_time);
         if (vIdent) {
@@ -734,6 +736,14 @@ int do_delall(User * u)
         return MOD_CONT;
     }
     if ((na = findnick(nick))) {
+        if (na->status & NS_VERBOTEN) {
+            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            return MOD_CONT;
+        }
+        if (na->status & NS_VERBOTEN) {
+            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            return MOD_CONT;
+        }
         nc = na->nc;
         for (i = 0; i < nc->aliases.count; i++) {
             na = nc->aliases.list[i];

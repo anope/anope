@@ -2962,7 +2962,7 @@ int check_sqline(char *nick, int nick_change)
 {
     int i;
     SXLine *sx;
-    char *reason = NULL;
+    char reason[300];
 
     if (sqlines.count == 0)
         return 0;
@@ -2980,7 +2980,6 @@ int check_sqline(char *nick, int nick_change)
         if (match_wild_nocase(sx->mask, nick)) {
             sqline(sx->mask, sx->reason);
             /* We kill nick since s_sqline can't */
-            reason = smalloc(strlen(sx->reason) + 10);
             snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
             kill_user(s_OperServ, nick, reason);
             free(reason);
@@ -4531,7 +4530,6 @@ static int do_jupe(User * u)
 {
     char *jserver = strtok(NULL, " ");
     char *reason = strtok(NULL, "");
-    char rbuf[256];
 
     if (!jserver) {
         syntax_error(s_OperServ, u, "JUPE", OPER_JUPE_SYNTAX);
@@ -4539,12 +4537,7 @@ static int do_jupe(User * u)
         if (!isValidHost(jserver, 3)) {
             notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
         } else {
-            snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick,
-                     reason ? ": " : "", reason ? reason : "");
-
-            anope_cmd_squit(jserver, rbuf);
-            anope_cmd_server(jserver, 1, rbuf);
-            new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+            anope_cmd_jupe(jserver, u->nick, reason);
 
             if (WallOSJupe)
                 anope_cmd_global(s_OperServ, "\2%s\2 used JUPE on \2%s\2",

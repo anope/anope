@@ -35,6 +35,17 @@ int AnopeInit(int argc, char **argv)							/* This will be executed when the mod
     moduleSetHostHelp(myHostServHelp);						/* add us to the .hs help list */
 
     status = moduleAddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
+
+    /* Check if we have any argv's */
+    if(argc>0) {
+	/* we do, the first will be the nick of the person modload'ing us */
+	/* or NULL if we were auto-loaded */
+	if(argv[0]) {
+		alog("hs_moo was modloaded by: [%s]",argv[0]);
+	} else {
+		alog("hs_moo was automatically loaded by anope");
+	}
+    }
     alog("hs_moo.so: Add Command 'moo' Status: %d",status);			/* Log the command being added */
          
     moduleAddCallback("test",time(NULL)+dotime("15s"),test,0,NULL);		/* set a call-back function to exec in 3 mins time */

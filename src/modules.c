@@ -318,6 +318,9 @@ int loadModule(Module * m, User * u)
     const char *err;
     int (*func) (int, char **);
     int ret = 0;
+    char *argv[1];
+    int argc = 0;
+
     Module *m2;
     if (!m || !m->name) {
         return MOD_ERR_PARAMS;
@@ -360,7 +363,18 @@ int loadModule(Module * m, User * u)
     }
     if (func) {
         mod_current_module_name = m->name;
-        ret = func(0, NULL);    /* exec AnopeInit */
+	/* argv[0] is the user if there was one, or NULL if not */
+	if(u) {
+		argv[0] = sstrdup(u->nick);
+	} else {
+		argv[0] = NULL;
+	}
+	argc++;
+
+	ret = func(argc, argv);    /* exec AnopeInit */
+	if(u) {
+		free(argv[0]);
+	}
         if (ret == MOD_STOP) {
             alog("%s requested unload...", m->name);
             unloadModule(m, NULL);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="395"
+VERSION_BUILD="396"
 
 # $Log$
+#
+# BUILD : 1.7.5 (396)
+# BUGS  : N/A
+# NOTES : Added arvg[0] to AnopeInit call, it will contain the nick of the person who loaded the module.  All existing modules are un-effected :)
 #
 # BUILD : 1.7.5 (395)
 # BUGS  : N/A

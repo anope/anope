@@ -138,9 +138,12 @@ int m_privmsg(char *source, char *receiver, char *msg)
     }
 
     if (*receiver == '#') {
-        if (s_BotServ && (ci = cs_findchan(receiver)))
-            if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi)  /* Some paranoia checks */
+        if (s_BotServ && (ci = cs_findchan(receiver))) {
+            /* Some paranoia checks */
+            if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi) {
                 botchanmsgs(u, ci, msg);
+            }
+        }
     } else {
 
         /* Check if we should ignore.  Operators always get through. */

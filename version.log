@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="411"
+VERSION_BUILD="412"
 
 # $Log$
+#
+# BUILD : 1.7.5 (412)
+# BUGS  : 169
+# NOTES : A minor touch up to prevent issues
 #
 # BUILD : 1.7.5 (411)
 # BUGS  : 197

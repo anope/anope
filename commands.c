@@ -73,7 +73,7 @@ void do_run_cmd(const char *service, User * u, Command * c,
                 if (retVal == MOD_CONT) {
                     current = c->next;
                     while (current && retVal == MOD_CONT) {
-                        mod_current_module_name = c->mod_name;
+                        mod_current_module_name = current->mod_name;
                         retVal = current->routine(u);
                         mod_current_module_name = NULL;
                         current = current->next;

@@ -4373,6 +4373,11 @@ static int do_akick(User * u)
     ChannelInfo *ci;
     AutoKick *akick;
     int i;
+    Channel *c;
+    struct c_userlist *cu = NULL;
+    struct c_userlist *next;
+    char *argv[3];
+    int count = 0;
 
     if (!cmd || (!mask && (!stricmp(cmd, "ADD") || !stricmp(cmd, "STICK")
                            || !stricmp(cmd, "UNSTICK")
@@ -4465,12 +4470,7 @@ static int do_akick(User * u)
         }
 
         /* Auto ENFORCE #63 */
-        Channel *c = findchan(ci->name);
-        struct c_userlist *cu = NULL;
-        struct c_userlist *next;
-        char *argv[3];
-        int count = 0;
-
+        c = findchan(ci->name);
         if (c) {
             cu = c->users;
             while (cu) {
@@ -4491,7 +4491,6 @@ static int do_akick(User * u)
                 cu = next;
             }
         }
-
         notice_lang(s_ChanServ, u, CHAN_AKICK_ADDED, mask, chan);
 
         if (count)

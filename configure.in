@@ -190,7 +190,7 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
 	AC_DEFINE(IRC_DREAMFORGE,1,"Frist IRCD type")
     elif test "$withval" = "IRC_BAHAMUT"; then
     	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
-    elif test "$withval" = "IRC_UNREAL"; then
+    elif test "$withval" = "IRC_UNREAL31"; then
 	AC_DEFINE(IRC_UNREAL31,1,"First IRCD type")
     elif test "$withval" = "IRC_ULTIMATE"; then
 	AC_DEFINE(IRC_ULTIMATE,1,"First IRCD type")

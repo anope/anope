@@ -8365,7 +8365,7 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_BAHAMUT 1
 _ACEOF
 
-    elif test "$withval" = "IRC_UNREAL"; then
+    elif test "$withval" = "IRC_UNREAL31"; then
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_UNREAL31 1

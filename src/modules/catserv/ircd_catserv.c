@@ -7,30 +7,28 @@
  **/
 
 #include "module.h"
+#include "catserv_messages.h"
 
 #define AUTHOR "Anope"
 #define VERSION "1.2"
 
 int my_privmsg(char *source, int ac, char **av);
-CommandHash *Catserv_cmdTable[MAX_CMD_HASH];
 
 void addClient(char *nick, char *realname);
-void addMessageList(void);
 void delClient(void);
-char *s_CatServ = "CatServ";
 void catserv(User * u, char *buf);
 
-int do_meow(User * u);
-int do_purr(User * u);
+char *s_CatServ = "CatServ";
 
 int AnopeInit(int argc, char **argv)
 {
     Message *msg = NULL;
     int status;
 #ifdef IRC_UNREAL32
-     msg = createMessage("PRIVMSG", my_privmsg);
     if (UseTokens) {
      msg = createMessage("!", my_privmsg);
+    } else {
+     msg = createMessage("PRIVMSG", my_privmsg);
     }
 #else
     msg = createMessage("PRIVMSG", my_privmsg);
@@ -91,15 +89,6 @@ void delClient(void)
     anope_cmd_quit(s_CatServ, "QUIT :Module Unloaded!");
 }
 
-void addMessageList(void)
-{
-    Command *c;
-    c = createCommand("meow", do_meow, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(Catserv_cmdTable, c, MOD_UNIQUE);
-    c = createCommand("purr", do_purr, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(Catserv_cmdTable, c, MOD_UNIQUE);
-}
-
 /*****************************************************************************/
 /* Main CatServ routine. */
 void catserv(User * u, char *buf)
@@ -119,17 +108,5 @@ void catserv(User * u, char *buf)
     } else {
         mod_run_cmd(s_CatServ, u, Catserv_cmdTable, cmd);
     }
-}
-
-int do_meow(User * u)
-{
-    notice(s_CatServ, u->nick, "MEOW!");
-    return MOD_STOP;
-}
-
-int do_purr(User * u)
-{
-    notice(s_CatServ, u->nick, "PURR!");
-    return MOD_STOP;
 }
 

@@ -44,8 +44,7 @@ AC_ARG_WITH(mysqlclient-lib,
     mysqlclient_fail=""
 
     dnl test --with-mysqlclient-prefix
-        for tryprefix in /usr /usr/local /usr/mysql /usr/local/mysql /usr/pkg 
-$msqlclient_prefix; do
+        for tryprefix in /usr /usr/local /usr/mysql /usr/local/mysql /usr/pkg $msqlclient_prefix; do
                 #testloop
                 for hloc in lib/mysql lib ; do
                         if test -e "$tryprefix/$hloc/libmysqlclient.so"; then

@@ -42,24 +42,18 @@ AC_CHECK_LIB(nsl,inet_ntoa,ANOPELIBS="$ANOPELIBS-lnsl ")
 AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
 AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
 AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
-AC_CHECK_LIB(mysqlclient, mysql_real_connect,[
-    ANOPELIBS="$ANOPELIBS-lmysqlclient "
-    AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
-    AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
-    MYSQL=" mysql.c "
-    RDB=" rdb.c "
-    AC_SUBST(MYSQL)
-    AC_SUBST(RDB)
-    AC_CHECK_HEADER(mysql.h,[
-      AC_DEFINE(HAVE_MYSQL_MYSQL_H,"1","We have the mysql Header file")
-    ])
-    AC_CHECK_HEADER(mysql/mysql.h,[
-      AC_DEFINE(HAVE_MYSQL_MYSQL_H,"1","We have the mysql Header file")
-      AC_DEFINE(MYSQL_HEADER_PREFIX,"1","mysql.h is in a mysql/ folder")
-    ])
-])
+AM_PATH_MYSQLCLIENT(,[
+	AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
+	AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
+	MYSQL=" mysql.c "
+	RDB=" rdb.c "
+	AC_SUBST(MYSQL)
+	AC_SUBST(RDB)
+],)
 
-AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
+ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
+CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
+LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
 
 ACX_PTHREAD([
     CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
@@ -68,7 +62,9 @@ ACX_PTHREAD([
 ])
 
 AC_SUBST(ANOPELIBS)
+AC_SUBST(LDFLAGS)
 
+AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
 
 dnl module checking based on Unreal's module checking code
 AC_DEFUN(AC_ENABLE_DYN,

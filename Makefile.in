@@ -13,6 +13,7 @@ TOUCH=@TOUCH@
 MODULE_PATH=@MODULE_PATH@
 MYSQL=@MYSQL@
 RDB=@RDB@
+LDFLAGS=@LDFLAGS@
 
 all:   language headers build modules
 

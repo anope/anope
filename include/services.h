@@ -58,17 +58,8 @@
 # define MYSQL_WARNING 2
 # define MYSQL_ERROR   4
 
-#ifdef HAVE_MYSQL_MYSQL_H
-#ifdef MYSQL_HEADER_PREFIX
-	#include <mysql/mysql.h>
-	#include <mysql/errmsg.h>
-#else
-	#include <mysql.h>
-	#include <errmsg.h>
-#endif
-#endif
-
-
+#include "mysql.h"
+#include "errmsg.h"
 #endif
 
 #if HAVE_STRINGS_H

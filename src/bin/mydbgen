@@ -166,12 +166,16 @@ else
 	fi
 
 	# Introduced on Anope 1.7.7 -> status smallint to inst unsigned.
-	echo -n "Blindly altering status for bigger capacity... "
+	echo "Blindly altering status for bigger capacity... "
 	echo "ALTER TABLE anope_ns_alias CHANGE status status int(11) unsigned NOT NULL default 0" > $TFILE
 	mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
+
+	# Introduced on Anope 1.7.8 (620) proxy scanner removed.
+	echo "Removing proxy scanner cache... "
+	echo "DROP TABLE IF EXISTS anope_os_cache" > $TFILE
+	mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
+
 	echo "done!"
-
-
 
 fi
 

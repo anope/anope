@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="628"
+VERSION_BUILD="629"
 
 # $Log$
+#
+# BUILD : 1.7.8 (629)
+# BUGS  : 313
+# NOTES : Updated mydbgen and Changes.mysql to remove anope_os_cache
 #
 # BUILD : 1.7.8 (628)
 # BUGS  : none

@@ -4049,6 +4049,7 @@ CHAN_HELP_SET
 	                     werden durch den Kicker signiert
 	    OPNOTICE      Sendet eine Notice wenn Op/Deop-Kommandos
 	                     benutzt werden
+	    XOP           Toggle the user privilege system
 	
 	Tippe /msg %S HELP option für weitere Informationen
 	zu einem bestimmten Kommando.

@@ -1120,6 +1120,9 @@ void do_cmode(const char *source, int ac, char **av)
     Channel *chan;
     ChannelInfo *ci = NULL;
 #ifdef IRC_BAHAMUT
+
+/* Ultimate3 doesn't send TS on Mode - TSL */
+#if !defined(IRC_ULTIMATE3)
     int i;
     char *t;
 
@@ -1141,6 +1144,8 @@ void do_cmode(const char *source, int ac, char **av)
             alog("TSMODE enabled but MODE has no valid TS");
         }
     }
+#endif
+
 #endif
 
     chan = findchan(av[0]);

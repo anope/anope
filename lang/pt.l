@@ -3890,8 +3890,9 @@ CHAN_HELP_SET
 	    SECUREOPS     Rigoroso o controle de status de OP
 	    SECUREFOUNDER Controle restrito do fundador do canal
 	    SIGNKICK      Assinatura dos kicks usados pelo comando kick
-	    OPNOTICE    Envia uma notice quando os comandos OP/DEOP
-	                são usados
+	    OPNOTICE    Envia uma notice quando os comandos OP/DEOP 
+				são usados
+	    XOP           Toggle the user privilege system
 	
 	Digite /msg %S HELP SET opções para maiores informações
 	sobre uma opção em particular.

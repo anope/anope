@@ -1345,6 +1345,7 @@ struct channel_ {
 #define CMODE_N 0x00001000
 #define CMODE_S 0x00002000
 #define CMODE_K 0x00004000
+#define CMODE_O 0x00008000
 #endif
 
 /* These modes are for IRC_RAGE2 servers only */

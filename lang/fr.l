@@ -375,7 +375,7 @@ NICK_IDENTIFY_EMAIL_HOWTO
 
 # LOGOUT responses
 NICK_ALREADY_IDENTIFIED
-	You are already identified.
+	Vous êtes déjà identifié.
 
 # UPDATE responses
 NICK_UPDATE_SUCCESS

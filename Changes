@@ -28,6 +28,11 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
 07/22 A Added VIAGRA support for modes +A and +H.                         [ #99]
+08/17 F Rage2 SNICK event handling.                                       [#128]
+08/17 F Included XOP reference to /CS HELP SET.                           [#139]
+08/17 F French language update.                                           [#146]
+08/17 F Ultimate3 channel modes fixed.                                    [#147]
+08/17 F Ultimate3 configuration defines set properly.                     [#148]
 
 Provided by Janos Kapitany <sarkanyka@cjbchat.hu>
 08/04 A New language file hun.l (Hungarian)                               [ #00]

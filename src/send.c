@@ -230,9 +230,14 @@ void send_mode(const char *source, const char *on, const char *fmt, ...)
 
     vsnprintf(buf, sizeof(buf), fmt, args);
 #ifdef IRC_BAHAMUT
+
+/* Ultimate3 doesn't send TS Mode - doing so will cause modes not to send */
+/* btw - this is used by channel setting was well - TSL 		*/
+#if !defined(IRC_ULTIMATE3)
     if (uplink_capab & CAPAB_TSMODE)
         send_cmd(source, "MODE %s 0 %s", on, buf);
     else
+#endif
 #endif
         send_cmd(source, "MODE %s %s", on, buf);
 }

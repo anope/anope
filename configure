@@ -8390,7 +8390,7 @@ _ACEOF
     elif test "$withval" = "IRC_ULTIMATE3"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_DREAMFORGE 1
+#define IRC_BAHAMUT 1
 _ACEOF
 
 

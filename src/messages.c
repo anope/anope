@@ -409,8 +409,8 @@ static int m_client(char *source, int ac, char **av)
 static int m_snick(char *source, int ac, char **av)
 {
     if (ac != 2) {
-        User *user = do_nick(source, av[0], av[3], av[4], av[8], av[10],
-                             strtoul(av[1], NULL, 10), strtoul(av[7], NULL,
+        User *user = do_nick(source, av[0], av[3], av[4], av[7], av[10],
+                             strtoul(av[1], NULL, 10), strtoul(av[8], NULL,
                                                                0),
                              strtoul(av[5], NULL, 0), av[6]);
         if (user) {

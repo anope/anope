@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="322"
+VERSION_BUILD="323"
 
 # $Log$
+#
+# BUILD : 1.7.5 (323)
+# BUGS  : 
+# NOTES : fix seriously stupid booboo introduced by myself (ifdef stuff finally fixed)
 #
 # BUILD : 1.7.5 (322)
 # BUGS  : 

@@ -182,7 +182,7 @@ typedef struct channel_ Channel;
 
 #if defined(IRC_BAHAMUT)
 # define HAS_NICKIP
- #ifdef !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
+ #if !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
 # define HAS_EXCEPT
 # define HAS_SVSHOLD                                                            
 # define NICKSERV_MODE "+o"

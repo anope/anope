@@ -57,7 +57,7 @@ IRCDVar ircd[] = {
      "+rd",                     /* Mode On Reg          */
      "-r+d",                    /* Mode on UnReg        */
      "-r+d",                    /* Mode on Nick Change  */
-     0,                         /* Supports SGlines     */
+     1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
      1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
@@ -1901,12 +1901,7 @@ void anope_cmd_release_svshold(char *nick)
 */
 void anope_cmd_unsgline(char *mask)
 {
-    /* 
-       Although Unreal has SVSNLINE, it has not worked in older version of
-       Unreal 3.2 it confused the tokens, now with 3.2.2 it seems they don't
-       understand the command at all, leaving it disable till I figure out
-       what is going on with it.
-     */
+    send_cmd(NULL, "SVSNLINE - :%s", mask);
 }
 
 /* UNSZLINE */
@@ -1930,12 +1925,8 @@ void anope_cmd_szline(char *mask, char *reason, char *whom)
 */
 void anope_cmd_sgline(char *mask, char *reason)
 {
-    /* 
-       Although Unreal has SVSNLINE, it has not worked the older version of
-       Unreal 3.2 it confused the tokens, now with 3.2.2 it seems they don't
-       understand the command at all, leaving it disable till I figure out
-       what is going on with it.
-     */
+    strnrepl(reason, BUFSIZE, " ", "_");
+    send_cmd(NULL, "SVSNLINE + %s :%s", reason, mask);
 }
 
 /* SVSMODE -b */

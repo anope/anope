@@ -265,7 +265,7 @@ void memo_send(User * u, char *name, char *text, int z)
     MemoInfo *mi;
     time_t now = time(NULL);
     char *source = u->na->nc->display;
-    int is_servadmin = is_services_admin(u);
+    int is_servoper = is_services_oper(u);
     int j;
 
     if (readonly) {
@@ -291,7 +291,7 @@ void memo_send(User * u, char *name, char *text, int z)
                         NICK_X_NOT_REGISTERED, name);
 
     } else if (z != 2 && MSSendDelay > 0 &&
-               u && u->lastmemosend + MSSendDelay > now && !is_servadmin) {
+               u && u->lastmemosend + MSSendDelay > now && !is_servoper) {
         u->lastmemosend = now;
         if (z == 0)
             notice_lang(s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, MSSendDelay);
@@ -300,12 +300,12 @@ void memo_send(User * u, char *name, char *text, int z)
             notice_lang(s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT,
                         MSSendDelay);
 
-    } else if (mi->memomax == 0 && !is_servadmin) {
+    } else if (mi->memomax == 0 && !is_servoper) {
         if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
 
     } else if (mi->memomax > 0 && mi->memocount >= mi->memomax
-               && !is_servadmin) {
+               && !is_servop) {
         if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
 

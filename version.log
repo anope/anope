@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="165"
+VERSION_BUILD="166"
 
 # $Log$
+#
+# BUILD : 1.7.3 (166)
+# BUGS  : #84
+# NOTES : MemoServ send limit does no longer apply for services operators. That fixed the problem with /MS STAFF for services 
+# ops (they got the "memo limit in time X reached" message).
 #
 # BUILD : 1.7.3 (165)
 # BUGS  : 

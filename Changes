@@ -13,6 +13,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/09 F Hybrid crash on unsetting registration mode.                      [ #00]
 12/09 F BotServ !seen not recognizing founder.                            [#167]
 12/08 F ChanServ ACCESS wrong when dealing negative numbers.              [#240]
 12/06 F Fixed misplaced pointer in moduleAddData().                       [ #00]

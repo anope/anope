@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="484"
+VERSION_BUILD="485"
 
 # $Log$
+#
+# BUILD : 1.7.6 (485)
+# BUGS  : 
+# NOTES : Fixed a segfault when unsetting registration modes on hybrid
 #
 # BUILD : 1.7.6 (484)
 # BUGS  : 167

@@ -1659,7 +1659,8 @@ int delnick(NickAlias * na)
     if (na->u) {
         na->u->na = NULL;
 
-        common_svsmode(na->u, ircd->modeonunreg, "1");
+        if (ircd->modeonunreg)
+            common_svsmode(na->u, ircd->modeonunreg, "1");
 
     }
 

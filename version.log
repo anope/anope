@@ -8,13 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="191"
+VERSION_BUILD="194"
 
 # $Log$
 #
-# BUILD : 1.7.3 (191)
-# BUGS  : 91
-# NOTES : Fixed bug 91 and added new win32 stuff for codemastr
+# BUILD : 1.7.3 (194)
+# BUGS  : none
+# NOTES : Rolled back win32 support files in lieu of a branch.
 #
 # BUILD : 1.7.3 (190)
 # BUGS  : 90

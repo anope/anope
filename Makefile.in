@@ -31,6 +31,7 @@ build:
 
 modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all )
+	echo "all done, now (g)make install to install Anope/Modules";
 
 language:
 	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; cp language.h ../include/)

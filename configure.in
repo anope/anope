@@ -208,3 +208,8 @@ AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], AC
 
 AC_OUTPUT(Makefile)
 
+cat <<EOT
+All done!  Now run "make" (or possibly "gmake") to compile Anope.
+See the INSTALL, README and FAQ files if you have any problems.
+EOT
+

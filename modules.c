@@ -1757,13 +1757,13 @@ int moduleAddData(ModuleData * md[], char *key, char *value)
     char *mod_name = sstrdup(mod_current_module_name);
 
     int index = 0;
-    index = CMD_HASH(mod_name);
     ModuleData *current = NULL;
     ModuleData *newHash = NULL;
     ModuleData *lastHash = NULL;
     ModuleDataItem *item = NULL;
     ModuleDataItem *itemCurrent = NULL;
     ModuleDataItem *lastItem = NULL;
+    index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
         if (strcasecmp(current->moduleName, mod_name) == 0)
@@ -1828,11 +1828,10 @@ char *moduleGetData(ModuleData * md[], char *key)
     char *mod_name = sstrdup(mod_current_module_name);
     int index = 0;
     char *ret = NULL;
-    index = CMD_HASH(mod_name);
     ModuleData *current = NULL;
     ModuleData *lastHash = NULL;
-
     ModuleDataItem *itemCurrent = NULL;
+    index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
         if (strcasecmp(current->moduleName, mod_name) == 0)
@@ -1861,13 +1860,13 @@ void moduleDelData(ModuleData * md[], char *key)
 {
     char *mod_name = sstrdup(mod_current_module_name);
     int index = 0;
-    index = CMD_HASH(mod_name);
     ModuleData *current = NULL;
     ModuleData *lastHash = NULL;
 
     ModuleDataItem *itemCurrent = NULL;
     ModuleDataItem *prev = NULL;
     ModuleDataItem *next = NULL;
+    index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
         if (strcasecmp(current->moduleName, mod_name) == 0)
@@ -1904,13 +1903,13 @@ void moduleDelAllData(ModuleData * md[])
 {
     char *mod_name = sstrdup(mod_current_module_name);
     int index = 0;
-    index = CMD_HASH(mod_name);
     ModuleData *current = NULL;
     ModuleData *lastHash = NULL;
 
     ModuleDataItem *itemCurrent = NULL;
     ModuleDataItem *prev = NULL;
     ModuleDataItem *next = NULL;
+    index = CMD_HASH(mod_name);
 
     for (current = md[index]; current; current = current->next) {
         if (strcasecmp(current->moduleName, mod_name) == 0)

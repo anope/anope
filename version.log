@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="76"
+VERSION_BUILD="77"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (77)
+# BUGS  : Compile errors on picky compilers
+# NOTES : fixed a compile error on picky compilers 
 #
 # BUILD : 1.7.2 (76)
 # BUGS  : 

@@ -840,18 +840,20 @@ void anope_cmd_376(char *source)
 void anope_cmd_nick(char *nick, char *name, char *modes)
 {
     EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
+    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
              send_token("NICK", "&"), nick, (long int) time(NULL),
-             ServiceUser, ServiceHost, ServerName, modes, name);
+             ServiceUser, ServiceHost, ServerName, modes, ServiceHost,
+             (ircd->nickip ? " *" : " "), name);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
+    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
              send_token("NICK", "&"), nick, (long int) time(NULL), user,
-             host, ServerName, modes, real);
+             host, ServerName, modes, host, (ircd->nickip ? " *" : " "),
+             real);
 }
 
 void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
@@ -876,9 +878,10 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
+    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
              send_token("NICK", "&"), nick, (long int) time(NULL), user,
-             host, ServerName, modes, real);
+             host, ServerName, modes, host, (ircd->nickip ? " *" : " "),
+             real);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1422,7 +1425,8 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
         return;
     }
 
-    send_cmd(oldnick, "%s %s", send_token("NICK", "&"), newnick);
+    send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick,
+             (long int) time(NULL));
 }
 
 /* SVSNICK */
@@ -1501,8 +1505,9 @@ int anope_event_netinfo(char *source, int ac, char **av)
 
 void anope_cmd_netinfo(int ac, char **av)
 {
-    send_cmd(NULL, "%s 0 %d %d %s 0 0 0 :%s", send_token("NETINFO", "AO"),
-             atoi(av[1]), atoi(av[2]), av[3], av[7]);
+    send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
+             send_token("NETINFO", "AO"), maxusercnt,
+             (long int) time(NULL), atoi(av[2]), av[3], av[7]);
 }
 
 /* TKL

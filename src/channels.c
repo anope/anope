@@ -1217,35 +1217,73 @@ void add_invite(Channel * chan, char *mask)
 
 void chan_set_correct_modes(User * user, Channel * c)
 {
-    char *chan;
+    char *tmp;
     int status;
+    ChannelInfo *ci;
 
-    chan = c->name;
+    ci = c->ci;
 
-    if (get_ignore(user->nick) == NULL) {
-        status = chan_get_user_status(c, user);
-        /* This looks dirty. For every mode we first check if the IRCd
-         * supports it. If true, we check if the user already has the
-         * mode. If both are true, we check if they should get the mode,
-         * which sends the mode to the uplink and returns true. If the
-         * mode is sent, we internally update to finish it off. -GD
-         */
-        if (ircd->owner && !(status & CUS_OWNER)
-            && check_should_owner(user, chan))
-            chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
-        else if (ircd->protect && !(status & CUS_PROTECT)
-                 && check_should_protect(user, chan))
-            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        else if (ircd->admin && !(status & CUS_PROTECT)
-                 && check_should_protect(user, chan))
-            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        else if (!(status & CUS_OP) && check_should_op(user, chan))
+    if (!ci || (ci->flags & CI_VERBOTEN) || (*(c->name) == '+'))
+        return;
+
+    if ((ci->flags & CI_SECURE) && !nick_identified(user))
+        return;
+
+    if (get_ignore(user->nick) != NULL)
+        return;
+
+    status = chan_get_user_status(c, user);
+    if (ircd->owner
+        && (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
+            || (!(ci->flags & CI_SECUREFOUNDER)
+                && is_founder(user, ci)))) {
+        if (!(status & CUS_OWNER)) {
+            tmp = stripModePrefix(ircd->ownerset);
+            if (!(status & CUS_OP)) {
+                anope_cmd_mode(whosends(ci), c->name, "+o%s %s %s", tmp,
+                               user->nick, user->nick);
+                chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
+            } else {
+                anope_cmd_mode(whosends(ci), c->name, "+%s %s", tmp,
+                               user->nick);
+                chan_set_user_status(c, user, CUS_OWNER);
+            }
+        } else if (!(status & CUS_OP)) {
+            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
             chan_set_user_status(c, user, CUS_OP);
-        else if (ircd->halfop && !(status & CUS_HALFOP)
-                 && check_should_halfop(user, chan))
+        }
+    } else if ((ircd->protect || ircd->admin)
+               && check_access(user, ci, CA_AUTOPROTECT)) {
+        tmp = stripModePrefix(ircd->adminset);
+        if (!(status & CUS_PROTECT)) {
+            if (!(status & CUS_OP)) {
+                anope_cmd_mode(whosends(ci), c->name, "+o%s %s %s", tmp,
+                               user->nick, user->nick);
+                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+            } else {
+                anope_cmd_mode(whosends(ci), c->name, "+%s %s", tmp,
+                               user->nick);
+                chan_set_user_status(c, user, CUS_PROTECT);
+            }
+        } else if (!(status & CUS_OP)) {
+            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
+            chan_set_user_status(c, user, CUS_OP);
+        }
+    } else if (check_access(user, ci, CA_AUTOOP)) {
+        if (!(status & CUS_OP)) {
+            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
+            chan_set_user_status(c, user, CUS_OP);
+        }
+    } else if (ircd->halfop && check_access(user, ci, CA_AUTOHALFOP)) {
+        if (!(status & CUS_HALFOP)) {
+            anope_cmd_mode(whosends(ci), c->name, "+h %s", user->nick);
             chan_set_user_status(c, user, CUS_HALFOP);
-        else if (!(status & CUS_VOICE) && check_should_voice(user, chan))
+        }
+    } else if (check_access(user, ci, CA_AUTOVOICE)) {
+        if (!(status & CUS_VOICE)) {
+            anope_cmd_mode(whosends(ci), c->name, "+v %s", user->nick);
             chan_set_user_status(c, user, CUS_VOICE);
+        }
     }
 }
 

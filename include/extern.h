@@ -151,6 +151,8 @@ E void expire_chans(void);
 E void cs_remove_nick(const NickCore * nc);
 E void cs_remove_bot(const BotInfo * bi);
 
+E int is_real_founder(User * user, ChannelInfo * ci);
+
 E void check_modes(Channel * c);
 E int check_valid_admin(User * user, Channel * chan, int servermode);
 E int check_valid_op(User * user, Channel * chan, int servermode);

@@ -186,7 +186,6 @@ void alpha_insert_chan(ChannelInfo * ci);
 static ChannelInfo *makechan(const char *chan);
 int delchan(ChannelInfo * ci);
 void reset_levels(ChannelInfo * ci);
-static int is_real_founder(User * user, ChannelInfo * ci);
 static int is_identified(User * user, ChannelInfo * ci);
 static void make_unidentified(User * u, ChannelInfo * ci);
 
@@ -2304,7 +2303,7 @@ int is_founder(User * user, ChannelInfo * ci)
 
 /*************************************************************************/
 
-static int is_real_founder(User * user, ChannelInfo * ci)
+int is_real_founder(User * user, ChannelInfo * ci)
 {
     if (user->isSuperAdmin) {
         return 1;

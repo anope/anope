@@ -36,6 +36,7 @@ static int do_sendall(User *u);
 void moduleAddMemoServCmds(void);
 static void new_memo_mail(NickCore *nc, Memo *m);
 static int do_rsend(User *u);
+static int do_memocheck(User *u);
 void rsend_notify(User *u, Memo *m, const char *chan);
 /*************************************************************************/
 
@@ -54,6 +55,7 @@ void moduleAddMemoServCmds(void) {
     c = createCommand("INFO",       do_info, NULL,  -1,MEMO_HELP_INFO, MEMO_SERVADMIN_HELP_INFO,MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO); addCoreCommand(MEMOSERV,c);
     c = createCommand("SENDALL",    do_sendall, is_services_admin, MEMO_HELP_SENDALL,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
     c = createCommand("RSEND",    do_rsend, NULL, MEMO_HELP_RSEND,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
+    c = createCommand("CHECK",    do_memocheck, NULL, MEMO_HELP_CHECK,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
 }
 
 /*************************************************************************/
@@ -1311,5 +1313,62 @@ void rsend_notify(User * u, Memo * m, const char *chan)
 
     return;
 }
+
+
+
+/*************************************************************************/
+/* This function checks whether the last memo you sent to person X has been read
+    or not. Note that this function does only work with nicks, NOT with chans. */
+
+static int do_memocheck(User * u)
+{
+    NickAlias *na = NULL;
+    MemoInfo *mi = NULL;
+    int i, found = 0;
+    char *stime = NULL;
+    char *recipient = strtok(NULL, "");
+
+    if (!recipient) {
+        syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+        return MOD_CONT;
+    } else if (!nick_recognized(u)) {
+        notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+        return MOD_CONT;
+    } else if (!(na = findnick(recipient))) {
+        notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
+        return MOD_CONT;
+    }
+
+    mi = &na->nc->memos;
+
+/* Okay, I know this looks strange but we wanna get the LAST memo, so we
+    have to loop backwards */
+
+    for (i = (mi->memocount - 1); i >= 0; i--) {
+        if (!stricmp(mi->memos[i].sender, u->nick)) {
+            found = 1;          /* Yes, we've found the memo */
+
+            stime = strdup(ctime(&mi->memos[i].time));
+            *(stime + strlen(stime) - 1) = ' '; /* cut the f*cking \0 terminator and replace it with a single space */
+
+            if (mi->memos[i].flags & MF_UNREAD)
+                notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
+                            stime);
+            else
+                notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick,
+                            stime);
+            break;
+        }
+    }
+
+    if (!found)
+        notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
+
+    if (stime)
+        free(stime);
+
+    return MOD_CONT;
+}
+
 
 /*************************************************************************/

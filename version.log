@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="75"
+VERSION_BUILD="76"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (76)
+# BUGS  : 
+# NOTES : Added memoserv function to check whether the last memo you sent to a nick has been read or not. new cmd: /MS CHECK 
+# <nick> (I rule! :P)
 #
 # BUILD : 1.7.2 (75)
 # BUGS  : N/A

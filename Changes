@@ -1,6 +1,7 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/04/29 Added new MemoServ command CHECK to check whether a memo has been read or not.
 2004/04/26 Added module data ability, currently only added to User struct
 2004/04/23 Added new MemoServ command RSEND to send a memo requesting a receipt memo once the recipient reads it.
 2004/04/22 Fixed ALIST bug when being invoked by systems admins (Bug #20)

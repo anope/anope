@@ -6,10 +6,7 @@
 # For usage, see the usage subroutine or run the script with no
 # command line arguments.
 #
-# $HeadURL: $
-# $LastChangedDate: $
-# $LastChangedBy: $
-# $LastChangedRevision: $
+# $Id$
 #    
 # ====================================================================
 require 5.6.0;

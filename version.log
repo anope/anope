@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="6"
 VERSION_PATCH="0"
-VERSION_BUILD="4"
+VERSION_BUILD="6"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.6.0 (6)
+# BUGS  : none
+# NOTES : Removed estra table definition from tables.sql. Minor fixes.
 #
 # BUILD : 1.6.0 (4)
 # BUGS  : none

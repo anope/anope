@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="199"
+VERSION_BUILD="200"
 
 # $Log$
+#
+# BUILD : 1.7.3 (200)
+# BUGS  : 96
+# NOTES : Fixed wrong bug number on previous commit
 #
 # BUILD : 1.7.3 (199)
 # BUGS  : 91

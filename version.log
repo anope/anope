@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="561"
+VERSION_BUILD="563"
 
 # $Log$
+#
+# BUILD : 1.7.8 (563)
+# BUGS  : none
+# NOTES : SVN Framework.
 #
 # BUILD : 1.7.8 (561)
 # BUGS  : none

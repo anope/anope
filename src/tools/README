@@ -1,0 +1,19 @@
+Anope SMTP Client
+
+	- Provided with Anope is a simple SMTP client which can be used to replace programs like
+SendMail in some cases. 
+
+	- To use the SMTP client find the line in your services.conf for the "SendMailPath", enter
+the path to your services installation directory, followed by the "anopesmtp" and the IP address
+of a valid SMTP server. It should look something like
+
+SendMailPath "/home/usersname/services/anopesmtp 194.97.50.135"
+
+	- If you run into a problem you can compile a debug into the code by opening smtp.h and at the
+bottom you should find "smtp_debug" change the 0 to a 1 and recompile the code. This should
+generate a log file of what happened when it attempted to connect to the SMTP server.
+
+
+Credits:
+Orginally written by  Dominick Meglio <codemastr@unrealircd.com>
+Ported to *nix by Trystan Scott Lee <trystan@nomadirc.net>

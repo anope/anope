@@ -20,9 +20,9 @@ LDFLAGS=@LDFLAGS@
 RUNGROUP=@RUNGROUP@
 IRCDFILE=@IRCDFILE@
 
-all:   language headers build modules
-strict: language headers strict_build strict_modules
-profile: language headers profile_build profile_modules
+all:   language headers build tools modules 
+strict: language headers strict_build tools strict_modules
+profile: language headers profile_build tools profile_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -53,6 +53,10 @@ modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
+tools: build
+	(cd src/tools ; ${MAKE} ${MAKEARGS} all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules/Tools";
+
 strict_modules: strict_build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=$(CFLAGS) $(STRICT)' all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
@@ -71,14 +75,17 @@ clean:
 	(cd lang ; ${MAKE} ${MAKEARGS} clean )
 	(cd include ; ${MAKE} ${MAKEARGS} clean )
 	(cd src ; ${MAKE} ${MAKEARGS} clean )
+	(cd src/tools ; ${MAKE} ${MAKEARGS} clean )
 
 distclean: clean
 	(cd lang ; ${MAKE} ${MAKEARGS} distclean )
 	(cd include ; ${MAKE} ${MAKEARGS} distclean )
 	(cd src ; ${MAKE} ${MAKEARGS} distclean )
+	(cd src/tools ; ${MAKE} ${MAKEARGS} distclean )
 	rm -f config.log config.status config.cache Makefile
 
 install: DUMMY
 	(cd src ; ${MAKE} ${MAKEARGS} install)
+	(cd src/tools ; ${MAKE} ${MAKEARGS} install)
 
 DUMMY:

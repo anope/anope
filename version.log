@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="549"
+VERSION_BUILD="550"
 
 # $Log$
+#
+# BUILD : 1.7.7 (550)
+# BUGS  : N/A
+# NOTES : Anope SMTP client
 #
 # BUILD : 1.7.7 (549)
 # BUGS  : N/A

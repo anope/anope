@@ -71,6 +71,7 @@ extern void moduleAddMsgs(void);
     do { \
         send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", (nick), time(NULL), \
                 (modes), ServiceUser, ServiceHost, ServiceHost, ServerName, (name)); \
+	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
     } while (0)
 #endif
 

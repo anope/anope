@@ -93,17 +93,17 @@ int m_motd(char *source)
     }
 
     f = fopen(MOTDFilename, "r");
-    anope_cmd_375(source);
     if (f) {
+        anope_cmd_375(source);
         while (fgets(buf, sizeof(buf), f)) {
             buf[strlen(buf) - 1] = 0;
             anope_cmd_372(source, buf);
         }
         fclose(f);
+        anope_cmd_376(source);
     } else {
         anope_cmd_372_error(source);
     }
-    anope_cmd_376(source);
     return MOD_CONT;
 }
 

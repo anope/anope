@@ -1185,7 +1185,7 @@ void anope_cmd_372(char *source, char *msg)
 void anope_cmd_372_error(char *source)
 {
     send_cmd(TS6SID,
-             "372 %s :- MOTD file not found!  Please "
+             "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 

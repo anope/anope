@@ -18,6 +18,10 @@
 
 const char version_protocol[] = "UltimateIRCd 2.8.2+";
 
+/* Not all ircds use +f for their flood/join throttle system */
+const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
+const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on remove */
+
 IRCDVar ircd[] = {
     {"UltimateIRCd 2.8.*",      /* ircd name */
      "+S",                      /* nickserv mode */
@@ -40,7 +44,7 @@ IRCDVar ircd[] = {
      "+ioS",                    /* Global alias mode   */
      "+pS",                     /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-kiflmnpstxAIKLORS",      /* Modes to Remove */
+     "-ilmnpstxAIKORS",         /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */

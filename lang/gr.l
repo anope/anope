@@ -1405,6 +1405,8 @@ CHAN_INFO_OPT_NONE
 	Κανένα
 CHAN_INFO_MODE_LOCK
 	      Επιλογές κλειδώματος: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Αυτό το κανάλι δεν θα λήξει.
 

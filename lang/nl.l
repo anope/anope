@@ -1403,6 +1403,8 @@ CHAN_INFO_OPT_NONE
 	Geen
 CHAN_INFO_MODE_LOCK
 	        Modeslot: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Dit kanaal zal niet verlopen.
 

@@ -4815,6 +4815,7 @@ static int do_info(User * u)
     const char *commastr = getstring(u->na, COMMA_SPACE);
     int is_servadmin = is_services_admin(u);
     int show_all = 0;
+    time_t expt;
 
     if (!chan) {
         syntax_error(s_ChanServ, u, "INFO", CHAN_INFO_SYNTAX);
@@ -4953,8 +4954,18 @@ static int do_info(User * u)
 
         }
 
-        if ((ci->flags & CI_NO_EXPIRE) && show_all)
+        if ((ci->flags & CI_NO_EXPIRE) && show_all) {
             notice_lang(s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
+        } else {
+            if (is_servadmin) {
+                expt = ci->last_used + CSExpire;
+                tm = localtime(&expt);
+                strftime_lang(buf, sizeof(buf), u,
+                              STRFTIME_DATE_TIME_FORMAT, tm);
+                notice_lang(s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
+            }
+        }
+
         if (ci->flags & CI_SUSPENDED) {
             notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby,
                         (ci->forbidreason ? ci->
@@ -5727,8 +5738,7 @@ static int do_clear(User * u)
 
         if (c->mode) {
             /* Clear modes the bulk of the modes */
-            anope_cmd_mode(s_ChanServ, c->name, "%s %s",
-                           ircd->modestoremove);
+            anope_cmd_mode(s_ChanServ, c->name, "%s", ircd->modestoremove);
             argv[0] = sstrdup(ircd->modestoremove);
             chan_set_modes(s_ChanServ, c, 1, argv, 0);
             free(argv[0]);
@@ -5750,11 +5760,18 @@ static int do_clear(User * u)
                 free(argv[0]);
             }
             if (ircd->fmode && c->flood) {
-                anope_cmd_mode(s_ChanServ, c->name, "-f %s", c->flood);
-                argv[0] = sstrdup("-f");
-                argv[1] = c->flood;
-                chan_set_modes(s_ChanServ, c, 2, argv, 0);
-                free(argv[0]);
+                if (flood_mode_char_remove) {
+                    anope_cmd_mode(s_ChanServ, c->name, "%s %s",
+                                   flood_mode_char_remove, c->flood);
+                    argv[0] = sstrdup(flood_mode_char_remove);
+                    argv[1] = c->flood;
+                    chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                    free(argv[0]);
+                } else {
+                    if (debug) {
+                        alog("debug: flood_mode_char_remove was not set unable to remove flood/throttle modes");
+                    }
+                }
             }
         }
 

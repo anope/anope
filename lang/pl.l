@@ -1519,6 +1519,8 @@ CHAN_INFO_OPT_NONE
 	Brak
 CHAN_INFO_MODE_LOCK
 	Zablokowane tryby: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Ten kana³ nie podlega prawu wygasania.
 

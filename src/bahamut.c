@@ -20,6 +20,10 @@
 
 const char version_protocol[] = "BahamutIRCd 1.4.*/1.8.*";
 
+/* Not all ircds use +f for their flood/join throttle system */
+const char flood_mode_char_set[] = "+j";        /* mode char for FLOOD mode on set */
+const char flood_mode_char_remove[] = "-j";     /* mode char for FLOOD mode on remove */
+
 IRCDVar ircd[] = {
     {"BahamutIRCd 1.4.*/1.8.*", /* ircd name */
      "+o",                      /* nickserv mode */
@@ -42,7 +46,7 @@ IRCDVar ircd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */
-     "-ciklmnpstOR",            /* Modes to Remove */
+     "-cilmnpstOR",             /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      0,                         /* Vhost  */
@@ -84,9 +88,9 @@ IRCDVar ircd[] = {
      0,                         /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK       */
      0,                         /* Vhost Mode           */
-     0,                         /* +f                   */
+     1,                         /* +f                   */
      0,                         /* +L                   */
-     0,                         /* Mode */
+     CMODE_j,                   /* Mode */
      0,                         /* Mode */
      1,
      1,                         /* No Knock requires +i */
@@ -347,7 +351,7 @@ CBMode cbmodes[128] = {
     {0},                        /* g */
     {0},                        /* h */
     {CMODE_i, 0, NULL, NULL},
-    {0},                        /* j */
+    {CMODE_j, 0, set_flood, cs_set_flood},      /* j */
     {CMODE_k, 0, set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
     {CMODE_m, 0, NULL, NULL},
@@ -370,6 +374,7 @@ CBMode cbmodes[128] = {
 CBModeInfo cbmodeinfos[] = {
     {'c', CMODE_c, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
+    {'j', CMODE_j, 0, get_flood, cs_get_flood},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
     {'m', CMODE_m, 0, NULL, NULL},
@@ -1572,7 +1577,16 @@ int anope_event_admin(char *source, int ac, char **av)
 
 int anope_flood_mode_check(char *value)
 {
-    return 0;
+    char *dp, *end;
+
+    if (value && *value != ':'
+        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
+        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
+        && (*end == 0)) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 

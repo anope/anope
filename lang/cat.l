@@ -1416,6 +1416,8 @@ CHAN_INFO_OPT_NONE
 	Cap
 CHAN_INFO_MODE_LOCK
 	      Mode de lock: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Aquest canal no caducara.
 

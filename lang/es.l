@@ -603,7 +603,7 @@ NICK_INFO_GREET
 NICK_INFO_OPTIONS
 	              Opciones: %s
 NICK_INFO_EXPIRE
-	Expires in: %s
+	Expira en: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Proteccion
@@ -1414,6 +1414,8 @@ CHAN_INFO_OPT_NONE
 	Ninguno
 CHAN_INFO_MODE_LOCK
 	      Modo de lock: %s
+CHAN_INFO_EXPIRE
+	      Expira en: %s
 CHAN_INFO_NO_EXPIRE
 	Este canal no expirara.
 

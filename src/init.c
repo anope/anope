@@ -591,35 +591,35 @@ int init(int ac, char **av)
         if (!skeleton) {
             load_ns_dbase();
             if (debug)
-                alog("debug: Loaded %s database (1/9)", s_NickServ);
+                alog("debug: Loaded %s database (1/8)", s_NickServ);
             if (s_HostServ) {
                 load_hs_dbase();
                 if (debug)
-                    alog("debug: Loaded %s database (2/9)", s_HostServ);
+                    alog("debug: Loaded %s database (2/8)", s_HostServ);
             }
             if (s_BotServ) {
                 load_bs_dbase();
                 if (debug)
-                    alog("debug: Loaded %s database (3/9)", s_BotServ);
+                    alog("debug: Loaded %s database (3/8)", s_BotServ);
             } else if (debug)
-                alog("debug: BotServ database (4/9) not loaded because BotServ is disabled");
+                alog("debug: BotServ database (3/8) not loaded because BotServ is disabled");
             load_cs_dbase();
             if (debug)
-                alog("debug: Loaded %s database (5/9)", s_ChanServ);
+                alog("debug: Loaded %s database (4/8)", s_ChanServ);
         }
         load_os_dbase();
         if (debug)
-            alog("debug: Loaded %s database (6/9)", s_OperServ);
+            alog("debug: Loaded %s database (5/8)", s_OperServ);
         load_news();
         if (debug)
-            alog("debug: Loaded news database (7/9)");
+            alog("debug: Loaded news database (6/8)");
         load_exceptions();
         if (debug)
-            alog("debug: Loaded exception database (8/9)");
+            alog("debug: Loaded exception database (7/8)");
         if (PreNickDBName) {
             load_ns_req_db();
             if (debug)
-                alog("debug: Loaded PreNick database (9/9)");
+                alog("debug: Loaded PreNick database (8/8)");
         }
 #ifdef USE_RDB
     }

@@ -1393,6 +1393,8 @@ CHAN_INFO_OPT_NONE
 	None
 CHAN_INFO_MODE_LOCK
 	      Mode lock: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	This channel will not expire.
 

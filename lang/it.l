@@ -1406,6 +1406,8 @@ CHAN_INFO_OPT_NONE
 	Nessno
 CHAN_INFO_MODE_LOCK
 	        Modi bloccati: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Questo canale non scadrà.
 

@@ -24,6 +24,8 @@ E char *uplink;
 /* IRC Variables */
 E IRCDVar ircd[];
 E IRCDCAPAB ircdcap[];
+E const char flood_mode_char_set[];
+E const char flood_mode_char_remove[];
 
 /**** actions.c ****/
 

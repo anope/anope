@@ -1407,6 +1407,8 @@ CHAN_INFO_OPT_NONE
 	Nenhuma
 CHAN_INFO_MODE_LOCK
 	        Trava de modo: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Este canal não irá expirar.
 

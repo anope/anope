@@ -22,6 +22,7 @@ Anope Version S V N
     NICK_INFO_EXPIRE
     NICK_GLIST_REPLY
     NICK_GLIST_REPLY_ADMIN
+    CHAN_INFO_EXPIRE
 
 *** Mod Strings:
 

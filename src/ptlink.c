@@ -18,6 +18,11 @@
 
 const char version_protocol[] = "PTlink 6.14.5+";
 
+/* Not all ircds use +f for their flood/join throttle system */
+const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
+const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on remove */
+
+
 IRCDVar ircd[] = {
     {"PTlinkIRCd 6.14.*",       /* ircd name */
      "+o",                      /* nickserv mode */
@@ -40,7 +45,7 @@ IRCDVar ircd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */
-     "-inpsmtCRKOASdcqBNfkl",   /* Modes to Remove */
+     "-inpsmtCRKOASdcqBNl",     /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */

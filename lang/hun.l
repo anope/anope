@@ -1403,6 +1403,8 @@ CHAN_INFO_OPT_NONE
 	Nincs
 CHAN_INFO_MODE_LOCK
 		Rögzített módok: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Ez a csatorna nem fog elévülni.
 

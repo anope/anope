@@ -1411,6 +1411,8 @@ CHAN_INFO_OPT_NONE
 	YOK
 CHAN_INFO_MODE_LOCK
 	     Mod kilidi: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Bu kanal için zaman aþýmý söz konusu deðil.
 

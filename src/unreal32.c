@@ -20,6 +20,10 @@
 
 const char version_protocol[] = "UnrealIRCd 3.2+";
 
+/* Not all ircds use +f for their flood/join throttle system */
+const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
+const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on remove */
+
 IRCDVar ircd[] = {
     {"UnrealIRCd 3.2.x",        /* ircd name */
      "+oS",                     /* nickserv mode */
@@ -452,6 +456,7 @@ void moduleAddIRCDMsgs(void) {
 
     m = createMessage("401",       NULL); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("451",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);

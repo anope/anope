@@ -1401,6 +1401,8 @@ CHAN_INFO_OPT_NONE
 	Нет
 CHAN_INFO_MODE_LOCK
 	Блокировка режимов: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Этот канал никогда не истечет.
 

@@ -1415,6 +1415,8 @@ CHAN_INFO_OPT_NONE
 	Aucune
 CHAN_INFO_MODE_LOCK
 	     Modes maintenus: %s
+CHAN_INFO_EXPIRE
+	      Expires in: %s
 CHAN_INFO_NO_EXPIRE
 	Ce channel n'expirera pas.
 

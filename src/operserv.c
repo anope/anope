@@ -5027,7 +5027,7 @@ static int do_defcon(User * u)
         return MOD_CONT;
     }
     DefConLevel = newLevel;
-    send_event("EVENT_DEFCON_LEVEL", "%d", DefConLevel);
+    send_event(EVENT_DEFCON_LEVEL, "%d", DefConLevel);
     DefContimer = time(NULL);
     notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
     defcon_sendlvls(u);
@@ -5123,7 +5123,7 @@ void resetDefCon(int level)
         if ((DefContimer)
             && (time(NULL) - DefContimer >= dotime(DefConTimeOut))) {
             DefConLevel = level;
-            send_event("EVENT_DEFCON_LEVEL", "%d", DefConLevel);
+            send_event(EVENT_DEFCON_LEVEL, "%d", DefConLevel);
             alog("Defcon level timeout, returning to lvl %d", level);
             anope_cmd_global(s_OperServ,
                              getstring2(NULL, OPER_DEFCON_WALL),

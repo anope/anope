@@ -219,6 +219,7 @@ struct memo_ {
     time_t time;	/* When it was sent */
     char sender[NICKMAX];
     char *text;
+    ModuleData *moduleData[1024]; 	/* Module saved data attached to the Memo */
 };
 
 #define MF_UNREAD	0x0001	/* Memo has not yet been read */
@@ -502,6 +503,8 @@ struct chaninfo_ {
 
     struct channel_ *c;			/* Pointer to channel record (if   *
 					 			 *    channel is currently in use) */
+								 
+    ModuleData *moduleData[1024]; 	/* Module saved data attached to the ChannelInfo */
 
     /* For BotServ */
 

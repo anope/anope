@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="79"
+VERSION_BUILD="80"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (80)
+# BUGS  : N/A
+# NOTES : Added Memos/ChannelInfo to the moduleAddData() system
 #
 # BUILD : 1.7.2 (79)
 # BUGS  : 

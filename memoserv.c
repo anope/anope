@@ -192,6 +192,7 @@ static int delmemo(MemoInfo * mi, int num)
             break;
     }
     if (i < mi->memocount) {
+        moduleCleanStruct(mi->memos[i].moduleData);
         free(mi->memos[i].text);        /* Deallocate memo text memory */
         mi->memocount--;        /* One less memo now */
         if (i < mi->memocount)  /* Move remaining memos down a slot */
@@ -778,8 +779,10 @@ static int do_del(User * u)
             notice_lang(s_MemoServ, u, MEMO_DELETED_ONE, last);
         } else {
             /* Delete all memos. */
-            for (i = 0; i < mi->memocount; i++)
+            for (i = 0; i < mi->memocount; i++) {
                 free(mi->memos[i].text);
+                moduleCleanStruct(mi->memos[i].moduleData);
+            }
             free(mi->memos);
             mi->memos = NULL;
             mi->memocount = 0;

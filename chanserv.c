@@ -2182,6 +2182,7 @@ int delchan(ChannelInfo * ci)
         for (i = 0; i < ci->memos.memocount; i++) {
             if (ci->memos.memos[i].text)
                 free(ci->memos.memos[i].text);
+            moduleCleanStruct(ci->memos.memos[i].moduleData);
         }
         free(ci->memos.memos);
     }
@@ -2193,6 +2194,9 @@ int delchan(ChannelInfo * ci)
     }
     if (ci->badwords)
         free(ci->badwords);
+
+    moduleCleanStruct(ci->moduleData);
+
     free(ci);
     if (nc)
         nc->channelcount--;

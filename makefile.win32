@@ -25,6 +25,7 @@ install:
         cd lang && $(MAKE) install && cd ..
         cd src && $(MAKE) install && cd ..
         cd src\modules && $(MAKE) install && cd ..
+	cd src\modules && $(MAKE) subs-install && cd ..
         -@echo ---
         -@echo Anope has been insalled successfully!
         -@echo ---

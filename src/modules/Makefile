@@ -32,7 +32,12 @@ subs:
         echo "make all in $$i..."; \
         (cd $$i; $(MAKE) $(MAKEARGS) all); done
 
-clean:
+subs_clean:
+	@for i in $(SUBS); do \
+	echo "cleaning in $$i..."; \
+	(cd $$i; $(MAKE) $(MAKEARGS) clean); done
+
+clean: subs_clean
 	rm -f *.o *.so *.c~ core
 
 spotless: clean

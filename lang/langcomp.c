@@ -61,7 +61,7 @@ int read_index_file()
     char buf[256];
     int i;
 
-    if (!(f = fopen("index", "r"))) {
+    if (!(f = fopen("index", "rb"))) {
 	perror("fopen(index)");
 	return -1;
     }
@@ -177,11 +177,11 @@ int main(int ac, char **av)
 
     if (read_index_file() < 0)
 	return 1;
-    if (!(in = fopen(filename, "r"))) {
+    if (!(in = fopen(filename, "rb"))) {
 	perror(filename);
 	return 1;
     }
-    if (!(out = fopen(outfile, "w"))) {
+    if (!(out = fopen(outfile, "wb"))) {
 	perror(outfile);
 	return 1;
     }

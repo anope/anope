@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="185"
+VERSION_BUILD="186"
 
 # $Log$
+#
+# BUILD : 1.7.3 (186)
+# BUGS  : 
+# NOTES : Added langtool.c and modified some langcomp.c stuff in behalf of codemastr (win32 port)
 #
 # BUILD : 1.7.3 (185)
 # BUGS  : 99

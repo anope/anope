@@ -277,7 +277,7 @@ void db_mysql_save_ns_core(NickCore * nc)
         snprintf(sqlcmd, MAX_SQL_BUF,
                  "INSERT DELAYED INTO anope_ns_core (display,pass,email,greet,icq,url,flags,"
                  "language,accesscount,memocount,memomax,channelcount,channelmax,active)"
-                 " VALUES ('%s','%s','%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%d','1')",
+                 " VALUES ('%s',%s,'%s','%s','%d','%s','%d','%d','%d','%d','%d','%d','%d','1')",
                  cnick, epass, cemail, cgreet, nc->icq, curl, nc->flags,
                  nc->language, nc->accesscount, nc->memos.memocount,
                  nc->memos.memomax, nc->channelcount, nc->channelmax);

@@ -8,10 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="53"
+VERSION_BUILD="54"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (54)
+# NOTES : Added one more fix for MySQL nick password.
 #
 # BUILD : 1.7.1 (53)
 # BUGS  : 10

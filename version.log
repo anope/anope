@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="264"
+VERSION_BUILD="265"
 
 # $Log$
+#
+# BUILD : 1.7.4 (265)
+# BUGS  : N/A
+# NOTES : Only forgot 2 changes :)
 #
 # BUILD : 1.7.4 (264)
 # BUGS  : N/A

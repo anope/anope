@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="619"
+VERSION_BUILD="620"
 
 # $Log$
+#
+# BUILD : 1.7.8 (620)
+# BUGS  : 313
+# NOTES : Fixed various mistakes, as listed in bug 313 (only the mydbgen issue is not done yet)
 #
 # BUILD : 1.7.8 (619)
 # BUGS  : 

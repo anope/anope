@@ -1,4 +1,4 @@
-/* Bahamut functions
+/* SolidIRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org

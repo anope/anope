@@ -40,7 +40,7 @@ spotless:
         cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
         cd src\modules && $(MAKE) spotless && cd ..\..
-        -@erase include\language.h include\version.h *~ services.exe version.sh.exe *.obj anopesmtp.exe
+        -@erase include\language.h include\version.h *~ anope.exe version.sh.exe *.obj anopesmtp.exe
 
 mypasql: 
         $(MYPASQL_BUILD)
@@ -151,7 +151,7 @@ lang\index:
 include\language.h: lang\language.h
         cd lang && copy language.h ..\include\language.h && cd ..
         
-include\version.h: version.sh.exe version.log include\services.h include\pseudo.h include\messages.h include\pseudo.h include\messages.h
+include\version.h: version.sh.exe version.log include\services.h include\pseudo.h include\messages.h
         version.sh.exe
                 copy version.h include\version.h
 

@@ -1,6 +1,6 @@
 
 #define SERVICES_DIR "data"
-#define SERVICES_BIN "services.exe"
+#define SERVICES_BIN "anope.exe"
 
 typedef   signed __int16  int16;
 typedef   signed __int16  int16_t;

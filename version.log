@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="472"
+VERSION_BUILD="473"
 
 # $Log$
+#
+# BUILD : 1.7.6 (473)
+# BUGS  : N/A
+# NOTES : In some cases if you set TOPICLOCK on the channel before it ever got a TOPIC, then attempted to set a TOPIC, 
+# services would try to set a maliformed TOPIC message to the ircd. 
 #
 # BUILD : 1.7.6 (472)
 # BUGS  : N/A

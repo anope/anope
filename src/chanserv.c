@@ -2729,6 +2729,9 @@ static int do_register(User * u)
             ci->last_topic = sstrdup(c->topic);
             strscpy(ci->last_topic_setter, c->topic_setter, NICKMAX);
             ci->last_topic_time = c->topic_time;
+        } else {
+            /* Set this to something, otherwise it will maliform the topic */
+            strscpy(ci->last_topic_setter, s_ChanServ, NICKMAX);
         }
         ci->bi = NULL;
         ci->botflags = BSDefFlags;

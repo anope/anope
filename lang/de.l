@@ -5327,22 +5327,28 @@ OPER_HELP_OPER_CMD
 	    KICK         Einen User aus einem beliebigen
 	                   Channel kicken
 	    AKILL        Die AutoKill-Liste bearbeiten
-	    SQLINE      Die SQLINE-Liste bearbeiten
-	    SGLINE      Die SGLINE-Liste bearbeiten
-	    SZLINE      Die SZLINE-Liste bearbeiten
 	    CLEARMODES  Die Modes eines Channels zurücksetzen
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
+	    SGLINE      Die SGLINE-Liste bearbeiten
+
+OPER_HELP_OPER_CMD_SQLINE
+	    SQLINE      Die SQLINE-Liste bearbeiten
+
+OPER_HELP_OPER_CMD_SZLINE
+	    SZLINE      Die SZLINE-Liste bearbeiten
 
 OPER_HELP_ADMIN_CMD
 	Befehle, auf die nur Services Administratoren Zugriff haben:
 	    SET              Verschiedene Services Optionen einstellen
 	    OPER             Die Services Operatoren Liste bearbeiten
-	    SVSNICK        Erzwingt einen Nicknamen wechsel
 	    NOOP            Alle O:Lines temporär deaktivieren
 	    JUPE             Einen Server "jupitern"
 	    QUIT             Services _ohne_ Speichern der Datenbanken
 	                        beenden
-	    UMODE          User Modes ändern
-	    OLINE            Einem User "Operflags" setzen (nur für UnrealIRCD)
 	    CACHE           Listet die Hostnamen-Cache die von den Proxy-Detector
 	                        benutzt wird
 	    DEFCON         Ändert das  DefCon System
@@ -5365,6 +5371,18 @@ OPER_HELP_ADMIN_CMD
 	Befehle, auf die nur Services Roots (diese sind fest in der 
 	services.conf eingetragen) Zugriff haben:
 	    ADMIN       Liste der Services Administratoren bearbeiten
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE            Einem User "Operflags" setzen
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE          User Modes ändern
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK        Erzwingt einen Nicknamen wechsel
 
 OPER_HELP_ROOT_CMD
 	Befehle, auf die nur Services Roots Zugriff haben:

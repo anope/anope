@@ -5150,8 +5150,17 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  neteja els Modes d'un canal
 	    KILLCLONES  Mata tots els usuaris en un host
 	    AKILL       Manipula la llista AKILL
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Manipula la llista SGLINE
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Manipula la llista SQLINE
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Manipula la llista SZLINE
 
 OPER_HELP_ADMIN_CMD
@@ -5187,6 +5196,18 @@ OPER_HELP_ADMIN_CMD
 	Comandes disponibles nomès pel super-usuari de serveis:
 	    ADMIN       Modifica la llista d'administradors de
 	                serveis
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change a user's modes
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

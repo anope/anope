@@ -4988,8 +4988,19 @@ OPER_HELP_OPER_CMD
 	    KICK        Kicka um usuário de um canal
 	    CLEARMODES  Limpa os modos de um canal
 	    AKILL       Manipula a Lista de AKILL
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Manipula a lista de SGLINE
+
+OPER_HELP_OPER_CMD_SQLINE
+	    SQLINE      Manipula a lista de SQLINE
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Manipula a lista de SZLINE
+
 
 OPER_HELP_ADMIN_CMD
 	Comandos disponíveis para os Administradores dos Services:
@@ -5014,6 +5025,18 @@ OPER_HELP_ADMIN_CMD
 	
 	Comandos disponíveis para Super usuários dos Services:
 	    ADMIN       Modifica lista de Administradores dos Services
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change a user's modes
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

@@ -969,13 +969,40 @@ static int do_help(User * u)
 
     if (!cmd) {
         notice_help(s_OperServ, u, OPER_HELP);
-        if (is_services_oper(u))
+        if (is_services_oper(u)) {
             notice_help(s_OperServ, u, OPER_HELP_OPER_CMD);
-        if (is_services_admin(u))
+            if (ircd->sgline || ircd->sqline || ircd->szline) {
+                notice_help(s_OperServ, u, OPER_HELP_OPER_CMD_EXTRA);
+            }
+            if (ircd->sgline) {
+                notice_help(s_OperServ, u, OPER_HELP_OPER_CMD_SGLINE);
+            }
+            if (ircd->sqline) {
+                notice_help(s_OperServ, u, OPER_HELP_OPER_CMD_SQLINE);
+            }
+            if (ircd->szline) {
+                notice_help(s_OperServ, u, OPER_HELP_OPER_CMD_SZLINE);
+            }
+        }
+        if (is_services_admin(u)) {
             notice_help(s_OperServ, u, OPER_HELP_ADMIN_CMD);
+            if (ircd->svsnick || ircd->omode || ircd->umode) {
+                notice_help(s_OperServ, u, OPER_HELP_ADMIN_CMD_EXTRA);
+            }
+            if (ircd->svsnick) {
+                notice_help(s_OperServ, u, OPER_HELP_ADMIN_CMD_SVSNICK);
+            }
+            if (ircd->omode) {
+                notice_help(s_OperServ, u, OPER_HELP_ADMIN_CMD_OLINE);
+            }
+            if (ircd->umode) {
+                notice_help(s_OperServ, u, OPER_HELP_ADMIN_CMD_UMODE);
+            }
+        }
 #ifdef USE_MODULES
-        if (is_services_root(u))
+        if (is_services_root(u)) {
             notice_help(s_OperServ, u, OPER_HELP_ROOT_CMD);
+        }
 #endif
         moduleDisplayHelp(5, u);
         notice_help(s_OperServ, u, OPER_HELP_LOGGED);

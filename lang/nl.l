@@ -5086,8 +5086,17 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Verwijder alle modes van een kanaal
 	    KILLCLONES  Kill alle gebruikers met een bepaalde hostmask
 	    AKILL       Beheer de AKILL lijst
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Beheer de SGLINE lijst
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Beheer de SQLINE lijst
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Beheer de SZLINE lijst
 
 OPER_HELP_ADMIN_CMD
@@ -5109,9 +5118,6 @@ OPER_HELP_ADMIN_CMD
 	                op afstand
 	    JUPE        "Jupiter" een server
 	    IGNORE      Wijzig de Services negeer-lijst
-	    UMODE       Wijzigt de modus van een gebruiker
-	    OLINE       Geef Operflags aan een bepaalde gebruiker (alleen 
-	                    UnrealIRCd)
 	    SET         Stel verscheidene globale Services opties in
 	    RELOAD      Herlaad Services' configuratie bestand
 	    UPDATE      Forceer dat de Services database onmiddelijk
@@ -5122,6 +5128,18 @@ OPER_HELP_ADMIN_CMD
 	
 	Commando's beschikbaar voor Services super-gebruikers:
 	    ADMIN       Wijzig de Services Administrator lijst
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Geef Operflags aan een bepaalde gebruiker
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Wijzigt de modus van een gebruiker
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commando's beschikbaar voor Services Roots:

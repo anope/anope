@@ -5044,8 +5044,17 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Bir kanalýn modlarýný temizler
 	    KILLCLONES  Ayni ip'deki tum kullanicilari kill'ler.
 	    AKILL       AKILL listesini düzenler
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      SGLINE listesini düzenler
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      SQLINE listesini düzenler
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      SZLINE listesini düzenler
 
 OPER_HELP_ADMIN_CMD
@@ -5076,6 +5085,18 @@ OPER_HELP_ADMIN_CMD
 
 	Sadece Servis super-user(root) larý için geçerli komutlar:
 	    ADMIN       Servis adminleri listesini düzenler
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change a user's modes
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

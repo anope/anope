@@ -4946,14 +4946,22 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Clear modes of a channel
 	    KILLCLONES  Kill all users that have a certain host
 	    AKILL       Manipulate the AKILL list
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Manipulate the SGLINE list
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Manipulate the SQLINE list
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Manipulate the SZLINE list
 
 OPER_HELP_ADMIN_CMD
 	Commands available to Services admins only:
 	    OPER        Modify the Services operator list
-	    SVSNICK     Forcefully change a user's nickname
 	    CHANLIST    Lists all channel records
 	    USERLIST    Lists all user records
 	    LOGONNEWS   Define messages to be shown to users at logon
@@ -4967,9 +4975,6 @@ OPER_HELP_ADMIN_CMD
 	                    remotely
 	    JUPE        "Jupiter" a server
 	    IGNORE      Modify the Services ignore list
-	    UMODE       Change a user's modes
-	    OLINE       Give Operflags to a certain user (UnrealIRCd
-	                    only)
 	    SET         Set various global Services options
 	    RELOAD      Reload services' configuration file
 	    UPDATE      Force the Services databases to be
@@ -4982,6 +4987,18 @@ OPER_HELP_ADMIN_CMD
 
 	Commands available to the Services super-user only:
 	    ADMIN       Modify the Services admin list
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change a user's modes
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Service Roots only:

@@ -5192,9 +5192,19 @@ OPER_HELP_OPER_CMD
 	    KILLCLONES  Déconnecte tous les utilisateurs ayant un
 	                    certain hostname
 	    AKILL       Contrôle la liste des AKILLs
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Contrôle la liste des SGLINEs
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Contrôle la liste des SQLINEs
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Contrôle la liste des SZLINEs
+
 
 OPER_HELP_ADMIN_CMD
 	Commandes réservées aux administrateurs des Services:
@@ -5216,8 +5226,6 @@ OPER_HELP_ADMIN_CMD
 	                    d'un serveur
 	    JUPE        "Jupiter" un serveur
 	    IGNORE      Modifier la liste d'ignore des services
-	    UMODE       Change un mode d'un utilisateur
-	    OLINE       Donne les flags d'un Oper à un utilisateur (UnrealIRCd seulement)
 	    SET         Configure des options globales des Services
 	    RELOAD      Recharge le fichier de configuration des Services
 	    UPDATE      Oblige les bases de données des Services
@@ -5229,6 +5237,18 @@ OPER_HELP_ADMIN_CMD
 	
 	Commandes réservées aux super-utilisateurs des Services:
 	    ADMIN       Modifie la liste des administrateurs des Services
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Donne les flags d'un Oper à un utilisateur
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change un mode d'un utilisateur
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

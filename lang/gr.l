@@ -5084,8 +5084,17 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Καθαρίζει τα modes από το κανάλι
 	    KILLCLONES  Σκοτώνει όλους τους χρήστες που έχουν το ίδιο host
 	    AKILL       Προσθέτει ip κλπ στην λίστα AKILL
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Προσθέτει ip στην λίστα SGLINE
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Προσθέτει ip στην λίστα SQLINE
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Προσθέτει ip στην λίστα SZLINE
 
 OPER_HELP_ADMIN_CMD
@@ -5117,6 +5126,18 @@ OPER_HELP_ADMIN_CMD
 	
 	Εντολές διαθέσιμες για τους Services super-χρήστη μόνο:
 	    ADMIN       Αλλάζει την λίστα των Services admin
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Change a user's modes
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

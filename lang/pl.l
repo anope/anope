@@ -5520,14 +5520,22 @@ OPER_HELP_OPER_CMD
 	   CLEARMODES  Czyszczenie modów na kanale.
 	   KILLCLONES  Skilluj u¿ytkowników z danego hosta.
 	   AKILL       Modyfikacje listy AKILL. 
-	   SGLINE      Modyfikacje listy SGLINII.
-	   SQLINE      Modyfikacje listy SQLINII.
-	   SZLINE      Modyfikacje listy SZLINII.
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
+	    SGLINE      Modyfikacje listy SGLINII.
+
+OPER_HELP_OPER_CMD_SQLINE
+	    SQLINE      Modyfikacje listy SQLINII.
+
+OPER_HELP_OPER_CMD_SZLINE
+	    SZLINE      Modyfikacje listy SZLINII.
 
 OPER_HELP_ADMIN_CMD
 	Komendy dostêpne tylko dla adminów serwisów:
 	   OPER        Modyfikacja listy operatorów serwisów.
-	   SVSNICK     Wymuszona zmiana nicka danego u¿ytkownika.
 	   CHANLIST    Lista wszystkich rekordów kana³ów.
 	   USERLIST    Lista wszystkich rekordów u¿ytkowników.
 	   LOGONNEWS   Modyfikacja wiadomo¶ci wy¶wietlanych 
@@ -5542,9 +5550,6 @@ OPER_HELP_ADMIN_CMD
 	               serwerze.
 	   JUPE        Fake serwer do blokady po³±czeñ.
 	   IGNORE      Modyfikacja listy ignore serwisów.
-	   UMODE       Zmiana usermod dla u¿ytkownika.
-	   OLINE       Daje flagi opera wybranemu u¿ytkownikowi 
-	               (tylko UnrealIRCD).
 	   SET         Ustawienia ró¿nych, globalnych opcji.
 	   RELOAD      Prze³adowanie pliku konfiguracyjnego.
 	   UPDATE      Natychmiastowa i wymuszona aktualizacja baz
@@ -5557,6 +5562,18 @@ OPER_HELP_ADMIN_CMD
 
 	Komendy dostêpne tylko dla superadminów:
 	   ADMIN       Modyfikacja listy adminów serwisów.
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Daje flagi opera wybranemu u¿ytkownikowi 
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Zmiana usermod dla u¿ytkownika.
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Wymuszona zmiana nicka danego u¿ytkownika.
 
 OPER_HELP_ROOT_CMD
 	Dodatkowe komendy dostêpne tylko dla superadminów:

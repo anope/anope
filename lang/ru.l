@@ -4994,14 +4994,23 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Очистка режимов на канале
 	    KILLCLONES  Прибить всех пользователей с определенного хоста
 	    AKILL       Управление списком AKILL'ов
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Управление списком SGLINE'ов
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Управление списком SQLINE'ов
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Управление списком SZLINE'ов
+
 
 OPER_HELP_ADMIN_CMD
 	Команды, доступные только Администраторам сервисов:
 	    OPER        Управление списком Операторов сервисов
-	    SVSNICK     Сменить ник пользователю
 	    CHANLIST    Показать все текущие каналы
 	    USERLIST    Показать всех текущих пользователей
 	    LOGONNEWS   Установить сообщения при входе в сеть
@@ -5015,9 +5024,6 @@ OPER_HELP_ADMIN_CMD
 	                    сервере
 	    JUPE        "Джупнуть" сервер
 	    IGNORE      Управление списком игноров сервисов
-	    UMODE       Изменение режимов пользователя
-	    OLINE       Установить флаги IRC Операторов определенному пользователю (только 
-	                    UnrealIRCd)
 	    SET         Установить различные опции сервисов
 	    RELOAD      Перезагрузить конфигурационный файл сервисов
 	    UPDATE      Заставить сервисы немедленно сохранить
@@ -5030,6 +5036,18 @@ OPER_HELP_ADMIN_CMD
 
 	Команды, доступные только суперпользователю сервисов:
 	    ADMIN       Управление списком администраторов сервисов
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Установить флаги IRC Операторов определенному пользователю
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Изменение режимов пользователя
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Сменить ник пользователю
 
 OPER_HELP_ROOT_CMD
 	Команды, доступны только суперпользователям сервисов:

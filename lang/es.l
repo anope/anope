@@ -5123,8 +5123,17 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Limpia los modos de un canal
 	    KILLCLONES  Killea todos los usuarios en un host
 	    AKILL       Manipula la lista AKILL
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Manipula la lista SGLINE
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Manipula la lista SQLINE
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Manipula la lista SZLINE
 
 OPER_HELP_ADMIN_CMD
@@ -5146,8 +5155,6 @@ OPER_HELP_ADMIN_CMD
 	                    un servidor remotamente
 	    JUPE        "Jupiter" un servidor
 	    IGNORE	Ignora a un usuario
-	    UMODE	Otorga cambios de modos de usuario
-	    OLINE	Otorga privilegios IRCOP temporarios (Unreal ircd)
 	    SET         Setea varias opciones globales de los Servicios
 	    RELOAD      Recarga la configuracion de los Servicios
 	    UPDATE      Fuerza a la base de datos de los Servicios a
@@ -5163,6 +5170,18 @@ OPER_HELP_ADMIN_CMD
 	Comandos disponibles al super-usuario de Servicios solamente:
 	    ADMIN       Modifica la lista de administradores de
 	                Servicios
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE	Otorga privilegios IRCOP temporarios
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE	Otorga cambios de modos de usuario
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
 
 OPER_HELP_ROOT_CMD
 	Commands available to Serivces Roots only:

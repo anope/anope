@@ -4987,15 +4987,23 @@ OPER_HELP_OPER_CMD
 	    CLEARMODES  Törli a szoba módot
 	    KILLCLONES  Killeli az összes klónt a hosztról
 	    AKILL       Szerkeszti az AKILL listát
+
+OPER_HELP_OPER_CMD_EXTRA
+	Following commands are also available
+
+OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Szerkeszti az SGLINE listát
+
+OPER_HELP_OPER_CMD_SQLINE
 	    SQLINE      Szerkeszti az SQLINE listát
+
+OPER_HELP_OPER_CMD_SZLINE
 	    SZLINE      Szerkeszti az SZLINE listát
 	
 OPER_HELP_ADMIN_CMD
 	Ezek a Parancsok a szervíz admin részére elérhetõek:
 		
 	    OPER        Módosítja a Szervíz operátorok listáját
-	    SVSNICK     Megváltoztatja a felhasználó nicknevét
 	    CHANLIST    Listázza az összes csatornát 
 	    USERLIST    Listázza az összes felhasználót  
 	    LOGONNEWS   Fellépõ üzenetek beállítása
@@ -5009,9 +5017,6 @@ OPER_HELP_ADMIN_CMD
 	                  távollétében
 	    JUPE        Létrehoz egy "Jupiter" álszervert.
 	    IGNORE      Módosítja a Szervíz mellõzési listáját
-	    UMODE       Felhasználó módok állítása
-	    OLINE       Operflaget ad a biztos felhasználónak
-	                  (csak UnrealIRCd)
 	    SET         Beállítja szervíz általános változóit
 	    RELOAD      Újratölti a szervíz Konfigurációs fájlját
 	    UPDATE      A Szervíz adatbázist frissíti, felülírja
@@ -5024,6 +5029,18 @@ OPER_HELP_ADMIN_CMD
 	
 	Parancs rendelkezésre áll szuper-felhasználó részére:
 	    ADMIN       Módosítja a Szervíz admin listát
+
+OPER_HELP_ADMIN_CMD_EXTRA
+	Following commands are also available to Service Admins
+
+OPER_HELP_ADMIN_CMD_OLINE
+	    OLINE       Operflaget ad a biztos felhasználónak
+
+OPER_HELP_ADMIN_CMD_UMODE
+	    UMODE       Felhasználó módok állítása
+
+OPER_HELP_ADMIN_CMD_SVSNICK
+	    SVSNICK     Megváltoztatja a felhasználó nicknevét
 	
 OPER_HELP_ROOT_CMD
 	Parancs rendelkezésre áll Szervíz Rootok részére:

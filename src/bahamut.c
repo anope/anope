@@ -99,7 +99,7 @@ IRCDVar ircd[] = {
      0,                         /* We support TOKENS */
      1,                         /* TOKENS are CASE inSensitive */
      0,                         /* TIME STAMPS are BASE64 */
-     0,                         /* +I support */
+     1,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
      0,                         /* Services Client mode */

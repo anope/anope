@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="471"
+VERSION_BUILD="472"
 
 # $Log$
+#
+# BUILD : 1.7.6 (472)
+# BUGS  : N/A
+# NOTES : 1. Bahamut +I support
+# 2. Changes file updated (merged my items under the dev banner)
 #
 # BUILD : 1.7.6 (471)
 # BUGS  : N/A

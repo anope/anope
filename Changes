@@ -1,13 +1,6 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
-11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
-11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
-11/30 F Fixed ircd->chanmodes (pointed to freed memory).                  [ #00]
-11/21 F Fixed session decrease on /NS GHOST.                              [#229]
-11/19 F Wrong string and missing registered nick check in bot change.     [#221]
-
-Provided by Trystan <trystan@nomadirc.net> - 2004
 12/02 A Support for other Ulines Servers (NeoStats/SolarStats)		  [ #00]
 11/28 A Support for Unreal's version of SVSHOLD				  [ #00]
 11/28 A /OS SET LIST to list the set options				  [ #00]
@@ -18,9 +11,13 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/21 A Opened SGLINE to all ircd that support GEOS bans		  [ #00]
 11/21 A Opened SZLINE to all ircd that support ZLINE's			  [ #00]
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
+11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/03 F Bahamut support +I channel modes				  [ #00]
 12/02 F Ultimate3 botserv bots were getting wrong modes			  [ #00]
 12/01 F ChanServ AKICK DEL (reordering) (pointed to freed memory)	  [ #00]
 12/01 F del_session() warning messages when LimitSessions is disabled	  [ #00]
+11/30 F Fixed ircd->chanmodes (pointed to freed memory).                  [ #00]
 11/28 F NSSecureAdmins now restricts /NS SET EMAIL			  [#218]
 11/27 F Compiles and Runs under CYGWIN again				  [ #00]
 11/27 F bot_raw_mode() would cause a TSMODE warning			  [#234]
@@ -29,12 +26,14 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/27 F Removed +d references from the PTlink protocol file		  [ #00]
 11/23 F Rage 2 updated to support BETA 7			 	  [#226]
 11/23 F PTLink anope_cmd_server() message			          [ #00]
+11/21 F Fixed session decrease on /NS GHOST.                              [#229]
 11/20 F Disables UseRDB if there is an error duing SQL init		  [ #00]
 11/20 F MS CHECK now checks if the nick is forbidden.                     [#225]
 11/20 F Removing Sqline on bot nicks change if the nick was registered.	  [#224]
 11/19 F normalizeBuffer() now strips control character 1.		  [ #00]
 11/19 F CTCP Ping replies when UsePrivmsg is enabled.			  [ #00]
-11/19 F Some config options could overflow strtol().			  [ #00] 
+11/19 F Some config options could overflow strtol().			  [ #00]
+11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 Provided by DrStein <gacevedo@anope.org> - 2004

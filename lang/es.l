@@ -363,7 +363,7 @@ NICK_IDENTIFY_SYNTAX
 NICK_IDENTIFY_FAILED
 	Lo siento, la identificacion ha fallado.
 NICK_IDENTIFY_SUCCEEDED
-	Clave aceptada - Haz sido reconocido.
+	Clave aceptada - Has sido reconocido.
 NICK_IDENTIFY_EMAIL_REQUIRED
 	Ahora debes proveer un e-mail para tu nick.
 	Este e-mail te permitira recuperar tu clave en
@@ -1400,7 +1400,7 @@ CHAN_INVITE_SYNTAX
 CHAN_UNBAN_SYNTAX
 	UNBAN canal
 CHAN_UNBANNED
-	Haz sido desbaneado de %s.
+	Has sido desbaneado de %s.
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
@@ -1442,7 +1442,7 @@ CHAN_SENDPASS_SUBJECT
 CHAN_SENDPASS_HEAD
 	Hola,
 CHAN_SENDPASS_LINE_1
-	Haz solicitado recibir la clave del canal %s por e-mail.
+	Has solicitado recibir la clave del canal %s por e-mail.
 CHAN_SENDPASS_LINE_2
 	La clave es %s. Por razones de seguridad deberas cambiarla en cuanto recibas este mail.
 CHAN_SENDPASS_LINE_3
@@ -4399,7 +4399,7 @@ CHAN_HELP_AKICK
 	usuario dado a la lista de Autokicks. Si una razon
 	es dada con el comando, esta razon sera usada cuando el
 	usuario es kickeado; si no, la razon por defecto es
-	"Haz sido baneado del canal".
+	"Has sido baneado del canal".
 	
 	El comando AKICK STICK banea permanente la mascara
 	dada en el canal. Si alguien intenta remover el ban,

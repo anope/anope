@@ -774,6 +774,19 @@ void save_os_dbase(void)
 
 /*************************************************************************/
 
+void save_os_rdb_dbase(void)
+{
+#ifdef USE_RDB
+    if (!rdb_open())
+        return;
+    rdb_save_os_db(maxusercnt, maxusertime, &akills, &sglines, &sqlines,
+                   &szlines, hcache[0]);
+    rdb_close();
+#endif
+}
+
+/*************************************************************************/
+
 /* Removes the nick structure from OperServ lists. */
 
 void os_remove_nick(NickCore * nc)

@@ -297,6 +297,7 @@ char *MysqlSecure;
 char *MysqlSock;
 int MysqlRetries = 0;
 int MysqlRetryGap = 0;
+int UseRDB = 0;
 
 int DefConLevel;
 int DefCon1;
@@ -491,6 +492,7 @@ Directive directives[] = {
     {"MysqlSock", {{PARAM_STRING, PARAM_RELOAD, &MysqlSock}}},
     {"MysqlRetries", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetries}}},
     {"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
+    {"UseRDB", {{PARAM_SET, PARAM_RELOAD, &UseRDB}}},
     {"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
     {"ModuleDelayedAutoload",
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},

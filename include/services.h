@@ -58,7 +58,7 @@
 # define MYSQL_WARNING 2
 # define MYSQL_ERROR   4
 
-#include <mysql.h>
+#include "mysql.h"
 #include "errmsg.h"
 #endif
 

@@ -1288,6 +1288,35 @@ void save_cs_dbase(void)
 
 /*************************************************************************/
 
+void save_cs_rdb_dbase(void)
+{
+#ifdef USE_RDB
+    int i;
+    ChannelInfo *ci;
+
+    if (!rdb_open())
+        return;
+
+    rdb_tag_table("anope_cs_info");
+    rdb_scrub_table("anope_ms_info", "serv='CHAN'");
+    rdb_clear_table("anope_cs_access");
+    rdb_clear_table("anope_cs_levels");
+    rdb_clear_table("anope_cs_akicks");
+    rdb_clear_table("anope_cs_badwords");
+
+    for (i = 0; i < 256; i++) {
+        for (ci = chanlists[i]; ci; ci = ci->next) {
+            rdb_save_cs_info(ci);
+        }                       /* for (chanlists[i]) */
+    }                           /* for (i) */
+
+    rdb_scrub_table("anope_cs_info", "active='0'");
+    rdb_close();
+#endif
+}
+
+/*************************************************************************/
+
 /* Check the current modes on a channel; if they conflict with a mode lock,
  * fix them. */
 
@@ -1922,6 +1951,12 @@ void cs_remove_nick(const NickCore * nc)
                         ci->founder = nc2;
                         ci->successor = NULL;
                         nc2->channelcount++;
+#ifdef USE_RDB
+                        if (rdb_open()) {
+                            rdb_cs_set_founder(ci->name, nc2->display);
+                            rdb_close();
+                        }
+#endif
                     }
                 } else {
                     alog("%s: Deleting channel %s owned by deleted nick %s", s_ChanServ, ci->name, nc->display);
@@ -1966,6 +2001,12 @@ void cs_remove_nick(const NickCore * nc)
             }
         }
     }
+#ifdef USE_RDB
+    if (rdb_open()) {
+        rdb_cs_deluser(nc->display);
+        rdb_close();
+    }
+#endif
 }
 
 /*************************************************************************/
@@ -2094,6 +2135,12 @@ int delchan(ChannelInfo * ci)
         }
         ci->c->ci = NULL;
     }
+#ifdef USE_RDB
+    if (rdb_open()) {
+        rdb_cs_delchan(ci);
+        rdb_close();
+    }
+#endif
     if (ci->next)
         ci->next->prev = ci->prev;
     if (ci->prev)
@@ -3841,7 +3888,6 @@ static int access_del(User * u, ChanAccess * access, int *perm, int uacc)
         (*perm)++;
         return 0;
     }
-    rdb_cs_del_access(access);
     access->nc = NULL;
     access->in_use = 0;
     return 1;
@@ -3977,7 +4023,6 @@ static int do_access(User * u)
                     return MOD_CONT;
                 }
                 access->level = level;
-                rdb_cs_add_access(ci, access);
                 alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, GetHost(u), ulev, access->level, na->nick, nc->display, ci->name);
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED,
                             access->nc->display, chan, level);
@@ -4007,7 +4052,6 @@ static int do_access(User * u)
         access->in_use = 1;
         access->level = level;
         access->last_seen = 0;
-        rdb_cs_add_access(ci, access);
 
         alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, GetHost(u), ulev, access->level, na->nick, nc->display, ci->name);
         notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,

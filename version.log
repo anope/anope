@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="470"
+VERSION_BUILD="471"
 
 # $Log$
+#
+# BUILD : 1.7.6 (471)
+# BUGS  : N/A
+# NOTES : Redid Services Mode stuff to be config option called UlineServers this allows you to state what servers can set 
+# channel modes and we are to respecet the mode. Gotta clean this up some more in a bit
 #
 # BUILD : 1.7.6 (470)
 # BUGS  : N/A

@@ -236,16 +236,13 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 
             if (add) {
                 /*
-                   Okay everyones biggest complaint is that NeoStats or any other
-                   services clients are flagged as services but we still strip their
-                   channel modes when strict is enabled. This lets them keep the mode and
-                   we update our internal user/channel struct - TSL
+                   if they are in the uline server list we assume they can
+                   have the mode - yes woke up in the middle of the night to
+                   add this.. - TSL
                  */
-                if (ircd->servicesmode) {
-                    if (user->mode & ircd->servicesmode) {
-                        chan_set_user_status(chan, user, cum->status);
-                        continue;
-                    }
+                if (is_ulined(user->server->name)) {
+                    chan_set_user_status(chan, user, cum->status);
+                    continue;
                 }
 
                 /* Fixes bug #68

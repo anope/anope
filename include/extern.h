@@ -451,6 +451,10 @@ E char *ExceptionDBName;
 E char *SessionLimitDetailsLoc;
 E char *SessionLimitExceeded;
 
+E char *UlineServers;
+E char **Ulines;
+E int NumUlines;
+
 #ifdef USE_RDB
 E int rdb_init();
 E int rdb_open();
@@ -825,6 +829,8 @@ E uint32 uplink_capab;
 
 E Server *first_server(int flags);
 E Server *next_server(int flags);
+
+E int is_ulined(char *server);
 
 E Server *new_server(Server * uplink, const char *name, const char *desc,
                    uint16 flags, char *suid);

@@ -329,6 +329,10 @@ int Numeric;
 
 int UnRestrictSAdmin;
 
+char *UlineServers;
+char **Ulines;
+int NumUlines;
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -665,6 +669,7 @@ Directive directives[] = {
     {"GlobalOnDefconMore",
      {{PARAM_SET, PARAM_RELOAD, &GlobalOnDefconMore}}},
     {"DefconMessage", {{PARAM_STRING, PARAM_RELOAD, &DefconMessage}}},
+    {"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
 /*************************************************************************/
@@ -1194,6 +1199,19 @@ int read_config(int reload)
             ServicesRoots =
                 realloc(ServicesRoots, sizeof(char *) * RootNumber);
             ServicesRoots[RootNumber - 1] = sstrdup(s);
+        } while ((s = strtok(NULL, " ")));
+    }
+
+    /* Ulines */
+
+    if (UlineServers) {
+        NumUlines = 0;
+
+        s = strtok(UlineServers, " ");
+        do {
+            NumUlines++;
+            Ulines = realloc(Ulines, sizeof(char *) * NumUlines);
+            Ulines[NumUlines - 1] = sstrdup(s);
         } while ((s = strtok(NULL, " ")));
     }
 

@@ -443,4 +443,17 @@ void capab_parse(int ac, char **av)
     }
 }
 
+int is_ulined(char *server)
+{
+    int j;
+
+    for (j = 0; j < NumUlines; j++) {
+        if (stricmp(Ulines[j], server) == 0) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 /* EOF */

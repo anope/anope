@@ -196,18 +196,21 @@ void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
+    char *realname;
 
     if (LogUsers) {
+        realname = normalizeBuffer(user->realname);
         if (ircd->vhost) {
             alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
                  (user->vhost ? user->vhost : "(none)"),
-                 normalizeBuffer(user->realname), user->server->name);
+                 realname, user->server->name);
         } else {
             alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
-                 normalizeBuffer(user->realname), user->server->name);
+                 realname, user->server->name);
         }
+        free(realname);
     }
     send_event(EVENT_USER_LOGOFF, user->nick);
 

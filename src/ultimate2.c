@@ -1766,6 +1766,7 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
     }
 
     send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
+    free(s);
 }
 
 #endif

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="620"
+VERSION_BUILD="621"
 
 # $Log$
+#
+# BUILD : 1.7.8 (621)
+# BUGS  : 314
+# NOTES : Fixed normalizeBuffer not being freed twice (anope_cmd_ctcp / delete_user)
 #
 # BUILD : 1.7.8 (620)
 # BUGS  : 313

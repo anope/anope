@@ -2255,6 +2255,7 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
     }
 
     send_cmd(source, "%s %s :\1%s \1", send_token("NOTICE", "B"), dest, s);
+    free(s);
 }
 
 #endif

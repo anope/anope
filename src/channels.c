@@ -1032,8 +1032,6 @@ void do_sjoin(const char *source, int ac, char **av)
         } else {
             c = join_user_update(user, c, av[1]);
             c->creation_time = ts;
-            if (c->ci && (!serv || is_sync(serv)))
-                restore_topic(c->name);
             chan_set_correct_modes(user, c);
         }
     }

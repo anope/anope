@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="637"
+VERSION_BUILD="638"
 
 # $Log$
+#
+# BUILD : 1.7.8 (638)
+# BUGS  : 
+# NOTES : Accidently left 2 lines too much while fixing the topics being re-set on sync, causing them to be re-set on every normal join sent via SJOIN
 #
 # BUILD : 1.7.8 (637)
 # BUGS  : 

@@ -118,8 +118,7 @@ void update_host(User * user)
     }
 
     if (debug)
-        alog("debug: %s changes its host to %s", user->nick,
-             common_get_vhost(user));
+        alog("debug: %s changes its host to %s", user->nick, user->host);
 }
 
 
@@ -734,7 +733,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
             alog("%s: %s!%s@%s automatically identified for nick %s",
                  s_NickServ, user->nick, user->username,
-                 common_get_vhost(user), user->nick);
+                 user->host, user->nick);
         }
     }
 

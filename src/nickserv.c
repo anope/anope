@@ -2069,7 +2069,7 @@ static int do_register(User * u)
     } else if (u->na) {         /* i.e. there's already such a nick regged */
         if (u->na->status & NS_VERBOTEN) {
             alog("%s: %s@%s tried to register FORBIDden nick %s",
-                 s_NickServ, u->username, common_get_vhost(u), u->nick);
+                 s_NickServ, u->username, u->host, u->nick);
             notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
         } else {
             notice_lang(s_NickServ, u, NICK_ALREADY_REGISTERED, u->nick);
@@ -2302,8 +2302,7 @@ static int do_confirm(User * u)
             u->na = na;
             na->u = u;
             alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ,
-                 u->nick, u->username, common_get_vhost(u),
-                 (email ? email : "none"));
+                 u->nick, u->username, u->host, (email ? email : "none"));
             if (NSAddAccessOnReg)
                 notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick,
                             na->nc->access[0]);
@@ -2398,7 +2397,7 @@ static int do_group(User * u)
         notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
     } else if (u->na && (u->na->status & NS_VERBOTEN)) {
         alog("%s: %s@%s tried to use GROUP from FORBIDden nick %s",
-             s_NickServ, u->username, common_get_vhost(u), u->nick);
+             s_NickServ, u->username, u->host, u->nick);
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
     } else if (u->na && NSNoGroupChange) {
         notice_lang(s_NickServ, u, NICK_GROUP_CHANGE_DISABLED, s_NickServ);
@@ -2416,7 +2415,7 @@ static int do_group(User * u)
                     s_NickServ, s_NickServ);
     } else if (check_password(pass, target->nc->pass) != 1) {
         alog("%s: Failed GROUP for %s!%s@%s (invalid password)",
-             s_NickServ, u->nick, u->username, common_get_vhost(u));
+             s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
         bad_password(u);
     } else {
@@ -2473,7 +2472,7 @@ static int do_group(User * u)
             }
 #endif
             send_event(EVENT_GROUP, u->nick);
-            alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
+            alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
             u->lastnickreg = time(NULL);
@@ -2546,7 +2545,7 @@ static int do_identify(User * u)
         notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
     } else if (!(res = check_password(pass, na->nc->pass))) {
         alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
-             u->username, common_get_vhost(u));
+             u->username, u->host);
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
         bad_password(u);
     } else if (res == -1) {
@@ -2579,7 +2578,7 @@ static int do_identify(User * u)
         }
         send_event(EVENT_NICK_IDENTIFY, u->nick);
         alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
-             u->username, common_get_vhost(u), u->nick);
+             u->username, u->host, u->nick);
         notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
         if (ircd->vhost) {
             do_on_id(u);
@@ -2730,7 +2729,7 @@ static int do_logout(User * u)
 
         u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
         alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
-             u->username, common_get_vhost(u), u2->nick);
+             u->username, u->host, u2->nick);
 
         if (nick)
             notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
@@ -2776,7 +2775,7 @@ static int do_drop(User * u)
                                      "\2%s\2 used DROP on \2%s\2", u->nick,
                                      nick);
                 alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)",
-                     s_NickServ, u->nick, u->username, common_get_vhost(u),
+                     s_NickServ, u->nick, u->username, u->host,
                      nr->nick, nr->email);
                 delnickrequest(nr);
                 notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
@@ -2808,7 +2807,7 @@ static int do_drop(User * u)
         }
 
         alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)",
-             s_NickServ, u->nick, u->username, common_get_vhost(u),
+             s_NickServ, u->nick, u->username, u->host,
              na->nick, na->nc->display,
              (na->nc->email ? na->nc->email : "none"));
         delnick(na);
@@ -2977,14 +2976,14 @@ static int do_set_password(User * u, NickCore * nc, char *param)
 #endif
 
     if (u->na && u->na->nc != nc && is_services_admin(u)) {
-        alog("%s: %s!%s@%s used SET PASSWORD as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), nc->display, (nc->email ? nc->email : "none"));
+        alog("%s: %s!%s@%s used SET PASSWORD as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
         if (WallSetpass)
             anope_cmd_global(s_NickServ,
                              "\2%s\2 used SET PASSWORD as Services admin on \2%s\2",
                              u->nick, nc->display);
     } else {
         alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
-             u->nick, u->username, common_get_vhost(u),
+             u->nick, u->username, u->host,
              (nc->email ? nc->email : "none"));
     }
     return MOD_CONT;
@@ -3047,10 +3046,10 @@ static int do_set_email(User * u, NickCore * nc, char *param)
     }
 
     if (u->na && u->na->nc != nc && is_services_admin(u)) {
-        alog("%s: %s!%s@%s used SET EMAIL as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), nc->display, (nc->email ? nc->email : "none"));
+        alog("%s: %s!%s@%s used SET EMAIL as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
     } else {
         alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.",
-             s_NickServ, u->nick, u->username, common_get_vhost(u),
+             s_NickServ, u->nick, u->username, u->host,
              (nc->email ? nc->email : "none"), (param ? param : "none"));
     }
     if (nc->email)
@@ -3954,8 +3953,7 @@ static int do_recover(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: RECOVER: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username,
-                     common_get_vhost(u));
+                     s_NickServ, nick, u->nick, u->username, u->host);
                 bad_password(u);
             }
         }
@@ -3997,8 +3995,7 @@ static int do_release(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: RELEASE: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username,
-                     common_get_vhost(u));
+                     s_NickServ, nick, u->nick, u->username, u->host);
                 bad_password(u);
             }
         }
@@ -4048,8 +4045,7 @@ static int do_ghost(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: GHOST: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username,
-                     common_get_vhost(u));
+                     s_NickServ, nick, u->nick, u->username, u->host);
                 bad_password(u);
             }
         }
@@ -4119,7 +4115,7 @@ static int do_getemail(User * u)
         return MOD_CONT;
     }
     alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick,
-         u->username, common_get_vhost(u), email);
+         u->username, u->host, email);
     for (i = 0; i < 1024; i++) {
         for (nc = nclists[i]; nc; nc = nc->next) {
             if (nc->email) {
@@ -4157,7 +4153,7 @@ static int do_getpass(User * u)
     } else if (!(na = findnick(nick))) {
         if ((nr = findrequestnick(nick))) {
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-                 u->username, common_get_vhost(u), nick);
+                 u->username, u->host, nick);
             if (WallGetpass)
                 anope_cmd_global(s_NickServ,
                                  "\2%s\2 used GETPASS on \2%s\2", u->nick,
@@ -4176,7 +4172,7 @@ static int do_getpass(User * u)
         notice_lang(s_NickServ, u, PERMISSION_DENIED);
     } else {
         alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-             u->username, common_get_vhost(u), nick);
+             u->username, u->host, nick);
         if (WallGetpass)
             anope_cmd_global(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
                              u->nick, nick);
@@ -4235,7 +4231,7 @@ static int do_sendpass(User * u)
         MailEnd(mail);
 
         alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick,
-             u->username, common_get_vhost(u), nick);
+             u->username, u->host, nick);
         notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
     }
 #endif

@@ -866,7 +866,7 @@ void check_clones(User * user)
                              "\2WARNING\2 - possible clones detected from %s",
                              common_get_vhost(user));
             alog("%s: possible clones detected from %s", s_OperServ,
-                 common_get_vhost(user));
+                 user->host);
             i = CLONE_DETECT_SIZE - 1;
             if (warnings[0].host)
                 free(warnings[0].host);

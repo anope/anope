@@ -1703,7 +1703,7 @@ int check_kick(User * user, char *chan)
   kick:
     if (debug)
         alog("debug: channel: AutoKicking %s!%s@%s from %s", user->nick,
-             user->username, common_get_vhost(user), chan);
+             user->username, user->host, chan);
 
     /* Remember that the user has not been added to our channel user list
      * yet, so we check whether the channel does not exist OR has no user
@@ -2716,7 +2716,7 @@ static int do_register(User * u)
         notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
     } else if ((ci = cs_findchan(chan)) != NULL) {
         if (ci->flags & CI_VERBOTEN) {
-            alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->username, common_get_vhost(u));
+            alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->username, u->host);
             notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
         } else {
             notice_lang(s_ChanServ, u, CHAN_ALREADY_REGISTERED, chan);
@@ -2782,7 +2782,7 @@ static int do_register(User * u)
         ci->botflags = BSDefFlags;
         ci->founder->channelcount++;
         alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan,
-             u->nick, u->username, common_get_vhost(u));
+             u->nick, u->username, u->host);
         notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
 #ifndef USE_ENCRYPTION
         notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, ci->founderpass);
@@ -2841,7 +2841,7 @@ static int do_identify(User * u)
                 u->founder_chans = uc;
                 uc->chan = ci;
                 alog("%s: %s!%s@%s identified for %s", s_ChanServ, u->nick,
-                     u->username, common_get_vhost(u), ci->name);
+                     u->username, u->host, ci->name);
             }
 
             notice_lang(s_ChanServ, u, CHAN_IDENTIFY_SUCCEEDED, chan);
@@ -2850,8 +2850,7 @@ static int do_identify(User * u)
             notice_lang(s_ChanServ, u, CHAN_IDENTIFY_FAILED);
         } else {
             alog("%s: Failed IDENTIFY for %s by %s!%s@%s",
-                 s_ChanServ, ci->name, u->nick, u->username,
-                 common_get_vhost(u));
+                 s_ChanServ, ci->name, u->nick, u->username, u->host);
             notice_lang(s_ChanServ, u, PASSWORD_INCORRECT);
             bad_password(u);
         }
@@ -2887,8 +2886,7 @@ static int do_logout(User * u)
             make_unidentified(u2, ci);
             notice_lang(s_ChanServ, u, CHAN_LOGOUT_SUCCEEDED, nick, chan);
             alog("%s: User %s!%s@%s has been logged out of channel %s.",
-                 s_ChanServ, u2->nick, u2->username, common_get_vhost(u2),
-                 chan);
+                 s_ChanServ, u2->nick, u2->username, u2->host, chan);
         } else {
             int i;
             for (i = 0; i < 1024; i++)
@@ -2948,8 +2946,7 @@ static int do_drop(User * u)
 
         alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
              s_ChanServ, ci->name, u->nick, u->username,
-             common_get_vhost(u),
-             (ci->founder ? ci->founder->display : "(none)"));
+             u->host, (ci->founder ? ci->founder->display : "(none)"));
 
         delchan(ci);
 
@@ -3117,7 +3114,7 @@ static int do_set_founder(User * u, ChannelInfo * ci, char *param)
 
     alog("%s: Changing founder of %s from %s to %s by %s!%s@%s",
          s_ChanServ, ci->name, ci->founder->display, nc->display, u->nick,
-         u->username, common_get_vhost(u));
+         u->username, u->host);
 
     /* Founder and successor must not be the same group */
     if (nc == ci->successor)
@@ -3163,8 +3160,7 @@ static int do_set_successor(User * u, ChannelInfo * ci, char *param)
     alog("%s: Changing successor of %s from %s to %s by %s!%s@%s",
          s_ChanServ, ci->name,
          (ci->successor ? ci->successor->display : "none"),
-         (nc ? nc->display : "none"), u->nick, u->username,
-         common_get_vhost(u));
+         (nc ? nc->display : "none"), u->nick, u->username, u->host);
 
     ci->successor = nc;
 
@@ -3214,15 +3210,14 @@ static int do_set_password(User * u, ChannelInfo * ci, char *param)
 
     if (get_access(u, ci) < ACCESS_FOUNDER) {
         alog("%s: %s!%s@%s set password as Services admin for %s",
-             s_ChanServ, u->nick, u->username, common_get_vhost(u),
-             ci->name);
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         if (WallSetpass)
             anope_cmd_global(s_ChanServ,
                              "\2%s\2 set password as Services admin for channel \2%s\2",
                              u->nick, ci->name);
     } else {
         alog("%s: %s!%s@%s changed password of %s (founder: %s)",
-             s_ChanServ, u->nick, u->username, common_get_vhost(u),
+             s_ChanServ, u->nick, u->username, u->host,
              ci->name, ci->founder->display);
     }
     return MOD_CONT;
@@ -3605,13 +3600,13 @@ static int do_set_xop(User * u, ChannelInfo * ci, char *param)
         }
 
         alog("%s: %s!%s@%s enabled XOP for %s", s_ChanServ, u->nick,
-             u->username, common_get_vhost(u), ci->name);
+             u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_XOP_ON);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_XOP;
 
         alog("%s: %s!%s@%s disabled XOP for %s", s_ChanServ, u->nick,
-             u->username, common_get_vhost(u), ci->name);
+             u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF);
     } else {
         syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
@@ -3818,7 +3813,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         access->level = xlev;
         access->last_seen = 0;
 
-        alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, common_get_vhost(u), ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
+        alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
 
         if (!change) {
             notice_lang(s_ChanServ, u, xmsgs[3], access->nc->display,
@@ -4146,7 +4141,7 @@ static int do_access(User * u)
                     return MOD_CONT;
                 }
                 access->level = level;
-                alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, common_get_vhost(u), ulev, access->level, na->nick, nc->display, ci->name);
+                alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, access->level, na->nick, nc->display, ci->name);
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED,
                             access->nc->display, chan, level);
                 return MOD_CONT;
@@ -4176,7 +4171,7 @@ static int do_access(User * u)
         access->level = level;
         access->last_seen = 0;
 
-        alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, common_get_vhost(u), ulev, access->level, na->nick, nc->display, ci->name);
+        alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, access->level, na->nick, nc->display, ci->name);
         notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,
                     ci->name, access->level);
     } else if (stricmp(cmd, "DEL") == 0) {
@@ -4236,7 +4231,7 @@ static int do_access(User * u)
             } else {
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED,
                             access->nc->display, ci->name);
-                alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->username, common_get_vhost(u), get_access(u, ci), na->nick, access->nc->display, chan);
+                alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), na->nick, access->nc->display, chan);
                 access->nc = NULL;
                 access->in_use = 0;
                 deleted = 1;
@@ -4305,7 +4300,7 @@ static int do_access(User * u)
 
         notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR);
         alog("%s: %s!%s@%s (level %d) cleared access list on %s",
-             s_ChanServ, u->nick, u->username, common_get_vhost(u),
+             s_ChanServ, u->nick, u->username, u->host,
              get_access(u, ci), chan);
 
     } else {
@@ -4968,7 +4963,7 @@ static int do_levels(User * u)
                 ci->levels[levelinfo[i].what] = level;
 
                 alog("%s: %s!%s@%s set level %s on channel %s to %d",
-                     s_ChanServ, u->nick, u->username, common_get_vhost(u),
+                     s_ChanServ, u->nick, u->username, u->host,
                      levelinfo[i].name, ci->name, level);
                 notice_lang(s_ChanServ, u, CHAN_LEVELS_CHANGED,
                             levelinfo[i].name, chan, level);
@@ -4984,7 +4979,7 @@ static int do_levels(User * u)
                 ci->levels[levelinfo[i].what] = ACCESS_INVALID;
 
                 alog("%s: %s!%s@%s disabled level %s on channel %s",
-                     s_ChanServ, u->nick, u->username, common_get_vhost(u),
+                     s_ChanServ, u->nick, u->username, u->host,
                      levelinfo[i].name, ci->name);
                 notice_lang(s_ChanServ, u, CHAN_LEVELS_DISABLED,
                             levelinfo[i].name, chan);
@@ -5033,8 +5028,7 @@ static int do_levels(User * u)
         reset_levels(ci);
 
         alog("%s: %s!%s@%s reset levels definitions on channel %s",
-             s_ChanServ, u->nick, u->username, common_get_vhost(u),
-             ci->name);
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         notice_lang(s_ChanServ, u, CHAN_LEVELS_RESET, chan);
     } else {
         syntax_error(s_ChanServ, u, "LEVELS", CHAN_LEVELS_SYNTAX);
@@ -5879,8 +5873,7 @@ static int do_cs_topic(User * u)
 
         if (is_services_admin(u) && !check_access(u, ci, CA_TOPIC))
             alog("%s: %s!%s@%s changed topic of %s as services admin.",
-                 s_ChanServ, u->nick, u->username, common_get_vhost(u),
-                 c->name);
+                 s_ChanServ, u->nick, u->username, u->host, c->name);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_cmd_join(s_ChanServ, c->name, time(NULL));
@@ -6275,8 +6268,7 @@ static int do_getpass(User * u)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
         alog("%s: %s!%s@%s used GETPASS on %s",
-             s_ChanServ, u->nick, u->username, common_get_vhost(u),
-             ci->name);
+             s_ChanServ, u->nick, u->username, u->host, ci->name);
         if (WallGetpass) {
             anope_cmd_global(s_ChanServ,
                              "\2%s\2 used GETPASS on channel \2%s\2",
@@ -6339,7 +6331,7 @@ static int do_sendpass(User * u)
         MailEnd(mail);
 
         alog("%s: %s!%s@%s used SENDPASS on %s", s_ChanServ, u->nick,
-             u->username, common_get_vhost(u), chan);
+             u->username, u->host, chan);
         notice_lang(s_ChanServ, u, CHAN_SENDPASS_OK, chan);
     }
 #endif

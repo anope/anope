@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="17"
+VERSION_BUILD="18"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (18)
+# BUGS  : none
+# NOTES : Fixed lack of BotServ. Fixed compile error if no RDB
 #
 # BUILD : 1.7.0 (17)
 # BUGS  : 

@@ -60,7 +60,7 @@ int db_mysql_init()
     }
     if (!db_mysql_open())
         do_mysql = 0;
-        
+
     return 1;
 }
 
@@ -106,8 +106,9 @@ int db_mysql_query(char *sql)
 
     int result, lcv;
     char *s = db_mysql_quote(sql);
-    
-    if(debug) alog(s);
+
+    if (debug)
+        alog(s);
     free(s);
 
     result = mysql_query(mysql, sql);
@@ -878,10 +879,12 @@ void db_mysql_load_bs_dbase(void)
 {
     BotInfo *bi;
     char sqlcmd[MAX_SQL_BUF];
-    
-    if (!do_mysql) return;
 
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `nick`,`user`,`host`,`rname`,`flags`,`created`,`chancount` FROM `anope_bs_core`");
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `nick`,`user`,`host`,`rname`,`flags`,`created`,`chancount` FROM `anope_bs_core`");
 
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
@@ -892,7 +895,7 @@ void db_mysql_load_bs_dbase(void)
         mysql_free_result(mysql_res);
         return;
     }
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         bi = makebot(mysql_row[0]);
         bi->user = sstrdup(mysql_row[1]);
         bi->host = sstrdup(mysql_row[2]);
@@ -913,9 +916,11 @@ void db_mysql_load_hs_dbase(void)
     char *vIdent;
     int32 time;
 
-    if (!do_mysql) return;
+    if (!do_mysql)
+        return;
 
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `nick`,`vident`,`vhost`,`creator`,`time` FROM `anope_hs_core`");
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `nick`,`vident`,`vhost`,`creator`,`time` FROM `anope_hs_core`");
 
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
@@ -926,7 +931,7 @@ void db_mysql_load_hs_dbase(void)
         mysql_free_result(mysql_res);
         return;
     }
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         nick = sstrdup(mysql_row[0]);
         vIdent = sstrdup(mysql_row[1]);
         vHost = sstrdup(mysql_row[2]);
@@ -945,30 +950,35 @@ void db_mysql_load_news(void)
 {
     char sqlcmd[MAX_SQL_BUF];
     int j;
-    
-    if (!do_mysql) return;
-    
-    snprintf(sqlcmd, MAX_SQL_BUF,"SELECT `type`,`num`,`ntext`,`who`,`time` FROM `anope_os_news`");
+
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `type`,`num`,`ntext`,`who`,`time` FROM `anope_os_news`");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
+        log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
     nnews = mysql_num_rows(mysql_res);
-    if (nnews < 8) news_size = 16;
-    else if (nnews >= 16384) news_size = 32767;
-    else news_size = 2 * nnews;
+    if (nnews < 8)
+        news_size = 16;
+    else if (nnews >= 16384)
+        news_size = 32767;
+    else
+        news_size = 2 * nnews;
     news = scalloc(sizeof(*news) * news_size, 1);
     if (!nnews) {
         mysql_free_result(mysql_res);
         return;
     }
     j = 0;
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         news[j].type = atoi(mysql_row[0]);
         news[j].num = atoi(mysql_row[1]);
         news[j].text = sstrdup(mysql_row[2]);
-        snprintf(news[j].who, NICKMAX, "%s",mysql_row[3]);
+        snprintf(news[j].who, NICKMAX, "%s", mysql_row[3]);
         news[j].time = atoi(mysql_row[4]);
         j++;
     }
@@ -979,22 +989,24 @@ void db_mysql_load_exceptions(void)
 {
     char sqlcmd[MAX_SQL_BUF];
     int j;
-    
-    if (!do_mysql) return;
 
-    snprintf(sqlcmd, MAX_SQL_BUF,"SELECT `mask`,`lim`,`who`,`reason`,`time`,`expires` FROM `anope_os_exceptions`;");
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `mask`,`lim`,`who`,`reason`,`time`,`expires` FROM `anope_os_exceptions`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
+        log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
     nexceptions = mysql_num_rows(mysql_res);
     exceptions = scalloc(sizeof(Exception) * nexceptions, 1);
     j = 0;
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         exceptions[j].mask = sstrdup(mysql_row[0]);
         exceptions[j].limit = atoi(mysql_row[1]);
-        snprintf(exceptions[j].who, NICKMAX, "%s",mysql_row[2]);
+        snprintf(exceptions[j].who, NICKMAX, "%s", mysql_row[2]);
         exceptions[j].reason = sstrdup(mysql_row[3]);
         exceptions[j].time = atoi(mysql_row[4]);
         exceptions[j].expires = atoi(mysql_row[5]);
@@ -1011,13 +1023,15 @@ void db_mysql_load_os_dbase(void)
     Akill *ak;
     SXLine *sx;
     HostCache *hc;
-    int akc,sgc,sqc,szc,j;
-    
-    if (!do_mysql) return;
-    
-    snprintf(sqlcmd, MAX_SQL_BUF,"SELECT `maxusercnt`,`maxusertime`,`akills_count`,`sglines_count`,`sqlines_count`,`szlines_count` FROM `anope_os_core`;");
+    int akc, sgc, sqc, szc, j;
+
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `maxusercnt`,`maxusertime`,`akills_count`,`sglines_count`,`sqlines_count`,`szlines_count` FROM `anope_os_core`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
+        log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
@@ -1034,15 +1048,16 @@ void db_mysql_load_os_dbase(void)
         akc = sgc = sqc = szc = 0;
     }
     mysql_free_result(mysql_res);
-    
-    snprintf(sqlcmd, MAX_SQL_BUF, "SELECT `user`,`host`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_akills`;");
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `user`,`host`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_akills`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
+        log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
-    slist_setcapacity(&akills,akc);
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    slist_setcapacity(&akills, akc);
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         ak = scalloc(sizeof(Akill), 1);
         ak->user = sstrdup(mysql_row[0]);
         ak->host = sstrdup(mysql_row[1]);
@@ -1053,14 +1068,15 @@ void db_mysql_load_os_dbase(void)
         slist_add(&akills, ak);
     }
     mysql_free_result(mysql_res);
-    
-    slist_setcapacity(&sglines,sgc);
-    slist_setcapacity(&sqlines,sqc);
-    slist_setcapacity(&szlines,szc);
-    
-    snprintf(sqlcmd, MAX_SQL_BUF, "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_sglines`;");
+
+    slist_setcapacity(&sglines, sgc);
+    slist_setcapacity(&sqlines, sqc);
+    slist_setcapacity(&szlines, szc);
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_sglines`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql statement: %s",sqlcmd);
+        log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
@@ -1075,9 +1091,10 @@ void db_mysql_load_os_dbase(void)
     }
     mysql_free_result(mysql_res);
 
-    snprintf(sqlcmd, MAX_SQL_BUF, "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_sqlines`;");
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_sqlines`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql statement: %s",sqlcmd);
+        log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
@@ -1092,9 +1109,10 @@ void db_mysql_load_os_dbase(void)
     }
     mysql_free_result(mysql_res);
 
-    snprintf(sqlcmd, MAX_SQL_BUF, "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_szlines`;");
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `mask`,`xby`,`reason`,`seton`,`expire` FROM `anope_os_szlines`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql statement: %s",sqlcmd);
+        log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
@@ -1108,11 +1126,12 @@ void db_mysql_load_os_dbase(void)
         slist_add(&szlines, sx);
     }
     mysql_free_result(mysql_res);
-    
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `mask`,`status`,`used` FROM `anope_os_hcache`");
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `mask`,`status`,`used` FROM `anope_os_hcache`");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
-        db_mysql_error(MYSQL_WARNING,"query");
+        log_perror("Can't create sql query: %s", sqlcmd);
+        db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1125,7 +1144,7 @@ void db_mysql_load_os_dbase(void)
         hc->host = sstrdup(mysql_row[0]);
         hc->status = atoi(mysql_row[1]);
         hc->used = atoi(mysql_row[2]);
-        
+
         hc->prev = NULL;
         hc->next = hcache[j];
         if (hc->next)
@@ -1144,85 +1163,102 @@ void db_mysql_load_cs_dbase(void)
     int n_levels, j;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    
-    if (!do_mysql) return;
-    
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `name`,`founder`,`successor`,`founderpass`,`descr`,`url`,`email`,`time_registered`,`last_used`,`last_topic`,`last_topic_setter`,`last_topic_time`,`flags`,`forbidby`,`forbidreason`,`bantype`,`accesscount`,`akickcount`,`mlock_on`,`mlock_off`,`mlock_limit`,`mlock_key`,`mlock_flood`,`mlock_redirect`,`entry_message`,`memomax`,`botnick`,`botflags`,`ttb`,`bwcount`,`capsmin`,`capspercent`,`floodlines`,`floodsecs`,`repeattimes` FROM `anope_cs_info`");
+
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `name`,`founder`,`successor`,`founderpass`,`descr`,`url`,`email`,`time_registered`,`last_used`,`last_topic`,`last_topic_setter`,`last_topic_time`,`flags`,`forbidby`,`forbidreason`,`bantype`,`accesscount`,`akickcount`,`mlock_on`,`mlock_off`,`mlock_limit`,`mlock_key`,`mlock_flood`,`mlock_redirect`,`entry_message`,`memomax`,`botnick`,`botflags`,`ttb`,`bwcount`,`capsmin`,`capspercent`,`floodlines`,`floodsecs`,`repeattimes` FROM `anope_cs_info`");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
-        db_mysql_error(MYSQL_WARNING,"query");
+        log_perror("Can't create sql query: %s", sqlcmd);
+        db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
         mysql_free_result(mysql_res);
         return;
     }
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
-        ci = scalloc(sizeof(ChannelInfo),1);
-        snprintf(ci->name,CHANMAX,"%s",mysql_row[0]);
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
+        ci = scalloc(sizeof(ChannelInfo), 1);
+        snprintf(ci->name, CHANMAX, "%s", mysql_row[0]);
         ci->founder = findcore(mysql_row[1]);
         ci->successor = findcore(mysql_row[2]);
-        snprintf(ci->founderpass,PASSMAX,"%s",mysql_row[3]);
+        snprintf(ci->founderpass, PASSMAX, "%s", mysql_row[3]);
         ci->desc = sstrdup(mysql_row[4]);
         ci->url = sstrdup(mysql_row[5]);
-        if (strlen(ci->url) == 0) { free(ci->url); ci->url = NULL; }
+        if (strlen(ci->url) == 0) {
+            free(ci->url);
+            ci->url = NULL;
+        }
         ci->email = sstrdup(mysql_row[6]);
-        if (strlen(ci->email) == 0) { free(ci->email); ci->email = NULL; }
+        if (strlen(ci->email) == 0) {
+            free(ci->email);
+            ci->email = NULL;
+        }
         ci->time_registered = atoi(mysql_row[7]);
         ci->last_used = atoi(mysql_row[8]);
         ci->last_topic = sstrdup(mysql_row[9]);
-        snprintf(ci->last_topic_setter,NICKMAX,"%s",mysql_row[10]);
+        snprintf(ci->last_topic_setter, NICKMAX, "%s", mysql_row[10]);
         ci->last_topic_time = atoi(mysql_row[11]);
         ci->flags = atoi(mysql_row[12]);
 #ifdef USE_ENCRYPTION
         if (!(ci->flags & (CI_ENCRYPTEDPW | CI_VERBOTEN))) {
             if (debug)
-                alog("debug: %s: encrypting password for %s on load",s_ChanServ,ci->name);
+                alog("debug: %s: encrypting password for %s on load",
+                     s_ChanServ, ci->name);
             if (encrypt_in_place(ci->founderpass, PASSMAX) < 0)
-                fatal("%s: load database: Can't encrypt %s password!",s_ChanServ,ci->name);
+                fatal("%s: load database: Can't encrypt %s password!",
+                      s_ChanServ, ci->name);
             ci->flags |= CI_ENCRYPTEDPW;
         }
 #else
         if (ci->flags & CI_ENCRYPTEDPW) {
-            fatal("%s: load database: password for %s encrypted but encryption disabled, aborting",s_ChanServ,ci->name);
+            fatal
+                ("%s: load database: password for %s encrypted but encryption disabled, aborting",
+                 s_ChanServ, ci->name);
         }
 #endif
         ci->flags &= ~CI_INHABIT;
-        
+
         ci->forbidby = sstrdup(mysql_row[13]);
         ci->forbidreason = sstrdup(mysql_row[14]);
         ci->bantype = atoi(mysql_row[15]);
-        
+
         tempstr = db_mysql_quote(ci->name);
-        snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `position`,`level` FROM `anope_cs_levels` WHERE `channel` = '%s'",tempstr);
+        snprintf(sqlcmd, MAX_SQL_BUF,
+                 "SELECT `position`,`level` FROM `anope_cs_levels` WHERE `channel` = '%s'",
+                 tempstr);
         if (db_mysql_query(sqlcmd)) {
-            log_perror("Can't create sql query: %s",sqlcmd);
-            db_mysql_error(MYSQL_WARNING,"query");
+            log_perror("Can't create sql query: %s", sqlcmd);
+            db_mysql_error(MYSQL_WARNING, "query");
         }
         res = mysql_store_result(mysql);
         n_levels = mysql_num_rows(res);
         ci->levels = scalloc(2 * CA_SIZE, 1);
         reset_levels(ci);
-        while((row = mysql_fetch_row(res))) {
+        while ((row = mysql_fetch_row(res))) {
             ci->levels[atoi(row[0])] = atoi(row[1]);
         }
         mysql_free_result(res);
         ci->accesscount = atoi(mysql_row[16]);
         if (ci->accesscount) {
             ci->access = scalloc(ci->accesscount, sizeof(ChanAccess));
-            snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `in_use`,`level`,`display`,`last_seen` FROM `anope_cs_access` WHERE `channel` = '%s'",tempstr);
+            snprintf(sqlcmd, MAX_SQL_BUF,
+                     "SELECT `in_use`,`level`,`display`,`last_seen` FROM `anope_cs_access` WHERE `channel` = '%s'",
+                     tempstr);
             if (db_mysql_query(sqlcmd)) {
-                log_perror("Can't create sql query: %s",sqlcmd);
-                db_mysql_error(MYSQL_WARNING,"query");
+                log_perror("Can't create sql query: %s", sqlcmd);
+                db_mysql_error(MYSQL_WARNING, "query");
             }
             res = mysql_store_result(mysql);
             j = 0;
-            while((row = mysql_fetch_row(res))) {
+            while ((row = mysql_fetch_row(res))) {
                 ci->access[j].in_use = atoi(row[0]);
                 if (ci->access[j].in_use) {
                     ci->access[j].level = atoi(row[1]);
                     ci->access[j].nc = findcore(row[2]);
-                    if (ci->access[j].nc == NULL) ci->access[j].in_use = 0;
+                    if (ci->access[j].nc == NULL)
+                        ci->access[j].in_use = 0;
                     ci->access[j].last_seen = atoi(row[3]);
                 }
                 j++;
@@ -1233,32 +1269,35 @@ void db_mysql_load_cs_dbase(void)
         }
         ci->akickcount = atoi(mysql_row[17]);
         if (ci->akickcount) {
-          ci->akick = scalloc(ci->akickcount,sizeof(AutoKick));
-          snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `flags`,`dmask`,`reason`,`creator`,`addtime` FROM `anope_cs_akicks` WHERE `channel` = '%s'",tempstr);
-          if (db_mysql_query(sqlcmd)) {
-              log_perror("Can't create sql query: %s",sqlcmd);
-              db_mysql_error(MYSQL_WARNING,"query");
-          }
-          res = mysql_store_result(mysql);
-          j = 0;
-          while((row = mysql_fetch_row(res))) {
-              ci->akick[j].flags = atoi(row[0]);
-              if (ci->akick[j].flags & AK_USED) {
-                  if (ci->akick[j].flags & AK_ISNICK) {
-                      ci->akick[j].u.nc = findcore(row[1]);
-                      if (!ci->akick[j].u.nc) ci->akick[j].flags &= ~AK_USED;
-                  } else {
-                      ci->akick[j].u.mask = sstrdup(row[1]);
-                  }
-                  ci->akick[j].reason = sstrdup(row[2]);
-                  ci->akick[j].creator = sstrdup(row[3]);
-                  ci->akick[j].addtime = atoi(row[4]);
-              }
-              j++;
-          }
-          mysql_free_result(res);
+            ci->akick = scalloc(ci->akickcount, sizeof(AutoKick));
+            snprintf(sqlcmd, MAX_SQL_BUF,
+                     "SELECT `flags`,`dmask`,`reason`,`creator`,`addtime` FROM `anope_cs_akicks` WHERE `channel` = '%s'",
+                     tempstr);
+            if (db_mysql_query(sqlcmd)) {
+                log_perror("Can't create sql query: %s", sqlcmd);
+                db_mysql_error(MYSQL_WARNING, "query");
+            }
+            res = mysql_store_result(mysql);
+            j = 0;
+            while ((row = mysql_fetch_row(res))) {
+                ci->akick[j].flags = atoi(row[0]);
+                if (ci->akick[j].flags & AK_USED) {
+                    if (ci->akick[j].flags & AK_ISNICK) {
+                        ci->akick[j].u.nc = findcore(row[1]);
+                        if (!ci->akick[j].u.nc)
+                            ci->akick[j].flags &= ~AK_USED;
+                    } else {
+                        ci->akick[j].u.mask = sstrdup(row[1]);
+                    }
+                    ci->akick[j].reason = sstrdup(row[2]);
+                    ci->akick[j].creator = sstrdup(row[3]);
+                    ci->akick[j].addtime = atoi(row[4]);
+                }
+                j++;
+            }
+            mysql_free_result(res);
         } else {
-          ci->akick = NULL;
+            ci->akick = NULL;
         }
         ci->mlock_on = atoi(mysql_row[18]);
         ci->mlock_off = atoi(mysql_row[19]);
@@ -1272,9 +1311,11 @@ void db_mysql_load_cs_dbase(void)
         ci->mlock_redirect = sstrdup(mysql_row[23]);
 #endif
         ci->memos.memomax = atoi(mysql_row[25]);
-        snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `number`,`flags`,`time`,`sender`,`text` FROM `anope_ms_info` WHERE `receiver` = '%s'",tempstr);
+        snprintf(sqlcmd, MAX_SQL_BUF,
+                 "SELECT `number`,`flags`,`time`,`sender`,`text` FROM `anope_ms_info` WHERE `receiver` = '%s'",
+                 tempstr);
         if (db_mysql_query(sqlcmd)) {
-            log_perror("Can't create sql query: %s",sqlcmd);
+            log_perror("Can't create sql query: %s", sqlcmd);
             db_mysql_error(MYSQL_WARNING, "query");
         }
         res = mysql_store_result(mysql);
@@ -1283,20 +1324,23 @@ void db_mysql_load_cs_dbase(void)
             Memo *memos;
             memos = scalloc(sizeof(Memo) * ci->memos.memocount, 1);
             ci->memos.memos = memos;
-            while((row = mysql_fetch_row(res))) {
+            while ((row = mysql_fetch_row(res))) {
                 memos->number = atoi(row[0]);
                 memos->flags = atoi(row[1]);
                 memos->time = atoi(row[2]);
-                snprintf(memos->sender,NICKMAX,"%s",row[3]);
+                snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
                 memos++;
             }
-        }  
+        }
         mysql_free_result(res);
         ci->entry_message = sstrdup(mysql_row[24]);
-        if (strlen(ci->entry_message) == 0) { free(ci->entry_message); ci->entry_message = NULL; }
+        if (strlen(ci->entry_message) == 0) {
+            free(ci->entry_message);
+            ci->entry_message = NULL;
+        }
         ci->c = NULL;
-        
+
         ci->bi = findbot(mysql_row[26]);
         ci->botflags = atoi(mysql_row[27]);
         ci->ttb = scalloc(2 * TTB_SIZE, 1);
@@ -1308,20 +1352,22 @@ void db_mysql_load_cs_dbase(void)
         ci->floodlines = atoi(mysql_row[32]);
         ci->floodsecs = atoi(mysql_row[33]);
         ci->repeattimes = atoi(mysql_row[34]);
-        
+
         ci->bwcount = atoi(mysql_row[29]);
         if (ci->bwcount) {
             ci->badwords = scalloc(ci->bwcount, sizeof(BadWord));
-            snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `word`,`type` FROM `anope_cs_badwords` WHERE `channel` = '%s'",tempstr);
+            snprintf(sqlcmd, MAX_SQL_BUF,
+                     "SELECT `word`,`type` FROM `anope_cs_badwords` WHERE `channel` = '%s'",
+                     tempstr);
             if (db_mysql_query(sqlcmd)) {
-                log_perror("Can't create sql query: %s",sqlcmd);
+                log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
             }
             res = mysql_store_result(mysql);
             j = 0;
-            while((row = mysql_fetch_row(res))) {
+            while ((row = mysql_fetch_row(res))) {
                 ci->badwords[j].in_use = 1;
-                if (ci->badwords[j].in_use) { /* I know... but for later */
+                if (ci->badwords[j].in_use) {   /* I know... but for later */
                     ci->badwords[j].word = sstrdup(row[0]);
                     ci->badwords[j].type = atoi(row[1]);
                 }
@@ -1335,13 +1381,14 @@ void db_mysql_load_cs_dbase(void)
         free(tempstr);
     }
     mysql_free_result(mysql_res);
-    
+
     for (j = 0; j < 256; j++) {
         ChannelInfo *next;
         for (ci = chanlists[j]; ci; ci = next) {
             next = ci->next;
             if (!(ci->flags & CI_VERBOTEN) && !ci->founder) {
-                alog("%s: database load: Deleting founderless channel %s",s_ChanServ,ci->name);
+                alog("%s: database load: Deleting founderless channel %s",
+                     s_ChanServ, ci->name);
                 delchan(ci);
             }
         }
@@ -1352,20 +1399,22 @@ void db_mysql_load_ns_req_dbase(void)
 {
     char sqlcmd[MAX_SQL_BUF];
     NickRequest *nr;
-    
-    if (!do_mysql) return;
-    
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `nick`,`passcode`,`password`,`email`,`requested`,`active` FROM `anope_ns_req`;");
+
+    if (!do_mysql)
+        return;
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `nick`,`passcode`,`password`,`email`,`requested`,`active` FROM `anope_ns_req`;");
     if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s",sqlcmd);
-        db_mysql_error(MYSQL_WARNING,"query");
+        log_perror("Can't create sql query: %s", sqlcmd);
+        db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
         mysql_free_result(mysql_res);
         return;
     }
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         nr = scalloc(1, sizeof(NickRequest));
         nr->nick = sstrdup(mysql_row[0]);
         nr->passcode = sstrdup(mysql_row[1]);
@@ -1384,11 +1433,13 @@ void db_mysql_load_ns_dbase(void)
     NickAlias *na;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    int i,j;
+    int i, j;
 
-    if (!do_mysql) return;
+    if (!do_mysql)
+        return;
 
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `display`,`pass`,`email`,`icq`,`url`,`flags`,`language`,`accesscount`,`memocount`,`memomax`,`channelcount`,`channelmax`,`greet`,`active` FROM `anope_ns_core`");
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `display`,`pass`,`email`,`icq`,`url`,`flags`,`language`,`accesscount`,`memocount`,`memomax`,`channelcount`,`channelmax`,`greet`,`active` FROM `anope_ns_core`");
 
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
@@ -1400,9 +1451,9 @@ void db_mysql_load_ns_dbase(void)
         return;
     }
 
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
         nc = scalloc(1, sizeof(NickCore));
-        
+
         nc->display = sstrdup(mysql_row[0]);
         nc->pass = sstrdup(mysql_row[1]);
         nc->email = sstrdup(mysql_row[2]);
@@ -1413,68 +1464,76 @@ void db_mysql_load_ns_dbase(void)
         nc->accesscount = atoi(mysql_row[7]);
         nc->memos.memocount = atoi(mysql_row[8]);
         nc->memos.memomax = atoi(mysql_row[9]);
-        nc->channelcount =  atoi(mysql_row[10]);
+        nc->channelcount = atoi(mysql_row[10]);
         nc->channelmax = atoi(mysql_row[11]);
         nc->greet = sstrdup(mysql_row[12]);
-        
+
         if (!NSAllowKillImmed)
             nc->flags &= ~NI_KILL_IMMED;
-        
+
 #ifdef USE_ENCRYPTION
         if (nc->pass && !(nc->flags & NI_ENCRYPTEDPW)) {
             if (debug)
-                alog("debug: %s: encrypting password for `%s' on load", s_NickServ, nc->display);
-            if(encrypt_in_place(nc->pass, PASSMAX) < 0)
-                fatal("%s: Can't encrypt `%s' nickname password!", s_NickServ, nc->display);
+                alog("debug: %s: encrypting password for `%s' on load",
+                     s_NickServ, nc->display);
+            if (encrypt_in_place(nc->pass, PASSMAX) < 0)
+                fatal("%s: Can't encrypt `%s' nickname password!",
+                      s_NickServ, nc->display);
 
             nc->flags |= NI_ENCRYPTEDPW;
         }
 #else
         if (nc->flags & NI_ENCRYPTEDPW)
-            fatal("%s: load database: password for %s encrypted but encryption disabled, aborting", s_NickServ, nc->display);
-#endif        
+            fatal
+                ("%s: load database: password for %s encrypted but encryption disabled, aborting",
+                 s_NickServ, nc->display);
+#endif
 
         if (nc->flags & NI_SERVICES_ADMIN)
             slist_add(&servadmins, nc);
         if (nc->flags & NI_SERVICES_OPER)
             slist_add(&servopers, nc);
-        
+
         if (nc->accesscount) {
             char **access;
             access = scalloc(sizeof(char *) * nc->accesscount, 1);
             nc->access = access;
             tmpstr = db_mysql_quote(nc->display);
-            snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `access` FROM `anope_ns_access` WHERE `display` = '%s'",tmpstr);
+            snprintf(sqlcmd, MAX_SQL_BUF,
+                     "SELECT `access` FROM `anope_ns_access` WHERE `display` = '%s'",
+                     tmpstr);
             free(tmpstr);
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
             }
             res = mysql_store_result(mysql);
-            while((row = mysql_fetch_row(res))) {
+            while ((row = mysql_fetch_row(res))) {
                 *access = sstrdup(row[0]);
                 access++;
             }
             mysql_free_result(res);
         }
-        
+
         if (nc->memos.memocount) {
             Memo *memos;
             memos = scalloc(sizeof(Memo) * nc->memos.memocount, 1);
             nc->memos.memos = memos;
             tmpstr = db_mysql_quote(nc->display);
-            snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `number`,`flags`,`time`,`sender`,`text` FROM `anope_ms_info` WHERE `receiver` = '%s' ORDER BY `number` ASC",tmpstr);
+            snprintf(sqlcmd, MAX_SQL_BUF,
+                     "SELECT `number`,`flags`,`time`,`sender`,`text` FROM `anope_ms_info` WHERE `receiver` = '%s' ORDER BY `number` ASC",
+                     tmpstr);
             free(tmpstr);
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
             }
             res = mysql_store_result(mysql);
-            while((row = mysql_fetch_row(res))) {
+            while ((row = mysql_fetch_row(res))) {
                 memos->number = atoi(row[0]);
                 memos->flags = atoi(row[1]);
                 memos->time = atoi(row[2]);
-                snprintf(memos->sender,NICKMAX,"%s",row[3]);
+                snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
                 memos++;
             }
@@ -1483,46 +1542,49 @@ void db_mysql_load_ns_dbase(void)
         insert_core(nc);
     }
     mysql_free_result(mysql_res);
-    
-    snprintf(sqlcmd,MAX_SQL_BUF,"SELECT `display`,`nick`,`time_registered`,`last_seen`,`status`,`last_usermask`,`last_realname`,`last_quit` FROM `anope_ns_alias`");
+
+    snprintf(sqlcmd, MAX_SQL_BUF,
+             "SELECT `display`,`nick`,`time_registered`,`last_seen`,`status`,`last_usermask`,`last_realname`,`last_quit` FROM `anope_ns_alias`");
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
     }
     mysql_res = mysql_store_result(mysql);
-    while((mysql_row = mysql_fetch_row(mysql_res))) {
-      na = scalloc(1, sizeof(NickAlias));
-      na->nick = sstrdup(mysql_row[1]);
+    while ((mysql_row = mysql_fetch_row(mysql_res))) {
+        na = scalloc(1, sizeof(NickAlias));
+        na->nick = sstrdup(mysql_row[1]);
 
-      na->last_usermask = sstrdup(mysql_row[5]);
-      na->last_realname = sstrdup(mysql_row[6]);
-      na->last_quit = sstrdup(mysql_row[7]);
-      na->time_registered = atoi(mysql_row[2]);
-      na->last_seen = atoi(mysql_row[3]);
-      na->status = atoi(mysql_row[4]);
-      na->status &= ~NS_TEMPORARY;
-      tmpstr = sstrdup(mysql_row[0]);
-      na->nc = findcore(tmpstr);
-      free(tmpstr);
-      
-      slist_add(&na->nc->aliases, na);
-      
-      if(!(na->status & NS_VERBOTEN)) {
-          if (!na->last_usermask) na->last_usermask = sstrdup("");
-          if (!na->last_realname) na->last_realname = sstrdup("");
-      }
-      
-      na->nc->flags &= ~NI_SERVICES_ROOT;
-      alpha_insert_alias(na);
+        na->last_usermask = sstrdup(mysql_row[5]);
+        na->last_realname = sstrdup(mysql_row[6]);
+        na->last_quit = sstrdup(mysql_row[7]);
+        na->time_registered = atoi(mysql_row[2]);
+        na->last_seen = atoi(mysql_row[3]);
+        na->status = atoi(mysql_row[4]);
+        na->status &= ~NS_TEMPORARY;
+        tmpstr = sstrdup(mysql_row[0]);
+        na->nc = findcore(tmpstr);
+        free(tmpstr);
+
+        slist_add(&na->nc->aliases, na);
+
+        if (!(na->status & NS_VERBOTEN)) {
+            if (!na->last_usermask)
+                na->last_usermask = sstrdup("");
+            if (!na->last_realname)
+                na->last_realname = sstrdup("");
+        }
+
+        na->nc->flags &= ~NI_SERVICES_ROOT;
+        alpha_insert_alias(na);
     }
     mysql_free_result(mysql_res);
-    
+
     for (j = 0; j < 1024; j++) {
         NickAlias *next;
         for (na = nalists[j]; na; na = next) {
             next = na->next;
             if (!na->nc) {
-                alog("%s: while loading database: %s has no core! We delete it.",s_NickServ, na->nick);
+                alog("%s: while loading database: %s has no core! We delete it.", s_NickServ, na->nick);
                 delnick(na);
                 continue;
             }
@@ -1533,4 +1595,3 @@ void db_mysql_load_ns_dbase(void)
         }
     }
 }
-

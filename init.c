@@ -644,50 +644,51 @@ int init(int ac, char **av)
 #ifdef USE_RDB
     if (UseRDB)
         rdb_load_dbases();
-    if (!UseRDB) {
 #endif
-    if (!skeleton) {
-        load_ns_dbase();
-        if (debug)
-            alog("debug: Loaded %s database (1/9)", s_NickServ);
-        if (s_HostServ) {
-            load_hs_dbase();
+    /* Need a better way to handle this -dane */
+    if (!UseRDB) {
+        if (!skeleton) {
+            load_ns_dbase();
             if (debug)
-                alog("debug: Loaded %s database (2/9)", s_HostServ);
+                alog("debug: Loaded %s database (1/9)", s_NickServ);
+            if (s_HostServ) {
+                load_hs_dbase();
+                if (debug)
+                    alog("debug: Loaded %s database (2/9)", s_HostServ);
+            }
+            if (s_BotServ) {
+                load_bs_dbase();
+                if (debug)
+                    alog("debug: Loaded %s database (3/9)", s_BotServ);
+            } else if (debug)
+                alog("debug: BotServ database (4/9) not loaded because BotServ is disabled");
+            load_cs_dbase();
+            if (debug)
+                alog("debug: Loaded %s database (5/9)", s_ChanServ);
         }
-        if (s_BotServ) {
+        load_os_dbase();
+        if (debug)
+            alog("debug: Loaded %s database (6/9)", s_OperServ);
+        load_news();
+        if (debug)
+            alog("debug: Loaded news database (7/9)");
+        load_exceptions();
+        if (debug)
+            alog("debug: Loaded exception database (8/9)");
+        if (PreNickDBName) {
+            load_ns_req_db();
             if (debug)
-                alog("debug: Loaded %s database (3/9)", s_BotServ);
-        } else if (debug)
-            alog("debug: BotServ database (4/9) not loaded because BotServ is disabled");
-        load_cs_dbase();
-        if (debug)
-            alog("debug: Loaded %s database (5/9)", s_ChanServ);
-    }
-    load_os_dbase();
-    if (debug)
-        alog("debug: Loaded %s database (6/9)", s_OperServ);
-    load_news();
-    if (debug)
-        alog("debug: Loaded news database (7/9)");
-    load_exceptions();
-    if (debug)
-        alog("debug: Loaded exception database (8/9)");
-    if (PreNickDBName) {
-        load_ns_req_db();
-        if (debug)
-            alog("debug: Loaded PreNick database (9/9)");
-    }
+                alog("debug: Loaded PreNick database (9/9)");
+        }
     }
     alog("Databases loaded");
 
     /* Save the databases back to file/mysql to reflect any changes */
 #ifdef USE_RDB
-    if (!UseRDB)   /* Only save if we are not using remote databases
-                    * to avoid floods. As a side effects our nice
-                    * FFF databases won't get overwritten if the
-                    * mysql db is broken (empty etc.) */
-    {
+    if (!UseRDB) {              /* Only save if we are not using remote databases
+                                 * to avoid floods. As a side effects our nice
+                                 * FFF databases won't get overwritten if the
+                                 * mysql db is broken (empty etc.) */
 #endif
         alog("Info: Reflecting database records.");
         save_databases();

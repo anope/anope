@@ -30,7 +30,7 @@ int rdb_open()
 {
 
 #ifdef USE_MYSQL
-    return 1; // db_mysql_open();
+    return 1;                   // db_mysql_open();
 #endif
 
 }
@@ -41,7 +41,7 @@ int rdb_close()
 {
 
 #ifdef USE_MYSQL
-    return 1; // db_mysql_close();
+    return 1;                   // db_mysql_close();
 #endif
 
 }
@@ -418,32 +418,42 @@ void rdb_load_dbases(void)
 {
     if (!skeleton) {
         rdb_load_ns_dbase();
-        if (debug) alog("RDB: Loaded NickServ DataBase (1/8)");
+        if (debug)
+            alog("RDB: Loaded NickServ DataBase (1/8)");
         if (s_HostServ) {
             rdb_load_hs_dbase();
-            if (debug) alog("RDB: Loaded HostServ DataBase (2/8)");
+            if (debug)
+                alog("RDB: Loaded HostServ DataBase (2/8)");
         }
         if (s_BotServ) {
             rdb_load_bs_dbase();
-            if (debug) alog("RDB: Loaded BotServ DataBase (3/8)");
+            if (debug)
+                alog("RDB: Loaded BotServ DataBase (3/8)");
         }
         rdb_load_cs_dbase();
-        if (debug) alog("RDB: Loaded ChanServ DataBase (4/8)");
+        if (debug)
+            alog("RDB: Loaded ChanServ DataBase (4/8)");
     }
     rdb_load_os_dbase();
-    if (debug) alog("RDB: Loaded OperServ DataBase (5/8)");
+    if (debug)
+        alog("RDB: Loaded OperServ DataBase (5/8)");
     rdb_load_news();
-    if (debug) alog("RDB: Loaded News DataBase (6/8)");
+    if (debug)
+        alog("RDB: Loaded News DataBase (6/8)");
     rdb_load_exceptions();
-    if (debug) alog("RDB: Loaded Exception Database (7/8)");
+    if (debug)
+        alog("RDB: Loaded Exception Database (7/8)");
     if (PreNickDBName) {
         rdb_load_ns_req_dbase();
-        if (debug) alog("RDB: Loaded PreNick DataBase (8/8)");
+        if (debug)
+            alog("RDB: Loaded PreNick DataBase (8/8)");
     } else {
-        if (debug) alog("RDB: No need to load PreNickDB (8/8)");
+        if (debug)
+            alog("RDB: No need to load PreNickDB (8/8)");
     }
     alog("RDB: All DataBases loaded.");
 }
+
 /*************************************************************************/
 
 void rdb_save_exceptions(Exception * e)

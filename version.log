@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="66"
+VERSION_BUILD="67"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (67)
+# BUGS  : N/A
+# NOTES : Bumped Changes file verisons ready for new updates
 #
 # BUILD : 1.7.2 (66)
 # BUGS  : 

@@ -154,7 +154,6 @@ extern int shutdown(int, int);
 #undef toupper
 #define tolower tolower_
 #define toupper toupper_
-extern int toupper(char), tolower(char);
 
 /* We also have our own encrypt(). */
 #define encrypt encrypt_

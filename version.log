@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="603"
+VERSION_BUILD="604"
 
 # $Log$
+#
+# BUILD : 1.7.8 (604)
+# BUGS  : N/A
+# NOTES : tolower/toupper compiler errors on Win32.
 #
 # BUILD : 1.7.8 (603)
 # BUGS  : N/A

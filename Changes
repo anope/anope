@@ -6,6 +6,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+03/07 F tolower/toupper compiler errors on Win32.                         [ #00]
 03/06 F Services not remove modes correct in some cases.                  [#308]
 03/06 F Protected Umode users are protected from bans.                    [#311]
 03/05 F Added UPDATE to ns help menu                                      [ #00]

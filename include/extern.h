@@ -654,7 +654,8 @@ E int m_version(char *source, int ac, char **av);
 
 /**** misc.c ****/
 
-
+E int toupper(char);
+E int tolower(char);
 E char *strscpy(char *d, const char *s, size_t len);
 E char *stristr(char *s1, char *s2);
 E char *strnrepl(char *s, int32 size, const char *old, const char *new);

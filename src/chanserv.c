@@ -1672,6 +1672,10 @@ int check_kick(User * user, char *chan)
         }
     }
 
+    if (is_ulined(user->server->name)) {
+        return 0;
+    }
+
     if (check_access(user, ci, CA_NOJOIN)) {
         get_idealban(ci, user, mask, sizeof(mask));
         reason = getstring(user->na, CHAN_NOT_ALLOWED_TO_JOIN);

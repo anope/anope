@@ -2599,12 +2599,14 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
     anope_cmd_sgline(entry->mask, entry->reason);
 
     if (KillonSGline && !ircd->sglineenforce) {
+        snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
         u2 = firstuser();
         while (u2) {
             next = nextuser();
-            if (match_wild_nocase(entry->mask, u2->realname)) {
-                snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
-                kill_user(ServerName, u2->nick, buf);
+            if (!is_oper(u2)) {
+                if (match_wild_nocase(entry->mask, u2->realname)) {
+                    kill_user(ServerName, u2->nick, buf);
+                }
             }
             u2 = next;
         }
@@ -3070,12 +3072,14 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
     sqline(entry->mask, entry->reason);
 
     if (KillonSQline) {
+        snprintf(buf, (BUFSIZE - 1), "Q-Lined: %s", entry->reason);
         u2 = firstuser();
         while (u2) {
             next = nextuser();
-            if (match_wild_nocase(entry->mask, u2->nick)) {
-                snprintf(buf, (BUFSIZE - 1), "Q-Lined: %s", entry->reason);
-                kill_user(ServerName, u2->nick, buf);
+            if (!is_oper(u2)) {
+                if (match_wild_nocase(entry->mask, u2->nick)) {
+                    kill_user(ServerName, u2->nick, buf);
+                }
             }
             u2 = next;
         }

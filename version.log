@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="540"
+VERSION_BUILD="541"
 
 # $Log$
+#
+# BUILD : 1.7.7 (541)
+# BUGS  : 274, 281
+# NOTES : IRCops are not killed on sqline/sgline when set KillOnSQline or KillOnSGline are enabled, made it so uline 
+# servers are except from NOJOIN settings
 #
 # BUILD : 1.7.7 (540)
 # BUGS  : 277

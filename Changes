@@ -1,6 +1,8 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+01/16 A Ulines Servers are now except from NOJOIN bans                    [#281]
+01/16 F IRCops are now except from KillonSQline and KillonSGline          [#274]
 01/16 F BS Badwords had a false positives if BSCaseSensitive wass enabled [#277]
 01/15 F Updated typo in example.conf.                                     [#279]
 

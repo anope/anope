@@ -1004,7 +1004,7 @@ static int m_time(char *source, int ac, char **av)
     time(&t);
     tm = localtime(&t);
     strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-    send_cmd(NULL, "391 :%s", buf);
+    send_cmd(NULL, "391 %s %s :%s", source, ServerName, buf);
     return MOD_CONT;
 }
 

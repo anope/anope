@@ -10,17 +10,17 @@ Introduction:
 
 Installation:
 
-    1. You need to configure Anope to be compiled with module support. To 
-       do so you must run ./configure and answer "Yes" when asked for
-       Module Support, and selecting a folder where your modules will live
-       in (the default path is safe for most people).
+    1. If modules are supported by your system, they will be configured
+       automatically when you run ./Config. The modules will be installed
+       to the modules directory in your data path (by default this will
+       be ~/services/modules).
 
        Notes:
 
        * Modules are not supported on the following platforms: OpenBSD, Windows.
-       * You might need to run "make distclean" prior to running ./configure
+       * You might need to run "make distclean" prior to running ./Config
 
-    2. Compile Anope as usual. The gmake process will now compile module
+    2. Compile Anope as usual. The (g)make process will now compile module
        support into Anope, and compile the default sample modules, and/or
        any other module located on the "modules" folder.
 
@@ -79,16 +79,15 @@ More Modules:
     You can download more useful modules from http://www.anope.org/ or from
     our interim modules development website http://modules.anope.org/. Just
     grab the module file (usually with a .c extension). Place the module
-    file on your compile "modules" folder. The same folder that contain both
+    file on your compile "src/modules" folder. The same folder that contain both
     hs_moo.c and catserv.c module files.
 
     The new modules need to be compiled and installed before you can make
     use of them:
-
-    1. Change directories to your compile "modules" folder.
-    2. Run ./configure
-    3. Run make
-    4. Run make install
+    
+    1. Make sure you're in the main source directory.
+    2. Run `make modules` to compile any new or changed modules.
+    3. Run `make install` to install the modules.
 
     You can now use /msg OperServ MODLOAD to load the new modules.
 

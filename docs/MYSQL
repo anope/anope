@@ -38,16 +38,16 @@ Requirements:
 
 Installation:
 
-    1. You need to configure Anope to be compiled with MySQL support. To 
-       do so you must run ./configure and answer "Yes" when asked for
-       MySQL Support.
+    1. The ./Config script automatically detects if your system is capable
+       of running Anope with MySQL support. There is no need anymore to
+       answer yes when asked.
 
        Notes:
 
        * MySQL is not supported on the following platforms: Windows.
-       * You might need to run "make distclean" prior to running ./configure
+       * You might need to run "make distclean" prior to running ./Config
 
-    2. Compile Anope as usual. The gmake process will now compile MySQL
+    2. Compile Anope as usual. The (g)make process will now compile MySQL
        support into Anope.
 
     3. Install Anope as usual. 

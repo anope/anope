@@ -26,7 +26,7 @@ The very first thing you need to do is to get the Anope package
 Next, unpack the package in your home directory, and go into the
 created directory.
   
-Now type ./configure to start the configuration script. It will
+Now type ./Config to start the configuration script. It will
 ask you a few questions, and figure out how to compile Anope on
 your system. If you are unsure about the answer to a question,
 use the default value. 
@@ -132,6 +132,11 @@ link Services.LocalHost.Net
         password-receive "mypass";
         class           servers;
 };
+
+If you're unable to get a link with your IRCd after reading this section,
+you might try the interactive link maker, which is located at:
+
+    http://heinz.anope.org/ilm.php
 
 
 4. Starting Anope

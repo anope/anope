@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="452"
+VERSION_BUILD="453"
 
 # $Log$
+#
+# BUILD : 1.7.6 (453)
+# BUGS  : 224
+# NOTES : Removing Sqline on bot nicks change if the nick was registered
 #
 # BUILD : 1.7.6 (452)
 # BUGS  : N/A

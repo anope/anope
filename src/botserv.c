@@ -1365,12 +1365,6 @@ static int do_bot(User * u)
             }
 
             if (stricmp(bi->nick, nick)) {
-                /* The new nick is really different, so we remove the Q line for
-                   the old nick. */
-                if (ircd->sqline) {
-                    anope_cmd_unsqline(bi->nick);
-                }
-
                 /* We check whether the nick is registered, and inform the user
                  * if so. You need to drop the nick manually before you can use
                  * it as a bot nick from now on -GD
@@ -1379,6 +1373,12 @@ static int do_bot(User * u)
                     notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED,
                                 nick);
                     return MOD_CONT;
+                }
+
+                /* The new nick is really different, so we remove the Q line for
+                   the old nick. */
+                if (ircd->sqline) {
+                    anope_cmd_unsqline(bi->nick);
                 }
 
                 /* We check whether user with this nick is online, and kill it if so */

@@ -8,9 +8,18 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="464"
+VERSION_BUILD="465"
 
 # $Log$
+#
+# BUILD : 1.7.6 (465)
+# BUGS  : 218, 235
+# NOTES : 1. correct the grammer in the example.conf
+# 2. SolidIRCD cmode +S
+# 3. NSSecureAdmins now restricts /NS SET EMAIL
+# 4. Unreals version of SVSHOLD
+# 5. SolidIRCD halfop support
+# 6. /os set list
 #
 # BUILD : 1.7.6 (464)
 # BUGS  : N/A

@@ -2639,6 +2639,10 @@ OPER_SET_SQL_ERROR
 	Setting for SQL must be ON or OFF.
 OPER_SET_SQL_ERROR_INIT
 	Error during init of SQL, check your logs to correct.
+OPER_SET_LIST_OPTION_ON
+	%s is enable
+OPER_SET_LIST_OPTION_OFF
+	%s is disabled
 
 # NOOP válaszok
 OPER_NOOP_SYNTAX
@@ -5421,6 +5425,18 @@ OPER_HELP_SET_SUPERADMIN
 	
 	Ez az opció nem ajánlott, csak akkor használd, ha 
 	szükséges és kapcsold ki, ha már nem.
+
+OPER_HELP_SET_SQL
+	Syntax: SET SQL {ON | OFF}
+
+	Setting this will toggle Anope's from usage of SQL, this should
+	be used to disable and enable SQL should your SQL server go down
+	while services are running.
+
+OPER_HELP_SET_LIST
+	Syntax: SET LIST
+
+	Display the various OperServ settings
 	
 OPER_HELP_NOOP
 	Syntax: NOOP SET szerver

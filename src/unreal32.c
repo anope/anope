@@ -1886,13 +1886,15 @@ int anope_event_whois(char *source, int ac, char **av)
 /* SVSHOLD - set */
 void anope_cmd_svshold(char *nick)
 {
-    /* Not supported by this IRCD */
+    send_cmd(NULL, "TKL + Q H %s %s %ld %ld :%s", nick, ServerName,
+             (long int) time(NULL) + NSReleaseTimeout,
+             (long int) time(NULL), "Being held for registered user");
 }
 
 /* SVSHOLD - release */
 void anope_cmd_release_svshold(char *nick)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "TKL - Q * %s %s", nick, ServerName);
 }
 
 /* UNSGLINE */

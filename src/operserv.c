@@ -169,6 +169,7 @@ void moduleAddOperServCmds(void) {
 
     /* Commands for Services admins: */
     c = createCommand("SET",            do_set, is_services_admin,OPER_HELP_SET, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET LIST",       NULL,   NULL,OPER_HELP_SET_LIST, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET READONLY",   NULL,   NULL,OPER_HELP_SET_READONLY, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET LOGCHAN",    NULL,   NULL,OPER_HELP_SET_LOGCHAN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET DEBUG",      NULL,   NULL,OPER_HELP_SET_DEBUG, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
@@ -4455,10 +4456,37 @@ static int do_set(User * u)
 {
     char *option = strtok(NULL, " ");
     char *setting = strtok(NULL, " ");
+    int index;
 
-    if (!option || !setting) {
+    if (!option) {
         syntax_error(s_OperServ, u, "SET", OPER_SET_SYNTAX);
-
+    } else if (stricmp(option, "LIST") == 0) {
+        index =
+            (allow_ignore ? OPER_SET_LIST_OPTION_ON :
+             OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "IGNORE");
+        index =
+            (readonly ? OPER_SET_LIST_OPTION_ON :
+             OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "READONLY");
+        index =
+            (logchan ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "LOGCHAN");
+        index =
+            (debug ? OPER_SET_LIST_OPTION_ON : OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "DEBUG");
+        index =
+            (noexpire ? OPER_SET_LIST_OPTION_ON :
+             OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "NOEXPIRE");
+#ifdef USE_MYSQL
+        index =
+            (do_mysql ? OPER_SET_LIST_OPTION_ON :
+             OPER_SET_LIST_OPTION_OFF);
+        notice_lang(s_OperServ, u, index, "SQL");
+#endif
+    } else if (!setting) {
+        syntax_error(s_OperServ, u, "SET", OPER_SET_SYNTAX);
     } else if (stricmp(option, "IGNORE") == 0) {
         if (stricmp(setting, "on") == 0) {
             allow_ignore = 1;
@@ -4515,11 +4543,11 @@ static int do_set(User * u)
             alog("Now sending log messages to %s", LogChannel);
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_ON, LogChannel);
         } else if (LogChannel && (stricmp(setting, "off") == 0)) {
+            alog("No longer sending log messages to a channel");
             if (ircd->join2msg) {
                 anope_cmd_part(s_GlobalNoticer, LogChannel, NULL);
             }
             logchan = 0;
-            alog("No longer sending log messages to a channel");
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);
         } else {
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_ERROR);
@@ -4577,7 +4605,6 @@ static int do_set(User * u)
         } else {
             notice_lang(s_OperServ, u, OPER_SET_NOEXPIRE_ERROR);
         }
-
     } else {
         notice_lang(s_OperServ, u, OPER_SET_UNKNOWN_OPTION, option);
     }

@@ -70,7 +70,9 @@
 #define CMODE_c 0x00000400	/* Colors can't be used */
 #define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
 #define CMODE_j 0x00001000      /* join throttle */
+#define CMODE_S 0x00002000      /* SSL only */
 #define CMODE_O 0x00008000	/* Only opers can join */
+
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 

@@ -60,7 +60,7 @@ IRCDVar ircd[] = {
      1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
      1,                         /* Supports SZlines     */
-     0,                         /* Supports Halfop +h   */
+     1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      0,                         /* Join 2 Set           */
      0,                         /* Join 2 Message       */
@@ -364,7 +364,7 @@ CBMode cbmodes[128] = {
     {0},                        /* P */
     {0},                        /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {0},                        /* S */
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
     {0},                        /* V */

@@ -3010,6 +3010,11 @@ static int do_set_email(User * u, NickCore * nc, char *param)
     if (!param && NSForceEmail) {
         notice_lang(s_NickServ, u, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
         return MOD_CONT;
+    } else if (NSSecureAdmins && u->na->nc != nc
+               && nick_is_services_admin(nc)
+               && !is_services_root(u)) {
+        notice_lang(s_NickServ, u, PERMISSION_DENIED);
+        return MOD_CONT;
     } else if (param && !MailValidate(param)) {
         notice_lang(s_NickServ, u, MAIL_X_INVALID, param);
         return MOD_CONT;

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="572"
+VERSION_BUILD="573"
 
 # $Log$
+#
+# BUILD : 1.7.8 (573)
+# BUGS  : 296
+# NOTES : mod_current_buffer was not set in all possible cases
 #
 # BUILD : 1.7.8 (572)
 # BUGS  : 

@@ -238,8 +238,23 @@ void process()
     if (mod_current_buffer) {
         free(mod_current_buffer);
     }
-    if (av[1]) {
-        mod_current_buffer = sstrdup(av[1]);
+    /* fix to moduleGetLastBuffer() bug 296 */
+    /* old logic was that since its meant for PRIVMSG that we would get
+       the NICK as AV[0] and the rest would be in av[1], however on Bahamut
+       based systems when you do /cs it assumes we will translate the command
+       to the NICK and thus AV[0] is the message. The new logic is to check
+       av[0] to see if its a service nick if so assign mod_current_buffer the
+       value from AV[1] else just assign av[0] - TSL */
+    if (av[0]) {
+        if (nickIsServices(av[0], 0)) {
+            if (av[1]) {
+                mod_current_buffer = sstrdup(av[1]);
+            } else {
+                mod_current_buffer = sstrdup(av[0]);
+            }
+        } else {
+            mod_current_buffer = sstrdup(av[0]);
+        }
     } else {
         mod_current_buffer = NULL;
     }

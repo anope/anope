@@ -3,6 +3,7 @@ Anope Version S V N
 Provided by Anope Dev. <dev@anope.org> - 2005
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+02/10 F mod_current_buffer was not set in all possible cases              [#296]
 02/07 F Updated userkey information in example.conf.                      [ #00]
 02/06 F Win32 Module Load Errors.                                         [#294]
 02/05 F Change Ident function did not update the vident.                  [#293]

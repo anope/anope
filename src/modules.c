@@ -341,7 +341,7 @@ int loadModule(Module * m, User * u)
     strncat(buf, m->name, 4095 - len);
     len = strlen(buf);
     strncat(buf, ".so", 4095 - len);
-	buf[4095] = '\0';
+    buf[4095] = '\0';
 
     m->filename = sstrdup(buf);
 #ifdef HAS_RTLD_LOCAL
@@ -364,18 +364,18 @@ int loadModule(Module * m, User * u)
     }
     if (func) {
         mod_current_module_name = m->name;
-	/* argv[0] is the user if there was one, or NULL if not */
-	if(u) {
-		argv[0] = sstrdup(u->nick);
-	} else {
-		argv[0] = NULL;
-	}
-	argc++;
+        /* argv[0] is the user if there was one, or NULL if not */
+        if (u) {
+            argv[0] = sstrdup(u->nick);
+        } else {
+            argv[0] = NULL;
+        }
+        argc++;
 
-	ret = func(argc, argv);    /* exec AnopeInit */
-	if(u) {
-		free(argv[0]);
-	}
+        ret = func(argc, argv); /* exec AnopeInit */
+        if (u) {
+            free(argv[0]);
+        }
         if (ret == MOD_STOP) {
             alog("%s requested unload...", m->name);
             unloadModule(m, NULL);
@@ -387,7 +387,8 @@ int loadModule(Module * m, User * u)
     }
 
     if (u) {
-        anope_cmd_global(s_OperServ, "%s loaded module %s", u->nick, m->name);
+        anope_cmd_global(s_OperServ, "%s loaded module %s", u->nick,
+                         m->name);
         notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name);
     }
     addModule(m);
@@ -433,7 +434,8 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     } else {
         if (u) {
-            anope_cmd_global(s_OperServ, "%s unloaded module %s", u->nick, m->name);
+            anope_cmd_global(s_OperServ, "%s unloaded module %s", u->nick,
+                             m->name);
             notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name);
         }
         delModule(m);
@@ -563,7 +565,7 @@ Command *createCommand(const char *name, int (*func) (User * u),
 {
     Command *c;
     if (!name || !*name) {
-      return NULL;
+        return NULL;
     }
 
     if ((c = malloc(sizeof(Command))) == NULL) {
@@ -901,7 +903,8 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 c->next = current->c;
                 current->c = c;
                 if (debug)
-                    alog("existing cmd: (0x%p), new cmd (0x%p)", (void *) c->next, (void *) c);
+                    alog("existing cmd: (0x%p), new cmd (0x%p)",
+                         (void *) c->next, (void *) c);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
 
@@ -909,7 +912,8 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing cmd: (0x%p), new cmd (0x%p)", (void *) tail, (void *) c);
+                    alog("existing cmd: (0x%p), new cmd (0x%p)",
+                         (void *) tail, (void *) c);
                 tail->next = c;
                 c->next = NULL;
 
@@ -1073,24 +1077,22 @@ Message *findMessage(MessageHash * msgTable[], const char *name)
     idx = CMD_HASH(name);
 
     for (current = msgTable[idx]; current; current = current->next) {
- 	if (UseTokens) {
- 	 if (ircd->tokencaseless) {
-	  if (stricmp(name, current->name) == 0) {
-	    return current->m;
-	  }
-	 }
- 	 else {
-	   if (strcmp(name, current->name) == 0) {
-	        return current->m;
- 	   }
-         }
-	}
-	else {
-         if (stricmp(name, current->name) == 0) {
-             return current->m;
-         }
+        if (UseTokens) {
+            if (ircd->tokencaseless) {
+                if (stricmp(name, current->name) == 0) {
+                    return current->m;
+                }
+            } else {
+                if (strcmp(name, current->name) == 0) {
+                    return current->m;
+                }
+            }
+        } else {
+            if (stricmp(name, current->name) == 0) {
+                return current->m;
+            }
         }
-     }
+    }
     return NULL;
 }
 
@@ -1123,14 +1125,16 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
                 m->next = current->m;
                 current->m = m;
                 if (debug)
-                    alog("existing msg: (0x%p), new msg (0x%p)", (void *) m->next, (void *) m);
+                    alog("existing msg: (0x%p), new msg (0x%p)",
+                         (void *) m->next, (void *) m);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
                 tail = current->m;
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing msg: (0x%p), new msg (0x%p)", (void *) tail, (void *) m);
+                    alog("existing msg: (0x%p), new msg (0x%p)",
+                         (void *) tail, (void *) m);
                 tail->next = m;
                 m->next = NULL;
                 return MOD_ERR_OK;
@@ -1789,15 +1793,16 @@ void moduleDisplayHelp(int service, User * u)
  * @param md The module data for the struct to be used
  * @return 0 is always returned;
  **/
-int moduleDataDebug(ModuleData **md) {
-	ModuleData *current = NULL;
-	alog("Dumping module data....");
-	for (current = *md; current; current = current->next) {
-	 	alog("Module: [%s]",current->moduleName);
-		alog(" Key [%s]\tValue [%s]",current->key, current->value);
-	}
-	alog("End of module data dump");
-	return 0;
+int moduleDataDebug(ModuleData ** md)
+{
+    ModuleData *current = NULL;
+    alog("Dumping module data....");
+    for (current = *md; current; current = current->next) {
+        alog("Module: [%s]", current->moduleName);
+        alog(" Key [%s]\tValue [%s]", current->key, current->value);
+    }
+    alog("End of module data dump");
+    return 0;
 }
 
 /**
@@ -1808,40 +1813,40 @@ int moduleDataDebug(ModuleData **md) {
  * @param value The value for the key/value pair, this is what will be stored for you
  * @return MOD_ERR_OK will be returned on success
  **/
-int moduleAddData(ModuleData **md, char *key, char *value)
+int moduleAddData(ModuleData ** md, char *key, char *value)
 {
-	char *mod_name = sstrdup(mod_current_module_name);
-	ModuleData *newData=NULL;
-	ModuleData *tmp = *md;
-	
-	if ( !key || !value ) {
-        	alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
-        	return MOD_ERR_PARAMS;		
-	}
-	
-	moduleDelData(md,key);  /* Remove any existing module data for this module with the same key */
-	
-	newData = malloc(sizeof(ModuleData));
-	if(!newData) {
-		return MOD_ERR_MEMORY;
-	}
-	
-        newData->moduleName = sstrdup(mod_name);
-	newData->key = sstrdup(key);
-	newData->value = sstrdup(value);
-	if(tmp) {
-		newData->next = tmp;
-	} else {
-		newData->next = NULL;
-	}
-	*md = newData;
+    char *mod_name = sstrdup(mod_current_module_name);
+    ModuleData *newData = NULL;
+    ModuleData *tmp = *md;
 
-	free(mod_name);
-	
-	if(debug) {
-		moduleDataDebug(md);
-	}
-	return MOD_ERR_OK;
+    if (!key || !value) {
+        alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
+        return MOD_ERR_PARAMS;
+    }
+
+    moduleDelData(md, key);     /* Remove any existing module data for this module with the same key */
+
+    newData = malloc(sizeof(ModuleData));
+    if (!newData) {
+        return MOD_ERR_MEMORY;
+    }
+
+    newData->moduleName = sstrdup(mod_name);
+    newData->key = sstrdup(key);
+    newData->value = sstrdup(value);
+    if (tmp) {
+        newData->next = tmp;
+    } else {
+        newData->next = NULL;
+    }
+    *md = newData;
+
+    free(mod_name);
+
+    if (debug) {
+        moduleDataDebug(md);
+    }
+    return MOD_ERR_OK;
 }
 
 /**
@@ -1851,22 +1856,23 @@ int moduleAddData(ModuleData **md, char *key, char *value)
  * @param key The key to find the data for
  * @return the value paired to the given key will be returned, or NULL 
  **/
-char *moduleGetData(ModuleData **md, char *key)
+char *moduleGetData(ModuleData ** md, char *key)
 {
-    
+
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
 
     if (debug) {
-      alog("debug: moduleGetData %p : key %s", (void *) md, key);
-      alog("debug: Current Module %s", mod_name);
+        alog("debug: moduleGetData %p : key %s", (void *) md, key);
+        alog("debug: Current Module %s", mod_name);
     }
-    
-    while(current) {
-    	if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {
-		return sstrdup(current->value);
-	}
-	current = current->next;
+
+    while (current) {
+        if ((stricmp(current->moduleName, mod_name) == 0)
+            && (stricmp(current->key, key) == 0)) {
+            return sstrdup(current->value);
+        }
+        current = current->next;
     }
     free(mod_name);
     return NULL;
@@ -1878,31 +1884,32 @@ char *moduleGetData(ModuleData **md, char *key)
  * @param md The module data for the struct to be used
  * @param key The key to delete the key/value pair for
  **/
-void moduleDelData(ModuleData **md, char *key)
+void moduleDelData(ModuleData ** md, char *key)
 {
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
     ModuleData *prev = NULL;
     ModuleData *next = NULL;
-    
-    if(key) { 
-    	while(current) {
-		next = current->next;
-		if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {	
-			if(prev) {
-				prev->next  = current->next;
-			} else {
-				*md = current->next;
-			}
-	        	free(current->moduleName);
-			free(current->key);
-			free(current->value);
-			current->next = NULL;
-			free(current);
-		}
-		prev = current;
-		current = next;
-    	}
+
+    if (key) {
+        while (current) {
+            next = current->next;
+            if ((stricmp(current->moduleName, mod_name) == 0)
+                && (stricmp(current->key, key) == 0)) {
+                if (prev) {
+                    prev->next = current->next;
+                } else {
+                    *md = current->next;
+                }
+                free(current->moduleName);
+                free(current->key);
+                free(current->value);
+                current->next = NULL;
+                free(current);
+            }
+            prev = current;
+            current = next;
+        }
     }
     free(mod_name);
 }
@@ -1913,29 +1920,29 @@ void moduleDelData(ModuleData **md, char *key)
  * do just about anything and everything, its safe to use from inside the module.
  * @param md The module data for the struct to be used
  **/
-void moduleDelAllData(ModuleData **md)
+void moduleDelAllData(ModuleData ** md)
 {
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
     ModuleData *prev = NULL;
     ModuleData *next = NULL;
-     
-    while(current) {
-	next = current->next;
-	if((stricmp(current->moduleName,mod_name)==0)) {	
-		if(prev) {
-			prev->next  = current->next;
-		} else {
-			*md = current->next;
-		}
-	        free(current->moduleName);
-		free(current->key);
-		free(current->value);
-		current->next = NULL;
-		free(current);
-	}
-	prev = current;
-	current = next;
+
+    while (current) {
+        next = current->next;
+        if ((stricmp(current->moduleName, mod_name) == 0)) {
+            if (prev) {
+                prev->next = current->next;
+            } else {
+                *md = current->next;
+            }
+            free(current->moduleName);
+            free(current->key);
+            free(current->value);
+            current->next = NULL;
+            free(current);
+        }
+        prev = current;
+        current = next;
     }
     free(mod_name);
 }
@@ -1944,7 +1951,7 @@ void moduleDelAllData(ModuleData **md)
  * This will delete all module data used in any struct by module m.
  * @param m The module to clear all data for
  **/
-void moduleDelAllDataMod(Module *m)
+void moduleDelAllDataMod(Module * m)
 {
     boolean freeme = false;
     int i, j;
@@ -1986,7 +1993,7 @@ void moduleDelAllDataMod(Module *m)
                 moduleCleanStruct(&ci->memos.memos[j].moduleData);
             }
         }
-    } 
+    }
 
     if (freeme) {
         free(mod_current_module_name);
@@ -1999,18 +2006,19 @@ void moduleDelAllDataMod(Module *m)
  * Useful for cleaning up when a User leave's the net, a NickCore is deleted, etc...
  * @param moduleData the moduleData struct to "clean"
  **/
-void moduleCleanStruct(ModuleData **moduleData) {
+void moduleCleanStruct(ModuleData ** moduleData)
+{
     ModuleData *current = *moduleData;
     ModuleData *next = NULL;
-     
-    while(current) {
-	next = current->next;
-	free(current->moduleName);
-	free(current->key);
-	free(current->value);
-	current->next = NULL;
-	free(current);
-	current = next;
+
+    while (current) {
+        next = current->next;
+        free(current->moduleName);
+        free(current->key);
+        free(current->value);
+        current->next = NULL;
+        free(current);
+        current = next;
     }
     *moduleData = NULL;
 }
@@ -2024,29 +2032,34 @@ void moduleCleanStruct(ModuleData **moduleData) {
  * @param build The build revision of anope from SVN
  * @return True if the version newer than the version specified.
  **/
-boolean moduleMinVersion(int major,int minor,int patch,int build) {
-	boolean ret=false;
-	if(VERSION_MAJOR>major) {  /* Def. new */
-		ret = true;
-	} else if(VERSION_MAJOR == major) {  /* Might be newer */
-		if(minor == -1) { return true; }					/* They dont care about minor */
-		if(VERSION_MINOR > minor) { /* Def. newer*/
-			ret = true;
-		} else if(VERSION_MINOR == minor) { /* Might be newer */
-			if(patch == -1) { return true; }				/* They dont care about patch */
-			if(VERSION_PATCH > patch) {
-				ret = true;
-			} else if(VERSION_PATCH == patch) {
-				if(build == -1) { return true; }			/* They dont care about build */
-				if(VERSION_BUILD >= build) {
-					ret = true;
-				}
-			}
-		}
-	}
-	return ret;
+boolean moduleMinVersion(int major, int minor, int patch, int build)
+{
+    boolean ret = false;
+    if (VERSION_MAJOR > major) {        /* Def. new */
+        ret = true;
+    } else if (VERSION_MAJOR == major) {        /* Might be newer */
+        if (minor == -1) {
+            return true;
+        }                       /* They dont care about minor */
+        if (VERSION_MINOR > minor) {    /* Def. newer */
+            ret = true;
+        } else if (VERSION_MINOR == minor) {    /* Might be newer */
+            if (patch == -1) {
+                return true;
+            }                   /* They dont care about patch */
+            if (VERSION_PATCH > patch) {
+                ret = true;
+            } else if (VERSION_PATCH == patch) {
+                if (build == -1) {
+                    return true;
+                }               /* They dont care about build */
+                if (VERSION_BUILD >= build) {
+                    ret = true;
+                }
+            }
+        }
+    }
+    return ret;
 }
 
 /* EOF */
-
-

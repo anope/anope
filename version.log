@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="511"
+VERSION_BUILD="512"
 
 # $Log$
+#
+# BUILD : 1.7.6 (512)
+# BUGS  : 
+# NOTES : Indenting src/modules.c correctly.... it got skipped somehow...
 #
 # BUILD : 1.7.6 (511)
 # BUGS  : 

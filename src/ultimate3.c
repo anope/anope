@@ -220,7 +220,7 @@ void anope_set_umode(User * user, int ac, char **av)
                     user->mode |= UMODE_P;
                 }
                 if (is_services_root(user)) {
-                    common_svsmode(user, "+R", NULL);
+                    common_svsmode(user, "+Z", NULL);
                     user->mode |= UMODE_R;
                 }
             } else {

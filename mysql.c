@@ -105,16 +105,18 @@ int db_mysql_open()
 int db_mysql_query(char *sql)
 {
     int result, lcv;
-    char *s = db_mysql_quote(sql);
+    char *s;
 
     if (!do_mysql) {
-        free(s);
         return -1;
     }
 
-    if (debug)
+    if (debug) {
+        s = db_mysql_quote(sql);
         alog(s);
-    free(s);
+        free(s);
+        
+    }
 
     result = mysql_query(mysql, sql);
 

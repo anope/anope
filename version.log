@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="354"
+VERSION_BUILD="355"
 
 # $Log$
+#
+# BUILD : 1.7.5 (355)
+# BUGS  : N/A
+# NOTES : An option to not detect mysql has been added to ./Config
 #
 # BUILD : 1.7.5 (354)
 # BUGS  : 

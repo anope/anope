@@ -844,6 +844,7 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+ --without-mysql     Do not use MySQL even if we find it
   --with-mysqlclient-prefix=PFX Prefix where mysqlclient is
 installed
   --with-mysqlclient-include=DIR Directory pointing
@@ -2742,6 +2743,13 @@ fi
 x="0";
 DIS_MYSQL="  MySql: No"
 
+# Check whether --with-mysql or --without-mysql was given.
+if test "${with_mysql+set}" = set; then
+  withval="$with_mysql"
+
+else
+
+
 
 # Check whether --with-mysqlclient-prefix or --without-mysqlclient-prefix was given.
 if test "${with_mysqlclient_prefix+set}" = set; then
@@ -2936,6 +2944,7 @@ if test "$x" = "1"; then
         DIS_MYSQL="  MySql: Yes"
 fi
 
+fi;
 
 DIS_THREAD="Threads: No"
 ac_aux_dir=
@@ -4134,7 +4143,7 @@ fi
 
 
 
-DIS_MODULES="Modules: NO"
+DIS_MODULES="Modules: Yes"
 
 
 
@@ -4316,6 +4325,7 @@ cat >>confdefs.h <<\_ACEOF
 #define STATIC_LINKING "NO_MODULES"
 _ACEOF
 
+  DIS_MODULES="Modules: No"
 
 fi
 

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="169"
+VERSION_BUILD="170"
 
 # $Log$
+#
+# BUILD : 1.7.3 (170)
+# BUGS  : 86
+# NOTES : Buffer initialization for encrypted MySQL passwords.
 #
 # BUILD : 1.7.3 (169)
 # BUGS  : 78

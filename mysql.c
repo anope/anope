@@ -218,6 +218,9 @@ char *db_mysql_secure(char *pass)
 
     char epass[BUFSIZE];
 
+    /* Initialize the buffer. Bug #86 */
+    memset(epass, '\0', BUFSIZE);
+
 #ifdef USE_ENCRYPTION
     /* If we use the builtin encryption don't double encrypt! */
     snprintf(epass, sizeof(epass), "'%s'", pass);

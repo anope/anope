@@ -1,6 +1,7 @@
 /* MySQL functions.
 /* MySQL functions.
 /* MySQL functions.
+/* MySQL functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -1609,5 +1610,6 @@ void db_mysql_load_ns_dbase(void)
         }
     }
 }
+ 
  
  

@@ -1,5 +1,4 @@
-/* Modular support
-/* Modular support
+
 /* Modular support
  *
  * (C) 2003 Anope Team
@@ -2026,4 +2025,4 @@ void moduleCleanStruct(ModuleData * moduleData[])
 
 /* EOF */
 
- 
+

@@ -1,5 +1,4 @@
-/* News functions.
-/* News functions.
+
 /* News functions.
  *
  * (C) 2003 Anope Team
@@ -46,8 +45,6 @@ struct newsmsgs {
     char *name;
     int msgs[MSG_MAX + 1];
 };
-
-/* *INDENT-OFF* */
 
 struct newsmsgs msgarray[] = {
     { NEWS_LOGON, "LOGON",
@@ -97,7 +94,7 @@ struct newsmsgs msgarray[] = {
 	}
 };
 
-/* *INDENT-ON* */
+static int *findmsgs(int16 type, char **typename)
 {
     int i;
     for (i = 0; i < lenof(msgarray); i++) {
@@ -539,3 +536,4 @@ static int del_newsitem(int num, short type)
 }
 
 /*************************************************************************/
+

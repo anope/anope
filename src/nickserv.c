@@ -1,4 +1,5 @@
 /* NickServ functions.
+/* NickServ functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -140,7 +141,6 @@ void moduleAddNickServCmds(void) {
     c = createCommand("FORBID",   do_forbid,   is_services_admin,  -1,-1, NICK_SERVADMIN_HELP_FORBID,NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID); addCoreCommand(NICKSERV,c);
 }
 /* *INDENT-ON* */
-/*************************************************************************/
 /*************************************************************************/
 
 /* Display total number of registered nicks and info about each; or, if

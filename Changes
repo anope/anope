@@ -6,6 +6,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 01/19 A Add simple smtp client, read the README in src/tools for info     [ #00]
 01/16 A Support for PTlinks VHOST (NEWMASK) command.                      [ #00]
 01/16 A Ulines Servers are now except from NOJOIN bans                    [#281]
+01/29 F Memoserv rsend issue                                              [#291]
 01/23 F Fixed u_char warnings under OpenBSD.                              [ #00]
 01/23 F anope_cmd_ctcp() fixed it was setup wrong.                        [ #00]
 01/23 F Checks to make sure Services and Services Alias are not the same  [ #00]

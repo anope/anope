@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="558"
+VERSION_BUILD="559"
 
 # $Log$
+#
+# BUILD : 1.7.7 (559)
+# BUGS  : 291
+# NOTES : Fixed memoserv issue :)
 #
 # BUILD : 1.7.7 (558)
 # BUGS  : N/A

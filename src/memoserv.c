@@ -1406,14 +1406,16 @@ static int do_rsend(User * u)
 {
     char *name = strtok(NULL, " ");
     char *text = strtok(NULL, "");
+    NickAlias *na = NULL;
     int z = 3;
-    NickAlias *na;
 
-    na = findnick(name);
-
-    if (stricmp(na->nc->display, u->na->nc->display) == 0) {
-        notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
-        return MOD_CONT;
+    if ((na = findnick(name))) {
+        if (u->na) {
+            if (stricmp(na->nc->display, u->na->nc->display) == 0) {
+                notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
+                return MOD_CONT;
+            }
+        }
     }
 
     if (MSMemoReceipt == 1) {

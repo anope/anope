@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="151"
+VERSION_BUILD="152"
 
 # $Log$
+#
+# BUILD : 1.7.3 (152)
+# NOTES : Reverted chanserv.c changes.
 #
 # BUILD : 1.7.3 (151)
 # BUGS  : 77

@@ -70,6 +70,10 @@ int test(int argc, char **argv) {
 	return MOD_CONT;
 }
 
+void AnopeFini(void)
+{
+  /* module is unloading */
+}
 
 /***************************************************************************************************************************************/
 /* The code below here shows various ways of dealing with the module help system                                                      */

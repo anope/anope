@@ -3,7 +3,7 @@ include ./Makefile.inc.win32
 
 OBJECTS= $(SRCS:.c=.dll)
 CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
-LFLAGS=/link ../anope.lib wsock32.lib libmysql.lib $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini
 
 all: $(OBJECTS)
 

@@ -19,13 +19,15 @@ FIRST=1
 for dir in *
 do
         if [ -d $dir ] ; then
-		if [ "$FIRST" = 1 ] ; then
-			echo -n " "$dir >> ./Makefile.inc
-	        else
-			echo "\\" >> ./Makefile.inc
-			echo -n "     " $dir >> ./Makefile.inc
+		if [ -f $dir/Makefile ] ; then
+			if [ "$FIRST" = 1 ] ; then
+				echo -n " "$dir >> ./Makefile.inc
+		        else
+				echo "\\" >> ./Makefile.inc
+				echo -n "     " $dir >> ./Makefile.inc
+			fi
+			FIRST=0
 		fi
-		FIRST=0
 	fi
 done
 

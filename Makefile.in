@@ -54,6 +54,13 @@ modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
+clean_modules:
+	(cd src ; ${MAKE} ${MAKEARGS} clean_modules )
+
+distclean_modules:
+	(cd src ; ${MAKE} ${MAKEARGS} distclean_modules )
+
+
 tools: build
 	(cd src/tools ; ${MAKE} ${MAKEARGS} all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules/Tools";

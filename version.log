@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="595"
+VERSION_BUILD="596"
 
 # $Log$
+#
+# BUILD : 1.7.8 (596)
+# BUGS  : N/A
+# NOTES : Added clean_modules and distclean_modules as valid make targets
 #
 # BUILD : 1.7.8 (595)
 # BUGS  : N/A

@@ -52,7 +52,7 @@ compiler and C library versions.
 
 Now go into the data directory (by default, ~/services). Copy the
 example.conf file to services.conf, and open the latter with your
-favourite text editor. It contains all the configuration
+favorite text editor. It contains all the configuration
 directives Anope will use at startup. Read the instructions contained
 in the file carefully. Using the default values is NOT a good idea,
 and will most likely not work!
@@ -96,7 +96,7 @@ Y:27:180:0:0:4000000
 C:127.0.0.1:mypass:Services.LocalHost.Net::30
 N:127.0.0.1:mypass:Services.LocalHost.Net::30
 
-mypass is the same password you mentionned in the RemoteServer 
+mypass is the same password you mentioned in the RemoteServer 
 configuration directive. 127.0.0.1 is the IP from which Services
 connect from (linking in localhost is the most efficient way
 to run Services).

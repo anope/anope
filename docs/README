@@ -89,7 +89,7 @@ Currently available services are:
 
   * ChanServ, a powerful channel manager that helps users to administer
   their channels in a totally customizable way. ChanServ has an internal
-  list of privilegied users and banned users that controls accesses
+  list of privileged users and banned users that controls accesses
   on a per-channel basis. It eliminates all takeover problems,
   because of its powerful op/unban/invite and even mass deop and mass
   kick functions.
@@ -116,7 +116,7 @@ Currently available services are:
 
   * HostServ, a neat service that allows users to show custom
   vHosts (virtual hosts) instead of their real IP address; this only
-  works on deamons supporting ip cloaking, such as UnrealIRCd and
+  works on daemons supporting ip cloaking, such as UnrealIRCd and
   UltimateIRCd.
 
   * HelpServ, a skeleton service used to serve help files.
@@ -129,8 +129,9 @@ Anope currently works with:
   - ViagraIRCd 1.3 or later
   - Hybrid 7 or later
   - PTlink 6.15 or later
+  - RageIRCd 2.0 beta-3 or later
 
-Anope could also work with some of the deamons derivated by the ones 
+Anope could also work with some of the daemons derived by the ones 
 listed above.
 
 
@@ -249,7 +250,7 @@ follow the following instructions:
   * Copy the lang/en_us.l file to a meaningful name (for example, if
     you would like to translate messages in Spanish, you would
     rename it to es.l).
-  * Edit the file with your favourite text editor. Carefully read
+  * Edit the file with your favorite text editor. Carefully read
     the instructions given at the top of the file, and start
     translating the whole file. The file is big so make sure you have
     some coffee available. ;) Try to avoid the use of English words
@@ -285,7 +286,7 @@ else to complete the translation!... ;)
 
 * For announcements and discussions about Anope, please visit our Portal
 and Forums at http://www.anope.org/ make sure you register yourself and
-your netowrk to get full benefits.
+your network to get full benefits.
 
 * If you read the documentation carefully, and didn't find the answer
 to your question, feel free to post on the website forums or join our 

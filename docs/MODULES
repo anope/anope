@@ -67,18 +67,18 @@ Example:
 
     * Note that the name of the module file is "hs_moo.c", yet we load
       and reference the module as "hs_moo" only. By naming convention
-      modules have an abreviated service name they attach to (hs_ for
+      modules have an abbreviated service name they attach to (hs_ for
       HostServ, cs_ for ChanServ, etc) followed by a descriptive keyword.
 
 More Modules:
 
-    Anope ships with two sample modules that only ilustrates some of the
+    Anope ships with two sample modules that only illustrates some of the
     implemented module capabilities. They don't really do much or anything
     useful.
 
     You can download more useful modules from http://www.anope.org/ or from
     our interim modules development website http://modules.anope.org/. Just
-    grab the module file (usualy with a .c extension). Place the module
+    grab the module file (usually with a .c extension). Place the module
     file on your compile "modules" folder. The same folder that contain both
     hs_moo.c and catserv.c module files.
 

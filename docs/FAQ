@@ -114,12 +114,12 @@ Index:
 
 3. Does Anope run under Windows?
 
-	Well... not officialy. Bu there is a cygwin based patch that makes
+	Well... not officially. Bu there is a cygwin based patch that makes
 	Anope work on Windows. Note, however, that some features might not
 	work, and you should take that into consideration when answering
 	the questions of ./configure (i.e. MySQL, Modules). 
 
-	You can obtain a pre-build copy of Anope for Windoes from 
+	You can obtain a pre-build copy of Anope for Windows from 
 	http://www.wircds.net/ although we have "blessed" that port,
 	we do not provide support for it. If you can't get it work,
 	go to wIRCds.net forum.
@@ -193,7 +193,7 @@ Index:
     "connection refused" or something similar, and Anope gives an error
     message from the server saying "Closing Link: ...".
 
-	See seection 3 of the INSTALL file.
+	See section 3 of the INSTALL file.
 
 
 10. My IRC server is giving me messages like "Connection to
@@ -400,7 +400,7 @@ Index:
 	be ignored, even if the problem happens not immediately.
 
 
-31. I would like to have the list of the differents RAW on operserv
+31. I would like to have the list of the different RAW on operserv
 
 	If you have to ask, you should not be messing with RAW :)
 

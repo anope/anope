@@ -219,12 +219,16 @@ void introduce_user(const char *user)
 #else
         NICK(s_DevNullAlias, desc_DevNullAlias, "+i");
 #endif
+
+#ifdef HAS_VHOST
     if (s_HostServAlias && (!user || stricmp(user, s_HostServAlias) == 0))
 #if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_HostServAlias, desc_HostServAlias, "+ioS");
 #else
         NICK(s_HostServAlias, desc_HostServAlias, "+io");
 #endif
+#endif
+
     if (s_GlobalNoticerAlias
         && (!user || stricmp(user, s_GlobalNoticerAlias) == 0))
 #if defined(IRC_ULTIMATE) || defined(IRC_UNREAL)

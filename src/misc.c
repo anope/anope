@@ -1142,7 +1142,7 @@ char *str_signed(unsigned char *str)
 
 char *stripModePrefix(const char *str) {
     if(str) {
-        return strdup(str+1);
+        return sstrdup(str+1);
     }
     return NULL;
 }

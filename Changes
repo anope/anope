@@ -1,6 +1,7 @@
 Anope Version SVN
 --------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/04/17 Added SIGUSR2 signal to Rehash Config and Save DBs
 2004/04/16 Fixed broken password saves to MySQL (Bug #11)
 
 Anope Version 1.7.1

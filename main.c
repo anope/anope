@@ -249,6 +249,7 @@ void sighandler(int signum)
     if (started) {
         if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
             signal(SIGHUP, SIG_IGN);
+            signal(SIGUSR2, SIG_IGN);
             alog("Received SIGHUP, restarting.");
 
             expire_all();
@@ -264,6 +265,21 @@ void sighandler(int signum)
             quitmsg =
                 "Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
 #endif
+
+        } else if (signum == SIGUSR2) {
+
+            alog("Received SIGUSR2: Saving Databases & Rehash Configuration");
+
+            expire_all();
+            save_databases();
+
+            if (!read_config(1)) {
+                sprintf(quitmsg,
+                        "Error Reading Configuration File (Received SIGUSR2)");
+                quitting = 1;
+            }
+            return;
+
         } else if (signum == SIGTERM) {
             signal(SIGTERM, SIG_IGN);
             signal(SIGHUP, SIG_IGN);

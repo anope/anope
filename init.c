@@ -605,7 +605,7 @@ int init(int ac, char **av)
     for (i = 1; i <= 31; i++) {
 #endif
 #if defined(USE_THREADS) && defined(LINUX20)
-        if (i != SIGUSR1 && i != SIGUSR2)
+        if (i != SIGUSR1)
 #endif
             signal(i, SIG_IGN);
     }
@@ -630,6 +630,7 @@ int init(int ac, char **av)
     }
     signal(SIGQUIT, sighandler);
     signal(SIGHUP, sighandler);
+    signal(SIGUSR2, sighandler);
 
 #ifdef SIGIOT
     signal(SIGIOT, sighandler);

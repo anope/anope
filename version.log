@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="56"
+VERSION_BUILD="57"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (57)
+# BUGS  : 
+# NOTES : Added SIGUSR2 to rehash configuration and save databases
 #
 # BUILD : 1.7.1 (56)
 # NOTES : Fourth time is a charm? Fixinf MySQL password saves.

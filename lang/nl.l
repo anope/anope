@@ -190,6 +190,8 @@ NICK_NOT_REGISTERED
 	Je nick is niet geregistreerd.
 NICK_NOT_REGISTERED_HELP
 	Je nick is niet geregistreerd.  Type /msg %s HELP voor informatie over het registreren van je nick.
+NICK_X_IS_SERVICES
+	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
 	Nick %s is niet geregistreerd.
 NICK_X_IN_USE

@@ -651,5 +651,61 @@ void EnforceQlinedNick(char *nick, char *killer)
         kill_user(killer, u2->nick,
                   "This nick is reserved for Services. Please use a non Q-Lined nick.");
     }
+}
 
+int nickIsServices(char *nick)
+{
+    int found = 0;
+
+    if (s_NickServ && (stricmp(nick, s_NickServ) == 0))
+        found++;
+    else if (s_ChanServ && (stricmp(nick, s_ChanServ) == 0))
+        found++;
+    else if (s_HostServ && (stricmp(nick, s_HostServ) == 0))
+        found++;
+    else if (s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
+        found++;
+    else if (s_BotServ && (stricmp(nick, s_BotServ) == 0))
+        found++;
+    else if (s_HelpServ && (stricmp(nick, s_HelpServ) == 0))
+        found++;
+    else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
+        found++;
+    else if (s_DevNull && (stricmp(nick, s_DevNull) == 0))
+        found++;
+    else if (s_GlobalNoticer && (stricmp(nick, s_GlobalNoticer) == 0))
+        found++;
+    else if (s_NickServAlias && (stricmp(nick, s_NickServAlias) == 0))
+        found++;
+    else if (s_ChanServAlias && (stricmp(nick, s_ChanServAlias) == 0))
+        found++;
+    else if (s_MemoServAlias && (stricmp(nick, s_MemoServAlias) == 0))
+        found++;
+    else if (s_BotServAlias && (stricmp(nick, s_BotServAlias) == 0))
+        found++;
+    else if (s_HelpServAlias && (stricmp(nick, s_HelpServAlias) == 0))
+        found++;
+    else if (s_OperServAlias && (stricmp(nick, s_OperServAlias) == 0))
+        found++;
+    else if (s_DevNullAlias && (stricmp(nick, s_DevNullAlias) == 0))
+        found++;
+    else if (s_HostServAlias && (stricmp(nick, s_HostServAlias) == 0))
+        found++;
+    else if (s_GlobalNoticerAlias
+             && (stricmp(nick, s_GlobalNoticerAlias) == 0))
+        found++;
+    else if (s_BotServ) {
+        BotInfo *bi;
+        int i;
+        for (i = 0; i < 256; i++) {
+            for (bi = botlists[i]; bi; bi = bi->next) {
+                if (stricmp(nick, bi->nick) == 0) {
+                    found++;
+                    continue;
+                }
+            }
+        }
+    }
+
+    return found;
 }

@@ -193,6 +193,8 @@ NICK_NOT_REGISTERED
 	Ваш ник не зарегистрирован.
 NICK_NOT_REGISTERED_HELP
 	Ваш ник не зарегистрирован.  Напишите /msg %s HELP для получения информации о том, как зарегистрировать ник.
+NICK_X_IS_SERVICES
+	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
 	Ник %s не зарегистрирован.
 NICK_X_IN_USE

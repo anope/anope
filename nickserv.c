@@ -3257,6 +3257,8 @@ static int do_info(User * u)
                                 s_NickServ, nr->nick);
                 }
             }
+        } else if (nickIsServices(nick)) {
+            notice_lang(s_NickServ, u, NICK_X_IS_SERVICES, nick);
         } else {
             notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
         }

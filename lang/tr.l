@@ -191,6 +191,8 @@ NICK_NOT_REGISTERED
 	Nickiniz kayýtlý deðil.
 NICK_NOT_REGISTERED_HELP
 	Nickiniz kayýtlý deðil.  Nick kayýt hakkýnda bilgi almak için /msg %s HELP yazýn.
+NICK_X_IS_SERVICES
+	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
 	%s kayýtlý bir nick deðil.
 NICK_X_IN_USE

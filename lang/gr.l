@@ -187,6 +187,8 @@ NICK_NOT_REGISTERED
 	Αυτό το ψευδώνυμο δεν έχει κατοχυρωθεί.
 NICK_NOT_REGISTERED_HELP
 	Αυτό το ψευδώνυμο δεν έχει κατοχυρωθεί.  Γράψε /msg %s HELP για περισσότερες πληροφορίες σχετικά για την κατοχύρωση ψευδωνύμου..
+NICK_X_IS_SERVICES
+	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
 	Αυτό το ψευδώνυμο %s δεν είναι κατοχυρωμένο.
 NICK_X_IN_USE

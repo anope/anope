@@ -187,6 +187,8 @@ NICK_NOT_REGISTERED
 	Seu nick não está registrado.
 NICK_NOT_REGISTERED_HELP
 	Seu nick não está registrado.  Digite /msg %s HELP para maiores informações sobre como registrar o nick.
+NICK_X_IS_SERVICES
+	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
 	Nick %s não está registrado.
 NICK_X_IN_USE

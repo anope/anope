@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="418"
+VERSION_BUILD="421"
 
 # $Log$
+#
+# BUILD : 1.7.5 (421)
+# BUGS  : 198
+# NOTES : 1. fixes TSMODE warnings found by SGR, 2. Fixed OPNOTICE when doing /CS OP
 #
 # BUILD : 1.7.5 (418)
 # BUGS  : N/A

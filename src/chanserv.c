@@ -5238,7 +5238,7 @@ static int do_util(User * u, CSModeUtil * util)
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
 
                 if (util->notice && ci->flags & util->notice)
-                    notice(whosends(ci), chan,
+                    notice(whosends(ci), uc->chan->name,
                            "%s command used for %s by %s", util->name,
                            u->nick, u->nick);
             }
@@ -5760,7 +5760,7 @@ static int do_clear(User * u)
     } else if (!u || !check_access(u, ci, CA_CLEAR)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else if (stricmp(what, "bans") == 0) {
-        char *av[3];
+        char *av[2];
         int i;
 
         /* Save original ban info */
@@ -5770,19 +5770,17 @@ static int do_clear(User * u)
             bans[i] = sstrdup(c->bans[i]);
 
         for (i = 0; i < count; i++) {
-            av[0] = sstrdup(chan);
-            av[1] = sstrdup("-b");
-            av[2] = bans[i];
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
+            av[0] = sstrdup("-b");
+            av[1] = bans[i];
+            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
+            chan_set_modes(whosends(ci), c, 2, av, 0);
             free(av[1]);
             free(av[0]);
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
         free(bans);
     } else if (ircd->except && stricmp(what, "excepts") == 0) {
-        char *av[3];
+        char *av[2];
         int i;
 
         /* Save original except info */
@@ -5792,12 +5790,10 @@ static int do_clear(User * u)
             excepts[i] = sstrdup(c->excepts[i]);
 
         for (i = 0; i < count; i++) {
-            av[0] = sstrdup(chan);
-            av[1] = sstrdup("-e");
-            av[2] = excepts[i];
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
+            av[0] = sstrdup("-e");
+            av[1] = excepts[i];
+            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
+            chan_set_modes(whosends(ci), c, 2, av, 0);
             free(av[1]);
             free(av[0]);
         }
@@ -5805,7 +5801,7 @@ static int do_clear(User * u)
         free(excepts);
 
     } else if (ircd->invitemode && stricmp(what, "invites") == 0) {
-        char *av[3];
+        char *av[2];
         int i;
 
         /* Save original except info */
@@ -5815,12 +5811,10 @@ static int do_clear(User * u)
             invites[i] = sstrdup(c->invite[i]);
 
         for (i = 0; i < count; i++) {
-            av[0] = sstrdup(chan);
-            av[1] = sstrdup("-I");
-            av[2] = invites[i];
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
+            av[0] = sstrdup("-I");
+            av[1] = invites[i];
+            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
+            chan_set_modes(whosends(ci), c, 2, av, 0);
             free(av[1]);
             free(av[0]);
         }
@@ -5833,9 +5827,10 @@ static int do_clear(User * u)
 
         if (c->mode) {
             /* Clear modes the bulk of the modes */
-            anope_cmd_mode(s_ChanServ, c->name, "%s", ircd->modestoremove);
+            anope_cmd_mode(whosends(ci), c->name, "%s",
+                           ircd->modestoremove);
             argv[0] = sstrdup(ircd->modestoremove);
-            chan_set_modes(s_ChanServ, c, 1, argv, 0);
+            chan_set_modes(whosends(ci), c, 1, argv, 0);
             free(argv[0]);
 
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
@@ -5844,23 +5839,24 @@ static int do_clear(User * u)
                 anope_cmd_mode(s_ChanServ, c->name, "-k %s", c->key);
                 argv[0] = sstrdup("-k");
                 argv[1] = c->key;
-                chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                chan_set_modes(whosends(ci), c, 2, argv, 0);
                 free(argv[0]);
             }
             if (ircd->Lmode && c->redirect) {
-                anope_cmd_mode(s_ChanServ, c->name, "-L %s", c->redirect);
+                anope_cmd_mode(whosends(ci), c->name, "-L %s",
+                               c->redirect);
                 argv[0] = sstrdup("-L");
                 argv[1] = c->redirect;
-                chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                chan_set_modes(whosends(ci), c, 2, argv, 0);
                 free(argv[0]);
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
-                    anope_cmd_mode(s_ChanServ, c->name, "%s %s",
+                    anope_cmd_mode(whosends(ci), c->name, "%s %s",
                                    flood_mode_char_remove, c->flood);
                     argv[0] = sstrdup(flood_mode_char_remove);
                     argv[1] = c->flood;
-                    chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                    chan_set_modes(whosends(ci), c, 2, argv, 0);
                     free(argv[0]);
                 } else {
                     if (debug) {

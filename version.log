@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="112"
+VERSION_BUILD="114"
 
 # $Log$
+#
+# BUILD : 1.7.3 (114)
+# BUGS  : 64
+# NOTES : Removed threads.c
 #
 # BUILD : 1.7.3 (112)
 # NOTES : Dev framework.

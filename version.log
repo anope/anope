@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="542"
+VERSION_BUILD="543"
 
 # $Log$
+#
+# BUILD : 1.7.7 (543)
+# BUGS  : 276
+# NOTES : Disables UseRDB when MysqlSecure is enable, since we use one way encryption on the sql databases
 #
 # BUILD : 1.7.7 (542)
 # BUGS  : 263

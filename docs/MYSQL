@@ -83,12 +83,14 @@ Security:
 
       Calculates an MD5 128-bit checksum for the password. The value is 
       returned as a 32-digit hex number that may be used as a hash key.
+	  This is a one way encryption algorithm.
       SLOW
 
    MysqlSecure "sha"
 
       Calculates an SHA 160-bit checksum for the password. The value is 
-      returned as a 40-digit hex number. SLOWEST
+      returned as a 40-digit hex number. This is a one way encryption 
+	  algorithm.SLOWEST
 
    MysqlSecure "mykey"
 
@@ -100,4 +102,8 @@ Security:
    text, services will need to encrypt/encode every single password on
    every database save. On large networks, it may impact responsiveness
    during the saves.
+
+   Caveat: If you enable MysqlSecure you can not longer use the UseRDB directive
+   as all the password types are encrypted with a one way encryption method for
+   older MySQL servers.
 

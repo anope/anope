@@ -556,6 +556,11 @@ int init(int ac, char **av)
             UseRDB = 0;
             alog("Error: Disabling UseRDB due to errors with SQL");
         }
+    } else {
+        if (MysqlSecure && UseRDB) {
+            UseRDB = 0;
+            alog("Error: MySQL password are encrypted using method in MysqlSecure disabling UseRDB");
+        }
     }
 #endif
 

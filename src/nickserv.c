@@ -2662,6 +2662,10 @@ static int do_setmodes(User * u)
                        && should_mode_change(uc->status, CUS_PROTECT)
                        && check_should_protect(u, chan)) {
                 chan_set_user_status(c, u, CUS_PROTECT);
+            } else if (ircd->admin
+                       && should_mode_change(uc->status, CUS_PROTECT)
+                       && check_should_protect(u, chan)) {
+                chan_set_user_status(c, u, CUS_PROTECT);
             } else if (should_mode_change(uc->status, CUS_OP)
                        && check_should_op(u, chan)) {
                 chan_set_user_status(c, u, CUS_OP);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="475"
+VERSION_BUILD="476"
 
 # $Log$
+#
+# BUILD : 1.7.6 (476)
+# BUGS  : N/A
+# NOTES : Fixed Ultimate3 not setting +a on channel admins
 #
 # BUILD : 1.7.6 (475)
 # BUGS  : 126

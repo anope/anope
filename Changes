@@ -13,6 +13,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/05 F Ultimate3 not setting +a on channel admins			  [ #00]
 12/04 F Cleaned up some memory warnings found with Valgrind		  [ #00]
 12/03 F Unreal 391 TIME replies						  [ #00]
 12/03 F CS TOPICLOCK setting a maliformed topic in some cases		  [ #00]

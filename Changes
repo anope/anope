@@ -2,6 +2,7 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
 06/16 F Module support for OpenBSD systems                                [#106]
+06/16 A More verbose error messages for services.conf checking.           [ #00]
 06/10 A User customizable pseudo-client modes.                            [ #99]
 06/10 A Improved handling of /NS INFO for pseudo-clients.                 [ #98]
 06/07 A Added register script in /bin/ for users to register anope.       [ #00]

@@ -1029,6 +1029,16 @@ int read_config(int reload)
             NSDefFlags |= NI_MEMO_RECEIVE;
     }
 
+    if (!ServicesRoot) {
+        error(0,
+              "You must define the 'ServicesRoot' configuration directive");
+        error(0,
+              "in your services.conf file. This is a required setting that");
+        error(0,
+              "defines the main Administrative nick(s) Anope will obey.");
+        retval = 0;
+    }
+
     CHECK(NSGuestNickPrefix);   /* Add safety check */
     if (NSGuestNickPrefix && (strlen(NSGuestNickPrefix) > 21)) {
         error(0, "Value of NSGuestNickPrefix must be between 1 and 21");
@@ -1290,6 +1300,11 @@ int read_config(int reload)
                 NetworkDomains[DomainNumber - 1] = strdup(s);
             } while ((s = strtok(NULL, " ")));
         }
+    }
+
+    if (!retval) {
+        printf
+            ("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");
     }
 
     return retval;

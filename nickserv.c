@@ -1125,9 +1125,11 @@ void cancel_user(User * u)
 #ifdef HAS_SVSHOLD
             }
 #endif
+            na->status &= ~NS_TEMPORARY;
             na->status |= NS_KILL_HELD;
+        } else {
+            na->status &= ~NS_TEMPORARY;
         }
-        na->status &= ~NS_TEMPORARY;
 
         del_ns_timeout(na, TO_COLLIDE);
     }

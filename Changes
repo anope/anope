@@ -3,6 +3,7 @@ Anope Version S V N
 Provided by Anope Dev. <dev@anope.org> - 2004
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+07/15 F Fixed the bug where /ns release didn't work with UseSVSHOLD.      [#125]
 07/15 F Fixed a tiny memleak in the db routine                            [ #00]
 07/15 F Updated Dutch language file.                                      [ #00]
 07/14 F Added CHECK to the memoserv help menu.                            [ #00]

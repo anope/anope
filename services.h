@@ -19,6 +19,10 @@
 #include "sysconf.h"
 #include "config.h"
 
+#ifndef MAX_CMD_HASH
+#define MAX_CMD_HASH 1024
+#endif
+
 /* Some Linux boxes (or maybe glibc includes) require this for the
  * prototype of strsignal(). */
 #define _GNU_SOURCE

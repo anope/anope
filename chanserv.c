@@ -693,7 +693,7 @@ void chanserv(User * u, char *buf)
 void load_cs_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c;
+    int ver, i, j, c, m;
     ChannelInfo *ci, **last, *prev;
     int failed = 0;
 
@@ -981,6 +981,9 @@ void load_cs_dbase(void)
                     memos->time = tmp32;
                     SAFE(read_buffer(memos->sender, f));
                     SAFE(read_string(&memos->text, f));
+                    for (m = 0; m < MAX_CMD_HASH; m++) {
+                        memos->moduleData[m] = NULL;
+                    }
                 }
             }
 

@@ -115,7 +115,7 @@ int db_mysql_query(char *sql)
         s = db_mysql_quote(sql);
         alog(s);
         free(s);
-        
+
     }
 
     result = mysql_query(mysql, sql);
@@ -157,7 +157,7 @@ char *db_mysql_quote(char *sql)
 {
     int slen;
     char *quoted;
-    
+
 
     if (!sql || !do_mysql) {
         return sstrdup("");
@@ -1175,7 +1175,7 @@ void db_mysql_load_cs_dbase(void)
 {
     char sqlcmd[MAX_SQL_BUF], *tempstr;
     ChannelInfo *ci;
-    int n_levels, j;
+    int n_levels, j, m;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
@@ -1345,6 +1345,9 @@ void db_mysql_load_cs_dbase(void)
                 memos->time = atoi(row[2]);
                 snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
+                for (m = 0; m < MAX_CMD_HASH; m++) {
+                    memos->moduleData[m] = NULL;
+                }
                 memos++;
             }
         }
@@ -1448,7 +1451,7 @@ void db_mysql_load_ns_dbase(void)
     NickAlias *na;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    int i, j;
+    int i, j, m;
 
     if (!do_mysql)
         return;
@@ -1529,8 +1532,8 @@ void db_mysql_load_ns_dbase(void)
             res = mysql_store_result(mysql);
             while ((row = mysql_fetch_row(res))) {
                 if (strlen(row[0]) > 0) {
-                  *access = sstrdup(row[0]);
-                  access++;
+                    *access = sstrdup(row[0]);
+                    access++;
                 }
             }
             mysql_free_result(res);
@@ -1556,6 +1559,9 @@ void db_mysql_load_ns_dbase(void)
                 memos->time = atoi(row[2]);
                 snprintf(memos->sender, NICKMAX, "%s", row[3]);
                 memos->text = sstrdup(row[4]);
+                for (m = 0; m < MAX_CMD_HASH; m++) {
+                    memos->moduleData[m] = NULL;
+                }
                 memos++;
             }
             mysql_free_result(res);

@@ -369,7 +369,7 @@ void nickserv(User * u, char *buf)
 void load_old_ns_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c;
+    int ver, i, j, c, m;
     NickAlias *na, *na2, *next;
     NickCore *nc;
     int failed = 0;
@@ -558,6 +558,9 @@ void load_old_ns_dbase(void)
                         memos->time = tmp32;
                         SAFE(read_buffer(memos->sender, f));
                         SAFE(read_string(&memos->text, f));
+                        for (m = 0; m < MAX_CMD_HASH; m++) {
+                            memos->moduleData[m] = NULL;
+                        }
                     }
                 }
 
@@ -658,7 +661,7 @@ void load_ns_req_db(void)
 void load_ns_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c;
+    int ver, i, j, c, m;
     NickAlias *na, **nalast, *naprev;
     NickCore *nc, **nclast, *ncprev;
     int failed = 0;
@@ -754,6 +757,9 @@ void load_ns_dbase(void)
                     memos->time = tmp32;
                     SAFE(read_buffer(memos->sender, f));
                     SAFE(read_string(&memos->text, f));
+                    for (m = 0; m < MAX_CMD_HASH; m++) {
+                        memos->moduleData[m] = NULL;
+                    }
                 }
             }
 

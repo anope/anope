@@ -266,6 +266,7 @@ void memo_send(User * u, char *name, char *text, int z)
     time_t now = time(NULL);
     char *source = u->na->nc->display;
     int is_servadmin = is_services_admin(u);
+    int j;
 
     if (readonly) {
         notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
@@ -314,12 +315,15 @@ void memo_send(User * u, char *name, char *text, int z)
         mi->memos = srealloc(mi->memos, sizeof(Memo) * mi->memocount);
         m = &mi->memos[mi->memocount - 1];
         strscpy(m->sender, source, NICKMAX);
+        for (j = 0; j < MAX_CMD_HASH; j++)
+            m->moduleData[j] = NULL;
         if (mi->memocount > 1) {
             m->number = m[-1].number + 1;
             if (m->number < 1) {
                 int i;
-                for (i = 0; i < mi->memocount; i++)
+                for (i = 0; i < mi->memocount; i++) {
                     mi->memos[i].number = i + 1;
+                }
             }
         } else {
             m->number = 1;

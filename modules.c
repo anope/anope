@@ -1996,7 +1996,6 @@ void moduleCleanStruct(ModuleData * moduleData[])
     ModuleDataItem *item = NULL, *nextItem = NULL;
     int i;
 
-
     for (i = 0; i < 1024; i++) {
         for (md = moduleData[i]; md; md = nextMd) {
             nextMd = md->next;

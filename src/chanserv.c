@@ -5048,19 +5048,19 @@ static int do_info(User * u)
                         get_mlock_modes(ci, 1));
 
         }
-
-        if ((ci->flags & CI_NO_EXPIRE) && show_all) {
-            notice_lang(s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
-        } else {
-            if (is_servadmin) {
-                expt = ci->last_used + CSExpire;
-                tm = localtime(&expt);
-                strftime_lang(buf, sizeof(buf), u,
-                              STRFTIME_DATE_TIME_FORMAT, tm);
-                notice_lang(s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
+        if (show_all) {
+            if (ci->flags & CI_NO_EXPIRE) {
+                notice_lang(s_ChanServ, u, CHAN_INFO_NO_EXPIRE);
+            } else {
+                if (is_servadmin) {
+                    expt = ci->last_used + CSExpire;
+                    tm = localtime(&expt);
+                    strftime_lang(buf, sizeof(buf), u,
+                                  STRFTIME_DATE_TIME_FORMAT, tm);
+                    notice_lang(s_ChanServ, u, CHAN_INFO_EXPIRE, buf);
+                }
             }
         }
-
         if (ci->flags & CI_SUSPENDED) {
             notice_lang(s_ChanServ, u, CHAN_X_SUSPENDED, ci->forbidby,
                         (ci->forbidreason ? ci->

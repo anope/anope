@@ -2486,6 +2486,8 @@ static int do_identify(User * u)
         }
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (nick_identified(u)) {
+        notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
     } else if (!(res = check_password(pass, na->nc->pass))) {
         alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
              u->username, common_get_vhost(u));
@@ -2493,8 +2495,6 @@ static int do_identify(User * u)
         bad_password(u);
     } else if (res == -1) {
         notice_lang(s_NickServ, u, NICK_IDENTIFY_FAILED);
-    } else if (nick_identified(u)) {
-        notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
     } else {
         if (!(na->status & NS_IDENTIFIED) && !(na->status & NS_RECOGNIZED)) {
             if (na->last_usermask)

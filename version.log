@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="454"
+VERSION_BUILD="455"
 
 # $Log$
+#
+# BUILD : 1.7.6 (455)
+# BUGS  : N/A
+# NOTES : Clean up changelog
 #
 # BUILD : 1.7.6 (454)
 # BUGS  : 225

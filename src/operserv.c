@@ -1442,11 +1442,10 @@ static int do_os_mode(User * u)
     } else if (c->bouncy_modes) {
         notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
         return MOD_CONT;
-    } else if (ircd->adminmode) {
-        if ((!is_services_admin(u)) && (c->mode & ircd->adminmode)) {
-            notice_lang(s_OperServ, u, PERMISSION_DENIED);
-            return MOD_CONT;
-        }
+    } else if ((ircd->adminmode) && (!is_services_admin(u))
+               && (c->mode & ircd->adminmode)) {
+        notice_lang(s_OperServ, u, PERMISSION_DENIED);
+        return MOD_CONT;
     } else {
         anope_cmd_mode(s_OperServ, chan, "%s", modes);
 

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="347"
+VERSION_BUILD="348"
 
 # $Log$
+#
+# BUILD : 1.7.5 (348)
+# BUGS  : 
+# NOTES : /os MODE was not functioning, by joining 2 seperate if statements into one the problem was solved. Many Thanks to DrStein for the patch. 
 #
 # BUILD : 1.7.5 (347)
 # BUGS  : 

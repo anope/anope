@@ -1,9 +1,19 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+01/23 A Support for Ratbox IRCD (With and Without TS6)                    [ #00]
+01/23 A Support for TS6 protocol                                          [ #00]
 01/19 A Add simple smtp client, read the README in src/tools for info     [ #00]
 01/16 A Support for PTlinks VHOST (NEWMASK) command.                      [ #00]
 01/16 A Ulines Servers are now except from NOJOIN bans                    [#281]
+01/23 F Fixed u_char warnings under OpenBSD.                              [ #00]
+01/23 F anope_cmd_ctcp() fixed it was setup wrong.                        [ #00]
+01/23 F Checks to make sure Services and Services Alias are not the same  [ #00]
+01/23 F SIGINT now shuts down Anope correctly when running with -nofork   [ #00]
+01/23 F Attempting to set +h (helper) modes on ircd where there is no +h  [ #00]
+01/23 F Fixed problem when dealing with non-existant user privmsg         [ #00]
+01/23 F Updated IRCD, FAQ, README to be more current                      [ #00]
+01/23 F Free's memory on shutdown that is in the User and Channel structs [ #00]
 01/20 F Misplaced MEMO_NO_RSEND_SELF in es.l reordered.                   [ #00]
 01/19 F OperServ HELP does not show commands not usable on that ircd      [ #25]
 01/16 F Help messages restricted to the right access level.               [#272]

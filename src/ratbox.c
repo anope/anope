@@ -1,9 +1,9 @@
-/* Hybrid IRCD functions
+/* Ratbox IRCD functions
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
  *
- * Please read COPYING and README for further details.
+ * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
@@ -14,38 +14,40 @@
 #include "services.h"
 #include "pseudo.h"
 
-#ifdef IRC_HYBRID
+#ifdef IRC_RATBOX
 
-const char version_protocol[] = "Hybrid IRCd 7.0";
+const char version_protocol[] = "Ratbox IRCD 2.0+";
 
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "";  /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "";       /* mode char for FLOOD mode on remove */
 int UseTSMODE = 0;
 
+int ts6nickcount = 0;
+
 IRCDVar ircd[] = {
-    {"HybridIRCd 7.*",          /* ircd name */
-     "+o",                      /* nickserv mode */
-     "+o",                      /* chanserv mode */
-     "+o",                      /* memoserv mode */
-     NULL,                      /* hostserv mode */
-     "+io",                     /* operserv mode */
-     "+o",                      /* botserv mode  */
-     "+h",                      /* helpserv mode */
-     "+i",                      /* Dev/Null mode */
-     "+io",                     /* Global mode   */
-     "+o",                      /* nickserv alias mode */
-     "+o",                      /* chanserv alias mode */
-     "+o",                      /* memoserv alias mode */
-     NULL,                      /* hostserv alias mode */
-     "+io",                     /* operserv alias mode */
-     "+o",                      /* botserv alias mode  */
-     "+h",                      /* helpserv alias mode */
-     "+i",                      /* Dev/Null alias mode */
-     "+io",                     /* Global alias mode   */
-     "+",                       /* Used by BotServ Bots */
-     3,                         /* Chan Max Symbols     */
-     "-ailmnpst",               /* Modes to Remove */
+    {"Ratbox 2.0+",             /* ircd name */
+     "+oi",                     /* nickserv mode */
+     "+oi",                     /* chanserv mode */
+     "+oi",                     /* memoserv mode */
+     "+oi",                     /* hostserv mode */
+     "+oai",                    /* operserv mode */
+     "+oi",                     /* botserv mode  */
+     "+oi",                     /* helpserv mode */
+     "+oi",                     /* Dev/Null mode */
+     "+oi",                     /* Global mode   */
+     "+oi",                     /* nickserv alias mode */
+     "+oi",                     /* chanserv alias mode */
+     "+oi",                     /* memoserv alias mode */
+     "+oi",                     /* hostserv alias mode */
+     "+oai",                    /* operserv alias mode */
+     "+oi",                     /* botserv alias mode  */
+     "+oi",                     /* helpserv alias mode */
+     "+oi",                     /* Dev/Null alias mode */
+     "+oi",                     /* Global alias mode   */
+     "+oi",                     /* Used by BotServ Bots */
+     2,                         /* Chan Max Symbols     */
+     "-acilmnpst",              /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      0,                         /* SVSNICK */
      0,                         /* Vhost  */
@@ -56,9 +58,9 @@ IRCDVar ircd[] = {
      NULL,                      /* Mode on UnReg        */
      NULL,                      /* Mode on Nick Change  */
      0,                         /* Supports SGlines     */
-     0,                         /* Supports SQlines     */
+     1,                         /* Supports SQlines     */
      0,                         /* Supports SZlines     */
-     1,                         /* Supports Halfop +h   */
+     0,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
      1,                         /* Join 2 Set           */
      1,                         /* Join 2 Message       */
@@ -67,7 +69,7 @@ IRCDVar ircd[] = {
      0,                         /* TS Topci Backward    */
      0,                         /* Protected Umode      */
      0,                         /* Has Admin            */
-     0,                         /* Chan SQlines         */
+     1,                         /* Chan SQlines         */
      0,                         /* Quit on Kill         */
      0,                         /* SVSMODE unban        */
      0,                         /* Has Protect          */
@@ -82,7 +84,7 @@ IRCDVar ircd[] = {
      0,                         /* O:LINE               */
      0,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     0,                         /* ChanServ extra               */
+     0,                         /* ChanServ extra       */
      CMODE_p,                   /* No Knock             */
      0,                         /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK        */
@@ -97,13 +99,13 @@ IRCDVar ircd[] = {
      0,                         /* We support TOKENS */
      1,                         /* TOKENS are CASE inSensitive */
      0,                         /* TIME STAMPS are BASE64 */
-     0,                         /* +I support */
+     1,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      NULL,                      /* vhost char */
-     0,                         /* ts6 */
+     1,                         /* ts6 */
      0,                         /* support helper umode */
      }
     ,
@@ -112,7 +114,7 @@ IRCDVar ircd[] = {
 
 IRCDCAPAB ircdcap[] = {
     {
-     CAPAB_NOQUIT,              /* NOQUIT       */
+     0,                         /* NOQUIT       */
      0,                         /* TSMODE       */
      0,                         /* UNCONNECT    */
      0,                         /* NICKIP       */
@@ -143,7 +145,8 @@ IRCDCAPAB ircdcap[] = {
      0, 0}
 };
 
-
+static User *current;
+static int next_index;
 
 void anope_set_umode(User * user, int ac, char **av)
 {
@@ -168,17 +171,6 @@ void anope_set_umode(User * user, int ac, char **av)
         case '-':
             add = 0;
             break;
-        case 'd':
-            if (ac == 0) {
-                alog("user: umode +d with no parameter (?) for user %s",
-                     user->nick);
-                break;
-            }
-
-            ac--;
-            av++;
-            user->svid = strtoul(*av, NULL, 0);
-            break;
         case 'o':
             if (add) {
                 opcnt++;
@@ -193,13 +185,6 @@ void anope_set_umode(User * user, int ac, char **av)
                 opcnt--;
             }
             break;
-        case 'r':
-            if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -r", user->nick);
-                user->mode &= ~UMODE_r;
-            }
-            break;
-
         }
     }
 }
@@ -241,16 +226,16 @@ unsigned long umodes[128] = {
     0,                          /* Z */
     0, 0, 0,                    /* [ \ ] */
     0, 0, 0,                    /* ^ _ ` */
-    UMODE_a, UMODE_b, UMODE_c,  /* a b c */
-    UMODE_d, 0, UMODE_f,        /* d e f */
-    UMODE_g, 0, UMODE_i,        /* g h i */
-    0, UMODE_k, UMODE_l,        /* j k l */
-    0, UMODE_n, UMODE_o,        /* m n o */
-    0, 0, UMODE_r,              /* p q r */
-    UMODE_s, 0, UMODE_u,        /* s t u */
+    UMODE_a, UMODE_b, 0,        /* a b c */
+    UMODE_d, 0, 0,              /* d e f */
+    0, 0, UMODE_i,              /* g h i */
+    0, 0, UMODE_l,              /* j k l */
+    UMODE_g, UMODE_n, UMODE_o,  /* m n o */
+    0, 0, 0,                    /* p q r */
+    0, 0, UMODE_u,              /* s t u */
     0, UMODE_w, UMODE_x,        /* v w x */
-    UMODE_y,                    /* y */
-    UMODE_z,                    /* z */
+    0,                          /* y */
+    0,                          /* z */
     0, 0, 0,                    /* { | } */
     0, 0                        /* ~ ‚ */
 };
@@ -261,9 +246,9 @@ char csmodes[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
     0,
-    'a',                        /* (33) !  */
+    0,
     0, 0, 0,
-    'h',
+    0,
     0, 0, 0, 0,
     0,
 
@@ -354,7 +339,7 @@ CBMode cbmodes[128] = {
     {0},                        /* O */
     {0},                        /* P */
     {0},                        /* Q */
-    {0},
+    {0},                        /* R */
     {0},                        /* S */
     {0},                        /* T */
     {0},                        /* U */
@@ -364,7 +349,7 @@ CBMode cbmodes[128] = {
     {0},                        /* Y */
     {0},                        /* Z */
     {0}, {0}, {0}, {0}, {0}, {0},
-    {CMODE_a, 0, NULL, NULL},
+    {0},
     {0},                        /* b */
     {0},                        /* c */
     {0},                        /* d */
@@ -394,7 +379,6 @@ CBMode cbmodes[128] = {
 };
 
 CBModeInfo cbmodeinfos[] = {
-    {'a', CMODE_a, 0, NULL, NULL},
     {'i', CMODE_i, 0, NULL, NULL},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
@@ -432,7 +416,7 @@ CUMode cumodes[128] = {
     {0},                        /* e */
     {0},                        /* f */
     {0},                        /* g */
-    {CUS_HALFOP, 0, check_valid_op},
+    {0},
     {0},                        /* i */
     {0},                        /* j */
     {0},                        /* k */
@@ -460,6 +444,9 @@ void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud;
+    User *u;
+
     *buf = '\0';
 
     if (fmt) {
@@ -474,19 +461,31 @@ void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
     if (UsePrivmsg) {
         anope_cmd_privmsg2(source, dest, buf);
     } else {
-        send_cmd(source, "NOTICE %s :%s", dest, buf);
+        ud = find_uid(source);
+        u = finduser(dest);
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source),
+                 "NOTICE %s :%s", (UseTS6 ? (u ? u->uid : dest) : dest),
+                 buf);
     }
 }
 
 void anope_cmd_notice2(char *source, char *dest, char *msg)
 {
-    send_cmd(source, "NOTICE %s :%s", dest, msg);
+    Uid *ud;
+    User *u;
+
+    ud = find_uid(source);
+    u = finduser(dest);
+    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "NOTICE %s :%s",
+             (UseTS6 ? (u ? u->uid : dest) : dest), msg);
 }
 
 void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud, *ud2;
+
     *buf = '\0';
 
     if (fmt) {
@@ -497,13 +496,22 @@ void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
     if (!buf) {
         return;
     }
+    ud = find_uid(source);
+    ud2 = find_uid(dest);
 
-    send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "PRIVMSG %s :%s",
+             (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), buf);
 }
 
 void anope_cmd_privmsg2(char *source, char *dest, char *msg)
 {
-    send_cmd(source, "PRIVMSG %s :%s", dest, msg);
+    Uid *ud, *ud2;
+
+    ud = find_uid(source);
+    ud2 = find_uid(dest);
+
+    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "PRIVMSG %s :%s",
+             (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), msg);
 }
 
 void anope_cmd_serv_notice(char *source, char *dest, char *msg)
@@ -521,6 +529,7 @@ void anope_cmd_global(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *u;
     *buf = '\0';
 
     if (fmt) {
@@ -532,12 +541,34 @@ void anope_cmd_global(char *source, const char *fmt, ...)
         return;
     }
 
-    send_cmd(source ? source : ServerName, "OPERWALL :%s", buf);
+    if (source) {
+        u = find_uid(source);
+        if (u) {
+            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", buf);
+        } else {
+            send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", buf);
+        }
+    } else {
+        send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", buf);
+    }
 }
 
 /* GLOBOPS - to handle old WALLOPS */
 void anope_cmd_global_legacy(char *source, char *fmt)
 {
+    Uid *u;
+
+    if (source) {
+        u = find_uid(source);
+        if (u) {
+            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", fmt);
+        } else {
+            send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", fmt);
+        }
+    } else {
+        send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", fmt);
+    }
+
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
 
@@ -547,22 +578,64 @@ int anope_event_sjoin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+/*
+   Non TS6
+
+   av[0] = nick
+   av[1] = hop
+   av[2] = ts
+   av[3] = modes
+   av[4] = user
+   av[5] = host
+   av[6] = server
+   av[7] = info
+
+   TS6
+   av[0] = nick
+   av[1] = hop
+   av[2] = ts
+   av[3] = modes
+   av[4] = user
+   av[5] = host
+   av[6] = IP
+   av[7] = UID
+   av[8] = info
+
+*/
 int anope_event_nick(char *source, int ac, char **av)
 {
-    if (ac != 2) {
-        User *user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
-                             strtoul(av[2], NULL, 10), 0, 0, NULL, NULL);
-        if (user)
+    Server *s;
+    User *u;
+
+    if (UseTS6 && ac == 9) {
+        s = findserver_uid(servlist, source);
+        /* Source is always the server */
+        *source = '\0';
+        User *user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
+                             strtoul(av[2], NULL, 10),
+                             0, 0, "*", av[7]);
+        if (user) {
             anope_set_umode(user, 1, &av[3]);
+        }
     } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL,
-                strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+        if (ac != 2) {
+            User *user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
+                                 strtoul(av[2], NULL, 10),
+                                 0, 0, "*", NULL);
+            if (user)
+                anope_set_umode(user, 1, &av[3]);
+        } else {
+            do_nick(source, av[0], NULL, NULL, NULL, NULL,
+                    strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+        }
+        return MOD_CONT;
     }
-    return MOD_CONT;
 }
 
 int anope_event_topic(char *source, int ac, char **av)
 {
+    User *u;
+
     if (ac == 4) {
         do_topic(source, ac, av);
     } else {
@@ -585,7 +658,16 @@ int anope_event_topic(char *source, int ac, char **av)
         if (ac > 1 && *av[1])
             c->topic = sstrdup(av[1]);
 
-        strscpy(c->topic_setter, source, sizeof(c->topic_setter));
+        if (UseTS6) {
+            u = find_byuid(source);
+            if (u) {
+                strscpy(c->topic_setter, u->nick, sizeof(c->topic_setter));
+            } else {
+                strscpy(c->topic_setter, source, sizeof(c->topic_setter));
+            }
+        } else {
+            strscpy(c->topic_setter, source, sizeof(c->topic_setter));
+        }
         c->topic_time = topic_time;
 
         record_topic(av[0]);
@@ -595,13 +677,37 @@ int anope_event_topic(char *source, int ac, char **av)
 
 int anope_event_tburst(char *source, int ac, char **av)
 {
-    if (ac != 5)
+    char *setter;
+
+    if (ac != 4) {
+        return MOD_CONT;
+    }
+
+    setter = myStrGetToken(av[2], '!', 0);
+
+    Channel *c = findchan(av[0]);
+    time_t topic_time = strtol(av[1], NULL, 10);
+
+    if (!c) {
+        alog("channel: TOPIC %s for nonexistent channel %s",
+             merge_args(ac - 1, av + 1), av[0]);
+        return MOD_CONT;
+    }
+
+    if (check_topiclock(c, topic_time))
         return MOD_CONT;
 
-    av[0] = av[1];
-    av[1] = av[3];
-    av[3] = av[4];
-    do_topic(source, 4, av);
+    if (c->topic) {
+        free(c->topic);
+        c->topic = NULL;
+    }
+    if (ac > 1 && *av[3])
+        c->topic = sstrdup(av[3]);
+
+    strscpy(c->topic_setter, setter, sizeof(c->topic_setter));
+    c->topic_time = topic_time;
+
+    record_topic(av[0]);
     return MOD_CONT;
 }
 
@@ -619,6 +725,15 @@ int anope_event_436(char *source, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
+    char buf[BUFSIZE];
+    *buf = '\0';
+
+    if (UseTS6) {
+        snprintf(buf, BUFSIZE - 1, "%dX", Numeric);
+        TS6SID = sstrdup(buf);
+        UseTSMODE = 1;  /* TMODE */
+    }
+
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
@@ -628,8 +743,11 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
     m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("BMASK",     anope_event_bmask); addCoreMessage(IRCD,m);
+    m = createMessage("UID",       anope_event_nick); addCoreMessage(IRCD,m);
     m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
@@ -639,28 +757,20 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("TBURST",    anope_event_tburst); addCoreMessage(IRCD,m);
+    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
     m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m);
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);    
+    m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -668,17 +778,19 @@ void moduleAddIRCDMsgs(void) {
 
 void anope_cmd_sqline(char *mask, char *reason)
 {
-
+    send_cmd(NULL, "RESV * %s :%s", mask, reason);
 }
+
 void anope_cmd_unsgline(char *mask)
 {
-/* Does not support */
+    /* Does not support */
 }
 
 void anope_cmd_unszline(char *mask)
 {
     /* Does not support */
 }
+
 void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
     /* Does not support */
@@ -701,34 +813,55 @@ void anope_cmd_sgline(char *mask, char *reason)
 
 void anope_cmd_remove_akill(char *user, char *host)
 {
-    /* does not support */
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "UNKLINE * %s %s", user, host);
 }
 
 void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
                      char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s :%s", chan, topic);
+    Uid *ud;
+
+    ud = find_uid(whosets);
+    send_cmd((UseTS6 ? (ud ? ud->uid : whosets) : whosets), "TOPIC %s :%s",
+             chan, topic);
 }
 
 void anope_cmd_vhost_off(User * u)
 {
-    /* does not support vhosting */
+    /* not supported  */
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-    /* does not support vhosting */
+    /* not supported  */
 }
 
 void anope_cmd_unsqline(char *user)
 {
-    /* Hybrid does not support SQLINEs */
+    send_cmd(NULL, "UNRESV * %s", user);
 }
 
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL), channel,
-             user);
+    Uid *ud;
+
+    if (UseTS6) {
+        ud = find_uid(user);
+        if (ud) {
+            send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
+                     channel, ud->uid);
+        } else {
+            send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
+                     channel, user);
+        }
+    } else {
+        send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
+                 channel, user);
+    }
 }
 
 /*
@@ -751,6 +884,8 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud, *ud2;
+
     *buf = '\0';
 
     if (fmt) {
@@ -766,13 +901,23 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
         return;
     }
 
-    send_cmd(source, "KILL %s :%s", user, buf);
+    if (UseTS6) {
+        ud = find_uid(source);
+        ud2 = find_uid(user);
+        if (ud && ud2) {
+            send_cmd(ud->uid, "KILL %s :%s", ud2->uid, buf);
+        } else {
+            send_cmd(source, "KILL %s :%s", user, buf);
+        }
+    } else {
+        send_cmd(source, "KILL %s :%s", user, buf);
+    }
 }
-
 
 void anope_cmd_svsmode(User * u, int ac, char **av)
 {
-    /* Hybrid does not support SVSMODE */
+    send_cmd((UseTS6 ? TS6SID : ServerName), "SVSMODE %s %s", u->nick,
+             av[0]);
 }
 
 void anope_cmd_connect(int servernum)
@@ -804,7 +949,7 @@ void anope_cmd_svsinfo()
  */
 void anope_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 5 5 0 :%ld", (long int) time(NULL));
+    send_cmd(NULL, "SVINFO 6 3 0 :%ld", (long int) time(NULL));
 }
 
 /* CAPAB */
@@ -817,9 +962,7 @@ void anope_cmd_svinfo()
   EOB    - Can do EOB message
   KLN    - Can do KLINE message 
   GLN    - Can do GLINE message 
-  HOPS   - can do half ops (+h)
   HUB    - This server is a HUB 
-  AOPS   - Can do anon ops (+a) 
   UID    - Can do UIDs
   ZIP    - Can do ZIPlinks
   ENC    - Can do ENCrypted links 
@@ -831,13 +974,17 @@ void anope_cmd_svinfo()
 void anope_cmd_capab()
 {
     send_cmd(NULL,
-             "CAPAB :QS EX CHW IE EOB KLN GLN HOPS HUB AOPS KNOCK TBURST PARA");
+             "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP");
 }
 
 /* PASS */
 void anope_cmd_pass(char *pass)
 {
-    send_cmd(NULL, "PASS %s :TS", pass);
+    if (UseTS6) {
+        send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
+    } else {
+        send_cmd(NULL, "PASS %s :TS", pass);
+    }
 }
 
 /* SERVER name hop descript */
@@ -849,16 +996,30 @@ void anope_cmd_server(char *servname, int hop, char *descript)
 void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
-    EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
-
+    char nicknumbuf[10];
+    EnforceQlinedNick(nick, NULL);
+    if (UseTS6) {
+        snprintf(nicknumbuf, 10, "%dXAAAAA%c", Numeric,
+                 (ts6nickcount + 'A'));
+        send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
+                 (long int) time(NULL), modes, user, host, nicknumbuf,
+                 real);
+        new_uid(nick, nicknumbuf);
+        ts6nickcount++;
+    } else {
+        send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+                 (long int) time(NULL), modes, user, host, ServerName,
+                 real);
+    }
+    anope_cmd_sqline(nick, "Reserved for services");
 }
 
 void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud;
+
     *buf = '\0';
 
     if (fmt) {
@@ -867,10 +1028,12 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
         va_end(args);
     }
 
+    ud = find_uid(nick);
+
     if (buf) {
-        send_cmd(nick, "PART %s :%s", chan, buf);
+        send_cmd((UseTS6 ? ud->uid : nick), "PART %s :%s", chan, buf);
     } else {
-        send_cmd(nick, "PART %s", chan);
+        send_cmd((UseTS6 ? ud->uid : nick), "PART %s", chan);
     }
 }
 
@@ -884,14 +1047,17 @@ int anope_event_ping(char *source, int ac, char **av)
 
 int anope_event_away(char *source, int ac, char **av)
 {
+    User *u;
+
     if (ac) {
         return MOD_CONT;
     }
 
-    if (!source) {
-        return MOD_CONT;
+    if (UseTS6) {
+        u = find_byuid(source);
     }
-    m_away(source, av[0]);
+
+    m_away((UseTS6 ? u->nick : source), av[0]);
     return MOD_CONT;
 }
 
@@ -912,27 +1078,19 @@ int anope_event_kick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_eob(char *source, int ac, char **av)
-{
-    Server *s;
-    s = findserver(servlist, source);
-    if (s) {
-        s->sync = 1;
-    }
-    return MOD_CONT;
-}
-
 void anope_cmd_eob()
 {
-    send_cmd(ServerName, "EOB");
+    /* doesn't support EOB */
 }
-
 
 int anope_event_join(char *source, int ac, char **av)
 {
-    if (ac != 1)
+    if (ac != 1) {
+        do_sjoin(source, ac, av);
         return MOD_CONT;
-    do_join(source, ac, av);
+    } else {
+        do_join(source, ac, av);
+    }
     return MOD_CONT;
 }
 
@@ -948,24 +1106,48 @@ int anope_event_motd(char *source, int ac, char **av)
 
 int anope_event_privmsg(char *source, int ac, char **av)
 {
-    if (ac != 2)
+    User *u;
+    Uid *ud;
+
+    if (ac != 2) {
         return MOD_CONT;
-    m_privmsg(source, av[0], av[1]);
+    }
+
+    if (UseTS6) {
+        u = find_byuid(source);
+        ud = find_nickuid(av[0]);
+        if (u) {
+            m_privmsg(u->nick, (ud ? ud->nick : av[0]), av[1]);
+        } else {
+            m_privmsg(source, av[0], av[1]);
+        }
+    } else {
+        m_privmsg(source, av[0], av[1]);
+    }
     return MOD_CONT;
 }
 
 int anope_event_part(char *source, int ac, char **av)
 {
-    if (ac < 1 || ac > 2)
+    User *u;
+
+    if (ac < 1 || ac > 2) {
         return MOD_CONT;
-    do_part(source, ac, av);
+    }
+
+    u = find_byuid(source);
+    do_part((UseTS6 ? (u ? u->nick : source) : source), ac, av);
+
     return MOD_CONT;
 }
 
 int anope_event_whois(char *source, int ac, char **av)
 {
+    Uid *ud;
+
     if (source && ac >= 1) {
-        m_whois(source, av[0]);
+        ud = find_nickuid(av[0]);
+        m_whois(source, (UseTS6 ? (ud ? ud->nick : av[0]) : av[0]));
     }
     return MOD_CONT;
 }
@@ -975,8 +1157,29 @@ int anope_event_server(char *source, int ac, char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
+        if (UseTS6 && TS6UPLINK) {
+            do_server(source, av[0], av[1], av[2], TS6UPLINK);
+        } else {
+            do_server(source, av[0], av[1], av[2], NULL);
+        }
+    } else {
+        do_server(source, av[0], av[1], av[2], NULL);
     }
-    do_server(source, av[0], av[1], av[2], NULL);
+    return MOD_CONT;
+}
+
+int anope_event_sid(char *source, int ac, char **av)
+{
+    Server *s;
+
+    /* :42X SID trystan.nomadirc.net 2 43X :ircd-ratbox test server */
+
+    /* do_server(const char *source, char *servername, char *hops,
+       char *descript, char *numeric) */
+
+    s = findserver_uid(servlist, source);
+
+    do_server(s->name, av[0], av[1], av[3], av[2]);
     return MOD_CONT;
 }
 
@@ -990,32 +1193,44 @@ int anope_event_squit(char *source, int ac, char **av)
 
 int anope_event_quit(char *source, int ac, char **av)
 {
-    if (ac != 1)
+    User *u;
+
+    if (ac != 1) {
         return MOD_CONT;
-    do_quit(source, ac, av);
+    }
+
+    u = find_byuid(source);
+
+    if (UseTS6 && u) {
+        do_quit(u->nick, ac, av);
+    } else {
+        do_quit(source, ac, av);
+    }
     return MOD_CONT;
 }
 
 void anope_cmd_372(char *source, char *msg)
 {
-    send_cmd(ServerName, "372 %s :- %s", source, msg);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "372 %s :- %s", source, msg);
 }
 
 void anope_cmd_372_error(char *source)
 {
-    send_cmd(ServerName, "372 %s :- MOTD file not found!  Please "
+    send_cmd((UseTS6 ? TS6SID : ServerName),
+             "372 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
 void anope_cmd_375(char *source)
 {
-    send_cmd(ServerName, "375 %s :- %s Message of the Day",
-             source, ServerName);
+    send_cmd((UseTS6 ? TS6SID : ServerName),
+             "375 %s :- %s Message of the Day", source, ServerName);
 }
 
 void anope_cmd_376(char *source)
 {
-    send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
+    send_cmd((UseTS6 ? TS6SID : ServerName),
+             "376 %s :End of /MOTD command.", source);
 }
 
 /* 391 */
@@ -1062,7 +1277,7 @@ void anope_cmd_307(const char *fmt, ...)
         return;
     }
 
-    send_cmd(ServerName, "307 %s ", buf);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "307 %s ", buf);
 }
 
 /* 311 */
@@ -1081,7 +1296,7 @@ void anope_cmd_311(const char *fmt, ...)
         return;
     }
 
-    send_cmd(ServerName, "311 %s ", buf);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "311 %s ", buf);
 }
 
 /* 312 */
@@ -1100,7 +1315,7 @@ void anope_cmd_312(const char *fmt, ...)
         return;
     }
 
-    send_cmd(ServerName, "312 %s ", buf);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "312 %s ", buf);
 }
 
 /* 317 */
@@ -1119,7 +1334,7 @@ void anope_cmd_317(const char *fmt, ...)
         return;
     }
 
-    send_cmd(ServerName, "317 %s ", buf);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "317 %s ", buf);
 }
 
 /* 219 */
@@ -1143,7 +1358,8 @@ void anope_cmd_401(char *source, char *who)
     if (!source || !who) {
         return;
     }
-    send_cmd(ServerName, "401 %s %s :No such service.", source, who);
+    send_cmd((UseTS6 ? TS6SID : ServerName), "401 %s %s :No such service.",
+             source, who);
 }
 
 /* 318 */
@@ -1153,7 +1369,8 @@ void anope_cmd_318(char *source, char *who)
         return;
     }
 
-    send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
+    send_cmd((UseTS6 ? TS6SID : ServerName),
+             "318 %s %s :End of /WHOIS list.", source, who);
 }
 
 /* 242 */
@@ -1217,6 +1434,7 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud;
     *buf = '\0';
 
     if (fmt) {
@@ -1228,22 +1446,20 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
         return;
     }
 
-    send_cmd(source, "MODE %s %s", dest, buf);
+    if (source) {
+        ud = find_uid(source);
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "MODE %s %s",
+                 dest, buf);
+    } else {
+        send_cmd(source, "MODE %s %s", dest, buf);
+    }
 }
 
-void anope_cmd_nick(char *nick, char *name, char *mode)
-{
-    EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-             (long int) time(NULL), mode, ServiceUser, ServiceHost,
-             ServerName, (name));
-}
-
-void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
-                    ...)
+void anope_cmd_tmode(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud;
     *buf = '\0';
 
     if (fmt) {
@@ -1251,11 +1467,59 @@ void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
     }
+    if (!buf) {
+        return;
+    }
+
+    send_cmd(NULL, "MODE %s %s", dest, buf);
+}
+
+void anope_cmd_nick(char *nick, char *name, char *mode)
+{
+    char nicknumbuf[10];
+    EnforceQlinedNick(nick, NULL);
+    if (UseTS6) {
+        snprintf(nicknumbuf, 10, "%dXAAAAA%c", Numeric,
+                 (ts6nickcount + 'A'));
+        send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
+                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
+                 nicknumbuf, name);
+        new_uid(nick, nicknumbuf);
+        ts6nickcount++;
+    } else {
+        send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
+                 ServerName, name);
+    }
+    anope_cmd_sqline(nick, "Reserved for services");
+}
+
+void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
+                    ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+    Uid *ud;
+    User *u;
+    *buf = '\0';
+
+
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+
+    ud = find_uid(source);
+    u = finduser(user);
 
     if (buf) {
-        send_cmd(source, "KICK %s %s :%s", chan, user, buf);
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source),
+                 "KICK %s %s :%s", chan,
+                 (UseTS6 ? (u ? u->uid : user) : user), buf);
     } else {
-        send_cmd(source, "KICK %s %s", chan, user);
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "KICK %s %s",
+                 chan, (UseTS6 ? (u ? u->uid : user) : user));
     }
 }
 
@@ -1279,7 +1543,15 @@ void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...)
 
 void anope_cmd_bot_chan_mode(char *nick, char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    Uid *u;
+
+    if (UseTS6) {
+        u = find_uid(nick);
+        anope_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode,
+                        (u ? u->uid : nick));
+    } else {
+        anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    }
 }
 
 /* QUIT */
@@ -1287,6 +1559,8 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
+    Uid *ud;
+
     *buf = '\0';
 
     if (fmt) {
@@ -1295,27 +1569,41 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
         va_end(args);
     }
 
+    ud = find_uid(source);
+
     if (buf) {
-        send_cmd(source, "QUIT :%s", buf);
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT :%s",
+                 buf);
     } else {
-        send_cmd(source, "QUIT");
+        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT");
     }
 }
 
 /* PONG */
 void anope_cmd_pong(char *servname, char *who)
 {
-    send_cmd(servname, "PONG %s", who);
+    if (UseTS6) {
+        send_cmd(TS6SID, "PONG %s", who);
+    } else {
+        send_cmd(servname, "PONG %s", who);
+    }
 }
 
 /* INVITE */
 void anope_cmd_invite(char *source, char *chan, char *nick)
 {
+    Uid *ud;
+    User *u;
+
     if (!source || !chan || !nick) {
         return;
     }
 
-    send_cmd(source, "INVITE %s %s", nick, chan);
+    ud = find_uid(source);
+    u = finduser(nick);
+
+    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "INVITE %s %s",
+             (UseTS6 ? (u ? u->uid : nick) : nick), chan);
 }
 
 /* SQUIT */
@@ -1330,22 +1618,40 @@ void anope_cmd_squit(char *servname, char *message)
 
 int anope_event_mode(char *source, int ac, char **av)
 {
-    if (ac < 2)
+    User *u, *u2;
+
+    if (ac < 2) {
         return MOD_CONT;
+    }
 
     if (*av[0] == '#' || *av[0] == '&') {
         do_cmode(source, ac, av);
     } else {
-        do_umode(source, ac, av);
+        if (UseTS6) {
+            u = find_byuid(source);
+            u2 = find_byuid(av[0]);
+            av[0] = u2->nick;
+            do_umode(u->nick, ac, av);
+        } else {
+            do_umode(source, ac, av);
+        }
+    }
+    return MOD_CONT;
+}
+
+int anope_event_tmode(char *source, int ac, char **av)
+{
+    if (*av[1] == '#' || *av[1] == '&') {
+        do_cmode(source, ac, av);
     }
     return MOD_CONT;
 }
 
 void anope_cmd_351(char *source)
 {
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s -- %s",
-             source, version_number, ServerName, ircd->name, version_flags,
-             version_build);
+    send_cmd((UseTS6 ? TS6SID : ServerName),
+             "351 %s Anope-%s %s :%s - %s -- %s", source, version_number,
+             ServerName, ircd->name, version_flags, version_build);
 }
 
 /* Event: PROTOCTL */
@@ -1370,14 +1676,13 @@ void anope_cmd_release_svshold(char *nick)
 /* SVSNICK */
 void anope_cmd_svsnick(char *nick, char *newnick, time_t when)
 {
-    /* Not Supported by this IRCD */
+    /* not supported */
 }
 
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
+    /* not supported  */
 }
 
 void anope_cmd_svso(char *source, char *nick, char *flag)
@@ -1401,22 +1706,21 @@ void anope_cmd_svsmode_chan(char *name, char *mode, char *nick)
 /* sent if svid is something weird */
 void anope_cmd_svid_umode(char *nick, time_t ts)
 {
-    send_cmd(ServerName, "SVSMODE %s +d 1", nick);
+    /* not supported */
 }
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
 void anope_cmd_nc_change(User * u)
 {
-    /* not used */
+    /* not supported */
 }
 
 /* SVSMODE +d */
 void anope_cmd_svid_umode2(User * u, char *ts)
 {
-    /* not used */
+    /* not supported */
 }
-
 
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
@@ -1449,7 +1753,9 @@ int anope_event_svinfo(char *source, int ac, char **av)
 
 int anope_event_pass(char *source, int ac, char **av)
 {
-    /* currently not used but removes the message : unknown message from server */
+    if (UseTS6) {
+        TS6UPLINK = sstrdup(av[3]);
+    }
     return MOD_CONT;
 }
 
@@ -1480,6 +1786,36 @@ int anope_event_admin(char *source, int ac, char **av)
 
 int anope_event_invite(char *source, int ac, char **av)
 {
+    return MOD_CONT;
+}
+
+int anope_event_bmask(char *source, int ac, char **av)
+{
+    Channel *c;
+    char *bans;
+    char *b;
+    int count, i;
+
+    /* :42X BMASK 1106409026 #ircops b :*!*@*.aol.com */
+    /*             0          1      2   3            */
+    c = findchan(av[1]);
+
+    if (c) {
+        bans = sstrdup(av[3]);
+        count = myNumToken(bans, ' ');
+        for (i = 0; i <= count - 1; i++) {
+            b = myStrGetToken(bans, ' ', i);
+            if (!stricmp(av[2], "b")) {
+                add_ban(c, b);
+            }
+            if (!stricmp(av[2], "e")) {
+                add_exception(c, b);
+            }
+            if (!stricmp(av[2], "I")) {
+                add_invite(c, b);
+            }
+        }
+    }
     return MOD_CONT;
 }
 
@@ -1540,6 +1876,5 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
 
     send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
 }
-
 
 #endif

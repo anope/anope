@@ -818,13 +818,27 @@ static int delbot(BotInfo * bi)
 BotInfo *findbot(char *nick)
 {
     BotInfo *bi;
+    Uid *ud;
+
+    /* to keep make strict happy */
+    ud = NULL;
 
     if (!nick || !*nick)
         return NULL;
 
-    for (bi = botlists[tolower(*nick)]; bi; bi = bi->next)
-        if (!stricmp(nick, bi->nick))
+    for (bi = botlists[tolower(*nick)]; bi; bi = bi->next) {
+        if (UseTS6 && ircd->ts6) {
+            ud = find_nickuid(nick);
+        }
+        if (!stricmp(nick, bi->nick)) {
             return bi;
+        }
+        if (ud && UseTS6 && ircd->ts6) {
+            if (!stricmp(ud->nick, bi->nick)) {
+                return bi;
+            }
+        }
+    }
 
     return NULL;
 }

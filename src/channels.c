@@ -180,7 +180,6 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     CBMode *cbm;
     CMMode *cmm;
     CUMode *cum;
-    int botcheck = 0;
     unsigned char botmode;
     BotInfo *bi;
 
@@ -326,7 +325,7 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 {
     struct u_chanlist *uc;
 
-    if (HelpChannel
+    if (HelpChannel && ircd->supporthelper
         && (status == CUS_OP || status == (CUS_PROTECT | CUS_OP)
             || status == (CUS_OWNER | CUS_OP))
         && !stricmp(chan->name, HelpChannel)) {
@@ -524,7 +523,11 @@ void do_join(const char *source, int ac, char **av)
     char *s, *t;
     struct u_chanlist *c, *nextc;
 
-    user = finduser(source);
+    if (UseTS6 && ircd->ts6) {
+        user = find_byuid(source);
+    } else {
+        user = finduser(source);
+    }
     if (!user) {
         alog("user: JOIN from nonexistent user %s: %s", source,
              merge_args(ac, av));
@@ -600,14 +603,26 @@ void do_kick(const char *source, int ac, char **av)
             continue;
         }
 
-        user = finduser(s);
+        if (UseTS6 && ircd->ts6) {
+            user = find_byuid(s);
+            if (!user) {
+                user = finduser(s);
+            }
+        } else {
+            user = finduser(s);
+        }
         if (!user) {
             alog("user: KICK for nonexistent user %s on %s: %s", s, av[0],
                  merge_args(ac - 2, av + 2));
             continue;
         }
-        if (debug)
-            alog("debug: kicking %s from %s", s, av[0]);
+        if (debug) {
+            if (UseTS6 && ircd->ts6) {
+                alog("debug: kicking %s from %s", user->nick, av[0]);
+            } else {
+                alog("debug: kicking %s from %s", s, av[0]);
+            }
+        }
         for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
              c = c->next);
         if (c) {
@@ -711,8 +726,6 @@ void do_sjoin(const char *source, int ac, char **av)
     Channel *c;
     User *user;
     char *s, *end, cubuf[7], *end2, *cumodes[6];
-
-
     int is_sqlined = 0;
     int ts = 0;
 
@@ -778,7 +791,12 @@ void do_sjoin(const char *source, int ac, char **av)
                 *end2++ = csmodes[(int) *s++];
             *end2 = 0;
 
-            user = finduser(s);
+
+            if (UseTS6 && ircd->ts6) {
+                user = find_byuid(s);
+            } else {
+                user = finduser(s);
+            }
             if (!user) {
                 alog("user: SJOIN for nonexistent user %s on %s", s,
                      av[1]);
@@ -822,7 +840,7 @@ void do_sjoin(const char *source, int ac, char **av)
         }
 
         /* Unreal just had to be different */
-    } else if (ac == 3) {
+    } else if (ac == 3 && !ircd->ts6) {
         c = findchan(av[1]);
         if (ircd->chansqline) {
             if (!c)
@@ -847,6 +865,7 @@ void do_sjoin(const char *source, int ac, char **av)
             *end2 = 0;
 
             user = finduser(s);
+
             if (!user) {
                 alog("user: SJOIN for nonexistent user %s on %s", s,
                      av[1]);
@@ -885,8 +904,80 @@ void do_sjoin(const char *source, int ac, char **av)
         if (c) {
             c->creation_time = ts;
         }
+    } else if (ac == 3 && ircd->ts6) {
+        c = findchan(av[1]);
+        if (ircd->chansqline) {
+            if (!c)
+                is_sqlined = check_chan_sqline(av[1]);
+        }
+
+        cubuf[0] = '+';
+        cumodes[0] = cubuf;
+
+        /* We make all the users join */
+        s = sstrdup(source);    /* Users are always the last element */
+
+        while (*s) {
+            end = strchr(s, ' ');
+            if (end)
+                *end = 0;
+
+            end2 = cubuf + 1;
+
+            while (csmodes[(int) *s] != 0)
+                *end2++ = csmodes[(int) *s++];
+            *end2 = 0;
+
+            if (UseTS6 && ircd->ts6) {
+                user = find_byuid(s);
+            } else {
+                user = finduser(s);
+            }
+            if (!user) {
+                alog("user: SJOIN for nonexistent user %s on %s", s,
+                     av[1]);
+                return;
+            }
+
+            if (is_sqlined && !is_oper(user)) {
+                anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
+            } else {
+                if (!check_kick(user, av[1])) {
+                    /* Make the user join; if the channel does not exist it
+                     * will be created there. This ensures that the channel
+                     * is not created to be immediately destroyed, and
+                     * that the locked key or topic is not shown to anyone
+                     * who joins the channel when empty.
+                     */
+                    c = join_user_update(user, c, av[1]);
+
+                    /* We update user mode on the channel */
+                    if (end2 - cubuf > 1) {
+                        int i;
+
+                        for (i = 1; i < end2 - cubuf; i++)
+                            cumodes[i] = user->nick;
+                        chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
+                                       cumodes, 1);
+                    }
+                }
+            }
+
+            if (!end)
+                break;
+            s = end + 1;
+        }
+
+        if (c) {
+            c->creation_time = ts;
+        }
+        free(s);
     } else if (ac == 2) {
-        user = finduser(source);
+        if (UseTS6 && ircd->ts6) {
+            user = find_byuid(source);
+        } else {
+            user = finduser(source);
+        }
         if (!user) {
             alog("user: SJOIN for nonexistent user %s on %s", source,
                  av[1]);
@@ -943,6 +1034,16 @@ void do_cmode(const char *source, int ac, char **av)
                 alog("TSMODE enabled but MODE has no valid TS");
             }
         }
+    }
+
+    /* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
+
+    if (UseTS6 && ircd->ts6) {
+        alog("chan %s : mode %s : extra %s", av[1], av[2], av[3]);
+        av[0] = sstrdup(av[1]);
+        av[1] = sstrdup(av[2]);
+        av[2] = sstrdup(av[3]);
+        alog("chan %s : mode %s : extra %s", av[0], av[1], av[2]);
     }
 
     chan = findchan(av[0]);

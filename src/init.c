@@ -508,7 +508,11 @@ int init(int ac, char **av)
 #ifndef USE_THREADS
     signal(SIGINT, sighandler);
 #else
-    signal(SIGINT, SIG_DFL);
+    if (nofork) {
+        signal(SIGINT, sighandler);
+    } else {
+        signal(SIGINT, SIG_DFL);
+    }
 #endif
     signal(SIGTERM, sighandler);
     signal(SIGQUIT, sighandler);
@@ -656,8 +660,13 @@ int init(int ac, char **av)
     }
 #endif
     /* Make myself known to myself in the serverlist */
-    me_server =
-        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+    if (UseTS6 && ircd->ts6) {
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+    } else {
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+    }
 
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);

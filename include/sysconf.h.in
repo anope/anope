@@ -126,6 +126,9 @@
 /* "First IRCD type" */
 #undef IRC_VIAGRA
 
+/* "First IRCD type" */
+#undef IRC_RATBOX
+
 /* "Module dir" */
 #undef MODULE_PATH
 
@@ -230,10 +233,6 @@ int ftruncate(int fd, off_t length);
 char *strsignal(int sig);
 #endif
 
-/* Freebsd 5.2.1 actually has u_char those it throws more
-   errors having it defined again - TSL */
-#undef u_char
-typedef unsigned char u_char;
 #endif
 
 

@@ -158,6 +158,7 @@ typedef struct csmode_ CSMode;
 typedef struct cumode_ CUMode;
 typedef struct csmodeutil_ CSModeUtil;
 typedef struct session_ Session;
+typedef struct uid_ Uid;
 
 /*************************************************************************/
 
@@ -180,6 +181,7 @@ typedef enum { false, true } boolean;
 #include "unreal32.h"
 #include "solidircd.h"
 #include "plexus.h"
+#include "ratbox.h"
 
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
@@ -264,6 +266,8 @@ struct ircdvars_ {
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	char *vhostchar;			/* char used for vhosting */
+	int ts6;					/* ircd is TS6 */
+	int supporthelper;			/* +h helper umodes */
 };
 
 struct ircdcapab_ {
@@ -297,6 +301,15 @@ struct ircdcapab_ {
   uint32 dozip;
   uint32 chanmodes;
   uint32 sjb64;
+};
+
+/* tiny struct needed for P10 and other UID servers so we can track 
+   services UID
+*/
+struct uid_ {
+    Uid *next, *prev;
+    char nick[NICKMAX];
+    char *uid;
 };
 
 /*************************************************************************/

@@ -17,6 +17,9 @@
 #define HASH(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
 User *userlist[1024];
 
+#define HASH2(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
+Uid *uidlist[1024];
+
 int32 usercnt = 0, opcnt = 0;
 uint32 maxusercnt = 0;
 time_t maxusertime;
@@ -222,6 +225,9 @@ void delete_user(User * user)
             free(user->vhost);
         }
     }
+    if (user->uid) {
+        free(user->uid);
+    }
     Anope_Free(user->realname);
     if (debug >= 2) {
         alog("debug: delete_user(): remove from channels");
@@ -361,6 +367,99 @@ User *nextuser(void)
         alog("debug: nextuser() returning %s",
              current ? current->nick : "NULL (end of list)");
     return current;
+}
+
+User *find_byuid(const char *uid)
+{
+    User *u, *next;
+
+    u = first_uid();
+    while (u) {
+        next = next_uid();
+        if (!stricmp(uid, u->uid)) {
+            return u;
+        }
+        u = next;
+    }
+    return NULL;
+}
+
+User *first_uid(void)
+{
+    next_index = 0;
+    while (next_index < 1024 && current == NULL) {
+        current = userlist[next_index++];
+    }
+    if (debug >= 2) {
+        alog("debug: first_uid() returning %s %s",
+             current ? current->nick : "NULL (end of list)",
+             current ? current->uid : "");
+    }
+    return current;
+}
+
+User *next_uid(void)
+{
+    if (current)
+        current = current->next;
+    if (!current && next_index < 1024) {
+        while (next_index < 1024 && current == NULL)
+            current = userlist[next_index++];
+    }
+    if (debug >= 2) {
+        alog("debug: next_uid() returning %s %s",
+             current ? current->nick : "NULL (end of list)",
+             current ? current->uid : "");
+    }
+    return current;
+}
+
+Uid *new_uid(const char *nick, char *uid)
+{
+    Uid *u, **list;
+
+    u = scalloc(sizeof(Uid), 1);
+    if (!nick || !uid) {
+        return NULL;
+    }
+    strscpy(u->nick, nick, NICKMAX);
+    list = &uidlist[HASH2(u->nick)];
+    u->next = *list;
+    if (*list)
+        (*list)->prev = u;
+    *list = u;
+    u->uid = sstrdup(uid);
+    return u;
+}
+
+Uid *find_uid(const char *nick)
+{
+    Uid *u;
+    int i;
+
+    for (i = 0; i < 1024; i++) {
+        for (u = uidlist[i]; u; u = u->next) {
+            if (!stricmp(nick, u->nick)) {
+                return u;
+            }
+        }
+    }
+    return NULL;
+}
+
+Uid *find_nickuid(const char *uid)
+{
+    Uid *u;
+    int i;
+
+    for (i = 0; i < 1024; i++) {
+        for (u = uidlist[i]; u; u = u->next) {
+            if (!stricmp(uid, u->uid)) {
+                return u;
+            }
+        }
+    }
+    return NULL;
 }
 
 /*************************************************************************/
@@ -509,7 +608,11 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user->timestamp = ts;
         user->my_signon = time(NULL);
         user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
-        user->uid = uid;        /* p10 stuff */
+        if (uid) {
+            user->uid = sstrdup(uid);   /* p10/ts6 stuff */
+        } else {
+            user->uid = NULL;
+        }
         user->vident = sstrdup(username);
 
         if (CheckClones) {

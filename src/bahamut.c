@@ -105,6 +105,8 @@ IRCDVar ircd[] = {
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      NULL,                      /* vhost char */
+     0,                         /* ts6 */
+     1,                         /* support helper umode */
      }
     ,
     {NULL}
@@ -902,8 +904,6 @@ void anope_cmd_capab()
 /* EVENT : SERVER */
 int anope_event_server(char *source, int ac, char **av)
 {
-    char *uplink;
-
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
     }
@@ -1668,7 +1668,7 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
         s = normalizeBuffer(buf);
     }
 
-    send_cmd(source, "%s NOTICE :\1%s \1", dest, s);
+    send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
 }
 
 /* this avoids "undefined symbol" messages of those whom try to load mods that

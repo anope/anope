@@ -16,9 +16,7 @@
 #include "messages.h"
 #include "language.h"
 
-
 int servernum;
-
 
 /*************************************************************************/
 
@@ -120,7 +118,7 @@ int m_privmsg(char *source, char *receiver, char *msg)
     ChannelInfo *ci;
     User *u;
 
-    if (!source || !*source) {
+    if (!source || !*source || !*receiver || !receiver || !msg) {
         return MOD_CONT;
     }
 
@@ -128,12 +126,8 @@ int m_privmsg(char *source, char *receiver, char *msg)
 
     if (!u) {
         alog("%s: user record for %s not found", msg, source);
-        anope_cmd_notice(msg, source,
+        anope_cmd_notice(receiver, source,
                          getstring(NULL, USER_RECORD_NOT_FOUND));
-        return MOD_CONT;
-    }
-
-    if (!*receiver || !receiver || !msg) {
         return MOD_CONT;
     }
 

@@ -92,6 +92,8 @@ Index:
 
 33. What is a Super-Admin? How does it work? Why might it not work?
 
+34. How to auto voice all those whom join my #channel?
+
 ---------------------------------------------------------------------------
 
 1. What is Anope?
@@ -114,20 +116,9 @@ Index:
 
 3. Does Anope run under Windows?
 
-	Well... not officially. Bu there is a cygwin based patch that makes
-	Anope work on Windows. Note, however, that some features might not
-	work, and you should take that into consideration when answering
-	the questions of ./configure (i.e. MySQL, Modules). 
-
-	You can obtain a pre-build copy of Anope for Windows from 
-	http://www.wircds.net/ although we have "blessed" that port,
-	we do not provide support for it. If you can't get it work,
-	go to wIRCds.net forum.
-
-	If you feel capable of taking ownership of an official windows
-	port, and to keep it current, please let the current Development 
-	team know.
-
+	Well... not officially. Bu there is a port branch of services that will
+	work on Windows. Visit http://windows.anope.org for more information on
+    this port.
 
 4. Can I send you questions without reading the FAQ, INSTALL or README 
    files?
@@ -421,3 +412,9 @@ Index:
 	It only works if SuperAdmin is uncommented in the services
 	configuration file. This is commented by default.
 	Read /msg OperServ HELP SET SUPERADMIN for further help.
+
+34. How to auto voice all those whom join my #channel?
+
+    /cs set #channel secure off
+    /cs set #channel xop off
+    /cs levels #channel set AUTOVOICE -1

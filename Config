@@ -224,6 +224,7 @@ echo "    9) RageIRCd 2.0.0     [beta-6 or later]"
 echo "   10) Unreal 3.2         [Unreal 3.2 beta19 or later]"
 echo "   11) Solid IRCD 3.4.x   [Solid IRCD 3.4.6 or later]"
 echo "   12) Plexus 2.0         [or later]"
+echo "   13) Ratbox 2.0.6       [or later]"
 
 while [ $ok -eq 0 ] ; do
         echo2 "[$IRCTYPE] "
@@ -284,6 +285,10 @@ while [ $ok -eq 0 ] ; do
 			;;
 		12)
 			IRCTYPE_DEF="IRC_PLEXUS"
+			ok=1;
+			;;
+		13)
+			IRCTYPE_DEF="IRC_RATBOX"
 			ok=1;
 			;;
 

@@ -10,7 +10,7 @@ details.
 
 Information about Anope may be found at http://www.anope.org/
 Information about Epona may be found at http://www.epona.org/
-Information about Services may be found at http://www.ircservices.za.net/
+Information about Services may be found at http://www.ircservices.esper.net/
 
 TABLE OF CONTENTS
 -----------------
@@ -133,6 +133,10 @@ Anope currently works with:
   - Hybrid 7 or later
   - PTlink 6.15 or later
   - RageIRCd 2.0 beta-6 or later
+  - Solid IRCD 3.4.6 or later
+  - Plexus 2.0 or later
+  - Ratbox 2.0 or later
+
 
 Anope could also work with some of the daemons derived by the ones 
 listed above, but there's no support for them if they work or don't

@@ -81,15 +81,23 @@ void moduleAddHostServCmds(void)
 
 /*************************************************************************/
 
-/*************************************************************************/
-/* HostServ initialization. */
+/**
+ * HostServ initialization.
+ * @return void
+ */
 void hostserv_init(void)
 {
     moduleAddHostServCmds();
 }
 
 /*************************************************************************/
-/* Main HostServ routine. */
+
+/**
+ * Main HostServ routine.
+ * @param u User Struct
+ * @param buf Buffer holding the message
+ * @return void
+ */
 void hostserv(User * u, char *buf)
 {
     char *cmd, *s;
@@ -115,8 +123,19 @@ void hostserv(User * u, char *buf)
 }
 
 /*************************************************************************/
-/*	Start of Linked List routines					 */
+/*	Start of Linked List routines					                     */
 /*************************************************************************/
+
+/**
+ * Create HostCore list member
+ * @param next HostCore next slot
+ * @param nick Nick to add
+ * @param vIdent Virtual Ident
+ * @param vHost  Virtual Host
+ * @param creator Person whom set the vhost
+ * @param time Time the vhost was Set
+ * @return HostCore
+ */
 HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
                              char *vHost, char *creator, int32 tmp_time)
 {
@@ -158,12 +177,15 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
 }
 
 /*************************************************************************/
+
 /**
  * Returns either NULL for the head, or the location of the *PREVIOUS*
  * record, this is where we need to insert etc..
- *
- * -rob
- **/
+ * @param head HostCore head
+ * @param nick Nick to find
+ * @param found If found
+ * @return HostCore
+ */
 HostCore *findHostCore(HostCore * head, char *nick, boolean * found)
 {
 

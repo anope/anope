@@ -105,6 +105,8 @@ IRCDVar ircd[] = {
      1,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "x",                       /* vhost char */
+     0,                         /* ts6 */
+     1,                         /* support helper umode */
      },
     {NULL}
 };

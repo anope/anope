@@ -982,9 +982,9 @@ void add_entropy_userkeys(void)
  * Get the random numbers 8 byte deep
  * @return char
  */
-u_char getrandom8(void)
+unsigned char getrandom8(void)
 {
-    u_char si, sj;
+    unsigned char si, sj;
 
     rs.i = (rs.i + 1);
     si = rs.s[rs.i];
@@ -1112,7 +1112,7 @@ char *host_resolve(char *host)
  * @return output string, same as input string.
  */
 
-char *str_signed(u_char *str)
+char *str_signed(unsigned char *str)
 {
 	char *nstr;
 	

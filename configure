@@ -4557,6 +4557,7 @@ esac
 
 fi
 
+
 fi
 echo "$as_me:$LINENO: result: $ac_cv_pic" >&5
 echo "${ECHO_T}$ac_cv_pic" >&6
@@ -8608,6 +8609,14 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 		IRCDFILE=" plexus.c "
+
+    elif test "$withval" = "IRC_RATBOX"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define IRC_RATBOX 1
+_ACEOF
+
+		IRCDFILE=" ratbox.c "
 
 
     fi

@@ -106,8 +106,8 @@ static const char Pad64 = '=';
 int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 {
     size_t datalength = 0;
-    u_char input[3];
-    u_char output[4];
+    unsigned char input[3];
+    unsigned char output[4];
     size_t i;
 
     while (2 < srclength) {
@@ -280,10 +280,10 @@ int b64_decode(char *src, char *target, size_t targsize)
     return (tarindex);
 }
 
-char *encode_ip(u_char * ip)
+char *encode_ip(unsigned char *ip)
 {
     static char buf[25];
-    u_char *cp;
+    unsigned char *cp;
     struct in_addr ia;          /* For IPv4 */
     char *s_ip;                 /* Signed ip string */
 
@@ -295,7 +295,7 @@ char *encode_ip(u_char * ip)
     } else {
         s_ip = str_signed(ip);
         ia.s_addr = inet_addr(s_ip);
-        cp = (u_char *) ia.s_addr;
+        cp = (unsigned char *) ia.s_addr;
         b64_encode((char *) &cp, sizeof(struct in_addr), buf, 25);
     }
     return buf;
@@ -378,14 +378,14 @@ static char *int_to_base64(long val)
 
 static long base64_to_int(char *b64)
 {
-    int v = base64_to_int6_map[(u_char) * b64++];
+    int v = base64_to_int6_map[(unsigned char) *b64++];
 
     if (!b64)
         return 0;
 
     while (*b64) {
         v <<= 6;
-        v += base64_to_int6_map[(u_char) * b64++];
+        v += base64_to_int6_map[(unsigned char) *b64++];
     }
 
     return v;

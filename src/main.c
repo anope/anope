@@ -253,6 +253,8 @@ void do_restart_services(void)
 
 static void services_shutdown(void)
 {
+    User *u, *next;
+
     if (!quitmsg)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);
@@ -262,6 +264,12 @@ static void services_shutdown(void)
         Anope_Free(mod_current_buffer);
         if (ircd->chanmodes) {
             Anope_Free(ircd->chanmodes);
+        }
+        u = firstuser();
+        while (u) {
+            next = nextuser();
+            delete_user(u);
+            u = next;
         }
     }
     disconn(servsock);
@@ -318,7 +326,18 @@ void sighandler(int signum)
             quitmsg = "Shutting down on SIGTERM";
             services_shutdown();
             exit(0);
-        } else if (signum == SIGINT || signum == SIGQUIT) {
+
+        } else if (signum == SIGINT) {
+            if (nofork) {
+                signal(SIGINT, SIG_IGN);
+                alog("Received SIGINT, exiting.");
+                expire_all();
+                save_databases();
+                quitmsg = "Shutting down on SIGINT";
+                services_shutdown();
+                exit(0);
+            }
+        } else if (signum == SIGQUIT) {
             /* nothing -- terminate below */
         } else if (!waiting) {
             alog("PANIC! buffer = %s", inbuf);

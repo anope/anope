@@ -19,13 +19,14 @@
 static int curday = 0;
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* Return the version number on the file.  Return 0 if there is no version
+/**
+ * Return the version number on the file.  Return 0 if there is no version
  * number or the number doesn't make sense (i.e. less than 1 or greater
  * than FILE_VERSION).
+ * @param f dbFile Struct Member
+ * @return int 0 if failure, 1 > is the version number
  */
-
 int get_file_version(dbFILE * f)
 {
     FILE *fp = f->fp;
@@ -53,10 +54,11 @@ int get_file_version(dbFILE * f)
 
 /*************************************************************************/
 
-/* Write the current version number to the file.  Return 0 on error, 1 on
- * success.
+/**
+ * Write the current version number to the file.
+ * @param f dbFile Struct Member
+ * @return 0 on error, 1 on success.
  */
-
 int write_file_version(dbFILE * f, uint32 version)
 {
     FILE *fp = f->fp;
@@ -73,8 +75,13 @@ int write_file_version(dbFILE * f, uint32 version)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
+/**
+ * Open the database for reading
+ * @param service If error whom to return the error as
+ * @param filename File to open as the database
+ * @return dbFile struct
+ */
 static dbFILE *open_db_read(const char *service, const char *filename)
 {
     dbFILE *f;
@@ -107,6 +114,13 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 
 /*************************************************************************/
 
+/**
+ * Open the database for writting
+ * @param service If error whom to return the error as
+ * @param filename File to open as the database
+ * @param version Database Version
+ * @return dbFile struct
+ */
 static dbFILE *open_db_write(const char *service, const char *filename,
                              uint32 version)
 {
@@ -198,15 +212,20 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 
 /*************************************************************************/
 
-/* Open a database file for reading (*mode == 'r') or writing (*mode == 'w').
+/**
+ * Open a database file for reading (*mode == 'r') or writing (*mode == 'w').
  * Return the stream pointer, or NULL on error.  When opening for write, it
  * is an error for rename() to return an error (when backing up the original
  * file) other than ENOENT, if NO_BACKUP_OKAY is not defined; it is an error
  * if the version number cannot be written to the file; and it is a fatal
  * error if opening the file for write fails and the backup was successfully
  * made but cannot be restored.
+ * @param service If error whom to return the error as
+ * @param filename File to open as the database
+ * @param mode Mode for writting or reading
+ * @param version Database Version
+ * @return dbFile struct
  */
-
 dbFILE *open_db(const char *service, const char *filename,
                 const char *mode, uint32 version)
 {
@@ -222,12 +241,14 @@ dbFILE *open_db(const char *service, const char *filename,
 
 /*************************************************************************/
 
-/* Restore the database file to its condition before open_db().  This is
+/**
+ * Restore the database file to its condition before open_db().  This is
  * identical to close_db() for files open for reading; however, for files
  * open for writing, we first attempt to restore any backup file before
  * closing files.
+ * @param dbFile struct
+ * @return void
  */
-
 void restore_db(dbFILE * f)
 {
     int errno_save = errno;
@@ -273,10 +294,12 @@ void restore_db(dbFILE * f)
 
 /*************************************************************************/
 
-/* Close a database file.  If the file was opened for write, remove the
+/**
+ * Close a database file.  If the file was opened for write, remove the
  * backup we (may have) created earlier.
+ * @param dbFile struct
+ * @return void
  */
-
 void close_db(dbFILE * f)
 {
     if (f->mode == 'w' && *f->backupname
@@ -290,9 +313,9 @@ void close_db(dbFILE * f)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* Read and write 2- and 4-byte quantities, pointers, and strings.  All
+/**
+ * Read and write 2- and 4-byte quantities, pointers, and strings.  All
  * multibyte values are stored in big-endian order (most significant byte
  * first).  A pointer is stored as a byte, either 0 if NULL or 1 if not,
  * and read pointers are returned as either (void *)0 or (void *)1.  A
@@ -301,10 +324,10 @@ void close_db(dbFILE * f)
  * Written strings are truncated silently at 65534 bytes, and are always
  * null-terminated.
  *
- * All routines return -1 on error, 0 otherwise.
+ * @param ret 16bit integer to write
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
  */
-
-
 int read_int16(uint16 * ret, dbFILE * f)
 {
     int c1, c2;
@@ -317,15 +340,33 @@ int read_int16(uint16 * ret, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
+
+/**
+ * Write a 16bit integer
+ *
+ * @param ret 16bit integer to write
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int write_int16(uint16 val, dbFILE * f)
 {
     if (fputc((val >> 8) & 0xFF, f->fp) == EOF
-        || fputc(val & 0xFF, f->fp) == EOF)
+        || fputc(val & 0xFF, f->fp) == EOF) {
         return -1;
+    }
     return 0;
 }
 
+/*************************************************************************/
 
+/**
+ * Read a unsigned 32bit integer
+ *
+ * @param ret unsigned 32bit integer to read
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int read_int32(uint32 * ret, dbFILE * f)
 {
     int c1, c2, c3, c4;
@@ -340,6 +381,15 @@ int read_int32(uint32 * ret, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
+
+/**
+ * Write a unsigned 32bit integer
+ *
+ * @param ret unsigned 32bit integer to write
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int write_int32(uint32 val, dbFILE * f)
 {
     if (fputc((val >> 24) & 0xFF, f->fp) == EOF)
@@ -353,7 +403,15 @@ int write_int32(uint32 val, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
 
+/**
+ * Read Pointer
+ *
+ * @param ret pointer to read
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int read_ptr(void **ret, dbFILE * f)
 {
     int c;
@@ -365,6 +423,15 @@ int read_ptr(void **ret, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
+
+/**
+ * Write Pointer
+ *
+ * @param ret pointer to write
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int write_ptr(const void *ptr, dbFILE * f)
 {
     if (fputc(ptr ? 1 : 0, f->fp) == EOF)
@@ -372,7 +439,15 @@ int write_ptr(const void *ptr, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
 
+/**
+ * Read String
+ *
+ * @param ret string
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int read_string(char **ret, dbFILE * f)
 {
     char *s;
@@ -393,6 +468,15 @@ int read_string(char **ret, dbFILE * f)
     return 0;
 }
 
+/*************************************************************************/
+
+/**
+ * Write String
+ *
+ * @param ret string
+ * @param dbFile struct
+ * @return -1 on error, 0 otherwise.
+ */
 int write_string(const char *s, dbFILE * f)
 {
     uint32 len;
@@ -412,10 +496,14 @@ int write_string(const char *s, dbFILE * f)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* Renames a database */
-
+/**
+ * Renames a database
+ *
+ * @param name Database to name
+ * @param ext Extention
+ * @return void
+ */
 static void rename_database(char *name, char *ext)
 {
 
@@ -431,8 +519,11 @@ static void rename_database(char *name, char *ext)
 
 /*************************************************************************/
 
-/* Removes old databases */
-
+/**
+ * Removes old databases
+ *
+ * @return void
+ */
 static void remove_backups(void)
 {
 
@@ -465,16 +556,20 @@ static void remove_backups(void)
 
 /*************************************************************************/
 
-/* Handles database backups. */
-
+/**
+ * Handles database backups.
+ *
+ * @return void
+ */
 void backup_databases(void)
 {
 
     time_t t;
     struct tm tm;
 
-    if (!KeepBackups)
+    if (!KeepBackups) {
         return;
+    }
 
     time(&t);
     tm = *localtime(&t);
@@ -497,11 +592,13 @@ void backup_databases(void)
 
         if (!skeleton) {
             rename_database(NickDBName, ext);
-            if (s_BotServ)
+            if (s_BotServ) {
                 rename_database(BotDBName, ext);
+            }
             rename_database(ChanDBName, ext);
-            if (s_HostServ)
+            if (s_HostServ) {
                 rename_database(HostDBName, ext);
+            }
         }
 
         rename_database(OperDBName, ext);

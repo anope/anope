@@ -18,6 +18,8 @@ Server *servlist = NULL;
 Server *me_server = NULL;
 uint32 uplink_capab;
 char *uplink;
+char *TS6UPLINK;
+char *TS6SID;
 
 /* For first_server / next_server */
 static Server *server_cur;
@@ -96,7 +98,7 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     serv->desc = sstrdup(desc);
     serv->flags = flags;
     serv->uplink = uplink;
-    serv->suid = suid;
+    serv->suid = sstrdup(suid);
     serv->sync = -1;
     serv->links = NULL;
     serv->prev = NULL;
@@ -236,6 +238,43 @@ Server *findserver(Server * s, const char *name)
 /*************************************************************************/
 
 /**
+ * Find a server by UID, returns NULL if not found
+ * @param s Server struct
+ * @param name Server Name
+ * @return Server struct
+ */
+Server *findserver_uid(Server * s, const char *name)
+{
+    Server *sl;
+
+    if (!name || !*name) {
+        return NULL;
+    }
+
+    if (debug >= 3) {
+        alog("debug: findserver_uid(%p)", name);
+    }
+    while (s && s->suid && (stricmp(s->suid, name) != 0)) {
+        if (s->links) {
+            sl = findserver_uid(s->links, name);
+            if (sl) {
+                s = sl;
+            } else {
+                s = s->next;
+            }
+        } else {
+            s = s->next;
+        }
+    }
+    if (debug >= 3) {
+        alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
+    }
+    return s;
+}
+
+/*************************************************************************/
+
+/**
  * Find if the server is synced with the network
  * @param s Server struct
  * @param name Server Name
@@ -303,7 +342,14 @@ void do_squit(const char *source, int ac, char **av)
     char buf[BUFSIZE];
     Server *s;
 
-    s = findserver(servlist, av[0]);
+    if (UseTS6 && ircd->ts6) {
+        s = findserver_uid(servlist, av[0]);
+        if (!s) {
+            s = findserver(servlist, av[0]);
+        }
+    } else {
+        s = findserver(servlist, av[0]);
+    }
     if (!s) {
         alog("SQUIT for nonexistent server (%s)!!", av[0]);
         return;

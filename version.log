@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="554"
+VERSION_BUILD="555"
 
 # $Log$
+#
+# BUILD : 1.7.7 (555)
+# BUGS  : N/A
+# NOTES : TS6 support, Ratbox support, lots of little bug fixes, updated documentation
 #
 # BUILD : 1.7.7 (554)
 # BUGS  : none

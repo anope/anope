@@ -1,9 +1,12 @@
 HOW TO ADD IRCD SUPPORT
 
 1. Files to edit
-2. Structure
-3. Functions / Events
-4. CAPAB/PROTOCTL 
+2. Modifing the header file
+3. The code
+4. Functions / Events
+5. CAPAB/PROTOCTL 
+
+=============================================================================================
 
 1. FILES TO EDIT
 
@@ -12,14 +15,123 @@ following files.
 
 A. Make a copy of the .c and .h file of the IRCD that closely matches the ircd
    that you are attempting to add support for.
-B. Make a backup copy of services.h 
-C. Make a backup copy of Config, and src/Makefile
+B. Make a backup copy of include/services.h, include/sysconf.h.in
+C. Make a backup copy of Config and configure.in
 
+First step in this process is to rename the .c and .h file after the IRCD that you are going
+to be adding support for. Its recommened that you come up with a name that is clear and easy
+to understand.
 
-2. STRUCTURE 
-To allow for easy code change to support your ircd. There are two structs that 
-make up the simplest variables to allow you to quickly change out your ircd
-without much work.
+Now that you have the files that you will need to create your own ircd support. Starting with
+Config, this file is a shell script file, scroll down till you find the list of ircds for the
+user to select. Indicate the based ircd version which is supported such as a series 1.x or 2.2.x, 
+placing in the comment side an exact version that the support is for or "experimental" if you
+are not the ircd developer. The next step is to decide how the IRCD will be defined, following
+the existing examples edit " IRCTYPE_DEF="IRC_RATBOX" " to be the descriptive define for your
+ircd. 
+
+With the Config file ready to go, edit configure.in and find in there the reference to 
+--with-ircd, you should see see the various other ircd, and you will want to add yours in there
+using the same IRC_ name you came up with above. Important in this step is to make sure that you
+set the IRCDFILE to the name of the .c file you set in step 1. Once you have the configure.in 
+created you can remove the old configure and at the command prompt type "autconf", this will
+generate the configure file.
+
+Getting close to actually modify code. Open sysconf.h.in and add two lines for your given ircd
+which is similar to this
+
+/* "First IRCD type" */
+#undef IRC_RATBOX
+
+Open services.h and add a line with the rest of the ircd include files to match the name of the
+.h file you set in step 1. 
+
+#include "ratbox.h"
+
+Taking the .c and .h file open them and replace the #ifdef IRC_* with the IRC_ name you set in
+step two. Ensure that the code comments at the top of the file match the ircd that the code
+will be for.
+
+You are now ready to start getting into the code.
+
+=============================================================================================
+
+2. Modifing the header file
+
+Now that you have gotten past the first part of the creation process. You are into the code 
+this part is the harder and more complex part. You will need a general understanding of C
+code to continue. Here are the step by step instructions required to make this work.
+
+Open the .h file and find the section of code with
+
+#define PROTECT_SET_MODE "+"
+#define PROTECT_UNSET_MODE "-"
+#define CS_CMD_PROTECT "PROTECT"
+#define CS_CMD_DEPROTECT "DEPROTECT"
+#define FANT_PROTECT_ADD "!protect"
+#define FANT_PROTECT_DEL "!deprotect"
+#define LEVEL_PROTECT_WORD "AUTOPROTECT"
+#define LEVELINFO_PROTECT_WORD "PROTECT"
+#define LEVELINFO_PROTECTME_WORD "PROTECTME"
+
+If the ircd supports a protective/admin (not owner) mode, set the PROTECT_SET_MODE and 
+PROTECT_UNSET_MODE to be that mode. On most ircd its the mode of "a" so you setting it
+to "+a" and "-a". The next to are based more on what this mode is called, when you 
+message ChanServ to get this mode, this is the command you will be using. Following 
+that comes the fantasy commands which can be used in channel to get these modes. The next
+three relate to the ACCESS LEVEL list system, again these are the words to gain these
+levels in the ACCESS LEVEL system. If your ircd does not have these functions, leave
+them at what ever value is currently set, the core code will handle ignore the request
+of the user.
+
+Now that this is set, you can define the MODES, all user modes are stored with UMODE_
+followed by a letter matching the modes case, be careful to use the correct case as this
+will make it clear when you setup MODES in the .c in a few. Use hex values for the modes
+so starting at 0x00000001 to 0x8000000, in most cases you want to list all modes. If you
+run out of values look at removing any modes that do not impact services.
+
+Channel modes are done much like user modes, with the exception that, bans, exceptions,
+invites, and modes that are applied to a user such as op, voice are not defined here. All
+other modes are defined in here. Again be clear and use the correct case and use hex values
+as done with user modes.
+
+Finally we come to DEFAULT_MLOCK, this is the mode that services will set by default on channels
+when they are registered. In general you want this to be whats acceptable by the ircd, in most
+cause this is "+nt"
+
+=============================================================================================
+
+3. The Code
+
+	Here is where the code of the .c file comes in. be prepared to spend at least an hour if
+not longer going over the code and getting it right especially if you are setting up an ircd
+that is completely different then that which your adding support for. This section goes over
+the majority of the code that is in use. 
+
+	First bit of code you will face is 
+
+const char version_protocol[] = "Ratbox IRCD";
+
+	This the protocol name which will appear in various places especially when you do -version
+at the command prompt, this where you state the server name, the version is not always needed
+unless you are showing that the support is for one branch of a ircd family, such as Unreal 3.1
+and Unreal 3.2
+
+	Once you have decided on this little piece of code, you will come to flood mode characters
+being used for setting and removing. If your IRCD does not support flood modes, you can just
+use "", we will be setting if your IRCD supports flooding in a little bit.
+
+const char flood_mode_char_set[] = "+f";
+const char flood_mode_char_remove[] = "-f";
+
+	The next task that you will face is setting whether the IRCD sends time stamps on modes but
+does not tell us that it will do so. If it does set UseTSMODE to 1, if it does not set it to be 0,
+if your not sure refer to your IRCD's documentation on how MODE is sent
+
+int UseTSMODE = 0;
+
+	Now you come to the part where you setup your ircd, there are two struct which hold this 
+information. This allows you to quickly setup your specific ircd.
 
 IRCDVar ircd[] = { }
 
@@ -214,15 +326,47 @@ usage of each.
 
 77. SGline Enforce : the ircd enforces sglines for us we don't need to, 1 = yes  0 = no
 
-
-
 IRCDCAPAB ircdcap[] = { } 
 
 This struct is based of the CAPAB defines, you should review the the CAPAB table
 below for how this to be done.
 
+Define Table
+======================================================================================================
+DEFINE WORD     |  VALUE      |  TOKEN       |  IRCD Meaning
+======================================================================================================
+CAPAB_NOQUIT    | 0x00000001  |  NOQUIT      |  Supports NOQUIT
+CAPAB_TSMODE    | 0x00000002  |  TS	         |  Channel modes are TimeStamped (normal sent during PASS)
+CAPAB_UNCONNECT | 0x00000004  |  UNCONNECT   |  Supports UNCONNECT
+CAPAB_NICKIP    | 0x00000008  |  NICKIP      |  IP in the NICK line
+CAPAB_NSJOIN    | 0x00000010  |  SSJOIN      |  smart sjoin  SSJOIN
+CAPAB_ZIP	    | 0x00000020  |  ZIP	     |  server supports gz'd links
+CAPAB_BURST     | 0x00000040  |  BURST       |  server supports BURST command
+CAPAB_TS3       | 0x00000080  |  TS3         |  Supports the TS3 Protocol
+CAPAB_TS5       | 0x00000100  |  TS5         |  Supports the TS5 Protocol
+CAPAB_DKEY      | 0x00000200  |  DKEY        |  server supports dh-key exchange using "DKEY"
+CAPAB_DOZIP	    | 0x00000400  |  ZIP	     |  output to this link shall be gzipped
+CAPAB_DODKEY    | 0x00000800  |  DKEY        |  do I do dkey with this link?
+CAPAB_QS        | 0x00001000  |  QS          |  Can handle quit storm removal
+CAPAB_SCS       | 0x00002000  |  SCS         |  Supports String Cache System
+CAPAB_PT4       | 0x00004000  |  PT4         |  PT4 Protocol Support
+CAPAB_UID       | 0x00008000  |  UID         |  Can do UIDs
+CAPAB_KNOCK     | 0x00010000  |  KNOCK       |  supports KNOCK
+CAPAB_CLIENT    | 0x00020000  |  CLIENT      |  Supports CLIENT
+CAPAB_IPV6      | 0x00040000  |  IPV6        |  Server is able to handle ipv6 address masks
+CAPAB_SSJ5      | 0x00080000  |  SSJ5        |  Server supports smart join protocol 5
+CAPAB_SN2       | 0x00100000  |  SN2         |  Supports SN2 protocol (SNICK 2)
+CAPAB_VHOST     | 0x00200000  |  VHOST       |  Supports VHOST protocol
+CAPAB_TOKEN     | 0x00400000  |  TOKEN       |  Supports tokenized server<->server commands
+CAPAB_SSJ3      | 0x00800000  |  SSJ3        |  Server supports smart join protocol 3
+CAPAB_NICK2     | 0x01000000  |  NICK2       |  supports the extended NICK command (version 2)
+CAPAB_UMODE2    | 0x02000000  |  UMODE2      |  support for the UMODE2 command
+CAPAB_VL        | 0x04000000  |  VL          |  Vline information is included in the info field
+CAPAB_TLKEXT    | 0x08000000  |  TLKEXT      |  This allows 10 instead of 8 parameters in TKL's
 
-3. FUNCTIONS AND EVENTS
+===================================================================================================
+
+4. FUNCTIONS AND EVENTS
 
 A brief word about functions and events. All events are captured via the 
 
@@ -298,35 +442,3 @@ following steps
 
 
 
-Define Table
-======================================================================================================
-DEFINE WORD     |  VALUE      |  TOKEN       |  IRCD Meaning
-======================================================================================================
-CAPAB_NOQUIT    | 0x00000001  |  NOQUIT      |  Supports NOQUIT
-CAPAB_TSMODE    | 0x00000002  |  TS	         |  Channel modes are TimeStamped (normal sent during PASS)
-CAPAB_UNCONNECT | 0x00000004  |  UNCONNECT   |  Supports UNCONNECT
-CAPAB_NICKIP    | 0x00000008  |  NICKIP      |  IP in the NICK line
-CAPAB_NSJOIN    | 0x00000010  |  SSJOIN      |  smart sjoin  SSJOIN
-CAPAB_ZIP	    | 0x00000020  |  ZIP	     |  server supports gz'd links
-CAPAB_BURST     | 0x00000040  |  BURST       |  server supports BURST command
-CAPAB_TS3       | 0x00000080  |  TS3         |  Supports the TS3 Protocol
-CAPAB_TS5       | 0x00000100  |  TS5         |  Supports the TS5 Protocol
-CAPAB_DKEY      | 0x00000200  |  DKEY        |  server supports dh-key exchange using "DKEY"
-CAPAB_DOZIP	    | 0x00000400  |  ZIP	     |  output to this link shall be gzipped
-CAPAB_DODKEY    | 0x00000800  |  DKEY        |  do I do dkey with this link?
-CAPAB_QS        | 0x00001000  |  QS          |  Can handle quit storm removal
-CAPAB_SCS       | 0x00002000  |  SCS         |  Supports String Cache System
-CAPAB_PT4       | 0x00004000  |  PT4         |  PT4 Protocol Support
-CAPAB_UID       | 0x00008000  |  UID         |  Can do UIDs
-CAPAB_KNOCK     | 0x00010000  |  KNOCK       |  supports KNOCK
-CAPAB_CLIENT    | 0x00020000  |  CLIENT      |  Supports CLIENT
-CAPAB_IPV6      | 0x00040000  |  IPV6        |  Server is able to handle ipv6 address masks
-CAPAB_SSJ5      | 0x00080000  |  SSJ5        |  Server supports smart join protocol 5
-CAPAB_SN2       | 0x00100000  |  SN2         |  Supports SN2 protocol (SNICK 2)
-CAPAB_VHOST     | 0x00200000  |  VHOST       |  Supports VHOST protocol
-CAPAB_TOKEN     | 0x00400000  |  TOKEN       |  Supports tokenized server<->server commands
-CAPAB_SSJ3      | 0x00800000  |  SSJ3        |  Server supports smart join protocol 3
-CAPAB_NICK2     | 0x01000000  |  NICK2       |  supports the extended NICK command (version 2)
-CAPAB_UMODE2    | 0x02000000  |  UMODE2      |  support for the UMODE2 command
-CAPAB_VL        | 0x04000000  |  VL          |  Vline information is included in the info field
-CAPAB_TLKEXT    | 0x08000000  |  TLKEXT      |  This allows 10 instead of 8 parameters in TKL's

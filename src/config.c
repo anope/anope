@@ -332,6 +332,8 @@ char *UlineServers;
 char **Ulines;
 int NumUlines;
 
+int UseTS6;
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -633,6 +635,7 @@ Directive directives[] = {
     {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
     {"UseSVS2MODE", {{PARAM_SET, PARAM_RELOAD, &UseSVS2MODE}}},
     {"UseTokens", {{PARAM_SET, 0, &UseTokens}}},
+    {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
     {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
@@ -985,6 +988,56 @@ int read_config(int reload)
         CHEK2(s_GlobalNoticer, GlobalName);
         CHEK2(PIDFilename, PIDFile);
     }
+
+    if (s_ChanServAlias) {
+        if (!stricmp(s_ChanServ, s_ChanServAlias)) {
+            printf
+                ("\n*** ChanServ and ChanServ Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+    if (s_NickServAlias) {
+        if (!stricmp(s_NickServ, s_NickServAlias)) {
+            printf
+                ("\n*** NickServ and NickServ Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+    if (s_OperServAlias) {
+        if (!stricmp(s_OperServ, s_OperServAlias)) {
+            printf
+                ("\n*** OperServ and OperServ Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+    if (s_MemoServAlias) {
+        if (!stricmp(s_MemoServ, s_MemoServAlias)) {
+            printf
+                ("\n*** MemoServ and MemoServ Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+    if (s_HelpServAlias) {
+        if (!stricmp(s_HelpServ, s_HelpServAlias)) {
+            printf
+                ("\n*** HelpServ and HelpServ Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+    if (s_GlobalNoticerAlias) {
+        if (!stricmp(s_GlobalNoticer, s_GlobalNoticerAlias)) {
+            printf
+                ("\n*** GlobalNoticer and GlobalNoticer Alias are the same, this will cause errors\n");
+            retval = 0;
+        }
+    }
+
+
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
         CHEK2(NickDBName, NickServDB);
@@ -1287,11 +1340,26 @@ int read_config(int reload)
         CHECK(BSBadWordsMax);
         CHECK(BSMinUsers);
         CHECK(BSKeepData);
+        if (s_BotServAlias) {
+            if (!stricmp(s_BotServ, s_BotServAlias)) {
+                printf
+                    ("\n*** BotServ and BotServ Alias are the same, this will cause errors\n");
+                retval = 0;
+            }
+        }
     }
 
     if (s_HostServ) {
         CHEK2(s_HostServ, HostServName);
         CHEK2(HostDBName, HostServDB);
+
+        if (s_HostServAlias) {
+            if (!stricmp(s_HostServ, s_HostServAlias)) {
+                printf
+                    ("\n*** HostServ and HostServ Alias are the same, this will cause errors\n");
+                retval = 0;
+            }
+        }
     }
 
     if (UseMail) {

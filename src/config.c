@@ -337,20 +337,13 @@ static void dep_ListOpersOnly(void)
 /* Configuration directives */
 
 typedef struct {
-    int type;
-    int flags;
-    void *ptr;
-} ConfParam;
-
-typedef struct {
     char *name;
-    ConfParam params[MAXPARAMS];
+    struct {
+        int type;               /* PARAM_* below */
+        int flags;              /* Same */
+        void *ptr;              /* Pointer to where to store the value */
+    } params[MAXPARAMS];
 } Directive;
-
-typedef struct {
-    char *name;
-    int (*func) (int line, int argc, char **argv);
-} ConfCB;
 
 #define PARAM_NONE	0
 #define PARAM_INT	1
@@ -369,11 +362,6 @@ typedef struct {
 #define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
 #define PARAM_RELOAD    0x04    /* Directive is reloadable */
 
-int doAddOper(int line, int argc, char **argv);
-
-ConfCB confroutines[] = {
-    {"Oper", &doAddOper}
-};
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
     {"AutokillDB", {{PARAM_STRING, PARAM_RELOAD, &AutokillDBName}}},
@@ -694,22 +682,6 @@ void error(int linenum, char *message, ...)
 
 /*************************************************************************/
 
-int doAddOper(int line, int argc, char **argv)
-{
-    char *name;
-    int i, operflags;
-    if (argc < 2) {
-        error(line, "Oper: Missing Arguments");
-        return 0;
-    }
-
-    name = argv[0];
-    operflags = atoi(argv[1]);
-    error(line, "Added Oper %s with flags %d", name, operflags);
-
-    return 1;
-}
-
 /* Parse a configuration line.  Return 1 on success; otherwise, print an
  * appropriate error message and return 0.  Destroys the buffer by side
  * effect.
@@ -761,13 +733,6 @@ int parse(char *buf, int linenum, int reload)
 
     if (!dir)
         return 1;
-
-    for (n = 0; n < lenof(confroutines); n++) {
-        ConfCB *cb = &confroutines[n];
-        if (stricmp(dir, cb->name) != 0)
-            continue;
-        return cb->func(linenum, ac, av);
-    }
 
     for (n = 0; n < lenof(directives); n++) {
         Directive *d = &directives[n];

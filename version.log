@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="342"
+VERSION_BUILD="343"
 
 # $Log$
+#
+# BUILD : 1.7.5 (343)
+# BUGS  : #00
+# NOTES : Fixed previous commit.
 #
 # BUILD : 1.7.5 (342)
 # BUGS  : #00

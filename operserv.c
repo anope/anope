@@ -326,7 +326,7 @@ static void get_operserv_stats(long *nrec, long *memuse)
     }
 
     count += akills.count;
-    mem += akills.capacity * sizeof(void);
+    mem += akills.capacity;
     mem += akills.count * sizeof(Akill);
 
     for (i = 0; i < akills.count; i++) {
@@ -340,7 +340,7 @@ static void get_operserv_stats(long *nrec, long *memuse)
 #ifdef IRC_BAHAMUT
 
     count += sglines.count;
-    mem += sglines.capacity * sizeof(void);
+    mem += sglines.capacity;
     mem += sglines.count * sizeof(SXLine);
 
     for (i = 0; i < sglines.count; i++) {
@@ -353,7 +353,7 @@ static void get_operserv_stats(long *nrec, long *memuse)
 #endif
 
     count += sqlines.count;
-    mem += sqlines.capacity * sizeof(void);
+    mem += sqlines.capacity;
     mem += sqlines.count * sizeof(SXLine);
 
     for (i = 0; i < sqlines.count; i++) {
@@ -366,7 +366,7 @@ static void get_operserv_stats(long *nrec, long *memuse)
 #ifdef IRC_BAHAMUT
 
     count += szlines.count;
-    mem += szlines.capacity * sizeof(void);
+    mem += szlines.capacity;
     mem += szlines.count * sizeof(SXLine);
 
     for (i = 0; i < szlines.count; i++) {

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="103"
+VERSION_BUILD="104"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (104)
+# BUGS  : 
+# NOTES : Removed some illegal sizeof(void). Thanks to codemastr.
 #
 # BUILD : 1.7.2 (103)
 # BUGS  : none

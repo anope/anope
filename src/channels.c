@@ -305,11 +305,13 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 {
     struct u_chanlist *uc;
 
-    if (HelpChannel && status == CUS_OP
+    if (HelpChannel
+        && (status == CUS_OP || status == (CUS_PROTECT | CUS_OP)
+            || status == (CUS_OWNER | CUS_OP))
         && !stricmp(chan->name, HelpChannel)) {
         if (debug) {
-            alog("debug: %s being given +h for being a OP in %s",
-                 user->nick, chan->name);
+            alog("debug: %s being given +h for having %d status in %s",
+                 user->nick, status, chan->name);
         }
         common_svsmode(user, "+h", NULL);
     }

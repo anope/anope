@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="459"
+VERSION_BUILD="460"
 
 # $Log$
+#
+# BUILD : 1.7.6 (460)
+# BUGS  : 223
+# NOTES : HelpChan +h mode not being given if status was greater then op.
 #
 # BUILD : 1.7.6 (459)
 # BUGS  : N/A

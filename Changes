@@ -18,6 +18,8 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/19 F Some config options could overflow strtol().			  [ #00] 
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
+Provided by DrStein <gacevedo@anope.org> - 2004
+11/22 F HelpChan +h mode not being given if status was greater then op.   [#223]
 
 Anope Version 1.7.6
 -------------------

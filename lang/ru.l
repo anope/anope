@@ -1467,6 +1467,14 @@ CHAN_GETPASS_PASSWORD_IS
 	Пароль на канал %s - %s.
 	
 # SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
+# SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS #канал
 CHAN_SENDPASS_UNAVAILABLE

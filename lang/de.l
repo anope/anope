@@ -711,7 +711,7 @@ NICK_GETPASS_UNAVAILABLE
 	GETPASS nicht verfügbar, da die Verschlüsselung aktiviert ist.
 NICK_GETPASS_PASSWORD_IS
 	Passwort von %s ist %s.
-	
+
 # SENDPASS responses
 NICK_GETEMAIL_SYNTAX
 	GETEMAIL user@email-host Keine WildCards!!
@@ -1486,6 +1486,14 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	Passwort für Channel %s ist %s.
 	
+# SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS Channel

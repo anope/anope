@@ -696,7 +696,7 @@ NICK_GETPASS_UNAVAILABLE
 	GETPASS komutu devre dýþý çünkü þifreleme(encryption) devrede.
 NICK_GETPASS_PASSWORD_IS
 	%s nickinin þifresi %s.
-	
+
 # SENDPASS responses
 NICK_GETEMAIL_SYNTAX
 	GETEMAIL user@email-host No WildCards!!
@@ -1476,6 +1476,14 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	%s kanalýnýn þifresi %s.
 	
+# SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS kanaladý

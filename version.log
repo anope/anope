@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="624"
+VERSION_BUILD="625"
 
 # $Log$
+#
+# BUILD : 1.7.8 (625)
+# BUGS  : 319
+# NOTES : Globalized do_getkey by DrStein.
 #
 # BUILD : 1.7.8 (624)
 # BUGS  : 312

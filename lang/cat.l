@@ -692,8 +692,7 @@ NICK_GETPASS_UNAVAILABLE
 	La comanda GETPASS no esta disponible per l'us d'encriptació.
 NICK_GETPASS_PASSWORD_IS
 	La clau per %s es %s.
-	
-# SENDPASS responses
+
 NICK_GETEMAIL_SYNTAX
 	GETEMAIL user@email-host No WildCards!!
 NICK_GETEMAIL_EMAILS_ARE
@@ -1481,6 +1480,14 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	La clau pel canal %s es %s.
 	
+# SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS canal

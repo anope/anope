@@ -1472,6 +1472,14 @@ CHAN_GETPASS_PASSWORD_IS
 	La chiave (password) del canale %s è %s.
 
 # SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
+# SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS canale
 CHAN_SENDPASS_UNAVAILABLE

@@ -6234,14 +6234,20 @@ static int do_getkey(User * u)
     char *chan = strtok(NULL, " ");
     ChannelInfo *ci;
 
-    if (chan && (ci = cs_findchan(chan)) && !(ci->flags & CI_VERBOTEN)
-        && check_access(u, ci, CA_GETKEY)) {
-        notice_user(s_ChanServ, u, "KEY %s %s", ci->name,
-                    (ci->
-                     c ? (ci->c->key ? ci->c->key : "NO KEY") : "NO KEY"));
+    if (!chan) {
+        syntax_error(s_ChanServ, u, "GETKEY", CHAN_GETKEY_SYNTAX);
+    } else if (!(ci = cs_findchan(chan))) {
+        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+    } else if (ci->flags & CI_VERBOTEN) {
+        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+    } else if (!check_access(u, ci, CA_GETKEY)) {
+        notice_lang(s_ChanServ, u, ACCESS_DENIED);
+    } else if (!ci->c || !ci->c->key) {
+        notice_lang(s_ChanServ, u, CHAN_GETKEY_NOKEY, chan);
     } else {
-        notice_user(s_ChanServ, u, "KEY %s ERROR", chan);
+        notice_lang(s_ChanServ, u, CHAN_GETKEY_KEY, chan, ci->c->key);
     }
+
     return MOD_CONT;
 }
 

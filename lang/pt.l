@@ -693,7 +693,7 @@ NICK_GETPASS_UNAVAILABLE
 	Comando GETPASS não disponível: modo de encriptação ativado.
 NICK_GETPASS_PASSWORD_IS
 	Senha para %s é %s.
-	
+
 # GETEMAIL responses
 NICK_GETEMAIL_SYNTAX
 	GETEMAIL user@emailhost Não use coringas!
@@ -1466,6 +1466,14 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	Senha do canal %s é %s.
 	
+# SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS canal

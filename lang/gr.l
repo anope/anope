@@ -690,7 +690,7 @@ NICK_GETPASS_UNAVAILABLE
 	Η GETPASS εντολή δεν είναι διαθέσιμη γιατί χρησιμοποιείται η κωδικοποίηση.
 NICK_GETPASS_PASSWORD_IS
 	Ο κωδικός για τον %s είναι %s.
-	
+
 # SENDPASS responses
 NICK_GETEMAIL_SYNTAX
 	GETEMAIL user@email-host No WildCards!!
@@ -1470,6 +1470,14 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	Ο κωδικός για το κανάλι %s είναι %s.
 	
+# SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS κανάλι

@@ -1586,6 +1586,14 @@ CHAN_GETPASS_PASSWORD_IS
 	Has³o kana³u %s to %s.
 	
 # SENDPASS responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
+# SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS kana³
 CHAN_SENDPASS_UNAVAILABLE

@@ -1457,7 +1457,15 @@ CHAN_GETPASS_UNAVAILABLE
 	GETPASS command unavailable because encryption is in use.
 CHAN_GETPASS_PASSWORD_IS
 	Password for channel %s is %s.
-	
+
+# GETKEY responses
+CHAN_GETKEY_SYNTAX
+	GETKEY channel
+CHAN_GETKEY_NOKEY
+	The channel %s has no key.
+CHAN_GETKEY_KEY
+	Key for channel %s is %s.
+
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS channel

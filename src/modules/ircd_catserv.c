@@ -9,7 +9,7 @@
 #include "module.h"
 
 #define AUTHOR "Anope"
-#define VERSION "1.1"
+#define VERSION "1.2"
 
 int my_privmsg(char *source, int ac, char **av);
 CommandHash *Catserv_cmdTable[MAX_CMD_HASH];

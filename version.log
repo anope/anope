@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="513"
+VERSION_BUILD="514"
 
 # $Log$
+#
+# BUILD : 1.7.6 (514)
+# BUGS  : 261
+# NOTES : Modules can no longer call addCommand directly. The mod_name of the command MUST be set if it is a module.
 #
 # BUILD : 1.7.6 (513)
 # BUGS  : 

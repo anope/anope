@@ -890,6 +890,9 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
     if (!cmdTable || !c || (pos < 0 || pos > 2)) {
         return MOD_ERR_PARAMS;
     }
+    
+    if (mod_current_module_name && !c->mod_name)
+        return MOD_ERR_NO_MOD_NAME;
 
     index = CMD_HASH(c->name);
 

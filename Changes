@@ -34,6 +34,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/30 F Fixed OS CLEARMODE, so the correct messages are sent		  [#207]
 10/30 F Fixed MS INFO using the correct message 			  [#205]
 10/29 F Fixed CS CLEAR MODES not resetting the modes			  [#182]
 10/29 F Fixed LogUser message, now normalizes the "realname" for display  [#199]

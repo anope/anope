@@ -1603,8 +1603,10 @@ static int do_clearmodes(User * u)
 
     if (!chan) {
         syntax_error(s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
+        return MOD_CONT;
     } else if (!(c = findchan(chan))) {
         notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+        return MOD_CONT;
     } else if (c->bouncy_modes) {
         notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
         return MOD_CONT;
@@ -1778,10 +1780,13 @@ static int do_clearmodes(User * u)
             free(invites);
         }
 
-
     }
 
-    notice_lang(s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
+    if (all) {
+        notice_lang(s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
+    } else {
+        notice_lang(s_OperServ, u, OPER_CLEARMODES_DONE, chan);
+    }
     return MOD_CONT;
 }
 

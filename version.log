@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="384"
+VERSION_BUILD="385"
 
 # $Log$
+#
+# BUILD : 1.7.5 (385)
+# BUGS  : N/A
+# NOTES : Moved more veriable declarations above the new null checking code
+# 
 #
 # BUILD : 1.7.5 (384)
 # BUGS  : N/A

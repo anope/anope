@@ -59,7 +59,7 @@ static int do_badwords(User * u);
 static int do_say(User * u);
 static int do_act(User * u);
 void moduleAddBotServCmds(void);
-char *normalizeBuffer(char *);
+
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddBotServCmds(void) {
@@ -2434,6 +2434,7 @@ static int do_act(User * u)
 
     char *chan = strtok(NULL, " ");
     char *text = strtok(NULL, "");
+    char tmpbuf[BUFSIZE];
 
     if (!chan || !text)
         syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
@@ -2448,7 +2449,8 @@ static int do_act(User * u)
     else if (!check_access(u, ci, CA_SAY))
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
-        anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION %s%c", 1,
+        strnrepl(text, BUFSIZE, "\001", "");
+        anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION %s %c", 1,
                           text, 1);
         ci->bi->lastmsg = time(NULL);
         if (logchan && LogBot)

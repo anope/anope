@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="430"
+VERSION_BUILD="431"
 
 # $Log$
+#
+# BUILD : 1.7.5 (431)
+# BUGS  : 193
+# NOTES : 1. extern normalizeBuffer() helpful in some many other places not just botserv, 2. fixed BS ACT, if the string 
+# contained a control char 001, it would cause the string to act like SAY
 #
 # BUILD : 1.7.5 (430)
 # BUGS  : 187, 201, 202

@@ -57,6 +57,7 @@ E BotInfo *makebot(char *nick);
 E BotInfo *findbot(char *nick);
 E void bot_join(ChannelInfo *ci);
 E void bot_rejoin_all(BotInfo *bi);
+E char *normalizeBuffer(char *);
 
 /**** channels.c ****/
 

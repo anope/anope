@@ -2022,21 +2022,21 @@ static int do_register(User * u)
 
     if (RestrictOperNicks) {
         for (i = 0; i < RootNumber; i++) {
-            if (strstr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
+            if (stristr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
         for (i = 0; i < servadmins.count && (nc = servadmins.list[i]); i++) {
-            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+            if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
         for (i = 0; i < servopers.count && (nc = servopers.list[i]); i++) {
-            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+            if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
@@ -2342,21 +2342,21 @@ static int do_group(User * u)
 
     if (RestrictOperNicks) {
         for (i = 0; i < RootNumber; i++) {
-            if (strstr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
+            if (stristr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
         for (i = 0; i < servadmins.count && (nc = servadmins.list[i]); i++) {
-            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+            if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
         for (i = 0; i < servopers.count && (nc = servopers.list[i]); i++) {
-            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+            if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;

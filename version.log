@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="406"
+VERSION_BUILD="407"
 
 # $Log$
+#
+# BUILD : 1.7.5 (407)
+# BUGS  : 185, 190
+# NOTES : TTB work again, and RestrictOperNicks is no longer case sensitive
 #
 # BUILD : 1.7.5 (406)
 # BUGS  : N/A

@@ -191,7 +191,7 @@ NICK_NOT_REGISTERED
 NICK_NOT_REGISTERED_HELP
 	Je nick is niet geregistreerd.  Type /msg %s HELP voor informatie over het registreren van je nick.
 NICK_X_IS_SERVICES
-	Nick %s is part of this Network's Services.
+	Nick %s is deel van de Services van dit netwerk.
 NICK_X_NOT_REGISTERED
 	Nick %s is niet geregistreerd.
 NICK_X_IN_USE
@@ -863,9 +863,9 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	Het wachtwoord van je kanaal is %s - onthoudt dit voor later gebruik.
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a none existant channel %s
+	Je hebt geprobeerd om niet-bestaand kanaal %s te registeren.
 CHAN_SYMBOL_REQUIRED
-	Please use the symbol of # or & when attempting to register
+	Gebruik het # of & symbool wanner je probeert een kanaal te registeren.
 
 
 # IDENTIFY responses
@@ -1414,7 +1414,7 @@ CHAN_CLEARED_MODES
 CHAN_CLEARED_OPS
 	Mode +o is verwijderd van kanaal %s.
 CHAN_CLEARED_HOPS
-	Mode +h has been cleared from channel %s.
+	Mode +h is verwijderd van kanaal %s.
 CHAN_CLEARED_VOICES
 	Mode +v is verwijderd van kanaal %s.
 CHAN_CLEARED_USERS
@@ -2771,11 +2771,11 @@ OPER_MODULE_LOAD_SYNTAX
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD bestandsnaam
 OPER_MODULE_LIST_HEADER
-	Current Module list:
+	Huidige Module lijst:
 OPER_MODULE_LIST
 	Module: %s [%s]
 OPER_MODULE_LIST_FOOTER
-	%d Modules loaded.
+	%d Modules geladen.
 OPER_MODULE_INFO_LIST
 	Module: %s Versie: %s Auteur: %s Geladen: %s
 OPER_MODULE_CMD_LIST
@@ -4601,8 +4601,9 @@ CHAN_HELP_CLEAR
 	     BANS     Verwijder alle bans op het kanaal.
 	     OPS      Verwijder kanaal-operator status (mode +o) van
 	                  alle kanaal-operators.
-	     HOPS     Removes channel-halfoperator status (mode +h) from
-	                  all channel halfoperators, if supported.
+	     HOPS     Verwijder kanaal-halfoperator status (mode +h)
+	                  van alle kanaal-halfoperators, indien deze
+			  mode ondersteund wordt.
 	     VOICES   Verwijder "voice" status (mode +v) van iedereen
 	                  met "voice" status op het kanaal.
 	     USERS    Verwijder (kick) alle gebruikers van het kanaal.
@@ -6188,15 +6189,15 @@ HOST_HELP_GROUP
 	laten zijn.
 
 OPER_SVSNICK_UNSUPPORTED
-	Sorry, SVSNICK is not available on this network.
+	Sorry, SVSNICK is niet beschikbaar op dit netwerk.
 
 OPER_SQLINE_UNSUPPORTED
-	Sorry, SQLINE is not available on this network.
+	Sorry, SQLINE is niet beschikbaar op dit netwerk.
 
 OPER_SVSO_UNSUPPORTED
-	Sorry, OLINE is not available on this network.
+	Sorry, OLINE is niet beschikbaar op dit netwerk.
 
 OPER_UMODE_UNSUPPORTED
-	Sorry, UMODE is not available on this network.
+	Sorry, UMODE is niet beschikbaar op dit netwerk.
 
 

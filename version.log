@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="213"
+VERSION_BUILD="214"
 
 # $Log$
+#
+# BUILD : 1.7.4 (214)
+# BUGS  : 112
+# NOTES : Removed TSMODE for usermodes on bahamut 1.8
 #
 # BUILD : 1.7.4 (213)
 # BUGS  : none

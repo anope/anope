@@ -869,29 +869,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 void do_umode(const char *source, int ac, char **av)
 {
     User *user;
-#ifdef IRC_BAHAMUT
-    int i;
-    char *t;
-
-    /* Another part of nice TSMODE support -GD */
-    if (uplink_capab & CAPAB_TSMODE) {
-        for (i = 0; i < strlen(av[1]); i++) {
-            if (!isdigit(av[1][i]))
-                break;
-        }
-        if (av[1][i] == '\0') {
-            /* We have a valid TS field in av[1] now, so we can strip it off */
-            /* But first we need to swap av[0] and av[1] -GD */
-            t = av[0];
-            av[0] = av[1];
-            av[1] = t;
-            ac--;
-            av++;
-        } else {
-            alog("TSMODE enabled but MODE has no valid TS");
-        }
-    }
-#endif
 
     if (stricmp(source, av[0]) != 0) {
         alog("user: MODE %s %s from different nick %s!", av[0], av[1],

@@ -1,6 +1,7 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/05/15 Added BSCaseSensitive directive for a cAsE sEnSiTiVe badword kicker.
 2004/05/14 Removed some illegal sizeof(void). Thanks to codemastr.
 2004/05/14 Added +a/-a support for PTLink
 2004/05/14 Fixed HELP LIST and LIST SYNTAX help messages ( #53 )

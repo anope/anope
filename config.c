@@ -218,6 +218,7 @@ int BSMinUsers;
 int BSBadWordsMax;
 int BSSmartJoin;
 int BSGentleBWReason;
+int BSCaseSensitive;
 
 int HideStatsO;
 int GlobalOnCycle;
@@ -374,6 +375,7 @@ Directive directives[] = {
     {"BSDefGreet", {{PARAM_SET, PARAM_RELOAD, &BSDefGreet}}},
     {"BSDefFantasy", {{PARAM_SET, PARAM_RELOAD, &BSDefFantasy}}},
     {"BSDefSymbiosis", {{PARAM_SET, PARAM_RELOAD, &BSDefSymbiosis}}},
+    {"BSCaseSensitive", {{PARAM_SET, PARAM_RELOAD, &BSCaseSensitive}}},
     {"BSGentleBWReason", {{PARAM_SET, PARAM_RELOAD, &BSGentleBWReason}}},
     {"BSKeepData", {{PARAM_TIME, PARAM_RELOAD, &BSKeepData}}},
     {"BSMinUsers", {{PARAM_POSINT, PARAM_RELOAD, &BSMinUsers}}},

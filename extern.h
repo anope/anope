@@ -354,6 +354,7 @@ E int   BSMinUsers;
 E int   BSBadWordsMax;
 E int   BSSmartJoin;
 E int   BSGentleBWReason;
+E int   BSCaseSensitive;
 
 E int   HideStatsO;
 E int   GlobalOnCycle;

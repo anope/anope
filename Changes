@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
+07/05 A Warning when LocalAddress conflicts with RemoteServer             [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
 07/04 F Fixed a bug with m_time.                                          [ #00]
 06/30 F Fixed bug which caused failure in anope crontab script.           [ #00]

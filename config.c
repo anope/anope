@@ -929,6 +929,21 @@ int read_config(int reload)
         if (RemoteServer3)
             CHECK(RemoteServer2);
     }
+    if (!reload) {
+        if (LocalHost) {
+            if ((!stricmp(LocalHost, RemoteServer))
+                && LocalPort == RemotePort) {
+                printf
+                    ("\n*** LocalAddress and RemoteServer are set to use the same IP address\n"
+                     "*** (%s) and port (%d). This would have resulted in errors.\n"
+                     "*** Change the LocalAddress to bind to another port.\n",
+                     RemoteServer, LocalPort);
+                retval = 0;
+            }
+        }
+    }
+
+
     CHECK(NetworkName);
     if (!reload) {
         CHEK2(temp_userhost, ServiceUser);

@@ -132,9 +132,29 @@ typedef struct channel_ Channel;
 /*************************************************************************/
 
 /* Protocol tweaks */
+
+
+
 #ifdef IRC_HYBRID
 # define HAS_HALFOP
 # define HAS_EXCEPT			/* Has +e (chan excepts) */
+# define NICKSERV_MODE "+o"
+# define CHANSERV_MODE "+o"
+# define MEMOSERV_MODE "+o"
+# define BOTSERV_MODE "+o"
+# define HELPSERV_MODE "+h"
+# define OPERSERV_MODE "+io"
+# define DEVNULL_MODE "+i"
+# define GLOBAL_MODE "+io"
+# define NICKSERV_ALIAS_MODE "+o"
+# define CHANSERV_ALIAS_MODE "+o"
+# define MEMOSERV_ALIAS_MODE "+o"
+# define BOTSERV_ALIAS_MODE "+o"
+# define HELPSERV_ALIAS_MODE "+h"
+# define OPERSERV_ALIAS_MODE "+io"
+# define DEVNULL_ALIAS_MODE "+i"
+# define GLOBAL_ALIAS_MODE "+io"
+# define BOTSERV_BOTS_MODE "+"
 #endif
 
 #ifdef IRC_VIAGRA
@@ -142,10 +162,46 @@ typedef struct channel_ Channel;
 # define HAS_VHOST
 # define HAS_VIDENT
 # define HAS_EXCEPT
+# define NICKSERV_MODE "+oS"
+# define CHANSERV_MODE "+oS"
+# define HOSTSERV_MODE "+oS"
+# define MEMOSERV_MODE "+oS"
+# define BOTSERV_MODE "+oS"
+# define HELPSERV_MODE "+oS"
+# define OPERSERV_MODE "+ioS"
+# define DEVNULL_MODE "+i"
+# define GLOBAL_MODE "+ioS"
+# define NICKSERV_ALIAS_MODE "+oS"
+# define CHANSERV_ALIAS_MODE "+oS"
+# define MEMOSERV_ALIAS_MODE "+oS"
+# define BOTSERV_ALIAS_MODE "+oS"
+# define HELPSERV_ALIAS_MODE "+oS"
+# define OPERSERV_ALIAS_MODE "+ioS"
+# define DEVNULL_ALIAS_MODE "+iS"
+# define GLOBAL_ALIAS_MODE "+ioS"
+# define HOSTSERV_ALIAS_MODE "+ioS"
+# define BOTSERV_BOTS_MODE "+qS"
 #endif
 
 #ifdef IRC_BAHAMUT
 # define HAS_NICKIP
+# define NICKSERV_MODE "+o"
+# define CHANSERV_MODE "+o"
+# define MEMOSERV_MODE "+o"
+# define BOTSERV_MODE "+o"
+# define HELPSERV_MODE "+h"
+# define OPERSERV_MODE "+io"
+# define DEVNULL_MODE "+i"
+# define GLOBAL_MODE "+io"
+# define NICKSERV_ALIAS_MODE "+o"
+# define CHANSERV_ALIAS_MODE "+o"
+# define MEMOSERV_ALIAS_MODE "+o"
+# define BOTSERV_ALIAS_MODE "+o"
+# define HELPSERV_ALIAS_MODE "+h"
+# define OPERSERV_ALIAS_MODE "+io"
+# define DEVNULL_ALIAS_MODE "+i"
+# define GLOBAL_ALIAS_MODE "+io"
+# define BOTSERV_BOTS_MODE "+"
 #endif
 
 #ifdef IRC_RAGE2
@@ -153,6 +209,25 @@ typedef struct channel_ Channel;
 # define HAS_EXCEPT
 # define HAS_VHOST
 # define HAS_NICKVHOST
+# define NICKSERV_MODE "+dS"
+# define CHANSERV_MODE "+dS"
+# define HOSTSERV_MODE "+dS"
+# define MEMOSERV_MODE "+dS"
+# define BOTSERV_MODE "+dS"
+# define HELPSERV_MODE "+dSh"
+# define OPERSERV_MODE "+diS"
+# define DEVNULL_MODE "+diS"
+# define GLOBAL_MODE "+diS"
+# define NICKSERV_ALIAS_MODE "+o"
+# define CHANSERV_ALIAS_MODE "+o"
+# define MEMOSERV_ALIAS_MODE "+o"
+# define BOTSERV_ALIAS_MODE "+o"
+# define HELPSERV_ALIAS_MODE "+h"
+# define OPERSERV_ALIAS_MODE "+io"
+# define DEVNULL_ALIAS_MODE "+i"
+# define GLOBAL_ALIAS_MODE "+io"
+# define HOSTSERV_ALIAS_MODE "+io"
+# define BOTSERV_BOTS_MODE "+S"
 #endif
 
 #ifdef IRC_PTLINK
@@ -160,6 +235,25 @@ typedef struct channel_ Channel;
 # define HAS_VHOST
 # define HAS_FMODE
 # define HAS_EXCEPT
+# define NICKSERV_MODE "+o"
+# define CHANSERV_MODE "+o"
+# define HOSTSERV_MODE "+o"
+# define MEMOSERV_MODE "+o"
+# define BOTSERV_MODE "+o"
+# define HELPSERV_MODE "+h"
+# define OPERSERV_MODE "+io"
+# define DEVNULL_MODE "+i"
+# define GLOBAL_MODE "+io"
+# define NICKSERV_ALIAS_MODE "+o"
+# define CHANSERV_ALIAS_MODE "+o"
+# define MEMOSERV_ALIAS_MODE "+o"
+# define BOTSERV_ALIAS_MODE "+o"
+# define HELPSERV_ALIAS_MODE "+h"
+# define OPERSERV_ALIAS_MODE "+io"
+# define DEVNULL_ALIAS_MODE "+i"
+# define GLOBAL_ALIAS_MODE "+io"
+# define HOSTSERV_ALIAS_MODE "+io"
+# define BOTSERV_BOTS_MODE "+"
 #endif
 
 #ifdef IRC_ULTIMATE
@@ -169,6 +263,25 @@ typedef struct channel_ Channel;
 # define HAS_VHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
 # define HAS_EXCEPT
+# define NICKSERV_MODE "+S"
+# define CHANSERV_MODE "+S"
+# define HOSTSERV_MODE "+oS"
+# define MEMOSERV_MODE "+S"
+# define BOTSERV_MODE "+S"
+# define HELPSERV_MODE "+Sh"
+# define OPERSERV_MODE "+iS"
+# define DEVNULL_MODE "+iS"
+# define GLOBAL_MODE "+iS"
+# define NICKSERV_ALIAS_MODE "+oS"
+# define CHANSERV_ALIAS_MODE "+oS"
+# define MEMOSERV_ALIAS_MODE "+oS"
+# define BOTSERV_ALIAS_MODE "+oS"
+# define HELPSERV_ALIAS_MODE "+oS"
+# define OPERSERV_ALIAS_MODE "+ioS"
+# define DEVNULL_ALIAS_MODE "+iS"
+# define GLOBAL_ALIAS_MODE "+ioS"
+# define HOSTSERV_ALIAS_MODE "+ioS"
+# define BOTSERV_BOTS_MODE "+pS"
 #endif
 
 #ifdef IRC_UNREAL
@@ -179,6 +292,25 @@ typedef struct channel_ Channel;
 # define HAS_VHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
 # define HAS_EXCEPT
+# define NICKSERV_MODE "+oS"
+# define CHANSERV_MODE "+oS"
+# define HOSTSERV_MODE "+oS"
+# define MEMOSERV_MODE "+oS"
+# define BOTSERV_MODE "+oS"
+# define HELPSERV_MODE "+oS"
+# define OPERSERV_MODE "+ioS"
+# define DEVNULL_MODE "+iS"
+# define GLOBAL_MODE "+ioS"
+# define NICKSERV_ALIAS_MODE "+oS"
+# define CHANSERV_ALIAS_MODE "+oS"
+# define MEMOSERV_ALIAS_MODE "+oS"
+# define BOTSERV_ALIAS_MODE "+oS"
+# define HELPSERV_ALIAS_MODE "+oS"
+# define OPERSERV_ALIAS_MODE "+ioS"
+# define DEVNULL_ALIAS_MODE "+iS"
+# define GLOBAL_ALIAS_MODE "+ioS"
+# define HOSTSERV_ALIAS_MODE "+ioS"
+# define BOTSERV_BOTS_MODE "+qS"
 #endif
 
 #ifdef IRC_ULTIMATE3
@@ -187,6 +319,83 @@ typedef struct channel_ Channel;
 # define HAS_NICKVHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
 # define HAS_EXCEPT
+# define NICKSERV_MODE "+S"
+# define CHANSERV_MODE "+S"
+# define HOSTSERV_MODE "+o"
+# define MEMOSERV_MODE "+S"
+# define BOTSERV_MODE "+S"
+# define HELPSERV_MODE "+Sh"
+# define OPERSERV_MODE "+iS"
+# define DEVNULL_MODE "+iS"
+# define GLOBAL_MODE "+iS"
+# define NICKSERV_ALIAS_MODE "+o"
+# define CHANSERV_ALIAS_MODE "+o"
+# define MEMOSERV_ALIAS_MODE "+o"
+# define BOTSERV_ALIAS_MODE "+o"
+# define HELPSERV_ALIAS_MODE "+h"
+# define OPERSERV_ALIAS_MODE "+io"
+# define DEVNULL_ALIAS_MODE "+i"
+# define GLOBAL_ALIAS_MODE "+io"
+# define HOSTSERV_ALIAS_MODE "+io"
+# define BOTSERV_BOTS_MODE "+S"
+#endif
+
+/*
+  This gets ugly since serval ircds use both DREAMFORCE and their own define
+*/
+
+#ifdef IRC_DREAMFORGE
+ #ifndef NICKSERV_MODE
+  # define NICKSERV_MODE "+o"
+ #endif 
+ #ifndef CHANSERV_MODE
+  # define CHANSERV_MODE "+o"
+ #endif 
+ #ifndef MEMOSERV_MODE
+  # define MEMOSERV_MODE "+o"
+ #endif
+ #ifndef BOTSERV_MODE
+  # define BOTSERV_MODE "+o"
+ #endif
+ #ifndef HELPSERV_MODE
+  # define HELPSERV_MODE "+h"
+ #endif
+ #ifndef OPERSERV_MODE
+  # define OPERSERV_MODE "+io"
+ #endif
+ #ifndef DEVNULL_MODE
+  # define DEVNULL_MODE "+i"
+ #endif
+ #ifndef GLOBAL_MODE
+  # define GLOBAL_MODE "+io"
+ #endif
+ #ifndef BOTSERV_BOTS_MODE
+  # define BOTSERV_BOTS_MODE "+"
+ #endif
+ #ifndef NICKSERV_ALIAS_MODE
+  # define NICKSERV_ALIAS_MODE "+o"
+ #endif 
+ #ifndef CHANSERV_ALIAS_MODE
+  # define CHANSERV_ALIAS_MODE "+o"
+ #endif 
+ #ifndef MEMOSERV_ALIAS_MODE
+  # define MEMOSERV_ALIAS_MODE "+o"
+ #endif
+ #ifndef BOTSERV_ALIAS_MODE
+  # define BOTSERV_ALIAS_MODE "+o"
+ #endif
+ #ifndef HELPSERV_ALIAS_MODE
+  # define HELPSERV_ALIAS_MODE "+h"
+ #endif
+ #ifndef OPERSERV_ALIAS_MODE
+  # define OPERSERV_ALIAS_MODE "+io"
+ #endif
+ #ifndef DEVNULL_ALIAS_MODE
+  # define DEVNULL_ALIAS_MODE "+i"
+ #endif
+ #ifndef GLOBAL_ALIAS_MODE
+  # define GLOBAL_ALIAS_MODE "+io"
+ #endif
 #endif
 
 /*************************************************************************/

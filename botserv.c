@@ -1381,15 +1381,8 @@ static int do_bot(User * u)
             EnforceQlinedNick(nick, s_BotServ);
 
             /* We make the bot online, ready to serve */
-#if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
-            NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+qS", 1);
-#elif defined(IRC_ULTIMATE) || defined (IRC_ULTIMATE3)
-            NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+pS", 1);
-#elif defined(IRC_RAGE2)
-            NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+S", 1);
-#else
-            NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+", 1);
-#endif
+            NEWNICK(bi->nick, bi->user, bi->host, bi->real,
+                    BOTSERV_BOTS_MODE, 1);
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
                         bi->host, bi->real);

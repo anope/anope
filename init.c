@@ -88,200 +88,96 @@ void introduce_user(const char *user)
 
     if (!user || stricmp(user, s_NickServ) == 0) {
         EnforceQlinedNick(s_NickServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_NickServ, desc_NickServ, "+S");
-#elif defined(IRC_RAGE2)
-        NICK(s_NickServ, desc_NickServ, "+dS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_NickServ, desc_NickServ, "+oS");
-#else
-        NICK(s_NickServ, desc_NickServ, "+o");
-#endif
+        NICK(s_NickServ, desc_NickServ, NICKSERV_MODE);
     }
-
     if (!user || stricmp(user, s_ChanServ) == 0) {
         EnforceQlinedNick(s_ChanServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_ChanServ, desc_ChanServ, "+S");
-#elif defined(IRC_RAGE2)
-        NICK(s_ChanServ, desc_ChanServ, "+dS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_ChanServ, desc_ChanServ, "+oS");
-#else
-        NICK(s_ChanServ, desc_ChanServ, "+o");
-#endif
+        NICK(s_ChanServ, desc_ChanServ, CHANSERV_MODE);
     }
 #ifdef HAS_VHOST
     if (s_HostServ && (!user || stricmp(user, s_HostServ) == 0)) {
         EnforceQlinedNick(s_HostServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_HostServ, desc_HostServ, "+oS");
-#elif defined(IRC_RAGE2)
-        NICK(s_HostServ, desc_HostServ, "+dS");
-#else
-        NICK(s_HostServ, desc_HostServ, "+o");
-#endif
+        NICK(s_HostServ, desc_HostServ, HOSTSERV_MODE);
     }
 #endif
 
     if (!user || stricmp(user, s_MemoServ) == 0) {
         EnforceQlinedNick(s_MemoServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_MemoServ, desc_MemoServ, "+S");
-#elif defined(IRC_RAGE2)
-        NICK(s_MemoServ, desc_MemoServ, "+dS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_MemoServ, desc_MemoServ, "+oS");
-#else
-        NICK(s_MemoServ, desc_MemoServ, "+o");
-#endif
+        NICK(s_MemoServ, desc_MemoServ, MEMOSERV_MODE);
     }
 
     if (s_BotServ && (!user || stricmp(user, s_BotServ) == 0)) {
         EnforceQlinedNick(s_BotServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_BotServ, desc_BotServ, "+S");
-#elif defined(IRC_RAGE2)
-        NICK(s_BotServ, desc_BotServ, "+dS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_BotServ, desc_BotServ, "+oS");
-#else
-        NICK(s_BotServ, desc_BotServ, "+o");
-#endif
+        NICK(s_BotServ, desc_BotServ, BOTSERV_MODE);
     }
 
     if (!user || stricmp(user, s_HelpServ) == 0) {
         EnforceQlinedNick(s_HelpServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_HelpServ, desc_HelpServ, "+Sh");
-#elif defined(IRC_RAGE2)
-        NICK(s_HelpServ, desc_HelpServ, "+dSh");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_HelpServ, desc_HelpServ, "+oS");
-#else
-        NICK(s_HelpServ, desc_HelpServ, "+h");
-#endif
+        NICK(s_HelpServ, desc_HelpServ, HELPSERV_MODE);
     }
 
     if (!user || stricmp(user, s_OperServ) == 0) {
         EnforceQlinedNick(s_OperServ, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_OperServ, desc_OperServ, "+iS");
-#elif defined(IRC_RAGE2)
-        NICK(s_OperServ, desc_OperServ, "+diS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_OperServ, desc_OperServ, "+ioS");
-#else
-        NICK(s_OperServ, desc_OperServ, "+io");
-#endif
+        NICK(s_OperServ, desc_OperServ, OPERSERV_MODE);
     }
 
     if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0)) {
         EnforceQlinedNick(s_DevNull, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
-        NICK(s_DevNull, desc_DevNull, "+iS");
-#elif defined(IRC_RAGE2)
-        NICK(s_DevNull, desc_DevNull, "+diS");
-#else
-        NICK(s_DevNull, desc_DevNull, "+i");
-#endif
+        NICK(s_DevNull, desc_DevNull, DEVNULL_MODE);
     }
 
     if (!user || stricmp(user, s_GlobalNoticer) == 0) {
         EnforceQlinedNick(s_GlobalNoticer, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        NICK(s_GlobalNoticer, desc_GlobalNoticer, "+iS");
-#elif defined(IRC_RAGE2)
-        NICK(s_GlobalNoticer, desc_GlobalNoticer, "+diS");
-#elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_GlobalNoticer, desc_GlobalNoticer, "+ioS");
-#else
-        NICK(s_GlobalNoticer, desc_GlobalNoticer, "+io");
-#endif
+        NICK(s_GlobalNoticer, desc_GlobalNoticer, GLOBAL_MODE);
     }
 
     /* We make aliases go online */
     if (s_NickServAlias && (!user || stricmp(user, s_NickServAlias) == 0)) {
         EnforceQlinedNick(s_NickServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_NickServAlias, desc_NickServAlias, "+oS");
-#else
-        NICK(s_NickServAlias, desc_NickServAlias, "+o");
-#endif
+        NICK(s_NickServAlias, desc_NickServAlias, NICKSERV_ALIAS_MODE);
     }
 
     if (s_ChanServAlias && (!user || stricmp(user, s_ChanServAlias) == 0)) {
         EnforceQlinedNick(s_ChanServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_ChanServAlias, desc_ChanServAlias, "+oS");
-#else
-        NICK(s_ChanServAlias, desc_ChanServAlias, "+o");
-#endif
+        NICK(s_ChanServAlias, desc_ChanServAlias, CHANSERV_ALIAS_MODE);
     }
 
     if (s_MemoServAlias && (!user || stricmp(user, s_MemoServAlias) == 0)) {
         EnforceQlinedNick(s_MemoServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_MemoServAlias, desc_MemoServAlias, "+oS");
-#else
-        NICK(s_MemoServAlias, desc_MemoServAlias, "+o");
-#endif
+        NICK(s_MemoServAlias, desc_MemoServAlias, MEMOSERV_ALIAS_MODE);
     }
 
     if (s_BotServAlias && (!user || stricmp(user, s_BotServAlias) == 0)) {
         EnforceQlinedNick(s_BotServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_BotServAlias, desc_BotServAlias, "+oS");
-#else
-        NICK(s_BotServAlias, desc_BotServAlias, "+o");
-#endif
+        NICK(s_BotServAlias, desc_BotServAlias, BOTSERV_ALIAS_MODE);
     }
 
     if (s_HelpServAlias && (!user || stricmp(user, s_HelpServAlias) == 0)) {
         EnforceQlinedNick(s_HelpServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_HelpServAlias, desc_HelpServAlias, "+oS");
-#else
-        NICK(s_HelpServAlias, desc_HelpServAlias, "+h");
-#endif
+        NICK(s_HelpServAlias, desc_HelpServAlias, HELPSERV_ALIAS_MODE);
     }
 
     if (s_OperServAlias && (!user || stricmp(user, s_OperServAlias) == 0)) {
         EnforceQlinedNick(s_OperServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_OperServAlias, desc_OperServAlias, "+ioS");
-#else
-        NICK(s_OperServAlias, desc_OperServAlias, "+io");
-#endif
+        NICK(s_OperServAlias, desc_OperServAlias, OPERSERV_ALIAS_MODE);
     }
 
     if (s_DevNullAlias && (!user || stricmp(user, s_DevNullAlias) == 0)) {
         EnforceQlinedNick(s_DevNullAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_DevNullAlias, desc_DevNullAlias, "+iS");
-#else
-        NICK(s_DevNullAlias, desc_DevNullAlias, "+i");
-#endif
+        NICK(s_DevNullAlias, desc_DevNullAlias, DEVNULL_ALIAS_MODE);
     }
 #ifdef HAS_VHOST
     if (s_HostServAlias && (!user || stricmp(user, s_HostServAlias) == 0)) {
         EnforceQlinedNick(s_HostServAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        NICK(s_HostServAlias, desc_HostServAlias, "+ioS");
-#else
-        NICK(s_HostServAlias, desc_HostServAlias, "+io");
-#endif
+        NICK(s_HostServAlias, desc_HostServAlias, HOSTSERV_ALIAS_MODE);
     }
 #endif
 
     if (s_GlobalNoticerAlias
         && (!user || stricmp(user, s_GlobalNoticerAlias) == 0)) {
         EnforceQlinedNick(s_GlobalNoticerAlias, NULL);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL)
-        NICK(s_GlobalNoticerAlias, desc_GlobalNoticerAlias, "+ioS");
-#else
-        NICK(s_GlobalNoticerAlias, desc_GlobalNoticerAlias, "+io");
-#endif
+        NICK(s_GlobalNoticerAlias, desc_GlobalNoticerAlias,
+             GLOBAL_ALIAS_MODE);
     }
 
     /* We make the bots go online */

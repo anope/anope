@@ -8,9 +8,18 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="461"
+VERSION_BUILD="462"
 
 # $Log$
+#
+# BUILD : 1.7.6 (462)
+# BUGS  : 226
+# NOTES : 1. RageIRCD sends TSMODE which is part of their beta7
+# 2. RageIRCD protocol file now has anope_cmd_chghost()
+# 3. RageIRCD SVINFO more in line with what we get
+# 4. Bahamut protocol file now has anope_cmd_chghost() to prevent undefined symbol messages
+# 5. Bahamut SZLINE and UNSZLINE dealt with per documentation, left the old commands behind
+#    for now, till we decide to move our base Bahamut version forward
 #
 # BUILD : 1.7.6 (461)
 # BUGS  : 230

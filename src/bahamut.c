@@ -676,13 +676,20 @@ void anope_cmd_unsgline(char *mask)
 /* UNSZLINE */
 void anope_cmd_unszline(char *mask)
 {
+    /* this will likely fail so its only here for legacy */
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
+    /* this is how we are supposed to deal with it */
+    send_cmd(NULL, "RAKILL %s *", mask);
 }
 
 /* SZLINE */
 void anope_cmd_szline(char *mask, char *reason, char *whom)
 {
+    /* this will likely fail so its only here for legacy */
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+    /* this is how we are supposed to deal with it */
+    send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 86400 * 2, whom,
+             (long int) time(NULL), reason);
 }
 
 /* SVSNOOP */
@@ -1645,6 +1652,15 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
     }
 
     send_cmd(source, "%s NOTICE :\1%s \1", dest, s);
+}
+
+/* this avoids "undefined symbol" messages of those whom try to load mods that
+   call on this function */
+void anope_cmd_chghost(char *nick, char *vhost)
+{
+    if (debug) {
+        alog("debug: This IRCD does not support vhosting");
+    }
 }
 
 #endif

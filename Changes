@@ -10,6 +10,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/21 A Opened SGLINE to all ircd that support GEOS bans		  [ #00]
 11/21 A Opened SZLINE to all ircd that support ZLINE's			  [ #00]
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+11/23 F Rage 2 updated to support BETA 7			 	  [#226]
 11/23 F PTLink anope_cmd_server() message			          [ #00]
 11/20 F Disables UseRDB if there is an error duing SQL init		  [ #00]
 11/20 F MS CHECK now checks if the nick is forbidden.                     [#225]

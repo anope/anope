@@ -641,6 +641,14 @@ void anope_cmd_vhost_off(User * u)
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
     send_cmd(s_HostServ, "SVSMODE %s +x", nick);
+    anope_cmd_chghost(nick, vhost);
+}
+
+void anope_cmd_chghost(char *nick, char *vhost)
+{
+    if (!nick || !vhost) {
+        return;
+    }
     send_cmd(ServerName, "VHOST %s %s", nick, vhost);
 }
 
@@ -720,13 +728,13 @@ void anope_cmd_connect(int servernum)
 
 void anope_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 5 5 0 %ld bluemoon 0", (long int) time(NULL));
+    send_cmd(NULL, "SVINFO 5 3 0 %ld bluemoon 0", (long int) time(NULL));
 }
 
 void anope_cmd_capab()
 {
-    /* future versions will support TSMODE */
-    send_cmd(NULL, "CAPAB BURST UNCONNECT SSJ3 SN2 VHOST");
+    /*  CAPAB BURST UNCONNECT ZIP SSJ3 SN2 VHOST SUID TOK1 TSMODE */
+    send_cmd(NULL, "CAPAB BURST UNCONNECT SSJ3 SN2 VHOST TSMODE");
 }
 
 void anope_cmd_server(char *servname, int hop, char *descript)
@@ -939,7 +947,7 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
     }
 
     if (ircdcap->tsmode) {
-        if (uplink_capab & ircdcap->tsmode) {
+        if (uplink_capab & ircdcap->tsmode || UseTSMODE) {
             send_cmd(source, "MODE %s 0 %s", dest, buf);
         } else {
             send_cmd(source, "MODE %s %s", dest, buf);

@@ -2431,6 +2431,8 @@ OPER_ADMIN_LIST_FORMAT
 	  %3d   %s
 OPER_ADMIN_CLEAR
 	Servis adminleri listesi temizlendi.
+OPER_ADMIN_MOVED
+	%s has been moved to Services Administrators list.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2462,6 +2464,8 @@ OPER_OPER_LIST_FORMAT
 	  %3d   %s
 OPER_OPER_CLEAR
 	Servis operatörleri listesi temizlendi.
+OPER_OPER_MOVED
+	%s has been moved to Services Operators list.
 
 # AKILL responses
 OPER_AKILL_SYNTAX

@@ -13,6 +13,7 @@ else
 fi
 
 VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA} (${VERSION_BUILD})"
+VERSIONDOTTED="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA}.${VERSION_BUILD}"
 
 if [ -f version.h ] ; then
 	BUILD=`fgrep '#define BUILD' version.h | sed 's/^#define BUILD.*\([0-9]*\).*$/\1/'`
@@ -49,6 +50,7 @@ cat >version.h <<EOF
 
 #define BUILD	"$BUILD"
 #define VERSION_STRING "$VERSION"
+#define VERSION_STRING_DOTTED "$VERSIONDOTTED"
 
 #ifdef DEBUG_COMMANDS
 # define VER_DEBUG "D"

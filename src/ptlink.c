@@ -16,7 +16,7 @@
 
 #ifdef IRC_PTLINK
 
-const char version_protocol[] = "PTlink 6.14.5+";
+const char version_protocol[] = "PTlink 6.15.*+";
 
 /* Not all ircds use +f for their flood/join throttle system */
 const char flood_mode_char_set[] = "+f";        /* mode char for FLOOD mode on set */
@@ -24,7 +24,7 @@ const char flood_mode_char_remove[] = "-f";     /* mode char for FLOOD mode on r
 int UseTSMODE = 0;
 
 IRCDVar ircd[] = {
-    {"PTlinkIRCd 6.14.*",       /* ircd name */
+    {"PTlink 6.15.*+",          /* ircd name */
      "+o",                      /* nickserv mode */
      "+o",                      /* chanserv mode */
      "+o",                      /* memoserv mode */
@@ -789,7 +789,7 @@ void anope_cmd_capab()
 void anope_cmd_server(char *servname, int hop, char *descript)
 {
     send_cmd(NULL, "SERVER %s %d Anope.Services%s :%s", servname, hop,
-             version_number, descript);
+             version_number_dotted, descript);
 }
 
 int anope_event_privmsg(char *source, int ac, char **av)

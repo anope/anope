@@ -578,6 +578,7 @@ E int MailValidate(const char *email);
 /**** main.c ****/
 
 E const char version_number[];
+E const char version_number_dotted[];
 E const char version_build[];
 E const char version_protocol[];
 E const char version_flags[];

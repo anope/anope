@@ -2607,6 +2607,8 @@ OPER_ADMIN_LIST_FORMAT
 OPER_ADMIN_CLEAR
 	Lista administratorów serwisów zosta³a 
 	wyczyszczona.
+OPER_ADMIN_MOVED
+	%s has been moved to Services Administrators list.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2639,6 +2641,8 @@ OPER_OPER_LIST_FORMAT
 	  %3d   %s
 OPER_OPER_CLEAR
 	Lista operatorów serwisów zosta³a wyczyszczona.
+OPER_OPER_MOVED
+	%s has been moved to Services Operators list.
 
 # AKILL responses
 OPER_AKILL_SYNTAX

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="460"
+VERSION_BUILD="461"
 
 # $Log$
+#
+# BUILD : 1.7.6 (461)
+# BUGS  : 230
+# NOTES : 1. Moving Services Operators to Services Admins and vice-versa (230), 2. PTlink anope_cmd_server() had a minor 
+# issue thats now fixed
 #
 # BUILD : 1.7.6 (460)
 # BUGS  : 223

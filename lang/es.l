@@ -333,13 +333,13 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	El nickname %s esta registrado bajo tu cuenta: %s
 NICK_REGISTERED_NO_MASK
-	Nickname %s registered.
+	Nickname %s registrado.
 NICK_PASSWORD_IS
 	Tu clave es %s - Recuerdala para uso futuro.
 
 # GROUP responses
 NICK_REG_DELAY
-	You have to be connected longer than %d seconds to register your nick.
+	Debes estar conectado mas de %d segundos para registrar tu nick.
 
 # GROUP responses
 NICK_GROUP_SYNTAX
@@ -891,9 +891,9 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	Tu clave para el canal es %s - Recuerdala para uso futuro.
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a none existant channel %s
+	Has intentado registrar el canal %s, el cual no existe.
 CHAN_SYMBOL_REQUIRED
-	Please use the symbol of # or & when attempting to register
+	Por favor usar el simbolo # o & cuando intentes registrar un canal.
 
 
 # IDENTIFY responses
@@ -2416,6 +2416,8 @@ OPER_ADMIN_LIST_FORMAT
 	  %3d   %s
 OPER_ADMIN_CLEAR
 	La lista de administradores de Servicios ha sido limpiada.
+OPER_ADMIN_MOVED
+	%s ha sido movido a la lista de Administradores de Servicios.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2447,6 +2449,8 @@ OPER_OPER_LIST_FORMAT
 	  %3d   %s
 OPER_OPER_CLEAR
 	La lista de operadores de Servicios ha sido limpiada.
+OPER_OPER_MOVED
+	%s ha sido movido a la lista de Operadores de Servicios.
 
 # AKILL responses
 OPER_AKILL_SYNTAX
@@ -6108,9 +6112,9 @@ BOT_SERVADMIN_HELP_BOT
 	BOT LIST es un alias de BOTLIST y solo lista
 	todos los bots disponibles en la red.
 	
-	Notese: si creas un bot con un nick ya registrado,
-	sera botado. Ademas, si un usuario esta actualmente
-	usando el nick, sera killeado.
+	Nota:: no puedes crear un bot que tenga un nick que ya
+	este registrado. Si un usuario no registrado esta usando 
+	el nick, sera killeado.	
 
 BOT_SERVADMIN_HELP_SET
 	

@@ -10,6 +10,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/21 A Opened SGLINE to all ircd that support GEOS bans		  [ #00]
 11/21 A Opened SZLINE to all ircd that support ZLINE's			  [ #00]
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+11/23 F PTLink anope_cmd_server() message			          [ #00]
 11/20 F Disables UseRDB if there is an error duing SQL init		  [ #00]
 11/20 F MS CHECK now checks if the nick is forbidden.                     [#225]
 11/20 F Removing Sqline on bot nicks change if the nick was registered.	  [#224]
@@ -19,6 +20,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
+11/23 F Moving Services Operators to Services Admins and vice-versa       [#230]
 11/22 F HelpChan +h mode not being given if status was greater then op.   [#223]
 
 Anope Version 1.7.6

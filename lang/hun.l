@@ -2387,6 +2387,8 @@ OPER_ADMIN_LIST_FORMAT
 	  %3d   %s
 OPER_ADMIN_CLEAR
 	Szervíz admin lista törölve.
+OPER_ADMIN_MOVED
+	%s has been moved to Services Administrators list.
 
 # OPER válaszok
 OPER_OPER_SYNTAX
@@ -2418,6 +2420,8 @@ OPER_OPER_LIST_FORMAT
 	  %3d   %s
 OPER_OPER_CLEAR
 	Szervíz operátor lista törölve.
+OPER_OPER_MOVED
+	%s has been moved to Services Operators list.
 
 # AKILL válaszok
 OPER_AKILL_SYNTAX

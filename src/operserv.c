@@ -4040,8 +4040,15 @@ static int do_admin(User * u)
             notice_lang(s_OperServ, u, OPER_ADMIN_REACHED_LIMIT, nick);
             return MOD_CONT;
         } else {
-            na->nc->flags |= NI_SERVICES_ADMIN;
-            notice_lang(s_OperServ, u, OPER_ADMIN_ADDED, nick);
+            if (na->nc->flags & NI_SERVICES_OPER
+                && (res = slist_indexof(&servopers, na->nc)) != -1) {
+                slist_delete(&servopers, res);
+                na->nc->flags |= NI_SERVICES_ADMIN;
+                notice_lang(s_OperServ, u, OPER_ADMIN_MOVED, nick);
+            } else {
+                na->nc->flags |= NI_SERVICES_ADMIN;
+                notice_lang(s_OperServ, u, OPER_ADMIN_ADDED, nick);
+            }
         }
 
         if (readonly)
@@ -4329,8 +4336,15 @@ static int do_oper(User * u)
             notice_lang(s_OperServ, u, OPER_OPER_REACHED_LIMIT, nick);
             return MOD_CONT;
         } else {
-            na->nc->flags |= NI_SERVICES_OPER;
-            notice_lang(s_OperServ, u, OPER_OPER_ADDED, nick);
+            if (na->nc->flags & NI_SERVICES_ADMIN
+                && (res = slist_indexof(&servadmins, na->nc)) != -1) {
+                slist_delete(&servadmins, res);
+                na->nc->flags |= NI_SERVICES_OPER;
+                notice_lang(s_OperServ, u, OPER_OPER_MOVED, nick);
+            } else {
+                na->nc->flags |= NI_SERVICES_OPER;
+                notice_lang(s_OperServ, u, OPER_OPER_ADDED, nick);
+            }
         }
 
         if (readonly)

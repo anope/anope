@@ -77,6 +77,7 @@ char **my_av, **my_envp;
 
 /* Moved here from version.h */
 const char version_number[] = VERSION_STRING;
+const char version_number_dotted[] = VERSION_STRING_DOTTED;
 const char version_build[] =
     "build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */

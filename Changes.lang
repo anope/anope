@@ -3,6 +3,8 @@ Anope Version S V N
 *** New Strings:
 
     NICK_REGISTERED_NO_MASK
+    OPER_ADMIN_MOVED
+    OPER_OPER_MOVED
 
 *** Mod Strings:
 

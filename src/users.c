@@ -661,10 +661,14 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             alog("debug: %s changes nick to %s", source, nick);
 
         if (LogUsers) {
+            logrealname = normalizeBuffer(user->realname);
             if (ircd->vhost) {
-                alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), user->realname, nick, user->server->name);
+                alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), logrealname, nick, user->server->name);
             } else {
-                alog("LOGUSERS: %s (%s@%s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, user->realname, nick, user->server->name);
+                alog("LOGUSERS: %s (%s@%s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, logrealname, nick, user->server->name);
+            }
+            if (logrealname) {
+                free(logrealname);
             }
         }
 

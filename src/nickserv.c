@@ -2319,6 +2319,7 @@ static int do_confirm(User * u)
 static int do_group(User * u)
 {
     NickAlias *na, *target;
+    NickCore *nc;
     char *nick = strtok(NULL, " ");
     char *pass = strtok(NULL, " ");
     int i;
@@ -2336,6 +2337,30 @@ static int do_group(User * u)
     if (checkDefCon(DEFCON_NO_NEW_NICKS)) {
         notice_lang(s_NickServ, u, OPER_DEFCON_DENIED);
         return MOD_CONT;
+    }
+
+    if (RestrictOperNicks) {
+        for (i = 0; i < RootNumber; i++) {
+            if (strstr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
+                            u->nick);                  
+                return MOD_CONT;
+            }
+        }
+        for (i = 0; i < servadmins.count && (nc = servadmins.list[i]); i++) {
+            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
+                            u->nick);
+                return MOD_CONT;
+            }
+        }
+        for (i = 0; i < servopers.count && (nc = servopers.list[i]); i++) {
+            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
+                            u->nick);
+                return MOD_CONT;
+            }
+        }         
     }
 
     if (!nick || !pass) {

@@ -5,6 +5,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 09/20 A Added RestrictOperNicks as new feature in services.conf.          [ #00]
 09/08 A Removed rand() and ported bsd's arc4random() to fit our needs.    [ #00]
 08/24 A New -l option for am script to list possible selectors.           [ #00]
+10/16 F Fixed RestrictOperNicks for /ns group command.                    [#188]
 10/13 F Type in comments on all src files - yay.                          [ #00]
 10/12 F Code Tidy, fixed some error checking.                             [ #00]
 10/09 F Bug in LogChannel possibly causing segfaults.                     [#176]

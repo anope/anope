@@ -861,14 +861,14 @@ else
 	fi
 
 	if [ "$THREAD" = "USE_THREADS" ] ; then
-		if run $CC $CC_FLAGS -D_REENTRANT tmp/test.c -pthread -o tmp/test ; then
-			CC_FLAGS="$CC_FLAGS -D_REENTRANT"
-			CC_LIBS="$CC_LIBS -pthread"
-			echo2 "-pthread "
-		elif run $CC $CC_FLAGS -D_REENTRANT tmp/test.c -lpthread -o tmp/test ; then
+		if run $CC $CC_FLAGS -D_REENTRANT tmp/test.c -lpthread -o tmp/test ; then
 			CC_FLAGS="$CC_FLAGS -D_REENTRANT"
 			CC_LIBS="$CC_LIBS -lpthread"
 			echo2 "-lpthread "
+		elif run $CC $CC_FLAGS -D_REENTRANT tmp/test.c -pthread -o tmp/test ; then
+			CC_FLAGS="$CC_FLAGS -D_REENTRANT"
+			CC_LIBS="$CC_LIBS -pthread"
+			echo2 "-pthread "
 		else
 		   	THREAD=""
 			echo ""
@@ -1848,6 +1848,7 @@ echo "done."
 # Delete the temporary directory we created.
 
 rm -rf tmp
+rm -f a.out
 
 ###########################################################################
 

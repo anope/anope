@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="162"
+VERSION_BUILD="163"
 
 # $Log$
+#
+# BUILD : 1.7.3 (163)
+# BUGS  : 67
+# NOTES : Reversed pthread library detection order on ./configure script.
 #
 # BUILD : 1.7.3 (162)
 # BUGS  : 79

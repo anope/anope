@@ -82,6 +82,8 @@ cat >version.h <<EOF
 # define VER_OS "J"
 #elif defined(MACOSX)
 # define VER_OS "X"
+#elif defined(_WIN32)
+# define VER_OS "W"
 #else
 # define VER_OS
 #endif

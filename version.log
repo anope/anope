@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="575"
+VERSION_BUILD="576"
 
 # $Log$
+#
+# BUILD : 1.7.8 (576)
+# BUGS  : N/A
+# NOTES : Build flag to show its Win32
 #
 # BUILD : 1.7.8 (575)
 # BUGS  : N/A

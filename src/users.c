@@ -729,7 +729,10 @@ void do_kill(char *nick, char *msg)
 
     user = finduser(nick);
     if (!user)
-        return;
+        if (debug) {
+            alog("debug: KILL of nonexistent nick: %s", nick);
+        }
+    return;
     if (debug)
         alog("debug: %s killed", nick);
     if ((na = user->na) && (!(na->status & NS_VERBOTEN))

@@ -4296,8 +4296,14 @@ int nsCheckNickTracking(User * u)
     char *nick;
 
     /* No nick alias or nick return false by default */
-    if ((!(na = u->na)) || (!(nick = na->nick)))
+    if ((!(na = u->na)) || (!(nick = na->nick))) {
         return 0;
+    }
+
+    /* nick is forbidden best return 0 */
+    if (na->status & NS_VERBOTEN) {
+        return 0;
+    }
 
     /* Get the core for the requested nick */
     nc = na->nc;

@@ -709,7 +709,11 @@ int do_setall(User * u)
             notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
             return MOD_CONT;
         }
-        alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+        if (vIdent && ircd->vident) {
+            alog("vHost for all nicks in group \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
+        } else {
+            alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+        }
         do_hs_sync(na->nc, vIdent, hostmask, u->nick, tmp_time);
         if (vIdent) {
             notice_lang(s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent,
@@ -736,10 +740,6 @@ int do_delall(User * u)
         return MOD_CONT;
     }
     if ((na = findnick(nick))) {
-        if (na->status & NS_VERBOTEN) {
-            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-            return MOD_CONT;
-        }
         if (na->status & NS_VERBOTEN) {
             notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
             return MOD_CONT;
@@ -900,7 +900,11 @@ int do_set(User * u)
             notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
             return MOD_CONT;
         }
-        alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+        if (vIdent && ircd->vident) {
+            alog("vHost for user \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
+        } else {
+            alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
+        }
         addHostCore(nick, vIdent, hostmask, u->nick, tmp_time);
         if (vIdent) {
             notice_lang(s_HostServ, u, HOST_IDENT_SET, nick, vIdent,
@@ -987,6 +991,10 @@ int do_del(User * u)
     char *nick = strtok(NULL, " ");
     if (nick) {
         if ((na = findnick(nick))) {
+            if (na->status & NS_VERBOTEN) {
+                notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+                return MOD_CONT;
+            }
             alog("vHost for user \002%s\002 deleted by oper \002%s\002",
                  nick, u->nick);
             delHostCore(nick);

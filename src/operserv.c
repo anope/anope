@@ -2982,7 +2982,6 @@ int check_sqline(char *nick, int nick_change)
             /* We kill nick since s_sqline can't */
             snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
             kill_user(s_OperServ, nick, reason);
-            free(reason);
             return 1;
         }
     }

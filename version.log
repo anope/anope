@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="407"
+VERSION_BUILD="408"
 
 # $Log$
+#
+# BUILD : 1.7.5 (408)
+# BUGS  : 189, 191
+# NOTES : segfault fix, and vident sent to logs when set
 #
 # BUILD : 1.7.5 (407)
 # BUGS  : 185, 190

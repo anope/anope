@@ -40,7 +40,7 @@ IRCDVar ircd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-iklmnpstR",              /* Modes to Remove */
+     "aiklmnpst",               /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      0,                         /* SVSNICK */
      0,                         /* Vhost  */
@@ -77,16 +77,18 @@ IRCDVar ircd[] = {
      0,                         /* O:LINE               */
      0,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     0,                         /* ChanServ extra   */
-     0,                         /* No Knock            */
-     0,                         /* Admin Only          */
-     DEFAULT_MLOCK,             /* Default MLOCK       */
-     0,                         /* Vhost Mode          */
-     0,                         /* +f                  */
-     0,                         /* +L                  */
-     0,
-     0,
-     0,
+     0,                         /* ChanServ extra               */
+     CMODE_p,                   /* No Knock             */
+     0,                         /* Admin Only           */
+     DEFAULT_MLOCK,             /* Default MLOCK        */
+     0,                         /* Vhost Mode           */
+     0,                         /* +f                   */
+     0,                         /* +L                   */
+     0,                         /* +f Mode                          */
+     0,                         /* +L Mode                              */
+     0,                         /* On nick change check if they could be identified */
+     0,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      }
     ,
     {NULL}
@@ -121,8 +123,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* VL           */
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
-     0                          /* DOZIP        */
-     }
+     0,                         /* DOZIP        */
+     0}
 };
 
 
@@ -545,7 +547,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
     m = createMessage("NOTICE",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      NULL); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
@@ -572,7 +574,7 @@ void moduleAddIRCDMsgs(void) {
 
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
 
 
 }
@@ -639,6 +641,15 @@ void anope_cmd_join(char *user, char *channel, time_t chantime)
     send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), channel, user);
 }
 
+/*
+oper:		the nick of the oper performing the kline
+target.server:	the server(s) this kline is destined for
+duration:	the duration if a tkline, 0 if permanent.
+user:		the 'user' portion of the kline
+host:		the 'host' portion of the kline
+reason:		the reason for the kline.
+*/
+
 void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
@@ -685,13 +696,25 @@ void anope_cmd_connect(int servernum)
 
     anope_cmd_capab();
     anope_cmd_server(ServerName, 1, ServerDesc);
-    anope_cmd_svsinfo();
+    anope_cmd_svinfo();
 }
 
-/* SVSINFO */
 void anope_cmd_svsinfo()
 {
-    send_cmd(NULL, "SVSINFO 5 5 0 :%ld", time(NULL));
+    /* not used */
+}
+
+/*
+ * SVINFO
+ *      parv[0] = sender prefix
+ *      parv[1] = TS_CURRENT for the server
+ *      parv[2] = TS_MIN for the server
+ *      parv[3] = server is standalone or connected to non-TS only
+ *      parv[4] = server's idea of UTC time
+ */
+void anope_cmd_svinfo()
+{
+    send_cmd(NULL, "SVINFO 5 5 0 :%ld", time(NULL));
 }
 
 /* CAPAB */
@@ -1272,6 +1295,26 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
     }
 
     send_cmd(oldnick, "NICK %s", newnick);
+}
+
+/*
+ * SVINFO
+ *      parv[0] = sender prefix
+ *      parv[1] = TS_CURRENT for the server
+ *      parv[2] = TS_MIN for the server
+ *      parv[3] = server is standalone or connected to non-TS only
+ *      parv[4] = server's idea of UTC time
+ */
+int anope_event_svinfo(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
+
+int anope_event_pass(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
 }
 
 #endif

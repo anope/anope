@@ -143,8 +143,7 @@ int chan_has_user_status(Channel * chan, User * user, int16 status)
     for (uc = user->chans; uc; uc = uc->next) {
         if (uc->chan == chan) {
             if (debug) {
-                alog("chan_has_user_status wanted %d the user is %d",
-                     status, uc->status);
+                alog("debug: chan_has_user_status wanted %d the user is %d", status, uc->status);
             }
             return (uc->status & status);
         }
@@ -873,6 +872,8 @@ void chan_adduser2(User * user, Channel * c)
         if (ircd->owner && check_should_owner(user, chan)) {
             chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
         } else if (ircd->protect && check_should_protect(user, chan)) {
+            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+        } else if (ircd->admin && check_should_protect(user, chan)) {
             chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
         } else if (check_should_op(user, chan)) {
             chan_set_user_status(c, user, CUS_OP);

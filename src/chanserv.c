@@ -2605,8 +2605,13 @@ static int do_register(User * u)
         uc->chan = ci;
         /* Implement new mode lock */
         check_modes(c);
+        /* On most ircds you do not receive the admin/owner mode till its registered */
         if (ircd->admin) {
             anope_cmd_mode(s_ChanServ, chan, "+a %s", u->nick);
+        }
+        if (ircd->owner && ircd->ownerset) {
+            anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->ownerset,
+                           u->nick);
         }
     }
     return MOD_CONT;
@@ -3149,8 +3154,9 @@ static int do_set_mlock(User * u, ChannelInfo * ci, char *param)
         }
     }
 
-    /* We can't mlock +K if +i is not mlocked as well. */
-    if (ircd->noknock) {
+    /* Some ircd we can't set NOKNOCK without INVITE */
+    /* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
+    if (ircd->noknock && ircd->knock_needs_i) {
         if ((ci->mlock_on & ircd->noknock) && !(ci->mlock_on & CMODE_i)) {
             ci->mlock_on &= ~ircd->noknock;
             notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_K_REQUIRED);

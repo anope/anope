@@ -204,8 +204,13 @@ void do_server(const char *source, int ac, char **av)
 {
     Server *s;
 
-    if (debug)
-        alog("debug: Server introduced (%s) from %s", av[0], source);
+    if (debug) {
+        if (!*source) {
+            alog("debug: Server introduced (%s)", av[0]);
+        } else {
+            alog("debug: Server introduced (%s) from %s", av[0], source);
+        }
+    }
 
     if (source[0] == '\0')
         s = me_server;
@@ -263,77 +268,103 @@ void do_squit(const char *source, int ac, char **av)
 void capab_parse(int ac, char **av)
 {
     int i;
+    char *s, *tmp;
+
+    char *temp;
 
     for (i = 0; i < ac; i++) {
-        if (!stricmp(av[i], "NOQUIT")) {
+        temp = av[i];
+
+        s = myStrGetToken(temp, '=', 0);
+        tmp = myStrGetTokenRemainder(temp, '=', 1);
+
+        if (!s) {
+            continue;
+        }
+
+        if (!stricmp(s, "NOQUIT")) {
             uplink_capab |= CAPAB_NOQUIT;
         }
-        if (!stricmp(av[i], "TSMODE")) {
+        if (!stricmp(s, "TSMODE")) {
             uplink_capab |= CAPAB_TSMODE;
         }
         if (!stricmp(av[i], "UNCONNECT")) {
             uplink_capab |= CAPAB_UNCONNECT;
         }
-        if (!stricmp(av[i], "NICKIP")) {
+        if (!stricmp(s, "NICKIP")) {
             uplink_capab |= CAPAB_NICKIP;
         }
-        if (!stricmp(av[i], "SSJOIN")) {
+        if (!stricmp(s, "SSJOIN")) {
             uplink_capab |= CAPAB_NSJOIN;
         }
-        if (!stricmp(av[i], "ZIP")) {
+        if (!stricmp(s, "ZIP")) {
             uplink_capab |= CAPAB_ZIP;
         }
-        if (!stricmp(av[i], "BURST")) {
+        if (!stricmp(s, "BURST")) {
             uplink_capab |= CAPAB_BURST;
         }
-        if (!stricmp(av[i], "TS5")) {
+        if (!stricmp(s, "TS5")) {
             uplink_capab |= CAPAB_TS5;
         }
-        if (!stricmp(av[i], "TS3")) {
+        if (!stricmp(s, "TS3")) {
             uplink_capab |= CAPAB_TS3;
         }
-        if (!stricmp(av[i], "DKEY")) {
+        if (!stricmp(s, "DKEY")) {
             uplink_capab |= CAPAB_DKEY;
         }
-        if (!stricmp(av[i], "PT4")) {
+        if (!stricmp(s, "PT4")) {
             uplink_capab |= CAPAB_PT4;
         }
-        if (!stricmp(av[i], "SCS")) {
+        if (!stricmp(s, "SCS")) {
             uplink_capab |= CAPAB_SCS;
         }
-        if (!stricmp(av[i], "QS")) {
+        if (!stricmp(s, "QS")) {
             uplink_capab |= CAPAB_QS;
         }
-        if (!stricmp(av[i], "UID")) {
+        if (!stricmp(s, "UID")) {
             uplink_capab |= CAPAB_UID;
         }
-        if (!stricmp(av[i], "KNOCK")) {
+        if (!stricmp(s, "KNOCK")) {
             uplink_capab |= CAPAB_KNOCK;
         }
-        if (!stricmp(av[i], "CLIENT")) {
+        if (!stricmp(s, "CLIENT")) {
             uplink_capab |= CAPAB_CLIENT;
         }
-        if (!stricmp(av[i], "IPV6")) {
+        if (!stricmp(s, "IPV6")) {
             uplink_capab |= CAPAB_IPV6;
         }
-        if (!stricmp(av[i], "SSJ5")) {
+        if (!stricmp(s, "SSJ5")) {
             uplink_capab |= CAPAB_SSJ5;
         }
-        if (!stricmp(av[i], "SN2")) {
+        if (!stricmp(s, "SN2")) {
             uplink_capab |= CAPAB_SN2;
         }
-        if (!stricmp(av[i], "TOK1")) {
+        if (!stricmp(s, "TOK1")) {
             uplink_capab |= CAPAB_TOKEN;
         }
-        if (!stricmp(av[i], "TOKEN")) {
+        if (!stricmp(s, "TOKEN")) {
             uplink_capab |= CAPAB_TOKEN;
         }
-        if (!stricmp(av[i], "VHOST")) {
+        if (!stricmp(s, "VHOST")) {
             uplink_capab |= CAPAB_VHOST;
         }
-        if (!stricmp(av[i], "SSJ3")) {
+        if (!stricmp(s, "SSJ3")) {
             uplink_capab |= CAPAB_SSJ3;
         }
+
+        if (!stricmp(s, "CHANMODES")) {
+            uplink_capab |= CAPAB_CHANMODE;
+            if (tmp) {
+                ircd->chanmodes = tmp;
+            }
+        }
+        if (s) {
+            free(s);
+        }
+        if (tmp) {
+            free(tmp);
+        }
+
     }
 }
 

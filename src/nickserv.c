@@ -1326,10 +1326,12 @@ static int is_on_access(User * u, NickCore * nc)
 
     for (i = 0; i < nc->accesscount; i++) {
         if (match_wild_nocase(nc->access[i], buf)
-            || (u->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
+            || (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
             free(buf);
             if (ircd->vhost) {
-                free(buf2);
+                if (u->vhost) {
+                    free(buf2);
+                }
             }
             return 1;
         }

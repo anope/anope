@@ -63,7 +63,7 @@ IRCDVar ircd[] = {
      1,                         /* TS Topic Forward     */
      0,                         /* TS Topci Backward    */
      0,                         /* Protected Umode      */
-     1,                         /* Has Admin            */
+     0,                         /* Has Admin            */
      0,                         /* Chan SQlines         */
      0,                         /* Quit on Kill         */
      0,                         /* SVSMODE unban        */
@@ -86,10 +86,11 @@ IRCDVar ircd[] = {
      UMODE_x,                   /* Vhost Mode           */
      1,                         /* +f                   */
      1,                         /* +L                   */
-     CMODE_f,
-     CMODE_L,
-     0,
-
+     CMODE_f,                   /* +f Mode                          */
+     CMODE_L,                   /* +L Mode                          */
+     0,                         /* On nick change check if they could be identified */
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      },
     {NULL}
 };
@@ -123,7 +124,8 @@ IRCDCAPAB ircdcap[] = {
      CAPAB_VL,                  /* VL           */
      CAPAB_TLKEXT,              /* TLKEXT       */
      0,                         /* DODKEY       */
-     0                          /* DOZIP        */
+     0,                         /* DOZIP        */
+     CAPAB_CHANMODE,            /* CHANMODE             */
      }
 };
 
@@ -229,7 +231,7 @@ CBMode cbmodes[128] = {
     {CMODE_Q, 0, NULL, NULL},
     {CMODE_R, 0, NULL, NULL},   /* R */
     {CMODE_S, 0, NULL, NULL},
-    {0},                        /* T */
+    {CMODE_T, 0, NULL, NULL},   /* T */
     {0},                        /* U */
     {CMODE_V, 0, NULL, NULL},
     {0},                        /* W */
@@ -291,6 +293,7 @@ CBModeInfo cbmodeinfos[] = {
     {'Q', CMODE_Q, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},
     {'S', CMODE_S, 0, NULL, NULL},
+    {'T', CMODE_T, 0, NULL, NULL},
     {'V', CMODE_V, 0, NULL, NULL},
     {0}
 };
@@ -415,9 +418,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      NULL); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
@@ -450,6 +452,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("TKL", 	   anope_event_tkl); addCoreMessage(IRCD,m);
     m = createMessage("EOS", 	   anope_event_eos); addCoreMessage(IRCD,m);
     m = createMessage("PASS", 	   anope_event_pass); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR", 	   anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("SMO", 	   anope_event_smo); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -509,7 +513,7 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
         return;
     }
 
-    send_cmd(source, "KILL %s :%s", user, buf);
+    send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
 
 void anope_cmd_svsmode(User * u, int ac, char **av)
@@ -1542,6 +1546,26 @@ void anope_cmd_svid_umode2(User * u, char *ts)
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
     // not used
+}
+
+int anope_event_error(char *source, int ac, char **av)
+{
+    if (av[0]) {
+        if (debug) {
+            alog("ERROR: %s", av[0]);
+        }
+    }
+    return MOD_CONT;
+}
+
+int anope_event_notice(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_smo(char *source, int ac, char **av)
+{
+    return MOD_CONT;
 }
 
 #endif

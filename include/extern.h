@@ -493,8 +493,6 @@ E char *DefconMessage;
 E char *DefConAkillReason;
 E char *DefConOffMessage;
 
-E int Numeric;
-
 /**** converter.c ****/
 
 E int convert_ircservices_44(void);
@@ -643,11 +641,6 @@ E char *myStrGetTokenRemainder(const char *str, const char dilim,
 E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(char *nick, char *killer);
 E int nickIsServices(char *nick);
-
-
-E const char* inttobase64(char* buf, unsigned int v, unsigned int count);
-E unsigned int base64toIP(const char* s);
-E unsigned int base64toint(const char* s);
 
 /**** modules.c ****/
 E void moduleCallBackRun(void);
@@ -851,7 +844,6 @@ E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *firstuser(void);
 E User *nextuser(void);
-E User *finduser_uid(const char *uid);
 
 E void update_host(User * user);
 E void change_user_host(User * user, const char *host);
@@ -1003,6 +995,7 @@ extern int anope_event_whois(char *source, int ac, char **av);
 extern int anope_event_part(char *source, int ac, char **av);
 extern int anope_event_server(char *source, int ac, char **av);
 extern int anope_event_nick(char *source, int ac, char **av);
+extern int anope_event_gnotice(char *source, int ac, char **av);
 extern int anope_event_privmsg(char *source, int ac, char **av);
 extern int anope_event_capab(char *source, int ac, char **av);
 extern int anope_event_sjoin(char *source, int ac, char **av);
@@ -1021,13 +1014,22 @@ extern int anope_event_chgname(char *source, int ac, char **av);
 extern int anope_event_setname(char *source, int ac, char **av);
 extern int anope_event_svsinfo(char *source, int ac, char **av);
 extern int anope_event_snick(char *source, int ac, char **av);
-extern int anope_event_vhost(char *source, int ac, char **av);   /* Rage IRCD Only */
+extern int anope_event_vhost(char *source, int ac, char **av);
 extern int anope_event_tkl(char *source, int ac, char **av);
 extern int anope_event_eos(char *source, int ac, char **av);
 extern int anope_event_pass(char *source, int ac, char **av);
 extern int anope_event_netinfo(char *source, int ac, char **av);
 extern int anope_event_error(char *source, int ac, char **av);
 extern int anope_event_eb(char *source, int ac, char **av);
+extern int anope_event_netctrl(char *source, int ac, char **av);
+extern int anope_event_notice(char *source, int ac, char **av);
+extern int anope_event_sqline(char *source, int ac, char **av);
+extern int anope_event_error(char *source, int ac, char **av);
+extern int anope_event_smo(char *source, int ac, char **av);
+extern int anope_event_myid(char *source, int ac, char **av);
+extern int anope_event_vctrl(char *source, int ac, char **av);
+extern int anope_event_netinfo(char *source, int ac, char **av);
+extern int anope_event_snetinfo(char *source, int ac, char **av);
 
 extern void anope_set_umode(User * user, int ac, char **av);
 extern void anope_cmd_svid_umode(char *nick, time_t ts);

@@ -87,7 +87,8 @@ IRCDVar ircd[] = {
      0,
      0,
      1,
-
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      }
     ,
     {NULL}
@@ -123,8 +124,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* VL           */
      0,                         /* TLKEXT       */
      CAPAB_DODKEY,              /* DODKEY       */
-     CAPAB_DOZIP                /* DOZIP        */
-     }
+     CAPAB_DOZIP,               /* DOZIP        */
+     0}
 };
 
 

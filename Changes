@@ -6,8 +6,14 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 08/24 F Compile error with gcc2.                                          [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+09/07 A Unreal32 channel mode +T support.                                 [ #00]
+09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+09/07 F Handling of most Unknown Message from Server commands.            [ #00]
+09/07 F Several Hybrid support fixes and improvements.                    [ #00]
+09/07 F Several Unreal support fixes and improvements.                    [ #00]
+09/07 F Several Ultimate support fixes and improvements.                  [ #00]
 08/28 F Channel registration handling for non chanops.                    [#142]
 08/28 F Protection from accessing unavailable struct data.                [#152]
 08/28 F Rage2 mode +M/+A channel support.                                 [#154]

@@ -8371,10 +8371,10 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_UNREAL31 1
 _ACEOF
 
-    elif test "$withval" = "IRC_ULTIMATE"; then
+    elif test "$withval" = "IRC_ULTIMATE2"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_ULTIMATE 1
+#define IRC_ULTIMATE2 1
 _ACEOF
 
     elif test "$withval" = "IRC_ULTIMATE3"; then

@@ -84,9 +84,13 @@ IRCDVar ircd[] = {
      UMODE_x,                   /* Vhost Mode           */
      0,                         /* +f                   */
      0,                         /* +L                   */
-     0,
-     0,
-     1,
+     0,                         /* +f Mode                          */
+     0,                         /* +L Mode                              */
+     1,                         /* On nick change check if they could be identified */
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      },
     {NULL}
 };
@@ -120,8 +124,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* VL           */
      0,                         /* TLKEXT       */
      CAPAB_DODKEY,              /* DODKEY       */
-     CAPAB_DOZIP                /* DOZIP        */
-     }
+     CAPAB_DOZIP,               /* DOZIP        */
+     0}
 };
 
 void anope_set_umode(User * user, int ac, char **av)
@@ -538,9 +542,9 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      NULL); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
@@ -552,7 +556,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
     m = createMessage("AKILL",     NULL); addCoreMessage(IRCD,m);
     m = createMessage("GLOBOPS",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("GNOTICE",   anope_event_gnotice); addCoreMessage(IRCD,m);
     m = createMessage("GOPER",     NULL); addCoreMessage(IRCD,m);
     m = createMessage("RAKILL",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("SILENCE",   NULL); addCoreMessage(IRCD,m);
@@ -560,7 +564,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SVSMODE",   NULL); addCoreMessage(IRCD,m);
     m = createMessage("SVSNICK",   NULL); addCoreMessage(IRCD,m);
     m = createMessage("SVSNOOP",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);
     m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
     m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("CS",        anope_event_cs); addCoreMessage(IRCD,m);
@@ -572,7 +576,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SGLINE",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SS",        NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
     m = createMessage("SZLINE",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("UNSGLINE",  NULL); addCoreMessage(IRCD,m);
     m = createMessage("UNSZLINE",  NULL); addCoreMessage(IRCD,m);
@@ -581,7 +585,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("GCONNECT",  NULL); addCoreMessage(IRCD,m);
     m = createMessage("NETGLOBAL", NULL); addCoreMessage(IRCD,m);
     m = createMessage("CHATOPS",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("NETCTRL",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NETCTRL",   anope_event_netctrl); addCoreMessage(IRCD,m);
     m = createMessage("CLIENT",	   anope_event_client); addCoreMessage(IRCD,m);
     m = createMessage("SMODE",	   NULL); addCoreMessage(IRCD,m);
 }
@@ -1539,6 +1543,40 @@ void anope_cmd_svid_umode3(User * u, char *ts)
 
 }
 
+int anope_event_svinfo(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
 
+int anope_event_pass(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
+
+int anope_event_gnotice(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
+
+int anope_event_netctrl(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
+
+int anope_event_notice(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
+
+int anope_event_sqline(char *source, int ac, char **av)
+{
+    /* currently not used but removes the message : unknown message from server */
+    return MOD_CONT;
+}
 
 #endif

@@ -87,7 +87,8 @@ IRCDVar ircd[] = {
      CMODE_f,
      CMODE_L,
      0,
-
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      }
     ,
     {NULL}
@@ -110,7 +111,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* SCS          */
      0,                         /* QS           */
      0,                         /* UID          */
-     0,                         /* KNOCK        */
+     CAPAB_KNOCK,               /* KNOCK        */
      0,                         /* CLIENT       */
      0,                         /* IPV6         */
      0,                         /* SSJ5         */
@@ -123,7 +124,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* VL           */
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
-     0                          /* DOZIP        */
+     0,                         /* DOZIP        */
+     CAPAB_CHANMODE             /* CHANMODE             */
      }
 };
 
@@ -569,9 +571,9 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      NULL); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
@@ -581,8 +583,6 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("USER",      NULL); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   NULL); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-
-    /* DALnet specific messages */
     m = createMessage("AKILL",     NULL); addCoreMessage(IRCD,m);
     m = createMessage("GLOBOPS",   NULL); addCoreMessage(IRCD,m);
     m = createMessage("GNOTICE",   NULL); addCoreMessage(IRCD,m);
@@ -595,16 +595,16 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SVSNOOP",   NULL); addCoreMessage(IRCD,m);
     m = createMessage("SQLINE",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
-
     m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("CHGHOST",   anope_event_chghost); addCoreMessage(IRCD,m);
     m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
     m = createMessage("CHGNAME",   anope_event_chgname); addCoreMessage(IRCD,m);
-    m = createMessage("NETINFO",   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NETINFO",   anope_event_netinfo); addCoreMessage(IRCD,m);
+    m = createMessage("SNETINFO",  anope_event_snetinfo); addCoreMessage(IRCD,m);
     m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
     m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
     m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-    m = createMessage("VCTRL",     NULL); addCoreMessage(IRCD,m);
+    m = createMessage("VCTRL",     anope_event_vctrl); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -1427,6 +1427,29 @@ void anope_cmd_svid_umode3(User * u, char *ts)
     // not used
 }
 
+int anope_event_notice(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
 
+int anope_event_pass(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_vctrl(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_netinfo(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_snetinfo(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
 
 #endif

@@ -248,7 +248,7 @@ while [ $ok -eq 0 ] ; do
 			ok=1;
 			;;
 		4)
-			IRCTYPE_DEF="IRC_ULTIMATE"
+			IRCTYPE_DEF="IRC_ULTIMATE2"
 			ok=1;
 			;;
 		5)

@@ -39,6 +39,8 @@
 #define CMODE_t 0x00000020
 #define CMODE_k 0x00000040		/* These two used only by ChanServ */
 #define CMODE_l 0x00000080
+#define CMODE_R 0x00000100		/* Only identified users can join */
+#define CMODE_r 0x00000200		/* Set for all registered channels */
 #define CMODE_c 0x00000400
 #define CMODE_A 0x00000800
 #define CMODE_H 0x00001000
@@ -54,8 +56,7 @@
 #define CMODE_u 0x00400000
 #define CMODE_z 0x00800000
 #define CMODE_N 0x01000000
-#define CMODE_R 0x00000100		/* Only identified users can join */
-#define CMODE_r 0x00000200		/* Set for all registered channels */
+#define CMODE_T 0x02000000
 
 /*************************************************************************/
 

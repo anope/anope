@@ -89,7 +89,8 @@ IRCDVar ircd[] = {
      0,                         /* Mode */
      0,                         /* Mode */
      1,
-
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      }
     ,
     {NULL}
@@ -124,8 +125,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* VL           */
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
-     CAPAB_DOZIP                /* DOZIP        */
-     }
+     CAPAB_DOZIP,               /* DOZIP        */
+     0}
 };
 
 
@@ -404,7 +405,7 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
     char buf[BUFSIZE];
     *buf = '\0';
 
-    if (!fmt) {
+    if (fmt) {
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
@@ -567,7 +568,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    NULL); addCoreMessage(IRCD,m);
+    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PASS",      NULL); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
@@ -605,6 +606,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SZLINE",    NULL); addCoreMessage(IRCD,m);
     m = createMessage("UNSGLINE",  NULL); addCoreMessage(IRCD,m);
     m = createMessage("UNSZLINE",  NULL); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+
 }
 
 /* *INDENT-ON* */
@@ -662,7 +665,7 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
     char buf[BUFSIZE];
     *buf = '\0';
 
-    if (!fmt) {
+    if (fmt) {
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
@@ -1418,5 +1421,26 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
 
     send_cmd(oldnick, "NICK %s", newnick);
 }
+
+int anope_event_error(char *source, int ac, char **av)
+{
+    if (ac >= 1) {
+        if (debug) {
+            alog("ERROR: %s", av[0]);
+        }
+    }
+    return MOD_CONT;
+}
+
+int anope_event_notice(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_sqline(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
 
 #endif

@@ -240,11 +240,13 @@ struct ircdvars_ {
 	uint32 adminmode;			/* Admin Only Channel Mode	*/
 	uint32 defmlock;			/* Default mlock modes		*/
 	uint32 vhostmode;			/* Vhost mode			*/
-	int fmode;				/* +f				*/
-	int Lmode;				/* +L				*/
+	int fmode;					/* +f				*/
+	int Lmode;					/* +L				*/
 	uint32 chan_fmode;			/* Mode 			*/
 	uint32 chan_lmode;			/* Mode				*/
 	int check_nick_id;			/* On nick change check if they could be identified */
+	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
+	char *chanmodes;				/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 };
 
 struct ircdcapab_ {
@@ -276,6 +278,7 @@ struct ircdcapab_ {
   uint32 tlkext;
   uint32 dodkey;
   uint32 dozip;
+  uint32 chanmodes;
 };
 
 /*************************************************************************/
@@ -1074,6 +1077,7 @@ struct hostcache_ {
 #define CAPAB_UMODE2    0x02000000
 #define CAPAB_VL        0x04000000
 #define CAPAB_TLKEXT    0x08000000
+#define CAPAB_CHANMODE  0x10000000
 
 
 /*************************************************************************/

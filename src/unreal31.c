@@ -63,7 +63,7 @@ IRCDVar ircd[] = {
      1,                         /* TS Topic Forward     */
      0,                         /* TS Topci Backward    */
      0,                         /* Protected Umode      */
-     1,                         /* Has Admin            */
+     0,                         /* Has Admin            */
      0,                         /* Chan SQlines         */
      0,                         /* Quit on Kill         */
      0,                         /* SVSMODE unban        */
@@ -89,7 +89,8 @@ IRCDVar ircd[] = {
      CMODE_f,
      CMODE_L,
      0,
-
+     1,                         /* No Knock requires +i */
+     NULL,                      /* CAPAB Chan Modes             */
      },
     {NULL}
 };
@@ -124,8 +125,8 @@ IRCDCAPAB ircdcap[] = {
      CAPAB_VL,                  /* VL           */
      CAPAB_TLKEXT,              /* TLKEXT       */
      0,                         /* DODKEY       */
-     0                          /* DOZIP        */
-     }
+     0,                         /* DOZIP        */
+     0}
 };
 
 unsigned long umodes[128] = {
@@ -512,7 +513,7 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    send_cmd(source, "KILL %s :%s", user, buf);
+    send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
 
 void anope_cmd_svsmode(User * u, int ac, char **av)

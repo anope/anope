@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="315"
+VERSION_BUILD="316"
 
 # $Log$
+#
+# BUILD : 1.7.5 (316)
+# BUGS  : 131
+# NOTES : Fixed bugs in previous BotServ buffer fix.
 #
 # BUILD : 1.7.5 (315)
 # BUGS  : 

@@ -185,17 +185,15 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
  *
  */
 
-void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
+void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 {
     int c;
     int16 cstatus = 0;
-    char *cmd, *buf;
+    char *cmd;
     UserData *ud;
 
-    buf = sstrdup(buff);
 
     if (!u) {
-        free(buf);
         return;
     }
 
@@ -243,7 +241,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
         if ((ci->botflags & BS_KICK_BOLDS) && strchr(buf, 2)) {
             check_ban(ci, u, TTB_BOLDS);
             bot_kick(ci, u, BOT_REASON_BOLD);
-            free(buf);
             return;
         }
 
@@ -251,7 +248,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
         if ((ci->botflags & BS_KICK_COLORS) && strchr(buf, 3)) {
             check_ban(ci, u, TTB_COLORS);
             bot_kick(ci, u, BOT_REASON_COLOR);
-            free(buf);
             return;
         }
 
@@ -259,7 +255,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
         if ((ci->botflags & BS_KICK_REVERSES) && strchr(buf, 22)) {
             check_ban(ci, u, TTB_REVERSES);
             bot_kick(ci, u, BOT_REASON_REVERSE);
-            free(buf);
             return;
         }
 
@@ -267,7 +262,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
         if ((ci->botflags & BS_KICK_UNDERLINES) && strchr(buf, 31)) {
             check_ban(ci, u, TTB_UNDERLINES);
             bot_kick(ci, u, BOT_REASON_UNDERLINE);
-            free(buf);
             return;
         }
 
@@ -285,7 +279,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
             if (i >= ci->capsmin && i * 100 / c >= ci->capspercent) {
                 check_ban(ci, u, TTB_CAPS);
                 bot_kick(ci, u, BOT_REASON_CAPS);
-                free(buf);
                 return;
             }
         }
@@ -405,7 +398,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
                         bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
                     else
                         bot_kick(ci, u, BOT_REASON_BADWORD, bw->word);
-                    free(buf);
                     return;
                 }
             }
@@ -421,7 +413,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
 
             ud = get_user_data(ci->c, u);
             if (!ud) {
-                free(buf);
                 return;
             }
 
@@ -434,7 +425,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
             if (ud->lines >= ci->floodlines) {
                 check_ban(ci, u, TTB_FLOOD);
                 bot_kick(ci, u, BOT_REASON_FLOOD);
-                free(buf);
                 return;
             }
         }
@@ -443,7 +433,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
         if (ci->botflags & BS_KICK_REPEAT) {
             ud = get_user_data(ci->c, u);
             if (!ud) {
-                free(buf);
                 return;
             }
             if (ud->lastline && stricmp(ud->lastline, buf)) {
@@ -459,7 +448,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
             if (ud->times >= ci->repeattimes) {
                 check_ban(ci, u, TTB_REPEAT);
                 bot_kick(ci, u, BOT_REASON_REPEAT);
-                free(buf);
                 return;
             }
         }
@@ -468,7 +456,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buff)
 
     /* return if the user is on the ignore list  */
     if (get_ignore(u->nick) != NULL) {
-        free(buf);
         return;
     }
 

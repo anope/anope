@@ -577,6 +577,7 @@ static int m_part(char *source, int ac, char **av)
 static int m_privmsg(char *source, int ac, char **av)
 {
     char *s;
+    char *buf;
     time_t starttime, stoptime; /* When processing started and finished */
 
     BotInfo *bi;
@@ -596,8 +597,12 @@ static int m_privmsg(char *source, int ac, char **av)
 
     if (*av[0] == '#') {
         if (s_BotServ && (ci = cs_findchan(av[0])))
-            if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi)  /* Some paranoia checks */
-                botchanmsgs(u, ci, av[1]);
+            if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi)
+                /* Some paranoia checks */
+                /* Copy the message to a temp. variable, otherwise botchanmsgs would break the buffer for modules -Keeper */
+                buf = sstrdup(av[1]);
+        botchanmsgs(u, ci, buf);
+        free(buf);
     } else {
 
         /* Check if we should ignore.  Operators always get through. */

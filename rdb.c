@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: rdb.c,v 1.11 2003/08/04 01:09:43 dane Exp $ 
+ * $Id$ 
  *
  */
 #include "services.h"

@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: proxy.c,v 1.11 2004/02/14 21:22:55 dane Exp $ 
+ * $Id$ 
  *
  */
 

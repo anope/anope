@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: operserv.c,v 1.89 2004/03/14 22:44:47 dane Exp $
+ * $Id$
  *
  */
 

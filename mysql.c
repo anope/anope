@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: mysql.c,v 1.33 2004/03/14 13:02:53 rob Exp $ 
+ * $Id$ 
  *
  */
 #include "services.h"

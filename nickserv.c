@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: nickserv.c,v 1.93 2004/03/13 03:25:59 dane Exp $
+ * $Id$
  *
  */
 

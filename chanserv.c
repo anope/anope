@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: chanserv.c,v 1.55 2004/03/17 20:08:49 ribosome Exp $ 
+ * $Id$ 
  *
  */
 

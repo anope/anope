@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- * $Id: messages.c,v 1.31 2004/02/15 18:34:40 dane Exp $
+ * $Id$
  *
  */
 

@@ -22,7 +22,7 @@
  * along with this program (see the file COPYING); if not, write to the
  * Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: main.c,v 1.23 2004/03/13 13:55:59 dane Exp $
+ * $Id$
  *
  */
 

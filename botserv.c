@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: botserv.c,v 1.46 2004/03/14 14:15:34 certus Exp $
+ * $Id$
  *
  */
 

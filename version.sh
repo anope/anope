@@ -3,7 +3,7 @@
 # Build version string and increment Services build number.
 #
 
-# Grab the actual version from the control file
+# Grab version information from the version control file.
 CTRL="version.log"
 if [ -f $CTRL ] ; then
 	. $CTRL
@@ -12,11 +12,7 @@ else
 	exit 0
 fi
 
-if [ $VERSION_BUILD -gt 0 ]; then
-	VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_BUILD}${VERSION_EXTRA}"
-else
-	VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA}"
-fi
+VERSION="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}${VERSION_EXTRA} (${VERSION_BUILD})"
 
 if [ -f version.h ] ; then
 	BUILD=`fgrep '#define BUILD' version.h | sed 's/^#define BUILD.*"\([0-9]*\)".*$/\1/'`
@@ -45,8 +41,8 @@ cat >version.h <<EOF
 #define VERSION_MAJOR	"$VERSION_MAJOR"
 #define VERSION_MINOR	"$VERSION_MINOR"
 #define VERSION_PATCH	"$VERSION_PATCH"
-#define VERSION_BUILD	"$VERSION_BUILD"
 #define VERSION_EXTRA	"$VERSION_EXTRA"
+#define VERSION_BUILD	"$VERSION_BUILD"
 
 #define BUILD	"$BUILD"
 
@@ -144,3 +140,4 @@ const char version_protocol[] =
 const char version_flags[] = VER_IRCD VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL VER_MODULE;
 
 EOF
+

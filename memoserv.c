@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: memoserv.c,v 1.30 2004/03/22 18:52:47 dane Exp $
+ * $Id$
  *
  */
 

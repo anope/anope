@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: helpserv.c,v 1.2 2004/01/18 04:33:25 dane Exp $ 
+ * $Id$ 
  *
  */
 

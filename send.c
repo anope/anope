@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: send.c,v 1.11 2004/01/18 05:10:47 dane Exp $ 
+ * $Id$ 
  *
  */
 

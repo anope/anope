@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: language.c,v 1.9 2003/12/12 16:04:57 dane Exp $ 
+ * $Id$ 
  *
  */
 

@@ -35,6 +35,8 @@ static int do_staff(User *u);
 static int do_sendall(User *u);
 void moduleAddMemoServCmds(void);
 static void new_memo_mail(NickCore *nc, Memo *m);
+static int do_rsend(User *u);
+void rsend_notify(User *u, Memo *m, const char *chan);
 /*************************************************************************/
 
 void moduleAddMemoServCmds(void) {
@@ -51,6 +53,7 @@ void moduleAddMemoServCmds(void) {
     c = createCommand("SET LIMIT",  NULL,    	NULL,  -1,MEMO_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT,MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT); addCoreCommand(MEMOSERV,c);
     c = createCommand("INFO",       do_info, NULL,  -1,MEMO_HELP_INFO, MEMO_SERVADMIN_HELP_INFO,MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO); addCoreCommand(MEMOSERV,c);
     c = createCommand("SENDALL",    do_sendall, is_services_admin, MEMO_HELP_SENDALL,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
+    c = createCommand("RSEND",    do_rsend, NULL, MEMO_HELP_RSEND,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
 }
 
 /*************************************************************************/
@@ -250,6 +253,7 @@ static int do_send(User * u)
  *	0 - reply to user
  *	1 - silent
  *	2 - silent with no delay timer
+ *	3 - reply to user and request read receipt
  **/
 void memo_send(User * u, char *name, char *text, int z)
 {
@@ -269,12 +273,15 @@ void memo_send(User * u, char *name, char *text, int z)
         if (z == 0)
             syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
 
+        if (z == 3)
+            syntax_error(s_MemoServ, u, "RSEND", MEMO_RSEND_SYNTAX);
+
     } else if (!nick_recognized(u)) {
-        if (z == 0)
+        if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 
     } else if (!(mi = getmemoinfo(name, &ischan))) {
-        if (z == 0)
+        if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u,
                         ischan ? CHAN_X_NOT_REGISTERED :
                         NICK_X_NOT_REGISTERED, name);
@@ -285,13 +292,16 @@ void memo_send(User * u, char *name, char *text, int z)
         if (z == 0)
             notice_lang(s_MemoServ, u, MEMO_SEND_PLEASE_WAIT, MSSendDelay);
 
+        if (z == 3)
+            notice_lang(s_MemoServ, u, MEMO_RSEND_PLEASE_WAIT, MSSendDelay);
+
     } else if (mi->memomax == 0 && !is_servadmin) {
-        if (z == 0)
+        if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_X_GETS_NO_MEMOS, name);
 
     } else if (mi->memomax > 0 && mi->memocount >= mi->memomax
                && !is_servadmin) {
-        if (z == 0)
+        if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_X_HAS_TOO_MANY_MEMOS, name);
 
     } else {
@@ -313,7 +323,10 @@ void memo_send(User * u, char *name, char *text, int z)
         m->time = time(NULL);
         m->text = sstrdup(text);
         m->flags = MF_UNREAD;
-        if (z == 0)
+        /* Set receipt request flag */
+        if (z == 3)
+           m->flags |= MF_RECEIPT;
+        if (z == 0 || z == 3)
             notice_lang(s_MemoServ, u, MEMO_SENT, name);
         if (!ischan) {
             NickAlias *na;
@@ -545,6 +558,12 @@ static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
                     m->sender, timebuf, s_MemoServ, m->number);
     notice_lang(s_MemoServ, u, MEMO_TEXT, m->text);
     m->flags &= ~MF_UNREAD;
+
+    /* Check if a receipt notification was requested */
+    if (m->flags && MF_RECEIPT) {
+       rsend_notify(u, m, chan);
+    }
+
     return 1;
 }
 
@@ -1210,6 +1229,139 @@ static void new_memo_mail(NickCore * nc, Memo * m)
     fprintf(mail->pipe, "%s", m->text);
     fprintf(mail->pipe, "\n");
     MailEnd(mail);
+    return;
+}
+
+/*************************************************************************/
+/* Send a memo to a nick/channel requesting a receipt. */
+
+static int do_rsend(User * u)
+{
+    char *name = strtok(NULL, " ");
+    char *text = strtok(NULL, "");
+    int z = 3;
+
+    if (MSMemoReceipt == 1) {
+        /* Services opers and above can use rsend */
+        if (is_services_oper(u)) {
+            memo_send(u, name, text, z);
+        } else {
+            notice_lang(s_MemoServ, u, ACCESS_DENIED);
+        }
+    } else if (MSMemoReceipt == 2) {
+        /* Everybody can use rsend */
+        memo_send(u, name, text, z);
+    } else {
+        /* rsend has been disabled */
+        notice_lang(s_MemoServ, u, MEMO_RSEND_DISABLED);
+    }
+
+    return MOD_CONT;
+}
+
+/*************************************************************************/
+/* Send receipt notification to sender. */
+
+void rsend_notify(User *u, Memo *m, const char *chan)
+{
+    User *nu;
+    Memo *nm;
+    MemoInfo *nmi;
+    NickAlias *nna;
+    NickCore *nnc;
+    char text[256];
+    const char *fmt;
+    int i;
+
+    /* Only send receipt if memos are allowed */
+    if ((!readonly) && (!checkDefCon(DEFCON_NO_NEW_MEMOS))) {
+
+        /* Gather nick alias, nick core and memo info for sender */
+        nna = findnick(m->sender);
+        nnc = nna->nc;
+        nmi = &nnc->memos;
+
+        /* Increase the sender's memocount by one */
+        nmi->memocount++;
+
+        /* Allocate memory for the new memo */
+        nmi->memos = srealloc(nmi->memos,
+                              sizeof(Memo) * nmi->memocount);
+
+        /* Grab the new memo pointer to work on it */
+        nm = &nmi->memos[nmi->memocount - 1];
+
+        /* Sender is MemoServ */
+        strscpy(nm->sender, s_MemoServ, NICKMAX);
+
+        /* If the user has more than one memo, assign the new
+           memo the next available index */
+        if (nmi->memocount > 1) {
+            nm->number = nm[-1].number + 1;
+
+            /* If needed, reindex memos */
+            if (nm->number < 1) {
+                for (i = 0; i < nmi->memocount; i++) {
+                    nmi->memos[i].number = i + 1;
+                }
+            }
+        } else {
+            /* User has no memos. Use index 1 */
+            nm->number = 1;
+        }
+
+        /* Populate memo structure and set text */
+        nm->time = time(NULL);
+
+        /* Text of the memo varies if the recepient was a
+           nick or channel */
+        if (chan) {
+            fmt = getstring(nna, MEMO_RSEND_CHAN_MEMO_TEXT);
+            sprintf(text, fmt, chan, u->na->nc->display);
+        } else {
+            fmt = getstring(nna, MEMO_RSEND_NICK_MEMO_TEXT);
+            sprintf(text, fmt, u->na->nc->display);
+        }
+
+        nm->text = sstrdup(text);
+        nm->flags = MF_UNREAD;
+
+        /* Notify recepient of the memo that a notification has
+           been sent to the sender */
+        notice_lang(s_MemoServ, u, MEMO_RSEND_USER_NOTIFICATION,
+                    nnc->display);
+
+        /* Check to see if we're notifying all aliases in the sender's
+           group or just the sender */
+        if (MSNotifyAll) {
+            if ((nnc->flags & NI_MEMO_RECEIVE) &&
+                get_ignore(m->sender) == NULL) { 
+                for (i = 0; i < nnc->aliases.count; i++) {
+                    nna = nnc->aliases.list[i];
+                    if (nna->u && nick_identified(nna->u)) {
+                        notice_lang(s_MemoServ, nna->u,
+                                    MEMO_NEW_MEMO_ARRIVED,
+                                    s_MemoServ, s_MemoServ,
+                                    nm->number);
+                    }
+                }
+            } else {
+                /* Find the sender user via the display nick */
+                nu = finduser(nnc->display);
+
+                if (nick_identified(nu)) {
+                    notice_lang(s_MemoServ, u,
+                                MEMO_NEW_MEMO_ARRIVED,
+                                s_MemoServ, s_MemoServ,
+                                nm->number);
+                }
+            }
+        }
+    }
+
+    /* Remove receipt flag from the original memo */
+    m->flags &= ~MF_RECEIPT;
+
     return;
 }
 

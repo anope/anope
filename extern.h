@@ -344,6 +344,7 @@ E int   CSOpersOnly;
 E int   MSMaxMemos;
 E int   MSSendDelay;
 E int   MSNotifyAll;
+E int   MSMemoReceipt;
 
 E int   BSDefFlags;
 E int   BSKeepData;

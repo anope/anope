@@ -1711,6 +1711,21 @@ MEMO_MAIL_TEXT2
 MEMO_MAIL_TEXT3
 	Memo Text:
 
+# RSEND responses
+MEMO_RSEND_PLEASE_WAIT
+	Please wait %d seconds before using the RSEND command again.
+MEMO_RSEND_DISABLED
+	Sorry, RSEND has been disabled on this network.
+MEMO_RSEND_SYNTAX
+	RSEND {nick | channel} memo-text
+MEMO_RSEND_NICK_MEMO_TEXT
+	Your memo sent to %s has been read.
+MEMO_RSEND_CHAN_MEMO_TEXT
+	Your memo sent to %s has been read by %s.
+MEMO_RSEND_USER_NOTIFICATION
+	A notification memo has been sent to %s informing him/her you have
+	read his/her memo.
+
 ###########################################################################
 #
 # BotServ messages
@@ -4639,6 +4654,7 @@ MEMO_HELP
 	    DEL    Delete a memo or memos
 	    SET    Set options related to memos
 	    INFO   Displays information about your memos
+	    RSEND  Sends a memo and requests a read receipt
 
 MEMO_HELP_ADMIN
 	    SENDALL  Send a memo to all registered users
@@ -4803,6 +4819,17 @@ MEMO_HELP_SENDALL
 	Syntax: SENDALL memo-text
 
 	Sends all registered users a memo containing memo-text.
+	
+MEMO_HELP_RSEND
+	Syntax: RSEND {nick | channel} memo-text
+	
+	Sends the named nick or channel a memo containing
+	memo-text.  When sending to a nickname, the recipient will
+	receive a notice that he/she has a new memo.  The target
+	nickname/channel must be registered.
+	Once the memo is read by its recepient, an automatic notification
+	memo will be sent to the sender informing him/her that the memo
+	has been read.
 
 ###########################################################################
 #

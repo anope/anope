@@ -205,6 +205,7 @@ int CSOpersOnly;
 int MSMaxMemos;
 int MSSendDelay;
 int MSNotifyAll;
+int MSMemoReceipt;
 
 int BSDefDontKickOps;
 int BSDefDontKickVoices;
@@ -495,6 +496,7 @@ Directive directives[] = {
     {"MSMaxMemos", {{PARAM_POSINT, PARAM_RELOAD, &MSMaxMemos}}},
     {"MSNotifyAll", {{PARAM_SET, PARAM_RELOAD, &MSNotifyAll}}},
     {"MSSendDelay", {{PARAM_TIME, PARAM_RELOAD, &MSSendDelay}}},
+    {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
     {"NetworkDomain", {{PARAM_STRING, PARAM_RELOAD, &NetworkDomain}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},

@@ -1,5 +1,13 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
+*** New Strings:
+
+MEMO_RSEND_PLEASE_WAIT
+MEMO_RSEND_DISABLED
+MEMO_RSEND_SYNTAX
+MEMO_RSEND_NICK_MEMO_TEXT
+MEMO_RSEND_CHAN_MEMO_TEXT
+MEMO_RSEND_USER_NOTIFICATION
 
 Anope Version 1.7.2
 --------------------

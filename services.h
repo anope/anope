@@ -202,6 +202,7 @@ struct memo_ {
 };
 
 #define MF_UNREAD	0x0001	/* Memo has not yet been read */
+#define MF_RECEIPT	0x0002	/* Sender requested receipt */
 
 typedef struct {
     int16 memocount, memomax;

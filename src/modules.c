@@ -1818,12 +1818,18 @@ int moduleDataDebug(ModuleData ** md)
  **/
 int moduleAddData(ModuleData ** md, char *key, char *value)
 {
+    /* Do we really need this sstrdup here? Why can't we just use
+     * mod_current_module_name itself inside this function? It's not like
+     * we're changing it or anything, we just pass it to yet another
+     * sstrdup() somewhere down there.... -GD
+     */
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *newData = NULL;
     ModuleData *tmp = *md;
 
     if (!key || !value) {
         alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
+        free(mod_name);
         return MOD_ERR_PARAMS;
     }
     
@@ -1837,6 +1843,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
 
     newData = malloc(sizeof(ModuleData));
     if (!newData) {
+        free(mod_name);
         return MOD_ERR_MEMORY;
     }
 
@@ -1867,7 +1874,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
  **/
 char *moduleGetData(ModuleData ** md, char *key)
 {
-
+    /* See comment in moduleAddData... -GD */
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
 
@@ -1883,8 +1890,8 @@ char *moduleGetData(ModuleData ** md, char *key)
     }
 
     while (current) {
-        if ((stricmp(current->moduleName, mod_name) == 0)
-            && (stricmp(current->key, key) == 0)) {
+        if ((stricmp(current->moduleName, mod_name) == 0) && (stricmp(current->key, key) == 0)) {
+			free(mod_name);
             return sstrdup(current->value);
         }
         current = current->next;
@@ -1901,6 +1908,7 @@ char *moduleGetData(ModuleData ** md, char *key)
  **/
 void moduleDelData(ModuleData ** md, char *key)
 {
+    /* See comment in moduleAddData... -GD */
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
     ModuleData *prev = NULL;
@@ -1915,8 +1923,7 @@ void moduleDelData(ModuleData ** md, char *key)
     if (key) {
         while (current) {
             next = current->next;
-            if ((stricmp(current->moduleName, mod_name) == 0)
-                && (stricmp(current->key, key) == 0)) {
+            if ((stricmp(current->moduleName, mod_name) == 0) && (stricmp(current->key, key) == 0)) {
                 if (prev) {
                     prev->next = current->next;
                 } else {
@@ -1927,8 +1934,9 @@ void moduleDelData(ModuleData ** md, char *key)
                 free(current->value);
                 current->next = NULL;
                 free(current);
+            } else {
+                prev = current;
             }
-            prev = current;
             current = next;
         }
     }
@@ -1943,6 +1951,7 @@ void moduleDelData(ModuleData ** md, char *key)
  **/
 void moduleDelAllData(ModuleData ** md)
 {
+    /* See comment in moduleAddData... -GD */
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
     ModuleData *prev = NULL;
@@ -1967,8 +1976,9 @@ void moduleDelAllData(ModuleData ** md)
             free(current->value);
             current->next = NULL;
             free(current);
+        } else {
+            prev = current;
         }
-        prev = current;
         current = next;
     }
     free(mod_name);

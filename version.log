@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="215"
+VERSION_BUILD="216"
 
 # $Log$
+#
+# BUILD : 1.7.4 (216)
+# BUGS  : 
+# NOTES : Fixed compiling bug with UltimateIRCd3 (thx to kenshinxl)
 #
 # BUILD : 1.7.4 (215)
 # BUGS  : 

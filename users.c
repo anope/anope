@@ -256,7 +256,7 @@ void set_umode(User * user, int ac, char **av)
         case '-':
             add = 0;
             break;
-#if defined(IRC_BAHAMUT)
+#if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3)
         case 'a':
             if (add && !is_services_admin(user)) {
                 send_cmd(ServerName, "SVSMODE %s -a", user->nick);

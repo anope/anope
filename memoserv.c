@@ -1298,7 +1298,7 @@ void rsend_notify(User * u, Memo * m, const char *chan)
         }
 
         /* Send notification */
-        memo_send(u, m->sender, text, 0);
+        memo_send(u, m->sender, text, 2);
 
         /* Notify recepient of the memo that a notification has
            been sent to the sender */

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="72"
+VERSION_BUILD="73"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (73)
+# BUGS  : 
+# NOTES : Removed delay timer from RSEND notifications.
 #
 # BUILD : 1.7.2 (72)
 # NOTES : New language index (temp fix)

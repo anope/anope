@@ -796,7 +796,7 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
  */
 void anope_cmd_svsmode(User * u, int ac, char **av)
 {
-    if (ac > 1) {
+    if (ac >= 1) {
         if (!u || !av[0]) {
             return;
         }
@@ -1742,7 +1742,6 @@ int anope_event_sethost(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-
 /*
 ** NICK - new
 **      source  = NULL
@@ -1793,7 +1792,7 @@ int anope_event_nick(char *source, int ac, char **av)
             user = do_nick(source, av[0], av[3], av[4], av[5], av[10],
                            strtoul(av[2], NULL, 10), strtoul(av[6], NULL,
                                                              0),
-                           base64dec(av[9]), av[8], NULL);
+                           ntohl(decode_ip(av[9])), av[8], NULL);
             if (user)
                 anope_set_umode(user, 1, &av[7]);
 

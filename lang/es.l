@@ -20,7 +20,7 @@
 # In help messages, "%S" (capital S, not lowercase) refers to the name of
 # the service sending the message; for example, in NickServ help messages,
 # "%S" is replaced by "NickServ" (or whatever it is renamed to in
-# config.h).  The %S's do not count as sprintf() parameters, so they can be
+# services.conf).  The %S's do not count as sprintf() parameters, so they can be
 # rearranged, removed, or added as necessary.
 #
 # Also in help messages, please try to limit line lengths to 60 characters
@@ -517,9 +517,9 @@ NICK_SET_HIDE_QUIT_OFF
 	
 # SET MSG responses
 NICK_SET_HIDE_STATUS_ON
-	Your services access status will now be hidden from %s INFO displays.
+	Tu estado de acceso a los Servicios no sera mostrado en %s INFO.
 NICK_SET_HIDE_STATUS_OFF
-	Your services access status will now be shown in %s INFO displays.
+	Tu estado de acceso a los Servicios ahora sera mostrado en %s INFO.
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
@@ -664,7 +664,7 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	No puedes recuperarte a ti mismo!
 NICK_RECOVERED
-	El usuario clamando tu nick ha sido killeado.
+	El usuario que ocupaba tu nick ha sido killeado.
 	/msg %s RELEASE %s para recuperarlo antes del minuto de time-out.
 
 # RELEASE responses
@@ -1345,13 +1345,13 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS ERROR Error de sintaxis
 CHAN_STATUS_NOT_REGGED
-	STATUS ERROR Channel %s not registered
+	STATUS ERROR El canal %s no esta registrado
 CHAN_STATUS_FORBIDDEN
-	STATUS ERROR Channel %s forbidden
+	STATUS ERROR El canal %s esta prohibido
 CHAN_STATUS_NOTONLINE
-	STATUS ERROR Nick %s not online
+	STATUS ERROR El nick %s no esta online
 CHAN_STATUS_INFO
 	STATUS %s %s %d
 
@@ -1457,13 +1457,13 @@ CHAN_CLEARED_MODES
 CHAN_CLEARED_OPS
 	Modo +o ha sido removido del canal %s.
 CHAN_CLEARED_HOPS
-	Mode +h has been cleared from channel %s.
+	El modo +h ha sido removido del canal %s.
 CHAN_CLEARED_VOICES
 	Modo +v ha sido removido del canal %s.
 CHAN_CLEARED_USERS
 	Todos los usuarios han sido kickeados del canal %s.
 CHAN_CLEARED_INVITES
-	All invites on channel %s have been removed.
+	Todos los invites en el canal %s han sido removidos.
 
 # GETPASS responses
 CHAN_GETPASS_SYNTAX
@@ -1673,11 +1673,11 @@ MEMO_SET_NOTIFY_OFF
 
 # SET LIMIT responses
 MEMO_SET_NOTIFY_MAIL
-	You will now be informed about new memos via email.
+	Seras informado de nuevos memos via email.
 MEMO_SET_NOTIFY_NOMAIL
-	You will no longer be informed via email.
+	No seras informado de nuevos memos via email.
 MEMO_SET_NOTIFY_INVALIDMAIL
-	There's no email address set for your nick.
+	Tu nick no tiene una direccion de e-mail.
 
 # SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
@@ -1772,59 +1772,40 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 	%s es notificado cuando nuevos memos le son enviados.
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s es notificado de nuevos memos cuando se conecta.
-	
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
+
 # Standard responses
 MEMO_MAIL_SUBJECT
-	New memo
+	Nuevo memo
 MEMO_MAIL_TEXT1
-	Hi %s
+	Hola %s
 MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
+	Acabas de recibir un nuevo memo de %s. Es el memo numero %d.
 MEMO_MAIL_TEXT3
-	Memo Text:
+	Texto del Memo:
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
 # Standard responses
 MEMO_RSEND_PLEASE_WAIT
-	Please wait %d seconds before using the RSEND command again.
+	Por favor espera %d segundos antes de usar el comando RSEND nuevamente.
 MEMO_RSEND_DISABLED
-	Sorry, RSEND has been disabled on this network.
+	Lo siento, RSEND ha sido deshabilitado en esta red.
 MEMO_RSEND_SYNTAX
-	RSEND {nick | channel} memo-text
+	RSEND {nick | canal} texto-memo
 MEMO_RSEND_NICK_MEMO_TEXT
-	[auto-memo] The memo you sent has been viewed.
+	[auto-memo] El memo que enviaste ha sido leido.
 MEMO_RSEND_CHAN_MEMO_TEXT
-	[auto-memo] The memo you sent to %s has been viewed.
+	[auto-memo] El memo que enviaste a %s ha sido leido.
 MEMO_RSEND_USER_NOTIFICATION
-	A notification memo has been sent to %s informing him/her you have
-	read his/her memo.
+	Una notificacion ha sido enviada a %s informando que has leido su memo.
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
 # Standard responses
 MEMO_CHECK_SYNTAX
 	CHECK nickname
 MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
+	El ultimo memo que enviaste a %s (enviado el %s) aun no ha sido leido.
 MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
+	El ultimo memo que enviaste a %s (enviado el %s) ha sido leido.
 MEMO_CHECK_NO_MEMO
-	Nick %s doesn't have a memo from you.
+	El nick %s no ha recibido ningun memo tuyo.
 
 ###########################################################################
 #
@@ -2374,7 +2355,7 @@ OPER_UMODE_CHANGED
 OPER_OLINE_SYNTAX
 	OLINE nick opciones
 OPER_OLINE_SUCCESS
-	Una linea O: con las opciones %s ha sido agregada para %s.
+	Una O:Line con las opciones %s ha sido agregada para %s.
 
 # CLEARMODES responses
 OPER_OLINE_IRCOP
@@ -2618,7 +2599,7 @@ OPER_SZLINE_LIST_EMPTY
 	La lista de SZLINEs esta vacia.
 OPER_SZLINE_LIST_HEADER
 	Lista actual de SZLINEs:
-	  Num   Mask                              Reason
+	  Num   Mascara                            Razon
 OPER_SZLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 OPER_SZLINE_VIEW_HEADER
@@ -2698,7 +2679,8 @@ OPER_RELOAD
 
 # RESTART responses
 OPER_CANNOT_RESTART
-	SERVICES_BIN no definido; imposible partir nuevamente. Corre nuevamente el script \2configure\2  y recompila Services para incluir el comando RESTART.
+	SERVICES_BIN no definido; imposible partir nuevamente. Corre nuevamente el
+	script \2configure\2  y recompila Services para incluir el comando RESTART.
 
 # IGNORE responses
 OPER_IGNORE_SYNTAX
@@ -2960,7 +2942,7 @@ OPER_SESSION_LIST_FORMAT
 	%6d    %s
 # host, sessions, limit
 OPER_SESSION_VIEW_FORMAT
-	El host %s actualmente tiene %d sesiones con un limite de %d.
+	El host %s actualmente tiene %d sesiones con un limite de %d.
 
 # EXCEPTION help
 
@@ -5070,15 +5052,14 @@ MEMO_HELP_SENDALL
 ###########################################################################
 
 MEMO_HELP_RSEND
-	Syntax: RSEND {nick | channel} memo-text
-	
-	Sends the named nick or channel a memo containing
-	memo-text.  When sending to a nickname, the recipient will
-	receive a notice that he/she has a new memo.  The target
-	nickname/channel must be registered.
-	Once the memo is read by its recepient, an automatic notification
-	memo will be sent to the sender informing him/her that the memo
-	has been read.
+	Sintaxis: RSEND {nick | canal} texto-memo
+
+	Envia a nick o canal un memo conteniendo memo-text. 
+	Cuando se envia a un nickname, el receptor recibira una noticia 
+	informandole que tiene un nuevo memo. El nickname o canal al cual se le 
+	enviara el memo debe estar registrado.
+	Una vez que el memo ha sido leido, quien envio el memo recibira una 
+	notificacion automatica informando que el memo ha sido leido.	
 
 ###########################################################################
 #
@@ -5087,10 +5068,10 @@ MEMO_HELP_RSEND
 ###########################################################################
 
 MEMO_HELP_CHECK
-	Syntax: CHECK nick
-	
-	Checks whether the _last_ memo you sent to nick has been read
-	or not. Note that this does only work with nicks, not with chans.
+	Sintaxis: CHECK nick
+
+	Verifica que el _ultimo_ memo que enviaste a nick haya sido leido.
+	 Nota que esto solo funciona para nicknames, no para canales.
 
 ###########################################################################
 #
@@ -6333,14 +6314,14 @@ HOST_HELP_GROUP
 	mismo grupo.
 
 OPER_SVSNICK_UNSUPPORTED
-	Sorry, SVSNICK is not available on this network.
+	Lo siento, SVSNICK no esta disponible en esta red.
 
 OPER_SQLINE_UNSUPPORTED
-	Sorry, SQLINE is not available on this network.
+	Lo siento, SQLINE no esta disponible en esta red.
 
 OPER_SVSO_UNSUPPORTED
-	Sorry, OLINE is not available on this network.
+	Lo siento, OLINE no esta disponible en esta red.
 
 OPER_UMODE_UNSUPPORTED
-	Sorry, UMODE is not available on this network.
+	Lo siento, OLINE no esta disponible en esta red.
 

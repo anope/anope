@@ -1098,6 +1098,10 @@ extern char *send_token(char *token1, char *token2);
 extern char *base64enc(long i);
 extern long base64dec(char *b64);
 extern long base64dects(char *ts);
+extern int b64_encode(unsigned char const *src, size_t srclength, char *target, size_t targsize);
+extern int b64_decode(char const *src, unsigned char *target, size_t targsize);
+extern char *encode_ip(u_char *ip);
+extern int decode_ip(char *buf);
 
 #define Anope_Free(x)       if ((x) != NULL) free(x)
 

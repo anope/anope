@@ -2995,6 +2995,10 @@ static int do_set_hide(User * u, NickCore * nc, char *param)
         flag = NI_HIDE_MASK;
         onmsg = NICK_SET_HIDE_MASK_ON;
         offmsg = NICK_SET_HIDE_MASK_OFF;
+    } else if (stricmp(param, "STATUS") == 0) {
+        flag = NI_HIDE_STATUS;
+        onmsg = NICK_SET_HIDE_STATUS_ON;
+        offmsg = NICK_SET_HIDE_STATUS_OFF;
     } else if (stricmp(param, "QUIT") == 0) {
         flag = NI_HIDE_QUIT;
         onmsg = NICK_SET_HIDE_QUIT_ON;
@@ -3243,10 +3247,34 @@ static int do_info(User * u)
         notice_lang(s_NickServ, u, NICK_INFO_REALNAME, na->nick,
                     na->last_realname);
 
-        if (nick_is_services_admin(na->nc))     /* This will also include the services root(s) */
-            notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ADMIN, na->nick);
-        else if (nick_is_services_oper(na->nc))
-            notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPER, na->nick);
+        if ((nick_identified(u) && (na->nc == u->na->nc)) || is_servadmin) {
+
+            if (nick_is_services_root(na->nc))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ROOT,
+                            na->nick);
+            else if (nick_is_services_admin(na->nc))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ADMIN,
+                            na->nick);
+            else if (nick_is_services_oper(na->nc))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPER,
+                            na->nick);
+
+        } else {
+
+            if (nick_is_services_root(na->nc)
+                && !(na->nc->flags & NI_HIDE_STATUS))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ROOT,
+                            na->nick);
+            else if (nick_is_services_admin(na->nc)
+                     && !(na->nc->flags & NI_HIDE_STATUS))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_ADMIN,
+                            na->nick);
+            else if (nick_is_services_oper(na->nc)
+                     && !(na->nc->flags & NI_HIDE_STATUS))
+                notice_lang(s_NickServ, u, NICK_INFO_SERVICES_OPER,
+                            na->nick);
+
+        }
 
 
         if (nick_online) {

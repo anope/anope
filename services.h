@@ -309,6 +309,7 @@ struct nickcore_ {
 #define NI_ENCRYPTEDPW		0x00004000	/* Nickname password is encrypted */
 #define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
 #define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
+#define NI_HIDE_STATUS          0x00020000  /* Don't show services access status */
 
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change

@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="35"
+VERSION_BUILD="36"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (36)
+# BUGS  : 
+# NOTES : 1. Added "is a services root administrator" to /ns info.   2. Added option for SOs and above to hide their services 
+# access status in /ns info.
 #
 # BUILD : 1.7.0 (35)
 # BUGS  : 

@@ -519,6 +519,10 @@ NICK_SET_HIDE_QUIT_ON
 	Deine letzte Quit-Message wird jetzt in der %s INFO Anzeige nicht mehr erscheinen.
 NICK_SET_HIDE_QUIT_OFF
 	Deine letzte Quit-Message wird jetzt in der %s INFO Anzeige erscheinen.
+NICK_SET_HIDE_STATUS_ON
+	Dein Services-Zugriffsstatus wird nun in %s INFO Anzeigen versteckt.
+NICK_SET_HIDE_STATUS_OFF
+	Dein Services-Zugriffsstatus wird nicht länger in %s INFO Anzeigen versteckt.
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
@@ -560,9 +564,11 @@ NICK_INFO_SYNTAX
 NICK_INFO_REALNAME
 	%s ist %s
 NICK_INFO_SERVICES_OPER
-	%s ist ein Services-Operator.
+	%s ist ein Services Operator.
 NICK_INFO_SERVICES_ADMIN
-	%s ist ein Services-Admin.
+	%s ist ein Services Administrator.
+NICK_INFO_SERVICES_ROOT
+	%s ist ein Services Root Administrator.
 NICK_INFO_ADDRESS
 	Letzte gesehene Hostmask: %s
 NICK_INFO_ADDRESS_ONLINE
@@ -3480,13 +3486,14 @@ NICK_HELP_SET_PRIVATE
 	abrufen, unabhängig vom Privat-Modus.)
 
 NICK_HELP_SET_HIDE
-	Syntax: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Syntax: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Erlaubt es dir, bestimmte Informationen in der Ausgabe
 	von %S INFO zu verstecken.
 	Du kannst deine eMail-Adresse verstecken (EMAIL), die 
-	zuletzt gesehene user@host-Maske (USERMASK) und die
-	letzte Quit-Nachricht (QUIT).
+	zuletzt gesehene user@host-Maske (USERMASK), dein
+	Services-Zugriffsstatus (STATUS) und die letzte Quit-Nachricht
+	(QUIT).
 	Der zweite Parameter bestimmt, ob die Information angezeigt
 	werden soll (OFF) oder nicht (ON).
 	

@@ -854,6 +854,18 @@ int is_services_oper(User * u)
 
 /*************************************************************************/
 
+/* Is the given nick a Services root nick? */
+
+int nick_is_services_root(NickCore * nc)
+{
+    if (nc->flags & (NI_SERVICES_ROOT))
+        return 1;
+
+    return 0;
+}
+
+/*************************************************************************/
+
 /* Is the given nick a Services admin/root nick? */
 
 int nick_is_services_admin(NickCore * nc)

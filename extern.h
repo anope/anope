@@ -676,6 +676,7 @@ E void os_remove_nick(NickCore *nc);
 E int is_services_root(User *u);
 E int is_services_admin(User *u);
 E int is_services_oper(User *u);
+E int nick_is_services_root(NickCore * nc);
 E int nick_is_services_admin(NickCore *nc);
 E int nick_is_services_oper(NickCore *nc);
 

@@ -498,6 +498,10 @@ NICK_SET_HIDE_QUIT_ON
 	Your last quit message will now be hidden from %s INFO displays.
 NICK_SET_HIDE_QUIT_OFF
 	Your last quit message will now be shown in %s INFO displays.
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
@@ -542,6 +546,8 @@ NICK_INFO_SERVICES_OPER
 	%s is a services operator.
 NICK_INFO_SERVICES_ADMIN
 	%s is a services admin.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	Last seen address: %s
 NICK_INFO_ADDRESS_ONLINE
@@ -3326,12 +3332,13 @@ NICK_HELP_SET_PRIVATE
 	information on it using the INFO command.)
 
 NICK_HELP_SET_HIDE
-	Syntax: SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	Syntax: SET HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Allows you to prevent certain pieces of information from
 	being displayed when someone does a %S INFO on your
 	nick.  You can hide your E-mail address (EMAIL), last seen
-	user@host mask (USERMASK), and last quit message (QUIT).
+	user@host mask (USERMASK), your services access status
+	(STATUS) and  last quit message (QUIT).
 	The second parameter specifies whether the information should
 	be displayed (OFF) or hidden (ON).
 	

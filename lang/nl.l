@@ -5570,6 +5570,12 @@ OPER_HELP_SET_SQL
 	verkeer worden uitgezet als de SQL server onbereikbaar wordt
 	terwijl services nog draaien.
 
+OPER_HELP_SET_IGNORE
+	Syntax: SET IGNORE {ON | OFF}
+
+	Setting this will toggle Anope's usage of the IGNORE system 
+	on or off.
+
 OPER_HELP_SET_LIST
 	Gebruik: SET LIST
 	

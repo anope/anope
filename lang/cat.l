@@ -5649,6 +5649,12 @@ OPER_HELP_SET_SQL
 	be used to disable and enable SQL should your SQL server go down
 	while services are running.
 
+OPER_HELP_SET_IGNORE
+	Syntax: SET IGNORE {ON | OFF}
+
+	Setting this will toggle Anope's usage of the IGNORE system 
+	on or off.
+
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 

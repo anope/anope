@@ -174,6 +174,7 @@ void moduleAddOperServCmds(void) {
     c = createCommand("SET LOGCHAN",    NULL,   NULL,OPER_HELP_SET_LOGCHAN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET DEBUG",      NULL,   NULL,OPER_HELP_SET_DEBUG, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET NOEXPIRE",   NULL,   NULL,OPER_HELP_SET_NOEXPIRE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET IGNORE",     NULL,   NULL,OPER_HELP_SET_IGNORE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET SUPERADMIN", NULL,   NULL,OPER_HELP_SET_SUPERADMIN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
 #ifdef USE_MYSQL
     c = createCommand("SET SQL",        NULL,   NULL,OPER_HELP_SET_SQL, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);

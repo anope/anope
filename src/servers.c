@@ -570,7 +570,7 @@ void finish_sync(Server * serv, int sync_links)
     do {
         if (!is_sync(s)) {
             if (debug)
-                alog("Finishing sync for server %s", s->name);
+                alog("debug: Finishing sync for server %s", s->name);
 
             s->sync = SSYNC_DONE;
         }

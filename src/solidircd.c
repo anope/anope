@@ -370,7 +370,7 @@ CBMode cbmodes[128] = {
     {0},                        /* K */
     {0},                        /* L */
     {CMODE_M, 0, NULL, NULL},   /* M */
-    {0},                        /* N */
+    {CMODE_N, 0, NULL, NULL},   /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
     {0},                        /* Q */
@@ -428,6 +428,8 @@ CBModeInfo cbmodeinfos[] = {
     {'M', CMODE_M, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},
+    {'N', CMODE_N, 0, NULL, NULL},
+    {'S', CMODE_S, 0, NULL, NULL},
     {0}
 };
 

@@ -51,7 +51,8 @@ Anope MySQL Support
 
 4) Configuration
 
-    1. Run bin/mydbgen to help on the schema creation and adjustments.
+    1. Go to your "services bin directory" (eg: /home/someuser/services/) and run mydbgen 
+       to help on the schema creation and adjustments.
 
     2. Edit services.conf and add your MySQL data to the MySQL configuration
        block. 

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="655"
+VERSION_BUILD="656"
 
 # $Log$
+#
+# BUILD : 1.7.8 (656)
+# BUGS  : 331
+# NOTES : (1) Updated de.l (2) mydbgen will now be installed correctly (3) added support for cmodes +SN to solidircd
 #
 # BUILD : 1.7.8 (655)
 # BUGS  : 

@@ -80,6 +80,8 @@ Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 
 Provided by crazytoon <da.crew@gmx.net> - 2005
 02/05 A Updated German language file.                                     [ #00]
+04/04 F Installation of mydbgen.                                          [ #00]
+04/04 F SolidIRCd code did not recognize channelmodes +S and +N.          [#331]
 
 Provided by BarkerJr <barkerjr@barkerjr.net> - 2005
 02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks.   [ #00]

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="118"
+VERSION_BUILD="119"
 
 # $Log$
+#
+# BUILD : 1.7.3 (119)
+# BUGS  : 54
+# NOTES : Allow /CS SUSPEND on registered non-forbidden channels only
 #
 # BUILD : 1.7.3 (118)
 # BUGS  : 56

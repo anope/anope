@@ -6093,7 +6093,7 @@ static int do_forbid(User * u)
     return MOD_CONT;
 }
 
-/*************************************************************************/
+    /*************************************************************************/
 
 static int do_suspend(User * u)
 {
@@ -6110,10 +6110,22 @@ static int do_suspend(User * u)
                       CHAN_SUSPEND_SYNTAX));
         return MOD_CONT;
     }
+
+    /* Only SUSPEND existing channels, otherwise use FORBID (bug #54) */
+    if ((ci = cs_findchan(chan)) == NULL) {
+        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+        return MOD_CONT;
+    }
+
+    /* You should not SUSPEND a FORBIDEN channel */
+    if (ci->flags & CI_VERBOTEN) {
+        notice_lang(s_ChanServ, u, CHAN_MAY_NOT_BE_REGISTERED, chan);
+        return MOD_CONT;
+    }
+
     if (readonly)
         notice_lang(s_ChanServ, u, READ_ONLY_MODE);
-    if ((ci = cs_findchan(chan)) == NULL)
-        ci = makechan(chan);
+
     if (ci) {
         ci->flags |= CI_SUSPENDED;
         ci->forbidby = sstrdup(u->nick);

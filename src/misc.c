@@ -157,6 +157,10 @@ static int do_match_wild(const char *pattern, const char *str, int docase)
     char c;
     const char *s;
 
+    if (!str || !*str) { 
+	return 0;
+     }
+
     /* This WILL eventually terminate: either by *pattern == 0, or by a
      * trailing '*'. */
 
@@ -223,6 +227,10 @@ int process_numlist(const char *numstr, int *count_ret,
     int res = 0, retval = 0, count = 0;
     va_list args;
 
+    if (!numstr || !*numstr) {
+	return -1;
+    }
+
     va_start(args, u);
 
     /*
@@ -283,6 +291,10 @@ int process_numlist(const char *numstr, int *count_ret,
 int dotime(const char *s)
 {
     int amount;
+
+    if (!s || !*s) {
+	return -1;
+    }
 
     amount = strtol(s, (char **) &s, 10);
     if (*s) {
@@ -630,9 +642,15 @@ char *myStrSubString(const char *src, int start, int end)
 
 void doCleanBuffer(char *str)
 {
-    char *in = str;
-    char *out = str;
+    char *in, *out;
     char ch;
+
+    if (!str) {
+	return;
+    }
+
+    in = str;
+    out = str;
 
     while (issp(ch = *in++));
     if (ch != '\0')
@@ -666,6 +684,10 @@ void EnforceQlinedNick(char *nick, char *killer)
 int nickIsServices(char *nick, int bot)
 {
     int found = 0;
+
+    if (!nick) {
+	return found;
+    }
 
     if (s_NickServ && (stricmp(nick, s_NickServ) == 0))
         found++;

@@ -458,6 +458,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("401",       NULL); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("451",       anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);
@@ -682,10 +683,6 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("AM",       anope_event_null); addCoreMessage(IRCD,m);
     }
-
-
-
-
 
     /* The none token version of these is in messages.c */
     if (UseTokens) {

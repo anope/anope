@@ -72,6 +72,10 @@ int m_time(char *source, int ac, char **av)
     struct tm *tm;
     char buf[64];
 
+    if (!source) {
+        return MOD_CONT;
+    }
+
     time(&t);
     tm = localtime(&t);
     strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
@@ -85,6 +89,10 @@ int m_motd(char *source)
 {
     FILE *f;
     char buf[BUFSIZE];
+
+    if (!source) {
+        return MOD_CONT;
+    }
 
     f = fopen(MOTDFilename, "r");
     anope_cmd_375(source);

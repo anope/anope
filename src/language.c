@@ -214,6 +214,10 @@ int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
     char *s;
     int i, ret;
 
+    if (!tm) {
+        return 0;
+    }
+
     strscpy(tmpbuf, langtexts[language][format], sizeof(tmpbuf));
     if ((s = langtexts[language][STRFTIME_DAYS_SHORT]) != NULL) {
         for (i = 0; i < tm->tm_wday; i++)
@@ -260,7 +264,13 @@ int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 
 void syntax_error(char *service, User * u, char *command, int msgnum)
 {
-    const char *str = getstring(u->na, msgnum);
+    const char *str;
+
+    if (!u) {
+        return;
+    }
+
+    str = getstring(u->na, msgnum);
     notice_lang(service, u, SYNTAX_ERROR, str);
     notice_lang(service, u, MORE_INFO, service, command);
 }

@@ -1252,7 +1252,7 @@ NickRequest *findrequestnick(const char *nick)
 {
     NickRequest *nr;
 
-    if (!nick || !*nick) {
+    if (!*nick || !nick) {
         if (debug) {
             alog("Error: findrequestnick() called with NULL values");
         }
@@ -1363,8 +1363,18 @@ int is_on_access(User * u, NickCore * nc)
 void alpha_insert_alias(NickAlias * na)
 {
     NickAlias *ptr, *prev;
-    char *nick = na->nick;
-    int index = HASH(nick);
+    char *nick;
+    int index;
+
+    if (!na) {
+        if (debug) {
+            alog("debug: alpha_insert_alias called with NULL values");
+        }
+        return;
+    }
+
+    nick = na->nick;
+    index = HASH(nick);
 
     for (prev = NULL, ptr = nalists[index];
          ptr && stricmp(ptr->nick, nick) < 0; prev = ptr, ptr = ptr->next);
@@ -1384,7 +1394,16 @@ void alpha_insert_alias(NickAlias * na)
 
 void insert_core(NickCore * nc)
 {
-    int index = HASH(nc->display);
+    int index;
+
+    if (!nc) {
+        if (debug) {
+            alog("debug: insert_core called with NULL values");
+        }
+        return;
+    }
+
+    index = HASH(nc->display);
 
     nc->prev = NULL;
     nc->next = nclists[index];
@@ -1396,6 +1415,13 @@ void insert_core(NickCore * nc)
 /*************************************************************************/
 void insert_requestnick(NickRequest * nr)
 {
+    if (!nr) {
+        if (debug) {
+            alog("debug: insert_requestnick called with NULL values");
+        }
+        return;
+    }
+
     int index = HASH(nr->nick);
 
     nr->prev = NULL;
@@ -3667,21 +3693,24 @@ static int do_glist(User * u)
         time_t expt;
         struct tm *tm;
         char buf[BUFSIZE];
+        int wont_expire;
+
         notice_lang(s_NickServ, u,
                     nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER,
                     na->nc->display);
         for (i = 0; i < na->nc->aliases.count; i++) {
             na2 = na->nc->aliases.list[i];
             if (na2->nc == na->nc) {
-                expt = na2->last_seen + NSExpire;
-                tm = localtime(&expt);
-                strftime_lang(buf, sizeof(buf), na2->u,
-                              STRFTIME_DATE_TIME_FORMAT, tm);
+                if (!(wont_expire = na2->status & NS_NO_EXPIRE)) {
+                    expt = na2->last_seen + NSExpire;
+                    tm = localtime(&expt);
+                    strftime_lang(buf, sizeof(buf), na2->u,
+                                  STRFTIME_DATE_TIME_FORMAT, tm);
+                }
                 notice_lang(s_NickServ, u,
-                            (is_services_admin(u) ? NICK_GLIST_REPLY_ADMIN
-                             : NICK_GLIST_REPLY),
-                            ((na2->status & NS_NO_EXPIRE) ? '!' : ' '),
-                            na2->nick, buf);
+                            ((is_services_admin(u) && !wont_expire)
+                             ? NICK_GLIST_REPLY_ADMIN : NICK_GLIST_REPLY),
+                            (wont_expire ? '!' : ' '), na2->nick, buf);
             }
         }
         notice_lang(s_NickServ, u, NICK_GLIST_FOOTER,

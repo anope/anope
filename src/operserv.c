@@ -826,9 +826,10 @@ int is_services_oper(User * u)
 
 int nick_is_services_root(NickCore * nc)
 {
-    if (nc->flags & (NI_SERVICES_ROOT))
-        return 1;
-
+    if (nc) {
+        if (nc->flags & (NI_SERVICES_ROOT))
+            return 1;
+    }
     return 0;
 }
 
@@ -838,9 +839,10 @@ int nick_is_services_root(NickCore * nc)
 
 int nick_is_services_admin(NickCore * nc)
 {
-    if (nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT))
-        return 1;
-
+    if (nc) {
+        if (nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT))
+            return 1;
+    }
     return 0;
 }
 
@@ -850,10 +852,12 @@ int nick_is_services_admin(NickCore * nc)
 
 int nick_is_services_oper(NickCore * nc)
 {
-    if (nc->
-        flags & (NI_SERVICES_OPER | NI_SERVICES_ADMIN | NI_SERVICES_ROOT))
-        return 1;
-
+    if (nc) {
+        if (nc->
+            flags & (NI_SERVICES_OPER | NI_SERVICES_ADMIN |
+                     NI_SERVICES_ROOT))
+            return 1;
+    }
     return 0;
 }
 
@@ -1364,7 +1368,13 @@ static int do_ignoreuser(User * u)
 void delete_ignore(const char *nick)
 {
     IgnoreData *ign, *prev;
-    IgnoreData **whichlist = &ignore[tolower(nick[0])];
+    IgnoreData **whichlist;
+
+    if (!nick || !*nick) {
+        return;
+    }
+
+    whichlist = &ignore[tolower(nick[0])];
 
     for (ign = *whichlist, prev = NULL; ign; prev = ign, ign = ign->next) {
         if (stricmp(ign->who, nick) == 0)
@@ -1886,6 +1896,10 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     int deleted = 0, i;
     char *user, *mask2, *host;
     Akill *entry;
+
+    if (!mask) {
+        return -1;
+    }
 
     /* Checks whether there is an AKILL that already covers
      * the one we want to add, and whether there are AKILLs
@@ -2412,6 +2426,10 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
      * the useless SGLINEs in the second.
      */
 
+    if (!mask) {
+        return -1;
+    }
+
     if (sglines.count > 0) {
 
         for (i = sglines.count - 1; i >= 0; i--) {
@@ -2860,6 +2878,10 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
      * If so, warn the user in the first case and cleanup
      * the useless SQLINEs in the second.
      */
+
+    if (!mask) {
+        return -1;
+    }
 
     if (sqlines.count > 0) {
 
@@ -3343,6 +3365,10 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
 {
     int deleted = 0, i;
     SXLine *entry;
+
+    if (!mask) {
+        return -1;
+    }
 
     /* Checks whether there is an SZLINE that already covers
      * the one we want to add, and whether there are SZLINEs

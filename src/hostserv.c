@@ -173,6 +173,10 @@ HostCore *findHostCore(HostCore * head, char *nick, boolean * found)
     current = head;
     previous = current;
 
+    if (!nick) {
+        return NULL;
+    }
+
     while (current != NULL) {
         if (stricmp(nick, current->nick) == 0) {
             *found = true;
@@ -199,6 +203,10 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 {
 
     HostCore *newCore, *tmp;
+
+    if (!nick || !vHost || !creator) {
+        return NULL;
+    }
 
     newCore = malloc(sizeof(HostCore));
     if (newCore == NULL) {

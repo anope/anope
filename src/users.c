@@ -765,7 +765,11 @@ int is_protected(User * user)
 
 int is_oper(User * user)
 {
-    return (user->mode & UMODE_o);
+    if (user) {
+        return (user->mode & UMODE_o);
+    } else {
+        return 0;
+    }
 }
 
 /*************************************************************************/

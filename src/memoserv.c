@@ -115,6 +115,13 @@ void check_memos(User * u)
     NickCore *nc;
     int i, newcnt = 0;
 
+    if (!u) {
+        if (debug) {
+            alog("debug: check_memos called with NULL values");
+        }
+        return;
+    }
+
     if (!(nc = (u->na ? u->na->nc : NULL)) || !nick_recognized(u) ||
         !(nc->flags & NI_MEMO_SIGNON))
         return;

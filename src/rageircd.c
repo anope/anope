@@ -470,6 +470,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("482",       anope_event_482); addCoreMessage(IRCD,m);
+    m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
     m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);

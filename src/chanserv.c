@@ -1248,6 +1248,13 @@ void check_modes(Channel * c)
     CBModeInfo *cbmi;
     CBMode *cbm;
 
+    if (!c) {
+        if (debug) {
+            alog("debug: check_modes called with NULL values");
+        }
+        return;
+    }
+
     if (c->bouncy_modes)
         return;
 
@@ -1369,7 +1376,7 @@ void check_modes(Channel * c)
 
 int check_valid_admin(User * user, Channel * chan, int servermode)
 {
-    if (!chan->ci)
+    if (!chan || !chan->ci)
         return 1;
 
     if (!ircd->admin) {
@@ -1404,7 +1411,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
 int check_valid_op(User * user, Channel * chan, int servermode)
 {
-    if (!chan->ci)
+    if (!chan || !chan->ci)
         return 1;
 
     /* They will be kicked; no need to deop, no need to update our internal struct too */
@@ -1774,6 +1781,13 @@ int check_topiclock(Channel * c, time_t topic_time)
 {
     ChannelInfo *ci;
 
+    if (!c) {
+        if (debug) {
+            alog("debug: check_topiclock called with NULL values");
+        }
+        return 0;
+    }
+
     if (!(ci = c->ci) || !(ci->flags & CI_TOPICLOCK))
         return 0;
 
@@ -2005,7 +2019,16 @@ int check_access(User * user, ChannelInfo * ci, int what)
 void alpha_insert_chan(ChannelInfo * ci)
 {
     ChannelInfo *ptr, *prev;
-    char *chan = ci->name;
+    char *chan;
+
+    if (!ci) {
+        if (debug) {
+            alog("debug: alpha_insert_chan called with NULL values");
+        }
+        return;
+    }
+
+    chan = ci->name;
 
     for (prev = NULL, ptr = chanlists[tolower(chan[1])];
          ptr != NULL && stricmp(ptr->name, chan) < 0;
@@ -2050,7 +2073,16 @@ static ChannelInfo *makechan(const char *chan)
 int delchan(ChannelInfo * ci)
 {
     int i;
-    NickCore *nc = ci->founder;
+    NickCore *nc;
+
+    if (!ci) {
+        if (debug) {
+            alog("debug: delchan called with NULL values");
+        }
+        return 0;
+    }
+
+    nc = ci->founder;
 
     if (debug >= 2) {
         alog("debug: delchan removing %s", ci->name);
@@ -2182,6 +2214,13 @@ void reset_levels(ChannelInfo * ci)
 {
     int i;
 
+    if (!ci) {
+        if (debug) {
+            alog("debug: reset_levels called with NULL values");
+        }
+        return;
+    }
+
     if (ci->levels)
         free(ci->levels);
     ci->levels = scalloc(CA_SIZE * sizeof(*ci->levels), 1);
@@ -2195,6 +2234,10 @@ void reset_levels(ChannelInfo * ci)
 
 int is_founder(User * user, ChannelInfo * ci)
 {
+    if (!user || !ci) {
+        return 0;
+    }
+
     if (user->isSuperAdmin) {
         return 1;
     }
@@ -2249,6 +2292,10 @@ ChanAccess *get_access_entry(NickCore * nc, ChannelInfo * ci)
     ChanAccess *access;
     int i;
 
+    if (!ci || !nc) {
+        return NULL;
+    }
+
     for (access = ci->access, i = 0; i < ci->accesscount; access++, i++)
         if (access->in_use && access->nc == nc)
             return access;
@@ -2266,7 +2313,7 @@ int get_access(User * user, ChannelInfo * ci)
 {
     ChanAccess *access;
 
-    if (!ci)
+    if (!ci || !user)
         return 0;
 
     if (is_founder(user, ci))
@@ -2289,7 +2336,7 @@ void update_cs_lastseen(User * user, ChannelInfo * ci)
 {
     ChanAccess *access;
 
-    if (!ci || !user->na)
+    if (!ci || !user || !user->na)
         return;
 
     if (is_founder(user, ci) || nick_identified(user)
@@ -2365,14 +2412,22 @@ static void make_unidentified(User * u, ChannelInfo * ci)
 
 char *cs_get_flood(ChannelInfo * ci)
 {
-    return ci->mlock_flood;
+    if (!ci) {
+        return NULL;
+    } else {
+        return ci->mlock_flood;
+    }
 }
 
 /*************************************************************************/
 
 char *cs_get_key(ChannelInfo * ci)
 {
-    return ci->mlock_key;
+    if (!ci) {
+        return NULL;
+    } else {
+        return ci->mlock_key;
+    }
 }
 
 /*************************************************************************/
@@ -2380,6 +2435,10 @@ char *cs_get_key(ChannelInfo * ci)
 char *cs_get_limit(ChannelInfo * ci)
 {
     static char limit[16];
+
+    if (!ci) {
+        return NULL;
+    }
 
     if (ci->mlock_limit == 0)
         return NULL;
@@ -2392,13 +2451,21 @@ char *cs_get_limit(ChannelInfo * ci)
 
 char *cs_get_redirect(ChannelInfo * ci)
 {
-    return ci->mlock_redirect;
+    if (!ci) {
+        return NULL;
+    } else {
+        return ci->mlock_redirect;
+    }
 }
 
 /*************************************************************************/
 
 void cs_set_flood(ChannelInfo * ci, char *value)
 {
+    if (!ci) {
+        return;
+    }
+
     if (ci->mlock_flood)
         free(ci->mlock_flood);
 
@@ -2415,6 +2482,10 @@ void cs_set_flood(ChannelInfo * ci, char *value)
 
 void cs_set_key(ChannelInfo * ci, char *value)
 {
+    if (!ci) {
+        return;
+    }
+
     if (ci->mlock_key)
         free(ci->mlock_key);
 
@@ -2431,6 +2502,10 @@ void cs_set_key(ChannelInfo * ci, char *value)
 
 void cs_set_limit(ChannelInfo * ci, char *value)
 {
+    if (!ci) {
+        return;
+    }
+
     ci->mlock_limit = value ? strtoul(value, NULL, 10) : 0;
 
     if (ci->mlock_limit <= 0)
@@ -2441,6 +2516,10 @@ void cs_set_limit(ChannelInfo * ci, char *value)
 
 void cs_set_redirect(ChannelInfo * ci, char *value)
 {
+    if (!ci) {
+        return;
+    }
+
     if (ci->mlock_redirect)
         free(ci->mlock_redirect);
 
@@ -2457,6 +2536,10 @@ int get_access_level(ChannelInfo * ci, NickAlias * na)
 {
     ChanAccess *access;
     int num;
+
+    if (!ci || !na) {
+        return 0;
+    }
 
     if (na->nc == ci->founder) {
         return ACCESS_FOUNDER;
@@ -4118,6 +4201,10 @@ AutoKick *is_stuck(ChannelInfo * ci, char *mask)
     int i;
     AutoKick *akick;
 
+    if (!ci) {
+        return NULL;
+    }
+
     for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
         if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)
             || !(akick->flags & AK_STUCK))
@@ -4141,6 +4228,10 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 {
     int i;
     char *av[2];
+
+    if (!ci) {
+        return;
+    }
 
     for (i = 0; i < ci->c->bancount; i++) {
         /* If akick is already covered by a wider ban.
@@ -4172,6 +4263,10 @@ void stick_all(ChannelInfo * ci)
     int i;
     char *av[2];
     AutoKick *akick;
+
+    if (!ci) {
+        return;
+    }
 
     for (akick = ci->akick, i = 0; i < ci->akickcount; akick++, i++) {
         if (!(akick->flags & AK_USED) || (akick->flags & AK_ISNICK)

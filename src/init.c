@@ -591,31 +591,38 @@ int init(int ac, char **av)
         if (!skeleton) {
             load_ns_dbase();
             if (debug)
-                alog("debug: Loaded %s database (1/8)", s_NickServ);
+                alog("debug: Loaded %s database (1/%d)", s_NickServ,
+                     (PreNickDBName ? 8 : 7));
             if (s_HostServ) {
                 load_hs_dbase();
                 if (debug)
-                    alog("debug: Loaded %s database (2/8)", s_HostServ);
+                    alog("debug: Loaded %s database (2/%d)", s_HostServ,
+                         (PreNickDBName ? 8 : 7));
             }
             if (s_BotServ) {
                 load_bs_dbase();
                 if (debug)
-                    alog("debug: Loaded %s database (3/8)", s_BotServ);
+                    alog("debug: Loaded %s database (3/%d)", s_BotServ,
+                         (PreNickDBName ? 8 : 7));
             } else if (debug)
-                alog("debug: BotServ database (3/8) not loaded because BotServ is disabled");
+                alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
             load_cs_dbase();
             if (debug)
-                alog("debug: Loaded %s database (4/8)", s_ChanServ);
+                alog("debug: Loaded %s database (4/%d)", s_ChanServ,
+                     (PreNickDBName ? 8 : 7));
         }
         load_os_dbase();
         if (debug)
-            alog("debug: Loaded %s database (5/8)", s_OperServ);
+            alog("debug: Loaded %s database (5/%d)", s_OperServ,
+                 (PreNickDBName ? 8 : 7));
         load_news();
         if (debug)
-            alog("debug: Loaded news database (6/8)");
+            alog("debug: Loaded news database (6/%d)",
+                 (PreNickDBName ? 8 : 7));
         load_exceptions();
         if (debug)
-            alog("debug: Loaded exception database (7/8)");
+            alog("debug: Loaded exception database (7/%d)",
+                 (PreNickDBName ? 8 : 7));
         if (PreNickDBName) {
             load_ns_req_db();
             if (debug)

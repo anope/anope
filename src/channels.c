@@ -955,6 +955,14 @@ void do_topic(const char *source, int ac, char **av)
 
 void add_ban(Channel * chan, char *mask)
 {
+    /* check for NULL values otherwise we will segfault */
+    if (!chan || !mask) {
+        if (debug) {
+            alog("debug: add_ban called with NULL values");
+        }
+        return;
+    }
+
     if (s_BotServ && BSSmartJoin && chan->ci && chan->ci->bi
         && chan->usercount >= BSMinUsers) {
         char botmask[BUFSIZE];

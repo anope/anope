@@ -739,6 +739,13 @@ BotInfo *makebot(char *nick)
 {
     BotInfo *bi;
 
+    if (!nick) {
+        if (debug) {
+            alog("debug: makebot called with NULL values");
+        }
+        return NULL;
+    }
+
     bi = scalloc(sizeof(BotInfo), 1);
     bi->nick = sstrdup(nick);
     bi->lastmsg = time(NULL);

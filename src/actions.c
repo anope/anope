@@ -175,8 +175,15 @@ void common_svsmode(User * u, char *modes, char *arg)
 
 char *common_get_vhost(User * u)
 {
-    if (u->mode & ircd->vhostmode) {
-        return u->vhost;
+    if (!u) {
+        return NULL;
+    }
+    if (ircd->vhostmode) {
+        if (u->mode & ircd->vhostmode) {
+            return u->vhost;
+        } else {
+            return u->host;
+        }
     } else {
         return u->host;
     }
@@ -186,9 +193,16 @@ char *common_get_vhost(User * u)
 
 char *common_get_vident(User * u)
 {
-    if (u->mode & ircd->vhostmode) {
-        if (u->vident) {
-            return u->vident;
+    if (!u) {
+        return NULL;
+    }
+    if (ircd->vhostmode) {
+        if (u->mode & ircd->vhostmode) {
+            if (u->vident) {
+                return u->vident;
+            } else {
+                return u->username;
+            }
         } else {
             return u->username;
         }

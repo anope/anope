@@ -546,6 +546,10 @@ Command *createCommand(const char *name, int (*func) (User * u),
                        int help_reg, int help_oper, int help_admin,
                        int help_root)
 {
+    if (!name || !*name) {
+      return NULL;
+    }
+
     Command *c;
     if ((c = malloc(sizeof(Command))) == NULL) {
         fatal("Out of memory!");

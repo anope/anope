@@ -7,7 +7,6 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 08/10 F Fixed previous BotServ buffer fix.                                [#131]
 08/10 F Updated documentation to reflect the changed build process.       [ #00]
 07/23 F Fixed BotServ buffer                                              [#131]
-07/23 F Fixed BotServ buffer                                              [#131]
 07/22 F Free NSNickTracking when a user quits.                            [#126]
 07/22 F NOOP bug with wildcards.                                          [#115]
 07/22 F Removed RESTRICTED from incorrectly labeled lang file entry.      [#111]

@@ -180,8 +180,9 @@ typedef struct channel_ Channel;
 # define BOTSERV_BOTS_MODE "+qS"
 #endif
 
-#if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
+#if defined(IRC_BAHAMUT)
 # define HAS_NICKIP
+ #ifdef !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
 # define HAS_EXCEPT
 # define HAS_SVSHOLD                                                            
 # define NICKSERV_MODE "+o"
@@ -201,6 +202,7 @@ typedef struct channel_ Channel;
 # define DEVNULL_ALIAS_MODE "+i"
 # define GLOBAL_ALIAS_MODE "+io"
 # define BOTSERV_BOTS_MODE "+"
+ #endif
 #endif
 
 #ifdef IRC_RAGE2

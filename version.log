@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="519"
+VERSION_BUILD="520"
 
 # $Log$
+#
+# BUILD : 1.7.6 (520)
+# BUGS  : 265
+# NOTES : Fixed a few issues with chanserv, botserv, symbiosis, and topics
 #
 # BUILD : 1.7.6 (519)
 # BUGS  : N/A

@@ -76,6 +76,10 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
+Provided by DrStein <gacevedo@anope.org> - 2005
+01/03 F Duplicated TOPIC sent, when TOPICLOCK is ON.                      [#265]
+01/03 F If SYMBIOSIS ON, BotServ's bot should be the topic setter.        [#265]
+
 Provided by DrStein <gacevedo@anope.org> - 2004
 12/23 A NS STATUS will return your status if no nickname is given.        [ #00]
 12/26 F Error message during SQL init even if UseRDB was disabled.        [ #00]

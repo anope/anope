@@ -1751,13 +1751,13 @@ void restore_topic(char *chan)
         return;
     if (c->topic)
         free(c->topic);
-    if (ci->last_topic) {
+    if ((ci->last_topic) && !(ci->flags & CI_TOPICLOCK)) {
         c->topic = sstrdup(ci->last_topic);
         strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
         c->topic_time = ci->last_topic_time;
     } else {
         c->topic = NULL;
-        strscpy(c->topic_setter, s_ChanServ, NICKMAX);
+        strscpy(c->topic_setter, whosends(ci), NICKMAX);
     }
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
@@ -1795,12 +1795,16 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (c->topic)
         free(c->topic);
-    if (ci->last_topic)
+    if (ci->last_topic) {
         c->topic = sstrdup(ci->last_topic);
-    else
+        strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
+    } else {
         c->topic = NULL;
+        /* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
+        /* Altough whosends() also checks for BSMinUsers -GD */
+        strscpy(c->topic_setter, whosends(ci), NICKMAX);
+    }
 
-    strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
     if (ircd->topictsforward) {
         /* Because older timestamps are rejected */
         /* Some how the topic_time from do_topic is 0 set it to current + 1 */
@@ -1810,7 +1814,11 @@ int check_topiclock(Channel * c, time_t topic_time)
             c->topic_time = topic_time + 1;
         }
     } else {
-        c->topic_time = ci->last_topic_time;
+        /* If no last topic, we can't use last topic time! - doc */
+        if (ci->last_topic)
+            c->topic_time = ci->last_topic_time;
+        else
+            c->topic_time = time(NULL) + 1;
     }
 
     if (ircd->join2set) {

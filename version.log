@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="260"
+VERSION_BUILD="261"
 
 # $Log$
+#
+# BUILD : 1.7.4 (261)
+# BUGS  : 
+# NOTES : fixed a tiny memleak in the db routine
 #
 # BUILD : 1.7.4 (260)
 # BUGS  : 

@@ -187,6 +187,9 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #else
             ;
 #endif
+        /* Then the Lord said unto Moses, thou shalt free what thou hast malloced
+         * -- codemastr */
+        free(f);
         errno = errno_save;
         return NULL;
     }

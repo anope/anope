@@ -1230,25 +1230,22 @@ void chan_set_correct_modes(User * user, Channel * c)
          * which sends the mode to the uplink and returns true. If the
          * mode is sent, we internally update to finish it off. -GD
          */
-        if (ircd->owner && !(status & CUS_OWNER)) {
-            if (check_should_owner(user, chan))
-                chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
-        } else if (ircd->protect && !(status & CUS_PROTECT)) {
-            if (check_should_protect(user, chan))
-                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        } else if (ircd->admin && !(status & CUS_PROTECT)) {
-            if (check_should_protect(user, chan))
-                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        } else if (!(status & CUS_OP)) {
-            if (check_should_op(user, chan))
-                chan_set_user_status(c, user, CUS_OP);
-        } else if (ircd->halfop && !(status & CUS_HALFOP)) {
-            if (check_should_halfop(user, chan))
-                chan_set_user_status(c, user, CUS_HALFOP);
-        } else if (!(status & CUS_VOICE)) {
-            if (check_should_voice(user, chan))
-                chan_set_user_status(c, user, CUS_VOICE);
-        }
+        if (ircd->owner && !(status & CUS_OWNER)
+            && check_should_owner(user, chan))
+            chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
+        else if (ircd->protect && !(status & CUS_PROTECT)
+                 && check_should_protect(user, chan))
+            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+        else if (ircd->admin && !(status & CUS_PROTECT)
+                 && check_should_protect(user, chan))
+            chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
+        else if (!(status & CUS_OP) && check_should_op(user, chan))
+            chan_set_user_status(c, user, CUS_OP);
+        else if (ircd->halfop && !(status & CUS_HALFOP)
+                 && check_should_halfop(user, chan))
+            chan_set_user_status(c, user, CUS_HALFOP);
+        else if (!(status & CUS_VOICE) && check_should_voice(user, chan))
+            chan_set_user_status(c, user, CUS_VOICE);
     }
 }
 

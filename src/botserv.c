@@ -1227,6 +1227,13 @@ static int do_bot(User * u)
                     return MOD_CONT;
                 }
             }
+
+            /* check for hardcored ircd forbidden nicks */
+            if (!anope_valid_nick(nick)) {
+                notice_lang(s_BotServ, u, BOT_BAD_NICK);
+                return MOD_CONT;
+            }
+
             if (!isValidHost(host, 3)) {
                 notice_lang(s_BotServ, u, BOT_BAD_HOST);
                 return MOD_CONT;
@@ -1331,6 +1338,13 @@ static int do_bot(User * u)
                     return MOD_CONT;
                 }
             }
+
+            /* check for hardcored ircd forbidden nicks */
+            if (!anope_valid_nick(nick)) {
+                notice_lang(s_BotServ, u, BOT_BAD_NICK);
+                return MOD_CONT;
+            }
+
             if (!isValidHost(host, 3)) {
                 notice_lang(s_BotServ, u, BOT_BAD_HOST);
                 return MOD_CONT;

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="424"
+VERSION_BUILD="426"
 
 # $Log$
+#
+# BUILD : 1.7.5 (426)
+# BUGS  : 133, 196, 200
+# NOTES : Add method to deal with hardcored sqline in the ircd (133), fixes timestamp errors with TOPIC (196), modes 
+# structs externed so mod coders can get to them easier (N/A), MS CHECK now checks the right value (200)
 #
 # BUILD : 1.7.5 (424)
 # BUGS  : N/A

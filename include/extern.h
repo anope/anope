@@ -27,6 +27,12 @@ E IRCDCAPAB ircdcap[];
 E const char flood_mode_char_set[];
 E const char flood_mode_char_remove[];
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
+extern unsigned long umodes[128];
+extern char csmodes[128];
+extern CMMode cmmodes[128];
+extern CBMode cbmodes[128];
+extern CBModeInfo cbmodeinfos[];
+extern CUMode cumodes[128];
 
 /**** actions.c ****/
 
@@ -1093,6 +1099,8 @@ extern void anope_cmd_jupe(char *jserver, char *who, char *reason);
 
 extern void anope_cmd_global_legacy(char *source, char *fmt);
 extern void wallops(char *source, const char *fmt, ...);
+
+extern int anope_valid_nick(char *nick);
 
 extern char *common_get_vident(User *u);
 extern char *common_get_vhost(User *u);

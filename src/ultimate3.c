@@ -1772,4 +1772,14 @@ void anope_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
+/* 
+  1 = valid nick
+  0 = nick is in valid
+*/
+int anope_valid_nick(char *nick)
+{
+    /* no hard coded invalid nicks */
+    return 1;
+}
+
 #endif

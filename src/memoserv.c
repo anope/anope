@@ -1393,7 +1393,7 @@ static int do_memocheck(User * u)
     have to loop backwards */
 
     for (i = (mi->memocount - 1); i >= 0; i--) {
-        if (!stricmp(mi->memos[i].sender, u->nick)) {
+        if (!stricmp(mi->memos[i].sender, u->na->nc->display)) {
             found = 1;          /* Yes, we've found the memo */
 
             tm = localtime(&mi->memos[i].time);

@@ -1561,4 +1561,19 @@ void anope_cmd_global_legacy(char *source, char *fmt)
              send_token("GLOBOPS", "]"), fmt);
 }
 
+/* 
+  1 = valid nick
+  0 = nick is in valid
+*/
+int anope_valid_nick(char *nick)
+{
+    if (!stricmp("ircd", nick)) {
+        return 0;
+    }
+    if (!stricmp("irc", nick)) {
+        return 0;
+    }
+    return 1;
+}
+
 #endif

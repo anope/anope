@@ -929,9 +929,12 @@ void do_topic(const char *source, int ac, char **av)
     time_t topic_time;
 
     if (ircd->sjb64) {
-        ts = base64dects(av[0]);
+        ts = base64dects(av[2]);
+        if (debug) {
+            alog("debug: encoded TOPIC TS %s converted to %d", av[2], ts);
+        }
     } else {
-        ts = strtoul(av[0], NULL, 10);
+        ts = strtoul(av[2], NULL, 10);
     }
 
     topic_time = ts;

@@ -1801,7 +1801,12 @@ int check_topiclock(Channel * c, time_t topic_time)
     strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
     if (ircd->topictsforward) {
         /* Because older timestamps are rejected */
-        c->topic_time = topic_time + 1;
+        /* Some how the topic_time from do_topic is 0 set it to current + 1 */
+        if (!topic_time) {
+            c->topic_time = time(NULL) + 1;
+        } else {
+            c->topic_time = topic_time + 1;
+        }
     } else {
         c->topic_time = ci->last_topic_time;
     }

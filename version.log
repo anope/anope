@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="27"
+VERSION_BUILD="28"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (28)
+# BUGS  : http://bugs.anope.org/show_bug.cgi?id=7
+# NOTES : Dont display "Commands available to services admins only:" for /hs help, as there are no services admin only commands
+# 
 #
 # BUILD : 1.7.0 (27)
 # BUGS  : none

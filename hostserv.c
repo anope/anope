@@ -824,8 +824,9 @@ static int do_help(User * u)
         notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
         if ((is_services_oper(u)) || (is_host_setter(u)))
             notice_help(s_HostServ, u, HOST_OPER_HELP);
-        if (is_services_admin(u))
-            notice_help(s_HostServ, u, HOST_ADMIN_HELP);
+        /* Removed as atm, there is no admin only help */
+/*        if (is_services_admin(u))
+            notice_help(s_HostServ, u, HOST_ADMIN_HELP);*/
         moduleDisplayHelp(6, u);
     } else {
         mod_help_cmd(s_HostServ, u, HOSTSERV, cmd);

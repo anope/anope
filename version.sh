@@ -62,7 +62,7 @@ const char version_protocol[] =
 # define VER_IRCD "RageIRCd 2.0.* -"
 #elif defined(IRC_BAHAMUT)
 	"Bahamut 1.4.27+"
-# define VER_IRCD "BahamutIRCd 1.4.* -"
+# define VER_IRCD "BahamutIRCd 1.4.*/1.8.* -"
 #elif defined(IRC_ULTIMATE)
 	"UltimateIRCd 2.8.2+"
 # define VER_IRCD "UltimateIRCd 2.8.* -"

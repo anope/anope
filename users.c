@@ -256,6 +256,14 @@ void set_umode(User * user, int ac, char **av)
         case '-':
             add = 0;
             break;
+#if defined(IRC_BAHAMUT)
+        case 'a':
+            if (add && !is_services_admin(user)) {
+                send_cmd(ServerName, "SVSMODE %s -a", user->nick);
+                user->mode &= ~UMODE_a;
+            }
+            break;
+#endif
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         case 'a':
             if (add && !is_services_oper(user)) {
@@ -362,7 +370,7 @@ void set_umode(User * user, int ac, char **av)
 
 /* Remove and free a User structure. */
 
-static void delete_user(User * user)
+void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
@@ -372,11 +380,11 @@ static void delete_user(User * user)
         alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
              user->nick, user->username, user->host,
              (user->vhost ? user->vhost : "(none)"), user->realname,
-             user->server);
+             user->server->name);
 #else
         alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
              user->nick, user->username, user->host,
-             user->realname, user->server);
+             user->realname, user->server->name);
 #endif
     }
 
@@ -394,7 +402,6 @@ static void delete_user(User * user)
         free(user->vhost);
 #endif
     free(user->realname);
-    free(user->server);
     if (debug >= 2)
         alog("debug: delete_user(): remove from channels");
     c = user->chans;
@@ -461,8 +468,8 @@ void get_user_stats(long *nusers, long *memuse)
 #endif
             if (user->realname)
                 mem += strlen(user->realname) + 1;
-            if (user->server)
-                mem += strlen(user->server) + 1;
+            if (user->server->name)
+                mem += strlen(user->server->name) + 1;
             for (uc = user->chans; uc; uc = uc->next)
                 mem += sizeof(*uc);
             for (uci = user->founder_chans; uci; uci = uci->next)
@@ -687,7 +694,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user = new_user(nick);
         user->username = sstrdup(username);
         user->host = sstrdup(host);
-        user->server = sstrdup(server);
+        user->server = findserver(servlist, server);
         user->realname = sstrdup(realname);
         user->timestamp = ts;
         user->my_signon = time(NULL);
@@ -745,11 +752,11 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
         if (LogUsers) {
 #ifdef HAS_VHOST
-            alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), user->realname, nick, user->server);
+            alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), user->realname, nick, user->server->name);
 #else
             alog("LOGUSERS: %s (%s@%s) (%s) changed his nick to %s (%s).",
                  user->nick, user->username, user->host,
-                 user->realname, nick, user->server);
+                 user->realname, nick, user->server->name);
 #endif
         }
 
@@ -862,6 +869,29 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 void do_umode(const char *source, int ac, char **av)
 {
     User *user;
+#ifdef IRC_BAHAMUT
+    int i;
+    char *t;
+
+    /* Another part of nice TSMODE support -GD */
+    if (uplink_capab & CAPAB_TSMODE) {
+        for (i = 0; i < strlen(av[1]); i++) {
+            if (!isdigit(av[1][i]))
+                break;
+        }
+        if (av[1][i] == '\0') {
+            /* We have a valid TS field in av[1] now, so we can strip it off */
+            /* But first we need to swap av[0] and av[1] -GD */
+            t = av[0];
+            av[0] = av[1];
+            av[1] = t;
+            ac--;
+            av++;
+        } else {
+            alog("TSMODE enabled but MODE has no valid TS");
+        }
+    }
+#endif
 
     if (stricmp(source, av[0]) != 0) {
         alog("user: MODE %s %s from different nick %s!", av[0], av[1],

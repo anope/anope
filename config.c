@@ -116,6 +116,7 @@ int UsePrivmsg;
 int DumpCore;
 int LogUsers;
 int NickRegDelay;
+int UseSVSHOLD;
 
 int UseMail;
 char *SendMailPath;
@@ -611,6 +612,7 @@ Directive directives[] = {
     {"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
     {"UseMail", {{PARAM_SET, PARAM_RELOAD, &UseMail}}},
     {"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
+    {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
     {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
     {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
     {"WallDrop", {{PARAM_SET, PARAM_RELOAD, &WallDrop}}},

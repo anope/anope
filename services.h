@@ -125,6 +125,7 @@ extern int toupper(char), tolower(char);
 
 /*************************************************************************/
 
+typedef struct server_ Server;
 typedef struct user_ User;
 typedef struct channel_ Channel;
 
@@ -185,6 +186,8 @@ typedef struct channel_ Channel;
 
 #ifdef IRC_BAHAMUT
 # define HAS_NICKIP
+# define HAS_EXCEPT
+# define HAS_SVSHOLD                                                            
 # define NICKSERV_MODE "+o"
 # define CHANSERV_MODE "+o"
 # define MEMOSERV_MODE "+o"
@@ -903,6 +906,32 @@ struct csmodeutil_ {
 #endif
 /*************************************************************************/
 
+/* Server CAPAB flags */
+#ifdef IRC_BAHAMUT
+# define CAPAB_NOQUIT    0x0001
+# define CAPAB_TSMODE    0x0002
+# define CAPAB_UNCONNECT 0x0004
+#endif
+
+/* Server data */
+
+struct server_ {
+    Server *next, *prev;
+    
+    char *name;		/* Server name */
+    uint16 hops;	/* Hops between services and server */
+    char *desc;		/* Server description */
+    uint16 flags;	/* Some info flags, as defined below */
+
+    Server *links;	/* Linked list head for linked servers */
+    Server *uplink;	/* Server which pretends to be the uplink */
+};
+
+#define SERVER_ISME  0x0001
+#define SERVER_JUPED 0x0002
+
+/*************************************************************************/
+
 /* Online user and channel data. */
 struct user_ {
     User *next, *prev;
@@ -918,7 +947,7 @@ struct user_ {
     char *vident;           /* User's virtual ident */
 #endif
     char *realname;
-    char *server;			/* Name of server user is on */
+    Server *server;		/* Server user is connected to */
 
     char *nickTrack;			/* Nick Tracking */
 

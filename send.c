@@ -80,6 +80,25 @@ void notice(const char *source, const char *dest, const char *fmt, ...)
 
 /*************************************************************************/
 
+void notice_server(const char *source, Server * s, const char *fmt, ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+
+    va_start(args, fmt);
+
+    vsnprintf(buf, sizeof(buf), fmt, args);
+#ifdef IRC_HYBRID
+    send_cmd(source, "%s $$%s :%s", (UsePrivmsg ? "PRIVMSG" : "NOTICE"),
+             s->name, buf);
+#else
+    send_cmd(source, "%s $%s :%s", (UsePrivmsg ? "PRIVMSG" : "NOTICE"),
+             s->name, buf);
+#endif
+}
+
+/*************************************************************************/
+
 void notice_user(const char *source, User * u, const char *fmt, ...)
 {
     va_list args;
@@ -197,6 +216,25 @@ void privmsg(const char *source, const char *dest, const char *fmt, ...)
 
     vsnprintf(buf, sizeof(buf), fmt, args);
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+}
+
+/*************************************************************************/
+
+/* Sends a MODE from the given source on the given nick */
+void send_mode(const char *source, const char *on, const char *fmt, ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+
+    va_start(args, fmt);
+
+    vsnprintf(buf, sizeof(buf), fmt, args);
+#ifdef IRC_BAHAMUT
+    if (uplink_capab & CAPAB_TSMODE)
+        send_cmd(source, "MODE %s 0 %s", on, buf);
+    else
+#endif
+        send_cmd(source, "MODE %s %s", on, buf);
 }
 
 /*************************************************************************/

@@ -63,7 +63,7 @@ extern void moduleAddMsgs(void);
     do { \
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", (nick), time(NULL), \
 		ServiceUser, ServiceHost, ServerName, (name)); \
-	if (strcmp(modes, "+")) send_cmd((nick), "MODE %s %s", (nick), (modes)); \
+	if (strcmp(modes, "+")) send_mode((nick), (nick), "%s", (modes)); \
 	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
     } while (0)
 #elif defined(IRC_PTLINK)
@@ -705,6 +705,9 @@ int init(int ac, char **av)
         alog("Info: Not reflecting database records.");
     }
 #endif
+    /* Make myself known to myself in the serverlist */
+    me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME);
+
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
     if (servsock < 0 && RemoteServer2) {
@@ -762,7 +765,7 @@ int init(int ac, char **av)
         send_cmd(NULL, "PASS %s :TS", RemotePassword2);
     else if (servernum == 3)
         send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-    send_cmd(NULL, "CAPAB NICKIP SSJOIN TS3");
+    send_cmd(NULL, "CAPAB NICKIP SSJOIN TS3 NOQUIT TSMODE UNCONNECT");
 #elif defined(IRC_HYBRID)
     if (servernum == 1)
         send_cmd(NULL, "PASS %s :TS", RemotePassword);

@@ -279,6 +279,7 @@ E int   UsePrivmsg;
 E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;
+E int   UseSVSHOLD;
 
 E char **HostSetters;
 E int HostNumber;
@@ -773,6 +774,8 @@ E void wallops(const char *source, const char *fmt, ...)
 
 E void notice(const char *source, const char *dest, const char *fmt, ...)
 	FORMAT(printf,3,4);
+E void notice_server(const char *source, Server * s, const char *fmt, ...)
+	FORMAT(printf,3,4);
 E void notice_user(const char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
@@ -782,6 +785,28 @@ E void notice_help(const char *source, User *dest, int message, ...);
 
 E void privmsg(const char *source, const char *dest, const char *fmt, ...)
 	FORMAT(printf,3,4);
+
+E void send_mode(const char *source, const char *on, const char *fmt, ...)
+	FORMAT(printf,3,4);
+
+/**** servers.c ****/
+
+E Server *servlist;
+E Server *me_server;
+#ifdef IRC_BAHAMUT
+E uint16 uplink_capab;
+#endif
+
+E Server *first_server(int flags);
+E Server *next_server(int flags);
+
+E Server *new_server(Server *uplink, const char *name, const char *desc,
+		     uint16 flags);
+
+E Server *findserver(Server *s, const char *name);
+
+E void do_server(const char *source, int ac, char **av);
+E void do_squit(const char *source, int ac, char **av);
 
 /**** sessions.c ****/
 
@@ -824,6 +849,8 @@ E int32 usercnt, opcnt, maxusercnt;
 E time_t maxusertime;
 
 E void set_umode(User * user, int ac, char **av);
+
+E void delete_user(User *user);
 
 E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);

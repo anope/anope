@@ -1351,7 +1351,7 @@ void check_modes(Channel * c)
 #ifndef IRC_HYBRID
         if (c->mode & CMODE_r) {
             c->mode &= ~CMODE_r;
-            send_cmd(whosends(ci), "MODE %s -r", c->name);
+            send_mode(whosends(ci), c->name, "-r");
         }
 #endif
         return;
@@ -1440,8 +1440,8 @@ void check_modes(Channel * c)
     *end = 0;
     *end2 = 0;
 
-    send_cmd(whosends(ci), "MODE %s %s%s", c->name, modebuf,
-             (end2 == argbuf ? "" : argbuf));
+    send_mode(whosends(ci), c->name, "%s%s", modebuf,
+              (end2 == argbuf ? "" : argbuf));
 }
 
 /*************************************************************************/
@@ -1459,14 +1459,12 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
     if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
         notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
-        send_cmd(whosends(chan->ci), "MODE %s -a %s", chan->name,
-                 user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-a %s", user->nick);
         return 0;
     }
 
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
-        send_cmd(whosends(chan->ci), "MODE %s -a %s", chan->name,
-                 user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-a %s", user->nick);
         return 0;
     }
 
@@ -1494,33 +1492,30 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 #ifdef HAS_HALFOP
 # if defined(IRC_UNREAL)
         if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-            send_cmd(whosends(chan->ci), "MODE %s -aoq %s %s %s",
-                     chan->name, user->nick, user->nick, user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-aoq %s %s %s",
+                      user->nick, user->nick, user->nick);
         } else {
-            send_cmd(whosends(chan->ci), "MODE %s -ahoq %s %s %s %s",
-                     chan->name, user->nick, user->nick, user->nick,
-                     user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-ahoq %s %s %s %s",
+                      user->nick, user->nick, user->nick, user->nick);
         }
 # elif defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-            send_cmd(whosends(chan->ci), "MODE %s -ao %s %s",
-                     chan->name, user->nick, user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-ao %s %s",
+                      user->nick, user->nick);
         } else {
-            send_cmd(whosends(chan->ci), "MODE %s -aoh %s %s %s",
-                     chan->name, user->nick, user->nick, user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-aoh %s %s %s",
+                      user->nick, user->nick, user->nick);
         }
 # else
         if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-            send_cmd(whosends(chan->ci), "MODE %s -o %s", chan->name,
-                     user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-o %s", user->nick);
         } else {
-            send_cmd(whosends(chan->ci), "MODE %s -ho %s %s", chan->name,
-                     user->nick, user->nick);
+            send_mode(whosends(chan->ci), chan->name, "-ho %s %s",
+                      user->nick, user->nick);
         }
 # endif
 #else
-        send_cmd(whosends(chan->ci), "MODE %s -o %s", chan->name,
-                 user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-o %s", user->nick);
 #endif
         return 0;
     }
@@ -1528,16 +1523,14 @@ int check_valid_op(User * user, Channel * chan, int servermode)
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
 #ifdef HAS_HALFOP
 # ifdef IRC_UNREAL
-        send_cmd(whosends(chan->ci), "MODE %s -ahoq %s %s %s %s",
-                 chan->name, user->nick, user->nick, user->nick,
-                 user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-ahoq %s %s %s %s",
+                  user->nick, user->nick, user->nick, user->nick);
 # else
-        send_cmd(whosends(chan->ci), "MODE %s -ho %s %s", chan->name,
-                 user->nick, user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-ho %s %s", user->nick,
+                  user->nick);
 # endif
 #else
-        send_cmd(whosends(chan->ci), "MODE %s -o %s", chan->name,
-                 user->nick);
+        send_mode(whosends(chan->ci), chan->name, "-o %s", user->nick);
 #endif
         return 0;
     }
@@ -1562,7 +1555,7 @@ int check_should_op(User * user, const char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOOP)) {
-        send_cmd(whosends(ci), "MODE %s +o %s", chan, user->nick);
+        send_mode(whosends(ci), chan, "+o %s", user->nick);
         return 1;
     }
 
@@ -1585,7 +1578,7 @@ int check_should_voice(User * user, const char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOVOICE)) {
-        send_cmd(whosends(ci), "MODE %s +v %s", chan, user->nick);
+        send_mode(whosends(ci), chan, "+v %s", user->nick);
         return 1;
     }
 
@@ -1604,7 +1597,7 @@ int check_should_halfop(User * user, const char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOHALFOP)) {
-        send_cmd(whosends(ci), "MODE %s +h %s", chan, user->nick);
+        send_mode(whosends(ci), chan, "+h %s", user->nick);
         return 1;
     }
 
@@ -1626,8 +1619,7 @@ int check_should_owner(User * user, const char *chan)
 
     if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
         || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
-        send_cmd(whosends(ci), "MODE %s +oq %s %s", chan, user->nick,
-                 user->nick);
+        send_mode(whosends(ci), chan, "+oq %s %s", user->nick, user->nick);
         return 1;
     }
 
@@ -1648,8 +1640,7 @@ int check_should_protect(User * user, const char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOPROTECT)) {
-        send_cmd(whosends(ci), "MODE %s +oa %s %s", chan, user->nick,
-                 user->nick);
+        send_mode(whosends(ci), chan, "+oa %s %s", user->nick, user->nick);
         return 1;
     }
 
@@ -1796,7 +1787,7 @@ int check_kick(User * user, char *chan)
         free(av[1]);
     }
 
-    send_cmd(whosends(ci), "MODE %s +b %s %lu", chan, mask, time(NULL));
+    send_mode(whosends(ci), chan, "+b %s %lu", mask, time(NULL));
     send_cmd(whosends(ci), "KICK %s %s :%s", chan, user->nick, reason);
 
     return 1;
@@ -1850,7 +1841,7 @@ void restore_topic(const char *chan)
 #ifdef IRC_HYBRID
     if (whosends(ci) == s_ChanServ) {
         send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), chan, s_ChanServ);
-        send_cmd(NULL, "MODE %s +o %s", chan, s_ChanServ);
+        send_mode(NULL, chan, "+o %s", s_ChanServ);
     }
     send_cmd(whosends(ci), "TOPIC %s :%s", chan, c->topic ? c->topic : "");
     if (whosends(ci) == s_ChanServ) {
@@ -1893,7 +1884,7 @@ int check_topiclock(Channel * c, time_t topic_time)
     if (whosends(ci) == s_ChanServ) {
         send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), c->name,
                  s_ChanServ);
-        send_cmd(NULL, "MODE %s +o %s", c->name, s_ChanServ);
+        send_mode(NULL, c->name, "+o %s", s_ChanServ);
     }
     send_cmd(whosends(ci), "TOPIC %s :%s", c->name,
              c->topic ? c->topic : "");
@@ -1973,7 +1964,7 @@ void cs_remove_nick(const NickCore * nc)
                     /* Maybe move this to delchan() ? */
                     if ((ci->c) && (ci->c->mode & CMODE_r)) {
                         ci->c->mode &= ~CMODE_r;
-                        send_cmd(whosends(ci), "MODE %s -r", ci->name);
+                        send_mode(whosends(ci), ci->name, "-r");
                     }
 #endif
 
@@ -2729,7 +2720,7 @@ static int do_register(User * u)
         /* Implement new mode lock */
         check_modes(c);
 #if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-        send_cmd(s_ChanServ, "MODE %s +a %s", chan, u->nick);
+        send_mode(s_ChanServ, chan, "+a %s", u->nick);
 #endif
     }
     return MOD_CONT;
@@ -2856,7 +2847,7 @@ static int do_drop(User * u)
 #ifndef IRC_HYBRID
         if (ci->c) {
             ci->c->mode &= ~CMODE_r;
-            send_cmd(whosends(ci), "MODE %s -r", ci->name);
+            send_mode(whosends(ci), ci->name, "-r");
         }
 #endif
         alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
@@ -4228,7 +4219,7 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 
     av[0] = sstrdup("+b");
     av[1] = akick->u.mask;
-    send_cmd(whosends(ci), "MODE %s +b %s", ci->c->name, akick->u.mask);
+    send_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
     chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
     free(av[0]);
 }
@@ -4248,8 +4239,7 @@ void stick_all(ChannelInfo * ci)
 
         av[0] = sstrdup("+b");
         av[1] = akick->u.mask;
-        send_cmd(whosends(ci), "MODE %s +b %s", ci->c->name,
-                 akick->u.mask);
+        send_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
         chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
         free(av[0]);
     }
@@ -5195,8 +5185,8 @@ static int do_util(User * u, CSModeUtil * util)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && check_access(u, ci, util->levelself)) {
-                send_cmd(whosends(ci), "MODE %s %s %s", uc->chan->name,
-                         util->mode, u->nick);
+                send_mode(whosends(ci), uc->chan->name, "%s %s",
+                          util->mode, u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
 
                 if (util->notice && ci->flags & util->notice)
@@ -5234,8 +5224,7 @@ static int do_util(User * u, CSModeUtil * util)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 #endif
     } else {
-        send_cmd(whosends(ci), "MODE %s %s %s", c->name, util->mode,
-                 u2->nick);
+        send_mode(whosends(ci), c->name, "%s %s", util->mode, u2->nick);
 
         av[0] = util->mode;
         av[1] = u2->nick;
@@ -5335,8 +5324,8 @@ static int do_owner(User * u)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
-                send_cmd(whosends(ci), "MODE %s %s %s", uc->chan->name,
-                         av[0], u->nick);
+                send_mode(whosends(ci), uc->chan->name, "%s %s",
+                          av[0], u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
         }
@@ -5356,7 +5345,7 @@ static int do_owner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        send_cmd(whosends(ci), "MODE %s +q %s", c->name, u->nick);
+        send_mode(whosends(ci), c->name, "+q %s", u->nick);
 
         av[0] = sstrdup("+q");
         av[1] = u->nick;
@@ -5387,8 +5376,8 @@ static int do_deowner(User * u)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
-                send_cmd(whosends(ci), "MODE %s %s %s", uc->chan->name,
-                         av[0], u->nick);
+                send_mode(whosends(ci), uc->chan->name, "%s %s",
+                          av[0], u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
         }
@@ -5408,7 +5397,7 @@ static int do_deowner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        send_cmd(whosends(ci), "MODE %s -q %s", c->name, u->nick);
+        send_mode(whosends(ci), c->name, "-q %s", u->nick);
 
         av[0] = sstrdup("-q");
         av[1] = u->nick;
@@ -5559,8 +5548,7 @@ static int do_ban(User * u)
                 av[0] = sstrdup("+b");
                 get_idealban(ci, u, mask, sizeof(mask));
                 av[1] = mask;
-                send_cmd(whosends(ci), "MODE %s +b %s", uc->chan->name,
-                         av[1]);
+                send_mode(whosends(ci), uc->chan->name, "+b %s", av[1]);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
                 free(av[0]);
 
@@ -5615,7 +5603,7 @@ static int do_ban(User * u)
         av[0] = sstrdup("+b");
         get_idealban(ci, u2, mask, sizeof(mask));
         av[1] = mask;
-        send_cmd(whosends(ci), "MODE %s +b %s", c->name, av[1]);
+        send_mode(whosends(ci), c->name, "+b %s", av[1]);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
         free(av[0]);
 
@@ -5683,7 +5671,7 @@ static int do_cs_topic(User * u)
         if (whosends(ci) == s_ChanServ) {
             send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), c->name,
                      s_ChanServ);
-            send_cmd(NULL, "MODE %s +o %s", c->name, s_ChanServ);
+            send_mode(NULL, c->name, "+o %s", s_ChanServ);
         }
         send_cmd(whosends(ci), "TOPIC %s :%s", c->name,
                  c->topic ? c->topic : "");
@@ -5729,7 +5717,7 @@ static int do_unban(User * u)
         av[1] = sstrdup("-b");
         for (i = 0; i < count; i++) {
             if (match_usermask(bans[i], u)) {
-                send_cmd(whosends(ci), "MODE %s -b %s", chan, bans[i]);
+                send_mode(whosends(ci), chan, "-b %s", bans[i]);
                 av[2] = sstrdup(bans[i]);
                 do_cmode(s_ChanServ, 3, av);
                 free(av[2]);
@@ -5778,7 +5766,7 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-b");
             av[2] = bans[i];
-            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            send_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);
@@ -5801,7 +5789,7 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-e");
             av[2] = excepts[i];
-            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            send_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);
@@ -5816,8 +5804,8 @@ static int do_clear(User * u)
 
         if (c->mode) {
             /* Clear modes */
-            send_cmd(s_ChanServ, "MODE %s %s %s", c->name, MODESTOREMOVE,
-                     c->key ? c->key : "");
+            send_mode(s_ChanServ, c->name, "%s %s", MODESTOREMOVE,
+                      c->key ? c->key : "");
             argv[0] = sstrdup(MODESTOREMOVE);
             argv[1] = c->key ? c->key : NULL;
             chan_set_modes(s_OperServ, c, c->key ? 2 : 1, argv, 0);
@@ -5857,7 +5845,7 @@ static int do_clear(User * u)
 
             *end = 0;
 
-            send_cmd(whosends(ci), "MODE %s -%s", c->name, buf);
+            send_mode(whosends(ci), c->name, "-%s", buf);
             c->mode = 0;
             check_modes(c);
         }
@@ -5873,7 +5861,7 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-o");
             av[2] = sstrdup(cu->user->nick);
-            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            send_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);
@@ -5892,7 +5880,7 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-h");
             av[2] = sstrdup(cu->user->nick);
-            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            send_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);
@@ -5911,7 +5899,7 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-v");
             av[2] = sstrdup(cu->user->nick);
-            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            send_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);

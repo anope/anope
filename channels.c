@@ -593,8 +593,8 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 BotInfo *bi;
 
                 if ((bi = findbot(*av))) {
-                    send_cmd(bi->nick, "MODE %s +%c %s", chan->name, mode,
-                             bi->nick);
+                    send_mode(bi->nick, chan->name, "+%c %s", mode,
+                              bi->nick);
                     continue;
                 }
             }
@@ -1114,6 +1114,29 @@ void do_cmode(const char *source, int ac, char **av)
 {
     Channel *chan;
     ChannelInfo *ci = NULL;
+#ifdef IRC_BAHAMUT
+    int i;
+    char *t;
+
+    /* TSMODE for bahamut - leave this code out to break MODEs. -GD */
+    if (uplink_capab & CAPAB_TSMODE) {
+        for (i = 0; i < strlen(av[1]); i++) {
+            if (!isdigit(av[1][i]))
+                break;
+        }
+        if (av[1][i] == '\0') {
+            /* We have a valid TS field in av[1] now, so we can strip it off */
+            /* After we swap av[0] and av[1] ofcourse to not break stuff! :) */
+            t = av[0];
+            av[0] = av[1];
+            av[1] = t;
+            ac--;
+            av++;
+        } else {
+            alog("TSMODE enabled but MODE has no valid TS");
+        }
+    }
+#endif
 
     chan = findchan(av[0]);
     if (!chan) {
@@ -1183,7 +1206,7 @@ static void add_ban(Channel * chan, char *mask)
         snprintf(botmask, sizeof(botmask), "%s!%s@%s", bi->nick, bi->user,
                  bi->host);
         if (match_wild_nocase(mask, botmask)) {
-            send_cmd(bi->nick, "MODE %s -b %s", chan->name, mask);
+            send_mode(bi->nick, chan->name, "-b %s", mask);
             return;
         }
     }
@@ -1597,7 +1620,7 @@ void do_mass_mode(char *modes)
             if (c->bouncy_modes) {
                 return;
             } else {
-                send_cmd(s_OperServ, "MODE %s %s", c->name, modes);
+                send_mode(s_OperServ, c->name, "%s", modes);
                 chan_set_modes(s_OperServ, c, ac, av, 1);
             }
         }

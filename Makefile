@@ -40,13 +40,13 @@ CFLAGS = $(CDEFS) $(BASE_CFLAGS) $(MORE_CFLAGS)
 OBJS =	actions.o botserv.o channels.o chanserv.o commands.o compat.o converter.o \
 	config.o datafiles.o encrypt.o helpserv.o hostserv.o init.o language.o list.o log.o mail.o main.o \
 	memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
-	process.o protocol.o proxy.o send.o sessions.o slist.o sockutil.o \
+	process.o protocol.o proxy.o send.o servers.o sessions.o slist.o sockutil.o \
 	timeout.o users.o \
 	$(VSNPRINTF_O) $(RDB_O) $(MYSQL_O)
 SRCS =	actions.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
 	config.c datafiles.c encrypt.c helpserv.c hostserv.c init.c language.c list.c log.c mail.c main.c \
 	memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
-	process.c protocol.c proxy.c send.c sessions.c slist.c sockutil.c \
+	process.c protocol.c proxy.c send.c servers.c sessions.c slist.c sockutil.c \
 	timeout.c users.c \
 	$(VSNPRINTF_C) $(RDB_C) $(MYSQL_C)
 
@@ -143,6 +143,7 @@ process.o:	process.c	services.h messages.h
 protocol.o:	protocol.c	services.h
 proxy.o:	proxy.c		services.h pseudo.h
 send.o:		send.c		services.h
+servers.o:	servers.c	services.h
 sessions.o:     sessions.c      services.h pseudo.h
 slist.o:	slist.c		services.h slist.h 
 sockutil.o:	sockutil.c	services.h

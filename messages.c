@@ -58,6 +58,28 @@ static int m_away(char *source, int ac, char **av)
 
 #ifdef IRC_BAHAMUT
 
+static int m_capab(char *source, int ac, char **av)
+{
+    int i;
+
+    for (i = 0; i < ac; i++) {
+        if (!stricmp(av[i], "NOQUIT"))
+            uplink_capab |= CAPAB_NOQUIT;
+        else if (!stricmp(av[i], "TSMODE"))
+            uplink_capab |= CAPAB_TSMODE;
+        else if (!stricmp(av[i], "UNCONNECT"))
+            uplink_capab |= CAPAB_UNCONNECT;
+    }
+
+    return MOD_CONT;
+}
+
+#endif
+
+/*************************************************************************/
+
+#ifdef IRC_BAHAMUT
+
 static int m_cs(char *source, int ac, char **av)
 {
     User *u;
@@ -675,10 +697,23 @@ static int m_quit(char *source, int ac, char **av)
 
 /*************************************************************************/
 
+static int m_squit(char *source, int ac, char **av)
+{
+    if (ac != 2)
+        return MOD_CONT;
+    do_squit(source, ac, av);
+    return MOD_CONT;
+}
+
+/*************************************************************************/
+
 static int m_server(char *source, int ac, char **av)
 {
     if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
+    if (ac != 3)
+        return MOD_CONT;
+    do_server(source, ac, av);
     return MOD_CONT;
 }
 
@@ -1126,7 +1161,7 @@ void moduleAddMsgs(void) {
     m = createMessage("PRIVMSG",   m_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      m_quit); addCoreMessage(IRCD,m);
     m = createMessage("SERVER",    m_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     NULL); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     m_squit); addCoreMessage(IRCD,m);
     m = createMessage("STATS",     m_stats); addCoreMessage(IRCD,m);
     m = createMessage("TIME",      m_time); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     m_topic); addCoreMessage(IRCD,m);
@@ -1156,7 +1191,7 @@ void moduleAddMsgs(void) {
 
     /* Bahamut specific messages */
 #ifdef IRC_BAHAMUT
-    m = createMessage("CAPAB", 	   NULL); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB", 	   m_capab); addCoreMessage(IRCD,m);
     m = createMessage("CS",        m_cs); addCoreMessage(IRCD,m);
     m = createMessage("HS",        m_hs); addCoreMessage(IRCD,m);
     m = createMessage("MS",        m_ms); addCoreMessage(IRCD,m);

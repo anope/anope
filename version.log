@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="205"
+VERSION_BUILD="206"
 
 # $Log$
+#
+# BUILD : 1.7.4 (206)
+# BUGS  : 55
+# NOTES : Added proper Bahamut1.8 support. Merged r132:195 from branch
+#         branches/proto/anope-bahamut18 which should now be obsolete.
 #
 # BUILD : 1.7.4 (205)
 # BUGS  : none

@@ -1023,67 +1023,20 @@ void oper_global(char *nick, char *fmt, ...)
 {
     va_list args;
     char msg[2048];             /* largest valid message is 512, this should cover any global */
-    int i;
+    Server *s;
 
     va_start(args, fmt);
     vsnprintf(msg, sizeof(msg), fmt, args);
     va_end(args);
 
-#ifdef IRC_HYBRID
-    if (DomainNumber > 0) {
-        for (i = 0; i < DomainNumber; i++) {
-            if ((nick) && (!AnonymousGlobal)) {
-                send_cmd(s_GlobalNoticer, "NOTICE $$*.%s :[%s] %s",
-                         NetworkDomains[i], nick, msg);
-            } else {
-                send_cmd(s_GlobalNoticer, "NOTICE $$*.%s :%s",
-                         NetworkDomains[i], msg);
-            }
-        }
-    } else {
-        /* Go through all common top-level domains.  If you have others,
-         * add them here.
-         */
-        if ((nick) && (!AnonymousGlobal)) {
-            notice(s_GlobalNoticer, "$$*.com", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$$*.net", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$$*.org", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$$*.edu", "[%s] %s", nick, msg);
-        } else {
-            notice(s_GlobalNoticer, "$$*.com", "%s", msg);
-            notice(s_GlobalNoticer, "$$*.net", "%s", msg);
-            notice(s_GlobalNoticer, "$$*.org", "%s", msg);
-            notice(s_GlobalNoticer, "$$*.edu", "%s", msg);
-        }
+    s = first_server(0);
+    while (s) {
+        if ((nick) && (!AnonymousGlobal))
+            notice_server(s_GlobalNoticer, s, "[%s] %s", nick, msg);
+        else
+            notice_server(s_GlobalNoticer, s, "%s", msg);
+        s = next_server(0);
     }
-#else
-    if (DomainNumber > 0) {
-        for (i = 0; i < DomainNumber; i++) {
-            if ((nick) && (!AnonymousGlobal)) {
-                send_cmd(s_GlobalNoticer, "NOTICE $*.%s :[%s] %s",
-                         NetworkDomains[i], nick, msg);
-            } else {
-                send_cmd(s_GlobalNoticer, "NOTICE $*.%s :%s",
-                         NetworkDomains[i], msg);
-            }
-        }
-    } else {
-        /* Go through all common top-level domains.  If you have others,
-         * add them here.
-         */
-        if ((nick) && (!AnonymousGlobal)) {
-            notice(s_GlobalNoticer, "$*.com", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$*.net", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$*.org", "[%s] %s", nick, msg);
-            notice(s_GlobalNoticer, "$*.edu", "[%s] %s", nick, msg);
-        } else {
-            notice(s_GlobalNoticer, "$*.com", "%s", msg);
-            notice(s_GlobalNoticer, "$*.net", "%s", msg);
-            notice(s_GlobalNoticer, "$*.org", "%s", msg);
-            notice(s_GlobalNoticer, "$*.edu", "%s", msg);
-        }
-    }
-#endif
 }
 
 /*************************************************************************/
@@ -1476,7 +1429,7 @@ static int do_os_mode(User * u)
         return MOD_CONT;
 #endif
     } else {
-        send_cmd(s_OperServ, "MODE %s %s", chan, modes);
+        send_mode(s_OperServ, chan, "%s", modes);
 
         ac = split_buf(modes, &av, 1);
         chan_set_modes(s_OperServ, c, ac, av, 0);
@@ -1527,7 +1480,7 @@ static int do_operumodes(User * u)
     if (!(u2 = finduser(nick))) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else {
-        send_cmd(s_OperServ, "MODE %s %s", nick, modes);
+        send_mode(s_OperServ, nick, "%s", modes);
 
         change_user_mode(u2, modes, NULL);
 
@@ -1575,7 +1528,7 @@ static int do_operoline(User * u)
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
             send_cmd(s_OperServ, "SVSO %s %s", nick, flags);
-            send_cmd(s_OperServ, "MODE %s +o", nick);
+            send_mode(s_OperServ, nick, "+o");
             change_user_mode(u2, "+o", NULL);
             notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
@@ -1644,8 +1597,7 @@ static int do_clearmodes(User * u)
                 argv[0] = sstrdup("-o");
                 argv[1] = cu->user->nick;
 
-                send_cmd(s_OperServ, "MODE %s -o %s", c->name,
-                         cu->user->nick);
+                send_mode(s_OperServ, c->name, "-o %s", cu->user->nick);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
 
                 free(argv[0]);
@@ -1661,8 +1613,7 @@ static int do_clearmodes(User * u)
                 argv[0] = sstrdup("-v");
                 argv[1] = sstrdup(cu->user->nick);
 
-                send_cmd(s_OperServ, "MODE %s -v %s", c->name,
-                         cu->user->nick);
+                send_mode(s_OperServ, c->name, "-v %s", cu->user->nick);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
 
                 free(argv[0]);
@@ -1678,8 +1629,7 @@ static int do_clearmodes(User * u)
                 argv[0] = sstrdup("-h");
                 argv[1] = sstrdup(cu->user->nick);
 
-                send_cmd(s_OperServ, "MODE %s -h %s", c->name,
-                         cu->user->nick);
+                send_mode(s_OperServ, c->name, "-h %s", cu->user->nick);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
 
                 free(argv[0]);
@@ -1688,8 +1638,8 @@ static int do_clearmodes(User * u)
         }
 
         /* Clear modes */
-        send_cmd(s_OperServ, "MODE %s %s %s", c->name, MODESTOREMOVE,
-                 c->key ? c->key : "");
+        send_mode(s_OperServ, c->name, "%s %s", MODESTOREMOVE,
+                  c->key ? c->key : "");
         argv[0] = sstrdup(MODESTOREMOVE);
         argv[1] = c->key ? c->key : NULL;
         chan_set_modes(s_OperServ, c, c->key ? 2 : 1, argv, 0);
@@ -1705,7 +1655,7 @@ static int do_clearmodes(User * u)
         for (i = 0; i < count; i++) {
             argv[0] = sstrdup("-b");
             argv[1] = bans[i];
-            send_cmd(s_OperServ, "MODE %s -b %s", c->name, argv[1]);
+            send_mode(s_OperServ, c->name, "-b %s", argv[1]);
             chan_set_modes(s_OperServ, c, 2, argv, 0);
             free(argv[1]);
             free(argv[0]);
@@ -1724,7 +1674,7 @@ static int do_clearmodes(User * u)
         for (i = 0; i < exceptcount; i++) {
             argv[0] = sstrdup("-e");
             argv[1] = excepts[i];
-            send_cmd(s_OperServ, "MODE %s -e %s", c->name, argv[1]);
+            send_mode(s_OperServ, c->name, "-e %s", argv[1]);
             chan_set_modes(s_OperServ, c, 2, argv, 0);
             free(argv[1]);
             free(argv[0]);
@@ -4448,8 +4398,8 @@ static int do_noop(User * u)
         /* Kill all the IRCops of the server */
         for (u2 = firstuser(); u2; u2 = u3) {
             u3 = nextuser();
-            if ((u2) && is_oper(u2) && (u2->server)
-                && !stricmp(u2->server, server)) {
+            if ((u2) && is_oper(u2) && (u2->server->name)
+                && !stricmp(u2->server->name, server)) {
                 kill_user(s_OperServ, u2->nick, reason);
             }
         }
@@ -4486,6 +4436,7 @@ static int do_jupe(User * u)
 #else
             send_cmd(NULL, "SERVER %s 2 :%s", jserver, rbuf);
 #endif
+            new_server(me_server, jserver, rbuf, SERVER_JUPED);
 
             if (WallOSJupe)
                 wallops(s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick,

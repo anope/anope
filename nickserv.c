@@ -1112,14 +1112,22 @@ void cancel_user(User * u)
 
     if (na) {
         if (na->status & NS_GUESTED) {
-            NEWNICK(u->nick, NSEnforcerUser, NSEnforcerHost,
-                    "Services Enforcer", "+", 0);
-            add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-            na->status &= ~NS_TEMPORARY;
+#ifdef HAS_SVSHOLD
+            if (UseSVSHOLD) {
+                send_cmd(ServerName, "SVSHOLD %s %d :%s", na->nick,
+                         NSReleaseTimeout,
+                         "Being held for registered user");
+            } else {
+#endif
+                NEWNICK(u->nick, NSEnforcerUser, NSEnforcerHost,
+                        "Services Enforcer", "+", 0);
+                add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+#ifdef HAS_SVSHOLD
+            }
+#endif
             na->status |= NS_KILL_HELD;
-        } else {
-            na->status &= ~NS_TEMPORARY;
         }
+        na->status &= ~NS_TEMPORARY;
 
         del_ns_timeout(na, TO_COLLIDE);
     }
@@ -1685,7 +1693,12 @@ static void release(NickAlias * na, int from_timeout)
 {
     if (!from_timeout)
         del_ns_timeout(na, TO_RELEASE);
-    send_cmd(na->nick, "QUIT");
+#ifdef HAS_SVSHOLD
+    if (UseSVSHOLD)
+        send_cmd(ServerName, "SVSHOLD %s 0", na->nick);
+    else
+#endif
+        send_cmd(na->nick, "QUIT");
     na->status &= ~NS_KILL_HELD;
 }
 

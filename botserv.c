@@ -952,8 +952,7 @@ void bot_join(ChannelInfo * ci)
             av[1] = sstrdup("-b");
             for (i = 0; i < count; i++) {
                 if (match_wild_nocase(ci->c->bans[i], botmask)) {
-                    send_cmd(ci->bi->nick, "MODE %s -b %s", ci->name,
-                             bans[i]);
+                    send_mode(ci->bi->nick, ci->name, "%s", bans[i]);
                     av[2] = sstrdup(bans[i]);
                     do_cmode(ci->bi->nick, 3, av);
                     free(av[2]);
@@ -980,14 +979,14 @@ void bot_join(ChannelInfo * ci)
 #endif
 
 #if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
-    send_cmd(ci->bi->nick, "MODE %s +ao %s %s", ci->c->name, ci->bi->nick,
-             ci->bi->nick);
+    send_mode(ci->bi->nick, ci->c->name, "+ao %s %s", ci->bi->nick,
+              ci->bi->nick);
 #elif defined(IRC_PTLINK)
     /* PTLinks requieres an IRCop to u-line changes, so use ChanServ */
-    send_cmd(s_ChanServ, "MODE %s +ao %s %s", ci->c->name, ci->bi->nick,
-             ci->bi->nick);
+    send_mode(s_ChanServ, ci->c->name, "+ao %s %s", ci->bi->nick,
+              ci->bi->nick);
 #else
-    send_cmd(ci->bi->nick, "MODE %s +o %s", ci->c->name, ci->bi->nick);
+    send_mode(ci->bi->nick, ci->c->name, "+o %s", ci->bi->nick);
 #endif
 }
 
@@ -1031,7 +1030,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
         av[1] = sstrdup("+b");
         get_idealban(ci, u, mask, sizeof(mask));
         av[2] = mask;
-        send_cmd(ci->bi->nick, "MODE %s +b %s", av[0], av[2]);
+        send_mode(ci->bi->nick, av[0], "+b %s", av[2]);
         do_cmode(ci->bi->nick, 3, av);
         free(av[1]);
     }
@@ -1102,7 +1101,7 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     av[1] = sstrdup("+b");
     get_idealban(ci, u, mask, sizeof(mask));
     av[2] = mask;
-    send_cmd(ci->bi->nick, "MODE %s +b %s", av[0], av[2]);
+    send_mode(ci->bi->nick, av[0], "+b %s", av[2]);
     do_cmode(ci->bi->nick, 3, av);
     free(av[1]);
 
@@ -1191,7 +1190,7 @@ static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
     av[1] = mode;
     av[2] = nick;
 
-    send_cmd(ci->bi->nick, "MODE %s %s %s", av[0], av[1], av[2]);
+    send_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
     do_cmode(ci->bi->nick, 3, av);
 }
 
@@ -1227,7 +1226,7 @@ static void bot_raw_unban(ChannelInfo * ci, char *nick)
 
     for (i = 0; i < count; i++) {
         if (match_usermask(bans[i], u)) {
-            send_cmd(ci->bi->nick, "MODE %s -b %s", ci->name, bans[i]);
+            send_mode(ci->bi->nick, ci->name, "-b %s", bans[i]);
             av[2] = bans[i];
             do_cmode(ci->bi->nick, 3, av);
         }

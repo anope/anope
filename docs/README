@@ -61,11 +61,12 @@ Anope credits:
     JH <jh@irc-chat.net>
     Joris Vink <joris@anope.org>
     Lucas Nussbaum <lucas@lucas-nussbaum.net>
+    Pieter Bootsma <geniusdex@anope.org>
     Thomas Juberg Stensås <ShadowMaster@Shadow-Realm.org>
     Trystan .S Lee <trystan@anope.org>
     openglx <openglx@brasnerd.com.br>
 Anope Translations:
-    GeniousDex (nl.l)
+    GeniusDex (nl.l)
     Oleg Nikolaev aka Isot <isot@complife.ru> (ru.l)
     Stuff <the.stuff@gmx.de> (de.l)
     DrStein (es.l)
@@ -123,7 +124,7 @@ Currently available services are:
 
 Anope currently works with:
   - DreamForge 4.6.7
-  - Bahamut 1.4.27 or later
+  - Bahamut 1.4.35 or later
   - UnrealIRCd 3.1.1 or later (including 3.2)
   - UltimateIRCd 2.8.2 or later (including 3.0.0)
   - ViagraIRCd 1.3 or later

@@ -1,6 +1,7 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/06/05 Fixed bug with RDB and empty nickserv greet message (# 28).
 2004/05/04 Fixed Badwords kicker to ignore control characters and color codes.
 2004/05/04 anoperc bugfixes including checking if anope binary exists.
 2004/05/03 always set the right module name when executing mod_tail commands

@@ -1474,7 +1474,11 @@ void db_mysql_load_ns_dbase(void)
         nc->memos.memomax = atoi(mysql_row[9]);
         nc->channelcount = atoi(mysql_row[10]);
         nc->channelmax = atoi(mysql_row[11]);
-        nc->greet = sstrdup(mysql_row[12]);
+
+        if (mysql_row[12][0] == '\0')   /* check if it's empty */
+            nc->greet = NULL;
+        else
+            nc->greet = sstrdup(mysql_row[12]);
 
         if (!NSAllowKillImmed)
             nc->flags &= ~NI_KILL_IMMED;

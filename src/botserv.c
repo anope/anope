@@ -722,28 +722,6 @@ void save_bs_dbase(void)
 
 /*************************************************************************/
 
-void save_bs_rdb_dbase(void)
-{
-#ifdef USE_RDB
-    int i;
-    BotInfo *bi;
-
-    if (!rdb_open())
-        return;
-
-    rdb_clear_table("anope_bs_core");
-
-    for (i = 0; i < 256; i++) {
-        for (bi = botlists[i]; bi; bi = bi->next) {
-            rdb_save_bs_core(bi);
-        }
-    }
-    rdb_close();
-#endif
-}
-
-/*************************************************************************/
-
 /* Inserts a bot in the bot list. I can't be much explicit mh? */
 
 static void insert_bot(BotInfo * bi)
@@ -800,6 +778,7 @@ static void change_bot_nick(BotInfo * bi, char *newnick)
 static int delbot(BotInfo * bi)
 {
     cs_remove_bot(bi);
+    rdb_bs_del_bot(bi);
 
     if (bi->next)
         bi->next->prev = bi->prev;
@@ -847,6 +826,7 @@ static void unassign(User * u, ChannelInfo * ci)
                  u->nick);
     }
     ci->bi->chancount--;
+    rdb_bs_change_bot_chancount(ci->bi);
     ci->bi = NULL;
 }
 
@@ -1391,6 +1371,8 @@ static int do_bot(User * u)
             bi->real = sstrdup(real);
             bi->created = time(NULL);
             bi->chancount = 0;
+            
+            rdb_bs_add_bot(bi);
 
             /* We check whether user with this nick is online, and kill it if so */
             EnforceQlinedNick(nick, s_BotServ);
@@ -1517,6 +1499,8 @@ static int do_bot(User * u)
                 /* We check whether user with this nick is online, and kill it if so */
                 EnforceQlinedNick(nick, s_BotServ);
             }
+            
+            rdb_bs_change_bot(bi, nick, user, host ,real);
 
             if (strcmp(nick, bi->nick))
                 change_bot_nick(bi, nick);
@@ -1653,6 +1637,7 @@ static int do_assign(User * u)
             unassign(u, ci);
         ci->bi = bi;
         bi->chancount++;
+        rdb_bs_change_bot_chancount(bi);
         if (ci->c && ci->c->usercount >= BSMinUsers) {
             bot_join(ci);
         }
@@ -1921,9 +1906,11 @@ static int do_set(User * u)
         if ((bi = findbot(chan))) {
             if (!stricmp(value, "ON")) {
                 bi->flags |= BI_PRIVATE;
+                rdb_bs_change_bot_flags(bi);
                 notice_lang(s_BotServ, u, BOT_SET_PRIVATE_ON, bi->nick);
             } else if (!stricmp(value, "OFF")) {
                 bi->flags &= ~BI_PRIVATE;
+                rdb_bs_change_bot_flags(bi);
                 notice_lang(s_BotServ, u, BOT_SET_PRIVATE_OFF, bi->nick);
             } else {
                 syntax_error(s_BotServ, u, "SET PRIVATE",

@@ -16,6 +16,7 @@
 #define EXTERN_H
 
 #include "slist.h"
+#include "rdb.h"
 
 #define E extern
 
@@ -42,7 +43,6 @@ E void botmsgs(User *u, BotInfo *bi, char *buf);
 E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
 E void load_bs_dbase(void);
 E void save_bs_dbase(void);
-E void save_bs_rdb_dbase(void);
 
 E BotInfo *makebot(char *nick);
 E BotInfo *findbot(char *nick);
@@ -101,7 +101,6 @@ E void cs_init(void);
 E void chanserv(User * u, char *buf);
 E void load_cs_dbase(void);
 E void save_cs_dbase(void);
-E void save_cs_rdb_dbase(void);
 E void expire_chans(void);
 E void cs_remove_nick(const NickCore * nc);
 E void cs_remove_bot(const BotInfo * bi);
@@ -229,7 +228,6 @@ E char *desc_HostServ;
 E char *s_HostServ;
 E void load_hs_dbase(void);
 E void save_hs_dbase(void);
-E void save_hs_rdb_dbase(void);
 E int do_on_id(User * u);
 E void delHostCore(char *nick);
 E void hostserv(User * u, char *buf);
@@ -422,50 +420,6 @@ E char *ExceptionDBName;
 E char *SessionLimitDetailsLoc;
 E char *SessionLimitExceeded;
 
-#ifdef USE_RDB
-E int rdb_init();
-E int rdb_open();
-E int rdb_close();
-E int rdb_tag_table(char *table);
-E int rdb_tag_table(char *table);
-E int rdb_clear_table(char *table);
-E int rdb_scrub_table(char *table, char *clause);
-E int rdb_direct_query(char *query);
-E int rdb_ns_set_display(char *newnick, char *oldnick);
-E int rdb_cs_set_founder(char *channel, char *founder);
-E int rdb_cs_deluser(char *nick);
-E int rdb_cs_delchan(ChannelInfo * ci);
-E void rdb_save_ns_core(NickCore * nc);
-E void rdb_save_ns_alias(NickAlias * na);
-E void rdb_save_ns_req(NickRequest * nr);
-E void rdb_save_cs_info(ChannelInfo * ci);
-E void rdb_save_bs_core(BotInfo * bi);
-E void rdb_save_bs_rdb_core(BotInfo * bi);
-E void rdb_save_hs_core(HostCore * hc);
-E void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                    SList * ak, SList * sgl, SList * sql, SList * szl,
-                    HostCache * hc);
-E void rdb_save_news(NewsItem * ni);
-E void rdb_save_exceptions(Exception * e);
-E void rdb_load_bs_dbase(void);
-E void rdb_load_hs_dbase(void);
-E void rdb_load_ns_dbase(void);
-E void rdb_load_dbases(void);
-#endif
-
-#ifdef USE_MYSQL
-E char *MysqlHost;
-E char *MysqlUser;
-E char *MysqlPass;
-E char *MysqlName;
-E int MysqlPort;
-E char *MysqlSock;
-E char *MysqlSecure;
-E int MysqlRetries;
-E int MysqlRetryGap;
-E int UseRDB;
-#endif
-
 E int read_config(int reload);
 
 E int DefConLevel;
@@ -550,10 +504,6 @@ E int   nofork;
 E int   forceload;
 E int	noexpire;
 
-#ifdef USE_RDB
-E int   do_mysql;
-#endif
-
 E int   is44;
 
 E int   quitting;
@@ -623,7 +573,6 @@ E NewsItem *news;
 E void get_news_stats(long *nrec, long *memuse);
 E void load_news(void);
 E void save_news(void);
-E void save_rdb_news(void);
 E void display_news(User * u, int16 type);
 E int do_logonnews(User * u);
 E int do_opernews(User * u);
@@ -651,8 +600,6 @@ E void load_ns_dbase(void);
 E void load_ns_req_db(void);
 E void save_ns_dbase(void);
 E void save_ns_req_dbase(void);
-E void save_ns_rdb_dbase(void);
-E void save_ns_req_rdb_dbase(void);
 E int validate_user(User * u);
 E void cancel_user(User * u);
 E int nick_identified(User * u);
@@ -688,7 +635,6 @@ E void operserv(User *u, char *buf);
 E void os_init(void);
 E void load_os_dbase(void);
 E void save_os_dbase(void);
-E void save_os_rdb_dbase(void);
 
 E void os_remove_nick(NickCore *nc);
 E int is_services_root(User *u);
@@ -822,7 +768,6 @@ E void del_session(const char *host);
 
 E void load_exceptions(void);
 E void save_exceptions(void);
-E void save_rdb_exceptions(void);
 E int do_exception(User *u);
 E void expire_exceptions(void);
 
@@ -884,42 +829,8 @@ E void split_usermask(const char *mask, char **nick, char **user,
                       char **host);
 E char *create_mask(User * u);
 
-#ifdef USE_MYSQL
-/**** mysql.c ****/
-E MYSQL       *mysql;
-E MYSQL_RES   *mysql_res;
-E MYSQL_FIELD *mysql_fields;
-E MYSQL_ROW   mysql_row;
-
-E int db_mysql_init();
-E int db_mysql_open();
-E int db_mysql_close();
-E int db_mysql_query(char *sql);
-E char *db_mysql_quote(char *sql);
-E void db_mysql_save_ns_core(NickCore * nc);
-E void db_mysql_save_ns_alias(NickAlias * na);
-E void db_mysql_save_ns_req(NickRequest * nr);
-E void db_mysql_save_cs_info(ChannelInfo * ci);
-E void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                           SList * ak, SList * sgl, SList * sql,
-                           SList * szl, HostCache * hc);
-E void db_mysql_save_news(NewsItem * ni);
-E void db_mysql_save_exceptions(Exception * e);
-E void db_mysql_save_hs_core(HostCore * hc);
-E void db_mysql_save_bs_core(BotInfo * bi);
-E void db_mysql_load_bs_dbase(void);
-E void db_mysql_load_hs_dbase(void);
-E void db_mysql_load_ns_dbase(void);
-E void db_mysql_load_ns_req_dbase(void);
-E void db_mysql_load_cs_dbase(void);
-E void db_mysql_load_os_dbase(void);
-E void db_mysql_load_exceptions(void);
-E void db_mysql_load_news(void);
-#endif
-
 #ifdef USE_ENCRYPTION
 extern int encrypt_in_place(char *buf, int size);
 #endif
-
 
 #endif	/* EXTERN_H */

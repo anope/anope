@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="283"
+VERSION_BUILD="294"
 
 # $Log$
+#
+# BUILD : 1.7.4 (294)
+# BUGS  : 
+# NOTES : First import. Current status: anope_bs_core finished for new phase1, anope_cs_access working for cs access add.
 #
 # BUILD : 1.7.4 (283)
 # BUGS  : N/A

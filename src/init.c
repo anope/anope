@@ -607,6 +607,11 @@ int init(int ac, char **av)
     lang_init();
     if (debug)
         alog("debug: Loaded languages");
+    
+    /* Initialize remote database support */
+    rdb_init();
+    if (debug)
+        alog("debug: Loaded remote databases");
 
     /* Initialize subservices */
     ns_init();
@@ -616,10 +621,6 @@ int init(int ac, char **av)
     os_init();
     hostserv_init();
     helpserv_init();
-
-#ifdef USE_RDB
-    rdb_init();
-#endif
 
     /* Initialize proxy detection */
 #ifdef USE_THREADS
@@ -643,12 +644,6 @@ int init(int ac, char **av)
 #endif
 
     /* Load up databases */
-#ifdef USE_RDB
-    if (UseRDB)
-        rdb_load_dbases();
-    /* Need a better way to handle this -dane */
-    if (!UseRDB) {
-#endif
         if (!skeleton) {
             load_ns_dbase();
             if (debug)
@@ -682,25 +677,8 @@ int init(int ac, char **av)
             if (debug)
                 alog("debug: Loaded PreNick database (9/9)");
         }
-#ifdef USE_RDB
-    }
-#endif
     alog("Databases loaded");
-
-    /* Save the databases back to file/mysql to reflect any changes */
-#ifdef USE_RDB
-    if (!UseRDB) {              /* Only save if we are not using remote databases
-                                 * to avoid floods. As a side effects our nice
-                                 * FFF databases won't get overwritten if the
-                                 * mysql db is broken (empty etc.) */
-#endif
-        alog("Info: Reflecting database records.");
-        save_databases();
-#ifdef USE_RDB
-    } else {
-        alog("Info: Not reflecting database records.");
-    }
-#endif
+    save_databases();
     /* Make myself known to myself in the serverlist */
     me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME);
 

@@ -152,8 +152,12 @@ CSModeUtil csmodeutils[] = {
 	{ "DEPROTECT",	"!deprotect",	"-a",	0          ,	CA_PROTECT, CA_PROTECTME },
 	{ "PROTECT",	"!protect",		"+a",	0          ,	CA_PROTECT, CA_PROTECTME },
 #endif
+#ifdef IRC_PTLINK
+	{ "DEPROTECT",	"!deprotect",	"-a",	0          ,	CA_PROTECT, CA_PROTECTME },
+	{ "PROTECT",	"!protect",		"+a",	0          ,	CA_PROTECT, CA_PROTECTME },
+#endif
 #if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-  	{ "DEPROTECT",	"!deadmin",	"-a",	0          ,	CA_PROTECT, CA_PROTECTME },
+  	{ "DEPROTECT",	"!deadmin",	    "-a",	0          ,	CA_PROTECT, CA_PROTECTME },
 	{ "PROTECT",	"!admin",		"+a",	0          ,	CA_PROTECT, CA_PROTECTME },
 #endif
 
@@ -295,7 +299,7 @@ static int do_deprotect(User * u);
 static int do_owner(User * u);
 static int do_deowner(User * u);
 #endif
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
 static int do_protect(User * u);
 static int do_deprotect(User * u);
 #endif
@@ -374,6 +378,10 @@ void moduleAddChanServCmds(void) {
     c = createCommand("DEPROTECT",do_deprotect,NULL,  CHAN_HELP_DEPROTECT,      -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("OWNER",    do_owner,    NULL,  CHAN_HELP_OWNER,          -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("DEOWNER",  do_deowner,  NULL,  CHAN_HELP_DEOWNER,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
+#endif
+#ifdef IRC_PTLINK
+    c = createCommand("PROTECT",  do_protect,  NULL,  CHAN_HELP_PROTECT,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
+    c = createCommand("DEPROTECT",do_deprotect,NULL,  CHAN_HELP_DEPROTECT,      -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
 #endif
 #if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
     c = createCommand("ADMIN",  do_protect,  NULL,  CHAN_HELP_PROTECT,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
@@ -1630,7 +1638,7 @@ int check_should_owner(User * user, const char *chan)
 
 /*************************************************************************/
 
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
 
 int check_should_protect(User * user, const char *chan)
 {
@@ -5253,7 +5261,7 @@ static int do_dehalfop(User * u)
 
 /*************************************************************************/
 
-#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
+#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
 
 static int do_protect(User * u)
 {

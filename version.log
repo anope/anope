@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="102"
+VERSION_BUILD="103"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (103)
+# BUGS  : none
+# NOTES : Added +a/-a support for PTLink ircd.
 #
 # BUILD : 1.7.2 (102)
 # BUGS  : 53

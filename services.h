@@ -688,6 +688,10 @@ struct csmodeutil_ {
 #define MUT_DEPROTECT   6
 #define MUT_PROTECT     7
 #endif
+#ifdef IRC_PTLINK
+#define MUT_DEPROTECT   4
+#define MUT_PROTECT     5
+#endif
 /*************************************************************************/
 
 /* Online user and channel data. */

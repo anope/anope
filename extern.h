@@ -120,7 +120,7 @@ E int check_should_halfop(User * user, const char *chan);
 E int check_should_owner(User * user, const char *chan);
 E int check_should_protect(User * user, const char *chan);
 #endif
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
 E int check_should_protect(User * user, const char *chan);
 #endif
 E int check_kick(User * user, char *chan);

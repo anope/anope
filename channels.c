@@ -1237,7 +1237,7 @@ static void chan_adduser2(User * user, Channel * c)
             chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
         } else
 #endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
         if (check_should_protect(user, chan)) {
             chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
         } else

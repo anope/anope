@@ -543,8 +543,10 @@ void load_old_ns_dbase(void)
                         SAFE(read_string(access, f));
                 }
 
-                SAFE(read_int16(&nc->memos.memocount, f));
-                SAFE(read_int16(&nc->memos.memomax, f));
+                SAFE(read_int16(&tmp16, f));
+                nc->memos.memocount = (int16) tmp16;
+                SAFE(read_int16(&tmp16, f));
+                nc->memos.memomax = (int16) tmp16;
                 if (nc->memos.memocount) {
                     Memo *memos;
                     memos = scalloc(sizeof(Memo) * nc->memos.memocount, 1);
@@ -741,8 +743,10 @@ void load_ns_dbase(void)
                     SAFE(read_string(access, f));
             }
 
-            SAFE(read_int16(&nc->memos.memocount, f));
-            SAFE(read_int16(&nc->memos.memomax, f));
+            SAFE(read_int16(&tmp16, f));
+            nc->memos.memocount = (int16) tmp16;
+            SAFE(read_int16(&tmp16, f));
+            nc->memos.memomax = (int16) tmp16;
             if (nc->memos.memocount) {
                 Memo *memos;
                 memos = scalloc(sizeof(Memo) * nc->memos.memocount, 1);

@@ -285,6 +285,7 @@ char *encode_ip(u_char * ip)
     static char buf[25];
     u_char *cp;
     struct in_addr ia;          /* For IPv4 */
+    char *s_ip;                 /* Signed ip string */
 
     if (!ip)
         return "*";
@@ -292,7 +293,8 @@ char *encode_ip(u_char * ip)
     if (strchr((char *) ip, ':')) {
         return NULL;
     } else {
-        ia.s_addr = inet_addr(ip);
+        s_ip = str_signed(ip);
+        ia.s_addr = inet_addr(s_ip);
         cp = (u_char *) ia.s_addr;
         b64_encode((char *) &cp, sizeof(struct in_addr), buf, 25);
     }

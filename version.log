@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="498"
+VERSION_BUILD="499"
 
 # $Log$
+#
+# BUILD : 1.7.6 (499)
+# BUGS  : 
+# NOTES : Fixed several compiler warnings with make strict, removed 2 deprecated config vars.
 #
 # BUILD : 1.7.6 (498)
 # BUGS  : N/A

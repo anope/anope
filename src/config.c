@@ -41,9 +41,6 @@ static char *temp_userhost;
 
 char *HelpChannel;
 char *LogChannel;
-char *NetworkDomain;
-char **NetworkDomains;
-int DomainNumber;
 char *NetworkName;
 
 char *s_NickServ;
@@ -337,11 +334,7 @@ int NumUlines;
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
 
-static void dep_ListOpersOnly(void)
-{
-    NSListOpersOnly = 1;
-    CSListOpersOnly = 1;
-}
+/* Hey, there are no left! -GD */
 
 /*************************************************************************/
 
@@ -486,8 +479,6 @@ Directive directives[] = {
     {"KillClonesAkillExpire",
      {{PARAM_TIME, PARAM_RELOAD, &KillClonesAkillExpire}}},
     {"LimitSessions", {{PARAM_SET, PARAM_FULLONLY, &LimitSessions}}},
-    {"ListOpersOnly",
-     {{PARAM_DEPRECATED, PARAM_RELOAD, dep_ListOpersOnly}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
@@ -518,7 +509,6 @@ Directive directives[] = {
     {"MSNotifyAll", {{PARAM_SET, PARAM_RELOAD, &MSNotifyAll}}},
     {"MSSendDelay", {{PARAM_TIME, PARAM_RELOAD, &MSSendDelay}}},
     {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
-    {"NetworkDomain", {{PARAM_STRING, PARAM_RELOAD, &NetworkDomain}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
@@ -1383,20 +1373,6 @@ int read_config(int reload)
     } else {
         PreNickDBName = NULL;
         NSRExpire = 0;
-    }
-
-    /* Network Domain building */
-    DomainNumber = 0;
-    if (NetworkDomain) {
-        s = strtok(NetworkDomain, " ");
-        if (s) {
-            do {
-                DomainNumber++;
-                NetworkDomains =
-                    realloc(NetworkDomains, sizeof(char *) * DomainNumber);
-                NetworkDomains[DomainNumber - 1] = sstrdup(s);
-            } while ((s = strtok(NULL, " ")));
-        }
     }
 
     if (!retval) {

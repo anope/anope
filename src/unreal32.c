@@ -1506,7 +1506,7 @@ int anope_event_netinfo(char *source, int ac, char **av)
 void anope_cmd_netinfo(int ac, char **av)
 {
     send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
-             send_token("NETINFO", "AO"), maxusercnt,
+             send_token("NETINFO", "AO"), (long int) maxusercnt,
              (long int) time(NULL), atoi(av[2]), av[3], av[7]);
 }
 

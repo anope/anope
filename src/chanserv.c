@@ -741,10 +741,9 @@ void load_cs_dbase(void)
             ci->levels = scalloc(2 * CA_SIZE, 1);
             reset_levels(ci);
             for (j = 0; j < n_levels; j++) {
+                SAFE(read_int16(&tmp16));
                 if (j < CA_SIZE)
-                    SAFE(read_int16(&ci->levels[j], f));
-                else
-                    SAFE(read_int16(&tmp16, f));
+                    ci->levels[j] = (int16) tmp16;
             }
             /* To avoid levels list silly hacks */
             if (ver < 10)
@@ -775,7 +774,8 @@ void load_cs_dbase(void)
                 for (j = 0; j < ci->accesscount; j++) {
                     SAFE(read_int16(&ci->access[j].in_use, f));
                     if (ci->access[j].in_use) {
-                        SAFE(read_int16(&ci->access[j].level, f));
+                        SAFE(read_int16(&tmp16, f));
+                        ci->access[j].level = (int16) tmp16;
                         SAFE(read_string(&s, f));
                         if (s) {
                             if (ver >= 13)
@@ -900,8 +900,10 @@ void load_cs_dbase(void)
                 }
             }
 
-            SAFE(read_int16(&ci->memos.memocount, f));
-            SAFE(read_int16(&ci->memos.memomax, f));
+            SAFE(read_int16(&tmp16, f));
+            ci->memos.memocount = (int16) tmp16;
+            SAFE(read_int16(&tmp16, f));
+            ci->memos.memomax = (int16) tmp16;
             if (ci->memos.memocount) {
                 Memo *memos;
                 memos = scalloc(sizeof(Memo) * ci->memos.memocount, 1);
@@ -949,10 +951,9 @@ void load_cs_dbase(void)
                 n_ttb = tmp16;
                 ci->ttb = scalloc(2 * TTB_SIZE, 1);
                 for (j = 0; j < n_ttb; j++) {
+                    SAFE(read_int16(&tmp16, f));
                     if (j < TTB_SIZE)
-                        SAFE(read_int16(&ci->ttb[j], f));
-                    else
-                        SAFE(read_int16(&tmp16, f));
+                        ci->ttb[j] = (int16) tmp16;
                 }
                 for (j = n_ttb; j < TTB_SIZE; j++)
                     ci->ttb[j] = 0;

@@ -337,10 +337,11 @@ int loadModule(Module * m, User * u)
     strncpy(buf, MODULE_PATH, 4095);    /* Get full path with .so extension */
     len = strlen(buf);
     strncat(buf, "runtime/", 4095 - len);
-    len += strlen(buf);
+    len = strlen(buf);
     strncat(buf, m->name, 4095 - len);
-    len += strlen(buf);
+    len = strlen(buf);
     strncat(buf, ".so", 4095 - len);
+	buf[4095] = '\0';
 
     m->filename = sstrdup(buf);
 #ifdef HAS_RTLD_LOCAL

@@ -1103,4 +1103,26 @@ char *host_resolve(char *host)
     }
 }
 
+/*************************************************************************/
 
+/**
+ * Change an unsigned string to a signed string, overwriting the original
+ * string.
+ * @param input string
+ * @return output string, same as input string.
+ */
+
+char *str_signed(u_char *str)
+{
+	char *nstr;
+	
+	nstr = (char *)str;
+	while (*str) {
+		*nstr = (char)*str;
+		str++; nstr++;
+	}
+	
+	return nstr;
+}
+
+/* EOF */

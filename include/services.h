@@ -45,6 +45,7 @@
 #include <limits.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/stat.h>	/* for umask() on some systems */
 #include <sys/types.h>

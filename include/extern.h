@@ -223,8 +223,6 @@ E char *ServiceHost;
 
 E char *HelpChannel;
 E char *LogChannel;
-E char **NetworkDomains;
-E int  DomainNumber;
 E char *NetworkName;
 
 E char *s_NickServ;
@@ -679,6 +677,8 @@ E void rand_init(void);
 E u_char getrandom8(void);
 E u_int16_t getrandom16(void);
 E u_int32_t getrandom32(void);
+
+E char *str_signed(u_char *str);
 
 /**** modules.c ****/
 E void moduleCallBackRun(void);

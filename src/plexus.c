@@ -1353,10 +1353,11 @@ void anope_cmd_squit(char *servname, char *message)
 
 int anope_event_mode(char *source, int ac, char **av)
 {
+    Server *s;
+
     if (ac < 2)
         return MOD_CONT;
 
-    Server *s;
     s = findserver(servlist, source);
 
     if (*av[0] == '#' || *av[0] == '&') {

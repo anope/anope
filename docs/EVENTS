@@ -126,43 +126,161 @@ Anope Internal Events
 
     Here's a list of all event hooks we currently offer, with a description
     of what argument is being passed to the event functions for this type of
-    event.
+    event. All arguments are plain-text strings (char *). The list is sorted
+    in alphabetical order.
 
     Note that all events are emitted AFTER the action has taken place, so
-    any deleted nick/channel/etc won't exist anymore when your function is
-    being run.
+    any deleted nick/channel/etc won't exist anymore and any created one will
+    exist when your function is being run, unless noted otherwise.
 
-    |------------------------|-------------------------------------------|
-    | Event Hook             | Event Argument                            |
-    |------------------------|-------------------------------------------|
-    | EVENT_DB_SAVING        | EVENT_START, EVENT_STOP                   |
-    | EVENT_NEWNICK          | Nick that just connected to the network   |
-    | EVENT_BOT_UNASSIGN     | Channel name the bot is on                |
-    | EVENT_BOT_JOIN         | Channel name the bot is on                |
-    | EVENT_BOT_CREATE       | Nick of the bot involved                  |
-    | EVENT_BOT_CHANGE       | Nick of the bot involved                  |
-    | EVENT_BOT_DEL          | Nick of the bot involved                  |
-    | EVENT_BOT_ASSIGN       | Nick of the bot involved                  |
-    | EVENT_TOPIC_UPDATED    | Channel name of the channel involved      |
-    | EVENT_CHAN_EXPIRE      | Channel name of the channel involved      |
-    | EVENT_CHAN_REGISTERED  | Channel name of the channel involved      |
-    | EVENT_CHAN_DROP        | Channel name of the channel involved      |
-    | EVENT_CHAN_FORBIDDEN   | Channel name of the channel involved      |
-    | EVENT_CHAN_SUSPENDED   | Channel name of the channel involved      |
-    | EVENT_CONNECT          | EVENT_START, EVENT_STOP                   |
-    | EVENT_DB_EXPIRE        | EVENT_START, EVENT_STOP                   |
-    | EVENT_RESTART          | EVENT_START                               |
-    | EVENT_SHUTDOWN         | EVENT_START, EVENT_STOP                   |
-    | EVENT_SIGNAL           | Quit message sent                         |
-    | EVENT_NICK_REGISTERED  | Nick of the account involved              |
-    | EVENT_NICK_DROPPED     | Nick of the account involved              |
-    | EVENT_NICK_FORBIDDEN   | Nick of the account involved              |
-    | EVENT_NICK_EXPIRE      | Nick of the account involved              |
-    | EVENT_CHANGE_NICK      | Nick of the user involved                 |
-    | EVENT_USER_LOGOFF      | Nick of the user involved                 |
-    | EVENT_GROUP            | Nick of the user involved                 |
-    | EVENT_NICK_IDENTIFY    | Nick of the user involved                 |
-    | EVENT_SERVER_SQUIT     | Name of the server involved               |
-    | EVENT_SERVER_CONNECT   | Name of the server involved               |
-    | EVENT_DEFCON_LEVEL     | Level of Defcon being invoked             |
-    |------------------------|-------------------------------------------|
+    Also note that EVENT_START and EVENT_STOP should not be matched with an
+    equal sign, but with string comparision. See the bundled events module for
+    an example on how to do this.
+
+    EVENT_BOT_ASSIGN
+        A BotServ bot has been assigned to a channel.
+        The argument contains the nickname of the bot involved.
+
+    EVENT_BOT_CHANGE
+        The properties of a BotServ bot have been changed.
+        The argument contains the nickname of the bot involved.
+
+    EVENT_BOT_CREATE
+        A new BotServ bot has been created, and is ready to use.
+        The argument contains the nickname of the newly created bot.
+
+    EVENT_BOT_DEL
+        A BotServ bot is being deleted from BotServ. This event is being sent
+        just before the actual deletion is performed.
+        The argument contains the nickname of the bot being deleted.
+
+    EVENT_BOT_JOIN
+        A BotServ bot has joined a channel and opped itself.
+        The argument contains the channel name the bot is on.
+
+    EVENT_BOT_UNASSIGN
+        A BotServ bot is being unassigned from a channel. This event is being
+        sent before the actual removing of the bot is done.
+        The argument contains the channel name the bot is on.
+
+    EVENT_CHAN_DROP
+        A channel has been dropped and deleted.
+        The argument is the name of the channel that has been dropped.
+
+    EVENT_CHAN_EXPIRE
+        A channel has been expired and will be deleted. The event will be
+        emitted just before the actual channel deletion happens.
+        The argument is the name of the channel being deleted.
+
+    EVENT_CHAN_FORBIDDEN
+        A channel has been forbidden (ChanServ FORBID).
+        The argument is the name of the channel that has been forbidden.
+
+    EVENT_CHAN_REGISTERED
+        A new channel has been registered.
+        The argument is the name of the channel that has been registered.
+
+    EVENT_CHAN_SUSPENDED
+        A channel has been suspended (ChanServ SUSPEND).
+        The argument is the name of the channel that has been suspended.
+
+    EVENT_CHANGE_NICK
+        A user has just changed it's nick.
+        The argument contains the new nickname of the user.
+
+    EVENT_CONNECT
+        This event is emitted when the connection to our uplink hub is being
+        made.
+        The argument is either EVENT_START or EVENT_STOP, to indicate if it's
+        emitted before or after the connection has been made. EVENT_STOP is
+        emitted before our burst is being sent over the link.
+
+    EVENT_DB_EXPIRE
+        This event is emitted when the expiry routines for all things that can
+        expire in Anope are being run.
+        The argument is either EVENT_START or EVENT_STOP, to indicate if it's
+        being emitted before or after the expiry routines have been run.
+
+    EVENT_DB_SAVING
+        This event is emitted when the databases are being saved.
+        The argument is either EVENT_START or EVENT_STOP, to indicate if it's
+        emitted before or after the saving routines.
+
+    EVENT_DEFCON_LEVEL
+        The DefCon level has just been changed. This event is emitted before
+        any DefCon-related action is taken. The internal DefConLevel has
+        already been raised at this point.
+        The argument contains the new level of DefCon being invoked.
+
+    EVENT_GROUP
+        A user has grouped it's nickname to another user group.
+        The argument contains the nickname of the user that joined the group.
+
+    EVENT_NEWNICK
+        A new user has been introduced on the network.
+        The argument contains the nickname of the newly introduced user.
+
+    EVENT_NICK_DROPPED
+        A user's nick has just been dropped. Note that the nickname information
+        has already been deleted!
+        The argument contains the nickname of the user that has just been
+        dropped.
+
+    EVENT_NICK_EXPIRE
+        A user's nick has just expired. Note that, as with EVENT_NICK_DROPPED,
+        the nickname information has already been deleted!
+        The argument contains the nickname of the user that has just expired.
+
+    EVENT_NICK_FORBIDDEN
+        A user's nick has just been forbidden.
+        The argument contains the nickname of the user that has just been
+        forbidden.
+
+    EVENT_NICK_IDENTIFY
+        A user has just identified for it's nickname with NickServ.
+        The argument contains the nickname of the user that just identified.
+
+    EVENT_NICK_REGISTERED
+        A new user has just registered it's nickname. This event is being
+        emitted when the registration is completed, but the user modes have not
+        yet been set.
+        The argument contains the nickname of the newly registered user.
+
+    EVENT_RESTART
+        This event is emitted before the services are being restarted.
+        The argument is always EVENT_START.
+
+    EVENT_SERVER_CONNECT
+        A new server has just connected to the network.
+        The argument contains the name of the new server.
+
+    EVENT_SERVER_SQUIT
+        A server has sent an SQUIT and is about to be removed from the
+        network. This event is being sent before the server is actually removed
+        from the network.
+        The argument is the name of the server that is being removed.
+
+    EVENT_SHUTDOWN
+        This event is emitted when Anope is being shut down.
+        The argument is either EVENT_START or EVENT_STOP, to indicate where in
+        the process of restarting the core is. With EVENT_START, services are
+        still fully online and operating. With EVENT_STOP, every internal clean
+        up has been done already, and the SQUIT has been sent; the only thing
+        done after emitting the event is closing the socket to the uplink hub.
+
+    EVENT_SIGNAL
+        This event is emitted when Anope is quitting because of a signal it
+        received.
+        The argument contains the quit message that will be sent with the SQUIT
+        for this shutdown.
+
+    EVENT_TOPIC_UPDATED
+        A channel topic has been succesfully updated. Note that this even is
+        only emitted if the new topic has been fully accepted and set by the
+        Anope core.
+        The argument is the name of the channel involved.
+
+    EVENT_USER_LOGOFF
+        A user has left the network. This event is emitted before the internal
+        removal is performed, so the user still exists internally.
+        The argument contains the nickname of the user leaving the network.

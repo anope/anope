@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+03/09 A Documentation on the proxy detector in docs/PROXY.                [ #00]
 03/03 A ShadowIRCD 4.0 beta 7 support added.                              [ #00]
 02/27 A Added multi-file module support.                                  [ #00]
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]

@@ -1160,13 +1160,13 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
     }
 }
 
-/* 391 */
+/* 391    RPL_TIME ":%s 391 %s %s :%s" */
 void anope_cmd_391(char *source, char *timestr)
 {
     if (!timestr) {
         return;
     }
-    send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
+    send_cmd(ServerName, "391 %s %s :%s", source, ServerName, timestr);
 }
 
 /* 250 */

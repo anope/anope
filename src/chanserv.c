@@ -1747,11 +1747,21 @@ void restore_topic(char *chan)
     Channel *c = findchan(chan);
     ChannelInfo *ci;
 
-    if (!c || !(ci = c->ci) || !(ci->flags & CI_KEEPTOPIC))
+    if (!c || !(ci = c->ci))
         return;
+    if (!(ci->flags & CI_KEEPTOPIC)) {
+        /* We need to reset the topic here, since it's currently empty and
+         * should be updated with a TOPIC from the IRCd soon. -GD
+         */
+        ci->last_topic = NULL;
+        strscpy(ci->last_topic_setter, whosends(ci), NICKMAX);
+        ci->last_topic_time = time(NULL);
+        /* And we still return... -GD */
+        return;
+    }
     if (c->topic)
         free(c->topic);
-    if ((ci->last_topic) && !(ci->flags & CI_TOPICLOCK)) {
+    if (ci->last_topic) {
         c->topic = sstrdup(ci->last_topic);
         strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
         c->topic_time = ci->last_topic_time;

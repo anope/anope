@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="522"
+VERSION_BUILD="523"
 
 # $Log$
+#
+# BUILD : 1.7.6 (523)
+# BUGS  : 267
+# NOTES : Internal last topic was not emptied on channel creation when KEEPTOPIC was off
 #
 # BUILD : 1.7.6 (522)
 # BUGS  : 254

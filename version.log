@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="216"
+VERSION_BUILD="218"
 
 # $Log$
+#
+# BUILD : 1.7.4 (218)
+# BUGS  : 
+# NOTES : Fixed compiling problem with Rage and Viagra
 #
 # BUILD : 1.7.4 (216)
 # BUGS  : 

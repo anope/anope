@@ -184,7 +184,7 @@ typedef struct channel_ Channel;
 # define BOTSERV_BOTS_MODE "+qS"
 #endif
 
-#if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3)
+#if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
 # define HAS_NICKIP
 # define HAS_EXCEPT
 # define HAS_SVSHOLD                                                            

@@ -2044,9 +2044,13 @@ static int do_register(User * u)
         }
     }
 
-    if (!pass || (NSForceEmail && !email)) {
-        syntax_error(s_NickServ, u, "REGISTER",
-                     NICK_REGISTER_SYNTAX_EMAIL);
+    if (!pass) {
+        if (NSForceEmail && !email) {
+            syntax_error(s_NickServ, u, "REGISTER",
+                         NICK_REGISTER_SYNTAX_EMAIL);
+        } else {
+            syntax_error(s_NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX);
+        }
     } else if (time(NULL) < u->lastnickreg + NSRegDelay) {
         notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
     } else if (u->na) {         /* i.e. there's already such a nick regged */
@@ -3247,6 +3251,11 @@ static int do_access(User * u)
     if (cmd && stricmp(cmd, "LIST") == 0 && mask && is_services_admin(u)
         && (na = findnick(mask))) {
 
+        if (na->nc->accesscount == 0) {
+            notice_lang(s_NickServ, u, NICK_ACCESS_LIST_X_EMPTY, na->nick);
+            return MOD_CONT;
+        }
+
         if (na->status & NS_VERBOTEN) {
             notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
             return MOD_CONT;
@@ -3326,6 +3335,11 @@ static int do_access(User * u)
             na->nc->access = NULL;
         }
     } else if (stricmp(cmd, "LIST") == 0) {
+        if (na->nc->accesscount == 0) {
+            notice_lang(s_NickServ, u, NICK_ACCESS_LIST_EMPTY, u->nick);
+            return MOD_CONT;
+        }
+
         notice_lang(s_NickServ, u, NICK_ACCESS_LIST);
         for (access = na->nc->access, i = 0; i < na->nc->accesscount;
              access++, i++) {

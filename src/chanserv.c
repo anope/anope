@@ -1971,7 +1971,8 @@ ChannelInfo *cs_findchan(const char *chan)
         return NULL;
     }
 
-    for (ci = chanlists[tolower(chan[1])]; ci; ci = ci->next) {
+    for (ci = chanlists[(unsigned char) tolower(chan[1])]; ci;
+         ci = ci->next) {
         if (stricmp(ci->name, chan) == 0)
             return ci;
     }
@@ -2035,13 +2036,13 @@ void alpha_insert_chan(ChannelInfo * ci)
 
     chan = ci->name;
 
-    for (prev = NULL, ptr = chanlists[tolower(chan[1])];
+    for (prev = NULL, ptr = chanlists[(unsigned char) tolower(chan[1])];
          ptr != NULL && stricmp(ptr->name, chan) < 0;
          prev = ptr, ptr = ptr->next);
     ci->prev = prev;
     ci->next = ptr;
     if (!prev)
-        chanlists[tolower(chan[1])] = ci;
+        chanlists[(unsigned char) tolower(chan[1])] = ci;
     else
         prev->next = ci;
     if (ptr)
@@ -2126,7 +2127,7 @@ int delchan(ChannelInfo * ci)
     if (ci->prev)
         ci->prev->next = ci->next;
     else
-        chanlists[tolower(ci->name[1])] = ci->next;
+        chanlists[(unsigned char) tolower(ci->name[1])] = ci->next;
     if (ci->desc)
         free(ci->desc);
     if (ci->mlock_key)
@@ -3700,7 +3701,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
         ulev = get_access(u, ci);
 
-        if (xlev >= ulev || ulev < ACCESS_AOP) {
+        if ((xlev >= ulev || ulev < ACCESS_AOP) && !is_servadmin) {
             notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             return MOD_CONT;
         }
@@ -3721,7 +3722,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 /**
                  * Patch provided by PopCorn to prevert AOP's reducing SOP's levels
                  **/
-                if ((access->level >= ulev) && (!u->isSuperAdmin)) {
+                if ((access->level >= ulev) && (!is_servadmin)) {
                     notice_lang(s_ChanServ, u, PERMISSION_DENIED);
                     return MOD_CONT;
                 }

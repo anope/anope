@@ -550,6 +550,10 @@ NICK_ACCESS_LIST
 	Lllista d'accés:
 NICK_ACCESS_LIST_X
 	Lllista d'accés per %s:
+NICK_ACCESS_LIST_EMPTY
+	Your access list is empty.
+NICK_ACCESS_LIST_X_EMPTY
+	Access list for %s is empty.
 
 # Status messages
 NICK_STATUS_0

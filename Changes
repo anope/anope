@@ -28,21 +28,24 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 10/05 A Globalized CS/NS STATUS messages		                  [ #00]
 10/02 A Added NewsCount as  new feature in services.conf                  [ #00]
 08/28 A CSupport for +I channel mode.                                     [ #00]
-08/28 A Complete support for Unreal3.2                                    [ #00]
+08/28 A Complete support for Unreal3.2.                                   [ #00]
 08/28 A New BASE64 general library.                                       [ #00]
 09/07 A Unreal32 channel mode +T support.                                 [ #00]
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
-10/31 F Fixes configure warning on BSD systems				  [#160]
-10/30 F Fixed OS CLEARMODE, so the correct messages are sent		  [#207]
-10/30 F Fixed MS INFO using the correct message 			  [#205]
-10/29 F Fixed CS CLEAR MODES not resetting the modes			  [#182]
-10/29 F Fixed LogUser message, now normalizes the "realname" for display  [#199]
-10/29 F Fixed BS ACT, if the string contained control character 1	  [#193]
-10/27 F Fixed hardcored ircd sqlines from taking out services		  [#133]
-10/27 F Fixed TOPIC timestamp not being read correctly		          [#196]
-10/24 F Fixed OPNOTICE when doing /CS OP			          [#198]
+11/06 F Fixed syntax error when NSForceEmail is disabled		  [ #00]
+11/06 F Fixed using "make" under some BSD systems			  [ #00]
+11/06 F Chanserv taking modes more than once.				  [ #68]
+10/31 F Fixes configure warning on BSD systems.				  [#160]
+10/30 F Fixed OS CLEARMODE, so the correct messages are sent.		  [#207]
+10/30 F Fixed MS INFO using the correct message. 			  [#205]
+10/29 F Fixed CS CLEAR MODES not resetting the modes.			  [#182]
+10/29 F Fixed LogUser message, now normalizes the "realname" for display. [#199]
+10/29 F Fixed BS ACT, if the string contained control character 1.	  [#193]
+10/27 F Fixed hardcored ircd sqlines from taking out services.		  [#133]
+10/27 F Fixed TOPIC timestamp not being read correctly.		          [#196]
+10/24 F Fixed OPNOTICE when doing /CS OP.			          [#198]
 10/20 F Updated Base64 Lib to fix Unreal NICKIP. 	                  [ #00]
 10/16 F Fixed BS TTB. 					                  [#185]
 10/16 F RestrictOperNicks is no longer case sensitive.	                  [#190]
@@ -73,8 +76,10 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 08/28 F Buffer preparation for vsnprintf() call.                          [#158]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
+11/06 A NS ACCESS LIST reports correctly that the list is empty           [ #00]
 10/05 A CS/NS INFO shows the expire time.                                 [ #00]
 10/05 A NS GLIST shows the expire time.                                   [ #00]
+11/06 F Service Admins can now modify the XOP list			  [#170]
 10/29 F ChanServ XOP reordering fix					  [#187]
 10/29 F ChanServ AKICK reordering fix					  [#201]
 10/29 F ChanServ now requires a more obscure password                     [#202]
@@ -88,6 +93,10 @@ Provided by DrStein <gacevedo@anope.org> - 2004
 
 Provided by crazytoon <da.crew@gmx.net> - 2004
 10/24 A Updated German language file	                                  [ #00]
+
+Provided by Miles Nordin <carton@Ivy.NET> - 2004
+11/06 F Fixes segfault under NetBSD with channel names using i18n symbols [ #00]
+
 
 Anope Version 1.7.5
 -------------------

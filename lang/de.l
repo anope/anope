@@ -570,6 +570,10 @@ NICK_ACCESS_LIST
 	Access-Liste:
 NICK_ACCESS_LIST_X
 	Access-List von %s:
+NICK_ACCESS_LIST_EMPTY
+	Your access list is empty.
+NICK_ACCESS_LIST_X_EMPTY
+	Access list for %s is empty.
 
 # Status messages
 NICK_STATUS_0

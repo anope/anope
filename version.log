@@ -8,9 +8,17 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="438"
+VERSION_BUILD="439"
 
 # $Log$
+#
+# BUILD : 1.7.6 (439)
+# BUGS  : 68, 170, 209
+# NOTES : 1. DrSteins XOP patch (bug# 170), 2. Cleaned up the English language file for grammar (bug# 209), 
+# 3. Patch that fixes segfaults under NetBSD, 4. Cleaned up some places that could lead to segfaults, 
+# 5. DrSteins patch for NS ACCESS LIST, 6. Chanserv taking modes more than once (bug #68), 
+# 7. Fixed errors when doing "make" under some BSD systems, 8. Fixed syntax error when NSForceEmail is disabled
+# 
 #
 # BUILD : 1.7.6 (438)
 # BUGS  : 160

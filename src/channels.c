@@ -235,10 +235,32 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                      mode, chan->name, user->nick);
 
             if (add) {
-                if (check && cum->is_valid
-                    && !cum->is_valid(user, chan, servermode))
-                    continue;
-                chan_set_user_status(chan, user, cum->status);
+                /* Fixes bug #68
+                   - might be a bit ugly but it works, the idea is that since the 
+                   is_valid function strips out all of the modes there is no point
+                   in sending it over and over again  
+                 */
+                if (check) {
+                    if (check == 2 && cum->is_valid) {
+                        if (debug) {
+                            alog("debug: Modes already removed, calling remove_user_status() to clean up");
+                        }
+                        chan_remove_user_status(chan, user, cum->status);
+                        continue;
+                    } else if (cum->is_valid
+                               && !cum->is_valid(user, chan, servermode)) {
+                        if (debug) {
+                            alog("debug: Modes already sent calling remove_user_status() to clean up");
+                        }
+                        chan_remove_user_status(chan, user, cum->status);
+                        check = 2;
+                        continue;
+                    } else {
+                        chan_set_user_status(chan, user, cum->status);
+                    }
+                } else {
+                    chan_set_user_status(chan, user, cum->status);
+                }
             } else {
                 chan_remove_user_status(chan, user, cum->status);
             }

@@ -540,6 +540,10 @@ NICK_ACCESS_LIST
 	Access list:
 NICK_ACCESS_LIST_X
 	Access list for %s:
+NICK_ACCESS_LIST_EMPTY
+	Your access list is empty.
+NICK_ACCESS_LIST_X_EMPTY
+	Access list for %s is empty.
 
 # Status messages
 NICK_STATUS_0
@@ -589,7 +593,7 @@ NICK_INFO_GREET
 NICK_INFO_OPTIONS
 	          Options: %s
 NICK_INFO_EXPIRE
-	Expires in: %s
+	Expires on: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Protection
@@ -1394,7 +1398,7 @@ CHAN_INFO_OPT_NONE
 CHAN_INFO_MODE_LOCK
 	      Mode lock: %s
 CHAN_INFO_EXPIRE
-	      Expires in: %s
+	      Expires on: %s
 CHAN_INFO_NO_EXPIRE
 	This channel will not expire.
 
@@ -2573,29 +2577,29 @@ OPER_SET_IGNORE_OFF
 OPER_SET_IGNORE_ERROR
 	Setting for IGNORE must be ON or OFF.
 OPER_SET_READONLY_ON
-	Services is now in read-only mode.
+	Services are now in read-only mode.
 OPER_SET_READONLY_OFF
-	Services is now in read-write mode.
+	Services are now in read-write mode.
 OPER_SET_READONLY_ERROR
 	Setting for READONLY must be ON or OFF.
 OPER_SET_LOGCHAN_ON
-	Services is now reporting log messages to %s.
+	Services are now reporting log messages to %s.
 OPER_SET_LOGCHAN_OFF
-	Services is no longer reporting log messages to a channel.
+	Services are no longer reporting log messages to a channel.
 OPER_SET_LOGCHAN_ERROR
 	Setting for LOGCHAN must be ON or OFF and LogChannel must be defined.
 OPER_SET_DEBUG_ON
-	Services is now in debug mode.
+	Services are now in debug mode.
 OPER_SET_DEBUG_OFF
-	Services is now in non-debug mode.
+	Services are now in non-debug mode.
 OPER_SET_DEBUG_LEVEL
-	Services is now in debug mode (level %d).
+	Services are now in debug mode (level %d).
 OPER_SET_DEBUG_ERROR
 	Setting for DEBUG must be ON, OFF, or a positive number.
 OPER_SET_NOEXPIRE_ON
-	Services is now in no expire mode.
+	Services are now in no expire mode.
 OPER_SET_NOEXPIRE_OFF
-	Services is now in expire mode.
+	Services are now in expire mode.
 OPER_SET_NOEXPIRE_ERROR
 	Setting for NOEXPIRE must be ON or OFF.
 OPER_SET_UNKNOWN_OPTION

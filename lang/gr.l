@@ -548,6 +548,10 @@ NICK_ACCESS_LIST
 	Λίστα πρόσβασης:
 NICK_ACCESS_LIST_X
 	Λίστα πρόσβασης για %s:
+NICK_ACCESS_LIST_EMPTY
+	Your access list is empty.
+NICK_ACCESS_LIST_X_EMPTY
+	Access list for %s is empty.
 
 # Status messages
 NICK_STATUS_0

@@ -554,6 +554,10 @@ NICK_ACCESS_LIST
 	Access listesi:
 NICK_ACCESS_LIST_X
 	%s nickinin access listesi:
+NICK_ACCESS_LIST_EMPTY
+	Your access list is empty.
+NICK_ACCESS_LIST_X_EMPTY
+	Access list for %s is empty.
 
 # Status messages
 NICK_STATUS_0

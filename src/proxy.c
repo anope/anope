@@ -234,7 +234,7 @@ int proxy_check(char *nick, char *host, uint32 ip)
 
     for (message = ProxyMessage, i = 0; i < 8 && *message && **message;
          message++, i++)
-        notice(s_GlobalNoticer, nick, *message);
+        notice(s_GlobalNoticer, nick, "%s", *message);
 
     hc = proxy_cache_add(host);
     if (ircd->nickip) {

@@ -18,22 +18,24 @@ all: $(LANGOBJS)
 distclean: clean spotless
 
 install: all
-	mkdir -p $(DATDEST)/languages
-ifdef RUNGROUP
-	chgrp $(RUNGROUP) $(DATDEST)/languages
-	chmod 770 $(DATDEST)/languages
-else
-	chmod 700 $(DATDEST)/languages
-endif
-	cp $(LANGOBJS) $(DATDEST)/languages
-ifdef RUNGROUP
-	chgrp $(RUNGROUP) $(DATDEST)/languages/*
-	chmod 660 $(DATDEST)/languages/*
-else
-	chmod 600 $(DATDEST)/languages/*
-endif
-
-
+	test -d $(DATDEST)/languages || mkdir $(DATDEST)/languages
+	@if [ "$(RUNGROUP)" ] ; then \
+		echo chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
+		chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
+		echo chmod -R g+rw $(DATDEST)/languages ; \
+		chmod -R g+rw $(DATDEST)/languages ; \
+		$(CP) $(LANGOBJS) $(DATDEST)/languages ; \
+		echo chgrp -R $(RUNGROUP) $(DATDEST)/languages ; \
+		chgrp -R $(RUNGROUP) $(DATDEST)/languages/* ; \
+		echo chmod -R g+rw $(DATDEST)/languages/* ; \
+		chmod -R g+rw $(DATDEST)/languages/* ; \
+	fi
+	@if [ ! "$(RUNGROUP)" ] ; then \
+		chmod 700 $(DATDEST)/languages/ ; \
+		$(CP) $(LANGOBJS) $(DATDEST)/languages ; \
+		chmod 600 $(DATDEST)/languages/* ; \
+	fi
+	
 clean:
 	rm -f $(LANGOBJS) langcomp
 

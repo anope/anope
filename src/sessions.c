@@ -240,7 +240,7 @@ int add_session(char *nick, char *host)
             if (SessionLimitExceeded)
                 notice(s_OperServ, nick, SessionLimitExceeded, host);
             if (SessionLimitDetailsLoc)
-                notice(s_OperServ, nick, SessionLimitDetailsLoc);
+                notice(s_OperServ, nick, "%s", SessionLimitDetailsLoc);
 
             /* We don't use kill_user() because a user stucture has not yet
              * been created. Simply kill the user. -TheShadow

@@ -183,6 +183,10 @@ Server *findserver(Server * s, const char *name)
 {
     Server *sl;
 
+    if (!name || !*name) {
+        return NULL;
+    }
+
     if (debug >= 3)
         alog("debug: findserver(%p)", name);
     while (s && (stricmp(s->name, name) != 0)) {

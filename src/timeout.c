@@ -27,14 +27,15 @@ int send_timeout_list(User * u)
 {
     Timeout *to, *last;
 
-    notice(s_OperServ, u->nick, "Now: %ld", time(NULL));
+    notice(s_OperServ, u->nick, "Now: %ld", (long int) time(NULL));
     for (to = timeouts, last = NULL; to; last = to, to = to->next) {
-        notice(s_OperServ, u->nick, "%p: %ld: %p (%p)",
-               to, to->timeout, to->code, to->data);
+        notice(s_OperServ, u->nick, "0x%p: %ld: 0x%p (0x%p)",
+               (void *) to, (long int) to->timeout, (void *) to->code,
+               (void *) to->data);
         if (to->prev != last)
             notice(s_OperServ, u->nick,
-                   "    to->prev incorrect!  expected=%p seen=%p",
-                   last, to->prev);
+                   "    to->prev incorrect!  expected=0x%p seen=0x%p",
+                   (void *) last, (void *) to->prev);
     }
     return MOD_CONT;
 }

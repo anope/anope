@@ -554,6 +554,10 @@ NICK_ACCESS_LIST
 	Lista de acceso:
 NICK_ACCESS_LIST_X
 	Lista de acceso para %s:
+NICK_ACCESS_LIST_EMPTY
+	Tu lista de acceso esta vacia.
+NICK_ACCESS_LIST_X_EMPTY
+	La lista de acceso para %s esta vacia.
 
 # Status messages
 NICK_STATUS_0

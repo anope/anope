@@ -1930,12 +1930,13 @@ static int do_help(User * u)
 static int do_register(User * u)
 {
     NickRequest *nr = NULL, *anr = NULL;
+    NickCore *nc = NULL;
     int prefixlen = strlen(NSGuestNickPrefix);
     int nicklen = strlen(u->nick);
     char *pass = strtok(NULL, " ");
     char *email = strtok(NULL, " ");
     char passcode[11];
-    int idx, min = 1, max = 62;
+    int idx, min = 1, max = 62, i = 0;
     int chars[] =
         { ' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l',
         'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y',
@@ -1974,6 +1975,27 @@ static int do_register(User * u)
         strspn(u->nick + prefixlen, "1234567890") == nicklen - prefixlen) {
         notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
         return MOD_CONT;
+    }
+
+    if (RestrictOperNicks) {
+        for (i = 0; i < RootNumber; i++) {
+            if (strstr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+                return MOD_CONT;
+            }
+        }
+        for (i = 0; i < servadmins.count && (nc = servadmins.list[i]);i++) {
+            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+                return MOD_CONT;
+            }
+        }
+        for (i = 0; i < servopers.count && (nc = servopers.list[i]);i++) {
+            if (strstr(u->nick, nc->display) && !is_oper(u)) {
+                notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
+                return MOD_CONT;
+            }
+        }
     }
 
     if (!pass || (NSForceEmail && !email)) {

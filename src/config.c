@@ -225,6 +225,7 @@ int BSCaseSensitive;
 int HideStatsO;
 int GlobalOnCycle;
 int AnonymousGlobal;
+int RestrictOperNicks;
 char *GlobalOnCycleMessage;
 char *GlobalOnCycleUP;
 char *ServicesRoot;
@@ -590,6 +591,7 @@ Directive directives[] = {
                        {PARAM_PORT, 0, &RemotePort3},
                        {PARAM_STRING, 0, &RemotePassword3}}},
     {"RestrictMail", {{PARAM_SET, PARAM_RELOAD, &RestrictMail}}},
+    {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
     {"SendMailPath", {{PARAM_STRING, PARAM_RELOAD, &SendMailPath}}},
     {"SendFrom", {{PARAM_STRING, PARAM_RELOAD, &SendFrom}}},
     {"ServerDesc", {{PARAM_STRING, 0, &ServerDesc}}},

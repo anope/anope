@@ -291,6 +291,7 @@ E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;
 E int   UseSVSHOLD;
+E int   RestrictOperNicks;
 
 E char **HostSetters;
 E int HostNumber;

@@ -1002,9 +1002,6 @@ static int do_help(User * u)
 
 /*************************************************************************/
 
-/* Global notice sending via GlobalNoticer. */
-/* Added name tag for globalmsg -Certus */
-
 static int do_global(User * u)
 {
     char *msg = strtok(NULL, "");
@@ -1019,24 +1016,44 @@ static int do_global(User * u)
     return MOD_CONT;
 }
 
+Server *server_global(Server * s, char *msg)
+{
+    Server *sl;
+
+    while (s) {
+        if (s->links) {
+            sl = server_global(s->links, msg);
+            if (sl)
+                s = sl;
+            else
+                s = s->next;
+        } else {
+            notice_server(s_GlobalNoticer, s, "%s", msg);
+            s = s->next;
+        }
+    }
+    return s;
+
+}
+
 void oper_global(char *nick, char *fmt, ...)
 {
     va_list args;
     char msg[2048];             /* largest valid message is 512, this should cover any global */
-    Server *s;
+    char dmsg[2048];            /* largest valid message is 512, this should cover any global */
 
     va_start(args, fmt);
     vsnprintf(msg, sizeof(msg), fmt, args);
     va_end(args);
 
-    s = first_server(0);
-    while (s) {
-        if ((nick) && (!AnonymousGlobal))
-            notice_server(s_GlobalNoticer, s, "[%s] %s", nick, msg);
-        else
-            notice_server(s_GlobalNoticer, s, "%s", msg);
-        s = next_server(0);
+    /* I don't like the way this is coded... */
+    if ((nick) && (!AnonymousGlobal)) {
+        snprintf(dmsg, sizeof(dmsg), "[%s] %s", nick, msg);
+        server_global(servlist, dmsg);
+    } else {
+        server_global(servlist, msg);
     }
+
 }
 
 /*************************************************************************/

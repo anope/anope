@@ -774,7 +774,7 @@ E void wallops(const char *source, const char *fmt, ...)
 
 E void notice(const char *source, const char *dest, const char *fmt, ...)
 	FORMAT(printf,3,4);
-E void notice_server(const char *source, Server * s, const char *fmt, ...)
+E void notice_server(const char *source, Server *s, const char *fmt, ...)
 	FORMAT(printf,3,4);
 E void notice_user(const char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);

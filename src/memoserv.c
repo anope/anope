@@ -1217,6 +1217,13 @@ static int do_info(User * u)
             else
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_LIMIT, name,
                             mi->memomax);
+        } else if (mi->memomax > 0) {
+            if (hardmax)
+                notice_lang(s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name,
+                            mi->memomax);
+            else
+                notice_lang(s_MemoServ, u, MEMO_INFO_X_LIMIT, name,
+                            mi->memomax);
         } else {
             notice_lang(s_MemoServ, u, MEMO_INFO_X_NO_LIMIT, name);
         }

@@ -644,9 +644,9 @@ int init(int ac, char **av)
 #ifdef USE_RDB
     if (UseRDB)
         rdb_load_dbases();
-#endif
     /* Need a better way to handle this -dane */
     if (!UseRDB) {
+#endif
         if (!skeleton) {
             load_ns_dbase();
             if (debug)
@@ -680,7 +680,9 @@ int init(int ac, char **av)
             if (debug)
                 alog("debug: Loaded PreNick database (9/9)");
         }
+#ifdef USE_RDB
     }
+#endif
     alog("Databases loaded");
 
     /* Save the databases back to file/mysql to reflect any changes */

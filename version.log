@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="278"
+VERSION_BUILD="282"
 
 # $Log$
+#
+# BUILD : 1.7.4 (282)
+# BUGS  : N/A
+# NOTES : Starting to add better mysql detection / manaul option
 #
 # BUILD : 1.7.4 (278)
 # BUGS  : 

@@ -2290,6 +2290,7 @@ static int do_confirm(User * u)
             u->lastnickreg = time(NULL);
             if (ircd->modeonreg) {
                 if (ircd->tsonmode) {
+                    snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
                     common_svsmode(u, ircd->modeonreg, tsbuf);
                 } else {
                     common_svsmode(u, ircd->modeonreg, NULL);
@@ -2343,7 +2344,7 @@ static int do_group(User * u)
         for (i = 0; i < RootNumber; i++) {
             if (strstr(u->nick, ServicesRoots[i]) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
-                            u->nick);                  
+                            u->nick);
                 return MOD_CONT;
             }
         }
@@ -2360,7 +2361,7 @@ static int do_group(User * u)
                             u->nick);
                 return MOD_CONT;
             }
-        }         
+        }
     }
 
     if (!nick || !pass) {

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="318"
+VERSION_BUILD="319"
 
 # $Log$
+#
+# BUILD : 1.7.5 (319)
+# BUGS  : 
+# NOTES : Hopefully fixed the Changes file now
 #
 # BUILD : 1.7.5 (318)
 # BUGS  : N/A

@@ -189,7 +189,21 @@ static dbFILE *open_db_write(const char *service, const char *filename,
             anope_cmd_global(NULL, "Can not back up %s database %s",
                              service, filename);
         }
-        alog("errno %d %d %d", errno, ENOENT, EACCES);
+#ifdef _WIN32
+        if (debug) {
+            if (errno == ENOENT) {
+                alog("Error %d (ENOENT) : the file or directory does not exist", errno, filename);
+            } else if (errno == EACCES) {
+                alog("Error %d (EACCES) : error while attempting to access file", errno);
+            } else {
+                alog("Error %d", errno);
+            }
+        }
+#else
+        if (debug) {
+            alog("Error %d", errno);
+        }
+#endif
         errno = errno_save;
         log_perror("Can not back up %s database %s", service, filename);
         if (!NoBackupOkay) {

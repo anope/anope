@@ -619,6 +619,9 @@ void do_backtrace(int show_segheader)
     free(strings);
     alog("Backtrace: complete");
 #else
-    alog("Backtrace: not available on this platform");
+    if (show_segheader) {
+        alog("Backtrace: Segmentation fault detected");
+    }
+    alog("Backtrace: not available on this system");
 #endif
 }

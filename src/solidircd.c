@@ -84,7 +84,7 @@ IRCDVar ircd[] = {
      1,                         /* UMODE               */
      0,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     0,                         /* ChanServ extra       */
+     CHAN_HELP_IRCD_HALFOP,     /* ChanServ extra       */
      0,                         /* No Knock             */
      0,                         /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK       */

@@ -3885,15 +3885,20 @@ CHAN_HELP_UNREAL
 	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
 	    PROTECT
 
-CHAN_HELP_ULTIMATE
-	
-	Αυτές οι εντολές είναι διαθέσιμες αε αυτό το δίκτυο:
-	    DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Αυτές οι εντολές είναι διαθέσιμες αε αυτό το δίκτυο:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5502,6 +5507,10 @@ OPER_HELP_SET
 	    LOGCHAN    Report log messages to a channel
 	    DEBUG      Ενεργοποιείτε ή απενεργοποιείτε σε debug mode
 	    NOEXPIRE   Ενεργοποιείτε ή απενεργοποιείτε σε no expire mode
+	    SUPERADMIN Activate or deactivate super-admin mode
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Μόνο για τους Services admins.
 

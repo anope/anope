@@ -1,6 +1,9 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+01/30 F ChanServ help to reflect the avaiable commands.                   [ #00]
+01/30 F ChanServ still used some commands that were not valid on all ircd [ #00]
+01/30 F Compiling modules under Mac OSX.                                  [#285]
 
 Anope Version 1.7.8
 -------------------

@@ -3929,15 +3929,20 @@ CHAN_HELP_UNREAL
 	    OWNER      Assegna lo stato di owner a un utente (+q)
 	    PROTECT    Assegna lo stato di protezione a un utente (+a)
 
-CHAN_HELP_ULTIMATE
-	
-	Su questa rete sono inoltre disponibili questi comandi:
-	    DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Su questa rete sono inoltre disponibili questi comandi:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5643,6 +5648,9 @@ OPER_HELP_SET
 	    DEBUG      Attiva o disattiva la modalità di debug
 	    NOEXPIRE   Attiva o disattiva la modalità no expire
 	    SUPERADMIN Attiva o disattiva la modalità SuperAdmin
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Limitato ai Services admin.
 

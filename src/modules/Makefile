@@ -5,7 +5,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
       	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
-	   'PROFILE=${PROFILE}'
+	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}'
 
 OBJECTS= $(SRCS:.c=.o)
 SO_FILES=$(OBJECTS:.o=.s)
@@ -25,7 +25,7 @@ distclean: clean spotless
 	$(CC) $(CFLAGS) -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	$(CC) -shared $< -o $*.so ${PROFILE}
+	$(CC) ${SHARED} $< -o $*.so ${PROFILE}
 
 clean:
 	rm -f *.o *.so *.c~ core

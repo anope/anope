@@ -105,7 +105,14 @@ fi
 AC_CACHE_CHECK(for compiler option to produce PIC,ac_cv_pic,[
 if test "$ac_cv_prog_gcc" = "yes"; then
         ac_cv_pic="-fPIC -DPIC -shared"
-
+	case `uname -s` in
+		Darwin*[)]
+		ac_cv_pic="-bundle -flat_namespace -undefined suppress"
+		;;
+		HP-UX*[)]
+		ac_cv_pic="-fPIC"
+		;;
+	esac
 else
 case `uname -s` in
     SunOS*[)]
@@ -116,6 +123,20 @@ esac
 fi
 
 ])
+
+if test "$ac_cv_prog_gcc" = "yes"; then
+	case `uname -s` in
+		Darwin*[)]
+		SHARED="-bundle -flat_namespace -undefined suppress"
+		AC_SUBST(SHARED)
+		;;
+		*[)]
+		SHARED="-shared"
+		AC_SUBST(SHARED)
+		;;
+	esac
+fi
+
 AC_CACHE_CHECK(if your system prepends an underscore on symbols,ac_cv_underscore,[
 cat >uscore.c << __EOF__
 int main() {

@@ -30,7 +30,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'MYSQL=${MYSQL}'\
-	   'RDB=${RDB}' 'IRCDFILE=${IRCDFILE}'
+	   'RDB=${RDB}' 'IRCDFILE=${IRCDFILE}' 'SHARED=${SHARED}'
 
 .c.o:
 	$(CC) $(CFLAGS) -I../include/ -c $<

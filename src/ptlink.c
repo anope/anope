@@ -79,13 +79,13 @@ IRCDVar ircd[] = {
      0,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
      0,                         /* O:LINE               */
-     1,                         /* UMODE               */
+     1,                         /* UMODE                */
      1,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     0,                         /* ChanServ extra   */
+     CHAN_HELP_IRCD_PROTECT,    /* ChanServ extra       */
      CMODE_K,                   /* No Knock             */
      CMODE_A,                   /* Admin Only           */
-     DEFAULT_MLOCK,             /* Default MLOCK       */
+     DEFAULT_MLOCK,             /* Default MLOCK        */
      UMODE_o,                   /* Vhost Mode           */
      1,                         /* +f                   */
      0,                         /* +L                   */

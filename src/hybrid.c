@@ -82,7 +82,7 @@ IRCDVar ircd[] = {
      0,                         /* O:LINE               */
      0,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
-     0,                         /* ChanServ extra               */
+     CHAN_HELP_IRCD_HALFOP,     /* ChanServ extra       */
      CMODE_p,                   /* No Knock             */
      0,                         /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK        */

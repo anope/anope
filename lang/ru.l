@@ -3807,15 +3807,20 @@ CHAN_HELP_UNREAL
 	DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
 	PROTECT
 
-CHAN_HELP_ULTIMATE
-	
-	В этой сети также доступны команды:
-	DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Эти команды также доступны в Вашей сети:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5418,6 +5423,9 @@ OPER_HELP_SET
 	    DEBUG      Активировать/деактивировать режим отладки
 	    NOEXPIRE   Активировать/деактивировать режим не-истечения
 	    SUPERADMIN Активировать/деактивировать режим Суперадмина
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 
 	Эту команду могут использовать только Администраторы сервисов.
 

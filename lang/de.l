@@ -4021,20 +4021,22 @@ CHAN_HELP
 CHAN_HELP_UNREAL
 	
 	Diese Befehle stehen zusätzlich in diesem Netzwerk zur Verfügung:
-	
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,PROTECT
-
-CHAN_HELP_ULTIMATE
-	
-	Diese Befehle stehen zusätzlich in diesem Netzwerk zur Verfügung:
-	
-	    DEHALFOP, HALFOP, HOP
+	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER, PROTECT
 
 CHAN_HELP_ULTIMATE3
 	
 	Diese Befehle stehen zusätzlich in diesem Netzwerk zur Verfügung:
-	
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5798,6 +5800,9 @@ OPER_HELP_SET
 	    NOEXPIRE   Den Auslauf-Modus der Services
 	                      an oder aus
 	    SUPERADMIN Den Super-Admin Modus an oder aus
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Beschränkt auf Services Administratoren.
 

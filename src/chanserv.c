@@ -5445,28 +5445,44 @@ static int do_devoice(User * u)
 
 static int do_halfop(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_HALFOP]);
+    if (ircd->halfop) {
+        return do_util(u, &csmodeutils[MUT_HALFOP]);
+    } else {
+        return MOD_CONT;
+    }
 }
 
 /*************************************************************************/
 
 static int do_dehalfop(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_DEHALFOP]);
+    if (ircd->halfop) {
+        return do_util(u, &csmodeutils[MUT_DEHALFOP]);
+    } else {
+        return MOD_CONT;
+    }
 }
 
 /*************************************************************************/
 
 static int do_protect(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_PROTECT]);
+    if (ircd->protect || ircd->admin) {
+        return do_util(u, &csmodeutils[MUT_PROTECT]);
+    } else {
+        return MOD_CONT;
+    }
 }
 
 /*************************************************************************/
 
 static int do_deprotect(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_DEPROTECT]);
+    if (ircd->protect || ircd->admin) {
+        return do_util(u, &csmodeutils[MUT_DEPROTECT]);
+    } else {
+        return MOD_CONT;
+    }
 }
 
 /*************************************************************************/
@@ -5478,11 +5494,14 @@ static int do_owner(User * u)
 
     Channel *c;
     ChannelInfo *ci;
+    struct u_chanlist *uc;
+
+    if (!ircd->owner) {
+        return MOD_CONT;
+    }
 
     if (!chan) {
-        struct u_chanlist *uc;
-
-        av[0] = sstrdup("+q");
+        av[0] = sstrdup(ircd->ownerset);
         av[1] = u->nick;
 
         /* Sets the mode to the user on every channels he is on. */
@@ -5511,9 +5530,10 @@ static int do_owner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        anope_cmd_mode(whosends(ci), c->name, "+q %s", u->nick);
+        anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerset,
+                       u->nick);
 
-        av[0] = sstrdup("+q");
+        av[0] = sstrdup(ircd->ownerset);
         av[1] = u->nick;
         chan_set_modes(s_ChanServ, c, 2, av, 1);
         free(av[0]);
@@ -5530,11 +5550,14 @@ static int do_deowner(User * u)
 
     Channel *c;
     ChannelInfo *ci;
+    struct u_chanlist *uc;
+
+    if (!ircd->owner) {
+        return MOD_CONT;
+    }
 
     if (!chan) {
-        struct u_chanlist *uc;
-
-        av[0] = sstrdup("-q");
+        av[0] = sstrdup(ircd->ownerunset);
         av[1] = u->nick;
 
         /* Sets the mode to the user on every channels he is on. */
@@ -5563,9 +5586,10 @@ static int do_deowner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        anope_cmd_mode(whosends(ci), c->name, "-q %s", u->nick);
+        anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
+                       u->nick);
 
-        av[0] = sstrdup("-q");
+        av[0] = sstrdup(ircd->ownerunset);
         av[1] = u->nick;
         chan_set_modes(s_ChanServ, c, 2, av, 1);
         free(av[0]);

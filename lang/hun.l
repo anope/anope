@@ -3786,15 +3786,20 @@ CHAN_HELP_UNREAL
 	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER, 
 	    PROTECT
 
-CHAN_HELP_ULTIMATE
-	
-	Ezek a parancsok is elérhetõk ezen a hálózaton:	    
-	    DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Ezek a parancsok is elérhetõk ezen a hálózaton:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5392,6 +5397,9 @@ OPER_HELP_SET
 	    DEBUG      Bekapcsolja/kikapcsolja a debug módot
 	    NOEXPIRE   Bekapcsolja/kikapcsolja a nem elévülõ módot
 	    SUPERADMIN Bekapcsolja/kikapcsolja a super-admin módot
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Korlátozva Szervíz adminnak.
 	

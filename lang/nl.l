@@ -3847,15 +3847,20 @@ CHAN_HELP_UNREAL
 	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
 	    PROTECT
 
-CHAN_HELP_ULTIMATE
-	
-	Deze commando's zijn ook beschikbaar op dit netwerk:
-	    DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Deze commando's zijn ook beschikbaar op dit netwerk:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5522,6 +5527,9 @@ OPER_HELP_SET
 	    DEBUG      (De)activeer debug mode
 	    NOEXPIRE   (De)activeer de geen-verloop mode
 	    SUPERADMIN (De)activeer SuperAdministrator mode
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Gelimiteerd tot Services adminstrators.
 

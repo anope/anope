@@ -1,10 +1,14 @@
 Anope Version S V N
 -------------------
 *** New Strings:
+	CHAN_HELP_IRCD_HALFOP
+	CHAN_HELP_IRCD_PROTECT
 
 *** Mod Strings:
+	OPER_HELP_SET
 
 *** Del Strings:
+	CHAN_HELP_ULTIMATE
 
 Anope Version 1.7.8
 -------------------

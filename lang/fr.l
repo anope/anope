@@ -3933,15 +3933,20 @@ CHAN_HELP_UNREAL
 	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER, 
 	    PROTECT
 
-CHAN_HELP_ULTIMATE
-	
-	Ces commandes sont également disponibles sur ce réseau:
-	    DEHALFOP, HALFOP, HOP
-
 CHAN_HELP_ULTIMATE3
 	
 	Ces commandes sont également disponibles sur ce réseau:
 	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+
+CHAN_HELP_IRCD_HALFOP
+	
+	These commands are also available on this network:
+	    DEHALFOP, HALFOP, HOP
+
+CHAN_HELP_IRCD_PROTECT
+	
+	These commands are also available on this network:
+	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
 	
@@ -5628,6 +5633,9 @@ OPER_HELP_SET
 	    DEBUG      Active ou désactive le mode de déboguage
 	    NOEXPIRE   Active ou désactive le mode sans expiration
 	    SUPERADMIN Active ou désactive le mode super-admin
+	    SQL   	 Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 	
 	Réservée aux Services admins.
 

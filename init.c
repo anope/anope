@@ -431,7 +431,7 @@ static int parse_options(int ac, char **av)
             } else if (!strcmp(s, "version")) {
                 fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
                         version_flags, version_build);
-                return 0;
+                exit(EXIT_SUCCESS);
             } else {
                 fprintf(stderr, "Unknown option -%s\n", s);
                 return -1;

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="32"
+VERSION_BUILD="33"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (33)
+# BUGS  : 
+# NOTES : Small bugfix to allow ./services -version to be done without anope running 
 #
 # BUILD : 1.7.0 (32)
 # BUGS  : 

@@ -24,7 +24,8 @@ const char flood_mode_char_set[] = "";  /* mode char for FLOOD mode on set */
 const char flood_mode_char_remove[] = "";       /* mode char for FLOOD mode on remove */
 int UseTSMODE = 1;
 
-int ts6nickcount = 0;
+/* 6 slot array, 35 possible combinations per slot, exponential. */
+int ts6nickcount[6] = { 0, 0, 0, 0, 0, 0 };
 
 IRCDVar ircd[] = {
     {"ShadowIRCd 4.0+",         /* ircd name */
@@ -786,7 +787,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
+    m = createMessage("TBURST",    anope_event_tburst); addCoreMessage(IRCD,m);
     m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
@@ -858,7 +859,8 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
     Uid *ud;
 
     ud = find_uid(whosets);
-    send_cmd((ud ? ud->uid : whosets), "TOPIC %s :%s", chan, topic);
+    send_cmd((ud ? ud->uid : whosets), "TOPIC %s %s %ld :%s", chan,
+             whosetit, when, topic);
 }
 
 void anope_cmd_vhost_off(User * u)
@@ -995,12 +997,17 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 {
     char nicknumbuf[10];
     EnforceQlinedNick(nick, NULL);
-    snprintf(nicknumbuf, 10, "%sAAAAA%c", Numeric, (ts6nickcount + 'A'));
+    snprintf(nicknumbuf, 10, "%sAAAA%c%c", Numeric,
+             (ts6nickcount[1] + 'A'), (ts6nickcount[0] + 'A'));
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
              (long int) time(NULL), modes, user, host, nicknumbuf, host,
              real);
     new_uid(nick, nicknumbuf);
-    ts6nickcount++;
+    ts6nickcount[0]++;
+    if (ts6nickcount[0] > 35) { /* AAAAA9 */
+        ts6nickcount[1]++;
+        ts6nickcount[0] = 0;    /* AAAABA */
+    }
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1464,12 +1471,12 @@ void anope_cmd_nick(char *nick, char *name, char *mode)
 {
     char nicknumbuf[10];
     EnforceQlinedNick(nick, NULL);
-    snprintf(nicknumbuf, 10, "%sAAAAA%c", TS6SID, (ts6nickcount + 'A'));
+    snprintf(nicknumbuf, 10, "%sAAAAA%c", TS6SID, (ts6nickcount[0] + 'A'));
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
              (long int) time(NULL), mode, ServiceUser, ServiceHost,
              nicknumbuf, ServiceHost, name);
     new_uid(nick, nicknumbuf);
-    ts6nickcount++;
+    ts6nickcount[0]++;
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1599,7 +1606,7 @@ int anope_event_mode(char *source, int ac, char **av)
         u = find_byuid(source);
         u2 = find_byuid(av[0]);
         av[0] = u2->nick;
-        do_umode(u->nick, ac, av);
+        do_umode((u ? u->nick : source), ac, av);
     }
     return MOD_CONT;
 }

@@ -165,8 +165,17 @@ else
 		fi
 	fi
 
+	# Introduced on Anope 1.7.7 -> status smallint to inst unsigned.
+	echo -n "Blindly altering status for bigger capacity... "
+	echo "ALTER TABLE anope_ns_alias CHANGE status status int(11) unsigned NOT NULL default 0" > $TFILE
+	mysql -h$SQLHOST -u$SQLUSER -p$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
+	echo "done!"
+
+
 
 fi
+
+echo ""
 
 # Insert initial version number. This will have to be redesigned for 1.7
 if [ $LVER -ne $SVER ]; then

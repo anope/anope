@@ -497,7 +497,8 @@ void anope_cmd_remove_akill(char *user, char *host)
 void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
                      char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
+    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
+             (unsigned long int) when, topic);
 }
 
 void anope_cmd_vhost_off(User * u)
@@ -510,7 +511,7 @@ void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
     send_cmd(NULL, "TKL + G %s %s %s %ld %ld :%s", user, host, who,
-             time(NULL) + 86400 * 2, when, reason);
+             (long int) time(NULL) + 86400 * 2, (long int) when, reason);
 }
 
 void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
@@ -571,16 +572,17 @@ void anope_cmd_376(char *source)
 void anope_cmd_nick(char *nick, char *name, char *modes)
 {
     EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
-             ServiceUser, ServiceHost, ServerName, modes, name);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick,
+             (long int) time(NULL), ServiceUser, ServiceHost, ServerName,
+             modes, name);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
-             user, host, ServerName, modes, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick,
+             (long int) time(NULL), user, host, ServerName, modes, real);
 }
 
 void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
@@ -605,8 +607,8 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
-             user, host, ServerName, modes, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick,
+             (long int) time(NULL), user, host, ServerName, modes, real);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1100,7 +1102,7 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
     if (!source || !guest) {
         return;
     }
-    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, when);
+    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
 /* Functions that use serval cmd functions */

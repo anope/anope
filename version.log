@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="421"
+VERSION_BUILD="423"
 
 # $Log$
+#
+# BUILD : 1.7.5 (423)
+# BUGS  : N/A
+# NOTES : code tidy up fixes stuff under Freebsd
 #
 # BUILD : 1.7.5 (421)
 # BUGS  : 198

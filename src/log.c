@@ -139,7 +139,8 @@ void alog(const char *fmt, ...)
         gettimeofday(&tv, NULL);
         strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
         s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
+        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
+                      (int) tv.tv_usec);
         strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
     } else {
 #endif
@@ -197,7 +198,8 @@ void log_perror(const char *fmt, ...)
         gettimeofday(&tv, NULL);
         strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
         s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
+        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
+                      (int) tv.tv_usec);
         strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
     } else {
 #endif
@@ -244,7 +246,8 @@ void fatal(const char *fmt, ...)
         gettimeofday(&tv, NULL);
         strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
         s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
+        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
+                      (int) tv.tv_usec);
         strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
     } else {
 #endif
@@ -287,7 +290,8 @@ void fatal_perror(const char *fmt, ...)
         gettimeofday(&tv, NULL);
         strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
         s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
+        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
+                      (int) tv.tv_usec);
         strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
     } else {
 #endif

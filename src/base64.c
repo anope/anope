@@ -290,7 +290,7 @@ char *encode_ip(u_char * ip)
     if (!ip)
         return "*";
 
-    if (strchr(ip, ':')) {
+    if (strchr((char *) ip, ':')) {
         return NULL;
     } else {
         ia.s_addr = inet_addr(ip);

@@ -51,7 +51,7 @@ void check_timeouts(void)
     time_t t = time(NULL);
 
     if (debug >= 2)
-        alog("debug: Checking timeouts at %ld", t);
+        alog("debug: Checking timeouts at %ld", (long int) t);
 
     to = timeouts;
     while (to) {

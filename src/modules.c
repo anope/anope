@@ -1402,7 +1402,7 @@ int moduleAddCallback(char *name, time_t when,
     }
     if (debug)
         alog("Added module CallBack: [%s] due to execute at %ld",
-             new->name ? new->name : "?", new->when);
+             new->name ? new->name : "?", (long int) new->when);
     return MOD_ERR_OK;
 }
 

@@ -738,7 +738,7 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
                      char *topic, time_t when)
 {
     send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan,
-             whosetit, when, topic);
+             whosetit, (unsigned long int) when, topic);
 }
 
 void anope_cmd_vhost_off(User * u)
@@ -757,7 +757,8 @@ void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
     send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"),
-             user, host, who, time(NULL) + 86400 * 2, when, reason);
+             user, host, who, (long int) time(NULL) + 86400 * 2,
+             (long int) when, reason);
 }
 
 /*
@@ -839,8 +840,8 @@ void anope_cmd_nick(char *nick, char *name, char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
-             send_token("NICK", "&"), nick, time(NULL), ServiceUser,
-             ServiceHost, ServerName, modes, name);
+             send_token("NICK", "&"), nick, (long int) time(NULL),
+             ServiceUser, ServiceHost, ServerName, modes, name);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -848,8 +849,8 @@ void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
-             send_token("NICK", "&"), nick, time(NULL), user, host,
-             ServerName, modes, real);
+             send_token("NICK", "&"), nick, (long int) time(NULL), user,
+             host, ServerName, modes, real);
 }
 
 void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
@@ -875,8 +876,8 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s * :%s",
-             send_token("NICK", "&"), nick, time(NULL), user, host,
-             ServerName, modes, real);
+             send_token("NICK", "&"), nick, (long int) time(NULL), user,
+             host, ServerName, modes, real);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1436,7 +1437,7 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
         return;
     }
     send_cmd(NULL, "%s %s %s :%ld", send_token("SVSNICK", "e"), source,
-             guest, when);
+             guest, (long int) when);
 }
 
 /* Functions that use serval cmd functions */

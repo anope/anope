@@ -214,7 +214,12 @@ int vfprintf(FILE *stream, const char *format, va_list ap);
 int vsprintf(char *str, const char *format, va_list ap);
 int vsnprintf(char *str, size_t size, const char *format, va_list ap);
 
+/* Freebsd 5.2.1 actually has u_char those it throws more 
+   errors having it defined again - TSL */
+#ifndef HAS_SYS_TYPES_H
 typedef unsigned char u_char;
+#endif
+
 #endif
 
 

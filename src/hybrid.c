@@ -709,7 +709,8 @@ void anope_cmd_unsqline(char *user)
 
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), channel, user);
+    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL), channel,
+             user);
 }
 
 /*
@@ -725,7 +726,7 @@ void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
     send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
-             (expires - (long) time(NULL)), user, host, reason);
+             (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
 void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
@@ -785,7 +786,7 @@ void anope_cmd_svsinfo()
  */
 void anope_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 5 5 0 :%ld", time(NULL));
+    send_cmd(NULL, "SVINFO 5 5 0 :%ld", (long int) time(NULL));
 }
 
 /* CAPAB */
@@ -831,8 +832,8 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, time(NULL),
-             modes, user, host, ServerName, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+             (long int) time(NULL), modes, user, host, ServerName, real);
 
 }
 
@@ -1215,8 +1216,9 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 void anope_cmd_nick(char *nick, char *name, char *mode)
 {
     EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, time(NULL), mode,
-             ServiceUser, ServiceHost, ServerName, (name));
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+             (long int) time(NULL), mode, ServiceUser, ServiceHost,
+             ServerName, (name));
 }
 
 void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
@@ -1356,8 +1358,8 @@ void anope_cmd_svsnick(char *nick, char *newnick, time_t when)
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, time(NULL),
-             modes, user, host, ServerName, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
+             (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
 void anope_cmd_svso(char *source, char *nick, char *flag)

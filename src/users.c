@@ -612,7 +612,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             sprintf(user->na->last_usermask, "%s@%s",
                     common_get_vident(user), common_get_vhost(user));
 
-            snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
+            snprintf(tsbuf, sizeof(tsbuf), "%lu",
+                     (unsigned long int) user->timestamp);
             anope_cmd_svid_umode2(user, tsbuf);
 
             alog("%s: %s!%s@%s automatically identified for nick %s",
@@ -625,7 +626,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     if (ircd->check_nick_id) {
         if (nick_identified(user)) {
             char tsbuf[16];
-            snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
+            snprintf(tsbuf, sizeof(tsbuf), "%lu",
+                     (unsigned long int) user->timestamp);
             anope_cmd_svid_umode3(user, tsbuf);
         }
     }

@@ -627,7 +627,8 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
 void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
                      char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
+    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
+             (unsigned long int) when, topic);
 }
 
 void anope_cmd_vhost_off(User * u)
@@ -649,14 +650,14 @@ void anope_cmd_unsqline(char *user)
 
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(user, "SJOIN %ld %s", chantime, channel);
+    send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
 
 void anope_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
-             time(NULL), reason);
+             (long int) time(NULL), reason);
 }
 
 void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
@@ -683,8 +684,9 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
 
 void anope_cmd_svsmode(User * u, int ac, char **av)
 {
-    send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick, u->timestamp,
-             av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
+    send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
+             (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
+             (ac == 2 ? av[1] : ""));
 }
 
 void anope_cmd_squit(char *servname, char *message)
@@ -717,7 +719,7 @@ void anope_cmd_connect(int servernum)
 
 void anope_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 5 5 0 %ld bluemoon 0", time(NULL));
+    send_cmd(NULL, "SVINFO 5 5 0 %ld bluemoon 0", (long int) time(NULL));
 }
 
 void anope_cmd_capab()
@@ -1198,8 +1200,8 @@ void anope_cmd_nick(char *nick, char *name, char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
-             time(NULL), ServiceUser, ServiceHost, ServerName, modes,
-             name);
+             (long int) time(NULL), ServiceUser, ServiceHost, ServerName,
+             modes, name);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1273,7 +1275,7 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
-             time(NULL), user, host, ServerName, modes, real);
+             (long int) time(NULL), user, host, ServerName, modes, real);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1427,14 +1429,14 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
     if (!source || !guest) {
         return;
     }
-    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, when);
+    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
-             time(NULL), user, host, ServerName, modes, real);
+             (long int) time(NULL), user, host, ServerName, modes, real);
 }
 
 
@@ -1448,7 +1450,8 @@ void anope_cmd_svso(char *source, char *nick, char *flag)
 /* sent if svid is something weird */
 void anope_cmd_svid_umode(char *nick, time_t ts)
 {
-    send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, ts);
+    send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
+             (unsigned long int) ts);
 }
 
 /* SVSMODE +d */

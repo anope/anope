@@ -2443,7 +2443,8 @@ char *cs_get_limit(ChannelInfo * ci)
     if (ci->mlock_limit == 0)
         return NULL;
 
-    snprintf(limit, sizeof(limit), "%lu", ci->mlock_limit);
+    snprintf(limit, sizeof(limit), "%lu",
+             (unsigned long int) ci->mlock_limit);
     return limit;
 }
 

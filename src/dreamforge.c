@@ -526,7 +526,8 @@ void anope_cmd_remove_akill(char *user, char *host)
 void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
                      char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
+    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
+             (unsigned long int) when, topic);
 }
 
 /* PART */
@@ -1072,8 +1073,9 @@ void anope_cmd_211(const char *fmt, ...)
 void anope_cmd_nick(char *nick, char *name, char *modes)
 {
     EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
-             ServiceUser, ServiceHost, ServerName, name);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
+             (long int) time(NULL), ServiceUser, ServiceHost, ServerName,
+             name);
     anope_cmd_mode(nick, nick, "%s", modes);
     anope_cmd_sqline(nick, "Reserved for services");
 }
@@ -1184,8 +1186,8 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
-             user, host, ServerName, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
+             (long int) time(NULL), user, host, ServerName, real);
     anope_cmd_mode(nick, "MODE %s %s", nick, modes);
     anope_cmd_sqline(nick, "Reserved for services");
 }
@@ -1232,14 +1234,14 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
     if (!source || !guest) {
         return;
     }
-    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, when);
+    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
 void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
                           char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
-             user, host, ServerName, real);
+    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
+             (long int) time(NULL), user, host, ServerName, real);
     anope_cmd_mode(nick, "MODE %s %s", nick, modes);
 }
 

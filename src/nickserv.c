@@ -1855,7 +1855,7 @@ void add_ns_timeout(NickAlias * na, int type, time_t delay)
         timeout_routine = timeout_release;
     else {
         alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
-             type, (void *) na, na->nick, delay);
+             type, (void *) na, na->nick, (long int) delay);
         return;
     }
 
@@ -2290,7 +2290,8 @@ static int do_confirm(User * u)
             u->lastnickreg = time(NULL);
             if (ircd->modeonreg) {
                 if (ircd->tsonmode) {
-                    snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
+                    snprintf(tsbuf, sizeof(tsbuf), "%lu",
+                             (unsigned long int) u->timestamp);
                     common_svsmode(u, ircd->modeonreg, tsbuf);
                 } else {
                     common_svsmode(u, ircd->modeonreg, NULL);
@@ -2448,7 +2449,8 @@ static int do_group(User * u)
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
             u->lastnickreg = time(NULL);
-            snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
+            snprintf(tsbuf, sizeof(tsbuf), "%lu",
+                     (unsigned long int) u->timestamp);
             if (ircd->modeonreg) {
                 if (ircd->tsonmode) {
                     common_svsmode(u, ircd->modeonreg, tsbuf);
@@ -2537,7 +2539,8 @@ static int do_identify(User * u)
 
         na->status |= NS_IDENTIFIED;
         na->last_seen = time(NULL);
-        snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
+        snprintf(tsbuf, sizeof(tsbuf), "%lu",
+                 (unsigned long int) u->timestamp);
 
         if (ircd->modeonreg) {
             if (ircd->tsonmode) {

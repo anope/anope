@@ -1326,7 +1326,7 @@ char *get_limit(Channel * chan)
     if (chan->limit == 0)
         return NULL;
 
-    snprintf(limit, sizeof(limit), "%lu", chan->limit);
+    snprintf(limit, sizeof(limit), "%lu", (unsigned long int) chan->limit);
     return limit;
 }
 

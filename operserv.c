@@ -1025,7 +1025,7 @@ static int do_global(User * u)
     }
     if (WallOSGlobal)
         wallops(s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
-    oper_global(u->nick, "%s",  msg);
+    oper_global(u->nick, "%s", msg);
     return MOD_CONT;
 }
 

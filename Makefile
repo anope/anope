@@ -168,6 +168,8 @@ language.h: lang/language.h
 lang/language.h: lang/Makefile lang/index
 	(cd lang ; $(MAKE) language.h)
 
+lang/index: 
+	(cd lang ; $(MAKE) index)
 
 ###########################################################################
 

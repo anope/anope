@@ -34,7 +34,7 @@ clean:
 	rm -f $(LANGOBJS) langcomp
 
 spotless: clean
-	rm -f language.h
+	rm -f language.h index
 
 
 cat:       cat.l       langcomp index

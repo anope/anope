@@ -3118,9 +3118,13 @@ static int do_set_successor(User * u, ChannelInfo * ci, char *param)
 
 static int do_set_password(User * u, ChannelInfo * ci, char *param)
 {
-#ifdef USE_ENCRYPTION
     int len = strlen(param);
 
+    if (stricmp(u->nick, param) == 0 || (StrictPasswords && len < 5)) {
+        notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
+        return MOD_CONT;
+    }
+#ifdef USE_ENCRYPTION
     if (len > PASSMAX) {
         len = PASSMAX;
         param[len] = 0;
@@ -5918,7 +5922,7 @@ static int do_clear(User * u)
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
                to send them - TSL */
             if (c->key) {
-                anope_cmd_mode(s_ChanServ, c->name, "-k %s", c->key);
+                anope_cmd_mode(whosends(ci), c->name, "-k %s", c->key);
                 argv[0] = sstrdup("-k");
                 argv[1] = c->key;
                 chan_set_modes(whosends(ci), c, 2, argv, 0);

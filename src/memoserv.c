@@ -1093,7 +1093,7 @@ static int do_info(User * u)
             else if (count == 0)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS, name,
                             mi->memocount);
-            else if (count == 0)
+            else if (count == 1)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_ONE_UNREAD,
                             name, mi->memocount);
             else

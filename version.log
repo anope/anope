@@ -8,9 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="434"
+VERSION_BUILD="435"
 
 # $Log$
+#
+# BUILD : 1.7.5 (435)
+# BUGS  : 203, 204, 205
+# NOTES :  1. minor fix to CS CLEAR, 2. Added to DrSteins more CS obsecure password, 3. fixed memoserv not using the
+# correct message, 4. fixed botserv info to tell the channel is forbidden
+#  
 #
 # BUILD : 1.7.5 (434)
 # BUGS  : N/A

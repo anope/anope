@@ -1612,6 +1612,10 @@ static int do_info(User * u)
             notice_lang(s_BotServ, u, PERMISSION_DENIED);
             return MOD_CONT;
         }
+        if (ci->flags & CI_VERBOTEN) {
+            notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, query);
+            return MOD_CONT;
+        }
 
         notice_lang(s_BotServ, u, BOT_INFO_CHAN_HEADER, ci->name);
         if (ci->bi)

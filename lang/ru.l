@@ -1756,6 +1756,22 @@ MEMO_RSEND_USER_NOTIFICATION
 ###########################################################################
 	
 # Standard responses
+MEMO_CHECK_SYNTAX
+	CHECK nickname
+MEMO_CHECK_NOT_READ
+	The last memo you sent to %s (sent on %s) has not yet been read.
+MEMO_CHECK_READ
+	The last memo you sent to %s (sent on %s) has been read.
+MEMO_CHECK_NO_MEMO
+	Nick %s doesn't have a memo from you.
+
+###########################################################################
+#
+# BotServ messages
+#
+###########################################################################
+	
+# Standard responses
 BOT_DOES_NOT_EXIST
 	Бот %s не существует.
 BOT_NOT_ASSIGNED
@@ -4859,6 +4875,18 @@ MEMO_HELP_RSEND
 	Once the memo is read by its recepient, an automatic notification
 	memo will be sent to the sender informing him/her that the memo
 	has been read.
+
+###########################################################################
+#
+# OperServ help messages
+#
+###########################################################################
+
+MEMO_HELP_CHECK
+	Syntax: CHECK nick
+	
+	Checks whether the _last_ memo you sent to nick has been read
+	or not. Note that this does only work with nicks, not with chans.
 
 ###########################################################################
 #

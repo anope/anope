@@ -30,9 +30,6 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* "We have the mysql Header file" */
-#undef HAVE_MYSQL_MYSQL_H
-
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
@@ -96,7 +93,7 @@
 /* "First IRCD type" */
 #undef IRC_BAHAMUT
 
-/* "First IRCD type" */
+/* "Frist IRCD type" */
 #undef IRC_DREAMFORGE
 
 /* "First IRCD type" */
@@ -105,28 +102,28 @@
 /* "First IRCD type" */
 #undef IRC_PTLINK
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_RAGE2
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_ULTIMATE2
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_ULTIMATE3
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_UNREAL31
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_UNREAL32
 
-/* "Second IRCD type" */
+/* "First IRCD type" */
 #undef IRC_VIAGRA
 
 /* "Module dir" */
 #undef MODULE_PATH
 
-/* "mysql.h is in a mysql/ folder" */
+/* "Has mysql/mysql.h" */
 #undef MYSQL_HEADER_PREFIX
 
 /* Define to the address where bug reports for this package should be sent. */

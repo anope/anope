@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="355"
+VERSION_BUILD="356"
 
 # $Log$
+#
+# BUILD : 1.7.5 (356)
+# BUGS  : N/A
+# NOTES : Fuixed mysql include issue, it should now detect to use mysql/mysql/h or not
 #
 # BUILD : 1.7.5 (355)
 # BUGS  : N/A

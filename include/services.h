@@ -57,12 +57,12 @@
 #ifdef USE_MYSQL
 # define MYSQL_WARNING 2
 # define MYSQL_ERROR   4
-#ifdef HAVE_MYSQL_MYSQL_H
-# include <mysql.h>
-# include <errmsg.h>
-#else
+#ifdef MYSQL_HEADER_PREFIX
 # include <mysql/mysql.h>
 # include <mysql/errmsg.h>
+#else
+# include <mysql.h>
+# include <errmsg.h>
 #endif
 #endif
 

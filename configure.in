@@ -48,6 +48,7 @@ AC_ARG_WITH(mysql, [ --without-mysql     Do not use MySQL even if we find it],,[
 AM_PATH_MYSQLCLIENT(,[
 	AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
 	AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
+	AC_CHECK_HEADER(mysql/mysql.h,AC_DEFINE(MYSQL_HEADER_PREFIX,1,"Has mysql/mysql.h"))
 	MYSQL=" mysql.c "
 	RDB=" rdb.c "
 	AC_SUBST(MYSQL)

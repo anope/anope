@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="497"
+VERSION_BUILD="498"
 
 # $Log$
+#
+# BUILD : 1.7.6 (498)
+# BUGS  : N/A
+# NOTES : Updated plexus.c/.h as per patch from ThaPrince
 #
 # BUILD : 1.7.6 (497)
 # BUGS  : 256, 258

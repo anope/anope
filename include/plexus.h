@@ -29,7 +29,6 @@
 #define UMODE_o 0x00000008
 #define UMODE_R 0x00000010
 #define UMODE_w 0x00000020
-#define UMODE_A 0x00000040
 
 #define CMODE_i 0x00000001
 #define CMODE_m 0x00000002
@@ -45,6 +44,7 @@
 #define CMODE_c 0x00002000
 #define CMODE_O 0x00004000
 #define CMODE_R 0x00008000
+#define CMODE_N 0x00010000
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 

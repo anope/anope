@@ -353,7 +353,8 @@ void memo_send(User * u, char *name, char *text, int z)
                                         s_MemoServ, m->number);
                     }
                 } else {
-                    if ((u = finduser(name)) && nick_identified(u))
+                    if ((u = finduser(name)) && nick_identified(u)
+                        && (nc->flags & NI_MEMO_RECEIVE))
                         notice_lang(s_MemoServ, u, MEMO_NEW_MEMO_ARRIVED,
                                     source, s_MemoServ, m->number);
                 }               /* if (flags & MEMO_RECEIVE) */

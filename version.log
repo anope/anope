@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="161"
+VERSION_BUILD="162"
 
 # $Log$
+#
+# BUILD : 1.7.3 (162)
+# BUGS  : 79
+# NOTES : Fixed bug 79 (memoserv set notify not working) also fixed a blocker bug in actions.c
 #
 # BUILD : 1.7.3 (161)
 # NOTES : Fixed cut/paste error on mydbgen

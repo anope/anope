@@ -972,6 +972,64 @@ void save_ns_req_dbase(void)
 
 #undef SAFE
 
+void save_ns_rdb_dbase(void)
+{
+#ifdef USE_RDB
+    int i;
+    NickAlias *na;
+    NickCore *nc;
+
+    if (!rdb_open())
+        return;
+
+    rdb_tag_table("anope_ns_core");
+    rdb_tag_table("anope_ns_alias");
+    rdb_scrub_table("anope_ms_info", "serv='NICK'");
+    rdb_clear_table("anope_ns_access");
+
+    for (i = 0; i < 1024; i++) {
+        for (nc = nclists[i]; nc; nc = nc->next) {
+            rdb_save_ns_core(nc);
+
+        }                       /* for (nc) */
+    }                           /* for (i) */
+
+    for (i = 0; i < 1024; i++) {
+        for (na = nalists[i]; na; na = na->next) {
+            rdb_save_ns_alias(na);
+
+        }                       /* for (na) */
+    }                           /* for (i) */
+
+    rdb_scrub_table("anope_ns_core", "active='0'");
+    rdb_scrub_table("anope_ns_alias", "active='0'");
+    rdb_close();
+#endif
+}
+
+void save_ns_req_rdb_dbase(void)
+{
+#ifdef USE_RDB
+    int i;
+    NickRequest *nr;
+
+    if (!rdb_open())
+        return;
+
+    rdb_tag_table("anope_ns_request");
+
+    for (i = 0; i < 1024; i++) {
+        for (nr = nrlists[i]; nr; nr = nr->next) {
+            rdb_save_ns_req(nr);
+        }
+    }
+
+    rdb_scrub_table("anope_ns_request", "active='0'");
+    rdb_close();
+#endif
+
+}
+
 /*************************************************************************/
 
 /* Check whether a user is on the access list of the nick they're using If
@@ -1379,6 +1437,17 @@ static void change_core_display(NickCore * nc, char *newdisplay)
     alog("%s: changing %s nickname group display to %s", s_NickServ,
          nc->display, newdisplay);
 
+#ifdef USE_RDB
+    /* Reflect this change in the database right away. This
+     * ensures that we know how to deal with this "new" nick
+     * on the next /OS UPDATE might need it on /NS DROP too...
+     */
+    if (rdb_open()) {
+        rdb_ns_set_display(newdisplay, nc->display);
+        rdb_close();
+    }
+#endif
+
     /* Remove the core from the list */
     if (nc->next)
         nc->next->prev = nc->prev;
@@ -1403,6 +1472,9 @@ static void change_core_display(NickCore * nc, char *newdisplay)
 static int delcore(NickCore * nc)
 {
     int i;
+#ifdef USE_RDB
+    static char clause[128];
+#endif
     /* (Hopefully complete) cleanup */
     cs_remove_nick(nc);
     os_remove_nick(nc);
@@ -1417,6 +1489,23 @@ static int delcore(NickCore * nc)
 
     /* Log .. */
     alog("%s: deleting nickname group %s", s_NickServ, nc->display);
+
+#ifdef USE_RDB
+    /* Reflect this change in the database right away. */
+    if (rdb_open()) {
+
+        snprintf(clause, sizeof(clause), "display='%s'", nc->display);
+        rdb_scrub_table("anope_ns_access", clause);
+        rdb_scrub_table("anope_ns_core", clause);
+        rdb_scrub_table("anope_cs_access", clause);
+        /* I'm unsure how to clean up the OS ADMIN/OPER list on the db */
+        /* I wish the "display" primary key would be the same on all tables */
+        snprintf(clause, sizeof(clause), "receiver='%s' AND serv='NICK'",
+                 nc->display);
+        rdb_scrub_table("anope_ms_info", clause);
+        rdb_close();
+    }
+#endif
 
     /* Now we can safely free it. */
     free(nc->display);
@@ -1486,6 +1575,9 @@ int delnickrequest(NickRequest * nr)
 
 int delnick(NickAlias * na)
 {
+#ifdef USE_RDB
+    static char clause[128];
+#endif
     /* First thing to do: remove any timeout belonging to the nick we're deleting */
     clean_ns_timeouts(na);
 
@@ -1528,6 +1620,16 @@ int delnick(NickAlias * na)
         na->prev->next = na->next;
     else
         nalists[HASH(na->nick)] = na->next;
+
+#ifdef USE_RDB
+    /* Reflect this change in the database right away. */
+    if (rdb_open()) {
+
+        snprintf(clause, sizeof(clause), "nick='%s'", na->nick);
+        rdb_scrub_table("anope_ns_alias", clause);
+        rdb_close();
+    }
+#endif
 
     free(na->nick);
     if (na->last_usermask)
@@ -2213,6 +2315,16 @@ static int do_group(User * u)
             u->na = na;
             na->u = u;
 
+#ifdef USE_RDB
+            /* Is this really needed? Since this is a new alias it will get
+             * its unique id on the next update, since it was previously
+             * deleted by delnick. Must observe...
+             */
+            if (rdb_open()) {
+                rdb_save_ns_alias(na);
+                rdb_close();
+            }
+#endif
             alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, GetHost(u), u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 

@@ -461,6 +461,25 @@ void save_exceptions()
 #undef SAFE
 
 /*************************************************************************/
+
+void save_rdb_exceptions()
+{
+#ifdef USE_RDB
+    int i;
+    Exception *e;
+
+    if (!rdb_open())
+        return;
+    rdb_clear_table("anope_os_exceptions");
+    for (i = 0; i < nexceptions; i++) {
+        e = &exceptions[i];
+        rdb_save_exceptions(e);
+    }
+    rdb_close();
+#endif
+}
+
+/*************************************************************************/
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 

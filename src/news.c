@@ -1,5 +1,6 @@
 /* News functions.
 /* News functions.
+/* News functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -97,7 +98,6 @@ struct newsmsgs msgarray[] = {
 };
 
 /* *INDENT-ON* */
-static int *findmsgs(int16 type, char **typename)
 {
     int i;
     for (i = 0; i < lenof(msgarray); i++) {

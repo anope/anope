@@ -1,5 +1,6 @@
 /* Miscellaneous routines.
 /* Miscellaneous routines.
+/* Miscellaneous routines.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -710,4 +711,5 @@ int nickIsServices(char *nick)
 
     return found;
 }
+
  

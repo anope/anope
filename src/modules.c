@@ -1,5 +1,6 @@
 /* Modular support
 /* Modular support
+/* Modular support
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -2024,4 +2025,5 @@ void moduleCleanStruct(ModuleData * moduleData[])
 }
 
 /* EOF */
+
  

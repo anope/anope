@@ -449,15 +449,15 @@ int anope_event_newmask(char *source, int ac, char **av)
 
 /*
  NICK %s %d %lu %s %s %s %s %s :%s
-	parv[1] = nickname
-	parv[2] = hopcount 
-	parv[3] = nick TS (nick introduction time)
-	parv[4] = umodes
-    parv[5] = username
-    parv[6] = hostname
-    parv[7] = spoofed hostname
-    parv[8] = server
-    parv[9] = nick info
+	parv[0] = nickname
+	parv[1] = hopcount 
+	parv[2] = nick TS (nick introduction time)
+	parv[3] = umodes
+    parv[4] = username
+    parv[5] = hostname
+    parv[6] = spoofed hostname
+    parv[7] = server
+    parv[8] = nick info
 */
 /*
  Change NICK
@@ -465,13 +465,18 @@ int anope_event_newmask(char *source, int ac, char **av)
 	parv[1] = new nick
 	parv[2] = TS (timestamp from user's server when nick changed was received)
 */
+/*
+ NICK xpto 2 561264 +rw irc num.myisp.pt mask.myisp.pt uc.ptlink.net :Just me
+       0   1  2      3   4   5            6              7             8
+
+*/
 int anope_event_nick(char *source, int ac, char **av)
 {
     User *user;
 
     if (ac != 2) {
-        user = do_nick(source, av[0], av[4], av[6], av[7], av[8],
-                       strtoul(av[2], NULL, 10), 0, 0, av[5], NULL);
+        user = do_nick(source, av[0], av[4], av[5], av[7], av[8],
+                       strtoul(av[2], NULL, 10), 0, 0, av[6], NULL);
         if (user)
             anope_set_umode(user, 1, &av[3]);
     } else {
@@ -1325,7 +1330,11 @@ void anope_cmd_vhost_off(User * u)
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
-    /* does not support vhosting */
+    if (vIdent) {
+        send_cmd(s_HostServ, "NEWMASK %s@%s %s", vIdent, vhost, nick);
+    } else {
+        send_cmd(s_HostServ, "NEWMASK %s %s", vhost, nick);
+    }
 }
 
 /* INVITE */

@@ -1,6 +1,6 @@
-Anope Version S V N
+Anope Version 1.7.7
 -------------------
-Provided by Anope Dev. <dev@anope.org> - 2004
+Provided by Anope Dev. <dev@anope.org> - 2004/2005
 12/30 A Warnings for NULL values with sstrdup/moduleData.                 [#261]
 12/26 A Services can enforce SGLINE/SQLINE by killing the user on set.    [#245]
 12/25 A Flag to tell if we need to enforce SGlines or not.                [ #00]
@@ -80,11 +80,9 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
-Provided by DrStein <gacevedo@anope.org> - 2005
+Provided by DrStein <gacevedo@anope.org> - 2004/2005
 01/03 F Duplicated TOPIC sent, when TOPICLOCK is ON.                      [#265]
 01/03 F If SYMBIOSIS ON, BotServ's bot should be the topic setter.        [#265]
-
-Provided by DrStein <gacevedo@anope.org> - 2004
 12/23 A NS STATUS will return your status if no nickname is given.        [ #00]
 12/26 F Error message during SQL init even if UseRDB was disabled.        [ #00]
 12/10 F Extra tab in language files, causing bad answer in !seen.         [#243]
@@ -96,10 +94,10 @@ Provided by DrStein <gacevedo@anope.org> - 2004
 Provided by Jens Hoffrichter <joho@nickstories.de> - 2004
 12/17 F Provides clear message of SUPERADMIN is not enabled.              [#246]
 
-Provided by mitch{Xy} <mitch@bondage.com> - 2004.
+Provided by mitch{Xy} <mitch@bondage.com> - 2004
 12/20 F Removed unclear email text from language files.                   [ #00]
 
-Provided by ThaPrince <jon@vile.com> - 2004.
+Provided by ThaPrince <jon@vile.com> - 2004
 12/25 A Support for Hybrid TBURST.                                        [#259]
 12/21 A Support for Hybrid IRCDs QS (Quit Storm).                         [#256]
 12/20 A Added plexus ircd support.                                        [ #00]

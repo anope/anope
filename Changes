@@ -1,6 +1,8 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/05/04 Fixed Badwords kicker to ignore control characters and color codes.
+2004/05/04 anoperc bugfixes including checking if anope binary exists.
 2004/05/03 always set the right module name when executing mod_tail commands
 2004/05/02 Added NickCore,NickAlias,Memos,ChannelInfo to the moduleAddData stuff, its going well!
 2004/04/29 Added new MemoServ command CHECK to check whether a memo has been read or not.

@@ -609,6 +609,8 @@ E char *myStrSubString(const char *src, int start, int end);
 E char *myStrGetTokenRemainder(const char *str, const char dilim,
         int token_number);
 E void doCleanBuffer(char *str);
+E void EnforceQlinedNick(char *nick, char *killer);
+
 
 /**** news.c ****/
 

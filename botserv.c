@@ -1280,7 +1280,6 @@ static int do_bot(User * u)
         else if (findbot(nick))
             notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
         else {
-            User *u2;
             NickAlias *na;
 
                 /**
@@ -1379,9 +1378,7 @@ static int do_bot(User * u)
             bi->chancount = 0;
 
             /* We check whether user with this nick is online, and kill it if so */
-            if ((u2 = finduser(nick)))
-                kill_user(s_BotServ, u2->nick,
-                          "This nick is now used by Services");
+            EnforceQlinedNick(nick, s_BotServ);
 
             /* We make the bot online, ready to serve */
 #if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
@@ -1411,7 +1408,6 @@ static int do_bot(User * u)
         else if (!(bi = findbot(oldnick)))
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
         else {
-            User *u2;
             NickAlias *na;
 
             /* Checks whether there *are* changes.
@@ -1511,9 +1507,7 @@ static int do_bot(User * u)
                     delnick(na);
 
                 /* We check whether user with this nick is online, and kill it if so */
-                if ((u2 = finduser(nick)))
-                    kill_user(s_BotServ, u2->nick,
-                              "This nick is now used by Services");
+                EnforceQlinedNick(nick, s_BotServ);
             }
 
             if (strcmp(nick, bi->nick))

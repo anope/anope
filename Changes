@@ -20,6 +20,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 05/12 F xOP management inconsistency                                      [ #38]
 05/11 F Bug with module unload / memo moduleData                          [ #43]
 05/05 F Bug with RDB and empty nickserv greet message                     [ #28]
+05/08 F Segfault on MySQL FORBID                                          [ #14]
 04/22 F ALIST bug when being invoked by systems admins                    [ #20]
 
 Provided by Rage IRCD. <rageircd@users.sourceforge.net> - 2004

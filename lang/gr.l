@@ -257,7 +257,7 @@ DURATION_SECOND
 	1 δευτερόλεπτο
 DURATION_SECONDS
 	%d δευτερόλεπτα
-	
+
 # Human readable expiration
 NO_EXPIRE
 	δεν λήγει ποτέ

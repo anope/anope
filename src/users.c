@@ -194,23 +194,17 @@ void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
-    char *realname = NULL;
 
     if (LogUsers) {
-        if (user->realname) {
-            realname = normalizeBuffer(user->realname);
-        } else {
-            realname = " ";
-        }
         if (ircd->vhost) {
             alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
                  (user->vhost ? user->vhost : "(none)"),
-                 realname, user->server->name);
+                 normalizeBuffer(user->realname), user->server->name);
         } else {
             alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
-                 realname, user->server->name);
+                 normalizeBuffer(user->realname), user->server->name);
         }
     }
 
@@ -229,7 +223,6 @@ void delete_user(User * user)
         }
     }
     Anope_Free(user->realname);
-    Anope_Free(realname);
     if (debug >= 2) {
         alog("debug: delete_user(): remove from channels");
     }
@@ -335,21 +328,6 @@ User *finduser(const char *nick)
     if (debug >= 3)
         alog("debug: finduser(%s) -> 0x%p", nick, (void *) user);
     return user;
-}
-
-
-/* On shut down clean out the user struct */
-void shut_clean_user()
-{
-    User *u;
-    int i;
-
-    for (i = 0; i < 1024; i++) {
-        for (u = userlist[i]; u; u = u->next) {
-            delete_user(u);
-        }
-    }
-    return;
 }
 
 

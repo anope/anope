@@ -283,7 +283,7 @@ DURATION_SECOND
 	1 sekunda
 DURATION_SECONDS
 	%d sekund(y)
-	
+
 # Human readable expiration
 NO_EXPIRE
 	nie wygasa

@@ -267,7 +267,7 @@ DURATION_SECOND
 	1 másodperc
 DURATION_SECONDS
 	%d másodperc
-	
+
 # Emberi olvasható elévülések
 NO_EXPIRE
 	nem fog elévülni

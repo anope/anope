@@ -260,7 +260,7 @@ DURATION_SECOND
 	1 seconde
 DURATION_SECONDS
 	%d secondes
-	
+
 # Human readable expiration
 NO_EXPIRE
 	verloopt niet

@@ -258,7 +258,7 @@ DURATION_SECOND
 	1 segon
 DURATION_SECONDS
 	%d segons
-	
+
 # Human readable expiration
 NO_EXPIRE
 	no expira

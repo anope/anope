@@ -263,7 +263,6 @@ static void services_shutdown(void)
         if (ircd->chanmodes) {
             Anope_Free(ircd->chanmodes);
         }
-        shut_clean_user();
     }
     disconn(servsock);
 }

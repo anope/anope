@@ -263,7 +263,7 @@ DURATION_SECOND
 	1 секунда
 DURATION_SECONDS
 	%d секунд
-	
+
 # Human readable expiration
 NO_EXPIRE
 	никогда не истечет

@@ -2403,13 +2403,6 @@ char *cs_get_flood(ChannelInfo * ci)
 
 /*************************************************************************/
 
-char *cs_get_joinflood(ChannelInfo * ci)
-{
-    return ci->mlock_joinflood;
-}
-
-/*************************************************************************/
-
 char *cs_get_key(ChannelInfo * ci)
 {
     return ci->mlock_key;
@@ -2462,28 +2455,6 @@ void cs_set_flood(ChannelInfo * ci, char *value)
     }
 }
 
-#endif
-
-/*************************************************************************/
-
-#ifdef HAS_JOINFLOOD
-void cs_set_joinflood(ChannelInfo * ci, char *value)
-{
-    char *end;
-    
-    if (ci->mlock_joinflood)
-        free(ci->mlock_joinflood);
-
-    if ((*value != ':') && (strtoul(value, &end, 10) > 0) && (*end == ':')
-	&& (*(++end) != '\0') && (strtoul(end, &end, 10) > 0)
-	&& (*end == '\0')) {
-	/* Above if looks ugly, but should work (tm) */
-        ci->mlock_joinflood = sstrdup(value);
-    } else {
-        ci->mlock_on &= ~CMODE_j;
-        ci->mlock_joinflood = NULL;
-    }
-}
 #endif
 
 /*************************************************************************/

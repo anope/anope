@@ -8,13 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="270"
+VERSION_BUILD="271"
 
 # $Log$
 #
-# BUILD : 1.7.4 (270)
+# BUILD : 1.7.4 (271)
 # BUGS  : 
-# NOTES : Adding +j mlock support for bahamut just before my vacation
+# NOTES : Rolled Back to 291 for GeniusDex 
 #
 # BUILD : 1.7.4 (269)
 # BUGS  : N/A

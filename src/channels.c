@@ -33,9 +33,6 @@ static void del_exception(Channel * chan, char *mask);
 #ifdef HAS_FMODE
 static char *get_flood(Channel * chan);
 #endif
-#ifdef HAS_JOINFLOOD
-static char *get_joinflood(Channel * chan);
-#endif
 static char *get_key(Channel * chan);
 static char *get_limit(Channel * chan);
 #ifdef HAS_LMODE
@@ -44,9 +41,6 @@ static char *get_redirect(Channel * chan);
 static Channel *join_user_update(User * user, Channel * chan, char *name);
 #ifdef HAS_FMODE
 static void set_flood(Channel * chan, char *value);
-#endif
-#ifdef HAS_JOINFLOOD
-static void set_joinflood(Channel * chan, char *value);
 #endif
 static void set_key(Channel * chan, char *value);
 static void set_limit(Channel * chan, char *value);
@@ -173,11 +167,7 @@ CBMode cbmodes[128] = {
 	{ 0 }, /* g */
 	{ 0 }, /* h */
 	{ CMODE_i, 0, NULL, NULL },
-#ifdef HAS_JOINFLOOD
-	{ CMODE_j, CBM_MINUS_NO_ARG, set_joinflood, cs_set_joinflood },
-#else
 	{ 0 }, /* j */
-#endif
 	{ CMODE_k, 0, set_key, cs_set_key },
 	{ CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit },
 	{ CMODE_m, 0, NULL, NULL },
@@ -231,9 +221,6 @@ CBModeInfo cbmodeinfos[] = {
 	{ 'f', CMODE_f, 0, get_flood, cs_get_flood },
 #endif
 	{ 'i', CMODE_i, 0, NULL, NULL },
-#ifdef HAS_JOINFLOOD
-	{ 'j', CMODE_j, CBM_MINUS_NO_ARG, get_joinflood, cs_get_joinflood },
-#endif
 	{ 'k', CMODE_k, 0, get_key, cs_get_key },
 	{ 'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit },
 	{ 'm', CMODE_m, 0, NULL, NULL },
@@ -1504,13 +1491,6 @@ static char *get_flood(Channel * chan)
 
 /*************************************************************************/
 
-static char *get_joinflood(Channel * chan)
-{
-    return chan->joinflood;
-}
-
-/*************************************************************************/
-
 static char *get_key(Channel * chan)
 {
     return chan->key;
@@ -1581,19 +1561,6 @@ static void set_flood(Channel * chan, char *value)
 }
 
 #endif
-
-/*************************************************************************/
-
-static void set_joinflood(Channel * chan, char *value)
-{
-    if (chan->joinflood)
-        free(chan->joinflood);
-    chan->joinflood = value ? sstrdup(value) : NULL;
-
-    if (debug)
-        alog("debug: Joinflood setting of channel %s set to %s", chan->name,
-             chan->joinflood ? chan->joinflood : "no joinflood settings");
-}
 
 /*************************************************************************/
 

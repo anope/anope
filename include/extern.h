@@ -143,10 +143,6 @@ E void stick_all(ChannelInfo * ci);
 E char *cs_get_flood(ChannelInfo * ci);
 E void cs_set_flood(ChannelInfo * ci, char *value);
 #endif
-#ifdef HAS_JOINFLOOD
-E char *cs_get_joinflood(ChannelInfo * ci);
-E void cs_set_joinflood(ChannelInfo * ci, char *value);
-#endif
 E char *cs_get_key(ChannelInfo * ci);
 E void cs_set_key(ChannelInfo * ci, char *value);
 E char *cs_get_limit(ChannelInfo * ci);

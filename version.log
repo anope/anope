@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="551"
+VERSION_BUILD="552"
 
 # $Log$
+#
+# BUILD : 1.7.7 (552)
+# BUGS  : none
+# NOTES : Fixed misplaced MEMO_NO_RSEND_SELF in es.l
 #
 # BUILD : 1.7.7 (551)
 # BUGS  : 25

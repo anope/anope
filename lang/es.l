@@ -1802,8 +1802,6 @@ MEMO_RSEND_CHAN_MEMO_TEXT
 	[auto-memo] El memo que enviaste a %s ha sido leido.
 MEMO_RSEND_USER_NOTIFICATION
 	Una notificacion ha sido enviada a %s informando que has leido su memo.
-MEMO_NO_RSEND_SELF
-	No puedes pedir una notificacion cuando te envias el memo a ti mismo.
 
 # Standard responses
 MEMO_CHECK_SYNTAX
@@ -1814,6 +1812,8 @@ MEMO_CHECK_READ
 	El ultimo memo que enviaste a %s (enviado el %s) ha sido leido.
 MEMO_CHECK_NO_MEMO
 	El nick %s no ha recibido ningun memo tuyo.
+MEMO_NO_RSEND_SELF
+	No puedes pedir una notificacion cuando te envias el memo a ti mismo.
 
 ###########################################################################
 #

@@ -407,7 +407,7 @@ void sighandler(int signum)
     }
 
     if (signum == SIGSEGV) {
-        do_backtrace();
+        do_backtrace(1);
     }
 
     if (started) {
@@ -578,7 +578,7 @@ int main(int ac, char **av, char **envp)
 
 /*************************************************************************/
 
-void do_backtrace(void)
+void do_backtrace(int show_segheader)
 {
 #ifdef HAVE_BACKTRACE
     void *array[50];
@@ -586,8 +586,10 @@ void do_backtrace(void)
     char **strings;
     int i;
 
-    alog("Backtrace: Segmentation fault detected");
-    alog("Backtrace: report the following lines");
+    if (show_segheader) {
+        alog("Backtrace: Segmentation fault detected");
+        alog("Backtrace: report the following lines");
+    }
     alog("Backtrace: Anope version %s %s %s", version_number,
          version_build, version_flags);
     size = backtrace(array, 10);

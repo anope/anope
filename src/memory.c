@@ -120,6 +120,10 @@ char *sstrdup(const char *src)
 #else
             abort();
 #endif
+    } else {
+        alog("sstrdup() called with NULL-arg");
+        if (debug)
+            do_backtrace(0);
     }
 
     return ret;

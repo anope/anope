@@ -1823,6 +1823,12 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
         alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
         return MOD_ERR_PARAMS;
     }
+    
+    if (mod_current_module_name == NULL) {
+        alog("moduleAddData() called with mod_current_module_name being NULL");
+        if (debug)
+            do_backtrace(0);
+    }
 
     moduleDelData(md, key);     /* Remove any existing module data for this module with the same key */
 
@@ -1862,6 +1868,12 @@ char *moduleGetData(ModuleData ** md, char *key)
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
 
+    if (mod_current_module_name == NULL) {
+        alog("moduleGetData() called with mod_current_module_name being NULL");
+        if (debug)
+            do_backtrace(0);
+    }
+
     if (debug) {
         alog("debug: moduleGetData %p : key %s", (void *) md, key);
         alog("debug: Current Module %s", mod_name);
@@ -1890,6 +1902,12 @@ void moduleDelData(ModuleData ** md, char *key)
     ModuleData *current = *md;
     ModuleData *prev = NULL;
     ModuleData *next = NULL;
+
+    if (mod_current_module_name == NULL) {
+        alog("moduleDelData() called with mod_current_module_name being NULL");
+        if (debug)
+            do_backtrace(0);
+    }
 
     if (key) {
         while (current) {
@@ -1926,6 +1944,12 @@ void moduleDelAllData(ModuleData ** md)
     ModuleData *current = *md;
     ModuleData *prev = NULL;
     ModuleData *next = NULL;
+
+    if (mod_current_module_name == NULL) {
+        alog("moduleDelAllData() called with mod_current_module_name being NULL");
+        if (debug)
+            do_backtrace(0);
+    }
 
     while (current) {
         next = current->next;

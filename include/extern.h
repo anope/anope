@@ -613,7 +613,7 @@ E time_t start_time;
 
 E void save_databases(void);
 E void expire_all(void);
-E void do_backtrace(void);
+E void do_backtrace(int show_segheader);
 E void sighandler(int signum);
 
 /**** memory.c ****/

@@ -3852,6 +3852,19 @@ NICK_SERVADMIN_HELP_SUSPEND
 #
 ###########################################################################
 
+NICK_SERVADMIN_HELP_UNSUSPEND
+	Syntax: UNSUSPEND nickname
+
+	UNSUSPENDS a nickname from being used.
+
+	Limited to Services admins.
+
+###########################################################################
+#
+# ChanServ help messages
+#
+###########################################################################
+
 CHAN_HELP
 	%S te permite registrar y controlar varios
 	aspectos de los canales. A menudo, %S puede prevenir

@@ -2882,7 +2882,7 @@ int check_sqline(char *nick, int nick_change)
 {
     int i;
     SXLine *sx;
-    char *reason;
+    char *reason = NULL;
 
     if (sqlines.count == 0)
         return 0;
@@ -2900,9 +2900,10 @@ int check_sqline(char *nick, int nick_change)
         if (match_wild_nocase(sx->mask, nick)) {
             sqline(sx->mask, sx->reason);
             /* We kill nick since s_sqline can't */
+            reason = smalloc(strlen(sx->reason) + 10);
             snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
             kill_user(s_OperServ, nick, reason);
-
+            free(reason);
             return 1;
         }
     }

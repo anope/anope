@@ -3,6 +3,7 @@ Anope Version S V N
 Provided by Anope Dev. <dev@anope.org> - 2004
 08/24 A New -l option for am script to list possible selectors.           [ #00]
 09/08 A Removed rand() and ported bsd's arc4random() to fit our needs.    [ #00]
+09/09 F Fixed bug with uninitialized pointer in check_sqline.             [ #00]
 09/08 F Fixed gcc2 support with multiple C++ style comments.              [ #00]
 08/26 F Fixed spelling stuff in the german langfile.                      [#159]
 08/24 F Compile error with gcc2.                                          [ #00]

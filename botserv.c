@@ -1090,7 +1090,7 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         && (get_access(u, ci) >= get_access(requester, ci)))
         return;
 
-#ifdef HAVE_EXCEPT
+#ifdef HAS_EXCEPT
     if (is_excepted(ci, u) == 1) {
         send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
                  getstring2(NULL, BOT_EXCEPT));

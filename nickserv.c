@@ -1651,7 +1651,9 @@ int delnick(NickAlias * na)
 
 static void collide(NickAlias * na, int from_timeout)
 {
+#ifndef IRC_HYBRID
     char guestnick[NICKMAX];
+#endif
 
     if (!from_timeout)
         del_ns_timeout(na, TO_COLLIDE);

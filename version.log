@@ -7,10 +7,14 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
-VERSION_PATCH="3"
-VERSION_BUILD="202"
+VERSION_PATCH="4"
+VERSION_BUILD="203"
 
 # $Log$
+#
+# BUILD : 1.7.4 (203)
+# BUGS  : none
+# NOTES : Anope 1.7.4 Release
 #
 # BUILD : 1.7.3 (202)
 # BUGS  : 99

@@ -630,7 +630,7 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
     send_cmd(s_HostServ, "SVSMODE %s -x", u->nick);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
@@ -1594,6 +1594,12 @@ void anope_cmd_jupe(char *jserver, char *who, char *reason)
     anope_cmd_squit(jserver, rbuf);
     anope_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+}
+
+/* GLOBOPS - to handle old WALLOPS */
+void anope_cmd_global_legacy(char *source, char *fmt)
+{
+    send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
 #endif

@@ -638,13 +638,13 @@ void do_part(const char *source, int ac, char **av)
 
    Unreal SJOIN
 
-   On Connect there is
-   SJOIN !11LkOb #ircops +nt :@Trystan
+   On Services connect there is
+   SJOIN !11LkOb #ircops +nt :@Trystan &*!*@*.aol.com "*@*.home.com
 
    av[0] = time stamp (base64)
    av[1] = channel
    av[2] = modes
-   av[3] = users + bans
+   av[3] = users + bans + exceptions
 
    On Channel Creation or a User joins an existing
    Luna.NomadIrc.Net SJOIN !11LkW9 #akill :@Trystan
@@ -712,6 +712,16 @@ void do_sjoin(const char *source, int ac, char **av)
                     s = end + 1;
                     continue;
                 }
+            }
+
+            /* Unreal plans to add +I - for now add the hook to allow
+               1.7.6 to work with it and not cause problems - TSL */
+            if (*s == '\'') {
+                add_invite(c, myStrGetToken(s, '\'', 1));
+                if (!end)
+                    break;
+                s = end + 1;
+                continue;
             }
 
             while (csmodes[(int) *s] != 0)

@@ -530,6 +530,11 @@ void anope_cmd_global(char *source, const char *fmt, ...)
     send_cmd(source ? source : ServerName, "OPERWALL :%s", buf);
 }
 
+/* GLOBOPS - to handle old WALLOPS */
+void anope_cmd_global_legacy(char *source, char *fmt)
+{
+    send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
+}
 
 int anope_event_sjoin(char *source, int ac, char **av)
 {

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="415"
+VERSION_BUILD="418"
 
 # $Log$
+#
+# BUILD : 1.7.5 (418)
+# BUGS  : N/A
+# NOTES : 1. Fixed Rage IRCD compiler error, 2. Added hook for Unreal SJOIN +I support, 3. wallops() is back, 4. 
+# depricated.h added to help older modules work with the new commands
 #
 # BUILD : 1.7.5 (415)
 # BUGS  : N/A

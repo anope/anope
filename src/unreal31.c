@@ -1552,4 +1552,11 @@ void anope_cmd_jupe(char *jserver, char *who, char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
+/* GLOBOPS - to handle old WALLOPS */
+void anope_cmd_global_legacy(char *source, char *fmt)
+{
+    send_cmd(source ? source : ServerName, "%s :%s",
+             send_token("GLOBOPS", "]"), fmt);
+}
+
 #endif

@@ -21,6 +21,8 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 08/24 F Compile error with gcc2.                                          [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+10/23 A Added depricated.h, this will allow old mods to work for now      [ #00]
+10/23 A Add hook for SJOIN for Unreal future +I support	                  [ #00]
 10/06 A Bahamut's channel mode +j (join throttle) 	                  [ #00]
 10/05 A Globalized CS/NS STATUS messages		                  [ #00]
 10/02 A Added NewsCount as  new feature in services.conf                  [ #00]

@@ -1091,6 +1091,8 @@ extern int anope_flood_mode_check(char *value);
 
 extern void anope_cmd_jupe(char *jserver, char *who, char *reason);
 
+extern void anope_cmd_global_legacy(char *source, char *fmt);
+extern void wallops(char *source, const char *fmt, ...);
 
 extern char *common_get_vident(User *u);
 extern char *common_get_vhost(User *u);

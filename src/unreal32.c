@@ -1362,6 +1362,13 @@ void anope_cmd_global(char *source, const char *fmt, ...)
              send_token("GLOBOPS", "]"), buf);
 }
 
+/* GLOBOPS - to handle old WALLOPS */
+void anope_cmd_global_legacy(char *source, char *fmt)
+{
+    send_cmd(source ? source : ServerName, "%s :%s",
+             send_token("GLOBOPS", "]"), fmt);
+}
+
 /* SQLINE */
 /*
 **	parv[0] = sender

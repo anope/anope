@@ -242,3 +242,23 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
     }
     anope_cmd_privmsg2(source, dest, buf);
 }
+
+/* cause #defines just bitched to much, its back and hooks to 
+   a legacy in the ircd protocol files  - TSL */
+void wallops(char *source, const char *fmt, ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+    *buf = '\0';
+
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    }
+
+    anope_cmd_global_legacy(source, buf);
+}

@@ -1,7 +1,14 @@
 Anope DefCon 
 ------------
 
-Introduction:
+1) Introduction
+2) Installation
+3) Configuration
+4) Usage
+5) Usage Example
+6) Support
+
+1) Introduction
 
     Anope 1.6 onwards supports a unique protection mechanism based on the
     military "Defense Readiness Condition" (DefCon) system. It is based on 
@@ -20,7 +27,7 @@ Introduction:
     are running. Also to protect the users, primarily in the event of Clones
     and/or FloodBOT attacks. 
 
-Installation:
+2) Installation
 
     The DefCon system is part of Anope's core,
 
@@ -32,7 +39,7 @@ Installation:
     Make sure you restart Anope after changing the DefCon configuration
     directives.
 
-Configuration:
+3) Configuration
 
     Pre-defined DefCon actions:
 
@@ -71,14 +78,14 @@ Configuration:
 
     The recommended default values are safe to use on any network.
 
-Usage:
+4) Usage
 
     Anope starts up in DEFCON5 (normal readiness). To change the Defcon level 
     in action use: 
     
     /msg OperServ DEFCON 1|2|3|4|5 
 
-Example:
+5) Usage Example
 
     Place the network on DEFCON4:
 
@@ -104,7 +111,7 @@ Example:
 
     -Global- Services are now back to normal, sorry for any inconvenience
 
-Support:
+6) Support
 
     You might get DefCon support by posting on our online forum, or maybe on 
     our #anope channel at /server irc.anope.org.

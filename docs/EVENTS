@@ -1,156 +1,163 @@
-Internal Events
+Anope Internal Events
+---------------------
 
-1. Intro
-2. Complex Events
-3. Triggered Events
-4. Triggered Events List
+1) Intro
+2) Complex Events
+3) Triggered Events
+4) Triggered Events List
 
-==============================================================================================
-1. Introduction to Internal Events
-==============================================================================================
+1) Introduction to Internal Events
 
-	Internal Events are setup to give module developers more information about what the core
-is doing at different times. This information can be as complex as data we are feeding to the
-uplink, to simple triggered events such as the databases being saved. A list of triggered 
-events can be found below. Additional there is a module included with the core which can 
-provide some clue as to how to use the code in your modules. The rest of this document assumes
-that you are used to writting modules.
+    Internal Events are setup to give module developers more information
+    about what the core is doing at different times. This information can
+    be as complex as data we are feeding to the uplink, to simple triggered
+    events such as the databases being saved. A list of triggered  events
+    can be found below. Additional there is a module included with the core
+    which can  provide some clue as to how to use the code in your modules.
+    The rest of this document assumes that you are used to writting modules.
 
-==============================================================================================
-2. Complex Events
-==============================================================================================
+2) Complex Events
 
-	This type of events are based around what happens when we talk to the IRCD, much like 
-MESSAGE events that the IRCD sends to us. The events are triggered when Anope writes to the
-ircd. To watch for these events you must have some knowledge of how the IRCD command system
-works. In our example we will trap for NICK events.
+    This type of events are based around what happens when we talk to the
+    IRCd, much like MESSAGE events that the IRCD sends to us. The events
+    are triggered when Anope writes to the ircd. To watch for these events
+    you must have some knowledge of how the IRCd command system works. In
+    our example we will trap for NICK events.
 
-A. All functions most be formatted as
+    A) All functions most be formatted as:
 
-   int functioname(char *source, int ac, char **av);
+        int functioname(char *source, int ac, char **av);
 
-B. In AnopeInit you must declare EvtMessage in some fashion, it is into this variable that
-   we will create the event handler. Here is what the base AnopeInit should look like at
-   this point.
-	
-	int AnopeInit(int argc, char **argv)
-	{
-    	EvtMessage *msg = NULL;
-    	int status;
+    B) In AnopeInit you must declare EvtMessage in some fashion, it is into
+       this variable that we will create the event handler. Here is what the
+       base AnopeInit should look like at this point:
+ 
+        int AnopeInit(int argc, char **argv)
+        {
+            EvtMessage *msg = NULL;
+            int status;
 
-    	moduleAddAuthor(AUTHOR);
-    	moduleAddVersion(VERSION);
-    	return MOD_CONT;
-	}
+            moduleAddAuthor(AUTHOR);
+            moduleAddVersion(VERSION);
+            return MOD_CONT;
+        }
 
-C. Pass "createEventHandler" the name of the message in this case NICK, and the function 
-   that was created in Step A. At this point you should assign the return of 
-   "createEventHandler" to the EvtMessage variable.
+       Note that AUTHOR and VERSION should be defined above the AnopeInit
+       function, just like you should do with any module.
 
-   msg = createEventHandler("NICK", my_nick);
+    C) Pass "createEventHandler" the name of the message in this case NICK,
+       and the function that was created in Step A. At this point you should
+       assign the return of "createEventHandler" to the EvtMessage variable.
 
-D. The Handler is not ready for use, now you must add it to the hash, with 
-   "moduleAddEventHandler", you will want to pass to this function the return
-   of "createEventHandler"
+        msg = createEventHandler("NICK", my_nick);
 
-   status = moduleAddEventHandler(msg);
+    D) The Handler is not ready for use yet; now you must add it to the hash
+       with "moduleAddEventHandler". You will want to pass to this function
+       the return of "createEventHandler".
 
-   it will return the module error code so you can confirm that it was added
-   correctly.
+        status = moduleAddEventHandler(msg);
 
-E. With that setup in your function you will be passed 3 items. The source most of the time 
-   this will be set to ServerName or NULL, consult our ircd documentation about how messages
-   are formatted. AC is the count of variables you will find in AV.
+       It will return the same module error codes as adding a regular message,
+       which you can use to confirm it was added correctly.
 
-	int my_nick(char *source, int ac, char **av)
-	{
-  		alog("Internal Event - nick is %s",av[0]);
-		return MOD_CONT;
-	}
+    E) With that setup in your function you will be passed 3 items. The source
+       most of the time this will be set to ServerName or NULL; consult our
+       IRCd documentation about how messages are formatted. AC is the count of
+       variables you will find in AV.
 
-==============================================================================================
-3. Triggered Events
-==============================================================================================
+        int my_nick(char *source, int ac, char **av)
+        {
+            alog("Internal Event - nick is %s",av[0]);
+            return MOD_CONT;
+        }
 
-	These events also known as "event hooks" are internal events such as expiring of nicks to
-the saving of databases.
+3) Triggered Events
 
-A. All functions most be formatted as
+    These events also known as "event hooks" are internal events such as
+    expiring of nicks to the saving of databases.
 
-   int functioname(char *message);
+    A) All functions most be formatted as:
 
-B. In AnopeInit you must declare EvtHook in some fashion, it is into this variable that
-   we will create the event handler. Here is what the base AnopeInit should look like at
-   this point.
-	
-	int AnopeInit(int argc, char **argv)
-	{
-    	EvtHook *hook = NULL;
-    	int status;
+        int functioname(char *message);
 
-    	moduleAddAuthor(AUTHOR);
-    	moduleAddVersion(VERSION);
-    	return MOD_CONT;
-	}
+    B) In AnopeInit you must declare EvtHook in some fashion; it is into
+       this variable that we will create the event handler. Here is what
+       the base AnopeInit should look like at this point:
+ 
+        int AnopeInit(int argc, char **argv)
+        {
+            EvtHook *hook = NULL;
+            int status;
 
-C. Pass "createEventHook" the name of the event, in this case we are going to hook to the
-   saving of databases, "EVENT_DB_SAVING" 
+            moduleAddAuthor(AUTHOR);
+            moduleAddVersion(VERSION);
+            return MOD_CONT;
+        }
 
-   hook = createEventHook(EVENT_DB_SAVING, my_save);
+    C) Pass "createEventHook" the name of the event. In this case we are
+       going to hook to the saving of databases, "EVENT_DB_SAVING".
 
-D. The Handler is not ready for use, now you must add it to the hash, with 
-   "moduleAddEventHook", you will want to pass to this function the return
-   of "createEventHook"
+        hook = createEventHook(EVENT_DB_SAVING, my_save);
 
-   status = moduleAddEventHook(hook);
+    D) The Handler is not ready for use yet; now you must add it to the hash
+       with "moduleAddEventHook". You will want to pass to this function the
+       return of "createEventHook"
 
-   it will return the module error code so you can confirm that it was added
-   correctly.
+        status = moduleAddEventHook(hook);
 
-E. With that setup in your function you will be passed 1 items, the message is very simple
-   it could be as simple as a start, stop or message. In the case of saving it has a start
-   and stop
+       It will return the same module error codes as adding a regular message,
+       which you can use to confirm it was added correctly.
 
-	int my_save(char *source)
-	{
+    E) With that setup in your function you will be passed 1 item. The message
+       is very simple; it could be as simple as a start, stop or message. In
+       the case of saving it has a start and stop.
 
-  		if (!stricmp(source, EVENT_START)) {
-      		alog("Saving the databases! has started");
-		} else {
-      		alog("Saving the databases is complete");
-  		}
-  		return MOD_CONT;
-	}
+        int my_save(char *source)
+        {
+            if (!stricmp(source, EVENT_START)) {
+                alog("Saving the databases! has started");
+            } else {
+                alog("Saving the databases is complete");
+            }
+            return MOD_CONT;
+        }
 
-==============================================================================================
-4. Triggered Events List
-==============================================================================================
-| Event Hook                  |    Event Argument                                            |
-==============================================================================================
-| EVENT_DB_SAVING             | EVENT_START, EVENT_STOP                                      |
-| EVENT_NEWNICK               | Nick as it connected                                         |
-| EVENT_BOT_UNASSIGN          | Channel name                                                 |
-| EVENT_BOT_JOIN              | Channel name                                                 |
-| EVENT_BOT_CREATE            | Bot Nick                                                     |
-| EVENT_BOT_CHANGE            | Bot Nick                                                     |
-| EVENT_BOT_DEL               | Bot Nick                                                     |
-| EVENT_BOT_ASSIGN            | Bot Nick                                                     |
-| EVENT_TOPIC_UPDATED         | Channel Name                                                 |
-| EVENT_CHAN_EXPIRE           | Channel Name                                                 |
-| EVENT_CHAN_REGISTERED       | Channel Name                                                 |
-| EVENT_CHAN_DROP             | Channel Name                                                 |
-| EVENT_CHAN_FORBIDDEN        | Channel Name                                                 |
-| EVENT_CHAN_SUSPENDED        | Channel Name                                                 |
-| EVENT_CONNECT               | EVENT_START, EVENT_STOP                                      |
-| EVENT_DB_EXPIRE             | EVENT_START, EVENT_STOP                                      |
-| EVENT_RESTART               | EVENT_START                                                  |
-| EVENT_SHUTDOWN              | EVENT_START, EVENT_STOP                                      |
-| EVENT_SIGNAL                | Quit Message                                                 |
-| EVENT_NICK_REGISTERED       | Nick                                                         |
-| EVENT_NICK_DROPPED          | Nick                                                         |
-| EVENT_NICK_FORBIDDEN        | Nick                                                         |
-| EVENT_NICK_EXPIRE           | Nick                                                         |
-| EVENT_CHANGE_NICK           | Nick                                                         |
-| EVENT_USER_LOGOFF           | Nick                                                         |
-==============================================================================================
+4) Triggered Events List
 
+    Here's a list of all event hooks we currently offer, with a description
+    of what argument is being passed to the event functions for this type of
+    event.
+
+    Note that all events are emitted AFTER the action has taken place, so
+    any deleted nick/channel/etc won't exist anymore when your function is
+    being run.
+
+    |------------------------|-------------------------------------------|
+    | Event Hook             | Event Argument                            |
+    |------------------------|-------------------------------------------|
+    | EVENT_DB_SAVING        | EVENT_START, EVENT_STOP                   |
+    | EVENT_NEWNICK          | Nick that just connected to the network   |
+    | EVENT_BOT_UNASSIGN     | Channel name the bot is on                |
+    | EVENT_BOT_JOIN         | Channel name the bot is on                |
+    | EVENT_BOT_CREATE       | Nick of the bot involved                  |
+    | EVENT_BOT_CHANGE       | Nick of the bot involved                  |
+    | EVENT_BOT_DEL          | Nick of the bot involved                  |
+    | EVENT_BOT_ASSIGN       | Nick of the bot involved                  |
+    | EVENT_TOPIC_UPDATED    | Channel name of the channel involved      |
+    | EVENT_CHAN_EXPIRE      | Channel name of the channel involved      |
+    | EVENT_CHAN_REGISTERED  | Channel name of the channel involved      |
+    | EVENT_CHAN_DROP        | Channel name of the channel involved      |
+    | EVENT_CHAN_FORBIDDEN   | Channel name of the channel involved      |
+    | EVENT_CHAN_SUSPENDED   | Channel name of the channel involved      |
+    | EVENT_CONNECT          | EVENT_START, EVENT_STOP                   |
+    | EVENT_DB_EXPIRE        | EVENT_START, EVENT_STOP                   |
+    | EVENT_RESTART          | EVENT_START                               |
+    | EVENT_SHUTDOWN         | EVENT_START, EVENT_STOP                   |
+    | EVENT_SIGNAL           | Quit message sent                         |
+    | EVENT_NICK_REGISTERED  | Nick of the account involved              |
+    | EVENT_NICK_DROPPED     | Nick of the account involved              |
+    | EVENT_NICK_FORBIDDEN   | Nick of the account involved              |
+    | EVENT_NICK_EXPIRE      | Nick of the account involved              |
+    | EVENT_CHANGE_NICK      | Nick of the user involved                 |
+    | EVENT_USER_LOGOFF      | Nick of the user involved                 |
+    |------------------------|-------------------------------------------|

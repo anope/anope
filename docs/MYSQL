@@ -1,7 +1,7 @@
 Anope MySQL Support
 -------------------
 
-Introduction:
+1) Introduction
 
     Anope 1.6 onwards supports MySQL databases. On Anope 1.6.0 only PHASE 1 
     has been implemented. Since the next phases require major changes in the 
@@ -29,30 +29,27 @@ Introduction:
     in realtime. That way the MySQL db could be modified externally (web?).  
     Again, the FFF will be kept intact.
 
-Requirements:
+2) Requirements
 
     1. MySQL server version 3.23.32 or greater
     2. MySQL libs and development files (usually called mysql-dev).
     3. A MySQL user account
     4. A MySQL database
 
-Installation:
+3) Installation
 
     1. The ./Config script automatically detects if your system is capable
        of running Anope with MySQL support. There is no need anymore to
        answer yes when asked.
 
-       Notes:
-
-       * MySQL is not supported on the following platforms: Windows.
-       * You might need to run "make distclean" prior to running ./Config
+       Note: You might need to run "make distclean" prior to running ./Config
 
     2. Compile Anope as usual. The (g)make process will now compile MySQL
        support into Anope.
 
     3. Install Anope as usual. 
 
-Configuration:
+4) Configuration
 
     1. Run bin/mydbgen to help on the schema creation and adjustments.
 
@@ -61,49 +58,51 @@ Configuration:
 
     3. Start or restart services to make use of the new Anope executable.
 
-Security:
+5) Security
 
-   To add a layer of security you have the option of encrypting or encoding
-   all passwords for nicks and chans. Use the "MysqlSecure" directive on your
-   services.conf file to enable it. The available storage methods are:
+    To add a layer of security you have the option of encrypting or encoding
+    all passwords for nicks and chans. Use the "MysqlSecure" directive on your
+    services.conf file to enable it. The available storage methods are:
 
-   #MysqlSecure "" or MysqlSecure ""
+        #MysqlSecure ""
 
-      Disables security. All passwords will be saved on the MySQL database
-      as clear text, with no encryption or encoding. FASTEST
+    or
 
-   MysqlSecure "des"
+        MysqlSecure ""
 
-      Encrypts all passwords using a UNIX DES encryption. This is a one way
-      encryption algorithm. You can only validate it against another DES
-      encrypted string, using the same "salt" (the first two characters of
-      the encrypted string). FAST
+    Disables security. All passwords will be saved on the MySQL database
+    as clear text, with no encryption or encoding. FASTEST
 
-   MysqlSecure "md5"
+        MysqlSecure "des"
 
-      Calculates an MD5 128-bit checksum for the password. The value is 
-      returned as a 32-digit hex number that may be used as a hash key.
-	  This is a one way encryption algorithm.
-      SLOW
+    Encrypts all passwords using a UNIX DES encryption. This is a one way
+    encryption algorithm. You can only validate it against another DES
+    encrypted string, using the same "salt" (the first two characters of
+    the encrypted string). FAST
 
-   MysqlSecure "sha"
+        MysqlSecure "md5"
 
-      Calculates an SHA 160-bit checksum for the password. The value is 
-      returned as a 40-digit hex number. This is a one way encryption 
-	  algorithm.SLOWEST
+    Calculates an MD5 128-bit checksum for the password. The value is 
+    returned as a 32-digit hex number that may be used as a hash key.
+    This is a one way encryption algorithm. SLOW
 
-   MysqlSecure "mykey"
+        MysqlSecure "sha"
 
-      Encodes the passwords using "mykey" as the encryption password. It
-      produces a binary string and can be decoded using the MySQL built in
-      function DECODE(crypt_str,mykey). VARIABLE
+    Calculates an SHA 160-bit checksum for the password. The value is 
+    returned as a 40-digit hex number. This is a one way encryption 
+    algorithm. SLOWEST
 
-   Caveat: Keep in mind that this if you use any method other than clear
-   text, services will need to encrypt/encode every single password on
-   every database save. On large networks, it may impact responsiveness
-   during the saves.
+        MysqlSecure "mykey"
 
-   Caveat: If you enable MysqlSecure you can not longer use the UseRDB directive
-   as all the password types are encrypted with a one way encryption method for
-   older MySQL servers.
+    Encodes the passwords using "mykey" as the encryption password. It
+    produces a binary string and can be decoded using the MySQL built in
+    function DECODE(crypt_str,mykey). VARIABLE
 
+    Caveat: Keep in mind that this if you use any method other than clear
+    text, services will need to encrypt/encode every single password on
+    every database save. On large networks, it may impact responsiveness
+    during the saves.
+
+    Caveat: If you enable MysqlSecure you can not longer use the UseRDB directive
+    as all the password types are encrypted with a one way encryption method for
+    older MySQL servers.

@@ -1,182 +1,184 @@
-ANOPE INSTALLATION INSTRUCTIONS
-===============================
+Anope Installation Instructions
+-------------------------------
 
-Table of contents
------------------
-  1. Installing Anope
-  2. Upgrading Anope
-  3. Setting up the IRCd
-  4. Starting Anope
-  5. Setting up a crontab
+1) Installing Anope
+2) Upgrading Anope
+3) Setting up the IRCd
+4) Starting Anope
+5) Setting up a crontab
   
-You should also read the README and FAQ files!
+Note: You should also read the README and FAQ files!
 
-1. Installing Anope
--------------------
+1) Installing Anope
 
-IMPORTANT NOTE: it is not recommended to use (and therefore install)
-Anope as root. Use an unprivileged user instead -- the one you're
-using for the ircd or a dedicated one will be good enough.
+    IMPORTANT NOTE: it is not recommended to use (and therefore install)
+                    Anope as root. Use an unprivileged user instead -- the
+                    one you're using for the ircd or a dedicated one will
+                    be good enough.
 
-The very first thing you need to do is to get the Anope package
-(if not already done). You can find it at the following place:
+    The very first thing you need to do is to get the Anope package (if not
+    already done). You can find it at:
 
-    http://www.anope.org/
-    
-Next, unpack the package in your home directory, and go into the
-created directory.
-  
-Now type ./Config to start the configuration script. It will
-ask you a few questions, and figure out how to compile Anope on
-your system. If you are unsure about the answer to a question,
-use the default value. 
+        http://www.anope.org/
 
-NOTE: although you may specify different binary and data paths, 
-      it is RECOMMENDED that you use the same value for both.
+    Next, unpack the package in your home directory, and go into the created
+    directory.
 
-You can now type make to compile Anope. If there are errors in the
-Makefile, *try to use gmake* instead. If it still doesn't work, you
-(or the system administrator if it's a shell) must install GNU
-make. You may find it at ftp://prep.ai.mit.edu/pub/gnu/.
+    Now type ./Config to start the configuration script. It will ask you a
+    few questions, and figure out how to compile Anope on your system. If
+    you are unsure about the answer to a question, use the default value. 
 
-Now type make install (or gmake install; see above). This will
-install all the needed files in the paths you specified with the
-configure script, and setup file permissions. You should ensure
-that the data directory is not accessible by other users, as malicious 
-users may cause troubles on your network if passwords are not 
-encrypted, or read the memos of any user.
+    NOTE: although you may specify different binary and data paths, it is
+          RECOMMENDED that you use the same value for both.
 
-If you see errors during this process, please mail us with the 
-*complete* error output, and don't forget to mention your OS, 
-compiler and C library versions. 
+    You can now type make to compile Anope. If there are errors in the
+    Makefile, *try to use gmake* instead. If it still doesn't work, you (or
+    the system administrator if it's a shell) must install GNU make. You may
+    find it at ftp://prep.ai.mit.edu/pub/gnu/.
 
-Now go into the data directory (by default, ~/services). Copy the
-example.conf file to services.conf, and open the latter with your
-favorite text editor. It contains all the configuration
-directives Anope will use at startup. Read the instructions contained
-in the file carefully. Using the default values is NOT a good idea,
-and will most likely not work!
+    Now type make install (or gmake install; see above). This will install
+    all the needed files in the paths you specified with the configure
+    script, and setup file permissions. You should ensure that the data
+    directory is not accessible by other users, as malicious users may
+    cause troubles on your network if passwords are not encrypted, or read
+    the memos of any user.
 
-If you need help, you should subscribe to the Anope mailing list and
-mail there to get help from other users. See the README file for more
-information.
+    If you see errors during this process, please mail us with the *complete*
+    error output, and don't forget to mention your OS, compiler and C library
+    versions. 
 
+    Now go into the data directory (by default, ~/services). Copy the example
+    configuration file (example.conf) to services.conf, and open the latter
+    with your favorite text editor. It contains all the configuration
+    directives Anope will use at startup. Read the instructions contained in
+    the file carefully. Using the default values is NOT a good idea, and will
+    most likely not work!
 
-2. Upgrading Anope
-------------------
+    If you need help, you should subscribe to the Anope mailing list and mail
+    there to get help from other users. See the README file for more
+    information.
 
-If you got a .diff file and want to patch the old Anope sources with it, do 
-the following:
-  * Copy the .diff file into the root Anope sources directory.
-  * Type patch -p1 <file.diff
+2) Upgrading Anope
 
-To upgrade Anope, just follow the installation instructions described in
-section 1. There are however a few specific guidelines:
+    If you got a .diff file and want to patch the old Anope sources with it,
+    do the following:
 
-  * IMPORTANT: Back up your old databases!
-  * If you are upgrading to a new major release, ALWAYS restart a 
-    fresh configuration file from example.conf.
+        * Copy the .diff file into the root Anope sources directory.
+        * Type patch -p1 <file.diff
 
+    Note that upgrading anope with a patchfile isn't recommended. You should
+    download a new, clean source package, as this will give the best results.
 
-3. Setting up the IRCd
-----------------------
+    To upgrade Anope, just follow the installation instructions described in
+    section 1. There are however a few specific guidelines:
 
-Services acts as an IRC server with pseudo-clients on it. To link
-them to your network, you'll need to add some lines in the ircd.conf
-of their hub server (as stated in the RemoteServer configuration
-directive).
+        * IMPORTANT: Back up your old databases!
+        * If you are upgrading to a new major release, ALWAYS restart a
+          fresh configuration file from example.conf.
 
-For samples below we'll take Services.LocalHost.Net as the name of
-the Services (as stated in the ServerName configuration directive).
+3) Setting up the IRCd
 
-First, the C/N lines, that allow Services to link. They also need a
-Y:line to work correctly.
+    Services acts as an IRC server with pseudo-clients on it. To link them to
+    your network, you'll need to add some lines in the ircd.conf of their hub
+    server (as stated in the RemoteServer configuration directive).
 
-Y:27:180:0:0:4000000
-C:127.0.0.1:mypass:Services.LocalHost.Net::30
-N:127.0.0.1:mypass:Services.LocalHost.Net::30
+    For samples below we'll take services.localhost.net as the name of the
+    Services (as stated in the ServerName configuration directive). Note that
+    this samples are made to be as generic as possible, but there might be
+    small variations, depending on your IRCd. For IRCd-specific help with
+    configuration, read near the end of this section.
 
-mypass is the same password you mentioned in the RemoteServer 
-configuration directive. 127.0.0.1 is the IP from which Services
-connect from (linking in localhost is the most efficient way
-to run Services).
+    First, the C/N lines, that allow Services to link. They also need a
+    Y:line to work correctly.
 
-Then, you have to set-up an U:line, that will allow Services to
-change channel modes, topics, and much more without being opped 
-in the channel.
+        Y:27:180:0:0:4000000
+        C:127.0.0.1:mypass:services.localhost.net::30
+        N:127.0.0.1:mypass:services.localhost.net::30
 
-U:Services.LocalHost.Net:*:*
+    "mypass" is the same password you mentioned in the RemoteServer
+    configuration directive. 127.0.0.1 is the IP from which Services connect
+    from (linking in localhost is the most efficient way to run Services).
 
-NOTE: if you have more than one server in your network, this line
-MUST be added on ALL servers, or things won't work.
+    Then, you have to set-up an U:line, that will allow Services to change
+    channel modes, topics, and much more without being opped in the channel.
 
-Finally, you'll need to add an H:line, to make the OperServ JUPE
-command work correctly.
+        U:services.localhost.net:*:*
 
-H:*::Services.LocalHost.Net
+    NOTE: if you have more than one server in your network, this line MUST
+          be added on ALL servers, or things won't work correctly.
 
-Don't forget to /rehash to apply changes.
+    Finally, you'll need to add an H:line, to make the OperServ JUPE command
+    work correctly.
 
-A new trend in ircd configuration is popping all over the place,
-good examples are the latest Hybrid and Unreal, which use a more
-"readable" for of configuration. For those, use something like:
+        H:*::Services.LocalHost.Net
 
-link Services.LocalHost.Net
-{
-        username        *;
-        hostname        localhost;
-        bind-ip         *;
-        port            6667;
-        hub             *;
-        password-connect "mypass";
-        password-receive "mypass";
-        class           servers;
-};
+    Don't forget to /rehash your IRCd to apply changes.
 
-If you're unable to get a link with your IRCd after reading this section,
-you might try the interactive link maker, which is located at:
+    A new trend in ircd configuration is popping all over the place, good
+    examples are the latest Hybrid, Unreal and Bahamut, which use a more
+    "readable" form of configuration. For those, use something like:
 
-    http://heinz.anope.org/ilm.php
+        link services.localhost.net
+        {
+            username        *;
+            hostname        localhost;
+            bind-ip         *;
+            port            6667;
+            hub             *;
+            password-connect "mypass";
+            password-receive "mypass";
+            class           servers;
+        };
 
+    Note that this block-style configuration files differ heavily, depending
+    on the IRCd. Consult the interactive link maker (link is below) for more
+    details on the exact configuration used by your IRCd.
 
-4. Starting Anope
------------------
+    If you're unable to get a link with your IRCd after reading this section,
+    you might try the interactive link maker, which is located at:
 
-Go into the directory where binaries were installed (by default,
-~/services). Type ./services to launch Anope.
+        http://heinz.anope.org/ilm.php
 
-If there are syntax errors in the configuration file they will be 
-displayed on the screen. Correct them until there are no errors 
-anymore. A successful startup won't generate any message. 
+4) Starting Anope
 
-Give to Services at least one minute to link to your network, as 
-certain IRCds on some OSes may be really slow for the link process.
-If nothing happens then, it is probably a configuration problem.
-Try to launch Anope with ./services -debug -nofork to see any errors
-that it encounters, and try to correct them.
+    Go into the directory where binaries were installed (by default, this is
+    ~/services). Type ./services to launch Anope.
 
-If you need help to solve errors, feel free to subscribe to the
-Anope mailing list and ask there. See the README file for details.
+    If there are syntax errors in the configuration file they will be
+    displayed on the screen. Correct them until there are no errors anymore.
+    A successful startup won't generate any message. 
 
+    Give Services at least one minute to link to your network, as certain
+    IRCds on some OSes may be really slow for the link process. If nothing
+    happens after about a minute, it is probably a configuration problem. Try
+    to launch Anope with ./services -debug -nofork to see any errors that it
+    encounters, and try to correct them.
 
-5. Setting up a crontab
------------------------
+    If you need help to solve errors, feel free to subscribe to the Anope
+    mailing list and ask there. See the README file for details.
 
-A crontab entry will allow you to check periodically whether Anope
-is still running, and restart it if not. You'll need to have
-Anope binaries and data installed in the same directory for this to
-work without modification.
+5) Setting up a crontab
 
-First rename the example.chk script that is in Anope path (by default, 
-~/services) to services.chk and edit it. You'll need to modify the 
-CONFIGURATION part of the file. Then ensure that the file is marked as 
-executable by typing chmod +x services.chk, and try to launch the script 
-to see if it works (Anope must not be running when you do this ;).
+    A crontab entry will allow you to check periodically whether Anope is
+    still running, and restart it if not. You'll need to have Anope binaries
+    and data installed in the same directory for this to work without
+    modification.
 
-When this is done, you'll have to add the crontab entry. Type crontab -e.
-This will open the default text editor with the crontab file. Enter the
-following (with correct path):
-*/5 * * * * /home/ircd/services/services.chk >/dev/null 2>&1
-The */5 at the beginning means "check every 5 minutes". You may replace
-the 5 with other another number if you want (but less than 60).
-Save and exit, and it's installed.
+    First rename the example.chk script that is in Anope path (by default,
+    this is ~/services) to services.chk and edit it. You'll need to modify
+    the CONFIGURATION part of the file. Then ensure that the file is marked
+    as executable by typing chmod +x services.chk, and try to launch the
+    script to see if it works (Anope must not be running when you do this ;))
+
+    When this is done, you'll have to add the crontab entry. Type crontab -e.
+    This will open the default text editor with the crontab file. Enter the
+    following (with correct path):
+
+        */5 * * * * /home/ircd/services/services.chk >/dev/null 2>&1
+
+    The */5 at the beginning means "check every 5 minutes". You may replace
+    the 5 with other another number if you want (but less than 60). Consult
+    your system's manual pages for more details on the syntax of the crontab
+    file. Interesting manpages are crontab(5), crontab(1) and cron(8).
+
+    Save and exit, and it's installed.

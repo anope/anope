@@ -1,5 +1,5 @@
-Reported Bugs from Bugzilla: http://bugs.anope.org
-===================================================
+Reported Bugs from Bugzilla: http://bugs.anope.org/
+---------------------------------------------------
 
 .- Strange Segfault on expiring nicknames. Almost arbitrary, very hard
    to reproduce.

@@ -167,6 +167,7 @@ void common_svsmode(User * u, char *modes, char *arg)
         av[1] = arg;
         ac++;
     }
+
     anope_cmd_svsmode(u, ac, av);
     anope_set_umode(u, ac, av);
 }

@@ -794,6 +794,8 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
  */
 void anope_cmd_svsmode(User * u, int ac, char **av)
 {
+    alog("ac count %d %s %s", ac, av[0], av[1]);
+
     if (ac > 1) {
         if (!u || !av[0]) {
             return;

@@ -30,6 +30,8 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/14 F Fixed NickServ Logout				                  [#180]
+10/14 F Fixed HelpChannel with Unreal			                  [#180]
 10/09 F Bug in MySQL debug, possibly causing segfaults.                   [#149]
 10/09 F Lots of code clean up to prevent segfaults			  [ #00]
 10/07 F Fixed TSMODE ircds that don't stay this in their CAPAB		  [ #00]

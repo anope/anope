@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="398"
+VERSION_BUILD="399"
 
 # $Log$
+#
+# BUILD : 1.7.5 (399)
+# BUGS  : 180, 181
+# NOTES : code tidy up, fixes a few items from bug 180 and 181
 #
 # BUILD : 1.7.5 (398)
 # BUGS  : N/A

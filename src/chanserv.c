@@ -2660,7 +2660,7 @@ static int do_register(User * u)
         notice_lang(s_ChanServ, u, CHAN_MUST_IDENTIFY_NICK, s_NickServ,
                     s_NickServ);
     } else if (!(c = findchan(chan))) {
-        notice_lang(s_NickServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
+        notice_lang(s_ChanServ, u, CHAN_REGISTER_NONE_CHANNEL, chan);
     } else if ((ci = cs_findchan(chan)) != NULL) {
         if (ci->flags & CI_VERBOTEN) {
             alog("%s: Attempt to register FORBIDden channel %s by %s!%s@%s", s_ChanServ, ci->name, u->nick, u->username, common_get_vhost(u));
@@ -6284,6 +6284,7 @@ static int do_status(User * u)
     ChannelInfo *ci;
     User *u2;
     char *nick, *chan;
+    char *temp;
 
     chan = strtok(NULL, " ");
     nick = strtok(NULL, " ");
@@ -6292,13 +6293,13 @@ static int do_status(User * u)
         return MOD_CONT;
     }
     if (!(ci = cs_findchan(chan))) {
-        char *temp = chan;
+        temp = chan;
         chan = nick;
         nick = temp;
         ci = cs_findchan(chan);
     }
     if (!ci) {
-        notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, chan);
+        notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
     } else if (ci->flags & CI_VERBOTEN) {
         notice_lang(s_ChanServ, u, CHAN_STATUS_FORBIDDEN, chan);
         return MOD_CONT;

@@ -2664,7 +2664,7 @@ static int do_logout(User * u)
         }
 
         if (ircd->modeonreg) {
-            common_svsmode(u2, ircd->modeonreg, "1");
+            common_svsmode(u2, ircd->modeonunreg, "1");
         }
 
         u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */

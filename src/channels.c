@@ -285,7 +285,7 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 
     if (HelpChannel && status == CUS_OP
         && !stricmp(chan->name, HelpChannel))
-        common_svsmode(user, "+h", NULL);
+        common_svsmode(user, "+h", "1");
 
     for (uc = user->chans; uc; uc = uc->next) {
         if (uc->chan == chan) {

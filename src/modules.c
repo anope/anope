@@ -900,7 +900,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 c->next = current->c;
                 current->c = c;
                 if (debug)
-                    alog("existing cmd: (%p), new cmd (0x%p)", c->next, (void *) c);
+                    alog("existing cmd: (0x%p), new cmd (0x%p)", (void *) c->next, (void *) c);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
 
@@ -908,7 +908,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing cmd: (%p), new cmd (0x%p)", tail, (void *) c);
+                    alog("existing cmd: (0x%p), new cmd (0x%p)", (void *) tail, (void *) c);
                 tail->next = c;
                 c->next = NULL;
 
@@ -1122,14 +1122,14 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
                 m->next = current->m;
                 current->m = m;
                 if (debug)
-                    alog("existing msg: (%p), new msg (0x%p)", m->next, (void *) m);
+                    alog("existing msg: (0x%p), new msg (0x%p)", (void *) m->next, (void *) m);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
                 tail = current->m;
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing msg: (%p), new msg (0x%p)", tail, (void *) m);
+                    alog("existing msg: (0x%p), new msg (0x%p)", (void *) tail, (void *) m);
                 tail->next = m;
                 m->next = NULL;
                 return MOD_ERR_OK;

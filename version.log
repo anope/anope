@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="365"
+VERSION_BUILD="366"
 
 # $Log$
+#
+# BUILD : 1.7.5 (366)
+# BUGS  : 
+# NOTES : Fixed a typo in T his previous commit (logins on -> logs on)
 #
 # BUILD : 1.7.5 (365)
 # BUGS  : 172

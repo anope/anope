@@ -1010,7 +1010,6 @@ struct user_ {
 #if defined(IRC_HYBRID)
 # define NEWNICK(nick,user,host,real,modes,qline) \
     do { \
-	kill_user(NULL, (nick), "Nick used by Services"); \
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", (nick), time(NULL), (modes), \
 		(user), (host), ServerName, (real)); \
 	} while (0)

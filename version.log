@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="446"
+VERSION_BUILD="447"
 
 # $Log$
+#
+# BUILD : 1.7.6 (447)
+# BUGS  : 
+# NOTES : New botserv bot nicks need to be unregistered nicks from now on
 #
 # BUILD : 1.7.6 (446)
 # BUGS  : N/A

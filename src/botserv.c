@@ -1257,14 +1257,13 @@ static int do_bot(User * u)
                 return MOD_CONT;
             }
 
-            /* We check whether the nick is registered, and drop it if so. */
+            /* We check whether the nick is registered, and inform the user
+             * if so. You need to drop the nick manually before you can use
+             * it as a bot nick from now on -GD
+             */
             if ((na = findnick(nick))) {
-                if (NSSecureAdmins && nick_is_services_admin(na->nc)
-                    && !is_services_root(u)) {
-                    notice_lang(s_BotServ, u, PERMISSION_DENIED);
-                    return MOD_CONT;
-                }
-                delnick(na);
+                notice_lang(s_BotServ, u, NICK_X_IN_USE, nick);
+                return MOD_CONT;
             }
 
             bi = makebot(nick);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="214"
+VERSION_BUILD="215"
 
 # $Log$
+#
+# BUILD : 1.7.4 (215)
+# BUGS  : 
+# NOTES : Forgot the Changes file
 #
 # BUILD : 1.7.4 (214)
 # BUGS  : 112

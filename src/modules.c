@@ -279,10 +279,14 @@ int moduleCopyFile(char *name)
     char input[4096];
     int len;
 
-    strncpy(output, MODULE_PATH, 4095); /* Get full path with .so extension */
-    strncpy(input, MODULE_PATH, 4095);  /* Get full path with .so extension */
+    strncpy(output, MODULE_PATH, 4095); /* Get full path with module extension */
+    strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
     len = strlen(output);
+#ifdef _WIN32
+    strncat(output, "runtime\\", 4095 - len);
+#else
     strncat(output, "runtime/", 4095 - len);
+#endif
     len += strlen(output);
     strncat(output, name, 4095 - len);
     strncat(input, name, 4095 - len);
@@ -290,11 +294,18 @@ int moduleCopyFile(char *name)
     strncat(output, MODULE_EXT, 4095 - len);
     strncat(input, MODULE_EXT, 4095 - len);
 
+#ifndef _WIN32
     if ((source = fopen(input, "r")) == NULL) {
+#else
+    if ((source = fopen(input, "rb")) == NULL) {
+#endif
         return MOD_ERR_NOEXIST;
     }
-
+#ifndef _WIN32
     if ((target = fopen(output, "w")) == NULL) {
+#else
+    if ((target = fopen(output, "wb")) == NULL) {
+#endif
         return MOD_ERR_FILE_IO;
     }
     while ((ch = fgetc(source)) != EOF) {
@@ -338,13 +349,17 @@ int loadModule(Module * m, User * u)
 
     moduleCopyFile(m->name);
 
-    strncpy(buf, MODULE_PATH, 4095);    /* Get full path with .so extension */
+    strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
     len = strlen(buf);
+#ifndef _WIN32
     strncat(buf, "runtime/", 4095 - len);
+#else
+    strncat(buf, "runtime\\", 4095 - len);
+#endif
     len = strlen(buf);
     strncat(buf, m->name, 4095 - len);
     len = strlen(buf);
-    strncat(buf, ".so", 4095 - len);
+    strncat(buf, MODULE_EXT, 4095 - len);
     buf[4095] = '\0';
 
     m->filename = sstrdup(buf);

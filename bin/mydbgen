@@ -146,7 +146,7 @@ else
 
 		else
 			echo "failed!"
-			FAILED="$FAILED 'anope_cs_info.ttb alter'"
+			FAILED="$FAILED 'anope_cs_info.memomax alter'"
 		fi
 	fi
 

@@ -6292,3 +6292,16 @@ HOST_HELP_GROUP
 	Este comando permite a usuarios a setear el vhost de su
 	nick actual para ser el vhost para todos los nicks en el
 	mismo grupo.
+
+OPER_SVSNICK_UNSUPPORTED
+	Sorry, SVSNICK is not available on this network.
+
+OPER_SQLINE_UNSUPPORTED
+	Sorry, SQLINE is not available on this network.
+
+OPER_SVSO_UNSUPPORTED
+	Sorry, OLINE is not available on this network.
+
+OPER_UMODE_UNSUPPORTED
+	Sorry, UMODE is not available on this network.
+

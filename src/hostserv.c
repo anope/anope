@@ -33,9 +33,6 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 void delHostCore(char *nick);
 
-static void send_on(char *nick, char *vIdent, char *vhost);
-static void send_off(User * u);
-
 char *getvIdent(char *nick);
 char *getvHost(char *nick);
 
@@ -112,11 +109,11 @@ void hostserv(User * u, char *buf)
     } else if (skeleton) {
         notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
     } else {
-#ifdef HAS_VHOST
-        mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);
-#else
-        notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
-#endif
+        if (ircd->vhost) {
+            mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);
+        } else {
+            notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
+        }
     }
 }
 
@@ -129,8 +126,8 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
 
     next = malloc(sizeof(HostCore));
     if (next == NULL) {
-        wallops(s_HostServ,
-                "Unable to allocate memory to create the vHost LL, problems i sense..");
+        anope_cmd_global(s_HostServ,
+                         "Unable to allocate memory to create the vHost LL, problems i sense..");
     } else {
         next->nick = malloc(sizeof(char) * strlen(nick) + 1);
         next->vHost = malloc(sizeof(char) * strlen(vHost) + 1);
@@ -139,8 +136,8 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
             next->vIdent = malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((next->nick == NULL) || (next->vHost == NULL)
             || (next->creator == NULL)) {
-            wallops(s_HostServ,
-                    "Unable to allocate memory to create the vHost LL, problems i sense..");
+            anope_cmd_global(s_HostServ,
+                             "Unable to allocate memory to create the vHost LL, problems i sense..");
             return NULL;
         }
         strcpy(next->nick, nick);
@@ -148,8 +145,8 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
         strcpy(next->creator, creator);
         if (vIdent) {
             if ((next->vIdent == NULL)) {
-                wallops(s_HostServ,
-                        "Unable to allocate memory to create the vHost LL, problems i sense..");
+                anope_cmd_global(s_HostServ,
+                                 "Unable to allocate memory to create the vHost LL, problems i sense..");
                 return NULL;
             }
             strcpy(next->vIdent, vIdent);
@@ -208,8 +205,8 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 
     newCore = malloc(sizeof(HostCore));
     if (newCore == NULL) {
-        wallops(s_HostServ,
-                "Unable to allocate memory to insert into the vHost LL, problems i sense..");
+        anope_cmd_global(s_HostServ,
+                         "Unable to allocate memory to insert into the vHost LL, problems i sense..");
         return NULL;
     } else {
         newCore->nick = malloc(sizeof(char) * strlen(nick) + 1);
@@ -219,8 +216,8 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
             newCore->vIdent = malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((newCore->nick == NULL) || (newCore->vHost == NULL)
             || (newCore->creator == NULL)) {
-            wallops(s_HostServ,
-                    "Unable to allocate memory to create the vHost LL, problems i sense..");
+            anope_cmd_global(s_HostServ,
+                             "Unable to allocate memory to create the vHost LL, problems i sense..");
             return NULL;
         }
         strcpy(newCore->nick, nick);
@@ -228,8 +225,8 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
         strcpy(newCore->creator, creator);
         if (vIdent) {
             if ((newCore->vIdent == NULL)) {
-                wallops(s_HostServ,
-                        "Unable to allocate memory to create the vHost LL, problems i sense..");
+                anope_cmd_global(s_HostServ,
+                                 "Unable to allocate memory to create the vHost LL, problems i sense..");
                 return NULL;
             }
             strcpy(newCore->vIdent, vIdent);
@@ -589,7 +586,7 @@ void load_hs_dbase_v3(dbFILE * f)
 	restore_db(f);						\
 	log_perror("Write error on %s", HostDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    wallops(NULL, "Write error on %s: %s", HostDBName,	\
+	    anope_cmd_global(NULL, "Write error on %s: %s", HostDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -684,10 +681,10 @@ int do_setall(User * u)
                 }
             }
         }
-#ifndef HAS_VIDENT
-        notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-        return MOD_CONT;
-#endif
+        if (!ircd->vident) {
+            notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+            return MOD_CONT;
+        }
     }
 
     if (strlen(rawhostmask) < HOSTMAX - 1)
@@ -863,10 +860,10 @@ int do_set(User * u)
                 }
             }
         }
-#ifndef HAS_VIDENT
-        notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-        return MOD_CONT;
-#endif
+        if (!ircd->vident) {
+            notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+            return MOD_CONT;
+        }
     }
     if (strlen(rawhostmask) < HOSTMAX - 1)
         snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
@@ -918,14 +915,14 @@ int do_on(User * u)
                 } else {
                     notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
                 }
-                send_on(u->nick, vIdent, vHost);
-#ifdef HAS_VHOST
-                u->vhost = sstrdup(vHost);
-#endif
-#ifdef HAS_VIDENT
-                if (vIdent)
-                    u->vident = sstrdup(vIdent);
-#endif
+                anope_cmd_vhost_on(u->nick, vIdent, vHost);
+                if (ircd->vhost) {
+                    u->vhost = sstrdup(vHost);
+                }
+                if (ircd->vident) {
+                    if (vIdent)
+                        u->vident = sstrdup(vIdent);
+                }
                 set_lastmask(u);
             }
         } else {
@@ -951,14 +948,14 @@ int do_on_id(User * u)
         } else {
             notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
         }
-        send_on(u->nick, vIdent, vHost);
-#ifdef HAS_VHOST
-        u->vhost = sstrdup(vHost);
-#endif
-#ifdef HAS_VIDENT
-        if (vIdent)
-            u->vident = sstrdup(vIdent);
-#endif
+        anope_cmd_vhost_on(u->nick, vIdent, vHost);
+        if (ircd->vhost) {
+            u->vhost = sstrdup(vHost);
+        }
+        if (ircd->vident) {
+            if (vIdent)
+                u->vident = sstrdup(vIdent);
+        }
         set_lastmask(u);
     }
     return MOD_CONT;
@@ -988,7 +985,7 @@ int do_del(User * u)
 int do_off(User * u)
 {
     /* put any generic code here... :) */
-    send_off(u);
+    anope_cmd_vhost_off(u->nick);
     return MOD_CONT;
 }
 
@@ -1031,76 +1028,16 @@ void set_lastmask(User * u)
         free(u->na->last_usermask);
 
     u->na->last_usermask =
-        smalloc(strlen(GetIdent(u)) + strlen(GetHost(u)) + 2);
-    sprintf(u->na->last_usermask, "%s@%s", GetIdent(u), GetHost(u));
+        smalloc(strlen(common_get_vident(u)) +
+                strlen(common_get_vhost(u)) + 2);
+    sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
+            common_get_vhost(u));
 
 }
 
 /*************************************************************************/
 /*	End of Generic Functions					 */
 /*************************************************************************/
-/*************************************************************************/
-/*	Start of Server Functions					 */
-/*************************************************************************/
-void send_on(char *nick, char *vIdent, char *vhost)
-{
-#ifdef IRC_UNREAL
-    if (vIdent) {
-        send_cmd(ServerName, "CHGIDENT %s %s", nick, vIdent);
-    }
-    send_cmd(ServerName, "CHGHOST %s %s", nick, vhost);
-#endif
-#ifdef IRC_VIAGRA
-    if (vIdent) {
-        send_cmd(NULL, "CHGIDENT %s %s", nick, vIdent);
-    }
-    send_cmd(NULL, "SVSMODE %s +x", nick);
-    send_cmd(NULL, "SVSCHGHOST %s %s", nick, vhost);
-#endif
-#ifdef IRC_ULTIMATE
-    if (vIdent) {
-        send_cmd(ServerName, "CHGIDENT %s %s", nick, vIdent);
-    }
-    send_cmd(s_HostServ, "SVSMODE %s +x", nick);
-    send_cmd(ServerName, "CHGHOST %s %s", nick, vhost);
-#endif
-#ifdef IRC_ULTIMATE3
-    send_cmd(s_HostServ, "SVSMODE %s +x", nick);
-    send_cmd(ServerName, "SETHOST %s %s", nick, vhost);
-#endif
-#ifdef IRC_RAGE2
-    send_cmd(s_HostServ, "SVSMODE %s +z", nick);
-    send_cmd(ServerName, "VHOST %s %s", nick, vhost);
-#endif
-}
-
-/*************************************************************************/
-void send_off(User * u)
-{
-#ifdef IRC_UNREAL
-    send_cmd(s_HostServ, "SVSMODE %s -xt", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
-    /*
-     * tell them to type /mode nick +x to get their original
-     * host cloaking back
-     */
-#endif
-#ifdef IRC_VIAGRA
-    send_cmd(NULL, "SVSMODE %s -x", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
-#endif
-#ifdef IRC_ULTIMATE
-    /* UltimateIRCd 2.x does not allow users to control +x */
-#endif
-#ifdef IRC_ULTIMATE3
-    send_cmd(s_HostServ, "SVSMODE %s -x", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
-#endif
-#ifdef IRC_RAGE2
-    send_cmd(s_HostServ, "SVSMODE %s -z", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
-#endif
-}
 
 /*************************************************************************/
 /*	End of Server Functions						 */

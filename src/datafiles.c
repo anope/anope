@@ -144,8 +144,8 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            wallops(NULL, "Can't back up %s database %s", service,
-                    filename);
+            anope_cmd_global(NULL, "Can't back up %s database %s", service,
+                             filename);
         }
         errno = errno_save;
         log_perror("Can't back up %s database %s", service, filename);
@@ -171,8 +171,8 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            wallops(NULL, "Can't write to %s database %s", service,
-                    filename);
+            anope_cmd_global(NULL, "Can't write to %s database %s",
+                             service, filename);
         }
         errno = errno_save;
         log_perror("Can't write to %s database %s", service, filename);
@@ -424,7 +424,8 @@ static void rename_database(char *name, char *ext)
     snprintf(destpath, sizeof(destpath), "backups/%s.%s", name, ext);
     if (rename(name, destpath) != 0) {
         alog("Backup of %s failed.", name);
-        wallops(s_OperServ, "WARNING! Backup of %s failed.", name);
+        anope_cmd_global(s_OperServ, "WARNING! Backup of %s failed.",
+                         name);
     }
 }
 

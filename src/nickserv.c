@@ -857,7 +857,7 @@ void load_ns_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", NickDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    wallops(NULL, "Write error on %s: %s", NickDBName,	\
+	    anope_cmd_global(NULL, "Write error on %s: %s", NickDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -1070,8 +1070,10 @@ int validate_user(User * u)
         if (na->last_usermask)
             free(na->last_usermask);
         na->last_usermask =
-            scalloc(strlen(GetIdent(u)) + strlen(GetHost(u)) + 2, 1);
-        sprintf(na->last_usermask, "%s@%s", GetIdent(u), GetHost(u));
+            scalloc(strlen(common_get_vident(u)) +
+                    strlen(common_get_vhost(u)) + 2, 1);
+        sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+                common_get_vhost(u));
         if (na->last_realname)
             free(na->last_realname);
         na->last_realname = sstrdup(u->realname);
@@ -1112,25 +1114,36 @@ void cancel_user(User * u)
 
     if (na) {
         if (na->status & NS_GUESTED) {
-#ifdef HAS_SVSHOLD
-            if (UseSVSHOLD) {
-                send_cmd(ServerName, "SVSHOLD %s %d :%s", na->nick,
-                         NSReleaseTimeout,
-                         "Being held for registered user");
+            if (ircd->svshold) {
+                if (UseSVSHOLD) {
+                    anope_cmd_svshold(na->nick);
+                } else {
+                    if (ircd->svsnick) {
+                        anope_cmd_guest_nick(u->nick, NSEnforcerUser,
+                                             NSEnforcerHost,
+                                             "Services Enforcer", "+");
+                        add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+                    } else {
+                        anope_cmd_svskill(s_NickServ, u->nick,
+                                          "Killing to enforce nick");
+                    }
+                }
             } else {
-#endif
-                NEWNICK(u->nick, NSEnforcerUser, NSEnforcerHost,
-                        "Services Enforcer", "+", 0);
-                add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-#ifdef HAS_SVSHOLD
+                if (ircd->svsnick) {
+                    anope_cmd_guest_nick(u->nick, NSEnforcerUser,
+                                         NSEnforcerHost,
+                                         "Services Enforcer", "+");
+                    add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+                } else {
+                    anope_cmd_svskill(s_NickServ, u->nick,
+                                      "Killing to enforce nick");
+                }
             }
-#endif
             na->status &= ~NS_TEMPORARY;
             na->status |= NS_KILL_HELD;
         } else {
             na->status &= ~NS_TEMPORARY;
         }
-
         del_ns_timeout(na, TO_COLLIDE);
     }
 }
@@ -1275,39 +1288,34 @@ static int is_on_access(User * u, NickCore * nc)
 {
     int i;
     char *buf;
-#ifdef HAS_VHOST
     char *buf2 = NULL;
-#endif
 
     if (nc->accesscount == 0)
         return 0;
 
     buf = scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
     sprintf(buf, "%s@%s", u->username, u->host);
-#ifdef HAS_VHOST
-    if (u->vhost) {
-        buf2 = scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
-        sprintf(buf2, "%s@%s", u->username, u->vhost);
+    if (ircd->vhost) {
+        if (u->vhost) {
+            buf2 = scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
+            sprintf(buf2, "%s@%s", u->username, u->vhost);
+        }
     }
-#endif
 
     for (i = 0; i < nc->accesscount; i++) {
         if (match_wild_nocase(nc->access[i], buf)
-#ifdef HAS_VHOST
-            || (u->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)
-#endif
-            ) {
+            || (u->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
             free(buf);
-#ifdef HAS_VHOST
-            free(buf2);
-#endif
+            if (ircd->vhost) {
+                free(buf2);
+            }
             return 1;
         }
     }
     free(buf);
-#ifdef HAS_VHOST
-    free(buf2);
-#endif
+    if (ircd->vhost) {
+        free(buf2);
+    }
     return 0;
 }
 
@@ -1587,12 +1595,7 @@ int delnick(NickAlias * na)
     if (na->u) {
         na->u->na = NULL;
 
-#ifndef IRC_PTLINK
-        change_user_mode(na->u, "-r+d", "1");
-#else
-        change_user_mode(na->u, "-r", NULL);
-#endif
-
+        common_svsmode(na->u, ircd->modeonunreg, "1");
 
     }
 
@@ -1661,9 +1664,7 @@ int delnick(NickAlias * na)
 
 static void collide(NickAlias * na, int from_timeout)
 {
-#ifndef IRC_HYBRID
     char guestnick[NICKMAX];
-#endif
 
     if (!from_timeout)
         del_ns_timeout(na, TO_COLLIDE);
@@ -1676,15 +1677,16 @@ static void collide(NickAlias * na, int from_timeout)
      *          --Certus
      */
 
-#ifdef IRC_HYBRID
-    kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
-#else
-    snprintf(guestnick, sizeof(guestnick), "%s%d", NSGuestNickPrefix,
-             guestnum++);
-    notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING, guestnick);
-    send_cmd(NULL, "SVSNICK %s %s :%ld", na->nick, guestnick, time(NULL));
-    na->status |= NS_GUESTED;
-#endif
+    if (ircd->svsnick) {
+        snprintf(guestnick, sizeof(guestnick), "%s%d", NSGuestNickPrefix,
+                 guestnum++);
+        notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
+                    guestnick);
+        anope_cmd_svsnick(na->nick, guestnick, time(NULL));
+        na->status |= NS_GUESTED;
+    } else {
+        kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
+    }
 }
 
 /*************************************************************************/
@@ -1695,12 +1697,15 @@ static void release(NickAlias * na, int from_timeout)
 {
     if (!from_timeout)
         del_ns_timeout(na, TO_RELEASE);
-#ifdef HAS_SVSHOLD
-    if (UseSVSHOLD)
-        send_cmd(ServerName, "SVSHOLD %s 0", na->nick);
-    else
-#endif
-        send_cmd(na->nick, "QUIT");
+    if (ircd->svshold) {
+        if (UseSVSHOLD) {
+            anope_cmd_relase_svshold(na->nick);
+        } else {
+            anope_cmd_quit(na->nick, NULL);
+        }
+    } else {
+        anope_cmd_quit(na->nick, NULL);
+    }
     na->status &= ~NS_KILL_HELD;
 }
 
@@ -1959,7 +1964,7 @@ static int do_register(User * u)
     } else if (u->na) {         /* i.e. there's already such a nick regged */
         if (u->na->status & NS_VERBOTEN) {
             alog("%s: %s@%s tried to register FORBIDden nick %s",
-                 s_NickServ, u->username, GetHost(u), u->nick);
+                 s_NickServ, u->username, common_get_vhost(u), u->nick);
             notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED, u->nick);
         } else {
             notice_lang(s_NickServ, u, NICK_ALREADY_REGISTERED, u->nick);
@@ -2138,9 +2143,7 @@ static int do_confirm(User * u)
 
     if (na) {
         int i;
-#if !defined(IRC_PTLINK)
         char tsbuf[16];
-#endif
 
 #ifdef USE_ENCRYPTION
         len = strlen(pass);
@@ -2173,8 +2176,10 @@ static int do_confirm(User * u)
             na->last_realname = sstrdup("unknown");
         } else {
             na->last_usermask =
-                scalloc(strlen(GetIdent(u)) + strlen(GetHost(u)) + 2, 1);
-            sprintf(na->last_usermask, "%s@%s", GetIdent(u), GetHost(u));
+                scalloc(strlen(common_get_vident(u)) +
+                        strlen(common_get_vhost(u)) + 2, 1);
+            sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+                    common_get_vhost(u));
             na->last_realname = sstrdup(u->realname);
         }
         na->time_registered = na->last_seen = time(NULL);
@@ -2188,7 +2193,7 @@ static int do_confirm(User * u)
             u->na = na;
             na->u = u;
             alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ,
-                 u->nick, u->username, GetHost(u),
+                 u->nick, u->username, common_get_vhost(u),
                  (email ? email : "none"));
             notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick,
                         na->nc->access[0]);
@@ -2196,12 +2201,13 @@ static int do_confirm(User * u)
             notice_lang(s_NickServ, u, NICK_PASSWORD_IS, na->nc->pass);
 #endif
             u->lastnickreg = time(NULL);
-#if !defined(IRC_PTLINK)
-            snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
-            change_user_mode(u, "+rd", tsbuf);
-#else
-            change_user_mode(u, "+r", NULL);
-#endif
+            if (ircd->modeonreg) {
+                if (ircd->tsonmode) {
+                    common_svsmode(u, ircd->modeonreg, tsbuf);
+                } else {
+                    common_svsmode(u, ircd->modeonreg, NULL);
+                }
+            }
 
         } else {
             notice_lang(s_NickServ, u, NICK_FORCE_REG, nr->nick);
@@ -2229,9 +2235,7 @@ static int do_group(User * u)
     char *nick = strtok(NULL, " ");
     char *pass = strtok(NULL, " ");
     int i;
-#if !defined(IRC_PTLINK)
     char tsbuf[16];
-#endif
 
     if (NSEmailReg && (findrequestnick(u->nick))) {
         notice_lang(s_NickServ, u, NICK_REQUESTED);
@@ -2253,7 +2257,7 @@ static int do_group(User * u)
         notice_lang(s_NickServ, u, NICK_GROUP_PLEASE_WAIT, NSRegDelay);
     } else if (u->na && (u->na->status & NS_VERBOTEN)) {
         alog("%s: %s@%s tried to use GROUP from FORBIDden nick %s",
-             s_NickServ, u->username, GetHost(u), u->nick);
+             s_NickServ, u->username, common_get_vhost(u), u->nick);
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
     } else if (u->na && NSNoGroupChange) {
         notice_lang(s_NickServ, u, NICK_GROUP_CHANGE_DISABLED, s_NickServ);
@@ -2271,7 +2275,7 @@ static int do_group(User * u)
                     s_NickServ, s_NickServ);
     } else if (check_password(pass, target->nc->pass) != 1) {
         alog("%s: Failed GROUP for %s!%s@%s (invalid password)",
-             s_NickServ, u->nick, u->username, GetHost(u));
+             s_NickServ, u->nick, u->username, common_get_vhost(u));
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
         bad_password(u);
     } else {
@@ -2297,8 +2301,10 @@ static int do_group(User * u)
 
         if (na) {
             na->last_usermask =
-                scalloc(strlen(GetIdent(u)) + strlen(GetHost(u)) + 2, 1);
-            sprintf(na->last_usermask, "%s@%s", GetIdent(u), GetHost(u));
+                scalloc(strlen(common_get_vident(u)) +
+                        strlen(common_get_vhost(u)) + 2, 1);
+            sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+                    common_get_vhost(u));
             na->last_realname = sstrdup(u->realname);
             na->time_registered = na->last_seen = time(NULL);
             na->status = NS_IDENTIFIED | NS_RECOGNIZED;
@@ -2325,16 +2331,18 @@ static int do_group(User * u)
                 rdb_close();
             }
 #endif
-            alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, GetHost(u), u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
+            alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
             u->lastnickreg = time(NULL);
-#if !defined(IRC_PTLINK)
             snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
-            change_user_mode(u, "+rd", tsbuf);
-#else
-            change_user_mode(u, "+r", NULL);
-#endif
+            if (ircd->modeonreg) {
+                if (ircd->tsonmode) {
+                    common_svsmode(u, ircd->modeonreg, tsbuf);
+                } else {
+                    common_svsmode(u, ircd->modeonreg, NULL);
+                }
+            }
 
             check_memos(u);
         } else {
@@ -2363,9 +2371,9 @@ static int do_nickupdate(User * u)
         na->last_realname = sstrdup(u->realname);
         na->status |= NS_IDENTIFIED;
         na->last_seen = time(NULL);
-#ifdef HAS_VHOST
-        do_on_id(u);
-#endif
+        if (ircd->vhost) {
+            do_on_id(u);
+        }
         notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);
     }
     return MOD_CONT;
@@ -2379,9 +2387,7 @@ static int do_identify(User * u)
     NickAlias *na;
     NickRequest *nr;
     int res;
-#if !defined(IRC_PTLINK)
     char tsbuf[16];
-#endif
 
     if (!pass) {
         syntax_error(s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
@@ -2395,7 +2401,7 @@ static int do_identify(User * u)
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else if (!(res = check_password(pass, na->nc->pass))) {
         alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
-             u->username, GetHost(u));
+             u->username, common_get_vhost(u));
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
         bad_password(u);
     } else if (res == -1) {
@@ -2407,8 +2413,10 @@ static int do_identify(User * u)
             if (na->last_usermask)
                 free(na->last_usermask);
             na->last_usermask =
-                scalloc(strlen(GetIdent(u)) + strlen(GetHost(u)) + 2, 1);
-            sprintf(na->last_usermask, "%s@%s", GetIdent(u), GetHost(u));
+                scalloc(strlen(common_get_vident(u)) +
+                        strlen(common_get_vhost(u)) + 2, 1);
+            sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+                    common_get_vhost(u));
             if (na->last_realname)
                 free(na->last_realname);
             na->last_realname = sstrdup(u->realname);
@@ -2416,21 +2424,22 @@ static int do_identify(User * u)
 
         na->status |= NS_IDENTIFIED;
         na->last_seen = time(NULL);
-
-#ifndef IRC_PTLINK
         snprintf(tsbuf, sizeof(tsbuf), "%lu", u->timestamp);
-        change_user_mode(u, "+rd", tsbuf);
-#else
-        change_user_mode(u, "+r", "");
-#endif                          /* IRC_PTLINK */
 
+        if (ircd->modeonreg) {
+            if (ircd->tsonmode) {
+                common_svsmode(u, ircd->modeonreg, tsbuf);
+            } else {
+                common_svsmode(u, ircd->modeonreg, "");
+            }
+        }
 
         alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
-             u->username, GetHost(u), u->nick);
+             u->username, common_get_vhost(u), u->nick);
         notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
-#ifdef HAS_VHOST
-        do_on_id(u);
-#endif
+        if (ircd->vhost) {
+            do_on_id(u);
+        }
         if (NSModeOnID) {
             do_setmodes(u);
         }
@@ -2462,19 +2471,14 @@ int should_mode_change(int16 status, int16 mode)
         if (status & CUS_OP) {
             return 0;
         }
-#ifdef HAS_HALFOP
         if (status & CUS_HALFOP) {
             return 0;
         }
-#endif
         if (status & CUS_VOICE) {
             return 0;
         }
         return 1;
         break;
-#ifdef HAS_HALFOP
-
-
     case CUS_HALFOP:
         if (status & CUS_OP) {
             return 0;
@@ -2484,44 +2488,20 @@ int should_mode_change(int16 status, int16 mode)
         }
         return 1;
         break;
-#endif
-#ifdef IRC_UNREAL
     case CUS_OWNER:
-        if (status & CUS_OWNER) {
-            return 0;
+        if (ircd->owner) {
+            if (status & CUS_OWNER) {
+                return 0;
+            }
         }
         break;
     case CUS_PROTECT:
-        if (status & CUS_OWNER) {
-            return 0;
-        }
-        if (status & CUS_PROTECT) {
-            return 0;
-        }
-        break;
-#endif
-#ifdef IRC_VIAGRA
-    case CUS_OWNER:
-        if (status & CUS_OWNER) {
-            return 0;
+        if (ircd->protect) {
+            if (status & CUS_PROTECT) {
+                return 0;
+            }
         }
         break;
-    case CUS_PROTECT:
-        if (status & CUS_OWNER) {
-            return 0;
-        }
-        if (status & CUS_PROTECT) {
-            return 0;
-        }
-        break;
-#endif
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-    case CUS_PROTECT:
-        if (status & CUS_PROTECT) {
-            return 0;
-        }
-        break;
-#endif
     }
     return 1;
 }
@@ -2536,37 +2516,28 @@ static int do_setmodes(User * u)
     for (uc = u->chans; uc; uc = uc->next) {
         if ((c = uc->chan)) {
             chan = c->name;
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-            if (should_mode_change(uc->status, CUS_OWNER)
+            if (ircd->owner && should_mode_change(uc->status, CUS_OWNER)
                 && check_should_owner(u, chan)) {
                 chan_set_user_status(c, u, CUS_OWNER);
-            } else
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
-                if (should_mode_change(uc->status, CUS_PROTECT)
-                    && check_should_protect(u, chan)) {
+            } else if (ircd->protect
+                       && should_mode_change(uc->status, CUS_PROTECT)
+                       && check_should_protect(u, chan)) {
                 chan_set_user_status(c, u, CUS_PROTECT);
-            } else
-#endif
-                if (should_mode_change(uc->status, CUS_OP)
-                    && check_should_op(u, chan)) {
+            } else if (should_mode_change(uc->status, CUS_OP)
+                       && check_should_op(u, chan)) {
                 chan_set_user_status(c, u, CUS_OP);
-            } else
-#ifdef HAS_HALFOP
-                if (should_mode_change(uc->status, CUS_HALFOP)
-                    && check_should_halfop(u, chan)) {
+            } else if (ircd->halfop
+                       && should_mode_change(uc->status, CUS_HALFOP)
+                       && check_should_halfop(u, chan)) {
                 chan_set_user_status(c, u, CUS_HALFOP);
-            } else
-#endif
-                if (should_mode_change(uc->status, CUS_VOICE)
-                    && check_should_voice(u, chan)) {
+            } else if (should_mode_change(uc->status, CUS_VOICE)
+                       && check_should_voice(u, chan)) {
                 chan_set_user_status(c, u, CUS_VOICE);
             }
         }
     }
     return MOD_CONT;
 }
-
 
 /*************************************************************************/
 
@@ -2599,11 +2570,11 @@ static int do_logout(User * u)
             u2->na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
         }
 
-        change_user_mode(u2, "-r+d", "1");
+        common_svsmode(u2, "-r+d", "1");
 
         u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
         alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
-             u->username, GetHost(u), u2->nick);
+             u->username, common_get_vhost(u), u2->nick);
 
         if (nick)
             notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
@@ -2638,10 +2609,11 @@ static int do_drop(User * u)
                 if (readonly)
                     notice_lang(s_NickServ, u, READ_ONLY_MODE);
                 if (WallDrop)
-                    wallops(s_NickServ, "\2%s\2 used DROP on \2%s\2",
-                            u->nick, nick);
+                    anope_cmd_global(s_NickServ,
+                                     "\2%s\2 used DROP on \2%s\2", u->nick,
+                                     nick);
                 alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)",
-                     s_NickServ, u->nick, u->username, GetHost(u),
+                     s_NickServ, u->nick, u->username, common_get_vhost(u),
                      nr->nick, nr->email);
                 delnickrequest(nr);
                 notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
@@ -2667,14 +2639,15 @@ static int do_drop(User * u)
             notice_lang(s_NickServ, u, READ_ONLY_MODE);
 
         alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)",
-             s_NickServ, u->nick, u->username, GetHost(u), na->nick,
-             na->nc->display, (na->nc->email ? na->nc->email : "none"));
+             s_NickServ, u->nick, u->username, common_get_vhost(u),
+             na->nick, na->nc->display,
+             (na->nc->email ? na->nc->email : "none"));
         delnick(na);
 
         if (!is_mine) {
             if (WallDrop)
-                wallops(s_NickServ, "\2%s\2 used DROP on \2%s\2", u->nick,
-                        nick);
+                anope_cmd_global(s_NickServ, "\2%s\2 used DROP on \2%s\2",
+                                 u->nick, nick);
             notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
         } else {
             if (nick)
@@ -2831,14 +2804,14 @@ static int do_set_password(User * u, NickCore * nc, char *param)
 #endif
 
     if (u->na && u->na->nc != nc && is_services_admin(u)) {
-        alog("%s: %s!%s@%s used SET PASSWORD as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, GetHost(u), nc->display, (nc->email ? nc->email : "none"));
+        alog("%s: %s!%s@%s used SET PASSWORD as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), nc->display, (nc->email ? nc->email : "none"));
         if (WallSetpass)
-            wallops(s_NickServ,
-                    "\2%s\2 used SET PASSWORD as Services admin on \2%s\2",
-                    u->nick, nc->display);
+            anope_cmd_global(s_NickServ,
+                             "\2%s\2 used SET PASSWORD as Services admin on \2%s\2",
+                             u->nick, nc->display);
     } else {
         alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
-             u->nick, u->username, GetHost(u),
+             u->nick, u->username, common_get_vhost(u),
              (nc->email ? nc->email : "none"));
     }
     return MOD_CONT;
@@ -2896,7 +2869,7 @@ static int do_set_email(User * u, NickCore * nc, char *param)
     }
 
     alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.", s_NickServ,
-         u->nick, u->username, GetHost(u),
+         u->nick, u->username, common_get_vhost(u),
          (nc->email ? nc->email : "none"), (param ? param : "none"));
 
     if (nc->email)
@@ -3254,10 +3227,7 @@ static int do_info(User * u)
     NickAlias *na;
     NickRequest *nr = NULL;
     int is_servadmin = is_services_admin(u);
-
-#ifdef HAS_VHOST
     char *vHost;
-#endif
 
     if (!nick) {
         syntax_error(s_NickServ, u, "INFO", NICK_INFO_SYNTAX);
@@ -3374,8 +3344,7 @@ static int do_info(User * u)
             notice_lang(s_NickServ, u, NICK_INFO_ICQ, na->nc->icq);
 
         if (show_hidden) {
-#ifdef HAS_VHOST
-            if (s_HostServ) {
+            if (s_HostServ && ircd->vhost) {
                 if (getvHost(na->nick) != NULL) {
                     vHost = smalloc(strlen(getvHost(na->nick)) + 2);
                     bzero(vHost, sizeof(vHost));
@@ -3385,7 +3354,6 @@ static int do_info(User * u)
                     free(vHost);
                 }
             }
-#endif
             if (na->nc->greet)
                 notice_lang(s_NickServ, u, NICK_INFO_GREET, na->nc->greet);
 
@@ -3673,10 +3641,8 @@ static int do_alist(User * u)
             min_level = ACCESS_SOP;
         } else if (stricmp(lev, "AOP") == 0) {
             min_level = ACCESS_AOP;
-#ifdef HAS_HALFOP
         } else if (stricmp(lev, "HOP") == 0) {
             min_level = ACCESS_HOP;
-#endif
         } else if (stricmp(lev, "VOP") == 0) {
             min_level = ACCESS_VOP;
         } else {
@@ -3771,7 +3737,8 @@ static int do_recover(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: RECOVER: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username, GetHost(u));
+                     s_NickServ, nick, u->nick, u->username,
+                     common_get_vhost(u));
                 bad_password(u);
             }
         }
@@ -3813,7 +3780,8 @@ static int do_release(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: RELEASE: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username, GetHost(u));
+                     s_NickServ, nick, u->nick, u->username,
+                     common_get_vhost(u));
                 bad_password(u);
             }
         }
@@ -3860,7 +3828,8 @@ static int do_ghost(User * u)
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {
                 alog("%s: GHOST: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username, GetHost(u));
+                     s_NickServ, nick, u->nick, u->username,
+                     common_get_vhost(u));
                 bad_password(u);
             }
         }
@@ -3916,7 +3885,7 @@ static int do_getemail(User * u)
         return MOD_CONT;
     }
     alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick,
-         u->username, GetHost(u), email);
+         u->username, common_get_vhost(u), email);
     for (i = 0; i < 1024; i++) {
         for (nc = nclists[i]; nc; nc = nc->next) {
             if (nc->email) {
@@ -3954,10 +3923,11 @@ static int do_getpass(User * u)
     } else if (!(na = findnick(nick))) {
         if ((nr = findrequestnick(nick))) {
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-                 u->username, GetHost(u), nick);
+                 u->username, common_get_vhost(u), nick);
             if (WallGetpass)
-                wallops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
-                        u->nick, nick);
+                anope_cmd_global(s_NickServ,
+                                 "\2%s\2 used GETPASS on \2%s\2", u->nick,
+                                 nick);
             notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick,
                         nr->passcode);
         } else {
@@ -3972,10 +3942,10 @@ static int do_getpass(User * u)
         notice_lang(s_NickServ, u, PERMISSION_DENIED);
     } else {
         alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-             u->username, GetHost(u), nick);
+             u->username, common_get_vhost(u), nick);
         if (WallGetpass)
-            wallops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2", u->nick,
-                    nick);
+            anope_cmd_global(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
+                             u->nick, nick);
         notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick,
                     na->nc->pass);
     }
@@ -4031,7 +4001,7 @@ static int do_sendpass(User * u)
         MailEnd(mail);
 
         alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick,
-             u->username, GetHost(u), nick);
+             u->username, common_get_vhost(u), nick);
         notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
     }
 #endif
@@ -4081,8 +4051,8 @@ static int do_forbid(User * u)
         }
 
         if (WallForbid)
-            wallops(s_NickServ, "\2%s\2 used FORBID on \2%s\2", u->nick,
-                    nick);
+            anope_cmd_global(s_NickServ, "\2%s\2 used FORBID on \2%s\2",
+                             u->nick, nick);
 
         alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);
         notice_lang(s_NickServ, u, NICK_FORBID_SUCCEEDED, nick);

@@ -19,410 +19,24 @@ Channel *chanlist[1024];
 
 #define HASH(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
 
-static void add_ban(Channel * chan, char *mask);
-#ifdef HAS_EXCEPT
-static void add_exception(Channel * chan, char *mask);
-#endif
-static void chan_adduser2(User * user, Channel * c);
-static Channel *chan_create(const char *chan);
-static void chan_delete(Channel * c);
-static void del_ban(Channel * chan, char *mask);
-#ifdef HAS_EXCEPT
-static void del_exception(Channel * chan, char *mask);
-#endif
-#ifdef HAS_FMODE
-static char *get_flood(Channel * chan);
-#endif
-static char *get_key(Channel * chan);
-static char *get_limit(Channel * chan);
-#ifdef HAS_LMODE
-static char *get_redirect(Channel * chan);
-#endif
-static Channel *join_user_update(User * user, Channel * chan, char *name);
-#ifdef HAS_FMODE
-static void set_flood(Channel * chan, char *value);
-#endif
-static void set_key(Channel * chan, char *value);
-static void set_limit(Channel * chan, char *value);
-#ifdef HAS_LMODE
-static void set_redirect(Channel * chan, char *value);
-#endif
+void add_ban(Channel * chan, char *mask);
+void add_exception(Channel * chan, char *mask);
+void chan_adduser2(User * user, Channel * c);
+Channel *chan_create(char *chan);
+void chan_delete(Channel * c);
+void del_ban(Channel * chan, char *mask);
+void del_exception(Channel * chan, char *mask);
+char *get_flood(Channel * chan);
+char *get_key(Channel * chan);
+char *get_limit(Channel * chan);
+char *get_redirect(Channel * chan);
+Channel *join_user_update(User * user, Channel * chan, char *name);
+void set_flood(Channel * chan, char *value);
+void set_key(Channel * chan, char *value);
+void set_limit(Channel * chan, char *value);
+void set_redirect(Channel * chan, char *value);
 void do_mass_mode(char *modes);
 
-/*************************************************************************/
-/* *INDENT-OFF* */
-
-CBMode cbmodes[128] = {
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 },
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_VIAGRA)
-	{ CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL },
-#else
-	{ 0 }, /* A */
-#endif
-	{ 0 }, /* B */
-#if defined(IRC_UNREAL) || defined(IRC_RAGE2)
-	{ CMODE_C, 0, NULL, NULL },
-#else
-	{ 0 }, /* C */
-#endif
-	{ 0 }, /* D */
-	{ 0 }, /* E */
-	{ 0 }, /* F */
-#ifdef IRC_UNREAL
-	{ CMODE_G, 0, NULL, NULL },
-#else
-	{ 0 }, /* G */
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-	{ CMODE_H, CBM_NO_USER_MLOCK, NULL, NULL },
-#else
-	{ 0 }, /* H */
-#endif
-#ifdef IRC_ULTIMATE
-	{ CMODE_I },
-#else
-	{ 0 }, /* I */
-#endif
-	{ 0 }, /* J */
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL)
-	{ CMODE_K, 0, NULL, NULL },
-#else
-	{ 0 }, /* K */
-#endif
-#ifdef HAS_LMODE
-	{ CMODE_L, 0, set_redirect, cs_set_redirect },
-#else
-	{ 0 }, /* L */
-#endif
-#ifdef IRC_BAHAMUT
-	{ CMODE_M },
-#else
-	{ 0 }, /* M */
-#endif
-#if defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK) || defined(IRC_RAGE2)
-	{ CMODE_N, 0, NULL, NULL },
-#else
-	{ 0 }, /* N */
-#endif
-#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-	{ CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL },
-#else
-	{ 0 }, /* O */
-#endif
-	{ 0 }, /* P */
-#ifdef IRC_UNREAL
-	{ CMODE_Q, 0, NULL, NULL },
-#else
-	{ 0 }, /* Q */
-#endif
-#ifndef IRC_HYBRID
-	{ CMODE_R, 0, NULL, NULL }, /* R */
-#else
-        { 0 },
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK) || defined(IRC_RAGE2)
-	{ CMODE_S, 0, NULL, NULL },
-#else
-	{ 0 }, /* S */
-#endif
-	{ 0 }, /* T */
-	{ 0 }, /* U */
-#ifdef IRC_UNREAL
-	{ CMODE_V, 0, NULL, NULL },
-#else
-	{ 0 }, /* V */
-#endif
-	{ 0 }, /* W */
-	{ 0 }, /* X */
-	{ 0 }, /* Y */
-	{ 0 }, /* Z */
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-#ifdef IRC_HYBRID
-        { CMODE_a, 0, NULL, NULL },
-#else
-	{ 0 }, /* a */
-#endif
-	{ 0 }, /* b */
-#if defined(IRC_BAHAMUT) || defined(IRC_UNREAL) || defined (IRC_PTLINK)
-	{ CMODE_c, 0, NULL, NULL },
-#else
-	{ 0 }, /* c */
-#endif
-#ifdef IRC_PTLINK
-	{ CMODE_d, 0, NULL, NULL },
-#else
-	{ 0 }, /* d */
-#endif
-	{ 0 }, /* e */
-#ifdef HAS_FMODE
-	{ CMODE_f, 0, set_flood, cs_set_flood },
-#else
-	{ 0 }, /* f */
-#endif
-	{ 0 }, /* g */
-	{ 0 }, /* h */
-	{ CMODE_i, 0, NULL, NULL },
-	{ 0 }, /* j */
-	{ CMODE_k, 0, set_key, cs_set_key },
-	{ CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit },
-	{ CMODE_m, 0, NULL, NULL },
-	{ CMODE_n, 0, NULL, NULL },
-	{ 0 }, /* o */
-	{ CMODE_p, 0, NULL, NULL },
-#ifdef IRC_PTLINK
-	{ CMODE_q, 0, NULL, NULL },
-#else
-	{ 0 }, /* q */
-#endif
-#ifndef IRC_HYBRID
-	{ CMODE_r, CBM_NO_MLOCK, NULL, NULL },
-#else
-	{ 0 },
-#endif
-	{ CMODE_s, 0, NULL, NULL },
-	{ CMODE_t, 0, NULL, NULL },
-#ifdef IRC_UNREAL
-	{ CMODE_u, 0, NULL, NULL },
-#else
-	{ 0 },
-#endif
-	{ 0 }, /* v */
-	{ 0 }, /* w */
-#ifdef IRC_ULTIMATE
-	{ CMODE_x },
-#else
-	{ 0 }, /* x */
-#endif
-	{ 0 }, /* y */
-#ifdef IRC_UNREAL
-	{ CMODE_z, 0, NULL, NULL },
-#else
-	{ 0 }, /* z */
-#endif
-	{ 0 }, { 0 }, { 0 }, { 0 }
-};
-
-CBModeInfo cbmodeinfos[] = {
-#if defined(IRC_HYBRID)
-	{ 'a', CMODE_a, 0, NULL, NULL },
-#endif
-#if defined(IRC_BAHAMUT) || defined(IRC_UNREAL) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
-	{ 'c', CMODE_c, 0, NULL, NULL },
-#endif
-#if defined(IRC_PTLINK)
-	{ 'd', CMODE_d, 0, NULL, NULL },
-#endif
-#ifdef HAS_FMODE
-	{ 'f', CMODE_f, 0, get_flood, cs_get_flood },
-#endif
-	{ 'i', CMODE_i, 0, NULL, NULL },
-	{ 'k', CMODE_k, 0, get_key, cs_get_key },
-	{ 'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit },
-	{ 'm', CMODE_m, 0, NULL, NULL },
-	{ 'n', CMODE_n, 0, NULL, NULL },
-	{ 'p', CMODE_p, 0, NULL, NULL },
-#ifdef IRC_PTLINK
-	{ 'q', CMODE_q, 0, NULL, NULL },
-#endif
-#ifndef IRC_HYBRID
-	{ 'r', CMODE_r, 0, NULL, NULL },
-#endif
-	{ 's', CMODE_s, 0, NULL, NULL },
-	{ 't', CMODE_t, 0, NULL, NULL },
-#ifdef IRC_UNREAL
-	{ 'u', CMODE_u, 0, NULL, NULL },
-#endif
-#ifdef IRC_ULTIMATE
-	{ 'x', CMODE_x, 0, NULL, NULL },
-#endif
-#ifdef IRC_UNREAL
-	{ 'z', CMODE_z, 0, NULL, NULL },
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2) || defined(IRC_VIAGRA)
-	{ 'A', CMODE_A, 0, NULL, NULL },
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_RAGE2)
-	{ 'C', CMODE_C, 0, NULL, NULL },
-#endif
-#ifdef IRC_UNREAL
-	{ 'G', CMODE_G, 0, NULL, NULL },
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-	{ 'H', CMODE_H, 0, NULL, NULL },
-#endif
-#ifdef IRC_ULTIMATE
-	{ 'I', CMODE_I, 0, NULL, NULL },
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_PTLINK) || defined(IRC_ULTIMATE3)
-	{ 'K', CMODE_K, 0, NULL, NULL },
-#endif
-#ifdef HAS_LMODE
-	{ 'L', CMODE_L, 0, get_redirect, cs_get_redirect },
-#endif
-#ifdef IRC_BAHAMUT
-#ifndef IRC_ULTIMATE3
-	{ 'M', CMODE_M, 0, NULL, NULL },
-#endif
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
-	{ 'N', CMODE_N, 0, NULL, NULL },
-#endif
-#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-	{ 'O', CMODE_O, 0, NULL, NULL },
-#endif
-#ifdef IRC_UNREAL
-	{ 'Q', CMODE_Q, 0, NULL, NULL },
-#endif
-#ifndef IRC_HYBRID
-	{ 'R', CMODE_R, 0, NULL, NULL },
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
-	{ 'S', CMODE_S, 0, NULL, NULL },
-#endif
-#ifdef IRC_UNREAL
-	{ 'V', CMODE_V, 0, NULL, NULL },
-#endif
-	{ 0 }
-};
-
-static CMMode cmmodes[128] = {
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL },
-	{ NULL },
-	{ add_ban, del_ban },
-	{ NULL },
-	{ NULL },
-#ifdef HAS_EXCEPT
-	{ add_exception, del_exception },
-#endif
-	{ NULL },
-	{ NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL },
-	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }
-};
-
-#if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK)
-
-static char csmodes[128] = {
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0,
- #if defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
-        'a', /* (33) ! Channel Admins */
- #else
-        0,
- #endif
-	 0, 0, 0,
- #if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-        'h', /* (37) % Channel halfops */
- #else
-        0,
- #endif
-        0, 0, 0, 0,
- #if defined(IRC_RAGE2)
-	'a', /* * Channel Admins */
- #else
-	0,
- #endif
-
-        'v', 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-#endif
-
-static CUMode cumodes[128] = {
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
-
-	{ 0 },
-
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        { CUS_PROTECT, CUF_PROTECT_BOTSERV, check_valid_op },
-#else
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-        { CUS_PROTECT, CUF_PROTECT_BOTSERV, check_valid_admin },
-#else
-        { 0 }, /* a */
-#endif
-#endif
-	{ 0 }, /* b */
-	{ 0 }, /* c */
-	{ 0 }, /* d */
-	{ 0 }, /* e */
-	{ 0 }, /* f */
-	{ 0 }, /* g */
-#ifdef HAS_HALFOP
-	{ CUS_HALFOP, 0, check_valid_op },
-#else
-	{ 0 }, /* h */
-#endif
-	{ 0 }, /* i */
-	{ 0 }, /* j */
-	{ 0 }, /* k */
-	{ 0 }, /* l */
-	{ 0 }, /* m */
-	{ 0 }, /* n */
-	{ CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op },
-	{ 0 }, /* p */
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-	{ CUS_OWNER, 0, check_valid_op },
-#else
-	{ 0 }, /* q */
-#endif
-	{ 0 }, /* r */
-	{ 0 }, /* s */
-	{ 0 }, /* t */
-	{ 0 }, /* u */
-	{ CUS_VOICE, 0, NULL },
-	{ 0 }, /* w */
-	{ 0 }, /* x */
-	{ 0 }, /* y */
-	{ 0 }, /* z */
-	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }
-};
-
-/* *INDENT-ON* */
-/*************************************************************************/
 /**************************** External Calls *****************************/
 /*************************************************************************/
 
@@ -453,7 +67,7 @@ void chan_deluser(User * user, Channel * c)
     c->usercount--;
 
     if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1) {
-        send_cmd(c->ci->bi->nick, "PART %s", c->name);
+        anope_cmd_part(c->ci->bi->nick, c->name, NULL);
     }
 
     if (!c->users)
@@ -598,8 +212,8 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 BotInfo *bi;
 
                 if ((bi = findbot(*av))) {
-                    send_mode(bi->nick, chan->name, "+%c %s", mode,
-                              bi->nick);
+                    anope_cmd_mode(bi->nick, chan->name, "+%c %s", mode,
+                                   bi->nick);
                     continue;
                 }
             }
@@ -665,7 +279,7 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
 
     if (HelpChannel && status == CUS_OP
         && !stricmp(chan->name, HelpChannel))
-        change_user_mode(user, "+h", NULL);
+        common_svsmode(user, "+h", NULL);
 
     for (uc = user->chans; uc; uc = uc->next) {
         if (uc->chan == chan) {
@@ -752,26 +366,26 @@ void get_channel_stats(long *nrec, long *memuse)
                 mem += strlen(chan->topic) + 1;
             if (chan->key)
                 mem += strlen(chan->key) + 1;
-#ifdef HAS_FMODE
-            if (chan->flood)
-                mem += strlen(chan->flood) + 1;
-#endif
-#ifdef HAS_LMODE
-            if (chan->redirect)
-                mem += strlen(chan->redirect) + 1;
-#endif
+            if (ircd->fmode) {
+                if (chan->flood)
+                    mem += strlen(chan->flood) + 1;
+            }
+            if (ircd->Lmode) {
+                if (chan->redirect)
+                    mem += strlen(chan->redirect) + 1;
+            }
             mem += sizeof(char *) * chan->bansize;
             for (j = 0; j < chan->bancount; j++) {
                 if (chan->bans[j])
                     mem += strlen(chan->bans[j]) + 1;
             }
-#ifdef HAS_EXCEPT
-            mem += sizeof(char *) * chan->exceptsize;
-            for (j = 0; j < chan->exceptcount; j++) {
-                if (chan->excepts[j])
-                    mem += strlen(chan->excepts[j]) + 1;
+            if (ircd->except) {
+                mem += sizeof(char *) * chan->exceptsize;
+                for (j = 0; j < chan->exceptcount; j++) {
+                    if (chan->excepts[j])
+                        mem += strlen(chan->excepts[j]) + 1;
+                }
             }
-#endif
             for (cu = chan->users; cu; cu = cu->next) {
                 mem += sizeof(*cu);
                 if (cu->ud) {
@@ -986,8 +600,6 @@ void do_part(const char *source, int ac, char **av)
 
 /*************************************************************************/
 
-#if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK)
-
 /* Handle a SJOIN command.
 
    On channel creation, syntax is:
@@ -1013,16 +625,15 @@ void do_sjoin(const char *source, int ac, char **av)
 
     /* Double check to avoid unknown modes that need parameters */
     if (ac >= 4 && ac <= 6) {
-        char *s, *end, cubuf[CHAN_MAX_SYMBOLS + 2], *end2,
-            *cumodes[CHAN_MAX_SYMBOLS + 1];
+        char *s, *end, cubuf[ircd->max_symbols + 2], *end2,
+            *cumodes[ircd->max_symbols + 1];
 
         c = findchan(av[1]);
-#ifndef IRC_HYBRID
-#ifndef IRC_PTLINK
-        if (!c)
-            is_sqlined = check_chan_sqline(av[1]);
-#endif
-#endif
+
+        if (ircd->chansqline) {
+            if (!c)
+                is_sqlined = check_chan_sqline(av[1]);
+        }
 
         cubuf[0] = '+';
         cumodes[0] = cubuf;
@@ -1048,7 +659,7 @@ void do_sjoin(const char *source, int ac, char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                send_cmd(s_OperServ, "KICK %s %s :Q-Lined", av[1], s);
+                anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1])) {
                     /* Make the user join; if the channel does not exist it
@@ -1094,14 +705,13 @@ void do_sjoin(const char *source, int ac, char **av)
             return;
 
         c = findchan(av[1]);
-#ifndef IRC_HYBRID
-#ifndef IRC_PTLINK
-        if (!c)
-            is_sqlined = check_chan_sqline(av[1]);
-#endif
-#endif
+        if (ircd->chansqline) {
+            if (!c)
+                is_sqlined = check_chan_sqline(av[1]);
+        }
+
         if (is_sqlined && !is_oper(user)) {
-            send_cmd(s_OperServ, "KICK %s %s :Q-Lined", av[1], user->nick);
+            anope_cmd_kick(s_OperServ, av[1], user->nick, "Q-Lined");
         } else {
             c = join_user_update(user, c, av[1]);
             c->creation_time = strtoul(av[0], NULL, 10);
@@ -1109,7 +719,6 @@ void do_sjoin(const char *source, int ac, char **av)
     }
 }
 
-#endif
 
 /*************************************************************************/
 
@@ -1119,34 +728,29 @@ void do_cmode(const char *source, int ac, char **av)
 {
     Channel *chan;
     ChannelInfo *ci = NULL;
-#ifdef IRC_BAHAMUT
-
-/* Ultimate3 doesn't send TS on Mode - TSL */
-#if !defined(IRC_ULTIMATE3)
     int i;
     char *t;
 
-    /* TSMODE for bahamut - leave this code out to break MODEs. -GD */
-    if (uplink_capab & CAPAB_TSMODE) {
-        for (i = 0; i < strlen(av[1]); i++) {
-            if (!isdigit(av[1][i]))
-                break;
-        }
-        if (av[1][i] == '\0') {
-            /* We have a valid TS field in av[1] now, so we can strip it off */
-            /* After we swap av[0] and av[1] ofcourse to not break stuff! :) */
-            t = av[0];
-            av[0] = av[1];
-            av[1] = t;
-            ac--;
-            av++;
-        } else {
-            alog("TSMODE enabled but MODE has no valid TS");
+    if (ircdcap->tsmode) {
+        /* TSMODE for bahamut - leave this code out to break MODEs. -GD */
+        if (uplink_capab & ircdcap->tsmode) {
+            for (i = 0; i < strlen(av[1]); i++) {
+                if (!isdigit(av[1][i]))
+                    break;
+            }
+            if (av[1][i] == '\0') {
+                /* We have a valid TS field in av[1] now, so we can strip it off */
+                /* After we swap av[0] and av[1] ofcourse to not break stuff! :) */
+                t = av[0];
+                av[0] = av[1];
+                av[1] = t;
+                ac--;
+                av++;
+            } else {
+                alog("TSMODE enabled but MODE has no valid TS");
+            }
         }
     }
-#endif
-
-#endif
 
     chan = findchan(av[0]);
     if (!chan) {
@@ -1206,7 +810,7 @@ void do_topic(const char *source, int ac, char **av)
 /**************************** Internal Calls *****************************/
 /*************************************************************************/
 
-static void add_ban(Channel * chan, char *mask)
+void add_ban(Channel * chan, char *mask)
 {
     if (s_BotServ && BSSmartJoin && chan->ci && chan->ci->bi
         && chan->usercount >= BSMinUsers) {
@@ -1216,7 +820,7 @@ static void add_ban(Channel * chan, char *mask)
         snprintf(botmask, sizeof(botmask), "%s!%s@%s", bi->nick, bi->user,
                  bi->host);
         if (match_wild_nocase(mask, botmask)) {
-            send_mode(bi->nick, chan->name, "-b %s", mask);
+            anope_cmd_mode(bi->nick, chan->name, "-b %s", mask);
             return;
         }
     }
@@ -1233,9 +837,7 @@ static void add_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-#ifdef HAS_EXCEPT
-
-static void add_exception(Channel * chan, char *mask)
+void add_exception(Channel * chan, char *mask)
 {
     if (chan->exceptcount >= chan->exceptsize) {
         chan->exceptsize += 8;
@@ -1248,8 +850,6 @@ static void add_exception(Channel * chan, char *mask)
         alog("debug: Added except %s to channel %s", mask, chan->name);
 }
 
-#endif
-
 /*************************************************************************/
 
 /* Add/remove a user to/from a channel, creating or deleting the channel as
@@ -1258,32 +858,22 @@ static void add_exception(Channel * chan, char *mask)
  * Modified, so ignored users won't get any status via services -certus */
 
 
-static void chan_adduser2(User * user, Channel * c)
+void chan_adduser2(User * user, Channel * c)
 {
     struct c_userlist *u;
     char *chan = c->name;
 
     if (get_ignore(user->nick) == NULL) {
 
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-        if (check_should_owner(user, chan)) {
+        if (ircd->owner && check_should_owner(user, chan)) {
             chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
-        } else
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
-        if (check_should_protect(user, chan)) {
+        } else if (ircd->protect && check_should_protect(user, chan)) {
             chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-        } else
-#endif
-        if (check_should_op(user, chan)) {
+        } else if (check_should_op(user, chan)) {
             chan_set_user_status(c, user, CUS_OP);
-        } else
-#ifdef HAS_HALFOP
-        if (check_should_halfop(user, chan)) {
+        } else if (ircd->halfop && check_should_halfop(user, chan)) {
             chan_set_user_status(c, user, CUS_HALFOP);
-        } else
-#endif
-        if (check_should_voice(user, chan)) {
+        } else if (check_should_voice(user, chan)) {
             chan_set_user_status(c, user, CUS_VOICE);
         }
     }
@@ -1323,8 +913,8 @@ static void chan_adduser2(User * user, Channel * c)
         if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
             && user->na && user->na->nc->greet
             && check_access(user, c->ci, CA_GREET)) {
-            send_cmd(c->ci->bi->nick, "PRIVMSG %s :[%s] %s", c->name,
-                     user->na->nick, user->na->nc->greet);
+            anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
+                              user->na->nick, user->na->nc->greet);
             c->ci->bi->lastmsg = time(NULL);
         }
     }
@@ -1336,7 +926,7 @@ static void chan_adduser2(User * user, Channel * c)
    chan_adduser, but splitted to make it more efficient to use for
    SJOINs). */
 
-static Channel *chan_create(const char *chan)
+Channel *chan_create(char *chan)
 {
     Channel *c;
     Channel **list;
@@ -1370,7 +960,7 @@ static Channel *chan_create(const char *chan)
 
 /* This destroys the channel structure, freeing everything in it. */
 
-static void chan_delete(Channel * c)
+void chan_delete(Channel * c)
 {
     BanData *bd, *next;
     int i;
@@ -1393,14 +983,14 @@ static void chan_delete(Channel * c)
 
     if (c->key)
         free(c->key);
-#ifdef HAS_FMODE
-    if (c->flood)
-        free(c->flood);
-#endif
-#ifdef HAS_LMODE
-    if (c->redirect)
-        free(c->redirect);
-#endif
+    if (ircd->fmode) {
+        if (c->flood)
+            free(c->flood);
+    }
+    if (ircd->Lmode) {
+        if (c->redirect)
+            free(c->redirect);
+    }
 
     for (i = 0; i < c->bancount; ++i) {
         if (c->bans[i])
@@ -1411,17 +1001,17 @@ static void chan_delete(Channel * c)
     if (c->bansize)
         free(c->bans);
 
-#ifdef HAS_EXCEPT
-    for (i = 0; i < c->exceptcount; ++i) {
-        if (c->excepts[i])
-            free(c->excepts[i]);
-        else
-            alog("channel: BUG freeing %s: exceps[%d] is NULL!", c->name,
-                 i);
+    if (ircd->except) {
+        for (i = 0; i < c->exceptcount; ++i) {
+            if (c->excepts[i])
+                free(c->excepts[i]);
+            else
+                alog("channel: BUG freeing %s: exceps[%d] is NULL!",
+                     c->name, i);
+        }
+        if (c->exceptsize)
+            free(c->excepts);
     }
-    if (c->exceptsize)
-        free(c->excepts);
-#endif
 
     if (c->next)
         c->next->prev = c->prev;
@@ -1435,7 +1025,7 @@ static void chan_delete(Channel * c)
 
 /*************************************************************************/
 
-static void del_ban(Channel * chan, char *mask)
+void del_ban(Channel * chan, char *mask)
 {
     char **s = chan->bans;
     int i = 0;
@@ -1462,9 +1052,7 @@ static void del_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-#ifdef HAS_EXCEPT
-
-static void del_exception(Channel * chan, char *mask)
+void del_exception(Channel * chan, char *mask)
 {
     int i;
     int reset = 0;
@@ -1486,29 +1074,23 @@ static void del_exception(Channel * chan, char *mask)
         alog("debug: Deleted except %s to channel %s", mask, chan->name);
 }
 
-#endif
-
 /*************************************************************************/
 
-#ifdef HAS_FMODE
-
-static char *get_flood(Channel * chan)
+char *get_flood(Channel * chan)
 {
     return chan->flood;
 }
 
-#endif
-
 /*************************************************************************/
 
-static char *get_key(Channel * chan)
+char *get_key(Channel * chan)
 {
     return chan->key;
 }
 
 /*************************************************************************/
 
-static char *get_limit(Channel * chan)
+char *get_limit(Channel * chan)
 {
     static char limit[16];
 
@@ -1521,18 +1103,14 @@ static char *get_limit(Channel * chan)
 
 /*************************************************************************/
 
-#ifdef HAS_LMODE
-
-static char *get_redirect(Channel * chan)
+char *get_redirect(Channel * chan)
 {
     return chan->redirect;
 }
 
-#endif
-
 /*************************************************************************/
 
-static Channel *join_user_update(User * user, Channel * chan, char *name)
+Channel *join_user_update(User * user, Channel * chan, char *name)
 {
     struct u_chanlist *c;
 
@@ -1557,9 +1135,7 @@ static Channel *join_user_update(User * user, Channel * chan, char *name)
 
 /*************************************************************************/
 
-#ifdef HAS_FMODE
-
-static void set_flood(Channel * chan, char *value)
+void set_flood(Channel * chan, char *value)
 {
     if (chan->flood)
         free(chan->flood);
@@ -1570,11 +1146,9 @@ static void set_flood(Channel * chan, char *value)
              chan->flood ? chan->flood : "no flood settings");
 }
 
-#endif
-
 /*************************************************************************/
 
-static void set_key(Channel * chan, char *value)
+void set_key(Channel * chan, char *value)
 {
     if (chan->key)
         free(chan->key);
@@ -1587,7 +1161,7 @@ static void set_key(Channel * chan, char *value)
 
 /*************************************************************************/
 
-static void set_limit(Channel * chan, char *value)
+void set_limit(Channel * chan, char *value)
 {
     chan->limit = value ? strtoul(value, NULL, 10) : 0;
 
@@ -1598,9 +1172,7 @@ static void set_limit(Channel * chan, char *value)
 
 /*************************************************************************/
 
-#ifdef HAS_LMODE
-
-static void set_redirect(Channel * chan, char *value)
+void set_redirect(Channel * chan, char *value)
 {
     if (chan->redirect)
         free(chan->redirect);
@@ -1610,8 +1182,6 @@ static void set_redirect(Channel * chan, char *value)
         alog("debug: Redirect of channel %s set to %s", chan->name,
              chan->redirect ? chan->redirect : "no redirect");
 }
-
-#endif
 
 void do_mass_mode(char *modes)
 {
@@ -1633,7 +1203,7 @@ void do_mass_mode(char *modes)
             if (c->bouncy_modes) {
                 return;
             } else {
-                send_mode(s_OperServ, c->name, "%s", modes);
+                anope_cmd_mode(s_OperServ, c->name, "%s", modes);
                 chan_set_modes(s_OperServ, c, ac, av, 1);
             }
         }

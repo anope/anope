@@ -16,9 +16,7 @@
 
 Server *servlist = NULL;
 Server *me_server = NULL;
-#ifdef IRC_BAHAMUT
-uint16 uplink_capab;
-#endif
+uint32 uplink_capab;
 
 /* For first_server / next_server */
 static Server *server_cur;
@@ -112,10 +110,8 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
 static void delete_server(Server * serv, const char *quitreason)
 {
     Server *s, *snext;
-#ifdef IRC_BAHAMUT
     User *u, *unext;
     NickAlias *na;
-#endif
 
     if (!serv) {
         alog("delete_server() called with NULL arg!");
@@ -125,32 +121,32 @@ static void delete_server(Server * serv, const char *quitreason)
     if (debug)
         alog("delete_server() called for %s", serv->name);
 
-#ifdef IRC_BAHAMUT
-    if (uplink_capab & CAPAB_NOQUIT) {
-        u = firstuser();
-        while (u) {
-            unext = nextuser();
-            if (u->server == serv) {
-                if ((na = u->na) && !(na->status & NS_VERBOTEN)
-                    && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
-                    na->last_seen = time(NULL);
-                    if (na->last_quit)
-                        free(na->last_quit);
-                    na->last_quit =
-                        (quitreason ? sstrdup(quitreason) : NULL);
-                }
+    if (ircdcap->noquit) {
+        if (uplink_capab & ircdcap->noquit) {
+            u = firstuser();
+            while (u) {
+                unext = nextuser();
+                if (u->server == serv) {
+                    if ((na = u->na) && !(na->status & NS_VERBOTEN)
+                        && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
+                        na->last_seen = time(NULL);
+                        if (na->last_quit)
+                            free(na->last_quit);
+                        na->last_quit =
+                            (quitreason ? sstrdup(quitreason) : NULL);
+                    }
 #ifndef STREAMLINED
-                if (LimitSessions)
-                    del_session(u->host);
+                    if (LimitSessions)
+                        del_session(u->host);
 #endif
-                delete_user(u);
+                    delete_user(u);
+                }
+                u = unext;
             }
-            u = unext;
+            if (debug >= 2)
+                alog("delete_server() cleared all users");
         }
-        if (debug >= 2)
-            alog("delete_server() cleared all users");
     }
-#endif
 
     s = serv->links;
     while (s) {
@@ -215,17 +211,23 @@ void do_server(const char *source, int ac, char **av)
         s = me_server;
     else
         s = findserver(servlist, source);
-#ifdef IRC_PTLINK
-    if (ac < 4)
-        alog("Malformed SERVER received (less than 4 params)");
-    else
-        new_server(s, av[0], av[3], 0);
-#else
-    if (ac < 3)
-        alog("Malformed SERVER received (less than 3 params)");
-    else
-        new_server(s, av[0], av[2], 0);
-#endif
+    if (ircd->numservargs == 4) {
+        if (ac < 4)
+            alog("Malformed SERVER received (less than 4 params)");
+        else
+            new_server(s, av[0], av[3], 0);
+    }
+    if (ircd->numservargs == 7) {
+        if (ac < 7)
+            alog("Malformed SERVER received (less than 7 params)");
+        else
+            new_server(s, av[0], av[6], 0);
+    } else {
+        if (ac < 3)
+            alog("Malformed SERVER received (less than 3 params)");
+        else
+            new_server(s, av[0], av[2], 0);
+    }
 }
 
 /*************************************************************************/
@@ -245,15 +247,94 @@ void do_squit(const char *source, int ac, char **av)
     snprintf(buf, sizeof(buf), "%s %s", s->name,
              (s->uplink ? s->uplink->name : ""));
 
-#ifdef IRC_BAHAMUT
-    if ((s->uplink == me_server) && (uplink_capab & CAPAB_UNCONNECT)) {
-        if (debug)
-            alog("debuf: Sending UNCONNECT SQUIT for %s", s->name);
-        send_cmd(ServerName, "SQUIT %s :%s", s->name, buf);
+    if (ircdcap->unconnect) {
+        if ((s->uplink == me_server)
+            && (uplink_capab & ircdcap->unconnect)) {
+            if (debug)
+                alog("debuf: Sending UNCONNECT SQUIT for %s", s->name);
+            /* need to fix */
+            anope_cmd_squit(s->name, buf);
+        }
     }
-#endif
 
     delete_server(s, buf);
+}
+
+void capab_parse(int ac, char **av)
+{
+    int i;
+
+    for (i = 0; i < ac; i++) {
+        if (!stricmp(av[i], "NOQUIT")) {
+            uplink_capab |= CAPAB_NOQUIT;
+        }
+        if (!stricmp(av[i], "TSMODE")) {
+            uplink_capab |= CAPAB_TSMODE;
+        }
+        if (!stricmp(av[i], "UNCONNECT")) {
+            uplink_capab |= CAPAB_UNCONNECT;
+        }
+        if (!stricmp(av[i], "NICKIP")) {
+            uplink_capab |= CAPAB_NICKIP;
+        }
+        if (!stricmp(av[i], "SSJOIN")) {
+            uplink_capab |= CAPAB_NSJOIN;
+        }
+        if (!stricmp(av[i], "ZIP")) {
+            uplink_capab |= CAPAB_ZIP;
+        }
+        if (!stricmp(av[i], "BURST")) {
+            uplink_capab |= CAPAB_BURST;
+        }
+        if (!stricmp(av[i], "TS5")) {
+            uplink_capab |= CAPAB_TS5;
+        }
+        if (!stricmp(av[i], "TS3")) {
+            uplink_capab |= CAPAB_TS3;
+        }
+        if (!stricmp(av[i], "DKEY")) {
+            uplink_capab |= CAPAB_DKEY;
+        }
+        if (!stricmp(av[i], "PT4")) {
+            uplink_capab |= CAPAB_PT4;
+        }
+        if (!stricmp(av[i], "SCS")) {
+            uplink_capab |= CAPAB_SCS;
+        }
+        if (!stricmp(av[i], "QS")) {
+            uplink_capab |= CAPAB_QS;
+        }
+        if (!stricmp(av[i], "UID")) {
+            uplink_capab |= CAPAB_UID;
+        }
+        if (!stricmp(av[i], "KNOCK")) {
+            uplink_capab |= CAPAB_KNOCK;
+        }
+        if (!stricmp(av[i], "CLIENT")) {
+            uplink_capab |= CAPAB_CLIENT;
+        }
+        if (!stricmp(av[i], "IPV6")) {
+            uplink_capab |= CAPAB_IPV6;
+        }
+        if (!stricmp(av[i], "SSJ5")) {
+            uplink_capab |= CAPAB_SSJ5;
+        }
+        if (!stricmp(av[i], "SN2")) {
+            uplink_capab |= CAPAB_SN2;
+        }
+        if (!stricmp(av[i], "TOK1")) {
+            uplink_capab |= CAPAB_TOKEN;
+        }
+        if (!stricmp(av[i], "TOKEN")) {
+            uplink_capab |= CAPAB_TOKEN;
+        }
+        if (!stricmp(av[i], "VHOST")) {
+            uplink_capab |= CAPAB_VHOST;
+        }
+        if (!stricmp(av[i], "SSJ3")) {
+            uplink_capab |= CAPAB_SSJ3;
+        }
+    }
 }
 
 /* EOF */

@@ -219,7 +219,7 @@ static Session *findsession(const char *host)
  * Returns 1 if the host was added or 0 if the user was killed.
  */
 
-int add_session(const char *nick, const char *host)
+int add_session(char *nick, char *host)
 {
     Session *session, **list;
     Exception *exception;
@@ -245,12 +245,8 @@ int add_session(const char *nick, const char *host)
             /* We don't use kill_user() because a user stucture has not yet
              * been created. Simply kill the user. -TheShadow
              */
-#ifdef IRC_BAHAMUT
-            send_cmd(NULL, "SVSKILL %s :Session limit exceeded", nick);
-#else
-            send_cmd(s_OperServ, "KILL %s :%s (Session limit exceeded)",
-                     nick, s_OperServ);
-#endif
+            kill_user(s_OperServ, nick, "Session limit exceeded");
+
             session->hits++;
             if (MaxSessionKill && session->hits >= MaxSessionKill) {
                 char akillmask[BUFSIZE];
@@ -258,9 +254,9 @@ int add_session(const char *nick, const char *host)
                 add_akill(NULL, akillmask, s_OperServ,
                           time(NULL) + SessionAutoKillExpiry,
                           "Session limit exceeded");
-                wallops(s_OperServ,
-                        "Added a temporary AKILL for \2%s\2 due to excessive connections",
-                        akillmask);
+                anope_cmd_global(s_OperServ,
+                                 "Added a temporary AKILL for \2%s\2 due to excessive connections",
+                                 akillmask);
             }
             return 0;
         } else {
@@ -292,9 +288,9 @@ void del_session(const char *host)
     session = findsession(host);
 
     if (!session) {
-        wallops(s_OperServ,
-                "WARNING: Tried to delete non-existant session: \2%s",
-                host);
+        anope_cmd_global(s_OperServ,
+                         "WARNING: Tried to delete non-existant session: \2%s",
+                         host);
         alog("session: Tried to delete non-existant session: %s", host);
         return;
     }
@@ -337,9 +333,9 @@ void expire_exceptions(void)
         if (exceptions[i].expires == 0 || exceptions[i].expires > now)
             continue;
         if (WallExceptionExpire)
-            wallops(s_OperServ,
-                    "Session limit exception for %s has expired.",
-                    exceptions[i].mask);
+            anope_cmd_global(s_OperServ,
+                             "Session limit exception for %s has expired.",
+                             exceptions[i].mask);
         free(exceptions[i].mask);
         free(exceptions[i].reason);
         nexceptions--;
@@ -429,7 +425,7 @@ void load_exceptions()
         restore_db(f);                                          \
         log_perror("Write error on %s", ExceptionDBName);       \
         if (time(NULL) - lastwarn > WarningTimeout) {           \
-            wallops(NULL, "Write error on %s: %s", ExceptionDBName,  \
+            anope_cmd_global(NULL, "Write error on %s: %s", ExceptionDBName,  \
                         strerror(errno));                       \
             lastwarn = time(NULL);                              \
         }                                                       \

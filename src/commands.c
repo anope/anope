@@ -22,7 +22,7 @@
  * command exists.
  */
 
-Command *lookup_cmd(Command * list, const char *cmd)
+Command *lookup_cmd(Command * list, char *cmd)
 {
     Command *c;
 
@@ -39,22 +39,20 @@ Command *lookup_cmd(Command * list, const char *cmd)
  * privilege to do so; if not, print an appropriate error message.
  */
 
-void run_cmd(const char *service, User * u, Command * list,
-             const char *cmd)
+void run_cmd(char *service, User * u, Command * list, char *cmd)
 {
     Command *c = lookup_cmd(list, cmd);
     do_run_cmd(service, u, c, cmd);
 }
 
-void mod_run_cmd(const char *service, User * u, CommandHash * cmdTable[],
+void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
                  const char *cmd)
 {
     Command *c = findCommand(cmdTable, cmd);
     do_run_cmd(service, u, c, cmd);
 }
 
-void do_run_cmd(const char *service, User * u, Command * c,
-                const char *cmd)
+void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
 {
     int retVal = 0;
     Command *current;
@@ -97,8 +95,7 @@ void do_run_cmd(const char *service, User * u, Command * c,
 
 /* Print a help message for the given command. */
 
-void do_help_cmd(const char *service, User * u, Command * c,
-                 const char *cmd)
+void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
 {
     Command *current;
     int has_had_help = 0;
@@ -161,14 +158,13 @@ void do_help_cmd(const char *service, User * u, Command * c,
     }
 }
 
-void help_cmd(const char *service, User * u, Command * list,
-              const char *cmd)
+void help_cmd(char *service, User * u, Command * list, char *cmd)
 {
     Command *c = lookup_cmd(list, cmd);
     do_help_cmd(service, u, c, cmd);
 }
 
-void mod_help_cmd(const char *service, User * u, CommandHash * cmdTable[],
+void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
                   const char *cmd)
 {
     Command *c = findCommand(cmdTable, cmd);

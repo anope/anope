@@ -17,63 +17,8 @@
 int servernum = 0;
 
 extern void moduleAddMsgs(void);
+extern void moduleAddIRCDMsgs(void);
 /*************************************************************************/
-
-/* Send a NICK command for the given pseudo-client. If `user' is NULL,
- * send NICK commands for all the pseudo-clients.
- * 
- * Now also sends MODE and SQLINE */
-#if defined(IRC_HYBRID)
-# define NICK(nick,name,modes) \
-    do { \
-	kill_user(NULL, (nick), "Nick used by Services"); \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", (nick), time(NULL), (modes), \
-		ServiceUser, ServiceHost, ServerName, (name)); \
-	} while (0)
-#elif defined(IRC_ULTIMATE3)
-# define NICK(nick,name,modes) \
-    do { \
-	send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", (nick), time(NULL), (modes), \
-		ServiceUser, ServiceHost, ServerName, (name)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-	} while (0)
-#elif defined(IRC_RAGE2)
-# define NICK(nick,name,modes) \
-    do { \
-	send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", (nick), time(NULL), ServiceUser, \
-		ServiceHost, ServerName, (modes), (name)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_BAHAMUT)
-# define NICK(nick,name,modes) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", (nick), time(NULL), (modes), \
-		ServiceUser, ServiceHost, ServerName, (name)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-	} while (0)
-#elif defined(IRC_UNREAL)
-# define NICK(nick,name,modes) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", (nick), time(NULL), \
-		ServiceUser, ServiceHost, ServerName, (modes), (name)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_DREAMFORGE)
-# define NICK(nick,name,modes) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", (nick), time(NULL), \
-		ServiceUser, ServiceHost, ServerName, (name)); \
-	if (strcmp(modes, "+")) send_mode((nick), (nick), "%s", (modes)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_PTLINK)
-# define NICK(nick,name,modes) \
-    do { \
-        send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", (nick), time(NULL), \
-                (modes), ServiceUser, ServiceHost, ServiceHost, ServerName, (name)); \
-	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#endif
 
 void introduce_user(const char *user)
 {
@@ -87,98 +32,107 @@ void introduce_user(const char *user)
     lasttimes[LTSIZE - 1] = time(NULL);
 #undef LTSIZE
 
+    /* NickServ */
     if (!user || stricmp(user, s_NickServ) == 0) {
         EnforceQlinedNick(s_NickServ, NULL);
-        NICK(s_NickServ, desc_NickServ, NICKSERV_MODE);
+        anope_cmd_nick(s_NickServ, desc_NickServ, ircd->nickservmode);
     }
+
+    /* ChanServ */
     if (!user || stricmp(user, s_ChanServ) == 0) {
         EnforceQlinedNick(s_ChanServ, NULL);
-        NICK(s_ChanServ, desc_ChanServ, CHANSERV_MODE);
+        anope_cmd_nick(s_ChanServ, desc_ChanServ, ircd->chanservmode);
     }
-#ifdef HAS_VHOST
-    if (s_HostServ && (!user || stricmp(user, s_HostServ) == 0)) {
+    if (s_HostServ && ircd->vhost
+        && (!user || stricmp(user, s_HostServ) == 0)) {
         EnforceQlinedNick(s_HostServ, NULL);
-        NICK(s_HostServ, desc_HostServ, HOSTSERV_MODE);
+        anope_cmd_nick(s_HostServ, desc_HostServ, ircd->hostservmode);
     }
-#endif
 
     if (!user || stricmp(user, s_MemoServ) == 0) {
         EnforceQlinedNick(s_MemoServ, NULL);
-        NICK(s_MemoServ, desc_MemoServ, MEMOSERV_MODE);
+        anope_cmd_nick(s_MemoServ, desc_MemoServ, ircd->memoservmode);
     }
 
     if (s_BotServ && (!user || stricmp(user, s_BotServ) == 0)) {
         EnforceQlinedNick(s_BotServ, NULL);
-        NICK(s_BotServ, desc_BotServ, BOTSERV_MODE);
+        anope_cmd_nick(s_BotServ, desc_BotServ, ircd->botservmode);
     }
 
     if (!user || stricmp(user, s_HelpServ) == 0) {
         EnforceQlinedNick(s_HelpServ, NULL);
-        NICK(s_HelpServ, desc_HelpServ, HELPSERV_MODE);
+        anope_cmd_nick(s_HelpServ, desc_HelpServ, ircd->helpservmode);
     }
 
     if (!user || stricmp(user, s_OperServ) == 0) {
         EnforceQlinedNick(s_OperServ, NULL);
-        NICK(s_OperServ, desc_OperServ, OPERSERV_MODE);
+        anope_cmd_nick(s_OperServ, desc_OperServ, ircd->operservmode);
     }
 
     if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0)) {
         EnforceQlinedNick(s_DevNull, NULL);
-        NICK(s_DevNull, desc_DevNull, DEVNULL_MODE);
+        anope_cmd_nick(s_DevNull, desc_DevNull, ircd->devnullmode);
     }
 
     if (!user || stricmp(user, s_GlobalNoticer) == 0) {
         EnforceQlinedNick(s_GlobalNoticer, NULL);
-        NICK(s_GlobalNoticer, desc_GlobalNoticer, GLOBAL_MODE);
+        anope_cmd_nick(s_GlobalNoticer, desc_GlobalNoticer,
+                       ircd->globalmode);
     }
 
     /* We make aliases go online */
     if (s_NickServAlias && (!user || stricmp(user, s_NickServAlias) == 0)) {
         EnforceQlinedNick(s_NickServAlias, NULL);
-        NICK(s_NickServAlias, desc_NickServAlias, NICKSERV_ALIAS_MODE);
+        anope_cmd_nick(s_NickServAlias, desc_NickServAlias,
+                       ircd->nickservaliasmode);
     }
 
     if (s_ChanServAlias && (!user || stricmp(user, s_ChanServAlias) == 0)) {
         EnforceQlinedNick(s_ChanServAlias, NULL);
-        NICK(s_ChanServAlias, desc_ChanServAlias, CHANSERV_ALIAS_MODE);
+        anope_cmd_nick(s_ChanServAlias, desc_ChanServAlias,
+                       ircd->chanservaliasmode);
     }
 
     if (s_MemoServAlias && (!user || stricmp(user, s_MemoServAlias) == 0)) {
         EnforceQlinedNick(s_MemoServAlias, NULL);
-        NICK(s_MemoServAlias, desc_MemoServAlias, MEMOSERV_ALIAS_MODE);
+        anope_cmd_nick(s_MemoServAlias, desc_MemoServAlias,
+                       ircd->memoservaliasmode);
     }
 
     if (s_BotServAlias && (!user || stricmp(user, s_BotServAlias) == 0)) {
         EnforceQlinedNick(s_BotServAlias, NULL);
-        NICK(s_BotServAlias, desc_BotServAlias, BOTSERV_ALIAS_MODE);
+        anope_cmd_nick(s_BotServAlias, desc_BotServAlias,
+                       ircd->botservaliasmode);
     }
 
     if (s_HelpServAlias && (!user || stricmp(user, s_HelpServAlias) == 0)) {
         EnforceQlinedNick(s_HelpServAlias, NULL);
-        NICK(s_HelpServAlias, desc_HelpServAlias, HELPSERV_ALIAS_MODE);
+        anope_cmd_nick(s_HelpServAlias, desc_HelpServAlias,
+                       ircd->helpservaliasmode);
     }
 
     if (s_OperServAlias && (!user || stricmp(user, s_OperServAlias) == 0)) {
         EnforceQlinedNick(s_OperServAlias, NULL);
-        NICK(s_OperServAlias, desc_OperServAlias, OPERSERV_ALIAS_MODE);
+        anope_cmd_nick(s_OperServAlias, desc_OperServAlias,
+                       ircd->operservaliasmode);
     }
 
     if (s_DevNullAlias && (!user || stricmp(user, s_DevNullAlias) == 0)) {
         EnforceQlinedNick(s_DevNullAlias, NULL);
-        NICK(s_DevNullAlias, desc_DevNullAlias, DEVNULL_ALIAS_MODE);
+        anope_cmd_nick(s_DevNullAlias, desc_DevNullAlias,
+                       ircd->devnullvaliasmode);
     }
-#ifdef HAS_VHOST
-    if (s_HostServAlias && (!user || stricmp(user, s_HostServAlias) == 0)) {
+    if (s_HostServAlias && ircd->vhost
+        && (!user || stricmp(user, s_HostServAlias) == 0)) {
         EnforceQlinedNick(s_HostServAlias, NULL);
-        NICK(s_HostServAlias, desc_HostServAlias, HOSTSERV_ALIAS_MODE);
+        anope_cmd_nick(s_HostServAlias, desc_HostServAlias,
+                       ircd->hostservaliasmode);
     }
-#endif
-
     if (s_GlobalNoticerAlias
         && (!user || stricmp(user, s_GlobalNoticerAlias) == 0)) {
         EnforceQlinedNick(s_GlobalNoticerAlias, NULL);
-        NICK(s_GlobalNoticerAlias, desc_GlobalNoticerAlias,
-             GLOBAL_ALIAS_MODE);
+        anope_cmd_nick(s_GlobalNoticerAlias, desc_GlobalNoticerAlias,
+                       ircd->globalaliasmode);
     }
 
     /* We make the bots go online */
@@ -192,8 +146,8 @@ void introduce_user(const char *user)
                 EnforceQlinedNick(bi->nick, s_BotServ);
 
                 if (!user || !stricmp(user, bi->nick))
-                    NEWNICK(bi->nick, bi->user, bi->host, bi->real,
-                            BOTSERV_BOTS_MODE, 1);
+                    anope_cmd_bot_nick(bi->nick, bi->user, bi->host,
+                                       bi->real, ircd->botserv_bot_mode);
             }
     }
 }
@@ -513,6 +467,9 @@ int init(int ac, char **av)
     if (!read_config(0))
         return -1;
 
+    /* Add IRCD Message handlers */
+    moduleAddIRCDMsgs();
+
     /* Add Core MSG handles */
     moduleAddMsgs();
 
@@ -735,75 +692,8 @@ int init(int ac, char **av)
              RemotePort);
     }
 
-#ifdef IRC_UNREAL
-    send_cmd(NULL, "PROTOCTL NICKv2 VHP");
-#endif
-#if defined(IRC_ULTIMATE3)
-    if (servernum == 1)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword);
-    else if (servernum == 2)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
-    else if (servernum == 3)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-    send_cmd(NULL, "CAPAB NICKIP SSJ5 TS5 CLIENT");
-#elif defined(IRC_RAGE2)
-    if (servernum == 1)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword);
-    else if (servernum == 2)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
-    else if (servernum == 3)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-    send_cmd(NULL, "CAPAB SSJ3 SN2 VHOST");
-#elif defined(IRC_BAHAMUT)
-    if (servernum == 1)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword);
-    else if (servernum == 2)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
-    else if (servernum == 3)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-    send_cmd(NULL, "CAPAB NICKIP SSJOIN TS3 NOQUIT TSMODE UNCONNECT");
-#elif defined(IRC_HYBRID)
-    if (servernum == 1)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword);
-    else if (servernum == 2)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
-    else if (servernum == 3)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-    send_cmd(NULL, "CAPAB TS5 EX IE HOPS HUB AOPS");
-#elif defined(IRC_PTLINK)
-    if (servernum == 1)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword);
-    else if (servernum == 2)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
-    else if (servernum == 3)
-        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
-#else
-    if (servernum == 1)
-        send_cmd(NULL, "PASS :%s", RemotePassword);
-    if (servernum == 2)
-        send_cmd(NULL, "PASS :%s", RemotePassword2);
-    if (servernum == 3)
-        send_cmd(NULL, "PASS :%s", RemotePassword3);
-#endif
-#ifdef IRC_PTLINK
-    send_cmd(NULL, "SERVER %s 1 Anope.Services%s :%s",
-             ServerName, version_number, ServerDesc);
-#else
-    send_cmd(NULL, "SERVER %s 1 :%s", ServerName, ServerDesc);
-#endif
-#ifdef IRC_RAGE2
-    send_cmd(NULL, "SVINFO 5 5 0 %ld bluemoon 0", time(NULL));
-#endif
-#if defined(IRC_BAHAMUT) && !defined(IRC_RAGE2)
-    send_cmd(NULL, "SVINFO 3 1 0 :%ld", time(NULL));
-#endif
-#ifdef IRC_HYBRID
-    send_cmd(NULL, "SVSINFO 5 5 0 :%ld", time(NULL));
-#endif
-#ifdef IRC_PTLINK
-    send_cmd(NULL, "SVINFO 3 6 %lu", time(NULL));
-    send_cmd(NULL, "SVSINFO %lu %d", time(NULL), maxusercnt);
-#endif
+    anope_cmd_connect(servernum);
+
     sgets2(inbuf, sizeof(inbuf), servsock);
     if (strnicmp(inbuf, "ERROR", 5) == 0) {
         /* Close server socket first to stop wallops, since the other
@@ -815,20 +705,17 @@ int init(int ac, char **av)
 
     /* Announce a logfile error if there was one */
     if (openlog_failed) {
-        wallops(NULL, "Warning: couldn't open logfile: %s",
-                strerror(openlog_errno));
+        anope_cmd_global(NULL, "Warning: couldn't open logfile: %s",
+                         strerror(openlog_errno));
     }
 
     /* Bring in our pseudo-clients */
     introduce_user(NULL);
 
     /* And hybrid needs Global joined in the logchan */
-#ifdef IRC_HYBRID
-    if (logchan) {
-        send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), LogChannel,
-                 s_GlobalNoticer);
+    if (logchan && ircd->join2msg) {
+        anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
     }
-#endif
 
     /**
       * Load our delayed modeles - modules that are planing on making clients need to wait till now

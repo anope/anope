@@ -248,7 +248,7 @@ void fatal(const char *fmt, ...)
     if (nofork)
         fprintf(stderr, "%sFATAL: %s\n", buf, buf2);
     if (servsock >= 0)
-        wallops(NULL, "FATAL ERROR!  %s", buf2);
+        anope_cmd_global(NULL, "FATAL ERROR!  %s", buf2);
     exit(1);
 }
 
@@ -291,7 +291,8 @@ void fatal_perror(const char *fmt, ...)
         fprintf(stderr, "%sFATAL: %s: %s\n", buf, buf2,
                 strerror(errno_save));
     if (servsock >= 0)
-        wallops(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
+        anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
+                         strerror(errno_save));
     exit(1);
 }
 

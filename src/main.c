@@ -102,16 +102,18 @@ static void expire_all(void)
     }
     waiting = -25;
     expire_akills();
-#ifdef IRC_BAHAMUT
-    waiting = -26;
-    expire_sglines();
-#endif
-    waiting = -28;
-    expire_sqlines();
-#ifdef IRC_BAHAMUT
-    waiting = -27;
-    expire_szlines();
-#endif
+    if (ircd->sgline) {
+        waiting = -26;
+        expire_sglines();
+    }
+    if (ircd->sqline) {
+        waiting = -28;
+        expire_sqlines();
+    }
+    if (ircd->szline) {
+        waiting = -27;
+        expire_szlines();
+    }
 #ifndef STREAMLINED
     expire_exceptions();
 #endif
@@ -170,7 +172,7 @@ void save_databases(void)
                 waiting = -13;
             }
             /* Temporary fix to avoid unwanted timeouts... */
-            send_cmd(ServerName, "PONG %s", ServerName);
+            anope_cmd_pong(ServerName, ServerName);
             if (s_BotServ) {
                 waiting = -14;
                 save_bs_rdb_dbase();
@@ -199,7 +201,7 @@ static void services_restart(void)
     alog("Restarting");
     if (!quitmsg)
         quitmsg = "Restarting";
-    send_cmd(ServerName, "SQUIT %s :%s", ServerName, quitmsg);
+    anope_cmd_squit(ServerName, quitmsg);
     disconn(servsock);
     close_log();
 #if defined(LINUX20) || defined(LINUX22)
@@ -236,7 +238,7 @@ static void services_shutdown(void)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);
     if (started)
-        send_cmd(ServerName, "SQUIT %s :%s", ServerName, quitmsg);
+        anope_cmd_squit(ServerName, quitmsg);
     disconn(servsock);
 }
 
@@ -301,7 +303,7 @@ void sighandler(int signum)
                 inbuf[447] = '>';
                 inbuf[448] = 0;
             }
-            wallops(NULL, "PANIC! buffer = %s\r\n", inbuf);
+            anope_cmd_global(NULL, "PANIC! buffer = %s\r\n", inbuf);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
             static char buf[BUFSIZE];
@@ -345,21 +347,20 @@ void sighandler(int signum)
             case -25:
                 snprintf(buf, sizeof(buf), "expiring autokills");
                 break;
-#ifdef IRC_BAHAMUT
             case -26:
                 snprintf(buf, sizeof(buf), "expiring SGLINEs");
                 break;
             case -27:
                 snprintf(buf, sizeof(buf), "expiring SZLINEs");
                 break;
-#endif
             case -28:
                 snprintf(buf, sizeof(buf), "expiring SQLINEs");
                 break;
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            wallops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
+            anope_cmd_global(NULL, "PANIC! %s (%s)", buf,
+                             strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
         }
     }
@@ -456,8 +457,8 @@ int main(int ac, char **av, char **envp)
 
         if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
             if (delayed_quit)
-                wallops(NULL,
-                        "Updating databases on shutdown, please wait.");
+                anope_cmd_global(NULL,
+                                 "Updating databases on shutdown, please wait.");
 
             save_databases();
 
@@ -510,7 +511,7 @@ int main(int ac, char **av, char **envp)
         alog("Restarting");
         if (!quitmsg)
             quitmsg = "Restarting";
-        send_cmd(ServerName, "SQUIT %s :%s", ServerName, quitmsg);
+        anope_cmd_squit(ServerName, quitmsg);
         disconn(servsock);
         close_log();
 #if defined(LINUX20) || defined(LINUX22)

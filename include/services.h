@@ -57,9 +57,13 @@
 #ifdef USE_MYSQL
 # define MYSQL_WARNING 2
 # define MYSQL_ERROR   4
-
-#include "mysql.h"
-#include "errmsg.h"
+#ifdef HAVE_MYSQL_MYSQL_H
+# include <mysql.h>
+# include <errmsg.h>
+#else
+# include <mysql/mysql.h>
+# include <mysql/errmsg.h>
+#endif
 #endif
 
 #if HAVE_STRINGS_H
@@ -124,280 +128,155 @@ extern int toupper(char), tolower(char);
 typedef struct server_ Server;
 typedef struct user_ User;
 typedef struct channel_ Channel;
+typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
+typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
+typedef struct memo_ Memo;
+typedef struct nickrequest_ NickRequest;
+typedef struct nickalias_ NickAlias;
+typedef struct nickcore_ NickCore;
+typedef struct botinfo_ BotInfo;
+typedef struct chaninfo_ ChannelInfo;
+typedef struct badword_ BadWord;
+typedef struct bandata_ BanData;
+typedef struct userdata_ UserData;
+typedef struct mailinfo_ MailInfo;
+typedef struct akill_ Akill;
+typedef struct sxline_ SXLine;
+typedef struct hostcore_ HostCore;
+typedef struct newsitem_ NewsItem;
+typedef struct hostcache_ HostCache;
+typedef struct exception_ Exception;
+typedef struct cbmode_ CBMode;
+typedef struct cbmodeinfo_ CBModeInfo;
+typedef struct cmmode_ CMMode;
+typedef struct csmode_ CSMode;
+typedef struct cumode_ CUMode;
+typedef struct csmodeutil_ CSModeUtil;
 
 /*************************************************************************/
+
+typedef enum { false, true } boolean;
+
 /*************************************************************************/
 
 /* Protocol tweaks */
 
 
+#include "hybrid.h"
+#include "viagra.h"
+#include "bahamut.h"
+#include "rageircd.h"
+#include "ptlink.h"
+#include "ultimate2.h"
+#include "unreal31.h"
+#include "ultimate3.h"
+#include "dreamforge.h"
+#include "unreal32.h"
 
-#ifdef IRC_HYBRID
-# define HAS_HALFOP
-# define HAS_EXCEPT			/* Has +e (chan excepts) */
-# define NICKSERV_MODE "+o"
-# define CHANSERV_MODE "+o"
-# define MEMOSERV_MODE "+o"
-# define BOTSERV_MODE "+o"
-# define HELPSERV_MODE "+h"
-# define OPERSERV_MODE "+io"
-# define DEVNULL_MODE "+i"
-# define GLOBAL_MODE "+io"
-# define NICKSERV_ALIAS_MODE "+o"
-# define CHANSERV_ALIAS_MODE "+o"
-# define MEMOSERV_ALIAS_MODE "+o"
-# define BOTSERV_ALIAS_MODE "+o"
-# define HELPSERV_ALIAS_MODE "+h"
-# define OPERSERV_ALIAS_MODE "+io"
-# define DEVNULL_ALIAS_MODE "+i"
-# define GLOBAL_ALIAS_MODE "+io"
-# define BOTSERV_BOTS_MODE "+"
-#endif
+typedef struct ircdvars_ IRCDVar;
+typedef struct ircdcapab_ IRCDCAPAB;
 
-#ifdef IRC_VIAGRA
-# define HAS_HALFOP
-# define HAS_VHOST
-# define HAS_VIDENT
-# define HAS_EXCEPT
-# define NICKSERV_MODE "+oS"
-# define CHANSERV_MODE "+oS"
-# define HOSTSERV_MODE "+oS"
-# define MEMOSERV_MODE "+oS"
-# define BOTSERV_MODE "+oS"
-# define HELPSERV_MODE "+oS"
-# define OPERSERV_MODE "+ioS"
-# define DEVNULL_MODE "+i"
-# define GLOBAL_MODE "+ioS"
-# define NICKSERV_ALIAS_MODE "+oS"
-# define CHANSERV_ALIAS_MODE "+oS"
-# define MEMOSERV_ALIAS_MODE "+oS"
-# define BOTSERV_ALIAS_MODE "+oS"
-# define HELPSERV_ALIAS_MODE "+oS"
-# define OPERSERV_ALIAS_MODE "+ioS"
-# define DEVNULL_ALIAS_MODE "+iS"
-# define GLOBAL_ALIAS_MODE "+ioS"
-# define HOSTSERV_ALIAS_MODE "+ioS"
-# define BOTSERV_BOTS_MODE "+qS"
-#endif
+struct ircdvars_ {
+	char *name;				/* Name of the ChanServ command */
+	char *nickservmode;			/* Mode used by NickServ	*/
+	char *chanservmode;			/* Mode used by ChanServ	*/
+	char *memoservmode;			/* Mode used by MemoServ	*/
+	char *hostservmode;			/* Mode used by HostServ	*/
+	char *operservmode;			/* Mode used by OperServ	*/
+	char *botservmode;			/* Mode used by BotServ		*/
+	char *helpservmode;			/* Mode used by HelpServ	*/
+	char *devnullmode;			/* Mode used by Dev/Null	*/
+	char *globalmode;			/* Mode used by Global		*/
+	char *nickservaliasmode;		/* Mode used by NickServ Alias	*/
+	char *chanservaliasmode;		/* Mode used by ChanServ Alias	*/
+	char *memoservaliasmode;		/* Mode used by MemoServ Alias	*/
+	char *hostservaliasmode;		/* Mode used by HostServ Alias	*/
+	char *operservaliasmode;		/* Mode used by OperServ Alias	*/
+	char *botservaliasmode;			/* Mode used by BotServ	 Alias	*/
+	char *helpservaliasmode;		/* Mode used by HelpServ Alias	*/
+	char *devnullvaliasmode;		/* Mode used by Dev/Null Alias	*/
+	char *globalaliasmode;			/* Mode used by Global	 Alias	*/
+	char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
+	int max_symbols;			/* Chan Max Symbols		*/
+	char *modestoremove;			/* Channel Modes to remove	*/
+	char *botchanumode;			/* Modes set when botserv joins a channel */
+	int svsnick;				/* Supports SVSNICK		*/
+	int vhost;				/* Supports vhost		*/
+	int owner;				/* Supports Owner		*/
+	char *ownerset;				/* Mode to set for owner	*/
+	char *ownerunset;			/* Mode to unset for a owner	*/
+	char *modeonreg;			/* Mode on Register		*/
+	char *modeonunreg;			/* Mode on Unregister		*/
+	char *modeonnick;			/* Mode on nick change		*/
+	int sgline;				/* Supports SGline		*/
+	int sqline;				/* Supports SQline		*/
+	int szline;				/* Supports SZline		*/
+	int halfop;				/* Supports HalfOp		*/
+	int numservargs;			/* Number of Server Args	*/
+	int join2set;				/* Join 2 Set Modes		*/
+	int join2msg;				/* Join 2 Message		*/
+	int except;				/* exception +e			*/
+	int topictsforward;			/* TS on Topics Forward		*/
+	int topictsbackward;			/* TS on Topics Backward	*/
+	uint32 protectedumode;			/* What is the Protected Umode	*/
+	int admin;				/* Has Admin 			*/
+	int chansqline;				/* Supports Channel Sqlines	*/
+	int quitonkill;				/* IRCD sends QUIT when kill	*/
+	int svsmode_unban;			/* svsmode can be used to unban	*/
+	int protect;				/* Has protect modes		*/
+	int reversekickcheck;			/* Can reverse ban check	*/
+	int chanreg;				/* channel mode +r for register	*/
+	uint32 regmode;				/* Mode to use for +r 		*/
+	int vident;				/* Supports vidents		*/
+	int svshold;				/* Supports svshold		*/
+	int tsonmode;				/* Timestamp on mode changes	*/
+	int nickip;				/* Sends IP on NICK		*/
+	int omode;				/* On the fly o:lines		*/
+	int umode;				/* change user modes		*/
+	int nickvhost;				/* Users vhost sent during NICK */
+	int chgreal;				/* Change RealName		*/
+	int extrahelp;				/* Lang file entry for extra 	*/
+	uint32 noknock;				/* Channel Mode for no knock	*/
+	uint32 adminmode;			/* Admin Only Channel Mode	*/
+	uint32 defmlock;			/* Default mlock modes		*/
+	uint32 vhostmode;			/* Vhost mode			*/
+	int fmode;				/* +f				*/
+	int Lmode;				/* +L				*/
+	uint32 chan_fmode;			/* Mode 			*/
+	uint32 chan_lmode;			/* Mode				*/
+	int check_nick_id;			/* On nick change check if they could be identified */
+};
 
-#if defined(IRC_BAHAMUT)
-# define HAS_NICKIP
- #if !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
-# define HAS_EXCEPT
-# define HAS_SVSHOLD                                                            
-# define NICKSERV_MODE "+o"
-# define CHANSERV_MODE "+o"
-# define MEMOSERV_MODE "+o"
-# define BOTSERV_MODE "+o"
-# define HELPSERV_MODE "+h"
-# define OPERSERV_MODE "+io"
-# define DEVNULL_MODE "+i"
-# define GLOBAL_MODE "+io"
-# define NICKSERV_ALIAS_MODE "+o"
-# define CHANSERV_ALIAS_MODE "+o"
-# define MEMOSERV_ALIAS_MODE "+o"
-# define BOTSERV_ALIAS_MODE "+o"
-# define HELPSERV_ALIAS_MODE "+h"
-# define OPERSERV_ALIAS_MODE "+io"
-# define DEVNULL_ALIAS_MODE "+i"
-# define GLOBAL_ALIAS_MODE "+io"
-# define BOTSERV_BOTS_MODE "+"
- #endif
-#endif
-
-#ifdef IRC_RAGE2
-# define HAS_HALFOP
-# define HAS_EXCEPT
-# define HAS_VHOST
-# define HAS_NICKVHOST
-# define NICKSERV_MODE "+dS"
-# define CHANSERV_MODE "+dS"
-# define HOSTSERV_MODE "+dS"
-# define MEMOSERV_MODE "+dS"
-# define BOTSERV_MODE "+dS"
-# define HELPSERV_MODE "+dSh"
-# define OPERSERV_MODE "+diS"
-# define DEVNULL_MODE "+diS"
-# define GLOBAL_MODE "+diS"
-# define NICKSERV_ALIAS_MODE "+o"
-# define CHANSERV_ALIAS_MODE "+o"
-# define MEMOSERV_ALIAS_MODE "+o"
-# define BOTSERV_ALIAS_MODE "+o"
-# define HELPSERV_ALIAS_MODE "+h"
-# define OPERSERV_ALIAS_MODE "+io"
-# define DEVNULL_ALIAS_MODE "+i"
-# define GLOBAL_ALIAS_MODE "+io"
-# define HOSTSERV_ALIAS_MODE "+io"
-# define BOTSERV_BOTS_MODE "+S"
-#endif
-
-#ifdef IRC_PTLINK
-# define HAS_NICKVHOST
-# define HAS_VHOST
-# define HAS_FMODE
-# define HAS_EXCEPT
-# define NICKSERV_MODE "+o"
-# define CHANSERV_MODE "+o"
-# define HOSTSERV_MODE "+o"
-# define MEMOSERV_MODE "+o"
-# define BOTSERV_MODE "+o"
-# define HELPSERV_MODE "+h"
-# define OPERSERV_MODE "+io"
-# define DEVNULL_MODE "+i"
-# define GLOBAL_MODE "+io"
-# define NICKSERV_ALIAS_MODE "+o"
-# define CHANSERV_ALIAS_MODE "+o"
-# define MEMOSERV_ALIAS_MODE "+o"
-# define BOTSERV_ALIAS_MODE "+o"
-# define HELPSERV_ALIAS_MODE "+h"
-# define OPERSERV_ALIAS_MODE "+io"
-# define DEVNULL_ALIAS_MODE "+i"
-# define GLOBAL_ALIAS_MODE "+io"
-# define HOSTSERV_ALIAS_MODE "+io"
-# define BOTSERV_BOTS_MODE "+"
-#endif
-
-#ifdef IRC_ULTIMATE
-# define HAS_FMODE			/* Has +f chan mode */
-# define HAS_HALFOP
-# define HAS_LMODE			/* Has +L chan mode */
-# define HAS_VHOST
-# define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
-# define HAS_EXCEPT
-# define NICKSERV_MODE "+S"
-# define CHANSERV_MODE "+S"
-# define HOSTSERV_MODE "+oS"
-# define MEMOSERV_MODE "+S"
-# define BOTSERV_MODE "+S"
-# define HELPSERV_MODE "+Sh"
-# define OPERSERV_MODE "+iS"
-# define DEVNULL_MODE "+iS"
-# define GLOBAL_MODE "+iS"
-# define NICKSERV_ALIAS_MODE "+oS"
-# define CHANSERV_ALIAS_MODE "+oS"
-# define MEMOSERV_ALIAS_MODE "+oS"
-# define BOTSERV_ALIAS_MODE "+oS"
-# define HELPSERV_ALIAS_MODE "+oS"
-# define OPERSERV_ALIAS_MODE "+ioS"
-# define DEVNULL_ALIAS_MODE "+iS"
-# define GLOBAL_ALIAS_MODE "+ioS"
-# define HOSTSERV_ALIAS_MODE "+ioS"
-# define BOTSERV_BOTS_MODE "+pS"
-#endif
-
-#ifdef IRC_UNREAL
-# define HAS_FMODE			/* Has +f chan mode */
-# define HAS_HALFOP
-# define HAS_LMODE			/* Has +L chan mode */
-# define HAS_NICKVHOST
-# define HAS_VHOST
-# define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
-# define HAS_EXCEPT
-# define NICKSERV_MODE "+oS"
-# define CHANSERV_MODE "+oS"
-# define HOSTSERV_MODE "+oS"
-# define MEMOSERV_MODE "+oS"
-# define BOTSERV_MODE "+oS"
-# define HELPSERV_MODE "+oS"
-# define OPERSERV_MODE "+ioS"
-# define DEVNULL_MODE "+iS"
-# define GLOBAL_MODE "+ioS"
-# define NICKSERV_ALIAS_MODE "+oS"
-# define CHANSERV_ALIAS_MODE "+oS"
-# define MEMOSERV_ALIAS_MODE "+oS"
-# define BOTSERV_ALIAS_MODE "+oS"
-# define HELPSERV_ALIAS_MODE "+oS"
-# define OPERSERV_ALIAS_MODE "+ioS"
-# define DEVNULL_ALIAS_MODE "+iS"
-# define GLOBAL_ALIAS_MODE "+ioS"
-# define HOSTSERV_ALIAS_MODE "+ioS"
-# define BOTSERV_BOTS_MODE "+qS"
-#endif
-
-#ifdef IRC_ULTIMATE3
-# define HAS_HALFOP
-# define HAS_VHOST
-# define HAS_NICKVHOST
-# define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
-# define HAS_EXCEPT
-# define NICKSERV_MODE "+S"
-# define CHANSERV_MODE "+S"
-# define HOSTSERV_MODE "+o"
-# define MEMOSERV_MODE "+S"
-# define BOTSERV_MODE "+S"
-# define HELPSERV_MODE "+Sh"
-# define OPERSERV_MODE "+iS"
-# define DEVNULL_MODE "+iS"
-# define GLOBAL_MODE "+iS"
-# define NICKSERV_ALIAS_MODE "+o"
-# define CHANSERV_ALIAS_MODE "+o"
-# define MEMOSERV_ALIAS_MODE "+o"
-# define BOTSERV_ALIAS_MODE "+o"
-# define HELPSERV_ALIAS_MODE "+h"
-# define OPERSERV_ALIAS_MODE "+io"
-# define DEVNULL_ALIAS_MODE "+i"
-# define GLOBAL_ALIAS_MODE "+io"
-# define HOSTSERV_ALIAS_MODE "+io"
-# define BOTSERV_BOTS_MODE "+S"
-#endif
-
-/*
-  This gets ugly since serval ircds use both DREAMFORCE and their own define
-*/
-
-#ifdef IRC_DREAMFORGE
- #ifndef NICKSERV_MODE
-  # define NICKSERV_MODE "+o"
- #endif 
- #ifndef CHANSERV_MODE
-  # define CHANSERV_MODE "+o"
- #endif 
- #ifndef MEMOSERV_MODE
-  # define MEMOSERV_MODE "+o"
- #endif
- #ifndef BOTSERV_MODE
-  # define BOTSERV_MODE "+o"
- #endif
- #ifndef HELPSERV_MODE
-  # define HELPSERV_MODE "+h"
- #endif
- #ifndef OPERSERV_MODE
-  # define OPERSERV_MODE "+io"
- #endif
- #ifndef DEVNULL_MODE
-  # define DEVNULL_MODE "+i"
- #endif
- #ifndef GLOBAL_MODE
-  # define GLOBAL_MODE "+io"
- #endif
- #ifndef BOTSERV_BOTS_MODE
-  # define BOTSERV_BOTS_MODE "+"
- #endif
- #ifndef NICKSERV_ALIAS_MODE
-  # define NICKSERV_ALIAS_MODE "+o"
- #endif 
- #ifndef CHANSERV_ALIAS_MODE
-  # define CHANSERV_ALIAS_MODE "+o"
- #endif 
- #ifndef MEMOSERV_ALIAS_MODE
-  # define MEMOSERV_ALIAS_MODE "+o"
- #endif
- #ifndef BOTSERV_ALIAS_MODE
-  # define BOTSERV_ALIAS_MODE "+o"
- #endif
- #ifndef HELPSERV_ALIAS_MODE
-  # define HELPSERV_ALIAS_MODE "+h"
- #endif
- #ifndef OPERSERV_ALIAS_MODE
-  # define OPERSERV_ALIAS_MODE "+io"
- #endif
- #ifndef DEVNULL_ALIAS_MODE
-  # define DEVNULL_ALIAS_MODE "+i"
- #endif
- #ifndef GLOBAL_ALIAS_MODE
-  # define GLOBAL_ALIAS_MODE "+io"
- #endif
-#endif
+struct ircdcapab_ {
+  uint32 noquit;
+  uint32 tsmode;
+  uint32 unconnect;  
+  uint32 nickip;
+  uint32 nsjoin;
+  uint32 zip;
+  uint32 burst;
+  uint32 ts5;
+  uint32 ts3;
+  uint32 dkey;
+  uint32 pt4;
+  uint32 scs;
+  uint32 qs;
+  uint32 uid;
+  uint32 knock;
+  uint32 client;
+  uint32 ipv6;
+  uint32 ssj5;
+  uint32 sn2;
+  uint32 token;
+  uint32 vhost;
+  uint32 ssj3;
+  uint32 nick2;
+  uint32 umode2;
+  uint32 vl;
+  uint32 tlkext;
+  uint32 dodkey;
+  uint32 dozip;
+};
 
 /*************************************************************************/
 
@@ -412,14 +291,15 @@ typedef struct channel_ Channel;
 #define PRE_NICK_VERSION 	1
 #define OPER_VERSION 		13
 
+/*************************************************************************/
+
+
 /**
  * ModuleData strucs used to allow modules to add / delete module Data from existing structs
  */
-typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
-typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
 
 struct ModuleDataItem_ {
-	char *key;								/* The key */
+	char *key;							/* The key */
 	char *value;							/* The Value */
 	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
 };
@@ -430,16 +310,11 @@ struct ModuleData_ {
 	ModuleData *next;						/* The next ModuleData record */
 };
 
-
-
-typedef enum { false, true } boolean;
-
 /*************************************************************************/
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
 
-typedef struct memo_ Memo;
 struct memo_ {
     uint32 number;	/* Index number -- not necessarily array position! */
     int16 flags;
@@ -449,9 +324,6 @@ struct memo_ {
     ModuleData *moduleData[1024]; 	/* Module saved data attached to the Memo */
 };
 
-#define MF_UNREAD	0x0001	/* Memo has not yet been read */
-#define MF_RECEIPT	0x0002	/* Sender requested receipt */
-
 typedef struct {
     int16 memocount, memomax;
     Memo *memos;
@@ -460,9 +332,7 @@ typedef struct {
 /*************************************************************************/
 
 /* NickServ nickname structures. */
-typedef struct nickrequest_ NickRequest;
-typedef struct nickalias_ NickAlias;
-typedef struct nickcore_ NickCore;
+
 
 struct nickrequest_ {
 	NickRequest *next, *prev;
@@ -470,124 +340,48 @@ struct nickrequest_ {
 	char *passcode;
 	char *password;
 	char *email;
-
 	time_t requested;
-
 	time_t lastmail;			/* Unsaved */
 };
 
 struct nickalias_ {
 	NickAlias *next, *prev;
-
-	char *nick;						/* Nickname */
-
-	char *last_quit;				/* Last quit message */
+	char *nick;				/* Nickname */
+	char *last_quit;			/* Last quit message */
 	char *last_realname;			/* Last realname */
 	char *last_usermask;			/* Last usermask */
-
-    time_t time_registered;			/* When the nick was registered */
-    time_t last_seen;				/* When it was seen online for the last time */
-
-    int16 status;					/* See NS_* below */
-
-    NickCore *nc;					/* I'm an alias of this */
-
-    /* Not saved */
-    ModuleData *moduleData[1024]; 	/* Module saved data attached to the nick alias */
-    User *u;						/* Current online user that has me */
+        time_t time_registered;			/* When the nick was registered */
+        time_t last_seen;			/* When it was seen online for the last time */
+        int16 status;				/* See NS_* below */
+        NickCore *nc;				/* I'm an alias of this */
+        /* Not saved */
+        ModuleData *moduleData[1024]; 		/* Module saved data attached to the nick alias */
+    	User *u;				/* Current online user that has me */
 };
 
 struct nickcore_ {
 	NickCore *next, *prev;
 
-	char *display;					/* How the nick is displayed */
-	char *pass;						/* Password of the nicks */
+	char *display;				/* How the nick is displayed */
+	char *pass;				/* Password of the nicks */
+	char *email;				/* E-mail associated to the nick */
+	char *greet;				/* Greet associated to the nick */
+	uint32 icq;				/* ICQ # associated to the nick */
+	char *url;				/* URL associated to the nick */
+	int32 flags;				/* See NI_* below */
+	uint16 language;			/* Language selected by nickname owner (LANG_*) */
+        int16 accesscount;			/* # of entries */
+        char **access;				/* Array of strings */
+        MemoInfo memos;
+        uint16 channelcount;			/* Number of channels currently registered */
+        uint16 channelmax;			/* Maximum number of channels allowed */
 
-	char *email;					/* E-mail associated to the nick */
-	char *greet;					/* Greet associated to the nick */
-	uint32 icq;						/* ICQ # associated to the nick */
-	char *url;						/* URL associated to the nick */
-
-	int32 flags;					/* See NI_* below */
-	uint16 language;				/* Language selected by nickname owner (LANG_*) */
-
-    int16 accesscount;				/* # of entries */
-    char **access;					/* Array of strings */
-
-    MemoInfo memos;
-
-    uint16 channelcount;			/* Number of channels currently registered */
-    uint16 channelmax;				/* Maximum number of channels allowed */
-
-    /* Unsaved data */
-    ModuleData *moduleData[1024];	/* Module saved data attached to the NickCore */
-    time_t lastmail;				/* Last time this nick record got a mail */
-    SList aliases;					/* List of aliases */
+        /* Unsaved data */
+        ModuleData *moduleData[1024];	  	/* Module saved data attached to the NickCore */
+        time_t lastmail;			/* Last time this nick record got a mail */
+        SList aliases;				/* List of aliases */
 };
 
-/* Nickname status flags: */
-#define NS_VERBOTEN		0x0002  	/* Nick may not be registered or used */
-#define NS_NO_EXPIRE	0x0004      /* Nick never expires */
-#define NS_IDENTIFIED	0x8000      /* User has IDENTIFY'd */
-#define NS_RECOGNIZED	0x4000      /* ON_ACCESS true && SECURE flag not set */
-#define NS_ON_ACCESS	0x2000      /* User comes from a known address */
-#define NS_KILL_HELD	0x1000      /* Nick is being held after a kill */
-#define NS_GUESTED	    0x0100	    /* SVSNICK has been sent but nick has not
-				     				 * yet changed. An enforcer will be
-				     				 * introduced when it does change. */
-#define NS_MASTER		0x0200		/* Was a master nick; used to import old databases */
-#define NS_TRANSGROUP	0xC000		/* Status flags that can be passed to a nick of the
-									   same group during nick change */
-#define NS_TEMPORARY	0xFF00      /* All temporary status flags */
-/* These two are not used anymore */
-#define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
-
-/* Nickname setting flags: */
-#define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
-#define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
-#define NI_MSG                  0x00000004	/* Use PRIVMSGs instead of NOTICEs */
-#define NI_MEMO_HARDMAX		0x00000008  /* Don't allow user to change memo limit */
-#define NI_MEMO_SIGNON		0x00000010  /* Notify of memos at signon and un-away */
-#define NI_MEMO_RECEIVE		0x00000020  /* Notify of new memos when sent */
-#define NI_PRIVATE		0x00000040  /* Don't show in LIST to non-servadmins */
-#define NI_HIDE_EMAIL		0x00000080  /* Don't show E-mail in INFO */
-#define NI_HIDE_MASK		0x00000100  /* Don't show last seen address in INFO */
-#define NI_HIDE_QUIT		0x00000200  /* Don't show last quit message in INFO */
-#define NI_KILL_QUICK		0x00000400  /* Kill in 20 seconds instead of 60 */
-#define NI_KILL_IMMED		0x00000800  /* Kill immediately instead of in 60 sec */
-#define NI_SERVICES_OPER 	0x00001000	/* User is a Services operator */
-#define NI_SERVICES_ADMIN	0x00002000	/* User is a Services admin */
-#define NI_ENCRYPTEDPW		0x00004000	/* Nickname password is encrypted */
-#define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
-#define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
-#define NI_HIDE_STATUS          0x00020000  /* Don't show services access status */
-
-/* Languages.  Never insert anything in the middle of this list, or
- * everybody will start getting the wrong language!  If you want to change
- * the order the languages are displayed in for NickServ HELP SET LANGUAGE,
- * do it in language.c.
- */
-#define LANG_EN_US              0	/* United States English */
-#define LANG_JA_JIS             1	/* Japanese (JIS encoding) */
-#define LANG_JA_EUC             2	/* Japanese (EUC encoding) */
-#define LANG_JA_SJIS            3	/* Japanese (SJIS encoding) */
-#define LANG_ES                 4	/* Spanish */
-#define LANG_PT                 5	/* Portugese */
-#define LANG_FR                 6	/* French */
-#define LANG_TR                 7	/* Turkish */
-#define LANG_IT                 8	/* Italian */
-#define LANG_DE                 9   /* German */
-#define LANG_CAT               10   /* Catalan */
-#define LANG_GR                11   /* Greek */
-#define LANG_NL                12   /* Dutch */
-#define LANG_RU                13   /* Russian */
-#define LANG_HUN               14   /* Hungarian */
-#define LANG_PL                15   /* Polish */
-
-#define NUM_LANGS              16	/* Number of languages */
-#define USED_LANGS             13	/* Number of languages provided */
-
-#define DEF_LANGUAGE	LANG_EN_US
 
 /*************************************************************************/
 
@@ -596,27 +390,21 @@ struct nickcore_ {
  *	--lara
  */
 
-typedef struct botinfo_ BotInfo;
-
 struct botinfo_ {
-
  	BotInfo *next, *prev;
 
  	char *nick;    			/* Nickname of the bot */
  	char *user;    			/* Its user name */
  	char *host;    			/* Its hostname */
  	char *real;     		/* Its real name */
-
  	int16 flags;			/* Bot flags -- see BI_* below */
-
  	time_t created; 		/* Birth date ;) */
 	int16 chancount;		/* Number of channels that use the bot. */
-
 	/* Dynamic data */
  	time_t lastmsg;			/* Last time we said something */
 };
 
-#define BI_PRIVATE		0x0001
+
 
 /* Channel info structures.  Stored similarly to the nicks, except that
  * the second character of the channel name, not the first, is used to
@@ -642,9 +430,7 @@ typedef struct {
 /* Levels for xOP */
 
 #define ACCESS_VOP		3
-#ifdef HAS_HALFOP
-# define ACCESS_HOP      4
-#endif
+#define ACCESS_HOP      	4
 #define ACCESS_AOP		5
 #define ACCESS_SOP		10
 
@@ -667,15 +453,12 @@ typedef struct {
 
 #define AK_USED		0x0001
 #define AK_ISNICK	0x0002
-#define AK_STUCK    0x0004
+#define AK_STUCK    	0x0004
 
 /* Structure used to contain bad words. */
 
-typedef struct badword_ BadWord;
-
 struct badword_ {
 	int16 in_use;
-
 	char *word;
 	int16 type;		/* BW_* below */
 };
@@ -685,7 +468,7 @@ struct badword_ {
 #define BW_START 	2
 #define BW_END 		3
 
-typedef struct chaninfo_ ChannelInfo;
+
 struct chaninfo_ {
     ChannelInfo *next, *prev;
     char name[CHANMAX];
@@ -708,7 +491,6 @@ struct chaninfo_ {
     char *forbidreason;
 
     int16 bantype;
-
     int16 *levels;				/* Access levels for commands */
 
     int16 accesscount;
@@ -716,15 +498,11 @@ struct chaninfo_ {
     int16 akickcount;
     AutoKick *akick;			/* List of users to kickban */
 
-    uint32 mlock_on, mlock_off;	/* See channel modes below */
+    uint32 mlock_on, mlock_off;		/* See channel modes below */
     uint32 mlock_limit;			/* 0 if no limit */
     char *mlock_key;			/* NULL if no key */
-#ifdef HAS_FMODE
     char *mlock_flood;			/* NULL if no +f */
-#endif
-#ifdef HAS_LMODE
     char *mlock_redirect;		/* NULL if no +L */
-#endif
 
     char *entry_message;		/* Notice sent on entering channel */
 
@@ -793,49 +571,49 @@ struct chaninfo_ {
 #define CA_UNBAN			3
 #define CA_AUTOOP			4
 #define CA_AUTODEOP			5	/* Maximum, not minimum */
-#define CA_AUTOVOICE		6
+#define CA_AUTOVOICE			6
 #define CA_OPDEOP			7	/* ChanServ commands OP and DEOP */
-#define CA_ACCESS_LIST		8
+#define CA_ACCESS_LIST			8
 #define CA_CLEAR			9
 #define CA_NOJOIN			10	/* Maximum */
-#define CA_ACCESS_CHANGE 	11
+#define CA_ACCESS_CHANGE 		11
 #define CA_MEMO				12
-#define CA_ASSIGN       	13  /* BotServ ASSIGN command */
-#define CA_BADWORDS     	14  /* BotServ BADWORDS command */
-#define CA_NOKICK       	15  /* Not kicked by the bot */
-#define CA_FANTASIA   		16
+#define CA_ASSIGN       		13  /* BotServ ASSIGN command */
+#define CA_BADWORDS     		14  /* BotServ BADWORDS command */
+#define CA_NOKICK       		15  /* Not kicked by the bot */
+#define CA_FANTASIA   			16
 #define CA_SAY				17
-#define CA_GREET            18
+#define CA_GREET            		18
 #define CA_VOICEME			19
 #define CA_VOICE			20
-#define CA_GETKEY           21
-#define CA_AUTOHALFOP		22
-#define CA_AUTOPROTECT		23
-#define CA_OPDEOPME         24
-#define CA_HALFOPME         25
-#define CA_HALFOP           26
-#define CA_PROTECTME        27
-#define CA_PROTECT          28
-#define CA_KICKME           29
-#define CA_KICK             30
+#define CA_GETKEY           		21
+#define CA_AUTOHALFOP			22
+#define CA_AUTOPROTECT			23
+#define CA_OPDEOPME         		24
+#define CA_HALFOPME         		25
+#define CA_HALFOP           		26
+#define CA_PROTECTME        		27
+#define CA_PROTECT          		28
+#define CA_KICKME           		29
+#define CA_KICK             		30
 #define CA_SIGNKICK			31
-/* #define CA_AUTOADMIN        32
-#define CA_ADMINME          33
-#define CA_ADMIN            34 */
-#define CA_BANME            32
-#define CA_BAN              33
-#define CA_TOPIC            34
-#define CA_INFO             35
+/* #define CA_AUTOADMIN        		32
+#define CA_ADMINME          		33
+#define CA_ADMIN            		34 */
+#define CA_BANME            		32
+#define CA_BAN              		33
+#define CA_TOPIC            		34
+#define CA_INFO             		35
 
 #define CA_SIZE		36
 
 /* BotServ SET flags */
-#define BS_DONTKICKOPS      0x00000001
-#define BS_DONTKICKVOICES   0x00000002
-#define BS_FANTASY          0x00000004
-#define BS_SYMBIOSIS        0x00000008
-#define BS_GREET            0x00000010
-#define BS_NOBOT            0x00000020
+#define BS_DONTKICKOPS      	0x00000001
+#define BS_DONTKICKVOICES   	0x00000002
+#define BS_FANTASY          	0x00000004
+#define BS_SYMBIOSIS        	0x00000008
+#define BS_GREET            	0x00000010
+#define BS_NOBOT            	0x00000020
 
 /* BotServ Kickers flags */
 #define BS_KICK_BOLDS 		0x80000000
@@ -850,80 +628,41 @@ struct chaninfo_ {
 /* Indices for TTB (Times To Ban) */
 #define TTB_BOLDS 		0
 #define TTB_COLORS 		1
-#define TTB_REVERSES	2
-#define TTB_UNDERLINES  3
-#define TTB_BADWORDS	4
+#define TTB_REVERSES		2
+#define TTB_UNDERLINES  	3
+#define TTB_BADWORDS		4
 #define TTB_CAPS		5
 #define TTB_FLOOD		6
 #define TTB_REPEAT		7
-
 #define TTB_SIZE 		8
 
 /*************************************************************************/
 
 /* ChanServ mode utilities commands */
 
-typedef struct csmodeutil_ CSModeUtil;
-
 struct csmodeutil_ {
-	char *name;				/* Name of the ChanServ command */
+	char *name;			/* Name of the ChanServ command */
 	char *bsname;			/* Name of the BotServ fantasy command */
-
-	char *mode;				/* Mode (ie. +o) */
+	char *mode;			/* Mode (ie. +o) */
 	int32 notice;			/* Notice flag (for the damn OPNOTICE) */
-
-	int level;				/* Level required to use the command */
+	int level;			/* Level required to use the command */
 	int levelself;			/* Level required to use the command for himself */
 };
 
-#define MUT_DEOP   		0
-#define MUT_OP			1
-#define MUT_DEVOICE		2
-#define MUT_VOICE		3
-#ifdef HAS_HALFOP
-#define MUT_DEHALFOP	4
-#define MUT_HALFOP		5
-#endif
-#ifdef IRC_UNREAL
-#define MUT_DEPROTECT   6
-#define MUT_PROTECT     7
-#endif
-#ifdef IRC_ULTIMATE3
-#define MUT_DEPROTECT   6
-#define MUT_PROTECT     7
-#endif
-#ifdef IRC_RAGE2
-#define MUT_DEPROTECT   6
-#define MUT_PROTECT     7
-#endif
-#ifdef IRC_VIAGRA
-#define MUT_DEPROTECT   6
-#define MUT_PROTECT     7
-#endif
-#ifdef IRC_PTLINK
-#define MUT_DEPROTECT   4
-#define MUT_PROTECT     5
-#endif
 /*************************************************************************/
-
-/* Server CAPAB flags */
-#ifdef IRC_BAHAMUT
-# define CAPAB_NOQUIT    0x0001
-# define CAPAB_TSMODE    0x0002
-# define CAPAB_UNCONNECT 0x0004
-#endif
 
 /* Server data */
 
 struct server_ {
     Server *next, *prev;
     
-    char *name;		/* Server name */
-    uint16 hops;	/* Hops between services and server */
-    char *desc;		/* Server description */
-    uint16 flags;	/* Some info flags, as defined below */
+    char *name;		/* Server name 				*/
+    uint16 hops;	/* Hops between services and server 	*/
+    char *desc;		/* Server description 			*/
+    uint16 flags;	/* Some info flags, as defined below 	*/
+    char *suid;		/* Server Univeral ID		     	*/
 
-    Server *links;	/* Linked list head for linked servers */
+    Server *links;	/* Linked list head for linked servers 	*/
     Server *uplink;	/* Server which pretends to be the uplink */
 };
 
@@ -938,23 +677,18 @@ struct user_ {
 
     char nick[NICKMAX];
 
-    char *username;
-    char *host;             /* User's real hostname */
-#ifdef HAS_VHOST
-    char *vhost;            /* User's virtual hostname */
-#endif
-#ifdef HAS_VIDENT
-    char *vident;           /* User's virtual ident */
-#endif
-    char *realname;
-    Server *server;		/* Server user is connected to */
-
-    char *nickTrack;			/* Nick Tracking */
-
-    time_t timestamp;		/* Timestamp of the nick */
-    time_t my_signon;		/* When did _we_ see the user? */
-    uint32 svid;			/* Services ID */
-    uint32 mode;			/* See below */
+    char *username;		/* ident			*/
+    char *host;             	/* User's real hostname 	*/
+    char *vhost;            	/* User's virtual hostname 	*/
+    char *vident;           	/* User's virtual ident 	*/
+    char *realname;		/* Realname 			*/
+    Server *server;		/* Server user is connected to  */
+    char *nickTrack;		/* Nick Tracking 		*/
+    time_t timestamp;		/* Timestamp of the nick 	*/
+    time_t my_signon;		/* When did _we_ see the user?  */
+    uint32 svid;		/* Services ID 			*/
+    uint32 mode;		/* See below 			*/
+    char *uid;			/* Univeral ID			*/
 
     NickAlias *na;
 
@@ -981,117 +715,7 @@ struct user_ {
     time_t lastmail;			/* Last time this user sent a mail */
 };
 
-#define UMODE_a 0x00000001
-#define UMODE_h 0x00000002
-#define UMODE_i 0x00000004
-#define UMODE_o 0x00000008
-#define UMODE_r 0x00000010
-#define UMODE_w 0x00000020
-#define UMODE_A 0x00000040
 
-#ifdef IRC_ULTIMATE
-#define UMODE_p 0x04000000
-#define UMODE_R 0x08000000
-#define UMODE_P 0x20000000
-#endif
-
-#ifdef IRC_ULTIMATE3
-#define UMODE_p 0x04000000
-#define UMODE_Z 0x08000000
-#define UMODE_P 0x20000000
-#endif
-
-#ifdef IRC_DREAMFORGE
-# define UMODE_g 0x80000000
-#endif
-
-#ifdef IRC_BAHAMUT
-# define UMODE_R 0x80000000
-#endif
-
-#ifdef IRC_VIAGRA
-#define UMODE_p 0x04000000
-#endif
-
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
-# define UMODE_x 0x40000000
-#endif
-
-/* Returns *current* user hostname */
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
-# define GetHost(x)      ((x)->mode & UMODE_x ? (x)->vhost : (x)->host)
-#elif defined(IRC_PTLINK)
-# define GetHost(x)      ((x)->mode & UMODE_o ? (x)->vhost ? (x)->vhost : (x)->host : (x)->host)
-#else
-# define GetHost(x)      ((x)->host)
-#endif
-
-/* Returns *current* user ident */
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-# define GetIdent(x)      ((x)->mode & UMODE_x ? (x)->vident ? (x)->vident : (x)->username : (x)->username)
-#else
-# define GetIdent(x)      ((x)->username)
-#endif
-
-/* This will introduce a pseudo client with the given nick, username, hostname,
-   realname and modes. It will also make a Q line for the nick on demand.
-   	--lara */
-#if defined(IRC_HYBRID)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", (nick), time(NULL), (modes), \
-		(user), (host), ServerName, (real)); \
-	} while (0)
-#elif defined(IRC_ULTIMATE3)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", (nick), time(NULL), (modes), \
-		(user), (host), ServerName, (real)); \
-	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_RAGE2)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", (nick), time(NULL), (user), \
-		(host), ServerName, (modes), (real)); \
-	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_RAGE2)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", (nick), time(NULL), (modes), \
-		(user), (host), ServerName, (real)); \
-	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_UNREAL)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", (nick), time(NULL), \
-		(user), (host), ServerName, (modes), (real)); \
-	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_DREAMFORGE)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", (nick), time(NULL), \
-		(user), (host), ServerName, (real)); \
-	if (strcmp(modes, "+")) send_cmd((nick), "MODE %s %s", (nick), (modes)); \
-	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#elif defined(IRC_PTLINK)
-# define NEWNICK(nick,user,host,real,modes,qline) \
-    do { \
-        send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", (nick), time(NULL), \
-                (modes), (user), (host), (host), ServerName, (real)); \
-       if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
-    } while (0)
-#endif
-
-typedef struct cbmode_ CBMode;
-typedef struct cbmodeinfo_ CBModeInfo;
-typedef struct cmmode_ CMMode;
-typedef struct csmode_ CSMode;
-typedef struct cumode_ CUMode;
 
 struct cbmode_ {
 	uint32 flag;			/* Long value that represents the mode */
@@ -1104,7 +728,7 @@ struct cbmode_ {
 
 #define CBM_MINUS_NO_ARG 	0x0001		/* No argument for unset */
 #define CBM_NO_MLOCK		0x0002		/* Can't be MLOCKed */
-#define CBM_NO_USER_MLOCK   0x0004      /* Can't be MLOCKed by non-opers */
+#define CBM_NO_USER_MLOCK   	0x0004      	/* Can't be MLOCKed by non-opers */
 
 struct cbmodeinfo_ {
 	char mode;				/* The mode */
@@ -1128,79 +752,9 @@ struct cumode_ {
 	int (*is_valid) (User *user, Channel *chan, int servermode);
 };
 
-/* User flags on channel */
-#define CUS_OP			0x0001
-#define CUS_VOICE		0x0002
-
-#ifdef HAS_HALFOP
-#define CUS_HALFOP		0x0004		/* Halfop (+h) */
-#endif
-
-/* Used by Unreal */
-#ifdef IRC_UNREAL
-#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-#endif
-
-/* Used by Viagra */
-#ifdef IRC_VIAGRA
-#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-#endif
-
-#ifdef IRC_ULTIMATE3
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-#endif
-
-#ifdef IRC_RAGE2
-#define CUS_PROTECT		0x0010		/* Protected users (+a) */
-#endif
-
-/* Used by PTlink */
-#ifdef IRC_PTLINK
-#define CUS_PROTECT            0x0016          /* Protected users (+a) */
-#endif
-
 /* Channel user mode flags */
 
 #define CUF_PROTECT_BOTSERV 	0x0001
-
-/* Useful value */
-
-#if defined(IRC_ULTIMATE)
-# define CHAN_MAX_SYMBOLS   3
-#elif defined(IRC_ULTIMATE3)
-# define CHAN_MAX_SYMBOLS  5
-#elif defined(IRC_UNREAL)
-# define CHAN_MAX_SYMBOLS	5
-#elif defined(IRC_RAGE2)
-# define CHAN_MAX_SYMBOLS   3
-#else
-# define CHAN_MAX_SYMBOLS   2
-#endif
-
-/* Binary modes that need to be cleared */
-
-#if defined(IRC_RAGE2)
-#define MODESTOREMOVE "-iklmnpRstcOASCNM"
-#elif defined(IRC_BAHAMUT)
-#define MODESTOREMOVE "-ciklmnpstOR"
-#elif defined(IRC_ULTIMATE)
-#define MODESTOREMOVE "-kiflmnpstxAIKLORS"
-#elif defined(IRC_ULTIMATE3)
-#define MODESTOREMOVE "-iklmnpstRKAO"
-#elif defined(IRC_UNREAL)
-#define MODESTOREMOVE "-ckiflmnpstuzACGHKLNOQRSV"
-#elif defined(IRC_VIAGRA)
-#define MODESTOREMOVE "-ciklmnpstORAH"
-#elif defined(IRC_PTLINK)
-#define MODESTOREMOVE "-cdfiklmnpqstRS"
-#else
-#define MODESTOREMOVE "-iklmnpstR"
-#endif
-
-typedef struct bandata_ BanData;
-typedef struct userdata_ UserData;
 
 /* This structure stocks ban data since it must not be removed when
  * user is kicked.
@@ -1237,29 +791,18 @@ struct channel_ {
     char name[CHANMAX];
     ChannelInfo *ci;			/* Corresponding ChannelInfo */
     time_t creation_time;		/* When channel was created */
-
     char *topic;
     char topic_setter[NICKMAX];		/* Who set the topic */
     time_t topic_time;			/* When topic was set */
-
-    uint32 mode;				/* Binary modes only */
+    uint32 mode;			/* Binary modes only */
     uint32 limit;			/* 0 if none */
     char *key;				/* NULL if none */
-#ifdef HAS_LMODE
-	char *redirect;			/* +L; NULL if none */
-#endif
-#ifdef HAS_FMODE
-	char *flood;			/* +f; NULL if none */
-#endif
-
+    char *redirect;			/* +L; NULL if none */
+    char *flood;			/* +f; NULL if none */
     int32 bancount, bansize;
     char **bans;
-
-#ifdef HAS_EXCEPT
     int32 exceptcount, exceptsize;
     char **excepts;
-#endif
-
     struct c_userlist {
 		struct c_userlist *next, *prev;
 		User *user;
@@ -1276,108 +819,13 @@ struct channel_ {
     int16 bouncy_modes;			/* Did we fail to set modes here? */
 };
 
-#define CMODE_i 0x00000001
-#define CMODE_m 0x00000002
-#define CMODE_n 0x00000004
-#define CMODE_p 0x00000008
-#define CMODE_s 0x00000010
-#define CMODE_t 0x00000020
-#define CMODE_k 0x00000040		/* These two used only by ChanServ */
-#define CMODE_l 0x00000080
-
-/* The two modes below are for IRC_DREAMFORGE servers only. */
-#ifndef IRC_HYBRID
-#define CMODE_R 0x00000100		/* Only identified users can join */
-#define CMODE_r 0x00000200		/* Set for all registered channels */
-#endif
-
-/* This mode is for IRC_BAHAMUT servers only. */
-#ifdef IRC_BAHAMUT
-#define CMODE_c 0x00000400		/* Colors can't be used */
-#define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
-#define CMODE_O 0x00008000		/* Only opers can join */
-#endif
-
-/* This mode is for IRC_HYBRID servers only. */
-#ifdef IRC_HYBRID
-#define CMODE_a 0x00000400
-#endif
-
-/* These modes are for IRC_ULTIMATE servers only. */
-#ifdef IRC_ULTIMATE
-#define CMODE_f 0x00000400
-#define CMODE_x 0x00000800
-#define CMODE_A 0x00001000
-#define CMODE_I 0x00002000
-#define CMODE_K 0x00004000
-#define CMODE_L 0x00008000
-#define CMODE_O 0x00010000
-#define CMODE_S 0x00020000
-#endif
-
-/* These modes are for IRC_UNREAL servers only. */
-#ifdef IRC_UNREAL
-#define CMODE_c 0x00000400
-#define CMODE_A 0x00000800
-#define CMODE_H 0x00001000
-#define CMODE_K 0x00002000
-#define CMODE_L 0x00004000
-#define CMODE_O 0x00008000
-#define CMODE_Q 0x00010000
-#define CMODE_S 0x00020000
-#define CMODE_V 0x00040000
-#define CMODE_f 0x00080000
-#define CMODE_G 0x00100000
-#define CMODE_C 0x00200000
-#define CMODE_u 0x00400000
-#define CMODE_z 0x00800000
-#define CMODE_N 0x01000000
-#endif
-
-#ifdef IRC_VIAGRA
-#define CMODE_A 0x00001000
-#define CMODE_H 0x00002000
-#endif
-
-/* These modes are for IRC_ULTIMATE3 servers only */
-#ifdef IRC_ULTIMATE3
-#define CMODE_A 0x00000800
-#define CMODE_N 0x00001000
-#define CMODE_S 0x00002000
-#define CMODE_K 0x00004000
-#define CMODE_O 0x00008000
-#endif
-
-/* These modes are for IRC_RAGE2 servers only */
-#ifdef IRC_RAGE2
-#define CMODE_A 0x00000800
-#define CMODE_N 0x00001000
-#define CMODE_S 0x00002000
-#define CMODE_C 0x00004000
-#endif
-
-/* These modes are for IRC_PTLINK servers only. */
-#ifdef IRC_PTLINK
-#define CMODE_A 0x00000400
-#define CMODE_B 0x00000800
-#define CMODE_c 0x00001000
-#define CMODE_d 0x00002000
-#define CMODE_f 0x00004000
-#define CMODE_K 0x00008000
-#define CMODE_O 0x00010000
-#define CMODE_q 0x00020000
-#define CMODE_S 0x00040000
-#define CMODE_N 0x00080000
-#endif
-
-
 /*************************************************************************/
 
 /* Constants for news types. */
 
 #define NEWS_LOGON		0
 #define NEWS_OPER		1
-#define NEWS_RANDOM 	2
+#define NEWS_RANDOM 		2
 
 /*************************************************************************/
 
@@ -1393,8 +841,6 @@ typedef struct ignore_data {
 
 /* Mail data */
 
-typedef struct mailinfo_ MailInfo;
-
 struct mailinfo_ {
 	FILE *pipe;
 	User *sender;
@@ -1403,8 +849,6 @@ struct mailinfo_ {
 };
 
 /*************************************************************************/
-
-typedef struct akill_ Akill;
 
 struct akill_ {
 	char *user;			/* User part of the AKILL */
@@ -1421,8 +865,6 @@ struct akill_ {
 
 /* Structure for OperServ SGLINE and SZLINE commands */
 
-typedef struct sxline_ SXLine;
-
 struct sxline_ {
 	char *mask;
 	char *by;
@@ -1435,8 +877,6 @@ struct sxline_ {
 
 /* Host serv structures */
 
-typedef struct hostcore_ HostCore;
-
 struct hostcore_ {
     HostCore *next;
     char *nick;				/* Owner of the vHost */
@@ -1448,7 +888,7 @@ struct hostcore_ {
 
 /*************************************************************************/
 
-typedef struct newsitem_ NewsItem;
+
 
 struct newsitem_ {
     int16 type;
@@ -1460,7 +900,7 @@ struct newsitem_ {
 
 /*************************************************************************/
 
-typedef struct exception_ Exception;
+
 struct exception_ {
     char *mask;                 /* Hosts to which this exception applies */
     int limit;                  /* Session limit for exception */
@@ -1478,7 +918,7 @@ struct exception_ {
 
 /* Proxy stuff */
 
-typedef struct hostcache_ HostCache;
+
 
 struct hostcache_ {
 	HostCache *prev, *next;
@@ -1515,6 +955,127 @@ struct hostcache_ {
 #define DEFCON_SILENT_OPER_ONLY		128	/* Silently ignore non-opers */
 #define DEFCON_AKILL_NEW_CLIENTS	256	/* AKILL any new clients */
 #define DEFCON_NO_NEW_MEMOS		512	/* No New Memos Sent */
+
+/*************************************************************************/
+
+/* Memo Flags */
+#define MF_UNREAD	0x0001	/* Memo has not yet been read */
+#define MF_RECEIPT	0x0002	/* Sender requested receipt */
+
+
+/* Nickname status flags: */
+#define NS_VERBOTEN	0x0002      /* Nick may not be registered or used */
+#define NS_NO_EXPIRE	0x0004      /* Nick never expires */
+#define NS_IDENTIFIED	0x8000      /* User has IDENTIFY'd */
+#define NS_RECOGNIZED	0x4000      /* ON_ACCESS true && SECURE flag not set */
+#define NS_ON_ACCESS	0x2000      /* User comes from a known address */
+#define NS_KILL_HELD	0x1000      /* Nick is being held after a kill */
+#define NS_GUESTED	0x0100	    /* SVSNICK has been sent but nick has not
+				     				 * yet changed. An enforcer will be
+				     				 * introduced when it does change. */
+#define NS_MASTER	0x0200		/* Was a master nick; used to import old databases */
+#define NS_TRANSGROUP	0xC000		/* Status flags that can be passed to a nick of the
+									   same group during nick change */
+#define NS_TEMPORARY	0xFF00      /* All temporary status flags */
+/* These two are not used anymore */
+#define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
+
+/* Nickname setting flags: */
+#define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
+#define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
+#define NI_MSG                  0x00000004  /* Use PRIVMSGs instead of NOTICEs */
+#define NI_MEMO_HARDMAX		0x00000008  /* Don't allow user to change memo limit */
+#define NI_MEMO_SIGNON		0x00000010  /* Notify of memos at signon and un-away */
+#define NI_MEMO_RECEIVE		0x00000020  /* Notify of new memos when sent */
+#define NI_PRIVATE		0x00000040  /* Don't show in LIST to non-servadmins */
+#define NI_HIDE_EMAIL		0x00000080  /* Don't show E-mail in INFO */
+#define NI_HIDE_MASK		0x00000100  /* Don't show last seen address in INFO */
+#define NI_HIDE_QUIT		0x00000200  /* Don't show last quit message in INFO */
+#define NI_KILL_QUICK		0x00000400  /* Kill in 20 seconds instead of 60 */
+#define NI_KILL_IMMED		0x00000800  /* Kill immediately instead of in 60 sec */
+#define NI_SERVICES_OPER 	0x00001000  /* User is a Services operator */
+#define NI_SERVICES_ADMIN	0x00002000  /* User is a Services admin */
+#define NI_ENCRYPTEDPW		0x00004000  /* Nickname password is encrypted */
+#define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
+#define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
+#define NI_HIDE_STATUS          0x00020000  /* Don't show services access status */
+
+/* Languages.  Never insert anything in the middle of this list, or
+ * everybody will start getting the wrong language!  If you want to change
+ * the order the languages are displayed in for NickServ HELP SET LANGUAGE,
+ * do it in language.c.
+ */
+#define LANG_EN_US              0	/* United States English */
+#define LANG_JA_JIS             1	/* Japanese (JIS encoding) */
+#define LANG_JA_EUC             2	/* Japanese (EUC encoding) */
+#define LANG_JA_SJIS            3	/* Japanese (SJIS encoding) */
+#define LANG_ES                 4	/* Spanish */
+#define LANG_PT                 5	/* Portugese */
+#define LANG_FR                 6	/* French */
+#define LANG_TR                 7	/* Turkish */
+#define LANG_IT                 8	/* Italian */
+#define LANG_DE                 9   	/* German */
+#define LANG_CAT               10   	/* Catalan */
+#define LANG_GR                11   	/* Greek */
+#define LANG_NL                12   	/* Dutch */
+#define LANG_RU                13   	/* Russian */
+#define LANG_HUN               14   	/* Hungarian */
+#define LANG_PL                15   	/* Polish */
+
+#define NUM_LANGS              16	/* Number of languages */
+#define USED_LANGS             13	/* Number of languages provided */
+
+
+#define DEF_LANGUAGE	LANG_EN_US
+
+#define BI_PRIVATE		0x0001
+
+#define CUS_OP			0x0001
+#define CUS_VOICE		0x0002
+#define CUS_HALFOP		0x0004		/* Halfop (+h) */
+#define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
+#define CUS_PROTECT		0x0010		/* Protected users (+a) */
+
+#define MUT_DEOP   		0
+#define MUT_OP			1
+#define MUT_DEVOICE		2
+#define MUT_VOICE		3
+#define MUT_DEHALFOP		4
+#define MUT_HALFOP		5
+#define MUT_DEPROTECT   	6
+#define MUT_PROTECT     	7
+
+
+#define CAPAB_NOQUIT 	0x00000001
+#define CAPAB_TSMODE 	0x00000002
+#define CAPAB_UNCONNECT 0x00000004
+#define CAPAB_NICKIP    0x00000008
+#define CAPAB_NSJOIN    0x00000010
+#define CAPAB_ZIP	0x00000020
+#define CAPAB_BURST     0x00000040
+#define CAPAB_TS3       0x00000080
+#define CAPAB_TS5       0x00000100
+#define CAPAB_DKEY      0x00000200
+#define CAPAB_DOZIP	0x00000400
+#define CAPAB_DODKEY    0x00000800
+#define CAPAB_QS        0x00001000
+#define CAPAB_SCS       0x00002000
+#define CAPAB_PT4       0x00004000
+#define CAPAB_UID       0x00008000
+#define CAPAB_KNOCK     0x00010000
+#define CAPAB_CLIENT    0x00020000
+#define CAPAB_IPV6      0x00040000
+#define CAPAB_SSJ5      0x00080000
+#define CAPAB_SN2       0x00100000
+#define CAPAB_VHOST     0x00200000
+#define CAPAB_TOKEN     0x00400000
+#define CAPAB_SSJ3      0x00800000
+#define CAPAB_NICK2     0x01000000
+#define CAPAB_UMODE2    0x02000000
+#define CAPAB_VL        0x04000000
+#define CAPAB_TLKEXT    0x08000000
+
+
 /*************************************************************************/
 
 #include "extern.h"

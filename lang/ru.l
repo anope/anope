@@ -6061,3 +6061,16 @@ HOST_HELP_GROUP
 	Ёта команда позвол€ет пользовател€м установить виртуальный хост с их
 	“≈ ”ў≈√ќ ника на все ники
 	группы.
+
+OPER_SVSNICK_UNSUPPORTED
+	Sorry, SVSNICK is not available on this network.
+
+OPER_SQLINE_UNSUPPORTED
+	Sorry, SQLINE is not available on this network.
+
+OPER_SVSO_UNSUPPORTED
+	Sorry, OLINE is not available on this network.
+
+OPER_UMODE_UNSUPPORTED
+	Sorry, UMODE is not available on this network.
+

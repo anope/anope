@@ -50,40 +50,6 @@ const char version_number[] = "$VERSION";
 const char version_build[] =
 	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
 
-const char version_protocol[] =
-#if defined(IRC_ULTIMATE3)
- 	"UltimateIRCd 3.0.0.a26+"
-# define VER_IRCD "UltimateIRCd 3.0.* -"
-#elif defined(IRC_VIAGRA)
-	"ViagraIRCd 1.3.x"
-# define VER_IRCD "ViagraIRCd 1.3.* -"
-#elif defined(IRC_RAGE2)
-	"RageIRCd 2.0.x"
-# define VER_IRCD "RageIRCd 2.0.* -"
-#elif defined(IRC_BAHAMUT)
-	"Bahamut 1.4.27+"
-# define VER_IRCD "BahamutIRCd 1.4.*/1.8.* -"
-#elif defined(IRC_ULTIMATE)
-	"UltimateIRCd 2.8.2+"
-# define VER_IRCD "UltimateIRCd 2.8.* -"
-#elif defined(IRC_UNREAL)
-	"UnrealIRCd 3.1.1+"
-# define VER_IRCD "UnrealIRCd -"
-#elif defined(IRC_DREAMFORGE)
-	"DreamForge 4.6.7"
-# define VER_IRCD "DreamForgeIRCd 4.6.7 -"
-#elif defined(IRC_HYBRID)
-	"Hybrid IRCd 7.0"
-# define VER_IRCD "HybridIRCd 7.* -"
-#elif defined(IRC_PTLINK)
-       "PTlink 6.14.5+"
-# define VER_IRCD "PTlinkIRCd 6.14.* -"
-#else
-	"unknown"
-# define VER_IRCD
-#endif
-	;
-
 #ifdef DEBUG_COMMANDS
 # define VER_DEBUG "D"
 #else
@@ -140,7 +106,8 @@ const char version_protocol[] =
 # define VER_MODULE
 #endif
 
-const char version_flags[] = VER_IRCD VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL VER_MODULE;
+/* the space is needed cause if you build with nothing it will complain */
+const char version_flags[] = " " VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL VER_MODULE;
 
 EOF
 

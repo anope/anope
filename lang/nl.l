@@ -6182,3 +6182,16 @@ HOST_HELP_GROUP
 	HUIDIGE nick de vhost van alle nicks in de zelfde groep te
 	laten zijn.
 
+OPER_SVSNICK_UNSUPPORTED
+	Sorry, SVSNICK is not available on this network.
+
+OPER_SQLINE_UNSUPPORTED
+	Sorry, SQLINE is not available on this network.
+
+OPER_SVSO_UNSUPPORTED
+	Sorry, OLINE is not available on this network.
+
+OPER_UMODE_UNSUPPORTED
+	Sorry, UMODE is not available on this network.
+
+

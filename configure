@@ -1289,23 +1289,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if test $# = 0; then
    echo "You might want to run ./Config or provide some parameters to this script."
    echo "./configure --help for information about this script"
@@ -2888,8 +2871,6 @@ _ACEOF
 
 	MYSQL=" mysql.c "
 	RDB=" rdb.c "
-
-
 	x="1";
 
 
@@ -8365,34 +8346,19 @@ cat >>confdefs.h <<\_ACEOF
 #define IRC_BAHAMUT 1
 _ACEOF
 
-    elif test "$withval" = "IRC_UNREAL"; then
+    elif test "$withval" = "IRC_UNREAL31"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_DREAMFORGE 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
-#define IRC_UNREAL 1
+#define IRC_UNREAL31 1
 _ACEOF
 
     elif test "$withval" = "IRC_ULTIMATE"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_DREAMFORGE 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
-#define IRC_ULTIMATE 1
+#define IRC_ULTIMATE2 1
 _ACEOF
 
     elif test "$withval" = "IRC_ULTIMATE3"; then
-
-cat >>confdefs.h <<\_ACEOF
-#define IRC_BAHAMUT 1
-_ACEOF
-
 
 cat >>confdefs.h <<\_ACEOF
 #define IRC_ULTIMATE3 1
@@ -8407,11 +8373,6 @@ _ACEOF
     elif test "$withval" = "IRC_VIAGRA"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_BAHAMUT 1
-_ACEOF
-
-
-cat >>confdefs.h <<\_ACEOF
 #define IRC_VIAGRA 1
 _ACEOF
 
@@ -8424,12 +8385,13 @@ _ACEOF
     elif test "$withval" = "IRC_RAGE2"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_BAHAMUT 1
+#define IRC_RAGE2 1
 _ACEOF
 
+    elif test "$withval" = "IRC_UNREAL32"; then
 
 cat >>confdefs.h <<\_ACEOF
-#define IRC_RAGE2 1
+#define IRC_UNREAL32 1
 _ACEOF
 
     fi

@@ -1,4 +1,5 @@
 /* Modular support
+/* Modular support
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -370,7 +371,7 @@ int loadModule(Module * m, User * u)
     }
 
     if (u) {
-        wallops(s_OperServ, "%s loaded module %s", u->nick, m->name);
+        anope_cmd_global(s_OperServ, "%s loaded module %s", u->nick, m->name);
         notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name);
     }
     addModule(m);
@@ -416,7 +417,7 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     } else {
         if (u) {
-            wallops(s_OperServ, "%s unloaded module %s", u->nick, m->name);
+            anope_cmd_global(s_OperServ, "%s unloaded module %s", u->nick, m->name);
             notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name);
         }
         delModule(m);
@@ -2023,3 +2024,4 @@ void moduleCleanStruct(ModuleData * moduleData[])
 }
 
 /* EOF */
+ 

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="325"
+VERSION_BUILD="327"
 
 # $Log$
+#
+# BUILD : 1.7.5 (327)
+# BUGS  : none
+# NOTES : Merged anope-capab into main trunk...
 #
 # BUILD : 1.7.5 (325)
 # BUGS  : 128 139 146 147 148

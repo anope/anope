@@ -6482,3 +6482,15 @@ HOST_HELP_GROUP
 	Dieses Command erlaubt es Usern, den vhost ihres aktuellen
 	Nicks, zum vhost der gessamten Group zu setzen.
 
+OPER_SVSNICK_UNSUPPORTED
+	Sorry, SVSNICK is not available on this network.
+
+OPER_SQLINE_UNSUPPORTED
+	Sorry, SQLINE is not available on this network.
+
+OPER_SVSO_UNSUPPORTED
+	Sorry, OLINE is not available on this network.
+
+OPER_UMODE_UNSUPPORTED
+	Sorry, UMODE is not available on this network.
+

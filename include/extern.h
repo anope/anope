@@ -19,23 +19,24 @@
 
 #define E extern
 
+E char *uplink;
 
-/**** modules.c ****/
-E void moduleCallBackRun(void);
-E void moduleCleanStruct(ModuleData * moduleData[]);
+/* IRC Variables */
+E IRCDVar ircd[];
+E IRCDCAPAB ircdcap[];
 
 /**** actions.c ****/
 
-E void change_user_mode(User * u, char *modes, char *arg);
-E void kill_user(const char *source, const char *user, const char *reason);
+E void kill_user(char *source, char *user, char *reason);
 E void bad_password(User * u);
+E void sqline(char *mask, char *reason);
+E void common_unban(ChannelInfo * ci, char *nick);
+E void common_svsmode(User * u, char *modes, char *arg);
 
 /**** botserv.c ****/
 
 E BotInfo *botlists[256];
-
 E void get_botserv_stats(long *nrec, long *memuse);
-
 E void bs_init(void);
 E void botserv(User *u, char *buf);
 E void botmsgs(User *u, BotInfo *bi, char *buf);
@@ -43,7 +44,6 @@ E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
 E void load_bs_dbase(void);
 E void save_bs_dbase(void);
 E void save_bs_rdb_dbase(void);
-
 E BotInfo *makebot(char *nick);
 E BotInfo *findbot(char *nick);
 E void bot_join(ChannelInfo *ci);
@@ -54,6 +54,30 @@ E void bot_rejoin_all(BotInfo *bi);
 E Channel *chanlist[1024];
 E CBMode cbmodes[128];
 E CBModeInfo cbmodeinfos[];
+E CUMode cumodes[128];
+E CMMode cmmodes[128];
+E unsigned long umodes[128];
+E char csmodes[128];
+
+extern void do_mass_mode(char *modes);
+extern void add_ban(Channel * chan, char *mask);
+extern void chan_adduser2(User * user, Channel * c);
+extern void chan_delete(Channel * c);
+extern void del_ban(Channel * chan, char *mask);
+extern void set_key(Channel * chan, char *value);
+extern void set_limit(Channel * chan, char *value);
+extern char *get_key(Channel * chan);
+extern char *get_limit(Channel * chan);
+extern Channel *chan_create(char *chan);
+extern Channel *join_user_update(User * user, Channel * chan, char *name);
+
+extern void add_exception(Channel * chan, char *mask);
+extern void del_exception(Channel * chan, char *mask);
+extern char *get_flood(Channel * chan);
+extern void set_flood(Channel * chan, char *value);
+extern char *get_redirect(Channel * chan);
+extern void set_redirect(Channel * chan, char *value);
+
 
 E void get_channel_stats(long *nrec, long *memuse);
 E Channel *findchan(const char *chan);
@@ -84,6 +108,7 @@ E void do_part(const char *source, int ac, char **av);
 E void do_sjoin(const char *source, int ac, char **av);
 E void do_topic(const char *source, int ac, char **av);
 E void do_mass_mode(char *modes);
+
 #define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? s_ChanServ : (ci)->bi->nick)
 
 /**** chanserv.c ****/
@@ -107,25 +132,16 @@ E void cs_remove_nick(const NickCore * nc);
 E void cs_remove_bot(const BotInfo * bi);
 
 E void check_modes(Channel * c);
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 E int check_valid_admin(User * user, Channel * chan, int servermode);
-#endif
 E int check_valid_op(User * user, Channel * chan, int servermode);
-E int check_should_op(User * user, const char *chan);
-E int check_should_voice(User * user, const char *chan);
-#ifdef HAS_HALFOP
-E int check_should_halfop(User * user, const char *chan);
-#endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-E int check_should_owner(User * user, const char *chan);
-E int check_should_protect(User * user, const char *chan);
-#endif
-#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_PTLINK)
-E int check_should_protect(User * user, const char *chan);
-#endif
+E int check_should_op(User * user, char *chan);
+E int check_should_voice(User * user, char *chan);
+E int check_should_halfop(User * user, char *chan);
+E int check_should_owner(User * user, char *chan);
+E int check_should_protect(User * user, char *chan);
 E int check_kick(User * user, char *chan);
 E void record_topic(const char *chan);
-E void restore_topic(const char *chan);
+E void restore_topic(char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);
 
 E ChannelInfo *cs_findchan(const char *chan);
@@ -138,19 +154,14 @@ E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
 E AutoKick *is_stuck(ChannelInfo * ci, char *mask);
 E void stick_mask(ChannelInfo * ci, AutoKick * akick);
 E void stick_all(ChannelInfo * ci);
-
-#ifdef HAS_FMODE
 E char *cs_get_flood(ChannelInfo * ci);
 E void cs_set_flood(ChannelInfo * ci, char *value);
-#endif
 E char *cs_get_key(ChannelInfo * ci);
 E void cs_set_key(ChannelInfo * ci, char *value);
 E char *cs_get_limit(ChannelInfo * ci);
 E void cs_set_limit(ChannelInfo * ci, char *value);
-#ifdef HAS_LMODE
 E char *cs_get_redirect(ChannelInfo * ci);
 E void cs_set_redirect(ChannelInfo * ci, char *value);
-#endif
 
 /**** compat.c ****/
 
@@ -482,9 +493,19 @@ E char *DefconMessage;
 E char *DefConAkillReason;
 E char *DefConOffMessage;
 
+E int Numeric;
+
 /**** converter.c ****/
 
 E int convert_ircservices_44(void);
+
+/**** helpserv.c  ****/
+E void helpserv(User * u, char *buf);
+E void helpserv_init(void);
+
+/**** hostserv.c  ****/
+E void hostserv_init(void);
+E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 
 /**** init.c ****/
 
@@ -505,7 +526,7 @@ E void lang_init(void);
 	(langtexts[((nc)?((NickCore*)nc)->language:NSDefLanguage)][(index)])
 E int strftime_lang(char *buf, int size, User * u, int format,
                     struct tm *tm);
-E void syntax_error(const char *service, User * u, const char *command,
+E void syntax_error(char *service, User * u, char *command,
                     int msgnum);
 
 
@@ -555,7 +576,6 @@ E int   do_mysql;
 #endif
 
 E int   is44;
-
 E int   quitting;
 E int   delayed_quit;
 E char *quitmsg;
@@ -581,18 +601,28 @@ E void ms_init(void);
 E void memoserv(User * u, char *buf);
 E void check_memos(User * u);
 
+/**** messages.c ****/
+
+E int m_nickcoll(char *user);
+E int m_away(char *source, char *msg);
+E int m_kill(char *nick, char *msg);
+E int m_motd(char *source);
+E int m_privmsg(char *source, char *receiver, char *msg);
+E int m_stats(char *source, int ac, char **av);
+E int m_whois(char *source, char *who);
+E int m_time(char *source, int ac, char **av);
+E int m_version(char *source, int ac, char **av);
+
 
 /**** misc.c ****/
+
 
 E char *strscpy(char *d, const char *s, size_t len);
 E char *stristr(char *s1, char *s2);
 E char *strnrepl(char *s, int32 size, const char *old, const char *new);
-
 E char *merge_args(int argc, char **argv);
-
 E int match_wild(const char *pattern, const char *str);
 E int match_wild_nocase(const char *pattern, const char *str);
-
 E int dotime(const char *s);
 E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
 E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
@@ -615,11 +645,18 @@ E void EnforceQlinedNick(char *nick, char *killer);
 E int nickIsServices(char *nick);
 
 
+E const char* inttobase64(char* buf, unsigned int v, unsigned int count);
+E unsigned int base64toIP(const char* s);
+E unsigned int base64toint(const char* s);
+
+/**** modules.c ****/
+E void moduleCallBackRun(void);
+E void moduleCleanStruct(ModuleData * moduleData[]);
+
 /**** news.c ****/
 
 E int32 nnews, news_size;
 E NewsItem *news;
-
 E void get_news_stats(long *nrec, long *memuse);
 E void load_news(void);
 E void save_news(void);
@@ -629,15 +666,12 @@ E int do_logonnews(User * u);
 E int do_opernews(User * u);
 E int do_randomnews(User * u);
 
-
 /**** nickserv.c ****/
 
 E NickAlias *nalists[1024];
 E NickCore *nclists[1024];
 E NickRequest *nrlists[1024];
-
 E unsigned int guestnum;
-
 E void insert_requestnick(NickRequest * nr);
 E void alpha_insert_alias(NickAlias * na);
 E void insert_core(NickCore * nc);
@@ -660,23 +694,14 @@ E int nick_recognized(User * u);
 E void expire_nicks(void);
 E void expire_requests(void);
 E int ns_do_register(User * u);
-
 E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickCore  *findcore(const char *nick);
 E void clean_ns_timeouts(NickAlias * na);
-
 E void nsStartNickTracking(User * u);
 E void nsStopNickTracking(User * u);
 E int nsCheckNickTracking(User *u);
 
-/**** helpserv.c  ****/
-E void helpserv(User * u, char *buf);
-E void helpserv_init(void);
-
-/**** hostserv.c  ****/
-E void hostserv_init(void);
-E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 
 /**** operserv.c  ****/
 
@@ -699,31 +724,27 @@ E int nick_is_services_admin(NickCore *nc);
 E int nick_is_services_oper(NickCore *nc);
 
 E int add_akill(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
+E int check_akill(char *nick, const char *username, const char *host, const char *vhost, const char *ip);
 E void expire_akills(void);
 E void oper_global(char *nick, char *fmt, ...);
-#ifdef IRC_BAHAMUT
+
 E int add_sgline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_sgline(const char *nick, const char *realname);
+E int check_sgline(char *nick, const char *realname);
 E void expire_sglines(void);
-#endif
 
 E int add_sqline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_sqline(const char *nick, int nick_change);
-#ifdef IRC_BAHAMUT
-E int check_chan_sqline(const char *chan);
-#endif
+E int check_sqline(char *nick, int nick_change);
 E void expire_sqlines(void);
+E int check_chan_sqline(const char *chan);
 
-#ifdef IRC_BAHAMUT
 E int add_szline(User * u, char *mask, const char *by,
                  const time_t expires, const char *reason);
 E void expire_szlines(void);
-#endif
 
 E void check_clones(User * user);
-
 E void delete_ignore(const char *nick);
+
+E Server *server_global(Server * s, char *msg);
 
 /**** process.c ****/
 
@@ -735,19 +756,6 @@ E IgnoreData *get_ignore(const char *nick);
 
 E int split_buf(char *buf, char ***argv, int colon_special);
 E void process(void);
-
-/**** protocol.c ****/
-
-E void s_akill(char *user, char *host, char *who, time_t when,
-               time_t expires, char *reason);
-E void s_rakill(char *user, char *host);
-E void s_sgline(char *mask, char *reason);
-E void s_sqline(char *mask, char *reason);
-E void s_svsnoop(char *server, int set);
-E void s_szline(char *mask, char *reason);
-E void s_unsgline(char *mask);
-E void s_unsqline(char *mask);
-E void s_unszline(char *mask);
 
 /**** proxy.c ****/
 
@@ -769,44 +777,33 @@ E void send_cmd(const char *source, const char *fmt, ...)
 E void vsend_cmd(const char *source, const char *fmt, va_list args)
 	FORMAT(printf,2,0);
 
-E void wallops(const char *source, const char *fmt, ...)
-	FORMAT(printf,2,3);
-
-E void notice(const char *source, const char *dest, const char *fmt, ...)
+E void notice_server(char *source, Server * s, char *fmt, ...)
 	FORMAT(printf,3,4);
-E void notice_server(const char *source, Server *s, const char *fmt, ...)
-	FORMAT(printf,3,4);
-E void notice_user(const char *source, User *u, const char *fmt, ...)
+E void notice_user(char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
-E void notice_list(const char *source, const char *dest, const char **text);
-E void notice_lang(const char *source, User *dest, int message, ...);
-E void notice_help(const char *source, User *dest, int message, ...);
+E void notice_list(char *source, char *dest, char **text);
+E void notice_lang(char *source, User *dest, int message, ...);
+E void notice_help(char *source, User *dest, int message, ...);
 
-E void privmsg(const char *source, const char *dest, const char *fmt, ...)
-	FORMAT(printf,3,4);
-
-E void send_mode(const char *source, const char *on, const char *fmt, ...)
-	FORMAT(printf,3,4);
 
 /**** servers.c ****/
 
 E Server *servlist;
 E Server *me_server;
-#ifdef IRC_BAHAMUT
-E uint16 uplink_capab;
-#endif
+E uint32 uplink_capab;
 
 E Server *first_server(int flags);
 E Server *next_server(int flags);
 
-E Server *new_server(Server *uplink, const char *name, const char *desc,
-		     uint16 flags);
+E Server *new_server(Server * uplink, const char *name, const char *desc,
+                   uint16 flags);
 
 E Server *findserver(Server *s, const char *name);
 
 E void do_server(const char *source, int ac, char **av);
 E void do_squit(const char *source, int ac, char **av);
+E void capab_parse(int ac, char **av);
 
 /**** sessions.c ****/
 
@@ -817,7 +814,7 @@ E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
 E int do_session(User *u);
-E int add_session(const char *nick, const char *host);
+E int add_session(char *nick, char *host);
 E void del_session(const char *host);
 
 E void load_exceptions(void);
@@ -848,36 +845,31 @@ E User *userlist[1024];
 E int32 usercnt, opcnt, maxusercnt;
 E time_t maxusertime;
 
-E void set_umode(User * user, int ac, char **av);
-
 E void delete_user(User *user);
 
 E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *firstuser(void);
 E User *nextuser(void);
+E User *finduser_uid(const char *uid);
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
+E void update_host(User * user);
 E void change_user_host(User * user, const char *host);
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK)
 E void change_user_username(User * user, const char *username);
 E void change_user_realname(User * user, const char *realname);
-#endif
 
 E User *do_nick(const char *source, char *nick, char *username, char *host,
-                char *server, char *realname, time_t ts, uint32 svid, ...);
+              char *server, char *realname, time_t ts, uint32 svid, uint32 ip, char *vhost, char *uid);
+
 E void do_umode(const char *source, int ac, char **av);
 E void do_quit(const char *source, int ac, char **av);
-E void do_kill(const char *source, int ac, char **av);
+E void do_kill(char *source, char *reason);
 
 E int is_oper(User * user);
 E int is_protected(User * user);
 
-#ifdef HAS_EXCEPT
 E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, char *mask);
-#endif
 
 E int match_usermask(const char *mask, User * user);
 E void split_usermask(const char *mask, char **nick, char **user,
@@ -921,5 +913,129 @@ E void db_mysql_load_news(void);
 extern int encrypt_in_place(char *buf, int size);
 #endif
 
+
+E void privmsg(char *source, char *dest, const char *fmt, ...);
+E void notice(char *source, char *dest, const char *fmt, ...);
+
+/******************************************************************************/
+
+extern void anope_cmd_211(const char *fmt, ...);                          	  		  /* 211 */
+extern void anope_cmd_219(char *source, char *who); 			  	  		  /* 219 */
+extern void anope_cmd_242(const char *fmt, ...);                          	  		  /* 242 */
+extern void anope_cmd_243(const char *fmt, ...);                          	  		  /* 243 */
+extern void anope_cmd_250(const char *fmt, ...);			  	  		  /* 250 */
+extern void anope_cmd_307(const char *fmt, ...);			    	  		  /* 307 */
+extern void anope_cmd_311(const char *fmt, ...);                          	  		  /* 311 */
+extern void anope_cmd_312(const char *fmt, ...);                          	  		  /* 312 */
+extern void anope_cmd_317(const char *fmt, ...);                          	  		  /* 317 */
+extern void anope_cmd_318(char *source, char *who);           		  	  		  /* 318 */
+extern void anope_cmd_351(char *source);				  	  		  /* 351 */
+extern void anope_cmd_372(char *source, char *msg);			 	  		  /* 372 */
+extern void anope_cmd_372_error(char *source);				  	  		  /* 372 */
+extern void anope_cmd_375(char *source);				 	  		  /* 375 */
+extern void anope_cmd_376(char *source);				 	  		  /* 376 */
+extern void anope_cmd_391(char *source, char *timestr);                             		  /* 391 */
+extern void anope_cmd_401(char *source, char *who);			  	  		  /* 401 */
+extern void anope_cmd_akill(char *user, char *host, char *who, time_t when, time_t expires, char *reason); /* AKILL */
+extern void anope_cmd_capab();						  	  		  /* CAPAB */
+extern void anope_cmd_chghost(char *nick, char *vhost);                   			  /* CHGHOST */
+extern void anope_cmd_chgident(char *nick, char *vIdent);                 			  /* CHGIDENT */
+extern void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost);    			  /* CHGHOST + CHGIDENT */
+extern void anope_cmd_vhost_off(char *nick);
+extern void anope_cmd_connect(int servernum);                             	           	  /* Connect */
+extern void anope_cmd_ea();									  /* EA      */
+extern void anope_cmd_global(char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
+extern void anope_cmd_invite(char *source, char *chan, char *nick);       	  		  /* INVITE */
+extern void anope_cmd_join(char *user, char *channel, time_t chantime);   	  		  /* JOIN */
+extern void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt, ...);		  /* KICK */
+extern void anope_cmd_mode(char *source, char *dest, const char *fmt, ...);   	  		  /* MODE */
+extern void anope_cmd_unban(char *name, char *nick);				  		  /* MODE -b */
+extern void anope_cmd_bot_chan_mode(char *nick, char *chan);			  		  /* MODE BotServ */
+extern void anope_cmd_netinfo(int ac, char **av);						  /* NETINFO */
+extern void anope_cmd_nick(char *nick, char *name, char *mode);			  		  /* NICK */
+extern void anope_cmd_chg_nick(char *oldnick, char *newnick);             	  		  /* NICK */
+extern void anope_cmd_bot_nick(char *nick, char *user,char *host,char *real,char *modes);	  /* NICK */
+extern void anope_cmd_guest_nick(char *nick, char *user,char *host,char *real,char *modes);	  /* NICK */
+extern void anope_cmd_notice(char *source, char *dest, const char *fmt, ...);     		  /* NOTICE */
+extern void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...); 		  /* NOTICE */
+extern void anope_cmd_notice2(char *source, char *dest, char *msg);		  		  /* NOTICE */
+extern void anope_cmd_serv_notice(char *source, char *dest, char *msg);		  		  /* NOTICE */
+extern void anope_cmd_part(char *nick, char *chan, const char *fmt, ...); 	  		  /* PART */
+extern void anope_cmd_pass(char *pass);                                   	  		  /* PASS */
+extern void anope_cmd_pong(char *servname, char *who);                    	  		  /* PONG */
+extern void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
+extern void anope_cmd_privmsg2(char *source, char *dest, char *msg);		  		  /* PRIVMSG */
+extern void anope_cmd_serv_privmsg(char *source, char *dest, char *msg);	  		  /* PRIVMSG */
+extern void anope_cmd_protoctl();                                         			  /* PROTOCTL */
+extern void anope_cmd_quit(char *source, const char *fmt, ...);           	  		  /* QUIT */
+extern void anope_cmd_remove_akill(char *user, char *host);			  		  /* RAKILL */
+extern void anope_cmd_server(char *servname, int hop, char *descript);    	  		  /* SERVER */
+extern void anope_cmd_sgline(char *mask, char *reason);			  	  		  /* SGLINE */
+extern void anope_cmd_sqline(char *mask, char *reason);                   	  		  /* SQLINE */
+extern void anope_cmd_szline(char *mask, char *reason);			  	  		  /* SZLINE */
+extern void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
+extern void anope_cmd_svinfo();						  	  		  /* SVINFO */
+extern void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
+extern void anope_cmd_relase_svshold(char *nick);				  		  /* SVSHOLD */
+extern void anope_cmd_svsinfo();								  /* SVSINFO */
+extern void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
+extern void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
+extern void anope_cmd_svsnick(char *nick,char *newnick, time_t when);     	  		  /* SVSNICK */
+extern void anope_cmd_svsnoop(char *server, int set);			  	  		  /* SVSNOOP */
+extern void anope_cmd_svso(char *source,char *nick, char *flag);          	  		  /* SVSO   */
+extern void anope_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when); /* TOPIC */
+extern void anope_cmd_unsgline(char *mask);				  	  		  /* UNSGLINE */
+extern void anope_cmd_unsqline(char *user);                               	  		  /* UNSQLINE */
+extern void anope_cmd_unszline(char *mask);				  	  		  /* UNSZLINE */
+
+extern int anope_event_436(char *source, int ac, char **av);
+extern int anope_event_away(char *source, int ac, char **av);
+extern int anope_event_ping(char *source, int ac, char **av);
+extern int anope_event_motd(char *source, int ac, char **av);
+extern int anope_event_join(char *source, int ac, char **av);
+extern int anope_event_kick(char *source, int ac, char **av);
+extern int anope_event_kill(char *source, int ac, char **av);
+extern int anope_event_mode(char *source, int ac, char **av);
+extern int anope_event_quit(char *source, int ac, char **av);
+extern int anope_event_squit(char *source, int ac, char **av);
+extern int anope_event_topic(char *source, int ac, char **av);
+extern int anope_event_whois(char *source, int ac, char **av);
+extern int anope_event_part(char *source, int ac, char **av);
+extern int anope_event_server(char *source, int ac, char **av);
+extern int anope_event_nick(char *source, int ac, char **av);
+extern int anope_event_privmsg(char *source, int ac, char **av);
+extern int anope_event_capab(char *source, int ac, char **av);
+extern int anope_event_sjoin(char *source, int ac, char **av);
+extern int anope_event_cs(char *source, int ac, char **av);
+extern int anope_event_hs(char *source, int ac, char **av);
+extern int anope_event_ms(char *source, int ac, char **av);
+extern int anope_event_ns(char *source, int ac, char **av);
+extern int anope_event_os(char *source, int ac, char **av);
+extern int anope_event_vs(char *source, int ac, char **av);
+extern int anope_event_svinfo(char *source, int ac, char **av);
+extern int anope_event_chghost(char *source, int ac, char **av);
+extern int anope_event_sethost(char *source, int ac, char **av);
+extern int anope_event_chgident(char *source, int ac, char **av);
+extern int anope_event_setident(char *source, int ac, char **av);
+extern int anope_event_chgname(char *source, int ac, char **av);
+extern int anope_event_setname(char *source, int ac, char **av);
+extern int anope_event_svsinfo(char *source, int ac, char **av);
+extern int anope_event_snick(char *source, int ac, char **av);
+extern int anope_event_vhost(char *source, int ac, char **av);   /* Rage IRCD Only */
+extern int anope_event_tkl(char *source, int ac, char **av);
+extern int anope_event_eos(char *source, int ac, char **av);
+extern int anope_event_pass(char *source, int ac, char **av);
+extern int anope_event_netinfo(char *source, int ac, char **av);
+extern int anope_event_error(char *source, int ac, char **av);
+extern int anope_event_eb(char *source, int ac, char **av);
+
+extern void anope_set_umode(User * user, int ac, char **av);
+extern void anope_cmd_svid_umode(char *nick, time_t ts);
+extern void anope_cmd_svid_umode2(User *u, char *ts);
+extern void anope_cmd_svid_umode3(User *u, char *ts);
+extern void anope_cmd_nc_change(User *u);
+
+extern char *common_get_vident(User *u);
+extern char *common_get_vhost(User *u);
 
 #endif	/* EXTERN_H */

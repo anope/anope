@@ -1,4 +1,5 @@
 /* News functions.
+/* News functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -96,7 +97,6 @@ struct newsmsgs msgarray[] = {
 };
 
 /* *INDENT-ON* */
-
 static int *findmsgs(int16 type, char **typename)
 {
     int i;
@@ -209,7 +209,7 @@ void load_news()
 	restore_db(f);						\
 	log_perror("Write error on %s", NewsDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    wallops(NULL, "Write error on %s: %s", NewsDBName,	\
+	    anope_cmd_global(NULL, "Write error on %s: %s", NewsDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\

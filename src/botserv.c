@@ -46,7 +46,6 @@ static void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
                          char *reason);
 static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
                          char *nick);
-static void bot_raw_unban(ChannelInfo * ci, char *nick);
 
 static int do_help(User * u);
 static int do_bot(User * u);
@@ -222,20 +221,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
         cstatus = chan_get_user_status(ci->c, u);
 
     if (buf && !check_access(u, ci, CA_NOKICK) &&
-#ifdef HAS_HALFOP
-#if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
         (!(ci->botflags & BS_DONTKICKOPS)
          || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_OWNER | CUS_PROTECT)))
-# elif defined (IRC_ULTIMATE3) || defined(IRC_RAGE2)
-        (!(ci->botflags & BS_DONTKICKOPS)
-         || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_PROTECT)))
-# else
-        (!(ci->botflags & BS_DONTKICKOPS)
-         || !(cstatus & (CUS_HALFOP | CUS_OP)))
-# endif
-#else
-        (!(ci->botflags & BS_DONTKICKOPS) || !(cstatus & CUS_OP))
-#endif
+
         && (!(ci->botflags & BS_DONTKICKVOICES) || !(cstatus & CUS_VOICE))) {
         /* Bolds kicker */
         if ((ci->botflags & BS_KICK_BOLDS) && strchr(buf, 2)) {
@@ -466,13 +454,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
         cmd = strtok(buf, " ");
 
         if (cmd) {
-#if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
-            if (!stricmp(cmd, "!deowner")) {
+            if (!stricmp(cmd, "!deowner") && ircd->owner) {
                 if (is_founder(u, ci))
                     bot_raw_mode(u, ci, "-q", u->nick);
-            } else
-#endif
-            if (!stricmp(cmd, "!kb")) {
+            } else if (!stricmp(cmd, "!kb")) {
                 char *target = strtok(NULL, " ");
                 char *reason = strtok(NULL, "");
 
@@ -502,11 +487,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                     else
                         bot_raw_kick(u, ci, target, reason);
                 }
-#if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
-            } else if (!stricmp(cmd, "!owner")) {
+            } else if (!stricmp(cmd, "!owner") && ircd->owner) {
                 if (is_founder(u, ci))
                     bot_raw_mode(u, ci, "+q", u->nick);
-#endif
             } else if (!stricmp(cmd, "!seen")) {
                 char *target = strtok(NULL, " ");
                 char buf[BUFSIZE];
@@ -520,16 +503,16 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         /* If we look for the bot */
                         snprintf(buf, sizeof(buf),
                                  getstring(u->na, BOT_SEEN_BOT), u->nick);
-                        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                                 buf);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     } else if (!(na = findnick(target))
                                || (na->status & NS_VERBOTEN)) {
                         /* If the nick is not registered or forbidden */
                         snprintf(buf, sizeof(buf),
                                  getstring(u->na, BOT_SEEN_UNKNOWN),
                                  target);
-                        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                                 buf);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     } else if ((u2 = nc_on_chan(ci->c, na->nc))) {
                         /* If the nick we're looking for is on the channel,
                          * there are three possibilities: it's yourself,
@@ -549,8 +532,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                                      getstring(u->na,
                                                BOT_SEEN_ON_CHANNEL_AS),
                                      target, u2->nick);
-                        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                                 buf);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     } else if ((access = get_access_entry(na->nc, ci))) {
                         /* User is on the access list but not present actually.
                            Special case: if access->last_seen is 0 it's that we
@@ -568,15 +551,15 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                                      getstring(u->na, BOT_SEEN_NEVER),
                                      target);
                         }
-                        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                                 buf);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     } else {
                         /* All other cases */
                         snprintf(buf, sizeof(buf),
                                  getstring(u->na, BOT_SEEN_UNKNOWN),
                                  target);
-                        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                                 buf);
+                        anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                                          buf);
                     }
                 }
             } else if (!stricmp(cmd, "!unban")
@@ -584,9 +567,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                 char *target = strtok(NULL, " ");
 
                 if (!target)
-                    bot_raw_unban(ci, u->nick);
+                    common_unban(ci, u->nick);
                 else
-                    bot_raw_unban(ci, target);
+                    common_unban(ci, target);
             } else {
                 CSModeUtil *util = csmodeutils;
 
@@ -669,7 +652,7 @@ void load_bs_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", BotDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    wallops(NULL, "Write error on %s: %s", BotDBName,	\
+	    anope_cmd_global(NULL, "Write error on %s: %s", BotDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -830,8 +813,8 @@ BotInfo *findbot(char *nick)
 static void unassign(User * u, ChannelInfo * ci)
 {
     if (ci->c && ci->c->usercount >= BSMinUsers) {
-        send_cmd(ci->bi->nick, "PART %s :UNASSIGN from %s", ci->name,
-                 u->nick);
+        anope_cmd_part(ci->bi->nick, ci->name, "UNASSIGN from %s",
+                       u->nick);
     }
     ci->bi->chancount--;
     ci->bi = NULL;
@@ -851,7 +834,8 @@ static BanData *get_ban_data(Channel * c, User * u)
     if (!c || !u)
         return NULL;
 
-    snprintf(mask, sizeof(mask), "%s@%s", u->username, GetHost(u));
+    snprintf(mask, sizeof(mask), "%s@%s", u->username,
+             common_get_vhost(u));
 
     for (bd = c->bd; bd; bd = next) {
         if (now - bd->last_use > BSKeepData) {
@@ -955,7 +939,7 @@ void bot_join(ChannelInfo * ci)
             av[1] = sstrdup("-b");
             for (i = 0; i < count; i++) {
                 if (match_wild_nocase(ci->c->bans[i], botmask)) {
-                    send_mode(ci->bi->nick, ci->name, "%s", bans[i]);
+                    anope_cmd_mode(ci->bi->nick, ci->name, "%s", bans[i]);
                     av[2] = sstrdup(bans[i]);
                     do_cmode(ci->bi->nick, 3, av);
                     free(av[2]);
@@ -968,29 +952,12 @@ void bot_join(ChannelInfo * ci)
         /* Should we be invited? */
         if ((ci->c->mode & CMODE_i)
             || (ci->c->limit && ci->c->usercount >= ci->c->limit))
-            send_cmd(NULL, "NOTICE @%s :%s invited %s into the channel.",
-                     ci->c->name, ci->bi->nick, ci->bi->nick);
+            anope_cmd_notice_ops(NULL, ci->c->name,
+                                 "%s invited %s into the channel.",
+                                 ci->bi->nick, ci->bi->nick);
     }
-#ifdef IRC_BAHAMUT
-    send_cmd(ci->bi->nick, "SJOIN %ld %s", ci->c->creation_time,
-             ci->c->name);
-#elif defined(IRC_HYBRID)
-    send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), ci->c->name,
-             ci->bi->nick);
-#else
-    send_cmd(ci->bi->nick, "JOIN %s", ci->c->name);
-#endif
-
-#if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
-    send_mode(ci->bi->nick, ci->c->name, "+ao %s %s", ci->bi->nick,
-              ci->bi->nick);
-#elif defined(IRC_PTLINK)
-    /* PTLinks requieres an IRCop to u-line changes, so use ChanServ */
-    send_mode(s_ChanServ, ci->c->name, "+ao %s %s", ci->bi->nick,
-              ci->bi->nick);
-#else
-    send_mode(ci->bi->nick, ci->c->name, "+o %s", ci->bi->nick);
-#endif
+    anope_cmd_join(ci->bi->nick, ci->c->name, ci->c->creation_time);
+    anope_cmd_bot_chan_mode(ci->bi->nick, ci->c->name);
 }
 
 /*************************************************************************/
@@ -1033,7 +1000,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
         av[1] = sstrdup("+b");
         get_idealban(ci, u, mask, sizeof(mask));
         av[2] = mask;
-        send_mode(ci->bi->nick, av[0], "+b %s", av[2]);
+        anope_cmd_mode(ci->bi->nick, av[0], "+b %s", av[2]);
         do_cmode(ci->bi->nick, 3, av);
         free(av[1]);
     }
@@ -1062,7 +1029,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     av[0] = ci->name;
     av[1] = u->nick;
     av[2] = buf;
-    send_cmd(ci->bi->nick, "KICK %s %s :%s", av[0], av[1], av[2]);
+    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
 }
 
@@ -1080,31 +1047,31 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     if (!u)
         return;
 
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-    if (is_protected(u) && (requester != u)) {
-        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                 getstring2(NULL, PERMISSION_DENIED));
-        return;
+    if (ircd->protectedumode) {
+        if (is_protected(u) && (requester != u)) {
+            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                              getstring2(NULL, PERMISSION_DENIED));
+            return;
+        }
     }
-#endif
 
     if ((ci->flags & CI_PEACE) && stricmp(requester->nick, nick)
         && (get_access(u, ci) >= get_access(requester, ci)))
         return;
 
-#ifdef HAS_EXCEPT
-    if (is_excepted(ci, u) == 1) {
-        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                 getstring2(NULL, BOT_EXCEPT));
-        return;
+    if (ircd->except) {
+        if (is_excepted(ci, u) == 1) {
+            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                              getstring2(NULL, BOT_EXCEPT));
+            return;
+        }
     }
-#endif
 
     av[0] = ci->name;
     av[1] = sstrdup("+b");
     get_idealban(ci, u, mask, sizeof(mask));
     av[2] = mask;
-    send_mode(ci->bi->nick, av[0], "+b %s", av[2]);
+    anope_cmd_mode(ci->bi->nick, av[0], "+b %s", av[2]);
     do_cmode(ci->bi->nick, 3, av);
     free(av[1]);
 
@@ -1119,7 +1086,7 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         av[2] = reason;
     }
 
-    send_cmd(ci->bi->nick, "KICK %s %s :%s", av[0], av[1], av[2]);
+    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
 }
 
@@ -1136,13 +1103,13 @@ static void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
     if (!u || !is_on_chan(ci->c, u))
         return;
 
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-    if (is_protected(u) && (requester != u)) {
-        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                 getstring2(NULL, PERMISSION_DENIED));
-        return;
+    if (ircd->protectedumode) {
+        if (is_protected(u) && (requester != u)) {
+            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                              getstring2(NULL, PERMISSION_DENIED));
+            return;
+        }
     }
-#endif
 
     if ((ci->flags & CI_PEACE) && stricmp(requester->nick, nick)
         && (get_access(u, ci) >= get_access(requester, ci)))
@@ -1159,7 +1126,7 @@ static void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
         av[2] = reason;
     }
 
-    send_cmd(ci->bi->nick, "KICK %s %s :%s", av[0], av[1], av[2]);
+    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
 }
 
@@ -1176,13 +1143,13 @@ static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
     if (!u || !is_on_chan(ci->c, u))
         return;
 
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-    if (is_protected(u) && *mode == '-' && (requester != u)) {
-        send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
-                 getstring2(NULL, PERMISSION_DENIED));
-        return;
+    if (ircd->protectedumode) {
+        if (is_protected(u) && *mode == '-' && (requester != u)) {
+            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+                              getstring2(NULL, PERMISSION_DENIED));
+            return;
+        }
     }
-#endif
 
     if (*mode == '-' && (ci->flags & CI_PEACE)
         && stricmp(requester->nick, nick)
@@ -1193,55 +1160,10 @@ static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
     av[1] = mode;
     av[2] = nick;
 
-    send_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
+    anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
     do_cmode(ci->bi->nick, 3, av);
 }
 
-/*************************************************************************/
-
-/* Removes all bans for a nick on a channel */
-
-static void bot_raw_unban(ChannelInfo * ci, char *nick)
-{
-#ifndef IRC_BAHAMUT
-    int count, i;
-    char *av[3], **bans;
-    User *u;
-#endif
-
-    if (!ci || !ci->c || !ci->bi || !nick)
-        return;
-#ifndef IRC_BAHAMUT
-    if (!(u = finduser(nick)))
-        return;
-#else
-    if (!finduser(nick))
-        return;
-#endif
-
-#ifndef IRC_BAHAMUT
-    av[0] = ci->name;
-    av[1] = sstrdup("-b");
-
-    count = ci->c->bancount;
-    bans = scalloc(sizeof(char *) * count, 1);
-    memcpy(bans, ci->c->bans, sizeof(char *) * count);
-
-    for (i = 0; i < count; i++) {
-        if (match_usermask(bans[i], u)) {
-            send_mode(ci->bi->nick, ci->name, "-b %s", bans[i]);
-            av[2] = bans[i];
-            do_cmode(ci->bi->nick, 3, av);
-        }
-    }
-    free(bans);
-    free(av[1]);
-#else
-    send_cmd(ServerName, "SVSMODE %s -b %s", ci->name, nick);
-#endif
-}
-
-/*************************************************************************/
 /*************************************************************************/
 
 static int do_help(User * u)
@@ -1383,8 +1305,8 @@ static int do_bot(User * u)
             EnforceQlinedNick(nick, s_BotServ);
 
             /* We make the bot online, ready to serve */
-            NEWNICK(bi->nick, bi->user, bi->host, bi->real,
-                    BOTSERV_BOTS_MODE, 1);
+            anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
+                               ircd->botserv_bot_mode);
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
                         bi->host, bi->real);
@@ -1493,9 +1415,9 @@ static int do_bot(User * u)
             if (stricmp(bi->nick, nick)) {
                 /* The new nick is really different, so we remove the Q line for
                    the old nick. */
-#ifndef IRC_HYBRID
-                send_cmd(NULL, "UNSQLINE %s", bi->nick);
-#endif
+                if (ircd->sqline) {
+                    anope_cmd_unsqline(bi->nick);
+                }
 
                 /* We check whether the nick is registered, and drop it if so */
                 if ((na = findnick(nick)))
@@ -1524,12 +1446,12 @@ static int do_bot(User * u)
             /* If only the nick changes, we just make the bot change his nick,
                else we must make it quit and rejoin. */
             if (!user)
-                send_cmd(oldnick, "NICK %s", bi->nick);
+                anope_cmd_chg_nick(oldnick, bi->nick);
             else {
-                send_cmd(oldnick, "QUIT :Quit: Be right back");
+                anope_cmd_quit(oldnick, "Quit: Be right back");
 
-                NEWNICK(bi->nick, bi->user, bi->host, bi->real,
-                        BOTSERV_BOTS_MODE, 1);
+                anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
+                                   ircd->botserv_bot_mode);
                 bot_rejoin_all(bi);
             }
 
@@ -1546,12 +1468,12 @@ static int do_bot(User * u)
         else if (!(bi = findbot(nick)))
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
         else {
-            send_cmd(bi->nick,
-                     "QUIT :Quit: Help! I'm being deleted by %s!",
-                     u->nick);
-#ifndef IRC_HYBRID
-            send_cmd(NULL, "UNSQLINE %s", bi->nick);
-#endif
+            anope_cmd_quit(bi->nick,
+                           "Quit: Help! I'm being deleted by %s!",
+                           u->nick);
+            if (ircd->sqline) {
+                anope_cmd_unsqline(bi->nick);
+            }
             delbot(bi);
 
             notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
@@ -2494,11 +2416,12 @@ static int do_say(User * u)
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
         if (text[0] != '\001') {
-            send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name, text);
+            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", text);
             ci->bi->lastmsg = time(NULL);
             if (logchan && LogBot)
-                send_cmd(ci->bi->nick, "PRIVMSG %s :SAY %s %s %s",
-                         LogChannel, u->nick, ci->name, text);
+                anope_cmd_privmsg(ci->bi->nick, LogChannel,
+                                  ":SAY %s %s %s", u->nick, ci->name,
+                                  text);
         } else {
             syntax_error(s_BotServ, u, "SAY", BOT_SAY_SYNTAX);
         }
@@ -2528,12 +2451,12 @@ static int do_act(User * u)
     else if (!check_access(u, ci, CA_SAY))
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
-        send_cmd(ci->bi->nick, "PRIVMSG %s :%cACTION %s%c", ci->name, 1,
-                 text, 1);
+        anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION %s%c", 1,
+                          text, 1);
         ci->bi->lastmsg = time(NULL);
         if (logchan && LogBot)
-            send_cmd(ci->bi->nick, "PRIVMSG %s :ACT %s %s %s", LogChannel,
-                     u->nick, ci->name, text);
+            anope_cmd_privmsg(ci->bi->nick, LogChannel, ":ACT %s %s %s",
+                              u->nick, ci->name, text);
     }
     return MOD_CONT;
 }

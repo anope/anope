@@ -6044,3 +6044,15 @@ HOST_HELP_GROUP
 	Ez a parancs lehetõvé teszi, hogy a JELENLEGI nick
 	vhostját beállítsuk a csoport minden nickjére.
 
+OPER_SVSNICK_UNSUPPORTED
+	Sorry, SVSNICK is not available on this network.
+
+OPER_SQLINE_UNSUPPORTED
+	Sorry, SQLINE is not available on this network.
+
+OPER_SVSO_UNSUPPORTED
+	Sorry, OLINE is not available on this network.
+
+OPER_UMODE_UNSUPPORTED
+	Sorry, UMODE is not available on this network.
+

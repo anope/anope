@@ -1,4 +1,5 @@
 /* MySQL functions.
+/* MySQL functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -418,16 +419,8 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     ciforbidby = db_mysql_quote(ci->forbidby);
     ciforbidreason = db_mysql_quote(ci->forbidreason);
     cimlock_key = db_mysql_quote(ci->mlock_key);
-#ifdef HAS_FMODE
     cimlock_flood = db_mysql_quote(ci->mlock_flood);
-#else
-    cimlock_flood = NULL;
-#endif
-#ifdef HAS_LMODE
     cimlock_redirect = db_mysql_quote(ci->mlock_redirect);
-#else
-    cimlock_redirect = NULL;
-#endif
     cientrymsg = db_mysql_quote(ci->entry_message);
     cibotnick = ci->bi ? db_mysql_quote(ci->bi->nick) : "";
 
@@ -455,16 +448,8 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
              (int) ci->accesscount, (int) ci->akickcount,
              (int) ci->mlock_on, (int) ci->mlock_off,
              (int) ci->mlock_limit, cimlock_key,
-#ifdef HAS_FMODE
              cimlock_flood,
-#else
-             "",
-#endif
-#ifdef HAS_LMODE
              cimlock_redirect,
-#else
-             "",
-#endif
              cientrymsg,
              (int) ci->memos.memomax,
              cibotnick,
@@ -502,16 +487,8 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
                  (int) ci->accesscount, (int) ci->akickcount,
                  (int) ci->mlock_on, (int) ci->mlock_off,
                  (int) ci->mlock_limit, cimlock_key,
-#ifdef HAS_FMODE
                  cimlock_flood,
-#else
-                 "",
-#endif
-#ifdef HAS_LMODE
                  cimlock_redirect,
-#else
-                 "",
-#endif
                  cientrymsg,
                  cibotnick,
                  (int) ci->botflags,
@@ -1330,13 +1307,8 @@ void db_mysql_load_cs_dbase(void)
         ci->mlock_off = atoi(mysql_row[19]);
         ci->mlock_limit = atoi(mysql_row[20]);
         ci->mlock_key = sstrdup(mysql_row[21]);
-#ifdef HAS_FMODE
         ci->mlock_flood = sstrdup(mysql_row[22]);
-#endif
-
-#ifdef HAS_LMODE
         ci->mlock_redirect = sstrdup(mysql_row[23]);
-#endif
         ci->memos.memomax = atoi(mysql_row[25]);
         snprintf(sqlcmd, MAX_SQL_BUF,
                  "SELECT `number`,`flags`,`time`,`sender`,`text` FROM `anope_ms_info` WHERE `receiver` = '%s'",
@@ -1636,3 +1608,4 @@ void db_mysql_load_ns_dbase(void)
         }
     }
 }
+ 

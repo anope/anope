@@ -109,13 +109,16 @@
 #undef IRC_RAGE2
 
 /* "Second IRCD type" */
-#undef IRC_ULTIMATE
+#undef IRC_ULTIMATE2
 
 /* "Second IRCD type" */
 #undef IRC_ULTIMATE3
 
 /* "Second IRCD type" */
-#undef IRC_UNREAL
+#undef IRC_UNREAL31
+
+/* "Second IRCD type" */
+#undef IRC_UNREAL32
 
 /* "Second IRCD type" */
 #undef IRC_VIAGRA

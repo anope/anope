@@ -53,16 +53,12 @@ static void free_operlist_entry(SList * slist, void *item);
 
 static int is_akill_entry_equal(SList * slist, void *item1, void *item2);
 static void free_akill_entry(SList * slist, void *item);
-#ifdef IRC_BAHAMUT
 static int is_sgline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_sgline_entry(SList * slist, void *item);
-#endif
 static int is_sqline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_sqline_entry(SList * slist, void *item);
-#ifdef IRC_BAHAMUT
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_szline_entry(SList * slist, void *item);
-#endif
 
 static int do_help(User * u);
 static int do_global(User * u);
@@ -113,17 +109,9 @@ static int showModuleMsgLoaded(MessageHash * msgList, char *mod_name,
                                User * u);
 #endif
 
-
-#ifdef USE_OSSVS
-#ifndef IRC_HYBRID
 static int do_operumodes(User * u);
-#endif
 static int do_svsnick(User * u);
-#endif
-
-#if defined(IRC_UNREAL) && defined(USE_OSSVS)
 static int do_operoline(User * u);
-#endif
 
 #ifdef DEBUG_COMMANDS
 static void send_clone_lists(User * u);
@@ -141,16 +129,12 @@ SListOpts saopts = { SLISTF_SORT, &compare_adminlist_entries, NULL,
     &free_adminlist_entry
 };
 
-#ifdef IRC_BAHAMUT
 SListOpts sgopts = { 0, NULL, &is_sgline_entry_equal, &free_sgline_entry };
-#endif
 SListOpts soopts =
     { SLISTF_SORT, &compare_operlist_entries, NULL, &free_operlist_entry };
 SListOpts sqopts =
     { SLISTF_SORT, NULL, &is_sqline_entry_equal, &free_sqline_entry };
-#ifdef IRC_BAHAMUT
 SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
-#endif
 
 /*************************************************************************/
 /* *INDENT-OFF* */
@@ -190,19 +174,13 @@ void moduleAddOperServCmds(void) {
     c = createCommand("SET DEBUG",  NULL,          NULL,OPER_HELP_SET_DEBUG, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET NOEXPIRE",NULL,         NULL,OPER_HELP_SET_NOEXPIRE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("SET SUPERADMIN",NULL,         NULL,OPER_HELP_SET_SUPERADMIN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#ifdef USE_OSSVS
     c = createCommand("SVSNICK",       do_svsnick,    is_services_admin,OPER_HELP_SVSNICK, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#ifndef IRC_HYBRID
     c = createCommand("UMODE",     do_operumodes,     is_services_admin,OPER_HELP_UMODE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#endif
-#endif
     c = createCommand("NOOP",       do_noop,       is_services_admin,OPER_HELP_NOOP, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("JUPE",       do_jupe,       is_services_admin,OPER_HELP_JUPE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("RAW",        do_raw,        is_services_admin,OPER_HELP_RAW, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("IGNORE",     do_ignoreuser,     is_services_admin,OPER_HELP_IGNORE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#if defined(IRC_UNREAL) && defined(USE_OSSVS)
     c = createCommand("OLINE",     do_operoline,     is_services_admin,OPER_HELP_OLINE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#endif
     c = createCommand("UPDATE",     do_update,     is_services_admin,OPER_HELP_UPDATE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("RELOAD",     do_reload,     is_services_admin,OPER_HELP_RELOAD, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("QUIT",       do_os_quit,    is_services_admin,OPER_HELP_QUIT, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
@@ -259,16 +237,19 @@ void os_init(void)
 
     slist_init(&akills);
     akills.opts = &akopts;
-    slist_init(&sglines);
-#ifdef IRC_BAHAMUT
-    sglines.opts = &sgopts;
-#endif
-    slist_init(&sqlines);
-    sqlines.opts = &sqopts;
-    slist_init(&szlines);
-#ifdef IRC_BAHAMUT
-    szlines.opts = &szopts;
-#endif
+
+    if (ircd->sgline) {
+        slist_init(&sglines);
+        sglines.opts = &sgopts;
+    }
+    if (ircd->sqline) {
+        slist_init(&sqlines);
+        sqlines.opts = &sqopts;
+    }
+    if (ircd->szline) {
+        slist_init(&szlines);
+        szlines.opts = &szopts;
+    }
 }
 
 /*************************************************************************/
@@ -327,46 +308,43 @@ static void get_operserv_stats(long *nrec, long *memuse)
         mem += strlen(ak->reason) + 1;
     }
 
-#ifdef IRC_BAHAMUT
+    if (ircd->sgline) {
+        count += sglines.count;
+        mem += sglines.capacity;
+        mem += sglines.count * sizeof(SXLine);
 
-    count += sglines.count;
-    mem += sglines.capacity;
-    mem += sglines.count * sizeof(SXLine);
+        for (i = 0; i < sglines.count; i++) {
+            sx = sglines.list[i];
+            mem += strlen(sx->mask) + 1;
+            mem += strlen(sx->by) + 1;
+            mem += strlen(sx->reason) + 1;
+        }
+    }
+    if (ircd->sqline) {
+        count += sqlines.count;
+        mem += sqlines.capacity;
+        mem += sqlines.count * sizeof(SXLine);
 
-    for (i = 0; i < sglines.count; i++) {
-        sx = sglines.list[i];
-        mem += strlen(sx->mask) + 1;
-        mem += strlen(sx->by) + 1;
-        mem += strlen(sx->reason) + 1;
+        for (i = 0; i < sqlines.count; i++) {
+            sx = sqlines.list[i];
+            mem += strlen(sx->mask) + 1;
+            mem += strlen(sx->by) + 1;
+            mem += strlen(sx->reason) + 1;
+        }
+    }
+    if (ircd->szline) {
+        count += szlines.count;
+        mem += szlines.capacity;
+        mem += szlines.count * sizeof(SXLine);
+
+        for (i = 0; i < szlines.count; i++) {
+            sx = szlines.list[i];
+            mem += strlen(sx->mask) + 1;
+            mem += strlen(sx->by) + 1;
+            mem += strlen(sx->reason) + 1;
+        }
     }
 
-#endif
-
-    count += sqlines.count;
-    mem += sqlines.capacity;
-    mem += sqlines.count * sizeof(SXLine);
-
-    for (i = 0; i < sqlines.count; i++) {
-        sx = sqlines.list[i];
-        mem += strlen(sx->mask) + 1;
-        mem += strlen(sx->by) + 1;
-        mem += strlen(sx->reason) + 1;
-    }
-
-#ifdef IRC_BAHAMUT
-
-    count += szlines.count;
-    mem += szlines.capacity;
-    mem += szlines.count * sizeof(SXLine);
-
-    for (i = 0; i < szlines.count; i++) {
-        sx = szlines.list[i];
-        mem += strlen(sx->mask) + 1;
-        mem += strlen(sx->by) + 1;
-        mem += strlen(sx->reason) + 1;
-    }
-
-#endif
 
     get_news_stats(&count2, &mem2);
     count += count2;
@@ -437,7 +415,7 @@ static void load_old_akill(void)
 
         /* No nicknames allowed! */
         if (strchr(ak->user, '!')) {
-            s_rakill(ak->user, ak->host);
+            anope_cmd_remove_akill(ak->user, ak->host);
             free(ak);
             continue;
         }
@@ -473,7 +451,7 @@ static void load_old_akill(void)
                 if (match_wild_nocase(amask, mask2)
                     && (entry->expires >= ak->expires
                         || entry->expires == 0)) {
-                    s_rakill(ak->user, ak->host);
+                    anope_cmd_remove_akill(ak->user, ak->host);
                     free(ak);
                     ak = NULL;
                     break;
@@ -683,7 +661,7 @@ void load_os_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", OperDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    wallops(NULL, "Write error on %s: %s", OperDBName,	\
+	    anope_cmd_global(NULL, "Write error on %s: %s", OperDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -900,13 +878,13 @@ void check_clones(User * user)
         free(clonelist[0].host);
     i = CLONE_DETECT_SIZE - 1;
     memmove(clonelist, clonelist + 1, sizeof(struct clone) * i);
-    clonelist[i].host = sstrdup(GetHost(user));
+    clonelist[i].host = sstrdup(common_get_vhost(user));
     last_time = clonelist[i].time = time(NULL);
     clone_count = 1;
     while (--i >= 0 && clonelist[i].host) {
         if (clonelist[i].time < last_time - CloneMaxDelay)
             break;
-        if (stricmp(clonelist[i].host, GetHost(user)) == 0) {
+        if (stricmp(clonelist[i].host, common_get_vhost(user)) == 0) {
             ++clone_count;
             last_time = clonelist[i].time;
             if (clone_count >= CloneMinUsers)
@@ -917,22 +895,22 @@ void check_clones(User * user)
         /* Okay, we have clones.  Check first to see if we already know
          * about them. */
         for (i = CLONE_DETECT_SIZE - 1; i >= 0 && warnings[i].host; --i) {
-            if (stricmp(warnings[i].host, GetHost(user)) == 0)
+            if (stricmp(warnings[i].host, common_get_vhost(user)) == 0)
                 break;
         }
         if (i < 0
             || warnings[i].time < user->my_signon - CloneWarningDelay) {
             /* Send out the warning, and note it. */
-            wallops(s_OperServ,
-                    "\2WARNING\2 - possible clones detected from %s",
-                    GetHost(user));
+            anope_cmd_global(s_OperServ,
+                             "\2WARNING\2 - possible clones detected from %s",
+                             common_get_vhost(user));
             alog("%s: possible clones detected from %s", s_OperServ,
-                 GetHost(user));
+                 common_get_vhost(user));
             i = CLONE_DETECT_SIZE - 1;
             if (warnings[0].host)
                 free(warnings[0].host);
             memmove(warnings, warnings + 1, sizeof(struct clone) * i);
-            warnings[i].host = sstrdup(GetHost(user));
+            warnings[i].host = sstrdup(common_get_vhost(user));
             warnings[i].time = clonelist[i].time;
             if (KillClones)
                 kill_user(s_OperServ, user->nick, "Clone kill");
@@ -1011,7 +989,8 @@ static int do_global(User * u)
         return MOD_CONT;
     }
     if (WallOSGlobal)
-        wallops(s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
+        anope_cmd_global(s_OperServ, "\2%s\2 just used GLOBAL command.",
+                         u->nick);
     oper_global(u->nick, "%s", msg);
     return MOD_CONT;
 }
@@ -1093,73 +1072,96 @@ static int do_stats(User * u)
                 notice_lang(s_OperServ, u, OPER_STATS_AKILL_EXPIRE_MIN);
             else
                 notice_lang(s_OperServ, u, OPER_STATS_AKILL_EXPIRE_NONE);
-#ifdef IRC_BAHAMUT
-            /* SGLINEs */
-            notice_lang(s_OperServ, u, OPER_STATS_SGLINE_COUNT,
-                        sglines.count);
-            timeout = SGLineExpiry + 59;
-            if (timeout >= 172800)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_DAYS,
-                            timeout / 86400);
-            else if (timeout >= 86400)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_DAY);
-            else if (timeout >= 7200)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_HOURS,
-                            timeout / 3600);
-            else if (timeout >= 3600)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_HOUR);
-            else if (timeout >= 120)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_MINS,
-                            timeout / 60);
-            else if (timeout >= 60)
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_MIN);
-            else
-                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_EXPIRE_NONE);
-#endif
-            /* SQLINEs */
-            notice_lang(s_OperServ, u, OPER_STATS_SQLINE_COUNT,
-                        sqlines.count);
-            timeout = SQLineExpiry + 59;
-            if (timeout >= 172800)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAYS,
-                            timeout / 86400);
-            else if (timeout >= 86400)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_DAY);
-            else if (timeout >= 7200)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOURS,
-                            timeout / 3600);
-            else if (timeout >= 3600)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_HOUR);
-            else if (timeout >= 120)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MINS,
-                            timeout / 60);
-            else if (timeout >= 60)
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_MIN);
-            else
-                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_EXPIRE_NONE);
-#ifdef IRC_BAHAMUT
-            /* SZLINEs */
-            notice_lang(s_OperServ, u, OPER_STATS_SZLINE_COUNT,
-                        szlines.count);
-            timeout = SZLineExpiry + 59;
-            if (timeout >= 172800)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAYS,
-                            timeout / 86400);
-            else if (timeout >= 86400)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_DAY);
-            else if (timeout >= 7200)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOURS,
-                            timeout / 3600);
-            else if (timeout >= 3600)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_HOUR);
-            else if (timeout >= 120)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MINS,
-                            timeout / 60);
-            else if (timeout >= 60)
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_MIN);
-            else
-                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_EXPIRE_NONE);
-#endif
+            if (ircd->sgline) {
+                /* SGLINEs */
+                notice_lang(s_OperServ, u, OPER_STATS_SGLINE_COUNT,
+                            sglines.count);
+                timeout = SGLineExpiry + 59;
+                if (timeout >= 172800)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_DAYS,
+                                timeout / 86400);
+                else if (timeout >= 86400)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_DAY);
+                else if (timeout >= 7200)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_HOURS,
+                                timeout / 3600);
+                else if (timeout >= 3600)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_HOUR);
+                else if (timeout >= 120)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_MINS,
+                                timeout / 60);
+                else if (timeout >= 60)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_MIN);
+                else
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SGLINE_EXPIRE_NONE);
+            }
+            if (ircd->sqline) {
+                /* SQLINEs */
+                notice_lang(s_OperServ, u, OPER_STATS_SQLINE_COUNT,
+                            sqlines.count);
+                timeout = SQLineExpiry + 59;
+                if (timeout >= 172800)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_DAYS,
+                                timeout / 86400);
+                else if (timeout >= 86400)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_DAY);
+                else if (timeout >= 7200)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_HOURS,
+                                timeout / 3600);
+                else if (timeout >= 3600)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_HOUR);
+                else if (timeout >= 120)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_MINS,
+                                timeout / 60);
+                else if (timeout >= 60)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_MIN);
+                else
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SQLINE_EXPIRE_NONE);
+            }
+            if (ircd->szline) {
+                /* SZLINEs */
+                notice_lang(s_OperServ, u, OPER_STATS_SZLINE_COUNT,
+                            szlines.count);
+                timeout = SZLineExpiry + 59;
+                if (timeout >= 172800)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_DAYS,
+                                timeout / 86400);
+                else if (timeout >= 86400)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_DAY);
+                else if (timeout >= 7200)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_HOURS,
+                                timeout / 3600);
+                else if (timeout >= 3600)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_HOUR);
+                else if (timeout >= 120)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_MINS,
+                                timeout / 60);
+                else if (timeout >= 60)
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_MIN);
+                else
+                    notice_lang(s_OperServ, u,
+                                OPER_STATS_SZLINE_EXPIRE_NONE);
+            }
             return MOD_CONT;
         } else if (!stricmp(extra, "RESET")) {
             if (is_services_admin(u)) {
@@ -1440,20 +1442,20 @@ static int do_os_mode(User * u)
     } else if (c->bouncy_modes) {
         notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
         return MOD_CONT;
-#ifdef CMODE_A
-    } else if ((!is_services_admin(u)) && (c->mode & CMODE_A)) {
-        notice_lang(s_OperServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-#endif
+    } else if (ircd->adminmode) {
+        if ((!is_services_admin(u)) && (c->mode & ircd->adminmode)) {
+            notice_lang(s_OperServ, u, PERMISSION_DENIED);
+            return MOD_CONT;
+        }
     } else {
-        send_mode(s_OperServ, chan, "%s", modes);
+        anope_cmd_mode(s_OperServ, chan, "%s", modes);
 
         ac = split_buf(modes, &av, 1);
         chan_set_modes(s_OperServ, c, ac, av, 0);
 
         if (WallOSMode)
-            wallops(s_OperServ, "%s used MODE %s on %s", u->nick, modes,
-                    chan);
+            anope_cmd_global(s_OperServ, "%s used MODE %s on %s", u->nick,
+                             modes, chan);
     }
     return MOD_CONT;
 }
@@ -1466,14 +1468,17 @@ static int do_os_mode(User * u)
  * modified to be part of the SuperAdmin directive -jester
  * check user flag for SuperAdmin -rob
  */
-#ifdef USE_OSSVS
-#ifndef IRC_HYBRID
 static int do_operumodes(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *modes = strtok(NULL, "");
 
     User *u2;
+
+    if (!ircd->umode) {
+        notice_lang(s_OperServ, u, OPER_UMODE_UNSUPPORTED);
+        return MOD_CONT;
+    }
 
     /* Only allow this if SuperAdmin is enabled */
     if (!u->isSuperAdmin) {
@@ -1497,20 +1502,20 @@ static int do_operumodes(User * u)
     if (!(u2 = finduser(nick))) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else {
-        send_mode(s_OperServ, nick, "%s", modes);
+        anope_cmd_mode(s_OperServ, nick, "%s", modes);
 
-        change_user_mode(u2, modes, NULL);
+        common_svsmode(u2, modes, NULL);
 
         notice_lang(s_OperServ, u, OPER_UMODE_SUCCESS, nick);
         notice_lang(s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
 
         if (WallOSMode)
-            wallops(s_OperServ, "\2%s\2 used UMODE on %s", u->nick, nick);
+            anope_cmd_global(s_OperServ, "\2%s\2 used UMODE on %s",
+                             u->nick, nick);
     }
     return MOD_CONT;
 }
-#endif
-#endif
+
 /**************************************************************************/
 
 /**
@@ -1519,13 +1524,17 @@ static int do_operumodes(User * u)
  * modified to be part of the SuperAdmin directive -jester
  * check u-> for SuperAdmin -rob
  */
-#if defined (IRC_UNREAL) && defined (USE_OSSVS)
 
 static int do_operoline(User * u)
 {
     char *nick = strtok(NULL, " ");
     char *flags = strtok(NULL, "");
     User *u2 = NULL;
+
+    if (!ircd->omode) {
+        notice_lang(s_OperServ, u, OPER_SVSO_UNSUPPORTED);
+        return MOD_CONT;
+    }
 
     /* Only allow this if SuperAdmin is enabled */
     if (!u->isSuperAdmin) {
@@ -1544,22 +1553,24 @@ static int do_operoline(User * u)
         if (!finduser(nick)) {
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
-            send_cmd(s_OperServ, "SVSO %s %s", nick, flags);
-            send_mode(s_OperServ, nick, "+o");
-            change_user_mode(u2, "+o", NULL);
+            anope_cmd_svso(s_OperServ, nick, flags);
+            anope_cmd_mode(s_OperServ, nick, "+o");
+            common_svsmode(u2, "+o", NULL);
             notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
-            wallops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
+            anope_cmd_global(s_OperServ, "\2%s\2 used OLINE for %s",
+                             u->nick, nick);
         } else if (u2 && flags[0] == '-') {
-            send_cmd(s_OperServ, "SVSO %s %s", nick, flags);
+            anope_cmd_svso(s_OperServ, nick, flags);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
-            wallops(s_OperServ, "\2%s\2 used OLINE for %s", u->nick, nick);
+            anope_cmd_global(s_OperServ, "\2%s\2 used OLINE for %s",
+                             u->nick, nick);
         } else
             syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
     }
     return MOD_CONT;
 }
-#endif
+
 /*************************************************************************/
 
 /* Clear all modes from a channel. */
@@ -1574,10 +1585,8 @@ static int do_clearmodes(User * u)
     int all = 0;
     int count;                  /* For saving ban info */
     char **bans;                /* For saving ban info */
-#ifdef HAS_EXCEPT
     int exceptcount;            /* For saving except info */
     char **excepts;             /* For saving except info */
-#endif
     struct c_userlist *cu, *next;
 
     if (!chan) {
@@ -1600,8 +1609,8 @@ static int do_clearmodes(User * u)
         }
 
         if (WallOSClearmodes)
-            wallops(s_OperServ, "%s used CLEARMODES%s on %s", u->nick,
-                    all ? " ALL" : "", chan);
+            anope_cmd_global(s_OperServ, "%s used CLEARMODES%s on %s",
+                             u->nick, all ? " ALL" : "", chan);
 
         if (all) {
             /* Clear mode +o */
@@ -1614,7 +1623,8 @@ static int do_clearmodes(User * u)
                 argv[0] = sstrdup("-o");
                 argv[1] = cu->user->nick;
 
-                send_mode(s_OperServ, c->name, "-o %s", cu->user->nick);
+                anope_cmd_mode(s_OperServ, c->name, "-o %s",
+                               cu->user->nick);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
 
                 free(argv[0]);
@@ -1630,34 +1640,36 @@ static int do_clearmodes(User * u)
                 argv[0] = sstrdup("-v");
                 argv[1] = sstrdup(cu->user->nick);
 
-                send_mode(s_OperServ, c->name, "-v %s", cu->user->nick);
+                anope_cmd_mode(s_OperServ, c->name, "-v %s",
+                               cu->user->nick);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
 
                 free(argv[0]);
             }
-#ifdef HAS_HALFOP
             /* Clear mode +h */
-            for (cu = c->users; cu; cu = next) {
-                next = cu->next;
+            if (ircd->halfop) {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
 
-                if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
-                    continue;
+                    if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+                        continue;
 
-                argv[0] = sstrdup("-h");
-                argv[1] = sstrdup(cu->user->nick);
+                    argv[0] = sstrdup("-h");
+                    argv[1] = sstrdup(cu->user->nick);
 
-                send_mode(s_OperServ, c->name, "-h %s", cu->user->nick);
-                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    anope_cmd_mode(s_OperServ, c->name, "-h %s",
+                                   cu->user->nick);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
 
-                free(argv[0]);
+                    free(argv[0]);
+                }
             }
-#endif
         }
 
         /* Clear modes */
-        send_mode(s_OperServ, c->name, "%s %s", MODESTOREMOVE,
-                  c->key ? c->key : "");
-        argv[0] = sstrdup(MODESTOREMOVE);
+        anope_cmd_mode(s_OperServ, c->name, "%s %s", ircd->modestoremove,
+                       c->key ? c->key : "");
+        argv[0] = sstrdup(ircd->modestoremove);
         argv[1] = c->key ? c->key : NULL;
         chan_set_modes(s_OperServ, c, c->key ? 2 : 1, argv, 0);
         free(argv[0]);
@@ -1672,7 +1684,7 @@ static int do_clearmodes(User * u)
         for (i = 0; i < count; i++) {
             argv[0] = sstrdup("-b");
             argv[1] = bans[i];
-            send_mode(s_OperServ, c->name, "-b %s", argv[1]);
+            anope_cmd_mode(s_OperServ, c->name, "-b %s", argv[1]);
             chan_set_modes(s_OperServ, c, 2, argv, 0);
             free(argv[1]);
             free(argv[0]);
@@ -1680,25 +1692,25 @@ static int do_clearmodes(User * u)
 
         free(bans);
 
-#ifdef HAS_EXCEPT
-        /* Clear excepts */
-        exceptcount = c->exceptcount;
-        excepts = scalloc(sizeof(char *) * exceptcount, 1);
+        if (ircd->except) {
+            /* Clear excepts */
+            exceptcount = c->exceptcount;
+            excepts = scalloc(sizeof(char *) * exceptcount, 1);
 
-        for (i = 0; i < exceptcount; i++)
-            excepts[i] = sstrdup(c->excepts[i]);
+            for (i = 0; i < exceptcount; i++)
+                excepts[i] = sstrdup(c->excepts[i]);
 
-        for (i = 0; i < exceptcount; i++) {
-            argv[0] = sstrdup("-e");
-            argv[1] = excepts[i];
-            send_mode(s_OperServ, c->name, "-e %s", argv[1]);
-            chan_set_modes(s_OperServ, c, 2, argv, 0);
-            free(argv[1]);
-            free(argv[0]);
+            for (i = 0; i < exceptcount; i++) {
+                argv[0] = sstrdup("-e");
+                argv[1] = excepts[i];
+                anope_cmd_mode(s_OperServ, c->name, "-e %s", argv[1]);
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[1]);
+                free(argv[0]);
+            }
+
+            free(excepts);
         }
-
-        free(excepts);
-#endif
     }
 
     notice_lang(s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);
@@ -1728,9 +1740,10 @@ static int do_os_kick(User * u)
         notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
         return MOD_CONT;
     }
-    send_cmd(s_OperServ, "KICK %s %s :%s (%s)", chan, nick, u->nick, s);
+    anope_cmd_kick(s_OperServ, chan, nick, "%s (%s)", u->nick, s);
     if (WallOSKick)
-        wallops(s_OperServ, "%s used KICK on %s/%s", u->nick, nick, chan);
+        anope_cmd_global(s_OperServ, "%s used KICK on %s/%s", u->nick,
+                         nick, chan);
     argv[0] = sstrdup(chan);
     argv[1] = sstrdup(nick);
     argv[2] = sstrdup(s);
@@ -1744,7 +1757,6 @@ static int do_os_kick(User * u)
 /*************************************************************************/
 
 /* Forcefully change a user's nickname */
-#ifdef USE_OSSVS
 
 static int do_svsnick(User * u)
 {
@@ -1753,6 +1765,11 @@ static int do_svsnick(User * u)
 
     NickAlias *na;
     char *c;
+
+    if (!ircd->svsnick) {
+        notice_lang(s_OperServ, u, OPER_SVSNICK_UNSUPPORTED);
+        return MOD_CONT;
+    }
 
     /* Only allow this if SuperAdmin is enabled */
     if (!u->isSuperAdmin) {
@@ -1794,13 +1811,13 @@ static int do_svsnick(User * u)
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, newnick);
     } else {
         notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick);
-        wallops(s_OperServ, "%s used SVSNICK to change %s to %s",
-                u->nick, nick, newnick);
-        send_cmd(NULL, "SVSNICK %s %s :%ld", nick, newnick, time(NULL));
+        anope_cmd_global(s_OperServ, "%s used SVSNICK to change %s to %s",
+                         u->nick, nick, newnick);
+        anope_cmd_svsnick(nick, newnick, time(NULL));
     }
     return MOD_CONT;
 }
-#endif
+
 /*************************************************************************/
 
 /* Adds an AKILL to the list. Returns >= 0 on success, -1 if it fails, -2
@@ -1904,8 +1921,8 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     slist_add(&akills, entry);
 
     if (AkillOnAdd)
-        s_akill(entry->user, entry->host, entry->by, entry->seton,
-                entry->expires, entry->reason);
+        anope_cmd_akill(entry->user, entry->host, entry->by, entry->seton,
+                        entry->expires, entry->reason);
 
     free(mask2);
 
@@ -1914,7 +1931,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 
 /* Does the user match any AKILLs? */
 
-int check_akill(const char *nick, const char *username, const char *host,
+int check_akill(char *nick, const char *username, const char *host,
                 const char *vhost, const char *ip)
 {
     int i;
@@ -1938,19 +1955,19 @@ int check_akill(const char *nick, const char *username, const char *host,
         if (match_wild_nocase(ak->user, username)
             && (match_wild_nocase(ak->host, host)
                 || (vhost && match_wild_nocase(ak->host, vhost)))) {
-            s_akill(ak->user, ak->host, ak->by, ak->seton, ak->expires,
-                    ak->reason);
+            anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                            ak->expires, ak->reason);
             return 1;
         }
-#ifdef HAS_NICKIP
-        if (ip)
-            if (match_wild_nocase(ak->user, username)
-                && match_wild_nocase(ak->host, ip)) {
-                s_akill(ak->user, ak->host, ak->by, ak->seton, ak->expires,
-                        ak->reason);
-                return 1;
-            }
-#endif
+        if (ircd->nickip) {
+            if (ip)
+                if (match_wild_nocase(ak->user, username)
+                    && match_wild_nocase(ak->host, ip)) {
+                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                                    ak->expires, ak->reason);
+                    return 1;
+                }
+        }
 
     }
 
@@ -1972,8 +1989,8 @@ void expire_akills(void)
             continue;
 
         if (WallAkillExpire)
-            wallops(s_OperServ, "AKILL on %s@%s has expired", ak->user,
-                    ak->host);
+            anope_cmd_global(s_OperServ, "AKILL on %s@%s has expired",
+                             ak->user, ak->host);
         slist_delete(&akills, i);
     }
 }
@@ -1983,7 +2000,7 @@ static void free_akill_entry(SList * slist, void *item)
     Akill *ak = item;
 
     /* Remove the AKILLs from all the servers */
-    s_rakill(ak->user, ak->host);
+    anope_cmd_remove_akill(ak->user, ak->host);
 
     /* Free the structure */
     free(ak->user);
@@ -2180,8 +2197,9 @@ static int do_akill(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                wallops(s_OperServ, "%s added an AKILL for %s (%s) (%s)",
-                        u->nick, mask, reason, buf);
+                anope_cmd_global(s_OperServ,
+                                 "%s added an AKILL for %s (%s) (%s)",
+                                 u->nick, mask, reason, buf);
             }
 
             if (readonly)
@@ -2321,8 +2339,6 @@ static int do_akill(User * u)
 
 /*************************************************************************/
 
-#ifdef IRC_BAHAMUT
-
 /* Adds an SGLINE to the list. Returns >= 0 on success, -1 if it failed, -2 if
  * only the expiry time changed.
  * The success result is the number of SGLINEs that were deleted to successfully add one.
@@ -2402,14 +2418,14 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 
     slist_add(&sglines, entry);
 
-    s_sgline(entry->mask, entry->reason);
+    anope_cmd_sgline(entry->mask, entry->reason);
 
     return deleted;
 }
 
 /* Does the user match any SGLINEs? */
 
-int check_sgline(const char *nick, const char *realname)
+int check_sgline(char *nick, const char *realname)
 {
     int i;
     SXLine *sx;
@@ -2423,10 +2439,9 @@ int check_sgline(const char *nick, const char *realname)
             continue;
 
         if (match_wild_nocase(sx->mask, realname)) {
-            s_sgline(sx->mask, sx->reason);
+            anope_cmd_sgline(sx->mask, sx->reason);
             /* We kill nick since s_sgline can't */
-            send_cmd(ServerName, "SVSKILL %s :G-Lined: %s", nick,
-                     sx->reason);
+            anope_cmd_svskill(ServerName, nick, "G-Lined: %s", sx->reason);
             return 1;
         }
     }
@@ -2449,7 +2464,8 @@ void expire_sglines(void)
             continue;
 
         if (WallSGLineExpire)
-            wallops(s_OperServ, "SGLINE on \2%s\2 has expired", sx->mask);
+            anope_cmd_global(s_OperServ, "SGLINE on \2%s\2 has expired",
+                             sx->mask);
         slist_delete(&sglines, i);
     }
 }
@@ -2459,7 +2475,7 @@ static void free_sgline_entry(SList * slist, void *item)
     SXLine *sx = item;
 
     /* Remove the SGLINE from all the servers */
-    s_unsgline(sx->mask);
+    anope_cmd_unsgline(sx->mask);
 
     /* Free the structure */
     free(sx->mask);
@@ -2549,14 +2565,17 @@ static int sgline_view_callback(SList * slist, int number, void *item,
     return sgline_view(number, item, u, sent_header);
 }
 
-#endif
 
 /* Manage the SGLINE list. */
 
 static int do_sgline(User * u)
 {
-#ifdef IRC_BAHAMUT
     char *cmd = strtok(NULL, " ");
+
+    if (!ircd->sgline) {
+        notice_lang(s_OperServ, u, OPER_SGLINE_UNSUPPORTED);
+        return MOD_CONT;
+    }
 
     if (!cmd)
         cmd = "";
@@ -2633,8 +2652,9 @@ static int do_sgline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                wallops(s_OperServ, "%s added an SGLINE for %s (%s)",
-                        u->nick, mask, buf);
+                anope_cmd_global(s_OperServ,
+                                 "%s added an SGLINE for %s (%s)", u->nick,
+                                 mask, buf);
             }
 
             if (readonly)
@@ -2763,9 +2783,6 @@ static int do_sgline(User * u)
     } else {
         syntax_error(s_OperServ, u, "SGLINE", OPER_SGLINE_SYNTAX);
     }
-#else
-    notice_lang(s_OperServ, u, OPER_SGLINE_UNSUPPORTED);
-#endif
     return MOD_CONT;
 }
 
@@ -2854,17 +2871,18 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
 
     slist_add(&sqlines, entry);
 
-    s_sqline(entry->mask, entry->reason);
+    sqline(entry->mask, entry->reason);
 
     return deleted;
 }
 
 /* Does the user match any SQLINEs? */
 
-int check_sqline(const char *nick, int nick_change)
+int check_sqline(char *nick, int nick_change)
 {
     int i;
     SXLine *sx;
+    char *reason;
 
     if (sqlines.count == 0)
         return 0;
@@ -2874,28 +2892,17 @@ int check_sqline(const char *nick, int nick_change)
         if (!sx)
             continue;
 
-#ifdef IRC_BAHAMUT
-        if (*sx->mask == '#')
-            continue;
-#endif
+        if (ircd->chansqline) {
+            if (*sx->mask == '#')
+                continue;
+        }
 
         if (match_wild_nocase(sx->mask, nick)) {
-            s_sqline(sx->mask, sx->reason);
+            sqline(sx->mask, sx->reason);
             /* We kill nick since s_sqline can't */
-#ifdef IRC_BAHAMUT
-            send_cmd(ServerName, "SVSKILL %s :Q-Lined: %s", nick,
-                     sx->reason);
-#else
-            if (!nick_change) {
-                send_cmd(s_OperServ, "KILL %s :Q-Lined: %s", nick,
-                         sx->reason);
-            } else {
-                char reason[300];
-                snprintf(reason, sizeof(reason), "Q-Lined: %s",
-                         sx->reason);
-                kill_user(s_OperServ, nick, reason);
-            }
-#endif
+            snprintf(reason, sizeof(reason), "Q-Lined: %s", sx->reason);
+            kill_user(s_OperServ, nick, reason);
+
             return 1;
         }
     }
@@ -2903,7 +2910,6 @@ int check_sqline(const char *nick, int nick_change)
     return 0;
 }
 
-#ifdef IRC_BAHAMUT
 int check_chan_sqline(const char *chan)
 {
     int i;
@@ -2921,14 +2927,13 @@ int check_chan_sqline(const char *chan)
             continue;
 
         if (match_wild_nocase(sx->mask, chan)) {
-            s_sqline(sx->mask, sx->reason);
+            sqline(sx->mask, sx->reason);
             return 1;
         }
     }
 
     return 0;
 }
-#endif
 
 /* Delete any expired SQLINEs. */
 
@@ -2945,7 +2950,8 @@ void expire_sqlines(void)
             continue;
 
         if (WallSQLineExpire)
-            wallops(s_OperServ, "SQLINE on \2%s\2 has expired", sx->mask);
+            anope_cmd_global(s_OperServ, "SQLINE on \2%s\2 has expired",
+                             sx->mask);
 
         slist_delete(&sqlines, i);
     }
@@ -2956,7 +2962,7 @@ static void free_sqline_entry(SList * slist, void *item)
     SXLine *sx = item;
 
     /* Remove the SQLINE from all the servers */
-    s_unsqline(sx->mask);
+    anope_cmd_unsqline(sx->mask);
 
     /* Free the structure */
     free(sx->mask);
@@ -3052,6 +3058,11 @@ static int do_sqline(User * u)
 {
     char *cmd = strtok(NULL, " ");
 
+    if (!ircd->sqline) {
+        notice_lang(s_OperServ, u, OPER_SQLINE_UNSUPPORTED);
+        return MOD_CONT;
+    }
+
     if (!cmd)
         cmd = "";
 
@@ -3089,14 +3100,14 @@ static int do_sqline(User * u)
                 notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
                 return MOD_CONT;
             }
-#ifndef IRC_BAHAMUT
-            /* Channel SQLINEs are only supported on Bahamut servers */
-            if (*mask == '#') {
-                notice_lang(s_OperServ, u,
-                            OPER_SQLINE_CHANNELS_UNSUPPORTED);
-                return MOD_CONT;
+            if (ircd->chansqline) {
+                /* Channel SQLINEs are only supported on Bahamut servers */
+                if (*mask == '#') {
+                    notice_lang(s_OperServ, u,
+                                OPER_SQLINE_CHANNELS_UNSUPPORTED);
+                    return MOD_CONT;
+                }
             }
-#endif
 
             deleted = add_sqline(u, mask, u->nick, expires, reason);
             if (deleted < 0)
@@ -3131,8 +3142,9 @@ static int do_sqline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                wallops(s_OperServ, "%s added an SQLINE for %s (%s)",
-                        u->nick, mask, buf);
+                anope_cmd_global(s_OperServ,
+                                 "%s added an SQLINE for %s (%s)", u->nick,
+                                 mask, buf);
             }
 
             if (readonly)
@@ -3266,8 +3278,6 @@ static int do_sqline(User * u)
 
 /*************************************************************************/
 
-#ifdef IRC_BAHAMUT
-
 /* Adds an SZLINE to the list. Returns >= 0 on success, -1 on error, -2 if
  * only the expiry time changed.
  * The success result is the number of SZLINEs that were deleted to successfully add one.
@@ -3344,7 +3354,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     entry->expires = expires;
 
     slist_add(&szlines, entry);
-    s_szline(entry->mask, entry->reason);
+    anope_cmd_szline(entry->mask, entry->reason);
 
     return deleted;
 }
@@ -3364,7 +3374,8 @@ void expire_szlines(void)
             continue;
 
         if (WallSZLineExpire)
-            wallops(s_OperServ, "SZLINE on \2%s\2 has expired", sx->mask);
+            anope_cmd_global(s_OperServ, "SZLINE on \2%s\2 has expired",
+                             sx->mask);
         slist_delete(&szlines, i);
     }
 }
@@ -3374,7 +3385,7 @@ static void free_szline_entry(SList * slist, void *item)
     SXLine *sx = item;
 
     /* Remove the SZLINE from all the servers */
-    s_unszline(sx->mask);
+    anope_cmd_unszline(sx->mask);
 
     /* Free the structure */
     free(sx->mask);
@@ -3465,14 +3476,16 @@ static int szline_view_callback(SList * slist, int number, void *item,
     return szline_view(number, item, u, sent_header);
 }
 
-#endif
-
 /* Manage the SZLINE list. */
 
 static int do_szline(User * u)
 {
-#ifdef IRC_BAHAMUT
     char *cmd = strtok(NULL, " ");
+
+    if (!ircd->szline) {
+        notice_lang(s_OperServ, u, OPER_SZLINE_UNSUPPORTED);
+        return MOD_CONT;
+    }
 
     if (!cmd)
         cmd = "";
@@ -3550,8 +3563,9 @@ static int do_szline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                wallops(s_OperServ, "%s added an SZLINE for %s (%s)",
-                        u->nick, mask, buf);
+                anope_cmd_global(s_OperServ,
+                                 "%s added an SZLINE for %s (%s)", u->nick,
+                                 mask, buf);
             }
 
             if (readonly)
@@ -3677,9 +3691,6 @@ static int do_szline(User * u)
     } else {
         syntax_error(s_OperServ, u, "SZLINE", OPER_SZLINE_SYNTAX);
     }
-#else
-    notice_lang(s_OperServ, u, OPER_SZLINE_UNSUPPORTED);
-#endif
     return MOD_CONT;
 }
 
@@ -3754,8 +3765,8 @@ static int do_userlist(User * u)
             if (modes && !(cu->user->mode & modes))
                 continue;
             notice_lang(s_OperServ, u, OPER_USERLIST_RECORD,
-                        cu->user->nick, GetIdent(cu->user),
-                        GetHost(cu->user));
+                        cu->user->nick, common_get_vident(cu->user),
+                        common_get_vhost(cu->user));
         }
     } else {
         char mask[BUFSIZE];
@@ -3768,14 +3779,14 @@ static int do_userlist(User * u)
             for (u2 = userlist[i]; u2; u2 = u2->next) {
                 if (pattern) {
                     snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick,
-                             GetIdent(u2), GetHost(u2));
+                             common_get_vident(u2), common_get_vhost(u2));
                     if (!match_wild_nocase(pattern, mask))
                         continue;
                     if (modes && !(u2->mode & modes))
                         continue;
                 }
                 notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick,
-                            GetIdent(u2), GetHost(u2));
+                            common_get_vident(u2), common_get_vhost(u2));
             }
         }
     }
@@ -4313,17 +4324,16 @@ static int do_set(User * u)
          * -jester
          */
         if (LogChannel && (stricmp(setting, "on") == 0)) {
-#ifdef IRC_HYBRID
-            send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), LogChannel,
-                     s_GlobalNoticer);
-#endif
+            if (ircd->join2msg) {
+                anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
+            }
             logchan = 1;
             alog("Now sending log messages to %s", LogChannel);
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_ON, LogChannel);
         } else if (LogChannel && (stricmp(setting, "off") == 0)) {
-#ifdef IRC_HYBRID
-            send_cmd(s_GlobalNoticer, "PART %s :Parting", LogChannel);
-#endif
+            if (ircd->join2msg) {
+                anope_cmd_part(s_GlobalNoticer, LogChannel, NULL);
+            }
             logchan = 0;
             alog("No longer sending log messages to a channel");
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);
@@ -4340,14 +4350,16 @@ static int do_set(User * u)
             u->isSuperAdmin = 1;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
             alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
-            wallops(s_OperServ, getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON),
-                    u->nick);
+            anope_cmd_global(s_OperServ,
+                             getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON),
+                             u->nick);
         } else if (SuperAdmin && (stricmp(setting, "off") == 0)) {
             u->isSuperAdmin = 0;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
             alog("%s: %s is no longer a SuperAdmin", s_OperServ, u->nick);
-            wallops(s_OperServ,
-                    getstring2(NULL, OPER_SUPER_ADMIN_WALL_OFF), u->nick);
+            anope_cmd_global(s_OperServ,
+                             getstring2(NULL, OPER_SUPER_ADMIN_WALL_OFF),
+                             u->nick);
         } else {
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_SYNTAX);
         }
@@ -4403,13 +4415,13 @@ static int do_noop(User * u)
         char reason[NICKMAX + 32];
 
         /* Remove the O:lines */
-        s_svsnoop(server, 1);
+        anope_cmd_svsnoop(server, 1);
 
         snprintf(reason, sizeof(reason), "NOOP command used by %s",
                  u->nick);
         if (WallOSNoOp)
-            wallops(s_OperServ, "\2%s\2 used NOOP on \2%s\2", u->nick,
-                    server);
+            anope_cmd_global(s_OperServ, "\2%s\2 used NOOP on \2%s\2",
+                             u->nick, server);
         notice_lang(s_OperServ, u, OPER_NOOP_SET, server);
 
         /* Kill all the IRCops of the server */
@@ -4421,7 +4433,7 @@ static int do_noop(User * u)
             }
         }
     } else if (!stricmp(cmd, "REVOKE")) {
-        s_svsnoop(server, 0);
+        anope_cmd_svsnoop(server, 0);
         notice_lang(s_OperServ, u, OPER_NOOP_REVOKE, server);
     } else {
         syntax_error(s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);
@@ -4446,18 +4458,13 @@ static int do_jupe(User * u)
             snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick,
                      reason ? ": " : "", reason ? reason : "");
 
-            send_cmd(NULL, "SQUIT %s :%s", jserver, rbuf);
-#ifdef IRC_PTLINK
-            send_cmd(NULL, "SERVER %s 1 Anope.Services%s :%s",
-                     jserver, version_number, rbuf);
-#else
-            send_cmd(NULL, "SERVER %s 2 :%s", jserver, rbuf);
-#endif
+            anope_cmd_squit(jserver, rbuf);
+            anope_cmd_server(jserver, 1, rbuf);
             new_server(me_server, jserver, rbuf, SERVER_JUPED);
 
             if (WallOSJupe)
-                wallops(s_OperServ, "\2%s\2 used JUPE on \2%s\2", u->nick,
-                        jserver);
+                anope_cmd_global(s_OperServ, "\2%s\2 used JUPE on \2%s\2",
+                                 u->nick, jserver);
         }
     }
     return MOD_CONT;
@@ -4480,9 +4487,11 @@ static int do_raw(User * u)
                 char *kw = strtok(text, " ");
                 while (kw && *kw == ':')
                     kw = strtok(NULL, " ");
-                wallops(s_OperServ, "\2%s\2 used RAW command for \2%s\2",
-                        u->nick,
-                        (kw ? kw : "\2non RFC compliant message\2"));
+                anope_cmd_global(s_OperServ,
+                                 "\2%s\2 used RAW command for \2%s\2",
+                                 u->nick,
+                                 (kw ? kw :
+                                  "\2non RFC compliant message\2"));
             }
             alog("%s used RAW command for %s", u->nick, text);
         }
@@ -4647,9 +4656,11 @@ static int do_killclones(User * u)
         add_akill(u, akillmask, u->nick,
                   time(NULL) + KillClonesAkillExpire, akillreason);
 
-        wallops(s_OperServ, "\2%s\2 used KILLCLONES for \2%s\2 killing "
-                "\2%d\2 clones. A temporary AKILL has been added "
-                "for \2%s\2.", u->nick, clonemask, count, akillmask);
+        anope_cmd_global(s_OperServ,
+                         "\2%s\2 used KILLCLONES for \2%s\2 killing "
+                         "\2%d\2 clones. A temporary AKILL has been added "
+                         "for \2%s\2.", u->nick, clonemask, count,
+                         akillmask);
 
         alog("%s: KILLCLONES: %d clone(s) matching %s killed.",
              s_OperServ, count, clonemask);
@@ -4697,8 +4708,8 @@ static int do_defcon(User * u)
     notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
     defcon_sendlvls(u);
     alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-    wallops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL), u->nick,
-            newLevel);
+    anope_cmd_global(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
+                     u->nick, newLevel);
     /* Global notice the user what is happening. Also any Message that
        the Admin would like to add. Set in config file. */
     if (GlobalOnDefcon) {
@@ -4789,8 +4800,9 @@ void resetDefCon(int level)
             && (time(NULL) - DefContimer >= dotime(DefConTimeOut))) {
             DefConLevel = level;
             alog("Defcon level timeout, returning to lvl %d", level);
-            wallops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
-                    s_OperServ, level);
+            anope_cmd_global(s_OperServ,
+                             getstring2(NULL, OPER_DEFCON_WALL),
+                             s_OperServ, level);
             if (GlobalOnDefcon) {
                 if (DefConOffMessage) {
                     oper_global(NULL, "%s", DefConOffMessage);
@@ -4900,8 +4912,8 @@ static int do_chankill(User * u)
                             cu->user->host, NULL, NULL);
             }
             if (WallOSAkill) {
-                wallops(s_OperServ, "%s used CHANKILL on %s (%s)", u->nick,
-                        channel, reason);
+                anope_cmd_global(s_OperServ, "%s used CHANKILL on %s (%s)",
+                                 u->nick, channel, reason);
             }
         } else {
             notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, channel);

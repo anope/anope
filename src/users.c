@@ -20,53 +20,6 @@ User *userlist[1024];
 int32 usercnt = 0, opcnt = 0, maxusercnt = 0;
 time_t maxusertime;
 
-static unsigned long umodes[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, UMODE_A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-    UMODE_P,
-#else
-    0,
-#endif
-    0,
-#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE)
-    UMODE_R,
-#else
-    0,
-#endif
-    0, 0, 0, 0, 0, 0, 0,
-#ifdef IRC_ULTIMATE3
-    UMODE_Z,
-#else
-    0,
-#endif
-    0, 0, 0, 0, 0,
-    0, UMODE_a, 0, 0, 0, 0, 0,
-#ifdef IRC_DREAMFORGE
-    UMODE_g,
-#else
-    0,
-#endif
-    UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-    UMODE_p,
-#else
-    0,
-#endif
-    0, UMODE_r, 0, 0, 0, 0, UMODE_w,
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
-    UMODE_x,
-#else
-    0,
-#endif
-    0,
-    0,
-    0, 0, 0, 0, 0
-};
-
 /*************************************************************************/
 /*************************************************************************/
 
@@ -138,9 +91,7 @@ static void change_user_nick(User * user, const char *nick)
 
 /*************************************************************************/
 
-#ifdef HAS_VHOST
-
-static void update_host(User * user)
+void update_host(User * user)
 {
     if (user->na && (nick_identified(user)
                      || (!(user->na->nc->flags & NI_SECURE)
@@ -149,21 +100,19 @@ static void update_host(User * user)
             free(user->na->last_usermask);
 
         user->na->last_usermask =
-            smalloc(strlen(GetIdent(user)) + strlen(GetHost(user)) + 2);
-        sprintf(user->na->last_usermask, "%s@%s", GetIdent(user),
-                GetHost(user));
+            smalloc(strlen(common_get_vident(user)) +
+                    strlen(common_get_vhost(user)) + 2);
+        sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
+                common_get_vhost(user));
     }
 
     if (debug)
         alog("debug: %s changes its host to %s", user->nick,
-             GetHost(user));
+             common_get_vhost(user));
 }
 
-#endif
 
 /*************************************************************************/
-
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 
 /* Change the (virtual) hostname of a user. */
 
@@ -181,10 +130,8 @@ void change_user_host(User * user, const char *host)
     update_host(user);
 }
 
-#endif
 /*************************************************************************/
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_PTLINK)
 /* Change the realname of a user. */
 
 void change_user_realname(User * user, const char *realname)
@@ -222,150 +169,17 @@ void change_user_username(User * user, const char *username)
             free(user->na->last_usermask);
 
         user->na->last_usermask =
-            smalloc(strlen(GetIdent(user)) + strlen(GetHost(user)) + 2);
-        sprintf(user->na->last_usermask, "%s@%s", GetIdent(user),
-                GetHost(user));
+            smalloc(strlen(common_get_vident(user)) +
+                    strlen(common_get_vhost(user)) + 2);
+        sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
+                common_get_vhost(user));
     }
     if (debug)
         alog("debug: %s changes its username to %s", user->nick, username);
 }
 
-#endif
-
 /*************************************************************************/
 
-void set_umode(User * user, int ac, char **av)
-{
-    int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
-
-    ac--;
-
-    if (debug)
-        alog("debug: Changing mode for %s to %s", user->nick, modes);
-
-    while (*modes) {
-
-        add ? (user->mode |= umodes[(int) *modes]) : (user->mode &=
-                                                      ~umodes[(int)
-                                                              *modes]);
-
-        switch (*modes++) {
-        case '+':
-            add = 1;
-            break;
-        case '-':
-            add = 0;
-            break;
-#if defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_VIAGRA) && !defined(IRC_RAGE2)
-        case 'a':
-            if (add && !is_services_admin(user)) {
-                send_cmd(ServerName, "SVSMODE %s -a", user->nick);
-                user->mode &= ~UMODE_a;
-            }
-            break;
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-        case 'a':
-            if (add && !is_services_oper(user)) {
-                send_cmd(ServerName, "SVSMODE %s -a", user->nick);
-                user->mode &= ~UMODE_a;
-            }
-            break;
-        case 'P':
-            if (add && !is_services_admin(user)) {
-                send_cmd(ServerName, "SVSMODE %s -P", user->nick);
-                user->mode &= ~UMODE_P;
-            }
-            break;
-#endif
-#if defined(IRC_ULTIMATE)
-        case 'R':
-            if (add && !is_services_root(user)) {
-                send_cmd(ServerName, "SVSMODE %s -R", user->nick);
-                user->mode &= ~UMODE_R;
-            }
-            break;
-#endif
-#if defined(IRC_ULTIMATE3)
-        case 'Z':
-            if (add && !is_services_root(user)) {
-                send_cmd(ServerName, "SVSMODE %s -Z", user->nick);
-                user->mode &= ~UMODE_Z;
-            }
-            break;
-#endif
-        case 'd':
-            if (ac == 0) {
-#if !defined(IRC_ULTIMATE) && !defined(IRC_UNREAL)
-                alog("user: umode +d with no parameter (?) for user %s",
-                     user->nick);
-#endif
-                break;
-            }
-
-            ac--;
-            av++;
-            user->svid = strtoul(*av, NULL, 0);
-            break;
-        case 'o':
-            if (add) {
-                opcnt++;
-
-                if (WallOper)
-                    wallops(s_OperServ, "\2%s\2 is now an IRC operator.",
-                            user->nick);
-                display_news(user, NEWS_OPER);
-#if defined(IRC_PTLINK)
-                if (is_services_admin(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +a", user->nick);
-                    user->mode |= UMODE_a;
-                }
-#endif
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-                if (is_services_oper(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +a", user->nick);
-                    user->mode |= UMODE_a;
-                }
-#endif
-
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-                if (is_services_admin(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +P", user->nick);
-                    user->mode |= UMODE_P;
-                }
-#endif
-
-#ifdef IRC_ULTIMATE
-                if (is_services_root(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +R", user->nick);
-                    user->mode |= UMODE_R;
-                }
-#endif
-#ifdef IRC_ULTIMATE3
-                if (is_services_root(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +Z", user->nick);
-                    user->mode |= UMODE_Z;
-                }
-#endif
-            } else {
-                opcnt--;
-            }
-            break;
-        case 'r':
-            if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -r", user->nick);
-                user->mode &= ~UMODE_r;
-            }
-            break;
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
-        case 'x':
-            update_host(user);
-            break;
-#endif
-        }
-    }
-}
 
 /*************************************************************************/
 
@@ -377,16 +191,16 @@ void delete_user(User * user)
     struct u_chaninfolist *ci, *ci2;
 
     if (LogUsers) {
-#ifdef HAS_VHOST
-        alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
-             user->nick, user->username, user->host,
-             (user->vhost ? user->vhost : "(none)"), user->realname,
-             user->server->name);
-#else
-        alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
-             user->nick, user->username, user->host,
-             user->realname, user->server->name);
-#endif
+        if (ircd->vhost) {
+            alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
+                 user->nick, user->username, user->host,
+                 (user->vhost ? user->vhost : "(none)"), user->realname,
+                 user->server->name);
+        } else {
+            alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
+                 user->nick, user->username, user->host,
+                 user->realname, user->server->name);
+        }
     }
 
     if (debug >= 2)
@@ -398,10 +212,10 @@ void delete_user(User * user)
         alog("debug: delete_user(): free user data");
     free(user->username);
     free(user->host);
-#ifdef HAS_VHOST
-    if (user->vhost)
-        free(user->vhost);
-#endif
+    if (ircd->vhost) {
+        if (user->vhost)
+            free(user->vhost);
+    }
     free(user->realname);
     if (debug >= 2)
         alog("debug: delete_user(): remove from channels");
@@ -466,10 +280,10 @@ void get_user_stats(long *nusers, long *memuse)
                 mem += strlen(user->username) + 1;
             if (user->host)
                 mem += strlen(user->host) + 1;
-#ifdef HAS_VHOST
-            if (user->vhost)
-                mem += strlen(user->vhost) + 1;
-#endif
+            if (ircd->vhost) {
+                if (user->vhost)
+                    mem += strlen(user->vhost) + 1;
+            }
             if (user->realname)
                 mem += strlen(user->realname) + 1;
             if (user->server->name)
@@ -540,7 +354,8 @@ User *nextuser(void)
 /* Handle a server NICK command. */
 
 User *do_nick(const char *source, char *nick, char *username, char *host,
-              char *server, char *realname, time_t ts, uint32 svid, ...)
+              char *server, char *realname, time_t ts, uint32 svid,
+              uint32 ip, char *vhost, char *uid)
 {
     User *user;
 
@@ -551,32 +366,18 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     char mask[USERMAX + HOSTMAX + 2];
 
     if (!*source) {
-#ifdef HAS_NICKIP
         char ipbuf[16];
         struct in_addr addr;
-        uint32 ip;
-#endif
-#ifdef HAS_VHOST
-        char *vhost = NULL;
-#endif
-#if defined(HAS_NICKIP) || defined(HAS_NICKVHOST)
-        va_list args;
-        va_start(args, svid);
-#endif
 
-#ifdef HAS_NICKIP
-        ip = va_arg(args, uint32);
-#endif
-
-#ifdef HAS_NICKVHOST
-        vhost = va_arg(args, char *);
-        if (!strcmp(vhost, "*")) {
-            vhost = NULL;
-            if (debug)
-                alog("debug: new user with no vhost in NICK command: %s",
-                     nick);
+        if (ircd->nickvhost) {
+            if (vhost) {
+                if (!strcmp(vhost, "*")) {
+                    vhost = NULL;
+                    if (debug)
+                        alog("debug: new user with no vhost in NICK command: %s", nick);
+                }
+            }
         }
-#endif
 
         /* This is a new user; create a User structure for it. */
         if (debug)
@@ -586,33 +387,35 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         /**
 	 * Ugly swap routine for Flop's bug :)
  	 **/
-            tmp = strchr(realname, '%');
-            while (tmp) {
-                *tmp = '-';
+            if (realname) {
                 tmp = strchr(realname, '%');
+                while (tmp) {
+                    *tmp = '-';
+                    tmp = strchr(realname, '%');
+                }
             }
         /**
 	 * End of ugly swap
 	 **/
 
-#ifdef HAS_NICKIP
-            addr.s_addr = htonl(ip);
-            ntoa(addr, ipbuf, sizeof(ipbuf));
-#endif
+            if (ircd->nickip) {
+                addr.s_addr = htonl(ip);
+                ntoa(addr, ipbuf, sizeof(ipbuf));
+            }
 
-#ifdef HAS_NICKVHOST
-# ifdef HAS_NICKIP
-            alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, vhost, realname, ipbuf, server);
-# else
-            alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, vhost, realname, server);
-# endif
-#else
-# ifdef HAS_NICKIP
-            alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, realname, ipbuf, server);
-# else
-            alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, realname, server);
-# endif
-#endif
+            if (ircd->nickvhost) {
+                if (ircd->nickip) {
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, vhost, realname, ipbuf, server);
+                } else {
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, vhost, realname, server);
+                }
+            } else {
+                if (ircd->nickip) {
+                    alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, realname, ipbuf, server);
+                } else {
+                    alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, realname, server);
+                }
+            }
         }
 
         /* We used to ignore the ~ which a lot of ircd's use to indicate no
@@ -628,17 +431,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
          * as such, create a user_struct, and if the client is removed, we'll delete it again when the QUIT notice
          * comes in from the ircd.
          **/
-        if (check_akill(nick, username, host,
-#ifdef HAS_NICKVHOST
-                        vhost,
-#else
-                        NULL,
-#endif
-#ifdef HAS_NICKIP
-                        ipbuf)) {
-#else
-                        NULL)) {
-#endif
+        if (check_akill(nick, username, host, vhost, ipbuf)) {
 /*            return NULL; */
         }
 
@@ -654,30 +447,20 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                       time(NULL) + dotime(DefConAKILL),
                       DefConAkillReason ? DefConAkillReason :
                       "DEFCON AKILL");
-            if (check_akill(nick, username, host,
-#ifdef HAS_NICKVHOST
-                            vhost,
-#else
-                            NULL,
-#endif
-#ifdef HAS_NICKIP
-                            ipbuf)) {
-#else
-                            NULL)) {
-#endif
+            if (check_akill(nick, username, host, vhost, ipbuf)) {
 /*            return NULL; */
             }
         }
-#ifdef IRC_BAHAMUT
-        /* Next for SGLINEs */
-        if (check_sgline(nick, realname))
-            return NULL;
-#endif
-
-        /* And for SQLINEs */
-        if (check_sqline(nick, 0))
-            return NULL;
-
+        if (ircd->sgline) {
+            /* Next for SGLINEs */
+            if (check_sgline(nick, realname))
+                return NULL;
+        }
+        if (ircd->sqline) {
+            /* And for SQLINEs */
+            if (check_sqline(nick, 0))
+                return NULL;
+        }
 #ifndef STREAMLINED
         /* Now check for session limits */
         if (LimitSessions && !add_session(nick, host))
@@ -686,12 +469,9 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
         /* And finally, for proxy ;) */
 #ifdef USE_THREADS
-# ifdef HAS_NICKIP
-        if (ProxyDetect && proxy_check(nick, host, ip))
-# else
-        if (ProxyDetect && proxy_check(nick, host, 0))
-# endif
+        if (ProxyDetect && proxy_check(nick, host, ip)) {
             return NULL;
+        }
 #endif
 
         /* Allocate User structure and fill it in. */
@@ -702,10 +482,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         user->realname = sstrdup(realname);
         user->timestamp = ts;
         user->my_signon = time(NULL);
-
-#ifdef HAS_VHOST
         user->vhost = vhost ? sstrdup(vhost) : sstrdup(host);
-#endif
+        user->uid = uid;        /* p10 stuff */
 
         if (CheckClones) {
             /* Check to see if it looks like clones. */
@@ -731,14 +509,9 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         } else if (svid != 1) {
             /* Resets the svid because it doesn't match */
             user->svid = 1;
-#ifdef IRC_BAHAMUT
-            send_cmd(ServerName, "SVSMODE %s %lu +d 1", user->nick,
-                     user->timestamp);
-#else
-#ifndef IRC_PTLINK
-            send_cmd(ServerName, "SVSMODE %s +d 1", user->nick);
-#endif
-#endif
+
+            anope_cmd_svid_umode(user->nick, user->timestamp);
+
         } else {
             user->svid = 1;
         }
@@ -746,6 +519,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     } else {
         /* An old user changing nicks. */
         user = finduser(source);
+
         if (!user) {
             alog("user: NICK from nonexistent nick %s", source);
             return NULL;
@@ -755,13 +529,11 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             alog("debug: %s changes nick to %s", source, nick);
 
         if (LogUsers) {
-#ifdef HAS_VHOST
-            alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), user->realname, nick, user->server->name);
-#else
-            alog("LOGUSERS: %s (%s@%s) (%s) changed his nick to %s (%s).",
-                 user->nick, user->username, user->host,
-                 user->realname, nick, user->server->name);
-#endif
+            if (ircd->vhost) {
+                alog("LOGUSERS: %s (%s@%s => %s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, (user->vhost ? user->vhost : "(none)"), user->realname, nick, user->server->name);
+            } else {
+                alog("LOGUSERS: %s (%s@%s) (%s) changed his nick to %s (%s).", user->nick, user->username, user->host, user->realname, nick, user->server->name);
+            }
         }
 
         user->timestamp = ts;
@@ -791,17 +563,14 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             if (!nc_changed && (user->na))
                 user->na->status |= status;
             else {
-#if !defined(IRC_BAHAMUT) && !defined(IRC_PTLINK)
-                /* Because on Bahamut it would be already -r */
-                change_user_mode(user, "-r+d", "1");
-#else
-                change_user_mode(user, "+d", "1");
-#endif
+                anope_cmd_nc_change(user);
             }
         }
 
-        if (!is_oper(user) && check_sqline(user->nick, 1))
-            return NULL;
+        if (ircd->sqline) {
+            if (!is_oper(user) && check_sqline(user->nick, 1))
+                return NULL;
+        }
 
     }                           /* if (!*source) */
 
@@ -814,6 +583,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     if (nc_changed || !nick_recognized(user)) {
         if (validate_user(user))
             check_memos(user);
+
     } else {
         if (nick_identified(user)) {
             user->na->last_seen = time(NULL);
@@ -821,44 +591,29 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             if (user->na->last_usermask)
                 free(user->na->last_usermask);
             user->na->last_usermask =
-                smalloc(strlen(GetIdent(user)) + strlen(GetHost(user)) +
-                        2);
-            sprintf(user->na->last_usermask, "%s@%s", GetIdent(user),
-                    GetHost(user));
+                smalloc(strlen(common_get_vident(user)) +
+                        strlen(common_get_vhost(user)) + 2);
+            sprintf(user->na->last_usermask, "%s@%s",
+                    common_get_vident(user), common_get_vhost(user));
 
-#ifdef IRC_PTLINK
-            change_user_mode(user, "+r", NULL);
-#endif
-
-#if !defined(IRC_BAHAMUT) && !defined(IRC_PTLINK)
-            if (user->svid != user->timestamp) {
-                char tsbuf[16];
-                snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
-                change_user_mode(user, "+rd", tsbuf);
-            } else {
-                change_user_mode(user, "+r", NULL);
-            }
-#endif
-
-
-            alog("%s: %s!%s@%s automatically identified for nick %s",
-                 s_NickServ, user->nick, user->username, GetHost(user),
-                 user->nick);
-        }
-    }
-
-/* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
-#ifdef IRC_BAHAMUT
-    if (nick_identified(user)) {
-        if (user->svid != user->timestamp) {
             char tsbuf[16];
             snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
-            change_user_mode(user, "+rd", tsbuf);
-        } else {
-            change_user_mode(user, "+r", NULL);
+            anope_cmd_svid_umode2(user, tsbuf);
+
+            alog("%s: %s!%s@%s automatically identified for nick %s",
+                 s_NickServ, user->nick, user->username,
+                 common_get_vhost(user), user->nick);
         }
     }
-#endif
+
+    /* Bahamut sets -r on every nick changes, so we must test it even if nc_changed == 0 */
+    if (ircd->check_nick_id) {
+        if (nick_identified(user)) {
+            char tsbuf[16];
+            snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
+            anope_cmd_svid_umode3(user, tsbuf);
+        }
+    }
 
     return user;
 }
@@ -877,8 +632,8 @@ void do_umode(const char *source, int ac, char **av)
     if (stricmp(source, av[0]) != 0) {
         alog("user: MODE %s %s from different nick %s!", av[0], av[1],
              source);
-        wallops(NULL, "%s attempted to change mode %s for %s", source,
-                av[1], av[0]);
+        anope_cmd_global(NULL, "%s attempted to change mode %s for %s",
+                         source, av[1], av[0]);
         return;
     }
 
@@ -889,7 +644,7 @@ void do_umode(const char *source, int ac, char **av)
         return;
     }
 
-    set_umode(user, ac - 1, &av[1]);
+    anope_set_umode(user, ac - 1, &av[1]);
 }
 
 /*************************************************************************/
@@ -932,22 +687,22 @@ void do_quit(const char *source, int ac, char **av)
  *	av[1] = reason
  */
 
-void do_kill(const char *source, int ac, char **av)
+void do_kill(char *nick, char *msg)
 {
     User *user;
     NickAlias *na;
 
-    user = finduser(av[0]);
+    user = finduser(nick);
     if (!user)
         return;
     if (debug)
-        alog("debug: %s killed", av[0]);
+        alog("debug: %s killed", nick);
     if ((na = user->na) && (!(na->status & NS_VERBOTEN))
         && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
         na->last_seen = time(NULL);
         if (na->last_quit)
             free(na->last_quit);
-        na->last_quit = *av[1] ? sstrdup(av[1]) : NULL;
+        na->last_quit = *msg ? sstrdup(msg) : NULL;
 
     }
 #ifndef STREAMLINED
@@ -960,15 +715,16 @@ void do_kill(const char *source, int ac, char **av)
 /*************************************************************************/
 /*************************************************************************/
 
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
-
 /* Is the given user protected from kicks and negative mode changes? */
 
 int is_protected(User * user)
 {
-    return (user->mode & UMODE_p);
+    if (ircd->protectedumode) {
+        return (user->mode & ircd->protectedumode);
+    } else {
+        return 0;
+    }
 }
-#endif
 
 /*************************************************************************/
 
@@ -982,7 +738,6 @@ int is_oper(User * user)
 /*************************************************************************/
 /*************************************************************************/
 
-#ifdef HAS_EXCEPT
 /* Is the given user ban-excepted? */
 int is_excepted(ChannelInfo * ci, User * user)
 {
@@ -992,6 +747,10 @@ int is_excepted(ChannelInfo * ci, User * user)
 
     if (!ci->c)
         return 0;
+
+    if (!ircd->except) {
+        return 0;
+    }
 
     count = ci->c->exceptcount;
     excepts = scalloc(sizeof(char *) * count, 1);
@@ -1018,6 +777,10 @@ int is_excepted_mask(ChannelInfo * ci, char *mask)
     if (!ci->c)
         return 0;
 
+    if (!ircd->except) {
+        return 0;
+    }
+
     count = ci->c->exceptcount;
     excepts = scalloc(sizeof(char *) * count, 1);
     memcpy(excepts, ci->c->excepts, sizeof(char *) * count);
@@ -1031,7 +794,7 @@ int is_excepted_mask(ChannelInfo * ci, char *mask)
     return isexcepted;
 }
 
-#endif
+
 /*************************************************************************/
 
 /* Does the user's usermask match the given mask (either nick!user@host or
@@ -1061,17 +824,11 @@ int match_usermask(const char *mask, User * user)
         result = match_wild_nocase(nick, user->nick)
             && match_wild_nocase(username, user->username)
             && (match_wild_nocase(host, user->host)
-#ifdef HAS_VHOST
-                || match_wild_nocase(host, user->vhost)
-#endif
-            );
+                || match_wild_nocase(host, user->vhost));
     } else {
         result = match_wild_nocase(username, user->username)
             && (match_wild_nocase(host, user->host)
-#ifdef HAS_VHOST
-                || match_wild_nocase(host, user->vhost)
-#endif
-            );
+                || match_wild_nocase(host, user->vhost));
     }
 
     free(mask2);
@@ -1125,38 +882,40 @@ void split_usermask(const char *mask, char **nick, char **user,
 char *create_mask(User * u)
 {
     char *mask, *s, *end;
-    int ulen = strlen(GetIdent(u));
+    int ulen = strlen(common_get_vident(u));
 
     /* Get us a buffer the size of the username plus hostname.  The result
      * will never be longer than this (and will often be shorter), thus we
      * can use strcpy() and sprintf() safely.
      */
-    end = mask = smalloc(ulen + strlen(GetHost(u)) + 3);
+    end = mask = smalloc(ulen + strlen(common_get_vhost(u)) + 3);
     end += sprintf(end, "%s%s@",
                    (ulen <
-                    (*(GetIdent(u)) ==
+                    (*(common_get_vident(u)) ==
                      '~' ? USERMAX + 1 : USERMAX) ? "*" : ""),
-                   (*(GetIdent(u)) ==
-                    '~' ? GetIdent(u) + 1 : GetIdent(u)));
+                   (*(common_get_vident(u)) ==
+                    '~' ? common_get_vident(u) +
+                    1 : common_get_vident(u)));
 
-    if (strspn(GetHost(u), "0123456789.") == strlen(GetHost(u))
-        && (s = strchr(GetHost(u), '.'))
+    if (strspn(common_get_vhost(u), "0123456789.") ==
+        strlen(common_get_vhost(u))
+        && (s = strchr(common_get_vhost(u), '.'))
         && (s = strchr(s + 1, '.'))
         && (s = strchr(s + 1, '.'))
         && (!strchr(s + 1, '.'))) {     /* IP addr */
-        s = sstrdup(GetHost(u));
+        s = sstrdup(common_get_vhost(u));
         *strrchr(s, '.') = 0;
 
         sprintf(end, "%s.*", s);
         free(s);
     } else {
-        if ((s = strchr(GetHost(u), '.')) && strchr(s + 1, '.')) {
-            s = sstrdup(strchr(GetHost(u), '.') - 1);
+        if ((s = strchr(common_get_vhost(u), '.')) && strchr(s + 1, '.')) {
+            s = sstrdup(strchr(common_get_vhost(u), '.') - 1);
             *s = '*';
             strcpy(end, s);
             free(s);
         } else {
-            strcpy(end, GetHost(u));
+            strcpy(end, common_get_vhost(u));
         }
     }
     return mask;

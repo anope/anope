@@ -48,7 +48,7 @@ SList pxqueue;
 pthread_mutex_t queuemut = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t queuecond = PTHREAD_COND_INITIALIZER;
 
-#if !defined(HAS_NICKIP) && !defined(HAVE_GETHOSTBYNAME_R6) && !defined(HAVE_GETHOSTBYNAME_R5) && !defined(HAVE_GETHOSTBYNAME_R3)
+#if !defined(HAVE_GETHOSTBYNAME_R6) && !defined(HAVE_GETHOSTBYNAME_R5) && !defined(HAVE_GETHOSTBYNAME_R3)
 pthread_mutex_t resmut = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
@@ -64,9 +64,7 @@ static void proxy_queue_signal(void);
 static void proxy_queue_unlock(void);
 static void proxy_queue_wait(void);
 static int proxy_read(int s, char *buf, size_t buflen);
-#ifndef HAS_NICKIP
 static uint32 proxy_resolve(char *host);
-#endif
 static int proxy_scan(uint32 ip);
 static void *proxy_thread_main(void *arg);
 
@@ -126,12 +124,12 @@ void get_proxy_stats(long *nrec, long *memuse)
 
 static void proxy_akill(char *host)
 {
-    s_akill("*", host, s_OperServ, time(NULL),
-            time(NULL) + (ProxyExpire ? ProxyExpire : 86400 * 2),
-            ProxyAkillReason);
+    anope_cmd_akill("*", host, s_OperServ, time(NULL),
+                    time(NULL) + (ProxyExpire ? ProxyExpire : 86400 * 2),
+                    ProxyAkillReason);
     if (WallProxy)
-        wallops(s_OperServ, "Insecure proxy \2%s\2 has been AKILLed.",
-                host);
+        anope_cmd_global(s_OperServ,
+                         "Insecure proxy \2%s\2 has been AKILLed.", host);
 }
 
 /*************************************************************************/
@@ -173,7 +171,7 @@ static void proxy_cache_del(HostCache * hc)
         alog("debug: Deleting %s from host cache", hc->host);
 
     if (hc->status > HC_NORMAL)
-        s_rakill("*", hc->host);
+        anope_cmd_remove_akill("*", hc->host);
 
     if (hc->next)
         hc->next->prev = hc->prev;
@@ -239,9 +237,9 @@ int proxy_check(char *nick, char *host, uint32 ip)
         notice(s_GlobalNoticer, nick, *message);
 
     hc = proxy_cache_add(host);
-#ifdef HAS_NICKIP
-    hc->ip = htonl(ip);
-#endif
+    if (ircd->nickip) {
+        hc->ip = htonl(ip);
+    }
     hc->status = HC_QUEUED;
 
     proxy_queue_lock();
@@ -439,8 +437,6 @@ static int proxy_read(int s, char *buf, size_t buflen)
 
 /* Resolves hostnames in a thread safe manner */
 
-#ifndef HAS_NICKIP
-
 static uint32 proxy_resolve(char *host)
 {
     struct hostent *hentp = NULL;
@@ -484,8 +480,6 @@ static uint32 proxy_resolve(char *host)
 
     return ip;
 }
-
-#endif
 
 /*************************************************************************/
 
@@ -685,11 +679,11 @@ static void *proxy_thread_main(void *arg)
                     alog("debug: Scanning host %s for proxy", hc->host);
                 }
             }
-#ifndef HAS_NICKIP
-            /* Test if it's an IP, and if not try to resolve the hostname */
-            if ((hc->ip = aton(hc->host)) == INADDR_NONE)
-                hc->ip = proxy_resolve(hc->host);
-#endif
+            if (!ircd->nickip) {
+                /* Test if it's an IP, and if not try to resolve the hostname */
+                if ((hc->ip = aton(hc->host)) == INADDR_NONE)
+                    hc->ip = proxy_resolve(hc->host);
+            }
             status = proxy_scan(hc->ip);
 
             if (debug) {

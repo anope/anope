@@ -4028,7 +4028,7 @@ static int do_access(User * u)
     ChanAccess *access;
 
     int i;
-    short level = 0, ulev;
+    int level = 0, ulev;
     int is_list = (cmd && stricmp(cmd, "LIST") == 0);
     int is_servadmin = is_services_admin(u);
 

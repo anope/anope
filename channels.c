@@ -20,14 +20,14 @@ Channel *chanlist[1024];
 #define HASH(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
 
 static void add_ban(Channel * chan, char *mask);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 static void add_exception(Channel * chan, char *mask);
 #endif
 static void chan_adduser2(User * user, Channel * c);
 static Channel *chan_create(const char *chan);
 static void chan_delete(Channel * c);
 static void del_ban(Channel * chan, char *mask);
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 static void del_exception(Channel * chan, char *mask);
 #endif
 #ifdef HAS_FMODE
@@ -62,13 +62,13 @@ CBMode cbmodes[128] = {
 	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 },
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 	{ CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL },
 #else
 	{ 0 }, /* A */
 #endif
 	{ 0 }, /* B */
-#ifdef IRC_UNREAL
+#if defined(IRC_UNREAL) || defined(IRC_RAGE2)
 	{ CMODE_C, 0, NULL, NULL },
 #else
 	{ 0 }, /* C */
@@ -104,12 +104,12 @@ CBMode cbmodes[128] = {
 #else
 	{ 0 }, /* M */
 #endif
-#if defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK)
+#if defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK) || defined(IRC_RAGE2)
 	{ CMODE_N, 0, NULL, NULL },
 #else
 	{ 0 }, /* N */
 #endif
-#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
+#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 	{ CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL },
 #else
 	{ 0 }, /* O */
@@ -125,7 +125,7 @@ CBMode cbmodes[128] = {
 #else
         { 0 },
 #endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_PTLINK) || defined(IRC_RAGE2)
 	{ CMODE_S, 0, NULL, NULL },
 #else
 	{ 0 }, /* S */
@@ -211,7 +211,7 @@ CBModeInfo cbmodeinfos[] = {
 #if defined(IRC_HYBRID)
 	{ 'a', CMODE_a, 0, NULL, NULL },
 #endif
-#if defined(IRC_BAHAMUT) || defined(IRC_UNREAL) || defined(IRC_PTLINK)
+#if defined(IRC_BAHAMUT) || defined(IRC_UNREAL) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 	{ 'c', CMODE_c, 0, NULL, NULL },
 #endif
 #if defined(IRC_PTLINK)
@@ -243,11 +243,13 @@ CBModeInfo cbmodeinfos[] = {
 #ifdef IRC_UNREAL
 	{ 'z', CMODE_z, 0, NULL, NULL },
 #endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 	{ 'A', CMODE_A, 0, NULL, NULL },
 #endif
-#ifdef IRC_UNREAL
+#if defined(IRC_UNREAL) || defined(IRC_RAGE2)
 	{ 'C', CMODE_C, 0, NULL, NULL },
+#endif
+#ifdef IRC_UNREAL
 	{ 'G', CMODE_G, 0, NULL, NULL },
 	{ 'H', CMODE_H, 0, NULL, NULL },
 #endif
@@ -265,10 +267,10 @@ CBModeInfo cbmodeinfos[] = {
 	{ 'M', CMODE_M, 0, NULL, NULL },
 #endif
 #endif
-#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK)
+#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 	{ 'N', CMODE_N, 0, NULL, NULL },
 #endif
-#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
+#if defined(IRC_BAHAMUT) || defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 	{ 'O', CMODE_O, 0, NULL, NULL },
 #endif
 #ifdef IRC_UNREAL
@@ -277,7 +279,7 @@ CBModeInfo cbmodeinfos[] = {
 #ifndef IRC_HYBRID
 	{ 'R', CMODE_R, 0, NULL, NULL },
 #endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 	{ 'S', CMODE_S, 0, NULL, NULL },
 #endif
 #ifdef IRC_UNREAL
@@ -304,7 +306,7 @@ static CMMode cmmodes[128] = {
 	{ add_ban, del_ban },
 	{ NULL },
 	{ NULL },
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 	{ add_exception, del_exception },
 #endif
 	{ NULL },
@@ -314,7 +316,7 @@ static CMMode cmmodes[128] = {
 	{ NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }, { NULL }
 };
 
- #if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK)
+#if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK)
 
 static char csmodes[128] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -322,17 +324,22 @@ static char csmodes[128] = {
 
 	0,
  #if defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
-        'a', /* (33) * Channel Admins */
+        'a', /* (33) ! Channel Admins */
  #else
         0,
  #endif
 	 0, 0, 0,
- #ifdef IRC_ULTIMATE3
+ #if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         'h', /* (37) % Channel halfops */
  #else
         0,
  #endif
-        0, 0, 0, 0, 0,
+        0, 0, 0, 0,
+ #if defined(IRC_RAGE2)
+	'a', /* * Channel Admins */
+ #else
+	0,
+ #endif
 
         'v', 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -367,7 +374,7 @@ static CUMode cumodes[128] = {
 #if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         { CUS_PROTECT, CUF_PROTECT_BOTSERV, check_valid_op },
 #else
-#if defined(IRC_ULTIMATE3)
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         { CUS_PROTECT, CUF_PROTECT_BOTSERV, check_valid_admin },
 #else
         { 0 }, /* a */
@@ -753,7 +760,7 @@ void get_channel_stats(long *nrec, long *memuse)
                 if (chan->bans[j])
                     mem += strlen(chan->bans[j]) + 1;
             }
-#if defined (IRC_ULTIMATE) || defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
             mem += sizeof(char *) * chan->exceptsize;
             for (j = 0; j < chan->exceptcount; j++) {
                 if (chan->excepts[j])
@@ -1193,7 +1200,7 @@ static void add_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 
 static void add_exception(Channel * chan, char *mask)
 {
@@ -1230,7 +1237,7 @@ static void chan_adduser2(User * user, Channel * c)
             chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
         } else
 #endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3)
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         if (check_should_protect(user, chan)) {
             chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
         } else
@@ -1368,7 +1375,7 @@ static void chan_delete(Channel * c)
     if (c->bansize)
         free(c->bans);
 
-#if defined (IRC_ULTIMATE) || defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
     for (i = 0; i < c->exceptcount; ++i) {
         if (c->excepts[i])
             free(c->excepts[i]);
@@ -1419,7 +1426,7 @@ static void del_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 
 static void del_exception(Channel * chan, char *mask)
 {

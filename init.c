@@ -37,6 +37,13 @@ extern void moduleAddMsgs(void);
 		ServiceUser, ServiceHost, ServerName, (name)); \
 	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
 	} while (0)
+#elif defined(IRC_RAGE2)
+# define NICK(nick,name,modes) \
+    do { \
+	send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", (nick), time(NULL), ServiceUser, \
+		ServiceHost, ServerName, (modes), (name)); \
+	send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
+    } while (0)
 #elif defined(IRC_BAHAMUT)
 # define NICK(nick,name,modes) \
     do { \
@@ -81,6 +88,8 @@ void introduce_user(const char *user)
     if (!user || stricmp(user, s_NickServ) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_NickServ, desc_NickServ, "+S");
+#elif defined(IRC_RAGE2)
+        NICK(s_NickServ, desc_NickServ, "+dS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_NickServ, desc_NickServ, "+oS");
 #else
@@ -89,6 +98,8 @@ void introduce_user(const char *user)
     if (!user || stricmp(user, s_ChanServ) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_ChanServ, desc_ChanServ, "+S");
+#elif defined(IRC_RAGE2)
+        NICK(s_ChanServ, desc_ChanServ, "+dS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_ChanServ, desc_ChanServ, "+oS");
 #else
@@ -99,6 +110,8 @@ void introduce_user(const char *user)
     if (s_HostServ && (!user || stricmp(user, s_HostServ) == 0))
 #if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_HostServ, desc_HostServ, "+oS");
+#elif defined(IRC_RAGE2)
+        NICK(s_HostServ, desc_HostServ, "+dS");
 #else
         NICK(s_HostServ, desc_HostServ, "+o");
 #endif
@@ -107,6 +120,8 @@ void introduce_user(const char *user)
     if (!user || stricmp(user, s_MemoServ) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_MemoServ, desc_MemoServ, "+S");
+#elif defined(IRC_RAGE2)
+        NICK(s_MemoServ, desc_MemoServ, "+dS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_MemoServ, desc_MemoServ, "+oS");
 #else
@@ -115,6 +130,8 @@ void introduce_user(const char *user)
     if (s_BotServ && (!user || stricmp(user, s_BotServ) == 0))
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_BotServ, desc_BotServ, "+S");
+#elif defined(IRC_RAGE2)
+        NICK(s_BotServ, desc_BotServ, "+dS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_BotServ, desc_BotServ, "+oS");
 #else
@@ -123,6 +140,8 @@ void introduce_user(const char *user)
     if (!user || stricmp(user, s_HelpServ) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_HelpServ, desc_HelpServ, "+Sh");
+#elif defined(IRC_RAGE2)
+        NICK(s_HelpServ, desc_HelpServ, "+dSh");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_HelpServ, desc_HelpServ, "+oS");
 #else
@@ -131,6 +150,8 @@ void introduce_user(const char *user)
     if (!user || stricmp(user, s_OperServ) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_OperServ, desc_OperServ, "+iS");
+#elif defined(IRC_RAGE2)
+        NICK(s_OperServ, desc_OperServ, "+diS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_OperServ, desc_OperServ, "+ioS");
 #else
@@ -139,12 +160,16 @@ void introduce_user(const char *user)
     if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0))
 #if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
         NICK(s_DevNull, desc_DevNull, "+iS");
+#elif defined(IRC_RAGE2)
+        NICK(s_DevNull, desc_DevNull, "+diS");
 #else
         NICK(s_DevNull, desc_DevNull, "+i");
 #endif
     if (!user || stricmp(user, s_GlobalNoticer) == 0)
 #if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
         NICK(s_GlobalNoticer, desc_GlobalNoticer, "+iS");
+#elif defined(IRC_RAGE2)
+        NICK(s_GlobalNoticer, desc_GlobalNoticer, "+diS");
 #elif defined(IRC_UNREAL) || defined(IRC_VIAGRA)
         NICK(s_GlobalNoticer, desc_GlobalNoticer, "+ioS");
 #else
@@ -222,7 +247,7 @@ void introduce_user(const char *user)
 #elif defined(IRC_ULTIMATE)
                     NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+pS",
                             1);
-#elif defined(IRC_ULTIMATE3)
+#elif defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
                     NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+S",
                             1);
 #else
@@ -781,7 +806,14 @@ int init(int ac, char **av)
     else if (servernum == 3)
         send_cmd(NULL, "PASS %s :TS", RemotePassword3);
     send_cmd(NULL, "CAPAB NICKIP SSJ5 TS5 CLIENT");
-
+#elif defined(IRC_RAGE2)
+    if (servernum == 1)
+        send_cmd(NULL, "PASS %s :TS", RemotePassword);
+    else if (servernum == 2)
+        send_cmd(NULL, "PASS %s :TS", RemotePassword2);
+    else if (servernum == 3)
+        send_cmd(NULL, "PASS %s :TS", RemotePassword3);
+    send_cmd(NULL, "CAPAB SSJ3 SN2 VHOST");
 #elif defined(IRC_BAHAMUT)
     if (servernum == 1)
         send_cmd(NULL, "PASS %s :TS", RemotePassword);
@@ -819,7 +851,10 @@ int init(int ac, char **av)
 #else
     send_cmd(NULL, "SERVER %s 1 :%s", ServerName, ServerDesc);
 #endif
-#ifdef IRC_BAHAMUT
+#ifdef IRC_RAGE2
+    send_cmd(NULL, "SVINFO 5 5 0 %ld bluemoon 0", time(NULL));
+#endif
+#if defined(IRC_BAHAMUT) && !defined(IRC_RAGE2)
     send_cmd(NULL, "SVINFO 3 1 0 :%ld", time(NULL));
 #endif
 #ifdef IRC_HYBRID

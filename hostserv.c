@@ -1075,8 +1075,10 @@ void send_on(char *nick, char *vIdent, char *vhost)
     send_cmd(s_HostServ, "SVSMODE %s +x", nick);
     send_cmd(ServerName, "SETHOST %s %s", nick, vhost);
 #endif
-
-
+#ifdef IRC_RAGE2
+    send_cmd(s_HostServ, "SVSMODE %s +z", nick);
+    send_cmd(ServerName, "VHOST %s %s", nick, vhost);
+#endif
 }
 
 /*************************************************************************/
@@ -1101,7 +1103,10 @@ void send_off(User * u)
     send_cmd(s_HostServ, "SVSMODE %s -x", u->nick);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
 #endif
-
+#ifdef IRC_RAGE2
+    send_cmd(s_HostServ, "SVSMODE %s -z", u->nick);
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
+#endif
 }
 
 /*************************************************************************/

@@ -224,7 +224,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 #if defined(IRC_UNREAL) || defined (IRC_VIAGRA)
         (!(ci->botflags & BS_DONTKICKOPS)
          || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_OWNER | CUS_PROTECT)))
-# elif defined (IRC_ULTIMATE3)
+# elif defined (IRC_ULTIMATE3) || defined(IRC_RAGE2)
         (!(ci->botflags & BS_DONTKICKOPS)
          || !(cstatus & (CUS_HALFOP | CUS_OP | CUS_PROTECT)))
 # else
@@ -1060,7 +1060,7 @@ static void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         && (get_access(u, ci) >= get_access(requester, ci)))
         return;
 
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAVE_EXCEPT
     if (is_excepted(ci, u) == 1) {
         send_cmd(ci->bi->nick, "PRIVMSG %s :%s", ci->name,
                  getstring2(NULL, BOT_EXCEPT));
@@ -1358,6 +1358,8 @@ static int do_bot(User * u)
             NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+qS", 1);
 #elif defined(IRC_ULTIMATE) || defined (IRC_ULTIMATE3)
             NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+pS", 1);
+#elif defined(IRC_RAGE2)
+            NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+S", 1);
 #else
             NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+", 1);
 #endif

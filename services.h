@@ -134,22 +134,32 @@ typedef struct channel_ Channel;
 /* Protocol tweaks */
 #ifdef IRC_HYBRID
 # define HAS_HALFOP
+# define HAS_EXCEPT			/* Has +e (chan excepts) */
 #endif
 
 #ifdef IRC_VIAGRA
 # define HAS_HALFOP
 # define HAS_VHOST
 # define HAS_VIDENT
+# define HAS_EXCEPT
 #endif
 
 #ifdef IRC_BAHAMUT
 # define HAS_NICKIP
 #endif
 
+#ifdef IRC_RAGE2
+# define HAS_HALFOP
+# define HAS_EXCEPT
+# define HAS_VHOST
+# define HAS_NICKVHOST
+#endif
+
 #ifdef IRC_PTLINK
 # define HAS_NICKVHOST
 # define HAS_VHOST
 # define HAS_FMODE
+# define HAS_EXCEPT
 #endif
 
 #ifdef IRC_ULTIMATE
@@ -158,6 +168,7 @@ typedef struct channel_ Channel;
 # define HAS_LMODE			/* Has +L chan mode */
 # define HAS_VHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
+# define HAS_EXCEPT
 #endif
 
 #ifdef IRC_UNREAL
@@ -167,6 +178,7 @@ typedef struct channel_ Channel;
 # define HAS_NICKVHOST
 # define HAS_VHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
+# define HAS_EXCEPT
 #endif
 
 #ifdef IRC_ULTIMATE3
@@ -174,6 +186,7 @@ typedef struct channel_ Channel;
 # define HAS_VHOST
 # define HAS_NICKVHOST
 # define HAS_VIDENT			/* Can the IRCD Change Idents on the fly */
+# define HAS_EXCEPT
 #endif
 
 /*************************************************************************/
@@ -667,6 +680,10 @@ struct csmodeutil_ {
 #define MUT_DEPROTECT   6
 #define MUT_PROTECT     7
 #endif
+#ifdef IRC_RAGE2
+#define MUT_DEPROTECT   6
+#define MUT_PROTECT     7
+#endif
 #ifdef IRC_VIAGRA
 #define MUT_DEPROTECT   6
 #define MUT_PROTECT     7
@@ -752,12 +769,12 @@ struct user_ {
 #define UMODE_p 0x04000000
 #endif
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
 # define UMODE_x 0x40000000
 #endif
 
 /* Returns *current* user hostname */
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
 # define GetHost(x)      ((x)->mode & UMODE_x ? (x)->vhost : (x)->host)
 #elif defined(IRC_PTLINK)
 # define GetHost(x)      ((x)->mode & UMODE_o ? (x)->vhost ? (x)->vhost : (x)->host : (x)->host)
@@ -789,7 +806,14 @@ struct user_ {
 		(user), (host), ServerName, (real)); \
 	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
     } while (0)
-#elif defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3)
+#elif defined(IRC_RAGE2)
+# define NEWNICK(nick,user,host,real,modes,qline) \
+    do { \
+	send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", (nick), time(NULL), (user), \
+		(host), ServerName, (modes), (real)); \
+	if ((qline)) send_cmd(NULL, "SQLINE %s :Reserved for services", (nick)); \
+    } while (0)
+#elif defined(IRC_BAHAMUT) && !defined(IRC_ULTIMATE3) && !defined(IRC_RAGE2)
 # define NEWNICK(nick,user,host,real,modes,qline) \
     do { \
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", (nick), time(NULL), (modes), \
@@ -885,6 +909,10 @@ struct cumode_ {
 #define CUS_PROTECT		0x0010		/* Protected users (+a) */
 #endif
 
+#ifdef IRC_RAGE2
+#define CUS_PROTECT		0x0010		/* Protected users (+a) */
+#endif
+
 /* Used by PTlink */
 #ifdef IRC_PTLINK
 #define CUS_PROTECT            0x0016          /* Protected users (+a) */
@@ -902,13 +930,17 @@ struct cumode_ {
 # define CHAN_MAX_SYMBOLS  5
 #elif defined(IRC_UNREAL)
 # define CHAN_MAX_SYMBOLS	5
+#elif defined(IRC_RAGE2)
+# define CHAN_MAX_SYMBOLS   3
 #else
 # define CHAN_MAX_SYMBOLS   2
 #endif
 
 /* Binary modes that need to be cleared */
 
-#if defined(IRC_BAHAMUT)
+#if defined(IRC_RAGE2)
+#define MODESTOREMOVE "-iklmnpRstcOASCNM"
+#elif defined(IRC_BAHAMUT)
 #define MODESTOREMOVE "-ciklmnpstOR"
 #elif defined(IRC_ULTIMATE)
 #define MODESTOREMOVE "-kiflmnpstxAIKLORS"
@@ -1061,6 +1093,14 @@ struct channel_ {
 #define CMODE_N 0x00001000
 #define CMODE_S 0x00002000
 #define CMODE_K 0x00004000
+#endif
+
+/* These modes are for IRC_RAGE2 servers only */
+#ifdef IRC_RAGE2
+#define CMODE_A 0x00000800
+#define CMODE_N 0x00001000
+#define CMODE_S 0x00002000
+#define CMODE_C 0x00004000
 #endif
 
 /* These modes are for IRC_PTLINK servers only. */

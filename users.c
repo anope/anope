@@ -57,12 +57,14 @@ static unsigned long umodes[128] = {
     0,
 #endif
     0, UMODE_r, 0, 0, 0, 0, UMODE_w,
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
     UMODE_x,
 #else
     0,
 #endif
-    0, 0, 0, 0, 0, 0, 0
+    0,
+    0,
+    0, 0, 0, 0, 0
 };
 
 /*************************************************************************/
@@ -160,7 +162,7 @@ static void update_host(User * user)
 
 /*************************************************************************/
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 
 /* Change the (virtual) hostname of a user. */
 
@@ -311,12 +313,14 @@ void set_umode(User * user, int ac, char **av)
                     user->mode |= UMODE_a;
                 }
 #endif
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
+#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
                 if (is_services_oper(user)) {
                     send_cmd(ServerName, "SVSMODE %s +a", user->nick);
                     user->mode |= UMODE_a;
                 }
+#endif
 
+#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3)
                 if (is_services_admin(user)) {
                     send_cmd(ServerName, "SVSMODE %s +P", user->nick);
                     user->mode |= UMODE_P;
@@ -345,7 +349,7 @@ void set_umode(User * user, int ac, char **av)
                 user->mode &= ~UMODE_r;
             }
             break;
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
         case 'x':
             update_host(user);
             break;
@@ -956,7 +960,7 @@ int is_oper(User * user)
 /*************************************************************************/
 /*************************************************************************/
 
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
 /* Is the given user ban-excepted? */
 int is_excepted(ChannelInfo * ci, User * user)
 {

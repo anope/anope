@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="92"
+VERSION_BUILD="93"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (93)
+# BUGS  : 46
+# NOTES : Applied the Rage2 IRCD patch provided by al
 #
 # BUILD : 1.7.2 (92)
 # BUGS  : 43

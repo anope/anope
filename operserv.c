@@ -1614,7 +1614,7 @@ static int do_clearmodes(User * u)
     int all = 0;
     int count;                  /* For saving ban info */
     char **bans;                /* For saving ban info */
-#if defined (IRC_ULTIMATE) || defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) ||defined (IRC_VIAGRA)
+#ifdef HAS_EXCEPT
     int exceptcount;            /* For saving except info */
     char **excepts;             /* For saving except info */
 #endif
@@ -1723,7 +1723,7 @@ static int do_clearmodes(User * u)
 
         free(bans);
 
-#if defined (IRC_ULTIMATE) || defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined (IRC_VIAGRA)
+#ifdef HAS_EXCEPT
         /* Clear excepts */
         exceptcount = c->exceptcount;
         excepts = scalloc(sizeof(char *) * exceptcount, 1);

@@ -79,7 +79,7 @@ static LevelInfo levelinfo[] = {
 #ifdef IRC_VIAGRA
         { CA_AUTOPROTECT,   "AUTOPROTECT",  CHAN_LEVEL_AUTOPROTECT },
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 	{ CA_AUTOPROTECT,   "AUTOADMIN",  CHAN_LEVEL_AUTOPROTECT },
 #endif
     { CA_AUTOVOICE,     "AUTOVOICE",  	CHAN_LEVEL_AUTOVOICE },
@@ -113,7 +113,7 @@ static LevelInfo levelinfo[] = {
         { CA_PROTECT,       "PROTECT",      CHAN_LEVEL_PROTECT },
     { CA_PROTECTME,     "PROTECTME",    CHAN_LEVEL_PROTECTME },
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
   { CA_PROTECT,       "ADMIN",      CHAN_LEVEL_PROTECT },
     { CA_PROTECTME,     "ADMINME",    CHAN_LEVEL_PROTECTME },
 #endif
@@ -152,7 +152,7 @@ CSModeUtil csmodeutils[] = {
 	{ "DEPROTECT",	"!deprotect",	"-a",	0          ,	CA_PROTECT, CA_PROTECTME },
 	{ "PROTECT",	"!protect",		"+a",	0          ,	CA_PROTECT, CA_PROTECTME },
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
   	{ "DEPROTECT",	"!deadmin",	"-a",	0          ,	CA_PROTECT, CA_PROTECTME },
 	{ "PROTECT",	"!admin",		"+a",	0          ,	CA_PROTECT, CA_PROTECTME },
 #endif
@@ -295,7 +295,7 @@ static int do_deprotect(User * u);
 static int do_owner(User * u);
 static int do_deowner(User * u);
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 static int do_protect(User * u);
 static int do_deprotect(User * u);
 #endif
@@ -375,7 +375,7 @@ void moduleAddChanServCmds(void) {
     c = createCommand("OWNER",    do_owner,    NULL,  CHAN_HELP_OWNER,          -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("DEOWNER",  do_deowner,  NULL,  CHAN_HELP_DEOWNER,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
     c = createCommand("ADMIN",  do_protect,  NULL,  CHAN_HELP_PROTECT,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("DEADMIN",do_deprotect,NULL,  CHAN_HELP_DEPROTECT,      -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
 #endif
@@ -1438,8 +1438,7 @@ void check_modes(Channel * c)
 
 /*************************************************************************/
 
-#ifdef IRC_ULTIMATE3
-
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 
 int check_valid_admin(User * user, Channel * chan, int servermode)
 {
@@ -1494,7 +1493,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
                      chan->name, user->nick, user->nick, user->nick,
                      user->nick);
         }
-# elif defined(IRC_ULTIMATE3)
+# elif defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
             send_cmd(whosends(chan->ci), "MODE %s -ao %s %s",
                      chan->name, user->nick, user->nick);
@@ -1631,7 +1630,7 @@ int check_should_owner(User * user, const char *chan)
 
 /*************************************************************************/
 
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3)
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
 
 int check_should_protect(User * user, const char *chan)
 {
@@ -1714,7 +1713,7 @@ int check_kick(User * user, char *chan)
     else
         nc = NULL;
 
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
     /*
      * Before we go through akick lists, see if they're excepted FIRST
      * We cannot kick excempted users that are akicked or not on the channel access list
@@ -2574,7 +2573,7 @@ static int do_help(User * u)
 #ifdef IRC_ULTIMATE
         notice_help(s_ChanServ, u, CHAN_HELP_ULTIMATE);
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         notice_help(s_ChanServ, u, CHAN_HELP_ULTIMATE3);
 #endif
         if (CSExpire >= 86400)
@@ -2721,7 +2720,7 @@ static int do_register(User * u)
         uc->chan = ci;
         /* Implement new mode lock */
         check_modes(c);
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         send_cmd(s_ChanServ, "MODE %s +a %s", chan, u->nick);
 #endif
     }
@@ -4406,7 +4405,7 @@ static int do_akick(User * u)
         }
 
         /* Check excepts BEFORE we get this far */
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
         if (is_excepted_mask(ci, mask) == 1) {
             notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask, chan);
             return MOD_CONT;
@@ -5254,7 +5253,7 @@ static int do_dehalfop(User * u)
 
 /*************************************************************************/
 
-#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA)
+#if defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_RAGE2)
 
 static int do_protect(User * u)
 {
@@ -5269,6 +5268,7 @@ static int do_deprotect(User * u)
 }
 
 /*************************************************************************/
+
 #endif
 
 #if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
@@ -5503,7 +5503,7 @@ static int do_ban(User * u)
                 char *av[3];
                 char mask[BUFSIZE];
 
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
                 /*
                  * Dont ban/kick the user on channels where he is excepted
                  * to prevent services <-> server wars.
@@ -5557,7 +5557,7 @@ static int do_ban(User * u)
     } else if (!is_same && (ci->flags & CI_PEACE)
                && (get_access(u2, ci) >= get_access(u, ci))) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-#if defined (IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
         /*
          * Dont ban/kick the user on channels where he is excepted
          * to prevent services <-> server wars.
@@ -5743,7 +5743,7 @@ static int do_clear(User * u)
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
         free(bans);
-#if defined (IRC_ULTIMATE) || defined (IRC_UNREAL) || defined (IRC_ULTIMATE3) || defined(IRC_HYBRID)
+#ifdef HAS_EXCEPT
     } else if (stricmp(what, "excepts") == 0) {
         char *av[3];
         int i;

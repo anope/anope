@@ -53,10 +53,13 @@ const char version_build[] =
 const char version_protocol[] =
 #if defined(IRC_ULTIMATE3)
  	"UltimateIRCd 3.0.0.a26+"
-#define VER_IRCD "UltimateIRCd 3.0.* -"
+# define VER_IRCD "UltimateIRCd 3.0.* -"
 #elif defined(IRC_VIAGRA)
 	"ViagraIRCd 1.3.x"
 # define VER_IRCD "ViagraIRCd 1.3.* -"
+#elif defined(IRC_RAGE2)
+	"RageIRCd 2.0.x"
+# define VER_IRCD "RageIRCd 2.0.* -"
 #elif defined(IRC_BAHAMUT)
 	"Bahamut 1.4.27+"
 # define VER_IRCD "BahamutIRCd 1.4.* -"

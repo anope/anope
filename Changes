@@ -1,8 +1,8 @@
 Anope Version 1.7.x (will be renamed when next release is produced)
 -------------------
 Provided by Anope Dev. <dev@anope.org>
-2004/06/11 Fixed a bug with module unload / memo moduleData  ( #43 )
-2004/06/05 Fixed bug with RDB and empty nickserv greet message (# 28).
+2004/05/11 Fixed a bug with module unload / memo moduleData  ( #43 )
+2004/05/05 Fixed bug with RDB and empty nickserv greet message (# 28).
 2004/05/04 Fixed Badwords kicker to ignore control characters and color codes.
 2004/05/04 anoperc bugfixes including checking if anope binary exists.
 2004/05/03 always set the right module name when executing mod_tail commands
@@ -12,6 +12,9 @@ Provided by Anope Dev. <dev@anope.org>
 2004/04/23 Added new MemoServ command RSEND to send a memo requesting a receipt memo once the recipient reads it.
 2004/04/22 Fixed ALIST bug when being invoked by systems admins (Bug #20)
 2004/04/19 Added /bin/anoperc anope console control script
+
+Provided by Rage IRCD. <rageircd@users.sourceforge.net>
+2004/05/11 Added Rage2 IRCD support accepted feature request ( #46 )
 
 Anope Version 1.7.2
 --------------------

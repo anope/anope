@@ -2483,7 +2483,7 @@ int should_mode_change(int16 status, int16 mode)
         }
         break;
 #endif
-#ifdef IRC_ULTIMATE3
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
     case CUS_PROTECT:
         if (status & CUS_PROTECT) {
             return 0;
@@ -2510,7 +2510,7 @@ static int do_setmodes(User * u)
                 chan_set_user_status(c, u, CUS_OWNER);
             } else
 #endif
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3)
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
                 if (should_mode_change(uc->status, CUS_PROTECT)
                     && check_should_protect(u, chan)) {
                 chan_set_user_status(c, u, CUS_PROTECT);

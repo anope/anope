@@ -304,7 +304,7 @@ static int m_nick(char *source, int ac, char **av)
             set_umode(user, 1, &av[3]);
 #else
 #if defined(IRC_BAHAMUT)
-#if defined(IRC_ULTIMATE3)
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
         User *user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
                              strtoul(av[2], NULL, 10), strtoul(av[7], NULL,
                                                                0),
@@ -373,6 +373,26 @@ static int m_client(char *source, int ac, char **av)
                              strtoul(av[10], NULL, 0), av[7]);
         if (user) {
             set_umode(user, 1, &av[3]);
+        }
+    }
+    return MOD_CONT;
+}
+
+#endif
+
+/*************************************************************************/
+
+#ifdef IRC_RAGE2
+
+static int m_snick(char *source, int ac, char **av)
+{
+    if (ac != 2) {
+        User *user = do_nick(source, av[0], av[3], av[4], av[8], av[10],
+                             strtoul(av[1], NULL, 10), strtoul(av[7], NULL,
+                                                               0),
+                             strtoul(av[5], NULL, 0), av[6]);
+        if (user) {
+            set_umode(user, 1, &av[9]);
         }
     }
     return MOD_CONT;
@@ -663,6 +683,7 @@ static int m_server(char *source, int ac, char **av)
 }
 
 /*************************************************************************/
+
 #if defined(IRC_ULTIMATE3)
 
 static int m_sethost(char *source, int ac, char **av)
@@ -676,6 +697,30 @@ static int m_sethost(char *source, int ac, char **av)
     if (!u) {
         if (debug)
             alog("user: SETHOST for nonexistent user %s", av[0]);
+        return MOD_CONT;
+    }
+
+    change_user_host(u, av[1]);
+    return MOD_CONT;
+}
+
+#endif
+
+/*************************************************************************/
+
+#ifdef IRC_RAGE2
+
+static int m_vhost(char *source, int ac, char **av)
+{
+    User *u;
+
+    if (ac != 2)
+        return MOD_CONT;
+
+    u = finduser(av[0]);
+    if (!u) {
+        if (debug)
+            alog("user: VHOST for nonexistent user %s", av[0]);
         return MOD_CONT;
     }
 
@@ -806,7 +851,7 @@ static int m_setname(char *source, int ac, char **av)
 
 /*************************************************************************/
 
-#if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK)
+#if defined(IRC_BAHAMUT) || defined(IRC_HYBRID) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
 
 static int m_sjoin(char *source, int ac, char **av)
 {
@@ -1180,6 +1225,10 @@ void moduleAddMsgs(void) {
     m = createMessage("NETCTRL",	NULL); addCoreMessage(IRCD,m);
     m = createMessage("CLIENT",	m_client); addCoreMessage(IRCD,m);
     m = createMessage("SMODE",	NULL); addCoreMessage(IRCD,m);
+#endif
+#ifdef IRC_RAGE2
+    m = createMessage("SNICK", m_snick); addCoreMessage(IRCD,m);
+    m = createMessage("VHOST", m_vhost); addCoreMessage(IRCD,m);
 #endif
 }
 

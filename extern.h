@@ -26,9 +26,9 @@ E void moduleCleanStruct(ModuleData * moduleData[]);
 
 /**** actions.c ****/
 
-E void change_user_mode(User *u, char *modes, char *arg);
+E void change_user_mode(User * u, char *modes, char *arg);
 E void kill_user(const char *source, const char *user, const char *reason);
-E void bad_password(User *u);
+E void bad_password(User * u);
 
 /**** botserv.c ****/
 
@@ -60,20 +60,21 @@ E Channel *findchan(const char *chan);
 E Channel *firstchan(void);
 E Channel *nextchan(void);
 
-E void chan_deluser(User *user, Channel *c);
+E void chan_deluser(User * user, Channel * c);
 
-E int is_on_chan(Channel *c, User *u);
-E User *nc_on_chan(Channel *c, NickCore *nc);
+E int is_on_chan(Channel * c, User * u);
+E User *nc_on_chan(Channel * c, NickCore * nc);
 
-E char *chan_get_modes(Channel *chan, int complete, int plus);
-E void chan_set_modes(const char *source, Channel *chan, int ac, char **av, int check);
+E char *chan_get_modes(Channel * chan, int complete, int plus);
+E void chan_set_modes(const char *source, Channel * chan, int ac,
+                      char **av, int check);
 
-E int chan_get_user_status(Channel *chan, User *user);
-E int chan_has_user_status(Channel *chan, User *user, int16 status);
-E void chan_remove_user_status(Channel *chan, User *user, int16 status);
-E void chan_set_user_status(Channel *chan, User *user, int16 status);
+E int chan_get_user_status(Channel * chan, User * user);
+E int chan_has_user_status(Channel * chan, User * user, int16 status);
+E void chan_remove_user_status(Channel * chan, User * user, int16 status);
+E void chan_set_user_status(Channel * chan, User * user, int16 status);
 
-E int   get_access_level(ChannelInfo *ci, NickAlias *na);
+E int get_access_level(ChannelInfo * ci, NickAlias * na);
 E char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, char **av);
@@ -97,58 +98,58 @@ E int delchan(ChannelInfo * ci);
 E void alpha_insert_chan(ChannelInfo * ci);
 E void reset_levels(ChannelInfo * ci);
 E void cs_init(void);
-E void chanserv(User *u, char *buf);
+E void chanserv(User * u, char *buf);
 E void load_cs_dbase(void);
 E void save_cs_dbase(void);
 E void save_cs_rdb_dbase(void);
 E void expire_chans(void);
-E void cs_remove_nick(const NickCore *nc);
-E void cs_remove_bot(const BotInfo *bi);
+E void cs_remove_nick(const NickCore * nc);
+E void cs_remove_bot(const BotInfo * bi);
 
-E void check_modes(Channel *c);
-#ifdef IRC_ULTIMATE3
-E int check_valid_admin(User *user, Channel *chan, int servermode);
+E void check_modes(Channel * c);
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+E int check_valid_admin(User * user, Channel * chan, int servermode);
 #endif
-E int check_valid_op(User *user, Channel *chan, int servermode);
-E int check_should_op(User *user, const char *chan);
-E int check_should_voice(User *user, const char *chan);
+E int check_valid_op(User * user, Channel * chan, int servermode);
+E int check_should_op(User * user, const char *chan);
+E int check_should_voice(User * user, const char *chan);
 #ifdef HAS_HALFOP
-E int check_should_halfop(User *user, const char *chan);
+E int check_should_halfop(User * user, const char *chan);
 #endif
 #if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-E int check_should_owner(User *user, const char *chan);
-E int check_should_protect(User *user, const char *chan);
+E int check_should_owner(User * user, const char *chan);
+E int check_should_protect(User * user, const char *chan);
 #endif
-#ifdef IRC_ULTIMATE3
-E int check_should_protect(User *user, const char *chan);
+#if defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+E int check_should_protect(User * user, const char *chan);
 #endif
-E int check_kick(User *user, char *chan);
+E int check_kick(User * user, char *chan);
 E void record_topic(const char *chan);
 E void restore_topic(const char *chan);
-E int check_topiclock(Channel *c, time_t topic_time);
+E int check_topiclock(Channel * c, time_t topic_time);
 
 E ChannelInfo *cs_findchan(const char *chan);
-E int check_access(User *user, ChannelInfo *ci, int what);
-E int is_founder(User *user, ChannelInfo *ci);
-E int get_access(User *user, ChannelInfo *ci);
-E ChanAccess *get_access_entry(NickCore *nc, ChannelInfo *ci);
-E void update_cs_lastseen(User *user, ChannelInfo *ci);
-E int get_idealban(ChannelInfo *ci, User *u, char *ret, int retlen);
-E AutoKick *is_stuck(ChannelInfo *ci, char *mask);
-E void stick_mask(ChannelInfo *ci, AutoKick *akick);
-E void stick_all(ChannelInfo *ci);
+E int check_access(User * user, ChannelInfo * ci, int what);
+E int is_founder(User * user, ChannelInfo * ci);
+E int get_access(User * user, ChannelInfo * ci);
+E ChanAccess *get_access_entry(NickCore * nc, ChannelInfo * ci);
+E void update_cs_lastseen(User * user, ChannelInfo * ci);
+E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
+E AutoKick *is_stuck(ChannelInfo * ci, char *mask);
+E void stick_mask(ChannelInfo * ci, AutoKick * akick);
+E void stick_all(ChannelInfo * ci);
 
 #ifdef HAS_FMODE
-E char *cs_get_flood(ChannelInfo *ci);
-E void cs_set_flood(ChannelInfo *ci, char *value);
+E char *cs_get_flood(ChannelInfo * ci);
+E void cs_set_flood(ChannelInfo * ci, char *value);
 #endif
-E char *cs_get_key(ChannelInfo *ci);
-E void cs_set_key(ChannelInfo *ci, char *value);
-E char *cs_get_limit(ChannelInfo *ci);
-E void cs_set_limit(ChannelInfo *ci, char *value);
+E char *cs_get_key(ChannelInfo * ci);
+E void cs_set_key(ChannelInfo * ci, char *value);
+E char *cs_get_limit(ChannelInfo * ci);
+E void cs_set_limit(ChannelInfo * ci, char *value);
 #ifdef HAS_LMODE
-E char *cs_get_redirect(ChannelInfo *ci);
-E void cs_set_redirect(ChannelInfo *ci, char *value);
+E char *cs_get_redirect(ChannelInfo * ci);
+E void cs_set_redirect(ChannelInfo * ci, char *value);
 #endif
 
 /**** compat.c ****/
@@ -229,9 +230,9 @@ E char *s_HostServ;
 E void load_hs_dbase(void);
 E void save_hs_dbase(void);
 E void save_hs_rdb_dbase(void);
-E int do_on_id(User *u);
+E int do_on_id(User * u);
 E void delHostCore(char *nick);
-E void hostserv(User *u, char *buf);
+E void hostserv(User * u, char *buf);
 
 E char *s_NickServAlias;
 E char *s_ChanServAlias;
@@ -499,8 +500,10 @@ E void lang_init(void);
 	(langtexts[((na)&&((NickAlias*)na)->nc&&!(((NickAlias*)na)->status & NS_VERBOTEN)?((NickAlias*)na)->nc->language:NSDefLanguage)][(index)])
 #define getstring2(nc,index) \
 	(langtexts[((nc)?((NickCore*)nc)->language:NSDefLanguage)][(index)])
-E int strftime_lang(char *buf, int size, User *u, int format, struct tm *tm);
-E void syntax_error(const char *service, User *u, const char *command, int msgnum);
+E int strftime_lang(char *buf, int size, User * u, int format,
+                    struct tm *tm);
+E void syntax_error(const char *service, User * u, const char *command,
+                    int msgnum);
 
 
 /**** list.c ****/
@@ -572,8 +575,8 @@ E char *sstrdup(const char *s);
 /**** memoserv.c ****/
 
 E void ms_init(void);
-E void memoserv(User *u, char *buf);
-E void check_memos(User *u);
+E void memoserv(User * u, char *buf);
+E void check_memos(User * u);
 
 
 /**** misc.c ****/
@@ -588,12 +591,12 @@ E int match_wild(const char *pattern, const char *str);
 E int match_wild_nocase(const char *pattern, const char *str);
 
 E int dotime(const char *s);
-E char *duration(NickAlias *na, char *buf, int bufsize, time_t seconds);
-E char *expire_left(NickAlias *na, char *buf, int len, time_t expires);
+E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
+E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
 
-typedef int (*range_callback_t)(User *u, int num, va_list args);
+typedef int (*range_callback_t) (User * u, int num, va_list args);
 E int process_numlist(const char *numstr, int *count_ret,
-		range_callback_t callback, User *u, ...);
+                      range_callback_t callback, User * u, ...);
 
 E int isValidHost(const char *host, int type);
 E int isvalidchar(char c);
@@ -615,10 +618,10 @@ E void get_news_stats(long *nrec, long *memuse);
 E void load_news(void);
 E void save_news(void);
 E void save_rdb_news(void);
-E void display_news(User *u, int16 type);
-E int do_logonnews(User *u);
-E int do_opernews(User *u);
-E int do_randomnews(User *u);
+E void display_news(User * u, int16 type);
+E int do_logonnews(User * u);
+E int do_opernews(User * u);
+E int do_randomnews(User * u);
 
 
 /**** nickserv.c ****/
@@ -635,28 +638,28 @@ E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
 
 E void ns_init(void);
-E void nickserv(User *u, char *buf);
+E void nickserv(User * u, char *buf);
 E void load_ns_dbase(void);
 E void load_ns_req_db(void);
 E void save_ns_dbase(void);
 E void save_ns_req_dbase(void);
 E void save_ns_rdb_dbase(void);
 E void save_ns_req_rdb_dbase(void);
-E int validate_user(User *u);
-E void cancel_user(User *u);
-E int nick_identified(User *u);
-E int nick_recognized(User *u);
+E int validate_user(User * u);
+E void cancel_user(User * u);
+E int nick_identified(User * u);
+E int nick_recognized(User * u);
 E void expire_nicks(void);
 E void expire_requests(void);
 E int ns_do_register(User * u);
 
-E int delnick(NickAlias *na);
+E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickCore  *findcore(const char *nick);
-E void clean_ns_timeouts(NickAlias *na);
+E void clean_ns_timeouts(NickAlias * na);
 
 /**** helpserv.c  ****/
-E void helpserv(User *u, char *buf);
+E void helpserv(User * u, char *buf);
 E void helpserv_init(void);
 
 /**** hostserv.c  ****/
@@ -701,11 +704,12 @@ E int check_chan_sqline(const char *chan);
 E void expire_sqlines(void);
 
 #ifdef IRC_BAHAMUT
-E int add_szline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
+E int add_szline(User * u, char *mask, const char *by,
+                 const time_t expires, const char *reason);
 E void expire_szlines(void);
 #endif
 
-E void check_clones(User *user);
+E void check_clones(User * user);
 
 E void delete_ignore(const char *nick);
 
@@ -722,7 +726,8 @@ E void process(void);
 
 /**** protocol.c ****/
 
-E void s_akill(char *user, char *host, char *who, time_t when, time_t expires, char *reason);
+E void s_akill(char *user, char *host, char *who, time_t when,
+               time_t expires, char *reason);
 E void s_rakill(char *user, char *host);
 E void s_sgline(char *mask, char *reason);
 E void s_sqline(char *mask, char *reason);
@@ -796,7 +801,7 @@ E char *sgets(char *buf, int len, int s);
 E char *sgets2(char *buf, int len, int s);
 E int sread(int s, char *buf, int len);
 E int sputs(char *str, int s);
-E int sockprintf(int s, char *fmt,...);
+E int sockprintf(int s, char *fmt, ...);
 E int conn(const char *host, int port, const char *lhost, int lport);
 E void disconn(int s);
 
@@ -807,35 +812,39 @@ E User *userlist[1024];
 E int32 usercnt, opcnt, maxusercnt;
 E time_t maxusertime;
 
-E void set_umode(User *user, int ac, char **av);
+E void set_umode(User * user, int ac, char **av);
 
 E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *firstuser(void);
 E User *nextuser(void);
 
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
+E void change_user_host(User * user, const char *host);
+#endif
 #if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_PTLINK)
-E void change_user_host(User *user, const char *host);
-E void change_user_username(User *user, const char *username);
-E void change_user_realname(User *user, const char *realname);
+E void change_user_username(User * user, const char *username);
+E void change_user_realname(User * user, const char *realname);
 #endif
 
-E User *do_nick(const char *source, char *nick, char *username, char *host, char *server, char *realname, time_t ts, uint32 svid, ...);
+E User *do_nick(const char *source, char *nick, char *username, char *host,
+                char *server, char *realname, time_t ts, uint32 svid, ...);
 E void do_umode(const char *source, int ac, char **av);
 E void do_quit(const char *source, int ac, char **av);
 E void do_kill(const char *source, int ac, char **av);
 
-E int is_oper(User *user);
-E int is_protected(User *user);
+E int is_oper(User * user);
+E int is_protected(User * user);
 
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_VIAGRA) || defined(IRC_HYBRID)
-E int is_excepted(ChannelInfo *ci, User *user);
-E int is_excepted_mask(ChannelInfo *ci, char *mask);
+#ifdef HAS_EXCEPT
+E int is_excepted(ChannelInfo * ci, User * user);
+E int is_excepted_mask(ChannelInfo * ci, char *mask);
 #endif
 
-E int match_usermask(const char *mask, User *user);
-E void split_usermask(const char *mask, char **nick, char **user, char **host);
-E char *create_mask(User *u);
+E int match_usermask(const char *mask, User * user);
+E void split_usermask(const char *mask, char **nick, char **user,
+                      char **host);
+E char *create_mask(User * u);
 
 #ifdef USE_MYSQL
 /**** mysql.c ****/
@@ -853,7 +862,9 @@ E void db_mysql_save_ns_core(NickCore * nc);
 E void db_mysql_save_ns_alias(NickAlias * na);
 E void db_mysql_save_ns_req(NickRequest * nr);
 E void db_mysql_save_cs_info(ChannelInfo * ci);
-E void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime, SList *ak, SList *sgl, SList *sql, SList *szl, HostCache *hc);
+E void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
+                           SList * ak, SList * sgl, SList * sql,
+                           SList * szl, HostCache * hc);
 E void db_mysql_save_news(NewsItem * ni);
 E void db_mysql_save_exceptions(Exception * e);
 E void db_mysql_save_hs_core(HostCore * hc);

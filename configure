@@ -463,6 +463,7 @@ echo "    5) UltimateIRCd 3.0.0 [alpha26 or later]"
 echo "    6) Hybrid IRCd 7.0    [experimental]"
 echo "    7) ViagraIRCd 1.3.x   [or later]"
 echo "    8) PTlink 6.15.0      [experimental]"
+echo "    9) RageIRCd 2.0       [beta-3 or later]"
 
 while [ $ok -eq 0 ] ; do
 	echo2 "[$IRCTYPE] "
@@ -485,30 +486,41 @@ while [ $ok -eq 0 ] ; do
 			IRCTYPE_DEF2=
 			ok=1
 			;;
-		3)  IRCTYPE_DEF="IRC_DREAMFORGE"
+		3)
+			IRCTYPE_DEF="IRC_DREAMFORGE"
 			IRCTYPE_DEF2="IRC_UNREAL"
 			ok=1
 			;;
-		4)  IRCTYPE_DEF="IRC_DREAMFORGE"
+		4)
+			IRCTYPE_DEF="IRC_DREAMFORGE"
 	        IRCTYPE_DEF2="IRC_ULTIMATE"
 	        ok=1
 	        ;;
-                5)      IRCTYPE_DEF="IRC_BAHAMUT"
+                5)
+			IRCTYPE_DEF="IRC_BAHAMUT"
                         IRCTYPE_DEF2="IRC_ULTIMATE3"
                         ok=1
                         ;;
-		6) IRCTYPE_DEF="IRC_HYBRID"
+		6)
+			IRCTYPE_DEF="IRC_HYBRID"
 		   IRCTYPE_DEF2=
 		   ok=1
 		   ;;
-                7) IRCTYPE_DEF="IRC_BAHAMUT"
+                7)
+			IRCTYPE_DEF="IRC_BAHAMUT"
                    IRCTYPE_DEF2="IRC_VIAGRA"
                    ok=1
                    ;;
-                8) IRCTYPE_DEF="IRC_PTLINK"
+                8)
+			IRCTYPE_DEF="IRC_PTLINK"
                    IRCTYPE_DEF2=
                    ok=1
                    ;;
+		9)
+			IRCTYPE_DEF="IRC_BAHAMUT"
+			IRCTYPE_DEF2="IRC_RAGE2"
+			ok=1
+			;;
 		*)
 			echo "Please enter a valid option number."
 			;;

@@ -6,12 +6,16 @@
 # $Id$
 
 VERSION_MAJOR="1"
-VERSION_MINOR="6"
+VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="6"
+VERSION_BUILD="8"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (8)
+# BUGS  : none.
+# NOTES : Made svn://zero.org/repos/anope/trunk the 1.7 development stream.
 #
 # BUILD : 1.6.0 (6)
 # BUGS  : none

@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id: extern.h,v 1.65 2004/03/13 13:55:59 dane Exp $ 
+ * $Id$ 
  *
  */
 

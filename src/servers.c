@@ -550,4 +550,54 @@ int is_sync(Server * server)
     return 0;
 }
 
+/*************************************************************************/
+
+/* Finish the syncing process for this server and (optionally) for all
+ * it's leaves as well
+ * @param serv Server to finish syncing
+ * @param sync_links Should all leaves be synced as well? (1: yes, 0: no)
+ * @return void
+ */
+void finish_sync(Server * serv, int sync_links)
+{
+    Server *s;
+
+    if (!serv || is_sync(serv))
+        return;
+
+    /* Mark each server as in sync */
+    s = serv;
+    do {
+        if (!is_sync(s)) {
+            if (debug)
+                alog("Finishing sync for server %s", s->name);
+
+            s->sync = SSYNC_DONE;
+        }
+
+        if (!sync_links)
+            break;
+
+        if (s->links) {
+            s = s->links;
+        } else if (s->next) {
+            s = s->next;
+        } else {
+            do {
+                s = s->uplink;
+                if (s == serv)
+                    s = NULL;
+                if (s == me_server)
+                    s = NULL;
+            } while (s && !(s->next));
+            if (s)
+                s = s->next;
+        }
+    } while (s);
+
+    /* Do some general stuff which should only be done once */
+    restore_unsynced_topics();
+    alog("Server %s is done syncing", serv->name);
+}
+
 /* EOF */

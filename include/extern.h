@@ -833,6 +833,8 @@ E void do_squit(const char *source, int ac, char **av);
 E void capab_parse(int ac, char **av);
 E int anope_check_sync(const char *name);
 
+E void finish_sync(Server *serv, int sync_links);
+
 /**** sessions.c ****/
 
 E Exception *exceptions;

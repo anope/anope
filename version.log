@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="469"
+VERSION_BUILD="470"
 
 # $Log$
+#
+# BUILD : 1.7.6 (470)
+# BUGS  : N/A
+# NOTES : add mode.. not remove mode.. from the previous commit 
 #
 # BUILD : 1.7.6 (469)
 # BUGS  : N/A

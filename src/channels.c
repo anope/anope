@@ -243,7 +243,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                  */
                 if (ircd->servicesmode) {
                     if (user->mode & ircd->servicesmode) {
-                        chan_remove_user_status(chan, user, cum->status);
+                        chan_set_user_status(chan, user, cum->status);
                         continue;
                     }
                 }

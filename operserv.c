@@ -1025,7 +1025,7 @@ static int do_global(User * u)
     }
     if (WallOSGlobal)
         wallops(s_OperServ, "\2%s\2 just used GLOBAL command.", u->nick);
-    oper_global(u->nick, msg);
+    oper_global(u->nick, "%s",  msg);
     return MOD_CONT;
 }
 
@@ -4577,7 +4577,7 @@ static int do_os_quit(User * u)
         sprintf(quitmsg, "QUIT command received from %s", u->nick);
 
     if (GlobalOnCycle) {
-        oper_global(NULL, GlobalOnCycleMessage);
+        oper_global(NULL, "%s", GlobalOnCycleMessage);
     }
     quitting = 1;
     return MOD_CONT;
@@ -4594,7 +4594,7 @@ static int do_shutdown(User * u)
         sprintf(quitmsg, "SHUTDOWN command received from %s", u->nick);
 
     if (GlobalOnCycle) {
-        oper_global(NULL, GlobalOnCycleMessage);
+        oper_global(NULL, "%s", GlobalOnCycleMessage);
     }
     save_data = 1;
     delayed_quit = 1;
@@ -4613,7 +4613,7 @@ static int do_restart(User * u)
         sprintf(quitmsg, "RESTART command received from %s", u->nick);
 
     if (GlobalOnCycle) {
-        oper_global(NULL, GlobalOnCycleMessage);
+        oper_global(NULL, "%s", GlobalOnCycleMessage);
     }
     /*    raise(SIGHUP); */
     do_restart_services();
@@ -4749,7 +4749,7 @@ static int do_defcon(User * u)
        the Admin would like to add. Set in config file. */
     if (GlobalOnDefcon) {
         if ((DefConLevel == 5) && (DefConOffMessage)) {
-            oper_global(NULL, DefConOffMessage);
+            oper_global(NULL, "%s", DefConOffMessage);
         } else {
             oper_global(NULL, langglobal, DefConLevel);
         }
@@ -4757,7 +4757,7 @@ static int do_defcon(User * u)
     if (GlobalOnDefconMore) {
         if ((DefConOffMessage) && DefConLevel == 5) {
         } else {
-            oper_global(NULL, DefconMessage);
+            oper_global(NULL, "%s", DefconMessage);
         }
     }
     /* Run any defcon functions, e.g. FORCE CHAN MODE */
@@ -4839,14 +4839,14 @@ void resetDefCon(int level)
                     s_OperServ, level);
             if (GlobalOnDefcon) {
                 if (DefConOffMessage) {
-                    oper_global(NULL, DefConOffMessage);
+                    oper_global(NULL, "%s", DefConOffMessage);
                 } else {
                     oper_global(NULL, getstring(NULL, DEFCON_GLOBAL),
                                 DefConLevel);
                 }
             }
             if (GlobalOnDefconMore && !DefConOffMessage) {
-                oper_global(NULL, DefconMessage);
+                oper_global(NULL, "%s", DefconMessage);
             }
             runDefCon();
         }

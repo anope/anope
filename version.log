@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="99"
+VERSION_BUILD="100"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (100)
+# BUGS  : 52
+# NOTES : Fixed a bug with globals containing format characters
 #
 # BUILD : 1.7.2 (99)
 # BUGS  : none

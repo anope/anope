@@ -891,7 +891,7 @@ int init(int ac, char **av)
     /* Write the StartGlobal */
     if (GlobalOnCycle) {
         if (GlobalOnCycleUP)
-            oper_global(NULL, GlobalOnCycleUP);
+            oper_global(NULL, "%s", GlobalOnCycleUP);
     }
 
     /* Success! */

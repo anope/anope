@@ -1745,11 +1745,11 @@ static int do_clearmodes(User * u)
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
-                    anope_cmd_mode(s_ChanServ, c->name, "%s %s",
+                    anope_cmd_mode(s_OperServ, c->name, "%s %s",
                                    flood_mode_char_remove, c->flood);
                     argv[0] = sstrdup(flood_mode_char_remove);
                     argv[1] = c->flood;
-                    chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
                     free(argv[0]);
                 } else {
                     if (debug) {

@@ -3581,22 +3581,35 @@ static int do_glist(User * u)
  */
 static int do_alist(User * u)
 {
-    char *lev = strtok(NULL, " ");
+    char *nick = NULL;
+    char *lev = NULL;
 
     NickAlias *na;
 
     int min_level = 0;
     int is_servadmin = is_services_admin(u);
 
-    /* Services admins can request ALIST on nicks.
-     * Check if 'lev' (first token) is actually a nick
-     * and, if so, reassign pointers.
-     */
-    if (is_servadmin && lev && (na = findnick(lev))) {
-        lev = strtok(NULL, " ");
-    } else {
+    if (!is_servadmin) {
+        /* Non service admins can only see their own levels */
         na = u->na;
+    } else {
+        /* Services admins can request ALIST on nicks.
+         * The first argument for service admins must
+         * always be a nickname.
+         */
+        nick = strtok(NULL, " ");
+
+        /* If an argument was passed, use it as the nick to see levels
+         * for, else check levels for the user calling the command */
+        if (nick) {
+            na = findnick(nick);
+        } else {
+            na = u->na;
+        }
     }
+
+    /* If available, get level from arguments */
+    lev = strtok(NULL, " ");
 
     /* if a level was given, make sure it's an int for later */
     if (lev) {
@@ -3619,8 +3632,8 @@ static int do_alist(User * u)
 
     if (!nick_identified(u)) {
         notice_lang(s_NickServ, u, ACCESS_DENIED);
-    } else if (lev && !na) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, na->nick);
+    } else if (is_servadmin && nick && !na) {
+        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else {

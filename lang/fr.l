@@ -2690,6 +2690,14 @@ OPER_SET_NOEXPIRE_ERROR
 	La valeur de NOEXPIRE doit être ON ou OFF.
 OPER_SET_UNKNOWN_OPTION
 	Option inconnue %s.
+OPER_SET_SQL_ON
+	SQL code will be used.
+OPER_SET_SQL_OFF
+	SQL code will not be used.
+OPER_SET_SQL_ERROR
+	Setting for SQL must be ON or OFF.
+OPER_SET_SQL_ERROR_INIT
+	Error during init of SQL, check your logs to correct.
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2962,6 +2970,10 @@ OPER_EXCEPTION_INVALID_LIMIT
 	Limite de session invalide. Elle doit être un entier valide supérieur ou égal à zero et plus petit que %d.
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Hostmask invalide. Seuls les hostmasks réels sont valides puisque les exceptions ne sont pas comparés aux nicks et usernames.
+OPER_EXCEPTION_EXISTS
+	%s already exists on the EXCEPTION list.
+OPER_EXCEPTION_CHANGED
+	Exception for %s has been updated to %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX

@@ -50,6 +50,10 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
+#ifdef HAVE_BACKTRACE
+#include <execinfo.h>
+#endif
+
 #ifdef USE_RDB
 # define MAX_SQL_BUF   4096
 #endif
@@ -171,6 +175,7 @@ typedef enum { false, true } boolean;
 #include "ultimate3.h"
 #include "dreamforge.h"
 #include "unreal32.h"
+#include "solidircd.h"
 
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
@@ -372,7 +377,7 @@ struct nickcore_ {
 	char *greet;				/* Greet associated to the nick */
 	uint32 icq;				/* ICQ # associated to the nick */
 	char *url;				/* URL associated to the nick */
-	int32 flags;				/* See NI_* below */
+	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
         int16 accesscount;			/* # of entries */
         char **access;				/* Array of strings */
@@ -899,7 +904,7 @@ struct hostcore_ {
 
 struct newsitem_ {
     int16 type;
-    int32 num;                  /* Numbering is separate for login and oper news */
+    uint32 num;                  /* Numbering is separate for login and oper news */
     char *text;
     char who[NICKMAX];
     time_t time;
@@ -968,7 +973,7 @@ struct hostcache_ {
 /* Memo Flags */
 #define MF_UNREAD	0x0001	/* Memo has not yet been read */
 #define MF_RECEIPT	0x0002	/* Sender requested receipt */
-
+#define MF_NOTIFYS      0x0004  /* Memo is a notification of receitp */
 
 /* Nickname status flags: */
 #define NS_VERBOTEN	0x0002      /* Nick may not be registered or used */

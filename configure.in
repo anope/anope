@@ -145,6 +145,7 @@ unreal_CHECK_TYPE_SIZES
 
 AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H,1,""))
 AC_CHECK_HEADER(sys/select.h,AC_DEFINE(HAVE_SYS_SELECT_H,1,""))
+AC_CHECK_HEADER(execinfo.h,AC_DEFINE(HAVE_BACKTRACE,1,""))
 
 AC_CHECK_FUNCS(strerror,AC_DEFINE(HAVE_STRERROR,1))
 AC_CHECK_FUNCS(sys_errlist,AC_DEFINE(HAVE_SYS_ERRLIST,1))
@@ -162,7 +163,11 @@ AC_CHECK_FUNCS(gethostbyname,AC_DEFINE(HAVE_GETHOSTBYNAME,1))
 AC_CHECK_FUNCS(gethostbyname_r,AC_DEFINE(HAVE_GETHOSTBYNAME_R,1))
 
 
-AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope], AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group"))
+AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope], [ 
+    AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group")
+    RUNGROUP=$withval
+])
+AC_SUBST(RUNGROUP)
 
 dnl AC_DEFINE_UNQUOTED(MYOSNAME,"`uname -a`","uname")
 
@@ -208,6 +213,8 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
 	AC_DEFINE(IRC_RAGE2,1,"First IRCD type")
     elif test "$withval" = "IRC_UNREAL32"; then
 	AC_DEFINE(IRC_UNREAL32,1,"First IRCD type")
+    elif test "$withval" = "IRC_SOLID"; then
+	AC_DEFINE(IRC_SOLID,1,"First IRCD type")
 
     fi
 ])

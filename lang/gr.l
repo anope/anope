@@ -2668,6 +2668,14 @@ OPER_SET_NOEXPIRE_ERROR
 	Η επιλογή για NOEXPIRE πρέπει να είναι ON ή OFF.
 OPER_SET_UNKNOWN_OPTION
 	’γνωστη επιλογή %s.
+OPER_SET_SQL_ON
+	SQL code will be used.
+OPER_SET_SQL_OFF
+	SQL code will not be used.
+OPER_SET_SQL_ERROR
+	Setting for SQL must be ON or OFF.
+OPER_SET_SQL_ERROR_INIT
+	Error during init of SQL, check your logs to correct.
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2938,6 +2946,10 @@ OPER_EXCEPTION_INVALID_LIMIT
 	Λάθος session limit. Πρέπει να είναι λάθος ο integer greater ή πρέπει να είναι μεταξύ μηδέν και %d.
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Λάθος hostmask. Μόνο πραγματικά hostmasks χρησιμοποιούνται και όχι ψευδώνυμα ή usernames.
+OPER_EXCEPTION_EXISTS
+	%s already exists on the EXCEPTION list.
+OPER_EXCEPTION_CHANGED
+	Exception for %s has been updated to %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX

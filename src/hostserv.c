@@ -535,7 +535,7 @@ void load_hs_dbase_v2(dbFILE * f)
     char *nick;
     char *vHost;
     char *creator;
-    int32 time;
+    uint32 time;
 
     while (!failed && (c = getc_db(f)) == 1) {
 
@@ -563,7 +563,7 @@ void load_hs_dbase_v3(dbFILE * f)
     char *vHost;
     char *creator;
     char *vIdent;
-    int32 time;
+    uint32 time;
 
     while (!failed && (c = getc_db(f)) == 1) {
         if (c == 1) {

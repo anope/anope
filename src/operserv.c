@@ -168,12 +168,15 @@ void moduleAddOperServCmds(void) {
     c = createCommand("SZLINE",     do_szline,     is_services_oper,OPER_HELP_SZLINE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
 
     /* Commands for Services admins: */
-    c = createCommand("SET",        do_set,        is_services_admin,OPER_HELP_SET, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("SET READONLY", NULL,         NULL,OPER_HELP_SET_READONLY, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("SET LOGCHAN",NULL,         NULL,OPER_HELP_SET_LOGCHAN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("SET DEBUG",  NULL,          NULL,OPER_HELP_SET_DEBUG, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("SET NOEXPIRE",NULL,         NULL,OPER_HELP_SET_NOEXPIRE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("SET SUPERADMIN",NULL,         NULL,OPER_HELP_SET_SUPERADMIN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET",            do_set, is_services_admin,OPER_HELP_SET, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET READONLY",   NULL,   NULL,OPER_HELP_SET_READONLY, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET LOGCHAN",    NULL,   NULL,OPER_HELP_SET_LOGCHAN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET DEBUG",      NULL,   NULL,OPER_HELP_SET_DEBUG, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET NOEXPIRE",   NULL,   NULL,OPER_HELP_SET_NOEXPIRE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+    c = createCommand("SET SUPERADMIN", NULL,   NULL,OPER_HELP_SET_SUPERADMIN, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+#ifdef USE_MYSQL
+    c = createCommand("SET SQL",        NULL,   NULL,OPER_HELP_SET_SQL, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
+#endif
     c = createCommand("SVSNICK",       do_svsnick,    is_services_admin,OPER_HELP_SVSNICK, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("UMODE",     do_operumodes,     is_services_admin,OPER_HELP_UMODE, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("NOOP",       do_noop,       is_services_admin,OPER_HELP_NOOP, -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
@@ -377,7 +380,7 @@ static void load_old_akill(void)
     dbFILE *f;
     int i, j;
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
     char buf[NICKMAX], mask2[BUFSIZE], *mask, *s;
     Akill *ak, *entry;
 
@@ -491,7 +494,7 @@ void load_os_dbase(void)
     int16 i, n, ver, c;
     HostCache *hc, **hclast, *hcprev;
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
     char *s;
     int failed = 0;
 
@@ -533,7 +536,7 @@ void load_os_dbase(void)
     }
 
     if (ver >= 7) {
-        int32 tmp32;
+        uint32 tmp32;
         SAFE(read_int32(&maxusercnt, f));
         SAFE(read_int32(&tmp32, f));
         maxusertime = tmp32;
@@ -4466,7 +4469,22 @@ static int do_set(User * u)
         } else {
             notice_lang(s_OperServ, u, OPER_SET_IGNORE_ERROR);
         }
-
+#ifdef USE_MYSQL
+    } else if (stricmp(option, "SQL") == 0) {
+        if (stricmp(setting, "on") == 0) {
+            if (rdb_init()) {
+                notice_lang(s_OperServ, u, OPER_SET_SQL_ON);
+            } else {
+                notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_INIT);
+            }
+        } else if (stricmp(setting, "off") == 0) {
+            /* could call rdb_close() but that does nothing - TSL */
+            do_mysql = 0;
+            notice_lang(s_OperServ, u, OPER_SET_SQL_OFF);
+        } else {
+            notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR);
+        }
+#endif
     } else if (stricmp(option, "READONLY") == 0) {
         if (stricmp(setting, "on") == 0) {
             readonly = 1;

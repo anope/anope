@@ -75,6 +75,9 @@
 /* "" */
 #undef HAVE_SYS_SELECT_H
 
+/* "" */
+#undef HAVE_BACKTRACE
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -116,6 +119,9 @@
 
 /* "First IRCD type" */
 #undef IRC_VIAGRA
+
+/* "First IRCD type" */
+#undef IRC_SOLID
 
 /* "Module dir" */
 #undef MODULE_PATH

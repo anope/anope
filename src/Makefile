@@ -5,14 +5,14 @@ OBJS =  actions.o base64.o botserv.o channels.o chanserv.o commands.o compat.o c
 	memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 	process.o proxy.o send.o servers.o sessions.o slist.o sockutil.o \
 	timeout.o users.o dreamforge.o bahamut.o unreal31.o ultimate2.o ultimate3.o \
-        hybrid.o ptlink.o viagra.o rageircd.o unreal32.o \
+        hybrid.o ptlink.o viagra.o rageircd.o unreal32.o solidircd.o \
 	$(VSNPRINTF_O) $(RDB_OBJ) $(MYSQL_OBJ)
 SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
         config.c datafiles.c encrypt.c helpserv.c hostserv.c init.c language.c list.c log.c mail.c main.c \
         memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
         process.c proxy.c send.c servers.c sessions.c slist.c sockutil.c \
 	dreamforge.c bahamut.c unreal31.c ultimate2.c ultimate3.c \
-        hybrid.c ptlink.c viagra.c rageircd.c unreal32.c \
+        hybrid.c ptlink.c viagra.c rageircd.c unreal32.c solidircd.c \
         timeout.c users.c \
         $(VSNPRINTF_C) $(RDB) $(MYSQL)
 
@@ -23,7 +23,7 @@ INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/modules.h ../include/slist.h \
 	../include/dreamforge.h ../include/bahamut.h ../include/ultimate2.h \
 	../include/ultimate3.h ../include/hybrid.h ../include/ptlink.h ../include/unreal31.h \
-	../include/viagra.h ../include/rageircd.h ../include/unreal32.h
+	../include/viagra.h ../include/rageircd.h ../include/unreal32.h ../include/solidircd.h
 
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \

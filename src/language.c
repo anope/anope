@@ -66,7 +66,7 @@ static void load_lang(int index, const char *filename)
 {
     char buf[256];
     FILE *f;
-    int num, i;
+    int32 num, i;
 
     if (debug) {
         alog("debug: Loading language %d from file `languages/%s'",

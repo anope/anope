@@ -222,7 +222,7 @@ echo "    7) ViagraIRCd 1.3.x   [or later]"
 echo "    8) PTlink 6.15.0      [experimental]"
 echo "    9) RageIRCd 2.0.0     [beta-6 or later]"
 echo "   10) Unreal 3.2         [Unreal 3.2 beta19 or later]"
-
+echo "   11) Solid IRCD 3.4.x   [Solid IRCD 3.4.6 or later]"
 
 while [ $ok -eq 0 ] ; do
         echo2 "[$IRCTYPE] "
@@ -274,6 +274,11 @@ while [ $ok -eq 0 ] ; do
 
 		10)
 			IRCTYPE_DEF="IRC_UNREAL32"
+			ok=1;
+			;;
+
+		11)
+			IRCTYPE_DEF="IRC_SOLID"
 			ok=1;
 			;;
 

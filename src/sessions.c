@@ -76,7 +76,7 @@ int16 nexceptions = 0;
 static Session *findsession(const char *host);
 
 static Exception *find_host_exception(const char *host);
-static int exception_add(const char *mask, const int limit,
+static int exception_add(User * u, const char *mask, const int limit,
                          const char *reason, const char *who,
                          const time_t expires);
 
@@ -380,7 +380,7 @@ void load_exceptions()
     int i;
     int16 n;
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
 
     if (!
         (f = open_db(s_OperServ, ExceptionDBName, "r", EXCEPTION_VERSION)))
@@ -479,16 +479,29 @@ void save_rdb_exceptions()
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 
-static int exception_add(const char *mask, const int limit,
+static int exception_add(User * u, const char *mask, const int limit,
                          const char *reason, const char *who,
                          const time_t expires)
 {
     int i;
 
     /* Check if an exception already exists for this mask */
-    for (i = 0; i < nexceptions; i++)
-        if (stricmp(mask, exceptions[i].mask) == 0)
-            return 0;
+    for (i = 0; i < nexceptions; i++) {
+        if (!stricmp(mask, exceptions[i].mask)) {
+            if (exceptions[i].limit != limit) {
+                exceptions[i].limit = limit;
+                if (u)
+                    notice_lang(s_OperServ, u, OPER_EXCEPTION_CHANGED,
+                                mask, exceptions[i].limit);
+                return -2;
+            } else {
+                if (u)
+                    notice_lang(s_OperServ, u, OPER_EXCEPTION_EXISTS,
+                                mask);
+                return -1;
+            }
+        }
+    }
 
     nexceptions++;
     exceptions = srealloc(exceptions, sizeof(Exception) * nexceptions);
@@ -626,6 +639,7 @@ int do_exception(User * u)
     char *mask, *reason, *expiry, *limitstr;
     int limit, expires;
     int i;
+    int x;
 
     if (!LimitSessions) {
         notice_lang(s_OperServ, u, OPER_EXCEPTION_DISABLED);
@@ -679,12 +693,13 @@ int do_exception(User * u)
                 return MOD_CONT;
             }
 
-            if (exception_add(mask, limit, reason, u->nick, expires))
+            x = exception_add(u, mask, limit, reason, u->nick, expires);
+
+            if (x == 1) {
                 notice_lang(s_OperServ, u, OPER_EXCEPTION_ADDED, mask,
                             limit);
-            else
-                notice_lang(s_OperServ, u, OPER_EXCEPTION_ALREADY_PRESENT,
-                            mask, limit);
+            }
+
             if (readonly)
                 notice_lang(s_OperServ, u, READ_ONLY_MODE);
         }

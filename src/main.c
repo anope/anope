@@ -397,13 +397,20 @@ void sighandler(int signum)
                  signum);
 #endif
     }
+
+    if (signum == SIGSEGV) {
+        do_backtrace();
+    }
+
     if (started) {
         services_shutdown();
         exit(0);
     } else {
-        alog("%s", quitmsg);
-        if (isatty(2))
+        if (isatty(2)) {
             fprintf(stderr, "%s\n", quitmsg);
+        } else {
+            alog("%s", quitmsg);
+        }
         exit(1);
     }
 }
@@ -554,3 +561,27 @@ int main(int ac, char **av, char **envp)
 }
 
 /*************************************************************************/
+
+void do_backtrace(void)
+{
+#ifdef HAVE_BACKTRACE
+    void *array[50];
+    size_t size;
+    char **strings;
+    int i;
+
+    alog("Backtrace: Segmentation fault detected");
+    alog("Backtrace: report the following lines");
+    alog("Backtrace: Anope version %s %s %s", version_number,
+         version_build, version_flags);
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
+    for (i = 1; i < size; i++) {
+        alog("Backtrace(%d): %s", i, strings[i]);
+    }
+    free(strings);
+    alog("Backtrace: complete");
+#else
+    alog("Backtrace: not available on this platform");
+#endif
+}

@@ -2610,6 +2610,14 @@ OPER_SET_NOEXPIRE_ERROR
 	Setting for NOEXPIRE must be ON or OFF.
 OPER_SET_UNKNOWN_OPTION
 	Unknown option %s.
+OPER_SET_SQL_ON
+	SQL code will be used.
+OPER_SET_SQL_OFF
+	SQL code will not be used.
+OPER_SET_SQL_ERROR
+	Setting for SQL must be ON or OFF.
+OPER_SET_SQL_ERROR_INIT
+	Error during init of SQL, check your logs to correct.
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2841,6 +2849,10 @@ OPER_EXCEPTION_INVALID_LIMIT
 	Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d.
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Invalid hostmask. Only real hostmasks are valid as exceptions are not matched against nicks or usernames.
+OPER_EXCEPTION_EXISTS
+	%s already exists on the EXCEPTION list.
+OPER_EXCEPTION_CHANGED
+	Exception for %s has been updated to %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX
@@ -5394,6 +5406,12 @@ OPER_HELP_SET_SUPERADMIN
 	This option is not persistant, and should only be used when
 	needed, and set back to OFF when no longer needed.
 
+OPER_HELP_SET_SQL
+	Syntax: SET SQL {ON | OFF}
+
+	Setting this will toggle Anope's from usage of SQL, this should
+	be used to disable and enable SQL should your SQL server go down
+	while services are running.
 
 OPER_HELP_NOOP
 	Syntax: NOOP SET server

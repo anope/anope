@@ -71,7 +71,7 @@ IRCDVar ircd[] = {
      0,                         /* Has Admin            */
      0,                         /* Chan SQlines         */
      0,                         /* Quit on Kill         */
-     0,                         /* SVSMODE unban        */
+     1,                         /* SVSMODE unban        */
      1,                         /* Has Protect          */
      1,                         /* Reverse              */
      1,                         /* Chan Reg             */
@@ -201,7 +201,7 @@ char csmodes[128] = {
     0,
     0, 0, 0,
     'h',                        /* (37) % Channel halfops */
-    'b',                        /* (38) & Channel halfops */
+    'b',                        /* (38) & bans */
     0, 0, 0,
     'q',
 
@@ -1932,7 +1932,8 @@ void anope_cmd_sgline(char *mask, char *reason)
 /* SVSMODE -b */
 void anope_cmd_unban(char *name, char *nick)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(ServerName, "%s %s -b %s", send_token("SVSMODE", "n"), name,
+             nick);
 }
 
 /* SVSMODE +d */
@@ -2025,7 +2026,6 @@ int anope_event_swhois(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-
 int anope_event_rehash(char *source, int ac, char **av)
 {
     return MOD_CONT;
@@ -2041,7 +2041,6 @@ int anope_event_admin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-
 int anope_event_sdesc(char *source, int ac, char **av)
 {
     Server *s;
@@ -2054,13 +2053,11 @@ int anope_event_sdesc(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-
 int anope_event_sjoin(char *source, int ac, char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
 }
-
 
 void anope_cmd_swhois(char *source, char *who, char *mask)
 {
@@ -2071,7 +2068,6 @@ void anope_cmd_eob()
 {
     send_cmd(ServerName, "EOS");
 }
-
 
 /* svswatch
  * parv[0] - sender

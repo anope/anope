@@ -636,7 +636,7 @@ void load_cs_dbase(void)
 
     for (i = 0; i < 256 && !failed; i++) {
         int16 tmp16;
-        int32 tmp32;
+        uint32 tmp32;
         int n_levels;
         char *s;
         NickAlias *na;

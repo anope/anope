@@ -361,6 +361,10 @@ void memo_send(User * u, char *name, char *text, int z)
         m->time = time(NULL);
         m->text = sstrdup(text);
         m->flags = MF_UNREAD;
+        /* Set notify sent flag - DrStein */
+        if (z == 2) {
+            m->flags |= MF_NOTIFYS;
+        }
         /* Set receipt request flag */
         if (z == 3)
             m->flags |= MF_RECEIPT;
@@ -446,7 +450,8 @@ static int do_cancel(User * u)
 
         for (i = mi->memocount - 1; i >= 0; i--) {
             if ((mi->memos[i].flags & MF_UNREAD)
-                && !stricmp(mi->memos[i].sender, u->na->nc->display)) {
+                && !stricmp(mi->memos[i].sender, u->na->nc->display)
+                && (!(mi->memos[i].flags & MF_NOTIFYS))) {
                 delmemo(mi, mi->memos[i].number);
                 notice_lang(s_MemoServ, u, MEMO_CANCELLED, name);
                 return MOD_CONT;

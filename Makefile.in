@@ -15,6 +15,7 @@ MODULE_PATH=@MODULE_PATH@
 MYSQL=@MYSQL@
 RDB=@RDB@
 LDFLAGS=@LDFLAGS@
+RUNGROUP=@RUNGROUP@
 
 all:   language headers build modules
 strict: language headers strict_build strict_modules

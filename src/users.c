@@ -17,7 +17,8 @@
 #define HASH(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
 User *userlist[1024];
 
-int32 usercnt = 0, opcnt = 0, maxusercnt = 0;
+int32 usercnt = 0, opcnt = 0;
+uint32 maxusercnt = 0;
 time_t maxusertime;
 
 /*************************************************************************/
@@ -707,8 +708,9 @@ void do_quit(const char *source, int ac, char **av)
              merge_args(ac, av));
         return;
     }
-    if (debug)
+    if (debug) {
         alog("debug: %s quits", source);
+    }
     if ((na = user->na) && (!(na->status & NS_VERBOTEN))
         && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
         na->last_seen = time(NULL);
@@ -717,8 +719,9 @@ void do_quit(const char *source, int ac, char **av)
         na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
     }
 #ifndef STREAMLINED
-    if (LimitSessions)
+    if (LimitSessions) {
         del_session(user->host);
+    }
 #endif
     delete_user(user);
 }
@@ -736,13 +739,15 @@ void do_kill(char *nick, char *msg)
     NickAlias *na;
 
     user = finduser(nick);
-    if (!user)
+    if (!user) {
         if (debug) {
             alog("debug: KILL of nonexistent nick: %s", nick);
         }
-    return;
-    if (debug)
+        return;
+    }
+    if (debug) {
         alog("debug: %s killed", nick);
+    }
     if ((na = user->na) && (!(na->status & NS_VERBOTEN))
         && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
         na->last_seen = time(NULL);
@@ -752,8 +757,9 @@ void do_kill(char *nick, char *msg)
 
     }
 #ifndef STREAMLINED
-    if (LimitSessions)
+    if (LimitSessions) {
         del_session(user->host);
+    }
 #endif
     delete_user(user);
 }

@@ -8,9 +8,24 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="462"
+VERSION_BUILD="463"
 
 # $Log$
+#
+# BUILD : 1.7.6 (463)
+# BUGS  : 192, 210, 222, 234
+# NOTES : 1. Removed +d references from the ptlink protocol code, since they do not timestamp the nicks
+# 2. Memos sent as notification of receipt can not be cancelled.
+# 3. Unreal3.2 supports SVSMODE -b on clearing bans
+# 4. fixed do_kill() not remove the user from the user list
+# 5. /os set sql [on|off] runtime sql toggle
+# 6. Segfaults logged to the services log when DumpCore is disabled
+# 7. fixed RUNGROUP not passed during build time
+# 8. Exceptions now update if the limit is changed
+# 9. Solid-IRCD support
+# 10. Fixed TSMODE warnings when using FANTASY commands
+# 11. Fixed read_int32 warnings (fixes compiling and running under cygwin)
+# - Thats all.. 
 #
 # BUILD : 1.7.6 (462)
 # BUGS  : 226

@@ -609,6 +609,8 @@ E time_t start_time;
 
 E void save_databases(void);
 E void expire_all(void);
+E void do_backtrace(void);
+E void sighandler(int signum);
 
 /**** memory.c ****/
 
@@ -871,7 +873,8 @@ E void disconn(int s);
 
 E User *userlist[1024];
 
-E int32 usercnt, opcnt, maxusercnt;
+E int32 usercnt, opcnt;
+E uint32 maxusercnt;
 E time_t maxusertime;
 
 E void delete_user(User *user);

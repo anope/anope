@@ -374,7 +374,7 @@ void load_old_ns_dbase(void)
     int failed = 0;
 
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
 
     char bufn[NICKMAX], bufp[PASSMAX];
     char *email, *greet, *url, *forbidby, *forbidreason;
@@ -632,7 +632,7 @@ void load_ns_req_db(void)
     dbFILE *f;
     int i, c, ver;
     NickRequest *nr;
-    int32 tmp32;
+    uint32 tmp32;
     int failed = 0;
 
     if (!(f = open_db(s_NickServ, PreNickDBName, "r", PRE_NICK_VERSION)))
@@ -663,7 +663,7 @@ void load_ns_dbase(void)
     NickCore *nc, **nclast, *ncprev;
     int failed = 0;
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
     char *s;
 
     if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))

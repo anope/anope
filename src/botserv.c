@@ -612,7 +612,7 @@ void load_bs_dbase(void)
     dbFILE *f;
     int c, ver;
     int16 tmp16;
-    int32 tmp32;
+    uint32 tmp32;
     BotInfo *bi;
     int failed = 0;
 
@@ -1148,11 +1148,18 @@ static void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
                          char *nick)
 {
-    char *av[3];
-    User *u = finduser(nick);
+    char *av[4];
+    int ac;
+    char buf[BUFSIZE];
+    *buf = '\0';
+    User *u;
+
+    u = finduser(nick);
 
     if (!u || !is_on_chan(ci->c, u))
         return;
+
+    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
 
     if (ircd->protectedumode) {
         if (is_protected(u) && *mode == '-' && (requester != u)) {
@@ -1167,12 +1174,22 @@ static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
         && (get_access(u, ci) >= get_access(requester, ci)))
         return;
 
-    av[0] = ci->name;
-    av[1] = mode;
-    av[2] = nick;
+    if (ircdcap->tsmode) {
+        av[0] = ci->name;
+        av[1] = buf;
+        av[2] = mode;
+        av[3] = nick;
+        ac = 4;
+        anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[2], av[3]);
+    } else {
+        av[0] = ci->name;
+        av[1] = mode;
+        av[2] = nick;
+        ac = 3;
+        anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
+    }
 
-    anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
-    do_cmode(ci->bi->nick, 3, av);
+    do_cmode(ci->bi->nick, ac, av);
 }
 
 /*************************************************************************/

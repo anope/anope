@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="557"
+VERSION_BUILD="558"
 
 # $Log$
+#
+# BUILD : 1.7.7 (558)
+# BUGS  : N/A
+# NOTES : Should really fix gcc2 stuff
 #
 # BUILD : 1.7.7 (557)
 # BUGS  : N/A

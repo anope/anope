@@ -678,6 +678,7 @@ int anope_event_tburst(char *source, int ac, char **av)
 {
     char *setter;
     Channel *c;
+    time_t topic_time;
 
     if (ac != 4) {
         return MOD_CONT;
@@ -686,7 +687,7 @@ int anope_event_tburst(char *source, int ac, char **av)
     setter = myStrGetToken(av[2], '!', 0);
 
     c = findchan(av[0]);
-    time_t topic_time = strtol(av[1], NULL, 10);
+    topic_time = strtol(av[1], NULL, 10);
 
     if (!c) {
         alog("channel: TOPIC %s for nonexistent channel %s",

@@ -180,6 +180,9 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     CBMode *cbm;
     CMMode *cmm;
     CUMode *cum;
+    int botcheck = 0;
+    unsigned char botmode;
+    BotInfo *bi;
 
     if (debug)
         alog("debug: Changing modes for %s to %s", chan->name,
@@ -215,11 +218,19 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             av++;
 
             if ((cum->flags & CUF_PROTECT_BOTSERV) && !add) {
-                BotInfo *bi;
-
                 if ((bi = findbot(*av))) {
-                    anope_cmd_mode(bi->nick, chan->name, "+%c %s", mode,
-                                   bi->nick);
+                    if (!botmode || botmode != mode) {
+                        anope_cmd_mode(bi->nick, chan->name, "+%c %s",
+                                       mode, bi->nick);
+                        botmode = mode;
+                        continue;
+                    } else {
+                        botmode = mode;
+                        continue;
+                    }
+                }
+            } else {
+                if ((bi = findbot(*av))) {
                     continue;
                 }
             }

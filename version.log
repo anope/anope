@@ -8,9 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="541"
+VERSION_BUILD="542"
 
 # $Log$
+#
+# BUILD : 1.7.7 (542)
+# BUGS  : 263
+# NOTES : BotServ bots would flood if they were attempting to reset modes on themselves ie.. (-oooooo), this fix makes 
+# them check if they set the mode last on themselves, if so it ignores and continues. This should also fix if you did -v to a bot as it would 
+# says non-existant user
 #
 # BUILD : 1.7.7 (541)
 # BUGS  : 274, 281

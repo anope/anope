@@ -382,10 +382,6 @@ static int parse_options(int ac, char **av)
                 nofork = 1;
             } else if (strcmp(s, "logchan") == 0) {
                 logchan = 1;
-#ifdef IRC_HYBRID
-                fprintf(stderr,
-                        "LogChan will only work if your logchannel is not set to +n\n");
-#endif
             } else if (strcmp(s, "forceload") == 0) {
                 forceload = 1;
             } else if (!strcmp(s, "noexpire")) {
@@ -825,6 +821,14 @@ int init(int ac, char **av)
 
     /* Bring in our pseudo-clients */
     introduce_user(NULL);
+
+    /* And hybrid needs Global joined in the logchan */
+#ifdef IRC_HYBRID
+    if (logchan) {
+        send_cmd(NULL, "SJOIN %ld %s + :%s", time(NULL), LogChannel,
+                 s_GlobalNoticer);
+    }
+#endif
 
     /**
       * Load our delayed modeles - modules that are planing on making clients need to wait till now

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="229"
+VERSION_BUILD="230"
 
 # $Log$
+#
+# BUILD : 1.7.4 (230)
+# BUGS  : 97
+# NOTES : Fixed the need of hybrid to have Global in LogChan on startup
 #
 # BUILD : 1.7.4 (229)
 # BUGS  : 118

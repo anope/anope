@@ -4463,7 +4463,40 @@ static int do_akick(User * u)
         } else {
             akick->reason = NULL;
         }
+
+        /* Auto ENFORCE #63 */
+        Channel *c = findchan(ci->name);
+        struct c_userlist *cu = NULL;
+        struct c_userlist *next;
+        char *argv[3];
+        int count = 0;
+
+        if (c) {
+            cu = c->users;
+            while (cu) {
+                next = cu->next;
+                if (check_kick(cu->user, c->name)) {
+                    argv[0] = sstrdup(c->name);
+                    argv[1] = sstrdup(cu->user->nick);
+                    argv[2] = sstrdup(akick->reason);
+
+                    do_kick(s_ChanServ, 3, argv);
+
+                    free(argv[2]);
+                    free(argv[1]);
+                    free(argv[0]);
+                    count++;
+
+                }
+                cu = next;
+            }
+        }
+
         notice_lang(s_ChanServ, u, CHAN_AKICK_ADDED, mask, chan);
+
+        if (count)
+            notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, chan,
+                        count);
 
     } else if (stricmp(cmd, "STICK") == 0) {
         NickAlias *na;

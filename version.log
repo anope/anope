@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="116"
+VERSION_BUILD="117"
 
 # $Log$
+#
+# BUILD : 1.7.3 (117)
+# BUGS  : 63
+# NOTES : Auto enforce upon AKICK addition.
 #
 # BUILD : 1.7.3 (116)
 # BUGS  : 65

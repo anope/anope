@@ -128,6 +128,12 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     if ((uplink == me_server) && !(flags & SERVER_JUPED))
         serv_uplink = serv;
 
+    /* Write the StartGlobal */
+    if (GlobalOnCycle) {
+        if (GlobalOnCycleUP)
+            notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
+    }
+
     return serv;
 }
 
@@ -338,12 +344,6 @@ void do_server(const char *source, char *servername, char *hops,
 
     new_server(s, servername, descript, 0, numeric);
     send_event(EVENT_SERVER_CONNECT, servername);
-
-    /* Write the StartGlobal */
-    if (GlobalOnCycle) {
-        if (GlobalOnCycleUP)
-            server_global(s, GlobalOnCycleUP);
-    }
 }
 
 /*************************************************************************/

@@ -634,7 +634,7 @@ E NickAlias *nalists[1024];
 E NickCore *nclists[1024];
 E NickRequest *nrlists[1024];
 
-E int guestnum;
+E unsigned int guestnum;
 
 E void insert_requestnick(NickRequest * nr);
 E void alpha_insert_alias(NickAlias * na);

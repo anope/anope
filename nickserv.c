@@ -23,7 +23,7 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 NickRequest *nrlists[1024];
 
-int guestnum;                   /* Current guest number */
+unsigned int guestnum;          /* Current guest number */
 
 #define TO_COLLIDE   0          /* Collide the user with this nick */
 #define TO_RELEASE   1          /* Release a collided nick */
@@ -1660,12 +1660,15 @@ static void collide(NickAlias * na, int from_timeout)
      * per second. So let use another safer method.
      *          --lara
      */
+    /* So you should check the length of NSGuestNickPrefix, eh Lara?
+     *          --Certus
+     */
 
-    snprintf(guestnick, sizeof(guestnick), "%s%d", NSGuestNickPrefix,
-             guestnum++);
 #ifdef IRC_HYBRID
     kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
 #else
+    snprintf(guestnick, sizeof(guestnick), "%s%d", NSGuestNickPrefix,
+             guestnum++);
     notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING, guestnick);
     send_cmd(NULL, "SVSNICK %s %s :%ld", na->nick, guestnick, time(NULL));
     na->status |= NS_GUESTED;

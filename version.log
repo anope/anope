@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="170"
+VERSION_BUILD="171"
 
 # $Log$
+#
+# BUILD : 1.7.3 (171)
+# BUGS  : 
+# NOTES : Fixed big with long NSGuestNickPrefixes. We just used them in a snprintf without checking their size. Fixed a second 
+# guestnick bug as well: if compiled for hybrid guestnum was increased, tho it was never used.
 #
 # BUILD : 1.7.3 (170)
 # BUGS  : 86

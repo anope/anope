@@ -1029,7 +1029,12 @@ int read_config(int reload)
             NSDefFlags |= NI_MEMO_RECEIVE;
     }
 
-    CHECK(NSGuestNickPrefix);
+    CHECK(NSGuestNickPrefix);   /* Add safety check */
+    if (NSGuestNickPrefix && (strlen(NSGuestNickPrefix) > 21)) {
+        error(0, "Value of NSGuestNickPrefix must be between 1 and 21");
+        retval = 0;
+    }
+
     CHECK(NSDefLanguage);
     if (NSDefLanguage) {
         NSDefLanguage--;

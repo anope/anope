@@ -23,7 +23,6 @@ void load_hs_dbase_v1(dbFILE * f);
 void load_hs_dbase_v2(dbFILE * f);
 void load_hs_dbase_v3(dbFILE * f);
 
-static int guestnum;            /* Current guest number */
 HostCore *head = NULL;          /* head of the HostCore list */
 HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
                              char *vHost, char *creator, int32 tmp_time);
@@ -94,9 +93,6 @@ void moduleAddHostServCmds(void)
 void hostserv_init(void)
 {
     moduleAddHostServCmds();
-    guestnum = time(NULL);
-    while (guestnum > 9999999)
-        guestnum -= 10000000;
 }
 
 /*************************************************************************/

@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="74"
+VERSION_BUILD="75"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (75)
+# BUGS  : N/A
+# NOTES : Been right through modules.c, every - yes EVERY function is now commented in a doxy-gen style mannor, detailing what it does, along with all the params and return codes - be affraid! - oh and jsut by-the-by when people are working on functions/new features/bug fixs in other parts of anope, we really should be adding these comments :)
+# 
 #
 # BUILD : 1.7.2 (74)
 # BUGS  : N/A

@@ -1009,6 +1009,12 @@ Command *findCommand(CommandHash * cmdTable[], const char *name)
  * Message Functions
  *******************************************************************************/
 
+ /**
+  * Create a new Message struct.
+  * @param name the name of the message
+  * @param func a pointer to the function to call when we recive this message
+  * @return a new Message object
+  **/
 Message *createMessage(char *name,
                        int (*func) (char *source, int ac, char **av))
 {
@@ -1026,6 +1032,13 @@ Message *createMessage(char *name,
     return m;
 }
 
+/** 
+ * find a message in the given table. 
+ * Looks up the message <name> in the MessageHash given
+ * @param MessageHash the message table to search for this command, will almost always be IRCD
+ * @param name the name of the command were looking for
+ * @return NULL if we cant find it, or a pointer to the Message if we can
+ **/
 Message *findMessage(MessageHash * msgTable[], const char *name)
 {
     int idx;
@@ -1042,6 +1055,14 @@ Message *findMessage(MessageHash * msgTable[], const char *name)
     }
     return NULL;
 }
+
+/**
+ * Add a message to the MessageHash.
+ * @param msgTable the MessageHash we want to add a message to
+ * @param m the Message we want to add
+ * @param pos the position we want to add the message to, E.G. MOD_HEAD, MOD_TAIL, MOD_UNIQUE 
+ * @return MOD_ERR_OK on a successful add.
+ **/
 
 int addMessage(MessageHash * msgTable[], Message * m, int pos)
 {
@@ -1095,6 +1116,12 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
     return MOD_ERR_OK;
 }
 
+/**
+ * Add the given message (m) to the MessageHash marking it as a core command
+ * @param msgTable the MessageHash we want to add to
+ * @param m the Message we are adding
+ * @return MOD_ERR_OK on a successful add.
+ **/
 int addCoreMessage(MessageHash * msgTable[], Message * m)
 {
     if (!msgTable || !m) {
@@ -1104,6 +1131,12 @@ int addCoreMessage(MessageHash * msgTable[], Message * m)
     return addMessage(msgTable, m, 0);
 }
 
+/**
+ * Add a module message to the IRCD message hash
+ * @param m the Message to add
+ * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
+ * @return MOD_ERR_OK on success, althing else on fail.
+ **/
 int moduleAddMessage(Message * m, int pos)
 {
     int status;
@@ -1132,6 +1165,11 @@ int moduleAddMessage(Message * m, int pos)
     return status;
 }
 
+/**
+ * remove the given message from the IRCD message hash
+ * @param name the name of the message to remove
+ * @return MOD_ERR_OK on success, althing else on fail.
+ **/
 int moduleDelMessage(char *name)
 {
     Message *m;
@@ -1152,6 +1190,13 @@ int moduleDelMessage(char *name)
     return status;
 }
 
+/**
+ * remove the given message from the given message hash, for the given module
+ * @param msgTable which MessageHash we are removing from
+ * @param m the Message we want to remove
+ * @mod_name the name of the module we are removing
+ * @return MOD_ERR_OK on success, althing else on fail.
+ **/
 int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
 {
     int index = 0;
@@ -1216,6 +1261,11 @@ int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
     return MOD_ERR_NOEXIST;
 }
 
+/**
+ * Destory a message, freeing its memory.
+ * @param m the message to be destroyed
+ * @return MOD_ERR_SUCCESS on success
+ **/
 int destroyMessage(Message * m)
 {
     if (!m) {
@@ -1232,6 +1282,10 @@ int destroyMessage(Message * m)
     return MOD_ERR_OK;
 }
 
+/**
+ * Add the modules version info.
+ * @param version the version of the current module
+ **/
 void moduleAddVersion(char *version)
 {
     if (mod_current_module && version) {
@@ -1239,6 +1293,10 @@ void moduleAddVersion(char *version)
     }
 }
 
+/**
+ * Add the modules author info
+ * @param author the author of the module
+ **/
 void moduleAddAuthor(char *author)
 {
     if (mod_current_module && author) {
@@ -1249,6 +1307,17 @@ void moduleAddAuthor(char *author)
 /*******************************************************************************
  * Module Callback Functions
  *******************************************************************************/
+ /**
+  * Adds a timed callback for the current module.
+  * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
+  * @param name the name of the callback, this is used for refrence mostly, but is needed it you want to delete this particular callback later on
+  * @param when when should the function be executed, this is a time in the future, seconds since 00:00:00 1970-01-01 UTC
+  * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv); 
+  * @param argc the argument count for the argv paramter
+  * @param atgv a argument list to be passed to the called function.
+  * @return MOD_ERR_OK on success, anything else on fail.
+  * @see moduleDelCallBack
+  **/
 int moduleAddCallback(char *name, time_t when,
                       int (*func) (int argc, char *argv[]), int argc,
                       char **argv)
@@ -1300,6 +1369,9 @@ int moduleAddCallback(char *name, time_t when,
     return MOD_ERR_OK;
 }
 
+/**
+ * Execute a stored call back
+ **/
 void moduleCallBackRun(void)
 {
     ModuleCallBack *tmp;
@@ -1320,6 +1392,10 @@ void moduleCallBackRun(void)
     return;
 }
 
+/**
+ * Removes a entry from the modules callback list
+ * @param prev a pointer to the previous entry in the list, NULL for the head
+ **/
 void moduleCallBackDeleteEntry(ModuleCallBack * prev)
 {
     ModuleCallBack *tmp = NULL;
@@ -1344,7 +1420,12 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
     free(tmp);
 }
 
-
+/**
+ * Search the module callback list for a given module
+ * @param mod_name the name of the module were looking for
+ * @param found have we found it?
+ * @return a pointer to the ModuleCallBack struct or NULL - dont forget to check the found paramter!
+ **/
 ModuleCallBack *moduleCallBackFindEntry(char *mod_name, boolean * found)
 {
     ModuleCallBack *prev = NULL, *current = NULL;
@@ -1367,6 +1448,10 @@ ModuleCallBack *moduleCallBackFindEntry(char *mod_name, boolean * found)
     }
 }
 
+/**
+ * Allow module coders to delete a callback by name.
+ * @param name the name of the callback they wish to delete
+ **/
 void moduleDelCallback(char *name)
 {
     ModuleCallBack *current = NULL;
@@ -1403,6 +1488,11 @@ void moduleDelCallback(char *name)
     }
 }
 
+/**
+ * Remove all outstanding module callbacks for the given module.
+ * When a module is unloaded, any callbacks it had outstanding must be removed, else when they attempt to execute the func pointer will no longer be valid, and we'll seg.
+ * @param mod_name the name of the module we are preping for unload 
+ **/
 void moduleCallBackPrepForUnload(char *mod_name)
 {
     boolean found = false;
@@ -1418,6 +1508,11 @@ void moduleCallBackPrepForUnload(char *mod_name)
     }
 }
 
+/**
+ * Return a copy of the complete last buffer.
+ * This is needed for modules who cant trust the strtok() buffer, as we dont know who will have already messed about with it.
+ * @reutrn a pointer to a copy of the last buffer - DONT mess with this, copy if first if you must do things to it.
+ **/
 char *moduleGetLastBuffer(void)
 {
     char *tmp = NULL;
@@ -1433,6 +1528,11 @@ char *moduleGetLastBuffer(void)
 /*******************************************************************************
  * Module HELP Functions
  *******************************************************************************/
+ /**
+  * Add help for Root admins.
+  * @param c the Command to add help for
+  * @param func the function to run when this help is asked for
+  **/
 int moduleAddRootHelp(Command * c, int (*func) (User * u))
 {
     if (c) {
@@ -1442,6 +1542,11 @@ int moduleAddRootHelp(Command * c, int (*func) (User * u))
     return MOD_CONT;
 }
 
+ /**
+  * Add help for Admins.
+  * @param c the Command to add help for
+  * @param func the function to run when this help is asked for
+  **/
 int moduleAddAdminHelp(Command * c, int (*func) (User * u))
 {
     if (c) {
@@ -1451,6 +1556,11 @@ int moduleAddAdminHelp(Command * c, int (*func) (User * u))
     return MOD_CONT;
 }
 
+ /**
+  * Add help for opers..
+  * @param c the Command to add help for
+  * @param func the function to run when this help is asked for
+  **/
 int moduleAddOperHelp(Command * c, int (*func) (User * u))
 {
     if (c) {
@@ -1460,6 +1570,11 @@ int moduleAddOperHelp(Command * c, int (*func) (User * u))
     return MOD_CONT;
 }
 
+/**
+  * Add help for registered users
+  * @param c the Command to add help for
+  * @param func the function to run when this help is asked for
+  **/
 int moduleAddRegHelp(Command * c, int (*func) (User * u))
 {
     if (c) {
@@ -1469,6 +1584,11 @@ int moduleAddRegHelp(Command * c, int (*func) (User * u))
     return MOD_CONT;
 }
 
+/**
+  * Add help for all users
+  * @param c the Command to add help for
+  * @param func the function to run when this help is asked for
+  **/
 int moduleAddHelp(Command * c, int (*func) (User * u))
 {
     if (c) {
@@ -1478,6 +1598,11 @@ int moduleAddHelp(Command * c, int (*func) (User * u))
     return MOD_CONT;
 }
 
+/**
+  * Add output to nickserv help.
+  * when doing a /msg nickserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetNickHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1485,6 +1610,11 @@ void moduleSetNickHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to chanserv help.
+  * when doing a /msg chanserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetChanHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1492,6 +1622,11 @@ void moduleSetChanHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to memoserv help.
+  * when doing a /msg memoserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetMemoHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1499,6 +1634,11 @@ void moduleSetMemoHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to botserv help.
+  * when doing a /msg botserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetBotHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1506,6 +1646,11 @@ void moduleSetBotHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to operserv help.
+  * when doing a /msg operserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetOperHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1513,6 +1658,11 @@ void moduleSetOperHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to hostserv help.
+  * when doing a /msg hostserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetHostHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1520,6 +1670,11 @@ void moduleSetHostHelp(void (*func) (User * u))
     }
 }
 
+/**
+  * Add output to helpserv help.
+  * when doing a /msg helpserv help, your function will be called to allow it to send out a notice() with the code you wish to dispaly
+  * @param func a pointer to the function which will display the code
+  **/
 void moduleSetHelpHelp(void (*func) (User * u))
 {
     if (mod_current_module) {
@@ -1527,6 +1682,11 @@ void moduleSetHelpHelp(void (*func) (User * u))
     }
 }
 
+/**
+ * Display any extra module help for the given service.
+ * @param services which services is help being dispalyed for?
+ * @param u which user is requesting the help
+ **/
 void moduleDisplayHelp(int service, User * u)
 {
 #ifdef USE_MODULES

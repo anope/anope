@@ -42,6 +42,8 @@ AC_CHECK_LIB(nsl,inet_ntoa,ANOPELIBS="$ANOPELIBS-lnsl ")
 AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
 AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
 AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
+x="0";
+DIS_MYSQL="  MySql: No"
 AM_PATH_MYSQLCLIENT(,[
 	AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
 	AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
@@ -49,22 +51,31 @@ AM_PATH_MYSQLCLIENT(,[
 	RDB=" rdb.c "
 	AC_SUBST(MYSQL)
 	AC_SUBST(RDB)
+	x="1";
 ],)
 
-ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
-CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
-LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
+if test "$x" = "1"; then
+	ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
+	CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
+	LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
+        DIS_MYSQL="  MySql: Yes"
+fi
 
+
+DIS_THREAD="Threads: No"
 ACX_PTHREAD([
     CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
     ANOPELIBS="$ANOPELIBS$PTHREAD_LIBS "
     AC_DEFINE_UNQUOTED(USE_THREADS,1,"Use threads")    
+    DIS_THREAD="Threads: Yes"
 ])
 
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 
 AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
+
+DIS_MODULES="Modules: NO"
 
 dnl module checking based on Unreal's module checking code
 AC_DEFUN(AC_ENABLE_DYN,
@@ -73,6 +84,7 @@ AC_CHECK_FUNC(dlopen,, AC_CHECK_LIB(dl,dlopen,[
   ANOPELIBS="$ANOPELIBS -ldl"
   AC_DEFINE(USE_MODULES,1,"Modules are available")
   USE_MODULES="yes"
+  DIS_MODULES="Modules: Yes"
 ],
 [
 AC_MSG_WARN(Dynamic linking is not enabled because dlopen was not found)
@@ -208,6 +220,11 @@ AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], [
 AC_OUTPUT(Makefile)
 
 cat <<EOT
+
+$DIS_MODULES
+$DIS_THREAD
+$DIS_MYSQL
+
 All done!  Now run "make" (or possibly "gmake") to compile Anope.
 See the INSTALL, README and FAQ files if you have any problems.
 EOT

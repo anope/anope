@@ -2739,6 +2739,8 @@ if test $ac_cv_lib_bsd_revoke = yes; then
   ANOPELIBS="$ANOPELIBS-lbsd "
 fi
 
+x="0";
+DIS_MYSQL="  MySql: No"
 
 
 # Check whether --with-mysqlclient-prefix or --without-mysqlclient-prefix was given.
@@ -2888,6 +2890,7 @@ _ACEOF
 	RDB=" rdb.c "
 
 
+	x="1";
 
 
 else
@@ -2926,10 +2929,15 @@ rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
 
 
 
-ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
-CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
-LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
+if test "$x" = "1"; then
+	ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
+	CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
+	LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
+        DIS_MYSQL="  MySql: Yes"
+fi
 
+
+DIS_THREAD="Threads: No"
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
   if test -f $ac_dir/install-sh; then
@@ -3473,6 +3481,7 @@ cat >>confdefs.h <<_ACEOF
 #define USE_THREADS 1
 _ACEOF
 
+    DIS_THREAD="Threads: Yes"
 
         :
 else
@@ -4125,6 +4134,8 @@ fi
 
 
 
+DIS_MODULES="Modules: NO"
+
 
 
 
@@ -4294,6 +4305,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
   USE_MODULES="yes"
+  DIS_MODULES="Modules: Yes"
 
 else
 
@@ -9577,6 +9589,11 @@ fi
 
 
 cat <<EOT
+
+$DIS_MODULES
+$DIS_THREAD
+$DIS_MYSQL
+
 All done!  Now run "make" (or possibly "gmake") to compile Anope.
 See the INSTALL, README and FAQ files if you have any problems.
 EOT

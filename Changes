@@ -1,12 +1,13 @@
 Anope Version 1.7.5
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
-08/10 F Fixed previous BotServ buffer fix.                                [#131]
 07/17 A Switched to autoconf for configure script.                        [ #00]
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
-06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+08/07 F configure will be ok if you dont have mysqlclient lib file        [ #00]
+08/10 F Fixed previous BotServ buffer fix.                                [#131]
 08/10 F Updated documentation to reflect the changed build process.       [ #00]
-07/23 F Fixed BotServ buffer                                              [#131]		
+07/23 F Fixed BotServ buffer                                              [#131]
+07/23 F Fixed BotServ buffer                                              [#131]
 07/22 F Free NSNickTracking when a user quits.                            [#126]
 07/22 F NOOP bug with wildcards.                                          [#115]
 07/22 F Removed RESTRICTED from incorrectly labeled lang file entry.      [#111]

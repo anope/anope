@@ -96,7 +96,7 @@ static int started = 0;
 
 /* Run expiration routines */
 
-static void expire_all(void)
+extern void expire_all(void)
 {
     waiting = -3;
     if (debug)

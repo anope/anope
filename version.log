@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="408"
+VERSION_BUILD="409"
 
 # $Log$
+#
+# BUILD : 1.7.5 (409)
+# BUGS  : 
+# NOTES : Made expire_all() extern instead of static.
 #
 # BUILD : 1.7.5 (408)
 # BUGS  : 189, 191

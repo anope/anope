@@ -598,6 +598,7 @@ E int   got_alarm;
 E time_t start_time;
 
 E void save_databases(void);
+E void expire_all(void);
 
 /**** memory.c ****/
 

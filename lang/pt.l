@@ -4886,6 +4886,7 @@ OPER_HELP_ADMIN_CMD
 	    USERLIST    Lista todos os records dos usuários
 	    OPER        Modifica a lista de Operadores dos Services
 	    LOGONNEWS   Define mensagens a serem mostradas na conexão
+	    RANDOMNEWS  Define mensagens a serem mostradas ao azar na conexão
 	    OPERNEWS    Defini mensagens a serem mostradas aos ircops
 	    NOOP        Remove temporariamente as O:lines de um 
 	                determinado server remotamente

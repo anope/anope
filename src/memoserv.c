@@ -124,8 +124,9 @@ void check_memos(User * u)
     }
 
     if (!(nc = (u->na ? u->na->nc : NULL)) || !nick_recognized(u) ||
-        !(nc->flags & NI_MEMO_SIGNON))
+        !(nc->flags & NI_MEMO_SIGNON)) {
         return;
+    }
 
     for (i = 0; i < nc->memos.memocount; i++) {
         if (nc->memos.memos[i].flags & MF_UNREAD)

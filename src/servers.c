@@ -146,8 +146,9 @@ static void delete_server(Server * serv, const char *quitreason)
     if (debug)
         alog("debug: delete_server() called for %s", serv->name);
 
-    if (ircdcap->noquit) {
-        if (uplink_capab & ircdcap->noquit) {
+    if (ircdcap->noquit || ircdcap->qs) {
+        if ((uplink_capab & ircdcap->noquit)
+            || (uplink_capab & ircdcap->qs)) {
             u = firstuser();
             while (u) {
                 unext = nextuser();

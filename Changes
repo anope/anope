@@ -13,6 +13,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/21 F Unsetting away would not trigger checking of memos.               [#258]
 12/21 F Dreamforge compile                                                [ #00]
 12/21 F Moved global about del of non-existant session inside debug() if  [ #00]
 12/19 F Fixed LogUser messages where the nickip is 0.                     [#253]
@@ -71,7 +72,8 @@ Provided by Jens Hoffrichter <joho@nickstories.de> - 2004
 Provided by mitch{Xy} <mitch@bondage.com> - 2004.
 12/20 F Removed unclear email text from language files.                   [ #00]
 
-Provided by ThaPrince <> - 2004.
+Provided by ThaPrince <jon@vile.com> - 2004.
+12/21 A Support for Hybrid IRCDs QS (Quit Storm).                         [#256]
 12/20 A Added plexus ircd support.                                        [ #00]
 
 Anope Version 1.7.6

@@ -1555,8 +1555,9 @@ int anope_event_436(char *source, int ac, char **av)
 */
 int anope_event_away(char *source, int ac, char **av)
 {
-    if (ac < 1)
+    if (ac) {
         return MOD_CONT;
+    }
 
     if (!source) {
         return MOD_CONT;

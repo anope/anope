@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="1"
-VERSION_BUILD="57"
+VERSION_BUILD="58"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.1 (58)
+# BUGS  : 
+# NOTES : anope_ns_req was being referenced should have been anope_ns_request (fixed) 
 #
 # BUILD : 1.7.1 (57)
 # BUGS  : 

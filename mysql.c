@@ -1411,7 +1411,7 @@ void db_mysql_load_ns_req_dbase(void)
         return;
 
     snprintf(sqlcmd, MAX_SQL_BUF,
-             "SELECT `nick`,`passcode`,`password`,`email`,`requested`,`active` FROM `anope_ns_req`;");
+             "SELECT `nick`,`passcode`,`password`,`email`,`requested`,`active` FROM `anope_ns_request`;");
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");

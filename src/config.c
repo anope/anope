@@ -825,7 +825,7 @@ int parse(char *buf, int linenum, int reload)
             case PARAM_STRING:
 /*	      if (reload && *(char **)d->params[i].ptr)
 	      	free(*(char **)d->params[i].ptr); */
-                *(char **) d->params[i].ptr = strdup(av[optind++]);
+                *(char **) d->params[i].ptr = anopeStrDup(av[optind++]);
                 if (!d->params[i].ptr) {
                     error(linenum, "%s: Out of memory", d->name);
                     return 0;
@@ -1182,7 +1182,7 @@ int read_config(int reload)
             RootNumber++;
             ServicesRoots =
                 realloc(ServicesRoots, sizeof(char *) * RootNumber);
-            ServicesRoots[RootNumber - 1] = strdup(s);
+            ServicesRoots[RootNumber - 1] = anopeStrDup(s);
         } while ((s = strtok(NULL, " ")));
     }
 
@@ -1195,7 +1195,7 @@ int read_config(int reload)
                 HostNumber++;
                 HostSetters =
                     realloc(HostSetters, sizeof(char *) * HostNumber);
-                HostSetters[HostNumber - 1] = strdup(s);
+                HostSetters[HostNumber - 1] = anopeStrDup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1210,7 +1210,7 @@ int read_config(int reload)
                 ModulesAutoload =
                     realloc(ModulesAutoload,
                             sizeof(char *) * ModulesNumber);
-                ModulesAutoload[ModulesNumber - 1] = strdup(s);
+                ModulesAutoload[ModulesNumber - 1] = anopeStrDup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1225,7 +1225,7 @@ int read_config(int reload)
                     realloc(ModulesDelayedAutoload,
                             sizeof(char *) * ModulesDelayedNumber);
                 ModulesDelayedAutoload[ModulesDelayedNumber - 1] =
-                    strdup(s);
+                    anopeStrDup(s);
             }
         } while ((s = strtok(NULL, " ")));
     }
@@ -1365,7 +1365,7 @@ int read_config(int reload)
                 DomainNumber++;
                 NetworkDomains =
                     realloc(NetworkDomains, sizeof(char *) * DomainNumber);
-                NetworkDomains[DomainNumber - 1] = strdup(s);
+                NetworkDomains[DomainNumber - 1] = anopeStrDup(s);
             } while ((s = strtok(NULL, " ")));
         }
     }

@@ -801,7 +801,7 @@ int displayCommand(Command * c)
     int i = 0;
     alog("Displaying command list for %s", c->name);
     for (cmd = c; cmd; cmd = cmd->next) {
-        alog("%d:  %p", ++i, cmd);
+        alog("%d:  0x%p", ++i, (void *) cmd);
     }
     alog("end");
     return 0;
@@ -844,7 +844,7 @@ int displayMessage(Message * m)
     int i = 0;
     alog("Displaying message list for %s", m->name);
     for (msg = m; msg; msg = msg->next) {
-        alog("%d: %p", ++i, msg);
+        alog("%d: 0x%p", ++i, (void *) msg);
     }
     alog("end");
     return 0;
@@ -886,7 +886,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 c->next = current->c;
                 current->c = c;
                 if (debug)
-                    alog("existing cmd: (%p), new cmd (%p)", c->next, c);
+                    alog("existing cmd: (%p), new cmd (0x%p)", c->next, (void *) c);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
 
@@ -894,7 +894,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing cmd: (%p), new cmd (%p)", tail, c);
+                    alog("existing cmd: (%p), new cmd (0x%p)", tail, (void *) c);
                 tail->next = c;
                 c->next = NULL;
 
@@ -1108,14 +1108,14 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
                 m->next = current->m;
                 current->m = m;
                 if (debug)
-                    alog("existing msg: (%p), new msg (%p)", m->next, m);
+                    alog("existing msg: (%p), new msg (0x%p)", m->next, (void *) m);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
                 tail = current->m;
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing msg: (%p), new msg (%p)", tail, m);
+                    alog("existing msg: (%p), new msg (0x%p)", tail, (void *) m);
                 tail->next = m;
                 m->next = NULL;
                 return MOD_ERR_OK;

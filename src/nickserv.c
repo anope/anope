@@ -1854,8 +1854,8 @@ void add_ns_timeout(NickAlias * na, int type, time_t delay)
     else if (type == TO_RELEASE)
         timeout_routine = timeout_release;
     else {
-        alog("NickServ: unknown timeout type %d! na=%p (%s), delay=%ld",
-             type, na, na->nick, delay);
+        alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
+             type, (void *) na, na->nick, delay);
         return;
     }
 
@@ -2243,11 +2243,11 @@ static int do_confirm(User * u)
             return MOD_CONT;
         }
         memset(pass, 0, strlen(pass));
-        na->status = NS_IDENTIFIED | NS_RECOGNIZED;
+        na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
         na->nc->flags |= NI_ENCRYPTEDPW;
 #else
         na->nc->pass = sstrdup(pass);
-        na->status = NS_IDENTIFIED | NS_RECOGNIZED;
+        na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
 #endif
         na->nc->flags |= NSDefFlags;
         for (i = 0; i < RootNumber; i++) {
@@ -2394,7 +2394,7 @@ static int do_group(User * u)
                     common_get_vhost(u));
             na->last_realname = sstrdup(u->realname);
             na->time_registered = na->last_seen = time(NULL);
-            na->status = NS_IDENTIFIED | NS_RECOGNIZED;
+            na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
 
             if (!(na->nc->flags & NI_SERVICES_ROOT)) {
                 for (i = 0; i < RootNumber; i++) {

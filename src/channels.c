@@ -321,7 +321,7 @@ Channel *findchan(const char *chan)
         c = c->next;
     }
     if (debug >= 3)
-        alog("debug: findchan(%s) -> %p", chan, c);
+        alog("debug: findchan(%s) -> %p", chan, (void *) c);
     return NULL;
 }
 
@@ -660,8 +660,7 @@ void do_sjoin(const char *source, int ac, char **av)
 {
     Channel *c;
     User *user;
-    char *s, *end, cubuf[ircd->max_symbols + 2], *end2,
-        *cumodes[ircd->max_symbols + 1];
+    char *s, *end, cubuf[7], *end2, *cumodes[6];
 
 
     int is_sqlined = 0;

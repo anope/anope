@@ -326,7 +326,7 @@ User *finduser(const char *nick)
     while (user && stricmp(user->nick, nick) != 0)
         user = user->next;
     if (debug >= 3)
-        alog("debug: finduser(%s) -> %p", nick, user);
+        alog("debug: finduser(%s) -> 0x%p", nick, (void *) user);
     return user;
 }
 

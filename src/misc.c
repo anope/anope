@@ -896,7 +896,7 @@ char *host_resolve(char *host)
         memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
         addr.s_addr = ip;
         ntoa(addr, ipbuf, sizeof(ipbuf));
-        ipreturn = strdup(ipbuf);
+        ipreturn = anopeStrDup(ipbuf);
         if (debug) {
 	  alog("Resolved %s to %s",host, ipbuf);
         }
@@ -905,5 +905,15 @@ char *host_resolve(char *host)
     else {
 	return ipreturn;
     }
+}
+
+char *anopeStrDup(const char *src) {
+    char *ret=NULL;
+    if(src) {
+        if( (ret = (char *)malloc(strlen(src)+1)) ) {;
+            strcpy(ret,src);
+        }
+    }
+    return ret;
 }
 

@@ -1735,6 +1735,8 @@ static int do_clearmodes(User * u)
 
         free(bans);
 
+        excepts = NULL;
+
         if (ircd->except) {
             /* Clear excepts */
             exceptcount = c->exceptcount;
@@ -1751,8 +1753,9 @@ static int do_clearmodes(User * u)
                 free(argv[1]);
                 free(argv[0]);
             }
-
-            free(excepts);
+            if (excepts) {
+                free(excepts);
+            }
         }
 
         if (ircd->invitemode) {

@@ -77,7 +77,7 @@ void *srealloc(void *oldptr, long newsize)
 
 char *sstrdup(const char *s)
 {
-    char *t = strdup(s);
+    char *t = anopeStrDup(s);
     if (!t)
 #if !defined(USE_THREADS) || !defined(LINUX20)
         raise(SIGUSR1);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="391"
+VERSION_BUILD="392"
 
 # $Log$
+#
+# BUILD : 1.7.5 (392)
+# BUGS  : N/A
+# NOTES : More code tidy with strict enabled, some clean up of Unreal32
 #
 # BUILD : 1.7.5 (391)
 # BUGS  : N/A

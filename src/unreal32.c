@@ -455,7 +455,7 @@ void anope_set_umode(User * user, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
-    m = createMessage("401",       NULL); addCoreMessage(IRCD,m);
+    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("451",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("461",       anope_event_null); addCoreMessage(IRCD,m);
@@ -464,6 +464,9 @@ void moduleAddIRCDMsgs(void) {
      m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);
     }
     m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+     m = createMessage("*",        anope_event_null); addCoreMessage(IRCD,m);
+    }
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("C",        anope_event_join); addCoreMessage(IRCD,m);
@@ -632,8 +635,10 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("5",        anope_event_error); addCoreMessage(IRCD,m);
     }
-    /* SMO has no token */
     m = createMessage("SMO", 	   anope_event_smo); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+     m = createMessage("AU",       anope_event_smo); addCoreMessage(IRCD,m);
+    }
     m = createMessage("UMODE2",    anope_event_umode2); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("|",        anope_event_umode2); addCoreMessage(IRCD,m);
@@ -662,7 +667,6 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("AG",       anope_event_sdesc); addCoreMessage(IRCD,m);
     }
-
     m = createMessage("HTM",        anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
       m = createMessage("BH",       anope_event_null); addCoreMessage(IRCD,m);
@@ -683,6 +687,15 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("AM",       anope_event_null); addCoreMessage(IRCD,m);
     }
+    m = createMessage("SENDSNO",    anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("Ss",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("SENDUMODE",  anope_event_null); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("AP",       anope_event_null); addCoreMessage(IRCD,m);
+    }
+
 
     /* The none token version of these is in messages.c */
     if (UseTokens) {
@@ -1965,9 +1978,12 @@ int anope_event_smo(char *source, int ac, char **av)
 	parv[3] - (optional) channel key(s)
 	- current we do not support the keys part
 */
+/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
+   when coming from a none TOKEN'd server
+*/
 void anope_cmd_svsjoin(char *source, char *nick, char *chan)
 {
-    send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BR"), nick, chan);
+    send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
 }
 
 /* svspart

@@ -2522,13 +2522,15 @@ static int do_act(User * u)
 /*************************************************************************/
 /**
  * Normalize buffer stripping control characters and colors
+ * @param A string to be parsed for control and color codes
+ * @return A string stripped of control and color codes
  */
 char *normalizeBuffer(char *buf)
 {
     char *newbuf;
     int i, len, j = 0;
 
-    newbuf = (char *) malloc(255);
+    newbuf = (char *) malloc(BUFSIZE);
 
     len = strlen(buf);
 

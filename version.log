@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="84"
+VERSION_BUILD="85"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (85)
+# BUGS  : 
+# NOTES : Made normalizeBuffer string size equal to BUFSIZE (1024). Fixed function comments to be doxygen friendly :)
 #
 # BUILD : 1.7.2 (84)
 # BUGS  : 

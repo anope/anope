@@ -2045,12 +2045,15 @@ static int do_register(User * u)
     }
 
     if (!pass) {
-        if (NSForceEmail && !email) {
+        if (NSForceEmail) {
             syntax_error(s_NickServ, u, "REGISTER",
                          NICK_REGISTER_SYNTAX_EMAIL);
         } else {
             syntax_error(s_NickServ, u, "REGISTER", NICK_REGISTER_SYNTAX);
         }
+    } else if (NSForceEmail && !email) {
+        syntax_error(s_NickServ, u, "REGISTER",
+                     NICK_REGISTER_SYNTAX_EMAIL);
     } else if (time(NULL) < u->lastnickreg + NSRegDelay) {
         notice_lang(s_NickServ, u, NICK_REG_PLEASE_WAIT, NSRegDelay);
     } else if (u->na) {         /* i.e. there's already such a nick regged */

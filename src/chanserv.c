@@ -5946,6 +5946,7 @@ static int do_clear(User * u)
                     }
                 }
             }
+            check_modes(c);
         }
 
 

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="331"
+VERSION_BUILD="332"
 
 # $Log$
+#
+# BUILD : 1.7.5 (332)
+# BUGS  : none
+# NOTES : Added -l option to am script to list possible selectors and
+#         fixed destination directory guessing for tags.
 #
 # BUILD : 1.7.5 (331)
 # BUGS  : 

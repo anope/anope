@@ -97,11 +97,12 @@ sub usage()
     # --create-branch to create a branch
     # --create-tag to create a tag
     # --switch to switch between branches/tags
-	print "Usage: $0 <-g | -p | -f> [-r revision | -b branch | -t tag | -P proto] <destination>\n";
+	print "Usage: $0 <-g | -p | -f | -l> [-r revision | -b branch | -t tag | -P proto] <destination>\n";
 	print " Operations:\n";
 	print "   -g           Get Operation\n";
 	print "   -p           Put Operation\n";
 	print "   -f[tar|diff] FTP Operation, retrieve latest tar or diff\n";
+	print "   -l           List Operation, for valid selector options\n";
 	print " Selector:\n";
 	print "   -r revision  Retrieve by revision number\n";
 	print "   -b branch    Retrieve by branch name\n";
@@ -148,6 +149,47 @@ sub find_conflict() {
     return $retval;
 }
 
+sub do_lst() {
+    my $out;
+    print "*** BRANCHES:\n";
+    print "trunk (DEFAULT)\n";
+    open (IN, "$svn list $svnroot/branches|");
+    while (<IN>) {
+        if (! /proto/) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+            print "$out";
+        }
+    }
+    close(IN);
+
+    print "\n*** PROTOTYPES:\n";
+    open (IN, "$svn list $svnroot/branches/proto|");
+    while (<IN>) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+	    chomp($out);
+        if (/bahamut18/) {
+		$out .= "\t(OBSOLETE)";
+	} elsif (/capab/) {
+		$out .= "\t(OBSOLETE)";
+	}
+            print "$out\n";
+    }
+    close(IN);
+
+    print "\n*** TAGS:\n";
+    open (IN, "$svn list $svnroot/tags|");
+    while (<IN>) {
+	    $out="$_";
+	    $out =~ s/\/$//;
+            print "$out";
+    }
+    close(IN);
+    print "\n";
+
+}
+
 sub do_ftp() {
 
     my $ftpc;
@@ -178,14 +220,13 @@ sub do_get() {
         $copy     = $copy . "-$rev";
     } elsif ($tag) {
         $selector = "tags/$tag";
-        $copy     = $copy . "-$tag";
+        $copy     = "$tag";
     } elsif ($branch) {
         $selector = "branches/$branch";
         $copy     = $copy . "-$branch";
     } elsif ($proto) {
         $selector = "branches/proto/$proto";
         $copy     = "$proto";
-	print "PROT: $proto SEL: $selector COPY: $copy\n";
     } else {
         $selector = "trunk";
     }
@@ -406,15 +447,18 @@ NOTES : ";
 }
 
 {
-	usage() if (! @ARGV);
+    usage() if (! @ARGV);
 
-    my $opt = 'hgpf:r:b:t:P:';
+    my $opt = 'hgplf:r:b:t:P:';
     getopts ("$opt", \%opt) or usage();
-	usage() if $opt{h};
+    usage() if $opt{h};
 
     usage() if ($opt{g} && $opt{p});
     usage() if ($opt{g} && $opt{f});
+    usage() if ($opt{g} && $opt{l});
     usage() if ($opt{p} && $opt{f});
+    usage() if ($opt{p} && $opt{l});
+    usage() if ($opt{f} && $opt{l});
     usage() if ($opt{r} && $opt{b});
     usage() if ($opt{r} && $opt{t});
     usage() if ($opt{b} && $opt{t});
@@ -435,6 +479,7 @@ NOTES : ";
         }
     }
 
+    do_lst() if $opt{l};
     do_ftp() if $opt{f};
     do_get() if $opt{g};
     do_put() if $opt{p};

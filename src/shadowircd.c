@@ -113,6 +113,7 @@ IRCDVar ircd[] = {
      0,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
+     1,                         /* reports sync state */
      }
     ,
     {NULL}
@@ -1145,9 +1146,9 @@ int anope_event_eos(char *source, int ac, char **av)
      * server finished bursting. -GD
      */
     if (s)
-        s->sync = 1;
-    else
-        me_server->sync = 1;
+        s->sync = SSYNC_DONE;
+    else if (serv_uplink)
+        serv_uplink->sync = SSYNC_DONE;
 
     return MOD_CONT;
 }

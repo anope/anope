@@ -112,6 +112,7 @@ IRCDVar ircd[] = {
      1,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
+     1,                         /* reports sync state */
      },
     {NULL}
 };
@@ -1744,9 +1745,9 @@ int anope_event_eob(char *source, int ac, char **av)
          * server finished bursting. -GD
          */
         if (s)
-            s->sync = 1;
-        else
-            me_server->sync = 1;
+            s->sync = SSYNC_DONE;
+        else if (serv_uplink)
+            serv_uplink->sync = SSYNC_DONE;
     }
     return MOD_CONT;
 }
@@ -1759,9 +1760,14 @@ int anope_event_burst(char *source, int ac, char **av)
     if (!ac) {
         /* for future use  - start burst */
     } else {
-        if (s) {
-            s->sync = 1;
-        }
+        /* If we found a server with the given source, that one just
+         * finished bursting. If there was no source, then our uplink
+         * server finished bursting. -GD
+         */
+        if (s)
+            s->sync = SSYNC_DONE;
+        else
+            me_server->sync = SSYNC_DONE;
     }
     return MOD_CONT;
 }

@@ -808,12 +808,14 @@ E void notice_help(char *source, User *dest, int message, ...);
 
 E Server *servlist;
 E Server *me_server;
+E Server *serv_uplink;
 E uint32 uplink_capab;
 
 E Server *first_server(int flags);
 E Server *next_server(int flags);
 
 E int is_ulined(char *server);
+E int is_sync(Server *server);
 
 E Server *new_server(Server * uplink, const char *name, const char *desc,
                    uint16 flags, char *suid);

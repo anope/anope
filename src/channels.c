@@ -1281,7 +1281,7 @@ void chan_adduser2(User * user, Channel * c)
         }
         /* Added channelname to entrymsg - 30.03.2004, Certus */
         /* Also, don't send the entrymsg when bursting -GD */
-        if (c->ci && c->ci->entry_message && (me_server->sync == 1))
+        if (c->ci && c->ci->entry_message && is_sync(user->server))
             notice_user(whosends(c->ci), user, "[%s] %s", c->name,
                         c->ci->entry_message);
     }
@@ -1302,7 +1302,7 @@ void chan_adduser2(User * user, Channel * c)
              * to has synced, or we'll get greet-floods when the net
              * recovers from a netsplit. -GD
              */
-            if (me_server->sync == 1) {
+            if (is_sync(user->server) == 1) {
                 anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
                                   user->na->nick, user->na->nc->greet);
                 c->ci->bi->lastmsg = time(NULL);

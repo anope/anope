@@ -15,7 +15,8 @@
 #include "services.h"
 
 Server *servlist = NULL;
-Server *me_server = NULL;       /* Our uplink server */
+Server *me_server = NULL;       /* This are we        */
+Server *serv_uplink = NULL;     /* This is our uplink */
 uint32 uplink_capab;
 char *uplink;
 char *TS6UPLINK;
@@ -103,7 +104,10 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     } else {
         serv->suid = NULL;
     }
-    serv->sync = -1;
+    if (ircd->sync)
+        serv->sync = SSYNC_IN_PROGRESS;
+    else
+        serv->sync = SSYNC_UNKNOWN;
     serv->links = NULL;
     serv->prev = NULL;
 
@@ -120,6 +124,9 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
             uplink->links->prev = serv;
         uplink->links = serv;
     }
+    /* Check if this is our uplink server */
+    if ((uplink == me_server) && !(flags & SERVER_JUPED))
+        serv_uplink = serv;
 
     return serv;
 }
@@ -289,14 +296,13 @@ int anope_check_sync(const char *name)
     Server *s;
     s = findserver(servlist, name);
 
-    if (!s) {
+    if (!s)
         return 0;
-    }
-    if (s->sync) {
-        return s->sync;
-    } else {
-        return 0;
-    }
+
+    if (is_sync(s))
+        return 1;
+    else
+        return -1;
 }
 
 /*************************************************************************/
@@ -519,6 +525,21 @@ int is_ulined(char *server)
         }
     }
 
+    return 0;
+}
+
+/*************************************************************************/
+
+/**
+ * See if the current server is synced, or has an unknown sync state
+ * (in which case we pretend it is always synced)
+ * @param server Server of which we want to know the state
+ * @return int 0 if not synced, 1 if synced
+ */
+int is_sync(Server * server)
+{
+    if ((server->sync == SSYNC_DONE) || (server->sync == SSYNC_UNKNOWN))
+        return 1;
     return 0;
 }
 

@@ -112,6 +112,7 @@ IRCDVar ircd[] = {
      0,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
+     0,                         /* reports sync state */
      }
     ,
     {NULL}

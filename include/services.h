@@ -335,6 +335,7 @@ struct ircdvars_ {
 	int supporthelper;			/* +h helper umodes */
 	int p10;					/* ircd is P10  */
 	char *nickchars;			/* character set */
+	int sync;					/* reports sync state */
 };
 
 struct ircdcapab_ {
@@ -750,17 +751,23 @@ struct csmodeutil_ {
 
 /* Server data */
 
+typedef enum {
+	SSYNC_UNKNOWN       = 0,	/* We can't get the sync state   */
+	SSYNC_IN_PROGRESS   = 1,	/* Sync is currently in progress */
+	SSYNC_DONE          = 2		/* We're in sync                 */
+} SyncState;
+
 struct server_ {
     Server *next, *prev;
     
-    char *name;		/* Server name 				*/
-    uint16 hops;	/* Hops between services and server 	*/
-    char *desc;		/* Server description 			*/
-    uint16 flags;	/* Some info flags, as defined below 	*/
-    char *suid;		/* Server Univeral ID		     	*/
-    int sync;	        /* Whether is synced or not	        */
+    char *name;     /* Server name                        */
+    uint16 hops;    /* Hops between services and server   */
+    char *desc;     /* Server description                 */
+    uint16 flags;   /* Some info flags, as defined below  */
+    char *suid;     /* Server Univeral ID                 */
+    SyncState sync; /* Server sync state (see above)      */
 
-    Server *links;	/* Linked list head for linked servers 	*/
+    Server *links;	/* Linked list head for linked servers 	  */
     Server *uplink;	/* Server which pretends to be the uplink */
 };
 

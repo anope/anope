@@ -430,8 +430,13 @@ How To Add IRCd Support
 
     84) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
 
-    83) Character Set: Unreal passes the character set during PROTOCTL,
+    85) Character Set: Unreal passes the character set during PROTOCTL,
                        the value is stored here. Set this NULL to start.
+
+    86) Reports sync: Does the IRCd report when it's in sync (or done bursting,
+                      depending on how you want to say it)? Remember to set
+                      the sync state for servers correctly if it does.
+                      Use 1 for yes, 0 for no.
 
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
@@ -439,7 +444,7 @@ How To Add IRCd Support
 
         IRCDCAPAB ircdcap[] = { }
 
-    This struct is based oN the CAPAB defines. You should review the CAPAB
+    This struct is based on the CAPAB defines. You should review the CAPAB
     table below to see how this should be done.
 
         Define Table

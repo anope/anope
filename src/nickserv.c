@@ -2306,7 +2306,7 @@ static int do_confirm(User * u)
             else
                 notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK,
                             u->nick);
-            send_event(EVENT_NICK_REGISTED, u->nick);
+            send_event(EVENT_NICK_REGISTERED, u->nick);
 #ifndef USE_ENCRYPTION
             notice_lang(s_NickServ, u, NICK_PASSWORD_IS, na->nc->pass);
 #endif
@@ -2754,6 +2754,7 @@ static int do_drop(User * u)
     NickRequest *nr = NULL;
     int is_servadmin = is_services_admin(u);
     int is_mine;                /* Does the nick being dropped belong to the user that is dropping? */
+    char *my_nick;
 
     if (readonly && !is_servadmin) {
         notice_lang(s_NickServ, u, NICK_DROP_DISABLED);
@@ -2783,6 +2784,8 @@ static int do_drop(User * u)
     }
 
     is_mine = (u->na && (u->na->nc == na->nc));
+    if (is_mine && !nick)
+        my_nick = sstrdup(na->nick);
 
     if (is_mine && !nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
@@ -2804,8 +2807,7 @@ static int do_drop(User * u)
              na->nick, na->nc->display,
              (na->nc->email ? na->nc->email : "none"));
         delnick(na);
-
-        send_event(EVENT_NICK_DROPPED, nick);
+        send_event(EVENT_NICK_DROPPED, (my_nick ? my_nick : nick));
 
         if (!is_mine) {
             if (WallDrop)
@@ -2817,6 +2819,9 @@ static int do_drop(User * u)
                 notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
             else
                 notice_lang(s_NickServ, u, NICK_DROPPED);
+            if (my_nick) {
+                free(my_nick);
+            }
         }
     }
     return MOD_CONT;

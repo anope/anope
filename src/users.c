@@ -210,6 +210,7 @@ void delete_user(User * user)
                  normalizeBuffer(user->realname), user->server->name);
         }
     }
+    send_event(EVENT_USER_LOGOFF, user->nick);
 
     if (debug >= 2)
         alog("debug: delete_user() called");

@@ -146,8 +146,10 @@ E. With that setup in your function you will be passed 1 items, the message is v
 | EVENT_RESTART               | EVENT_START                                                  |
 | EVENT_SHUTDOWN              | EVENT_START, EVENT_STOP                                      |
 | EVENT_SIGNAL                | quit message                                                 |
-| EVENT_NICK_REGISTED         | Nick                                                         |
+| EVENT_NICK_REGISTERED       | Nick                                                         |
 | EVENT_NICK_DROPPED          | Nick                                                         |
 | EVENT_NICK_FORBIDDEN        | Nick                                                         |
 | EVENT_CHANGE_NICK           | Nick                                                         |
+| EVENT_USER_LOGOFF           | Nick                                                         |
 ==============================================================================================
+

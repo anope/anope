@@ -35,8 +35,9 @@
 #define EVENT_RESTART "restart"
 #define EVENT_SHUTDOWN "shutdown"
 #define EVENT_SIGNAL "signal"
-#define EVENT_NICK_REGISTED "nick_registered"
+#define EVENT_NICK_REGISTERED "nick_registered"
 #define EVENT_NICK_DROPPED "nick_dropped"
 #define EVENT_NICK_FORBIDDEN "nick_forbidden"
 #define EVENT_CHANGE_NICK "change_nick"
+#define EVENT_USER_LOGOFF "user_logoff"
 

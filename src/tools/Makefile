@@ -1,5 +1,5 @@
-OBJS =  anopesmpt.o
-SRCS =  anopesmpt.c
+OBJS =  anopesmtp.o
+SRCS =  anopesmtp.c
 
 INCLUDES = ../../include/services.h
 

@@ -634,6 +634,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("CREDITS",   anope_event_credits); addCoreMessage(IRCD,m);
     m = createMessage("SMODE",     anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("EOBURST",   anope_event_eob); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -1688,6 +1689,21 @@ int anope_event_error(char *source, int ac, char **av)
     }
     return MOD_CONT;
 }
+
+
+int anope_event_eob(char *source, int ac, char **av)
+{
+    Server *s;
+
+    if (ac == 1) {
+        s = findserver(servlist, av[0]);
+        if (s) {
+            s->sync = 1;
+        }
+    }
+    return MOD_CONT;
+}
+
 
 int anope_event_burst(char *source, int ac, char **av)
 {

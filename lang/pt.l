@@ -2246,8 +2246,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d registros, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Sessões       : %6d registros, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d registros, %5d kB
 OPER_STATS_AKILL_COUNT
 	Número atual de AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2722,34 +2720,6 @@ OPER_USERLIST_END
 	Fim da listagem.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {host | padrão} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Detecção de Proxy está desabilitada.
-OPER_CACHE_NOT_FOUND
-	%s não foi encontrado no cache.
-OPER_CACHE_REMOVED
-	%s foi removido do cache.
-OPER_CACHE_HEADER
-	Hostname                                         Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Fim da lista - %d/%d resultados mostrados.
-OPER_CACHE_QUEUED
-	Queued
-OPER_CACHE_PROGRESS
-	Em progresso
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
 OPER_SUPER_ADMIN_ON
 	Você é agora um SuperAdmin
 OPER_SUPER_ADMIN_OFF
@@ -5642,21 +5612,6 @@ OPER_HELP_USERLIST
 	fornecido, listará apenas usuários que estão no canal dado.
 	estiver usando. Se INVISIBLE é especificado, listará apenas usuários
 	que tenham o modo +i.
-	
-	Limitado aos Administradores dos Services.
-	
-OPER_HELP_CACHE
-	Sintaxe: CACHE DEL host
-	         CACHE LIST padrão [QUEUED | ALL]
-	
-	O comando CACHE DEL apaga do cache o host especificado.
-	Isto é intensionado apenas para propósito de depuração.
-	
-	O comando CACHE LIST lista todas as proxies encontradas
-	que combinam com o padrão fornecido. Se a opção QUEUED
-	for fornecida, serão listados os scans (varreduras) em espera
-	ou em progresso, e se a opção ALL for fornecida, serão
-	listados todos os hosts no cache.
 	
 	Limitado aos Administradores dos Services.
 	

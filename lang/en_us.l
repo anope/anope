@@ -2234,8 +2234,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d records, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Sessions      : %6d records, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d records, %5d kB
 OPER_STATS_AKILL_COUNT
 	Current number of AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2705,35 +2703,6 @@ OPER_USERLIST_RECORD
 OPER_USERLIST_END
 	End of users list.
 
-# CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hostname | pattern} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Proxy detection is disabled.
-OPER_CACHE_NOT_FOUND
-	%s was not found in the cache.
-OPER_CACHE_REMOVED
-	%s has been removed from the cache.
-OPER_CACHE_HEADER
-	Hostname                                         Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	End of list - %d/%d matches shown.
-OPER_CACHE_QUEUED
-	Queued
-OPER_CACHE_PROGRESS
-	In progress
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
 OPER_SUPER_ADMIN_ON
 	You are now a SuperAdmin
 OPER_SUPER_ADMIN_OFF
@@ -4975,7 +4944,6 @@ OPER_HELP_ADMIN_CMD
 	    OPERNEWS    Define messages to be shown to users who oper
 	    SESSION     View the list of host sessions
 	    EXCEPTION   Modify the session-limit exception list
-	    CACHE       Lists hostname cache used by the proxy detector
 	    NOOP        Temporarily remove all O:lines of a server 
 	                    remotely
 	    JUPE        "Jupiter" a server
@@ -5577,20 +5545,6 @@ OPER_HELP_USERLIST
 	the format nick!user@host). If channel is given, lists only users
 	that are on the given channel. If INVISIBLE is specified, only users
 	with the +i flag will be listed.
-	
-	Limited to Services admins.
-
-OPER_HELP_CACHE
-	Syntax: CACHE DEL hostname
-	        CACHE LIST pattern [QUEUED | ALL]
-	
-	The CACHE DEL command deletes the specified hostname from 
-	the cache. This is meant for debug purpose only.
-
-	The CACHE LIST command lists all found proxies that match the
-	given pattern. If the QUEUED option is given, it will list
-	the queued or in progress scans instead, and if the ALL option 
-	is given, it will list all cached hostnames.
 	
 	Limited to Services admins.
 

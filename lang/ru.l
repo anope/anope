@@ -2272,8 +2272,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ                              : %6d записей, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Сессии                                : %6d записей, %5d kB
-OPER_STATS_PROXY_MEM
-	Прокси                                : %6d записей, %5d kB
 OPER_STATS_AKILL_COUNT
 	Количество AKILL'ов                   : %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2746,34 +2744,6 @@ OPER_USERLIST_END
 	Конец списка пользователей.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {имя хоста | символьная маска} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Детектор прокси отключен.
-OPER_CACHE_NOT_FOUND
-	%s не найден в кэше.
-OPER_CACHE_REMOVED
-	%s удален из кэша.
-OPER_CACHE_HEADER
-	Имя хоста                                         Статус
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Конец списка - %d/%d записей найдено.
-OPER_CACHE_QUEUED
-	Очередь
-OPER_CACHE_PROGRESS
-	Выполняется
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP прокси
 OPER_SUPER_ADMIN_ON
 	Теперь Вы Супер-Админ
 OPER_SUPER_ADMIN_OFF
@@ -5626,20 +5596,6 @@ OPER_HELP_USERLIST
 	в формате nick!user@host). Если указан #канал, покажет только пользователей,
 	находящихся на этом канале. Если указан пареметр INVISIBLE будут показаны
 	только те пользователи, на которых стоит флаг +i.
-	
-	Эту команду могут использовать только Администраторы сервисов.
-
-OPER_HELP_CACHE
-	Синтаксис: CACHE DEL хост
-	           CACHE LIST символьная маска [QUEUED | ALL]
-	
-	Команда CACHE DEL удаляет указанный хост из
-	кэша. Эта команда предназначена только для отладки.
-
-	Команда CACHE LIST показывает списко всех найденных прокси, подпадающих под
-	указанную символьную маску. Если указать параметр QUEUED, то будет показана
-	очередь сканов, и если указать параметр ALL,
-	то будут показаны все кэшированные хосты.
 	
 	Эту команду могут использовать только Администраторы сервисов.
 

@@ -2276,8 +2276,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ     : %6d records, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Sesiones     : %6d records, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies      : ^B%6d^B records, ^B%5d^B kB
 OPER_STATS_AKILL_COUNT
 	Numero actual de AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2759,42 +2757,6 @@ OPER_USERLIST_END
 	Fin de la lista de usuarios.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hostname | patron} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Deteccion de Proxy deshabilitada.
-OPER_CACHE_NOT_FOUND
-	%s no encontrado en el cache.
-OPER_CACHE_REMOVED
-	%s ha sido removido del cache.
-OPER_CACHE_HEADER
-	Hostname                                         Estatus
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Fin de la lista - %d/%d instancias mostradas.
-OPER_CACHE_QUEUED
-	Encolado
-OPER_CACHE_PROGRESS
-	En progreso
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	Proxy HTTP
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_SUPER_ADMIN_ON
 	Ahora eres un SuperAdmin.
 OPER_SUPER_ADMIN_OFF
@@ -5800,26 +5762,6 @@ OPER_HELP_USERLIST
 	
 	Limitado a administradores de Servicios.
 
-OPER_HELP_CACHE
-	Sintaxis: CACHE DEL hostname
-	          CACHE LIST patron [QUEUED | ALL]
-	
-	El comando CACHE DEL borra el host especificado del cache.
-	Esto esta dispuesto solo para propositos de debug.
-	
-	El comando CACHE LIST lista todos los proxies encontrados que
-	concuerden con el patron dado. Si la opcion QUEUED es dada,
-	listara los procesos encolados o en progreso en vez, y si la
-	opcion ALL es dada, listara todos los hostnames en cache.
-	
-	Limitado a administradores de Servicios.
-
-###########################################################################
-#
-# BotServ help messages
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Sintaxis: MODLOAD NombreArchivo
 

@@ -2276,8 +2276,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d records, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Sessies       : %6d records, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d records, %5d kB
 OPER_STATS_AKILL_COUNT
 	Huidig aantal AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2750,34 +2748,6 @@ OPER_USERLIST_END
 	Einde van gebruikers lijst.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hostname | trefbeeld} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Proxy detectie is uitgeschakeld.
-OPER_CACHE_NOT_FOUND
-	%s is niet gevonden in de cache.
-OPER_CACHE_REMOVED
-	%s is verwijderd uit de cache.
-OPER_CACHE_HEADER
-	Hostname                                         Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Eind lijst - %d/%d overeenkomsten weergegeven.
-OPER_CACHE_QUEUED
-	In de wachtrij
-OPER_CACHE_PROGRESS
-	In behandeling
-OPER_CACHE_NORMAL
-	Normaal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
 OPER_SUPER_ADMIN_ON
 	Je bent nu een SuperAdministrator
 OPER_SUPER_ADMIN_OFF
@@ -5735,28 +5705,6 @@ OPER_HELP_USERLIST
 	
 	Gelimiteerd tot Services admins.
 
-OPER_HELP_CACHE
-	Gebruik: CACHE DEL hostname
-	         CACHE LIST trefbeeld [QUEUED | ALL]
-	
-	Het CACHE DEL commando verwijderd de gegeven hostname uit
-	de cache. Dit commando is alleen bedoeld voor debugging.
-
-	Het CACHE LIST commando geeft alle gevonden proxies weer
-	die overeenkomen met het gegeven trefbeeld. Als de QUEUED
-	optie is meegegeven zullen alleen scans die in de wachtrij
-	staan of op het moment bezig zijn weergegeven worden, en als
-	de ALL optie is gegeven zullen alle gecachde hostnames
-	worden weergegeven.
-	
-	Gelimiteerd tot Services admins.
-
-###########################################################################
-#
-# BotServ help messages
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Gebruik: MODLOAD bestandsnaam
 	

@@ -2297,8 +2297,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ          : %6d Einträge, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Verbindungen      : %6d Einträge, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d records, %5d kB
 OPER_STATS_AKILL_COUNT
 	Aktuelle Anzahl von AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2781,34 +2779,6 @@ OPER_USERLIST_END
 ###########################################################################
 
 # EXCEPTION responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {Hostname | Muster} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Proxy Detektor ist deaktiviert.
-OPER_CACHE_NOT_FOUND
-	%s wurde nicht im Cache gefunden.
-OPER_CACHE_REMOVED
-	%s wurde aus dem Cache gelöscht.
-OPER_CACHE_HEADER
-	Hostname                                         Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Ende der Liste - %d/%d passende Einträge angezeigt.
-OPER_CACHE_QUEUED
-	in der Warteschlange
-OPER_CACHE_PROGRESS
-	in Bearbeitung
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
 OPER_SUPER_ADMIN_ON
 	Du bist jetzt ein Super-Admin.
 OPER_SUPER_ADMIN_OFF
@@ -6018,27 +5988,6 @@ OPER_HELP_USERLIST
 	
 	Beschränkt auf Services Administratoren.
 	
-###########################################################################
-#
-# BotServ help messages   ## 19.10.2004 ##
-#
-###########################################################################
-	
-OPER_HELP_CACHE
-	Syntax: CACHE DEL Hostname
-	        CACHE LIST Muster [QUEUED | ALL]
-	
-	Der CACHE DEL Befehl löscht den angegeben Hostnamen aus dem
-	Cache. Dieser Befehl ist ausschließlich für DEBUG Zwecke.
-
-	Der CACHE LIST Befehl listet alle Proxies auf, die dem
-	angegebenen Muster entsprechen. Falls die QUEUED Option
-	mitangegeben wird, werden alle Scans in der Warteschlange und
-	alle Scans die gerade laufen angezeigt. Wenn die ALL Option 
-	mitangegeben wird, werden alle Hostnamen aufgelistet.
-	
-	Beschränkt auf Services Administratoren.
-
 ###########################################################################
 #
 # BotServ help messages   ## 19.10.2004 ##

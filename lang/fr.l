@@ -2316,8 +2316,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d enregistrements, %5d ko
 OPER_STATS_SESSIONS_MEM
 	Sessions      : %6d enregistrements, %5d ko
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d enregistrements, %5d ko
 OPER_STATS_AKILL_COUNT
 	Nombre d'AKILLs actuel: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2800,42 +2798,6 @@ OPER_USERLIST_END
 	Fin de la liste des utilisateurs.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hostname | pattern} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	La détection de proxies est désactivée.
-OPER_CACHE_NOT_FOUND
-	%s n'a pas été trouvé dans le cache.
-OPER_CACHE_REMOVED
-	%s a été supprimé du cache.
-OPER_CACHE_HEADER
-	Nom d'hôte                                       Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Fin de la liste - %d/%d correspondances affichées.
-OPER_CACHE_QUEUED
-	En attente
-OPER_CACHE_PROGRESS
-	En cours
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	Proxy HTTP
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_SUPER_ADMIN_ON
 	Vous êtes maintenant SuperAdmin.
 OPER_SUPER_ADMIN_OFF
@@ -5843,28 +5805,6 @@ OPER_HELP_USERLIST
 	
 	Réservée aux Services admins.
 
-OPER_HELP_CACHE
-	Syntaxe: CACHE DEL nom d'hôte
-	         CACHE LIST modèle [QUEUED | ALL]
-	
-	La commande CACHE DEL supprime du cache le nom d'hôte 
-	spécifié. Cette commande ne devrait être utilisée que
-	pour le déboguage.
-	
-	La commande CACHE LIST liste tous les proxies  
-	correspondants au modèle donné, ou, si l'option QUEUED 
-	est donnée, les scans en attente ou en cours, ou, si
-	l'option ALL est donnée, tous les noms d'hôtes présents
-	dans la cache.
-	
-	Réservée aux administrateurs des services.
-
-###########################################################################
-#
-# BotServ help messages
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD FileName
 

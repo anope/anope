@@ -326,24 +326,6 @@ E int   RestrictMail;
 E int   MailDelay;
 E int  DontQuoteAddresses;
 
-E int   ProxyDetect;
-E int   ProxyThreads;
-E char *ProxyMessage[8];
-E int   ProxyCheckWingate;
-E int   ProxyCheckSocks4;
-E int   ProxyCheckSocks5;
-E int   ProxyCheckHTTP1;
-E int   ProxyCheckHTTP2;
-E int   ProxyCheckHTTP3;
-E int   ProxyTimeout;
-E char *ProxyTestServer;
-E int   ProxyTestPort;
-E int   ProxyExpire;
-E int   ProxyCacheExpire;
-E char *ProxyAkillReason;
-E int   WallProxy;
-E int   ProxyMax;
-
 E int   NSDefFlags;
 E int   NSDefLanguage;
 E int   NSRegDelay;
@@ -485,8 +467,7 @@ E void rdb_save_bs_core(BotInfo * bi);
 E void rdb_save_bs_rdb_core(BotInfo * bi);
 E void rdb_save_hs_core(HostCore * hc);
 E void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                    SList * ak, SList * sgl, SList * sql, SList * szl,
-                    HostCache * hc);
+                    SList * ak, SList * sgl, SList * sql, SList * szl);
 E void rdb_save_news(NewsItem * ni);
 E void rdb_save_exceptions(Exception * e);
 E void rdb_load_bs_dbase(void);
@@ -693,6 +674,8 @@ E u_int32_t getrandom32(void);
 
 E char *str_signed(unsigned char *str);
 
+E void ntoa(struct in_addr addr, char *ipaddr, int len);
+
 /**** modules.c ****/
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
@@ -803,19 +786,6 @@ E IgnoreData *get_ignore(const char *nick);
 
 E int split_buf(char *buf, char ***argv, int colon_special);
 E void process(void);
-
-/**** proxy.c ****/
-
-E HostCache *hcache[1024];
-
-E HostCache *proxy_cache_add(char *host);
-E void get_proxy_stats(long *nrec, long *memuse);
-E void ntoa(struct in_addr addr, char *ipaddr, int len);
-E int proxy_check(char *nick, char *host, uint32 ip);
-E void proxy_expire();
-E int proxy_init(void);
-
-E int do_cache(User *u);
 
 /**** send.c ****/
 
@@ -966,7 +936,7 @@ E void db_mysql_save_ns_req(NickRequest * nr);
 E void db_mysql_save_cs_info(ChannelInfo * ci);
 E void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
                            SList * ak, SList * sgl, SList * sql,
-                           SList * szl, HostCache * hc);
+                           SList * szl);
 E void db_mysql_save_news(NewsItem * ni);
 E void db_mysql_save_exceptions(Exception * e);
 E void db_mysql_save_hs_core(HostCore * hc);

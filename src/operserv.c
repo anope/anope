@@ -195,7 +195,6 @@ void moduleAddOperServCmds(void) {
     c = createCommand("EXCEPTION",  do_exception,  is_services_admin,OPER_HELP_EXCEPTION, -1,-1,-1, -1); addCoreCommand(OPERSERV,c);
     c = createCommand("CHANLIST",   do_chanlist,   is_services_admin,OPER_HELP_CHANLIST,   -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("USERLIST",   do_userlist,   is_services_admin,OPER_HELP_USERLIST,   -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("CACHE",      do_cache,      is_services_admin,OPER_HELP_CACHE,      -1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("DEFCON", do_defcon,   is_services_admin, OPER_HELP_DEFCON,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("CHANKILL", do_chankill,   is_services_admin, OPER_HELP_CHANKILL,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     /* Commands for Services root: */
@@ -492,7 +491,6 @@ void load_os_dbase(void)
 {
     dbFILE *f;
     int16 i, ver, c;
-    HostCache *hc, **hclast, *hcprev;
     uint16 tmp16, n;
     uint32 tmp32;
     char *s;
@@ -623,33 +621,6 @@ void load_os_dbase(void)
         }
     }
 
-    if (ver >= 12) {
-        for (i = 0; i < 1024 && !failed; i++) {
-            hclast = &hcache[i];
-            hcprev = NULL;
-
-            while ((c = getc_db(f)) != 0) {
-                if (c != 1)
-                    fatal("Invalid format in %s", OperDBName);
-
-                hc = scalloc(1, sizeof(HostCache));
-
-                SAFE(read_string(&hc->host, f));
-                SAFE(read_int16(&tmp16, f));
-                hc->status = tmp16;
-                SAFE(read_int32(&tmp32, f));
-                hc->used = tmp32;
-
-                *hclast = hc;
-                hclast = &hc->next;
-                hc->prev = hcprev;
-                hcprev = hc;
-            }                   /* while (getc_db(f) != 0) */
-
-            *hclast = NULL;
-        }                       /* for (i) */
-    }
-
     close_db(f);
 
 }
@@ -680,7 +651,6 @@ void save_os_dbase(void)
     static time_t lastwarn = 0;
     Akill *ak;
     SXLine *sx;
-    HostCache *hc;
 
     if (!(f = open_db(s_OperServ, OperDBName, "w", OPER_VERSION)))
         return;
@@ -732,22 +702,6 @@ void save_os_dbase(void)
         SAFE(write_int32(sx->expires, f));
     }
 
-    for (i = 0; i < 1024; i++) {
-        for (hc = hcache[i]; hc; hc = hc->next) {
-            /* Don't save in-progress scans */
-            if (hc->status < HC_NORMAL)
-                continue;
-
-            SAFE(write_int8(1, f));
-
-            SAFE(write_string(hc->host, f));
-            SAFE(write_int16(hc->status, f));
-            SAFE(write_int32(hc->used, f));
-
-        }                       /* for (hc) */
-        SAFE(write_int8(0, f));
-    }                           /* for (i) */
-
     close_db(f);
 
 }
@@ -762,7 +716,7 @@ void save_os_rdb_dbase(void)
     if (!rdb_open())
         return;
     rdb_save_os_db(maxusercnt, maxusertime, &akills, &sglines, &sqlines,
-                   &szlines, hcache[0]);
+                   &szlines);
     rdb_close();
 #endif
 }
@@ -1311,13 +1265,6 @@ static int do_stats(User * u)
         get_session_stats(&count, &mem);
         notice_lang(s_OperServ, u, OPER_STATS_SESSIONS_MEM, count,
                     (mem + 512) / 1024);
-#ifdef USE_THREADS
-        if (ProxyDetect) {
-            get_proxy_stats(&count, &mem);
-            notice_lang(s_OperServ, u, OPER_STATS_PROXY_MEM, count,
-                        (mem + 512) / 1024);
-        }
-#endif
     }
     return MOD_CONT;
 }

@@ -2299,8 +2299,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ   : %6d kayýt, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Oturumlar  : %6d kayýt, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxyler   : %6d kayit, %5d kB
 OPER_STATS_AKILL_COUNT
 	Þu anki AKILL sayýsý: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2781,42 +2779,6 @@ OPER_USERLIST_END
 	Kullanýcý listesi sonu.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {host | model} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Proxy taramasi devre disi.
-OPER_CACHE_NOT_FOUND
-	%s cache te bulunamadi.
-OPER_CACHE_REMOVED
-	%s cache ten çikarildi.
-OPER_CACHE_HEADER
-	Host                                             Durum
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Liste sonu - %d/%d kayit gösterildi.
-OPER_CACHE_QUEUED
-	Siraya alindi
-OPER_CACHE_PROGRESS
-	Islemde
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_SUPER_ADMIN_ON
 	You are now a SuperAdmin
 OPER_SUPER_ADMIN_OFF
@@ -5662,26 +5624,6 @@ OPER_HELP_USERLIST
 	
 	Servis adminlerinin Kullanýmýyla sýnýrlýdýr.
 
-OPER_HELP_CACHE
-	Kullanimi: CACHE DEL hostadi
-	           CACHE LIST model [QUEUED | ALL]
-	
-	CACHE DEL komutu belirtilen hostadini cache ten siler.
-	sadece hata kontrolü için kullanilir.
-
-	CACHE LIST komutu belirtilen modele uyan tüm proxy leri
-	listeler. Eger QUEUED özelligi belirtilmisse, siradaki veya
-	aktif taramalardaki proxy leri listeler. Eger ALL özelligi
-	belirtilmis ise tüm cache teki hostadlarini listeler.
-	
-	Servis adminlerinin kullanimiyla sinirlidir..
-
-###########################################################################
-#
-# BotServ help messages
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD FileName
 

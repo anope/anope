@@ -638,13 +638,11 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
 
 /*************************************************************************/
 void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                         SList * ak, SList * sgl, SList * sql, SList * szl,
-                         HostCache * hc)
+                         SList * ak, SList * sgl, SList * sql, SList * szl)
 {
     char sqlcmd[MAX_SQL_BUF];
     Akill *t_ak;
     SXLine *t_sl;
-    HostCache *t_hc;
     char *takuser, *takhost, *takby, *takreason, *tslmask, *tslby,
         *tslreason, *thchost;
 
@@ -753,25 +751,6 @@ void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
         free(tslmask);
         free(tslby);
         free(tslreason);
-    }
-
-/* and finally we save hcache */
-    rdb_clear_table("anope_os_hcache");
-    for (i = 0; i < 1024; i++) {
-        for (t_hc = hcache[i]; t_hc; t_hc = t_hc->next) {
-            /* Don't save in-progress scans */
-            if (t_hc->status < HC_NORMAL)
-                continue;
-            thchost = db_mysql_quote(t_hc->host);
-            snprintf(sqlcmd, MAX_SQL_BUF,
-                     "INSERT DELAYED INTO anope_os_hcache (mask,status,used) VALUES ('%s','%d','%d')",
-                     thchost, (int) t_hc->status, (int) t_hc->used);
-            if (db_mysql_query(sqlcmd)) {
-                log_perror("Can't create sql query: %s", sqlcmd);
-                db_mysql_error(MYSQL_WARNING, "query");
-            }
-            free(thchost);
-        }
     }
 
     return;
@@ -1037,7 +1016,6 @@ void db_mysql_load_os_dbase(void)
     char sqlcmd[MAX_SQL_BUF];
     Akill *ak;
     SXLine *sx;
-    HostCache *hc;
     int akc, sgc, sqc, szc, j;
 
     if (!do_mysql)
@@ -1144,33 +1122,6 @@ void db_mysql_load_os_dbase(void)
         sx->seton = atoi(mysql_row[3]);
         sx->expires = atoi(mysql_row[4]);
         slist_add(&szlines, sx);
-    }
-    mysql_free_result(mysql_res);
-
-    snprintf(sqlcmd, MAX_SQL_BUF,
-             "SELECT `mask`,`status`,`used` FROM `anope_os_hcache`");
-    if (db_mysql_query(sqlcmd)) {
-        log_perror("Can't create sql query: %s", sqlcmd);
-        db_mysql_error(MYSQL_WARNING, "query");
-		return;
-    }
-    mysql_res = mysql_store_result(mysql);
-    if (mysql_num_rows(mysql_res) == 0) {
-        mysql_free_result(mysql_res);
-        return;
-    }
-    while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        j = HASH(mysql_row[0]);
-        hc = scalloc(1, sizeof(HostCache));
-        hc->host = sstrdup(mysql_row[0]);
-        hc->status = atoi(mysql_row[1]);
-        hc->used = atoi(mysql_row[2]);
-
-        hc->prev = NULL;
-        hc->next = hcache[j];
-        if (hc->next)
-            hc->next->prev = hc;
-        hcache[j] = hc;
     }
     mysql_free_result(mysql_res);
 }

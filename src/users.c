@@ -593,12 +593,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         if (LimitSessions && !add_session(nick, host))
             return NULL;
 
-        /* And finally, for proxy ;) */
-#ifdef USE_THREADS
-        if (ProxyDetect && proxy_check(nick, host, ip)) {
-            return NULL;
-        }
-#endif
 
         /* Allocate User structure and fill it in. */
         user = new_user(nick);

@@ -38,9 +38,6 @@ USE_MYSQL=0
 # Set this to the path where the MySQL libraries can be found
 #MYSQL_LIB="c:\\mysql\\lib\\opt\\"
 
-# Set this to 1 to enable the proxy scanner
-PROXY_SCANNER=0
-
 # Set this to 1 to enable database encryption
 DB_ENCRYPTION=0
 
@@ -158,10 +155,6 @@ MYPASQL_BUILD=$(CC) /LD $(MYSQL_INC_PATH) src\mypasql.c /link $(MYSQL_LIB_PATH) 
 /DEF:src\mypasql.def libmysql.lib zlib.lib ws2_32.lib advapi32.lib /NODEFAULTLIB:LIBCMTD.lib
 
 LIBS=$(LIBS) libmysql.lib zlib.lib
-!ENDIF
-
-!IF $(PROXY_SCANNER) == 1
-BASE_CFLAGS=/D USE_THREADS $(BASE_CFLAGS)
 !ENDIF
 
 !IF $(DB_ENCRYPTION) == 1

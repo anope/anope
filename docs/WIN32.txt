@@ -52,31 +52,26 @@ Anope for Windows
            path one of two ways, either with \ or /. If you use \ you must
            add a secondary \; so c:\mysql would be c:\\mysql.
 
-        C) To use Anope's built in Proxy scanner you need to change
-           PROXY_SCANNER to be equal to 1 (i.e. PROXY_SCANNER=1). Please note
-           that the Anope's built in proxy scanner is not the best available,
-           and that it's recommended to use another third party scanner.
-
-        D) Do you want to use the MD5 message-digest algorithm to encrypt
+        C) Do you want to use the MD5 message-digest algorithm to encrypt
            passwords? Selecting "yes" protects your passwords from being
            stolen if someone gains access to the Services databases, but
            makes it impossible to recover forgotten passwords. There is no
            way to reverse this operation, so make sure you really want to
            enable it. Change DB_ENCRYPTION to be equal to 1 to enable it.
 
-        E) If you are using Visual Studio 6, this next line can be very
+        D) If you are using Visual Studio 6, this next line can be very
            important. If you are getting an error during compile about
            "unresolved external symbol __ftol2", remove the # in front of
            VC6=/QIfist and attempt to compile again.
 
-        F) If you get an error about "Cannot find wsock32.lib" or
+        E) If you get an error about "Cannot find wsock32.lib" or
            "Cannot find msvcrt.lib" when compiling, you need to define the
            libpath, in the LIBPATH directive. You can define the path in one
            of two ways: either with \ or /. If you use \ you must add a
            secondary \; so c:\sdk\lib would be c:\\sdk\\lib. Be sure to
            remove the # in front of LFLAGS.
 
-        G) Most import is to set the DATDEST to be the folder name where the
+        F) Most import is to set the DATDEST to be the folder name where the
            database will be stored. This does not need to be the full path,
            just the folder under the main executable in which data will
            exist. In our example we will use "data"

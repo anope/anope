@@ -1147,4 +1147,13 @@ char *stripModePrefix(const char *str) {
     return NULL;
 }
 
+/* Equivalent to inet_ntoa */
+
+void ntoa(struct in_addr addr, char *ipaddr, int len)
+{
+    unsigned char *bytes = (unsigned char *) &addr.s_addr;
+    snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
+             bytes[3]);
+}
+
 /* EOF */

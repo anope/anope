@@ -30,6 +30,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 01/30 F ChanServ help to reflect the avaiable commands.                   [ #00]
 01/30 F ChanServ used some commands that were not valid on all ircds.     [ #00]
 01/30 F Compiling modules under Mac OSX.                                  [#285]
+03/07 R Removed Proxy Detector from core.                                 [ #00]
 
 Provided by crazytoon <da.crew@gmx.net> - 2005
 02/05 A Updated German language file.                                     [ #00]

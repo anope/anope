@@ -592,14 +592,6 @@ int init(int ac, char **av)
     }
 #endif
 
-    /* Initialize proxy detection */
-#ifdef USE_THREADS
-    if (ProxyDetect && !proxy_init()) {
-        perror("proxy_init()");
-        return -1;
-    }
-#endif
-
     /* load any custom modules */
     modules_init();
 

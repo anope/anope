@@ -2294,8 +2294,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d βάσεις, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Sessions      : %6d βάσεις, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxies       : %6d βάσεις, %5d kB
 OPER_STATS_AKILL_COUNT
 	Ως τώρα υπάρχουν AKILLs: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2776,42 +2774,6 @@ OPER_USERLIST_END
 	Τέλος λίστας χρηστών.
 
 # CACHE responses
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hostname | pattern} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Η Proxy ανίχνευση είναι απενεργοποιημένη.
-OPER_CACHE_NOT_FOUND
-	%s δεν βρέθηκε στο cache.
-OPER_CACHE_REMOVED
-	%s διαγράφηκε από το cache.
-OPER_CACHE_HEADER
-	Μάσκα-host                                         Status
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Τέλος λίστας - %d/%d βρέθηκαν.
-OPER_CACHE_QUEUED
-	Queued
-OPER_CACHE_PROGRESS
-	In progress
-OPER_CACHE_NORMAL
-	Normal
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_SUPER_ADMIN_ON
 	You are now a SuperAdmin
 OPER_SUPER_ADMIN_OFF
@@ -5713,26 +5675,6 @@ OPER_HELP_USERLIST
 	    
 	Μόνο για τους Services admins.
 
-OPER_HELP_CACHE
-	Σύνταξη: CACHE DEL hostname
-	        CACHE LIST επιλογή [QUEUED | ALL]
-	
-	Η εντολή CACHE DEL διαγράφει τα συγκεκριμένα hostname από 
-	την cache.
-
-	Η εντολή CACHE LIST εμφανίζει την λίστα με όλα τα proxies που
-	βρέθηκαν και ταιριάζουν με την επιλογή που δώσατε. Αν δώσετε QUEUED
-	επιλογή, θα εμφανίσει λίστα με τα queued ή τα scans, και με την
-	ALL επιλογή θα εμφανίσει όλα τα cached hostnames.
-	    
-	Μόνο για τους Services admins.
-
-###########################################################################
-#
-# BotServ help messages
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD FileName
 

@@ -198,7 +198,6 @@ typedef struct akill_ Akill;
 typedef struct sxline_ SXLine;
 typedef struct hostcore_ HostCore;
 typedef struct newsitem_ NewsItem;
-typedef struct hostcache_ HostCache;
 typedef struct exception_ Exception;
 typedef struct cbmode_ CBMode;
 typedef struct cbmodeinfo_ CBModeInfo;
@@ -1023,32 +1022,6 @@ struct session_ {
 };
 
 /*************************************************************************/
-
-/* Proxy stuff */
-
-
-
-struct hostcache_ {
-	HostCache *prev, *next;
-
-	char *host;							/* The hostname */
-	uint32 ip;							/* The IP address */
-
-	int16 status;						/* HC_* below */
-	time_t used;						/* When was this entry last used? */
-};
-
-/* We assume that values < 0 are in-progress values, and values > 0 are
- * proxy value. 0 is the normal value.
- */
-
-#define HC_QUEUED		-2				/* Waiting to be scanned */
-#define HC_PROGRESS		-1				/* Currently being scanned */
-#define HC_NORMAL		 0				/* No proxy found on this host */
-#define HC_WINGATE		 1				/* Wingate found */
-#define HC_SOCKS4		 2				/* Socks4 found */
-#define HC_SOCKS5		 3				/* Socks5 found */
-#define HC_HTTP			 4				/* HTTP proxy found */
 
 /**
  * DEFCON Defines

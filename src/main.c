@@ -128,10 +128,6 @@ extern void expire_all(void)
         expire_szlines();
     }
     expire_exceptions();
-#ifdef USE_THREADS
-    if (ProxyDetect)
-        proxy_expire();
-#endif
     send_event(EVENT_DB_EXPIRE, EVENT_STOP);
 }
 

@@ -314,12 +314,11 @@ void rdb_save_hs_core(HostCore * hc)
 /*************************************************************************/
 
 void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                    SList * ak, SList * sgl, SList * sql, SList * szl,
-                    HostCache * hc)
+                    SList * ak, SList * sgl, SList * sql, SList * szl)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_os_db(maxusercnt, maxusertime, ak, sgl, sql, szl, hc);
+    db_mysql_save_os_db(maxusercnt, maxusertime, ak, sgl, sql, szl);
 #endif
 
 }

@@ -21,13 +21,13 @@ OBJS =  actions.obj base64.obj botserv.obj channels.obj chanserv.obj commands.ob
         converter.obj config.obj datafiles.obj encrypt.obj events.obj helpserv.obj hostserv.obj \
         init.obj language.obj list.obj log.obj mail.obj main.obj memory.obj memoserv.obj \
         messages.obj misc.obj modules.obj news.obj nickserv.obj operserv.obj \
-        process.obj proxy.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
+        process.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
         timeout.obj users.obj $(RDB_O) $(MYSQL_O) $(CAPAB_O)
         
 SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
         config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c language.c list.c \
 		log.c mail.c main.c memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c \
-		operserv.c process.c proxy.c send.c servers.obj sessions.c slist.c sockutil.c \
+		operserv.c process.c send.c servers.obj sessions.c slist.c sockutil.c \
         timeout.c users.c $(RDB_C) $(MYSQL_C) $(CAPAB_C)
 
 ###########################################################################
@@ -86,7 +86,6 @@ news.obj:                news.c                ..\include\services.h ..\include\
 nickserv.obj:        nickserv.c        ..\include\services.h ..\include\pseudo.h
 operserv.obj:        operserv.c        ..\include\services.h ..\include\pseudo.h
 process.obj:        process.c        ..\include\services.h ..\include\messages.h
-proxy.obj:        proxy.c                ..\include\services.h ..\include\pseudo.h
 send.obj:                send.c                ..\include\services.h
 servers.obj:     servers.c      ..\include\services.h
 sessions.obj:     sessions.c      ..\include\services.h ..\include\pseudo.h

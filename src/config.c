@@ -125,24 +125,6 @@ int RestrictMail;
 int MailDelay;
 int DontQuoteAddresses;
 
-int ProxyDetect;
-int ProxyThreads;
-char *ProxyMessage[8];
-int ProxyCheckWingate;
-int ProxyCheckSocks4;
-int ProxyCheckSocks5;
-int ProxyCheckHTTP1;
-int ProxyCheckHTTP2;
-int ProxyCheckHTTP3;
-int ProxyTimeout;
-char *ProxyTestServer;
-int ProxyTestPort;
-int ProxyExpire;
-int ProxyCacheExpire;
-char *ProxyAkillReason;
-int WallProxy;
-int ProxyMax;
-
 static int NSDefNone;
 char *NSGuestNickPrefix;
 int NSAllowKillImmed;
@@ -567,30 +549,6 @@ Directive directives[] = {
     {"OperServAlias", {{PARAM_STRING, 0, &s_OperServAlias},
                        {PARAM_STRING, 0, &desc_OperServAlias}}},
     {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
-    {"ProxyAkillReason",
-     {{PARAM_STRING, PARAM_RELOAD, &ProxyAkillReason}}},
-    {"ProxyCacheExpire", {{PARAM_TIME, PARAM_RELOAD, &ProxyCacheExpire}}},
-    {"ProxyCheckWingate", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckWingate}}},
-    {"ProxyCheckSocks4", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckSocks4}}},
-    {"ProxyCheckSocks5", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckSocks5}}},
-    {"ProxyCheckHTTP1", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckHTTP1}}},
-    {"ProxyCheckHTTP2", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckHTTP2}}},
-    {"ProxyCheckHTTP3", {{PARAM_SET, PARAM_RELOAD, &ProxyCheckHTTP3}}},
-    {"ProxyDetect", {{PARAM_SET, 0, &ProxyDetect}}},
-    {"ProxyExpire", {{PARAM_TIME, PARAM_RELOAD, &ProxyExpire}}},
-    {"ProxyMax", {{PARAM_POSINT, PARAM_RELOAD, &ProxyMax}}},
-    {"ProxyMessage1", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[0]}}},
-    {"ProxyMessage2", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[1]}}},
-    {"ProxyMessage3", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[2]}}},
-    {"ProxyMessage4", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[3]}}},
-    {"ProxyMessage5", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[4]}}},
-    {"ProxyMessage6", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[5]}}},
-    {"ProxyMessage7", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[6]}}},
-    {"ProxyMessage8", {{PARAM_STRING, PARAM_RELOAD, &ProxyMessage[7]}}},
-    {"ProxyTestServer", {{PARAM_STRING, PARAM_RELOAD, &ProxyTestServer},
-                         {PARAM_PORT, PARAM_RELOAD, &ProxyTestPort}}},
-    {"ProxyThreads", {{PARAM_POSINT, 0, &ProxyThreads}}},
-    {"ProxyTimeout", {{PARAM_TIME, PARAM_RELOAD, &ProxyTimeout}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
     {"RemoteServer", {{PARAM_STRING, 0, &RemoteServer},
                       {PARAM_PORT, 0, &RemotePort},
@@ -656,7 +614,6 @@ Directive directives[] = {
     {"WallOSSGLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSGLine}}},
     {"WallOSSQLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSQLine}}},
     {"WallOSSZLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSZLine}}},
-    {"WallProxy", {{PARAM_SET, PARAM_RELOAD, &WallProxy}}},
     {"WallSetpass", {{PARAM_SET, PARAM_RELOAD, &WallSetpass}}},
     {"WallSGLineExpire", {{PARAM_SET, PARAM_RELOAD, &WallSGLineExpire}}},
     {"WallSQLineExpire", {{PARAM_SET, PARAM_RELOAD, &WallSQLineExpire}}},
@@ -1365,15 +1322,6 @@ int read_config(int reload)
     if (UseMail) {
         CHECK(SendMailPath);
         CHECK(SendFrom);
-    }
-
-    if (ProxyDetect) {
-        CHECK(ProxyThreads);
-        CHECK(ProxyTimeout);
-        CHECK(ProxyTestServer);
-        CHECK(ProxyCacheExpire);
-        CHECK(ProxyAkillReason);
-        CHECK(ProxyMax);
     }
 
     if (GlobalOnCycle) {

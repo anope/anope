@@ -2260,8 +2260,6 @@ OPER_STATS_OPERSERV_MEM
 	OperServ	 : %6d bejegyzés, %5d kB
 OPER_STATS_SESSIONS_MEM
 	Session	 : %6d bejegyzés, %5d kB
-OPER_STATS_PROXY_MEM
-	Proxik	 : %6d bejegyzés, %5d kB
 OPER_STATS_AKILL_COUNT
 	Aktuális AKILLek száma: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
@@ -2738,34 +2736,6 @@ OPER_USERLIST_END
 	Vége a felhasználó listának.
 
 # CACHE válaszok
-OPER_CACHE_SYNTAX
-	CACHE {DEL | LIST} {hosztnév | pattern} [QUEUED | ALL]
-OPER_CACHE_DISABLED
-	Proxy ellenörzés tiltva.
-OPER_CACHE_NOT_FOUND
-	%s nem használt rejtést.
-OPER_CACHE_REMOVED
-	%s törölve lesz rejtés használatáért(proxi).
-OPER_CACHE_HEADER
-	Hosztnév					Státusz
-OPER_CACHE_LIST
-	%-48s %s
-OPER_CACHE_FOOTER
-	Vége a listának - %d/%d bejegyzés mutatása.
-OPER_CACHE_QUEUED
-	Várakozik
-OPER_CACHE_PROGRESS
-	Folyamatban
-OPER_CACHE_NORMAL
-	Normál
-OPER_CACHE_WINGATE
-	Wingate
-OPER_CACHE_SOCKS4
-	SOCKS 4
-OPER_CACHE_SOCKS5
-	SOCKS 5
-OPER_CACHE_HTTP
-	HTTP proxy
 OPER_SUPER_ADMIN_ON
 	Most már Szuper-Admin vagy
 OPER_SUPER_ADMIN_OFF
@@ -5603,20 +5573,6 @@ OPER_HELP_USERLIST
 	meg van adva, akkor csak az adott csatornán lévõket
 	listázza. Ha az INVISIBLE meg van adva, akkor csak a
 	+i flages usereket listázza.
-	
-	Korlátozva Szervíz adminoknak.
-	
-OPER_HELP_CACHE
-	Syntax: CACHE  DEL hostnév
-	        CACHE  LIST pattern [QUEUED | ALL]
-	
-	The CACHE DEL command deletes the specified hostname from 
-	the cache. This is meant for debug purpose only.
-	
-	The CACHE LIST command lists all found proxies that match the
-	given pattern. If the QUEUED option is given, it will list
-	the queued or in progress scans instead, and if the ALL option 
-	is given, it will list all cached hostnames.
 	
 	Korlátozva Szervíz adminoknak.
 	

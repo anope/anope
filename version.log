@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="642"
+VERSION_BUILD="643"
 
 # $Log$
+#
+# BUILD : 1.7.8 (643)
+# BUGS  : 
+# NOTES : Fixed: (1) memleak in nickIsServices [src/misc.c] (2) Fixed language files to reflect r641 (3) Updated nl.l (4) Added event of r642 to docs/EVENTS
 #
 # BUILD : 1.7.8 (642)
 # BUGS  : 

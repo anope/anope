@@ -210,6 +210,8 @@ NICK_X_ILLEGAL
 	Nick %s is an illegal nickname and cannot be used.
 NICK_X_TRUNCATED
 	Nick %s was truncated to %d characters.
+NICK_X_SUSPENDED
+	Nick %s is currently suspended.
 CHAN_X_NOT_REGISTERED
 	%s kanalý kayýtlý deðil.
 CHAN_X_NOT_IN_USE
@@ -627,6 +629,10 @@ NICK_INFO_FOR_MORE
 	Geniþ bilgi için, /msg %s INFO %s ALL yazýn.
 
 # LIST responses
+NICK_INFO_SUSPENDED
+	This nickname is currently suspended, reason: %s
+
+# LIST responses
 NICK_LIST_SYNTAX
 	LIST model
 NICK_LIST_SERVADMIN_SYNTAX
@@ -726,6 +732,22 @@ NICK_SENDPASS_LINE_5
 	%s yönetimi.
 NICK_SENDPASS_OK
 	%s nickinin þifresi gönderildi.
+
+# FORBID responses
+NICK_SUSPEND_SYNTAX
+	SUSPEND nickname reason
+NICK_SUSPEND_SUCCEEDED
+	Nick %s is now suspended.
+NICK_SUSPEND_FAILED
+	Couldn't suspend nick %s!
+
+# UNSUSPEND responses
+NICK_UNSUSPEND_SYNTAX
+	UNSUSPEND nickname
+NICK_UNSUSPEND_SUCCEEDED
+	Nick %s is now released.
+NICK_UNSUSPEND_FAILED
+	Couldn't release nick %s!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -3820,6 +3842,19 @@ NICK_SERVADMIN_HELP_FORBID
 	Bazý networklerde, sebep yazýlmasý gereklidir.
 	
 	Sadece Servis adminleri tarafýndan kullanýlýr.
+
+###########################################################################
+#
+# ChanServ help messages
+#
+###########################################################################
+
+NICK_SERVADMIN_HELP_SUSPEND
+	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+
+	SUSPENDs / UNSUSPENDs a nickname from being identified to
+	
+	Limited to Services admins.
 
 ###########################################################################
 #

@@ -209,6 +209,8 @@ NICK_X_ILLEGAL
 	Nick %s is een illegale nickname en mag niet worden gebruikt.
 NICK_X_TRUNCATED
 	Nick %s is verkort naar %d tekens.
+NICK_X_SUSPENDED
+	Nick %s is tijdelijk buiten werking gesteld.
 CHAN_X_NOT_REGISTERED
 	Channel %s is niet geregistreerd.
 CHAN_X_NOT_IN_USE
@@ -624,6 +626,10 @@ NICK_INFO_FOR_MORE
 	Voor meer informatie, type /msg %s INFO %s ALL.
 
 # LIST responses
+NICK_INFO_SUSPENDED
+	Deze nick is tijdelijk buiten werking gesteld, reden: %s
+
+# LIST responses
 NICK_LIST_SYNTAX
 	LIST trefbeeld
 NICK_LIST_SERVADMIN_SYNTAX
@@ -723,6 +729,22 @@ NICK_SENDPASS_LINE_5
 	%s beheerders.
 NICK_SENDPASS_OK
 	Wachtwoord %s is verstuurd.
+
+# FORBID responses
+NICK_SUSPEND_SYNTAX
+	SUSPEND nick reden
+NICK_SUSPEND_SUCCEEDED
+	Nick %s is tijdelijk buiten werking gesteld.
+NICK_SUSPEND_FAILED
+	Kan nick %s niet tijdelijk buiten werking stellen!
+
+# UNSUSPEND responses
+NICK_UNSUSPEND_SYNTAX
+	UNSUSPEND nick
+NICK_UNSUSPEND_SUCCEEDED
+	Nick %s is nu vrijgegeven.
+NICK_UNSUSPEND_FAILED
+	Kan nick %s niet vrijgeven!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -3791,6 +3813,20 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	Gelimiteerd tot Services admins.
 
+
+###########################################################################
+#
+# ChanServ help messages
+#
+###########################################################################
+
+NICK_SERVADMIN_HELP_SUSPEND
+	Gebruik: SUSPEND nick reden / UNSUSPEND nick
+
+	Stelt een nick tijdelijk buiten werking. Een nick die buiten werking
+	is gesteld kan niet worden gebruikt: identificatie wordt uitgeschakeld.
+	
+	Gelimited to Services admins.
 
 ###########################################################################
 #

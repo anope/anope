@@ -216,6 +216,8 @@ NICK_X_ILLEGAL
 	 %snick illegális nicknév vagy nem használható.
 NICK_X_TRUNCATED
 	A nicked %s meg lett csonkítva %d karakter hosszúságúra.
+NICK_X_SUSPENDED
+	Nick %s is currently suspended.
 CHAN_X_NOT_REGISTERED
 	 %s szoba nem regisztrált.
 CHAN_X_NOT_IN_USE
@@ -620,6 +622,10 @@ NICK_INFO_FOR_MORE
 	Bõvebb információkért, írd be: /msg %s INFO %s ALL.
 
 # LIST válaszok
+NICK_INFO_SUSPENDED
+	This nickname is currently suspended, reason: %s
+
+# LIST responses
 NICK_LIST_SYNTAX
 	LIST pattern
 NICK_LIST_SERVADMIN_SYNTAX
@@ -721,6 +727,22 @@ NICK_SENDPASS_OK
 	%s nick jelszava elküldve.
 
 # FORBID válaszok
+NICK_SUSPEND_SYNTAX
+	SUSPEND nickname reason
+NICK_SUSPEND_SUCCEEDED
+	Nick %s is now suspended.
+NICK_SUSPEND_FAILED
+	Couldn't suspend nick %s!
+
+# UNSUSPEND responses
+NICK_UNSUSPEND_SYNTAX
+	UNSUSPEND nickname
+NICK_UNSUSPEND_SUCCEEDED
+	Nick %s is now released.
+NICK_UNSUSPEND_FAILED
+	Couldn't release nick %s!
+
+# FORBID responses
 NICK_FORBID_SYNTAX
 	FORBID nicknév [indok]
 NICK_FORBID_SYNTAX_REASON
@@ -3736,6 +3758,19 @@ NICK_SERVADMIN_HELP_FORBID
 #
 ###########################################################
 	
+NICK_SERVADMIN_HELP_SUSPEND
+	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+
+	SUSPENDs / UNSUSPENDs a nickname from being identified to
+	
+	Limited to Services admins.
+
+###########################################################################
+#
+# ChanServ help messages
+#
+###########################################################################
+
 CHAN_HELP
 	
 	%S lehetõséget ad arra, hogy regisztráld a csatornádat.

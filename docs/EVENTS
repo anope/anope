@@ -238,8 +238,7 @@ Anope Internal Events
 
     EVENT_NICK_FORBIDDEN
         A user's nick has just been forbidden.
-        The argument contains the nickname of the user that has just been
-        forbidden.
+        The argument contains the nickname that has just been forbidden.
 
     EVENT_NICK_IDENTIFY
         A user has just identified for it's nickname with NickServ.
@@ -250,6 +249,10 @@ Anope Internal Events
         emitted when the registration is completed, but the user modes have not
         yet been set.
         The argument contains the nickname of the newly registered user.
+
+    EVENT_NICK_SUSPEND
+        A user's nick has just been suspended.
+        The argument contains the nickname that has just been suspended.
 
     EVENT_RESTART
         This event is emitted before the services are being restarted.

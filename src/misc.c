@@ -878,7 +878,10 @@ int nickIsServices(char *tempnick, int bot)
             }
         }
     }
-
+	
+	/* Somehow, something tells me we should free this :) -GD */
+	free(nick);
+	
     return found;
 }
 

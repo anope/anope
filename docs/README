@@ -185,6 +185,7 @@ the behavior of Anope:
                         possible, even if errors are encountered
     -noexpire       Expiration routines won't be run at all
     -logchan        Startup with logchan enabled
+    -version	    Display the version of Anope
 
      Upon starting, Anope will parse its command-line parameters, open
 its logfile, then (assuming the -nofork option is not given) detach itself

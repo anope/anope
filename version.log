@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="362"
+VERSION_BUILD="363"
 
 # $Log$
+#
+# BUILD : 1.7.5 (363)
+# NOTES : Added unreal fix from Trystan.
 #
 # BUILD : 1.7.5 (362)
 # BUGS  : 17 143 147 166 172 173

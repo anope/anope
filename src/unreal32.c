@@ -1782,13 +1782,15 @@ int anope_event_server(char *source, int ac, char **av)
     char *vl;
     char *numeric;
 
-    if (!stricmp(av[1], "1"))
+    if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
-
-    vl = myStrGetToken(av[2], ' ', 0);
-    numeric = myStrGetToken(vl, '-', 2);
-    desc = myStrGetTokenRemainder(av[2], ' ', 1);
-    do_server(source, av[0], av[1], desc, numeric);
+        vl = myStrGetToken(av[2], ' ', 0);
+        numeric = myStrGetToken(vl, '-', 2);
+        desc = myStrGetTokenRemainder(av[2], ' ', 1);
+        do_server(source, av[0], av[1], desc, numeric);
+    } else {
+        do_server(source, av[0], av[1], av[2], NULL);
+    }
 
     return MOD_CONT;
 }

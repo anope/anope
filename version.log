@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="552"
+VERSION_BUILD="553"
 
 # $Log$
+#
+# BUILD : 1.7.7 (553)
+# BUGS  : none
+# NOTES : Forgot Changes file :)
 #
 # BUILD : 1.7.7 (552)
 # BUGS  : none

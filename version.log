@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="495"
+VERSION_BUILD="496"
 
 # $Log$
+#
+# BUILD : 1.7.6 (496)
+# BUGS  : N/A
+# NOTES : Dreamforge now compiles properly again :)
 #
 # BUILD : 1.7.6 (495)
 # BUGS  : N/A

@@ -8521,6 +8521,14 @@ _ACEOF
 
 		IRCDFILE=" bahamut.c "
 
+    elif test "$withval" = "IRC_DREAMFORGE"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define IRC_DREAMFORGE 1
+_ACEOF
+
+                IRCDFILE=" dreamforge.c "
+
     elif test "$withval" = "IRC_UNREAL31"; then
 
 cat >>confdefs.h <<\_ACEOF

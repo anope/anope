@@ -197,6 +197,10 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
     	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
 		IRCDFILE=" bahamut.c "
 		AC_SUBST(IRCDFILE)
+    elif test "$withval" = "IRC_DREAMFORGE"; then
+                AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
+                IRCDFILE=" dreamforge.c "
+	        AC_SUBST(IRCDFILE)
     elif test "$withval" = "IRC_UNREAL31"; then
 		AC_DEFINE(IRC_UNREAL31,1,"First IRCD type")
 		IRCDFILE=" unreal31.c "

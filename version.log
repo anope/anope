@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="532"
+VERSION_BUILD="533"
 
 # $Log$
+#
+# BUILD : 1.7.7 (533)
+# BUGS  : N/A
+# NOTES : Added make profile to allow for gprof profiling
 #
 # BUILD : 1.7.7 (532)
 # NOTES : Updated es.l by DrStein

@@ -4,16 +4,19 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
       	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 
+   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
+	   'PROFILE=${PROFILE}'
 
 OBJECTS= $(SRCS:.c=.o)
 SO_FILES=$(OBJECTS:.o=.s)
 CDEFS= -g -rdynamic -Wall
 CFLAGS=$(CFLAGS) $(CDEFS)
 
-all: $(OBJECTS)
+all: modules
 
-install:  $(SO_FILES)
+modules: $(OBJECTS) $(SO_FILES)
+
+install: 
 	$(CP) ./*.so $(MODULE_PATH) 
 
 distclean: clean spotless
@@ -22,7 +25,7 @@ distclean: clean spotless
 	$(CC) $(CFLAGS) -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	ld -shared $< -o $*.so
+	$(CC) -shared $< -o $*.so ${PROFILE}
 
 clean:
 	rm -f *.o *.so *.c~ core

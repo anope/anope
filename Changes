@@ -1,6 +1,7 @@
 Anope Version 1.7.7
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004/2005
+01/12 A Added make profile to allow for gprof profileing of anope.        [ #00]
 12/30 A Warnings for NULL values with sstrdup/moduleData.                 [#261]
 12/26 A Services can enforce SGLINE/SQLINE by killing the user on set.    [#245]
 12/25 A Flag to tell if we need to enforce SGlines or not.                [ #00]

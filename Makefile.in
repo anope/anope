@@ -3,6 +3,8 @@ INCLUDEDIR=../include
 ANOPELIBS=@ANOPELIBS@
 CFLAGS=@CFLAGS@
 STRICT=-Wall -ansi -pedantic
+PROFILE=-pg
+LDPROFILE=
 SHELL=/bin/sh
 SUBDIRS=src
 BINDEST=@BINDEST@
@@ -20,6 +22,7 @@ IRCDFILE=@IRCDFILE@
 
 all:   language headers build modules
 strict: language headers strict_build strict_modules
+profile: language headers profile_build profile_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -40,12 +43,22 @@ strict_build:
             ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; ) \
         done
 
+profile_build:
+	@for i in $(SUBDIRS); do \
+            echo "*** Strict Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(PROFILE)' 'LDFLAGS=${LDFLAGS} ${PROFILE}' all; ) \
+        done
+
 modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
 strict_modules: strict_build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=$(CFLAGS) $(STRICT)' all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
+
+profile_modules: profile_build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
 language:

@@ -37,5 +37,6 @@ install:
         -@copy *.dll ..\..\$(DATDEST)\modules
 
 subs-install: install
-	@for i in ( $(SUBS) ); do \
+	@for %i in ( $(SUBS) ); do \
 		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) install && cd ..
+

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="586"
+VERSION_BUILD="587"
 
 # $Log$
+#
+# BUILD : 1.7.8 (587)
+# BUGS  : N/A
+# NOTES : Fixed a typo in the win32 makefile.inc
+# 
 #
 # BUILD : 1.7.8 (586)
 # BUGS  : N/A

@@ -40,7 +40,7 @@ USE_MYSQL=0
 # Set this to 1 to enable the proxy scanner
 PROXY_SCANNER=0
 
-# Set this to 1 to enable the proxy scanner
+# Set this to 1 to enable database encryption
 DB_ENCRYPTION=0
 
 # If you want to change the names/locations of files/folders, you

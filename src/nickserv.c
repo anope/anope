@@ -97,22 +97,22 @@ static int do_listlinks(User * u);
 /* *INDENT-OFF* */
 void moduleAddNickServCmds(void) {
     Command *c;
-    c = createCommand("HELP",     do_help,     NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("REGISTER", do_register, NULL,  NICK_HELP_REGISTER,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("RESEND", do_resend,     NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("CONFIRM",  do_confirm,  NULL,  -1,		      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("GROUP",    do_group,    NULL,  NICK_HELP_GROUP,        -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("UPDATE",   do_nickupdate,    NULL,  NICK_HELP_UPDATE,        -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("ID",       do_identify, NULL,  NICK_HELP_IDENTIFY,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("IDENTIFY", do_identify, NULL,  NICK_HELP_IDENTIFY,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("SIDENTIFY",do_identify, NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("LOGOUT",   do_logout,   NULL,  -1,NICK_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT,NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT); addCoreCommand(NICKSERV,c);
-    c = createCommand("DROP",     do_drop,     NULL,  -1,NICK_HELP_DROP, NICK_SERVADMIN_HELP_DROP,NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP); addCoreCommand(NICKSERV,c);
-    c = createCommand("LINK",     do_link,     NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("UNLINK",   do_unlink,   NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("LISTLINKS",do_listlinks,NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("ACCESS",   do_access,   NULL,  NICK_HELP_ACCESS,       -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("SET",      do_set,      NULL,  NICK_HELP_SET,-1, NICK_SERVADMIN_HELP_SET,NICK_SERVADMIN_HELP_SET, NICK_SERVADMIN_HELP_SET); addCoreCommand(NICKSERV,c);
+    c = createCommand("HELP",     do_help,       NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("REGISTER", do_register,   NULL,  NICK_HELP_REGISTER,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("RESEND", do_resend,       NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("CONFIRM",  do_confirm,    NULL,  -1,		      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("GROUP",    do_group,      NULL,  NICK_HELP_GROUP,        -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("UPDATE",   do_nickupdate, NULL,  NICK_HELP_UPDATE,        -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("ID",       do_identify,   NULL,  NICK_HELP_IDENTIFY,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("IDENTIFY", do_identify,   NULL,  NICK_HELP_IDENTIFY,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("SIDENTIFY",do_identify,   NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("LOGOUT",   do_logout,     NULL,  -1,NICK_HELP_LOGOUT, -1,NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT); addCoreCommand(NICKSERV,c);
+    c = createCommand("DROP",     do_drop,       NULL,  -1,NICK_HELP_DROP, -1,NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP); addCoreCommand(NICKSERV,c);
+    c = createCommand("LINK",     do_link,       NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("UNLINK",   do_unlink,     NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("LISTLINKS",do_listlinks,  NULL,  -1,                     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("ACCESS",   do_access,     NULL,  NICK_HELP_ACCESS,       -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
+    c = createCommand("SET",      do_set,        NULL,  NICK_HELP_SET,-1, -1,NICK_SERVADMIN_HELP_SET, NICK_SERVADMIN_HELP_SET); addCoreCommand(NICKSERV,c);
     c = createCommand("SET DISPLAY",  NULL,    NULL,  NICK_HELP_SET_DISPLAY,  -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("SET PASSWORD", NULL,    NULL,  NICK_HELP_SET_PASSWORD, -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("SET URL",      NULL,    NULL,  NICK_HELP_SET_URL,      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
@@ -124,19 +124,19 @@ void moduleAddNickServCmds(void) {
     c = createCommand("SET PRIVATE",  NULL,    NULL,  NICK_HELP_SET_PRIVATE,  -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("SET MSG",      NULL,    NULL,  NICK_HELP_SET_MSG,      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("SET HIDE",     NULL,    NULL,  NICK_HELP_SET_HIDE,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("SET NOEXPIRE", NULL,    NULL,  -1, -1,NICK_SERVADMIN_HELP_SET_NOEXPIRE,NICK_SERVADMIN_HELP_SET_NOEXPIRE,NICK_SERVADMIN_HELP_SET_NOEXPIRE); addCoreCommand(NICKSERV,c);
+    c = createCommand("SET NOEXPIRE", NULL,    NULL,  -1, -1,-1,NICK_SERVADMIN_HELP_SET_NOEXPIRE,NICK_SERVADMIN_HELP_SET_NOEXPIRE); addCoreCommand(NICKSERV,c);
     c = createCommand("RECOVER",  do_recover,  NULL,  NICK_HELP_RECOVER,      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("RELEASE",  do_release,  NULL,  NICK_HELP_RELEASE,      -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("GHOST",    do_ghost,    NULL,  NICK_HELP_GHOST,        -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("INFO",     do_info,     NULL,  NICK_HELP_INFO,-1, NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO,NICK_SERVADMIN_HELP_INFO); addCoreCommand(NICKSERV,c);
-    c = createCommand("LIST",     do_list,     NULL,  -1,NICK_HELP_LIST, NICK_SERVADMIN_HELP_LIST,NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST); addCoreCommand(NICKSERV,c);
-    c = createCommand("ALIST",    do_alist,    NULL,  -1,NICK_HELP_ALIST, NICK_SERVADMIN_HELP_ALIST,NICK_SERVADMIN_HELP_ALIST, NICK_SERVADMIN_HELP_ALIST); addCoreCommand(NICKSERV,c);
-    c = createCommand("GLIST",    do_glist,    NULL,  -1,NICK_HELP_GLIST, NICK_SERVADMIN_HELP_GLIST,NICK_SERVADMIN_HELP_GLIST, NICK_SERVADMIN_HELP_GLIST); addCoreCommand(NICKSERV,c);
+    c = createCommand("LIST",     do_list,     NULL,  -1,NICK_HELP_LIST, -1,NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST); addCoreCommand(NICKSERV,c);
+    c = createCommand("ALIST",    do_alist,    NULL,  -1,NICK_HELP_ALIST, -1,NICK_SERVADMIN_HELP_ALIST, NICK_SERVADMIN_HELP_ALIST); addCoreCommand(NICKSERV,c);
+    c = createCommand("GLIST",    do_glist,    NULL,  -1,NICK_HELP_GLIST, -1,NICK_SERVADMIN_HELP_GLIST, NICK_SERVADMIN_HELP_GLIST); addCoreCommand(NICKSERV,c);
     c = createCommand("STATUS",   do_status,   NULL,  NICK_HELP_STATUS,       -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
     c = createCommand("SENDPASS", do_sendpass, NULL,  NICK_HELP_SENDPASS,     -1,-1,-1,-1); addCoreCommand(NICKSERV,c);
-    c = createCommand("GETPASS",  do_getpass,  is_services_admin,  -1,-1, NICK_SERVADMIN_HELP_GETPASS,NICK_SERVADMIN_HELP_GETPASS, NICK_SERVADMIN_HELP_GETPASS); addCoreCommand(NICKSERV,c);
-    c = createCommand("GETEMAIL", do_getemail, is_services_admin,  -1,-1, NICK_SERVADMIN_HELP_GETEMAIL,NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL); addCoreCommand(NICKSERV,c);
-    c = createCommand("FORBID",   do_forbid,   is_services_admin,  -1,-1, NICK_SERVADMIN_HELP_FORBID,NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID); addCoreCommand(NICKSERV,c);
+    c = createCommand("GETPASS",  do_getpass,  is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_GETPASS, NICK_SERVADMIN_HELP_GETPASS); addCoreCommand(NICKSERV,c);
+    c = createCommand("GETEMAIL", do_getemail, is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL); addCoreCommand(NICKSERV,c);
+    c = createCommand("FORBID",   do_forbid,   is_services_admin,  -1,-1, -1,NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID); addCoreCommand(NICKSERV,c);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

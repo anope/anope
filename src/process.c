@@ -80,6 +80,19 @@ IgnoreData *get_ignore(const char *nick)
     IgnoreData **whichlistast = &ignore[42];    /* * */
     IgnoreData **whichlistqst = &ignore[63];    /* ? */
     int finished = 0;
+
+
+    /* User has disabled the IGNORE system */
+    if (!allow_ignore) {
+        return NULL;
+    }
+
+    /* if an oper gets on the ignore list we let them privmsg, this will allow
+       them in places we call get_ignore to get by */
+    if (u && is_oper(u)) {
+        return NULL;
+    }
+
     for (ign = *whichlist, prev = NULL; ign; prev = ign, ign = ign->next) {
         if (stricmp(ign->who, nick) == 0) {
             finished = 1;

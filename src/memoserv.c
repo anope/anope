@@ -48,14 +48,14 @@ void moduleAddMemoServCmds(void) {
     c = createCommand("LIST",       do_list, 	NULL,  MEMO_HELP_LIST,          -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
     c = createCommand("READ",       do_read, 	NULL,  MEMO_HELP_READ,          -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
     c = createCommand("DEL",        do_del,  	NULL,  MEMO_HELP_DEL,           -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
-    c = createCommand("STAFF",      do_staff,   is_services_oper,  MEMO_HELP_STAFF,         -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
+    c = createCommand("STAFF",      do_staff,   is_services_oper,  -1,          -1,MEMO_HELP_STAFF,MEMO_HELP_STAFF,MEMO_HELP_STAFF); addCoreCommand(MEMOSERV,c);
     c = createCommand("SET",        do_set,  	NULL,  MEMO_HELP_SET,           -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
     c = createCommand("SET NOTIFY", NULL,    	NULL,  MEMO_HELP_SET_NOTIFY,    -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
     c = createCommand("SET LIMIT",  NULL,    	NULL,  -1,MEMO_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT,MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT); addCoreCommand(MEMOSERV,c);
-    c = createCommand("INFO",       do_info, NULL,  -1,MEMO_HELP_INFO, MEMO_SERVADMIN_HELP_INFO,MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO); addCoreCommand(MEMOSERV,c);
-    c = createCommand("SENDALL",    do_sendall, is_services_admin, MEMO_HELP_SENDALL,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
-    c = createCommand("RSEND",    do_rsend, NULL, MEMO_HELP_RSEND,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
-    c = createCommand("CHECK",    do_memocheck, NULL, MEMO_HELP_CHECK,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
+    c = createCommand("INFO",       do_info, NULL,  -1,MEMO_HELP_INFO, -1,MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO); addCoreCommand(MEMOSERV,c);
+    c = createCommand("SENDALL",    do_sendall, is_services_admin, -1, -1,-1,MEMO_HELP_SENDALL,MEMO_HELP_SENDALL); addCoreCommand(MEMOSERV,c);
+    c = createCommand("RSEND",      do_rsend, NULL, MEMO_HELP_RSEND,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
+    c = createCommand("CHECK",      do_memocheck, NULL, MEMO_HELP_CHECK,       -1,-1,-1,-1); addCoreCommand(MEMOSERV,c);
 }
 
 /*************************************************************************/

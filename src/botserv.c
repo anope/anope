@@ -69,7 +69,7 @@ void moduleAddBotServCmds(void) {
     c = createCommand("ASSIGN",			    do_assign,   NULL,  BOT_HELP_ASSIGN,             -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
     c = createCommand("UNASSIGN",		    do_unassign, NULL,  BOT_HELP_UNASSIGN,           -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
     c = createCommand("INFO",               do_info,     NULL,  BOT_HELP_INFO,               -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
-    c = createCommand("SET",                do_set,      NULL,  BOT_HELP_SET,-1, BOT_SERVADMIN_HELP_SET,BOT_SERVADMIN_HELP_SET, BOT_SERVADMIN_HELP_SET); addCoreCommand(BOTSERV,c);
+    c = createCommand("SET",                do_set,      NULL,  BOT_HELP_SET,                -1,-1,BOT_SERVADMIN_HELP_SET, BOT_SERVADMIN_HELP_SET); addCoreCommand(BOTSERV,c);
     c = createCommand("SET DONTKICKOPS",    NULL,        NULL,  BOT_HELP_SET_DONTKICKOPS,    -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
     c = createCommand("SET DONTKICKVOICES", NULL,        NULL,  BOT_HELP_SET_DONTKICKVOICES, -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
     c = createCommand("SET FANTASY",		NULL,		 NULL,	BOT_HELP_SET_FANTASY,		 -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
@@ -89,9 +89,9 @@ void moduleAddBotServCmds(void) {
     c = createCommand("ACT",				do_act,		 NULL,  BOT_HELP_ACT,				 -1,-1,-1,-1); addCoreCommand(BOTSERV,c);
 
     /* Services admins commands */
-    c = createCommand("BOT",		do_bot,   is_services_admin,  -1,-1, BOT_SERVADMIN_HELP_BOT,BOT_SERVADMIN_HELP_BOT, BOT_SERVADMIN_HELP_BOT); addCoreCommand(BOTSERV,c);
-    c = createCommand("SET NOBOT", 	NULL,	 NULL,	-1,-1, BOT_SERVADMIN_HELP_SET_NOBOT,BOT_SERVADMIN_HELP_SET_NOBOT, BOT_SERVADMIN_HELP_SET_NOBOT); addCoreCommand(BOTSERV,c);
-    c = createCommand("SET PRIVATE", NULL,	 NULL,	-1,-1, BOT_SERVADMIN_HELP_SET_PRIVATE,BOT_SERVADMIN_HELP_SET_PRIVATE, BOT_SERVADMIN_HELP_SET_PRIVATE); addCoreCommand(BOTSERV,c);
+    c = createCommand("BOT",		do_bot,   is_services_admin,  -1,-1, -1,BOT_SERVADMIN_HELP_BOT, BOT_SERVADMIN_HELP_BOT); addCoreCommand(BOTSERV,c);
+    c = createCommand("SET NOBOT", 	NULL,	 NULL,	-1,-1, -1,BOT_SERVADMIN_HELP_SET_NOBOT, BOT_SERVADMIN_HELP_SET_NOBOT); addCoreCommand(BOTSERV,c);
+    c = createCommand("SET PRIVATE", NULL,	 NULL,	-1,-1, -1,BOT_SERVADMIN_HELP_SET_PRIVATE, BOT_SERVADMIN_HELP_SET_PRIVATE); addCoreCommand(BOTSERV,c);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

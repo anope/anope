@@ -264,9 +264,9 @@ void moduleAddChanServCmds(void) {
     c = createCommand("HELP",     do_help,     NULL,  -1,                       -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("REGISTER", do_register, NULL,  CHAN_HELP_REGISTER,       -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("IDENTIFY", do_identify, NULL,  CHAN_HELP_IDENTIFY,       -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
-    c = createCommand("LOGOUT",   do_logout,   NULL,  -1,CHAN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT,CHAN_SERVADMIN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT); addCoreCommand(CHANSERV,c);
-    c = createCommand("DROP",     do_drop,     NULL,  -1,CHAN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP,CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP); addCoreCommand(CHANSERV,c);
-    c = createCommand("SET",      do_set,      NULL,  CHAN_HELP_SET,-1, CHAN_SERVADMIN_HELP_SET,CHAN_SERVADMIN_HELP_SET, CHAN_SERVADMIN_HELP_SET); addCoreCommand(CHANSERV,c);
+    c = createCommand("LOGOUT",   do_logout,   NULL,  -1,CHAN_HELP_LOGOUT, -1,CHAN_SERVADMIN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT); addCoreCommand(CHANSERV,c);
+    c = createCommand("DROP",     do_drop,     NULL,  -1,CHAN_HELP_DROP, -1,CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP); addCoreCommand(CHANSERV,c);
+    c = createCommand("SET",      do_set,      NULL,  CHAN_HELP_SET,-1, -1,CHAN_SERVADMIN_HELP_SET, CHAN_SERVADMIN_HELP_SET); addCoreCommand(CHANSERV,c);
     c = createCommand("SET FOUNDER",    NULL,  NULL,  CHAN_HELP_SET_FOUNDER,    -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SET SUCCESSOR",  NULL,  NULL,  CHAN_HELP_SET_SUCCESSOR,  -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SET PASSWORD",   NULL,  NULL,  CHAN_HELP_SET_PASSWORD,   -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
@@ -287,7 +287,7 @@ void moduleAddChanServCmds(void) {
     c = createCommand("SET OPNOTICE",   NULL,  NULL,  CHAN_HELP_SET_OPNOTICE,   -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SET XOP",        NULL,  NULL,  CHAN_HELP_SET_XOP,        -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SET PEACE",      NULL,  NULL,  CHAN_HELP_SET_PEACE,      -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
-    c = createCommand("SET NOEXPIRE",   NULL,  NULL,  -1, -1,CHAN_SERVADMIN_HELP_SET_NOEXPIRE,CHAN_SERVADMIN_HELP_SET_NOEXPIRE,CHAN_SERVADMIN_HELP_SET_NOEXPIRE); addCoreCommand(CHANSERV,c);
+    c = createCommand("SET NOEXPIRE",   NULL,  NULL,  -1, -1, -1,CHAN_SERVADMIN_HELP_SET_NOEXPIRE,CHAN_SERVADMIN_HELP_SET_NOEXPIRE); addCoreCommand(CHANSERV,c);
     c = createCommand("AOP",      do_aop,      NULL,  CHAN_HELP_AOP,            -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("HOP",      do_hop,      NULL,  CHAN_HELP_HOP,            -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SOP",      do_sop,      NULL,  CHAN_HELP_SOP,            -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
@@ -318,11 +318,11 @@ void moduleAddChanServCmds(void) {
     c = createCommand("CLEAR",    do_clear,    NULL,  CHAN_HELP_CLEAR,          -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("GETKEY",   do_getkey,   NULL,  CHAN_HELP_GETKEY,         -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
     c = createCommand("SENDPASS", do_sendpass, NULL,  CHAN_HELP_SENDPASS,       -1,-1,-1,-1); addCoreCommand(CHANSERV,c);
-    c = createCommand("GETPASS",  do_getpass,  is_services_admin,  -1,-1, CHAN_SERVADMIN_HELP_GETPASS,CHAN_SERVADMIN_HELP_GETPASS, CHAN_SERVADMIN_HELP_GETPASS); addCoreCommand(CHANSERV,c);
-    c = createCommand("FORBID",   do_forbid,   is_services_admin,  -1,-1, CHAN_SERVADMIN_HELP_FORBID,CHAN_SERVADMIN_HELP_FORBID, CHAN_SERVADMIN_HELP_FORBID); addCoreCommand(CHANSERV,c);
-    c = createCommand("SUSPEND",   do_suspend,   is_services_admin,  -1,-1, CHAN_SERVADMIN_HELP_SUSPEND,CHAN_SERVADMIN_HELP_SUSPEND, CHAN_SERVADMIN_HELP_SUSPEND); addCoreCommand(CHANSERV,c);
-    c = createCommand("UNSUSPEND",   do_unsuspend,   is_services_admin,  -1,-1, CHAN_SERVADMIN_HELP_UNSUSPEND,CHAN_SERVADMIN_HELP_UNSUSPEND, CHAN_SERVADMIN_HELP_UNSUSPEND); addCoreCommand(CHANSERV,c);
-    c = createCommand("STATUS",   do_status,   is_services_admin,  -1,-1, CHAN_SERVADMIN_HELP_STATUS,CHAN_SERVADMIN_HELP_STATUS, CHAN_SERVADMIN_HELP_STATUS); addCoreCommand(CHANSERV,c);
+    c = createCommand("GETPASS",  do_getpass,   is_services_admin,  -1, -1, -1, CHAN_SERVADMIN_HELP_GETPASS, CHAN_SERVADMIN_HELP_GETPASS); addCoreCommand(CHANSERV,c);
+    c = createCommand("FORBID",   do_forbid,    is_services_admin,  -1, -1, -1, CHAN_SERVADMIN_HELP_FORBID, CHAN_SERVADMIN_HELP_FORBID); addCoreCommand(CHANSERV,c);
+    c = createCommand("SUSPEND",  do_suspend,   is_services_admin,  -1, -1, -1, CHAN_SERVADMIN_HELP_SUSPEND, CHAN_SERVADMIN_HELP_SUSPEND); addCoreCommand(CHANSERV,c);
+    c = createCommand("UNSUSPEND",do_unsuspend, is_services_admin,  -1, -1, -1, CHAN_SERVADMIN_HELP_UNSUSPEND, CHAN_SERVADMIN_HELP_UNSUSPEND); addCoreCommand(CHANSERV,c);
+    c = createCommand("STATUS",   do_status,    is_services_admin,  -1, -1, -1, CHAN_SERVADMIN_HELP_STATUS, CHAN_SERVADMIN_HELP_STATUS); addCoreCommand(CHANSERV,c);
 }
 
 /* *INDENT-ON* */

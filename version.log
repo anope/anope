@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="321"
+VERSION_BUILD="322"
 
 # $Log$
+#
+# BUILD : 1.7.5 (322)
+# BUGS  : 
+# NOTES : fixed small lang mistake
 #
 # BUILD : 1.7.5 (321)
 # BUGS  : none

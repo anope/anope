@@ -1757,7 +1757,7 @@ BOT_NOT_ON_CHANNEL
 	
 # Kick reasons (must be a single line)
 BOT_REASON_BADWORD
-	Don't use word %s on this channel!
+	Don't use the word \"%s\" on this channel!
 BOT_REASON_BADWORD_GENTLE
 	Watch your language!
 BOT_REASON_BOLD

@@ -15,7 +15,7 @@ ANOPEBIN=""
 ANOPROG="services"
 
 # SCRIPT VERSION NUMBER (DO NOT ALTER)
-ARCVERSION="1.0"
+ARCVERSION="1.1"
 
 
 ################################################
@@ -39,6 +39,11 @@ fi
 
 if [ "$ANOPEBIN" = "" ] ; then
 	echo "Error: Please open this file set the variables correctly";
+	exit 1
+fi
+
+if [ ! -f $ANOPEBIN$ANOPROG ] ; then
+	echo "Error: $ANOPEBIN$ANOPROG cannot be accessed"
 	exit 1
 fi
 
@@ -116,7 +121,7 @@ elif [ "$1" = "help" ] ; then
 		echo "			For a list of type $0 $1 paramlist"
 		echo "$0 stop		Shutdown Anope"
 		echo "$0 status		Show Anope's Status"
-		echo "$0 restart	Restart Anope (Databases will be saved"
+		echo "$0 restart	Restart Anope (Databases will be saved)"
 		echo "$0 rehash	Rehash Configuration and Save Databases"
 		echo "$0 version	Return Anope Version and Build Information"
 		echo "$0 help		Show this help menu"

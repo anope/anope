@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="78"
+VERSION_BUILD="79"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (79)
+# BUGS  : 
+# NOTES : Added check to anoperc to see if paths work, and fixed one grammar error 
 #
 # BUILD : 1.7.2 (78)
 # BUGS  : N/A

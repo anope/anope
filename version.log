@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="601"
+VERSION_BUILD="602"
 
 # $Log$
+#
+# BUILD : 1.7.8 (602)
+# BUGS  : 308, 311
+# NOTES : Fixed a couple of bugs, some smelling errors, and only in debug will nonexistent warnings display
 #
 # BUILD : 1.7.8 (601)
 # BUGS  : N/A

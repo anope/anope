@@ -432,7 +432,9 @@ int anope_event_newmask(char *source, int ac, char **av)
     u = finduser(source);
 
     if (!u) {
-        alog("user: NEWMASK for nonexistent user %s", av[0]);
+        if (debug) {
+            alog("user: NEWMASK for nonexistent user %s", av[0]);
+        }
         return MOD_CONT;
     }
 

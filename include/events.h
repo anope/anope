@@ -45,5 +45,5 @@
 #define EVENT_NICK_IDENTIFY "nick_id"
 #define EVENT_SERVER_SQUIT "server_squit"
 #define EVENT_SERVER_CONNECT "server_connect"
-
+#define EVENT_DEFCON_LEVEL "defcon_level"
 

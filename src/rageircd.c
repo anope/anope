@@ -450,8 +450,9 @@ int anope_event_vhost(char *source, int ac, char **av)
 
     u = finduser(av[0]);
     if (!u) {
-        if (debug)
+        if (debug) {
             alog("user: VHOST for nonexistent user %s", av[0]);
+        }
         return MOD_CONT;
     }
 

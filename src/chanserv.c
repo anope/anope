@@ -5752,6 +5752,11 @@ static int do_ban(User * u)
                                     u->nick, ci->name);
                     continue;
                 }
+                if (is_protected(u)) {
+                    notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+                    continue;
+                }
+
                 av[0] = sstrdup("+b");
                 get_idealban(ci, u, mask, sizeof(mask));
                 av[1] = mask;
@@ -5802,6 +5807,8 @@ static int do_ban(User * u)
          */
     } else if (ircd->except && is_excepted(ci, u2)) {
         notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+    } else if (ircd->protectedumode && is_protected(u2)) {
+        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
         char *av[3];
         char mask[BUFSIZE];

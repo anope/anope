@@ -182,6 +182,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     CUMode *cum;
     unsigned char botmode = 0;
     BotInfo *bi;
+    char *lastnick = NULL;
 
     if (debug)
         alog("debug: Changing modes for %s to %s", chan->name,
@@ -235,8 +236,10 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             }
 
             if (!(user = finduser(*av))) {
-                alog("channel: MODE %s %c%c for nonexistent user %s",
-                     chan->name, (add ? '+' : '-'), mode, *av);
+                if (debug) {
+                    alog("channel: MODE %s %c%c for nonexistent user %s",
+                         chan->name, (add ? '+' : '-'), mode, *av);
+                }
                 continue;
             }
 
@@ -273,7 +276,14 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                             alog("debug: Modes already sent calling remove_user_status() to clean up");
                         }
                         chan_remove_user_status(chan, user, cum->status);
-                        check = 2;
+                        if (!lastnick) {
+                            check = 2;
+                            lastnick = sstrdup(user->nick);
+                        } else {
+                            if (stricmp(user->nick, lastnick)) {
+                                check = 1;
+                            }
+                        }
                         continue;
                     } else {
                         chan_set_user_status(chan, user, cum->status);
@@ -529,8 +539,10 @@ void do_join(const char *source, int ac, char **av)
         user = finduser(source);
     }
     if (!user) {
-        alog("user: JOIN from nonexistent user %s: %s", source,
-             merge_args(ac, av));
+        if (debug) {
+            alog("user: JOIN from nonexistent user %s: %s", source,
+                 merge_args(ac, av));
+        }
         return;
     }
 
@@ -612,8 +624,10 @@ void do_kick(const char *source, int ac, char **av)
             user = finduser(s);
         }
         if (!user) {
-            alog("user: KICK for nonexistent user %s on %s: %s", s, av[0],
-                 merge_args(ac - 2, av + 2));
+            if (debug) {
+                alog("user: KICK for nonexistent user %s on %s: %s", s,
+                     av[0], merge_args(ac - 2, av + 2));
+            }
             continue;
         }
         if (debug) {
@@ -653,8 +667,10 @@ void do_part(const char *source, int ac, char **av)
 
     user = finduser(source);
     if (!user) {
-        alog("user: PART from nonexistent user %s: %s", source,
-             merge_args(ac, av));
+        if (debug) {
+            alog("user: PART from nonexistent user %s: %s", source,
+                 merge_args(ac, av));
+        }
         return;
     }
     t = av[0];
@@ -798,8 +814,10 @@ void do_sjoin(const char *source, int ac, char **av)
                 user = finduser(s);
             }
             if (!user) {
-                alog("user: SJOIN for nonexistent user %s on %s", s,
-                     av[1]);
+                if (debug) {
+                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                         av[1]);
+                }
                 return;
             }
 
@@ -867,8 +885,10 @@ void do_sjoin(const char *source, int ac, char **av)
             user = finduser(s);
 
             if (!user) {
-                alog("user: SJOIN for nonexistent user %s on %s", s,
-                     av[1]);
+                if (debug) {
+                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                         av[1]);
+                }
                 return;
             }
 
@@ -934,8 +954,10 @@ void do_sjoin(const char *source, int ac, char **av)
                 user = finduser(s);
             }
             if (!user) {
-                alog("user: SJOIN for nonexistent user %s on %s", s,
-                     av[1]);
+                if (debug) {
+                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                         av[1]);
+                }
                 return;
             }
 
@@ -979,8 +1001,10 @@ void do_sjoin(const char *source, int ac, char **av)
             user = finduser(source);
         }
         if (!user) {
-            alog("user: SJOIN for nonexistent user %s on %s", source,
-                 av[1]);
+            if (debug) {
+                alog("user: SJOIN for nonexistent user %s on %s", source,
+                     av[1]);
+            }
             return;
         }
 
@@ -1050,8 +1074,10 @@ void do_cmode(const char *source, int ac, char **av)
     if (!chan) {
         ci = cs_findchan(av[0]);
         if (!(ci && (ci->flags & CI_VERBOTEN)))
-            alog("channel: MODE %s for nonexistent channel %s",
-                 merge_args(ac - 1, av + 1), av[0]);
+            if (debug) {
+                alog("channel: MODE %s for nonexistent channel %s",
+                     merge_args(ac - 1, av + 1), av[0]);
+            }
         return;
     }
 
@@ -1091,8 +1117,10 @@ void do_topic(const char *source, int ac, char **av)
     topic_time = ts;
 
     if (!c) {
-        alog("channel: TOPIC %s for nonexistent channel %s",
-             merge_args(ac - 1, av + 1), av[0]);
+        if (debug) {
+            alog("channel: TOPIC %s for nonexistent channel %s",
+                 merge_args(ac - 1, av + 1), av[0]);
+        }
         return;
     }
 
@@ -1235,8 +1263,10 @@ void chan_adduser2(User * user, Channel * c)
     }
 
     /**
-     * We let the bot join even if it was an ignored user, as if we dont, and the ignored user dosnt just leave, the bot will never
-     * make it into the channel, leaving the channel botless even for legit users - Rob
+     * We let the bot join even if it was an ignored user, as if we don't, 
+     * and the ignored user dosnt just leave, the bot will never
+     * make it into the channel, leaving the channel botless even for 
+     * legit users - Rob
      **/
     if (s_BotServ && c->ci && c->ci->bi) {
         if (c->usercount == BSMinUsers)

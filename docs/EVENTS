@@ -164,4 +164,5 @@ Anope Internal Events
     | EVENT_NICK_IDENTIFY    | Nick of the user involved                 |
     | EVENT_SERVER_SQUIT     | Name of the server involved               |
     | EVENT_SERVER_CONNECT   | Name of the server involved               |
+    | EVENT_DEFCON_LEVEL     | Level of Defcon being invoked             |
     |------------------------|-------------------------------------------|

@@ -643,8 +643,10 @@ int anope_event_topic(char *source, int ac, char **av)
         time_t topic_time = time(NULL);
 
         if (!c) {
-            alog("channel: TOPIC %s for nonexistent channel %s",
-                 merge_args(ac - 1, av + 1), av[0]);
+            if (debug) {
+                alog("channel: TOPIC %s for nonexistent channel %s",
+                     merge_args(ac - 1, av + 1), av[0]);
+            }
             return MOD_CONT;
         }
 
@@ -691,8 +693,10 @@ int anope_event_tburst(char *source, int ac, char **av)
     topic_time = strtol(av[1], NULL, 10);
 
     if (!c) {
-        alog("channel: TOPIC %s for nonexistent channel %s",
-             merge_args(ac - 1, av + 1), av[0]);
+        if (debug) {
+            alog("channel: TOPIC %s for nonexistent channel %s",
+                 merge_args(ac - 1, av + 1), av[0]);
+        }
         return MOD_CONT;
     }
 

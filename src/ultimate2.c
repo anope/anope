@@ -454,7 +454,9 @@ int anope_event_setname(char *source, int ac, char **av)
 
     u = finduser(source);
     if (!u) {
-        alog("user: SETNAME for nonexistent user %s", source);
+        if (debug) {
+            alog("user: SETNAME for nonexistent user %s", source);
+        }
         return MOD_CONT;
     }
 
@@ -471,7 +473,9 @@ int anope_event_chgname(char *source, int ac, char **av)
 
     u = finduser(av[0]);
     if (!u) {
-        alog("user: CHGNAME for nonexistent user %s", av[0]);
+        if (debug) {
+            alog("user: CHGNAME for nonexistent user %s", av[0]);
+        }
         return MOD_CONT;
     }
 
@@ -488,7 +492,9 @@ int anope_event_setident(char *source, int ac, char **av)
 
     u = finduser(source);
     if (!u) {
-        alog("user: SETIDENT for nonexistent user %s", source);
+        if (debug) {
+            alog("user: SETIDENT for nonexistent user %s", source);
+        }
         return MOD_CONT;
     }
 
@@ -505,7 +511,9 @@ int anope_event_chgident(char *source, int ac, char **av)
 
     u = finduser(av[0]);
     if (!u) {
-        alog("user: CHGIDENT for nonexistent user %s", av[0]);
+        if (debug) {
+            alog("user: CHGIDENT for nonexistent user %s", av[0]);
+        }
         return MOD_CONT;
     }
 
@@ -522,8 +530,9 @@ int anope_event_sethost(char *source, int ac, char **av)
 
     u = finduser(source);
     if (!u) {
-        if (debug)
+        if (debug) {
             alog("user: SETHOST for nonexistent user %s", source);
+        }
         return MOD_CONT;
     }
 
@@ -558,7 +567,9 @@ int anope_event_chghost(char *source, int ac, char **av)
 
     u = finduser(av[0]);
     if (!u) {
-        alog("user: CHGHOST for nonexistent user %s", av[0]);
+        if (debug) {
+            alog("user: CHGHOST for nonexistent user %s", av[0]);
+        }
         return MOD_CONT;
     }
 

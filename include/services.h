@@ -263,6 +263,7 @@ struct ircdvars_ {
         int sjoinexchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
+	char *vhostchar;			/* char used for vhosting */
 };
 
 struct ircdcapab_ {

@@ -6156,7 +6156,7 @@ HOST_DEL
 HOST_DEL_SYNTAX
 	Gebruik: /msg %s del <nick>.
 HOST_OFF_UNREAL
-	Je vhost is verwijderd. Om standaard host verberging weer aan te schakelen, type je /mode %s +x
+	Je vhost is verwijderd. Om standaard host verberging weer aan te schakelen, type je /mode %s +%s
 HOST_NO_VIDENT
 	Je IRCD ondersteunt geen vIdent's. Als dit niet klopt, rapporteer dit dan als een mogelijke bug
 HOST_GROUP

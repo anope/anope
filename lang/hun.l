@@ -6015,7 +6015,7 @@ HOST_DEL_SYNTAX
 	Szintaktika: /msg %s del <nick>.
 HOST_OFF_UNREAL
 	A vhostod kikapcsolva. Hogy újra használd az alap
-	hosztrejtést írd be /mode %s +x
+	hosztrejtést írd be /mode %s +%s
 HOST_NO_VIDENT
 	Ön ircdje nem támogatja a videnteket, ha ez nem igaz,
 	akkor kérem jelentse ezt, mint lehetséges hibát.

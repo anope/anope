@@ -102,6 +102,7 @@ IRCDVar ircd[] = {
      0,                         /* SJOIN except char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
+     "x",                       /* vhost char */
      }
     ,
     {NULL}
@@ -792,7 +793,7 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
 void anope_cmd_vhost_off(User * u)
 {
     send_cmd(NULL, "SVSMODE %s -x", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostcar);
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)

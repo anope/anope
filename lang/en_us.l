@@ -5987,7 +5987,7 @@ HOST_DEL
 HOST_DEL_SYNTAX
 	Syntax: /msg %s del <nick>.
 HOST_OFF_UNREAL
-	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +x
+	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +%s
 HOST_NO_VIDENT
 	Your IRCD does not support vIdent's, if this is incorrect, please report this as a possible bug
 HOST_GROUP

@@ -675,7 +675,7 @@ void error(int linenum, char *message, ...)
 int parse(char *buf, int linenum, int reload)
 {
     char *s, *t, *dir;
-    int i, n, optind, val, tmp;
+    int i, n, optind, val;
     int retval = 1;
     int ac = 0;
     char *av[MAXPARAMS];

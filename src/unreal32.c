@@ -1110,8 +1110,9 @@ void anope_cmd_pong(char *servname, char *who)
 /* JOIN */
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(ServerName, "SJOIN !%s %s :%s",
-             base64enc((long int) chantime), channel, user);
+    send_cmd(ServerName, "%s !%s %s :%s",
+             send_token("SJOIN", "~"), base64enc((long int) chantime),
+             channel, user);
     /* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
 }
 
@@ -1928,15 +1929,16 @@ int anope_event_whois(char *source, int ac, char **av)
 /* SVSHOLD - set */
 void anope_cmd_svshold(char *nick)
 {
-    send_cmd(NULL, "TKL + Q H %s %s %ld %ld :%s", nick, ServerName,
-             (long int) time(NULL) + NSReleaseTimeout,
+    send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"),
+             nick, ServerName, (long int) time(NULL) + NSReleaseTimeout,
              (long int) time(NULL), "Being held for registered user");
 }
 
 /* SVSHOLD - release */
 void anope_cmd_release_svshold(char *nick)
 {
-    send_cmd(NULL, "TKL - Q * %s %s", nick, ServerName);
+    send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick,
+             ServerName);
 }
 
 /* UNSGLINE */
@@ -1945,7 +1947,7 @@ void anope_cmd_release_svshold(char *nick)
 */
 void anope_cmd_unsgline(char *mask)
 {
-    send_cmd(NULL, "SVSNLINE - :%s", mask);
+    send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
 }
 
 /* UNSZLINE */
@@ -1970,7 +1972,8 @@ void anope_cmd_szline(char *mask, char *reason, char *whom)
 void anope_cmd_sgline(char *mask, char *reason)
 {
     strnrepl(reason, BUFSIZE, " ", "_");
-    send_cmd(NULL, "SVSNLINE + %s :%s", reason, mask);
+    send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), reason,
+             mask);
 }
 
 /* SVSMODE -b */
@@ -2119,12 +2122,12 @@ int anope_event_sjoin(char *source, int ac, char **av)
 
 void anope_cmd_swhois(char *source, char *who, char *mask)
 {
-    send_cmd(source, "SWHOIS %s :%s", who, mask);
+    send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
 }
 
 void anope_cmd_eob()
 {
-    send_cmd(ServerName, "EOS");
+    send_cmd(ServerName, "%s", send_token("EOS", "ES"));
 }
 
 /* svswatch
@@ -2134,7 +2137,8 @@ void anope_cmd_eob()
  */
 void anope_cmd_svswatch(char *sender, char *nick, char *parm)
 {
-    send_cmd(sender, "SVSWATCH %s :%s", nick, parm);
+    send_cmd(sender, "%s %s :%s", send_token("SVSWATCH", "Bw"), nick,
+             parm);
 }
 
 /* check if +f mode is valid for the ircd */

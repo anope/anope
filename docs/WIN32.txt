@@ -14,7 +14,7 @@ Anope for Windows
     1) Download the required files:
 
         * Current Anope source:
-     http://zero.org:7467/viewcvs/trunk.tar.gz
+            http://zero.org:7467/viewcvs/trunk.tar.gz
 
         If you have Visual C++ 6, 7 or .NET skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once

@@ -1,5 +1,5 @@
 Anope -- a set of IRC services for IRC networks
-===============================================
+-----------------------------------------------
 
 Anope is          2003-2005 Anope Team    <info@anope.org>.
 Based on Epona    2000-2002 PegSoft       <epona@pegsoft.net>.
@@ -12,306 +12,321 @@ Information about Anope may be found at http://www.anope.org/
 Information about Epona may be found at http://www.epona.org/
 Information about Services may be found at http://www.ircservices.esper.net/
 
-TABLE OF CONTENTS
+Table of Contents
 -----------------
-  1. Credits
-  2. Presentation
-  3. Installation
-  4. Command line options
-  5. Messages translation
-  6. Contact and mailing list
+1) Credits
+2) Presentation
+3) Installation
+4) Command Line Options
+5) Messages Translation
+6) Contact and Mailing List
 
-1. CREDITS
-----------
+1) Credits
 
-Anope is based on Lara's Epona version 1.4.14.
-Epona is based on Andy Church's IRC Services version 4.3.3.
+    Anope is based on Lara's Epona version 1.4.14.
+    Epona is based on Andy Church's IRC Services version 4.3.3.
 
-The original credits:
-    Mauritz Antunes -- Portuguese translation
-    Jose R. Holzmann, Raul S. Villarreal -- Spanish translation
-    Andrew Kempe <theshadow@shadowfire.org> -- news system
-    <d.duca@eurcom.net> -- Italian translation
-    <mikado@holyfire.com> -- Turkish translation
-    Andrew Kempe <theshadow@shadowfire.org> -- session limiting
-Epona credits:
-    lara <lara@pegsoft.net> -- Main coding
-    CafeiN <oytuny@yahoo.com> -- Turkish translation
-    Sylvain Cresto aka tost <scresto@netsante.fr> -- FreeBSD 5 patch
-    Marcelo Conde Foscarini aka Bras <ircadmin@brmarket.net> -- Portuguese translation
-    Alvaro Toledo aka POLLITO <atoledo@keldon.org> -- Spanish translation
-    chemical <chemical@musicplay.de> -- German translation
-    shine <dh@shinewelt.de> -- German translation
-    Guven Guzelbey aka MeShGuL <guzelbey@cs.utk.edu> -- Turkish translation
-    Jordi Pujol <jordi.pujol@aujac.org> -- Catalan translation
-    Eva Dachs <evadachs@terra.es> -- Catalan translation
-    Toni Perez <toni.perez@aujac.org> -- Catalan translation
-    Sergios Karalis <sergios_k@hotmail.com> -- Greek translation
-    Thomas J. Stensas aka ShadowMaster <shadowmaster@shadow-realm.org> -- Ultimate 3.x support
-Anope credits:
-    Adam Kramer <ribosome@anope.org>
-    Alvaro Toledo <atoledo@keldon.org>
-    Björn Stiddien <keeper@anope.org>
-    Daniel Engel <dane@zero.org>
-    David <dv@diboo.net>
-    David Narayan <jester@phrixus.net>
-    David Robson <rob@anope.org>
-    Daniele Nicolucci <jollino@sogno.net>
-    Florian Schulze <certus@anope.org>
-    JH <jh@irc-chat.net>
-    Joris Vink <joris@anope.org>
-    Lucas Nussbaum <lucas@lucas-nussbaum.net>
-    Pieter Bootsma <geniusdex@anope.org>
-    Thomas Juberg Stensås <ShadowMaster@Shadow-Realm.org>
-    Trystan .S Lee <trystan@nomadirc.net>
-    openglx <openglx@brasnerd.com.br>
-Anope Translations:
-    GeniusDex <geniusdex@anope.org> (nl.l)
-    Oleg Nikolaev aka Isot <isot@complife.ru> (ru.l)
-    Stuff <the.stuff@gmx.de> (de.l)
-    Gabriel Acevedo H. <drstein@anope.org> (es.l)
-    Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
-    Mateusz Szczyrzyca <annihilator@ircnet.pl> (pl.l)
+    The original credits:
+
+        * Mauritz Antunes
+            Portuguese translation
+        * Jose R. Holzmann, Raul S. Villarreal
+            Spanish translation
+        * Andrew Kempe <theshadow@shadowfire.org>
+            News system
+        * <d.duca@eurcom.net>
+            Italian translation
+        * <mikado@holyfire.com>
+            Turkish translation
+        * Andrew Kempe <theshadow@shadowfire.org>
+            Session limiting
+
+    Epona credits:
+
+        * lara <lara@pegsoft.net>
+            Main coding
+        * CafeiN <oytuny@yahoo.com>
+            Turkish translation
+        * Sylvain Cresto aka tost <scresto@netsante.fr>
+            FreeBSD 5 patch
+        * Marcelo Conde Foscarini aka Bras <ircadmin@brmarket.net>
+            Portuguese translation
+        * Alvaro Toledo aka POLLITO <atoledo@keldon.org>
+            Spanish translation
+        * chemical <chemical@musicplay.de>
+            German translation
+        * shine <dh@shinewelt.de>
+            German translation
+        * Guven Guzelbey aka MeShGuL <guzelbey@cs.utk.edu>
+            Turkish translation
+        * Jordi Pujol <jordi.pujol@aujac.org>
+            Catalan translation
+        * Eva Dachs <evadachs@terra.es>
+            Catalan translation
+        * Toni Perez <toni.perez@aujac.org>
+            Catalan translation
+        * Sergios Karalis <sergios_k@hotmail.com>
+            Greek translation
+        * Thomas J. Stensas aka ShadowMaster <shadowmaster@shadow-realm.org>
+            Ultimate 3.x support
+
+    Anope credits:
+
+        * Adam Kramer <ribosome@anope.org>
+        * Alvaro Toledo <atoledo@keldon.org>
+        * Björn Stiddien <keeper@anope.org>
+        * Chris Hogben <heinz@anope.org>
+        * Daniel Engel <dane@zero.org>
+        * David <dv@diboo.net>
+        * David Narayan <jester@phrixus.net>
+        * David Robson <rob@anope.org>
+        * Daniele Nicolucci <jollino@sogno.net>
+        * Florian Schulze <certus@anope.org>
+        * Gabriel Acevedo H. <drstein@anope.org>
+        * JH <jh@irc-chat.net>
+        * Joris Vink <joris@anope.org>
+        * Lucas Nussbaum <lucas@lucas-nussbaum.net>
+        * Pieter Bootsma <geniusdex@anope.org>
+        * Thomas Juberg Stensås <ShadowMaster@Shadow-Realm.org>
+        * Trystan .S Lee <trystan@nomadirc.net>
+        * openglx <openglx@brasnerd.com.br>
+
+    Anope Translations:
+
+        * GeniusDex <geniusdex@anope.org> (nl.l)
+        * Oleg Nikolaev aka Isot <isot@complife.ru> (ru.l)
+        * Stuff <the.stuff@gmx.de> (de.l)
+        * Gabriel Acevedo H. <drstein@anope.org> (es.l)
+        * Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
+        * Mateusz Szczyrzyca <annihilator@ircnet.pl> (pl.l)
 
     
-2. PRESENTATION
----------------
+2) Presentation
 
-Anope is a set of Services for IRC networks that allows users to
-manage their nicks and channels in a secure and efficient way, and
-administrators to manage their network with powerful tools.
+    Anope is a set of Services for IRC networks that allows users to manage
+    their nicks and channels in a secure and efficient way, and administrators
+    to manage their network with powerful tools.
 
-Currently available services are:
+    Currently available services are:
 
-  * NickServ, a powerful nickname manager that users can use to
-  protect themselves against nick stealing. Each user has its
-  own nickname group, that allows him to register as many nicks as
-  he needs while still being able to take profit of his privileges
-  and to modify his nick configuration. NickServ also has an optional 
-  password retrieval feature.
+        * NickServ, a powerful nickname manager that users can use to protect
+          themselves against nick stealing. Each user has its own nickname
+          group, that allows the user to register as many nicks as needed
+          while still being able to take profit of his privileges and to
+          modify the nick configuration. NickServ also has an optional
+          password retrieval feature.
 
-  * ChanServ, a powerful channel manager that helps users to administer
-  their channels in a totally customizable way. ChanServ has an internal
-  list of privileged users and banned users that controls accesses
-  on a per-channel basis. It eliminates all takeover problems,
-  because of its powerful op/unban/invite and even mass deop and mass
-  kick functions.
-  
-  * MemoServ, an helpful companion that allows sending short messages
-  to offline users, that they can then read when they come online
-  later.
-  
-  * BotServ, an original service that allows users to get a permanent,
-  friendly bot on their channels in an easy way. Each bot can be
-  configured to monitor the channels against floods, repetitions,
-  caps writing, swear, and take appropriate actions. It also can
-  handle user-friendly commands (!op,!deop,!voice,!devoice,!kick,...),
-  say a short greet message when an user joins a channel, and even
-  "take over" ChanServ actions such as auto-opping users, saying the
-  entry notice, and so on. This service can be disabled if you
-  want to save some bandwidth.
-  
-  * OperServ, the IRCops' and IRC admins' black box, that allows them
-  to manage the list of network bans (also known as AKILL (DALnet) or 
-  GLINE (Undernet)), to configure messages displayed to users when
-  they log on, to set modes and to kick users from any channel,
-  to send notices quickly to the entire network, and much more!
+        * ChanServ, a powerful channel manager that helps users to administer
+          their channels in a totally customizable way. ChanServ has an
+          internal list of privileged users and banned users that controls
+          accesses on a per-channel basis. It eliminates all takeover
+          problems, because of its powerful op/unban/invite and even mass
+          deop and mass kick functions.
 
-  * HostServ, a neat service that allows users to show custom
-  vHosts (virtual hosts) instead of their real IP address; this only
-  works on daemons supporting ip cloaking, such as UnrealIRCd and
-  UltimateIRCd.
+        * MemoServ, an helpful companion that allows sending short messages
+          to offline users, that they can then read when they come online
+          later.
 
-  * HelpServ, a skeleton service used to serve help files.
+        * BotServ, an original service that allows users to get a permanent,
+          friendly bot on their channels in an easy way. Each bot can be
+          configured to monitor the channels against floods, repetitions,
+          caps writing, and swearing, and to take appropriate actions. It
+          also can handle user-friendly commands (like !op, !deop, !voice,
+          !devoice, !kick, and many others), say a short greet message when
+          an user joins a channel, and even "take over" ChanServ actions such
+          as auto-opping users, saying the entry notice, and so on. This
+          service can be disabled if you want to save some bandwidth.
 
-Anope currently works with:
-  - DreamForge 4.6.7
-  - Bahamut 1.4.35 or later (including 1.8)
-  - UnrealIRCd 3.1.1 or later (including 3.2)
-  - UltimateIRCd 2.8.2 or later (including 3.0.0)
-  - ViagraIRCd 1.3 or later
-  - Hybrid 7 or later
-  - PTlink 6.15 or later
-  - RageIRCd 2.0 beta-6 or later
-  - Solid IRCD 3.4.6 or later
-  - Plexus 2.0 or later
-  - Ratbox 2.0 or later
+        * OperServ, the IRCops' and IRC admins' black box, that allows them
+          to manage the list of network bans (also known as AKILL (DALnet) or
+          GLINE (Undernet)), to configure messages displayed to users when
+          they log on, to set modes and to kick users from any channel, to
+          send notices quickly to the entire network, and much more!
 
+        * HostServ, a neat service that allows users to show custom vHosts
+          (virtual hosts) instead of their real IP address; this only works
+          on daemons supporting ip cloaking, such as UnrealIRCd, UltimateIRCd
+          and ViagraIRCd.
 
-Anope could also work with some of the daemons derived by the ones 
-listed above, but there's no support for them if they work or don't
-work.
+        * HelpServ, a skeleton service used to serve help files.
+
+    Anope currently works with:
+
+        * DreamForge 4.6.7
+        * Bahamut 1.4.27 or later (including 1.8)
+        * UnrealIRCd 3.1.1 or later (including 3.2)
+        * UltimateIRCd 2.8.2 or later (including 3.0.0)
+        * Hybrid 7 or later
+        * ViagraIRCd 1.3 or later
+        * PTlink 6.15 or later
+        * RageIRCd 2.0 beta-6 or later
+        * Solid IRCd 3.4.6 or later
+        * Plexus 2.0 or later
+        * Ratbox 2.0.6 or later
+
+    Anope could also work with some of the daemons derived by the ones listed
+    above, but there's no support for them if they work or don't work.
 
 
-3. INSTALLATION
----------------
+3) Installation
 
-See the INSTALL file.
-
-
-4. COMMAND LINE OPTIONS
------------------------
-
-     Normally, Anope can be run simply by invoking the "services"
-executable.  Anope will then use the defaults specified in the
-services.conf file, and connect to the specified uplink server.
-Alternatively, any of the following command-line options can be specified
-to change the default values:
-
-    -remote server[:port]    Connect to the specified server
-    -local host  -or-        Connect from the specified address (e.g.
-           [host]:[port]        for multihomed servers)
-    -name servername         Our server name (e.g. services.some.net)
-    -desc string             Description of us (e.g. SomeNet Services)
-    -user username           Username for Services' nicks (e.g. services)
-    -host hostname           Hostname for Services' nicks (e.g. esper.net)
-    -dir directory           Directory containing Services' data files
-                                (e.g. /usr/local/lib/services)
-    -log filename            Services log filename (e.g. services.log)
-    -update secs             How often to update databases (in seconds)
-    -expire secs             How often to check for nick/channel
-                                expiration (in seconds)
-
-     Additionally, the following command-line options can be used to modify
-the behavior of Anope:
-
-    -debug          Enable debugging mode--more info sent to log
-                        (give option more times for more info)
-    -readonly       Enable read-only mode--no changes to
-                        databases allowed, .db files and log
-                        not written
-    -skeleton       Enable skeleton mode--like read-only mode,
-                        but only OperServ is available
-    -nofork         Do not fork after startup; log messages will
-                        be written to terminal (as well as to
-                        the log file if not in read-only mode)
-    -forceload      Try to load as much of the databases as
-                        possible, even if errors are encountered
-    -noexpire       Expiration routines won't be run at all
-    -logchan        Startup with logchan enabled
-    -version	    Display the version of Anope
-
-     Upon starting, Anope will parse its command-line parameters, open
-its logfile, then (assuming the -nofork option is not given) detach itself
-and run in the background.  If Anope encounters a problem reading the
-database files or cannot connect to its uplink server, it will terminate
-immediately; otherwise, it will run until the connection is terminated (or
-a QUIT, SHUTDOWN, or RESTART command is sent--see OperServ's help).  In the
-case of an error, an appropriate error message will be written to the log
-file.
-
-     If Anope is run with the "-readonly" command-line option, it can
-serve as a "backup" to the full version of services.  A "full" version of
-services (run without -readonly) will automatically reintroduce its
-pseudo-clients (NickServ, ChanServ, etc.), while a "backup" services will
-not, thus allowing full services to be brought up at any time without
-disrupting the network (and without having to take backup services down
-beforehand).
-
-     If Anope is run with the "-skeleton" command-line option, it will
-not try to load the nickname or channel databases, and will respond with
-"service is inactive" messages to any commands sent to NickServ, ChanServ,
-MemoServ or BotServ.  This can be useful as an emergency stopgap measure 
-when the main copy of Anope cannot be started.
-
-     The "-debug" option is useful if you find or suspect a problem in
-Anope. Giving it once on the command line will cause all traffic to and
-from services as well as some other debugging information to be recorded in
-the log file; if you send a bug report, PLEASE include an excerpt from the
-log file WITH DEBUGGING ACTIVE--I cannot emphasize enough how important
-this is to tracking down problems.  (You can also enable debugging while
-Services is running using OperServ's SET DEBUG command.)  If you repeat the
--debug option more than once, the debugging level will be increased, which
-provides more detailed information but may also slow Anope down
-considerably and make the log file grow dramatically faster (in particular,
-at debug level 4 a message is written to the log for every character
-received from the server).  In general, a debug level of 1 is sufficient
-for the coding team to be able to trace a problem, because all network 
-traffic is included and we can usually reproduce the problem.
-
-     The "-forceload" option is provided to attempt recovery of data from
-corrupted or truncated databases.  Normally, if Anope encounters an
-error writing to a database file, it will attempt to restore the original
-version of the file and report an error to the logfile and through WALLOPS.
-However, if this should fail (which normally should not happen), or if
-Anope is terminated abruptly e.g. by kill -9 or a power failure, then
-one or more of the databases may be corrupt.  Normally, this will cause
-Anope to abort the next time you try to run it; however, if you give
-the -forceload option to Anope, it will instead read as much as it can,
-then skip to the next database.  For obvious reasons, it's recommended to
-keep backup copies of your databases in case something does happen (since
-Anope will stop at the first error even with -forceload, meaning you
-lose any data after that).
+    See the INSTALL file for instruction on installing Anope.
 
 
-5. MESSAGES TRANSLATIONS
-------------------------
+4) Command Line Options
 
-Anope has a powerful option in NickServ allowing users to choose what
-language it must use when sending messages to users. Messages
-are stored in language files (located in the lang directory).
+    Normally, Anope can be run simply by invoking the "services" executable.
+    Anope will then use the defaults specified in the services.conf file, and
+    connect to the specified uplink server. Alternatively, any of the
+    following command-line options can be specified to change the default
+    values:
 
-Anope is currently provided with eleven languages: Catalan, Dutch, English,
-French, German, Greek, Italian, Portuguese, Russian, Spanish and 
-Turkish. If you want to translate Anope messages into another language,
-follow the following instructions:
+        -remote server[:port]    Connect to the specified server
+        -local host  -or-        Connect from the specified address (e.g. for
+            [host]:[port]            multihomed servers)
+        -name servername         Our server name (e.g. services.some.net)
+        -desc string             Description of us (e.g. SomeNet Services)
+        -user username           Username for Services' nicks (e.g. services)
+        -host hostname           Hostname for Services' nicks (e.g. esper.net)
+        -dir directory           Directory containing Services' data files
+                                     (e.g. /usr/local/lib/services)
+        -log filename            Services log filename (e.g. services.log)
+        -update secs             How often to update databases (in seconds)
+        -expire secs             How often to check for nick/channel
+                                     expiration (in seconds)
 
-  * Copy the lang/en_us.l file to a meaningful name (for example, if
-    you would like to translate messages in Spanish, you would
-    rename it to es.l).
-  * Edit the file with your favorite text editor. Carefully read
-    the instructions given at the top of the file, and start
-    translating the whole file. The file is big so make sure you have
-    some coffee available. ;) Try to avoid the use of English words
-    as much as possible. If the new language contains only a few 'special' 
-    characters, try and use latin representations of it, if possible. 
-    Remember that most clients are only capable of handling the 
-    ISO-8859-1 charset. Of course, if you are translating Anope to a 
-    language with a totally different charset, such as Russian, feel free 
-    to use the one that suites it best (and the one that is in use by 
-    most speakers of that language ;).
-  * When this is done, you have two solutions: either patch Services
-    source code so they take in account the new language file (basically,
-    you'll have to modify lang/Makefile, language.c and maybe services.h),
-    or send us the translated file so we can make the patch and 
-    include your language in the next Anope release.
-  * Note that there is a language tool on bin/langtool.pl that can aid
-    the verification process on newly created language files. Try to use
-    it before you submit a language file.
+    Additionally, the following command-line options can be used to modify
+    the behavior of Anope:
 
-When new major releases come out, you'll not have to retranslate the whole
-file; the Changes.lang file will help you to know which messages were
-added, modified or deleted.
+        -debug          Enable debugging mode; more info sent to log (give
+                            option more times for more info)
+        -readonly       Enable read-only mode; no changes to databases
+                            allowed, .db files and log not written
+        -skeleton       Enable skeleton mode; like read-only mode, but only
+                            OperServ is available
+        -nofork         Do not fork after startup; log messages will be
+                            written to terminal (as well as to the log file
+                            if not in read-only mode)
+        -forceload      Try to load as much of the databases as possible,
+                            even if errors are encountered
+        -noexpire       Expiration routines won't be run at all
+        -logchan        Startup with logchan enabled
+        -version        Display the version of Anope
 
-If you did a language file translation, and want to let others use it,
-please send it to dev@anope.org (don't forget to mention clearly your
-(nick)name, your e-mail and the language name). You'll of course get full
-credit for it, and will even get future final major releases before anyone 
-else to complete the translation!... ;) 
+    Upon starting, Anope will parse its command-line parameters, open its
+    logfile, then (assuming the -nofork option is not given) detach itself
+    and run in the background. If Anope encounters a problem reading the
+    database files or cannot connect to its uplink server, it will terminate
+    immediately; otherwise, it will run until the connection is terminated
+    (or a QUIT, SHUTDOWN, or RESTART command is sent; see OperServ's help).
+    In the case of an error, an appropriate error message will be written to
+    the log file.
 
+    If Anope is run with the "-readonly" command-line option, it can serve as
+    a "backup" to the full version of services.  A "full" version of services
+    (run without -readonly) will automatically reintroduce its pseudo-clients
+    (NickServ, ChanServ, etc.), while a "backup" services will not, thus
+    allowing full services to be brought up at any time without disrupting
+    the network (and without having to take backup services down beforehand).
 
-6. CONTACT
----------------------------
+    If Anope is run with the "-skeleton" command-line option, it will not try
+    to load the nickname or channel databases, and will respond with "service
+    is inactive" messages to any commands sent to NickServ, ChanServ,
+    MemoServ or BotServ. This can be useful as an emergency stopgap measure
+    when the main copy of Anope cannot be started.
 
-* For announcements and discussions about Anope, please visit our Portal
-and Forums at http://www.anope.org/ make sure you register yourself and
-your network to get full benefits.
+    The "-debug" option is useful if you find or suspect a problem in Anope.
+    Giving it once on the command line will cause all traffic to and from
+    services as well as some other debugging information to be recorded in
+    the log file; if you send a bug report, PLEASE include an excerpt from
+    the log file WITH DEBUGGING ACTIVE; we cannot emphasize enough how
+    important this is to tracking down problems. (You can also enable
+    debugging while Services is running using OperServ's SET DEBUG command.)
+    If you repeat the -debug option more than once, the debugging level will
+    be increased, which provides more detailed information but may also slow
+    Anope down considerably and make the log file grow dramatically faster
+    (in particular, at debug level 4 a message is written to the log for
+    every character received from the server). In general, a debug level of 1
+    is sufficient for the coding team to be able to trace a problem, because
+    all network traffic is included and we can usually reproduce the problem.
 
-* If you read the documentation carefully, and didn't find the answer
-to your question, feel free to post on the website forums or join our 
-irc channel (irc.anope.org #anope). Once you join our Support channel,
-just type "? report" for instructions on how to report a Bug. Be as 
-precise as possible when asking a question, because we have no extraordinary 
-powers and can't guess things if they aren't provided. The more precise you 
-are, the sooner you'll be likely to get an answer.
+    The "-forceload" option is provided to attempt recovery of data from
+    corrupted or truncated databases. Normally, if Anope encounters an error
+    writing to a database file, it will attempt to restore the original
+    version of the file and report an error to the logfile and through
+    WALLOPS. However, if this should fail (which normally should not happen),
+    or if Anope is terminated abruptly e.g. by kill -9 or a power failure,
+    then one or more of the databases may be corrupt. Normally, this will
+    cause Anope to abort the next time you try to run it; however, if yo
+    give the -forceload option to Anope, it will instead read as much as it
+    can, then skip to the next database. For obvious reasons, it's highly
+    recommended to keep backup copies of your databases in case something
+    does happen (since Anope will stop at the first error in a database, even
+    with -forceload, meaning you lose any data after that).
 
-* If you think you found a bug, add it to the bug tracking system on our 
-website (http://www.anope.org) and - again - be as precise as possible. Also 
-say whether the bug happens always or under what circumstances, and anything 
-that could be useful to track your bug down. If you wrote a patch, send it 
-over. :)
+5) Messages Translations
 
-* We do *not* support Windows versions of Anope. You must seek support from
-the website you downloaded the Windows port from. Anope Services was never
-meant to run on Windows... it might in the future, but for the time being
-you are on your own. And for Mac fans... Anope runs like a champ on OSX.
+    Anope has a powerful option in NickServ allowing users to choose what
+    language it must use when sending messages to users. Messages are stored
+    in language files (located in the lang directory).
+
+    Anope is currently provided with thirteen languages: Catalan, Dutch,
+    English, French, German, Greek, Hungarian, Italian, Polish, Portuguese,
+    Russian, Spanish and Turkish. If you want to translate Anope messages
+    into another language, follow this instructions:
+
+        * Copy the lang/en_us.l file to a meaningful name (for example, if
+          you would like to translate messages in Spanish, you would rename
+          it to es.l).
+
+        * Edit the file with your favorite text editor. Carefully read the
+          instructions given at the top of the file, and start translating
+          the whole file. The file is big, so make sure you have some coffee
+          available ;) Try to avoid the use of English words as much as
+          possible. If the new language contains only a few 'special'
+          characters, try and use latin representations of it, if possible.
+          Remember that most clients are only capable of handling the
+          ISO-8859-1 charset. Of course, if you are translating Anope to a
+          language with a totally different charset, such as Russian, feel
+          free to use the one that suites it best (and the one that is in use
+          by most speakers of that language ;)).
+
+        * When this is done, you have two solutions: either patch Services
+          source code so they take in account the new language file
+          (basically, you'll have to modify lang/Makefile, language.c and
+          maybe services.h), or send us the translated file so we can make
+          the patch and include your language in the next Anope release.
+
+        * Note that there is a language tool on bin/langtool.pl that can aid
+          the verification process on newly created language files. Try to
+          use it before you submit a language file.
+
+    When new major releases come out, you'll not have to retranslate the
+    whole file; the Changes.lang file will help you to know which messages
+    were added, modified or deleted.
+
+    If you did a language file translation, and want to let others use it,
+    please send it to dev@anope.org (don't forget to mention clearly your
+    (nick)name, your e-mail and the language name). You'll of course get full
+    credit for it, and will even get future final major releases before
+    anyone else to complete the translation!... ;) 
+
+6) Contact
+
+    For announcements and discussions about Anope, please visit our
+    Portal and Forums at http://www.anope.org/ -- make sure you register
+    yourself and your network to get full benefits.
+
+    If you read the documentation carefully, and didn't find the answer to
+    your question, feel free to post on the website forums or join our irc
+    channel (irc.anope.org #anope). Once you join our Support channel, just
+    type "? report" for instructions on how to report a Bug. Be as precise as
+    possible when asking a question, because we have no extraordinary powers
+    and can't guess things if they aren't provided. The more precise you are,
+    the sooner you'll be likely to get an answer.
+
+    If you think you found a bug, add it to the bug tracking system
+    (http://bugs.anope.org) and - again - be as precise as possible. Also say
+    whether the bug happens always or under what circumstances, and anything
+    that could be useful to track your bug down. If you wrote a patch, send
+    it over. :)

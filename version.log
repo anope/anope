@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="581"
+VERSION_BUILD="582"
 
 # $Log$
+#
+# BUILD : 1.7.8 (582)
+# BUGS  : 
+# NOTES : Another update in the docs/ dir. All that's left is FAQ now if i'm right. Has been noted in Changes already in r578
 #
 # BUILD : 1.7.8 (581)
 # BUGS  : 

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="341"
+VERSION_BUILD="342"
 
 # $Log$
+#
+# BUILD : 1.7.5 (342)
+# BUGS  : #00
+# NOTES : Certus: Replaced current rand-implementation with arc4random and replaced C++ comments with C-style comments (gcc 2.95 might 
+# complain).
 #
 # BUILD : 1.7.5 (341)
 # BUGS  : none

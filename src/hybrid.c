@@ -1272,19 +1272,19 @@ void anope_cmd_svid_umode(char *nick, time_t ts)
 /* nc_change was = 1, and there is no na->status */
 void anope_cmd_nc_change(User * u)
 {
-    // not used
+    /* not used */
 }
 
 /* SVSMODE +d */
 void anope_cmd_svid_umode2(User * u, char *ts)
 {
-    // not used
+    /* not used */
 }
 
 
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
-    // not used
+    /* not used */
 }
 
 /* NICK <newnick>  */

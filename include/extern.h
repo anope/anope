@@ -493,6 +493,9 @@ E char *DefconMessage;
 E char *DefConAkillReason;
 E char *DefConOffMessage;
 
+E unsigned int UserKey1;
+E unsigned int UserKey2;     
+E unsigned int UserKey3;
 /**** converter.c ****/
 
 E int convert_ircservices_44(void);
@@ -641,6 +644,12 @@ E char *myStrGetTokenRemainder(const char *str, const char dilim,
 E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(char *nick, char *killer);
 E int nickIsServices(char *nick);
+
+E void add_entropy_userkeys(void);
+E void rand_init(void);
+E u_char getrandom8(void);
+E u_int16_t getrandom16(void);
+E u_int32_t getrandom32(void);
 
 /**** modules.c ****/
 E void moduleCallBackRun(void);
@@ -899,6 +908,7 @@ E void db_mysql_load_cs_dbase(void);
 E void db_mysql_load_os_dbase(void);
 E void db_mysql_load_exceptions(void);
 E void db_mysql_load_news(void);
+E unsigned int mysql_rand(void);
 #endif
 
 #ifdef USE_ENCRYPTION

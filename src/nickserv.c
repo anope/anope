@@ -2010,12 +2010,11 @@ static int do_register(User * u)
             notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX - 1);
         }
 #endif
-        srand((unsigned) time(NULL));
         for (idx = 0; idx < 9; idx++) {
             passcode[idx] =
                 chars[(1 +
-                       (int) (((float) (max - min)) * rand() /
-                              (RAND_MAX + 1.0)) + min)];
+                       (int) (((float) (max - min)) * getrandom16() /
+                              (65535 + 1.0)) + min)];
         } passcode[idx] = '\0';
         nr = makerequest(u->nick);
         nr->passcode = sstrdup(passcode);

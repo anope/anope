@@ -75,8 +75,8 @@ IgnoreData *get_ignore(const char *nick)
     IgnoreData **whichlist = &ignore[tolower(nick[0])];
     User *u = finduser(nick);
     IgnoreData **whichlist2 = NULL;
-    // Bleah, this doesn't work. I need a way to get the first char of u->username.
-    //if (u) whichlist2 = &ignore[tolower(u->username[0])];
+    /* Bleah, this doesn't work. I need a way to get the first char of u->username.
+       /if (u) whichlist2 = &ignore[tolower(u->username[0])]; */
     IgnoreData **whichlistast = &ignore[42];    /* * */
     IgnoreData **whichlistqst = &ignore[63];    /* ? */
     int finished = 0;

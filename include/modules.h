@@ -90,7 +90,7 @@ struct Module_ {
 	void (*hostHelp)(User *u); /* 6 */
 	void (*helpHelp)(User *u); /* 7 */
 
-//	CommandHash *cmdList[MAX_CMD_HASH];
+/*	CommandHash *cmdList[MAX_CMD_HASH]; */
 	MessageHash *msgList[MAX_CMD_HASH];
 };
 

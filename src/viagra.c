@@ -1452,7 +1452,7 @@ void anope_cmd_nc_change(User * u)
 /* SVSMODE +d */
 void anope_cmd_svid_umode2(User * u, char *ts)
 {
-    // not used by bahamut ircds
+    /* not used by bahamut ircds */
 }
 
 void anope_cmd_svid_umode3(User * u, char *ts)

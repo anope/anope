@@ -316,6 +316,10 @@ char *DefConOffMessage;
 char *DefconMessage;
 char *DefConAkillReason;
 
+unsigned int UserKey1;
+unsigned int UserKey2;
+unsigned int UserKey3;
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -333,13 +337,20 @@ static void dep_ListOpersOnly(void)
 /* Configuration directives */
 
 typedef struct {
+    int type;
+    int flags;
+    void *ptr;
+} ConfParam;
+
+typedef struct {
     char *name;
-    struct {
-        int type;               /* PARAM_* below */
-        int flags;              /* Same */
-        void *ptr;              /* Pointer to where to store the value */
-    } params[MAXPARAMS];
+    ConfParam params[MAXPARAMS];
 } Directive;
+
+typedef struct {
+    char *name;
+    int (*func) (int line, int argc, char **argv);
+} ConfCB;
 
 #define PARAM_NONE	0
 #define PARAM_INT	1
@@ -358,6 +369,11 @@ typedef struct {
 #define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
 #define PARAM_RELOAD    0x04    /* Directive is reloadable */
 
+int doAddOper(int line, int argc, char **argv);
+
+ConfCB confroutines[] = {
+    {"Oper", &doAddOper}
+};
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
     {"AutokillDB", {{PARAM_STRING, PARAM_RELOAD, &AutokillDBName}}},
@@ -612,6 +628,9 @@ Directive directives[] = {
     {"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
     {"UseMail", {{PARAM_SET, PARAM_RELOAD, &UseMail}}},
     {"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
+    {"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
+    {"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
+    {"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
     {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
     {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
     {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
@@ -675,6 +694,22 @@ void error(int linenum, char *message, ...)
 
 /*************************************************************************/
 
+int doAddOper(int line, int argc, char **argv)
+{
+    char *name;
+    int i, operflags;
+    if (argc < 2) {
+        error(line, "Oper: Missing Arguments");
+        return 0;
+    }
+
+    name = argv[0];
+    operflags = atoi(argv[1]);
+    error(line, "Added Oper %s with flags %d", name, operflags);
+
+    return 1;
+}
+
 /* Parse a configuration line.  Return 1 on success; otherwise, print an
  * appropriate error message and return 0.  Destroys the buffer by side
  * effect.
@@ -726,6 +761,13 @@ int parse(char *buf, int linenum, int reload)
 
     if (!dir)
         return 1;
+
+    for (n = 0; n < lenof(confroutines); n++) {
+        ConfCB *cb = &confroutines[n];
+        if (stricmp(dir, cb->name) != 0)
+            continue;
+        return cb->func(linenum, ac, av);
+    }
 
     for (n = 0; n < lenof(directives); n++) {
         Directive *d = &directives[n];
@@ -1259,6 +1301,23 @@ int read_config(int reload)
             alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined disabling GlobalOnCycle");
             GlobalOnCycle = 0;
         }
+    }
+
+    /* Check the user keys */
+    CHECK(UserKey1);
+    CHECK(UserKey2);
+    CHECK(UserKey3);
+    if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
+        || (UserKey3 == UserKey2)) {
+        error(0,
+              "Every UserKey must be different. It's for YOUR safety! Remember that!");
+        retval = 0;
+    }
+    if ((UserKey1 == 9866235) || (UserKey2 == 5216332)
+        || (UserKey3 == 9651291)) {
+        error(0,
+              "You don't want your network secure? You are supposed to set NEW UserKey values!!!");
+        retval = 0;
     }
 
     /**

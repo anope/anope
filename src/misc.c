@@ -19,6 +19,12 @@
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)
 
+struct arc4_stream {
+    u_int8_t i;
+    u_int8_t j;
+    u_int8_t s[256];
+} rs;
+
 /*************************************************************************/
 
 /* toupper/tolower:  Like the ANSI functions, but make sure we return an
@@ -642,7 +648,7 @@ void doCleanBuffer(char *str)
                 break;
             *out++ = ' ';
         }
-    *out = ch;                  // == '\0'
+    *out = ch;                  /* == '\0' */
 }
 
 void EnforceQlinedNick(char *nick, char *killer)
@@ -712,6 +718,117 @@ int nickIsServices(char *nick)
     }
 
     return found;
+}
+
+static void arc4_init(void)
+{
+    int n;
+    for (n = 0; n < 256; n++)
+        rs.s[n] = n;
+    rs.i = 0;
+    rs.j = 0;
+}
+
+static inline void arc4_addrandom(void *dat, int datlen)
+{
+    int n;
+    u_int8_t si;
+
+    rs.i--;
+    for (n = 0; n < 256; n++) {
+        rs.i = (rs.i + 1);
+        si = rs.s[rs.i];
+        rs.j = (rs.j + si + ((unsigned char *) dat)[n % datlen]);
+        rs.s[rs.i] = rs.s[rs.j];
+        rs.s[rs.j] = si;
+    }
+}
+
+void rand_init(void)
+{
+    int n;
+#ifndef _WIN32
+    int fd;
+#endif
+    struct {
+#ifdef USE_MYSQL
+        int sqlrand;
+#endif
+#ifndef _WIN32
+        struct timeval nowt;        /* time */
+        char rnd[32];                 /* /dev/urandom */
+#else
+        MEMORYSTATUS mstat;  /* memory status */
+        struct _timeb nowt;	        /* time */
+#endif
+    } rdat;
+
+    arc4_init();
+
+    /* Grab "random" MYSQL data */
+#ifdef USE_MYSQL
+    rdat.sqlrand = mysql_rand();
+#endif
+
+    /* Grab OS specific "random" data */
+#ifndef _WIN32
+    /* unix/bsd: time */
+    gettimeofday(&rdat.nowt, NULL);
+    /* unix/bsd: /dev/urandom */
+    fd = open("/dev/urandom", "r");
+    if (fd) {
+        n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
+        close(fd);
+    }
+#else
+    /* win32: time */
+    _ftime(&rdat.nowt);
+    /* win32: memory status */
+    GlobalMemoryStatus (&rdat.mstat);
+#endif
+
+    arc4_addrandom(&rdat, sizeof(rdat));
+}
+
+void add_entropy_userkeys(void)
+{
+    arc4_addrandom(&UserKey1, sizeof(UserKey1));
+    arc4_addrandom(&UserKey2, sizeof(UserKey2));
+    arc4_addrandom(&UserKey3, sizeof(UserKey3));
+    /* UserKey3 is also used in mysql_rand() */
+}
+
+u_char getrandom8(void)
+{
+    u_char si, sj;
+
+    rs.i = (rs.i + 1);
+    si = rs.s[rs.i];
+    rs.j = (rs.j + si);
+    sj = rs.s[rs.j];
+    rs.s[rs.i] = sj;
+    rs.s[rs.j] = si;
+    return (rs.s[(si + sj) & 0xff]);
+}
+
+u_int16_t getrandom16(void)
+{
+    u_int16_t val;
+
+    val = getrandom8() << 8;
+    val |= getrandom8();
+    return val;
+}
+
+u_int32_t getrandom32(void)
+{
+    u_int32_t val;
+
+    val = getrandom8() << 24;
+    val |= getrandom8() << 16;
+    val |= getrandom8() << 8;
+    val |= getrandom8();
+    return val;
 }
 
 

@@ -1452,7 +1452,7 @@ void anope_cmd_svid_umode2(User * u, char *ts)
 
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
-    // not used
+    /* not used */
 }
 
 #endif

@@ -1611,4 +1611,27 @@ void db_mysql_load_ns_dbase(void)
     }
 }
 
+/* get random mysql number for the generator */
+unsigned int mysql_rand(void)
+{
+    char sqlcmd[MAX_SQL_BUF];
+    unsigned int num = 0;
+    if (!do_mysql)
+        return 0;
+    snprintf(sqlcmd, MAX_SQL_BUF, "SELECT RAND()");
+    if (db_mysql_query(sqlcmd)) {
+        log_perror("Can't create sql query: %s", sqlcmd);
+        db_mysql_error(MYSQL_WARNING, "query");
+    }
+    mysql_res = mysql_store_result(mysql);
+    if (mysql_num_rows(mysql_res) == 0) {
+        mysql_free_result(mysql_res);
+        return 0;
+    }
+    mysql_row = mysql_fetch_row(mysql_res);
+    num = (atoi(mysql_row[0]) * UserKey3);
+    mysql_free_result(mysql_res);
+    return num;
+}
+
 

@@ -589,6 +589,10 @@ int init(int ac, char **av)
     /* load any custom modules */
     modules_init();
 
+    /* Initialize random number generator */
+    rand_init();
+    add_entropy_userkeys();
+
 #ifdef USE_CONVERTER
     /* Convert the databases NOW! */
 # ifdef IS44_CONVERTER

@@ -12,6 +12,9 @@
 /* "Has sys/types.h" */
 #undef HAS_SYS_TYPES_H
 
+/* "" */
+#undef HAVE_BACKTRACE
+
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
@@ -75,9 +78,6 @@
 /* "" */
 #undef HAVE_SYS_SELECT_H
 
-/* "" */
-#undef HAVE_BACKTRACE
-
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -93,17 +93,20 @@
 /* "First IRCD type" */
 #undef IRC_BAHAMUT
 
-/* "Frist IRCD type" */
-#undef IRC_DREAMFORGE
-
 /* "First IRCD type" */
 #undef IRC_HYBRID
+
+/* "First IRCD type" */
+#undef IRC_PLEXUS
 
 /* "First IRCD type" */
 #undef IRC_PTLINK
 
 /* "First IRCD type" */
 #undef IRC_RAGE2
+
+/* "First IRCD type" */
+#undef IRC_SOLID
 
 /* "First IRCD type" */
 #undef IRC_ULTIMATE2
@@ -119,9 +122,6 @@
 
 /* "First IRCD type" */
 #undef IRC_VIAGRA
-
-/* "First IRCD type" */
-#undef IRC_SOLID
 
 /* "Module dir" */
 #undef MODULE_PATH
@@ -227,11 +227,10 @@ int ftruncate(int fd, off_t length);
 char *strsignal(int sig);
 #endif
 
-/* Freebsd 5.2.1 actually has u_char those it throws more 
+/* Freebsd 5.2.1 actually has u_char those it throws more
    errors having it defined again - TSL */
 #undef u_char
 typedef unsigned char u_char;
-
 #endif
 
 

@@ -8593,6 +8593,14 @@ _ACEOF
 
 		IRCDFILE=" solidircd.c "
 
+    elif test "$withval" = "IRC_PLEXUS"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define IRC_PLEXUS 1
+_ACEOF
+
+		IRCDFILE=" plexus.c "
+
 
     fi
 

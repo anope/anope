@@ -233,6 +233,10 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
 		AC_DEFINE(IRC_SOLID,1,"First IRCD type")
 		IRCDFILE=" solidircd.c "
 		AC_SUBST(IRCDFILE)
+    elif test "$withval" = "IRC_PLEXUS"; then
+		AC_DEFINE(IRC_PLEXUS,1,"First IRCD type")
+		IRCDFILE=" plexus.c "
+		AC_SUBST(IRCDFILE)
 
     fi
 ])

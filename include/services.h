@@ -178,6 +178,7 @@ typedef enum { false, true } boolean;
 #include "dreamforge.h"
 #include "unreal32.h"
 #include "solidircd.h"
+#include "plexus.h"
 
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;

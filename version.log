@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="493"
+VERSION_BUILD="494"
 
 # $Log$
+#
+# BUILD : 1.7.6 (494)
+# BUGS  : N/A
+# NOTES : Added support for plexus IRCD - provided by ThaPrince
 #
 # BUILD : 1.7.6 (493)
 # BUGS  : N/A

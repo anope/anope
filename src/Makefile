@@ -21,7 +21,8 @@ INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/modules.h ../include/slist.h \
 	../include/dreamforge.h ../include/bahamut.h ../include/ultimate2.h \
 	../include/ultimate3.h ../include/hybrid.h ../include/ptlink.h ../include/unreal31.h \
-	../include/viagra.h ../include/rageircd.h ../include/unreal32.h ../include/solidircd.h
+	../include/viagra.h ../include/rageircd.h ../include/unreal32.h ../include/solidircd.h \
+	../include/plexus.h
 
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="157"
+VERSION_BUILD="159"
 
 # $Log$
+#
+# BUILD : 1.7.3 (159)
+# BUGS  : 
+# NOTES : Fixed some internal errors with return values in void functions. codemastr needs it to be fixed for the windows 
+# port.
 #
 # BUILD : 1.7.3 (157)
 # NOTES : Fixed botched auto-akick enforcer. ? post 1207

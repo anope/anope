@@ -341,7 +341,7 @@ void rdb_load_bs_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    return db_mysql_load_bs_dbase();
+    db_mysql_load_bs_dbase();
 #endif
 
 }
@@ -352,7 +352,7 @@ void rdb_load_hs_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    return db_mysql_load_hs_dbase();
+    db_mysql_load_hs_dbase();
 #endif
 
 }
@@ -363,7 +363,7 @@ void rdb_load_ns_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    return db_mysql_load_ns_dbase();
+    db_mysql_load_ns_dbase();
 #endif
 }
 
@@ -372,7 +372,7 @@ void rdb_load_ns_dbase(void)
 void rdb_load_news(void)
 {
 #ifdef USE_MYSQL
-    return db_mysql_load_news();
+    db_mysql_load_news();
 #endif
 }
 
@@ -381,7 +381,7 @@ void rdb_load_news(void)
 void rdb_load_exceptions(void)
 {
 #ifdef USE_MYSQL
-    return db_mysql_load_exceptions();
+    db_mysql_load_exceptions();
 #endif
 }
 
@@ -390,7 +390,7 @@ void rdb_load_exceptions(void)
 void rdb_load_cs_dbase(void)
 {
 #ifdef USE_MYSQL
-    return db_mysql_load_cs_dbase();
+    db_mysql_load_cs_dbase();
 #endif
 }
 
@@ -399,7 +399,7 @@ void rdb_load_cs_dbase(void)
 void rdb_load_os_dbase(void)
 {
 #ifdef USE_MYSQL
-    return db_mysql_load_os_dbase();
+    db_mysql_load_os_dbase();
 #endif
 }
 
@@ -408,7 +408,7 @@ void rdb_load_os_dbase(void)
 void rdb_load_ns_req_dbase(void)
 {
 #ifdef USE_MYSQL
-    return db_mysql_load_ns_req_dbase();
+    db_mysql_load_ns_req_dbase();
 #endif
 }
 

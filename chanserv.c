@@ -4478,7 +4478,10 @@ static int do_akick(User * u)
                 if (check_kick(cu->user, c->name)) {
                     argv[0] = sstrdup(c->name);
                     argv[1] = sstrdup(cu->user->nick);
-                    argv[2] = sstrdup(akick->reason);
+                    if (akick->reason)
+                        argv[2] = sstrdup(akick->reason);
+                    else
+                        argv[2] = sstrdup("none");
 
                     do_kick(s_ChanServ, 3, argv);
 

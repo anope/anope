@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="152"
+VERSION_BUILD="157"
 
 # $Log$
+#
+# BUILD : 1.7.3 (157)
+# NOTES : Fixed botched auto-akick enforcer. ? post 1207
 #
 # BUILD : 1.7.3 (152)
 # NOTES : Reverted chanserv.c changes.

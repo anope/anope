@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="69"
+VERSION_BUILD="70"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (70)
+# BUGS  : 
+# NOTES : Modified RSEND to send receipt memo as user instead of MemoServ
 #
 # BUILD : 1.7.2 (69)
 # BUGS  : 

@@ -1264,99 +1264,45 @@ static int do_rsend(User * u)
 
 void rsend_notify(User *u, Memo *m, const char *chan)
 {
-    User *nu;
-    Memo *nm;
-    MemoInfo *nmi;
-    NickAlias *nna;
-    NickCore *nnc;
+    NickAlias *na;
+    NickCore *nc;
     char text[256];
     const char *fmt;
-    int i;
 
     /* Only send receipt if memos are allowed */
     if ((!readonly) && (!checkDefCon(DEFCON_NO_NEW_MEMOS))) {
 
-        /* Gather nick alias, nick core and memo info for sender */
-        nna = findnick(m->sender);
-        nnc = nna->nc;
-        nmi = &nnc->memos;
+        /* Get nick alias for sender */
+        na = findnick(m->sender);
 
-        /* Increase the sender's memocount by one */
-        nmi->memocount++;
-
-        /* Allocate memory for the new memo */
-        nmi->memos = srealloc(nmi->memos,
-                              sizeof(Memo) * nmi->memocount);
-
-        /* Grab the new memo pointer to work on it */
-        nm = &nmi->memos[nmi->memocount - 1];
-
-        /* Sender is MemoServ */
-        strscpy(nm->sender, s_MemoServ, NICKMAX);
-
-        /* If the user has more than one memo, assign the new
-           memo the next available index */
-        if (nmi->memocount > 1) {
-            nm->number = nm[-1].number + 1;
-
-            /* If needed, reindex memos */
-            if (nm->number < 1) {
-                for (i = 0; i < nmi->memocount; i++) {
-                    nmi->memos[i].number = i + 1;
-                }
-            }
-        } else {
-            /* User has no memos. Use index 1 */
-            nm->number = 1;
+        if (!na) {
+            return;
         }
 
-        /* Populate memo structure and set text */
-        nm->time = time(NULL);
+        /* Get nick core for sender */
+        nc = na->nc;
+
+        if (!nc) {
+            return;
+        }
 
         /* Text of the memo varies if the recepient was a
            nick or channel */
         if (chan) {
-            fmt = getstring(nna, MEMO_RSEND_CHAN_MEMO_TEXT);
-            sprintf(text, fmt, chan, u->na->nc->display);
+            fmt = getstring(na, MEMO_RSEND_CHAN_MEMO_TEXT);
+            sprintf(text, fmt, chan);
         } else {
-            fmt = getstring(nna, MEMO_RSEND_NICK_MEMO_TEXT);
-            sprintf(text, fmt, u->na->nc->display);
+            fmt = getstring(na, MEMO_RSEND_NICK_MEMO_TEXT);
+            sprintf(text, fmt);
         }
 
-        nm->text = sstrdup(text);
-        nm->flags = MF_UNREAD;
+        /* Send notification */
+        memo_send(u, m->sender, text, 0);
 
         /* Notify recepient of the memo that a notification has
            been sent to the sender */
         notice_lang(s_MemoServ, u, MEMO_RSEND_USER_NOTIFICATION,
-                    nnc->display);
-
-        /* Check to see if we're notifying all aliases in the sender's
-           group or just the sender */
-        if (MSNotifyAll) {
-            if ((nnc->flags & NI_MEMO_RECEIVE) &&
-                get_ignore(m->sender) == NULL) { 
-                for (i = 0; i < nnc->aliases.count; i++) {
-                    nna = nnc->aliases.list[i];
-                    if (nna->u && nick_identified(nna->u)) {
-                        notice_lang(s_MemoServ, nna->u,
-                                    MEMO_NEW_MEMO_ARRIVED,
-                                    s_MemoServ, s_MemoServ,
-                                    nm->number);
-                    }
-                }
-            } else {
-                /* Find the sender user via the display nick */
-                nu = finduser(nnc->display);
-
-                if (nick_identified(nu)) {
-                    notice_lang(s_MemoServ, u,
-                                MEMO_NEW_MEMO_ARRIVED,
-                                s_MemoServ, s_MemoServ,
-                                nm->number);
-                }
-            }
-        }
+                    nc->display);
     }
 
     /* Remove receipt flag from the original memo */

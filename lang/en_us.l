@@ -1719,9 +1719,9 @@ MEMO_RSEND_DISABLED
 MEMO_RSEND_SYNTAX
 	RSEND {nick | channel} memo-text
 MEMO_RSEND_NICK_MEMO_TEXT
-	Your memo sent to %s has been read.
+	[auto-memo] The memo you sent has been viewed.
 MEMO_RSEND_CHAN_MEMO_TEXT
-	Your memo sent to %s has been read by %s.
+	[auto-memo] The memo you sent to %s has been viewed.
 MEMO_RSEND_USER_NOTIFICATION
 	A notification memo has been sent to %s informing him/her you have
 	read his/her memo.

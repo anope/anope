@@ -1430,19 +1430,22 @@ static void del_ban(Channel * chan, char *mask)
 
 static void del_exception(Channel * chan, char *mask)
 {
-    int reset = 0, i;
-    for (i = 0; i <= chan->exceptcount; i++) {
-        if (chan->excepts[i] == mask) {
+    int i;
+    int reset = 0;
+
+    for (i = 0; i < chan->exceptcount; i++) {
+        if ((!reset) && (strcasecmp(chan->excepts[i], mask) == 0)) {
+            free(chan->excepts[i]);
             reset = 1;
         }
-        if (reset) {
-            if (i == chan->exceptcount)
-                chan->excepts[i] = NULL;
-            else
-                chan->excepts[i] = chan->excepts[i + 1];
-        }
+        if (reset)
+            chan->excepts[i] =
+                (i == chan->exceptcount) ? NULL : chan->excepts[i + 1];
     }
-    chan->exceptcount--;
+
+    if (reset)
+        chan->exceptcount--;
+
     if (debug)
         alog("debug: Deleted except %s to channel %s", mask, chan->name);
 }

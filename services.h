@@ -1016,8 +1016,10 @@ struct channel_ {
     int32 bancount, bansize;
     char **bans;
 
+#ifdef HAS_EXCEPT
     int32 exceptcount, exceptsize;
     char **excepts;
+#endif
 
     struct c_userlist {
 		struct c_userlist *next, *prev;

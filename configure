@@ -648,8 +648,7 @@ ok=0
 echo "Do you want to compile Anope with Module support?"
 echo "This will allow you to load and unload external modules of code without"
 echo "restarting services. You can find several Anope modules on our website."
-echo "This requires libdl, if you have problems compiling disable this option."
-echo "(this option is ignored on OpenBSD for the time being)"
+echo "If you have problems compiling disable this option."
 while [ $ok -eq 0 ] ; do
         echo2 "[$DEF] "
         if read INPUT ; then : ; else echo "" ; exit 1 ; fi

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="194"
+VERSION_BUILD="196"
 
 # $Log$
+#
+# BUILD : 1.7.3 (196)
+# BUGS  : 106
+# NOTES : Fixed module support for OpenBSD systems
 #
 # BUILD : 1.7.3 (194)
 # BUGS  : none

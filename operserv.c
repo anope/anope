@@ -15,16 +15,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-/*
- * Disable the modules on OpenBSD (for now)
- * there is work in progress for this.
- */
-#ifdef __OpenBSD__
-#ifdef USE_MODULES
-#undef USE_MODULES
-#endif                          /* USE_MODULES */
-#endif                          /* __OpenBSD__ */
-
 extern Module *mod_current_module;
 extern int mod_current_op;
 extern User *mod_current_user;

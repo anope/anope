@@ -1829,7 +1829,7 @@ int moduleAddData(ModuleData **md, char *key, char *value)
 	newData->key = sstrdup(key);
 	newData->value = sstrdup(value);
 	if(tmp) {
-		newData->next = tmp->next;
+		newData->next = tmp;
 	} else {
 		newData->next = NULL;
 	}

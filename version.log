@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="480"
+VERSION_BUILD="481"
 
 # $Log$
+#
+# BUILD : 1.7.6 (481)
+# BUGS  : 
+# NOTES : Fixed misplaced pointer in moduleaddData().
 #
 # BUILD : 1.7.6 (480)
 # BUGS  : 

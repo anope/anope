@@ -13,6 +13,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/06 F Fixed misplaced pointer in moduleAddData().                       [ #00]
 12/06 F Fixed infinite loop with moduleGetData().                         [#239]
 12/05 F CS CLEAR OPS strips +a/+q modes, and uses SVSMODE where possible. [ #00]
 12/05 F Ultimate3 not setting +a on channel admins.                       [ #00]

@@ -1413,6 +1413,7 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
 int check_valid_op(User * user, Channel * chan, int servermode)
 {
+    char *tmp;
     if (!chan || !chan->ci)
         return 1;
 
@@ -1425,25 +1426,29 @@ int check_valid_op(User * user, Channel * chan, int servermode)
         if (ircd->halfop) {
             if (ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
+                    tmp = stripModePrefix(ircd->ownerunset);
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-%so%s %s %s %s", ++ircd->adminunset,
-                                   ++ircd->ownerunset, user->nick,
+                                   "%so%s %s %s %s", ircd->adminunset,
+                                   tmp, user->nick,
                                    user->nick, user->nick);
+                    free(tmp);
                 } else {
+                    tmp = stripModePrefix(ircd->ownerunset);
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-%sho%s %s %s %s %s",
-                                   ++ircd->adminunset, ++ircd->ownerunset,
+                                   "%sho%s %s %s %s %s",
+                                   ircd->adminunset, tmp,
                                    user->nick, user->nick, user->nick,
                                    user->nick);
+                    free(tmp);
                 }
             } else if (!ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-%so %s %s", ++ircd->adminunset,
+                                   "%so %s %s", ircd->adminunset,
                                    user->nick, user->nick);
                 } else {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-%soh %s %s %s", ++ircd->adminunset,
+                                   "%soh %s %s %s", ircd->adminunset,
                                    user->nick, user->nick, user->nick);
                 }
             } else {
@@ -1465,10 +1470,12 @@ int check_valid_op(User * user, Channel * chan, int servermode)
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
         if (ircd->halfop) {
             if (ircd->owner && ircd->protect) {
+                tmp = stripModePrefix(ircd->ownerunset);
                 anope_cmd_mode(whosends(chan->ci), chan->name,
-                               "-%sho%s %s %s %s %s", ++ircd->adminunset,
-                               ++ircd->ownerunset, user->nick, user->nick,
+                               "%sho%s %s %s %s %s", ircd->adminunset,
+                               tmp, user->nick, user->nick,
                                user->nick, user->nick);
+                free(tmp);
             } else {
                 anope_cmd_mode(whosends(chan->ci), chan->name, "-ho %s %s",
                                user->nick, user->nick);
@@ -6093,13 +6100,13 @@ static int do_clear(User * u)
                         if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
                             continue;
                         } else {
-                            snprintf(tmp, BUFSIZE, "-%so",
-                                     ++ircd->ownerunset);
+                            snprintf(tmp, BUFSIZE, "%so",
+                                     ircd->ownerunset);
                             av[1] = sstrdup(tmp);
 
                         }
                     } else {
-                        snprintf(tmp, BUFSIZE, "-%so", ++ircd->adminunset);
+                        snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
                         av[1] = sstrdup(tmp);
                     }
                 } else {
@@ -6120,12 +6127,12 @@ static int do_clear(User * u)
                         if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
                             continue;
                         } else {
-                            snprintf(tmp, BUFSIZE, "-%so",
-                                     ++ircd->ownerunset);
+                            snprintf(tmp, BUFSIZE, "%so",
+                                     ircd->ownerunset);
                             av[1] = sstrdup(tmp);
                         }
                     } else {
-                        snprintf(tmp, BUFSIZE, "-%so", ++ircd->adminunset);
+                        snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
                         av[1] = sstrdup(tmp);
                     }
                 } else {

@@ -1135,4 +1135,16 @@ char *str_signed(unsigned char *str)
 	return nstr;
 }
 
+/**
+ *  Strip the mode prefix from the given string.
+ *  Useful for using the modes stored in things like ircd->ownerset etc.. 
+ **/
+
+char *stripModePrefix(const char *str) {
+    if(str) {
+        return strdup(str+1);
+    }
+    return NULL;
+}
+
 /* EOF */

@@ -678,6 +678,7 @@ E char *myStrGetOnlyToken(const char *str, const char dilim,
 E char *myStrSubString(const char *src, int start, int end);
 E char *myStrGetTokenRemainder(const char *str, const char dilim,
         int token_number);
+E char *stripModePrefix(const char *str);
 E int myNumToken(const char *str, const char dilim);
 E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(char *nick, char *killer);

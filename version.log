@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="607"
+VERSION_BUILD="608"
 
 # $Log$
+#
+# BUILD : 1.7.8 (608)
+# BUGS  : 
+# NOTES : Added db-merger and epona db converter. docs will follow.
 #
 # BUILD : 1.7.8 (607)
 # BUGS  : N/A

@@ -4,6 +4,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 07/17 A Switched to autoconf for configure script.                        [ #00]
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+07/22 F Free NSNickTracking when a user quits.                            [#126]
 07/22 F NOOP bug with wildcards.                                          [#115]
 07/22 F Removed RESTRICTED from incorrectly labeled lang file entry.      [#111]
 07/15 F Fixed the bug where /ns release didn't work with UseSVSHOLD.      [#125]

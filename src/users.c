@@ -98,6 +98,7 @@ static User *new_user(const char *nick)
             alog("user: New maximum user count: %d", maxusercnt);
     }
     user->isSuperAdmin = 0;     /* always set SuperAdmin to 0 for new users */
+    user->nickTrack = NULL;        /* ensure no default tracking nick */
     return user;
 }
 
@@ -423,6 +424,9 @@ void delete_user(User * user)
         free(ci);
         ci = ci2;
     }
+
+    if (user->nickTrack)
+        free(user->nickTrack);
 
     moduleCleanStruct(user->moduleData);
 

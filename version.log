@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="273"
+VERSION_BUILD="275"
 
 # $Log$
+#
+# BUILD : 1.7.4 (275)
+# BUGS  : 126
+# NOTES : Fixed the 3rd mem leak identified in this bug report, i didnt find the first two however :/
+# 
 #
 # BUILD : 1.7.4 (273)
 # BUGS  : 121

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="275"
+VERSION_BUILD="277"
 
 # $Log$
+#
+# BUILD : 1.7.4 (277)
+# BUGS  : 131
+# NOTES : BotServ fantasy modified (module) buffer
 #
 # BUILD : 1.7.4 (275)
 # BUGS  : 126

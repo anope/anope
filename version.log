@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="340"
+VERSION_BUILD="341"
 
 # $Log$
+#
+# BUILD : 1.7.5 (341)
+# BUGS  : none
+# NOTES : Fixed minor bug in /CS LOGOUT
 #
 # BUILD : 1.7.5 (340)
 # BUGS  : none

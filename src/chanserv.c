@@ -2683,7 +2683,7 @@ static int do_logout(User * u)
                       CHAN_LOGOUT_SERVADMIN_SYNTAX));
     } else if (!(ci = cs_findchan(chan))) {
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-    } else if (!is_servadmin & (ci->flags & CI_VERBOTEN)) {
+    } else if (!is_servadmin && (ci->flags & CI_VERBOTEN)) {
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else if (nick && !(u2 = finduser(nick))) {
         notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);

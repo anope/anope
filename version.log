@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="582"
+VERSION_BUILD="583"
 
 # $Log$
+#
+# BUILD : 1.7.8 (583)
+# BUGS  : N/A
+# NOTES : Added multifile module support for nix, win32 will follow
 #
 # BUILD : 1.7.8 (582)
 # BUGS  : 

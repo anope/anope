@@ -1,5 +1,3 @@
-include ./Makefile.inc
-
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
@@ -12,29 +10,21 @@ SO_FILES=$(OBJECTS:.o=.s)
 CDEFS= -g -rdynamic -Wall
 CFLAGS=$(CFLAGS) $(CDEFS)
 
-all: modules subs
+all: module
 
-modules: $(OBJECTS) $(SO_FILES)
-
-install: 
-	$(CP) ./*.so $(MODULE_PATH) 
+module: $(OBJECTS) so
 
 distclean: clean spotless
 
 .c.o:
-	$(CC) $(CFLAGS) -I../${INCLUDEDIR} -c $<
+	$(CC) $(CFLAGS) -I../ -I../../${INCLUDEDIR} -c $<
 
-.o.s:
-	$(CC) ${SHARED} $< -o $*.so ${PROFILE}
-
-subs:
-	@for i in $(SUBS); do \
-        echo "make all in $$i..."; \
-        (cd $$i; $(MAKE) $(MAKEARGS) $(MYMAKEFLAGS) all); done
+so:
+	$(CC) ${SHARED} $(OBJECTS) -o ../$(TARGET).so ${PROFILE}
 
 clean:
 	rm -f *.o *.so *.c~ core
 
 spotless: clean
-	rm -f *.so Makefile.inc
+	rm -f *~ 
 

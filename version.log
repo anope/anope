@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="629"
+VERSION_BUILD="630"
 
 # $Log$
+#
+# BUILD : 1.7.8 (630)
+# BUGS  : N/A
+# NOTES : Use sstrdup instead of strdup 
 #
 # BUILD : 1.7.8 (629)
 # BUGS  : 313

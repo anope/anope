@@ -2135,11 +2135,11 @@ void updateProtectDetails(char *level_info_protect_word, char *level_info_protec
         ptr = csmodeutils[i];
         while(ptr.name) {
                 if(strcmp(ptr.name,"PROTECT")==0) {
-                        csmodeutils[i].bsname = strdup(fant_protect_add);
-                        csmodeutils[i].mode = strdup(protect_set_mode);
+                        csmodeutils[i].bsname = sstrdup(fant_protect_add);
+                        csmodeutils[i].mode = sstrdup(protect_set_mode);
                 } else if(strcmp(ptr.name,"DEPROTECT")==0) {
-                        csmodeutils[i].bsname = strdup(fant_protect_del);
-                        csmodeutils[i].mode = strdup(protect_unset_mode);
+                        csmodeutils[i].bsname = sstrdup(fant_protect_del);
+                        csmodeutils[i].mode = sstrdup(protect_unset_mode);
                 }
                 ptr = csmodeutils[++i];
         }
@@ -2148,11 +2148,11 @@ void updateProtectDetails(char *level_info_protect_word, char *level_info_protec
         l_ptr = levelinfo[i];
         while(l_ptr.what != -1) {
                 if(l_ptr.what == CA_PROTECT) {
-                        levelinfo[i].name = strdup(level_info_protect_word);
+                        levelinfo[i].name = sstrdup(level_info_protect_word);
                 } else if(l_ptr.what == CA_PROTECTME) {
-                        levelinfo[i].name = strdup(level_info_protectme_word);
+                        levelinfo[i].name = sstrdup(level_info_protectme_word);
                 } else if(l_ptr.what == CA_AUTOPROTECT) {
-                        levelinfo[i].name = strdup(level_protect_word);
+                        levelinfo[i].name = sstrdup(level_protect_word);
                 }
                 l_ptr = levelinfo[++i];
         }

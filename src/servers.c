@@ -380,7 +380,7 @@ void capab_parse(int ac, char **av)
         if (!stricmp(s, "CHANMODES")) {
             uplink_capab |= CAPAB_CHANMODE;
             if (tmp) {
-                ircd->chanmodes = tmp;
+                ircd->chanmodes = sstrdup(tmp);
             }
         }
         if (s) {

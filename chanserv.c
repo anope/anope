@@ -4754,6 +4754,8 @@ static int do_levels(User * u)
     short level;
     int i;
 
+    int is_list = (cmd && stricmp(cmd, "LIST") == 0);
+
     /* If SET, we want two extra parameters; if DIS[ABLE] or FOUNDER, we want only
      * one; else, we want none.
      */
@@ -4767,6 +4769,8 @@ static int do_levels(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else if (ci->flags & CI_XOP) {
         notice_lang(s_ChanServ, u, CHAN_LEVELS_XOP);
+    } else if (is_list && !check_access(u, ci, CA_ACCESS_LIST)) {
+        notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else if (!is_founder(u, ci) && !is_services_admin(u)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else if (stricmp(cmd, "SET") == 0) {

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="144"
+VERSION_BUILD="151"
 
 # $Log$
+#
+# BUILD : 1.7.3 (151)
+# BUGS  : 77
+# NOTES : HostServ functions no longer called for non VHOST capable ircds.
 #
 # BUILD : 1.7.3 (144)
 # BUGS  : 

@@ -2343,7 +2343,9 @@ static int do_nickupdate(User * u)
         na->last_realname = sstrdup(u->realname);
         na->status |= NS_IDENTIFIED;
         na->last_seen = time(NULL);
+#ifdef HAS_VHOST
         do_on_id(u);
+#endif
         notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);
     }
     return MOD_CONT;
@@ -2406,7 +2408,9 @@ static int do_identify(User * u)
         alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
              u->username, GetHost(u), u->nick);
         notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
+#ifdef HAS_VHOST
         do_on_id(u);
+#endif
         if (NSModeOnID) {
             do_setmodes(u);
         }

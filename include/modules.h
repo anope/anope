@@ -330,6 +330,12 @@ int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleD
 MDE boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
 
 /*************************************************************************/
+/* Some IRCD protocol module support functions */
+
+/** Update the protect deatials, could be either protect or admin etc.. */
+MDE void updateProtectDetails(char *level_info_protect_word, char *level_info_protectme_word, char *fant_protect_add, char *fant_protect_del, char *level_protect_word, char *protect_set_mode, char *protect_unset_mode);
+
+/************************************************************************/
 
 #endif
 /* EOF */

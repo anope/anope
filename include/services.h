@@ -245,6 +245,8 @@ typedef enum { false, true } boolean;
 #include "ratbox.h"
 #include "shadowircd.h"
 
+
+
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
 
@@ -746,6 +748,13 @@ struct csmodeutil_ {
 	int level;			/* Level required to use the command */
 	int levelself;			/* Level required to use the command for himself */
 };
+
+typedef struct {
+    int what;
+    char *name;
+    int desc;
+} LevelInfo;
+
 
 /*************************************************************************/
 

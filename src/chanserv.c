@@ -62,17 +62,12 @@ static int def_levels[][2] = {
     { -1 }
 };
 
-typedef struct {
-    int what;
-    char *name;
-    int desc;
-} LevelInfo;
 
-static LevelInfo levelinfo[] = {
+LevelInfo levelinfo[] = {
 	{ CA_AUTODEOP,      "AUTODEOP",     CHAN_LEVEL_AUTODEOP },
 	{ CA_AUTOHALFOP,    "AUTOHALFOP",   CHAN_LEVEL_AUTOHALFOP },
 	{ CA_AUTOOP,        "AUTOOP",       CHAN_LEVEL_AUTOOP },
-	{ CA_AUTOPROTECT,   LEVEL_PROTECT_WORD,  CHAN_LEVEL_AUTOPROTECT },
+	{ CA_AUTOPROTECT,   "",  CHAN_LEVEL_AUTOPROTECT },
 	{ CA_AUTOVOICE,     "AUTOVOICE",    CHAN_LEVEL_AUTOVOICE },
 	{ CA_NOJOIN,        "NOJOIN",       CHAN_LEVEL_NOJOIN },
 	{ CA_SIGNKICK,      "SIGNKICK",     CHAN_LEVEL_SIGNKICK },
@@ -92,8 +87,8 @@ static LevelInfo levelinfo[] = {
 	{ CA_INVITE,        "INVITE",       CHAN_LEVEL_INVITE },
 	{ CA_OPDEOP,        "OPDEOP",       CHAN_LEVEL_OPDEOP },
 	{ CA_OPDEOPME,      "OPDEOPME",     CHAN_LEVEL_OPDEOPME },
-	{ CA_PROTECT,       LEVELINFO_PROTECT_WORD,      CHAN_LEVEL_PROTECT },
-	{ CA_PROTECTME,     LEVELINFO_PROTECTME_WORD,    CHAN_LEVEL_PROTECTME },
+	{ CA_PROTECT,       "",      CHAN_LEVEL_PROTECT },
+	{ CA_PROTECTME,     "",    CHAN_LEVEL_PROTECTME },
 	{ CA_TOPIC,         "TOPIC",        CHAN_LEVEL_TOPIC },
 	{ CA_UNBAN,         "UNBAN",        CHAN_LEVEL_UNBAN },
 	{ CA_VOICE,         "VOICE",        CHAN_LEVEL_VOICE },
@@ -116,8 +111,8 @@ CSModeUtil csmodeutils[] = {
 	{ "VOICE",	"!voice",   	"+v",   0          ,	CA_VOICE,  CA_VOICEME  },
         { "DEHALFOP",	"!dehalfop",	"-h",	0          ,	CA_HALFOP, CA_HALFOPME },
 	{ "HALFOP",	"!halfop",	"+h",	0          ,	CA_HALFOP, CA_HALFOPME },
-	{ "DEPROTECT",	FANT_PROTECT_DEL,	PROTECT_UNSET_MODE,	0          ,	CA_PROTECT, CA_PROTECTME },
-	{ "PROTECT",	FANT_PROTECT_ADD,	PROTECT_SET_MODE,	0          ,	CA_PROTECT, CA_PROTECTME },
+	{ "DEPROTECT",	"",	"",	0          ,	CA_PROTECT, CA_PROTECTME },
+	{ "PROTECT",	"",	"",	0          ,	CA_PROTECT, CA_PROTECTME },
 	{ NULL }
 };
 

@@ -486,6 +486,8 @@ void anope_set_umode(User * user, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
+    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+a","-a");
+
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);

@@ -594,6 +594,8 @@ int anope_event_client(char *source, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
+    updateProtectDetails("ADMIN","ADMINME","!admin","!deadmin","AUTOADMIN","+a","-a");
+
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);

@@ -15,15 +15,6 @@
 
 #ifdef IRC_BAHAMUT
 
-#define PROTECT_SET_MODE "+"
-#define PROTECT_UNSET_MODE "-"
-#define CS_CMD_PROTECT "PROTECT"
-#define CS_CMD_DEPROTECT "DEPROTECT"
-#define FANT_PROTECT_ADD "!protect"
-#define FANT_PROTECT_DEL "!deprotect"
-#define LEVEL_PROTECT_WORD "AUTOPROTECT"
-#define LEVELINFO_PROTECT_WORD "PROTECT"
-#define LEVELINFO_PROTECTME_WORD "PROTECTME"
 
 #define UMODE_a 0x00000001  /* umode +a - Services Admin */
 #define UMODE_h 0x00000002  /* umode +h - Helper */

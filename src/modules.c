@@ -2124,4 +2124,38 @@ const char *ano_moderr(void)
 }
 #endif
 
+/**
+ * Allow ircd protocol files to update the protect level info tables.
+ **/
+void updateProtectDetails(char *level_info_protect_word, char *level_info_protectme_word, char *fant_protect_add, char *fant_protect_del, char *level_protect_word, char *protect_set_mode, char *protect_unset_mode) {
+        int i = 0;
+        CSModeUtil ptr;
+        LevelInfo l_ptr;
+
+        ptr = csmodeutils[i];
+        while(ptr.name) {
+                if(strcmp(ptr.name,"PROTECT")==0) {
+                        csmodeutils[i].bsname = strdup(fant_protect_add);
+                        csmodeutils[i].mode = strdup(protect_set_mode);
+                } else if(strcmp(ptr.name,"DEPROTECT")==0) {
+                        csmodeutils[i].bsname = strdup(fant_protect_del);
+                        csmodeutils[i].mode = strdup(protect_unset_mode);
+                }
+                ptr = csmodeutils[++i];
+        }
+
+        i = 0;
+        l_ptr = levelinfo[i];
+        while(l_ptr.what != -1) {
+                if(l_ptr.what == CA_PROTECT) {
+                        levelinfo[i].name = strdup(level_info_protect_word);
+                } else if(l_ptr.what == CA_PROTECTME) {
+                        levelinfo[i].name = strdup(level_info_protectme_word);
+                } else if(l_ptr.what == CA_AUTOPROTECT) {
+                        levelinfo[i].name = strdup(level_protect_word);
+                }
+                l_ptr = levelinfo[++i];
+        }
+}
+
 /* EOF */

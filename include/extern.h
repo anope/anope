@@ -134,6 +134,7 @@ E void do_mass_mode(char *modes);
 
 E ChannelInfo *chanlists[256];
 E CSModeUtil csmodeutils[];
+E LevelInfo levelinfo[];
 
 E void listchans(int count_only, const char *chan);
 E void get_chanserv_stats(long *nrec, long *memuse);

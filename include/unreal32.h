@@ -77,21 +77,6 @@
 #define CMODE_T 0x02000000
 #define CMODE_M 0x04000000
 
-/*************************************************************************/
-
-/* Since we differ !protect from !admin we need to know what to use */
-
-#define FANT_PROTECT_ADD "!protect"
-#define FANT_PROTECT_DEL "!deprotect"
-#define LEVEL_PROTECT_WORD "AUTOPROTECT"
-#define LEVELINFO_PROTECT_WORD "PROTECT"
-#define LEVELINFO_PROTECTME_WORD "PROTECTME"
-#define PROTECT_SET_MODE "+a"
-#define PROTECT_UNSET_MODE "-a"
-#define CS_CMD_PROTECT "PROTECT"
-#define CS_CMD_DEPROTECT "DEPROTECT"
-
-/*************************************************************************/
 
 /* Default Modes with MLOCK */
 

@@ -732,6 +732,8 @@ int anope_event_436(char *source, int ac, char **av)
 void moduleAddIRCDMsgs(void) 
 {
     Message *m;
+    
+    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+","-");
 
     if (UseTS6) {
         TS6SID = sstrdup(Numeric);

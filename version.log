@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="625"
+VERSION_BUILD="626"
 
 # $Log$
+#
+# BUILD : 1.7.8 (626)
+# BUGS  : N/A
+# NOTES : Moved the protect defines out of the ircd protocol header files.
+# 
 #
 # BUILD : 1.7.8 (625)
 # BUGS  : 319

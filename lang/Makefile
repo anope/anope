@@ -15,6 +15,7 @@ LANGCOMP = ./langcomp
 
 all: $(LANGOBJS)
 
+distclean: clean spotless
 
 install: all
 	mkdir -p $(DATDEST)/languages

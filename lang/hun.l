@@ -5,7 +5,7 @@
 #    
 # Translated by:                                      
 # ==============                                      
-# Janos Kapitany 'Sarkanyka' (sarkanyka@cjbchat.hu)
+# Janos Kapitany 'Sarkanyka' (chates@freemail.hu)
 # CJB CHAT Magyarország, http://cjbchat.hu     
 # Ez a fordítás a CJB Chat megrendelésére készült. 
 #
@@ -45,48 +45,50 @@
 
 ###########################################################
 #
-# Name of this language
+# A nyelvezet neve
 #
 ###########################################################
 
 
-# For languages other than English, this string should have the following
-# format:
-#     language-name-in-language (language-name-in-English)
-# For example, "Español (Spanish)" or "Français (French)".
+# Angoltól (English) eltéro nyelvek esetén a stringnek a következo
+# formátumban kell lennie:
+#     nyelvezet-neve-a-nyelvben (nyelvezet-neve-angolul)
+# Például, "Spanyol (Spanish)" vagy "Francia (French)".
 
 LANG_NAME
 	Magyar (Hungarian)
-	
+
 ###########################################################
 #
 # Általános üzenetek
 #
 ###########################################################
 	
-# strfidõ() beállitási sorai. 3 strfidõ információ formátumban adható
+# strftime() beállitási sorai. 3 strfidõ információ formátumban adható
 # meg a beállitásokban.  Rövid, hosszú és teljes verzió:
 #	%a = Nap neve (rövid)		%H = óra
 #	%b = Hónap neve (rövid)	%M = perc
 #	%d = nap a hónapban		%S = másodperc
 #	%Y = év			%Z = idõ zóne
-	
-# ezt a formát használd az iidõnél() mikor a dátum és idõ
+#     %A = hónap neve			%B = nap neve
+
+# ezt a formát használd az strftime() mikor a dátum és idõ
 # együtt szükséges.
 STRFTIME_DATE_TIME_FORMAT
 	%Z %Y %B %d %H:%M:%S
-# ezt a formát használd az idõnél() mikor a dátumnak hosszú
+# ezt a formát használd az strftime() mikor a dátumnak hosszú
 # formátum kell (Angol: a nap neve is).
 STRFTIME_LONG_DATE_FORMAT
 	%Y %B %d %A
-# ezt a formát használd az idonél() mikor a dátumnak elég
+# ezt a formát használd az strftime() mikor a dátumnak elég
 # a rövig forma (Angol:: nap neve is).
 STRFTIME_SHORT_DATE_FORMAT
-	%Y %b %d
-# These tell our strftime() what the names of months and days are.  If you
-# don't use %a, %A, %b, or %B in your strftime() strings above, you can
-# leave these empty.  However, if you enter names, they MUST stay in order,
-# one per line, and the list MUST be complete!
+	%b %d %Y
+
+# Ez megadja az strftime() által használt hónap és nap neveket.  Ha nem
+# használsz %a, %A, %b, vagy %B változót az strftime() stringben feljebb, akkor
+# nyugodtan szabadon hagyhatod. Ha beírsz neveket, akkor azoknak sorban kell lenniük,
+# és csak egy lehet soronként, a listának teljesnek KELL lennie!
 	
 # %a
 STRFTIME_DAYS_SHORT
@@ -134,17 +136,21 @@ STRFTIME_MONTHS_LONG
 	Október
 	November
 	December
-		
-# This is used in ChanServ/NickServ INFO displays.
+
+
+
+# Ezt a ChanServ/NickServ INFO megjelenítéseknél használja.
 COMMA_SPACE
 	,
+
+
 # Különbözõ hiba üzenetek.
 USER_RECORD_NOT_FOUND
 	Belsõ hiba - nem teljesíthetõ kérés.
 UNKNOWN_COMMAND
 	Ismeretlen Parancs %s.
 UNKNOWN_COMMAND_HELP
-	Ismeretlen parancs %s.  Írd be: "/msg %s HELP" .
+	Ismeretlen parancs %s. Írd be: "/msg %s HELP".
 SYNTAX_ERROR
 	Szintaktika: %s
 MORE_INFO
@@ -152,26 +158,29 @@ MORE_INFO
 NO_HELP_AVAILABLE
 	Nincs ezzel kapcsolatban segítség: %s.
 OBSOLETE_COMMAND
-	Nem használható parancs; használd a %s.
+	Nem használható parancs; használd a %s parancsot helyette.
+
 BAD_USERHOST_MASK
 	A maszknak ilyen formátumúnak kell lennie: user@host.
 BAD_EXPIRY_TIME
 	Érvénytelen elévülési idõ.
 USERHOST_MASK_TOO_WIDE
 	%s túl tág tartományra vonatkozik.
+
 SERVICE_OFFLINE
 	%s jelenleg offline.
 READ_ONLY_MODE
-	Megjegyzés: A Szervíz  csak olvas módban fut!
+	Megjegyzés: A Szervíz csak olvasás módban fut!
 PASSWORD_INCORRECT
 	Hibás jelszó.
 
-# What's the difference between "Access denied" and "Permission denied"?
-# Very little; you can safely make them the same message with no real loss
-# of meaning.  If you want to make a distinction, "Access denied" is
-# usually used more generally; for example, a non-oper trying to access
-# OperServ gets "Access denied", while a non-Services admin trying to use
-# NickServ SET NOEXPIRE gets "Permission denied".
+# Mi a különbség a "Hozzáférés megtagadva" és az "Engedély letiltva" között?
+# Nagyon kicsi; ha ugyanazt az üzenetet írod mindkettõre, nem igazán veszít
+# a jelentésbõl. Ha különbséget akarsz tenni, akkor a "Hozzáférés megtagadva"
+# általánosabb értelemben használatos, például, ha egy nem oper próbál 
+# hozzáférni az OperServhez, akkor azt kapja, hogy "Hozzáférés megtagadva",
+# amikor egy nem Szervíz admin próbálja használni a NickServ SET NOEXPIRE
+# opciót, akkor õ azt kapja, hogy "Endegély letiltva".
 ACCESS_DENIED
 	Hozzáférés megtagadva.
 PERMISSION_DENIED
@@ -184,13 +193,13 @@ MORE_OBSCURE_PASSWORD
 	karakter legyen,	és nem kitalálható legyen, (ne a
 	nickneved/valósneved),  ne legyen benne írásjel.
 PASSWORD_TRUNCATED
-	Megj.:  A jelszavad %d karakter hosszúra lett csonkitva.
+	Megjegyzés:  A jelszavad %d karakter hosszúságúra lett csonkítva.
 NICK_NOT_REGISTERED
 	A neved még nem regisztrált.
 NICK_NOT_REGISTERED_HELP
 	A neved még nem regisztrált.  Segítség: /msg %s HELP.
 NICK_X_IS_SERVICES
-	Nick %s is part of this Network's Services.
+	A %s nick a Hálózat Szervízének egysége.
 NICK_X_NOT_REGISTERED
 	Ez a nick: %s nem regisztrált.
 NICK_X_IN_USE
@@ -225,9 +234,9 @@ NICK_IDENTIFY_REQUIRED
 CHAN_IDENTIFY_REQUIRED
 	Jelszavas azonositás szükséges ehhez a parancshoz.
 	Próbáld újra miután beírtad: /msg %s IDENTIFY %s jelszó.
-
+	
 MAIL_DISABLED
-	A Szervíz úgy lett beállítva, hogy nem küld mailt.
+	A Szervíz úgy van beállítva, hogy nem küld mailt.
 MAIL_INVALID
 	%sEmail címe nem érvényes.
 MAIL_X_INVALID
@@ -236,6 +245,7 @@ MAIL_LATER
 	Nem lehet most levelet küldeni;  próbáld újra késõbb.
 MAIL_DELAYED
 	Kérlek várj %d másodpercet és próbáld újra.
+	
 NO_REASON
 	Nincs indok
 UNKNOWN
@@ -259,9 +269,9 @@ DURATION_SECOND
 DURATION_SECONDS
 	%d másodperc
 	
-# Human readable expiration
+# Emberi olvasható elévülések
 NO_EXPIRE
-	nem évül el
+	nem fog elévülni
 EXPIRES_SOON
 	elévül a következõ adatbázis mentésnél
 EXPIRES_M
@@ -281,7 +291,7 @@ EXPIRES_D
 EXPIRES_1D
 	elévül %d nap múlva
 	
-# Általános Footer üzenet
+# Általános lábjegyzet üzenet
 END_OF_ANY_LIST
 	%s lista vége.
 
@@ -329,20 +339,18 @@ NICK_REGISTERED
 	Ez a nicknév: %s számodra lett regisztrálva: %s
 NICK_PASSWORD_IS
 	Jelszavad: %s - jegyezd meg a késõbbi használathoz!
+NICK_REG_DELAY
+	A nicked regisztrálásához %d másodpercnél régebben kell csatlakozva lenned.
 	
 # GROUP válaszok
-NICK_REG_DELAY
-	You have to be connected longer than %d seconds to register your nick.
-
-# GROUP responses
 NICK_GROUP_SYNTAX
-	GROUP cél jelszó
+	GROUP célnick jelszó
 NICK_GROUP_DISABLED
-	Sajnálom,  a  csoport használata most le van tiltva.
+	Sajnálom, a csoportok használata ideiglenesen le van tiltva.
 NICK_GROUP_FAILED
-	Sajnálom,  a group parancs használata sikertelen.
+	Sajnálom, a group parancs használata sikertelen.
 NICK_GROUP_PLEASE_WAIT
-	Kérlek várj %d sec-et mielõtt használod a GROUP parancsot.
+	Kérlek várj %d másodpercet, mielõtt ismét használod a GROUP parancsot.
 NICK_GROUP_CHANGE_DISABLED
 	A nicked már regisztrált; írd be /msg %s DROP elõször.
 NICK_GROUP_SAME
@@ -418,14 +426,14 @@ NICK_SET_PASSWORD_CHANGED
 	Jelszavad megváltoztatva.
 NICK_SET_PASSWORD_CHANGED_TO
 	Jelszavad megváltoztatva a következõre: %s.
-
+	
 # SET LANGUAGE válaszok
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE szám
 NICK_SET_LANGUAGE_UNKNOWN
 	Ismeretlen nyelvi sorszám %d /msg %s HELP SET LANGUAGE
 NICK_SET_LANGUAGE_CHANGED
-	Új nyelvezet: Magyar. Fordítás: Sarkanyka és cyberoldboy
+	Új nyelvezet: Magyar.
 
 # SET URL válaszok
 NICK_SET_URL_CHANGED
@@ -491,25 +499,23 @@ NICK_SET_PRIVATE_OFF
 NICK_SET_HIDE_SYNTAX
 	SET HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
 NICK_SET_HIDE_EMAIL_ON
-	 E-mail címed most rejtve lesz a %s INFO kíirásnál.
+	 E-mail címed most rejtve lesz a %s INFO kiírásnál.
 NICK_SET_HIDE_EMAIL_OFF
-	E-mail címed most látható lesz a %s INFO kíirásnál.
+	E-mail címed most látható lesz a %s INFO kiírásnál.
 NICK_SET_HIDE_MASK_ON
-	Utolsó user@host maszkod rejtve lesz a %s INFO kíirásnál.
+	Utolsó user@host maszkod rejtve lesz a %s INFO kiírásnál.
 NICK_SET_HIDE_MASK_OFF
-	Utolsó user@host maszkod látható lesz a %s INFO kíirásnál.
+	Utolsó user@host maszkod látható lesz a %s INFO kiírásnál.
 NICK_SET_HIDE_QUIT_ON
-	Utolsó kilépõ üzeneted rejtve lesz a %s INFO kíirásnál
+	Utolsó kilépõ üzeneted rejtve lesz a %s INFO kiírásnál
 NICK_SET_HIDE_QUIT_OFF
-	Utolsó kilépõ üzeneted látható lesz a %s INFO kíirásnál.
+	Utolsó kilépõ üzeneted látható lesz a %s INFO kiírásnál.
+NICK_SET_HIDE_STATUS_ON
+	A szervíz hozzáférési státuszod rejtve lesz a %s INFO kiírásnál.
+NICK_SET_HIDE_STATUS_OFF
+	A szervíz hozzáférési státuszod látható lesz a %s INFO kiírásnál.
 
 # SET MSG válaszok
-NICK_SET_HIDE_STATUS_ON
-	Your services access status will now be hidden from %s INFO displays.
-NICK_SET_HIDE_STATUS_OFF
-	Your services access status will now be shown in %s INFO displays.
-	
-# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET MSG {ON | OFF}
 NICK_SET_MSG_ON
@@ -527,7 +533,7 @@ NICK_SET_NOEXPIRE_OFF
 
 # ACCESS válaszok
 NICK_ACCESS_SYNTAX
-	ACCESS {ADD | DEL | LIST} [mask]
+	ACCESS {ADD | DEL | LIST} [maszk]
 NICK_ACCESS_ALREADY_PRESENT
 	Ez a maszk: %s már szerepel a hozzáférési listádon.
 NICK_ACCESS_REACHED_LIMIT
@@ -547,13 +553,13 @@ NICK_ACCESS_LIST_X
 NICK_INFO_SYNTAX
 	INFO nick [ALL]
 NICK_INFO_REALNAME
-	%s is %s
+	%s az %s
 NICK_INFO_SERVICES_OPER
 	%s egy szervíz operátor.
 NICK_INFO_SERVICES_ADMIN
-	%s egy szervíz admin.
+	%s egy szervíz adminisztrátor.
 NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+	%s egy szervíz root adminisztrátor.
 NICK_INFO_ADDRESS
 	Utoljára látott cím: %s
 NICK_INFO_ADDRESS_ONLINE
@@ -578,13 +584,13 @@ NICK_INFO_GREET
 	Köszöntõ üzenet: %s
 NICK_INFO_OPTIONS
 	Opciók: %s
-# These strings MUST NOT be empty
+# Ezek a stringek NEM LEHETNEK üresek
 NICK_INFO_OPT_KILL
 	Kill védelem
 NICK_INFO_OPT_SECURE
-	Security
+	Biztonság
 NICK_INFO_OPT_PRIVATE
-	Private
+	Privát
 NICK_INFO_OPT_MSG
 	Üzenet mód
 NICK_INFO_OPT_NONE
@@ -673,25 +679,23 @@ NICK_GETEMAIL_NOT_USED
 NICK_SENDPASS_SYNTAX
 	SENDPASS nicknév
 NICK_SENDPASS_UNAVAILABLE
-	SENDPASS nem elérhetõ, mig az encryption használatban van.
+	SENDPASS nem elérhetõ, amíg az encryption használatban van.
 NICK_SENDPASS_SUBJECT
 	Nicknév jelszó (%s)
 NICK_SENDPASS_HEAD
 	Hi,
 NICK_SENDPASS_LINE_1
-	Kérted a %s nicknév jelszavát hogy e-mailben küldjem el..
+	Azt kérted, hogy a %s nicknév jelszavát küldjük el e-mailben.
 NICK_SENDPASS_LINE_2
-	%s a jelszavad. Ezt a biztosnág miatt meg kell váltóztatni
-	miután megkaptad ezt a levelet.
+	A jelszavad %s. Ezt a biztosnág miatt meg kell váltóztatni,	miután megkaptad ezt a levelet.
 NICK_SENDPASS_LINE_3
-	Ha nem tudod miért kaptad ezt a levelet akkor ne vedd 
-	tudomásul!
+	Ha nem tudod miért kaptad ezt a levelet, akkor kérlek hagyd figyelmen kivül!
 NICK_SENDPASS_LINE_4
-		ERRE A LEVÉLRE NE VÁLASZOLJ!!!
+	ERRE A LEVÉLRE NE VÁLASZOLJ!!!
 NICK_SENDPASS_LINE_5
 	%s adminisztrátorok.
 NICK_SENDPASS_OK
-	%s jelszava elküldve.
+	%s nick jelszava elküldve.
 
 # FORBID válaszok
 NICK_FORBID_SYNTAX
@@ -699,46 +703,43 @@ NICK_FORBID_SYNTAX
 NICK_FORBID_SYNTAX_REASON
 	FORBID nicknév indok
 NICK_FORBID_SUCCEEDED
-	%s nick  most már forbidolt.
+	%s nick most már forbidolt.
 NICK_FORBID_FAILED
 	Nem forbidolható: %s!
 
 # Nick Registraion válaszok
 NICK_REQUESTED
-	Ez a nick már kérte, ellenõrizze az e-mail cimét és benne
-	a kódod.
+	Ezt a nicket már kérelmezték, ellenõrizd az e-mail cimed, egy levélben van a kódod.
 NICK_REG_RESENT
-	Te kódod ide lett elküldve  %s.
+	A kód újra el lett küldve erre a címre: %s.
 NICK_REG_UNABLE
-	Nick NEM regisztrált, próbáld késöbb.
+	Nick NEM regisztrált, próbáld késõbb.
 NICK_IS_PREREG
-	Ez a nick aktiváló kódra vár a regisztráció befejezéséhez.
+	A nick az emailben elküldött kóddal való aktíválásra vár a regisztráció befejezéséhez.
 NICK_ENTER_REG_CODE
-	A kód el lett küldve %s -hoz, irja be /msg %s confirm 
-	<kód> hogy teljes legyen a regisztráció.
+	A kód a %s címre lett küldve, írd be /msg %s confirm <kód> a regisztráció befejezéséhez.
 NICK_CONFIRM_NOT_FOUND
-	Regisztráció 1 lépése lehet hogy elévült, használd :
-	"/msg %s register <jelszó> <email>" elsõ.
+	Regisztráció 1 lépése lehet, hogy elévült, írd be: "/msg %s register <jelszó> <email>".
 NICK_CONFIRM_INVALID
-	Érvénytelen kód , ellenõrizze az e-mail-ben,  próbálja újra.
+	Érvénytelen kód, ellenõrizze az e-mailben, majd próbálja újra.
 NICK_REG_MAIL_SUBJECT
-	Nicknéc regisztrálva (%s)
+	Nicknév Regisztráció (%s)
 NICK_REG_MAIL_HEAD
 	Hi,
 NICK_REG_MAIL_LINE_1
-	Te kérted a regisztrációt a %s névre.
+	Te kérelmeztad a %s nick regisztrálását.
 NICK_REG_MAIL_LINE_2
-	Ird be: " /msg %s megerõsít %s " és teljes a regisztráció.
+	Írd be: " /msg %s confirm %s ", hogy befejezd a regisztrációt.
 NICK_REG_MAIL_LINE_3
-	Ha nem tudod miért kaptad a levelet töröld és felejtsd el!
+	Ha nem tudod miért kaptad a levelet, kérlek hagyd figyelmen kívül!
 NICK_REG_MAIL_LINE_4
 	NE VÁLASZOLJ A LEVÉLRE!
 NICK_REG_MAIL_LINE_5
-	%s administrators.
+	%s adminisztrátorok.
 NICK_GETPASS_PASSCODE_IS
-	Kód  %s -hoz  %s.
+	Kód a %s nickhez:  %s.
 NICK_FORCE_REG
-	Nicknév %s megerõsítés
+	A %s nicknév érvényesítve. 
 
 ###########################################################
 #
@@ -822,9 +823,9 @@ CHAN_LEVEL_INFO
 
 # Automatikus válaszok
 CHAN_IS_REGISTERED
-	Ez a csatorna %s-vel van regisztrálva.
+	Ez a szoba a %s adatbázisában regisztrált.
 CHAN_NOT_ALLOWED_OP
-	Nincs neked engedélyezve chanop ezen a csatornán: %s.
+	Nem lehetsz szobaop ezen a csatornán: %s.
 CHAN_MAY_NOT_BE_USED
 	Ez a csatorna nem használható.
 CHAN_NOT_ALLOWED_TO_JOIN
@@ -832,7 +833,7 @@ CHAN_NOT_ALLOWED_TO_JOIN
 
 # REGISTER válaszok
 CHAN_REGISTER_SYNTAX
-	REGISTER #csatorna jelszó leírás
+	REGISTER #szoba jelszó leírás
 CHAN_REGISTER_DISABLED
 	Sajnálom,  a csatorna regisztráció jelenleg szünetel.
 CHAN_REGISTER_NOT_LOCAL
@@ -857,21 +858,21 @@ CHAN_REGISTRATION_FAILED
 CHAN_REGISTERED
 	Regisztráltam a %s csatornát a (%s) nickre.
 CHAN_PASSWORD_IS
-	Csatorna jelszava: %s - Emlékezz erre késöbb.
+	Csatorna jelszava: %s - Jegyezd fel a késõbbi használathoz.
 
 # IDENTIFY válaszok
 CHAN_IDENTIFY_SYNTAX
-	IDENTIFY   #csatorna   jelszó
+	IDENTIFY   #szoba   jelszó
 CHAN_IDENTIFY_FAILED
 	Sajnálom,  azonosítás sikertelen.
 CHAN_IDENTIFY_SUCCEEDED
-	Jelszavad elfogadva - founder a szinted a %s csatornán.
+	Jelszavad elfogadva - founder szintû a hozzáférésed a %s csatornán.
 
 # LOGOUT válaszok
 CHAN_LOGOUT_SYNTAX
-	LOGOUT #csatorna nicknév
+	LOGOUT #szoba nicknév
 CHAN_LOGOUT_SERVADMIN_SYNTAX
-	LOGOUT #csatorna [nicknév]
+	LOGOUT #szoba  [nicknév]
 CHAN_LOGOUT_SUCCEEDED
 	%s felhasználó kijelentkezett a %s csatornáról.
 CHAN_LOGOUT_ALL_SUCCEEDED
@@ -879,7 +880,7 @@ CHAN_LOGOUT_ALL_SUCCEEDED
 
 # DROP válaszok
 CHAN_DROP_SYNTAX
-	DROP #csatorna
+	DROP #szoba
 CHAN_DROP_DISABLED
 	A csatornák regisztrációjának törlése jelenleg szünetel.
 CHAN_DROPPED
@@ -887,7 +888,7 @@ CHAN_DROPPED
 
 # SET válaszok
 CHAN_SET_SYNTAX
-	SET #csatorna opció paraméterek
+	SET #szoba opció paraméterek
 CHAN_SET_DISABLED
 	A csatornák opcióinak beállitása jelenleg szünetel.
 CHAN_SET_UNKNOWN_OPTION
@@ -905,7 +906,7 @@ CHAN_SUCCESSOR_CHANGED
 CHAN_SUCCESSOR_UNSET
 	A megadott csatorna %s successora törölve.
 CHAN_SUCCESSOR_IS_FOUNDER
-	%s nem lehet a %s csatorna successora mert õ a founder is
+	%s nem lehet a %s csatorna successora, mert õ a founder is.
 
 # SET PASSWORD válaszok
 CHAN_SET_PASSWORD_FAILED
@@ -957,7 +958,7 @@ CHAN_MLOCK_CHANGED
 
 # SET KEEPTOPIC válaszok
 CHAN_SET_KEEPTOPIC_SYNTAX
-	SET #csatorna KEEPTOPIC {ON | OFF}
+	SET #szoba KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
 	Témamegõrzés ON
 CHAN_SET_KEEPTOPIC_OFF
@@ -965,7 +966,7 @@ CHAN_SET_KEEPTOPIC_OFF
 
 # SET TOPICLOCK válaszok
 CHAN_SET_TOPICLOCK_SYNTAX
-	SET #csatorna TOPICLOCK {ON | OFF}
+	SET #szoba TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
 	Témalezárás ON.
 CHAN_SET_TOPICLOCK_OFF
@@ -973,7 +974,7 @@ CHAN_SET_TOPICLOCK_OFF
 
 # SET PEACE válaszok
 CHAN_SET_PEACE_SYNTAX
-	SET #csatorna PEACE {ON | OFF}
+	SET #szoba PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
 	Peace opció ON.
 CHAN_SET_PEACE_OFF
@@ -981,7 +982,7 @@ CHAN_SET_PEACE_OFF
 
 # SET PRIVATE válaszok
 CHAN_SET_PRIVATE_SYNTAX
-	SET #csatorna PRIVATE {ON | OFF}
+	SET #szoba PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
 	Private opció ON.
 CHAN_SET_PRIVATE_OFF
@@ -989,7 +990,7 @@ CHAN_SET_PRIVATE_OFF
 
 # SET SECUREOPS válaszok
 CHAN_SET_SECUREOPS_SYNTAX
-	SET #csatorna SECUREOPS {ON | OFF}
+	SET #szoba SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
 	Secure ops opció ON.
 CHAN_SET_SECUREOPS_OFF
@@ -997,7 +998,7 @@ CHAN_SET_SECUREOPS_OFF
 
 # SET SECUREFOUNDER válaszok
 CHAN_SET_SECUREFOUNDER_SYNTAX
-	SET #csatorna SECUREFOUNDER {ON | OFF}
+	SET #szoba SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
 	Secure founder opció ON.
 CHAN_SET_SECUREFOUNDER_OFF
@@ -1005,7 +1006,7 @@ CHAN_SET_SECUREFOUNDER_OFF
 
 # SET RESTRICTED válaszok
 CHAN_SET_RESTRICTED_SYNTAX
-	SET #csatorna RESTRICTED {ON | OFF}
+	SET #szoba RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
 	Korlátozott hozzáférés opció ON.
 CHAN_SET_RESTRICTED_OFF
@@ -1013,7 +1014,7 @@ CHAN_SET_RESTRICTED_OFF
 
 # SET SECURE válaszok
 CHAN_SET_SECURE_SYNTAX
-	SET #csatorna SECURE {ON | OFF}
+	SET #szoba SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
 	Secure opció ON.
 CHAN_SET_SECURE_OFF
@@ -1021,7 +1022,7 @@ CHAN_SET_SECURE_OFF
 
 # SET SIGNKICK válaszok
 CHAN_SET_SIGNKICK_SYNTAX
-	SET csatorna SIGNKICK {ON | LEVEL | OFF}
+	SET #szoba SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
 	Jelzett kick opció ON.
 CHAN_SET_SIGNKICK_LEVEL
@@ -1032,7 +1033,7 @@ CHAN_SET_SIGNKICK_OFF
 
 # SET OPNOTICE válaszok
 CHAN_SET_OPNOTICE_SYNTAX
-	SET #csatorna OPNOTICE {ON | OFF}
+	SET #szoba OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
 	Op-notice opció ON.
 CHAN_SET_OPNOTICE_OFF
@@ -1040,7 +1041,7 @@ CHAN_SET_OPNOTICE_OFF
 
 # SET XOP válaszok
 CHAN_SET_XOP_SYNTAX
-	SET #csatorna XOP {ON | OFF}
+	SET #szoba XOP {ON | OFF}
 CHAN_SET_XOP_ON
 	Az xOP lista rendszer ON.
 CHAN_SET_XOP_OFF
@@ -1048,7 +1049,7 @@ CHAN_SET_XOP_OFF
 
 # SET NOEXPIRE válaszok
 CHAN_SET_NOEXPIRE_SYNTAX
-	SET #csatorna NOEXPIRE {ON | OFF}
+	SET #szoba NOEXPIRE {ON | OFF}
 CHAN_SET_NOEXPIRE_ON
 	A megadott csatorna (%s) nem fog elévülni.
 CHAN_SET_NOEXPIRE_OFF
@@ -1065,7 +1066,7 @@ CHAN_XOP_ACCESS
 
 # AOP üzenetek
 CHAN_AOP_SYNTAX
-	AOP #csatorna {ADD|DEL|LIST|CLEAR} [nick|sorozat]
+	AOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]
 CHAN_AOP_DISABLED
 	Csatorna AOP lista módosítás szünetel.
 CHAN_AOP_NICKS_ONLY
@@ -1096,7 +1097,7 @@ CHAN_AOP_CLEAR
 
 # HOP üzenetek
 CHAN_HOP_SYNTAX
-	HOP #csatorna {ADD|DEL|LIST|CLEAR} [nick|sorozat]
+	HOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]
 CHAN_HOP_DISABLED
 	Csatorna HOP lista módosítás szünetel.
 CHAN_HOP_NICKS_ONLY
@@ -1127,7 +1128,7 @@ CHAN_HOP_CLEAR
 
 # SOP üzenetek
 CHAN_SOP_SYNTAX
-	SOP #csatorna {ADD|DEL|LIST|CLEAR}[nick|sorozat]
+	SOP #szoba { ADD | DEL | LIST | CLEAR }[ nick | sorszám]
 CHAN_SOP_DISABLED
 	Csatorna SOP lista módosítás szünetel.
 CHAN_SOP_NICKS_ONLY
@@ -1158,7 +1159,7 @@ CHAN_SOP_CLEAR
 
 # VOP messages
 CHAN_VOP_SYNTAX
-	VOP #csatorna {ADD|DEL|LIST|CLEAR} [nick|sorozat]
+	VOP #csatorna { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]
 CHAN_VOP_DISABLED
 	Csatorna VOP lista módosítás szünetel.
 CHAN_VOP_NICKS_ONLY
@@ -1189,7 +1190,7 @@ CHAN_VOP_CLEAR
 
 # ACCESS üzenetek
 CHAN_ACCESS_SYNTAX
-	ACCESS#csatorna{ADD|DEL|LIST|CLEAR} [nick[szint]|sorszám]
+	ACCESS#szoba{ ADD | DEL | LIST | CLEAR } [ nick [ szint ] | sorszám ]
 CHAN_ACCESS_XOP
 	Nem használhatod ezt a parancsot. 
 	Használd az AOP, SOP és VOP parancsokat helyette.
@@ -1241,8 +1242,7 @@ CHAN_ACCESS_CLEAR
 	
 # AKICK válaszok
 CHAN_AKICK_SYNTAX
-	AKICK #csatorna{ADD | STICK | UNSTICK | DEL | LIST | VIEW 
-	ENFORCE | CLEAR} [nick | usermaszk] [indok]
+	AKICK #szoba {ADD | STICK | UNSTICK | DEL | LIST | VIEW | ENFORCE | CLEAR}[ nick-maszk ] [ indok ]
 CHAN_AKICK_DISABLED
 	Csatorna autokick listájának módosítása szünetel.
 CHAN_AKICK_ALREADY_EXISTS
@@ -1287,16 +1287,16 @@ CHAN_AKICK_CLEAR
 
 # LEVELS válaszok
 CHAN_LEVELS_SYNTAX
-	LEVELS #csatorna{SET|DIS[ABLE]|LIST|RESET}[item[szint]]
+	LEVELS #szoba{SET | DIS[ABLE] | LIST | RESET }[ opció [szint]]
 CHAN_LEVELS_XOP
-	Ez a parancs használhatatlan ebben a módban.
+	Ez a parancs használhatatlan ebben a módban. (xOP)
 CHAN_LEVELS_RANGE
 	A szintnek kizárólag %d és %d között kell lennie.
 CHAN_LEVELS_CHANGED
 	%s szintjének új értéke a (%s) csatornán: %d.
 CHAN_LEVELS_UNKNOWN
-	Beállítás %s hibás.Használd: /msg %s HELP LEVELS DESC
-	listából az érvényes beállításokat  
+	%s beállítás nem ismert. Írd be /msg %s HELP LEVELS DESC
+	az érvényes beállítások listájának megtekintéséhez.  
 CHAN_LEVELS_DISABLED
 	%s letiltva a (%s) csatornán.
 CHAN_LEVELS_LIST_HEADER
@@ -1308,47 +1308,47 @@ CHAN_LEVELS_LIST_FOUNDER
 CHAN_LEVELS_LIST_NORMAL
 	    %-*s  %d
 CHAN_LEVELS_RESET
-	%s szintjei visszaállítva az alapbeállításokra.
+	%s szintjei visszaállítva az alapértékekre.
 
 # INFO válaszok
 CHAN_INFO_SYNTAX
-	INFO #csatorna [ALL]
+	INFO #szoba [ALL]
 CHAN_INFO_HEADER
 	%s információi:
 CHAN_INFO_FOUNDER
-		Tulajdonos: %s (%s)
+	    Tulajdonos: %s (%s)
 CHAN_INFO_NO_FOUNDER
-		Tulajdonos: %s
+	    Tulajdonos: %s
 CHAN_INFO_SUCCESSOR
-		Jogutód: %s (%s)
+	    Jogutód: %s (%s)
 CHAN_INFO_NO_SUCCESSOR
-		Jogutód: %s
+	    Jogutód: %s
 CHAN_INFO_DESCRIPTION
-		Leírás: %s
+	    Leírás: %s
 CHAN_INFO_ENTRYMSG
-	Köszöntõ üzenet: %s
+	    Köszöntõ üzenet: %s
 CHAN_INFO_TIME_REGGED
-		Regisztrálás ideje: %s
+	    Regisztrálás ideje: %s
 CHAN_INFO_LAST_USED
-		Utoljára használva: %s
+	    Utoljára használva: %s
 CHAN_INFO_LAST_TOPIC
-		Utolsó topic: %s
+	    Utolsó topic: %s
 CHAN_INFO_TOPIC_SET_BY
-		A témát beállította: %s
+	    A témát beállította: %s
 CHAN_INFO_URL
-	      URL: %s
+	    URL: %s
 CHAN_INFO_EMAIL
-		E-mail cím: %s
+	    E-mail cím: %s
 CHAN_INFO_BANTYPE
-		Ban típus: %d
+	    Ban típus: %d
 CHAN_INFO_OPTIONS
-		Opciók: %s
+	    Opciók: %s
 CHAN_INFO_OPT_KEEPTOPIC
 	Témamegõrzés
 CHAN_INFO_OPT_OPNOTICE
 	Opok értesítése
 CHAN_INFO_OPT_PEACE
-	Peace
+	Békesség
 CHAN_INFO_OPT_PRIVATE
 	Privát
 CHAN_INFO_OPT_RESTRICTED
@@ -1358,11 +1358,11 @@ CHAN_INFO_OPT_SECURE
 CHAN_INFO_OPT_SECUREOPS
 	Opjog védelme
 CHAN_INFO_OPT_SECUREFOUNDER
-	Secure Founder
+	Founderjog védelme
 CHAN_INFO_OPT_SIGNKICK
 	Signed kicks
 CHAN_INFO_OPT_TOPICLOCK
-	Témalezárás
+	Témaváltás lezárása
 CHAN_INFO_OPT_XOP
 	xOP lista rendszer
 CHAN_INFO_OPT_NONE
@@ -1386,39 +1386,39 @@ CHAN_LIST_END
 
 # INVITE válaszok
 CHAN_INVITE_SYNTAX
-	INVITE #csatorna
+	INVITE #szoba
 
 # UNBAN válaszok
 CHAN_UNBAN_SYNTAX
-	UNBAN #csatorna
+	UNBAN #szoba
 CHAN_UNBANNED
 	%s csatornán a tiltást levetetted magadról.
 
 # TOPIC válaszok
 CHAN_TOPIC_SYNTAX
-	TOPIC #csatorna [topic]
+	TOPIC #szoba [topic]
 
 # CLEAR válaszok
 CHAN_CLEAR_SYNTAX
-	CLEAR #csatorna mit?
+	CLEAR #szoba mit?
 CHAN_CLEARED_BANS
 	A (%s) csatornáról minden kitiltás levéve.
 CHAN_CLEARED_EXCEPTS
-	A (%s) csatornáról minden kivétel el lett távolítva.
+	A (%s) csatornáról minden kivétel levéve.
 CHAN_CLEARED_MODES
-	A (%s) csatornáról minden mód el lett távolítva.
+	A (%s) csatornáról minden mód el levéve.
 CHAN_CLEARED_OPS
-	A (%s) csatornán minden operátori jog el lett véve.
+	A (%s) csatornán minden +o mód levéve.
 CHAN_CLEARED_HOPS
-	Mode +h has been cleared from channel %s.
+	A (%s) csatornán minden +h mód levéve.
 CHAN_CLEARED_VOICES
-	A (%s) csatornán minden hangadás el lett véve.
+	A (%s) csatornán minden +v mód levéve.
 CHAN_CLEARED_USERS
 	A (%s) csatornáról minden felhasználó ki lett rúgva.
 
 # GETPASS válaszok
 CHAN_GETPASS_SYNTAX
-	GETPASS csatorna
+	GETPASS #szoba
 CHAN_GETPASS_UNAVAILABLE
 	GETPASS elérhetetlen, mig az encryption használatban van.
 CHAN_GETPASS_PASSWORD_IS
@@ -1426,7 +1426,7 @@ CHAN_GETPASS_PASSWORD_IS
 
 # SENDPASS válaszok
 CHAN_SENDPASS_SYNTAX
-	SENDPASS #csatorna
+	SENDPASS #szoba
 CHAN_SENDPASS_UNAVAILABLE
 	SENDPASS elérhetetlen, amíg az encryption használatban van
 CHAN_SENDPASS_SUBJECT
@@ -1482,8 +1482,7 @@ CHAN_UNSUSPEND_FAILED
 
 # Misc válaszok
 CHAN_EXCEPTED
-	%s megegyezik egy kivétellel (%s) nem tiltható, 
-	amig a kivételt el nem távolítják.
+	%s megegyezik egy kivétellel (%s) nem tiltható, amíg a kivétel él.
 
 ###########################################################
 #
@@ -1518,6 +1517,7 @@ MEMO_NEW_X_MEMO_ARRIVED
 MEMO_NEW_MEMO_ARRIVED
 	%s küldött egy új üzenetet.
 	Ha szeretnéd elolvasni, írd be: /msg %s READ %d.
+
 # Multi-use válaszok
 MEMO_HAVE_NO_MEMOS
 	Nincs üzeneted.
@@ -1556,7 +1556,7 @@ MEMO_CANCELLED
 
 # LIST válaszok
 MEMO_LIST_SYNTAX
-	LIST [#szoba] [list | NEW]
+	LIST [#szoba] [list | NEW ]
 MEMO_HAVE_NO_NEW_MEMOS
 	Nem kaptál új üzenetet.
 MEMO_X_HAS_NO_NEW_MEMOS
@@ -1576,11 +1576,11 @@ MEMO_LIST_FORMAT
 
 # READ válaszok
 MEMO_READ_SYNTAX
-	READ [#szoba] {list | LAST | NEW}
+	READ [#szoba] {list | LAST | NEW }
 MEMO_HEADER
-	Üz.szám: %d; fa:%s (%s). Törléshez: /msg %s DEL %d
+	Üzenet szám: %d; feladó: %s (%s). Törléshez: /msg %s DEL %d
 MEMO_CHAN_HEADER
-	Üz.szám: %d; fa.:%s (%s). Törléshez: /msg %s DEL %s %d
+	Üzenet szám: %d; feladó.: %s (%s). Törléshez: /msg %s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -1606,6 +1606,7 @@ MEMO_SET_DISABLED
 MEMO_SET_UNKNOWN_OPTION
 	Ismeretlen SET opció: %s
 
+# SET NOTIFY válaszok
 MEMO_SET_NOTIFY_SYNTAX
 	SET NOTIFY {ON | LOGON | NEW | OFF}
 MEMO_SET_NOTIFY_ON
@@ -1616,16 +1617,15 @@ MEMO_SET_NOTIFY_NEW
 	%s mostmár értesíteni fog, ha új üzeneted érkezik.
 MEMO_SET_NOTIFY_OFF
 	%s mostmár nem fog értestíteni, ha új üzeneted érkezik.
+MEMO_SET_NOTIFY_MAIL
+	Az új memo üzeneteidrõl emailben kapsz értesítést.
+MEMO_SET_NOTIFY_NOMAIL
+	Már nem kapsz értesítést emailben.
+MEMO_SET_NOTIFY_INVALIDMAIL
+	Nincs beállítva email cím a nevedhez.
+
 
 # SET LIMIT válaszok
-MEMO_SET_NOTIFY_MAIL
-	You will now be informed about new memos via email.
-MEMO_SET_NOTIFY_NOMAIL
-	You will no longer be informed via email.
-MEMO_SET_NOTIFY_INVALIDMAIL
-	There's no email address set for your nick.
-
-# SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
 	SET LIMIT [#szoba] limit
 MEMO_SET_LIMIT_SERVADMIN_SYNTAX
@@ -1656,9 +1656,9 @@ MEMO_UNSET_LIMIT
 
 # INFO válaszok
 MEMO_INFO_SYNTAX
-	INFO [szoba]
+	INFO [#szoba]
 MEMO_INFO_SERVADMIN_SYNTAX
-	INFO [nick | szoba]
+	INFO [nick | #szoba]
 MEMO_INFO_NO_MEMOS
 	Jelenleg nincs üzeneted.
 MEMO_INFO_MEMO
@@ -1720,6 +1720,42 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 	%s értesítést kért, ha új üzenete érkezik.
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s kérte, csatlakozáskor értesítést kapjon,üzeneteirõl.
+
+# Memo2Mail válaszok
+MEMO_MAIL_SUBJECT
+	Új memo
+MEMO_MAIL_TEXT1
+	Hi %s
+MEMO_MAIL_TEXT2
+	Kaptál egy új memo üzenetet %s nicktõl. Ez a memo a %d sorszámú.
+MEMO_MAIL_TEXT3
+	Memo Szöveg:
+
+# RSEND válaszok
+MEMO_RSEND_PLEASE_WAIT
+	Kérlek várj %d másodpercet mielõtt újra használod az RSEND parancsot.
+MEMO_RSEND_DISABLED
+	Sajnálom, az RSEND használata le van tiltva ezen a hálózaton.
+MEMO_RSEND_SYNTAX
+	RSEND {nick | #szoba} memo-szöveg
+MEMO_RSEND_NICK_MEMO_TEXT
+	[auto-memo] A memo, amit küldtél meg lett tekintve.
+MEMO_RSEND_CHAN_MEMO_TEXT
+	[auto-memo] A memo, amit %s számára küldtél meg lett tekintve.
+MEMO_RSEND_USER_NOTIFICATION
+	Az értesítõ üzenet %s részére el lett küldve, informálva
+	õt arról, hogy elolvastad a memoját.
+
+# CHECK válaszok
+MEMO_CHECK_SYNTAX
+	CHECK nicknév 
+MEMO_CHECK_NOT_READ
+	Az utolsó memo, amit %s részére (%s idõpontban) küldtél még olvasatlan.
+MEMO_CHECK_READ
+	Az utolsó memo, amit %s részére (%s idõpontban) küldtél már olvasott.
+MEMO_CHECK_NO_MEMO
+	%s nickre nem érkezett memo üzenet tõled.
+
 	
 ###########################################################
 #
@@ -1728,52 +1764,11 @@ MEMO_INFO_X_NOTIFY_SIGNON
 ###########################################################
 	
 # Standard válaszok
-MEMO_MAIL_SUBJECT
-	New memo
-MEMO_MAIL_TEXT1
-	Hi %s
-MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
-MEMO_MAIL_TEXT3
-	Memo Text:
-
-# RSEND responses
-MEMO_RSEND_PLEASE_WAIT
-	Please wait %d seconds before using the RSEND command again.
-MEMO_RSEND_DISABLED
-	Sorry, RSEND has been disabled on this network.
-MEMO_RSEND_SYNTAX
-	RSEND {nick | channel} memo-text
-MEMO_RSEND_NICK_MEMO_TEXT
-	[auto-memo] The memo you sent has been viewed.
-MEMO_RSEND_CHAN_MEMO_TEXT
-	[auto-memo] The memo you sent to %s has been viewed.
-MEMO_RSEND_USER_NOTIFICATION
-	A notification memo has been sent to %s informing him/her you have
-	read his/her memo.
-
-# CHECK responses
-MEMO_CHECK_SYNTAX
-	CHECK nickname
-MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
-MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
-MEMO_CHECK_NO_MEMO
-	Nick %s doesn't have a memo from you.
-
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
 BOT_DOES_NOT_EXIST
 	%s nevû bot nem létezik.
 BOT_NOT_ASSIGNED
-	Társítanod kellene egy bot a csatornára mielõtt használod
-	ezt a parancsot, /msg %S HELP ASSIGN bõvebb infókért.
+	Társítanod kellene egy botot a csatornára mielõtt használod
+	ezt a parancsot, írd be /msg %S HELP ASSIGN bõvebb infókért.
 BOT_NOT_ON_CHANNEL
 	A Bot nincs a %s csatornán.
 
@@ -1793,9 +1788,9 @@ BOT_REASON_FLOOD
 BOT_REASON_REPEAT
 	Ne ismételd magad!
 BOT_REASON_REVERSE
-	Nem lehet visszafelé írni ezen a csatornán!
+	Nem írj visszafelé ezen a csatornán!
 BOT_REASON_UNDERLINE
-	Nem húzhatsz alá ezen a csatornán!
+	Nem használj aláhúzásokat ezen a csatornán!
 
 # !seen válaszok
 BOT_SEEN_BOT
@@ -1807,7 +1802,7 @@ BOT_SEEN_ON_CHANNEL
 BOT_SEEN_ON_CHANNEL_AS
 	%s a szobában van (%s néven) ! 
 BOT_SEEN_ON
-	%s utoljára %s elõtt járt erre.
+	%s utoljára %s ideje járt erre.
 BOT_SEEN_NEVER
 	Sosem láttam %s nicket ebben a szobában.
 BOT_SEEN_UNKNOWN
@@ -1815,45 +1810,45 @@ BOT_SEEN_UNKNOWN
 
 # BOT válaszok
 BOT_BOT_SYNTAX
-	BOT ADD nick user hoszt real
-	BOT CHANGE réginickújnick [user [hoszt [real]]]
+	BOT ADD nick user hoszt valósnév
+	BOT CHANGE réginickújnick [user [hoszt [valósnév]]]
 	BOT DEL nick
 	BOT LIST
 BOT_BOT_ALREADY_EXISTS
-	Bot %s már tartalmaz.
+	%s nevû bot már létezik.
 BOT_BOT_CREATION_FAILED
-	Bot létrehozása sikertelen.
+	A bot létrehozása sikertelen.
 BOT_BOT_READONLY
-	Bot módosítása szünetel.
+	A bot módosítás ideiglenesen szünetel.
 BOT_BOT_ADDED
 	%s!%s@%s (%s) hozzáadva a bot listához.
 BOT_BOT_ANY_CHANGES
-	Régi info megegyezik az újjal.
+	A régi info megegyezik az újjal.
 BOT_BOT_CHANGED
-	Bot %s van megváltoztatva %s!%s@%s (%s)
+	A %s nevû bot megváltoztatva %s!%s@%s (%s)
 BOT_BOT_DELETED
-	Bot %s törölve.
+	A %s nevû bot törölve.
 
 # BOTLIST válaszok
 BOT_BOTLIST_HEADER
-	Bot list:
+	Botok listája:
 BOT_BOTLIST_PRIVATE_HEADER
-	Bots fenntartva csak IRC operatoroknak:
+	Botok melyeket csak IRC operátorok társíthatnak:
 BOT_BOTLIST_FOOTER
 	%d botok rendelkezésre állnak.
 BOT_BOTLIST_EMPTY
 	Nem áll rendelkezésre bot.
-	Kérd meg a szervíz admint, hogy csináljon egyet!
+	Kérj meg egy szervíz admint, hogy csináljon!
 
 # ASSIGN válaszok
 BOT_ASSIGN_SYNTAX
 	ASSIGN #szoba nick
 BOT_ASSIGN_READONLY
-	Bot kijelölés nem müködik.
+	Bot társítás ideiglenesen nem mûködik.
 BOT_ASSIGN_ALREADY
-	%s bot van kijelölve a %s szobához.
+	A %s nevû bot már társítva van a %s szobához.
 BOT_ASSIGN_ASSIGNED
-	%s bot van kijelölve a %s szobához.
+	A %s nevû bot társítva a %s szobához.
 	
 # UNASSIGN válaszok
 BOT_UNASSIGN_SYNTAX
@@ -1865,71 +1860,71 @@ BOT_UNASSIGN_UNASSIGNED
 BOT_INFO_SYNTAX
 	INFO {#szoba | nick}
 BOT_INFO_NOT_FOUND
-	%s nincsen érvényes bot a regisztrált szobában.
+	%s nem érvényes bot vagy regisztrált szoba.
 BOT_INFO_BOT_HEADER
-	Információ a %s botról:
+	Információk a %s nevû botról:
 BOT_INFO_BOT_MASK
 	Maszk : %s@%s
 BOT_INFO_BOT_REALNAME
 	Valódi neve: %s
 BOT_INFO_BOT_CREATED
-	Készítette: %s
+	Született: %s
 BOT_INFO_BOT_USAGE
 	Használva: %d szobában
 BOT_INFO_BOT_OPTIONS
-	Beállitásai: %s
+	Beállításai: %s
 BOT_INFO_OPT_PRIVATE
-	Private
+	Privát
 BOT_INFO_CHAN_HEADER
 	Információ a %s szobáról:
 BOT_INFO_CHAN_BOT
 	Bot név: %s
 BOT_INFO_CHAN_BOT_NONE
-	Bot név: nincs kijelölve még.
+	Bot név: nincs társítva még.
 BOT_INFO_CHAN_KICK_BADWORDS
-		Csúnya szavakért kirúgva: %s
+		Csúnya szavakért kirúgás: %s
 BOT_INFO_CHAN_KICK_BADWORDS_BAN
-		Csúnya szavakért kirúgva: %s (%d kirúgva és tiltva)
+		Csúnya szavakért kirúgás: %s (%d kirúgás után kitiltás)
 BOT_INFO_CHAN_KICK_BOLDS
-		Félkövér betû használatáért kirúgva: %s
+		Félkövér betûkért kirúgás: %s
 BOT_INFO_CHAN_KICK_BOLDS_BAN
-		Félkövér betu használatáért kirúgva: %s (%d kirúgva és tiltva)
+		Félkövér betûkért kirúgás: %s (%d kirúgás után kitiltás)
 BOT_INFO_CHAN_KICK_CAPS_ON
-		Cap Lockért kirúgva: %s (minimum %d/%d%%)
+		Caps Lockért kirúgás: %s (minimum %d/%d%%)
 BOT_INFO_CHAN_KICK_CAPS_BAN
-		Cap Lockért kirúgva: %s (%d kirúgva és tiltva; min. %d/%d%%)
+		Caps Lockért kirúgás: %s (%d kirúgás után kitiltás; min. %d/%d%%)
 BOT_INFO_CHAN_KICK_CAPS_OFF
-		Cap Lockért kirúgva : %s
+		Caps Lockért kirúgás : %s
 BOT_INFO_CHAN_KICK_COLORS
-		Szinezésért kirúgva: %s
+		Szinezésért kirúgás: %s
 BOT_INFO_CHAN_KICK_COLORS_BAN
-		Szinezésért kirúgva: %s (%d kirugott és tiltott)
+		Szinezésért kirúgás: %s (%d kirúgás után kitiltás)
 BOT_INFO_CHAN_KICK_FLOOD_ON
-		Floodért kirúgva: %s (%d sor %ds -ban)
+		Floodért kirúgás: %s (%d sor %ds mp alatt)
 BOT_INFO_CHAN_KICK_FLOOD_BAN
-		Floodért kirúgva: %s (%d kirúgva és tiltva; %d sor %ds mp)
+		Floodért kirúgás: %s (%d kirúgás után kitiltás; %d sor %ds mp alatt)
 BOT_INFO_CHAN_KICK_FLOOD_OFF
-		Floodért kirúgva: %s
+		Floodért kirúgás: %s
 BOT_INFO_CHAN_KICK_REPEAT_ON
-		Ismétlésért kirúgva : %s (%d idõre)
+		Ismétlésért kirúgás : %s (%d alkalommal)
 BOT_INFO_CHAN_KICK_REPEAT_BAN
-		Ismétlésért kirúgva: %s (%d kirúgva és tiltva; %d idõre)
+		Ismétlésért kirúgás: %s (%d kirúgás után kitiltás; %d idõre)
 BOT_INFO_CHAN_KICK_REPEAT_OFF
-		Ismétlésért kirúgva: %s
+		Ismétlésért kirúgás: %s
 BOT_INFO_CHAN_KICK_REVERSES
-		Visszafelé írásért kirúgva: %s
+		Visszafelé írásért kirúgás: %s
 BOT_INFO_CHAN_KICK_REVERSES_BAN
-		Visszafelé írásért kirúgva: %s (%d kirúgva és tiltva)
+		Visszafelé írásért kirúgás: %s (%d kirúgás után kitiltás)
 BOT_INFO_CHAN_KICK_UNDERLINES
-		Aláhúzásért kirúgva: %s
+		Aláhúzásért kirúgás: %s
 BOT_INFO_CHAN_KICK_UNDERLINES_BAN
-		Aláhúzásért kirúgva: %s (%d kirúgva és tiltva)
+		Aláhúzásért kirúgás: %s (%d kirúgás után kitiltás)
 BOT_INFO_ACTIVE
-	Engedélyezve
+	engedélyezve
 BOT_INFO_INACTIVE
-	Tiltva
+	letiltva
 BOT_INFO_CHAN_OPTIONS
-		Beállítás: %s
+		Beállítások: %s
 BOT_INFO_OPT_DONTKICKOPS
 	Opok védelme
 BOT_INFO_OPT_DONTKICKVOICES
@@ -2012,12 +2007,12 @@ BOT_SET_SYMBIOSIS_OFF
 
 # KICK válaszok
 BOT_KICK_SYNTAX
-	KICK szoba option {ON|OFF} [settings]
+	KICK #szoba opció {ON|OFF} [beállítások]
 BOT_KICK_DISABLED
-	Kirúgás használata idõlegesen letiltva.
+	Kirúgás használata ideiglenesen letiltva.
 BOT_KICK_UNKNOWN
 	Ismeretlen opció: %s.
-	További információért nézd meg: /msg %S HELP KICK 
+	További információért írd be: /msg %S HELP KICK 
 BOT_KICK_BAD_TTB
 	%s nem fogadható el banolási idõnek.
 
@@ -2140,13 +2135,13 @@ BOT_BAD_IDENT
 #
 ###########################################################
 	
-# General üzenetek
+# Általános üzenetek
 OPER_BOUNCY_MODES
 	Szervíz nem tudja változtatni a módokat.
-	Szerver jól van beállítva?
+	A szervereid jól vannak beállítva?
 OPER_BOUNCY_MODES_U_LINE
 	Szervíz nem tudja változtatni a módokat.
-	Szerver U:lines beállitása helyes?
+	A szerverek U:lines beállitása helyes?
 
 # GLOBAL válaszok
 OPER_GLOBAL_SYNTAX
@@ -2158,131 +2153,131 @@ OPER_STATS_UNKNOWN_OPTION
 OPER_STATS_CURRENT_USERS
 	Aktuális felhasználók: %d (%d op)
 OPER_STATS_MAX_USERS
-	Max.felhasználó: %d (%s)
+	Legtöbb felhasználó: %d (%s)
 # This is ugly, but at least it's language-portable...
 # Note that you can include seconds in any of these--my personal preference
 # is to only give resolution to the nearest minute when uptime is one hour
 # or more, but just add a %d to get seconds as well.
 OPER_STATS_UPTIME_DHMS
-	Szervíz fellépett %d nap, %02d:%02d
+	Szervíz fent van %d nap, %02d:%02d
 OPER_STATS_UPTIME_1DHMS
-	Szervíz fellépett %d nap, %02d:%02d
+	Szervíz fent van %d nap, %02d:%02d
 OPER_STATS_UPTIME_HMS
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_HM1S
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_H1MS
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_H1M1S
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_1HMS
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_1HM1S
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_1H1MS
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_1H1M1S
-	Szervíz fellépett %d óra, %d perce
+	Szervíz fent van %d óra, %d perce
 OPER_STATS_UPTIME_MS
-	Szervíz fellépett %d perc, %d másodperce.
+	Szervíz fent van %d perc, %d másodperce.
 OPER_STATS_UPTIME_M1S
-	Szervíz fellépett %d perc, %d másodperce.
+	Szervíz fent van %d perc, %d másodperce.
 OPER_STATS_UPTIME_1MS
-	Szervíz fellépett %d perc, %d másodperce.
+	Szervíz fent van %d perc, %d másodperce.
 OPER_STATS_UPTIME_1M1S
-	Szervíz fellépett %d perc, %d másodperce.
+	Szervíz fent van %d perc, %d másodperce.
 OPER_STATS_BYTES_READ
-	Bytes olvas	: %5d kB
+	Olvasott Byteok : %5d kB
 OPER_STATS_BYTES_WRITTEN
-	Bytes ír	: %5d kB
+	Írott Byteok : %5d kB
 OPER_STATS_USER_MEM
-	Felhasználó	: %6d felvétel, %5d kB
+	Felhasználó	 : %6d bejegyzés, %5d kB
 OPER_STATS_CHANNEL_MEM
-	szoba	: %6d felvétel, %5d kB
+	Szoba	       : %6d bejegyzés, %5d kB
 OPER_STATS_GROUPS_MEM
-	NS Csoport	: %6d felvétel, %5d kB
+	NS Csoport	 : %6d bejegyzés, %5d kB
 OPER_STATS_ALIASES_MEM
-	NS Aliases	: %6d felvétel, %5d kB
+	NS Aliases	 : %6d bejegyzés, %5d kB
 OPER_STATS_CHANSERV_MEM
-	ChanServ	: %6d felvétel, %5d kB
+	ChanServ	 : %6d bejegyzés, %5d kB
 OPER_STATS_BOTSERV_MEM
-	BotServ	: %6d felvétel, %5d kB
+	BotServ	 : %6d bejegyzés, %5d kB
 OPER_STATS_OPERSERV_MEM
-	OperServ	: %6d felvétel, %5d kB
+	OperServ	 : %6d bejegyzés, %5d kB
 OPER_STATS_SESSIONS_MEM
-	Sessions	: %6d felvétel, %5d kB
+	Session	 : %6d bejegyzés, %5d kB
 OPER_STATS_PROXY_MEM
-	Proxies	: %6d felvétel, %5d kB
+	Proxik	 : %6d bejegyzés, %5d kB
 OPER_STATS_AKILL_COUNT
-	Aktuális kitiltottak száma: %d
+	Aktuális AKILLek száma: %d
 OPER_STATS_AKILL_EXPIRE_DAYS
-	Hiányzik AKILL lejárati idõ: %d nap
+	Alap AKILL lejárati idõ: %d nap
 OPER_STATS_AKILL_EXPIRE_DAY
-	Hiányzik AKILL lejárati idõ: 1 nap
+	Alap AKILL lejárati idõ: 1 nap
 OPER_STATS_AKILL_EXPIRE_HOURS
-	Hiányzik AKILL lejárati idõ: %d óra
+	Alap AKILL lejárati idõ: %d óra
 OPER_STATS_AKILL_EXPIRE_HOUR
-	Hiányzik AKILL lejárati idõ: 1 óra
+	Alap AKILL lejárati idõ: 1 óra
 OPER_STATS_AKILL_EXPIRE_MINS
-	Hiányzik AKILL lejárati idõ: %d perc
+	Alap AKILL lejárati idõ: %d perc
 OPER_STATS_AKILL_EXPIRE_MIN
-	Hiányzik AKILL lejárati idõ: 1 perc
+	Alap AKILL lejárati idõ: 1 perc
 OPER_STATS_AKILL_EXPIRE_NONE
-	Hiányzik AKILL lejárati idõ: Nem elévülõ
+	Alap AKILL lejárati idõ: Nem elévülõ
 OPER_STATS_SGLINE_COUNT
-	Aktuális szám a SGLINEsben: %d
+	Aktuális SGLINEok száma: %d
 OPER_STATS_SGLINE_EXPIRE_DAYS
-	Hiányzik SGLINE lejárati idõ: %d nap
+	Alap SGLINE lejárati idõ: %d nap
 OPER_STATS_SGLINE_EXPIRE_DAY
-	Hiányzik SGLINE lejárati idõ: 1 nap
+	Alap SGLINE lejárati idõ: 1 nap
 OPER_STATS_SGLINE_EXPIRE_HOURS
-	Hiányzik SGLINE lejárati idõ: %d óra
+	Alap SGLINE lejárati idõ: %d óra
 OPER_STATS_SGLINE_EXPIRE_HOUR
-	Hiányzik SGLINE lejárati idõ: 1 óra
+	Alap SGLINE lejárati idõ: 1 óra
 OPER_STATS_SGLINE_EXPIRE_MINS
-	Hiányzik SGLINE lejárati idõ: %d perc
+	Alap SGLINE lejárati idõ: %d perc
 OPER_STATS_SGLINE_EXPIRE_MIN
-	Hiányzik SGLINE lejárati idõ: 1 perc
+	Alap SGLINE lejárati idõ: 1 perc
 OPER_STATS_SGLINE_EXPIRE_NONE
-	Hiányzik SGLINE lejárati ido: Nem elévülõ
+	Alap SGLINE lejárati ido: Nem elévülõ
 OPER_STATS_SQLINE_COUNT
-	Aktuális szám SQLINEben : %d
+	Aktuális SQLINEok száma : %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
-	Hiányzik SQLINE lejárati idõ: %d nap
+	Alap SQLINE lejárati idõ: %d nap
 OPER_STATS_SQLINE_EXPIRE_DAY
-	Hiányzik SQLINE lejárati idõ: 1 nap
+	Alap SQLINE lejárati idõ: 1 nap
 OPER_STATS_SQLINE_EXPIRE_HOURS
-	Hiányzik SQLINE lejárati idõ: %d óra
+	Alap SQLINE lejárati idõ: %d óra
 OPER_STATS_SQLINE_EXPIRE_HOUR
-	Hiányzik SQLINE lejárati idõ: 1 óra
+	Alap SQLINE lejárati idõ: 1 óra
 OPER_STATS_SQLINE_EXPIRE_MINS
-	Hiányzik SQLINE lejárati idõ: %d perc
+	Alap SQLINE lejárati idõ: %d perc
 OPER_STATS_SQLINE_EXPIRE_MIN
-	Hiányzik SQLINE lejárati idõ: 1 perc
+	Alap SQLINE lejárati idõ: 1 perc
 OPER_STATS_SQLINE_EXPIRE_NONE
-	Hiányzik SQLINE lejárati idõ Nem elévülõ
+	Alap SQLINE lejárati idõ Nem elévülõ
 OPER_STATS_SZLINE_COUNT
-	Aktuális szám a SZLINEben: %d
+	Aktuális SZLINEok száma: %d
 OPER_STATS_SZLINE_EXPIRE_DAYS
-	Hiányzik SZLINE lejárati idõ: %d nap
+	Alap SZLINE lejárati idõ: %d nap
 OPER_STATS_SZLINE_EXPIRE_DAY
-	Hiányzik SZLINE lejárati idõ: 1 nap
+	Alap SZLINE lejárati idõ: 1 nap
 OPER_STATS_SZLINE_EXPIRE_HOURS
-	Hiányzik SZLINE lejárati idõ: %d óra
+	Alap SZLINE lejárati idõ: %d óra
 OPER_STATS_SZLINE_EXPIRE_HOUR
-	Hiányzik SZLINE lejárati idõ: 1 óra
+	Alap SZLINE lejárati idõ: 1 óra
 OPER_STATS_SZLINE_EXPIRE_MINS
-	Hiányzik SZLINE lejárati idõ: %d perc
+	Alap SZLINE lejárati idõ: %d perc
 OPER_STATS_SZLINE_EXPIRE_MIN
-	Hiányzik SZLINE lejárati idõ: 1 perc
+	Alap SZLINE lejárati idõ: 1 perc
 OPER_STATS_SZLINE_EXPIRE_NONE
-	Hiányzik SZLINE lejárati idõ: Nem elévülõ
+	Alap SZLINE lejárati idõ: Nem elévülõ
 OPER_STATS_RESET
 	Statisztika nullázva.
 
 # MODE válaszok
 OPER_MODE_SYNTAX
-	MODE szobamód
+	MODE szoba mód
 
 # UMODE reagálások
 OPER_UMODE_SYNTAX
@@ -2304,9 +2299,9 @@ OPER_OLINE_IRCOP
 OPER_CLEARMODES_SYNTAX
 	CLEARMODES #szoba [ALL]
 OPER_CLEARMODES_DONE
-	Binary mód és kitiltás törölve a %s csatornáról.
+	Bináris módok és kitiltások törölve a %s csatornáról.
 OPER_CLEARMODES_ALL_DONE
-	Összes mód törölve %s csatornáról.
+	Összes mód törölve a %s csatornáról.
 	
 # KICK válaszok
 OPER_KICK_SYNTAX
@@ -2320,10 +2315,9 @@ OPER_SVSNICK_NEWNICK
 
 # ADMIN válaszok
 OPER_ADMIN_SYNTAX
-	ADMIN {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+	ADMIN {ADD|DEL|LIST|CLEAR} [nick | bejegyzések]
 OPER_ADMIN_SKELETON
-	Szervíz most csökkentett módban fut, az ADMIN parancsok
-	nem elérhetõk
+	Szervíz most skeleton módban fut, az ADMIN parancs nem elérhetõ
 OPER_ADMIN_EXISTS
 	%s már szerepel a szervíz admin litában.
 OPER_ADMIN_REACHED_LIMIT
@@ -2352,10 +2346,9 @@ OPER_ADMIN_CLEAR
 
 # OPER válaszok
 OPER_OPER_SYNTAX
-	OPER {ADD|DEL|LIST|CLEAR} [nick | entry-list]
+	OPER {ADD|DEL|LIST|CLEAR} [nick | bejegyzések]
 OPER_OPER_SKELETON
-	Szervíz most csökkentett módban fut, az OPER parancsok
-	nem elérhetõk.
+	Szervíz most skeleton módban fut, az OPER parancs nem elérhetõ.
 OPER_OPER_EXISTS
 	%s már szerepel a szervíz operátor listán.
 OPER_OPER_REACHED_LIMIT
@@ -2384,8 +2377,7 @@ OPER_OPER_CLEAR
 
 # AKILL válaszok
 OPER_AKILL_SYNTAX
-	AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+lejárat] 
-	{maszk | sorszám} [indok]]
+	AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+lejárat] {maszk | sorszám} [indok]]
 OPER_AKILL_EXISTS
 	%s már bekapcsolva az AKILL lista.
 OPER_AKILL_ALREADY_COVERED
@@ -2394,7 +2386,7 @@ OPER_AKILL_REACHED_LIMIT
 	Te csak %d AKILL-t jegyezhetsz.
 OPER_AKILL_NO_NICK
 	Emlékeztetõ: AKILL maszk nem tartalmazhat nicknevet;
-	amikor használod, nem tartalmazhat nicket a maszk.
+	ellenõrizd, hogy nem tartalmazhat nick részt a maszk.
 OPER_AKILL_ADDED
 	%s hozzáadva az AKILL listához.
 OPER_AKILL_CHANGED
@@ -2429,8 +2421,7 @@ OPER_CHANKILL_SYNTAX
 
 # SGLINE válaszok
 OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} 
-	[[+lejárat] {maszk|sorszám}[:Indok]]
+	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[ +lejárat] {maszk| sorszám }[:Indok]]
 OPER_SGLINE_UNSUPPORTED
 	SGLINE nem használható ezen a hálózaton.
 OPER_SGLINE_EXISTS
@@ -2471,8 +2462,7 @@ OPER_SGLINE_CLEAR
 
 # SQLINE válaszok
 OPER_SQLINE_SYNTAX
-	SQLINE {ADD|DEL|LIST|VIEW|CLEAR}[[+lejárat]
-	{maszk|sorszám}[indok]]
+	SQLINE {ADD|DEL|LIST|VIEW|CLEAR}[ [ +lejárat ] { maszk | sorszám }[ indok ]]
 OPER_SQLINE_CHANNELS_UNSUPPORTED
 	Szoba SQLINE-ok nem támogatottak ezen az IRCd-n,ezért
 	nem tudod használni.
@@ -2514,8 +2504,7 @@ OPER_SQLINE_CLEAR
 
 # SZLINE válaszok
 OPER_SZLINE_SYNTAX
-	SZLINE {ADD|DEL|LIST|VIEW|CLEAR}[[+lejárat]
-	{maszk|entry-list}[indok]]
+	SZLINE {ADD | DEL | LIST | VIEW | CLEAR }[[ +lejárat ] { maszk | sorszám } [ indok ]]
 OPER_SZLINE_UNSUPPORTED
 	SZLINE nem használható ezen a hálózaton.
 OPER_SZLINE_EXISTS
@@ -2558,7 +2547,7 @@ OPER_SZLINE_CLEAR
 
 # SET válaszok
 OPER_SET_SYNTAX
-	SET option setting
+	SET opció beállítás
 OPER_SET_IGNORE_ON
 	Mellõzés kód lessz használva.
 OPER_SET_IGNORE_OFF
@@ -2624,7 +2613,7 @@ OPER_RELOAD
 # RESTART válaszok
 OPER_CANNOT_RESTART
 	SERVICES_BIN nincs meghatározva; nem tud újraindulni.
-	Frissitsd a \2conf\2script és recompile. 
+	Térj vissza a \2configure\2 scripthez és kez újra a forgatást. 
 	Szervízhez engedélyezd a RESTART parancsot.
 
 # IGNORE válaszok
@@ -2656,7 +2645,7 @@ OPER_KILLCLONES_UNKNOWN_NICK
 
 # CHANLIST válaszok
 OPER_CHANLIST_HEADER
-	szoba lista:
+	Szoba lista:
 	Név			User Mód   Topic
 OPER_CHANLIST_HEADER_USER
 	%s szoba listája:
@@ -2698,7 +2687,7 @@ OPER_CACHE_QUEUED
 OPER_CACHE_PROGRESS
 	Folyamatban
 OPER_CACHE_NORMAL
-	Normal
+	Normál
 OPER_CACHE_WINGATE
 	Wingate
 OPER_CACHE_SOCKS4
@@ -2712,7 +2701,7 @@ OPER_SUPER_ADMIN_ON
 OPER_SUPER_ADMIN_OFF
 	Te nem vagy már Szuper-Admin
 OPER_SUPER_ADMIN_SYNTAX
-	SET Superadmin  ON [jelszó] vagy OFF 
+	SET SuperAdmin  ON vagy OFF 
 	(engedélyezni kell a services.conf-ban)
 OPER_SUPER_ADMIN_WALL_ON
 	%s most már Szuper-Admin
@@ -2756,11 +2745,11 @@ OPER_MODULE_LOAD_SYNTAX
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD Fájlnév
 OPER_MODULE_LIST_HEADER
-	Current Module list:
+	Jelenlegi Modul lista:
 OPER_MODULE_LIST
 	Modul: %s [%s]
 OPER_MODULE_LIST_FOOTER
-	%d Modules loaded.
+	%d Modul betöltve.
 OPER_MODULE_INFO_LIST
 	Modul: %s Verzió: %s Szerzõ: %s Betöltve: %s
 OPER_MODULE_CMD_LIST
@@ -2834,11 +2823,11 @@ OPER_EXCEPTION_INVALID_HOSTMASK
 
 # SESSION válaszok
 OPER_SESSION_SYNTAX
-	SESSION {LIST korlát | VIEW host}
+	SESSION {LIST korlát | VIEW hoszt}
 OPER_SESSION_LIST_SYNTAX
 	SESSION LIST korlát
 OPER_SESSION_VIEW_SYNTAX
-	SESSION VIEW host
+	SESSION VIEW hoszt
 OPER_SESSION_DISABLED
 	Session korlátozás tiltva.
 OPER_SESSION_INVALID_THRESHOLD
@@ -2847,15 +2836,15 @@ OPER_SESSION_INVALID_THRESHOLD
 OPER_SESSION_NOT_FOUND
 	%s nincs a session listán.
 OPER_SESSION_LIST_HEADER
-	Hostnak a legkisebb %d sessions:
+	Hosztok legalább %d sessionnel:
 OPER_SESSION_LIST_COLHEAD
 	Sessions  Host
-# korlát, host
+# korlát, hoszt
 OPER_SESSION_LIST_FORMAT
 	%6d    %s
-# host, sessions, korlát
+# hoszt, sessions, korlát
 OPER_SESSION_VIEW_FORMAT
-	A host %s aktuálisan %d sessionsal korlátozva %d-ból.
+	A %s hoszt aktuálisan %d sessiont használ, a határértéke %d.
 
 # EXCEPTION help
 OPER_HELP_EXCEPTION
@@ -2936,6 +2925,7 @@ OPER_HELP_DEFCON
 	A defcon rendszer képes használni elõre beállított
 	korlátozást a szervíz használatban egy támadás alkalmával
 	a hálózaton.
+
 OPER_HELP_DEFCON_NO_NEW_CHANNELS
 	* Nem lehet új csatornát regisztrálni.
 OPER_HELP_DEFCON_NO_NEW_NICKS
@@ -2970,27 +2960,27 @@ OPER_HELP_CHANKILL
 ###########################################################################
 
 NEWS_LOGON_TEXT
-	Legfrissebb Híreink: - %s %s
+	[Fellépési Hír] - %s %s
 NEWS_OPER_TEXT
-	Oper Hírek: - %s %s
+	[Oper Hír] - %s %s
 NEWS_RANDOM_TEXT
-	Véletlenszerû Hírek: - %s %s
+	[Véletlenszerû Hír] - %s %s
 
 NEWS_LOGON_SYNTAX
-	Syntax: LOGONNEWS {ADD|DEL|LIST} [szöveg|szám]
+	Syntax: LOGONNEWS { ADD | DEL | LIST } [szöveg|szám]
 NEWS_LOGON_LIST_HEADER
-	Logon news tételek:
+	Fellépési hírek:
 NEWS_LOGON_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s %s által)
 	    %s
 NEWS_LOGON_LIST_NONE
 	Nincs fellépõ üzenet.
 NEWS_LOGON_ADD_SYNTAX
-	Syntax: LOGONNEWS ADD text
+	Syntax: LOGONNEWS ADD szöveg
 NEWS_LOGON_ADD_FULL
 	A Hírlista tele!
 NEWS_LOGON_ADDED
-	Hozzáadva az új logon news tétel: (#%d).
+	Hozzáadva az új fellépési hír: (#%d).
 NEWS_LOGON_DEL_SYNTAX
 	Syntax: LOGONNEWS DEL {szám | ALL}
 NEWS_LOGON_DEL_NOT_FOUND
@@ -2998,25 +2988,25 @@ NEWS_LOGON_DEL_NOT_FOUND
 NEWS_LOGON_DELETED
 	Logon news tétel #%d törölve.
 NEWS_LOGON_DEL_NONE
-	Nincs törölhetõ fellépési üzenet!
+	Nincs törölhetõ fellépési hír!
 NEWS_LOGON_DELETED_ALL
-	Összes logon news tétel törölve.
+	Összes fellépési hír tétel törölve.
 
 NEWS_OPER_SYNTAX
-	Syntax: OPERNEWS {ADD|DEL|LIST} [szöveg|szám]
+	Syntax: OPERNEWS { ADD | DEL |LIST } [ szöveg | szám ]
 NEWS_OPER_LIST_HEADER
-	Oper news lista:
+	Oper hírek listája:
 NEWS_OPER_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s %s által)
 	    %s
 NEWS_OPER_LIST_NONE
 	Nincs oper news.
 NEWS_OPER_ADD_SYNTAX
 	Syntax: OPERNEWS ADD szöveg
 NEWS_OPER_ADD_FULL
-	OperNews lista tele!
+	Az Oper hírek listája tele van!
 NEWS_OPER_ADDED
-	Hozzáadva az új oper news tétel:(#%d).
+	Hozzáadva az új oper hír:(#%d).
 NEWS_OPER_DEL_SYNTAX
 	Syntax: OPERNEWS DEL {szám | ALL}
 NEWS_OPER_DEL_NOT_FOUND
@@ -3026,17 +3016,17 @@ NEWS_OPER_DELETED
 NEWS_OPER_DEL_NONE
 	Nincs törölhetõ opernews tétel!
 NEWS_OPER_DELETED_ALL
-	Összes oper news tétel törölve.
+	Összes oper hír törölve.
 
 NEWS_RANDOM_SYNTAX
-	Syntax: RANDOMNEWS {ADD|DEL|LIST} [szöveg|szám]
+	Syntax: RANDOMNEWS { ADD | DEL | LIST } [ szöveg | szám ]
 NEWS_RANDOM_LIST_HEADER
 	Véletlenszerû hírek listája:
 NEWS_RANDOM_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s %s által)
 	    %s
 NEWS_RANDOM_LIST_NONE
-	Nincs random news.
+	Nincs véletlenszerû hír.
 NEWS_RANDOM_ADD_SYNTAX
 	Syntax: RANDOMNEWS ADD szöveg
 NEWS_RANDOM_ADD_FULL
@@ -3055,20 +3045,19 @@ NEWS_RANDOM_DELETED_ALL
 	Összes random news tétel törölve.
 
 NEWS_HELP_LOGON
-	Syntax: LOGONNEWS ADD szöveg
-	        LOGONNEWS DEL {szám | ALL}
+	Syntax: LOGONNEWS ADD szöveg
+	        LOGONNEWS DEL {sorszám  | ALL}
 	        LOGONNEWS LIST
 	
 	Szerkeszti, vagy kiirja a logon news üzeneteket.Amikor
 	egy felhasználó csatlakozik a hálózathoz ezeket az
-	üzeneteket küldi neki.(Bármennyi is van csak három 
-	üzenetet küld, mindg a három legutólsót küldi el)
-	
-	
+	üzeneteket küldi neki. (Bármennyi is van csak három 
+	üzenetet küld, mindig a három legutolsót küldi el.)
+		
 	LOGONNEWS LIST lehetõség van használatára IRC operátornak,
-	szészére listázza az aktuális newa üzeneteket. Add és 
-	Del -t csak szervíz adminok használhatják
-
+	részére listázza az aktuális news üzeneteket. Az ADD és a 
+	DEL  parancsokat csak szervíz adminok használhatják.
+		
 NEWS_HELP_OPER
 	Syntax: OPERNEWS ADD szöveg
 	        OPERNEWS DEL {szám | ALL}
@@ -3087,8 +3076,8 @@ NEWS_HELP_OPER
 	Del -t csak szervíz adminok használhatják
 
 NEWS_HELP_RANDOM
-	Syntax: RANDOMNEWS ADD text
-	        RANDOMNEWS DEL {num | ALL}
+	Syntax: RANDOMNEWS ADD szöveg
+	        RANDOMNEWS DEL {sorszám | ALL}
 	        RANDOMNEWS LIST
 	
 	Szerkeszti és listázza a random news üzeneteket. Amikor
@@ -3144,19 +3133,25 @@ NICK_HELP
 	beírod, hogy: /msg %S parancs, lásd még a
 	/msg %S HELP parancs.
 	
-		REGISTER Nicknév regisztráció
-		GROUP Csatlakozás egy csoporthoz
-		IDENTIFY Jelszavas azonosítás
-		ACCESS A hozzáférési lista módosítása
-		SET Opciók beállítása például a kill protection
-		DROP Nicknév regisztrációjának törlése
-		RECOVER Killeli a nickedet használó usert
-		RELEASE Visszaadja a neved a RECOVER után
-		SENDPASS Elfelejtetted a jelszavad? Próbáld ezt
+	    REGISTER   Nicknév regisztráció
+	    GROUP      Csatlakozás egy csoporthoz
+	    IDENTIFY   Jelszavas azonosítás
+	    ACCESS     A hozzáférési lista módosítása
+	    SET        Opciók beállítása, például kill védelem
+	    DROP       Nicknév regisztrációjának törlése
+	    RECOVER    Killeli a nickedet használó usert
+	    RELEASE    Visszaadja a neved a RECOVER után
+	    SENDPASS   Elfelejtetted a jelszavad? Próbáld ezt
 	
 	Egyéb parancsok: GHOST, ALIST, GLIST, INFO, LIST, LOGOUT, STATUS
-
-	A %S segítségével elkövetett visszaéléseket megbüntetjük.
+	
+	Megjegyzés: Ez a szolgáltatás szeretné biztosítani az 
+	IRC felhasználok számára hogy a kilétüket ne lehessen 
+	kompromitálni. Egyáltalán NEM azt szolgálja, hogy 
+	lehetõséget nyújtson nicknevek "lopására" vagy más
+	erkölcstelen akciókra. A %S segítségével elkövetett
+	visszaélés jutalma minimum az visszaélõ nickjének
+	elvesztése.
 	
 NICK_HELP_EXPIRES
 	Ha egy regisztrált nicknevet %d napig nem használnak, akkor
@@ -3274,31 +3269,33 @@ NICK_HELP_ACCESS
 	
 	Példák:
 	
-		ACCESS ADD achurch@*.dragonfire.net
-			Hozzáférést engedélyez az achurch identnek bármely
-			géprõl aminek a dragonfire.net a domainje.
+	    ACCESS ADD anyone@*.bepeg.com
+	          Hozzáférést engedélyez az anyone identnek bármely
+	          géprõl aminek a bepeg.com a domainje.
 	
-		ACCESS DEL achurch@*.dragonfire.net
-			Törli az elözõ parancsot.
+	    ACCESS DEL anyone@*.bepeg.com
+	          Törli az elözõ parancsot.
 	
-		ACCESS LIST
-			Megmutatja a hozzáférési listát.
+	    ACCESS LIST
+	          Megmutatja a hozzáférési listát.
 
 NICK_HELP_SET
 	Syntax: SET opció paraméterek
 	
 	Beállítható nicknév opciók. Az opció ezek egyike lehet:
 	
-		LANGUAGE A szervíz nyelvezetének megválasztása
-		URL Egy URL társítása a nicknevedhez
-		EMAIL Egy E-mail cím társítása a nicknevedhez
-		ICQ ICQ szám társítása a nicknevedhez
-		GREET Köszöntõ üzenet társítása a nicknevedhez
-		KILL A kill védelem be-,kikapcsolása
-		SECURE A nickneved védelmének be-,kikapcsolása
-		PRIVATE A nickneved /msg %S LIST -ból való elrejtése
-		HIDE A nicknévhez tartozó információk elrejtése
-		MSG Megváltózatja a szervízzel való kommunikációt
+	    DISPLAY    Set the display of your group in Services
+	    PASSWORD   Set your nickname password
+	    LANGUAGE   A szervíz nyelvezetének megválasztása
+	    URL        Egy URL társítása a nicknevedhez
+	    EMAIL      Egy E-mail cím társítása a nicknevedhez
+	    ICQ        ICQ szám társítása a nicknevedhez
+	    GREET      Köszöntõ üzenet társítása a nicknevedhez
+	    KILL       A kill védelem be-,kikapcsolása
+	    SECURE     A nickneved védelmének be-,kikapcsolása
+	    PRIVATE    A nickneved /msg %S LIST -ból való elrejtése
+	    HIDE       A nicknévhez tartozó információk elrejtése
+	    MSG        Megváltoztatja a szervízzel való kommunikációt
 	    
 	Ezen parancs kiadása elõtt, azonositanod kell magad, mint
 	a nick tulajdonosa az IDENTIFY parancsot használva, írd
@@ -3466,16 +3463,16 @@ NICK_HELP_LIST
 	
 	Példák:
 	
-		LIST joeuser@foo.com
-			Listáz minden regisztrált nicknevet, amelyet utoljára:
-			joeuser@foo.com címrõl használtak.
+	    LIST joeuser@foo.com
+	          Listáz minden regisztrált nicknevet, amelyet utoljára:
+	           joeuser@foo.com címrõl használtak.
 	
-		LIST *Bot*
-			Listáz minden nicket amelyben szerepelt a Bot
+	    LIST *Bot*
+	          Listáz minden nicket amelyben szerepelt a Bot
 	
-		LIST *@*.bar.org
-			Listáz minden nicket, amit utoljára olyan user használt,
-			akinek a bar.org volt a domain-je.
+	    LIST *@*.bar.org
+	          Listáz minden nicket, amit utoljára olyan user használt,
+	          akinek a bar.org volt a domain-je.
 	
 NICK_HELP_ALIST
 	Syntax: ALIST [szint]
@@ -3484,16 +3481,16 @@ NICK_HELP_ALIST
 	Opcionálisan megadhatod a szintet XOP vagy ACCESS
 	formátumban is. Az eredmény csak azon szobákat fogja 
 	megjeleniteni, ahol a megadott hozzáférési szinted van.
-
+	
 	Példák:
-		ALIST Founder
-			Listáz minden csatornát, ahol Founder hozzáférésed van.
-		ALIST AOP
-			Listáz minden csatornát, ahol AOP hozzáférésed
-			vagy magasabb szinted van.
-		ALIST 10
-			Listáz minden csatornát, ahol 10-es hozzáférésed
-			vagy magasabb szinted van.
+	    ALIST Founder
+	          Listáz minden csatornát, ahol Founder hozzáférésed van.
+	    ALIST AOP
+	          Listáz minden csatornát, ahol AOP hozzáférésed
+	          vagy magasabb szinted van.
+	    ALIST 10
+	          Listáz minden csatornát, ahol 10-es hozzáférésed
+	          vagy magasabb szinted van.
 
 	Azok a csatornák melyeken a NOEXPIREopció be van állítva,
 	prefixel lesznek megjelölve a listában.
@@ -3515,16 +3512,15 @@ NICK_HELP_STATUS
 	ahol a nicknévaz a nicknév amit küldtél a parancsban, és
 	a státusz-kóda következõ lehet:
 	
-	0 - nincs ilyen user online vagy a nick nem regisztrált
-	1 - a felhasználó nem azonosított, mint a nick tulajdonosa
-	2 - A felhasználó azonosított, mint tulajdonos de csak a 
-	    hozzáférési lista alapján
-	3 - A felhasználó azonosított, mint tulajdonos a jelszava
-	    alapján
-	
+	    0 - Nincs ilyen user online vagy a nick nem regisztrált
+	    1 - A felhasználó nem azonosított be, mint a nick tulajdonosa
+	    2 - A felhasználó beazonosított, mint tulajdonos de csak a 
+	        hozzáférési lista alapján
+	    3 - A felhasználó beazonosított tulajdonosként a jelszavával
+	        
 	Tizenhat nicknév küldhetõ el parancsonként; a többit 
-	figyelmen kívül hagyja. 
-	Nincs hibaüzenet, ha nem adsz meg nicknevet.
+	figyelmen kívül hagyja.	Nincs hibaüzenet, ha nem
+	adsz meg nicknevet.
 	
 NICK_HELP_SENDPASS
 	Syntax: SENDPASS nicknév
@@ -3536,18 +3532,18 @@ NICK_HELP_SENDPASS
 	a jelszavadat.
 	
 	Korlátozni lehet IRC operátorokra egyes hálózatokon.
-
+	
 	Parancs nem elérhetõ, ha az encryption használatban van.
-
+	
 NICK_SERVADMIN_HELP
 	
 	Következõ parancsokat használhatják a szervíz adminok:
 	
-		GETPASS Kiirja a jeszavát a nicknévnek
-				(encryption esetén nem használható)
-		GETEMAIL Kiírja az ilyen e-mail címmel regisztrált
-				felhasználókat
-		FORBID Megelõzi, hogy a nicknév regisztrált legyen
+	    GETPASS    Kiirja a jeszavát a nicknévnek
+	                 (encryption esetén nem használható)
+	    GETEMAIL   Kiírja az ilyen e-mail címmel regisztrált
+	                 felhasználókat
+	    FORBID     Megelõzi, hogy a nicknév regisztrált legyen
 	
 	Szervíz adminok is droppolhatnak nickeket, akkor ha
 	beazonosíttotak a nicknevükre, és megnézhetik a nickek
@@ -3611,23 +3607,20 @@ NICK_SERVADMIN_HELP_LIST
 	Ha a FORBIDDEN vagy NOEXPIRE opció meg van adva, csak azok
 	a nickek amelyek vagy forbidoltak vagy NOEXPIRE flegjük van
 	fognak  megjelenik. Ha mindkét opció meg van adva mindkét
-	tipus megjelenik. 
-
-	Az opciók korlátozva Services adminoknak.
-
+	tipus megjelenik. Az opciók korlátozva Services adminoknak.
 	
 	Példák:
 	
 		LIST *!joeuser@foo.com
-			Kiirja a felhasználókat, akinek a hosztja joeuser@foo.com
+	            Kiírja a felhasználókat, akiknek a hosztja joeuser@foo.com
 	
 		LIST *Bot*!*@*
-			Kiirja az összes regisztrált nicket amnek a nevében 
-			szerepel a Bot (betû érzéketlen).
+	            Kiírja az összes regisztrált nicket, melyek nevében 
+	            szerepel a Bot (betû érzéketlen).
 	
-		LIST * NOEXPIRE
-			Listázza az összes felhasználót, akinek a beállítása
-			nem elévülõ.
+	    LIST * NOEXPIRE
+	            Listázza az összes felhasználót, akinek a beállítása
+	            nem elévülõ.
 
 NICK_SERVADMIN_HELP_ALIST
 	Syntax: ALIST [nicknév] [szint]
@@ -3663,7 +3656,7 @@ NICK_SERVADMIN_HELP_GETPASS
 	A parancs nem elérhetõ, ha az encryption használatban van.
 	
 NICK_SERVADMIN_HELP_GETEMAIL
-	Syntax: GETEMAIL user@emailhost
+	Syntax: GETEMAIL user@emailhoszt
 
 	Visszaadja a megadott emaillel regisztrált nickeket.
 	Megjegyzés: használhatsz * karaktert mind a user,
@@ -3698,38 +3691,36 @@ CHAN_HELP
 	/msg %S parancs, ha több információ kell a paranccsal
 	kapcsolatban, akkor írd be: /msg %S HELP parancs.
 	
-		REGISTER szoba regisztrálása
-		IDENTIFY Azonosíthatod magad a jelszavaddal
-		SET Beállíthatod a csatornád opcióit
-		INFO Megtekintheted a szoba információit
-		SOP SuperOperátor lista beállítása
-		AOP AutoOperátor lista beállítása
-		VOP AutoHangadók listájának beállítása
-		HOP Autoféloperátorok listájának beállítása
-		ACCESS A szoba hozzáférési listájának beállítása
-		LEVELS Átállíthatod a szoba hozzáférési szintjeit
-		AKICK AutoKirúgás listára teheted a "rossz" usereket
-		DROP Törölheted a csatornád regisztrációját
-	    
-	Egyéb parancsok:  BAN, CLEAR, DEOP, DEVOICE, GETKEY, 
-				INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
-				UNBAN, VOICE
+	    REGISTER   Szoba regisztrálása
+	    IDENTIFY   Azonosíthatod magad a jelszavaddal
+	    SET        Beállíthatod a csatornád opcióit
+	    AOP        AutoOperátor lista beállítása
+	    SOP        SzuperOperátor lista beállítása
+	    ACCESS     A szoba hozzáférési listájának beállítása
+	    LEVELS     Átállíthatod a szoba hozzáférési szintjeit
+	    AKICK      AutoKirúgás listára teheted a "rossz" usereket
+	    DROP       Törölheted a csatornád regisztrációját
+	    SENDPASS   Elveszett a jelszavad? Jelszó küldés.
+
+	Egyéb parancsok: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO 
+	                 INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
+	                 UNBAN, VOICE, VOP
 	
 CHAN_HELP_UNREAL
 	
 	Ezek a parancsok is elérhetõk ezen a hálózaton:
-		DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-		PROTECT
+	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER, 
+	    PROTECT
 
 CHAN_HELP_ULTIMATE
 	
 	Ezek a parancsok is elérhetõk ezen a hálózaton:	    
-		DEHALFOP, HALFOP, HOP
+	    DEHALFOP, HALFOP, HOP
 
 CHAN_HELP_ULTIMATE3
 	
 	Ezek a parancsok is elérhetõk ezen a hálózaton:
-		DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
+	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
 
 CHAN_HELP_EXPIRES
 	
@@ -3795,26 +3786,26 @@ CHAN_HELP_SET
 	
 	Elérhetõ opciók:
 	
-		FOUNDER A founder megváltoztatása
-		SUCCESSOR A successor megadása
-		PASSWORD A founder jelszó változtatása
-		DESC A szobameghatározás állítás
-		URL Egy URL társítása a szobához
-		EMAIL Egy E-mail cím társítása a szobához
-		ENTRYMSG A szoba belépo üzenetének 
-				állítása
-		BANTYPE A banolás tipusának beállítása
-		MLOCK Szoba módok lezárása (+flag -flag)
-		KEEPTOPIC Topic megtartása ha a szoba nincs használatban
-		OPNOTICE Üzenetet küld az OP/VOICE parancsok használtáról
-		PEACE Szabályozza a kritikus parancsok használatát
-		PRIVATE A szoba elrejtése a listából
-		SECURE Aktiválja a %S biztonsági lehetõségeit
-		SECUREOPS A csatornán az op státusz szigorú kezelése
-		SECUREFOUNDER Csatornán a founder státusz szigorú kezelése
-		SIGNKICK Sign kickek, melyek a KICK paranccsal történnek
-		TOPICLOCK Topic lezárása 
-		XOP Xop (Sop, Aop, Hop, Vop) lista rendszer bekapcsolása
+	    FOUNDER       A founder megváltoztatása
+	    SUCCESSOR     A successor megadása
+	    PASSWORD      A founder jelszó változtatása
+	    DESC          A szobameghatározás állítás
+	    URL           Egy URL társítása a szobához
+	    EMAIL         Egy E-mail cím társítása a szobához
+	    ENTRYMSG      A szoba belépo üzenetének 
+	                  állítása
+	    BANTYPE       A banolás tipusának beállítása
+	    MLOCK         Szoba módok lezárása (+flag -flag)
+	    KEEPTOPIC     Topic megtartása ha a szoba nincs használatban
+	    OPNOTICE      Üzenetet küld az OP/VOICE parancsok használtáról
+	    PEACE         Szabályozza a kritikus parancsok használatát
+	    PRIVATE       A szoba elrejtése a listából
+	    SECURE        Aktiválja a %S biztonsági lehetõségeit
+	    SECUREOPS     A csatornán az op státusz szigorú kezelése
+	    SECUREFOUNDER Csatornán a founder státusz szigorú kezelése
+	    SIGNKICK      Sign kickek, melyek a KICK paranccsal történnek
+	    TOPICLOCK     Témaváltás letiltása 
+	    XOP           Xop (Sop, Aop, Hop, Vop) lista rendszer bekapcsolása
 	
 	Írd be: /msg %S HELP SET opció bõvebb információért az
 	adott opcióról.
@@ -3878,10 +3869,10 @@ CHAN_HELP_SET_BANTYPE
 	
 	A bantípus egy szám 0 és 3 között a jelentése:
 	
-		0: *!user@host formátumú tiltás
-		1: *!*user@host formátumú tiltás
-		2: *!*@host formátumú tiltás
-		3: *!*user@*.domain formátumú tiltás
+	0: *!user@host formátumú tiltás
+	1: *!*user@host formátumú tiltás
+	2: *!*@host formátumú tiltás
+	3: *!*user@*.domain formátumú tiltás
 
 CHAN_HELP_SET_KEEPTOPIC
 	Syntax: SET #szoba KEEPTOPIC {ON | OFF}
@@ -3900,7 +3891,7 @@ CHAN_HELP_SET_TOPICLOCK
 	paranccsal.
 	
 CHAN_HELP_SET_MLOCK
-	Syntax: SET #szoba MLOCK módok
+	Syntax: SET #szoba  MLOCK módok
 	
 	Beállíthatod a mode-lock opciót a csatornán. A  %S
 	lehetõséget nyújt arra, hogy meghatározd azokat a módokat
@@ -3910,28 +3901,28 @@ CHAN_HELP_SET_MLOCK
 	azok a módok amelyek a + jel után vannak lockolódnak,
 	és azok a módok amelyek a - jel után vannak nem
 	rakhatóak fel a szobára.
-
+	
 	Figyelmeztetés:  Ha beállítasz egy mode-lock alatti 
 	kulcsot, mint azt a második példában látod, akkor be kell
-	állítanod a RESTRICTED opciót a csatornán (lásd HELP 
-	SET RESTRICTED)vagy bárki beléphet a szobába amikor üres
-	és lehetõsége lesz meglátni a kulcsot!
+	állítanod a RESTRICTED opciót a csatornán (lásd 
+	HELP	SET RESTRICTED) vagy bárki beléphet a szobába,
+	amikor üres és lehetõsége lesz meglátni a kulcsot!
 	
 	Példák:
 	
-		SET #szoba MLOCK +nt-ikl
-			Az  "n" és a "t" állandóan fent van, és az "i", "k", és
-			"l" állandóan ki lesz kapcsolva. Minden más mód 
-			felrakása-levétele szabad.
+	    SET #szoba MLOCK +nt-ikl
+	         Az  "n" és a "t" állandóan fent van, és az "i", "k", és
+	         "l" állandóan ki lesz kapcsolva. Minden más mód 
+	         felrakása-levétele szabad.
 	
-		SET #szoba MLOCK +knst-ilmp my-key
-			A "k", "n", "s", és "t" állandóan fent van, és az "i",
-			"l", "m", és a "p" ki lesz kapcsolva. A szobába való
-			belépéshez szküséges jelszó:	"my-key".
+	    SET #szoba MLOCK +knst-ilmp my-key
+	         A "k", "n", "s", és "t" állandóan fent van, és az "i",
+	         "l", "m", és a "p" ki lesz kapcsolva. A szobába való
+	         belépéshez szküséges jelszó:	"my-key".
 	
-		SET #szoba MLOCK +
-			Eltávolítja az összes lockolt módot.
-	 		Minden mód szabadon ki/bekapcsolható.
+	    SET #szoba MLOCK +
+	         Eltávolítja az összes lockolt módot.
+	         Minden mód szabadon ki/bekapcsolható.
 	
 CHAN_HELP_SET_PEACE
 	Syntax: SET #szoba PEACE {ON | OFF}
@@ -4020,8 +4011,8 @@ CHAN_HELP_SET_OPNOTICE
 	
 CHAN_HELP_AOP
 	Syntax: AOP #szoba ADD nick
-	        AOP #szoba  DEL {nick|sorszám|lista}
-	        AOP #szoba LIST [maszk|lista]
+	        AOP #szoba  DEL {nick  |  sorszám  |  lista }
+	        AOP #szoba LIST [ maszk  |  lista ]
 	        AOP #szoba CLEAR
 	
 	Karbantartja az AOP(AutoOP) listát a csatornán. Az AOP 
@@ -4065,8 +4056,8 @@ CHAN_HELP_AOP
 	
 CHAN_HELP_HOP
 	Syntax: HOP  #szoba ADD nick
-	        HOP #szoba DEL {nick|sorszám|lista}
-	        HOP #szoba LIST [maszk|lista]
+	        HOP #szoba DEL { nick  |  sorszám  |  lista}
+	        HOP #szoba LIST [ maszk | lista ]
 	        HOP #szoba CLEAR
 	
 	Karbantartja az HOP (HALFOP) listát a csatornán. A HOP
@@ -4108,8 +4099,8 @@ CHAN_HELP_HOP
 	
 CHAN_HELP_SOP
 	Syntax: SOP #szoba ADD nick
-	        SOP #szoba DEL {nick|sorszám|sorozat}
-	        SOP #szoba LIST [maszk|lista]
+	        SOP #szoba DEL { nick  |  sorszám  |  lista }
+	        SOP #szoba LIST [ maszk | lista ]
 	        SOP #szoba CLEAR
 	
 	Karbantartja az SOP(SuperOP)listát a csatornán. Az SOP
@@ -4142,6 +4133,8 @@ CHAN_HELP_SOP
 	Az SOP ADD, SOP DEL és SOP CLEAR parancsokat csak a
 	founder szintu userek használhatják. Habár, minden SOP 
 	listán szereplo user használhatja az SOP LIST parancsot.
+
+
 	
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
 	használhatod az access lista rendszert. Nézd meg: /msg
@@ -4151,8 +4144,8 @@ CHAN_HELP_SOP
 	
 CHAN_HELP_VOP
 	Syntax: VOP #szoba ADD nick
-	        VOP #szoba DEL {nick | entry-num| list}
-	        VOP #szoba LIST [mask | list]
+	        VOP #szoba DEL {nick | sorszám| lista}
+	        VOP #szoba LIST [maszk | lista]
 	        VOP #szoba CLEAR
 	
 	Karbantartja az VOP (VoiceOP) listát a csatornán. VOP 
@@ -4192,8 +4185,8 @@ CHAN_HELP_VOP
 	
 CHAN_HELP_ACCESS
 	Syntax:	ACCESS #szoba ADD nick szint
-			ACCESS #szoba DEL {nick | entry-num | list}
-			ACCESS #szoba LIST [mask | list]
+			ACCESS #szoba DEL {nick | sorszám | lista}
+			ACCESS #szoba LIST [maszk | lista]
 			ACCESS #szoba CLEAR
 	
 	Access lista a csatornán. A hozzáférési lista (access)
@@ -4230,30 +4223,30 @@ CHAN_HELP_ACCESS_LEVELS
 	
 	Alapból, a következõ hozzáférési szintek érvényesek:
 	   
-	Founder	Teljes hozzáférés a %S funkciókhoz; automatikus
-			opjog a csatornára való belépéskor.  Megjegyzés,
-			csak egy embernek lehet founder státusza (ez 
-			nem adható az ACCESS paranccsal).
-	     10	Hozzáférés az AKICK parancshoz; automatikus op.
-	      5	Automatikus op státusz.
-	      3	Automatikus voice státusz.
-	      0	Nincs különleges privilégiuma; opolható más
-			opok által(ha a secure-ops ki van kapcsolva).
-	     <0	Nem opolható.
+	   Founder   Teljes hozzáférés a %S funkciókhoz; automatikus
+	                     opjog a csatornára való belépéskor.
+	                     Megjegyzés, csak egy embernek lehet founder státusza
+	                     (nem adható az ACCESS paranccsal).
+	        10   Hozzáférés az AKICK parancshoz; automatikus op.
+	         5   Automatikus op státusz.
+	         3   Automatikus voice státusz.
+	         0   Nincs különleges privilégiuma; opolható más
+	                     opok által(ha a secure-ops ki van kapcsolva).
+	        <0   Nem opolható.
 	
 	Ezek a szintek változhatnak, vagy újakat adhatsz hozzá, a
 	LEVELS paranccsal; írd be: /msg %S HELP LEVELS bõvebb
 	információért.
 	
 CHAN_HELP_AKICK
-	Syntax:	AKICK #szoba ADD maszk [indok]
-			AKICK #szoba STICK maszk
-			AKICK #szoba UNSTICK maszk
-			AKICK #szoba DEL maszk
-			AKICK #szoba LIST [maszk]
-			AKICK #szoba VIEW [maszk]
-			AKICK #szoba ENFORCE
-			AKICK #szoba CLEAR
+	Syntax: AKICK #szoba ADD maszk [indok]
+	        AKICK #szoba STICK maszk
+	        AKICK #szoba UNSTICK maszk
+	        AKICK #szoba DEL maszk
+	        AKICK #szoba LIST [maszk]
+	        AKICK #szoba VIEW [maszk]
+	        AKICK #szoba ENFORCE
+	        AKICK #szoba CLEAR
 	
 	Karbantarthatod a csatornához tartozó autokirúgás listát
 	Ha egy olyan felhasználó, akinek a maszkja megegyezik egy 
@@ -4532,13 +4525,15 @@ CHAN_HELP_CLEAR
 	A %S eltávolítja a beállításokat a csatornán. 
 	A következõ opciók lehetségesek:
 	
-		MODES Törli az összes módot ami nem szerepel a szoba
-				mode lockjában.
-		BANS Törli az összes tiltást a csatornán.
-		EXCEPTS Törli az összes kivételt a csatornán.
-		OPS Elvesz minden op-ot a csatornán
-		VOICES Elvesz minden "voice"-t (mode +v) a csatornán.
-		USERS Eltávolít minden usert a csatornáról (kirúgás).
+	    MODES    Törli az összes módot ami nem szerepel a szoba
+	             mode lockjában.
+	    BANS     Törli az összes tiltást a csatornán.
+	    EXCEPTS  Törli az összes kivételt a csatornán.
+	    OPS      Elvesz minden opot a csatornán
+	    HOPS     Eltávolít minden félop csatorna státuszt (+h mód)
+	             az összes csatornán lévõ féloperátortól, ha támogatott.
+	    VOICES   Elvesz minden "voice"-t (mode +v) a csatornán.
+	    USERS    Eltávolít minden usert a csatornáról (kirúgás).
 		
 	Alapbeállításban, a founder szintû userek használhatják.
 	
@@ -4568,14 +4563,14 @@ CHAN_SERVADMIN_HELP
 	
 	A következõ parancsok Szervíz adminok használhatják:
 	
-		GETPASS Megadja a founder jelszót a csatornán
-				(Csak, ha az encryption nincs használatban)
-		FORBID Megakadályozza a szoba használatát
-		SUSPEND Felfüggeszti a szoba használatát de
-				megõrzi az adatokat és beállításokat.
-		UNSUSPEND Törli a suspendet a csatornáról.
-		STATUS Kiirja a felhasználó aktuális hozzáférési
-				szintjét a megadott csatornán
+	    GETPASS    Megadja a founder jelszót a csatornán
+	               (Csak, ha az encryption nincs használatban)
+	    FORBID     Megakadályozza a szoba használatát
+	    SUSPEND    Felfüggeszti a szoba használatát de
+	               megõrzi az adatokat és beállításokat.
+	    UNSUSPEND  Törli a suspendet a csatornáról.
+	    STATUS     Kiírja a felhasználó aktuális hozzáférési
+	               szintjét a megadott csatornán
 	
 	Szervíz adminok tudják droppolni a csatornákat anélkül, 
 	hogy a szoba jelszót használnának, és megnézhetika az
@@ -4616,6 +4611,7 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	ON paranmétert megelõzi az elévülõ csatornákat.
 	
 	Korlátozva Szervíz adminnak.
+
 
 CHAN_SERVADMIN_HELP_INFO
 	
@@ -4674,12 +4670,12 @@ CHAN_SERVADMIN_HELP_UNSUSPEND
 	Korlátozva Szervíz adminnak.
 	
 CHAN_SERVADMIN_HELP_STATUS
-	Syntax: STATUS #szobanicknév
+	Syntax: STATUS  #szoba nicknév
 	
 	Kiirja a nicknév aktuális hozzáférési szintjét a megadott
 	csatornán. 	Válasz a következõ formában::
 	
-		STATUS szoba nicknév access-szint
+	    STATUS szoba nicknév access-szint
 	
 	Ha hiba történik akkor a válasz a következõ formátunú:
 	
@@ -4702,19 +4698,21 @@ MEMO_HELP
 		
 	%S parancsok a következõket tartalmazzák:
 	
-		SEND Üzenetet küld egy nicknek vagy csatornára
-		LIST Megjeleníti az üzenetek listáját
-		READ Elolvassa a megadott üzenete(ke)t
-		CANCEL Visszavonja az utoljára küldött memot
-		DEL Törli a megadott üzenete(ke)t
-		SET Üzenetekkel kapcsolatos beállításokat hajt végre
-		INFO Kiirja az üzenetekkel kapcsolatos információkat
+	    SEND   Üzenetet küld egy nicknek vagy csatornára
+	    CANCEL Visszavonja az utoljára küldött memot
+	    LIST   Megjeleníti az üzenetek listáját
+	    READ   Elolvassa a megadott üzenete(ke)t
+	    DEL    Törli a megadott üzenete(ke)t
+	    SET    Üzenetekkel kapcsolatos beállításokat hajt végre
+	    INFO   Kiírja az üzenetekkel kapcsolatos információkat
+	    RSEND  Memo üzenetet küld és olvasási visszaigazolást kér
+	    CHECK  Ellenõrzi, hogy a címzett elolvasta-e már az üzit
 	
 MEMO_HELP_ADMIN
-		SENDALL Memo küldése minden regisztrált felhasználónak.
+	    SENDALL Memo küldése minden regisztrált felhasználónak.
 	
 MEMO_HELP_OPER
-		STAFF Memo küldése minden opernek/adminnak.
+	    STAFF Memo küldése minden opernek/adminnak.
 	
 MEMO_HELP_FOOTER
 	
@@ -4726,7 +4724,7 @@ MEMO_HELP_FOOTER
 	%s LEVELS paranccsal.
 	
 MEMO_HELP_SEND
-	Syntax: SEND {nick|#szoba} memo-szöveg
+	Syntax: SEND { nick  |  #szoba } memo-szöveg
 	
 	Üzenetet küld a megnevezett nicknek vagy csatornára
 	a üzenet-szövegét tartalmazva. Amikor nicknévnek küldesz
@@ -4735,7 +4733,7 @@ MEMO_HELP_SEND
 	lennie.
 	
 MEMO_HELP_CANCEL
-	Syntax: CANCEL {nick|#szoba}
+	Syntax: CANCEL { nick  |  #szoba }
 	
 	Visszavonja az utolsó memo üzenetet, amit a nicknek
 	vagy csatornának küldtél.
@@ -4789,9 +4787,9 @@ MEMO_HELP_SET
 	Beállít különbözo memo opciókat. 
 	Az opció lehet az alábbiak egyike:
 	
-		NOTIFY Itt állíthatod be, ha figyelmeztetést szeretnél
-				kapni az új üzenetekrol (csak nicknevehez)
-		LIMIT Beállítja a maximális üzenetek számát
+	    NOTIFY     Itt állíthatod be, ha figyelmeztetést szeretnél
+	               kapni az új üzenetekrol (csak nicknevehez)
+	    LIMIT      Beállítja a maximális üzenetek számát
 	
 	További információért írd be: /msg %S HELP SET opció
 	
@@ -4801,13 +4799,12 @@ MEMO_HELP_SET_NOTIFY
 	Itt tudod beállítani, ha értesítést szeretnél kapni
 	az új üzenetekrõl:
 	
-		ON	Értesítést kapsz az új üzenetrõl csatlakozáskor,
-			amikor visszajössz /AWAY-ból, vagy ha küldenek
-			neked.
-		LOGON	Értesítést kapsz az új üzenetekrõl csatlakozáskor
-			vagy ha visszajössz /AWAY-ból.
-		NEW	Csak akkor kapsz értesítést, ha új üzenet érkezett.
-		OFF	Nem kapsz értesítést az üzeneteidrõl.
+	    ON      Értesítést kapsz az új üzenetrõl csatlakozáskor,
+	            amikor visszajössz /AWAY-ból, vagy ha küldenek neked.
+	    LOGON   Értesítést kapsz az új üzenetekrõl csatlakozáskor
+	            vagy ha visszajössz /AWAY-ból.
+	    NEW     Csak akkor kapsz értesítést, ha új üzenet érkezett.
+	    OFF     Nem kapsz értesítést az üzeneteidrõl.
 	
 	Az ON ekvivalens a LOGON és a NEW kombinálásával.
 	
@@ -4877,95 +4874,89 @@ MEMO_HELP_SENDALL
 	Syntax: SENDALL memo-üzenet
 	
 	Memo üzenet küldése minden regisztrált felhasználónak.
+
+MEMO_HELP_RSEND
+	Syntax: RSEND {nick | #szoba} memo-üzenet
 	
+	Memot küld a megadott névnek, szobának a memo-üzenet
+	tartalmával. Ha nicknévnek küldöd, akkor értesítést fog
+	kapni, hogy új üzenete érkezett. A cél nicknévnek vagy
+	csatornának regisztráltnak kell lennie.
+	Amint a címzett elolvasta a memot, egy automatikus értesítést
+	fog kapni a feladó arról, hogy az üzenetét elolvasták.
+
+MEMO_HELP_CHECK
+	Syntax: CHECK nick
+	
+	Ellenõrzi, hogy az _utolsó_ üzenet, amit a nick számára
+	küldtél már olvasott-e vagy még olvasatlan.
+	Megjegyzés, ez csak nickekkel mûködik szobákkal nem.
+
 ###########################################################
 #
 # OperServ help üzenetek
 #
 ###########################################################
 	
-MEMO_HELP_RSEND
-	Syntax: RSEND {nick | channel} memo-text
-	
-	Sends the named nick or channel a memo containing
-	memo-text.  When sending to a nickname, the recipient will
-	receive a notice that he/she has a new memo.  The target
-	nickname/channel must be registered.
-	Once the memo is read by its recipient, an automatic notification
-	memo will be sent to the sender informing him/her that the memo
-	has been read.
-
-MEMO_HELP_CHECK
-	Syntax: CHECK nick
-	
-	Checks whether the _last_ memo you sent to nick has been read
-	or not. Note that this does only work with nicks, not with chans.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
-
 OPER_HELP
 	%S parancsok:
-		GLOBAL Üzenetet küld összes felhasználónak
-		STATS Mutatja a Szervít és hálózat állapotát
-		OPER LIST Listázza az öszzes szerviz operátort
-		ADMIN LIST Listázza az öszzes szerviz admint
-		STAFF Kijelzi a szervízt és aktív állapotát
+	    GLOBAL      Üzenetet küld összes felhasználónak
+	    STATS       Mutatja a Szervít és hálózat állapotát
+	    OPER LIST   Listázza az öszzes szerviz operátort
+	    ADMIN LIST  Listázza az öszzes szerviz admint
+	    STAFF       Kijelzi a szervízt és aktív állapotát
 	
 OPER_HELP_OPER_CMD
 	Ezek a Parancsok szervíz adminok/oprátorok részére elérhetõek:
-		MODE Váltóztatja a szoba módot
-		KICK Kirúgja a felhasználót csatornáról
-		CLEARMODES Törli a szoba módot
-		KILLCLONES Killeli az összes klónt a hosztról
-		AKILL Szerkeszti az AKILL listát
-		SGLINE Szerkeszti az SGLINE listát
-		SQLINE Szerkeszti az SQLINE listát
-		SZLINE Szerkeszti az SZLINE listát
+	    MODE        Váltóztatja a szoba módot
+	    KICK        Kirúgja a felhasználót csatornáról
+	    CLEARMODES  Törli a szoba módot
+	    KILLCLONES  Killeli az összes klónt a hosztról
+	    AKILL       Szerkeszti az AKILL listát
+	    SGLINE      Szerkeszti az SGLINE listát
+	    SQLINE      Szerkeszti az SQLINE listát
+	    SZLINE      Szerkeszti az SZLINE listát
 	
 OPER_HELP_ADMIN_CMD
 	Ezek a Parancsok a szervíz admin részére elérhetõek:
 		
-		OPER Módosítja a Szervíz operátorok listáját
-		SVSNICK Megváltoztatja a felhasználó nicknevét
-		CHANLIST Listázza az összes csatornát 
-		USERLIST Listázza az összes felhasználót  
-		LOGONNEWS Fellépõ üzenetek beállítása
-		RANDOMNEWS Véletlenszerûen megjelenõ üzenetet állít be 
-				a felhasználók részére
-		OPERNEWS Operek részére megjelenõ üzenetet állít be
-		SESSION Olvassa a sessionok hoszt listáját
-		EXCEPTION Módosítja a session-korlát/kivétel listát
-		CACHE Kiírja a hostnév rejtõ usereket a proxy keresõ
-		NOOP Ideiglenesen törli az összes O:line-t a szerver
-				távollétében
-		JUPE Létrehoz egy "Jupiter" álszervert.
-		IGNORE Módosítja a Szervíz mellõzési listáját
-		UMODE Felhasználó módok állítása
-		OLINE Operflaget ad a biztos felhasználónak(csak Unreal
-				IRCd)
-		SET Beállítja szervíz általános változóit
-		RELOAD Újratölti a szervíz Konfigurációs fájlját
-		UPDATE A Szervíz adatbázist frissíti, felülírja
+	    OPER        Módosítja a Szervíz operátorok listáját
+	    SVSNICK     Megváltoztatja a felhasználó nicknevét
+	    CHANLIST    Listázza az összes csatornát 
+	    USERLIST    Listázza az összes felhasználót  
+	    LOGONNEWS   Fellépõ üzenetek beállítása
+	    RANDOMNEWS  Véletlenszerûen megjelenõ üzenetet állít be 
+	                  a felhasználók részére
+	    OPERNEWS    Operek részére megjelenõ üzenetet állít be
+	    SESSION     Olvassa a sessionok hoszt listáját
+	    EXCEPTION   Módosítja a session-korlát/kivétel listát
+	    CACHE       Kiírja a hostnév rejtõ usereket a proxy keresõ
+	    NOOP        Ideiglenesen törli az összes O:line-t a szerver
+	                  távollétében
+	    JUPE        Létrehoz egy "Jupiter" álszervert.
+	    IGNORE      Módosítja a Szervíz mellõzési listáját
+	    UMODE       Felhasználó módok állítása
+	    OLINE       Operflaget ad a biztos felhasználónak
+	                  (csak UnrealIRCd)
+	    SET         Beállítja szervíz általános változóit
+	    RELOAD      Újratölti a szervíz Konfigurációs fájlját
+	    UPDATE      A Szervíz adatbázist frissíti, felülírja
 				lemezre közvetlenül
-		RESTART Menti az adatbázist, és újraindítja a szervízt
-		QUIT Leállítja a szervíz programot mentés nélkül
-		SHUTDOWN Leállítja a szervíz programot mentéssel
-		DEFCON Manipulálja a DefCon rendszert
-		CHANKILL Kirúgja az összes usert a csatornáról
+	    RESTART     Menti az adatbázist, és újraindítja a szervízt
+	    QUIT        Leállítja a szervíz programot mentés nélkül
+	    SHUTDOWN    Leállítja a szervíz programot mentéssel
+	    DEFCON      Manipulálja a DefCon rendszert
+	    CHANKILL    Kirúgja az összes usert a csatornáról
 	
 	Parancs rendelkezésre áll szuper-felhasználó részére:
-		ADMIN Módosítja a Szervíz admin listát
+	    ADMIN       Módosítja a Szervíz admin listát
 	
 OPER_HELP_ROOT_CMD
 	Parancs rendelkezésre áll Szervíz Rootok részére:
-		MODLOAD Betölti a modult
-		MODUNLOAD Kitölti a modult
-		MODLIST Listázza a betöltött modulokat
-		MODINFO Információ a betöltött modulokról
+	    MODLOAD     Betölti a modult
+	    MODUNLOAD   Kitölti a modult
+	    MODLIST     Listázza a betöltött modulokat
+	    MODINFO     Információ a betöltött modulokról
 	
 OPER_HELP_LOGGED
 	Üzenet:Minden %S-nek küldött parancs naplózva van.
@@ -5031,10 +5022,10 @@ OPER_HELP_OPER
 	Összes egyéb felhasználás korlátozva Szervíz adminoknak
 	
 OPER_HELP_ADMIN
-	Syntax:	ADMIN ADD nick
-			ADMIN DEL {nick|sorszám|lista}
-			ADMIN LIST [maszk|lista]
-			ADMIN CLEAR
+	Syntax:	ADMIN  ADD nick
+			ADMIN  DEL { nick  |  sorszám  |  lista }
+			ADMIN  LIST [ maszk  |  lista ]
+			ADMIN  CLEAR
 	
 	Lehetõséget nyújt a Services rootnak, hogy hozzáadjon,
 	töröljön nickneveket a Services adminok listáján. Az
@@ -5074,7 +5065,7 @@ OPER_HELP_IGNORE
 	Készíthetsz tartós mellõzést ha idõnek 0 a paramétere.
 		
 OPER_HELP_MODE
-	Syntax: MODE #szobamódok
+	Syntax: MODE #szoba módok
 	
 	Megengedi a szervíz operátornak, hogy szoba módokat 
 	állítson. Parameterek ugyanazok mint a szabvány
@@ -5092,7 +5083,7 @@ OPER_HELP_UMODE
 	Korlátozva Szuper adminnak.
 	
 OPER_HELP_OLINE
-	Syntax: OLINE user flags
+	Syntax: OLINE user flagek
 	
 	Lehetõséget ad a szervíz adminnak, hogy egy usernek 
 	operflaget adjon. Elõjelként "+" vagy "-" adható meg.
@@ -5129,11 +5120,11 @@ OPER_HELP_SVSNICK
 	Korlátozva Szuper adminnak
 	
 OPER_HELP_AKILL
-	Syntax: AKILL ADD [+lejárat] maszk indok
-	        AKILL DEL {maszk | sor-szám | list}
-	        AKILL LIST [maszk | list]
-	        AKILL VIEW [maszk | list]
-	        AKILL CLEAR
+	Syntax: AKILL  ADD [ +lejárat] maszk indok
+	        AKILL  DEL {maszk | sor-szám | list}
+	        AKILL  LIST [maszk | list]
+	        AKILL  VIEW [maszk | list]
+	        AKILL  CLEAR
 	
 	Lehetõséget ad a szervíz opoknak, hogy karbantartsák az
 	AKILL listát.  Ha egy felhasználó az AKILL maszkkal egyezõ
@@ -5222,8 +5213,8 @@ OPER_HELP_SQLINE
 	        SQLINE VIEW [maszk | list]
 	        SQLINE CLEAR
 	
-	Engedélyezi a operátoroknak, hogy karbantartsák az SGLINE
-	listát. Ha egy felhasználó "nick-je" ráillik egy SGLINe
+	Engedélyezi a operátoroknak, hogy karbantartsák az SQLINE
+	listát. Ha egy felhasználó "nick-je" ráillik egy SQLINe
 	maszkra, megpróbál csatlakozni, a szervíz nem fogja engedni
 	az egész irc-n.
 	
@@ -5239,7 +5230,7 @@ OPER_HELP_SQLINE
 	(+30 az 30 napot jelent).Ha +0-át adsz meg akkor nem 
 	elévülo lesz.Ha a usermaszk + -al kezdodik akkor elévülést
 	meg kell adni akkor is ha megegyezik az alapértelmezéssel.
-	Az SGLINE jelenlegi alapértelmezett elévüólési ideje 
+	Az SQLINE jelenlegi alapértelmezett elévülési ideje 
 	megnézheto a STATS AKILL paranccsal.
 	SQLINE DEL eltávolítja a maszkot az SQLINE listáról,
 	ha jelen van.Ha bejegyzés sorszámot adsz meg akkor azok
@@ -5261,7 +5252,7 @@ OPER_HELP_SQLINE
 	
 OPER_HELP_SZLINE
 	Syntax: SZLINE ADD [+lejárat] maszk indok
-	        SZLINE DEL {maszk | entry-szám | list}
+	        SZLINE DEL {maszk | sorszám | list}
 	        SZLINE LIST [maszk | list]
 	        SZLINE VIEW [maszk | list]
 	        SZLINE CLEAR
@@ -5278,7 +5269,7 @@ OPER_HELP_SZLINE
 	(+30 az 30 napot jelent).Ha +0-át adsz meg akkor nem 
 	elévülo lesz.Ha a usermaszk + -al kezdodik akkor elévülést
 	meg kell adni akkor is ha megegyezik az alapértelmezéssel.
-	Az SZLINE jelenlegi alapértelmezett elévüólési ideje 
+	Az SZLINE jelenlegi alapértelmezett elévülési ideje 
 	megnézheto a STATS AKILL paranccsal.
 	SZLINE DEL eltávolítja a maszkot az SZLINE listáról,
 	ha jelen van.Ha bejegyzés sorszámot adsz meg akkor azok 
@@ -5301,15 +5292,15 @@ OPER_HELP_SZLINE
 	Korlátozva Szervíz operatornak.
 	
 OPER_HELP_SET
-	Syntax: SET opcióbeállítás
+	Syntax: SET  opció beállítás
 	
 	Beállítja a Services általános opcióit.
 	A lehetséges opciók:
-		READONLY	 Csak-olvasás vagy olvasás-írás mód beállítása
-		LOGCHAN	 Kiírja a naplózott üzeneteket a csatornára
-		DEBUG	 Bekapcsolja/kikapcsolja a debug módot
-		NOEXPIRE	 Bekapcsolja/kikapcsolja a nem elévülõ módot
-		SUPERADMIN Bekapcsolja/kikapcsolja a super-admin módot
+	    READONLY   Csak-olvasás vagy olvasás-írás mód beállítása
+	    LOGCHAN    Kiírja a naplózott üzeneteket a csatornára
+	    DEBUG      Bekapcsolja/kikapcsolja a debug módot
+	    NOEXPIRE   Bekapcsolja/kikapcsolja a nem elévülõ módot
+	    SUPERADMIN Bekapcsolja/kikapcsolja a super-admin módot
 	
 	Korlátozva Szervíz adminnak.
 	
@@ -5325,7 +5316,8 @@ OPER_HELP_SET_READONLY
 	kerül mentésre, amíg a csak olvasni módot kikapcsolja
 	és restartolja a szervízt.
 	
-	Ez a parancs egyenértékû a -readonly beállítással.	
+	Ez a parancs egyenértéku a parancs-sorban kiadott
+	-readonly opcióval.	
 
 	
 OPER_HELP_SET_LOGCHAN
@@ -5342,27 +5334,27 @@ OPER_HELP_SET_LOGCHAN
 OPER_HELP_SET_DEBUG
 	Syntax: SET DEBUG {ON | OFF | szám}
 	
-	Sets debug mode on or off.  In debug mode, all data sent to
-	and from Services as well as a number of other debugging
-	messages are written to the log file.  If num is
-	given, debug mode is activated, with the debugging level set
-	to num.
+	Be vagy kikapcsolja a debug módot. Debug módban, minden a
+	Szervíznek és a szervíz által küldött üzenet és persze még
+	sok más üzenet rögzítésere kerül a naplófájlban. Ha megadsz
+	számot is, akkor a debug mód bekapcsol és a megadott szinten
+	fog muködni.
 	
-	This option is equivalent to the command-line option
+	Ez az opció megegyezik a parancs-sorban kiadható opcióval:
 	-debug.
 	
 OPER_HELP_SET_NOEXPIRE
 	Syntax: SET NOEXPIRE {ON | OFF}
 	
-	Bekapcsolja a nem elévülést. A nem elévülõ módban, nickeknicks,
-	channels, akills and exceptions won't expire until the
-	option is unset.
+	Bekapcsolja a nem elévülést. A nem elévülõ módban nickek,
+	csatornák, akillek és kivételek rakhatóak nem elévülõre is
+	amíg ezt az opciót nem kapcsolod ki.
 	
-	This option is equivalent to the command-line option
+	Ez az opció megegyezik a parancs-sorban kiadható opcióval:
 	-noexpire.
 	
 OPER_HELP_SET_SUPERADMIN
-	Syntax: SET SUPERADMIN {ON | OFF} [jelszó]
+	Syntax: SET SUPERADMIN {ON | OFF}
 	
 	Ez a beállítás extra jogokat biztosít számodra, például
 	az "összes szoba founderje" stb...
@@ -5498,8 +5490,8 @@ OPER_HELP_USERLIST
 	Korlátozva Szervíz adminoknak.
 	
 OPER_HELP_CACHE
-	Syntax: CACHE DEL hostnév
-	        CACHE LIST pattern [QUEUED | ALL]
+	Syntax: CACHE  DEL hostnév
+	        CACHE  LIST pattern [QUEUED | ALL]
 	
 	The CACHE DEL command deletes the specified hostname from 
 	the cache. This is meant for debug purpose only.
@@ -5557,15 +5549,16 @@ BOT_HELP
 	Bõvebb információt így kaphatsz az adott parancsról:
 	/msg %S HELP parancs.
 	
-	BOTLIST Listázza az elérhetõ botokat
-	ASSIGN Társít egy botot a csatornához
-	SET Konfigurálja a bot opcióit
-	KICK Konfigurálja a kirúgásokat
-	BADWORDS Szerkeszti a tiltott szavak listáját
+	BOTLIST            Listázza az elérhetõ botokat
+	ASSIGN             Társít egy botot a csatornához
+	SET                Konfigurálja a bot opcióit
+	KICK               Konfigurálja a kirúgásokat
+	BADWORDS           Szerkeszti a tiltott szavak listáját
 	
 	Egyéb parancsok: ACT INFO SAY UNASSIGN
 	
 	A Bot akkor fog belépni a csatornára, ha legalább
+
 	%d felhasználó van bent.
 	
 BOT_HELP_BOTLIST
@@ -5590,7 +5583,7 @@ BOT_HELP_UNASSIGN
 	akarod hozni a szobádba.
 	
 BOT_HELP_INFO
-	Syntax: INFO {#szoba | nick}
+	Syntax: INFO {#szoba  |  nick}
 	
 	Lehetõvé teszi, hogy megnézd a %S információkat egy
 	csatornával vagy bottal kapcsolatban. Ha a paraméter
@@ -5604,12 +5597,12 @@ BOT_HELP_SET
 	
 	Beállítja a bot opcióit. Az opció a következõ lehet:
 	
-		DONTKICKOPS Védelem az opoknak bot kirúgás ellen
-		DONTKICKVOICES Védelem a voicesokna bot kirúgás ellen
-		GREET Engedélyezi a köszöntõ üzenetet
-		FANTASY Engedélyezi a fantaisi parancsokat
-		SYMBIOSIS Megengedi, hogy a bot olyan legyen mint 
-					az igazi botok
+	    DONTKICKOPS      Védelem az opoknak bot kirúgás ellen
+	    DONTKICKVOICES   Védelem a voicesokna bot kirúgás ellen
+	    GREET            Engedélyezi a köszöntõ üzenetet
+	    FANTASY          Engedélyezi a fantaisi parancsokat
+	    SYMBIOSIS        Megengedi, hogy a bot olyan legyen mint 
+	                     az igazi botok
 	
 	Írd be /msg %S HELP SET opció bõvebb információkért
 	az adott opcióról.
@@ -5625,14 +5618,14 @@ BOT_HELP_SET_DONTKICKOPS
 	kirúgni, akkor se, ha nem egyeznek meg a NOKICK szinttel
 		
 BOT_HELP_SET_DONTKICKVOICES
-	Syntax: SET #szobaDONTKICKVOICES {ON|OFF}
+	Syntax: SET #szoba DONTKICKVOICES { ON|OFF }
 	
 	Engedélyezi vagy tiltja hangadók védelmét a csatornán.
 	Ha engedélyezve van, akkor a hangadókat nem fogja a bot
 	kirúgni, akkor se, ha nem egyeznek meg a NOKICK szinttel
 	
 BOT_HELP_SET_FANTASY
-	Syntax: SET#szobaFANTASY {ON|OFF}
+	Syntax: SET #szoba FANTASY { ON|OFF }
 	
 	Engedélyezi vagy tiltja fantasy módot a csatornán.
 	Ha engedélyezve van, akkor a következõ parancsok
@@ -5648,14 +5641,14 @@ BOT_HELP_SET_FANTASY
 	legyen a megfelelõ szintjük az OPDEOP parancsokhoz.).
 	
 BOT_HELP_SET_GREET
-	Syntax: SET#szoba GREET {ON|OFF}
+	Syntax: SET #szoba  GREET { ON|OFF }
 	
 	Engedélyezi vagy tiltja Köszöntõ módot a csatornán.
 	Ha engedélyezve van, akkor a bot megjeleníti azoknak
 	a köszöntõ üzenetét, akiknek a szintjük megfelelõ ehhez.
 	
 BOT_HELP_SET_SYMBIOSIS
-	Syntax: SET#szobaSYMBIOSIS {ON|OFF}
+	Syntax: SET #szoba SYMBIOSIS { ON|OFF }
 	
 	Engedélyezi vagy tiltja symbiosis módot a csatornán.
 	Ha engedélyezve van, akkor a bot fog mindent csinálni,
@@ -5663,19 +5656,19 @@ BOT_HELP_SET_SYMBIOSIS
 	KICK, és a belépõüzenet kiírása.
 	
 BOT_HELP_KICK
-	Syntax: KICK #szobaopcióparaméterek
+	Syntax: KICK  #szobaopcióparaméterek
 	
 	Bot kirúgások beállítása. Az opció a következõ lehet:
 	
-		BOLDS A bot kirúgja félkövér betûkkel írókat
-		BADWORDS A bot kirúgja a csúnyaszavakat használókat
-		CAPS A bot kirúgja CapsLock használókat
-		COLORS A bot kirúgja szinesen írókat
-		FLOOD A bot kirúgja floodolókat
-		REPEAT A bot kirúgja az önmagukat 
-				ismétlõket.
-		REVERSES A bot kirúgja visszafelé írókat
-		UNDERLINES A bot kirúgja aláhúzással írókat
+	    BOLDS         A bot kirúgja félkövér betûkkel írókat
+	    BADWORDS      A bot kirúgja a csúnyaszavakat használókat
+	    CAPS          A bot kirúgja CapsLock használókat
+	    COLORS        A bot kirúgja szinesen írókat
+	    FLOOD         A bot kirúgja floodolókat
+	    REPEAT        A bot kirúgja az önmagukat 
+	                  ismétlõket.
+	    REVERSES      A bot kirúgja visszafelé írókat
+	    UNDERLINES    A bot kirúgja aláhúzással írókat
 	
 	Írd be /msg %S HELP KICK opció az adott opcióval
 	kapcsolatos bõvebb információkért.
@@ -5684,7 +5677,7 @@ BOT_HELP_KICK
 	lehet korlátozni.
 	
 BOT_HELP_KICK_BOLDS
-	Syntax: KICK #szoba BOLDS {ON|OFF} [ttb]
+	Syntax: KICK  #szoba BOLDS { ON|OFF } [ ttb ]
 	
 	Beállítja a félkövér írásért járó kirúgást.
 	Ha engedélyezve van akkor a bot kirúg a félkövér betûkért.
@@ -5694,7 +5687,7 @@ BOT_HELP_KICK_BOLDS
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_KICK_COLORS
-	Syntax: KICK #szoba COLORS {ON|OFF} [ttb]
+	Syntax: KICK  #szoba COLORS { ON|OFF } [ ttb ]
 	
 	Beállítja a szines írásért járó kirúgást.
 	Ha engedélyezve van akkor a bot kirúgja a színesen írókat.
@@ -5704,7 +5697,7 @@ BOT_HELP_KICK_COLORS
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_KICK_REVERSES
-	Syntax: KICK #szobaREVERSES {ON|OFF} [ttb]
+	Syntax: KICK  #szobaREVERSES { ON|OFF } [ ttb ]
 	
 	Beállítja a visszafelé írásért járó kirúgást.
 	Ha engedélyezve van akkor a bot kirúgja a reverse írókat.
@@ -5714,7 +5707,7 @@ BOT_HELP_KICK_REVERSES
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.	
 
 BOT_HELP_KICK_UNDERLINES
-	Syntax: KICK #szobaUNDERLINES {ON|OFF} [ttb]
+	Syntax: KICK #szobaUNDERLINES { ON|OFF } [ ttb ]
 	
 	Beállítja az aláhúzott írásért járó kirúgást.
 	Ha engedélyezve van akkor a bot kirúgja az aláhúzva írókat
@@ -5724,7 +5717,7 @@ BOT_HELP_KICK_UNDERLINES
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_KICK_CAPS
-	Syntax: KICK#szobaCAPS {ON|OFF} [ttb[min[százalék]]]
+	Syntax: KICK #szobaCAPS { ON|OFF } [ ttb  [ min  [ százalék ]]]
 	
 	Beállítja a túlzott caps miatt járó kirúgást.
 	Ha engedélyezve van, akkor a bot kirúgja a "kiabálókat".
@@ -5739,7 +5732,7 @@ BOT_HELP_KICK_CAPS
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_KICK_FLOOD
-	Syntax: KICK #szoba FLOOD {ON|OFF} [ttb[sor[mp]]]
+	Syntax: KICK #szoba FLOOD { ON|OFF } [ ttb  [ sor  [ mp ]]]
 	
 	Beállítja a flood miatti kirúgást. Ha engedélyezve van
 	akkor a bot kirúgja a floodoló usereket, ha legalább
@@ -5751,7 +5744,7 @@ BOT_HELP_KICK_FLOOD
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_KICK_REPEAT
-	Syntax: KICK #szoba REPEAT {ON|OFF} [ttb[szám]]
+	Syntax: KICK  #szoba REPEAT { ON|OFF } [ ttb  [ szám ]]
 	
 	Beállítja az ismétlés miatti kirúgást. Ha engedélyezve
 	van az opció, akkor a bot kirúgja az önmagukat ismétlõ
@@ -5778,10 +5771,10 @@ BOT_HELP_KICK_BADWORDS
 	Ha megadod a ttb-t, akkor x kirúgás után banol a bot.
 	
 BOT_HELP_BADWORDS
-	Syntax:BADWORDS#szobaADD szó [SINGLE|START|END]
-		 BADWORDS#szobaDEL {szó|sorszám|list}
-		 BADWORDS#szobaLIST [maszk|list]
-		 BADWORDS#szobaCLEAR
+	Syntax:BADWORDS #szoba ADD  szó  [SINGLE  |  START  |  END]
+		 BADWORDS #szoba DEL { szó  |  sorszám  |  list}
+		 BADWORDS #szoba LIST  [ maszk  |  list]
+		 BADWORDS #szoba CLEAR
 
 	Karbantartja a szoba csúnyaszó listáját. A tiltott
 	szavak listája meghatározza, hogy mely szavak kiejtésére
@@ -5807,7 +5800,7 @@ BOT_HELP_BADWORDS
 	bejegyzések kerülnek listázásra. Ha egy sorozatot adsz meg
 	akkor azok a bejegyzések kerülnek megjelenítésre; példa:
 
-	   BADWORDS #szoba LIST 2-5,7-9
+	   BADWORDS  #szoba  LIST  2-5,7-9
 	      Listázza a csúnyaszavakat 2-tõl 5-ig és a 7-tõl
 	      9-ig.
 	      
@@ -5815,12 +5808,12 @@ BOT_HELP_BADWORDS
 	a tiltott szavak listájáról
 	
 BOT_HELP_SAY
-	Syntax: SAY#szobaszöveg
+	Syntax: SAY #szoba szöveg
 	
 	Elküldi a bot a megadott szöveget a csatornára.
 	
 BOT_HELP_ACT
-	Syntax: ACT#szobaszöveg
+	Syntax: ACT #szoba szöveg
 	
 	A bot "/me" akcióval küldi el a megadott szöveget
 	a csatornára.
@@ -5832,8 +5825,8 @@ BOT_SERVADMIN_HELP
 		BOT Karbantartja a hálózat botjainak listáját
 	
 BOT_SERVADMIN_HELP_BOT
-	Syntax:	BOT ADD nickuserhostreal
-			BOT CHANGE réginickújnick[user[host[real]]]
+	Syntax:	BOT ADD  nick   user   hoszt   valós
+			BOT CHANGE  réginick   újnick [user  [ hoszt  [ valós ]]]
 			BOT DEL nick
 			BOT LIST
 	
@@ -5859,10 +5852,10 @@ BOT_SERVADMIN_HELP_SET
 	
 	Ezeket az opciókat csak Szervíz adminok használhatják:
 		
-		NOBOT Megelõzi, hogy egy botot társítani lehessen
-				csatornához
-		PRIVATE Megelõzi, hogy egy botot nem IRCop személy
-				társíthasson
+	    NOBOT            Megelõzi, hogy egy botot társítani lehessen
+	                       csatornához
+	    PRIVATE          Megelõzi, hogy egy botot nem IRCop személy
+	                       társíthasson
 	
 BOT_SERVADMIN_HELP_SET_NOBOT
 	Syntax: SET #szoba NOBOT {ON|OFF}
@@ -5960,17 +5953,17 @@ HOST_LIST_KEY_FOOTER
 	
 HOST_HELP
 	%S parancsok:
-		ON Aktiválja a társított vhostot
-		OFF Kikapcsolja a társított vhostot
-		GROUP A vhostot a csoport minden tagjára állítja
+	    ON          Aktiválja a társított vhostot
+	    OFF         Kikapcsolja a társított vhostot
+	    GROUP       A vhostot a csoport minden tagjára állítja
 
 HOST_OPER_HELP
 	Parancsok a VHostok beállításához/módosításához:
-		SET Beállít egy vhosztot a felhasználónak
-		SETALL Beállítja a vhosztot összes nicknek a csoportban
-		DEL Törli egy felhasználónak a vhostját
-		DELALL Törli a vhosztot a nickekröl a csoportban
-		LIST Kiír egy vagy több vhost bejegyzést
+	    SET         Beállít egy vhosztot a felhasználónak
+	    SETALL      Beállítja a vhosztot összes nicknek a csoportban
+	    DEL         Törli egy felhasználónak a vhostját
+	    DELALL      Törli a vhosztot a nickekröl a csoportban
+	    LIST        Kiír egy vagy több vhost bejegyzést
 
 HOST_ADMIN_HELP
 	Ezek a Parancsok csak szervíz adminok által használhatók:
@@ -6048,6 +6041,6 @@ HOST_HELP_LIST
 HOST_HELP_GROUP
 	Syntax: GROUP
 	
-	Ez a parancs lehetõvé teszi a felhasználóknak, hogy a 
-	vhostjukat beállítsák a csoport minden nickjére.
+	Ez a parancs lehetõvé teszi, hogy a JELENLEGI nick
+	vhostját beállítsuk a csoport minden nickjére.
 

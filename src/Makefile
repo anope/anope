@@ -31,6 +31,8 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 
 all: services
 
+distclean: clean spotless
+
 services:  $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
 
@@ -76,8 +78,12 @@ modules: DUMMY
 	(cd modules ; ./configure ; ${MAKE} ${MAKEARGS} all)
 
 clean:
+	@touch modules/Makefile.inc # Horribly ugly...
 	(cd modules ; ${MAKE} ${MAKEARGS} clean)
 	rm -f *.o services a.out
+
+spotless: clean
+	(cd modules ; ${MAKE} ${MAKEARGS} distclean)
 
 install: services
 	test -d ${BINDEST} || mkdir ${BINDEST}

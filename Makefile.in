@@ -46,7 +46,9 @@ clean:
 	(cd src ; ${MAKE} ${MAKEARGS} clean )
 
 distclean: clean
-	(cd include ; ${MAKE} ${MAKEARGS} distclean)
+	(cd lang ; ${MAKE} ${MAKEARGS} distclean )
+	(cd include ; ${MAKE} ${MAKEARGS} distclean )
+	(cd src ; ${MAKE} ${MAKEARGS} distclean )
 	rm -f config.log config.status config.cache Makefile
 
 install: DUMMY

@@ -4,10 +4,11 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 07/17 A Switched to autoconf for configure script.                        [ #00]
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+08/11 F Proper make distclean to leave source spotless.                   [ #00]
 08/11 F Fixed support for Ultimate, Rage and Viagra.                      [#113]
-08/07 F configure will be ok if you dont have mysqlclient lib file.       [ #00]
 08/10 F Fixed previous BotServ buffer fix.                                [#131]
 08/10 F Updated documentation to reflect the changed build process.       [ #00]
+08/07 F configure will be ok if you dont have mysqlclient lib file.       [ #00]
 07/23 F Fixed BotServ buffer.                                             [#131]
 07/22 F Free NSNickTracking when a user quits.                            [#126]
 07/22 F NOOP bug with wildcards.                                          [#115]
@@ -32,7 +33,7 @@ Provided by Janos Kapitany <sarkanyka@cjbchat.hu>
 08/04 A New language file hun.l (Hungarian)                               [ #00]
 
 Provided by Mateusz Szczyrzyca <annihilator@ircnet.pl> - 2004
-08/04 A New language file pl.l (Polish)                                   [ #00]
+08/11 A New language file pl.l (Polish)                                   [ #00]
 
 Anope Version 1.7.4
 -------------------

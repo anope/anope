@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="320"
+VERSION_BUILD="321"
 
 # $Log$
+#
+# BUILD : 1.7.5 (321)
+# BUGS  : none
+# NOTES : Fixed make distclean and updated hun.l
 #
 # BUILD : 1.7.5 (320)
 # BUGS  : 

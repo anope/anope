@@ -76,7 +76,7 @@ IRCDVar ircd[] = {
      0,                         /* Channel Mode         */
      0,                         /* vidents              */
      0,                         /* svshold              */
-     0,                         /* time stamp on mode   */
+     1,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
      0,                         /* UMODE                */
      0,                         /* O:LINE               */
@@ -184,7 +184,7 @@ void anope_set_umode(User * user, int ac, char **av)
             break;
         case 'R':
             if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -R", user->nick);
+                common_svsmode(user, "-R", NULL);
                 user->mode &= ~UMODE_R;
             }
             break;
@@ -638,18 +638,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
@@ -775,6 +765,9 @@ void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
 void anope_cmd_svsmode(User * u, int ac, char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %s", u->nick, av[0]);
+
+    if ((ac == 2) && isdigit(*av[1]))
+        send_cmd(ServerName, "SVSID %s %s", u->nick, av[1]);
 }
 
 void anope_cmd_connect(int servernum)
@@ -833,7 +826,7 @@ void anope_cmd_svinfo()
 void anope_cmd_capab()
 {
     send_cmd(NULL,
-             "CAPAB :QS EX CHW IE EOB KLN GLN HOPS HUB AOPS KNOCK TBURST PARA");
+             "CAPAB :QS EX CHW IE EOB KLN GLN HOPS HUB KNOCK TBURST PARA");
 }
 
 /* PASS */
@@ -1354,16 +1347,15 @@ void anope_cmd_squit(char *servname, char *message)
 
 int anope_event_mode(char *source, int ac, char **av)
 {
-    Server *s;
-
     if (ac < 2)
         return MOD_CONT;
-
-    s = findserver(servlist, source);
 
     if (*av[0] == '#' || *av[0] == '&') {
         do_cmode(source, ac, av);
     } else {
+        Server *s;
+        s = findserver(servlist, source);
+
         if (s && *av[0]) {
             do_umode(av[0], ac, av);
         } else {
@@ -1444,16 +1436,14 @@ void anope_cmd_svid_umode(char *nick, time_t ts)
 /* nc_change was = 1, and there is no na->status */
 void anope_cmd_nc_change(User * u)
 {
-    common_svsmode(u, "-R", NULL);
-    send_cmd(ServerName, "SVSID %s 1", u->nick);
+    common_svsmode(u, "-R", "1");
 }
 
 /* SVSMODE +d */
 void anope_cmd_svid_umode2(User * u, char *ts)
 {
     if (u->svid != u->timestamp) {
-        common_svsmode(u, "+R", NULL);
-        send_cmd(ServerName, "SVSID %s %s", u->nick, ts);
+        common_svsmode(u, "+R", ts);
     } else {
         common_svsmode(u, "+R", NULL);
     }

@@ -101,7 +101,8 @@ Provided by Jens Hoffrichter <joho@nickstories.de> - 2004
 Provided by mitch{Xy} <mitch@bondage.com> - 2004
 12/20 F Removed unclear email text from language files.                   [ #00]
 
-Provided by ThaPrince <jon@vile.com> - 2004
+Provided by ThaPrince <jon@vile.com> - 2004/2005
+01/13 A Support for plexus SVSID.                                         [ #00]
 12/25 A Support for Hybrid TBURST.                                        [#259]
 12/21 A Support for Hybrid IRCDs QS (Quit Storm).                         [#256]
 12/20 A Added plexus ircd support.                                        [ #00]

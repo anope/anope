@@ -1440,7 +1440,7 @@ void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
     /* Not Supported by this IRCD */
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
     /* Not Supported by this IRCD */
 }

@@ -1012,7 +1012,7 @@ int do_del(User * u)
 int do_off(User * u)
 {
     /* put any generic code here... :) */
-    anope_cmd_vhost_off(u->nick);
+    anope_cmd_vhost_off(u);
     return MOD_CONT;
 }
 

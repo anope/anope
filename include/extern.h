@@ -961,7 +961,7 @@ extern void anope_cmd_capab();						  	  		  /* CAPAB */
 extern void anope_cmd_chghost(char *nick, char *vhost);                   			  /* CHGHOST */
 extern void anope_cmd_chgident(char *nick, char *vIdent);                 			  /* CHGIDENT */
 extern void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost);    			  /* CHGHOST + CHGIDENT */
-extern void anope_cmd_vhost_off(char *nick);
+extern void anope_cmd_vhost_off(User *u);
 extern void anope_cmd_connect(int servernum);                             	           	  /* Connect */
 extern void anope_cmd_ea();									  /* EA      */
 extern void anope_cmd_global(char *source, const char *fmt, ...);         	  		  /* GLOBOPS */

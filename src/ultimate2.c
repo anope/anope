@@ -784,9 +784,9 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
-    /* does not support vhosting */
+    /* does not support removing vhosting */
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)

@@ -741,15 +741,16 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
              whosetit, when, topic);
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
     if (UseSVS2MODE) {
         send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"),
-                 nick);
+                 u->nick);
     } else {
         send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"),
-                 nick);
+                 u->nick);
     }
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
 }
 
 void anope_cmd_akill(char *user, char *host, char *who, time_t when,

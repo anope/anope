@@ -779,9 +779,10 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
-    send_cmd(NULL, "SVSMODE %s -x", nick);
+    send_cmd(NULL, "SVSMODE %s -x", u->nick);
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)

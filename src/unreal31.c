@@ -500,9 +500,10 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, when, topic);
 }
 
-void anope_cmd_vhost_off(char *nick)
+void anope_cmd_vhost_off(User * u)
 {
-    send_cmd(s_HostServ, "SVSMODE %s -xt", nick);
+    send_cmd(s_HostServ, "SVSMODE %s -xt", u->nick);
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick);
 }
 
 void anope_cmd_akill(char *user, char *host, char *who, time_t when,

@@ -553,7 +553,10 @@ int init(int ac, char **av)
     helpserv_init();
 
 #ifdef USE_RDB
-    rdb_init();
+    if (!rdb_init()) {
+        UseRDB = 0;
+        alog("Error: Disabling UseRDB due to errors with SQL");
+    }
 #endif
 
     /* Initialize proxy detection */

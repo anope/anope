@@ -54,11 +54,12 @@ int db_mysql_init()
     /* If the host is not defined, assume we don't want MySQL */
     if (!MysqlHost) {
         do_mysql = 0;
-        alog("MySQL has been disabled.");
+        alog("MySQL: has been disabled.");
+	return 0;
     } else {
         do_mysql = 1;
-        alog("MySQL has been enabled.");
-        alog("MySQL client version %s.",mysql_get_client_info());
+        alog("MySQL: has been enabled.");
+        alog("MySQL: client version %s.",mysql_get_client_info());
     }
 
     /* The following configuration options are required.
@@ -68,10 +69,13 @@ int db_mysql_init()
     if ((do_mysql) && (!MysqlName || !MysqlUser)) {
         do_mysql = 0;
         alog("MySQL Error: Set all required configuration options.");
+	return 0;
     }
 
-    if (!db_mysql_open())
+    if (!db_mysql_open()) {
         do_mysql = 0;
+	return 0;
+    }
 
     return 1;
 }
@@ -95,14 +99,14 @@ int db_mysql_open()
         if ((!mysql_real_connect
              (mysql, MysqlHost, MysqlUser, MysqlPass, MysqlName, MysqlPort,
               MysqlSock, 0))) {
-            log_perror("Cant connect to MySQL: %s\n", mysql_error(mysql));
+            log_perror("MySQL Error: Cant connect to MySQL: %s\n", mysql_error(mysql));
             return 0;
         }
     } else {
         if ((!mysql_real_connect
              (mysql, MysqlHost, MysqlUser, MysqlPass, MysqlName, MysqlPort,
               NULL, 0))) {
-            log_perror("Cant connect to MySQL: %s\n", mysql_error(mysql));
+            log_perror("MySQL Error: Cant connect to MySQL: %s\n", mysql_error(mysql));
             return 0;
         }
     }

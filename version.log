@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="455"
+VERSION_BUILD="456"
 
 # $Log$
+#
+# BUILD : 1.7.6 (456)
+# BUGS  : N/A
+# NOTES : Disables UseRDB if SQL fails to init
 #
 # BUILD : 1.7.6 (455)
 # BUGS  : N/A

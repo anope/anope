@@ -7,6 +7,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+11/20 F Disables UseRDB if there is an error duing SQL init		  [ #00]
 11/20 F MS CHECK now checks if the nick is forbidden.                     [#225]
 11/20 F Removing Sqline on bot nicks change if the nick was registered.	  [#224]
 11/19 F normalizeBuffer() now strips control character 1.		  [ #00]

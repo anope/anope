@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="265"
+VERSION_BUILD="266"
 
 # $Log$
+#
+# BUILD : 1.7.4 (266)
+# BUGS  : N/A
+# NOTES : Added include/Makefile to svn
 #
 # BUILD : 1.7.4 (265)
 # BUGS  : N/A

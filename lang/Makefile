@@ -40,7 +40,7 @@ spotless: clean
 	rm -f language.h index
 
 
-cat:       cat.l       langcomp index
+cat:      cat.l      langcomp index
 	./langcomp $@.l
 de:       de.l       langcomp index
 	./langcomp $@.l

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="124"
+VERSION_BUILD="125"
 
 # $Log$
+#
+# BUILD : 1.7.3 (125)
+# BUGS  : 72
+# NOTES : New /CS CLEAR HOPS for ircds that support halfops.
 #
 # BUILD : 1.7.3 (124)
 # BUGS  : 70

@@ -1414,6 +1414,8 @@ CHAN_CLEARED_MODES
 	%s kanalýndaki tüm modlar resetlendi.
 CHAN_CLEARED_OPS
 	Mod +o %s kanalýnda temizlendi.
+CHAN_CLEARED_HOPS
+	Mode +h has been cleared from channel %s.
 CHAN_CLEARED_VOICES
 	Mod +v %s kanalýnda temizlendi.
 CHAN_CLEARED_USERS
@@ -4567,6 +4569,8 @@ CHAN_HELP_CLEAR
 	     EXCEPTS  Clears all excepts on the channel.
 	     OPS      Kanal opu statüsünde olanlarýn (mode +o)
 	                  oplarýný alýr.
+	     HOPS     Removes channel-halfoperator status (mode +h) from
+	                  all channel halfoperators, if supported.
 	     VOICES   Voice statüsünde olanlarýn (mode +v) voice larýný
 	                  alýr.
 	     USERS    Tüm kullanýcýlarý kanaldan atar.

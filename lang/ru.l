@@ -1404,6 +1404,8 @@ CHAN_CLEARED_MODES
 	Все режимы на канале %s были сброшены.
 CHAN_CLEARED_OPS
 	Все опы были сняты на канале %s.
+CHAN_CLEARED_HOPS
+	Mode +h has been cleared from channel %s.
 CHAN_CLEARED_VOICES
 	Все войсы были сняты на канале %s.
 CHAN_CLEARED_USERS
@@ -4520,6 +4522,8 @@ CHAN_HELP_CLEAR
 	     EXCEPTS  Удалить все исключения из банов на канале.
 	     OPS      Снять статус оператора (режим +o) со
 	              всех операторов канала.
+	     HOPS     Removes channel-halfoperator status (mode +h) from
+	              all channel halfoperators, if supported.
 	     VOICES   Снять "войсы" (режим +v) со всех, 
 	              на ком установлен этот режим.
 	     USERS    Удалить (выкинуть) всех пользователей с канала.

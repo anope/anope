@@ -1406,6 +1406,8 @@ CHAN_CLEARED_MODES
 	Alle modes op kanaal %s zijn teruggezet op hun oorspronkelijke waarde.
 CHAN_CLEARED_OPS
 	Mode +o is verwijderd van kanaal %s.
+CHAN_CLEARED_HOPS
+	Mode +h has been cleared from channel %s.
 CHAN_CLEARED_VOICES
 	Mode +v is verwijderd van kanaal %s.
 CHAN_CLEARED_USERS
@@ -4588,6 +4590,8 @@ CHAN_HELP_CLEAR
 	     BANS     Verwijder alle bans op het kanaal.
 	     OPS      Verwijder kanaal-operator status (mode +o) van
 	                  alle kanaal-operators.
+	     HOPS     Removes channel-halfoperator status (mode +h) from
+	                  all channel halfoperators, if supported.
 	     VOICES   Verwijder "voice" status (mode +v) van iedereen
 	                  met "voice" status op het kanaal.
 	     USERS    Verwijder (kick) alle gebruikers van het kanaal.

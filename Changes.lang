@@ -1,7 +1,13 @@
 Anope Version S N V
 -------------------
 *** New Strings:
+
+  CHAN_CLEARED_HOPS
+
 *** Mod Strings:
+
+  CHAN_HELP_CLEAR
+
 *** Del Strings:
 
 Anope Version 1.7.3

@@ -1408,6 +1408,8 @@ CHAN_CLEARED_MODES
 	Όλα τα modes από το κανάλι %s έχουν σβηστεί.
 CHAN_CLEARED_OPS
 	Όλα τα Mode +o έχει καθαριστεί από το κανάλι %s.
+CHAN_CLEARED_HOPS
+	Mode +h has been cleared from channel %s.
 CHAN_CLEARED_VOICES
 	Όλα τα Mode +v έχει καθαριστεί από το κανάλι %s.
 CHAN_CLEARED_USERS
@@ -4595,6 +4597,8 @@ CHAN_HELP_CLEAR
 	     EXCEPTS  Καθαρίζει όλα τα excepts από το κανάλι.
 	     OPS      Αφαιρεί το channel-operator status (mode +o) από
 	                  όλους τους channel operators.
+	     HOPS     Removes channel-halfoperator status (mode +h) from
+	                  all channel halfoperators, if supported.
 	     VOICES   Αφαιρεί τα "voice" status (mode +v) από τον καθένα.
 	     USERS    Πετάει (kicks) όλους τους χρήστες από το κανάλι.
 	

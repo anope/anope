@@ -5877,6 +5877,26 @@ static int do_clear(User * u)
             free(av[0]);
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
+#ifdef HAS_HALFOP
+    } else if (stricmp(what, "hops") == 0) {
+        char *av[3];
+        struct c_userlist *cu, *next;
+
+        for (cu = c->users; cu; cu = next) {
+            next = cu->next;
+            if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
+                continue;
+            av[0] = sstrdup(chan);
+            av[1] = sstrdup("-h");
+            av[2] = sstrdup(cu->user->nick);
+            send_cmd(whosends(ci), "MODE %s %s :%s", av[0], av[1], av[2]);
+            do_cmode(s_ChanServ, 3, av);
+            free(av[2]);
+            free(av[1]);
+            free(av[0]);
+        }
+        notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
+#endif
     } else if (stricmp(what, "voices") == 0) {
         char *av[3];
         struct c_userlist *cu, *next;

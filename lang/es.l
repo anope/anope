@@ -1417,6 +1417,8 @@ CHAN_CLEARED_MODES
 	Todos los modos en el canal %s han sido reseteados.
 CHAN_CLEARED_OPS
 	Modo +o ha sido removido del canal %s.
+CHAN_CLEARED_HOPS
+	Mode +h has been cleared from channel %s.
 CHAN_CLEARED_VOICES
 	Modo +v ha sido removido del canal %s.
 CHAN_CLEARED_USERS
@@ -4655,6 +4657,8 @@ CHAN_HELP_CLEAR
 	     EXCEPTS  Limpia todos los excepts en el canal.
 	     OPS      Remueve estatus de operador de canal(modo +o)
 	                  de todos los operadores de canal.
+	     HOPS     Removes channel-halfoperator status (mode +h) from
+	                  all channel halfoperators, if supported.
 	     VOICES   Remueve el estatus "voice" (modo +v) de quien
 	                  tenga ese modo seteado.
 	     USERS    Remueve (kickea) todos los usuarios del canal.

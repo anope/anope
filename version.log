@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="197"
+VERSION_BUILD="198"
 
 # $Log$
+#
+# BUILD : 1.7.3 (198)
+# BUGS  : N/A
+# NOTES : Fixed changes format for dengel
 #
 # BUILD : 1.7.3 (197)
 # BUGS  : none

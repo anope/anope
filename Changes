@@ -1,7 +1,6 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
-06/16 F Module support for OpenBSD systems                                [#106]
 06/16 A More verbose error messages for services.conf checking.           [ #00]
 06/10 A User customizable pseudo-client modes.                            [ #99]
 06/10 A Improved handling of /NS INFO for pseudo-clients.                 [ #98]
@@ -11,6 +10,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 05/24 A New NSNickTracking directive to provide nick tracking.            [ #71]
 05/21 A Auto enforce upon AKICK addition.                                 [ #63]
 05/21 A New file docs/OLDCHANGES contains all change history.             [ #65]
+06/16 F Module support for OpenBSD systems                                [#106]
 06/12 F We check now for valid arguments in ModuleAddData().              [ #90]
 06/12 F Unified kill_user function to handle all ircd protocols.          [#101]
 06/10 F Added check to see if MysqlUser and MysqlName were not null.      [ #92]

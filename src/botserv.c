@@ -1262,7 +1262,7 @@ static int do_bot(User * u)
              * it as a bot nick from now on -GD
              */
             if ((na = findnick(nick))) {
-                notice_lang(s_BotServ, u, NICK_X_IN_USE, nick);
+                notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
                 return MOD_CONT;
             }
 
@@ -1368,9 +1368,15 @@ static int do_bot(User * u)
                     anope_cmd_unsqline(bi->nick);
                 }
 
-                /* We check whether the nick is registered, and drop it if so */
-                if ((na = findnick(nick)))
-                    delnick(na);
+                /* We check whether the nick is registered, and inform the user
+                 * if so. You need to drop the nick manually before you can use
+                 * it as a bot nick from now on -GD
+                 */
+                if ((na = findnick(nick))) {
+                    notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED,
+                                nick);
+                    return MOD_CONT;
+                }
 
                 /* We check whether user with this nick is online, and kill it if so */
                 EnforceQlinedNick(nick, s_BotServ);

@@ -3,6 +3,7 @@ Anope Version S V N
 Provided by Anope Dev. <dev@anope.org> - 2004
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]

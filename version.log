@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="450"
+VERSION_BUILD="451"
 
 # $Log$
+#
+# BUILD : 1.7.6 (451)
+# BUGS  : 221
+# NOTES : Fixes for wrong string for bot nick registration check, and added the check to bot change
 #
 # BUILD : 1.7.6 (450)
 # BUGS  : 

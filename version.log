@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="96"
+VERSION_BUILD="97"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (97)
+# BUGS  : 51
+# NOTES : Fixed a typo in hostserv group help response
 #
 # BUILD : 1.7.2 (96)
 # BUGS  : 40

@@ -6008,7 +6008,7 @@ HOST_HELP_LIST
 HOST_HELP_GROUP
 	Syntax: GROUP
 	
-	This command allows users to set the vhost of thier
+	This command allows users to set the vhost of their
 	CURRENT nick to be the vhost for all nicks in the same
 	group.
 

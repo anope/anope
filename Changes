@@ -33,6 +33,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
+11/28 F Fixes RSEND oddity						  [#237]
 11/26 F Memos sent as notification of receipt can't be cancelled.         [#192]
 11/23 F Moving Services Operators to Services Admins and vice-versa       [#230]
 11/22 F HelpChan +h mode not being given if status was greater then op.   [#223]

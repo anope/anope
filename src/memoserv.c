@@ -611,7 +611,7 @@ static int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
     m->flags &= ~MF_UNREAD;
 
     /* Check if a receipt notification was requested */
-    if (m->flags && MF_RECEIPT) {
+    if (m->flags & MF_RECEIPT) {
         rsend_notify(u, m, chan);
     }
 

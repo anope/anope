@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="412"
+VERSION_BUILD="414"
 
 # $Log$
+#
+# BUILD : 1.7.5 (414)
+# BUGS  : N/A
+# NOTES : Deleted compile.sh as it wont work anymore anyway
 #
 # BUILD : 1.7.5 (412)
 # BUGS  : 169

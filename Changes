@@ -70,6 +70,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 
 Provided by DrStein <gacevedo@anope.org> - 2004
 12/23 A NS STATUS will return your status if no nickname is given.        [ #00]
+12/30 F Loop overpassed in moduleDelData.                                 [#261]
 12/26 F Error message during SQL init even if UseRDB was disabled.        [ #00]
 12/10 F Extra tab in language files, causing bad answer in !seen.         [#243]
 11/28 F Fixes RSEND oddity.                                               [#237]

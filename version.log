@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="486"
+VERSION_BUILD="487"
 
 # $Log$
+#
+# BUILD : 1.7.6 (487)
+# BUGS  : 
+# NOTES : Fixed possible NULL-free() in delcore()
 #
 # BUILD : 1.7.6 (486)
 # BUGS  : 243

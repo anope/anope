@@ -1602,8 +1602,8 @@ static int delcore(NickCore * nc)
     if (nc->memos.memos) {
         for (i = 0; i < nc->memos.memocount; i++) {
             if (nc->memos.memos[i].text)
-                moduleCleanStruct(&nc->memos.memos[i].moduleData);
-            free(nc->memos.memos[i].text);
+                free(nc->memos.memos[i].text);
+            moduleCleanStruct(&nc->memos.memos[i].moduleData);
         }
         free(nc->memos.memos);
     }

@@ -380,8 +380,10 @@ How To Add IRCd Support
 
     67) CMode L: CMODE_ that defines link mode. Use 0 for no support.
 
-    68) Check Nick ID: "on check change check if they should remain
-                        identified" (needs a better description)
+    68) Check Nick ID: Should we check if a user should remain identified when
+                       changing their nick? This is for IRCd's that remove
+                       their registered-user mode when someone changes their
+                       nick (like Bahamut does).
                        Use 1 for yes, 0 for no.
 
     69) No Knock Requires +i: Does the No Knock channel mode require invite

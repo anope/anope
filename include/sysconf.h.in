@@ -1,10 +1,13 @@
-/* include/sysconf.h.in.  Generated from ./autoconf/configure.in by autoheader.  */
+/* include/sysconf.h.in.  Generated from configure.in by autoheader.  */
 
 /* "Default umask Permissions" */
 #undef DEFUMASK
 
-/* "Underscore needed for dlopen" */
+/* "No prefix needed for dlopen" */
 #undef DL_PREFIX
+
+/* "Use md5" */
+#undef ENCRYPT_MD5
 
 /* "Has sys/types.h" */
 #undef HAS_SYS_TYPES_H
@@ -194,9 +197,6 @@
 #undef u_int32_t
 
 /* Static config, copy from here to below before running autoheader! */
-#ifdef USE_ENCRYPTION
-#define ENCRYPT_MD5
-#endif
 
 #ifdef HAS_SYS_TYPES_H
 #include <sys/types.h>

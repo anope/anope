@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="268"
+VERSION_BUILD="269"
 
 # $Log$
+#
+# BUILD : 1.7.4 (269)
+# BUGS  : N/A
+# NOTES : dont use -funsigned-chars as the md5 encryption stuff (while it will still encrypt, probably in a way that is more normal md5) it wont be compatiable with the old md5 encryption, so for now, we will never use it, and itll be left to the OSs to just pick if chars are signed or unsigned....
+# 
 #
 # BUILD : 1.7.4 (268)
 # BUGS  : N/A

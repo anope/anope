@@ -20,7 +20,7 @@ fi
 AC_CONFIG_HEADER(include/sysconf.h)
 AC_PROG_CC
 if test "$ac_cv_prog_gcc" = "yes"; then
-    CFLAGS="$CFLAGS -funsigned-char"
+#    CFLAGS="$CFLAGS -funsigned-char"
     AC_CACHE_CHECK(if gcc has a working -pipe, ac_cv_pipe, [
     save_cflags="$CFLAGS"
     CFLAGS="$CFLAGS -pipe"
@@ -204,7 +204,10 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
     fi
 ])
 
-AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], AC_DEFINE_UNQUOTED(USE_ENCRYPTION,"USE_ENCRYPTION","has encryption"))
+AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], [
+    AC_DEFINE_UNQUOTED(USE_ENCRYPTION,,"has encryption")
+    AC_DEFINE_UNQUOTED(ENCRYPT_MD5,,"Use md5")
+])
 
 AC_OUTPUT(Makefile)
 

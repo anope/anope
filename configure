@@ -2237,7 +2237,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 if test "$ac_cv_c_compiler_gnu" = "yes"; then
-    CFLAGS="$CFLAGS -funsigned-char"
+#    CFLAGS="$CFLAGS -funsigned-char"
 
 echo "$as_me:$LINENO: checking if gcc has a working -pipe" >&5
 echo $ECHO_N "checking if gcc has a working -pipe... $ECHO_C" >&6
@@ -8616,9 +8616,16 @@ fi;
 if test "${with_encryption+set}" = set; then
   withval="$with_encryption"
 
+
 cat >>confdefs.h <<_ACEOF
-#define USE_ENCRYPTION "USE_ENCRYPTION"
+#define USE_ENCRYPTION
 _ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define ENCRYPT_MD5
+_ACEOF
+
 
 fi;
 

@@ -634,8 +634,8 @@ void load_cs_dbase(void)
     ver = get_file_version(f);
 
     for (i = 0; i < 256 && !failed; i++) {
-        uint16 tmp16;
-        uint32 tmp32;
+        int16 tmp16;
+        int32 tmp32;
         int n_levels;
         char *s;
         NickAlias *na;

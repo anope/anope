@@ -195,7 +195,7 @@ Server *findserver(Server * s, const char *name)
         }
     }
     if (debug >= 3)
-        alog("debug: findserver(%s) -> %p", name, s);
+        alog("debug: findserver(%s) -> %p", name, (void *) s);
     return s;
 }
 
@@ -226,7 +226,7 @@ int anope_check_sync(const char *name)
 void do_server(const char *source, char *servername, char *hops,
                char *descript, char *numeric)
 {
-    Server *s, *s2;
+    Server *s;
 
     if (debug) {
         if (!*source) {

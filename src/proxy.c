@@ -263,7 +263,8 @@ static int proxy_connect(unsigned long ip, unsigned short port)
 
     fd_set fds;
     struct timeval tv;
-    int error, errlen;
+    int error;
+    unsigned int errlen;
 
     if ((s = socket(PF_INET, SOCK_STREAM, 0)) == -1)
         return -1;

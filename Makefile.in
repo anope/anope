@@ -2,6 +2,7 @@ CC=@CC@
 INCLUDEDIR=../include
 ANOPELIBS=@ANOPELIBS@
 CFLAGS=@CFLAGS@
+STRICT=-Wall -ansi -pedantic
 SHELL=/bin/sh
 SUBDIRS=src
 BINDEST=@BINDEST@
@@ -16,6 +17,7 @@ RDB=@RDB@
 LDFLAGS=@LDFLAGS@
 
 all:   language headers build modules
+strict: language headers strict_build strict_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -30,14 +32,18 @@ build:
             ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \
         done
 
-strict:  language headers
+strict_build:  
 	@for i in $(SUBDIRS); do \
             echo "*** Strict Building $$i";\
-            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} -ansi -Wall -pedantic' all; ) \
+            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; ) \
         done
 
 modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
+	@echo "*** All done, now (g)make install to install Anope/Modules";
+
+strict_modules: strict_build
+	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=$(CFLAGS) $(STRICT)' all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
 language:

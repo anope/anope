@@ -61,7 +61,7 @@ void check_timeouts(void)
         }
         if (debug >= 4) {
             alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
-                 (void *) to, to->code, to->repeat);
+                 (void *) to, (void *) to->code, to->repeat);
         }
         to->code(to);
         if (to->repeat) {

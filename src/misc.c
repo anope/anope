@@ -910,9 +910,13 @@ char *host_resolve(char *host)
 char *anopeStrDup(const char *src) {
     char *ret=NULL;
     if(src) {
+#ifdef __STRICT_ANSI__
         if( (ret = (char *)malloc(strlen(src)+1)) ) {;
             strcpy(ret,src);
         }
+#else
+        ret = strdup(src); /* this way will prolly be faster, use it if we can */
+#endif
     }
     return ret;
 }

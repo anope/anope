@@ -1189,11 +1189,18 @@ int read_config(int reload)
 
         s = strtok(ServicesRoot, " ");
         do {
-            RootNumber++;
-            ServicesRoots =
-                realloc(ServicesRoots, sizeof(char *) * RootNumber);
-            ServicesRoots[RootNumber - 1] = sstrdup(s);
+            if (s) {
+                RootNumber++;
+                ServicesRoots =
+                    realloc(ServicesRoots, sizeof(char *) * RootNumber);
+                ServicesRoots[RootNumber - 1] = sstrdup(s);
+            }
         } while ((s = strtok(NULL, " ")));
+    }
+
+    if (!RootNumber) {
+        error(0, "No ServicesRoot defined");
+        retval = 0;
     }
 
     /* Ulines */
@@ -1203,9 +1210,11 @@ int read_config(int reload)
 
         s = strtok(UlineServers, " ");
         do {
-            NumUlines++;
-            Ulines = realloc(Ulines, sizeof(char *) * NumUlines);
-            Ulines[NumUlines - 1] = sstrdup(s);
+            if (s) {
+                NumUlines++;
+                Ulines = realloc(Ulines, sizeof(char *) * NumUlines);
+                Ulines[NumUlines - 1] = sstrdup(s);
+            }
         } while ((s = strtok(NULL, " ")));
     }
 

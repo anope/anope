@@ -15,6 +15,8 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+12/26 F Updated IRCD doc to show all the flags currently in the code.     [ #00]
+12/26 F Fixed segfault with some config options if they are set wrong.    [ #00]
 12/26 F Updated PTLink support to be more in line with the ircd protocol. [ #00]
 12/25 F Fixed up user and channel modes for various ircds.                [ #00]
 12/23 F Several compiler errors under make strict.                        [ #00]

@@ -192,6 +192,29 @@ usage of each.
 
 66. Cmode L  : CMODE_ that defines Linked Mode, 0 = no
 
+67. Check Nick ID : on check change check if they should remain identified, 1 = yes  0 = no
+
+68. No Knock Requires +i : if No Knock mode requires invite only, 1 = yes  0 = no
+
+69. Chan Modes : if sent in capab/protoctl we store it in here (NULL by default)
+
+70. Tokens : if Anope can support the ircd with Tokens, 1 = yes  0 = no
+
+71. Token Case Senstive : some ircds the TOKENS/COMMANDS are case senstive, 1 = yes  0 = no
+
+72. SJOIN time stamps are base64 : if they are base64 encoded, 1 = yes  0 = no
+
+73. Supports +I : Whether the ircd supports +I, 1 = yes  0 = no
+
+74. SJOIN Ban Char : char used to identify bans, use ''
+
+75. SJOIN Except Char : char used to identify exceptions, use ''
+
+76. SVSMODE UCMODE : clear user channel modes with SVSMODE, 1 = yes  0 = no
+
+77. SGline Enforce : the ircd enforces sglines for us we don't need to, 1 = yes  0 = no
+
+
 
 IRCDCAPAB ircdcap[] = { } 
 
@@ -280,16 +303,16 @@ Define Table
 DEFINE WORD     |  VALUE      |  TOKEN       |  IRCD Meaning
 ======================================================================================================
 CAPAB_NOQUIT    | 0x00000001  |  NOQUIT      |  Supports NOQUIT
-CAPAB_TSMODE    | 0x00000002  |  TS	     |  Channel modes are TimeStamped (normal sent during PASS)
+CAPAB_TSMODE    | 0x00000002  |  TS	         |  Channel modes are TimeStamped (normal sent during PASS)
 CAPAB_UNCONNECT | 0x00000004  |  UNCONNECT   |  Supports UNCONNECT
 CAPAB_NICKIP    | 0x00000008  |  NICKIP      |  IP in the NICK line
 CAPAB_NSJOIN    | 0x00000010  |  SSJOIN      |  smart sjoin  SSJOIN
-CAPAB_ZIP	| 0x00000020  |  ZIP	     |  server supports gz'd links
+CAPAB_ZIP	    | 0x00000020  |  ZIP	     |  server supports gz'd links
 CAPAB_BURST     | 0x00000040  |  BURST       |  server supports BURST command
 CAPAB_TS3       | 0x00000080  |  TS3         |  Supports the TS3 Protocol
 CAPAB_TS5       | 0x00000100  |  TS5         |  Supports the TS5 Protocol
 CAPAB_DKEY      | 0x00000200  |  DKEY        |  server supports dh-key exchange using "DKEY"
-CAPAB_DOZIP	| 0x00000400  |  ZIP	     |  output to this link shall be gzipped
+CAPAB_DOZIP	    | 0x00000400  |  ZIP	     |  output to this link shall be gzipped
 CAPAB_DODKEY    | 0x00000800  |  DKEY        |  do I do dkey with this link?
 CAPAB_QS        | 0x00001000  |  QS          |  Can handle quit storm removal
 CAPAB_SCS       | 0x00002000  |  SCS         |  Supports String Cache System

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="504"
+VERSION_BUILD="505"
 
 # $Log$
+#
+# BUILD : 1.7.6 (505)
+# BUGS  : N/A
+# NOTES : Some documentation updated, fixed compiler errors with ptlink, and fixed a segfault with some options when 
+# set with just quotes
 #
 # BUILD : 1.7.6 (504)
 # BUGS  : 245

@@ -646,7 +646,7 @@ void anope_cmd_unsqline(char *user)
 
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(ServerName, "SJOIN %ld %s + :%s", (long int) time(null),
+    send_cmd(ServerName, "SJOIN %ld %s + :%s", (long int) time(NULL),
              channel, user);
 }
 
@@ -1590,7 +1590,7 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
         return;
     }
 
-    send_cmd(oldnick, "NICK %s %ld", newnick, (long int) time(null));
+    send_cmd(oldnick, "NICK %s %ld", newnick, (long int) time(NULL));
 }
 
 /*

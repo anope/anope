@@ -100,9 +100,10 @@ void hostserv(User * u, char *buf)
     if (!cmd) {
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(s_HostServ, u->nick, "\1PING %s", s);
+        if (!(s = strtok(NULL, ""))) {
+            s = "";
+        }
+        anope_cmd_ctcp(s_HostServ, u->nick, "PING %s", s);
     } else if (skeleton) {
         notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
     } else {

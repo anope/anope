@@ -1023,6 +1023,7 @@ extern void anope_cmd_unszline(char *mask);				  	  		  /* UNSZLINE */
 extern void anope_cmd_eob();									  /* EOB - end of burst */
 extern void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 extern void anope_cmd_svswatch(char *sender, char *nick, char *parm);
+extern void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...);   	  		  /* CTCP */
 
 extern int anope_event_482(char *source, int ac, char **av);
 extern int anope_event_436(char *source, int ac, char **av);

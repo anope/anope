@@ -147,9 +147,10 @@ void botserv(User * u, char *buf)
     if (!cmd) {
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(s_BotServ, u->nick, "\1PING %s", s);
+        if (!(s = strtok(NULL, ""))) {
+            s = "";
+        }
+        anope_cmd_ctcp(s_BotServ, u->nick, "PING %s", s);
     } else if (skeleton) {
         notice_lang(s_BotServ, u, SERVICE_OFFLINE, s_BotServ);
     } else {
@@ -171,9 +172,10 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
         return;
 
     if (!stricmp(cmd, "\1PING")) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(bi->nick, u->nick, "\1PING %s", s);
+        if (!(s = strtok(NULL, ""))) {
+            s = "";
+        }
+        anope_cmd_ctcp(bi->nick, u->nick, "PING %s", s);
     }
 }
 
@@ -197,8 +199,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
     }
 
     /* Answer to ping if needed, without breaking the buffer. */
-    if (!strnicmp(buf, "\1PING", 5))
-        notice(ci->bi->nick, u->nick, buf);
+    if (!strnicmp(buf, "\1PING", 5)) {
+        anope_cmd_ctcp(ci->bi->nick, u->nick, "PING %s", buf);
+    }
 
     /* If it's a /me, cut the CTCP part at the beginning (not
      * at the end, because one character just doesn't matter,
@@ -2484,6 +2487,9 @@ char *normalizeBuffer(char *buf)
 
     for (i = 0; i < len; i++) {
         switch (buf[i]) {
+            /* ctrl char */
+        case 1:
+            break;
             /* Bold ctrl char */
         case 2:
             break;

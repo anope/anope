@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="451"
+VERSION_BUILD="452"
 
 # $Log$
+#
+# BUILD : 1.7.6 (452)
+# BUGS  : N/A
+# NOTES : 1. Fixed some config options could overflow strtol(), 2. Fixed CTCP Ping replies when UsePrivmsg is enabled
 #
 # BUILD : 1.7.6 (451)
 # BUGS  : 221

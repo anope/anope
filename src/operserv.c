@@ -267,9 +267,10 @@ void operserv(User * u, char *buf)
     if (!cmd) {
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(s_OperServ, u->nick, "\1PING %s", s);
+        if (!(s = strtok(NULL, ""))) {
+            s = "";
+        }
+        anope_cmd_ctcp(s_OperServ, u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_OperServ, u, OPERSERV, cmd);
     }

@@ -89,9 +89,10 @@ void memoserv(User * u, char *buf)
     if (!cmd) {
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(s_MemoServ, u->nick, "\1PING %s", s);
+        if (!(s = strtok(NULL, ""))) {
+            s = "";
+        }
+        anope_cmd_ctcp(s_MemoServ, u->nick, "PING %s", s);
     } else if (skeleton) {
         notice_lang(s_MemoServ, u, SERVICE_OFFLINE, s_MemoServ);
     } else {

@@ -808,6 +808,12 @@ int parse(char *buf, int linenum, int reload)
                     retval = 0;
                     break;
                 }
+                if (errno == ERANGE && val == LONG_MAX) {
+                    /* well the true top off is 2,147,483,647 but lets not give them the real top */
+                    error(linenum,
+                          "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
+                          d->name, optind);
+                }
                 *(int *) d->params[i].ptr = val;
                 break;
             case PARAM_PORT:

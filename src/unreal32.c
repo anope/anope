@@ -2151,4 +2151,25 @@ int anope_valid_nick(char *nick)
     return 1;
 }
 
+void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+    char *s;
+    *buf = '\0';
+
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!buf) {
+        return;
+    } else {
+        s = normalizeBuffer(buf);
+    }
+
+    send_cmd(source, "%s %s :\1%s \1", send_token("NOTICE", "B"), dest, s);
+}
+
 #endif

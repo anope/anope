@@ -6,6 +6,10 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 F Wrong string and missing registered nick check in bot change.     [#221]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages	  [ #00]
+11/19 F normalizeBuffer() now strips control character 1		  [ #00]
+11/19 F CTCP Ping replies when UsePrivmsg is enabled			  [ #00]
+11/19 F Some config options could overflow strtol()			  [ #00] 
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 

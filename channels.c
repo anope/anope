@@ -89,7 +89,7 @@ CBMode cbmodes[128] = {
 	{ 0 }, /* I */
 #endif
 	{ 0 }, /* J */
-#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3)
+#if defined(IRC_ULTIMATE) || defined(IRC_ULTIMATE3) || defined(IRC_UNREAL)
 	{ CMODE_K, 0, NULL, NULL },
 #else
 	{ 0 }, /* K */

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="186"
+VERSION_BUILD="187"
 
 # $Log$
+#
+# BUILD : 1.7.3 (187)
+# BUGS  : 102
+# NOTES : Removed duplicate ULTIMATE3 define.
 #
 # BUILD : 1.7.3 (186)
 # BUGS  : 

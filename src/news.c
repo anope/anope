@@ -1,6 +1,5 @@
 /* News functions.
 /* News functions.
-/* News functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -48,51 +47,48 @@ struct newsmsgs {
 };
 
 struct newsmsgs msgarray[] = {
-    { NEWS_LOGON, "LOGON",
-	{ NEWS_LOGON_SYNTAX,
-	  NEWS_LOGON_LIST_HEADER,
-	  NEWS_LOGON_LIST_ENTRY,
-	  NEWS_LOGON_LIST_NONE,
-	  NEWS_LOGON_ADD_SYNTAX,
-	  NEWS_LOGON_ADD_FULL,
-	  NEWS_LOGON_ADDED,
-	  NEWS_LOGON_DEL_SYNTAX,
-	  NEWS_LOGON_DEL_NOT_FOUND,
-	  NEWS_LOGON_DELETED,
-	  NEWS_LOGON_DEL_NONE,
-	  NEWS_LOGON_DELETED_ALL
-	}
-    },
-    { NEWS_OPER, "OPER",
-	{ NEWS_OPER_SYNTAX,
-	  NEWS_OPER_LIST_HEADER,
-	  NEWS_OPER_LIST_ENTRY,
-	  NEWS_OPER_LIST_NONE,
-	  NEWS_OPER_ADD_SYNTAX,
-	  NEWS_OPER_ADD_FULL,
-	  NEWS_OPER_ADDED,
-	  NEWS_OPER_DEL_SYNTAX,
-	  NEWS_OPER_DEL_NOT_FOUND,
-	  NEWS_OPER_DELETED,
-	  NEWS_OPER_DEL_NONE,
-	  NEWS_OPER_DELETED_ALL
-	}
-	},
-	{ NEWS_RANDOM, "RANDOM",
-	{ NEWS_RANDOM_SYNTAX,
-	  NEWS_RANDOM_LIST_HEADER,
-	  NEWS_RANDOM_LIST_ENTRY,
-	  NEWS_RANDOM_LIST_NONE,
-	  NEWS_RANDOM_ADD_SYNTAX,
-	  NEWS_RANDOM_ADD_FULL,
-	  NEWS_RANDOM_ADDED,
-	  NEWS_RANDOM_DEL_SYNTAX,
-	  NEWS_RANDOM_DEL_NOT_FOUND,
-	  NEWS_RANDOM_DELETED,
-	  NEWS_RANDOM_DEL_NONE,
-	  NEWS_RANDOM_DELETED_ALL
-	}
-	}
+    {NEWS_LOGON, "LOGON",
+     {NEWS_LOGON_SYNTAX,
+      NEWS_LOGON_LIST_HEADER,
+      NEWS_LOGON_LIST_ENTRY,
+      NEWS_LOGON_LIST_NONE,
+      NEWS_LOGON_ADD_SYNTAX,
+      NEWS_LOGON_ADD_FULL,
+      NEWS_LOGON_ADDED,
+      NEWS_LOGON_DEL_SYNTAX,
+      NEWS_LOGON_DEL_NOT_FOUND,
+      NEWS_LOGON_DELETED,
+      NEWS_LOGON_DEL_NONE,
+      NEWS_LOGON_DELETED_ALL}
+     },
+    {NEWS_OPER, "OPER",
+     {NEWS_OPER_SYNTAX,
+      NEWS_OPER_LIST_HEADER,
+      NEWS_OPER_LIST_ENTRY,
+      NEWS_OPER_LIST_NONE,
+      NEWS_OPER_ADD_SYNTAX,
+      NEWS_OPER_ADD_FULL,
+      NEWS_OPER_ADDED,
+      NEWS_OPER_DEL_SYNTAX,
+      NEWS_OPER_DEL_NOT_FOUND,
+      NEWS_OPER_DELETED,
+      NEWS_OPER_DEL_NONE,
+      NEWS_OPER_DELETED_ALL}
+     },
+    {NEWS_RANDOM, "RANDOM",
+     {NEWS_RANDOM_SYNTAX,
+      NEWS_RANDOM_LIST_HEADER,
+      NEWS_RANDOM_LIST_ENTRY,
+      NEWS_RANDOM_LIST_NONE,
+      NEWS_RANDOM_ADD_SYNTAX,
+      NEWS_RANDOM_ADD_FULL,
+      NEWS_RANDOM_ADDED,
+      NEWS_RANDOM_DEL_SYNTAX,
+      NEWS_RANDOM_DEL_NOT_FOUND,
+      NEWS_RANDOM_DELETED,
+      NEWS_RANDOM_DEL_NONE,
+      NEWS_RANDOM_DELETED_ALL}
+     }
 };
 
 static int *findmsgs(int16 type, char **typename)
@@ -299,7 +295,7 @@ void display_news(User * u, int16 type)
             }
         }
     } else {
-        int i, count = 0; 
+        int i, count = 0;
 
         for (i = nnews - 1; i >= 0; i--) {
             if (count >= NewsCount)
@@ -539,6 +535,4 @@ static int del_newsitem(int num, short type)
 }
 
 /*************************************************************************/
-
- 
  

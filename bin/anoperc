@@ -31,7 +31,7 @@ fi
 
 PID=`cat $ANOPEBIN$PIDFILE`
 
-if [ ! `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
+if [ ! `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
 	echo "Warning: Anope is not currently running"
 	exit 1
 fi
@@ -51,7 +51,7 @@ if [ "$1" = "start" ] ; then
 
 if [ -f $ANOPEBIN$PIDFILE ] ; then
 	PID=`cat $ANOPEBIN$PIDFILE`
-	if [ `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
+	if [ `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
 		echo "Warning! Anope is already running"
 		exit 1
 	fi
@@ -61,7 +61,7 @@ fi
 	$ANOPEBIN$ANOPROG $*
 	sleep 1
 		if [ ! -f $ANOPEBIN$PIDFILE ] ; then
-	        echo "Unfortunatly it seems Anope did not start successfully"
+	        echo "Unfortunately it seems Anope did not start successfully"
                 echo "This error has been logged in your Anope Log file"
                 echo "Located in "$ANOPEBIN"logs/"
                 echo "This may help you diagnose the problem"
@@ -69,8 +69,8 @@ fi
 		exit 1
 		fi
 		PID=`cat $ANOPEBIN$PIDFILE`
-		if [ ! `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
-		echo "Unfortunatly it seems Anope did not start successfully"
+		if [ ! `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` ] ; then
+		echo "Unfortunately it seems Anope did not start successfully"
 		echo "This error has been logged in your Anope Log file"
 		echo "Located in "$ANOPEBIN"logs/"
 		echo "This may help you diagnose the problem"
@@ -86,7 +86,7 @@ elif [ "$1" = "stop" ] ; then
 elif [ "$1" = "status" ] ; then
 	if [ -f $ANOPEBIN$PIDFILE ] ; then
 		PID=`cat $ANOPEBIN$PIDFILE`
-        	if [ `ps ux | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
+        	if [ `ps auxw | grep $ANOPROG | grep $PID | grep -v -c grep` = 1 ] ; then
 		        echo "Anope is currently running"
 		        exit 1
 	        fi

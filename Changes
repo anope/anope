@@ -1,6 +1,7 @@
 Anope Version 1.7.3
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
+05/16 A make install will now move anoperc to bin, fixed anoperc bug
 05/15 A New standard Changes file format.
 05/15 A BSCaseSensitive directive for a cAsE sEnSiTiVe badword kicker.
 05/14 A Support for +a/-a on PTLink ircd.

@@ -75,6 +75,7 @@ distclean: spotless
 
 install: $(PROGRAM) languages
 	$(INSTALL) services $(BINDEST)/services
+	$(INSTALL) bin/anoperc $(BINDEST)/anoperc
 	rm -f $(BINDEST)/listnicks $(BINDEST)/listchans
 	ln $(BINDEST)/services $(BINDEST)/listnicks
 	ln $(BINDEST)/services $(BINDEST)/listchans

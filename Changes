@@ -68,6 +68,9 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 Provided by DrStein <gacevedo@anope.org> - 2004
 10/05 A CS/NS INFO shows the expire time.                                 [ #00]
 10/05 A NS GLIST shows the expire time.                                   [ #00]
+10/29 F ChanServ XOP reordering fix					  [#187]
+10/29 F ChanServ AKICK reordering fix					  [#201]
+10/29 F ChanServ now requires a more obscure password                     [#202]
 10/27 F MS CHECK to look for the correct sender value.                    [#200]
 10/21 F Updated Spanish language file.                                    [ #00]
 10/15 F More Check and trap for forbidden nicks on HS.                    [#183]

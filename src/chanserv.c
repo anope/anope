@@ -2686,7 +2686,9 @@ static int do_register(User * u)
                     nc->
                     channelmax ? CHAN_EXCEEDED_CHANNEL_LIMIT :
                     CHAN_REACHED_CHANNEL_LIMIT, nc->channelmax);
-
+    } else if (stricmp(u->nick, pass) == 0
+               || (StrictPasswords && strlen(pass) < 5)) {
+        notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
     } else if (!(ci = makechan(chan))) {
         alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
@@ -3761,6 +3763,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
     } else if (stricmp(cmd, "DEL") == 0) {
+        int deleted, a, b;
         if (readonly) {
             notice_lang(s_ChanServ, u, xmsgs[1]);
             return MOD_CONT;
@@ -3775,7 +3778,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
-            int count, deleted, last = -1, perm = 0;
+            int count, last = -1, perm = 0;
             deleted =
                 process_numlist(nick, &count, xop_del_callback, u, ci,
                                 &last, &perm, ulev, xlev);
@@ -3811,12 +3814,35 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
             access = &ci->access[i];
             if (!is_servadmin && ulev <= access->level) {
+                deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
                 notice_lang(s_ChanServ, u, xmsgs[8], access->nc->display,
                             ci->name);
                 access->nc = NULL;
                 access->in_use = 0;
+                deleted = 1;
+            }
+        }
+        if (deleted) {
+            /* Reordering - DrStein */
+            for (b = 0; b < ci->accesscount; b++) {
+                if (ci->access[b].in_use) {
+                    for (a = 0; a < ci->accesscount; a++) {
+                        if (a > b)
+                            break;
+                        if (!ci->access[a].in_use) {
+                            ci->access[a].in_use = 1;
+                            ci->access[a].level = ci->access[b].level;
+                            ci->access[a].nc = ci->access[b].nc;
+                            ci->access[a].last_seen =
+                                ci->access[b].last_seen;
+                            ci->access[b].nc = NULL;
+                            ci->access[b].in_use = 0;
+                            break;
+                        }
+                    }
+                }
             }
         }
     } else if (stricmp(cmd, "LIST") == 0) {
@@ -4088,7 +4114,7 @@ static int do_access(User * u)
         notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,
                     ci->name, access->level);
     } else if (stricmp(cmd, "DEL") == 0) {
-
+        int deleted, a, b;
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_DISABLED);
             return MOD_CONT;
@@ -4101,7 +4127,7 @@ static int do_access(User * u)
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
-            int count, deleted, last = -1, perm = 0;
+            int count, last = -1, perm = 0;
             deleted = process_numlist(nick, &count, access_del_callback, u,
                                       ci, &last, &perm, get_access(u, ci));
             if (!deleted) {
@@ -4139,6 +4165,7 @@ static int do_access(User * u)
             }
             access = &ci->access[i];
             if (!is_servadmin && get_access(u, ci) <= access->level) {
+                deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED,
@@ -4146,6 +4173,29 @@ static int do_access(User * u)
                 alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->username, common_get_vhost(u), get_access(u, ci), na->nick, access->nc->display, chan);
                 access->nc = NULL;
                 access->in_use = 0;
+                deleted = 1;
+            }
+        }
+
+        if (deleted) {
+            /* Reordering - DrStein */
+            for (b = 0; b < ci->accesscount; b++) {
+                if (ci->access[b].in_use) {
+                    for (a = 0; a < ci->accesscount; a++) {
+                        if (a > b)
+                            break;
+                        if (!ci->access[a].in_use) {
+                            ci->access[a].in_use = 1;
+                            ci->access[a].level = ci->access[b].level;
+                            ci->access[a].nc = ci->access[b].nc;
+                            ci->access[a].last_seen =
+                                ci->access[b].last_seen;
+                            ci->access[b].nc = NULL;
+                            ci->access[b].in_use = 0;
+                            break;
+                        }
+                    }
+                }
             }
         }
     } else if (stricmp(cmd, "LIST") == 0) {
@@ -4603,6 +4653,7 @@ static int do_akick(User * u)
                     ci->name);
 
     } else if (stricmp(cmd, "DEL") == 0) {
+        int deleted, a, b;
 
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
@@ -4616,7 +4667,7 @@ static int do_akick(User * u)
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)) {
-            int count, deleted, last = -1;
+            int count, last = -1;
             deleted = process_numlist(mask, &count, akick_del_callback, u,
                                       ci, &last);
             if (!deleted) {
@@ -4654,8 +4705,33 @@ static int do_akick(User * u)
             }
             notice_lang(s_ChanServ, u, CHAN_AKICK_DELETED, mask, chan);
             akick_del(u, akick);
+            deleted = 1;
         }
+        if (deleted) {
+            /* Reordering - DrStein */
+            for (b = 0; b < ci->akickcount; b++) {
+                if (ci->akick[b].flags & AK_USED) {
+                    for (a = 1; a < ci->akickcount; a++) {
+                        if (a > b)
+                            break;
+                        if (!(ci->akick[a].flags & AK_USED)) {
+                            ci->akick[a].flags = ci->akick[b].flags;
+                            if (ci->akick[b].flags & AK_ISNICK) {
+                                ci->akick[a].u.nc = ci->akick[b].u.nc;
+                            } else {
+                                ci->akick[a].u.mask = ci->akick[b].u.mask;
+                            }
+                            ci->akick[a].reason = ci->akick[b].reason;
+                            ci->akick[a].creator = ci->akick[b].creator;
+                            ci->akick[a].addtime = ci->akick[b].addtime;
 
+                            akick_del(u, &ci->akick[b]);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;
 

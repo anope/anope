@@ -45,7 +45,7 @@ IRCDVar ircd[] = {
      "+io",                     /* Global alias mode   */
      "+",                       /* Used by BotServ Bots */
      3,                         /* Chan Max Symbols     */
-     "-aiklmnpst",              /* Modes to Remove */
+     "-ailmnpst",               /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */
      0,                         /* SVSNICK */
      0,                         /* Vhost  */

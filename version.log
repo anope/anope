@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="429"
+VERSION_BUILD="430"
 
 # $Log$
+#
+# BUILD : 1.7.5 (430)
+# BUGS  : 187, 201, 202
+# NOTES : Reorder fixes, Obsecure password for chanserv registeration (DrStein), minor tweak to hybrid support (TSL)
 #
 # BUILD : 1.7.5 (429)
 # NOTES : Minor fix on example.conf

@@ -1619,6 +1619,14 @@ MEMO_SET_NOTIFY_OFF
 	%s no t'enviara cap notificació dels teus memos.
 
 # SET LIMIT responses
+MEMO_SET_NOTIFY_MAIL
+	You will now be informed about new memos via email.
+MEMO_SET_NOTIFY_NOMAIL
+	You will no longer be informed via email.
+MEMO_SET_NOTIFY_INVALIDMAIL
+	There's no email address set for your nick.
+
+# SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
 	SET LIMIT [canal] límit
 MEMO_SET_LIMIT_SERVADMIN_SYNTAX
@@ -1712,6 +1720,22 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s es notificat de nous memos quant es connecta.
 	
+###########################################################################
+#
+# BotServ messages
+#
+###########################################################################
+	
+# Standard responses
+MEMO_MAIL_SUBJECT
+	New memo
+MEMO_MAIL_TEXT1
+	Hi %s
+MEMO_MAIL_TEXT2
+	You've just received a new memo from %s. This is memo number %d.
+MEMO_MAIL_TEXT3
+	Memo Text:
+
 ###########################################################################
 #
 # BotServ messages

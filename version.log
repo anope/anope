@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="26"
+VERSION_BUILD="27"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (27)
+# BUGS  : none
+# NOTES : Normalized language files and updated Changes.lang
 #
 # BUILD : 1.7.0 (26)
 # BUGS  : none

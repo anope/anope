@@ -1859,7 +1859,7 @@ void moduleDelData(ModuleData **md, char *key)
 			current->next = NULL;
 			free(current);
 		}
-		prev = current;;
+		prev = current;
 		current = next;
     	}
     }
@@ -1893,7 +1893,7 @@ void moduleDelAllData(ModuleData **md)
 		current->next = NULL;
 		free(current);
 	}
-	prev = current;;
+	prev = current;
 	current = next;
     }
     free(mod_name);
@@ -1945,7 +1945,7 @@ void moduleDelAllDataMod(Module *m)
                 moduleCleanStruct(&ci->memos.memos[j].moduleData);
             }
         }
-    }
+    } 
 
     if (freeme) {
         free(mod_current_module_name);
@@ -1959,7 +1959,7 @@ void moduleDelAllDataMod(Module *m)
  * @param moduleData the moduleData struct to "clean"
  **/
 void moduleCleanStruct(ModuleData **moduleData) {
-    ModuleData *current = *moduleData;;
+    ModuleData *current = *moduleData;
     ModuleData *next = NULL;
      
     while(current) {

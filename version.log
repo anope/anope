@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="351"
+VERSION_BUILD="352"
 
 # $Log$
+#
+# BUILD : 1.7.5 (352)
+# BUGS  : N/A
+# NOTES : corrected a semi-colon that my compiled dosnt mind, but certuss does :)
 #
 # BUILD : 1.7.5 (351)
 # BUGS  : N/A

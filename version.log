@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="652"
+VERSION_BUILD="653"
 
 # $Log$
+#
+# BUILD : 1.7.8 (653)
+# BUGS  : 339
+# NOTES : Chanserv now sets topic when channel is recreated.
 #
 # BUILD : 1.7.8 (652)
 # BUGS  : 

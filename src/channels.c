@@ -1470,11 +1470,10 @@ Channel *chan_create(char *chan)
     if (c->ci) {
         check_modes(c);
         stick_all(c->ci);
-        c->topic_sync = 0;
-    } else {
-        restore_topic(chan);
-        c->topic_sync = 1;
     }
+
+    if (serv_uplink && is_sync(serv_uplink) && (!(c->topic_sync)))
+        restore_topic(chan);
 
     return c;
 }

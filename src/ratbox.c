@@ -54,6 +54,8 @@ IRCDVar ircd[] = {
      0,                         /* Has Owner */
      NULL,                      /* Mode to set for an owner */
      NULL,                      /* Mode to unset for an owner */
+     NULL,                      /* Mode to set for chan admin */
+     NULL,                      /* Mode to unset for chan admin */
      NULL,                      /* Mode On Reg          */
      NULL,                      /* Mode on UnReg        */
      NULL,                      /* Mode on Nick Change  */

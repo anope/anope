@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="589"
+VERSION_BUILD="590"
 
 # $Log$
+#
+# BUILD : 1.7.8 (590)
+# BUGS  : 288 / N/A
+# NOTES : Fixed 288, moved updated all set/unset admin/owner calls to use the ircd protocol files. This needs a fair good test, but it seems all ok, and i cant see anything wrong with it :)
+# 
 #
 # BUILD : 1.7.8 (589)
 # BUGS  : 303

@@ -278,6 +278,8 @@ struct ircdvars_ {
 	int owner;				/* Supports Owner		*/
 	char *ownerset;				/* Mode to set for owner	*/
 	char *ownerunset;			/* Mode to unset for a owner	*/
+	char *adminset;				/* Mode to set for admin	*/
+	char *adminunset;			/* Mode to unset for admin	*/
 	char *modeonreg;			/* Mode on Register		*/
 	char *modeonunreg;			/* Mode on Unregister		*/
 	char *modeonnick;			/* Mode on nick change		*/

@@ -1391,14 +1391,14 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
     if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
         notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
-        anope_cmd_mode(whosends(chan->ci), chan->name, "-a %s",
-                       user->nick);
+        anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
+                       ircd->adminunset, user->nick);
         return 0;
     }
 
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
-        anope_cmd_mode(whosends(chan->ci), chan->name, "-a %s",
-                       user->nick);
+        anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
+                       ircd->adminunset, user->nick);
         return 0;
     }
 
@@ -1426,21 +1426,25 @@ int check_valid_op(User * user, Channel * chan, int servermode)
             if (ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-aoq %s %s %s", user->nick, user->nick,
-                                   user->nick);
+                                   "-%so%s %s %s %s", ++ircd->adminunset,
+                                   ++ircd->ownerunset, user->nick,
+                                   user->nick, user->nick);
                 } else {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-ahoq %s %s %s %s", user->nick,
-                                   user->nick, user->nick, user->nick);
+                                   "-%sho%s %s %s %s %s",
+                                   ++ircd->adminunset, ++ircd->ownerunset,
+                                   user->nick, user->nick, user->nick,
+                                   user->nick);
                 }
             } else if (!ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-ao %s %s", user->nick, user->nick);
+                                   "-%so %s %s", ++ircd->adminunset,
+                                   user->nick, user->nick);
                 } else {
                     anope_cmd_mode(whosends(chan->ci), chan->name,
-                                   "-aoh %s %s %s", user->nick, user->nick,
-                                   user->nick);
+                                   "-%soh %s %s %s", ++ircd->adminunset,
+                                   user->nick, user->nick, user->nick);
                 }
             } else {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
@@ -1462,7 +1466,8 @@ int check_valid_op(User * user, Channel * chan, int servermode)
         if (ircd->halfop) {
             if (ircd->owner && ircd->protect) {
                 anope_cmd_mode(whosends(chan->ci), chan->name,
-                               "-ahoq %s %s %s %s", user->nick, user->nick,
+                               "-%sho%s %s %s %s %s", ++ircd->adminunset,
+                               ++ircd->ownerunset, user->nick, user->nick,
                                user->nick, user->nick);
             } else {
                 anope_cmd_mode(whosends(chan->ci), chan->name, "-ho %s %s",
@@ -2589,10 +2594,7 @@ int get_access_level(ChannelInfo * ci, NickAlias * na)
 
         access = &ci->access[num];
 
-        if (!access->in_use)
-            return 0;
-
-        if (access->nc == na->nc) {
+        if (access->nc && access->nc == na->nc && access->in_use) {
             return access->level;
         }
 
@@ -2785,7 +2787,8 @@ static int do_register(User * u)
         check_modes(c);
         /* On most ircds you do not receive the admin/owner mode till its registered */
         if (ircd->admin) {
-            anope_cmd_mode(s_ChanServ, chan, "+a %s", u->nick);
+            anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->adminset,
+                           u->nick);
         }
         if (ircd->owner && ircd->ownerset) {
             anope_cmd_mode(s_ChanServ, chan, "%s %s", ircd->ownerset,
@@ -5908,6 +5911,7 @@ static int do_clear(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *what = strtok(NULL, " ");
+    char tmp[BUFSIZE];
     Channel *c;
     ChannelInfo *ci;
 
@@ -6076,10 +6080,10 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             anope_cmd_svsmode_chan(av[0], "-o", NULL);
             if (ircd->owner) {
-                anope_cmd_svsmode_chan(av[0], "-q", NULL);
+                anope_cmd_svsmode_chan(av[0], ircd->ownerunset, NULL);
             }
             if (ircd->protect || ircd->admin) {
-                anope_cmd_svsmode_chan(av[0], "-a", NULL);
+                anope_cmd_svsmode_chan(av[0], ircd->adminunset, NULL);
             }
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
@@ -6089,10 +6093,14 @@ static int do_clear(User * u)
                         if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
                             continue;
                         } else {
-                            av[1] = sstrdup("-qo");
+                            snprintf(tmp, BUFSIZE, "-%so",
+                                     ++ircd->ownerunset);
+                            av[1] = sstrdup(tmp);
+
                         }
                     } else {
-                        av[1] = sstrdup("-ao");
+                        snprintf(tmp, BUFSIZE, "-%so", ++ircd->adminunset);
+                        av[1] = sstrdup(tmp);
                     }
                 } else {
                     av[1] = sstrdup("-o");
@@ -6112,10 +6120,13 @@ static int do_clear(User * u)
                         if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
                             continue;
                         } else {
-                            av[1] = sstrdup("-qo");
+                            snprintf(tmp, BUFSIZE, "-%so",
+                                     ++ircd->ownerunset);
+                            av[1] = sstrdup(tmp);
                         }
                     } else {
-                        av[1] = sstrdup("-ao");
+                        snprintf(tmp, BUFSIZE, "-%so", ++ircd->adminunset);
+                        av[1] = sstrdup(tmp);
                     }
                 } else {
                     av[1] = sstrdup("-o");

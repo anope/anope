@@ -262,167 +262,173 @@ How To Add IRCd Support
                           owner status. If the IRCd doesn't support owners,
                           set this to NULL.
 
-    29) Mode on Nick Register: What mode to give users when they register
+    29) ADMIN MODE SET: What mode to set to make someone a channel admin.
+                        If the IRCd dosn't support admins, set to NULL.
+
+    30) ADMIN MODE UNSET: What mode to unset to take away channel admin.
+                          If the IRCd dosn't support admins, set to NULL.
+
+    31) Mode on Nick Register: What mode to give users when they register
                                with NickServ. If your ircd doesn't set expect
                                a mode to be set on registration, you should
                                set this to NULL.
 
-    30) Mode on Nick Unregister: What mode to set give users when they cancel
+    32) Mode on Nick Unregister: What mode to set give users when they cancel
                                  their registration with NickServ. If your
                                  IRCd doesn't set a mode for registered users
                                  you should set this to NULL.
 
-    31) Mode on Nick Change: What mode to give users when they change their
+    33) Mode on Nick Change: What mode to give users when they change their
                              nick. If your ircd doesn't set a mode, you
                              should set this to NULL.
 
-    32) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
+    34) SGLINE: Does the IRCd support realname (geocs) bans? Use 1 for yes,
                 0 for no.
 
-    33) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
+    35) SQLINE: Does the IRCd support nick bans? Use 1 for yes, 0 for no.
 
-    34) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
+    36) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
 
-    35) HALFOP: Is channel mode +h for halfop supported by the IRCd? Use 1 for
+    37) HALFOP: Is channel mode +h for halfop supported by the IRCd? Use 1 for
                 yes, 0 for no.
 
-    36) Number of Server Args: When an IRCd connects, this is the number of
+    38) Number of Server Args: When an IRCd connects, this is the number of
                                parameters that are passed.
 
-    37) Join to Set: Services must join a channel to set any modes on that
+    39) Join to Set: Services must join a channel to set any modes on that
                      channel. Use 1 for yes, 0 for no.
 
-    38) Join to Message: Services must join a channel to send any message to
+    40) Join to Message: Services must join a channel to send any message to
                          that channel (cannot override +n). Use 1 for yes,
                          0 for no.
 
-    39) Exceptions: Support for channel exceptions (mode +e). Use 1 for yes,
+    41) Exceptions: Support for channel exceptions (mode +e). Use 1 for yes,
                     0 for no.
 
-    40) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
+    42) TS Topic Forward: Some IRCd's (like UnrealIRCd) like their topic TS
                           set forward by +1. Use 1 for yes, 0 for no.
 
-    41) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
+    43) TS Topic Backward: Some IRCd's (mainly older DreamForge-like ones)
                            like their topic TS set back by -1. Use 1 for yes,
                            0 for no.
 
-    42) Protected Umode: UMODE_ define that defines the protected usermod.
+    44) Protected Umode: UMODE_ define that defines the protected usermod.
                          Use 0 for no support, or enter the UMODE_ define.
 
-    43) Admin: Support for channel admins (Mainly used by UltimateIRCd). Use
+    45) Admin: Support for channel admins (Mainly used by UltimateIRCd). Use
                1 for yes, 0 for no.
 
-    44) SQline Channels: The IRCd's supports banning channel names via
+    46) SQline Channels: The IRCd's supports banning channel names via
                          SQLINES. Use 1 for yes, 0 for no.
 
-    45) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
+    47) Quit On Kill: When we (SVS)KILL a user, does the IRCd send back a
                       QUIT message for that user? Use 1 for yes, 0 for no.
 
-    46) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
+    48) SVSMODE -b: We can use SVSMODE to unban hosts from a channel. Use
                     1 for yes, 0 for no.
 
-    47) Protect: Support for channel protect (mode +a, mainly being used by
+    49) Protect: Support for channel protect (mode +a, mainly being used by
                  UnrealIRCd and ViagraIRCd). Use 1 for yes, 0 for no.
 
-    48) Reverse: We can do a reverse check when unbanning. For use with 
+    50) Reverse: We can do a reverse check when unbanning. For use with 
                  DreamForge based IRCd's. Use 1 for yes, 0 for no.
 
-    49) Register Channels: Supports sending a channelmode for registered
+    51) Register Channels: Supports sending a channelmode for registered
                            channels. Use 1 for yes, 0 for no.
 
-    50) Registered Mode: Channelmode to set on registered channels, see the
+    52) Registered Mode: Channelmode to set on registered channels, see the
                          option above. Use 1 for yes, 0 for no.
 
-    51) vIdent: Support for including a user's ident in their vHost. Use
+    53) vIdent: Support for including a user's ident in their vHost. Use
                 1 for yes, 0 for no.
 
-    52) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
+    54) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
                  a nick enforcer client. Use 1 for yes, 0 for no.
 
-    53) TS on MODE: We need to send a timestamp when modes are being changed.
+    55) TS on MODE: We need to send a timestamp when modes are being changed.
                     Use 1 for yes, 0 for no.
 
-    54) NICKIP: The IP address of new users is being sent along with their
+    56) NICKIP: The IP address of new users is being sent along with their
                 hostname when new users are being introduced on the network.
                 Use 1 for yes, 0 for no.
 
-    55) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
+    57) Umode: We can use OperServ to change a user's mode. Use 1 for yes,
                0 for no.
 
-    56) O:LINE: We can use OperServ to give some user a temporary O:LINE.
+    58) O:LINE: We can use OperServ to give some user a temporary O:LINE.
                 Use 1 for yes, 0 for no.
 
-    57) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
+    59) Vhost On Nick: On NICK the IRCd sends the VHOST. Use 1 for yes,
                        0 for no.
 
-    58) Change Realname: Change real name. Use 1 for yes, 0 for no.
+    60) Change Realname: Change real name. Use 1 for yes, 0 for no.
 
-    59) Extra Help: If the IRCd has more help for functions in ChanServ than
+    61) Extra Help: If the IRCd has more help for functions in ChanServ than
                     the default help, you should put the language string
                     identifier here. Use 0 for no extra help.
 
-    60) No Knock: CMODE_ that defines NO KNOCK. Use 0 for no support.
+    62) No Knock: CMODE_ that defines NO KNOCK. Use 0 for no support.
 
-    61) Admin Only: CMODE_ that defines Admin Only. Use 0 for no support.
+    63) Admin Only: CMODE_ that defines Admin Only. Use 0 for no support.
 
-    62) Default MLock: Default channelmodes for MLOCK. Use 0 for no modes.
+    64) Default MLock: Default channelmodes for MLOCK. Use 0 for no modes.
 
-    63) Vhost Umode: UMODE_ that indicates if the user currently has a vHost.
+    65) Vhost Umode: UMODE_ that indicates if the user currently has a vHost.
                      Use 0 for no support.
 
-    64) Flood Mode: The IRCd has a channelmode for blocking floods. Use 1 for
+    66) Flood Mode: The IRCd has a channelmode for blocking floods. Use 1 for
                     yes, 0 for no.
 
-    65) Link Mode: The IRCd has a channelmode for linking a channel to some
+    67) Link Mode: The IRCd has a channelmode for linking a channel to some
                    other channel. Use 1 for yes, 0 for no.
 
-    66) CMode F: CMODE_ that defines flood mode. Use 0 for no support.
+    68) CMode F: CMODE_ that defines flood mode. Use 0 for no support.
 
-    67) CMode L: CMODE_ that defines link mode. Use 0 for no support.
+    69) CMode L: CMODE_ that defines link mode. Use 0 for no support.
 
-    68) Check Nick ID: Should we check if a user should remain identified when
+    70) Check Nick ID: Should we check if a user should remain identified when
                        changing their nick? This is for IRCd's that remove
                        their registered-user mode when someone changes their
                        nick (like Bahamut does).
                        Use 1 for yes, 0 for no.
 
-    69) No Knock Requires +i: Does the No Knock channel mode require invite
+    71) No Knock Requires +i: Does the No Knock channel mode require invite
                               only channels? Use 1 for yes, 0 for no.
 
-    70) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
+    72) Chan Modes: If sent in CAPAB/PROTOCOL, we store it in here. This is
                     NULL by default.
 
-    71) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
+    73) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
                 0 for no.
 
-    72) Token Case Senstive: Are the IRCd's TOKENS/COMMANDS case sensitive?
+    74) Token Case Senstive: Are the IRCd's TOKENS/COMMANDS case sensitive?
                              Use 1 for yes, 0 for no.
 
-    73) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
+    75) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
                          1 for yes, 0 for no.
 
-    74) Supports +I: Does the IRCd support channelmode +I? Use 1 for yes,
+    76) Supports +I: Does the IRCd support channelmode +I? Use 1 for yes,
                      0 for no.
 
-    75) SJOIN Ban Char: Character used to identify bans. Use ''.
+    77) SJOIN Ban Char: Character used to identify bans. Use ''.
 
-    76) SJOIN Except Char: Character used to identify exceptions. use ''.
+    78) SJOIN Except Char: Character used to identify exceptions. use ''.
 
-    77) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
+    79) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    78) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
+    80) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
-    79) Vhost Character: The character used to represent the vHost mode, if
+    81) Vhost Character: The character used to represent the vHost mode, if
                          this is supported by the IRCd.
 
-    80) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
+    82) TS6: Does the IRCd support TS6? Use 1 for yes, 0 for no.
 
-    81) UMode +h: Does the IRCd support usermode +h for helpers?
+    83) UMode +h: Does the IRCd support usermode +h for helpers?
                   Use 1 for yes, 0 for no.
 
-    82) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
+    84) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
 
     83) Character Set: Unreal passes the character set during PROTOCTL,
                        the value is stored here. Set this NULL to start.

@@ -55,6 +55,8 @@ IRCDVar ircd[] = {
      1,                         /* Has Owner */
      "+q",                      /* Mode to set for an owner */
      "-q",                      /* Mode to unset for an owner */
+     "+a",                      /* Mode to set for channel admin */
+     "-a",                      /* Mode to unset for channel admin */
      "+rd",                     /* Mode On Reg          */
      "-r+d",                    /* Mode on UnReg        */
      "-r+d",                    /* Mode on Nick Change  */

@@ -1764,13 +1764,14 @@ static int do_clearmodes(User * u)
             }
             /* Clear mode protected or admins */
             if (ircd->svsmode_ucmode && (ircd->protect || ircd->admin)) {
-                anope_cmd_svsmode_chan(c->name, "-a", NULL);
+
+                anope_cmd_svsmode_chan(c->name, ircd->adminunset, NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
                         continue;
                     }
-                    argv[0] = sstrdup("-a");
+                    argv[0] = sstrdup(ircd->adminunset);
                     argv[1] = cu->user->nick;
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                     free(argv[0]);
@@ -1780,10 +1781,10 @@ static int do_clearmodes(User * u)
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
                         continue;
-                    argv[0] = sstrdup("-a");
+                    argv[0] = sstrdup(ircd->adminunset);
                     argv[1] = sstrdup(cu->user->nick);
-                    anope_cmd_mode(s_OperServ, c->name, "-a %s",
-                                   cu->user->nick);
+                    anope_cmd_mode(s_OperServ, c->name, "%s %s",
+                                   ircd->adminunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                     free(argv[0]);
                 }

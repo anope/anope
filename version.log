@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="584"
+VERSION_BUILD="585"
 
 # $Log$
+#
+# BUILD : 1.7.8 (585)
+# BUGS  : N/A
+# NOTES : removed veriable that isnt used anymore :)
+# 
 #
 # BUILD : 1.7.8 (584)
 # BUGS  : N/A

@@ -30,7 +30,7 @@ distclean: clean spotless
 subs:
 	@for i in $(SUBS); do \
         echo "make all in $$i..."; \
-        (cd $$i; $(MAKE) $(MAKEARGS) $(MYMAKEFLAGS) all); done
+        (cd $$i; $(MAKE) $(MAKEARGS) all); done
 
 clean:
 	rm -f *.o *.so *.c~ core

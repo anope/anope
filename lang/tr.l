@@ -330,6 +330,8 @@ NICK_ALREADY_REGISTERED
 	%s nicki zaten kayýtlý!
 NICK_REGISTERED
 	%s nicki sizin adýnýza kayýt edildi: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Nick Þifreniz %s - Ýlerde kullanacaðýnýz için unutmayýnýz ve kimseye söylemeyiniz.
 

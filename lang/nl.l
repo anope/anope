@@ -329,6 +329,8 @@ NICK_ALREADY_REGISTERED
 	Nickname %s is al geregistreerd!
 NICK_REGISTERED
 	Nickname %s is geregistreerd onder jouw account: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Je wachtwoord is %s - onthoudt dit voor later gebruik.
 

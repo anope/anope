@@ -357,6 +357,8 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Nick %s zosta³ teraz zarejestrowany dla 
 	Ciebie z mask±: %s.
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Twoje has³o nicka to %s
 	Zapamiêtaj je do przysz³ego u¿ytku.

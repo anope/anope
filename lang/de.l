@@ -353,6 +353,8 @@ NICK_ALREADY_REGISTERED
 	Dieser Nickname %s ist bereits registriert!
 NICK_REGISTERED
 	Dein Nickname %s ist unter deinem Host registriert worden: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Dein Passwort ist %s - behalte es für spätere Benutzung.
 NICK_REG_DELAY

@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="448"
+VERSION_BUILD="449"
 
 # $Log$
+#
+# BUILD : 1.7.6 (449)
+# NOTES : Language normalization.
 #
 # BUILD : 1.7.6 (448)
 # BUGS  : 

@@ -332,6 +332,8 @@ NICK_ALREADY_REGISTERED
 	Ник %s уже зарегистрирован!
 NICK_REGISTERED
 	Ник %s зарегистрирован на Вашу учетную запись: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Ваш пароль - %s - используйте его в дальнейшем и не забывайте.
 

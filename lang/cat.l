@@ -328,6 +328,8 @@ NICK_ALREADY_REGISTERED
 
 NICK_REGISTERED
 	El nickname %s ja esta registrat sota el teu compte: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	La teva clau es %s - Recordala per un us futur.
 

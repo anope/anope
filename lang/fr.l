@@ -329,6 +329,8 @@ NICK_ALREADY_REGISTERED
 	Le nick %s est déjà enregistré!
 NICK_REGISTERED
 	Le nick %s est maintenant enregistré sous votre masque: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Votre mot de passe est %s - notez le pour une utilisation ultérieure.
 

@@ -326,6 +326,8 @@ NICK_ALREADY_REGISTERED
 	Αυτό το ψευδώνυμο %s είναι ήδη κατοχυρωμένο!
 NICK_REGISTERED
 	Αυτό το ψευδώνυμο %s κατοχυρώθηκε υπό την διεύθυνσή σου: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Ο κωδικός σου είναι %s - θυμήσου τον για αργότερη χρήση.
 

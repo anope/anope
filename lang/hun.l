@@ -336,6 +336,8 @@ NICK_ALREADY_REGISTERED
 	Ez a nicknév: %s már regisztrált!
 NICK_REGISTERED
 	Ez a nicknév: %s számodra lett regisztrálva: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Jelszavad: %s - jegyezd meg a késõbbi használathoz!
 NICK_REG_DELAY

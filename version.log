@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="82"
+VERSION_BUILD="83"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (83)
+# BUGS  : 22
+# NOTES : Badwords now cannot be evaded by using control chars or color codes.
 #
 # BUILD : 1.7.2 (82)
 # BUGS  : N/A

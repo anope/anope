@@ -60,6 +60,7 @@ static int do_badwords(User * u);
 static int do_say(User * u);
 static int do_act(User * u);
 void moduleAddBotServCmds(void);
+char *normalizeBuffer(char *);
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddBotServCmds(void) {
@@ -284,28 +285,32 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
         if (ci->botflags & BS_KICK_BADWORDS) {
             int i;
             int mustkick = 0;
+            char *nbuf;
             BadWord *bw;
+
+            /* Normalize the buffer */
+            nbuf = normalizeBuffer(buf);
 
             for (i = 0, bw = ci->badwords; i < ci->bwcount; i++, bw++) {
                 if (!bw->in_use)
                     continue;
 
-                if (bw->type == BW_ANY && stristr(buf, bw->word)) {
+                if (bw->type == BW_ANY && stristr(nbuf, bw->word)) {
                     mustkick = 1;
                 } else if (bw->type == BW_SINGLE) {
                     int len = strlen(bw->word);
 
-                    if (!stricmp(buf, bw->word)) {
+                    if (!stricmp(nbuf, bw->word)) {
                         mustkick = 1;
                         /* two next if are quite odd isn't it? =) */
-                    } else if ((strchr(buf, ' ') == buf + len)
-                               && (stristr(buf, bw->word) == buf)) {
+                    } else if ((strchr(nbuf, ' ') == nbuf + len)
+                               && (stristr(nbuf, bw->word) == nbuf)) {
                         mustkick = 1;
                     } else
-                        if ((strrchr(buf, ' ') ==
-                             buf + strlen(buf) - len - 1)
-                            && (stristr(buf, bw->word) ==
-                                buf + strlen(buf) - len)) {
+                        if ((strrchr(nbuf, ' ') ==
+                             nbuf + strlen(nbuf) - len - 1)
+                            && (stristr(nbuf, bw->word) ==
+                                nbuf + strlen(nbuf) - len)) {
                         mustkick = 1;
                     } else {
                         char *wordbuf = scalloc(len + 3, 1);
@@ -315,13 +320,13 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         wordbuf[len + 2] = '\0';
                         memcpy(wordbuf + 1, bw->word, len);
 
-                        if (stristr(buf, wordbuf))
+                        if (stristr(nbuf, wordbuf))
                             mustkick = 1;
                     }
                 } else if (bw->type == BW_START) {
                     int len = strlen(bw->word);
 
-                    if (!strnicmp(buf, bw->word, len)) {
+                    if (!strnicmp(nbuf, bw->word, len)) {
                         mustkick = 1;
                     } else {
                         char *wordbuf = scalloc(len + 2, 1);
@@ -330,7 +335,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         wordbuf[0] = ' ';
                         wordbuf[len + 1] = '\0';
 
-                        if (stristr(buf, wordbuf))
+                        if (stristr(nbuf, wordbuf))
                             mustkick = 1;
 
                         free(wordbuf);
@@ -338,7 +343,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                 } else if (bw->type == BW_END) {
                     int len = strlen(bw->word);
 
-                    if (!strnicmp(buf + strlen(buf) - len, bw->word, len)) {
+                    if (!strnicmp
+                        (nbuf + strlen(nbuf) - len, bw->word, len)) {
                         mustkick = 1;
                     } else {
                         char *wordbuf = scalloc(len + 2, 1);
@@ -347,7 +353,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         wordbuf[len] = ' ';
                         wordbuf[len + 1] = '\0';
 
-                        if (stristr(buf, wordbuf))
+                        if (stristr(nbuf, wordbuf))
                             mustkick = 1;
 
                         free(wordbuf);
@@ -363,6 +369,10 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                     return;
                 }
             }
+
+            /* Free the normalized buffer */
+            if (nbuf)
+                free(nbuf);
         }
 
         /* Flood kicker */
@@ -2510,3 +2520,57 @@ static int do_act(User * u)
 }
 
 /*************************************************************************/
+/**
+ * Normalize buffer stripping control characters and colors
+ */
+char *normalizeBuffer(char *buf)
+{
+    char *newbuf;
+    int i, len, j = 0;
+
+    newbuf = (char *) malloc(255);
+
+    len = strlen(buf);
+
+    for (i = 0; i < len; i++) {
+        switch (buf[i]) {
+            /* Bold ctrl char */
+        case 2:
+            break;
+            /* Color ctrl char */
+        case 3:
+            /* If the next character is a digit, its also removed */
+            if (isdigit(buf[i + 1])) {
+                i++;
+
+                /* Check for background color code
+                 * and remove it as well
+                 */
+                if (buf[i + 1] == ',') {
+                    i++;
+
+                    if (isdigit(buf[i + 1]))
+                        i++;
+                }
+            }
+
+            break;
+
+            /* Reverse ctrl char */
+        case 22:
+            break;
+            /* Underline ctrl char */
+        case 31:
+            break;
+            /* A valid char gets copied into the new buffer */
+        default:
+            newbuf[j] = buf[i];
+            j++;
+        }
+    }
+
+    /* Terminate the string */
+    newbuf[j] = 0;
+
+    return (newbuf);
+}

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="163"
+VERSION_BUILD="164"
 
 # $Log$
+#
+# BUILD : 1.7.3 (164)
+# BUGS  : 
+# NOTES : Fixed Changes file formatted error 
 #
 # BUILD : 1.7.3 (163)
 # BUGS  : 67

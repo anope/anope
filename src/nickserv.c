@@ -2758,7 +2758,7 @@ static int do_drop(User * u)
     NickRequest *nr = NULL;
     int is_servadmin = is_services_admin(u);
     int is_mine;                /* Does the nick being dropped belong to the user that is dropping? */
-    char *my_nick;
+    char *my_nick = NULL;
 
     if (readonly && !is_servadmin) {
         notice_lang(s_NickServ, u, NICK_DROP_DISABLED);

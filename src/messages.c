@@ -363,7 +363,7 @@ int m_whois(char *source, char *who)
         }
         anope_cmd_311("%s %s %s %s * :%s", source, who,
                       ServiceUser, ServiceHost, clientdesc);
-        anope_cmd_219(source, who);
+        anope_cmd_312("%s %s %s :%s", source, who, ServerName, ServerDesc);
         anope_cmd_317("%s %s %ld %ld :seconds idle, signon time", source,
                       who, time(NULL) - start_time, start_time);
         anope_cmd_318(source, who);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="579"
+VERSION_BUILD="580"
 
 # $Log$
+#
+# BUILD : 1.7.8 (580)
+# BUGS  : 301 302
+# NOTES : Fixed (1) uninitialized var in nickserv do_drop (2) remote whois returning incorrect numeric (3) some operserv commands using notice() instead of notice_user()
 #
 # BUILD : 1.7.8 (579)
 # BUGS  : 

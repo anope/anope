@@ -936,21 +936,21 @@ static int send_clone_lists(User * u)
     int i;
 
     if (!CheckClones) {
-        notice(s_OperServ, u->nick, "CheckClones not enabled.");
+        notice_user(s_OperServ, u, "CheckClones not enabled.");
         return MOD_CONT;
     }
 
-    notice(s_OperServ, u->nick, "clonelist[]");
+    notice_user(s_OperServ, u, "clonelist[]");
     for (i = 0; i < CLONE_DETECT_SIZE; i++) {
         if (clonelist[i].host)
-            notice(s_OperServ, u->nick, "    %10ld  %s", clonelist[i].time,
-                   clonelist[i].host ? clonelist[i].host : "(null)");
+            notice_user(s_OperServ, u, "    %10ld  %s", clonelist[i].time,
+                        clonelist[i].host ? clonelist[i].host : "(null)");
     }
-    notice(s_OperServ, u->nick, "warnings[]");
+    notice_user(s_OperServ, u, "warnings[]");
     for (i = 0; i < CLONE_DETECT_SIZE; i++) {
         if (clonelist[i].host)
-            notice(s_OperServ, u->nick, "    %10ld  %s", warnings[i].time,
-                   warnings[i].host ? warnings[i].host : "(null)");
+            notice_user(s_OperServ, u, "    %10ld  %s", warnings[i].time,
+                        warnings[i].host ? warnings[i].host : "(null)");
     }
     return MOD_CONT;
 }
@@ -1433,7 +1433,7 @@ static int do_ignorelist(User * u)
                 notice_lang(s_OperServ, u, OPER_IGNORE_LIST);
                 sent_header = 1;
             }
-            notice(s_OperServ, u->nick, "%s", id->who);
+            notice_user(s_OperServ, u, "%s", id->who);
         }
     }
     if (!sent_header)
@@ -4918,9 +4918,9 @@ static int do_matchwild(User * u)
     char *pat = strtok(NULL, " ");
     char *str = strtok(NULL, " ");
     if (pat && str)
-        notice(s_OperServ, u->nick, "%d", match_wild(pat, str));
+        notice_user(s_OperServ, u, "%d", match_wild(pat, str));
     else
-        notice(s_OperServ, u->nick, "Syntax error.");
+        notice_user(s_OperServ, u, "Syntax error.");
     return MOD_CONT;
 }
 

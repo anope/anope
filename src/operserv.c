@@ -2519,7 +2519,11 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
                const char *reason)
 {
     int deleted = 0, i;
+    int x;
     SXLine *entry;
+    User *u2;
+    char buf[BUFSIZE];
+    *buf = '\0';
 
     /* Checks whether there is an SGLINE that already covers
      * the one we want to add, and whether there are SGLINEs
@@ -2595,6 +2599,17 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 
     anope_cmd_sgline(entry->mask, entry->reason);
 
+    if (KillonSGline && !ircd->sglineenforce) {
+        for (x = 0; x < 1024; x++) {
+            for (u2 = userlist[x]; u2; u2 = u2->next) {
+                if (match_wild_nocase(entry->mask, u2->realname)) {
+                    snprintf(buf, BUFSIZE - 1, "G-Lined: %s",
+                             entry->reason);
+                    kill_user(ServerName, u2->nick, buf);
+                }
+            }
+        }
+    }
     return deleted;
 }
 
@@ -2972,7 +2987,11 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
                const char *reason)
 {
     int deleted = 0, i;
+    int x;
+    User *u2;
     SXLine *entry;
+    char buf[BUFSIZE];
+    *buf = '\0';
 
     /* Checks whether there is an SQLINE that already covers
      * the one we want to add, and whether there are SQLINEs
@@ -3051,6 +3070,18 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
     slist_add(&sqlines, entry);
 
     sqline(entry->mask, entry->reason);
+
+    if (KillonSQline) {
+        for (x = 0; x < 1024; x++) {
+            for (u2 = userlist[x]; u2; u2 = u2->next) {
+                if (match_wild_nocase(entry->mask, u2->nick)) {
+                    snprintf(buf, BUFSIZE - 1, "Q-Lined: %s",
+                             entry->reason);
+                    kill_user(ServerName, u2->nick, buf);
+                }
+            }
+        }
+    }
 
     return deleted;
 }

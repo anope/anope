@@ -242,6 +242,8 @@ int SGLineExpiry;
 int SQLineExpiry;
 int SZLineExpiry;
 int AkillOnAdd;
+int KillonSGline;
+int KillonSQline;
 int WallOper;
 int WallBadOS;
 int WallOSGlobal;
@@ -475,6 +477,8 @@ Directive directives[] = {
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
     {"KillClones", {{PARAM_SET, PARAM_FULLONLY, &KillClones}}},
+    {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
+    {"KillonSQline", {{PARAM_SET, PARAM_RELOAD, &KillonSQline}}},
     {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
     {"KillClonesAkillExpire",
      {{PARAM_TIME, PARAM_RELOAD, &KillClonesAkillExpire}}},

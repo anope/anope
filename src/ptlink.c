@@ -591,7 +591,7 @@ int anope_event_capab(char *source, int ac, char **av)
 */
 void anope_cmd_sqline(char *mask, char *reason)
 {
-    send_cmd(NULL, "SQLINE %s :%s", mask, reason);
+    send_cmd(ServerName, "SQLINE %s :%s", mask, reason);
 }
 
 /*
@@ -646,7 +646,8 @@ void anope_cmd_unsqline(char *user)
 
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(user, "JOIN %s", channel);
+    send_cmd(ServerName, "SJOIN %ld %s + :%s", (long int) time(null),
+             channel, user);
 }
 
 /*
@@ -1589,7 +1590,7 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
         return;
     }
 
-    send_cmd(oldnick, "NICK %s", newnick);
+    send_cmd(oldnick, "NICK %s %ld", newnick, (long int) time(null));
 }
 
 /*
@@ -1597,11 +1598,11 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
   	parv[0] = sender (services client)
 	parv[1]	= target client nick
 	parv[2] = channels list 
-  	:ChanServ SVSJOIN mynick 4163321 #Chan1,#Chan2
+  	:OperServ SVSJOIN Trystan #Admin
 */
 void anope_cmd_svsjoin(char *source, char *nick, char *chan)
 {
-    send_cmd(source, "SVSJOIN %s :%s", nick, chan);
+    send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
 
 /*

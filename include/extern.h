@@ -401,6 +401,8 @@ E int	SGLineExpiry;
 E int   SQLineExpiry;
 E int	SZLineExpiry;
 E int   AkillOnAdd;
+E int   KillonSGline;
+E int   KillonSQline;
 E int   DisableRaw;
 E int   WallOper;
 E int   WallBadOS;

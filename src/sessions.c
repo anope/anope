@@ -51,34 +51,17 @@
 
 /*************************************************************************/
 
-typedef struct session_ Session;
-struct session_ {
-    Session *prev, *next;
-    char *host;
-    int count;                  /* Number of clients with this host */
-    int hits;                   /* Number of subsequent kills for a host */
-};
-
 /* I'm sure there is a better way to hash the list of hosts for which we are
  * storing session information. This should be sufficient for the mean time.
  * -TheShadow */
 
 #define HASH(host)      (((host)[0]&31)<<5 | ((host)[1]&31))
 
-static Session *sessionlist[1024];
-static int32 nsessions = 0;
+Session *sessionlist[1024];
+int32 nsessions = 0;
 
 Exception *exceptions = NULL;
 int16 nexceptions = 0;
-
-/*************************************************************************/
-
-static Session *findsession(const char *host);
-
-static Exception *find_host_exception(const char *host);
-static int exception_add(User * u, const char *mask, const int limit,
-                         const char *reason, const char *who,
-                         const time_t expires);
 
 /*************************************************************************/
 /****************************** Statistics *******************************/
@@ -195,13 +178,14 @@ int do_session(User * u)
 /********************* Internal Session Functions ************************/
 /*************************************************************************/
 
-static Session *findsession(const char *host)
+Session *findsession(const char *host)
 {
     Session *session;
     int i;
 
-    if (!host)
+    if (!host) {
         return NULL;
+    }
 
     for (i = 0; i < 1024; i++) {
         for (session = sessionlist[i]; session; session = session->next) {
@@ -282,6 +266,20 @@ void del_session(const char *host)
 {
     Session *session;
 
+    if (!LimitSessions) {
+        if (debug) {
+            alog("debug: del_session called when LimitSessions is disabled");
+        }
+        return;
+    }
+
+    if (!host || !*host) {
+        if (debug) {
+            alog("debug: del_session called with NULL values");
+        }
+        return;
+    }
+
     if (debug >= 2)
         alog("debug: del_session() called");
 
@@ -291,7 +289,10 @@ void del_session(const char *host)
         anope_cmd_global(s_OperServ,
                          "WARNING: Tried to delete non-existant session: \2%s",
                          host);
-        alog("session: Tried to delete non-existant session: %s", host);
+        if (debug) {
+            alog("session: Tried to delete non-existant session: %s",
+                 host);
+        }
         return;
     }
 
@@ -479,9 +480,9 @@ void save_rdb_exceptions()
 /************************ Exception Manipulation *************************/
 /*************************************************************************/
 
-static int exception_add(User * u, const char *mask, const int limit,
-                         const char *reason, const char *who,
-                         const time_t expires)
+int exception_add(User * u, const char *mask, const int limit,
+                  const char *reason, const char *who,
+                  const time_t expires)
 {
     int i;
 

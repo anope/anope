@@ -4010,7 +4010,11 @@ static int do_ghost(User * u)
             char buf[NICKMAX + 32];
             snprintf(buf, sizeof(buf), "GHOST command used by %s",
                      u->nick);
-            del_session(u2->host);
+#ifndef STREAMLINED
+            if (LimitSessions) {
+                del_session(u2->host);
+            }
+#endif
             kill_user(s_NickServ, nick, buf);
             notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
         } else {

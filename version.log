@@ -8,9 +8,17 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="467"
+VERSION_BUILD="468"
 
 # $Log$
+#
+# BUILD : 1.7.6 (468)
+# BUGS  : N/A
+# NOTES : 1. fixes del_session() warning when LimitSessions is disabled
+# 2. actions.c is doxygen ready, along with code clean up
+# 3. sessions.c cleaned up and moved some items around
+# 4. ChanServ AKICK (pointed to freed memory)
+# 5. servers.c is doxygen ready, along with some code clean up
 #
 # BUILD : 1.7.6 (467)
 # BUGS  : 

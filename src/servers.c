@@ -23,7 +23,11 @@ static Server *server_cur;
 
 /*************************************************************************/
 
-/* Walk through the servers list */
+/**
+ * Return the first server in the server struct
+ * @param flags Server Flags, see services.h
+ * @return Server Struct
+ */
 Server *first_server(int flags)
 {
     server_cur = servlist;
@@ -34,6 +38,13 @@ Server *first_server(int flags)
     return server_cur;
 }
 
+/*************************************************************************/
+
+/**
+ * Return the next server in the server struct
+ * @param flags Server Flags, see services.h
+ * @return Server Struct
+ */
 Server *next_server(int flags)
 {
     if (!server_cur)
@@ -60,12 +71,18 @@ Server *next_server(int flags)
 
 /*************************************************************************/
 
-/* This function makes a new Server structure and links it in the right
+/**
+ * This function makes a new Server structure and links it in the right
  * places in the linked list if a Server struct to it's uplink if provided.
  * It can also be NULL to indicate it's the uplink and should be first in
  * the server list.
+ * @param uplink Server struct
+ * @param name Server Name
+ * @param desc Server Description
+ * @param flags Server Flags, see services.h
+ * @param suid Server Universal ID
+ * @return Server Struct
  */
-
 Server *new_server(Server * uplink, const char *name, const char *desc,
                    uint16 flags, char *suid)
 {
@@ -102,13 +119,16 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
 
 /*************************************************************************/
 
-/* Remove and free a Server structure. This function is the most complete
+/**
+ * Remove and free a Server structure. This function is the most complete
  * remove treatment a server can get, as it first quits all clients which
  * still pretend to be on this server, then it walks through all connected
  * servers and disconnects them too. If all mess is cleared, the server
  * itself will be too.
+ * @param Server struct
+ * @param reason the server quit
+ * @return void
  */
-
 static void delete_server(Server * serv, const char *quitreason)
 {
     Server *s, *snext;
@@ -140,8 +160,9 @@ static void delete_server(Server * serv, const char *quitreason)
                             (quitreason ? sstrdup(quitreason) : NULL);
                     }
 #ifndef STREAMLINED
-                    if (LimitSessions)
+                    if (LimitSessions) {
                         del_session(u->host);
+                    }
 #endif
                     delete_user(u);
                 }
@@ -177,8 +198,12 @@ static void delete_server(Server * serv, const char *quitreason)
 
 /*************************************************************************/
 
-/* Find a server by name, returns NULL if not found */
-
+/**
+ * Find a server by name, returns NULL if not found
+ * @param s Server struct
+ * @param name Server Name
+ * @return Server struct
+ */
 Server *findserver(Server * s, const char *name)
 {
     Server *sl;
@@ -187,30 +212,35 @@ Server *findserver(Server * s, const char *name)
         return NULL;
     }
 
-    if (debug >= 3)
+    if (debug >= 3) {
         alog("debug: findserver(%p)", name);
+    }
     while (s && (stricmp(s->name, name) != 0)) {
         if (s->links) {
             sl = findserver(s->links, name);
-            if (sl)
+            if (sl) {
                 s = sl;
-            else
+            } else {
                 s = s->next;
+            }
         } else {
             s = s->next;
         }
     }
-    if (debug >= 3)
+    if (debug >= 3) {
         alog("debug: findserver(%s) -> %p", name, (void *) s);
+    }
     return s;
 }
 
-/*
-  Not Synced    = -1
-  Error         = 0
-  Synced        = 1
-*/
+/*************************************************************************/
 
+/**
+ * Find if the server is synced with the network
+ * @param s Server struct
+ * @param name Server Name
+ * @return Not Synced returns -1, Synced returns 1, Error returns 0
+ */
 int anope_check_sync(const char *name)
 {
     Server *s;
@@ -227,7 +257,15 @@ int anope_check_sync(const char *name)
 }
 
 /*************************************************************************/
-/* :<introducing server> SERVER <servername> <hops> :<description>
+
+/**
+ * Handle adding the server to the Server struct
+ * @param source Name of the uplink if any
+ * @param servername Name of the server being linked
+ * @param hops Number of hops to reach this server
+ * @param descript Description of the server
+ * @param numeric Server Numberic/SUID
+ * @return void
  */
 void do_server(const char *source, char *servername, char *hops,
                char *descript, char *numeric)
@@ -252,7 +290,13 @@ void do_server(const char *source, char *servername, char *hops,
 }
 
 /*************************************************************************/
-/* SQUIT <server> :<comment>
+
+/**
+ * Handle removing the server from the Server struct
+ * @param source Name of the server leaving
+ * @param ac Number of arguments in av
+ * @param av Agruments as part of the SQUIT
+ * @return void
  */
 void do_squit(const char *source, int ac, char **av)
 {
@@ -271,8 +315,9 @@ void do_squit(const char *source, int ac, char **av)
     if (ircdcap->unconnect) {
         if ((s->uplink == me_server)
             && (uplink_capab & ircdcap->unconnect)) {
-            if (debug)
+            if (debug) {
                 alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
+            }
             /* need to fix */
             anope_cmd_squit(s->name, buf);
         }
@@ -281,6 +326,14 @@ void do_squit(const char *source, int ac, char **av)
     delete_server(s, buf);
 }
 
+/*************************************************************************/
+
+/**
+ * Handle parsing the CAPAB/PROTOCTL messages
+ * @param ac Number of arguments in av
+ * @param av Agruments 
+ * @return void
+ */
 void capab_parse(int ac, char **av)
 {
     int i;
@@ -371,12 +424,9 @@ void capab_parse(int ac, char **av)
         if (!stricmp(s, "SSJ3")) {
             uplink_capab |= CAPAB_SSJ3;
         }
-
         if (!stricmp(s, "SJB64")) {
             uplink_capab |= CAPAB_SJB64;
-
         }
-
         if (!stricmp(s, "CHANMODES")) {
             uplink_capab |= CAPAB_CHANMODE;
             if (tmp) {

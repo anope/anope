@@ -155,6 +155,7 @@ typedef struct cmmode_ CMMode;
 typedef struct csmode_ CSMode;
 typedef struct cumode_ CUMode;
 typedef struct csmodeutil_ CSModeUtil;
+typedef struct session_ Session;
 
 /*************************************************************************/
 
@@ -924,6 +925,15 @@ struct exception_ {
                                  * positions when deleting entries. It is
                                  * symbolic and used internally. It is
                                  * calculated at load time and never saved. */
+};
+
+/*************************************************************************/
+
+struct session_ {
+    Session *prev, *next;
+    char *host;
+    int count;                  /* Number of clients with this host */
+    int hits;                   /* Number of subsequent kills for a host */
 };
 
 /*************************************************************************/

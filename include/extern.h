@@ -841,6 +841,9 @@ E int anope_check_sync(const char *name);
 E Exception *exceptions;
 E int16 nexceptions;
 
+Session *sessionlist[1024];
+int32 nsessions;
+
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
@@ -853,6 +856,13 @@ E void save_exceptions(void);
 E void save_rdb_exceptions(void);
 E int do_exception(User *u);
 E void expire_exceptions(void);
+
+E Session *findsession(const char *host);
+
+E Exception *find_host_exception(const char *host);
+E int exception_add(User * u, const char *mask, const int limit,
+                         const char *reason, const char *who,
+                         const time_t expires);
 
 /**** sockutil.c ****/
 

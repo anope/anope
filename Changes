@@ -17,6 +17,8 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 11/21 A Opened SGLINE to all ircd that support GEOS bans		  [ #00]
 11/21 A Opened SZLINE to all ircd that support ZLINE's			  [ #00]
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
+12/01 F ChanServ AKICK DEL (reordering) (pointed to freed memory)	  [ #00]
+12/01 F del_session() warning messages when LimitSessions is disabled	  [ #00]
 11/28 F NSSecureAdmins now restricts /NS SET EMAIL			  [#218]
 11/27 F Compiles and Runs under CYGWIN again				  [ #00]
 11/27 F bot_raw_mode() would cause a TSMODE warning			  [#234]

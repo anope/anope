@@ -4725,10 +4725,13 @@ static int do_akick(User * u)
                             if (ci->akick[b].flags & AK_ISNICK) {
                                 ci->akick[a].u.nc = ci->akick[b].u.nc;
                             } else {
-                                ci->akick[a].u.mask = ci->akick[b].u.mask;
+                                ci->akick[a].u.mask =
+                                    sstrdup(ci->akick[b].u.mask);
                             }
-                            ci->akick[a].reason = ci->akick[b].reason;
-                            ci->akick[a].creator = ci->akick[b].creator;
+                            ci->akick[a].reason =
+                                sstrdup(ci->akick[b].reason);
+                            ci->akick[a].creator =
+                                sstrdup(ci->akick[b].creator);
                             ci->akick[a].addtime = ci->akick[b].addtime;
 
                             akick_del(u, &ci->akick[b]);

@@ -52,9 +52,11 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name);
 int displayMessageFromHashl(char *name);
 int displayMessage(Message * m);
 
-/*******************************************************************************
- * Module Functions
- *******************************************************************************/
+/**
+ * Automaticaly load modules at startup.
+ * This will load modules at startup before the IRCD link is attempted, this
+ * allows admins to have a module relating to ircd support load
+ */
 void modules_init(void)
 {
 #ifdef USE_MODULES
@@ -75,6 +77,11 @@ void modules_init(void)
 #endif
 }
 
+/**
+ * Automaticaly load modules at startup, delayed.
+ * This function waits until the IRCD link has been made, and then attempts
+ * to load the specified modules.
+ */
 void modules_delayed_init(void)
 {
 #ifdef USE_MODULES
@@ -95,6 +102,11 @@ void modules_delayed_init(void)
 #endif
 }
 
+/**
+ * Create a new module, setting up the default values as needed.
+ * @param filename the filename of the new module
+ * @return a newly created module struct
+ */
 Module *createModule(char *filename)
 {
     Module *m;
@@ -119,6 +131,12 @@ Module *createModule(char *filename)
     return m;                   /* return a nice new module */
 }
 
+/**
+ * Destory the module.
+ * free up all memory used by our module struct.
+ * @param m the module to free
+ * @return MOD_ERR_OK on success, anything else on fail
+ */
 int destroyModule(Module * m)
 {
     if (!m) {
@@ -143,6 +161,11 @@ int destroyModule(Module * m)
     return MOD_ERR_OK;
 }
 
+/**
+ * Add the module to the list of currently loaded modules.
+ * @param m the currently loaded module
+ * @return MOD_ERR_OK on success, anything else on fail
+ */
 int addModule(Module * m)
 {
     int index = 0;
@@ -173,6 +196,11 @@ int addModule(Module * m)
     return MOD_ERR_OK;
 }
 
+/**
+ * Remove the module from the list of loaded modules.
+ * @param m module to remove
+ * @return MOD_ERR_OK on success anything else on fail
+ */
 int delModule(Module * m)
 {
     int index = 0;
@@ -202,6 +230,11 @@ int delModule(Module * m)
     return MOD_ERR_NOEXIST;
 }
 
+/**
+ * Search the list of loaded modules for the given name.
+ * @param name the name of the module to find
+ * @return a pointer to the module found, or NULL
+ */
 Module *findModule(char *name)
 {
     int idx;
@@ -220,6 +253,14 @@ Module *findModule(char *name)
 
 }
 
+/** 
+ * Copy the module from the modules folder to the runtime folder.
+ * This will prevent module updates while the modules is loaded from
+ * triggering a segfault, as the actaul file in use will be in the 
+ * runtime folder.
+ * @param name the name of the module to copy
+ * @return MOD_ERR_OK on success
+ */
 int moduleCopyFile(char *name)
 {
 #ifdef USE_MODULES
@@ -258,6 +299,12 @@ int moduleCopyFile(char *name)
     return MOD_ERR_OK;
 }
 
+/**
+ * Loads a given module.
+ * @param m the module to load
+ * @param u the user who loaded it, NULL for auto-load
+ * @return MOD_ERR_OK on success, anything else on fail
+ */
 int loadModule(Module * m, User * u)
 {
 #ifdef USE_MODULES
@@ -331,6 +378,12 @@ int loadModule(Module * m, User * u)
 #endif
 }
 
+/**
+ * Unload the given module.
+ * @param m the module to unload
+ * @param u the user who unloaded it
+ * @return MOD_ERR_OK on success, anything else on fail
+ */
 int unloadModule(Module * m, User * u)
 {
 #ifdef USE_MODULES
@@ -371,6 +424,13 @@ int unloadModule(Module * m, User * u)
 #endif
 }
 
+/**
+ * Prepare a module to be unloaded.
+ * Remove all commands and messages this module is providing, and delete 
+ * any callbacks which are still pending.
+ * @param m the module to prepare for unload
+ * @return MOD_ERR_OK on success
+ */
 int prepForUnload(Module * m)
 {
     int idx;
@@ -461,6 +521,18 @@ int prepForUnload(Module * m)
 /*******************************************************************************
  * Command Functions
  *******************************************************************************/
+/**
+ * Create a Command struct ready for use in anope.
+ * @param name the name of the command
+ * @param func pointer to the function to execute when command is given
+ * @param has_priv pointer to function to check user priv's
+ * @param help_all help file index for all users
+ * @param help_reg help file index for all regustered users
+ * @param help_oper help file index for all opers
+ * @param help_admin help file index for all admins
+ * @param help_root help file indenx for all services roots
+ * @return a "ready to use" Command struct will be returned
+ */
 Command *createCommand(const char *name, int (*func) (User * u),
                        int (*has_priv) (User * u), int help_all,
                        int help_reg, int help_oper, int help_admin,
@@ -493,6 +565,11 @@ Command *createCommand(const char *name, int (*func) (User * u),
     return c;
 }
 
+/**
+ * Destroy a command struct freeing any memory.
+ * @param c Command to destroy
+ * @return MOD_ERR_OK on success, anything else on fail
+ */
 int destroyCommand(Command * c)
 {
     if (!c) {
@@ -534,6 +611,12 @@ int destroyCommand(Command * c)
     return MOD_ERR_OK;
 }
 
+/**
+ * Add a CORE command ot the given command hash
+ * @param cmdTable the command table to add the command to
+ * @param c the command to add
+ * @return MOD_ERR_OK on success
+ */
 int addCoreCommand(CommandHash * cmdTable[], Command * c)
 {
     if (!cmdTable || !c) {
@@ -544,6 +627,15 @@ int addCoreCommand(CommandHash * cmdTable[], Command * c)
     return addCommand(cmdTable, c, 0);
 }
 
+/**
+ * Add a module provided command to the given service.
+ * e.g. moduleAddCommand(NICKSERV,c,MOD_HEAD);
+ * @param cmdTable the services to add the command to
+ * @param c the command to add
+ * @param pos the position to add to, MOD_HEAD, MOD_TAIL, MOD_UNIQUE
+ * @see createCommand
+ * @return MOD_ERR_OK on successfully adding the command
+ */
 int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
 {
     int status;
@@ -585,6 +677,12 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
     return status;
 }
 
+/**
+ * Delete a command from the service given.
+ * @param cmdTable the cmdTable for the services to remove the command from
+ * @param name the name of the command to delete from the service
+ * @return returns MOD_ERR_OK on success
+ */
 int moduleDelCommand(CommandHash * cmdTable[], char *name)
 {
     Command *c = NULL;
@@ -616,6 +714,13 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
     return status;
 }
 
+/**
+ * Output the command stack into the log files.
+ * This will print the call-stack for a given command into the log files, very useful for debugging.
+ * @param cmdTable the command table to read from
+ * @param name the name of the command to print
+ * @return 0 is returned, it has no relevence yet :)
+ */
 int displayCommandFromHash(CommandHash * cmdTable[], char *name)
 {
     CommandHash *current = NULL;
@@ -635,6 +740,12 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name)
     return 0;
 }
 
+/**
+ * Output the command stack into the log files.
+ * This will print the call-stack for a given command into the log files, very useful for debugging.
+ * @param c the command struct to print
+ * @return 0 is returned, it has no relevence yet :)
+ */
 
 int displayCommand(Command * c)
 {
@@ -648,6 +759,12 @@ int displayCommand(Command * c)
     return 0;
 }
 
+/**
+ * Display the message call stak.
+ * Prints the call stack for a message based on the message name, again useful for debugging and little lese :)
+ * @param name the name of the message to print info for
+ * @return the return int has no relevence atm :)
+ */
 int displayMessageFromHash(char *name)
 {
     MessageHash *current = NULL;
@@ -667,6 +784,12 @@ int displayMessageFromHash(char *name)
     return 0;
 }
 
+/**
+ * Displays a message list for a given message.
+ * Again this is of little use other than debugging.
+ * @param m the message to display
+ * @return 0 is returned and has no meaning 
+ */
 int displayMessage(Message * m)
 {
     Message *msg = NULL;
@@ -681,11 +804,15 @@ int displayMessage(Message * m)
 
 
 /**
- * Add a command to a command table
+ * Add a command to a command table.
  * only add if were unique, pos = 0;
  * if we want it at the "head" of that command, pos = 1
  * at the tail, pos = 2
- **/
+ * @param cmdTable the table to add the command to
+ * @param c the command to add
+ * @param pos the position in the cmd call stack to add the command
+ * @return MOD_ERR_OK will be returned on success.
+ */
 int addCommand(CommandHash * cmdTable[], Command * c, int pos)
 {
     /* We can assume both param's have been checked by this point.. */
@@ -745,6 +872,13 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
     return MOD_ERR_OK;
 }
 
+/**
+ * Remove a command from the command hash.
+ * @param cmdTable the command table to remove the command from
+ * @param c the command to remove
+ * @param mod_name the name of the module who owns the command
+ * @return MOD_ERR_OK will be returned on success
+ */
 int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
 {
     int index = 0;
@@ -808,6 +942,12 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
     return MOD_ERR_NOEXIST;
 }
 
+/**
+ * Search the command table gieven for a command.
+ * @param cmdTable the name of the command table to search
+ * @name the name of the command to look for
+ * @return returns a pointer to the found command struct, or NULL
+ */
 Command *findCommand(CommandHash * cmdTable[], const char *name)
 {
     int idx;

@@ -393,6 +393,7 @@ static long base64_to_int(char *b64)
 long base64dects(char *ts)
 {
     char *token;
+    long value;
 
     if (!ts) {
         return 0;
@@ -402,5 +403,7 @@ long base64dects(char *ts)
     if (!token) {
         return strtoul(ts, NULL, 10);
     }
-    return base64dec(token);
+    value = base64dec(token);
+    Anope_Free(token);
+    return value;
 }

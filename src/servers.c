@@ -17,6 +17,7 @@
 Server *servlist = NULL;
 Server *me_server = NULL;
 uint32 uplink_capab;
+char *uplink;
 
 /* For first_server / next_server */
 static Server *server_cur;

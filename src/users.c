@@ -197,17 +197,19 @@ void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
+    char *realname;
 
     if (LogUsers) {
+        realname = normalizeBuffer(user->realname);
         if (ircd->vhost) {
             alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
                  (user->vhost ? user->vhost : "(none)"),
-                 normalizeBuffer(user->realname), user->server->name);
+                 realname, user->server->name);
         } else {
             alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
-                 normalizeBuffer(user->realname), user->server->name);
+                 realname, user->server->name);
         }
     }
 
@@ -221,12 +223,15 @@ void delete_user(User * user)
     free(user->username);
     free(user->host);
     if (ircd->vhost) {
-        if (user->vhost)
+        if (user->vhost) {
             free(user->vhost);
+        }
     }
-    free(user->realname);
-    if (debug >= 2)
+    Anope_Free(user->realname);
+    Anope_Free(realname);
+    if (debug >= 2) {
         alog("debug: delete_user(): remove from channels");
+    }
     c = user->chans;
     while (c) {
         c2 = c->next;
@@ -331,6 +336,22 @@ User *finduser(const char *nick)
     return user;
 }
 
+
+/* On shut down clean out the user struct */
+void shut_clean_user()
+{
+    User *u;
+    int i;
+
+    for (i = 0; i < 1024; i++) {
+        for (u = userlist[i]; u; u = u->next) {
+            delete_user(u);
+        }
+    }
+    return;
+}
+
+
 /*************************************************************************/
 
 /* Iterate over all users in the user list.  Return NULL at end of list. */
@@ -379,6 +400,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
     int nc_changed = 1;         /* Did nick core change? */
     int status = 0;             /* Status to apply */
     char mask[USERMAX + HOSTMAX + 2];
+    char *logrealname;
 
     if (!*source) {
         char ipbuf[16];
@@ -415,23 +437,26 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                     tmp = strchr(realname, '%');
                 }
             }
+            logrealname = normalizeBuffer(realname);
+
         /**
 	 * End of ugly swap
 	 **/
 
             if (ircd->nickvhost) {
                 if (ircd->nickip) {
-                    alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), normalizeBuffer(realname), ipbuf, server);
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), logrealname, ipbuf, server);
                 } else {
-                    alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), normalizeBuffer(realname), server);
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), logrealname, server);
                 }
             } else {
                 if (ircd->nickip) {
-                    alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, normalizeBuffer(realname), ipbuf, server);
+                    alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, logrealname, ipbuf, server);
                 } else {
-                    alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, normalizeBuffer(realname), server);
+                    alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, logrealname, server);
                 }
             }
+            Anope_Free(logrealname);
         }
 
         /* We used to ignore the ~ which a lot of ircd's use to indicate no

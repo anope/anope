@@ -410,10 +410,6 @@ int init(int ac, char **av)
     int openlog_failed = 0, openlog_errno = 0;
     int started_from_term = isatty(0) && isatty(1) && isatty(2);
 
-    /* Imported from main.c */
-    extern void sighandler(int signum);
-
-
     /* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
     umask(DEFUMASK);

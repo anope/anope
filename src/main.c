@@ -85,6 +85,8 @@ const char version_flags[] =
     " " VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL
     VER_MODULE;
 
+extern char *mod_current_buffer;
+
 /******** Local variables! ********/
 
 /* Set to 1 if we are waiting for input */
@@ -254,8 +256,15 @@ static void services_shutdown(void)
     if (!quitmsg)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);
-    if (started)
+    if (started) {
         anope_cmd_squit(ServerName, quitmsg);
+        Anope_Free(uplink);
+        Anope_Free(mod_current_buffer);
+        if (ircd->chanmodes) {
+            Anope_Free(ircd->chanmodes);
+        }
+        shut_clean_user();
+    }
     disconn(servsock);
 }
 

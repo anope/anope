@@ -1853,7 +1853,6 @@ int anope_event_chghost(char *source, int ac, char **av)
 /* EVENT: SERVER */
 int anope_event_server(char *source, int ac, char **av)
 {
-    char *uplink;
     char *desc;
     char *vl;
     char *numeric;
@@ -1864,6 +1863,9 @@ int anope_event_server(char *source, int ac, char **av)
         numeric = myStrGetToken(vl, '-', 2);
         desc = myStrGetTokenRemainder(av[2], ' ', 1);
         do_server(source, av[0], av[1], desc, numeric);
+        Anope_Free(vl);
+        Anope_Free(desc);
+        Anope_Free(numeric);
     } else {
         do_server(source, av[0], av[1], av[2], NULL);
     }

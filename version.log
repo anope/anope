@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="474"
+VERSION_BUILD="475"
 
 # $Log$
+#
+# BUILD : 1.7.6 (475)
+# BUGS  : 126
+# NOTES : Some valgrind clean up, should fix 126
 #
 # BUILD : 1.7.6 (474)
 # BUGS  : N/A

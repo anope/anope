@@ -2075,20 +2075,30 @@ int check_akill(char *nick, const char *username, const char *host,
         if (!ak)
             continue;
         if (match_wild_nocase(ak->user, username)
-            && (match_wild_nocase(ak->host, host)
-                || (vhost && match_wild_nocase(ak->host, vhost)))) {
+            && match_wild_nocase(ak->host, host)) {
             anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
                             ak->expires, ak->reason);
             return 1;
         }
+        if (ircd->vhost) {
+            if (vhost) {
+                if (match_wild_nocase(ak->user, username)
+                    && match_wild_nocase(ak->host, vhost)) {
+                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                                    ak->expires, ak->reason);
+                    return 1;
+                }
+            }
+        }
         if (ircd->nickip) {
-            if (ip)
+            if (ip) {
                 if (match_wild_nocase(ak->user, username)
                     && match_wild_nocase(ak->host, ip)) {
                     anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
                                     ak->expires, ak->reason);
                     return 1;
                 }
+            }
         }
 
     }
@@ -3497,13 +3507,19 @@ int check_szline(char *nick, char *ip)
     int i;
     SXLine *sx;
 
-    if (szlines.count == 0)
+    if (szlines.count == 0) {
         return 0;
+    }
+
+    if (!ip) {
+        return 0;
+    }
 
     for (i = 0; i < szlines.count; i++) {
         sx = szlines.list[i];
-        if (!sx)
+        if (!sx) {
             continue;
+        }
 
         if (match_wild_nocase(sx->mask, ip)) {
             anope_cmd_szline(sx->mask, sx->reason, sx->by);

@@ -899,6 +899,7 @@ E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *firstuser(void);
 E User *nextuser(void);
+E void shut_clean_user();
 
 E void update_host(User * user);
 E void change_user_host(User * user, const char *host);

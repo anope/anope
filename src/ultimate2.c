@@ -89,6 +89,10 @@ IRCDVar ircd[] = {
      0,
      1,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
+     1,                         /* We support TOKENS */
+     0,                         /* TOKENS are CASE inSensitive */
+     0,                         /* TIME STAMPS are BASE64 */
+     0,                         /* +I support */
      }
     ,
     {NULL}
@@ -564,47 +568,175 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("401",       NULL); addCoreMessage(IRCD,m);
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("6",       anope_event_away); addCoreMessage(IRCD,m);
+    }
     m = createMessage("INVITE",    NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("*",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("C",       anope_event_join); addCoreMessage(IRCD,m);
+    }
     m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("H",       anope_event_kick); addCoreMessage(IRCD,m);
+    }
     m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage(".",       anope_event_kill); addCoreMessage(IRCD,m);
+    }
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("G",       anope_event_mode); addCoreMessage(IRCD,m);
+    }
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("F",       anope_event_motd); addCoreMessage(IRCD,m);
+    }
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("&",       anope_event_nick); addCoreMessage(IRCD,m);
+    }
     m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("B",       anope_event_notice); addCoreMessage(IRCD,m);
+    }
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("D",       anope_event_part); addCoreMessage(IRCD,m);
+    }
     m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("<",       anope_event_pass); addCoreMessage(IRCD,m);
+    }
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("9",       anope_event_ping); addCoreMessage(IRCD,m);
+    }
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!",       anope_event_privmsg); addCoreMessage(IRCD,m);
+    }
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage(",",       anope_event_quit); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("'",       anope_event_server); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("-",       anope_event_squit); addCoreMessage(IRCD,m);
+    }
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage(")",       anope_event_topic); addCoreMessage(IRCD,m);
+    }
     m = createMessage("USER",      NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("%",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("WALLOPS",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("=",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("#",       anope_event_whois); addCoreMessage(IRCD,m);
+    }
     m = createMessage("AKILL",     NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("V",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("GLOBOPS",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("]",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("GNOTICE",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("Z",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("GOPER",     NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("[",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("RAKILL",    NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("Y",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SILENCE",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("U",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SVSKILL",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("h",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SVSMODE",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("n",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SVSNICK",   NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("e",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SVSNOOP",   NULL); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("f",       NULL); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("c",       anope_event_sqline); addCoreMessage(IRCD,m);
+    }
     m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("d",       NULL); addCoreMessage(IRCD,m);
+    }
     m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("_",       anope_event_capab); addCoreMessage(IRCD,m);
+    }
     m = createMessage("CHGHOST",   anope_event_chghost); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!<",       anope_event_chghost); addCoreMessage(IRCD,m);
+    }
     m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-    m = createMessage("CHGNAME",   anope_event_chgname); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!=",       anope_event_chgident); addCoreMessage(IRCD,m);
+    }
     m = createMessage("NETINFO",   anope_event_netinfo); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("u",       anope_event_netinfo); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SNETINFO",  anope_event_snetinfo); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!1",      anope_event_snetinfo); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!8",       anope_event_sethost); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!9",       anope_event_setident); addCoreMessage(IRCD,m);
+    }
     m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!;",       anope_event_setname); addCoreMessage(IRCD,m);
+    }
     m = createMessage("VCTRL",     anope_event_vctrl); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("!I",      anope_event_vctrl); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("REHASH",     anope_event_rehash); addCoreMessage(IRCD,m);
+    m = createMessage("ADMIN",      anope_event_admin); addCoreMessage(IRCD,m);
+    m = createMessage("CREDITS",    anope_event_credits); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",      anope_event_error); addCoreMessage(IRCD,m);
+
+
 }
 
 /* *INDENT-ON* */
@@ -624,6 +756,11 @@ void anope_cmd_sqline(char *mask, char *reason)
 void anope_cmd_svsnoop(char *server, int set)
 {
     send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+}
+
+void anope_cmd_svsadmin(char *server, int set)
+{
+    anope_cmd_svsnoop(server, set);
 }
 
 void anope_cmd_remove_akill(char *user, char *host)
@@ -694,6 +831,7 @@ void anope_cmd_svsmode(User * u, int ac, char **av)
 
 void anope_cmd_connect(int servernum)
 {
+    anope_cmd_capab();
     if (servernum == 1)
         anope_cmd_pass(RemotePassword);
     if (servernum == 2)
@@ -701,6 +839,15 @@ void anope_cmd_connect(int servernum)
     if (servernum == 3)
         anope_cmd_pass(RemotePassword3);
     anope_cmd_server(ServerName, 1, ServerDesc);
+}
+
+void anope_cmd_capab()
+{
+    if (UseTokens) {
+        send_cmd(NULL, "PROTOCTL NOQUIT TOKEN SILENCE KNOCK");
+    } else {
+        send_cmd(NULL, "PROTOCTL NOQUIT SILENCE KNOCK");
+    }
 }
 
 
@@ -1131,7 +1278,7 @@ int anope_event_server(char *source, int ac, char **av)
 
     if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
-    do_server(source, ac, av);
+    do_server(source, av[0], av[1], av[2], NULL);
     return MOD_CONT;
 }
 
@@ -1261,6 +1408,7 @@ void anope_cmd_serv_privmsg(char *source, char *dest, char *msg)
 
 void anope_cmd_nick(char *nick, char *name, char *mode)
 {
+    EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
              ServiceUser, ServiceHost, ServerName, name);
     anope_cmd_mode(nick, nick, "%s", mode);
@@ -1315,9 +1463,10 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
+    EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
              user, host, ServerName, real);
-    anope_cmd_mode(nick, "MODE %s %s", nick, modes);
+    anope_cmd_mode(nick, nick, "%s", modes);
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1449,6 +1598,84 @@ int anope_event_netinfo(char *source, int ac, char **av)
 
 int anope_event_snetinfo(char *source, int ac, char **av)
 {
+    return MOD_CONT;
+}
+
+int anope_event_sqline(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+/*
+** svsjoin
+**
+**	parv[0] - sender
+**	parv[1] - nick to make join
+**	parv[2] - channel(s) to join
+*/
+void anope_cmd_svsjoin(char *source, char *nick, char *chan)
+{
+    send_cmd(source, "SVSJOIN %s %s", nick, chan);
+}
+
+/*
+** svspart
+**
+**	parv[0] - sender
+**	parv[1] - nick to make part
+**	parv[2] - channel(s) to part
+*/
+void anope_cmd_svspart(char *source, char *nick, char *chan)
+{
+    send_cmd(source, "SVSPART %s %s", nick, chan);
+}
+
+void anope_cmd_swhois(char *source, char *who, char *mask)
+{
+    /* not supported */
+}
+
+void anope_cmd_eob()
+{
+    /* not supported */
+}
+
+int anope_event_rehash(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_credits(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_admin(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_flood_mode_check(char *value)
+{
+    char *dp, *end;
+
+    if (value && *value != ':'
+        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
+        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
+        && (*end == 0)) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+int anope_event_error(char *source, int ac, char **av)
+{
+    if (av[0]) {
+        if (debug) {
+            alog("ERROR: %s", av[0]);
+        }
+    }
     return MOD_CONT;
 }
 

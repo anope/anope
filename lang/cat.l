@@ -13,8 +13,8 @@
 # messages need to take the same per ameters in the same order as the
 # English messages do.  (Obviously, this doesn't hold for the strftime()
 # format lines immediately below.)  If you can't get a natural translation
-# of a message without changing the order of the per ameters, let me know
-# (achurch@dragonfire.net) which message is causing a problem and I'll see
+# of a message without changing the order of the parameters, let us know
+# (dev@anope.org) which message is causing a problem and I'll see
 # what I can do.
 #
 # In help messages, "%S" (capital S, not lowercase) refers to the name of
@@ -577,9 +577,11 @@ NICK_INFO_LAST_QUIT
 NICK_INFO_URL
 	                   URL: %s
 NICK_INFO_EMAIL
-	      Adreça E-mail: %s
+	      		Adreça E-mail: %s
 NICK_INFO_VHOST
-	            vhost: %s
+	            	vhost: %s
+NICK_INFO_VHOST2
+	            	vhost: %s@%s
 NICK_INFO_ICQ
 	                 ICQ #: %d
 NICK_INFO_GREET
@@ -1432,6 +1434,8 @@ CHAN_CLEARED_VOICES
 	Mode +v ha estat eliminat del canal %s.
 CHAN_CLEARED_USERS
 	Tots els usuaris han estat kickegats del canal %s.
+CHAN_CLEARED_INVITES
+	All invites on channel %s have been removed.
 
 # GETPASS responses
 CHAN_GETPASS_SYNTAX

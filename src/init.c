@@ -34,103 +34,85 @@ void introduce_user(const char *user)
 
     /* NickServ */
     if (!user || stricmp(user, s_NickServ) == 0) {
-        EnforceQlinedNick(s_NickServ, NULL);
         anope_cmd_nick(s_NickServ, desc_NickServ, ircd->nickservmode);
     }
 
     /* ChanServ */
     if (!user || stricmp(user, s_ChanServ) == 0) {
-        EnforceQlinedNick(s_ChanServ, NULL);
         anope_cmd_nick(s_ChanServ, desc_ChanServ, ircd->chanservmode);
     }
     if (s_HostServ && ircd->vhost
         && (!user || stricmp(user, s_HostServ) == 0)) {
-        EnforceQlinedNick(s_HostServ, NULL);
         anope_cmd_nick(s_HostServ, desc_HostServ, ircd->hostservmode);
     }
 
     if (!user || stricmp(user, s_MemoServ) == 0) {
-        EnforceQlinedNick(s_MemoServ, NULL);
         anope_cmd_nick(s_MemoServ, desc_MemoServ, ircd->memoservmode);
     }
 
     if (s_BotServ && (!user || stricmp(user, s_BotServ) == 0)) {
-        EnforceQlinedNick(s_BotServ, NULL);
         anope_cmd_nick(s_BotServ, desc_BotServ, ircd->botservmode);
     }
 
     if (!user || stricmp(user, s_HelpServ) == 0) {
-        EnforceQlinedNick(s_HelpServ, NULL);
         anope_cmd_nick(s_HelpServ, desc_HelpServ, ircd->helpservmode);
     }
 
     if (!user || stricmp(user, s_OperServ) == 0) {
-        EnforceQlinedNick(s_OperServ, NULL);
         anope_cmd_nick(s_OperServ, desc_OperServ, ircd->operservmode);
     }
 
     if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0)) {
-        EnforceQlinedNick(s_DevNull, NULL);
         anope_cmd_nick(s_DevNull, desc_DevNull, ircd->devnullmode);
     }
 
     if (!user || stricmp(user, s_GlobalNoticer) == 0) {
-        EnforceQlinedNick(s_GlobalNoticer, NULL);
         anope_cmd_nick(s_GlobalNoticer, desc_GlobalNoticer,
                        ircd->globalmode);
     }
 
     /* We make aliases go online */
     if (s_NickServAlias && (!user || stricmp(user, s_NickServAlias) == 0)) {
-        EnforceQlinedNick(s_NickServAlias, NULL);
         anope_cmd_nick(s_NickServAlias, desc_NickServAlias,
                        ircd->nickservaliasmode);
     }
 
     if (s_ChanServAlias && (!user || stricmp(user, s_ChanServAlias) == 0)) {
-        EnforceQlinedNick(s_ChanServAlias, NULL);
         anope_cmd_nick(s_ChanServAlias, desc_ChanServAlias,
                        ircd->chanservaliasmode);
     }
 
     if (s_MemoServAlias && (!user || stricmp(user, s_MemoServAlias) == 0)) {
-        EnforceQlinedNick(s_MemoServAlias, NULL);
         anope_cmd_nick(s_MemoServAlias, desc_MemoServAlias,
                        ircd->memoservaliasmode);
     }
 
     if (s_BotServAlias && (!user || stricmp(user, s_BotServAlias) == 0)) {
-        EnforceQlinedNick(s_BotServAlias, NULL);
         anope_cmd_nick(s_BotServAlias, desc_BotServAlias,
                        ircd->botservaliasmode);
     }
 
     if (s_HelpServAlias && (!user || stricmp(user, s_HelpServAlias) == 0)) {
-        EnforceQlinedNick(s_HelpServAlias, NULL);
         anope_cmd_nick(s_HelpServAlias, desc_HelpServAlias,
                        ircd->helpservaliasmode);
     }
 
     if (s_OperServAlias && (!user || stricmp(user, s_OperServAlias) == 0)) {
-        EnforceQlinedNick(s_OperServAlias, NULL);
         anope_cmd_nick(s_OperServAlias, desc_OperServAlias,
                        ircd->operservaliasmode);
     }
 
     if (s_DevNullAlias && (!user || stricmp(user, s_DevNullAlias) == 0)) {
-        EnforceQlinedNick(s_DevNullAlias, NULL);
         anope_cmd_nick(s_DevNullAlias, desc_DevNullAlias,
                        ircd->devnullvaliasmode);
     }
     if (s_HostServAlias && ircd->vhost
         && (!user || stricmp(user, s_HostServAlias) == 0)) {
-        EnforceQlinedNick(s_HostServAlias, NULL);
         anope_cmd_nick(s_HostServAlias, desc_HostServAlias,
                        ircd->hostservaliasmode);
     }
     if (s_GlobalNoticerAlias
         && (!user || stricmp(user, s_GlobalNoticerAlias) == 0)) {
-        EnforceQlinedNick(s_GlobalNoticerAlias, NULL);
         anope_cmd_nick(s_GlobalNoticerAlias, desc_GlobalNoticerAlias,
                        ircd->globalaliasmode);
     }
@@ -143,16 +125,12 @@ void introduce_user(const char *user)
         for (i = 0; i < 256; i++)
             for (bi = botlists[i]; bi; bi = bi->next) {
 
-                EnforceQlinedNick(bi->nick, s_BotServ);
-
                 if (!user || !stricmp(user, bi->nick))
                     anope_cmd_bot_nick(bi->nick, bi->user, bi->host,
                                        bi->real, ircd->botserv_bot_mode);
             }
     }
 }
-
-#undef NICK
 
 /*************************************************************************/
 
@@ -345,8 +323,8 @@ static int parse_options(int ac, char **av)
                 is44 = 1;
 #endif
             } else if (!strcmp(s, "version")) {
-                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
-                        version_flags, version_build);
+                fprintf(stdout, "Anope-%s %s %s -- %s\n", version_number,
+                        ircd->name, version_flags, version_build);
                 exit(EXIT_SUCCESS);
             } else if (!strcmp(s, "help")) {
                 fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
@@ -663,7 +641,8 @@ int init(int ac, char **av)
     }
 #endif
     /* Make myself known to myself in the serverlist */
-    me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME);
+    me_server =
+        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
@@ -720,6 +699,8 @@ int init(int ac, char **av)
     if (logchan && ircd->join2msg) {
         anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
     }
+
+    anope_cmd_eob();
 
     /**
       * Load our delayed modeles - modules that are planing on making clients need to wait till now

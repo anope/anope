@@ -67,7 +67,7 @@ Server *next_server(int flags)
  */
 
 Server *new_server(Server * uplink, const char *name, const char *desc,
-                   uint16 flags)
+                   uint16 flags, char *suid)
 {
     Server *serv;
 
@@ -78,6 +78,8 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     serv->desc = sstrdup(desc);
     serv->flags = flags;
     serv->uplink = uplink;
+    serv->suid = suid;
+    serv->sync = -1;
     serv->links = NULL;
     serv->prev = NULL;
 
@@ -197,18 +199,41 @@ Server *findserver(Server * s, const char *name)
     return s;
 }
 
+/*
+  Not Synced    = -1
+  Error         = 0
+  Synced        = 1
+*/
+
+int anope_check_sync(const char *name)
+{
+    Server *s;
+    s = findserver(servlist, name);
+
+    if (!s) {
+        return 0;
+    }
+    if (s->sync) {
+        return s->sync;
+    } else {
+        return 0;
+    }
+}
+
 /*************************************************************************/
 /* :<introducing server> SERVER <servername> <hops> :<description>
  */
-void do_server(const char *source, int ac, char **av)
+void do_server(const char *source, char *servername, char *hops,
+               char *descript, char *numeric)
 {
-    Server *s;
+    Server *s, *s2;
 
     if (debug) {
         if (!*source) {
-            alog("debug: Server introduced (%s)", av[0]);
+            alog("debug: Server introduced (%s)", servername);
         } else {
-            alog("debug: Server introduced (%s) from %s", av[0], source);
+            alog("debug: Server introduced (%s) from %s", servername,
+                 source);
         }
     }
 
@@ -216,23 +241,8 @@ void do_server(const char *source, int ac, char **av)
         s = me_server;
     else
         s = findserver(servlist, source);
-    if (ircd->numservargs == 4) {
-        if (ac < 4)
-            alog("Malformed SERVER received (less than 4 params)");
-        else
-            new_server(s, av[0], av[3], 0);
-    }
-    if (ircd->numservargs == 7) {
-        if (ac < 7)
-            alog("Malformed SERVER received (less than 7 params)");
-        else
-            new_server(s, av[0], av[6], 0);
-    } else {
-        if (ac < 3)
-            alog("Malformed SERVER received (less than 3 params)");
-        else
-            new_server(s, av[0], av[2], 0);
-    }
+
+    new_server(s, servername, descript, 0, numeric);
 }
 
 /*************************************************************************/
@@ -293,6 +303,10 @@ void capab_parse(int ac, char **av)
         }
         if (!stricmp(s, "NICKIP")) {
             uplink_capab |= CAPAB_NICKIP;
+            /* Update the struct so that we know we can get NICKIP */
+            if (!ircd->nickip) {
+                ircd->nickip = 1;
+            }
         }
         if (!stricmp(s, "SSJOIN")) {
             uplink_capab |= CAPAB_NSJOIN;
@@ -350,6 +364,11 @@ void capab_parse(int ac, char **av)
         }
         if (!stricmp(s, "SSJ3")) {
             uplink_capab |= CAPAB_SSJ3;
+        }
+
+        if (!stricmp(s, "SJB64")) {
+            uplink_capab |= CAPAB_SJB64;
+
         }
 
         if (!stricmp(s, "CHANMODES")) {

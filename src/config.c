@@ -117,6 +117,8 @@ int DumpCore;
 int LogUsers;
 int NickRegDelay;
 int UseSVSHOLD;
+int UseTokens;
+int UseSVS2MODE;
 
 int UseMail;
 char *SendMailPath;
@@ -622,6 +624,8 @@ Directive directives[] = {
     {"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
     {"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
     {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
+    {"UseSVS2MODE", {{PARAM_SET, PARAM_RELOAD, &UseSVS2MODE}}},
+    {"UseTokens", {{PARAM_SET, 0, &UseTokens}}},
     {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
     {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
     {"WallDrop", {{PARAM_SET, PARAM_RELOAD, &WallDrop}}},
@@ -941,7 +945,7 @@ int read_config(int reload)
             CHECK(RemoteServer2);
     }
     if (!reload) {
-        if (LocalHost) {
+        if (LocalHost && RemoteServer) {
             if ((!stricmp(LocalHost, RemoteServer))
                 && LocalPort == RemotePort) {
                 printf
@@ -1317,6 +1321,13 @@ int read_config(int reload)
         }
         if (GlobalOnDefconMore)
             CHECK(DefconMessage);
+    }
+
+    if (UseTokens) {
+        if (!ircd->token) {
+            alog("Anope does not support TOKENS for this ircd setting unsetting UseToken");
+            UseTokens = 0;
+        }
     }
 
     /**

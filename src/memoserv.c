@@ -1003,6 +1003,9 @@ static int do_info(User * u)
         if (!na) {
             notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
             return MOD_CONT;
+        } else if (na->status & NS_VERBOTEN) {
+            notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, name);
+            return MOD_CONT;
         }
         mi = &na->nc->memos;
         hardmax = na->nc->flags & NI_MEMO_HARDMAX ? 1 : 0;

@@ -16,16 +16,34 @@
 /*************************************************************************/
 
 /* User Modes */
-#define UMODE_a 0x00000001
-#define UMODE_h 0x00000002
-#define UMODE_i 0x00000004
-#define UMODE_o 0x00000008
-#define UMODE_r 0x00000010
-#define UMODE_w 0x00000020
-#define UMODE_A 0x00000040
-#define UMODE_g 0x80000000
-#define UMODE_x 0x40000000
-#define UMODE_R 0x80000000
+#define UMODE_a 0x00000001  /* a Services Admin */
+#define UMODE_h 0x00000002  /* h Available for help (HelpOp) */
+#define UMODE_i 0x00000004  /* i Invisible (not shown in /who) */
+#define UMODE_o 0x00000008  /* o Global IRC Operator */
+#define UMODE_r 0x00000010  /* r Identifies the nick as being registered  */
+#define UMODE_w 0x00000020  /* w Can listen to wallop messages */
+#define UMODE_A 0x00000040  /* A Server Admin */
+#define UMODE_N 0x00000080  /* N Network Administrator */
+#define UMODE_O 0x00000100  /* O Local IRC Operator */
+#define UMODE_C 0x00000200  /* C Co-Admin */
+#define UMODE_d 0x00000400  /* d Makes it so you can not receive channel PRIVMSGs */
+#define UMODE_p 0x00000800  /* Hides the channels you are in in a /whois reply  */
+#define UMODE_q 0x00001000  /* q Only U:Lines can kick you (Services Admins Only) */
+#define UMODE_s 0x00002000  /* s Can listen to server notices  */
+#define UMODE_t 0x00004000  /* t Says you are using a /vhost  */
+#define UMODE_v 0x00008000  /* v Receives infected DCC Send Rejection notices */
+#define UMODE_z 0x00010000  /* z Indicates that you are an SSL client */
+#define UMODE_B 0x00020000  /* B Marks you as being a Bot */
+#define UMODE_G 0x00040000  /* G Filters out all the bad words per configuration */
+#define UMODE_H 0x00080000  /* H Hide IRCop Status (IRCop Only) */
+#define UMODE_S 0x00100000  /* S services client */
+#define UMODE_V 0x00200000  /* V Marks you as a WebTV user */
+#define UMODE_W 0x00400000  /* W Lets you see when people do a /whois on you */
+#define UMODE_T 0x00800000  /* T Prevents you from receiving CTCPs  */
+#define UMODE_g 0x20000000  /* g Can send & read globops and locops */
+#define UMODE_x 0x40000000  /* x Gives user a hidden hostname */
+#define UMODE_R 0x80000000  /* Allows you to only receive PRIVMSGs/NOTICEs from registered (+r) users */
+
 
 /*************************************************************************/
 
@@ -43,7 +61,7 @@
 #define CMODE_r 0x00000200		/* Set for all registered channels */
 #define CMODE_c 0x00000400
 #define CMODE_A 0x00000800
-#define CMODE_H 0x00001000
+/* #define CMODE_H 0x00001000   Was now +I may not join, but Unreal Removed it and it will not set in 3.2 */
 #define CMODE_K 0x00002000
 #define CMODE_L 0x00004000
 #define CMODE_O 0x00008000
@@ -57,6 +75,7 @@
 #define CMODE_z 0x00800000
 #define CMODE_N 0x01000000
 #define CMODE_T 0x02000000
+#define CMODE_M 0x04000000
 
 /*************************************************************************/
 
@@ -77,5 +96,8 @@
 /* Default Modes with MLOCK */
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
+
+#define SJOINBANNCHAR '&'
+#define SJOINEXCEPTIONCHAR '\"'
 
 #endif

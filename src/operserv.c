@@ -3100,13 +3100,12 @@ static int do_sqline(User * u)
                 notice_lang(s_OperServ, u, USERHOST_MASK_TOO_WIDE, mask);
                 return MOD_CONT;
             }
-            if (ircd->chansqline) {
-                /* Channel SQLINEs are only supported on Bahamut servers */
-                if (*mask == '#') {
-                    notice_lang(s_OperServ, u,
-                                OPER_SQLINE_CHANNELS_UNSUPPORTED);
-                    return MOD_CONT;
-                }
+
+            /* Channel SQLINEs are only supported on Bahamut servers */
+            if (*mask == '#' && !ircd->chansqline) {
+                notice_lang(s_OperServ, u,
+                            OPER_SQLINE_CHANNELS_UNSUPPORTED);
+                return MOD_CONT;
             }
 
             deleted = add_sqline(u, mask, u->nick, expires, reason);
@@ -4460,7 +4459,7 @@ static int do_jupe(User * u)
 
             anope_cmd_squit(jserver, rbuf);
             anope_cmd_server(jserver, 1, rbuf);
-            new_server(me_server, jserver, rbuf, SERVER_JUPED);
+            new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 
             if (WallOSJupe)
                 anope_cmd_global(s_OperServ, "\2%s\2 used JUPE on \2%s\2",

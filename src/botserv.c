@@ -1236,46 +1236,9 @@ static int do_bot(User * u)
 		 **/
 
             /* Check whether it's a services client's nick and return if so - Certus */
+            /* use nickIsServices reduce the total number lines of code  - TSL */
 
-            if ((s_NickServ && (stricmp(nick, s_NickServ) == 0))
-                || (s_NickServAlias && !stricmp(nick, s_NickServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_ChanServ && (stricmp(nick, s_ChanServ) == 0))
-                       || (s_ChanServAlias
-                           && !stricmp(nick, s_ChanServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
-                       || (s_MemoServAlias
-                           && !stricmp(nick, s_MemoServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_BotServ && (stricmp(nick, s_BotServ) == 0))
-                       || (s_BotServAlias
-                           && !stricmp(nick, s_BotServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_HelpServ && (stricmp(nick, s_HelpServ) == 0))
-                       || (s_HelpServAlias
-                           && !stricmp(nick, s_HelpServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_OperServ && (stricmp(nick, s_OperServ) == 0))
-                       || (s_OperServAlias
-                           && !stricmp(nick, s_OperServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else
-                if ((s_GlobalNoticer
-                     && (stricmp(nick, s_GlobalNoticer) == 0))
-                    || (s_GlobalNoticerAlias
-                        && !stricmp(nick, s_GlobalNoticerAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_HostServ && (stricmp(nick, s_HostServ) == 0))
-                       || (s_HostServAlias
-                           && !stricmp(nick, s_HostServAlias))) {
+            if (nickIsServices(nick, 0)) {
                 notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
                 return MOD_CONT;
             }
@@ -1342,43 +1305,8 @@ static int do_bot(User * u)
             }
 
             /* Check whether it's a services client's nick and return if so - Certus */
-            if ((s_NickServ && !stricmp(nick, s_NickServ))
-                || (s_NickServAlias && !stricmp(nick, s_NickServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_ChanServ && !stricmp(nick, s_ChanServ))
-                       || (s_ChanServAlias
-                           && !stricmp(nick, s_ChanServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_MemoServ && !stricmp(nick, s_MemoServ))
-                       || (s_MemoServAlias
-                           && !stricmp(nick, s_MemoServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_BotServ && !stricmp(nick, s_BotServ))
-                       || (s_BotServAlias
-                           && !stricmp(nick, s_BotServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_HelpServ && !stricmp(nick, s_HelpServ))
-                       || (s_HelpServAlias
-                           && !stricmp(nick, s_HelpServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_OperServ && !stricmp(nick, s_OperServ))
-                       || (s_OperServAlias
-                           && !stricmp(nick, s_OperServAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_GlobalNoticer && !stricmp(nick, s_GlobalNoticer))
-                       || (s_GlobalNoticerAlias
-                           && !stricmp(nick, s_GlobalNoticerAlias))) {
-                notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
-                return MOD_CONT;
-            } else if ((s_HostServ && !stricmp(nick, s_HostServ))
-                       || (s_HostServAlias
-                           && !stricmp(nick, s_HostServAlias))) {
+            /* use nickIsServices() to reduce the number of lines of code  - TSL */
+            if (nickIsServices(nick, 0)) {
                 notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
                 return MOD_CONT;
             }

@@ -33,9 +33,6 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 void delHostCore(char *nick);
 
-char *getvIdent(char *nick);
-char *getvHost(char *nick);
-
 int is_host_setter(User * u);
 int is_host_remover(User * u);
 
@@ -881,6 +878,10 @@ int do_set(User * u)
     tmp_time = time(NULL);
 
     if ((na = findnick(nick))) {
+        if (na->status & NS_VERBOTEN) {
+            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            return MOD_CONT;
+        }
         alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
         addHostCore(nick, vIdent, hostmask, u->nick, tmp_time);
         if (vIdent) {

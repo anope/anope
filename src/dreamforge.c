@@ -89,6 +89,10 @@ IRCDVar ircd[] = {
      0,
      1,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
+     0,                         /* We support TOKENS */
+     1,                         /* TOKENS are CASE inSensitive */
+     0,                         /* TIME STAMPS are BASE64 */
+     0,                         /* +I support */
      }
     ,
     {NULL}
@@ -185,27 +189,56 @@ void anope_set_umode(User * user, int ac, char **av)
     }
 }
 
+
 unsigned long umodes[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, UMODE_A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0,
-    0,
-    0,
-    0, 0, 0, 0, 0, 0, 0,
-    0,
-    0, 0, 0, 0, 0,
-    0, UMODE_a, 0, 0, 0, 0, 0,
-    UMODE_g,
-    UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
-    0,
-    0, UMODE_r, 0, 0, 0, 0, UMODE_w,
-    0,
-    0,
-    0,
-    0, 0, 0, 0, 0
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused, Unused, Horzontal Tab */
+    0, 0, 0,                    /* Line Feed, Unused, Unused */
+    0, 0, 0,                    /* Carriage Return, Unused, Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused, Unused, Space */
+    0, 0, 0,                    /* ! " #  */
+    0, 0, 0,                    /* $ % &  */
+    0, 0, 0,                    /* ! ( )  */
+    0, 0, 0,                    /* * + ,  */
+    0, 0, 0,                    /* - . /  */
+    0, 0,                       /* 0 1 */
+    0, 0,                       /* 2 3 */
+    0, 0,                       /* 4 5 */
+    0, 0,                       /* 6 7 */
+    0, 0,                       /* 8 9 */
+    0, 0,                       /* : ; */
+    0, 0, 0,                    /* < = > */
+    0, 0,                       /* ? @ */
+    UMODE_A, 0, 0,              /* A B C */
+    0, 0, 0,                    /* D E F */
+    0, 0, 0,                    /* G H I */
+    0, 0, 0,                    /* J K L */
+    0, 0, UMODE_O,              /* M N O */
+    0, 0, 0,                    /* P Q R */
+    0, 0, 0,                    /* S T U */
+    0, 0, 0,                    /* V W X */
+    0,                          /* Y */
+    0,                          /* Z */
+    0, 0, 0,                    /* [ \ ] */
+    0, 0, 0,                    /* ^ _ ` */
+    UMODE_a, 0, UMODE_c,        /* a b c */
+    0, 0, UMODE_f,              /* d e f */
+    UMODE_g, UMODE_h, UMODE_i,  /* g h i */
+    0, UMODE_k, 0,              /* j k l */
+    0, 0, UMODE_o,              /* m n o */
+    0, 0, UMODE_r,              /* p q r */
+    UMODE_s, 0, 0,              /* s t u */
+    0, 0, 0,                    /* v w x */
+    0,                          /* y */
+    0,                          /* z */
+    0, 0, 0,                    /* { | } */
+    0, 0                        /* ~ ‚ */
 };
 
 char csmodes[128] = {
@@ -447,6 +480,10 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("UNSQLINE",  NULL); addCoreMessage(IRCD,m);
 
     m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("REHASH",     anope_event_rehash); addCoreMessage(IRCD,m);
+    m = createMessage("ADMIN",      anope_event_admin); addCoreMessage(IRCD,m);
+    m = createMessage("CREDITS",    anope_event_credits); addCoreMessage(IRCD,m);
+
 
 }
 
@@ -467,6 +504,11 @@ void anope_cmd_sqline(char *mask, char *reason)
 void anope_cmd_svsnoop(char *server, int set)
 {
     send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+}
+
+void anope_cmd_svsadmin(char *server, int set)
+{
+    anope_cmd_svsnoop(server, set);
 }
 
 void anope_cmd_remove_akill(char *user, char *host)
@@ -563,6 +605,7 @@ void anope_pong(char *servname)
 
 void anope_cmd_connect(int servernum)
 {
+    anope_cmd_capab();
     if (servernum == 1)
         anope_cmd_pass(RemotePassword);
     if (servernum == 2)
@@ -576,6 +619,11 @@ void anope_cmd_connect(int servernum)
 void anope_cmd_pass(char *pass)
 {
     send_cmd(NULL, "PASS :%s", pass);
+}
+
+void anope_cmd_capab()
+{
+    send_cmd(NULL, "PROTOCTL NOQUIT");
 }
 
 void anope_cmd_bot_chan_mode(char *nick, char *chan)
@@ -1016,6 +1064,7 @@ void anope_cmd_211(const char *fmt, ...)
 
 void anope_cmd_nick(char *nick, char *name, char *modes)
 {
+    EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
              ServiceUser, ServiceHost, ServerName, name);
     anope_cmd_mode(nick, nick, "%s", modes);
@@ -1049,7 +1098,7 @@ int anope_event_server(char *source, int ac, char **av)
 
     if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
-    do_server(source, ac, av);
+    do_server(source, av[0], av[1], av[2], NULL);
     return MOD_CONT;
 }
 
@@ -1127,6 +1176,7 @@ void anope_cmd_pong(char *servname, char *who)
 void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
+    EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick, time(NULL),
              user, host, ServerName, real);
     anope_cmd_mode(nick, "MODE %s %s", nick, modes);
@@ -1243,6 +1293,46 @@ void anope_cmd_chg_nick(char *oldnick, char *newnick)
     }
 
     send_cmd(oldnick, "NICK %s", newnick);
+}
+
+void anope_cmd_svsjoin(char *source, char *nick, char *chan)
+{
+    /* Not Supported by this IRCD */
+}
+
+void anope_cmd_svspart(char *source, char *nick, char *chan)
+{
+    /* Not Supported by this IRCD */
+}
+
+void anope_cmd_swhois(char *source, char *who, char *mask)
+{
+    /* not supported */
+}
+
+int anope_event_rehash(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_credits(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_admin(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_flood_mode_check(char *value)
+{
+    return 0;
+}
+
+void anope_cmd_eob()
+{
+    /* Not supported  */
 }
 
 #endif

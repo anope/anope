@@ -33,7 +33,6 @@ unsigned int guestnum;          /* Current guest number */
 
 extern char *getvHost(char *nick);
 
-static int is_on_access(User * u, NickCore * nc);
 void alpha_insert_alias(NickAlias * na);
 void insert_core(NickCore * nc);
 void insert_requestnick(NickRequest * nr);
@@ -41,7 +40,6 @@ static NickAlias *makenick(const char *nick);
 static NickRequest *makerequest(const char *nick);
 static NickAlias *makealias(const char *nick, NickCore * nc);
 static void change_core_display(NickCore * nc, char *newdisplay);
-static int group_identified(User * u, NickCore * nc);
 
 static void collide(NickAlias * na, int from_timeout);
 static void release(NickAlias * na, int from_timeout);
@@ -1188,7 +1186,7 @@ int nick_recognized(User * u)
 
 /* Returns whether a user is identified AND in the group nc */
 
-static int group_identified(User * u, NickCore * nc)
+int group_identified(User * u, NickCore * nc)
 {
     return nick_identified(u) && u->na->nc == nc;
 }
@@ -1302,7 +1300,7 @@ NickCore *findcore(const char *nick)
 /* Is the given user's address on the given nick's access list?  Return 1
  * if so, 0 if not. */
 
-static int is_on_access(User * u, NickCore * nc)
+int is_on_access(User * u, NickCore * nc)
 {
     int i;
     char *buf;
@@ -2499,6 +2497,12 @@ static int do_identify(User * u)
         /* Enable nick tracking if enabled */
         if (NSNickTracking)
             nsStartNickTracking(u);
+
+        /* Clear any timers */
+        if (na->nc->flags & NI_KILLPROTECT) {
+            del_ns_timeout(na, TO_COLLIDE);
+        }
+
     }
     return MOD_CONT;
 }
@@ -2614,7 +2618,9 @@ static int do_logout(User * u)
             u2->na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
         }
 
-        common_svsmode(u2, "-r+d", "1");
+        if (ircd->modeonreg) {
+            common_svsmode(u2, ircd->modeonreg, "1");
+        }
 
         u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
         alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
@@ -2628,6 +2634,12 @@ static int do_logout(User * u)
         /* Stop nick tracking if enabled */
         if (NSNickTracking)
             nsStopNickTracking(u);
+
+        /* Clear any timers again */
+        if (u->na->nc->flags & NI_KILLPROTECT) {
+            del_ns_timeout(u->na, TO_COLLIDE);
+        }
+
     }
     return MOD_CONT;
 }
@@ -3286,7 +3298,7 @@ static int do_info(User * u)
                                 s_NickServ, nr->nick);
                 }
             }
-        } else if (nickIsServices(nick)) {
+        } else if (nickIsServices(nick, 1)) {
             notice_lang(s_NickServ, u, NICK_X_IS_SERVICES, nick);
         } else {
             notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
@@ -3390,12 +3402,14 @@ static int do_info(User * u)
         if (show_hidden) {
             if (s_HostServ && ircd->vhost) {
                 if (getvHost(na->nick) != NULL) {
-                    vHost = smalloc(strlen(getvHost(na->nick)) + 2);
-                    bzero(vHost, sizeof(vHost));
-                    snprintf(vHost, strlen(getvHost(na->nick)) + 2, "%s",
-                             getvHost(na->nick));
-                    notice_lang(s_NickServ, u, NICK_INFO_VHOST, vHost);
-                    free(vHost);
+                    if (ircd->vident && getvIdent(na->nick) != NULL) {
+                        notice_lang(s_NickServ, u, NICK_INFO_VHOST2,
+                                    getvIdent(na->nick),
+                                    getvHost(na->nick));
+                    } else {
+                        notice_lang(s_NickServ, u, NICK_INFO_VHOST,
+                                    getvHost(na->nick));
+                    }
                 }
             }
             if (na->nc->greet)

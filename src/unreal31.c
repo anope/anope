@@ -91,6 +91,9 @@ IRCDVar ircd[] = {
      0,
      1,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
+     0,                         /* We support Unreal TOKENS */
+     1,                         /* TOKENS are CASE inSensitive */
+     1,                         /* validate - to the #:# standard */
      },
     {NULL}
 };
@@ -451,6 +454,18 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
     m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
     m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
+    m = createMessage("REHASH",     anope_event_rehash); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("O",        anope_event_rehash); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("ADMIN",      anope_event_admin); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("@",        anope_event_admin); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("CREDITS",    anope_event_credits); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("AJ",       anope_event_credits); addCoreMessage(IRCD,m);
+    }
 }
 
 /* *INDENT-ON* */
@@ -465,6 +480,11 @@ int anope_event_capab(char *source, int ac, char **av)
 void anope_cmd_svsnoop(char *server, int set)
 {
     send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+}
+
+void anope_cmd_svsadmin(char *server, int set)
+{
+    anope_cmd_svsnoop(server, set);
 }
 
 void anope_cmd_remove_akill(char *user, char *host)
@@ -547,6 +567,7 @@ void anope_cmd_376(char *source)
 
 void anope_cmd_nick(char *nick, char *name, char *modes)
 {
+    EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
              ServiceUser, ServiceHost, ServerName, modes, name);
     anope_cmd_sqline(nick, "Reserved for services");
@@ -580,6 +601,7 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
 void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                         char *modes)
 {
+    EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick, time(NULL),
              user, host, ServerName, modes, real);
     anope_cmd_sqline(nick, "Reserved for services");
@@ -1356,7 +1378,7 @@ int anope_event_server(char *source, int ac, char **av)
 
     if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
-    do_server(source, ac, av);
+    do_server(source, av[0], av[1], av[2], NULL);
     return MOD_CONT;
 }
 
@@ -1453,6 +1475,66 @@ void anope_cmd_svid_umode2(User * u, char *ts)
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
     /* not used */
+}
+
+/* svsjoin
+	parv[0] - sender
+	parv[1] - nick to make join
+	parv[2] - channel(s) to join
+*/
+void anope_cmd_svsjoin(char *source, char *nick, char *chan)
+{
+    send_cmd(source, "SVSJOIN %s :%s", nick, chan);
+}
+
+/* svspart
+	parv[0] - sender
+	parv[1] - nick to make part
+	parv[2] - channel(s) to part
+*/
+void anope_cmd_svspart(char *source, char *nick, char *chan)
+{
+    send_cmd(source, "SVSPART %s :%s", nick, chan);
+}
+
+void anope_cmd_swhois(char *source, char *who, char *mask)
+{
+    /* Can anyone tell me if 3.1 has this? */
+}
+
+void anope_cmd_eob()
+{
+    /* Can anyone tell me if 3.1 has this? */
+}
+
+
+int anope_event_rehash(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_credits(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_event_admin(char *source, int ac, char **av)
+{
+    return MOD_CONT;
+}
+
+int anope_flood_mode_check(char *value)
+{
+    char *dp, *end;
+
+    if (value && *value != ':'
+        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
+        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
+        && (*end == 0)) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 #endif

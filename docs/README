@@ -63,13 +63,15 @@ Anope credits:
     Lucas Nussbaum <lucas@lucas-nussbaum.net>
     Pieter Bootsma <geniusdex@anope.org>
     Thomas Juberg Stensås <ShadowMaster@Shadow-Realm.org>
-    Trystan .S Lee <trystan@anope.org>
+    Trystan .S Lee <trystan@nomadirc.net>
     openglx <openglx@brasnerd.com.br>
 Anope Translations:
     GeniusDex <geniusdex@anope.org> (nl.l)
     Oleg Nikolaev aka Isot <isot@complife.ru> (ru.l)
     Stuff <the.stuff@gmx.de> (de.l)
     DrStein <gacevedo@anope.org> (es.l)
+    Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
+    Mateusz Szczyrzyca <annihilator@ircnet.pl> (pl.l)
 
     
 2. PRESENTATION
@@ -130,7 +132,7 @@ Anope currently works with:
   - ViagraIRCd 1.3 or later
   - Hybrid 7 or later
   - PTlink 6.15 or later
-  - RageIRCd 2.0 beta-3 or later
+  - RageIRCd 2.0 beta-6 or later
 
 Anope could also work with some of the daemons derived by the ones 
 listed above, but there's no support for them if they work or don't

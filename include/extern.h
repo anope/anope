@@ -59,13 +59,14 @@ E CMMode cmmodes[128];
 E unsigned long umodes[128];
 E char csmodes[128];
 
-extern void do_mass_mode(char *modes);
 extern void add_ban(Channel * chan, char *mask);
 extern void chan_adduser2(User * user, Channel * c);
+extern void add_invite(Channel * chan, char *mask);
 extern void chan_delete(Channel * c);
 extern void del_ban(Channel * chan, char *mask);
 extern void set_key(Channel * chan, char *value);
 extern void set_limit(Channel * chan, char *value);
+extern void del_invite(Channel * chan, char *mask);
 extern char *get_key(Channel * chan);
 extern char *get_limit(Channel * chan);
 extern Channel *chan_create(char *chan);
@@ -291,7 +292,9 @@ E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;
 E int   UseSVSHOLD;
+E int   UseSVS2MODE;
 E int   RestrictOperNicks;
+E int   UseTokens;
 
 E char **HostSetters;
 E int HostNumber;
@@ -508,6 +511,8 @@ E void helpserv_init(void);
 /**** hostserv.c  ****/
 E void hostserv_init(void);
 E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
+E char *getvIdent(char *nick);
+E char *getvHost(char *nick);
 
 /**** init.c ****/
 
@@ -642,9 +647,10 @@ E char *myStrGetOnlyToken(const char *str, const char dilim,
 E char *myStrSubString(const char *src, int start, int end);
 E char *myStrGetTokenRemainder(const char *str, const char dilim,
         int token_number);
+E int myNumToken(const char *str, const char dilim);
 E void doCleanBuffer(char *str);
 E void EnforceQlinedNick(char *nick, char *killer);
-E int nickIsServices(char *nick);
+E int nickIsServices(char *nick, int bot);
 
 E void add_entropy_userkeys(void);
 E void rand_init(void);
@@ -705,6 +711,8 @@ E void nsStartNickTracking(User * u);
 E void nsStopNickTracking(User * u);
 E int nsCheckNickTracking(User *u);
 
+E int group_identified(User * u, NickCore * nc);
+E int is_on_access(User * u, NickCore * nc);
 
 /**** operserv.c  ****/
 
@@ -800,13 +808,14 @@ E Server *first_server(int flags);
 E Server *next_server(int flags);
 
 E Server *new_server(Server * uplink, const char *name, const char *desc,
-                   uint16 flags);
+                   uint16 flags, char *suid);
 
 E Server *findserver(Server *s, const char *name);
 
-E void do_server(const char *source, int ac, char **av);
+E void do_server(const char *source, char *servername, char *hops, char *descript, char *numeric);
 E void do_squit(const char *source, int ac, char **av);
 E void capab_parse(int ac, char **av);
+E int anope_check_sync(const char *name);
 
 /**** sessions.c ****/
 
@@ -864,6 +873,7 @@ E User *do_nick(const char *source, char *nick, char *username, char *host,
               char *server, char *realname, time_t ts, uint32 svid, uint32 ip, char *vhost, char *uid);
 
 E void do_umode(const char *source, int ac, char **av);
+E void do_umode2(const char *source, int ac, char **av);
 E void do_quit(const char *source, int ac, char **av);
 E void do_kill(char *source, char *reason);
 
@@ -874,6 +884,7 @@ E int is_excepted(ChannelInfo * ci, User * user);
 E int is_excepted_mask(ChannelInfo * ci, char *mask);
 
 E int match_usermask(const char *mask, User * user);
+E int match_userip(const char *mask, User * user, char *host);
 E void split_usermask(const char *mask, char **nick, char **user,
                       char **host);
 E char *create_mask(User * u);
@@ -978,19 +989,27 @@ extern void anope_cmd_sqline(char *mask, char *reason);                   	  		 
 extern void anope_cmd_szline(char *mask, char *reason);			  	  		  /* SZLINE */
 extern void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
 extern void anope_cmd_svinfo();						  	  		  /* SVINFO */
+extern void anope_cmd_svsadmin(char *server, int set);						  /* SVSADMIN */
 extern void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
 extern void anope_cmd_release_svshold(char *nick);				  		  /* SVSHOLD */
 extern void anope_cmd_svsinfo();								  /* SVSINFO */
+extern void anope_cmd_svsjoin(char *source, char *nick,char *chan);          	  		  /* SVSJOIN */
 extern void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
 extern void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
 extern void anope_cmd_svsnick(char *nick,char *newnick, time_t when);     	  		  /* SVSNICK */
 extern void anope_cmd_svsnoop(char *server, int set);			  	  		  /* SVSNOOP */
 extern void anope_cmd_svso(char *source,char *nick, char *flag);          	  		  /* SVSO   */
+extern void anope_cmd_svspart(char *source, char *nick,char *chan);          	  		  /* SVSPART   */
+extern void anope_cmd_swhois(char *source, char *who, char *mask);	  	  		  /* SWHOIS */
 extern void anope_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when); /* TOPIC */
 extern void anope_cmd_unsgline(char *mask);				  	  		  /* UNSGLINE */
 extern void anope_cmd_unsqline(char *user);                               	  		  /* UNSQLINE */
 extern void anope_cmd_unszline(char *mask);				  	  		  /* UNSZLINE */
+extern void anope_cmd_eob();									  /* EOB - end of burst */
+extern void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
+extern void anope_cmd_svswatch(char *sender, char *nick, char *parm);
 
+extern int anope_event_482(char *source, int ac, char **av);
 extern int anope_event_436(char *source, int ac, char **av);
 extern int anope_event_away(char *source, int ac, char **av);
 extern int anope_event_ping(char *source, int ac, char **av);
@@ -1028,27 +1047,51 @@ extern int anope_event_snick(char *source, int ac, char **av);
 extern int anope_event_vhost(char *source, int ac, char **av);
 extern int anope_event_tkl(char *source, int ac, char **av);
 extern int anope_event_eos(char *source, int ac, char **av);
+extern int anope_event_eob(char *source, int ac, char **av);
 extern int anope_event_pass(char *source, int ac, char **av);
 extern int anope_event_netinfo(char *source, int ac, char **av);
 extern int anope_event_error(char *source, int ac, char **av);
 extern int anope_event_eb(char *source, int ac, char **av);
 extern int anope_event_netctrl(char *source, int ac, char **av);
 extern int anope_event_notice(char *source, int ac, char **av);
+extern int anope_event_snotice(char *source, int ac, char **av);
 extern int anope_event_sqline(char *source, int ac, char **av);
 extern int anope_event_error(char *source, int ac, char **av);
 extern int anope_event_smo(char *source, int ac, char **av);
 extern int anope_event_myid(char *source, int ac, char **av);
 extern int anope_event_vctrl(char *source, int ac, char **av);
+extern int anope_event_tctrl(char *source, int ac, char **av);
 extern int anope_event_netinfo(char *source, int ac, char **av);
 extern int anope_event_snetinfo(char *source, int ac, char **av);
+extern int anope_event_umode2(char *source, int ac, char **av);
+extern int anope_event_globops(char *source, int ac, char **av);
+extern int anope_event_swhois(char *source, int ac, char **av);
+extern int anope_event_burst(char *source, int ac, char **av);
+extern int anope_event_luserslock(char *source, int ac, char **av);
+extern int anope_event_admin(char *source, int ac, char **av);
+extern int anope_event_credits(char *source, int ac, char **av);
+extern int anope_event_rehash(char *source, int ac, char **av);
+extern int anope_event_sdesc(char *source, int ac, char **av);
+extern int anope_event_netglobal(char *source, int ac, char **av);
+extern int anope_event_invite(char *source, int ac, char **av);
 
 extern void anope_set_umode(User * user, int ac, char **av);
 extern void anope_cmd_svid_umode(char *nick, time_t ts);
 extern void anope_cmd_svid_umode2(User *u, char *ts);
 extern void anope_cmd_svid_umode3(User *u, char *ts);
 extern void anope_cmd_nc_change(User *u);
+extern int anope_flood_mode_check(char *value);
 
 extern char *common_get_vident(User *u);
 extern char *common_get_vhost(User *u);
+extern char *send_token(char *token1, char *token2);
+extern char *base64enc(long i);
+extern long base64dec(char *b64);
+extern long base64dects(char *ts);
+
+#define Anope_Free(x)       if ((x) != NULL) free(x)
+
+extern char *host_resolve(char *host);
+
 
 #endif	/* EXTERN_H */

@@ -2038,8 +2038,16 @@ int delchan(ChannelInfo * ci)
     int i;
     NickCore *nc = ci->founder;
 
+    if (debug >= 2) {
+        alog("debug: delchan removing %s", ci->name);
+    }
+
     if (ci->bi) {
         ci->bi->chancount--;
+    }
+
+    if (debug >= 2) {
+        alog("debug: delchan top of removing the bot");
     }
     if (ci->c) {
         if (ci->bi && ci->c->usercount >= BSMinUsers) {
@@ -2047,10 +2055,19 @@ int delchan(ChannelInfo * ci)
         }
         ci->c->ci = NULL;
     }
+    if (debug >= 2) {
+        alog("debug: delchan() Bot has been removed moving on");
+    }
 #ifdef USE_RDB
+    if (debug >= 2) {
+        alog("debug: delchan() rdb updating");
+    }
     if (rdb_open()) {
         rdb_cs_delchan(ci);
         rdb_close();
+    }
+    if (debug >= 2) {
+        alog("debug: delchan() rdb done");
     }
 #endif
     if (ci->next)
@@ -2079,6 +2096,9 @@ int delchan(ChannelInfo * ci)
         free(ci->forbidreason);
     if (ci->access)
         free(ci->access);
+    if (debug >= 2) {
+        alog("debug: delchan() top of the akick list");
+    }
     for (i = 0; i < ci->akickcount; i++) {
         if (!(ci->akick[i].flags & AK_ISNICK) && ci->akick[i].u.mask)
             free(ci->akick[i].u.mask);
@@ -2087,10 +2107,16 @@ int delchan(ChannelInfo * ci)
         if (ci->akick[i].creator)
             free(ci->akick[i].creator);
     }
+    if (debug >= 2) {
+        alog("debug: delchan() done with the akick list");
+    }
     if (ci->akick)
         free(ci->akick);
     if (ci->levels)
         free(ci->levels);
+    if (debug >= 2) {
+        alog("debug: delchan() top of the memo list");
+    }
     if (ci->memos.memos) {
         for (i = 0; i < ci->memos.memocount; i++) {
             if (ci->memos.memos[i].text)
@@ -2099,21 +2125,38 @@ int delchan(ChannelInfo * ci)
         }
         free(ci->memos.memos);
     }
+    if (debug >= 2) {
+        alog("debug: delchan() done with the memo list");
+    }
     if (ci->ttb)
         free(ci->ttb);
+
+    if (debug >= 2) {
+        alog("debug: delchan() top of the badword list");
+    }
     for (i = 0; i < ci->bwcount; i++) {
         if (ci->badwords[i].word)
             free(ci->badwords[i].word);
     }
     if (ci->badwords)
         free(ci->badwords);
+    if (debug >= 2) {
+        alog("debug: delchan() done with the badword list");
+    }
 
+
+    if (debug >= 2) {
+        alog("debug: delchan() calling on moduleCleanStruct()");
+    }
     moduleCleanStruct(&ci->moduleData);
 
     free(ci);
     if (nc)
         nc->channelcount--;
 
+    if (debug >= 2) {
+        alog("debug: delchan() all done");
+    }
     return 1;
 }
 
@@ -2342,16 +2385,11 @@ char *cs_get_redirect(ChannelInfo * ci)
 
 void cs_set_flood(ChannelInfo * ci, char *value)
 {
-    char *dp, *end;
-
     if (ci->mlock_flood)
         free(ci->mlock_flood);
 
     /* This looks ugly, but it works ;) */
-    if (value && *value != ':'
-        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
-        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
-        && (*end == 0)) {
+    if (anope_flood_mode_check(value)) {
         ci->mlock_flood = sstrdup(value);
     } else {
         ci->mlock_on &= ~ircd->chan_fmode;
@@ -5645,6 +5683,30 @@ static int do_clear(User * u)
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
         free(excepts);
+
+    } else if (ircd->invitemode && stricmp(what, "invites") == 0) {
+        char *av[3];
+        int i;
+
+        /* Save original except info */
+        int count = c->invitecount;
+        char **invites = scalloc(sizeof(char *) * count, 1);
+        for (i = 0; i < count; i++)
+            invites[i] = sstrdup(c->invite[i]);
+
+        for (i = 0; i < count; i++) {
+            av[0] = sstrdup(chan);
+            av[1] = sstrdup("-I");
+            av[2] = invites[i];
+            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
+            do_cmode(s_ChanServ, 3, av);
+            free(av[2]);
+            free(av[1]);
+            free(av[0]);
+        }
+        notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
+        free(invites);
+
     } else if (stricmp(what, "modes") == 0) {
         char buf[BUFSIZE], *end = buf;
         char *argv[2];

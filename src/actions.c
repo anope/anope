@@ -113,11 +113,15 @@ void common_unban(ChannelInfo * ci, char *nick)
     int count, i;
     char *av[3], **bans;
     User *u;
+    char *host;
 
-    if (!ci || !ci->c || !ci->bi || !nick)
+    if (!ci || !ci->c || !nick)
         return;
+
     if (!(u = finduser(nick)))
         return;
+
+    host = host_resolve(u->host);
 
     if (ircd->svsmode_unban) {
         anope_cmd_unban(ci->name, nick);
@@ -131,7 +135,15 @@ void common_unban(ChannelInfo * ci, char *nick)
             if (match_usermask(bans[i], u)) {
                 anope_cmd_mode(whosends(ci), ci->name, "-b %s", bans[i]);
                 av[2] = bans[i];
-                do_cmode(ci->bi->nick, 3, av);
+                do_cmode(whosends(ci), 3, av);
+            }
+            if (host) {
+                if (match_userip(bans[i], u, host)) {
+                    anope_cmd_mode(whosends(ci), ci->name, "-b %s",
+                                   bans[i]);
+                    av[2] = bans[i];
+                    do_cmode(whosends(ci), 3, av);
+                }
             }
         }
         free(bans);

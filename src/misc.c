@@ -663,7 +663,7 @@ void EnforceQlinedNick(char *nick, char *killer)
     }
 }
 
-int nickIsServices(char *nick)
+int nickIsServices(char *nick, int bot)
 {
     int found = 0;
 
@@ -704,7 +704,7 @@ int nickIsServices(char *nick)
     else if (s_GlobalNoticerAlias
              && (stricmp(nick, s_GlobalNoticerAlias) == 0))
         found++;
-    else if (s_BotServ) {
+    else if (s_BotServ && bot) {
         BotInfo *bi;
         int i;
         for (i = 0; i < 256; i++) {
@@ -829,6 +829,60 @@ u_int32_t getrandom32(void)
     val |= getrandom8() << 8;
     val |= getrandom8();
     return val;
+}
+
+char *send_token(char *token1, char *token2)
+{
+ if (UseTokens && ircd->token && ircdcap->token) {
+      return token2;
+  }
+  else {
+   return token1;
+  }
+}
+
+int myNumToken(const char *str, const char dilim)
+{
+    int len, idx, counter = 0, start_pos = 0;
+    if (!str) {
+        return 0;
+    }
+    len = strlen(str);
+    for (idx = 0; idx <= len; idx++) {
+        if ((str[idx] == dilim) || (idx == len)) {
+                start_pos = idx + 1;
+                counter++;
+        }
+    }
+    return counter;
+}
+
+
+char *host_resolve(char *host)
+{
+    struct hostent *hentp = NULL;
+    uint32 ip = INADDR_NONE;
+    char ipbuf[16];
+    char *ipreturn;
+    struct in_addr addr;
+
+    ipreturn = NULL;
+
+    hentp = gethostbyname(host);
+
+    if (hentp) {
+        memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
+        addr.s_addr = ip;
+        ntoa(addr, ipbuf, sizeof(ipbuf));
+        ipreturn = strdup(ipbuf);
+        if (debug) {
+	  alog("Resolved %s to %s",host, ipbuf);
+        }
+        return ipreturn;
+    }
+    else {
+	return ipreturn;
+    }
 }
 
 

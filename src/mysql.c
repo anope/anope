@@ -58,6 +58,7 @@ int db_mysql_init()
     } else {
         do_mysql = 1;
         alog("MySQL has been enabled.");
+        alog("MySQL client version %s.",mysql_get_client_info());
     }
 
     /* The following configuration options are required.

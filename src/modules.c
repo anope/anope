@@ -1054,10 +1054,24 @@ Message *findMessage(MessageHash * msgTable[], const char *name)
     idx = CMD_HASH(name);
 
     for (current = msgTable[idx]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            return current->m;
+ 	if (UseTokens) {
+ 	 if (ircd->tokencaseless) {
+	  if (stricmp(name, current->name) == 0) {
+	    return current->m;
+	  }
+	 }
+ 	 else {
+	   if (strcmp(name, current->name) == 0) {
+	        return current->m;
+ 	   }
+         }
+	}
+	else {
+         if (stricmp(name, current->name) == 0) {
+             return current->m;
+         }
         }
-    }
+     }
     return NULL;
 }
 

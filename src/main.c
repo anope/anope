@@ -503,8 +503,9 @@ int main(int ac, char **av, char **envp)
             int errno_save = errno;
             quitmsg = scalloc(BUFSIZE, 1);
             if (quitmsg) {
-                snprintf(quitmsg, BUFSIZE, "Read error from server: %s",
-                         strerror(errno_save));
+                snprintf(quitmsg, BUFSIZE,
+                         "Read error from server: %s (error num: %d)",
+                         strerror(errno_save), errno_save);
             } else {
                 quitmsg = "Read error from server";
             }

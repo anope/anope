@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="356"
+VERSION_BUILD="362"
 
 # $Log$
+#
+# BUILD : 1.7.5 (362)
+# BUGS  : 17 143 147 166 172 173
+# NOTES : Applied patch 927 provided by Trystan.
 #
 # BUILD : 1.7.5 (356)
 # BUGS  : N/A

@@ -1,13 +1,13 @@
 MYSQL_OBJ = $(MYSQL:.c=.o)
 RDB_OBJ = $(RDB:.c=.o)
-OBJS =  actions.o botserv.o channels.o chanserv.o commands.o compat.o converter.o \
+OBJS =  actions.o base64.o botserv.o channels.o chanserv.o commands.o compat.o converter.o \
         config.o datafiles.o encrypt.o helpserv.o hostserv.o init.o language.o list.o log.o mail.o main.o \
 	memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 	process.o proxy.o send.o servers.o sessions.o slist.o sockutil.o \
 	timeout.o users.o dreamforge.o bahamut.o unreal31.o ultimate2.o ultimate3.o \
         hybrid.o ptlink.o viagra.o rageircd.o unreal32.o \
 	$(VSNPRINTF_O) $(RDB_OBJ) $(MYSQL_OBJ)
-SRCS =  actions.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
+SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c converter.c \
         config.c datafiles.c encrypt.c helpserv.c hostserv.c init.c language.c list.c log.c mail.c main.c \
         memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
         process.c proxy.c send.c servers.c sessions.c slist.c sockutil.c \

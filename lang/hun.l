@@ -19,8 +19,8 @@
 # messages need to take the same parameters in the same order as the
 # English messages do.  (Obviously, this doesn't hold for the strftime()
 # format lines immediately below.)  If you can't get a natural translation
-# of a message without changing the order of the parameters, let me know
-# (achurch@dragonfire.net) which message is causing a problem and I'll see
+# of a message without changing the order of the parameters, let us know
+# (dev@anope.org) which message is causing a problem and I'll see
 # what I can do.
 #
 # In help messages, "%S" (capital S, not lowercase) refers to the name of
@@ -577,6 +577,8 @@ NICK_INFO_EMAIL
 	E-mail cím: %s
 NICK_INFO_VHOST
 	vhost: %s
+NICK_INFO_VHOST2
+	vhost: %s@%s
 NICK_INFO_ICQ
 	ICQ #: %d
 NICK_INFO_GREET
@@ -1419,6 +1421,8 @@ CHAN_CLEARED_VOICES
 	A (%s) csatornán minden +v mód levéve.
 CHAN_CLEARED_USERS
 	A (%s) csatornáról minden felhasználó ki lett rúgva.
+CHAN_CLEARED_INVITES
+	All invites on channel %s have been removed.
 
 # GETPASS válaszok
 CHAN_GETPASS_SYNTAX

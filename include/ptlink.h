@@ -30,6 +30,19 @@
 #define UMODE_r 0x00000010
 #define UMODE_w 0x00000020
 #define UMODE_A 0x00000040
+#define UMODE_B 0x00000080
+#define UMODE_H 0x00000100
+#define UMODE_N 0x00000200
+#define UMODE_O 0x00000400
+#define UMODE_p 0x00000800
+#define UMODE_R 0x00001000
+#define UMODE_s 0x00002000
+#define UMODE_S 0x00004000
+#define UMODE_T 0x00008000
+#define UMODE_v 0x00001000
+#define UMODE_y 0x00002000
+#define UMODE_z 0x00004000
+
 
 
 #define CMODE_i 0x00000001
@@ -52,6 +65,7 @@
 #define CMODE_N 0x00080000
 #define CMODE_R 0x00000100		/* Only identified users can join */
 #define CMODE_r 0x00000200		/* Set for all registered channels */
+#define CMODE_C 0x00100000
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 

@@ -245,7 +245,11 @@ struct ircdvars_ {
 	uint32 chan_lmode;			/* Mode				*/
 	int check_nick_id;			/* On nick change check if they could be identified */
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
-	char *chanmodes;				/* If the ircd sends CHANMODE in CAPAB this is where we store it */
+	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
+	int token;				/* Does Anope support the tokens for the ircd */
+	int tokencaseless;			/* TOKEN are not case senstive - most its Unreal that is case senstive */
+	int sjb64;				/* Base 64 encode TIMESTAMP */
+        int invitemode;				/* +I  */
 };
 
 struct ircdcapab_ {
@@ -278,6 +282,7 @@ struct ircdcapab_ {
   uint32 dodkey;
   uint32 dozip;
   uint32 chanmodes;
+  uint32 sjb64;
 };
 
 /*************************************************************************/
@@ -658,6 +663,7 @@ struct server_ {
     char *desc;		/* Server description 			*/
     uint16 flags;	/* Some info flags, as defined below 	*/
     char *suid;		/* Server Univeral ID		     	*/
+    int sync;	        /* Whether is synced or not	        */
 
     Server *links;	/* Linked list head for linked servers 	*/
     Server *uplink;	/* Server which pretends to be the uplink */
@@ -800,6 +806,8 @@ struct channel_ {
     char **bans;
     int32 exceptcount, exceptsize;
     char **excepts;
+    int32 invitecount, invitesize;
+    char **invite;
     struct c_userlist {
 		struct c_userlist *next, *prev;
 		User *user;
@@ -1072,7 +1080,7 @@ struct hostcache_ {
 #define CAPAB_VL        0x04000000
 #define CAPAB_TLKEXT    0x08000000
 #define CAPAB_CHANMODE  0x10000000
-
+#define CAPAB_SJB64     0x20000000
 
 /*************************************************************************/
 

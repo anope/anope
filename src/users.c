@@ -383,6 +383,12 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         if (debug)
             alog("debug: new user: %s", nick);
 
+        if (ircd->nickip && ip) {
+            addr.s_addr = htonl(ip);
+            ntoa(addr, ipbuf, sizeof(ipbuf));
+        }
+
+
         if (LogUsers) {
         /**
 	 * Ugly swap routine for Flop's bug :)
@@ -397,11 +403,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         /**
 	 * End of ugly swap
 	 **/
-
-            if (ircd->nickip) {
-                addr.s_addr = htonl(ip);
-                ntoa(addr, ipbuf, sizeof(ipbuf));
-            }
 
             if (ircd->nickvhost) {
                 if (ircd->nickip) {
@@ -647,6 +648,24 @@ void do_umode(const char *source, int ac, char **av)
     anope_set_umode(user, ac - 1, &av[1]);
 }
 
+/* Handle a UMODE2 command for a user.
+ *	av[0] = modes
+ */
+
+void do_umode2(const char *source, int ac, char **av)
+{
+    User *user;
+
+    user = finduser(source);
+    if (!user) {
+        alog("user: MODE %s for nonexistent nick %s: %s", av[0], source,
+             merge_args(ac, av));
+        return;
+    }
+
+    anope_set_umode(user, ac - 1, &av[0]);
+}
+
 /*************************************************************************/
 
 /* Handle a QUIT command.
@@ -828,6 +847,45 @@ int match_usermask(const char *mask, User * user)
     } else {
         result = match_wild_nocase(username, user->username)
             && (match_wild_nocase(host, user->host)
+                || match_wild_nocase(host, user->vhost));
+    }
+
+    free(mask2);
+    return result;
+}
+
+
+/*************************************************************************/
+
+/* simlar to match_usermask, except here we pass the host as the IP */
+
+int match_userip(const char *mask, User * user, char *iphost)
+{
+    char *mask2 = sstrdup(mask);
+    char *nick, *username, *host;
+    int result;
+
+    if (strchr(mask2, '!')) {
+        nick = strtok(mask2, "!");
+        username = strtok(NULL, "@");
+    } else {
+        nick = NULL;
+        username = strtok(mask2, "@");
+    }
+    host = strtok(NULL, "");
+    if (!username || !host) {
+        free(mask2);
+        return 0;
+    }
+
+    if (nick) {
+        result = match_wild_nocase(nick, user->nick)
+            && match_wild_nocase(username, user->username)
+            && (match_wild_nocase(host, iphost)
+                || match_wild_nocase(host, user->vhost));
+    } else {
+        result = match_wild_nocase(username, user->username)
+            && (match_wild_nocase(host, iphost)
                 || match_wild_nocase(host, user->vhost));
     }
 

@@ -49,25 +49,8 @@ int m_kill(char *nick, char *msg)
     BotInfo *bi;
 
     /* Recover if someone kills us. */
-    if (stricmp(nick, s_OperServ) == 0 ||
-        (s_OperServAlias && stricmp(nick, s_OperServAlias) == 0) ||
-        stricmp(nick, s_NickServ) == 0 ||
-        (s_NickServAlias && stricmp(nick, s_NickServAlias) == 0) ||
-        stricmp(nick, s_ChanServ) == 0 ||
-        (s_ChanServAlias && stricmp(nick, s_ChanServAlias) == 0) ||
-        stricmp(nick, s_MemoServ) == 0 ||
-        (s_MemoServAlias && stricmp(nick, s_MemoServAlias) == 0) ||
-        (s_HostServ && stricmp(nick, s_HostServ) == 0) ||
-        (s_HostServAlias && stricmp(nick, s_HostServAlias) == 0) ||
-        (s_BotServ && stricmp(nick, s_BotServ) == 0) ||
-        (s_BotServAlias && stricmp(nick, s_BotServAlias) == 0) ||
-        stricmp(nick, s_HelpServ) == 0 ||
-        (s_HelpServAlias && stricmp(nick, s_HelpServAlias) == 0) ||
-        (s_DevNull && stricmp(nick, s_DevNull) == 0) ||
-        (s_DevNullAlias && stricmp(nick, s_DevNullAlias) == 0) ||
-        stricmp(nick, s_GlobalNoticer) == 0 ||
-        (s_GlobalNoticerAlias && stricmp(nick, s_GlobalNoticerAlias) == 0)
-        ) {
+    /* use nickIsServices() to reduce the number of lines of code  - TSL */
+    if (nickIsServices(nick, 0)) {
         if (!readonly && !skeleton)
             introduce_user(nick);
     } else if (s_BotServ && (bi = findbot(nick))) {
@@ -135,6 +118,10 @@ int m_privmsg(char *source, char *receiver, char *msg)
         alog("%s: user record for %s not found", msg, source);
         anope_cmd_notice(msg, source,
                          getstring(NULL, USER_RECORD_NOT_FOUND));
+        return MOD_CONT;
+    }
+
+    if (!*receiver || !receiver || !msg) {
         return MOD_CONT;
     }
 

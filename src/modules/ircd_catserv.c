@@ -27,7 +27,14 @@ int AnopeInit(int argc, char **argv)
 {
     Message *msg = NULL;
     int status;
+#ifdef IRC_UNREAL32
+     msg = createMessage("PRIVMSG", my_privmsg);
+    if (UseTokens) {
+     msg = createMessage("!", my_privmsg);
+    }
+#else
     msg = createMessage("PRIVMSG", my_privmsg);
+#endif
     status = moduleAddMessage(msg, MOD_HEAD);
     if (status == MOD_ERR_OK) {
         addClient(s_CatServ, "meow!");
@@ -81,7 +88,7 @@ void addClient(char *nick, char *realname)
 
 void delClient(void)
 {
-    send_cmd(s_CatServ, "QUIT :Module Unloaded!");
+    anope_cmd_quit(s_CatServ, "QUIT :Module Unloaded!");
 }
 
 void addMessageList(void)

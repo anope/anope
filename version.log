@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="309"
+VERSION_BUILD="310"
 
 # $Log$
+#
+# BUILD : 1.7.4 (310)
+# BUGS  : none
+# NOTES : Fixed am script to run indent on src dir if it exists.
 #
 # BUILD : 1.7.4 (309)
 # BUGS  : none

@@ -376,8 +376,12 @@ NOTES : ";
     die ("Aborting...\n") unless &getans();
 
     print "*** Running Indent...\n";
-    system("indent -kr -nut *.c");
-    system("rm -f *~");
+    my $prefix=".";
+    if (-d src) {
+	    $prefix="src";
+    }
+    system("indent -kr -nut $prefix/*.c");
+    system("rm -f $prefix/*~");
 
     print "*** Bumping the revision number...\n";
     # Re-write the control file

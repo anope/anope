@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="499"
+VERSION_BUILD="500"
 
 # $Log$
+#
+# BUILD : 1.7.6 (500)
+# BUGS  : 259
+# NOTES : Added support for hybrid TBURST -- merry xmas :)
 #
 # BUILD : 1.7.6 (499)
 # BUGS  : 

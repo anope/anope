@@ -589,6 +589,18 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+int anope_event_tburst(char *source, int ac, char **av)
+{
+    if (ac != 5)
+        return MOD_CONT;
+
+    av[0] = av[1];
+    av[1] = av[3];
+    av[3] = av[4];
+    do_topic(source, 4, av);
+    return MOD_CONT;
+}
+
 int anope_event_436(char *source, int ac, char **av)
 {
     if (ac < 1)
@@ -623,6 +635,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("TBURST",    anope_event_tburst); addCoreMessage(IRCD,m);
     m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);

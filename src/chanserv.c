@@ -741,7 +741,7 @@ void load_cs_dbase(void)
             ci->levels = scalloc(2 * CA_SIZE, 1);
             reset_levels(ci);
             for (j = 0; j < n_levels; j++) {
-                SAFE(read_int16(&tmp16));
+                SAFE(read_int16(&tmp16, f));
                 if (j < CA_SIZE)
                     ci->levels[j] = (int16) tmp16;
             }

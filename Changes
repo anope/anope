@@ -15,8 +15,8 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
 12/23 F Several compiler errors under make strict.                        [ #00]
 12/21 F Unsetting away would not trigger checking of memos.               [#258]
-12/21 F Dreamforge compile                                                [ #00]
-12/21 F Moved global about del of non-existant session inside debug() if  [ #00]
+12/21 F Dreamforge compile.                                               [ #00]
+12/21 F Moved global about del of non-existant session inside debug() if. [ #00]
 12/19 F Fixed LogUser messages where the nickip is 0.                     [#253]
 12/19 F Segfault if USERDB enabled and tables don't exist.                [#255]
 12/18 F Now only builds the ircd you selected.                            [ #00]
@@ -61,7 +61,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
-12/10 F Extra tab in language files, causing bad answer in !seen          [#243]
+12/10 F Extra tab in language files, causing bad answer in !seen.         [#243]
 11/28 F Fixes RSEND oddity.                                               [#237]
 11/26 F Memos sent as notification of receipt can't be cancelled.         [#192]
 11/23 F Moving Services Operators to Services Admins and vice-versa.      [#230]
@@ -74,9 +74,10 @@ Provided by mitch{Xy} <mitch@bondage.com> - 2004.
 12/20 F Removed unclear email text from language files.                   [ #00]
 
 Provided by ThaPrince <jon@vile.com> - 2004.
+12/25 A Support for Hybrid TBURST.                                        [#259]
 12/21 A Support for Hybrid IRCDs QS (Quit Storm).                         [#256]
-12/22 F Updated the plexus support.                                       [ #00]
 12/20 A Added plexus ircd support.                                        [ #00]
+12/22 F Updated the plexus support.                                       [ #00]
 
 Anope Version 1.7.6
 -------------------

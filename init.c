@@ -432,6 +432,41 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
                         version_flags, version_build);
                 exit(EXIT_SUCCESS);
+            } else if (!strcmp(s, "help")) {
+                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
+                        version_flags, version_build);
+                fprintf(stdout,
+                        "Anope IRC Services (http://www.anope.org)\n");
+                fprintf(stdout, "Usage ./services [options] ...\n");
+                fprintf(stdout,
+                        "-remote        -remote hostname[:port]\n");
+                fprintf(stdout, "-local         -local hostname[:port]\n");
+                fprintf(stdout, "-name          -name servername\n");
+                fprintf(stdout, "-desc          -desc serverdesc\n");
+                fprintf(stdout, "-user          -user serviceuser\n");
+                fprintf(stdout, "-host          -host servicehost\n");
+                fprintf(stdout,
+                        "-update        -update updatetime(secs)\n");
+                fprintf(stdout,
+                        "-expire        -expire expiretime(secs)\n");
+                fprintf(stdout, "-debug         -debug\n");
+                fprintf(stdout, "-nofork        -nofork\n");
+                fprintf(stdout, "-logchan       -logchan channelname\n");
+                fprintf(stdout, "-skeleton      -skeleton\n");
+                fprintf(stdout, "-forceload     -forceload\n");
+                fprintf(stdout, "-readonly      -readonly\n");
+                fprintf(stdout, "-noexpire      -noexpire\n");
+                fprintf(stdout, "-is44          -is44\n");
+                fprintf(stdout, "-version       -version\n");
+                fprintf(stdout, "-help          -help\n");
+                fprintf(stdout, "-log           -log logfilename\n");
+                fprintf(stdout,
+                        "-dir           -dir servicesdirectory\n\n");
+                fprintf(stdout,
+                        "Further support is available from http://www.anope.org\n");
+                fprintf(stdout,
+                        "Or visit US on IRC at irc.anope.org #anope\n");
+                exit(EXIT_SUCCESS);
             } else {
                 fprintf(stderr, "Unknown option -%s\n", s);
                 return -1;

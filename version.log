@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="505"
+VERSION_BUILD="506"
 
 # $Log$
+#
+# BUILD : 1.7.6 (506)
+# BUGS  : 260
+# NOTES : Fixed segfaults in the user-list walking with KillonSGline/KillonSQline
 #
 # BUILD : 1.7.6 (505)
 # BUGS  : N/A

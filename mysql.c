@@ -59,6 +59,15 @@ int db_mysql_init()
         alog("MySQL has been enabled.");
     }
 
+    /* The following configuration options are required.
+     * If missing disable MySQL to avoid any problems.   
+     */
+
+    if (!MysqlName || !MysqlUser) {
+        do_mysql = 0;
+        alog("MySQL Error: Set all required configuration options.");
+    }
+
     if (!db_mysql_open())
         do_mysql = 0;
 

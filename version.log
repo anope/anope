@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="182"
+VERSION_BUILD="183"
 
 # $Log$
+#
+# BUILD : 1.7.3 (183)
+# BUGS  : 92
+# NOTES : Added check to see if MysqlName and MysqlUser were not null to avoid any problems.
 #
 # BUILD : 1.7.3 (182)
 # BUGS  : 94

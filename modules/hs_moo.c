@@ -23,6 +23,7 @@ int myHostServMooRootHelp(User *u);   						 /* Function to display extra help t
 int AnopeInit(int argc, char **argv)							/* This will be executed when the module is loaded */
 {
     Command *c;											/* Pointer to a Command */
+    int status = 0;											/* the status of our new command */
     c = createCommand("moo", hs_moo_show, NULL, -1, -1, -1, -1, -1);	/* Create a new command "moo" pointing to hs_moo */
 
     moduleAddHelp(c,myHostServMooHelp);						/* add help for all users to this command */
@@ -33,13 +34,17 @@ int AnopeInit(int argc, char **argv)							/* This will be executed when the mod
 
     moduleSetHostHelp(myHostServHelp);						/* add us to the .hs help list */
 
-
-    alog("hs_moo.so: Add Command 'moo' Status: %d",				/* Log the command being added */
-         moduleAddCommand(HOSTSERV, c, MOD_HEAD));			/* And add it to the HOSTSERV cmd table */
+    status = moduleAddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
+    alog("hs_moo.so: Add Command 'moo' Status: %d",status);			/* Log the command being added */
+         
     moduleAddCallback("test",time(NULL)+dotime("15s"),test,0,NULL);		/* set a call-back function to exec in 3 mins time */
     moduleDelCallback("test");
     moduleAddAuthor(AUTHOR);								/* tell Anope about the author */
     moduleAddVersion(VERSION);								/* Tell Anope about the verison */
+
+    if(status!=MOD_ERR_OK) {
+	return MOD_STOP;
+    }
     return MOD_CONT;
 }
 

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="29"
+VERSION_BUILD="30"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (30)
+# BUGS  : http://bugs.anope.org/show_bug.cgi?id=3
+# NOTES : Fixed moduleAddCommand for a non-existant service, now returns MOD_ERR_NOSERVICE, updated hs_moo to deal with it nicely
 #
 # BUILD : 1.7.0 (29)
 # BUGS  : http://bugs.anope.org/show_bug.cgi?id=9

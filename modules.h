@@ -50,6 +50,7 @@
  #define MOD_ERR_NODELETE	9
  #define MOD_ERR_UNKNOWN	10
  #define MOD_ERR_FILE_IO        11
+ #define MOD_ERR_NOSERVICE 12
 
  /*************************************************************************/
 

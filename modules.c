@@ -656,20 +656,49 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
         c->mod_name = sstrdup(mod_current_module->name);
     }
 
+
     if (cmdTable == HOSTSERV) {
-        c->service = sstrdup(s_HostServ);
+        if (s_HostServ) {
+            c->service = sstrdup(s_HostServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == BOTSERV) {
-        c->service = sstrdup(s_BotServ);
+        if (s_BotServ) {
+            c->service = sstrdup(s_BotServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == MEMOSERV) {
-        c->service = sstrdup(s_MemoServ);
+        if (s_MemoServ) {
+            c->service = sstrdup(s_MemoServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == CHANSERV) {
-        c->service = sstrdup(s_ChanServ);
+        if (s_ChanServ) {
+            c->service = sstrdup(s_ChanServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == NICKSERV) {
-        c->service = sstrdup(s_NickServ);
+        if (s_NickServ) {
+            c->service = sstrdup(s_NickServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == HELPSERV) {
-        c->service = sstrdup(s_HelpServ);
+        if (s_HelpServ) {
+            c->service = sstrdup(s_HelpServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else if (cmdTable == OPERSERV) {
-        c->service = sstrdup(s_OperServ);
+        if (s_OperServ) {
+            c->service = sstrdup(s_OperServ);
+        } else {
+            return MOD_ERR_NOSERVICE;
+        }
     } else
         c->service = sstrdup("Unknown");
 

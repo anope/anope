@@ -2,6 +2,7 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
 08/24 A New -l option for am script to list possible selectors.           [ #00]
+08/26 F Fixed spelling stuff in the german langfile.                      [#159]
 08/24 F Compile error with gcc2.                                          [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004

@@ -1277,7 +1277,7 @@ CHAN_AKICK_STUCK
 CHAN_AKICK_UNSTUCK
 	%s ist nun nicht mehr stetig aktiviert im %s.
 CHAN_AKICK_DELETED
-	%s wurde von der Autokick-Liste von %s gefunden.
+	%s wurde von der Autokick-Liste von %s entfernt.
 CHAN_AKICK_DELETED_ONE
 	1 Eintrag der AutoKick-Liste von %s entfernt.
 CHAN_AKICK_DELETED_SEVERAL

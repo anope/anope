@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="272"
+VERSION_BUILD="273"
 
 # $Log$
+#
+# BUILD : 1.7.4 (273)
+# BUGS  : 121
+# NOTES : Applied patch provided by Trystan for +A +H support on viagra
 #
 # BUILD : 1.7.4 (272)
 # BUGS  : 111,115

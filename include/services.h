@@ -1196,6 +1196,8 @@ struct cumode_ {
 #define MODESTOREMOVE "-iklmnpstRKAO"
 #elif defined(IRC_UNREAL)
 #define MODESTOREMOVE "-ckiflmnpstuzACGHKLNOQRSV"
+#elif defined(IRC_VIAGRA)
+#define MODESTOREMOVE "-ciklmnpstORAH"
 #elif defined(IRC_PTLINK)
 #define MODESTOREMOVE "-cdfiklmnpqstRS"
 #else
@@ -1335,6 +1337,11 @@ struct channel_ {
 #define CMODE_u 0x00400000
 #define CMODE_z 0x00800000
 #define CMODE_N 0x01000000
+#endif
+
+#ifdef IRC_VIAGRA
+#define CMODE_A 0x00001000
+#define CMODE_H 0x00002000
 #endif
 
 /* These modes are for IRC_ULTIMATE3 servers only */

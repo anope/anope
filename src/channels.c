@@ -62,7 +62,7 @@ CBMode cbmodes[128] = {
 	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 }, { 0 },
 	{ 0 },
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_RAGE2) || defined(IRC_VIAGRA)
 	{ CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL },
 #else
 	{ 0 }, /* A */
@@ -78,9 +78,12 @@ CBMode cbmodes[128] = {
 	{ 0 }, /* F */
 #ifdef IRC_UNREAL
 	{ CMODE_G, 0, NULL, NULL },
-	{ CMODE_H, CBM_NO_USER_MLOCK, NULL, NULL },
 #else
 	{ 0 }, /* G */
+#endif
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
+	{ CMODE_H, CBM_NO_USER_MLOCK, NULL, NULL },
+#else
 	{ 0 }, /* H */
 #endif
 #ifdef IRC_ULTIMATE
@@ -243,7 +246,7 @@ CBModeInfo cbmodeinfos[] = {
 #ifdef IRC_UNREAL
 	{ 'z', CMODE_z, 0, NULL, NULL },
 #endif
-#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2)
+#if defined(IRC_ULTIMATE) || defined(IRC_UNREAL) || defined(IRC_ULTIMATE3) || defined(IRC_PTLINK) || defined(IRC_RAGE2) || defined(IRC_VIAGRA)
 	{ 'A', CMODE_A, 0, NULL, NULL },
 #endif
 #if defined(IRC_UNREAL) || defined(IRC_RAGE2)
@@ -251,6 +254,8 @@ CBModeInfo cbmodeinfos[] = {
 #endif
 #ifdef IRC_UNREAL
 	{ 'G', CMODE_G, 0, NULL, NULL },
+#endif
+#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
 	{ 'H', CMODE_H, 0, NULL, NULL },
 #endif
 #ifdef IRC_ULTIMATE

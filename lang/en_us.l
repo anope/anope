@@ -326,6 +326,8 @@ NICK_REGISTERED
 	Nickname %s registered under your account: %s
 NICK_PASSWORD_IS
 	Your password is %s - remember this for later use.
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
 
 # GROUP responses
 NICK_GROUP_SYNTAX

@@ -276,6 +276,7 @@ E int   ForceForbidReason;
 E int   UsePrivmsg;
 E int   DumpCore;
 E int   LogUsers;
+E int   NickRegDelay;
 
 E char **HostSetters;
 E int HostNumber;

@@ -344,6 +344,8 @@ NICK_REGISTERED
 	Nickname %s ist unter deinem Host registriert worden: %s
 NICK_PASSWORD_IS
 	Dein Passwort ist %s - behalte es für spätere Benutzung.
+NICK_REG_DELAY
+	Du musst länger als %d Sekunden connected sein, um einen Nick zu registrieren.
 
 # GROUP responses
 NICK_GROUP_SYNTAX

@@ -115,6 +115,7 @@ int ForceForbidReason;
 int UsePrivmsg;
 int DumpCore;
 int LogUsers;
+int NickRegDelay;
 
 int UseMail;
 char *SendMailPath;
@@ -500,6 +501,7 @@ Directive directives[] = {
     {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
+    {"NickRegDelay", {{PARAM_INT, PARAM_RELOAD, &NickRegDelay}}},
     {"NickServName", {{PARAM_STRING, 0, &s_NickServ},
                       {PARAM_STRING, 0, &desc_NickServ}}},
     {"NickServAlias", {{PARAM_STRING, 0, &s_NickServAlias},

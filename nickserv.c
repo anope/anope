@@ -1898,6 +1898,12 @@ static int do_register(User * u)
         return MOD_CONT;
     }
 
+    if (!is_oper(u) && NickRegDelay
+        && ((time(NULL) - u->my_signon) < NickRegDelay)) {
+        notice_lang(s_NickServ, u, NICK_REG_DELAY, NickRegDelay);
+        return MOD_CONT;
+    }
+
     if ((anr = findrequestnick(u->nick))) {
         notice_lang(s_NickServ, u, NICK_REQUESTED);
         return MOD_CONT;

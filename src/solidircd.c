@@ -418,6 +418,7 @@ CBModeInfo cbmodeinfos[] = {
     {'t', CMODE_t, 0, NULL, NULL},
     {'M', CMODE_M, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
+    {'R', CMODE_R, 0, NULL, NULL},
     {0}
 };
 

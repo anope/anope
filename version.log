@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="508"
+VERSION_BUILD="509"
 
 # $Log$
+#
+# BUILD : 1.7.6 (509)
+# BUGS  : 261
+# NOTES : Doc found more to the bug 261, should to be the last
 #
 # BUILD : 1.7.6 (508)
 # BUGS  : 261

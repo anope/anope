@@ -69,6 +69,27 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
                  const char *cmd)
 {
     Command *c = findCommand(cmdTable, cmd);
+
+    if (cmdTable == HOSTSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == BOTSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == MEMOSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == CHANSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == NICKSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == HELPSERV) {
+        c->mod_name = NULL;
+    } else if (cmdTable == OPERSERV) {
+        c->mod_name = NULL;
+    } else {
+        c->mod_name = sstrdup(mod_current_module_name);
+        if (debug)
+            alog("Module %s is using addCommand instead of moduleAddCommand.", c->mod_name);
+    }
+
     do_run_cmd(service, u, c, cmd);
 }
 

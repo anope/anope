@@ -736,9 +736,12 @@ void do_sjoin(const char *source, int ac, char **av)
 {
     Channel *c;
     User *user;
+    Server *serv;
     char *s, *end, cubuf[7], *end2, *cumodes[6];
     int is_sqlined = 0;
     int ts = 0;
+
+    serv = findserver(servlist, source);
 
     if (ircd->sjb64) {
         ts = base64dects(av[0]);
@@ -838,6 +841,8 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
+                    if (c->ci && (!serv || is_sync(serv)))
+                        restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
             }
@@ -911,6 +916,8 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
+                    if (c->ci && (!serv || is_sync(serv)))
+                        restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
             }
@@ -982,6 +989,8 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
+                    if (c->ci && (!serv || is_sync(serv)))
+                        restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
             }
@@ -1023,6 +1032,8 @@ void do_sjoin(const char *source, int ac, char **av)
         } else {
             c = join_user_update(user, c, av[1]);
             c->creation_time = ts;
+            if (c->ci && (!serv || is_sync(serv)))
+                restore_topic(c->name);
             chan_set_correct_modes(user, c);
         }
     }
@@ -1125,6 +1136,9 @@ void do_topic(const char *source, int ac, char **av)
         }
         return;
     }
+
+    /* We can be sure that the topic will be in sync here -GD */
+    c->topic_sync = 1;
 
     if (check_topiclock(c, topic_time))
         return;
@@ -1340,7 +1354,7 @@ void chan_adduser2(User * user, Channel * c)
              * to has synced, or we'll get greet-floods when the net
              * recovers from a netsplit. -GD
              */
-            if (is_sync(user->server) == 1) {
+            if (is_sync(user->server)) {
                 anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
                                   user->na->nick, user->na->nc->greet);
                 c->ci->bi->lastmsg = time(NULL);
@@ -1378,8 +1392,10 @@ Channel *chan_create(char *chan)
     /* Restore locked modes and saved topic */
     if (c->ci) {
         check_modes(c);
-        restore_topic(chan);
         stick_all(c->ci);
+        c->topic_sync = 0;
+    } else {
+        c->topic_sync = 1;
     }
 
     return c;
@@ -1687,6 +1703,21 @@ void do_mass_mode(char *modes)
                 anope_cmd_mode(s_OperServ, c->name, "%s", modes);
                 chan_set_modes(s_OperServ, c, ac, av, 1);
             }
+        }
+    }
+}
+
+/*************************************************************************/
+
+void restore_unsynced_topics(void)
+{
+    Channel *c;
+    int i;
+
+    for (i = 0; i < 1024; i++) {
+        for (c = chanlist[i]; c; c = c->next) {
+            if (!(c->topic_sync))
+                restore_topic(c->name);
         }
     }
 }

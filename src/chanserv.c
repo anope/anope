@@ -1764,6 +1764,8 @@ void restore_topic(char *chan)
 
     if (!c || !(ci = c->ci))
         return;
+    /* We can be sure that the topic will be in sync when we return -GD */
+    c->topic_sync = 1;
     if (!(ci->flags & CI_KEEPTOPIC)) {
         /* We need to reset the topic here, since it's currently empty and
          * should be updated with a TOPIC from the IRCd soon. -GD
@@ -1771,7 +1773,6 @@ void restore_topic(char *chan)
         ci->last_topic = NULL;
         strscpy(ci->last_topic_setter, whosends(ci), NICKMAX);
         ci->last_topic_time = time(NULL);
-        /* And we still return... -GD */
         return;
     }
     if (c->topic)

@@ -1173,6 +1173,7 @@ int anope_event_eos(char *source, int ac, char **av)
         s->sync = SSYNC_DONE;
     else if (serv_uplink)
         serv_uplink->sync = SSYNC_DONE;
+    restore_unsynced_topics();
 
     return MOD_CONT;
 }

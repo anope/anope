@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="634"
+VERSION_BUILD="635"
 
 # $Log$
+#
+# BUILD : 1.7.8 (635)
+# BUGS  : 
+# NOTES : Topics should be only updated when really needed during bursts now (on IRCDs that support it)
 #
 # BUILD : 1.7.8 (634)
 # BUGS  : 321

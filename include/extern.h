@@ -128,6 +128,8 @@ E void do_sjoin(const char *source, int ac, char **av);
 E void do_topic(const char *source, int ac, char **av);
 E void do_mass_mode(char *modes);
 
+E void restore_unsycned_topics(void);
+
 #define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? s_ChanServ : (ci)->bi->nick)
 
 /**** chanserv.c ****/

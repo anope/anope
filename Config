@@ -225,6 +225,7 @@ echo "   10) Unreal 3.2         [Unreal 3.2 beta19 or later]"
 echo "   11) Solid IRCD 3.4.x   [Solid IRCD 3.4.6 or later]"
 echo "   12) Plexus 2.0         [or later]"
 echo "   13) Ratbox 2.0.6       [or later]"
+echo "   14) ShadowIRCD 4.0x    [beta 7 or later]"
 
 while [ $ok -eq 0 ] ; do
         echo2 "[$IRCTYPE] "
@@ -291,6 +292,11 @@ while [ $ok -eq 0 ] ; do
 			IRCTYPE_DEF="IRC_RATBOX"
 			ok=1;
 			;;
+		14)
+			IRCTYPE_DEF="IRC_SHADOWIRCD"
+			ok=1;
+			;;
+
 
                 *)
                         echo "Please enter a valid option number."

@@ -1558,6 +1558,7 @@ int check_should_halfop(User * user, char *chan)
 
 int check_should_owner(User * user, char *chan)
 {
+    char *tmp;
     ChannelInfo *ci = cs_findchan(chan);
 
     if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
@@ -1565,7 +1566,8 @@ int check_should_owner(User * user, char *chan)
 
     if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
         || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
-        anope_cmd_mode(whosends(ci), chan, "+oq %s %s", user->nick,
+        tmp = stripModePrefix(ircd->ownerset);
+        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
         return 1;
     }
@@ -1577,13 +1579,15 @@ int check_should_owner(User * user, char *chan)
 
 int check_should_protect(User * user, char *chan)
 {
+    char *tmp;
     ChannelInfo *ci = cs_findchan(chan);
 
     if (!ci || (ci->flags & CI_VERBOTEN) || *chan == '+')
         return 0;
 
     if (check_access(user, ci, CA_AUTOPROTECT)) {
-        anope_cmd_mode(whosends(ci), chan, "+oa %s %s", user->nick,
+        tmp = stripModePrefix(ircd->adminset);
+        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
         return 1;
     }

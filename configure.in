@@ -267,6 +267,11 @@ AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
 		AC_DEFINE(IRC_RATBOX,1,"First IRCD type")
 		IRCDFILE=" ratbox.c "
 		AC_SUBST(IRCDFILE)
+    elif test "$withval" = "IRC_SHADOWIRCD"; then
+		AC_DEFINE(IRC_SHADOWIRCD,1,"First IRCD type")
+		IRCDFILE=" shadowircd.c "
+		AC_SUBST(IRCDFILE)
+
 
     fi
 ])

@@ -1094,7 +1094,7 @@ void anope_cmd_pass(char *pass)
 void anope_cmd_server(char *servname, int hop, char *descript)
 {
     if (Numeric) {
-        send_cmd(NULL, "SERVER %s %d :U0-*-%d %s", servname, hop, Numeric,
+        send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric,
                  descript);
     } else {
         send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
@@ -1489,13 +1489,9 @@ void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void anope_cmd_connect(int servernum)
 {
-    char buf[16];
-    *buf = '\0';
-
     if (Numeric) {
-        snprintf(buf, sizeof(buf), "%d", Numeric);
         me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, buf);
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
     } else {
         me_server =
             new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1887,17 +1883,17 @@ int anope_event_server(char *source, int ac, char **av)
 {
     char *desc;
     char *vl;
-    char *numeric;
+    char *upnumeric;
 
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
         vl = myStrGetToken(av[2], ' ', 0);
-        numeric = myStrGetToken(vl, '-', 2);
+        upnumeric = myStrGetToken(vl, '-', 2);
         desc = myStrGetTokenRemainder(av[2], ' ', 1);
-        do_server(source, av[0], av[1], desc, numeric);
+        do_server(source, av[0], av[1], desc, upnumeric);
         Anope_Free(vl);
         Anope_Free(desc);
-        Anope_Free(numeric);
+        Anope_Free(upnumeric);
     } else {
         do_server(source, av[0], av[1], av[2], NULL);
     }

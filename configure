@@ -8639,6 +8639,15 @@ _ACEOF
 
 		IRCDFILE=" ratbox.c "
 
+    elif test "$withval" = "IRC_SHADOWIRCD"; then
+
+cat >>confdefs.h <<\_ACEOF
+#define IRC_SHADOWIRCD 1
+_ACEOF
+
+		IRCDFILE=" shadowircd.c "
+
+
 
     fi
 

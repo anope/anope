@@ -748,13 +748,9 @@ void anope_cmd_pong(char *servname, char *who)
 
 void anope_cmd_connect(int servernum)
 {
-    char buf[16];
-    *buf = '\0';
-
     if (Numeric) {
-        snprintf(buf, sizeof(buf), "%d", Numeric);
         me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, buf);
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
     } else {
         me_server =
             new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -768,7 +764,7 @@ void anope_cmd_connect(int servernum)
         anope_cmd_pass(RemotePassword3);
     anope_cmd_capab();
     if (Numeric) {
-        send_cmd(NULL, "MYID !%d", Numeric);
+        send_cmd(NULL, "MYID !%s", Numeric);
     }
     anope_cmd_server(ServerName, 1, ServerDesc);
     anope_cmd_svinfo();

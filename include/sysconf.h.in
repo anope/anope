@@ -129,6 +129,9 @@
 /* "First IRCD type" */
 #undef IRC_RATBOX
 
+/* "First IRCD type" */
+#undef IRC_SHADOWIRCD
+
 /* "Module dir" */
 #undef MODULE_PATH
 

@@ -324,7 +324,7 @@ long unsigned int UserKey1;
 long unsigned int UserKey2;
 long unsigned int UserKey3;
 
-int Numeric;
+char *Numeric;
 
 int UnRestrictSAdmin;
 
@@ -519,7 +519,7 @@ Directive directives[] = {
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
     {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
-    {"Numeric", {{PARAM_POSINT, PARAM_RELOAD, &Numeric}}},
+    {"Numeric", {{PARAM_STRING, PARAM_RELOAD, &Numeric}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
@@ -1435,6 +1435,14 @@ int read_config(int reload)
         if (!ircd->token) {
             alog("Anope does not support TOKENS for this ircd setting unsetting UseToken");
             UseTokens = 0;
+        }
+    }
+
+    if (UseTS6 && ircd->ts6) {
+        if (!Numeric) {
+            error(0,
+                  "UseTS6 requires the setting of Numeric to be enabled.");
+            retval = 0;
         }
     }
 

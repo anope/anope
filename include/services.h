@@ -245,6 +245,7 @@ typedef enum { false, true } boolean;
 #include "solidircd.h"
 #include "plexus.h"
 #include "ratbox.h"
+#include "shadowircd.h"
 
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;

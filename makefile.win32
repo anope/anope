@@ -114,6 +114,10 @@ dist:
         echo Compiling Ratbox IRCd build
         $(MAKE) IRCTYPE=/DIRC_RATBOX CAPAB_C=ratbox.c CAPAB_O=ratbox.obj
         -@copy src\$(PROGRAM) services-ratbox.exe
+#Compile ShadowIRCD
+        echo Compiling Shadow IRCd build
+        $(MAKE) IRCTYPE=/DIRC_SHADOWIRCD CAPAB_C=shadowircd.c CAPAB_O=shadwoircd.obj
+        -@copy src\$(PROGRAM) services-shadowircd.exe
 
 #Compile mypasql
         $(MYPASQL_BUILD)

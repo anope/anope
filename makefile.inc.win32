@@ -26,6 +26,7 @@
 # 11 Solid IRCD 3.4.x   [Solid IRCD 3.4.6 or later]
 # 12 Plexus 2.0         [or later]
 # 13 Ratbox 2.0.6       [or later]
+# 14 ShadowIRCD 4.0x    [beta 7 or later]
 
 IRCD=10
 
@@ -128,6 +129,10 @@ CAPAB_O=plexus.obj
 IRCTYPE=/D IRC_RATBOX
 CAPAB_C=ratbox.c
 CAPAB_O=ratbox.obj
+!ELSEIF $(IRCD) == 14
+IRCTYPE=/D IRC_SHADOWIRCD
+CAPAB_C=shadowircd.c
+CAPAB_O=shadowircd.obj
 !ELSE
 !ERROR Invalid IRCd
 !ENDIF

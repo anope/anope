@@ -14,7 +14,7 @@ Anope Internal Events
     events such as the databases being saved. A list of triggered  events
     can be found below. Additional there is a module included with the core
     which can  provide some clue as to how to use the code in your modules.
-    The rest of this document assumes that you are used to writting modules.
+    The rest of this document assumes that you are used to writing modules.
 
 2) Complex Events
 
@@ -160,4 +160,8 @@ Anope Internal Events
     | EVENT_NICK_EXPIRE      | Nick of the account involved              |
     | EVENT_CHANGE_NICK      | Nick of the user involved                 |
     | EVENT_USER_LOGOFF      | Nick of the user involved                 |
+    | EVENT_GROUP            | Nick of the user involved                 |
+    | EVENT_NICK_IDENTIFY    | Nick of the user involved                 |
+    | EVENT_SERVER_SQUIT     | Name of the server involved               |
+    | EVENT_SERVER_CONNECT   | Name of the server involved               |
     |------------------------|-------------------------------------------|

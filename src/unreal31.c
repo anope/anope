@@ -110,6 +110,7 @@ IRCDVar ircd[] = {
      0,                         /* ts6 */
      1,                         /* support helper umode */
      0,                         /* p10 */
+     NULL,                      /* character set */
      },
     {NULL}
 };
@@ -146,8 +147,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
      0,
-     0,
-     }
+     0, 0}
 };
 
 unsigned long umodes[128] = {

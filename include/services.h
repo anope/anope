@@ -333,6 +333,7 @@ struct ircdvars_ {
 	int ts6;					/* ircd is TS6 */
 	int supporthelper;			/* +h helper umodes */
 	int p10;					/* ircd is P10  */
+	char *nickchars;			/* character set */
 };
 
 struct ircdcapab_ {
@@ -366,6 +367,7 @@ struct ircdcapab_ {
   uint32 dozip;
   uint32 chanmodes;
   uint32 sjb64;
+  uint32 nickchars;
 };
 
 /* tiny struct needed for P10 and other UID servers so we can track 
@@ -1180,6 +1182,7 @@ struct hostcache_ {
 #define CAPAB_TLKEXT    0x08000000
 #define CAPAB_CHANMODE  0x10000000
 #define CAPAB_SJB64     0x20000000
+#define CAPAB_NICKCHARS 0x40000000
 
 /*************************************************************************/
 

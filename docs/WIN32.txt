@@ -83,7 +83,7 @@ Anope for Windows
  
     4) You are now ready to compile. bring up the Visual C++ toolkit command
        prompt; This will launch a dos command prompt like windows, which will
-       set the enviroment properties need to make Anope. Change directories
+       set the environment properties need to make Anope. Change directories
        to where you unpacked the source code in step 2. At the prompt type:
 
         nmake -f Makefile.win32
@@ -102,7 +102,7 @@ Anope for Windows
 2) Installation
 
     Since Anope for Windows does not use a visual interface, you must do the
-    configuration with a texteditor before proceeding with running anope
+    configuration with a text editor before proceeding with running anope
     itself.
 
     Open services.conf, and read through it carefully and adjust the settings

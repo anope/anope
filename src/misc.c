@@ -811,14 +811,16 @@ void EnforceQlinedNick(char *nick, char *killer)
  * @param int Check if botserv bots
  * @return int
  */
-int nickIsServices(char *nick, int bot)
+int nickIsServices(char *tempnick, int bot)
 {
     int found = 0;
-    char *s;
+    char *s, *nick;
 
-    if (!nick) {
+    if (!tempnick) {
     	return found;
     }
+
+    nick = sstrdup(tempnick);
 
     s = strchr(nick, '@');
     if (s) {

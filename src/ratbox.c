@@ -109,6 +109,7 @@ IRCDVar ircd[] = {
      1,                         /* ts6 */
      0,                         /* support helper umode */
      0,                         /* p10 */
+     NULL,                      /* character set */
      }
     ,
     {NULL}
@@ -144,11 +145,8 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
-     0, 0}
+     0, 0, 0}
 };
-
-static User *current;
-static int next_index;
 
 void anope_set_umode(User * user, int ac, char **av)
 {
@@ -628,8 +626,8 @@ int anope_event_nick(char *source, int ac, char **av)
             do_nick(source, av[0], NULL, NULL, NULL, NULL,
                     strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
         }
-        return MOD_CONT;
     }
+    return MOD_CONT;
 }
 
 int anope_event_topic(char *source, int ac, char **av)
@@ -1046,7 +1044,7 @@ int anope_event_ping(char *source, int ac, char **av)
 
 int anope_event_away(char *source, int ac, char **av)
 {
-    User *u;
+    User *u = NULL;
 
     if (ac) {
         return MOD_CONT;
@@ -1056,7 +1054,7 @@ int anope_event_away(char *source, int ac, char **av)
         u = find_byuid(source);
     }
 
-    m_away((UseTS6 ? u->nick : source), av[0]);
+    m_away((UseTS6 ? (u ? u->nick : source) : source), av[0]);
     return MOD_CONT;
 }
 
@@ -1444,7 +1442,6 @@ void anope_cmd_tmode(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
-    Uid *ud;
     *buf = '\0';
 
     if (fmt) {

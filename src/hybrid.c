@@ -107,6 +107,7 @@ IRCDVar ircd[] = {
      0,                         /* ts6 */
      0,                         /* support helper umode */
      0,                         /* p10 */
+     NULL,                      /* character set */
      }
     ,
     {NULL}
@@ -142,7 +143,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* TLKEXT       */
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
-     0, 0}
+     0, 0, 0}
 };
 
 

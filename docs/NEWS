@@ -1,6 +1,6 @@
 Highlighted News in Anope 1.6
 =============================
-  * Fixed various exploits and vulverabilities.
+  * Fixed various exploits and vulnerabilities.
   * Fixed various language typos and inconsistencies.
   * Improved ignore system.
   * Improved ./configure script.
@@ -41,7 +41,7 @@ After the change from Epona to Anope
   * Services realtime logging to a channel
   * SuperAdmin directive for access to "super" commands.
   * Ban system is now exception aware.
-  * HostServ for hostname masquarading.
+  * HostServ for hostname masquerading.
   * Smarter XOP System.
   * Email verification/handshake upon registration.
   * Services can now /ignore users.
@@ -86,7 +86,7 @@ while networks using UnrealIRCd must upgrade to Unreal 3.1.1.
 
 For the full changes, see the Changes file.
 
-For announcements and discussions about Anope, subscribe to the mailing
-list by sending an e-mail to epona-request@epona.org with "subscribe"
-in the body (quotes excluded). You can then post to the mailing list
-by sending an e-mail to epona@epona.org.
+For announcements and discussions about Anope, please visit our
+web site http://www.anope.org
+
+

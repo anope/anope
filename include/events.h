@@ -41,4 +41,9 @@
 #define EVENT_NICK_EXPIRE "nick_expire"
 #define EVENT_CHANGE_NICK "change_nick"
 #define EVENT_USER_LOGOFF "user_logoff"
+#define EVENT_GROUP "nick_group"
+#define EVENT_NICK_IDENTIFY "nick_id"
+#define EVENT_SERVER_SQUIT "server_squit"
+#define EVENT_SERVER_CONNECT "server_connect"
+
 

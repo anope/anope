@@ -19,12 +19,12 @@ How To Add IRCd Support
     C) Make a backup copy of Config and configure.in
 
     First step in this process is to rename the .c and .h file after the IRCd
-    that you are going to be adding support for. Its recommened that you come
+    that you are going to be adding support for. Its recommended that you come
     up with a name that is clear and easy to understand.
 
     Now that you have the files that you will need to create your own ircd
     support, starting with Config. This file is a shell script file; scroll
-    down untill you find the list of ircs for the user to select. Indicate
+    down until you find the list of ircs for the user to select. Indicate
     the based ircd version which is supported such as a series 1.x or 2.2.x,
     placing in the comment side an exact version that the support is for or
     "experimental" if you are not the ircd developer. The next step is to
@@ -32,7 +32,7 @@ How To Add IRCd Support
     'IRCTYPE_DEF="IRC_RATBOX"' to be the descriptive define for your ircd. 
 
     With the Config file ready to go, edit configure.in and find in there the
-    reference to --with-ircd. You should see see the various other ircds, and
+    reference to --with-ircd. You should see the various other ircds, and
     you will want to add yours in there using the same IRC_ name you came up
     with above. Important in this step is to make sure that you set the
     IRCDFILE to the name of the .c file you set in step 1. Once you have the
@@ -56,7 +56,7 @@ How To Add IRCd Support
 
     You are now ready to start getting into the code.
 
-2) Modifing the Header File
+2) Modifying the Header File
 
     Now that you have gotten past the first part of the creation process, you
     are into the code. This part is the harder and more complex part. You
@@ -101,7 +101,7 @@ How To Add IRCd Support
 
     Finally we come to DEFAULT_MLOCK; this is the mode that services will set
     by default on channels when they are registered. In general you want this
-    to be whats acceptable by the ircd; in most cases this is "+nt"
+    to be what is acceptable by the ircd; in most cases this is "+nt"
 
 3) The Code
 
@@ -246,10 +246,10 @@ How To Add IRCd Support
                               opped (+o), and protected (+a) on IRCd's that
                               support it.
 
-    24) SVSNICK: Can the ircd use SVSNICK to change someones nick? Otherwise,
+    24) SVSNICK: Can the ircd use SVSNICK to change some ones nick? Otherwise,
                  KILL is used. Use 1 for yes, 0 for no.
 
-    25) VHOST: Can a user's host be changd on the fly? Enabling this allow
+    25) VHOST: Can a user's host be changed on the fly? Enabling this allow
                HostServ online. Use 1 for yes, 0 for no.
 
     26) OWNER: Has a channel umode for being the channel owner. For example,
@@ -283,7 +283,7 @@ How To Add IRCd Support
 
     34) SZLINE: Does the IRCd support SZLINES? Use 1 for yes, 0 for no.
 
-    35) HALFOP: Is channelmode +h for halfop supported by the IRCd? Use 1 for
+    35) HALFOP: Is channel mode +h for halfop supported by the IRCd? Use 1 for
                 yes, 0 for no.
 
     36) Number of Server Args: When an IRCd connects, this is the number of
@@ -336,7 +336,7 @@ How To Add IRCd Support
     51) vIdent: Support for including a user's ident in their vHost. Use
                 1 for yes, 0 for no.
 
-    52) SVSHOLD: Support for temporarely 'holding' a nick, instead of using
+    52) SVSHOLD: Support for temporarily 'holding' a nick, instead of using
                  a nick enforcer client. Use 1 for yes, 0 for no.
 
     53) TS on MODE: We need to send a timestamp when modes are being changed.
@@ -395,7 +395,7 @@ How To Add IRCd Support
     71) Tokens: Can we use tokens to talk to the IRCd? Use 1 for yes,
                 0 for no.
 
-    72) Token Case Senstive: Are the IRCd's TOKENS/COMMANDS case senstive?
+    72) Token Case Senstive: Are the IRCd's TOKENS/COMMANDS case sensitive?
                              Use 1 for yes, 0 for no.
 
     73) base64 SJOIN TS: Are the timestamps sent with a SJOIN in base64? Use
@@ -411,7 +411,7 @@ How To Add IRCd Support
     77) SVSMODE UCMODE: Can we clear user channel modes with SVSMODE? Use
                         1 for yes, 0 for no.
 
-    78) SGline Enforce: Does the IRCd enfore SGLINES for us or do we need to
+    78) SGline Enforce: Does the IRCd enforce SGLINES for us or do we need to
                         do so? Use 1 for yes, 0 for no.
 
     79) Vhost Character: The character used to represent the vHost mode, if
@@ -423,6 +423,9 @@ How To Add IRCd Support
                   Use 1 for yes, 0 for no.
 
     82) P10: Is this IRCd a P10-style IRCd? Use 1 for yes, 0 for no.
+
+    83) Character Set: Unreal passes the character set during PROTOCTL,
+                       the value is stored here. Set this NULL to start.
 
     So we've had this long list. Now there's a second struct to fill. This
     struct isn't as long as the previous one though, so we'll handle it quite
@@ -465,6 +468,10 @@ How To Add IRCd Support
     CAPAB_UMODE2    | 0x02000000 | UMODE2    | Supports UMODE2 command
     CAPAB_VL        | 0x04000000 | VL        | VLine information in info field
     CAPAB_TLKEXT    | 0x08000000 | TLKEXT    | Not 8, but 10 params in TKL's
+    CAPAB_CHANMODE  | 0x10000000 | CHANMODE  | Channel modes are passed here
+    CAPAB_SJB64     | 0x20000000 | SJB64     | SJOIN timestamps are base64 encoded
+    CAPAB_NICKCHARS | 0x40000000 | NICKCHARS | Character set used by the IRCD for nicks
+
 
 4) Modes 
 
@@ -478,6 +485,22 @@ How To Add IRCd Support
     of +i find the 105th (ASCII code of 'i') character slot in the array, and
     place the UMODE_i into this slot. Your base .c file should contain a good
     start for this, as well as a little help locating the characters.
+
+	The following mode set is for the channel symbols. During a SJOIN event 
+    the modes are sent usually before the nick. These normally are @, +, %
+    etc.. depending on the ircd. Starting at ASCII 0 and running to 127. 
+    Replace the 0 with the character (o = @, h = %) for the given mode. In the
+    case of halfop which is usually sent as % replace the 37th character with
+    'h', do this until all modes that are possible be received in this manor 
+    have been inserted into the array.
+
+	Now that you have that complete, the following array is ready to be dealt
+    with. This is the cmmodes array, like the others it is a ASCII array
+	starting at 0 and going to 127. However at the given letter you will want
+    to enter the add, and delete function for the given mode. In the case of
+    bans (+b) there is add_ban, and del_ban. Anope provides functions for 
+    bans, exceptions and invites, should your ircd have more then these please
+    contact Anope to discuss what can be done to add this mode.
 
 5) Functions and Events
 

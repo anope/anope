@@ -107,6 +107,7 @@ IRCDVar ircd[] = {
      0,                         /* ts6 */
      1,                         /* support helper umode */
      0,                         /* p10 */
+     NULL,                      /* character set */
      }
     ,
     {NULL}
@@ -144,8 +145,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* DODKEY       */
      0,                         /* DOZIP        */
      CAPAB_CHANMODE,            /* CHANMODE             */
-     0,
-     }
+     0, 0}
 };
 
 void anope_set_umode(User * user, int ac, char **av)

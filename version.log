@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="587"
+VERSION_BUILD="588"
 
 # $Log$
+#
+# BUILD : 1.7.8 (588)
+# BUGS  : 304
+# NOTES : 1. nickIsServices() no longer alters the buffer 2. Fixes +I on Unreal and Bahamut 3. Anope Feature Request 285
+# 4. Updates documentation 5. Ratbox compiles clean with make strict 6. Trap and storing of NICKCHARS
 #
 # BUILD : 1.7.8 (587)
 # BUGS  : N/A

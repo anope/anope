@@ -109,6 +109,7 @@ IRCDVar ircd[] = {
      0,                         /* ts6 */
      1,                         /* support helper umode */
      0,                         /* p10 */
+     NULL,                      /* character set */
      },
     {NULL}
 };
@@ -145,6 +146,7 @@ IRCDCAPAB ircdcap[] = {
      0,                         /* DOZIP        */
      CAPAB_CHANMODE,            /* CHANMODE             */
      CAPAB_SJB64,
+     CAPAB_NICKCHARS,
      }
 };
 
@@ -223,32 +225,51 @@ char csmodes[128] = {
 };
 
 CMMode cmmodes[128] = {
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL},
-    {NULL},
-    {add_ban, del_ban},
-    {NULL},
-    {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},
+    {NULL}, {NULL}, {NULL},     /* BCD */
+    {NULL}, {NULL}, {NULL},     /* EFG */
+    {NULL},                     /* H */
+    {add_invite, del_invite},   /* I */
+    {NULL},                     /* J */
+    {NULL}, {NULL}, {NULL},     /* KLM */
+    {NULL}, {NULL}, {NULL},     /* NOP */
+    {NULL}, {NULL}, {NULL},     /* QRS */
+    {NULL}, {NULL}, {NULL},     /* TUV */
+    {NULL}, {NULL}, {NULL},     /* WXY */
+    {NULL},                     /* Z */
+    {NULL}, {NULL},             /* (char 91 - 92) */
+    {NULL}, {NULL}, {NULL},     /* (char 93 - 95) */
+    {NULL},                     /* ` (char 96) */
+    {NULL},                     /* a (char 97) */
+    {add_ban, del_ban},         /* b */
+    {NULL}, {NULL},             /* cd */
     {add_exception, del_exception},
-    {NULL},
-    {NULL},
+    {NULL}, {NULL},
     {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
     {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
     {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}
 };
-
-
 
 CBMode cbmodes[128] = {
     {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},

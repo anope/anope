@@ -86,7 +86,7 @@ Index:
 30. When I used the OperServ RAW command, Anope and/or my network
     crashed, or did weird things! Please fix this bug!
 
-31. I would like to have the list of the differents RAW on operserv
+31. I would like to have the list of the different RAW on OperServ
 
 32. I can't get /OS UMODES and /OS SVSNICK do not work!
 
@@ -116,9 +116,8 @@ Index:
 
 3. Does Anope run under Windows?
 
-	Well... not officially. Bu there is a port branch of services that will
-	work on Windows. Visit http://windows.anope.org for more information on
-    this port.
+	For more information visit http://windows.anope.org on how to obtain
+    the windows version of Anope.
 
 4. Can I send you questions without reading the FAQ, INSTALL or README 
    files?
@@ -391,7 +390,7 @@ Index:
 	be ignored, even if the problem happens not immediately.
 
 
-31. I would like to have the list of the different RAW on operserv
+31. I would like to have the list of the different RAW on OperServ
 
 	If you have to ask, you should not be messing with RAW :)
 
@@ -409,7 +408,7 @@ Index:
 	all channels. It must be activated on a per user basis and is
 	only available to Services Admins and Services Roots.
 	It is set using OperServ and is not persistent.
-	It only works if SuperAdmin is uncommented in the services
+	It only works if SuperAdmin is not commented in the services
 	configuration file. This is commented by default.
 	Read /msg OperServ HELP SET SUPERADMIN for further help.
 

@@ -2472,6 +2472,7 @@ static int do_group(User * u)
                 rdb_close();
             }
 #endif
+            send_event(EVENT_GROUP, u->nick);
             alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, common_get_vhost(u), u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);
 
@@ -2576,7 +2577,7 @@ static int do_identify(User * u)
                 common_svsmode(u, ircd->modeonreg, "");
             }
         }
-
+        send_event(EVENT_NICK_IDENTIFY, u->nick);
         alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
              u->username, common_get_vhost(u), u->nick);
         notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);

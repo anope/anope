@@ -52,7 +52,7 @@ Anope DefCon
     Services will ignore everyone but opers           64 
     Services will silently ignore everyone but opers 128 
     AKILL all new clients trying to connect          256 
-    No new memos sent to block memoserv attacks      512
+    No new memos sent to block MemoServ attacks      512
 
     These are the values used to determine each defcon setting, are set via: 
 

@@ -330,6 +330,7 @@ void do_server(const char *source, char *servername, char *hops,
         s = findserver(servlist, source);
 
     new_server(s, servername, descript, 0, numeric);
+    send_event(EVENT_SERVER_CONNECT, servername);
 }
 
 /*************************************************************************/
@@ -358,6 +359,7 @@ void do_squit(const char *source, int ac, char **av)
         alog("SQUIT for nonexistent server (%s)!!", av[0]);
         return;
     }
+    send_event(EVENT_SERVER_SQUIT, s->name);
 
     snprintf(buf, sizeof(buf), "%s %s", s->name,
              (s->uplink ? s->uplink->name : ""));
@@ -481,6 +483,12 @@ void capab_parse(int ac, char **av)
             uplink_capab |= CAPAB_CHANMODE;
             if (tmp) {
                 ircd->chanmodes = sstrdup(tmp);
+            }
+        }
+        if (!stricmp(s, "NICKCHARS")) {
+            uplink_capab |= CAPAB_NICKCHARS;
+            if (tmp) {
+                ircd->nickchars = sstrdup(tmp);
             }
         }
         if (s) {

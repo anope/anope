@@ -4059,6 +4059,7 @@ static int do_ghost(User * u)
 static int do_status(User * u)
 {
     User *u2;
+    NickAlias *na = NULL;
     int i = 0;
     char *nick = strtok(NULL, " ");
 
@@ -4068,12 +4069,14 @@ static int do_status(User * u)
         nick = u->nick;
 
     while (nick && (i++ < 16)) {
-        if (!(u2 = finduser(nick)))
+        if (!(u2 = finduser(nick)))     /* Nick is not online */
             notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
-        else if (nick_identified(u2))
+        else if (nick_identified(u2))   /* Nick is identified */
             notice_lang(s_NickServ, u, NICK_STATUS_3, nick);
-        else if (nick_recognized(u2))
+        else if (nick_recognized(u2))   /* Nick is recognised, but NOT identified */
             notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
+        else if ((na = findnick(nick)) == NULL) /* Nick is online, but NOT a registered */
+            notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
         else
             notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
 

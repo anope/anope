@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="529"
+VERSION_BUILD="530"
 
 # $Log$
+#
+# BUILD : 1.7.7 (530)
+# BUGS  : N/A
+# NOTES : Fixed /ns status to be consistant with what help reports it will do.
 #
 # BUILD : 1.7.7 (529)
 # BUGS  : 

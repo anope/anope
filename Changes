@@ -16,6 +16,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004/2005
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.    [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+01/08 F /NS Status always returns 0 for unregisterd nicks like help says  [ #00]
 01/07 F Fixed example.conf syntax mistake.                                [ #00]
 01/06 F Possible crash using memoserv.                                    [#269]
 01/05 F Few updates to Dutch language file (nl.l).                        [ #00]

@@ -14,7 +14,7 @@
 #ifdef IRC_VIAGRA
 
 #define PROTECT_SET_MODE "+a"
-#define PROTECT_UNSET_MODE "+a"
+#define PROTECT_UNSET_MODE "-a"
 #define CS_CMD_PROTECT "PROTECT"
 #define CS_CMD_DEPROTECT "DEPROTECT"
 #define FANT_PROTECT_ADD "!protect"

@@ -14,7 +14,7 @@
 #ifdef IRC_RAGE2
 
 #define PROTECT_SET_MODE "+a"
-#define PROTECT_UNSET_MODE "+a"
+#define PROTECT_UNSET_MODE "-a"
 #define FANT_PROTECT_ADD "!admin"
 #define FANT_PROTECT_DEL "!deadmin"
 #define LEVEL_PROTECT_WORD "AUTOADMIN"

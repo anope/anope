@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="346"
+VERSION_BUILD="347"
 
 # $Log$
+#
+# BUILD : 1.7.5 (347)
+# BUGS  : 
+# NOTES : Fixed PROTECT_UNSET_MODE from +a to -a -- Certus was too lazy to do it so he asked if i could :\
 #
 # BUILD : 1.7.5 (346)
 # BUGS  : 

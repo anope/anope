@@ -606,23 +606,21 @@ int anope_event_sjoin(char *source, int ac, char **av)
 int anope_event_nick(char *source, int ac, char **av)
 {
     Server *s;
-    User *u;
+    User *user;
 
     if (UseTS6 && ac == 9) {
         s = findserver_uid(servlist, source);
         /* Source is always the server */
         *source = '\0';
-        User *user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
-                             strtoul(av[2], NULL, 10),
-                             0, 0, "*", av[7]);
+        user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
+                       strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
         if (user) {
             anope_set_umode(user, 1, &av[3]);
         }
     } else {
         if (ac != 2) {
-            User *user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
-                                 strtoul(av[2], NULL, 10),
-                                 0, 0, "*", NULL);
+            user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
+                           strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
             if (user)
                 anope_set_umode(user, 1, &av[3]);
         } else {
@@ -679,6 +677,7 @@ int anope_event_topic(char *source, int ac, char **av)
 int anope_event_tburst(char *source, int ac, char **av)
 {
     char *setter;
+    Channel *c;
 
     if (ac != 4) {
         return MOD_CONT;
@@ -686,7 +685,7 @@ int anope_event_tburst(char *source, int ac, char **av)
 
     setter = myStrGetToken(av[2], '!', 0);
 
-    Channel *c = findchan(av[0]);
+    c = findchan(av[0]);
     time_t topic_time = strtol(av[1], NULL, 10);
 
     if (!c) {
@@ -723,10 +722,11 @@ int anope_event_436(char *source, int ac, char **av)
 
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
+void moduleAddIRCDMsgs(void) 
+{
     Message *m;
-
     char buf[BUFSIZE];
+
     *buf = '\0';
 
     if (UseTS6) {

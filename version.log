@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="556"
+VERSION_BUILD="557"
 
 # $Log$
+#
+# BUILD : 1.7.7 (557)
+# BUGS  : N/A
+# NOTES : Should fix gcc2 compiler warnings with ratbox
 #
 # BUILD : 1.7.7 (556)
 # BUGS  : N/A

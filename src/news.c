@@ -1,5 +1,6 @@
 /* News functions.
 /* News functions.
+/* News functions.
  *
  * (C) 2003 Anope Team
  * Contact us at info@anope.org
@@ -539,4 +540,5 @@ static int del_newsitem(int num, short type)
 
 /*************************************************************************/
 
+ 
  

@@ -161,7 +161,7 @@ void alog(const char *fmt, ...)
     if (LogChannel && logchan && !debug && findchan(LogChannel)) {
         char str[BUFSIZE];
         vsnprintf(str, sizeof(str), fmt, args);
-        privmsg(s_GlobalNoticer, LogChannel, str);
+        privmsg(s_GlobalNoticer, LogChannel, "%s", str);
     }
 
     va_end(args);

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="378"
+VERSION_BUILD="379"
 
 # $Log$
+#
+# BUILD : 1.7.5 (379)
+# BUGS  : 176
+# NOTES : Fixed a possible segfault due to a bug in LogChannel
 #
 # BUILD : 1.7.5 (378)
 # BUGS  : N/A

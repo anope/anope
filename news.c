@@ -17,9 +17,9 @@
 
 /*************************************************************************/
 
-static int32 nnews = 0;
-static int32 news_size = 0;
-static NewsItem *news = NULL;
+int32 nnews = 0;
+int32 news_size = 0;
+NewsItem *news = NULL;
 
 /*************************************************************************/
 

@@ -33,9 +33,9 @@ static int guestnum;            /* Current guest number */
 extern char *getvHost(char *nick);
 
 static int is_on_access(User * u, NickCore * nc);
-static void alpha_insert_alias(NickAlias * na);
-static void insert_core(NickCore * nc);
-static void insert_requestnick(NickRequest * nr);
+void alpha_insert_alias(NickAlias * na);
+void insert_core(NickCore * nc);
+void insert_requestnick(NickRequest * nr);
 static NickAlias *makenick(const char *nick);
 static NickRequest *makerequest(const char *nick);
 static NickAlias *makealias(const char *nick, NickCore * nc);
@@ -696,7 +696,6 @@ void load_ns_dbase(void)
 
             SAFE(read_string(&nc->display, f));
             SAFE(read_string(&nc->pass, f));
-
             SAFE(read_string(&nc->email, f));
             SAFE(read_string(&nc->greet, f));
             SAFE(read_int32(&nc->icq, f));
@@ -1300,7 +1299,7 @@ static int is_on_access(User * u, NickCore * nc)
 
 /* Insert a nick alias alphabetically into the database. */
 
-static void alpha_insert_alias(NickAlias * na)
+void alpha_insert_alias(NickAlias * na)
 {
     NickAlias *ptr, *prev;
     char *nick = na->nick;
@@ -1322,7 +1321,7 @@ static void alpha_insert_alias(NickAlias * na)
 
 /* Insert a nick core into the database. */
 
-static void insert_core(NickCore * nc)
+void insert_core(NickCore * nc)
 {
     int index = HASH(nc->display);
 
@@ -1334,7 +1333,7 @@ static void insert_core(NickCore * nc)
 }
 
 /*************************************************************************/
-static void insert_requestnick(NickRequest * nr)
+void insert_requestnick(NickRequest * nr)
 {
     int index = HASH(nr->nick);
 

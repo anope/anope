@@ -43,6 +43,7 @@ E void load_bs_dbase(void);
 E void save_bs_dbase(void);
 E void save_bs_rdb_dbase(void);
 
+E BotInfo *makebot(char *nick);
 E BotInfo *findbot(char *nick);
 E void bot_join(ChannelInfo *ci);
 E void bot_rejoin_all(BotInfo *bi);
@@ -91,6 +92,9 @@ E CSModeUtil csmodeutils[];
 E void listchans(int count_only, const char *chan);
 E void get_chanserv_stats(long *nrec, long *memuse);
 
+E int delchan(ChannelInfo * ci);
+E void alpha_insert_chan(ChannelInfo * ci);
+E void reset_levels(ChannelInfo * ci);
 E void cs_init(void);
 E void chanserv(User *u, char *buf);
 E void load_cs_dbase(void);
@@ -436,6 +440,10 @@ E void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
                     HostCache * hc);
 E void rdb_save_news(NewsItem * ni);
 E void rdb_save_exceptions(Exception * e);
+E void rdb_load_bs_dbase(void);
+E void rdb_load_hs_dbase(void);
+E void rdb_load_ns_dbase(void);
+E void rdb_load_dbases(void);
 #endif
 
 #ifdef USE_MYSQL
@@ -448,6 +456,7 @@ E char *MysqlSock;
 E char *MysqlSecure;
 E int MysqlRetries;
 E int MysqlRetryGap;
+E int UseRDB;
 #endif
 
 E int read_config(int reload);
@@ -595,6 +604,9 @@ E void doCleanBuffer(char *str);
 
 /**** news.c ****/
 
+E int32 nnews, news_size;
+E NewsItem *news;
+
 E void get_news_stats(long *nrec, long *memuse);
 E void load_news(void);
 E void save_news(void);
@@ -611,6 +623,9 @@ E NickAlias *nalists[1024];
 E NickCore *nclists[1024];
 E NickRequest *nrlists[1024];
 
+E void insert_requestnick(NickRequest * nr);
+E void alpha_insert_alias(NickAlias * na);
+E void insert_core(NickCore * nc);
 E void listnicks(int count_only, const char *nick);
 E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
@@ -642,9 +657,11 @@ E void helpserv_init(void);
 
 /**** hostserv.c  ****/
 E void hostserv_init(void);
+E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 
 /**** operserv.c  ****/
 
+E SList akills, sglines, sqlines, szlines;
 E SList servadmins;
 E SList servopers;
 
@@ -714,6 +731,7 @@ E void s_unszline(char *mask);
 
 E HostCache *hcache[1024];
 
+E HostCache *proxy_cache_add(char *host);
 E void get_proxy_stats(long *nrec, long *memuse);
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 E int proxy_check(char *nick, char *host, uint32 ip);
@@ -745,6 +763,9 @@ E void privmsg(const char *source, const char *dest, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
 /**** sessions.c ****/
+
+E Exception *exceptions;
+E int16 nexceptions;
 
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
@@ -832,6 +853,14 @@ E void db_mysql_save_news(NewsItem * ni);
 E void db_mysql_save_exceptions(Exception * e);
 E void db_mysql_save_hs_core(HostCore * hc);
 E void db_mysql_save_bs_core(BotInfo * bi);
+E void db_mysql_load_bs_dbase(void);
+E void db_mysql_load_hs_dbase(void);
+E void db_mysql_load_ns_dbase(void);
+E void db_mysql_load_ns_req_dbase(void);
+E void db_mysql_load_cs_dbase(void);
+E void db_mysql_load_os_dbase(void);
+E void db_mysql_load_exceptions(void);
+E void db_mysql_load_news(void);
 #endif
 
 

@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="15"
+VERSION_BUILD="17"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (17)
+# BUGS  : 
+# NOTES : Implemented MySQL Phase 2, see Changes and docs/MYSQL file for information.
 #
 # BUILD : 1.7.0 (15)
 # BUGS  : N/A

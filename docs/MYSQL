@@ -17,6 +17,12 @@ Introduction:
     replace the FFF completely as an archive method (since all changes to 
     the mysql db would be lost on the next Services save). All, while keeping 
     FFF intact. This is still not the final goal, but it's a milestone.
+    (COMPLETED)
+    
+    UPDATE: Anope 1.7.0 (Revision 11 and above) finally supports phase 2!
+            A new config directive called 'UseRDB' has been added.
+            If you enable this, anope will automatically try to load its
+            data from MySQL (if configured and compiled with).
 
     PHASE 3:The next step, and most convoluted of all (since we'll need to 
     modify pretty much all the source) is to load/save (SELECT/INSERT) data 

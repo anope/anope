@@ -226,10 +226,10 @@ int xop_msgs[4][14] = {
 /* *INDENT-ON* */
 /*************************************************************************/
 
-static void alpha_insert_chan(ChannelInfo * ci);
+void alpha_insert_chan(ChannelInfo * ci);
 static ChannelInfo *makechan(const char *chan);
-static int delchan(ChannelInfo * ci);
-static void reset_levels(ChannelInfo * ci);
+int delchan(ChannelInfo * ci);
+void reset_levels(ChannelInfo * ci);
 static int is_real_founder(User * user, ChannelInfo * ci);
 static int is_identified(User * user, ChannelInfo * ci);
 static void make_unidentified(User * u, ChannelInfo * ci);
@@ -2075,7 +2075,7 @@ int check_access(User * user, ChannelInfo * ci, int what)
 
 /* Insert a channel alphabetically into the database. */
 
-static void alpha_insert_chan(ChannelInfo * ci)
+void alpha_insert_chan(ChannelInfo * ci)
 {
     ChannelInfo *ptr, *prev;
     char *chan = ci->name;
@@ -2120,7 +2120,7 @@ static ChannelInfo *makechan(const char *chan)
 /* Remove a channel from the ChanServ database.  Return 1 on success, 0
  * otherwise. */
 
-static int delchan(ChannelInfo * ci)
+int delchan(ChannelInfo * ci)
 {
     int i;
     NickCore *nc = ci->founder;
@@ -2204,7 +2204,7 @@ static int delchan(ChannelInfo * ci)
 
 /* Reset channel access level values to their default state. */
 
-static void reset_levels(ChannelInfo * ci)
+void reset_levels(ChannelInfo * ci)
 {
     int i;
 

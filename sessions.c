@@ -68,8 +68,8 @@ struct session_ {
 static Session *sessionlist[1024];
 static int32 nsessions = 0;
 
-static Exception *exceptions = NULL;
-static int16 nexceptions = 0;
+Exception *exceptions = NULL;
+int16 nexceptions = 0;
 
 /*************************************************************************/
 

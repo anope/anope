@@ -50,7 +50,7 @@ pthread_mutex_t resmut = PTHREAD_MUTEX_INITIALIZER;
 
 static uint32 aton(char *ipaddr);
 static void proxy_akill(char *host);
-static HostCache *proxy_cache_add(char *host);
+HostCache *proxy_cache_add(char *host);
 static void proxy_cache_del(HostCache * hc);
 static HostCache *proxy_cache_find(char *host);
 static int proxy_connect(unsigned long ip, unsigned short port);
@@ -134,7 +134,7 @@ static void proxy_akill(char *host)
 
 /* Adds a cache entry after having it allocated */
 
-static HostCache *proxy_cache_add(char *host)
+HostCache *proxy_cache_add(char *host)
 {
     HostCache *hc;
     int index = HASH(host);

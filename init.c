@@ -616,7 +616,7 @@ int init(int ac, char **av)
     helpserv_init();
 
 #ifdef USE_RDB
-    db_mysql_init();
+    rdb_init();
 #endif
 
     /* Initialize proxy detection */
@@ -641,6 +641,11 @@ int init(int ac, char **av)
 #endif
 
     /* Load up databases */
+#ifdef USE_RDB
+    if (UseRDB)
+        rdb_load_dbases();
+    if (!UseRDB) {
+#endif
     if (!skeleton) {
         load_ns_dbase();
         if (debug)
@@ -651,7 +656,6 @@ int init(int ac, char **av)
                 alog("debug: Loaded %s database (2/9)", s_HostServ);
         }
         if (s_BotServ) {
-            load_bs_dbase();
             if (debug)
                 alog("debug: Loaded %s database (3/9)", s_BotServ);
         } else if (debug)
@@ -674,12 +678,24 @@ int init(int ac, char **av)
         if (debug)
             alog("debug: Loaded PreNick database (9/9)");
     }
-
+    }
     alog("Databases loaded");
 
     /* Save the databases back to file/mysql to reflect any changes */
-    save_databases();
-
+#ifdef USE_RDB
+    if (!UseRDB)   /* Only save if we are not using remote databases
+                    * to avoid floods. As a side effects our nice
+                    * FFF databases won't get overwritten if the
+                    * mysql db is broken (empty etc.) */
+    {
+#endif
+        alog("Info: Reflecting database records.");
+        save_databases();
+#ifdef USE_RDB
+    } else {
+        alog("Info: Not reflecting database records.");
+    }
+#endif
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
     if (servsock < 0 && RemoteServer2) {

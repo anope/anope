@@ -34,7 +34,7 @@ int nbots = 0;
 
 /*************************************************************************/
 
-static BotInfo *makebot(char *nick);
+BotInfo *makebot(char *nick);
 static UserData *get_user_data(Channel * c, User * u);
 static void unassign(User * u, ChannelInfo * ci);
 
@@ -709,7 +709,7 @@ static void insert_bot(BotInfo * bi)
 
 /*************************************************************************/
 
-static BotInfo *makebot(char *nick)
+BotInfo *makebot(char *nick)
 {
     BotInfo *bi;
 

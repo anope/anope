@@ -16,6 +16,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.    [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+01/01 F Ultimate3 channel modes, which had been defined incorrectly.      [ #00]
 12/31 F Fixed integer overflow error with CS ACCESS/LEVELS.               [#262]
 12/30 F Fixed moduleAddData using an old moduleData as list head.         [#261]
 12/30 F List handling of moduleData was bad on deletion.                  [#261]

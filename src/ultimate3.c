@@ -79,7 +79,7 @@ IRCDVar ircd[] = {
      0,                         /* vidents              */
      0,                         /* svshold              */
      1,                         /* time stamp on mode   */
-     0,                         /* NICKIP               */
+     1,                         /* NICKIP               */
      0,                         /* O:LINE               */
      1,                         /* UMODE               */
      1,                         /* VHOST ON NICK        */

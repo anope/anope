@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="518"
+VERSION_BUILD="519"
 
 # $Log$
+#
+# BUILD : 1.7.6 (519)
+# BUGS  : N/A
+# NOTES : Ultimate3 bug fixes, they have NICKIP, and some channel modes were defined the same causing problems
 #
 # BUILD : 1.7.6 (518)
 # BUGS  : 262

@@ -8,10 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="71"
+VERSION_BUILD="72"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (72)
+# NOTES : New language index (temp fix)
 #
 # BUILD : 1.7.2 (71)
 # NOTES : Language file normalization. Make sure distclean is made.

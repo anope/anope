@@ -1,3 +1,6 @@
+Anope Version S V N
+-------------------
+
 Anope Version 1.7.7
 -------------------
 - ALTER TABLE anope_ns_alias CHANGE status status int(11) unsigned NOT NULL default '0'

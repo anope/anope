@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="536"
+VERSION_BUILD="538"
 
 # $Log$
+#
+# BUILD : 1.7.7 (538)
+# BUGS  : none
+# NOTES : Framework for svn development.
 #
 # BUILD : 1.7.7 (536)
 # BUGS  : none

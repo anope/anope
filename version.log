@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="25"
+VERSION_BUILD="26"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (26)
+# BUGS  : none
+# NOTES : Testing svn access with a new am script.
 #
 # BUILD : 1.7.0 (25)
 # BUGS  : 

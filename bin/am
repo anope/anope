@@ -23,12 +23,14 @@ my $fhint="version.log";
 
 # Default values, change or use environment variables instead.
 my $copy="anope";
+my $svnuser="";
 my $svnpath="/usr/bin";
 my $svnroot="svn://zero.org/repos/$copy";
 my $editor="/usr/bin/vi";
 
 # Environment variables SVNBINDIR and SVNROOT override the above 
 # hardcoded values.
+$svnuser="$ENV{SVNUSER}"   if ($ENV{SVNUSER});
 $svnpath="$ENV{SVNBINDIR}" if ($ENV{SVNBINDIR});
 $svnroot="$ENV{SVNROOT}"   if ($ENV{SVNROOT});
 $editor="$ENV{EDITOR}"     if ($ENV{EDITOR});
@@ -372,7 +374,7 @@ NOTES : ";
     close(OUT);
 
     print "*** Starting the upload...\n\n";
-    my $rval=system("$svn commit $dst --message '$svn_comment'");
+    my $rval=system("$svn commit $dst --username='$svnuser' --message '$svn_comment'");
     if ( $rval ) {
             print "*** Error: Unable to complete commit. Rolling back....\n\n";
             system("$svn revert $ctrlfile");

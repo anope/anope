@@ -165,7 +165,7 @@ BASE_CFLAGS=/D USE_THREADS $(BASE_CFLAGS)
 !ENDIF
 
 !IF $(DB_ENCRYPTION) == 1
-BASE_CFLAGS=/D USE_ENCRYPTION $(BASE_CFLAGS)
+BASE_CFLAGS=/D USE_ENCRYPTION /D ENCRYPT_MD5 $(BASE_CFLAGS)
 !ENDIF
 
 # Note that changing any of these options (or, in fact, anything in this

@@ -8,9 +8,12 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="126"
+VERSION_BUILD="128"
 
 # $Log$
+#
+# BUILD : 1.7.3 (128)
+# NOTES : Typo no Changes file.
 #
 # BUILD : 1.7.3 (126)
 # BUGS  : 73

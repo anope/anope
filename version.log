@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="476"
+VERSION_BUILD="477"
 
 # $Log$
+#
+# BUILD : 1.7.6 (477)
+# BUGS  : N/A
+# NOTES : list.c and mail.c are doxygen ready now
 #
 # BUILD : 1.7.6 (476)
 # BUGS  : N/A

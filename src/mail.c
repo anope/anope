@@ -15,16 +15,24 @@
 #include "services.h"
 #include "language.h"
 
-/* Begins to send a mail. Must be followed by a MailEnd call.
+/*************************************************************************/
+
+/**
+ * Begins to send a mail. Must be followed by a MailEnd call.
  * Returns NULL if the call failed. Error messages are
  * automatically sent to the user.
+ * @param u the User struct
+ * @param nr NickReqest Struct
+ * @param subject Subject of the email
+ * @param service Service to respond with
+ * @return MailInfo struct
  */
-
 MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
                        char *service)
 {
-    if (!u || !nr || !subject)
+    if (!u || !nr || !subject || !service) {
         return NULL;
+    }
 
     if (!UseMail) {
         notice_lang(service, u, MAIL_DISABLED);
@@ -60,15 +68,23 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
     return NULL;
 }
 
-/* Begins to send a mail. Must be followed by a MailEnd call.
+/*************************************************************************/
+
+/**
+ * Begins to send a mail. Must be followed by a MailEnd call.
  * Returns NULL if the call failed. Error messages are
  * automatically sent to the user.
+ * @param u the User struct
+ * @param nc NickCore Struct
+ * @param subject Subject of the email
+ * @param service Service to respond with
+ * @return MailInfo struct
  */
-
 MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
 {
-    if (!u || !nc || !subject)
+    if (!u || !nc || !subject || !service) {
         return NULL;
+    }
 
     if (!UseMail) {
         notice_lang(service, u, MAIL_DISABLED);
@@ -107,8 +123,13 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
     return NULL;
 }
 
-/* new function to send memo mails */
+/*************************************************************************/
 
+/**
+ * new function to send memo mails
+ * @param nc NickCore Struct
+ * @return MailInfo struct
+ */
 MailInfo *MailMemoBegin(NickCore * nc)
 {
 
@@ -145,19 +166,26 @@ MailInfo *MailMemoBegin(NickCore * nc)
     return NULL;
 }
 
-/* Finish to send the mail. Cleanup everything. */
+/*************************************************************************/
 
-/*  - param checking modified because we don't
-      have an user sending this mail.
-      Certus, 02.04.2004 */
-
+/**
+ * Finish to send the mail. Cleanup everything.
+ * @param mail MailInfo Struct
+ * @return void
+ */
 void MailEnd(MailInfo * mail)
 {
-    if (!mail || !mail->pipe)   /* removed sender check */
-        return;
+    /*  - param checking modified because we don't
+       have an user sending this mail.
+       Certus, 02.04.2004 */
 
-    if (!mail->recipient && !mail->recip)
+    if (!mail || !mail->pipe) { /* removed sender check */
         return;
+    }
+
+    if (!mail->recipient && !mail->recip) {
+        return;
+    }
 
     pclose(mail->pipe);
 
@@ -173,8 +201,14 @@ void MailEnd(MailInfo * mail)
     free(mail);
 }
 
-/* Resets the MailDelay protection */
+/*************************************************************************/
 
+/**
+ * Resets the MailDelay protection.
+ * @param u the User struct
+ * @param nc NickCore Struct
+ * @return void
+ */
 void MailReset(User * u, NickCore * nc)
 {
     if (u)
@@ -183,14 +217,18 @@ void MailReset(User * u, NickCore * nc)
         nc->lastmail = 0;
 }
 
-/* Checks whether we have a valid, common e-mail address.
+/*************************************************************************/
+
+/**
+ * Checks whether we have a valid, common e-mail address.
  * This is NOT entirely RFC compliant, and won't be so, because I said 
  * *common* cases. ;) It is very unlikely that e-mail addresses that
  * are really being used will fail the check.
  *
  * FIXME: rewrite this a bit cleaner.
+ * @param email Email to Validate
+ * @return int
  */
-
 int MailValidate(const char *email)
 {
     int i, j, has_period = 0, len;

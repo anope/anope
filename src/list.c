@@ -16,6 +16,12 @@
 
 /*************************************************************************/
 
+/**
+ * List all register nicks
+ * @param ac Number of Arguments
+ * @param av Array if Arguments
+ * @return void
+ */
 void do_listnicks(int ac, char **av)
 {
     int count = 0;              /* Count only rather than display? */
@@ -96,6 +102,12 @@ are given, detailed information about those nicks is displayed.\n\
 
 /*************************************************************************/
 
+/**
+ * List all register channels
+ * @param ac Number of Arguments
+ * @param av Array if Arguments
+ * @return void
+ */
 void do_listchans(int ac, char **av)
 {
     int count = 0;              /* Count only rather than display? */

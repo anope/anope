@@ -2794,6 +2794,10 @@ static int do_drop(User * u)
         if (readonly)
             notice_lang(s_NickServ, u, READ_ONLY_MODE);
 
+        if (ircd->sqline && (na->status & NS_VERBOTEN)) {
+            anope_cmd_unsqline(na->nick);
+        }
+
         alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)",
              s_NickServ, u->nick, u->username, common_get_vhost(u),
              na->nick, na->nc->display,
@@ -4265,6 +4269,11 @@ static int do_forbid(User * u)
         if (na->u) {
             notice_lang(s_NickServ, na->u, FORCENICKCHANGE_NOW);
             collide(na, 0);
+        }
+
+
+        if (ircd->sqline) {
+            anope_cmd_sqline(na->nick, ((reason) ? reason : "Forbidden"));
         }
 
         if (WallForbid)

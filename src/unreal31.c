@@ -103,6 +103,7 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     0,                         /* SJOIN invite char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "x",                       /* vhost char */
@@ -1127,9 +1128,8 @@ void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void anope_cmd_connect(int servernum)
 {
-    if (!servernum) {
-        servernum = 1;
-    }
+    me_server =
+        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
     anope_cmd_protoctl();
     if (servernum == 1) {

@@ -53,15 +53,15 @@ int32 read_buffer_len()
  * @param int Length of buffer
  * @return int
  */
-static int buffered_read(int fd, char *buf, int len)
+static int buffered_read(ano_socket_t fd, char *buf, int len)
 {
     int nread, left = len;
     fd_set fds;
     struct timeval tv = { 0, 0 };
-    int errno_save = errno;
+    int errno_save = ano_sockgeterr();
 
     if (fd < 0) {
-        errno = EBADF;
+        ano_sockseterr(SOCKERR_EBADF);
         return -1;
     }
     while (left > 0) {
@@ -80,8 +80,8 @@ static int buffered_read(int fd, char *buf, int len)
                 maxread = read_buftop - read_bufend - 1;
             else
                 maxread = read_buftop - read_bufend;
-            nread = read(fd, read_bufend, maxread);
-            errno_save = errno;
+            nread = ano_sockread(fd, read_bufend, maxread);
+            errno_save = ano_sockgeterr();
             if (debug >= 3)
                 alog("debug: buffered_read wanted %d, got %d", maxread,
                      nread);
@@ -118,7 +118,7 @@ static int buffered_read(int fd, char *buf, int len)
         alog("debug: buffered_read(%d,%p,%d) returning %d",
              fd, buf, len, len - left);
     }
-    errno = errno_save;
+    ano_sockseterr(errno_save);
     return len - left;
 }
 
@@ -130,17 +130,17 @@ static int buffered_read(int fd, char *buf, int len)
  * @param fd File Pointer
  * @return int
  */
-static int buffered_read_one(int fd)
+static int buffered_read_one(ano_socket_t fd)
 {
     int nread;
     fd_set fds;
     struct timeval tv = { 0, 0 };
     char c;
     struct timeval *tvptr = (read_bufend == read_curpos ? NULL : &tv);
-    int errno_save = errno;
+    int errno_save = ano_sockgeterr();
 
     if (fd < 0) {
-        errno = EBADF;
+        ano_sockseterr(SOCKERR_EBADF);
         return -1;
     }
     FD_ZERO(&fds);
@@ -157,8 +157,8 @@ static int buffered_read_one(int fd)
             maxread = read_buftop - read_bufend - 1;
         else
             maxread = read_buftop - read_bufend;
-        nread = read(fd, read_bufend, maxread);
-        errno_save = errno;
+        nread = ano_sockread(fd, read_bufend, maxread);
+        errno_save = ano_sockgeterr();
         if (debug >= 3)
             alog("debug: buffered_read_one wanted %d, got %d", maxread,
                  nread);
@@ -171,7 +171,7 @@ static int buffered_read_one(int fd)
     if (read_curpos == read_bufend) {   /* No more data on socket */
         if (debug >= 4)
             alog("debug: buffered_read_one(%d) returning %d", fd, EOF);
-        errno = errno_save;
+        ano_sockseterr(errno_save);
         return EOF;
     }
     c = *read_curpos++;
@@ -210,7 +210,7 @@ static int flush_write_buffer(int wait)
 {
     fd_set fds;
     struct timeval tv = { 0, 0 };
-    int errno_save = errno;
+    int errno_save = ano_sockgeterr();
 
     if (write_bufend == write_curpos || write_fd == -1)
         return 0;
@@ -224,8 +224,8 @@ static int flush_write_buffer(int wait)
             maxwrite = write_buftop - write_curpos - 1;
         else
             maxwrite = write_bufend - write_curpos;
-        nwritten = write(write_fd, write_curpos, maxwrite);
-        errno_save = errno;
+        nwritten = ano_sockwrite(write_fd, write_curpos, maxwrite);
+        errno_save = ano_sockgeterr();
         if (debug >= 3)
             alog("debug: flush_write_buffer wanted %d, got %d", maxwrite,
                  nwritten);
@@ -237,7 +237,7 @@ static int flush_write_buffer(int wait)
             return nwritten;
         }
     }
-    errno = errno_save;
+    ano_sockseterr(errno_save);
     return 0;
 }
 
@@ -250,10 +250,10 @@ static int flush_write_buffer(int wait)
  * @param len Length to write
  * @return int
  */
-static int buffered_write(int fd, char *buf, int len)
+static int buffered_write(ano_socket_t fd, char *buf, int len)
 {
     int nwritten, left = len;
-    int errno_save = errno;
+    int errno_save = ano_sockgeterr();
 
     if (fd < 0) {
         errno = EBADF;
@@ -310,7 +310,7 @@ static int buffered_write(int fd, char *buf, int len)
         alog("debug: buffered_write(%d,%p,%d) returning %d",
              fd, buf, len, len - left);
     }
-    errno = errno_save;
+    ano_sockseterr(errno_save);
     return len - left;
 }
 
@@ -326,12 +326,12 @@ static int buffered_write(int fd, char *buf, int len)
  * @return int
  */
 #if 0
-static int buffered_write_one(int c, int fd)
+static int buffered_write_one(int c, ano_socket_t fd)
 {
     struct timeval tv = { 0, 0 };
 
     if (fd < 0) {
-        errno = EBADF;
+        ano_sockseterr(SOCKERR_EBADF);
         return -1;
     }
     write_fd = fd;
@@ -373,7 +373,7 @@ static int buffered_write_one(int c, int fd)
  * @param int to read
  * @return int
  */
-int sgetc(int s)
+int sgetc(ano_socket_t s)
 {
     int c;
 
@@ -408,7 +408,7 @@ int sungetc(int c, int s)
  * @param s Socket
  * @return buffer
  */
-char *sgets(char *buf, int len, int s)
+char *sgets(char *buf, int len, ano_socket_t s)
 {
     int c = 0;
     struct timeval tv;
@@ -422,7 +422,7 @@ char *sgets(char *buf, int len, int s)
     tv.tv_usec = 0;
     while (read_buffer_len() == 0 &&
            (c = select(s + 1, &fds, NULL, NULL, &tv)) < 0) {
-        if (errno != EINTR)
+        if (ano_sockgeterr() != EINTR)
             break;
     }
     if (read_buffer_len() == 0 && c == 0)
@@ -445,7 +445,7 @@ char *sgets(char *buf, int len, int s)
  * @param s Socket
  * @return buffer
  */
-char *sgets2(char *buf, int len, int s)
+char *sgets2(char *buf, int len, ano_socket_t s)
 {
     char *str = sgets(buf, len, s);
 
@@ -469,7 +469,7 @@ char *sgets2(char *buf, int len, int s)
  * @param len Length
  * @return int
  */
-int sread(int s, char *buf, int len)
+int sread(ano_socket_t s, char *buf, int len)
 {
     return buffered_read(s, buf, len);
 }
@@ -482,7 +482,7 @@ int sread(int s, char *buf, int len)
  * @param str Buffer to write
  * @return int
  */
-int sputs(char *str, int s)
+int sputs(char *str, ano_socket_t s)
 {
     return buffered_write(s, str, strlen(str));
 }
@@ -496,7 +496,7 @@ int sputs(char *str, int s)
  * @param ... various args
  * @return int
  */
-int sockprintf(int s, char *fmt, ...)
+int sockprintf(ano_socket_t s, char *fmt, ...)
 {
     va_list args;
     char buf[16384];            /* Really huge, to try and avoid truncation */
@@ -555,7 +555,7 @@ int conn(const char *host, int port, const char *lhost, int lport)
     char *addr;
 #endif
     struct sockaddr_in sa, lsa;
-    int sock;
+    ano_socket_t sock;
 
     memset(&lsa, 0, sizeof(lsa));
     if (lhost) {
@@ -584,7 +584,7 @@ int conn(const char *host, int port, const char *lhost, int lport)
 #else
     if (!(addr = pack_ip(host))) {
         alog("conn(): `%s' is not a valid IP address", host);
-        errno = EINVAL;
+        ano_sockseterr(SOCKERR_EINVAL);
         return -1;
     }
     memcpy((char *) &sa.sin_addr, addr, 4);
@@ -597,16 +597,16 @@ int conn(const char *host, int port, const char *lhost, int lport)
 
     if ((lhost || lport)
         && bind(sock, (struct sockaddr *) &lsa, sizeof(lsa)) < 0) {
-        int errno_save = errno;
-        close(sock);
-        errno = errno_save;
+        int errno_save = ano_sockgeterr();
+        ano_sockclose(sock);
+        ano_sockseterr(errno_save);
         return -1;
     }
 
     if (connect(sock, (struct sockaddr *) &sa, sizeof(sa)) < 0) {
-        int errno_save = errno;
-        close(sock);
-        errno = errno_save;
+        int errno_save = ano_sockgeterr();
+        ano_sockclose(sock);
+        ano_sockseterr(errno_save);
         return -1;
     }
 
@@ -620,8 +620,109 @@ int conn(const char *host, int port, const char *lhost, int lport)
  * @param s Socket
  * @return void
  */
-void disconn(int s)
+void disconn(ano_socket_t s)
 {
     shutdown(s, 2);
-    close(s);
+    ano_sockclose(s);
 }
+
+/*************************************************************************/
+/* Windows support functions */
+
+#ifdef _WIN32
+/* Microsoft makes things nice and fun for us! */
+struct u_WSA_errors {
+    int error_code;
+    char *error_string;
+};
+
+/* Must be sorted ascending by error code */
+struct u_WSA_errors WSAErrors[] = {
+    {WSAEINTR, "Interrupted system call"},
+    {WSAEBADF, "Bad file number"},
+    {WSAEACCES, "Permission denied"},
+    {WSAEFAULT, "Bad address"},
+    {WSAEINVAL, "Invalid argument"},
+    {WSAEMFILE, "Too many open sockets"},
+    {WSAEWOULDBLOCK, "Operation would block"},
+    {WSAEINPROGRESS, "Operation now in progress"},
+    {WSAEALREADY, "Operation already in progress"},
+    {WSAENOTSOCK, "Socket operation on non-socket"},
+    {WSAEDESTADDRREQ, "Destination address required"},
+    {WSAEMSGSIZE, "Message too long"},
+    {WSAEPROTOTYPE, "Protocol wrong type for socket"},
+    {WSAENOPROTOOPT, "Bad protocol option"},
+    {WSAEPROTONOSUPPORT, "Protocol not supported"},
+    {WSAESOCKTNOSUPPORT, "Socket type not supported"},
+    {WSAEOPNOTSUPP, "Operation not supported on socket"},
+    {WSAEPFNOSUPPORT, "Protocol family not supported"},
+    {WSAEAFNOSUPPORT, "Address family not supported"},
+    {WSAEADDRINUSE, "Address already in use"},
+    {WSAEADDRNOTAVAIL, "Can't assign requested address"},
+    {WSAENETDOWN, "Network is down"},
+    {WSAENETUNREACH, "Network is unreachable"},
+    {WSAENETRESET, "Net connection reset"},
+    {WSAECONNABORTED, "Software caused connection abort"},
+    {WSAECONNRESET, "Connection reset by peer"},
+    {WSAENOBUFS, "No buffer space available"},
+    {WSAEISCONN, "Socket is already connected"},
+    {WSAENOTCONN, "Socket is not connected"},
+    {WSAESHUTDOWN, "Can't send after socket shutdown"},
+    {WSAETOOMANYREFS, "Too many references, can't splice"},
+    {WSAETIMEDOUT, "Connection timed out"},
+    {WSAECONNREFUSED, "Connection refused"},
+    {WSAELOOP, "Too many levels of symbolic links"},
+    {WSAENAMETOOLONG, "File name too long"},
+    {WSAEHOSTDOWN, "Host is down"},
+    {WSAEHOSTUNREACH, "No route to host"},
+    {WSAENOTEMPTY, "Directory not empty"},
+    {WSAEPROCLIM, "Too many processes"},
+    {WSAEUSERS, "Too many users"},
+    {WSAEDQUOT, "Disc quota exceeded"},
+    {WSAESTALE, "Stale NFS file handle"},
+    {WSAEREMOTE, "Too many levels of remote in path"},
+    {WSASYSNOTREADY, "Network subsystem is unavailable"},
+    {WSAVERNOTSUPPORTED, "Winsock version not supported"},
+    {WSANOTINITIALISED, "Winsock not yet initialized"},
+    {WSAHOST_NOT_FOUND, "Host not found"},
+    {WSATRY_AGAIN, "Non-authoritative host not found"},
+    {WSANO_RECOVERY, "Non-recoverable errors"},
+    {WSANO_DATA, "Valid name, no data record of requested type"},
+    {WSAEDISCON, "Graceful disconnect in progress"},
+#ifdef WSASYSCALLFAILURE
+    {WSASYSCALLFAILURE, "System call failure"},
+#endif
+    {0, NULL}
+};
+
+char *ano_sockstrerror(int error)
+{
+    static char unkerr[64];
+    int start = 0;
+    int stop = sizeof(WSAErrors) / sizeof(WSAErrors[0]) - 1;
+    int mid;
+
+    /* Microsoft decided not to use sequential numbers for the error codes,
+     * so we can't just use the array index for the code. But, at least
+     * use a binary search to make it as fast as possible. 
+     */
+    while (start <= stop) {
+        mid = (start + stop) / 2;
+        if (WSAErrors[mid].error_code > error)
+            stop = mid - 1;
+
+        else if (WSAErrors[mid].error_code < error)
+            start = mid + 1;
+        else
+            return WSAErrors[mid].error_string;
+    }
+    sprintf(unkerr, "Unknown Error: %d", error);
+    return unkerr;
+}
+
+int ano_socksetnonb(ano_socket_t fd)
+{
+    int i = 1;
+    return (!ioctlsocket(fd, FIONBIO, &i) ? -1 : 1);
+}
+#endif

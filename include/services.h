@@ -37,23 +37,59 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Windows does not have:
+ * unistd.h, grp.h,
+ * netdb.h, netinet/in.h,
+ * sys/socket.h, sys/time.h
+ * Windows requires:
+ * winsock.h
+ * -- codemastr
+ */
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
+
+#ifndef _WIN32
 #include <grp.h>
+#endif
+
 #include <limits.h>
+
+#ifndef _WIN32
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#else
+#include <winsock.h>
+#include <windows.h>
+#endif
+
 #include <sys/stat.h>	/* for umask() on some systems */
 #include <sys/types.h>
+
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
+
+#ifdef _WIN32
+#include <sys/timeb.h>
+#include <direct.h>
+#include <io.h>
+#endif
+
 #include <fcntl.h>
 
+#ifndef _WIN32
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
+#endif
 #endif
 
 #ifdef USE_RDB
@@ -81,8 +117,13 @@
 #endif
 
 #ifdef USE_THREADS
-# include <pthread.h>
+ #ifndef _WIN32
+ #include <pthread.h>
+ #endif
+#include "threads.h"
 #endif
+
+#include "sockets.h"
 
 #ifdef _AIX
 /* Some AIX boxes seem to have bogus includes that don't have these
@@ -117,6 +158,14 @@ extern int toupper(char), tolower(char);
 
 /* We also have our own encrypt(). */
 #define encrypt encrypt_
+
+
+#ifdef __WINS__
+#ifndef BKCHECK
+#define BKCHECK
+  extern "C" void __pfnBkCheck() {}
+#endif
+#endif
 
 
 #if INTTYPE_WORKAROUND
@@ -162,7 +211,20 @@ typedef struct uid_ Uid;
 
 /*************************************************************************/
 
+/* Windows defines a boolean type as an 
+ * unsigned char. It does however need
+ * true/false. -- codemastr
+ */
+#ifndef _WIN32
 typedef enum { false, true } boolean;
+#else
+ #ifndef true
+  #define true 1
+ #endif
+ #ifndef false
+  #define false 0
+ #endif
+#endif /* _WIN32 */
 
 /*************************************************************************/
 
@@ -263,6 +325,7 @@ struct ircdvars_ {
     int invitemode;				/* +I  */
     int sjoinbanchar;			/* use single quotes to define it */
     int sjoinexchar;			/* use single quotes to define it */
+    int sjoininvchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	char *vhostchar;			/* char used for vhosting */

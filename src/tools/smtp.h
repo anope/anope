@@ -24,21 +24,39 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Windows does not have:
+ * unistd.h, grp.h,
+ * netdb.h, netinet/in.h,
+ * sys/socket.h, sys/time.h
+ * Windows requires:
+ * winsock.h
+ * -- codemastr
+ */
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
+
 #include <signal.h>
 #include <time.h>
 #include <errno.h>
-#include <grp.h>
 #include <limits.h>
+
+#ifndef _WIN32
 #include <netdb.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <sys/socket.h>
-#include <sys/stat.h>
+#else
+#include <winsock.h>
+#include <windows.h>
+#endif
+
 #include <sys/types.h>
+
+#ifndef _WIN32
 #include <sys/time.h>
-#include <fcntl.h>
-#include <ctype.h>
+#endif
 
 #ifdef _AIX
 extern int strcasecmp(const char *, const char *);
@@ -48,6 +66,11 @@ extern int socket(int, int, int);
 extern int connect(int, struct sockaddr *, int);
 # endif
 #endif /* _AIX */
+
+#ifdef _WIN32
+#define PATH_MAX 		MAX_PATH
+#define snprintf _snprintf
+#endif
 
 
 /*************************************************************************/

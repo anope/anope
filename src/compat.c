@@ -136,19 +136,27 @@ char *strerror(int errnum)
 /*************************************************************************/
 
 #if !HAVE_STRSIGNAL
+/* Windows only supports 6 signals:
+ * SIGINT, SIGILL, SIGABRT, SIGFPE, SIGSEGV, SIGTERM
+ * -- codemastr
+ */
 char *strsignal(int signum)
 {
     static char buf[32];
     switch (signum) {
+#ifndef _WIN32
     case SIGHUP:
         strscpy(buf, "Hangup", sizeof(buf));
         break;
+#endif
     case SIGINT:
         strscpy(buf, "Interrupt", sizeof(buf));
         break;
+#ifndef _WIN32
     case SIGQUIT:
         strscpy(buf, "Quit", sizeof(buf));
         break;
+#endif
 #ifdef SIGILL
     case SIGILL:
         strscpy(buf, "Illegal instruction", sizeof(buf));
@@ -172,15 +180,18 @@ char *strsignal(int signum)
     case SIGFPE:
         strscpy(buf, "Floating point exception", sizeof(buf));
         break;
+#ifndef _WIN32
     case SIGKILL:
         strscpy(buf, "Killed", sizeof(buf));
         break;
     case SIGUSR1:
         strscpy(buf, "User signal 1", sizeof(buf));
         break;
+#endif
     case SIGSEGV:
         strscpy(buf, "Segmentation fault", sizeof(buf));
         break;
+#ifndef _WIN32
     case SIGUSR2:
         strscpy(buf, "User signal 2", sizeof(buf));
         break;
@@ -190,9 +201,11 @@ char *strsignal(int signum)
     case SIGALRM:
         strscpy(buf, "Alarm clock", sizeof(buf));
         break;
+#endif
     case SIGTERM:
         strscpy(buf, "Terminated", sizeof(buf));
         break;
+#ifndef _WIN32
     case SIGSTOP:
         strscpy(buf, "Suspended (signal)", sizeof(buf));
         break;
@@ -202,12 +215,34 @@ char *strsignal(int signum)
     case SIGIO:
         strscpy(buf, "I/O error", sizeof(buf));
         break;
+#endif
     default:
         snprintf(buf, sizeof(buf), "Signal %d\n", signum);
         break;
     }
     return buf;
 }
+#endif
+
+#ifdef _WIN32
+
+#ifdef USE_THREADS
+/* Simulate pthread conditional variable waiting */
+int ano_cond_wait(ano_cond_t cond, ano_mutex_t mutex)
+{
+    ReleaseMutex(mutex);
+    if (WaitForSingleObject(cond, INFINITE) == WAIT_FAILED)
+        return 1;
+    if (WaitForSingleObject(mutex, INFINITE) == WAIT_FAILED)
+        return 1;
+    return 0;
+}
+
+/* Used for the cleanup functions */
+ano_thread_start __declspec(thread) cleanup_func = NULL;
+
+#endif
+
 #endif
 
 /*************************************************************************/

@@ -16,7 +16,7 @@
 #include "language.h"
 #include "version.h"
 
-#ifdef USE_MODULES
+#if defined(USE_MODULES) && !defined(_WIN32)
 #include <dlfcn.h>
 /* Define these for systems without them */
 #ifndef RTLD_NOW
@@ -31,6 +31,10 @@
 #ifndef RTLD_LOCAL
 #define RTLD_LOCAL 0
 #endif
+#endif
+
+#ifdef _WIN32
+const char *ano_moderr(void);
 #endif
 
 /**
@@ -283,8 +287,8 @@ int moduleCopyFile(char *name)
     strncat(output, name, 4095 - len);
     strncat(input, name, 4095 - len);
     len += strlen(output);
-    strncat(output, ".so", 4095 - len);
-    strncat(input, ".so", 4095 - len);
+    strncat(output, MODULE_EXT, 4095 - len);
+    strncat(input, MODULE_EXT, 4095 - len);
 
     if ((source = fopen(input, "r")) == NULL) {
         return MOD_ERR_NOEXIST;
@@ -344,22 +348,19 @@ int loadModule(Module * m, User * u)
     buf[4095] = '\0';
 
     m->filename = sstrdup(buf);
-#ifdef HAS_RTLD_LOCAL
-    m->handle = dlopen(m->filename, RTLD_LAZY | RTLD_LOCAL);
-#else
-    m->handle = dlopen(m->filename, RTLD_LAZY);
-#endif
-    if ((err = dlerror()) != NULL) {
+    ano_modclearerr();
+    m->handle = ano_modopen(m->filename);
+    if ((err = ano_moderr()) != NULL) {
         alog(err);
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
         }
         return MOD_ERR_NOLOAD;
     }
-
-    func = dlsym(m->handle, DL_PREFIX "AnopeInit");
-    if ((err = dlerror()) != NULL) {
-        dlclose(m->handle);     /* If no AnopeInit - it isnt an Anope Module, close it */
+    ano_modclearerr();
+    func = ano_modsym(m->handle, "AnopeInit");
+    if ((err = ano_moderr()) != NULL) {
+        ano_modclose(m->handle);     /* If no AnopeInit - it isnt an Anope Module, close it */
         return MOD_ERR_NOLOAD;
     }
     if (func) {
@@ -421,13 +422,13 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_UNKNOWN;
     }
 
-    func = dlsym(m->handle, DL_PREFIX "AnopeFini");
+    func = ano_modsym(m->handle, "AnopeFini");
     if (func) {
         func();                 /* exec AnopeFini */
     }
 
-    if ((dlclose(m->handle)) != 0) {
-        alog(dlerror());
+    if ((ano_modclose(m->handle)) != 0) {
+        alog(ano_moderr());
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
         }
@@ -2093,5 +2094,19 @@ boolean moduleMinVersion(int major, int minor, int patch, int build)
     }
     return ret;
 }
+
+#ifdef _WIN32
+const char *ano_moderr(void)
+{
+    static char errbuf[513];
+    DWORD err = GetLastError();
+    if (err == 0)
+        return NULL;
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                  FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, 0, errbuf, 512,
+                  NULL);
+    return errbuf;
+}
+#endif
 
 /* EOF */

@@ -777,14 +777,14 @@ void do_sjoin(const char *source, int ac, char **av)
                 }
             }
 
-            /* Unreal plans to add +I - for now add the hook to allow
-               1.7.6 to work with it and not cause problems - TSL */
-            if (*s == '\'') {
-                add_invite(c, myStrGetToken(s, '\'', 1));
-                if (!end)
-                    break;
-                s = end + 1;
-                continue;
+            if (ircd->sjoininvchar) {
+                if (*s == ircd->sjoininvchar) {
+                    add_invite(c, myStrGetToken(s, ircd->sjoininvchar, 1));
+                    if (!end)
+                        break;
+                    s = end + 1;
+                    continue;
+                }
             }
 
             while (csmodes[(int) *s] != 0)

@@ -1,4 +1,16 @@
-/* Needed due to Windows lack of a decent interpreter */
+/* Language stuff generator for win32.
+ *
+ * (C) 2003 Anope Team
+ * Contact us at info@anope.org
+ *
+ * Please read COPYING and README for furhter details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church. 
+ * 
+ * Written by Dominick Meglio <codemastr@unrealircd.com>
+ *
+ */
 
 #include <string.h>
 #include <stdio.h>

@@ -101,7 +101,8 @@ static dbFILE *open_db_read(const char *service, const char *filename)
         int errno_save = errno;
 #ifndef NOT_MAIN
         if (errno != ENOENT)
-            log_perror("Can't read %s database %s", service, f->filename);
+            log_perror("Can not read %s database %s", service,
+                       f->filename);
 #endif
         free(f);
         errno = errno_save;
@@ -126,16 +127,33 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 {
     dbFILE *f;
     int fd;
+#ifdef _WIN32
+    char buffer[_MAX_PATH];
+    char win32filename[MAXPATHLEN];
+
+    /* Get the current working directory: */
+    if (_getcwd(buffer, _MAX_PATH) == NULL) {
+        alog("debug: Unable to set Current working directory");
+    }
+#endif
 
     f = scalloc(sizeof(*f), 1);
     if (!f) {
 #ifndef NOT_MAIN
-        log_perror("Can't read %s database %s", service, filename);
+        log_perror("Can not read %s database %s", service, filename);
+#else
+        alog("Can not read %s database %s", service, filename);
 #endif
         return NULL;
     }
     strscpy(f->filename, filename, sizeof(f->filename));
+#ifndef _WIN32
     filename = f->filename;
+#else
+    snprintf(win32filename, sizeof(win32filename), "%s\\%s", buffer,
+             f->filename);
+    filename = win32filename;
+#endif
     f->mode = 'w';
 
     *f->backupname = 0;
@@ -150,19 +168,30 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         errno = errno_save;
         return NULL;
     }
-    unlink(f->backupname);
+#ifndef _WIN32
+    unlink(filename);
+#else
+    DeleteFile(filename);
+#endif
     f->backupfp = fopen(filename, "rb");
+#ifdef _WIN32
+    if (!MoveFileExA(filename, f->backupname, MOVEFILE_COPY_ALLOWED)
+        && GetLastError() != ENOENT) {
+        int errno_save = GetLastError();
+#else
     if (rename(filename, f->backupname) < 0 && errno != ENOENT) {
         int errno_save = errno;
+#endif
 #ifndef NOT_MAIN
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            anope_cmd_global(NULL, "Can't back up %s database %s", service,
-                             filename);
+            anope_cmd_global(NULL, "Can not back up %s database %s",
+                             service, filename);
         }
+        alog("errno %d %d %d", errno, ENOENT, EACCES);
         errno = errno_save;
-        log_perror("Can't back up %s database %s", service, filename);
+        log_perror("Can not back up %s database %s", service, filename);
         if (!NoBackupOkay) {
 #endif
             if (f->backupfp)
@@ -175,9 +204,17 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #endif
         *f->backupname = 0;
     }
+#ifndef _WIN32
     unlink(filename);
+#else
+    DeleteFile(filename);
+#endif
     /* Use open() to avoid people sneaking a new file in under us */
+#ifndef _WIN32
     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0666);
+#else
+    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | _O_BINARY, 0666);
+#endif
     f->fp = fdopen(fd, "wb");   /* will fail and return NULL if fd < 0 */
     if (!f->fp || !write_file_version(f, version)) {
         int errno_save = errno;
@@ -193,7 +230,11 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #endif
         if (f->fp) {
             fclose(f->fp);
+#ifndef _WIN32
             unlink(filename);
+#else
+            DeleteFile(filename);
+#endif
         }
         if (*f->backupname && rename(f->backupname, filename) < 0)
 #ifndef NOT_MAIN
@@ -283,7 +324,11 @@ void restore_db(dbFILE * f)
         if (f->backupfp)
             fclose(f->backupfp);
         if (*f->backupname)
+#ifndef _WIN32
             unlink(f->backupname);
+#else
+            DeleteFile(f->backupname);
+#endif
     }
     fclose(f->fp);
     if (!errno_save)
@@ -306,7 +351,11 @@ void close_db(dbFILE * f)
         && strcmp(f->backupname, f->filename) != 0) {
         if (f->backupfp)
             fclose(f->backupfp);
+#ifndef _WIN32
         unlink(f->backupname);
+#else
+        DeleteFile(f->backupname);
+#endif
     }
     fclose(f->fp);
     free(f);
@@ -539,19 +588,47 @@ static void remove_backups(void)
     strftime(ext, sizeof(ext), "%Y%m%d", &tm);
 
     snprintf(path, sizeof(path), "backups/%s.%s", NickDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", BotDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", ChanDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", OperDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", NewsDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", ExceptionDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
     snprintf(path, sizeof(path), "backups/%s.%s", HostDBName, ext);
+#ifndef _WIN32
     unlink(path);
+#else
+    DeleteFile(path);
+#endif
 }
 
 /*************************************************************************/

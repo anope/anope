@@ -20,6 +20,23 @@ static int curday = 0;
 
 /*************************************************************************/
 
+#ifdef _WIN32
+int strcasecmp(const char *s1, const char *s2)
+{
+    register int c;
+
+    while ((c = tolower(*s1)) == tolower(*s2)) {
+        if (c == 0)
+            return 0;
+        s1++;
+        s2++;
+    }
+    if (c < tolower(*s2))
+        return -1;
+    return 1;
+}
+#endif
+
 static int get_logname(char *name, int count, struct tm *tm)
 {
 

@@ -102,6 +102,7 @@ IRCDVar ircd[] = {
      1,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     0,                         /* SJOIN invite char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      NULL,                      /* vhost char */
@@ -912,6 +913,14 @@ void anope_cmd_svsmode(User * u, int ac, char **av)
 
 void anope_cmd_connect(int servernum)
 {
+    /* Make myself known to myself in the serverlist */
+    if (UseTS6) {
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+    } else {
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+    }
     if (servernum == 1)
         anope_cmd_pass(RemotePassword);
     else if (servernum == 2)

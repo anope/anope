@@ -440,8 +440,9 @@ int init(int ac, char **av)
     }
 
     /* Read configuration file; exit if there are problems. */
-    if (!read_config(0))
+    if (!read_config(0)) {
         return -1;
+    }
 
     /* Add IRCD Message handlers */
     moduleAddIRCDMsgs();
@@ -452,7 +453,7 @@ int init(int ac, char **av)
     /* Parse all remaining command-line options. */
     parse_options(ac, av);
 
-    /* Detach ourselves if requested. */
+#ifndef _WIN32
     if (!nofork) {
         if ((i = fork()) < 0) {
             perror("fork()");
@@ -470,6 +471,21 @@ int init(int ac, char **av)
             return -1;
         }
     }
+#else
+    /* Initialize winsocks -- codemastr */
+    {
+        WSADATA wsa;
+        if (WSAStartup(MAKEWORD(1, 1), &wsa)) {
+            alog("Failed to initialized WinSock library");
+            return -1;
+        }
+    }
+    if (!nofork) {
+        alog("Launching Anope into the background");
+        FreeConsole();
+    }
+#endif
+
 
     /* Write our PID to the PID file. */
     write_pidfile();
@@ -515,21 +531,27 @@ int init(int ac, char **av)
     }
 #endif
     signal(SIGTERM, sighandler);
+#ifndef _WIN32
     signal(SIGQUIT, sighandler);
+#endif
     if (!DumpCore) {
         signal(SIGSEGV, sighandler);
+#ifndef _WIN32
         signal(SIGBUS, sighandler);
-        signal(SIGILL, sighandler);
         signal(SIGTRAP, sighandler);
+#endif
     } else {
         signal(SIGSEGV, SIG_DFL);
-        signal(SIGBUS, SIG_DFL);
-        signal(SIGILL, SIG_DFL);
-        signal(SIGTRAP, SIG_DFL);
+#ifndef _WIN32
+        signal(SIGBUS, sighandler);
+        signal(SIGTRAP, sighandler);
+#endif
     }
+#ifndef _WIN32
     signal(SIGQUIT, sighandler);
     signal(SIGHUP, sighandler);
     signal(SIGUSR2, sighandler);
+#endif
 
 #ifdef SIGIOT
     signal(SIGIOT, sighandler);
@@ -537,7 +559,9 @@ int init(int ac, char **av)
     signal(SIGFPE, sighandler);
 
 #if !defined(USE_THREADS) || !defined(LINUX20)
+#ifndef _WIN32
     signal(SIGUSR1, sighandler);        /* This is our "out-of-memory" panic switch */
+#endif
 #endif
 
     /* Initialize multi-language support */
@@ -659,15 +683,6 @@ int init(int ac, char **av)
         alog("Info: Not reflecting database records.");
     }
 #endif
-    /* Make myself known to myself in the serverlist */
-    if (UseTS6 && ircd->ts6) {
-        me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
-    } else {
-        me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-    }
-
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
     if (servsock < 0 && RemoteServer2) {

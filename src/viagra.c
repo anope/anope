@@ -101,6 +101,7 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     0,                         /* SJOIN invite char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "x",                       /* vhost char */
@@ -797,7 +798,7 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
 void anope_cmd_vhost_off(User * u)
 {
     send_cmd(NULL, "SVSMODE %s -x", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostcar);
+    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
@@ -951,6 +952,9 @@ void anope_cmd_pong(char *servname, char *who)
 
 void anope_cmd_connect(int servernum)
 {
+    me_server =
+        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+
     if (servernum == 1) {
         anope_cmd_pass(RemotePassword);
     } else if (servernum == 2) {

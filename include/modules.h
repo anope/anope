@@ -18,6 +18,34 @@
 #include "services.h"
 #include <stdio.h>
 
+/* Cross OS compatibility macros */
+#ifdef _WIN32
+typedef HMODULE ano_module_t;
+
+#define ano_modopen(file)		LoadLibrary(file)
+/* ano_moderr in modules.c */
+#define ano_modsym(file, symbol)	(void *)GetProcAddress(file, symbol)
+#define ano_modclose(file)		FreeLibrary(file) ? 0 : 1
+#define ano_modclearerr()		SetLastError(0)
+#define MODULE_EXT			".dll"
+
+#else
+typedef void *	ano_module_t;
+
+#ifdef HAS_RTLD_LOCAL
+#define ano_modopen(file)		dlopen(file, RTLD_LAZY|RTLD_LOCAL)
+#else
+#define ano_modopen(file) 		dlopen(file, RTLD_LAZY)
+#endif
+#define ano_moderr()			dlerror()
+#define ano_modsym(file, symbol)	dlsym(file, DL_PREFIX symbol)
+#define ano_modclose(file)		dlclose(file)
+#define ano_modclearerr()		errno = 0
+#define MODULE_EXT			".so"
+
+#endif
+
+
 /*************************************************************************/
 #define CMD_HASH(x)      (((x)[0]&31)<<5 | ((x)[1]&31))	/* Will gen a hash from a string :) */
 #define MAX_CMD_HASH 1024
@@ -53,7 +81,18 @@
  #define MOD_ERR_NOSERVICE   12
  #define MOD_ERR_NO_MOD_NAME 13
 
- /*************************************************************************/
+/*************************************************************************/
+/* Macros to export the Module API functions/variables */
+#ifndef _WIN32
+#define MDE
+#else
+#ifndef MODULE_COMPILE
+#define MDE __declspec(dllexport)
+#else
+#define MDE __declspec(dllimport)
+#endif
+#endif
+/*************************************************************************/
 
 /* Structure for information about a *Serv command. */
 
@@ -66,14 +105,14 @@ typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
 
 
-extern CommandHash *HOSTSERV[MAX_CMD_HASH];
-extern CommandHash  *BOTSERV[MAX_CMD_HASH];
-extern CommandHash *MEMOSERV[MAX_CMD_HASH];
-extern CommandHash *NICKSERV[MAX_CMD_HASH];
-extern CommandHash *CHANSERV[MAX_CMD_HASH];
-extern CommandHash *HELPSERV[MAX_CMD_HASH];
-extern CommandHash *OPERSERV[MAX_CMD_HASH];
-extern MessageHash *IRCD[MAX_CMD_HASH];
+extern MDE CommandHash *HOSTSERV[MAX_CMD_HASH];
+extern MDE CommandHash  *BOTSERV[MAX_CMD_HASH];
+extern MDE CommandHash *MEMOSERV[MAX_CMD_HASH];
+extern MDE CommandHash *NICKSERV[MAX_CMD_HASH];
+extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
+extern MDE CommandHash *HELPSERV[MAX_CMD_HASH];
+extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
+extern MDE MessageHash *IRCD[MAX_CMD_HASH];
 
 struct Module_ {
 	char *name;
@@ -173,62 +212,62 @@ Module *findModule(char *name);		/* Find a module */
 int loadModule(Module *m,User *u);	/* Load the given module into the program */
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */
-void moduleAddVersion(char *version);
-void moduleAddAuthor(char *author);
+MDE void moduleAddVersion(char *version);
+MDE void moduleAddAuthor(char *author);
 void modules_init(void);
 void modules_delayed_init(void);
 void moduleCallBackPrepForUnload(char *mod_name);
-void moduleCallBackDeleteEntry(ModuleCallBack * prev);
-char *moduleGetLastBuffer(void);
-void moduleSetHelpHelp(void (*func) (User * u));
-void moduleDisplayHelp(int service, User *u);
-void moduleSetHostHelp(void (*func) (User * u));
-void moduleSetOperHelp(void (*func) (User * u));
-void moduleSetBotHelp(void (*func) (User * u));
-void moduleSetMemoHelp(void (*func) (User * u));
-void moduleSetChanHelp(void (*func) (User * u));
-void moduleSetNickHelp(void (*func) (User * u));
-int moduleAddHelp(Command * c, int (*func) (User * u));
-int moduleAddRegHelp(Command * c, int (*func) (User * u));
-int moduleAddOperHelp(Command * c, int (*func) (User * u));
-int moduleAddAdminHelp(Command * c, int (*func) (User * u));
-int moduleAddRootHelp(Command * c, int (*func) (User * u));
+MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
+MDE char *moduleGetLastBuffer(void);
+MDE void moduleSetHelpHelp(void (*func) (User * u));
+MDE void moduleDisplayHelp(int service, User *u);
+MDE void moduleSetHostHelp(void (*func) (User * u));
+MDE void moduleSetOperHelp(void (*func) (User * u));
+MDE void moduleSetBotHelp(void (*func) (User * u));
+MDE void moduleSetMemoHelp(void (*func) (User * u));
+MDE void moduleSetChanHelp(void (*func) (User * u));
+MDE void moduleSetNickHelp(void (*func) (User * u));
+MDE int moduleAddHelp(Command * c, int (*func) (User * u));
+MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
+MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
+MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
+MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
 /*************************************************************************/
 /*************************************************************************/
 /* Command Managment Functions */
-Command *createCommand(const char *name,int (*func)(User *u),int (*has_priv)(User *u),int help_all, int help_reg, int help_oper, int help_admin,int help_root);
-int destroyCommand(Command *c);					/* destroy a command */
-int addCoreCommand(CommandHash *cmdTable[], Command *c);	/* Add a command to a command table */
-int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
-int addCommand(CommandHash *cmdTable[], Command *c,int pos);
-int delCommand(CommandHash *cmdTable[], Command *c,char *mod_name);		/* Del a command from a cmd table */
-int moduleDelCommand(CommandHash *cmdTable[],char *name);		/* Del a command from a cmd table */
+MDE Command *createCommand(const char *name,int (*func)(User *u),int (*has_priv)(User *u),int help_all, int help_reg, int help_oper, int help_admin,int help_root);
+MDE int destroyCommand(Command *c);					/* destroy a command */
+MDE int addCoreCommand(CommandHash *cmdTable[], Command *c);	/* Add a command to a command table */
+MDE int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
+MDE int addCommand(CommandHash *cmdTable[], Command *c,int pos);
+MDE int delCommand(CommandHash *cmdTable[], Command *c,char *mod_name);		/* Del a command from a cmd table */
+MDE int moduleDelCommand(CommandHash *cmdTable[],char *name);		/* Del a command from a cmd table */
 Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 /*************************************************************************/
 /*************************************************************************/
 /* Message Managment Functions */
-Message *createMessage(char *name,int (*func)(char *source, int ac, char **av));
+MDE Message *createMessage(char *name,int (*func)(char *source, int ac, char **av));
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
-int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
+MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
-int moduleAddMessage(Message *m, int pos);
+MDE int moduleAddMessage(Message *m, int pos);
 int delMessage(MessageHash *msgTable[], Message *m, char *mod_name);		/* Del a Message from a msg table */
-int moduleDelMessage(char *name);
+MDE int moduleDelMessage(char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
 Message *findMessage(MessageHash *msgTable[], const char *name);
 /*************************************************************************/
-int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
-void moduleDelCallback(char *name);
-void moduleCallBackRun(void);
+MDE int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
+MDE void moduleDelCallback(char *name);
+MDE void moduleCallBackRun(void);
 
-char *moduleGetData(ModuleData **md, char *key);			/* Get the value for this key from this struct */
-int moduleAddData(ModuleData **md, char *key, char *value);		/* Set the value for this key for this struct */
-void moduleDelData(ModuleData **md, char *key);				/* Delete this key/value pair */
-void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
-void moduleCleanStruct(ModuleData **moduleData);			/* Clean a moduleData hash */
+MDE char *moduleGetData(ModuleData **md, char *key);			/* Get the value for this key from this struct */
+MDE int moduleAddData(ModuleData **md, char *key, char *value);		/* Set the value for this key for this struct */
+MDE void moduleDelData(ModuleData **md, char *key);				/* Delete this key/value pair */
+MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
+MDE void moduleCleanStruct(ModuleData **moduleData);			/* Clean a moduleData hash */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
-boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
+MDE boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
 
 /*************************************************************************/
 

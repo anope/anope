@@ -27,8 +27,8 @@ extern void help_cmd(char *service, User *u, Command *list,
 		char *name);
 extern void do_run_cmd(char *service, User * u, Command *c,const char *cmd);
 extern void do_help_cmd(char *service, User * u, Command *c,const char *cmd);
-extern void mod_help_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
-extern void mod_run_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
+extern MDE void mod_help_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
+extern MDE void mod_run_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);
 
 extern char *mod_current_module_name;
 /*************************************************************************/

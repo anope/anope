@@ -170,9 +170,9 @@ void change_user_realname(User * user, const char *realname)
 
 void change_user_username(User * user, const char *username)
 {
-    if (user->username)
-        free(user->username);
-    user->username = sstrdup(username);
+    if (user->vident)
+        free(user->vident);
+    user->vident = sstrdup(username);
     if (user->na && (nick_identified(user)
                      || (!(user->na->nc->flags & NI_SECURE)
                          && nick_recognized(user)))) {

@@ -73,7 +73,11 @@ static void load_lang(int index, const char *filename)
              index, filename);
     }
     snprintf(buf, sizeof(buf), "languages/%s", filename);
+#ifndef _WIN32
     if (!(f = fopen(buf, "r"))) {
+#else
+    if (!(f = fopen(buf, "rb"))) {
+#endif
         log_perror("Failed to load language %d (%s)", index, filename);
         return;
     } else if (read_int32(&num, f) < 0) {

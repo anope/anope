@@ -282,6 +282,7 @@ static void services_shutdown(void)
 void sighandler(int signum)
 {
     if (started) {
+#ifndef _WIN32
         if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
             signal(SIGHUP, SIG_IGN);
             signal(SIGUSR2, SIG_IGN);
@@ -300,7 +301,8 @@ void sighandler(int signum)
             quitmsg =
                 "Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
 #endif
-
+        } else if (signum == SIGQUIT) {
+            /* had to move it to here to make win32 happy */
         } else if (signum == SIGUSR2) {
 
             alog("Received SIGUSR2: Saving Databases & Rehash Configuration");
@@ -315,9 +317,13 @@ void sighandler(int signum)
             }
             return;
 
-        } else if (signum == SIGTERM) {
+        } else
+#endif
+        if (signum == SIGTERM) {
             signal(SIGTERM, SIG_IGN);
+#ifndef _WIN32
             signal(SIGHUP, SIG_IGN);
+#endif
 
             alog("Received SIGTERM, exiting.");
 
@@ -326,7 +332,6 @@ void sighandler(int signum)
             quitmsg = "Shutting down on SIGTERM";
             services_shutdown();
             exit(0);
-
         } else if (signum == SIGINT) {
             if (nofork) {
                 signal(SIGINT, SIG_IGN);
@@ -337,8 +342,6 @@ void sighandler(int signum)
                 services_shutdown();
                 exit(0);
             }
-        } else if (signum == SIGQUIT) {
-            /* nothing -- terminate below */
         } else if (!waiting) {
             alog("PANIC! buffer = %s", inbuf);
             /* Cut off if this would make IRC command >510 characters. */
@@ -347,7 +350,7 @@ void sighandler(int signum)
                 inbuf[447] = '>';
                 inbuf[448] = 0;
             }
-            anope_cmd_global(NULL, "PANIC! buffer = %s\r\n", inbuf);
+            wallops(NULL, "PANIC! buffer = %s\r\n", inbuf);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
             static char buf[BUFSIZE];
@@ -403,14 +406,13 @@ void sighandler(int signum)
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            anope_cmd_global(NULL, "PANIC! %s (%s)", buf,
-                             strsignal(signum));
+            wallops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
         }
     }
 
     if (
-#if !defined(USE_THREADS) || !defined(LINUX20)
+#if (!defined(USE_THREADS) || !defined(LINUX20)) && !defined(_WIN32)
            signum == SIGUSR1 ||
 #endif
            !(quitmsg = calloc(BUFSIZE, 1))) {
@@ -599,6 +601,7 @@ int main(int ac, char **av, char **envp)
 
 void do_backtrace(int show_segheader)
 {
+#ifndef _WIN32
 #ifdef HAVE_BACKTRACE
     void *array[50];
     size_t size;
@@ -619,9 +622,9 @@ void do_backtrace(int show_segheader)
     free(strings);
     alog("Backtrace: complete");
 #else
-    if (show_segheader) {
-        alog("Backtrace: Segmentation fault detected");
-    }
-    alog("Backtrace: not available on this system");
+    alog("Backtrace: not available on this platform");
+#endif
+#else
+    alog("Backtrace: not available on this windows");
 #endif
 }

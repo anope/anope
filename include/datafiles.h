@@ -15,7 +15,9 @@
 #ifndef DATAFILES_H
 #define DATAFILES_H
 
+#ifndef _WIN32
 #include <sys/param.h>
+#endif
 
 /*************************************************************************/
 

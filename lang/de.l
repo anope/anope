@@ -49,11 +49,11 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ###########################################################################
 #
-# WICHTIG: Bitte ändert NICHT die MENÜS,selbst wenn die so komisch ausshen,
-#          (damit mein ich die ganzen /help /help befehl) im IRC werden die 
-#          richtig angezeigt.THX :) (-Noch nicht ganz fertig jetzt- )
+# INFO : Das File ist zu 95% fertig :) 
+#        Werde es warscheinlich in den nechten 1-2 wochen ganz fertig 
+#        bekommen.. 
 #
-#  Datum : 22.10.2004    
+#  Datum : 05.02.2005   
 #
 #  - crazytoon - 
 #
@@ -353,7 +353,7 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Dein Nickname %s ist unter deinem Host registriert worden: %s
 NICK_REGISTERED_NO_MASK
-	Nickname %s registered.
+	Der Nickname %s ist registriert.
 NICK_PASSWORD_IS
 	Dein Passwort ist %s - behalte es für spätere Benutzung.
 NICK_REG_DELAY
@@ -2421,15 +2421,15 @@ OPER_ADMIN_ADDED
 OPER_ADMIN_NOT_FOUND
 	%s wurde nicht auf der Liste der Services Administratoren gefunden.
 OPER_ADMIN_NO_MATCH
-	Keine entsprechenden Einträge in der Services Admin-Liste gefunden.
+	Keine entsprechenden Einträge in der Services Administratoren-Liste gefunden.
 OPER_ADMIN_DELETED
-	%s wurde aus der Services Admin-Liste entfernt.
+	%s wurde aus der Services Administratoren-Liste entfernt.
 OPER_ADMIN_DELETED_ONE
-	Es wurde 1 Eintrag aus der Services Admin-Liste entfernt.
+	Es wurde 1 Eintrag aus der Services Administratoren-Liste entfernt.
 OPER_ADMIN_DELETED_SEVERAL
-	Es wurden %d Einträge aus der Services Admin-Liste entfernt.
+	Es wurden %d Einträge aus der Services Administratoren-Liste entfernt.
 OPER_ADMIN_LIST_EMPTY
-	Services Admin-Liste ist leer.
+	Die Services Administratoren-Liste ist leer.
 OPER_ADMIN_LIST_HEADER
 	Services Admin-Liste:
 	  Nummer   Nickname
@@ -2438,7 +2438,7 @@ OPER_ADMIN_LIST_FORMAT
 OPER_ADMIN_CLEAR
 	Die Liste der Services Administratoren wurde geleert.
 OPER_ADMIN_MOVED
-	%s has been moved to Services Administrators list.
+	%s wurde zu der Services Administratoren-Liste verschoben.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2471,7 +2471,7 @@ OPER_OPER_LIST_FORMAT
 OPER_OPER_CLEAR
 	Die Liste der Services Operatoren wurde geleert.
 OPER_OPER_MOVED
-	%s has been moved to Services Operators list.
+	%s wurde zu der Services Operatoren-Liste verschoben.
 
 # AKILL responses
 OPER_AKILL_SYNTAX
@@ -2680,17 +2680,17 @@ OPER_SET_NOEXPIRE_ERROR
 OPER_SET_UNKNOWN_OPTION
 	Unbekannte Option %s.
 OPER_SET_SQL_ON
-	SQL code will be used.
+	SQL code wird jetzt benutzt.
 OPER_SET_SQL_OFF
-	SQL code will not be used.
+	SQL code wird jetzt NICHT mehr benutzt.
 OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
+	Einstellungen für SQL können nur ON oder OFF sein.
 OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
+	SQL FEHLER, schaue bitte in deine Logs nach um zu sehen wie du es berichtigen kannst.
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s ist eingeschaltet
 OPER_SET_LIST_OPTION_OFF
-	%s is disabled
+	%s ist ausgeschaltet
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2965,9 +2965,9 @@ OPER_EXCEPTION_INVALID_LIMIT
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Ungültige Hostmask. Nur echte Hostmasken sind gültig als Einträge (ohne Nicknamen und Idents).
 OPER_EXCEPTION_EXISTS
-	%s already exists on the EXCEPTION list.
+	%s ist bereits in der  EXCEPTION-Liste.
 OPER_EXCEPTION_CHANGED
-	Exception for %s has been updated to %d.
+	Exception für %s ist zu %d aktualisiert worden.
 
 # SESSION responses
 OPER_SESSION_SYNTAX
@@ -3782,7 +3782,7 @@ NICK_HELP_GLIST
 	Zeigt alle Nicknamen die in deiner Gruppe enthalten sind.	
 	
 NICK_HELP_STATUS
-	Syntax: STATUS Nickname...
+	Syntax: STATUS Nickname
 	
 	Liefert einen Wert zurück, der besagt, ob der augenblickliche
 	Nutzer des Nicknamens der identifizierte Eigentümer ist, oder 
@@ -3801,8 +3801,8 @@ NICK_HELP_STATUS
 	        Identifizierung mit Passwort
 	
 	Bis zu 16 Nicknamen können mit dem Befehl übergeben werden,
-	der Rest wird ignoriert. If no nickname is given, your status
-	will be returned.
+	der Rest wird ignoriert. Wenn kein Nickname angegeben wird,
+	wird dein STATUS angezeigt.
 
 NICK_HELP_SENDPASS
 	Syntax: SENDPASS Nickname
@@ -4030,12 +4030,12 @@ CHAN_HELP_ULTIMATE3
 
 CHAN_HELP_IRCD_HALFOP
 	
-	These commands are also available on this network:
+	Die folgende Befehle sind auf diesem Netzwerk Verfügbar:
 	    DEHALFOP, HALFOP, HOP
 
 CHAN_HELP_IRCD_PROTECT
 	
-	These commands are also available on this network:
+	Die folgende Befehle sind auf diesem Netzwerk Verfügbar:
 	    DEPROTECT, PROTECT
 
 CHAN_HELP_EXPIRES
@@ -4058,7 +4058,7 @@ CHAN_HELP_REGISTER
 	Wenn du einen Channel registrierst, wird dein Nickname
 	als Founder (Gründer) eingetragen. Der Channel-Founder 
 	kann alle Einstellungen des Channels bearbeiten, und 
-	wird automatisch beim Joinen desChannels durch %S mit 
+	wird automatisch beim Joinen des Channels durch %S mit 
 	Founder/Operator Privilegien ausgestattet.  Mit Hilfe 
 	des ACCESS Befehls (/msg %S HELP ACCESS) kann man 
 	einen Teil dieser Privilegien anderen registrierten 
@@ -5329,10 +5329,10 @@ OPER_HELP_OPER_CMD
 	    KICK         Einen User aus einem beliebigen
 	                   Channel kicken
 	    AKILL        Die AutoKill-Liste bearbeiten
-	    CLEARMODES  Die Modes eines Channels zurücksetzen
+	    CLEARMODES   Die Modis eines Channels zurücksetzen
 
 OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
+	Die folgende Befehle sind Verfügbar
 
 OPER_HELP_OPER_CMD_SGLINE
 	    SGLINE      Die SGLINE-Liste bearbeiten
@@ -5375,7 +5375,7 @@ OPER_HELP_ADMIN_CMD
 	    ADMIN       Liste der Services Administratoren bearbeiten
 
 OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
+	Die folgende Befehle sind für Service Administartoren Verfügbar
 
 OPER_HELP_ADMIN_CMD_OLINE
 	    OLINE            Einem User "Operflags" setzen
@@ -5800,9 +5800,9 @@ OPER_HELP_SET
 	    NOEXPIRE   Den Auslauf-Modus der Services
 	                      an oder aus
 	    SUPERADMIN Den Super-Admin Modus an oder aus
-	    SQL   	 Activate or deactivate sql mode
-	    IGNORE     Activate or deactivate ignore mode
-	    LIST       List the options
+	    SQL   	 SQL-Modus an oder aus
+	    IGNORE     Ignore-Modus an oder aus
+	    LIST       Optionen-Liste
 	
 	Beschränkt auf Services Administratoren.
 
@@ -5869,20 +5869,19 @@ OPER_HELP_SET_SUPERADMIN
 OPER_HELP_SET_SQL
 	Syntax: SET SQL {ON | OFF}
 
-	Setting this will toggle Anope's from usage of SQL, this should
-	be used to disable and enable SQL should your SQL server go down
-	while services are running.
+	Diese Einstellung wird Anope veranlassen SQL zu benutzen oder nicht.
+	Kann nützlich sein wenn zB der MySQL-Server aus ist.
 
 OPER_HELP_SET_IGNORE
 	Syntax: SET IGNORE {ON | OFF}
 
-	Setting this will toggle Anope's usage of the IGNORE system 
-	on or off.
+	Mit diese Einstellung kannst du  Anope's IGNORE-System 
+	an oder aus machen.
 
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Zeigt dir eine Liste der verfügbaren Einstellungen von OperServ
 
 OPER_HELP_NOOP
 	Syntax: NOOP SET Server

@@ -2925,6 +2925,10 @@ static int do_drop(User * u)
             }
         }
 
+        if (ircd->chansqline && (ci->flags & CI_VERBOTEN)) {
+            anope_cmd_unsqline(ci->name);
+        }
+
         alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
              s_ChanServ, ci->name, u->nick, u->username,
              common_get_vhost(u),
@@ -6359,6 +6363,10 @@ static int do_forbid(User * u)
             anope_cmd_global(s_ChanServ,
                              "\2%s\2 used FORBID on channel \2%s\2",
                              u->nick, ci->name);
+
+        if (ircd->chansqline) {
+            anope_cmd_sqline(ci->name, ((reason) ? reason : "Forbidden"));
+        }
 
         alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick,
              ci->name);

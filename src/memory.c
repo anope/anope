@@ -38,7 +38,11 @@ void *smalloc(long size)
     buf = malloc(size);
     if (!buf)
 #if !defined(USE_THREADS) || !defined(LINUX20)
+#ifndef _WIN32
         raise(SIGUSR1);
+#else
+        abort();
+#endif
 #else
         abort();
 #endif
@@ -63,7 +67,11 @@ void *scalloc(long elsize, long els)
     buf = calloc(elsize, els);
     if (!buf)
 #if !defined(USE_THREADS) || !defined(LINUX20)
+#ifndef _WIN32
         raise(SIGUSR1);
+#else
+        abort();
+#endif
 #else
         abort();
 #endif
@@ -88,7 +96,11 @@ void *srealloc(void *oldptr, long newsize)
     buf = realloc(oldptr, newsize);
     if (!buf)
 #if !defined(USE_THREADS) || !defined(LINUX20)
+#ifndef _WIN32
         raise(SIGUSR1);
+#else
+        abort();
+#endif
 #else
         abort();
 #endif
@@ -116,7 +128,11 @@ char *sstrdup(const char *src)
 #endif
         if (!ret)
 #if !defined(USE_THREADS) || !defined(LINUX20)
+#ifndef _WIN32
             raise(SIGUSR1);
+#else
+            abort();
+#endif
 #else
             abort();
 #endif

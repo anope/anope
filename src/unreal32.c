@@ -99,9 +99,10 @@ IRCDVar ircd[] = {
      1,                         /* We support Unreal TOKENS */
      0,                         /* TOKENS are CASE Sensitive */
      1,                         /* TIME STAMPS are BASE64 */
-     0,                         /* +I support */
+     1,                         /* +I support */
      '&',                       /* SJOIN ban char */
      '\"',                      /* SJOIN except char */
+     '\'',                      /* SJOIN invite char */
      1,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "x",                       /* vhost char */
@@ -1465,8 +1466,16 @@ void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void anope_cmd_connect(int servernum)
 {
-    if (!servernum) {
-        servernum = 1;
+    char buf[16];
+    *buf = '\0';
+
+    if (Numeric) {
+        snprintf(buf, sizeof(buf), "%d", Numeric);
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, buf);
+    } else {
+        me_server =
+            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
     }
 
     anope_cmd_capab();

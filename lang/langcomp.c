@@ -53,6 +53,9 @@ char **strings;		/* Strings we have loaded */
 
 int linenum = 0;	/* Current line number in input file */
 
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
 
 char *anopeStrDup(const char *src);
 

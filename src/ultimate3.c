@@ -102,6 +102,7 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
+     0,                         /* SJOIN invite char */
      0,                         /* Can remove User Channel Modes with SVSMODE */
      1,                         /* Sglines are enforced */
      "x",                       /* vhost char */
@@ -1573,9 +1574,8 @@ void anope_cmd_svsnick(char *source, char *guest, time_t when)
 
 void anope_cmd_connect(int servernum)
 {
-    if (!servernum) {
-        servernum = 1;
-    }
+    me_server =
+        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
     if (servernum == 1) {
         anope_cmd_pass(RemotePassword);

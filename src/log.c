@@ -58,7 +58,11 @@ static void remove_log(void)
 
     if (!get_logname(name, sizeof(name), &tm))
         return;
+#ifndef _WIN32
     unlink(name);
+#else
+    DeleteFile(name);
+#endif
 }
 
 /*************************************************************************/
@@ -314,3 +318,48 @@ void fatal_perror(const char *fmt, ...)
 }
 
 /*************************************************************************/
+
+/* Same thing, but do it like perror(). 
+ * This is for socket errors. On *nix, it works just like fatal_perror,
+ * on Win32, it uses the socket error code and formatting functions.
+ */
+
+void fatal_sockerror(const char *fmt, ...)
+{
+    va_list args;
+    time_t t;
+    struct tm tm;
+    char buf[256], buf2[4096];
+    int errno_save = ano_sockgeterr();
+
+    checkday();
+
+    va_start(args, fmt);
+    time(&t);
+    tm = *localtime(&t);
+#if HAVE_GETTIMEOFDAY
+    if (debug) {
+        char *s;
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
+        s = buf + strlen(buf);
+        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
+        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
+    } else {
+#endif
+        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
+#if HAVE_GETTIMEOFDAY
+    }
+#endif
+    vsnprintf(buf2, sizeof(buf2), fmt, args);
+    if (logfile)
+        fprintf(logfile, "%sFATAL: %s: %s\n", buf, buf2,
+                ano_sockstrerror(errno_save));
+    if (stderr)
+        fprintf(stderr, "%sFATAL: %s: %s\n", buf, buf2,
+                ano_sockstrerror(errno_save));
+    if (servsock >= 0)
+        wallops(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
+    exit(1);
+}

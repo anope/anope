@@ -45,11 +45,16 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
 /* Proxy queue; access controlled by queuemut */
 SList pxqueue;
 
-pthread_mutex_t queuemut = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t queuecond = PTHREAD_COND_INITIALIZER;
+#ifndef _WIN32
+ano_mutex_t queuemut = PTHREAD_MUTEX_INITIALIZER;
+ano_cond_t queuecond = PTHREAD_COND_INITIALIZER;
 
 #if !defined(HAVE_GETHOSTBYNAME_R6) && !defined(HAVE_GETHOSTBYNAME_R5) && !defined(HAVE_GETHOSTBYNAME_R3)
-pthread_mutex_t resmut = PTHREAD_MUTEX_INITIALIZER;
+ano_mutex_t resmut = PTHREAD_MUTEX_INITIALIZER;
+#endif
+#else
+ano_mutex_t queuemut;
+ano_cond_t queuecond;
 #endif
 
 static uint32 aton(char *ipaddr);
@@ -259,7 +264,7 @@ int proxy_check(char *nick, char *host, uint32 ip)
 static int proxy_connect(unsigned long ip, unsigned short port)
 {
     struct sockaddr_in sin;
-    int s;
+    ano_socket_t s;
 
     fd_set fds;
     struct timeval tv;
@@ -269,8 +274,8 @@ static int proxy_connect(unsigned long ip, unsigned short port)
     if ((s = socket(PF_INET, SOCK_STREAM, 0)) == -1)
         return -1;
 
-    if (fcntl(s, F_SETFL, O_NONBLOCK) == -1) {
-        close(s);
+    if (ano_socksetnonb(s) == -1) {
+        ano_sockclose(s);
         return -1;
     }
 
@@ -281,8 +286,8 @@ static int proxy_connect(unsigned long ip, unsigned short port)
     sin.sin_port = htons(port);
 
     if (connect(s, (struct sockaddr *) &sin, sizeof(struct sockaddr_in)) ==
-        -1 && errno != EINPROGRESS) {
-        close(s);
+        -1 && ano_sockerrnonb(ano_sockgeterr())) {
+        ano_sockclose(s);
         return -1;
     }
 
@@ -293,14 +298,18 @@ static int proxy_connect(unsigned long ip, unsigned short port)
     tv.tv_usec = 0;
 
     if (select(s + 1, NULL, &fds, NULL, &tv) <= 0) {
-        close(s);
+        ano_sockclose(s);
         return -1;
     }
 
     errlen = sizeof(int);
+#ifndef _WIN32
     if (getsockopt(s, SOL_SOCKET, SO_ERROR, &error, &errlen) == -1
+#else
+    if (getsockopt(s, SOL_SOCKET, SO_ERROR, (char *) &error, &errlen) == -1
+#endif
         || error != 0) {
-        close(s);
+        ano_sockclose(s);
         return -1;
     }
 
@@ -347,14 +356,19 @@ void proxy_expire()
 int proxy_init(void)
 {
     int i;
-    pthread_t th;
+    ano_thread_t th;
 
     slist_init(&pxqueue);
 
+#ifdef _WIN32
+    queuemut = CreateMutex(NULL, FALSE, NULL);
+    queuecond = CreateEvent(NULL, FALSE, FALSE, NULL);
+#endif
+
     for (i = 1; i <= ProxyThreads; i++) {
-        if (pthread_create(&th, NULL, proxy_thread_main, NULL))
+        if (ano_thread_create(th, proxy_thread_main, NULL))
             return 0;
-        if (pthread_detach(th))
+        if (ano_thread_detach(th))
             return 0;
         if (debug)
             alog("debug: Creating proxy thread %ld (%d of %d)", (long) th,
@@ -379,8 +393,8 @@ static void proxy_queue_lock(void)
 {
     if (debug)
         alog("debug: Thread %ld: Locking proxy queue mutex",
-             (long) pthread_self());
-    pthread_mutex_lock(&queuemut);
+             (long) ano_thread_self());
+    ano_mutex_lock(queuemut);
 }
 
 /*************************************************************************/
@@ -389,8 +403,8 @@ static void proxy_queue_signal(void)
 {
     if (debug)
         alog("debug: Thread %ld: Signaling proxy queue condition",
-             (long) pthread_self());
-    pthread_cond_signal(&queuecond);
+             (long) ano_thread_self());
+    ano_cond_signal(queuecond);
 }
 
 /*************************************************************************/
@@ -399,8 +413,8 @@ static void proxy_queue_unlock(void)
 {
     if (debug)
         alog("debug: Thread %ld: Unlocking proxy queue mutex",
-             (long) pthread_self());
-    pthread_mutex_unlock(&queuemut);
+             (long) ano_thread_self());
+    ano_mutex_unlock(queuemut);
 }
 
 /*************************************************************************/
@@ -409,8 +423,8 @@ static void proxy_queue_wait(void)
 {
     if (debug)
         alog("debug: Thread %ld: waiting proxy queue condition",
-             (long) pthread_self());
-    pthread_cond_wait(&queuecond, &queuemut);
+             (long) ano_thread_self());
+    ano_cond_wait(queuecond, queuemut);
 }
 
 /*************************************************************************/
@@ -458,9 +472,12 @@ static uint32 proxy_resolve(char *host)
     struct hostent hent;
     struct hostent_data data;
     hentp = gethostbyname_r(host, &hent, &data);
+#elif defined(_WIN32)
+    /* MSVC's gethostbyname is thread safe -- codemastr */
+    hentp = gethostbyname(host);
 #else
     /* Make it safe that way */
-    pthread_mutex_lock(&resmut);
+    ano_mutex_lock(resmut);
     hentp = gethostbyname(host);
 #endif
 
@@ -472,11 +489,11 @@ static uint32 proxy_resolve(char *host)
             addr.s_addr = ip;
             ntoa(addr, ipbuf, sizeof(ipbuf));
             alog("debug: Thread %ld: resolved %s to %s",
-                 (long) pthread_self(), host, ipbuf);
+                 (long) ano_thread_self(), host, ipbuf);
         }
     }
-#if !defined(HAVE_GETHOSTBYNAME_R6) && !defined(HAVE_GETHOSTBYNAME_R5) && !defined(HAVE_GETHOSTBYNAME_R3)
-    pthread_mutex_unlock(&resmut);
+#if !defined(HAVE_GETHOSTBYNAME_R6) && !defined(HAVE_GETHOSTBYNAME_R5) && !defined(HAVE_GETHOSTBYNAME_R3) && !defined(_WIN32)
+    ano_mutex_unlock(resmut);
 #endif
 
     return ip;
@@ -520,17 +537,17 @@ static int proxy_scan(uint32 ip)
             buf[8] = 0;
 
             if (send(s, buf, 9, 0) != 9) {
-                close(s);
+                ano_sockclose(s);
                 return HC_NORMAL;
             }
 
             if (proxy_read(s, buf, 2) != 2) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
             if (buf[1] == 90) {
-                close(s);
+                ano_sockclose(s);
                 return HC_SOCKS4;
             }
 
@@ -541,19 +558,19 @@ static int proxy_scan(uint32 ip)
             uint32 sip;
 
             if (send(s, "\5\1\0", 3, 0) != 3) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
             memset(buf, 0, sizeof(buf));
 
             if (proxy_read(s, buf, 2) != 2) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
             if (buf[0] != 5 || buf[1] != 0) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
@@ -572,14 +589,14 @@ static int proxy_scan(uint32 ip)
             buf[9] = ((unsigned short) ProxyTestPort) & 0xFF;
 
             if (send(s, buf, 10, 0) != 10) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
             memset(buf, 0, sizeof(buf));
 
             if (proxy_read(s, buf, 2) != 2) {
-                close(s);
+                ano_sockclose(s);
                 continue;
             }
 
@@ -589,7 +606,7 @@ static int proxy_scan(uint32 ip)
             }
         }
 
-        close(s);
+        ano_sockclose(s);
     }
 
     /* Scan for HTTP proxy */
@@ -613,12 +630,12 @@ static int proxy_scan(uint32 ip)
                     if (!strnicmp(buf, "HTTP/1.0 200", 12) || !stricmp(buf, "HTTP/1.1 200 Co")) {       /* Apache may return 200 OK
                                                                                                            even if it's not processing
                                                                                                            the CONNECT request. :/ */
-                        close(s);
+                        ano_sockclose(s);
                         return HC_HTTP;
                     }
                 }
             }
-            close(s);
+            ano_sockclose(s);
         }
     }
 
@@ -629,11 +646,11 @@ static int proxy_scan(uint32 ip)
         if (proxy_read(s, buf, 8) == 8) {
             buf[8] = '\0';
             if (!stricmp(buf, "Wingate>") || !stricmp(buf, "Too many")) {
-                close(s);
+                ano_sockclose(s);
                 return HC_WINGATE;
             }
         }
-        close(s);
+        ano_sockclose(s);
     }
 
     return HC_NORMAL;
@@ -646,24 +663,24 @@ static int proxy_scan(uint32 ip)
 static void *proxy_thread_main(void *arg)
 {
     while (1) {
-        pthread_cleanup_push(&proxy_queue_cleanup_unlock, NULL);
+        ano_cleanup_push(proxy_queue_cleanup_unlock, NULL);
         proxy_queue_lock();
         proxy_queue_wait();
-        pthread_cleanup_pop(1);
+        ano_cleanup_pop(1);
 
         /* We loop until there is no more host to check in the list */
         while (1) {
             HostCache *hc = NULL;
             int status;
 
-            pthread_cleanup_push(&proxy_queue_cleanup_unlock, NULL);
+            ano_cleanup_push(proxy_queue_cleanup_unlock, NULL);
             proxy_queue_lock();
             if (pxqueue.count > 0) {
                 hc = pxqueue.list[0];
                 hc->status = HC_PROGRESS;
                 slist_delete(&pxqueue, 0);
             }
-            pthread_cleanup_pop(1);
+            ano_cleanup_pop(1);
 
             if (!hc)
                 break;

@@ -17,7 +17,15 @@
 
 #include "slist.h"
 
+#ifndef _WIN32
 #define E extern
+#else
+#ifndef MODULE_COMPILE
+#define E extern __declspec(dllexport)
+#else
+#define E extern __declspec(dllimport)
+#endif
+#endif
 
 E char *uplink;
 
@@ -200,7 +208,9 @@ E char *strerror(int errnum);
 #if !HAVE_STRSIGNAL
 char *strsignal(int signum);
 #endif
-
+#ifdef _WIN32
+char *sockstrerror(int error);
+#endif
 
 /**** config.c ****/
 
@@ -660,7 +670,7 @@ E int process_numlist(const char *numstr, int *count_ret,
                       range_callback_t callback, User * u, ...);
 
 E int isValidHost(const char *host, int type);
-E int isvalidchar(char c);
+E int isvalidchar(const char c);
 
 E char *myStrGetToken(const char *str, const char dilim, int token_number);
 E char *myStrGetOnlyToken(const char *str, const char dilim,
@@ -877,14 +887,14 @@ E int32 total_read, total_written;
 E int32 read_buffer_len(void);
 E int32 write_buffer_len(void);
 
-E int sgetc(int s);
-E char *sgets(char *buf, int len, int s);
-E char *sgets2(char *buf, int len, int s);
-E int sread(int s, char *buf, int len);
-E int sputs(char *str, int s);
-E int sockprintf(int s, char *fmt, ...);
+E int sgetc(ano_socket_t s);
+E char *sgets(char *buf, int len, ano_socket_t s);
+E char *sgets2(char *buf, int len, ano_socket_t s);
+E int sread(ano_socket_t s, char *buf, int len);
+E int sputs(char *str, ano_socket_t s);
+E int sockprintf(ano_socket_t s, char *fmt, ...);
 E int conn(const char *host, int port, const char *lhost, int lport);
-E void disconn(int s);
+E void disconn(ano_socket_t s);
 
 /**** users.c ****/
 

@@ -1,9 +1,19 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
+02/03 A Merged anope-win32 branch into the main, now Win32 ready          [ #00]
+02/05 F Change Ident function did not update the vident                   [#293]
 01/30 F ChanServ help to reflect the avaiable commands.                   [ #00]
 01/30 F ChanServ still used some commands that were not valid on all ircd [ #00]
 01/30 F Compiling modules under Mac OSX.                                  [#285]
+
+Provided by crazytoon <da.crew@gmx.net> - 2005
+02/05 A Updated German language file	                                  [ #00]
+
+Provided by BarkerJr <barkerjr@barkerjr.net> - 2005
+02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks    [ #00]
+
 
 Anope Version 1.7.8
 -------------------

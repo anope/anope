@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="230"
+VERSION_BUILD="257"
 
 # $Log$
+#
+# BUILD : 1.7.4 (257)
+# BUGS  : N/A
+# NOTES : Bots will join a channel even if the first user to join is being ignored
 #
 # BUILD : 1.7.4 (230)
 # BUGS  : 97

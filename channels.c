@@ -1297,22 +1297,25 @@ static void chan_adduser2(User * user, Channel * c)
                             c->ci->memos.memocount, c->ci->name);
             }
         }
-
         /* Added channelname to entrymsg - 30.03.2004, Certus */
         if (c->ci && c->ci->entry_message)
             notice_user(whosends(c->ci), user, "[%s] %s", c->name,
                         c->ci->entry_message);
+    }
 
-        if (s_BotServ && c->ci && c->ci->bi) {
-            if (c->usercount == BSMinUsers)
-                bot_join(c->ci);
-            if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
-                && user->na && user->na->nc->greet
-                && check_access(user, c->ci, CA_GREET)) {
-                send_cmd(c->ci->bi->nick, "PRIVMSG %s :[%s] %s", c->name,
-                         user->na->nick, user->na->nc->greet);
-                c->ci->bi->lastmsg = time(NULL);
-            }
+    /**
+     * We let the bot join even if it was an ignored user, as if we dont, and the ignored user dosnt just leave, the bot will never
+     * make it into the channel, leaving the channel botless even for legit users - Rob
+     **/
+    if (s_BotServ && c->ci && c->ci->bi) {
+        if (c->usercount == BSMinUsers)
+            bot_join(c->ci);
+        if (c->usercount >= BSMinUsers && (c->ci->botflags & BS_GREET)
+            && user->na && user->na->nc->greet
+            && check_access(user, c->ci, CA_GREET)) {
+            send_cmd(c->ci->bi->nick, "PRIVMSG %s :[%s] %s", c->name,
+                     user->na->nick, user->na->nc->greet);
+            c->ci->bi->lastmsg = time(NULL);
         }
     }
 }

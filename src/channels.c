@@ -180,7 +180,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     CBMode *cbm;
     CMMode *cmm;
     CUMode *cum;
-    unsigned char botmode;
+    unsigned char botmode = 0;
     BotInfo *bi;
 
     if (debug)

@@ -2003,18 +2003,18 @@ void moduleCleanStruct(ModuleData **moduleData) {
  **/
 boolean moduleMinVersion(int major,int minor,int patch,int build) {
 	boolean ret=false;
-	if(VERSION_MAJOR>major) {  // Def. new
+	if(VERSION_MAJOR>major) {  /* Def. new */
 		ret = true;
-	} else if(VERSION_MAJOR == major) {  // Might be newer
-		if(minor == -1) { return true; }					// They dont care about minor
-		if(VERSION_MINOR > minor) { // Def. newer
+	} else if(VERSION_MAJOR == major) {  /* Might be newer */
+		if(minor == -1) { return true; }					/* They dont care about minor */
+		if(VERSION_MINOR > minor) { /* Def. newer*/
 			ret = true;
-		} else if(VERSION_MINOR == minor) { // Might be newer
-			if(patch == -1) { return true; }				// They dont care about patch
+		} else if(VERSION_MINOR == minor) { /* Might be newer */
+			if(patch == -1) { return true; }				/* They dont care about patch */
 			if(VERSION_PATCH > patch) {
 				ret = true;
 			} else if(VERSION_PATCH == patch) {
-				if(build == -1) { return true; }			// They dont care about build
+				if(build == -1) { return true; }			/* They dont care about build */
 				if(VERSION_BUILD >= build) {
 					ret = true;
 				}

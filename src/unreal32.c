@@ -1935,7 +1935,7 @@ void anope_cmd_svid_umode2(User * u, char *ts)
 
 void anope_cmd_svid_umode3(User * u, char *ts)
 {
-    // not used
+    /* not used */
 }
 
 int anope_event_error(char *source, int ac, char **av)

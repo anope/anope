@@ -751,7 +751,7 @@ static void arc4_init(void)
     rs.j = 0;
 }
 
-static inline void arc4_addrandom(void *dat, int datlen)
+static void arc4_addrandom(void *dat, int datlen)
 {
     int n;
     u_int8_t si;
@@ -906,5 +906,4 @@ char *host_resolve(char *host)
 	return ipreturn;
     }
 }
-
 

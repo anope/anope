@@ -291,7 +291,6 @@ void memo_send(User * u, char *name, char *text, int z)
     time_t now = time(NULL);
     char *source = u->na->nc->display;
     int is_servoper = is_services_oper(u);
-    int j;
 
     if (readonly) {
         notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
@@ -310,7 +309,7 @@ void memo_send(User * u, char *name, char *text, int z)
             notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 
     } else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
-        if (z == 0 || z == 3)
+        if (z == 0 || z == 3) {
             if (isforbid) {
                 notice_lang(s_MemoServ, u,
                             ischan ? CHAN_X_FORBIDDEN :
@@ -320,7 +319,7 @@ void memo_send(User * u, char *name, char *text, int z)
                             ischan ? CHAN_X_NOT_REGISTERED :
                             NICK_X_NOT_REGISTERED, name);
             }
-
+        }
     } else if (z != 2 && MSSendDelay > 0 &&
                u && u->lastmemosend + MSSendDelay > now && !is_servoper) {
         u->lastmemosend = now;

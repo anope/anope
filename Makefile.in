@@ -30,6 +30,12 @@ build:
             ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \
         done
 
+strict:  language headers
+	@for i in $(SUBDIRS); do \
+            echo "*** Strict Building $$i";\
+            ( cd $$i; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} -ansi -Wall -pedantic' all; ) \
+        done
+
 modules: build
 	(cd src/modules ; ./configure ; ${MAKE} ${MAKEARGS} all; )
 	@echo "*** All done, now (g)make install to install Anope/Modules";

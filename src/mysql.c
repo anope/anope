@@ -1167,7 +1167,7 @@ void db_mysql_load_cs_dbase(void)
 {
     char sqlcmd[MAX_SQL_BUF], *tempstr;
     ChannelInfo *ci;
-    int n_levels, j, m;
+    int n_levels, j;
     MYSQL_RES *res;
     MYSQL_ROW row;
 
@@ -1436,7 +1436,7 @@ void db_mysql_load_ns_dbase(void)
     NickAlias *na;
     MYSQL_RES *res;
     MYSQL_ROW row;
-    int i, j, m;
+    int i, j;
 
     if (!do_mysql)
         return;

@@ -15,6 +15,8 @@
 #ifndef DATAFILES_H
 #define DATAFILES_H
 
+#include <sys/param.h>
+
 /*************************************************************************/
 
 typedef struct dbFILE_ dbFILE;
@@ -23,8 +25,8 @@ struct dbFILE_ {
     FILE *fp;			/* The normal file descriptor */
     FILE *backupfp;		/* Open file pointer to a backup copy of
 				 *    the database file (if non-NULL) */
-    char filename[PATH_MAX];	/* Name of the database file */
-    char backupname[PATH_MAX];	/* Name of the backup file */
+    char filename[MAXPATHLEN];	/* Name of the database file */
+    char backupname[MAXPATHLEN];	/* Name of the backup file */
 };
 
 /*************************************************************************/

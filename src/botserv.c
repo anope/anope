@@ -608,8 +608,8 @@ void load_bs_dbase(void)
 {
     dbFILE *f;
     int c, ver;
-    int16 tmp16;
-    int32 tmp32;
+    uint16 tmp16;
+    uint32 tmp32;
     BotInfo *bi;
     int failed = 0;
 
@@ -1891,8 +1891,9 @@ static int do_kickcmd(User * u)
         if (!stricmp(option, "BADWORDS")) {
             if (!stricmp(value, "ON")) {
                 if (ttb) {
-                    ci->ttb[TTB_BADWORDS] = atol(ttb);
-                    if (ci->ttb[TTB_BADWORDS] < 0) {
+                    ci->ttb[TTB_BADWORDS] =
+                        strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -1911,8 +1912,8 @@ static int do_kickcmd(User * u)
         } else if (!stricmp(option, "BOLDS")) {
             if (!stricmp(value, "ON")) {
                 if (ttb) {
-                    ci->ttb[TTB_BOLDS] = atol(ttb);
-                    if (ci->ttb[TTB_BOLDS] < 0) {
+                    ci->ttb[TTB_BOLDS] = strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -1934,8 +1935,8 @@ static int do_kickcmd(User * u)
                 char *percent = strtok(NULL, " ");
 
                 if (ttb) {
-                    ci->ttb[TTB_CAPS] = atol(ttb);
-                    if (ci->ttb[TTB_CAPS] < 0) {
+                    ci->ttb[TTB_CAPS] = strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -1971,8 +1972,8 @@ static int do_kickcmd(User * u)
         } else if (!stricmp(option, "COLORS")) {
             if (!stricmp(value, "ON")) {
                 if (ttb) {
-                    ci->ttb[TTB_COLORS] = atol(ttb);
-                    if (ci->ttb[TTB_COLORS] < 0) {
+                    ci->ttb[TTB_COLORS] = strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -1994,8 +1995,8 @@ static int do_kickcmd(User * u)
                 char *secs = strtok(NULL, " ");
 
                 if (ttb) {
-                    ci->ttb[TTB_FLOOD] = atol(ttb);
-                    if (ci->ttb[TTB_FLOOD] < 0) {
+                    ci->ttb[TTB_FLOOD] = strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -2033,8 +2034,8 @@ static int do_kickcmd(User * u)
                 char *times = strtok(NULL, " ");
 
                 if (ttb) {
-                    ci->ttb[TTB_REPEAT] = atol(ttb);
-                    if (ci->ttb[TTB_REPEAT] < 0) {
+                    ci->ttb[TTB_REPEAT] = strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -2062,8 +2063,9 @@ static int do_kickcmd(User * u)
         } else if (!stricmp(option, "REVERSES")) {
             if (!stricmp(value, "ON")) {
                 if (ttb) {
-                    ci->ttb[TTB_REVERSES] = atol(ttb);
-                    if (ci->ttb[TTB_REVERSES] < 0) {
+                    ci->ttb[TTB_REVERSES] =
+                        strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }
@@ -2082,8 +2084,9 @@ static int do_kickcmd(User * u)
         } else if (!stricmp(option, "UNDERLINES")) {
             if (!stricmp(value, "ON")) {
                 if (ttb) {
-                    ci->ttb[TTB_UNDERLINES] = atol(ttb);
-                    if (ci->ttb[TTB_UNDERLINES] < 0) {
+                    ci->ttb[TTB_UNDERLINES] =
+                        strtol(ttb, (char **) NULL, 10);
+                    if (errno) {
                         notice_lang(s_BotServ, u, BOT_KICK_BAD_TTB, ttb);
                         return MOD_CONT;
                     }

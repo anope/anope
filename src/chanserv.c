@@ -624,7 +624,7 @@ void chanserv(User * u, char *buf)
 void load_cs_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c, m;
+    int ver, i, j, c;
     ChannelInfo *ci, **last, *prev;
     int failed = 0;
 
@@ -634,8 +634,8 @@ void load_cs_dbase(void)
     ver = get_file_version(f);
 
     for (i = 0; i < 256 && !failed; i++) {
-        int16 tmp16;
-        int32 tmp32;
+        uint16 tmp16;
+        uint32 tmp32;
         int n_levels;
         char *s;
         NickAlias *na;

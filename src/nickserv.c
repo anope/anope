@@ -367,7 +367,7 @@ void nickserv(User * u, char *buf)
 void load_old_ns_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c, m;
+    int ver, i, j, c;
     NickAlias *na, *na2, *next;
     NickCore *nc;
     int failed = 0;
@@ -657,7 +657,7 @@ void load_ns_req_db(void)
 void load_ns_dbase(void)
 {
     dbFILE *f;
-    int ver, i, j, c, m;
+    int ver, i, j, c;
     NickAlias *na, **nalast, *naprev;
     NickCore *nc, **nclast, *ncprev;
     int failed = 0;
@@ -3328,7 +3328,6 @@ static int do_info(User * u)
     NickAlias *na;
     NickRequest *nr = NULL;
     int is_servadmin = is_services_admin(u);
-    char *vHost;
 
     if (!nick) {
         syntax_error(s_NickServ, u, "INFO", NICK_INFO_SYNTAX);

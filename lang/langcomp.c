@@ -44,11 +44,15 @@
 #include <stdlib.h>
 #include <string.h>
 #undef getline
+
 int numstrings = 0;	/* Number of strings we should have */
 char **stringnames;	/* Names of the strings (from index file) */
 char **strings;		/* Strings we have loaded */
 
 int linenum = 0;	/* Current line number in input file */
+
+
+char *anopeStrDup(const char *src);
 
 /*************************************************************************/
 
@@ -80,7 +84,7 @@ int read_index_file()
     while (fgets(buf, sizeof(buf), f)) {
 	if (buf[strlen(buf)-1] == '\n')
 	    buf[strlen(buf)-1] = '\0';
-	if (!(stringnames[i++] = strdup(buf))) {
+	if (!(stringnames[i++] = anopeStrDup(buf))) {
 	    perror("strdup()");
 	    return -1;
 	}
@@ -143,10 +147,20 @@ int fput32(int val, FILE *f)
 }
 
 /*************************************************************************/
+char *anopeStrDup(const char *src) {
+    char *ret=NULL;
+    if(src) {
+        if( (ret = (char *)malloc(strlen(src)+1)) ) {;
+            strcpy(ret,src);
+        }
+    }
+    return ret;
+}
 
+/*************************************************************************/
 int main(int ac, char **av)
 {
-    unsigned char *filename = NULL, *s;
+    char *filename = NULL, *s;
     char langname[254], outfile[256];
     FILE *in, *out;
     int warn = 0;

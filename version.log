@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="98"
+VERSION_BUILD="99"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (99)
+# BUGS  : none
+# NOTES : Removed lang/index since it is auto-generated upon compilation.
 #
 # BUILD : 1.7.2 (98)
 # BUGS  : none

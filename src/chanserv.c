@@ -1945,6 +1945,13 @@ ChannelInfo *cs_findchan(const char *chan)
 {
     ChannelInfo *ci;
 
+    if (!chan || !*chan) {
+        if (debug) {
+            alog("Error: finduser() called with NULL values");
+        }
+        return NULL;
+    }
+
     for (ci = chanlists[tolower(chan[1])]; ci; ci = ci->next) {
         if (stricmp(ci->name, chan) == 0)
             return ci;
@@ -1962,8 +1969,15 @@ ChannelInfo *cs_findchan(const char *chan)
 
 int check_access(User * user, ChannelInfo * ci, int what)
 {
-    int level = get_access(user, ci);
-    int limit = ci->levels[what];
+    int level;
+    int limit;
+
+    if (!user || !ci) {
+        return 0;
+    }
+
+    level = get_access(user, ci);
+    limit = ci->levels[what];
 
     /* Resetting the last used time */
     if (level > 0)

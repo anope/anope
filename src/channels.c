@@ -305,6 +305,13 @@ Channel *findchan(const char *chan)
 {
     Channel *c;
 
+    if (!chan || !*chan) {
+        if (debug) {
+            alog("Error: findchan() called with NULL values");
+        }
+        return NULL;
+    }
+
     if (debug >= 3)
         alog("debug: findchan(%p)", chan);
     c = chanlist[HASH(chan)];

@@ -1252,8 +1252,13 @@ NickRequest *findrequestnick(const char *nick)
 {
     NickRequest *nr;
 
-    if (!nick)
+    if (!nick || !*nick) {
+        if (debug) {
+            alog("Error: findrequestnick() called with NULL values");
+        }
         return NULL;
+    }
+
     for (nr = nrlists[HASH(nick)]; nr; nr = nr->next) {
         if (stricmp(nr->nick, nick) == 0)
             return nr;
@@ -1267,6 +1272,13 @@ NickRequest *findrequestnick(const char *nick)
 NickAlias *findnick(const char *nick)
 {
     NickAlias *na;
+
+    if (!nick || !*nick) {
+        if (debug) {
+            alog("Error: findnick() called with NULL values");
+        }
+        return NULL;
+    }
 
     for (na = nalists[HASH(nick)]; na; na = na->next) {
         if (stricmp(na->nick, nick) == 0)
@@ -1284,6 +1296,13 @@ NickAlias *findnick(const char *nick)
 NickCore *findcore(const char *nick)
 {
     NickCore *nc;
+
+    if (!nick || !*nick) {
+        if (debug) {
+            alog("Error: findcore() called with NULL values");
+        }
+        return NULL;
+    }
 
     for (nc = nclists[HASH(nick)]; nc; nc = nc->next) {
         if (stricmp(nc->display, nick) == 0)

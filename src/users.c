@@ -306,6 +306,13 @@ User *finduser(const char *nick)
 {
     User *user;
 
+    if (!nick || !*nick) {
+        if (debug) {
+            alog("Error: finduser() called with NULL values");
+        }
+        return NULL;
+    }
+
     if (debug >= 3)
         alog("debug: finduser(%p)", nick);
     user = userlist[HASH(nick)];

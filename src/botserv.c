@@ -192,7 +192,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
     UserData *ud;
 
 
-    if (!u) {
+    if (!u || !buf || !ci) {
         return;
     }
 

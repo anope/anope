@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="383"
+VERSION_BUILD="384"
 
 # $Log$
+#
+# BUILD : 1.7.5 (384)
+# BUGS  : N/A
+# NOTES : Moved veriable declaration to the top of function - btw, are all these null checks needed? createCommand should never be passed NULL values, its a wasted if imho... *shrug*
+# 
 #
 # BUILD : 1.7.5 (383)
 # BUGS  : N/A

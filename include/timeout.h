@@ -43,7 +43,7 @@ extern void del_timeout(Timeout *t);
 
 #ifdef DEBUG_COMMANDS
 /* Send the list of timeouts to the given user. */
-extern void send_timeout_list(User *u);
+extern int send_timeout_list(User *u);
 #endif
 
 

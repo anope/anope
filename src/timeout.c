@@ -13,7 +13,7 @@
  */
 
 #include "services.h"
-#include "timeout.h"
+#include "pseudo.h"
 
 static Timeout *timeouts = NULL;
 
@@ -23,7 +23,7 @@ static Timeout *timeouts = NULL;
 
 /* Send the timeout list to the given user. */
 
-void send_timeout_list(User * u)
+int send_timeout_list(User * u)
 {
     Timeout *to, *last;
 
@@ -36,6 +36,7 @@ void send_timeout_list(User * u)
                    "    to->prev incorrect!  expected=%p seen=%p",
                    last, to->prev);
     }
+    return MOD_CONT;
 }
 
 #endif                          /* DEBUG_COMMANDS */

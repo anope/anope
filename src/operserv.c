@@ -114,7 +114,7 @@ static int do_svsnick(User * u);
 static int do_operoline(User * u);
 
 #ifdef DEBUG_COMMANDS
-static void send_clone_lists(User * u);
+static int send_clone_lists(User * u);
 static int do_matchwild(User * u);
 #endif
 
@@ -925,13 +925,13 @@ void check_clones(User * user)
 
 /* Send clone arrays to given nick. */
 
-static void send_clone_lists(User * u)
+static int send_clone_lists(User * u)
 {
     int i;
 
     if (!CheckClones) {
         notice(s_OperServ, u->nick, "CheckClones not enabled.");
-        return;
+        return MOD_CONT;
     }
 
     notice(s_OperServ, u->nick, "clonelist[]");
@@ -946,6 +946,7 @@ static void send_clone_lists(User * u)
             notice(s_OperServ, u->nick, "    %10ld  %s", warnings[i].time,
                    warnings[i].host ? warnings[i].host : "(null)");
     }
+    return MOD_CONT;
 }
 
 #endif                          /* DEBUG_COMMANDS */

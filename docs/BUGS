@@ -13,5 +13,3 @@ Reported Bugs from Mantis: http://www.anope.org/bug
    timed events (nick kills, database saving, etc.) until the next message
    comes in from Services' uplink server.
 
-.- Modules will not work on OpenBSD machines, due to limitations on libdl.
-

@@ -416,7 +416,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
 
     /* Let's take care of the core itself */
     snprintf(sqlcmd, MAX_SQL_BUF,
-             "UPDATE anope_cs_info SET founder=%s,successor='%s',founderpass='%s',"
+             "UPDATE anope_cs_info SET founder=%s,successor='%s',founderpass=%s,"
              "descr='%s',url='%s',email='%s',time_registered='%d',last_used='%d',"
              "last_topic='%s',last_topic_setter='%s',last_topic_time='%d',flags='%d',"
              "forbidby='%s',forbidreason='%s',bantype='%d',accesscount='%d',"
@@ -468,7 +468,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
                  ",last_topic_time,flags,forbidby,forbidreason,bantype,accesscount,akickcount"
                  ",mlock_on,mlock_off,mlock_limit,mlock_key,mlock_flood,mlock_redirect,"
                  "entry_message,botnick,botflags,bwcount,capsmin,capspercent,floodlines,"
-                 "floodsecs,repeattimes,active) VALUES ('%s','%s','%s','%s','%s','%s','%s'"
+                 "floodsecs,repeattimes,active) VALUES ('%s','%s','%s',%s,'%s','%s','%s'"
                  ",'%d','%d','%s','%s','%d','%d','%s','%s','%d','%d','%d','%d','%d','%d',"
                  "'%s','%s','%s','%s','%s','%d','%d','%d','%d','%d','%d','%d','1')",
                  ciname,

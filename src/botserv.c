@@ -295,7 +295,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                 } else if (bw->type == BW_SINGLE) {
                     int len = strlen(bw->word);
 
-                    if ((BSCaseSensitive && strstr(nbuf, bw->word))
+                    if ((BSCaseSensitive && !strcmp(nbuf, bw->word))
                         || (!BSCaseSensitive
                             && (!stricmp(nbuf, bw->word)))) {
                         mustkick = 1;
@@ -303,12 +303,12 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                     } else if ((strchr(nbuf, ' ') == nbuf + len)
                                &&
                                ((BSCaseSensitive
-                                 && (strstr(nbuf, bw->word) == nbuf))
+                                 && !strcmp(nbuf, bw->word))
                                 || (!BSCaseSensitive
                                     && (stristr(nbuf, bw->word) ==
                                         nbuf)))) {
                         mustkick = 1;
-                    } else
+                    } else {
                         if ((strrchr(nbuf, ' ') ==
                              nbuf + strlen(nbuf) - len - 1)
                             &&
@@ -318,19 +318,22 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                              || (!BSCaseSensitive
                                  && (stristr(nbuf, bw->word) ==
                                      nbuf + strlen(nbuf) - len)))) {
-                        mustkick = 1;
-                    } else {
-                        char *wordbuf = scalloc(len + 3, 1);
-
-                        wordbuf[0] = ' ';
-                        wordbuf[len + 1] = ' ';
-                        wordbuf[len + 2] = '\0';
-                        memcpy(wordbuf + 1, bw->word, len);
-
-                        if ((BSCaseSensitive && (strstr(nbuf, wordbuf)))
-                            || (!BSCaseSensitive
-                                && (stristr(nbuf, wordbuf))))
                             mustkick = 1;
+                        } else {
+                            char *wordbuf = scalloc(len + 3, 1);
+
+                            wordbuf[0] = ' ';
+                            wordbuf[len + 1] = ' ';
+                            wordbuf[len + 2] = '\0';
+                            memcpy(wordbuf + 1, bw->word, len);
+
+                            if ((BSCaseSensitive
+                                 && (strstr(nbuf, wordbuf)))
+                                || (!BSCaseSensitive
+                                    && (stristr(nbuf, wordbuf)))) {
+                                mustkick = 1;
+                            }
+                        }
                     }
                 } else if (bw->type == BW_START) {
                     int len = strlen(bw->word);

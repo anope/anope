@@ -2791,23 +2791,23 @@ OPER_MODULE_LOAD_FAIL
 OPER_MODULE_REMOVE_FAIL
 	Kann Module %s nicht entfernen
 OPER_MODULE_LOAD_SYNTAX
-	MODLOAD FileNamee
+	MODLOAD FileName
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD FileName
 OPER_MODULE_LIST_HEADER
-	Current Module list:
+	Aktuelle Modul - Liste:
 OPER_MODULE_LIST
 	Module: %s [%s]
 OPER_MODULE_LIST_FOOTER
-	%d Modules loaded.
+	%d Module geladen.
 OPER_MODULE_INFO_LIST
-	Module: %s Version: %s Author: %s loaded: %s
+	Module: %s Version: %s Autor: %s geladen: %s
 OPER_MODULE_CMD_LIST
-	Unterstützte command: /msg %s %s
+	Unterstützte Befehle: /msg %s %s
 OPER_MODULE_MSG_LIST
 	Unterstützte IRCD's für: %s
 OPER_MODULE_NO_LIST
-	derzeit keine module geladen
+	Derzeit keine module geladen
 OPER_MODULE_NO_INFO
 	Es sind keine Informationen für das Module %s verfügbar
 OPER_MODULE_INFO_SYNTAX

@@ -1268,8 +1268,10 @@ static void chan_adduser2(User * user, Channel * c)
             }
         }
 
+        /* Added channelname to entrymsg - 30.03.2004, Certus */
         if (c->ci && c->ci->entry_message)
-            notice_user(whosends(c->ci), user, "%s", c->ci->entry_message);
+            notice_user(whosends(c->ci), user, "[%s] %s", c->name,
+                        c->ci->entry_message);
 
         if (s_BotServ && c->ci && c->ci->bi) {
             if (c->usercount == BSMinUsers)

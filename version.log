@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="8"
+VERSION_BUILD="11"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (11)
+# BUGS  : 
+# NOTES : Added channelname to entrymsgs
 #
 # BUILD : 1.7.0 (8)
 # BUGS  : none.

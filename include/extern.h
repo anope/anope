@@ -1033,6 +1033,7 @@ extern void anope_cmd_svsinfo();								  /* SVSINFO */
 extern void anope_cmd_svsjoin(char *source, char *nick,char *chan);          	  		  /* SVSJOIN */
 extern void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
 extern void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
+extern void anope_cmd_svsmode_chan(char *name, char *mode, char *nick);				  /* SVSMODE */
 extern void anope_cmd_svsnick(char *nick,char *newnick, time_t when);     	  		  /* SVSNICK */
 extern void anope_cmd_svsnoop(char *server, int set);			  	  		  /* SVSNOOP */
 extern void anope_cmd_svso(char *source,char *nick, char *flag);          	  		  /* SVSO   */
@@ -1134,8 +1135,8 @@ extern char *send_token(char *token1, char *token2);
 extern char *base64enc(long i);
 extern long base64dec(char *b64);
 extern long base64dects(char *ts);
-extern int b64_encode(unsigned char const *src, size_t srclength, char *target, size_t targsize);
-extern int b64_decode(char const *src, unsigned char *target, size_t targsize);
+extern int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
+extern int b64_decode(char *src, char *target, size_t targsize);
 extern char *encode_ip(u_char *ip);
 extern int decode_ip(char *buf);
 

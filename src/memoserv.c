@@ -1106,7 +1106,7 @@ static int do_info(User * u)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_MEMOS_SOME_UNREAD,
                             name, mi->memocount, count);
         }
-        if (mi->memomax >= 0) {
+        if (mi->memomax) {
             if (hardmax)
                 notice_lang(s_MemoServ, u, MEMO_INFO_X_HARD_LIMIT, name,
                             mi->memomax);

@@ -155,7 +155,7 @@ void load_news()
 {
     dbFILE *f;
     int i;
-    int16 n;
+    uint16 n;
     uint32 tmp32;
 
     if (!(f = open_db(s_OperServ, NewsDBName, "r", NEWS_VERSION)))

@@ -101,8 +101,7 @@ IRCDVar ircd[] = {
      1,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
-     0,                         /* Services Client mode */
-     0,                         /* not p10 */
+     0,                         /* Can remove User Channel Modes with SVSMODE */
      },
     {NULL}
 };
@@ -1290,9 +1289,22 @@ void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     anope_cmd_sqline(nick, "Reserved for services");
 }
 
+/* SVSMODE -b */
 void anope_cmd_unban(char *name, char *nick)
 {
-    send_cmd(ServerName, "SVSMODE %s -b %s", name, nick);
+    anope_cmd_svsmode_chan(name, "-b", nick);
+}
+
+
+/* SVSMODE channel modes */
+
+void anope_cmd_svsmode_chan(char *name, char *mode, char *nick)
+{
+    if (nick) {
+        send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
+    } else {
+        send_cmd(ServerName, "SVSMODE %s %s", name, mode);
+    }
 }
 
 void anope_cmd_bot_chan_mode(char *nick, char *chan)

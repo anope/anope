@@ -19,10 +19,14 @@ static SListOpts slist_defopts = { 0, NULL, NULL, NULL };
 
 /*************************************************************************/
 
-/* Adds a pointer to the list. Returns the index of the new item.
-   Returns -2 if there are too many items in the list, -3 if the
-   item already exists when the flags of the list contain SLISTF_NODUP. */
-
+/**
+ * Adds a pointer to the list. Returns the index of the new item.
+ * Returns -2 if there are too many items in the list, -3 if the
+ * item already exists when the flags of the list contain SLISTF_NODUP.
+ * @param slist Slist Struct
+ * @param item Item being added
+ * @return int
+ */
 int slist_add(SList * slist, void *item)
 {
     if (slist->limit != 0 && slist->count >= slist->limit)
@@ -57,10 +61,13 @@ int slist_add(SList * slist, void *item)
 
 /*************************************************************************/
 
-/* Clears the list. If free is 1, the freeitem function will be called
+/**
+ * Clears the list. If free is 1, the freeitem function will be called
  * for each item before clearing. 
+ * @param slist Slist Struct
+ * @param mustfree What is being freed
+ * @return void
  */
-
 void slist_clear(SList * slist, int mustfree)
 {
     if (mustfree && slist->opts && slist->opts->freeitem && slist->count) {
@@ -81,9 +88,13 @@ void slist_clear(SList * slist, int mustfree)
 
 /*************************************************************************/
 
-/* Deletes an item from the list, by index. Returns 1 if successful, 
-   0 otherwise. */
-
+/**
+ * Deletes an item from the list, by index. Returns 1 if successful, 
+ * 0 otherwise.
+ * @param slist Slist Struct
+ * @param index beign deleted
+ * @return int Returns 1 if successful, 0 otherwise.
+ */
 int slist_delete(SList * slist, int index)
 {
     /* Range check */
@@ -107,10 +118,15 @@ int slist_delete(SList * slist, int index)
 
 /*************************************************************************/
 
-/* Deletes a range of entries. Return -1 if the permission was denied,
+/**
+ * Deletes a range of entries. Return -1 if the permission was denied,
  * 0 if no records were deleted, or the number of records deleted
+ * @param slist Slist Struct
+ * @param range Range to delete
+ * @param cb Call back function
+ * @param ... various args
+ * @return int
  */
-
 int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
                        ...)
 {
@@ -164,11 +180,16 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
 
 /*************************************************************************/
 
-/* Enumerates all entries of the list. If range is not NULL, will only
+/**
+ * Enumerates all entries of the list. If range is not NULL, will only
  * enumerate entries that are in the range. Returns the total number
  * of entries enumerated.
+ * @param slit Slist struct
+ * @param range Range to enum
+ * @param cb Call back function
+ * @param ... various args
+ * @return int
  */
-
 int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
 {
     int count = 0, i, res;
@@ -231,8 +252,11 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
 
 /*************************************************************************/
 
-/* Determines whether the list is full. */
-
+/**
+ * Determines whether the list is full.
+ * @param slist Slist Struct
+ * @return int
+ */
 int slist_full(SList * slist)
 {
     if (slist->limit != 0 && slist->count >= slist->limit)
@@ -243,8 +267,11 @@ int slist_full(SList * slist)
 
 /*************************************************************************/
 
-/* Initialization of the list. */
-
+/**
+ * Initialization of the list.
+ * @param slist Slist Struct
+ * @return int
+ */
 void slist_init(SList * slist)
 {
     memset(slist, 0, sizeof(SList));
@@ -254,8 +281,12 @@ void slist_init(SList * slist)
 
 /*************************************************************************/
 
-/* Returns the index of an item in the list, -1 if inexistant. */
-
+/**
+ * Returns the index of an item in the list, -1 if inexistant.
+ * @param slist Slist Struct
+ * @param item Item index
+ * @return int
+ */
 int slist_indexof(SList * slist, void *item)
 {
     int16 i;
@@ -278,8 +309,11 @@ int slist_indexof(SList * slist, void *item)
 
 /*************************************************************************/
 
-/* Removes all NULL pointers from the list. */
-
+/**
+ * Removes all NULL pointers from the list. 
+ * @param slist Slist Struct
+ * @return void
+ */
 void slist_pack(SList * slist)
 {
     int i;
@@ -291,9 +325,13 @@ void slist_pack(SList * slist)
 
 /*************************************************************************/
 
-/* Removes a specific item from the list. Returns the old index of the
-   deleted item, or -1 if the item was not found. */
-
+/**
+ * Removes a specific item from the list. Returns the old index of the
+ * deleted item, or -1 if the item was not found.
+ * @param slist Slist Struct
+ * @param item to remove
+ * @return int
+ */
 int slist_remove(SList * slist, void *item)
 {
     int index = slist_indexof(slist, item);
@@ -305,8 +343,12 @@ int slist_remove(SList * slist, void *item)
 
 /*************************************************************************/
 
-/* Sets the maximum capacity of the list */
-
+/**
+ * Sets the maximum capacity of the list
+ * @param slist Slist Struct
+ * @param capacity How large the list can be
+ * @return int
+ */
 int slist_setcapacity(SList * slist, int16 capacity)
 {
     if (slist->capacity == capacity)

@@ -103,8 +103,7 @@ static const char Pad64 = '=';
 	   characters followed by one "=" padding character.
    */
 
-int b64_encode(unsigned char const *src, size_t srclength, char *target,
-               size_t targsize)
+int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
 {
     size_t datalength = 0;
     u_char input[3];
@@ -163,7 +162,7 @@ int b64_encode(unsigned char const *src, size_t srclength, char *target,
    it returns the number of data bytes stored at the target, or -1 on error.
  */
 
-int b64_decode(char const *src, unsigned char *target, size_t targsize)
+int b64_decode(char *src, char *target, size_t targsize)
 {
     int tarindex, state, ch;
     char *pos;

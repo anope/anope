@@ -611,7 +611,7 @@ void load_bs_dbase(void)
 {
     dbFILE *f;
     int c, ver;
-    int16 tmp16;
+    uint16 tmp16;
     uint32 tmp32;
     BotInfo *bi;
     int failed = 0;

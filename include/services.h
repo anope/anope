@@ -49,6 +49,7 @@
 #include <sys/stat.h>	/* for umask() on some systems */
 #include <sys/types.h>
 #include <sys/time.h>
+#include <fcntl.h>
 
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
@@ -258,8 +259,7 @@ struct ircdvars_ {
         int invitemode;				/* +I  */
         int sjoinbanchar;			/* use single quotes to define it */
         int sjoinexchar;			/* use single quotes to define it */
-	uint32 servicesmode;			/* Services Mode +S */
-	int p10;			 	/* P10 ircd */
+	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 };
 
 struct ircdcapab_ {
@@ -308,6 +308,7 @@ struct ircdcapab_ {
 #define PRE_NICK_VERSION 	1
 #define OPER_VERSION 		13
 #define HELP_VERSION 		1
+#define HOST_VERSION 		3
 
 /*************************************************************************/
 
@@ -330,7 +331,7 @@ struct ModuleData_ {
 
 struct memo_ {
     uint32 number;	/* Index number -- not necessarily array position! */
-    int16 flags;
+    uint16 flags;
     time_t time;	/* When it was sent */
     char sender[NICKMAX];
     char *text;
@@ -338,7 +339,7 @@ struct memo_ {
 };
 
 typedef struct {
-    int16 memocount, memomax;
+    uint16 memocount, memomax;
     Memo *memos;
 } MemoInfo;
 
@@ -365,7 +366,7 @@ struct nickalias_ {
 	char *last_usermask;			/* Last usermask */
         time_t time_registered;			/* When the nick was registered */
         time_t last_seen;			/* When it was seen online for the last time */
-        int16 status;				/* See NS_* below */
+        uint16 status;				/* See NS_* below */
         NickCore *nc;				/* I'm an alias of this */
         /* Not saved */
         ModuleData *moduleData; 		/* Module saved data attached to the nick alias */
@@ -383,7 +384,7 @@ struct nickcore_ {
 	char *url;				/* URL associated to the nick */
 	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
-        int16 accesscount;			/* # of entries */
+        uint16 accesscount;			/* # of entries */
         char **access;				/* Array of strings */
         MemoInfo memos;
         uint16 channelcount;			/* Number of channels currently registered */
@@ -426,8 +427,8 @@ struct botinfo_ {
 
 /* Access levels for users. */
 typedef struct {
-    int16 in_use;	/* 1 if this entry is in use, else 0 */
-    int16 level;
+    uint16 in_use;	/* 1 if this entry is in use, else 0 */
+    uint16 level;
     NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
     time_t last_seen;
 } ChanAccess;
@@ -451,9 +452,7 @@ typedef struct {
 typedef struct {
     int16 in_use;   /* Always 0 if not in use */
     int16 is_nick;	/* 1 if a regged nickname, 0 if a nick!user@host mask */
-
-	int16 flags;
-
+    uint16 flags;
     union {
 		char *mask;		/* Guaranteed to be non-NULL if in use, NULL if not */
 		NickCore *nc;	/* Same */
@@ -471,9 +470,9 @@ typedef struct {
 /* Structure used to contain bad words. */
 
 struct badword_ {
-	int16 in_use;
+	uint16 in_use;
 	char *word;
-	int16 type;		/* BW_* below */
+	uint16 type;		/* BW_* below */
 };
 
 #define BW_ANY 		0
@@ -506,9 +505,9 @@ struct chaninfo_ {
     int16 bantype;
     int16 *levels;				/* Access levels for commands */
 
-    int16 accesscount;
+    uint16 accesscount;
     ChanAccess *access;			/* List of authorized users */
-    int16 akickcount;
+    uint16 akickcount;
     AutoKick *akick;			/* List of users to kickban */
 
     uint32 mlock_on, mlock_off;		/* See channel modes below */
@@ -532,7 +531,7 @@ struct chaninfo_ {
     uint32 botflags;				/* BS_* below */
     int16 *ttb;						/* Times to ban for each kicker */
 
-    int16 bwcount;
+    uint16 bwcount;
     BadWord *badwords;				/* For BADWORDS kicker */
     int16 capsmin, capspercent;		/* For CAPS kicker */
     int16 floodlines, floodsecs;	/* For FLOOD kicker */
@@ -904,10 +903,8 @@ struct hostcore_ {
 
 /*************************************************************************/
 
-
-
 struct newsitem_ {
-    int16 type;
+    uint16 type;
     uint32 num;                  /* Numbering is separate for login and oper news */
     char *text;
     char who[NICKMAX];

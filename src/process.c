@@ -184,14 +184,19 @@ void process()
     char **av;
     Message *m;
 
+    /* zero out the buffers before we do much else */
+    *buf = '\0';
+    *source = '\0';
+    *cmd = '\0';
 
     /* If debugging, log the buffer */
-    if (debug)
+    if (debug) {
         alog("debug: Received: %s", inbuf);
+    }
 
     /* First make a copy of the buffer so we have the original in case we
      * crash - in that case, we want to know what we crashed on. */
-    strscpy(buf, inbuf, sizeof(buf));
+    strscpy(buf, inbuf, 513);
 
     doCleanBuffer((char *) buf);
 

@@ -188,19 +188,20 @@ void change_user_username(User * user, const char *username)
 
 /*************************************************************************/
 
-
-/*************************************************************************/
-
 /* Remove and free a User structure. */
 
 void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
-    char *realname;
+    char *realname = NULL;
 
     if (LogUsers) {
-        realname = normalizeBuffer(user->realname);
+        if (user->realname) {
+            realname = normalizeBuffer(user->realname);
+        } else {
+            realname = " ";
+        }
         if (ircd->vhost) {
             alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,

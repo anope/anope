@@ -379,8 +379,8 @@ void load_exceptions()
 {
     dbFILE *f;
     int i;
-    int16 n;
-    int16 tmp16;
+    uint16 n;
+    uint16 tmp16;
     uint32 tmp32;
 
     if (!

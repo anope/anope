@@ -635,7 +635,7 @@ void load_cs_dbase(void)
     ver = get_file_version(f);
 
     for (i = 0; i < 256 && !failed; i++) {
-        int16 tmp16;
+        uint16 tmp16;
         uint32 tmp32;
         int n_levels;
         char *s;
@@ -6004,18 +6004,62 @@ static int do_clear(User * u)
         char *av[3];
         struct c_userlist *cu, *next;
 
-        for (cu = c->users; cu; cu = next) {
-            next = cu->next;
-            if (!chan_has_user_status(c, cu->user, CUS_OP))
-                continue;
+        if (ircd->svsmode_ucmode) {
             av[0] = sstrdup(chan);
-            av[1] = sstrdup("-o");
-            av[2] = sstrdup(cu->user->nick);
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
-            free(av[1]);
-            free(av[0]);
+            anope_cmd_svsmode_chan(av[0], "-o", NULL);
+            if (ircd->owner) {
+                anope_cmd_svsmode_chan(av[0], "-q", NULL);
+            }
+            if (ircd->protect || ircd->admin) {
+                anope_cmd_svsmode_chan(av[0], "-a", NULL);
+            }
+            for (cu = c->users; cu; cu = next) {
+                next = cu->next;
+                av[0] = sstrdup(chan);
+                if (!chan_has_user_status(c, cu->user, CUS_OP)) {
+                    if (!chan_has_user_status(c, cu->user, CUS_PROTECT)) {
+                        if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
+                            continue;
+                        } else {
+                            av[1] = sstrdup("-qo");
+                        }
+                    } else {
+                        av[1] = sstrdup("-ao");
+                    }
+                } else {
+                    av[1] = sstrdup("-o");
+                }
+                av[2] = sstrdup(cu->user->nick);
+                do_cmode(s_ChanServ, 3, av);
+                free(av[2]);
+                free(av[1]);
+                free(av[0]);
+            }
+        } else {
+            for (cu = c->users; cu; cu = next) {
+                next = cu->next;
+                av[0] = sstrdup(chan);
+                if (!chan_has_user_status(c, cu->user, CUS_OP)) {
+                    if (!chan_has_user_status(c, cu->user, CUS_PROTECT)) {
+                        if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
+                            continue;
+                        } else {
+                            av[1] = sstrdup("-qo");
+                        }
+                    } else {
+                        av[1] = sstrdup("-ao");
+                    }
+                } else {
+                    av[1] = sstrdup("-o");
+                }
+                av[2] = sstrdup(cu->user->nick);
+                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                               av[2]);
+                do_cmode(s_ChanServ, 3, av);
+                free(av[2]);
+                free(av[1]);
+                free(av[0]);
+            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
     } else if (ircd->halfop && stricmp(what, "hops") == 0) {
@@ -6029,7 +6073,14 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-h");
             av[2] = sstrdup(cu->user->nick);
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
+            if (ircd->svsmode_ucmode) {
+                anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                do_cmode(s_ChanServ, 3, av);
+                break;
+            } else {
+                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                               av[2]);
+            }
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);
@@ -6047,7 +6098,14 @@ static int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup("-v");
             av[2] = sstrdup(cu->user->nick);
-            anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1], av[2]);
+            if (ircd->svsmode_ucmode) {
+                anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                do_cmode(s_ChanServ, 3, av);
+                break;
+            } else {
+                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                               av[2]);
+            }
             do_cmode(s_ChanServ, 3, av);
             free(av[2]);
             free(av[1]);

@@ -16,7 +16,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-#define HOST_VERSION 3
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
 
 void load_hs_dbase_v1(dbFILE * f);
@@ -700,6 +699,7 @@ int do_setall(User * u)
 
     if (!isValidHost(hostmask, 3)) {
         notice_lang(s_HostServ, u, HOST_SET_ERROR);
+        free(hostmask);
         return MOD_CONT;
     }
 
@@ -708,6 +708,7 @@ int do_setall(User * u)
     if ((na = findnick(nick))) {
         if (na->status & NS_VERBOTEN) {
             notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            free(hostmask);
             return MOD_CONT;
         }
         if (vIdent && ircd->vident) {

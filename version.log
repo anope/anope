@@ -8,9 +8,22 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="477"
+VERSION_BUILD="478"
 
 # $Log$
+#
+# BUILD : 1.7.6 (478)
+# BUGS  : N/A
+# NOTES : 1. CS CLEAR strips +q/+a
+# 2. CS CLEAR uses SVSMODE with Unreal to strip +q/a/o/h/v
+# 3. SVSMODE unban works again on Viagra
+# 4. Adds anope_cmd_svsmode_chan() to for SVSMODE on channels
+# 5. OS CLEARMODES uses SVSMODE with Unreal to strip +q/a/o/h/v
+# 6. memory.c, servers.c, slist.c, sockutil.c, misc. is doxygen ready
+# 7. Unreal32 pseduo clients use SJOIN now to join the channels
+# 8. clean out the process() buffers before we start to use them, maybe less garbage in them when we do bts
+# 9. Few memory cleans up in hostserv do_setall()
+# 10. Tons of clean up, only a handful left when you make strict
 #
 # BUILD : 1.7.6 (477)
 # BUGS  : N/A

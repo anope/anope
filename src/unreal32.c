@@ -102,8 +102,7 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      '&',                       /* SJOIN ban char */
      '\"',                      /* SJOIN except char */
-     UMODE_S,                   /* Services Client mode */
-     0,                         /* not p10 */
+     1,                         /* Can remove User Channel Modes with SVSMODE */
      },
     {NULL}
 };
@@ -430,22 +429,12 @@ void anope_set_umode(User * user, int ac, char **av)
         case 'o':
             if (add) {
                 opcnt++;
-
-                /* No need to display news to a services client */
-                if (user->mode & ircd->servicesmode) {
-                    if (WallOper) {
-                        anope_cmd_global(s_OperServ,
-                                         "\2%s\2 is now a Network Service.",
-                                         user->nick);
-                    }
-                } else {
-                    if (WallOper) {
-                        anope_cmd_global(s_OperServ,
-                                         "\2%s\2 is now an IRC operator.",
-                                         user->nick);
-                    }
-                    display_news(user, NEWS_OPER);
+                if (WallOper) {
+                    anope_cmd_global(s_OperServ,
+                                     "\2%s\2 is now an IRC operator.",
+                                     user->nick);
                 }
+                display_news(user, NEWS_OPER);
             } else {
                 opcnt--;
             }
@@ -1087,11 +1076,11 @@ void anope_cmd_pong(char *servname, char *who)
 }
 
 /* JOIN */
-/* Althought Unreal 3.2 does not need the timestamp others do so
-   we get it in the common function call */
 void anope_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(user, "%s %s", send_token("JOIN", "C"), channel);
+    send_cmd(ServerName, "SJOIN !%s %s :%s",
+             base64enc((long int) chantime), channel, user);
+    /* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
 }
 
 /* unsqline
@@ -1948,9 +1937,23 @@ void anope_cmd_sgline(char *mask, char *reason)
 /* SVSMODE -b */
 void anope_cmd_unban(char *name, char *nick)
 {
-    send_cmd(ServerName, "%s %s -b %s", send_token("SVSMODE", "n"), name,
-             nick);
+    anope_cmd_svsmode_chan(name, "-b", nick);
 }
+
+
+/* SVSMODE channel modes */
+
+void anope_cmd_svsmode_chan(char *name, char *mode, char *nick)
+{
+    if (nick) {
+        send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"),
+                 name, mode, nick);
+    } else {
+        send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name,
+                 mode);
+    }
+}
+
 
 /* SVSMODE +d */
 /* sent if svid is something weird */

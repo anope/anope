@@ -15,30 +15,44 @@
 #include "services.h"
 
 /*************************************************************************/
-/*************************************************************************/
-
-/* Read from a socket with buffering. */
 
 static char read_netbuf[NET_BUFSIZE];
 static char *read_curpos = read_netbuf; /* Next byte to return */
 static char *read_bufend = read_netbuf; /* Next position for data from socket */
 static char *const read_buftop = read_netbuf + NET_BUFSIZE;
 int32 total_read = 0;
+static char write_netbuf[NET_BUFSIZE];
+static char *write_curpos = write_netbuf;       /* Next byte to write to socket */
+static char *write_bufend = write_netbuf;       /* Next position for data to socket */
+static char *const write_buftop = write_netbuf + NET_BUFSIZE;
+static int write_fd = -1;
+int32 total_written;
+static int lastchar = EOF;
 
+/*************************************************************************/
 
-/* Return amount of data in read buffer. */
-
+/**
+ * Return amount of data in read buffer.
+ * @return int32
+ */
 int32 read_buffer_len()
 {
-    if (read_bufend >= read_curpos)
+    if (read_bufend >= read_curpos) {
         return read_bufend - read_curpos;
-    else
+    } else {
         return (read_bufend + NET_BUFSIZE) - read_curpos;
+    }
 }
 
+/*************************************************************************/
 
-/* Read data. */
-
+/**
+ * Read data.
+ * @param fd File Pointer
+ * @param buf Buffer
+ * @param int Length of buffer
+ * @return int
+ */
 static int buffered_read(int fd, char *buf, int len)
 {
     int nread, left = len;
@@ -108,9 +122,14 @@ static int buffered_read(int fd, char *buf, int len)
     return len - left;
 }
 
-/* Optimized version of the above for reading a single character; returns
- * the character in an int or EOF, like fgetc(). */
+/*************************************************************************/
 
+/**
+ * Optimized version of the above for reading a single character; returns
+ * the character in an int or EOF, like fgetc().
+ * @param fd File Pointer
+ * @return int
+ */
 static int buffered_read_one(int fd)
 {
     int nread;
@@ -166,31 +185,27 @@ static int buffered_read_one(int fd)
 
 /*************************************************************************/
 
-/* Write to a socket with buffering.  Note that this assumes only one
- * socket. */
-
-static char write_netbuf[NET_BUFSIZE];
-static char *write_curpos = write_netbuf;       /* Next byte to write to socket */
-static char *write_bufend = write_netbuf;       /* Next position for data to socket */
-static char *const write_buftop = write_netbuf + NET_BUFSIZE;
-static int write_fd = -1;
-int32 total_written;
-
-
-/* Return amount of data in write buffer. */
-
+/**
+ * Return amount of data in write buffer.
+ * @return int
+ */
 int32 write_buffer_len()
 {
-    if (write_bufend >= write_curpos)
+    if (write_bufend >= write_curpos) {
         return write_bufend - write_curpos;
-    else
+    } else {
         return (write_bufend + NET_BUFSIZE) - write_curpos;
+    }
 }
 
+/*************************************************************************/
 
-/* Helper routine to try and write up to one chunk of data from the buffer
- * to the socket.  Return how much was written. */
-
+/**
+ * Helper routine to try and write up to one chunk of data from the buffer
+ * to the socket.  Return how much was written.
+ * @param wait Wait
+ * @return int
+ */
 static int flush_write_buffer(int wait)
 {
     fd_set fds;
@@ -226,9 +241,15 @@ static int flush_write_buffer(int wait)
     return 0;
 }
 
+/*************************************************************************/
 
-/* Write data. */
-
+/**
+ * Write data.
+ * @param fd File Pointer
+ * @param buf Buffer to write
+ * @param len Length to write
+ * @return int
+ */
 static int buffered_write(int fd, char *buf, int len)
 {
     int nwritten, left = len;
@@ -293,10 +314,17 @@ static int buffered_write(int fd, char *buf, int len)
     return len - left;
 }
 
-/* Optimized version of the above for writing a single character; returns
- * the character in an int or EOF, like fputc().  Commented out because it
- * isn't currently used. */
 
+/*************************************************************************/
+
+/**
+ * Optimized version of the above for writing a single character; returns
+ * the character in an int or EOF, like fputc().  Commented out because it
+ * isn't currently used.
+ * @param int to write
+ * @param fd Pointer
+ * @return int
+ */
 #if 0
 static int buffered_write_one(int c, int fd)
 {
@@ -339,10 +367,12 @@ static int buffered_write_one(int c, int fd)
 #endif                          /* 0 */
 
 /*************************************************************************/
-/*************************************************************************/
 
-static int lastchar = EOF;
-
+/**
+ * sgetc ?
+ * @param int to read
+ * @return int
+ */
 int sgetc(int s)
 {
     int c;
@@ -355,6 +385,14 @@ int sgetc(int s)
     return buffered_read_one(s);
 }
 
+/*************************************************************************/
+
+/**
+ * sungetc ?
+ * @param int c
+ * @param int s
+ * @return int
+ */
 int sungetc(int c, int s)
 {
     return lastchar = c;
@@ -362,10 +400,14 @@ int sungetc(int c, int s)
 
 /*************************************************************************/
 
-/* If connection was broken, return NULL.  If the read timed out, return
+/**
+ * If connection was broken, return NULL.  If the read timed out, return
  * (char *)-1.
+ * @param buf Buffer to get
+ * @param len Length
+ * @param s Socket
+ * @return buffer
  */
-
 char *sgets(char *buf, int len, int s)
 {
     int c = 0;
@@ -395,10 +437,14 @@ char *sgets(char *buf, int len, int s)
 
 /*************************************************************************/
 
-/* sgets2:  Read a line of text from a socket, and strip newline and
+/**
+ * sgets2:  Read a line of text from a socket, and strip newline and
  *          carriage return characters from the end of the line.
+ * @param buf Buffer to get
+ * @param len Length
+ * @param s Socket
+ * @return buffer
  */
-
 char *sgets2(char *buf, int len, int s)
 {
     char *str = sgets(buf, len, s);
@@ -415,9 +461,14 @@ char *sgets2(char *buf, int len, int s)
 
 /*************************************************************************/
 
-/* Read from a socket.  (Use this instead of read() because it has
- * buffering.) */
-
+/**
+ * Read from a socket.  (Use this instead of read() because it has
+ * buffering.)
+ * @param s Socket
+ * @param buf Buffer to get
+ * @param len Length
+ * @return int
+ */
 int sread(int s, char *buf, int len)
 {
     return buffered_read(s, buf, len);
@@ -425,6 +476,12 @@ int sread(int s, char *buf, int len)
 
 /*************************************************************************/
 
+/**
+ * sputs : write buffer
+ * @param s Socket
+ * @param str Buffer to write
+ * @return int
+ */
 int sputs(char *str, int s)
 {
     return buffered_write(s, str, strlen(str));
@@ -432,25 +489,35 @@ int sputs(char *str, int s)
 
 /*************************************************************************/
 
+/**
+ * sockprintf : a socket writting printf()
+ * @param s Socket
+ * @param fmt format of message
+ * @param ... various args
+ * @return int
+ */
 int sockprintf(int s, char *fmt, ...)
 {
     va_list args;
     char buf[16384];            /* Really huge, to try and avoid truncation */
+    int value;
 
     va_start(args, fmt);
-    return buffered_write(s, buf, vsnprintf(buf, sizeof(buf), fmt, args));
-    /* no va_end() but not sure how to squeeze it in here */
+    value = buffered_write(s, buf, vsnprintf(buf, sizeof(buf), fmt, args));
+    va_end(args);
+    return value;
 }
 
-/*************************************************************************/
 /*************************************************************************/
 
 #if !HAVE_GETHOSTBYNAME
 
-/* Translate an IP dotted-quad address to a 4-byte character string.
+/**
+ * Translate an IP dotted-quad address to a 4-byte character string.
  * Return NULL if the given string is not in dotted-quad format.
+ * @param ipaddr IP Address
+ * @return char 4byte ip char string
  */
-
 static char *pack_ip(const char *ipaddr)
 {
     static char ipbuf[4];
@@ -471,10 +538,15 @@ static char *pack_ip(const char *ipaddr)
 
 /*************************************************************************/
 
-/* lhost/lport specify the local side of the connection.  If they are not
+/**
+ * lhost/lport specify the local side of the connection.  If they are not
  * given (lhost==NULL, lport==0), then they are left free to vary.
+ * @param host Remote Host
+ * @param port Remote Port
+ * @param lhost LocalHost
+ * @param lport LocalPort
+ * @return int if successful
  */
-
 int conn(const char *host, int port, const char *lhost, int lport)
 {
 #if HAVE_GETHOSTBYNAME
@@ -543,6 +615,11 @@ int conn(const char *host, int port, const char *lhost, int lport)
 
 /*************************************************************************/
 
+/**
+ * Close up the connection
+ * @param s Socket
+ * @return void
+ */
 void disconn(int s)
 {
     shutdown(s, 2);

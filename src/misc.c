@@ -27,38 +27,55 @@ struct arc4_stream {
 
 /*************************************************************************/
 
-/* toupper/tolower:  Like the ANSI functions, but make sure we return an
+/**
+ * toupper:  Like the ANSI functions, but make sure we return an
  *                   int instead of a (signed) char.
+ * @param c Char
+ * @return int
  */
-
 int toupper(char c)
 {
-    if (islower(c))
+    if (islower(c)) {
         return (unsigned char) c - ('a' - 'A');
-    else
+    } else {
         return (unsigned char) c;
-}
-
-int tolower(char c)
-{
-    if (isupper(c))
-        return (unsigned char) c + ('a' - 'A');
-    else
-        return (unsigned char) c;
+    }
 }
 
 /*************************************************************************/
 
-/* strscpy:  Copy at most len-1 characters from a string to a buffer, and
- *           add a null terminator after the last character copied.
+/**
+ * tolower:  Like the ANSI functions, but make sure we return an
+ *                   int instead of a (signed) char.
+ * @param c Char
+ * @return int
  */
+int tolower(char c)
+{
+    if (isupper(c)) {
+        return (unsigned char) c + ('a' - 'A');
+    } else {
+        return (unsigned char) c;
+    }
+}
 
+/*************************************************************************/
+
+/**
+ * strscpy:  Copy at most len-1 characters from a string to a buffer, and
+ *           add a null terminator after the last character copied.
+ * @param d Buffer to copy into
+ * @param s Data to copy int
+ * @param len Length of data
+ * @return updated buffer
+ */
 char *strscpy(char *d, const char *s, size_t len)
 {
     char *d_orig = d;
 
-    if (!len)
+    if (!len) {
         return d;
+    }
     while (--len && (*d++ = *s++));
     *d = '\0';
     return d_orig;
@@ -66,11 +83,14 @@ char *strscpy(char *d, const char *s, size_t len)
 
 /*************************************************************************/
 
-/* stristr:  Search case-insensitively for string s2 within string s1,
+/**
+ * stristr:  Search case-insensitively for string s2 within string s1,
  *           returning the first occurrence of s2 or NULL if s2 was not
  *           found.
+ * @param s1 String 1
+ * @param s2 String 2
+ * @return first occurrence of s2
  */
-
 char *stristr(char *s1, char *s2)
 {
     register char *s = s1, *d = s2;
@@ -91,12 +111,17 @@ char *stristr(char *s1, char *s2)
 
 /*************************************************************************/
 
-/* strnrepl:  Replace occurrences of `old' with `new' in string `s'.  Stop
+/**
+ * strnrepl:  Replace occurrences of `old' with `new' in string `s'.  Stop
  *            replacing if a replacement would cause the string to exceed
  *            `size' bytes (including the null terminator).  Return the
  *            string.
+ * @param s String
+ * @param size size of s
+ * @param old character to replace
+ * @param new character to replace with
+ * @return updated s
  */
-
 char *strnrepl(char *s, int32 size, const char *old, const char *new)
 {
     char *ptr = s;
@@ -124,13 +149,15 @@ char *strnrepl(char *s, int32 size, const char *old, const char *new)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* merge_args:  Take an argument count and argument vector and merge them
+/**
+ * merge_args:  Take an argument count and argument vector and merge them
  *              into a single string in which each argument is separated by
  *              a space.
+ * @param int Number of Args
+ * @param argv Array
+ * @return string of the merged array
  */
-
 char *merge_args(int argc, char **argv)
 {
     int i;
@@ -145,13 +172,16 @@ char *merge_args(int argc, char **argv)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* match_wild:  Attempt to match a string to a pattern which might contain
+/**
+ * do_match_wild:  Attempt to match a string to a pattern which might contain
  *              '*' or '?' wildcards.  Return 1 if the string matches the
  *              pattern, 0 if not.
+ * @param pattern To be matched
+ * @param str String in which the pattern is to be matched
+ * @param docase Case In/Senstive
+ * @return 1 if the string matches the pattern, 0 if not.
  */
-
 static int do_match_wild(const char *pattern, const char *str, int docase)
 {
     char c;
@@ -195,21 +225,36 @@ static int do_match_wild(const char *pattern, const char *str, int docase)
     }
 }
 
+/*************************************************************************/
 
+/**
+ * match_wild:  Case Senstive wild card search
+ * @param pattern To be matched
+ * @param str String in which the pattern is to be matched
+ * @return 1 if the string matches the pattern, 0 if not.
+ */
 int match_wild(const char *pattern, const char *str)
 {
     return do_match_wild(pattern, str, 1);
 }
 
+/*************************************************************************/
+
+/**
+ * match_wild:  Case Insenstive wild card search
+ * @param pattern To be matched
+ * @param str String in which the pattern is to be matched
+ * @return 1 if the string matches the pattern, 0 if not.
+ */
 int match_wild_nocase(const char *pattern, const char *str)
 {
     return do_match_wild(pattern, str, 0);
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
-/* Process a string containing a number/range list in the form
+/**
+ * Process a string containing a number/range list in the form
  * "n1[-n2][,n3[-n4]]...", calling a caller-specified routine for each
  * number in the list.  If the callback returns -1, stop immediately.
  * Returns the sum of all nonnegative return values from the callback.
@@ -218,8 +263,13 @@ int match_wild_nocase(const char *pattern, const char *str)
  *
  * The callback should be of type range_callback_t, which is defined as:
  *	int (*range_callback_t)(User *u, int num, va_list args)
+ * @param numstr
+ * @param count_ret 
+ * @param callback Call back function
+ * @param u User Struct
+ * @param ... various args
+ * @return int
  */
-
 int process_numlist(const char *numstr, int *count_ret,
                     range_callback_t callback, User * u, ...)
 {
@@ -279,15 +329,17 @@ int process_numlist(const char *numstr, int *count_ret,
 
 /*************************************************************************/
 
-/* dotime:  Return the number of seconds corresponding to the given time
+/**
+ * dotime:  Return the number of seconds corresponding to the given time
  *          string.  If the given string does not represent a valid time,
  *          return -1.
  *
  *          A time string is either a plain integer (representing a number
  *          of seconds), or an integer followed by one of these characters:
  *          "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
+ * @param s String to convert
+ * @return int
  */
-
 int dotime(const char *s)
 {
     int amount;
@@ -317,9 +369,15 @@ int dotime(const char *s)
 
 /*************************************************************************/
 
-/* Expresses in a string the period of time represented by a given amount
-   of seconds (with days/hours/minutes). */
-
+/**
+ * Expresses in a string the period of time represented by a given amount
+ * of seconds (with days/hours/minutes).
+ * @param na Nick Alias
+ * @param buf buffer to store result into
+ * @param bufsize Size of the buffer
+ * @param seconds time in seconds
+ * @return buffer
+ */
 char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 {
     int days = 0, hours = 0, minutes = 0;
@@ -380,8 +438,14 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 
 /*************************************************************************/
 
-/* Generates a human readable string of type "expires in ..." */
-
+/**
+ * Generates a human readable string of type "expires in ..."
+ * @param na Nick Alias
+ * @param buf buffer to store result into
+ * @param bufsize Size of the buffer
+ * @param seconds time in seconds
+ * @return buffer
+ */
 char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
 {
     time_t now = time(NULL);
@@ -429,17 +493,18 @@ char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
     return buf;
 }
 
+
+/*************************************************************************/
+
 /**
- * Return 1 if a host is valid, 0 if it isnt.
- * host = string to check
- * type = format, 1 = ip4addr, 2 = hostname
- *
+ * Validate the host
  * shortname  =  ( letter / digit ) *( letter / digit / "-" ) *( letter / digit )
  * hostname   =  shortname *( "." shortname )
  * ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
- *
- **/
-
+ * @param host = string to check
+ * @param type = format, 1 = ip4addr, 2 = hostname
+ * @return 1 if a host is valid, 0 if it isnt.
+ */
 int doValidHost(const char *host, int type)
 {
     int idx = 0;
@@ -517,16 +582,14 @@ int doValidHost(const char *host, int type)
     return 1;
 }
 
+/*************************************************************************/
+
 /**
- * Return 1 if a host is valid, 0 if it isnt.
- * host = string to check
- * type = format, 1 = ip4addr, 2 = hostname, 3 = either
- *
- * shortname  =  ( letter / digit ) *( letter / digit / "-" ) *( letter / digit )
- * hostname   =  shortname *( "." shortname )
- * ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
- *
- **/
+ * Front end to doValidHost
+ * @param host = string to check
+ * @param type = format, 1 = ip4addr, 2 = hostname
+ * @return 1 if a host is valid, 0 if it isnt.
+ */
 int isValidHost(const char *host, int type)
 {
     int status = 0;
@@ -540,6 +603,13 @@ int isValidHost(const char *host, int type)
     return status;
 }
 
+/*************************************************************************/
+
+/**
+ * Valid character check
+ * @param c Charaacter to check
+ * @return 1 if a host is valid, 0 if it isnt.
+ */
 int isvalidchar(const char c)
 {
     if (((c >= 'A') && (c <= 'Z')) ||
@@ -550,6 +620,16 @@ int isvalidchar(const char c)
         return 0;
 }
 
+
+/*************************************************************************/
+
+/**
+ * Get the token
+ * @param str String to search in
+ * @param dilim Character to search for
+ * @param token_number the token number
+ * @return token
+ */
 char *myStrGetToken(const char *str, const char dilim, int token_number)
 {
     int len, idx, counter = 0, start_pos = 0;
@@ -572,6 +652,15 @@ char *myStrGetToken(const char *str, const char dilim, int token_number)
     return substring;
 }
 
+/*************************************************************************/
+
+/**
+ * Get the token only
+ * @param str String to search in
+ * @param dilim Character to search for
+ * @param token_number the token number
+ * @return token
+ */
 char *myStrGetOnlyToken(const char *str, const char dilim,
                         int token_number)
 {
@@ -598,6 +687,15 @@ char *myStrGetOnlyToken(const char *str, const char dilim,
     return substring;
 }
 
+/*************************************************************************/
+
+/**
+ * Get the Remaining tokens
+ * @param str String to search in
+ * @param dilim Character to search for
+ * @param token_number the token number
+ * @return token
+ */
 char *myStrGetTokenRemainder(const char *str, const char dilim,
                              int token_number)
 {
@@ -622,6 +720,15 @@ char *myStrGetTokenRemainder(const char *str, const char dilim,
     return substring;
 }
 
+/*************************************************************************/
+
+/**
+ * Get the string between point A and point B
+ * @param str String to search in
+ * @param start Point A
+ * @param end Point B
+ * @return the string in between
+ */
 char *myStrSubString(const char *src, int start, int end)
 {
     char *substring = NULL;
@@ -640,6 +747,13 @@ char *myStrSubString(const char *src, int start, int end)
     return substring;
 }
 
+/*************************************************************************/
+
+/**
+ * Clean up the buffer for extra spaces
+ * @param str to clean up
+ * @return void
+ */
 void doCleanBuffer(char *str)
 {
     char *in, *out;
@@ -669,6 +783,14 @@ void doCleanBuffer(char *str)
     *out = ch;                  /* == '\0' */
 }
 
+/*************************************************************************/
+
+/**
+ * Kill the user to enforce the sqline
+ * @param nick to kill
+ * @param killer whom is doing the killing
+ * @return void
+ */
 void EnforceQlinedNick(char *nick, char *killer)
 {
     User *u2;
@@ -681,6 +803,14 @@ void EnforceQlinedNick(char *nick, char *killer)
     }
 }
 
+/*************************************************************************/
+
+/**
+ * Is the given nick a network service
+ * @param nick to check
+ * @param int Check if botserv bots
+ * @return int
+ */
 int nickIsServices(char *nick, int bot)
 {
     int found = 0;
@@ -742,6 +872,12 @@ int nickIsServices(char *nick, int bot)
     return found;
 }
 
+/*************************************************************************/
+
+/**
+ * arc4 init
+ * @return void
+ */
 static void arc4_init(void)
 {
     int n;
@@ -751,6 +887,14 @@ static void arc4_init(void)
     rs.j = 0;
 }
 
+/*************************************************************************/
+
+/**
+ * arc4 addrandom
+ * @param data
+ * @param dalen Data Length
+ * @return void
+ */
 static void arc4_addrandom(void *dat, int datlen)
 {
     int n;
@@ -766,6 +910,12 @@ static void arc4_addrandom(void *dat, int datlen)
     }
 }
 
+/*************************************************************************/
+
+/**
+ * random init
+ * @return void
+ */
 void rand_init(void)
 {
     int n;
@@ -797,7 +947,7 @@ void rand_init(void)
     /* unix/bsd: time */
     gettimeofday(&rdat.nowt, NULL);
     /* unix/bsd: /dev/urandom */
-    fd = open("/dev/urandom", "r");
+    fd = open("/dev/urandom", O_RDONLY);
     if (fd) {
         n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
         close(fd);
@@ -812,6 +962,12 @@ void rand_init(void)
     arc4_addrandom(&rdat, sizeof(rdat));
 }
 
+/*************************************************************************/
+
+/**
+ * Setup the random numbers
+ * @return void
+ */
 void add_entropy_userkeys(void)
 {
     arc4_addrandom(&UserKey1, sizeof(UserKey1));
@@ -820,6 +976,12 @@ void add_entropy_userkeys(void)
     /* UserKey3 is also used in mysql_rand() */
 }
 
+/*************************************************************************/
+
+/**
+ * Get the random numbers 8 byte deep
+ * @return char
+ */
 u_char getrandom8(void)
 {
     u_char si, sj;
@@ -833,6 +995,12 @@ u_char getrandom8(void)
     return (rs.s[(si + sj) & 0xff]);
 }
 
+/*************************************************************************/
+
+/**
+ * Get the random numbers 16 byte deep
+ * @return char
+ */
 u_int16_t getrandom16(void)
 {
     u_int16_t val;
@@ -842,6 +1010,12 @@ u_int16_t getrandom16(void)
     return val;
 }
 
+/*************************************************************************/
+
+/**
+ * Get the random numbers 32 byte deep
+ * @return char
+ */
 u_int32_t getrandom32(void)
 {
     u_int32_t val;
@@ -853,6 +1027,14 @@ u_int32_t getrandom32(void)
     return val;
 }
 
+/*************************************************************************/
+
+/**
+ * Determine if we need to send the TOKEN
+ * @param token1 
+ * @param token2
+ * @return token to send
+ */
 char *send_token(char *token1, char *token2)
 {
  if (UseTokens && ircd->token && ircdcap->token) {
@@ -863,6 +1045,14 @@ char *send_token(char *token1, char *token2)
   }
 }
 
+/*************************************************************************/
+
+/**
+ * Number of tokens in a string
+ * @param str String
+ * @param dilim Dilimiter
+ * @return number of tokens
+ */
 int myNumToken(const char *str, const char dilim)
 {
     int len, idx, counter = 0, start_pos = 0;
@@ -879,7 +1069,13 @@ int myNumToken(const char *str, const char dilim)
     return counter;
 }
 
+/*************************************************************************/
 
+/**
+ * Resolve a host to an IP
+ * @param host to convert
+ * @return ip address
+ */
 char *host_resolve(char *host)
 {
     struct hostent *hentp = NULL;

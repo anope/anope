@@ -100,8 +100,7 @@ IRCDVar ircd[] = {
      0,                         /* +I support */
      0,                         /* SJOIN ban char */
      0,                         /* SJOIN except char */
-     0,                         /* Services Client mode */
-     0,                         /* not p10 */
+     0,                         /* Can remove User Channel Modes with SVSMODE */
      }
     ,
     {NULL}
@@ -1370,6 +1369,13 @@ void anope_cmd_svso(char *source, char *nick, char *flag)
 }
 
 void anope_cmd_unban(char *name, char *nick)
+{
+    /* Not Supported by this IRCD */
+}
+
+/* SVSMODE channel modes */
+
+void anope_cmd_svsmode_chan(char *name, char *mode, char *nick)
 {
     /* Not Supported by this IRCD */
 }

@@ -380,7 +380,7 @@ static void load_old_akill(void)
 {
     dbFILE *f;
     int i, j;
-    int16 tmp16;
+    uint16 tmp16;
     uint32 tmp32;
     char buf[NICKMAX], mask2[BUFSIZE], *mask, *s;
     Akill *ak, *entry;
@@ -492,9 +492,9 @@ static void load_old_akill(void)
 void load_os_dbase(void)
 {
     dbFILE *f;
-    int16 i, n, ver, c;
+    int16 i, ver, c;
     HostCache *hc, **hclast, *hcprev;
-    int16 tmp16;
+    uint16 tmp16, n;
     uint32 tmp32;
     char *s;
     int failed = 0;
@@ -1627,97 +1627,140 @@ static int do_clearmodes(User * u)
             }
         }
 
-        if (WallOSClearmodes)
+        if (WallOSClearmodes) {
             anope_cmd_global(s_OperServ, "%s used CLEARMODES%s on %s",
                              u->nick, all ? " ALL" : "", chan);
-
+        }
         if (all) {
             /* Clear mode +o */
-            for (cu = c->users; cu; cu = next) {
-                next = cu->next;
-
-                if (!chan_has_user_status(c, cu->user, CUS_OP))
-                    continue;
-
-                argv[0] = sstrdup("-o");
-                argv[1] = cu->user->nick;
-
-                anope_cmd_mode(s_OperServ, c->name, "-o %s",
-                               cu->user->nick);
-                chan_set_modes(s_OperServ, c, 2, argv, 0);
-
-                free(argv[0]);
-            }
-
-            /* Clear mode +v */
-            for (cu = c->users; cu; cu = next) {
-                next = cu->next;
-
-                if (!chan_has_user_status(c, cu->user, CUS_VOICE))
-                    continue;
-
-                argv[0] = sstrdup("-v");
-                argv[1] = sstrdup(cu->user->nick);
-
-                anope_cmd_mode(s_OperServ, c->name, "-v %s",
-                               cu->user->nick);
-                chan_set_modes(s_OperServ, c, 2, argv, 0);
-
-                free(argv[0]);
-            }
-            /* Clear mode +h */
-            if (ircd->halfop) {
+            if (ircd->svsmode_ucmode) {
+                anope_cmd_svsmode_chan(c->name, "-o", NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
+                    if (!chan_has_user_status(c, cu->user, CUS_OP)) {
+                        continue;
+                    }
+                    argv[0] = sstrdup("-o");
+                    argv[1] = cu->user->nick;
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            } else {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+                    if (!chan_has_user_status(c, cu->user, CUS_OP))
+                        continue;
+                    argv[0] = sstrdup("-o");
+                    argv[1] = cu->user->nick;
+                    anope_cmd_mode(s_OperServ, c->name, "-o %s",
+                                   cu->user->nick);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            }
 
+            if (ircd->svsmode_ucmode) {
+                anope_cmd_svsmode_chan(c->name, "-v", NULL);
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+                    if (!chan_has_user_status(c, cu->user, CUS_VOICE)) {
+                        continue;
+                    }
+                    argv[0] = sstrdup("-v");
+                    argv[1] = cu->user->nick;
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            } else {
+                /* Clear mode +v */
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+                    if (!chan_has_user_status(c, cu->user, CUS_VOICE))
+                        continue;
+                    argv[0] = sstrdup("-v");
+                    argv[1] = sstrdup(cu->user->nick);
+                    anope_cmd_mode(s_OperServ, c->name, "-v %s",
+                                   cu->user->nick);
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            }
+
+            /* Clear mode +h */
+            if (ircd->svsmode_ucmode && ircd->halfop) {
+                anope_cmd_svsmode_chan(c->name, "-h", NULL);
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
+                    if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
+                        continue;
+                    }
+                    argv[0] = sstrdup("-h");
+                    argv[1] = cu->user->nick;
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            } else {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
                         continue;
-
                     argv[0] = sstrdup("-h");
                     argv[1] = sstrdup(cu->user->nick);
-
                     anope_cmd_mode(s_OperServ, c->name, "-h %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
-
                     free(argv[0]);
                 }
             }
-
             /* Clear mode Owners */
-            if (ircd->owner) {
+            if (ircd->svsmode_ucmode && ircd->owner) {
+                anope_cmd_svsmode_chan(c->name, ircd->ownerunset, NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
-
+                    if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
+                        continue;
+                    }
+                    argv[0] = sstrdup(ircd->ownerunset);
+                    argv[1] = cu->user->nick;
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            } else {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_OWNER))
                         continue;
-
                     argv[0] = sstrdup(ircd->ownerunset);
                     argv[1] = sstrdup(cu->user->nick);
-
                     anope_cmd_mode(s_OperServ, c->name, "%s %s",
                                    ircd->ownerunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
-
                     free(argv[0]);
                 }
             }
-
             /* Clear mode protected or admins */
-            if (ircd->protect || ircd->admin) {
+            if (ircd->svsmode_ucmode && (ircd->protect || ircd->admin)) {
+                anope_cmd_svsmode_chan(c->name, "-a", NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
-
+                    if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
+                        continue;
+                    }
+                    argv[0] = sstrdup("-a");
+                    argv[1] = cu->user->nick;
+                    chan_set_modes(s_OperServ, c, 2, argv, 0);
+                    free(argv[0]);
+                }
+            } else {
+                for (cu = c->users; cu; cu = next) {
+                    next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
                         continue;
-
                     argv[0] = sstrdup("-a");
                     argv[1] = sstrdup(cu->user->nick);
-
                     anope_cmd_mode(s_OperServ, c->name, "-a %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
-
                     free(argv[0]);
                 }
             }

@@ -373,7 +373,7 @@ void load_old_ns_dbase(void)
     NickCore *nc;
     int failed = 0;
 
-    int16 tmp16;
+    uint16 tmp16;
     uint32 tmp32;
 
     char bufn[NICKMAX], bufp[PASSMAX];
@@ -662,7 +662,7 @@ void load_ns_dbase(void)
     NickAlias *na, **nalast, *naprev;
     NickCore *nc, **nclast, *ncprev;
     int failed = 0;
-    int16 tmp16;
+    uint16 tmp16;
     uint32 tmp32;
     char *s;
 

@@ -14,9 +14,6 @@
 
 #include "services.h"
 
-/*************************************************************************/
-/*************************************************************************/
-
 /* smalloc, scalloc, srealloc, sstrdup:
  *	Versions of the memory allocation functions which will cause the
  *	program to terminate with an "Out of memory" error if the memory
@@ -24,6 +21,13 @@
  *	is never NULL.)
  */
 
+/*************************************************************************/
+
+/**
+ * malloc, replacement so we can trap for "out of memory"
+ * @param size to allocate
+ * @return void
+ */
 void *smalloc(long size)
 {
     void *buf;
@@ -41,6 +45,14 @@ void *smalloc(long size)
     return buf;
 }
 
+/*************************************************************************/
+
+/**
+ * calloc, replacement so we can trap for "out of memory"
+ * @param elsize to allocate
+ * @param els size of members
+ * @return void
+ */
 void *scalloc(long elsize, long els)
 {
     void *buf;
@@ -58,6 +70,14 @@ void *scalloc(long elsize, long els)
     return buf;
 }
 
+/*************************************************************************/
+
+/**
+ * realloc, replacement so we can trap for "out of memory"
+ * @param oldptr Old Pointer
+ * @param newsize Size of new pointer
+ * @return void
+ */
 void *srealloc(void *oldptr, long newsize)
 {
     void *buf;
@@ -75,6 +95,14 @@ void *srealloc(void *oldptr, long newsize)
     return buf;
 }
 
+/*************************************************************************/
+
+/**
+ * strdup, replacement so we can trap for "out of memory"
+ * @param oldptr Old Pointer
+ * @param newsize Size of new pointer
+ * @return void
+ */
 char *sstrdup(const char *src)
 {
     char *ret = NULL;

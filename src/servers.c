@@ -444,6 +444,14 @@ void capab_parse(int ac, char **av)
     }
 }
 
+/*************************************************************************/
+
+/**
+ * Search the uline servers array to find out if the server that just set the
+ * mode is in our uline list
+ * @param server Server Setting the mode
+ * @return int 0 if not found, 1 if found
+ */
 int is_ulined(char *server)
 {
     int j;

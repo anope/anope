@@ -3179,7 +3179,7 @@ NICK_HELP
 	    SENDPASS   Forgot your password? Try this
 	
 	Other commands: GHOST, ALIST, GLIST, INFO, LIST, LOGOUT, 
-	                STATUS
+	                STATUS, UPDATE
 	
 	NOTICE: This service is intended to provide a way for
 	IRC users to ensure their identity is not compromised.

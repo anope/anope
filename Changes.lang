@@ -6,6 +6,7 @@ Anope Version S V N
 
 *** Mod Strings:
 	OPER_HELP_SET
+	NICK_HELP
 
 *** Del Strings:
 	CHAN_HELP_ULTIMATE

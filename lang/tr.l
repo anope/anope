@@ -608,7 +608,7 @@ NICK_INFO_FOR_MORE
 NICK_LIST_SYNTAX
 	LIST model
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST model [FORBIDDEN] [NOEXPIRE]
+	LIST model [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	%s içeren kayýtlarýn listesi:
 NICK_LIST_RESULTS
@@ -3688,18 +3688,18 @@ NICK_SERVADMIN_HELP_INFO
 	kullanabilirler.
 
 NICK_SERVADMIN_HELP_LIST
-	Kullanýmý: LIST model [FORBIDDEN] [NOEXPIRE]
+	Kullanýmý: LIST model [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Belirtilen modele uyuþan tüm kayýtlý nickleri nick!user@host 
 	formatýnda listeler. PRIVATE özellið aktif olan kullanýcýlar 
 	sadece servis adminleri tarafýndan görüntülenir. NOEXPIRE 
 	ayarý olan nicklerde servis adminleri için asýlý bir ! bulunur.
 	
-	Eðer FORBIDDEN ve NOEXPIRE parametreleri verilmiþse, Sadece
-	yasaklanmýþ(forbidden) ve zaman asimi olmayan(noexpire) 
-	nickler listelenir. Eðer iki parametrede verilmiþse iki tip
-	nicklerde listelenir. Bu özellikleri sadece Servis adminleri
-	kullanabilir.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Örnekler:
 	

@@ -3609,7 +3609,7 @@ NICK_SERVADMIN_HELP_INFO
 	Администраторы сервисов могу использовать параметр ALL для любого ника.
 
 NICK_SERVADMIN_HELP_LIST
-	Синтаксис: LIST маска [FORBIDDEN] [NOEXPIRE]
+	Синтаксис: LIST маска [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Показывает список всех зарегистрированных ников which которые содержат
 	введенную маску, в формате nick!user@host. Ники, у которых включена опция
@@ -3617,11 +3617,11 @@ NICK_SERVADMIN_HELP_LIST
 	с включенным параметром NOEXPIRE будут показаны с префиксом ! перед
 	ником.
 	
-	Если указан параметр FORBIDDEN или NOEXPIRE, будут показаны только
-	ники, имеющие включенные опции FORBIDden или NOEXPIRE.
-	Если указаны все опции - все
-	типы ников будут показаны.  Эти опции могут использовать только
-	Администраторы сервисов.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Примеры:
 	

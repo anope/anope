@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="2"
-VERSION_BUILD="101"
+VERSION_BUILD="102"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.2 (102)
+# BUGS  : 53
+# NOTES : Modified HELP LIST and LIST SYNTAX help messages
 #
 # BUILD : 1.7.2 (101)
 # BUGS  : none

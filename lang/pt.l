@@ -602,7 +602,7 @@ NICK_INFO_FOR_MORE
 NICK_LIST_SYNTAX
 	LIST opções
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST opções [FORBIDDEN] [NOEXPIRE]
+	LIST opções [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Lista de entradas com %s:
 NICK_LIST_RESULTS
@@ -3687,19 +3687,19 @@ NICK_SERVADMIN_HELP_INFO
 	Administradores de Services podem usar o comando ALL com qualquer nick.
 
 NICK_SERVADMIN_HELP_LIST
-	Sintaxe: LIST padrão [FORBIDDEN] [NOEXPIRE]
+	Sintaxe: LIST padrão [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Lista todos os nicks registrados que combinem com o padrão
 	fornecido (formato nick!ident@host). Nicks com opção PRIVATE
 	serão somente exibidos para os Administradores dos Services.
 	Nicks com opção NOEXPIRE ajustada terão um ! preposto ao nick
 	na lista quando for a pedido de Administrador dos Services.
-	Se as opções FORBIDDEN ou NOEXPIRE forem fornecidas, somente os
-	nicks proibidos (forbidden) ou os que tem a flag NOEXPIRE serão
-	exibidos, respectivamente. Se ambas as opções são fornecidas,
-	ambos os tipos de nicks serão exibidos.
 	
-	Essas opções são limitadas aos Administradores dos Services.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Exemplos:
 	

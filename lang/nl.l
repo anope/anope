@@ -3640,7 +3640,7 @@ NICK_SERVADMIN_HELP_INFO
 	Services admins mogen het ALL parameter met elke nick gebruiken.
 
 NICK_SERVADMIN_HELP_LIST
-	Gebruik: trefbeeld [FORBIDDEN] [NOEXPIRE]
+	Gebruik: trefbeeld [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Geeft alle geregistreerde nicknames weer die overeen komen
 	met het gegeven trefbeeld, in nick!gebruiker@host formaat.
@@ -3649,11 +3649,11 @@ NICK_SERVADMIN_HELP_LIST
 	een ! voor de naam hebben als een Services admin de lijst
 	bekijkt.
 	
-	Als de FORBIDDEN of NOEXPIRE opties zijn gegeven worden alleen
-	nicks die, respectievelijk, verboden zijn of niet zullen
-	verlopen worden weergegeven. Als beide opties zijn gegeven
-	zullen beide types nicks worden weergegeven. Deze opties zijn
-	gelimiteerd tot Services admins.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Voorbeelden:
 	

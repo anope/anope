@@ -3798,7 +3798,7 @@ NICK_SERVADMIN_HELP_INFO
 	jeden beliebigen Nick benutzen.
 
 NICK_SERVADMIN_HELP_LIST
-	Syntax: LIST pattern [FORBIDDEN] [NOEXPIRE]
+	Syntax: LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 
 	Zeigt alle registrierten Nicknamen an, die einem bestimmten
 	Muster (pattern), nick!user@host, entsprechen.
@@ -3807,11 +3807,11 @@ NICK_SERVADMIN_HELP_LIST
 	NOEXPIRE eingeschaltet ist, werden ein ! vor ihrem
 	Eintrag in der Liste haben (nur bei Services Admins).
 	
-	Bei Angabe des Parameters FORBIDDEN oder NOEXPIRE werden
-	nur Nicks aufgelistet, die das entsprechende Flag gesetzt
-	haben. Wenn beide Parameter gleichzeitig angegeben, nur 
-	Nicks, die beide Flags eingeschaltet haben. Diese 
-	Funktion ist beschränkt auf Services Admins.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Beispiele:
 	

@@ -3732,7 +3732,7 @@ NICK_SERVADMIN_HELP_INFO
 	avec n'importe quel nick.
 
 NICK_SERVADMIN_HELP_LIST
-	Syntaxe: LIST modèle [FORBIDDEN] [NOEXPIRE]
+	Syntaxe: LIST modèle [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Liste tous les nicks enregistrés qui correspondent au modèle
 	donné, de format nick!user@host. Les nicks ayant l'option
@@ -3740,11 +3740,11 @@ NICK_SERVADMIN_HELP_LIST
 	nicks ayant l'option NOEXPIRE seront préfixés par un !
 	devant leur nick pour les Services admins. 
 	
-	Si les options FORBIDDEN ou NOEXPIRE sont données, seuls 
-	les nicks qui, respectivement, sont interdits ou ont l'option
-	NOEXPIRE active seront affichées. Si les deux options sont
-	données, les deux types de nicks seront affichés. Ces options
-	sont réservées aux Services admins.
+	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	NOEXPIRE flag set will be displayed. If all three options are
+	given, all three types of nicks will be displayed. These options
+	are limited to Services admins.  
 	
 	Exemples:
 	

@@ -602,7 +602,7 @@ NICK_INFO_FOR_MORE
 NICK_LIST_SYNTAX
 	LIST pattern
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST pattern [FORBIDDEN] [NOEXPIRE]
+	LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Η λίστα με τις καταχωρήσεις βρέθηκαν %s:
 NICK_LIST_RESULTS
@@ -3693,7 +3693,7 @@ NICK_SERVADMIN_HELP_INFO
 	κάθε ψευδώνυμο.
 
 NICK_SERVADMIN_HELP_LIST
-	Σύνταξη: LIST pattern [FORBIDDEN] [NOEXPIRE]
+	Σύνταξη: LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
 	Δίνει την λίστα όλων των κατοχυρωμένων ψευδώνυμων που ταιριάζουν με το ανάλογο
 	pattern, σε σύνταξη nick!user@host.  Ψευδώνυμα με επιλογή PRIVATE

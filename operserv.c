@@ -5008,22 +5008,21 @@ int do_modlist(User * u)
 {
     int idx;
     int count = 0;
-    struct tm tm;
-    char timebuf[64];
     ModuleHash *current = NULL;
+
+    notice_lang(s_OperServ, u, OPER_MODULE_LIST_HEADER);
 
     for (idx = 0; idx != MAX_CMD_HASH; idx++) {
         for (current = MODULE_HASH[idx]; current; current = current->next) {
-            tm = *localtime(&current->m->time);
-
-            strftime_lang(timebuf, sizeof(timebuf), u,
-                          STRFTIME_DATE_TIME_FORMAT, &tm);
-            notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name);
+            notice_lang(s_OperServ, u, OPER_MODULE_LIST, current->name,
+                        current->m->version);
             count++;
         }
     }
     if (count == 0) {
         notice_lang(s_OperServ, u, OPER_MODULE_NO_LIST);
+    } else {
+        notice_lang(s_OperServ, u, OPER_MODULE_LIST_FOOTER, count);
     }
 
     return MOD_CONT;

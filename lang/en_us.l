@@ -2717,8 +2717,12 @@ OPER_MODULE_LOAD_SYNTAX
 	MODLOAD FileName
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD FileName
+OPER_MODULE_LIST_HEADER
+	Current Module list:
 OPER_MODULE_LIST
-	Module: %s
+	Module: %s [%s]
+OPER_MODULE_LIST_FOOTER
+	%d Modules loaded.
 OPER_MODULE_INFO_LIST
 	Module: %s Version: %s Author: %s loaded: %s
 OPER_MODULE_CMD_LIST

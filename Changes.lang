@@ -3,6 +3,8 @@ Anope Version S N V
 *** New Strings:
 
   CHAN_CLEARED_HOPS
+  OPER_MODULE_LIST_HEADER
+  OPER_MODULE_LIST_FOOTER
 
 *** Mod Strings:
 

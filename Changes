@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
+05/27 A Better /OS MODLIST output to include version information.         [ #74]
 05/25 A New /CS CLEAR HOPS for ircd's that support halfops.               [ #72]
 05/24 A New NSNickTracking directive to provide nick tracking.            [ #71]
 05/21 A Auto enforce upon AKICK addition.                                 [ #63]

@@ -7,8 +7,6 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 10/03 F Changed UserKeys from uint to long uint.                          [ #00]
 09/21 F An option to explicitly not use mysql is added to Config          [ #00]
 09/19 F Rewrote the internals of moduleData to save lots of memory.       [ #00]
-09/17 F Fixed MySQL error, whereby checks are only done if mysql is on.   [ #00]
-09/14 F Fixed /os MODE by joining nested ifs into one.                    [ #00]
 09/14 F Protection unsetting now does -a instead of +a.                   [ #00]
 09/12 F Updated Dutch language file.                                      [ #00]
 09/10 F Typo in anope_cmd_relase_svshold function name.                   [ #00]
@@ -48,10 +46,11 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 08/28 F Buffer preparation for vsnprintf() call.                          [#158]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
-10/05 A NS INFO shows the expire time 			                  [ #00]
-10/05 A NS GLIST shows the expire time 			                  [ #00]
-10/05 F NS GLIST allows the owner of the nick to use the nickname param   [ #00]
-
+10/05 A NS INFO shows the expire time.                                    [ #00]
+10/05 A NS GLIST shows the expire time.                                   [ #00]
+10/05 F NS GLIST allows the owner of the nick to use the nickname param.  [ #00]
+09/17 F Fixed MySQL error, whereby checks are only done if mysql is on.   [ #00]
+09/14 F Fixed /os MODE by joining nested ifs into one.                    [ #00]
 
 Anope Version 1.7.5
 -------------------

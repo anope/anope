@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="491"
+VERSION_BUILD="492"
 
 # $Log$
+#
+# BUILD : 1.7.6 (492)
+# BUGS  : N/A
+# NOTES : Some gcc2 errors fixed
 #
 # BUILD : 1.7.6 (491)
 # BUGS  : N/A

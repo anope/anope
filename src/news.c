@@ -422,6 +422,7 @@ static void do_news_add(User * u, int16 type, int *msgs,
                         const char *typename)
 {
     char *text = strtok(NULL, "");
+	int n;
 
     if (!text) {
         char buf[32];
@@ -432,7 +433,7 @@ static void do_news_add(User * u, int16 type, int *msgs,
             notice_lang(s_OperServ, u, READ_ONLY_MODE);
 			return;
 		}
-        int n = add_newsitem(u, text, type);
+        n = add_newsitem(u, text, type);
         if (n < 0)
             notice_lang(s_OperServ, u, msgs[MSG_ADD_FULL]);
         else
@@ -483,7 +484,7 @@ static void do_news_del(User * u, int16 type, int *msgs,
                         const char *typename)
 {
     char *text = strtok(NULL, " ");
-    int i;
+    int i, num;
 
     if (!text) {
         char buf[32];
@@ -495,7 +496,7 @@ static void do_news_del(User * u, int16 type, int *msgs,
 			return;
 		}
         if (stricmp(text, "ALL") != 0) {
-            int num = atoi(text);
+            num = atoi(text);
             if (num > 0 && del_newsitem(num, type)) {
                 notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
                 /* Reset the order - #0000397 */

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="487"
+VERSION_BUILD="488"
 
 # $Log$
+#
+# BUILD : 1.7.6 (488)
+# BUGS  : N/A
+# NOTES : del_session() warning messages when LimitSessions is disabled.
 #
 # BUILD : 1.7.6 (487)
 # BUGS  : 

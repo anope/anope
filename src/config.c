@@ -1393,8 +1393,7 @@ int read_config(int reload)
               "Every UserKey must be different. It's for YOUR safety! Remember that!");
         retval = 0;
     }
-    if ((UserKey1 == 9866235) || (UserKey2 == 5216332)
-        || (UserKey3 == 9651291)) {
+    if (UserKey1 == 9866235) {
         error(0,
               "You don't want your network secure? You are supposed to set NEW UserKey values!!!");
         retval = 0;

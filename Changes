@@ -2,47 +2,48 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
-02/03 A Merged anope-win32 branch into the main, now Win32 ready          [ #00]
+02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+02/07 F Updated userkey information in example.conf.                      [ #00]
 02/06 F Win32 Module Load Errors.                                         [#294]
-02/05 F Change Ident function did not update the vident                   [#293]
+02/05 F Change Ident function did not update the vident.                  [#293]
 01/30 F ChanServ help to reflect the avaiable commands.                   [ #00]
-01/30 F ChanServ still used some commands that were not valid on all ircd [ #00]
+01/30 F ChanServ used some commands that were not valid on all ircds.     [ #00]
 01/30 F Compiling modules under Mac OSX.                                  [#285]
 
 Provided by crazytoon <da.crew@gmx.net> - 2005
-02/05 A Updated German language file	                                  [ #00]
+02/05 A Updated German language file.                                     [ #00]
 
 Provided by BarkerJr <barkerjr@barkerjr.net> - 2005
-02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks    [ #00]
+02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks.   [ #00]
 
 
 Anope Version 1.7.8
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
-01/23 A Support for Ratbox IRCD (With and Without TS6)                    [ #00]
-01/23 A Support for TS6 protocol                                          [ #00]
-01/19 A Add simple smtp client, read the README in src/tools for info     [ #00]
+01/23 A Support for Ratbox IRCD (With and Without TS6).                   [ #00]
+01/23 A Support for TS6 protocol.                                         [ #00]
+01/19 A Add simple smtp client, read the README in src/tools for info.    [ #00]
 01/16 A Support for PTlinks VHOST (NEWMASK) command.                      [ #00]
-01/16 A Ulines Servers are now except from NOJOIN bans                    [#281]
-01/29 F Fixes help for HS HELP LIST                                       [#290]
-01/29 F Memoserv rsend issue                                              [#291]
+01/16 A Ulines Servers are now except from NOJOIN bans.                   [#281]
+01/29 F Fixes help for HS HELP LIST.                                      [#290]
+01/29 F Memoserv rsend issue.                                             [#291]
 01/23 F Fixed u_char warnings under OpenBSD.                              [ #00]
 01/23 F anope_cmd_ctcp() fixed it was setup wrong.                        [ #00]
 01/23 F Checks to make sure Services and Services Alias are not the same  [ #00]
-01/23 F SIGINT now shuts down Anope correctly when running with -nofork   [ #00]
+01/23 F SIGINT now shuts down Anope correctly when running with -nofork.  [ #00]
 01/23 F Attempting to set +h (helper) modes on ircd where there is no +h  [ #00]
-01/23 F Fixed problem when dealing with non-existant user privmsg         [ #00]
-01/23 F Updated IRCD, FAQ, README to be more current                      [ #00]
+01/23 F Fixed problem when dealing with non-existant user privmsg.        [ #00]
+01/23 F Updated IRCD, FAQ, README to be more current.                     [ #00]
 01/23 F Free's memory on shutdown that is in the User and Channel structs [ #00]
 01/20 F Misplaced MEMO_NO_RSEND_SELF in es.l reordered.                   [ #00]
-01/19 F OperServ HELP does not show commands not usable on that ircd      [ #25]
+01/19 F OperServ HELP does not show commands not usable on that ircd.     [ #25]
 01/16 F Help messages restricted to the right access level.               [#272]
 01/16 F Updated IGNORE system to allow ircops past in all areas.          [#275]
 01/16 F Help for /OS SET IGNORE.                                          [#271]
-01/16 F Updated language files to show the correct vhost character        [#278]
-01/16 F Disables UseRDB when MysqlSecure is enabled                       [#276]
+01/16 F Updated language files to show the correct vhost character.       [#278]
+01/16 F Disables UseRDB when MysqlSecure is enabled.                      [#276]
 01/16 F BS bots no longer flood resetting modes if its the same mode.     [#263]
-01/16 F IRCops are now except from KillonSQline and KillonSGline          [#274]
+01/16 F IRCops are now except from KillonSQline and KillonSGline.         [#274]
 01/16 F BS Badwords had a false positives if BSCaseSensitive wass enabled [#277]
 01/15 F Updated typo in example.conf.                                     [#279]
 

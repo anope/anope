@@ -1,6 +1,7 @@
 Anope Version 1.7.0
 --------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/04/04 Added -version argument to return version and build info
 2004/04/04 Fixed moduleAddCommand for a non-existant service
 2004/04/01 Added memo2mail and /msg memoserv set notify MAIL/NOMAIL.
 2004/03/31 Fixed MySQL double encryption if using MD5.

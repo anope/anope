@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="30"
+VERSION_BUILD="32"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (32)
+# BUGS  : 
+# NOTES : Added -version arguement to return anope version and build information 
 #
 # BUILD : 1.7.0 (30)
 # BUGS  : http://bugs.anope.org/show_bug.cgi?id=3

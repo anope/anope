@@ -428,6 +428,10 @@ static int parse_options(int ac, char **av)
             } else if (!strcmp(s, "is44")) {
                 is44 = 1;
 #endif
+            } else if (!strcmp(s, "version")) {
+                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
+                        version_flags, version_build);
+                return 0;
             } else {
                 fprintf(stderr, "Unknown option -%s\n", s);
                 return -1;

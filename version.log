@@ -8,10 +8,15 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="11"
+VERSION_BUILD="12"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (12)
+# BUGS  : 5
+# NOTES : Fixed a bug with module callbacks, this is a tiny fix, but will need to be merged with the 1.6.x series, as it can cause a segfault if a module attempts to use recersive callbacks.
+# 
 #
 # BUILD : 1.7.0 (11)
 # BUGS  : 

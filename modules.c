@@ -1264,7 +1264,9 @@ void moduleCallBackRun(void)
         if (debug)
             alog("Executing callback: %s", tmp->name ? tmp->name : "?");
         if (tmp->func) {
+            mod_current_module_name = tmp->owner_name;
             tmp->func(tmp->argc, tmp->argv);
+            mod_current_module = NULL;
             moduleCallBackDeleteEntry(NULL);    /* delete the head */
         }
     }

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="647"
+VERSION_BUILD="648"
 
 # $Log$
+#
+# BUILD : 1.7.8 (648)
+# BUGS  : 337
+# NOTES : Fixed the db query for anope_cs_akicks in display name change function.
 #
 # BUILD : 1.7.8 (647)
 # BUGS  : 326

@@ -136,7 +136,7 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
 
     /* Change the display on ChanServ AKICK list */
     snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_access SET creator='%s' WHERE creator='%s'",
+             "UPDATE anope_cs_akicks SET creator='%s' WHERE creator='%s'",
              newnick, oldnick);
     db_mysql_query(buf);
 

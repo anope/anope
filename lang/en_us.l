@@ -3579,9 +3579,9 @@ NICK_HELP_STATUS
 	    3 - user recognized as owner via password identification
 	
 	Up to sixteen nicknames may be sent with each command; the
-	rest will be ignored.  No error message is generated if no
-	nickname is given.
-	
+	rest will be ignored. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Syntax: SENDPASS nickname
 	

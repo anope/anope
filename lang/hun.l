@@ -3583,9 +3583,9 @@ NICK_HELP_STATUS
 	    3 - A felhasználó beazonosított tulajdonosként a jelszavával
 	        
 	Tizenhat nicknév küldhetõ el parancsonként; a többit 
-	figyelmen kívül hagyja.	Nincs hibaüzenet, ha nem
-	adsz meg nicknevet.
-	
+	figyelmen kívül hagyja. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Syntax: SENDPASS nicknév
 	

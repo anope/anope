@@ -3791,9 +3791,9 @@ NICK_HELP_STATUS
 	        Identifizierung mit Passwort
 	
 	Bis zu 16 Nicknamen können mit dem Befehl übergeben werden,
-	der Rest wird ignoriert. Es wird keine Fehlermeldung
-	ausgegeben, wenn kein Nickname angegeben wird.
-	
+	der Rest wird ignoriert. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Syntax: SENDPASS Nickname
 	

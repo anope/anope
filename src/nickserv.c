@@ -4055,11 +4055,16 @@ static int do_ghost(User * u)
 
 static int do_status(User * u)
 {
-    char *nick;
     User *u2;
     int i = 0;
+    char *nick = strtok(NULL, " ");
 
-    while ((nick = strtok(NULL, " ")) && (i++ < 16)) {
+    /* If no nickname is given, we assume that the user
+     * is asking for himself */
+    if (!nick)
+        nick = u->nick;
+
+    while (nick && (i++ < 16)) {
         if (!(u2 = finduser(nick)))
             notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
         else if (nick_identified(u2))
@@ -4068,6 +4073,9 @@ static int do_status(User * u)
             notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
         else
             notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
+
+        /* Get the next nickname */
+        nick = strtok(NULL, " ");
     }
     return MOD_CONT;
 }

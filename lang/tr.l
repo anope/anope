@@ -3688,9 +3688,9 @@ NICK_HELP_STATUS
 	    3 - Kullanýcý nickin sahibi olarak þifreyle tanýtýlmýþ
 	
 	Her komutta en fazla 16 nick için cevap verilir; gerisi 
-	yoksayýlýr. Eðer bir nick belirtilmemiþse cevap olarak bir
-	hata mesajý gelmez.
-	
+	yoksayýlýr. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Kullanýmý: SENDPASS nick
 	

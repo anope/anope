@@ -257,26 +257,26 @@ CBMode cbmodes[128] = {
     {0},
     {CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* B */
-    {CMODE_C, 0, NULL, NULL},
+    {CMODE_C, 0, NULL, NULL},   /* C */
     {0},                        /* D */
     {0},                        /* E */
     {0},                        /* F */
-    {CMODE_G, 0, NULL, NULL},
-    {0},
+    {CMODE_G, 0, NULL, NULL},   /* G */
+    {0},                        /* H */
     {0},                        /* I */
     {0},                        /* J */
-    {CMODE_K, 0, NULL, NULL},
+    {CMODE_K, 0, NULL, NULL},   /* K */
     {CMODE_L, 0, set_redirect, cs_set_redirect},
     {CMODE_M, 0, NULL, NULL},   /* M */
-    {CMODE_N, 0, NULL, NULL},
+    {CMODE_N, 0, NULL, NULL},   /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
-    {CMODE_Q, 0, NULL, NULL},
+    {CMODE_Q, 0, NULL, NULL},   /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {CMODE_T, 0, NULL, NULL},   /* T */
     {0},                        /* U */
-    {CMODE_V, 0, NULL, NULL},
+    {CMODE_V, 0, NULL, NULL},   /* V */
     {0},                        /* W */
     {0},                        /* X */
     {0},                        /* Y */

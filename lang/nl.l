@@ -3639,8 +3639,8 @@ NICK_HELP_STATUS
 	    3 - gebruiker wordt door wachtwoordidentificatie herkend als eigenaar
 	
 	Er kunnen maximaal zestien nicks per keer worden verstuurd;
-	de rest wordt genegeerd.  Er wordt geen foutmelding
-	gegeven als er geen nicks zijn gegeven.
+	de rest wordt genegeerd. If no nickname is given, your status
+	will be returned.
 
 NICK_HELP_SENDPASS
 	Gebruik: SENDPASS nick

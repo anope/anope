@@ -261,7 +261,7 @@ unsigned long umodes[128] = {
     0, 0, 0,                    /* G H I */
     0, 0, 0,                    /* J K L */
     0, 0, UMODE_0,              /* M N O */
-    UMODE_P, 0, 0,              /* P Q R */
+    UMODE_P, 0, UMODE_R,        /* P Q R */
     UMODE_S, 0, 0,              /* S T U */
     0, UMODE_W, 0,              /* V W X */
     0,                          /* Y */
@@ -352,15 +352,15 @@ CBMode cbmodes[128] = {
     {0},                        /* H */
     {0},                        /* I */
     {0},                        /* J */
-    {CMODE_K, 0, NULL, NULL},
+    {CMODE_K, 0, NULL, NULL},   /* K */
     {0},                        /* L */
-    {CMODE_M},
-    {CMODE_N, 0, NULL, NULL},
+    {CMODE_M, 0, NULL, NULL},   /* M */
+    {CMODE_N, 0, NULL, NULL},   /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
     {0},                        /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
     {0},                        /* V */
@@ -377,19 +377,19 @@ CBMode cbmodes[128] = {
     {0},                        /* f */
     {0},                        /* g */
     {0},                        /* h */
-    {CMODE_i, 0, NULL, NULL},
+    {CMODE_i, 0, NULL, NULL},   /* i */
     {0},                        /* j */
     {CMODE_k, 0, set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
-    {CMODE_m, 0, NULL, NULL},
-    {CMODE_n, 0, NULL, NULL},
+    {CMODE_m, 0, NULL, NULL},   /* m */
+    {CMODE_n, 0, NULL, NULL},   /* n */
     {0},                        /* o */
-    {CMODE_p, 0, NULL, NULL},
-    {CMODE_q, 0, NULL, NULL},
+    {CMODE_p, 0, NULL, NULL},   /* p */
+    {CMODE_q, 0, NULL, NULL},   /* q */
     {CMODE_r, CBM_NO_MLOCK, NULL, NULL},
-    {CMODE_s, 0, NULL, NULL},
-    {CMODE_t, 0, NULL, NULL},
-    {0},
+    {CMODE_s, 0, NULL, NULL},   /* s */
+    {CMODE_t, 0, NULL, NULL},   /* t */
+    {0},                        /* u */
     {0},                        /* v */
     {0},                        /* w */
     {0},                        /* x */
@@ -412,6 +412,7 @@ CBModeInfo cbmodeinfos[] = {
     {'t', CMODE_t, 0, NULL, NULL},
     {'A', CMODE_A, 0, NULL, NULL},
     {'K', CMODE_K, 0, NULL, NULL},
+    {'M', CMODE_M, 0, NULL, NULL},
     {'N', CMODE_N, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
     {'R', CMODE_R, 0, NULL, NULL},

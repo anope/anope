@@ -141,28 +141,55 @@ IRCDCAPAB ircdcap[] = {
 };
 
 
-
 unsigned long umodes[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, UMODE_A, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0,
-    0,
-    UMODE_R,
-    0, 0, 0, 0, 0, 0, 0,
-    0,
-    0, 0, 0, 0, 0,
-    0, UMODE_a, 0, 0, 0, 0, 0,
-    0,
-    UMODE_h, UMODE_i, 0, 0, 0, 0, 0, UMODE_o,
-    0,
-    0, UMODE_r, 0, 0, 0, 0, UMODE_w,
-    UMODE_x,
-    0,
-    0,
-    0, 0, 0, 0, 0
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused, Unused, Horzontal Tab */
+    0, 0, 0,                    /* Line Feed, Unused, Unused */
+    0, 0, 0,                    /* Carriage Return, Unused, Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused */
+    0, 0, 0,                    /* Unused, Unused, Space */
+    0, 0, 0,                    /* ! " #  */
+    0, 0, 0,                    /* $ % &  */
+    0, 0, 0,                    /* ! ( )  */
+    0, 0, 0,                    /* * + ,  */
+    0, 0, 0,                    /* - . /  */
+    0, 0,                       /* 0 1 */
+    0, 0,                       /* 2 3 */
+    0, 0,                       /* 4 5 */
+    0, 0,                       /* 6 7 */
+    0, 0,                       /* 8 9 */
+    0, 0,                       /* : ; */
+    0, 0, 0,                    /* < = > */
+    0, 0,                       /* ? @ */
+    UMODE_A, 0, 0,              /* A B C */
+    0, 0, 0,                    /* D E F */
+    0, 0, 0,                    /* G H I */
+    0, 0, 0,                    /* J K L */
+    0, 0, 0,                    /* M N O */
+    0, 0, UMODE_R,              /* P Q R */
+    0, 0, 0,                    /* S T U */
+    0, 0, 0,                    /* V W X */
+    0,                          /* Y */
+    0,                          /* Z */
+    0, 0, 0,                    /* [ \ ] */
+    0, 0, 0,                    /* ^ _ ` */
+    UMODE_a, 0, 0,              /* a b c */
+    0, 0, 0,                    /* d e f */
+    0, UMODE_h, UMODE_i,        /* g h i */
+    0, 0, 0,                    /* j k l */
+    0, 0, UMODE_o,              /* m n o */
+    0, 0, UMODE_r,              /* p q r */
+    0, 0, 0,                    /* s t u */
+    0, UMODE_w, 0,              /* v w x */
+    0,                          /* y */
+    0,                          /* z */
+    0, 0, 0,                    /* { | } */
+    0, 0                        /* ~ ‚ */
 };
 
 char csmodes[128] = {
@@ -259,13 +286,13 @@ CBMode cbmodes[128] = {
     {0},                        /* J */
     {0},                        /* K */
     {0},                        /* L */
-    {CMODE_M},
-    {CMODE_N, 0, NULL, NULL},
+    {CMODE_M, 0, NULL, NULL},   /* M */
+    {CMODE_N, 0, NULL, NULL},   /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
     {0},                        /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
     {0},                        /* V */

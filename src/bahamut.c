@@ -255,7 +255,7 @@ unsigned long umodes[128] = {
     UMODE_m, UMODE_n, UMODE_o,  /* m n o */
     0, 0, UMODE_r,              /* p q r */
     UMODE_s, 0, 0,              /* s t u */
-    0, 0, UMODE_x,              /* v w x */
+    0, UMODE_w, UMODE_x,        /* v w x */
     UMODE_y,                    /* y */
     0,                          /* z */
     0, 0, 0,                    /* { | } */
@@ -333,7 +333,7 @@ CBMode cbmodes[128] = {
     {0},                        /* J */
     {0},                        /* K */
     {0},                        /* L */
-    {CMODE_M},
+    {CMODE_M, 0, NULL, NULL},   /* M */
     {0},                        /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
@@ -391,6 +391,7 @@ CBModeInfo cbmodeinfos[] = {
     {'t', CMODE_t, 0, NULL, NULL},
     {'M', CMODE_M, 0, NULL, NULL},
     {'O', CMODE_O, 0, NULL, NULL},
+    {'R', CMODE_R, 0, NULL, NULL},
     {0}
 };
 

@@ -3700,9 +3700,9 @@ NICK_HELP_STATUS
 	    3 - Usuari reconegut mitjançant autentificació per clau.
 	
 	Fins 16 nicknames poden ser enviats amb cada comanda. El
-	reste seran ignorats. Cap missatge d'error es generat si
-	el nickname no es donat.
-	
+	reste seran ignorats. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Sintaxis: SENDPASS nickname
 	

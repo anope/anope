@@ -3680,9 +3680,9 @@ NICK_HELP_STATUS
 	    3 - Usuario reconocido mediante autentificacion por clave.
 	
 	hasta 16 nicknames pueden ser enviados con cada comando. El
-	resto seran ingnorados. Ningun mensaje de error es generado si
-	el nickname no es dado.
-	
+	resto seran ingnorados. Si no se entrega un nickname, se mostrara
+	tu estado.
+
 NICK_HELP_SENDPASS
 	Sintaxis: SENDPASS nickname
 	

@@ -3693,8 +3693,8 @@ NICK_HELP_STATUS
 	    3 - usuário reconhecido como dono via identificação por senha
 	
 	Até 16 nicks podem ser enviados com cada comando; o resto será
-	ignorado. Não é gerado mensagem de erro se nenhum nick for fornecido.
-	
+	ignorado. If no nickname is given, your status will be returned.
+
 NICK_HELP_SENDPASS
 	Sintaxe: SENDPASS nick
 	

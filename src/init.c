@@ -552,8 +552,10 @@ int init(int ac, char **av)
 
 #ifdef USE_RDB
     if (!rdb_init()) {
-        UseRDB = 0;
-        alog("Error: Disabling UseRDB due to errors with SQL");
+        if (UseRDB) {
+            UseRDB = 0;
+            alog("Error: Disabling UseRDB due to errors with SQL");
+        }
     }
 #endif
 

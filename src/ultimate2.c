@@ -320,9 +320,9 @@ CBMode cbmodes[128] = {
     {0},                        /* F */
     {0},                        /* G */
     {0},                        /* H */
-    {CMODE_I},
+    {CMODE_I, 0, NULL, NULL},   /* I */
     {0},                        /* J */
-    {CMODE_K, 0, NULL, NULL},
+    {CMODE_K, 0, NULL, NULL},   /* K */
     {CMODE_L, 0, set_redirect, cs_set_redirect},
     {0},                        /* M */
     {0},                        /* N */
@@ -330,7 +330,7 @@ CBMode cbmodes[128] = {
     {0},                        /* P */
     {0},                        /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
     {0},                        /* V */
@@ -347,22 +347,22 @@ CBMode cbmodes[128] = {
     {CMODE_f, 0, set_flood, cs_set_flood},
     {0},                        /* g */
     {0},                        /* h */
-    {CMODE_i, 0, NULL, NULL},
+    {CMODE_i, 0, NULL, NULL},   /* i */
     {0},                        /* j */
     {CMODE_k, 0, set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
-    {CMODE_m, 0, NULL, NULL},
-    {CMODE_n, 0, NULL, NULL},
+    {CMODE_m, 0, NULL, NULL},   /* m */
+    {CMODE_n, 0, NULL, NULL},   /* n */
     {0},                        /* o */
-    {CMODE_p, 0, NULL, NULL},
+    {CMODE_p, 0, NULL, NULL},   /* p */
     {0},                        /* q */
     {CMODE_r, CBM_NO_MLOCK, NULL, NULL},
-    {CMODE_s, 0, NULL, NULL},
-    {CMODE_t, 0, NULL, NULL},
-    {0},
+    {CMODE_s, 0, NULL, NULL},   /* s */
+    {CMODE_t, 0, NULL, NULL},   /* t */
+    {0},                        /* u */
     {0},                        /* v */
     {0},                        /* w */
-    {CMODE_x},
+    {CMODE_x, 0, NULL, NULL},   /* x */
     {0},                        /* y */
     {0},                        /* z */
     {0}, {0}, {0}, {0}

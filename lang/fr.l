@@ -3728,8 +3728,8 @@ NICK_HELP_STATUS
 	    3 - utilisateur reconnu comme propriétaire via l'identification
 	
 	Jusqu'à seize nicks peuvent être envoyés avec chaque commande;
-	le reste sera ignoré. Aucun message d'erreur n'est généré si
-	aucun nick n'est donné.
+	le reste sera ignoré. If no nickname is given, your status
+	will be returned.
 
 NICK_HELP_SENDPASS
 	Syntaxe: SENDPASS nickname

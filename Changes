@@ -14,7 +14,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.	  [ #00]
 11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
 11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
-12/25 F SolidIRCD can mlock +R again                                      [ #00]
+12/25 F Fixed up user and channel modes for various ircds                 [ #00]
 12/23 F Several compiler errors under make strict.                        [ #00]
 12/21 F Unsetting away would not trigger checking of memos.               [#258]
 12/21 F Dreamforge compile.                                               [ #00]
@@ -63,6 +63,8 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
 
 Provided by DrStein <gacevedo@anope.org> - 2004
+12/23 A NS STATUS will return your status if no nickname is given.        [ #00]
+12/26 F Error message during SQL init even if UseRDB was disabled.        [ #00]
 12/10 F Extra tab in language files, causing bad answer in !seen.         [#243]
 11/28 F Fixes RSEND oddity.                                               [#237]
 11/26 F Memos sent as notification of receipt can't be cancelled.         [#192]

@@ -3710,9 +3710,9 @@ NICK_HELP_STATUS
 	        l'identificazione per mezzo della password
 	
 	Con ogni comando possono essere inviati fino a 16 nick; il
-	resto sarà ignorato. Non è generato alcun messaggio di errore
-	se non viene specificato alcun nick.
-	
+	resto sarà ignorato. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Sintassi: SENDPASS nick
 	

@@ -3908,10 +3908,9 @@ NICK_HELP_STATUS
 	    identyfikacji.
 	
 	Maksymalnie mo¿na podaæ 16 nicków za jednym razem. 
-	Reszta bêdzie ignorowana. Nie bêdzie wy¶wietlony
-	komunikat b³êdu w wypadku gdy ¿aden nick nie bêdzie 
-	podany.
-	
+	Reszta bêdzie ignorowana. If no nickname is given, your status
+	will be returned.
+
 NICK_HELP_SENDPASS
 	Sk³adnia: SENDPASS nick
 	

@@ -224,20 +224,20 @@ unsigned long umodes[128] = {
     0, 0, 0,                    /* J K L */
     0, 0, 0,                    /* M N O */
     0, 0, UMODE_R,              /* P Q R */
-    0, 0, 0,                    /* S T U */
+    UMODE_S, 0, 0,              /* S T U */
     0, 0, 0,                    /* V W X */
     0,                          /* Y */
     0,                          /* Z */
     0, 0, 0,                    /* [ \ ] */
     0, 0, 0,                    /* ^ _ ` */
-    UMODE_a, 0, 0,              /* a b c */
-    0, 0, 0,                    /* d e f */
+    UMODE_a, UMODE_b, 0,        /* a b c */
+    UMODE_d, 0, 0,              /* d e f */
     0, UMODE_h, UMODE_i,        /* g h i */
-    0, 0, 0,                    /* j k l */
-    0, 0, UMODE_o,              /* m n o */
+    0, 0, UMODE_l,              /* j k l */
+    UMODE_g, UMODE_n, UMODE_o,  /* m n o */
     0, 0, 0,                    /* p q r */
-    0, 0, 0,                    /* s t u */
-    0, UMODE_w, 0,              /* v w x */
+    0, 0, UMODE_u,              /* s t u */
+    0, UMODE_w, UMODE_x,        /* v w x */
     0,                          /* y */
     0,                          /* z */
     0, 0, 0,                    /* { | } */

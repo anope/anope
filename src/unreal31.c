@@ -176,9 +176,10 @@ char csmodes[128] = {
     0,
     0,
     0, 0, 0,
+    'h',                        /* (37) % Channel halfops */
     0,
-    0, 0, 0, 0,
-    0,
+    0, 0, 0,
+    'q',
 
     'v', 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -187,7 +188,7 @@ char csmodes[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'a', 0
 };
 
 CMMode cmmodes[128] = {
@@ -230,26 +231,26 @@ CBMode cbmodes[128] = {
     {0},
     {CMODE_A, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* B */
-    {CMODE_C, 0, NULL, NULL},
+    {CMODE_C, 0, NULL, NULL},   /* C */
     {0},                        /* D */
     {0},                        /* E */
     {0},                        /* F */
-    {CMODE_G, 0, NULL, NULL},
+    {CMODE_G, 0, NULL, NULL},   /* G */
     {CMODE_H, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* I */
     {0},                        /* J */
-    {CMODE_K, 0, NULL, NULL},
+    {CMODE_K, 0, NULL, NULL},   /* K */
     {CMODE_L, 0, set_redirect, cs_set_redirect},
     {0},                        /* M */
-    {CMODE_N, 0, NULL, NULL},
+    {CMODE_N, 0, NULL, NULL},   /* N */
     {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
     {0},                        /* P */
-    {CMODE_Q, 0, NULL, NULL},
+    {CMODE_Q, 0, NULL, NULL},   /* Q */
     {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},
+    {CMODE_S, 0, NULL, NULL},   /* S */
     {0},                        /* T */
     {0},                        /* U */
-    {CMODE_V, 0, NULL, NULL},
+    {CMODE_V, 0, NULL, NULL},   /* V */
     {0},                        /* W */
     {0},                        /* X */
     {0},                        /* Y */

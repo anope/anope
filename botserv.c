@@ -1525,13 +1525,9 @@ static int do_bot(User * u)
                 send_cmd(oldnick, "NICK %s", bi->nick);
             else {
                 send_cmd(oldnick, "QUIT :Quit: Be right back");
-#if defined(IRC_UNREAL)
-                NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+qS", 1);
-#elif defined(IRC_ULTIMATE)
-                NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+pS", 1);
-#else
-                NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+", 1);
-#endif
+
+                NEWNICK(bi->nick, bi->user, bi->host, bi->real,
+                        BOTSERV_BOTS_MODE, 1);
                 bot_rejoin_all(bi);
             }
 

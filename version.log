@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="201"
+VERSION_BUILD="202"
 
 # $Log$
+#
+# BUILD : 1.7.3 (202)
+# BUGS  : 99
+# NOTES : Completed user defined modes as per Trystan patch
 #
 # BUILD : 1.7.3 (201)
 # BUGS  : 91

@@ -2,7 +2,6 @@ Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2004
 06/16 A More verbose error messages for services.conf checking.           [ #00]
-06/10 A User customizable pseudo-client modes.                            [ #99]
 06/10 A Improved handling of /NS INFO for pseudo-clients.                 [ #98]
 06/07 A Added register script in /bin/ for users to register anope.       [ #00]
 05/27 A Better /OS MODLIST output to include version information.         [ #74]
@@ -35,6 +34,7 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 05/21 F Reserved nicks (Q-lined) will be KILLed if taken on induction.    [ #50]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+06/10 A User customizable pseudo-client modes.                            [ #99]
 06/17 F GlobalOnCycleMessage checked at startup                           [ #91]
 
 Anope Version 1.7.3

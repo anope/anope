@@ -192,19 +192,8 @@ void introduce_user(const char *user)
                 EnforceQlinedNick(bi->nick, s_BotServ);
 
                 if (!user || !stricmp(user, bi->nick))
-#if defined(IRC_UNREAL) || defined(IRC_VIAGRA)
-                    NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+qS",
-                            1);
-#elif defined(IRC_ULTIMATE)
-                    NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+pS",
-                            1);
-#elif defined(IRC_ULTIMATE3) || defined(IRC_RAGE2)
-                    NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+S",
-                            1);
-#else
-                    NEWNICK(bi->nick, bi->user, bi->host, bi->real, "+",
-                            1);
-#endif
+                    NEWNICK(bi->nick, bi->user, bi->host, bi->real,
+                            BOTSERV_BOTS_MODE, 1);
             }
     }
 }

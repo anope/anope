@@ -3,6 +3,7 @@ Anope Version S V N
 Provided by Anope Dev. <dev@anope.org> - 2004
 07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
 06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+07/15 F Updated Dutch language file.                                      [ #00]
 07/14 F Added CHECK to the memoserv help menu.                            [ #00]
 07/12 F Bots will join a channel even for ignored users                   [ #00]
 07/05 F Global now joins LogChan on startup with hybrid.                  [ #97]

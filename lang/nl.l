@@ -586,7 +586,7 @@ NICK_INFO_ICQ
 NICK_INFO_GREET
 	       Groet-bericht: %s
 NICK_INFO_OPTIONS
-	             Opties: %s
+	              Opties: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Bescherming
@@ -708,7 +708,7 @@ NICK_FORBID_SYNTAX_REASON
 NICK_FORBID_SUCCEEDED
 	Nick %s is nu verboden.
 NICK_FORBID_FAILED
-	Nick %s verbieden gefaald!
+	Verbieden van nick %s is niet gelukt!
 
 # Nick Registraion responses
 NICK_REQUESTED
@@ -1727,13 +1727,13 @@ MEMO_INFO_X_NOTIFY_SIGNON
 	
 # Standard responses
 MEMO_MAIL_SUBJECT
-	New memo
+	Nieuwe memo
 MEMO_MAIL_TEXT1
-	Hi %s
+	Hoi %s
 MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
+	Je hebt zojuist een memo ontvangen van %s. Het gaat om memo nummer %d.
 MEMO_MAIL_TEXT3
-	Memo Text:
+	Inhoud van de memo:
 
 ###########################################################################
 #
@@ -1743,18 +1743,18 @@ MEMO_MAIL_TEXT3
 	
 # Standard responses
 MEMO_RSEND_PLEASE_WAIT
-	Please wait %d seconds before using the RSEND command again.
+	Wacht %d seconden voor je het RSEND commando weer gebruikt.
 MEMO_RSEND_DISABLED
-	Sorry, RSEND has been disabled on this network.
+	Sorry, RSEND is uitgeschakeld op dit netwerk.
 MEMO_RSEND_SYNTAX
-	RSEND {nick | channel} memo-text
+	RSEND {nick | kanaal} memo-tekst
 MEMO_RSEND_NICK_MEMO_TEXT
-	[auto-memo] The memo you sent has been viewed.
+	[auto-memo] De memo die je gestuurd hebt is bekeken.
 MEMO_RSEND_CHAN_MEMO_TEXT
-	[auto-memo] The memo you sent to %s has been viewed.
+	[auto-memo] De memo die je naar %s gestuurd hebt is bekeken.
 MEMO_RSEND_USER_NOTIFICATION
-	A notification memo has been sent to %s informing him/her you have
-	read his/her memo.
+	Een notificatie-memo is naar %s verstuurd om hem/haar te
+	informeren dat je zijn/haar memo gelezen hebt.
 
 ###########################################################################
 #
@@ -1764,13 +1764,13 @@ MEMO_RSEND_USER_NOTIFICATION
 	
 # Standard responses
 MEMO_CHECK_SYNTAX
-	CHECK nickname
+	CHECK nick
 MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
+	De laatste memo die je naar %s gestuurd hebt (op %s) is nog niet gelezen.
 MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
+	De laatste memo die je naar %s gestuurd hebt (op %s) is gelezen.
 MEMO_CHECK_NO_MEMO
-	Nick %s doesn't have a memo from you.
+	Nick %s heeft geen memo van jou.
 
 ###########################################################################
 #
@@ -2059,7 +2059,7 @@ BOT_KICK_CAPS_OFF
 BOT_KICK_COLORS_ON
 	Bot zal nu kicken op kleuren.
 BOT_KICK_COLORS_ON_BAN
-	Bot zak nu kicken op kleuren, en zal een ban zetten na 
+	Bot zal nu kicken op kleuren, en zal een ban zetten na 
 	%d kicks voor dezelfde gebruiker.
 BOT_KICK_COLORS_OFF
 	Bot zal niet meer kicken op kleuren.
@@ -2429,7 +2429,7 @@ OPER_AKILL_VIEW_FORMAT
 	%3d  %s (door %s op %s; %s)
 	      %s
 OPER_AKILL_CLEAR
-	The AKILL lijst is leeggemaakt.
+	De AKILL lijst is leeggemaakt.
 	
 # SGLINE responses
 OPER_CHANKILL_SYNTAX
@@ -2448,7 +2448,7 @@ OPER_SGLINE_REACHED_LIMIT
 OPER_SGLINE_ADDED
 	%s toegevoegd aan de SGLINE lijst.
 OPER_SGLINE_CHANGED
-	Verlloptijd van %s veranderd.
+	Verlooptijd van %s veranderd.
 OPER_SGLINE_NOT_FOUND
 	%s niet gevonden op de SGLINE lijst.
 OPER_SGLINE_NO_MATCH
@@ -2617,7 +2617,7 @@ OPER_RAW_SYNTAX
 
 # UPDATE responses
 OPER_UPDATING
-	Databases bijwerkend.
+	Bijwerken databases.
 	
 # RELOAD responses
 OPER_RELOAD
@@ -2747,9 +2747,9 @@ OPER_DEFCON_NO_CONF
 OPER_DEFCON_CHANGED
 	Services zijn nu in DEFCON %d
 OPER_DEFCON_WALL
-	%s heeft het DEFCON level veranderd naar %d
+	%s heeft het DEFCON niveau veranderd naar %d
 DEFCON_GLOBAL
-	Het Defcon Level staat nu op Level: %d
+	Het Defcon niveau staat nu op niveau: %d
 
 # Module strings
 
@@ -2782,7 +2782,7 @@ OPER_MODULE_NO_LIST
 OPER_MODULE_NO_INFO
 	Er is geen informatie aanwezig voor module %s
 OPER_MODULE_INFO_SYNTAX
-	MODINFO FileName
+	MODINFO bestandsnaame
 
 ###########################################################################
 #
@@ -3861,8 +3861,8 @@ CHAN_HELP_SET
 	    PRIVATE       Verberg een kanaal van het LIST commando
 	    RESTRICTED    Limiteer toegang tot het kanaal
 	    SECURE        Activeer %S veiligheidsopties
-	    SECUREOPS     Sterkere controlle van de kanaalop status
-	    SECUREFOUNDER Sterkere controlle van de stichter status
+	    SECUREOPS     Sterkere controle van de kanaalop status
+	    SECUREFOUNDER Sterkere controle van de stichter status
 	    SIGNKICK      Onderteken kicks die worden uitgevoerd met het
 	                    KICK commando
 	    TOPICLOCK     Topic kan alleen veranderd worden met TOPIC
@@ -4783,6 +4783,8 @@ MEMO_HELP
 	    DEL    Verwijder een of meerdere memo's
 	    SET    Stel opties gerelateerd aan memo's in
 	    INFO   Toont info over jouw memo's
+	    RSEND  Verstuur een memo en verzoek een ontvangstbevestiging
+	    CHECK  Kijk of je laatste memo naar iemand is gelezen
 
 MEMO_HELP_ADMIN
 	    SENDALL  Stuur een memo naar alle geregistreerde gebruikers 
@@ -4840,7 +4842,7 @@ MEMO_HELP_READ
 MEMO_HELP_DEL
 	Gebruik: DEL [kanaal] {nr | lijst | LAST | ALL}
 	
-	Verwijdert de gespicificeerde memo('s). Je kan meerdere
+	Verwijdert de gespecificeerde memo('s). Je kan meerdere
 	memo-nummers specificeren of bereiken van nummers ipv een
 	enkel nummer, zoals in het 2e voorbeeld hier onder.
 	
@@ -4850,7 +4852,7 @@ MEMO_HELP_DEL
 	Voorbeelden:
 	
 	   DEL 1
-	      Verwijdert je eersye memo.
+	      Verwijdert je eerste memo.
 	
 	   DEL 2-5,7-9
 	      Verwijdert de memo's genummerd 2 t/m 5 en 7 t/m 9.
@@ -4963,15 +4965,15 @@ MEMO_HELP_SENDALL
 ###########################################################################
 
 MEMO_HELP_RSEND
-	Syntax: RSEND {nick | channel} memo-text
+	Gebruik: RSEND {nick | kanaal} memo-tekst
 	
-	Sends the named nick or channel a memo containing
-	memo-text.  When sending to a nickname, the recipient will
-	receive a notice that he/she has a new memo.  The target
-	nickname/channel must be registered.
-	Once the memo is read by its recepient, an automatic notification
-	memo will be sent to the sender informing him/her that the memo
-	has been read.
+	Stuurt de gegeven nick of kanaal een memo met memo-tekst.
+	Wanneer je een memo naar een nick stuurt zal de ontvanger een
+	notificatie krijgen dat hij/zij een nieuwe memo heeft. Ook moet
+	de gegeven nick/kanaal geregistreerd zijn.
+	Zodra de memo is gelezen door de ontvanger zal er automatisch
+	een memo teruggestuurd worden naar degene die de memo verstuurd
+	heeft om hem/haar te informeren dat de memo gelezen is.
 
 ###########################################################################
 #
@@ -4980,10 +4982,11 @@ MEMO_HELP_RSEND
 ###########################################################################
 
 MEMO_HELP_CHECK
-	Syntax: CHECK nick
+	Gebruik: CHECK nick
 	
-	Checks whether the _last_ memo you sent to nick has been read
-	or not. Note that this does only work with nicks, not with chans.
+	Controleert of de _laatste_ memo die je naar nick gestuurd
+	hebt isgelezen of niet. Let wel op: dit werkt alleen met nicks,
+	niet met kanalen.
 
 ###########################################################################
 #
@@ -6066,7 +6069,7 @@ HOST_DEL_SYNTAX
 HOST_OFF_UNREAL
 	Je vhost is verwijderd. Om standaard host verberging weer aan te schakelen, type je /mode %s +x
 HOST_NO_VIDENT
-	Je IRCD ondersteund geen vIdent's. Als dit niet klopt, rapporteer dit dan als een mogelijke bug
+	Je IRCD ondersteunt geen vIdent's. Als dit niet klopt, rapporteer dit dan als een mogelijke bug
 HOST_GROUP
 	Alle vhost's in de groep %s zijn ingesteld op %s
 HOST_IDENT_GROUP
@@ -6078,11 +6081,11 @@ HOST_IDENT_GROUP
 #
 ###########################################################################
 HOST_LIST_FOOTER
-	Alle records zijn weergegeven (Count: %d)
+	Alle records zijn weergegeven (Aantal: %d)
 HOST_LIST_RANGE_FOOTER
 	Alle records getoond van %d tot %d
 HOST_LIST_KEY_FOOTER
-	Alle records getoond met overeenkomende key %s (Count: %d)
+	Alle records getoond met overeenkomende key %s (Aantal: %d)
 
 ###########################################################################
 #

@@ -1409,12 +1409,28 @@ static int do_rsend(User * u)
     NickAlias *na = NULL;
     int z = 3;
 
+    /* check if RSEND is usable first */
+    if (!MSMemoReceipt) {
+        notice_lang(s_MemoServ, u, MEMO_RSEND_DISABLED);
+        return MOD_CONT;
+    }
+
+    /* check if the variables are here */
+    if (!name || !text) {
+        notice_lang(s_MemoServ, u, MEMO_RSEND_SYNTAX);
+        return MOD_CONT;
+    }
+
+    /* prevent user from rsend to themselves */
     if ((na = findnick(name))) {
         if (u->na) {
             if (stricmp(na->nc->display, u->na->nc->display) == 0) {
                 notice_lang(s_MemoServ, u, MEMO_NO_RSEND_SELF);
                 return MOD_CONT;
             }
+        } else {
+            notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, name);
+            return MOD_CONT;
         }
     }
 
@@ -1430,6 +1446,10 @@ static int do_rsend(User * u)
         memo_send(u, name, text, z);
     } else {
         /* rsend has been disabled */
+        if (debug) {
+            alog("debug: MSMemoReceipt is set misconfigured to %d",
+                 MSMemoReceipt);
+        }
         notice_lang(s_MemoServ, u, MEMO_RSEND_DISABLED);
     }
 

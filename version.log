@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="7"
-VERSION_BUILD="559"
+VERSION_BUILD="560"
 
 # $Log$
+#
+# BUILD : 1.7.7 (560)
+# BUGS  : 290, 291
+# NOTES : Fixes HS HELP LIST, and improves on Robs fix for RSEND
 #
 # BUILD : 1.7.7 (559)
 # BUGS  : 291

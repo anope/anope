@@ -75,7 +75,7 @@ void moduleAddHostServCmds(void)
                       -1, -1, -1);
     addCoreCommand(HOSTSERV, c);
     c = createCommand("LIST", listOut, is_services_oper, -1,
-                      -1, HOST_HELP_LIST, -1, -1);
+                      -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
     addCoreCommand(HOSTSERV, c);
 }
 

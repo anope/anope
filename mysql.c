@@ -104,9 +104,13 @@ int db_mysql_open()
 
 int db_mysql_query(char *sql)
 {
-
     int result, lcv;
     char *s = db_mysql_quote(sql);
+
+    if (!do_mysql) {
+        free(s);
+        return -1;
+    }
 
     if (debug)
         alog(s);
@@ -151,8 +155,9 @@ char *db_mysql_quote(char *sql)
 {
     int slen;
     char *quoted;
+    
 
-    if (!sql) {
+    if (!sql || !do_mysql) {
         return sstrdup("");
     }
 
@@ -1521,8 +1526,10 @@ void db_mysql_load_ns_dbase(void)
             }
             res = mysql_store_result(mysql);
             while ((row = mysql_fetch_row(res))) {
-                *access = sstrdup(row[0]);
-                access++;
+                if (strlen(row[0]) > 0) {
+                  *access = sstrdup(row[0]);
+                  access++;
+                }
             }
             mysql_free_result(res);
         }

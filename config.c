@@ -326,6 +326,7 @@ static void dep_ListOpersOnly(void)
 /*************************************************************************/
 
 #define MAXPARAMS	8
+#define MAXEQUALS	8
 
 /* Configuration directives */
 
@@ -337,6 +338,16 @@ typedef struct {
         void *ptr;              /* Pointer to where to store the value */
     } params[MAXPARAMS];
 } Directive;
+
+typedef struct {
+    char *name;
+    struct {
+        int type;               /* PARAM_* below */
+        int flags;              /* Same */
+        void *ptr[MAXEQUALS];              /* Pointer to where to store the value */
+    } params[MAXPARAMS];
+    void *ptrcount;
+} DynDirective;
 
 #define PARAM_NONE	0
 #define PARAM_INT	1
@@ -354,6 +365,13 @@ typedef struct {
 #define PARAM_OPTIONAL	0x01
 #define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
 #define PARAM_RELOAD    0x04    /* Directive is reloadable */
+
+char *oper_test[MAXEQUALS];
+int oper_test_count = 0;
+
+DynDirective dyndirectives[] = {
+    {"Oper", {{PARAM_STRING, PARAM_RELOAD, &oper_test}},&oper_test_count},
+};
 
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
@@ -675,7 +693,7 @@ void error(int linenum, char *message, ...)
 int parse(char *buf, int linenum, int reload)
 {
     char *s, *t, *dir;
-    int i, n, optind, val;
+    int i, n, optind, val, tmp;
     int retval = 1;
     int ac = 0;
     char *av[MAXPARAMS];
@@ -719,6 +737,16 @@ int parse(char *buf, int linenum, int reload)
     if (!dir)
         return 1;
 
+    for (n = 0; n < lenof(dyndirectives); n++) {
+        DynDirective *d = &dyndirectives[n];
+        tmp = *(int *) d->ptrcount;
+        *(char **) d->params[0].ptr[tmp] = strdup(av[0]);
+        *(int *) d->ptrcount = tmp + 1;
+    }
+    if (!stricmp(dir,"Oper")) {
+    	alog("Found OperBlock %s",av[0]);
+	return 1;
+    }
     for (n = 0; n < lenof(directives); n++) {
         Directive *d = &directives[n];
         if (stricmp(dir, d->name) != 0)

@@ -1151,9 +1151,9 @@ static void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
     char *av[4];
     int ac;
     char buf[BUFSIZE];
-    *buf = '\0';
     User *u;
 
+    *buf = '\0';
     u = finduser(nick);
 
     if (!u || !is_on_chan(ci->c, u))

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="463"
+VERSION_BUILD="464"
 
 # $Log$
+#
+# BUILD : 1.7.6 (464)
+# BUGS  : N/A
+# NOTES : gcc 2.x compiler errors
 #
 # BUILD : 1.7.6 (463)
 # BUGS  : 192, 210, 222, 234

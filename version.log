@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="0"
-VERSION_BUILD="33"
+VERSION_BUILD="34"
 VERSION_EXTRA=""
 
 # $Log$
+#
+# BUILD : 1.7.0 (34)
+# BUGS  : none
+# NOTES : Fixed indentation issue on memoserv.c
 #
 # BUILD : 1.7.0 (33)
 # BUGS  : 

@@ -326,6 +326,8 @@ NICK_ALREADY_REGISTERED
 	Nickname %s is already registered!
 NICK_REGISTERED
 	Nickname %s registered under your account: %s
+NICK_REGISTERED_NO_MASK
+	Nickname %s registered.
 NICK_PASSWORD_IS
 	Your password is %s - remember this for later use.
 NICK_REG_DELAY

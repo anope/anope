@@ -359,6 +359,7 @@ E int   NSEmailReg;
 E int   NSModeOnID;
 E int   NSRestrictGetPass;
 E int   NSNickTracking;
+E int   NSAddAccessOnReg;
 
 E int   CSDefFlags;
 E int   CSMaxReg;

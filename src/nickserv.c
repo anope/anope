@@ -2277,9 +2277,14 @@ static int do_confirm(User * u)
             na->last_realname = sstrdup(u->realname);
         }
         na->time_registered = na->last_seen = time(NULL);
-        na->nc->accesscount = 1;
-        na->nc->access = scalloc(sizeof(char *), 1);
-        na->nc->access[0] = create_mask(u);
+        if (NSAddAccessOnReg) {
+            na->nc->accesscount = 1;
+            na->nc->access = scalloc(sizeof(char *), 1);
+            na->nc->access[0] = create_mask(u);
+        } else {
+            na->nc->accesscount = 0;
+            na->nc->access = NULL;
+        }
         na->nc->language = NSDefLanguage;
         if (email)
             na->nc->email = sstrdup(email);
@@ -2289,8 +2294,12 @@ static int do_confirm(User * u)
             alog("%s: '%s' registered by %s@%s (e-mail: %s)", s_NickServ,
                  u->nick, u->username, common_get_vhost(u),
                  (email ? email : "none"));
-            notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick,
-                        na->nc->access[0]);
+            if (NSAddAccessOnReg)
+                notice_lang(s_NickServ, u, NICK_REGISTERED, u->nick,
+                            na->nc->access[0]);
+            else
+                notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK,
+                            u->nick);
 #ifndef USE_ENCRYPTION
             notice_lang(s_NickServ, u, NICK_PASSWORD_IS, na->nc->pass);
 #endif

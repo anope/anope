@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="6"
-VERSION_BUILD="489"
+VERSION_BUILD="490"
 
 # $Log$
+#
+# BUILD : 1.7.6 (490)
+# BUGS  : 253
+# NOTES : Fixed loguser where the nickip is 0
 #
 # BUILD : 1.7.6 (489)
 # BUGS  : 244, 246, 247, 248, 249, 250, 251, 252, 254, 255

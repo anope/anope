@@ -399,7 +399,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         if (debug)
             alog("debug: new user: %s", nick);
 
-        if (ircd->nickip && ip) {
+        if (ircd->nickip) {
             addr.s_addr = htonl(ip);
             ntoa(addr, ipbuf, sizeof(ipbuf));
         }

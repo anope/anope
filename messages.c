@@ -711,7 +711,11 @@ static int m_server(char *source, int ac, char **av)
 {
     if (!stricmp(av[1], "1"))
         uplink = sstrdup(av[0]);
+#ifdef IRC_PTLINK
+    if (ac != 4)
+#else
     if (ac != 3)
+#endif
         return MOD_CONT;
     do_server(source, ac, av);
     return MOD_CONT;

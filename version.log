@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="206"
+VERSION_BUILD="207"
 
 # $Log$
+#
+# BUILD : 1.7.4 (207)
+# BUGS  : N/A
+# NOTES : Fixed PTLink m_server incorrect argument count
 #
 # BUILD : 1.7.4 (206)
 # BUGS  : 55

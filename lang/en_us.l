@@ -753,7 +753,7 @@ CHAN_LEVEL_AUTOPROTECT
 CHAN_LEVEL_AUTODEOP
 	Channel operator status disallowed
 CHAN_LEVEL_NOJOIN
-	Not allowed to join channel if RESTRICTED
+	Not allowed to join channel
 CHAN_LEVEL_INVITE
 	Allowed to use INVITE command
 CHAN_LEVEL_AKICK

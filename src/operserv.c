@@ -4416,7 +4416,7 @@ static int do_noop(User * u)
         for (u2 = firstuser(); u2; u2 = u3) {
             u3 = nextuser();
             if ((u2) && is_oper(u2) && (u2->server->name)
-                && !stricmp(u2->server->name, server)) {
+                && match_wild(server,u2->server->name)) {
                 kill_user(s_OperServ, u2->nick, reason);
             }
         }

@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="271"
+VERSION_BUILD="272"
 
 # $Log$
+#
+# BUILD : 1.7.4 (272)
+# BUGS  : 111,115
+# NOTES : Fixed bugs 111 and 115, both need backporting to 1.6.x
+# 
 #
 # BUILD : 1.7.4 (271)
 # BUGS  : 

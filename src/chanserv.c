@@ -3398,10 +3398,10 @@ static int do_set_keeptopic(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_KEEPTOPIC;
-        notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_KEEPTOPIC;
-        notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_KEEPTOPIC_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET KEEPTOPIC",
                      CHAN_SET_KEEPTOPIC_SYNTAX);
@@ -3415,10 +3415,10 @@ static int do_set_topiclock(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_TOPICLOCK;
-        notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_TOPICLOCK;
-        notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_TOPICLOCK_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET TOPICLOCK",
                      CHAN_SET_TOPICLOCK_SYNTAX);
@@ -3432,10 +3432,10 @@ static int do_set_private(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PRIVATE;
-        notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_PRIVATE;
-        notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_PRIVATE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET PRIVATE",
                      CHAN_SET_PRIVATE_SYNTAX);
@@ -3449,10 +3449,10 @@ static int do_set_secureops(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREOPS;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECUREOPS;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECUREOPS_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECUREOPS",
                      CHAN_SET_SECUREOPS_SYNTAX);
@@ -3466,10 +3466,10 @@ static int do_set_securefounder(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECUREFOUNDER;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECUREFOUNDER;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECUREFOUNDER_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECUREFOUNDER",
                      CHAN_SET_SECUREFOUNDER_SYNTAX);
@@ -3485,12 +3485,12 @@ static int do_set_restricted(User * u, ChannelInfo * ci, char *param)
         ci->flags |= CI_RESTRICTED;
         if (ci->levels[CA_NOJOIN] < 0)
             ci->levels[CA_NOJOIN] = 0;
-        notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_RESTRICTED;
         if (ci->levels[CA_NOJOIN] >= 0)
             ci->levels[CA_NOJOIN] = -2;
-        notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_RESTRICTED_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET RESTRICTED",
                      CHAN_SET_RESTRICTED_SYNTAX);
@@ -3504,10 +3504,10 @@ static int do_set_secure(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SECURE;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECURE_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECURE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_SECURE;
-        notice_lang(s_ChanServ, u, CHAN_SET_SECURE_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_SECURE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SECURE", CHAN_SET_SECURE_SYNTAX);
     }
@@ -3521,14 +3521,14 @@ static int do_set_signkick(User * u, ChannelInfo * ci, char *param)
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_SIGNKICK;
         ci->flags &= ~CI_SIGNKICK_LEVEL;
-        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_ON, ci->name);
     } else if (stricmp(param, "LEVEL") == 0) {
         ci->flags |= CI_SIGNKICK_LEVEL;
         ci->flags &= ~CI_SIGNKICK;
-        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL);
+        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_LEVEL, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~(CI_SIGNKICK | CI_SIGNKICK_LEVEL);
-        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_SIGNKICK_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET SIGNKICK",
                      CHAN_SET_SIGNKICK_SYNTAX);
@@ -3542,10 +3542,10 @@ static int do_set_opnotice(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_OPNOTICE;
-        notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_OPNOTICE;
-        notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_OPNOTICE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET OPNOTICE",
                      CHAN_SET_OPNOTICE_SYNTAX);
@@ -3596,13 +3596,13 @@ static int do_set_xop(User * u, ChannelInfo * ci, char *param)
 
         alog("%s: %s!%s@%s enabled XOP for %s", s_ChanServ, u->nick,
              u->username, u->host, ci->name);
-        notice_lang(s_ChanServ, u, CHAN_SET_XOP_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_XOP_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_XOP;
 
         alog("%s: %s!%s@%s disabled XOP for %s", s_ChanServ, u->nick,
              u->username, u->host, ci->name);
-        notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_XOP_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET XOP", CHAN_SET_XOP_SYNTAX);
     }
@@ -3617,10 +3617,10 @@ static int do_set_peace(User * u, ChannelInfo * ci, char *param)
 {
     if (stricmp(param, "ON") == 0) {
         ci->flags |= CI_PEACE;
-        notice_lang(s_ChanServ, u, CHAN_SET_PEACE_ON);
+        notice_lang(s_ChanServ, u, CHAN_SET_PEACE_ON, ci->name);
     } else if (stricmp(param, "OFF") == 0) {
         ci->flags &= ~CI_PEACE;
-        notice_lang(s_ChanServ, u, CHAN_SET_PEACE_OFF);
+        notice_lang(s_ChanServ, u, CHAN_SET_PEACE_OFF, ci->name);
     } else {
         syntax_error(s_ChanServ, u, "SET PEACE", CHAN_SET_PEACE_SYNTAX);
     }

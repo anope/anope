@@ -999,92 +999,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET canal KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Retenció de topic activat.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Retenció de topic desactivada.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET canal TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Lock de topic activat.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Lock de topic desactivat.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET canal PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Opció de pau Activada.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Opció de pau desactivada.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET canal PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Opció de privacitat activada.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Opció de privacitat desactivada.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET canal SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Seguretat d'ops activada.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Seguretat d'ops desactivada.
-	
+	Secure ops option for %s is now OFF.
+
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET canal SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Seguretat de fundador activada.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Seguretat de fundador desactivada.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET canal RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	accés restringiy activat.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	accés restringit desactivat.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET canal SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Opció de seguretat activada.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Opció de seguretat desactivada.
-	
+	Secure option for %s is now OFF.
+
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET canal SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Opció de kick signat activada.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Opció de kick signat activada, però depen del nivell de 
-	l'usuari que utilitzi la comanda.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Opció de kick firmat desactivada.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET canal OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Opció Op-notice activada.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Opció Op-notice desactivada.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET canal XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	El sistema de llistes xOP ara Engegat.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	El sistema de llistes xOP ara Aturat.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

@@ -991,92 +991,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET #канал KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Удерживание топика ВКЛЮЧЕНО.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Удерживание топика ВЫКЛЮЧЕНО.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET #канал TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Блокирование топика ВКЛЮЧЕНО.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Блокирование топика ВЫКЛЮЧЕНО.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET #канал PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Опция спокойствия ВКЛЮЧЕНА.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Опция спокойствия ВЫКЛЮЧЕНА.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET #канал PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Приватность канала ВКЛЮЧЕНА.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Приватность канала ВЫКЛЮЧЕНА.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET #канал SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Безопасность статуса оператора канала ВКЛЮЧЕНА.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Безопасность статуса оператора канала ВЫКЛЮЧЕНА.
+	Secure ops option for %s is now OFF.
 	
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET #канал SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Безопасность владельца ВКЛЮЧЕНА.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Безрпасность владельца ВЫКЛЮЧЕНА.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET #канал RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Ограниченный доступ на канал ВКЛЮЧЕН.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	Ограниченный доступ на канал ВЫКЛЮЧЕН.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET #канал SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Безопасность ВКЛЮЧЕНА.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Безопасность ВЫКЛЮЧЕНА.
-	
+	Secure option for %s is now OFF.
+
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET #канал SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Подпись киков на канале ВКЛЮЧЕНА.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Подпись киков на канале ВКЛЮЧЕНА, но зависит от уровня пользователя, 
-	использовшего данную команду.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Подпись киков на канале ВЫКЛЮЧЕНА.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET #канал OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Уведомление об использовании команды OP ВКЛЮЧЕНО.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Уведомление об использовании команды OP ВЫКЛЮЧЕНО.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET #канал XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	Тип списка доступа xOP ВКЛЮЧЕН.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	Тип списка доступа xOP ВЫКЛЮЧЕН.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

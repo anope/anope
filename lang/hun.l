@@ -988,92 +988,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET #szoba KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Témamegõrzés ON
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Témamegõrzés OFF
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK válaszok
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET #szoba TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Témalezárás ON.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Témalezárás OFF.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE válaszok
 CHAN_SET_PEACE_SYNTAX
 	SET #szoba PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Peace opció ON.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Peace opció OFF.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE válaszok
 CHAN_SET_PRIVATE_SYNTAX
 	SET #szoba PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Private opció ON.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Private opció OFF.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS válaszok
 CHAN_SET_SECUREOPS_SYNTAX
 	SET #szoba SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Secure ops opció ON.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Secure ops opció OFF.
+	Secure ops option for %s is now OFF.
 
 # SET SECUREFOUNDER válaszok
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET #szoba SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Secure founder opció ON.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Secure founder opció OFF.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED válaszok
 CHAN_SET_RESTRICTED_SYNTAX
 	SET #szoba RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Korlátozott hozzáférés opció ON.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	Korlátozott hozzáférés opció OFF.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE válaszok
 CHAN_SET_SECURE_SYNTAX
 	SET #szoba SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Secure opció ON.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Secure opció OFF.
+	Secure option for %s is now OFF.
 
 # SET SIGNKICK válaszok
 CHAN_SET_SIGNKICK_SYNTAX
 	SET #szoba SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Jelzett kick opció ON.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Jelzett kick opció ON, a beállított szinttõl függ, hogy
-	melyik felhasználó fér hozzá.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Jelzett kick opció OFF
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE válaszok
 CHAN_SET_OPNOTICE_SYNTAX
 	SET #szoba OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Op-notice opció ON.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Op-notice opció OFF.
+	Op-notice option for %s is now OFF.
 
 # SET XOP válaszok
 CHAN_SET_XOP_SYNTAX
 	SET #szoba XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	Az xOP lista rendszer ON.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	Az xOP lista rendszer OFF.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE válaszok
 CHAN_SET_NOEXPIRE_SYNTAX

@@ -997,92 +997,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET canale KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Il mantenimento del topic ora è ATTIVO.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Il mantenimento del topic ora è DISATTIVO.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET canale TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Il blocco del topic ora è ATTIVO.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Il blocco del topic ora è DISATTIVO.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET canale PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	L'opzione Peace ora è ATTIVA.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	L'opzione Peace ora è DISATTIVA.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET canale PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	L'opzione Private ora è ATTIVA.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	L'opzione Private ora è DISATTIVA.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET canale SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	L'opzione Secure Ops ora è ATTIVA.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	L'opzione Secure Ops ora è DISATTIVA.
+	Secure ops option for %s is now OFF.
 
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET canale SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	L'opzione Secure Founder ora è ATTIVA.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	L'opzione Secure Founder ora è DISATTIVA.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET canale RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	L'opzione Restricted ora è ATTIVA.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	L'opzione Restricted ora è DISATTIVA.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET canale SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	L'opzione Secure ora è ATTIVA.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	L'opzione Secure ora è DISATTIVA.
+	Secure option for %s is now OFF.
 
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET canale SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	L'opzione Signed Kick ora è ATTIVA.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	L'opzione Signed Kick ora è ATTIVA, ma dipende dal livello
-	dell'utente che usa il comando.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	L'opzione Signed Kick ora è DISATTIVA.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET canale OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	L'opzione Op Notice ora è ATTIVA.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	L'opzione Op Notice ora è DISATTIVA.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET canale XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	La gestione del canale per mezzo delle liste xOP ora è ATTIVA.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	La gestione del canale per mezzo delle liste xOP ora è DISATTIVA.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

@@ -1000,92 +1000,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET channel KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Le maintien du topic est maintenant activé.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Le maintien du topic est maintenant désactivé.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET channel TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Le verrouillage du topic est maintenant activé.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Le verrouillage du topic est maintenant désactivé.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET channel PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	L'option de paix est maintenant activée.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	L'option de paix est maintenant désactivée.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET channel PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Votre channel est maintenant privé.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Votre channel est maintenant public.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET channel SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Le contrôle des ops est maintenant activé.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Le contrôle des ops est maintenant désactivé.
-	
+	Secure ops option for %s is now OFF.
+
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET channel SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Le contrôle du propriétaire est maintenant activé.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Le contrôle du propriétaire est maintenant désactivé.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET channel RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	L'accès restreint est maintenant activé.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	L'accès restreint est maintenant désactivé.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET channel SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	La sécurité est maintenant activée.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	La sécurité est maintenant désactivée.
-	
+	Secure option for %s is now ON.
+
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET channel SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Les kicks signés sont maintenant activés.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Les kicks signés sont maintenant activés, mais dépend du
-	level de l'utilisateur qui utilise la commande.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Les kicks signés sont maintenant désactivés.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET channel OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	La notice sur OP/DEOP est maintenant activée.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	La notice sur OP/DEOP est maintenant désactivée.
+	Op-notice option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_XOP_SYNTAX
 	SET channel XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	Le système de listes de xOPs est maintenant activé.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	Le système de listes de xOPs est maintenant désactivé.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

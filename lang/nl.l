@@ -993,92 +993,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET kanaal KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic behoudens optie staat nu AAN.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Topic behoudens optie staat nu UIT.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET kanaal TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topicslot optie staat nu AAN.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Topicslot optie staat nu UIT.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET kanaal PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Vredesoptie staat nu AAN.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Vredesoptie staat nu UIT.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET kanaal PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Prive optie staat nu AAN.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Prive optie staat nu UIT.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET kanaal SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Veilige ops optie staat nu AAN.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Veilige ops optie staat nu UIT.
-	
+	Secure ops option for %s is now OFF.
+
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET kanaal SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Veilige founder optie staat nu AAN.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Veilige founder optie staat nu UIT.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET kanaal RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Gelimiteerde toegangsoptie staat nu AAN.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	Gelimiteerde toegangsoptie staat nu OFF.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET kanaal SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Veiligheidsoptie staat nu AAN.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Veiligheidsoptie staat nu UIT.
-	
+	Secure option for %s is now OFF.
+
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET kanaal SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Ondertekende kick optie staat nu AAN.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Ondertekende kick optie staat nu AAN, maar hangt af van het level van de
-	gebruiker van het commando.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Ondertekende kick optie staat nu UIT.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET kanaal OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Op-notificatie optie staat nu AAN.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Op-notificatie optie staat nu UIT.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET kanaal XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP lijsten systeem staat nu AAN.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	xOP lijsten systeem staat nu UIT.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

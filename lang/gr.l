@@ -995,92 +995,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET channel KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Η επιλογή του Topic retention είναι τώρα ON.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Η επιλογή του Topic retention είναι τώρα OFF.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET channel TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Η επιλογή για κλείδωμα του Topic είναι τώρα ON.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Η επιλογή για κλείδωμα του Topic είναι τώρα OFF.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET channel PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Η επιλογή Peace είναι τώρα ON.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Η επιλογή Peace είναι τώρα OFF.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET channel PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Η επιλογή Private είναι τώρα ON.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Η επιλογή Private είναι τώρα OFF.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET channel SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Η επιλογή Secure ops είναι τώρα ON.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Η επιλογή Secure ops είναι τώρα OFF.
-	
+	Secure ops option for %s is now OFF.
+
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET channel SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Η επιλογή Secure founder είναι τώρα ON.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Η επιλογή Secure founder είναι τώρα OFF.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET channel RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Η επιλογή Restricted access είναι τώρα ON.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	Η επιλογή Restricted access είναι τώρα OFF.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET channel SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Η επιλογή Secure option είναι τώρα ON.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Η επιλογή Secure option είναι τώρα OFF.
-	
+	Secure option for %s is now OFF.
+
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET channel SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Η επιλογή Signed kick είναι τώρα ON.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Η επιλογή Signed kick είναι τώρα ON, αλλά χρειάζεται ρύθμιση το level έτσι
-	ώστε ο χρήστης να μπορεί να χρησιμοποιήσει αυτή την εντολή.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Η επιλογή Signed kick είναι τώρα OFF.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET channel OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Η επιλογή Op-notice είναι τώρα ON.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Η επιλογή Op-notice είναι τώρα OFF.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET channel XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	Η xOP επιλογή του συστήματος είναι τώρα ON.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	Η xOP επιλογή του συστήματος είναι τώρα OFF.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

@@ -1001,92 +1001,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET kanaladý KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic hatýrlama özelliði AKTÝF.
+	Topic retention option for %s is now ON.
 CHAN_SET_KEEPTOPIC_OFF
-	Topic hatýrlama özelliði KAPALI.
+	Topic retention option for %s is now OFF.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET kanaladý TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topic kilidi AKTÝF.
+	Topic lock option for %s is now ON.
 CHAN_SET_TOPICLOCK_OFF
-	Topic kilidi KAPALI.
+	Topic lock option for %s is now OFF.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET kanaladi PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Baris özelligi AKTIF.
+	Peace option for %s is now ON.
 CHAN_SET_PEACE_OFF
-	Baris özelligi KAPALI.
+	Peace option for %s is now OFF.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET kanaladý PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Özel özelliði AKTÝF.
+	Private option for %s is now ON.
 CHAN_SET_PRIVATE_OFF
-	Özel özelliði KAPALI.
+	Private option for %s is now OFF.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET kanaladý SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Secure ops özelliði AKTÝF.
+	Secure ops option for %s is now ON.
 CHAN_SET_SECUREOPS_OFF
-	Secure ops özelliði KAPALI.
-	
+	Secure ops option for %s is now OFF.
+
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET kanaladý SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Secure founder özelliði AKTÝF.
+	Secure founder option for %s is now ON.
 CHAN_SET_SECUREFOUNDER_OFF
-	Secure founder özelliði KAPALI.
+	Secure founder option for %s is now OFF.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET kanaladý RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Restricted access özelliði AKTÝF.
+	Restricted access option for %s is now ON.
 CHAN_SET_RESTRICTED_OFF
-	Restricted access özelliði KAPALI.
+	Restricted access option for %s is now OFF.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET kanal SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Güvenlik özelliði AKTÝF.
+	Secure option for %s is now ON.
 CHAN_SET_SECURE_OFF
-	Güvenlik özelliði KAPALI.
+	Secure option for %s is now OFF.
 
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET kanaladý SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Ýþaretli atma özelliði AKTÝF.
+	Signed kick option for %s is now ON.
 CHAN_SET_SIGNKICK_LEVEL
-	Ýþaretli atma özelliði AKTÝF, fakat komutu kullanan
-	kullanýcýnýn seviyesine baðlý.
+	Signed kick option for %s is now ON, but depends of the
+	level of the user that is using the command.
 CHAN_SET_SIGNKICK_OFF
-	Ýþaretli atma özelliði KAPALI.
+	Signed kick option for %s is now OFF.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET kanaladý OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Oplara-not özelliði AKTÝF.
+	Op-notice option for %s is now ON.
 CHAN_SET_OPNOTICE_OFF
-	Oplara-not özelliði KAPALI.
+	Op-notice option for %s is now OFF.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET kanaladi XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP sistemi AKTIF.
+	xOP lists system for %s is now ON.
 CHAN_SET_XOP_OFF
-	xOP sistemi KAPALI.
+	xOP lists system for %s is now OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX

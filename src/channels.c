@@ -841,7 +841,8 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
-                    if (c->ci && (!serv || is_sync(serv)))
+                    if (c->ci && (!serv || is_sync(serv))
+                        && !c->topic_sync)
                         restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
@@ -916,8 +917,6 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
-                    if (c->ci && (!serv || is_sync(serv)))
-                        restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
             }
@@ -989,8 +988,6 @@ void do_sjoin(const char *source, int ac, char **av)
                                        cumodes, 1);
                     }
 
-                    if (c->ci && (!serv || is_sync(serv)))
-                        restore_topic(c->name);
                     chan_set_correct_modes(user, c);
                 }
             }
@@ -1403,6 +1400,7 @@ Channel *chan_create(char *chan)
         stick_all(c->ci);
         c->topic_sync = 0;
     } else {
+        restore_topic(chan);
         c->topic_sync = 1;
     }
 

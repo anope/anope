@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="638"
+VERSION_BUILD="639"
 
 # $Log$
+#
+# BUILD : 1.7.8 (639)
+# BUGS  : 
+# NOTES : Some more fixing of the topic stuff to get it to work better with UnrealIRCd
 #
 # BUILD : 1.7.8 (638)
 # BUGS  : 

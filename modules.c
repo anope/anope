@@ -446,6 +446,9 @@ int prepForUnload(Module * m)
     /* Kill any active callbacks this module has */
     moduleCallBackPrepForUnload(m->name);
 
+    /* Remove any stored data this module has */
+    moduleDelAllDataMod(m);
+
     /**
      * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)
      **/
@@ -981,7 +984,7 @@ int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
 /**
  * Search the command table gieven for a command.
  * @param cmdTable the name of the command table to search
- * @name the name of the command to look for
+ * @param name the name of the command to look for
  * @return returns a pointer to the found command struct, or NULL
  */
 Command *findCommand(CommandHash * cmdTable[], const char *name)
@@ -1580,6 +1583,222 @@ void moduleDisplayHelp(int service, User * u)
     }
 #endif
 }
+
+/**
+ * Add module data to a struct.
+ * This allows module coders to add data to an existing struct
+ * @param md The module data for the struct to be used
+ * @param key The Key for the key/value pair
+ * @param value The value for the key/value pair, this is what will be stored for you
+ * @return MOD_ERR_OK will be returned on success
+ **/
+int moduleAddData(ModuleData * md[], char *key, char *value)
+{
+    char *mod_name = sstrdup(mod_current_module_name);
+
+    int index = 0;
+    index = CMD_HASH(mod_name);
+    ModuleData *current = NULL;
+    ModuleData *newHash = NULL;
+    ModuleData *lastHash = NULL;
+    ModuleDataItem *item = NULL;
+    ModuleDataItem *itemCurrent = NULL;
+    ModuleDataItem *lastItem = NULL;
+
+    for (current = md[index]; current; current = current->next) {
+        if (strcasecmp(current->moduleName, mod_name) == 0)
+            lastHash = current;
+    }
+
+    if (!lastHash) {
+        newHash = malloc(sizeof(ModuleData));
+        if (!newHash) {
+            return MOD_ERR_MEMORY;
+        }
+        newHash->next = NULL;
+        newHash->di = NULL;
+        newHash->moduleName = strdup(mod_name);
+        md[index] = newHash;
+        lastHash = newHash;
+    }
+
+        /**
+	 * Ok, at this point lastHash will always be a valid ModuleData struct, and will always be "our" module Data Struct
+	 **/
+    for (itemCurrent = lastHash->di; itemCurrent;
+         itemCurrent = itemCurrent->next) {
+        alog("key: [%s] itemKey: [%s]", key, itemCurrent->key);
+        if (strcasecmp(itemCurrent->key, key) == 0) {
+            item = itemCurrent;
+        }
+        lastItem = itemCurrent;
+    }
+    if (!item) {
+        item = malloc(sizeof(ModuleDataItem));
+        if (!item) {
+            return MOD_ERR_MEMORY;
+        }
+        item->next = NULL;
+        item->key = strdup(key);
+        item->value = strdup(value);
+        if (lastItem)
+            lastItem->next = item;
+        else
+            lastHash->di = item;
+    } else {
+        free(item->key);
+        free(item->value);
+        item->key = strdup(key);
+        item->value = strdup(value);
+    }
+    free(mod_name);
+    return MOD_ERR_OK;
+
+}
+
+/**
+ * Returns the value from a key/value pair set.
+ * This allows module coders to retrive any data they have previuosly stored in any given struct
+ * @param md The module data for the struct to be used
+ * @param key The key to find the data for
+ * @return the value paired to the given key will be returned, or NULL 
+ **/
+char *moduleGetData(ModuleData * md[], char *key)
+{
+    char *mod_name = sstrdup(mod_current_module_name);
+    int index = 0;
+    char *ret = NULL;
+    index = CMD_HASH(mod_name);
+    ModuleData *current = NULL;
+    ModuleData *lastHash = NULL;
+
+    ModuleDataItem *itemCurrent = NULL;
+
+    for (current = md[index]; current; current = current->next) {
+        if (strcasecmp(current->moduleName, mod_name) == 0)
+            lastHash = current;
+    }
+
+    if (lastHash) {
+        for (itemCurrent = lastHash->di; itemCurrent;
+             itemCurrent = itemCurrent->next) {
+            if (strcmp(itemCurrent->key, key) == 0) {
+                ret = strdup(itemCurrent->value);
+            }
+        }
+    }
+    free(mod_name);
+    return ret;
+}
+
+/**
+ * Delete the key/value pair indicated by "key" for the current module.
+ * This allows module coders to remove a previously stored key/value pair.
+ * @param md The module data for the struct to be used
+ * @param key The key to delete the key/value pair for
+ **/
+void moduleDelData(ModuleData * md[], char *key)
+{
+    char *mod_name = sstrdup(mod_current_module_name);
+    int index = 0;
+    index = CMD_HASH(mod_name);
+    ModuleData *current = NULL;
+    ModuleData *lastHash = NULL;
+
+    ModuleDataItem *itemCurrent = NULL;
+    ModuleDataItem *prev = NULL;
+    ModuleDataItem *next = NULL;
+
+    for (current = md[index]; current; current = current->next) {
+        if (strcasecmp(current->moduleName, mod_name) == 0)
+            lastHash = current;
+    }
+    if (lastHash) {
+        for (itemCurrent = lastHash->di; itemCurrent; itemCurrent = next) {
+            next = itemCurrent->next;
+            if (strcmp(key, itemCurrent->key) == 0) {
+                free(itemCurrent->key);
+                free(itemCurrent->value);
+                itemCurrent->next = NULL;
+                free(itemCurrent);
+                if (prev) {
+                    prev->next = next;
+                } else {
+                    lastHash->di = next;
+                }
+            } else {
+                prev = itemCurrent;
+            }
+        }
+    }
+    free(mod_name);
+}
+
+/**
+ * This will remove all data for a particular module from existing structs.
+ * Its primary use is modulePrepForUnload() however, based on past expericance with module coders wanting to 
+ * do just about anything and everything, its safe to use from inside the module.
+ * @param md The module data for the struct to be used
+ **/
+void moduleDelAllData(ModuleData * md[])
+{
+    char *mod_name = sstrdup(mod_current_module_name);
+    int index = 0;
+    index = CMD_HASH(mod_name);
+    ModuleData *current = NULL;
+    ModuleData *lastHash = NULL;
+
+    ModuleDataItem *itemCurrent = NULL;
+    ModuleDataItem *prev = NULL;
+    ModuleDataItem *next = NULL;
+
+    for (current = md[index]; current; current = current->next) {
+        if (strcasecmp(current->moduleName, mod_name) == 0)
+            lastHash = current;
+    }
+    if (lastHash) {
+        for (itemCurrent = lastHash->di; itemCurrent; itemCurrent = next) {
+            next = itemCurrent->next;
+            free(itemCurrent->key);
+            free(itemCurrent->value);
+            itemCurrent->next = NULL;
+            free(itemCurrent);
+            if (prev) {
+                prev->next = next;
+            } else {
+                lastHash->di = next;
+            }
+        }
+    }
+    free(mod_name);
+}
+
+/**
+ * This will delete all module data used in any struct by module m.
+ * @param m The module to clear all data for
+ **/
+void moduleDelAllDataMod(Module * m)
+{
+    boolean freeme = false;
+    int i;
+    User *user;
+    if (!mod_current_module_name) {
+        mod_current_module_name = sstrdup(m->name);
+        freeme = true;
+    }
+
+    for (i = 0; i < 1024; i++) {
+        for (user = userlist[i]; user; user = user->next) {
+            moduleDelAllData(user->moduleData);
+        }
+    }
+
+    if (freeme) {
+        free(mod_current_module_name);
+        mod_current_module_name = NULL;
+    }
+}
+
 
 
 /* EOF */

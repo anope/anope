@@ -644,8 +644,24 @@ struct csmodeutil_ {
 #endif
 /*************************************************************************/
 
-/* Online user and channel data. */
+typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
+typedef struct ModuleDataItem_ ModuleDataItem;		/* A Module Data Item struct */
 
+struct ModuleDataItem_ {
+	char *key;								/* The key */
+	char *value;							/* The Value */
+	ModuleDataItem *next;						/* The next ModuleDataItem in this list */
+};
+
+struct ModuleData_ {	
+	char *moduleName;						/* Which module we belong to */
+	ModuleDataItem *di;						/* The first Item they own */
+	ModuleData *next;						/* The next ModuleData record */
+};
+
+
+
+/* Online user and channel data. */
 struct user_ {
     User *next, *prev;
 
@@ -669,6 +685,8 @@ struct user_ {
 
     NickAlias *na;
 
+    ModuleData *moduleData[1024];		/* defined for it, it should allow the module Add/Get */	
+    
     int isSuperAdmin;		/* is SuperAdmin on or off? */
 
     struct u_chanlist {

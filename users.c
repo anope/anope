@@ -362,6 +362,9 @@ static void delete_user(User * user)
 {
     struct u_chanlist *c, *c2;
     struct u_chaninfolist *ci, *ci2;
+    int i;
+    ModuleData *md, *nextMd;
+    ModuleDataItem *item, *nextItem;
 
     if (LogUsers) {
 #ifdef HAS_VHOST
@@ -412,6 +415,22 @@ static void delete_user(User * user)
         free(ci);
         ci = ci2;
     }
+
+    for (i = 0; i < 1024; i++) {        /* Clear up any module data used be the User struct */
+        for (md = user->moduleData[i]; md; md = nextMd) {
+            nextMd = md->next;
+            for (item = md->di; item; item = nextItem) {
+                nextItem = item->next;
+                free(item->key);
+                free(item->value);
+                item->next = NULL;
+                free(item);
+            }
+            free(md->moduleName);
+            free(md);
+        }
+    }
+
     if (debug >= 2)
         alog("debug: delete_user(): delete from list");
     if (user->prev)

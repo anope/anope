@@ -64,6 +64,7 @@ typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
 
+
 extern CommandHash *HOSTSERV[MAX_CMD_HASH];
 extern CommandHash  *BOTSERV[MAX_CMD_HASH];
 extern CommandHash *MEMOSERV[MAX_CMD_HASH];
@@ -218,6 +219,14 @@ Message *findMessage(MessageHash *msgTable[], const char *name);
 int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
 void moduleDelCallback(char *name);
 void moduleCallBackRun(void);
+
+char *moduleGetData(ModuleData *md[], char *key);			/* Get the value for this key from this struct */
+int moduleAddData(ModuleData *md[], char *key, char *value);		/* Set the value for this key for this struct */
+void moduleDelData(ModuleData *md[], char *key);				/* Delete this key/value pair */
+void moduleDelAllData(ModuleData *md[]);					/* Delete all key/value pairs for this module for this struct */
+
+void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
+
 /*************************************************************************/
 
 #endif

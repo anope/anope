@@ -1852,12 +1852,20 @@ int moduleAddData(ModuleData **md, char *key, char *value)
  **/
 char *moduleGetData(ModuleData **md, char *key)
 {
+    
     char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *current = *md;
+
+    if (debug) {
+      alog("debug: moduleGetData %p : key %s", (void *) md, key);
+      alog("debug: Current Module %s", mod_name);
+    }
+    
     while(current) {
     	if((stricmp(current->moduleName,mod_name)==0) && (stricmp(current->key,key)==0)) {
 		return sstrdup(current->value);
 	}
+	current = current->next;
     }
     free(mod_name);
     return NULL;

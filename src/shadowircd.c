@@ -623,7 +623,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
 int anope_event_nick(char *source, int ac, char **av)
 {
     Server *s;
-    User *user;
+    User *user, *u2;
 
     if (ac == 10) {
         s = findserver_uid(servlist, source);
@@ -635,9 +635,30 @@ int anope_event_nick(char *source, int ac, char **av)
             anope_set_umode(user, 1, &av[3]);
         }
     } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL,
+        u2 = find_byuid(source);
+        do_nick((u2 ? u2->nick : source), av[0], NULL, NULL, NULL, NULL,
                 strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
     }
+    return MOD_CONT;
+}
+
+
+int anope_event_chghost(char *source, int ac, char **av)
+{
+    User *u;
+
+    if (ac != 2)
+        return MOD_CONT;
+
+    u = find_byuid(av[0]);
+    if (!u) {
+        if (debug) {
+            alog("user: CHGHOST for nonexistent user %s", av[0]);
+        }
+        return MOD_CONT;
+    }
+
+    change_user_host(u, av[1]);
     return MOD_CONT;
 }
 
@@ -777,10 +798,11 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);    
+    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);   
     m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
     m = createMessage("EOB",       anope_event_eos); addCoreMessage(IRCD,m);
     m = createMessage("TSSYNC",    anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSCLOAK",    anope_event_chghost); addCoreMessage(IRCD,m);
 
 }
 

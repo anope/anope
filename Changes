@@ -45,6 +45,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 03/07 R Removed Proxy Detector from core.                                 [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
+03/16 F Shadowircd nick handling and vhost changing                       [#321]
 03/14 R Removed some old irc-services convertor ifdef's                   [#317]
 
 Provided by DrStein <drstein@anope.org> - 2005

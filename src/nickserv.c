@@ -2683,7 +2683,7 @@ static int do_setmodes(User * u)
     /* Walk users current channels */
     for (uc = u->chans; uc; uc = uc->next) {
         if ((c = uc->chan))
-            chan_set_correct_modes(u, c);
+            chan_set_correct_modes(u, c, 1);
     }
     return MOD_CONT;
 }

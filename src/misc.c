@@ -1144,7 +1144,7 @@ char *str_signed(unsigned char *str)
  **/
 
 char *stripModePrefix(const char *str) {
-    if(str) {
+    if (str && ((*str == '+') || (*str == '-'))) {
         return sstrdup(str+1);
     }
     return NULL;

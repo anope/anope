@@ -128,7 +128,7 @@ E void do_sjoin(const char *source, int ac, char **av);
 E void do_topic(const char *source, int ac, char **av);
 E void do_mass_mode(char *modes);
 
-E void chan_set_correct_modes(User * user, Channel * c);
+E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
 E void restore_unsycned_topics(void);
 
 #define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? s_ChanServ : (ci)->bi->nick)

@@ -161,6 +161,10 @@ void chan_remove_user_status(Channel * chan, User * user, int16 status)
 {
     struct u_chanlist *uc;
 
+    if (debug >= 2)
+        alog("debug: removing user status (%d) from %s for %s", status,
+             user->nick, chan->name);
+
     for (uc = user->chans; uc; uc = uc->next) {
         if (uc->chan == chan) {
             uc->status &= ~status;
@@ -175,14 +179,15 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                     int check)
 {
     int add = 1;
-    int servermode = !!strchr(source, '.');
     char *modes = av[0], mode;
     CBMode *cbm;
     CMMode *cmm;
     CUMode *cum;
     unsigned char botmode = 0;
     BotInfo *bi;
-    char *lastnick = NULL;
+    User *user;
+    int i, real_ac = ac;
+    char **real_av = av;
 
     if (debug)
         alog("debug: Changing modes for %s to %s", chan->name,
@@ -208,8 +213,6 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
         }
 
         if ((cum = &cumodes[(int) mode])->status != 0) {
-            User *user;
-
             if (ac == 0) {
                 alog("channel: mode %c%c with no parameter (?) for channel %s", add ? '+' : '-', mode, chan->name);
                 continue;
@@ -247,53 +250,11 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 alog("debug: Setting %c%c on %s for %s", (add ? '+' : '-'),
                      mode, chan->name, user->nick);
 
-            if (add) {
-                /*
-                   if they are in the uline server list we assume they can
-                   have the mode - yes woke up in the middle of the night to
-                   add this.. - TSL
-                 */
-                if (is_ulined(user->server->name)) {
-                    chan_set_user_status(chan, user, cum->status);
-                    continue;
-                }
-
-                /* Fixes bug #68
-                   - might be a bit ugly but it works, the idea is that since the 
-                   is_valid function strips out all of the modes there is no point
-                   in sending it over and over again  
-                 */
-                if (check) {
-                    if (check == 2 && cum->is_valid) {
-                        if (debug) {
-                            alog("debug: Modes already removed, calling remove_user_status() to clean up");
-                        }
-                        chan_remove_user_status(chan, user, cum->status);
-                        continue;
-                    } else if (cum->is_valid
-                               && !cum->is_valid(user, chan, servermode)) {
-                        if (debug) {
-                            alog("debug: Modes already sent calling remove_user_status() to clean up");
-                        }
-                        chan_remove_user_status(chan, user, cum->status);
-                        if (!lastnick) {
-                            check = 2;
-                            lastnick = sstrdup(user->nick);
-                        } else {
-                            if (stricmp(user->nick, lastnick)) {
-                                check = 1;
-                            }
-                        }
-                        continue;
-                    } else {
-                        chan_set_user_status(chan, user, cum->status);
-                    }
-                } else {
-                    chan_set_user_status(chan, user, cum->status);
-                }
-            } else {
+            if (add)
+                chan_set_user_status(chan, user, cum->status);
+            else
                 chan_remove_user_status(chan, user, cum->status);
-            }
+
         } else if ((cbm = &cbmodes[(int) mode])->flag != 0) {
             if (add)
                 chan->mode |= cbm->flag;
@@ -319,12 +280,28 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 
             ac--;
             av++;
-            add ? cmm->addmask(chan, *av) : cmm->delmask(chan, *av);
+            if (add)
+                cmm->addmask(chan, *av);
+            else
+                cmm->delmask(chan, *av);
         }
     }
 
-    if (check)
+    if (check) {
         check_modes(chan);
+
+        if (check < 2) {
+            /* Walk through all users we've set modes for and see if they are
+             * valid. Invalid modes (like +o with SECUREOPS on) will be removed
+             */
+            real_ac--;
+            real_av++;
+            for (i = 0; i < real_ac; i++) {
+                if ((user = finduser(*av)) && is_on_chan(chan, user))
+                    chan_set_correct_modes(user, chan, 0);
+            }
+        }
+    }
 }
 
 /*************************************************************************/
@@ -334,6 +311,10 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 void chan_set_user_status(Channel * chan, User * user, int16 status)
 {
     struct u_chanlist *uc;
+
+    if (debug >= 2)
+        alog("debug: setting user status (%d) on %s for %s", status,
+             user->nick, chan->name);
 
     if (HelpChannel && ircd->supporthelper
         && (status == CUS_OP || status == (CUS_PROTECT | CUS_OP)
@@ -573,8 +554,8 @@ void do_join(const char *source, int ac, char **av)
             continue;
 
         chan = findchan(s);
-        join_user_update(user, chan, s);
-        chan_set_correct_modes(user, chan);
+        chan = join_user_update(user, chan, s);
+        chan_set_correct_modes(user, chan, 1);
     }
 }
 
@@ -739,6 +720,7 @@ void do_sjoin(const char *source, int ac, char **av)
     char *s, *end, cubuf[7], *end2, *cumodes[6];
     int is_sqlined = 0;
     int ts = 0;
+    int is_created = 0;
 
     serv = findserver(servlist, source);
 
@@ -837,13 +819,13 @@ void do_sjoin(const char *source, int ac, char **av)
                         for (i = 1; i < end2 - cubuf; i++)
                             cumodes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 1);
+                                       cumodes, 2);
                     }
 
                     if (c->ci && (!serv || is_sync(serv))
                         && !c->topic_sync)
                         restore_topic(c->name);
-                    chan_set_correct_modes(user, c);
+                    chan_set_correct_modes(user, c, 1);
                 }
             }
 
@@ -856,7 +838,7 @@ void do_sjoin(const char *source, int ac, char **av)
             /* Set the timestamp */
             c->creation_time = ts;
             /* We now update the channel mode. */
-            chan_set_modes(source, c, ac - 3, &av[2], 1);
+            chan_set_modes(source, c, ac - 3, &av[2], 2);
         }
 
         /* Unreal just had to be different */
@@ -913,10 +895,10 @@ void do_sjoin(const char *source, int ac, char **av)
                         for (i = 1; i < end2 - cubuf; i++)
                             cumodes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 1);
+                                       cumodes, 2);
                     }
 
-                    chan_set_correct_modes(user, c);
+                    chan_set_correct_modes(user, c, 1);
                 }
             }
 
@@ -984,10 +966,10 @@ void do_sjoin(const char *source, int ac, char **av)
                         for (i = 1; i < end2 - cubuf; i++)
                             cumodes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 1);
+                                       cumodes, 2);
                     }
 
-                    chan_set_correct_modes(user, c);
+                    chan_set_correct_modes(user, c, 1);
                 }
             }
 
@@ -1018,6 +1000,8 @@ void do_sjoin(const char *source, int ac, char **av)
             return;
 
         c = findchan(av[1]);
+        if (!c)
+            is_created = 1;
         if (ircd->chansqline) {
             if (!c)
                 is_sqlined = check_chan_sqline(av[1]);
@@ -1028,7 +1012,9 @@ void do_sjoin(const char *source, int ac, char **av)
         } else {
             c = join_user_update(user, c, av[1]);
             c->creation_time = ts;
-            chan_set_correct_modes(user, c);
+            if (is_created && c->ci)
+                restore_topic(c->name);
+            chan_set_correct_modes(user, c, 1);
         }
     }
 }
@@ -1229,80 +1215,167 @@ void add_invite(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-/* Set the correct modes for the given user on the given channel. Ignored
- * users won't get any modes set this way. -GD
- */
-
-void chan_set_correct_modes(User * user, Channel * c)
+/**
+ * Set the correct modes, or remove the ones granted without permission,
+ * for the specified user on ths specified channel. This doesn't give
+ * modes to ignored users, but does remove them if needed.
+ * @param user The user to give/remove modes to/from
+ * @param c The channel to give/remove modes on
+ * @param give_modes Set to 1 to give modes, 0 to not give modes
+ * @return void
+ **/
+void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 {
     char *tmp;
+    char modebuf[BUFSIZE];
+    char userbuf[BUFSIZE];
     int status;
+    int add_modes = 0;
+    int rem_modes = 0;
     ChannelInfo *ci;
 
-    ci = c->ci;
+    if (!c || !(ci = c->ci))
+        return;
 
-    if (!ci || (ci->flags & CI_VERBOTEN) || (*(c->name) == '+'))
+    if ((ci->flags & CI_VERBOTEN) || (*(c->name) == '+'))
         return;
 
     if ((ci->flags & CI_SECURE) && !nick_identified(user))
         return;
 
-    if (get_ignore(user->nick) != NULL)
+    status = chan_get_user_status(c, user);
+
+    if (debug >= 2)
+        alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
+
+    if (give_modes && (get_ignore(user->nick) == NULL)) {
+        if (ircd->owner
+            &&
+            (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
+             || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))))
+            add_modes |= (CUS_OWNER | CUS_OP);
+        else if ((ircd->protect || ircd->admin)
+                 && check_access(user, ci, CA_AUTOPROTECT))
+            add_modes |= (CUS_PROTECT | CUS_OP);
+        else if (check_access(user, ci, CA_AUTOOP))
+            add_modes |= CUS_OP;
+        else if (ircd->halfop && check_access(user, ci, CA_AUTOHALFOP))
+            add_modes |= CUS_HALFOP;
+        else if (check_access(user, ci, CA_AUTOVOICE))
+            add_modes |= CUS_VOICE;
+    }
+
+    /* We check if every mode they have is legally acquired here, and remove
+     * the modes that they're not allowed to have. But only if SECUREOPS is
+     * on, because else every mode is legal. -GD
+     */
+    if (ci->flags & CI_SECUREOPS) {
+        if (ircd->owner && (status & CUS_OWNER)
+            &&
+            !(((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
+              || (!(ci->flags & CI_SECUREFOUNDER)
+                  && is_founder(user, ci))))
+            rem_modes |= CUS_OWNER;
+        if ((ircd->protect || ircd->admin) && (status & CUS_PROTECT)
+            && !check_access(user, ci, CA_AUTOPROTECT))
+            rem_modes |= CUS_PROTECT;
+        if ((status & CUS_OP) && !check_access(user, ci, CA_AUTOOP))
+            rem_modes |= CUS_OP;
+        if (ircd->halfop && (status & CUS_HALFOP)
+            && !check_access(user, ci, CA_AUTOHALFOP))
+            rem_modes |= CUS_HALFOP;
+    }
+
+    /* No modes to add or remove, exit function -GD */
+    if (!add_modes && !rem_modes)
         return;
 
-    status = chan_get_user_status(c, user);
-    if (ircd->owner
-        && (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
-            || (!(ci->flags & CI_SECUREFOUNDER)
-                && is_founder(user, ci)))) {
-        if (!(status & CUS_OWNER)) {
+    /* No need for strn* functions for modebuf, as every possible string
+     * will always fit in. -GD
+     */
+    strcpy(modebuf, "");
+    strcpy(userbuf, "");
+    if (add_modes > 0) {
+        strcat(modebuf, "+");
+        if ((add_modes & CUS_OWNER) && !(status & CUS_OWNER)) {
             tmp = stripModePrefix(ircd->ownerset);
-            if (!(status & CUS_OP)) {
-                anope_cmd_mode(whosends(ci), c->name, "+o%s %s %s", tmp,
-                               user->nick, user->nick);
-                chan_set_user_status(c, user, CUS_OWNER | CUS_OP);
-            } else {
-                anope_cmd_mode(whosends(ci), c->name, "+%s %s", tmp,
-                               user->nick);
-                chan_set_user_status(c, user, CUS_OWNER);
-            }
-        } else if (!(status & CUS_OP)) {
-            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
-            chan_set_user_status(c, user, CUS_OP);
+            strcat(modebuf, tmp);
+            free(tmp);
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        } else {
+            add_modes &= ~CUS_OWNER;
         }
-    } else if ((ircd->protect || ircd->admin)
-               && check_access(user, ci, CA_AUTOPROTECT)) {
-        tmp = stripModePrefix(ircd->adminset);
-        if (!(status & CUS_PROTECT)) {
-            if (!(status & CUS_OP)) {
-                anope_cmd_mode(whosends(ci), c->name, "+o%s %s %s", tmp,
-                               user->nick, user->nick);
-                chan_set_user_status(c, user, CUS_PROTECT | CUS_OP);
-            } else {
-                anope_cmd_mode(whosends(ci), c->name, "+%s %s", tmp,
-                               user->nick);
-                chan_set_user_status(c, user, CUS_PROTECT);
-            }
-        } else if (!(status & CUS_OP)) {
-            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
-            chan_set_user_status(c, user, CUS_OP);
+        if ((add_modes & CUS_PROTECT) && !(status & CUS_PROTECT)) {
+            tmp = stripModePrefix(ircd->adminset);
+            strcat(modebuf, tmp);
+            free(tmp);
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        } else {
+            add_modes &= ~CUS_PROTECT;
         }
-    } else if (check_access(user, ci, CA_AUTOOP)) {
-        if (!(status & CUS_OP)) {
-            anope_cmd_mode(whosends(ci), c->name, "+o %s", user->nick);
-            chan_set_user_status(c, user, CUS_OP);
+        if ((add_modes & CUS_OP) && !(status & CUS_OP)) {
+            strcat(modebuf, "o");
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        } else {
+            add_modes &= ~CUS_OP;
         }
-    } else if (ircd->halfop && check_access(user, ci, CA_AUTOHALFOP)) {
-        if (!(status & CUS_HALFOP)) {
-            anope_cmd_mode(whosends(ci), c->name, "+h %s", user->nick);
-            chan_set_user_status(c, user, CUS_HALFOP);
+        if ((add_modes & CUS_HALFOP) && !(status & CUS_HALFOP)) {
+            strcat(modebuf, "h");
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        } else {
+            add_modes &= ~CUS_HALFOP;
         }
-    } else if (check_access(user, ci, CA_AUTOVOICE)) {
-        if (!(status & CUS_VOICE)) {
-            anope_cmd_mode(whosends(ci), c->name, "+v %s", user->nick);
-            chan_set_user_status(c, user, CUS_VOICE);
+        if ((add_modes & CUS_VOICE) && !(status & CUS_VOICE)) {
+            strcat(modebuf, "v");
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        } else {
+            add_modes &= ~CUS_VOICE;
         }
     }
+    if (rem_modes > 0) {
+        strcat(modebuf, "-");
+        if (rem_modes & CUS_OWNER) {
+            tmp = stripModePrefix(ircd->ownerset);
+            strcat(modebuf, tmp);
+            free(tmp);
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        }
+        if (rem_modes & CUS_PROTECT) {
+            tmp = stripModePrefix(ircd->adminset);
+            strcat(modebuf, tmp);
+            free(tmp);
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        }
+        if (rem_modes & CUS_OP) {
+            strcat(modebuf, "o");
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        }
+        if (rem_modes & CUS_HALFOP) {
+            strcat(modebuf, "h");
+            strcat(userbuf, " ");
+            strcat(userbuf, user->nick);
+        }
+    }
+
+    /* Here, both can be empty again due to the "isn't it set already?"
+     * checks above. -GD
+     */
+    if (!add_modes && !rem_modes)
+        return;
+
+    anope_cmd_mode(whosends(ci), c->name, "%s%s", modebuf, userbuf);
+    if (add_modes > 0)
+        chan_set_user_status(c, user, add_modes);
+    if (rem_modes > 0)
+        chan_remove_user_status(c, user, rem_modes);
 }
 
 /*************************************************************************/

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="645"
+VERSION_BUILD="646"
 
 # $Log$
+#
+# BUILD : 1.7.8 (646)
+# BUGS  : 327 329 334 335
+# NOTES : Fixed quite a few bugs with mode handling (not always removed correctly, added/removed modes were split), fixed a segfault in chan_set_correct_modes, fixed some issues with topic setting, made stripModePrefix really stripping the mode prefix instead of the first char
 #
 # BUILD : 1.7.8 (645)
 # BUGS  : none

@@ -586,6 +586,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
     } else {
         if (nick_identified(user)) {
+            char tsbuf[16];
             user->na->last_seen = time(NULL);
 
             if (user->na->last_usermask)
@@ -596,7 +597,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             sprintf(user->na->last_usermask, "%s@%s",
                     common_get_vident(user), common_get_vhost(user));
 
-            char tsbuf[16];
             snprintf(tsbuf, sizeof(tsbuf), "%lu", user->timestamp);
             anope_cmd_svid_umode2(user, tsbuf);
 

@@ -201,12 +201,12 @@ void delete_user(User * user)
         if (ircd->vhost) {
             alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
-                 (user->vhost ? user->vhost : "(none)"), user->realname,
-                 user->server->name);
+                 (user->vhost ? user->vhost : "(none)"),
+                 normalizeBuffer(user->realname), user->server->name);
         } else {
             alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
                  user->nick, user->username, user->host,
-                 user->realname, user->server->name);
+                 normalizeBuffer(user->realname), user->server->name);
         }
     }
 
@@ -420,15 +420,15 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
             if (ircd->nickvhost) {
                 if (ircd->nickip) {
-                    alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, vhost, realname, ipbuf, server);
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) [%s] connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), normalizeBuffer(realname), ipbuf, server);
                 } else {
-                    alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, vhost, realname, server);
+                    alog("LOGUSERS: %s (%s@%s => %s) (%s) connected to the network (%s).", nick, username, host, (vhost ? vhost : "none"), normalizeBuffer(realname), server);
                 }
             } else {
                 if (ircd->nickip) {
-                    alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, realname, ipbuf, server);
+                    alog("LOGUSERS: %s (%s@%s) (%s) [%s] connected to the network (%s).", nick, username, host, normalizeBuffer(realname), ipbuf, server);
                 } else {
-                    alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, realname, server);
+                    alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, normalizeBuffer(realname), server);
                 }
             }
         }

@@ -2434,7 +2434,6 @@ static int do_act(User * u)
 
     char *chan = strtok(NULL, " ");
     char *text = strtok(NULL, "");
-    char tmpbuf[BUFSIZE];
 
     if (!chan || !text)
         syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);

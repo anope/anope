@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="431"
+VERSION_BUILD="432"
 
 # $Log$
+#
+# BUILD : 1.7.5 (432)
+# BUGS  : 199
+# NOTES : 1. fixed unused var from previous commit, 2. normalized the realname when doing LogUsers (199)
 #
 # BUILD : 1.7.5 (431)
 # BUGS  : 193

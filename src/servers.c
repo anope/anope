@@ -338,6 +338,12 @@ void do_server(const char *source, char *servername, char *hops,
 
     new_server(s, servername, descript, 0, numeric);
     send_event(EVENT_SERVER_CONNECT, servername);
+
+    /* Write the StartGlobal */
+    if (GlobalOnCycle) {
+        if (GlobalOnCycleUP)
+            server_global(s, GlobalOnCycleUP);
+    }
 }
 
 /*************************************************************************/

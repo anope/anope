@@ -725,12 +725,6 @@ int init(int ac, char **av)
       **/
     modules_delayed_init();
 
-    /* Write the StartGlobal */
-    if (GlobalOnCycle) {
-        if (GlobalOnCycleUP)
-            oper_global(NULL, "%s", GlobalOnCycleUP);
-    }
-
     /* Success! */
     return 0;
 }

@@ -331,6 +331,10 @@ NICK_PASSWORD_IS
 	Votre mot de passe est %s - notez le pour une utilisation ultérieure.
 
 # GROUP responses
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
+
+# GROUP responses
 NICK_GROUP_SYNTAX
 	GROUP cible motdepasse
 NICK_GROUP_DISABLED
@@ -508,6 +512,12 @@ NICK_SET_HIDE_QUIT_OFF
 	Votre dernière raison de /QUIT sera affichée par la commande INFO de %s.
 
 # SET NOEXPIRE responses
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
+	
+# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_MSG_ON
@@ -550,6 +560,8 @@ NICK_INFO_SERVICES_OPER
 	%s est opérateur des services.
 NICK_INFO_SERVICES_ADMIN
 	%s est administrateur des services.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	            Adresse: %s
 NICK_INFO_ADDRESS_ONLINE

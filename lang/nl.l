@@ -331,6 +331,10 @@ NICK_PASSWORD_IS
 	Je wachtwoord is %s - onthoudt dit voor later gebruik.
 
 # GROUP responses
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
+
+# GROUP responses
 NICK_GROUP_SYNTAX
 	GROUP doel wachtwoord
 NICK_GROUP_DISABLED
@@ -507,6 +511,12 @@ NICK_SET_HIDE_QUIT_OFF
 	Je laatste quit bericht zal vanaf nu getoond worden op %s INFO schermen.
 	
 # SET MSG responses
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
+	
+# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_MSG_ON
@@ -549,6 +559,8 @@ NICK_INFO_SERVICES_OPER
 	%s is een services beheerder.
 NICK_INFO_SERVICES_ADMIN
 	%s is een services eigenaar.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	Laatst bekende adres: %s
 NICK_INFO_ADDRESS_ONLINE

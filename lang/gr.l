@@ -328,6 +328,10 @@ NICK_PASSWORD_IS
 	Ο κωδικός σου είναι %s - θυμήσου τον για αργότερη χρήση.
 
 # GROUP responses
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
+
+# GROUP responses
 NICK_GROUP_SYNTAX
 	GROUP ^_στόχος^_ ^_κωδικό^_
 NICK_GROUP_DISABLED
@@ -504,6 +508,12 @@ NICK_SET_HIDE_QUIT_OFF
 	Το τελευταίο αποχαιρετιστήριο μήνυμα απο δω και στο εξής θα παρουσιάζεται στην %s INFO εντολή.
 	
 # SET MSG responses
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
+	
+# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_MSG_ON
@@ -546,6 +556,8 @@ NICK_INFO_SERVICES_OPER
 	%s είναι ένας χειριστής των υπηρεσιών.
 NICK_INFO_SERVICES_ADMIN
 	%s είναι ο επικεφαλής των υπηρεσιών.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	Τελευταία διεύθυνση: %s
 NICK_INFO_ADDRESS_ONLINE

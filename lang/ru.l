@@ -334,6 +334,10 @@ NICK_PASSWORD_IS
 	Ваш пароль - %s - используйте его в дальнейшем и не забывайте.
 
 # GROUP responses
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
+
+# GROUP responses
 NICK_GROUP_SYNTAX
 	GROUP target password
 NICK_GROUP_DISABLED
@@ -504,6 +508,12 @@ NICK_SET_HIDE_QUIT_OFF
 	Ваше последнее сообщение при выходе будет показано по запросу %s INFO.
 	
 # SET MSG responses
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
+	
+# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_MSG_ON
@@ -546,6 +556,8 @@ NICK_INFO_SERVICES_OPER
 	%s оператор сервисов.
 NICK_INFO_SERVICES_ADMIN
 	%s администратор сервисов.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	Последняя маска:                 %s
 NICK_INFO_ADDRESS_ONLINE

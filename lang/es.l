@@ -334,6 +334,10 @@ NICK_PASSWORD_IS
 	Tu clave es %s - Recuerdala para uso futuro.
 
 # GROUP responses
+NICK_REG_DELAY
+	You have to be connected longer than %d seconds to register your nick.
+
+# GROUP responses
 NICK_GROUP_SYNTAX
 	GROUP grupo clave
 NICK_GROUP_DISABLED
@@ -510,6 +514,12 @@ NICK_SET_HIDE_QUIT_OFF
 	Tu ultimo mensaje quit sera ahora mostrado en %s INFO displays.
 	
 # SET MSG responses
+NICK_SET_HIDE_STATUS_ON
+	Your services access status will now be hidden from %s INFO displays.
+NICK_SET_HIDE_STATUS_OFF
+	Your services access status will now be shown in %s INFO displays.
+	
+# SET MSG responses
 NICK_SET_MSG_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_MSG_ON
@@ -552,6 +562,8 @@ NICK_INFO_SERVICES_OPER
 	%s es un operador de servicios.
 NICK_INFO_SERVICES_ADMIN
 	%s es un administrador de servicios.
+NICK_INFO_SERVICES_ROOT
+	%s is a services root administrator.
 NICK_INFO_ADDRESS
 	Ultima direccion vista: %s
 NICK_INFO_ADDRESS_ONLINE

@@ -124,7 +124,7 @@ int db_mysql_query(char *sql)
 
     if (debug) {
         s = db_mysql_quote(sql);
-        alog(s);
+        alog("debug: %s", s);
         free(s);
 
     }

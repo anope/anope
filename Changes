@@ -27,6 +27,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/09 F Bug in MySQL debug, possibly causing segfaults.                   [#149]
 10/09 F Lots of code clean up to prevent segfaults			  [ #00]
 10/07 F Fixed TSMODE ircds that don't stay this in their CAPAB		  [ #00]
 10/05 F Cleaned up how OS/CS CLEAR MODES works		                  [ #00]

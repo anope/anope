@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="173"
+VERSION_BUILD="174"
 
 # $Log$
+#
+# BUILD : 1.7.3 (174)
+# BUGS  : 
+# NOTES : Sorry, another changes file mistake, remember to have a fullstop at the end, AND bug number as [#00] if there is no bug
 #
 # BUILD : 1.7.3 (173)
 # BUGS  : 

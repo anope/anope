@@ -643,11 +643,18 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
     if (!cmdTable || !c) {
         return MOD_ERR_PARAMS;
     }
+    /* ok, this appears to be a module adding a command from outside of AnopeInit, try to look up its module struct for it */
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+
     if (!mod_current_module) {
         return MOD_ERR_UNKNOWN;
     }                           /* shouldnt happen */
     c->core = 0;
-    c->mod_name = sstrdup(mod_current_module->name);
+    if (!c->mod_name) {
+        c->mod_name = sstrdup(mod_current_module->name);
+    }
 
     if (cmdTable == HOSTSERV) {
         c->service = sstrdup(s_HostServ);
@@ -1072,11 +1079,19 @@ int moduleAddMessage(Message * m, int pos)
     if (!m) {
         return MOD_ERR_PARAMS;
     }
+
+    /* ok, this appears to be a module adding a message from outside of AnopeInit, try to look up its module struct for it */
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+
     if (!mod_current_module) {
         return MOD_ERR_UNKNOWN;
     }                           /* shouldnt happen */
     m->core = 0;
-    m->mod_name = sstrdup(mod_current_module->name);
+    if (!m->mod_name) {
+        m->mod_name = sstrdup(mod_current_module->name);
+    }
 
     status = addMessage(IRCD, m, pos);
     if (debug) {

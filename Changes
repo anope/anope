@@ -31,6 +31,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/16 F Fixed tsbuf not being sent on registration	                  [#180]
 10/15 F Fixed OS JUPE					                  [#147]
 10/14 F Fixed NickServ Logout				                  [#180]
 10/14 F Fixed HelpChannel with Unreal			                  [#180]

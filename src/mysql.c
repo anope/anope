@@ -1,6 +1,4 @@
-/* MySQL functions.
-/* MySQL functions.
-/* MySQL functions.
+
 /* MySQL functions.
  *
  * (C) 2003 Anope Team
@@ -1610,6 +1608,5 @@ void db_mysql_load_ns_dbase(void)
         }
     }
 }
- 
- 
- 
+
+

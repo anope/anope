@@ -1,4 +1,4 @@
-/* NickServ functions.
+
 /* NickServ functions.
  *
  * (C) 2003 Anope Team

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="5"
-VERSION_BUILD="329"
+VERSION_BUILD="330"
 
 # $Log$
+#
+# BUILD : 1.7.5 (330)
+# BUGS  : N/A
+# NOTES : More indent fun!
 #
 # BUILD : 1.7.5 (329)
 # BUGS  : N/A

@@ -1236,7 +1236,10 @@ int read_config(int reload)
     }
 
     if (GlobalOnCycle) {
-        CHECK(GlobalOnCycleMessage);
+        if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
+            alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined disabling GlobalOnCycle");
+            GlobalOnCycle = 0;
+        }
     }
 
     /**

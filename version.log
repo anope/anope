@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="3"
-VERSION_BUILD="200"
+VERSION_BUILD="201"
 
 # $Log$
+#
+# BUILD : 1.7.3 (201)
+# BUGS  : 91
+# NOTES : Fix provided by trystan - ty :)
 #
 # BUILD : 1.7.3 (200)
 # BUGS  : 96

@@ -1,6 +1,7 @@
 Anope Version 1.7.0
 --------------------
 Provided by Anope Dev. <dev@anope.org>
+2004/04/09 Fixed segfault due to coreless nicks in MySQL db (Bug #8)
 2004/04/08 Added NickRegDelay. Nicks have to be connected longer than X seconds before a /ns register.
 2004/04/08 Added "is a services root administrator" to /ns info.
 2004/04/08 Added option for SOs and above to hide their services access status in /ns info.

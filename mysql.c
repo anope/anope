@@ -1570,7 +1570,8 @@ void db_mysql_load_ns_dbase(void)
         na->nc = findcore(tmpstr);
         free(tmpstr);
 
-        slist_add(&na->nc->aliases, na);
+        if (na->nc)
+            slist_add(&na->nc->aliases, na);
 
         if (!(na->status & NS_VERBOTEN)) {
             if (!na->last_usermask)
@@ -1579,7 +1580,8 @@ void db_mysql_load_ns_dbase(void)
                 na->last_realname = sstrdup("");
         }
 
-        na->nc->flags &= ~NI_SERVICES_ROOT;
+        if (na->nc)
+            na->nc->flags &= ~NI_SERVICES_ROOT;
         alpha_insert_alias(na);
     }
     mysql_free_result(mysql_res);

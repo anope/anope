@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="4"
-VERSION_BUILD="211"
+VERSION_BUILD="212"
 
 # $Log$
+#
+# BUILD : 1.7.4 (212)
+# BUGS  : none
+# NOTES : Moved Changes entries around.
 #
 # BUILD : 1.7.4 (211)
 # BUGS  : N/A

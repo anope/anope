@@ -549,6 +549,16 @@ NICK_ACCESS_LIST
 NICK_ACCESS_LIST_X
 	Lista de acesso para %s:
 
+# Status messages
+NICK_STATUS_0
+	STATUS %s 0
+NICK_STATUS_1
+	STATUS %s 1
+NICK_STATUS_2
+	STATUS %s 2
+NICK_STATUS_3
+	STATUS %s 3
+
 # INFO responses
 NICK_INFO_SYNTAX
 	INFO nick [ALL]
@@ -586,6 +596,8 @@ NICK_INFO_GREET
 	Mensagem de entrada: %s
 NICK_INFO_OPTIONS
 	Opções: %s
+NICK_INFO_EXPIRE
+	Expires in: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Proteção
@@ -635,6 +647,10 @@ NICK_GLIST_HEADER_X
 	Lista de nicks no grupo %s:
 NICK_GLIST_FOOTER
 	%d nicks no grupo.
+NICK_GLIST_REPLY
+	   %c%s
+NICK_GLIST_REPLY_ADMIN
+	   %c%s (expires in %s)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -1319,6 +1335,18 @@ CHAN_LEVELS_LIST_NORMAL
 	    %-*s  %d
 CHAN_LEVELS_RESET
 	Níveis de acesso para o %s redefinidos para o padrão.
+
+# Status Messages
+CHAN_STATUS_SYNTAX
+	STATUS ERROR Syntax error
+CHAN_STATUS_NOT_REGGED
+	STATUS ERROR Channel %s not registered
+CHAN_STATUS_FORBIDDEN
+	STATUS ERROR Channel %s forbidden
+CHAN_STATUS_NOTONLINE
+	STATUS ERROR Nick %s not online
+CHAN_STATUS_INFO
+	STATUS %s %s %d
 
 # INFO responses
 CHAN_INFO_SYNTAX

@@ -3337,6 +3337,7 @@ static int do_info(User * u)
         int need_comma = 0;
         int nick_online = 0;
         int show_hidden = 0;
+        time_t expt;
 
         /* Is the real owner of the nick we're looking up online? -TheShadow */
         if (na->status & (NS_RECOGNIZED | NS_IDENTIFIED))
@@ -3464,8 +3465,17 @@ static int do_info(User * u)
             notice_lang(s_NickServ, u, NICK_INFO_OPTIONS,
                         *buf ? buf : getstring(u->na, NICK_INFO_OPT_NONE));
 
-            if (na->status & NS_NO_EXPIRE)
+            if (na->status & NS_NO_EXPIRE) {
                 notice_lang(s_NickServ, u, NICK_INFO_NO_EXPIRE);
+            } else {
+                if (is_services_admin(u)) {
+                    expt = na->last_seen + NSExpire;
+                    tm = localtime(&expt);
+                    strftime_lang(buf, sizeof(buf), na->u,
+                                  STRFTIME_DATE_TIME_FORMAT, tm);
+                    notice_lang(s_NickServ, u, NICK_INFO_EXPIRE, buf);
+                }
+            }
         }
 
         if (!show_hidden
@@ -3643,7 +3653,9 @@ static int do_glist(User * u)
     NickAlias *na, *na2;
     int i;
 
-    if ((nick ? !is_services_admin(u) : !nick_identified(u))) {
+    if ((nick ? (stricmp(nick, u->nick) ? !is_services_admin(u)
+                 : !nick_identified(u))
+         : !nick_identified(u))) {
         notice_lang(s_NickServ, u, ACCESS_DENIED);
     } else if ((!nick ? !(na = u->na) : !(na = findnick(nick)))) {
         notice_lang(s_NickServ, u,
@@ -3652,15 +3664,25 @@ static int do_glist(User * u)
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else {
+        time_t expt;
+        struct tm *tm;
+        char buf[BUFSIZE];
         notice_lang(s_NickServ, u,
                     nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER,
                     na->nc->display);
         for (i = 0; i < na->nc->aliases.count; i++) {
             na2 = na->nc->aliases.list[i];
-            if (na2->nc == na->nc)
-                notice_user(s_NickServ, u, "   %c%s",
+            if (na2->nc == na->nc) {
+                expt = na2->last_seen + NSExpire;
+                tm = localtime(&expt);
+                strftime_lang(buf, sizeof(buf), na2->u,
+                              STRFTIME_DATE_TIME_FORMAT, tm);
+                notice_lang(s_NickServ, u,
+                            (is_services_admin(u) ? NICK_GLIST_REPLY_ADMIN
+                             : NICK_GLIST_REPLY),
                             ((na2->status & NS_NO_EXPIRE) ? '!' : ' '),
-                            na2->nick);
+                            na2->nick, buf);
+            }
         }
         notice_lang(s_NickServ, u, NICK_GLIST_FOOTER,
                     na->nc->aliases.count);
@@ -3935,13 +3957,13 @@ static int do_status(User * u)
 
     while ((nick = strtok(NULL, " ")) && (i++ < 16)) {
         if (!(u2 = finduser(nick)))
-            notice_user(s_NickServ, u, "STATUS %s 0", nick);
+            notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
         else if (nick_identified(u2))
-            notice_user(s_NickServ, u, "STATUS %s 3", nick);
+            notice_lang(s_NickServ, u, NICK_STATUS_3, nick);
         else if (nick_recognized(u2))
-            notice_user(s_NickServ, u, "STATUS %s 2", nick);
+            notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
         else
-            notice_user(s_NickServ, u, "STATUS %s 1", nick);
+            notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
     }
     return MOD_CONT;
 }

@@ -73,8 +73,8 @@ IRCDVar ircd[] = {
      0,                         /* svshold              */
      0,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
-     1,                         /* UMODE                */
      0,                         /* O:LINE               */
+     1,                         /* UMODE               */
      1,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
      0,                         /* ChanServ extra   */
@@ -1377,7 +1377,7 @@ void anope_set_umode(User * user, int ac, char **av)
                                      user->nick);
                 display_news(user, NEWS_OPER);
                 if (is_services_admin(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +a", user->nick);
+                    common_svsmode(user, "+a", NULL);
                     user->mode |= UMODE_a;
                 }
 
@@ -1387,7 +1387,7 @@ void anope_set_umode(User * user, int ac, char **av)
             break;
         case 'r':
             if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -r", user->nick);
+                common_svsmode(user, "-r", NULL);
                 user->mode &= ~UMODE_r;
             }
             break;

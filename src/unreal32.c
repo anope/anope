@@ -42,7 +42,7 @@ IRCDVar ircd[] = {
      "+ioS",                    /* Global alias mode   */
      "+qS",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
-     "-ckiflmnpstuzACGHKLMNOQRSTV",     /* Modes to Remove */
+     "-cilmnpstuzACGHKMNOQRSTV",        /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -75,8 +75,8 @@ IRCDVar ircd[] = {
      1,                         /* svshold              */
      1,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
-     1,                         /* UMODE                */
      1,                         /* O:LINE               */
+     1,                         /* UMODE               */
      1,                         /* VHOST ON NICK        */
      1,                         /* Change RealName      */
      CHAN_HELP_UNREAL,          /* ChanServ extra   */
@@ -106,7 +106,7 @@ IRCDCAPAB ircdcap[] = {
      CAPAB_NOQUIT,              /* NOQUIT       */
      0,                         /* TSMODE       */
      0,                         /* UNCONNECT    */
-     0,                         /* NICKIP       */
+     CAPAB_NICKIP,              /* NICKIP       */
      0,                         /* SJOIN        */
      CAPAB_ZIP,                 /* ZIP          */
      0,                         /* BURST        */
@@ -411,13 +411,14 @@ void anope_set_umode(User * user, int ac, char **av)
             add = 0;
             break;
         case 'd':
-            if (ac == 0) {
+            if (ac <= 0) {
                 break;
             }
-
             ac--;
             av++;
-            user->svid = strtoul(*av, NULL, 0);
+            if (av) {
+                user->svid = strtoul(*av, NULL, 0);
+            }
             break;
         case 'o':
             if (add) {
@@ -434,13 +435,7 @@ void anope_set_umode(User * user, int ac, char **av)
             break;
         case 'r':
             if (add && !nick_identified(user)) {
-                if (UseSVS2MODE) {
-                    send_cmd(ServerName, "%s %s -r",
-                             send_token("SVS2MODE", "v"), user->nick);
-                } else {
-                    send_cmd(ServerName, "%s %s -r",
-                             send_token("SVSMODE", "n"), user->nick);
-                }
+                common_svsmode(user, "-r", NULL);
                 user->mode &= ~UMODE_r;
             }
             break;

@@ -5726,15 +5726,39 @@ static int do_clear(User * u)
         char *argv[2];
 
         if (c->mode) {
-            /* Clear modes */
+            /* Clear modes the bulk of the modes */
             anope_cmd_mode(s_ChanServ, c->name, "%s %s",
-                           ircd->modestoremove, c->key ? c->key : "");
+                           ircd->modestoremove);
             argv[0] = sstrdup(ircd->modestoremove);
-            argv[1] = c->key ? c->key : NULL;
-            chan_set_modes(s_OperServ, c, c->key ? 2 : 1, argv, 0);
+            chan_set_modes(s_ChanServ, c, 1, argv, 0);
             free(argv[0]);
-            check_modes(c);
+
+            /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
+               to send them - TSL */
+            if (c->key) {
+                anope_cmd_mode(s_ChanServ, c->name, "-k %s", c->key);
+                argv[0] = sstrdup("-k");
+                argv[1] = c->key;
+                chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
+            if (ircd->Lmode && c->redirect) {
+                anope_cmd_mode(s_ChanServ, c->name, "-L %s", c->redirect);
+                argv[0] = sstrdup("-L");
+                argv[1] = c->redirect;
+                chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
+            if (ircd->fmode && c->flood) {
+                anope_cmd_mode(s_ChanServ, c->name, "-f %s", c->flood);
+                argv[0] = sstrdup("-f");
+                argv[1] = c->flood;
+                chan_set_modes(s_ChanServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
         }
+
+
 
         /* TODO: decide if the above implementation is better than this one. */
 
@@ -6152,7 +6176,7 @@ static int do_status(User * u)
     chan = strtok(NULL, " ");
     nick = strtok(NULL, " ");
     if (!nick || strtok(NULL, " ")) {
-        notice_user(s_ChanServ, u, "STATUS ERROR Syntax error");
+        notice_lang(s_ChanServ, u, CHAN_STATUS_SYNTAX);
         return MOD_CONT;
     }
     if (!(ci = cs_findchan(chan))) {
@@ -6162,18 +6186,15 @@ static int do_status(User * u)
         ci = cs_findchan(chan);
     }
     if (!ci) {
-        notice_user(s_ChanServ, u,
-                    "STATUS ERROR Channel %s not registered", chan);
+        notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, chan);
     } else if (ci->flags & CI_VERBOTEN) {
-        notice_user(s_ChanServ, u, "STATUS ERROR Channel %s forbidden",
-                    chan);
+        notice_lang(s_ChanServ, u, CHAN_STATUS_FORBIDDEN, chan);
         return MOD_CONT;
     } else if ((u2 = finduser(nick)) != NULL) {
-        notice_user(s_ChanServ, u, "STATUS %s %s %d", chan, nick,
+        notice_lang(s_ChanServ, u, CHAN_STATUS_INFO, chan, nick,
                     get_access(u2, ci));
     } else {                    /* !u2 */
-        notice_user(s_ChanServ, u, "STATUS ERROR Nick %s not online",
-                    nick);
+        notice_lang(s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
     }
     return MOD_CONT;
 }

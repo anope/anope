@@ -18,6 +18,8 @@ Provided by Anope Dev. <dev@anope.org> - 2004
 08/24 F Compile error with gcc2.                                          [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2004
+10/05 F Cleaned up how OS/CS CLEAR MODES works		                  [ #00]
+10/05 A Globalized CS/NS STATUS messages		                  [ #00]
 10/02 A Added NewsCount as  new feature in services.conf                  [ #00]
 08/28 A CSupport for +I channel mode.                                     [ #00]
 08/28 A Complete support for Unreal3.2                                    [ #00]
@@ -26,6 +28,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
 08/23 A New protocol independent design (aka anope-capab).                [ #00]
 08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+10/05 F Cleaned up how OS/CS CLEAR MODES works		                  [ #00]
 09/27 F Verbose message for vident.                                       [#173]
 09/27 F Check and trap for forbidden nicks on HS.                         [#172]
 09/27 F Tracking of IP address for simple checks.                         [#166]
@@ -43,6 +46,11 @@ Provided by Trystan <trystan@nomadirc.net> - 2004
 08/28 F Undefined references on botserv.c upon compilation.               [#156]
 08/28 F Memory leaks taken care of.                                       [#157]
 08/28 F Buffer preparation for vsnprintf() call.                          [#158]
+
+Provided by DrStein <gacevedo@anope.org> - 2004
+10/05 A NS INFO shows the expire time 			                  [ #00]
+10/05 A NS GLIST shows the expire time 			                  [ #00]
+10/05 F NS GLIST allows the owner of the nick to use the nickname param   [ #00]
 
 
 Anope Version 1.7.5

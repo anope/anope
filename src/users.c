@@ -670,7 +670,7 @@ void do_umode2(const char *source, int ac, char **av)
         return;
     }
 
-    anope_set_umode(user, ac - 1, &av[0]);
+    anope_set_umode(user, ac, &av[0]);
 }
 
 /*************************************************************************/

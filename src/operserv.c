@@ -1587,6 +1587,8 @@ static int do_clearmodes(User * u)
     char **bans;                /* For saving ban info */
     int exceptcount;            /* For saving except info */
     char **excepts;             /* For saving except info */
+    int invitecount;            /* For saving invite info */
+    char **invites;             /* For saving invite info */
     struct c_userlist *cu, *next;
 
     if (!chan) {
@@ -1666,13 +1668,38 @@ static int do_clearmodes(User * u)
             }
         }
 
-        /* Clear modes */
-        anope_cmd_mode(s_OperServ, c->name, "%s %s", ircd->modestoremove,
-                       c->key ? c->key : "");
-        argv[0] = sstrdup(ircd->modestoremove);
-        argv[1] = c->key ? c->key : NULL;
-        chan_set_modes(s_OperServ, c, c->key ? 2 : 1, argv, 0);
-        free(argv[0]);
+        if (c->mode) {
+            /* Clear modes the bulk of the modes */
+            anope_cmd_mode(s_OperServ, c->name, "%s %s",
+                           ircd->modestoremove);
+            argv[0] = sstrdup(ircd->modestoremove);
+            chan_set_modes(s_OperServ, c, 1, argv, 0);
+            free(argv[0]);
+
+            /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
+               to send them - TSL */
+            if (c->key) {
+                anope_cmd_mode(s_OperServ, c->name, "-k %s", c->key);
+                argv[0] = sstrdup("-k");
+                argv[1] = c->key;
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
+            if (ircd->Lmode && c->redirect) {
+                anope_cmd_mode(s_OperServ, c->name, "-L %s", c->redirect);
+                argv[0] = sstrdup("-L");
+                argv[1] = c->redirect;
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
+            if (ircd->fmode && c->flood) {
+                anope_cmd_mode(s_OperServ, c->name, "-f %s", c->flood);
+                argv[0] = sstrdup("-f");
+                argv[1] = c->flood;
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[0]);
+            }
+        }
 
         /* Clear bans */
         count = c->bancount;
@@ -1711,6 +1738,28 @@ static int do_clearmodes(User * u)
 
             free(excepts);
         }
+
+        if (ircd->invitemode) {
+            /* Clear invites */
+            invitecount = c->invitecount;
+            invites = scalloc(sizeof(char *) * invitecount, 1);
+
+            for (i = 0; i < invitecount; i++)
+                invites[i] = sstrdup(c->invite[i]);
+
+            for (i = 0; i < invitecount; i++) {
+                argv[0] = sstrdup("-I");
+                argv[1] = excepts[i];
+                anope_cmd_mode(s_OperServ, c->name, "-I %s", argv[1]);
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[1]);
+                free(argv[0]);
+            }
+
+            free(invites);
+        }
+
+
     }
 
     notice_lang(s_OperServ, u, OPER_CLEARMODES_ALL_DONE, chan);

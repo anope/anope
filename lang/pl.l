@@ -602,6 +602,16 @@ NICK_ACCESS_LIST
 NICK_ACCESS_LIST_X
 	Lista dostêpu dla %s:
 
+# Status messages
+NICK_STATUS_0
+	STATUS %s 0
+NICK_STATUS_1
+	STATUS %s 1
+NICK_STATUS_2
+	STATUS %s 2
+NICK_STATUS_3
+	STATUS %s 3
+
 # INFO responses
 NICK_INFO_SYNTAX
 	INFO nick [ALL]
@@ -639,6 +649,8 @@ NICK_INFO_GREET
 	Wiadomo¶æ powitalna: %s
 NICK_INFO_OPTIONS
 	Opcje: %s
+NICK_INFO_EXPIRE
+	Expires in: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Chroniony
@@ -689,6 +701,10 @@ NICK_GLIST_HEADER_X
 	Lista cz³onków grupy %s:
 NICK_GLIST_FOOTER
 	%d cz³onków w grupie.
+NICK_GLIST_REPLY
+	   %c%s
+NICK_GLIST_REPLY_ADMIN
+	   %c%s (expires in %s)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -1431,6 +1447,18 @@ CHAN_LEVELS_LIST_NORMAL
 CHAN_LEVELS_RESET
 	Poziomy dostêpu na %s zosta³y zresetowane do 
 	domy¶lnych.
+
+# Status Messages
+CHAN_STATUS_SYNTAX
+	STATUS ERROR Syntax error
+CHAN_STATUS_NOT_REGGED
+	STATUS ERROR Channel %s not registered
+CHAN_STATUS_FORBIDDEN
+	STATUS ERROR Channel %s forbidden
+CHAN_STATUS_NOTONLINE
+	STATUS ERROR Nick %s not online
+CHAN_STATUS_INFO
+	STATUS %s %s %d
 
 # INFO responses
 CHAN_INFO_SYNTAX

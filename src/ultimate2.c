@@ -73,8 +73,8 @@ IRCDVar ircd[] = {
      0,                         /* svshold              */
      1,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
-     1,                         /* UMODE                */
      0,                         /* O:LINE               */
+     1,                         /* UMODE               */
      0,                         /* VHOST ON NICK        */
      1,                         /* Change RealName      */
      CHAN_HELP_ULTIMATE,        /* ChanServ extra   */
@@ -161,19 +161,19 @@ void anope_set_umode(User * user, int ac, char **av)
             break;
         case 'a':
             if (add && !is_services_oper(user)) {
-                send_cmd(ServerName, "SVSMODE %s -a", user->nick);
+                common_svsmode(user, "-a", NULL);
                 user->mode &= ~UMODE_a;
             }
             break;
         case 'P':
             if (add && !is_services_admin(user)) {
-                send_cmd(ServerName, "SVSMODE %s -P", user->nick);
+                common_svsmode(user, "-P", NULL);
                 user->mode &= ~UMODE_P;
             }
             break;
         case 'R':
             if (add && !is_services_root(user)) {
-                send_cmd(ServerName, "SVSMODE %s -R", user->nick);
+                common_svsmode(user, "-R", NULL);
                 user->mode &= ~UMODE_R;
             }
             break;
@@ -196,17 +196,17 @@ void anope_set_umode(User * user, int ac, char **av)
                                      user->nick);
                 display_news(user, NEWS_OPER);
                 if (is_services_oper(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +a", user->nick);
+                    common_svsmode(user, "+a", NULL);
                     user->mode |= UMODE_a;
                 }
 
                 if (is_services_admin(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +P", user->nick);
+                    common_svsmode(user, "+P", NULL);
                     user->mode |= UMODE_P;
                 }
 
                 if (is_services_root(user)) {
-                    send_cmd(ServerName, "SVSMODE %s +R", user->nick);
+                    common_svsmode(user, "+R", NULL);
                     user->mode |= UMODE_R;
                 }
             } else {
@@ -215,7 +215,7 @@ void anope_set_umode(User * user, int ac, char **av)
             break;
         case 'r':
             if (add && !nick_identified(user)) {
-                send_cmd(ServerName, "SVSMODE %s -r", user->nick);
+                common_svsmode(user, "-r", NULL);
                 user->mode &= ~UMODE_r;
             }
             break;

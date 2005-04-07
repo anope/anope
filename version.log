@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="656"
+VERSION_BUILD="657"
 
 # $Log$
+#
+# BUILD : 1.7.8 (657)
+# BUGS  : 346 351 341 328 345
+# NOTES : Added channame to XOP/ACCESS/AKICK CLEAR, added checks to /hs off, fixed guest nick to take an unused nick, added SVN revision to win32 versions, fixed /ns alist to not accept invalid access levels, improved Config script, fixed responses for /ns glist/alist -- ty qa ;)
 #
 # BUILD : 1.7.8 (656)
 # BUGS  : 331

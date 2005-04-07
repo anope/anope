@@ -1156,7 +1156,7 @@ CHAN_AOP_LIST_HEADER
 	%s kanali AOP listesi:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	Kanalin AOP listesi temizlendi.
+	Kanalin %s AOP listesi temizlendi.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1187,7 +1187,7 @@ CHAN_HOP_LIST_HEADER
 	%s kanali HOP listesi:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	Kanal HOP listesi temizlendi.
+	Kanal %s HOP listesi temizlendi.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1218,7 +1218,7 @@ CHAN_SOP_LIST_HEADER
 	%s kanali SOP listesi:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	Kanal SOP listesi temizlendi.
+	Kanal %s SOP listesi temizlendi.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1249,7 +1249,7 @@ CHAN_VOP_LIST_HEADER
 	%s kanali VOP listesi:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	Kanal VOP listesi temizlendi.
+	Kanal %s VOP listesi temizlendi.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1298,7 +1298,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	Kanal access listesi temizlendi.
+	Kanal %s access listesi temizlendi.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1342,7 +1342,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	 %s için AKICK uygulamasý tamam; %d kullanýcý için geçerli.
 CHAN_AKICK_CLEAR
-	Kanal akick listesi temizlendi.
+	Kanal %s akick listesi temizlendi.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

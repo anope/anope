@@ -1761,8 +1761,11 @@ static void collide(NickAlias * na, int from_timeout)
      */
 
     if (ircd->svsnick) {
-        snprintf(guestnick, sizeof(guestnick), "%s%d", NSGuestNickPrefix,
-                 guestnum++);
+        /* We need to make sure the guestnick is free -- heinz */
+        do {
+            snprintf(guestnick, sizeof(guestnick), "%s%d%d",
+                     NSGuestNickPrefix, getrandom32(), getrandom32());
+        } while (finduser(guestnick));
         notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
                     guestnick);
         anope_cmd_svsnick(na->nick, guestnick, time(NULL));
@@ -3777,12 +3780,15 @@ static int do_glist(User * u)
     char *nick = strtok(NULL, " ");
 
     NickAlias *na, *na2;
+    int is_servadmin = is_services_admin(u);
+    int nick_ided = nick_identified(u);
     int i;
 
-    if ((nick ? (stricmp(nick, u->nick) ? !is_services_admin(u)
-                 : !nick_identified(u))
-         : !nick_identified(u))) {
-        notice_lang(s_NickServ, u, ACCESS_DENIED);
+    if ((nick ? (stricmp(nick, u->nick) ? !is_servadmin : !nick_ided)
+         : !nick_ided)) {
+        notice_lang(s_NickServ, u,
+                    (nick_ided ? ACCESS_DENIED :
+                     NICK_IDENTIFY_REQUIRED), s_NickServ);
     } else if ((!nick ? !(na = u->na) : !(na = findnick(nick)))) {
         notice_lang(s_NickServ, u,
                     (!nick ? NICK_NOT_REGISTERED : NICK_X_NOT_REGISTERED),
@@ -3879,11 +3885,14 @@ static int do_alist(User * u)
     }
 
     if (!nick_identified(u)) {
-        notice_lang(s_NickServ, u, ACCESS_DENIED);
+        notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
     } else if (is_servadmin && nick && !na) {
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+    } else if (min_level <= ACCESS_INVALID || min_level >= ACCESS_FOUNDER) {
+        notice_lang(s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE,
+                    ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
     } else {
         int i, level;
         int chan_count = 0;

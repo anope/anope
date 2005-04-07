@@ -1238,7 +1238,7 @@ CHAN_AOP_LIST_HEADER
 	Lista AOP dla %s:
 	  Nr   Nick
 CHAN_AOP_CLEAR
-	Kana³owa lista AOP zosta³a wyczyszczona.
+	Kana³owa %s lista AOP zosta³a wyczyszczona.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1271,7 +1271,7 @@ CHAN_HOP_LIST_HEADER
 	Lista HOP dla %s:
 	  Nr   Nick
 CHAN_HOP_CLEAR
-	Kana³owa lista HOP zosta³a wyczyszczona.
+	Kana³owa %s lista HOP zosta³a wyczyszczona.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1304,7 +1304,7 @@ CHAN_SOP_LIST_HEADER
 	Lista SOP dla %s:
 	  Nr   Nick
 CHAN_SOP_CLEAR
-	Kana³owa lista SOP zosta³a wyczyszczona.
+	Kana³owa %s lista SOP zosta³a wyczyszczona.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1337,7 +1337,7 @@ CHAN_VOP_LIST_HEADER
 	Lista VOP dla %s:
 	  Nr   Nick
 CHAN_VOP_CLEAR
-	Kana³owa lista VOP zosta³a wyczyszczona.
+	Kana³owa %s lista VOP zosta³a wyczyszczona.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1393,7 +1393,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	Lista dostêpu kana³u zosta³a wyczyszczona.
+	Lista dostêpu kana³u %s zosta³a wyczyszczona.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX

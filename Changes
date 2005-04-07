@@ -10,6 +10,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+04/07 F Added channel names to XOP/ACCESS/AKICK CLEAR                     [#346]
+04/07 F Only users with vHost/vIdent can /hostserv off                    [#351]
+04/07 F Make sure nick isn't in use on nickserv collide                   [#341]
 04/01 F Sync state for leaf-servers not updated correctly.                [ #00]
 03/30 F ChanServ now sets topic again when channel is re-created.         [#339]
 03/29 F Changed anoperc script to use kill numerics for compliance.       [ #00]
@@ -61,13 +64,17 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 03/07 R Removed Proxy Detector from core.                                 [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
+04/07 F Win32 now includes SVN revision in version                        [#328]
 03/16 F Shadowircd nick handling and vhost changing                       [#321]
 03/14 R Removed some old irc-services convertor ifdef's                   [#317]
 
 Provided by DrStein <drstein@anope.org> - 2005
+04/07 A NickServ's ALIST won't accept invalid access levels for min_level [ #00]
 03/22 A Compiling extra tools (db-merger, epona2anope)                    [ #00]
+03/17 A Improvements on Config script.                                    [ #00]
 03/17 A OS SET SQL ON shall warn about SQL disabled in services.conf      [ #00]
 03/15 A ChanServ will now include the channel name in SET's responses     [#318]
+04/07 F NickServ shall give the correct response to GLIST/ALIST           [#345]
 03/15 F ChanServ's do_getkey() function is now using notice_lang()        [#319]
 03/14 F Updated docs/FAQ.                                                 [#312]
 03/09 F Updated Spanish language file (es.l).                             [ #00]
@@ -86,6 +93,8 @@ Provided by crazytoon <da.crew@gmx.net> - 2005
 Provided by BarkerJr <barkerjr@barkerjr.net> - 2005
 02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks.   [ #00]
 
+Provided by nenolod <nenolod@gmail.com> - 2005
+04/07 F Numerous ShadowIRCD fixes                                         [ #00]
 
 Anope Version 1.7.8
 -------------------

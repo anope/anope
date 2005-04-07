@@ -3952,7 +3952,7 @@ static int do_xop(User * u, char *xname, int xlev, int *xmsgs)
             }
         }
 
-        notice_lang(s_ChanServ, u, xmsgs[13]);
+        notice_lang(s_ChanServ, u, xmsgs[13], ci->name);
     } else {
         syntax_error(s_ChanServ, u, xname, xmsgs[0]);
     }
@@ -4293,7 +4293,7 @@ static int do_access(User * u)
         ci->access = NULL;
         ci->accesscount = 0;
 
-        notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR);
+        notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);
         alog("%s: %s!%s@%s (level %d) cleared access list on %s",
              s_ChanServ, u->nick, u->username, u->host,
              get_access(u, ci), chan);
@@ -4902,7 +4902,7 @@ static int do_akick(User * u)
         ci->akick = NULL;
         ci->akickcount = 0;
 
-        notice_lang(s_ChanServ, u, CHAN_AKICK_CLEAR);
+        notice_lang(s_ChanServ, u, CHAN_AKICK_CLEAR, ci->name);
 
     } else {
         syntax_error(s_ChanServ, u, "AKICK", CHAN_AKICK_SYNTAX);

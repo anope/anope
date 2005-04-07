@@ -1152,7 +1152,7 @@ CHAN_AOP_LIST_HEADER
 	Lista AOP di %s:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	La lista AOP del canale è stata svuotata.
+	La lista AOP del canale %s è stata svuotata.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1183,7 +1183,7 @@ CHAN_HOP_LIST_HEADER
 	Lista HOP di %s:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	La lista HOP del canale è stata svuotata.
+	La lista HOP del canale %s è stata svuotata.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1214,7 +1214,7 @@ CHAN_SOP_LIST_HEADER
 	Lista SOP di %s:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	La lista SOP del canale è stata svuotata.
+	La lista SOP del canale %s è stata svuotata.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1245,7 +1245,7 @@ CHAN_VOP_LIST_HEADER
 	Lista VOP di %s:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	La lista VOP del canale è stata svuotata.
+	La lista VOP del canale %s è stata svuotata.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1293,7 +1293,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	La lista di accesso del canale è stata svuotata.
+	La lista di accesso del canale %s è stata svuotata.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1337,7 +1337,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE su %s completato; ne sono stati influenzati %d utenti.
 CHAN_AKICK_CLEAR
-	La lista autokick del canale è stata svuotata.
+	La lista autokick del canale %s è stata svuotata.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

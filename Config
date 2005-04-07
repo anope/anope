@@ -17,6 +17,69 @@ echo2 () {
     $ECHO2 "$*$ECHO2SUF"    # these are defined later
 }
 
+exists () {                     # because some shells don't have test -e
+    if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+Load_Cache () {
+    if [ -f config.cache -a -r config.cache -a ! "$IGNORE_CACHE" ] ; then
+        echo "Using defaults from config.cache. To ignore, ./Config -nocache"
+        echo ""
+        . config.cache
+        CAN_QUICK="yes"
+    else
+        CAN_QUICK="no"
+    fi
+}
+
+Run_Configure () {
+WITH_BIN=""
+WITH_DATA=""
+WITH_ENC=""
+WITH_IRCD=""
+WITH_RUN=""
+WITH_PERM=""
+WITH_MYSQL=""
+
+if [ "$BINDEST" != "" ] ; then
+    WITH_BIN=" --with-bindir=$BINDEST"
+    WITH_DATA=" --with-datadir=$DATDEST"
+fi
+
+if [ "$DATDEST" != "" ] ; then
+    WITH_DATA=" --with-datadir=$DATDEST"
+fi
+
+if [ "$ENCRYPTION" != "" ] ; then
+    WITH_ENC=" --with-encryption"
+fi
+
+if [ "$IRCTYPE_DEF" != "" ] ; then
+    WITH_IRCD=" --with-ircd=$IRCTYPE_DEF"
+fi
+
+if [ "$RUNGROUP" != "" ] ; then
+    WITH_RUN="  --with-rungroup=$RUNGROUP"
+fi
+
+if [ "$UMASK" != "" ] ; then
+    WITH_PERM=" --with-permissions=$UMASK"
+fi
+
+if [ "$MYSQL" != "yes" ] ; then
+    WITH_MYSQL=" --without-mysql"
+fi
+
+
+echo "./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM $WITH_MYSQL"
+
+./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM $WITH_MYSQL
+}
+
 ECHO2SUF=''
 if [ "`echo -n a ; echo -n b`" = "ab" ] ; then
 	ECHO2='echo -n'
@@ -30,14 +93,6 @@ else
 fi
 export ECHO2 ECHO2SUF
 
-exists () {                     # because some shells don't have test -e
-	if [ -f $1 -o -d $1 -o -p $1 -o -c $1 -o -b $1 ] ; then
-            return 0
-        else
-            return 1
-        fi
-}
-
 ###########################################################################
 # Init values
 ###########################################################################
@@ -48,39 +103,55 @@ RUNGROUP=
 UMASK=
 IRCTYPE="no default"
 ENCRYPTION=
+CAN_QUICK="no"
 
 ###########################################################################
-# Load the cache
+# Check out the options
 ###########################################################################
-if [ -f config.cache -a -r config.cache -a ! "$IGNORE_CACHE" ] ; then
-cat <<EOT
-	Using defaults from config.cache. To ignore, rm config.cache
-EOT
-. config.cache
-fi		
+while [ $# -ge 1 ] ; do
+        if [ $1 = "--help" ] ; then
+                echo "Config utility for Anope"
+                echo "------------------------"
+                echo "Syntax: ./Config [options]"
+                echo "-nocache     Ignore settings saved in config.cache"
+                echo "-nointro     Skip intro (disclaimer, etc)"
+                echo "-quick       Skip questions, go straight to configure"
+                exit 0
+        elif [ $1 = "-nocache" ] ; then
+                IGNORE_CACHE="1"
+        elif [ $1 = "-nointro" ] ; then
+                NO_INTRO="1"
+        elif [ $1 = "-quick" -o $1 = "-q" ] ; then
+                Load_Cache
+                if [ $CAN_QUICK = "yes" ] ; then
+                    Run_Configure
+                else
+                    echo ""
+                    echo "Can't find cache file (config.cache), aborting..."
+                fi
+                exit 0
+        fi
+        shift 1
+done
 
 ###########################################################################
+if [ ! "$NO_INTRO" ] ; then
+        clear
+        more .BANNER
+        echo ""
+else
+        echo ""
+fi
 
-echo ""
-echo "-========================= A N O P E ==========================-"
-echo "For more detailed information on the features of Anope1.7 please"
-echo "read the self-named documentation found on the 'docs' directory."
-echo ""
-
-echo "Anope is a set of IRC Service expanded upon Lara's Epona, based"
-echo "on Andy Church's IRC Services. For all your Anope needs please"
-echo "visit our portal at http://www.anope.org/"
-echo ""
-
-echo "Please read the INSTALL file for install/upgrade instructions."
-echo "Reading the FAQ and README files would be a good idea too. (all"
-echo "documentation is located on directory 'docs')."
-echo "-==============================================================-"
-echo ""
 echo "Beginning Services configuration."
 echo ""
 
 ###########################################################################
+# Load the cache
+###########################################################################
+if [ ! "$IGNORE_CACHE" ] ; then
+        Load_Cache
+fi
 
 # Ask the user anything we need to know ahead of time.
 
@@ -395,46 +466,4 @@ echo "done."
 ################################################################################
 # Build the configure string
 ################################################################################
-
-WITH_BIN=""
-WITH_DATA=""
-WITH_ENC=""
-WITH_IRCD=""
-WITH_RUN=""
-WITH_PERM=""
-WITH_MYSQL=""
-
-if [ "$BINDEST" != "" ] ; then 
-    WITH_BIN=" --with-bindir=$BINDEST"
-    WITH_DATA=" --with-datadir=$DATDEST"
-fi
-
-if [ "$DATDEST" != "" ] ; then
-    WITH_DATA=" --with-datadir=$DATDEST"
-fi
-
-if [ "$ENCRYPTION" != "" ] ; then
-    WITH_ENC=" --with-encryption"
-fi
-
-if [ "$IRCTYPE_DEF" != "" ] ; then
-    WITH_IRCD=" --with-ircd=$IRCTYPE_DEF"
-fi
-
-if [ "$RUNGROUP" != "" ] ; then
-    WITH_RUN="  --with-rungroup=$RUNGROUP"
-fi
-
-if [ "$UMASK" != "" ] ; then
-    WITH_PERM=" --with-permissions=$UMASK"
-fi
-
-if [ "$MYSQL" != "yes" ] ; then
-    WITH_MYSQL=" --without-mysql"
-fi
-
-
-echo "./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM $WITH_MYSQL"
-
-./configure $WITH_BIN $WITH_DATA $WITH_ENC $WITH_IRCD $WITH_RUN $WITH_PERM $WITH_MYSQL
-
+Run_Configure

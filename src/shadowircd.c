@@ -519,7 +519,8 @@ void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
     ud = find_uid(source);
     ud2 = find_uid(dest);
 
-    send_cmd((ud ? ud->uid : source), "PRIVMSG %s :%s", ud2->uid, buf);
+    send_cmd((ud ? ud->uid : source), "PRIVMSG %s :%s",
+             (ud2 ? ud2->uid : dest), buf);
 }
 
 void anope_cmd_privmsg2(char *source, char *dest, char *msg)
@@ -529,7 +530,8 @@ void anope_cmd_privmsg2(char *source, char *dest, char *msg)
     ud = find_uid(source);
     ud2 = find_uid(dest);
 
-    send_cmd((ud ? ud->uid : source), "PRIVMSG %s :%s", ud2->uid, msg);
+    send_cmd((ud ? ud->uid : source), "PRIVMSG %s :%s",
+             (ud2 ? ud2->uid : dest), msg);
 }
 
 void anope_cmd_serv_notice(char *source, char *dest, char *msg)
@@ -772,6 +774,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
     m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
     m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("SVSKILL",   anope_event_kill); addCoreMessage(IRCD,m);
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
@@ -865,7 +868,7 @@ void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
 
 void anope_cmd_vhost_off(User * u)
 {
-    send_cmd(NULL, "MODE %s -v", u->uid);
+    send_cmd(NULL, "MODE %s -v", (u->uid ? u->uid : u->nick));
 }
 
 void anope_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
@@ -1604,7 +1607,7 @@ int anope_event_mode(char *source, int ac, char **av)
         u = find_byuid(source);
         u2 = find_byuid(av[0]);
         av[0] = u2->nick;
-        do_umode((u ? u->nick : source), ac, av);
+        do_umode2((u ? u->nick : source), ac, av);
     }
     return MOD_CONT;
 }

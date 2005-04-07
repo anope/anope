@@ -1148,7 +1148,7 @@ CHAN_AOP_LIST_HEADER
 	AOP lijst voor %s:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	Kanaal AOP lijst is leeggemaakt.
+	Kanaal %s AOP lijst is leeggemaakt.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1179,7 +1179,7 @@ CHAN_HOP_LIST_HEADER
 	HOP lijst voor %s:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	Kanaal HOP lijst is leeggemaakt.
+	Kanaal %s HOP lijst is leeggemaakt.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1210,7 +1210,7 @@ CHAN_SOP_LIST_HEADER
 	SOP lijst voor %s:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	Kanaal SOP list is leeggemaakt.
+	Kanaal %s SOP lijst is leeggemaakt.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1241,7 +1241,7 @@ CHAN_VOP_LIST_HEADER
 	VOP lijst for %s:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	Kanaal VOP lijst is leeggemaakt.
+	Kanaal %s VOP lijst is leeggemaakt.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1290,7 +1290,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	Kanaal toegangslijst is leeggemaakt.
+	Kanaal %s toegangslijst is leeggemaakt.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1334,7 +1334,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE voor %s compleet; %d gebruikers zijn getroffen.
 CHAN_AKICK_CLEAR
-	Kanaal autokick lijst is leeggemaakt.
+	Kanaal %s autokick lijst is leeggemaakt.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

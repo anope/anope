@@ -1035,8 +1035,23 @@ int do_del(User * u)
 /*************************************************************************/
 int do_off(User * u)
 {
-    /* put any generic code here... :) */
-    anope_cmd_vhost_off(u);
+    NickAlias *na;
+    char *vhost;
+    char *vident = NULL;
+    if ((na = findnick(u->nick))) {
+        if (na->status & NS_IDENTIFIED) {
+            vhost = getvHost(u->nick);
+            vident = getvIdent(u->nick);
+            if (vhost == NULL && vident == NULL)
+                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+            else
+                anope_cmd_vhost_off(u);
+        } else {
+            notice_lang(s_HostServ, u, HOST_ID);
+        }
+    } else {
+        notice_lang(s_HostServ, u, HOST_NOT_REGED);
+    }
     return MOD_CONT;
 }
 

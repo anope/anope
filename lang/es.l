@@ -1156,7 +1156,7 @@ CHAN_AOP_LIST_HEADER
 	Lista AOP para %s:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	La lista AOP de canales ha sido limpiada.
+	La lista AOP de canales %s ha sido limpiada.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1188,7 +1188,7 @@ CHAN_HOP_LIST_HEADER
 	Lista HOP para %s:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	La lista HOP de canales ha sido limpiada.
+	La lista HOP de canales %s ha sido limpiada.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1220,7 +1220,7 @@ CHAN_SOP_LIST_HEADER
 	Lista SOP para %s:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	La lista HOP de canales ha sido limpiada.
+	La lista HOP de canales %s ha sido limpiada.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1252,7 +1252,7 @@ CHAN_VOP_LIST_HEADER
 	Lista VOP para %s:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	La lista HOP de canales ha sido limpiada.
+	La lista HOP de canales %s ha sido limpiada.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1301,7 +1301,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	La lista de acceso para el canal ha sido limpiada.
+	La lista de acceso para el canal %s ha sido limpiada.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1345,7 +1345,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE en %s completa; %d usuarios afectados.
 CHAN_AKICK_CLEAR
-	La lista de kicks automaticos ha sido limpiada.
+	La lista de kicks automaticos del canal %s ha sido limpiada.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

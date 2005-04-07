@@ -1157,7 +1157,7 @@ CHAN_AOP_LIST_HEADER
 	Llista AOP per a %s:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	La llista AOP de canals ha estat netegada.
+	La llista AOP de canals %s ha estat netegada.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1189,7 +1189,7 @@ CHAN_HOP_LIST_HEADER
 	Llista HOP per a %s:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	La llista HOP de canals ha estat netegada.
+	La llista HOP de canals %s ha estat netegada.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1221,7 +1221,7 @@ CHAN_SOP_LIST_HEADER
 	Llista SOP per a %s:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	La llista HOP de canals ha estat netegada.
+	La llista SOP de canals %s ha estat netegada.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1253,7 +1253,7 @@ CHAN_VOP_LIST_HEADER
 	Llista VOP per a %s:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	La llista HOP de canals ha estat netegada.
+	La llista VOP de canals %s ha estat netegada.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1302,7 +1302,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	La llista d'accés pel canal ha estat netegada.
+	La llista d'accés pel canal %s ha estat netegada.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX

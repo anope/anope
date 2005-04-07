@@ -1156,7 +1156,7 @@ CHAN_AOP_LIST_HEADER
 	Liste des AOPs de %s:
 	  Num  Nick
 CHAN_AOP_CLEAR
-	La liste des AOPs est maintenant vide.
+	La liste des AOPs de %s est maintenant vide.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1187,7 +1187,7 @@ CHAN_HOP_LIST_HEADER
 	Liste des HOPs de %s:
 	  Num  Nick
 CHAN_HOP_CLEAR
-	La liste des HOPs est maintenant vide.
+	La liste des HOPs de %s est maintenant vide.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1218,7 +1218,7 @@ CHAN_SOP_LIST_HEADER
 	Liste des SOPs de %s:
 	  Num  Nick
 CHAN_SOP_CLEAR
-	La liste des SOPs est maintenant vide.
+	La liste des SOPs de %s est maintenant vide.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1249,7 +1249,7 @@ CHAN_VOP_LIST_HEADER
 	Liste des VOPs de %s:
 	  Num  Nick
 CHAN_VOP_CLEAR
-	La liste des VOPs est maintenant vide.
+	La liste des VOPs de %s est maintenant vide.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1298,7 +1298,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	La liste d'accès est maintenant vide.
+	La liste d'accès de %s est maintenant vide.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1345,7 +1345,7 @@ CHAN_AKICK_ENFORCE_DONE
 	L'application des entrées de la liste de kicks automatiques 
 	pour %s est terminé; %d utilisateurs étaient concernés.
 CHAN_AKICK_CLEAR
-	La liste de kicks automatiques est maintenant vide.
+	La liste de kicks automatiques de %s est maintenant vide.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

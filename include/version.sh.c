@@ -22,6 +22,7 @@
 long version_major, version_minor, version_patch, version_build, build;
 char *version_extra;
 char version[1024];
+char version_dotted[1024];
 
 
 void load_ctrl(FILE *);
@@ -45,9 +46,11 @@ int main()
     load_ctrl(fd);
     fclose(fd);
 
-    _snprintf(version, 1024, "%d.%d.%d%s", version_major, version_minor,
-              version_patch, version_extra ? version_extra : "");
+    _snprintf(version, 1024, "%d.%d.%d%s (%d)", version_major, version_minor,
+              version_patch, (version_extra ? version_extra : ""), version_build);
 
+    _snprintf(version_dotted, 1024, "%d.%d.%d%s.%d", version_major, version_minor,
+              version_patch, (version_extra ? version_extra : ""), version_build);
 
     fd = fopen("version.h", "r");
 
@@ -205,6 +208,8 @@ void parse_line(FILE * fd, char *line)
                     fprintf(fd, "%d", build);
                 else if (!strcmp(varbegin, "VERSION"))
                     fprintf(fd, "%s", version);
+                else if (!strcmp(varbegin, "VERSIONDOTTED"))
+                    fprintf(fd, "%s", version_dotted);
                 fputc(tmp, fd);
             }
             c = var;

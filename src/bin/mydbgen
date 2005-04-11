@@ -65,12 +65,14 @@ echo "What is your MySQL password?"
 echo $n "-> $c"
 stty -echo echonl
 read cc
+SQLPASS_PREFIX=""
 if [ ! -z "$cc" ] ; then
+	SQLPASS_PREFIX="-p"
 	SQLPASS=$cc
 fi
 stty $OLD_TTY
 
-mysqlshow -h$SQLHOST -u$SQLUSER >/dev/null 2>&1
+mysqlshow -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS >/dev/null 2>&1
 if test "$?" = "1" ; then
 	echo "Error: Unable to login, verify your login/password and hostname"
 	exit

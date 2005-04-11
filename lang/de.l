@@ -1159,12 +1159,12 @@ CHAN_AOP_DELETED_ONE
 CHAN_AOP_DELETED_SEVERAL
 	%d Einträge wurden von der %s AOP-Liste gelöscht.
 CHAN_AOP_LIST_EMPTY
-	Die %s AOP-Liste ist leer.
+	Die AOP-Liste von %s ist leer.
 CHAN_AOP_LIST_HEADER
 	AOP Liste für %s:
 	  Nummer  Nickname
 CHAN_AOP_CLEAR
-	Die %s AOP-Liste wurde geleert.
+	Die AOP-Liste von %s wurde geleert.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1188,9 +1188,9 @@ CHAN_HOP_DELETED
 CHAN_HOP_DELETED_ONE
 	1 Eintrag wurde von der %s HOP-Liste gelöscht.
 CHAN_HOP_DELETED_SEVERAL
-	%d Einträge wurdenvon der %s HOP-Liste gelöscht.
+	%d Einträge wurden von der %s HOP-Liste gelöscht.
 CHAN_HOP_LIST_EMPTY
-	Die %s HOP-Liste ist leer.
+	Die HOP-Liste von %s ist leer.
 CHAN_HOP_LIST_HEADER
 	HOP Liste für %s:
 	  Nummer  Nickname
@@ -1221,12 +1221,12 @@ CHAN_SOP_DELETED_ONE
 CHAN_SOP_DELETED_SEVERAL
 	%d Einträge wurden von der %s SOP-Liste gelöscht.
 CHAN_SOP_LIST_EMPTY
-	Die %s SOP-Liste ist leer.
+	Die SOP-Liste von %s ist leer.
 CHAN_SOP_LIST_HEADER
 	SOP Liste für %s:
 	  Nummer  Nickname
 CHAN_SOP_CLEAR
-	Die %s SOP-Liste wurde geleert.
+	Die SOP-Liste von %s wurde geleert.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1252,12 +1252,12 @@ CHAN_VOP_DELETED_ONE
 CHAN_VOP_DELETED_SEVERAL
 	%d Einträge wurden von der %s VOP-Liste gelöscht.
 CHAN_VOP_LIST_EMPTY
-	Die %s VOP-Liste ist leer.
+	Die VOP-Liste von %s ist leer.
 CHAN_VOP_LIST_HEADER
 	VOP Liste für %s:
 	  Nummer  Nickname
 CHAN_VOP_CLEAR
-	Die %s VOP-Liste wurde geleert.
+	Die VOP-Liste von %s wurde geleert.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1306,7 +1306,7 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
 CHAN_ACCESS_CLEAR
-	Die %s Access-Liste wurde geleert.
+	Die Access-Liste von %s wurde geleert.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1350,7 +1350,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE für %s erledigt. %d User betroffen.
 CHAN_AKICK_CLEAR
-	%s Autokick-Liste wurde geleert.
+	Die Autokick-Liste von %s wurde geleert.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX
@@ -2878,7 +2878,7 @@ OPER_MODULE_LOAD_SYNTAX
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD Modul-Name
 OPER_MODULE_LIST_HEADER
-	Aktuelle Modul - Liste:
+	Aktuelle Module - Liste:
 OPER_MODULE_LIST
 	Module: %s [%s]
 OPER_MODULE_LIST_FOOTER

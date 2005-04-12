@@ -1763,8 +1763,8 @@ static void collide(NickAlias * na, int from_timeout)
     if (ircd->svsnick) {
         /* We need to make sure the guestnick is free -- heinz */
         do {
-            snprintf(guestnick, sizeof(guestnick), "%s%d%d",
-                     NSGuestNickPrefix, getrandom32(), getrandom32());
+            snprintf(guestnick, sizeof(guestnick), "%s%d",
+                     NSGuestNickPrefix, getrandom16());
         } while (finduser(guestnick));
         notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
                     guestnick);

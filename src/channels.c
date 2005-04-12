@@ -1240,9 +1240,6 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
     if ((ci->flags & CI_VERBOTEN) || (*(c->name) == '+'))
         return;
 
-    if ((ci->flags & CI_SECURE) && !nick_identified(user))
-        return;
-
     status = chan_get_user_status(c, user);
 
     if (debug >= 2)
@@ -1268,8 +1265,9 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
     /* We check if every mode they have is legally acquired here, and remove
      * the modes that they're not allowed to have. But only if SECUREOPS is
      * on, because else every mode is legal. -GD
+     * Unless the channel has just been created. -heinz
      */
-    if (ci->flags & CI_SECUREOPS) {
+    if ((ci->flags & CI_SECUREOPS) || c->usercount == 1) {
         if (ircd->owner && (status & CUS_OWNER)
             &&
             !(((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))

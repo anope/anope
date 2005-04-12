@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="659"
+VERSION_BUILD="660"
 
 # $Log$
+#
+# BUILD : 1.7.8 (660)
+# BUGS  : 
+# NOTES : Added .BANNER file for the Config script
 #
 # BUILD : 1.7.8 (659)
 # BUGS  : N/A

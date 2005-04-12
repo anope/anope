@@ -74,6 +74,7 @@ Provided by DrStein <drstein@anope.org> - 2005
 03/17 A Improvements on Config script.                                    [ #00]
 03/17 A OS SET SQL ON shall warn about SQL disabled in services.conf      [ #00]
 03/15 A ChanServ will now include the channel name in SET's responses     [#318]
+04/12 F Introduction text data file was missing.                          [ #00]
 04/07 F NickServ shall give the correct response to GLIST/ALIST           [#345]
 03/15 F ChanServ's do_getkey() function is now using notice_lang()        [#319]
 03/14 F Updated docs/FAQ.                                                 [#312]

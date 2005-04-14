@@ -10,6 +10,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+04/14 F When setting multiple ops, SecureOps will check each user.        [#342]
 04/12 F Users channel modes are correctly set on join.                    [#342]
 04/11 F Make sure nick isn't in use on nickserv collide.                  [#341]
 04/07 F Added channel names to XOP/ACCESS/AKICK CLEAR                     [#346]

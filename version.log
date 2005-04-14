@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="661"
+VERSION_BUILD="662"
 
 # $Log$
+#
+# BUILD : 1.7.8 (662)
+# BUGS  : 342
+# NOTES : I should know that real_av and av are not identical, thanks for pointing that out heinz :P
 #
 # BUILD : 1.7.8 (661)
 # BUGS  : 341 342

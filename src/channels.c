@@ -297,7 +297,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             real_ac--;
             real_av++;
             for (i = 0; i < real_ac; i++) {
-                if ((user = find_user(*real_av)) && is_on_chan(chan, user))
+                if ((user = finduser(*real_av)) && is_on_chan(chan, user))
                     chan_set_correct_modes(user, chan, 0);
                 real_av++;
             }

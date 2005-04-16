@@ -1,5 +1,5 @@
 #
-# Anope IRC Services 1.7.8 for Windows
+# Anope IRC Services 1.7.9 for Windows
 #
 #  Contact us at info@anope.org
 #
@@ -44,7 +44,6 @@ DB_ENCRYPTION=0
 # If you want to change the names/locations of files/folders, you
 # can do that here.
 PROGRAM=anope.exe
-BINDEST=bin
 DATDEST=data
 
 # If you are compiling using VC6, or get __ftol2 errors, please uncomment
@@ -53,11 +52,13 @@ DATDEST=data
 
 # If you are getting errors such as 'Cannot find wsock32.lib', then change
 # the following line to the path where the library files can be found.
-#LIBPATH=C:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\lib
+#
+# Eg: LIBPATH=C:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\lib
+#
 LIBPATH=
 
 # If you edited the line above, uncomment the next line.
-LFLAGS=/LIBPATH:"$(LIBPATH)"
+#LFLAGS=/LIBPATH:"$(LIBPATH)"
 
 
 ###############################################################

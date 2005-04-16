@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+04/16 I Changed subversion format from bdb to fsfs.                       [ #00]
 03/25 A Added nickserv suspend/unsuspend command.                         [ #00]
 03/25 A Added check for UID in anoperc. Stops running as root.            [ #00]
 03/11 A Event for database backups.                                       [ #00]

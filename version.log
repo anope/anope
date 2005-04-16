@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="686"
+VERSION_BUILD="687"
 
 # $Log$
+#
+# BUILD : 1.7.8 (687)
+# BUGS  : N/A
+# NOTES : Another heinz makefile.win32 patch :)
 #
 # BUILD : 1.7.8 (686)
 # BUGS  : N/A

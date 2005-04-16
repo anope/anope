@@ -13,7 +13,7 @@ include Makefile.inc.win32
 
 ###########################################################################
 
-all: src languages anopesmtp modules install
+all: src languages tools modules install
 
 src: include\version.h include\sysconf.h include\language.h include\sysconf.h
         cd src && $(MAKE) && cd ..
@@ -25,16 +25,17 @@ install:
         cd lang && $(MAKE) install && cd ..
         cd src && $(MAKE) install && cd ..
         cd src\modules && $(MAKE) install && cd ..
-		cd src\modules && $(MAKE) subs-install && cd ..
+        cd src\modules && $(MAKE) subs-install && cd ..
         -@echo ---
         -@echo Anope has been insalled successfully!
+        -@echo See docs/INSTALL for details on how to configure Anope for use.
         -@echo ---
         
 clean:
-        cd src && $(MAKE) spotless && cd ..
         cd lang && $(MAKE) spotless && cd ..
-        -@erase *.exe version.h *.obj
+        cd src && $(MAKE) spotless && cd ..
         cd src\modules && $(MAKE) spotless && cd ..\..
+        -@erase *.exe version.h *.obj
 
 spotless:
         cd lang && $(MAKE) spotless && cd ..
@@ -131,8 +132,8 @@ dist:
 languages: FRC
         cd lang && $(MAKE) && cd ..
 
-anopesmtp: FRC
-        $(CC) src\tools\anopesmtp.c /link wsock32.lib $(LFLAGS)
+tools: FRC
+        cd src\tools && $(MAKE) && cd ..\..
 
 modules: FRC
         cd src\modules && $(MAKE) && cd ..\..

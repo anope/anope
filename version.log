@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="687"
+VERSION_BUILD="707"
 
 # $Log$
+#
+# BUILD : 1.7.8 (707)
+# BUGS  : 
+# NOTES : Added src/tools/Makefile.win32, which was missing since last commit
 #
 # BUILD : 1.7.8 (687)
 # BUGS  : N/A

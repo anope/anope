@@ -1908,7 +1908,7 @@ BOT_SEEN_NEVER
 	Ik heb %s nooit op dit kanaal gezien.
 BOT_SEEN_UNKNOWN
 	Ik weet niet wie %s is.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick gebruiker host echte naam
@@ -2843,7 +2843,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Huidige Module lijst:
 OPER_MODULE_LIST
-	Module: %s [%s]
+	Module: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules geladen.
 OPER_MODULE_INFO_LIST
@@ -3240,6 +3240,56 @@ HELP_HELP_HOST
 # NickServ help messages
 #
 ###########################################################################
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Registreer een nickname
+NICK_HELP_CMD_GROUP
+	    GROUP      Bij een groep aanmelden
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Jezelf identificeren met je wachtwoord
+NICK_HELP_CMD_ACCESS
+	    ACCESS     De lijst met toegestane adressen wijzigen
+NICK_HELP_CMD_SET
+	    SET        Opties instellen, inclusief kill bescherming
+NICK_HELP_CMD_DROP
+	    DROP       De registratie van je nickname annuleren
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Een andere gebruiker killen die je nick gebruikt
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Je nick terugnemen nadat je RECOVER gebruikt hebt
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Je wachtwoord vergeten? Probeer dit
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Bekijk het wachtwoord voor een nick
+	               (alleen als encryptie is uitgeschakeld)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Voorkom dat een nick gebruikt wordt
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
 
 NICK_HELP
 	%S stelt je in staat een nickname te "registreren", en
@@ -3249,18 +3299,7 @@ NICK_HELP
 	Voor meer informatie over een specifiek commando, type
 	/msg %S HELP commando.
 	
-	    REGISTER   Registreer een nickname
-	    GROUP      Bij een groep aanmelden
-	    IDENTIFY   Jezelf identificeren met je wachtwoord
-	    ACCESS     De lijst met toegestane adressen wijzigen
-	    SET        Opties instellen, inclusief kill bescherming
-	    DROP       De registratie van je nickname annuleren
-	    RECOVER    Een andere gebruiker killen die je nick gebruikt
-	    RELEASE    Je nick terugnemen nadat je RECOVER gebruikt hebt
-	    SENDPASS   Je wachtwoord vergeten? Probeer dit
-	
-	Andere commando's: GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	OPMERKING: Deze service is bedoeld om IRC gebruikers een weg
 	te bieden om te verzekeren dat hun identiteit niet in gevaar komt.
 	Het is NIET bedoeld om het "stelen" van nicknames of andere
@@ -3668,13 +3707,6 @@ NICK_HELP_SENDPASS
 	Dit commando is alleen beschikbaar als encryptie is uitgeschakeld.
 
 NICK_SERVADMIN_HELP
-	
-	De volgende commando's zijn beschikbaar voor Services admins:
-	
-	    GETPASS    Bekijk het wachtwoord voor een nick
-	                   (alleen als encryptie is uitgeschakeld)
-	    FORBID     Voorkom dat een nick gebruikt wordt
-	
 	Services admins kunnen ook de registratie van elke nick
 	opheffen zonder zich voor die nick te identificeren, en
 	mogen de toegangslijst voor elke nick bekijken.
@@ -3846,6 +3878,87 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Haal het stichter-wachtwoord voor een kanaal op
+CHAN_HELP_CMD_FORBID
+	    FORBID     Verbied het gebruik van een kanaal
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Stel een kanaal tijdelijk buiten werking terwijl de
+	               kanaal-data en -instellingen bewaard blijven.
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Stelt een tijdelijk buiten werking gesteld kanaal weer
+	               in werking
+CHAN_HELP_CMD_STATUS
+	    STATUS     Geeft het huidige toegangsniveau van een gebruiker
+	               op een kanaal weer
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Registreer een kanaal
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Identificeer jezelf met je wachtwoord
+CHAN_HELP_CMD_SET
+	    SET        Stel kanaal opties en informatie in
+CHAN_HELP_CMD_AOP
+	    AOP        Wijzig de lijst van AOP's
+CHAN_HELP_CMD_SOP
+	    SOP        Wijzig de lijst van SOP's
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Wijzig de lijst van toegestane gebruikers
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Verander de betekenissen van toegangsniveaus
+CHAN_HELP_CMD_AKICK
+	    AKICK      Beheer de AutoKick lijst
+CHAN_HELP_CMD_DROP
+	    DROP       Annuleer een kanaalregistratie
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Wachtwoord vergeten?
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	%S stelt je in staat om kanalen te registreren en er
@@ -3855,43 +3968,8 @@ CHAN_HELP
 	Beschikbare commando's staan hier beneden; om ze te gebruiken
 	type je /msg %S commando. Voor meer informatie over een
 	specifiek commando type je /msg %S HELP commando.
+	 
 	
-	    REGISTER   Registreer een kanaal
-	    IDENTIFY   Identificeer jezelf met je wachtwoord
-	    SET        Stel kanaal opties en informatie in
-	    AOP        Wijzig de lijst van AOP's
-	    SOP        Wijzig de lijst van SOP's
-	    ACCESS     Wijzig de lijst van toegestane gebruikers
-	    LEVELS     Verander de betekenissen van toegangsniveaus
-	    AKICK      Beheer de AutoKick lijst
-	    DROP       Annuleer een kanaalregistratie
-	    SENDPASS   Wachtwoord vergeten?
-	
-	Overige commando's: BAN, CLEAR, DEOP, DEVOICE, GETKEY,
-	                    INFO, INVITE, KICK, LIST, LOGOUT, OP,
-	                    TOPIC, UNBAN, VOICE, VOP
-
-CHAN_HELP_UNREAL
-	
-	Deze commando's zijn ook beschikbaar op dit netwerk:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Deze commando's zijn ook beschikbaar op dit netwerk:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Onthoud dat elk kanaal wat %d dagen ongebruikt is (dwz dat
@@ -4742,18 +4820,6 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	De volgende commando's zijn beschikbaar voor services administrators:
-	
-	    GETPASS    Haal het stichter-wachtwoord voor een kanaal op
-	                   (alleen als encryptie is uitgeschakeld)
-	    FORBID     Verbied het gebruik van een kanaal
-	    SUSPEND    Stel een kanaal tijdelijk buiten werking terwijl de
-	                   kanaal-data en -instellingen bewaard blijven.
-	    UNSUSPEND  Stelt een tijdelijk buiten werking gesteld kanaal weer
-	                   in werking
-	    STATUS     Geeft het huidige toegangsniveau van een gebruiker
-	                   op een kanaal weer
-	
 	Services administrators kunnen ook elk kanaal dropped zonder dat
 	ze hoeven te indentificeren via een wachtwoord, en kunnen de
 	toegangs-, AKICK-, en niveau-lijsten bekijken voor elk kanaal.
@@ -4878,8 +4944,30 @@ CHAN_SERVADMIN_HELP_STATUS
 # MemoServ help messages
 #
 ###########################################################################
+MEMO_HELP_CMD_SEND
+	    SEND   Vertstuur een memo naar een nick of kanaal
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Annuleer je laatst verzonden memo
+MEMO_HELP_CMD_LIST
+	    LIST   Geef je memo's weer
+MEMO_HELP_CMD_READ
+	    READ   Lees een of meerdere memo's
+MEMO_HELP_CMD_DEL
+	    DEL    Verwijder een of meerdere memo's
+MEMO_HELP_CMD_SET
+	    SET    Stel opties gerelateerd aan memo's in
+MEMO_HELP_CMD_INFO
+	    INFO   Toont info over jouw memo's
+MEMO_HELP_CMD_RSEND
+	    RSEND  Verstuur een memo en verzoek een ontvangstbevestiging
+MEMO_HELP_CMD_CHECK
+	    CHECK  Kijk of je laatste memo naar iemand is gelezen
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Stuur een memo naar alle geregistreerde gebruikers 
+MEMO_HELP_CMD_STAFF
+	    STAFF  Stuur een memo naar alle opers/admin
 
-MEMO_HELP
+MEMO_HELP_HEADER
 	%S is een services die IRC gebruikers in staat stelt om
 	korte berichten te sturen naar andere IRC gebruikers, online
 	of offline, of naar kanalen(*). De verstuurder's nick en de
@@ -4888,22 +4976,11 @@ MEMO_HELP
 	
 	%S's commando's bevatten:
 	
-	    SEND   Vertstuur een memo naar een nick of kanaal
-	    CANCEL Annuleer je laatst verzonden memo
-	    LIST   Geef je memo's weer
-	    READ   Lees een of meerdere memo's
-	    DEL    Verwijder een of meerdere memo's
-	    SET    Stel opties gerelateerd aan memo's in
-	    INFO   Toont info over jouw memo's
-	    RSEND  Verstuur een memo en verzoek een ontvangstbevestiging
-	    CHECK  Kijk of je laatste memo naar iemand is gelezen
 
 MEMO_HELP_ADMIN
-	    SENDALL  Stuur een memo naar alle geregistreerde gebruikers 
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Stuur een memo naar alle opers/admin
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	Type /msg %S HELP commando voor hulp bij een van
@@ -5106,82 +5183,91 @@ MEMO_HELP_CHECK
 #
 ###########################################################################
 
-OPER_HELP
-	%S commando's:
+OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Stuurt een bericht naar alle gebruikers
+OPER_HELP_CMD_STATS
 	    STATS       Geeft de status van Services en netwerk weer
-	    OPER LIST   Geeft alle Services operators weer
-	    ADMIN LIST  Geeft alle Services admins weer
-	    STAFF       Display Services staff and online status
-
-OPER_HELP_OPER_CMD
-	Commando's beschikbaar voor Services operators en administrators:
-	    MODE        Verander de modes op een kanaal
-	    KICK        Kick een gebruiker uit een kanaal
-	    CLEARMODES  Verwijder alle modes van een kanaal
-	    KILLCLONES  Kill alle gebruikers met een bepaalde hostmask
-	    AKILL       Beheer de AKILL lijst
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Beheer de SGLINE lijst
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Beheer de SQLINE lijst
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Beheer de SZLINE lijst
-
-OPER_HELP_ADMIN_CMD
-	Commando's beschikbaar voor Services administrators:
+OPER_HELP_CMD_OPER
 	    OPER        Wijzig de Services operator lijst
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Wijzig de Services Administrator lijst
+OPER_HELP_CMD_STAFF
+	    STAFF       Display Services staff and online status
+OPER_HELP_CMD_MODE
+	    MODE        Verander de modes op een kanaal
+OPER_HELP_CMD_KICK
+	    KICK        Kick een gebruiker uit een kanaal
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Verwijder alle modes van een kanaal
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Kill alle gebruikers met een bepaalde hostmask
+OPER_HELP_CMD_AKILL
+	    AKILL       Beheer de AKILL lijst
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Beheer de SGLINE lijst
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Beheer de SQLINE lijst
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Beheer de SZLINE lijst
+OPER_HELP_CMD_CHANLIST
 	    CHANLIST    Geef alle kanalen weer
+OPER_HELP_CMD_USERLIST
 	    USERLIST    Geef alle gebruikers weer
+OPER_HELP_CMD_LOGONNEWS
 	    LOGONNEWS   Stel de berichten in die gebruikers krijgen als
-	                    ze inloggen
+	                ze inloggen
+OPER_HELP_CMD_RANDOMNEWS
 	    RANDOMNEWS  Stel de berichten in waarvan gebruikers er willekeurig
-	                    een te zien krijgen als ze inloggen
+	                een te zien krijgen als ze inloggen
+OPER_HELP_CMD_OPERNEWS
 	    OPERNEWS    Stel de berichten in die gebruikers te zien krijgen
 	                die OPER worden
+OPER_HELP_CMD_SESSION
 	    SESSION     Bekijk de lijst met sessies per host
+OPER_HELP_CMD_EXCEPTION
 	    EXCEPTION   Beheer de sessie-limiet uitzonderingen lijst
-	    CACHE       Geeft de hostname cache weer die gebruikt wordt door
-	                    de proxy detectie.
+OPER_HELP_CMD_NOOP
 	    NOOP        Verwijder tijdelijk alle O:regels van een server
 	                op afstand
+
+OPER_HELP_CMD_JUPE
 	    JUPE        "Jupiter" een server
+OPER_HELP_CMD_IGNORE
 	    IGNORE      Wijzig de Services negeer-lijst
+OPER_HELP_CMD_SET
 	    SET         Stel verscheidene globale Services opties in
+OPER_HELP_CMD_RELOAD
 	    RELOAD      Herlaad Services' configuratie bestand
+OPER_HELP_CMD_UPDATE
 	    UPDATE      Forceer dat de Services database onmiddelijk
-	                    op de harde schijf wordt weggeschreven
+	                op de harde schijf wordt weggeschreven
+OPER_HELP_CMD_RESTART
 	    RESTART     Sla databases op en herstart Services
+OPER_HELP_CMD_QUIT
 	    QUIT        Sluit Services af zonder databases op te slaan
+OPER_HELP_CMD_SHUTDOWN
 	    SHUTDOWN    Sla databases op en sluit Services af
-	
-	Commando's beschikbaar voor Services super-gebruikers:
-	    ADMIN       Wijzig de Services Administrator lijst
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulate the DefCon system
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kill all users on a specific channel
+OPER_HELP_CMD_OLINE
 	    OLINE       Geef Operflags aan een bepaalde gebruiker
-
-OPER_HELP_ADMIN_CMD_UMODE
+OPER_HELP_CMD_UMODE
 	    UMODE       Wijzigt de modus van een gebruiker
-
-OPER_HELP_ADMIN_CMD_SVSNICK
+OPER_HELP_CMD_SVSNICK
 	    SVSNICK     Forcefully change a user's nickname
-
-OPER_HELP_ROOT_CMD
-	Commando's beschikbaar voor Services Roots:
+OPER_HELP_CMD_MODLOAD
 	    MODLOAD     Laad een module
+OPER_HELP_CMD_MODUNLOAD
 	    MODUNLOAD   Ontlaad een module
-	    MODLIST     Geef geladen modules weer
+OPER_HELP_CMD_MODINFO
 	    MODINFO     Info over een geladen module
+OPER_HELP_CMD_MODLIST
+	    MODLIST     Geef geladen modules weer
+
+OPER_HELP
+	%S commando's:
 
 OPER_HELP_LOGGED
 	Waarschuwing: Alle commando's die naar %S gestuurd worden worden gelogd!
@@ -5802,7 +5888,29 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-	
+
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Geef beschikbare bots weer
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Wijs een bot toe aan een kanaal
+BOT_HELP_CMD_SET
+	SET                Configureer bot opties
+BOT_HELP_CMD_KICK
+	KICK               Configureer kickers
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Beheer slechte-woorden lijst
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Beheer de lijst met bots op het netwerk
+
 BOT_HELP
 	%S stelt je in staat een bot op je eigen kanaal te hebben.
 	Het is gemaakt voor gebruikers die geen eigen bot kunnen
@@ -5812,14 +5920,7 @@ BOT_HELP
 	/msg %S commando typen. Voor meer informatie over een
 	specifiek commando moet je /msg %S HELP command typen.
 	
-	BOTLIST            Geef beschikbare bots weer
-	ASSIGN             Wijs een bot toe aan een kanaal
-	SET                Configureer bot opties
-	KICK               Configureer kickers
-	BADWORDS           Beheer slechte-woorden lijst
-	
-	Overige commando's: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	Bot zal een kanaal joinen wanneer daar tenminste %d
 	gebruiker(s) is/zijn.
 	
@@ -6084,17 +6185,10 @@ BOT_HELP_ACT
 	Laat de bot een "/me" commando doen op het gegeven kanaal
 	met de gegeven tekst.
 
-BOT_SERVADMIN_HELP
-	
-	Het volgende commando is beschikbaar voor Services administrators:
-	
-	    BOT              Beheer de lijst met bots op het netwerk
-
 BOT_SERVADMIN_HELP_BOT
 	Gebruik: BOT ADD nick gebruiker host echte naam
 	         BOT CHANGE oldnick newnick [gebruiker [host [echte naam]]]
 	         BOT DEL nick
-	         BOT LIST
 	
 	Stelt Services administrators in staat om bots te maken,
 	wijzigen en verwijderen die gebruikers op hun eigen kanaal
@@ -6107,8 +6201,6 @@ BOT_SERVADMIN_HELP_BOT
 	naam van een bot veranderen zonder deze (en de date die
 	met de bot geassocieerd is) te verwijderen.
 	BOT DEL verwijdert de gegeven bot van de bot lijst.
-	BOT LIST is een synoniem van BOTLIST en geeft gewoon
-	alle beschikbare bots op het netwerk weer.
 	
 	Let op: Als je een bot maakt die een nick heeft die momenteel
 	in gebruiker is zal de betreffende gebruiker worden gekilled.
@@ -6221,22 +6313,38 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commando'ss:
+HOST_HELP_CMD_ON
 	    ON          Activeert je toegewezen vhost
+
+HOST_HELP_CMD_OFF
 	    OFF         Deactiveert je toegewezen vhost
+
+HOST_HELP_CMD_GROUP
 	    GROUP       Stelt de vhost voor all nicks in een groep gelijk
 
-HOST_OPER_HELP
-	Commando's beschikbaar voor Services operators:
+HOST_HELP_CMD_SET
 	    SET         Stel de vhost van een andere gebruiker in
+
+HOST_HELP_CMD_SETALL
 	    SETALL      Stel de vhost voor alle nicks in een groep in
+
+HOST_HELP_CMD_DEL
 	    DEL         Verwijder de vhost van een andere gebruiker
+
+HOST_HELP_CMD_DELALL
 	    DELALL      Verwijder de vhost voor alle nicks in een groep
+
+HOST_HELP_CMD_LIST
 	    LIST        Geeft een of meer vhosts weer.
 
+HOST_HELP
+	%S commando'ss:
+
+HOST_OPER_HELP
+	not used.
+
 HOST_ADMIN_HELP
-	Commando's beschikbaar voor Services administrators:
+	not used.
 
 HOST_HELP_ON
 	Gebruik: ON

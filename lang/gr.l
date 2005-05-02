@@ -1913,7 +1913,7 @@ BOT_SEEN_NEVER
 	Δεν έχω δει κανέναν %s σε αυτό το κανάλι.
 BOT_SEEN_UNKNOWN
 	Δεν ξέρω κανέναν %s ποιος είναι.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick user host real
@@ -2877,7 +2877,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Current Module list:
 OPER_MODULE_LIST
-	Module: %s [%s]
+	Module: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules loaded.
 OPER_MODULE_INFO_LIST
@@ -3263,6 +3263,57 @@ HELP_HELP_HOST
 # NickServ help messages
 #
 ###########################################################################
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Κατοχυρώνει ένα ψευδώνυμο
+NICK_HELP_CMD_GROUP
+	    GROUP      Μπένετε σε ομάδα ψευδώνυμου
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Σας αναγνωρίζει με τη χρήση κωδικού
+NICK_HELP_CMD_ACCESS
+	    ACCESS     Αλλάζει τη λίστα των εξουσιοδοτημένων διευθύνσεων
+NICK_HELP_CMD_SET
+	    SET        Αλλαγή επιλογών, συμπεριλαμβάνεται η προστασία με αποσύνδεση
+NICK_HELP_CMD_DROP
+	    DROP       Διαγράφει ένα ψευδώνυμο
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Αποσύνδεση ενός άλλου χρήστη που έχει πάρει το ψευδώνυμό σας
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Ανάκτηση της κατακράτησης του ψευδωνύμου,μετά από RECOVER
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Ξέχασες τον κωδικό? Δοκίμασε αυτό και θα στο στείλουμε εμείς
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Εμφανίζει τον κωδικό για το συγκεκριμένο ψευδώνυμο
+	               (μόνο αν η κωδικοποίηση είναι ανενεργή)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Καταστέλει ένα ψευδώνυμο,δηλ το κάνει να μην το χρησιμοποιεί
+	               κανείς,όποιος το πάρει έχει kill
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
 
 NICK_HELP
 	O %S σας επιτρέπει να κατοχυρώσετε ένα ψευδώνυμο,
@@ -3272,18 +3323,7 @@ NICK_HELP
 	Για περισσότερες πληροφορίες σε μια συγκεκριμένη εντολή,γράψτε
 	/msg %S HELP ^_command^_.
 	
-	    REGISTER   Κατοχυρώνει ένα ψευδώνυμο
-	    GROUP      Μπένετε σε ομάδα ψευδώνυμου
-	    IDENTIFY   Σας αναγνωρίζει με τη χρήση κωδικού
-	    ACCESS     Αλλάζει τη λίστα των εξουσιοδοτημένων διευθύνσεων
-	    SET        Αλλαγή επιλογών, συμπεριλαμβάνεται η προστασία με αποσύνδεση
-	    DROP       Διαγράφει ένα ψευδώνυμο
-	    RECOVER    Αποσύνδεση ενός άλλου χρήστη που έχει πάρει το ψευδώνυμό σας
-	    RELEASE    Ανάκτηση της κατακράτησης του ψευδωνύμου,μετά από RECOVER
-	    SENDPASS   Ξέχασες τον κωδικό? Δοκίμασε αυτό και θα στο στείλουμε εμείς
-	
-	’λλες εντολές: GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	ΠΑΡΑΤΗΡΗΣΗ: Αυτή η υπηρεσία σκοπεύει να παρέχει ένα τρόπο
 	στους χρήστες του δικτύου, να διασφαλίσουν ότι η ταυτότητά
 	τους δεν εκτίθεται.  ΔΕΝ υφίσταται για να εξυπηρετεί ή να
@@ -3712,14 +3752,6 @@ NICK_HELP_SENDPASS
 	Αυτή η εντολή είναι αδύνατη αν έχει ενεργοποιηθεί η κωδικοποίηση των κωδικών.
 	
 NICK_SERVADMIN_HELP
-	
-	Οι παρακάτω εντολές είναι διαθέσιμες για τους (επικεφαλείς) Services admins:
-	
-	    GETPASS    Εμφανίζει τον κωδικό για το συγκεκριμένο ψευδώνυμο
-	                   (μόνο αν η κωδικοποίηση είναι ανενεργή)
-	    FORBID     Καταστέλει ένα ψευδώνυμο,δηλ το κάνει να μην το χρησιμοποιεί
-	       κανείς,όποιος το πάρει έχει kill
-	
 	Οι Services admins (επικεφαλείς) μπορούν να διαγράψουν ένα ψευδώνυμο χωρίς να
 	χρειαστεί να κάνουν εντολή αναγνώρισης και καν αλλαγή ψευδώνυμου, και μπορούν να
 	δουν την  λίστα access  για κάθε ψευδώνυμο (/msg %S ACCESS LIST nick).
@@ -3873,6 +3905,87 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Βλέπεις τον κωδικό του συγκεκριμένου καναλιού
+CHAN_HELP_CMD_FORBID
+	    FORBID     Καταστέλει το κανάλι,δεν μπορεί να το χρησιμοποιήση κανείς
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Prevent a channel from being used preserving
+	               channel data and settings
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Releases a suspended channel
+CHAN_HELP_CMD_STATUS
+	    STATUS     Επιστρέφει την συγκεκριμένη access level του χρήστη στο
+	               κανάλι
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Κατοχυρώνει ένα κανάλι
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Σας αναγνωρίζει με κωδικό
+CHAN_HELP_CMD_SET
+	    SET        Ρυθμίζει τις επιλογές και τις πληροφορίες
+	               του καναλιού	
+CHAN_HELP_CMD_AOP
+	    AOP        Αλλάζει την λίστα των AOP χρηστών
+CHAN_HELP_CMD_SOP
+	    SOP        Αλλάζει την λίστα των SOP χρηστών
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Αλλάζει τη λίστα των εξουσιοδοτημένων χρηστών
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Επανακαθορίζει το νόημα των επιπέδων πρόσβασης
+CHAN_HELP_CMD_AKICK
+	    AKICK      Συντηρεί τη λίστα αυτόματης απόρριψης
+CHAN_HELP_CMD_DROP
+	    DROP       Ακυρώνει την κατοχύρωση ενός καναλιού
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Στέλνει τον χαμένο κωδικό του καναλιού
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	Ο %S σας επιτρέπει να κατοχυρώσετε και να χειριστείτε
@@ -3883,44 +3996,8 @@ CHAN_HELP
 	παρακάτω.  Για να τις χρησιμοποιήσετε, πληκτρολογήστε
 	/msg %S εντολή.  Για περισσότερες πληροφορίες σε μία
 	συγκεκριμένη εντολή, πληκτρολογήστε /msg %S HELP εντολή.
+	 
 	
-	    REGISTER   Κατοχυρώνει ένα κανάλι
-	    IDENTIFY   Σας αναγνωρίζει με κωδικό
-	    SET        Ρυθμίζει τις επιλογές και τις πληροφορίες
-	           του καναλιού	
-	    AOP        Αλλάζει την λίστα των AOP χρηστών
-	    SOP        Αλλάζει την λίστα των SOP χρηστών
-	    ACCESS     Αλλάζει τη λίστα των εξουσιοδοτημένων χρηστών
-	    LEVELS     Επανακαθορίζει το νόημα των επιπέδων πρόσβασης
-	    AKICK      Συντηρεί τη λίστα αυτόματης απόρριψης
-	    DROP       Ακυρώνει την κατοχύρωση ενός καναλιού
-	    SENDPASS   Στέλνει τον χαμένο κωδικό του καναλιού
-	
-	’λλες εντολές: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
-	                INVITE, KICK, LIST, LOGOUT, OP, TOPIC,
-	                UNBAN, VOICE, VOP
-
-CHAN_HELP_UNREAL
-	
-	Αυτές οι εντολές είναι διαθέσιμες αε αυτό το δίκτυο:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Αυτές οι εντολές είναι διαθέσιμες αε αυτό το δίκτυο:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Σημείωση: οποιοδήποτε κανάλι δεν χρησιμοποιείται για %d μέρες
@@ -4736,15 +4813,6 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Οι επόμενες εντολές είναι μόνο για Services admins:
-	
-	    GETPASS    Βλέπεις τον κωδικό του συγκεκριμένου καναλιού
-	                   (μόνο αν η κωδικοποίηση είναι απενεργοποιημένη)
-	    FORBID     Καταστέλει το κανάλι,δεν μπορεί να το χρησιμοποιήση κανείς
-	    STATUS     Επιστρέφει την συγκεκριμένη access level του χρήστη στο
-	                   κανάλι
-	    CLIST      Εμφανίζει τα κανάλια που είναι founder ένα ψευδώνυμο
-	
 	Οι Services admins μπορούν να διαγράψουν οποιοδήποτε κανάλι,  χωρίς να κάνουν
 	εντολή αναγνώρισης μέσω κωδικού, μπορούν να δούν την access, AKICK,
 	και τα level οποιουδήποτε καναλιού.
@@ -4865,7 +4933,30 @@ CHAN_SERVADMIN_HELP_STATUS
 #
 ###########################################################################
 
-MEMO_HELP
+MEMO_HELP_CMD_SEND
+	    SEND   Στέλνει ένα μήνυμα σε ένα ψευδώνυμο ή ένα κανάλι
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Ακυρώνει το τελευταίο μήνυμα που στέλνετε
+MEMO_HELP_CMD_LIST
+	    LIST   Εμφανίζει λίστα με τα μηνύματα σας
+MEMO_HELP_CMD_READ
+	    READ   Διαβάζει ένα ή πολλά μηνύματα
+MEMO_HELP_CMD_DEL
+	    DEL    Διαγράφει ένα ή πολλά μηνύματα
+MEMO_HELP_CMD_SET
+	    SET    Αλλάζει τις επιλογές των μηνυμάτων
+MEMO_HELP_CMD_INFO
+	    INFO   Displays information about your memos
+MEMO_HELP_CMD_RSEND
+	    RSEND  Sends a memo and requests a read receipt
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Send a memo to all registered users
+MEMO_HELP_CMD_STAFF
+	    STAFF  Send a memo to all opers/admins
+
+MEMO_HELP_HEADER
 	Ο %S είναι μια υπηρεσία που επιτρέπει στους χρήστες
 	του IRC να στέλνουν μικρά γραπτά μηνύματα σε άλλους χρήστες
 	του δικτύου (είτε βρίσκονται συνδεδεμένοι εκείνη τη στιγμή,
@@ -4875,19 +4966,11 @@ MEMO_HELP
 	
 	Οι εντολές του %S είναι:
 	
-	    SEND   Στέλνει ένα μήνυμα σε ένα ψευδώνυμο ή ένα κανάλι
-	    CANCEL Ακυρώνει το τελευταίο μήνυμα που στέλνετε
-	    LIST   Εμφανίζει λίστα με τα μηνύματα σας
-	    READ   Διαβάζει ένα ή πολλά μηνύματα
-	    DEL    Διαγράφει ένα ή πολλά μηνύματα
-	    SET    Αλλάζει τις επιλογές των μηνυμάτων
 
 MEMO_HELP_ADMIN
-	    SENDALL  Send a memo to all registered users
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Send a memo to all opers/admins
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	Γράψτε /msg %S HELP εντολή για βοήθεια σε
@@ -5095,82 +5178,91 @@ MEMO_HELP_CHECK
 #
 ###########################################################################
 
-OPER_HELP
-	Οι εντολές του %S είναι::
+OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Στέλνει μήνυμα σε όλους τους χρήστες
+OPER_HELP_CMD_STATS
 	    STATS       Δείχνει στατιστικά σχετικά με τα Services και το δίκτυο
-	    OPER LIST   Εμφανίζει όλους τους Services operators
-	    ADMIN LIST  Εμφανίζει όλους τους Services admins
-	    STAFF       Display Services staff and online status
-
-OPER_HELP_OPER_CMD
-	Διαθέσιμες εντολές για τους Services operators και admins μόνο:
-	    MODE        Αλλάζει modes σε κανάλι και άλλα
-	    KICK        Απομακρύνει το χρήστη από το κανάλι
-	    CLEARMODES  Καθαρίζει τα modes από το κανάλι
-	    KILLCLONES  Σκοτώνει όλους τους χρήστες που έχουν το ίδιο host
-	    AKILL       Προσθέτει ip κλπ στην λίστα AKILL
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Προσθέτει ip στην λίστα SGLINE
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Προσθέτει ip στην λίστα SQLINE
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Προσθέτει ip στην λίστα SZLINE
-
-OPER_HELP_ADMIN_CMD
-	Διαθέσιμες εντολές για τους Services admins μόνο:
+OPER_HELP_CMD_OPER
 	    OPER        Αλλάζει την λίστα των Services operator
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Αλλάζει την λίστα των Services admin
+OPER_HELP_CMD_STAFF
+	    STAFF       Display Services staff and online status
+OPER_HELP_CMD_MODE
+	    MODE        Αλλάζει modes σε κανάλι και άλλα
+OPER_HELP_CMD_KICK
+	    KICK        Απομακρύνει το χρήστη από το κανάλι
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Καθαρίζει τα modes από το κανάλι
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Σκοτώνει όλους τους χρήστες που έχουν το ίδιο host
+OPER_HELP_CMD_AKILL
+	    AKILL       Προσθέτει ip κλπ στην λίστα AKILL
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Προσθέτει ip στην λίστα SGLINE
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Προσθέτει ip στην λίστα SQLINE
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Προσθέτει ip στην λίστα SZLINE
+OPER_HELP_CMD_CHANLIST
 	    CHANLIST    Εμφανίζει όλα τα κανάλια
+OPER_HELP_CMD_USERLIST
 	    USERLIST    Εμφανίζει όλους τους χρήστες
+OPER_HELP_CMD_LOGONNEWS
 	    LOGONNEWS   Αλλάζεις τα μηνύματα που θα εμφανίζονται όταν αυτοί θα μπένουν
 	        στο δίκτυο
+OPER_HELP_CMD_RANDOMNEWS
 	    RANDOMNEWS  Αλλάζεις τα τυχαία επιλεγόμενα μηνύματα που θα εμφανίζονται 
 	                    όταν αυτοί θα μπένουν στο δίκτυο
+OPER_HELP_CMD_OPERNEWS
 	    OPERNEWS    Αλλάζεις τα μηνύματα που θα εμφανίζονται στους χρήστες που
 	        γίνονται oper
+OPER_HELP_CMD_SESSION
 	    SESSION     Βλέπεις την λίστα με τα host sessions
+OPER_HELP_CMD_EXCEPTION
 	    EXCEPTION   Αλλάζεις την λίστα του session-limit exception
-	    CACHE       Βλέπεις την λίστα με το hostname cache που χρησιμοποιούνται
-	        από τον proxy detector
+OPER_HELP_CMD_NOOP
 	    NOOP        Αφαιρεί προσωρινά όλες τις O:γραμμές από τον server 
 	                    αυτόματα
+OPER_HELP_CMD_JUPE
 	    JUPE        "Jupiter" σε server
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Modify the Services ignore list
+OPER_HELP_CMD_SET
 	    SET         Ρυθμίζεις διάφορες επιλογές των Services
+OPER_HELP_CMD_RELOAD
 	    RELOAD      Ξαναφορτώνει το services' configuration αρχείο
+OPER_HELP_CMD_UPDATE
 	    UPDATE      Ενεργούν τα Services (βάσεις δεδομένων) για
 	                    να γίνουν update στο δίσκο αμέσως
+OPER_HELP_CMD_RESTART
 	    RESTART     Σώζει τις βάσεις δεδομένων και επανεκκινεί τα Services
+OPER_HELP_CMD_QUIT
 	    QUIT        Τερματίζει το πρόγραμμα των Services χωρίς να σώσει τις αλλαγές
+OPER_HELP_CMD_SHUTDOWN
 	    SHUTDOWN    Τερματίζει το πρόγραμμα των Services με ταυτόχρονο γράψιμο των
 	        αλλαγών
-	
-	Εντολές διαθέσιμες για τους Services super-χρήστη μόνο:
-	    ADMIN       Αλλάζει την λίστα των Services admin
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulate the DefCon system
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kill all users on a specific channel
+OPER_HELP_CMD_OLINE
 	    OLINE       Give Operflags to a certain user
-
-OPER_HELP_ADMIN_CMD_UMODE
+OPER_HELP_CMD_UMODE
 	    UMODE       Change a user's modes
-
-OPER_HELP_ADMIN_CMD_SVSNICK
+OPER_HELP_CMD_SVSNICK
 	    SVSNICK     Forcefully change a user's nickname
-
-OPER_HELP_ROOT_CMD
-	Commands available to Serivces Roots only:
+OPER_HELP_CMD_MODLOAD
 	    MODLOAD     Load a module
+OPER_HELP_CMD_MODUNLOAD
 	    MODUNLOAD   Un-Load a module
-	    MODLIST     List loaded modules
+OPER_HELP_CMD_MODINFO
 	    MODINFO     Info about a loaded module
+OPER_HELP_CMD_MODLIST
+	    MODLIST     List loaded modules
+
+OPER_HELP
+	Οι εντολές του %S είναι::
 
 OPER_HELP_LOGGED
 	Σημείωση: Όλες οι εντολές στέλνονται στον %S και καταγράφονται!
@@ -5770,7 +5862,28 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-	
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Λίστα με διαθέσιμα bots
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Ζητάτε από το bot να έρθει στο κανάλι σας
+BOT_HELP_CMD_SET
+	SET                Αλλάζετε τις επιλογές του bot
+BOT_HELP_CMD_KICK
+	KICK               Ρυθμίζεται  τι να κάνει στους "άτακτους χρήστες"
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Αλλάζετε την λίστα κακών λέξεων
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Αλλάζει την λίστα των bot του δικτύου
+
 BOT_HELP
 	Ο %S σου επιτρέπει να έχεις bot στο δικό σου κανάλι.
 	Αυτή η υπηρεσια έχει δημιουργηθεί για τους χρήστες που δεν μπορούν
@@ -5780,14 +5893,7 @@ BOT_HELP
 	/msg %S command.Για περισσότερες πληροφορίες σε συγκεκριμένες
 	εντολές γράψτε /msg %S HELP command. 
 	    
-	BOTLIST            Λίστα με διαθέσιμα bots
-	ASSIGN             Ζητάτε από το bot να έρθει στο κανάλι σας
-	SET                Αλλάζετε τις επιλογές του bot
-	KICK               Ρυθμίζεται  τι να κάνει στους "άτακτους χρήστες"
-	BADWORDS           Αλλάζετε την λίστα κακών λέξεων
-	
-	’λλες εντολές: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	Το Bot θα μπεί στο κανάλι όταν είναι τουλάχιστον μέσα
 	%d χρήστη(ες).
 	
@@ -6051,17 +6157,11 @@ BOT_HELP_ACT
 	Κάνει το bot να ενεργεί,δηλ να εκτελεί εντολή "/me"
 	εμφανίζοντας το μήνυμα στο ανάλογο κανάλι.
 
-BOT_SERVADMIN_HELP
-	
-	Η ακόλουθη εντολή είναι μόνο για τους Services admins:
-	
-	    BOT              Αλλάζει την λίστα των bot του δικτύου
 
 BOT_SERVADMIN_HELP_BOT
 	Σύνταξη: BOT ADD ψευδώνυμο ID host πραγματικό όνομα
 	        BOT CHANGE παλιό-ψευδώνυμοick νέο-ψευδώνυμο [ID [host [πραγματικό όνομα]]]
 	    BOT DEL ψευδώνυμο	        
-	        BOT LIST
 	
 	Επιτρέπει μόνο στους Services admins να δημιουργήσουν, αλλάξουν, και 
 	να σβήσουν τα bots στα οποία οι χρήστες θα μπορούν να χρησιμοποιήσουν 
@@ -6074,8 +6174,6 @@ BOT_SERVADMIN_HELP_BOT
 	ή πραγματικό όνομα του bot χωρίς να χρειάζεται να το σβήσετε (και όλες
 	οι ρυθμίσεις θα μείνουν).
 	Η εντολή BOT DEL αφαιρεί το bot από την λίστα bot.  
-	Η εντολή BOT LIST είναι ίδιο με την BOTLIST και απλά δείχνει όλη την
-	λίστα των bots που υπάρχουν στο δίκτυο.
 	
 	Σημείωση: αν φτιάξεις ένα bot που έχει ψευδώνυμο κατοχυρωμένο 
 	θα διαγραφεί. Επίσης, αν ένας χρήστης χρησιμοποιεί ήδη το ψευδώνυμο
@@ -6190,20 +6288,38 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commands:
+HOST_HELP_CMD_ON
 	    ON          Activates your assigned vhost
+
+HOST_HELP_CMD_OFF
 	    OFF         Deactivates your assigned vhost
 
-HOST_OPER_HELP
-	Commands available to services operators only:
+HOST_HELP_CMD_GROUP
+	    GROUP       Syncs the vhost for all nicks in a group
+
+HOST_HELP_CMD_SET
 	    SET         Set the vhost of another user
+
+HOST_HELP_CMD_SETALL
 	    SETALL      Set the vhost for all nicks in a group
+
+HOST_HELP_CMD_DEL
 	    DEL         Delete the vhost of another user
+
+HOST_HELP_CMD_DELALL
+	    DELALL      Delete the vhost for all nicks in a group
+
+HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
+HOST_HELP
+	%S commands:
+
+HOST_OPER_HELP
+	not used.
+
 HOST_ADMIN_HELP
-	Commands available to services admins only:
+	not used.
 
 HOST_HELP_ON
 	Syntax: ON

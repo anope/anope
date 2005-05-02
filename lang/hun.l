@@ -2820,7 +2820,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Jelenlegi Modul lista:
 OPER_MODULE_LIST
-	Modul: %s [%s]
+	Modul: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modul betöltve.
 OPER_MODULE_INFO_LIST
@@ -3201,7 +3201,58 @@ HELP_HELP_HOST
 # NickServ segítség üzenetei
 #
 ###########################################################
-	
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Nicknév regisztráció
+NICK_HELP_CMD_GROUP
+	    GROUP      Csatlakozás egy csoporthoz
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Jelszavas azonosítás
+NICK_HELP_CMD_ACCESS
+	    ACCESS     A hozzáférési lista módosítása
+NICK_HELP_CMD_SET
+	    SET        Opciók beállítása, például kill védelem
+NICK_HELP_CMD_DROP
+	    DROP       Nicknév regisztrációjának törlése
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Killeli a nickedet használó usert
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Visszaadja a neved a RECOVER után
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Elfelejtetted a jelszavad? Próbáld ezt
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Kiirja a jeszavát a nicknévnek
+	               (encryption esetén nem használható)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Kiírja az ilyen e-mail címmel regisztrált
+	               felhasználókat
+NICK_HELP_CMD_FORBID
+	    FORBID     Megelõzi, hogy a nicknév regisztrált legyen
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
+
 NICK_HELP
 	%S lehetõséget nyújt a "register" parancs használatával
 	a nickneved regisztrálására, ezzel megelõzi, hogy más is
@@ -3210,18 +3261,7 @@ NICK_HELP
 	beírod, hogy: /msg %S parancs, lásd még a
 	/msg %S HELP parancs.
 	
-	    REGISTER   Nicknév regisztráció
-	    GROUP      Csatlakozás egy csoporthoz
-	    IDENTIFY   Jelszavas azonosítás
-	    ACCESS     A hozzáférési lista módosítása
-	    SET        Opciók beállítása, például kill védelem
-	    DROP       Nicknév regisztrációjának törlése
-	    RECOVER    Killeli a nickedet használó usert
-	    RELEASE    Visszaadja a neved a RECOVER után
-	    SENDPASS   Elfelejtetted a jelszavad? Próbáld ezt
-	
-	Egyéb parancsok: GHOST, ALIST, GLIST, INFO, LIST, LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	Megjegyzés: Ez a szolgáltatás szeretné biztosítani az 
 	IRC felhasználok számára hogy a kilétüket ne lehessen 
 	kompromitálni. Egyáltalán NEM azt szolgálja, hogy 
@@ -3613,15 +3653,6 @@ NICK_HELP_SENDPASS
 	Parancs nem elérhetõ, ha az encryption használatban van.
 	
 NICK_SERVADMIN_HELP
-	
-	Következõ parancsokat használhatják a szervíz adminok:
-	
-	    GETPASS    Kiirja a jeszavát a nicknévnek
-	                 (encryption esetén nem használható)
-	    GETEMAIL   Kiírja az ilyen e-mail címmel regisztrált
-	                 felhasználókat
-	    FORBID     Megelõzi, hogy a nicknév regisztrált legyen
-	
 	Szervíz adminok is droppolhatnak nickeket, akkor ha
 	beazonosíttotak a nicknevükre, és megnézhetik a nickek
 	hozzáférési listáját. (/msg %S ACCESS LIST nick)
@@ -3783,6 +3814,86 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Megadja a founder jelszót a csatornán
+CHAN_HELP_CMD_FORBID
+	    FORBID     Megakadályozza a szoba használatát
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Felfüggeszti a szoba használatát de
+	               megõrzi az adatokat és beállításokat.
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Törli a suspendet a csatornáról.
+CHAN_HELP_CMD_STATUS
+	    STATUS     Kiírja a felhasználó aktuális hozzáférési
+	               szintjét a megadott csatornán
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Szoba regisztrálása
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Azonosíthatod magad a jelszavaddal
+CHAN_HELP_CMD_SET
+	    SET        Beállíthatod a csatornád opcióit
+CHAN_HELP_CMD_AOP
+	    AOP        AutoOperátor lista beállítása
+CHAN_HELP_CMD_SOP
+	    SOP        SzuperOperátor lista beállítása
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     A szoba hozzáférési listájának beállítása
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Átállíthatod a szoba hozzáférési szintjeit
+CHAN_HELP_CMD_AKICK
+	    AKICK      AutoKirúgás listára teheted a "rossz" usereket
+CHAN_HELP_CMD_DROP
+	    DROP       Törölheted a csatornád regisztrációját
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Elveszett a jelszavad? Jelszó küldés.
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	
@@ -3793,43 +3904,8 @@ CHAN_HELP
 	operátori kiváltságokat. A parancsok használatához írd be:
 	/msg %S parancs, ha több információ kell a paranccsal
 	kapcsolatban, akkor írd be: /msg %S HELP parancs.
+	 
 	
-	    REGISTER   Szoba regisztrálása
-	    IDENTIFY   Azonosíthatod magad a jelszavaddal
-	    SET        Beállíthatod a csatornád opcióit
-	    AOP        AutoOperátor lista beállítása
-	    SOP        SzuperOperátor lista beállítása
-	    ACCESS     A szoba hozzáférési listájának beállítása
-	    LEVELS     Átállíthatod a szoba hozzáférési szintjeit
-	    AKICK      AutoKirúgás listára teheted a "rossz" usereket
-	    DROP       Törölheted a csatornád regisztrációját
-	    SENDPASS   Elveszett a jelszavad? Jelszó küldés.
-
-	Egyéb parancsok: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO 
-	                 INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
-	                 UNBAN, VOICE, VOP
-	
-CHAN_HELP_UNREAL
-	
-	Ezek a parancsok is elérhetõk ezen a hálózaton:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER, 
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Ezek a parancsok is elérhetõk ezen a hálózaton:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Megjegyzés: azok a csatornák, amelyeket nem használnak %d
@@ -4669,17 +4745,6 @@ CHAN_HELP_SENDPASS
 	
 CHAN_SERVADMIN_HELP
 	
-	A következõ parancsok Szervíz adminok használhatják:
-	
-	    GETPASS    Megadja a founder jelszót a csatornán
-	               (Csak, ha az encryption nincs használatban)
-	    FORBID     Megakadályozza a szoba használatát
-	    SUSPEND    Felfüggeszti a szoba használatát de
-	               megõrzi az adatokat és beállításokat.
-	    UNSUSPEND  Törli a suspendet a csatornáról.
-	    STATUS     Kiírja a felhasználó aktuális hozzáférési
-	               szintjét a megadott csatornán
-	
 	Szervíz adminok tudják droppolni a csatornákat anélkül, 
 	hogy a szoba jelszót használnának, és megnézhetika az
 	access, AKICK, és beállitási szint listát a csatornán.
@@ -4796,8 +4861,30 @@ CHAN_SERVADMIN_HELP_STATUS
 # MemoServ help üzenetek
 #
 ###########################################################
-	
-MEMO_HELP
+MEMO_HELP_CMD_SEND
+	    SEND   Üzenetet küld egy nicknek vagy csatornára
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Visszavonja az utoljára küldött memot
+MEMO_HELP_CMD_LIST
+	    LIST   Megjeleníti az üzenetek listáját
+MEMO_HELP_CMD_READ
+	    READ   Elolvassa a megadott üzenete(ke)t
+MEMO_HELP_CMD_DEL
+	    DEL    Törli a megadott üzenete(ke)t
+MEMO_HELP_CMD_SET
+	    SET    Üzenetekkel kapcsolatos beállításokat hajt végre
+MEMO_HELP_CMD_INFO
+	    INFO   Kiírja az üzenetekkel kapcsolatos információkat
+MEMO_HELP_CMD_RSEND
+	    RSEND  Memo üzenetet küld és olvasási visszaigazolást kér
+MEMO_HELP_CMD_CHECK
+	    CHECK  Ellenõrzi, hogy a címzett elolvasta-e már az üzit
+MEMO_HELP_CMD_SENDALL
+	    SENDALL Memo küldése minden regisztrált felhasználónak.
+MEMO_HELP_CMD_STAFF
+	    STAFF Memo küldése minden opernek/adminnak.
+
+MEMO_HELP_HEADER
 	%S lehetõséget nyújt az IRC felhasználókank, hogy rövid
 	üzeneteket küldjenek más IRC felhasználók részére,
 	akkor is, ha a fogadó fél nem online, és csatornákra (*).
@@ -4806,22 +4893,11 @@ MEMO_HELP
 		
 	%S parancsok a következõket tartalmazzák:
 	
-	    SEND   Üzenetet küld egy nicknek vagy csatornára
-	    CANCEL Visszavonja az utoljára küldött memot
-	    LIST   Megjeleníti az üzenetek listáját
-	    READ   Elolvassa a megadott üzenete(ke)t
-	    DEL    Törli a megadott üzenete(ke)t
-	    SET    Üzenetekkel kapcsolatos beállításokat hajt végre
-	    INFO   Kiírja az üzenetekkel kapcsolatos információkat
-	    RSEND  Memo üzenetet küld és olvasási visszaigazolást kér
-	    CHECK  Ellenõrzi, hogy a címzett elolvasta-e már az üzit
 	
 MEMO_HELP_ADMIN
-	    SENDALL Memo küldése minden regisztrált felhasználónak.
-	
+	not used.
 MEMO_HELP_OPER
-	    STAFF Memo küldése minden opernek/adminnak.
-	
+	not used.
 MEMO_HELP_FOOTER
 	
 	A parancsokkal kapcsolatos további segítségért
@@ -5005,83 +5081,89 @@ MEMO_HELP_CHECK
 # OperServ help üzenetek
 #
 ###########################################################
+
+OPER_HELP_CMD_GLOBAL
+	    GLOBAL      Üzenetet küld összes felhasználónak
+OPER_HELP_CMD_STATS
+	    STATS       Mutatja a Szervít és hálózat állapotát
+OPER_HELP_CMD_OPER
+	    OPER        Módosítja a Szervíz operátorok listáját
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Módosítja a Szervíz admin listát
+OPER_HELP_CMD_STAFF
+	    STAFF       Kijelzi a szervízt és aktív állapotát
+OPER_HELP_CMD_MODE
+	    MODE        Váltóztatja a szoba módot
+OPER_HELP_CMD_KICK
+	    KICK        Kirúgja a felhasználót csatornáról
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Törli a szoba módot
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Killeli az összes klónt a hosztról
+OPER_HELP_CMD_AKILL
+	    AKILL       Szerkeszti az AKILL listát
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Szerkeszti az SGLINE listát
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Szerkeszti az SQLINE listát
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Szerkeszti az SZLINE listát
+OPER_HELP_CMD_CHANLIST
+	    CHANLIST    Listázza az összes csatornát 
+OPER_HELP_CMD_USERLIST
+	    USERLIST    Listázza az összes felhasználót  
+OPER_HELP_CMD_LOGONNEWS
+	    LOGONNEWS   Fellépõ üzenetek beállítása
+OPER_HELP_CMD_RANDOMNEWS
+	    RANDOMNEWS  Véletlenszerûen megjelenõ üzenetet állít be 
+	                a felhasználók részére
+OPER_HELP_CMD_OPERNEWS
+	    OPERNEWS    Operek részére megjelenõ üzenetet állít be
+OPER_HELP_CMD_SESSION
+	    SESSION     Olvassa a sessionok hoszt listáját
+OPER_HELP_CMD_EXCEPTION
+	    EXCEPTION   Módosítja a session-korlát/kivétel listát
+OPER_HELP_CMD_NOOP
+	    NOOP        Ideiglenesen törli az összes O:line-t a szerver
+	                távollétében
+OPER_HELP_CMD_JUPE
+	    JUPE        Létrehoz egy "Jupiter" álszervert.
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Módosítja a Szervíz mellõzési listáját
+OPER_HELP_CMD_SET
+	    SET         Beállítja szervíz általános változóit
+OPER_HELP_CMD_RELOAD
+	    RELOAD      Újratölti a szervíz Konfigurációs fájlját
+OPER_HELP_CMD_UPDATE
+	    UPDATE      A Szervíz adatbázist frissíti, felülírja
+	                lemezre közvetlenül
+OPER_HELP_CMD_RESTART
+	    RESTART     Menti az adatbázist, és újraindítja a szervízt
+OPER_HELP_CMD_QUIT
+	    QUIT        Leállítja a szervíz programot mentés nélkül
+OPER_HELP_CMD_SHUTDOWN
+	    SHUTDOWN    Leállítja a szervíz programot mentéssel
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulálja a DefCon rendszert
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kirúgja az összes usert a csatornáról
+OPER_HELP_CMD_OLINE
+	    OLINE       Operflaget ad a biztos felhasználónak
+OPER_HELP_CMD_UMODE
+	    UMODE       Felhasználó módok állítása
+OPER_HELP_CMD_SVSNICK
+	    SVSNICK     Megváltoztatja a felhasználó nicknevét
+OPER_HELP_CMD_MODLOAD
+	    MODLOAD     Betölti a modult
+OPER_HELP_CMD_MODUNLOAD
+	    MODUNLOAD   Kitölti a modult
+OPER_HELP_CMD_MODINFO
+	    MODINFO     Információ a betöltött modulokról
+OPER_HELP_CMD_MODLIST
+	    MODLIST     Listázza a betöltött modulokat
 	
 OPER_HELP
 	%S parancsok:
-	    GLOBAL      Üzenetet küld összes felhasználónak
-	    STATS       Mutatja a Szervít és hálózat állapotát
-	    OPER LIST   Listázza az öszzes szerviz operátort
-	    ADMIN LIST  Listázza az öszzes szerviz admint
-	    STAFF       Kijelzi a szervízt és aktív állapotát
-	
-OPER_HELP_OPER_CMD
-	Ezek a Parancsok szervíz adminok/oprátorok részére elérhetõek:
-	    MODE        Váltóztatja a szoba módot
-	    KICK        Kirúgja a felhasználót csatornáról
-	    CLEARMODES  Törli a szoba módot
-	    KILLCLONES  Killeli az összes klónt a hosztról
-	    AKILL       Szerkeszti az AKILL listát
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Szerkeszti az SGLINE listát
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Szerkeszti az SQLINE listát
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Szerkeszti az SZLINE listát
-	
-OPER_HELP_ADMIN_CMD
-	Ezek a Parancsok a szervíz admin részére elérhetõek:
-		
-	    OPER        Módosítja a Szervíz operátorok listáját
-	    CHANLIST    Listázza az összes csatornát 
-	    USERLIST    Listázza az összes felhasználót  
-	    LOGONNEWS   Fellépõ üzenetek beállítása
-	    RANDOMNEWS  Véletlenszerûen megjelenõ üzenetet állít be 
-	                  a felhasználók részére
-	    OPERNEWS    Operek részére megjelenõ üzenetet állít be
-	    SESSION     Olvassa a sessionok hoszt listáját
-	    EXCEPTION   Módosítja a session-korlát/kivétel listát
-	    CACHE       Kiírja a hostnév rejtõ usereket a proxy keresõ
-	    NOOP        Ideiglenesen törli az összes O:line-t a szerver
-	                  távollétében
-	    JUPE        Létrehoz egy "Jupiter" álszervert.
-	    IGNORE      Módosítja a Szervíz mellõzési listáját
-	    SET         Beállítja szervíz általános változóit
-	    RELOAD      Újratölti a szervíz Konfigurációs fájlját
-	    UPDATE      A Szervíz adatbázist frissíti, felülírja
-				lemezre közvetlenül
-	    RESTART     Menti az adatbázist, és újraindítja a szervízt
-	    QUIT        Leállítja a szervíz programot mentés nélkül
-	    SHUTDOWN    Leállítja a szervíz programot mentéssel
-	    DEFCON      Manipulálja a DefCon rendszert
-	    CHANKILL    Kirúgja az összes usert a csatornáról
-	
-	Parancs rendelkezésre áll szuper-felhasználó részére:
-	    ADMIN       Módosítja a Szervíz admin listát
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
-	    OLINE       Operflaget ad a biztos felhasználónak
-
-OPER_HELP_ADMIN_CMD_UMODE
-	    UMODE       Felhasználó módok állítása
-
-OPER_HELP_ADMIN_CMD_SVSNICK
-	    SVSNICK     Megváltoztatja a felhasználó nicknevét
-	
-OPER_HELP_ROOT_CMD
-	Parancs rendelkezésre áll Szervíz Rootok részére:
-	    MODLOAD     Betölti a modult
-	    MODUNLOAD   Kitölti a modult
-	    MODLIST     Listázza a betöltött modulokat
-	    MODINFO     Információ a betöltött modulokról
 	
 OPER_HELP_LOGGED
 	Üzenet:Minden %S-nek küldött parancs naplózva van.
@@ -5670,7 +5752,28 @@ OPER_HELP_MODLIST
 # BotServ help üzenetek
 #
 ###########################################################
-	
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Listázza az elérhetõ botokat
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Társít egy botot a csatornához
+BOT_HELP_CMD_SET
+	SET                Konfigurálja a bot opcióit
+BOT_HELP_CMD_KICK
+	KICK               Konfigurálja a kirúgásokat
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Szerkeszti a tiltott szavak listáját
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Karbantartja a hálózat botjainak listáját
+
 BOT_HELP
 	
 	%S lehetõvé teszi, hogy botod legyen a csatornádon.
@@ -5681,14 +5784,7 @@ BOT_HELP
 	Bõvebb információt így kaphatsz az adott parancsról:
 	/msg %S HELP parancs.
 	
-	BOTLIST            Listázza az elérhetõ botokat
-	ASSIGN             Társít egy botot a csatornához
-	SET                Konfigurálja a bot opcióit
-	KICK               Konfigurálja a kirúgásokat
-	BADWORDS           Szerkeszti a tiltott szavak listáját
-	
-	Egyéb parancsok: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	A Bot akkor fog belépni a csatornára, ha legalább
 
 	%d felhasználó van bent.
@@ -5950,17 +6046,10 @@ BOT_HELP_ACT
 	A bot "/me" akcióval küldi el a megadott szöveget
 	a csatornára.
 	
-BOT_SERVADMIN_HELP
-	
-	A következõ parancsok csak Szervíz Adminoknak elérhetõek:
-	
-		BOT Karbantartja a hálózat botjainak listáját
-	
 BOT_SERVADMIN_HELP_BOT
 	Syntax:	BOT ADD  nick   user   hoszt   valós
 			BOT CHANGE  réginick   újnick [user  [ hoszt  [ valós ]]]
 			BOT DEL nick
-			BOT LIST
 	
 	Lehetõvé teszi a Services adminoknak, hogy létrehozzanak
 	töröljenek, módosítsanak botokat, amiket a userek
@@ -5973,8 +6062,6 @@ BOT_SERVADMIN_HELP_BOT
 	hostnevét, valósnevét, anélkül hogy törölni kellene
 	(minden adat, beállítás megmarad benne.)
 	BOT DEL törli a megadott botot a listából.  
-	BOT LIST egy alias a BOTLIST parancsra, és csak
-	listázza a hálózaton elérhetõ botokat.
 	
 	Megjegyzés: ha létrehozol egy botot, egy már regisztrált
 	nickkel, akkor a nick dropolva lesz. Akkor is, ha a user
@@ -6082,23 +6169,31 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help üzenetek
 #
 ###########################################################
-	
-HOST_HELP
-	%S parancsok:
+HOST_HELP_CMD_ON
 	    ON          Aktiválja a társított vhostot
+HOST_HELP_CMD_OFF
 	    OFF         Kikapcsolja a társított vhostot
+HOST_HELP_CMD_GROUP
 	    GROUP       A vhostot a csoport minden tagjára állítja
-
-HOST_OPER_HELP
-	Parancsok a VHostok beállításához/módosításához:
+HOST_HELP_CMD_SET
 	    SET         Beállít egy vhosztot a felhasználónak
+HOST_HELP_CMD_SETALL
 	    SETALL      Beállítja a vhosztot összes nicknek a csoportban
+HOST_HELP_CMD_DEL
 	    DEL         Törli egy felhasználónak a vhostját
+HOST_HELP_CMD_DELALL
 	    DELALL      Törli a vhosztot a nickekröl a csoportban
+HOST_HELP_CMD_LIST
 	    LIST        Kiír egy vagy több vhost bejegyzést
 
+HOST_HELP
+	%S parancsok:
+
+HOST_OPER_HELP
+	not used.
+
 HOST_ADMIN_HELP
-	Ezek a Parancsok csak szervíz adminok által használhatók:
+	not used.
 
 HOST_HELP_ON
 	Syntax: ON

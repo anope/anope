@@ -607,7 +607,7 @@ int isValidHost(const char *host, int type)
 
 /**
  * Valid character check
- * @param c Charaacter to check
+ * @param c Character to check
  * @return 1 if a host is valid, 0 if it isnt.
  */
 int isvalidchar(const char c)

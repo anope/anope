@@ -12,7 +12,6 @@ distclean: clean spotless
 .c.dll:
         $(CC) $(CFLAGS) $(IRCTYPE) $< $(LFLAGS)
         
-
 subs:
         @for %i in ( $(SUBS) ); do \
         	@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) && cd ..

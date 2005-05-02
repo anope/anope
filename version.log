@@ -8,25 +8,336 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="707"
+VERSION_BUILD="753"
 
 # $Log$
 #
-# BUILD : 1.7.8 (707)
-# BUGS  : 
-# NOTES : Added src/tools/Makefile.win32, which was missing since last commit
+# BUILD : 1.7.8 (753)
+# BUGS  : N/a
+# NOTES : Merged anope-dev with trunk
 #
-# BUILD : 1.7.8 (687)
-# BUGS  : N/A
-# NOTES : Another heinz makefile.win32 patch :)
-#
-# BUILD : 1.7.8 (686)
-# BUGS  : N/A
-# NOTES : Applied small makefile patch for win32
-#
-# BUILD : 1.7.8 (685)
+# BUILD : 1.7.8 (752)
 # BUGS  : none
-# NOTES : svn FSFS test.
+# NOTES : Startup alog language change to reflect modular ircd protocol.
+#
+# BUILD : 1.7.8 (751)
+# BUGS  : none
+# NOTES : Added latest inspircd protocol file
+#
+# BUILD : 1.7.8 (750)
+# BUGS  : 354 316
+# NOTES : FIXED: (354) typo in include/extern.h (316) modes with no arguments where required being set internally with /os mode
+#
+# BUILD : 1.7.8 (749)
+# BUGS  : 
+# NOTES : Fixed small example.conf typo and updated win32 stuff by heinz (and VBS is evil!)
+#
+# BUILD : 1.7.8 (748)
+# BUGS  : 
+# NOTES : Updates ns_noop by DrS, and added a small debug with send_event which can be handy with debugging
+#
+# BUILD : 1.7.8 (747)
+# BUGS  : N/A
+# NOTES : win32 makefile patchs - install.vbs isnt in svn yet!
+#
+# BUILD : 1.7.8 (746)
+# BUGS  : N/A
+# NOTES : Compile issues when encryption is used
+#
+# BUILD : 1.7.8 (745)
+# BUGS  : N/A
+# NOTES : Fixed cs_tban help for newlines, and fixed null in os_info
+#
+# BUILD : 1.7.8 (744)
+# BUGS  : N/A
+# NOTES : Added cs_tban 
+#
+# BUILD : 1.7.8 (743)
+# BUGS  : 
+# NOTES : <heinz> missed Changes.conf
+#
+# BUILD : 1.7.8 (742)
+# BUGS  : 
+# NOTES : Added five modules of the modulepack, and added their configvars to the config file
+#
+# BUILD : 1.7.8 (741)
+# BUGS  : 
+# NOTES : Fixed a small bug with my previous am update and ran indent on src/core and src/protocol
+#
+# BUILD : 1.7.8 (740)
+# BUGS  : 
+# NOTES : Updated am to also indent src/core and src/protocol files
+#
+# BUILD : 1.7.8 (739)
+# BUGS  : 
+# NOTES : Modularized BotServ fantasy commands, and fixed a small error with BOT_SEEN_UNKNOWN in most langfiles (most had a newline after it)
+#
+# BUILD : 1.7.8 (738)
+# BUGS  : 
+# NOTES : Updated docs/EVENTS -- It was ancient! We have argc/argv now, and we have a few new events as well...
+#
+# BUILD : 1.7.8 (737)
+# BUGS  : 
+# NOTES : Added EVENT_PART_CHANNEL (same params as JOIN_CHANNEL)
+#
+# BUILD : 1.7.8 (736)
+# BUGS  : 
+# NOTES : Fixed Rob his spelling mistakes with langau... language -- Added EVENT_JOIN_CHANNEL for when users join a channel (av: [0] START/STOP [1] nick [2] chan)
+#
+# BUILD : 1.7.8 (735)
+# BUGS  : N/A
+# NOTES : Applied crazys patch for gcc4 compiling
+#
+# BUILD : 1.7.8 (734)
+# BUGS  : N/A
+# NOTES : Synced with brains cvs for inspircd 
+#
+# BUILD : 1.7.8 (733)
+# BUGS  : N/A
+# NOTES : synced with brains cvs tree
+#
+# BUILD : 1.7.8 (732)
+# BUGS  : N/a
+# NOTES : Synced with [brain]s cvs for inspircd support
+#
+# BUILD : 1.7.8 (731)
+# BUGS  : N/A
+# NOTES : shadowircd.c will never try and use a null, i hope shadows comments can be beleived :)
+#
+# BUILD : 1.7.8 (730)
+# BUGS  : N/A
+# NOTES : Dont leave the tmp  veriable un-freeed in the hs_conf demo module
+#
+# BUILD : 1.7.8 (729)
+# BUGS  : N/A
+# NOTES : added hs_conf.c to the demos folder
+#
+# BUILD : 1.7.8 (728)
+# BUGS  : N/A
+# NOTES : Anope compiles with no modules present at all :)
+#
+# BUILD : 1.7.8 (727)
+# BUGS  : N/A
+# NOTES : ci always set
+#
+# BUILD : 1.7.8 (726)
+# BUGS  : 
+# NOTES : Ran indent on src/modules.c -- Added support for multi-line language texts with the module lang system -- Fixed display help texts with the modulelang system; mod_current_module(_name) was not set correctly
+#
+# BUILD : 1.7.8 (725)
+# BUGS  : N/A
+# NOTES : Added multi-langauge module framework
+#
+# BUILD : 1.7.8 (724)
+# BUGS  : N/A
+# NOTES : Added new module type
+#
+# BUILD : 1.7.8 (723)
+# BUGS  : 
+# NOTES : Small error with variable names fixed. That is what you get for coding on sunday...
+#
+# BUILD : 1.7.8 (722)
+# BUGS  : N/A
+# NOTES : Moved demo modules to demos folder
+#
+# BUILD : 1.7.8 (721)
+# BUGS  : 
+# NOTES : EVENT_TOPIC_UPDATES is now sent for all channels, not just registered ones, and it has no NULL-argument anymore (which sstrdup() complained about)
+#
+# BUILD : 1.7.8 (720)
+# BUGS  : 
+# NOTES : Fixed normalizeBuffer using malloc() instead of smalloc()
+#
+# BUILD : 1.7.8 (719)
+# BUGS  : N/A
+# NOTES : Restored old win32 makefile (i think)
+#
+# BUILD : 1.7.8 (718)
+# BUGS  : N/A
+# NOTES : Removed old calls to addCoreCommand()
+#
+# BUILD : 1.7.8 (717)
+# BUGS  : N/A
+# NOTES : Didnt mean to commit alog()s :)
+#
+# BUILD : 1.7.8 (716)
+# BUGS  : N/A
+# NOTES : Fixed cs_xop
+#
+# BUILD : 1.7.8 (715)
+# BUGS  : N/A
+# NOTES : Heinz win32 patch part 2 of 2
+#
+# BUILD : 1.7.8 (714)
+# BUGS  : N/A
+# NOTES : Applied heinzs win32 patch (part 1)
+#
+# BUILD : 1.7.8 (713)
+# BUGS  : 
+# NOTES : Cosmetic updates for OSOpersOnly
+#
+# BUILD : 1.7.8 (712)
+# BUGS  : N/A
+# NOTES : Added OSOpersOnly as a default config flag, when enabled, it will prefect modules from adding operserv commands with the standard command access level checks.
+#
+# BUILD : 1.7.8 (711)
+# BUGS  : N/A
+# NOTES : Fixed what i broke in Changes file :)
+#
+# BUILD : 1.7.8 (710)
+# BUGS  : N/A
+# NOTES : Updated version numbers on modules to use svn revision string
+#
+# BUILD : 1.7.8 (709)
+# BUGS  : N/A
+# NOTES : Dont event params if there wernt any, while it isnt a problem to do so, its a waste of time.
+#
+# BUILD : 1.7.8 (708)
+# BUGS  : N/A
+# NOTES : Added a fantasy command to events.c to demo the easy event system for botserv fantasy commands.
+# 
+#
+# BUILD : 1.7.8 (706)
+# BUGS  : N/A
+# NOTES : Dont seg on -version anymore
+#
+# BUILD : 1.7.8 (705)
+# BUGS  : N/A
+# NOTES : Applied DrSteins patch, convereted all events to argc,argv this means we can expand the event system alot without breaking modules more in the future.
+#
+# BUILD : 1.7.8 (704)
+# BUGS  : N/A
+# NOTES : Converted nenolods  (spellin?) new shadowircd.c file into a suitable module format 
+#
+# BUILD : 1.7.8 (703)
+# BUGS  : N/A
+# NOTES : I trust heniz, really i do! 
+#
+# BUILD : 1.7.8 (702)
+# BUGS  : N/A
+# NOTES : Removed extra gap in lang. files
+#
+# BUILD : 1.7.8 (701)
+# BUGS  : N/A
+# NOTES : Finished all the modular work, all servs are now fully modular :)
+#
+# BUILD : 1.7.8 (700)
+# BUGS  : 
+# NOTES : Updated the FAQ to enlighten people about how to enable RAW if really needed
+#
+# BUILD : 1.7.8 (699)
+# BUGS  : N/A
+# NOTES : synced with inspircds cvs
+#
+# BUILD : 1.7.8 (698)
+# BUGS  : N/A
+# NOTES : Fixed case insensitve token matching for ircd messages
+#
+# BUILD : 1.7.8 (697)
+# BUGS  : N/A
+# NOTES : Synced our svn with brains cvs for inspircd
+#
+# BUILD : 1.7.8 (696)
+# BUGS  : N/A
+# NOTES : Moved veriable declare, used the right version of inspircd.c and .h :)
+#
+# BUILD : 1.7.8 (695)
+# BUGS  : N/A
+# NOTES : Modularised nickserv, added brians inspircd module to ./src/protocols 
+#
+# BUILD : 1.7.8 (694)
+# BUGS  : N/A
+# NOTES : Added AnopeFini() calls to all modules - i forgot them :(
+# 
+#
+# BUILD : 1.7.8 (693)
+# BUGS  : N/A
+# NOTES : Removed the os_raw module from the example.conf 
+#
+# BUILD : 1.7.8 (692)
+# BUGS  : N/A
+# NOTES : OperServ now nice and modular 
+#
+# BUILD : 1.7.8 (691)
+# BUGS  : N/A
+# NOTES : All compiles for win32 now thanks to heniz the window fitter :)
+#
+# BUILD : 1.7.8 (690)
+# BUGS  : N/A
+# NOTES : Updated example.conf and Changes.conf
+#
+# BUILD : 1.7.8 (689)
+# BUGS  : N/A
+# NOTES : BotServ is now all modular
+#
+# BUILD : 1.7.8 (688)
+# BUGS  : N/A
+# NOTES : Added helpserv stuff
+#
+# BUILD : 1.7.8 (684)
+# BUGS  : N/A
+# NOTES : Converted memoserv over to be module based too
+#
+# BUILD : 1.7.8 (683)
+# BUGS  : N/A
+# NOTES : Module subfolders now get ./configure called on them if it exists, so they could check for any custom libraries they need etc... now.
+# 
+#
+# BUILD : 1.7.8 (682)
+# BUGS  : N/A
+# NOTES : Removed a couple of alog debug output from the previous bug hunting fun
+#
+# BUILD : 1.7.8 (681)
+# BUGS  : N/A
+# NOTES : Events no long segfault after when being called after mod-unloaded.
+#
+# BUILD : 1.7.8 (680)
+# BUGS  : N/A
+# NOTES : Added Id keyword (i think)
+#
+# BUILD : 1.7.8 (679)
+# BUGS  : N/A
+# NOTES : id test... :/
+#
+# BUILD : 1.7.8 (678)
+# BUGS  : N/A
+# NOTES : Added module types
+#
+# BUILD : 1.7.8 (676)
+# BUGS  : N/A
+# NOTES : Added modules to hostserv Changes.conf line
+#
+# BUILD : 1.7.8 (675)
+# BUGS  : N/A
+# NOTES : Swaped declarations of found around so older compilers dont complain
+#
+# BUILD : 1.7.8 (674)
+# BUGS  : N/A
+# NOTES : Updated Changes.conf
+#
+# BUILD : 1.7.8 (673)
+# BUGS  : N/A
+# NOTES : Added warning in example.conf
+#
+# BUILD : 1.7.8 (672)
+# BUGS  : N/A
+# NOTES : dos2unix on all hs .c files
+#
+# BUILD : 1.7.8 (671)
+# BUGS  : N/A
+# NOTES : Removed extra space from lang file
+#
+# BUILD : 1.7.8 (670)
+# BUGS  : N/A
+# NOTES : Added host langage strings to all languages.
+#
+# BUILD : 1.7.8 (669)
+# BUGS  : N/A
+# NOTES : Added module.h to ./include/ 
+#
+# BUILD : 1.7.8 (668)
+# BUGS  : N/A
+# NOTES : Added ircd.c file :)
 #
 # BUILD : 1.7.8 (663)
 # BUGS  : 

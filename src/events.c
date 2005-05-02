@@ -36,18 +36,33 @@ EvtHook *find_eventhook(const char *name)
     return m;
 }
 
-void send_event(char *name, const char *fmt, ...)
+void send_event(char *name, int argc, ...)
 {
-    va_list args;
-    char buf[16384];            /* Really huge, to try and avoid truncation */
-    *buf = '\0';
+    va_list va;
+    char *a;
+    int idx = 0;
+    char **argv;
 
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
+    argv = (char **) malloc(sizeof(char *) * argc);
+    va_start(va, argc);
+    for (idx = 0; idx < argc; idx++) {
+        a = va_arg(va, char *);
+        argv[idx] = sstrdup(a);
     }
-    event_process_hook(name, buf);
+    va_end(va);
+
+    if (debug)
+        alog("Emitting event \"%s\" (%d args)", name, argc);
+
+    event_process_hook(name, argc, argv);
+
+    /**
+     * Now that the events have seen the message, free it up
+     **/
+    for (idx = 0; idx < argc; idx++) {
+        free(argv[idx]);
+    }
+    free(argv);
 }
 
 void eventprintf(char *fmt, ...)
@@ -133,7 +148,7 @@ void event_message_process(char *eventbuf)
     free(av);
 }
 
-void event_process_hook(char *name, char *eventbuf)
+void event_process_hook(char *name, int argc, char **argv)
 {
     int retVal = 0;
     EvtHook *current = NULL;
@@ -141,23 +156,18 @@ void event_process_hook(char *name, char *eventbuf)
     if (mod_current_evtbuffer) {
         free(mod_current_evtbuffer);
     }
-    if (eventbuf) {
-        mod_current_evtbuffer = sstrdup(eventbuf);
-    } else {
-        mod_current_evtbuffer = NULL;
-    }
     /* Do something with the message. */
     evh = find_eventhook(name);
     if (evh) {
         if (evh->func) {
             mod_current_module_name = evh->mod_name;
-            retVal = evh->func(eventbuf);
+            retVal = evh->func(argc, argv);
             mod_current_module_name = NULL;
             if (retVal == MOD_CONT) {
                 current = evh->next;
                 while (current && current->func && retVal == MOD_CONT) {
                     mod_current_module_name = current->mod_name;
-                    retVal = current->func(eventbuf);
+                    retVal = current->func(argc, argv);
                     mod_current_module_name = NULL;
                     current = current->next;
                 }
@@ -286,7 +296,7 @@ EvtMessage *createEventHandler(char *name,
   * @param func a pointer to the function to call when we recive this message
   * @return a new Message object
   **/
-EvtHook *createEventHook(char *name, int (*func) (char *message))
+EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv))
 {
     EvtHook *evh = NULL;
     if (!func) {
@@ -685,7 +695,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
     index = CMD_HASH(evh->name);
 
     for (current = hookEvtTable[index]; current; current = current->next) {
-        if (stricmp(evh->name, current->name)) {
+        if (stricmp(evh->name, current->name) == 0) {
             if (!lastHash) {
                 tail = current->evh;
                 if (tail->next) {

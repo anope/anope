@@ -1,2 +1,2 @@
-SRCS=hs_moo.c events.c
-SUBS=catserv
+SRCS=cs_appendtopic.c cs_enforce.c cs_tban.c ns_maxemail.c ns_noop.c os_info.c
+SUBS=test

@@ -39,47 +39,21 @@ Anope for Windows
     2) Unpack the Anope tarball with your favorite uncompression program
        (winzip or winrar).
 
-    3) Open Makefile.inc.win32 in the main directory with a text editor
-       (notepad or notepad clones).
-   
-        A) Change the line "IRCD=" to match the ircd that you want to build,
-           and place that number after the =. So if you want to build for
-           Unreal 3.2 (#10), you would change the line to read "IRCD=10".
-
-        B) If you are building for MySQL change USE_MYSQL to equal 1 (i.e.
-           USE_MYSQL=1). On the next two lines you must enter the path to the
-           MySQL installation. MYSQL_INC, and MYSQL_LIB. You can define the
-           path one of two ways, either with \ or /. If you use \ you must
-           add a secondary \; so c:\mysql would be c:\\mysql.
-
-        C) Do you want to use the MD5 message-digest algorithm to encrypt
-           passwords? Selecting "yes" protects your passwords from being
-           stolen if someone gains access to the Services databases, but
-           makes it impossible to recover forgotten passwords. There is no
-           way to reverse this operation, so make sure you really want to
-           enable it. Change DB_ENCRYPTION to be equal to 1 to enable it.
-
-        D) If you are using Visual Studio 6, this next line can be very
-           important. If you are getting an error during compile about
-           "unresolved external symbol __ftol2", remove the # in front of
-           VC6=/QIfist and attempt to compile again.
-
-        E) If you get an error about "Cannot find wsock32.lib" or
-           "Cannot find msvcrt.lib" when compiling, you need to define the
-           libpath, in the LIBPATH directive. You can define the path in one
-           of two ways: either with \ or /. If you use \ you must add a
-           secondary \; so c:\sdk\lib would be c:\\sdk\\lib. Be sure to
-           remove the # in front of LFLAGS.
-
-        F) Most import is to set the DATDEST to be the folder name where the
-           database will be stored. This does not need to be the full path,
-           just the folder under the main executable in which data will
-           exist. In our example we will use "data"
+    3) Bring up the Visual C++ toolkit command prompt; This will launch a
+       dos command prompt like windows, which will set the environment
+       properties need to make Anope. Change directories to where you unpacked
+       the source code in step 2.
+       
+    4) You now need to configure Anope to your requirements. At the prompt type:
+    
+        cscript /nologo install.vbs
+        
+       An interactive configuration program should guide you through the install
+       options, and then detect your Microsoft Visual C++ Library files. If it
+       fails to detect them, you can manually specify a path. Please refer to
+       your compilers documentation if you need to specify a manual path.
  
-    4) You are now ready to compile. bring up the Visual C++ toolkit command
-       prompt; This will launch a dos command prompt like windows, which will
-       set the environment properties need to make Anope. Change directories
-       to where you unpacked the source code in step 2. At the prompt type:
+    5) You are now ready to compile. At the prompt type:
 
         nmake -f Makefile.win32
 
@@ -88,7 +62,7 @@ Anope for Windows
        adjust the Makefile.inc.win32 to help resolve the issue. If those
        changes in Makefile.inc.win32 didn't help, file a bug report.
 
-    5) Anope will install the files where the belong. The only thing you need
+    6) Anope will install the files where the belong. The only thing you need
        to do is rename "data/example.conf" to be "services.conf".
 
     You have now completed the building phase of Anope for Windows. You can
@@ -97,17 +71,23 @@ Anope for Windows
 2) Installation
 
     Since Anope for Windows does not use a visual interface, you must do the
-    configuration with a text editor before proceeding with running anope
+    configuration with a text editor before proceeding with running Anope
     itself.
 
     Open services.conf, and read through it carefully and adjust the settings
-    you think you need to adjust. Pay special attention to this settings:
+    you think you need to adjust. Pay special attention to these settings:
 
-    A) RemoteServer: This is the address to your ircd, along with the port
+    A) IRCDModule:   This is the name of an IRCd Module that Anope will use
+                     to communicate with your server. Anope supports 15 IRCds,
+                     so ensure you set the right value here.
+    B) RemoteServer: This is the address to your ircd, along with the port
                      and password. You should consult your ircd
                      documentation on how to link ircds.
-    B) ServicesRoot: Remove the # and change the names to your nick so you
+    C) ServicesRoot: Remove the # and change the names to your nick so you
                      can take control of services once they are online.
+    D) UserKey1/2/3: Remove the # infront of the three UserKey settings, and
+                     change the parameters to numbers; around 6-7 digits will
+                     do.
 
     If you are unsure of the settings, you can go to the dos command prompt
     and run "anope.exe -nofork -debug" and watch the information as it
@@ -123,31 +103,34 @@ Anope for Windows
 3) Compiling Modules
 
     If you want to build other modules than the ones shipped by default, you
-    will need to modify the Makefile.inc.win32 file.
+    will need to modify the Makefile.inc.win32 file, in the src\modules folder.
 
-    A) If you get an error about "Cannot find wsock32.lib" or
-       "Cannot find msvcrt.lib" when compiling, you need to define the
-       libpath, in the LIBPATH directive. You can define the path in one
-       of two ways: either with \ or /. If you use \ you must add a
-       secondary \; so c:\sdk\lib would be c:\\sdk\\lib. Be sure to
-       remove the # in front of LFLAGS.
-
-    B) Add modules; find the line stating "SRCS=" and add the name of the
+    A) Add modules; find the line stating "SRCS=" and add the name of the
        file to the end of the line. So if you have two files:
 
         SRCS=file.c file2.c
+        
+       If you are compiling a folder of module components, such as the example
+       "catserv", you will need to add/change the "SUBS=" line. If you were
+       compiling the "catserv" example, the line would look like this:
+       
+        SUBS=catserv
 
-    C) When you've done this, use the same command prompt you set up in part
-       1, change directories to the src/modules folder, and type:
+    B) When you've done this, use the same command prompt you set up in part
+       1, change directories to the src\modules folder, and type:
 
         nmake -f Makefile.win32
+        
+       followed afterwards, by:
 
-    D) Copy the *.dll files that get created to the "data/modules/runtime"
-       folder.
+        nmake -f Makefile.win32 install
+        
+    C) You should now be able to load your modules on IRC via OperServ, or via
+       the services.conf file.
 
 4) Credits
 
-    Anope is base on Epona and IRCServices. See README for more credits and
+    Anope is based on Epona and IRCServices. See CREDITS for more credits and
     a complete list of all developers.
 
     Anope's Windows-specific code is provided by:
@@ -155,3 +138,8 @@ Anope for Windows
         * Dominick Meglio       <codemastr@unrealircd.com>
         * Trystan Scott Lee     <trystan@nomadirc.net>
         * Chris Hogben          <heinz@anope.org>
+        
+    Anope's Windows Installer was made using:
+    
+        * Inno Setup 5          <http://www.jrsoftware.org>
+        

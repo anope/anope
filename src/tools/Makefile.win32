@@ -19,7 +19,6 @@ spotless: clean
         -@del *.exe *.lib *.exp
 
 install: FRC
-        -@mkdir ..\..\$(DATDEST)\tools
-        -@copy *.exe ..\..\$(DATDEST)\tools
+        -@copy *.exe ..\..\$(DATDEST)\
 
 FRC:

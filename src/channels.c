@@ -256,10 +256,12 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 chan_remove_user_status(chan, user, cum->status);
 
         } else if ((cbm = &cbmodes[(int) mode])->flag != 0) {
-            if (add)
-                chan->mode |= cbm->flag;
-            else
-                chan->mode &= ~cbm->flag;
+            if (check >= 0) {
+                if (add)
+                    chan->mode |= cbm->flag;
+                else
+                    chan->mode &= ~cbm->flag;
+            }
 
             if (cbm->setvalue) {
                 if (add || !(cbm->flags & CBM_MINUS_NO_ARG)) {
@@ -271,6 +273,13 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                     av++;
                 }
                 cbm->setvalue(chan, add ? *av : NULL);
+            }
+
+            if (check < 0) {
+                if (add)
+                    chan->mode |= cbm->flag;
+                else
+                    chan->mode &= ~cbm->flag;
             }
         } else if ((cmm = &cmmodes[(int) mode])->addmask) {
             if (ac == 0) {
@@ -287,7 +296,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
         }
     }
 
-    if (check) {
+    if (check > 0) {
         check_modes(chan);
 
         if (check < 2) {
@@ -537,6 +546,8 @@ void do_join(const char *source, int ac, char **av)
         if (debug)
             alog("debug: %s joins %s", source, s);
 
+        send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, source, s);
+
         if (*s == '0') {
             c = user->chans;
             while (c) {
@@ -557,6 +568,8 @@ void do_join(const char *source, int ac, char **av)
         chan = findchan(s);
         chan = join_user_update(user, chan, s);
         chan_set_correct_modes(user, chan, 1);
+
+        send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, source, s);
     }
 }
 
@@ -663,6 +676,8 @@ void do_part(const char *source, int ac, char **av)
                 alog("user: BUG parting %s: channel entry found but c->chan NULL", s);
                 return;
             }
+            send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick,
+                       c->chan->name);
             chan_deluser(user, c->chan);
             if (c->next)
                 c->next->prev = c->prev;
@@ -671,6 +686,8 @@ void do_part(const char *source, int ac, char **av)
             else
                 user->chans = c->next;
             free(c);
+            send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
+                       c->chan->name);
         }
     }
 }
@@ -805,6 +822,9 @@ void do_sjoin(const char *source, int ac, char **av)
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1])) {
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
+                               user->nick, av[1]);
+
                     /* Make the user join; if the channel does not exist it
                      * will be created there. This ensures that the channel
                      * is not created to be immediately destroyed, and
@@ -827,6 +847,9 @@ void do_sjoin(const char *source, int ac, char **av)
                         && !c->topic_sync)
                         restore_topic(c->name);
                     chan_set_correct_modes(user, c, 1);
+
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
+                               user->nick, av[1]);
                 }
             }
 
@@ -881,6 +904,9 @@ void do_sjoin(const char *source, int ac, char **av)
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1])) {
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
+                               user->nick, av[1]);
+
                     /* Make the user join; if the channel does not exist it
                      * will be created there. This ensures that the channel
                      * is not created to be immediately destroyed, and
@@ -900,6 +926,9 @@ void do_sjoin(const char *source, int ac, char **av)
                     }
 
                     chan_set_correct_modes(user, c, 1);
+
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
+                               user->nick, av[1]);
                 }
             }
 
@@ -952,6 +981,9 @@ void do_sjoin(const char *source, int ac, char **av)
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1])) {
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
+                               user->nick, av[1]);
+
                     /* Make the user join; if the channel does not exist it
                      * will be created there. This ensures that the channel
                      * is not created to be immediately destroyed, and
@@ -971,6 +1003,9 @@ void do_sjoin(const char *source, int ac, char **av)
                     }
 
                     chan_set_correct_modes(user, c, 1);
+
+                    send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP,
+                               user->nick, av[1]);
                 }
             }
 
@@ -1011,11 +1046,17 @@ void do_sjoin(const char *source, int ac, char **av)
         if (is_sqlined && !is_oper(user)) {
             anope_cmd_kick(s_OperServ, av[1], user->nick, "Q-Lined");
         } else {
+            send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, user->nick,
+                       av[1]);
+
             c = join_user_update(user, c, av[1]);
             c->creation_time = ts;
             if (is_created && c->ci)
                 restore_topic(c->name);
             chan_set_correct_modes(user, c, 1);
+
+            send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, user->nick,
+                       av[1]);
         }
     }
 }
@@ -1122,6 +1163,8 @@ void do_topic(const char *source, int ac, char **av)
     /* We can be sure that the topic will be in sync here -GD */
     c->topic_sync = 1;
 
+    ci = c->ci;
+
     /* If the current topic we have matches the last known topic for this
      * channel exactly, there's no need to update anything and we can as
      * well just return silently without updating anything. -GD
@@ -1138,13 +1181,20 @@ void do_topic(const char *source, int ac, char **av)
         free(c->topic);
         c->topic = NULL;
     }
-    if (ac > 3 && *av[3])
+    if (ac > 3 && *av[3]) {
         c->topic = sstrdup(av[3]);
+    }
 
     strscpy(c->topic_setter, av[1], sizeof(c->topic_setter));
     c->topic_time = topic_time;
 
     record_topic(av[0]);
+
+    if (ci->last_topic) {
+        send_event(EVENT_TOPIC_UPDATED, 2, av[0], ci->last_topic);
+    } else {
+        send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+    }
 }
 
 /*************************************************************************/
@@ -1471,8 +1521,9 @@ Channel *chan_create(char *chan)
         stick_all(c->ci);
     }
 
-    if (serv_uplink && is_sync(serv_uplink) && (!(c->topic_sync)))
+    if (serv_uplink && is_sync(serv_uplink) && (!(c->topic_sync))) {
         restore_topic(chan);
+    }
 
     return c;
 }

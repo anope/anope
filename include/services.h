@@ -229,24 +229,6 @@ typedef enum { false, true } boolean;
 
 /* Protocol tweaks */
 
-
-#include "hybrid.h"
-#include "viagra.h"
-#include "bahamut.h"
-#include "rageircd.h"
-#include "ptlink.h"
-#include "ultimate2.h"
-#include "unreal31.h"
-#include "ultimate3.h"
-#include "dreamforge.h"
-#include "unreal32.h"
-#include "solidircd.h"
-#include "plexus.h"
-#include "ratbox.h"
-#include "shadowircd.h"
-
-
-
 typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
 
@@ -311,7 +293,6 @@ struct ircdvars_ {
 	int umode;					/* change user modes		*/
 	int nickvhost;				/* Users vhost sent during NICK */
 	int chgreal;				/* Change RealName		*/
-	int extrahelp;				/* Lang file entry for extra 	*/
 	uint32 noknock;				/* Channel Mode for no knock	*/
 	uint32 adminmode;			/* Admin Only Channel Mode	*/
 	uint32 defmlock;			/* Default mlock modes		*/
@@ -382,6 +363,40 @@ struct uid_ {
     char nick[NICKMAX];
     char *uid;
 };
+
+/*************************************************************************/
+/* Config Details */
+/*************************************************************************/
+
+#define MAXPARAMS	8
+
+/* Configuration directives */
+
+typedef struct {
+    char *name;
+    struct {
+        int type;               /* PARAM_* below */
+        int flags;              /* Same */
+        void *ptr;              /* Pointer to where to store the value */
+    } params[MAXPARAMS];
+} Directive;
+
+#define PARAM_NONE	0
+#define PARAM_INT	1
+#define PARAM_POSINT	2       /* Positive integer only */
+#define PARAM_PORT	3       /* 1..65535 only */
+#define PARAM_STRING	4
+#define PARAM_TIME	5
+#define PARAM_STRING_ARRAY 6    /* Array of string */
+#define PARAM_SET	-1      /* Not a real parameter; just set the
+                                 *    given integer variable to 1 */
+#define PARAM_DEPRECATED -2     /* Set for deprecated directives; `ptr'
+                                 *    is a function pointer to call */
+
+/* Flags: */
+#define PARAM_OPTIONAL	0x01
+#define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
+#define PARAM_RELOAD    0x04    /* Directive is reloadable */
 
 /*************************************************************************/
 
@@ -992,6 +1007,17 @@ struct sxline_ {
 
 /*************************************************************************/
 
+/*************************************************************************/
+
+/* clone stuff structure */
+
+struct clone {
+    char *host;
+    long time;
+};
+
+/************************************************************************/
+
 /* Host serv structures */
 
 struct hostcore_ {
@@ -1039,7 +1065,97 @@ struct session_ {
 };
 
 /*************************************************************************/
+/**
+ * IRCD Protocol module support struct.
+ * protocol modules register the command they want touse for function X with our set
+ * functions, we then call the correct function for the anope_ commands.
+ **/
+typedef struct ircd_proto_ {
+    void (*ircd_cmd_svsnoop)(char *server, int set);
+    void (*ircd_cmd_remove_akill)(char *user, char *host);
+    void (*ircd_cmd_topic)(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
+    void (*ircd_cmd_vhost_off)(User * u);
+    void (*ircd_cmd_akill)(char *user, char *host, char *who, time_t when,time_t expires, char *reason);
+    void (*ircd_cmd_svskill)(char *source, char *user, char *buf);
+    void (*ircd_cmd_svsmode)(User * u, int ac, char **av);
+    void (*ircd_cmd_372)(char *source, char *msg);
+    void (*ircd_cmd_372_error)(char *source);
+    void (*ircd_cmd_375)(char *source);
+    void (*ircd_cmd_376)(char *source);
+    void (*ircd_cmd_nick)(char *nick, char *name, char *modes);
+    void (*ircd_cmd_guest_nick)(char *nick, char *user, char *host, char *real, char *modes);
+    void (*ircd_cmd_mode)(char *source, char *dest, char *buf);
+    void (*ircd_cmd_bot_nick)(char *nick, char *user, char *host, char *real, char *modes);
+    void (*ircd_cmd_kick)(char *source, char *chan, char *user, char *buf);
+    void (*ircd_cmd_notice_ops)(char *source, char *dest, char *buf);
+    void (*ircd_cmd_notice)(char *source, char *dest, char *buf);
+    void (*ircd_cmd_notice2)(char *source, char *dest, char *msg);
+    void (*ircd_cmd_privmsg)(char *source, char *dest, char *buf);
+    void (*ircd_cmd_privmsg2)(char *source, char *dest, char *msg);
+    void (*ircd_cmd_serv_notice)(char *source, char *dest, char *msg);
+    void (*ircd_cmd_serv_privmsg)(char *source, char *dest, char *msg);
+    void (*ircd_cmd_bot_chan_mode)(char *nick, char *chan);
+    void (*ircd_cmd_351)(char *source);
+    void (*ircd_cmd_quit)(char *source, char *buf);
+    void (*ircd_cmd_pong)(char *servname, char *who);
+    void (*ircd_cmd_join)(char *user, char *channel, time_t chantime);
+    void (*ircd_cmd_unsqline)(char *user);
+    void (*ircd_cmd_invite)(char *source, char *chan, char *nick);
+    void (*ircd_cmd_part)(char *nick, char *chan, char *buf);
+    void (*ircd_cmd_391)(char *source, char *timestr);
+    void (*ircd_cmd_250)(char *buf);
+    void (*ircd_cmd_307)(char *buf);
+    void (*ircd_cmd_311)(char *buf);
+    void (*ircd_cmd_312)(char *buf);
+    void (*ircd_cmd_317)(char *buf);
+    void (*ircd_cmd_219)(char *source, char *letter);
+    void (*ircd_cmd_401)(char *source, char *who);
+    void (*ircd_cmd_318)(char *source, char *who);
+    void (*ircd_cmd_242)(char *buf);
+    void (*ircd_cmd_243)(char *buf);
+    void (*ircd_cmd_211)(char *buf);
+    void (*ircd_cmd_global)(char *source, char *buf);
+    void (*ircd_cmd_global_legacy)(char *source, char *fmt);
+    void (*ircd_cmd_sqline)(char *mask, char *reason);
+    void (*ircd_cmd_squit)(char *servname, char *message);
+    void (*ircd_cmd_svso)(char *source, char *nick, char *flag);
+    void (*ircd_cmd_chg_nick)(char *oldnick, char *newnick);
+    void (*ircd_cmd_svsnick)(char *source, char *guest, time_t when);
+    void (*ircd_cmd_vhost_on)(char *nick, char *vIdent, char *vhost);
+    void (*ircd_cmd_connect)(int servernum);
+    void (*ircd_cmd_svshold)(char *nick);
+    void (*ircd_cmd_release_svshold)(char *nick);
+    void (*ircd_cmd_unsgline)(char *mask);
+    void (*ircd_cmd_unszline)(char *mask);
+    void (*ircd_cmd_szline)(char *mask, char *reason, char *whom);
+    void (*ircd_cmd_sgline)(char *mask, char *reason);
+    void (*ircd_cmd_unban)(char *name, char *nick);
+    void (*ircd_cmd_svsmode_chan)(char *name, char *mode, char *nick);
+    void (*ircd_cmd_svid_umode)(char *nick, time_t ts);
+    void (*ircd_cmd_nc_change)(User * u);
+    void (*ircd_cmd_svid_umode2)(User * u, char *ts);
+    void (*ircd_cmd_svid_umode3)(User * u, char *ts);
+    void (*ircd_cmd_ctcp)(char *source, char *dest, char *buf);
+    void (*ircd_cmd_eob)();
+    void (*ircd_cmd_jupe)(char *jserver, char *who, char *reason);
+    void (*ircd_set_umode)(User *user, int ac, char **av);
+    int (*ircd_valid_nick)(char *nick);
+    int (*ircd_flood_mode_check)(char *value);
+} IRCDProto;
 
+typedef struct ircd_modes_ {
+        int user_invis;
+        int user_oper;
+        int chan_invite;
+        int chan_secret;
+        int chan_private;
+        int chan_key;
+        int chan_limit;
+} IRCDModes;
+
+
+
+/*************************************************************************/
 /**
  * DEFCON Defines
  **/

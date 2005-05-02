@@ -96,11 +96,15 @@ typedef void *	ano_module_t;
 #endif
 /*************************************************************************/
 
+typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED } MODType;
+
+/*************************************************************************/
 /* Structure for information about a *Serv command. */
 
 typedef struct Command_ Command;
 typedef struct CommandHash_ CommandHash;
 typedef struct Module_ Module;
+typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
@@ -118,8 +122,14 @@ extern MDE CommandHash *CHANSERV[MAX_CMD_HASH];
 extern MDE CommandHash *HELPSERV[MAX_CMD_HASH];
 extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MDE MessageHash *IRCD[MAX_CMD_HASH];
-extern EvtMessageHash *EVENT[MAX_CMD_HASH];
-extern EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
+extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
+extern MDE EvtMessageHash *EVENT[MAX_CMD_HASH];
+extern MDE EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
+
+struct ModuleLang_ {
+    int argc;
+    char **argv;
+};
 
 struct Module_ {
 	char *name;
@@ -128,6 +138,8 @@ struct Module_ {
 	time_t time;
 	char *version;
 	char *author;
+
+	MODType type;
 
 	void (*nickHelp)(User *u); /* service 1 */
 	void (*chanHelp)(User *u); /* 2 */
@@ -139,6 +151,7 @@ struct Module_ {
 
 /*	CommandHash *cmdList[MAX_CMD_HASH]; */
 	MessageHash *msgList[MAX_CMD_HASH];
+	ModuleLang lang[NUM_LANGS];
 };
 
 struct ModuleHash_ {
@@ -225,7 +238,7 @@ struct EvtMessageHash_ {
 
 
 struct EvtHook_ {
-    int (*func)(char *source);
+    int (*func)(int argc, char **argv);
     int core;
 	char *name;
     char *mod_name;
@@ -241,12 +254,13 @@ struct EvtHookHash_ {
 
 /*************************************************************************/
 /* Module Managment Functions */
-Module *createModule(char *filename);	/* Create a new module, using the given name */
+MDE Module *createModule(char *filename);        /* Create a new module, using the given name */
 int destroyModule(Module *m);		/* Delete the module */
 int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
-Module *findModule(char *name);		/* Find a module */
+MDE Module *findModule(char *name);                /* Find a module */
 int loadModule(Module *m,User *u);	/* Load the given module into the program */
+int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */
 MDE void moduleAddVersion(char *version);
@@ -269,6 +283,14 @@ MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
+MDE void moduleSetType(MODType type);
+MDE Module *mod_current_module;
+MDE char *mod_current_module_name;
+MDE char *mod_current_buffer;
+MDE int mod_current_op;
+MDE User *mod_current_user;
+
+MDE int moduleGetConfigDirective(Directive *h);
 /*************************************************************************/
 /*************************************************************************/
 /* Command Managment Functions */
@@ -287,7 +309,7 @@ Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a comma
 MDE Message *createMessage(char *name,int (*func)(char *source, int ac, char **av));
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
-int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
+MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
 MDE int moduleAddMessage(Message *m, int pos);
 int delMessage(MessageHash *msgTable[], Message *m, char *mod_name);		/* Del a Message from a msg table */
 MDE int moduleDelMessage(char *name);
@@ -305,7 +327,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, char *mod_
 int destroyEventHandler(EvtMessage * evm);
 int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 
-MDE EvtHook *createEventHook(char *name, int (*func) (char *source));
+MDE EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv));
 EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
 int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
 MDE int moduleAddEventHook(EvtHook * evh);
@@ -313,6 +335,10 @@ MDE int moduleEventDelHook(const char *name);
 int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, char *mod_name);
 int destroyEventHook(EvtHook * evh);
 extern char *mod_current_evtbuffer;
+
+MDE void moduleInsertLanguage(int langNumber, int ac, char **av);
+MDE void moduleNoticeLang(char *source, User *u, int number, ...);
+MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/
 

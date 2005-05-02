@@ -343,7 +343,7 @@ void do_server(const char *source, char *servername, char *hops,
         s = findserver(servlist, source);
 
     new_server(s, servername, descript, 0, numeric);
-    send_event(EVENT_SERVER_CONNECT, servername);
+    send_event(EVENT_SERVER_CONNECT, 1, servername);
 }
 
 /*************************************************************************/
@@ -372,7 +372,7 @@ void do_squit(const char *source, int ac, char **av)
         alog("SQUIT for nonexistent server (%s)!!", av[0]);
         return;
     }
-    send_event(EVENT_SERVER_SQUIT, s->name);
+    send_event(EVENT_SERVER_SQUIT, 1, s->name);
 
     snprintf(buf, sizeof(buf), "%s %s", s->name,
              (s->uplink ? s->uplink->name : ""));

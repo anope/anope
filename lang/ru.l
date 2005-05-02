@@ -1904,7 +1904,7 @@ BOT_SEEN_NEVER
 	Я никогда не видел %s на канале.
 BOT_SEEN_UNKNOWN
 	Я не знаю кто такой %s.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD ник идент хост реальное имя
@@ -2831,7 +2831,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Current Module list:
 OPER_MODULE_LIST
-	Модуль: %s [%s]
+	Модуль: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules loaded.
 OPER_MODULE_INFO_LIST
@@ -3204,6 +3204,56 @@ HELP_HELP_HOST
 # NickServ help messages
 #
 ###########################################################################
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Регистрация ника
+NICK_HELP_CMD_GROUP
+	    GROUP      Объединение ников в группы
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Идентификация Вас как владельца ника
+NICK_HELP_CMD_ACCESS
+	    ACCESS     Управление списком доступа
+NICK_HELP_CMD_SET
+	    SET        Установка параметров, включая защиту kill'ом
+NICK_HELP_CMD_DROP
+	    DROP       Отмена регистрации ника
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Выбросить из чата пользователя, взявшего Ваш ник
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Восстановление использования Вашего ника после команды RECOVER
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Забыли пароль? Попробуйте эту команду
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Возвращает пароль ника
+	               (только если шифрование выключено)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Предохраняет ник от использования
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
 
 NICK_HELP
 	%S это сервис, предназначенный для "регистрации" Вашего ника и его защиты
@@ -3213,19 +3263,7 @@ NICK_HELP
 	Для более подробной информации по какой-либо
 	команде напишите: /msg %S HELP команда.
 	
-	    REGISTER   Регистрация ника
-	    GROUP      Объединение ников в группы
-	    IDENTIFY   Идентификация Вас как владельца ника
-	    ACCESS     Управление списком доступа
-	    SET        Установка параметров, включая защиту kill'ом
-	    DROP       Отмена регистрации ника
-	    RECOVER    Выбросить из чата пользователя, взявшего Ваш ник
-	    RELEASE    Восстановление использования Вашего ника после команды RECOVER
-	    SENDPASS   Забыли пароль? Попробуйте эту команду
-	
-	Другие команды: GHOST, ALIST, GLIST, INFO, LIST, LOGOUT, 
-	                STATUS
-	
+NICK_HELP_FOOTER
 	ВАЖНО: Данный сервис предназначен для того, чтобы пользователи IRC  
 	могли воспользоваться многими удобными возможностями.
 	NickServ НЕ предназначен для облегчения "воровства" ников,
@@ -3639,13 +3677,6 @@ NICK_HELP_SENDPASS
 	При включенном шифровании паролей эта команда недоступна.
 
 NICK_SERVADMIN_HELP
-	
-	Доступные команды для Администраторов сервисов:
-	
-	    GETPASS    Возвращает пароль ника
-	                 (только если шифрование выключено)
-	    FORBID     Предохраняет ник от использования
-	
 	Администраторы сервисов могут также удалить любой ник без идентификации
 	для него, и могут смотреть список доступа для любого ника
 	(/msg %S ACCESS LIST ник).
@@ -3805,6 +3836,86 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Получить пароль владельца канала
+CHAN_HELP_CMD_FORBID
+	    FORBID     Запретить использовать канал
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Приостановить работу канала с сохранением
+	               данных и настроек канала.
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Восстановить работу приостановленного канала.
+CHAN_HELP_CMD_STATUS
+	    STATUS     Возвращает текущий уровень доступа для указанного
+	               пользователя на канале.
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Регистрация канала
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Идентифицироваться как владелец канала
+CHAN_HELP_CMD_SET
+	    SET        Установить информацию о канале и опции канала
+CHAN_HELP_CMD_AOP
+	    AOP        Модифицировать список AOP'ов
+CHAN_HELP_CMD_SOP
+	    SOP        Модифицировать список SOP'ов
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Модифицировать список привилегированных пользователей
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Переустановить значения уровней доступа
+CHAN_HELP_CMD_AKICK
+	    AKICK      Управление списком автокиков
+CHAN_HELP_CMD_DROP
+	    DROP       Удалить канал из базы данных ChanServ
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Поможет восстановить забытый пароль
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	%S позволяет Вам регистрировать канал и управлять
@@ -3814,43 +3925,8 @@ CHAN_HELP
 	команды показаны ниже; чтобы использовать их пишите
 	/msg %S команда. Для более подробной информации о конкретной
 	команде, напишите /msg %S HELP команда.
+	 
 	
-	    REGISTER   Регистрация канала
-	    IDENTIFY   Идентифицироваться как владелец канала
-	    SET        Установить информацию о канале и опции канала
-	    AOP        Модифицировать список AOP'ов
-	    SOP        Модифицировать список SOP'ов
-	    ACCESS     Модифицировать список привилегированных пользователей
-	    LEVELS     Переустановить значения уровней доступа
-	    AKICK      Управление списком автокиков
-	    DROP       Удалить канал из базы данных ChanServ
-	    SENDPASS   Поможет восстановить забытый пароль
-	
-	Другие команды: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
-	                INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
-	                UNBAN, VOICE, VOP
-
-CHAN_HELP_UNREAL
-	
-	В данной сети также доступны команды:
-	DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Эти команды также доступны в Вашей сети:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Помните, что любой канал, не использующийся в течение %d дней
@@ -4670,17 +4746,6 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Нижеследующие команды доступны для администраторов сервисов:
-	
-	    GETPASS    Получить пароль владельца канала
-	               (только если шифрование выключено)
-	    FORBID     Запретить использовать канал
-	    SUSPEND    Приостановить работу канала с сохранением
-	               данных и настроек канала.
-	    UNSUSPEND  Восстановить работу приостановленного канала.
-	    STATUS     Возвращает текущий уровень доступа для указанного
-	               пользователя на канале.
-	
 	Администраторы сервисов могут также удалить любой канал без
 	идентификации как владелец канала, могут просматривать список доступа, список акиков,
 	и установки уровней доступа на канале.
@@ -4797,7 +4862,30 @@ CHAN_SERVADMIN_HELP_STATUS
 #
 ###########################################################################
 
-MEMO_HELP
+MEMO_HELP_CMD_SEND
+	    SEND   Отправить мемо на ник или канал
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Отменить последнюю отправленную Вами мемку
+MEMO_HELP_CMD_LIST
+	    LIST   Список Ваших мемок
+MEMO_HELP_CMD_READ
+	    READ   Читать мемки
+MEMO_HELP_CMD_DEL
+	    DEL    Удалять мемки
+MEMO_HELP_CMD_SET
+	    SET    Установка опций для мемок
+MEMO_HELP_CMD_INFO
+	    INFO   показать информацию о Ваших мемках
+MEMO_HELP_CMD_RSEND
+	    RSEND  Sends a memo and requests a read receipt
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  отправляет мемку всем зарегистрированным пользователям
+MEMO_HELP_CMD_STAFF
+	    STAFF  Отправляет мемку всем операторам/администраторам сервисов
+
+MEMO_HELP_HEADER
 	%S это удобный сервис, позволяющий пользователям IRC отправлять
 	короткие сообщения другим пользователям, которых нет в данный момент в сети,
 	или на каналы(*). Ник отправителя, как и
@@ -4806,20 +4894,11 @@ MEMO_HELP
 
 	%S's включает команды:
 
-	    SEND   Отправить мемо на ник или канал
-	    CANCEL Отменить последнюю отправленную Вами мемку
-	    LIST   Список Ваших мемок
-	    READ   Читать мемки
-	    DEL    Удалять мемки
-	    SET    Установка опций для мемок
-	    INFO   показать информацию о Ваших мемках
 
 MEMO_HELP_ADMIN
-	    SENDALL  отправляет мемку всем зарегистрированным пользователям
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Отправляет мемку всем операторам/администраторам сервисов
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	Напишите /msg %S HELP команда для получения более подробной
@@ -5013,82 +5092,89 @@ MEMO_HELP_CHECK
 #
 ###########################################################################
 
+OPER_HELP_CMD_GLOBAL
+	    GLOBAL      Послать сообщение всем пользователям
+OPER_HELP_CMD_STATS
+	    STATS       Показать статистику сервисов и сети
+OPER_HELP_CMD_OPER
+	    OPER        Управление списком Операторов сервисов
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Управление списком администраторов сервисов
+OPER_HELP_CMD_STAFF
+	    STAFF       Список всех прописанных на сервисах и их онлайн-статус
+OPER_HELP_CMD_MODE
+	    MODE        Изменяет режим на канале
+OPER_HELP_CMD_KICK
+	    KICK        Кикнуть пользователя с канала
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Очистка режимов на канале
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Прибить всех пользователей с определенного хоста
+OPER_HELP_CMD_AKILL
+	    AKILL       Управление списком AKILL'ов
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Управление списком SGLINE'ов
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Управление списком SQLINE'ов
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Управление списком SZLINE'ов
+OPER_HELP_CMD_CHANLIST
+	    CHANLIST    Показать все текущие каналы
+OPER_HELP_CMD_USERLIST
+	    USERLIST    Показать всех текущих пользователей
+OPER_HELP_CMD_LOGONNEWS
+	    LOGONNEWS   Установить сообщения при входе в сеть
+OPER_HELP_CMD_RANDOMNEWS
+	    RANDOMNEWS  Установить случайные сообщения
+	                при входе в сеть
+OPER_HELP_CMD_OPERNEWS
+	    OPERNEWS    Установить сообщения, показываемые при /oper
+OPER_HELP_CMD_SESSION
+	    SESSION     Посмотреть список текущих соединений
+OPER_HELP_CMD_EXCEPTION
+	    EXCEPTION   Управление списком исключений из лимита сессий
+OPER_HELP_CMD_NOOP
+	    NOOP        Временно удалить все O:лайны на указанном
+	                сервере
+OPER_HELP_CMD_JUPE
+	    JUPE        "Джупнуть" сервер
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Управление списком игноров сервисов
+OPER_HELP_CMD_SET
+	    SET         Установить различные опции сервисов
+OPER_HELP_CMD_RELOAD
+	    RELOAD      Перезагрузить конфигурационный файл сервисов
+OPER_HELP_CMD_UPDATE
+	    UPDATE      Заставить сервисы немедленно сохранить
+	                все базы данных на диск
+
+OPER_HELP_CMD_RESTART
+	    RESTART     Сохранить базы данных и перезапустить сервисы
+OPER_HELP_CMD_QUIT
+	    QUIT        Завершить работу сервисов без сохранения данных
+OPER_HELP_CMD_SHUTDOWN
+	    SHUTDOWN    Завершить работу сервисов с сохранением данных
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Управление системой DefCon
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Прибить всех пользователей на определенном канале
+OPER_HELP_CMD_OLINE
+	    OLINE       Установить флаги IRC Операторов определенному пользователю
+OPER_HELP_CMD_UMODE
+	    UMODE       Изменение режимов пользователя
+OPER_HELP_CMD_SVSNICK
+	    SVSNICK     Сменить ник пользователю
+OPER_HELP_CMD_MODLOAD
+	    MODLOAD     Загрузить модуль
+OPER_HELP_CMD_MODUNLOAD
+	    MODUNLOAD   Выгрузить модуль
+OPER_HELP_CMD_MODINFO
+	    MODINFO     Информация о загруженном модуле
+OPER_HELP_CMD_MODLIST
+	    MODLIST     Список загруженных модулей
+
 OPER_HELP
 	%S commands:
-	    GLOBAL      Послать сообщение всем пользователям
-	    STATS       Показать статистику сервисов и сети
-	    OPER LIST   Список Операторов сервисов
-	    ADMIN LIST  Список Администраторов Сервисов
-	    STAFF       Список всех прописанных на сервисах и их онлайн-статус
-
-OPER_HELP_OPER_CMD
-	Команды, доступные только Операторам и Администраторам сервисов и:
-	    MODE        Изменяет режим на канале
-	    KICK        Кикнуть пользователя с канала
-	    CLEARMODES  Очистка режимов на канале
-	    KILLCLONES  Прибить всех пользователей с определенного хоста
-	    AKILL       Управление списком AKILL'ов
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Управление списком SGLINE'ов
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Управление списком SQLINE'ов
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Управление списком SZLINE'ов
-
-
-OPER_HELP_ADMIN_CMD
-	Команды, доступные только Администраторам сервисов:
-	    OPER        Управление списком Операторов сервисов
-	    CHANLIST    Показать все текущие каналы
-	    USERLIST    Показать всех текущих пользователей
-	    LOGONNEWS   Установить сообщения при входе в сеть
-	    RANDOMNEWS  Установить случайные сообщения
-	                    при входе в сеть
-	    OPERNEWS    Установить сообщения, показываемые при /oper
-	    SESSION     Посмотреть список текущих соединений
-	    EXCEPTION   Управление списком исключений из лимита сессий
-	    CACHE       Список кэшированных хостов, используемых детектором прокси
-	    NOOP        Временно удалить все O:лайны на указанном
-	                    сервере
-	    JUPE        "Джупнуть" сервер
-	    IGNORE      Управление списком игноров сервисов
-	    SET         Установить различные опции сервисов
-	    RELOAD      Перезагрузить конфигурационный файл сервисов
-	    UPDATE      Заставить сервисы немедленно сохранить
-	                    все базы данных на диск
-	    RESTART     Сохранить базы данных и перезапустить сервисы
-	    QUIT        Завершить работу сервисов без сохранения данных
-	    SHUTDOWN    Завершить работу сервисов с сохранением данных
-	    DEFCON      Управление системой DefCon
-	    CHANKILL    Прибить всех пользователей на определенном канале
-
-	Команды, доступные только суперпользователю сервисов:
-	    ADMIN       Управление списком администраторов сервисов
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
-	    OLINE       Установить флаги IRC Операторов определенному пользователю
-
-OPER_HELP_ADMIN_CMD_UMODE
-	    UMODE       Изменение режимов пользователя
-
-OPER_HELP_ADMIN_CMD_SVSNICK
-	    SVSNICK     Сменить ник пользователю
-
-OPER_HELP_ROOT_CMD
-	Команды, доступны только суперпользователям сервисов:
-	    MODLOAD     Загрузить модуль
-	    MODUNLOAD   Выгрузить модуль
-	    MODLIST     Список загруженных модулей
-	    MODINFO     Информация о загруженном модуле
 
 OPER_HELP_LOGGED
 	Внимание: Все команды %S'у записываются в лог!
@@ -5694,7 +5780,29 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-	
+
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Список доступных для установки ботов
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Установить бота на канал
+BOT_HELP_CMD_SET
+	SET                Конфигурировать настройки бота
+BOT_HELP_CMD_KICK
+	KICK               Конфигурировать за что бот будет кикать и банить
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Управление списком плохих слов
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Управление ботами
+
 BOT_HELP
 	%S позволяет Вам повесить бота на свой канал.
 	Это сделано для тех, кто не может иначе установить или
@@ -5704,14 +5812,7 @@ BOT_HELP
 	более подробной информации по конкретной команде, напишите /msg 
 	%S HELP команда.
 	
-	BOTLIST            Список доступных для установки ботов
-	ASSIGN             Установить бота на канал
-	SET                Конфигурировать настройки бота
-	KICK               Конфигурировать за что бот будет кикать и банить
-	BADWORDS           Управление списком плохих слов
-	
-	Другие команды: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	Бот присоединится к каналу после того, как на нем окажется
 	не менее %d пользователей.
 	
@@ -5972,17 +6073,10 @@ BOT_HELP_ACT
 	Заставляет бота выполнить команду, эквивалентную команду "/me"
 	на указанном канале, использовав указанный текст.
 
-BOT_SERVADMIN_HELP
-	
-	Нижеследующие команды доступны для Администраторов сервисов:
-	
-	    BOT              Управление ботами
-
 BOT_SERVADMIN_HELP_BOT
 	Синтаксис: BOT ADD ник идент хост реальное имя
 	           BOT CHANGE старый ник новый ник [идент [хост [реальное имя]]]
 	           BOT DEL ник
-	           BOT LIST
 	
 	Позволяет Администраторам сервисов создавать, изменять и удалять
 	ботов, которые могут быть в дальнейшем использованы пользователями
@@ -5995,8 +6089,6 @@ BOT_SERVADMIN_HELP_BOT
 	или реальное имя бота без удаления его (и всех
 	его настроек).
 	BOT DEL удаляет указанного бота из списка ботов.  
-	BOT LIST или BOTLIST покажет список
-	всех доступных в сети ботов.
 	
 	Примечание: Если Вы создали бота с ником, ранее кем-то зарегистрированным,
 	этот ник будет удален. А также, если кто-то использует данный ник
@@ -6101,22 +6193,31 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commands:
+HOST_HELP_CMD_ON
 	    ON          Активирует назначенный Вам виртуальный хост
+HOST_HELP_CMD_OFF
 	    OFF         Деактивирует виртуальный хост
+HOST_HELP_CMD_GROUP
 	    GROUP       Устанавливает и синхронизирует виртуальный хост для всех ников в Вашей группе
 
-HOST_OPER_HELP
-	Команды, доступные только Операторам хостов (setter/removers):
-	    SET         Установить вирутальный хост пользователю
-	    SETALL      Установить виртуальный хост для всех нков в группе
-	    DEL         Удалить виртуальный хост пользователя
-	    DELALL      Удалить виртуальные хосты для всех ников в группе
 
-HOST_ADMIN_HELP
-	Команды, доступные только Администраторам сервисов:
+HOST_HELP_CMD_SET
+	    SET         Установить вирутальный хост пользователю
+HOST_HELP_CMD_SETALL
+	    SETALL      Установить виртуальный хост для всех нков в группе
+HOST_HELP_CMD_DEL
+	    DEL         Удалить виртуальный хост пользователя
+HOST_HELP_CMD_DELALL
+	    DELALL      Удалить виртуальные хосты для всех ников в группе
+HOST_HELP_CMD_LIST
 	    LIST        Покажет список виртуальных хостов.
+
+HOST_HELP
+	%S commands:
+HOST_OPER_HELP
+	not used.
+HOST_ADMIN_HELP
+	not used.
 
 HOST_HELP_ON
 	Синтаксис: ON

@@ -1865,7 +1865,7 @@ BOT_SEEN_NEVER
 	I've never seen %s on this channel.
 BOT_SEEN_UNKNOWN
 	I don't know who %s is.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick user host real
@@ -2778,6 +2778,8 @@ OPER_MODULE_LOAD_FAIL
 	Unable to load module %s
 OPER_MODULE_REMOVE_FAIL
 	Unable to remove module %s
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD FileName
 OPER_MODULE_UNLOAD_SYNTAX
@@ -2785,7 +2787,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Current Module list:
 OPER_MODULE_LIST
-	Module: %s [%s]
+	Module: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules loaded.
 OPER_MODULE_INFO_LIST
@@ -3160,6 +3162,55 @@ HELP_HELP_HOST
 #
 ###########################################################################
 
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Register a nickname
+NICK_HELP_CMD_GROUP
+	    GROUP      Join a group
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Identify yourself with your password
+NICK_HELP_CMD_ACCESS
+	    ACCESS     Modify the list of authorized addresses
+NICK_HELP_CMD_SET
+	    SET        Set options, including kill protection
+NICK_HELP_CMD_DROP
+	    DROP       Cancel the registration of a nickname
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Kill another user who has taken your nick
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Regain custody of your nick after RECOVER
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Forgot your password? Try this
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Retrieve the password for a nickname
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Prevents a nickname from being registered
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
+
 NICK_HELP
 	%S allows you to "register" a nickname and
 	prevent others from using it. The following
@@ -3168,19 +3219,9 @@ NICK_HELP
 	For more information on a specific command, type
 	/msg %S HELP command.
 	
-	    REGISTER   Register a nickname
-	    GROUP      Join a group
-	    IDENTIFY   Identify yourself with your password
-	    ACCESS     Modify the list of authorized addresses
-	    SET        Set options, including kill protection
-	    DROP       Cancel the registration of a nickname
-	    RECOVER    Kill another user who has taken your nick
-	    RELEASE    Regain custody of your nick after RECOVER
-	    SENDPASS   Forgot your password? Try this
 	
-	Other commands: GHOST, ALIST, GLIST, INFO, LIST, LOGOUT, 
-	                STATUS, UPDATE
-	
+NICK_HELP_FOOTER
+	 
 	NOTICE: This service is intended to provide a way for
 	IRC users to ensure their identity is not compromised.
 	It is NOT intended to facilitate "stealing" of
@@ -3596,15 +3637,7 @@ NICK_HELP_SENDPASS
 	This command is unavailable when encryption is enabled.
 
 NICK_SERVADMIN_HELP
-	
-	The following commands are available to Services admins:
-	
-	    GETPASS    Retrieve the password for a nickname
-	                   (only if encryption is disabled)
-	    GETEMAIL   Matches and returns all users that
-	                   registered using given email
-	    FORBID     Prevents a nickname from being registered
-	
+	 
 	Services admins can also drop any nickname without needing
 	to identify for the nick, and may view the access list for
 	any nickname (/msg %S ACCESS LIST nick).
@@ -3753,6 +3786,87 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 #
 ###########################################################################
 
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Retrieve the founder password for a channel
+CHAN_HELP_CMD_FORBID
+	    FORBID     Prevent a channel from being used
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Prevent a channel from being used preserving
+	               channel data and settings
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Releases a suspended channel
+CHAN_HELP_CMD_STATUS
+	    STATUS     Returns the current access level of a user
+	               on a channel
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Register a channel
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Identify yourself with your password
+CHAN_HELP_CMD_SET
+	    SET        Set channel options and information
+CHAN_HELP_CMD_AOP
+	    AOP        Modify the list of AOP users
+CHAN_HELP_CMD_SOP
+	    SOP        Modify the list of SOP users
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Modify the list of privileged users
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Redefine the meanings of access levels
+CHAN_HELP_CMD_AKICK
+	    AKICK      Maintain the AutoKick list
+CHAN_HELP_CMD_DROP
+	    DROP       Cancel the registration of a channel
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Help retrieve lost passwords
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
+
 CHAN_HELP
 	%S allows you to register and control various
 	aspects of channels.  %S can often prevent
@@ -3761,43 +3875,8 @@ CHAN_HELP
 	commands are listed below; to use them, type
 	/msg %S command.  For more information on a
 	specific command, type /msg %S HELP command.
+	 
 	
-	    REGISTER   Register a channel
-	    IDENTIFY   Identify yourself with your password
-	    SET        Set channel options and information
-	    AOP        Modify the list of AOP users
-	    SOP        Modify the list of SOP users
-	    ACCESS     Modify the list of privileged users
-	    LEVELS     Redefine the meanings of access levels
-	    AKICK      Maintain the AutoKick list
-	    DROP       Cancel the registration of a channel
-	    SENDPASS   Help retrieve lost passwords
-	
-	Other commands: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
-	                INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
-	                UNBAN, VOICE, VOP
-
-CHAN_HELP_UNREAL
-	
-	These commands are also available on this network:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Note that any channel which is not used for %d days
@@ -4616,18 +4695,7 @@ CHAN_HELP_SENDPASS
 	This command is unavailable when encryption is enabled.
 
 CHAN_SERVADMIN_HELP
-	
-	The following commands are available to Services admins:
-	
-	    GETPASS    Retrieve the founder password for a channel
-	                   (only if encryption is disabled)
-	    FORBID     Prevent a channel from being used
-	    SUSPEND    Prevent a channel from being used preserving
-	                   channel data and settings.
-	    UNSUSPEND  Releases a suspended channel.
-	    STATUS     Returns the current access level of a user
-	                   on a channel
-	
+	 
 	Services admins can also drop any channel without needing
 	to identify via password, and may view the access, AKICK,
 	and level setting lists for any channel.
@@ -4744,7 +4812,30 @@ CHAN_SERVADMIN_HELP_STATUS
 #
 ###########################################################################
 
-MEMO_HELP
+MEMO_HELP_CMD_SEND
+	    SEND   Send a memo to a nick or channel
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Cancel last memo you sent
+MEMO_HELP_CMD_LIST
+	    LIST   List your memos
+MEMO_HELP_CMD_READ
+	    READ   Read a memo or memos
+MEMO_HELP_CMD_DEL
+	    DEL    Delete a memo or memos
+MEMO_HELP_CMD_SET
+	    SET    Set options related to memos
+MEMO_HELP_CMD_INFO
+	    INFO   Displays information about your memos
+MEMO_HELP_CMD_RSEND
+	    RSEND  Sends a memo and requests a read receipt
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Send a memo to all registered users
+MEMO_HELP_CMD_STAFF
+	    STAFF  Send a memo to all opers/admins
+
+MEMO_HELP_HEADER
 	%S is a utility allowing IRC users to send short
 	messages to other IRC users, whether they are online at
 	the time or not, or to channels(*).  Both the sender's
@@ -4753,21 +4844,11 @@ MEMO_HELP
 
 	%S's commands include:
 
-	    SEND   Send a memo to a nick or channel
-	    CANCEL Cancel last memo you sent
-	    LIST   List your memos
-	    READ   Read a memo or memos
-	    DEL    Delete a memo or memos
-	    SET    Set options related to memos
-	    INFO   Displays information about your memos
-	    RSEND  Sends a memo and requests a read receipt
-	    CHECK  Checks if last memo to a nick was read
 
 MEMO_HELP_ADMIN
-	    SENDALL  Send a memo to all registered users
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Send a memo to all opers/admins
+	not used.
 
 MEMO_HELP_FOOTER
 	
@@ -4949,81 +5030,89 @@ MEMO_HELP_CHECK
 # OperServ help messages
 #
 ###########################################################################
+OPER_HELP_CMD_GLOBAL
+	    GLOBAL      Send a message to all users
+OPER_HELP_CMD_STATS
+	    STATS       Show status of Services and network
+OPER_HELP_CMD_OPER
+	    OPER        Modify the Services operator list
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Modify the Services admin list
+OPER_HELP_CMD_STAFF
+	    STAFF       Display Services staff and online status
+OPER_HELP_CMD_MODE
+	    MODE        Change a channel's modes
+OPER_HELP_CMD_KICK
+	    KICK        Kick a user from a channel
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Clear modes of a channel
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Kill all users that have a certain host
+OPER_HELP_CMD_AKILL
+	    AKILL       Manipulate the AKILL list
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Manipulate the SGLINE list
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Manipulate the SQLINE list
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Manipulate the SZLINE list
+OPER_HELP_CMD_CHANLIST
+	    CHANLIST    Lists all channel records
+OPER_HELP_CMD_USERLIST
+	    USERLIST    Lists all user records
+OPER_HELP_CMD_LOGONNEWS
+	    LOGONNEWS   Define messages to be shown to users at logon
+OPER_HELP_CMD_RANDOMNEWS
+	    RANDOMNEWS  Define messages to be randomly shown to users 
+	                at logon
+OPER_HELP_CMD_OPERNEWS
+	    OPERNEWS    Define messages to be shown to users who oper
+OPER_HELP_CMD_SESSION
+	    SESSION     View the list of host sessions
+OPER_HELP_CMD_EXCEPTION
+	    EXCEPTION   Modify the session-limit exception list
+OPER_HELP_CMD_NOOP
+	    NOOP        Temporarily remove all O:lines of a server 
+	                remotely
+
+OPER_HELP_CMD_JUPE
+	    JUPE        "Jupiter" a server
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Modify the Services ignore list
+OPER_HELP_CMD_SET
+	    SET         Set various global Services options
+OPER_HELP_CMD_RELOAD
+	    RELOAD      Reload services' configuration file
+OPER_HELP_CMD_UPDATE
+	    UPDATE      Force the Services databases to be
+	                updated on disk immediately
+OPER_HELP_CMD_RESTART
+	    RESTART     Save databases and restart Services
+OPER_HELP_CMD_QUIT
+	    QUIT        Terminate the Services program with no save
+OPER_HELP_CMD_SHUTDOWN
+	    SHUTDOWN    Terminate the Services program with save
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulate the DefCon system
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kill all users on a specific channel
+OPER_HELP_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+OPER_HELP_CMD_UMODE
+	    UMODE       Change a user's modes
+OPER_HELP_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
+OPER_HELP_CMD_MODLOAD
+	    MODLOAD     Load a module
+OPER_HELP_CMD_MODUNLOAD
+	    MODUNLOAD   Un-Load a module
+OPER_HELP_CMD_MODINFO
+	    MODINFO     Info about a loaded module
+OPER_HELP_CMD_MODLIST
+	    MODLIST     List loaded modules
 
 OPER_HELP
 	%S commands:
-	    GLOBAL      Send a message to all users
-	    STATS       Show status of Services and network
-	    OPER LIST   List all Services operators
-	    ADMIN LIST  List all Services admins
-	    STAFF       Display Services staff and online status
-
-OPER_HELP_OPER_CMD
-	Commands available to Services operators and admins only:
-	    MODE        Change a channel's modes
-	    KICK        Kick a user from a channel
-	    CLEARMODES  Clear modes of a channel
-	    KILLCLONES  Kill all users that have a certain host
-	    AKILL       Manipulate the AKILL list
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Manipulate the SGLINE list
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Manipulate the SQLINE list
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Manipulate the SZLINE list
-
-OPER_HELP_ADMIN_CMD
-	Commands available to Services admins only:
-	    OPER        Modify the Services operator list
-	    CHANLIST    Lists all channel records
-	    USERLIST    Lists all user records
-	    LOGONNEWS   Define messages to be shown to users at logon
-	    RANDOMNEWS  Define messages to be randomly shown to users 
-	                    at logon
-	    OPERNEWS    Define messages to be shown to users who oper
-	    SESSION     View the list of host sessions
-	    EXCEPTION   Modify the session-limit exception list
-	    NOOP        Temporarily remove all O:lines of a server 
-	                    remotely
-	    JUPE        "Jupiter" a server
-	    IGNORE      Modify the Services ignore list
-	    SET         Set various global Services options
-	    RELOAD      Reload services' configuration file
-	    UPDATE      Force the Services databases to be
-	                    updated on disk immediately
-	    RESTART     Save databases and restart Services
-	    QUIT        Terminate the Services program with no save
-	    SHUTDOWN    Terminate the Services program with save
-	    DEFCON      Manipulate the DefCon system
-	    CHANKILL    Kill all users on a specific channel
-
-	Commands available to the Services super-user only:
-	    ADMIN       Modify the Services admin list
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
-	    OLINE       Give Operflags to a certain user
-
-OPER_HELP_ADMIN_CMD_UMODE
-	    UMODE       Change a user's modes
-
-OPER_HELP_ADMIN_CMD_SVSNICK
-	    SVSNICK     Forcefully change a user's nickname
-
-OPER_HELP_ROOT_CMD
-	Commands available to Service Roots only:
-	    MODLOAD     Load a module
-	    MODUNLOAD   Un-Load a module
-	    MODLIST     List loaded modules
-	    MODINFO     Info about a loaded module
 
 OPER_HELP_LOGGED
 	Notice: All commands sent to %S are logged!
@@ -5629,7 +5718,27 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-	
+BOT_HELP_CMD_BOTLIST
+	    BOTLIST        Lists available bots
+BOT_HELP_CMD_ASSIGN
+	    ASSIGN         Assigns a bot to a channel
+BOT_HELP_CMD_SET
+	    SET            Configures bot options
+BOT_HELP_CMD_KICK
+	    KICK           Configures kickers
+BOT_HELP_CMD_BADWORDS
+	    BADWORDS       Maintains bad words list
+BOT_HELP_CMD_ACT
+	    ACT            Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	    INFO           Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	    SAY            Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	    UNASSIGN       Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	    BOT            Maintains network bot list
+
 BOT_HELP
 	%S allows you to have a bot on your own channel.
 	It has been created for users that can't host or
@@ -5639,16 +5748,11 @@ BOT_HELP
 	more information on a specific command, type /msg 
 	%S HELP command.
 	
-	BOTLIST            Lists available bots
-	ASSIGN             Assigns a bot to a channel
-	SET                Configures bot options
-	KICK               Configures kickers
-	BADWORDS           Maintains bad words list
-	
-	Other commands: ACT INFO SAY UNASSIGN
-	
+
+BOT_HELP_FOOTER
 	Bot will join a channel whenever there is at least
 	%d user(s) on it.
+
 	
 BOT_HELP_BOTLIST
 	Syntax: BOTLIST
@@ -5907,17 +6011,11 @@ BOT_HELP_ACT
 	Makes the bot do the equivalent of a "/me" command
 	on the given channel using the given text.
 
-BOT_SERVADMIN_HELP
-	
-	The following command is available to Services admins:
-	
-	    BOT              Maintains network bot list
 
 BOT_SERVADMIN_HELP_BOT
 	Syntax: BOT ADD nick user host real
 	        BOT CHANGE oldnick newnick [user [host [real]]]
 	        BOT DEL nick
-	        BOT LIST
 	
 	Allows Services admins to create, modify, and delete
 	bots that users will be able to use on their own
@@ -5930,8 +6028,6 @@ BOT_SERVADMIN_HELP_BOT
 	or realname of a bot without actually delete it (and all
 	the data associated with it).
 	BOT DEL removes the given bot from the bot list.  
-	BOT LIST is an alias of BOTLIST and just lists all
-	bots available on the network.
 	
 	Note: you cannot create a bot that has a nick that is
 	currently registered. If an unregistered user is currently
@@ -6036,22 +6132,38 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commands:
+HOST_HELP_CMD_ON
 	    ON          Activates your assigned vhost
+
+HOST_HELP_CMD_OFF
 	    OFF         Deactivates your assigned vhost
+
+HOST_HELP_CMD_GROUP
 	    GROUP       Syncs the vhost for all nicks in a group
 
-HOST_OPER_HELP
-	Commands available to HostSetters/Removes only:
+HOST_HELP_CMD_SET
 	    SET         Set the vhost of another user
+
+HOST_HELP_CMD_SETALL
 	    SETALL      Set the vhost for all nicks in a group
+
+HOST_HELP_CMD_DEL
 	    DEL         Delete the vhost of another user
+
+HOST_HELP_CMD_DELALL
 	    DELALL      Delete the vhost for all nicks in a group
+
+HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
+HOST_OPER_HELP
+	moo
+
 HOST_ADMIN_HELP
-	Commands available to services admins only:
+	moo
+
+HOST_HELP
+	%S commands:
 
 HOST_HELP_ON
 	Syntax: ON

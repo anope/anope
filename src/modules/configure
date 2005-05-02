@@ -2,16 +2,23 @@
 
 echo -n "SRCS=" > ./Makefile.inc
 FIRST=1
-for oldfile in *.c
-do
-	if [ "$FIRST" = 1 ] ; then
-		echo -n " "$oldfile >> ./Makefile.inc
-	else
-		echo "\\" >> ./Makefile.inc
-		echo -n "     " $oldfile >> ./Makefile.inc
-	fi
-	FIRST=0
-done
+
+LS=`ls *.c 2>/dev/null | wc -l `
+if [ "0" == "$LS" ] ; then
+  echo "*** no modules found"
+else
+	for oldfile in *.c
+	do
+		if [ "$FIRST" = 1 ] ; then
+			echo -n " "$oldfile >> ./Makefile.inc
+		else
+			echo "\\" >> ./Makefile.inc
+			echo -n "     " $oldfile >> ./Makefile.inc
+		fi
+		FIRST=0
+	done
+fi
+
 echo "" >> ./Makefile.inc
 
 echo -n "SUBS=" >> ./Makefile.inc
@@ -27,6 +34,9 @@ do
 				echo -n "     " $dir >> ./Makefile.inc
 			fi
 			FIRST=0
+			if [ -f $dir/configure ] ; then
+				$dir/configure
+			fi
 		fi
 	fi
 done

@@ -86,6 +86,52 @@ void modules_init(void)
 #endif
 }
 
+/** 
+ * Load up a list of core modules from the conf.
+ * @param number The number of modules to load
+ * @param list The list of modules to load
+ **/
+void modules_core_init(int number, char **list)
+{
+    int idx;
+    Module *m;
+    int status = 0;
+    for (idx = 0; idx < number; idx++) {
+        m = findModule(list[idx]);
+        if (!m) {
+            m = createModule(list[idx]);
+            mod_current_module = m;
+            mod_current_user = NULL;
+            status = loadModule(mod_current_module, NULL);
+            if (debug || status) {
+                alog("trying to load core module [%s]",
+                     mod_current_module->name);
+                alog("status: [%d]", status);
+            }
+            mod_current_module = NULL;
+            mod_current_user = NULL;
+        }
+    }
+}
+
+/**
+ * Load the ircd protocol module up
+ **/
+int protocol_module_init(void)
+{
+    int ret = 0;
+    Module *m;
+    m = createModule(IRCDModule);
+    mod_current_module = m;
+    mod_current_user = NULL;
+    alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name);
+    ret = loadModule(mod_current_module, NULL);
+    moduleSetType(PROTOCOL);
+    alog("status: [%d]", ret);
+    mod_current_module = NULL;
+    return ret;
+}
+
 /**
  * Automaticaly load modules at startup, delayed.
  * This function waits until the IRCD link has been made, and then attempts
@@ -119,12 +165,14 @@ void modules_delayed_init(void)
 Module *createModule(char *filename)
 {
     Module *m;
+    int i = 0;
     if (!filename) {
         return NULL;
     }
     if ((m = malloc(sizeof(Module))) == NULL) {
         fatal("Out of memory!");
     }
+
     m->name = sstrdup(filename);        /* Our Name */
     m->handle = NULL;           /* Handle */
     m->version = NULL;
@@ -137,6 +185,10 @@ Module *createModule(char *filename)
     m->hostHelp = NULL;
     m->helpHelp = NULL;
 
+    m->type = THIRD;
+    for (i = 0; i < NUM_LANGS; i++) {
+        m->lang[i].argc = 0;
+    }
     return m;                   /* return a nice new module */
 }
 
@@ -148,9 +200,16 @@ Module *createModule(char *filename)
  */
 int destroyModule(Module * m)
 {
+    int i = 0;
     if (!m) {
         return MOD_ERR_PARAMS;
     }
+
+    mod_current_module = m;
+    for (i = 0; i < NUM_LANGS; i++) {
+        moduleDeleteLanguage(i);
+    }
+
     if (m->name) {
         free(m->name);
     }
@@ -165,6 +224,7 @@ int destroyModule(Module * m)
     if (m->version) {
         free(m->version);
     }
+
     /* No need to free our cmd/msg list, as they will always be empty by the module is destroyed */
     free(m);
     return MOD_ERR_OK;
@@ -260,6 +320,25 @@ Module *findModule(char *name)
     }
     return NULL;
 
+}
+
+/**
+ * Search all loaded modules looking for a protocol module.
+ * @return 1 if one is found.
+ **/
+int protocolModuleLoaded()
+{
+    int idx = 0;
+    ModuleHash *current = NULL;
+
+    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
+        for (current = MODULE_HASH[idx]; current; current = current->next) {
+            if (current->m->type == PROTOCOL) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 /** 
@@ -375,7 +454,11 @@ int loadModule(Module * m, User * u)
     ano_modclearerr();
     func = ano_modsym(m->handle, "AnopeInit");
     if ((err = ano_moderr()) != NULL) {
-        ano_modclose(m->handle);     /* If no AnopeInit - it isnt an Anope Module, close it */
+        ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
+        if (u) {
+            notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
+        }
+
         return MOD_ERR_NOLOAD;
     }
     if (func) {
@@ -392,7 +475,14 @@ int loadModule(Module * m, User * u)
         if (u) {
             free(argv[0]);
         }
+        if (m->type == PROTOCOL && protocolModuleLoaded()) {
+            alog("You cannot load have 2 protocol modules.");
+            ret = MOD_STOP;
+        }
         if (ret == MOD_STOP) {
+            if (u) {
+                notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
+            }
             alog("%s requested unload...", m->name);
             unloadModule(m, NULL);
             mod_current_module_name = NULL;
@@ -411,6 +501,10 @@ int loadModule(Module * m, User * u)
     return MOD_ERR_OK;
 
 #else
+    if (u) {
+        notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
+    }
+
     return MOD_ERR_NOLOAD;
 #endif
 }
@@ -431,6 +525,13 @@ int unloadModule(Module * m, User * u)
             notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
         }
         return MOD_ERR_PARAMS;
+    }
+
+    if (m->type == PROTOCOL) {
+        if (u) {
+            notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
+        }
+        return MOD_ERR_NOUNLOAD;
     }
 
     if (prepForUnload(mod_current_module) != MOD_ERR_OK) {
@@ -463,6 +564,18 @@ int unloadModule(Module * m, User * u)
 }
 
 /**
+ * Module setType() 
+ * Lets the module set a type, CORE,PROTOCOL,3RD etc..
+ **/
+void moduleSetType(MODType type)
+{
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+    mod_current_module->type = type;
+}
+
+/**
  * Prepare a module to be unloaded.
  * Remove all commands and messages this module is providing, and delete 
  * any callbacks which are still pending.
@@ -474,8 +587,14 @@ int prepForUnload(Module * m)
     int idx;
     CommandHash *current = NULL;
     MessageHash *mcurrent = NULL;
+    EvtMessageHash *ecurrent = NULL;
+    EvtHookHash *ehcurrent = NULL;
+
     Command *c;
     Message *msg;
+    EvtMessage *eMsg;
+    EvtHook *eHook;
+    int status = 0;
 
     if (!m) {
         return MOD_ERR_PARAMS;
@@ -555,6 +674,25 @@ int prepForUnload(Module * m)
                 }
             }
         }
+
+        for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent->next) {
+            for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
+                if ((eMsg->mod_name)
+                    && (stricmp(eMsg->mod_name, m->name) == 0)) {
+                    status = delEventHandler(EVENT, eMsg, m->name);
+                }
+            }
+        }
+        for (ehcurrent = EVENTHOOKS[idx]; ehcurrent;
+             ehcurrent = ehcurrent->next) {
+            for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
+                if ((eHook->mod_name)
+                    && (stricmp(eHook->mod_name, m->name) == 0)) {
+                    status = delEventHook(EVENTHOOKS, eHook, m->name);
+                }
+            }
+        }
+
     }
     return MOD_ERR_OK;
 }
@@ -906,7 +1044,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
     if (!cmdTable || !c || (pos < 0 || pos > 2)) {
         return MOD_ERR_PARAMS;
     }
-    
+
     if (mod_current_module_name && !c->mod_name)
         return MOD_ERR_NO_MOD_NAME;
 
@@ -1131,6 +1269,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
     MessageHash *newHash = NULL;
     MessageHash *lastHash = NULL;
     Message *tail = NULL;
+    int match = 0;
 
     if (!msgTable || !m || (pos < 0 || pos > 2)) {
         return MOD_ERR_PARAMS;
@@ -1139,7 +1278,12 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
     index = CMD_HASH(m->name);
 
     for (current = msgTable[index]; current; current = current->next) {
-        if (stricmp(m->name, current->name) == 0) {     /* the msg exist's we are a addHead */
+        if ((UseTokens) && (!ircd->tokencaseless)) {
+            match = strcmp(m->name, current->name);
+        } else {
+            match = stricmp(m->name, current->name);
+        }
+        if (match == 0) {       /* the msg exist's we are a addHead */
             if (pos == 1) {
                 m->next = current->m;
                 current->m = m;
@@ -1754,54 +1898,34 @@ void moduleDisplayHelp(int service, User * u)
     int idx;
     int header_shown = 0;
     ModuleHash *current = NULL;
+	Module *calling_module = mod_current_module;
+	char *calling_module_name = mod_current_module_name;
 
     for (idx = 0; idx != MAX_CMD_HASH; idx++) {
         for (current = MODULE_HASH[idx]; current; current = current->next) {
+			mod_current_module_name = current->name;
+			mod_current_module = current->m;
+			
             if ((service == 1) && current->m->nickHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_NickServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->nickHelp(u);
             } else if ((service == 2) && current->m->chanHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_ChanServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->chanHelp(u);
             } else if ((service == 3) && current->m->memoHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_MemoServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->memoHelp(u);
             } else if ((service == 4) && current->m->botHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_BotServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->botHelp(u);
             } else if ((service == 5) && current->m->operHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_OperServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->operHelp(u);
             } else if ((service == 6) && current->m->hostHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_HostServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->hostHelp(u);
             } else if ((service == 7) && current->m->helpHelp) {
-                if (header_shown == 0) {
-                    notice_lang(s_HelpServ, u, MODULE_HELP_HEADER);
-                    header_shown = 1;
-                }
                 current->m->helpHelp(u);
             }
         }
     }
+	
+	mod_current_module = calling_module;
+	mod_current_module_name = calling_module_name;
 #endif
 }
 
@@ -1847,7 +1971,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
         free(mod_name);
         return MOD_ERR_PARAMS;
     }
-    
+
     if (mod_current_module_name == NULL) {
         alog("moduleAddData() called with mod_current_module_name being NULL");
         if (debug)
@@ -1901,8 +2025,9 @@ char *moduleGetData(ModuleData ** md, char *key)
     }
 
     while (current) {
-        if ((stricmp(current->moduleName, mod_name) == 0) && (stricmp(current->key, key) == 0)) {
-			free(mod_name);
+        if ((stricmp(current->moduleName, mod_name) == 0)
+            && (stricmp(current->key, key) == 0)) {
+            free(mod_name);
             return sstrdup(current->value);
         }
         current = current->next;
@@ -1934,7 +2059,8 @@ void moduleDelData(ModuleData ** md, char *key)
     if (key) {
         while (current) {
             next = current->next;
-            if ((stricmp(current->moduleName, mod_name) == 0) && (stricmp(current->key, key) == 0)) {
+            if ((stricmp(current->moduleName, mod_name) == 0)
+                && (stricmp(current->key, key) == 0)) {
                 if (prev) {
                     prev->next = current->next;
                 } else {
@@ -2127,35 +2253,216 @@ const char *ano_moderr(void)
 /**
  * Allow ircd protocol files to update the protect level info tables.
  **/
-void updateProtectDetails(char *level_info_protect_word, char *level_info_protectme_word, char *fant_protect_add, char *fant_protect_del, char *level_protect_word, char *protect_set_mode, char *protect_unset_mode) {
-        int i = 0;
-        CSModeUtil ptr;
-        LevelInfo l_ptr;
+void updateProtectDetails(char *level_info_protect_word,
+                          char *level_info_protectme_word,
+                          char *fant_protect_add, char *fant_protect_del,
+                          char *level_protect_word, char *protect_set_mode,
+                          char *protect_unset_mode)
+{
+    int i = 0;
+    CSModeUtil ptr;
+    LevelInfo l_ptr;
 
-        ptr = csmodeutils[i];
-        while(ptr.name) {
-                if(strcmp(ptr.name,"PROTECT")==0) {
-                        csmodeutils[i].bsname = sstrdup(fant_protect_add);
-                        csmodeutils[i].mode = sstrdup(protect_set_mode);
-                } else if(strcmp(ptr.name,"DEPROTECT")==0) {
-                        csmodeutils[i].bsname = sstrdup(fant_protect_del);
-                        csmodeutils[i].mode = sstrdup(protect_unset_mode);
-                }
-                ptr = csmodeutils[++i];
+    ptr = csmodeutils[i];
+    while (ptr.name) {
+        if (strcmp(ptr.name, "PROTECT") == 0) {
+            csmodeutils[i].bsname = sstrdup(fant_protect_add);
+            csmodeutils[i].mode = sstrdup(protect_set_mode);
+        } else if (strcmp(ptr.name, "DEPROTECT") == 0) {
+            csmodeutils[i].bsname = sstrdup(fant_protect_del);
+            csmodeutils[i].mode = sstrdup(protect_unset_mode);
+        }
+        ptr = csmodeutils[++i];
+    }
+
+    i = 0;
+    l_ptr = levelinfo[i];
+    while (l_ptr.what != -1) {
+        if (l_ptr.what == CA_PROTECT) {
+            levelinfo[i].name = sstrdup(level_info_protect_word);
+        } else if (l_ptr.what == CA_PROTECTME) {
+            levelinfo[i].name = sstrdup(level_info_protectme_word);
+        } else if (l_ptr.what == CA_AUTOPROTECT) {
+            levelinfo[i].name = sstrdup(level_protect_word);
+        }
+        l_ptr = levelinfo[++i];
+    }
+}
+
+/**
+ * Deal with modules who want to lookup config directives!
+ * @param h The Directive to lookup in the config file
+ * @return 1 on success, 0 on error
+ **/
+int moduleGetConfigDirective(Directive * d)
+{
+    FILE *config;
+    char *dir;
+    char buf[1024];
+    int linenum = 0;
+    int i;
+    int optind = 0;
+    int ac = 0;
+    char *av[MAXPARAMS];
+    char *s, *t;
+    int retval;
+
+    config = fopen(SERVICES_CONF, "r");
+    if (!config) {
+        alog("Can't open %s", SERVICES_CONF);
+        return 0;
+    }
+    while (fgets(buf, sizeof(buf), config)) {
+        linenum++;
+        if (*buf == '#' || *buf == '\r' || *buf == '\n')
+            continue;
+
+        dir = myStrGetOnlyToken(buf, '\t', 0);
+        if (dir) {
+            s = myStrGetTokenRemainder(buf, '\t', 1);
+        } else {
+            dir = myStrGetOnlyToken(buf, ' ', 0);
+            if (dir) {
+                s = myStrGetTokenRemainder(buf, ' ', 1);
+            } else {
+                continue;
+            }
         }
 
-        i = 0;
-        l_ptr = levelinfo[i];
-        while(l_ptr.what != -1) {
-                if(l_ptr.what == CA_PROTECT) {
-                        levelinfo[i].name = sstrdup(level_info_protect_word);
-                } else if(l_ptr.what == CA_PROTECTME) {
-                        levelinfo[i].name = sstrdup(level_info_protectme_word);
-                } else if(l_ptr.what == CA_AUTOPROTECT) {
-                        levelinfo[i].name = sstrdup(level_protect_word);
+        if (stricmp(dir, d->name) == 0) {
+            if (s) {
+                while (isspace(*s))
+                    s++;
+                while (*s) {
+                    if (ac >= MAXPARAMS) {
+                        alog("module error: too many config. params");
+                        break;
+                    }
+                    t = s;
+                    if (*s == '"') {
+                        t++;
+                        s++;
+                        while (*s && *s != '"') {
+                            if (*s == '\\' && s[1] != 0)
+                                s++;
+                            s++;
+                        }
+                        if (!*s)
+                            alog("module error: Warning: unterminated double-quoted string");
+                        else
+                            *s++ = 0;
+                    } else {
+                        s += strcspn(s, " \t\r\n");
+                        if (*s)
+                            *s++ = 0;
+                    }
+                    av[ac++] = t;
+                    while (isspace(*s))
+                        s++;
                 }
-                l_ptr = levelinfo[++i];
+            }
+            retval = parse_directive(d, dir, ac, av, linenum, 0, s);
         }
+    }
+    fclose(config);
+    return retval;
+}
+
+/**
+ * Allow a module to add a set of language strings to anope
+ * @param langNumber the language number for the strings
+ * @param ac The language count for the strings
+ * @param av The language sring list.
+ **/
+void moduleInsertLanguage(int langNumber, int ac, char **av)
+{
+    int i;
+
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+	
+	if (debug)
+		alog("debug: %s Adding %d texts for language %d", mod_current_module->name, ac, langNumber);
+	
+    if (mod_current_module->lang[langNumber].argc > 0) {
+        moduleDeleteLanguage(langNumber);
+    }
+
+    mod_current_module->lang[langNumber].argc = ac;
+    mod_current_module->lang[langNumber].argv =
+        malloc(sizeof(char *) * ac);
+    for (i = 0; i < ac; i++) {
+        mod_current_module->lang[langNumber].argv[i] = sstrdup(av[i]);
+    }
+}
+
+/**
+ * Send a notice to the user in the correct language, or english.
+ * @param source Who sends the notice
+ * @param u The user to send the message to
+ * @param number The message number
+ * @param ... The argument list
+ **/
+void moduleNoticeLang(char *source, User * u, int number, ...)
+{
+    va_list va;
+    char buffer[4096], outbuf[4096];
+    char *fmt = NULL;
+    int lang = LANG_EN_US;
+    char *s, *t, *buf;
+
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+    /* Find the users lang, and use it if we cant */
+    if (u->na && u->na->nc) {
+        lang = u->na->nc->language;
+    }
+
+    /* If the users lang isnt supported, drop back to enlgish */
+    if (mod_current_module->lang[lang].argc == 0) {
+        lang = LANG_EN_US;
+    }
+
+    /* If the requested lang string exists for the language */
+    if (mod_current_module->lang[lang].argc > number) {
+        fmt = mod_current_module->lang[lang].argv[number];
+
+        buf = sstrdup(fmt);
+        s = buf;
+        while (*s) {
+            t = s;
+            s += strcspn(s, "\n");
+            if (*s)
+                *s++ = '\0';
+            strscpy(outbuf, t, sizeof(outbuf));
+
+            va_start(va, number);
+            vsnprintf(buffer, 4095, outbuf, va);
+            va_end(va);
+            notice(source, u->nick, buffer);
+        }
+		free(buf);
+    } else {
+        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
+    }
+}
+
+/**
+ * Delete a language from a module
+ * @param langNumber the language Number to delete
+ **/
+void moduleDeleteLanguage(int langNumber)
+{
+    int idx = 0;
+    if ((mod_current_module_name) && (!mod_current_module)) {
+        mod_current_module = findModule(mod_current_module_name);
+    }
+    for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {
+        free(mod_current_module->lang[langNumber].argv[idx]);
+    }
+    mod_current_module->lang[langNumber].argc = 0;
 }
 
 /* EOF */

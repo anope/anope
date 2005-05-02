@@ -321,13 +321,13 @@ void display_news(User * u, int16 type)
 /*************************************************************************/
 /***************************** News editing ******************************/
 /*************************************************************************/
-
 /* Declared in extern.h */
 int do_logonnews(User * u)
 {
     do_news(u, NEWS_LOGON);
     return MOD_CONT;
 }
+
 
 /* Declared in extern.h */
 int do_opernews(User * u)

@@ -212,7 +212,7 @@ void delete_user(User * user)
         }
         free(realname);
     }
-    send_event(EVENT_USER_LOGOFF, user->nick);
+    send_event(EVENT_USER_LOGOFF, 1, user->nick);
 
     if (debug >= 2)
         alog("debug: delete_user() called");
@@ -642,7 +642,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         } else {
             user->svid = 1;
         }
-        send_event(EVENT_NEWNICK, nick);
+        send_event(EVENT_NEWNICK, 1, nick);
 
     } else {
         /* An old user changing nicks. */
@@ -687,7 +687,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             }
 
             change_user_nick(user, nick);
-            send_event(EVENT_CHANGE_NICK, nick);
+            send_event(EVENT_CHANGE_NICK, 1, nick);
 
             if ((old_na ? old_na->nc : NULL) ==
                 (user->na ? user->na->nc : NULL))
@@ -892,7 +892,7 @@ int is_protected(User * user)
 int is_oper(User * user)
 {
     if (user) {
-        return (user->mode & UMODE_o);
+        return (user->mode & anope_get_oper_mode());
     } else {
         return 0;
     }

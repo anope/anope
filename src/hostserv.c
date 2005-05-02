@@ -32,51 +32,20 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 void delHostCore(char *nick);
 
-int is_host_setter(User * u);
-int is_host_remover(User * u);
+E int is_host_setter(User * u);
+E int is_host_remover(User * u);
 
-static int do_help(User * u);
-static int do_set(User * u);
-static int do_on(User * u);
-int do_on_id(User * u);
-static void set_lastmask(User * u);
-static int do_off(User * u);
-static int do_del(User * u);
-static int do_group(User * u);
-static int listOut(User * u);
-int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
-               time_t time);
-int do_setall(User * u);
-int do_delall(User * u);
-void moduleAddHostServCmds(void);
+E int do_on_id(User * u);
+E void set_lastmask(User * u);
+
+E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
+                 char *creator, time_t time);
+
+E void moduleAddHostServCmds(void);
 /*************************************************************************/
 void moduleAddHostServCmds(void)
 {
-    Command *c;
-    c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("SET", do_set, is_host_setter, HOST_HELP_SET, -1, -1,
-                      -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1,
-                      -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("SETALL", do_setall, is_host_setter,
-                      HOST_HELP_SETALL, -1, -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("DELALL", do_delall, is_host_remover,
-                      HOST_HELP_DELALL, -1, -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("ON", do_on, NULL, HOST_HELP_ON, -1, -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("OFF", do_off, NULL, HOST_HELP_OFF, -1, -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1,
-                      -1, -1, -1);
-    addCoreCommand(HOSTSERV, c);
-    c = createCommand("LIST", listOut, is_services_oper, -1,
-                      -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
-    addCoreCommand(HOSTSERV, c);
+    modules_core_init(HostServCoreNumber, HostServCoreModules);
 }
 
 /*************************************************************************/
@@ -88,6 +57,7 @@ void moduleAddHostServCmds(void)
 void hostserv_init(void)
 {
     moduleAddHostServCmds();
+
 }
 
 /*************************************************************************/
@@ -125,6 +95,11 @@ void hostserv(User * u, char *buf)
 /*************************************************************************/
 /*	Start of Linked List routines					                     */
 /*************************************************************************/
+
+HostCore *hostCoreListHead()
+{
+    return head;
+}
 
 /**
  * Create HostCore list member
@@ -177,7 +152,6 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
 }
 
 /*************************************************************************/
-
 /**
  * Returns either NULL for the head, or the location of the *PREVIOUS*
  * record, this is where we need to insert etc..
@@ -188,7 +162,6 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
  */
 HostCore *findHostCore(HostCore * head, char *nick, boolean * found)
 {
-
     HostCore *previous, *current;
 
     *found = false;
@@ -349,117 +322,6 @@ char *getvIdent(char *nick)
             return tmp->next->vIdent;
     }
     return NULL;
-}
-
-/*************************************************************************/
-int listOut(User * u)
-{
-    char *key = strtok(NULL, "");
-    struct tm *tm;
-    char buf[BUFSIZE];
-    int counter = 1;
-    int from = 0, to = 0;
-    char *tmp = NULL;
-    char *s = NULL;
-    int display_counter = 0;
-
-    HostCore *current;
-
-    current = head;
-    if (current == NULL)
-        notice_lang(s_HostServ, u, HOST_EMPTY);
-    else {
-                /**
-		 * Do a check for a range here, then in the next loop
-		 * we'll only display what has been requested..
-		 **/
-        if (key) {
-            if (key[0] == '#') {
-                tmp = myStrGetOnlyToken((key + 1), '-', 0);     /* Read FROM out */
-                if (!tmp) {
-                    return MOD_CONT;
-                }
-                for (s = tmp; *s; s++) {
-                    if (!isdigit(*s)) {
-                        return MOD_CONT;
-                    }
-                }
-                from = atoi(tmp);
-                tmp = myStrGetTokenRemainder(key, '-', 1);      /* Read TO out */
-                if (!tmp) {
-                    return MOD_CONT;
-                }
-                for (s = tmp; *s; s++) {
-                    if (!isdigit(*s)) {
-                        return MOD_CONT;
-                    }
-                }
-                to = atoi(tmp);
-                key = NULL;
-            }
-        }
-
-        while (current != NULL) {
-            if (key) {
-                if (((match_wild_nocase(key, current->nick))
-                     || (match_wild_nocase(key, current->vHost)))
-                    && (display_counter < NSListMax)) {
-                    display_counter++;
-                    tm = localtime(&current->time);
-                    strftime_lang(buf, sizeof(buf), u,
-                                  STRFTIME_DATE_TIME_FORMAT, tm);
-                    if (current->vIdent) {
-                        notice_lang(s_HostServ, u, HOST_IDENT_ENTRY,
-                                    counter, current->nick,
-                                    current->vIdent, current->vHost,
-                                    current->creator, buf);
-                    } else {
-                        notice_lang(s_HostServ, u, HOST_ENTRY, counter,
-                                    current->nick, current->vHost,
-                                    current->creator, buf);
-                    }
-                }
-            } else {
-                        /**
-			 * List the host if its in the display range, and not more
-			 * than NSListMax records have been displayed...
-			 **/
-                if ((((counter >= from) && (counter <= to))
-                     || ((from == 0) && (to == 0)))
-                    && (display_counter < NSListMax)) {
-                    display_counter++;
-                    tm = localtime(&current->time);
-                    strftime_lang(buf, sizeof(buf), u,
-                                  STRFTIME_DATE_TIME_FORMAT, tm);
-                    if (current->vIdent) {
-                        notice_lang(s_HostServ, u, HOST_IDENT_ENTRY,
-                                    counter, current->nick,
-                                    current->vIdent, current->vHost,
-                                    current->creator, buf);
-                    } else {
-                        notice_lang(s_HostServ, u, HOST_ENTRY, counter,
-                                    current->nick, current->vHost,
-                                    current->creator, buf);
-                    }
-                }
-            }
-            counter++;
-            current = current->next;
-        }
-        if (key) {
-            notice_lang(s_HostServ, u, HOST_LIST_KEY_FOOTER, key,
-                        display_counter);
-        } else {
-            if (from != 0) {
-                notice_lang(s_HostServ, u, HOST_LIST_RANGE_FOOTER, from,
-                            to);
-            } else {
-                notice_lang(s_HostServ, u, HOST_LIST_FOOTER,
-                            display_counter);
-            }
-        }
-    }
-    return MOD_CONT;
 }
 
 /*************************************************************************/
@@ -670,116 +532,6 @@ void save_hs_rdb_dbase(void)
 /*************************************************************************/
 /*	Start of Generic Functions					 */
 /*************************************************************************/
-int do_setall(User * u)
-{
-
-    char *nick = strtok(NULL, " ");
-    char *rawhostmask = strtok(NULL, " ");
-    char *hostmask = smalloc(HOSTMAX);
-
-    NickAlias *na;
-    int32 tmp_time;
-    char *s;
-
-    char *vIdent = NULL;
-
-    if (!nick || !rawhostmask) {
-        notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
-        return MOD_CONT;
-    }
-
-    vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);    /* Get the first substring, @ as delimiter */
-    if (vIdent) {
-        rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
-        if (!rawhostmask) {
-            notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
-            return MOD_CONT;
-        }
-        if (strlen(vIdent) > USERMAX - 1) {
-            notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-            return MOD_CONT;
-        } else {
-            for (s = vIdent; *s; s++) {
-                if (!isvalidchar(*s)) {
-                    notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-                    return MOD_CONT;
-                }
-            }
-        }
-        if (!ircd->vident) {
-            notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-            return MOD_CONT;
-        }
-    }
-
-    if (strlen(rawhostmask) < HOSTMAX - 1)
-        snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
-    else {
-        notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
-        return MOD_CONT;
-    }
-
-    if (!isValidHost(hostmask, 3)) {
-        notice_lang(s_HostServ, u, HOST_SET_ERROR);
-        free(hostmask);
-        return MOD_CONT;
-    }
-
-    tmp_time = time(NULL);
-
-    if ((na = findnick(nick))) {
-        if (na->status & NS_VERBOTEN) {
-            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-            free(hostmask);
-            return MOD_CONT;
-        }
-        if (vIdent && ircd->vident) {
-            alog("vHost for all nicks in group \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
-        } else {
-            alog("vHost for all nicks in group \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
-        }
-        do_hs_sync(na->nc, vIdent, hostmask, u->nick, tmp_time);
-        if (vIdent) {
-            notice_lang(s_HostServ, u, HOST_IDENT_SETALL, nick, vIdent,
-                        hostmask);
-        } else {
-            notice_lang(s_HostServ, u, HOST_SETALL, nick, hostmask);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOREG, nick);
-    }
-
-    free(hostmask);
-    return MOD_CONT;
-}
-
-int do_delall(User * u)
-{
-    int i;
-    char *nick = strtok(NULL, " ");
-    NickAlias *na;
-    NickCore *nc;
-    if (!nick) {
-        notice_lang(s_HostServ, u, HOST_DELALL_SYNTAX, s_HostServ);
-        return MOD_CONT;
-    }
-    if ((na = findnick(nick))) {
-        if (na->status & NS_VERBOTEN) {
-            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-            return MOD_CONT;
-        }
-        nc = na->nc;
-        for (i = 0; i < nc->aliases.count; i++) {
-            na = nc->aliases.list[i];
-            delHostCore(na->nick);
-        }
-        alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);
-        notice_lang(s_HostServ, u, HOST_DELALL, nc->display);
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOREG, nick);
-    }
-    return MOD_CONT;
-}
 
 int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
                time_t time)
@@ -790,193 +542,6 @@ int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
     for (i = 0; i < nc->aliases.count; i++) {
         na = nc->aliases.list[i];
         addHostCore(na->nick, vIdent, hostmask, creator, time);
-    }
-    return MOD_CONT;
-}
-
-static int do_group(User * u)
-{
-    NickAlias *na;
-    HostCore *tmp;
-    char *vHost = NULL;
-    char *vIdent = NULL;
-    char *creator = NULL;
-    time_t time;
-    boolean found = false;
-
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
-            tmp = findHostCore(head, u->nick, &found);
-            if (found) {
-                if (tmp == NULL) {
-                    tmp = head; /* incase first in list */
-                } else if (tmp->next) { /* we dont want the previous entry were not inserting! */
-                    tmp = tmp->next;    /* jump to the next */
-                }
-
-                vHost = sstrdup(tmp->vHost);
-                if (tmp->vIdent)
-                    vIdent = sstrdup(tmp->vIdent);
-                creator = sstrdup(tmp->creator);
-                time = tmp->time;
-
-                do_hs_sync(na->nc, vIdent, vHost, creator, time);
-                if (tmp->vIdent) {
-                    notice_lang(s_HostServ, u, HOST_IDENT_GROUP,
-                                na->nc->display, vIdent, vHost);
-                } else {
-                    notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display,
-                                vHost);
-                }
-                free(vHost);
-                if (vIdent)
-                    free(vIdent);
-                free(creator);
-
-            } else {
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            }
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
-    }
-    return MOD_CONT;
-}
-
-static int do_help(User * u)
-{
-    char *cmd = strtok(NULL, "");
-
-    if (!cmd) {
-        notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
-        if ((is_services_oper(u)) || (is_host_setter(u)))
-            notice_help(s_HostServ, u, HOST_OPER_HELP);
-        /* Removed as atm, there is no admin only help */
-/*        if (is_services_admin(u))
-            notice_help(s_HostServ, u, HOST_ADMIN_HELP);*/
-        moduleDisplayHelp(6, u);
-    } else {
-        mod_help_cmd(s_HostServ, u, HOSTSERV, cmd);
-    }
-    return MOD_CONT;
-}
-
-/*************************************************************************/
-int do_set(User * u)
-{
-    char *nick = strtok(NULL, " ");
-    char *rawhostmask = strtok(NULL, " ");
-    char *hostmask = smalloc(HOSTMAX);
-
-    NickAlias *na;
-    int32 tmp_time;
-    char *s;
-
-    char *vIdent = NULL;
-
-    if (!nick || !rawhostmask) {
-        notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
-        return MOD_CONT;
-    }
-
-    vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);    /* Get the first substring, @ as delimiter */
-    if (vIdent) {
-        rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
-        if (!rawhostmask) {
-            notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
-            return MOD_CONT;
-        }
-        if (strlen(vIdent) > USERMAX - 1) {
-            notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-            return MOD_CONT;
-        } else {
-            for (s = vIdent; *s; s++) {
-                if (!isvalidchar(*s)) {
-                    notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-                    return MOD_CONT;
-                }
-            }
-        }
-        if (!ircd->vident) {
-            notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-            return MOD_CONT;
-        }
-    }
-    if (strlen(rawhostmask) < HOSTMAX - 1)
-        snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
-    else {
-        notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
-        return MOD_CONT;
-    }
-
-    if (!isValidHost(hostmask, 3)) {
-        notice_lang(s_HostServ, u, HOST_SET_ERROR);
-        return MOD_CONT;
-    }
-
-
-    tmp_time = time(NULL);
-
-    if ((na = findnick(nick))) {
-        if (na->status & NS_VERBOTEN) {
-            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-            return MOD_CONT;
-        }
-        if (vIdent && ircd->vident) {
-            alog("vHost for user \002%s\002 set to \002%s@%s\002 by oper \002%s\002", nick, vIdent, hostmask, u->nick);
-        } else {
-            alog("vHost for user \002%s\002 set to \002%s\002 by oper \002%s\002", nick, hostmask, u->nick);
-        }
-        addHostCore(nick, vIdent, hostmask, u->nick, tmp_time);
-        if (vIdent) {
-            notice_lang(s_HostServ, u, HOST_IDENT_SET, nick, vIdent,
-                        hostmask);
-        } else {
-            notice_lang(s_HostServ, u, HOST_SET, nick, hostmask);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOREG, nick);
-    }
-    free(hostmask);
-    return MOD_CONT;
-}
-
-/*************************************************************************/
-int do_on(User * u)
-{
-    NickAlias *na;
-    char *vHost;
-    char *vIdent = NULL;
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
-            vHost = getvHost(u->nick);
-            vIdent = getvIdent(u->nick);
-            if (vHost == NULL) {
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            } else {
-                if (vIdent) {
-                    notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED,
-                                vIdent, vHost);
-                } else {
-                    notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
-                }
-                anope_cmd_vhost_on(u->nick, vIdent, vHost);
-                if (ircd->vhost) {
-                    u->vhost = sstrdup(vHost);
-                }
-                if (ircd->vident) {
-                    if (vIdent)
-                        u->vident = sstrdup(vIdent);
-                }
-                set_lastmask(u);
-            }
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
     }
     return MOD_CONT;
 }
@@ -1009,52 +574,6 @@ int do_on_id(User * u)
 }
 
 /*************************************************************************/
-int do_del(User * u)
-{
-    NickAlias *na;
-    char *nick = strtok(NULL, " ");
-    if (nick) {
-        if ((na = findnick(nick))) {
-            if (na->status & NS_VERBOTEN) {
-                notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-                return MOD_CONT;
-            }
-            alog("vHost for user \002%s\002 deleted by oper \002%s\002",
-                 nick, u->nick);
-            delHostCore(nick);
-            notice_lang(s_HostServ, u, HOST_DEL, nick);
-        } else {
-            notice_lang(s_HostServ, u, HOST_NOREG, nick);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_DEL_SYNTAX, s_HostServ);
-    }
-    return MOD_CONT;
-}
-
-/*************************************************************************/
-int do_off(User * u)
-{
-    NickAlias *na;
-    char *vhost;
-    char *vident = NULL;
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
-            vhost = getvHost(u->nick);
-            vident = getvIdent(u->nick);
-            if (vhost == NULL && vident == NULL)
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            else
-                anope_cmd_vhost_off(u);
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
-    }
-    return MOD_CONT;
-}
-
 int is_host_setter(User * u)
 {
     int i, j;
@@ -1100,11 +619,3 @@ void set_lastmask(User * u)
             common_get_vhost(u));
 
 }
-
-/*************************************************************************/
-/*	End of Generic Functions					 */
-/*************************************************************************/
-
-/*************************************************************************/
-/*	End of Server Functions						 */
-/*************************************************************************/

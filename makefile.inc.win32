@@ -12,25 +12,6 @@
 # Please read and edit the configurations options below.
 
 
-# Set which IRCd to compile for
-#  1 DreamForge 4.6.7   [dated IRCd, upgrade to a current one]
-#  2 Bahamut 1.4.27     [or later]
-#  3 UnrealIRCd 3.1.1   [or later]
-#  4 UltimateIRCd 2.8.2 [or later]
-#  5 UltimateIRCd 3.0.0 [alpha26 or later]
-#  6 Hybrid IRCd 7.0    [experimental]
-#  7 ViagraIRCd 1.3.x   [or later]
-#  8 PTlink 6.15.0      [experimental]
-#  9 RageIRCd 2.0       [beta-3 or later]
-# 10 Unreal 3.2         [Unreal 3.2 beta19 or later] (default)
-# 11 Solid IRCD 3.4.x   [Solid IRCD 3.4.6 or later]
-# 12 Plexus 2.0         [or later]
-# 13 Ratbox 2.0.6       [or later]
-# 14 ShadowIRCD 4.0x    [beta 7 or later]
-
-IRCD=10
-
-
 # Set this to 1 to enable MySQL support
 USE_MYSQL=0
 # Set this to the path where the MySQL includes can be found
@@ -53,7 +34,7 @@ DATDEST=data
 # If you are getting errors such as 'Cannot find wsock32.lib', then change
 # the following line to the path where the library files can be found.
 #
-# Eg: LIBPATH=C:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\lib
+#  Eg: LIBPATH=C:\\Program Files\\Microsoft Visual Studio .NET 2003\\Vc7\\lib
 #
 LIBPATH=
 
@@ -73,68 +54,6 @@ BASE_CFLAGS=/O2 /MD
 LIBS=wsock32.lib advapi32.lib /NODEFAULTLIB:libcmtd.lib
 ELIBS=
 MLIBS=
-
-!IFNDEF IRCTYPE
-!IF $(IRCD) == 1
-IRCTYPE=IRC_DREAMFORGE
-CAPAB_C=dreamforge.c
-CAPAB_O=dreamforge.obj
-!ELSEIF $(IRCD) == 2
-IRCTYPE=/D IRC_BAHAMUT
-CAPAB_C=bahamut.c
-CAPAB_O=bahamut.obj
-!ELSEIF $(IRCD) == 3
-IRCTYPE=/D IRC_UNREAL31
-CAPAB_C=unreal31.c
-CAPAB_O=unreal31.obj
-!ELSEIF $(IRCD) == 4
-IRCTYPE=/D IRC_ULTIMATE2
-CAPAB_C=ultimate2.c
-CAPAB_O=ultimate2.obj
-!ELSEIF $(IRCD) == 5
-IRCTYPE=/D IRC_ULTIMATE33
-CAPAB_C=ultimate3.c
-CAPAB_O=ultimate3.obj
-!ELSEIF $(IRCD) == 6
-IRCTYPE=/D IRC_HYBRID
-CAPAB_C=hybrid.c
-CAPAB_O=hybrid.obj
-!ELSEIF $(IRCD) == 7
-IRCTYPE=/D IRC_VIAGRA
-CAPAB_C=hybrid.c
-CAPAB_O=hybrid.obj
-!ELSEIF $(IRCD) == 8
-IRCTYPE=/D IRC_PTLINK
-CAPAB_C=ptlink.c
-CAPAB_O=ptlink.obj
-!ELSEIF $(IRCD) == 9
-IRCTYPE=/D IRC_RAGE2
-CAPAB_C=rageircd.c
-CAPAB_O=rageircd.obj
-!ELSEIF $(IRCD) == 10
-IRCTYPE=/D IRC_UNREAL32
-CAPAB_C=unreal32.c
-CAPAB_O=unreal32.obj
-!ELSEIF $(IRCD) == 11
-IRCTYPE=/D IRC_SOLID
-CAPAB_C=solidircd.c
-CAPAB_O=solidircd.obj
-!ELSEIF $(IRCD) == 12
-IRCTYPE=/D IRC_PLEXUS
-CAPAB_C=plexus.c
-CAPAB_O=plexus.obj
-!ELSEIF $(IRCD) == 13
-IRCTYPE=/D IRC_RATBOX
-CAPAB_C=ratbox.c
-CAPAB_O=ratbox.obj
-!ELSEIF $(IRCD) == 14
-IRCTYPE=/D IRC_SHADOWIRCD
-CAPAB_C=shadowircd.c
-CAPAB_O=shadowircd.obj
-!ELSE
-!ERROR Invalid IRCd
-!ENDIF
-!ENDIF
 
 !IF $(USE_MYSQL) == 1
 !IF $(MYSQL_LIB) != ""

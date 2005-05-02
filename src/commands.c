@@ -95,8 +95,8 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                 notice_lang(service, u, OPER_DEFCON_DENIED);
             }
         } else {
+            mod_current_module_name = c->mod_name;
             if ((c->has_priv == NULL) || c->has_priv(u)) {
-                mod_current_module_name = c->mod_name;
                 retVal = c->routine(u);
                 mod_current_module_name = NULL;
                 if (retVal == MOD_CONT) {
@@ -108,13 +108,12 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                         current = current->next;
                     }
                 }
-            }
-
-            else {
+            } else {
                 notice_lang(service, u, ACCESS_DENIED);
                 alog("Access denied for %s with service %s and command %s",
                      u->nick, service, cmd);
             }
+            mod_current_module_name = NULL;
         }
     } else {
         if ((!checkDefCon(DEFCON_SILENT_OPER_ONLY)) || is_oper(u)) {
@@ -139,9 +138,17 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     int has_had_help = 0;
     int cont = MOD_CONT;
     const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
+    Module *calling_module = mod_current_module;
+    char *calling_module_name = mod_current_module_name;
 
     for (current = c; (current) && (cont == MOD_CONT);
          current = current->next) {
+        mod_current_module_name = current->mod_name;
+        if (mod_current_module_name)
+            mod_current_module = findModule(mod_current_module_name);
+        else
+            mod_current_module = NULL;
+
         p1 = current->help_param1;
         p2 = current->help_param2;
         p3 = current->help_param3;
@@ -194,6 +201,9 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     if (has_had_help == 0) {
         notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
     }
+
+    mod_current_module = calling_module;
+    mod_current_module_name = calling_module_name;
 }
 
 /*************************************************************************/

@@ -16,7 +16,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-static int do_help(User * u);
 void moduleAddHelpServCmds(void);
 
 /*************************************************************************/
@@ -27,9 +26,7 @@ void moduleAddHelpServCmds(void);
  */
 void moduleAddHelpServCmds(void)
 {
-    Command *c;
-    c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-    addCoreCommand(HELPSERV, c);
+    modules_core_init(HelpServCoreNumber, HelpServCoreModules);
 }
 
 /*************************************************************************/
@@ -70,31 +67,3 @@ void helpserv(User * u, char *buf)
 }
 
 /*************************************************************************/
-
-/**
- * Display the HelpServ help.
- * This core function has been embed in the source for a long time, but  
- * it moved into it's own file so we now all can enjoy the joy of        
- * modules for HelpServ.
- * @param u User Struct of the user looking for help
- * @return MOD_CONT
- */
-static int do_help(User * u)
-{
-    char *cmd = strtok(NULL, "");
-
-    if (!cmd) {
-        notice_help(s_HelpServ, u, HELP_HELP, s_NickServ, s_ChanServ,
-                    s_MemoServ);
-        if (s_BotServ) {
-            notice_help(s_HelpServ, u, HELP_HELP_BOT, s_BotServ);
-        }
-        if (s_HostServ) {
-            notice_help(s_HelpServ, u, HELP_HELP_HOST, s_HostServ);
-        }
-        moduleDisplayHelp(7, u);
-    } else {
-        mod_help_cmd(s_HelpServ, u, HELPSERV, cmd);
-    }
-    return MOD_CONT;
-}

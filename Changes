@@ -1,7 +1,20 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
-04/16 I Changed subversion format from bdb to fsfs.                       [ #00]
+04/30 A Modulepack with a few useful modules which are loaded by default. [ #00]
+04/30 A Modularized all BotServ fantasy commands.                         [ #00]
+04/30 A Event EVENT_PART_CHANNEL for when users part a channel.           [ #00]
+04/30 A Event EVENT_JOIN_CHANNEL for when users join a channel.           [ #00]
+04/25 A Support for multiple lines in module language texts.              [ #00]
+04/25 A Multi language module support.                                    [ #00]
+04/22 A Option to make OperServ configurable oper-only or not.            [ #00]
+04/21 A Events now accept argc/argv making them more useful/expandable.   [ #00]
+04/20 A Fully modular core now in place, including dynamic help.          [ #00]
+04/16 A Module subfolders now check configure executed if it exists.      [ #00]
+04/14 A Added EVENT_BOT_CMD for !commands in a botserv fantasy channel.   [ #00]
+04/14 A Added EVENT_RELOAD for config reloads.                            [ #00]
+04/13 A moduleGetConfigDirective to allow config files access to the conf.[ #00]
+04/12 A IRCD Protocol Module support.                                     [ #00]
 03/25 A Added nickserv suspend/unsuspend command.                         [ #00]
 03/25 A Added check for UID in anoperc. Stops running as root.            [ #00]
 03/11 A Event for database backups.                                       [ #00]
@@ -11,6 +24,21 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+05/01 F Typo in include/extern.h with restore_unsynced_topics.            [#354]
+05/01 F Modes with no arguments where required no longer set with OS mode.[#316]
+05/01 F Update win32 documentation and files so it works again.           [ #00]
+04/30 F Removed newline after BOT_SEEN_UNKNOWN in most languages.         [ #00]
+04/30 F Updated docs/EVENTS for change to argc/argv and new events.       [ #00]
+04/27 F Rob's spelling mistakes. It's language, not langauge!             [ #00]
+04/25 F Displaying help texts with module language system.                [ #00]
+04/24 F Call to sstrdup() with NULL-args if empty topic was set.          [ #00]
+04/24 F Event for topic changes only being sent for registered channels.  [ #00]
+04/24 F Buffer normalization not checking allocated memory for errors.    [ #00]
+04/21 F Updated example modules to use id strings as versions.            [ #00]
+04/21 F Renamed EVENT_BOT_CMD to EVENT_BOT_FANTASY.                       [ #00]
+04/19 F Updated docs/FAQ.                                                 [ #00]
+04/19 F Case sensitive tokens for ircd modules actaully work now.         [ #00]
+04/16 F Events no longer cause a segfault after being modunload-ed.       [ #00]
 04/14 F When setting multiple ops, SecureOps will check each user.        [#342]
 04/12 F Users channel modes are correctly set on join.                    [#342]
 04/11 F Make sure nick isn't in use on nickserv collide.                  [#341]
@@ -66,6 +94,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 01/30 F Compiling modules under Mac OSX.                                  [#285]
 03/07 R Removed Proxy Detector from core.                                 [ #00]
 
+Provided by Brain <brain@inspircd.org> - 2005
+04/18 A InspIRCd 1.0 Beta 3 support module.                               [ #00]
+
 Provided by Trystan <trystan@nomadirc.net> - 2005
 04/07 F Win32 now includes SVN revision in version                        [#328]
 03/16 F Shadowircd nick handling and vhost changing                       [#321]
@@ -77,6 +108,10 @@ Provided by DrStein <drstein@anope.org> - 2005
 03/17 A Improvements on Config script.                                    [ #00]
 03/17 A OS SET SQL ON shall warn about SQL disabled in services.conf      [ #00]
 03/15 A ChanServ will now include the channel name in SET's responses     [#318]
+05/01 F Fixed small typo in data/example.conf for OSInfoDBName.           [ #00]
+05/01 F Updated modpack ns_noop to fix a few bugs.                        [ #00]
+04/21 F alog() in ns_group wich was storing the wrong suspended nick.     [#343]
+04/21 F NS SUSPEND now uses the same reason for the whole group.          [#343]
 04/12 F Introduction text data file was missing.                          [ #00]
 04/07 F NickServ shall give the correct response to GLIST/ALIST           [#345]
 03/15 F ChanServ's do_getkey() function is now using notice_lang()        [#319]
@@ -91,6 +126,7 @@ Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 
 Provided by crazytoon <da.crew@gmx.net> - 2005
 04/07 A Updated German language file.                                     [ #00]
+04/30 F gcc4.0 compiler errors.                                           [ #00]
 04/04 F Installation of mydbgen.                                          [ #00]
 04/04 F SolidIRCd code did not recognize channelmodes +S and +N.          [#331]
 
@@ -485,3 +521,4 @@ Provided by Anope Dev. <dev@anope.org>
 2004/03/28 Forked 1.7 development stream.
 
 NOTE: FOR PREVIOUS CHANGES PLEASE REFER TO FILE docs/OLDCHANGES
+

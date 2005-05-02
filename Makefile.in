@@ -21,9 +21,9 @@ RUNGROUP=@RUNGROUP@
 IRCDFILE=@IRCDFILE@
 SHARED=@SHARED@
 
-all:   language headers build tools modules 
-strict: language headers strict_build tools strict_modules
-profile: language headers profile_build tools profile_modules
+all:   language headers build core protocols tools modules 
+strict: language headers strict_build core protocols tools strict_modules
+profile: language headers profile_build core protocols tools profile_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -60,6 +60,13 @@ clean_modules:
 distclean_modules:
 	(cd src ; ${MAKE} ${MAKEARGS} distclean_modules )
 
+protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} all; )
+
+core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} core; )
 
 tools: build
 	(cd src/tools ; ${MAKE} ${MAKEARGS} all; )

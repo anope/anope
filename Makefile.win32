@@ -13,7 +13,7 @@ include Makefile.inc.win32
 
 ###########################################################################
 
-all: src languages tools modules install
+all: src core protocols languages tools modules install
 
 src: include\version.h include\sysconf.h include\language.h include\sysconf.h
         cd src && $(MAKE) && cd ..
@@ -25,106 +25,37 @@ install:
         cd lang && $(MAKE) install && cd ..
         cd src && $(MAKE) install && cd ..
         cd src\modules && $(MAKE) install && cd ..
-        cd src\modules && $(MAKE) subs-install && cd ..
+	cd src\modules && $(MAKE) subs-install && cd ..
+	cd src\protocol && $(MAKE) install && cd ..
+	cd src\core && $(MAKE) install && cd ..
+	cd src\tools && $(MAKE) install && cd ..
         -@echo ---
         -@echo Anope has been insalled successfully!
-        -@echo See docs/INSTALL for details on how to configure Anope for use.
+	-@echo See docs\INSTALL for details on how to configure Anope for use.
         -@echo ---
         
 clean:
-        cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
-        cd src\modules && $(MAKE) spotless && cd ..\..
+	cd src\modules && $(MAKE) spotless && cd ..
+	cd src\protocol && $(MAKE) spotless && cd ..
+	cd src\core && $(MAKE) spotless && cd ..
+	cd src\tools && $(MAKE) spotless && cd ..
+        cd lang && $(MAKE) spotless && cd ..
         -@erase *.exe version.h *.obj
 
 spotless:
         cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
         cd src\modules && $(MAKE) spotless && cd ..\..
+	cd src\protocol && $(MAKE) spotless && cd ..\..
+	cd src\core && $(MAKE) spotless && cd ..\..
+	cd src\tools && $(MAKE) spotless && cd ..\..
         -@erase include\language.h include\version.h *~ anope.exe version.sh.exe *.obj anopesmtp.exe
 
 mypasql: 
         $(MYPASQL_BUILD)
 
 distclean: spotless
-
-dist:
-        $(MAKE) clean
-#Compile dreamforge
-        echo Compiling Dreamforge build
-        $(MAKE) IRCTYPE=/DIRC_DREAMFORGE CAPAB_C=dreamforge.c CAPAB_O=dreamforge.obj
-        -@copy src\$(PROGRAM) services-dreamforge.exe
-        $(MAKE) clean
-#Compile bahamut
-        echo Compiling Bahamut build
-        $(MAKE) IRCTYPE=/DIRC_BAHAMUT CAPAB_C=bahamut.c CAPAB_O=bahamut.obj
-        -@copy src\$(PROGRAM) services-bahamut.exe
-        $(MAKE) clean
-#Compile unreal
-        echo Compiling UnrealIRCd3.1 build
-        $(MAKE) IRCTYPE=/DIRC_UNREAL31 CAPAB_C=unreal31.c CAPAB_O=unreal31.obj
-        -@copy src\$(PROGRAM) services-unreal31.exe
-        $(MAKE) clean        
-#Compile ultimate2
-        echo Compiling UltimateIRCd2 build
-        $(MAKE) IRCTYPE=/DIRC_ULTIMATE2 CAPAB_C=ultimate2.c CAPAB_O=ultimate2.obj
-        -@copy src\$(PROGRAM) services-ultimate2.exe
-        $(MAKE) clean        
-#Compile ultimate3
-        echo Compiling UltimateIRCd 3.x build
-        $(MAKE) IRCTYPE=/DIRC_ULTIMATE3 CAPAB_C=ultimate3.c CAPAB_O=ultimate3.obj
-        -@copy src\$(PROGRAM) services-ultimate3.exe
-        $(MAKE) clean        
-#Compile hybrid
-        echo Compiling Hybrid build
-        $(MAKE) IRCTYPE=/DIRC_HYBRID CAPAB_C=hybrid.c CAPAB_O=hybrid.obj
-        -@copy src\$(PROGRAM) services-hybrid.exe
-        $(MAKE) clean        
-#Compile viagra
-        echo Compiling ViagraIRCd build
-        $(MAKE) IRCTYPE=/DIRC_VIAGRA CAPAB_C=viagra.c CAPAB_O=viagra.obj
-        -@copy src\$(PROGRAM) services-viagra.exe
-        $(MAKE) clean        
-#Compile ptlink
-        echo Compiling PTLink IRCd build
-        $(MAKE) IRCTYPE=/DIRC_PTLINK CAPAB_C=ptlink.c CAPAB_O=ptlink.obj
-        -@copy src\$(PROGRAM) services-ptlink.exe
-        $(MAKE) clean        
-#Compile rage2
-        echo Compiling Rage2 IRCd build
-        $(MAKE) IRCTYPE=/DIRC_RAGE2 CAPAB_C=rageircd.c CAPAB_O=rageircd.obj
-        -@copy src\$(PROGRAM) services-rage2.exe
-        $(MAKE) clean
-#Compile UnrealIRCD3.2
-        echo Compiling UnrealIRCD3.2 IRCd build
-        $(MAKE) IRCTYPE=/DIRC_UNREAL32 CAPAB_C=unreal32.c CAPAB_O=unreal32.obj
-        -@copy src\$(PROGRAM) services-unreal32.exe
-        $(MAKE) clean
-#Compile SolidIRCD
-        echo Compiling SolidIRCD IRCd build
-        $(MAKE) IRCTYPE=/DIRC_SOLID CAPAB_C=solidircd.c CAPAB_O=solidircd.obj
-        -@copy src\$(PROGRAM) services-solid.exe
-        $(MAKE) clean
-#Compile PlexusIRCD
-        echo Compiling Plexus IRCd build
-        $(MAKE) IRCTYPE=/DIRC_PLEXUS CAPAB_C=plexus.c CAPAB_O=plexus.obj
-        -@copy src\$(PROGRAM) services-plexus.exe
-        $(MAKE) clean
-#Compile Ratbox
-        echo Compiling Ratbox IRCd build
-        $(MAKE) IRCTYPE=/DIRC_RATBOX CAPAB_C=ratbox.c CAPAB_O=ratbox.obj
-        -@copy src\$(PROGRAM) services-ratbox.exe
-#Compile ShadowIRCD
-        echo Compiling Shadow IRCd build
-        $(MAKE) IRCTYPE=/DIRC_SHADOWIRCD CAPAB_C=shadowircd.c CAPAB_O=shadwoircd.obj
-        -@copy src\$(PROGRAM) services-shadowircd.exe
-
-#Compile mypasql
-        $(MYPASQL_BUILD)
-
-#Cleanup
-        $(MAKE) spotless
-
 
 ###########################################################################
 
@@ -134,6 +65,12 @@ languages: FRC
 
 tools: FRC
         cd src\tools && $(MAKE) && cd ..\..
+
+core: FRC
+	cd src\core && $(MAKE) && cd ..\..
+
+protocols: FRC
+	cd src\protocol && $(MAKE) && cd ..\..
 
 modules: FRC
         cd src\modules && $(MAKE) && cd ..\..

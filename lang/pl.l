@@ -2055,7 +2055,7 @@ BOT_SEEN_NEVER
 	Nigdy nie widzia³em %s na tym kanale.
 BOT_SEEN_UNKNOWN
 	Nie wiem kim %s jest.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick user host real
@@ -3045,7 +3045,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Aktualna lista modu³u:
 OPER_MODULE_LIST
-	Modu³: %s [%s]
+	Modu³: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	Ilo¶æ modu³ów za³adowanych: %d.
 OPER_MODULE_INFO_LIST
@@ -3434,6 +3434,56 @@ HELP_HELP_HOST
 # HELP NickServ 
 #
 ###########################################################################
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	   REGISTER   Rejestracja nicka.
+NICK_HELP_CMD_GROUP
+	   GROUP      Stworzenie grupy w³asnych nicków.      
+NICK_HELP_CMD_IDENTIFY
+	   IDENTIFY   Identyfikacja nicka za pomoc± has³a.
+NICK_HELP_CMD_ACCESS
+	   ACCESS     Modyfikacje listy dostêpu.
+NICK_HELP_CMD_SET
+	   SET        Ustawienia ró¿nych opcji nicka.
+NICK_HELP_CMD_DROP
+	   DROP       Odrejestruj nicka.
+NICK_HELP_CMD_RECOVER
+	   RECOVER    Odzyskuje Twojego nicka.
+NICK_HELP_CMD_RELEASE
+	   RELEASE    Zwalnia nick po opcji RECOVER.
+NICK_HELP_CMD_SENDPASS
+	   SENDPASS   Zapomniane has³o? Spróbuj tego.
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Odzyskanie has³a dla nicka (tylko przy wy³±czonym szyfrowaniu)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Wy¶wietla pasuj±cych u¿ytkowników zarejestrowanych z podanym 
+	               e-mailem
+NICK_HELP_CMD_FORBID
+	    FORBID     Zabrania rejestracji podanego nicka.
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
 
 NICK_HELP
 	%S umo¿liwia Tobie zarejestrowanie w³asnego 
@@ -3444,19 +3494,7 @@ NICK_HELP
 	uzyskaæ pisz±c:
 	/msg %S HELP komenda.
 	
-	   REGISTER   Rejestracja nicka.
-	   GROUP      Stworzenie grupy w³asnych nicków.      
-	   IDENTIFY   Identyfikacja nicka za pomoc± has³a.
-	   ACCESS     Modyfikacje listy dostêpu.
-	   SET        Ustawienia ró¿nych opcji nicka.
-	   DROP       Odrejestruj nicka.
-	   RECOVER    Odzyskuje Twojego nicka.
-	   RELEASE    Zwalnia nick po opcji RECOVER.
-	   SENDPASS   Zapomniane has³o? Spróbuj tego.
-	
-	Pozosta³e komendy: GHOST, ALIST, GLIST, INFO, LIST, 
-	                   LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	INFO: Ten serwis ma na celu identyfikacjê 
 	u¿ytkowników bez wzglêdu na host czy zmienne IP.
 	To NIE jest po to, aby zajmowaæ komu¶ nicka, 
@@ -3933,19 +3971,6 @@ NICK_HELP_SENDPASS
 	gdy has³a s± szyfrowane.
 
 NICK_SERVADMIN_HELP
-	
-	Nastêpuj±ce komendy s± dostêpne dla administratorów 
-	serwisów:
-	
-	    GETPASS    Odzyskanie has³a dla nicka
-	                   (tylko przy wy³±czonym 
-	                   szyfrowaniu).
-	    GETEMAIL   Wy¶wietla pasuj±cych u¿ytkowników 
-	                   zarejestrowanych z podanym 
-	                   e-mailem.
-	    FORBID     Zabrania rejestracji podanego 
-	                   nicka.
-	
 	Administratorzy Serwisów mog± odrejestrowaæ ka¿dy 
 	nick bez potrzeby identyfikacji dla niego i mog± 
 	widzieæ listê dostêpu dla ka¿dego nicka 
@@ -4127,6 +4152,87 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	   GETPASS     Uzyskanie has³a w³a¶ciciela dla 
+	               wskazanego kana³u 
+CHAN_HELP_CMD_FORBID
+	   FORBID      Zamkniêcie wskazanego kana³u.
+CHAN_HELP_CMD_SUSPEND
+	   SUSPEND     Blokada kana³u z zachowaniem 
+	               wszelkich jego danych i ustawieñ.
+CHAN_HELP_CMD_UNSUSPEND
+	   UNSUSPEND   Odblokowanie kana³u.
+CHAN_HELP_CMD_STATUS
+	   STATUS      Zwraca aktualny poziom dostêpu do 
+	               kana³u wskazanego u¿ytkownika.
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Rejestracja kana³u.
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Identyfikacja w³a¶ciciela kana³u.
+CHAN_HELP_CMD_SET
+	    SET        Ustawienia ró¿nych opcji kana³u.
+CHAN_HELP_CMD_AOP
+	    AOP        Modyfikacje listy AOP kana³u.
+CHAN_HELP_CMD_SOP
+	    SOP        Modyfikacje listy SOP kana³u.
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Zarz±dzanie kana³ow± list± dostêpu
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Zarz±dzanie poziomami dostêpu.
+CHAN_HELP_CMD_AKICK
+	    AKICK      Zarz±dzanie kana³ow± list± AKICK.
+CHAN_HELP_CMD_DROP
+	    DROP       Odrejestrowanie kana³u.
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Odzyskanie utraconego has³a.
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	%S pozwala na rejestracjê oraz kontrolê 
@@ -4138,44 +4244,8 @@ CHAN_HELP
 	/msg %S komenda. Aby uzyskaæ wiêcej 
 	informacji o poszczególnych komendach, napisz: 
 	/msg %S HELP komenda.
+	 
 	
-	    REGISTER   Rejestracja kana³u.
-	    IDENTIFY   Identyfikacja w³a¶ciciela kana³u.
-	    SET        Ustawienia ró¿nych opcji kana³u.
-	    AOP        Modyfikacje listy AOP kana³u.
-	    SOP        Modyfikacje listy SOP kana³u.
-	    ACCESS     Zarz±dzanie kana³ow± list± dostêpu
-	    LEVELS     Zarz±dzanie poziomami dostêpu.
-	    AKICK      Zarz±dzanie kana³ow± list± AKICK.
-	    DROP       Odrejestrowanie kana³u.
-	    SENDPASS   Odzyskanie utraconego has³a.
-	
-	Pozosta³e komendy: BAN, CLEAR, DEOP, DEVOICE, 
-	                   GETKEY, INFO, INVITE, KICK, LIST, 
-	                   LOGOUT, OP, TOPIC, UNBAN, VOICE, 
-	                   VOP
-
-CHAN_HELP_UNREAL
-	
-	Te komendy s± rownie¿ dostêpne na tej sieci:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, 
-	    OWNER, PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Te komendy s± rownie¿ dostêpne na tej sieci:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Uwaga! Kana³ który nie by³ u¿ywany od %d dni (np. 
@@ -5166,19 +5236,6 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Poni¿sze komendy s± dostêpne dla administratorów 
-	Serwices:
-
-	   GETPASS     Uzyskanie has³a w³a¶ciciela dla 
-	               wskazanego kana³u (nie dzia³a w 
-	               przypadku kodowawanych hase³).
-	   FORBID      Zamkniêcie wskazanego kana³u.
-	   SUSPEND     Blokada kana³u z zachowaniem 
-	               wszelkich jego danych i ustawieñ.
-	   UNSUSPEND   Odblokowanie kana³u.
-	   STATUS      Zwraca aktualny poziom dostêpu do 
-	               kana³u wskazanego u¿ytkownika.
-	
 	Administratorzy Serwisów mog± tak¿e usun±æ ka¿dy z 
 	kana³ów bez potrzeby identyfikowania siê z u¿yciem 
 	has³a w³a¶ciciela. Mog± przejrzeæ listy dostêpów, 
@@ -5309,8 +5366,34 @@ CHAN_SERVADMIN_HELP_STATUS
 # Wiadomo¶ci pomocy MemoServ 
 #
 ###########################################################################
+MEMO_HELP_CMD_SEND
+	    SEND   Wyslij wiadomo¶æ do u¿ytkownika/kana³u.
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Wycofaj ostatni± ustawion± wiadomo¶æ.
+MEMO_HELP_CMD_LIST
+	    LIST   Wy¶wietl wszystkie ustawione wiadomo¶ci.
+MEMO_HELP_CMD_READ
+	    READ   Przeczytaj jedn± lub wiêcej wiadomo¶ci.
+MEMO_HELP_CMD_DEL
+	    DEL    Skasuj jedn± lub wiêcej wiadomo¶ci.
+MEMO_HELP_CMD_SET
+	    SET    Ustaw opcje dla wiadomo¶ci.
+MEMO_HELP_CMD_INFO
+	    INFO   Wy¶wietl informacje o wiadomo¶ciach.
+MEMO_HELP_CMD_RSEND
+	    RSEND  Wysy³a wiadomo¶æ z ¿±daniem potwierdzenia 
+	    	   odbioru.
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Wysy³a wiadomo¶æ do wszystkich 
+	    zarejestrowanych u¿ytkowników.
 
-MEMO_HELP
+MEMO_HELP_CMD_STAFF
+	    STAFF  Wysy³a wiadomo¶æ do wszystkich 
+	    operatorów/administratorów Serwisów.
+
+MEMO_HELP_HEADER
 	%S jest mechanizmem umo¿liwiaj±cym przesy³anie
 	krótkich wiadomo¶ci innym uzytkownikom sieci lub
 	kana³om(*). Zarówno nick osoby wysy³aj±cej jak i
@@ -5319,24 +5402,11 @@ MEMO_HELP
 
 	%S lista dostêpnych komend:
 
-	    SEND   Wyslij wiadomo¶æ do u¿ytkownika/kana³u.
-	    CANCEL Wycofaj ostatni± ustawion± wiadomo¶æ.
-	    LIST   Wy¶wietl wszystkie ustawione wiadomo¶ci.
-	    READ   Przeczytaj jedn± lub wiêcej wiadomo¶ci.
-	    DEL    Skasuj jedn± lub wiêcej wiadomo¶ci.
-	    SET    Ustaw opcje dla wiadomo¶ci.
-	    INFO   Wy¶wietl informacje o wiadomo¶ciach.
-	    RSEND  Wysy³a wiadomo¶æ z ¿±daniem potwierdzenia 
-	    	   odbioru.
 
 MEMO_HELP_ADMIN
-	    SENDALL  Wysy³a wiadomo¶æ do wszystkich 
-	    zarejestrowanych u¿ytkowników.
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Wysy³a wiadomo¶æ do wszystkich 
-	    operatorów/administratorów Serwisów.
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	Napisz /msg %S HELP komenda, aby 
@@ -5533,82 +5603,89 @@ MEMO_HELP_CHECK
 #
 ###########################################################################
 
-OPER_HELP
-	komendy %S:
+OPER_HELP_CMD_GLOBAL
 	   GLOBAL      Wiadomo¶æ do wszystkich u¿ytkowników.
+OPER_HELP_CMD_STATS
 	   STATS       Informacje na temat serwisów i sieci.
-	   OPER LIST   Lista wszystkich operatorów serwisów.
-	   ADMIN LIST  Lista wszystkich administratorów.
-	   STAFF       Wy¶wietla ekipe serwisów i jej stan.
-
-OPER_HELP_OPER_CMD
-	Komendy tylko dla operatorów i adminów serwisów:
-	   MODE        Zmiana modów kana³owych.
-	   KICK        Wykopanie u¿ytkownika z kana³u.
-	   CLEARMODES  Czyszczenie modów na kanale.
-	   KILLCLONES  Skilluj u¿ytkowników z danego hosta.
-	   AKILL       Modyfikacje listy AKILL. 
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Modyfikacje listy SGLINII.
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Modyfikacje listy SQLINII.
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Modyfikacje listy SZLINII.
-
-OPER_HELP_ADMIN_CMD
-	Komendy dostêpne tylko dla adminów serwisów:
+OPER_HELP_CMD_OPER
 	   OPER        Modyfikacja listy operatorów serwisów.
+OPER_HELP_CMD_ADMIN
+	   ADMIN       Modyfikacja listy adminów serwisów.
+OPER_HELP_CMD_STAFF
+	   STAFF       Wy¶wietla ekipe serwisów i jej stan.
+OPER_HELP_CMD_MODE
+	   MODE        Zmiana modów kana³owych.
+OPER_HELP_CMD_KICK
+	   KICK        Wykopanie u¿ytkownika z kana³u.
+OPER_HELP_CMD_CLEARMODES
+	   CLEARMODES  Czyszczenie modów na kanale.
+OPER_HELP_CMD_KILLCLONES
+	   KILLCLONES  Skilluj u¿ytkowników z danego hosta.
+OPER_HELP_CMD_AKILL
+	   AKILL       Modyfikacje listy AKILL. 
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Modyfikacje listy SGLINII.
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Modyfikacje listy SQLINII.
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Modyfikacje listy SZLINII.
+OPER_HELP_CMD_CHANLIST
 	   CHANLIST    Lista wszystkich rekordów kana³ów.
+OPER_HELP_CMD_USERLIST
 	   USERLIST    Lista wszystkich rekordów u¿ytkowników.
+OPER_HELP_CMD_LOGONNEWS
 	   LOGONNEWS   Modyfikacja wiadomo¶ci wy¶wietlanych 
 	               u¿ytkownikom po po³±czeniu.
+OPER_HELP_CMD_RANDOMNEWS
 	   RANDOMNEWS  Modyfikacja losowych wiadomo¶ci wy¶wietlanych 
 	               u¿ytkownikom po po³±czeniu.
+OPER_HELP_CMD_OPERNEWS
 	   OPERNEWS    Modyfikacja wiadomo¶ci wy¶wietlanych ircopom.
+OPER_HELP_CMD_SESSION
 	   SESSION     Pokazuje liste sesji.
+OPER_HELP_CMD_EXCEPTION
 	   EXCEPTION   Modyfikacja listy wyj±tków dla limitów sesji. 
-	   CACHE       Lista hostów w cache detektora proxy.
+OPER_HELP_CMD_NOOP
 	   NOOP        Tymczasowe usuniêcie wszystkich O:linii na 
 	               serwerze.
+OPER_HELP_CMD_JUPE
 	   JUPE        Fake serwer do blokady po³±czeñ.
+OPER_HELP_CMD_IGNORE
 	   IGNORE      Modyfikacja listy ignore serwisów.
+OPER_HELP_CMD_SET
 	   SET         Ustawienia ró¿nych, globalnych opcji.
+OPER_HELP_CMD_RELOAD
 	   RELOAD      Prze³adowanie pliku konfiguracyjnego.
+OPER_HELP_CMD_UPDATE
 	   UPDATE      Natychmiastowa i wymuszona aktualizacja baz
 	               serwisów na dysku.
+OPER_HELP_CMD_RESTART
 	   RESTART     Zapis baz i restart serwisów.
+OPER_HELP_CMD_QUIT
 	   QUIT        Wy³±czenie serwisów bez zapisywania baz.
+OPER_HELP_CMD_SHUTDOWN
 	   SHUTDOWN    Wy³±czenie serwisów z zapisaniem baz.
+OPER_HELP_CMD_DEFCON
 	   DEFCON      Modyfikacje systemu DefCon.
+OPER_HELP_CMD_CHANKILL
 	   CHANKILL    Skilluj wszystkich u¿ytkowników na kanale.
-
-	Komendy dostêpne tylko dla superadminów:
-	   ADMIN       Modyfikacja listy adminów serwisów.
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
+OPER_HELP_CMD_OLINE
 	    OLINE       Daje flagi opera wybranemu u¿ytkownikowi 
-
-OPER_HELP_ADMIN_CMD_UMODE
+OPER_HELP_CMD_UMODE
 	    UMODE       Zmiana usermod dla u¿ytkownika.
-
-OPER_HELP_ADMIN_CMD_SVSNICK
+OPER_HELP_CMD_SVSNICK
 	    SVSNICK     Wymuszona zmiana nicka danego u¿ytkownika.
-
-OPER_HELP_ROOT_CMD
-	Dodatkowe komendy dostêpne tylko dla superadminów:
+OPER_HELP_CMD_MODLOAD
 	   MODLOAD     Za³aduj modu³.
+OPER_HELP_CMD_MODUNLOAD
 	   MODUNLOAD   Wy³aduj modu³.
-	   MODLIST     Lista za³adowanych modu³ów.
+OPER_HELP_CMD_MODINFO
 	   MODINFO     Informacja na temat wybranego modu³u.
+OPER_HELP_CMD_MODLIST
+	   MODLIST     Lista za³adowanych modu³ów.
+
+OPER_HELP
+	komendy %S:
 
 OPER_HELP_LOGGED
 	Notka: Wszystkie komendy w %S s± logowane!
@@ -6214,7 +6291,29 @@ OPER_HELP_MODLIST
 # Wiadomo¶ci pomocy BotServ
 #
 ###########################################################################
-	
+
+
+BOT_HELP_CMD_BOTLIST
+	   BOTLIST    Lista dostêpnych boty.
+BOT_HELP_CMD_ASSIGN
+	   ASSIGN     Przydziela bota do kana³u.
+BOT_HELP_CMD_SET
+	   SET        Konfiguruje bota.
+BOT_HELP_CMD_KICK
+	   KICK       Konfiguruje kick'i.
+BOT_HELP_CMD_BADWORDS
+	   BADWORDS   Zarz±dzanie lista zakaznych s³ów.
+BOT_HELP_CMD_ACT
+	   ACT        Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	   INFO       Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	   SAY        Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	   UNASSIGN   Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	   BOT        Zarz±dza list± botów sieci.
+
 BOT_HELP
 	%S pozwala umie¶ciæ bota na w³asnym kanale.
 	Zosta³ stworzony dla u¿ytkowników, którzy nie mog±
@@ -6224,14 +6323,7 @@ BOT_HELP
 	/msg %S komenda. Aby uzyskaæ wiêcej 
 	informacji wpisz /msg %S HELP komenda.
 	
-	   BOTLIST    Lista dostêpnych boty.
-	   ASSIGN     Przydziela bota do kana³u.
-	   SET        Konfiguruje bota.
-	   KICK       Konfiguruje kick'i.
-	   BADWORDS   Zarz±dzanie lista zakaznych s³ów.
-	
-	Pozosta³e komendy: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	Bot wejdzie na kana³ je¶li przebywa na nim 
 	przynajmniej %d u¿ytkownik(ów).
 	
@@ -6493,18 +6585,10 @@ BOT_HELP_ACT
 	Sprawia ¿e Bot u¿yje komendy akcji (/me) przy 
 	wypowiedzeniu podanego tekstu na kanale.
 
-BOT_SERVADMIN_HELP
-	
-	Poni¿sza komenda jest dostêpna dla Aministratorów
-	Serwisów:
-	
-	    BOT          Zarz±dza list± botów sieci.
-
 BOT_SERVADMIN_HELP_BOT
 	Sk³adnia: BOT ADD nick ident host nazwa
 	          BOT CHANGE starynick nowynick [ident [host [nazwa]]]
 	          BOT DEL nick
-	          BOT LIST
 	
 	Polecenie pozwala Administratorom Serwisów na 
 	tworzenie, modyfikowanie oraz kasowanie botów 
@@ -6515,8 +6599,6 @@ BOT_SERVADMIN_HELP_BOT
 	BOT CHANGE pozwala na zmiane nicka, identa, 
 	hosta lub realname bota bez jego kasowania. 
 	BOT DEL usuwa wskazanego bota. 
-	BOT LIST dzia³a tak samo jak BOTLIST 
-	wy¶wietlaj±c wszystkie dostêpne boty.
 	
 	UWAGA: Je¶li stworzony zostanie bot o nicku, 
 	który jest ju¿ zarejestrowany, nick zostanie 
@@ -6627,22 +6709,38 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commands:
+HOST_HELP_CMD_ON
 	    ON          Activates your assigned vhost
+
+HOST_HELP_CMD_OFF
 	    OFF         Deactivates your assigned vhost
+
+HOST_HELP_CMD_GROUP
 	    GROUP       Syncs the vhost for all nicks in a group
 
-HOST_OPER_HELP
-	Commands available to HostSetters/Removes only:
+HOST_HELP_CMD_SET
 	    SET         Set the vhost of another user
+
+HOST_HELP_CMD_SETALL
 	    SETALL      Set the vhost for all nicks in a group
+
+HOST_HELP_CMD_DEL
 	    DEL         Delete the vhost of another user
+
+HOST_HELP_CMD_DELALL
 	    DELALL      Delete the vhost for all nicks in a group
+
+HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
+HOST_HELP
+	%S commands:
+
+HOST_OPER_HELP
+	not used.
+
 HOST_ADMIN_HELP
-	Commands available to services admins only:
+	not used.
 
 HOST_HELP_ON
 	Syntax: ON

@@ -1,0 +1,35 @@
+#!/bin/sh
+
+echo -n "SRCS=" > ./Makefile.inc
+FIRST=1
+for oldfile in *.c
+do
+	if [ "$FIRST" = 1 ] ; then
+		echo -n " "$oldfile >> ./Makefile.inc
+	else
+		echo "\\" >> ./Makefile.inc
+		echo -n "     " $oldfile >> ./Makefile.inc
+	fi
+	FIRST=0
+done
+echo "" >> ./Makefile.inc
+
+echo -n "SUBS=" >> ./Makefile.inc
+FIRST=1
+for dir in *
+do
+        if [ -d $dir ] ; then
+		if [ -f $dir/Makefile ] ; then
+			if [ "$FIRST" = 1 ] ; then
+				echo -n " "$dir >> ./Makefile.inc
+		        else
+				echo "\\" >> ./Makefile.inc
+				echo -n "     " $dir >> ./Makefile.inc
+			fi
+			FIRST=0
+		fi
+	fi
+done
+
+exit 0
+

@@ -95,6 +95,8 @@ List of Questions
 
 34) How to auto voice all those whom join my #channel?
 
+35) How can i enable the OperServ RAW command?
+
 
 List of answers
 ---------------
@@ -396,3 +398,21 @@ List of answers
     /cs set #channel secure off
     /cs set #channel xop off
     /cs levels #channel set AUTOVOICE -1
+
+35) How can i enable the OperServ RAW command?
+
+    Enabling the OperServ RAW command is VERY dangerous and should
+    never be done on a real network without thinking about it very
+    well first. The RAW command can easily break your whole network
+    if used incorrectly, and thus you will receive NO SUPPORT if you
+    enable RAW on your network.
+    
+    Before you enable RAW, be very sure you really want to enable it,
+    and keep in mind that you will NOT BE ABLE to receive ANY SUPPORT
+    anymore, because Anope's stability cannot be guaranteed if RAW is
+    enabled.
+    
+    The RAW command comes bundled as a core module for operserv. To
+    load it, add the os_raw module to the list of OperServ core
+    modules. But be sure to keep in mind that when you enable the RAW
+    command, you CANNOT GET ANY SUPPORT for Anope anymore.

@@ -18,6 +18,7 @@ int servernum = 0;
 
 extern void moduleAddMsgs(void);
 extern void moduleAddIRCDMsgs(void);
+extern int protocol_module_init(void);
 /*************************************************************************/
 
 void introduce_user(const char *user)
@@ -319,8 +320,8 @@ static int parse_options(int ac, char **av)
             } else if (!strcmp(s, "noexpire")) {
                 noexpire = 1;
             } else if (!strcmp(s, "version")) {
-                fprintf(stdout, "Anope-%s %s %s -- %s\n", version_number,
-                        ircd->name, version_flags, version_build);
+                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
+                        version_flags, version_build);
                 exit(EXIT_SUCCESS);
             } else if (!strcmp(s, "help")) {
                 fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
@@ -437,8 +438,6 @@ int init(int ac, char **av)
         return -1;
     }
 
-    /* Add IRCD Message handlers */
-    moduleAddIRCDMsgs();
 
     /* Add Core MSG handles */
     moduleAddMsgs();
@@ -446,6 +445,10 @@ int init(int ac, char **av)
     /* Parse all remaining command-line options. */
     parse_options(ac, av);
 
+    /* Add IRCD Protocol Module; exit if there are errors */
+    if (protocol_module_init()) {
+        return -1;
+    }
 #ifndef _WIN32
     if (!nofork) {
         if ((i = fork()) < 0) {
@@ -485,15 +488,17 @@ int init(int ac, char **av)
 
     /* Announce ourselves to the logfile. */
     if (debug || readonly || skeleton) {
-        alog("Anope %s (compiled for %s) starting up (options:%s%s%s)",
+        alog("Anope %s (ircd protocol: %s) starting up (options:%s%s%s)",
              version_number, version_protocol,
              debug ? " debug" : "", readonly ? " readonly" : "",
              skeleton ? " skeleton" : "");
     } else {
-        alog("Anope %s (compiled for %s) starting up",
+        alog("Anope %s (ircd protocol: %s) starting up",
              version_number, version_protocol);
     }
     start_time = time(NULL);
+
+
 
     /* If in read-only mode, close the logfile again. */
     if (readonly)
@@ -561,6 +566,7 @@ int init(int ac, char **av)
     lang_init();
     if (debug)
         alog("debug: Loaded languages");
+
 
     /* Initialize subservices */
     ns_init();
@@ -658,7 +664,7 @@ int init(int ac, char **av)
         alog("Info: Not reflecting database records.");
     }
 #endif
-    send_event(EVENT_CONNECT, EVENT_START);
+    send_event(EVENT_CONNECT, 1, EVENT_START);
 
     /* Connect to the remote server */
     servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
@@ -692,7 +698,7 @@ int init(int ac, char **av)
     }
 
     anope_cmd_connect(servernum);
-    send_event(EVENT_CONNECT, EVENT_STOP);
+    send_event(EVENT_CONNECT, 1, EVENT_STOP);
 
     sgets2(inbuf, sizeof(inbuf), servsock);
     if (strnicmp(inbuf, "ERROR", 5) == 0) {

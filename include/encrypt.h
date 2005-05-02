@@ -12,5 +12,5 @@
  *
  */
 
-extern int encrypt(const char *src, int len, char *dest, int size);
-extern int check_password(const char *plaintext, const char *password);
+E int encrypt(const char *src, int len, char *dest, int size);
+E int check_password(const char *plaintext, const char *password);

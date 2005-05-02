@@ -98,7 +98,7 @@ static int started = 0;
 
 extern void expire_all(void)
 {
-    send_event(EVENT_DB_EXPIRE, EVENT_START);
+    send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
     waiting = -3;
     if (debug)
         alog("debug: Running expire routines");
@@ -125,14 +125,14 @@ extern void expire_all(void)
         expire_szlines();
     }
     expire_exceptions();
-    send_event(EVENT_DB_EXPIRE, EVENT_STOP);
+    send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
 }
 
 /*************************************************************************/
 
 void save_databases(void)
 {
-    send_event(EVENT_DB_SAVING, EVENT_START);
+    send_event(EVENT_DB_SAVING, 1, EVENT_START);
 
     waiting = -2;
     if (debug)
@@ -204,7 +204,7 @@ void save_databases(void)
         }
     }
 #endif
-    send_event(EVENT_DB_SAVING, EVENT_STOP);
+    send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }
 
 /*************************************************************************/
@@ -214,7 +214,7 @@ void save_databases(void)
 static void services_restart(void)
 {
     alog("Restarting");
-    send_event(EVENT_RESTART, EVENT_START);
+    send_event(EVENT_RESTART, 1, EVENT_START);
     if (!quitmsg)
         quitmsg = "Restarting";
     anope_cmd_squit(ServerName, quitmsg);
@@ -254,7 +254,7 @@ static void services_shutdown(void)
 {
     User *u, *next;
 
-    send_event(EVENT_SHUTDOWN, EVENT_START);
+    send_event(EVENT_SHUTDOWN, 1, EVENT_START);
 
     if (!quitmsg)
         quitmsg = "Terminating, reason unknown";
@@ -273,7 +273,7 @@ static void services_shutdown(void)
             u = next;
         }
     }
-    send_event(EVENT_SHUTDOWN, EVENT_STOP);
+    send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
     disconn(servsock);
 }
 
@@ -317,6 +317,7 @@ void sighandler(int signum)
                         "Error Reading Configuration File (Received SIGUSR2)");
                 quitting = 1;
             }
+            send_event(EVENT_RELOAD, 1, EVENT_START);
             return;
 
         } else
@@ -432,7 +433,8 @@ void sighandler(int signum)
     if (signum == SIGSEGV) {
         do_backtrace(1);
     }
-    send_event(EVENT_SIGNAL, quitmsg);
+    /* Should we send the signum here as well? -GD */
+    send_event(EVENT_SIGNAL, 1, quitmsg);
 
     if (started) {
         services_shutdown();

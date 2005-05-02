@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 
  * 
- * $Id:$ 
+ * $Id$ 
  *
  */
 
@@ -22,6 +22,7 @@
 #define EVENT_BOT_JOIN "bot_join"
 #define EVENT_BOT_CREATE "bot_create"
 #define EVENT_BOT_CHANGE "bot_change"
+#define EVENT_BOT_FANTASY "bot_command"
 #define EVENT_BOT_DEL "bot_del"
 #define EVENT_BOT_ASSIGN "bot_assign"
 #define EVENT_TOPIC_UPDATED "chan_topic_updated"
@@ -34,6 +35,7 @@
 #define EVENT_CONNECT "connect"
 #define EVENT_DB_EXPIRE "db_expire"
 #define EVENT_RESTART "restart"
+#define EVENT_RELOAD "reload"
 #define EVENT_SHUTDOWN "shutdown"
 #define EVENT_SIGNAL "signal"
 #define EVENT_NICK_REGISTERED "nick_registered"
@@ -49,4 +51,5 @@
 #define EVENT_DEFCON_LEVEL "defcon_level"
 #define EVENT_NICK_SUSPENDED "nick_suspended"
 #define EVENT_NICK_UNSUSPEND "nick_unsuspend"
-
+#define EVENT_JOIN_CHANNEL "join_channel"
+#define EVENT_PART_CHANNEL "part_channel"

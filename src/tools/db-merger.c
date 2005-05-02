@@ -30,9 +30,9 @@
 #include <time.h>
 
 #ifndef _WIN32
-  #include <unistd.h>
+#include <unistd.h>
 #else
-  #include "sysconf.h"
+#include "sysconf.h"
 #endif
 
 /* CONFIGURATION BLOCK */

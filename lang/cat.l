@@ -1923,7 +1923,7 @@ BOT_SEEN_NEVER
 	Mai he vist a %s en aquest canal.
 BOT_SEEN_UNKNOWN
 	Mai he visto a %s.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick usuari host nom-real
@@ -2887,7 +2887,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Current Module list:
 OPER_MODULE_LIST
-	Module: %s [%s]
+	Module: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules loaded.
 OPER_MODULE_INFO_LIST
@@ -3287,6 +3287,56 @@ HELP_HELP_HOST
 #
 ###########################################################################
 
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Registra un nickname
+NICK_HELP_CMD_GROUP
+	    GROUP      Ingresa en un grup
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Per identificar-te amb la teva clau
+NICK_HELP_CMD_ACCESS
+	    ACCESS     Modifica la llista d'adreçes autoritzades
+NICK_HELP_CMD_SET
+	    SET        Estableix proteccions, inclouent kills
+NICK_HELP_CMD_DROP
+	    DROP       Cancela el registre d'un nickname
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Kickeja un usuari que estigui utilitzant el teu nickname
+NICK_HELP_CMD_RELEASE
+	    RELEASE    Repren possesió del teu nick després de RECOVER
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Vas oblidar la teva clau? Intenta això
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Recupera la clau per un nickname
+	               (sols si encriptació esta deshabilitada)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Impossibilita que un nickname sigui utilitzat
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
+
 NICK_HELP
 	%S Et permet "registrar" un nickname i
 	prevenir a d'altres utilitzar-lo. Les següents comandes
@@ -3295,18 +3345,7 @@ NICK_HELP
 	per més informació sobre una comanda especifica
 	escriu /msg %S HELP comanda.
 	
-	    REGISTER   Registra un nickname
-	    GROUP      Ingresa en un grup
-	    IDENTIFY   Per identificar-te amb la teva clau
-	    ACCESS     Modifica la llista d'adreçes autoritzades
-	    SET        Estableix proteccions, inclouent kills
-	    DROP       Cancela el registre d'un nickname
-	    RECOVER    Kickeja un usuari que estigui utilitzant el teu nickname
-	    RELEASE    Repren possesió del teu nick després de RECOVER
-	    SENDPASS   Vas oblidar la teva clau? Intenta això
-	
-	Altres comandes: GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	NOTESE: Aquest servei intenta proveir una eina
 	pels usuaris d'IRC d'assegurar-se que la seva identitat no esta
 	compromessa, NO per facilitar el "robatori" de nicknames
@@ -3720,14 +3759,6 @@ NICK_HELP_SENDPASS
 	Aquesta comanda no esta disponible quant encriptació esta habilitada.
 
 NICK_SERVADMIN_HELP
-	
-	Les següents comandes estan disponibles a administradors
-	de serveis:
-	
-	    GETPASS    Recupera la clau per un nickname
-	                   (sols si encriptació esta deshabilitada)
-	    FORBID     Impossibilita que un nickname sigui utilitzat
-	
 	Administradors de serveis poden també eliminar qualsevol
 	nickname sense tenir que identificar-se pel nick i poden
 	veure la llista d'accés per qualsevol nickname
@@ -3891,6 +3922,87 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Retorna la clau de fundador per a un canal
+	               (sols si l'encriptació esta deshabilitada)
+CHAN_HELP_CMD_FORBID
+	    FORBID     Evita que un canal es faci servir
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Prevent a channel from being used preserving
+	               channel data and settings
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Releases a suspended channel
+CHAN_HELP_CMD_STATUS
+	    STATUS     Returns the current access level of a user
+	               on a channel
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Registra un canal
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   T'identifica amb la teva clau
+CHAN_HELP_CMD_SET
+	    SET        Establir opcions i informació d'un canal
+CHAN_HELP_CMD_AOP
+	    AOP        Modifica la llista d'usuaris AOP
+CHAN_HELP_CMD_SOP
+	    SOP        Modifica la llista d'usuaris SOP
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Modifica la llista d'usuaris privilegiats
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Redefine el significat de nivells d'accés
+CHAN_HELP_CMD_AKICK
+	    AKICK      Manté la llista d'AutoKick
+CHAN_HELP_CMD_DROP
+	    DROP       Cancel.la l'enregistrament d'un canal
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Ajuda a recuperar claus perdudes
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	%S et permet registrar i controlar varis
@@ -3901,42 +4013,7 @@ CHAN_HELP
 	Per a utilitzar-los, escriu /msg %S comanda.
 	Per més informació sobre una comanda especifica,
 	escriu /msg %S HELP comanda.
-	
-	    REGISTER   Registra un canal
-	    IDENTIFY   T'identifica amb la teva clau
-	    SET        Establir opcions i informació d'un canal
-	    AOP        Modifica la llista d'usuaris AOP
-	    SOP        Modifica la llista d'usuaris SOP
-	    ACCESS     Modifica la llista d'usuaris privilegiats
-	    LEVELS     Redefine el significat de nivells d'accés
-	    AKICK      Manté la llista d'AutoKick
-	    DROP       Cancel.la l'enregistrament d'un canal
-	    SENDPASS   Ajuda a recuperar claus perdudes
-	
-	Altres comandes: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
-	                INVITE, KICK, LIST, LOGOUT, OP, UNBAN, 
-	                VOICE, VOP
-	
-CHAN_HELP_UNREAL
-	
-	Aquestes comandes tambe estan disponibles en aquesta xarxa:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Aquestes comandes tambe estan disponibles en aquesta xarxa:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
+	 
 
 CHAN_HELP_EXPIRES
 	
@@ -4798,9 +4875,6 @@ CHAN_SERVADMIN_HELP
 	Les següents comandes estan disponibles per a administradors
 	de serveis:
 	
-	    GETPASS    Retorna la clau de fundador per a un canal
-	                   (sols si l'encriptació esta deshabilitada)
-	    FORBID     Evita que un canal es faci servir
 	    STATUS     Retorna el nivell d'accés actual d'un
 	                   usuari en un canal
 	    CLIST      llista tots els canals en els que l'usuari
@@ -4928,8 +5002,30 @@ CHAN_SERVADMIN_HELP_STATUS
 # MemoServ help messages
 #
 ###########################################################################
+MEMO_HELP_CMD_SEND
+	    SEND   Envia un memo a un nick o canal
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Cancela l'últim memo enviat
+MEMO_HELP_CMD_LIST
+	    LIST   llista els teus memos
+MEMO_HELP_CMD_READ
+	    READ   Llegeix un o més memos
+MEMO_HELP_CMD_DEL
+	    DEL    Esborra un o més memos
+MEMO_HELP_CMD_SET
+	    SET    Estableix opcions relacionades a memos
+MEMO_HELP_CMD_INFO
+	    INFO   Displays information about your memos
+MEMO_HELP_CMD_RSEND
+	    RSEND  Sends a memo and requests a read receipt
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Send a memo to all registered users
+MEMO_HELP_CMD_STAFF
+	    STAFF  Send a memo to all opers/admins
 
-MEMO_HELP
+MEMO_HELP_HEADER
 	%S és una utilitat que permet a usuaris de IRC
 	enviar missatges curts a altres usuaris de IRC, estiguin
 	en linea o no, o a canals(*). Ambdós el nickname que
@@ -4938,19 +5034,10 @@ MEMO_HELP
 	
 	Les comandes de %S incloen:
 	
-	    SEND   Envia un memo a un nick o canal
-	    CANCEL Cancela l'últim memo enviat
-	    LIST   llista els teus memos
-	    READ   Llegeix un o més memos
-	    DEL    Esborra un o més memos
-	    SET    Estableix opcions relacionades a memos
-	
 MEMO_HELP_ADMIN
-	    SENDALL  Send a memo to all registered users
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF  Send a memo to all opers/admins
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	escriu /msg %S HELP comando per a més ajuda en
@@ -5158,88 +5245,91 @@ MEMO_HELP_CHECK
 # OperServ help messages
 #
 ###########################################################################
-
-OPER_HELP
-	Comandes per a %S:
+OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Envia un missatge a totss els usuaris
+OPER_HELP_CMD_STATS
 	    STATS       mostra estatus dels serveis i la xarxa
-	    OPER LIST   Llista tots els operadors de serveis
-	    ADMIN LIST  Llista tots els administradors de
-	                serveis
-
-OPER_HELP_OPER_CMD
-	Comandes disponibles sols per a operadors i administradors
-	de serveis:
-	    MODE        Canvia els Modes d'un canal
-	    KICK        Kickeja un usuari d'un canal
-	    CLEARMODES  neteja els Modes d'un canal
-	    KILLCLONES  Mata tots els usuaris en un host
-	    AKILL       Manipula la llista AKILL
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      Manipula la llista SGLINE
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      Manipula la llista SQLINE
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      Manipula la llista SZLINE
-
-OPER_HELP_ADMIN_CMD
-	Comandes disponibles només a administradors de serveis:
+OPER_HELP_CMD_OPER
 	    OPER        Modifica la llista d'operadors de serveis
-	    CHANLIST    Llista tots els records de canal
-	    USERLIST    Llista tots els records d'usuaris
-	    LOGONNEWS   Defineix missatges per a ser mostrats a usuaris
-	                al conectarse
-	    RANDOMNEWS  Defineix missatges per a ser mostrats a usuaris
-	                al conectarse
-	    OPERNEWS    Defineix missatges per a ser mostrats a usuaris
-	                al transformar-se en operadors
-	    SESSION     Mostra la llista de sessions de host
-	    EXCEPTION   Modifica la llista de límit de sessió
-	    CACHE       Llista cau de hostnames utilitzats pel detector
-	                de proxys
-	    NOOP        Temporalment elimina totes les linees O:
-	                d'un servidor remotamente
-	    JUPE        "Jupiter" (Mart,Saturn....) un servidor
-	    SET         Estableix varies opcions globals dels serveis
-	    RELOAD      Recarrega la configuració dels serveis
-	    UPDATE      Força a la base de dades dels serveis a
-	                ser actualitzada a disc inmediatament
-	    QUIT        Termina el programa de serveis sense grabar les dades
-	    RESTART     Guarda la base de dades dels serveis i
-	                reinicia els serveis
-	    QUIT        Termina el programa de serveis sense guardar
-	                els canvis
-	    SHUTDOWN    Termina el programa de serveis guardant els
-	                canvios
-	
-	Comandes disponibles nomès pel super-usuari de serveis:
+OPER_HELP_CMD_ADMIN
 	    ADMIN       Modifica la llista d'administradors de
 	                serveis
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
+OPER_HELP_CMD_STAFF
+	    STAFF       Display Services staff and online status
+OPER_HELP_CMD_MODE
+	    MODE        Canvia els Modes d'un canal
+OPER_HELP_CMD_KICK
+	    KICK        Kickeja un usuari d'un canal
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  neteja els Modes d'un canal
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Mata tots els usuaris en un host
+OPER_HELP_CMD_AKILL
+	    AKILL       Manipula la llista AKILL
+OPER_HELP_CMD_SGLINE
+	    SGLINE      Manipula la llista SGLINE
+OPER_HELP_CMD_SQLINE
+	    SQLINE      Manipula la llista SQLINE
+OPER_HELP_CMD_SZLINE
+	    SZLINE      Manipula la llista SZLINE
+OPER_HELP_CMD_CHANLIST
+	    CHANLIST    Llista tots els records de canal
+OPER_HELP_CMD_USERLIST
+	    USERLIST    Llista tots els records d'usuaris
+OPER_HELP_CMD_LOGONNEWS
+	    LOGONNEWS   Defineix missatges per a ser mostrats a usuaris
+	                al conectarse
+OPER_HELP_CMD_RANDOMNEWS
+	    RANDOMNEWS  Defineix missatges per a ser mostrats a usuaris
+	                al conectarse
+OPER_HELP_CMD_OPERNEWS
+	    OPERNEWS    Defineix missatges per a ser mostrats a usuaris
+	                al transformar-se en operadors
+OPER_HELP_CMD_SESSION
+	    SESSION     Mostra la llista de sessions de host
+OPER_HELP_CMD_EXCEPTION
+	    EXCEPTION   Modifica la llista de límit de sessió
+OPER_HELP_CMD_NOOP
+	    NOOP        Temporalment elimina totes les linees O:
+	                d'un servidor remotamente
+OPER_HELP_CMD_JUPE
+	    JUPE        "Jupiter" (Mart,Saturn....) un servidor
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Modify the Services ignore list
+OPER_HELP_CMD_SET
+	    SET         Estableix varies opcions globals dels serveis
+OPER_HELP_CMD_RELOAD
+	    RELOAD      Recarrega la configuració dels serveis
+OPER_HELP_CMD_UPDATE
+	    UPDATE      Força a la base de dades dels serveis a
+	                ser actualitzada a disc inmediatament
+OPER_HELP_CMD_RESTART
+	    RESTART     Guarda la base de dades dels serveis i
+	                reinicia els serveis
+OPER_HELP_CMD_QUIT
+	    QUIT        Termina el programa de serveis sense guardar
+	                els canvis
+OPER_HELP_CMD_SHUTDOWN
+	    SHUTDOWN    Termina el programa de serveis guardant els
+	                canvios
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulate the DefCon system
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kill all users on a specific channel
+OPER_HELP_CMD_OLINE
 	    OLINE       Give Operflags to a certain user
-
-OPER_HELP_ADMIN_CMD_UMODE
+OPER_HELP_CMD_UMODE
 	    UMODE       Change a user's modes
-
-OPER_HELP_ADMIN_CMD_SVSNICK
+OPER_HELP_CMD_SVSNICK
 	    SVSNICK     Forcefully change a user's nickname
-
-OPER_HELP_ROOT_CMD
-	Commands available to Serivces Roots only:
+OPER_HELP_CMD_MODLOAD
 	    MODLOAD     Load a module
+OPER_HELP_CMD_MODUNLOAD
 	    MODUNLOAD   Un-Load a module
-	    MODLIST     List loaded modules
+OPER_HELP_CMD_MODINFO
 	    MODINFO     Info about a loaded module
+OPER_HELP_CMD_MODLIST
+	    MODLIST     List loaded modules
 
 OPER_HELP_LOGGED
 	Noticia: Totes les comandes enviades a %S son monitorejades!
@@ -5877,6 +5967,27 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Llista bots disponibles
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Assigna un bot a un canal
+BOT_HELP_CMD_SET
+	SET                Configura opcions de bots
+BOT_HELP_CMD_KICK
+	KICK               Configura kickers
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Manté una llista de paraules malsonants
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Manté la llista de bots de la xarxa
 	
 BOT_HELP
 	%S et permet crear un bot en el teu propi canal.
@@ -5888,14 +5999,8 @@ BOT_HELP
 	informació sobre un comanda especifica, escriu  
 	/msg %S HELP comanda.
 	
-	BOTLIST            Llista bots disponibles
-	ASSIGN             Assigna un bot a un canal
-	SET                Configura opcions de bots
-	KICK               Configura kickers
-	BADWORDS           Manté una llista de paraules malsonants
 	
-	Altres comandos: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	El bot entrara a un canal quan hi hagin
 	%d usuari(s) en ell.
 	
@@ -6166,18 +6271,11 @@ BOT_HELP_ACT
 	Fa que el bot fagi l'equivalent a la comanda "/me"
 	en el canal especificat utilitzant el text especificat.
 
-BOT_SERVADMIN_HELP
-	
-	La següent comanda està disponible per administradors
-	de serveis:
-	
-	    BOT              Manté la llista de bots de la xarxa
 
 BOT_SERVADMIN_HELP_BOT
 	Sintaxi: BOT ADD nick usuari host real
 	          BOT CHANGE nick-ant nick-nue [usuari [host [real]]]
 	          BOT DEL nick
-	          BOT LIST
 	
 	Permet als administradors de serveis crear, modificar
 	i esborrar bots que usuaris podran usar en els seus propis
@@ -6190,8 +6288,6 @@ BOT_SERVADMIN_HELP_BOT
 	o nom real d'un bot sense tenir que esborrar-lo (i la
 	informació associada a ell).
 	BOT DEL esborra el bot donat de la llista de bots.
-	BOT LIST es un àlies de BOTLIST i només llista
-	tots els bots disponibles en la xarxa.
 	
 	Nota: Si fas un bot amb un nick ja enregistrat,
 	sera eliminat. A més, si un usuari està actualment
@@ -6312,20 +6408,38 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
-HOST_HELP
-	%S commands:
+HOST_HELP_CMD_ON
 	    ON          Activates your assigned vhost
+
+HOST_HELP_CMD_OFF
 	    OFF         Deactivates your assigned vhost
 
-HOST_OPER_HELP
-	Commands available to services operators only:
+HOST_HELP_CMD_GROUP
+	    GROUP       Syncs the vhost for all nicks in a group
+
+HOST_HELP_CMD_SET
 	    SET         Set the vhost of another user
+
+HOST_HELP_CMD_SETALL
 	    SETALL      Set the vhost for all nicks in a group
+
+HOST_HELP_CMD_DEL
 	    DEL         Delete the vhost of another user
+
+HOST_HELP_CMD_DELALL
+	    DELALL      Delete the vhost for all nicks in a group
+
+HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
+HOST_HELP
+	%S commands:
+
+HOST_OPER_HELP
+	not used.
+
 HOST_ADMIN_HELP
-	Commands available to services admins only:
+	not used.
 
 HOST_HELP_ON
 	Syntax: ON

@@ -1919,7 +1919,7 @@ BOT_SEEN_NEVER
 	%s diye birini bu kanalda hiç görmedim.
 BOT_SEEN_UNKNOWN
 	%s þahsýnýn kim olduðunu bilmiyorum.
-	
+
 # BOT responses
 BOT_BOT_SYNTAX
 	BOT ADD nick user host gerçekismi
@@ -2882,7 +2882,7 @@ OPER_MODULE_UNLOAD_SYNTAX
 OPER_MODULE_LIST_HEADER
 	Current Module list:
 OPER_MODULE_LIST
-	Module: %s [%s]
+	Module: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
 	%d Modules loaded.
 OPER_MODULE_INFO_LIST
@@ -3277,6 +3277,57 @@ HELP_HELP_HOST
 # NickServ help messages
 #
 ###########################################################################
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Confirm a nickserv auth code
+NICK_HELP_CMD_RESEND
+	    RESEND     Resend a nickserv auth code
+
+NICK_HELP_CMD_REGISTER
+	    REGISTER   Nickinizi kaydeder
+NICK_HELP_CMD_GROUP
+	    GROUP      Bir gruba dahil eder
+NICK_HELP_CMD_IDENTIFY
+	    IDENTIFY   Þifrenizle nickinizi tanýtýr
+NICK_HELP_CMD_ACCESS
+	    ACCESS     Ýzinli adreslerin listesini düzenler
+NICK_HELP_CMD_SET
+	    SET        Ayarlar, kill korumasýný içerir
+NICK_HELP_CMD_DROP
+	    DROP       Nickin kaydýný siler
+NICK_HELP_CMD_RECOVER
+	    RECOVER    Nickinizi kullanan birini kill ler
+NICK_HELP_CMD_RELEASE
+	    RELEASE    RECOVER komutundan sonra nickinizi serbest 
+	               býrakýr
+NICK_HELP_CMD_SENDPASS
+	    SENDPASS   Þifrenizimi unuttunuz? Bunu deneyin
+NICK_HELP_CMD_GHOST
+	    GHOST      Disconnects a "ghost" IRC session using your nick
+NICK_HELP_CMD_ALIST
+	    ALIST      List channels you have access on
+NICK_HELP_CMD_GLIST
+	    GLIST      Lists all nicknames in your group
+NICK_HELP_CMD_INFO
+	    INFO       Displays information about a given nickname
+NICK_HELP_CMD_LIST
+	    LIST       List all registered nicknames that match a given pattern
+NICK_HELP_CMD_LOGOUT
+	    LOGOUT     Reverses the effect of the IDENTIFY command
+NICK_HELP_CMD_STATUS
+	    STATUS     Returns the owner status of the given nickname
+NICK_HELP_CMD_UPDATE
+	    UPDATE     Updates your current status, i.e. it checks for new memos
+NICK_HELP_CMD_GETPASS
+	    GETPASS    Bir nickin þifresini öðrenmek içindir
+	               (Sadece þifreleme(encryption) devre dýþýysa)
+NICK_HELP_CMD_GETEMAIL
+	    GETEMAIL   Matches and returns all users that registered using given email
+NICK_HELP_CMD_FORBID
+	    FORBID     Bir nickin kullanýlmasýný yasaklar
+NICK_HELP_CMD_SUSPEND
+	    SUSPEND    Suspend a given nick
+NICK_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Unsuspend a given nick
 
 NICK_HELP
 	%S nickinizi "kayýt" etmenizi ve diðerlerinin nickinizi 
@@ -3285,19 +3336,7 @@ NICK_HELP
 	/msg %S komut yazýn. Belirli bir komut hakkýnda daha 
 	fazla bilgi için, /msg %S HELP komut yazýn.
 	
-	    REGISTER   Nickinizi kaydeder
-	    GROUP      Bir gruba dahil eder
-	    IDENTIFY   Þifrenizle nickinizi tanýtýr
-	    ACCESS     Ýzinli adreslerin listesini düzenler
-	    SET        Ayarlar, kill korumasýný içerir
-	    DROP       Nickin kaydýný siler
-	    RECOVER    Nickinizi kullanan birini kill ler
-	    RELEASE    RECOVER komutundan sonra nickinizi serbest 
-	                  býrakýr
-	    SENDPASS   Þifrenizimi unuttunuz? Bunu deneyin
-	
-	Diðer komutlar: GHOST, GLIST, INFO, LIST, LOGOUT, STATUS
-	
+NICK_HELP_FOOTER
 	NOT: Bu servis kullanýcýlarýn kimliklerini tehlikeye 
 	atmayacak þekilde tasarlanmýþtýr. Bu nickleri "çalmayý" 
 	veya diðer kötü niyetli hareketleri kolaylaþtýrmayý saðlama
@@ -3707,13 +3746,6 @@ NICK_HELP_SENDPASS
 	Eðer þifreleme(encryption) aktifse bu komut devre dýþý kalýr.
 
 NICK_SERVADMIN_HELP
-	
-	Aþaðýdaki komutlarý Servis adminleri kullanabilir:
-	
-	    GETPASS    Bir nickin þifresini öðrenmek içindir
-	                 (Sadece þifreleme(encryption) devre dýþýysa)
-	    FORBID     Bir nickin kullanýlmasýný yasaklar
-	
 	Servis adminleri herhangi bir nickin tanýtmasýna gerek olmadan 
 	kaydýný silebilir(drop) ve herhangi bir nickin access listesini 
 	görüntüleyebilir. (/msg %S ACCESS LIST nick).
@@ -3874,6 +3906,85 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 # ChanServ help messages
 #
 ###########################################################################
+CHAN_HELP_CMD_GETPASS
+	    GETPASS    Bir kanalýn founder þifresini ister
+CHAN_HELP_CMD_FORBID
+	    FORBID     Kanalý kullanýma kapatýr
+CHAN_HELP_CMD_SUSPEND
+	    SUSPEND    Prevent a channel from being used preserving
+	               channel data and settings
+CHAN_HELP_CMD_UNSUSPEND
+	    UNSUSPEND  Releases a suspended channel
+CHAN_HELP_CMD_STATUS
+	    STATUS     Kullanýcýnýn kanaldaki access seviyesini söyler
+CHAN_HELP_CMD_REGISTER
+	    REGISTER   Kanalý kaydeder
+CHAN_HELP_CMD_IDENTIFY
+	    IDENTIFY   Þifreyle sizi kanalýn sahibi olarak tanýmlar
+CHAN_HELP_CMD_SET
+	    SET        Kanal özelliklerini ve bilgisini ayarlar
+CHAN_HELP_CMD_AOP
+	    AOP        AOP listesini düzenler
+CHAN_HELP_CMD_SOP
+	    SOP        SOP listesini düzenler
+CHAN_HELP_CMD_ACCESS
+	    ACCESS     Ayrýcalýklý kullanýcýlarý belirler deðiþtirir
+CHAN_HELP_CMD_LEVELS
+	    LEVELS     Access seviyelerini isteðinize göre düzenler
+CHAN_HELP_CMD_AKICK
+	    AKICK      Autokick listesini düzenler
+CHAN_HELP_CMD_DROP
+	    DROP       Kanal kaydýný siler
+CHAN_HELP_CMD_SENDPASS
+	    SENDPASS   Kayýp þifrelerinizi söyler
+CHAN_HELP_CMD_BAN
+	    BAN        Bans a selected nick on a channel
+CHAN_HELP_CMD_CLEAR
+	    CLEAR      Tells ChanServ to clear certain settings on a channel
+CHAN_HELP_CMD_DEVOICE
+	    DEVOICE    Devoices a selected nick on a channel
+CHAN_HELP_CMD_GETKEY
+	    GETKEY     Returns the key of the given channel
+CHAN_HELP_CMD_INFO
+	    INFO       Lists information about the named registered channel
+CHAN_HELP_CMD_INVITE
+	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+CHAN_HELP_CMD_KICK
+	    KICK       Kicks a selected nick from a channel
+CHAN_HELP_CMD_LIST
+	    LIST       Lists all registered channels matching the given pattern
+CHAN_HELP_CMD_LOGOUT
+	    LOGOUT     This command will logout the selected nickname
+CHAN_HELP_CMD_OP
+	    OP         Gives Op status to a selected nick on a channel
+CHAN_HELP_CMD_TOPIC
+	    TOPIC      Manipulate the topic of the specified channel
+CHAN_HELP_CMD_UNBAN
+	    UNBAN      Remove all bans preventing you from entering a channel
+CHAN_HELP_CMD_VOICE
+	    VOICE      Voices a selected nick on a channel
+CHAN_HELP_CMD_VOP
+	    VOP        Maintains the VOP (VOicePeople) list for a channel
+CHAN_HELP_CMD_DEHALFOP
+	    DEHALFOP   Dehalfops a selected nick on a channel
+CHAN_HELP_CMD_DEOWNER
+	    DEOWNER    Removes your owner status on a channel
+CHAN_HELP_CMD_DEPROTECT
+	    DEPROTECT  Deprotects a selected nick on a channel
+CHAN_HELP_CMD_HALFOP
+	    HALFOP     Halfops a selected nick on a channel
+CHAN_HELP_CMD_HOP
+	    HOP        Maintains the HOP (HalfOP) list for a channel
+CHAN_HELP_CMD_OWNER
+	    OWNER      Gives you owner status on channel
+CHAN_HELP_CMD_PROTECT
+	    PROTECT    Protects a selected nick on a channel
+CHAN_HELP_CMD_ADMIN
+	    ADMIN      Protects a selected nick on a channel
+CHAN_HELP_CMD_DEADMIN
+	    DEADMIN    Deprotects a selected nick on a channel
+CHAN_HELP_CMD_DEOP
+	    DEOP       Deops a selected nick on a channel
 
 CHAN_HELP
 	%S kanallarýnýzý kayýt etmenizi ve kontrol etmenizi
@@ -3883,43 +3994,8 @@ CHAN_HELP
 	listelenmiþtir; onlarý kullanmak için /msg %S komut
 	yazýn. Belirli bir komut hakkýnda daha fazla bilgi için,
 	/msg %S HELP komut yazýn.
+	 
 	
-	    REGISTER      Kanalý kaydeder
-	    IDENTIFY      Þifreyle sizi kanalýn sahibi olarak tanýmlar
-	    SET           Kanal özelliklerini ve bilgisini ayarlar
-	    AOP           AOP listesini düzenler
-	    SOP           SOP listesini düzenler
-	    ACCESS        Ayrýcalýklý kullanýcýlarý belirler deðiþtirir
-	    LEVELS        Access seviyelerini isteðinize göre düzenler
-	    AKICK         Autokick listesini düzenler
-	    DROP          Kanal kaydýný siler
-	    SENDPASS      Kayýp þifrelerinizi söyler
-	
-	Diðer komutlar: BAN, CLEAR, DEOP, DEVOICE, GETKEY, INFO, 
-	                INVITE, KICK, LIST, LOGOUT, OP, TOPIC, 
-	                UNBAN, VOICE, VOP
-	                
-CHAN_HELP_UNREAL
-	
-	Bu networkte bu komutlarda mevcuttur:
-	    DEHALFOP, DEOWNER, DEPROTECT, HALFOP, HOP, OWNER,
-	    PROTECT
-
-CHAN_HELP_ULTIMATE3
-	
-	Bu networkte bu komutlarda mevcuttur:
-	    DEHALFOP, HALFOP, HOP, ADMIN, DEADMIN
-
-CHAN_HELP_IRCD_HALFOP
-	
-	These commands are also available on this network:
-	    DEHALFOP, HALFOP, HOP
-
-CHAN_HELP_IRCD_PROTECT
-	
-	These commands are also available on this network:
-	    DEPROTECT, PROTECT
-
 CHAN_HELP_EXPIRES
 	
 	Unutmayýn %d gün kullanýlmayan kanallarýn
@@ -4709,14 +4785,6 @@ CHAN_HELP_SENDPASS
 
 CHAN_SERVADMIN_HELP
 	
-	Aþaðýdaki komutlar servis adminleri tarafýndan kullanýlabilir:
-	
-	    GETPASS    Bir kanalýn founder þifresini ister
-	                   (sadece þifreleme(encryption) devre dýþýysa)
-	    FORBID     Kanalý kullanýma kapatýr
-	    STATUS     Kullanýcýnýn kanaldaki access seviyesini söyler
-	    CLIST      Bir kullanýcýnýn founder olduðu kanallarý listeler
-	
 	Servis adminleri kanalýn kaydýný þifreyle tanýtmadan silebilir,
 	ve access, Akick ve seviye ayarlarýný görüntüleyebilirler.
 
@@ -4834,7 +4902,30 @@ CHAN_SERVADMIN_HELP_STATUS
 #
 ###########################################################################
 
-MEMO_HELP
+MEMO_HELP_CMD_SEND
+	    SEND   Nicke veya kanala mesaj gönderir
+MEMO_HELP_CMD_CANCEL
+	    CANCEL Son gönderilen mesajý iptal eder
+MEMO_HELP_CMD_LIST
+	    LIST   Mesajlarýnýzý listeler
+MEMO_HELP_CMD_READ
+	    READ   Mesajlarý okumanýzý saðlar
+MEMO_HELP_CMD_DEL
+	    DEL    Mesajlarý silmenizi saðlar
+MEMO_HELP_CMD_SET
+	    SET    Mesajlarla ilgili ayarlarý yapar
+MEMO_HELP_CMD_INFO
+	    INFO   Displays information about your memos
+MEMO_HELP_CMD_RSEND
+	    RSEND  Sends a memo and requests a read receipt
+MEMO_HELP_CMD_CHECK
+	    CHECK  Checks if last memo to a nick was read
+MEMO_HELP_CMD_SENDALL
+	    SENDALL  Send a memo to all registered users
+MEMO_HELP_CMD_STAFF
+	    STAFF      Send a memo to all opers/admins
+
+MEMO_HELP_HEADER
 	%S kullanýcýlarýn birbirlerine veya kanallara(*) online 
 	olmasalar bile mesaj göndermelerini saðlar. Mesaj gönderebilmek
 	için gönderenin nicki, gönderilenin nicki veya kanalýn kayýtlý
@@ -4842,19 +4933,11 @@ MEMO_HELP
 	
 	%S'ün mevcut komutlarý:
 	
-	    SEND   Nicke veya kanala mesaj gönderir
-	    CANCEL Son gönderilen mesajý iptal eder
-	    LIST   Mesajlarýnýzý listeler
-	    READ   Mesajlarý okumanýzý saðlar
-	    DEL    Mesajlarý silmenizi saðlar
-	    SET    Mesajlarla ilgili ayarlarý yapar
 
 MEMO_HELP_ADMIN
-	    SENDALL  Send a memo to all registered users
-
+	not used.
 MEMO_HELP_OPER
-	    STAFF      Send a memo to all opers/admins
-
+	not used.
 MEMO_HELP_FOOTER
 	
 	Yukardaki herhangi bir komut hakkýnda yardým için 
@@ -5055,81 +5138,92 @@ MEMO_HELP_CHECK
 #
 ###########################################################################
 
+OPER_HELP_CMD_GLOBAL
+	    GLOBAL      Tüm kullanýcýlara mesaj gönderir
+OPER_HELP_CMD_STATS
+	    STATS       Servislerin ve networkun durumunu gösterir
+OPER_HELP_CMD_OPER
+	    OPER        Servis operatör listesini düzenler
+OPER_HELP_CMD_ADMIN
+	    ADMIN       Servis adminleri listesini düzenler
+OPER_HELP_CMD_STAFF
+	    STAFF       Display Services staff and online status
+OPER_HELP_CMD_MODE
+	    MODE        Bir kanalýn modlarýný deðiþtirir
+OPER_HELP_CMD_KICK
+	    KICK        Bir kullanýcýyý kanaldan atar
+OPER_HELP_CMD_CLEARMODES
+	    CLEARMODES  Bir kanalýn modlarýný temizler
+OPER_HELP_CMD_KILLCLONES
+	    KILLCLONES  Ayni ip'deki tum kullanicilari kill'ler.
+OPER_HELP_CMD_AKILL
+	    AKILL       AKILL listesini düzenler
+OPER_HELP_CMD_SGLINE
+	    SGLINE      SGLINE listesini düzenler
+OPER_HELP_CMD_SQLINE
+	    SQLINE      SQLINE listesini düzenler
+OPER_HELP_CMD_SZLINE
+	    SZLINE      SZLINE listesini düzenler
+OPER_HELP_CMD_CHANLIST
+	    CHANLIST    Tüm kanal kayýtlarýný listeler
+OPER_HELP_CMD_USERLIST
+	    USERLIST    Tüm kullanýcý kayýtlarýný listeler
+OPER_HELP_CMD_LOGONNEWS
+	    LOGONNEWS   Baðlantý sýrasýnda kullanýcýnýn göreceði mesajý 
+	                belirler
+OPER_HELP_CMD_RANDOMNEWS
+	    RANDOMNEWS  Baglanti sirasina kullaniciya gönderilen karisik
+	                mesajlari belirler
+OPER_HELP_CMD_OPERNEWS
+	    OPERNEWS    Oper olan kullanýcýlarýn görüntüleyeceði mesajý 
+	                belirler
+OPER_HELP_CMD_SESSION
+	    SESSION     Host session(oturum) larýn listesini gösterir
+OPER_HELP_CMD_EXCEPTION
+	    EXCEPTION   Session-limit exception listesini düzenler
+OPER_HELP_CMD_NOOP
+	    NOOP        Geçici olarak tüm O:line larý kaldýrýr
+OPER_HELP_CMD_JUPE
+	    JUPE        Bir server'ý "Kullanýlmaz" yapar
+OPER_HELP_CMD_IGNORE
+	    IGNORE      Modify the Services ignore list
+OPER_HELP_CMD_SET
+	    SET         Çeþitli global servis özelliklerini ayarlar
+OPER_HELP_CMD_RELOAD
+	    RELOAD      Servislerin conf dosyasýný yeniden yükler
+OPER_HELP_CMD_UPDATE
+	    UPDATE      Diskteki Servis veritabanýnýn hemen
+	                güncellenmesini saðlar
+
+OPER_HELP_CMD_RESTART
+	    RESTART     Veritabanýný kaydeder ve servisleri yeniden 
+	                baþlatýr
+
+OPER_HELP_CMD_QUIT
+	    QUIT        Servis programýný kapatýr
+OPER_HELP_CMD_SHUTDOWN
+	    SHUTDOWN    Servisler programýný kayýt ederek kapatýr
+OPER_HELP_CMD_DEFCON
+	    DEFCON      Manipulate the DefCon system
+OPER_HELP_CMD_CHANKILL
+	    CHANKILL    Kill all users on a specific channel
+OPER_HELP_CMD_OLINE
+	    OLINE       Give Operflags to a certain user
+OPER_HELP_CMD_UMODE
+	    UMODE       Change a user's modes
+OPER_HELP_CMD_SVSNICK
+	    SVSNICK     Forcefully change a user's nickname
+OPER_HELP_CMD_MODLOAD
+	    MODLOAD     Load a module
+OPER_HELP_CMD_MODUNLOAD
+	    MODUNLOAD   Un-Load a module
+OPER_HELP_CMD_MODINFO
+	    MODINFO     Info about a loaded module
+OPER_HELP_CMD_MODLIST
+	    MODLIST     List loaded modules
+
 OPER_HELP
 	%S commands:
-	    GLOBAL      Tüm kullanýcýlara mesaj gönderir
-	    STATS       Servislerin ve networkun durumunu gösterir
-	    OPER LIST   Tüm Servis operatörlerini listeler
-	    ADMIN LIST  Tüm Servis adminlerini listeler
-	    STAFF       Display Services staff and online status
-
-OPER_HELP_OPER_CMD
-	Sadece Servis operatörleri ve adminleri için geçerli komutlar:
-	    MODE        Bir kanalýn modlarýný deðiþtirir
-	    KICK        Bir kullanýcýyý kanaldan atar
-	    CLEARMODES  Bir kanalýn modlarýný temizler
-	    KILLCLONES  Ayni ip'deki tum kullanicilari kill'ler.
-	    AKILL       AKILL listesini düzenler
-
-OPER_HELP_OPER_CMD_EXTRA
-	Following commands are also available
-
-OPER_HELP_OPER_CMD_SGLINE
-	    SGLINE      SGLINE listesini düzenler
-
-OPER_HELP_OPER_CMD_SQLINE
-	    SQLINE      SQLINE listesini düzenler
-
-OPER_HELP_OPER_CMD_SZLINE
-	    SZLINE      SZLINE listesini düzenler
-
-OPER_HELP_ADMIN_CMD
-	Sadece Servis adminleri için geçerli komutlar:
-	    CACHE       Proxy detectörü tarafindan kullanilan hostname
-	                    cache listesini gösterir
-	    SESSION     Host session(oturum) larýn listesini gösterir
-	    EXCEPTION   Session-limit exception listesini düzenler
-	    CHANLIST    Tüm kanal kayýtlarýný listeler
-	    USERLIST    Tüm kullanýcý kayýtlarýný listeler
-	    OPER        Servis operatör listesini düzenler
-	    LOGONNEWS   Baðlantý sýrasýnda kullanýcýnýn göreceði mesajý 
-	                    belirler
-	    RANDOMNEWS  Baglanti sirasina kullaniciya gönderilen karisik
-	                    mesajlari belirler
-	    OPERNEWS    Oper olan kullanýcýlarýn görüntüleyeceði mesajý 
-	                    belirler
-	    NOOP        Geçici olarak tüm O:line larý kaldýrýr
-	    JUPE        Bir server'ý "Kullanýlmaz" yapar
-	    SET         Çeþitli global servis özelliklerini ayarlar
-	    UPDATE      Diskteki Servis veritabanýnýn hemen
-	                    güncellenmesini saðlar
-	    RELOAD      Servislerin conf dosyasýný yeniden yükler
-	    QUIT        Servis programýný kapatýr
-	    RESTART     Veritabanýný kaydeder ve servisleri yeniden 
-	                    baþlatýr
-	    SHUTDOWN    Servisler programýný kayýt ederek kapatýr
-
-	Sadece Servis super-user(root) larý için geçerli komutlar:
-	    ADMIN       Servis adminleri listesini düzenler
-
-OPER_HELP_ADMIN_CMD_EXTRA
-	Following commands are also available to Service Admins
-
-OPER_HELP_ADMIN_CMD_OLINE
-	    OLINE       Give Operflags to a certain user
-
-OPER_HELP_ADMIN_CMD_UMODE
-	    UMODE       Change a user's modes
-
-OPER_HELP_ADMIN_CMD_SVSNICK
-	    SVSNICK     Forcefully change a user's nickname
-
-OPER_HELP_ROOT_CMD
-	Commands available to Serivces Roots only:
-	    MODLOAD     Load a module
-	    MODUNLOAD   Un-Load a module
-	    MODLIST     List loaded modules
-	    MODINFO     Info about a loaded module
 
 OPER_HELP_LOGGED
 	Not: %S'e gönderilen tüm komutlarýn kaydý tutulur!
@@ -5719,7 +5813,29 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-	
+
+
+BOT_HELP_CMD_BOTLIST
+	BOTLIST            Mevcut botlarý listeler
+BOT_HELP_CMD_ASSIGN
+	ASSIGN             Kanala bot sokar
+BOT_HELP_CMD_SET
+	SET                Bot özelliklerini ayarlar
+BOT_HELP_CMD_KICK
+	KICK               Atma özelliklerini ayarlar
+BOT_HELP_CMD_BADWORDS
+	BADWORDS           Küfür listesi oluþturur
+BOT_HELP_CMD_ACT
+	ACT                Makes the bot do the equivalent of a "/me" command
+BOT_HELP_CMD_INFO
+	INFO               Allows you to see BotServ information about a channel or a bot
+BOT_HELP_CMD_SAY
+	SAY                Makes the bot say the given text on the given channel
+BOT_HELP_CMD_UNASSIGN
+	UNASSIGN           Unassigns a bot from a channel
+BOT_HELP_CMD_BOT
+	BOT                Networkün bot listesini düzenler
+
 BOT_HELP
 	%S kanalýnýzda bir botunuzun olmasýný saðlar. Bu
 	servis bot konfigürasyonundan anlamayanlar yada
@@ -5729,14 +5845,7 @@ BOT_HELP
 	daha fazla bilgi için, /msg %S HELP komut
 	yazýn.
 	
-	BOTLIST            Mevcut botlarý listeler
-	ASSIGN             Kanala bot sokar
-	SET                Bot özelliklerini ayarlar
-	KICK               Atma özelliklerini ayarlar
-	BADWORDS           Küfür listesi oluþturur
-	
-	Diðer komutlar: ACT INFO SAY UNASSIGN
-	
+BOT_HELP_FOOTER
 	Kanalda en az %d kullanýcý olduðu zaman bot kanala girer.
 
 BOT_HELP_BOTLIST
@@ -5984,17 +6093,10 @@ BOT_HELP_ACT
 	Botun belirtilen yazýyla belirtilen kanalda "/me" komutunun 
 	yaptýðýný kendi üzerinde yapmasýný saðlar.
 
-BOT_SERVADMIN_HELP
-	
-	Aþaðýdaki komut Servis adminleri tarafýndan kullanýlýr:
-	
-	    BOT              Networkün bot listesini düzenler
-
 BOT_SERVADMIN_HELP_BOT
 	Kullanýmý: BOT ADD nick user host gerçekismi
 	        BOT CHANGE eskinick yeninick [user [host [gerçekismi]]]
 	        BOT DEL nick
-	        BOT LIST
 	
 	Servis adminlerinin kullanýcýlarýn kanallarýnda kullanmasý 
 	için botlarý yaratmasýný, deðiþtirmesini ve silmesini saðlar.
@@ -6005,8 +6107,6 @@ BOT_SERVADMIN_HELP_BOT
 	BOT CHANGE botun nickini, username ini, hostname ini veya
 	gerçek ismini silmeye gerek kalmadan deðiþtirmeyi saðlar.
 	BOT DEL belirtilen botu bot listesinden siler.
-	BOT LIST komutu BOTLIST ile aynýdýr ve sadece networkteki
-	mevcut botlarý listeler.
 	
 	Not: Eðer botun nicki olarak, kayýtlý bir nick
 	kullanýrsanýz o nickin kaydý silinir(drop). Ayrýca

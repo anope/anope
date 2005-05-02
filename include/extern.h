@@ -15,32 +15,37 @@
 #ifndef EXTERN_H
 #define EXTERN_H
 
-#include "slist.h"
-
 #ifndef _WIN32
 #define E extern
+#define I extern
 #else
 #ifndef MODULE_COMPILE
 #define E extern __declspec(dllexport)
+#define I extern __declspec(dllimport)
 #else
 #define E extern __declspec(dllimport)
+#define I extern __declspec(dllexport)
 #endif
 #endif
+
+#include "slist.h"
 
 E char *uplink;
 
 /* IRC Variables */
-E IRCDVar ircd[];
-E IRCDCAPAB ircdcap[];
-E const char flood_mode_char_set[];
-E const char flood_mode_char_remove[];
+E IRCDVar *ircd;
+E IRCDCAPAB *ircdcap;
+E char *flood_mode_char_set;
+E char *flood_mode_char_remove;
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
-E unsigned long umodes[128];
+I unsigned long umodes[128];
 E char csmodes[128];
 E CMMode cmmodes[128];
 E CBMode cbmodes[128];
-E CBModeInfo cbmodeinfos[];
+E CBModeInfo *cbmodeinfos;
 E CUMode cumodes[128];
+E char *IRCDModule;
+E IRCDProto ircdproto;
 
 /**** actions.c ****/
 
@@ -53,6 +58,7 @@ E void common_svsmode(User * u, char *modes, char *arg);
 /**** botserv.c ****/
 
 E BotInfo *botlists[256];
+E int nbots;
 E void get_botserv_stats(long *nrec, long *memuse);
 E void bs_init(void);
 E void botserv(User *u, char *buf);
@@ -66,15 +72,19 @@ E BotInfo *findbot(char *nick);
 E void bot_join(ChannelInfo *ci);
 E void bot_rejoin_all(BotInfo *bi);
 E char *normalizeBuffer(char *);
+E void unassign(User * u, ChannelInfo * ci);
+E void insert_bot(BotInfo * bi);
+
+E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, char *reason);
+E void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, char *reason);
+E void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode, char *nick);
 
 /**** channels.c ****/
 
 E Channel *chanlist[1024];
 E CBMode cbmodes[128];
-E CBModeInfo cbmodeinfos[];
 E CUMode cumodes[128];
 E CMMode cmmodes[128];
-E unsigned long umodes[128];
 E char csmodes[128];
 
 E void add_ban(Channel * chan, char *mask);
@@ -129,7 +139,7 @@ E void do_topic(const char *source, int ac, char **av);
 E void do_mass_mode(char *modes);
 
 E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
-E void restore_unsycned_topics(void);
+E void restore_unsynced_topics(void);
 
 #define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? s_ChanServ : (ci)->bi->nick)
 
@@ -187,6 +197,11 @@ E char *cs_get_limit(ChannelInfo * ci);
 E void cs_set_limit(ChannelInfo * ci, char *value);
 E char *cs_get_redirect(ChannelInfo * ci);
 E void cs_set_redirect(ChannelInfo * ci, char *value);
+
+E int levelinfo_maxwidth;
+E ChannelInfo *makechan(const char *chan);
+E int is_identified(User * user, ChannelInfo * ci);
+E char *get_mlock_modes(ChannelInfo * ci, int complete);
 
 /**** compat.c ****/
 
@@ -430,10 +445,34 @@ E int   CloneWarningDelay;
 E int   KillClones;
 E int   AddAkiller;
 
+/**
+ * Modules Stuff
+ **/
 E char **ModulesAutoload;
 E int ModulesNumber;
 E char **ModulesDelayedAutoload;
 E int ModulesDelayedNumber;
+
+E char **HostServCoreModules;
+E int HostServCoreNumber;
+
+E char **HelpServCoreModules;
+E int HelpServCoreNumber;
+
+E char **MemoServCoreModules;
+E int MemoServCoreNumber;
+
+E char **BotServCoreModules;
+E int BotServCoreNumber;
+
+E char **OperServCoreModules;
+E int OperServCoreNumber;
+
+E char **NickServCoreModules;
+E int NickServCoreNumber;
+
+E char **ChanServCoreModules;
+E int ChanServCoreNumber;
 
 
 E int   KillClonesAkillExpire;
@@ -518,6 +557,9 @@ E long unsigned int UserKey3;
 
 E int convert_ircservices_44(void);
 
+/**** encrypt.c ****/
+E int check_password(const char *plaintext, const char *password);
+
 /**** helpserv.c  ****/
 E void helpserv(User * u, char *buf);
 E void helpserv_init(void);
@@ -527,12 +569,114 @@ E void hostserv_init(void);
 E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
 E char *getvHost(char *nick);
+E int is_host_remover(User * u);
+E int is_host_setter(User *u);
+E HostCore *hostCoreListHead();
+E HostCore *findHostCore(HostCore * head, char *nick, boolean * found);
+E void set_lastmask(User * u);
 
 /**** init.c ****/
 
 E void introduce_user(const char *user);
 E int init(int ac, char **av);
 E int servernum;
+
+/**** ircd.c ****/
+E void pmodule_cmd_svsnoop(void (*func) (char *server, int set));
+E void pmodule_cmd_remove_akill(void (*func) (char *user, char *host));
+E void pmodule_cmd_topic(void (*func) (char *whosets, char *chan, char *whosetit, char *topic, time_t when));
+E void pmodule_cmd_vhost_off(void (*func) (User * u));
+E void pmodule_cmd_akill(void (*func) (char *user, char *host, char *who, time_t when, time_t expires, char *reason));
+E void pmodule_cmd_svskill(void (*func) (char *source, char *user, char *buf));
+E void pmodule_cmd_svsmode(void (*func) (User * u, int ac, char **av));
+E void pmodule_cmd_372(void (*func) (char *source, char *msg));
+E void pmodule_cmd_372_error(void (*func) (char *source));
+E void pmodule_cmd_375(void (*func) (char *source));
+E void pmodule_cmd_376(void (*func) (char *source));
+E void pmodule_cmd_nick(void (*func) (char *nick, char *name, char *modes));
+E void pmodule_cmd_guest_nick(void (*func) (char *nick, char *user, char *host, char *real, char *modes));
+E void pmodule_cmd_mode(void (*func) (char *source, char *dest, char *buf));
+E void pmodule_cmd_bot_nick(void (*func) (char *nick, char *user, char *host, char *real, char *modes));
+E void pmodule_cmd_kick(void (*func) (char *source, char *chan, char *user, char *buf));
+E void pmodule_cmd_notice_ops(void (*func) (char *source, char *dest, char *buf));
+E void pmodule_cmd_notice(void (*func) (char *source, char *dest, char *buf));
+E void pmodule_cmd_notice2(void (*func) (char *source, char *dest, char *msg));
+E void pmodule_cmd_privmsg(void (*func) (char *source, char *dest, char *buf));
+E void pmodule_cmd_privmsg2(void (*func) (char *source, char *dest, char *msg));
+E void pmodule_cmd_serv_notice(void (*func) (char *source, char *dest, char *msg));
+E void pmodule_cmd_serv_privmsg(void (*func) (char *source, char *dest, char *msg));
+E void pmodule_cmd_bot_chan_mode(void (*func) (char *nick, char *chan));
+E void pmodule_cmd_351(void (*func) (char *source));
+E void pmodule_cmd_quit(void (*func) (char *source, char *buf));
+E void pmodule_cmd_pong(void (*func) (char *servname, char *who));
+E void pmodule_cmd_join(void (*func) (char *user, char *channel, time_t chantime));
+E void pmodule_cmd_unsqline(void (*func) (char *user));
+E void pmodule_cmd_invite(void (*func) (char *source, char *chan, char *nick));
+E void pmodule_cmd_part(void (*func) (char *nick, char *chan, char *buf));
+E void pmodule_cmd_391(void (*func) (char *source, char *timestr));
+E void pmodule_cmd_250(void (*func) (char *buf));
+E void pmodule_cmd_307(void (*func) (char *buf));
+E void pmodule_cmd_311(void (*func) (char *buf));
+E void pmodule_cmd_312(void (*func) (char *buf));
+E void pmodule_cmd_317(void (*func) (char *buf));
+E void pmodule_cmd_219(void (*func) (char *source, char *letter));
+E void pmodule_cmd_401(void (*func) (char *source, char *who));
+E void pmodule_cmd_318(void (*func) (char *source, char *who));
+E void pmodule_cmd_242(void (*func) (char *buf));
+E void pmodule_cmd_243(void (*func) (char *buf));
+E void pmodule_cmd_211(void (*func) (char *buf));
+E void pmodule_cmd_global(void (*func) (char *source, char *buf));
+E void pmodule_cmd_global_legacy(void (*func) (char *source, char *fmt));
+E void pmodule_cmd_sqline(void (*func) (char *mask, char *reason));
+E void pmodule_cmd_squit(void (*func) (char *servname, char *message));
+E void pmodule_cmd_svso(void (*func) (char *source, char *nick, char *flag));
+E void pmodule_cmd_chg_nick(void (*func) (char *oldnick, char *newnick));
+E void pmodule_cmd_svsnick(void (*func) (char *source, char *guest, time_t when));
+E void pmodule_cmd_vhost_on(void (*func) (char *nick, char *vIdent, char *vhost));
+E void pmodule_cmd_connect(void (*func) (int servernum));
+E void pmodule_cmd_svshold(void (*func) (char *nick));
+E void pmodule_cmd_release_svshold(void (*func) (char *nick));
+E void pmodule_cmd_unsgline(void (*func) (char *mask));
+E void pmodule_cmd_unszline(void (*func) (char *mask));
+E void pmodule_cmd_szline(void (*func) (char *mask, char *reason, char *whom));
+E void pmodule_cmd_sgline(void (*func) (char *mask, char *reason));
+E void pmodule_cmd_unban(void (*func) (char *name, char *nick));
+E void pmodule_cmd_svsmode_chan(void (*func) (char *name, char *mode, char *nick));
+E void pmodule_cmd_svid_umode(void (*func) (char *nick, time_t ts));
+E void pmodule_cmd_nc_change(void (*func) (User * u));
+E void pmodule_cmd_svid_umode2(void (*func) (User * u, char *ts));
+E void pmodule_cmd_svid_umode3(void (*func) (User * u, char *ts));
+E void pmodule_cmd_ctcp(void (*func) (char *source, char *dest, char *buf));
+E void pmodule_cmd_eob(void (*func) ());
+E void pmodule_cmd_jupe(void (*func) (char *jserver, char *who, char *reason));
+E void pmodule_set_umode(void (*func) (User * user, int ac, char **av));
+E void pmodule_valid_nick(int (*func) (char *nick));
+E void pmodule_flood_mode_check(int (*func) (char *value));
+E void pmodule_ircd_var(IRCDVar * ircdvar);
+E void pmodule_ircd_cap(IRCDCAPAB * cap);
+E void pmodule_ircd_version(char *version);
+E void pmodule_ircd_cbmodeinfos(CBModeInfo * modeinfos);
+E void pmodule_ircd_cumodes(CUMode modes[128]);
+E void pmodule_ircd_flood_mode_char_set(char *mode);
+E void pmodule_ircd_flood_mode_char_remove(char *mode);
+E void pmodule_ircd_cbmodes(CBMode modes[128]);
+E void pmodule_ircd_cmmodes(CMMode modes[128]);
+E void pmodule_ircd_csmodes(char mode[128]);
+E void pmodule_ircd_useTSMode(int use);
+E void pmodule_invis_umode(int mode);
+E void pmodule_oper_umode(int mode);
+E void pmodule_invite_cmode(int mode);
+E void pmodule_secret_cmode(int mode);
+E void pmodule_private_cmode(int mode);
+E void pmodule_key_mode(int mode);
+E void pmodule_limit_mode(int mode);
+
+E int anope_get_secret_mode();
+E int anope_get_invite_mode();
+E int anope_get_limit_mode();
+E int anope_get_private_mode();
+E int anope_get_invis_mode();
+E int anope_get_oper_mode();
 
 /**** language.c ****/
 
@@ -580,7 +724,7 @@ E int MailValidate(const char *email);
 E const char version_number[];
 E const char version_number_dotted[];
 E const char version_build[];
-E const char version_protocol[];
+E char *version_protocol;
 E const char version_flags[];
 
 E char *services_dir;
@@ -611,6 +755,7 @@ E void save_databases(void);
 E void expire_all(void);
 E void do_backtrace(int show_segheader);
 E void sighandler(int signum);
+E void do_restart_services(void);
 
 /**** memory.c ****/
 
@@ -625,6 +770,8 @@ E char *sstrdup(const char *s);
 E void ms_init(void);
 E void memoserv(User * u, char *buf);
 E void check_memos(User * u);
+E MemoInfo *getmemoinfo(const char *name, int *ischan, int *isforbid);
+E int delmemo(MemoInfo * mi, int num);
 
 /**** messages.c ****/
 
@@ -704,6 +851,8 @@ E int do_randomnews(User * u);
 E NickAlias *nalists[1024];
 E NickCore *nclists[1024];
 E NickRequest *nrlists[1024];
+E NickRequest *findrequestnick(const char *nick);
+E int delnickrequest(NickRequest * nr);
 E unsigned int guestnum;
 E void insert_requestnick(NickRequest * nr);
 E void alpha_insert_alias(NickAlias * na);
@@ -711,6 +860,11 @@ E void insert_core(NickCore * nc);
 E void listnicks(int count_only, const char *nick);
 E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
+E void collide(NickAlias * na, int from_timeout);
+E void del_ns_timeout(NickAlias * na, int type);
+E void change_core_display(NickCore * nc, char *newdisplay);
+E void release(NickAlias * na, int from_timeout);
+E int do_setmodes(User * u);
 
 E void ns_init(void);
 E void nickserv(User * u, char *buf);
@@ -726,7 +880,7 @@ E int nick_identified(User * u);
 E int nick_recognized(User * u);
 E void expire_nicks(void);
 E void expire_requests(void);
-E int ns_do_register(User * u);
+I int ns_do_register(User * u);
 E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickCore  *findcore(const char *nick);
@@ -778,9 +932,15 @@ E void expire_szlines(void);
 E int check_szline(char *nick, char *ip);
 
 E void check_clones(User * user);
-E void delete_ignore(const char *nick);
 
 E Server *server_global(Server * s, char *msg);
+
+E int OSOpersOnly; 
+E time_t DefContimer;
+E void runDefCon(void);
+
+E struct clone clonelist[CLONE_DETECT_SIZE];
+E struct clone warnings[CLONE_DETECT_SIZE];
 
 /**** process.c ****/
 
@@ -862,6 +1022,19 @@ E Exception *find_host_exception(const char *host);
 E int exception_add(User * u, const char *mask, const int limit,
                          const char *reason, const char *who,
                          const time_t expires);
+
+/**** slist.c ****/
+E int slist_add(SList *slist, void *item);
+E void slist_clear(SList *slist, int free);
+E int slist_delete(SList *slist, int index);
+E int slist_delete_range(SList *slist, char *range, slist_delcheckcb_t cb, ...);
+E int slist_enum(SList *slist, char *range, slist_enumcb_t cb, ...);
+E int slist_full(SList *slist);
+E int slist_indexof(SList *slist, void *item);
+E void slist_init(SList *slist);
+E void slist_pack(SList *slist);
+E int slist_remove(SList *slist, void *item);
+E int slist_setcapacity(SList *slist, int16 capacity);
 
 /**** sockutil.c ****/
 
@@ -1051,74 +1224,74 @@ E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(char *sender, char *nick, char *parm);
 E void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...);   	  		  /* CTCP */
 
-E int anope_event_482(char *source, int ac, char **av);
-E int anope_event_436(char *source, int ac, char **av);
-E int anope_event_away(char *source, int ac, char **av);
-E int anope_event_ping(char *source, int ac, char **av);
-E int anope_event_motd(char *source, int ac, char **av);
-E int anope_event_join(char *source, int ac, char **av);
-E int anope_event_kick(char *source, int ac, char **av);
-E int anope_event_kill(char *source, int ac, char **av);
-E int anope_event_mode(char *source, int ac, char **av);
-E int anope_event_tmode(char *source, int ac, char **av);
-E int anope_event_quit(char *source, int ac, char **av);
-E int anope_event_squit(char *source, int ac, char **av);
-E int anope_event_topic(char *source, int ac, char **av);
-E int anope_event_whois(char *source, int ac, char **av);
-E int anope_event_part(char *source, int ac, char **av);
-E int anope_event_server(char *source, int ac, char **av);
-E int anope_event_sid(char *source, int ac, char **av);
-E int anope_event_nick(char *source, int ac, char **av);
-E int anope_event_bmask(char *source, int ac, char **av);
-E int anope_event_gnotice(char *source, int ac, char **av);
-E int anope_event_privmsg(char *source, int ac, char **av);
-E int anope_event_capab(char *source, int ac, char **av);
-E int anope_event_sjoin(char *source, int ac, char **av);
-E int anope_event_cs(char *source, int ac, char **av);
-E int anope_event_hs(char *source, int ac, char **av);
-E int anope_event_ms(char *source, int ac, char **av);
-E int anope_event_ns(char *source, int ac, char **av);
-E int anope_event_os(char *source, int ac, char **av);
-E int anope_event_vs(char *source, int ac, char **av);
-E int anope_event_svinfo(char *source, int ac, char **av);
-E int anope_event_chghost(char *source, int ac, char **av);
-E int anope_event_sethost(char *source, int ac, char **av);
-E int anope_event_chgident(char *source, int ac, char **av);
-E int anope_event_setident(char *source, int ac, char **av);
-E int anope_event_chgname(char *source, int ac, char **av);
-E int anope_event_setname(char *source, int ac, char **av);
-E int anope_event_svsinfo(char *source, int ac, char **av);
-E int anope_event_snick(char *source, int ac, char **av);
-E int anope_event_vhost(char *source, int ac, char **av);
-E int anope_event_tkl(char *source, int ac, char **av);
-E int anope_event_eos(char *source, int ac, char **av);
-E int anope_event_eob(char *source, int ac, char **av);
-E int anope_event_pass(char *source, int ac, char **av);
-E int anope_event_netinfo(char *source, int ac, char **av);
-E int anope_event_error(char *source, int ac, char **av);
-E int anope_event_eb(char *source, int ac, char **av);
-E int anope_event_netctrl(char *source, int ac, char **av);
-E int anope_event_notice(char *source, int ac, char **av);
-E int anope_event_snotice(char *source, int ac, char **av);
-E int anope_event_sqline(char *source, int ac, char **av);
-E int anope_event_error(char *source, int ac, char **av);
-E int anope_event_smo(char *source, int ac, char **av);
-E int anope_event_myid(char *source, int ac, char **av);
-E int anope_event_vctrl(char *source, int ac, char **av);
-E int anope_event_tctrl(char *source, int ac, char **av);
-E int anope_event_netinfo(char *source, int ac, char **av);
-E int anope_event_snetinfo(char *source, int ac, char **av);
-E int anope_event_umode2(char *source, int ac, char **av);
-E int anope_event_globops(char *source, int ac, char **av);
-E int anope_event_swhois(char *source, int ac, char **av);
-E int anope_event_burst(char *source, int ac, char **av);
-E int anope_event_luserslock(char *source, int ac, char **av);
-E int anope_event_admin(char *source, int ac, char **av);
-E int anope_event_credits(char *source, int ac, char **av);
-E int anope_event_rehash(char *source, int ac, char **av);
-E int anope_event_sdesc(char *source, int ac, char **av);
-E int anope_event_netglobal(char *source, int ac, char **av);
-E int anope_event_invite(char *source, int ac, char **av);
+I int anope_event_482(char *source, int ac, char **av);
+I int anope_event_436(char *source, int ac, char **av);
+I int anope_event_away(char *source, int ac, char **av);
+I int anope_event_ping(char *source, int ac, char **av);
+I int anope_event_motd(char *source, int ac, char **av);
+I int anope_event_join(char *source, int ac, char **av);
+I int anope_event_kick(char *source, int ac, char **av);
+I int anope_event_kill(char *source, int ac, char **av);
+I int anope_event_mode(char *source, int ac, char **av);
+I int anope_event_tmode(char *source, int ac, char **av);
+I int anope_event_quit(char *source, int ac, char **av);
+I int anope_event_squit(char *source, int ac, char **av);
+I int anope_event_topic(char *source, int ac, char **av);
+I int anope_event_whois(char *source, int ac, char **av);
+I int anope_event_part(char *source, int ac, char **av);
+I int anope_event_server(char *source, int ac, char **av);
+I int anope_event_sid(char *source, int ac, char **av);
+I int anope_event_nick(char *source, int ac, char **av);
+I int anope_event_bmask(char *source, int ac, char **av);
+I int anope_event_gnotice(char *source, int ac, char **av);
+I int anope_event_privmsg(char *source, int ac, char **av);
+I int anope_event_capab(char *source, int ac, char **av);
+I int anope_event_sjoin(char *source, int ac, char **av);
+I int anope_event_cs(char *source, int ac, char **av);
+I int anope_event_hs(char *source, int ac, char **av);
+I int anope_event_ms(char *source, int ac, char **av);
+I int anope_event_ns(char *source, int ac, char **av);
+I int anope_event_os(char *source, int ac, char **av);
+I int anope_event_vs(char *source, int ac, char **av);
+I int anope_event_svinfo(char *source, int ac, char **av);
+I int anope_event_chghost(char *source, int ac, char **av);
+I int anope_event_sethost(char *source, int ac, char **av);
+I int anope_event_chgident(char *source, int ac, char **av);
+I int anope_event_setident(char *source, int ac, char **av);
+I int anope_event_chgname(char *source, int ac, char **av);
+I int anope_event_setname(char *source, int ac, char **av);
+I int anope_event_svsinfo(char *source, int ac, char **av);
+I int anope_event_snick(char *source, int ac, char **av);
+I int anope_event_vhost(char *source, int ac, char **av);
+I int anope_event_tkl(char *source, int ac, char **av);
+I int anope_event_eos(char *source, int ac, char **av);
+I int anope_event_eob(char *source, int ac, char **av);
+I int anope_event_pass(char *source, int ac, char **av);
+I int anope_event_netinfo(char *source, int ac, char **av);
+I int anope_event_error(char *source, int ac, char **av);
+I int anope_event_eb(char *source, int ac, char **av);
+I int anope_event_netctrl(char *source, int ac, char **av);
+I int anope_event_notice(char *source, int ac, char **av);
+I int anope_event_snotice(char *source, int ac, char **av);
+I int anope_event_sqline(char *source, int ac, char **av);
+I int anope_event_error(char *source, int ac, char **av);
+I int anope_event_smo(char *source, int ac, char **av);
+I int anope_event_myid(char *source, int ac, char **av);
+I int anope_event_vctrl(char *source, int ac, char **av);
+I int anope_event_tctrl(char *source, int ac, char **av);
+I int anope_event_netinfo(char *source, int ac, char **av);
+I int anope_event_snetinfo(char *source, int ac, char **av);
+I int anope_event_umode2(char *source, int ac, char **av);
+I int anope_event_globops(char *source, int ac, char **av);
+I int anope_event_swhois(char *source, int ac, char **av);
+I int anope_event_burst(char *source, int ac, char **av);
+I int anope_event_luserslock(char *source, int ac, char **av);
+I int anope_event_admin(char *source, int ac, char **av);
+I int anope_event_credits(char *source, int ac, char **av);
+I int anope_event_rehash(char *source, int ac, char **av);
+I int anope_event_sdesc(char *source, int ac, char **av);
+I int anope_event_netglobal(char *source, int ac, char **av);
+I int anope_event_invite(char *source, int ac, char **av);
 E int anope_event_null(char *source, int ac, char **av);
 
 E void anope_set_umode(User * user, int ac, char **av);
@@ -1150,9 +1323,9 @@ E int decode_ip(char *buf);
 
 E char *host_resolve(char *host);
 
-extern void event_message_process(char *eventbuf);
-extern void eventprintf(char *fmt, ...);
-extern void event_process_hook(char *name, char *eventbuf);
-extern void send_event(char *name, const char *fmt, ...);
+E void event_message_process(char *eventbuf);
+E void eventprintf(char *fmt, ...);
+E void event_process_hook(char *name, int argc, char **argv);
+E void send_event(char *name, int argc, ...);
 
 #endif	/* EXTERN_H */

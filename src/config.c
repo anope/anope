@@ -18,6 +18,8 @@
 
 /* Configurable variables: */
 
+char *IRCDModule;
+
 char *RemoteServer;
 int RemotePort;
 char *RemotePassword;
@@ -267,12 +269,46 @@ char *ExceptionDBName;
 char *SessionLimitExceeded;
 char *SessionLimitDetailsLoc;
 
+int OSOpersOnly;
+
 char *Modules;
 char *ModulesDelayed;
 char **ModulesAutoload;
 int ModulesNumber;
 int ModulesDelayedNumber;
 char **ModulesDelayedAutoload;
+
+/**
+ * Core Module Stuff 
+ **/
+char *HostCoreModules;
+char **HostServCoreModules;
+int HostServCoreNumber;
+
+char *MemoCoreModules;
+char **MemoServCoreModules;
+int MemoServCoreNumber;
+
+char *HelpCoreModules;
+char **HelpServCoreModules;
+int HelpServCoreNumber;
+
+char *BotCoreModules;
+char **BotServCoreModules;
+int BotServCoreNumber;
+
+char *OperCoreModules;
+char **OperServCoreModules;
+int OperServCoreNumber;
+
+char *NickCoreModules;
+char **NickServCoreModules;
+int NickServCoreNumber;
+
+char *ChanCoreModules;
+char **ChanServCoreModules;
+int ChanServCoreNumber;
+
 
 char *MysqlHost;
 char *MysqlUser;
@@ -316,6 +352,11 @@ int NumUlines;
 
 int UseTS6;
 
+
+
+
+char **buildStringList(char *src, int *number);
+
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -324,36 +365,6 @@ int UseTS6;
 
 /*************************************************************************/
 
-#define MAXPARAMS	8
-
-/* Configuration directives */
-
-typedef struct {
-    char *name;
-    struct {
-        int type;               /* PARAM_* below */
-        int flags;              /* Same */
-        void *ptr;              /* Pointer to where to store the value */
-    } params[MAXPARAMS];
-} Directive;
-
-#define PARAM_NONE	0
-#define PARAM_INT	1
-#define PARAM_POSINT	2       /* Positive integer only */
-#define PARAM_PORT	3       /* 1..65535 only */
-#define PARAM_STRING	4
-#define PARAM_TIME	5
-#define PARAM_STRING_ARRAY 6    /* Array of string */
-#define PARAM_SET	-1      /* Not a real parameter; just set the
-                                 *    given integer variable to 1 */
-#define PARAM_DEPRECATED -2     /* Set for deprecated directives; `ptr'
-                                 *    is a function pointer to call */
-
-/* Flags: */
-#define PARAM_OPTIONAL	0x01
-#define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
-#define PARAM_RELOAD    0x04    /* Directive is reloadable */
-
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
     {"AutokillDB", {{PARAM_STRING, PARAM_RELOAD, &AutokillDBName}}},
@@ -361,6 +372,7 @@ Directive directives[] = {
     {"ChankillExpiry", {{PARAM_TIME, PARAM_RELOAD, &ChankillExpiry}}},
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
+    {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"BotServDB", {{PARAM_STRING, PARAM_RELOAD, &BotDBName}}},
     {"BotServName", {{PARAM_STRING, 0, &s_BotServ},
                      {PARAM_STRING, 0, &desc_BotServ}}},
@@ -381,6 +393,7 @@ Directive directives[] = {
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
+    {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"ChanServDB", {{PARAM_STRING, PARAM_RELOAD, &ChanDBName}}},
     {"ChanServName", {{PARAM_STRING, 0, &s_ChanServ},
                       {PARAM_STRING, 0, &desc_ChanServ}}},
@@ -448,10 +461,13 @@ Directive directives[] = {
                     {PARAM_STRING, 0, &desc_GlobalNoticer}}},
     {"GlobalAlias", {{PARAM_STRING, 0, &s_GlobalNoticerAlias},
                      {PARAM_STRING, 0, &desc_GlobalNoticerAlias}}},
+    {"HelpCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HelpCoreModules}}},
     {"HelpChannel", {{PARAM_STRING, PARAM_RELOAD, &HelpChannel}}},
+    {"HostCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HostCoreModules}}},
     {"HostServAlias", {{PARAM_STRING, 0, &s_HostServAlias},
                        {PARAM_STRING, 0, &desc_HostServAlias}}},
     {"HostSetters", {{PARAM_STRING, PARAM_RELOAD, &HostSetter}}},
+    {"IRCDModule", {{PARAM_STRING, 0, &IRCDModule}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"HelpServName", {{PARAM_STRING, 0, &s_HelpServ},
@@ -475,6 +491,7 @@ Directive directives[] = {
     {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
     {"MaxSessionKill", {{PARAM_INT, PARAM_RELOAD, &MaxSessionKill}}},
     {"MaxSessionLimit", {{PARAM_POSINT, PARAM_RELOAD, &MaxSessionLimit}}},
+    {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
     {"MemoServName", {{PARAM_STRING, 0, &s_MemoServ},
                       {PARAM_STRING, 0, &desc_MemoServ}}},
     {"MemoServAlias", {{PARAM_STRING, 0, &s_MemoServAlias},
@@ -504,6 +521,7 @@ Directive directives[] = {
     {"Numeric", {{PARAM_STRING, PARAM_RELOAD, &Numeric}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
+    {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NickServName", {{PARAM_STRING, 0, &s_NickServ},
                       {PARAM_STRING, 0, &desc_NickServ}}},
@@ -543,6 +561,7 @@ Directive directives[] = {
     {"NSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &NSRestrictGetPass}}},
     {"NSNickTracking", {{PARAM_SET, PARAM_RELOAD, &NSNickTracking}}},
     {"NSAddAccessOnReg", {{PARAM_SET, PARAM_RELOAD, &NSAddAccessOnReg}}},
+    {"OperCoreModules", {{PARAM_STRING, PARAM_RELOAD, &OperCoreModules}}},
     {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
     {"OperServName", {{PARAM_STRING, 0, &s_OperServ},
                       {PARAM_STRING, 0, &desc_OperServ}}},
@@ -569,6 +588,7 @@ Directive directives[] = {
     {"ServiceUser", {{PARAM_STRING, 0, &temp_userhost}}},
     {"SessionLimitDetailsLoc",
      {{PARAM_STRING, PARAM_RELOAD, &SessionLimitDetailsLoc}}},
+    {"OSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &OSOpersOnly}}},
     {"SessionLimitExceeded",
      {{PARAM_STRING, PARAM_RELOAD, &SessionLimitExceeded}}},
     {"SessionAutoKillExpiry",
@@ -662,6 +682,125 @@ void error(int linenum, char *message, ...)
  * effect.
  */
 
+int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
+                    int linenum, int reload, char *s)
+{
+    int retval = 1;
+    int i;
+    int val;
+    int optind;
+
+    if (stricmp(dir, d->name) != 0)
+        return 1;
+    optind = 0;
+    for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
+        if (reload && !(d->params[i].flags & PARAM_RELOAD))
+            continue;
+
+        if (d->params[i].type == PARAM_SET) {
+            *(int *) d->params[i].ptr = 1;
+            continue;
+        }
+#ifdef STREAMLINED
+        if (d->params[i].flags & PARAM_FULLONLY) {
+            error(linenum,
+                  "Directive `%s' not available in STREAMLINED mode",
+                  d->name);
+            break;
+        }
+#endif
+
+        if (d->params[i].type == PARAM_DEPRECATED) {
+            void (*func) (void);
+            error(linenum, "Deprecated directive `%s' used", d->name);
+            func = (void (*)(void)) (d->params[i].ptr);
+            func();             /* For clarity */
+            continue;
+        }
+        if (optind >= ac) {
+            if (!(d->params[i].flags & PARAM_OPTIONAL)) {
+                error(linenum, "Not enough parameters for `%s'", d->name);
+                retval = 0;
+            }
+            break;
+        }
+        switch (d->params[i].type) {
+        case PARAM_INT:
+            val = strtol(av[optind++], &s, 0);
+            if (*s) {
+                error(linenum,
+                      "%s: Expected an integer for parameter %d",
+                      d->name, optind);
+                retval = 0;
+                break;
+            }
+            *(int *) d->params[i].ptr = val;
+            break;
+        case PARAM_POSINT:
+            val = strtol(av[optind++], &s, 0);
+            if (*s || val <= 0) {
+                error(linenum,
+                      "%s: Expected a positive integer for parameter %d",
+                      d->name, optind);
+                retval = 0;
+                break;
+            }
+            if (errno == ERANGE && val == LONG_MAX) {
+                /* well the true top off is 2,147,483,647 but lets not give them the real top */
+                error(linenum,
+                      "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
+                      d->name, optind);
+            }
+            *(int *) d->params[i].ptr = val;
+            break;
+        case PARAM_PORT:
+            val = strtol(av[optind++], &s, 0);
+            if (*s) {
+                error(linenum,
+                      "%s: Expected a port number for parameter %d",
+                      d->name, optind);
+                retval = 0;
+                break;
+            }
+            if (val < 1 || val > 65535) {
+                error(linenum,
+                      "Port numbers must be in the range 1..65535");
+                retval = 0;
+                break;
+            }
+            *(int *) d->params[i].ptr = val;
+            break;
+        case PARAM_STRING:
+/*	      if (reload && *(char **)d->params[i].ptr)
+	      	free(*(char **)d->params[i].ptr); */
+            *(char **) d->params[i].ptr = sstrdup(av[optind++]);
+            if (!d->params[i].ptr) {
+                error(linenum, "%s: Out of memory", d->name);
+                return 0;
+            }
+            break;
+        case PARAM_TIME:
+            val = dotime(av[optind++]);
+            if (val < 0) {
+                error(linenum,
+                      "%s: Expected a time value for parameter %d",
+                      d->name, optind);
+                retval = 0;
+                break;
+            }
+            *(int *) d->params[i].ptr = val;
+            break;
+        default:
+            error(linenum, "%s: Unknown type %d for param %d",
+                  d->name, d->params[i].type, i + 1);
+            retval = 0;         /* don't bother continuing--something's bizarre */
+            break;
+        }
+    }
+    return retval;;
+}
+
+
 int parse(char *buf, int linenum, int reload)
 {
     char *s, *t, *dir;
@@ -711,123 +850,20 @@ int parse(char *buf, int linenum, int reload)
 
     for (n = 0; n < lenof(directives); n++) {
         Directive *d = &directives[n];
-        if (stricmp(dir, d->name) != 0)
-            continue;
-        optind = 0;
-        for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
-            if (reload && !(d->params[i].flags & PARAM_RELOAD))
-                continue;
-
-            if (d->params[i].type == PARAM_SET) {
-                *(int *) d->params[i].ptr = 1;
-                continue;
-            }
-#ifdef STREAMLINED
-            if (d->params[i].flags & PARAM_FULLONLY) {
-                error(linenum,
-                      "Directive `%s' not available in STREAMLINED mode",
-                      d->name);
-                break;
-            }
-#endif
-
-            if (d->params[i].type == PARAM_DEPRECATED) {
-                void (*func) (void);
-                error(linenum, "Deprecated directive `%s' used", d->name);
-                func = (void (*)(void)) (d->params[i].ptr);
-                func();         /* For clarity */
-                continue;
-            }
-            if (optind >= ac) {
-                if (!(d->params[i].flags & PARAM_OPTIONAL)) {
-                    error(linenum, "Not enough parameters for `%s'",
-                          d->name);
-                    retval = 0;
-                }
-                break;
-            }
-            switch (d->params[i].type) {
-            case PARAM_INT:
-                val = strtol(av[optind++], &s, 0);
-                if (*s) {
-                    error(linenum,
-                          "%s: Expected an integer for parameter %d",
-                          d->name, optind);
-                    retval = 0;
-                    break;
-                }
-                *(int *) d->params[i].ptr = val;
-                break;
-            case PARAM_POSINT:
-                val = strtol(av[optind++], &s, 0);
-                if (*s || val <= 0) {
-                    error(linenum,
-                          "%s: Expected a positive integer for parameter %d",
-                          d->name, optind);
-                    retval = 0;
-                    break;
-                }
-                if (errno == ERANGE && val == LONG_MAX) {
-                    /* well the true top off is 2,147,483,647 but lets not give them the real top */
-                    error(linenum,
-                          "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
-                          d->name, optind);
-                }
-                *(int *) d->params[i].ptr = val;
-                break;
-            case PARAM_PORT:
-                val = strtol(av[optind++], &s, 0);
-                if (*s) {
-                    error(linenum,
-                          "%s: Expected a port number for parameter %d",
-                          d->name, optind);
-                    retval = 0;
-                    break;
-                }
-                if (val < 1 || val > 65535) {
-                    error(linenum,
-                          "Port numbers must be in the range 1..65535");
-                    retval = 0;
-                    break;
-                }
-                *(int *) d->params[i].ptr = val;
-                break;
-            case PARAM_STRING:
-/*	      if (reload && *(char **)d->params[i].ptr)
-	      	free(*(char **)d->params[i].ptr); */
-                *(char **) d->params[i].ptr = sstrdup(av[optind++]);
-                if (!d->params[i].ptr) {
-                    error(linenum, "%s: Out of memory", d->name);
-                    return 0;
-                }
-                break;
-            case PARAM_TIME:
-                val = dotime(av[optind++]);
-                if (val < 0) {
-                    error(linenum,
-                          "%s: Expected a time value for parameter %d",
-                          d->name, optind);
-                    retval = 0;
-                    break;
-                }
-                *(int *) d->params[i].ptr = val;
-                break;
-            default:
-                error(linenum, "%s: Unknown type %d for param %d",
-                      d->name, d->params[i].type, i + 1);
-                return 0;       /* don't bother continuing--something's bizarre */
-            }
+        retval = parse_directive(d, dir, ac, av, linenum, reload, s);
+        if (!retval) {
+            break;
         }
-        break;                  /* because we found a match */
     }
 
     if (n == lenof(directives)) {
-        error(linenum, "Unknown directive `%s'", dir);
+/*        error(linenum, "Unknown directive `%s'", dir);
         return 1;               /* don't cause abort */
     }
 
     return retval;
 }
+
 
 /*************************************************************************/
 
@@ -933,6 +969,7 @@ int read_config(int reload)
         }
     }
 
+    CHECK(IRCDModule);
 
     CHECK(NetworkName);
     if (!reload) {
@@ -1229,48 +1266,31 @@ int read_config(int reload)
     }
 
     /* Host Setters building... :P */
-    HostNumber = 0;             /* always zero it, even if we have no setters */
-    if (HostSetter) {
-        s = strtok(HostSetter, " ");
-        do {
-            if (s) {
-                HostNumber++;
-                HostSetters =
-                    realloc(HostSetters, sizeof(char *) * HostNumber);
-                HostSetters[HostNumber - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
+    HostSetters = buildStringList(HostSetter, &HostNumber);
 
     /* Modules Autoload building... :P */
-    ModulesNumber = 0;          /* always zero it, even if we have no setters */
-    if (Modules) {
-        s = strtok(Modules, " ");
-        do {
-            if (s) {
-                ModulesNumber++;
-                ModulesAutoload =
-                    realloc(ModulesAutoload,
-                            sizeof(char *) * ModulesNumber);
-                ModulesAutoload[ModulesNumber - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
+    ModulesAutoload = buildStringList(Modules, &ModulesNumber);
+    ModulesDelayedAutoload =
+        buildStringList(ModulesDelayed, &ModulesDelayedNumber);
+    HostServCoreModules =
+        buildStringList(HostCoreModules, &HostServCoreNumber);
+    MemoServCoreModules =
+        buildStringList(MemoCoreModules, &MemoServCoreNumber);
+    HelpServCoreModules =
+        buildStringList(HelpCoreModules, &HelpServCoreNumber);
 
-    ModulesDelayedNumber = 0;   /* always zero it, even if we have no setters */
-    if (ModulesDelayed) {
-        s = strtok(ModulesDelayed, " ");
-        do {
-            if (s) {
-                ModulesDelayedNumber++;
-                ModulesDelayedAutoload =
-                    realloc(ModulesDelayedAutoload,
-                            sizeof(char *) * ModulesDelayedNumber);
-                ModulesDelayedAutoload[ModulesDelayedNumber - 1] =
-                    sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
+    BotServCoreModules =
+        buildStringList(BotCoreModules, &BotServCoreNumber);
+
+    OperServCoreModules =
+        buildStringList(OperCoreModules, &OperServCoreNumber);
+
+    ChanServCoreModules =
+        buildStringList(ChanCoreModules, &ChanServCoreNumber);
+
+    NickServCoreModules =
+        buildStringList(NickCoreModules, &NickServCoreNumber);
+
 
     if (LimitSessions) {
         CHECK(DefSessionLimit);
@@ -1379,7 +1399,10 @@ int read_config(int reload)
             CHECK(DefconMessage);
     }
 
-    if (UseTokens) {
+    /**
+     * Temp. disabled, as ircd-> isnt loaded yet, so we cant check here!
+     **/
+/*    if (UseTokens) {
         if (!ircd->token) {
             alog("Anope does not support TOKENS for this ircd setting unsetting UseToken");
             UseTokens = 0;
@@ -1392,7 +1415,7 @@ int read_config(int reload)
                   "UseTS6 requires the setting of Numeric to be enabled.");
             retval = 0;
         }
-    }
+    }*/
 
     /**
      * If they try to enable any email registration option,
@@ -1417,6 +1440,27 @@ int read_config(int reload)
     }
 
     return retval;
+}
+
+
+char **buildStringList(char *src, int *number)
+{
+    char *s;
+    int i = 0;
+    char **list = NULL;
+
+    if (src) {
+        s = strtok(src, " ");
+        do {
+            if (s) {
+                i++;
+                list = realloc(list, sizeof(char *) * i);
+                list[i - 1] = sstrdup(s);
+            }
+        } while ((s = strtok(NULL, " ")));
+    }
+    *number = i;                /* always zero it, even if we have no setters */
+    return list;
 }
 
 /*************************************************************************/

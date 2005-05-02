@@ -46,18 +46,5 @@ typedef int (*slist_enumcb_t) (SList *slist, int number, void *item, va_list arg
 /* Callback to know whether we can delete the entry. */
 typedef int (*slist_delcheckcb_t) (SList *slist, void *item, va_list args);
 
-/* Functions for global use */
-extern int 	slist_add(SList *slist, void *item);
-extern void slist_clear(SList *slist, int free);
-extern int 	slist_delete(SList *slist, int index);
-extern int 	slist_delete_range(SList *slist, char *range, slist_delcheckcb_t cb, ...);
-extern int 	slist_enum(SList *slist, char *range, slist_enumcb_t cb, ...);
-extern int  slist_full(SList *slist);
-extern int 	slist_indexof(SList *slist, void *item);
-extern void slist_init(SList *slist);
-extern void slist_pack(SList *slist);
-extern int 	slist_remove(SList *slist, void *item);
-extern int 	slist_setcapacity(SList *slist, int16 capacity);
-
 #endif /* SLIST_H */
 

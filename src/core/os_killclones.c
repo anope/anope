@@ -29,7 +29,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("KILLCLONES", do_killclones, is_services_oper,

@@ -28,7 +28,8 @@ int AnopeInit(int argc, char **argv)
     EvtHook *hook;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
 
     /* No need to load of we don't support owner */

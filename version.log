@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="757"
+VERSION_BUILD="758"
 
 # $Log$
+#
+# BUILD : 1.7.8 (758)
+# BUGS  : 332
+# NOTES : FIXED: anope_event_away() doing dangerous things with ac/av, viagra had issues in notice_ops, anope_cmd_mode() used wrongly for dreamforge and ultimate2
 #
 # BUILD : 1.7.8 (757)
 # BUGS  : 355 361

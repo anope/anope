@@ -211,7 +211,7 @@ void ultimate3_set_umode(User * user, int ac, char **av)
                 }
                 if (is_services_root(user)) {
                     common_svsmode(user, "+Z", NULL);
-                    user->mode |= UMODE_R;
+                    user->mode |= UMODE_Z;
                 }
             } else {
                 opcnt--;

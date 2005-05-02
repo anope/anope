@@ -24,6 +24,8 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
 02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
 02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+05/02 F Usermode +R instead of +Z used for services roots with Ultimate3. [#361]
+05/02 F Getting op if you had access to protect and not op on a channel.  [#355]
 05/01 F Typo in include/extern.h with restore_unsynced_topics.            [#354]
 05/01 F Modes with no arguments where required no longer set with OS mode.[#316]
 05/01 F Update win32 documentation and files so it works again.           [ #00]

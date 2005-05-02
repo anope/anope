@@ -1301,11 +1301,11 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             &&
             (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
              || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))))
-            add_modes |= (CUS_OWNER | CUS_OP);
+            add_modes |= CUS_OWNER;
         else if ((ircd->protect || ircd->admin)
                  && check_access(user, ci, CA_AUTOPROTECT))
-            add_modes |= (CUS_PROTECT | CUS_OP);
-        else if (check_access(user, ci, CA_AUTOOP))
+            add_modes |= CUS_PROTECT;
+        if (check_access(user, ci, CA_AUTOOP))
             add_modes |= CUS_OP;
         else if (ircd->halfop && check_access(user, ci, CA_AUTOHALFOP))
             add_modes |= CUS_HALFOP;

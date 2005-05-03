@@ -1142,10 +1142,12 @@ CHAN_AOP_LIST_EMPTY
 CHAN_AOP_LIST_HEADER
 	%s AOP listája:
 	  Sorszám  Nicknév
-CHAN_AOP_CLEAR
-	A csatorna AOP listája törölve.
 
 # HOP üzenetek
+CHAN_AOP_CLEAR
+	Channel %s AOP list has been cleared.
+
+# HOP messages
 CHAN_HOP_SYNTAX
 	HOP #szoba { ADD | DEL | LIST | CLEAR } [ nick | sorszám ]
 CHAN_HOP_DISABLED
@@ -1173,10 +1175,12 @@ CHAN_HOP_LIST_EMPTY
 CHAN_HOP_LIST_HEADER
 	%s HOP listája:
 	  Sorszám  Nicknév
-CHAN_HOP_CLEAR
-	A csatorna HOP listája törölve.
 
 # SOP üzenetek
+CHAN_HOP_CLEAR
+	Channel %s HOP list has been cleared.
+
+# SOP messages
 CHAN_SOP_SYNTAX
 	SOP #szoba { ADD | DEL | LIST | CLEAR }[ nick | sorszám]
 CHAN_SOP_DISABLED
@@ -1204,8 +1208,10 @@ CHAN_SOP_LIST_EMPTY
 CHAN_SOP_LIST_HEADER
 	%s SOP listája:
 	  Sorszám  Nicknév
+
+# VOP messages
 CHAN_SOP_CLEAR
-	A csatorna SOP listája törölve.
+	Channel %s SOP list has been cleared.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1235,10 +1241,12 @@ CHAN_VOP_LIST_EMPTY
 CHAN_VOP_LIST_HEADER
 	%s VOP listája:
 	  Sorszám  Nicknév
-CHAN_VOP_CLEAR
-	A csatorna VOP listája törölve.
 
 # ACCESS üzenetek
+CHAN_VOP_CLEAR
+	Channel %s VOP list has been cleared.
+
+# ACCESS messages
 CHAN_ACCESS_SYNTAX
 	ACCESS#szoba{ ADD | DEL | LIST | CLEAR } [ nick [ szint ] | sorszám ]
 CHAN_ACCESS_XOP
@@ -1287,10 +1295,12 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
-CHAN_ACCESS_CLEAR
-	A csatorna hozzáférési listája törölve.
 	
 # AKICK válaszok
+CHAN_ACCESS_CLEAR
+	Channel %s access list has been cleared.
+
+# AKICK responses
 CHAN_AKICK_SYNTAX
 	AKICK #szoba {ADD | STICK | UNSTICK | DEL | LIST | VIEW | ENFORCE | CLEAR}[ nick-maszk ] [ indok ]
 CHAN_AKICK_DISABLED
@@ -1332,10 +1342,12 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	Az AKICK ENFORCE a(z) %s csatornán teljesítve;
 	%d user eltávolítva.
-CHAN_AKICK_CLEAR
-	A csatorna akick listája törölve.
 
 # LEVELS válaszok
+CHAN_AKICK_CLEAR
+	Channel %s akick list has been cleared.
+
+# LEVELS responses
 CHAN_LEVELS_SYNTAX
 	LEVELS #szoba{SET | DIS[ABLE] | LIST | RESET }[ opció [szint]]
 CHAN_LEVELS_XOP

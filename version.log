@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="762"
+VERSION_BUILD="763"
 
 # $Log$
+#
+# BUILD : 1.7.8 (763)
+# BUGS  : none
+# NOTES : Final file normalization, Languages ready for dev release.
 #
 # BUILD : 1.7.8 (762)
 # BUGS  : none

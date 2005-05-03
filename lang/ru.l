@@ -1145,8 +1145,10 @@ CHAN_AOP_LIST_EMPTY
 CHAN_AOP_LIST_HEADER
 	Список AOP'ов канала %s:
 	 Номер  Ник
+
+# HOP messages
 CHAN_AOP_CLEAR
-	Список AOP'ов канала был очищен.
+	Channel %s AOP list has been cleared.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1176,8 +1178,10 @@ CHAN_HOP_LIST_EMPTY
 CHAN_HOP_LIST_HEADER
 	Список HOP'ов канала %s:
 	  Номер  Ник
+
+# SOP messages
 CHAN_HOP_CLEAR
-	Список HOP'ов канала был очищен.
+	Channel %s HOP list has been cleared.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1207,8 +1211,10 @@ CHAN_SOP_LIST_EMPTY
 CHAN_SOP_LIST_HEADER
 	Список SOP'ов канала %s:
 	  Номер  Ник
+
+# VOP messages
 CHAN_SOP_CLEAR
-	Список SOP'ов канала был очищен.
+	Channel %s SOP list has been cleared.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1238,8 +1244,10 @@ CHAN_VOP_LIST_EMPTY
 CHAN_VOP_LIST_HEADER
 	Список VOP'ов канала %s:
 	  Номер  Ник
+
+# ACCESS messages
 CHAN_VOP_CLEAR
-	Список VOP'ов канала был очищен.
+	Channel %s VOP list has been cleared.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1287,8 +1295,10 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
+
+# AKICK responses
 CHAN_ACCESS_CLEAR
-	Список доступа канала очищен.
+	Channel %s access list has been cleared.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1331,8 +1341,10 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 	    %s
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE на канале %s завершен; %d пользователей выкинуто.
+
+# LEVELS responses
 CHAN_AKICK_CLEAR
-	Список автокиков на канал очищен.
+	Channel %s akick list has been cleared.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

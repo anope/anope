@@ -1149,8 +1149,10 @@ CHAN_AOP_LIST_EMPTY
 CHAN_AOP_LIST_HEADER
 	Η AOP λίστα του %s είναι :
 	  Νούμερο  Ψευδώνυμο
+
+# HOP messages
 CHAN_AOP_CLEAR
-	Η AOP λίστα του καναλιού έχει καθαριστεί πλήρως.
+	Channel %s AOP list has been cleared.
 
 # HOP messages
 CHAN_HOP_SYNTAX
@@ -1180,8 +1182,10 @@ CHAN_HOP_LIST_EMPTY
 CHAN_HOP_LIST_HEADER
 	Η HOP λίστα του %s είναι:
 	  Νούμερο  Ψευδώνυμο
+
+# SOP messages
 CHAN_HOP_CLEAR
-	Η HOP λίστα του καναλιού έχει καθαριστεί πλήρως.
+	Channel %s HOP list has been cleared.
 
 # SOP messages
 CHAN_SOP_SYNTAX
@@ -1211,8 +1215,10 @@ CHAN_SOP_LIST_EMPTY
 CHAN_SOP_LIST_HEADER
 	Η SOP λίστα του %s είναι:
 	  Νούμερο  Ψευδώνυμο
+
+# VOP messages
 CHAN_SOP_CLEAR
-	Η SOP λίστα του καναλιού έχει καθαριστεί πλήρως.
+	Channel %s SOP list has been cleared.
 
 # VOP messages
 CHAN_VOP_SYNTAX
@@ -1242,8 +1248,10 @@ CHAN_VOP_LIST_EMPTY
 CHAN_VOP_LIST_HEADER
 	Η VOP λίστα του %s είναι:
 	  Νούμερο  Ψευδώνυμο
+
+# ACCESS messages
 CHAN_VOP_CLEAR
-	Η VOP λίστα του καναλιού έχει καθαριστεί πλήρως.
+	Channel %s VOP list has been cleared.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
@@ -1291,8 +1299,10 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
+
+# AKICK responses
 CHAN_ACCESS_CLEAR
-	Η access λίστα του καναλιού καθαρίστηκε πλήρως.
+	Channel %s access list has been cleared.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
@@ -1335,8 +1345,10 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 	    %s
 CHAN_AKICK_ENFORCE_DONE
 	Η AKICK ENFORCE για τον %s ολοκληρώθηκε; %d χρήστες θα επιρρεαστούν.
+
+# LEVELS responses
 CHAN_AKICK_CLEAR
-	Η akick λίστα του καναλιού έχει καθαριστεί πλήρως.
+	Channel %s akick list has been cleared.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX
@@ -1466,7 +1478,7 @@ CHAN_TOPIC_SYNTAX
 
 # CLEAR responses
 CHAN_CLEAR_SYNTAX
-	CLEAR κανάλι τι ακριβώς
+	CLEAR channel what
 CHAN_CLEARED_BANS
 	Όλα τα bans από το κανάλι %s έχουν απομακρυνθεί.
 CHAN_CLEARED_EXCEPTS

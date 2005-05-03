@@ -1440,7 +1440,7 @@ CHAN_AKICK_ENFORCE_DONE
 	Egzekucja listy AKICK %s zakoñczona. 
 	Wyegzekwowano %d u¿ytkowników.
 CHAN_AKICK_CLEAR
-	Lista AKICK zosta³a wyczyszczona.
+	Lista AKICK kana³ %s zosta³a wyczyszczona.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX

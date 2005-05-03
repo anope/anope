@@ -52,7 +52,7 @@ void send_event(char *name, int argc, ...)
     va_end(va);
 
     if (debug)
-        alog("Emitting event \"%s\" (%d args)", name, argc);
+        alog("debug: Emitting event \"%s\" (%d args)", name, argc);
 
     event_process_hook(name, argc, argv);
 

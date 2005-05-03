@@ -2378,7 +2378,7 @@ void moduleInsertLanguage(int langNumber, int ac, char **av)
 {
     int i;
 
-    if ((mod_current_module_name) && (!mod_current_module)) {
+    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
 	
@@ -2412,7 +2412,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     int lang = LANG_EN_US;
     char *s, *t, *buf;
 
-    if ((mod_current_module_name) && (!mod_current_module)) {
+    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
     /* Find the users lang, and use it if we cant */
@@ -2456,7 +2456,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 void moduleDeleteLanguage(int langNumber)
 {
     int idx = 0;
-    if ((mod_current_module_name) && (!mod_current_module)) {
+    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
     for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {

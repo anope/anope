@@ -157,13 +157,13 @@ void viagra_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		* At least this is readable without paying much attention :) -GD
-		*/
-		if (add)
-			user->mode |= umodes[(int) *modes];
-		else
-			user->mode &= ~umodes[(int) *modes];
+        /* This looks better, much better than "add ? (do_add) : (do_remove)".
+         * At least this is readable without paying much attention :) -GD
+         */
+        if (add)
+            user->mode |= umodes[(int) *modes];
+        else
+            user->mode &= ~umodes[(int) *modes];
 
         switch (*modes++) {
         case '+':
@@ -893,8 +893,8 @@ int anope_event_away(char *source, int ac, char **av)
     if (!source) {
         return MOD_CONT;
     }
-	m_away(source, (ac ? av[0] : NULL));
-	return MOD_CONT;
+    m_away(source, (ac ? av[0] : NULL));
+    return MOD_CONT;
 }
 
 int anope_event_ping(char *source, int ac, char **av)

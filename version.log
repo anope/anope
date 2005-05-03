@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="759"
+VERSION_BUILD="761"
 
 # $Log$
+#
+# BUILD : 1.7.8 (761)
+# BUGS  : N/A
+# NOTES : Tidied up tr.l in trunk
 #
 # BUILD : 1.7.8 (759)
 # BUGS  : 

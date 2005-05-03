@@ -1232,15 +1232,15 @@ void ptlink_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		* At least this is readable without paying much attention :) -GD
-		*/
-		if (add)
-			user->mode |= umodes[(int) *modes];
-		else
-			user->mode &= ~umodes[(int) *modes];
-		
-		switch (*modes++) {
+        /* This looks better, much better than "add ? (do_add) : (do_remove)".
+         * At least this is readable without paying much attention :) -GD
+         */
+        if (add)
+            user->mode |= umodes[(int) *modes];
+        else
+            user->mode &= ~umodes[(int) *modes];
+
+        switch (*modes++) {
         case '+':
             add = 1;
             break;
@@ -1288,8 +1288,8 @@ int anope_event_away(char *source, int ac, char **av)
     if (!source) {
         return MOD_CONT;
     }
-	m_away(source, (ac ? av[0] : NULL));
-	return MOD_CONT;
+    m_away(source, (ac ? av[0] : NULL));
+    return MOD_CONT;
 }
 
 void ptlink_cmd_bot_nick(char *nick, char *user, char *host, char *real,

@@ -157,13 +157,13 @@ void shadowircd_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		* At least this is readable without paying much attention :) -GD
-		*/
-		if (add)
-			user->mode |= umodes[(int) *modes];
-		else
-			user->mode &= ~umodes[(int) *modes];
+        /* This looks better, much better than "add ? (do_add) : (do_remove)".
+         * At least this is readable without paying much attention :) -GD
+         */
+        if (add)
+            user->mode |= umodes[(int) *modes];
+        else
+            user->mode &= ~umodes[(int) *modes];
 
         switch (*modes++) {
         case '+':
@@ -1768,7 +1768,8 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("ShadowIRCd 4.0+");

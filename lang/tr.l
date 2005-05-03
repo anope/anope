@@ -6223,20 +6223,29 @@ HOST_LIST_KEY_FOOTER
 # HostServ Help messages
 #
 ###########################################################################
+HOST_HELP_CMD_ON
+	    ON          Activates your assigned vhost
+HOST_HELP_CMD_OFF
+	    OFF         Deactivates your assigned vhost
+HOST_HELP_CMD_GROUP
+	    GROUP       Syncs the vhost for all nicks in a group
+HOST_HELP_CMD_SET
+	    SET         Set the vhost of another user
+HOST_HELP_CMD_SETALL
+	    SETALL      Set the vhost for all nicks in a group
+HOST_HELP_CMD_DEL
+	    DEL         Delete the vhost of another user
+HOST_HELP_CMD_DELALL
+	    DELALL      Delete the vhost for all nicks in a group
+HOST_HELP_CMD_LIST
+	    LIST        Displays one or more vhost entries.
+HOST_OPER_HELP
+	n/a
+HOST_ADMIN_HELP
+	n/a
+
 HOST_HELP
 	%S commands:
-	    ON          Activates your assigned vhost
-	    OFF         Deactivates your assigned vhost
-
-HOST_OPER_HELP
-	Commands available to services operators only:
-	    SET         Set the vhost of another user
-	    SETALL      Set the vhost for all nicks in a group
-	    DEL         Delete the vhost of another user
-	    LIST        Displays one or more vhost entries.
-
-HOST_ADMIN_HELP
-	Commands available to services admins only:
 
 HOST_HELP_ON
 	Syntax: ON

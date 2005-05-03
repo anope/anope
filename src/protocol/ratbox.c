@@ -154,13 +154,13 @@ void ratbox_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		* At least this is readable without paying much attention :) -GD
-		*/
-		if (add)
-			user->mode |= umodes[(int) *modes];
-		else
-			user->mode &= ~umodes[(int) *modes];
+        /* This looks better, much better than "add ? (do_add) : (do_remove)".
+         * At least this is readable without paying much attention :) -GD
+         */
+        if (add)
+            user->mode |= umodes[(int) *modes];
+        else
+            user->mode &= ~umodes[(int) *modes];
 
         switch (*modes++) {
         case '+':
@@ -1004,8 +1004,9 @@ int anope_event_away(char *source, int ac, char **av)
     if (UseTS6) {
         u = find_byuid(source);
     }
-	
-	m_away((UseTS6 ? (u ? u->nick : source) : source), (ac ? av[0] : NULL));
+
+    m_away((UseTS6 ? (u ? u->nick : source) : source),
+           (ac ? av[0] : NULL));
     return MOD_CONT;
 }
 

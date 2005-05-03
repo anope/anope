@@ -3038,6 +3038,8 @@ OPER_MODULE_LOAD_FAIL
 	Nie moge za³adowaæ modu³u %s
 OPER_MODULE_REMOVE_FAIL
 	Nie moge wy³adowaæ modu³u %s
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD NazwaPliku
 OPER_MODULE_UNLOAD_SYNTAX
@@ -6733,14 +6735,14 @@ HOST_HELP_CMD_DELALL
 HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
-HOST_HELP
-	%S commands:
-
 HOST_OPER_HELP
 	not used.
 
 HOST_ADMIN_HELP
 	not used.
+
+HOST_HELP
+	%S commands:
 
 HOST_HELP_ON
 	Syntax: ON

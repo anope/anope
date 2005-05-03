@@ -1346,7 +1346,7 @@ CHAN_AKICK_VIEW_FORMAT_STUCK
 CHAN_AKICK_ENFORCE_DONE
 	AKICK ENFORCE en %s completa; %d usuaris afectats.
 CHAN_AKICK_CLEAR
-	La llista de kicks automàtics ha estat netegada.
+	La llista de kicks automàtics en canal %s ha estat netegada.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX
@@ -2880,6 +2880,8 @@ OPER_MODULE_LOAD_FAIL
 	Unable to load module %s
 OPER_MODULE_REMOVE_FAIL
 	Unable to remove module %s
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD FileName
 OPER_MODULE_UNLOAD_SYNTAX
@@ -5331,6 +5333,9 @@ OPER_HELP_CMD_MODINFO
 OPER_HELP_CMD_MODLIST
 	    MODLIST     List loaded modules
 
+OPER_HELP
+	%S commands:
+
 OPER_HELP_LOGGED
 	Noticia: Totes les comandes enviades a %S son monitorejades!
 
@@ -6432,14 +6437,14 @@ HOST_HELP_CMD_DELALL
 HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
-HOST_HELP
-	%S commands:
-
 HOST_OPER_HELP
 	not used.
 
 HOST_ADMIN_HELP
 	not used.
+
+HOST_HELP
+	%S commands:
 
 HOST_HELP_ON
 	Syntax: ON

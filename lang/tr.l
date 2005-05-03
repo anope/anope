@@ -2875,6 +2875,8 @@ OPER_MODULE_LOAD_FAIL
 	Unable to load module %s
 OPER_MODULE_REMOVE_FAIL
 	Unable to remove module %s
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD FileName
 OPER_MODULE_UNLOAD_SYNTAX

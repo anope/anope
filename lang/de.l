@@ -2873,6 +2873,8 @@ OPER_MODULE_LOAD_FAIL
 	Kann Modul %s nicht laden
 OPER_MODULE_REMOVE_FAIL
 	Kann Modul %s nicht entfernen
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD Modul-Name
 OPER_MODULE_UNLOAD_SYNTAX
@@ -6616,13 +6618,14 @@ HOST_HELP_CMD_DELALL
 HOST_HELP_CMD_LIST
 	    LIST      Zeigt einen oder mehrere vHost Einträge an
 
-HOST_HELP
-	%S Befehle:
 HOST_OPER_HELP
 	not used.
 
 HOST_ADMIN_HELP
 	not used.
+
+HOST_HELP
+	%S Befehle:
 
 HOST_HELP_ON
 	Syntax: ON

@@ -2813,6 +2813,8 @@ OPER_MODULE_LOAD_FAIL
 	Nem sikerült a betölteni a %s modult
 OPER_MODULE_REMOVE_FAIL
 	Nem sikerült eltávolítani a %s modult
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD Fájlnév
 OPER_MODULE_UNLOAD_SYNTAX
@@ -6186,14 +6188,14 @@ HOST_HELP_CMD_DELALL
 HOST_HELP_CMD_LIST
 	    LIST        Kiír egy vagy több vhost bejegyzést
 
-HOST_HELP
-	%S parancsok:
-
 HOST_OPER_HELP
 	not used.
 
 HOST_ADMIN_HELP
 	not used.
+
+HOST_HELP
+	%S parancsok:
 
 HOST_HELP_ON
 	Syntax: ON

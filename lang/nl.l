@@ -2836,6 +2836,8 @@ OPER_MODULE_LOAD_FAIL
 	Laden van de module %s is gefaald
 OPER_MODULE_REMOVE_FAIL
 	Het verwijderen van module %s is gefaald
+OPER_MODULE_NO_UNLOAD
+	This module can not be unloaded.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD bestandsnaam
 OPER_MODULE_UNLOAD_SYNTAX
@@ -6337,14 +6339,14 @@ HOST_HELP_CMD_DELALL
 HOST_HELP_CMD_LIST
 	    LIST        Geeft een of meer vhosts weer.
 
-HOST_HELP
-	%S commando'ss:
-
 HOST_OPER_HELP
 	not used.
 
 HOST_ADMIN_HELP
 	not used.
+
+HOST_HELP
+	%S commando'ss:
 
 HOST_HELP_ON
 	Gebruik: ON

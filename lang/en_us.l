@@ -6157,10 +6157,10 @@ HOST_HELP_CMD_LIST
 	    LIST        Displays one or more vhost entries.
 
 HOST_OPER_HELP
-	moo
+	not used.
 
 HOST_ADMIN_HELP
-	moo
+	not used.
 
 HOST_HELP
 	%S commands:

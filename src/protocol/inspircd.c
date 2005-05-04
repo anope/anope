@@ -672,6 +672,7 @@ int anope_event_eob(char *source, int ac, char **av)
     send_cmd(NULL, "v %s Anope-%s %s :%s - %s -- %s", ServerName,
              version_number, ServerName, ircd->name, version_flags,
              version_build);
+    return MOD_CONT;
 }
 
 /* SERVER name hop descript */

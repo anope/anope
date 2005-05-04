@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="763"
+VERSION_BUILD="764"
 
 # $Log$
+#
+# BUILD : 1.7.8 (764)
+# BUGS  : 363
+# NOTES : Missing (c->)ci check in do_topic(), causing segfaults...
 #
 # BUILD : 1.7.8 (763)
 # BUGS  : none

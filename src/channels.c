@@ -1169,7 +1169,7 @@ void do_topic(const char *source, int ac, char **av)
      * channel exactly, there's no need to update anything and we can as
      * well just return silently without updating anything. -GD
      */
-    if ((ac > 3) && *av[3] && (ci = c->ci) && ci->last_topic
+    if ((ac > 3) && *av[3] && ci && ci->last_topic
         && (strcmp(av[3], ci->last_topic) == 0)
         && (strcmp(av[1], ci->last_topic_setter) == 0))
         return;
@@ -1190,7 +1190,7 @@ void do_topic(const char *source, int ac, char **av)
 
     record_topic(av[0]);
 
-    if (ci->last_topic) {
+    if (ci && ci->last_topic) {
         send_event(EVENT_TOPIC_UPDATED, 2, av[0], ci->last_topic);
     } else {
         send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");

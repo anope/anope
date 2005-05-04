@@ -289,7 +289,6 @@ int mSaveData(int argc, char **argv)
 
     if (argc >= 1) {
         if (stricmp(argv[0], EVENT_START) == 0) {
-            alog("ns_noop: Saving the databases has started!");
             if ((out = fopen(NSAutoOPDBName, "w")) == NULL) {
                 alog("ns_noop: ERROR: can not open the database file!");
                 anope_cmd_global(s_NickServ,
@@ -307,7 +306,6 @@ int mSaveData(int argc, char **argv)
                 fclose(out);
             }
         } else {
-            alog("ns_noop: Saving the databases is complete");
             ret = 0;
         }
     }

@@ -411,7 +411,6 @@ int mSaveData(int argc, char **argv)
 
     if (argc >= 1) {
         if (!stricmp(argv[0], EVENT_START)) {
-            alog("os_info: Saving the databases has started!");
             if ((out = fopen(OSInfoDBName, "w")) == NULL) {
                 alog("os_info: ERROR: can not open the database file!");
                 anope_cmd_global(s_OperServ,
@@ -443,7 +442,6 @@ int mSaveData(int argc, char **argv)
                 fclose(out);
             }
         } else {
-            alog("os_info: Saving the databases is complete");
             ret = 0;
         }
     }

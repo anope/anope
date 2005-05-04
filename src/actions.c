@@ -207,23 +207,13 @@ void common_svsmode(User * u, char *modes, char *arg)
  */
 char *common_get_vhost(User * u)
 {
-    if (!u) {
+    if (!u)
         return NULL;
-    }
-    if (ircd->vhostmode) {
-        if (u->mode & ircd->vhostmode) {
-            return u->vhost;
-            /* ptlink hack since there is no user mode
-               for vhost, simply compare the host to the
-               vhost struct memember */
-        } else if (stricmp(u->vhost, u->host)) {
-            return u->vhost;
-        } else {
-            return u->host;
-        }
-    } else {
+
+    if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+        return u->vhost;
+    else
         return u->host;
-    }
 }
 
 /*************************************************************************/
@@ -236,33 +226,11 @@ char *common_get_vhost(User * u)
  */
 char *common_get_vident(User * u)
 {
-    if (!u) {
+    if (!u)
         return NULL;
-    }
-    if (ircd->vhostmode) {
-        if (u->mode & ircd->vhostmode) {
-            return u->vident;
-            /* ptlink hack since there is no user mode
-               for vhost, simply compare the host to the
-               vhost struct memember */
-        } else if (u->vident) {
-            if (stricmp(u->vident, u->username)) {
-                return u->vident;
-            } else {
-                return u->username;
-            }
-        } else {
-            return u->username;
-        }
-    } else {
-        if (u->vident) {
-            if (stricmp(u->vident, u->username)) {
-                return u->vident;
-            } else {
-                return u->username;
-            }
-        } else {
-            return u->username;
-        }
-    }
+
+    if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+        return u->vident;
+    else
+        return u->username;
 }

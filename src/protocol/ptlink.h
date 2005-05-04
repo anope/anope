@@ -31,6 +31,9 @@
 #define UMODE_y 0x00002000
 #define UMODE_z 0x00004000
 
+#define UMODE_VH 0x00008000		/* Fake umode used for internal vhost things */
+#define UMODE_NM 0x00010000		/* Fake umode used for internal NEWMASK things */
+/* Let's hope for a better vhost-system with PTlink7 ;) */
 
 
 #define CMODE_i 0x00000001

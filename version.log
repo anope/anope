@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="8"
-VERSION_BUILD="764"
+VERSION_BUILD="765"
 
 # $Log$
+#
+# BUILD : 1.7.8 (765)
+# BUGS  : 352
+# NOTES : Fixed various PTlink vhost handling bugs. Added a fake umode to indicate we have a vHost, to not break other IRCDs which DO use umodes. Ignoring PTlinks NEWMASK on SVSMODE +r, as that would desynch the services internal vhost.
 #
 # BUILD : 1.7.8 (764)
 # BUGS  : 363

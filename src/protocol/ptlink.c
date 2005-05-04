@@ -79,7 +79,7 @@ IRCDVar myIrcd[] = {
      CMODE_K,                   /* No Knock             */
      CMODE_A,                   /* Admin Only           */
      DEFAULT_MLOCK,             /* Default MLOCK        */
-     UMODE_o,                   /* Vhost Mode           */
+     UMODE_VH,                  /* Vhost Mode           */
      1,                         /* +f                   */
      0,                         /* +L                   */
      CMODE_f,
@@ -429,6 +429,18 @@ int anope_event_newmask(char *source, int ac, char **av)
         }
         return MOD_CONT;
     }
+	
+	if ((u->mode & (UMODE_NM | UMODE_VH)) == (UMODE_NM | UMODE_VH)) {
+		/* This NEWMASK should be discarded because it's sent due to a +r by
+		 * someone with a ptlink-masked host. PTlink has our correct host, so
+		 * we can just ignore this :) Or we'll get ptlink's old host which is
+		 * not what we want. -GD
+		 */
+		u->mode &= ~UMODE_NM;
+		if (debug)
+			alog("debug: Ignoring NEWMASK because it's send because of SVSMODE +r");
+		return MOD_CONT;
+	}
 
     newuser = myStrGetOnlyToken(av[0], '@', 0);
     if (newuser) {
@@ -440,7 +452,9 @@ int anope_event_newmask(char *source, int ac, char **av)
 
     if (*newhost == '@')
         newhost++;
-
+	
+	u->mode |= UMODE_VH;
+	
     if (newhost) {
         change_user_host(u, newhost);
     }
@@ -699,6 +713,15 @@ void ptlink_cmd_svsmode(User * u, int ac, char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %s%s%s", u->nick, av[0],
              (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
+	
+	/* If we set +r on someone +NRah (1 or more of those modes), PTlink will
+	 * send us a NEWMASK with their ptlink-masked-host. If we want HostServ
+	 * to work for them, we will need to send our NEWMASK after we receive
+	 * theirs. Thus we make a hack and store in moduleData that we need to
+	 * look out for that.
+	 */
+	if (strchr(av[0], 'r') && (u->mode & UMODE_N) || (u->mode & UMODE_R) || (u->mode & UMODE_a) || (u->mode & UMODE_h))
+		u->mode |= UMODE_NM;
 }
 
 int anope_event_error(char *source, int ac, char **av)
@@ -1180,11 +1203,16 @@ void ptlink_cmd_vhost_off(User * u)
 
 void ptlink_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 {
+	User *u;
+	
     if (vIdent) {
         send_cmd(s_HostServ, "NEWMASK %s@%s %s", vIdent, vhost, nick);
     } else {
         send_cmd(s_HostServ, "NEWMASK %s %s", vhost, nick);
     }
+	
+	if ((u = finduser(nick)))
+		u->mode |= UMODE_VH;
 }
 
 /* INVITE */

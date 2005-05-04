@@ -7,10 +7,14 @@
 
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
-VERSION_PATCH="8"
-VERSION_BUILD="769"
+VERSION_PATCH="9"
+VERSION_BUILD="770"
 
 # $Log$
+#
+# BUILD : 1.7.9 (770)
+# BUGS  : none
+# NOTES : Anope 1.7.9 Release.
 #
 # BUILD : 1.7.8 (769)
 # BUGS  : N/A

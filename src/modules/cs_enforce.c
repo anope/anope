@@ -23,13 +23,14 @@ void my_cs_help(User * u);
 int my_cs_help_enforce(User * u);
 void my_add_languages(void);
 
-#define LNG_NUM_STRINGS		5
+#define LNG_NUM_STRINGS		6
 
 #define LNG_CHAN_HELP						0
 #define LNG_ENFORCE_SYNTAX					1
 #define LNG_CHAN_HELP_ENFORCE				2
 #define LNG_CHAN_HELP_ENFORCE_R_ENABLED		3
 #define LNG_CHAN_HELP_ENFORCE_R_DISABLED	4
+#define LNG_CHAN_RESPONSE                       5
 
 int AnopeInit(int argc, char **argv)
 {
@@ -198,8 +199,8 @@ void do_enforce_modes(Channel * c)
 int my_cs_enforce(User * u)
 {
     char *cur_buffer;
-    char *chan;
-    char *what;
+    char *chan=NULL;
+    char *what=NULL;
     Channel *c;
     ChannelInfo *ci;
 
@@ -220,21 +221,26 @@ int my_cs_enforce(User * u)
         what = myStrGetToken(cur_buffer, ' ', 1);
         if (!what || (stricmp(what, "SET") == 0)) {
             do_enforce_set(c);
+	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "MODES") == 0) {
             do_enforce_modes(c);
+	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "SECUREOPS") == 0) {
             do_enforce_secureops(c);
+	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "RESTRICTED") == 0) {
             do_enforce_restricted(c);
+	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "+R") == 0) {
             do_enforce_cmode_R(c);
+	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else {
             moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
         }
     }
 
-    free(chan);
-    free(what);
+    if(chan) free(chan);
+    if(what) free(what);
 
     return MOD_CONT;
 }
@@ -290,7 +296,8 @@ void my_add_languages(void)
             "specified for \037what\037, an equalivant of channelmode +R on\n"
             "other ircds will be enforced. All users that are in the channel\n"
             "but have not identified for their nickname will be kicked and\n"
-            "banned from the channel."
+            "banned from the channel.",
+	"Enforced %s"
     };
 
     /* Dutch */
@@ -324,7 +331,8 @@ void my_add_languages(void)
             "server niet ondersteund wordt. Als +R wordt ingevuld voor \037wat\037\n"
             "zullen alle gebruikers die in het kanaal zitten maar zich niet\n"
             "hebben geidentificeerd voor hun nick uit het kanaal gekicked en\n"
-            "verbannen worden."
+            "verbannen worden.",
+	"Enforced %s"
     };
 
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);

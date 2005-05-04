@@ -1473,8 +1473,7 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Brain");
-    moduleAddVersion
-        ("$Id$");
+    moduleAddVersion("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("InspIRCd 1.0 Beta3");

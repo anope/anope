@@ -1,7 +1,7 @@
 #include "module.h"
 
 #define AUTHOR "Rob"
-#define VERSION "1"
+#define VERSION "$Id$"
 
 void myHelp(User * u);
 void myFullHelpSyntax(User * u);
@@ -32,6 +32,10 @@ int AnopeInit(int argc, char **argv)
     status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
     mAddLanguages();
+
+    moduleAddAuthor(AUTHOR);
+    moduleAddVersion(VERSION);
+    moduleSetType(SUPPORTED);
 
     if (status != MOD_ERR_OK) {
         return MOD_STOP;

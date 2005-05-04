@@ -1540,8 +1540,7 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
+    moduleAddVersion("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("UnrealIRCd 3.1.1+");

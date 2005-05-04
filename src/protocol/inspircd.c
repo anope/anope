@@ -383,13 +383,9 @@ void inspircd_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-        /* This looks better, much better than "add ? (do_add) : (do_remove)".
-         * At least this is readable without paying much attention :) -GD
-         */
-        if (add)
-            user->mode |= umodes[(int) *modes];
-        else
-            user->mode &= ~umodes[(int) *modes];
+        add ? (user->mode |= umodes[(int) *modes]) : (user->mode &=
+                                                      ~umodes[(int)
+                                                              *modes]);
 
         switch (*modes++) {
         case '+':
@@ -439,7 +435,7 @@ void moduleAddIRCDMsgs(void) {
 
     m = createMessage("$",      anope_event_null); addCoreMessage(IRCD,m);		// send routing table
     m = createMessage("X",      anope_event_null); addCoreMessage(IRCD,m);		// begin netburst NOW
-    m = createMessage("Y",      anope_event_null); addCoreMessage(IRCD,m);		// end of UPLINK netburst
+    m = createMessage("Y",      anope_event_eob); addCoreMessage(IRCD,m);		// end of UPLINK netburst
     m = createMessage("H",      anope_event_null); addCoreMessage(IRCD,m);		// local sync start
     m = createMessage("F",      anope_event_null); addCoreMessage(IRCD,m);		// local sync end
     m = createMessage("f",      anope_event_null); addCoreMessage(IRCD,m);		// local U-lined sync end
@@ -668,7 +664,14 @@ void inspircd_cmd_protoctl()
 /* PASS */
 void inspircd_cmd_pass(char *pass)
 {
-//    send_cmd(NULL, "PASS :%s", pass);
+}
+
+int anope_event_eob(char *source, int ac, char **av)
+{
+    send_cmd(NULL, "/ NickServ");
+    send_cmd(NULL, "v %s Anope-%s %s :%s - %s -- %s", ServerName,
+             version_number, ServerName, ircd->name, version_flags,
+             version_build);
 }
 
 /* SERVER name hop descript */
@@ -691,9 +694,6 @@ void inspircd_cmd_server(char *servname, int hop, char *descript)
             break;
         }
         send_cmd(NULL, "U %s %s :%s", servname, pw, descript);
-        send_cmd(NULL, "v %s Anope-%s %s :%s - %s -- %s", servname,
-                 version_number, ServerName, ircd->name, version_flags,
-                 version_build);
     }
 }
 
@@ -1200,6 +1200,8 @@ int anope_event_chghost(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+
+
 /* EVENT: SERVER */
 int anope_event_server(char *source, int ac, char **av)
 {
@@ -1473,7 +1475,8 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Brain");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("InspIRCd 1.0 Beta3");

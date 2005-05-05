@@ -1293,7 +1293,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 
     status = chan_get_user_status(c, user);
 
-    if (debug >= 2)
+    if (debug)
         alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
 
     if (give_modes && (get_ignore(user->nick) == NULL)) {
@@ -1318,7 +1318,8 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
      * on, because else every mode is legal. -GD
      * Unless the channel has just been created. -heinz
      */
-    if ((ci->flags & CI_SECUREOPS) || c->usercount == 1) {
+    if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1))
+        && !is_ulined(user->server->name)) {
         if (ircd->owner && (status & CUS_OWNER)
             &&
             !(((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
@@ -1326,12 +1327,15 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
                   && is_founder(user, ci))))
             rem_modes |= CUS_OWNER;
         if ((ircd->protect || ircd->admin) && (status & CUS_PROTECT)
-            && !check_access(user, ci, CA_AUTOPROTECT))
+            && !check_access(user, ci, CA_AUTOPROTECT)
+            && !check_access(user, ci, CA_PROTECTME))
             rem_modes |= CUS_PROTECT;
-        if ((status & CUS_OP) && !check_access(user, ci, CA_AUTOOP))
+        if ((status & CUS_OP) && !check_access(user, ci, CA_AUTOOP)
+            && !check_access(user, ci, CA_OPDEOPME))
             rem_modes |= CUS_OP;
         if (ircd->halfop && (status & CUS_HALFOP)
-            && !check_access(user, ci, CA_AUTOHALFOP))
+            && !check_access(user, ci, CA_AUTOHALFOP)
+            && !check_access(user, ci, CA_HALFOPME))
             rem_modes |= CUS_HALFOP;
     }
 

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="773"
+VERSION_BUILD="774"
 
 # $Log$
+#
+# BUILD : 1.7.9 (774)
+# BUGS  : 366
+# NOTES : Updated chan_set_correct_modes() to work ok with U:Lined servers and added checking for OPDEOPME next to AUTOOP levels (same for the other modes)
 #
 # BUILD : 1.7.9 (773)
 # BUGS  : none

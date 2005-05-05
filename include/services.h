@@ -715,6 +715,7 @@ struct chaninfo_ {
 /* #define CA_AUTOADMIN        		32
 #define CA_ADMINME          		33
 #define CA_ADMIN            		34 */
+	/* Why are these commented out and not removed? -GD */
 #define CA_BANME            		32
 #define CA_BAN              		33
 #define CA_TOPIC            		34

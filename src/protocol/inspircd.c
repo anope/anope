@@ -1104,7 +1104,7 @@ int anope_event_setname(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("debug: SETNAME for nonexistent user %s", source);
+            alog("user: SETNAME for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1122,7 +1122,7 @@ int anope_event_chgname(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("debug: CHGNAME for nonexistent user %s", av[0]);
+            alog("user: CHGNAME for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -1150,7 +1150,7 @@ int anope_event_sethost(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("debug: SETHOST for nonexistent user %s", source);
+            alog("user: SETHOST for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1178,7 +1178,7 @@ int anope_event_nick(char *source, int ac, char **av)
         // nick introductions (e.g. introductions for clients we already have). If this happens,
         // we should ignore any that claim to be from us as these are just confirmations of the
         // services "complement" - processing them will cause all kinds of session limit oddities.
-        if ((strcmp(av[7], ServerName)) || (finduser(av[1]))) {
+        if ((strcmp(av[7], ServerName)) && (!finduser(av[1]))) {
             inet_aton(av[6], &addy);
             user = do_nick(source, av[1], av[4], av[2], uplink, av[8],
                            strtoul(av[0], NULL, 10), 0, htonl(*ad), av[3],
@@ -1201,7 +1201,7 @@ int anope_event_chghost(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("debug: CHGHOST for nonexistent user %s", av[0]);
+            alog("user: CHGHOST for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -1485,7 +1485,8 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Brain");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("InspIRCd 1.0 Beta3");

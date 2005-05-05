@@ -118,7 +118,8 @@ void update_host(User * user)
     }
 
     if (debug)
-        alog("debug: %s changes its host to %s", user->nick, user->host);
+        alog("debug: %s changes its host to %s", user->nick,
+             common_get_vhost(user));
 }
 
 

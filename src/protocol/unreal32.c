@@ -1300,7 +1300,7 @@ int anope_event_setname(char *source, int ac, char **av)
     u = finduser(source);
     if (!u) {
         if (debug) {
-            alog("user: SETNAME for nonexistent user %s", source);
+            alog("debug: SETNAME for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1319,7 +1319,7 @@ int anope_event_chgname(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("user: CHGNAME for nonexistent user %s", av[0]);
+            alog("debug: CHGNAME for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -1338,7 +1338,7 @@ int anope_event_setident(char *source, int ac, char **av)
     u = finduser(source);
     if (!u) {
         if (debug) {
-            alog("user: SETIDENT for nonexistent user %s", source);
+            alog("debug: SETIDENT for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1356,7 +1356,7 @@ int anope_event_chgident(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("user: CHGIDENT for nonexistent user %s", av[0]);
+            alog("debug: CHGIDENT for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -1375,7 +1375,7 @@ int anope_event_sethost(char *source, int ac, char **av)
     u = finduser(source);
     if (!u) {
         if (debug) {
-            alog("user: SETHOST for nonexistent user %s", source);
+            alog("debug: SETHOST for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1465,7 +1465,7 @@ int anope_event_chghost(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("user: CHGHOST for nonexistent user %s", av[0]);
+            alog("debug: CHGHOST for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -1631,7 +1631,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (av[0]) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

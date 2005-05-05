@@ -224,7 +224,7 @@ int displayHookFromHash(char *name)
     int index = 0;
     index = CMD_HASH(name);
     if (debug > 1) {
-        alog("trying to display message %s", name);
+        alog("debug: trying to display message %s", name);
     }
     for (current = EVENTHOOKS[index]; current; current = current->next) {
         if (stricmp(name, current->name) == 0) {
@@ -232,7 +232,7 @@ int displayHookFromHash(char *name)
         }
     }
     if (debug > 1) {
-        alog("done displaying message %s", name);
+        alog("debug: done displaying message %s", name);
     }
     return 0;
 }
@@ -249,7 +249,7 @@ int displayEvtMessageFromHash(char *name)
     int index = 0;
     index = CMD_HASH(name);
     if (debug > 1) {
-        alog("trying to display message %s", name);
+        alog("debug: trying to display message %s", name);
     }
     for (current = EVENT[index]; current; current = current->next) {
         if (stricmp(name, current->name) == 0) {
@@ -257,7 +257,7 @@ int displayEvtMessageFromHash(char *name)
         }
     }
     if (debug > 1) {
-        alog("done displaying message %s", name);
+        alog("debug: done displaying message %s", name);
     }
     return 0;
 }
@@ -401,7 +401,7 @@ int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
             evm->next = current->evm;
             current->evm = evm;
             if (debug)
-                alog("existing msg: (0x%p), new msg (0x%p)",
+                alog("debug: existing msg: (0x%p), new msg (0x%p)",
                      (void *) evm->next, (void *) evm);
             return MOD_ERR_OK;
         }
@@ -447,7 +447,7 @@ int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
             evh->next = current->evh;
             current->evh = evh;
             if (debug)
-                alog("existing msg: (0x%p), new msg (0x%p)",
+                alog("debug: existing msg: (0x%p), new msg (0x%p)",
                      (void *) evh->next, (void *) evh);
             return MOD_ERR_OK;
         }

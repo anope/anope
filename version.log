@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="775"
+VERSION_BUILD="776"
 
 # $Log$
+#
+# BUILD : 1.7.9 (776)
+# BUGS  : none
+# NOTES : Prepended all debug messages for consistency.
 #
 # BUILD : 1.7.9 (775)
 # BUGS  : 

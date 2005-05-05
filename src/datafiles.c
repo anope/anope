@@ -133,7 +133,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 
     /* Get the current working directory: */
     if (_getcwd(buffer, _MAX_PATH) == NULL) {
-        alog("debug: Unable to set Current working directory");
+        alog("Warning: Unable to set Current working directory");
     }
 #endif
 
@@ -192,16 +192,16 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #ifdef _WIN32
         if (debug) {
             if (errno == ENOENT) {
-                alog("Error %d (ENOENT) : the file or directory does not exist", errno, filename);
+                alog("debug: Error %d (ENOENT) : the file or directory does not exist", errno, filename);
             } else if (errno == EACCES) {
-                alog("Error %d (EACCES) : error while attempting to access file", errno);
+                alog("debug: Error %d (EACCES) : error while attempting to access file", errno);
             } else {
-                alog("Error %d", errno);
+                alog("debug: Error %d", errno);
             }
         }
 #else
         if (debug) {
-            alog("Error %d", errno);
+            alog("debug: Error %d", errno);
         }
 #endif
         errno = errno_save;

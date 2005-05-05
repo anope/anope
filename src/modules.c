@@ -104,9 +104,9 @@ void modules_core_init(int number, char **list)
             mod_current_user = NULL;
             status = loadModule(mod_current_module, NULL);
             if (debug || status) {
-                alog("trying to load core module [%s]",
+                alog("debug: trying to load core module [%s]",
                      mod_current_module->name);
-                alog("status: [%d]", status);
+                alog("debug: status: [%d]", status);
             }
             mod_current_module = NULL;
             mod_current_user = NULL;
@@ -946,7 +946,7 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name)
     int index = 0;
     index = CMD_HASH(name);
     if (debug > 1) {
-        alog("trying to display command %s", name);
+        alog("debug: trying to display command %s", name);
     }
     for (current = cmdTable[index]; current; current = current->next) {
         if (stricmp(name, current->name) == 0) {
@@ -954,7 +954,7 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name)
         }
     }
     if (debug > 1) {
-        alog("done displaying command %s", name);
+        alog("debug: done displaying command %s", name);
     }
     return 0;
 }
@@ -990,7 +990,7 @@ int displayMessageFromHash(char *name)
     int index = 0;
     index = CMD_HASH(name);
     if (debug > 1) {
-        alog("trying to display message %s", name);
+        alog("debug: trying to display message %s", name);
     }
     for (current = IRCD[index]; current; current = current->next) {
         if (stricmp(name, current->name) == 0) {
@@ -998,7 +998,7 @@ int displayMessageFromHash(char *name)
         }
     }
     if (debug > 1) {
-        alog("done displaying message %s", name);
+        alog("debug: done displaying message %s", name);
     }
     return 0;
 }
@@ -1060,7 +1060,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 c->next = current->c;
                 current->c = c;
                 if (debug)
-                    alog("existing cmd: (0x%p), new cmd (0x%p)",
+                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
                          (void *) c->next, (void *) c);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
@@ -1069,7 +1069,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing cmd: (0x%p), new cmd (0x%p)",
+                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
                          (void *) tail, (void *) c);
                 tail->next = c;
                 c->next = NULL;
@@ -1288,7 +1288,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
                 m->next = current->m;
                 current->m = m;
                 if (debug)
-                    alog("existing msg: (0x%p), new msg (0x%p)",
+                    alog("debug: existing msg: (0x%p), new msg (0x%p)",
                          (void *) m->next, (void *) m);
                 return MOD_ERR_OK;
             } else if (pos == 2) {
@@ -1296,7 +1296,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
                 while (tail->next)
                     tail = tail->next;
                 if (debug)
-                    alog("existing msg: (0x%p), new msg (0x%p)",
+                    alog("debug: existing msg: (0x%p), new msg (0x%p)",
                          (void *) tail, (void *) m);
                 tail->next = m;
                 m->next = NULL;
@@ -1569,7 +1569,7 @@ int moduleAddCallback(char *name, time_t when,
         }
     }
     if (debug)
-        alog("Added module CallBack: [%s] due to execute at %ld",
+        alog("debug: added module CallBack: [%s] due to execute at %ld",
              new->name ? new->name : "?", (long int) new->when);
     return MOD_ERR_OK;
 }
@@ -1586,7 +1586,7 @@ void moduleCallBackRun(void)
     tmp = moduleCallBackHead;
     if (tmp->when <= time(NULL)) {
         if (debug)
-            alog("Executing callback: %s", tmp->name ? tmp->name : "?");
+            alog("debug: executing callback: %s", tmp->name ? tmp->name : "?");
         if (tmp->func) {
             mod_current_module_name = tmp->owner_name;
             tmp->func(tmp->argc, tmp->argv);
@@ -1674,7 +1674,7 @@ void moduleDelCallback(char *name)
             if ((strcmp(mod_current_module_name, current->owner_name) == 0)
                 && (strcmp(current->name, name) == 0)) {
                 if (debug) {
-                    alog("Removing CallBack %s for module %s", name,
+                    alog("debug: removing CallBack %s for module %s", name,
                          mod_current_module_name);
                 }
                 tmp = current->next;    /* get a pointer to the next record, as once we delete this record, we'll lose it :) */
@@ -1706,7 +1706,7 @@ void moduleCallBackPrepForUnload(char *mod_name)
     tmp = moduleCallBackFindEntry(mod_name, &found);
     while (found) {
         if (debug) {
-            alog("Removing CallBack for module %s", mod_name);
+            alog("debug: removing CallBack for module %s", mod_name);
         }
         moduleCallBackDeleteEntry(tmp);
         tmp = moduleCallBackFindEntry(mod_name, &found);

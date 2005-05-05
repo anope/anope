@@ -443,7 +443,7 @@ int anope_event_vhost(char *source, int ac, char **av)
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
-            alog("user: VHOST for nonexistent user %s", av[0]);
+            alog("debug: VHOST for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -566,7 +566,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

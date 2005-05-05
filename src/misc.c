@@ -1107,12 +1107,11 @@ char *host_resolve(char *host)
         ntoa(addr, ipbuf, sizeof(ipbuf));
         ipreturn = sstrdup(ipbuf);
         if (debug) {
-	  alog("Resolved %s to %s",host, ipbuf);
+	        alog("debug: resolved %s to %s",host, ipbuf);
         }
         return ipreturn;
-    }
-    else {
-	return ipreturn;
+    } else {
+	    return ipreturn;
     }
 }
 

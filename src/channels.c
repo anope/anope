@@ -240,7 +240,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
 
             if (!(user = finduser(*av))) {
                 if (debug) {
-                    alog("channel: MODE %s %c%c for nonexistent user %s",
+                    alog("debug: MODE %s %c%c for nonexistent user %s",
                          chan->name, (add ? '+' : '-'), mode, *av);
                 }
                 continue;
@@ -357,7 +357,7 @@ Channel *findchan(const char *chan)
 
     if (!chan || !*chan) {
         if (debug) {
-            alog("Error: findchan() called with NULL values");
+            alog("debug: findchan() called with NULL values");
         }
         return NULL;
     }
@@ -532,7 +532,7 @@ void do_join(const char *source, int ac, char **av)
     }
     if (!user) {
         if (debug) {
-            alog("user: JOIN from nonexistent user %s: %s", source,
+            alog("debug: JOIN from nonexistent user %s: %s", source,
                  merge_args(ac, av));
         }
         return;
@@ -614,7 +614,7 @@ void do_kick(const char *source, int ac, char **av)
         }
         if (!user) {
             if (debug) {
-                alog("user: KICK for nonexistent user %s on %s: %s", s,
+                alog("debug: KICK for nonexistent user %s on %s: %s", s,
                      av[0], merge_args(ac - 2, av + 2));
             }
             continue;
@@ -657,7 +657,7 @@ void do_part(const char *source, int ac, char **av)
     user = finduser(source);
     if (!user) {
         if (debug) {
-            alog("user: PART from nonexistent user %s: %s", source,
+            alog("debug: PART from nonexistent user %s: %s", source,
                  merge_args(ac, av));
         }
         return;
@@ -812,7 +812,7 @@ void do_sjoin(const char *source, int ac, char **av)
             }
             if (!user) {
                 if (debug) {
-                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                    alog("debug: SJOIN for nonexistent user %s on %s", s,
                          av[1]);
                 }
                 return;
@@ -894,7 +894,7 @@ void do_sjoin(const char *source, int ac, char **av)
 
             if (!user) {
                 if (debug) {
-                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                    alog("debug: SJOIN for nonexistent user %s on %s", s,
                          av[1]);
                 }
                 return;
@@ -971,7 +971,7 @@ void do_sjoin(const char *source, int ac, char **av)
             }
             if (!user) {
                 if (debug) {
-                    alog("user: SJOIN for nonexistent user %s on %s", s,
+                    alog("debug: SJOIN for nonexistent user %s on %s", s,
                          av[1]);
                 }
                 return;
@@ -1026,7 +1026,7 @@ void do_sjoin(const char *source, int ac, char **av)
         }
         if (!user) {
             if (debug) {
-                alog("user: SJOIN for nonexistent user %s on %s", source,
+                alog("debug: SJOIN for nonexistent user %s on %s", source,
                      av[1]);
             }
             return;
@@ -1110,7 +1110,7 @@ void do_cmode(const char *source, int ac, char **av)
         ci = cs_findchan(av[0]);
         if (!(ci && (ci->flags & CI_VERBOTEN)))
             if (debug) {
-                alog("channel: MODE %s for nonexistent channel %s",
+                alog("debug: MODE %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
             }
         return;
@@ -1154,7 +1154,7 @@ void do_topic(const char *source, int ac, char **av)
 
     if (!c) {
         if (debug) {
-            alog("channel: TOPIC %s for nonexistent channel %s",
+            alog("debug: TOPIC %s for nonexistent channel %s",
                  merge_args(ac - 1, av + 1), av[0]);
         }
         return;

@@ -606,7 +606,7 @@ int anope_event_topic(char *source, int ac, char **av)
 
         if (!c) {
             if (debug) {
-                alog("channel: TOPIC %s for nonexistent channel %s",
+                alog("debug: TOPIC %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
             }
             return MOD_CONT;
@@ -911,7 +911,7 @@ int anope_event_sethost(char *source, int ac, char **av)
     u = finduser(source);
     if (!u) {
         if (debug) {
-            alog("user: SETHOST for nonexistent user %s", source);
+            alog("debug: SETHOST for nonexistent user %s", source);
         }
         return MOD_CONT;
     }
@@ -1443,7 +1443,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

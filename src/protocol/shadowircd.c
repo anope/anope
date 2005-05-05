@@ -636,7 +636,7 @@ int anope_event_chghost(char *source, int ac, char **av)
     u = find_byuid(av[0]);
     if (!u) {
         if (debug) {
-            alog("user: CHGHOST for nonexistent user %s", av[0]);
+            alog("debug: CHGHOST for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -657,7 +657,7 @@ int anope_event_topic(char *source, int ac, char **av)
 
         if (!c) {
             if (debug) {
-                alog("channel: TOPIC %s for nonexistent channel %s",
+                alog("debug: TOPIC %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
             }
             return MOD_CONT;
@@ -703,7 +703,7 @@ int anope_event_tburst(char *source, int ac, char **av)
 
     if (!c) {
         if (debug) {
-            alog("channel: TOPIC %s for nonexistent channel %s",
+            alog("debug: TOPIC %s for nonexistent channel %s",
                  merge_args(ac - 1, av + 1), av[0]);
         }
         return MOD_CONT;
@@ -1641,7 +1641,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

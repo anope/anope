@@ -277,7 +277,7 @@ void process()
         }
     } else {
         if (debug)
-            alog("unknown message from server (%s)", inbuf);
+            alog("debug: unknown message from server (%s)", inbuf);
     }
     if (mod_current_op == 1) {
         alog("trying to load [%s]", mod_current_module->name);

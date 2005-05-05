@@ -419,44 +419,44 @@ void rdb_load_dbases(void)
         rdb_load_ns_dbase();
         anope_cmd_pong(ServerName, ServerName);
         if (debug)
-            alog("RDB: Loaded NickServ DataBase (1/8)");
+            alog("debug: RDB Loaded NickServ DataBase (1/8)");
         if (s_HostServ) {
             rdb_load_hs_dbase();
             anope_cmd_pong(ServerName, ServerName);
             if (debug)
-                alog("RDB: Loaded HostServ DataBase (2/8)");
+                alog("debug: RDB Loaded HostServ DataBase (2/8)");
         }
         if (s_BotServ) {
             rdb_load_bs_dbase();
             anope_cmd_pong(ServerName, ServerName);
             if (debug)
-                alog("RDB: Loaded BotServ DataBase (3/8)");
+                alog("debug: RDB Loaded BotServ DataBase (3/8)");
         }
         rdb_load_cs_dbase();
         anope_cmd_pong(ServerName, ServerName);
         if (debug)
-            alog("RDB: Loaded ChanServ DataBase (4/8)");
+            alog("debug: RDB Loaded ChanServ DataBase (4/8)");
     }
     rdb_load_os_dbase();
     anope_cmd_pong(ServerName, ServerName);
     if (debug)
-        alog("RDB: Loaded OperServ DataBase (5/8)");
+        alog("debug: RDB Loaded OperServ DataBase (5/8)");
     rdb_load_news();
     anope_cmd_pong(ServerName, ServerName);
     if (debug)
-        alog("RDB: Loaded News DataBase (6/8)");
+        alog("debug: RDB Loaded News DataBase (6/8)");
     rdb_load_exceptions();
     anope_cmd_pong(ServerName, ServerName);
     if (debug)
-        alog("RDB: Loaded Exception Database (7/8)");
+        alog("debug: RDB Loaded Exception Database (7/8)");
     if (PreNickDBName) {
         rdb_load_ns_req_dbase();
         anope_cmd_pong(ServerName, ServerName);
         if (debug)
-            alog("RDB: Loaded PreNick DataBase (8/8)");
+            alog("debug: RDB Loaded PreNick DataBase (8/8)");
     } else {
         if (debug)
-            alog("RDB: No need to load PreNickDB (8/8)");
+            alog("debug: RDB No need to load PreNickDB (8/8)");
     }
     alog("RDB: All DataBases loaded.");
 }

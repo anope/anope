@@ -1393,7 +1393,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

@@ -1183,7 +1183,7 @@ NickRequest *findrequestnick(const char *nick)
 
     if (!*nick || !nick) {
         if (debug) {
-            alog("Error: findrequestnick() called with NULL values");
+            alog("debug: findrequestnick() called with NULL values");
         }
         return NULL;
     }
@@ -1204,7 +1204,7 @@ NickAlias *findnick(const char *nick)
 
     if (!nick || !*nick) {
         if (debug) {
-            alog("Error: findnick() called with NULL values");
+            alog("debug: findnick() called with NULL values");
         }
         return NULL;
     }
@@ -1228,7 +1228,7 @@ NickCore *findcore(const char *nick)
 
     if (!nick || !*nick) {
         if (debug) {
-            alog("Error: findcore() called with NULL values");
+            alog("debug: findcore() called with NULL values");
         }
         return NULL;
     }
@@ -1797,8 +1797,8 @@ void clean_ns_timeouts(NickAlias * na)
         next = t->next;
         if (t->na == na) {
             if (debug)
-                alog("%s: deleting timeout type %d from %s", s_NickServ,
-                     t->type, t->na->nick);
+                alog("debug: %s deleting timeout type %d from %s",
+                     s_NickServ, t->type, t->na->nick);
             /* If the timeout has the TO_RELEASE type, we should release the user */
             if (t->type == TO_RELEASE)
                 release(na, 1);

@@ -324,7 +324,7 @@ User *finduser(const char *nick)
 
     if (!nick || !*nick) {
         if (debug) {
-            alog("Error: finduser() called with NULL values");
+            alog("debug: finduser() called with NULL values");
         }
         return NULL;
     }

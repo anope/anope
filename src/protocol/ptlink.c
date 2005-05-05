@@ -425,7 +425,7 @@ int anope_event_newmask(char *source, int ac, char **av)
 
     if (!u) {
         if (debug) {
-            alog("user: NEWMASK for nonexistent user %s", av[0]);
+            alog("debug: NEWMASK for nonexistent user %s", av[0]);
         }
         return MOD_CONT;
     }
@@ -729,7 +729,7 @@ int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
-            alog("ERROR: %s", av[0]);
+            alog("debug: %s", av[0]);
         }
     }
     return MOD_CONT;

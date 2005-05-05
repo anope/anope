@@ -1,5 +1,6 @@
 Anope Version S V N
 -------------------
+05/05 F Segfault in ns_maxemail when passing wrong param count.           [ #00]
 05/05 F ULined servers still got their modes removed with SecureOps on.   [ #00]
 05/05 F Missing access checks when removing modes due to SecureOps.       [#366]
 Provided by Anope Dev. <dev@anope.org> - 2005

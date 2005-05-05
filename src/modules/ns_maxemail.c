@@ -116,6 +116,8 @@ int my_ns_register(User * u)
 
     cur_buffer = moduleGetLastBuffer();
     email = myStrGetToken(cur_buffer, ' ', 1);
+	if (!email)
+		return MOD_CONT;
 
     ret = check_email_limit_reached(email, u);
     free(email);
@@ -132,7 +134,10 @@ int my_ns_set(User * u)
 
     cur_buffer = moduleGetLastBuffer();
     set = myStrGetToken(cur_buffer, ' ', 0);
-
+	
+	if (!set)
+		return MOD_CONT;
+	
     if (stricmp(set, "email") != 0) {
         free(set);
         return MOD_CONT;
@@ -140,6 +145,8 @@ int my_ns_set(User * u)
 
     free(set);
     email = myStrGetToken(cur_buffer, ' ', 1);
+	if (!email)
+		return MOD_CONT;
 
     ret = check_email_limit_reached(email, u);
     free(email);

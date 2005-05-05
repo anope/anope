@@ -383,9 +383,13 @@ void inspircd_set_umode(User * user, int ac, char **av)
 
     while (*modes) {
 
-        add ? (user->mode |= umodes[(int) *modes]) : (user->mode &=
-                                                      ~umodes[(int)
-                                                              *modes]);
+        /* This looks better, much better than "add ? (do_add) : (do_remove)".
+         * At least this is readable without paying much attention :) -GD
+         */
+        if (add)
+            user->mode |= umodes[(int) *modes];
+        else
+            user->mode &= ~umodes[(int) *modes];
 
         switch (*modes++) {
         case '+':
@@ -497,8 +501,7 @@ void inspircd_cmd_remove_akill(char *user, char *host)
 void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
                         char *topic, time_t when)
 {
-    send_cmd(NULL, "t %lu %s %s :%s", (unsigned long int) when, whosetit,
-             chan, topic);
+    send_cmd(NULL, "t %s %s :%s", whosets, chan, topic);
 }
 
 void inspircd_cmd_vhost_off(User * u)
@@ -911,23 +914,29 @@ int anope_event_away(char *source, int ac, char **av)
 
 int anope_event_servertopic(char *source, int ac, char **av)
 {
+    /* T 1115252145 ViaraiX #deck8 :Welcome to Deck8 */
     char *v[32];
     if (ac != 4)
         return MOD_CONT;
-    v[0] = av[2];               // channel
-    v[1] = av[3];               // topic
-    do_topic(NULL, 2, v);       // no source (server set)
+    v[0] = av[2];
+    v[1] = av[1];
+    v[2] = av[0];
+    v[3] = av[3];
+    do_topic(NULL, 4, v);       // no source (server set)
     return MOD_CONT;
 }
 
 int anope_event_topic(char *source, int ac, char **av)
 {
+    // t [Brain] #chatspike :this is a topic test fsfdsfsdfds
     char *v[32];
     if (ac != 3)
         return MOD_CONT;
-    v[0] = av[1];               // channel
-    v[1] = av[2];               // topic content
-    do_topic(av[0], 2, v);
+    v[0] = av[1];
+    v[1] = av[0];
+    v[2] = "0";
+    v[3] = av[2];
+    do_topic(av[0], 3, v);
     return MOD_CONT;
 }
 

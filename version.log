@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="778"
+VERSION_BUILD="779"
 
 # $Log$
+#
+# BUILD : 1.7.9 (779)
+# BUGS  : none
+# NOTES : TS6 nick tracking fix by static
 #
 # BUILD : 1.7.9 (778)
 # BUGS  : N/A

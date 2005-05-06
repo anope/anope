@@ -647,7 +647,10 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
     } else {
         /* An old user changing nicks. */
-        user = finduser(source);
+        if (UseTS6)
+            user = find_byuid(source);
+        else
+            user = finduser(source);
 
         if (!user) {
             alog("user: NICK from nonexistent nick %s", source);

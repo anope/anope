@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="780"
+VERSION_BUILD="781"
 
 # $Log$
+#
+# BUILD : 1.7.9 (781)
+# BUGS  : 358 364
+# NOTES : Changed chan_set_correct_modes() to allow identified founders to get founder is SECUREFOUNDER is on. Added code in delchan() to logout people identified as founder to the channel dropped.
 #
 # BUILD : 1.7.9 (780)
 # BUGS  : none

@@ -1297,10 +1297,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
         alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
 
     if (give_modes && (get_ignore(user->nick) == NULL)) {
-        if (ircd->owner
-            &&
-            (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
-             || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))))
+        if (ircd->owner && is_founder(user, ci))
             add_modes |= CUS_OWNER;
         else if ((ircd->protect || ircd->admin)
                  && check_access(user, ci, CA_AUTOPROTECT))
@@ -1320,11 +1317,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
      */
     if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1))
         && !is_ulined(user->server->name)) {
-        if (ircd->owner && (status & CUS_OWNER)
-            &&
-            !(((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
-              || (!(ci->flags & CI_SECUREFOUNDER)
-                  && is_founder(user, ci))))
+        if (ircd->owner && (status & CUS_OWNER) && !is_founder(user, ci))
             rem_modes |= CUS_OWNER;
         if ((ircd->protect || ircd->admin) && (status & CUS_PROTECT)
             && !check_access(user, ci, CA_AUTOPROTECT)

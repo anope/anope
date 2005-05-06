@@ -1933,6 +1933,8 @@ int delchan(ChannelInfo * ci)
 {
     int i;
     NickCore *nc;
+    User *u;
+    struct u_chaninfolist *cilist, *cilist_next;
 
     if (!ci) {
         if (debug) {
@@ -1975,6 +1977,34 @@ int delchan(ChannelInfo * ci)
         alog("debug: delchan() rdb done");
     }
 #endif
+    if (debug >= 2) {
+        alog("debug: delchan() founder cleanup");
+    }
+    for (i = 0; i < 1024; i++) {
+        for (u = userlist[i]; u; u = u->next) {
+            cilist = u->founder_chans;
+            while (cilist) {
+                cilist_next = cilist->next;
+                if (cilist->chan == ci) {
+                    if (debug)
+                        alog("debug: Dropping founder login of %s for %s",
+                             u->nick, ci->name);
+                    if (cilist->next)
+                        cilist->next->prev = cilist->prev;
+                    if (cilist->prev)
+                        cilist->prev->next = cilist->next;
+                    else
+                        u->founder_chans = cilist->next;
+                    free(cilist);
+                }
+                cilist = cilist_next;
+            }
+        }
+    }
+    if (debug >= 2) {
+        alog("debug: delchan() founder cleanup done");
+    }
+
     if (ci->next)
         ci->next->prev = ci->prev;
     if (ci->prev)

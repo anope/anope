@@ -321,6 +321,7 @@ int do_clearmodes(User * u)
                 free(argv[1]);
                 free(argv[0]);
             }
+			
             if (excepts) {
                 free(excepts);
             }
@@ -336,7 +337,7 @@ int do_clearmodes(User * u)
 
             for (i = 0; i < invitecount; i++) {
                 argv[0] = sstrdup("-I");
-                argv[1] = excepts[i];
+                argv[1] = invites[i];
                 anope_cmd_mode(s_OperServ, c->name, "-I %s", argv[1]);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
                 free(argv[1]);

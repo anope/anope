@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="781"
+VERSION_BUILD="782"
 
 # $Log$
+#
+# BUILD : 1.7.9 (782)
+# BUGS  : 357
+# NOTES : Fixed a segfault in os_clearmodes when clearing invites -- it used the exception list for the invite hosts, not the invite list, which is bad :)
 #
 # BUILD : 1.7.9 (781)
 # BUGS  : 358 364

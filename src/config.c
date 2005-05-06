@@ -804,7 +804,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
 int parse(char *buf, int linenum, int reload)
 {
     char *s, *t, *dir;
-    int i, n, optind, val;
+    int n;
     int retval = 1;
     int ac = 0;
     char *av[MAXPARAMS];
@@ -858,7 +858,7 @@ int parse(char *buf, int linenum, int reload)
 
     if (n == lenof(directives)) {
 /*        error(linenum, "Unknown directive `%s'", dir);
-        return 1;               /* don't cause abort */
+                return 1;               *//* don't cause abort */
     }
 
     return retval;

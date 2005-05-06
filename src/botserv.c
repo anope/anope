@@ -138,8 +138,6 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
     int16 cstatus = 0;
     char *cmd;
     UserData *ud;
-    int found = 0;
-
 
     if (!u || !buf || !ci) {
         return;

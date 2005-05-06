@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="782"
+VERSION_BUILD="783"
 
 # $Log$
+#
+# BUILD : 1.7.9 (783)
+# BUGS  : 
+# NOTES : Fixed most compiler warnings for the core (not modules) when using make strict
 #
 # BUILD : 1.7.9 (782)
 # BUGS  : 357

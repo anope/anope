@@ -1,5 +1,6 @@
 Anope Version S V N
 -------------------
+05/06 F Compiler warnings when using make strict.                         [ #00]
 05/06 F Segfault in os_clearmodes when chan had invites (+I) set.         [#357]
 05/06 F Identified founders are now logged out if the channel is dropped. [#364]
 05/06 F Founders identified by pass can get founder chanmode again.       [#358]

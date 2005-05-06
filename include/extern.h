@@ -445,6 +445,8 @@ E int   CloneWarningDelay;
 E int   KillClones;
 E int   AddAkiller;
 
+E int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS], int linenum, int reload, char *s);
+
 /**
  * Modules Stuff
  **/
@@ -673,6 +675,7 @@ E void pmodule_limit_mode(int mode);
 
 E int anope_get_secret_mode();
 E int anope_get_invite_mode();
+E int anope_get_key_mode();
 E int anope_get_limit_mode();
 E int anope_get_private_mode();
 E int anope_get_invis_mode();
@@ -830,6 +833,7 @@ E char *str_signed(unsigned char *str);
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
 /**** modules.c ****/
+E void modules_core_init(int number, char **list);
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
 

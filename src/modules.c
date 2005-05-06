@@ -1896,7 +1896,6 @@ void moduleDisplayHelp(int service, User * u)
 {
 #ifdef USE_MODULES
     int idx;
-    int header_shown = 0;
     ModuleHash *current = NULL;
 	Module *calling_module = mod_current_module;
 	char *calling_module_name = mod_current_module_name;
@@ -2300,12 +2299,10 @@ int moduleGetConfigDirective(Directive * d)
     char *dir;
     char buf[1024];
     int linenum = 0;
-    int i;
-    int optind = 0;
     int ac = 0;
     char *av[MAXPARAMS];
     char *s, *t;
-    int retval;
+    int retval = 1;
 
     config = fopen(SERVICES_CONF, "r");
     if (!config) {

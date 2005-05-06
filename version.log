@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="779"
+VERSION_BUILD="780"
 
 # $Log$
+#
+# BUILD : 1.7.9 (780)
+# BUGS  : none
+# NOTES : Language to clarify configuration directive dependencies.
 #
 # BUILD : 1.7.9 (779)
 # BUGS  : none

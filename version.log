@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="783"
+VERSION_BUILD="784"
 
 # $Log$
+#
+# BUILD : 1.7.9 (784)
+# BUGS  : 
+# NOTES : Fixed another segfault in ns_maxemail, forget a check for nc->email this time.
 #
 # BUILD : 1.7.9 (783)
 # BUGS  : 

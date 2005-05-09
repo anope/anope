@@ -82,8 +82,7 @@ int count_email_in_use(char *email, User * u)
 
     for (i = 0; i < 1024; i++) {
         for (nc = nclists[i]; nc; nc = nc->next) {
-            if (!(u->na && u->na->nc && u->na->nc == nc)
-                && (stricmp(nc->email, email) == 0))
+            if (!(u->na && u->na->nc && (u->na->nc == nc)) && nc->email && (stricmp(nc->email, email) == 0))
                 count++;
         }
     }

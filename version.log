@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="784"
+VERSION_BUILD="785"
 
 # $Log$
+#
+# BUILD : 1.7.9 (785)
+# BUGS  : 371 372
+# NOTES : Set mod_current_module_name for AnopeFini and updated get_access to return -1 for non-identified users instead of 0.
 #
 # BUILD : 1.7.9 (784)
 # BUGS  : 

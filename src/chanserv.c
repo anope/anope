@@ -2210,20 +2210,23 @@ int get_access(User * user, ChannelInfo * ci)
     ChanAccess *access;
 
     if (!ci || !user)
-        return 0;
+        return -1;
 
     if (is_founder(user, ci))
         return ACCESS_FOUNDER;
 
     if (!user->na)
-        return 0;
+        return -1;
 
     if (nick_identified(user)
         || (nick_recognized(user) && !(ci->flags & CI_SECURE)))
         if ((access = get_access_entry(user->na->nc, ci)))
             return access->level;
 
-    return 0;
+    if (nick_identified(user))
+        return 0;
+
+    return -1;
 }
 
 /*************************************************************************/

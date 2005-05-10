@@ -1,5 +1,7 @@
 Anope Version S V N
 -------------------
+05/10 F AnopeFini was called without mod_current_module_name set.         [#371]
+05/10 F Unidentified users now have level -1 instead of 0 again.          [#372]
 05/09 F Segfault in ns_maxemail when user's email not set.                [ #00]
 05/06 F Compiler warnings when using make strict.                         [ #00]
 05/06 F Segfault in os_clearmodes when chan had invites (+I) set.         [#357]

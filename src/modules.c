@@ -540,7 +540,9 @@ int unloadModule(Module * m, User * u)
 
     func = ano_modsym(m->handle, "AnopeFini");
     if (func) {
+        mod_current_module_name = m->name;
         func();                 /* exec AnopeFini */
+        mod_current_module_name = NULL;
     }
 
     if ((ano_modclose(m->handle)) != 0) {

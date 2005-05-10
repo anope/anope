@@ -1929,7 +1929,6 @@ BOT_BOT_SYNTAX
 	BOT ADD nick usuari host nom-real
 	BOT CHANGE nick-antic nick-nou [usuari [host [nom-real]]]
 	BOT DEL nick
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	El bot %s ja existeix.
 BOT_BOT_CREATION_FAILED

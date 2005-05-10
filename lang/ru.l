@@ -1922,7 +1922,6 @@ BOT_BOT_SYNTAX
 	BOT ADD ник идент хост реальное имя
 	BOT CHANGE старый ник новый ник [идент [хост [реальное имя]]]
 	BOT DEL ник
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	Бот %s уже существует.
 BOT_BOT_CREATION_FAILED

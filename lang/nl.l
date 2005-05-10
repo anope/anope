@@ -1914,7 +1914,6 @@ BOT_BOT_SYNTAX
 	BOT ADD nick gebruiker host echte naam
 	BOT CHANGE oude-nick nieuwe-nick [gebruiker [host [echte naam]]]
 	BOT DEL nick
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	Bot %s bestaat al.
 BOT_BOT_CREATION_FAILED

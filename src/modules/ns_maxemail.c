@@ -189,8 +189,16 @@ void my_add_languages(void)
         "Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
     };
 
+   char *langtable_de[] = {
+        /* LNG_NSEMAILMAX_REACHED */
+        "Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
+        /* LNG_NSEMAILMAX_REACHED_ONE */
+        "Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
+   };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
+    moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
 }
 
 /* EOF */

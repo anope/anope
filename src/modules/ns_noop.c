@@ -390,9 +390,9 @@ void m_AddLanguages(void)
         /* AUTOOP_OFF */
         "You will no longer be auto op'ed in channels when you join them",
         /* AUTOOP_DESC */
-        "    AUTOOP     Toggles auto-op'ing when joining rooms",
+        "    AUTOOP     Toggles auto-op'ing when joining channels",
         /* AUTOOP_HELP */
-        "When set to ON, this command will prevent %s setting any\n"
+        "When set to OFF, this command will prevent %s setting any\n"
             "modes on you when you join any channel. This command requires\n"
             "you to be identified."
     };
@@ -414,7 +414,7 @@ void m_AddLanguages(void)
         /* AUTOOP_DESC */
         "    AUTOOP     Cambia la opcion de auto-op cuando entras a un canal",
         /* AUTOOP_HELP */
-        "Cuando esta en ON, evitaras que ChanServ/BotServ\n"
+        "Cuando esta en OFF, evitaras que ChanServ/BotServ\n"
             "cambien tus modos en el canal que tengas acceso.\n",
         "(Debes estar identificado para usar esta opcion)"
     };
@@ -436,15 +436,36 @@ void m_AddLanguages(void)
         /* AUTOOP_DESC */
         "    AUTOOP     Zet auto-op aan of uit",
         /* AUTOOP_HELP */
-        "Wanner dit aan (ON) staat, zal dit commando er voor zorgen dat\n"
+        "Wanner dit UIT (OFF) staat, zal dit commando er voor zorgen dat\n"
             "%s geen kanaalmodes aan jou zal geven wanneer je een\n"
             "kanaal binnen komt. Voor dit command is het vereist dat je\n"
             "geidentificeerd bent."
     };
 
+     char *langtable_de[] = {
+        /* AUTOOP_SYNTAX */
+        "Syntax: AUTOOP [ON|OFF]",
+        /* AUTOOP_STATUS_ON */
+        "Dein aktuelle AUTOOP Einstellung ist AN (ON)",
+        /* AUTOOP_STATUS_OFF */
+        "Dein aktuelle AUTOOP Einstellung ist AUS (OFF)",
+        /* AUTOOP_NO_NICK */
+        "Nur registriete und identifizierte Nicknamen können die Option benutzen",
+        /* AUTOOP_ON */
+        "Du bekommst jetzt Auto-Op wenn du ein Channel joinst",
+        /* AUTOOP_OFF */
+        "Du wirst kein Auto-Op mehr bekommen wenn du ein Channel joinst",
+        /* AUTOOP_DESC */
+        "    AUTOOP     Verwaltet dein Auto-Op wenn du Channels joinst",
+        /* AUTOOP_HELP */
+        "Wenn die Option AUS ist (OFF), wird dir Chanserv/BotServ keine Modis\n"
+            "geben wenn du einen Channel joinst.Um das Befehl zu benutzen\n"
+            "musst du identifiziert sein."
+    };
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
+    moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
 }
 
 /*************************************************************************/

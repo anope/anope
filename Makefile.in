@@ -18,7 +18,6 @@ MYSQL=@MYSQL@
 RDB=@RDB@
 LDFLAGS=@LDFLAGS@
 RUNGROUP=@RUNGROUP@
-IRCDFILE=@IRCDFILE@
 SHARED=@SHARED@
 
 all:   language headers build core protocols tools modules 
@@ -30,7 +29,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
       	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'RDB=${RDB}'\
-	   'MYSQL=${MYSQL}' 'IRCDFILE=${IRCDFILE}' 'SHARED=${SHARED}'
+	   'MYSQL=${MYSQL}' 'SHARED=${SHARED}'
 
 build:
 	@for i in $(SUBDIRS); do \

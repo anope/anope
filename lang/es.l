@@ -1901,7 +1901,6 @@ BOT_BOT_SYNTAX
 	BOT ADD nick usuario host nombre-real
 	BOT CHANGE nick-antiguo nick-nuevo [usuario [host [nombre-real]]]
 	BOT DEL nick
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	El bot %s ya existe.
 BOT_BOT_CREATION_FAILED

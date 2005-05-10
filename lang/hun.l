@@ -1909,7 +1909,6 @@ BOT_BOT_SYNTAX
 	BOT ADD nick user hoszt valósnév
 	BOT CHANGE réginickújnick [user [hoszt [valósnév]]]
 	BOT DEL nick
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	%s nevû bot már létezik.
 BOT_BOT_CREATION_FAILED

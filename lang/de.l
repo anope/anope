@@ -8,7 +8,7 @@
 # Based on the original code of Epona by Lara.
 # Based on the original code of Services by Andy Church. 
 #
-# Translated by chemical <chem@gmx.net>,shine <dh@shinewelt.de>
+# Translated by chemical <chem@gmx.net>,shine <dh@shinewelt.de> bis 28.02.2003
 # - Solltest du irgendwelche Rechtschreibfehler oder sonstige
 #   Verbesserungsvorschläge haben, immer her damit!
 #
@@ -49,7 +49,7 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ##########################################################################
 #
-# INFO ::: Letzte Änderung:	04.04.2005	-- crazy --
+# INFO ::: Letzte Änderung:	07.05.2005	-- crazy --
 #
 ##########################################################################
 
@@ -340,9 +340,9 @@ NICK_REGISTER_SYNTAX
 NICK_REGISTER_SYNTAX_EMAIL
 	REGISTER Passwort eMail
 NICK_REGISTRATION_DISABLED
-	Sorry, das Registrieren von Nicknamen ist derzeit deaktiviert.
+	Das Registrieren von Nicknamen ist derzeit deaktiviert.
 NICK_REGISTRATION_FAILED
-	Sorry, Registrierung fehlgeschlagen.
+	Registrierung fehlgeschlagen.
 NICK_REG_PLEASE_WAIT
 	Bitte warte %d Sekunden, bevor der REGISTER Befehl wieder funktioniert.
 NICK_CANNOT_BE_REGISTERED
@@ -362,9 +362,9 @@ NICK_REG_DELAY
 NICK_GROUP_SYNTAX
 	GROUP Ziel Passwort
 NICK_GROUP_DISABLED
-	Sorry, das Gruppieren von Nicknamen ist derzeit deaktiviert.
+	Das Gruppieren von Nicknamen ist derzeit deaktiviert.
 NICK_GROUP_FAILED
-	Sorry, Gruppieren fehlgeschlagen.
+	Gruppieren fehlgeschlagen.
 NICK_GROUP_PLEASE_WAIT
 	Bitte warte %d Sekunden, bevor der GROUP Befehl wieder funktioniert.
 NICK_GROUP_CHANGE_DISABLED
@@ -381,7 +381,7 @@ NICK_GROUP_JOINED
 NICK_IDENTIFY_SYNTAX
 	IDENTIFY Passwort
 NICK_IDENTIFY_FAILED
-	Sorry, die Identifizierung ist fehlgeschlagen.
+	Die Identifizierung ist fehlgeschlagen.
 NICK_IDENTIFY_SUCCEEDED
 	Passwort akzeptiert - du bist jetzt angemeldet.
 NICK_IDENTIFY_EMAIL_REQUIRED
@@ -415,7 +415,7 @@ NICK_LOGOUT_SERVICESADMIN
 
 # DROP responses
 NICK_DROP_DISABLED
-	Sorry, das Entfernen von Nicknamen ist derzeit deaktiviert.
+	Das Entfernen von Nicknamen ist derzeit deaktiviert.
 NICK_DROPPED
 	Die Registrierung deines Nicknamens wurde gelöscht.
 NICK_X_DROPPED
@@ -427,7 +427,7 @@ NICK_SET_SYNTAX
 NICK_SET_SERVADMIN_SYNTAX
 	SET [Nickname] Option Parameter
 NICK_SET_DISABLED
-	Sorry, das Ändern der Optionen wurde deaktiviert.
+	Das Ändern der Optionen wurde deaktiviert.
 NICK_SET_UNKNOWN_OPTION
 	Unbekannte SET Option %s.
 NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
@@ -443,7 +443,7 @@ NICK_SET_DISPLAY_CHANGED
 
 # SET PASSWORD responses
 NICK_SET_PASSWORD_FAILED
-	Sorry, konnte dein Passwort nicht ändern.
+	Konnte dein Passwort nicht ändern.
 NICK_SET_PASSWORD_CHANGED
 	Passwort geändert.
 NICK_SET_PASSWORD_CHANGED_TO
@@ -559,7 +559,7 @@ NICK_ACCESS_SYNTAX
 NICK_ACCESS_ALREADY_PRESENT
 	Diese Hostmaske %s ist bereits auf der Access-Liste.
 NICK_ACCESS_REACHED_LIMIT
-	Sorry, du kannst nur %d Einträge auf der Access-Liste speichern.
+	Du kannst nur %d Einträge auf der Access-Liste speichern.
 NICK_ACCESS_ADDED
 	%s wurde zu deiner Access-Liste hinzugefügt.
 NICK_ACCESS_NOT_FOUND
@@ -901,7 +901,7 @@ CHAN_NOT_ALLOWED_TO_JOIN
 CHAN_REGISTER_SYNTAX
 	REGISTER Channel Passwort Beschreibung
 CHAN_REGISTER_DISABLED
-	Sorry, die Registrierung von Channels ist derzeit deaktiviert.
+	Die Registrierung von Channels ist derzeit deaktiviert.
 CHAN_REGISTER_NOT_LOCAL
 	Lokale Channels können nicht registriert werden.
 CHAN_MUST_REGISTER_NICK
@@ -916,11 +916,11 @@ CHAN_ALREADY_REGISTERED
 CHAN_MUST_BE_CHANOP
 	Du musst Channel-Operator sein um diesen Channel zu registrieren.
 CHAN_REACHED_CHANNEL_LIMIT
-	Sorry, du hast bereits %d Channels auf deinen Nicknamen registriert.
+	Du hast bereits %d Channels auf deinen Nicknamen registriert.
 CHAN_EXCEEDED_CHANNEL_LIMIT
-	Sorry, du hast bereits das Limit von %d registrierten Channels erreicht.
+	Du hast bereits das Limit von %d registrierten Channels erreicht.
 CHAN_REGISTRATION_FAILED
-	Sorry, Registrierung fehlgeschlagen.
+	Registrierung fehlgeschlagen.
 CHAN_REGISTERED
 	Der Channel %s ist registriert unter deinem Nicknamen: %s
 CHAN_PASSWORD_IS
@@ -935,7 +935,7 @@ CHAN_SYMBOL_REQUIRED
 CHAN_IDENTIFY_SYNTAX
 	IDENTIFY Channel Passwort
 CHAN_IDENTIFY_FAILED
-	Sorry, Identifizierung ist fehlgeschlagen.
+	Identifizierung ist fehlgeschlagen.
 CHAN_IDENTIFY_SUCCEEDED
 	Passwort akzeptiert - du hast jetzt Founderlevel-Zugriff auf %s.
 
@@ -953,7 +953,7 @@ CHAN_LOGOUT_ALL_SUCCEEDED
 CHAN_DROP_SYNTAX
 	DROP Channel
 CHAN_DROP_DISABLED
-	Sorry, das Entfernen von Channel-Registrierungen ist derzeit deaktiviert.
+	Das Entfernen von Channel-Registrierungen ist derzeit deaktiviert.
 CHAN_DROPPED
 	Channel %s wurde aus der Datenbank entfernt.
 
@@ -961,7 +961,7 @@ CHAN_DROPPED
 CHAN_SET_SYNTAX
 	SET Channel Option Parameter
 CHAN_SET_DISABLED
-	Sorry, Channel-Optionen sind derzeit deaktiviert.
+	Channel-Optionen sind derzeit deaktiviert.
 CHAN_SET_UNKNOWN_OPTION
 	Unbekannte SET-Option %s.
 
@@ -981,7 +981,7 @@ CHAN_SUCCESSOR_IS_FOUNDER
 
 # SET PASSWORD responses
 CHAN_SET_PASSWORD_FAILED
-	Sorry, konnte das Passwort nicht ändern.
+	Konnte das Passwort nicht ändern.
 CHAN_PASSWORD_CHANGED
 	%s Passwort wurde geändert.
 CHAN_PASSWORD_CHANGED_TO
@@ -1128,7 +1128,7 @@ CHAN_SET_NOEXPIRE_OFF
 
 # xOP messages
 CHAN_XOP_REACHED_LIMIT
-	Sorry, du kannst maximal %d AOP/SOP/VOP Einträge in einem Channel haben.
+	Du kannst maximal %d AOP/SOP/VOP Einträge in einem Channel haben.
 CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
@@ -1139,7 +1139,7 @@ CHAN_XOP_ACCESS
 CHAN_AOP_SYNTAX
 	AOP Channel {ADD|DEL|LIST|CLEAR} [Nickname | entry-liste]
 CHAN_AOP_DISABLED
-	Sorry, die Channel AOP-Liste kann derzeit nicht geändert werden.
+	Die Channel AOP-Liste kann derzeit nicht geändert werden.
 CHAN_AOP_NICKS_ONLY
 	Die Channel AOP-Liste darf nur registrierte Nicknamen enthalten.
 CHAN_AOP_ADDED
@@ -1170,7 +1170,7 @@ CHAN_AOP_CLEAR
 CHAN_HOP_SYNTAX
 	HOP Channel {ADD|DEL|LIST|CLEAR} [Nickname | entry-liste]
 CHAN_HOP_DISABLED
-	Sorry, die Channel HOP-Liste kann derzeit nicht geändert werden.
+	Die Channel HOP-Liste kann derzeit nicht geändert werden.
 CHAN_HOP_NICKS_ONLY
 	Die Channel HOP-Liste darf nur registrierte Nicknamen enthalten.
 CHAN_HOP_ADDED
@@ -1201,7 +1201,7 @@ CHAN_HOP_CLEAR
 CHAN_SOP_SYNTAX
 	SOP Channel {ADD|DEL|LIST|CLEAR} [Nickname | entry-liste]
 CHAN_SOP_DISABLED
-	Sorry, die Channel SOP-Liste kann derzeit nicht geändert werden.
+	Die Channel SOP-Liste kann derzeit nicht geändert werden.
 CHAN_SOP_NICKS_ONLY
 	Die Channel SOP-Liste darf nur registrierte Nicknamen enthalten.
 CHAN_SOP_ADDED
@@ -1232,7 +1232,7 @@ CHAN_SOP_CLEAR
 CHAN_VOP_SYNTAX
 	VOP Channel {ADD|DEL|LIST|CLEAR} [Nickname | entry-liste]
 CHAN_VOP_DISABLED
-	Sorry, die Channel VOP-Liste kann derzeit nicht geändert werden.
+	Die Channel VOP-Liste kann derzeit nicht geändert werden.
 CHAN_VOP_NICKS_ONLY
 	Die Channel VOP-Liste darf nur registrierte Nicknamen enthalten.
 CHAN_VOP_ADDED
@@ -1267,15 +1267,15 @@ CHAN_ACCESS_XOP
 	Nutze stattdessen die AOP, SOP und VOP Befehle.
 	Tippe /msg %s HELP Befehl für weitere Informationen.
 CHAN_ACCESS_DISABLED
-	Sorry, das Ändern der Channel-Access-Liste wurde zwischenzeitig deaktiviert.
+	Das Ändern der Channel-Access-Liste wurde zwischenzeitig deaktiviert.
 CHAN_ACCESS_LEVEL_NONZERO
-	Access-Level muss grösser 0 sein.
+	Access-Level muss grösser als 0 sein.
 CHAN_ACCESS_LEVEL_RANGE
 	Access-Level muss zwischen %d und einschliesslich %d liegen.
 CHAN_ACCESS_NICKS_ONLY
 	Die Channel-Access-Liste darf nur registrierte Nicknamen enthalten.
 CHAN_ACCESS_REACHED_LIMIT
-	Sorry, aber die Access-Liste ist auf %d Einträge beschränkt.
+	Die Access-Liste ist auf %d Einträge beschränkt.
 CHAN_ACCESS_LEVEL_UNCHANGED
 	Access-Level für %s in %s ist unverändert auf %d.
 CHAN_ACCESS_LEVEL_CHANGED
@@ -1312,11 +1312,11 @@ CHAN_ACCESS_CLEAR
 CHAN_AKICK_SYNTAX
 	AKICK Channel {ADD | DEL | LIST | VIEW | ENFORCE | CLEAR} [Nickname/Usermaske]
 CHAN_AKICK_DISABLED
-	Sorry, das Bearbeiten der AutoKick-Liste wurde zwischenzeitlich deaktiviert.
+	Das Bearbeiten der AutoKick-Liste wurde zwischenzeitlich deaktiviert.
 CHAN_AKICK_ALREADY_EXISTS
 	%s existiert bereits auf der AutoKick-Liste von %s.
 CHAN_AKICK_REACHED_LIMIT
-	Sorry, du kannst nur max. %d Einträge auf der AutoKick-Liste haben.
+	Du kannst nur max. %d Einträge auf der AutoKick-Liste haben.
 CHAN_AKICK_ADDED
 	%s wurde der AutoKick-Liste von %s hinzugefügt.
 CHAN_AKICK_NO_SUCH_ENTRY
@@ -1510,9 +1510,9 @@ CHAN_GETPASS_PASSWORD_IS
 CHAN_GETKEY_SYNTAX
 	GETKEY Channel
 CHAN_GETKEY_NOKEY
-	Der Channel %s hat kein Key.
+	Der Channel %s hat keinen Schlüßel.
 CHAN_GETKEY_KEY
-	Key für den Channel %s ist %s.
+	Schlüßel für den Channel %s ist %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -1578,7 +1578,7 @@ CHAN_EXCEPTED
 
 ###########################################################################
 #
-# MemoServ messages  ## 22.10.2004 ##
+# MemoServ messages
 #
 ###########################################################################
 
@@ -1622,7 +1622,7 @@ MEMO_LIST_NOT_FOUND
 MEMO_SEND_SYNTAX
 	SEND {Nickname | Channel} Memo-text
 MEMO_SEND_DISABLED
-	Sorry, der Memo-Versand wurde kurzzeitig deaktiviert.
+	Der Memo-Versand wurde kurzzeitig deaktiviert.
 MEMO_SEND_PLEASE_WAIT
 	Bitte warte %d Sekunden bis du den SEND Befehl wieder benutzen kannst.
 MEMO_X_GETS_NO_MEMOS
@@ -1640,7 +1640,7 @@ MEMO_MASS_SENT
 MEMO_CANCEL_SYNTAX
 	CANCEL {Nickname | Channel}
 MEMO_CANCEL_DISABLED
-	Sorry, das Widerrufen von Memos wurde deaktiviert.
+	Das Widerrufen von Memos wurde deaktiviert.
 MEMO_CANCEL_NONE
 	Kein Memo konnte widerrufen werden.
 MEMO_CANCELLED
@@ -1694,7 +1694,7 @@ MEMO_CHAN_DELETED_ALL
 MEMO_SET_SYNTAX
 	SET Option Parameter
 MEMO_SET_DISABLED
-	Sorry, MEMO SET Befehl wurde kurzzeitig deaktiviert.
+	MEMO SET Befehl wurde kurzzeitig deaktiviert.
 MEMO_SET_UNKNOWN_OPTION
 	Unbekannte SET Option %s.
 
@@ -1819,18 +1819,12 @@ MEMO_MAIL_TEXT2
 	Du hast gerade eine neue Memo von %s erhalten. Dies ist Memo Nummer %d.
 MEMO_MAIL_TEXT3
 	Memo Text:
-
-###########################################################################
-#
-# BotServ messages ## 19.10.2004 ##
-#
-###########################################################################
 	
 # Standard responses
 MEMO_RSEND_PLEASE_WAIT
 	Bitte warte %d Sekunden bevor der RSEND Befehl wieder funktioniert.
 MEMO_RSEND_DISABLED
-	Sorry, RSEND ist auf diesem Netzwerk ausgeschaltet.
+	RSEND ist auf diesem Netzwerk ausgeschaltet.
 MEMO_RSEND_SYNTAX
 	RSEND {Nickname | Channel} Memo-text
 MEMO_RSEND_NICK_MEMO_TEXT
@@ -1840,12 +1834,6 @@ MEMO_RSEND_CHAN_MEMO_TEXT
 MEMO_RSEND_USER_NOTIFICATION
 	Eine Benachrichtigungs-Memo wurde zum %s gesendet um ihn/sie zu
 	informieren das du seine/ihre Memo gelesen hast.
-
-###########################################################################
-#
-# BotServ messages  ## 18.10.2004 ##
-#
-###########################################################################
 	
 # Standard responses
 MEMO_CHECK_SYNTAX
@@ -1857,12 +1845,6 @@ MEMO_CHECK_READ
 MEMO_CHECK_NO_MEMO
 	Nickname %s hat keine Memo von dir.
 
-###########################################################################
-#
-# BotServ messages  ## 18.10. 2004 ##
-#
-###########################################################################
-	
 # Standard responses
 MEMO_NO_RSEND_SELF
 	Das Erhalten von Empfangsbestätigungen ist nur beim Senden
@@ -1923,16 +1905,15 @@ BOT_SEEN_UNKNOWN
 BOT_BOT_SYNTAX
 	BOT ADD Botnick User Hostmaske Realname
 	BOT CHANGE Botnick Neuer-Botnick [User [Hostmaske [Realname]]]
-	BOT DEL Nickname
-	BOT LIST
+	BOT DEL Nickname
 BOT_BOT_ALREADY_EXISTS
 	Bot %s existiert bereits.
 BOT_BOT_CREATION_FAILED
-	Sorry, Erstellung des Bots ist fehlgeschlagen.
+	Erstellung des Bots ist fehlgeschlagen.
 BOT_BOT_READONLY
-	Sorry, das Verändern von Bot-Einstellungen ist derzeit deaktiviert.
+	Das Verändern von Bot-Einstellungen ist derzeit deaktiviert.
 BOT_BOT_ADDED
-	%s!%s@%s (%s) wurde zur Bot-Liste hinzugefügt.
+	%s!%s@%s (%s) wurde zur der Bot-Liste hinzugefügt.
 BOT_BOT_ANY_CHANGES
 	Das alten Informationen stimmen mit den neuen überein.
 BOT_BOT_CHANGED
@@ -1955,7 +1936,7 @@ BOT_BOTLIST_EMPTY
 BOT_ASSIGN_SYNTAX
 	ASSIGN Channel Nickname
 BOT_ASSIGN_READONLY
-	Sorry, das Zuweisen von Bots ist derzeit deaktiviert.
+	Das Zuweisen von Bots ist derzeit deaktiviert.
 BOT_ASSIGN_ALREADY
 	Bot %s ist bereits dem Channel %s zugewiesen.
 BOT_ASSIGN_ASSIGNED
@@ -1977,21 +1958,21 @@ BOT_INFO_BOT_HEADER
 BOT_INFO_BOT_MASK
 	     Hostmaske: %s@%s
 BOT_INFO_BOT_REALNAME
-	   Echter Name: %s
+	     Echter Name: %s
 BOT_INFO_BOT_CREATED
-	      Erstellt: %s
+	     Erstellt: %s
 BOT_INFO_BOT_USAGE
-	    benutzt in: %d Channel(s)
+	     benutzt in: %d Channel(s)
 BOT_INFO_BOT_OPTIONS
-	    Options : %s
+	     Options : %s
 BOT_INFO_OPT_PRIVATE
-	Private
+	     Private
 BOT_INFO_CHAN_HEADER
 	Information von Channel %s:
 BOT_INFO_CHAN_BOT
-	           Bot nick : %s
+	           Botnick : %s
 BOT_INFO_CHAN_BOT_NONE
-	           Bot nick : noch nicht zugewiesen.
+	           Botnick : noch nicht zugewiesen.
 BOT_INFO_CHAN_KICK_BADWORDS
 	   Bad words kicker : %s
 BOT_INFO_CHAN_KICK_BADWORDS_BAN
@@ -2055,7 +2036,7 @@ BOT_INFO_OPT_NONE
 BOT_SET_SYNTAX
 	SET Channel Option Einstellungen
 BOT_SET_DISABLED
-	Sorry, die SET-Optionen sind derzeit deaktiviert.
+	Die SET-Optionen sind derzeit deaktiviert.
 BOT_SET_UNKNOWN
 	Unbekannte Option %s.
 	Tippe /msg %S HELP SET für weitere Informationen.
@@ -2120,7 +2101,7 @@ BOT_SET_SYMBIOSIS_OFF
 BOT_KICK_SYNTAX
 	KICK Channel Option {ON|OFF} [Einstellungen]
 BOT_KICK_DISABLED
-	Sorry, die Konfiguration des Kickers ist derzeit deaktiviert.
+	Die Konfiguration des Kickers ist derzeit deaktiviert.
 BOT_KICK_UNKNOWN
 	Unbekannte Option %s.
 	Tippe /msg %S HELP KICK für weitere Informationen.
@@ -2194,9 +2175,9 @@ BOT_KICK_UNDERLINES_OFF
 BOT_BADWORDS_SYNTAX
 	BADWORDS Channel {ADD|DEL|LIST|CLEAR} [Wort | entry-liste] [SINGLE|START|END]
 BOT_BADWORDS_DISABLED
-	Sorry, das Ändern der Bad Words-Liste ist derzeit deaktiviert.
+	Das Ändern der Bad Words-Liste ist derzeit deaktiviert.
 BOT_BADWORDS_REACHED_LIMIT
-	Sorry, du kannst nur %d Einträge in der Bad Words-Liste eines Channels haben.
+	Du kannst nur %d Einträge in der Bad Words-Liste eines Channels haben.
 BOT_BADWORDS_ALREADY_EXISTS
 	%s existiert bereits in der Bad Words-Liste von %s.
 BOT_BADWORDS_ADDED
@@ -2235,11 +2216,6 @@ BOT_ACT_SYNTAX
 BOT_EXCEPT
 	User stimmt mit Channel Exception überein.
 
-###########################################################################
-#
-# OperServ messages  ## 17.10.2004 ##
-#
-###########################################################################
 
 # General messages
 BOT_BAD_NICK
@@ -2250,7 +2226,7 @@ BOT_BAD_IDENT
 	Bot Idents dürfen nur gültige Zeichen enthalten.
 ###########################################################################
 #
-# OperServ messages ## 19.10.2004 ##
+# OperServ messages
 #
 ###########################################################################
 
@@ -2408,7 +2384,7 @@ OPER_UMODE_CHANGED
 
 # OLINE responses
 OPER_OLINE_SYNTAX
-	OLINE Nickname flags
+	OLINE Nickname Flags
 OPER_OLINE_SUCCESS
 	Operflags %s wurden für %s hinzugefügt. 
 OPER_OLINE_IRCOP
@@ -2441,7 +2417,7 @@ OPER_ADMIN_SKELETON
 OPER_ADMIN_EXISTS
 	%s existiert bereits auf der Services Administratoren-Liste.
 OPER_ADMIN_REACHED_LIMIT
-	Sorry, du kannst nur %d Services Administratoren haben.
+	Du kannst nur %d Services Administratoren haben.
 OPER_ADMIN_ADDED
 	%s wurde zur Liste der Services Administratoren hinzugefügt.
 OPER_ADMIN_NOT_FOUND
@@ -2474,7 +2450,7 @@ OPER_OPER_SKELETON
 OPER_OPER_EXISTS
 	%s existiert bereits auf der Services Operatoren-Liste.
 OPER_OPER_REACHED_LIMIT
-	Sorry, du kannst nur %d Services Operatoren haben.
+	Du kannst nur %d Services Operatoren haben.
 OPER_OPER_ADDED
 	%s wurde zur der Services Operatoren-Liste hinzugefügt.
 OPER_OPER_NOT_FOUND
@@ -2507,7 +2483,7 @@ OPER_AKILL_EXISTS
 OPER_AKILL_ALREADY_COVERED
 	%s wird bereits von %s getroffen.
 OPER_AKILL_REACHED_LIMIT
-	Sorry, du kannst nur %d AKILLs haben.
+	Du kannst nur %d AKILLs haben.
 OPER_AKILL_NO_NICK
 	Achtung: AKILL-Masken dürfen keine Nicknamen enthalten, stelle sicher, dass du keinen in der Hostmaske eingetragen hast.
 OPER_AKILL_ADDED
@@ -2547,13 +2523,13 @@ OPER_CHANKILL_SYNTAX
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]
 OPER_SGLINE_UNSUPPORTED
-	Sorry, SGLINE ist in diesem Netz nicht verfügbar.
+	SGLINE ist in diesem Netz nicht verfügbar.
 OPER_SGLINE_EXISTS
 	%s existiert bereits auf der SGLINE-Liste.
 OPER_SGLINE_ALREADY_COVERED
 	%s wird bereits durch %s getroffen.
 OPER_SGLINE_REACHED_LIMIT
-	Sorry, du kannst nur %d SGLINE's haben.
+	Du kannst nur %d SGLINE's haben.
 OPER_SGLINE_ADDED
 	%s wurde zur SGLINE-Liste hinzugefügt.
 OPER_SGLINE_CHANGED
@@ -2594,7 +2570,7 @@ OPER_SQLINE_EXISTS
 OPER_SQLINE_ALREADY_COVERED
 	%s wird bereits durch %s getroffen.
 OPER_SQLINE_REACHED_LIMIT
-	Sorry, du kannst nur %d SQLINE's haben.
+	Du kannst nur %d SQLINE's haben.
 OPER_SQLINE_ADDED
 	%s wurde zur SQLINE-Liste hinzugefügt.
 OPER_SQLINE_CHANGED
@@ -2629,13 +2605,13 @@ OPER_SQLINE_CLEAR
 OPER_SZLINE_SYNTAX
 	SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmaske | entry-liste} [Grund]]
 OPER_SZLINE_UNSUPPORTED
-	Sorry, SZLINE ist auf diesem Netzwerk nicht verfügbar.
+	SZLINE ist auf diesem Netzwerk nicht verfügbar.
 OPER_SZLINE_EXISTS
 	%s existiert bereits auf der SZLINE-Liste.
 OPER_SZLINE_ALREADY_COVERED
 	%s wird bereits durch %s getroffen.
 OPER_SZLINE_REACHED_LIMIT
-	Sorry, du kannst nur %d SZLINE's haben.
+	Du kannst nur %d SZLINE's haben.
 OPER_SZLINE_ONLY_IPS
 	Achtung: Man kann nur IP-Masken zur SZLINE-Liste hinzufügen.
 OPER_SZLINE_ADDED
@@ -2805,7 +2781,7 @@ OPER_USERLIST_END
 
 ###########################################################################
 #
-# Session Limiting and Exception messages  ## 20.10.2004 ##
+# Session Limiting and Exception messages
 #
 ###########################################################################
 
@@ -2819,25 +2795,10 @@ OPER_SUPER_ADMIN_SYNTAX
 OPER_SUPER_ADMIN_WALL_ON
 	%s ist jetzt ein Super-Admin.
 OPER_SUPER_ADMIN_WALL_OFF
-	%s verlässt den Super-Admin Mode. 
-
-###########################################################################
-#
-# Session Limiting and Exception messages   ## 17.10.2004 ##
-#
-###########################################################################
-
-# EXCEPTION responses
+	%s verlässt den Super-Admin Mode.
 OPER_SUPER_ADMIN_ONLY
 	NUR Super-Admins können dieses Befehl benutzen.
 
-###########################################################################
-#
-# Session Limiting and Exception messages  ## 18.10.2004 ##
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_STAFF_LIST_HEADER
 	On Level Nickname
 
@@ -2847,9 +2808,6 @@ OPER_STAFF_FORMAT
 	 %c %s  %s
 OPER_STAFF_AFORMAT
 	 %c %s  %s [%s]
-
-# DefCon Messages
-
 OPER_DEFCON_SYNTAX
 	Syntax: DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
@@ -2874,7 +2832,7 @@ OPER_MODULE_LOAD_FAIL
 OPER_MODULE_REMOVE_FAIL
 	Kann Modul %s nicht entfernen
 OPER_MODULE_NO_UNLOAD
-	This module can not be unloaded.
+	Modul KANN NICHT entfernt werden.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD Modul-Name
 OPER_MODULE_UNLOAD_SYNTAX
@@ -2898,19 +2856,12 @@ OPER_MODULE_NO_INFO
 OPER_MODULE_INFO_SYNTAX
 	MODINFO Modul-Name
 
-###########################################################################
-#
-# Session Limiting and Exception messages ## 20.10.2004 ##
-#
-###########################################################################
-
-# EXCEPTION responses
 MODULE_HELP_HEADER
 	Die folgenden Befehle wurden durch ein Modul geladen:
 
 ###########################################################################
 #
-# Session Limiting and Exception messages  ## 21.10.2004 ##
+# Session Limiting and Exception messages
 #
 ###########################################################################
 
@@ -3075,7 +3026,7 @@ OPER_HELP_SESSION
 
 ###########################################################################
 #
-# News system messages  ## 22.10.2004 ##
+# News system messages 
 #
 ###########################################################################
 
@@ -3110,14 +3061,6 @@ OPER_HELP_DEFCON_SILENT_OPER_ONLY
 	* Stilles ignorieren von non-opers
 OPER_HELP_DEFCON_AKILL_NEW_CLIENTS
 	* Setzt einen AKILL auf jeden NEU verbindenden Clienten
-
-
-###########################################################################
-#
-# News system messages  ## 19.10.2004 ##
-#
-###########################################################################
-
 OPER_HELP_DEFCON_NO_NEW_MEMOS
 	* Es werden keine neuen Memos gesendet
 OPER_HELP_CHANKILL
@@ -3252,12 +3195,6 @@ NEWS_HELP_OPER
 	ADD oder DEL können allerdings nur von Services Admins
 	ausgeführt werden.
 
-###########################################################################
-#
-# HelpServ help message  ## 17.10.2004 ##
-#
-###########################################################################
-
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD Text
 	        RANDOMNEWS DEL {Nummer | ALL}
@@ -3291,7 +3228,7 @@ HELP_HELP
 	
 	/msg %s HELP
 	     für Informationen zum Senden von Memos an User, die im
-	     Moment nicht online sind     
+	     Moment nicht online sind
 
 HELP_HELP_BOT
 
@@ -3306,13 +3243,13 @@ HELP_HELP_HOST
 
 ###########################################################################
 #
-# NickServ help messages  ## 22.10.2004 ##
+# NickServ help messages
 #
 ###########################################################################
 NICK_HELP_CMD_CONFIRM
-	    CONFIRM    Confirm a nickserv auth code
+	    CONFIRM    Bestätigt einen "nickserv auth code".
 NICK_HELP_CMD_RESEND
-	    RESEND     Resend a nickserv auth code
+	    RESEND     Sendet ernuet ein "nickserv auth code".
 
 NICK_HELP_CMD_REGISTER
 	    REGISTER    Registriert einen Nicknamen
@@ -3327,29 +3264,28 @@ NICK_HELP_CMD_SET
 NICK_HELP_CMD_DROP
 	    DROP        Die Registrierung einen Nicknamen löschen
 NICK_HELP_CMD_RECOVER
-	    RECOVER     User killen, der deinen Nicknamen
-	                verwendet
+	    RECOVER     User killen, der deinen Nicknamen verwendet
 NICK_HELP_CMD_RELEASE
 	    RELEASE     Hebt die Nickname-Sperre auf nach der 
 	                verwendung des RECOVER Befehls
 NICK_HELP_CMD_SENDPASS
-	    SENDPASS    Passwort vergessen? Versuch das hier..
+	    SENDPASS    Passwort vergessen? Versuch das hier.
 NICK_HELP_CMD_GHOST
-	    GHOST      Disconnects a "ghost" IRC session using your nick
+	    GHOST      Trennt eine "ghost" IRC-Verbindung mit deinen Nicknamen
 NICK_HELP_CMD_ALIST
-	    ALIST      List channels you have access on
+	    ALIST      Listet Channels in dem du Zugang hast
 NICK_HELP_CMD_GLIST
-	    GLIST      Lists all nicknames in your group
+	    GLIST      Listet alle Nicknamen in deine Gruppe
 NICK_HELP_CMD_INFO
-	    INFO       Displays information about a given nickname
+	    INFO       Zeigt Informationen über den angegebenen Nicknamen
 NICK_HELP_CMD_LIST
-	    LIST       List all registered nicknames that match a given pattern
+	    LIST       Listet alle registrieten Nicknamen des angegebene Muster
 NICK_HELP_CMD_LOGOUT
-	    LOGOUT     Reverses the effect of the IDENTIFY command
+	    LOGOUT     Macht das IDENTIFY Befehl rückgängig
 NICK_HELP_CMD_STATUS
-	    STATUS     Returns the owner status of the given nickname
+	    STATUS     Zeigt den Status des angegebenen Nicknamens an
 NICK_HELP_CMD_UPDATE
-	    UPDATE     Updates your current status, i.e. it checks for new memos
+	    UPDATE     Erneuert dein gegenwärtigen Status ( Memos , Flags , vHost )
 NICK_HELP_CMD_GETPASS
 	    GETPASS    Das Passwort eines Nicknamens aus der
 	               Datenbank auslesen (nur wenn keine
@@ -3360,9 +3296,9 @@ NICK_HELP_CMD_GETEMAIL
 NICK_HELP_CMD_FORBID
 	    FORBID     Einen bestimmten Nicknamen verbieten
 NICK_HELP_CMD_SUSPEND
-	    SUSPEND    Suspend a given nick
+	    SUSPEND    Suspendet den angegebenen Nicknamen
 NICK_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Unsuspend a given nick
+	    UNSUSPEND  Unsuspend den angegebenen Nicknamen
 
 NICK_HELP
 	Mit %S kannst du einen Nicknamen "registrieren" und somit
@@ -3765,7 +3701,7 @@ NICK_HELP_LIST
 	
 	    LIST *!joeuser@foo.com
 	        Zeigt alle Nicknamen an, deren Besitzer joeuser@foo.com
-	        ist.        
+	        ist.
 	
 	    LIST *Bot*!*@*
 	        Zeigt alle registrierten Nicknamen mit Bot in ihrem
@@ -4014,24 +3950,12 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	Beschränkt auf Services Administratoren.
 
-###########################################################################
-#
-# ChanServ help messages  ## 22.10.2004 ##
-#
-###########################################################################
-
 NICK_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND Nickname Grund
 
 	SUSPEND verhindert das der angegebene Nickname sich identifizieren kann.
 
 	Beschränkt auf Services Administratoren.
-
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
 
 NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND Nickname
@@ -4052,11 +3976,11 @@ CHAN_HELP_CMD_GETPASS
 CHAN_HELP_CMD_FORBID
 	    FORBID     Verhindert die Nutzung eines Channels
 CHAN_HELP_CMD_SUSPEND
-	    SUSPEND    Verbietet jegliche Nutzung des Channels. 
+	    SUSPEND    Verbietet jegliche Nutzung des Channels.
 	               Die Channel Einstellungen bleiben jedoch
 	               erhalten
 CHAN_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Hebt ein SUSPEND wieder auf               
+	    UNSUSPEND  Hebt ein SUSPEND wieder auf
 CHAN_HELP_CMD_STATUS
 	    STATUS     Liefert das Zugriffslevel eines Users
 	               in dem Channel
@@ -4069,9 +3993,9 @@ CHAN_HELP_CMD_SET
 	    SET        Bestimmte Channel-Optionen und
 	               Informationen einstellen
 CHAN_HELP_CMD_AOP
-	    AOP        Die Liste von AOP User bearbeiten
+	    AOP        Verwaltet die AOP-Liste von einen Channel
 CHAN_HELP_CMD_SOP
-	    SOP        Die Liste von AOP User bearbeiten
+	    SOP        Verwaltet die SOP-Liste von einen Channel
 CHAN_HELP_CMD_ACCESS
 	    ACCESS     Die Liste der priviligierten User
 	               bearbeiten
@@ -4085,53 +4009,59 @@ CHAN_HELP_CMD_DROP
 CHAN_HELP_CMD_SENDPASS
 	    SENDPASS   Hilft bei vergessenen Passwörtern
 CHAN_HELP_CMD_BAN
-	    BAN        Bans a selected nick on a channel
+	    BAN        Bant den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_CLEAR
-	    CLEAR      Tells ChanServ to clear certain settings on a channel
+	    CLEAR      Entfernt bestimmte Einstellungen des angegebenen Channel
 CHAN_HELP_CMD_DEVOICE
-	    DEVOICE    Devoices a selected nick on a channel
+	    DEVOICE    Enfernt den Voice-Status des angegebenen Nicknamens
+	               in einen Channel
 CHAN_HELP_CMD_GETKEY
-	    GETKEY     Returns the key of the given channel
+	    GETKEY     Gibt den Channel-Schlüßel wieder
 CHAN_HELP_CMD_INFO
-	    INFO       Lists information about the named registered channel
+	    INFO       Zeigt Informationen über den angegebenen Channel
 CHAN_HELP_CMD_INVITE
-	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+	    INVITE     Veranlaßt den ChanServ den angegebenen Nickname in 
+	               einen Channel eizuladen
 CHAN_HELP_CMD_KICK
-	    KICK       Kicks a selected nick from a channel
+	    KICK       Kickt den angegebenen Nicknamen aus einen Channel
 CHAN_HELP_CMD_LIST
-	    LIST       Lists all registered channels matching the given pattern
+	    LIST       Listet alle registrieten Channels des angegebene Muster
 CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
+	    LOGOUT     Das Befehl wir den angegegenen Nickname abmelden
 CHAN_HELP_CMD_OP
-	    OP         Gives Op status to a selected nick on a channel
+	    OP         Gibt den angegebenen Nicknamen Op-Status in einen Channel
 CHAN_HELP_CMD_TOPIC
-	    TOPIC      Manipulate the topic of the specified channel
+	    TOPIC      Ändert den Topic des angegebenen Channels
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Enfernt ein ban(s) die dich betreffen aus einen Channel
 CHAN_HELP_CMD_VOICE
-	    VOICE      Voices a selected nick on a channel
+	    VOICE      Gibt den angegebenen User Voice-Status in einen Channel
 CHAN_HELP_CMD_VOP
-	    VOP        Maintains the VOP (VOicePeople) list for a channel
+	    VOP        Verwaltet die VOP-Liste von einen Channel
 CHAN_HELP_CMD_DEHALFOP
-	    DEHALFOP   Dehalfops a selected nick on a channel
+	    DEHALFOP   Enfernt den HalfOP-Status des angegebenen Nicknamens
+	               in einen Channel
 CHAN_HELP_CMD_DEOWNER
-	    DEOWNER    Removes your owner status on a channel
+	    DEOWNER    Entfernt dein Gründer Status in einen Channel
 CHAN_HELP_CMD_DEPROTECT
-	    DEPROTECT  Deprotects a selected nick on a channel
+	    DEPROTECT  Entfern den schutz des angegebenen Nicknamens 
+	               in einen Channel
 CHAN_HELP_CMD_HALFOP
-	    HALFOP     Halfops a selected nick on a channel
+	    HALFOP     Gibt den angegebenen User HalfOP-Status in einen Channel
 CHAN_HELP_CMD_HOP
-	    HOP        Maintains the HOP (HalfOP) list for a channel
+	    HOP        Verwaltet die HOP-Liste von einen Channel
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gives you owner status on channel
+	    OWNER      Gibt dir Gründer Staus in einen Channel
 CHAN_HELP_CMD_PROTECT
-	    PROTECT    Protects a selected nick on a channel
+	    PROTECT    Schützt den angegebenen Nicknamen in einen Channel
 CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protects a selected nick on a channel
+	    ADMIN      Schützt den angegebenen Nicknamen in einen Channel
 CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotects a selected nick on a channel
+	    DEADMIN    Entfern den schutz des angegebenen Nicknamens 
+	               in einen Channel
 CHAN_HELP_CMD_DEOP
-	    DEOP       Deops a selected nick on a channel
+	    DEOP       Enfernt den OP-Status des angegebenen Nicknamens
+	               in einen Channel
 
 CHAN_HELP
 	Mit Hilfe von %S kann man Channel registrieren und
@@ -4651,7 +4581,7 @@ CHAN_HELP_ACCESS
 	   ACCESS #channel LIST 2-5,7-9
 	      Zeigt Einträge mit den Nummern 2 bis 5 und 
 	      7 bis 9 an.
-	      
+	
 	Durch ACCESS CLEAR werden alle Einträge der
 	Zugriffsliste entfernt.
 
@@ -4954,7 +4884,7 @@ CHAN_HELP_TOPIC
 	nützlich. Tippe /msg %S HELP SET TOPICLOCK für weitere
 	Informationen.
 	
-	Standardmässig auf Founder beschränkt. 
+	Standardmässig auf Founder (Gründer) beschränkt. 
 
 CHAN_HELP_CLEAR
 	Syntax: CLEAR Channel was
@@ -5023,7 +4953,7 @@ CHAN_SERVADMIN_HELP_LOGOUT
 	angegebenen Channels ausloggen, ohne Founder-Rechte
 	des Channels zu besitzen. Weiterhin musst du den
 	Parameter Nickname nicht unbedingt angeben, dies hat zur
-	Folge, dass jeder Nick aus dem Channel ausgeloggt wird.
+	Folge, dass jeder Nickname aus dem Channel ausgeloggt wird.
 
 CHAN_SERVADMIN_HELP_DROP
 	Syntax: DROP Channel
@@ -5138,7 +5068,7 @@ CHAN_SERVADMIN_HELP_STATUS
 
 ###########################################################################
 #
-# MemoServ help messages  ## 22.10.2004 ##
+# MemoServ help messages
 #
 ###########################################################################
 MEMO_HELP_CMD_SEND
@@ -5181,12 +5111,12 @@ MEMO_HELP_HEADER
 	%S's Befehle beinhalten:
 	
 MEMO_HELP_ADMIN
-	not used.
+	NICHT benutzt.
 MEMO_HELP_OPER
-	not used.
+	NICHT benutzt.
 MEMO_HELP_FOOTER
 	
-	Type /msg %S HELP Befehl für hilfe bei jedem der
+	Tippe: /msg %S HELP Befehl für hilfe bei jedem der
 	oben aufgeführten Befehle.
 
 	(*) Bei der Standarteinstellung kann jeder User mit einem 
@@ -5223,7 +5153,7 @@ MEMO_HELP_LIST
 	      Zeigt Memos mit den Nummern 2 bis 5 und 7 bis 9.
 
 MEMO_HELP_READ
-	Syntax: READ [Channel] {Nummer | Liste | LAST | NEW}
+	Syntax: READ [Channel] {Nummer | List | LAST | NEW}
 	
 	Schickt dir den Inhalt der Memo, die du lesen möchtest.
 	Wird LAST angegeben, bekommst du die Memo die du als 
@@ -5268,7 +5198,7 @@ MEMO_HELP_SET
 	    LIMIT       Ändert die maximale Anzahl Memos, die
 	                du empfangen kannst.
 	
-	Tippe /msg %S HELP SET Option für weitere Infos
+	Tippe: /msg %S HELP SET Option für weitere Informationen
 	über eine bestimmte Option.
 
 MEMO_HELP_SET_NOTIFY
@@ -5346,12 +5276,6 @@ MEMO_SERVADMIN_HELP_INFO
 	Informationen über den Nicknamen angezeigt. Diese
 	Funktion ist beschränkt auf Services Administratoren.
 
-###########################################################################
-#
-# OperServ help messages  ## 22.10.2004 ##
-#
-###########################################################################
-
 MEMO_HELP_STAFF
 	Syntax: STAFF Memo-Text
 
@@ -5361,23 +5285,11 @@ MEMO_HELP_STAFF
 	(Oper und Admin) hast, so werden die alle diese Nachricht erhalten. 
 	Das gleichte trifft für die Operatoren auf der Root-Liste zu.
 
-###########################################################################
-#
-# OperServ help messages ## 22.10.2004 ##
-#
-###########################################################################
-
 MEMO_HELP_SENDALL
 	Syntax: SENDALL Memo-Text
 
 	Sendet allen registrieten Usern eine Nachricht mit dem 
 	Memo-Text.
-
-###########################################################################
-#
-# OperServ help messages  ## 22.10.2004 ##
-#
-###########################################################################
 
 MEMO_HELP_RSEND
 	Syntax: RSEND {Nickname | Channel} Memo-Text
@@ -5390,12 +5302,6 @@ MEMO_HELP_RSEND
 	bekommst du eine Auto-Memo die dich Informirmiert
 	das der / die jenige dein Memo-Text gelesen hat.
 
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
-
 MEMO_HELP_CHECK
 	Syntax: CHECK Nickname
 	
@@ -5404,21 +5310,21 @@ MEMO_HELP_CHECK
 
 ###########################################################################
 #
-# OperServ help messages  ## 20.10.2004 ##
+# OperServ help messages
 #
 ###########################################################################
 
 OPER_HELP_CMD_GLOBAL
-	    GLOBAL      Eine Notice an alle User schicken            
+	    GLOBAL       Eine Notice an alle User schicken
 OPER_HELP_CMD_STATS
-	    STATS       Status des Netzes und der Services anzeigen
+	    STATS        Status des Netzes und der Services anzeigen
 OPER_HELP_CMD_OPER
-	    OPER          Die Services Operatoren Liste bearbeiten
+	    OPER         Die Services Operatoren Liste bearbeiten
 OPER_HELP_CMD_ADMIN
-	    ADMIN         Liste der Services Administratoren bearbeiten
+	    ADMIN        Liste der Services Administratoren bearbeiten
 OPER_HELP_CMD_STAFF
-	    STAFF       Zeigt alle Nicknamen, die Zugriff auf die 
-	                Services haben, Onlinestatus und Level
+	    STAFF        Zeigt alle Nicknamen, die Zugriff auf die 
+	                 Services haben, Onlinestatus und Level
 OPER_HELP_CMD_MODE
 	    MODE         Channel-Modes ändern
 OPER_HELP_CMD_KICK
@@ -5427,15 +5333,15 @@ OPER_HELP_CMD_KICK
 OPER_HELP_CMD_CLEARMODES
 	    CLEARMODES   Die Modis eines Channels zurücksetzen
 OPER_HELP_CMD_KILLCLONES
-	    KILLCLONES    Alle User mit einem bestimmten Host killen
+	    KILLCLONES   Alle User mit einem bestimmten Host killen
 OPER_HELP_CMD_AKILL
 	    AKILL        Die AutoKill-Liste bearbeiten
 OPER_HELP_CMD_SGLINE
-	    SGLINE      Die SGLINE-Liste bearbeiten
+	    SGLINE       Die SGLINE-Liste bearbeiten
 OPER_HELP_CMD_SQLINE
-	    SQLINE      Die SQLINE-Liste bearbeiten
+	    SQLINE       Die SQLINE-Liste bearbeiten
 OPER_HELP_CMD_SZLINE
-	    SZLINE      Die SZLINE-Liste bearbeiten
+	    SZLINE       Die SZLINE-Liste bearbeiten
 OPER_HELP_CMD_CHANLIST
 	    CHANLIST      Alle registrierten Channels anzeigen
 OPER_HELP_CMD_USERLIST
@@ -5464,7 +5370,7 @@ OPER_HELP_CMD_RELOAD
 OPER_HELP_CMD_UPDATE
 	    UPDATE        Die Services Datenbänke sofort speichern
 OPER_HELP_CMD_RESTART
-	    RESTART       Datenbanken speichern und Services neustarten            
+	    RESTART       Datenbanken speichern und Services neustarten
 OPER_HELP_CMD_QUIT
 	    QUIT          Services _ohne_ Speichern der Datenbanken
 	                  beenden
@@ -5477,7 +5383,7 @@ OPER_HELP_CMD_CHANKILL
 OPER_HELP_CMD_OLINE
 	    OLINE         Einem User "Operflags" setzen
 OPER_HELP_CMD_UMODE
-	    UMODE         User Modes ändern
+	    UMODE         User Modis ändern
 OPER_HELP_CMD_SVSNICK
 	    SVSNICK       Erzwingt einen Nicknamen wechsel
 OPER_HELP_CMD_MODLOAD
@@ -5810,7 +5716,7 @@ OPER_HELP_SQLINE
 	(expiry) definiert werden, auch wenn es die Standard-Zeit ist. 
 	Die Standard-Auslaufzeit für eine SQLINE kann man unter
 	STATS AKILL finden.
-	    
+	
 	Das SQLINE DEL Command entfernt die betreffende Maske von
 	der SQLINE Liste.  Wird eine Liste von Nummern angegeben,
 	werden diese Einträge entfernt. (Siehe das Beispiel für LIST 
@@ -6116,12 +6022,6 @@ OPER_HELP_USERLIST
 	
 	Beschränkt auf Services Administratoren.
 	
-###########################################################################
-#
-# BotServ help messages   ## 19.10.2004 ##
-#
-###########################################################################
-	
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD Modul-Name
 
@@ -6157,7 +6057,7 @@ OPER_HELP_MODLIST
 
 ###########################################################################
 #
-# BotServ help messages   ## 19.10.2004 ##
+# BotServ help messages
 #
 ###########################################################################
 
@@ -6173,13 +6073,13 @@ BOT_HELP_CMD_KICK
 BOT_HELP_CMD_BADWORDS
 	    BADWORDS      Verwaltet die Bad-Word-Liste
 BOT_HELP_CMD_ACT
-	    ACT           Makes the bot do the equivalent of a "/me" command
+	    ACT           Veranlaßt den Bot ein "/me" Befehl ausführen
 BOT_HELP_CMD_INFO
-	    INFO          Allows you to see BotServ information about a channel or a bot
+	    INFO          Erlaubt dir Informationen über ein BotServ ServicesBot zu sehen
 BOT_HELP_CMD_SAY
-	    SAY           Makes the bot say the given text on the given channel
+	    SAY           Veranlaßt ein Bot ein Text in einen Channel zu sagen
 BOT_HELP_CMD_UNASSIGN
-	    UNASSIGN      Unassigns a bot from a channel
+	    UNASSIGN      Entfernt ein ServicesBot von einen Channel
 BOT_HELP_CMD_BOT
 	    BOT           Verwaltung von Bots
 
@@ -6457,7 +6357,7 @@ BOT_HELP_BADWORDS
 	
 	BADWORDS #Channel LIST 2-5,7-9
 	Zeigt die Einträge 2-5 und 7-9 der Bad-Word-Liste an.
-	      
+	
 	Der BADWORDS CLEAR Befehl löscht alle Einträge aus der
 	Bad-Word-Liste.
 
@@ -6520,7 +6420,7 @@ BOT_SERVADMIN_HELP_SET_PRIVATE
 
 ###########################################################################
 #
-# HostServ messages   ## 19.10.2004 ##
+# HostServ messages
 #
 ###########################################################################
 HOST_EMPTY
@@ -6581,12 +6481,6 @@ HOST_GROUP
 	Alle vHosts in der Gruppe %s wurden auf %s gesetzt.
 HOST_IDENT_GROUP
 	Alle vHosts in der Gruppe %s wurden auf %s@%s gesetzt.
-
-###########################################################################
-#
-# HostServ Help messages  ## 19.10.2004 ##
-#
-###########################################################################
 HOST_LIST_FOOTER
 	Liste alle Einträge. (Count: %d)
 HOST_LIST_RANGE_FOOTER
@@ -6594,11 +6488,6 @@ HOST_LIST_RANGE_FOOTER
 HOST_LIST_KEY_FOOTER
 	Auf das Muster %s passenden Einträge. (Count: %d)
 
-###########################################################################
-#
-# HostServ Help messages   ## 19.10.2004 ##
-#
-###########################################################################
 HOST_HELP_CMD_ON
 	    ON          Aktiviert deinen vHost
 HOST_HELP_CMD_OFF
@@ -6608,21 +6497,21 @@ HOST_HELP_CMD_GROUP
 	                in einer Gruppe an
 
 HOST_HELP_CMD_SET
-	    SET       Setzt einem User einen vHost
+	    SET         Setzt einem User einen vHost
 HOST_HELP_CMD_SETALL
-	    SETALL    Setzt einer Gruppe einen vHost
+	    SETALL      Setzt einer Gruppe einen vHost
 HOST_HELP_CMD_DEL
-	    DEL       Löscht den vHost eines Users
+	    DEL         Löscht den vHost eines Users
 HOST_HELP_CMD_DELALL
-	    DELALL    Löscht den vHost einer Gruppe
+	    DELALL      Löscht den vHost einer Gruppe
 HOST_HELP_CMD_LIST
-	    LIST      Zeigt einen oder mehrere vHost Einträge an
+	    LIST        Zeigt einen oder mehrere vHost Einträge an
 
 HOST_OPER_HELP
-	not used.
+	Nicht benutzt.
 
 HOST_ADMIN_HELP
-	not used.
+	Nicht benutzt.
 
 HOST_HELP
 	%S Befehle:
@@ -6706,16 +6595,16 @@ HOST_HELP_GROUP
 	Nicknamens, zum vHost der gesamten Gruppe zu setzen.
 
 OPER_SVSNICK_UNSUPPORTED
-	Sorry, SVSNICK ist auf diesem Netzwerk nicht verfügbar.
+	SVSNICK ist auf diesem Netzwerk nicht verfügbar.
 
 OPER_SQLINE_UNSUPPORTED
-	Sorry, SQLINE ist auf diesem Netzwerk nicht verfügbar.
+	SQLINE ist auf diesem Netzwerk nicht verfügbar.
 
 OPER_SVSO_UNSUPPORTED
-	Sorry, OLINE ist auf diesem Netzwerk nicht verfügbar.
+	OLINE ist auf diesem Netzwerk nicht verfügbar.
 
 OPER_UMODE_UNSUPPORTED
-	Sorry, UMODE ist auf diesem Netzwerk nicht verfügbar.
+	UMODE ist auf diesem Netzwerk nicht verfügbar.
 
 OPER_SUPER_ADMIN_NOT_ENABLED
 	SuperAdmin muss in der services.conf eingeschaltet werden.

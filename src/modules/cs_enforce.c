@@ -23,13 +23,13 @@ void my_cs_help(User * u);
 int my_cs_help_enforce(User * u);
 void my_add_languages(void);
 
-#define LNG_NUM_STRINGS		6
+#define LNG_NUM_STRINGS    6
 
-#define LNG_CHAN_HELP						0
-#define LNG_ENFORCE_SYNTAX					1
-#define LNG_CHAN_HELP_ENFORCE				2
-#define LNG_CHAN_HELP_ENFORCE_R_ENABLED		3
-#define LNG_CHAN_HELP_ENFORCE_R_DISABLED	4
+#define LNG_CHAN_HELP                           0
+#define LNG_ENFORCE_SYNTAX                      1
+#define LNG_CHAN_HELP_ENFORCE                   2
+#define LNG_CHAN_HELP_ENFORCE_R_ENABLED         3
+#define LNG_CHAN_HELP_ENFORCE_R_DISABLED        4
 #define LNG_CHAN_RESPONSE                       5
 
 int AnopeInit(int argc, char **argv)
@@ -335,8 +335,40 @@ void my_add_languages(void)
 	"Enforced %s"
     };
 
+   char *langtable_de[] = {
+        /* LNG_CHAN_HELP */
+        "    ENFORCE   Erzwingt verschieden Modes und SET Optionen",
+        /* LNG_ENFORCE_SYNTAX */
+        "Syntax: \002ENFORCE \037Channel\037 [\037was\037]\002",
+        /* LNG_CHAN_HELP_ENFORCE */
+        "Erzwingt verschieden Modes und SET Optionen. Die \037Channel\037\n"
+            "Option zeigt dir den Channel an, indem Modes und Optionen\n"
+            "zu erzwingen sind. Die \037was\037 Option zeigt dir welche Modes\n"
+            "und Optionen zu erzwingen sind. Die können nur SET, SECUREOPS,\n"
+            "RESTRICTED, MODES oder +R sein.Default ist SET.\n"
+            " \n"
+            "Wenn \037was\037 SET ist, wird SECUREOPS und RESTRICTED\n"
+            "auf die User die z.Z.in Channel sind erzwungen, wenn sie AN sind.\n"
+            "Benutze SECUREOPS oder RESTRICTED , um die Optionen einzeln\n"
+            "zu erzwingen, also wenn sie nicht eingeschaltet sind.",
+        /* LNG_CHAN_HELP_ENFORCE_R_ENABLED */
+        "Wenn \037was\037 MODES ist, wird das ChannelMode +R erzwungen\n"
+            "falls an. Wenn \037was\037 +R ist, wird +R erzwungen aber eben\n"
+            "wenn noch nicht als Channel-Mode ist. Wenn +R noch nicht als\n"
+            "Channel-Mode war werden alle User aus den Channel gebannt um\n"
+            "sicher zu sein das sie nicht rejoinen.",
+        /* LNG_CHAN_HELP_ENFORCE_R_DISABLED */
+        "Wenn \037was\037 MODES ist, wird nichts erzwungen weil es MODES seine\n"
+            "können die dein IRCD nicht unterstützt. Wenn \037was\037 +R ist\n"
+            "oder ein Modes was auf ein anderen IRCD gleich +R ist, wird es\n"
+            "erzwungen. Alle User die nicht für deren Nicknamen identifiziert\n"
+            "sind werden aus den Channel gekickt und gebannt.",
+        "Erzwungen %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
+    moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
 }
 
 /* EOF */

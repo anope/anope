@@ -1925,7 +1925,6 @@ BOT_BOT_SYNTAX
 	BOT ADD nick user host gerçekismi
 	BOT CHANGE eskinick yeninick [user [host [gerçekismi]]]
 	BOT DEL nick
-	BOT LIST
 BOT_BOT_ALREADY_EXISTS
 	%s nickli bot zaten var.
 BOT_BOT_CREATION_FAILED

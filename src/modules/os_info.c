@@ -592,14 +592,44 @@ void m_AddLanguages(void)
             "een oper /cs info kanaal doet voor dit kanaal, en kan worden\n"
             "gebruikt om een kanaal te 'markeren' etc...",
         /* OINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a nick",
+        "    OINFO         Voeg een OperInfo regel toe aan een nick of verwijder deze",
         /* OCINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a channel"
+        "    OINFO         Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
+    };
+
+    char *langtable_de[] = {
+        /* OINFO_SYNTAX */
+        "Syntax: OINFO [ADD|DEL] Nickname <Information>",
+        /* OINFO_ADD_SUCCESS */
+        "Eine OperInfo Linie wurde zu den Nicknamen %s hinzugefügt",
+        /* OINFO_DEL_SUCCESS */
+        "Die OperInfo Linie wurde von den Nicknamen %s enfernt",
+        /* OCINFO_SYNTAX */
+        "Syntax: OINFO [ADD|DEL] Channel <Information>",
+        /* OCINFO_ADD_SUCCESS */
+        "Eine OperInfo Linie wurde zu den Channel %s hinzugefügt",
+        /* OCINFO_DEL_SUCCESS */
+        "Die OperInfo Linie wurde von den Channel %s enfernt",
+        /* OINFO_HELP */
+        "Syntax: OINFO [ADD|DEL] Nickname <Information>\n"
+            "Addiert oder löscht eine OperInfo Linie zu den angegebenen\n"
+            "Nicknamen.Sie wird angezeigt wenn ein Oper mit /ns info sich\n"
+            "über den Nicknamen informiert.",
+        /* OCINFO_HELP */
+        "Syntax: OINFO [ADD|DEL] chan <info>\n"
+            "Addiert oder löscht eine OperInfo Linie zu den angegebenen\n"
+            "Channel.Sie wird angezeigt wenn ein Oper mit /cs info sich\n"
+            "über den Channel informiert.",
+        /* OINFO_HELP_CMD */
+        "    OINFO         Addiert / Löscht eine OperInfo Linie zu / von einen Nicknamen",
+        /* OCINFO_HELP_CMD */
+        "    OINFO         Addiert / Löscht eine OperInfo Linie zu / von einen Channel"
     };
 
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
+    moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
 }
 
 /*************************************************************************/

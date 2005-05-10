@@ -1,5 +1,6 @@
 Anope Version S V N
 -------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
 05/10 F AnopeFini was called without mod_current_module_name set.         [#371]
 05/10 F Unidentified users now have level -1 instead of 0 again.          [#372]
 05/09 F Segfault in ns_maxemail when user's email not set.                [ #00]
@@ -10,7 +11,12 @@ Anope Version S V N
 05/05 F Segfault in ns_maxemail when passing wrong param count.           [ #00]
 05/05 F ULined servers still got their modes removed with SecureOps on.   [ #00]
 05/05 F Missing access checks when removing modes due to SecureOps.       [#366]
-Provided by Anope Dev. <dev@anope.org> - 2005
+
+Provided by crazytoon <crazy@anope.org> - 2005
+05/08 A Updated German language file.                                     [ #00]
+05/08 A German translation for all modulepack modules                     [ #00]
+05/08 F Removed "IRCDFILE" from the Makefile's                            [ #00]
+05/10 F Removed BOT LIST from BOT_BOT_SYNTAX                              [ #00]
 
 Anope Version 1.7.9
 -------------------

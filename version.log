@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="785"
+VERSION_BUILD="786"
 
 # $Log$
+#
+# BUILD : 1.7.9 (786)
+# BUGS  : 
+# NOTES : Applied patch by crazy for language updates and removal of IRCDFILE stuff
 #
 # BUILD : 1.7.9 (785)
 # BUGS  : 371 372

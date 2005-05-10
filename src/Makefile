@@ -1,6 +1,5 @@
 MYSQL_OBJ = $(MYSQL:.c=.o)
 RDB_OBJ = $(RDB:.c=.o)
-IRCD_OBJ = $(IRCDFILE:.c=.o)
 OBJS =  actions.o base64.o botserv.o channels.o chanserv.o commands.o compat.o \
         config.o datafiles.o encrypt.o events.o helpserv.o hostserv.o init.o ircd.o language.o list.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
@@ -23,7 +22,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'MYSQL=${MYSQL}'\
-	   'RDB=${RDB}' 'IRCDFILE=${IRCDFILE}' 'SHARED=${SHARED}'
+	   'RDB=${RDB}' 'SHARED=${SHARED}'
 
 .c.o:
 	$(CC) $(CFLAGS) -I../include/ -c $<

@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+05/11 F Unable to make when using an old shell.                           [#369]
 05/10 F AnopeFini was called without mod_current_module_name set.         [#371]
 05/10 F Unidentified users now have level -1 instead of 0 again.          [#372]
 05/09 F Segfault in ns_maxemail when user's email not set.                [ #00]

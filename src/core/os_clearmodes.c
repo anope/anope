@@ -321,7 +321,7 @@ int do_clearmodes(User * u)
                 free(argv[1]);
                 free(argv[0]);
             }
-			
+
             if (excepts) {
                 free(excepts);
             }

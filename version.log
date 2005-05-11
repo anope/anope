@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="786"
+VERSION_BUILD="787"
 
 # $Log$
+#
+# BUILD : 1.7.9 (787)
+# BUGS  : 369
+# NOTES : Added a dummy folder/makefile to keep older shells happen with doing processing Makefile.inc subs
 #
 # BUILD : 1.7.9 (786)
 # BUGS  : 

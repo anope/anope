@@ -685,9 +685,9 @@ void do_part(const char *source, int ac, char **av)
                 c->prev->next = c->next;
             else
                 user->chans = c->next;
-            free(c);
             send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
                        c->chan->name);
+            free(c);
         }
     }
 }

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="787"
+VERSION_BUILD="788"
 
 # $Log$
+#
+# BUILD : 1.7.9 (788)
+# BUGS  : 374
+# NOTES : Moved free() to after sending the EVENT_PART_CHANNEL event, so the event does not use an already freed variable
 #
 # BUILD : 1.7.9 (787)
 # BUGS  : 369

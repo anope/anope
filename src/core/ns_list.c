@@ -65,7 +65,7 @@ void AnopeFini(void)
  **/
 void myNickServHelp(User * u)
 {
-    if (NSListOpersOnly && !(is_oper(u))) {
+    if (!NSListOpersOnly || (is_oper(u))) {
         notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
     }
 }

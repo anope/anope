@@ -32,9 +32,19 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("LIST", do_list, NULL, -1, CHAN_HELP_LIST,
-                      CHAN_SERVADMIN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST,
-                      CHAN_SERVADMIN_HELP_LIST);
+    if (CSListOpersOnly) {
+        c = createCommand("LIST", do_list, is_oper, -1, CHAN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST);
+
+    } else {
+        c = createCommand("LIST", do_list, NULL, -1, CHAN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST,
+                          CHAN_SERVADMIN_HELP_LIST);
+    }
+
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);
@@ -58,7 +68,9 @@ void AnopeFini(void)
  **/
 void myChanServHelp(User * u)
 {
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
+    if (!CSListOpersOnly || (is_oper(u))) {
+        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_LIST);
+    }
 }
 
 /**
@@ -79,11 +91,6 @@ int do_list(User * u)
     char *keyword;
     int32 matchflags = 0;
 
-
-    if (CSListOpersOnly && (!u || !is_oper(u))) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-    }
 
     if (!pattern) {
         syntax_error(s_ChanServ, u, "LIST",

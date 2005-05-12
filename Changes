@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+05/12 F NSListOpersOnly works correctly.                                  [#375]
 05/12 F Using variable for EVENT_PART_CHANNEL after freeing it.           [#374]
 05/11 F Unable to make when using an old shell.                           [#369]
 05/10 F AnopeFini was called without mod_current_module_name set.         [#371]

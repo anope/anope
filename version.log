@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="788"
+VERSION_BUILD="789"
 
 # $Log$
+#
+# BUILD : 1.7.9 (789)
+# BUGS  : 375
+# NOTES : NSOperListOnly and CSOperListOnly are correctly formated in the help now.
 #
 # BUILD : 1.7.9 (788)
 # BUGS  : 374

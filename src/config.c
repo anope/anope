@@ -856,11 +856,6 @@ int parse(char *buf, int linenum, int reload)
         }
     }
 
-    if (n == lenof(directives)) {
-/*        error(linenum, "Unknown directive `%s'", dir);
-                                                                                return 1;               *//* don't cause abort */
-    }
-
     return retval;
 }
 

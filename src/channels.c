@@ -1140,6 +1140,7 @@ void do_topic(const char *source, int ac, char **av)
     ChannelInfo *ci;
     int ts;
     time_t topic_time;
+    char *topicsetter;
 
     if (ircd->sjb64) {
         ts = base64dects(av[2]);
@@ -1165,17 +1166,26 @@ void do_topic(const char *source, int ac, char **av)
 
     ci = c->ci;
 
+    /* For Unreal, cut off the ! and any futher part of the topic setter.
+     * This way, nick!ident@host setters will only show the nick. -GD
+     */
+    topicsetter = myStrGetToken(av[1], '!', 0);
+
     /* If the current topic we have matches the last known topic for this
      * channel exactly, there's no need to update anything and we can as
      * well just return silently without updating anything. -GD
      */
     if ((ac > 3) && *av[3] && ci && ci->last_topic
         && (strcmp(av[3], ci->last_topic) == 0)
-        && (strcmp(av[1], ci->last_topic_setter) == 0))
+        && (strcmp(topicsetter, ci->last_topic_setter) == 0)) {
+        free(topicsetter);
         return;
+    }
 
-    if (check_topiclock(c, topic_time))
+    if (check_topiclock(c, topic_time)) {
+        free(topicsetter);
         return;
+    }
 
     if (c->topic) {
         free(c->topic);
@@ -1185,8 +1195,9 @@ void do_topic(const char *source, int ac, char **av)
         c->topic = sstrdup(av[3]);
     }
 
-    strscpy(c->topic_setter, av[1], sizeof(c->topic_setter));
+    strscpy(c->topic_setter, topicsetter, sizeof(c->topic_setter));
     c->topic_time = topic_time;
+    free(topicsetter);
 
     record_topic(av[0]);
 

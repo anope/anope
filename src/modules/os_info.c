@@ -188,7 +188,6 @@ int myAddNickInfo(User * u)
         } else {
             moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
         }
-        free(text);
     }
     return MOD_CONT;
 }
@@ -257,7 +256,6 @@ int myAddChanInfo(User * u)
         } else {
             moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
         }
-        free(text);
     }
     return MOD_CONT;
 }
@@ -296,7 +294,6 @@ int myNickInfo(User * u)
                 }
                 free(nick);
             }
-            free(text);
         }
     }
     return MOD_CONT;
@@ -330,7 +327,6 @@ int myChanInfo(User * u)
                 }
                 free(chan);
             }
-            free(text);
         }
     }
     return MOD_CONT;
@@ -361,8 +357,7 @@ int mLoadData(void)
         alog("os_info: WARNING: can not open the database file! (it might not exist, this is not fatal)");
         ret = 1;
     } else {
-        while (!feof(in)) {
-            fgets(buffer, 1500, in);
+        while (fgets(buffer, 1500, in)) {
             type = myStrGetToken(buffer, ' ', 0);
             name = myStrGetToken(buffer, ' ', 1);
             info = myStrGetTokenRemainder(buffer, ' ', 2);

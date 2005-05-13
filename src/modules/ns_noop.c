@@ -257,8 +257,7 @@ int mLoadData(void)
         alog("ns_noop: WARNING: Can not open database file! (it might not exist, this is not fatal)");
         ret = 1;
     } else {
-        while (!feof(in)) {
-            fgets(buffer, 1500, in);
+        while (fgets(buffer, 1500, in)) {
             name = myStrGetToken(buffer, ' ', 0);
             if (name) {
                 len = strlen(name);

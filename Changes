@@ -21,6 +21,9 @@ Provided by crazytoon <crazy@anope.org> - 2005
 05/08 F Removed "IRCDFILE" from the Makefile's                            [ #00]
 05/10 F Removed BOT LIST from BOT_BOT_SYNTAX                              [ #00]
 
+Provided by Sascha Just <bugs.anope@nmg.own-hero.de> - 2005
+05/13 F Nicer used of fgets, dont free the buffer.                        [#378]
+
 Anope Version 1.7.9
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005

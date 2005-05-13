@@ -32,15 +32,8 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    if (NSListOpersOnly) {
-        c = createCommand("LIST", do_list, is_oper, -1, NICK_HELP_LIST, -1,
-                          NICK_SERVADMIN_HELP_LIST,
-                          NICK_SERVADMIN_HELP_LIST);
-    } else {
-        c = createCommand("LIST", do_list, NULL, -1, NICK_HELP_LIST, -1,
-                          NICK_SERVADMIN_HELP_LIST,
-                          NICK_SERVADMIN_HELP_LIST);
-    }
+    c = createCommand("LIST", do_list, NULL, -1, NICK_HELP_LIST, -1,
+                      NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST);
 
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
@@ -106,7 +99,10 @@ int do_list(User * u)
     char *tmp = NULL;
     char *s = NULL;
 
-
+    if (!(!NSListOpersOnly || (is_oper(u)))) {  /* reverse the help logic */
+        notice_lang(s_NickServ, u, ACCESS_DENIED);
+        return MOD_STOP;
+    }
 
     if (!pattern) {
         syntax_error(s_NickServ, u, "LIST",

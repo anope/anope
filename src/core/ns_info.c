@@ -245,8 +245,13 @@ int do_info(User * u)
                         *buf ? buf : getstring(u->na, NICK_INFO_OPT_NONE));
 
             if (na->nc->flags & NI_SUSPENDED) {
-                notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED,
-                            na->last_quit);
+                if (na->last_quit) {
+                    notice_lang(s_NickServ, u, NICK_INFO_SUSPENDED,
+                                na->last_quit);
+                } else {
+                    notice_lang(s_NickServ, u,
+                                NICK_INFO_SUSPENDED_NO_REASON);
+                }
             }
 
             if (na->status & NS_NO_EXPIRE) {

@@ -628,6 +628,8 @@ NICK_INFO_FOR_MORE
 # LIST responses
 NICK_INFO_SUSPENDED
 	Deze nick is tijdelijk buiten werking gesteld, reden: %s
+NICK_INFO_SUSPENDED_NO_REASON
+	Deze nick is tijdelijk buiten werking gesteld
 
 # LIST responses
 NICK_LIST_SYNTAX

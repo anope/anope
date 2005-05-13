@@ -8,9 +8,18 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="790"
+VERSION_BUILD="792"
 
 # $Log$
+#
+# BUILD : 1.7.9 (792)
+# BUGS  : N/A
+# NOTES : Added a check for last_quit when infoing a suspended nick, this should never happen, but it seems a few networks have odd databases which are using the suspend flag for something else, i think its related to networks that have merged databases, but i dont know, anyway, we check for it before using it now. (this dosnt fix the fact they are using a nc->flag that core wants for something else)
+# 
+#
+# BUILD : 1.7.9 (791)
+# BUGS  : N/A
+# NOTES : PARAM_RELOAD works for NSListOpersOnly etc again *grumbles at heniz* 
 #
 # BUILD : 1.7.9 (790)
 # BUGS  : N/A

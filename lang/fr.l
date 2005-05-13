@@ -629,6 +629,9 @@ NICK_INFO_FOR_MORE
 # LIST responses
 NICK_INFO_SUSPENDED
 	This nickname is currently suspended, reason: %s
+NICK_INFO_SUSPENDED_NO_REASON
+	This nickname is currently suspended
+
 
 # LIST responses
 NICK_LIST_SYNTAX

@@ -653,6 +653,7 @@ void do_part(const char *source, int ac, char **av)
     User *user;
     char *s, *t;
     struct u_chanlist *c;
+    char *channame;
 
     user = finduser(source);
     if (!user) {
@@ -676,8 +677,10 @@ void do_part(const char *source, int ac, char **av)
                 alog("user: BUG parting %s: channel entry found but c->chan NULL", s);
                 return;
             }
+            channame = sstrdup(c->chan->name);
             send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick,
-                       c->chan->name);
+                       channame);
+
             chan_deluser(user, c->chan);
             if (c->next)
                 c->next->prev = c->prev;
@@ -685,9 +688,11 @@ void do_part(const char *source, int ac, char **av)
                 c->prev->next = c->next;
             else
                 user->chans = c->next;
-            send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
-                       c->chan->name);
             free(c);
+
+            send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
+                       channame);
+            free(channame);
         }
     }
 }

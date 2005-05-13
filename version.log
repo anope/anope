@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="794"
+VERSION_BUILD="795"
 
 # $Log$
+#
+# BUILD : 1.7.9 (795)
+# BUGS  : 379
+# NOTES : Fixed the channelname issue in do_part once and for all with sstrdup(tm) power
 #
 # BUILD : 1.7.9 (794)
 # BUGS  : 377

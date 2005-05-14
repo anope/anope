@@ -468,7 +468,17 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("a",      anope_event_chgname); addCoreMessage(IRCD,m);		// change gecos
 }
 
-/* *INDENT-ON* */
+char* xsumtable = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+char* CreateSum()
+{
+	int q = 0;
+        static char sum[8];
+        sum[7] = '\0';
+        for(q = 0; q < 7; q++)
+                sum[q] = xsumtable[rand()%52];
+        return sum;
+}
 
 /* Event: PROTOCTL */
 int anope_event_capab(char *source, int ac, char **av)
@@ -485,7 +495,7 @@ int anope_event_nickchange(char *source, int ac, char **av)
 
 void inspircd_cmd_svsnoop(char *server, int set)
 {
-    send_cmd(NULL, "*");
+    send_cmd(CreateSum(), "*");
 }
 
 void inspircd_cmd_svsadmin(char *server, int set)
@@ -495,25 +505,24 @@ void inspircd_cmd_svsadmin(char *server, int set)
 
 void inspircd_cmd_remove_akill(char *user, char *host)
 {
-    send_cmd(NULL, ". %s@%s %s", user, host, s_OperServ);
+    send_cmd(CreateSum(), ". %s@%s %s", user, host, s_OperServ);
 }
 
 void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
-                        char *topic, time_t when)
+                     char *topic, time_t when)
 {
-    send_cmd(NULL, "t %s %s :%s", whosets, chan, topic);
+    send_cmd(CreateSum(), "t %s %s :%s", whosets, chan, topic);
 }
 
 void inspircd_cmd_vhost_off(User * u)
 {
-    send_cmd(NULL, "m %s %s -x", s_HostServ, u->nick);
+    send_cmd(CreateSum(), "m %s %s -x", s_HostServ, u->nick);
 }
 
 void inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
-                        time_t expires, char *reason)
+                     time_t expires, char *reason)
 {
-    send_cmd(NULL, "# %s@%s %s %lu %lu :%s", user, host, who,
-             (long int) when, 86400 * 2, reason);
+    send_cmd(CreateSum(), "# %s@%s %s %lu %lu :%s", user, host, who, (long int)when, 86400 * 2, reason);
 }
 
 void inspircd_cmd_svskill(char *source, char *user, char *buf)
@@ -521,12 +530,12 @@ void inspircd_cmd_svskill(char *source, char *user, char *buf)
     if (!buf || !source || !user) {
         return;
     }
-    send_cmd(NULL, "K %s %s :%s", s_OperServ, user, buf);
+    send_cmd(CreateSum(),"K %s %s :%s", s_OperServ, user, buf);
 }
 
 void inspircd_cmd_svsmode(User * u, int ac, char **av)
 {
-    send_cmd(NULL, "M %s %s", u->nick, av[0]);
+    send_cmd(CreateSum(), "M %s %s", u->nick, av[0]);
 }
 
 
@@ -549,19 +558,15 @@ void inspircd_cmd_376(char *source)
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
     // N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS>
-    send_cmd(NULL, "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",
-             (long int) time(NULL), nick, ServiceHost, ServiceHost,
-             ServiceUser, modes, ServerName, name);
+    send_cmd(CreateSum(), "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,ServerName,name);
 }
 
-void inspircd_cmd_guest_nick(char *nick, char *user, char *host,
-                             char *real, char *modes)
+void inspircd_cmd_guest_nick(char *nick, char *user, char *host, char *real,
+                          char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick,
+    send_cmd(CreateSum(), "NICK %s 1 %ld %s %s %s 0 %s * :%s", nick,
              (long int) time(NULL), user, host, ServerName, modes, real);
-    send_cmd(NULL, "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",
-             (long int) time(NULL), nick, host, host, user, modes,
-             ServerName, real);
+    send_cmd(CreateSum(), "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",(long int) time(NULL),nick,host,host,user,modes,ServerName,real);
 }
 
 void inspircd_cmd_mode(char *source, char *dest, char *buf)
@@ -569,23 +574,21 @@ void inspircd_cmd_mode(char *source, char *dest, char *buf)
     if (!buf) {
         return;
     }
-    send_cmd(NULL, "m %s %s %s", source, dest, buf);
+    send_cmd(CreateSum(), "m %s %s %s", source, dest, buf);
 }
 
 void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+                        char *modes)
 {
-    send_cmd(NULL, "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",
-             (long int) time(NULL), nick, host, host, user, modes,
-             ServerName, real);
+    send_cmd(CreateSum(), "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",(long int) time(NULL),nick,host,host,user,modes,ServerName,real);
 }
 
 void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)
 {
     if (buf) {
-        send_cmd(NULL, "k %s %s :%s", source, user, chan, buf);
+        send_cmd(CreateSum(), "k %s %s :%s", source, user, chan, buf);
     } else {
-        send_cmd(NULL, "k %s %s :", source, user, chan);
+        send_cmd(CreateSum(), "k %s %s :", source, user, chan);
     }
 }
 
@@ -595,7 +598,7 @@ void inspircd_cmd_notice_ops(char *source, char *dest, char *buf)
         return;
     }
 
-    send_cmd(NULL, "V %s @%s :%s", source, dest, buf);
+    send_cmd(CreateSum(), "V %s @%s :%s", source, dest, buf);
 }
 
 
@@ -608,13 +611,13 @@ void inspircd_cmd_notice(char *source, char *dest, char *buf)
     if (UsePrivmsg) {
         inspircd_cmd_privmsg2(source, dest, buf);
     } else {
-        send_cmd(NULL, "V %s %s :%s", source, dest, buf);
+        send_cmd(CreateSum(), "V %s %s :%s", source, dest, buf);
     }
 }
 
 void inspircd_cmd_notice2(char *source, char *dest, char *msg)
 {
-    send_cmd(NULL, "V %s %s :%s", source, dest, msg);
+    send_cmd(CreateSum(), "V %s %s :%s", source, dest, msg);
 }
 
 void inspircd_cmd_privmsg(char *source, char *dest, char *buf)
@@ -623,12 +626,12 @@ void inspircd_cmd_privmsg(char *source, char *dest, char *buf)
         return;
     }
 
-    send_cmd(NULL, "P %s %s :%s", source, dest, buf);
+    send_cmd(CreateSum(), "P %s %s :%s", source, dest, buf);
 }
 
 void inspircd_cmd_privmsg2(char *source, char *dest, char *msg)
 {
-    send_cmd(NULL, "P %s %s :%s", source, dest, msg);
+    send_cmd(CreateSum(), "P %s %s :%s", source, dest, msg);
 }
 
 void inspircd_cmd_serv_notice(char *source, char *dest, char *msg)
@@ -653,9 +656,9 @@ void inspircd_cmd_351(char *source)
 void inspircd_cmd_quit(char *source, char *buf)
 {
     if (buf) {
-        send_cmd(NULL, "Q %s :%s", source, buf);
+        send_cmd(CreateSum(), "Q %s :%s", source, buf);
     } else {
-        send_cmd(NULL, "QUIT %s :", source);
+        send_cmd(CreateSum(), "QUIT %s :", source);
     }
 }
 
@@ -671,46 +674,48 @@ void inspircd_cmd_pass(char *pass)
 
 int anope_event_eob(char *source, int ac, char **av)
 {
-    send_cmd(NULL, "/ NickServ");
-    send_cmd(NULL, "v %s Anope-%s %s :%s - %s -- %s", ServerName,
-             version_number, ServerName, ircd->name, version_flags,
-             version_build);
-    return MOD_CONT;
+	send_cmd(CreateSum(), "/ NickServ");
+	send_cmd(CreateSum(), "v %s Anope-%s %s :%s - %s -- %s", ServerName, version_number, ServerName, ircd->name, version_flags, version_build);
+	return MOD_CONT;
 }
 
 /* SERVER name hop descript */
 void inspircd_cmd_server(char *servname, int hop, char *descript)
 {
     Server *newserv;
-    if (hop == 0) {
-        send_cmd(NULL, "H %s", servname);
-    } else {
-        char pw[1024];
-        switch (hop) {
-        case 1:
-            strncpy(pw, RemotePassword, 1023);
-            break;
-        case 2:
-            strncpy(pw, RemotePassword2, 1023);
-            break;
-        case 3:
-            strncpy(pw, RemotePassword3, 1023);
-            break;
-        }
-        send_cmd(NULL, "U %s %s :%s", servname, pw, descript);
+    if (hop == 0)
+    {
+          send_cmd(CreateSum(), "H %s",servname);
+    }
+    else
+    {
+          char pw[1024];
+          switch (hop)
+          {
+              case 1:
+                 strncpy(pw,RemotePassword,1023);
+              break;
+              case 2:
+                 strncpy(pw,RemotePassword2,1023);
+              break;
+              case 3:
+                 strncpy(pw,RemotePassword3,1023);
+              break;
+          }	
+          send_cmd(CreateSum(), "U %s %s :%s", servname, pw, descript);
     }
 }
 
 /* PONG */
 void inspircd_cmd_pong(char *servname, char *who)
 {
-    send_cmd(NULL, "!");
+    send_cmd(CreateSum(), "!");
 }
 
 /* JOIN */
 void inspircd_cmd_join(char *user, char *channel, time_t chantime)
 {
-    send_cmd(NULL, "J %s %s", user, channel);
+    send_cmd(CreateSum(), "J %s %s", user, channel);
 }
 
 /* UNSQLINE */
@@ -719,7 +724,7 @@ void inspircd_cmd_unsqline(char *user)
     if (!user) {
         return;
     }
-    send_cmd(NULL, "[ %s %s", user, s_OperServ);
+    send_cmd(CreateSum(), "[ %s %s", user, s_OperServ);
 }
 
 /* CHGHOST */
@@ -728,7 +733,7 @@ void inspircd_cmd_chghost(char *nick, char *vhost)
     if (!nick || !vhost) {
         return;
     }
-    send_cmd(NULL, "b %s %s", nick, vhost);
+    send_cmd(CreateSum(), "b %s %s", nick, vhost);
 }
 
 /* CHGIDENT */
@@ -743,7 +748,7 @@ void inspircd_cmd_invite(char *source, char *chan, char *nick)
         return;
     }
 
-    send_cmd(NULL, "i %s %s %s", source, nick, chan);
+    send_cmd(CreateSum(), "i %s %s %s", source, nick, chan);
 }
 
 /* PART */
@@ -753,9 +758,9 @@ void inspircd_cmd_part(char *nick, char *chan, char *buf)
         return;
     }
     if (buf) {
-        send_cmd(NULL, "L %s :%s", nick, chan, buf);
+        send_cmd(CreateSum(), "L %s :%s", nick, chan, buf);
     } else {
-        send_cmd(NULL, "L %s %s :", nick, chan);
+        send_cmd(CreateSum(), "L %s %s :", nick, chan);
     }
 }
 
@@ -822,7 +827,7 @@ void inspircd_cmd_211(char *buf)
 /* GLOBOPS */
 void inspircd_cmd_global(char *source, char *buf)
 {
-    send_cmd(NULL, "V %s * :%s", (source ? source : s_OperServ), buf);
+    send_cmd(CreateSum(), "V %s * :%s", (source ? source : s_OperServ), buf);
 }
 
 /* SQLINE */
@@ -832,8 +837,7 @@ void inspircd_cmd_sqline(char *mask, char *reason)
         return;
     }
     // { <mask> <who-set-it> <time-set> <duration> :<reason>
-    send_cmd(NULL, "{ %s %s %lu 0 :%s", mask, ServerName,
-             (unsigned long) time(NULL), reason);
+    send_cmd(CreateSum(), "{ %s %s %lu 0 :%s", mask, ServerName, (unsigned long)time(NULL), reason);
 }
 
 /* SQUIT */
@@ -843,13 +847,13 @@ void inspircd_cmd_squit(char *servname, char *message)
         return;
     }
 
-    send_cmd(NULL, "& %s", servname);
+    send_cmd(CreateSum(), "& %s", servname);
 }
 
 /* SVSO */
 void inspircd_cmd_svso(char *source, char *nick, char *flag)
 {
-    send_cmd(NULL, "M %s %s", nick, flag);
+    send_cmd(CreateSum(),"M %s %s",nick,flag);
 }
 
 /* NICK <newnick>  */
@@ -868,7 +872,7 @@ void inspircd_cmd_svsnick(char *source, char *guest, time_t when)
     if (!source || !guest) {
         return;
     }
-    send_cmd(NULL, "n %s %s", source, guest);
+    send_cmd(CreateSum(), "n %s %s", source, guest);
 }
 
 /* Functions that use serval cmd functions */
@@ -888,6 +892,8 @@ void inspircd_cmd_connect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+
+    srand(time(NULL));
 
     inspircd_cmd_server(ServerName, servernum, ServerDesc);
 }
@@ -917,12 +923,12 @@ int anope_event_servertopic(char *source, int ac, char **av)
     /* T 1115252145 ViaraiX #deck8 :Welcome to Deck8 */
     char *v[32];
     if (ac != 4)
-        return MOD_CONT;
+       return MOD_CONT;
     v[0] = av[2];
     v[1] = av[1];
     v[2] = av[0];
     v[3] = av[3];
-    do_topic(NULL, 4, v);       // no source (server set)
+    do_topic(NULL, 4, v); // no source (server set)
     return MOD_CONT;
 }
 
@@ -963,22 +969,26 @@ int anope_event_quit(char *source, int ac, char **av)
 
 int anope_event_servermode(char *source, int ac, char **av)
 {
-    char *v[32];
-    Channel *c;
+    char* v[32];
+    Channel* c;
     int i = 0;
 
-    if (*av[0] == '#') {
-        c = findchan(av[0]);
-        for (i = 1; i < ac; i++)
-            v[i - 1] = av[i];
-        if (c) {
-            chan_set_modes(s_OperServ, c, ac - 1, v, 1);
-        }
-    } else {
-        v[0] = av[0];
-        for (i = 0; i < ac; i++)
-            v[i + 1] = av[i];
-        anope_event_mode(av[0], ac + 1, v);
+    if (*av[0] == '#')
+    {
+	    c = findchan(av[0]);
+            for (i = 1; i < ac; i++)
+                v[i-1] = av[i];
+	    if (c)
+	    {
+	    	chan_set_modes(s_OperServ, c, ac-1, v, 1);
+	    }
+    }
+    else
+    {
+	    v[0] = av[0];
+	    for (i = 0; i < ac; i++)
+	       	v[i+1] = av[i];
+	    anope_event_mode(av[0], ac+1, v);
     }
     return MOD_CONT;
 }
@@ -991,13 +1001,14 @@ int anope_event_mode(char *source, int ac, char **av)
     if (ac < 3)
         return MOD_CONT;
 
-    for (i = 1; i < ac; i++) {
-        v[i - 1] = av[i];
+    for (i = 1; i < ac; i++)
+    {
+        v[i-1] = av[i];
     }
     if (*av[1] == '#') {
-        do_cmode(av[1], ac - 1, v);
+        do_cmode(av[1], ac-1, v);
     } else {
-        do_umode(av[0], ac - 1, v);
+        do_umode(av[0], ac-1, v);
     }
     return MOD_CONT;
 }
@@ -1016,8 +1027,7 @@ int anope_event_kick(char *source, int ac, char **av)
     // Syntax: k <source> <dest> <channel> :<reason>
     char *v[32];
     if (ac != 4)
-        return MOD_CONT;
-    v[0] = av[1];
+        return MOD_CONT;    v[0] = av[1];
     v[1] = av[2];
     v[2] = av[3];
     do_kick(av[0], 3, v);
@@ -1038,17 +1048,17 @@ int anope_event_join(char *source, int ac, char **av)
     Channel *c;
     int i;
     int32 modes = 0, thismode;
-    char *new_av[32];
-    char *cumodes[3];
+    char* new_av[32];
+    char* cumodes[3];
     char thismodes[256];
     cumodes[0] = thismodes;
 
     // some sanity checks
     if (ac < 2) {
-        return MOD_CONT;
+            return MOD_CONT;
     }
 
-    u = finduser(av[0]);        // get the user info
+    u = finduser(av[0]); // get the user info
 
     if (!u) {
         return MOD_CONT;
@@ -1057,32 +1067,36 @@ int anope_event_join(char *source, int ac, char **av)
     cumodes[1] = av[0];
 
     // iterate through each channel the user is joining
-    for (i = 1; i < ac; i++) {
-        // the channel name
-        new_av[0] = av[i];
+    for (i = 1; i < ac; i++)
+    {
+            // the channel name
+            new_av[0] = av[i];
 
-        // strip off the permissions
-        strcpy(thismodes, "");
-        if (*new_av[0] != '#') {
-            switch (*new_av[0]) {
-            case '@':
-                strcpy(thismodes, "+o");
-                break;
-            case '%':
-                strcpy(thismodes, "+h");
-                break;
-            case '+':
-                strcpy(thismodes, "+v");
-                break;
+            // strip off the permissions
+            strcpy(thismodes,"");
+            if (*new_av[0] != '#')
+            {
+		    switch (*new_av[0])
+		    {
+			case '@':
+				strcpy(thismodes,"+o");
+			break;
+			case '%':
+				strcpy(thismodes,"+h");
+			break;
+			case '+':
+				strcpy(thismodes,"+v");
+			break;
+		    }
+                    new_av[0]++;
             }
-            new_av[0]++;
-        }
 
-        do_join(av[0], 1, new_av);
-        c = findchan(new_av[0]);
-        if ((c) && (strcmp(thismodes, ""))) {
-            chan_set_modes(av[0], c, 2, cumodes, 1);
-        }
+            do_join(av[0], 1, new_av);
+            c = findchan(new_av[0]);
+            if ((c) && (strcmp(thismodes,"")))
+            {
+                    chan_set_modes(av[0], c, 2, cumodes, 1);
+            }
     }
 
     return MOD_CONT;
@@ -1162,7 +1176,7 @@ int anope_event_nick(char *source, int ac, char **av)
 {
     User *user;
     struct in_addr addy;
-    uint32 *ad = (uint32 *) & addy;
+    uint32* ad = (uint32*)&addy;
 
 // someone really should comment this -- Brain
 
@@ -1173,19 +1187,19 @@ int anope_event_nick(char *source, int ac, char **av)
 // Syntax: N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS>
 
     if (ac == 9) {
-        // fix by brain - 27 apr 2005
-        // During a net merge between two meshed clients there may be some spurious "bouncing"
-        // nick introductions (e.g. introductions for clients we already have). If this happens,
-        // we should ignore any that claim to be from us as these are just confirmations of the
-        // services "complement" - processing them will cause all kinds of session limit oddities.
-        if ((strcmp(av[7], ServerName)) && (!finduser(av[1]))) {
-            inet_aton(av[6], &addy);
-            user = do_nick(source, av[1], av[4], av[2], uplink, av[8],
-                           strtoul(av[0], NULL, 10), 0, htonl(*ad), av[3],
-                           NULL);
-            if (user)
-                anope_set_umode(user, 1, &av[5]);
-        }
+	// fix by brain - 27 apr 2005
+	// During a net merge between two meshed clients there may be some spurious "bouncing"
+	// nick introductions (e.g. introductions for clients we already have). If this happens,
+	// we should ignore any that claim to be from us as these are just confirmations of the
+	// services "complement" - processing them will cause all kinds of session limit oddities.
+	if ((strcmp(av[7],ServerName)) && (!finduser(av[1])))
+	{
+	        inet_aton(av[6],&addy);
+	        user = do_nick("", av[1], av[4], av[2], uplink, av[8],
+	               strtoul(av[0], NULL, 10), 0, htonl(*ad), av[3], NULL);
+	        if (user)
+	            anope_set_umode(user, 1, &av[5]);
+	}
     }
     return MOD_CONT;
 }
@@ -1219,9 +1233,10 @@ int anope_event_server(char *source, int ac, char **av)
     // anope only sees the uplink at all times (and receives
     // all nick introductions etc as if they'd come from the
     // uplink directly, 1 hop away.
-    if (!uplink) {
-        uplink = sstrdup(av[0]);
-        do_server(source, av[0], av[1], av[3], NULL);
+    if (!uplink)
+    {
+	    uplink = sstrdup(av[0]);
+	    do_server(source, av[0], av[1], av[3], NULL);
     }
     return MOD_CONT;
 }
@@ -1240,8 +1255,8 @@ int anope_event_part(char *source, int ac, char **av)
     char *v[32];
     if (ac != 3)
         return MOD_CONT;
-    v[0] = av[1];               // channel
-    v[1] = av[2];               // reason
+    v[0] = av[1]; // channel
+    v[1] = av[2]; // reason
     do_part(av[0], 2, v);
     return MOD_CONT;
 }
@@ -1273,15 +1288,14 @@ void inspircd_cmd_unsgline(char *mask)
 void inspircd_cmd_unszline(char *mask)
 {
     // ] <mask> <who>
-    send_cmd(NULL, "] %s %s", mask, s_OperServ);
+    send_cmd(CreateSum(), "] %s %s", mask, s_OperServ);
 }
 
 /* SZLINE */
 void inspircd_cmd_szline(char *mask, char *reason, char *whom)
 {
     // } <mask> <who-set-it> <time-set> <duration> :<reason>
-    send_cmd(NULL, "} %s %s %lu %lu :%s", mask, whom,
-             (long int) time(NULL), 86400 * 2, reason);
+    send_cmd(CreateSum(), "} %s %s %lu %lu :%s",mask,whom,(long int) time(NULL),86400 * 2, reason);
 }
 
 /* SGLINE */
@@ -1320,7 +1334,7 @@ void inspircd_cmd_nc_change(User * u)
 /* SVSMODE +r */
 void inspircd_cmd_svid_umode2(User * u, char *ts)
 {
-    send_cmd(NULL, "m %s %s +r", s_OperServ, u->nick);
+    send_cmd(CreateSum(),"m %s %s +r",s_OperServ,u->nick);
 }
 
 void inspircd_cmd_svid_umode3(User * u, char *ts)
@@ -1372,13 +1386,13 @@ int inspircd_flood_mode_check(char *value)
 
 void inspircd_cmd_jupe(char *jserver, char *who, char *reason)
 {
-    alog("JUPE: Unsupported!");
+	alog("JUPE: Unsupported!");
 }
 
 /* GLOBOPS - to handle old WALLOPS */
 void inspircd_cmd_global_legacy(char *source, char *fmt)
 {
-    send_cmd(NULL, "@ %s :%s", source ? source : ServerName, fmt);
+    send_cmd(CreateSum(), "@ %s :%s", source ? source : ServerName, fmt);
 }
 
 int inspircd_valid_nick(char *nick)
@@ -1394,7 +1408,7 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
         return;
     } else {
         s = normalizeBuffer(buf);
-        send_cmd(NULL, "V %s %s :\1%s \1", source, dest, s);
+        send_cmd(CreateSum(), "V %s %s :\1%s \1", source, dest, s);
         free(s);
     }
 }
@@ -1404,8 +1418,7 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
  * Tell anope which function we want to perform each task inside of anope.
  * These prototypes must match what anope expects.
  **/
-void moduleAddAnopeCmds()
-{
+void moduleAddAnopeCmds() {
     pmodule_cmd_svsnoop(inspircd_cmd_svsnoop);
     pmodule_cmd_remove_akill(inspircd_cmd_remove_akill);
     pmodule_cmd_topic(inspircd_cmd_topic);
@@ -1481,36 +1494,36 @@ void moduleAddAnopeCmds()
 /** 
  * Now tell anope how to use us.
  **/
-int AnopeInit(int argc, char **argv)
-{
+int AnopeInit(int argc, char **argv) {
 
-    moduleAddAuthor("Brain");
-    moduleAddVersion("$Id$");
-    moduleSetType(PROTOCOL);
+	moduleAddAuthor("Brain");
+        moduleAddVersion("$Id$");
+        moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("InspIRCd 1.0 Beta3");
-    pmodule_ircd_cap(myIrcdcap);
-    pmodule_ircd_var(myIrcd);
-    pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-    pmodule_ircd_cumodes(myCumodes);
-    pmodule_ircd_flood_mode_char_set("+f");
-    pmodule_ircd_flood_mode_char_remove("-f");
-    pmodule_ircd_cbmodes(myCbmodes);
-    pmodule_ircd_cmmodes(myCmmodes);
-    pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+        pmodule_ircd_version("InspIRCd 1.0 Beta3");
+        pmodule_ircd_cap(myIrcdcap);
+        pmodule_ircd_var(myIrcd);
+        pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+        pmodule_ircd_cumodes(myCumodes);
+        pmodule_ircd_flood_mode_char_set("+f");
+        pmodule_ircd_flood_mode_char_remove("-f");
+        pmodule_ircd_cbmodes(myCbmodes);
+        pmodule_ircd_cmmodes(myCmmodes);
+        pmodule_ircd_csmodes(myCsmodes);
+	pmodule_ircd_useTSMode(0);
 
-        /** Deal with modes anope _needs_ to know **/
-    pmodule_invis_umode(UMODE_i);
-    pmodule_oper_umode(UMODE_o);
-    pmodule_invite_cmode(CMODE_i);
-    pmodule_secret_cmode(CMODE_s);
-    pmodule_private_cmode(CMODE_p);
-    pmodule_key_mode(CMODE_k);
-    pmodule_limit_mode(CMODE_l);
+	/** Deal with modes anope _needs_ to know **/
+	pmodule_invis_umode(UMODE_i);
+	pmodule_oper_umode(UMODE_o);
+	pmodule_invite_cmode(CMODE_i);
+	pmodule_secret_cmode(CMODE_s);
+	pmodule_private_cmode(CMODE_p);
+	pmodule_key_mode(CMODE_k);
+	pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
     moduleAddIRCDMsgs();
 
     return MOD_CONT;
 }
+

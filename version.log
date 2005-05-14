@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="795"
+VERSION_BUILD="796"
 
 # $Log$
+#
+# BUILD : 1.7.9 (796)
+# BUGS  : N/A
+# NOTES : Updated inspircd module to work with inspircd beta 5 and up
 #
 # BUILD : 1.7.9 (795)
 # BUGS  : 379

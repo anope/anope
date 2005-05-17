@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="799"
+VERSION_BUILD="801"
 
 # $Log$
+#
+# BUILD : 1.7.9 (801)
+# BUGS  : N/A
+# NOTES : last couple of solaris fixs :)
 #
 # BUILD : 1.7.9 (799)
 # BUGS  : N/A

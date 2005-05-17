@@ -67,6 +67,18 @@ extern int connect(int, struct sockaddr *, int);
 # endif
 #endif /* _AIX */
 
+/* Some SUN fixs */
+#ifdef __sun
+/* Solaris specific code, types that do not exist in Solaris'
+ *  * sys/types.h
+ *   **/
+#ifndef INADDR_NONE
+#define INADDR_NONE (-1)
+#endif
+
+#endif
+
+
 #ifdef _WIN32
 #define PATH_MAX 		MAX_PATH
 #define snprintf _snprintf

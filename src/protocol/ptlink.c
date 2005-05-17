@@ -587,7 +587,6 @@ void moduleAddIRCDMsgs(void) {
 
 /* *INDENT-ON* */
 
-
 int anope_event_svsinfo(char *source, int ac, char **av)
 {
     return MOD_CONT;

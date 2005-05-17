@@ -228,7 +228,7 @@ AC_LANG_RESTORE
 ])dnl ACX_PTHREAD
 
 dnl # Configure paths for mysql-client, GPLv2
-dnl #$Id: mysql.m4,v 1.1 2001/10/15 01:48:03 ken Exp $
+dnl #$Id$
 dnl #ken restivo modified 2001/08/04 to remove NULLs and use 0, in case NULL undefined.
 dnl # Markus Fischer <[EMAIL PROTECTED]>,  23.9.1999
 dnl # URL : http://josefine.ben.tuwien.ac.at/~mfischer/m4/mysql-client.m4

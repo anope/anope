@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="796"
+VERSION_BUILD="797"
 
 # $Log$
+#
+# BUILD : 1.7.9 (797)
+# BUGS  : N/A
+# NOTES : Applied some nicities for sun boxs
 #
 # BUILD : 1.7.9 (796)
 # BUGS  : N/A

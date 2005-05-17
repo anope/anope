@@ -1,5 +1,6 @@
 /* PlexusIRCD IRCD functions
 /* PlexusIRCD IRCD functions
+/* PlexusIRCD IRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -695,7 +696,6 @@ void moduleAddIRCDMsgs(void) {
 }
 
 /* *INDENT-ON* */
-
 void plexus_cmd_sqline(char *mask, char *reason)
 {
     send_cmd(NULL, "RESV * %s :%s", mask, reason);

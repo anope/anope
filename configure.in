@@ -159,6 +159,7 @@ AC_DEFINE(DL_PREFIX,"","No prefix needed for dlopen")
 fi
 
 MODULEFLAGS=$ac_cv_pic
+AC_SUBST(MODULEFLAGS)
 AC_DEFINE(USE_MODULES,1,"Modules available")
 ])
 

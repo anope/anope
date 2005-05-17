@@ -5,12 +5,11 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
       	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
-	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}'
+	   'PROFILE=${PROFILE}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
 
 OBJECTS= $(SRCS:.c=.o)
 SO_FILES=$(OBJECTS:.o=.s)
 CDEFS= -g -rdynamic -Wall
-CFLAGS=$(CFLAGS) $(CDEFS)
 
 all: modules subs
 
@@ -22,7 +21,7 @@ install:
 distclean: clean spotless
 
 .c.o:
-	$(CC) $(CFLAGS) -I../${INCLUDEDIR} -c $<
+	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:
 	$(CC) ${SHARED} $< -o $*.so ${PROFILE}

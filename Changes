@@ -1,6 +1,7 @@
 Anope Version S V N
 -------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+05/17 F Compiling on solaris and amd64 systems.                           [ #00]
 05/13 F Possible segfault with do_part by using freed memory.             [#379]
 05/13 F Long hosts got cut off when setting topic and host was recorded.  [#377]
 05/12 F NSListOpersOnly works correctly.                                  [#375]

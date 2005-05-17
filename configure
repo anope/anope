@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT RM CP TOUCH INSTALL CPP EGREP MYSQL RDB MYSQLCLIENT_LDFLAGS MYSQLCLIENT_CFLAGS MYSQLCLIENT_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS ANOPELIBS SHARED RUNGROUP BINDEST DATDEST MODULE_PATH IRCDFILE LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT RM CP TOUCH INSTALL CPP EGREP MYSQL RDB MYSQLCLIENT_LDFLAGS MYSQLCLIENT_CFLAGS MYSQLCLIENT_LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os acx_pthread_config PTHREAD_CC PTHREAD_LIBS PTHREAD_CFLAGS ANOPELIBS SHARED MODULEFLAGS RUNGROUP BINDEST DATDEST MODULE_PATH IRCDFILE LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -4620,6 +4620,7 @@ _ACEOF
 fi
 
 MODULEFLAGS=$ac_cv_pic
+
 
 cat >>confdefs.h <<\_ACEOF
 #define USE_MODULES 1
@@ -9314,6 +9315,7 @@ s,@PTHREAD_LIBS@,$PTHREAD_LIBS,;t t
 s,@PTHREAD_CFLAGS@,$PTHREAD_CFLAGS,;t t
 s,@ANOPELIBS@,$ANOPELIBS,;t t
 s,@SHARED@,$SHARED,;t t
+s,@MODULEFLAGS@,$MODULEFLAGS,;t t
 s,@RUNGROUP@,$RUNGROUP,;t t
 s,@BINDEST@,$BINDEST,;t t
 s,@DATDEST@,$DATDEST,;t t

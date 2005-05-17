@@ -17,6 +17,8 @@
 
 int do_setall(User * u);
 void myHostServHelp(User * u);
+extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
+                      char *creator, time_t time);
 
 /**
  * Create the off command, and tell anope about it.

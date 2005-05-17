@@ -522,7 +522,7 @@ void inspircd_cmd_vhost_off(User * u)
 void inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
                      time_t expires, char *reason)
 {
-    send_cmd(CreateSum(), "# %s@%s %s %lu %lu :%s", user, host, who, (long int)when, 86400 * 2, reason);
+    send_cmd(CreateSum(), "# %s@%s %s %lu %lu :%s", user, host, who, (unsigned long)when, (unsigned long)86400 * 2, reason);
 }
 
 void inspircd_cmd_svskill(char *source, char *user, char *buf)
@@ -586,9 +586,9 @@ void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)
 {
     if (buf) {
-        send_cmd(CreateSum(), "k %s %s :%s", source, user, chan, buf);
+        send_cmd(CreateSum(), "k %s %s %s :%s", source, user, chan, buf);
     } else {
-        send_cmd(CreateSum(), "k %s %s :", source, user, chan);
+        send_cmd(CreateSum(), "k %s %s %s :", source, user, chan);
     }
 }
 
@@ -682,7 +682,6 @@ int anope_event_eob(char *source, int ac, char **av)
 /* SERVER name hop descript */
 void inspircd_cmd_server(char *servname, int hop, char *descript)
 {
-    Server *newserv;
     if (hop == 0)
     {
           send_cmd(CreateSum(), "H %s",servname);
@@ -758,7 +757,7 @@ void inspircd_cmd_part(char *nick, char *chan, char *buf)
         return;
     }
     if (buf) {
-        send_cmd(CreateSum(), "L %s :%s", nick, chan, buf);
+        send_cmd(CreateSum(), "L %s %s :%s", nick, chan, buf);
     } else {
         send_cmd(CreateSum(), "L %s %s :", nick, chan);
     }
@@ -1037,17 +1036,9 @@ int anope_event_kick(char *source, int ac, char **av)
 
 int anope_event_join(char *source, int ac, char **av)
 {
-    //if (ac != 2)
-    //    return MOD_CONT;
-    //char *v[32];
-    //v[0] = av[1];
-    //do_join(av[0], 1, v);
-    //return MOD_CONT;
-
     User *u;
     Channel *c;
     int i;
-    int32 modes = 0, thismode;
     char* new_av[32];
     char* cumodes[3];
     char thismodes[256];
@@ -1295,7 +1286,7 @@ void inspircd_cmd_unszline(char *mask)
 void inspircd_cmd_szline(char *mask, char *reason, char *whom)
 {
     // } <mask> <who-set-it> <time-set> <duration> :<reason>
-    send_cmd(CreateSum(), "} %s %s %lu %lu :%s",mask,whom,(long int) time(NULL),86400 * 2, reason);
+    send_cmd(CreateSum(), "} %s %s %lu %lu :%s",mask,whom,(unsigned long)time(NULL),(unsigned long)86400 * 2, reason);
 }
 
 /* SGLINE */

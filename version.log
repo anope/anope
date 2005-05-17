@@ -8,9 +8,18 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="9"
-VERSION_BUILD="797"
+VERSION_BUILD="799"
 
 # $Log$
+#
+# BUILD : 1.7.9 (799)
+# BUGS  : N/A
+# NOTES : Fixed compiling on solaris and amd64 systems
+#
+# BUILD : 1.7.9 (798)
+# BUGS  : N/A
+# NOTES : Should compile on solaris and amd64, inspircd.c has warnings atm, [brain] is on them :)
+# 
 #
 # BUILD : 1.7.9 (797)
 # BUGS  : N/A

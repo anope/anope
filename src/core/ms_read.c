@@ -19,6 +19,8 @@ int do_read(User * u);
 int read_memo_callback(User * u, int num, va_list args);
 int read_memo(User * u, int index, MemoInfo * mi, const char *chan);
 void myMemoServHelp(User * u);
+extern void rsend_notify(User * u, Memo * m, const char *chan);
+
 
 /**
  * Create the command, and tell anope about it.

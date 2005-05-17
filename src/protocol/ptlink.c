@@ -720,8 +720,9 @@ void ptlink_cmd_svsmode(User * u, int ac, char **av)
      * theirs. Thus we make a hack and store in moduleData that we need to
      * look out for that.
      */
-    if (strchr(av[0], 'r') && (u->mode & UMODE_N) || (u->mode & UMODE_R)
-        || (u->mode & UMODE_a) || (u->mode & UMODE_h))
+    if ((strchr(av[0], 'r')
+         && ((u->mode & UMODE_N) || (u->mode & UMODE_R)
+             || (u->mode & UMODE_a) || (u->mode & UMODE_h))))
         u->mode |= UMODE_NM;
 }
 

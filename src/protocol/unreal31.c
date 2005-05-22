@@ -786,7 +786,7 @@ void unreal_cmd_250(char *buf)
         return;
     }
 
-    send_cmd(NULL, "250 %s ", buf);
+    send_cmd(NULL, "250 %s", buf);
 }
 
 /* 307 */
@@ -796,7 +796,7 @@ void unreal_cmd_307(char *buf)
         return;
     }
 
-    send_cmd(ServerName, "307 %s ", buf);
+    send_cmd(ServerName, "307 %s", buf);
 }
 
 /* 311 */
@@ -806,7 +806,7 @@ void unreal_cmd_311(char *buf)
         return;
     }
 
-    send_cmd(ServerName, "311 %s ", buf);
+    send_cmd(ServerName, "311 %s", buf);
 }
 
 /* 312 */
@@ -816,7 +816,7 @@ void unreal_cmd_312(char *buf)
         return;
     }
 
-    send_cmd(ServerName, "312 %s ", buf);
+    send_cmd(ServerName, "312 %s", buf);
 }
 
 /* 317 */
@@ -826,7 +826,7 @@ void unreal_cmd_317(char *buf)
         return;
     }
 
-    send_cmd(ServerName, "317 %s ", buf);
+    send_cmd(ServerName, "317 %s", buf);
 }
 
 /* 219 */
@@ -870,7 +870,7 @@ void unreal_cmd_242(char *buf)
         return;
     }
 
-    send_cmd(NULL, "242 %s ", buf);
+    send_cmd(NULL, "242 %s", buf);
 }
 
 /* 243 */
@@ -880,7 +880,7 @@ void unreal_cmd_243(char *buf)
         return;
     }
 
-    send_cmd(NULL, "243 %s ", buf);
+    send_cmd(NULL, "243 %s", buf);
 }
 
 /* 211 */
@@ -890,7 +890,7 @@ void unreal_cmd_211(char *buf)
         return;
     }
 
-    send_cmd(NULL, "211 %s ", buf);
+    send_cmd(NULL, "211 %s", buf);
 }
 
 /* GLOBOPS */

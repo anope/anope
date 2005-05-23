@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="809"
+VERSION_BUILD="810"
 
 # $Log$
+#
+# BUILD : 1.7.10 (810)
+# BUGS  : 
+# NOTES : And heniz (yes, heniz!) made a boo-boo with the version of install.vbs :)
 #
 # BUILD : 1.7.10 (809)
 # BUGS  : 

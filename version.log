@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="808"
+VERSION_BUILD="809"
 
 # $Log$
+#
+# BUILD : 1.7.10 (809)
+# BUGS  : 
+# NOTES : Updated install.vbs to detect SDK paths (by heinz)
 #
 # BUILD : 1.7.10 (808)
 # BUGS  : 

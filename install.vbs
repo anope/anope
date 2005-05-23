@@ -29,7 +29,7 @@ WScript.Echo " | | | || | |  |_|  |_| |  __/"
 WScript.Echo " |_| |_||_| |_\___/|  _/ \___|"
 WScript.Echo "                   | |"
 WScript.Echo "                   |_| IRC Services"
-WScript.Echo "                             v1.7.9"
+WScript.Echo "                        v1.7.10-rc2"
 WScript.Echo ""
 WScript.Echo ""
 WScript.Echo "This program will help you to compile your Services, and ask you"
@@ -163,7 +163,26 @@ If (fso.FolderExists("C:\Program Files\Microsoft Visual Studio\VC98\Lib") And Li
         End If
 End If
 
-If (fso.FileExists("C:\Program Files\Microsoft Visual Studio .NET 2003\VC7\Bin\nmake.exe") = False AND fso.FileExists("C:\Program Files\Microsoft Visual Studio\VC98\Bin\nmake.exe") = False AND fso.FileExists("C:\nmake.exe") = False) Then
+If (fso.FolderExists("C:\Program Files\Microsoft Platform SDK\Lib") And LibPath = "") Then
+        WScript.Echo "I found a copy of Microsoft Platform SDK.."
+        libPath = "C:\Program Files\Microsoft Platform SDK\Lib"
+        CompilerVer = "SDK"
+        If (fso.FileExists(libPath & "/MSVCRT.lib") = False) Then
+                WScript.Echo "Hm. I can't seem to find the default library.. Are you sure this is installed properly?"
+                libPath = ""
+        ElseIf (fso.FileExists(libPath & "/wsock32.lib") = False) Then
+                WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
+                libPath = ""
+        ElseIf (fso.FileExists(libPath & "/advapi32.lib") = False) Then
+                WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
+                libPath = ""
+        ElseIf (fso.FileExists(libPath & "/uuid.lib") = False) Then
+                WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
+                libPath = ""
+        End If
+End If
+
+If (fso.FileExists("C:\Program Files\Microsoft Visual Studio .NET 2003\VC7\Bin\nmake.exe") = False AND fso.FileExists("C:\Program Files\Microsoft Visual Studio\VC98\Bin\nmake.exe") = False AND fso.FileExists("C:\nmake.exe") = False AND fso.FileExists("C:\Program Files\Microsoft Platform SDK\Bin\nmake.exe") = False) Then
                 WScript.Echo ""
                 WScript.Echo "I couldn't seem to find a copy of nmake.exe on your system.."
                 WScript.Echo ""
@@ -171,6 +190,8 @@ If (fso.FileExists("C:\Program Files\Microsoft Visual Studio .NET 2003\VC7\Bin\n
                 WScript.Echo "I suggest downloading a copy from the URL below, and placing it in your C:\ drive."
                 WScript.Echo ""
                 WScript.Echo "http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe"
+                WScript.Echo ""
+                WScript.Echo "You should place nmake.exe in c:\"
                 WScript.Echo ""
 End If
         

@@ -1,6 +1,7 @@
 Anope Version 1.7.10
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+05/23 F Updated install.vbs to detect SDK paths.                          [ #00]
 05/22 F Removed trailing space for whois output.                          [ #00]
 05/17 F Compiling on solaris and amd64 systems.                           [ #00]
 05/13 F Possible segfault with do_part by using freed memory.             [#379]

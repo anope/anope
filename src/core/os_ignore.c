@@ -171,6 +171,9 @@ void delete_ignore(const char *nick)
         if (stricmp(ign->who, nick) == 0)
             break;
     }
+	/* If the ignore was not found, bail out -GD */
+	if (!ign)
+		return;
     if (prev)
         prev->next = ign->next;
     else

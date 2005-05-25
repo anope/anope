@@ -99,30 +99,33 @@ IgnoreData *get_ignore(const char *nick)
             break;
         }
     }
-    if (!finished && whichlist2) {
-        for (ign = *whichlist2, prev = NULL; ign;
-             prev = ign, ign = ign->next) {
-            if (match_usermask(ign->who, u)) {
-                finished = 1;
-                break;
+    /* We can only do the next checks if we have an actual user -GD */
+    if (u) {
+        if (!finished && whichlist2) {
+            for (ign = *whichlist2, prev = NULL; ign;
+                 prev = ign, ign = ign->next) {
+                if (match_usermask(ign->who, u)) {
+                    finished = 1;
+                    break;
+                }
             }
         }
-    }
-    if (!finished) {
-        for (ign = *whichlistast, prev = NULL; ign;
-             prev = ign, ign = ign->next) {
-            if (match_usermask(ign->who, u)) {
-                finished = 1;
-                break;
+        if (!finished) {
+            for (ign = *whichlistast, prev = NULL; ign;
+                 prev = ign, ign = ign->next) {
+                if (match_usermask(ign->who, u)) {
+                    finished = 1;
+                    break;
+                }
             }
         }
-    }
-    if (!finished) {
-        for (ign = *whichlistqst, prev = NULL; ign;
-             prev = ign, ign = ign->next) {
-            if (match_usermask(ign->who, u)) {
-                finished = 1;
-                break;
+        if (!finished) {
+            for (ign = *whichlistqst, prev = NULL; ign;
+                 prev = ign, ign = ign->next) {
+                if (match_usermask(ign->who, u)) {
+                    finished = 1;
+                    break;
+                }
             }
         }
     }

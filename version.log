@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="810"
+VERSION_BUILD="811"
 
 # $Log$
+#
+# BUILD : 1.7.10 (811)
+# BUGS  : 
+# NOTES : Development Framework
 #
 # BUILD : 1.7.10 (810)
 # BUGS  : 

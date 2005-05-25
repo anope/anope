@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="811"
+VERSION_BUILD="813"
 
 # $Log$
+#
+# BUILD : 1.7.10 (813)
+# BUGS  : 380
+# NOTES : Fixed a bug with listnicks option displaying
 #
 # BUILD : 1.7.10 (811)
 # BUGS  : 

@@ -117,17 +117,17 @@ void listnicks(int count_only, const char *nick)
             need_comma = 1;
         }
         if (na->nc->flags & NI_SECURE) {
-            end += snprintf(buf, sizeof(buf) - (end - buf), "%sSecurity",
+            end += snprintf(end, sizeof(buf) - (end - buf), "%sSecurity",
                             need_comma ? commastr : "");
             need_comma = 1;
         }
         if (na->nc->flags & NI_PRIVATE) {
-            end += snprintf(buf, sizeof(buf) - (end - buf), "%sPrivate",
+            end += snprintf(end, sizeof(buf) - (end - buf), "%sPrivate",
                             need_comma ? commastr : "");
             need_comma = 1;
         }
         if (na->status & NS_NO_EXPIRE) {
-            end += snprintf(buf, sizeof(buf) - (end - buf), "%sNo Expire",
+            end += snprintf(end, sizeof(buf) - (end - buf), "%sNo Expire",
                             need_comma ? commastr : "");
             need_comma = 1;
         }

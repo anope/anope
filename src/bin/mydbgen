@@ -88,16 +88,16 @@ while [ -z "$SQLDB" ] ; do
         fi
 done
 
-MYSQLDUMP="mysqldump -h$SQLHOST -u$SQLUSER $SQLDB"
-MYSQLSHOW="mysqlshow -h$SQLHOST -u$SQLUSER $SQLDB"
-MYSQL="mysql -h$SQLHOST -u$SQLUSER $SQLDB"
+MYSQLDUMP="mysqldump -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB"
+MYSQLSHOW="mysqlshow -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB"
+MYSQL="mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB"
 
 echo ""
 
 $MYSQLSHOW | grep -q $SQLDB
 if test "$?" = "1" ; then
 	echo -n "Unable to find databse, creating... "
-	mysql -h$SQLHOST -u$SQLUSER -Bs -e "create database $SQLDB" >/dev/null 2>&1
+	mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS -Bs -e "create database $SQLDB" >/dev/null 2>&1
 	if test "$?" = "0" ; then
 		echo "done!"
 	else
@@ -122,7 +122,7 @@ else
 	if test "$?" = "1" ; then
 		echo -n "Unable to find Anope info table, creating... "
 		echo "CREATE TABLE anope_info (version int, date datetime) TYPE=MyISAM" > $TFILE
-		mysql -h$SQLHOST -u$SQLUSER $SQLDB < $TFILE >/dev/null 2>&1
+		mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
 		if test "$?" = "0" ; then
 			echo "done!"
 
@@ -142,7 +142,7 @@ else
 	if test "$?" = "1" ; then
 		echo -n "Unable to find anope_cs_info.memomax, altering... "
 		echo "ALTER TABLE anope_cs_info ADD memomax smallint unsigned NOT NULL default 0" > $TFILE
-		mysql -h$SQLHOST -u$SQLUSER $SQLDB < $TFILE >/dev/null 2>&1
+		mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
 		if test "$?" = "0" ; then
 			echo "done!"
 
@@ -157,7 +157,7 @@ else
 	if test "$?" = "1" ; then
 		echo -n "Unable to find anope_cs_info.ttb, altering... "
 		echo "ALTER TABLE anope_cs_info ADD ttb smallint NOT NULL default 0" > $TFILE
-		mysql -h$SQLHOST -u$SQLUSER $SQLDB < $TFILE >/dev/null 2>&1
+		mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
 		if test "$?" = "0" ; then
 			echo "done!"
 
@@ -170,12 +170,12 @@ else
 	# Introduced on Anope 1.7.7 -> status smallint to inst unsigned.
 	echo "Blindly altering status for bigger capacity... "
 	echo "ALTER TABLE anope_ns_alias CHANGE status status int(11) unsigned NOT NULL default 0" > $TFILE
-	mysql -h$SQLHOST -u$SQLUSER $SQLDB < $TFILE >/dev/null 2>&1
+	mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
 
 	# Introduced on Anope 1.7.8 (620) proxy scanner removed.
 	echo "Removing proxy scanner cache... "
 	echo "DROP TABLE IF EXISTS anope_os_cache" > $TFILE
-	mysql -h$SQLHOST -u$SQLUSER $SQLDB < $TFILE >/dev/null 2>&1
+	mysql -h$SQLHOST -u$SQLUSER $SQLPASS_PREFIX$SQLPASS $SQLDB < $TFILE >/dev/null 2>&1
 
 	echo "done!"
 

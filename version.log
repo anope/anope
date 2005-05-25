@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="813"
+VERSION_BUILD="814"
 
 # $Log$
+#
+# BUILD : 1.7.10 (814)
+# BUGS  : 381
+# NOTES : Removed a double extern definition of rdb_tag_table; Fixed mydbgen so it sends the pass and installs in the data dir
 #
 # BUILD : 1.7.10 (813)
 # BUGS  : 380

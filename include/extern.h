@@ -498,7 +498,6 @@ E int rdb_init();
 E int rdb_open();
 E int rdb_close();
 E int rdb_tag_table(char *table);
-E int rdb_tag_table(char *table);
 E int rdb_clear_table(char *table);
 E int rdb_scrub_table(char *table, char *clause);
 E int rdb_direct_query(char *query);

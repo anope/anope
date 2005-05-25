@@ -107,12 +107,12 @@ install: services
 	test -d ${BINDEST} || mkdir ${BINDEST}
 	$(INSTALL) services $(BINDEST)/services
 	$(INSTALL) bin/anoperc $(BINDEST)/anoperc
-	$(INSTALL) bin/mydbgen $(BINDEST)/mydbgen
 	rm -f $(BINDEST)/listnicks $(BINDEST)/listchans
 	ln $(BINDEST)/services $(BINDEST)/listnicks
 	ln $(BINDEST)/services $(BINDEST)/listchans
 	(cd ../lang ; $(MAKE) install)
 	$(CP) ../data/* $(DATDEST)
+	$(INSTALL) bin/mydbgen $(DATDEST)/mydbgen
 	test -d $(DATDEST)/backups || mkdir $(DATDEST)/backups
 	test -d $(DATDEST)/logs || mkdir $(DATDEST)/logs
 	@if [ "$(MODULE_PATH)" ] ; then \

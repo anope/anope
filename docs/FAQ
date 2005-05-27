@@ -97,6 +97,10 @@ List of Questions
 
 35) How can i enable the OperServ RAW command?
 
+36) Can you help me?
+
+37) Where is RootServ?
+
 
 List of answers
 ---------------
@@ -416,3 +420,16 @@ List of answers
     load it, add the os_raw module to the list of OperServ core
     modules. But be sure to keep in mind that when you enable the RAW
     command, you CANNOT GET ANY SUPPORT for Anope anymore.
+
+36) Can you help me?
+
+    No, we can't help you unless you tell us what you need help with.
+
+37) Where is RootServ?
+
+    Anope does not supply RootServ. All functions you would find in
+    RootServ have been integrated into OperServ. If you really want
+    to use RootServ, you can set the OperServAlias in services.conf
+    to be RootServ. This will enable the RootServ nick to be used for
+    OperServ as well. Read the comments need OperServAlias in the
+    configuration file for more information.

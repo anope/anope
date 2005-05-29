@@ -528,7 +528,6 @@ int anope_event_436(char *source, int ac, char **av)
 }
 
 
-/* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
     
@@ -585,7 +584,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("UNZLINE",   anope_event_null); addCoreMessage(IRCD,m);
 }
 
-/* *INDENT-ON* */
+int anope_event_svsinfo(char *source, int ac, char **av)
 {
     return MOD_CONT;
 }

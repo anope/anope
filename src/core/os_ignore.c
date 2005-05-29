@@ -32,7 +32,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
     c = createCommand("IGNORE", do_ignoreuser, is_services_admin,
                       OPER_HELP_IGNORE, -1, -1, -1, -1);
@@ -171,9 +172,9 @@ void delete_ignore(const char *nick)
         if (stricmp(ign->who, nick) == 0)
             break;
     }
-	/* If the ignore was not found, bail out -GD */
-	if (!ign)
-		return;
+    /* If the ignore was not found, bail out -GD */
+    if (!ign)
+        return;
     if (prev)
         prev->next = ign->next;
     else

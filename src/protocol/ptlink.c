@@ -1,4 +1,5 @@
 /* PTLink IRCD functions
+/* PTLink IRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -586,7 +587,6 @@ void moduleAddIRCDMsgs(void) {
 }
 
 /* *INDENT-ON* */
-int anope_event_svsinfo(char *source, int ac, char **av)
 {
     return MOD_CONT;
 }
@@ -1717,5 +1717,3 @@ int AnopeInit(int argc, char **argv)
 
     return MOD_CONT;
 }
-
-

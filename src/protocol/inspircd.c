@@ -636,10 +636,19 @@ void inspircd_cmd_privmsg2(char *source, char *dest, char *msg)
 
 void inspircd_cmd_serv_notice(char *source, char *dest, char *msg)
 {
+   if (!strcmp(dest,uplink))
+   {
+      alog("debug: serv_notice output to %s", dest);
+      send_cmd(CreateSum(), "V %s * :%s", source, msg);
+   }
 }
 
 void inspircd_cmd_serv_privmsg(char *source, char *dest, char *msg)
 {
+   if (!strcmp(dest,uplink))
+   {
+      send_cmd(CreateSum(), "P %s * :%s", source, msg);
+   }
 }
 
 
@@ -826,7 +835,7 @@ void inspircd_cmd_211(char *buf)
 /* GLOBOPS */
 void inspircd_cmd_global(char *source, char *buf)
 {
-    send_cmd(CreateSum(), "V %s * :%s", (source ? source : s_OperServ), buf);
+    send_cmd(CreateSum(), "V %s @* :%s", (source ? source : s_OperServ), buf);
 }
 
 /* SQLINE */
@@ -901,9 +910,7 @@ void inspircd_cmd_connect(int servernum)
 
 int anope_event_ping(char *source, int ac, char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    inspircd_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    inspircd_cmd_pong("", "");
     return MOD_CONT;
 }
 
@@ -941,7 +948,7 @@ int anope_event_topic(char *source, int ac, char **av)
     v[1] = av[0];
     v[2] = "0";
     v[3] = av[2];
-    do_topic(av[0], 3, v);
+    do_topic(av[0], 4, v);
     return MOD_CONT;
 }
 

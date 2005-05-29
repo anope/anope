@@ -36,7 +36,7 @@ int AnopeInit(int argc, char **argv)
      * we can look at moving it here later
      **/
     c = createCommand("OPERNEWS", do_opernews, is_services_oper,
-                      NEWS_HELP_LOGON, -1, -1, -1, -1);
+                      NEWS_HELP_OPER, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     moduleSetOperHelp(myOperServHelp);

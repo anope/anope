@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+05/29 F operserv opernews dispalys the correct help now.                  [#386]
 05/27 F Updated docs/FAQ.                                                 [ #00]
 05/25 F Segfault when clearing non-existing nick '0' from ignore list.    [#383]
 05/25 F Removed a double extern definition of rdb_tag_table.              [#381]

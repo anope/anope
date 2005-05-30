@@ -621,10 +621,40 @@ void m_AddLanguages(void)
         "    OINFO         Addiert / Löscht eine OperInfo Linie zu / von einen Channel"
     };
 
+    char *langtable_pt[] = {
+        /* OINFO_SYNTAX */
+        "Sintaxe: OINFO [ADD|DEL] nick <informação>",
+        /* OINFO_ADD_SUCCESS */
+        "A linha OperInfo foi adicionada ao nick %s",
+        /* OINFO_DEL_SUCCESS */
+        "A linha OperInfo foi removida do nick %s",
+        /* OCINFO_SYNTAX */
+        "Sintaxe: OINFO [ADD|DEL] canal <informação>",
+        /* OCINFO_ADD_SUCCESS */
+        "A linha OperInfo foi adicionada ao canal %s",
+        /* OCINFO_DEL_SUCCESS */
+        "A linha OperInfo foi removida do canal %s",
+        /* OINFO_HELP */
+        "Sintaxe: OINFO [ADD|DEL] nick <informação>\n"
+            "Adiciona ou apaga informação para Operadores ao nick fornecido\n"
+            "Isto será mostrado quando qualquer Operador usar /ns info nick\n"
+            "e pode ser usado para 'etiquetar' usuários etc...",
+        /* OCINFO_HELP */
+        "Sintaxe: OINFO [ADD|DEL] canal <informação>\n"
+            "Adiciona ou apaga informação para Operadores ao canal fornecido\n"
+            "Isto será mostrado quando qualquer Operador usar /cs info canal\n"
+            "e pode ser usado para 'etiquetar' canais etc...",
+        /* OINFO_HELP_CMD */
+        "    OINFO      Adiciona ou Apaga a linha OperInfo para um nick",
+        /* OCINFO_HELP_CMD */
+        "    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
 }
 
 /*************************************************************************/

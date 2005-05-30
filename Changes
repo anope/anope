@@ -8,6 +8,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 05/25 F Fixed mydbgen so it sends the pass and installs in the data dir.  [ #00]
 05/25 F Not all nick options were displayed in listnicks.                 [#380]
 
+Provided by Ricardo <ricardoltdb@gmail.com> - 2005
+05/30 F Updated Portuguese language file. And bundled modules language.   [ #00]
+
 Anope Version 1.7.10
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005

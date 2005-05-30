@@ -366,9 +366,42 @@ void my_add_languages(void)
         "Erzwungen %s"
     };
 
+    /* Portuguese */
+    char *langtable_pt[] = {
+        /* LNG_CHAN_HELP */
+        "    ENFORCE    Verifica o cumprimento de vários modos de canal e opções ajustadas",
+        /* LNG_ENFORCE_SYNTAX */
+        "Sintaxe: \002ENFORCE \037canal\037 [\037opção\037]\002",
+        /* LNG_CHAN_HELP_ENFORCE */
+        "Verifica o cumprimento de vários modos de canal e opções ajustadas.\n"
+            "O campo \037canal\037 indica qual canal deve ter os modos e opções verificadas\n"
+            "O campo \037opção\037 indica quais modos e opções devem ser verificadas,\n"
+            "e pode ser: SET, SECUREOPS, RESTRICTED, MODES ou +R\n"
+            "Quando deixado em branco, o padrão é SET.\n"
+            " \n"
+            "Se \037opção\037 for SET, serão verificadas as opções SECUREOPS e RESTRICTED\n"
+            "para usuários que estiverem no canal, caso elas estejam ativadas. Use\n"
+            "SECUREOPS para verificar a opção SECUREOPS, mesmo que ela não esteja ativada\n"
+            "Use RESTRICTED para verificar a opção RESTRICTED, mesmo que ela não esteja\n"
+            "ativada.",
+        /* LNG_CHAN_HELP_ENFORCE_R_ENABLED */
+        "Se \037opção\037 for MODES, será verificado o modo de canal +R caso ele\n"
+            "esteja ativado. Se +R for especificado para \037opção\037, o modo de canal\n"
+            "+R também será verificado, mesmo que ele não esteja ativado. Se ele não\n"
+            "estiver ativado, os usuários serão banidos para evitar que reentrem no canal.",
+        /* LNG_CHAN_HELP_ENFORCE_R_DISABLED */
+        "Se \037opção\037 for MODES, nada será verificado, visto que isto poderia\n"
+            "verificar modos que o IRCd atual não suporta. Se +R for especificado\n"
+            "para \037opção\037, um equivalente ao modo de canal +R em outros IRCds\n"
+            "será verificado. Todos os usuários que estão no canal, mas não estejam\n"
+            "identificados para seus nicks serão kickados e banidos do canal.",
+	"Verificado %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
 }
 
 /* EOF */

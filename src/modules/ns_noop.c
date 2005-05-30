@@ -461,10 +461,34 @@ void m_AddLanguages(void)
             "geben wenn du einen Channel joinst.Um das Befehl zu benutzen\n"
             "musst du identifiziert sein."
     };
+
+    /* Portuguese */
+    char *langtable_pt[] = {
+        /* AUTOOP_SYNTAX */
+        "Sintaxe: AUTOOP [ON|OFF]",
+        /* AUTOOP_STATUS_ON */
+        "Sua configuração atual de AUTOOP está ATIVADA",
+        /* AUTOOP_STATUS_OFF */
+        "Sua configuração atual de AUTOOP está DESATIVADA",
+        /* AUTOOP_NO_NICK */
+        "Apenas nicks registrados e identificados podem alterar esta opção",
+        /* AUTOOP_ON */
+        "Você receberá OP automaticamente ao entrar em um canal",
+        /* AUTOOP_OFF */
+        "Você não mais receberá OP automaticamente ao entrar em um canal",
+        /* AUTOOP_DESC */
+        "    AUTOOP     Ativa ou Desativa OP automático ao entrar em um canal",
+        /* AUTOOP_HELP */
+        "Quando ajustado em OFF, este comando irá impedir que o %s ajuste\n"
+            "quaisquer modos em você quando entrar em algum canal. Este comando requer\n"
+            "que você esteja identificado."
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
 }
 
 /*************************************************************************/

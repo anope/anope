@@ -192,9 +192,22 @@ void my_add_languages(void)
         "Syntax: APPENDTOPIC Channel Text\n"
     };
 
+    /* Portuguese */
+    char *langtable_pt[] = {
+        /* LNG_CHAN_HELP */
+        "    APPENDTOPIC   Adiciona texto ao tópico de um canal",
+        /* LNG_CHAN_HELP_APPENDTOPIC */
+        "Este comando permite aos usuários anexar texto a um tópico de canal\n"
+            "já definido. Quando TOPICLOCK está ativado, o tópico é atualizado e\n"
+            "o novo tópico é travado.",
+        /* LNG_APPENDTOPIC_SYNTAX */
+        "Sintaxe: APPENDTOPIC canal texto\n"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
 }
 
 /* EOF */

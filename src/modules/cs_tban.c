@@ -173,14 +173,14 @@ int canBanUser(Channel * c, User * u, User * u2)
 void mAddLanguages(void)
 {
     char *langtable_en_us[] = {
-        "   TBAN         Bans the user for a given length of time",
+        "    TBAN       Bans the user for a given length of time",
         "Syntax: TBAN channel nick time",
         "Bans the given user from a channel for a specified length of\n"
             "time. If the ban is removed before by hand, it will NOT be replaced.",
         "%s banned from %s, will auto-expire in %s"
     };
     char *langtable_nl[] = {
-        "   TBAN         Verban een gebruiker voor een bepaalde tijd",
+        "    TBAN       Verban een gebruiker voor een bepaalde tijd",
         "Syntax: TBAN kanaal nick tijd",
         "Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
             "gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
@@ -189,16 +189,25 @@ void mAddLanguages(void)
     };
 
     char *langtable_de[] = {
-        "   TBAN         Bant ein User für eine bestimmte Zeit aus ein Channel",
+        "    TBAN       Bant ein User für eine bestimmte Zeit aus ein Channel",
         "Syntax: TBAN Channel Nickname Zeit",
         "Bant ein User für eine bestimmte Zeit aus ein Channel\n"
             "Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
         "%s gebannt von %s, wird auto-auslaufen in %s"
     };
 
+    char *langtable_pt[] = {
+        "    TBAN       Bane o usuário por um determinado período de tempo",
+        "Sintaxe: TBAN canal nick tempo",
+        "Bane de um canal o usuário especificado por um determinado período de\n"
+            "tempo. Se o ban for removido manualmente antes do tempo, ele não será recolocado.",
+        "%s foi banido do %s, irá auto-expirar em %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
+    moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
 }
 
 

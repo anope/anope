@@ -38,11 +38,14 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ###########################################################
 ## Translation fully reviewed/completed/updated
-## by Ricardo (ricardoltdb@gmail.com) at 16/01/2005.
+## by Ricardo (ricardoltdb@gmail.com) at 01/16/2005.
 ###
 ## Tradução totalmente revista/completada/atualizada
 ## por Ricardo (ricardoltdb@gmail.com) em 16/01/2005.
-## - Atualizada/Updated para/to SVN 611 em/at 08/03/2005.
+## Atualizações/Updates:
+## * SVN 564 - 01/31/2005.
+## * SVN 611 - 03/08/2005.
+## * SVN 815 - 05/27/2005.
 ###########################################################
 ###########################################################################
 #
@@ -214,7 +217,7 @@ NICK_X_ILLEGAL
 NICK_X_TRUNCATED
 	Nick %s foi truncado para %d caracteres.
 NICK_X_SUSPENDED
-	Nick %s is currently suspended.
+	Nick %s está atualmente suspenso.
 CHAN_X_NOT_REGISTERED
 	O canal %s não está registrado.
 CHAN_X_NOT_IN_USE
@@ -627,9 +630,9 @@ NICK_INFO_FOR_MORE
 
 # LIST responses
 NICK_INFO_SUSPENDED
-	This nickname is currently suspended, reason: %s
+	Este nick está atualmente suspenso, motivo: %s
 NICK_INFO_SUSPENDED_NO_REASON
-	This nickname is currently suspended
+	Este nick está atualmente suspenso
 
 # LIST responses
 NICK_LIST_SYNTAX
@@ -732,21 +735,21 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	Senha para %s foi enviada.
 
-# FORBID responses
+# SUSPEND responses
 NICK_SUSPEND_SYNTAX
-	SUSPEND nickname reason
+	SUSPEND nick motivo
 NICK_SUSPEND_SUCCEEDED
-	Nick %s is now suspended.
+	Nick %s foi suspendido.
 NICK_SUSPEND_FAILED
-	Couldn't suspend nick %s!
+	Impossível suspender o nick %s!
 
 # UNSUSPEND responses
 NICK_UNSUSPEND_SYNTAX
-	UNSUSPEND nickname
+	UNSUSPEND nick
 NICK_UNSUSPEND_SUCCEEDED
-	Nick %s is now released.
+	Nick %s foi liberado.
 NICK_UNSUSPEND_FAILED
-	Couldn't release nick %s!
+	Impossível liberar o nick %s!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -1015,92 +1018,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET canal KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic retention option for %s is now ON.
+	Retenção de tópico para %s está agora ATIVADA.
 CHAN_SET_KEEPTOPIC_OFF
-	Topic retention option for %s is now OFF.
+	Retenção de tópico para %s está agora DESATIVADA.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET canal TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topic lock option for %s is now ON.
+	Trava de tópico para %s está agora ATIVADA.
 CHAN_SET_TOPICLOCK_OFF
-	Topic lock option for %s is now OFF.
+	Trava de tópico para %s está agora DESATIVADA.
 
-# SET PRIVATE responses
+# SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET canal PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Peace option for %s is now ON.
+	Opção Peace para %s está agora ATIVADA.
 CHAN_SET_PEACE_OFF
-	Peace option for %s is now OFF.
+	Opção Peace para %s está agora DESATIVADA.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET canal PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Private option for %s is now ON.
+	Opção Private para %s está agora ATIVADA.
 CHAN_SET_PRIVATE_OFF
-	Private option for %s is now OFF.
+	Opção Private para %s está agora DESATIVADA.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET canal SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Secure ops option for %s is now ON.
+	Opção Secure OPs para %s está agora ATIVADA.
 CHAN_SET_SECUREOPS_OFF
-	Secure ops option for %s is now OFF.
+	Opção Secure OPs para %s está agora DESATIVADA.
 	
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET canal SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Secure founder option for %s is now ON.
+	Opção Secure Founder para %s está agora ATIVADA.
 CHAN_SET_SECUREFOUNDER_OFF
-	Secure founder option for %s is now OFF.
+	Opção Secure Founder para %s está agora DESATIVADA.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET canal RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Restricted access option for %s is now ON.
+	Opção de acesso restrito para %s está agora ATIVADA.
 CHAN_SET_RESTRICTED_OFF
-	Restricted access option for %s is now OFF.
+	Opção de acesso restrito para %s está agora DESATIVADA.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET canal SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Secure option for %s is now ON.
+	Opção Secure para %s está agora ATIVADA.
 CHAN_SET_SECURE_OFF
-	Secure option for %s is now OFF.
-
+	Opção Secure para %s está agora DESATIVADA.
+	
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET canal SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Signed kick option for %s is now ON.
+	Opção Signed Kicks para %s está agora ATIVADA.
 CHAN_SET_SIGNKICK_LEVEL
-	Signed kick option for %s is now ON, but depends of the
-	level of the user that is using the command.
+	Opção Signed Kicks para %s está agora ATIVADA, mas depende
+	do nível de acesso do usuário que está usando o comando.
 CHAN_SET_SIGNKICK_OFF
-	Signed kick option for %s is now OFF.
+	Opção Signed Kicks para %s está agora DESATIVADA.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET canal OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Op-notice option for %s is now ON.
+	Opção Op-notice para %s está agora ATIVADA.
 CHAN_SET_OPNOTICE_OFF
-	Op-notice option for %s is now OFF.
+	Opção Op-notice para %s está agora DESATIVADA.
 
-# SET NOEXPIRE responses
+# SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET canal XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP lists system for %s is now ON.
+	Sistema de acesso xOP para %s está agora ATIVADO.
 CHAN_SET_XOP_OFF
-	xOP lists system for %s is now OFF.
+	Sistema de acesso xOP para %s está agora DESATIVADO.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX
@@ -1408,7 +1411,7 @@ CHAN_INFO_OPTIONS
 CHAN_INFO_OPT_KEEPTOPIC
 	Retenção de tópico
 CHAN_INFO_OPT_OPNOTICE
-	OP Notice
+	Op-notice
 CHAN_INFO_OPT_PEACE
 	Paz
 CHAN_INFO_OPT_PRIVATE
@@ -1490,13 +1493,13 @@ CHAN_GETPASS_UNAVAILABLE
 CHAN_GETPASS_PASSWORD_IS
 	Senha do canal %s é %s.
 	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
-	GETKEY channel
+	GETKEY canal
 CHAN_GETKEY_NOKEY
-	The channel %s has no key.
+	O canal %s não tem key.
 CHAN_GETKEY_KEY
-	Key for channel %s is %s.
+	A Key do canal %s é %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -2489,10 +2492,9 @@ OPER_AKILL_VIEW_FORMAT
 	      %s
 OPER_AKILL_CLEAR
 	Lista de AKILL apagada.
-	
-# SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+tempo] {canal} [motivo]
+	CHANKILL [+tempo] {#canal} [motivo]
+
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+tempo] {máscara | lista}[:motivo]]
@@ -2664,8 +2666,8 @@ OPER_SET_SQL_ERROR
 OPER_SET_SQL_ERROR_INIT
 	Erro durante inicialização de SQL, verifique seus logs para corrigir.
 OPER_SET_SQL_ERROR_DISABLED
-	SQL is not configured for this network. Please edit the
-	configuration file (services.conf).
+	SQL não está configurada para esta rede. Por favor, edite o
+	arquivo de configuração (services.conf).
 OPER_SET_LIST_OPTION_ON
 	%s está ativada
 OPER_SET_LIST_OPTION_OFF
@@ -2986,7 +2988,7 @@ OPER_HELP_STAFF
 OPER_HELP_DEFCON
 	Sintaxe: DEFCON [1|2|3|4|5]
 
-	O sistema Defcon pode ser usado para implementar um ajuste
+	O sistema Defcon pode ser usado para implementar um conjunto
 	pré-definido de restrições aos Services, útil durante uma
 	tentativa de ataque à Rede.
 
@@ -3190,10 +3192,9 @@ HELP_HELP_HOST
 #
 ###########################################################################
 NICK_HELP_CMD_CONFIRM
-	    CONFIRM    Confirm a nickserv auth code
+	    CONFIRM    Confirma um código de autorização do NickServ
 NICK_HELP_CMD_RESEND
-	    RESEND     Resend a nickserv auth code
-
+	    RESEND     Reenvia um código de autorização do NickServ
 NICK_HELP_CMD_REGISTER
 	    REGISTER   Registra um nick
 NICK_HELP_CMD_GROUP
@@ -3213,33 +3214,32 @@ NICK_HELP_CMD_RELEASE
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   Esqueceu sua senha? Tente isto
 NICK_HELP_CMD_GHOST
-	    GHOST      Disconnects a "ghost" IRC session using your nick
+	    GHOST      Termina uma sessão "fantasma" de IRC que esteja usando seu nick
 NICK_HELP_CMD_ALIST
-	    ALIST      List channels you have access on
+	    ALIST      Lista todos os canais nos quais você tem acesso
 NICK_HELP_CMD_GLIST
-	    GLIST      Lists all nicknames in your group
+	    GLIST      Lista todos os nicks do seu grupo
 NICK_HELP_CMD_INFO
-	    INFO       Displays information about a given nickname
+	    INFO       Mostra informações sobre algum nick registrado
 NICK_HELP_CMD_LIST
-	    LIST       List all registered nicknames that match a given pattern
+	    LIST       Lista todos os nicks registrados que combinam com o padrão fornecido
 NICK_HELP_CMD_LOGOUT
-	    LOGOUT     Reverses the effect of the IDENTIFY command
+	    LOGOUT     Reverte o efeito do comando IDENTIFY
 NICK_HELP_CMD_STATUS
-	    STATUS     Returns the owner status of the given nickname
+	    STATUS     Retorna o status do owner de um determinado nick
 NICK_HELP_CMD_UPDATE
-	    UPDATE     Updates your current status, i.e. it checks for new memos
+	    UPDATE     Atualiza seu status atual, ou seja, verifica novos memos
 NICK_HELP_CMD_GETPASS
-	    GETPASS    Recupera a senha de um nick determinado
-	               (apenas se não estiver com encriptação)
+	    GETPASS    Recupera a senha de um determinado nick
 NICK_HELP_CMD_GETEMAIL
 	    GETEMAIL   Encontra e retorna todos os usuários que se
-	               registraram usando o email fornecido
+	                   registraram usando o email fornecido
 NICK_HELP_CMD_FORBID
 	    FORBID     Previne um nick de ser usado ou registrado
 NICK_HELP_CMD_SUSPEND
-	    SUSPEND    Suspend a given nick
+	    SUSPEND    Suspende o nick fornecido
 NICK_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Unsuspend a given nick
+	    UNSUSPEND  Libera o nick fornecido
 
 NICK_HELP
 	%S permite que você "registre" um nick e evita que outras
@@ -3390,7 +3390,7 @@ NICK_HELP_ACCESS
 NICK_HELP_SET
 	Sintaxe: SET opção parâmetros
 	
-	Ajusta várias opções de nick.  A opção pode ser:
+	Ajusta várias opções de nick. A opção pode ser:
 	
 	    DISPLAY    Mostra o seu grupo nos Services
 	    PASSWORD   Ajusta a senha do seu nick
@@ -3400,10 +3400,8 @@ NICK_HELP_SET
 	    EMAIL      Associa um endereço de e-mail ao seu nick
 	    ICQ        Associa um número de ICQ ao seu nick
 	    GREET      Associa uma mensgem de entrada ao seu nick
-	    KILL       Ativa/Desativa a proteção de kill para o seu
-	               nick
-	    SECURE     Ativa/Desativa o dispositivo de segurança para
-	               o seu nick
+	    KILL       Ativa/Desativa a proteção de kill para o seu nick
+	    SECURE     Ativa/Desativa os recursos de segurança para o seu nick
 	    PRIVATE    Previne seu nick de aparecer em um /msg %S LIST
 	    HIDE       Esconde certas informações sobre seu nick
 	    MSG        Altera o método de comunicação dos Services
@@ -3561,7 +3559,7 @@ NICK_HELP_RELEASE
 NICK_HELP_GHOST
 	Sintaxe: GHOST nick [senha]
 	 
-	Elimina uma sessão "fantasma" de IRC que esteja usando seu
+	Termina uma sessão "fantasma" de IRC que esteja usando seu
 	nick. A sessão "fantasma" é aquela que não está realmente
 	conectada, mas que o servidor de IRC acredita estar ainda
 	ativa por qualquer razão. Isso acontece normalmente se seu
@@ -3787,31 +3785,19 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	Limitado aos Administradores dos Services.
 
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
-
 NICK_SERVADMIN_HELP_SUSPEND
-	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+	Sintaxe: SUSPEND nick motivo
 
-	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
-	Limited to Services admins.
+	SUSPENDE um nick, impedindo-o de ser usado.
 
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
+	Limitado aos Administradores dos Services.
 
 NICK_SERVADMIN_HELP_UNSUSPEND
-	Syntax: UNSUSPEND nickname
+	Sintaxe: UNSUSPEND nick
 
-	UNSUSPENDS a nickname from being used.
+	LIBERA um nick suspendido, permitindo que seja usado.
 
-	Limited to Services admins.
+	Limitado aos Administradores dos Services.
 
 ###########################################################################
 #
@@ -3824,12 +3810,11 @@ CHAN_HELP_CMD_FORBID
 	    FORBID     Previne um canal de ser registrado/usado
 CHAN_HELP_CMD_SUSPEND
 	    SUSPEND    Previne um canal de ser registrado/usado,
-	               preservando os dados do canal e suas configurações.
+	               preservando os dados do canal e suas configurações
 CHAN_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Libera um canal suspenso.
+	    UNSUSPEND  Libera um canal suspenso
 CHAN_HELP_CMD_STATUS
-	    STATUS     Fornece o atual nível de acesso de um
-	               usuário em um canal
+	    STATUS     Fornece o atual nível de acesso de um usuário em um canal
 CHAN_HELP_CMD_REGISTER
 	    REGISTER   Registra um canal
 CHAN_HELP_CMD_IDENTIFY
@@ -3837,11 +3822,9 @@ CHAN_HELP_CMD_IDENTIFY
 CHAN_HELP_CMD_SET
 	    SET        Ajusta as opções e informações do canal
 CHAN_HELP_CMD_AOP
-	    AOP        Modifica a lista de usuários AOP
-	               (efetivo quando listagem xOP está ativada)
+	    AOP        Modifica a lista de AOP (AutoOP) de um canal
 CHAN_HELP_CMD_SOP
-	    SOP        Modifica a lista de usuários SOP
-	               (efetivo quando listagem xOP está ativada)
+	    SOP        Modifica a lista de SOP (SuperOP) de um canal
 CHAN_HELP_CMD_ACCESS
 	    ACCESS     Modifica a lista de usuários privilegiados
 CHAN_HELP_CMD_LEVELS
@@ -3853,53 +3836,53 @@ CHAN_HELP_CMD_DROP
 CHAN_HELP_CMD_SENDPASS
 	    SENDPASS   Ajuda para recuperar senhas
 CHAN_HELP_CMD_BAN
-	    BAN        Bans a selected nick on a channel
+	    BAN        Bane o nick selecionado em um canal
 CHAN_HELP_CMD_CLEAR
-	    CLEAR      Tells ChanServ to clear certain settings on a channel
+	    CLEAR      Diz ao ChanServ para remover certos ajustes de um canal
 CHAN_HELP_CMD_DEVOICE
-	    DEVOICE    Devoices a selected nick on a channel
+	    DEVOICE    Retira o status de Voice de um nick no canal
 CHAN_HELP_CMD_GETKEY
-	    GETKEY     Returns the key of the given channel
+	    GETKEY     Retorna a key (do modo +k) do canal fornecido
 CHAN_HELP_CMD_INFO
-	    INFO       Lists information about the named registered channel
+	    INFO       Mostra informações sobre algum canal registrado
 CHAN_HELP_CMD_INVITE
-	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+	    INVITE     Pede ao ChanServ para convidar você ou um nick fornecido para um canal
 CHAN_HELP_CMD_KICK
-	    KICK       Kicks a selected nick from a channel
+	    KICK       Kicka (expulsa) um nick de um canal
 CHAN_HELP_CMD_LIST
-	    LIST       Lists all registered channels matching the given pattern
+	    LIST       Lista todos os canais registrados que combinam com o padrão fornecido
 CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
+	    LOGOUT     Desconecta um determinado nick
 CHAN_HELP_CMD_OP
-	    OP         Gives Op status to a selected nick on a channel
+	    OP         Atribui status de OP a um nick no canal
 CHAN_HELP_CMD_TOPIC
-	    TOPIC      Manipulate the topic of the specified channel
+	    TOPIC      Modifica o tópico de um canal
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Remove todos os bans permitindo que você entre em um canal
 CHAN_HELP_CMD_VOICE
-	    VOICE      Voices a selected nick on a channel
+	    VOICE      Atribui status de Voice a um nick no canal
 CHAN_HELP_CMD_VOP
-	    VOP        Maintains the VOP (VOicePeople) list for a channel
+	    VOP        Modifica a lista de VOP (VOicePeople) de um canal
 CHAN_HELP_CMD_DEHALFOP
-	    DEHALFOP   Dehalfops a selected nick on a channel
+	    DEHALFOP   Retira o status de HalfOP de um nick no canal
 CHAN_HELP_CMD_DEOWNER
-	    DEOWNER    Removes your owner status on a channel
+	    DEOWNER    Retira seu status de Owner no canal
 CHAN_HELP_CMD_DEPROTECT
-	    DEPROTECT  Deprotects a selected nick on a channel
+	    DEPROTECT  Desprotege um determinado nick no canal
 CHAN_HELP_CMD_HALFOP
-	    HALFOP     Halfops a selected nick on a channel
+	    HALFOP     Atribui status de HalfOP a um nick no canal
 CHAN_HELP_CMD_HOP
-	    HOP        Maintains the HOP (HalfOP) list for a channel
+	    HOP        Modifica a lista de HOP (HalfOP) de um canal
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gives you owner status on channel
+	    OWNER      Concede-lhe status de Owner no canal
 CHAN_HELP_CMD_PROTECT
-	    PROTECT    Protects a selected nick on a channel
+	    PROTECT    Protege um determinado nick no canal
 CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protects a selected nick on a channel
+	    ADMIN      Protege um determinado nick no canal
 CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotects a selected nick on a channel
+	    DEADMIN    Desprotege um determinado nick no canal
 CHAN_HELP_CMD_DEOP
-	    DEOP       Deops a selected nick on a channel
+	    DEOP       Retira o status de OP de um nick no canal
 
 CHAN_HELP
 	%S permite que você registre e controle vários
@@ -3909,7 +3892,7 @@ CHAN_HELP
 	estão listados abaixo; para usá-los, digite
 	/msg %S comando. Para mais informações sobre
 	um comando específico, digite /msg %S HELP comando.
-	 
+	
 	
 CHAN_HELP_EXPIRES
 	
@@ -3985,10 +3968,8 @@ CHAN_HELP_SET
 	                    aos usuários quando eles entram no canal
 	    BANTYPE       Ajusta como os Services devem fazer o ban
 	    MLOCK         Liga ou desliga a trava dos modos do canal
-	    KEEPTOPIC     Mantem o tópico quando o canal não está
-	                    em uso
-	    TOPICLOCK     O tópico pode ser mudado apenas
-	                    com o comando TOPIC
+	    KEEPTOPIC     Mantem o tópico quando o canal não está em uso
+	    TOPICLOCK     O tópico pode ser mudado apenas com o comando TOPIC
 	    PEACE         Regula o uso de comandos críticos
 	    PRIVATE       Esconde o canal do comando LIST
 	    RESTRICTED    Acesso restrito ao canal
@@ -3996,8 +3977,7 @@ CHAN_HELP_SET
 	    SECUREOPS     Controle rigoroso do status de OP
 	    SECUREFOUNDER Controle rigoroso do status de Fundador do Canal
 	    SIGNKICK      Assinatura dos kicks feitos pelo comando KICK
-	    OPNOTICE      Envia uma notice quando os comandos OP/DEOP 
-	                    são usados
+	    OPNOTICE      Envia uma notice quando os comandos OP/DEOP são usados
 	    XOP           Altera o sistema de privilégio de usuário
 	
 	Digite /msg %S HELP SET opção para maiores informações
@@ -4210,8 +4190,8 @@ CHAN_HELP_SET_XOP
 CHAN_HELP_SET_OPNOTICE
 	Sintaxe: SET canal OPNOTICE {ON | OFF}
 	
-	Ativa e desativa a opção OP-Notice para um canal. Quando
-	OP-Notice estiver ativado, o %S enviará uma notice para
+	Ativa e desativa a opção Op-notice para um canal. Quando
+	Op-notice estiver ativado, o %S enviará uma notice para
 	o canal sempre que os comandos OP ou DEOP forem usados em um
 	usuário no canal.
 
@@ -4336,7 +4316,7 @@ CHAN_HELP_VOP
 	         VOP canal LIST [máscara | lista-entradas]
 	         VOP canal CLEAR
 	
-	Mantém a lista de VOP (AutoVoice) para um canal. A lista
+	Mantém a lista de VOP (VOicePeople) para um canal. A lista
 	de VOP permite a um usuário receber Voice automaticamente
 	ao entrar no canal e dar Voice a si mesmo se não possuir.
 	
@@ -4524,7 +4504,7 @@ CHAN_HELP_LIST
 	Sintaxe: LIST padrão
 	
 	Lista todos os canais registrados que combinam com o padrão
-	dado. (Canais com opção PRIVATE ativada não serão listados).
+	fornecido. (Canais com opção PRIVATE ativada não serão listados).
 
 CHAN_HELP_OP
 	Sintaxe: OP #canal nick
@@ -4732,12 +4712,12 @@ CHAN_HELP_CLEAR
 CHAN_HELP_GETKEY
 	Sintaxe: GETKEY canal
 	
-	Retorna a key de um determinado canal. Este comando é
+	Retorna a key (do modo +k) de um determinado canal. Este comando é
 	geralmente usado por bots e/ou scripts, da seguinte forma:
 	
 	KEY <canal> <key>
 	
-	key é "NENHUM KEY" se nenhuma key estiver gravada.
+	key é "NENHUMA KEY" se nenhuma key estiver gravada.
 	
 CHAN_HELP_SENDPASS
 	Sintaxe: SENDPASS canal
@@ -4910,9 +4890,9 @@ MEMO_HELP_HEADER
 	
 	
 MEMO_HELP_ADMIN
-	not used.
+	Não usado.
 MEMO_HELP_OPER
-	not used.
+	Não usado.
 MEMO_HELP_FOOTER
 	
 	Digite /msg %S HELP comando para ajuda em qualquer um
@@ -4923,7 +4903,7 @@ MEMO_HELP_FOOTER
 	    com o comando %s LEVELS.
 
 MEMO_HELP_SEND
-	Sintaxe: SEND {nick | canal} mensagem
+	Sintaxe: SEND {nick | canal} mensagem
 	
 	Envia um memo ao nick ou ao canal determinado contendo
 	a mensagem. Quando enviada para o destinatário, este
@@ -5139,7 +5119,7 @@ OPER_HELP_CMD_EXCEPTION
 	    EXCEPTION   Modifica a lista de limite de sessões
 OPER_HELP_CMD_NOOP
 	    NOOP        Remove temporariamente todas as O:lines de um 
-	                servidor remotamente
+	                  servidor remotamente
 OPER_HELP_CMD_JUPE
 	    JUPE        Jupa um servidor
 OPER_HELP_CMD_IGNORE
@@ -5792,28 +5772,26 @@ OPER_HELP_MODLIST
 # BotServ help messages
 #
 ###########################################################################
-
-
 BOT_HELP_CMD_BOTLIST
-	BOTLIST            Lista os bots disponíveis
+	    BOTLIST            Lista os bots disponíveis
 BOT_HELP_CMD_ASSIGN
-	ASSIGN             Associa um bot ao canal
+	    ASSIGN             Associa um bot ao canal
 BOT_HELP_CMD_SET
-	SET                Configura as opções do bot
+	    SET                Configura as opções do bot
 BOT_HELP_CMD_KICK
-	KICK               Configura os kickers
+	    KICK               Configura os kickers
 BOT_HELP_CMD_BADWORDS
-	BADWORDS           Configura os palavrões
+	    BADWORDS           Configura os palavrões
 BOT_HELP_CMD_ACT
-	ACT                Makes the bot do the equivalent of a "/me" command
+	    ACT                Faz com que o bot faça o mesmo que o comando "/me"
 BOT_HELP_CMD_INFO
-	INFO               Allows you to see BotServ information about a channel or a bot
+	    INFO               Permite que você veja informações do BotServ sobre um canal ou bot
 BOT_HELP_CMD_SAY
-	SAY                Makes the bot say the given text on the given channel
+	    SAY                Faz com que o bot diga determinado texto no canal dado
 BOT_HELP_CMD_UNASSIGN
-	UNASSIGN           Unassigns a bot from a channel
+	    UNASSIGN           Desassocia um bot de um canal
 BOT_HELP_CMD_BOT
-	BOT                Mantém a lista de bots da Rede
+	    BOT                Mantém a lista de bots da Rede
 
 BOT_HELP
 	%S permite que você tenha um bot no seu canal.
@@ -5825,8 +5803,7 @@ BOT_HELP
 	sobre um comando, digite /msg %S HELP comando.
 	
 BOT_HELP_FOOTER
-	O bot irá entrar no canal sempre que tiver ao menos
-	%d usuário(s) nele.
+	O bot irá entrar no canal sempre que tiver ao menos %d usuário(s) nele.
 	
 BOT_HELP_BOTLIST
 	Sintaxe: BOTLIST
@@ -5852,7 +5829,7 @@ BOT_HELP_UNASSIGN
 BOT_HELP_INFO
 	Sintaxe: INFO {canal | nick}
 	
-	Permite que você veja as informações do %S sobre um
+	Permite que você veja informações do %S sobre um
 	canal ou bot. Se a opção for um canal, então você terá
 	informações tais como kickers ativos. Se tiver sido um nick,
 	você terá informações sobre o bot, como o horário de criação

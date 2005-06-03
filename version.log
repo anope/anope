@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="823"
+VERSION_BUILD="824"
 
 # $Log$
+#
+# BUILD : 1.7.10 (824)
+# BUGS  : 389
+# NOTES : Added the possibility for protocol files to override the code setting mod_current_buffer, which is needed for InspIRCd
 #
 # BUILD : 1.7.10 (823)
 # BUGS  : 385 391

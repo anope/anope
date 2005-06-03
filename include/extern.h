@@ -583,6 +583,7 @@ E int init(int ac, char **av);
 E int servernum;
 
 /**** ircd.c ****/
+E void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av));
 E void pmodule_cmd_svsnoop(void (*func) (char *server, int set));
 E void pmodule_cmd_remove_akill(void (*func) (char *user, char *host));
 E void pmodule_cmd_topic(void (*func) (char *whosets, char *chan, char *whosetit, char *topic, time_t when));

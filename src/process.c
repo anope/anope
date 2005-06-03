@@ -248,18 +248,21 @@ void process()
        to the NICK and thus AV[0] is the message. The new logic is to check
        av[0] to see if its a service nick if so assign mod_current_buffer the
        value from AV[1] else just assign av[0] - TSL */
-    if (av[0]) {
-        if (nickIsServices(av[0], 1)) {
-            if (av[1]) {
-                mod_current_buffer = sstrdup(av[1]);
+    /* First check if the ircd proto module overrides this -GD */
+    if (!anope_set_mod_current_buffer(ac, av)) {
+        if (av[0]) {
+            if (nickIsServices(av[0], 1)) {
+                if (av[1]) {
+                    mod_current_buffer = sstrdup(av[1]);
+                } else {
+                    mod_current_buffer = sstrdup(av[0]);
+                }
             } else {
                 mod_current_buffer = sstrdup(av[0]);
             }
         } else {
-            mod_current_buffer = sstrdup(av[0]);
+            mod_current_buffer = NULL;
         }
-    } else {
-        mod_current_buffer = NULL;
     }
     /* Do something with the message. */
     m = find_message(cmd);

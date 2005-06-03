@@ -421,6 +421,15 @@ void inspircd_set_umode(User * user, int ac, char **av)
     }
 }
 
+/* Set mod_current_buffer from here */
+void inspircd_set_mod_current_buffer(int ac, char **av)
+{
+	if (ac >= 3)
+		mod_current_buffer = sstrdup(av[2]);
+	else
+		mod_current_buffer = NULL;
+}
+
 int anope_event_nickchange(char *source, int ac, char **av);
 int anope_event_servertopic(char *source, int ac, char **av);
 int anope_event_servermode(char *source, int ac, char **av);
@@ -1424,6 +1433,7 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
  * These prototypes must match what anope expects.
  **/
 void moduleAddAnopeCmds() {
+	pmodule_set_mod_current_buffer(inspircd_set_mod_current_buffer);
     pmodule_cmd_svsnoop(inspircd_cmd_svsnoop);
     pmodule_cmd_remove_akill(inspircd_cmd_remove_akill);
     pmodule_cmd_topic(inspircd_cmd_topic);

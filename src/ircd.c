@@ -24,6 +24,7 @@ int UseTSMODE;
  **/
 void initIrcdProto()
 {
+    ircdproto.ircd_set_mod_current_buffer = NULL;
     ircdproto.ircd_set_umode = NULL;
     ircdproto.ircd_cmd_svsnoop = NULL;
     ircdproto.ircd_cmd_remove_akill = NULL;
@@ -94,6 +95,17 @@ void initIrcdProto()
     ircdproto.ircd_cmd_jupe = NULL;
     ircdproto.ircd_valid_nick = NULL;
     ircdproto.ircd_cmd_ctcp = NULL;
+}
+
+/* Special function, returns 1 if executed, 0 if not */
+int anope_set_mod_current_buffer(int ac, char **av)
+{
+    if (ircdproto.ircd_set_mod_current_buffer) {
+        ircdproto.ircd_set_mod_current_buffer(ac, av);
+        return 1;
+    }
+
+    return 0;
 }
 
 void anope_set_umode(User * user, int ac, char **av)
@@ -600,6 +612,11 @@ void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
 /**
  * Set routines for modules to set the prefered function for dealing with things.
  **/
+
+void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av))
+{
+    ircdproto.ircd_set_mod_current_buffer = func;
+}
 
 void pmodule_cmd_svsnoop(void (*func) (char *server, int set))
 {

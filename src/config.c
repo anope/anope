@@ -1395,24 +1395,6 @@ int read_config(int reload)
     }
 
     /**
-     * Temp. disabled, as ircd-> isnt loaded yet, so we cant check here!
-     **/
-/*    if (UseTokens) {
-        if (!ircd->token) {
-            alog("Anope does not support TOKENS for this ircd setting unsetting UseToken");
-            UseTokens = 0;
-        }
-    }
-
-    if (UseTS6 && ircd->ts6) {
-        if (!Numeric) {
-            error(0,
-                  "UseTS6 requires the setting of Numeric to be enabled.");
-            retval = 0;
-        }
-    }*/
-
-    /**
      * If they try to enable any email registration option,
      * make sure they have everything else they need too...
      *

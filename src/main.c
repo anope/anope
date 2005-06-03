@@ -466,6 +466,10 @@ int main(int ac, char **av, char **envp)
     my_av = av;
     my_envp = envp;
 
+    /* General initialization first */
+    if ((i = init_primary(ac, av)) != 0)
+        return i;
+
     /* Find program name. */
     if ((progname = strrchr(av[0], '/')) != NULL)
         progname++;
@@ -492,7 +496,7 @@ int main(int ac, char **av, char **envp)
     }
 
     /* Initialization stuff. */
-    if ((i = init(ac, av)) != 0)
+    if ((i = init_secondary(ac, av)) != 0)
         return i;
 
 

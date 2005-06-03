@@ -121,6 +121,7 @@ int protocol_module_init(void)
 {
     int ret = 0;
     Module *m;
+	
     m = createModule(IRCDModule);
     mod_current_module = m;
     mod_current_user = NULL;
@@ -129,6 +130,27 @@ int protocol_module_init(void)
     moduleSetType(PROTOCOL);
     alog("status: [%d]", ret);
     mod_current_module = NULL;
+	
+	/* This is really NOT the correct place to do config checks, but
+	 * as we only have the ircd struct filled here, we have to over
+	 * here. -GD
+	 */
+    if (UseTokens && !(ircd->token)) {
+        alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
+        UseTokens = 0;
+    }
+	
+	if (UseTS6 && !(ircd->ts6)) {
+		alog("Chosen IRCd does not support TS6, unsetting UseTS6");
+		UseTS6 = 0;
+	}
+	
+	/* We can assume the ircd supports TS6 here */
+    if (UseTS6 && !Numeric) {
+        error(0, "UseTS6 requires the setting of Numeric to be enabled.");
+        ret = -1;
+    }
+
     return ret;
 }
 

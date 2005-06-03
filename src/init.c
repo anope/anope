@@ -398,12 +398,12 @@ static void write_pidfile(void)
 
 /*************************************************************************/
 
-/* Overall initialization routine.  Returns 0 on success, -1 on failure. */
+/* Overall initialization routines.  Return 0 on success, -1 on failure. */
 
-int init(int ac, char **av)
+int openlog_failed = 0, openlog_errno = 0;
+
+int init_primary(int ac, char **av)
 {
-    int i;
-    int openlog_failed = 0, openlog_errno = 0;
     int started_from_term = isatty(0) && isatty(1) && isatty(2);
 
     /* Set file creation mask and group ID. */
@@ -438,6 +438,18 @@ int init(int ac, char **av)
         return -1;
     }
 
+    /* Add IRCD Protocol Module; exit if there are errors */
+    if (protocol_module_init()) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int init_secondary(int ac, char **av)
+{
+    int i;
+    int started_from_term = isatty(0) && isatty(1) && isatty(2);
 
     /* Add Core MSG handles */
     moduleAddMsgs();
@@ -445,10 +457,6 @@ int init(int ac, char **av)
     /* Parse all remaining command-line options. */
     parse_options(ac, av);
 
-    /* Add IRCD Protocol Module; exit if there are errors */
-    if (protocol_module_init()) {
-        return -1;
-    }
 #ifndef _WIN32
     if (!nofork) {
         if ((i = fork()) < 0) {
@@ -481,7 +489,6 @@ int init(int ac, char **av)
         FreeConsole();
     }
 #endif
-
 
     /* Write our PID to the PID file. */
     write_pidfile();

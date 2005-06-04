@@ -5,7 +5,7 @@
 ###############################################
 
 # CONFIGURATION CACHE (e.g. ../config.cache)
-CACHEFILE="../config.cache"
+CACHEFILE="../../config.cache"
 
 # REGISTRATION INFORMATION CACHE FILE (no need to alter this)
 REGCACHE="register.cache"
@@ -25,7 +25,7 @@ REGISTRYADDRESS="register@anope.org"
 ################################################
 
 if [ $0 != "./register" ] ; then
-	echo "Warning: Run this file while in the /bin/ directory (e.g. ./register)"
+	echo "Warning: Run this file while in the /src/bin/ directory (e.g. ./register)"
 	exit 1
 fi
 
@@ -93,7 +93,7 @@ if [ $answer = "YES" ] ; then
 		echo "Cleaning up..."
 		rm $REGCACHE
 		fi
-	echo "Registration Competed. Thank you for registering Anope."
+	echo "Registration Completed. Thank you for registering Anope."
 	exit 0;
 
 fi

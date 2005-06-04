@@ -215,68 +215,6 @@ AC_ARG_WITH(datadir, [ --with-datadir=datadir     Specify the location of the se
 AC_SUBST(DATDEST)
 AC_SUBST(MODULE_PATH)
 
-AC_ARG_WITH(ircd, [ --with-ircd=ircd     Specify the first ircd type], [
-    if test "$withval" = "IRC_BAHAMUT"; then
-    	AC_DEFINE(IRC_BAHAMUT,1,"First IRCD type")
-		IRCDFILE=" bahamut.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_DREAMFORGE"; then
-                AC_DEFINE(IRC_DREAMFORGE,1,"First IRCD type")
-                IRCDFILE=" dreamforge.c "
-	        AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_UNREAL31"; then
-		AC_DEFINE(IRC_UNREAL31,1,"First IRCD type")
-		IRCDFILE=" unreal31.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_ULTIMATE2"; then
-		AC_DEFINE(IRC_ULTIMATE2,1,"First IRCD type")
-		IRCDFILE=" ultimate2.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_ULTIMATE3"; then
-		AC_DEFINE(IRC_ULTIMATE3,1,"First IRCD type")
-		IRCDFILE=" ultimate3.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_HYBRID"; then
-    	AC_DEFINE(IRC_HYBRID,1,"First IRCD type")
-		IRCDFILE=" hybrid.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_VIAGRA"; then
-		AC_DEFINE(IRC_VIAGRA,1,"First IRCD type")
-		IRCDFILE=" viagra.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_PTLINK"; then
-    	AC_DEFINE(IRC_PTLINK,1,"First IRCD type")
-		IRCDFILE=" ptlink.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_RAGE2"; then
-		AC_DEFINE(IRC_RAGE2,1,"First IRCD type")
-		IRCDFILE=" rageircd.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_UNREAL32"; then
-		AC_DEFINE(IRC_UNREAL32,1,"First IRCD type")
-		IRCDFILE=" unreal32.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_SOLID"; then
-		AC_DEFINE(IRC_SOLID,1,"First IRCD type")
-		IRCDFILE=" solidircd.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_PLEXUS"; then
-		AC_DEFINE(IRC_PLEXUS,1,"First IRCD type")
-		IRCDFILE=" plexus.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_RATBOX"; then
-		AC_DEFINE(IRC_RATBOX,1,"First IRCD type")
-		IRCDFILE=" ratbox.c "
-		AC_SUBST(IRCDFILE)
-    elif test "$withval" = "IRC_SHADOWIRCD"; then
-		AC_DEFINE(IRC_SHADOWIRCD,1,"First IRCD type")
-		IRCDFILE=" shadowircd.c "
-		AC_SUBST(IRCDFILE)
-
-
-    fi
-])
-
 AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], [
     AC_DEFINE_UNQUOTED(USE_ENCRYPTION,,"has encryption")
     AC_DEFINE_UNQUOTED(ENCRYPT_MD5,,"Use md5")

@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="825"
+VERSION_BUILD="826"
 
 # $Log$
+#
+# BUILD : 1.7.10 (826)
+# BUGS  : 384
+# NOTES : Removed --with-ircd stuff from configure(.in)
 #
 # BUILD : 1.7.10 (825)
 # BUGS  : 398

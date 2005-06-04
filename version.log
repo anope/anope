@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="824"
+VERSION_BUILD="825"
 
 # $Log$
+#
+# BUILD : 1.7.10 (825)
+# BUGS  : 398
+# NOTES : Forgot to enable finish_sync() for ultimate3, it was still using the old way to do it
 #
 # BUILD : 1.7.10 (824)
 # BUGS  : 389

@@ -2,6 +2,7 @@ Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+06/04 F Finishing sync for Ultimate3 was not done correctly.              [#398]
 06/03 F Moved checks for UseTokens, UseTS6, and Numeric.                  [#385]
 06/03 F Load protocol module before launching listnicks/listchans.        [#391]
 05/29 F operserv opernews dispalys the correct help now.                  [#386]

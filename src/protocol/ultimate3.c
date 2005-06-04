@@ -1600,10 +1600,9 @@ int anope_event_burst(char *source, int ac, char **av)
          * finished bursting. If there was no source, then our uplink
          * server finished bursting. -GD
          */
-        if (s)
-            s->sync = SSYNC_DONE;
-        else
-            me_server->sync = SSYNC_DONE;
+		if (!s && serv_uplink)
+			s = serv_uplink;
+		finish_sync(s, 1);
     }
     return MOD_CONT;
 }

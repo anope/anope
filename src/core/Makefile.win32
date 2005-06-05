@@ -4,7 +4,7 @@ SRCS=bs_act.c bs_assign.c bs_badwords.c bs_bot.c bs_botlist.c bs_fantasy.c bs_fa
      os_logonnews.c os_mode.c os_modinfo.c os_modlist.c os_modload.c os_modunload.c os_noop.c os_oline.c os_oper.c os_opernews.c os_quit.c os_randomnews.c os_raw.c os_reload.c os_restart.c os_session.c os_set.c os_sgline.c os_shutdown.c os_sqline.c os_staff.c os_stats.c os_svsnick.c os_szline.c os_umode.c os_update.c os_userlist.c
 OBJECTS= $(SRCS:.c=.dll)
 CFLAGS=/LD /MD /D MODULE_COMPILE $(CFLAGS) /I"../../include"
-LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini
+LFLAGS=/link ../anope.lib wsock32.lib $(LIBS) $(LFLAGS) $(MYSQL_LIB_PATH) /export:AnopeInit /export:AnopeFini /VERSION:$(VERSION)
 
 all: $(OBJECTS)
 

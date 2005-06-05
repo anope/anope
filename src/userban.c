@@ -21,6 +21,8 @@
 
 /*************************************************************************/
 
+/* This 2 functions were originally found in Bahamut */
+
 /**
  * Turn a cidr value into a netmask
  * @param cidr CIDR value
@@ -467,6 +469,8 @@ BanInfo *banlist_lookup_id(BanList * bl, uint32 id)
                 return ban;
         }
     }
+
+    return NULL;
 }
 
 /* EOF */

@@ -476,7 +476,7 @@ int main(int ac, char **av, char **envp)
     else
         progname = av[0];
 
-#ifdef __CYGWIN__
+#ifdef _WIN32
     if (strcmp(progname, "listnicks.exe") == 0)
 #else
     if (strcmp(progname, "listnicks") == 0)
@@ -485,7 +485,7 @@ int main(int ac, char **av, char **envp)
         do_listnicks(ac, av);
         return 0;
     }
-#ifdef __CYGWIN__
+#ifdef _WIN32
     else if (strcmp(progname, "listchans.exe") == 0)
 #else
     else if (strcmp(progname, "listchans") == 0)

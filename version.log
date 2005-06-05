@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="827"
+VERSION_BUILD="828"
 
 # $Log$
+#
+# BUILD : 1.7.10 (828)
+# BUGS  : 
+# NOTES : Added a new ban system which should be faster than what we have now and also supports CIDR bans -- not yet in use, but will be used for akills andeventually channel bans -- hashing and cidr bans are not tested yet
 #
 # BUILD : 1.7.10 (827)
 # BUGS  : 394

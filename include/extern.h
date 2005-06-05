@@ -1055,6 +1055,20 @@ E int sockprintf(ano_socket_t s, char *fmt, ...);
 E int conn(const char *host, int port, const char *lhost, int lport);
 E void disconn(ano_socket_t s);
 
+/**** userban.c ****/
+
+E uint32 cidr_to_netmask(uint16 cidr);
+E uint16 netmask_to_cidr(uint32 mask);
+E BanInfo *ban_create(char *mask, uint32 id);
+E int ban_match(BanInfo *ban, char *user, char *host, uint32 ip);
+E int ban_match_mask(BanInfo *ban, char *mask, uint32 ip);
+E int ban_add(BanList *bl, char *mask);
+E void ban_del(BanList *bl, BanInfo *ban);
+E BanList *banlist_create(int hashed);
+E int banlist_match(BanList *bl, char *user, char *host, uint32 ip);
+E int banlist_match_mask(BanList *bl, char *mask, uint32 ip);
+E BanInfo *banlist_lookup_id(BanList *bl, uint32 id);
+
 /**** users.c ****/
 
 E User *userlist[1024];

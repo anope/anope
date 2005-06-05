@@ -1317,6 +1317,44 @@ typedef struct ircd_modes_ {
 
 /*************************************************************************/
 
+/* UserBan support structures */
+
+typedef struct baninfo_ BanInfo;
+typedef struct banlist_ BanList;
+
+struct baninfo_ {
+	uint32 id;   /* Ban ID, can be used to look it up */
+	uint16 type;	/* See BANTYPE_ below */
+	
+	uint32 cidr_mask;  /* Netmask for CIDR matching */
+	uint32 cidr_ip;    /* IP mask for CIDR matching */
+	char *user;    /* User value, NULL when not matched */
+	char *host;    /* Host value, NULL when not matched */
+	
+	char *mask;   /* String version of the ban mask, for displaying */
+	
+	BanInfo *next;
+	BanInfo *prev;
+};
+
+struct banlist_ {
+	uint16  flags;    /* See BANLIST_ below */
+	BanInfo **bans;    /* Ban data lists */
+	uint32 next_id;    /* Next ID to use for a ban */
+};
+
+#define BANTYPE_NONE         0x0000
+#define BANTYPE_CIDR4        0x0001
+#define BANTYPE_USER         0x0002
+#define BANTYPE_USER_WILD    0x0004
+#define BANTYPE_HOST         0x0008
+#define BANTYPE_HOST_WILD    0x0010
+
+#define BANLIST_NONE         0x0000
+#define BANLIST_HASHED       0x0001
+
+/*************************************************************************/
+
 #include "extern.h"
 
 /*************************************************************************/

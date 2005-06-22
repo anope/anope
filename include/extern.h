@@ -574,6 +574,9 @@ E int is_host_remover(User * u);
 E int is_host_setter(User *u);
 E HostCore *hostCoreListHead();
 E HostCore *findHostCore(HostCore * head, char *nick, boolean * found);
+E HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
+E HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
+E HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 E void set_lastmask(User * u);
 
 /**** init.c ****/

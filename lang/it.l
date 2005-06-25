@@ -2966,7 +2966,7 @@ OPER_HELP_STAFF
 	Sintassi: STAFF
 
 	Mostra tutti i nick dello staff dei services coi rispettivi
-    livelli e stato on-line.
+	livelli e stato on-line.
 
 OPER_HELP_DEFCON
 	Sintassi: DEFCON [1|2|3|4|5]
@@ -3717,7 +3717,7 @@ NICK_SERVADMIN_HELP_LIST
 	
 	Se sono specificate le opzioni FORBIDDEN, NOEXPIRE o UNCONFIRMED,
 	unicamente i nick che sono rispettivamente vietati (FORBIDden),
-    non confermati (UNCONFIRMED) oppure hanno la flag NOEXPIRE impostata
+	non confermati (UNCONFIRMED) oppure hanno la flag NOEXPIRE impostata
 	verranno mostrati. Se tutte e tre le opzioni sono specificate, tutti
 	e tre i tipi di nick verranno mostrati. Queste opzioni sono
 	limitate ai Services admin.
@@ -4866,7 +4866,7 @@ CHAN_SERVADMIN_HELP_FORBID
 	il canale indicato. Può essere annullato con
 	una deregistrazione (drop) del canale.
 	
-    Il motivo potrebbe essere richiesto su alcune reti.
+	Il motivo potrebbe essere richiesto su alcune reti.
 
 	Limitato ai Services admin.
 
@@ -6342,10 +6342,10 @@ HOST_HELP_LIST
 	Questo comando elenca i vhost registrati all'operatore.
 	Se una chiave è specificata, verranno mostrati unicamente i
 	vhost corrispondenti a quanto immesso come <chiave>, ad
-    esempio Rob* per tutte le corrispondenze che iniziano con "Rob"
+	esempio Rob* per tutte le corrispondenze che iniziano con "Rob"
 
 	Se viene usata una lista in stile #X-Y, verranno mostrate unicamente
-    le corrispondenze tra X ed Y, ad es. #1-3 mostrerà unicamente le prime
+	le corrispondenze tra X ed Y, ad es. #1-3 mostrerà unicamente le prime
 	3 corrispondenze nick/vhost.
 
 	L'elenco utilizza il valore di NSListMax come limite per

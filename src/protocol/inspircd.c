@@ -19,37 +19,37 @@
 
 #ifdef _WIN32
 #include "winsock.h"
-int inet_aton (const char *name, struct in_addr *addr)
+int inet_aton(const char *name, struct in_addr *addr)
 {
-     uint32 a = inet_addr (name);
-     addr->s_addr = a;
-     return a != (uint32)-1;
+    uint32 a = inet_addr(name);
+    addr->s_addr = a;
+    return a != (uint32) - 1;
 }
 #endif
 
 IRCDVar myIrcd[] = {
     {"InspIRCd 1.0 Beta",       /* ircd name */
-     "+o",                     /* nickserv mode */
-     "+o",                     /* chanserv mode */
-     "+o",                     /* memoserv mode */
-     "+o",                     /* hostserv mode */
-     "+io",                    /* operserv mode */
-     "+o",                     /* botserv mode  */
-     "+o",                     /* helpserv mode */
-     "+i",                     /* Dev/Null mode */
-     "+io",                    /* Global mode   */
-     "+o",                     /* nickserv alias mode */
-     "+o",                     /* chanserv alias mode */
-     "+o",                     /* memoserv alias mode */
-     "+io",                    /* hostserv alias mode */
-     "+io",                    /* operserv alias mode */
-     "+o",                     /* botserv alias mode  */
-     "+o",                     /* helpserv alias mode */
-     "+i",                     /* Dev/Null alias mode */
-     "+io",                    /* Global alias mode   */
-     "+i",                     /* Used by BotServ Bots */
+     "+o",                      /* nickserv mode */
+     "+o",                      /* chanserv mode */
+     "+o",                      /* memoserv mode */
+     "+o",                      /* hostserv mode */
+     "+io",                     /* operserv mode */
+     "+o",                      /* botserv mode  */
+     "+o",                      /* helpserv mode */
+     "+i",                      /* Dev/Null mode */
+     "+io",                     /* Global mode   */
+     "+o",                      /* nickserv alias mode */
+     "+o",                      /* chanserv alias mode */
+     "+o",                      /* memoserv alias mode */
+     "+io",                     /* hostserv alias mode */
+     "+io",                     /* operserv alias mode */
+     "+o",                      /* botserv alias mode  */
+     "+o",                      /* helpserv alias mode */
+     "+i",                      /* Dev/Null alias mode */
+     "+io",                     /* Global alias mode   */
+     "+i",                      /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
-     "-cilmnpstuzCGKNOQRSV",  /* Modes to Remove */
+     "-cilmnpstuzCGKNOQRSV",    /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
      1,                         /* SVSNICK */
      1,                         /* Vhost  */
@@ -114,7 +114,8 @@ IRCDVar myIrcd[] = {
      0,                         /* p10 */
      NULL,                      /* character set */
      1,                         /* reports sync state */
-     },
+     }
+    ,
     {NULL}
 };
 
@@ -401,7 +402,9 @@ void inspircd_set_umode(User * user, int ac, char **av)
             if (add) {
                 opcnt++;
                 if (WallOper) {
-                    anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+                    anope_cmd_global(s_OperServ,
+                                     "\2%s\2 is now an IRC operator.",
+                                     user->nick);
                 }
                 display_news(user, NEWS_OPER);
             } else {
@@ -424,10 +427,10 @@ void inspircd_set_umode(User * user, int ac, char **av)
 /* Set mod_current_buffer from here */
 void inspircd_set_mod_current_buffer(int ac, char **av)
 {
-	if (ac >= 3)
-		mod_current_buffer = sstrdup(av[2]);
-	else
-		mod_current_buffer = NULL;
+    if (ac >= 3)
+        mod_current_buffer = sstrdup(av[2]);
+    else
+        mod_current_buffer = NULL;
 }
 
 int anope_event_nickchange(char *source, int ac, char **av);

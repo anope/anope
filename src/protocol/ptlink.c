@@ -1,4 +1,5 @@
 /* PTLink IRCD functions
+/* PTLink IRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -1716,3 +1717,4 @@ int AnopeInit(int argc, char **argv)
     return MOD_CONT;
 }
 
+ 

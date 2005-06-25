@@ -1,4 +1,5 @@
 /* Rage IRCD functions
+/* Rage IRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -561,7 +562,6 @@ void moduleAddIRCDMsgs(void) {
 }
 
 /* *INDENT-ON* */
-
 int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
@@ -579,16 +579,18 @@ int anope_event_burst(char *source, int ac, char **av)
     s = findserver(servlist, source);
     if (ac > 1) {
         /* for future use  - start burst */
-    } else {
-        /* If we found a server with the given source, that one just
-         * finished bursting. If there was no source, then our uplink
-         * server finished bursting. -GD
-         */
-        if (!s && serv_uplink)
-            s = serv_uplink;
-        finish_sync(s, 1);
-    }
-    return MOD_CONT;
+} else {
+
+    /* If we found a server with the given source, that one just
+     * finished bursting. If there was no source, then our uplink
+     * server finished bursting. -GD
+     */
+    if (!s && serv_uplink)
+        s = serv_uplink;
+    finish_sync(s, 1);
+}
+
+return MOD_CONT;
 }
 
 void rageircd_cmd_sqline(char *mask, char *reason)

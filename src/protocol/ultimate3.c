@@ -1600,9 +1600,9 @@ int anope_event_burst(char *source, int ac, char **av)
          * finished bursting. If there was no source, then our uplink
          * server finished bursting. -GD
          */
-		if (!s && serv_uplink)
-			s = serv_uplink;
-		finish_sync(s, 1);
+        if (!s && serv_uplink)
+            s = serv_uplink;
+        finish_sync(s, 1);
     }
     return MOD_CONT;
 }
@@ -1765,7 +1765,8 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("UltimateIRCd 3.0.0.a26+");

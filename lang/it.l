@@ -3,12 +3,12 @@
 # (C) 2003-2005 Anope Team
 # Contact us at info@anope.org
 #
-# Please read COPYING and README for furhter details.
+# Please read COPYING and README for further details.
 #
 # Based on the original code of Epona by Lara.
 # Based on the original code of Services by Andy Church.
-#
-# Translated by Daniele Nicolucci <jollino@discussioni.org>
+# Based on the translation for Anope 1.6 by Daniele Nicolucci.
+# Translated for Anope 1.8 by Gordon Shumway <hal9000@musichat.net>
 #
 # When translating this file to another language, keep in mind that the
 # order of parameters for sprintf() is fixed in the source code, so your
@@ -51,7 +51,7 @@
 # For example, "Español (Spanish)" or "Français (French)".
 
 LANG_NAME
-	Italiano (Italiano)
+	Italiano (Italian)
 
 ###########################################################################
 #
@@ -69,7 +69,7 @@ LANG_NAME
 # This is used as the format string for strftime() for a date and time
 # together.
 STRFTIME_DATE_TIME_FORMAT
-	%a %d %b %Y %Z - %H:%M:%S
+	%a %d %b %Y - %H:%M:%S %Z
 # This is used as the format string for strftime() for a date alone in long
 # format (English: including weekday).
 STRFTIME_LONG_DATE_FORMAT
@@ -190,11 +190,11 @@ NICK_NOT_REGISTERED
 NICK_NOT_REGISTERED_HELP
 	Il tuo nick non è registrato. Digita /msg %s HELP per informazioni sulla registrazione del nick.
 NICK_X_IS_SERVICES
-	Nick %s is part of this Network's Services.
+	Il nick %s fa parte dei servizi di questo network.
 NICK_X_NOT_REGISTERED
 	Il nick %s non è registrato.
 NICK_X_IN_USE
-	Nick %s is currently in use.
+	Il nick %s è attualmente in uso.
 NICK_X_NOT_IN_USE
 	Il nick %s non è attualmente in uso.
 NICK_X_NOT_ON_CHAN
@@ -205,11 +205,11 @@ NICK_X_FORBIDDEN_OPER
 	Il nick %s è stato vietato da %s:
 	%s
 NICK_X_ILLEGAL
-	Nick %s is an illegal nickname and cannot be used.
+	Il nick %s è un nickname non autorizzato e non può essere utilizzato.
 NICK_X_TRUNCATED
-	Nick %s was truncated to %d characters.
+	Il nick %s è stato troncato a %d caratteri.
 NICK_X_SUSPENDED
-	Nick %s is currently suspended.
+	Il nick %s è momentaneamente sospeso.
 CHAN_X_NOT_REGISTERED
 	Il canale %s non è registrato.
 CHAN_X_NOT_IN_USE
@@ -227,6 +227,7 @@ NICK_IDENTIFY_REQUIRED
 CHAN_IDENTIFY_REQUIRED
 	Autentificazione richiesta per questo comando.
 	Riprova dopo aver digitato /msg %s IDENTIFY %s password.
+
 MAIL_DISABLED
 	I servizi sono stati configurati per non inviare e-mail.
 MAIL_INVALID
@@ -237,6 +238,7 @@ MAIL_LATER
 	Impossibile inviare e-mail adesso; riprova più tardi.
 MAIL_DELAYED
 	Attendi %d secondi è riprova.
+
 NO_REASON
 	Nessun motivo
 UNKNOWN
@@ -329,13 +331,11 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Il nick %s è stato registrato sotto il tuo account: %s
 NICK_REGISTERED_NO_MASK
-	Nickname %s registered.
+	Nickname %s registrato.
 NICK_PASSWORD_IS
 	La tua password è %s - non dimenticarla!
-
-# GROUP responses
 NICK_REG_DELAY
-	You have to be connected longer than %d seconds to register your nick.
+	Devi essere connesso per almeno %d secondi per poter registrare il tuo nick.
 
 # GROUP responses
 NICK_GROUP_SYNTAX
@@ -372,14 +372,12 @@ NICK_IDENTIFY_EMAIL_HOWTO
 	Digita /msg %S SET EMAIL e-mail per inserire la tua e-mail.
 	La tua privacy è rispettata; questa e-mail non sarà data a
 	terzi.
-
-# LOGOUT responses
 NICK_ALREADY_IDENTIFIED
-	You are already identified.
+	Sei già identificato.
 
 # UPDATE responses
 NICK_UPDATE_SUCCESS
-	Status updated (memos, vhost, chmodes, flags).
+	Stato aggiornato (memos, vhost, chmodes, flags).
 	
 # LOGOUT responses
 NICK_LOGOUT_SYNTAX
@@ -388,10 +386,8 @@ NICK_LOGOUT_SUCCEEDED
 	Non sei più identificato per il tuo nick.
 NICK_LOGOUT_X_SUCCEEDED
 	Il nick %s è stato deidentificato.
-
-# DROP responses
 NICK_LOGOUT_SERVICESADMIN
-	Can't logout %s because he's a services administrator.
+	Impossibile deidentificare %s perchè è un services administrator.
 
 # DROP responses
 NICK_DROP_DISABLED
@@ -513,12 +509,10 @@ NICK_SET_HIDE_QUIT_ON
 	Il tuo ultimo messaggio di quit sarà nascosto dai messaggi INFO di %s.
 NICK_SET_HIDE_QUIT_OFF
 	Il tuo ultimo messaggio di quit sarà visualizzato nei messaggi INFO di %s.
-
-# SET MSG responses
 NICK_SET_HIDE_STATUS_ON
-	Your services access status will now be hidden from %s INFO displays.
+	Il tuo stato di accesso ai servizi verrà ora nascosto dalle visualizzazioni %s di INFO.
 NICK_SET_HIDE_STATUS_OFF
-	Your services access status will now be shown in %s INFO displays.
+	Il tuo stati di accesso ai servizi verrà ora mostrato nelle visualizzazioni %s di INFO.
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
@@ -554,19 +548,19 @@ NICK_ACCESS_LIST
 NICK_ACCESS_LIST_X
 	Lista di accesso di %s:
 NICK_ACCESS_LIST_EMPTY
-	Your access list is empty.
+	La tua lista d'accesso è vuota.
 NICK_ACCESS_LIST_X_EMPTY
-	Access list for %s is empty.
+	La lista d'accesso per %s è vuota.
 
 # Status messages
 NICK_STATUS_0
-	STATUS %s 0
+	STATO %s 0
 NICK_STATUS_1
-	STATUS %s 1
+	STATO %s 1
 NICK_STATUS_2
-	STATUS %s 2
+	STATO %s 2
 NICK_STATUS_3
-	STATUS %s 3
+	STATO %s 3
 
 # INFO responses
 NICK_INFO_SYNTAX
@@ -578,7 +572,7 @@ NICK_INFO_SERVICES_OPER
 NICK_INFO_SERVICES_ADMIN
 	%s è un amministratore dei servizi (services admin).
 NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+	%s è un amministratore root dei servizi (services root admin).
 NICK_INFO_ADDRESS
 	     Ultimo indirizzo usato: %s
 NICK_INFO_ADDRESS_ONLINE
@@ -622,12 +616,10 @@ NICK_INFO_NO_EXPIRE
 	Questo nick non scadrà.
 NICK_INFO_FOR_MORE
 	Per ottenere altre informazioni, digita /msg %s INFO %s ALL.
-
-# LIST responses
 NICK_INFO_SUSPENDED
-	This nickname is currently suspended, reason: %s
+	Questo nickname è momentaneamente sospeso, motivo: %s
 NICK_INFO_SUSPENDED_NO_REASON
-	This nickname is currently suspended
+	Questo nickname è momentaneamente sospeso
 
 # LIST responses
 NICK_LIST_SYNTAX
@@ -665,7 +657,7 @@ NICK_GLIST_FOOTER
 NICK_GLIST_REPLY
 	   %c%s
 NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %c%s (scade tra %s)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
@@ -700,13 +692,13 @@ NICK_GETPASS_UNAVAILABLE
 NICK_GETPASS_PASSWORD_IS
 	La password di %s è %s.
 
-# SENDPASS responses
+# GETEMAIL responses
 NICK_GETEMAIL_SYNTAX
-	GETEMAIL user@email-host No WildCards!!
+	GETEMAIL user@email-host Niente WildCards!!
 NICK_GETEMAIL_EMAILS_ARE
-	Emails Match %s to %s.
+	Email corrispondondenti %s a %s.
 NICK_GETEMAIL_NOT_USED
-	No Emails listed for %s.
+	Nessuna email in lista per %s.
 	
 # SENDPASS responses
 NICK_SENDPASS_SYNTAX
@@ -730,21 +722,21 @@ NICK_SENDPASS_LINE_5
 NICK_SENDPASS_OK
 	La password di %s è stata inviata.
 
-# FORBID responses
+# SUSPEND responses
 NICK_SUSPEND_SYNTAX
-	SUSPEND nickname reason
+	SUSPEND nick motivo
 NICK_SUSPEND_SUCCEEDED
-	Nick %s is now suspended.
+	Il nick %s è ora sospeso.
 NICK_SUSPEND_FAILED
-	Couldn't suspend nick %s!
+	Impossibile sospendere il nick %s!
 
 # UNSUSPEND responses
 NICK_UNSUSPEND_SYNTAX
 	UNSUSPEND nickname
 NICK_UNSUSPEND_SUCCEEDED
-	Nick %s is now released.
+	Il nick %s è ora rilasciato.
 NICK_UNSUSPEND_FAILED
-	Couldn't release nick %s!
+	Impossibile rilasciare il nick %s!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -756,13 +748,7 @@ NICK_FORBID_SUCCEEDED
 NICK_FORBID_FAILED
 	Impossibile vietare il nick %s!
 
-###########################################################################
-#
-# ChanServ messages
-#
-###########################################################################
-
-# Access level descriptions
+# Nick Registraion responses
 NICK_REQUESTED
 	Questo nick è già stato richiesto. Per favore, controlla la tua casella di posta; dovresti aver ricevuto il codice di attivazione.
 NICK_REG_RESENT
@@ -795,6 +781,8 @@ NICK_GETPASS_PASSCODE_IS
 	Il codice di attivazione per %s is %s.
 NICK_FORCE_REG
 	Il nick %s è stato confermato.
+
+
 
 ###########################################################################
 #
@@ -916,9 +904,9 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	La tua password di canale è %s - non dimenticarla!
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a none existant channel %s
+	Hai provato a registrare un canale non esistente %s
 CHAN_SYMBOL_REQUIRED
-	Please use the symbol of # or & when attempting to register
+	Per favore usa il simbolo # o & provando a registrare
 
 
 # IDENTIFY responses
@@ -1021,92 +1009,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET canale KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic retention option for %s is now ON.
+	La memorizzazione del topic per %s è ora ATTIVATA.
 CHAN_SET_KEEPTOPIC_OFF
-	Topic retention option for %s is now OFF.
+	La memorizzazione del topic per %s è ora DISATTIVATA.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET canale TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topic lock option for %s is now ON.
+	Il blocco del topic per %s è ora ATTIVATO.
 CHAN_SET_TOPICLOCK_OFF
-	Topic lock option for %s is now OFF.
+	Il blocco del topic per %s è ora DISATTIVATO.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET canale PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Peace option for %s is now ON.
+	L'opzione Peace per %s è ora ATTIVATA.
 CHAN_SET_PEACE_OFF
-	Peace option for %s is now OFF.
+	L'opzione Peace per %s è ora DISATTIVATA.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET canale PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Private option for %s is now ON.
+	L'opzione Private per %s è ora ATTIVATA.
 CHAN_SET_PRIVATE_OFF
-	Private option for %s is now OFF.
+	L'opzione Private per %s è ora DISATTIVATA.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET canale SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Secure ops option for %s is now ON.
+	L'opzione Secure ops per %s è ora ATTIVATA.
 CHAN_SET_SECUREOPS_OFF
-	Secure ops option for %s is now OFF.
+	L'opzione Secure ops per %s è ora DISATTIVATA.
 
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET canale SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Secure founder option for %s is now ON.
+	L'opzione Secure founder per %s è ora ATTIVATA.
 CHAN_SET_SECUREFOUNDER_OFF
-	Secure founder option for %s is now OFF.
+	L'opzione Secure founder per %s è ora DISATTIVATA.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET canale RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Restricted access option for %s is now ON.
+	L'opzione Restricted access per %s è ora ATTIVATA.
 CHAN_SET_RESTRICTED_OFF
-	Restricted access option for %s is now OFF.
+	L'opzione Restricted access per %s è ora DISATTIVATA.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET canale SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Secure option for %s is now ON.
+	L'opzione Secure per %s è ora ATTIVATA.
 CHAN_SET_SECURE_OFF
-	Secure option for %s is now OFF.
+	L'opzione Secure per %s è ora DISATTIVATA.
 
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET canale SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Signed kick option for %s is now ON.
+	L'opzione Signed kick per %s è ora ATTIVATA.
 CHAN_SET_SIGNKICK_LEVEL
-	Signed kick option for %s is now ON, but depends of the
-	level of the user that is using the command.
+	L'opzione Signed kick per %s è ora ATTIVATA, ma dipende dal
+	livello dell'utente che utilizza il comando.
 CHAN_SET_SIGNKICK_OFF
-	Signed kick option for %s is now OFF.
+	L'opzione Signed kick per %s è ora DISATTIVATA.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET canale OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Op-notice option for %s is now ON.
+	L'opzione Op-notice per %s è ora ATTIVATA.
 CHAN_SET_OPNOTICE_OFF
-	Op-notice option for %s is now OFF.
+	L'opzione Op-notice per %s è ora DISATTIVATA.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET canale XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP lists system for %s is now ON.
+	Il sistema di liste xOP per %s è ora ATTIVATO.
 CHAN_SET_XOP_OFF
-	xOP lists system for %s is now OFF.
+	Il sistema di liste xOP per %s è ora DISATTIVATO.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX
@@ -1289,7 +1277,7 @@ CHAN_ACCESS_LIST_HEADER
 	Lista di accesso di %s:
 	  Num   Liv  Nick
 CHAN_ACCESS_LIST_FOOTER
-	End of access list.
+	Fine della lista di accesso.
 CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
@@ -1367,13 +1355,13 @@ CHAN_LEVELS_RESET
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS ERROR Errore di sintassi
 CHAN_STATUS_NOT_REGGED
-	STATUS ERROR Channel %s not registered
+	STATUS ERROR Il canale %s non è registrato
 CHAN_STATUS_FORBIDDEN
-	STATUS ERROR Channel %s forbidden
+	STATUS ERROR Il canale %s è proibito
 CHAN_STATUS_NOTONLINE
-	STATUS ERROR Nick %s not online
+	STATUS ERROR Il nick %s non è online
 CHAN_STATUS_INFO
 	STATUS %s %s %d
 
@@ -1479,13 +1467,13 @@ CHAN_CLEARED_MODES
 CHAN_CLEARED_OPS
 	Il modo +o è stato rimosso da tutti gli utenti di %s.
 CHAN_CLEARED_HOPS
-	Mode +h has been cleared from channel %s.
+	Il modo +h è stato rimosso dal canale %s.
 CHAN_CLEARED_VOICES
 	Il modo +v è stato rimosso da tutti gli utenti di %s.
 CHAN_CLEARED_USERS
 	Tutti gli utenti sono stati kickati dal canale %s.
 CHAN_CLEARED_INVITES
-	All invites on channel %s have been removed.
+	Tutti gli invites sono stati rimossi dal canale %s.
 
 # GETPASS responses
 CHAN_GETPASS_SYNTAX
@@ -1497,11 +1485,11 @@ CHAN_GETPASS_PASSWORD_IS
 
 # SENDPASS responses
 CHAN_GETKEY_SYNTAX
-	GETKEY channel
+	GETKEY canale
 CHAN_GETKEY_NOKEY
-	The channel %s has no key.
+	Il canale %s non ha una key.
 CHAN_GETKEY_KEY
-	Key for channel %s is %s.
+	La key per il canale %s è %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
@@ -1534,14 +1522,6 @@ CHAN_FORBID_SUCCEEDED
 	Il canale %s non può più essere registrato o usato.
 CHAN_FORBID_FAILED
 	Impossibile vietare il canale %s!
-
-###########################################################################
-#
-# MemoServ messages
-#
-###########################################################################
-
-# Automatic messages
 CHAN_FORBID_REASON
 	Questo canale è stato vietato.
 
@@ -1561,7 +1541,7 @@ CHAN_SUSPEND_REASON
 CHAN_UNSUSPEND_SYNTAX
 	UNSUSPEND canale
 CHAN_UNSUSPEND_ERROR
-	No # found in front of channel name.
+	Nessun # trovato davanti al nome del canale.
 CHAN_UNSUSPEND_SUCCEEDED
 	Il canale %s ora è stato rilasciato.
 CHAN_UNSUSPEND_FAILED
@@ -1629,7 +1609,7 @@ MEMO_SENT
 
 # CANCEL responses
 MEMO_MASS_SENT
-	A massmemo has been sent to all registered users.
+	Un memo di massa è stato inviato a tutti gli utenti registrati.
 	
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
@@ -1682,10 +1662,8 @@ MEMO_DELETED_SEVERAL
 	I memo %s sono stati cancellati.
 MEMO_DELETED_ALL
 	Tutti i tuoi memo sono stati cancellati.
-
-# SET responses
 MEMO_CHAN_DELETED_ALL
-	All memos for channel %s have been deleted.
+	Tutti i memo per il canale %s sono stati cancellati.
 
 # SET responses
 MEMO_SET_SYNTAX
@@ -1706,14 +1684,12 @@ MEMO_SET_NOTIFY_NEW
 	%s ti informerà dei nuovi memo quando li ricevi.
 MEMO_SET_NOTIFY_OFF
 	%s non ti informerà dei nuovi memo.
-
-# SET LIMIT responses
 MEMO_SET_NOTIFY_MAIL
-	You will now be informed about new memos via email.
+	Verrai ora informato su nuovi memo via email.
 MEMO_SET_NOTIFY_NOMAIL
-	You will no longer be informed via email.
+	Non verrai più informato via email.
 MEMO_SET_NOTIFY_INVALIDMAIL
-	There's no email address set for your nick.
+	Non c'è un indirizzo email impostato per il tuo nick.
 
 # SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
@@ -1809,68 +1785,42 @@ MEMO_INFO_X_NOTIFY_RECEIVE
 MEMO_INFO_X_NOTIFY_SIGNON
 	%s viene informato dei nuovi memo quando si connette.
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+# Memo2Mail responses
 MEMO_MAIL_SUBJECT
-	New memo
+	Nuovo memo
 MEMO_MAIL_TEXT1
-	Hi %s
+	Ciao %s
 MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
+	Hai appena ricevuto un nuovo memo da %s. Questo è il memo numero %d.
 MEMO_MAIL_TEXT3
-	Memo Text:
+	Testo del memo:
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+# RSEND responses
 MEMO_RSEND_PLEASE_WAIT
-	Please wait %d seconds before using the RSEND command again.
+	Prego attendere %d secondi prima di usare il comando RSEND command nuovamente.
 MEMO_RSEND_DISABLED
-	Sorry, RSEND has been disabled on this network.
+	Spiacente, RSEND è stato disattivato su questo network.
 MEMO_RSEND_SYNTAX
-	RSEND {nick | channel} memo-text
+	RSEND {nick | canale} testo-memo
 MEMO_RSEND_NICK_MEMO_TEXT
-	[auto-memo] The memo you sent has been viewed.
+	[auto-memo] Il memo che hai inviato è stato letto.
 MEMO_RSEND_CHAN_MEMO_TEXT
-	[auto-memo] The memo you sent to %s has been viewed.
+	[auto-memo] Il memo che hai inviato a %s è stato letto.
 MEMO_RSEND_USER_NOTIFICATION
-	A notification memo has been sent to %s informing him/her you have
-	read his/her memo.
+	Un memo di notifica è stato mandato a %s informandolo/a che hai
+	letto il suo memo.
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+# CHECK responses
 MEMO_CHECK_SYNTAX
 	CHECK nickname
 MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
+	L'ultimo memo che hai inviato a %s (inviato il %s) non è stato ancora letto.
 MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
+	L'ultimo memo che hai inviato a %s (inviato il %s) è stato letto.
 MEMO_CHECK_NO_MEMO
-	Nick %s doesn't have a memo from you.
-
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+	Il nick %s non ha un tuo memo.
 MEMO_NO_RSEND_SELF
-	You can not request a receipt when sending a memo to yourself.
+	Non puoi richiedere una ricevuta se mandi un memo a te stesso.
 
 ###########################################################################
 #
@@ -1960,7 +1910,7 @@ BOT_ASSIGN_SYNTAX
 BOT_ASSIGN_READONLY
 	Spiacente, l'assegnazione dei bot è temporaneamente disabilitata.
 BOT_ASSIGN_ALREADY
-	Bot %s is already assigned to channel %s.
+	Il bot %s è già assegnato al canale %s.
 BOT_ASSIGN_ASSIGNED
 	Il bot %s è stato assegnato a %s.
 
@@ -2044,13 +1994,13 @@ BOT_INFO_OPT_DONTKICKOPS
 BOT_INFO_OPT_DONTKICKVOICES
 	Protezione per i voice
 BOT_INFO_OPT_FANTASY
-	Fantasy
+	Fantasia
 BOT_INFO_OPT_GREET
-	Greet
+	Saluto
 BOT_INFO_OPT_NOBOT
 	Nessun bot
 BOT_INFO_OPT_SYMBIOSIS
-	Symbiosis
+	Simbiosi
 BOT_INFO_OPT_NONE
 	Nessuna
 	
@@ -2234,29 +2184,15 @@ BOT_SAY_SYNTAX
 BOT_ACT_SYNTAX
 	ACT canale testo
 
-###########################################################################
-#
-# OperServ messages
-#
-###########################################################################
-
-# General messages
+# Errors
 BOT_EXCEPT
 	L'utente corrisponde a una delle eccezioni del canale.
-
-###########################################################################
-#
-# OperServ messages
-#
-###########################################################################
-
-# General messages
 BOT_BAD_NICK
-	Bot Nicks may only contain valid nick characters.
+	I nick dei bot possono contenere unicamente caratteri validi.
 BOT_BAD_HOST
-	Bot Hosts may only contain valid host characters.
+	Gli host dei bot possono contenere unicamente caratteri validi.
 BOT_BAD_IDENT
-	Bot Idents may only contain valid characters.
+	Gli ident dei bot possono contenere unicamente caratteri validi.
 ###########################################################################
 #
 # OperServ messages
@@ -2406,8 +2342,6 @@ OPER_MODE_SYNTAX
 # CLEARMODES responses
 OPER_UMODE_SYNTAX
 	UMODE nick modi
-
-# OLINE responses
 OPER_UMODE_SUCCESS
 	Modi utente di %s modificati.
 OPER_UMODE_CHANGED
@@ -2417,9 +2351,7 @@ OPER_UMODE_CHANGED
 OPER_OLINE_SYNTAX
 	OLINE nick flag
 OPER_OLINE_SUCCESS
-	Una O:Line con le flag %s è stata aggiunta per %s.
-
-# CLEARMODES responses
+	Le operflags %s sono state aggiunte a %s.
 OPER_OLINE_IRCOP
 	Ora sei un IRC Operator.
 
@@ -2438,9 +2370,9 @@ OPER_KICK_SYNTAX
 	
 # ADMIN responses
 OPER_SVSNICK_SYNTAX
-	SVSNICK nick newnick 
+	SVSNICK nick nuovonick 
 OPER_SVSNICK_NEWNICK
-	The nick %s is now being changed to %s.
+	Il nick %s viene ora cambiato in %s.
 	
 # ADMIN responses
 OPER_ADMIN_SYNTAX
@@ -2473,7 +2405,7 @@ OPER_ADMIN_LIST_FORMAT
 OPER_ADMIN_CLEAR
 	La lista dei Services admin è stata svuotata.
 OPER_ADMIN_MOVED
-	%s has been moved to Services Administrators list.
+	%s è stato spostato nella lista dei Services admin.
 
 # OPER responses
 OPER_OPER_SYNTAX
@@ -2506,7 +2438,7 @@ OPER_OPER_LIST_FORMAT
 OPER_OPER_CLEAR
 	La lista dei Services oper è stata svuotata.
 OPER_OPER_MOVED
-	%s has been moved to Services Operators list.
+	%s è stato spostato nella lista dei Services oper.
 
 # AKILL responses
 OPER_AKILL_SYNTAX
@@ -2548,10 +2480,8 @@ OPER_AKILL_VIEW_FORMAT
 	      %s
 OPER_AKILL_CLEAR
 	La lista AKILL è stata svuotata.
-	
-# SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+expiry] {#channel} [reason]
+	CHANAKILL [+scadenza] {#canale} [motivo]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+durata] {mask | numero-lista}[:motivo]]
@@ -2564,7 +2494,7 @@ OPER_SGLINE_ALREADY_COVERED
 OPER_SGLINE_REACHED_LIMIT
 	Spiacente, puoi avere un massimo di %d SGLINE.
 OPER_SGLINE_ADDED
-	%s added to the SGLINE list.
+	%s aggiunto alla lista SGLINE.
 OPER_SGLINE_CHANGED
 	Durata di %s modificata.
 OPER_SGLINE_NOT_FOUND
@@ -2697,7 +2627,7 @@ OPER_SET_LOGCHAN_ON
 OPER_SET_LOGCHAN_OFF
 	Services is no longer reporting log messages to a channel.
 OPER_SET_LOGCHAN_ERROR
-	Setting for LOGCHAN must be ON or OFF and LogChannel must be defined.
+	L'impostazione per LOGCHAN dev'essere ON o OFF e LogChannel dev'essere definito.
 OPER_SET_DEBUG_ON
 	I Services ora sono in modalità debug.
 OPER_SET_DEBUG_OFF
@@ -2715,20 +2645,20 @@ OPER_SET_NOEXPIRE_ERROR
 OPER_SET_UNKNOWN_OPTION
 	Opzione %s sconosciuta.
 OPER_SET_SQL_ON
-	SQL code will be used.
+	Il codice SQL viene utilizzato.
 OPER_SET_SQL_OFF
-	SQL code will not be used.
+	Il codice SQL non viene utilizzato.
 OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
+	L'impostazione per SQL dev'essere ON o OFF.
 OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
+	Errore durante l'inizializzazione di SQL, controlla i tuoi log per correggere.
 OPER_SET_SQL_ERROR_DISABLED
-	SQL is not configured for this network. Please edit the
-	configuration file (services.conf).
+	SQL non è configurato per questo network. Modifica
+	il file di configurazione (services.conf).
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s è attivato
 OPER_SET_LIST_OPTION_OFF
-	%s is disabled
+	%s è disattivato
 
 # NOOP responses
 OPER_NOOP_SYNTAX
@@ -2741,10 +2671,8 @@ OPER_NOOP_REVOKE
 # JUPE responses
 OPER_JUPE_SYNTAX
 	JUPE nomeserver [motivo]
-
-# RAW responses
 OPER_JUPE_HOST_ERROR
-	Please use a valid server name when juping
+	Prego utilizzare un nome server valido per jupe
 	
 # RAW responses
 OPER_RAW_SYNTAX
@@ -2793,7 +2721,7 @@ OPER_CHANLIST_HEADER
 	Lista dei canali:
 	Nome                 Utenti Modi    Topic
 OPER_CHANLIST_HEADER_USER
-	%s channel list:
+	%s lista canali:
 	Nome                 Utenti Modi    Topic
 OPER_CHANLIST_RECORD
 	%-20s  %4d +%-6s %s
@@ -2822,30 +2750,11 @@ OPER_SUPER_ADMIN_SYNTAX
 OPER_SUPER_ADMIN_WALL_ON
 	%s ora è un SuperAdmin.
 OPER_SUPER_ADMIN_WALL_OFF
-	%s non è più un SuperAdmin.
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
+	%%s non è più un SuperAdmin.
 OPER_SUPER_ADMIN_ONLY
 	Solo i SuperAdmin possono usare questo comando.
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
 OPER_STAFF_LIST_HEADER
-	On Level Nick
-
-# DefCon Messages
-
+	Su Livello Nick
 OPER_STAFF_FORMAT
 	 %c %s  %s
 OPER_STAFF_AFORMAT
@@ -2854,62 +2763,54 @@ OPER_STAFF_AFORMAT
 # DefCon Messages
 
 OPER_DEFCON_SYNTAX
-	Syntax: DEFCON [1|2|3|4|5]
+	Sintassi: DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
-	This service is temporarly disabled, please try again later
+	I servizi sono in modalità Defcon, prego riprovare più tardi.
 OPER_DEFCON_NO_CONF
-	The Defcon system must be enabled in the services.conf file
+	Il sistema Defcon dev'essere attivato nel file services.conf
 OPER_DEFCON_CHANGED
-	Services are now at DEFCON %d
+	I servizi sono ora in DEFCON %d
 OPER_DEFCON_WALL
-	%s Changed the DEFCON level to %d
+	%s ha cambiato il livello DEFCON a %d
 DEFCON_GLOBAL
-	The Defcon Level is now at Level: %d
+	Il livello Defcon è ora: %d
 
-# Modules strings
+# Module strings
 
 OPER_MODULE_LOADED
-	Module %s loaded
+	Modulo %s caricato
 OPER_MODULE_UNLOADED
-	Module %s unloaded
+	Modulo %s rimosso
 OPER_MODULE_LOAD_FAIL
-	Unable to load module %s
+	Impossibile caricare il modulo %s
 OPER_MODULE_REMOVE_FAIL
-	Unable to remove module %s
+	Impossibile rimuovere il modulo %s
 OPER_MODULE_NO_UNLOAD
-	This module can not be unloaded.
+	Questo modulo non può essere rimosso.
 OPER_MODULE_LOAD_SYNTAX
-	MODLOAD FileName
+	MODLOAD NomeFile
 OPER_MODULE_UNLOAD_SYNTAX
-	MODUNLOAD FileName
+	MODUNLOAD NomeFile
 OPER_MODULE_LIST_HEADER
-	Current Module list:
+	Lista moduli attuali:
 OPER_MODULE_LIST
-	Module: %s [%s] [%s]
+	Modulo: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
-	%d Modules loaded.
+	%d Moduli caricati.
 OPER_MODULE_INFO_LIST
-	Module: %s Version: %s Author: %s loaded: %s
+	Modulo: %s Versione: %s Autore: %s caricato: %s
 OPER_MODULE_CMD_LIST
-	Providing command: /msg %s %s
+	Fornendo il comando: /msg %s %s
 OPER_MODULE_MSG_LIST
-	Providing IRCD handler for: %s
+	Fornendo l'handler IRCD per: %s
 OPER_MODULE_NO_LIST
-	No modules currently loaded
+	Nessn modulo attualmente caricato
 OPER_MODULE_NO_INFO
-	No information about module %s is available
+	Nessun'informazione sul modulo %s è disponibile
 OPER_MODULE_INFO_SYNTAX
-	MODINFO FileName
-
-###########################################################################
-#
-# Session Limiting and Exception messages
-#
-###########################################################################
-
-# EXCEPTION responses
+	MODINFO NomeFile
 MODULE_HELP_HEADER
-	The following commands have been loaded by a module:
+	I seguenti comandi sono stati caricati da un modulo:
 
 ###########################################################################
 #
@@ -2964,9 +2865,9 @@ OPER_EXCEPTION_INVALID_LIMIT
 OPER_EXCEPTION_INVALID_HOSTMASK
 	Hostmask non valida. Solo le hostmask reali sono valide; le eccezioni non vengono confrontate con i nick o con gli username (ident).
 OPER_EXCEPTION_EXISTS
-	%s already exists on the EXCEPTION list.
+	%s esiste già nella lista EXCEPTION.
 OPER_EXCEPTION_CHANGED
-	Exception for %s has been updated to %d.
+	Exception per %s è stata aggiornata in %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX
@@ -3061,59 +2962,45 @@ OPER_HELP_SESSION
 	
 	Limitato ai Services admin.
 
-###########################################################################
-#
-# News system messages
-#
-###########################################################################
-
 OPER_HELP_STAFF
-	Syntax: STAFF
+	Sintassi: STAFF
 
-	Displays all Services Staff nicks along with level
-	and on-line status.
+	Mostra tutti i nick dello staff dei services coi rispettivi
+    livelli e stato on-line.
 
 OPER_HELP_DEFCON
-	Syntax: DEFCON [1|2|3|4|5]
+	Sintassi: DEFCON [1|2|3|4|5]
 
-	The defcon system can be used to implement a pre-defined
-	set of restrictions to services useful during an attemtped
-	attack on the network.
+	Il sistema defcon può essere utilizzato per implementare un insieme
+	di restrizioni dei servizi predefinite, utili durante un tentativo
+	d'attacco sul network.
 
 OPER_HELP_DEFCON_NO_NEW_CHANNELS
-	* No new channel registrations
+	* Nessuna nuova registrazione di canali
 OPER_HELP_DEFCON_NO_NEW_NICKS
-	* No new nick registrations
+	* Nessuna nuova registrazione di nick
 OPER_HELP_DEFCON_NO_MLOCK_CHANGE
-	* No MLOCK changes
+	* Nessune modifiche ad MLOCK
 OPER_HELP_DEFCON_FORCE_CHAN_MODES
-	* Force Chan Modes (%s) to be set on all channels
+	* Forza l'impostazione dei modi canale (%s) su tutti i canali
 OPER_HELP_DEFCON_REDUCE_SESSION
-	* Use the reduced session limit of %d
+	* Usa il limite di sessioni ridotto a %d
 OPER_HELP_DEFCON_NO_NEW_CLIENTS
-	* Kill any NEW clients connecting
+	* Killa tutti i NUOVI client che si collegano
 OPER_HELP_DEFCON_OPER_ONLY
-	* Ignore any non-opers with message
+	* Ignora tutti i non-opers con messaggio
 OPER_HELP_DEFCON_SILENT_OPER_ONLY
-	* Silently ignore non-opers
+	* Ignora silenziosamente i non-opers
 OPER_HELP_DEFCON_AKILL_NEW_CLIENTS
-	* AKILL any new clients connecting
-
-
-###########################################################################
-#
-# News system messages
-#
-###########################################################################
-
+	* AKILL tutti i nuovi client che si collegano
 OPER_HELP_DEFCON_NO_NEW_MEMOS
-	* No new memos sent
+	* Niente nuovi memo inviati
 OPER_HELP_CHANKILL
-	Syntax: CHANKILL [+expiry] channel reason
+	Sintassi: CHANKILL [+scadenza] canale motivo
 
-	Puts an AKILL for every nick on the specified channel. It
-	uses the entire and complete real ident@host for every nick,
-	then enforces the AKILL. 
+	Imposta un AKILL per tutti i nick presenti nel canale specificato.
+	Utilizza l'intero e completo ident@host per ogni nick,
+	in seguito imposta l'AKILL. 
 
 ###########################################################################
 #
@@ -3283,18 +3170,18 @@ HELP_HELP_BOT
 HELP_HELP_HOST
 
 	/msg %s HELP
-	     for information on setting up nick vHosts
+	     per informazioni su come impostare vHosts sui nick
 
 ###########################################################################
 #
 # NickServ help messages
 #
 ###########################################################################
-NICK_HELP_CMD_CONFIRM
-	    CONFIRM    Confirm a nickserv auth code
-NICK_HELP_CMD_RESEND
-	    RESEND     Resend a nickserv auth code
 
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Conferma un "auth code" di nickserv
+NICK_HELP_CMD_RESEND
+	    RESEND     Reinvia un "auth code" di nickserv
 NICK_HELP_CMD_REGISTER
 	    REGISTER   Registra un nick
 NICK_HELP_CMD_GROUP
@@ -3328,18 +3215,18 @@ NICK_HELP_CMD_LOGOUT
 NICK_HELP_CMD_STATUS
 	    STATUS     Indica lo stato di identificazione di un nick
 NICK_HELP_CMD_UPDATE
-	    UPDATE     Updates your current status, i.e. it checks for new memos
+	    UPDATE     Aggiorna il tuo stato attuale, ovvero controlla eventuali nuovi memo
 NICK_HELP_CMD_GETPASS
 	    GETPASS    Recupera la password di un nick
 	               (solo se la criptazione è disattivata)
 NICK_HELP_CMD_GETEMAIL
-	    GETEMAIL   Matches and returns all users that registered using given email
+	    GETEMAIL   Mostra l'elenco degli utenti registratisi con l'indirizzo email specificato
 NICK_HELP_CMD_FORBID
 	    FORBID     Blocca un nick in modo che non venga usato
 NICK_HELP_CMD_SUSPEND
-	    SUSPEND    Suspend a given nick
+	    SUSPEND    Sospendi il nick specificato
 NICK_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Unsuspend a given nick
+	    UNSUSPEND  Rilascia il nick specificato
 
 NICK_HELP
 	%S ti permette di "registrare" un nick e di
@@ -3364,7 +3251,7 @@ NICK_HELP_EXPIRES
 	dopo %d giorni di inutilizzo.
 
 NICK_HELP_REGISTER
-	Sintassi: REGISTER password [e-mail]
+	Sintassi: REGISTER password [email]
 	
 	Registra il tuo nick nel database di %S. Quando il
 	nick è registrato, puoi usare i comandi SET e ACCESS
@@ -3438,11 +3325,11 @@ NICK_HELP_IDENTIFY
 	comando REGISTER.
 	
 NICK_HELP_UPDATE
-	Syntax: UPDATE
+	Sintassi: UPDATE
 
-	Updates your current status, i.e. it checks for new memos,
-	sets needed chanmodes (ModeonID) and updates your vhost and
-	your userflags (lastseentime, etc).
+	Aggiorna il tuo stato attuale, ovvero controlla eventuali nuovi memo,
+	imposta i chanmode necessari (ModeonID) e aggiorna il tuo vhost e
+	i tuoi userflags (lastseentime, ecc).
 	
 NICK_HELP_LOGOUT
 	Sintassi: LOGOUT
@@ -3753,8 +3640,8 @@ NICK_HELP_STATUS
 	        l'identificazione per mezzo della password
 	
 	Con ogni comando possono essere inviati fino a 16 nick; il
-	resto sarà ignorato. If no nickname is given, your status
-	will be returned.
+	resto sarà ignorato. Se nessun nickname è specificato verrà indicato
+	lo stato del tuo nick.
 
 NICK_HELP_SENDPASS
 	Sintassi: SENDPASS nick
@@ -3828,11 +3715,12 @@ NICK_SERVADMIN_HELP_LIST
 	attiva avranno un ! prima del nick stesso (solo per i
 	Services admin).
 	
-	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
-	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
-	NOEXPIRE flag set will be displayed. If all three options are
-	given, all three types of nicks will be displayed. These options
-	are limited to Services admins.  
+	Se sono specificate le opzioni FORBIDDEN, NOEXPIRE o UNCONFIRMED,
+	unicamente i nick che sono rispettivamente vietati (FORBIDden),
+    non confermati (UNCONFIRMED) oppure hanno la flag NOEXPIRE impostata
+	verranno mostrati. Se tutte e tre le opzioni sono specificate, tutti
+	e tre i tipi di nick verranno mostrati. Queste opzioni sono
+	limitate ai Services admin.
 	
 	Esempi:
 	
@@ -3883,14 +3771,13 @@ NICK_SERVADMIN_HELP_GETPASS
 	criptazione dei database.
 
 NICK_SERVADMIN_HELP_GETEMAIL
-	Syntax: GETEMAIL user@emailhost
+	Sintassi: GETEMAIL user@emailhost
 
-	Returns the matching nicks that used given email. Note that
-	you can not use wildcards for either user or emailhost. Whenever
-	this command is used, a message including the person who issued
-	the command and the email it was used on will be logged.
+	Mostra i nick che utilizzano l'email specificato. Nota che
+	non puoi usare "wildcards" (*) né per user, né per emailhost.
+	Questo comando viene loggato.
 
-	Limited to Services admins.
+	Limitato ai Services admin.
 
 NICK_SERVADMIN_HELP_FORBID
 	Sintassi: FORBID nick [motivo]
@@ -3903,31 +3790,19 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	Limitato ai Services admin.
 
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
-
 NICK_SERVADMIN_HELP_SUSPEND
-	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+	Sintassi: SUSPEND nickname motivo
 
-	SUSPENDs / UNSUSPENDs a nickname from being identified to
+	Impedisce al nickname di venire utilizzato.
 	
-	Limited to Services admins.
-
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
+	Limitato ai Services admin.
 
 NICK_SERVADMIN_HELP_UNSUSPEND
-	Syntax: UNSUSPEND nickname
+	Sintassi: UNSUSPEND nickname
 
-	UNSUSPENDS a nickname from being used.
+	Rilascia il nickname sospeso.
 
-	Limited to Services admins.
+	Limitato ai Services admin.
 
 ###########################################################################
 #
@@ -3939,10 +3814,10 @@ CHAN_HELP_CMD_GETPASS
 CHAN_HELP_CMD_FORBID
 	    FORBID     Blocca un canale in modo che non venga usato
 CHAN_HELP_CMD_SUSPEND
-	    SUSPEND    Prevent a channel from being used preserving
-	               channel data and settings
+	    SUSPEND    Impedisce l'utilizzo di un canale mantenendo
+	               i dati e le impostazioni
 CHAN_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Releases a suspended channel
+	    UNSUSPEND  Rilascia un canale sospeso
 CHAN_HELP_CMD_STATUS
 	    STATUS      Restituisce il livello di accesso corrente di
 	                un utente su un canale
@@ -4009,9 +3884,9 @@ CHAN_HELP_CMD_OWNER
 CHAN_HELP_CMD_PROTECT
 	    PROTECT    Assegna lo stato di protezione a un utente (+a)
 CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protects a selected nick on a channel
+	    ADMIN      Protegge un nick su un canale
 CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotects a selected nick on a channel
+	    DEADMIN    Sprotegge un nick su un canale
 CHAN_HELP_CMD_DEOP
 	    DEOP       Toglie lo stato di operatore a un utente (-o)
 
@@ -4056,9 +3931,6 @@ CHAN_HELP_REGISTER
 	NOTA: Per registrare un canale, devi aver prima
 	registrato il tuo nick. Se non l'hai fatto, digita
 	/msg %s HELP per avere informazioni su come farlo.
-	
-	ATTENZIONE! Il nome del canale deve includere il
-	cancelletto (#) all'inizio!
 
 CHAN_HELP_IDENTIFY
 	Sintassi: IDENTIFY canale password
@@ -4878,8 +4750,8 @@ CHAN_HELP_CLEAR
 	     BANS     Annulla tutti i ban del canale.
 	     OPS      Rimuove lo stato di operatore (modo +o) da
 	                  tutti gli operatori del canale.
-	     HOPS     Removes channel-halfoperator status (mode +h) from
-	                  all channel halfoperators, if supported.
+	     HOPS     Rimuove lo stato di halfoperator (modo +h) da
+	                  tutti gli halfoperator del canale, se supportato.
 	     VOICES   Rimuove lo stato di voice (modo +v) da tutti
 	                  gli utenti voice sul canale.
 	     USERS    Rimuove (con un kick) tutti gli utenti del canale.
@@ -4986,9 +4858,6 @@ CHAN_SERVADMIN_HELP_GETPASS
 	utilizzato.
 	
 	Limitato ai Services admin.
-	
-	Questo comando non è disponibile quando è attiva la
-	criptazione dei database.
 
 CHAN_SERVADMIN_HELP_FORBID
 	Sintassi: FORBID canale [motivo]
@@ -4997,26 +4866,28 @@ CHAN_SERVADMIN_HELP_FORBID
 	il canale indicato. Può essere annullato con
 	una deregistrazione (drop) del canale.
 	
-	Limitato ai to Services admins.
+    Il motivo potrebbe essere richiesto su alcune reti.
+
+	Limitato ai Services admin.
 
 CHAN_SERVADMIN_HELP_SUSPEND
-	Syntax: SUSPEND channel [reason]
+	Sintassi: SUSPEND canale [motivo]
 	
-	Disallows anyone from registering or using the given
-	channel.  May be cancelled by using the UNSUSPEND
-	command to preserve all previous channel data/settings.
+	Impedisce chiunque dal registrare o utilizzare il canale
+	specificato. Può essere annullato utilizzando il comando
+	UNSUSPEND preservando tutti i dati e le impostazioni precedenti.
 	
-	Reason may be required on certain networks.
+	Il motivo potrebbe essere richiesto su alcune reti.
 	
-	Limited to Services admins.
+	Limitato ai Services admin.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
-	Syntax: UNSUSPEND channel
+	Sintassi: UNSUSPEND canale
 	
-	Releases a suspended channel. All data and settings
-	are preserved from before the suspension.
+	Rilascia un canale sospeso. Tutti i dati e le impostazioni
+	sono preservate da prima della sospensione.
 	
-	Limited to Services admins.
+	Limitato ai Services admin.
 
 CHAN_SERVADMIN_HELP_STATUS
 	Sintassi: STATUS canale nick
@@ -5050,15 +4921,15 @@ MEMO_HELP_CMD_DEL
 MEMO_HELP_CMD_SET
 	    SET    Imposta le opzioni relative ai memo
 MEMO_HELP_CMD_INFO
-	    INFO   Displays information about your memos
+	    INFO   Mostra informazioni sui tuoi nuovi memo
 MEMO_HELP_CMD_RSEND
-	    RSEND  Sends a memo and requests a read receipt
+	    RSEND  Invia un memo e richiede una notifica di lettura
 MEMO_HELP_CMD_CHECK
-	    CHECK  Checks if last memo to a nick was read
+	    CHECK  Controlla se l'ultimo memo ad un nick è stato letto
 MEMO_HELP_CMD_SENDALL
-	    SENDALL  Send a memo to all registered users
+	    SENDALL Invia un memo a tutti gli utenti registrati
 MEMO_HELP_CMD_STAFF
-	    STAFF  Send a memo to all opers/admins
+	    STAFF Invia un memo a tutti gli opers/admins
 
 MEMO_HELP_HEADER
 	%S è un servizio che permette agli utenti della rete di
@@ -5071,9 +4942,9 @@ MEMO_HELP_HEADER
 	
 	
 MEMO_HELP_ADMIN
-	not used.
+	non utilizzato.
 MEMO_HELP_OPER
-	not used.
+	non utilizzato.
 MEMO_HELP_FOOTER
 	
 	Digita /msg %S HELP comando per maggiori informazioni
@@ -5132,7 +5003,7 @@ MEMO_HELP_DEL
 	numei multipli di memo o intervalli di numeri invece di
 	un numero singolo, come nel secondo esempio.
 	
-	If LAST is given, the last memo will be deleted.
+	Se viene usato LAST elimina l'ultimo memo.
 	Se viene usato ALL elimina tutti i memo.
 	
 	Esempi:
@@ -5227,67 +5098,41 @@ MEMO_SERVADMIN_HELP_INFO
 	le stesse informazioni ma relative al nick.
 	Questo modo d'uso è limitato ai Services admin.
 
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
-
 MEMO_HELP_STAFF
-	Syntax: STAFF memo-text
+	Sintassi: STAFF testo-memo
 
-	Sends all services staff a memo containing memo-text.
-	Note: If you have opers on both the oper list and the
-	admin list they will recive the memo twice.  The same
-	applies for oper's on the Root list as well as other
-	lists.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
+	Invia un memo contenenteo testo-memo a tutto lo services staff.
+	Nota: Se hai degli operatori sia nella lista oper che nella
+	lista admin, riceveranno il memo due volte. Lo stesso vale per
+	gli opers che si trovano sia nella lista root che in altre liste.
 
 MEMO_HELP_SENDALL
-	Syntax: SENDALL memo-text
+	Sintassi: SENDALL testo-memo
 
-	Sends all registered users a memo containing memo-text.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
+	Invia un memo contenente testo-memo a tutti gli utenti registrati.
 
 MEMO_HELP_RSEND
-	Syntax: RSEND {nick | channel} memo-text
+	Sintassi: RSEND {nick | canale} testo-memo
 	
-	Sends the named nick or channel a memo containing
-	memo-text.  When sending to a nickname, the recipient will
-	receive a notice that he/she has a new memo.  The target
-	nickname/channel must be registered.
-	Once the memo is read by its recepient, an automatic notification
-	memo will be sent to the sender informing him/her that the memo
-	has been read.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
+	Invia un memo contenente memo-text al nick o canale
+	specificato. Se inviato ad un nickname, il destinatario riceverà
+	un notice che gli segnala il nuovo memo. Il nickname o canale
+	dev'essere registrato.
+	Una volta che il memo viene letto dal destinatario, verrà inviata
+	una notifica automatica al mittente, informandolo che il suo memo
+	è stato letto.
 
 MEMO_HELP_CHECK
-	Syntax: CHECK nick
+	Sintassi: CHECK nick
 	
-	Checks whether the _last_ memo you sent to nick has been read
-	or not. Note that this does only work with nicks, not with chans.
+	Controlla se l'_ultimo_ memo che hai inviato al nick è stato letto
+	oppure no. Nota che questo funziona unicamente coi nick, non coi canali.
 
 ###########################################################################
 #
 # OperServ help messages
 #
 ###########################################################################
-
 OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Invia un messaggio a tutti gli utenti
 OPER_HELP_CMD_STATS
@@ -5297,7 +5142,7 @@ OPER_HELP_CMD_OPER
 OPER_HELP_CMD_ADMIN
 	    ADMIN       Modifica la lista dei Services admin
 OPER_HELP_CMD_STAFF
-	    STAFF       Display Services staff and online status
+	    STAFF       Mostra lo staff dei services con stato online
 OPER_HELP_CMD_MODE
 	    MODE        Cambia dei modi di un canale
 OPER_HELP_CMD_KICK
@@ -5351,23 +5196,23 @@ OPER_HELP_CMD_QUIT
 OPER_HELP_CMD_SHUTDOWN
 	    SHUTDOWN    Termina i Services salvando i database
 OPER_HELP_CMD_DEFCON
-	    DEFCON      Manipulate the DefCon system
+	    DEFCON      Manipola il sistema DefCon
 OPER_HELP_CMD_CHANKILL
-	    CHANKILL    Kill all users on a specific channel
+	    CHANKILL    Killa tutti gli utenti su di un canale specifico
 OPER_HELP_CMD_OLINE
 	    OLINE       Imposta le operflag di un utente
 OPER_HELP_CMD_UMODE
 	    UMODE       Cambia i modi utente di un utente
 OPER_HELP_CMD_SVSNICK
-	    SVSNICK     Forcefully change a user's nickname
+	    SVSNICK     Forza il cambio del nickname di un utente
 OPER_HELP_CMD_MODLOAD
-	    MODLOAD     Load a module
+	    MODLOAD     Carica un modulo
 OPER_HELP_CMD_MODUNLOAD
-	    MODUNLOAD   Un-Load a module
+	    MODUNLOAD   Rimuovi un modulo
 OPER_HELP_CMD_MODINFO
-	    MODINFO     Info about a loaded module
+	    MODINFO     Informazioni su un modulo caricato
 OPER_HELP_CMD_MODLIST
-	    MODLIST     List loaded modules
+	    MODLIST     Elenca i moduli caricati
 
 OPER_HELP
 	Comandi di %S:
@@ -5536,11 +5381,11 @@ OPER_HELP_KICK
 	Limitato ai Services operator.
 
 OPER_HELP_SVSNICK
-	Syntax: SVSNICK nick newnick
+	Sintassi: SVSNICK nick nuovonick
 	
-	Forcefully changes a user's nickname from nick to newnick.
+	Forza il cambio del nickname di un utente da nick a newnick.
 	
-	Limited to Services admins
+	Limitato ai Services admin
 
 OPER_HELP_AKILL
 	Sintassi: AKILL ADD [+durata] mask motivo
@@ -5740,13 +5585,13 @@ OPER_HELP_SET
 	Imposta varie opzioni globali dei Services. Le opzioni
 	configurabili sono:
 	    READONLY   Imposta la modalità read-only o read-write
-	    LOGCHAN    Report log messages to a channel
+	    LOGCHAN    Riporta i messaggi di log in un canale
 	    DEBUG      Attiva o disattiva la modalità di debug
 	    NOEXPIRE   Attiva o disattiva la modalità no expire
 	    SUPERADMIN Attiva o disattiva la modalità SuperAdmin
-	    SQL   	 Activate or deactivate sql mode
-	    IGNORE     Activate or deactivate ignore mode
-	    LIST       List the options
+	    SQL   	 Attiva o disattiva la modalità sql
+	    IGNORE     Attiva o disattiva la modalità ignore
+	    LIST       Elenca le opzioni
 	
 	Limitato ai Services admin.
 
@@ -5768,15 +5613,15 @@ OPER_HELP_SET_READONLY
 	-readonly.
 
 OPER_HELP_SET_LOGCHAN
-	Syntax: SET LOGCHAN {ON | OFF}
+	Sintassi: SET LOGCHAN {ON | OFF}
 
-	With this setting on, Services will send its logs to a specified
-	channel as well as the log file. LogChannel must also be defined
-	in the Services configuration file for this setting to be of any
-	use.
+	Se impostata su on, questa opzione fa scrivere i log dei services
+	in un canale specificato oltre che al log file. LogChannel dev'essere
+	definito nel file di configurazione dei services per permettere a
+	questa opzione di funzionare.
 
-	Note: This can have strong security implications if your log
-	channel is not properly secured.
+	Nota: Potrebbero esserci problemi di sicurezza se il canale non
+	viene impostato con restrizioni adeguate.
 
 OPER_HELP_SET_DEBUG
 	Sintassi: SET DEBUG {ON | OFF | numero}
@@ -5812,22 +5657,22 @@ OPER_HELP_SET_SUPERADMIN
 	solo quando necessario, e reimpostata a OFF al più presto.
 
 OPER_HELP_SET_SQL
-	Syntax: SET SQL {ON | OFF}
+	Sintassi: SET SQL {ON | OFF}
 
-	Setting this will toggle Anope's from usage of SQL, this should
-	be used to disable and enable SQL should your SQL server go down
-	while services are running.
+	Questa impostazione abilita o disabilita l'utilizzo di SQL da parte
+	di Anope. Da usare nel caso che il server SQL diventa irraggiungibile
+	mentre i services stanno lavorando.
 
 OPER_HELP_SET_IGNORE
-	Syntax: SET IGNORE {ON | OFF}
+	Sintassi: SET IGNORE {ON | OFF}
 
-	Setting this will toggle Anope's usage of the IGNORE system 
-	on or off.
+	Questa impostazione abilita o disabilita l'utilizzo del sistema IGNORE
+	da parte di Anope.
 
 OPER_HELP_SET_LIST
-	Syntax: SET LIST
+	Sintassi: SET LIST
 
-	Display the various OperServ settings
+	Mostra le varie impostazioni di OperServ
 
 OPER_HELP_NOOP
 	Sintassi: NOOP SET server
@@ -5962,34 +5807,34 @@ OPER_HELP_USERLIST
 	Limitato ai Services admin.
 
 OPER_HELP_MODLOAD
-	Syntax: MODLOAD FileName
+	Sintassi: MODLOAD NomeFile
 
-	This command loads the module named FileName from the modules
-	directory.
+	Questo comando carica il modulo chiamato NomeFile dalla cartella
+	modules.
 
-	Limited to Services Roots.
+	Limitato ai Services Root.
 
 OPER_HELP_MODUNLOAD
-	Syntax: MODUNLOAD FileName
+	Sintassi: MODUNLOAD NomeFile
 
-	This command unloads the module named FileName from the modules
-	directory.
+	Questo comando rimuove il modulo chiamato NomeFile dalla cartella
+	modules.
 
-	Limited to Services Roots.
+	Limitato ai Services Root.
 
 OPER_HELP_MODINFO
-	Syntax: MODINFO FileName
+	Sintassi: MODINFO NomeFile
 
-	This command lists information about the specified loaded module
+	Questo comando elenca informazioni sul modulo caricato specificato
 
-	Limited to Services Roots.
+	Limitato ai Services Root.
 
 OPER_HELP_MODLIST
-	Syntax: MODLIST
+	Sintassi: MODLIST
 
-	Lists all currently loaded modules.
+	Elenca tutti i moduli attualmente caricati.
 
-	Limited to Services Roots.
+	Limitato ai Services Root.
 
 
 ###########################################################################
@@ -6357,15 +6202,15 @@ HOST_IDENT_SET
 HOST_SETALL
 	Il vhost per il gruppo di %s è stato impostato a %s.
 HOST_DELALL
-	vhosts for group %s have been removed.
+	i vhost per il gruppo %s sono stati rimossi.
 HOST_DELALL_SYNTAX
-	Syntax: DELALL <nick>.
+	Sintassi: DELALL <nick>.
 HOST_IDENT_SETALL
 	Il vhost per il gruppo di %s è stato impostato a %s@%s.
 HOST_SET_ERROR
 	Errore! Un vhost può contenere soltanto i caratteri A-Z, a-z, 0-9, '.' e '-'.
 HOST_SET_IDENT_ERROR
-	A vhost ident must be in the format of a valid ident
+	L'ident per un vhost dev'essere nel formato di un ident valido
 HOST_SET_TOOLONG
 	Errore! Il vhost è troppo lungo; usane uno che sia %d caratteri o meno.
 HOST_SET_IDENTTOOLONG
@@ -6396,28 +6241,16 @@ HOST_OFF_UNREAL
 	Il tuo vhost è stato rimosso. Per riattivare il mascheramento standard del tuo host o IP, digita /mode %s +%s
 HOST_NO_VIDENT
 	Il tuo IRCD non supporta i vIdent; se li supporta, invia un messaggio al team di sviluppo dei Services indicandolo come possibile bug.
-
-###########################################################################
-#
-# HostServ Help messages
-#
-###########################################################################
 HOST_GROUP
-	All vhost's in the group %s have been set to %s
+	Tutti i vhost nel gruppo %s sono stati impostati a %s
 HOST_IDENT_GROUP
-	All vhost's in the group %s have been set to %s@%s
-
-###########################################################################
-#
-# HostServ Help messages
-#
-###########################################################################
+	Tutti i vhost nel gruppo %s sono stati impostati a %s@%s
 HOST_LIST_FOOTER
-	Displayed all records (Count: %d)
+	Mostrato tutti i records (Conteggio: %d)
 HOST_LIST_RANGE_FOOTER
-	Displayed records from %d to %d
+	Mostrato records da %d a %d
 HOST_LIST_KEY_FOOTER
-	Displayed records matching key %s (Count: %d)
+	Mostrato records corrispondenti alla chiave %s (Conteggio: %d)
 
 ###########################################################################
 #
@@ -6437,15 +6270,15 @@ HOST_HELP_CMD_SETALL
 HOST_HELP_CMD_DEL
 	    DEL         Rimuove il vhost di un altro utente
 HOST_HELP_CMD_DELALL
-	    DELALL      Delete the vhost for all nicks in a group
+	    DELALL      Rimuove il vhost da tutti i nick di un gruppo
 HOST_HELP_CMD_LIST
 	    LIST        Mostra uno o più vhost nel database
 
 HOST_OPER_HELP
-	not used.
+	non utilizzato.
 
 HOST_ADMIN_HELP
-	not used.
+	non utilizzato.
 
 HOST_HELP
 	Comandi di %S:
@@ -6468,12 +6301,12 @@ HOST_HELP_SET
 	Limitato ai Services oper.
 
 HOST_HELP_DELALL
-	Syntax: DELALL <nick>.
+	Sintassi: DELALL <nick>.
 
-	Deletes the vhost for all nick's in the same group as
-	that of the given nick.
+	Rimuove il vhost da tutti i nick dello stesso gruppo del nick
+	specificato.
 
-	Limited to Host Removers.
+	Limitato agli Host Removers.
 
 
 HOST_HELP_SETALL
@@ -6504,21 +6337,21 @@ HOST_HELP_DEL
 	Limitato ai Services oper.
 
 HOST_HELP_LIST
-	Syntax: LIST [<key>|<#X-Y>]
+	Sintassi: LIST [<chiave>|<#X-Y>]
 
-	This command lists registered vhosts to the operator
-	if a Key is specified, only entries whos nick or vhost match
-	the pattern given in <key> are displayed e.g. Rob* for all
-	entries beginning with "Rob"
+	Questo comando elenca i vhost registrati all'operatore.
+	Se una chiave è specificata, verranno mostrati unicamente i
+	vhost corrispondenti a quanto immesso come <chiave>, ad
+    esempio Rob* per tutte le corrispondenze che iniziano con "Rob"
 
-	If a #X-Y style is used, only entries between the range of X
-	and Y will be displayed, e.g. #1-3 will display the first 3
-	nick/vhost entries.
+	Se viene usata una lista in stile #X-Y, verranno mostrate unicamente
+    le corrispondenze tra X ed Y, ad es. #1-3 mostrerà unicamente le prime
+	3 corrispondenze nick/vhost.
 
-	The list uses the value of NSListMax as a hard limit for the
-	number of items to display to a operator at any 1 time.
+	L'elenco utilizza il valore di NSListMax come limite per
+	il numero di elementi da mostrare ad un operatore alla volta.
 
-	Limited to Services operators.
+	Limitato ai Services oper.
 
 HOST_HELP_GROUP
 	Sintassi: GROUP
@@ -6527,17 +6360,17 @@ HOST_HELP_GROUP
 	loro nick ATTUALE come vhost di tutti i nick nello stesso gruppo.
 
 OPER_SVSNICK_UNSUPPORTED
-	Sorry, SVSNICK is not available on this network.
+	Spiacente, SVSNICK non è disponibile su questa rete.
 
 OPER_SQLINE_UNSUPPORTED
-	Sorry, SQLINE is not available on this network.
+	Spiacente, SQLINE non è disponibile su questa rete.
 
 OPER_SVSO_UNSUPPORTED
-	Sorry, OLINE is not available on this network.
+	Spiacente, OLINE non è disponibile su questa rete.
 
 OPER_UMODE_UNSUPPORTED
-	Sorry, UMODE is not available on this network.
+	Spiacente, UMODE non è disponibile su questa rete.
 
 OPER_SUPER_ADMIN_NOT_ENABLED
-	SuperAdmin setting not enabled in services.conf
+	L'impostazione SuperAdmin non è abilitata in services.conf
 

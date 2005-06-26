@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="834"
+VERSION_BUILD="835"
 
 # $Log$
+#
+# BUILD : 1.7.10 (835)
+# BUGS  : 
+# NOTES : Added portugese translation to hs_request, applied win32 fixes by heinz (or should i say heniz?)
 #
 # BUILD : 1.7.10 (834)
 # BUGS  : 

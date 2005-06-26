@@ -38,10 +38,10 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ###########################################################
 ## Translation fully reviewed/completed/updated
-## by Ricardo (ricardoltdb@gmail.com) at 01/16/2005.
+## by Ricardo at 01/16/2005.
 ###
 ## Tradução totalmente revista/completada/atualizada
-## por Ricardo (ricardoltdb@gmail.com) em 16/01/2005.
+## por Ricardo em 16/01/2005.
 ## Atualizações/Updates:
 ## * SVN 564 - 01/31/2005.
 ## * SVN 611 - 03/08/2005.

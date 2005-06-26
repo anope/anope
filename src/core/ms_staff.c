@@ -17,7 +17,6 @@
 
 int do_staff(User * u);
 void myMemoServHelp(User * u);
-extern void memo_send(User * u, char *name, char *text, int z);
 
 /**
  * Create the command, and tell anope about it.

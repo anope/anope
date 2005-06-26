@@ -2337,19 +2337,17 @@ int moduleGetConfigDirective(Directive * d)
         linenum++;
         if (*buf == '#' || *buf == '\r' || *buf == '\n')
             continue;
-
         dir = myStrGetOnlyToken(buf, '\t', 0);
         if (dir) {
             s = myStrGetTokenRemainder(buf, '\t', 1);
         } else {
             dir = myStrGetOnlyToken(buf, ' ', 0);
-            if (dir) {
+            if (dir || (dir = myStrGetOnlyToken(buf, '\n', 0))) {
                 s = myStrGetTokenRemainder(buf, ' ', 1);
             } else {
                 continue;
             }
         }
-
         if (stricmp(dir, d->name) == 0) {
             if (s) {
                 while (isspace(*s))

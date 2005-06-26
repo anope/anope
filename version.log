@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="833"
+VERSION_BUILD="834"
 
 # $Log$
+#
+# BUILD : 1.7.10 (834)
+# BUGS  : 
+# NOTES : Added hs_request to the modpack, made memo_send a real global, and fixed a bug with module config stuff and PARAM_SET options
 #
 # BUILD : 1.7.10 (833)
 # BUGS  : 

@@ -484,11 +484,34 @@ void m_AddLanguages(void)
             "que você esteja identificado."
     };
 
+	/* Italian (IT) */
+    char *langtable_it[] = {
+        /* AUTOOP_SYNTAX */
+        "Sintassi: AUTOOP [ON|OFF]",
+        /* AUTOOP_STATUS_ON */
+        "La tua impostazione AUTOOP è attualmente ATTIVATA",
+        /* AUTOOP_STATUS_OFF */
+        "La tua impostazione AUTOOP è attualmente DISATTIVATA",
+        /* AUTOOP_NO_NICK */
+        "Unicamente nicknames registrati ed identificati possono impostare questa opzione",
+        /* AUTOOP_ON */
+        "Verrai ora oppato automaticamente nei canali quando ci entri",
+        /* AUTOOP_OFF */
+        "Non verrai più oppato automaticamente nei canali quando ci entri",
+        /* AUTOOP_DESC */
+        "    AUTOOP     Attiva o disattiva l'OP automatico quando si entra nei canali",
+        /* AUTOOP_HELP */
+        "Se impostato su OFF, questo comando eviterà che %s imposti dei modi\n"
+            "su di te quando entri un canale. Questo comando richiede\n"
+            "che tu sia identificato."
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
+	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 }
 
 /*************************************************************************/

@@ -300,7 +300,7 @@ void my_add_languages(void)
 	"Enforced %s"
     };
 
-    /* Dutch */
+    /* Dutch (NL) */
     char *langtable_nl[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Forceer enkele kanaalmodes en set-opties",
@@ -335,6 +335,7 @@ void my_add_languages(void)
 	"Enforced %s"
     };
 
+   /* German (DE) */
    char *langtable_de[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE   Erzwingt verschieden Modes und SET Optionen",
@@ -366,7 +367,7 @@ void my_add_languages(void)
         "Erzwungen %s"
     };
 
-    /* Portuguese */
+    /* Portuguese (PT) */
     char *langtable_pt[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Verifica o cumprimento de vários modos de canal e opções ajustadas",
@@ -398,10 +399,43 @@ void my_add_languages(void)
 	"Verificado %s"
     };
 
+    /* Italian (IT) */
+    char *langtable_it[] = {
+        /* LNG_CHAN_HELP */
+        "    ENFORCE    Forza diversi modi di canale ed opzioni SET",
+        /* LNG_ENFORCE_SYNTAX */
+        "Sintassi: \002ENFORCE \037canale\037 [\037cosa\037]\002",
+        /* LNG_CHAN_HELP_ENFORCE */
+        "Forza diversi modi di canale ed opzioni SET. Il parametro \037canale\037\n"
+            "indica il canale sul quale forzare i modi e le opzioni. Il parametro\n"
+            "\037cosa\037 indica i modi e le opzioni da forzare, e possono essere\n"
+            "qualsiasi delle opzioni SET, SECUREOPS, RESTRICTED, MODES, o +R.\n"
+            "Se non specificato, viene sottointeso SET.\n"
+            " \n"
+            "Se \037cosa\037 è SET, forzerà SECUREOPS e RESTRICTED sugli utenti\n"
+            "attualmente nel canale, se sono impostati. Specifica SECUREOPS per\n"
+            "forzare l'opzione SECUREOPS, anche se non è attivata. Specifica\n"
+            "RESTRICTED per forzare l'opzione RESTRICTED, anche se non è\n"
+            "attivata.",
+        /* LNG_CHAN_HELP_ENFORCE_R_ENABLED */
+        "Se \037cosa\037 è MODES, forzerà il modo del canale +R se è impostato.\n"
+            "Se +R è specificato per \037cosa\037, il modo del canale +R verrà\n"
+            "forzato, anche se non è impostato. Se non è impostato, gli utenti\n"
+            "verranno bannati per assicurare che non rientrino semplicemente.",
+        /* LNG_CHAN_HELP_ENFORCE_R_DISABLED */
+        "Se \037cosa\037 è MODES, niente verrà forzato, siccome forzerebbe\n"
+            "dei modi che l'ircd in uso non supporterebbe. Se +R è specificato\n"
+            "per \037cosa\037, un modo equivalente a +R sui altri ircd verrà\n"
+            "forzato. Tutti gli utenti presenti nel canale ma non identificati\n"
+            "per il loro nickname verranno bannati ed espulsi dal canale.\n",
+	"Forzato %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

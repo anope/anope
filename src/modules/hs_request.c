@@ -843,9 +843,59 @@ void my_add_languages(void)
             "o mesmo que fazer um LIST +req"
     };
 
+    char *langtable_it[] = {
+        /* LNG_REQUEST_SYNTAX */
+        "Sintassi: \002REQUEST \037vhost\037\002",
+        /* LNG_REQUESTED */
+        "Il tuo vHost è stato richiesto",
+        /* LNG_REQUEST_WAIT */
+        "Prego attendere %d secondi prima di richiedere un nuovo vHost",
+        /* LNG_REQUEST_MEMO */
+        "[auto memo] è stato richiesto il vHost \002%s\002.",
+        /* LNG_ACTIVATE_SYNTAX */
+        "Sintassi: \002ACTIVATE \037nick\037\002",
+        /* LNG_ACTIVATED */
+        "Il vHost per %s è stato attivato",
+        /* LNG_ACTIVATE_MEMO */
+        "[auto memo] Il vHost da te richiesto è stato approvato.",
+        /* LNG_REJECT_SYNTAX */
+        "Sintassi: \002REJECT \037nick\037\002",
+        /* LNG_REJECTED */
+        "Il vHost per %s è stato rifiutato",
+        /* LNG_REJECT_MEMO */
+        "[auto memo] Il vHost da te richiesto è stato rifiutato.",
+        /* LNG_REJECT_MEMO_REASON */
+        "[auto memo] Il vHost da te richiesto è stato rifiutato. Motivo: %s",
+        /* LNG_NO_REQUEST */
+        "Nessuna richiesta trovata per il nick %s.",
+        /* LNG_HELP */
+        "    REQUEST     Richiede un vHost per il tuo nick",
+        /* LNG_HELP_SETTER */
+        "    ACTIVATE    Approva il vHost richiesto di un utente\n"
+            "    REJECT      Rifiuta il vHost richiesto di un utente\n"
+            "    WAITING     Comando per LIST +req",
+        /* LNG_HELP_REQUEST */
+        "Richiede l'attivazione del vHost specificato per il tuo nick da parte\n"
+            "degli amministratori di rete. Sei pregato di pazientare finchè la tua\n"
+            "richiesta viene elaborata.",
+        /* LNG_HELP_ACTIVATE */
+        "Attiva il vHost richiesto per il nick specificato.",
+        /* LNG_HELP_ACTIVATE_MEMO */
+        "Viene inviato un memo per informare l'utente.",
+        /* LNG_HELP_REJECT */
+        "Rifiuta il vHost richiesto per il nick specificato.",
+        /* LNG_HELP_REJECT_MEMO */
+        "Viene inviato un memo per informare l'utente.",
+        /* LNG_WAITING_SYNTAX */
+        "Sintassi: \002WAITING\002",
+        /* LNG_HELP_WAITING */
+        "Questo comando è per comodità. Praticamente è la stessa cosa che\n"
+            "eseguire un LIST +req ."
+    };
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

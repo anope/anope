@@ -179,6 +179,7 @@ void mAddLanguages(void)
             "time. If the ban is removed before by hand, it will NOT be replaced.",
         "%s banned from %s, will auto-expire in %s"
     };
+
     char *langtable_nl[] = {
         "    TBAN       Verban een gebruiker voor een bepaalde tijd",
         "Syntax: TBAN kanaal nick tijd",
@@ -204,10 +205,19 @@ void mAddLanguages(void)
         "%s foi banido do %s, irá auto-expirar em %s"
     };
 
+	char *langtable_it[] = {
+        "    TBAN       Banna l'utente per un periodo di tempo specificato",
+        "Sintassi: TBAN canale nick tempo",
+        "Banna l'utente specificato da un canale per un periodo di tempo\n"
+            "specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrà rimpiazzato.",
+        "%s bannato da %s, scadrà automaticamente tra %s"
+    };
+
     moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
+	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 }
 
 

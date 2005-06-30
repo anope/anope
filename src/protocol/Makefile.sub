@@ -16,7 +16,7 @@ module: $(OBJECTS) so
 distclean: clean spotless
 
 .c.o:
-	$(CC) $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
+	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
 
 so:
 	$(CC) ${SHARED} $(OBJECTS) -o ../$(TARGET).so ${PROFILE}

@@ -3,6 +3,7 @@ Anope Version  S V N
 Provided by Anope Dev. <dev@anope.org> - 2005
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+07/01 F Most core compile warnings when using make strict.                [ #00]
 07/01 F Requesting a -version on startup doesn't require a valid config.  [ #00]
 06/04 F Register script now works again.                                  [#394]
 06/04 F Finishing sync for Ultimate3 was not done correctly.              [#398]

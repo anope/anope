@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="839"
+VERSION_BUILD="840"
 
 # $Log$
+#
+# BUILD : 1.7.10 (840)
+# BUGS  : 
+# NOTES : Fixed most core compile warnings when using make strict
 #
 # BUILD : 1.7.10 (839)
 # BUGS  : 

@@ -582,7 +582,8 @@ E void set_lastmask(User * u);
 /**** init.c ****/
 
 E void introduce_user(const char *user);
-E int init(int ac, char **av);
+E int init_primary(int ac, char **av);
+E int init_secondary(int ac, char **av);
 E int servernum;
 
 /**** ircd.c ****/
@@ -1152,6 +1153,8 @@ E void privmsg(char *source, char *dest, const char *fmt, ...);
 E void notice(char *source, char *dest, const char *fmt, ...);
 
 /******************************************************************************/
+
+E int anope_set_mod_current_buffer(int ac, char **av);
 
 E void anope_cmd_211(const char *fmt, ...);                          	  		  /* 211 */
 E void anope_cmd_219(char *source, char *who); 			  	  		  /* 219 */

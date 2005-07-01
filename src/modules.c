@@ -147,7 +147,7 @@ int protocol_module_init(void)
 	
 	/* We can assume the ircd supports TS6 here */
     if (UseTS6 && !Numeric) {
-        error(0, "UseTS6 requires the setting of Numeric to be enabled.");
+        alog("UseTS6 requires the setting of Numeric to be enabled.");
         ret = -1;
     }
 
@@ -474,7 +474,7 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
-    func = ano_modsym(m->handle, "AnopeInit");
+    func = (int (*)(int, char **))ano_modsym(m->handle, "AnopeInit");
     if ((err = ano_moderr()) != NULL) {
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
         if (u) {
@@ -540,7 +540,7 @@ int loadModule(Module * m, User * u)
 int unloadModule(Module * m, User * u)
 {
 #ifdef USE_MODULES
-    void (*func) ();
+    void (*func) (void);
 
     if (!m || !m->handle) {
         if (u) {
@@ -560,7 +560,7 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_UNKNOWN;
     }
 
-    func = ano_modsym(m->handle, "AnopeFini");
+    func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
     if (func) {
         mod_current_module_name = m->name;
         func();                 /* exec AnopeFini */

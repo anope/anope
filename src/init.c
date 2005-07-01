@@ -191,6 +191,10 @@ static int parse_dir_options(int ac, char **av)
                     return -1;
                 }
                 log_filename = av[i];
+            } else if (strcmp(s, "version") == 0) {
+                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
+                        version_flags, version_build);
+                exit(EXIT_SUCCESS);
             }
         }
     }
@@ -319,10 +323,6 @@ static int parse_options(int ac, char **av)
                 forceload = 1;
             } else if (!strcmp(s, "noexpire")) {
                 noexpire = 1;
-            } else if (!strcmp(s, "version")) {
-                fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
-                        version_flags, version_build);
-                exit(EXIT_SUCCESS);
             } else if (!strcmp(s, "help")) {
                 fprintf(stdout, "Anope-%s %s -- %s\n", version_number,
                         version_flags, version_build);
@@ -413,7 +413,7 @@ int init_primary(int ac, char **av)
     if (set_group() < 0)
         return -1;
 
-    /* Parse command line for -dir option. */
+    /* Parse command line for -dir and -version options. */
     parse_dir_options(ac, av);
 
     /* Chdir to Services data directory. */

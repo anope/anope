@@ -142,6 +142,7 @@ int do_access(User * u)
     char *cmd = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
     char *s = strtok(NULL, " ");
+    char event_access[BUFSIZE];
 
     ChannelInfo *ci;
     NickAlias *na;
@@ -218,6 +219,8 @@ int do_access(User * u)
                     return MOD_CONT;
                 }
                 access->level = level;
+                snprintf(event_access, BUFSIZE, "%d", access->level);
+                send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
                 alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, access->level, na->nick, nc->display, ci->name);
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_LEVEL_CHANGED,
                             access->nc->display, chan, level);
@@ -248,6 +251,8 @@ int do_access(User * u)
         access->level = level;
         access->last_seen = 0;
 
+        snprintf(event_access, BUFSIZE, "%d", access->level);
+        send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
         alog("%s: %s!%s@%s (level %d) set access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, access->level, na->nick, nc->display, ci->name);
         notice_lang(s_ChanServ, u, CHAN_ACCESS_ADDED, nc->display,
                     ci->name, access->level);
@@ -306,6 +311,7 @@ int do_access(User * u)
                 deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
+                send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED,
                             access->nc->display, ci->name);
                 alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), na->nick, access->nc->display, chan);

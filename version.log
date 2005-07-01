@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="841"
+VERSION_BUILD="842"
 
 # $Log$
+#
+# BUILD : 1.7.10 (842)
+# BUGS  : 
+# NOTES : Added 3 new events for channel access/xop list modifications
 #
 # BUILD : 1.7.10 (841)
 # BUGS  : 400

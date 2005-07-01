@@ -53,3 +53,6 @@
 #define EVENT_NICK_UNSUSPEND "nick_unsuspend"
 #define EVENT_JOIN_CHANNEL "join_channel"
 #define EVENT_PART_CHANNEL "part_channel"
+#define EVENT_ACCESS_ADD "access_add"
+#define EVENT_ACCESS_CHANGE "access_change"
+#define EVENT_ACCESS_DEL "access_del"

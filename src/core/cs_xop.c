@@ -235,6 +235,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
+    char event_access[BUFSIZE];
 
     ChannelInfo *ci;
     NickAlias *na;
@@ -324,10 +325,14 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
         alog("%s: %s!%s@%s (level %d) %s access level %d to %s (group %s) on channel %s", s_ChanServ, u->nick, u->username, u->host, ulev, change ? "changed" : "set", access->level, na->nick, nc->display, ci->name);
 
+        snprintf(event_access, BUFSIZE, "%d", access->level);
+
         if (!change) {
+            send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick, event_access);
             notice_lang(s_ChanServ, u, xmsgs[3], access->nc->display,
                         ci->name);
         } else {
+            send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick, event_access);
             notice_lang(s_ChanServ, u, xmsgs[4], access->nc->display,
                         ci->name);
         }
@@ -387,6 +392,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
+                send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
                 notice_lang(s_ChanServ, u, xmsgs[8], access->nc->display,
                             ci->name);
                 access->nc = NULL;

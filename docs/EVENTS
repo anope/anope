@@ -145,6 +145,31 @@ Anope Internal Events
     second argument, and so on. If av[0] and av[1] are given, the event has
     two arguments, and argc should be 2.
 
+    EVENT_ACCESS_ADD
+        An user has been added to a channel access list.
+        av[0]  Name of the channel the user has been added to.
+        av[1]  The nickname of the user that has just added an entry to the
+               access list.
+        av[2]  The nickname of the user that has been added to the access
+               list.
+        av[3]  The level number the user has been added with.
+
+    EVENT_ACCESS_CHANGE
+        An user level has been changed on a channel access list.
+        av[0]  Name of the channel the access list has been modified which.
+        av[1]  The nickname of the user that has just modified the access
+               list of the channel.
+        av[2]  The nickname of the user wich his access level has just been
+               modified.
+        av[3]  The new access level for the user.
+
+    EVENT_ACCESS_DEL
+        An user has been deleted of a channel access list.
+        av[0]  Name of the channel the access entry has been deleted which.
+        av[1]  The nickname of the user that has just deleted the access entry.
+        av[2]  The nickname of the user wich his access level has just been
+               removed.
+
     EVENT_BOT_ASSIGN
         A BotServ bot has been assigned to a channel.
         av[0]  Name of the channel the bot has been assigned to.

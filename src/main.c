@@ -275,6 +275,7 @@ static void services_shutdown(void)
     }
     send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
     disconn(servsock);
+    modules_unload_all();       /* Only legitimate use of this function */
 }
 
 /*************************************************************************/

@@ -61,6 +61,7 @@ int displayCommandFromHash(CommandHash * cmdTable[], char *name);
 int displayMessageFromHashl(char *name);
 int displayMessage(Message * m);
 
+
 /**
  * Automaticaly load modules at startup.
  * This will load modules at startup before the IRCD link is attempted, this
@@ -176,6 +177,51 @@ void modules_delayed_init(void)
             mod_current_user = NULL;
         }
     }
+#endif
+}
+
+/**
+ * Unload ALL loaded modules, no matter what kind of module it is.
+ * Do NEVER EVER, and i mean NEVER (and if that isn't clear enough
+ * yet, i mean: NEVER AT ALL) call this unless we're shutting down,
+ * or we'll fuck up Anope badly (protocol handling won't work for
+ * example). If anyone calls this function without a justified need
+ * for it, i reserve the right to break their legs in a painful way.
+ * And if that isn't enough discouragement, you'll wake up with your
+ * both legs broken tomorrow ;) -GD
+ */
+void modules_unload_all(void)
+{
+#ifdef USE_MODULES
+	int idx;
+	ModuleHash *mh, *next;
+    void (*func) (void);
+	
+	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
+		mh = MODULE_HASH[idx];
+		while (mh) {
+			next = mh->next;
+			
+		    if (prepForUnload(mh->m) != MOD_ERR_OK) {
+				mh = next;
+				continue;
+		    }
+			
+		    func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
+		    if (func) {
+		        mod_current_module_name = mh->m->name;
+		        func();                 /* exec AnopeFini */
+		        mod_current_module_name = NULL;
+		    }
+			
+		    if ((ano_modclose(mh->m->handle)) != 0)
+		        alog(ano_moderr());
+		    else
+		        delModule(mh->m);
+			
+			mh = next;
+		}
+	}
 #endif
 }
 
@@ -369,32 +415,38 @@ int protocolModuleLoaded()
  * triggering a segfault, as the actaul file in use will be in the 
  * runtime folder.
  * @param name the name of the module to copy
+ * @param output the destination to copy the module to
  * @return MOD_ERR_OK on success
  */
-int moduleCopyFile(char *name)
+int moduleCopyFile(char *name, char *output)
 {
 #ifdef USE_MODULES
     int ch;
     FILE *source, *target;
-    char output[4096];
+	int srcfp;
     char input[4096];
     int len;
 
-    strncpy(output, MODULE_PATH, 4095); /* Get full path with module extension */
     strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
-    len = strlen(output);
-#ifdef _WIN32
-    strncat(output, "runtime\\", 4095 - len);
-#else
-    strncat(output, "runtime/", 4095 - len);
-#endif
-    len += strlen(output);
-    strncat(output, name, 4095 - len);
+    len = strlen(input);
     strncat(input, name, 4095 - len);
-    len += strlen(output);
-    strncat(output, MODULE_EXT, 4095 - len);
+    len = strlen(output);
     strncat(input, MODULE_EXT, 4095 - len);
 
+#ifndef _WIN32
+	if ((srcfp = mkstemp(output)) == -1)
+		return MOD_ERR_FILE_IO;
+#else
+	if (!mktemp(output))
+		return MOD_ERR_FILE_IO;
+#endif
+	
+	if (debug)
+		alog("Runtime module location: %s", output);
+	
+	/* Linux/UNIX should ignore the b param, why do we still have seperate
+	 * calls for it here? -GD
+	 */
 #ifndef _WIN32
     if ((source = fopen(input, "r")) == NULL) {
 #else
@@ -403,7 +455,7 @@ int moduleCopyFile(char *name)
         return MOD_ERR_NOEXIST;
     }
 #ifndef _WIN32
-    if ((target = fopen(output, "w")) == NULL) {
+    if ((target = fdopen(srcfp, "w")) == NULL) {
 #else
     if ((target = fopen(output, "wb")) == NULL) {
 #endif
@@ -447,9 +499,8 @@ int loadModule(Module * m, User * u)
     if ((m2 = findModule(m->name)) != NULL) {
         return MOD_ERR_EXISTS;
     }
-
-    moduleCopyFile(m->name);
-
+	
+	/* Generate the filename for the temporary copy of the module */
     strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
     len = strlen(buf);
 #ifndef _WIN32
@@ -461,7 +512,14 @@ int loadModule(Module * m, User * u)
     strncat(buf, m->name, 4095 - len);
     len = strlen(buf);
     strncat(buf, MODULE_EXT, 4095 - len);
+	len = strlen(buf);
+	strncat(buf, ".", 4095 - len);
+	len = strlen(buf);
+	strncat(buf, "XXXXXX", 4095 - len);
     buf[4095] = '\0';
+	/* Don't skip return value checking! -GD */
+    if (ret = moduleCopyFile(m->name, buf) != MOD_ERR_OK)
+		return ret;
 
     m->filename = sstrdup(buf);
     ano_modclearerr();

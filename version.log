@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="840"
+VERSION_BUILD="841"
 
 # $Log$
+#
+# BUILD : 1.7.10 (841)
+# BUGS  : 400
+# NOTES : Modules will now get a more random filename in the runtime/ folder, which makes sure that no duplicate filenames will occur, which makes sure listchans can run at the same time as services since they both use the same protocol module, which in turn fixes bug 400. And all modules are now properly unloaded on shutdown :)
 #
 # BUILD : 1.7.10 (840)
 # BUGS  : 

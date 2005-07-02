@@ -628,7 +628,7 @@ void rageircd_cmd_svsadmin(char *server, int set)
 
 void rageircd_cmd_sgline(char *mask, char *reason)
 {
-    send_cmd(NULL, "SGLINE %d :%s:%s", strlen(mask), mask, reason);
+    send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 
 }
 

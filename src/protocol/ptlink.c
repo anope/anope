@@ -1391,7 +1391,7 @@ void ptlink_cmd_unsgline(char *mask)
  */
 void ptlink_cmd_sgline(char *mask, char *reason)
 {
-    send_cmd(ServerName, "SXLINE %d :%s:%s", strlen(mask), mask, reason);
+    send_cmd(ServerName, "SXLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
 /* SVSNICK */

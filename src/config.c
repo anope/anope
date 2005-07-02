@@ -687,7 +687,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
 {
     int retval = 1;
     int i;
-    int val;
+    long val;
     int optind;
 
     if (stricmp(dir, d->name) != 0)

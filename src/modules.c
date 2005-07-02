@@ -2486,7 +2486,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     va_list va;
     char buffer[4096], outbuf[4096];
     char *fmt = NULL;
-    int lang = LANG_EN_US;
+    int lang = NSDefLanguage;
     char *s, *t, *buf;
 
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
@@ -2497,7 +2497,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
         lang = u->na->nc->language;
     }
 
-    /* If the users lang isnt supported, drop back to enlgish */
+    /* If the users lang isnt supported, drop back to English */
     if (mod_current_module->lang[lang].argc == 0) {
         lang = LANG_EN_US;
     }

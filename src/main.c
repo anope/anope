@@ -467,6 +467,17 @@ int main(int ac, char **av, char **envp)
     my_av = av;
     my_envp = envp;
 
+#ifndef _WIN32
+    /* If we're root, issue a warning now */
+    if ((getuid() == 0) && (getgid() == 0)) {
+        fprintf(stderr,
+                "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
+        fprintf(stderr,
+                "    require root privileges to run, and it is discouraged that you run Anope\n");
+        fprintf(stderr, "    as the root superuser.\n");
+    }
+#endif
+
     /* General initialization first */
     if ((i = init_primary(ac, av)) != 0)
         return i;

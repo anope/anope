@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="844"
+VERSION_BUILD="845"
 
 # $Log$
+#
+# BUILD : 1.7.10 (845)
+# BUGS  : 
+# NOTES : Added a warning for *NIX when running as root
 #
 # BUILD : 1.7.10 (844)
 # BUGS  : 

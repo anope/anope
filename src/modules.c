@@ -556,7 +556,7 @@ int loadModule(Module * m, User * u)
             free(argv[0]);
         }
         if (m->type == PROTOCOL && protocolModuleLoaded()) {
-            alog("You cannot load have 2 protocol modules.");
+            alog("You cannot load two protocol modules");
             ret = MOD_STOP;
         }
         if (ret == MOD_STOP) {

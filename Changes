@@ -5,6 +5,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+07/07 F Clarified comments for SendmailPath regarding -t option.          [ #00]
 07/02 F Module languages now default to NSDefLanguage, not English.       [ #00]
 07/02 F Various compile warnings when using AMD64.                        [ #00]
 07/01 F Modules will now be properly unloaded on shutdown.                [ #00]

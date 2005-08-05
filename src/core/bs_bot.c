@@ -84,6 +84,7 @@ int do_bot(User * u)
     BotInfo *bi;
     char *cmd = strtok(NULL, " ");
     char *ch = NULL;
+    int len;
 
     if (!cmd)
         syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
@@ -99,6 +100,9 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_BOT_READONLY);
         else if (findbot(nick))
             notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
+	else if((len=strlen(nick))>NICKMAX) {
+            notice_lang(s_BotServ, u, BOT_BAD_NICK);
+	}
         else {
             NickAlias *na;
 
@@ -191,6 +195,9 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_BOT_READONLY);
         else if (!(bi = findbot(oldnick)))
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
+	else if((len=strlen(nick))>NICKMAX) {
+            notice_lang(s_BotServ, u, BOT_BAD_NICK);
+	}
         else {
             NickAlias *na;
 

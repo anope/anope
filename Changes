@@ -5,6 +5,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+08/05 F Bot max nick length limited by NICKMAX now.                       [ #00]
 07/07 F Typing mistake in module error message.                           [ #00]
 07/07 F Clarified comments for SendmailPath regarding -t option.          [ #00]
 07/02 F Module languages now default to NSDefLanguage, not English.       [ #00]
@@ -23,6 +24,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 05/25 F Removed a double extern definition of rdb_tag_table.              [#381]
 05/25 F Fixed mydbgen so it sends the pass and installs in the data dir.  [ #00]
 05/25 F Not all nick options were displayed in listnicks.                 [#380]
+
+Provided by Hal9000 <hal9000@musichat.net> - 2005
+06/25 F Updated Italian langauge file.                                    [ #00]
 
 Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 06/25 A Portugese translation for hs_request.                             [ #00]

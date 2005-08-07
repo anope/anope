@@ -1,3 +1,44 @@
+Highlighted News in Anope 1.7 (and soon 1.8)
+============================================
+  * Fixed various exploits and vulnerabilities.
+  * Fixed various language typos and inconsistencies.
+  * Added a new and improved ./Config script.
+  * Added MySQL phase 2 implementation (see docs/MYSQL).
+  * Added NickServ registration delays.
+  * Added read receipts for memos.
+  * Added a way for modules to store data with internal structures.
+  * Added nick tracking support.
+  * Improved random number algorithm.
+  * Added support for SVSHOLD.
+  * Addes support for U:Lined servers.
+  * Added support for TS6 IRCd's.
+  * Removed proxy detector (see docs/PROXY).
+  * Added support for Windows.
+  * Added internal events for modules.
+  * Added a way to suspend nicks.
+  * Added support for module configuration directives.
+  * Converted the core to be completely modular.
+  * Added translation support for modules.
+  * Added a module pack with handy modules.
+  * Added IRCd protocol modules.
+  * Added support for new IRCd's. Currently supported:
+    - DreamForge 4.6.7
+    - Bahamut 1.4.27 or later (including 1.8)
+    - UnrealIRCd 3.1.1 or later (including 3.2)
+    - UltimateIRCd 2.8.2 or later (including 3.0.0)
+    - Hybrid 7 or later
+    - ViagraIRCd 1.3 or later
+    - PTlink 6.15 or later
+    - RageIRCd 2.0 beta-6 or later
+    - Solid IRCd 3.4.6 or later
+    - Plexus 2.0 or later
+    - Ratbox 2.0.6 or later
+    - ShadowIRCd 4.0 beta 7 or later
+  * Added new languages. Currently included:
+      Catalan, German, English, Spanish, French, Greek,
+      Hungarian, Italian, Dutch, Polish, Portugese,
+      Russian, Turkish
+
 Highlighted News in Anope 1.6
 =============================
   * Fixed various exploits and vulnerabilities.

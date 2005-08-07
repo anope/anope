@@ -119,6 +119,7 @@ int do_set(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
+	char *tmp = NULL;
 
     NickAlias *na;
     int is_servadmin = is_services_admin(u);
@@ -130,9 +131,15 @@ int do_set(User * u)
     }
 
     if (is_servadmin && cmd && (na = findnick(cmd))) {
-        cmd = param;
-        param = strtok(NULL, " ");
-        set_nick = 1;
+		tmp = strtok(NULL, " ");
+		/* If there is no param left, don't treat the cmd as a
+		 * nick. We have more chance of success that way. -GD
+		 */
+		if (tmp) {
+	        cmd = param;
+    	    param = strtok(NULL, " ");
+        	set_nick = 1;
+		}
     } else {
         na = u->na;
     }

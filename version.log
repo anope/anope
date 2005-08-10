@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="851"
+VERSION_BUILD="852"
 
 # $Log$
+#
+# BUILD : 1.7.10 (852)
+# BUGS  : 
+# NOTES : Added the new windows installation files
 #
 # BUILD : 1.7.10 (851)
 # BUGS  : 

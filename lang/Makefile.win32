@@ -63,10 +63,10 @@ ru:       ru.l       langtool.exe langcomp.exe index
         langcomp $@.l
 
 langtool.exe: langtool.c
-        $(CC) langtool.c -o $@
+        $(CC) $(CFLAGS) langtool.c -o $@ /link $(LFLAGS)
 
 langcomp.exe: langcomp.c
-        $(CC) langcomp.c -o $@
+        $(CC) $(CFLAGS) langcomp.c -o $@ /link $(LFLAGS)
 
 language.h: langtool.exe index
         langtool language.h

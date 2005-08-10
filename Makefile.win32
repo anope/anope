@@ -25,21 +25,21 @@ install:
         cd lang && $(MAKE) install && cd ..
         cd src && $(MAKE) install && cd ..
         cd src\modules && $(MAKE) install && cd ..
-	cd src\modules && $(MAKE) subs-install && cd ..
-	cd src\protocol && $(MAKE) install && cd ..
-	cd src\core && $(MAKE) install && cd ..
-	cd src\tools && $(MAKE) install && cd ..
+        cd src\modules && $(MAKE) subs-install && cd ..
+        cd src\protocol && $(MAKE) install && cd ..
+        cd src\core && $(MAKE) install && cd ..
+        cd src\tools && $(MAKE) install && cd ..
         -@echo ---
         -@echo Anope has been insalled successfully!
-	-@echo See docs\INSTALL for details on how to configure Anope for use.
+        -@echo See docs\INSTALL for details on how to configure Anope for use.
         -@echo ---
         
 clean:
         cd src && $(MAKE) spotless && cd ..
-	cd src\modules && $(MAKE) spotless && cd ..
-	cd src\protocol && $(MAKE) spotless && cd ..
-	cd src\core && $(MAKE) spotless && cd ..
-	cd src\tools && $(MAKE) spotless && cd ..
+        cd src\modules && $(MAKE) spotless && cd ..
+        cd src\protocol && $(MAKE) spotless && cd ..
+        cd src\core && $(MAKE) spotless && cd ..
+        cd src\tools && $(MAKE) spotless && cd ..
         cd lang && $(MAKE) spotless && cd ..
         -@erase *.exe version.h *.obj
 
@@ -47,9 +47,9 @@ spotless:
         cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
         cd src\modules && $(MAKE) spotless && cd ..\..
-	cd src\protocol && $(MAKE) spotless && cd ..\..
-	cd src\core && $(MAKE) spotless && cd ..\..
-	cd src\tools && $(MAKE) spotless && cd ..\..
+        cd src\protocol && $(MAKE) spotless && cd ..\..
+        cd src\core && $(MAKE) spotless && cd ..\..
+        cd src\tools && $(MAKE) spotless && cd ..\..
         -@erase include\language.h include\version.h *~ anope.exe version.sh.exe *.obj anopesmtp.exe
 
 mypasql: 
@@ -67,10 +67,10 @@ tools: FRC
         cd src\tools && $(MAKE) && cd ..\..
 
 core: FRC
-	cd src\core && $(MAKE) && cd ..\..
+        cd src\core && $(MAKE) && cd ..\..
 
 protocols: FRC
-	cd src\protocol && $(MAKE) && cd ..\..
+        cd src\protocol && $(MAKE) && cd ..\..
 
 modules: FRC
         cd src\modules && $(MAKE) && cd ..\..
@@ -94,6 +94,6 @@ include\version.h: version.sh.exe version.log include\services.h include\pseudo.
                 copy version.h include\version.h
 
 version.sh.exe:
-        $(CC) include\version.sh.c
+        $(CC) $(BASE_CFLAGS) include\version.sh.c /link $(LFLAGS)
 
 FRC:

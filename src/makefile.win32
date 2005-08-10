@@ -49,7 +49,7 @@ install:
         -@copy  bin\* ..\$(DATDEST)\bin
 
 win32.res: win32.rc
-        $(RC) /l 0x409 /fowin32.res win32.rc
+        $(RC) /l 0x409 $(RC_FLAGS) /fowin32.res win32.rc
 
       
 ###########################################################################

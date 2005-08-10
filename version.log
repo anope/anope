@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="850"
+VERSION_BUILD="851"
 
 # $Log$
+#
+# BUILD : 1.7.10 (851)
+# BUGS  : 
+# NOTES : Fixed a few memleaks in os_info (thanks Certus)
 #
 # BUILD : 1.7.10 (850)
 # BUGS  : 

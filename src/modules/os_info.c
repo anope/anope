@@ -271,6 +271,7 @@ int myNickInfo(User * u)
 {
     char *text = NULL;
     char *nick = NULL;
+	char *info = NULL;
     NickAlias *na = NULL;
 
     /* Only show our goodies to opers */
@@ -283,10 +284,9 @@ int myNickInfo(User * u)
                 /* ok we've found the user */
                 if ((na = findnick(nick))) {
                     /* If we have any info on this user */
-                    if (moduleGetData(&na->nc->moduleData, "info")) {
-                        notice_user(s_NickServ, u, "         OperInfo: %s",
-                                    moduleGetData(&na->nc->moduleData,
-                                                  "info"));
+                    if ((info = moduleGetData(&na->nc->moduleData, "info"))) {
+                        notice_user(s_NickServ, u, "         OperInfo: %s", info);
+						free(info);
                     }
                     /* NickCore not found! */
                 } else {
@@ -308,6 +308,7 @@ int myChanInfo(User * u)
 {
     char *text = NULL;
     char *chan = NULL;
+	char *info = NULL;
     ChannelInfo *ci = NULL;
 
     /* Only show our goodies to opers */
@@ -319,10 +320,9 @@ int myChanInfo(User * u)
             if (chan) {
                 if ((ci = cs_findchan(chan))) {
                     /* If we have any info on this channel */
-                    if (moduleGetData(&ci->moduleData, "info")) {
-                        notice_user(s_ChanServ, u, "       OperInfo: %s",
-                                    moduleGetData(&ci->moduleData,
-                                                  "info"));
+                    if ((info = moduleGetData(&ci->moduleData, "info"))) {
+                        notice_user(s_ChanServ, u, "       OperInfo: %s", info);
+						free(info);
                     }
                 }
                 free(chan);
@@ -403,6 +403,7 @@ int mSaveData(int argc, char **argv)
     int i = 0;
     int ret = 0;
     FILE *out;
+	char *info = NULL;
 
     if (argc >= 1) {
         if (!stricmp(argv[0], EVENT_START)) {
@@ -415,10 +416,9 @@ int mSaveData(int argc, char **argv)
                 for (i = 0; i < 1024; i++) {
                     for (nc = nclists[i]; nc; nc = nc->next) {
                         /* If we have any info on this user */
-                        if (moduleGetData(&nc->moduleData, "info")) {
-                            fprintf(out, "N %s %s\n", nc->display,
-                                    moduleGetData(&nc->moduleData,
-                                                  "info"));
+                        if ((info = moduleGetData(&nc->moduleData, "info"))) {
+                            fprintf(out, "N %s %s\n", nc->display, info);
+							free(info);
                         }
                     }
                 }
@@ -427,10 +427,9 @@ int mSaveData(int argc, char **argv)
                 for (i = 0; i < 256; i++) {
                     for (ci = chanlists[i]; ci; ci = ci->next) {
                         /* If we have any info on this channel */
-                        if (moduleGetData(&ci->moduleData, "info")) {
-                            fprintf(out, "C %s %s\n", ci->name,
-                                    moduleGetData(&ci->moduleData,
-                                                  "info"));
+                        if ((info = moduleGetData(&ci->moduleData, "info"))) {
+                            fprintf(out, "C %s %s\n", ci->name, info);
+							free(info);
                         }
                     }
                 }

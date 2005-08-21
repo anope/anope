@@ -28,7 +28,6 @@ int do_set_secure(User * u, NickCore * nc, char *param);
 int do_set_private(User * u, NickCore * nc, char *param);
 int do_set_msg(User * u, NickCore * nc, char *param);
 int do_set_hide(User * u, NickCore * nc, char *param);
-int do_set_noexpire(User * u, NickAlias * nc, char *param);
 void myNickServHelp(User * u);
 
 /**
@@ -45,8 +44,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1,
-                      NICK_SERVADMIN_HELP_SET, NICK_SERVADMIN_HELP_SET);
+    c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SET DISPLAY", NULL, NULL, NICK_HELP_SET_DISPLAY, -1,
                       -1, -1, -1);
@@ -80,10 +78,6 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
     c = createCommand("SET HIDE", NULL, NULL, NICK_HELP_SET_HIDE, -1, -1,
                       -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET NOEXPIRE", NULL, NULL, -1, -1, -1,
-                      NICK_SERVADMIN_HELP_SET_NOEXPIRE,
-                      NICK_SERVADMIN_HELP_SET_NOEXPIRE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);
@@ -119,48 +113,26 @@ int do_set(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
-	char *tmp = NULL;
-
-    NickAlias *na;
-    int is_servadmin = is_services_admin(u);
-    int set_nick = 0;
-
+	NickAlias *na = u->na;
+	
     if (readonly) {
         notice_lang(s_NickServ, u, NICK_SET_DISABLED);
         return MOD_CONT;
     }
-
-    if (is_servadmin && cmd && (na = findnick(cmd))) {
-		tmp = strtok(NULL, " ");
-		/* If there is no param left, don't treat the cmd as a
-		 * nick. We have more chance of success that way. -GD
-		 */
-		if (tmp) {
-	        cmd = param;
-    	    param = strtok(NULL, " ");
-        	set_nick = 1;
-		}
-    } else {
-        na = u->na;
-    }
-
+	
     if (!param
         && (!cmd
             || (stricmp(cmd, "URL") != 0 && stricmp(cmd, "EMAIL") != 0
                 && stricmp(cmd, "GREET") != 0
                 && stricmp(cmd, "ICQ") != 0))) {
-        if (is_servadmin) {
-            syntax_error(s_NickServ, u, "SET", NICK_SET_SERVADMIN_SYNTAX);
-        } else {
-            syntax_error(s_NickServ, u, "SET", NICK_SET_SYNTAX);
-        }
+        syntax_error(s_NickServ, u, "SET", NICK_SET_SYNTAX);
     } else if (!na) {
         notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else if (na->nc->flags & NI_SUSPENDED) {
         notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-    } else if (!is_servadmin && !nick_identified(u)) {
+    } else if (!nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
     } else if (stricmp(cmd, "DISPLAY") == 0) {
         do_set_display(u, na->nc, param);
@@ -186,14 +158,8 @@ int do_set(User * u)
         do_set_msg(u, na->nc, param);
     } else if (stricmp(cmd, "HIDE") == 0) {
         do_set_hide(u, na->nc, param);
-    } else if (stricmp(cmd, "NOEXPIRE") == 0) {
-        do_set_noexpire(u, na, param);
     } else {
-        if (is_servadmin)
-            notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK,
-                        cmd);
-        else
-            notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd);
+        notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd);
     }
     return MOD_CONT;
 }
@@ -231,11 +197,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
 
-    if (NSSecureAdmins && u->na->nc != nc && nick_is_services_admin(nc)
-        && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-    } else if (stricmp(nc->display, param) == 0
+    if (stricmp(nc->display, param) == 0
                || (StrictPasswords && len < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
         return MOD_CONT;
@@ -262,17 +224,10 @@ int do_set_password(User * u, NickCore * nc, char *param)
     notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, nc->pass);
 #endif
 
-    if (u->na && u->na->nc != nc && is_services_admin(u)) {
-        alog("%s: %s!%s@%s used SET PASSWORD as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
-        if (WallSetpass)
-            anope_cmd_global(s_NickServ,
-                             "\2%s\2 used SET PASSWORD as Services admin on \2%s\2",
-                             u->nick, nc->display);
-    } else {
-        alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
+    alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
              u->nick, u->username, u->host,
              (nc->email ? nc->email : "none"));
-    }
+
     return MOD_CONT;
 }
 
@@ -316,23 +271,15 @@ int do_set_email(User * u, NickCore * nc, char *param)
     if (!param && NSForceEmail) {
         notice_lang(s_NickServ, u, NICK_SET_EMAIL_UNSET_IMPOSSIBLE);
         return MOD_CONT;
-    } else if (NSSecureAdmins && u->na->nc != nc
-               && nick_is_services_admin(nc)
-               && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
     } else if (param && !MailValidate(param)) {
         notice_lang(s_NickServ, u, MAIL_X_INVALID, param);
         return MOD_CONT;
     }
 
-    if (u->na && u->na->nc != nc && is_services_admin(u)) {
-        alog("%s: %s!%s@%s used SET EMAIL as Services admin on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
-    } else {
-        alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.",
+    alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.",
              s_NickServ, u->nick, u->username, u->host,
              (nc->email ? nc->email : "none"), (param ? param : "none"));
-    }
+
     if (nc->email)
         free(nc->email);
 
@@ -501,26 +448,4 @@ int do_set_hide(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
-int do_set_noexpire(User * u, NickAlias * na, char *param)
-{
-    if (!is_services_admin(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-    }
-    if (!param) {
-        syntax_error(s_NickServ, u, "SET NOEXPIRE",
-                     NICK_SET_NOEXPIRE_SYNTAX);
-        return MOD_CONT;
-    }
-    if (stricmp(param, "ON") == 0) {
-        na->status |= NS_NO_EXPIRE;
-        notice_lang(s_NickServ, u, NICK_SET_NOEXPIRE_ON, na->nick);
-    } else if (stricmp(param, "OFF") == 0) {
-        na->status &= ~NS_NO_EXPIRE;
-        notice_lang(s_NickServ, u, NICK_SET_NOEXPIRE_OFF, na->nick);
-    } else {
-        syntax_error(s_NickServ, u, "SET NOEXPIRE",
-                     NICK_SET_NOEXPIRE_SYNTAX);
-    }
-    return MOD_CONT;
-}
+/* EOF */

@@ -534,12 +534,126 @@ NICK_SET_MSG_OFF
 	Services will now reply to you with notices.
 
 # SET NOEXPIRE responses
-NICK_SET_NOEXPIRE_SYNTAX
-	SET [nick] NOEXPIRE {ON | OFF}
-NICK_SET_NOEXPIRE_ON
-	%s nicki zaman aþýmýndan çýkarýldý.
-NICK_SET_NOEXPIRE_OFF
-	%s nicki zaman aþýmýna eklendi.
+NICK_SASET_SYNTAX
+	SASET nickname option parameters
+NICK_SASET_DISABLED
+	Sorry, nickname option setting is temporarily disabled.
+NICK_SASET_UNKNOWN_OPTION
+	Unknown SASET option %s.
+NICK_SASET_BAD_NICK
+	Nickname %s not registered.
+NICK_SASET_OPTION_DISABLED
+	Option %s cannot be set on this network.
+
+# SASET DISPLAY responses
+NICK_SASET_DISPLAY_INVALID
+	The new display for %s MUST be a nickname of the nickname group!
+NICK_SASET_DISPLAY_CHANGED
+	The new display is now %s.
+
+# SASET PASSWORD responses
+NICK_SASET_PASSWORD_FAILED
+	Sorry, couldn't change password for %s.
+NICK_SASET_PASSWORD_CHANGED
+	Password for %s changed.
+NICK_SASET_PASSWORD_CHANGED_TO
+	Password for %s changed to %s.
+
+# SASET LANGUAGE responses
+NICK_SASET_URL_CHANGED
+	URL for %s changed to %s.
+NICK_SASET_URL_UNSET
+	URL %s unset.
+
+# SASET EMAIL responses
+NICK_SASET_EMAIL_CHANGED
+	E-mail address for %s changed to %s.
+NICK_SASET_EMAIL_UNSET
+	E-mail address for %s unset.
+NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
+	You cannot unset the e-mail on this network.
+	
+# SASET ICQ responses
+NICK_SASET_ICQ_CHANGED
+	ICQ number for %s set to %s.
+NICK_SASET_ICQ_UNSET
+	ICQ number for %s unset.
+NICK_SASET_ICQ_INVALID
+	%s is not a valid number.
+	
+# SASET GREET responses
+NICK_SASET_GREET_CHANGED
+	Greet message for %s changed to %s.
+NICK_SASET_GREET_UNSET
+	Greet message for %s unset.
+
+# SASET PROTECT responses
+NICK_SASET_KILL_SYNTAX
+	SASET nickname KILL {ON | QUICK | OFF}
+NICK_SASET_KILL_IMMED_SYNTAX
+	SASET nickname KILL {ON | QUICK | IMMED | OFF}
+NICK_SASET_KILL_ON
+	Protection is now ON for %s.
+NICK_SASET_KILL_QUICK
+	Protection is now ON for %s, with a reduced delay.
+NICK_SASET_KILL_IMMED
+	Protection is now ON for %s, with no delay.
+NICK_SASET_KILL_IMMED_DISABLED
+	The IMMED option is not available on this network.
+NICK_SASET_KILL_OFF
+	Protection is now OFF for %s.
+
+# SASET SECURE responses
+NICK_SASET_SECURE_SYNTAX
+	SASET nickname SECURE {ON | OFF}
+NICK_SASET_SECURE_ON
+	Secure option is now ON for %s.
+NICK_SASET_SECURE_OFF
+	Secure option is now OFF for %s.
+
+# SASET PRIVATE responses
+NICK_SASET_PRIVATE_SYNTAX
+	SASET nickname PRIVATE {ON | OFF}
+NICK_SASET_PRIVATE_ON
+	Private option is now ON for %s.
+NICK_SASET_PRIVATE_OFF
+	Private option is now OFF for %s.
+
+# SASET HIDE responses
+NICK_SASET_HIDE_SYNTAX
+	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+NICK_SASET_HIDE_EMAIL_ON
+	The E-mail address of %s will now be hidden from %s INFO displays.
+NICK_SASET_HIDE_EMAIL_OFF
+	The E-mail address of %s will now be shown in %s INFO displays.
+NICK_SASET_HIDE_MASK_ON
+	The last seen user@host mask of %s will now be hidden from %s INFO displays.
+NICK_SASET_HIDE_MASK_OFF
+	The last seen user@host mask of %s will now be shown in %s INFO displays.
+NICK_SASET_HIDE_QUIT_ON
+	The last quit message of %s will now be hidden from %s INFO displays.
+NICK_SASET_HIDE_QUIT_OFF
+	The last quit message of %s will now be shown in %s INFO displays.
+NICK_SASET_HIDE_STATUS_ON
+	The services access status of %s will now be hidden from %s INFO displays.
+NICK_SASET_HIDE_STATUS_OFF
+	The services access status of %s will now be shown in %s INFO displays.
+	
+# SASET MSG responses
+NICK_SASET_MSG_SYNTAX
+	SSAET nickname PRIVATE {ON | OFF}
+NICK_SASET_MSG_ON
+	Services will now reply to %s with messages.
+NICK_SASET_MSG_OFF
+	Services will now reply to %s with notices.
+
+# SET NOEXPIRE responses
+NICK_SASET_NOEXPIRE_SYNTAX
+	SASET nickname NOEXPIRE {ON | OFF}
+NICK_SASET_NOEXPIRE_ON
+	Nick %s will not expire.
+NICK_SASET_NOEXPIRE_OFF
+	Nick %s will expire.
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
@@ -3295,6 +3409,8 @@ NICK_HELP_CMD_ACCESS
 	    ACCESS     Ýzinli adreslerin listesini düzenler
 NICK_HELP_CMD_SET
 	    SET        Ayarlar, kill korumasýný içerir
+NICK_HELP_CMD_SASET
+	    SASET      Set SET-options on another nickname
 NICK_HELP_CMD_DROP
 	    DROP       Nickin kaydýný siler
 NICK_HELP_CMD_RECOVER
@@ -3611,6 +3727,155 @@ NICK_HELP_SET_MSG
 	you. With MSG set, Services will use messages, else they'll 
 	use notices.
 
+NICK_HELP_SASET
+	Syntax: SASET nickname option parameters.
+	
+	Sets various nickname options.  option can be one of:
+	
+	    DISPLAY    Set the display of the group in Services
+	    PASSWORD   Set the nickname password
+	    LANGUAGE   Set the language Services will use when
+	                   sending messages
+	    URL        Associate a URL with the nickname
+	    EMAIL      Associate an E-mail address with the nickname
+	    ICQ        Associate an ICQ number with the nickname
+	    GREET      Associate a greet message with the nickname
+	    KILL       Turn protection on or off
+	    SECURE     Turn nickname security on or off
+	    PRIVATE    Prevent the nickname from appearing in a
+	                   /msg %S LIST
+	    HIDE       Hide certain pieces of nickname information
+	    MSG        Change the communication method of Services
+	    NOEXPIRE   Prevent the nickname from expiring
+	
+	Type /msg %S HELP SASET option for more information
+	on a specific option. The options will be set on the given
+	nickname. 
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_DISPLAY
+	Syntax: SASET nickname DISPLAY new-display
+	
+	Changes the display used to refer to the nickname group in 
+	Services. The new display MUST be a nick of the group.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_PASSWORD
+	Syntax: SET nickname PASSWORD new-password
+	
+	Changes the password used to identify as the nick's	owner.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_URL
+	Syntax: SASET nickname URL url
+	
+	Associates the given URL with the nickname.  This URL
+	will be displayed whenever someone requests information
+	on the nick with the INFO command.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_EMAIL
+	Syntax: SASET nickname EMAIL address
+	
+	Associates the given E-mail address with the nickname.
+	
+	Limited to Services admins.
+	
+NICK_HELP_SASET_ICQ
+	Syntax: SASET nickname ICQ number
+	
+	Associates the given ICQ number with the nickname.  This 
+	number will be displayed whenever someone requests 
+	information on the nick with the INFO command.
+	
+	Limited to Services admins.
+	
+NICK_HELP_SASET_GREET
+	Syntax: SASET nickname GREET message
+	
+	Makes the given message the greet of the nickname, that
+	will be displayed when joining a channel that has GREET
+	option enabled, provided that the user has the necessary 
+	access on it.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_KILL
+	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
+	
+	Turns the automatic protection option for the nick
+	on or off.  With protection on, if another user
+	tries to take the nick, they will be given one minute to
+	change to another nick, after which %S will forcibly change
+	their nick.
+	
+	If you select QUICK, the user will be given only 20 seconds
+	to change nicks instead of the usual 60.  If you select
+	IMMED, user's nick will be changed immediately without being
+	warned first or given a chance to change their nick; please
+	do not use this option unless necessary.  Also, your
+	network's administrators may have disabled this option.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_SECURE
+	Syntax: SASET nickname SECURE {ON | OFF}
+	
+	Turns %S's security features on or off for your
+	nick.  With SECURE set, you must enter your password
+	before you will be recognized as the owner of the nick,
+	regardless of whether your address is on the access
+	list.  However, if you are on the access list, %S
+	will not auto-kill you regardless of the setting of the
+	KILL option.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_PRIVATE
+	Syntax: SASET nickname PRIVATE {ON | OFF}
+	
+	Turns %S's privacy option on or off for the nick.
+	With PRIVATE set, the nickname will not appear in
+	nickname lists generated with %S's LIST command.
+	(However, anyone who knows the nickname can still get
+	information on it using the INFO command.)
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_HIDE
+	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
+	
+	Allows you to prevent certain pieces of information from
+	being displayed when someone does a %S INFO on the
+	nick.  You can hide the E-mail address (EMAIL), last seen
+	user@host mask (USERMASK), the services access status
+	(STATUS) and  last quit message (QUIT).
+	The second parameter specifies whether the information should
+	be displayed (OFF) or hidden (ON).
+	
+	Limited to Services admins.
+	
+NICK_HELP_SASET_MSG
+	Syntax: SASET nickname MSG {ON | OFF}
+	
+	Allows you to choose the way Services are communicating with 
+	the given user. With MSG set, Services will use messages,
+	else they'll use notices.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_NOEXPIRE
+	Syntax: SASET nickname NOEXPIRE {ON | OFF}
+	
+	Sets whether the given nickname will expire.  Setting this
+	to ON prevents the nickname from expiring.
+	
+	Limited to Services admins.
+
 NICK_HELP_RECOVER
 	Kullanýmý: RECOVER nick [þifre]
 	
@@ -3775,25 +4040,6 @@ NICK_SERVADMIN_HELP_DROP
 	Grubunuzda bulunan herhangi bir nicki özel ayrýcalýklara
 	gerek olmadan silebilirsiniz. Bu iþlemler Servis adminleri 
 	tarafýndan yapýlabilir.
-
-NICK_SERVADMIN_HELP_SET
-	
-	Servis adminleri ayrýca NOEXPIRE özelliðini ayarlayabilirler, 
-	böylece hangi nicklerin zaman asimini uðrayýp kayýtlarýnýn 
-	silinmeyeceðini belirlerler.
-	Ek olarak, Servis adminleri bu formatý kullanarak 
-	SET nick özellik parametre herhangi bir nick için 
-	þifre girmeden ayar yapabilirler.
-
-NICK_SERVADMIN_HELP_SET_NOEXPIRE
-	Kullanýmý: SET [nick] NOEXPIRE {ON | OFF}
-	
-	Belirtilen nickin zaman asimina uðrayýp uðramayacaðýný belirler.
-	Bunu ON yapmak o nickin zaman asimina uðramasýný ve kaydýnýn 
-	silinmesini engeller. Eðer bir nick belirtilmezse no-expire
-	parametresini komutu kullananýn nickine ayarlar.
-	
-	Sadece Servis adminleri kullanabilir.
 
 NICK_SERVADMIN_HELP_INFO
 	

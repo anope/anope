@@ -215,8 +215,10 @@ int write_file_version(dbFILE * f, uint32 version);
 int mystricmp(const char *s1, const char *s2);
 int write_string(const char *s, dbFILE * f);
 int write_ptr(const void *ptr, dbFILE * f);
-int read_int16(uint16 * ret, dbFILE * f);
-int read_int32(uint32 * ret, dbFILE * f);
+int read_int16(int16 * ret, dbFILE * f);
+int read_uint16(uint16 * ret, dbFILE * f);
+int read_int32(int32 * ret, dbFILE * f);
+int read_uint32(uint32 * ret, dbFILE * f);
 int read_string(char **ret, dbFILE * f);
 int write_int16(uint16 val, dbFILE * f);
 int write_int32(uint32 val, dbFILE * f);
@@ -284,7 +286,7 @@ int main(int argc, char *argv[])
                 READ(read_buffer(ci->last_topic_setter, f));
                 READ(read_int32(&tmp32, f));
                 ci->last_topic_time = tmp32;
-                READ(read_int32(&ci->flags, f));
+                READ(read_uint32(&ci->flags, f));
                 /* Temporary flags cleanup */
                 ci->flags &= ~0x80000000;
                 READ(read_string(&ci->forbidby, f));
@@ -355,9 +357,9 @@ int main(int argc, char *argv[])
                 } else {
                     ci->akick = NULL;
                 }
-                READ(read_int32(&ci->mlock_on, f));
-                READ(read_int32(&ci->mlock_off, f));
-                READ(read_int32(&ci->mlock_limit, f));
+                READ(read_uint32(&ci->mlock_on, f));
+                READ(read_uint32(&ci->mlock_off, f));
+                READ(read_uint32(&ci->mlock_limit, f));
                 READ(read_string(&ci->mlock_key, f));
                 READ(read_string(&ci->mlock_flood, f));
                 READ(read_string(&ci->mlock_joinrate, f));
@@ -369,7 +371,7 @@ int main(int argc, char *argv[])
                     memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
                     ci->memos.memos = memos;
                     for (j = 0; j < ci->memos.memocount; j++, memos++) {
-                        READ(read_int32(&memos->number, f));
+                        READ(read_uint32(&memos->number, f));
                         READ(read_int16(&memos->flags, f));
                         READ(read_int32(&tmp32, f));
                         memos->time = tmp32;
@@ -608,7 +610,19 @@ void close_db(dbFILE * f)
     free(f);
 }
 
-int read_int16(uint16 * ret, dbFILE * f)
+int read_int16(int16 * ret, dbFILE * f)
+{
+    int c1, c2;
+
+    c1 = fgetc(f->fp);
+    c2 = fgetc(f->fp);
+    if (c1 == EOF || c2 == EOF)
+        return -1;
+    *ret = c1 << 8 | c2;
+    return 0;
+}
+
+int read_uint16(uint16 * ret, dbFILE * f)
 {
     int c1, c2;
 
@@ -629,7 +643,21 @@ int write_int16(uint16 val, dbFILE * f)
 }
 
 
-int read_int32(uint32 * ret, dbFILE * f)
+int read_int32(int32 * ret, dbFILE * f)
+{
+    int c1, c2, c3, c4;
+
+    c1 = fgetc(f->fp);
+    c2 = fgetc(f->fp);
+    c3 = fgetc(f->fp);
+    c4 = fgetc(f->fp);
+    if (c1 == EOF || c2 == EOF || c3 == EOF || c4 == EOF)
+        return -1;
+    *ret = c1 << 24 | c2 << 16 | c3 << 8 | c4;
+    return 0;
+}
+
+int read_uint32(uint32 * ret, dbFILE * f)
 {
     int c1, c2, c3, c4;
 
@@ -681,7 +709,7 @@ int read_string(char **ret, dbFILE * f)
     char *s;
     uint16 len;
 
-    if (read_int16(&len, f) < 0)
+    if (read_uint16(&len, f) < 0)
         return -1;
     if (len == 0) {
         *ret = NULL;

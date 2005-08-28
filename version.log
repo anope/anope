@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="856"
+VERSION_BUILD="857"
 
 # $Log$
+#
+# BUILD : 1.7.10 (857)
+# BUGS  : 
+# NOTES : Another FAQ update
 #
 # BUILD : 1.7.10 (856)
 # BUGS  : 

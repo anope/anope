@@ -7,6 +7,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+08/29 F Organised docs/FAQ a bit more and slightly restyled it.           [ #00]
 08/25 F Compiler warnings in tools with gcc4.                             [ #00]
 08/21 F Default config location in example.conf was wrong.                [ #00]
 08/10 F Few memleaks in bundled os_info module.                           [ #00]

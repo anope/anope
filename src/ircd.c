@@ -326,15 +326,17 @@ void anope_cmd_invite(char *source, char *chan, char *nick)
 
 void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
     if (fmt) {
+        va_list args;
+        char buf[BUFSIZE];
+        *buf = '\0';
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
+        ircdproto.ircd_cmd_part(nick, chan, buf);
+    } else {
+        ircdproto.ircd_cmd_part(nick, chan, NULL);
     }
-    ircdproto.ircd_cmd_part(nick, chan, buf);
 }
 
 void anope_cmd_391(char *source, char *timestr)

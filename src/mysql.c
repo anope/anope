@@ -413,10 +413,16 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
         *cbadwords, *efounderpass;
 
     ciname = db_mysql_quote(ci->name);
-    cifoundernick =
-        ci->founder ? db_mysql_quote(ci->founder->display) : "";
-    cisuccessornick =
-        ci->successor ? db_mysql_quote(ci->successor->display) : "";
+    if(ci->founder) {
+        cifoundernick = db_mysql_quote(ci->founder->display);
+    } else {
+        cifoundernick = db_mysql_quote("");
+    }
+    if(ci->successor) {
+        cisuccessornick = db_mysql_quote(ci->successor->display);
+    } else {
+        cisuccessornick = db_mysql_quote("");
+    }
     cifounderpass = db_mysql_quote(ci->founderpass);
     cidesc = db_mysql_quote(ci->desc);
     ciurl = db_mysql_quote(ci->url);
@@ -429,7 +435,11 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     cimlock_flood = db_mysql_quote(ci->mlock_flood);
     cimlock_redirect = db_mysql_quote(ci->mlock_redirect);
     cientrymsg = db_mysql_quote(ci->entry_message);
-    cibotnick = ci->bi ? db_mysql_quote(ci->bi->nick) : "";
+    if(ci->bi) {
+        cibotnick = db_mysql_quote(ci->bi->nick);
+    } else {
+        cibotnick = db_mysql_quote("");
+    }
 
     efounderpass = db_mysql_secure(cifounderpass);
     free(cifounderpass);
@@ -605,26 +615,21 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     }
 
     free(ciname);
-    if (!(ci->flags & CI_VERBOTEN)) {
-        free(cifoundernick);
-        if (strlen(cisuccessornick) > 0)
-            free(cisuccessornick);
-        free(efounderpass);
-        free(cidesc);
-        free(ciurl);
-        free(ciemail);
-        free(cilasttopic);
-        free(cilasttopicsetter);
-        free(cimlock_key);
-        free(cimlock_flood);
-        free(cimlock_redirect);
-        free(cientrymsg);
-        if (ci->bi)
-            free(cibotnick);
-    } else {
-        free(ciforbidby);
-        free(ciforbidreason);
-    }
+    free(cifoundernick); /* mark */
+    free(cisuccessornick); /* mark */
+    free(efounderpass);
+    free(cidesc);
+    free(ciurl);
+    free(ciemail);
+    free(cilasttopic);
+    free(cilasttopicsetter);
+    free(cimlock_key);
+    free(cimlock_flood);
+    free(cimlock_redirect);
+    free(cientrymsg);
+    free(cibotnick); /* mark */
+    free(ciforbidby);
+    free(ciforbidreason);
 
     return;
 }

@@ -1347,18 +1347,13 @@ int read_config(int reload)
     }
 
     /* Check the user keys */
-    CHECK(UserKey1);
-    CHECK(UserKey2);
-    CHECK(UserKey3);
     if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
         || (UserKey3 == UserKey2)) {
-        error(0,
-              "Every UserKey must be different. It's for YOUR safety! Remember that!");
+        alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
         retval = 0;
     }
     if (UserKey1 == 9866235) {
-        error(0,
-              "You don't want your network secure? You are supposed to set NEW UserKey values!!!");
+        alog("You don't want your network secure? You are supposed to set NEW UserKey values!!!");
         retval = 0;
     }
 

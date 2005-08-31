@@ -6130,7 +6130,7 @@ OPER_HELP_MODLIST
 
 	Geeft alle momenteel geladen modules weer.
 
-	Gelimiteerd tot Services Roots.
+	Gelimiteerd tot IRC Operators.
 
 
 ###########################################################################

@@ -5957,7 +5957,7 @@ OPER_HELP_MODLIST
 
 	Lists all currently loaded modules.
 
-	Limited to Services Roots.
+	Limited to IRC Operators.
 
 
 ###########################################################################

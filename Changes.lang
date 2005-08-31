@@ -69,6 +69,7 @@ Anope Version  S V N
 	NICK_HELP_CMD_SASET
 
 *** Mod Strings:
+    OPER_HELP_MODLIST
 
 *** Del Strings:
 	NICK_SERVADMIN_HELP_SET

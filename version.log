@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="865"
+VERSION_BUILD="866"
 
 # $Log$
+#
+# BUILD : 1.7.10 (866)
+# BUGS  : 
+# NOTES : Added a moduleGetLangString() function to allow modules to retrieve their language strings instead of only being able to send a NOTICE with them
 #
 # BUILD : 1.7.10 (865)
 # BUGS  : 

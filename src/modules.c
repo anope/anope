@@ -2492,7 +2492,8 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-    /* Find the users lang, and use it if we cant */
+	
+    /* Find the users lang, and use it if we can */
     if (u->na && u->na->nc) {
         lang = u->na->nc->language;
     }
@@ -2524,6 +2525,42 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     } else {
         alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
     }
+}
+
+/**
+ * Get the text of the given lanugage string in the corrent language, or
+ * in english.
+ * @param u The user to send the message to
+ * @param number The message number
+ **/
+char *moduleGetLangString(User * u, int number)
+{
+    va_list va;
+    char buffer[4096], outbuf[4096];
+    char *fmt = NULL;
+    int lang = NSDefLanguage;
+    char *s, *t, *buf;
+
+    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name)))
+        mod_current_module = findModule(mod_current_module_name);
+	
+    /* Find the users lang, and use it if we can */
+    if (u->na && u->na->nc)
+        lang = u->na->nc->language;
+
+    /* If the users lang isnt supported, drop back to English */
+    if (mod_current_module->lang[lang].argc == 0)
+        lang = LANG_EN_US;
+
+    /* If the requested lang string exists for the language */
+    if (mod_current_module->lang[lang].argc > number)
+        return mod_current_module->lang[lang].argv[number];
+	/* Return an empty string otherwise, because we might be used without
+	 * the return value being checked. If we would return NULL, bad things
+	 * would happen!
+	 */
+	else
+		return "";
 }
 
 /**

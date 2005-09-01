@@ -338,6 +338,7 @@ extern char *mod_current_evtbuffer;
 
 MDE void moduleInsertLanguage(int langNumber, int ac, char **av);
 MDE void moduleNoticeLang(char *source, User *u, int number, ...);
+MDE char *moduleGetLangString(User * u, int number);
 MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/

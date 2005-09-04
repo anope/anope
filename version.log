@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="869"
+VERSION_BUILD="870"
 
 # $Log$
+#
+# BUILD : 1.7.10 (870)
+# BUGS  : 
+# NOTES : Move on, nothing to see here (typo fix in Changes)
 #
 # BUILD : 1.7.10 (869)
 # BUGS  : 

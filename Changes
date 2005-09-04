@@ -8,7 +8,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
-09/04 F Protocol mode for plexus called wrong UNSGLINE function.          [ #00]
+09/04 F Protocol module for plexus called wrong UNSGLINE function.        [ #00]
 08/31 F Help for /os modlist had faulty 'limited to' information.         [ #00]
 08/30 F Changed UserKeys to RECOMMENDED instead of REQUIRED.              [ #00]
 08/29 F Pseudo-clients can now part with no instead of an empty reason.   [ #00]

@@ -51,7 +51,7 @@ IRCDVar myIrcd[] = {
      NULL,                      /* Mode On Reg          */
      NULL,                      /* Mode on UnReg        */
      NULL,                      /* Mode on Nick Change  */
-     0,                         /* Supports SGlines     */
+     1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
      0,                         /* Supports SZlines     */
      0,                         /* Supports Halfop +h   */
@@ -753,12 +753,20 @@ void moduleAddIRCDMsgs(void)
 
 void ratbox_cmd_sqline(char *mask, char *reason)
 {
-    send_cmd(NULL, "RESV * %s :%s", mask, reason);
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "RESV * %s :%s", mask, reason);
 }
 
 void ratbox_cmd_unsgline(char *mask)
 {
-    /* Does not support */
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "UNXLINE * %s", mask);
 }
 
 void ratbox_cmd_unszline(char *mask)
@@ -783,7 +791,11 @@ void ratbox_cmd_svsadmin(char *server, int set)
 
 void ratbox_cmd_sgline(char *mask, char *reason)
 {
-    /* does not support */
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "XLINE * %s 0 :%s", mask, reason);
 }
 
 void ratbox_cmd_remove_akill(char *user, char *host)
@@ -817,7 +829,11 @@ void ratbox_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void ratbox_cmd_unsqline(char *user)
 {
-    send_cmd(NULL, "UNRESV * %s", user);
+    Uid *ud;
+
+    ud = find_uid(s_OperServ);
+    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
+             "UNRESV * %s", user);
 }
 
 void ratbox_cmd_join(char *user, char *channel, time_t chantime)
@@ -1344,7 +1360,7 @@ void ratbox_cmd_nick(char *nick, char *name, char *mode)
                  (long int) time(NULL), mode, ServiceUser, ServiceHost,
                  ServerName, name);
     }
-    ratbox_cmd_sqline(nick, "Reserved for services");
+    send_cmd(UseTS6 ? nicknumbuf : nick, "RESV * %s :%s", nick, "Reserved for services");
 }
 
 void ratbox_cmd_kick(char *source, char *chan, char *user, char *buf)

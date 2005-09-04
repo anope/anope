@@ -770,7 +770,7 @@ moduleAddIRCDMsgs (void)
 void
 plexus_cmd_sqline (char *mask, char *reason)
 {
-  send_cmd (NULL, "RESV * %s :%s", mask, reason);
+  send_cmd (s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
 void
@@ -843,7 +843,7 @@ plexus_cmd_vhost_on (char *nick, char *vIdent, char *vhost)
 void
 plexus_cmd_unsqline (char *user)
 {
-  send_cmd (NULL, "UNRESV * %s", user);
+  send_cmd (s_OperServ, "UNRESV * %s", user);
 }
 
 void
@@ -1356,7 +1356,7 @@ plexus_cmd_nick (char *nick, char *name, char *mode)
   send_cmd (NULL, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
 	    (long int) time (NULL), mode, ServiceUser, ServiceHost,
 	    "*", ServerName, (name));
-  plexus_cmd_sqline (nick, "Reserved for services");
+  send_cmd (nick, "RESV * %s :%s", nick, "Reserved for services");
 }
 
 void

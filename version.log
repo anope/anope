@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="868"
+VERSION_BUILD="869"
 
 # $Log$
+#
+# BUILD : 1.7.10 (869)
+# BUGS  : 
+# NOTES : pmodule_cmd_unsgline for plexus set plexus_cmd_unsqline instead of pmodule_cmd_unsgline (so unsQline instead of unsGline)
 #
 # BUILD : 1.7.10 (868)
 # BUGS  : 

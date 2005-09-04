@@ -1759,7 +1759,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_connect (plexus_cmd_connect);
   pmodule_cmd_svshold (plexus_cmd_svshold);
   pmodule_cmd_release_svshold (plexus_cmd_release_svshold);
-  pmodule_cmd_unsgline (plexus_cmd_unsqline);
+  pmodule_cmd_unsgline (plexus_cmd_unsgline);
   pmodule_cmd_unszline (plexus_cmd_unszline);
   pmodule_cmd_szline (plexus_cmd_szline);
   pmodule_cmd_sgline (plexus_cmd_sgline);

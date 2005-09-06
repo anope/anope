@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="872"
+VERSION_BUILD="873"
 
 # $Log$
+#
+# BUILD : 1.7.10 (873)
+# BUGS  : 
+# NOTES : Added SGLINE support for plexus, and fixed minor other things (by ThaPrince)
 #
 # BUILD : 1.7.10 (872)
 # BUGS  : 

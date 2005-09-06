@@ -47,7 +47,7 @@ IRCDVar myIrcd[] = {
    "+R",			/* Mode On Reg          */
    "-R",			/* Mode on UnReg        */
    "-R",			/* Mode on Nick Change  */
-   0,				/* Supports SGlines     */
+   1,				/* Supports SGlines     */
    1,				/* Supports SQlines     */
    0,				/* Supports SZlines     */
    1,				/* Supports Halfop +h   */
@@ -776,7 +776,7 @@ plexus_cmd_sqline (char *mask, char *reason)
 void
 plexus_cmd_unsgline (char *mask)
 {
-  /* Does not support */
+  send_cmd (s_OperServ, "UNXLINE * %s", mask);
 }
 
 void
@@ -806,7 +806,7 @@ plexus_cmd_svsadmin (char *server, int set)
 void
 plexus_cmd_sgline (char *mask, char *reason)
 {
-  /* does not support */
+  send_cmd (s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
 void
@@ -826,18 +826,26 @@ plexus_cmd_topic (char *whosets, char *chan, char *whosetit,
 void
 plexus_cmd_vhost_off (User * u)
 {
-  send_cmd (NULL, "SVSMODE %s -h", u->nick);
+  send_cmd (ServerName, "SVSMODE %s -h", u->nick);
 }
 
 void
 plexus_cmd_vhost_on (char *nick, char *vIdent, char *vhost)
 {
+  User *u;
+
   if (!nick)
-    {
-      return;
-    }
-  send_cmd (NULL, "SVSMODE %s +h", nick);
-  send_cmd (NULL, "SVSHOST %s %s", nick, vhost);
+  {
+    return;
+  }
+
+  u = finduser (nick);
+
+  if (u)
+  {
+    send_cmd (ServerName, "SVSHOST %s %s", nick, vhost);
+    u->mode |= UMODE_h;
+  }
 }
 
 void
@@ -849,7 +857,7 @@ plexus_cmd_unsqline (char *user)
 void
 plexus_cmd_join (char *user, char *channel, time_t chantime)
 {
-  send_cmd (NULL, "SJOIN %ld %s + :%s", (long int) time (NULL), channel,
+  send_cmd (ServerName, "SJOIN %ld %s + :%s", (long int) time (NULL), channel,
 	    user);
 }
 
@@ -981,7 +989,7 @@ plexus_cmd_bot_nick (char *nick, char *user, char *host, char *real,
 		     char *modes)
 {
   EnforceQlinedNick (nick, NULL);
-  send_cmd (NULL, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
+  send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
 	    (long int) time (NULL), modes, user, host, "*", ServerName, real);
   plexus_cmd_sqline (nick, "Reserved for services");
 
@@ -1005,10 +1013,10 @@ anope_event_sethost (char *source, int ac, char **av)
 {
   User *u;
 
-  if (ac != 1)
+  if (ac != 2)
     return MOD_CONT;
 
-  u = finduser (source);
+  u = finduser (av[0]);
   if (!u)
     {
       if (debug)
@@ -1018,7 +1026,7 @@ anope_event_sethost (char *source, int ac, char **av)
       return MOD_CONT;
     }
 
-  change_user_host (u, av[0]);
+  change_user_host (u, av[1]);
   return MOD_CONT;
 }
 
@@ -1197,7 +1205,7 @@ plexus_cmd_391 (char *source, char *timestr)
     {
       return;
     }
-  send_cmd (NULL, "391 :%s %s :%s", source, ServerName, timestr);
+  send_cmd (ServerName, "391 :%s %s :%s", source, ServerName, timestr);
 }
 
 /* 250 */
@@ -1209,7 +1217,7 @@ plexus_cmd_250 (char *buf)
       return;
     }
 
-  send_cmd (NULL, "250 %s", buf);
+  send_cmd (ServerName, "250 %s", buf);
 }
 
 /* 307 */
@@ -1271,11 +1279,11 @@ plexus_cmd_219 (char *source, char *letter)
 
   if (letter)
     {
-      send_cmd (NULL, "219 %s %c :End of /STATS report.", source, *letter);
+      send_cmd (ServerName, "219 %s %c :End of /STATS report.", source, *letter);
     }
   else
     {
-      send_cmd (NULL, "219 %s l :End of /STATS report.", source);
+      send_cmd (ServerName, "219 %s l :End of /STATS report.", source);
     }
 }
 
@@ -1311,7 +1319,7 @@ plexus_cmd_242 (char *buf)
       return;
     }
 
-  send_cmd (NULL, "242 %s", buf);
+  send_cmd (ServerName, "242 %s", buf);
 }
 
 /* 243 */
@@ -1323,7 +1331,7 @@ plexus_cmd_243 (char *buf)
       return;
     }
 
-  send_cmd (NULL, "243 %s", buf);
+  send_cmd (ServerName, "243 %s", buf);
 }
 
 /* 211 */
@@ -1335,7 +1343,7 @@ plexus_cmd_211 (char *buf)
       return;
     }
 
-  send_cmd (NULL, "211 %s", buf);
+  send_cmd (ServerName, "211 %s", buf);
 }
 
 void
@@ -1353,7 +1361,7 @@ void
 plexus_cmd_nick (char *nick, char *name, char *mode)
 {
   EnforceQlinedNick (nick, NULL);
-  send_cmd (NULL, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
+  send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
 	    (long int) time (NULL), mode, ServiceUser, ServiceHost,
 	    "*", ServerName, (name));
   send_cmd (nick, "RESV * %s :%s", nick, "Reserved for services");
@@ -1380,7 +1388,7 @@ plexus_cmd_notice_ops (char *source, char *dest, char *buf)
       return;
     }
 
-  send_cmd (NULL, "NOTICE @%s :%s", dest, buf);
+  send_cmd (ServerName, "NOTICE @%s :%s", dest, buf);
 }
 
 void
@@ -1431,7 +1439,7 @@ plexus_cmd_squit (char *servname, char *message)
       return;
     }
 
-  send_cmd (NULL, "SQUIT %s :%s", servname, message);
+  send_cmd (ServerName, "SQUIT %s :%s", servname, message);
 }
 
 int
@@ -1499,14 +1507,14 @@ plexus_cmd_svsnick (char *nick, char *newnick, time_t when)
     {
       return;
     }
-  send_cmd (NULL, "SVSNICK %s %s", nick, newnick);
+  send_cmd (ServerName, "SVSNICK %s %s", nick, newnick);
 }
 
 void
 plexus_cmd_guest_nick (char *nick, char *user, char *host, char *real,
 		       char *modes)
 {
-  send_cmd (NULL, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
+  send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s %s 0 :%s", nick,
 	    (long int) time (NULL), modes, user, host, "*", ServerName, real);
 }
 

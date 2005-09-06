@@ -51,6 +51,8 @@ Provided by Hal9000 <hal9000@musichat.net> - 2005
 06/25 F Updated Italian language file.                                    [ #00]
 
 Provided by ThaPrince <jon@vile.com> - 2005
+09/06 A SGLINE support for plexus.                                        [ #00]
+09/06 F Missing sources and other minor issues with plexus.               [ #00]
 09/04 F SGLINE/SQLINE for ratbox/plexus/etc needs a valid nick.           [ #00]
 
 Anope Version 1.7.10

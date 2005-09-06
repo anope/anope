@@ -224,11 +224,10 @@ void delete_user(User * user)
         alog("debug: delete_user(): free user data");
     free(user->username);
     free(user->host);
-    if (ircd->vhost) {
-        if (user->vhost) {
-            free(user->vhost);
-        }
-    }
+    if (user->vhost)
+        free(user->vhost);
+    if (user->vident)
+        free(user->vident);
     if (user->uid) {
         free(user->uid);
     }

@@ -43,6 +43,7 @@ Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 05/30 F Updated Portuguese language file. And bundled modules language.   [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
+09/06 F Memory for vHosts/vIdents was not (always) being freed.           [ #00]
 06/04 F Removed ircd-file related code from configure(.in)                [#384]
 
 Provided by Hal9000 <hal9000@musichat.net> - 2005

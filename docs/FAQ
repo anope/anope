@@ -79,6 +79,9 @@ Table of Contents
     7.3) I selected a language other than English, but sometimes Anope sends
          responses in English instead.
 
+8) DevNull
+    8.1) What is the purpose of DevNull?
+
 -------------------------------------------------------------------------------
 
 1) General
@@ -424,3 +427,13 @@ Table of Contents
     wait for the primary translator to provide us with a translation, or do the
     translation yourself and send us the messages translated into your
     language.
+
+
+8) DevNull
+
+8.1) What is the purpose of DevNull?
+
+    DevNull functions as a message sink. Any message sent to it will be
+    ignored. It will not be logged, there will be no response. It will be lost
+    forever. Whether it's useful or not is up to you; we just provide you with
+    the option.

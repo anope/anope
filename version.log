@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="876"
+VERSION_BUILD="877"
 
 # $Log$
+#
+# BUILD : 1.7.10 (877)
+# BUGS  : 
+# NOTES : Added two more globops warnings when a database cannott be opened
 #
 # BUILD : 1.7.10 (876)
 # BUGS  : 

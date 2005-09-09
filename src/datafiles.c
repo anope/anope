@@ -17,6 +17,7 @@
 #include <fcntl.h>
 
 static int curday = 0;
+static time_t lastwarn = 0;
 
 /*************************************************************************/
 
@@ -91,6 +92,12 @@ static dbFILE *open_db_read(const char *service, const char *filename)
     if (!f) {
 #ifndef NOT_MAIN
         log_perror("Can't read %s database %s", service, filename);
+        if (time(NULL) - lastwarn > WarningTimeout) {
+            anope_cmd_global(NULL,
+                             "Write error on %s: Memory allocation failed",
+                             filename);
+            lastwarn = time(NULL);
+        }
 #endif
         return NULL;
     }
@@ -103,6 +110,11 @@ static dbFILE *open_db_read(const char *service, const char *filename)
         if (errno != ENOENT)
             log_perror("Can not read %s database %s", service,
                        f->filename);
+        if (time(NULL) - lastwarn > WarningTimeout) {
+            anope_cmd_global(NULL, "Write error on %s: %s", f->filename,
+                             strerror(errno));
+            lastwarn = time(NULL);
+        }
 #endif
         free(f);
         errno = errno_save;

@@ -806,7 +806,7 @@ plexus_cmd_svsadmin (char *server, int set)
 void
 plexus_cmd_sgline (char *mask, char *reason)
 {
-  send_cmd (s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+  send_cmd (s_OperServ, "XLINE * %s :%s", mask, reason);
 }
 
 void

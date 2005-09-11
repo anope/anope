@@ -19,6 +19,14 @@
  *
  *   - Certus
  *      February 11, 2005
+ *
+ *
+ *   0.2 beta:
+ *   Fixed some overflows in the ->flags and the ->status fields. Use db-fix
+ *   to fix your broken nick dbs.
+ *
+ *   - Certus
+ *      August 04, 2005
  */
 
 
@@ -115,7 +123,7 @@ typedef struct hostcore_ HostCore;
 
 struct memo_ {
     uint32 number;      /* Index number -- not necessarily array position! */
-    int16 flags;            /* Flags */
+    uint16 flags;            /* Flags */
     time_t time;          /* When was it sent? */
     char sender[32];   /* Name of the sender */
     char *text;
@@ -134,7 +142,7 @@ typedef struct {
 } MemoInfo;
 
 typedef struct {
-    int16 in_use;         /* 1 if this entry is in use, else 0 */
+    uint16 in_use;         /* 1 if this entry is in use, else 0 */
     int16 level;
     NickCore *nc;       /* Guaranteed to be non-NULL if in use, NULL if not */
     time_t last_seen;
@@ -143,7 +151,7 @@ typedef struct {
 typedef struct {
     int16 in_use;         /* Always 0 if not in use */
     int16 is_nick;         /* 1 if a regged nickname, 0 if a nick!user@host mask */
-	int16 flags;
+	uint16 flags;
     union {
 		char *mask;      /* Guaranteed to be non-NULL if in use, NULL if not */
 		NickCore *nc;   /* Same */
@@ -161,7 +169,7 @@ struct nickalias_ {
     char *last_usermask;     /* Last usermask */
     time_t time_registered;  /* When the nick was registered */
     time_t last_seen;           /* When it was seen online for the last time */
-    int16 status;                  /* See NS_* below */
+    uint16 status;                  /* See NS_* below */
     NickCore *nc;               /* I'm an alias of this */
 };
 
@@ -174,9 +182,9 @@ struct nickcore_ {
     char *greet;              /* Greet associated to the nick */
     uint32 icq;                 /* ICQ # associated to the nick */
     char *url;                  /* URL associated to the nick */
-    int32 flags;                /* See NI_* below */
+    uint32 flags;                /* See NI_* below */
     uint16 language;        /* Language selected by nickname owner (LANG_*) */
-    int16 accesscount;     /* # of entries */
+    uint16 accesscount;     /* # of entries */
     char **access;          /* Array of strings */
     MemoInfo memos;     /* Memo information */
     uint16 channelcount;  /* Number of channels currently registered */
@@ -205,9 +213,9 @@ struct chaninfo_ {
     char *forbidreason;                /* if forbidden: why */
     int16 bantype;                       /* Bantype */
     int16 *levels;                        /* Access levels for commands */
-    int16 accesscount;                 /* # of pple with access */
+    uint16 accesscount;                 /* # of pple with access */
     ChanAccess *access;             /* List of authorized users */
-    int16 akickcount;                    /* # of akicked pple */
+    uint16 akickcount;                    /* # of akicked pple */
     AutoKick *akick;                    /* List of users to kickban */
     uint32 mlock_on, mlock_off;   /* See channel modes below */
     uint32 mlock_limit;                /* 0 if no limit */
@@ -219,7 +227,7 @@ struct chaninfo_ {
     char *bi;                               /* Bot used on this channel */
     uint32 botflags;                      /* BS_* below */
     int16 *ttb;                             /* Times to ban for each kicker */
-    int16 bwcount;                       /* Badword count */
+    uint16 bwcount;                       /* Badword count */
     BadWord *badwords;             /* For BADWORDS kicker */
     int16 capsmin, capspercent;    /* For CAPS kicker */
     int16 floodlines, floodsecs;      /* For FLOOD kicker */
@@ -238,9 +246,9 @@ struct botinfo_ {
 };
 
 struct badword_ {
-	int16 in_use;
+	uint16 in_use;
 	char *word;
-	int16 type;	
+	uint16 type;	
 };
 
 struct hostcore_ {
@@ -264,10 +272,8 @@ int mystricmp(const char *s1, const char *s2);
 int delnick(NickAlias *na, int donttouchthelist);
 int write_string(const char *s, dbFILE * f);
 int write_ptr(const void *ptr, dbFILE * f);
-int read_int16(int16 * ret, dbFILE * f);
-int read_int32(int32 * ret, dbFILE * f);
-int read_uint16(uint16 * ret, dbFILE * f);
-int read_uint32(uint32 * ret, dbFILE * f);
+int read_int16(uint16 * ret, dbFILE * f);
+int read_int32(uint32 * ret, dbFILE * f);
 int read_string(char **ret, dbFILE * f);
 int write_int16(uint16 val, dbFILE * f);
 int write_int32(uint32 val, dbFILE * f);
@@ -292,7 +298,7 @@ int main(int argc, char *argv[])
     NickCore *nc, *ncnext;
     HostCore *firsthc = NULL;
 
-    printf("\n"C_LBLUE"DB Merger v0.1 beta for Anope IRC Services by Certus"C_NONE"\n\n");
+    printf("\n"C_LBLUE"DB Merger v0.2 beta for Anope IRC Services by Certus"C_NONE"\n\n");
 
     if (argc >= 2) {
         if (!mystricmp(argv[1], "--PREFEROLDEST")) {
@@ -346,10 +352,10 @@ int main(int argc, char *argv[])
                 READ(read_string(&nc->pass, f));
                 READ(read_string(&nc->email, f));
                 READ(read_string(&nc->greet, f));
-                READ(read_uint32(&nc->icq, f));
+                READ(read_int32(&nc->icq, f));
                 READ(read_string(&nc->url, f));
                 READ(read_int32(&nc->flags, f));
-                READ(read_uint16(&nc->language, f));
+                READ(read_int16(&nc->language, f));
                 READ(read_int16(&nc->accesscount, f));
                 if (nc->accesscount) {
                     char **access;
@@ -365,7 +371,7 @@ int main(int argc, char *argv[])
                     memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
                     nc->memos.memos = memos;
                     for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                        READ(read_uint32(&memos->number, f));
+                        READ(read_int32(&memos->number, f));
                         READ(read_int16(&memos->flags, f));
                         READ(read_int32(&tmp32, f));
                         memos->time = tmp32;
@@ -373,7 +379,7 @@ int main(int argc, char *argv[])
                         READ(read_string(&memos->text, f));
                     }
                 }
-                READ(read_uint16(&nc->channelcount, f));
+                READ(read_int16(&nc->channelcount, f));
                 READ(read_int16(&tmp16, f));
             } /* getc_db() */
             *nclast = NULL;
@@ -460,10 +466,10 @@ int main(int argc, char *argv[])
                     nclists[index] = nc;
 
                     READ(read_string(&nc->greet, f));
-                    READ(read_uint32(&nc->icq, f));
+                    READ(read_int32(&nc->icq, f));
                     READ(read_string(&nc->url, f));
                     READ(read_int32(&nc->flags, f));
-                    READ(read_uint16(&nc->language, f));
+                    READ(read_int16(&nc->language, f));
                     READ(read_int16(&nc->accesscount, f));
                     if (nc->accesscount) {
                         char **access;
@@ -479,7 +485,7 @@ int main(int argc, char *argv[])
                         memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
                         nc->memos.memos = memos;
                         for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                            READ(read_uint32(&memos->number, f));
+                            READ(read_int32(&memos->number, f));
                             READ(read_int16(&memos->flags, f));
                             READ(read_int32(&tmp32, f));
                             memos->time = tmp32;
@@ -487,7 +493,7 @@ int main(int argc, char *argv[])
                             READ(read_string(&memos->text, f));
                         }
                     }
-                    READ(read_uint16(&nc->channelcount, f));
+                    READ(read_int16(&nc->channelcount, f));
                     READ(read_int16(&tmp16, f));
                 } /* getc_db() */
             } /* for() loop */
@@ -721,7 +727,7 @@ int main(int argc, char *argv[])
                 READ(read_buffer(ci->last_topic_setter, f));
                 READ(read_int32(&tmp32, f));
                 ci->last_topic_time = tmp32;
-                READ(read_uint32(&ci->flags, f));
+                READ(read_int32(&ci->flags, f));
                 /* Temporary flags cleanup */
                 ci->flags &= ~0x80000000;
                 READ(read_string(&ci->forbidby, f));
@@ -792,9 +798,9 @@ int main(int argc, char *argv[])
                 } else {
                     ci->akick = NULL;
                 }
-                READ(read_uint32(&ci->mlock_on, f));
-                READ(read_uint32(&ci->mlock_off, f));
-                READ(read_uint32(&ci->mlock_limit, f));
+                READ(read_int32(&ci->mlock_on, f));
+                READ(read_int32(&ci->mlock_off, f));
+                READ(read_int32(&ci->mlock_limit, f));
                 READ(read_string(&ci->mlock_key, f));
                 READ(read_string(&ci->mlock_flood, f));
                 READ(read_string(&ci->mlock_redirect, f));
@@ -805,7 +811,7 @@ int main(int argc, char *argv[])
                     memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
                     ci->memos.memos = memos;
                     for (j = 0; j < ci->memos.memocount; j++, memos++) {
-                        READ(read_uint32(&memos->number, f));
+                        READ(read_int32(&memos->number, f));
                         READ(read_int16(&memos->flags, f));
                         READ(read_int32(&tmp32, f));
                         memos->time = tmp32;
@@ -903,7 +909,7 @@ int main(int argc, char *argv[])
                     READ(read_buffer(ci->last_topic_setter, f));
                     READ(read_int32(&tmp32, f));
                     ci->last_topic_time = tmp32;
-                    READ(read_uint32(&ci->flags, f));
+                    READ(read_int32(&ci->flags, f));
                     /* Temporary flags cleanup */
                     ci->flags &= ~0x80000000;
                     READ(read_string(&ci->forbidby, f));
@@ -974,9 +980,9 @@ int main(int argc, char *argv[])
                     } else {
                         ci->akick = NULL;
                     }
-                    READ(read_uint32(&ci->mlock_on, f));
-                    READ(read_uint32(&ci->mlock_off, f));
-                    READ(read_uint32(&ci->mlock_limit, f));
+                    READ(read_int32(&ci->mlock_on, f));
+                    READ(read_int32(&ci->mlock_off, f));
+                    READ(read_int32(&ci->mlock_limit, f));
                     READ(read_string(&ci->mlock_key, f));
                     READ(read_string(&ci->mlock_flood, f));
                     READ(read_string(&ci->mlock_redirect, f));
@@ -987,7 +993,7 @@ int main(int argc, char *argv[])
                         memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
                         ci->memos.memos = memos;
                         for (j = 0; j < ci->memos.memocount; j++, memos++) {
-                            READ(read_uint32(&memos->number, f));
+                            READ(read_int32(&memos->number, f));
                             READ(read_int16(&memos->flags, f));
                             READ(read_int32(&tmp32, f));
                             memos->time = tmp32;
@@ -1678,19 +1684,7 @@ void close_db(dbFILE * f)
     free(f);
 }
 
-int read_int16(int16 * ret, dbFILE * f)
-{
-    int c1, c2;
-
-    c1 = fgetc(f->fp);
-    c2 = fgetc(f->fp);
-    if (c1 == EOF || c2 == EOF)
-        return -1;
-    *ret = c1 << 8 | c2;
-    return 0;
-}
-
-int read_uint16(uint16 * ret, dbFILE * f)
+int read_int16(uint16 * ret, dbFILE * f)
 {
     int c1, c2;
 
@@ -1711,21 +1705,7 @@ int write_int16(uint16 val, dbFILE * f)
 }
 
 
-int read_int32(int32 * ret, dbFILE * f)
-{
-    int c1, c2, c3, c4;
-
-    c1 = fgetc(f->fp);
-    c2 = fgetc(f->fp);
-    c3 = fgetc(f->fp);
-    c4 = fgetc(f->fp);
-    if (c1 == EOF || c2 == EOF || c3 == EOF || c4 == EOF)
-        return -1;
-    *ret = c1 << 24 | c2 << 16 | c3 << 8 | c4;
-    return 0;
-}
-
-int read_uint32(uint32 * ret, dbFILE * f)
+int read_int32(uint32 * ret, dbFILE * f)
 {
     int c1, c2, c3, c4;
 
@@ -1777,7 +1757,7 @@ int read_string(char **ret, dbFILE * f)
     char *s;
     uint16 len;
 
-    if (read_uint16(&len, f) < 0)
+    if (read_int16(&len, f) < 0)
         return -1;
     if (len == 0) {
         *ret = NULL;

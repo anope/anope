@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="879"
+VERSION_BUILD="880"
 
 # $Log$
+#
+# BUILD : 1.7.10 (880)
+# BUGS  : n/a
+# NOTES : Version 0.2 for db-merge fixing corruptions. By Certus.
 #
 # BUILD : 1.7.10 (879)
 # BUGS  : n/a

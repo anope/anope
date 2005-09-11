@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="881"
+VERSION_BUILD="882"
 
 # $Log$
+#
+# BUILD : 1.7.10 (882)
+# BUGS  : n/a
+# NOTES : Typo fix
 #
 # BUILD : 1.7.10 (881)
 # BUGS  : 

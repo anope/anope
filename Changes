@@ -47,6 +47,9 @@ Provided by Trystan <trystan@nomadirc.net> - 2005
 09/06 F Memory for vHosts/vIdents was not (always) being freed.           [ #00]
 06/04 F Removed ircd-file related code from configure(.in)                [#384]
 
+Provided by DrStein <drstein@anope.org> - 2005
+08/30 A anoperc is now configured by the Config script                    [ #00]
+
 Provided by Hal9000 <hal9000@musichat.net> - 2005
 06/27 A Italian translations for modpack modules.                         [ #00]
 06/25 F Updated Italian language file.                                    [ #00]

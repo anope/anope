@@ -98,6 +98,7 @@ distclean: clean
 	(cd src ; ${MAKE} ${MAKEARGS} distclean )
 	(cd src/tools ; ${MAKE} ${MAKEARGS} distclean )
 	rm -f config.log config.status config.cache Makefile
+	rm -f src/bin/anoperc
 
 install: DUMMY
 	(cd src ; ${MAKE} ${MAKEARGS} install)

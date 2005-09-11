@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="878"
+VERSION_BUILD="879"
 
 # $Log$
+#
+# BUILD : 1.7.10 (879)
+# BUGS  : n/a
+# NOTES : The anoperc scripts is now generate for the user. By DrStein
 #
 # BUILD : 1.7.10 (878)
 # BUGS  : 

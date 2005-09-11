@@ -221,6 +221,7 @@ AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], [
 ])
 
 AC_OUTPUT(Makefile)
+AC_OUTPUT(src/bin/anoperc)
 
 cat <<EOT
 

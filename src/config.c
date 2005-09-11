@@ -44,6 +44,7 @@ static char *temp_userhost;
 char *HelpChannel;
 char *LogChannel;
 char *NetworkName;
+int NickLen;
 
 char *s_NickServ;
 char *s_ChanServ;
@@ -517,6 +518,7 @@ Directive directives[] = {
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
+    {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
     {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
     {"Numeric", {{PARAM_STRING, PARAM_RELOAD, &Numeric}}},
     {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
@@ -945,12 +947,11 @@ int read_config(int reload)
         CHECK(RemoteServer);
         CHECK(ServerName);
         CHECK(ServerDesc);
-    }
-    if (!reload) {
+        CHECK(NickLen);
+
         if (RemoteServer3)
             CHECK(RemoteServer2);
-    }
-    if (!reload) {
+
         if (LocalHost && RemoteServer) {
             if ((!stricmp(LocalHost, RemoteServer))
                 && LocalPort == RemotePort) {
@@ -962,6 +963,9 @@ int read_config(int reload)
                 retval = 0;
             }
         }
+
+        if (NickLen >= NICKMAX)
+            NickLen = NICKMAX - 1;
     }
 
     CHECK(IRCDModule);

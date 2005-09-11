@@ -255,6 +255,7 @@ E char *ServiceHost;
 E char *HelpChannel;
 E char *LogChannel;
 E char *NetworkName;
+E int   NickLen;
 
 E char *s_NickServ;
 E char *s_ChanServ;

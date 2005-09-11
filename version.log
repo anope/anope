@@ -8,9 +8,13 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="880"
+VERSION_BUILD="881"
 
 # $Log$
+#
+# BUILD : 1.7.10 (881)
+# BUGS  : 
+# NOTES : Added a NickLen directive to make sure bot nicks are not longer than the net's allowed niclen, and thus we can't be yelled at because of that
 #
 # BUILD : 1.7.10 (880)
 # BUGS  : n/a

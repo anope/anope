@@ -8,9 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="10"
-VERSION_BUILD="882"
+VERSION_EXTRA="-rc1"
+VERSION_BUILD="883"
 
 # $Log$
+#
+# BUILD : 1.7.10 (883)
+# BUGS  : n/a
+# NOTES : Making use of VERSION_EXTRA for release candidates.
 #
 # BUILD : 1.7.10 (882)
 # BUGS  : n/a

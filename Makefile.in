@@ -22,8 +22,8 @@ SHARED=@SHARED@
 MODULEFLAGS=@MODULEFLAGS@
 
 all:   language headers build core protocols tools modules 
-strict: language headers strict_build core protocols tools strict_modules
-profile: language headers profile_build core protocols tools profile_modules
+strict: language headers strict_build strict_core strict_protocols tools strict_modules
+profile: language headers profile_build profile_core profile_protocols tools profile_modules
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -64,9 +64,25 @@ protocols: build
 	@echo "*** Building protocol support";
 	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} all; )
 
+strict_protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' all; )
+
+profile_protocols: build
+	@echo "*** Building protocol support";
+	(cd src/protocol ; ./configure ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' all; )
+
 core: build 
 	@echo "*** Building Core modules";
 	(cd src/ ; ${MAKE} ${MAKEARGS} core; )
+
+strict_core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} $(STRICT)' core; )
+
+profile_core: build 
+	@echo "*** Building Core modules";
+	(cd src/ ; ${MAKE} ${MAKEARGS} 'CFLAGS=${CFLAGS} ${PROFILE}' 'PROFILE=${PROFILE}' core; )
 
 tools: build
 	(cd src/tools ; ${MAKE} ${MAKEARGS} all; )

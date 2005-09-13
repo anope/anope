@@ -441,40 +441,40 @@ int anope_event_servermode(char *source, int ac, char **av);
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
-    // user has no choice but to use tokens with InspIRCd :)
+    /* user has no choice but to use tokens with InspIRCd :) */
     UseTokens = 1;
 
     updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+a","-a");
 
-    m = createMessage("$",      anope_event_null); addCoreMessage(IRCD,m);		// send routing table
-    m = createMessage("X",      anope_event_null); addCoreMessage(IRCD,m);		// begin netburst NOW
-    m = createMessage("Y",      anope_event_eob); addCoreMessage(IRCD,m);		// end of UPLINK netburst
-    m = createMessage("H",      anope_event_null); addCoreMessage(IRCD,m);		// local sync start
-    m = createMessage("F",      anope_event_null); addCoreMessage(IRCD,m);		// local sync end
-    m = createMessage("f",      anope_event_null); addCoreMessage(IRCD,m);		// local U-lined sync end
-    m = createMessage("*",      anope_event_null); addCoreMessage(IRCD,m);		// no operation
-    m = createMessage("|",      anope_event_null); addCoreMessage(IRCD,m);		// oper type
-    m = createMessage("-",      anope_event_null); addCoreMessage(IRCD,m);		// start mesh operation
-    m = createMessage("s",      anope_event_server); addCoreMessage(IRCD,m);		// passive server response
-    m = createMessage("U",      anope_event_null); addCoreMessage(IRCD,m);		// active service connect
-    m = createMessage("J",      anope_event_join); addCoreMessage(IRCD,m);		// join
-    m = createMessage("k",      anope_event_kick); addCoreMessage(IRCD,m);		// kick
-    m = createMessage("K",      anope_event_kill); addCoreMessage(IRCD,m);		// kill
-    m = createMessage("M",      anope_event_servermode); addCoreMessage(IRCD,m);	// servermode
-    m = createMessage("m",      anope_event_mode); addCoreMessage(IRCD,m);              // mode
-    m = createMessage("N",      anope_event_nick); addCoreMessage(IRCD,m);		// nick (introduce)
-    m = createMessage("n",      anope_event_nickchange); addCoreMessage(IRCD,m);	// nick (change)
-    m = createMessage("V",      anope_event_null); addCoreMessage(IRCD,m);		// notice
-    m = createMessage("L",      anope_event_part); addCoreMessage(IRCD,m);		// part
-    m = createMessage("?",      anope_event_ping); addCoreMessage(IRCD,m);		// ping
-    m = createMessage("P",      anope_event_privmsg); addCoreMessage(IRCD,m);		// privmsg
-    m = createMessage("Q",      anope_event_quit); addCoreMessage(IRCD,m);		// quit
-    m = createMessage("&",      anope_event_squit); addCoreMessage(IRCD,m);		// squit
-    m = createMessage("t",      anope_event_topic); addCoreMessage(IRCD,m);		// topic (user)
-    m = createMessage("T",      anope_event_servertopic); addCoreMessage(IRCD,m);	// topic (server)
-    m = createMessage("@",      anope_event_null); addCoreMessage(IRCD,m);		// wallops
-    m = createMessage("b",      anope_event_chghost); addCoreMessage(IRCD,m);		// change displayed host
-    m = createMessage("a",      anope_event_chgname); addCoreMessage(IRCD,m);		// change gecos
+    m = createMessage("$",      anope_event_null); addCoreMessage(IRCD,m);		/* send routing table */
+    m = createMessage("X",      anope_event_null); addCoreMessage(IRCD,m);		/* begin netburst NOW */
+    m = createMessage("Y",      anope_event_eob); addCoreMessage(IRCD,m);		/* end of UPLINK netburst */
+    m = createMessage("H",      anope_event_null); addCoreMessage(IRCD,m);		/* local sync start */
+    m = createMessage("F",      anope_event_null); addCoreMessage(IRCD,m);		/* local sync end */
+    m = createMessage("f",      anope_event_null); addCoreMessage(IRCD,m);		/* local U-lined sync end */
+    m = createMessage("*",      anope_event_null); addCoreMessage(IRCD,m);		/* no operation */
+    m = createMessage("|",      anope_event_null); addCoreMessage(IRCD,m);		/* oper type */
+    m = createMessage("-",      anope_event_null); addCoreMessage(IRCD,m);		/* start mesh operation */
+    m = createMessage("s",      anope_event_server); addCoreMessage(IRCD,m);		/* passive server response */
+    m = createMessage("U",      anope_event_null); addCoreMessage(IRCD,m);		/* active service connect  */
+    m = createMessage("J",      anope_event_join); addCoreMessage(IRCD,m);		/* join */
+    m = createMessage("k",      anope_event_kick); addCoreMessage(IRCD,m);		/* kick */
+    m = createMessage("K",      anope_event_kill); addCoreMessage(IRCD,m);		/* kill */
+    m = createMessage("M",      anope_event_servermode); addCoreMessage(IRCD,m);	/* servermode */
+    m = createMessage("m",      anope_event_mode); addCoreMessage(IRCD,m);              /* mode */
+    m = createMessage("N",      anope_event_nick); addCoreMessage(IRCD,m);		/* nick (introduce) */
+    m = createMessage("n",      anope_event_nickchange); addCoreMessage(IRCD,m);	/* nick (change) */
+    m = createMessage("V",      anope_event_null); addCoreMessage(IRCD,m);		/* notice */
+    m = createMessage("L",      anope_event_part); addCoreMessage(IRCD,m);		/* part */
+    m = createMessage("?",      anope_event_ping); addCoreMessage(IRCD,m);		/* ping */
+    m = createMessage("P",      anope_event_privmsg); addCoreMessage(IRCD,m);		/* privmsg */
+    m = createMessage("Q",      anope_event_quit); addCoreMessage(IRCD,m);		/* quit */
+    m = createMessage("&",      anope_event_squit); addCoreMessage(IRCD,m);		/* squit */
+    m = createMessage("t",      anope_event_topic); addCoreMessage(IRCD,m);		/* topic (user) */
+    m = createMessage("T",      anope_event_servertopic); addCoreMessage(IRCD,m);	/* topic (server) */
+    m = createMessage("@",      anope_event_null); addCoreMessage(IRCD,m);		/* wallops */
+    m = createMessage("b",      anope_event_chghost); addCoreMessage(IRCD,m);		/* change displayed host */
+    m = createMessage("a",      anope_event_chgname); addCoreMessage(IRCD,m);		/* change gecos */
 }
 
 char* xsumtable = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -566,7 +566,7 @@ void inspircd_cmd_376(char *source)
 
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
-    // N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS>
+    /* N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS> */
     send_cmd(CreateSum(), "N %lu %s %s %s %s %s 0.0.0.0 %s :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,ServerName,name);
 }
 
@@ -863,7 +863,7 @@ void inspircd_cmd_sqline(char *mask, char *reason)
     if (!mask || !reason) {
         return;
     }
-    // { <mask> <who-set-it> <time-set> <duration> :<reason>
+    /* { <mask> <who-set-it> <time-set> <duration> :<reason> */
     send_cmd(CreateSum(), "{ %s %s %lu 0 :%s", mask, ServerName, (unsigned long)time(NULL), reason);
 }
 
@@ -953,13 +953,13 @@ int anope_event_servertopic(char *source, int ac, char **av)
     v[1] = av[1];
     v[2] = av[0];
     v[3] = av[3];
-    do_topic(NULL, 4, v); // no source (server set)
+    do_topic(NULL, 4, v); /* no source (server set) */
     return MOD_CONT;
 }
 
 int anope_event_topic(char *source, int ac, char **av)
 {
-    // t [Brain] #chatspike :this is a topic test fsfdsfsdfds
+    /* t [Brain] #chatspike :this is a topic test fsfdsfsdfds */
     char *v[32];
     if (ac != 3)
         return MOD_CONT;
@@ -1049,7 +1049,7 @@ int anope_event_kill(char *source, int ac, char **av)
 
 int anope_event_kick(char *source, int ac, char **av)
 {
-    // Syntax: k <source> <dest> <channel> :<reason>
+    /* Syntax: k <source> <dest> <channel> :<reason> */
     char *v[32];
     if (ac != 4)
         return MOD_CONT;    v[0] = av[1];
@@ -1070,12 +1070,12 @@ int anope_event_join(char *source, int ac, char **av)
     char thismodes[256];
     cumodes[0] = thismodes;
 
-    // some sanity checks
+    /* some sanity checks */
     if (ac < 2) {
             return MOD_CONT;
     }
 
-    u = finduser(av[0]); // get the user info
+    u = finduser(av[0]); /* get the user info */
 
     if (!u) {
         return MOD_CONT;
@@ -1083,13 +1083,13 @@ int anope_event_join(char *source, int ac, char **av)
 
     cumodes[1] = av[0];
 
-    // iterate through each channel the user is joining
+    /* iterate through each channel the user is joining */
     for (i = 1; i < ac; i++)
     {
-            // the channel name
+            /* the channel name */
             new_av[0] = av[i];
 
-            // strip off the permissions
+            /* strip off the permissions */
             strcpy(thismodes,"");
             if (*new_av[0] != '#')
             {
@@ -1195,20 +1195,20 @@ int anope_event_nick(char *source, int ac, char **av)
     struct in_addr addy;
     uint32* ad = (uint32*)&addy;
 
-// someone really should comment this -- Brain
+/* someone really should comment this -- Brain
 
-// User *do_nick(const char *source, char *nick, char *username, char *host,
-//              char *server, char *realname, time_t ts, uint32 svid,
-//              uint32 ip, char *vhost, char *uid)
+ User *do_nick(const char *source, char *nick, char *username, char *host,
+              char *server, char *realname, time_t ts, uint32 svid,
+              uint32 ip, char *vhost, char *uid)
 
-// Syntax: N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS>
-
+ Syntax: N <time> <nick> <host> <displayed-host> <ident> <modes> <ipaddress> <server> :<GECOS>
+*/
     if (ac == 9) {
-	// fix by brain - 27 apr 2005
-	// During a net merge between two meshed clients there may be some spurious "bouncing"
-	// nick introductions (e.g. introductions for clients we already have). If this happens,
-	// we should ignore any that claim to be from us as these are just confirmations of the
-	// services "complement" - processing them will cause all kinds of session limit oddities.
+/*	 fix by brain - 27 apr 2005
+	 During a net merge between two meshed clients there may be some spurious "bouncing"
+	 nick introductions (e.g. introductions for clients we already have). If this happens,
+	 we should ignore any that claim to be from us as these are just confirmations of the
+	 services "complement" - processing them will cause all kinds of session limit oddities.*/
 	if ((strcmp(av[7],ServerName)) && (!finduser(av[1])))
 	{
 	        inet_aton(av[6],&addy);
@@ -1246,10 +1246,11 @@ int anope_event_chghost(char *source, int ac, char **av)
 /* EVENT: SERVER */
 int anope_event_server(char *source, int ac, char **av)
 {
-    // to shield anope from the intricacies of the mesh,
-    // anope only sees the uplink at all times (and receives
-    // all nick introductions etc as if they'd come from the
-    // uplink directly, 1 hop away.
+    /*
+     to shield anope from the intricacies of the mesh,
+     anope only sees the uplink at all times (and receives
+     all nick introductions etc as if they'd come from the
+     uplink directly, 1 hop away. */
     if (!uplink)
     {
 	    uplink = sstrdup(av[0]);
@@ -1272,8 +1273,8 @@ int anope_event_part(char *source, int ac, char **av)
     char *v[32];
     if (ac != 3)
         return MOD_CONT;
-    v[0] = av[1]; // channel
-    v[1] = av[2]; // reason
+    v[0] = av[1]; /* channel */
+    v[1] = av[2]; /* reason */
     do_part(av[0], 2, v);
     return MOD_CONT;
 }
@@ -1304,14 +1305,14 @@ void inspircd_cmd_unsgline(char *mask)
 /* UNSZLINE */
 void inspircd_cmd_unszline(char *mask)
 {
-    // ] <mask> <who>
+    /* ] <mask> <who> */
     send_cmd(CreateSum(), "] %s %s", mask, s_OperServ);
 }
 
 /* SZLINE */
 void inspircd_cmd_szline(char *mask, char *reason, char *whom)
 {
-    // } <mask> <who-set-it> <time-set> <duration> :<reason>
+    /* } <mask> <who-set-it> <time-set> <duration> :<reason> */
     send_cmd(CreateSum(), "} %s %s %lu %lu :%s",mask,whom,(unsigned long)time(NULL),(unsigned long)86400 * 2, reason);
 }
 
@@ -1397,7 +1398,7 @@ int anope_event_admin(char *source, int ac, char **av)
 
 int inspircd_flood_mode_check(char *value)
 {
-    // no +f mode!
+    /* no +f mode! */
     return 1;
 }
 
@@ -1414,7 +1415,7 @@ void inspircd_cmd_global_legacy(char *source, char *fmt)
 
 int inspircd_valid_nick(char *nick)
 {
-    // no special nicks
+    /* no special nicks */
     return 1;
 }
 

@@ -518,7 +518,7 @@ int loadModule(Module * m, User * u)
 	strncat(buf, "XXXXXX", 4095 - len);
     buf[4095] = '\0';
 	/* Don't skip return value checking! -GD */
-    if (ret = moduleCopyFile(m->name, buf) != MOD_ERR_OK)
+    if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK)
 		return ret;
 
     m->filename = sstrdup(buf);
@@ -2535,11 +2535,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
  **/
 char *moduleGetLangString(User * u, int number)
 {
-    va_list va;
-    char buffer[4096], outbuf[4096];
-    char *fmt = NULL;
     int lang = NSDefLanguage;
-    char *s, *t, *buf;
 
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name)))
         mod_current_module = findModule(mod_current_module_name);

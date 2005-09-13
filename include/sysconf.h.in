@@ -90,48 +90,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* "First IRCD type" */
-#undef IRC_DREAMFORGE
-
-/* "First IRCD type" */
-#undef IRC_BAHAMUT
-
-/* "First IRCD type" */
-#undef IRC_HYBRID
-
-/* "First IRCD type" */
-#undef IRC_PLEXUS
-
-/* "First IRCD type" */
-#undef IRC_PTLINK
-
-/* "First IRCD type" */
-#undef IRC_RAGE2
-
-/* "First IRCD type" */
-#undef IRC_SOLID
-
-/* "First IRCD type" */
-#undef IRC_ULTIMATE2
-
-/* "First IRCD type" */
-#undef IRC_ULTIMATE3
-
-/* "First IRCD type" */
-#undef IRC_UNREAL31
-
-/* "First IRCD type" */
-#undef IRC_UNREAL32
-
-/* "First IRCD type" */
-#undef IRC_VIAGRA
-
-/* "First IRCD type" */
-#undef IRC_RATBOX
-
-/* "First IRCD type" */
-#undef IRC_SHADOWIRCD
-
 /* "Module dir" */
 #undef MODULE_PATH
 
@@ -219,7 +177,7 @@
 #include <stdio.h>
 
 /* We KNOW these are not ansi, we are defining them here to suppress the warning
-s messages on a "make strict" compile */
+ * s messages on a "make strict" compile */
 int snprintf(char *str, size_t size, const char *format, ...);
 int vprintf(const char *format, va_list ap);
 int vfprintf(FILE *stream, const char *format, va_list ap);

@@ -26,6 +26,15 @@ Dim LibPath
 Dim LibPath2
 Dim IncDir
 Dim IncDir2
+Dim verMaj
+Dim verMin
+Dim verPatch
+Dim verExtra
+Dim verBuild
+Dim verStringShort
+Dim verStringLong
+Dim f2
+Dim i
 
 ' Set default values
 
@@ -45,243 +54,247 @@ LibPath2 = ""
 IncDir = ""
 IncDir2 = ""
 
-' Display Header
-WScript.Echo ""
-WScript.Echo "   ___"
-WScript.Echo "  / _ \  http://www.anope.org"
-WScript.Echo " | /_\ | _ __  _ _  _ _   ___"
-WScript.Echo " |  _  || '_ \/ _ \/ _ \ / _ \"
-WScript.Echo " | | | || | |  |_|  |_| |  __/"
-WScript.Echo " |_| |_||_| |_\___/|  _/ \___|"
-WScript.Echo "                   | |"
-WScript.Echo "                   |_| IRC Services"
-WScript.Echo "                        v" & AnoVersion
-WScript.Echo ""
-WScript.Echo ""
-WScript.Echo "This program will help you to compile your Services, and ask you"
-WScript.Echo "questions regarding the compile-time settings of it during the"
-WScript.Echo "process."
-WScript.Echo ""
-WScript.Echo "Anope is a set of Services for IRC networks that allows users to"
-WScript.Echo "manage their nicks and channels in a secure and efficient way,"
-WScript.Echo "and administrators to manage their network with powerful tools."
-WScript.Echo ""
-WScript.Echo "Do not forget to read all the documents located in docs/,"
-WScript.Echo "especially the README and INSTALL files."
-WScript.Echo ""
-WScript.Echo "For all your Anope needs please visit our portal at"
-WScript.Echo "http://www.anope.org/"
-WScript.Echo ""
-WScript.Echo "Press Enter to Continue..."
-Wscript.StdIn.ReadLine
-
-' Enable MySQL Support?
-Do While (UseMySQL <> "Y" AND UseMySQL <> "N" AND UseMySQL <> "YES" AND UseMySQL <> "NO")
-        WScript.Echo "Would you like to compile Anope with MySQL Support?"
-        WScript.Echo "(NOTE: You must have MySQL 3.23 or Later installed)"
-        WScript.Echo ""
-        WScript.Echo "Yes / No (Default)"
-        UseMySQL = UCase(Trim(WScript.StdIn.ReadLine))
-        If (UseMySQL = "") Then
-                UseMySQL = "N"
-        End If
-        If (UseMySQL <> "Y" AND UseMySQL <> "N" AND UseMySQL <> "YES" AND UseMySQL <> "NO") Then
-                WScript.Echo ""
-                WScript.Echo "Invalid Selection!"
-                WScript.Echo ""
-        End If
-Loop
-WScript.Echo ""
-
-' If enabled, find the required files
-If (UseMySQL = "Y" OR UseMySQL = "YES") Then
-        If (fso.FileExists(MySQLLibPath & "\libmysql.lib") = False) Then
-                Do While (fso.FileExists(MySQLLibPath & "\libmysql.lib") = False)
-                        WScript.Echo "ERROR: Cannot find 'libmysql.lib' in " & MySQLLibPath
-                        WScript.Echo ""
-                        WScript.Echo "Please enter the path to 'libmysql.lib': "
-                        WScript.Echo "(Please DO NOT include a trailing slash '\')"
-                        MySQLLibPath = Trim(WScript.StdIn.ReadLine)
-                Loop
-        ElseIf (fso.FileExists(MySQLHeadPath & "\mysql.h") = False) Then
-                Do While (fso.FileExists(MySQLHeadPath & "\mysql.h") = False)
-                        WScript.Echo "ERROR: Cannot find 'mysql.h' in " & MySQLHeadPath
-                        WScript.Echo ""
-                        WScript.Echo "Please enter the path to 'mysql.h': "
-                        WScript.Echo "(Please DO NOT include a trailing slash '\')"
-                        MySQLHeadPath = Trim(WScript.StdIn.ReadLine)
-                Loop
-        End If
-        WScript.Echo "All required files for MySQL Support have been located!"
-        WScript.Echo "MySQL Support Enabled.."
-        UseMySQL = "1"
+' Get Version
+If (fso.FileExists("version.log") = False) Then
+        WScript.Echo "I can't find 'version.log' in this directory."
+        WScript.Echo "Please run this script from a complete Anope source."
 Else
-        WScript.Echo "MySQL Support Disabled.."
-        UseMySQL = "0"
-End If
-WScript.Echo ""
+        Set f2 = fso.OpenTextFile("version.log", ForReading)
+        Do While (i < 7)
+                f2.SkipLine()
+                i = i + 1
+        Loop
+        verMaj = Replace(Replace(Trim(f2.ReadLine), "VERSION_MAJOR=" & chr(34), ""), chr(34), "")
+        verMin = Replace(Replace(Trim(f2.ReadLine), "VERSION_MINOR=" & chr(34), ""), chr(34), "")
+        verPatch = Replace(Replace(Trim(f2.ReadLine), "VERSION_PATCH=" & chr(34), ""), chr(34), "")
+        verExtra = Replace(Replace(Trim(f2.ReadLine), "VERSION_EXTRA=" & chr(34), ""), chr(34), "")
+        verBuild = Replace(Replace(Trim(f2.ReadLine), "VERSION_BUILD=" & chr(34), ""), chr(34), "")
+        f2.close
+        verStringShort = verMaj & "." & verMin & "." & verPatch & verExtra
+        verStringLong = verStringShort & "." & verBuild
 
-' Enable Database Encryption Support?
-Do While (UseDBEnc <> "Y" AND UseDBEnc <> "N" AND UseDBEnc <> "YES" AND UseDBEnc <> "NO")
-        WScript.Echo "Would you like to enable Database Encryption?"
-        WScript.Echo "(NOTE: If you enable encryption, you will NOT be able to recover"
-        WScript.Echo "passwords at a later date. GETPASS and SENDPASS will also be useless)"
+        ' Display Header
         WScript.Echo ""
-        WScript.Echo "Yes / No (Default)"
-        UseDBEnc = UCase(Trim(WScript.StdIn.ReadLine))
-        If (UseDBEnc = "") Then
-                UseDBEnc = "N"
-        End If
-        If (UseDBEnc <> "Y" AND UseDBEnc <> "N" AND UseDBEnc <> "YES" AND UseDBEnc <> "NO") Then
-                WScript.Echo ""
-                WScript.Echo "Invalid Selection!"
-                WScript.Echo ""
-        End If
-Loop
-WScript.Echo ""
-If (UseDBEnc = "Y" OR UseDBEnc = "YES") Then
-        WScript.Echo "Database Encryption Enabled.."
-        UseDBEnc = "1"
-Else
-        WScript.Echo "Database Encryption Disabled.."
-        UseDBEnc = "0"
-End If
-WScript.Echo ""
-
-' Check for required libraries and paths
-WScript.Echo "I will now check you have all the things I need..."
-WScript.Echo ""
-If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib")) Then
-        WScript.Echo "I found a copy of Microsoft Visual Studio .NET 2003.."
-        LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib"
-        LibPath2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Lib"
-        If (fso.FileExists(LibPath & "/MSVCRT.lib") = False And fso.FileExists(LibPath2 & "/MSVCRT.lib") = False) Then
-                WScript.Echo "Hm. I can't seem to find the default library.. You probably only have the SDK installed.."
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False And fso.FileExists(LibPath2 & "/wsock32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find wsock32.lib.. You probably only have the SDK installed.."
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False And fso.FileExists(LibPath2 & "/advapi32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find advapi32.lib.. You probably only have the SDK installed.."
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False And fso.FileExists(LibPath2 & "/uuid.lib") = False) Then
-                WScript.Echo "I couldn't seem to find uuid.lib.. You probably only have the SDK installed.."
-                LibPath = ""
-                LibPath2 = ""
-        End If
-        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
-        IncDir2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include"
-End If
-
-If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Lib") And LibPath = "") Then
-        WScript.Echo "I found a copy of Microsoft Visual Studio 6.. It's old, but we can use it.."
-        LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Lib"
-        CompilerVer = "VC6"
-        If (fso.FileExists(LibPath & "/MSVCRT.lib") = False) Then
-                WScript.Echo "Hm. I can't seem to find the default library.. Are you sure this is installed properly?"
-                LibPath = ""
-        ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
-                LibPath = ""
-        ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
-                LibPath = ""
-        ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False) Then
-                WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
-                LibPath = ""
-        End If
-        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Inlcude"
-End If
-
-If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Platform SDK\Lib") And LibPath = "") Then
-        WScript.Echo "I found a copy of Microsoft Platform SDK.."
-        LibPath = DefaultDrive & ":\Program Files\Microsoft Platform SDK\Lib"
-        LibPath2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib"
-        CompilerVer = "SDK"
-        If (fso.FileExists(LibPath & "/MSVCRT.lib") = False And fso.FileExists(LibPath2 & "/MSVCRT.lib") = False) Then
-                WScript.Echo "Hm. I can't seem to find the default library.. Are you sure this is installed properly?"
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False And fso.FileExists(LibPath2 & "/wsock32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False And fso.FileExists(LibPath2 & "/advapi32.lib") = False) Then
-                WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
-                LibPath = ""
-                LibPath2 = ""
-        ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False And fso.FileExists(LibPath2 & "/uuid.lib") = False) Then
-                WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
-                LibPath = ""
-                LibPath2 = ""
-        End If
-        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual C++ Toolkit 2003\include"
-        IncDir2 = "C:\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
-End If
-
-If (fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Bin\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Bin\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Platform SDK\Bin\nmake.exe") = False) Then
-                WScript.Echo ""
-                WScript.Echo "I couldn't seem to find a copy of nmake.exe on your system.."
-                WScript.Echo ""
-                WScript.Echo "I can continue without it for now, but you'll need it when you want to compile."
-                WScript.Echo "I suggest downloading a copy from the URL below, and placing it in your C:\ drive."
-                WScript.Echo ""
-                WScript.Echo "http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe"
-                WScript.Echo ""
-                WScript.Echo "You should place nmake.exe in " & DefaultDrive & ":\"
-                WScript.Echo ""
-End If
-
-If (LibPath = "") Then
-        Dim tmpPath
-        WScript.Echo "I couldn't find any of the paths I was looking for.."
-        WScript.Echo "If you have installed the Visual C++ Libraries in a non-standard location, enter"
-        WScript.Echo "this location below, and I will try and look there.."
-        WScript.Echo "(NOTE: Do NOT enter a trailing slash)"
+        WScript.Echo "   ___"
+        WScript.Echo "  / _ \  http://www.anope.org"
+        WScript.Echo " | /_\ | _ __  _ _  _ _   ___"
+        WScript.Echo " |  _  || '_ \/ _ \/ _ \ / _ \"
+        WScript.Echo " | | | || | |  |_|  |_| |  __/"
+        WScript.Echo " |_| |_||_| |_\___/|  _/ \___|"
+        WScript.Echo "                   | |"
+        WScript.Echo "                   |_| IRC Services"
+        WScript.Echo "                        v" & verStringShort
         WScript.Echo ""
-        WScript.Echo "Path to Visual C++ Libraries: "
-        tmpPath = Trim(WScript.StdIn.ReadLine)
-        If (fso.FolderExists(tmpPath) AND fso.FileExists(tmpPath & "\MSVCRT.lib")) Then
-                LibPath = tmpPath
-                If (fso.FileExists(LibPath & "\wsock32.lib") = False) Then
+        WScript.Echo ""
+        WScript.Echo "This program will help you to compile your Services, and ask you"
+        WScript.Echo "questions regarding the compile-time settings of it during the"
+        WScript.Echo "process."
+        WScript.Echo ""
+        WScript.Echo "Anope is a set of Services for IRC networks that allows users to"
+        WScript.Echo "manage their nicks and channels in a secure and efficient way,"
+        WScript.Echo "and administrators to manage their network with powerful tools."
+        WScript.Echo ""
+        WScript.Echo "Do not forget to read all the documents located in docs/,"
+        WScript.Echo "especially the README and INSTALL files."
+        WScript.Echo ""
+        WScript.Echo "For all your Anope needs please visit our portal at"
+        WScript.Echo "http://www.anope.org/"
+        WScript.Echo ""
+        WScript.Echo "Press Enter to Continue..."
+        Wscript.StdIn.ReadLine
+        
+        ' Enable MySQL Support?
+        Do While (UseMySQL <> "Y" AND UseMySQL <> "N" AND UseMySQL <> "YES" AND UseMySQL <> "NO")
+                WScript.Echo "Would you like to compile Anope with MySQL Support?"
+                WScript.Echo "(NOTE: You must have MySQL 3.23 or Later installed)"
+                WScript.Echo ""
+                WScript.Echo "Yes / No (Default)"
+                UseMySQL = UCase(Trim(WScript.StdIn.ReadLine))
+                If (UseMySQL = "") Then
+                        UseMySQL = "N"
+                End If
+                If (UseMySQL <> "Y" AND UseMySQL <> "N" AND UseMySQL <> "YES" AND UseMySQL <> "NO") Then
+                        WScript.Echo ""
+                        WScript.Echo "Invalid Selection!"
+                        WScript.Echo ""
+                End If
+        Loop
+        WScript.Echo ""
+        
+        ' If enabled, find the required files
+        If (UseMySQL = "Y" OR UseMySQL = "YES") Then
+                If (fso.FileExists(MySQLLibPath & "\libmysql.lib") = False) Then
+                        Do While (fso.FileExists(MySQLLibPath & "\libmysql.lib") = False)
+                                WScript.Echo "ERROR: Cannot find 'libmysql.lib' in " & MySQLLibPath
+                                WScript.Echo ""
+                                WScript.Echo "Please enter the path to 'libmysql.lib': "
+                                WScript.Echo "(Please DO NOT include a trailing slash '\')"
+                                MySQLLibPath = Trim(WScript.StdIn.ReadLine)
+                        Loop
+                ElseIf (fso.FileExists(MySQLHeadPath & "\mysql.h") = False) Then
+                        Do While (fso.FileExists(MySQLHeadPath & "\mysql.h") = False)
+                                WScript.Echo "ERROR: Cannot find 'mysql.h' in " & MySQLHeadPath
+                                WScript.Echo ""
+                                WScript.Echo "Please enter the path to 'mysql.h': "
+                                WScript.Echo "(Please DO NOT include a trailing slash '\')"
+                                MySQLHeadPath = Trim(WScript.StdIn.ReadLine)
+                        Loop
+                End If
+                WScript.Echo "All required files for MySQL Support have been located!"
+                WScript.Echo "MySQL Support Enabled.."
+                UseMySQL = "1"
+        Else
+                WScript.Echo "MySQL Support Disabled.."
+                UseMySQL = "0"
+        End If
+        WScript.Echo ""
+        
+        ' Enable Database Encryption Support?
+        Do While (UseDBEnc <> "Y" AND UseDBEnc <> "N" AND UseDBEnc <> "YES" AND UseDBEnc <> "NO")
+                WScript.Echo "Would you like to enable Database Encryption?"
+                WScript.Echo "(NOTE: If you enable encryption, you will NOT be able to recover"
+                WScript.Echo "passwords at a later date. GETPASS and SENDPASS will also be useless)"
+                WScript.Echo ""
+                WScript.Echo "Yes / No (Default)"
+                UseDBEnc = UCase(Trim(WScript.StdIn.ReadLine))
+                If (UseDBEnc = "") Then
+                        UseDBEnc = "N"
+                End If
+                If (UseDBEnc <> "Y" AND UseDBEnc <> "N" AND UseDBEnc <> "YES" AND UseDBEnc <> "NO") Then
+                        WScript.Echo ""
+                        WScript.Echo "Invalid Selection!"
+                        WScript.Echo ""
+                End If
+        Loop
+        WScript.Echo ""
+        If (UseDBEnc = "Y" OR UseDBEnc = "YES") Then
+                WScript.Echo "Database Encryption Enabled.."
+                UseDBEnc = "1"
+        Else
+                WScript.Echo "Database Encryption Disabled.."
+                UseDBEnc = "0"
+        End If
+        WScript.Echo ""
+        
+        ' Check for required libraries and paths
+        WScript.Echo "I will now check you have all the things I need..."
+        WScript.Echo ""
+        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib")) Then
+                WScript.Echo "I found a copy of Microsoft Visual Studio .NET 2003.."
+                LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib"
+                LibPath2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Lib"
+                If (fso.FileExists(LibPath & "/MSVCRT.lib") = False And fso.FileExists(LibPath2 & "/MSVCRT.lib") = False) Then
+                        WScript.Echo "Hm. I can't seem to find the default library.. You probably only have the SDK installed.."
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False And fso.FileExists(LibPath2 & "/wsock32.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find wsock32.lib.. You probably only have the SDK installed.."
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False And fso.FileExists(LibPath2 & "/advapi32.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find advapi32.lib.. You probably only have the SDK installed.."
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False And fso.FileExists(LibPath2 & "/uuid.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find uuid.lib.. You probably only have the SDK installed.."
+                        LibPath = ""
+                        LibPath2 = ""
+                End If
+                IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
+                IncDir2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include"
+        End If
+        
+        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Lib") And LibPath = "") Then
+                WScript.Echo "I found a copy of Microsoft Visual Studio 6.. It's old, but we can use it.."
+                LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Lib"
+                CompilerVer = "VC6"
+                If (fso.FileExists(LibPath & "/MSVCRT.lib") = False) Then
+                        WScript.Echo "Hm. I can't seem to find the default library.. Are you sure this is installed properly?"
+                        LibPath = ""
+                ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False) Then
                         WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
                         LibPath = ""
-                ElseIf (fso.FileExists(LibPath & "\advapi32.lib") = False) Then
+                ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False) Then
                         WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
                         LibPath = ""
-                ElseIf (fso.FileExists(LibPath & "\uuid.lib") = False) Then
+                ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False) Then
                         WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
                         LibPath = ""
-                Else
-                        WScript.Echo "Okay, I found what I was looking for.."
                 End If
-        Else
-                WScript.Echo "I couldn't find the default library in that folder."
+                IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Inlcude"
         End If
-End If
-
-If (LibPath <> "") Then
-                Dim f, f2, i, verMaj, verMin, verPatch, verBuild
-                Const ForReading = 1, ForWriting = 2
-                WScript.Echo "Looks like you've got all the libraries I need.."
-                If (fso.FileExists("version.log") = False) Then
-                        WScript.Echo "I can't find 'version.log' in this directory."
-                        WScript.Echo "Please run this script from a complete Anope source."
+        
+        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Platform SDK\Lib") And LibPath = "") Then
+                WScript.Echo "I found a copy of Microsoft Platform SDK.."
+                LibPath = DefaultDrive & ":\Program Files\Microsoft Platform SDK\Lib"
+                LibPath2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib"
+                CompilerVer = "SDK"
+                If (fso.FileExists(LibPath & "/MSVCRT.lib") = False And fso.FileExists(LibPath2 & "/MSVCRT.lib") = False) Then
+                        WScript.Echo "Hm. I can't seem to find the default library.. Are you sure this is installed properly?"
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False And fso.FileExists(LibPath2 & "/wsock32.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False And fso.FileExists(LibPath2 & "/advapi32.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
+                        LibPath = ""
+                        LibPath2 = ""
+                ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False And fso.FileExists(LibPath2 & "/uuid.lib") = False) Then
+                        WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
+                        LibPath = ""
+                        LibPath2 = ""
+                End If
+                IncDir = DefaultDrive & ":\Program Files\Microsoft Visual C++ Toolkit 2003\include"
+                IncDir2 = "C:\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
+        End If
+        
+        If (fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Bin\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Bin\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\nmake.exe") = False AND fso.FileExists(DefaultDrive & ":\Program Files\Microsoft Platform SDK\Bin\nmake.exe") = False) Then
+                        WScript.Echo ""
+                        WScript.Echo "I couldn't seem to find a copy of nmake.exe on your system.."
+                        WScript.Echo ""
+                        WScript.Echo "I can continue without it for now, but you'll need it when you want to compile."
+                        WScript.Echo "I suggest downloading a copy from the URL below, and placing it in your C:\ drive."
+                        WScript.Echo ""
+                        WScript.Echo "http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe"
+                        WScript.Echo ""
+                        WScript.Echo "You should place nmake.exe in " & DefaultDrive & ":\"
+                        WScript.Echo ""
+        End If
+        
+        If (LibPath = "") Then
+                Dim tmpPath
+                WScript.Echo "I couldn't find any of the paths I was looking for.."
+                WScript.Echo "If you have installed the Visual C++ Libraries in a non-standard location, enter"
+                WScript.Echo "this location below, and I will try and look there.."
+                WScript.Echo "(NOTE: Do NOT enter a trailing slash)"
+                WScript.Echo ""
+                WScript.Echo "Path to Visual C++ Libraries: "
+                tmpPath = Trim(WScript.StdIn.ReadLine)
+                If (fso.FolderExists(tmpPath) AND fso.FileExists(tmpPath & "\MSVCRT.lib")) Then
+                        LibPath = tmpPath
+                        If (fso.FileExists(LibPath & "\wsock32.lib") = False) Then
+                                WScript.Echo "I couldn't seem to find wsock32.lib.. We kind of need this.."
+                                LibPath = ""
+                        ElseIf (fso.FileExists(LibPath & "\advapi32.lib") = False) Then
+                                WScript.Echo "I couldn't seem to find advapi32.lib.. We kind of need this.."
+                                LibPath = ""
+                        ElseIf (fso.FileExists(LibPath & "\uuid.lib") = False) Then
+                                WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
+                                LibPath = ""
+                        Else
+                                WScript.Echo "Okay, I found what I was looking for.."
+                        End If
                 Else
-                        Set f2 = fso.OpenTextFile("version.log", ForReading)
-                        Do While (i < 7)
-                                f2.SkipLine()
-                                i = i + 1
-                        Loop
-                        verMaj = Replace(Replace(Trim(f2.ReadLine), "VERSION_MAJOR=" & chr(34), ""), chr(34), "")
-                        verMin = Replace(Replace(Trim(f2.ReadLine), "VERSION_MINOR=" & chr(34), ""), chr(34), "")
-                        verPatch = Replace(Replace(Trim(f2.ReadLine), "VERSION_PATCH=" & chr(34), ""), chr(34), "")
-                        verBuild = Replace(Replace(Trim(f2.ReadLine), "VERSION_BUILD=" & chr(34), ""), chr(34), "")
-                        verStr = Replace(verStr, chr(34), "")
-                        f2.close
+                        WScript.Echo "I couldn't find the default library in that folder."
+                End If
+        End If
+        
+        If (LibPath <> "") Then
+                        Dim f
+                        Const ForReading = 1, ForWriting = 2
+                        WScript.Echo "Looks like you've got all the libraries I need.."
                         Set f = fso.OpenTextFile("Makefile.inc.win32", ForWriting)
                         f.WriteLine("USE_MYSQL=" & UseMySQL)
                         If (UseMySQL = "1") Then
@@ -295,7 +308,7 @@ If (LibPath <> "") Then
                         if (LibPath2 <> "") Then
                                 LibPath = LibPath2 & chr(34) & " /LIBPATH:" & chr(34) & LibPath
                         End If
-                        f.WriteLine("VERSION=" & verMaj & "." & verMin & "." & verPatch & "." & verBuild)
+                        f.WriteLine("VERSION=" & verMaj & "." & verMin & "." & verPatch & verExtra & "." & verBuild)
                         f.WriteLine("LIBPATH=" & LibPath)
                         f.WriteLine("PROGRAM=anope.exe")
                         f.WriteLine("DATDEST=data")
@@ -375,12 +388,12 @@ If (LibPath <> "") Then
                         WScript.Echo "Configuration Complete!"
                         WScript.Echo ""
                         WScript.Echo "Type make to Compile Anope"
-                End If
-Else
-                WScript.Echo ""
-                WScript.Echo "Sorry, but you didn't have all the required libraries installed."
-                WScript.Echo ""
-                WScript.Echo "See http://wiki.anope.org/Documentation:Windows for a list of downloads needed to install Anope"
-                WScript.Echo ""
-End If
+        Else
+                        WScript.Echo ""
+                        WScript.Echo "Sorry, but you didn't have all the required libraries installed."
+                        WScript.Echo ""
+                        WScript.Echo "See http://wiki.anope.org/Documentation:Windows for a list of downloads needed to install Anope"
+                        WScript.Echo ""
+        End If
 
+End If

@@ -20,7 +20,7 @@
 #define CTRL "version.log"
 
 long version_major, version_minor, version_patch, version_build, build;
-char *version_extra;
+char *version_extra = NULL;
 char version[1024];
 char version_dotted[1024];
 
@@ -64,6 +64,9 @@ int main()
     fd = fopen("version.h", "w");
     write_version(fd);
     fclose(fd);
+	
+	if (version_extra)
+		free(version_extra);
 }
 
 void load_ctrl(FILE * fd)
@@ -119,7 +122,7 @@ char *get_value_str(char *string)
         string[len - 1] = 0;
     if (!*string)
         return NULL;
-    return string;
+    return strdup(string);
 }
 
 void parse_version(FILE * fd)

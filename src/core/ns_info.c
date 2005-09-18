@@ -161,7 +161,6 @@ int do_info(User * u)
 
         }
 
-
         if (nick_online) {
             if (show_hidden || !(na->nc->flags & NI_HIDE_MASK))
                 notice_lang(s_NickServ, u, NICK_INFO_ADDRESS_ONLINE,

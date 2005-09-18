@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-rc2"
-VERSION_BUILD="889"
+VERSION_BUILD="890"
 
 # $Log$
+#
+# BUILD : 1.7.11 (890)
+# BUGS  : 
+# NOTES : Fixed common_get_vhost/vident to also return vhost/vident on ircds without usermode for vhost/vident
 #
 # BUILD : 1.7.11 (889)
 # BUGS  : 

@@ -212,6 +212,8 @@ char *common_get_vhost(User * u)
 
     if (ircd->vhostmode && (u->mode & ircd->vhostmode))
         return u->vhost;
+    else if (ircd->vhost && u->vhost)
+        return u->vhost;
     else
         return u->host;
 }
@@ -230,6 +232,8 @@ char *common_get_vident(User * u)
         return NULL;
 
     if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+        return u->vident;
+    else if (ircd->vident && u->vident)
         return u->vident;
     else
         return u->username;

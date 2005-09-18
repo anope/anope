@@ -48,6 +48,9 @@ Provided by Ricardo <ricardoltdb@gmail.com> - 2005
 05/30 F Updated Portuguese language file. And bundled modules language.   [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
+09/18 F Removed color codes for tools on win32.                           [ #00]
+09/18 F MySQL detection for win32 in install.vbs had issues.              [ #00]
+09/18 F Memleak when AddAkiller was enabled.                              [ #00]
 09/13 F Reduntant IRCD defines removed.                                   [ #00]
 09/13 F Double Makedile generation.                                       [ #00]
 09/06 F Memory for vHosts/vIdents was not (always) being freed.           [ #00]

@@ -138,11 +138,15 @@ int do_akill(User * u)
             }
 
             deleted = add_akill(u, mask, u->nick, expires, reason);
-            if (deleted < 0)
+            if (deleted < 0) {
+                if (AddAkiller) {
+                    free(reason);
+                }
                 return MOD_CONT;
-            else if (deleted)
+            } else if (deleted) {
                 notice_lang(s_OperServ, u, OPER_AKILL_DELETED_SEVERAL,
                             deleted);
+            }
             notice_lang(s_OperServ, u, OPER_AKILL_ADDED, mask);
 
             if (WallOSAkill) {
@@ -175,9 +179,12 @@ int do_akill(User * u)
                                  u->nick, mask, reason, buf);
             }
 
-            if (readonly)
+            if (readonly) {
                 notice_lang(s_OperServ, u, READ_ONLY_MODE);
-
+            }
+            if (AddAkiller) {
+               free(reason);
+            }
         } else {
             syntax_error(s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
         }

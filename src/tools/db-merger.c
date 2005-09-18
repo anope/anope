@@ -84,8 +84,13 @@
 
 /* END OF CONFIGURATION BLOCK */
 
+#ifndef _WIN32
 #define C_LBLUE "\033[1;34m"
 #define C_NONE "\033[m"
+#else
+#define C_LBLUE ""
+#define C_NONE ""
+#endif
 
 #define getc_db(f)		(fgetc((f)->fp))
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))

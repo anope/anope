@@ -1819,7 +1819,7 @@ ChannelInfo *cs_findchan(const char *chan)
 
     if (!chan || !*chan) {
         if (debug) {
-            alog("debug: finduser() called with NULL values");
+            alog("debug: cs_findchan() called with NULL values");
         }
         return NULL;
     }

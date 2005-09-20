@@ -518,8 +518,11 @@ int loadModule(Module * m, User * u)
 	strncat(buf, "XXXXXX", 4095 - len);
     buf[4095] = '\0';
 	/* Don't skip return value checking! -GD */
-    if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK)
+    if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK) {
+        if (u)
+            notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
 		return ret;
+	}
 
     m->filename = sstrdup(buf);
     ano_modclearerr();

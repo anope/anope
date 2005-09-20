@@ -101,6 +101,8 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
         else if (strlen(nick) > NickLen)
             notice_lang(s_BotServ, u, BOT_BAD_NICK);
+		else if (strlen(user) >= USERMAX)
+			notice_lang(s_BotServ, u, BOT_BAD_IDENT);
         else {
             NickAlias *na;
 

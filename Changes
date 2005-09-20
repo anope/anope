@@ -8,6 +8,8 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+09/20 F Ident length checking when adding a bot was broken.               [ #00]
+09/20 F No response was giving when trying to load a non-existing module. [ #00]
 09/18 F Last host was not always correctly set to a vHost if applied.     [ #00]
 09/14 F Various issues with handling the version identifiers.             [ #00]
 09/13 F make strict/profile now work for core and protocol files.         [ #00]

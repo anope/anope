@@ -376,6 +376,12 @@ User *find_byuid(const char *uid)
 {
     User *u, *next;
 
+    if (!uid) {
+        if (debug)
+            alog("debug: find_byuid() called with NULL-value");
+        return NULL;
+    }
+
     u = first_uid();
     while (u) {
         next = next_uid();

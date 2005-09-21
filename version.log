@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-rc2"
-VERSION_BUILD="891"
+VERSION_BUILD="892"
 
 # $Log$
+#
+# BUILD : 1.7.11 (892)
+# BUGS  : 
+# NOTES : Applied patch by Trystan to [1] strip CR/LF as well with normalizeBuffer() [2] fix various issues with hs_request (makes use of #1 in hs_request so that lines that are \n only are not processed; Adds check of tmp before allowing strtol() to get its hands on it; HSRequestDBName is set during the config load, if not by the config its sstrdup() with the default value.. so that the message at the end of the load does not read (NULL); frees the HSRequestDBName on unload; ran indent again it)
 #
 # BUILD : 1.7.11 (891)
 # BUGS  : 

@@ -85,8 +85,8 @@ HostCore *hs_request_head;
 int AnopeInit(int argc, char **argv)
 {
     Command *c;
-	EvtHook *hook;
-	
+    EvtHook *hook;
+
     c = createCommand("request", hs_do_request, nick_identified, -1, -1,
                       -1, -1, -1);
     moduleAddHelp(c, hs_help_request);
@@ -113,35 +113,36 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_HEAD);
-	
-	hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
-	moduleAddEventHook(hook);
+
+    hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
+    moduleAddEventHook(hook);
 
     moduleSetHostHelp(hs_help);
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);
-	
-	my_load_config();
-	my_add_languages();
+
+    my_load_config();
+    my_add_languages();
     hs_request_head = NULL;
-	
-	if (debug)
-		alog("[hs_request] Loading database...");
-	hsreq_load_db();
+
+    if (debug)
+        alog("[hs_request] Loading database...");
+    hsreq_load_db();
     alog("hs_request loaded");
     return MOD_CONT;
 }
 
 void AnopeFini(void)
 {
-	if (debug)
-		alog("[hs_request] Saving database...");
-	hsreq_save_db();
-	
-	/* Clean up all open host requests */
+    if (debug)
+        alog("[hs_request] Saving database...");
+    hsreq_save_db();
+
+    /* Clean up all open host requests */
     while (hs_request_head)
-		hs_request_head = deleteHostCore(hs_request_head, NULL);
-	
+        hs_request_head = deleteHostCore(hs_request_head, NULL);
+
+    free(HSRequestDBName);
     alog("hs_request un-loaded");
 }
 
@@ -580,113 +581,130 @@ void hs_help(User * u)
 }
 void hsreq_load_db(void)
 {
-	FILE *fp;
-	char *filename;
-	char buf[1024];
-	char *nick, *vident, *vhost, *creator, *tmp;
-	int32 tmp_time;
-	
-	if (HSRequestDBName)
-		filename = HSRequestDBName;
-	else
-		filename = HSREQ_DEFAULT_DBNAME;
-	
-	fp = fopen(filename ,"r");
-	if (!fp) {
-		alog("[hs_request] Unable to open database ('%s') for reading", filename);
-		return;
-	}
-	
-	while (fgets(buf, 1024, fp)) {
-		nick = myStrGetToken(buf, ':', 0);
-		vident = myStrGetToken(buf, ':', 1);
-		vhost = myStrGetToken(buf, ':', 2);
-		tmp = myStrGetToken(buf, ':', 3);
-		tmp_time = strtol(tmp, (char **)NULL, 16);
-		free(tmp);
-		creator = myStrGetToken(buf, ':', 4);
-		if (!nick || !vident || !vhost || !creator) {
-			alog("[hs_request] Error while reading database, skipping record");
-			continue;
-		}
-		if (stricmp(vident, "(null)") == 0) {
-			free(vident);
-			vident = NULL;
-		}
-		my_add_host_request(nick, vident, vhost, creator, tmp_time);
-		free(nick);
-		free(vhost);
-		free(creator);
-		if (vident)
-			free(vident);
-	}
-	
-	fclose(fp);
-	
-	if (debug)
-		alog("[hs_request] Succesfully loaded database");
+    FILE *fp;
+    char *filename;
+    char readbuf[1024];
+    char *nick, *vident, *vhost, *creator, *tmp;
+    int32 tmp_time;
+    char *buf;
+
+    if (HSRequestDBName)
+        filename = HSRequestDBName;
+    else
+        filename = HSREQ_DEFAULT_DBNAME;
+
+    fp = fopen(filename, "r");
+    if (!fp) {
+        alog("[hs_request] Unable to open database ('%s') for reading",
+             filename);
+        return;
+    }
+
+    while (fgets(readbuf, 1024, fp)) {
+        buf = normalizeBuffer(readbuf);
+        if (buf || *buf) {
+            nick = myStrGetToken(buf, ':', 0);
+            vident = myStrGetToken(buf, ':', 1);
+            vhost = myStrGetToken(buf, ':', 2);
+            tmp = myStrGetToken(buf, ':', 3);
+            if (tmp) {
+                tmp_time = strtol(tmp, (char **) NULL, 16);
+                free(tmp);
+            } else {
+                tmp_time = 0;
+            }
+            creator = myStrGetToken(buf, ':', 4);
+            if (!nick || !vident || !vhost || !creator) {
+                alog("[hs_request] Error while reading database, skipping record");
+                continue;
+            }
+            if (stricmp(vident, "(null)") == 0) {
+                free(vident);
+                vident = NULL;
+            }
+            my_add_host_request(nick, vident, vhost, creator, tmp_time);
+            free(nick);
+            free(vhost);
+            free(creator);
+            if (vident)
+                free(vident);
+        }
+        free(buf);
+    }
+
+    fclose(fp);
+
+    if (debug)
+        alog("[hs_request] Succesfully loaded database");
 }
 
 void hsreq_save_db(void)
 {
-	FILE *fp;
-	char *filename;
-	char *vident;
-	HostCore *current;
-	
-	if (HSRequestDBName)
-		filename = HSRequestDBName;
-	else
-		filename = HSREQ_DEFAULT_DBNAME;
-	
-	fp = fopen(filename ,"w");
-	if (!fp) {
-		alog("[hs_request] Unable to open database ('%s') for writing", filename);
-		return;
-	}
-	
-	current = hs_request_head;
-	while (current) {
-		vident = (current->vIdent ? current->vIdent : "(null)");
-		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident, current->vHost, (uint32)current->time, current->creator);
-		current = current->next;
-	}
-	
-	fclose(fp);
+    FILE *fp;
+    char *filename;
+    char *vident;
+    HostCore *current;
 
-	if (debug)
-		alog("[hs_request] Succesfully saved database");
+    if (HSRequestDBName)
+        filename = HSRequestDBName;
+    else
+        filename = HSREQ_DEFAULT_DBNAME;
+
+    fp = fopen(filename, "w");
+    if (!fp) {
+        alog("[hs_request] Unable to open database ('%s') for writing",
+             filename);
+        return;
+    }
+
+    current = hs_request_head;
+    while (current) {
+        vident = (current->vIdent ? current->vIdent : "(null)");
+        fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident,
+                current->vHost, (uint32) current->time, current->creator);
+        current = current->next;
+    }
+
+    fclose(fp);
+
+    if (debug)
+        alog("[hs_request] Succesfully saved database");
 }
 
 int hsreqevt_db_saving(int argc, char **argv)
 {
-	if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
-		hsreq_save_db();
-	
-	return MOD_CONT;
+    if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
+        hsreq_save_db();
+
+    return MOD_CONT;
 }
 
 void my_load_config(void)
 {
-	int i;
-	char *tmp = NULL;
-	
+    int i;
+    char *tmp = NULL;
+
     Directive confvalues[][1] = {
-		{{"HSRequestMemoUser", {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoUser}}}},
-		{{"HSRequestMemoOper", {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
-		{{"HSRequestMemoSetters", {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
-		{{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
+        {{"HSRequestMemoUser",
+          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoUser}}}},
+        {{"HSRequestMemoOper",
+          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
+        {{"HSRequestMemoSetters",
+          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
+        {{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
     };
-	
-	for (i = 0; i < 4; i++)
-    	moduleGetConfigDirective(confvalues[i]);
-	
-	if (tmp) {
-		if (HSRequestDBName)
-			free(HSRequestDBName);
-		HSRequestDBName = tmp;
-	}
-	
+
+    for (i = 0; i < 4; i++)
+        moduleGetConfigDirective(confvalues[i]);
+
+    if (tmp) {
+        if (HSRequestDBName)
+            free(HSRequestDBName);
+        HSRequestDBName = sstrdup(tmp);
+    } else {
+        HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
+    }
+
     if (debug)
         alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
 }
@@ -895,7 +913,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

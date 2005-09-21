@@ -1069,7 +1069,12 @@ char *normalizeBuffer(char *buf)
             }
 
             break;
-
+            /* line feed char */
+        case 10:
+            break;
+            /* carriage returns char */
+        case 13:
+            break;
             /* Reverse ctrl char */
         case 22:
             break;

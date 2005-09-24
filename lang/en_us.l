@@ -3392,7 +3392,7 @@ NICK_HELP_GROUP
 	group. password is the password of the target nickname.
 	
 	Joining a group will allow you to share your configuration,
-	memos, and channel priviledges with all the nicknames in the
+	memos, and channel privileges with all the nicknames in the
 	group, and much more!
 	 
 	A group exists as long as it is useful. This means that even

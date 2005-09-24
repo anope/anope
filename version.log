@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-rc3"
-VERSION_BUILD="894"
+VERSION_BUILD="895"
 
 # $Log$
+#
+# BUILD : 1.7.11 (895)
+# BUGS  : 
+# NOTES : Fixed a typo in en_us.l
 #
 # BUILD : 1.7.11 (894)
 # BUGS  : 

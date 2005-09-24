@@ -8,6 +8,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 07/01 A Events for channel access/xop updates.                            [ #00]
 06/26 A New module pack module: hs_request.                               [ #00]
 06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+09/24 F Typo in English language file.                                    [ #00]
 09/21 F Segfault when find_byuid() was called with a NULL argument.       [ #00]
 09/20 F Ident length checking when adding a bot was broken.               [ #00]
 09/20 F No response was giving when trying to load a non-existing module. [ #00]

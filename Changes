@@ -1,5 +1,5 @@
-Anope Version  S V N
---------------------
+Anope Version  1.7.11
+---------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 09/01 A Function to retrieve a module language string.                    [ #00]
 08/21 A NickServ SASET to set options on other nicks (split from SET).    [ #00]

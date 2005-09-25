@@ -131,6 +131,7 @@ Else
                                 WScript.Echo "(Please DO NOT include a trailing slash '\')"
                                 MySQLLibPath = Trim(WScript.StdIn.ReadLine)
                         Loop
+				End If
                 If (fso.FileExists(MySQLHeadPath & "\mysql.h") = False) Then
                         Do While (fso.FileExists(MySQLHeadPath & "\mysql.h") = False)
                                 WScript.Echo "ERROR: Cannot find 'mysql.h' in " & MySQLHeadPath

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-rc3"
-VERSION_BUILD="895"
+VERSION_BUILD="896"
 
 # $Log$
+#
+# BUILD : 1.7.11 (896)
+# BUGS  : 
+# NOTES : Fixed minor issues: forgot an 'End If' in install.vbs and an old typo in Changes.conf
 #
 # BUILD : 1.7.11 (895)
 # BUGS  : 

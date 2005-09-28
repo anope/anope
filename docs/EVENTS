@@ -200,6 +200,21 @@ Anope Internal Events
                command. If none are present, this will not exist, and argc will
                will be 3.
 
+    EVENT_BOT_FANTASY_NO_ACCESS
+        A fantasy command of the bot has been triggered by someone without
+		access to BotServ FANTASY commands on the channel. This will NOT
+		trigger if someone with access has triggered a fantasy command; use
+		EVENT_BOT_FANTASY for those. Hook to both events to catch both event
+		triggers.
+        av[0]  The fantasy command that has been triggered with leading '!'.
+        av[1]  The nickname of the user that has triggered the fantasy
+               command.
+        av[2]  The name of the channel the fantasy command has been triggered
+               on.
+        av[3]  Contains any optional paramenters passed after the fantasy
+               command. If none are present, this will not exist, and argc will
+               will be 3.
+
     EVENT_BOT_JOIN
         A BotServ bot has joined a channel and opped itself.
         av[0]  The channel name the bot has just joined.

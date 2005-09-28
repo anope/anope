@@ -23,6 +23,7 @@
 #define EVENT_BOT_CREATE "bot_create"
 #define EVENT_BOT_CHANGE "bot_change"
 #define EVENT_BOT_FANTASY "bot_command"
+#define EVENT_BOT_FANTASY_NO_ACCESS "bot_command_no_access"
 #define EVENT_BOT_DEL "bot_del"
 #define EVENT_BOT_ASSIGN "bot_assign"
 #define EVENT_TOPIC_UPDATED "chan_topic_updated"

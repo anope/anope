@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="899"
+VERSION_BUILD="900"
 
 # $Log$
+#
+# BUILD : 1.7.11 (900)
+# BUGS  : 
+# NOTES : Added an event for fantasy commands triggered by people without CA_FANTASY access on the channel
 #
 # BUILD : 1.7.11 (899)
 # BUGS  : 

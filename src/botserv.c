@@ -400,17 +400,20 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
     /* Fantaisist commands */
 
-    if (buf && (ci->botflags & BS_FANTASY) && *buf == '!'
-        && check_access(u, ci, CA_FANTASIA)) {
+    if (buf && (ci->botflags & BS_FANTASY) && *buf == '!') {
         cmd = strtok(buf, " ");
 
         if (cmd && (cmd[0] == '!')) {
             char *params = strtok(NULL, "");
+            char *event_name = EVENT_BOT_FANTASY_NO_ACCESS;
+
+            if (check_access(u, ci, CA_FANTASIA))
+                event_name = EVENT_BOT_FANTASY;
+
             if (params)
-                send_event(EVENT_BOT_FANTASY, 4, cmd, u->nick, ci->name,
-                           params);
+                send_event(event_name, 4, cmd, u->nick, ci->name, params);
             else
-                send_event(EVENT_BOT_FANTASY, 3, cmd, u->nick, ci->name);
+                send_event(event_name, 3, cmd, u->nick, ci->name);
         }
     }
 }

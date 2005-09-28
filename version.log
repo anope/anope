@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="900"
+VERSION_BUILD="901"
 
 # $Log$
+#
+# BUILD : 1.7.11 (901)
+# BUGS  : 
+# NOTES : Updated Italian translation (by Hal9000); updated German translation for cs_appendtopic (by Cloud); added Changes message for ns_saset fix accidently comitted when comitting the dev framework
 #
 # BUILD : 1.7.11 (900)
 # BUGS  : 

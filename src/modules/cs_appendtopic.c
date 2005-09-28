@@ -184,13 +184,13 @@ void my_add_languages(void)
 	/* German (DE) */
     char *langtable_de[] = {
         /* LNG_CHAN_HELP */
-        "    APPENDTOPIC   Fühgt ein Text zu ein Channel Topic ein",
+        "    APPENDTOPIC   Fügt einen Text zu einem Channel-Topic hinzu.",
         /* LNG_CHAN_HELP_APPENDTOPIC */
-        "Das befehl erlaubt User ein Text zu den vorhandenen Channel Topic\n"
-            "hinzu zu fühgen. Wenn TOPICLOCK an ist, wird der Topic aktualisiert\n"
-            "und der neue aktualisierte Topic wird locked.",
+        "Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
+            "hinzuzufügen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
+            "und das neue, aktualisierte Topic wird gesperrt.",
         /* LNG_APPENDTOPIC_SYNTAX */
-        "Syntax: APPENDTOPIC Channel Text\n"
+        "Syntax: APPENDTOPIC Channel Text\n"
     };
 
     /* Portuguese (PT) */

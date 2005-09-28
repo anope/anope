@@ -2,6 +2,13 @@ Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
+09/28 F NickServ SASET didn't fill the nick in the 'not registered' line. [ #00]
+
+Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
+09/28 F Updated Italian language file.                                    [ #00]
+
+Provided by Cloud <cloud@shortcut.game-host.org> - 2005
+09/28 F Updated German translation for cs_appendtopic.                    [ #00]
 
 Anope Version  1.7.11
 ---------------------

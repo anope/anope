@@ -140,7 +140,7 @@ int do_saset(User * u)
                 && stricmp(cmd, "ICQ") != 0))) {
         syntax_error(s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
     } else if (!na) {
-        notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+        notice_lang(s_NickServ, u, NICK_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else if (na->nc->flags & NI_SUSPENDED) {

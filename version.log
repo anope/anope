@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
-VERSION_EXTRA=""
-VERSION_BUILD="897"
+VERSION_EXTRA="-svn"
+VERSION_BUILD="899"
 
 # $Log$
+#
+# BUILD : 1.7.11 (899)
+# BUGS  : 
+# NOTES : Development Framework
 #
 # BUILD : 1.7.11 (897)
 # BUGS  : 

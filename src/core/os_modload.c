@@ -76,21 +76,14 @@ void myOperServHelp(User * u)
 int do_modload(User * u)
 {
     char *name;
-    Module *m;
 
     name = strtok(NULL, "");
     if (!name) {
         syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
         return MOD_CONT;
     }
-    m = findModule(name);
-    if (!m) {
-        m = createModule(name);
-        mod_current_module = m;
-        mod_current_user = u;
-        mod_current_op = 1;
-    } else {
+	if (!queueModuleLoad(name, u))
         notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
-    }
+	
     return MOD_CONT;
 }

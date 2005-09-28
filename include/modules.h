@@ -97,6 +97,7 @@ typedef void *	ano_module_t;
 /*************************************************************************/
 
 typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED } MODType;
+typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
 
 /*************************************************************************/
 /* Structure for information about a *Serv command. */
@@ -106,6 +107,7 @@ typedef struct CommandHash_ CommandHash;
 typedef struct Module_ Module;
 typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
+typedef struct ModuleQueue_ ModuleQueue;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
@@ -158,6 +160,14 @@ struct ModuleHash_ {
         char *name;
         Module *m;
         ModuleHash *next;
+};
+
+struct ModuleQueue_ {
+	Module *m;
+	ModuleOperation op;
+	User *u;
+	
+	ModuleQueue *next;
 };
 
 struct Command_ {
@@ -355,6 +365,12 @@ MDE void moduleCleanStruct(ModuleData **moduleData);			/* Clean a moduleData has
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
 MDE boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
+
+/*************************************************************************/
+/* Module Queue Operations */
+MDE int queueModuleLoad(char *name, User *u);
+MDE int queueModuleUnload(char *name, User *u);
+MDE void handleModuleOperationQueue(void);
 
 /*************************************************************************/
 /* Some IRCD protocol module support functions */

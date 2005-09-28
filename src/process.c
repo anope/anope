@@ -18,7 +18,6 @@
 extern Module *mod_current_module;
 extern char *mod_current_module_name;
 extern User *mod_current_user;
-extern int mod_current_op;
 extern char *mod_current_buffer;
 /*************************************************************************/
 /*************************************************************************/
@@ -285,21 +284,10 @@ void process()
         if (debug)
             alog("debug: unknown message from server (%s)", inbuf);
     }
-    if (mod_current_op == 1) {
-        alog("trying to load [%s]", mod_current_module->name);
-        alog("status: [%d]",
-             loadModule(mod_current_module, mod_current_user));
-        mod_current_module = NULL;
-        mod_current_user = NULL;
-        mod_current_op = 0;
-    } else if (mod_current_op == 2) {
-        alog("trying to unload [%s]", mod_current_module->name);
-        alog("status: [%d]",
-             unloadModule(mod_current_module, mod_current_user));
-        mod_current_module = NULL;
-        mod_current_user = NULL;
-        mod_current_op = 0;
-    }
+
+    /* Load/unload modules if needed */
+    handleModuleOperationQueue();
+
     /* Free argument list we created */
     free(av);
 }

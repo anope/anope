@@ -75,7 +75,6 @@ void myOperServHelp(User * u)
 int do_modunload(User * u)
 {
     char *name;
-    Module *m;
 
     name = strtok(NULL, "");
     if (!name) {
@@ -83,13 +82,8 @@ int do_modunload(User * u)
                      OPER_MODULE_UNLOAD_SYNTAX);
         return MOD_CONT;
     }
-    m = findModule(name);
-    if (m) {
-        mod_current_user = u;
-        mod_current_module = m;
-        mod_current_op = 2;
-    } else {
+	if (!queueModuleUnload(name, u))
         notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
-    }
+	
     return MOD_CONT;
 }

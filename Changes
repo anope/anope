@@ -2,6 +2,7 @@ Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
+09/28 F Made module (un)loading code more friendly for modularized core.  [ #00]
 09/28 F NickServ SASET didn't fill the nick in the 'not registered' line. [ #00]
 
 Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005

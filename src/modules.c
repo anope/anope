@@ -53,9 +53,10 @@ ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 Module *mod_current_module;
 char *mod_current_module_name = NULL;
 char *mod_current_buffer = NULL;
-int mod_current_op;
 User *mod_current_user;
 ModuleCallBack *moduleCallBackHead = NULL;
+ModuleQueue *mod_operation_queue = NULL;
+
 int displayCommand(Command * c);
 int displayCommandFromHash(CommandHash * cmdTable[], char *name);
 int displayMessageFromHashl(char *name);
@@ -2576,6 +2577,103 @@ void moduleDeleteLanguage(int langNumber)
         free(mod_current_module->lang[langNumber].argv[idx]);
     }
     mod_current_module->lang[langNumber].argc = 0;
+}
+
+/**
+ * Enqueue a module operation (load/unload/reload)
+ * @param m Module to perform the operation on
+ * @param op Operation to perform on the module
+ * @param u User who requested the operation
+ **/
+void queueModuleOperation(Module *m, ModuleOperation op, User *u)
+{
+	ModuleQueue *qm;
+	
+	qm = scalloc(1, sizeof(ModuleQueue));
+	qm->m = m;
+	qm->op = op;
+	qm->u = u;
+	qm->next = mod_operation_queue;
+	mod_operation_queue = qm;
+}
+
+/**
+ * Enqueue a module to load
+ * @param name Name of the module to load
+ * @param u User who requested the load
+ * @return 1 on success, 0 on error
+ **/
+int queueModuleLoad(char *name, User *u)
+{
+	Module *m;
+	
+	if (!name || !u)
+		return 0;
+	
+	if (findModule(name))
+		return 0;
+	m = createModule(name);
+	queueModuleOperation(m, MOD_OP_LOAD, u);
+	
+	return 1;
+}
+
+/**
+ * Enqueue a module to unload
+ * @param name Name of the module to unload
+ * @param u User who requested the unload
+ * @return 1 on success, 0 on error
+ **/
+int queueModuleUnload(char *name, User *u)
+{
+	Module *m;
+	
+	if (!name || !u)
+		return 0;
+	
+	m = findModule(name);
+	if (!m)
+		return 0;
+	queueModuleOperation(m, MOD_OP_UNLOAD, u);
+	
+	return 1;
+}
+
+/**
+ * Execute all queued module operations
+ **/
+void handleModuleOperationQueue(void)
+{
+	ModuleQueue *next;
+	int status;
+	
+	if (!mod_operation_queue)
+		return;
+	
+	while (mod_operation_queue) {
+		next = mod_operation_queue->next;
+		
+		mod_current_module = mod_operation_queue->m;
+		mod_current_user = mod_operation_queue->u;
+
+		if (mod_operation_queue->op == MOD_OP_LOAD) {
+			alog("Trying to load module [%s]", mod_operation_queue->m->name);
+			status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
+			alog("Module loading status: %d", status);
+		} else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
+			alog("Trying to unload module [%s]", mod_operation_queue->m->name);
+			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);
+			alog("Module unloading status: %d", status);
+		}
+		
+		/* Remove the ModuleQueue from memory */
+		free(mod_operation_queue);
+		
+		mod_operation_queue = next;
+	}
+	
+	mod_current_module = NULL;
+	mod_current_user = NULL;
 }
 
 /* EOF */

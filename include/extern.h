@@ -397,6 +397,7 @@ E int   BSBadWordsMax;
 E int   BSSmartJoin;
 E int   BSGentleBWReason;
 E int   BSCaseSensitive;
+E char *BSFantasyCharacter;
 
 E int   HideStatsO;
 E int   GlobalOnCycle;

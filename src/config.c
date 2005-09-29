@@ -207,6 +207,7 @@ int BSBadWordsMax;
 int BSSmartJoin;
 int BSGentleBWReason;
 int BSCaseSensitive;
+char *BSFantasyCharacter;
 
 int HideStatsO;
 int GlobalOnCycle;
@@ -387,6 +388,8 @@ Directive directives[] = {
     {"BSDefFantasy", {{PARAM_SET, PARAM_RELOAD, &BSDefFantasy}}},
     {"BSDefSymbiosis", {{PARAM_SET, PARAM_RELOAD, &BSDefSymbiosis}}},
     {"BSCaseSensitive", {{PARAM_SET, PARAM_RELOAD, &BSCaseSensitive}}},
+    {"BSFantasyCharacter",
+     {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
     {"BSGentleBWReason", {{PARAM_SET, PARAM_RELOAD, &BSGentleBWReason}}},
     {"BSKeepData", {{PARAM_TIME, PARAM_RELOAD, &BSKeepData}}},
     {"BSMinUsers", {{PARAM_POSINT, PARAM_RELOAD, &BSMinUsers}}},
@@ -1316,12 +1319,19 @@ int read_config(int reload)
         CHECK(BSBadWordsMax);
         CHECK(BSMinUsers);
         CHECK(BSKeepData);
+        CHECK(BSFantasyCharacter);
         if (s_BotServAlias) {
             if (!stricmp(s_BotServ, s_BotServAlias)) {
                 printf
                     ("\n*** BotServ and BotServ Alias are the same, this will cause errors\n");
                 retval = 0;
             }
+        }
+        if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
+            printf
+                ("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
+                 "*** character ('%c') will be used. The others will be ignored.\n",
+                 *BSFantasyCharacter);
         }
     }
 

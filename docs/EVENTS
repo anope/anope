@@ -191,7 +191,7 @@ Anope Internal Events
     EVENT_BOT_FANTASY
         A fantasy command of the bot has been triggered. This event should be
         used to create your own fantasy commands.
-        av[0]  The fantasy command that has been triggered with leading '!'.
+        av[0]  The fantasy command that has been triggered without leading '!'.
         av[1]  The nickname of the user that has triggered the fantasy
                command.
         av[2]  The name of the channel the fantasy command has been triggered
@@ -206,7 +206,7 @@ Anope Internal Events
 		trigger if someone with access has triggered a fantasy command; use
 		EVENT_BOT_FANTASY for those. Hook to both events to catch both event
 		triggers.
-        av[0]  The fantasy command that has been triggered with leading '!'.
+        av[0]  The fantasy command that has been triggered without leading '!'.
         av[1]  The nickname of the user that has triggered the fantasy
                command.
         av[2]  The name of the channel the fantasy command has been triggered

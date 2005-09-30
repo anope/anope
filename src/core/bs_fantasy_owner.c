@@ -66,7 +66,7 @@ int do_fantasy(int argc, char **argv)
     if (argc < 3)
         return MOD_CONT;
 
-    if (stricmp(argv[0], "!deowner") == 0) {
+    if (stricmp(argv[0], "deowner") == 0) {
         u = finduser(argv[1]);
         ci = cs_findchan(argv[2]);
         if (!u || !ci)
@@ -74,7 +74,7 @@ int do_fantasy(int argc, char **argv)
 
         if (is_founder(u, ci))
             bot_raw_mode(u, ci, ircd->ownerunset, u->nick);
-    } else if (stricmp(argv[0], "!owner") == 0) {
+    } else if (stricmp(argv[0], "owner") == 0) {
         u = finduser(argv[1]);
         ci = cs_findchan(argv[2]);
         if (!u || !ci)

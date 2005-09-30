@@ -407,13 +407,8 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
             char *params = strtok(NULL, "");
             char *event_name = EVENT_BOT_FANTASY_NO_ACCESS;
 
-            /* Warning: Hack Ahead
-             * To allow older modules to still work safely with the fantasy
-             * events, we replace the first char with '!' so that the cmd will
-             * be !trigger, and not *trigger or whatever, which will confuse
-             * them. Should be replaced after 1.8 -GD
-             */
-            cmd[0] = '!';
+            /* Strip off the fantasy character */
+            cmd++;
 
             if (check_access(u, ci, CA_FANTASIA))
                 event_name = EVENT_BOT_FANTASY;

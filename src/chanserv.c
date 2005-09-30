@@ -105,15 +105,15 @@ LevelInfo levelinfo[] = {
 int levelinfo_maxwidth = 0;
 
 CSModeUtil csmodeutils[] = {
-	{ "DEOP",   	"!deop",	"-o",   CI_OPNOTICE,	CA_OPDEOP, CA_OPDEOPME },
-	{ "OP",		"!op",		"+o",	CI_OPNOTICE,	CA_OPDEOP, CA_OPDEOPME },
-	{ "DEVOICE",	"!devoice", 	"-v",   0          ,	CA_VOICE,  CA_VOICEME  },
-	{ "VOICE",	"!voice",   	"+v",   0          ,	CA_VOICE,  CA_VOICEME  },
-        { "DEHALFOP",	"!dehalfop",	"-h",	0          ,	CA_HALFOP, CA_HALFOPME },
-	{ "HALFOP",	"!halfop",	"+h",	0          ,	CA_HALFOP, CA_HALFOPME },
-	{ "DEPROTECT",	"",	"",	0          ,	CA_PROTECT, CA_PROTECTME },
-	{ "PROTECT",	"",	"",	0          ,	CA_PROTECT, CA_PROTECTME },
-	{ NULL }
+    { "DEOP",      "deop",     "-o", CI_OPNOTICE, CA_OPDEOP,  CA_OPDEOPME },
+    { "OP",        "op",       "+o", CI_OPNOTICE, CA_OPDEOP,  CA_OPDEOPME },
+    { "DEVOICE",   "devoice",  "-v", 0,           CA_VOICE,   CA_VOICEME  },
+    { "VOICE",     "voice",    "+v", 0,           CA_VOICE,   CA_VOICEME  },
+    { "DEHALFOP",  "dehalfop", "-h", 0,           CA_HALFOP,  CA_HALFOPME },
+    { "HALFOP",    "halfop",   "+h", 0,           CA_HALFOP,  CA_HALFOPME },
+    { "DEPROTECT", "",         "",   0,           CA_PROTECT, CA_PROTECTME },
+    { "PROTECT",   "",         "",   0,           CA_PROTECT, CA_PROTECTME },
+    { NULL }
 };
 
 /* *INDENT-ON* */

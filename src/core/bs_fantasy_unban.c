@@ -61,7 +61,7 @@ int do_fantasy(int argc, char **argv)
     if (argc < 3)
         return MOD_CONT;
 
-    if (stricmp(argv[0], "!unban") == 0) {
+    if (stricmp(argv[0], "unban") == 0) {
         u = finduser(argv[1]);
         ci = cs_findchan(argv[2]);
         if (!u || !ci || !check_access(u, ci, CA_UNBAN))

@@ -65,7 +65,7 @@ int do_fantasy(int argc, char **argv)
     if (argc < 4)
         return MOD_CONT;
 
-    if (stricmp(argv[0], "!seen") == 0) {
+    if (stricmp(argv[0], "seen") == 0) {
         u = finduser(argv[1]);
         ci = cs_findchan(argv[2]);
         if (!u || !ci)

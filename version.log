@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="906"
+VERSION_BUILD="907"
 
 # $Log$
+#
+# BUILD : 1.7.11 (907)
+# BUGS  : 
+# NOTES : Fixed capab parsing on hybrid/plexus/ratbox and a typo in example.conf
 #
 # BUILD : 1.7.11 (906)
 # BUGS  : 

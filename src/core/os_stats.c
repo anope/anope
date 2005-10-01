@@ -71,6 +71,24 @@ void myOperServHelp(User * u)
 }
 
 /**
+ * Count servers connected to server s
+ * @param s The server to start counting from
+ * @return Amount of servers connected to server s
+ **/
+int stats_count_servers(Server *s)
+{
+	int count = 1;
+	
+	while (s) {
+		if (s->links)
+			count += stats_count_servers(s->links);
+		s = s->next;
+	}
+	
+	return count;
+}
+
+/**
  * The /os stats command.
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
@@ -83,6 +101,8 @@ int do_stats(User * u)
         mins = (uptime / 60) % 60, secs = uptime % 60;
     struct tm *tm;
     char timebuf[64];
+	char buf[512];
+	int buflen;
 
     if (extra && stricmp(extra, "ALL") != 0) {
         if (stricmp(extra, "AKILL") == 0) {
@@ -207,81 +227,195 @@ int do_stats(User * u)
                 notice_lang(s_OperServ, u, PERMISSION_DENIED);
             }
             return MOD_CONT;
-        } else {
+        } else if (stricmp(extra, "MEMORY") && stricmp(extra, "UPLINK")) {
             notice_lang(s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra);
         }
     }
-
-    notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
-    tm = localtime(&maxusertime);
-    strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT,
-                  tm);
-    notice_lang(s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
-    if (days > 1) {
-        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_DHMS,
-                    days, hours, mins, secs);
-    } else if (days == 1) {
-        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1DHMS,
-                    days, hours, mins, secs);
-    } else {
-        if (hours > 1) {
-            if (mins != 1) {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HMS,
-                                hours, mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HM1S,
-                                hours, mins, secs);
-                }
-            } else {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1MS,
-                                hours, mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1M1S,
-                                hours, mins, secs);
-                }
-            }
-        } else if (hours == 1) {
-            if (mins != 1) {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HMS,
-                                hours, mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HM1S,
-                                hours, mins, secs);
-                }
-            } else {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1MS,
-                                hours, mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1M1S,
-                                hours, mins, secs);
-                }
-            }
-        } else {
-            if (mins != 1) {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_MS,
-                                mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_M1S,
-                                mins, secs);
-                }
-            } else {
-                if (secs != 1) {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1MS,
-                                mins, secs);
-                } else {
-                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1M1S,
-                                mins, secs);
-                }
-            }
-        }
+	
+	if ((stricmp(extra, "MEMORY") != 0) && (stricmp(extra, "UPLINK") != 0)) {
+	    notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
+    	tm = localtime(&maxusertime);
+	    strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT,
+    	              tm);
+	    notice_lang(s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
+    	if (days > 1) {
+        	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_DHMS,
+            	        days, hours, mins, secs);
+	    } else if (days == 1) {
+    	    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1DHMS,
+        	            days, hours, mins, secs);
+	    } else {
+    	    if (hours > 1) {
+        	    if (mins != 1) {
+            	    if (secs != 1) {
+                	    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HMS,
+                    	            hours, mins, secs);
+	                } else {
+    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HM1S,
+        	                        hours, mins, secs);
+            	    }
+	            } else {
+    	            if (secs != 1) {
+	                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1MS,
+    	                            hours, mins, secs);
+        	        } else {
+            	        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1M1S,
+                	                hours, mins, secs);
+	                }
+    	        }
+        	} else if (hours == 1) {
+            	if (mins != 1) {
+                	if (secs != 1) {
+                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HMS,
+                        	        hours, mins, secs);
+	                } else {
+    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HM1S,
+        	                        hours, mins, secs);
+            	    }
+	            } else {
+    	            if (secs != 1) {
+        	            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1MS,
+            	                    hours, mins, secs);
+                	} else {
+                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1M1S,
+                        	        hours, mins, secs);
+	                }
+    	        }
+        	} else {
+            	if (mins != 1) {
+                	if (secs != 1) {
+                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_MS,
+                        	        mins, secs);
+	                } else {
+    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_M1S,
+        	                        mins, secs);
+            	    }
+	            } else {
+    	            if (secs != 1) {
+        	            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1MS,
+            	                    mins, secs);
+                	} else {
+                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1M1S,
+                        	        mins, secs);
+	                }
+    	        }
+        	}
+		}
     }
-
-    if (extra && stricmp(extra, "ALL") == 0 && is_services_admin(u)) {
+	
+	if (extra && ((stricmp(extra, "ALL") == 0) || (stricmp(extra, "UPLINK") == 0)) && is_services_admin(u)) {
+		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
+		buf[0] = '\0';
+		buflen = 511; /* How confusing, this is the amount of space left! */
+		if (uplink_capab & CAPAB_NOQUIT) {
+			strncat(buf, " NOQUIT", buflen);
+			buflen -= 7;
+		}
+		if (uplink_capab & CAPAB_TSMODE) {
+			strncat(buf, " TSMODE", buflen);
+			buflen -= 7;
+		}
+		if (uplink_capab & CAPAB_UNCONNECT) {
+			strncat(buf, " UNCONNECT", buflen);
+			buflen -= 10;
+		}
+		if (uplink_capab & CAPAB_NICKIP) {
+			strncat(buf, " NICKIP", buflen);
+			buflen -= 7;
+		}
+		if (uplink_capab & CAPAB_NSJOIN) {
+			strncat(buf, " SSJOIN", buflen);
+			buflen -= 7;
+		}
+		if (uplink_capab & CAPAB_ZIP) {
+			strncat(buf, " ZIP", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_BURST) {
+			strncat(buf, " BURST", buflen);
+			buflen -= 6;
+		}
+		if (uplink_capab & CAPAB_TS5) {
+			strncat(buf, " TS5", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_TS3) {
+			strncat(buf, " TS3", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_DKEY) {
+			strncat(buf, " DKEY", buflen);
+			buflen -= 5;
+		}
+		if (uplink_capab & CAPAB_PT4) {
+			strncat(buf, " PT4", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_SCS) {
+			strncat(buf, " SCS", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_QS) {
+			strncat(buf, " QS", buflen);
+			buflen -= 3;
+		}
+		if (uplink_capab & CAPAB_UID) {
+			strncat(buf, " UID", buflen);
+			buflen -= 4;
+		}
+		if (uplink_capab & CAPAB_KNOCK) {
+			strncat(buf, " KNOCK", buflen);
+			buflen -= 6;
+		}
+		if (uplink_capab & CAPAB_CLIENT) {
+			strncat(buf, " CLIENT", buflen);
+			buflen -= 7;
+		}
+		if (uplink_capab & CAPAB_IPV6) {
+			strncat(buf, " IPV6", buflen);
+			buflen -= 5;
+		}
+		if (uplink_capab & CAPAB_SSJ5) {
+			strncat(buf, " SSJ5", buflen);
+			buflen -= 5;
+		}
+		if (uplink_capab & CAPAB_SN2) {
+			strncat(buf, " SN2", buflen);
+			buflen -= 5;
+		}
+		if (uplink_capab & CAPAB_TOKEN) {
+			strncat(buf, " TOKEN", buflen);
+			buflen -= 6;
+		}
+		if (uplink_capab & CAPAB_VHOST) {
+			strncat(buf, " VHOST", buflen);
+			buflen -= 6;
+		}
+		if (uplink_capab & CAPAB_SSJ3) {
+			strncat(buf, " SSJ3", buflen);
+			buflen -= 5;
+		}
+		if (uplink_capab & CAPAB_SJB64) {
+			strncat(buf, " SJB64", buflen);
+			buflen -= 6;
+		}
+		if (uplink_capab & CAPAB_CHANMODE) {
+			strncat(buf, " CHANMODES=", buflen);
+			buflen -= 11;
+			strncat(buf, ircd->chanmodes, buflen);
+			buflen -= strlen(ircd->chanmodes);
+		}
+		if (uplink_capab & CAPAB_NICKCHARS) {
+			strncat(buf, " NICKCHARS=", buflen);
+			buflen -= 11;
+			strncat(buf, ircd->nickchars, buflen);
+			buflen -= strlen(ircd->nickchars);
+		}
+		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf);
+		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(serv_uplink));
+	}
+	
+	if (extra && ((stricmp(extra, "ALL") == 0) || (stricmp(extra, "MEMORY") == 0)) && is_services_admin(u)) {
         long count, mem;
 
         notice_lang(s_OperServ, u, OPER_STATS_BYTES_READ,

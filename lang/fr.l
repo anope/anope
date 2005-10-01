@@ -2530,6 +2530,14 @@ OPER_STATS_RESET
 	Statistiques réinitialisées.
 
 # MODE responses
+OPER_STATS_UPLINK_SERVER
+	Uplink server: %s
+OPER_STATS_UPLINK_CAPAB
+	Uplink capab: %s
+OPER_STATS_UPLINK_SERVER_COUNT
+	Servers found: %d
+
+# MODE responses
 OPER_MODE_SYNTAX
 	MODE channel modes
 

@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
 09/29 A Configuration option to change fantasy command prefix character.  [ #00]
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
 10/01 F UserKeys gave an error without message when missing.              [ #00]

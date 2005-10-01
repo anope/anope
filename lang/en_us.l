@@ -2443,6 +2443,12 @@ OPER_STATS_SZLINE_EXPIRE_NONE
 	Default SZLINE expiry time: No expiration
 OPER_STATS_RESET
 	Statistics reset.
+OPER_STATS_UPLINK_SERVER
+	Uplink server: %s
+OPER_STATS_UPLINK_CAPAB
+	Uplink capab: %s
+OPER_STATS_UPLINK_SERVER_COUNT
+	Servers found: %d
 
 # MODE responses
 OPER_MODE_SYNTAX
@@ -5371,7 +5377,7 @@ OPER_HELP_GLOBAL
 	The message will be sent from the nick %s.
 
 OPER_HELP_STATS
-	Syntax: STATS [AKILL | ALL | RESET]
+	Syntax: STATS [AKILL | ALL | RESET | MEMORY | UPLINK]
 	
 	Without any option, shows the current number of users and
 	IRCops online (excluding Services), the highest number of
@@ -5381,13 +5387,18 @@ OPER_HELP_STATS
 	With the AKILL option, displays the current size of the
 	AKILL list and the current default expiry time.
 	
-	The ALL option is available only to Services admins, and
-	displays information on Services' memory usage.  Using this
-	option can freeze Services for a short period of time on
-	large networks, so don't overuse it!
-	
 	The RESET option currently resets the maximum user count
 	to the number of users currently present on the network.
+	
+	The MEMORY option displays information on the memory
+	usage of Services. Using this option can freeze Services for
+	a short period of time on large networks; don't overuse it!
+	
+	The UPLINK option displays information about the current
+	server Anope uses as an uplink to the network.
+	
+	The ALL displays the user and uptime statistics, and
+	everything you'd see with MEMORY and UPLINK options.
 	
 	UPTIME may be used as a synonym for STATS.
 

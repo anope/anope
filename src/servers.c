@@ -188,7 +188,7 @@ static void delete_server(Server * serv, const char *quitreason)
                 }
                 u = unext;
             }
-            if (debug >= 2)
+            if (debug)
                 alog("debug: delete_server() cleared all users");
         }
     }
@@ -200,7 +200,7 @@ static void delete_server(Server * serv, const char *quitreason)
         s = snext;
     }
 
-    if (debug >= 2)
+    if (debug)
         alog("debug: delete_server() cleared all servers");
 
     free(serv->name);

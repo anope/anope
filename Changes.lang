@@ -1,8 +1,12 @@
 Anope Version  S V N
 --------------------
 *** New Strings:
+	OPER_STATS_UPLINK_SERVER
+	OPER_STATS_UPLINK_CAPAB
+	OPER_STATS_UPLINK_SERVER_COUNT
 
 *** Mod Strings:
+	OPER_HELP_STATS
 
 *** Del Strings:
 

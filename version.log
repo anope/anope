@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="904"
+VERSION_BUILD="905"
 
 # $Log$
+#
+# BUILD : 1.7.11 (905)
+# BUGS  : 
+# NOTES : Fixed up config; UserKeys can be safely missing again, you get a real warning when they are identical, and fixed a small grammar error in the GlobalOnCycle warning just above
 #
 # BUILD : 1.7.11 (904)
 # BUGS  : 

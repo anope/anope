@@ -1355,7 +1355,7 @@ int read_config(int reload)
 
     if (GlobalOnCycle) {
         if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
-            alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined disabling GlobalOnCycle");
+            alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
             GlobalOnCycle = 0;
         }
     }
@@ -1363,11 +1363,8 @@ int read_config(int reload)
     /* Check the user keys */
     if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
         || (UserKey3 == UserKey2)) {
-        alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
-        retval = 0;
-    }
-    if (UserKey1 == 9866235) {
-        alog("You don't want your network secure? You are supposed to set NEW UserKey values!!!");
+        printf
+            ("Every UserKey must be different. It's for YOUR safety! Remember that!\n");
         retval = 0;
     }
 

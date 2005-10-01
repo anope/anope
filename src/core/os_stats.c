@@ -103,6 +103,7 @@ int do_stats(User * u)
     char timebuf[64];
 	char buf[512];
 	int buflen;
+	int i;
 
     if (extra && stricmp(extra, "ALL") != 0) {
         if (stricmp(extra, "AKILL") == 0) {
@@ -304,113 +305,30 @@ int do_stats(User * u)
     }
 	
 	if (extra && ((stricmp(extra, "ALL") == 0) || (stricmp(extra, "UPLINK") == 0)) && is_services_admin(u)) {
-		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
 		buf[0] = '\0';
 		buflen = 511; /* How confusing, this is the amount of space left! */
-		if (uplink_capab & CAPAB_NOQUIT) {
-			strncat(buf, " NOQUIT", buflen);
-			buflen -= 7;
+		for (i = 0; capab_info[i].token; i++) {
+			if (uplink_capab & capab_info[i].flag) {
+				strncat(buf, " ", buflen);
+				buflen--;
+				strncat(buf, capab_info[i].token, buflen);
+				buflen -= strlen(capab_info[i].token);
+				/* Special cases */
+				if (capab_info[i].flag == CAPAB_CHANMODE) {
+					strncat(buf, "=", buflen);
+					buflen--;
+					strncat(buf, ircd->chanmodes, buflen);
+					buflen -= strlen(ircd->chanmodes);
+				}
+				if (capab_info[i].flag == CAPAB_NICKCHARS) {
+					strncat(buf, "=", buflen);
+					buflen--;
+					strncat(buf, ircd->nickchars, buflen);
+					buflen -= strlen(ircd->nickchars);
+				}
+			}
 		}
-		if (uplink_capab & CAPAB_TSMODE) {
-			strncat(buf, " TSMODE", buflen);
-			buflen -= 7;
-		}
-		if (uplink_capab & CAPAB_UNCONNECT) {
-			strncat(buf, " UNCONNECT", buflen);
-			buflen -= 10;
-		}
-		if (uplink_capab & CAPAB_NICKIP) {
-			strncat(buf, " NICKIP", buflen);
-			buflen -= 7;
-		}
-		if (uplink_capab & CAPAB_NSJOIN) {
-			strncat(buf, " SSJOIN", buflen);
-			buflen -= 7;
-		}
-		if (uplink_capab & CAPAB_ZIP) {
-			strncat(buf, " ZIP", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_BURST) {
-			strncat(buf, " BURST", buflen);
-			buflen -= 6;
-		}
-		if (uplink_capab & CAPAB_TS5) {
-			strncat(buf, " TS5", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_TS3) {
-			strncat(buf, " TS3", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_DKEY) {
-			strncat(buf, " DKEY", buflen);
-			buflen -= 5;
-		}
-		if (uplink_capab & CAPAB_PT4) {
-			strncat(buf, " PT4", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_SCS) {
-			strncat(buf, " SCS", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_QS) {
-			strncat(buf, " QS", buflen);
-			buflen -= 3;
-		}
-		if (uplink_capab & CAPAB_UID) {
-			strncat(buf, " UID", buflen);
-			buflen -= 4;
-		}
-		if (uplink_capab & CAPAB_KNOCK) {
-			strncat(buf, " KNOCK", buflen);
-			buflen -= 6;
-		}
-		if (uplink_capab & CAPAB_CLIENT) {
-			strncat(buf, " CLIENT", buflen);
-			buflen -= 7;
-		}
-		if (uplink_capab & CAPAB_IPV6) {
-			strncat(buf, " IPV6", buflen);
-			buflen -= 5;
-		}
-		if (uplink_capab & CAPAB_SSJ5) {
-			strncat(buf, " SSJ5", buflen);
-			buflen -= 5;
-		}
-		if (uplink_capab & CAPAB_SN2) {
-			strncat(buf, " SN2", buflen);
-			buflen -= 5;
-		}
-		if (uplink_capab & CAPAB_TOKEN) {
-			strncat(buf, " TOKEN", buflen);
-			buflen -= 6;
-		}
-		if (uplink_capab & CAPAB_VHOST) {
-			strncat(buf, " VHOST", buflen);
-			buflen -= 6;
-		}
-		if (uplink_capab & CAPAB_SSJ3) {
-			strncat(buf, " SSJ3", buflen);
-			buflen -= 5;
-		}
-		if (uplink_capab & CAPAB_SJB64) {
-			strncat(buf, " SJB64", buflen);
-			buflen -= 6;
-		}
-		if (uplink_capab & CAPAB_CHANMODE) {
-			strncat(buf, " CHANMODES=", buflen);
-			buflen -= 11;
-			strncat(buf, ircd->chanmodes, buflen);
-			buflen -= strlen(ircd->chanmodes);
-		}
-		if (uplink_capab & CAPAB_NICKCHARS) {
-			strncat(buf, " NICKCHARS=", buflen);
-			buflen -= 11;
-			strncat(buf, ircd->nickchars, buflen);
-			buflen -= strlen(ircd->nickchars);
-		}
+		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
 		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf);
 		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(serv_uplink));
 	}

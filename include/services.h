@@ -1282,18 +1282,26 @@ typedef struct ircd_modes_ {
 #define MUT_DEPROTECT   	6
 #define MUT_PROTECT     	7
 
+/*************************************************************************/
+/* CAPAB stuffs */
 
-#define CAPAB_NOQUIT 	0x00000001
-#define CAPAB_TSMODE 	0x00000002
+typedef struct capabinfo_ CapabInfo;
+struct capabinfo_ {
+	char *token;
+	uint32 flag;
+};
+
+#define CAPAB_NOQUIT    0x00000001
+#define CAPAB_TSMODE    0x00000002
 #define CAPAB_UNCONNECT 0x00000004
 #define CAPAB_NICKIP    0x00000008
 #define CAPAB_NSJOIN    0x00000010
-#define CAPAB_ZIP	0x00000020
+#define CAPAB_ZIP       0x00000020
 #define CAPAB_BURST     0x00000040
 #define CAPAB_TS3       0x00000080
 #define CAPAB_TS5       0x00000100
 #define CAPAB_DKEY      0x00000200
-#define CAPAB_DOZIP	0x00000400
+#define CAPAB_DOZIP     0x00000400
 #define CAPAB_DODKEY    0x00000800
 #define CAPAB_QS        0x00001000
 #define CAPAB_SCS       0x00002000

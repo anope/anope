@@ -25,6 +25,36 @@ char *TS6SID;
 /* For first_server / next_server */
 static Server *server_cur;
 
+CapabInfo capab_info[] = {
+    {"NOQUIT", CAPAB_NOQUIT},
+    {"TSMODE", CAPAB_TSMODE},
+    {"UNCONNECT", CAPAB_UNCONNECT},
+    {"NICKIP", CAPAB_NICKIP},
+    {"SSJOIN", CAPAB_NSJOIN},
+    {"ZIP", CAPAB_ZIP},
+    {"BURST", CAPAB_BURST},
+    {"TS5", CAPAB_TS5},
+    {"TS3", CAPAB_TS3},
+    {"DKEY", CAPAB_DKEY},
+    {"PT4", CAPAB_PT4},
+    {"SCS", CAPAB_SCS},
+    {"QS", CAPAB_QS},
+    {"UID", CAPAB_UID},
+    {"KNOCK", CAPAB_KNOCK},
+    {"CLIENT", CAPAB_CLIENT},
+    {"IPV6", CAPAB_IPV6},
+    {"SSJ5", CAPAB_SSJ5},
+    {"SN2", CAPAB_SN2},
+    {"TOK1", CAPAB_TOKEN},
+    {"TOKEN", CAPAB_TOKEN},
+    {"VHOST", CAPAB_VHOST},
+    {"SSJ3", CAPAB_SSJ3},
+    {"SJB64", CAPAB_SJB64},
+    {"CHANMODES", CAPAB_CHANMODE},
+    {"NICKCHARS", CAPAB_NICKCHARS},
+    {NULL, 0}
+};
+
 /*************************************************************************/
 
 /**
@@ -402,6 +432,7 @@ void do_squit(const char *source, int ac, char **av)
 void capab_parse(int ac, char **av)
 {
     int i;
+    int j;
     char *s, *tmp;
 
     char *temp;
@@ -412,105 +443,25 @@ void capab_parse(int ac, char **av)
         s = myStrGetToken(temp, '=', 0);
         tmp = myStrGetTokenRemainder(temp, '=', 1);
 
-        if (!s) {
+        if (!s)
             continue;
-        }
 
-        if (!stricmp(s, "NOQUIT")) {
-            uplink_capab |= CAPAB_NOQUIT;
-        }
-        if (!stricmp(s, "TSMODE")) {
-            uplink_capab |= CAPAB_TSMODE;
-        }
-        if (!stricmp(av[i], "UNCONNECT")) {
-            uplink_capab |= CAPAB_UNCONNECT;
-        }
-        if (!stricmp(s, "NICKIP")) {
-            uplink_capab |= CAPAB_NICKIP;
-            /* Update the struct so that we know we can get NICKIP */
-            if (!ircd->nickip) {
+        for (j = 0; capab_info[j].token; j++) {
+            if (stricmp(s, capab_info[j].token) == 0)
+                uplink_capab |= capab_info[j].flag;
+            /* Special cases */
+            if ((stricmp(s, "NICKIP") == 0) && !ircd->nickip)
                 ircd->nickip = 1;
-            }
-        }
-        if (!stricmp(s, "SSJOIN")) {
-            uplink_capab |= CAPAB_NSJOIN;
-        }
-        if (!stricmp(s, "ZIP")) {
-            uplink_capab |= CAPAB_ZIP;
-        }
-        if (!stricmp(s, "BURST")) {
-            uplink_capab |= CAPAB_BURST;
-        }
-        if (!stricmp(s, "TS5")) {
-            uplink_capab |= CAPAB_TS5;
-        }
-        if (!stricmp(s, "TS3")) {
-            uplink_capab |= CAPAB_TS3;
-        }
-        if (!stricmp(s, "DKEY")) {
-            uplink_capab |= CAPAB_DKEY;
-        }
-        if (!stricmp(s, "PT4")) {
-            uplink_capab |= CAPAB_PT4;
-        }
-        if (!stricmp(s, "SCS")) {
-            uplink_capab |= CAPAB_SCS;
-        }
-        if (!stricmp(s, "QS")) {
-            uplink_capab |= CAPAB_QS;
-        }
-        if (!stricmp(s, "UID")) {
-            uplink_capab |= CAPAB_UID;
-        }
-        if (!stricmp(s, "KNOCK")) {
-            uplink_capab |= CAPAB_KNOCK;
-        }
-        if (!stricmp(s, "CLIENT")) {
-            uplink_capab |= CAPAB_CLIENT;
-        }
-        if (!stricmp(s, "IPV6")) {
-            uplink_capab |= CAPAB_IPV6;
-        }
-        if (!stricmp(s, "SSJ5")) {
-            uplink_capab |= CAPAB_SSJ5;
-        }
-        if (!stricmp(s, "SN2")) {
-            uplink_capab |= CAPAB_SN2;
-        }
-        if (!stricmp(s, "TOK1")) {
-            uplink_capab |= CAPAB_TOKEN;
-        }
-        if (!stricmp(s, "TOKEN")) {
-            uplink_capab |= CAPAB_TOKEN;
-        }
-        if (!stricmp(s, "VHOST")) {
-            uplink_capab |= CAPAB_VHOST;
-        }
-        if (!stricmp(s, "SSJ3")) {
-            uplink_capab |= CAPAB_SSJ3;
-        }
-        if (!stricmp(s, "SJB64")) {
-            uplink_capab |= CAPAB_SJB64;
-        }
-        if (!stricmp(s, "CHANMODES")) {
-            uplink_capab |= CAPAB_CHANMODE;
-            if (tmp) {
+            if ((stricmp(s, "CHANMODES") == 0) && tmp)
                 ircd->chanmodes = sstrdup(tmp);
-            }
-        }
-        if (!stricmp(s, "NICKCHARS")) {
-            uplink_capab |= CAPAB_NICKCHARS;
-            if (tmp) {
+            if ((stricmp(s, "NICKCHARS") == 0) && tmp)
                 ircd->nickchars = sstrdup(tmp);
-            }
-        }
-        if (s) {
-            free(s);
-        }
-        if (tmp) {
-            free(tmp);
         }
 
+        if (s)
+            free(s);
+        if (tmp)
+            free(tmp);
     }
 }
 

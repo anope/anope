@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="908"
+VERSION_BUILD="909"
 
 # $Log$
+#
+# BUILD : 1.7.11 (909)
+# BUGS  : 
+# NOTES : Fixed /cs hop being available on ircds without halfop support
 #
 # BUILD : 1.7.11 (908)
 # BUGS  : 

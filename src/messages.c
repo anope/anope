@@ -263,7 +263,7 @@ int m_stats(char *source, int ac, char **av)
             }
         }
 
-        anope_cmd_219(source, NULL);
+        anope_cmd_219(source, av[0]);
         break;
     case 'o':
     case 'O':
@@ -296,7 +296,7 @@ int m_stats(char *source, int ac, char **av)
                           uptime % 60);
             anope_cmd_250("%s :Current users: %d (%d ops); maximum %d",
                           source, usercnt, opcnt, maxusercnt);
-            anope_cmd_219(source, NULL);
+            anope_cmd_219(source, av[0]);
             break;
         }                       /* case 'u' */
 

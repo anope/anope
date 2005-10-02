@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="909"
+VERSION_BUILD="910"
 
 # $Log$
+#
+# BUILD : 1.7.11 (910)
+# BUGS  : 
+# NOTES : Fixed some stats not passing the correct letter to anope_cmd_219
 #
 # BUILD : 1.7.11 (909)
 # BUGS  : 

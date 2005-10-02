@@ -233,7 +233,7 @@ int do_stats(User * u)
         }
     }
 	
-	if ((stricmp(extra, "MEMORY") != 0) && (stricmp(extra, "UPLINK") != 0)) {
+	if (!extra || ((stricmp(extra, "MEMORY") != 0) && (stricmp(extra, "UPLINK") != 0))) {
 	    notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
     	tm = localtime(&maxusertime);
 	    strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT,

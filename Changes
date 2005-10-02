@@ -4,6 +4,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
 09/29 A Configuration option to change fantasy command prefix character.  [ #00]
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
+10/02 F Added check in OperServ stats to avoid segfault without param.    [ #00]
 10/02 F Numeric 219 didn't give correct letter for STATS u.               [ #00]
 10/02 F ChanServ HOP was available on IRCDs without halfop support.       [ #00]
 10/01 F Placed capab tokens and flags into a table for easier handling.   [ #00]

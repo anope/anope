@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="11"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="911"
+VERSION_BUILD="912"
 
 # $Log$
+#
+# BUILD : 1.7.11 (912)
+# BUGS  : 
+# NOTES : Turned identical userkeys error into a warning and added hs_request to src/modules/makefile.inc.win32
 #
 # BUILD : 1.7.11 (911)
 # BUGS  : 

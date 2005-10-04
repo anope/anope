@@ -1362,11 +1362,8 @@ int read_config(int reload)
 
     /* Check the user keys */
     if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
-        || (UserKey3 == UserKey2)) {
-        printf
-            ("Every UserKey must be different. It's for YOUR safety! Remember that!\n");
-        retval = 0;
-    }
+        || (UserKey3 == UserKey2))
+        alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
 
     /**
      * Check all DEFCON dependiencies...

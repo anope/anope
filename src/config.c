@@ -950,7 +950,6 @@ int read_config(int reload)
         CHECK(RemoteServer);
         CHECK(ServerName);
         CHECK(ServerDesc);
-        CHECK(NickLen);
 
         if (RemoteServer3)
             CHECK(RemoteServer2);
@@ -967,8 +966,15 @@ int read_config(int reload)
             }
         }
 
-        if (NickLen >= NICKMAX)
+        if (NickLen == 0) {
+            alog("You have not defined the NickLen configuration directive. It is strongly");
+            alog("advised that you do configure this correctly in your services.conf");
             NickLen = NICKMAX - 1;
+        } else if ((NickLen < 1) || (NickLen >= NICKMAX)) {
+            alog("NickLen has an invalid value; setting to %d",
+                 (NICKMAX - 1));
+            NickLen = NICKMAX - 1;
+        }
     }
 
     CHECK(IRCDModule);
@@ -1319,7 +1325,6 @@ int read_config(int reload)
         CHECK(BSBadWordsMax);
         CHECK(BSMinUsers);
         CHECK(BSKeepData);
-        CHECK(BSFantasyCharacter);
         if (s_BotServAlias) {
             if (!stricmp(s_BotServ, s_BotServAlias)) {
                 printf
@@ -1327,6 +1332,8 @@ int read_config(int reload)
                 retval = 0;
             }
         }
+        if (!BSFantasyCharacter)
+            BSFantasyCharacter = "!";
         if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
             printf
                 ("*** BSFantasyCharacter is more than 1 character long. Only the first\n"

@@ -35,7 +35,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("STATS", do_stats, is_services_oper, OPER_HELP_STATS,
@@ -75,17 +76,17 @@ void myOperServHelp(User * u)
  * @param s The server to start counting from
  * @return Amount of servers connected to server s
  **/
-int stats_count_servers(Server *s)
+int stats_count_servers(Server * s)
 {
-	int count = 1;
-	
-	while (s) {
-		if (s->links)
-			count += stats_count_servers(s->links);
-		s = s->next;
-	}
-	
-	return count;
+    int count = 1;
+
+    while (s) {
+        if (s->links)
+            count += stats_count_servers(s->links);
+        s = s->next;
+    }
+
+    return count;
 }
 
 /**
@@ -101,9 +102,9 @@ int do_stats(User * u)
         mins = (uptime / 60) % 60, secs = uptime % 60;
     struct tm *tm;
     char timebuf[64];
-	char buf[512];
-	int buflen;
-	int i;
+    char buf[512];
+    int buflen;
+    int i;
 
     if (extra && stricmp(extra, "ALL") != 0) {
         if (stricmp(extra, "AKILL") == 0) {
@@ -232,108 +233,119 @@ int do_stats(User * u)
             notice_lang(s_OperServ, u, OPER_STATS_UNKNOWN_OPTION, extra);
         }
     }
-	
-	if (!extra || ((stricmp(extra, "MEMORY") != 0) && (stricmp(extra, "UPLINK") != 0))) {
-	    notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt, opcnt);
-    	tm = localtime(&maxusertime);
-	    strftime_lang(timebuf, sizeof(timebuf), u, STRFTIME_DATE_TIME_FORMAT,
-    	              tm);
-	    notice_lang(s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt, timebuf);
-    	if (days > 1) {
-        	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_DHMS,
-            	        days, hours, mins, secs);
-	    } else if (days == 1) {
-    	    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1DHMS,
-        	            days, hours, mins, secs);
-	    } else {
-    	    if (hours > 1) {
-        	    if (mins != 1) {
-            	    if (secs != 1) {
-                	    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HMS,
-                    	            hours, mins, secs);
-	                } else {
-    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HM1S,
-        	                        hours, mins, secs);
-            	    }
-	            } else {
-    	            if (secs != 1) {
-	                    notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1MS,
-    	                            hours, mins, secs);
-        	        } else {
-            	        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1M1S,
-                	                hours, mins, secs);
-	                }
-    	        }
-        	} else if (hours == 1) {
-            	if (mins != 1) {
-                	if (secs != 1) {
-                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HMS,
-                        	        hours, mins, secs);
-	                } else {
-    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HM1S,
-        	                        hours, mins, secs);
-            	    }
-	            } else {
-    	            if (secs != 1) {
-        	            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1MS,
-            	                    hours, mins, secs);
-                	} else {
-                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1M1S,
-                        	        hours, mins, secs);
-	                }
-    	        }
-        	} else {
-            	if (mins != 1) {
-                	if (secs != 1) {
-                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_MS,
-                        	        mins, secs);
-	                } else {
-    	                notice_lang(s_OperServ, u, OPER_STATS_UPTIME_M1S,
-        	                        mins, secs);
-            	    }
-	            } else {
-    	            if (secs != 1) {
-        	            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1MS,
-            	                    mins, secs);
-                	} else {
-                    	notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1M1S,
-                        	        mins, secs);
-	                }
-    	        }
-        	}
-		}
+
+    if (!extra
+        || ((stricmp(extra, "MEMORY") != 0)
+            && (stricmp(extra, "UPLINK") != 0))) {
+        notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt,
+                    opcnt);
+        tm = localtime(&maxusertime);
+        strftime_lang(timebuf, sizeof(timebuf), u,
+                      STRFTIME_DATE_TIME_FORMAT, tm);
+        notice_lang(s_OperServ, u, OPER_STATS_MAX_USERS, maxusercnt,
+                    timebuf);
+        if (days > 1) {
+            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_DHMS,
+                        days, hours, mins, secs);
+        } else if (days == 1) {
+            notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1DHMS,
+                        days, hours, mins, secs);
+        } else {
+            if (hours > 1) {
+                if (mins != 1) {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HMS,
+                                    hours, mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_HM1S,
+                                    hours, mins, secs);
+                    }
+                } else {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1MS,
+                                    hours, mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_H1M1S,
+                                    hours, mins, secs);
+                    }
+                }
+            } else if (hours == 1) {
+                if (mins != 1) {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HMS,
+                                    hours, mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1HM1S,
+                                    hours, mins, secs);
+                    }
+                } else {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1H1MS,
+                                    hours, mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u,
+                                    OPER_STATS_UPTIME_1H1M1S, hours, mins,
+                                    secs);
+                    }
+                }
+            } else {
+                if (mins != 1) {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_MS,
+                                    mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_M1S,
+                                    mins, secs);
+                    }
+                } else {
+                    if (secs != 1) {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1MS,
+                                    mins, secs);
+                    } else {
+                        notice_lang(s_OperServ, u, OPER_STATS_UPTIME_1M1S,
+                                    mins, secs);
+                    }
+                }
+            }
+        }
     }
-	
-	if (extra && ((stricmp(extra, "ALL") == 0) || (stricmp(extra, "UPLINK") == 0)) && is_services_admin(u)) {
-		buf[0] = '\0';
-		buflen = 511; /* How confusing, this is the amount of space left! */
-		for (i = 0; capab_info[i].token; i++) {
-			if (uplink_capab & capab_info[i].flag) {
-				strncat(buf, " ", buflen);
-				buflen--;
-				strncat(buf, capab_info[i].token, buflen);
-				buflen -= strlen(capab_info[i].token);
-				/* Special cases */
-				if (capab_info[i].flag == CAPAB_CHANMODE) {
-					strncat(buf, "=", buflen);
-					buflen--;
-					strncat(buf, ircd->chanmodes, buflen);
-					buflen -= strlen(ircd->chanmodes);
-				}
-				if (capab_info[i].flag == CAPAB_NICKCHARS) {
-					strncat(buf, "=", buflen);
-					buflen--;
-					strncat(buf, ircd->nickchars, buflen);
-					buflen -= strlen(ircd->nickchars);
-				}
-			}
-		}
-		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER, serv_uplink->name);
-		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf);
-		notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT, stats_count_servers(serv_uplink));
-	}
-	
-	if (extra && ((stricmp(extra, "ALL") == 0) || (stricmp(extra, "MEMORY") == 0)) && is_services_admin(u)) {
+
+    if (extra
+        && ((stricmp(extra, "ALL") == 0)
+            || (stricmp(extra, "UPLINK") == 0)) && is_services_admin(u)) {
+        buf[0] = '\0';
+        buflen = 511;           /* How confusing, this is the amount of space left! */
+        for (i = 0; capab_info[i].token; i++) {
+            if (uplink_capab & capab_info[i].flag) {
+                strncat(buf, " ", buflen);
+                buflen--;
+                strncat(buf, capab_info[i].token, buflen);
+                buflen -= strlen(capab_info[i].token);
+                /* Special cases */
+                if (capab_info[i].flag == CAPAB_CHANMODE) {
+                    strncat(buf, "=", buflen);
+                    buflen--;
+                    strncat(buf, ircd->chanmodes, buflen);
+                    buflen -= strlen(ircd->chanmodes);
+                }
+                if (capab_info[i].flag == CAPAB_NICKCHARS) {
+                    strncat(buf, "=", buflen);
+                    buflen--;
+                    strncat(buf, ircd->nickchars, buflen);
+                    buflen -= strlen(ircd->nickchars);
+                }
+            }
+        }
+        notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER,
+                    serv_uplink->name);
+        notice_lang(s_OperServ, u, OPER_STATS_UPLINK_CAPAB, buf);
+        notice_lang(s_OperServ, u, OPER_STATS_UPLINK_SERVER_COUNT,
+                    stats_count_servers(serv_uplink));
+    }
+
+    if (extra
+        && ((stricmp(extra, "ALL") == 0)
+            || (stricmp(extra, "MEMORY") == 0)) && is_services_admin(u)) {
         long count, mem;
 
         notice_lang(s_OperServ, u, OPER_STATS_BYTES_READ,

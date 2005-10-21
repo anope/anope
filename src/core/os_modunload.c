@@ -35,7 +35,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1,
@@ -82,8 +83,8 @@ int do_modunload(User * u)
                      OPER_MODULE_UNLOAD_SYNTAX);
         return MOD_CONT;
     }
-	if (!queueModuleUnload(name, u))
+    if (!queueModuleUnload(name, u))
         notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
-	
+
     return MOD_CONT;
 }

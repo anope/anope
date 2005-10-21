@@ -47,41 +47,41 @@ int AnopeInit(int argc, char **argv)
     c = createCommand("SASET", do_saset, is_services_admin, -1, -1, -1,
                       NICK_HELP_SASET, NICK_HELP_SASET);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET DISPLAY", NULL, is_services_admin, NICK_HELP_SASET_DISPLAY, -1,
-                      -1, -1, -1);
+    c = createCommand("SASET DISPLAY", NULL, is_services_admin,
+                      NICK_HELP_SASET_DISPLAY, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET PASSWORD", NULL, is_services_admin, NICK_HELP_SASET_PASSWORD,
-                      -1, -1, -1, -1);
+    c = createCommand("SASET PASSWORD", NULL, is_services_admin,
+                      NICK_HELP_SASET_PASSWORD, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET URL", NULL, is_services_admin, NICK_HELP_SASET_URL, -1, -1, -1,
-                      -1);
+    c = createCommand("SASET URL", NULL, is_services_admin,
+                      NICK_HELP_SASET_URL, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET EMAIL", NULL, is_services_admin, NICK_HELP_SASET_EMAIL, -1, -1,
-                      -1, -1);
+    c = createCommand("SASET EMAIL", NULL, is_services_admin,
+                      NICK_HELP_SASET_EMAIL, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET ICQ", NULL, is_services_admin, NICK_HELP_SASET_ICQ, -1, -1, -1,
-                      -1);
+    c = createCommand("SASET ICQ", NULL, is_services_admin,
+                      NICK_HELP_SASET_ICQ, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET GREET", NULL, is_services_admin, NICK_HELP_SASET_GREET, -1, -1,
-                      -1, -1);
+    c = createCommand("SASET GREET", NULL, is_services_admin,
+                      NICK_HELP_SASET_GREET, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET KILL", NULL, is_services_admin, NICK_HELP_SASET_KILL, -1, -1,
-                      -1, -1);
+    c = createCommand("SASET KILL", NULL, is_services_admin,
+                      NICK_HELP_SASET_KILL, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET SECURE", NULL, is_services_admin, NICK_HELP_SASET_SECURE, -1,
-                      -1, -1, -1);
+    c = createCommand("SASET SECURE", NULL, is_services_admin,
+                      NICK_HELP_SASET_SECURE, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET PRIVATE", NULL, is_services_admin, NICK_HELP_SASET_PRIVATE, -1,
-                      -1, -1, -1);
+    c = createCommand("SASET PRIVATE", NULL, is_services_admin,
+                      NICK_HELP_SASET_PRIVATE, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET MSG", NULL, is_services_admin, NICK_HELP_SASET_MSG, -1, -1, -1,
-                      -1);
+    c = createCommand("SASET MSG", NULL, is_services_admin,
+                      NICK_HELP_SASET_MSG, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET HIDE", NULL, is_services_admin, NICK_HELP_SASET_HIDE, -1, -1,
-                      -1, -1);
+    c = createCommand("SASET HIDE", NULL, is_services_admin,
+                      NICK_HELP_SASET_HIDE, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET NOEXPIRE", is_services_admin, NULL, -1, -1, -1,
-                      NICK_HELP_SASET_NOEXPIRE,
+    c = createCommand("SASET NOEXPIRE", is_services_admin, NULL, -1, -1,
+                      -1, NICK_HELP_SASET_NOEXPIRE,
                       NICK_HELP_SASET_NOEXPIRE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
@@ -106,8 +106,8 @@ void AnopeFini(void)
  **/
 void myNickServHelp(User * u)
 {
-	if (is_services_admin(u))
-	    notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
+    if (is_services_admin(u))
+        notice_lang(s_NickServ, u, NICK_HELP_CMD_SASET);
 }
 
 /**
@@ -117,7 +117,7 @@ void myNickServHelp(User * u)
  **/
 int do_saset(User * u)
 {
-	char *nick = strtok(NULL, " ");
+    char *nick = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
 
@@ -127,12 +127,12 @@ int do_saset(User * u)
         notice_lang(s_NickServ, u, NICK_SASET_DISABLED);
         return MOD_CONT;
     }
-	
-	if (!(na = findnick(nick))) {
+
+    if (!(na = findnick(nick))) {
         notice_lang(s_NickServ, u, NICK_SASET_BAD_NICK, nick);
-		return MOD_CONT;
-	}
-	
+        return MOD_CONT;
+    }
+
     if (!param
         && (!cmd
             || (stricmp(cmd, "URL") != 0 && stricmp(cmd, "EMAIL") != 0
@@ -190,7 +190,8 @@ int do_saset_display(User * u, NickCore * nc, char *param)
     }
 
     if (i == nc->aliases.count) {
-        notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_INVALID, nc->display);
+        notice_lang(s_NickServ, u, NICK_SASET_DISPLAY_INVALID,
+                    nc->display);
         return MOD_CONT;
     }
 
@@ -228,7 +229,8 @@ int do_saset_password(User * u, NickCore * nc, char *param)
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,
              nc->display);
-        notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_FAILED, nc->display);
+        notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_FAILED,
+                    nc->display);
         return MOD_CONT;
     }
 
@@ -236,14 +238,17 @@ int do_saset_password(User * u, NickCore * nc, char *param)
     notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
 #else
     nc->pass = sstrdup(param);
-    notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display, nc->pass);
+    notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display,
+                nc->pass);
 #endif
 
-    alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
+    alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", s_NickServ,
+         u->nick, u->username, u->host, nc->display,
+         (nc->email ? nc->email : "none"));
     if (WallSetpass)
         anope_cmd_global(s_NickServ,
-                             "\2%s\2 used SASET PASSWORD on \2%s\2",
-                             u->nick, nc->display);
+                         "\2%s\2 used SASET PASSWORD on \2%s\2",
+                         u->nick, nc->display);
     return MOD_CONT;
 }
 
@@ -254,7 +259,8 @@ int do_saset_url(User * u, NickCore * nc, char *param)
 
     if (param) {
         nc->url = sstrdup(param);
-        notice_lang(s_NickServ, u, NICK_SASET_URL_CHANGED, nc->display, param);
+        notice_lang(s_NickServ, u, NICK_SASET_URL_CHANGED, nc->display,
+                    param);
     } else {
         nc->url = NULL;
         notice_lang(s_NickServ, u, NICK_SASET_URL_UNSET, nc->display);
@@ -277,14 +283,17 @@ int do_saset_email(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
-    alog("%s: %s!%s@%s used SASET EMAIL on %s (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, nc->display, (nc->email ? nc->email : "none"));
+    alog("%s: %s!%s@%s used SASET EMAIL on %s (e-mail: %s)", s_NickServ,
+         u->nick, u->username, u->host, nc->display,
+         (nc->email ? nc->email : "none"));
 
     if (nc->email)
         free(nc->email);
 
     if (param) {
         nc->email = sstrdup(param);
-        notice_lang(s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display, param);
+        notice_lang(s_NickServ, u, NICK_SASET_EMAIL_CHANGED, nc->display,
+                    param);
     } else {
         nc->email = NULL;
         notice_lang(s_NickServ, u, NICK_SASET_EMAIL_UNSET, nc->display);
@@ -300,7 +309,8 @@ int do_saset_icq(User * u, NickCore * nc, char *param)
             notice_lang(s_NickServ, u, NICK_SASET_ICQ_INVALID, param);
         } else {
             nc->icq = tmp;
-            notice_lang(s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display, param);
+            notice_lang(s_NickServ, u, NICK_SASET_ICQ_CHANGED, nc->display,
+                        param);
         }
     } else {
         nc->icq = 0;
@@ -322,7 +332,8 @@ int do_saset_greet(User * u, NickCore * nc, char *param)
                  (end ? end : ""));
 
         nc->greet = sstrdup(buf);
-        notice_lang(s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display, buf);
+        notice_lang(s_NickServ, u, NICK_SASET_GREET_CHANGED, nc->display,
+                    buf);
     } else {
         nc->greet = NULL;
         notice_lang(s_NickServ, u, NICK_SASET_GREET_UNSET, nc->display);
@@ -368,7 +379,8 @@ int do_saset_secure(User * u, NickCore * nc, char *param)
         nc->flags &= ~NI_SECURE;
         notice_lang(s_NickServ, u, NICK_SASET_SECURE_OFF, nc->display);
     } else {
-        syntax_error(s_NickServ, u, "SASET SECURE", NICK_SASET_SECURE_SYNTAX);
+        syntax_error(s_NickServ, u, "SASET SECURE",
+                     NICK_SASET_SECURE_SYNTAX);
     }
     return MOD_CONT;
 }

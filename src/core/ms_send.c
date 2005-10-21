@@ -29,7 +29,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
     c = createCommand("SEND", do_send, NULL, MEMO_HELP_SEND, -1, -1, -1,
                       -1);

@@ -113,13 +113,13 @@ int do_set(User * u)
 {
     char *cmd = strtok(NULL, " ");
     char *param = strtok(NULL, " ");
-	NickAlias *na = u->na;
-	
+    NickAlias *na = u->na;
+
     if (readonly) {
         notice_lang(s_NickServ, u, NICK_SET_DISABLED);
         return MOD_CONT;
     }
-	
+
     if (!param
         && (!cmd
             || (stricmp(cmd, "URL") != 0 && stricmp(cmd, "EMAIL") != 0
@@ -197,8 +197,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
 
-    if (stricmp(nc->display, param) == 0
-               || (StrictPasswords && len < 5)) {
+    if (stricmp(nc->display, param) == 0 || (StrictPasswords && len < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
         return MOD_CONT;
     }
@@ -225,8 +224,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
 #endif
 
     alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
-             u->nick, u->username, u->host,
-             (nc->email ? nc->email : "none"));
+         u->nick, u->username, u->host, (nc->email ? nc->email : "none"));
 
     return MOD_CONT;
 }
@@ -277,8 +275,8 @@ int do_set_email(User * u, NickCore * nc, char *param)
     }
 
     alog("%s: %s!%s@%s (e-mail: %s) changed its e-mail to %s.",
-             s_NickServ, u->nick, u->username, u->host,
-             (nc->email ? nc->email : "none"), (param ? param : "none"));
+         s_NickServ, u->nick, u->username, u->host,
+         (nc->email ? nc->email : "none"), (param ? param : "none"));
 
     if (nc->email)
         free(nc->email);

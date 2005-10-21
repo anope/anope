@@ -35,7 +35,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
     c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL,
                       -1, -1, -1, -1);
@@ -183,7 +184,7 @@ int do_akill(User * u)
                 notice_lang(s_OperServ, u, READ_ONLY_MODE);
             }
             if (AddAkiller) {
-               free(reason);
+                free(reason);
             }
         } else {
             syntax_error(s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);

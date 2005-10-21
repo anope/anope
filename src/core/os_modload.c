@@ -36,7 +36,8 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("MODLOAD", do_modload, is_services_root, -1, -1, -1,
@@ -82,8 +83,8 @@ int do_modload(User * u)
         syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
         return MOD_CONT;
     }
-	if (!queueModuleLoad(name, u))
+    if (!queueModuleLoad(name, u))
         notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
-	
+
     return MOD_CONT;
 }

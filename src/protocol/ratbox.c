@@ -1360,8 +1360,7 @@ void ratbox_cmd_nick(char *nick, char *name, char *mode)
                  (long int) time(NULL), mode, ServiceUser, ServiceHost,
                  ServerName, name);
     }
-    send_cmd(UseTS6 ? nicknumbuf : nick, "RESV * %s :%s", nick,
-             "Reserved for services");
+    send_cmd(UseTS6 ? nicknumbuf : nick, "RESV * %s :%s", nick, "Reserved for services");
 }
 
 void ratbox_cmd_kick(char *source, char *chan, char *user, char *buf)

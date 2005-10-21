@@ -1204,34 +1204,34 @@ void hybrid_cmd_351(char *source)
 /* Event: PROTOCTL */
 int anope_event_capab(char *source, int ac, char **av)
 {
-    int argvsize = 8;
-    int argc;
-    char **argv;
-    char *str;
-
-    if (ac < 1)
-        return MOD_CONT;
-
-    /* We get the params as one arg, we should split it for capab_parse */
-    argv = scalloc(argvsize, sizeof(char *));
-    argc = 0;
-    while ((str = myStrGetToken(av[0], ' ', argc))) {
-        if (argc == argvsize) {
-            argvsize += 8;
-            argv = srealloc(argv, argvsize * sizeof(char *));
-        }
-        argv[argc] = str;
-        argc++;
-    }
-
+	int argvsize = 8;
+	int argc;
+	char **argv;
+	char *str;
+	
+	if (ac < 1)
+		return MOD_CONT;
+	
+	/* We get the params as one arg, we should split it for capab_parse */
+	argv = scalloc(argvsize, sizeof(char *));
+	argc = 0;
+	while ((str = myStrGetToken(av[0], ' ', argc))) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			argv = srealloc(argv, argvsize * sizeof(char *));
+		}
+		argv[argc] = str;
+		argc++;
+	}
+	
     capab_parse(argc, argv);
-
-    /* Free our built ac/av */
-    for (argvsize = 0; argvsize < argc; argvsize++) {
-        free(argv[argvsize]);
-    }
-    free(argv);
-
+	
+	/* Free our built ac/av */
+	for (argvsize = 0; argvsize < argc; argvsize++) {
+		free(argv[argvsize]);
+	}
+	free(argv);
+	
     return MOD_CONT;
 }
 

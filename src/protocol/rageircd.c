@@ -1,5 +1,4 @@
 /* Rage IRCD functions
-/* Rage IRCD functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -562,6 +561,7 @@ void moduleAddIRCDMsgs(void) {
 }
 
 /* *INDENT-ON* */
+int anope_event_error(char *source, int ac, char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -628,7 +628,7 @@ void rageircd_cmd_svsadmin(char *server, int set)
 
 void rageircd_cmd_sgline(char *mask, char *reason)
 {
-    send_cmd(NULL, "SGLINE %d :%s:%s", (int) strlen(mask), mask, reason);
+    send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 
 }
 

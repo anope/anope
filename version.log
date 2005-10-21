@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="12"
 VERSION_EXTRA="-rc1"
-VERSION_BUILD="914"
+VERSION_BUILD="915"
 
 # $Log$
+#
+# BUILD : 1.7.12 (915)
+# BUGS  : 
+# NOTES : Fixed indenting errors in last commit (1.7.12-rc1)
 #
 # BUILD : 1.7.12 (914)
 # BUGS  : 

@@ -703,7 +703,7 @@ void ultimate3_cmd_svsadmin(char *server, int set)
 
 void ultimate3_cmd_sgline(char *mask, char *reason)
 {
-    send_cmd(NULL, "SGLINE %d :%s:%s", (int) strlen(mask), mask, reason);
+    send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
 void ultimate3_cmd_remove_akill(char *user, char *host)

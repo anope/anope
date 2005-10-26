@@ -72,7 +72,9 @@ void modules_init(void)
 {
 #ifdef USE_MODULES
     int idx;
+	int ret;
     Module *m;
+	
     for (idx = 0; idx < ModulesNumber; idx++) {
         m = findModule(ModulesAutoload[idx]);
         if (!m) {
@@ -80,7 +82,10 @@ void modules_init(void)
             mod_current_module = m;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
-            alog("status: [%d]", loadModule(mod_current_module, NULL));
+			ret = loadModule(mod_current_module, NULL);
+            alog("status: [%d]", ret);
+			if (ret != MOD_ERR_OK)
+				destroyModule(m);
             mod_current_module = NULL;
             mod_current_user = NULL;
         }
@@ -109,6 +114,8 @@ void modules_core_init(int number, char **list)
                 alog("debug: trying to load core module [%s]",
                      mod_current_module->name);
                 alog("debug: status: [%d]", status);
+				if (status != MOD_ERR_OK)
+					destroyModule(mod_current_module);
             }
             mod_current_module = NULL;
             mod_current_user = NULL;
@@ -133,26 +140,30 @@ int protocol_module_init(void)
     alog("status: [%d]", ret);
     mod_current_module = NULL;
 	
-	/* This is really NOT the correct place to do config checks, but
-	 * as we only have the ircd struct filled here, we have to over
-	 * here. -GD
-	 */
-    if (UseTokens && !(ircd->token)) {
-        alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
-        UseTokens = 0;
-    }
-	
-	if (UseTS6 && !(ircd->ts6)) {
-		alog("Chosen IRCd does not support TS6, unsetting UseTS6");
-		UseTS6 = 0;
+	if (ret == MOD_ERR_OK) {
+		/* This is really NOT the correct place to do config checks, but
+		 * as we only have the ircd struct filled here, we have to over
+		 * here. -GD
+		 */
+	    if (UseTokens && !(ircd->token)) {
+    	    alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
+        	UseTokens = 0;
+	    }
+		
+		if (UseTS6 && !(ircd->ts6)) {
+			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
+			UseTS6 = 0;
+		}
+		
+		/* We can assume the ircd supports TS6 here */
+    	if (UseTS6 && !Numeric) {
+        	alog("UseTS6 requires the setting of Numeric to be enabled.");
+	        ret = -1;
+    	}
+	} else {
+		destroyModule(m);
 	}
 	
-	/* We can assume the ircd supports TS6 here */
-    if (UseTS6 && !Numeric) {
-        alog("UseTS6 requires the setting of Numeric to be enabled.");
-        ret = -1;
-    }
-
     return ret;
 }
 
@@ -165,7 +176,9 @@ void modules_delayed_init(void)
 {
 #ifdef USE_MODULES
     int idx;
+	int ret;
     Module *m;
+	
     for (idx = 0; idx < ModulesDelayedNumber; idx++) {
         m = findModule(ModulesDelayedAutoload[idx]);
         if (!m) {
@@ -173,9 +186,12 @@ void modules_delayed_init(void)
             mod_current_module = m;
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
-            alog("status: [%d]", loadModule(mod_current_module, NULL));
+			ret = loadModule(mod_current_module, NULL);
+            alog("status: [%d]", ret);
             mod_current_module = NULL;
             mod_current_user = NULL;
+			if (ret != MOD_ERR_OK)
+				destroyModule(m);
         }
     }
 #endif
@@ -2660,6 +2676,8 @@ void handleModuleOperationQueue(void)
 			alog("Trying to load module [%s]", mod_operation_queue->m->name);
 			status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
 			alog("Module loading status: %d", status);
+			if (status != MOD_ERR_OK)
+				destroyModule(mod_operation_queue->m);
 		} else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
 			alog("Trying to unload module [%s]", mod_operation_queue->m->name);
 			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);

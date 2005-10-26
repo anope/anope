@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="12"
 VERSION_EXTRA="-rc1"
-VERSION_BUILD="915"
+VERSION_BUILD="917"
 
 # $Log$
+#
+# BUILD : 1.7.12 (917)
+# BUGS  : 
+# NOTES : Fixed module loading code to get rid of a few memory leaks and to (hopefully) correctly remove runtime copies when loading fails
 #
 # BUILD : 1.7.12 (915)
 # BUGS  : 

@@ -37,7 +37,7 @@ int AnopeInit(int argc, char **argv)
      * we can look at moving it here later
      **/
     c = createCommand("RANDOMNEWS", do_randomnews, is_services_oper,
-                      NEWS_HELP_OPER, -1, -1, -1, -1);
+                      NEWS_HELP_RANDOM, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     moduleSetOperHelp(myOperServHelp);

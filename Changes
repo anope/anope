@@ -4,6 +4,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
 09/29 A Configuration option to change fantasy command prefix character.  [ #00]
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
+10/25 F Help response for os random news was using opernews text.         [ #00]
 10/05 F Changed NickLen and BSFantasyChar into recommended and optional.  [ #00]
 10/04 F Added missing hs_request to win32 modules makefile.               [ #00]
 10/03 F Changed error on identical userkeys into a warning.               [ #00]

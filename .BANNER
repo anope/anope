@@ -6,7 +6,7 @@
  |_| |_||_| |_\___/|  _/ \___|
                    | |
                    |_| IRC Services
-                            v1.7.11-svn
+                            v1.7.12
 This program will help you to compile your Services, and ask you
 questions regarding the compile-time settings of it during the
 process. For more options type ./Config --help

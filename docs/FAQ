@@ -66,8 +66,7 @@ Table of Contents
     5.2) Anope ignored the SET SUCCESSOR setting and deleted a channel when the
          founder expired.
     5.3) How to auto voice all those whom join my #channel?
-    5.4) My RESTRICTED channel doesn't work, but everything else works
-         perfectly!
+    5.4) Channel options like RESTRICTED or SECUREOPS don't work. What's wrong?
 
 6) BotServ
     6.1) How do I add bots to BotServ?
@@ -393,11 +392,12 @@ Table of Contents
         /cs set #channel xop off
         /cs levels #channel set AUTOVOICE -1
 
-5.4) My RESTRICTED channel doesn't work, but everything else works perfectly!
+5.4) Channel options like RESTRICTED or SECUREOPS don't work. What's wrong?
 
-    Make sure that you didn't put any of your IRCd's as a ULined server in
-    Anope. Clients from ULined servers are always allowed to join RESTRICTED
-    channels, without checking their access level.
+    Make sure that you didn't put any of your normal IRCd's as a ULined server
+    in Anope. Some access checks for clients from ULined servers are skipped to
+    avoid fights between the ULined servers. This is usually only useful when
+    you have a statistics server connected to your network.
 
 
 6) BotServ

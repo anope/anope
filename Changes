@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+11/01 F /os reload - BSFantasyChar was not sstrduped if not defined.      [ #00]
 10/30 F Updated docs/FAQ.                                                 [ #00]
 
 Anope Version 1.7.12
@@ -9,7 +10,6 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
 09/29 A Configuration option to change fantasy command prefix character.  [ #00]
 09/28 A Event for fantasy commands triggered without channel access.      [ #00]
-11/01 F /os reload - BSFantasyChar was not sstrduped if not defined.      [ #00]
 10/25 F Memleaks and not removing tempfiles on failed module loading.     [ #00]
 10/25 F Help response for os random news was using opernews text.         [ #00]
 10/05 F Changed NickLen and BSFantasyChar into recommended and optional.  [ #00]

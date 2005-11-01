@@ -1333,7 +1333,7 @@ int read_config(int reload)
             }
         }
         if (!BSFantasyCharacter)
-            BSFantasyCharacter = "!";
+            BSFantasyCharacter = sstrdup("!");
         if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
             printf
                 ("*** BSFantasyCharacter is more than 1 character long. Only the first\n"

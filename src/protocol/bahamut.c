@@ -630,7 +630,7 @@ void moduleAddIRCDMsgs(void) {
 
 
     /* first update the cs protect info about this ircd */
-    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+","-");
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 	
     /* now add the commands */
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);

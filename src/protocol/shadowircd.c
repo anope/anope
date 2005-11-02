@@ -741,7 +741,7 @@ void moduleAddIRCDMsgs(void)
 {
     Message *m;
     
-    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+a","-a");
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
 
     TS6SID = sstrdup(Numeric);
     UseTS6 = 1;

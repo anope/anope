@@ -458,7 +458,7 @@ void moduleAddIRCDMsgs(void) {
 
     Message *m;
 
-    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+","-");
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);

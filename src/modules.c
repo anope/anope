@@ -538,7 +538,8 @@ int loadModule(Module * m, User * u)
     if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK) {
         if (u)
             notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
-		return ret;
+        m->filename = sstrdup(buf);
+	return ret;
 	}
 
     m->filename = sstrdup(buf);

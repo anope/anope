@@ -696,7 +696,7 @@ moduleAddIRCDMsgs (void)
 {
   Message *m;
 
-  updateProtectDetails ("PROTECT", "PROTECTME", "!protect", "!deprotect",
+  updateProtectDetails ("PROTECT", "PROTECTME", "protect", "deprotect",
 			"AUTOPROTECT", "+", "-");
 
   m = createMessage ("401", anope_event_null);

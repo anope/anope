@@ -444,7 +444,7 @@ void moduleAddIRCDMsgs(void) {
     /* user has no choice but to use tokens with InspIRCd :) */
     UseTokens = 1;
 
-    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+a","-a");
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
 
     m = createMessage("$",      anope_event_null); addCoreMessage(IRCD,m);		/* send routing table */
     m = createMessage("X",      anope_event_null); addCoreMessage(IRCD,m);		/* begin netburst NOW */

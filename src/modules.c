@@ -207,36 +207,38 @@ void modules_delayed_init(void)
  * And if that isn't enough discouragement, you'll wake up with your
  * both legs broken tomorrow ;) -GD
  */
-void modules_unload_all(void)
+void modules_unload_all(boolean fini)
 {
 #ifdef USE_MODULES
 	int idx;
 	ModuleHash *mh, *next;
-    void (*func) (void);
-	
+        void (*func) (void);
+       	
 	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
 		mh = MODULE_HASH[idx];
 		while (mh) {
 			next = mh->next;
-			
-		    if (prepForUnload(mh->m) != MOD_ERR_OK) {
-				mh = next;
+		    if(fini) {
+		        if (prepForUnload(mh->m) != MOD_ERR_OK) {
+			    	mh = next;
 				continue;
+		        }
+			
+		        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
+		        if (func) {
+		            mod_current_module_name = mh->m->name;
+		            func();                 /* exec AnopeFini */
+		            mod_current_module_name = NULL;
+		        }
+			
+		        if ((ano_modclose(mh->m->handle)) != 0)
+		            alog(ano_moderr());
+		        else
+		            delModule(mh->m);
+		    } else {
+                        delModule(mh->m);
 		    }
-			
-		    func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
-		    if (func) {
-		        mod_current_module_name = mh->m->name;
-		        func();                 /* exec AnopeFini */
-		        mod_current_module_name = NULL;
-		    }
-			
-		    if ((ano_modclose(mh->m->handle)) != 0)
-		        alog(ano_moderr());
-		    else
-		        delModule(mh->m);
-			
-			mh = next;
+	   	    mh = next;
 		}
 	}
 #endif

@@ -841,7 +841,7 @@ E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
 /**** modules.c ****/
 E void modules_core_init(int number, char **list);
-E void modules_unload_all(void);	/* Read warnings near function source */
+E void modules_unload_all(boolean fini);	/* Read warnings near function source */
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
 

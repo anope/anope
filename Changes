@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+11/14 F Added a check for nickchars before trying to use them in /os stats[ #00]
 11/08 F Remove tmp modules from runtime folder when we can.               [ #00]
 11/02 F !protect/!deprotect no longer work for a number of ircds.         [#403]
 11/02 F segfault when os modloading a non-existing module.                [ #00]

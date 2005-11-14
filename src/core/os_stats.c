@@ -331,8 +331,10 @@ int do_stats(User * u)
                 if (capab_info[i].flag == CAPAB_NICKCHARS) {
                     strncat(buf, "=", buflen);
                     buflen--;
-                    strncat(buf, ircd->nickchars, buflen);
-                    buflen -= strlen(ircd->nickchars);
+		    if(ircd->nickchars) {
+                        strncat(buf, ircd->nickchars, buflen);
+                        buflen -= strlen(ircd->nickchars);
+		    } /* leave blank if it was null */
                 }
             }
         }

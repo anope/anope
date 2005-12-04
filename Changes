@@ -8,6 +8,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 11/01 F /os reload - BSFantasyChar was not sstrduped if not defined.      [ #00]
 10/30 F Updated docs/FAQ.                                                 [ #00]
 
+Provided by Trystan <trystan@nomadirc.net> - 2005
+11/19 F find_byuid for ircds which didnt give us a uid.                   [ #00]
+
 Anope Version 1.7.12
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005

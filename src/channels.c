@@ -326,10 +326,9 @@ void chan_set_user_status(Channel * chan, User * user, int16 status)
         alog("debug: setting user status (%d) on %s for %s", status,
              user->nick, chan->name);
 
-    if (HelpChannel && ircd->supporthelper
-        && (status == CUS_OP || status == (CUS_PROTECT | CUS_OP)
-            || status == (CUS_OWNER | CUS_OP))
-        && !stricmp(chan->name, HelpChannel)) {
+    if (HelpChannel && ircd->supporthelper && (status & CUS_OP)
+        && (stricmp(chan->name, HelpChannel) == 0)
+        && (!chan->ci || check_access(user, chan->ci, CA_AUTOOP))) {
         if (debug) {
             alog("debug: %s being given +h for having %d status in %s",
                  user->nick, status, chan->name);

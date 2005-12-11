@@ -1,6 +1,8 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+12/11 F First user on HelpChannel always got +h, even without access.     [#405]
+12/02 F Missing quitmessage when catching unknown signals.                [ #00]
 11/14 F Added a check for nickchars before trying to use them in /os stats[ #00]
 11/08 F Remove tmp modules from runtime folder when we can.               [ #00]
 11/02 F !protect/!deprotect no longer work for a number of ircds.         [#403]
@@ -10,6 +12,9 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
 11/19 F find_byuid for ircds which didnt give us a uid.                   [ #00]
+
+Provided by Vladimir K. <wawaka@gmail.com> - 2005
+12/11 F Enforcers had incorrect user when only user specified.            [#410]
 
 Anope Version 1.7.12
 --------------------

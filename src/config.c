@@ -1089,7 +1089,7 @@ int read_config(int reload)
             NSEnforcerHost = ServiceHost;
         } else {
             *s++ = 0;
-            NSEnforcerUser = temp_userhost;
+            NSEnforcerUser = temp_nsuserhost;
             NSEnforcerHost = s;
         }
     }

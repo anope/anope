@@ -385,11 +385,11 @@ User *find_byuid(const char *uid)
     u = first_uid();
     while (u) {
         next = next_uid();
-	if(u->uid) {
+        if (u->uid) {
             if (!stricmp(uid, u->uid)) {
                 return u;
             }
-	}
+        }
         u = next;
     }
     return NULL;

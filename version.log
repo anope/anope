@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="12"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="945"
+VERSION_BUILD="947"
 
 # $Log$
+#
+# BUILD : 1.7.12 (947)
+# BUGS  : 
+# NOTES : Updated inspircd support module and fixed error with generating language.h on certain setups
 #
 # BUILD : 1.7.12 (945)
 # BUGS  : 405 410

@@ -1,4 +1,4 @@
-/* InspIRCd 1.0 beta functions
+/* inspircd beta 6 functions
  *
  * (C) 2003-2005 Anope Team
  * Contact us at info@anope.org
@@ -121,4 +121,13 @@ int inspircd_flood_mode_check(char *value);
 void inspircd_cmd_jupe(char *jserver, char *who, char *reason);
 int inspircd_valid_nick(char *nick);
 void inspircd_cmd_ctcp(char *source, char *dest, char *buf);
-
+int anope_event_fjoin(char *source, int ac, char **av);
+int anope_event_fmode(char *source, int ac, char **av);
+int anope_event_ftopic(char *source, int ac, char **av);
+int anope_event_sanick(char *source, int ac, char **av);
+int anope_event_samode(char *source, int ac, char **av);
+int anope_event_sajoin(char *source, int ac, char **av);
+int anope_event_sapart(char *source, int ac, char **av);
+int anope_event_version(char *source, int ac, char **av);
+int anope_event_opertype(char *source, int ac, char **av);
+int anope_event_idle(char* source, int ac, char **av);

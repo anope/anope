@@ -36,6 +36,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     if (DisableRaw) {
+		alog("[os_raw] Unloading because DisableRaw is enabled");
         return MOD_STOP;
     }
     return MOD_CONT;

@@ -75,15 +75,7 @@ langcomp: langcomp.c
 
 
 language.h: index Makefile
-	@perl -e <index >$@ '\
-		print STDERR "Generating language.h... "; \
-		$$i=0; \
-		while (<>) { \
-			chop; \
-			printf "#define %-32s %d\n", $$_, $$i++; \
-		} \
-		print "\n#define NUM_STRINGS $$i\n"; \
-		print STDERR "$$i strings\n";'
+	@perl -e <index >$@ 'print STDERR "Generating language.h... "; $$i=0; while (<>) { chop; printf "#define %-32s %d\n", $$_, $$i++; } print "\n#define NUM_STRINGS $$i\n"; print STDERR "$$i strings\n";'
 
 index: en_us.l
 	grep '^[A-Z]' en_us.l >index

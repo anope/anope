@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
+12/26 F Generating language.h failed on certain setups.                   [ #00]
 12/11 F First user on HelpChannel always got +h, even without access.     [#405]
 12/02 F Missing quitmessage when catching unknown signals.                [ #00]
 11/14 F Added a check for nickchars before trying to use them in /os stats[ #00]
@@ -15,6 +16,9 @@ Provided by Trystan <trystan@nomadirc.net> - 2005
 
 Provided by Vladimir K. <wawaka@gmail.com> - 2005
 12/11 F Enforcers had incorrect user when only user specified.            [#410]
+
+Provided by Brain <brain@inspircd.org> - 2005
+12/26 A InspIRCd 1.0 Beta 6+ support module to replace old (b3) support.  [ #00]
 
 Anope Version 1.7.12
 --------------------

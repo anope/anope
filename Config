@@ -132,7 +132,8 @@ done
 ###########################################################################
 if [ ! "$NO_INTRO" ] ; then
         clear
-        more .BANNER
+		. version.log
+        cat .BANNER | sed "s/CURVER/$VERSION_MAJOR.$VERSION_MINOR.$VERSION_PATCH$VERSION_EXTRA/" | more
         echo ""
 else
         echo ""

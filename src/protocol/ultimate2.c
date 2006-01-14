@@ -1658,7 +1658,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(ultimate2_cmd_connect);
     pmodule_cmd_svshold(ultimate2_cmd_svshold);
     pmodule_cmd_release_svshold(ultimate2_cmd_release_svshold);
-    pmodule_cmd_unsgline(ultimate2_cmd_unsqline);
+    pmodule_cmd_unsgline(ultimate2_cmd_unsgline);
     pmodule_cmd_unszline(ultimate2_cmd_unszline);
     pmodule_cmd_szline(ultimate2_cmd_szline);
     pmodule_cmd_sgline(ultimate2_cmd_sgline);

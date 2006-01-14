@@ -1640,7 +1640,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(viagra_cmd_connect);
     pmodule_cmd_svshold(viagra_cmd_svshold);
     pmodule_cmd_release_svshold(viagra_cmd_release_svshold);
-    pmodule_cmd_unsgline(viagra_cmd_unsqline);
+    pmodule_cmd_unsgline(viagra_cmd_unsgline);
     pmodule_cmd_unszline(viagra_cmd_unszline);
     pmodule_cmd_szline(viagra_cmd_szline);
     pmodule_cmd_sgline(viagra_cmd_sgline);

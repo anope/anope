@@ -1307,7 +1307,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(dreamforge_cmd_connect);
     pmodule_cmd_svshold(dreamforge_cmd_svshold);
     pmodule_cmd_release_svshold(dreamforge_cmd_release_svshold);
-    pmodule_cmd_unsgline(dreamforge_cmd_unsqline);
+    pmodule_cmd_unsgline(dreamforge_cmd_unsgline);
     pmodule_cmd_unszline(dreamforge_cmd_unszline);
     pmodule_cmd_szline(dreamforge_cmd_szline);
     pmodule_cmd_sgline(dreamforge_cmd_sgline);

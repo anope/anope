@@ -1743,7 +1743,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(shadowircd_cmd_connect);
     pmodule_cmd_svshold(shadowircd_cmd_svshold);
     pmodule_cmd_release_svshold(shadowircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(shadowircd_cmd_unsqline);
+    pmodule_cmd_unsgline(shadowircd_cmd_unsgline);
     pmodule_cmd_unszline(shadowircd_cmd_unszline);
     pmodule_cmd_szline(shadowircd_cmd_szline);
     pmodule_cmd_sgline(shadowircd_cmd_sgline);

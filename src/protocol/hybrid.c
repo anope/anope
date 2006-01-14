@@ -1475,7 +1475,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(hybrid_cmd_connect);
     pmodule_cmd_svshold(hybrid_cmd_svshold);
     pmodule_cmd_release_svshold(hybrid_cmd_release_svshold);
-    pmodule_cmd_unsgline(hybrid_cmd_unsqline);
+    pmodule_cmd_unsgline(hybrid_cmd_unsgline);
     pmodule_cmd_unszline(hybrid_cmd_unszline);
     pmodule_cmd_szline(hybrid_cmd_szline);
     pmodule_cmd_sgline(hybrid_cmd_sgline);

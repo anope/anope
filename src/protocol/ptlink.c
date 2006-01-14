@@ -1660,7 +1660,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(ptlink_cmd_connect);
     pmodule_cmd_svshold(ptlink_cmd_svshold);
     pmodule_cmd_release_svshold(ptlink_cmd_release_svshold);
-    pmodule_cmd_unsgline(ptlink_cmd_unsqline);
+    pmodule_cmd_unsgline(ptlink_cmd_unsgline);
     pmodule_cmd_unszline(ptlink_cmd_unszline);
     pmodule_cmd_szline(ptlink_cmd_szline);
     pmodule_cmd_sgline(ptlink_cmd_sgline);

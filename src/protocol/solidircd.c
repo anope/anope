@@ -1631,7 +1631,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(solidircd_cmd_connect);
     pmodule_cmd_svshold(solidircd_cmd_svshold);
     pmodule_cmd_release_svshold(solidircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(solidircd_cmd_unsqline);
+    pmodule_cmd_unsgline(solidircd_cmd_unsgline);
     pmodule_cmd_unszline(solidircd_cmd_unszline);
     pmodule_cmd_szline(solidircd_cmd_szline);
     pmodule_cmd_sgline(solidircd_cmd_sgline);

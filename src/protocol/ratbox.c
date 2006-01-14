@@ -1796,7 +1796,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(ratbox_cmd_connect);
     pmodule_cmd_svshold(ratbox_cmd_svshold);
     pmodule_cmd_release_svshold(ratbox_cmd_release_svshold);
-    pmodule_cmd_unsgline(ratbox_cmd_unsqline);
+    pmodule_cmd_unsgline(ratbox_cmd_unsgline);
     pmodule_cmd_unszline(ratbox_cmd_unszline);
     pmodule_cmd_szline(ratbox_cmd_szline);
     pmodule_cmd_sgline(ratbox_cmd_sgline);

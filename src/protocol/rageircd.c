@@ -1600,7 +1600,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(rageircd_cmd_connect);
     pmodule_cmd_svshold(rageircd_cmd_svshold);
     pmodule_cmd_release_svshold(rageircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(rageircd_cmd_unsqline);
+    pmodule_cmd_unsgline(rageircd_cmd_unsgline);
     pmodule_cmd_unszline(rageircd_cmd_unszline);
     pmodule_cmd_szline(rageircd_cmd_szline);
     pmodule_cmd_sgline(rageircd_cmd_sgline);

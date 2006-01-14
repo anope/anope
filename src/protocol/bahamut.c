@@ -1603,7 +1603,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(bahamut_cmd_connect);
     pmodule_cmd_svshold(bahamut_cmd_svshold);
     pmodule_cmd_release_svshold(bahamut_cmd_release_svshold);
-    pmodule_cmd_unsgline(bahamut_cmd_unsqline);
+    pmodule_cmd_unsgline(bahamut_cmd_unsgline);
     pmodule_cmd_unszline(bahamut_cmd_unszline);
     pmodule_cmd_szline(bahamut_cmd_szline);
     pmodule_cmd_sgline(bahamut_cmd_sgline);

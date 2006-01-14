@@ -1515,7 +1515,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(unreal_cmd_connect);
     pmodule_cmd_svshold(unreal_cmd_svshold);
     pmodule_cmd_release_svshold(unreal_cmd_release_svshold);
-    pmodule_cmd_unsgline(unreal_cmd_unsqline);
+    pmodule_cmd_unsgline(unreal_cmd_unsgline);
     pmodule_cmd_unszline(unreal_cmd_unszline);
     pmodule_cmd_szline(unreal_cmd_szline);
     pmodule_cmd_sgline(unreal_cmd_sgline);

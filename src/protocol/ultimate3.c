@@ -1740,7 +1740,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(ultimate3_cmd_connect);
     pmodule_cmd_svshold(ultimate3_cmd_svshold);
     pmodule_cmd_release_svshold(ultimate3_cmd_release_svshold);
-    pmodule_cmd_unsgline(ultimate3_cmd_unsqline);
+    pmodule_cmd_unsgline(ultimate3_cmd_unsgline);
     pmodule_cmd_unszline(ultimate3_cmd_unszline);
     pmodule_cmd_szline(ultimate3_cmd_szline);
     pmodule_cmd_sgline(ultimate3_cmd_sgline);

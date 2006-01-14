@@ -423,14 +423,14 @@ NOTES : ";
     }
     system("indent -kr -nut $prefix/*.c");
     system("rm -f $prefix/*~");
-    if (-d "src/core") {
-        system("indent -kr -nut src/core/*.c");
-        system("rm -f src/core/*~");
-    }
-    if (-d "src/protocol") {
-        system("indent -kr -nut src/protocol/*.c");
-        system("rm -f src/protocol/*~");
-    }
+#    if (-d "src/core") {
+#        system("indent -kr -nut src/core/*.c");
+#        system("rm -f src/core/*~");
+#    }
+#    if (-d "src/protocol") {
+#        system("indent -kr -nut src/protocol/*.c");
+#        system("rm -f src/protocol/*~");
+#    }
 
     print "*** Bumping the revision number...\n";
     # Re-write the control file

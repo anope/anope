@@ -1621,7 +1621,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(inspircd_cmd_unsqline);
+    pmodule_cmd_unsgline(inspircd_cmd_unsgline);
     pmodule_cmd_unszline(inspircd_cmd_unszline);
     pmodule_cmd_szline(inspircd_cmd_szline);
     pmodule_cmd_sgline(inspircd_cmd_sgline);

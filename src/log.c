@@ -121,7 +121,7 @@ void close_log(void)
 
 void alog(const char *fmt, ...)
 {
-    va_list args;
+    va_list args, logargs, consoleargs, logchanargs;
     time_t t;
     struct tm tm;
     char buf[256];
@@ -134,6 +134,20 @@ void alog(const char *fmt, ...)
     }
 
     va_start(args, fmt);
+
+    /* 64-bit safety:
+     *
+     * GCC on many 64-bit boxes causes the stack used for the va_list
+     * to become unavailable after you use them, so we need to make copies
+     * of the va_list for all of our logging targets, otherwise Anope will
+     * crash. :(
+     *
+     *   --nenolod
+     */
+    va_copy(logargs, args);
+    va_copy(consoleargs, args);
+    va_copy(logchanargs, args);
+
     time(&t);
     tm = *localtime(&t);
 #if HAVE_GETTIMEOFDAY
@@ -154,21 +168,24 @@ void alog(const char *fmt, ...)
 #endif
     if (logfile) {
         fputs(buf, logfile);
-        vfprintf(logfile, fmt, args);
+        vfprintf(logfile, fmt, logargs);
         fputc('\n', logfile);
     }
     if (nofork) {
         fputs(buf, stderr);
-        vfprintf(stderr, fmt, args);
+        vfprintf(stderr, fmt, consoleargs);
         fputc('\n', stderr);
     }
 
     if (LogChannel && logchan && !debug && findchan(LogChannel)) {
         char str[BUFSIZE];
-        vsnprintf(str, sizeof(str), fmt, args);
+        vsnprintf(str, sizeof(str), fmt, logchanargs);
         privmsg(s_GlobalNoticer, LogChannel, "%s", str);
     }
 
+    va_end(logargs);
+    va_end(consoleargs);
+    va_end(logchanargs);
     va_end(args);
     errno = errno_save;
 }
@@ -180,7 +197,7 @@ void alog(const char *fmt, ...)
 
 void log_perror(const char *fmt, ...)
 {
-    va_list args;
+    va_list args, logargs, consoleargs;
     time_t t;
     struct tm tm;
     char buf[256];
@@ -193,6 +210,19 @@ void log_perror(const char *fmt, ...)
     }
 
     va_start(args, fmt);
+
+    /* 64-bit safety:
+     *
+     * GCC on many 64-bit boxes causes the stack used for the va_list
+     * to become unavailable after you use them, so we need to make copies
+     * of the va_list for all of our logging targets, otherwise Anope will
+     * crash. :(
+     *
+     *   --nenolod
+     */
+    va_copy(logargs, args);
+    va_copy(consoleargs, args);
+
     time(&t);
     tm = *localtime(&t);
 #if HAVE_GETTIMEOFDAY
@@ -213,15 +243,18 @@ void log_perror(const char *fmt, ...)
 #endif
     if (logfile) {
         fputs(buf, logfile);
-        vfprintf(logfile, fmt, args);
+        vfprintf(logfile, fmt, logargs);
         fprintf(logfile, ": %s\n", strerror(errno_save));
     }
     if (nofork) {
         fputs(buf, stderr);
-        vfprintf(stderr, fmt, args);
+        vfprintf(stderr, fmt, consoleargs);
         fprintf(stderr, ": %s\n", strerror(errno_save));
     }
     errno = errno_save;
+
+    va_end(logargs);
+    va_end(consoleargs);
     va_end(args);
 }
 

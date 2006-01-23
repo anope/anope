@@ -15,6 +15,9 @@
 /* "" */
 #undef HAVE_BACKTRACE
 
+/* "" */
+#undef HAVE_VA_LIST_AS_ARRAY
+
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
@@ -183,6 +186,7 @@ int vprintf(const char *format, va_list ap);
 int vfprintf(FILE *stream, const char *format, va_list ap);
 int vsprintf(char *str, const char *format, va_list ap);
 int vsnprintf(char *str, size_t size, const char *format, va_list ap);
+int mkstemp(char *template);
 
 FILE *popen(const char *command, const char *type);
 int pclose(FILE *stream);

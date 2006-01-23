@@ -1343,4 +1343,24 @@ E void eventprintf(char *fmt, ...);
 E void event_process_hook(char *name, int argc, char **argv);
 E void send_event(char *name, int argc, ...);
 
+#ifndef va_copy
+# ifdef __va_copy
+#  define VA_COPY(DEST,SRC) __va_copy((DEST),(SRC))
+# else
+#  define VA_COPY(DEST, SRC) memcpy ((&DEST), (&SRC), sizeof(va_list))
+# endif
+#else
+# ifdef HAVE_VA_LIST_AS_ARRAY
+#   define VA_COPY(DEST,SRC) va_copy(*(DEST) = *(SRC))
+# else
+#   define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
+# endif
+#endif
+
+#ifdef __STRICT_ANSI__
+#ifndef fileno
+int fileno(FILE *stream);
+#endif
+#endif
+
 #endif	/* EXTERN_H */

@@ -58,6 +58,8 @@ int mSaveData(int argc, char **argv);
 int mLoadConfig();
 int mEventReload(int argc, char **argv);
 
+char *os_info_tmp;
+
 /*************************************************************************/
 
 /**
@@ -449,10 +451,9 @@ int mSaveData(int argc, char **argv)
  **/
 int mLoadConfig(void)
 {
-    char *tmp = NULL;
 
     Directive directivas[] = {
-        {"OSInfoDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
+        {"OSInfoDBName", {{PARAM_STRING, PARAM_RELOAD, &os_info_tmp}}},
     };
 
     Directive *d = &directivas[0];
@@ -461,8 +462,8 @@ int mLoadConfig(void)
     if (OSInfoDBName)
         free(OSInfoDBName);
 
-    if (tmp) {
-        OSInfoDBName = tmp;
+    if (os_info_tmp) {
+        OSInfoDBName = sstrdup(os_info_tmp);
     } else {
         OSInfoDBName = sstrdup(DEFAULT_DB_NAME);
         alog("os_info: OSInfoDBName is not defined in Services configuration file, using default %s", OSInfoDBName);

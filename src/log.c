@@ -143,10 +143,12 @@ void alog(const char *fmt, ...)
      * crash. :(
      *
      *   --nenolod
+     * Not all systems have va_copy() so macro VA_COPY on so it will work 
+     * like the function does see extern.h for how -- TSL
      */
-    va_copy(logargs, args);
-    va_copy(consoleargs, args);
-    va_copy(logchanargs, args);
+    VA_COPY(logargs, args);
+    VA_COPY(consoleargs, args);
+    VA_COPY(logchanargs, args);
 
     time(&t);
     tm = *localtime(&t);
@@ -219,9 +221,11 @@ void log_perror(const char *fmt, ...)
      * crash. :(
      *
      *   --nenolod
+     * Not all systems have va_copy() so macro VA_COPY on so it will work 
+     * like the function does see extern.h for how -- TSL
      */
-    va_copy(logargs, args);
-    va_copy(consoleargs, args);
+    VA_COPY(logargs, args);
+    VA_COPY(consoleargs, args);
 
     time(&t);
     tm = *localtime(&t);

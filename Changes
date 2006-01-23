@@ -1,10 +1,26 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
-01/14 F SGLines will now be removed correctly.                            [ #00]
+01/14 F SGLines will now be removed correctly.                            [#413]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2005
 01/15 F va_arg issue on various 64bit platforms.                          [#415]
+
+Provided by Trystan <trystan@nomadirc.net> - 2005
+01/21 A Added EVENT_CHAN_KICK to the events for when a users is kicked    [ #00]
+01/21 A Added NULL param checks for add_invite() and add_exception()      [#419]
+01/21 F segfault in moduleNoticeLang() when mixed arguments types used.   [#421]
+01/21 F fixed Ultimate3 protocol so it can do channel sqline again.       [#412]
+01/21 F EVENT_PART_CHANNEL sent on /join 0                                [#417]
+01/21 F serval function channel.c where not TS6 friendly.                 [#418]
+01/21 F Fixed memory leak in do_mass_mode()                               [#420]
+01/21 F Fixed inspircd compiler warnings / synced with inspircd svn.      [#422]
+01/21 F Fixed va_copy() which is not found on all operating systems.      [ #00]
+01/21 F Cleaned up more make strict warnings.                             [ #00]  
+01/23 F Updated config.guess and config.sub.                              [ #00]
+
+Provided by Heinz <heinz@anope.org>
+01/21 A Added support for Visual Studio 2005                              [#408]
 
 
 Anope Version 1.7.13
@@ -119,7 +135,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2005
 09/18 F MySQL detection for win32 in install.vbs had issues.              [ #00]
 09/18 F Memleak when AddAkiller was enabled.                              [ #00]
 09/13 F Reduntant IRCD defines removed.                                   [ #00]
-09/13 F Double Makedile generation.                                       [ #00]
+09/13 F Double Makefile generation.                                       [ #00]
 09/06 F Memory for vHosts/vIdents was not (always) being freed.           [ #00]
 06/04 F Removed ircd-file related code from configure(.in)                [#384]
 

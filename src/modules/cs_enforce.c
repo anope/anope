@@ -23,14 +23,15 @@ void my_cs_help(User * u);
 int my_cs_help_enforce(User * u);
 void my_add_languages(void);
 
-#define LNG_NUM_STRINGS    6
+#define LNG_NUM_STRINGS    7
 
 #define LNG_CHAN_HELP                           0
 #define LNG_ENFORCE_SYNTAX                      1
 #define LNG_CHAN_HELP_ENFORCE                   2
-#define LNG_CHAN_HELP_ENFORCE_R_ENABLED         3
-#define LNG_CHAN_HELP_ENFORCE_R_DISABLED        4
-#define LNG_CHAN_RESPONSE                       5
+#define LNG_CHAN_HELP_ENFORCE_2                 3
+#define LNG_CHAN_HELP_ENFORCE_R_ENABLED         4
+#define LNG_CHAN_HELP_ENFORCE_R_DISABLED        5
+#define LNG_CHAN_RESPONSE                       6
 
 int AnopeInit(int argc, char **argv)
 {
@@ -256,6 +257,7 @@ int my_cs_help_enforce(User * u)
     moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
     notice(s_ChanServ, u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
+    moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_2);
     notice(s_ChanServ, u->nick, " ");
     if (cbmodes['R'].flag != 0)
         moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
@@ -279,7 +281,9 @@ void my_add_languages(void)
             "on. The \037what\037 option indicates what modes and options to\n"
             "enforce, and can be any of SET, SECUREOPS, RESTRICTED, MODES,\n"
             "or +R. When left out, it defaults to SET.\n"
-            " \n"
+            " \n",
+        /* LNG_CHAN_HELP_ENFORCE_2 */
+        /* avoid issue with older compilers */
             "If \037what\037 is SET, it will enforce SECUREOPS and RESTRICTED\n"
             "on the users currently in the channel, if they are set. Give\n"
             "SECUREOPS to enforce the SECUREOPS option, even if it is not\n"
@@ -312,7 +316,9 @@ void my_add_languages(void)
             "worden. De \037wat\037 optie geeft aan welke modes en opties\n"
             "geforceerd moeten worden; dit kan SET, SECUREOPS, RESTRICTED,\n"
             "MODES, of +R zijn. Indien weggelaten is dit standaard SET.\n"
-            " \n"
+            " \n",
+        /* LNG_CHAN_HELP_ENFORCE_2 */
+        /* avoid issue with older compilers */
             "Als er voor \037wat\037 SET wordt ingevuld, zullen SECUREOPS en\n"
             "RESTRICTED geforceerd worden op de gebruikers in het kanaal,\n"
             "maar alleen als die opties aangezet zijn voor het kanaal. Als\n"
@@ -347,7 +353,9 @@ void my_add_languages(void)
             "zu erzwingen sind. Die \037was\037 Option zeigt dir welche Modes\n"
             "und Optionen zu erzwingen sind. Die können nur SET, SECUREOPS,\n"
             "RESTRICTED, MODES oder +R sein.Default ist SET.\n"
-            " \n"
+            " \n",
+        /* LNG_CHAN_HELP_ENFORCE_2 */
+        /* avoid issue with older compilers */
             "Wenn \037was\037 SET ist, wird SECUREOPS und RESTRICTED\n"
             "auf die User die z.Z.in Channel sind erzwungen, wenn sie AN sind.\n"
             "Benutze SECUREOPS oder RESTRICTED , um die Optionen einzeln\n"
@@ -379,7 +387,9 @@ void my_add_languages(void)
             "O campo \037opção\037 indica quais modos e opções devem ser verificadas,\n"
             "e pode ser: SET, SECUREOPS, RESTRICTED, MODES ou +R\n"
             "Quando deixado em branco, o padrão é SET.\n"
-            " \n"
+            " \n",
+        /* LNG_CHAN_HELP_ENFORCE_2 */
+        /* avoid issue with older compilers */
             "Se \037opção\037 for SET, serão verificadas as opções SECUREOPS e RESTRICTED\n"
             "para usuários que estiverem no canal, caso elas estejam ativadas. Use\n"
             "SECUREOPS para verificar a opção SECUREOPS, mesmo que ela não esteja ativada\n"
@@ -411,7 +421,9 @@ void my_add_languages(void)
             "\037cosa\037 indica i modi e le opzioni da forzare, e possono essere\n"
             "qualsiasi delle opzioni SET, SECUREOPS, RESTRICTED, MODES, o +R.\n"
             "Se non specificato, viene sottointeso SET.\n"
-            " \n"
+            " \n",
+        /* LNG_CHAN_HELP_ENFORCE_2 */
+        /* avoid issue with older compilers */
             "Se \037cosa\037 è SET, forzerà SECUREOPS e RESTRICTED sugli utenti\n"
             "attualmente nel canale, se sono impostati. Specifica SECUREOPS per\n"
             "forzare l'opzione SECUREOPS, anche se non è attivata. Specifica\n"

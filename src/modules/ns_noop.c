@@ -36,6 +36,8 @@
 #define AUTOOP_DESC       6
 #define AUTOOP_HELP       7
 
+char *ns_noop_tmp;
+
 /*************************************************************************/
 
 User *currentUser;
@@ -320,10 +322,9 @@ int mSaveData(int argc, char **argv)
  **/
 int mLoadConfig(int argc, char **argv)
 {
-    char *tmp = NULL;
 
     Directive d[] = {
-        {"NSAutoOPDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
+        {"NSAutoOPDBName", {{PARAM_STRING, PARAM_RELOAD, &ns_noop_tmp}}},
     };
 
     moduleGetConfigDirective(d);
@@ -331,8 +332,8 @@ int mLoadConfig(int argc, char **argv)
     if (NSAutoOPDBName)
         free(NSAutoOPDBName);
 
-    if (tmp) {
-        NSAutoOPDBName = tmp;
+    if (ns_noop_tmp) {
+        NSAutoOPDBName = sstrdup(ns_noop_tmp);
     } else {
         NSAutoOPDBName = sstrdup(DEFAULT_DB_NAME);
         alog("ns_noop: NSAutoOPDBName is not defined in Services configuration file, using default %s", NSAutoOPDBName);

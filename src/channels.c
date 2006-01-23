@@ -523,9 +523,13 @@ void do_join(const char *source, int ac, char **av)
     Channel *chan;
     char *s, *t;
     struct u_chanlist *c, *nextc;
+    char *channame;
 
     if (UseTS6 && ircd->ts6) {
         user = find_byuid(source);
+        if (!user) {
+                user = finduser(source);
+        }
     } else {
         user = finduser(source);
     }
@@ -551,8 +555,12 @@ void do_join(const char *source, int ac, char **av)
             c = user->chans;
             while (c) {
                 nextc = c->next;
+                channame = sstrdup(c->chan->name);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick, channame);
                 chan_deluser(user, c->chan);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick, channame);
                 free(c);
+                free(channame);
                 c = nextc;
             }
             user->chans = NULL;
@@ -587,6 +595,7 @@ void do_kick(const char *source, int ac, char **av)
     User *user;
     char *s, *t;
     struct u_chanlist *c;
+    char *channame;
 
     t = av[1];
     while (*(s = t)) {
@@ -619,15 +628,14 @@ void do_kick(const char *source, int ac, char **av)
             continue;
         }
         if (debug) {
-            if (UseTS6 && ircd->ts6) {
-                alog("debug: kicking %s from %s", user->nick, av[0]);
-            } else {
-                alog("debug: kicking %s from %s", s, av[0]);
-            }
+           alog("debug: kicking %s from %s", user->nick, av[0]);
         }
         for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
              c = c->next);
         if (c) {
+            channame = sstrdup(c->chan->name);
+            send_event(EVENT_CHAN_KICK, 3, EVENT_START, user->nick,
+                       channame);
             chan_deluser(user, c->chan);
             if (c->next)
                 c->next->prev = c->prev;
@@ -636,6 +644,9 @@ void do_kick(const char *source, int ac, char **av)
             else
                 user->chans = c->next;
             free(c);
+            send_event(EVENT_CHAN_KICK, 3, EVENT_STOP, user->nick,
+                       channame);
+            free(channame);
         }
     }
 }
@@ -654,7 +665,14 @@ void do_part(const char *source, int ac, char **av)
     struct u_chanlist *c;
     char *channame;
 
-    user = finduser(source);
+    if (UseTS6 && ircd->ts6) {
+       user = find_byuid(source);
+       if (!user) {
+           user = finduser(source);
+       }
+    } else {
+       user = finduser(source);
+    }
     if (!user) {
         if (debug) {
             alog("debug: PART from nonexistent user %s: %s", source,
@@ -810,10 +828,14 @@ void do_sjoin(const char *source, int ac, char **av)
 
 
             if (UseTS6 && ircd->ts6) {
-                user = find_byuid(s);
-            } else {
+               user = find_byuid(s);
+               if (!user) {
                 user = finduser(s);
+               }
+            } else {
+              user = finduser(s);
             }
+
             if (!user) {
                 if (debug) {
                     alog("debug: SJOIN for nonexistent user %s on %s", s,
@@ -894,7 +916,14 @@ void do_sjoin(const char *source, int ac, char **av)
                 *end2++ = csmodes[(int) *s++];
             *end2 = 0;
 
-            user = finduser(s);
+            if (UseTS6 && ircd->ts6) {
+               user = find_byuid(s);
+               if (!user) {
+                user = finduser(s);
+               }
+            } else {
+              user = finduser(s);
+            }
 
             if (!user) {
                 if (debug) {
@@ -969,9 +998,12 @@ void do_sjoin(const char *source, int ac, char **av)
             *end2 = 0;
 
             if (UseTS6 && ircd->ts6) {
-                user = find_byuid(s);
-            } else {
+               user = find_byuid(s);
+               if (!user) {
                 user = finduser(s);
+               }
+            } else {
+              user = finduser(s);
             }
             if (!user) {
                 if (debug) {
@@ -1024,9 +1056,12 @@ void do_sjoin(const char *source, int ac, char **av)
         free(s);
     } else if (ac == 2) {
         if (UseTS6 && ircd->ts6) {
-            user = find_byuid(source);
+           user = find_byuid(source);
+           if (!user) {
+               user = finduser(source);
+           }
         } else {
-            user = finduser(source);
+              user = finduser(source);
         }
         if (!user) {
             if (debug) {
@@ -1253,6 +1288,14 @@ void add_ban(Channel * chan, char *mask)
 
 void add_exception(Channel * chan, char *mask)
 {
+    /* check for NULL values otherwise we will segfault */
+    if (!chan || !mask) {
+        if (debug) {
+            alog("debug: add_ban called with NULL values");
+        }
+        return;
+    }
+
     if (chan->exceptcount >= chan->exceptsize) {
         chan->exceptsize += 8;
         chan->excepts =
@@ -1268,6 +1311,14 @@ void add_exception(Channel * chan, char *mask)
 
 void add_invite(Channel * chan, char *mask)
 {
+    /* check for NULL values otherwise we will segfault */
+    if (!chan || !mask) {
+        if (debug) {
+            alog("debug: add_ban called with NULL values");
+        }
+        return;
+    }
+
     if (chan->invitecount >= chan->invitesize) {
         chan->invitesize += 8;
         chan->invite =
@@ -1844,6 +1895,7 @@ void do_mass_mode(char *modes)
             }
         }
     }
+    free(myModes);
 }
 
 /*************************************************************************/

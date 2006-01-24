@@ -35,7 +35,6 @@ Dim verStringShort
 Dim verStringLong
 Dim f2
 Dim i
-Dim VS2005Dep  ' We need to supress deprecation warnings  -- heinz
 
 ' Set default values
 
@@ -181,41 +180,7 @@ Else
         ' Check for required libraries and paths
         WScript.Echo "I will now check you have all the things I need..."
         WScript.Echo ""
-        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio 8\VC\Lib")) Then
-                WScript.Echo "I found a copy of Microsoft Visual Studio 2005.."
-                LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio 8\VC\Lib"
-                ' debug stuff  -- heinz
-                LibPath2 = DefaultDrive & ":\Program Files\Microsoft Platform SDK\lib"
-                ' LibPath2 = "F:\MSSDK\Lib"
-                If (fso.FileExists(LibPath & "/MSVCRT.lib") = False And fso.FileExists(LibPath2 & "/MSVCRT.lib") = False) Then
-                        WScript.Echo "Hm. I can't seem to find the default library.."
-                        LibPath = ""
-                        LibPath2 = ""
-                ElseIf (fso.FileExists(LibPath & "/wsock32.lib") = False And fso.FileExists(LibPath2 & "/wsock32.lib") = False) Then
-                        WScript.Echo "I couldn't seem to find wsock32.lib..You probably haven't downloaded the PlatformSDK.."
-                        LibPath = ""
-                        LibPath2 = ""
-                ElseIf (fso.FileExists(LibPath & "/advapi32.lib") = False And fso.FileExists(LibPath2 & "/advapi32.lib") = False) Then
-                        WScript.Echo "I couldn't seem to find advapi32.lib.. You probably haven't downloaded the PlatformSDK.."
-                        LibPath = ""
-                        LibPath2 = ""
-                ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False And fso.FileExists(LibPath2 & "/uuid.lib") = False) Then
-                        WScript.Echo "I couldn't seem to find uuid.lib.. You probably haven't downloaded the PlatformSDK.."
-                        LibPath = ""
-                        LibPath2 = ""
-                End If
-                If LibPath = "" Then
-                        WScript.Echo ""
-                        WScript.Echo "For more details on PlatformSDK Installation visit:"
-                        WScript.Echo "http://msdn.microsoft.com/vstudio/express/visualc/usingpsdk/"
-                        Wscript.Echo ""
-                Else
-                        VS2005Dep = " /D_CRT_SECURE_NO_DEPRECATE /w "
-                        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio 8\VC\Include"
-                End If
-        End If
-        
-        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib") And LibPath = "") Then
+        If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib")) Then
                 WScript.Echo "I found a copy of Microsoft Visual Studio .NET 2003.."
                 LibPath = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Lib"
                 LibPath2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Lib"
@@ -235,10 +200,9 @@ Else
                         WScript.Echo "I couldn't seem to find uuid.lib.. You probably only have the SDK installed.."
                         LibPath = ""
                         LibPath2 = ""
-                Else
-                        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
-                        IncDir2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include"
                 End If
+                IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\VC7\Include"
+                IncDir2 = DefaultDrive & ":\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include"
         End If
         
         If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Lib") And LibPath = "") Then
@@ -257,9 +221,8 @@ Else
                 ElseIf (fso.FileExists(LibPath & "/uuid.lib") = False) Then
                         WScript.Echo "I couldn't seem to find uuid.lib.. We kind of need this.."
                         LibPath = ""
-                Else
-                        IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Inlcude"
                 End If
+                IncDir = DefaultDrive & ":\Program Files\Microsoft Visual Studio\VC98\Inlcude"
         End If
         
         If (fso.FolderExists(DefaultDrive & ":\Program Files\Microsoft Platform SDK\Lib") And LibPath = "") Then
@@ -353,7 +316,7 @@ Else
                         f.WriteLine("CC=cl")
                         f.WriteLine("RC=rc")
                         f.WriteLine("MAKE=nmake -f Makefile.win32")
-                        f.WriteLine("BASE_CFLAGS=" & VS2005Dep & "/O2 /MD  /I " & Chr(34) & IncDir & Chr(34))
+                        f.WriteLine("BASE_CFLAGS=/O2 /MD  /I " & Chr(34) & IncDir & Chr(34))
                         If IncDir2 <> "" Then
                                 f.WriteLine("BASE_CFLAGS=$(BASE_CFLAGS) /I " & Chr(34) & IncDir2 & Chr(34))
                                 f.WriteLine("RC_FLAGS=/i " & Chr(34) & IncDir2 & Chr(34))

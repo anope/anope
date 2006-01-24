@@ -2531,17 +2531,18 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
         fmt = mod_current_module->lang[lang].argv[number];
 
         buf = sstrdup(fmt);
-        va_start(va, number);
-        vsnprintf(buffer, 4095, outbuf, va);
-        va_end(va);
-        s = buffer;
+        s = buf;
         while (*s) {
             t = s;
             s += strcspn(s, "\n");
             if (*s)
                 *s++ = '\0';
             strscpy(outbuf, t, sizeof(outbuf));
-            notice(source, u->nick, outbuf);
+
+            va_start(va, number);
+            vsnprintf(buffer, 4095, outbuf, va);
+            va_end(va);
+            notice(source, u->nick, buffer);
         }
 		free(buf);
     } else {

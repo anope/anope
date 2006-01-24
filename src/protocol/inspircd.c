@@ -27,14 +27,6 @@ int inet_aton (const char *name, struct in_addr *addr)
      return a != (uint32)-1;
 }
 #endif
-#ifdef __STRICT_ANSI__
-int inet_aton (const char *name, struct in_addr *addr)
-{
-     uint32 a = inet_addr (name);
-     addr->s_addr = a;
-     return a != (uint32)-1;
-}
-#endif
 
 IRCDVar myIrcd[] = {
     {"InspIRCd Beta 6",         /* ircd name */
@@ -459,7 +451,6 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
     m = createMessage("NOTICE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
@@ -575,9 +566,7 @@ void inspircd_cmd_376(char *source)
 
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
-    /*
-      :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards
-    */
+    // :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,name);
     send_cmd(ServerName, "OPERTYPE Service");
 }
@@ -1072,6 +1061,9 @@ void inspircd_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void inspircd_cmd_connect(int servernum)
 {
+    me_server =
+        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+
     if (servernum == 1) {
         inspircd_cmd_pass(RemotePassword);
     }
@@ -1084,9 +1076,6 @@ void inspircd_cmd_connect(int servernum)
     inspircd_cmd_server(ServerName, 0, ServerDesc);
     send_cmd(NULL,"BURST");
     send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s -- %s", version_number, ServerName, ircd->name, version_flags, version_build);
-
-    me_server =
-        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 }
 
 /* Events */
@@ -1331,11 +1320,11 @@ int anope_event_nick(char *source, int ac, char **av)
     if (ac != 1) {
         if (ac == 8) {
             inet_aton(av[6],&addy);
-            user = do_nick("",	 	av[1],	/* nick */
-					av[4],	/* username */
-					av[2],	/* realhost */
-					source, /* server */
-					av[7],	/* realname */
+            user = do_nick("",	 	av[1],	// nick
+					av[4],	// username
+					av[2],	// realhost
+					source, // server
+					av[7],	// realname
 					strtoul(av[0], NULL, 10),
 					0,
 					htonl(*ad),
@@ -1632,7 +1621,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(inspircd_cmd_unsqline);
+    pmodule_cmd_unsgline(inspircd_cmd_unsgline);
     pmodule_cmd_unszline(inspircd_cmd_unszline);
     pmodule_cmd_szline(inspircd_cmd_szline);
     pmodule_cmd_sgline(inspircd_cmd_sgline);

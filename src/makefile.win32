@@ -45,7 +45,6 @@ spotless:
         
 install:
         -@copy anope.exe ..\anope.exe
-        -@copy anope.exe.manifest ..\anope.exe.manifest
         -@mkdir ..\$(DATDEST)\bin
         -@copy  bin\* ..\$(DATDEST)\bin
 

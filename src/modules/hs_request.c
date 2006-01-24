@@ -81,7 +81,6 @@ void my_load_config(void);
 void my_add_languages(void);
 
 HostCore *hs_request_head;
-char *hs_request_tmp;
 
 int AnopeInit(int argc, char **argv)
 {
@@ -683,6 +682,7 @@ int hsreqevt_db_saving(int argc, char **argv)
 void my_load_config(void)
 {
     int i;
+    char *tmp = NULL;
 
     Directive confvalues[][1] = {
         {{"HSRequestMemoUser",
@@ -691,16 +691,16 @@ void my_load_config(void)
           {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
         {{"HSRequestMemoSetters",
           {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
-        {{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &hs_request_tmp}}}}
+        {{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
     };
 
     for (i = 0; i < 4; i++)
         moduleGetConfigDirective(confvalues[i]);
 
-    if (hs_request_tmp) {
+    if (tmp) {
         if (HSRequestDBName)
             free(HSRequestDBName);
-        HSRequestDBName = sstrdup(hs_request_tmp);
+        HSRequestDBName = sstrdup(tmp);
     } else {
         HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
     }

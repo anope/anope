@@ -9,13 +9,9 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="956"
+VERSION_BUILD="955"
 
 # $Log$
-#
-# BUILD : 1.7.13 (956)
-# BUGS  : 
-# NOTES : applied patch provided by trystan
 #
 # BUILD : 1.7.13 (955)
 # BUGS  : 

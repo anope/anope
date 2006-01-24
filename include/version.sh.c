@@ -219,5 +219,5 @@ void parse_line(FILE * fd, char *line)
         } else
             fputc(*c, fd);
     }
-    fprintf(fd, "\n");
+    fprintf(fd, "\r\n");
 }

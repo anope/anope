@@ -239,14 +239,6 @@ Anope Internal Events
         A channel has been forbidden (ChanServ FORBID).
         av[0]  The name of the channel that has been forbidden.
 
-    EVENT_CHAN_KICK
-        A user has been kicked from channel.
-        av[0]  EVENT_START or EVENT_STOP. EVENT_START when the user is about
-               to be removed from the channel internally, EVENT_STOP when
-               this has been done.
-        av[1]  The nickname of the user being kicked from the channel.
-        av[2]  The name of the channel the user has kicked from.
-
     EVENT_CHAN_REGISTERED
         A new channel has been registered.
         av[0]  The name of the channel that has been registered.

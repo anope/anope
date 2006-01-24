@@ -33,7 +33,6 @@
 #define EVENT_CHAN_FORBIDDEN "chan_forbidden"
 #define EVENT_CHAN_SUSPENDED "chan_suspended"
 #define EVENT_CHAN_UNSUSPEND "chan_unsuspend"
-#define EVENT_CHAN_KICK "chan_kicked"
 #define EVENT_CONNECT "connect"
 #define EVENT_DB_EXPIRE "db_expire"
 #define EVENT_RESTART "restart"

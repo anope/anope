@@ -10,7 +10,8 @@ dnl Based heavily on the Unreal configure.in script, and extra thanks to
 dnl codemastr from UnrealIRCD.
 
 
-AC_INIT(src/actions.c)
+AC_INIT
+AC_CONFIG_SRCDIR([src/actions.c])
 if test $# = 0; then
    echo "You might want to run ./Config or provide some parameters to this script."
    echo "./configure --help for information about this script"
@@ -19,12 +20,12 @@ fi
 
 AC_CONFIG_HEADER(include/sysconf.h)
 AC_PROG_CC
-if test "$ac_cv_prog_gcc" = "yes"; then
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
 #    CFLAGS="$CFLAGS -funsigned-char"
     AC_CACHE_CHECK(if gcc has a working -pipe, ac_cv_pipe, [
     save_cflags="$CFLAGS"
     CFLAGS="$CFLAGS -pipe"
-    AC_TRY_COMPILE(,, ac_cv_pipe="yes", ac_cv_pipe="no")
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[]])],[ac_cv_pipe="yes"],[ac_cv_pipe="no"])
     CFLAGS="$save_cflags"
     ])
     if test "$ac_cv_pipe" = "yes"; then
@@ -43,6 +44,36 @@ AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
 AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
 AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
 x="0";
+
+dnl Does this platform require array notation to assign to a va_list?
+dnl If cross-compiling, we assume va_list is "normal".  If this breaks
+dnl you, set ac_cv_valistisarray=true and maybe define HAVE_VA_LIST_AS_ARRAY
+dnl also just to be sure.
+
+dnl NOTE: this autoconf test is taken from mozilla: www.mozilla.org.
+
+AC_MSG_CHECKING(whether va_list assignments need array notation)
+AC_CACHE_VAL(ac_cv_valistisarray,
+        [AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <stdlib.h>
+		     #include <stdarg.h>
+		     void foo(int i, ...) {
+			va_list ap1, ap2;
+			va_start(ap1, i);
+			ap2 = ap1;
+			if (va_arg(ap2, int) != 123 || va_arg(ap1, int) != 123) { exit(1); }
+			va_end(ap1); va_end(ap2);
+		     }
+		     int main()
+		     { foo(0, 123); return(0); }]])],[ac_cv_valistisarray=false],[ac_cv_valistisarray=true],[ac_cv_valistisarray=false])])
+					     
+if test "$ac_cv_valistisarray" = true ; then
+	AC_DEFINE(HAVE_VA_LIST_AS_ARRAY,[1],[va_list as array])
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+
 DIS_MYSQL="  MySql: No"
 AC_ARG_WITH(mysql, [ --without-mysql     Do not use MySQL even if we find it],,[ 
 AM_PATH_MYSQLCLIENT(,[
@@ -97,13 +128,13 @@ AC_DEFINE(STATIC_LINKING,"NO_MODULES","modules not available")
 hold_cflags=$CFLAGS
 CFLAGS="$CFLAGS -export-dynamic"
 AC_CACHE_CHECK(if we need the -export-dynamic flag, ac_cv_export_dynamic, [
-AC_TRY_LINK(, [int i];, ac_cv_export_dynamic=yes, ac_cv_export_dynamic=no)])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[int i;]])],[ac_cv_export_dynamic=yes],[ac_cv_export_dynamic=no])])
 if test "$ac_cv_export_dynamic" = "no"; then
 CFLAGS=$hold_cflags
 fi
 
 AC_CACHE_CHECK(for compiler option to produce PIC,ac_cv_pic,[
-if test "$ac_cv_prog_gcc" = "yes"; then
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
         ac_cv_pic="-fPIC -DPIC -shared"
 	case `uname -s` in
 		Darwin*[)]
@@ -124,7 +155,7 @@ fi
 
 ])
 
-if test "$ac_cv_prog_gcc" = "yes"; then
+if test "$ac_cv_c_compiler_gnu" = "yes"; then
 	case `uname -s` in
 		Darwin*[)]
 		SHARED="-bundle -flat_namespace -undefined suppress"

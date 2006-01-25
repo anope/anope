@@ -144,9 +144,9 @@ void alog(const char *fmt, ...)
      *
      *   --nenolod
      */
-    va_copy(logargs, args);
-    va_copy(consoleargs, args);
-    va_copy(logchanargs, args);
+    VA_COPY(logargs, args);
+    VA_COPY(consoleargs, args);
+    VA_COPY(logchanargs, args);
 
     time(&t);
     tm = *localtime(&t);
@@ -220,8 +220,8 @@ void log_perror(const char *fmt, ...)
      *
      *   --nenolod
      */
-    va_copy(logargs, args);
-    va_copy(consoleargs, args);
+    VA_COPY(logargs, args);
+    VA_COPY(consoleargs, args);
 
     time(&t);
     tm = *localtime(&t);

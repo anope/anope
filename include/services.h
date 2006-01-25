@@ -146,6 +146,20 @@
 
 #include "sockets.h"
 
+#ifndef va_copy
+# ifdef __va_copy
+#  define VA_COPY(DEST,SRC) __va_copy((DEST),(SRC))
+# else
+#  define VA_COPY(DEST, SRC) memcpy ((&DEST), (&SRC), sizeof(va_list))
+# endif
+#else
+# ifdef HAVE_VA_LIST_AS_ARRAY
+#   define VA_COPY(DEST,SRC) (*(DEST) = *(SRC))
+# else
+#   define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
+# endif
+#endif 
+
 #ifdef _AIX
 /* Some AIX boxes seem to have bogus includes that don't have these
  * prototypes. */

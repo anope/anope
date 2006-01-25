@@ -90,6 +90,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* va_list as array */
+#undef HAVE_VA_LIST_AS_ARRAY
+
 /* "Module dir" */
 #undef MODULE_PATH
 
@@ -177,7 +180,7 @@
 #include <stdio.h>
 
 /* We KNOW these are not ansi, we are defining them here to suppress the warning
- * s messages on a "make strict" compile */
+ *  * s messages on a "make strict" compile */
 int snprintf(char *str, size_t size, const char *format, ...);
 int vprintf(const char *format, va_list ap);
 int vfprintf(FILE *stream, const char *format, va_list ap);

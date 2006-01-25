@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="955"
+VERSION_BUILD="958"
 
 # $Log$
+#
+# BUILD : 1.7.13 (958)
+# BUGS  : 
+# NOTES : Applied the new french translation provided by illu.
 #
 # BUILD : 1.7.13 (955)
 # BUGS  : 

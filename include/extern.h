@@ -839,6 +839,10 @@ E char *str_signed(unsigned char *str);
 
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
+E char **buildStringList(char *src, int *number);
+
+
+
 /**** modules.c ****/
 E void modules_core_init(int number, char **list);
 E void modules_unload_all(boolean fini);	/* Read warnings near function source */

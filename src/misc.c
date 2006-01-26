@@ -1158,4 +1158,31 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
              bytes[3]);
 }
 
+/**
+ * Build a string list from a given source string.
+ * This is usually used for parsing out values from the config file, but could
+ * be used for other things.
+ * NOTE: this function uses strtok(), be aware it will break any buffer you think you have in there ;)
+ **/
+char **buildStringList(char *src, int *number)
+{
+    char *s;
+    int i = 0;
+    char **list = NULL;
+
+    if (src) {
+        s = strtok(src, " ");
+        do {
+            if (s) {
+                i++;
+                list = realloc(list, sizeof(char *) * i);
+                list[i - 1] = sstrdup(s);
+            }
+        } while ((s = strtok(NULL, " ")));
+    }
+    *number = i;                /* always zero it, even if we have no setters */
+    return list;
+}
+
+
 /* EOF */

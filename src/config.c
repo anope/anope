@@ -355,10 +355,6 @@ int NumUlines;
 int UseTS6;
 
 
-
-
-char **buildStringList(char *src, int *number);
-
 /*************************************************************************/
 
 /* Deprecated directive (dep_) and value checking (chk_) functions: */
@@ -1429,25 +1425,5 @@ int read_config(int reload)
     return retval;
 }
 
-
-char **buildStringList(char *src, int *number)
-{
-    char *s;
-    int i = 0;
-    char **list = NULL;
-
-    if (src) {
-        s = strtok(src, " ");
-        do {
-            if (s) {
-                i++;
-                list = realloc(list, sizeof(char *) * i);
-                list[i - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
-    *number = i;                /* always zero it, even if we have no setters */
-    return list;
-}
 
 /*************************************************************************/

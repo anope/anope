@@ -5,6 +5,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 01/26 F Export buildStringList() for modules.                             [#425]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2005
+02/03 A Support for Charybdis IRCd.                                       [ #00]
 01/15 F va_arg issue on various 64bit platforms.                          [#415]
 
 Provided by illu. <illu@rs2i.net> - 2006

@@ -113,13 +113,16 @@ int do_logout(User * u)
 
         /* Stop nick tracking if enabled */
         if (NSNickTracking)
+			/* Shouldn't this be u2? -GD */
             nsStopNickTracking(u);
 
         /* Clear any timers again */
         if (u->na->nc->flags & NI_KILLPROTECT) {
             del_ns_timeout(u->na, TO_COLLIDE);
         }
-
+		
+		/* Send out an event */
+		send_event(EVENT_NICK_LOGOUT, 1, u2->nick);
     }
     return MOD_CONT;
 }

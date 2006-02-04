@@ -239,6 +239,11 @@ Anope Internal Events
         A channel has been forbidden (ChanServ FORBID).
         av[0]  The name of the channel that has been forbidden.
 
+    EVENT_CHAN_KICK
+        Someone has just been kicked from a channel.
+        av[0]  The nick of the user that has been kicked.
+        av[1]  The channel the user has been kicked from.
+
     EVENT_CHAN_REGISTERED
         A new channel has been registered.
         av[0]  The name of the channel that has been registered.
@@ -318,6 +323,10 @@ Anope Internal Events
     EVENT_NICK_IDENTIFY
         A user has just identified for it's nickname with NickServ.
         av[0]  The nickname of the user that just identified.
+
+    EVENT_NICK_LOGOUT
+        A user has just (been) logged out.
+        av[0]  The nickname of the user that has (been) logged out.
 
     EVENT_NICK_REGISTERED
         A new user has just registered it's nickname. This event is being

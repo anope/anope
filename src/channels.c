@@ -628,6 +628,7 @@ void do_kick(const char *source, int ac, char **av)
         for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
              c = c->next);
         if (c) {
+            send_event(EVENT_CHAN_KICK, 2, user->nick, av[0]);
             chan_deluser(user, c->chan);
             if (c->next)
                 c->next->prev = c->prev;

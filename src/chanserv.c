@@ -1376,6 +1376,7 @@ int check_should_owner(User * user, char *chan)
         tmp = stripModePrefix(ircd->ownerset);
         anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
+        free(tmp);
         return 1;
     }
 
@@ -1396,6 +1397,7 @@ int check_should_protect(User * user, char *chan)
         tmp = stripModePrefix(ircd->adminset);
         anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
+        free(tmp);
         return 1;
     }
 

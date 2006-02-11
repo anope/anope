@@ -84,5 +84,10 @@ int do_fantasy(int argc, char **argv)
         }
     }
 
+    if (target)
+       free(target);
+    if (reason)
+       free(reason);
+
     return MOD_CONT;
 }

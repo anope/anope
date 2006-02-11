@@ -979,6 +979,7 @@ void do_sjoin(const char *source, int ac, char **av)
                     alog("debug: SJOIN for nonexistent user %s on %s", s,
                          av[1]);
                 }
+                free(s);
                 return;
             }
 
@@ -1838,6 +1839,7 @@ void do_mass_mode(char *modes)
     for (i = 0; i < 1024; i++) {
         for (c = chanlist[i]; c; c = c->next) {
             if (c->bouncy_modes) {
+                free(myModes);
                 return;
             } else {
                 anope_cmd_mode(s_OperServ, c->name, "%s", modes);
@@ -1845,6 +1847,7 @@ void do_mass_mode(char *modes)
             }
         }
     }
+    free(myModes);
 }
 
 /*************************************************************************/

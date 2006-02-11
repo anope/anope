@@ -826,6 +826,7 @@ int nickIsServices(char *tempnick, int bot)
     if (s) {
      *s++ = 0;
      if (stricmp(s, ServerName) != 0)
+        free(nick);
         return found;
     }
 

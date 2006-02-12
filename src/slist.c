@@ -131,7 +131,7 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
                        ...)
 {
     int count = 0, i, n1, n2;
-    va_list args;
+    va_list args, preserve;
 
     va_start(args, cb);
 
@@ -149,14 +149,25 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
         }
 
         for (i = n1; i <= n2 && i > 0 && i <= slist->count; i++) {
+
             if (!slist->list[i - 1])
                 continue;
-            if (cb && !cb(slist, slist->list[i - 1], args))
-                return -1;
 
+	    /* copy this off the stack for safety's sake --nenolod */
+	    VA_COPY(preserve, args);
+
+            if (cb && !cb(slist, slist->list[i - 1], preserve)) {
+		va_end(preserve);
+                return -1;
+	    }
+
+	    /* if it's to be freed, lets free it */
             if (slist->opts && slist->opts->freeitem)
                 slist->opts->freeitem(slist, slist->list[i - 1]);
             slist->list[i - 1] = NULL;
+
+	    /* and release the copied list */
+	    va_end(preserve);
 
             count++;
         }
@@ -193,7 +204,7 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
 int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
 {
     int count = 0, i, res;
-    va_list args;
+    va_list args, preserve;
 
     va_start(args, cb);
 
@@ -204,9 +215,18 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
                 continue;
             }
 
-            res = cb(slist, i + 1, slist->list[i], args);
-            if (res < 0)
+	    /* copy off stack for safety */
+	    VA_COPY(preserve, args);
+
+            res = cb(slist, i + 1, slist->list[i], preserve);
+            if (res < 0) {
+		va_end(preserve);
                 break;
+	    }
+
+            /* and release our copy */
+            va_end(preserve);
+
             count += res;
         }
     } else {
@@ -230,10 +250,18 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
                     continue;
                 }
 
-                res = cb(slist, i, slist->list[i - 1], args);
-                if (res < 0)
+	        /* copy off stack for safety */
+	        VA_COPY(preserve, args);
+
+                res = cb(slist, i, slist->list[i - 1], preserve);
+                if (res < 0) {
+                    va_end(preserve);
                     break;
+                }
                 count += res;
+
+                /* and release our copy */
+                va_end(preserve);
             }
             if (res < -1)
                 break;

@@ -134,6 +134,7 @@ void common_unban(ChannelInfo * ci, char *nick)
     char *av[3], **bans;
     User *u;
     char *host;
+    int matchfound = 0;
 
     if (!ci || !ci->c || !nick) {
         return;
@@ -158,18 +159,33 @@ void common_unban(ChannelInfo * ci, char *nick)
                 anope_cmd_mode(whosends(ci), ci->name, "-b %s", bans[i]);
                 av[2] = bans[i];
                 do_cmode(whosends(ci), 3, av);
+                matchfound++;
             }
             if (host) {
-                if (match_userip(bans[i], u, host)) {
+                /* prevent multiple unbans if the first one was successful in
+                   locating the ban for us. This is due to match_userip() checks
+                   the vhost again, and thus can return false positive results
+                   for the function. but won't prevent thus from clearing out
+                   the bans against an IP address since the first would fail and
+                   the second would match - TSL
+                */   
+                if (!matchfound) {
+                 if (match_userip(bans[i], u, host)) {
                     anope_cmd_mode(whosends(ci), ci->name, "-b %s",
                                    bans[i]);
                     av[2] = bans[i];
                     do_cmode(whosends(ci), 3, av);
+                 }
                 }
             }
+            matchfound = 0;
         }
         free(bans);
         free(av[1]);
+    }
+    /* host_resolve() sstrdup us this info so we gotta free it */
+    if (host) {
+        free(host);
     }
 }
 

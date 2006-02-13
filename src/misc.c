@@ -275,7 +275,7 @@ int process_numlist(const char *numstr, int *count_ret,
 {
     int n1, n2, i;
     int res = 0, retval = 0, count = 0;
-    va_list args;
+    va_list args,preserve;
 
     if (!numstr || !*numstr) {
 	return -1;
@@ -300,7 +300,9 @@ int process_numlist(const char *numstr, int *count_ret,
             }
         }
         for (i = n1; i <= n2 && i >= 0; i++) {
-            int res = callback(u, i, args);
+            VA_COPY(preserve,args);
+            int res = callback(u, i, preserve);
+	    va_end(preserve);
             count++;
             if (res < 0)
                 break;

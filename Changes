@@ -2,6 +2,7 @@ Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2005
 02/04 A Events for channel kicks and NickServ logout.                     [ #00]
+02/13 F Yet anotehr 64bit issue.                                          [ #00]
 01/14 F SGLines will now be removed correctly.                            [ #00]
 01/26 F Export buildStringList() for modules.                             [#425]
 02/11 F Fixed a few memleaks.                                             [#420]

@@ -39,7 +39,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleSetChanHelp(myChanServHelp);
 #ifdef USE_ENCRYPTION
-
+    return MOD_STOP;
 #else
     return MOD_CONT;
 #endif

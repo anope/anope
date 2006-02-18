@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="965"
+VERSION_BUILD="968"
 
 # $Log$
+#
+# BUILD : 1.7.13 (968)
+# BUGS  : 
+# NOTES : Fixed cs_getpass.c, thx to Trystan.
 #
 # BUILD : 1.7.13 (965)
 # BUGS  : 442 437 432 431 420

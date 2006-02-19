@@ -314,8 +314,6 @@ int do_access(User * u)
                 deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
-                send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick,
-                           na->nick);
                 notice_lang(s_ChanServ, u, CHAN_ACCESS_DELETED,
                             access->nc->display, ci->name);
                 alog("%s: %s!%s@%s (level %d) deleted access of %s (group %s) on %s", s_ChanServ, u->nick, u->username, u->host, get_access(u, ci), na->nick, access->nc->display, chan);
@@ -345,6 +343,7 @@ int do_access(User * u)
                     }
                 }
             }
+            send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

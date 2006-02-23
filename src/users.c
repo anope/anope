@@ -977,9 +977,15 @@ int is_excepted_mask(ChannelInfo * ci, char *mask)
 
 int match_usermask(const char *mask, User * user)
 {
-    char *mask2 = sstrdup(mask);
+    char *mask2;
     char *nick, *username, *host;
     int result;
+
+    if (!mask || !*mask) {
+        return 0;
+    }
+
+    mask2 = sstrdup(mask);
 
     if (strchr(mask2, '!')) {
         nick = strtok(mask2, "!");
@@ -1016,9 +1022,15 @@ int match_usermask(const char *mask, User * user)
 
 int match_userip(const char *mask, User * user, char *iphost)
 {
-    char *mask2 = sstrdup(mask);
+    char *mask2;
     char *nick, *username, *host;
     int result;
+
+    if (!mask || !*mask) {
+        return 0;
+    }
+
+    mask2 = sstrdup(mask);
 
     if (strchr(mask2, '!')) {
         nick = strtok(mask2, "!");

@@ -18,6 +18,7 @@ Provided by illu. <illu@rs2i.net> - 2006
 01/25 F Updated the french language file.                                 [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
+02/23 F Usermatching possible null arg on sstrdup.                        [ #00]
 02/12 F Double unbanning of in certain conditions.                        [ #00]
 01/25 F va_copy issue for various platforms.                              [ #00]
 

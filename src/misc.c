@@ -301,7 +301,7 @@ int process_numlist(const char *numstr, int *count_ret,
         }
         for (i = n1; i <= n2 && i >= 0; i++) {
             VA_COPY(preserve,args);
-            int res = callback(u, i, preserve);
+            res = callback(u, i, preserve);
 	    va_end(preserve);
             count++;
             if (res < 0)

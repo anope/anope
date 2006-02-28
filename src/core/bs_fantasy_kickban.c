@@ -54,7 +54,7 @@ void AnopeFini(void)
  **/
 int do_fantasy(int argc, char **argv)
 {
-    User *u;
+    User *u, *u2;
     ChannelInfo *ci;
     char *target = NULL;
     char *reason = NULL;
@@ -79,9 +79,11 @@ int do_fantasy(int argc, char **argv)
             if (stricmp(target, ci->bi->nick) == 0) {
                 bot_raw_ban(u, ci, u->nick, "Oops!");
             } else {
-                if (!reason)
+               u2 = finduser(target);
+
+                if (u2 && !reason && !is_protected(u2))
                     bot_raw_ban(u, ci, target, "Requested");
-                else
+                else if (u2 && !is_protected(u2))
                     bot_raw_ban(u, ci, target, reason);
             }
         }

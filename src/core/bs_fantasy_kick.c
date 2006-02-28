@@ -54,7 +54,7 @@ void AnopeFini(void)
  **/
 int do_fantasy(int argc, char **argv)
 {
-    User *u;
+    User *u, *u2;
     ChannelInfo *ci;
     char *target = NULL;
     char *reason = NULL;
@@ -75,11 +75,13 @@ int do_fantasy(int argc, char **argv)
         if (!target && check_access(u, ci, CA_KICKME)) {
             bot_raw_kick(u, ci, u->nick, "Requested");
         } else if (target && check_access(u, ci, CA_KICK)) {
+           u2 = finduser(target);
+            
             if (!stricmp(target, ci->bi->nick))
                 bot_raw_kick(u, ci, u->nick, "Oops!");
-            else if (!reason)
+            else if (u2 && !reason && !is_protected(u2))
                 bot_raw_kick(u, ci, target, "Requested");
-            else
+            else if (u2 && !is_protected(u2))
                 bot_raw_kick(u, ci, target, reason);
         }
     }

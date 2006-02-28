@@ -1,6 +1,6 @@
 Anope Version  S V N
 --------------------
-Provided by Anope Dev. <dev@anope.org> - 2005
+Provided by Anope Dev. <dev@anope.org> - 2006
 02/04 A Events for channel kicks and NickServ logout.                     [ #00]
 02/13 F Yet anotehr 64bit issue.                                          [ #00]
 01/14 F SGLines will now be removed correctly.                            [ #00]
@@ -9,7 +9,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 02/17 F cs_getpass will now unload if encryption is enaled.               [ #00]
 02/19 F Fixed position of EVENT_ACCESS_DEL.                               [ #00]
 
-Provided by nenolod. <nenolod@nenolod.net> - 2005
+Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]
 02/12 F more va_list issues for 64bit platforms.                          [ #00]
 01/15 F va_arg issue on various 64bit platforms.                          [#415]
@@ -22,7 +22,8 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 02/12 F Double unbanning of in certain conditions.                        [ #00]
 01/25 F va_copy issue for various platforms.                              [ #00]
 
-
+Provided by ThaPrince <jon@vile.com> - 2006
+02/28 F fantasy kick now honours protected, just like cs versions.        [ #00]
 
 Anope Version 1.7.13
 --------------------

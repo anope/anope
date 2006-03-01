@@ -84,6 +84,9 @@ int do_forbid(User * u)
     if (*chan != '#') {
         notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
         return MOD_CONT;
+    } else if (strchr(chan, ':')) {
+        notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
+        return MOD_CONT;
     }
     if (readonly)
         notice_lang(s_ChanServ, u, READ_ONLY_MODE);

@@ -26,6 +26,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed memleak in os_mode.c.                                       [#444]
 03/01 F Fixed memleak in do_mass_mode().                                  [#450]
 03/01 F Fixed memleaks in cs_list.c, hs_list.c and ns_list.c.             [#447]
+03/01 F Fixed memleaks in hs_set.c.                                       [#441]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

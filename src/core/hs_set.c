@@ -81,6 +81,7 @@ int myDoSet(User * u)
 
     if (!nick || !rawhostmask) {
         notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
+        free(hostmask);
         return MOD_CONT;
     }
 
@@ -89,21 +90,32 @@ int myDoSet(User * u)
         rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
         if (!rawhostmask) {
             notice_lang(s_HostServ, u, HOST_SET_SYNTAX, s_HostServ);
+            free(vIdent);
+            free(hostmask);
             return MOD_CONT;
         }
         if (strlen(vIdent) > USERMAX - 1) {
             notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+            free(vIdent);
+            free(rawhostmask);
+            free(hostmask);
             return MOD_CONT;
         } else {
             for (s = vIdent; *s; s++) {
                 if (!isvalidchar(*s)) {
                     notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
+                    free(vIdent);
+                    free(rawhostmask);
+                    free(hostmask);
                     return MOD_CONT;
                 }
             }
         }
         if (!ircd->vident) {
             notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+            free(vIdent);
+            free(rawhostmask);
+            free(hostmask);
             return MOD_CONT;
         }
     }
@@ -111,11 +123,21 @@ int myDoSet(User * u)
         snprintf(hostmask, HOSTMAX - 1, "%s", rawhostmask);
     else {
         notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+        if (vIdent) {
+            free(vIdent);
+            free(rawhostmask);
+        }
+        free(hostmask);
         return MOD_CONT;
     }
 
     if (!isValidHost(hostmask, 3)) {
         notice_lang(s_HostServ, u, HOST_SET_ERROR);
+        if (vIdent) {
+            free(vIdent);
+            free(rawhostmask);
+        }
+        free(hostmask);
         return MOD_CONT;
     }
 
@@ -125,6 +147,11 @@ int myDoSet(User * u)
     if ((na = findnick(nick))) {
         if (na->status & NS_VERBOTEN) {
             notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+            if (vIdent) {
+                free(vIdent);
+                free(rawhostmask);
+            }
+            free(hostmask);
             return MOD_CONT;
         }
         if (vIdent && ircd->vident) {
@@ -143,5 +170,9 @@ int myDoSet(User * u)
         notice_lang(s_HostServ, u, HOST_NOREG, nick);
     }
     free(hostmask);
+    if (vIdent) {
+        free(vIdent);
+        free(rawhostmask);
+    }
     return MOD_CONT;
 }

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="992"
+VERSION_BUILD="993"
 
 # $Log$
+#
+# BUILD : 1.7.13 (993)
+# BUGS  : 441
+# NOTES : Fixed memleak in hs_set.c
 #
 # BUILD : 1.7.13 (992)
 # BUGS  : 450 447

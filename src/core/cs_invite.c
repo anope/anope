@@ -79,6 +79,8 @@ int do_invite(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
     } else if (ci->flags & CI_VERBOTEN) {
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+    } else if (ci->flags & CI_SUSPENDED) {
+        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else if (!u || !check_access(u, ci, CA_INVITE)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {

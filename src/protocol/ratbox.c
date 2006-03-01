@@ -667,11 +667,16 @@ int anope_event_tburst(char *source, int ac, char **av)
             alog("debug: TOPIC %s for nonexistent channel %s",
                  merge_args(ac - 1, av + 1), av[0]);
         }
+        if (setter)
+            free(setter);
         return MOD_CONT;
     }
 
-    if (check_topiclock(c, topic_time))
+    if (check_topiclock(c, topic_time)) {
+        if (setter)
+            free(setter);
         return MOD_CONT;
+    }
 
     if (c->topic) {
         free(c->topic);
@@ -684,6 +689,8 @@ int anope_event_tburst(char *source, int ac, char **av)
     c->topic_time = topic_time;
 
     record_topic(av[0]);
+    if (setter)
+        free(setter);
     return MOD_CONT;
 }
 
@@ -1679,7 +1686,10 @@ int anope_event_bmask(char *source, int ac, char **av)
             if (!stricmp(av[2], "I")) {
                 add_invite(c, b);
             }
+            if (b)
+                free(b);
         }
+        free(bans);
     }
     return MOD_CONT;
 }

@@ -13,6 +13,9 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed # prefix check on /cs forbid.                               [#461]
 03/01 F Fixed events on /join 0.                                          [#417]
 03/01 F Added NULL checks to add_invite and add_exception.                [#419]
+03/01 F Fixed suspend check on /cs invite.                                [#429]
+03/01 F Fixed memleaks in some protocol files.                            [#434]
+03/01 F Fixed bot check on /bs unassign.                                  [#446]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

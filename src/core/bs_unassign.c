@@ -79,9 +79,10 @@ int do_unassign(User * u)
         notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
     else if (!is_services_admin(u) && !check_access(u, ci, CA_ASSIGN))
         notice_lang(s_BotServ, u, ACCESS_DENIED);
+    else if (!ci->bi)
+        notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
     else {
-        if (ci->bi)
-            unassign(u, ci);
+        unassign(u, ci);
         notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
     }
     return MOD_CONT;

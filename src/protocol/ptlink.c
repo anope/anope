@@ -418,6 +418,7 @@ int anope_event_newmask(char *source, int ac, char **av)
 {
     User *u;
     char *newhost = NULL, *newuser = NULL;
+    int tofree = 0;
 
     if (ac != 1)
         return MOD_CONT;
@@ -445,7 +446,9 @@ int anope_event_newmask(char *source, int ac, char **av)
     newuser = myStrGetOnlyToken(av[0], '@', 0);
     if (newuser) {
         newhost = myStrGetTokenRemainder(av[0], '@', 1);
+        tofree = 1;
         change_user_username(u, newuser);
+        free(newuser);
     } else {
         newhost = av[0];
     }
@@ -455,9 +458,11 @@ int anope_event_newmask(char *source, int ac, char **av)
 
     u->mode |= UMODE_VH;
 
-    if (newhost) {
+    if (newhost)
         change_user_host(u, newhost);
-    }
+
+    if (tofree)
+        free(newhost);
 
     return MOD_CONT;
 }

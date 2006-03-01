@@ -2564,7 +2564,7 @@ char *moduleGetLangString(User * u, int number)
         mod_current_module = findModule(mod_current_module_name);
 	
     /* Find the users lang, and use it if we can */
-    if (u->na && u->na->nc)
+    if (u && u->na && u->na->nc)
         lang = u->na->nc->language;
 
     /* If the users lang isnt supported, drop back to English */
@@ -2572,14 +2572,16 @@ char *moduleGetLangString(User * u, int number)
         lang = LANG_EN_US;
 
     /* If the requested lang string exists for the language */
-    if (mod_current_module->lang[lang].argc > number)
+    if (mod_current_module->lang[lang].argc > number) {
         return mod_current_module->lang[lang].argv[number];
 	/* Return an empty string otherwise, because we might be used without
 	 * the return value being checked. If we would return NULL, bad things
 	 * would happen!
 	 */
-	else
+	} else {
+        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
 		return "";
+    }
 }
 
 /**

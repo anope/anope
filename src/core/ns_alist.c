@@ -156,7 +156,7 @@ int do_alist(User * u)
                     match_count++;
 
                     if ((ci->flags & CI_XOP) || (level == ACCESS_FOUNDER)) {
-                        char *xop;
+                        const char *xop;
 
                         xop = get_xop_level(level);
 

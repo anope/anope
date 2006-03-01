@@ -996,6 +996,10 @@ CHAN_NOT_ALLOWED_TO_JOIN
 	Вам не разрешено находиться на этом канале.
 
 # REGISTER responses
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
+
+# REGISTER responses
 CHAN_REGISTER_SYNTAX
 	REGISTER #канал пароль описание
 CHAN_REGISTER_DISABLED

@@ -168,14 +168,14 @@ void common_unban(ChannelInfo * ci, char *nick)
                    for the function. but won't prevent thus from clearing out
                    the bans against an IP address since the first would fail and
                    the second would match - TSL
-                */   
+                 */
                 if (!matchfound) {
-                 if (match_userip(bans[i], u, host)) {
-                    anope_cmd_mode(whosends(ci), ci->name, "-b %s",
-                                   bans[i]);
-                    av[2] = bans[i];
-                    do_cmode(whosends(ci), 3, av);
-                 }
+                    if (match_userip(bans[i], u, host)) {
+                        anope_cmd_mode(whosends(ci), ci->name, "-b %s",
+                                       bans[i]);
+                        av[2] = bans[i];
+                        do_cmode(whosends(ci), 3, av);
+                    }
                 }
             }
             matchfound = 0;

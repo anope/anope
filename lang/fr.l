@@ -1012,6 +1012,10 @@ CHAN_NOT_ALLOWED_TO_JOIN
 	Vous n'êtes pas autorisé à être sur ce channel.
 
 # REGISTER responses
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
+
+# REGISTER responses
 CHAN_REGISTER_SYNTAX
 	REGISTER canal motdepasse description
 CHAN_REGISTER_DISABLED

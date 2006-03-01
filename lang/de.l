@@ -1015,6 +1015,10 @@ CHAN_NOT_ALLOWED_TO_JOIN
 	Dir ist es nicht erlaubt, diesen Channel zu betreten.
 
 # REGISTER responses
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
+
+# REGISTER responses
 CHAN_REGISTER_SYNTAX
 	REGISTER Channel Passwort Beschreibung
 CHAN_REGISTER_DISABLED

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="985"
+VERSION_BUILD="986"
 
 # $Log$
+#
+# BUILD : 1.7.13 (986)
+# BUGS  : n/a
+# NOTES : Propagated CHAN_X_INVALID to all languages and Changes.lang
 #
 # BUILD : 1.7.13 (985)
 # BUGS  : 

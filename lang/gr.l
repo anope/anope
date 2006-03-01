@@ -1000,6 +1000,10 @@ CHAN_NOT_ALLOWED_TO_JOIN
 	Δεν έχεις την άδεια να είσαι σε αυτό το κανάλι.
 	
 # REGISTER responses
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
+
+# REGISTER responses
 CHAN_REGISTER_SYNTAX
 	REGISTER channel password description
 CHAN_REGISTER_DISABLED

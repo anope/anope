@@ -1070,6 +1070,10 @@ CHAN_NOT_ALLOWED_TO_JOIN
 	Nie masz pozwolenia, aby przebywaæ na tym kanale.
 
 # REGISTER responses
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
+
+# REGISTER responses
 CHAN_REGISTER_SYNTAX
 	REGISTER kana³ has³o opis
 CHAN_REGISTER_DISABLED

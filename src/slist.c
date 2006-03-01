@@ -153,21 +153,21 @@ int slist_delete_range(SList * slist, char *range, slist_delcheckcb_t cb,
             if (!slist->list[i - 1])
                 continue;
 
-	    /* copy this off the stack for safety's sake --nenolod */
-	    VA_COPY(preserve, args);
+            /* copy this off the stack for safety's sake --nenolod */
+            VA_COPY(preserve, args);
 
             if (cb && !cb(slist, slist->list[i - 1], preserve)) {
-		va_end(preserve);
+                va_end(preserve);
                 return -1;
-	    }
+            }
 
-	    /* if it's to be freed, lets free it */
+            /* if it's to be freed, lets free it */
             if (slist->opts && slist->opts->freeitem)
                 slist->opts->freeitem(slist, slist->list[i - 1]);
             slist->list[i - 1] = NULL;
 
-	    /* and release the copied list */
-	    va_end(preserve);
+            /* and release the copied list */
+            va_end(preserve);
 
             count++;
         }
@@ -215,14 +215,14 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
                 continue;
             }
 
-	    /* copy off stack for safety */
-	    VA_COPY(preserve, args);
+            /* copy off stack for safety */
+            VA_COPY(preserve, args);
 
             res = cb(slist, i + 1, slist->list[i], preserve);
             if (res < 0) {
-		va_end(preserve);
+                va_end(preserve);
                 break;
-	    }
+            }
 
             /* and release our copy */
             va_end(preserve);
@@ -250,8 +250,8 @@ int slist_enum(SList * slist, char *range, slist_enumcb_t cb, ...)
                     continue;
                 }
 
-	        /* copy off stack for safety */
-	        VA_COPY(preserve, args);
+                /* copy off stack for safety */
+                VA_COPY(preserve, args);
 
                 res = cb(slist, i, slist->list[i - 1], preserve);
                 if (res < 0) {

@@ -551,9 +551,11 @@ void do_join(const char *source, int ac, char **av)
             while (c) {
                 nextc = c->next;
                 channame = sstrdup(c->chan->name);
-                send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick, channame);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick,
+                           channame);
                 chan_deluser(user, c->chan);
-                send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick, channame);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
+                           channame);
                 free(channame);
                 free(c);
                 c = nextc;
@@ -1111,19 +1113,19 @@ void do_cmode(const char *source, int ac, char **av)
 
     if (UseTS6 && ircd->ts6) {
         if (*av[0] == '#' || *av[0] == '&') {
-         if (debug) {
-            alog("debug: Before TS6 swap: do_cmode() chan %s : mode %s : extra %s", av[1], av[2], av[3]);
-         }
-         av[0] = (ac >= 2 ? sstrdup(av[1]) : NULL);
-         av[1] = (ac >= 3 ? sstrdup(av[2]) : NULL);
-         av[2] = (ac >= 4 ? sstrdup(av[3]) : NULL);
-         if (debug) {
-            alog("debug: After TS swap: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
-         }
+            if (debug) {
+                alog("debug: Before TS6 swap: do_cmode() chan %s : mode %s : extra %s", av[1], av[2], av[3]);
+            }
+            av[0] = (ac >= 2 ? sstrdup(av[1]) : NULL);
+            av[1] = (ac >= 3 ? sstrdup(av[2]) : NULL);
+            av[2] = (ac >= 4 ? sstrdup(av[3]) : NULL);
+            if (debug) {
+                alog("debug: After TS swap: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
+            }
         } else {
-         if (debug) {
-            alog("debug: TS swap not needed: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
-         }
+            if (debug) {
+                alog("debug: TS swap not needed: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
+            }
         }
     }
 

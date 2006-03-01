@@ -85,11 +85,8 @@ int do_operoline(User * u)
         syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
         return MOD_CONT;
     } else {
-        u2 = finduser(nick);
-
-/* let's check whether the user is online */
-
-        if (!finduser(nick)) {
+        /* let's check whether the user is online */
+        if (!(u2 = finduser(nick))) {
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
             anope_cmd_svso(s_OperServ, nick, flags);

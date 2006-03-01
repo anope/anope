@@ -16,6 +16,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed suspend check on /cs invite.                                [#429]
 03/01 F Fixed memleaks in some protocol files.                            [#434]
 03/01 F Fixed bot check on /bs unassign.                                  [#446]
+03/01 F Fixed wasteful finduser() call in os_oline.c                      [#457]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

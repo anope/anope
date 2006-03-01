@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="974"
+VERSION_BUILD="975"
 
 # $Log$
+#
+# BUILD : 1.7.13 (975)
+# BUGS  : 435
+# NOTES : Added messages explaining what module status numbers mean
 #
 # BUILD : 1.7.13 (974)
 # BUGS  : 454

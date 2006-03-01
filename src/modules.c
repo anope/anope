@@ -61,7 +61,26 @@ int displayCommand(Command * c);
 int displayCommandFromHash(CommandHash * cmdTable[], char *name);
 int displayMessageFromHashl(char *name);
 int displayMessage(Message * m);
+char *ModuleGetErrStr(int status);
 
+char *ModuleGetErrStr(int status)
+{
+    const char *module_err_str[] = {
+        "Module, Okay - No Error",
+        "Module Error, allocating memory",
+        "Module Error, not enough parameters",
+        "Module Error, already loaded",
+        "Module Error, file does not exist",
+        "Module Error, No User",
+        "Module Error, Error during load time or module returned MOD_STOP",
+        "Module Error, Unable to unload"
+        "Module Error, Unknown Error occuried",
+        "Module Error, File I/O Error",
+        "Module Error, No Service found for request",
+        "Module Error, No module name for request",
+    };
+    return (char *) module_err_str[status];
+}
 
 /**
  * Automaticaly load modules at startup.
@@ -83,7 +102,7 @@ void modules_init(void)
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
 			ret = loadModule(mod_current_module, NULL);
-            alog("status: [%d]", ret);
+            alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
 			if (ret != MOD_ERR_OK)
 				destroyModule(m);
             mod_current_module = NULL;
@@ -113,7 +132,7 @@ void modules_core_init(int number, char **list)
             if (debug || status) {
                 alog("debug: trying to load core module [%s]",
                      mod_current_module->name);
-                alog("debug: status: [%d]", status);
+                alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
 				if (status != MOD_ERR_OK)
 					destroyModule(mod_current_module);
             }
@@ -137,7 +156,7 @@ int protocol_module_init(void)
     alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name);
     ret = loadModule(mod_current_module, NULL);
     moduleSetType(PROTOCOL);
-    alog("status: [%d]", ret);
+    alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
 	
 	if (ret == MOD_ERR_OK) {
@@ -187,7 +206,7 @@ void modules_delayed_init(void)
             mod_current_user = NULL;
             alog("trying to load [%s]", mod_current_module->name);
 			ret = loadModule(mod_current_module, NULL);
-            alog("status: [%d]", ret);
+            alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_user = NULL;
 			if (ret != MOD_ERR_OK)

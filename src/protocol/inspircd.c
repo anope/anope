@@ -1553,6 +1553,12 @@ int inspircd_valid_nick(char *nick)
     return 1;
 }
 
+int inspircd_valid_chan(char *chan)
+{
+    return 1;
+}
+
+
 void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1642,6 +1648,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);
+    pmodule_valid_chan(inspircd_valid_chan);
     pmodule_cmd_ctcp(inspircd_cmd_ctcp);
     pmodule_set_umode(inspircd_set_umode);
 }

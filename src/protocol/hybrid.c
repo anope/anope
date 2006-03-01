@@ -1400,6 +1400,17 @@ int hybrid_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int hybrid_valid_chan(char *chan)
+{
+    /* no hard coded invalid chans */
+    return 1;
+}
+
+
 void hybrid_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1489,6 +1500,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(hybrid_flood_mode_check);
     pmodule_cmd_jupe(hybrid_cmd_jupe);
     pmodule_valid_nick(hybrid_valid_nick);
+    pmodule_valid_chan(hybrid_valid_chan);
     pmodule_cmd_ctcp(hybrid_cmd_ctcp);
     pmodule_set_umode(hybrid_set_umode);
 }

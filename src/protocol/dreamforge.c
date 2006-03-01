@@ -1232,6 +1232,17 @@ int dreamforge_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int dreamforge_valid_chan(char *chan)
+{
+    /* no hard coded invalid chan */
+    return 1;
+}
+
+
 void dreamforge_cmd_ctcp(char *source, char *dest, char *buf)
 {
 
@@ -1321,6 +1332,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(dreamforge_flood_mode_check);
     pmodule_cmd_jupe(dreamforge_cmd_jupe);
     pmodule_valid_nick(dreamforge_valid_nick);
+    pmodule_valid_chan(dreamforge_valid_chan);
     pmodule_cmd_ctcp(dreamforge_cmd_ctcp);
     pmodule_set_umode(dreamforge_set_umode);
 }

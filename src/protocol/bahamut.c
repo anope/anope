@@ -1521,6 +1521,16 @@ int bahamut_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = nick is in chan
+*/
+int bahamut_valid_chan(char *chan)
+{
+    /* no silly invalid chans */
+    return 1;
+}
+
 void bahamut_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1617,6 +1627,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(bahamut_flood_mode_check);
     pmodule_cmd_jupe(bahamut_cmd_jupe);
     pmodule_valid_nick(bahamut_valid_nick);
+    pmodule_valid_chan(bahamut_valid_chan);
     pmodule_cmd_ctcp(bahamut_cmd_ctcp);
     pmodule_set_umode(bahamut_set_umode);
 }

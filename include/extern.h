@@ -659,6 +659,7 @@ E void pmodule_cmd_eob(void (*func) ());
 E void pmodule_cmd_jupe(void (*func) (char *jserver, char *who, char *reason));
 E void pmodule_set_umode(void (*func) (User * user, int ac, char **av));
 E void pmodule_valid_nick(int (*func) (char *nick));
+E void pmodule_valid_chan(int (*func) (char *chan));
 E void pmodule_flood_mode_check(int (*func) (char *value));
 E void pmodule_ircd_var(IRCDVar * ircdvar);
 E void pmodule_ircd_cap(IRCDCAPAB * cap);
@@ -1327,6 +1328,7 @@ E void anope_cmd_global_legacy(char *source, char *fmt);
 E void wallops(char *source, const char *fmt, ...);
 
 E int anope_valid_nick(char *nick);
+E int anope_valid_chan(char *chan);
 
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);

@@ -1714,6 +1714,18 @@ plexus_valid_nick (char *nick)
   return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int
+plexus_valid_chan (char *chan)
+{
+  /* no hard coded invalid chan */
+  return 1;
+}
+
+
 void
 plexus_cmd_ctcp (char *source, char *dest, char *buf)
 {
@@ -1808,6 +1820,7 @@ moduleAddAnopeCmds ()
   pmodule_flood_mode_check (plexus_flood_mode_check);
   pmodule_cmd_jupe (plexus_cmd_jupe);
   pmodule_valid_nick (plexus_valid_nick);
+  pmodule_valid_chan (plexus_valid_chan);
   pmodule_cmd_ctcp (plexus_cmd_ctcp);
   pmodule_set_umode (plexus_set_umode);
 }

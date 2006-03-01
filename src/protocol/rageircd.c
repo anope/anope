@@ -1525,6 +1525,17 @@ int rageircd_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int rageircd_valid_chan(char *chan)
+{
+    /* no hard coded invalid nicks */
+    return 1;
+}
+
+
 void rageircd_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1614,6 +1625,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(rageircd_flood_mode_check);
     pmodule_cmd_jupe(rageircd_cmd_jupe);
     pmodule_valid_nick(rageircd_valid_nick);
+    pmodule_valid_chan(rageircd_valid_chan);
     pmodule_cmd_ctcp(rageircd_cmd_ctcp);
     pmodule_set_umode(rageircd_set_umode);
 }

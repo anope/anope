@@ -1440,6 +1440,13 @@ int unreal_valid_nick(char *nick)
     return 1;
 }
 
+int unreal_valid_chan(char *chan) {
+    if (strchr(chan, ':')) {
+      return 0;
+    }
+    return 1;
+}
+
 void unreal_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1529,6 +1536,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(unreal_flood_mode_check);
     pmodule_cmd_jupe(unreal_cmd_jupe);
     pmodule_valid_nick(unreal_valid_nick);
+    pmodule_valid_chan(unreal_valid_chan);
     pmodule_cmd_ctcp(unreal_cmd_ctcp);
     pmodule_set_umode(unreal_set_umode);
 }

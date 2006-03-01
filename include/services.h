@@ -1177,6 +1177,7 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_jupe)(char *jserver, char *who, char *reason);
     void (*ircd_set_umode)(User *user, int ac, char **av);
     int (*ircd_valid_nick)(char *nick);
+    int (*ircd_valid_chan)(char *chan);
     int (*ircd_flood_mode_check)(char *value);
 } IRCDProto;
 

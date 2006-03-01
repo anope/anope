@@ -1765,6 +1765,17 @@ int charybdis_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is invalid
+*/
+int charybdis_valid_chan(char *chan)
+{
+    /* no hard coded invalid chan */
+    return 1;
+}
+
+
 void charybdis_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1872,6 +1883,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(charybdis_flood_mode_check);
     pmodule_cmd_jupe(charybdis_cmd_jupe);
     pmodule_valid_nick(charybdis_valid_nick);
+    pmodule_valid_chan(charybdis_valid_chan);
     pmodule_cmd_ctcp(charybdis_cmd_ctcp);
     pmodule_set_umode(charybdis_set_umode);
 }

@@ -1565,6 +1565,17 @@ int viagra_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int viagra_valid_chan(char *chan)
+{
+    /* no hard coded invalid chans */
+    return 1;
+}
+
+
 void viagra_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1654,6 +1665,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(viagra_flood_mode_check);
     pmodule_cmd_jupe(viagra_cmd_jupe);
     pmodule_valid_nick(viagra_valid_nick);
+    pmodule_valid_chan(viagra_valid_chan);
     pmodule_cmd_ctcp(viagra_cmd_ctcp);
     pmodule_set_umode(viagra_set_umode);
 }

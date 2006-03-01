@@ -95,7 +95,7 @@ int do_register(User * u)
         notice_lang(s_ChanServ, u, CHAN_REGISTER_NOT_LOCAL);
     } else if (*chan != '#') {
         notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
-    } else if (strchr(chan, ':')) {
+    } else if (anope_valid_chan(chan)) {
         notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
     } else if (!u->na || !(nc = u->na->nc)) {
         notice_lang(s_ChanServ, u, CHAN_MUST_REGISTER_NICK, s_NickServ);

@@ -94,6 +94,7 @@ void initIrcdProto()
     ircdproto.ircd_flood_mode_check = NULL;
     ircdproto.ircd_cmd_jupe = NULL;
     ircdproto.ircd_valid_nick = NULL;
+    ircdproto.ircd_valid_chan = NULL;
     ircdproto.ircd_cmd_ctcp = NULL;
 }
 
@@ -596,6 +597,12 @@ int anope_valid_nick(char *nick)
     return ircdproto.ircd_valid_nick(nick);
 }
 
+int anope_valid_chan(char *chan)
+{
+    return ircdproto.ircd_valid_chan(chan);
+}
+
+
 void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...)
 {
     va_list args;
@@ -986,6 +993,11 @@ void pmodule_set_umode(void (*func) (User * user, int ac, char **av))
 void pmodule_valid_nick(int (*func) (char *nick))
 {
     ircdproto.ircd_valid_nick = func;
+}
+
+void pmodule_valid_chan(int (*func) (char *chan))
+{
+    ircdproto.ircd_valid_chan = func;
 }
 
 void pmodule_flood_mode_check(int (*func) (char *value))

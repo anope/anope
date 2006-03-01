@@ -1679,6 +1679,17 @@ int shadowircd_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int shadowircd_valid_chan(char *chan)
+{
+    /* no hard coded invalid chan */
+    return 1;
+}
+
+
 void shadowircd_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1767,6 +1778,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(shadowircd_flood_mode_check);
     pmodule_cmd_jupe(shadowircd_cmd_jupe);
     pmodule_valid_nick(shadowircd_valid_nick);
+    pmodule_valid_chan(shadowircd_valid_chan);
     pmodule_cmd_ctcp(shadowircd_cmd_ctcp);
     pmodule_set_umode(shadowircd_set_umode);
 }

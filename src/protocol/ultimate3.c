@@ -1665,6 +1665,17 @@ int ultiamte3_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int ultiamte3_valid_chan(char *chan)
+{
+    /* no hard coded invalid chans */
+    return 1;
+}
+
+
 void ultimate3_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1754,6 +1765,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(ultiamte3_flood_mode_check);
     pmodule_cmd_jupe(ultimate3_cmd_jupe);
     pmodule_valid_nick(ultiamte3_valid_nick);
+    pmodule_valid_chan(ultiamte3_valid_chan);
     pmodule_cmd_ctcp(ultimate3_cmd_ctcp);
     pmodule_set_umode(ultimate3_set_umode);
 }

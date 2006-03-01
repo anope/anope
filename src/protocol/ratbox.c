@@ -1731,6 +1731,17 @@ int ratbox_valid_nick(char *nick)
     return 1;
 }
 
+/* 
+  1 = valid chan
+  0 = chan is in valid
+*/
+int ratbox_valid_chan(char *chan)
+{
+    /* no hard coded invalid chans */
+    return 1;
+}
+
+
 void ratbox_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1820,6 +1831,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(ratbox_flood_mode_check);
     pmodule_cmd_jupe(ratbox_cmd_jupe);
     pmodule_valid_nick(ratbox_valid_nick);
+    pmodule_valid_chan(ratbox_valid_chan);
     pmodule_cmd_ctcp(ratbox_cmd_ctcp);
     pmodule_set_umode(ratbox_set_umode);
 }

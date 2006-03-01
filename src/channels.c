@@ -1104,11 +1104,21 @@ void do_cmode(const char *source, int ac, char **av)
     /* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
 
     if (UseTS6 && ircd->ts6) {
-        alog("chan %s : mode %s : extra %s", av[1], av[2], av[3]);
-        av[0] = sstrdup(av[1]);
-        av[1] = sstrdup(av[2]);
-        av[2] = sstrdup(av[3]);
-        alog("chan %s : mode %s : extra %s", av[0], av[1], av[2]);
+        if (*av[0] == '#' || *av[0] == '&') {
+         if (debug) {
+            alog("debug: Before TS6 swap: do_cmode() chan %s : mode %s : extra %s", av[1], av[2], av[3]);
+         }
+         av[0] = (ac >= 2 ? sstrdup(av[1]) : NULL);
+         av[1] = (ac >= 3 ? sstrdup(av[2]) : NULL);
+         av[2] = (ac >= 4 ? sstrdup(av[3]) : NULL);
+         if (debug) {
+            alog("debug: After TS swap: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
+         }
+        } else {
+         if (debug) {
+            alog("debug: TS swap not needed: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
+         }
+        }
     }
 
     chan = findchan(av[0]);

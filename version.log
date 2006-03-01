@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="975"
+VERSION_BUILD="976"
 
 # $Log$
+#
+# BUILD : 1.7.13 (976)
+# BUGS  : 396
+# NOTES : Fixed TS6 issues with handling nick changes and channel modes
 #
 # BUILD : 1.7.13 (975)
 # BUGS  : 435

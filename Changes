@@ -21,6 +21,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 03/01 A Clarity on module loading status numbers.                         [#435]
 03/01 F Crash when not giving user for moduleGetLangString.               [#454]
 02/23 F Usermatching possible null arg on sstrdup.                        [ #00]
+02/20 F Fixed some TS6 issues with do_cmode() and do_nick()               [#396]
 02/12 F Double unbanning of in certain conditions.                        [ #00]
 01/25 F va_copy issue for various platforms.                              [ #00]
 

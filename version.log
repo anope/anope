@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="988"
+VERSION_BUILD="989"
 
 # $Log$
+#
+# BUILD : 1.7.13 (989)
+# BUGS  : 444
+# NOTES : Fixed memleak in os_mode.c
 #
 # BUILD : 1.7.13 (988)
 # BUGS  : 421 436 438

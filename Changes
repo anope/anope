@@ -16,13 +16,14 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed suspend check on /cs invite.                                [#429]
 03/01 F Fixed memleaks in some protocol files.                            [#434]
 03/01 F Fixed bot check on /bs unassign.                                  [#446]
-03/01 F Fixed wasteful finduser() call in os_oline.c                      [#457]
+03/01 F Fixed wasteful finduser() call in os_oline.c.                     [#457]
 03/01 F Fixed memleak in runDefCon().                                     [#451]
 03/01 F Fixed function type of get_xop_level.                             [#459]
 03/01 F Prevented registration of UnrealIRCd's "local" channels.          [#456]
 03/01 F Fixed bug in moduleNoticeLang().                                  [#421]
 03/01 F Made should_mode_change() extern.                                 [#436]
 03/01 F Made add_ns_timeout() static.                                     [#438]
+03/01 F Fixed memleak in os_mode.c.                                       [#444]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

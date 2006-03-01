@@ -1869,6 +1869,7 @@ void do_mass_mode(char *modes)
     for (i = 0; i < 1024; i++) {
         for (c = chanlist[i]; c; c = c->next) {
             if (c->bouncy_modes) {
+                free(av);
                 free(myModes);
                 return;
             } else {
@@ -1877,6 +1878,7 @@ void do_mass_mode(char *modes)
             }
         }
     }
+    free(av);
     free(myModes);
 }
 

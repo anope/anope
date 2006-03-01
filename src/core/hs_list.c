@@ -97,20 +97,24 @@ int listOut(User * u)
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
+                        free(tmp);
                         return MOD_CONT;
                     }
                 }
                 from = atoi(tmp);
+                free(tmp);
                 tmp = myStrGetTokenRemainder(key, '-', 1);      /* Read TO out */
                 if (!tmp) {
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
+                        free(tmp);
                         return MOD_CONT;
                     }
                 }
                 to = atoi(tmp);
+                free(tmp);
                 key = NULL;
             }
         }

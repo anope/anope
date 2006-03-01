@@ -95,7 +95,7 @@ int do_list(User * u)
     NickRequest *nr = NULL;
     int nronly = 0;
     char noexpire_char = ' ';
-    int count = 0, from = 0, to = 0;
+    int count = 0, from = 0, to = 0, tofree = 0;
     char *tmp = NULL;
     char *s = NULL;
 
@@ -118,21 +118,26 @@ int do_list(User * u)
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
+                        free(tmp);
                         return MOD_CONT;
                     }
                 }
                 from = atoi(tmp);
+                free(tmp);
                 tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
                 if (!tmp) {
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
+                        free(tmp);
                         return MOD_CONT;
                     }
                 }
                 to = atoi(tmp);
+                free(tmp);
                 pattern = sstrdup("*");
+                tofree = 1;
             }
         }
 
@@ -222,5 +227,7 @@ int do_list(User * u)
         notice_lang(s_NickServ, u, NICK_LIST_RESULTS,
                     nnicks > NSListMax ? NSListMax : nnicks, nnicks);
     }
+    if (tofree)
+        free(pattern);
     return MOD_CONT;
 }

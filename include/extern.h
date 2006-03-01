@@ -128,7 +128,7 @@ E void chan_remove_user_status(Channel * chan, User * user, int16 status);
 E void chan_set_user_status(Channel * chan, User * user, int16 status);
 
 E int get_access_level(ChannelInfo * ci, NickAlias * na);
-E char *get_xop_level(int level);
+E const char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, char **av);
 E void do_join(const char *source, int ac, char **av);

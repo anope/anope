@@ -2438,7 +2438,7 @@ int get_access_level(ChannelInfo * ci, NickAlias * na)
 
 }
 
-char *get_xop_level(int level)
+const char *get_xop_level(int level)
 {
     if (level < ACCESS_VOP) {
         return "Err";

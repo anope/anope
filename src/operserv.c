@@ -1685,6 +1685,7 @@ void runDefCon(void)
                 if ((newmodes = defconReverseModes(DefConChanModes))) {
                     alog("DEFCON: setting %s on all chan's", newmodes);
                     do_mass_mode(newmodes);
+                    free(newmodes);
                 }
                 DefConModesSet = 0;
             }

@@ -881,6 +881,7 @@ E void del_ns_timeout(NickAlias * na, int type);
 E void change_core_display(NickCore * nc, char *newdisplay);
 E void release(NickAlias * na, int from_timeout);
 E int do_setmodes(User * u);
+E int should_mode_change(int16 status, int16 mode);
 
 E void ns_init(void);
 E void nickserv(User * u, char *buf);

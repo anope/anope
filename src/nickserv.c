@@ -46,6 +46,7 @@ int delnickrequest(NickRequest * nr);
 NickRequest *findrequestnick(const char *nick);
 
 int do_setmodes(User * u);
+int should_mode_change(int16 status, int16 mode);
 
 /*************************************************************************/
 /* *INDENT-OFF* */
@@ -1721,7 +1722,7 @@ static void timeout_release(Timeout * t)
 
 /* Add a collide/release timeout. */
 
-void add_ns_timeout(NickAlias * na, int type, time_t delay)
+static void add_ns_timeout(NickAlias * na, int type, time_t delay)
 {
     Timeout *to;
     struct my_timeout *t;
@@ -1817,6 +1818,9 @@ void clean_ns_timeouts(NickAlias * na)
 /*************************************************************************/
 /*********************** NickServ command routines ***********************/
 /*************************************************************************/
+
+
+/* We don't use this function but we keep it for module coders -certus */
 int should_mode_change(int16 status, int16 mode)
 {
     switch (mode) {

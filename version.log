@@ -9,13 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="987"
+VERSION_BUILD="988"
 
 # $Log$
 #
+# BUILD : 1.7.13 (988)
+# BUGS  : 421 436 438
+# NOTES : Hooray, it's still bug-fixing-day!
+#
 # BUILD : 1.7.13 (987)
 # BUGS  : 456
-# NOTES : Added fix for unreal's local channels
+# NOTES : Added fix for unreal's "local" channels
 #
 # BUILD : 1.7.13 (986)
 # BUGS  : n/a

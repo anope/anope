@@ -10,6 +10,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 02/19 F Fixed position of EVENT_ACCESS_DEL.                               [ #00]
 03/01 F Fixed ident check on /bs bot change.                              [#463]
 03/01 F Fixed # prefix check on /cs forbid.                               [#461]
+03/01 F Fixed events on /join 0.                                          [#417]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

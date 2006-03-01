@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="977"
+VERSION_BUILD="978"
 
 # $Log$
+#
+# BUILD : 1.7.13 (978)
+# BUGS  : 417
+# NOTES : fixed events on /join 0.
 #
 # BUILD : 1.7.13 (977)
 # BUGS  : 461 463

@@ -523,6 +523,7 @@ void do_join(const char *source, int ac, char **av)
     Channel *chan;
     char *s, *t;
     struct u_chanlist *c, *nextc;
+    char *channame;
 
     if (UseTS6 && ircd->ts6) {
         user = find_byuid(source);
@@ -545,19 +546,24 @@ void do_join(const char *source, int ac, char **av)
         if (debug)
             alog("debug: %s joins %s", source, s);
 
-        send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, source, s);
-
         if (*s == '0') {
             c = user->chans;
             while (c) {
                 nextc = c->next;
+                channame = sstrdup(c->chan->name);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick, channame);
                 chan_deluser(user, c->chan);
+                send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick, channame);
+                free(channame);
                 free(c);
                 c = nextc;
             }
             user->chans = NULL;
             continue;
         }
+
+        /* how about not triggering the JOIN event on an actual /part :) -certus */
+        send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, source, s);
 
         /* Make sure check_kick comes before chan_adduser, so banned users
          * don't get to see things like channel keys. */

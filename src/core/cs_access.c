@@ -101,7 +101,7 @@ static int access_list(User * u, int index, ChannelInfo * ci,
                        int *sent_header)
 {
     ChanAccess *access = &ci->access[index];
-    char *xop;
+    const char *xop;
 
     if (!access->in_use)
         return 0;

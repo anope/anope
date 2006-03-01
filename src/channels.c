@@ -1271,6 +1271,12 @@ void add_ban(Channel * chan, char *mask)
 
 void add_exception(Channel * chan, char *mask)
 {
+    if (!chan || !mask) {
+        if (debug)
+            alog("debug: add_exception called with NULL values");
+        return;
+    }
+
     if (chan->exceptcount >= chan->exceptsize) {
         chan->exceptsize += 8;
         chan->excepts =
@@ -1286,6 +1292,12 @@ void add_exception(Channel * chan, char *mask)
 
 void add_invite(Channel * chan, char *mask)
 {
+    if (!chan || !mask) {
+        if (debug)
+            alog("debug: add_invite called with NULL values");
+        return;
+    }
+
     if (chan->invitecount >= chan->invitesize) {
         chan->invitesize += 8;
         chan->invite =

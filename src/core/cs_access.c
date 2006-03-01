@@ -136,9 +136,6 @@ static int access_list_callback(User * u, int num, va_list args)
  * The /cs access command.
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
- *
- * Known bug: EVENT_ACCESS_DEL won't be triggered if you use numbers instead of nicks.
- * -Certus
  **/
 int do_access(User * u)
 {
@@ -346,8 +343,12 @@ int do_access(User * u)
                     }
                 }
             }
+            /* We don't know the nick if someone used numbers, so we trigger the event without
+             * nick param. We just do this once, even if someone enters a range. -Certus */
             if (na)
                 send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, na->nick);
+            else
+                send_event(EVENT_ACCESS_DEL, 2, ci->name, u->nick);
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

@@ -81,6 +81,10 @@ int do_forbid(User * u)
                       CHAN_FORBID_SYNTAX));
         return MOD_CONT;
     }
+    if (*chan != '#') {
+        notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
+        return MOD_CONT;
+    }
     if (readonly)
         notice_lang(s_ChanServ, u, READ_ONLY_MODE);
     if ((ci = cs_findchan(chan)) != NULL)

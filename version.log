@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="976"
+VERSION_BUILD="977"
 
 # $Log$
+#
+# BUILD : 1.7.13 (977)
+# BUGS  : 461 463
+# NOTES : happy bug-fixing-day to all of you.
 #
 # BUILD : 1.7.13 (976)
 # BUGS  : 396

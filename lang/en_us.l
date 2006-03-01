@@ -984,6 +984,8 @@ CHAN_MAY_NOT_BE_USED
 	This channel may not be used.
 CHAN_NOT_ALLOWED_TO_JOIN
 	You are not permitted to be on this channel.
+CHAN_X_INVALID
+	Channel %s is not a valid channel.
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX

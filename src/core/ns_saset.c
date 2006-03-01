@@ -80,7 +80,7 @@ int AnopeInit(int argc, char **argv)
     c = createCommand("SASET HIDE", NULL, is_services_admin,
                       NICK_HELP_SASET_HIDE, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SASET NOEXPIRE", is_services_admin, NULL, -1, -1,
+    c = createCommand("SASET NOEXPIRE", NULL, is_services_admin, -1, -1,
                       -1, NICK_HELP_SASET_NOEXPIRE,
                       NICK_HELP_SASET_NOEXPIRE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
@@ -127,7 +127,10 @@ int do_saset(User * u)
         notice_lang(s_NickServ, u, NICK_SASET_DISABLED);
         return MOD_CONT;
     }
-
+	if (!nick) {
+		syntax_error(s_NickServ, u, "SASET", NICK_SASET_SYNTAX);
+		return MOD_CONT;
+	}
     if (!(na = findnick(nick))) {
         notice_lang(s_NickServ, u, NICK_SASET_BAD_NICK, nick);
         return MOD_CONT;

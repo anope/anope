@@ -28,7 +28,8 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed memleak in do_mass_mode().                                  [#450]
 03/01 F Fixed memleaks in cs_list.c, hs_list.c and ns_list.c.             [#447]
 03/01 F Fixed memleaks in hs_set.c.                                       [#441]
-03/01 F Fixed missing TS6 functionality in channels.c.                    [#418]
+04/01 F Fixed missing TS6 functionality in channels.c.                    [#418]
+04/01 F Fixed possible overflow in process().                             [#445]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

@@ -211,7 +211,7 @@ void process()
 
     /* First make a copy of the buffer so we have the original in case we
      * crash - in that case, we want to know what we crashed on. */
-    strscpy(buf, inbuf, 513);
+    strscpy(buf, inbuf, sizeof(buf));
 
     doCleanBuffer((char *) buf);
 

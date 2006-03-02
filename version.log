@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="997"
+VERSION_BUILD="998"
 
 # $Log$
+#
+# BUILD : 1.7.13 (998)
+# BUGS  : 445
+# NOTES : Tixed possible overflow in process()
 #
 # BUILD : 1.7.13 (997)
 # BUGS  : 418

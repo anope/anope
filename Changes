@@ -3,6 +3,7 @@ Anope Version  S V N
 Provided by Anope Dev. <dev@anope.org> - 2006
 02/04 A Events for channel kicks and NickServ logout.                     [ #00]
 03/02 A Added support for TS6 Save (FNC) on ratbox, shadow and charybdis. [#424]
+03/02 F BotServ/HostServ are no longer loaded when they are disabled.     [#440]
 03/01 F Added ircd module support for valid_chan.                         [ #00]
 03/01 F Minor issues in ns_saset.                                         [#455]
 02/13 F Yet anotehr 64bit issue.                                          [ #00]

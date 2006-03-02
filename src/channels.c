@@ -1170,11 +1170,11 @@ void do_cmode(const char *source, int ac, char **av)
                      merge_args(ac - 1, av + 1), av[0]);
             }
         if (tofree0)
-            free(av[0];
+            free(av[0]);
         if (tofree1)
-            free(av[1];
+            free(av[1]);
         if (tofree2)
-            free(av[2];
+            free(av[2]);
         return;
     }
 
@@ -1190,12 +1190,12 @@ void do_cmode(const char *source, int ac, char **av)
     ac--;
     av++;
     chan_set_modes(source, chan, ac, av, 1);
+    if (tofree0)
+        free(av[0]);
     if (tofree1)
-        free(av[0];
+        free(av[1]);
     if (tofree2)
-        free(av[1];
-    if (tofree3)
-        free(av[2];
+        free(av[2]);
 }
 
 /*************************************************************************/

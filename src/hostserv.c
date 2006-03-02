@@ -56,8 +56,9 @@ void moduleAddHostServCmds(void)
  */
 void hostserv_init(void)
 {
-    moduleAddHostServCmds();
-
+    if (s_HostServ) {
+        moduleAddHostServCmds();
+    }
 }
 
 /*************************************************************************/

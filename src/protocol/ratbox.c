@@ -1730,6 +1730,7 @@ int ratbox_valid_nick(char *nick)
     /* TS6 Save extension -Certus */
     if (isdigit(*nick))
         return 0;
+	return 1;
 }
 
 /* 

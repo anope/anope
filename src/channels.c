@@ -527,6 +527,8 @@ void do_join(const char *source, int ac, char **av)
 
     if (UseTS6 && ircd->ts6) {
         user = find_byuid(source);
+        if (!user)
+            user = finduser(source);
     } else {
         user = finduser(source);
     }
@@ -627,11 +629,7 @@ void do_kick(const char *source, int ac, char **av)
             continue;
         }
         if (debug) {
-            if (UseTS6 && ircd->ts6) {
-                alog("debug: kicking %s from %s", user->nick, av[0]);
-            } else {
-                alog("debug: kicking %s from %s", s, av[0]);
-            }
+            alog("debug: kicking %s from %s", user->nick, av[0]);
         }
         for (c = user->chans; c && stricmp(av[0], c->chan->name) != 0;
              c = c->next);
@@ -663,7 +661,13 @@ void do_part(const char *source, int ac, char **av)
     struct u_chanlist *c;
     char *channame;
 
-    user = finduser(source);
+    if (UseTS6 && ircd->ts6) {
+        user = find_byuid(source);
+        if (!user)
+            user = finduser(source);
+    } else {
+        user = finduser(source);
+    }
     if (!user) {
         if (debug) {
             alog("debug: PART from nonexistent user %s: %s", source,
@@ -820,9 +824,12 @@ void do_sjoin(const char *source, int ac, char **av)
 
             if (UseTS6 && ircd->ts6) {
                 user = find_byuid(s);
+                if (!user)
+                    user = finduser(s);
             } else {
                 user = finduser(s);
             }
+
             if (!user) {
                 if (debug) {
                     alog("debug: SJOIN for nonexistent user %s on %s", s,
@@ -903,7 +910,13 @@ void do_sjoin(const char *source, int ac, char **av)
                 *end2++ = csmodes[(int) *s++];
             *end2 = 0;
 
-            user = finduser(s);
+            if (UseTS6 && ircd->ts6) {
+                user = find_byuid(s);
+                if (!user)
+                    user = finduser(s);
+            } else {
+                user = finduser(s);
+            }
 
             if (!user) {
                 if (debug) {
@@ -979,6 +992,8 @@ void do_sjoin(const char *source, int ac, char **av)
 
             if (UseTS6 && ircd->ts6) {
                 user = find_byuid(s);
+                if (!user)
+                    user = finduser(s);
             } else {
                 user = finduser(s);
             }
@@ -1035,6 +1050,8 @@ void do_sjoin(const char *source, int ac, char **av)
     } else if (ac == 2) {
         if (UseTS6 && ircd->ts6) {
             user = find_byuid(source);
+            if (!user)
+                user = finduser(s);
         } else {
             user = finduser(source);
         }

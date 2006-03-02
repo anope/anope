@@ -132,6 +132,11 @@ int do_register(User * u)
         return MOD_CONT;
     }
 
+    if (!anope_valid_nick(u->nick)) {
+        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
+        return MOD_CONT;
+    }
+
     if (RestrictOperNicks) {
         for (i = 0; i < RootNumber; i++) {
             if (stristr(u->nick, ServicesRoots[i]) && !is_oper(u)) {

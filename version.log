@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1000"
+VERSION_BUILD="1001"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1001)
+# BUGS  : 
+# NOTES : NickServ will now check anope_valid_nick()
 #
 # BUILD : 1.7.13 (1000)
 # BUGS  : 424

@@ -1727,8 +1727,9 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason)
 */
 int ratbox_valid_nick(char *nick)
 {
-    /* no hard coded invalid nicks */
-    return 1;
+    /* TS6 Save extension -Certus */
+    if (isdigit(*nick))
+        return 0;
 }
 
 /* 

@@ -2,6 +2,7 @@ Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2006
 02/04 A Events for channel kicks and NickServ logout.                     [ #00]
+03/02 A Added support for TS6 Save (FNC) on ratbox, shadow and charybdis. [#424]
 03/01 F Added ircd module support for valid_chan.                         [ #00]
 03/01 F Minor issues in ns_saset.                                         [#455]
 02/13 F Yet anotehr 64bit issue.                                          [ #00]
@@ -28,9 +29,9 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/01 F Fixed memleak in do_mass_mode().                                  [#450]
 03/01 F Fixed memleaks in cs_list.c, hs_list.c and ns_list.c.             [#447]
 03/01 F Fixed memleaks in hs_set.c.                                       [#441]
-04/01 F Fixed missing TS6 functionality in channels.c.                    [#418]
-04/01 F Fixed possible overflow in process().                             [#445]
-04/01 F Fixed memleak in do_cmode().                                      [#430]
+03/02 F Fixed missing TS6 functionality in channels.c.                    [#418]
+03/02 F Fixed possible overflow in process().                             [#445]
+03/02 F Fixed memleak in do_cmode().                                      [#430]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

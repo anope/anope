@@ -1675,7 +1675,9 @@ void shadowircd_cmd_jupe(char *jserver, char *who, char *reason)
 */
 int shadowircd_valid_nick(char *nick)
 {
-    /* no hard coded invalid nicks */
+    /* TS6 Save extension -Certus */
+    if (isdigit(*nick))
+        return 0;
     return 1;
 }
 

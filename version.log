@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1002"
+VERSION_BUILD="1003"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1003)
+# BUGS  : 467
+# NOTES : Fixed server desc for several ircds
 #
 # BUILD : 1.7.13 (1002)
 # BUGS  : 440

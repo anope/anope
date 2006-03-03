@@ -740,7 +740,7 @@ void rageircd_cmd_capab()
 
 void rageircd_cmd_server(char *servname, int hop, char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
+    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 /* PASS */

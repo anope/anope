@@ -951,7 +951,7 @@ void viagra_cmd_pass(char *pass)
 /* SERVER */
 void viagra_cmd_server(char *servname, int hop, char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
+    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 void viagra_cmd_burst()

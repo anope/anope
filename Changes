@@ -34,6 +34,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/02 F Fixed possible overflow in process().                             [#445]
 03/02 F Fixed memleak in do_cmode().                                      [#430]
 03/03 F Rage, Bahamut and Viagra will now use the correct server desc.    [#467]
+03/03 F Fixed botserv's mode behaviour with protect umode.                [#333]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

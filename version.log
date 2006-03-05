@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1004"
+VERSION_BUILD="1005"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1005)
+# BUGS  : 469
+# NOTES : Applied Trystan's moduleNoticeLang() patch
 #
 # BUILD : 1.7.13 (1004)
 # BUGS  : 333

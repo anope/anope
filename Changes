@@ -52,6 +52,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 02/20 F Fixed some TS6 issues with do_cmode() and do_nick()               [#396]
 02/12 F Double unbanning of in certain conditions.                        [ #00]
 01/25 F va_copy issue for various platforms.                              [ #00]
+03/05 F Fixed moduleNoteiceLang() issue.                                  [#469]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 02/28 F fantasy kick now honours protected, just like cs versions.        [ #00]

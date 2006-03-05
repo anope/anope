@@ -2536,7 +2536,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     }
 	
     /* Find the users lang, and use it if we can */
-    if (u->na && u->na->nc) {
+    if (u && u->na && u->na->nc) {
         lang = u->na->nc->language;
     }
 
@@ -2551,7 +2551,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 
         buf = sstrdup(fmt);
         va_start(va, number);
-        vsnprintf(buffer, 4095, outbuf, va);
+        vsnprintf(buffer, 4095, buf, va);
         va_end(va);
         s = buffer;
         while (*s) {

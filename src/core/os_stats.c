@@ -35,8 +35,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
 
     moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
+    moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("STATS", do_stats, is_services_oper, OPER_HELP_STATS,
@@ -78,9 +77,10 @@ void myOperServHelp(User * u)
  **/
 int stats_count_servers(Server * s)
 {
-    int count = 1;
+    int count = 0;
 
     while (s) {
+        count++;
         if (s->links)
             count += stats_count_servers(s->links);
         s = s->next;
@@ -234,9 +234,8 @@ int do_stats(User * u)
         }
     }
 
-    if (!extra
-        || ((stricmp(extra, "MEMORY") != 0)
-            && (stricmp(extra, "UPLINK") != 0))) {
+    if (!extra || ((stricmp(extra, "MEMORY") != 0)
+                   && (stricmp(extra, "UPLINK") != 0))) {
         notice_lang(s_OperServ, u, OPER_STATS_CURRENT_USERS, usercnt,
                     opcnt);
         tm = localtime(&maxusertime);
@@ -310,9 +309,9 @@ int do_stats(User * u)
         }
     }
 
-    if (extra
-        && ((stricmp(extra, "ALL") == 0)
-            || (stricmp(extra, "UPLINK") == 0)) && is_services_admin(u)) {
+    if (extra && ((stricmp(extra, "ALL") == 0)
+                  || (stricmp(extra, "UPLINK") == 0))
+        && is_services_admin(u)) {
         buf[0] = '\0';
         buflen = 511;           /* How confusing, this is the amount of space left! */
         for (i = 0; capab_info[i].token; i++) {
@@ -331,10 +330,10 @@ int do_stats(User * u)
                 if (capab_info[i].flag == CAPAB_NICKCHARS) {
                     strncat(buf, "=", buflen);
                     buflen--;
-		    if(ircd->nickchars) {
+                    if (ircd->nickchars) {
                         strncat(buf, ircd->nickchars, buflen);
                         buflen -= strlen(ircd->nickchars);
-		    } /* leave blank if it was null */
+                    }           /* leave blank if it was null */
                 }
             }
         }
@@ -345,9 +344,9 @@ int do_stats(User * u)
                     stats_count_servers(serv_uplink));
     }
 
-    if (extra
-        && ((stricmp(extra, "ALL") == 0)
-            || (stricmp(extra, "MEMORY") == 0)) && is_services_admin(u)) {
+    if (extra && ((stricmp(extra, "ALL") == 0)
+                  || (stricmp(extra, "MEMORY") == 0))
+        && is_services_admin(u)) {
         long count, mem;
 
         notice_lang(s_OperServ, u, OPER_STATS_BYTES_READ,

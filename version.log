@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1005"
+VERSION_BUILD="1006"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1006)
+# BUGS  : 468
+# NOTES : Fixed a counting issue in /os stats uplink and ran indent on src/core/os_uplink.c
 #
 # BUILD : 1.7.13 (1005)
 # BUGS  : 469

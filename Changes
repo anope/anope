@@ -46,6 +46,9 @@ Provided by illu. <illu@rs2i.net> - 2006
 01/25 F Updated the french language file.                                 [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
+03/05 F Fixed moduleNoteiceLang() issue.                                  [#469]
+03/12 F moduleGetLastBuffer() returning NULL on alias and pseudo clients  [#476]
+03/12 F nickIsServices() returns correctly for aliases                    [ #00]
 03/01 A Clarity on module loading status numbers.                         [#435]
 03/01 F Applied ultiamte3 chan sqline patch.                              [#412]
 03/01 F Crash when not giving user for moduleGetLangString.               [#454]
@@ -53,7 +56,6 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 02/20 F Fixed some TS6 issues with do_cmode() and do_nick()               [#396]
 02/12 F Double unbanning of in certain conditions.                        [ #00]
 01/25 F va_copy issue for various platforms.                              [ #00]
-03/05 F Fixed moduleNoteiceLang() issue.                                  [#469]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 02/28 F fantasy kick now honours protected, just like cs versions.        [ #00]

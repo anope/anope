@@ -20,7 +20,6 @@ extern char *mod_current_module_name;
 extern User *mod_current_user;
 extern char *mod_current_buffer;
 /*************************************************************************/
-/*************************************************************************/
 
 /* Use ignore code? */
 int allow_ignore = 1;
@@ -140,7 +139,6 @@ IgnoreData *get_ignore(const char *nick)
 }
 
 /*************************************************************************/
-/*************************************************************************/
 
 /* split_buf:  Split a buffer into arguments and store the arguments in an
  *             argument vector pointed to by argv (which will be malloc'd
@@ -248,16 +246,21 @@ void process()
        av[0] to see if its a service nick if so assign mod_current_buffer the
        value from AV[1] else just assign av[0] - TSL */
     /* First check if the ircd proto module overrides this -GD */
+    /* fix to moduleGetLastBuffer() bug 476:
+       fixed in part by adding {} to nickIsServices()
+       however if you have a pseudo they could not use moduleGetLastBuffer()
+       cause they are not part of nickIsServices, even those the ac count is 2
+       that was ignored and only the first param was passed on which is fine for
+       Bahmut ircd aliases but not for pseudo clients on. So additional logic is
+       that if the ac is greater then 1 copy av[1] else copy av[0] 
+       I also changed from if statments, cause attempting to access a array member
+       that is not set can lead to odd things - TSL (3/12/06) */     
     if (!anope_set_mod_current_buffer(ac, av)) {
-        if (av[0]) {
+        if (ac >= 1) {
             if (nickIsServices(av[0], 1)) {
-                if (av[1]) {
-                    mod_current_buffer = sstrdup(av[1]);
-                } else {
-                    mod_current_buffer = sstrdup(av[0]);
-                }
+                mod_current_buffer = (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
             } else {
-                mod_current_buffer = sstrdup(av[0]);
+                mod_current_buffer = (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
             }
         } else {
             mod_current_buffer = NULL;

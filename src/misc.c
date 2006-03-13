@@ -826,10 +826,11 @@ int nickIsServices(char *tempnick, int bot)
 
     s = strchr(nick, '@');
     if (s) {
-     *s++ = 0;
-     if (stricmp(s, ServerName) != 0)
-        free(nick);
-        return found;
+        *s++ = 0;
+        if (stricmp(s, ServerName) != 0) {
+            free(nick);
+            return found;
+        }
     }
 
     if (s_NickServ && (stricmp(nick, s_NickServ) == 0))

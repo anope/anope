@@ -9,7 +9,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 
 OBJECTS= $(SRCS:.c=.o)
 SO_FILES=$(OBJECTS:.o=.s)
-CDEFS= -g -rdynamic -Wall
+CDEFS= -rdynamic -Wall
 
 all: modules subs
 

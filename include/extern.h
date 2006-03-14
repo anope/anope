@@ -1350,4 +1350,9 @@ E void eventprintf(char *fmt, ...);
 E void event_process_hook(char *name, int argc, char **argv);
 E void send_event(char *name, int argc, ...);
 
+#ifdef _WIN32
+E char *GetWindowsVersion(void) ;
+E int SupportedWindowsVersion(void);
+#endif
+
 #endif	/* EXTERN_H */

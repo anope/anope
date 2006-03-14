@@ -655,6 +655,10 @@ void do_backtrace(int show_segheader)
     alog("Backtrace: not available on this platform");
 #endif
 #else
-    alog("Backtrace: not available on this windows");
+    char *winver;
+    winver = GetWindowsVersion();
+    alog("Backtrace: not available on Windows");
+    alog("Running %S", winver);
+    free(winver);
 #endif
 }

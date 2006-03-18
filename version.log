@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1009"
+VERSION_BUILD="1010"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1010)
+# BUGS  : 471
+# NOTES : fixed charybdis umodes.
 #
 # BUILD : 1.7.13 (1009)
 # BUGS  : 460

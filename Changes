@@ -37,6 +37,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/03 F Rage, Bahamut and Viagra will now use the correct server desc.    [#467]
 03/03 F Fixed botserv's mode behaviour with protect umode.                [#333]
 03/18 F Fixed sstrdup() with NULL argument in cs_akick.c.                 [#460]
+03/18 F Fixed charybdis umodes.                                           [#471]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

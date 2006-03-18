@@ -451,8 +451,13 @@ int do_akick(User * u)
                                 ci->akick[a].u.mask =
                                     sstrdup(ci->akick[b].u.mask);
                             }
-                            ci->akick[a].reason =
-                                sstrdup(ci->akick[b].reason);
+                            /* maybe we should first check whether there
+                               is a reason before we sstdrup it -Certus */
+                            if (ci->akick[b].reason)
+                                ci->akick[a].reason =
+                                    sstrdup(ci->akick[b].reason);
+                            else
+                                ci->akick[a].reason = NULL;
                             ci->akick[a].creator =
                                 sstrdup(ci->akick[b].creator);
                             ci->akick[a].addtime = ci->akick[b].addtime;

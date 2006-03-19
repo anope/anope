@@ -111,7 +111,7 @@ int do_chankill(User * u)
                 if (is_oper(cu->user)) {
                     continue;
                 }
-                strncpy(mask, "*@", 3); /* Use *@" for the akill's, */
+                (void) strncpy(mask, "*@", 3); /* Use *@" for the akill's, */
                 strncat(mask, cu->user->host, HOSTMAX);
                 add_akill(NULL, mask, s_OperServ, expires, reason);
                 check_akill(cu->user->nick, cu->user->username,

@@ -73,7 +73,7 @@ int do_status(User * u)
     ChannelInfo *ci;
     User *u2;
     char *nick, *chan;
-    char *temp;
+    char *temp = NULL;
 
     chan = strtok(NULL, " ");
     nick = strtok(NULL, " ");

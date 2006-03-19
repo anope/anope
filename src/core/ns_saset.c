@@ -14,6 +14,9 @@
 /*************************************************************************/
 
 #include "module.h"
+#ifdef USE_ENCRYPTION
+#include "encrypt.h"
+#endif
 
 int do_saset(User * u);
 int do_saset_display(User * u, NickCore * nc, char *param);

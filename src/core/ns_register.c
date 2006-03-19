@@ -14,6 +14,9 @@
 /*************************************************************************/
 
 #include "module.h"
+#ifdef USE_ENCRYPTION
+#include "encrypt.h"
+#endif
 
 int do_confirm(User * u);
 int do_register(User * u);

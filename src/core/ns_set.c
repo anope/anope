@@ -14,6 +14,9 @@
 /*************************************************************************/
 
 #include "module.h"
+#ifdef USE_ENCRYPTION
+#include "encrypt.h"
+#endif
 
 int do_set(User * u);
 int do_set_display(User * u, NickCore * nc, char *param);

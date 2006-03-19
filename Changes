@@ -38,6 +38,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/03 F Fixed botserv's mode behaviour with protect umode.                [#333]
 03/18 F Fixed sstrdup() with NULL argument in cs_akick.c.                 [#460]
 03/18 F Fixed charybdis umodes.                                           [#471]
+03/19 F Fixed a gcc4 compiling issue.                                     [#453]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]
@@ -51,6 +52,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 03/18 A New icon file for anope win32.                                    [#472]
 03/14 A Anope will now terminate on Win98. Added version check.           [#473]
 03/01 A Clarity on module loading status numbers.                         [#435]
+03/19 F Fixed some gcc4 compiling issues.                                 [#453]
 03/18 F Fixed closing of file pointer in langtool.c.                      [#478]
 03/14 F Fixed gcc switches for modules.                                   [#474]
 03/12 F moduleGetLastBuffer() returning NULL on alias and pseudo clients  [#476]

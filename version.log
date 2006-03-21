@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1012"
+VERSION_BUILD="1013"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1013)
+# BUGS  : 
+# NOTES : bs will now check for a bot on /bs kick
 #
 # BUILD : 1.7.13 (1012)
 # BUGS  : 453

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="13"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1017"
+VERSION_BUILD="1018"
 
 # $Log$
+#
+# BUILD : 1.7.13 (1018)
+# BUGS  : 
+# NOTES : fixed winver var in init.c
 #
 # BUILD : 1.7.13 (1017)
 # BUGS  : 

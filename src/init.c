@@ -405,9 +405,6 @@ int openlog_failed = 0, openlog_errno = 0;
 int init_primary(int ac, char **av)
 {
     int started_from_term = isatty(0) && isatty(1) && isatty(2);
-#ifdef _WIN32
-    char *winver;
-#endif
 
     /* Set file creation mask and group ID. */
 #if defined(DEFUMASK) && HAVE_UMASK
@@ -488,7 +485,7 @@ int init_secondary(int ac, char **av)
         }
     }
     if (!SupportedWindowsVersion()) {
-        winver = GetWindowsVersion();
+        char *winver = GetWindowsVersion();
         alog("%s is not a supported version of Windows", winver);
         free(winver); 
         return -1;

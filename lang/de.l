@@ -230,7 +230,7 @@ NICK_X_ILLEGAL
 NICK_X_TRUNCATED
 	Dein Nickname %s wurde auf %d Zeichen gekürzt.
 NICK_X_SUSPENDED
-	Nick %s is currently suspended.
+	Der Nick %s ist vorübergehend gesperrt.
 CHAN_X_NOT_REGISTERED
 	Der Channel %s ist nicht registriert.
 CHAN_X_NOT_IN_USE
@@ -241,7 +241,7 @@ CHAN_X_FORBIDDEN_OPER
 	Der Channel %s wurde verboten von %s:
 	%s
 CHAN_X_SUSPENDED
-	      Suspended: [%s] %s
+	      Vorübergehend gesperrt: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Um diesen Befehl nutzen zu können, musst du dich identifizieren.
 	Versuch es erneut nach /msg %s IDENTIFY Passwort.
@@ -549,55 +549,55 @@ NICK_SET_MSG_OFF
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
 NICK_SASET_DISABLED
-	Sorry, nickname option setting is temporarily disabled.
+	Das Setzen von Nick-Optionen ist zeitweise deaktiviert.
 NICK_SASET_UNKNOWN_OPTION
-	Unknown SASET option %s.
+	Ubekannte SASET option %s.
 NICK_SASET_BAD_NICK
-	Nickname %s not registered.
+	Nickname %s ist nicht registriert.
 NICK_SASET_OPTION_DISABLED
-	Option %s cannot be set on this network.
+	Die Einstellung %s ist auf diesem Netzwerk nicht verfügbar.
 
 # SASET DISPLAY responses
 NICK_SASET_DISPLAY_INVALID
-	The new display for %s MUST be a nickname of the nickname group!
+  Der für %s angezeigte Ursprung muss ein Nickname aus der zugehörigen Gruppe sein!
 NICK_SASET_DISPLAY_CHANGED
-	The new display is now %s.
+	Der angezeigte Gruppenursprung ist jetzt %s.
 
 # SASET PASSWORD responses
 NICK_SASET_PASSWORD_FAILED
-	Sorry, couldn't change password for %s.
+	Das Passwort für %s konnte nicht geändert werden.
 NICK_SASET_PASSWORD_CHANGED
-	Password for %s changed.
+	Passwort für %s wurde geändert.
 NICK_SASET_PASSWORD_CHANGED_TO
-	Password for %s changed to %s.
+	Passwort für %s wurde auf %s gesetzt.
 
 # SASET LANGUAGE responses
 NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
+	URL für %s wurde auf %s gesetzt.
 NICK_SASET_URL_UNSET
-	URL %s unset.
+	URL %s wurde entfernt.
 
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
-	E-mail address for %s changed to %s.
+	E-mail Adresse für %s wurde auf %s geändert.
 NICK_SASET_EMAIL_UNSET
-	E-mail address for %s unset.
+	E-mail Adresse  %s wurde entfernt.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
-	You cannot unset the e-mail on this network.
+	Auf diesem Netzwerk ist es nicht möglich die E-Mail Adresse zu entfernen.
 	
 # SASET ICQ responses
 NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
+	ICQ Nummer für %s wurde auf %s gesetzt.
 NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
+	ICQ Nummer %s wurde entfernt.
 NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
+	%s ist keine gültige ICQ Nummer.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
-	Greet message for %s changed to %s.
+	Begrüssungsnachricht %s wurde auf %s geändert.
 NICK_SASET_GREET_UNSET
-	Greet message for %s unset.
+	Begrüssungsnachricht %s wurde entfernt.
 
 # SASET PROTECT responses
 NICK_SASET_KILL_SYNTAX
@@ -605,67 +605,67 @@ NICK_SASET_KILL_SYNTAX
 NICK_SASET_KILL_IMMED_SYNTAX
 	SASET nickname KILL {ON | QUICK | IMMED | OFF}
 NICK_SASET_KILL_ON
-	Protection is now ON for %s.
+	Schutz des Nicknamens %s ist jetzt aktiviert (ON).
 NICK_SASET_KILL_QUICK
-	Protection is now ON for %s, with a reduced delay.
+  Schutz des Nicknamens %s mit verkürzter Verzögerung aktiviert (ON).
 NICK_SASET_KILL_IMMED
-	Protection is now ON for %s, with no delay.
+  Schutz des Nicknamens %s ohne Verzögerung aktiviert (ON).
 NICK_SASET_KILL_IMMED_DISABLED
-	The IMMED option is not available on this network.
+	Die IMMED Einstellung (Schutz ohne Verzögerung) ist auf diesem Netzwerk nicht verfügbar.
 NICK_SASET_KILL_OFF
-	Protection is now OFF for %s.
+	Schutz des Nicknamens %s ist jetzt deaktiviert (OFF).
 
 # SASET SECURE responses
 NICK_SASET_SECURE_SYNTAX
 	SASET nickname SECURE {ON | OFF}
 NICK_SASET_SECURE_ON
-	Secure option is now ON for %s.
+	Sicherheitsfunktion (SECURE) ist für %s jetzt aktiviert (ON).
 NICK_SASET_SECURE_OFF
-	Secure option is now OFF for %s.
+	Sicherheitsfunktion (SECURE) ist für %s jetzt deaktiviert (OFF).
 
 # SASET PRIVATE responses
 NICK_SASET_PRIVATE_SYNTAX
 	SASET nickname PRIVATE {ON | OFF}
 NICK_SASET_PRIVATE_ON
-	Private option is now ON for %s.
+	Der Privat-Modus (PRIVATE) ist für %s jetzt aktiviert (ON).
 NICK_SASET_PRIVATE_OFF
-	Private option is now OFF for %s.
+	Der Privat-Modus (PRIVATE) ist für %s jetzt deaktiviert (OFF).
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SASET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
-	The E-mail address of %s will now be hidden from %s INFO displays.
+  Die Emailadresse %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_EMAIL_OFF
-	The E-mail address of %s will now be shown in %s INFO displays.
+	Die Emailadresse %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_MASK_ON
-	The last seen user@host mask of %s will now be hidden from %s INFO displays.
+  Die letzte bekannte user@host Maske von %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_MASK_OFF
-	The last seen user@host mask of %s will now be shown in %s INFO displays.
+	Die letzte bekannte user@host Maske von %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_QUIT_ON
-	The last quit message of %s will now be hidden from %s INFO displays.
+  Die letzte Quit-Nachricht von %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_QUIT_OFF
-	The last quit message of %s will now be shown in %s INFO displays.
+	Die letzte Quit-Nachricht von %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_STATUS_ON
-	The services access status of %s will now be hidden from %s INFO displays.
+  Die Services-Zugriffsberechtigungen von %s werden jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_STATUS_OFF
-	The services access status of %s will now be shown in %s INFO displays.
+	Die Services-Zugriffsberechtigungen von %s werden jetzt bei %s INFO Abrufen angezeigt.
 	
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SSAET nickname PRIVATE {ON | OFF}
+	SASET nickname PRIVATE {ON | OFF}
 NICK_SASET_MSG_ON
-	Services will now reply to %s with messages.
+	Die Services werden jetzt %s mit messages antworten.
 NICK_SASET_MSG_OFF
-	Services will now reply to %s with notices.
+	Die Services werden jetzt %s mit notices antworten.
 
 # SET NOEXPIRE responses
 NICK_SASET_NOEXPIRE_SYNTAX
 	SASET nickname NOEXPIRE {ON | OFF}
 NICK_SASET_NOEXPIRE_ON
-	Nick %s will not expire.
+	Nickname %s wird nicht mehr verfallen.
 NICK_SASET_NOEXPIRE_OFF
-	Nick %s will expire.
+	Nickname %s wird wieder verfallen.
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
@@ -756,9 +756,9 @@ NICK_INFO_FOR_MORE
 
 # LIST responses
 NICK_INFO_SUSPENDED
-	Dieser Nickname ist zur Zeit suspended, Grund: %s
+	Dieser Nickname ist zur Zeit gesperrt, Grund: %s
 NICK_INFO_SUSPENDED_NO_REASON
-	Dieser Nickname ist zur Zeit suspended
+	Dieser Nickname ist zur Zeit gesperrt
 
 
 # LIST responses
@@ -1016,7 +1016,7 @@ CHAN_NOT_ALLOWED_TO_JOIN
 
 # REGISTER responses
 CHAN_X_INVALID
-	Channel %s is not a valid channel.
+	Channel %s ist kein gültiger Channel.
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
@@ -1126,9 +1126,9 @@ CHAN_EMAIL_UNSET
 
 # SET ENTRYMSG responses
 CHAN_ENTRY_MSG_CHANGED
-	Eintrittsmeldung von %s wurde geändert.
+	Begrüssungsnachricht von %s wurde geändert.
 CHAN_ENTRY_MSG_UNSET
-	Eintrittsmeldung von %s wurde entfernt.
+	Begrüssungsnachricht von %s wurde entfernt.
 	
 # SET BANTYPE responses
 CHAN_SET_BANTYPE_INVALID
@@ -1152,15 +1152,15 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET Channel KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic retention Option für %s ist jetzt ON.
+	Die Topic-Beibehaltung für %s ist jetzt aktiviert (ON).
 CHAN_SET_KEEPTOPIC_OFF
-	Topic retention Option für %s ist jetzt OFF.
+	Die Topic-Beibehaltung für %s ist jetzt deaktiviert (OFF).
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET Channel TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topic-Serre Option für %s ist jetzt ON.
+	Topic-Sperre Option für %s ist jetzt ON.
 CHAN_SET_TOPICLOCK_OFF
 	Topic-Sperre Option für %s ist jetzt OFF.
 
@@ -2145,7 +2145,7 @@ BOT_INFO_OPT_DONTKICKVOICES
 BOT_INFO_OPT_FANTASY
 	Fantasy-Mode
 BOT_INFO_OPT_GREET
-	Eintrittsmeldung
+	Begrüssungsnachricht
 BOT_INFO_OPT_NOBOT
 	Kein Bot
 BOT_INFO_OPT_SYMBIOSIS
@@ -2190,9 +2190,9 @@ BOT_SET_FANTASY_OFF
 BOT_SET_GREET_SYNTAX
 	SET Channel GREET {ON|OFF}
 BOT_SET_GREET_ON
-	Eintrittsmeldung ist jetzt ON im %s.
+	Begrüssungsnachricht ist jetzt ON im %s.
 BOT_SET_GREET_OFF
-	Eintrittsmeldung ist jetzt OFF im %s.
+	Begrüssungsnachricht ist jetzt OFF im %s.
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
@@ -2353,9 +2353,9 @@ BOT_BAD_IDENT
 
 # General messages
 OPER_BOUNCY_MODES
-	Services können die Modis nicht ändern. Ist der Server richtig konfiguriert?
+	Services können die Modi nicht ändern. Ist der Server richtig konfiguriert?
 OPER_BOUNCY_MODES_U_LINE
-	Services können die Modis nicht ändern. Sind die U:lines des
+	Services können die Modi nicht ändern. Sind die U:lines des
 	Servers richtig konfiguriert?
 
 # GLOBAL responses
@@ -2491,11 +2491,11 @@ OPER_STATS_RESET
 
 # MODE responses
 OPER_STATS_UPLINK_SERVER
-	Uplink server: %s
+	Uplink Server: %s
 OPER_STATS_UPLINK_CAPAB
-	Uplink capab: %s
+	Uplink-Fähigkeiten: %s
 OPER_STATS_UPLINK_SERVER_COUNT
-	Servers found: %d
+	Server gefunden: %d
 
 # MODE responses
 OPER_MODE_SYNTAX
@@ -2507,9 +2507,9 @@ OPER_UMODE_SYNTAX
 
 # UMODE responses
 OPER_UMODE_SUCCESS
-	Usermodis von %s geändert.
+	Usermodi von %s geändert.
 OPER_UMODE_CHANGED
-	%s hat deine Usermodis geändert.
+	%s hat deine Usermodi geändert.
 
 # OLINE responses
 OPER_OLINE_SYNTAX
@@ -2523,9 +2523,9 @@ OPER_OLINE_IRCOP
 OPER_CLEARMODES_SYNTAX
 	CLEARMODES Channel [ALL]
 OPER_CLEARMODES_DONE
-	Alle binären Modis und Bans wurden aus dem Channel %s entfernt.
+	Alle binären Modi und Bans wurden aus dem Channel %s entfernt.
 OPER_CLEARMODES_ALL_DONE
-	Alle Modis wurden vom Channel %s zurückgesetzt.
+	Alle Modi wurden vom Channel %s zurückgesetzt.
 
 
 # KICK responses
@@ -3391,7 +3391,7 @@ NICK_HELP_CMD_ACCESS
 NICK_HELP_CMD_SET
 	    SET         Optionen einstellen, auch Kill-Schutz
 NICK_HELP_CMD_SASET
-	    SASET      Set SET-options on another nickname
+	    SASET      Setzt SET Einstellungen auf einen anderen Nicknamen
 NICK_HELP_CMD_DROP
 	    DROP        Die Registrierung einen Nicknamen löschen
 NICK_HELP_CMD_RECOVER
@@ -3753,151 +3753,168 @@ NICK_HELP_SET_MSG
 NICK_HELP_SASET
 	Syntax: SASET nickname option parameters.
 	
-	Sets various nickname options.  option can be one of:
+	Setzt verschiedene Einstellungen für den Nicknamen.  Gültig für option ist:
 	
-	    DISPLAY    Set the display of the group in Services
-	    PASSWORD   Set the nickname password
-	    LANGUAGE   Set the language Services will use when
-	                   sending messages
-	    URL        Associate a URL with the nickname
-	    EMAIL      Associate an E-mail address with the nickname
-	    ICQ        Associate an ICQ number with the nickname
-	    GREET      Associate a greet message with the nickname
-	    KILL       Turn protection on or off
-	    SECURE     Turn nickname security on or off
-	    PRIVATE    Prevent the nickname from appearing in a
-	                   /msg %S LIST
-	    HIDE       Hide certain pieces of nickname information
-	    MSG        Change the communication method of Services
-	    NOEXPIRE   Prevent the nickname from expiring
+	    DISPLAY    Setzt einen Nicknamen als Ursprung der Nickgruppe
+	    PASSWORD   Setzt das Passwort eines Nicknamens
+	    LANGUAGE   Bestimmt die Sprache, welche die Services benutzen,
+	    							wenn sie eine Nachricht senden
+	    URL        Fügt eine URL dem Nicknamen hinzu
+	    EMAIL      Fügt eine Emailadresse dem Nicknamen hinzu
+	    ICQ        Fügt eine ICQ Nummer dem Nicknamen hinzu
+	    GREET      Fügt eine Begrüssungsnachricht dem Nicknamen hinzu
+	    KILL       Schützt den Nicknamen durch Identifikationszwang
+	    SECURE     Schaltet die Identifikationssicherheitsfunktion 
+	    							an oder aus
+	    PRIVATE    Verhindert, dass der Nickname im Befehl
+	                   /msg %S LIST auftaucht
+	    HIDE       Versteckt bestimmte, dem Nicknamen zugeordnete, 
+	    							Informationen
+	    MSG        Bestimmt die Art wie die Services Nachrichten senden
+	    NOEXPIRE   Verhindert, dass der Nickname nach einer bestimmten
+	    							Zeit verfällt
 	
-	Type /msg %S HELP SASET option for more information
-	on a specific option. The options will be set on the given
-	nickname. 
+	Mit /msg %S HELP SASET option können mehr Informationen zu 
+	den Einstellungen angefordert werden. Die Einstellungen betreffen den
+	angegebenen Nicknamen. 
 	
-	Limited to Services admins.
+	Die Befehle sind nur für Services admins verfügbar.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
 	
-	Changes the display used to refer to the nickname group in 
-	Services. The new display MUST be a nick of the group.
+	Ändert den Nicknamen der als Ursprung einer Nicknamengruppe
+	angezeigt wird. Der neue Ursprung muss ein Nickname der 
+	entsprechenden Gruppe sein.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SET nickname PASSWORD new-password
 	
-	Changes the password used to identify as the nick's	owner.
+	Ändert das Passwort um sich als Besitzer eines Nicknamens
+	zu identifizieren.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
 	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
+	Verknüpft eine URL mit dem Nicknamen. Diese URL wird
+	angezeigt wenn jemand mit dem INFO Befehl nähere 
+	Informationen zu dem Nicknamen abruft.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
-	Associates the given E-mail address with the nickname.
+	Verknüpft die angegeben Emailadresse mit dem
+	Nicknamen.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
 	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
+	Verknüpft die angegebene ICQ Nummer mit dem Nicknamen.
+	Diese ICQ Nummer wird angezeigt wenn jemand mit dem 
+	INFO Befehl nähere Informationen zu dem Nicknamen abruft.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
 	
-	Makes the given message the greet of the nickname, that
-	will be displayed when joining a channel that has GREET
-	option enabled, provided that the user has the necessary 
-	access on it.
+	Setzt die angegebene Nachricht als Begrüssungsnachricht
+	für den Nicknamen. Diese wird angezeigt, wenn der Nickname
+	den Channel betritt und die GREET Einstellung aktiviert
+	ist. Vorraussetzung ist, dass der Benutzer die entsprechenden
+	Rechte besitzt.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
 	
-	Turns the automatic protection option for the nick
-	on or off.  With protection on, if another user
-	tries to take the nick, they will be given one minute to
-	change to another nick, after which %S will forcibly change
-	their nick.
+	Stellt den automatischen Schutz des Nicknames durch
+	einen Kill an oder aus. Nimmt ein User diesen Nickname, 
+	hat er eine Minute Zeit sich zu identifizieren,
+	danach wird er, bei eingeschaltetem Schutz, durch
+	%S umbenannt in einen Zufallsnamen.
 	
-	If you select QUICK, the user will be given only 20 seconds
-	to change nicks instead of the usual 60.  If you select
-	IMMED, user's nick will be changed immediately without being
-	warned first or given a chance to change their nick; please
-	do not use this option unless necessary.  Also, your
-	network's administrators may have disabled this option.
+	Bei der Einstellung QUICK wird Wartezeit zum
+	Identifizieren auf 20 Sekunden herabgesenkt. Bei
+	IMMED wird der User sofort ohne Warnung
+	umbenannt, wenn er nicht auf der Zugriffsliste des
+	Nicknamens steht. Bitte benutze diese Option nicht
+	unnötigerweise.
+	Ausserdem ist es möglich, dass die Netz-Admins
+	diese Option deaktiviert haben.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
 	
-	Turns %S's security features on or off for your
-	nick.  With SECURE set, you must enter your password
-	before you will be recognized as the owner of the nick,
-	regardless of whether your address is on the access
-	list.  However, if you are on the access list, %S
-	will not auto-kill you regardless of the setting of the
-	KILL option.
+	Schaltet die Sicherheitsfunktionen von %S für den
+	Nicknamen an oder aus. Mit eingeschaltetem SECURE
+	muss sich der Nickname immer identifizieren, egal 
+	ob seine Hostmaske auf der Zugriffsliste für den 
+	Nicknamen steht oder nicht. Wenn er allerdings auf 
+	der Zugriffsliste stehst, wird %S bei 
+	fehlender Identifizierung den Nicknamen nicht killen
+	(ist von der KILL Option unabhängig).
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
 	
-	Turns %S's privacy option on or off for the nick.
-	With PRIVATE set, the nickname will not appear in
-	nickname lists generated with %S's LIST command.
-	(However, anyone who knows the nickname can still get
-	information on it using the INFO command.)
+	Ändert %S's Privat-Modus für den Nicknamen.
+	Mit eingeschaltetem PRIVATE wird der Nickname
+	nicht auf Listen erscheinen, die durch %S's LIST 
+	Befehl erstellt wurden.
 	
-	Limited to Services admins.
+	(Jeder der den Nicknamen kennt, kann gezielt mit 
+	dem INFO Befehl Informationen über den Nicknamen 
+	abrufen, unabhängig vom Privat-Modus.)
+	
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
+
+	Erlaubt es beim angegebenen Nicknamen , bestimmte Informationen 
+	in der Ausgabe von %S INFO zu verstecken.
+	Es kann die eMail-Adresse versteckt (EMAIL) werden, die 
+	zuletzt gesehene user@host-Maske (USERMASK), der
+	Services-Zugriffsstatus (STATUS) und die letzte Quit-Nachricht
+	(QUIT).
+	Der zweite Parameter bestimmt, ob die Information angezeigt
+	werden soll (OFF) oder nicht (ON).
 	
-	Allows you to prevent certain pieces of information from
-	being displayed when someone does a %S INFO on the
-	nick.  You can hide the E-mail address (EMAIL), last seen
-	user@host mask (USERMASK), the services access status
-	(STATUS) and  last quit message (QUIT).
-	The second parameter specifies whether the information should
-	be displayed (OFF) or hidden (ON).
-	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
-	Allows you to choose the way Services are communicating with 
-	the given user. With MSG set, Services will use messages,
-	else they'll use notices.
+	Bestimmt die Art, mit dem sich die Services mit dem 
+	angebenen Nicknamen unterhalten. 
+	Ist MSG eingeschaltet, benutzen die Services Messages
+	(Queries), ansonsten werden die Antworten als Notices
+	geschickt (Standard).
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
 	
-	Sets whether the given nickname will expire.  Setting this
-	to ON prevents the nickname from expiring.
+	Bestimmt ob ein Nickname nach einer gewissen Zeit 
+	verfällt. Wird NOEXPIRE auf ON gesetzt verfällt
+	der Nickname nie.
 	
-	Limited to Services admins.
+	Beschränkt auf Services Admins.
 
 NICK_HELP_RECOVER
 	Syntax: RECOVER Nickname [Passwort]
@@ -3931,8 +3948,8 @@ NICK_HELP_RELEASE
 	Syntax: RELEASE Nickname [Passwort]
 	
 	Durch %S wird die Nickname-Sperre, ausgelöst
-	durch z.B. den Automatischen Kill-Schutz oder durch
-	Verwendung des RECOVER Befehlss, aufgehoben.
+	durch z.B. den automatischen Kill-Schutz oder durch
+	Verwendung des RECOVER Befehls, aufgehoben.
 	Standardmässig hält diese Sperre 1 Minute, dieser
 	Befehl setzt den Nickname früher wieder frei.
 	
@@ -3946,8 +3963,8 @@ NICK_HELP_GHOST
 	Syntax: GHOST Nickname [Passwort]
 	
 	Trennt eine "geisternde" IRC Verbindung, die deinen
-	Nickname besitzt. Eine solche Verbindung ist eine
-	die nicht wirklich verbunden ist bzw im Begriff ist,
+	Nickname besitzt. Eine solche Verbindung ist eine,
+	die nicht wirklich verbunden ist, bzw. im Begriff ist
 	getrennt zu werden. Normalerweise passiert dies,
 	wenn dein Computer abstürtzt oder deine Internet-
 	Verbindung zusammenbricht, wenn du im IRC bist.
@@ -4961,7 +4978,7 @@ CHAN_HELP_INFO
 	letzte Nutzung, seine Beschreibung und Mode-Locks,
 	wenn welche eingestellt sind. Wenn du als Founder
 	(Gründer) identifiziert bist und den Parameter 
-	ALL angibst, wird die Eintrittsmeldung und 
+	ALL angibst, wird die Begrüssungsnachricht und 
 	die Successors (Vertreter) ebenfalls angezeigt.
 
 CHAN_HELP_LIST
@@ -5150,7 +5167,7 @@ CHAN_HELP_CLEAR
 	in einem Channel zurücksetzen soll. Die Option 
 	kann eine der folgenden sein:
 	
-	     MODES    Setzt alle Modis in dem Channel zurück.
+	     MODES    Setzt alle Modi in dem Channel zurück.
 	              (z.B. Modi i,k,l,m,n,p,s und t)
 	     BANS     Entfernt alle Bans in dem Channel
 	     EXCEPTS  Entfernt alle Excepts in dem Channel
@@ -5588,7 +5605,7 @@ OPER_HELP_CMD_KICK
 	    KICK         Einen User aus einem beliebigen
 	                 Channel kicken
 OPER_HELP_CMD_CLEARMODES
-	    CLEARMODES   Die Modis eines Channels zurücksetzen
+	    CLEARMODES   Die Modi eines Channels zurücksetzen
 OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES   Alle User mit einem bestimmten Host killen
 OPER_HELP_CMD_AKILL
@@ -5640,7 +5657,7 @@ OPER_HELP_CMD_CHANKILL
 OPER_HELP_CMD_OLINE
 	    OLINE         Einem User "Operflags" setzen
 OPER_HELP_CMD_UMODE
-	    UMODE         User Modis ändern
+	    UMODE         User Modi ändern
 OPER_HELP_CMD_SVSNICK
 	    SVSNICK       Erzwingt einen Nicknamen wechsel
 OPER_HELP_CMD_MODLOAD
@@ -5791,7 +5808,7 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE User Modi
 	
-	Erlaubt es Services Administratoren die Usermodis eines 
+	Erlaubt es Services Administratoren die Usermodi eines 
 	beliebigen Users zu ändern. Der Paramater hat das gleiche 
 	Format wie der normale /MODE Befehl.
 	
@@ -6396,7 +6413,7 @@ BOT_HELP_SET
 	                      gekickt.
 	    DONTKICKVOICES    Gevoicte User werden (nicht) 
 	                      vom Bot gekickt.
-	    GREET             Eintrittsmeldung
+	    GREET             Begrüssungsnachricht
 	    FANTASY           Aktiviert Befehle wie !op !deop usw. 
 	    SYMBIOSIS         Bot übernimmt die Aufgaben vom ChanServ
 	
@@ -6444,7 +6461,7 @@ BOT_HELP_SET_GREET
 	
 	Aktiviert oder deaktiviert den Greet Mode
 	in einem Channel. Wenn diese Mode aktiviert ist, zeigt der Bot
-	eine Eintrittsmeldung bei joinenden Usern, die eine
+	eine Begrüssungsnachricht bei joinenden Usern, die eine
 	Msg definiert haben und weiterhin auch die 
 	Berechtigung haben, dass diese angezeigt wird.
 	
@@ -6454,7 +6471,7 @@ BOT_HELP_SET_SYMBIOSIS
 	Aktiviert oder deaktiviert den Symbiosis Mode.
 	Wenn diese Mode aktiviert ist, führt der Bot alle Aktionen aus,
 	die sonst %s übernimmt. 
-	(Modechanges, Kicks, Eintrittsmeldungen usw.)
+	(Modechanges, Kicks, Begrüssungsnachrichten usw.)
 	
 BOT_HELP_KICK
 	Syntax: KICK Channel Option Parameter

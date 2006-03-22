@@ -559,7 +559,7 @@ NICK_SASET_OPTION_DISABLED
 
 # SASET DISPLAY responses
 NICK_SASET_DISPLAY_INVALID
-  Der für %s angezeigte Ursprung muss ein Nickname aus der zugehörigen Gruppe sein!
+	Der für %s angezeigte Ursprung muss ein Nickname aus der zugehörigen Gruppe sein!
 NICK_SASET_DISPLAY_CHANGED
 	Der angezeigte Gruppenursprung ist jetzt %s.
 
@@ -607,9 +607,9 @@ NICK_SASET_KILL_IMMED_SYNTAX
 NICK_SASET_KILL_ON
 	Schutz des Nicknamens %s ist jetzt aktiviert (ON).
 NICK_SASET_KILL_QUICK
-  Schutz des Nicknamens %s mit verkürzter Verzögerung aktiviert (ON).
+	Schutz des Nicknamens %s mit verkürzter Verzögerung aktiviert (ON).
 NICK_SASET_KILL_IMMED
-  Schutz des Nicknamens %s ohne Verzögerung aktiviert (ON).
+	Schutz des Nicknamens %s ohne Verzögerung aktiviert (ON).
 NICK_SASET_KILL_IMMED_DISABLED
 	Die IMMED Einstellung (Schutz ohne Verzögerung) ist auf diesem Netzwerk nicht verfügbar.
 NICK_SASET_KILL_OFF
@@ -635,19 +635,19 @@ NICK_SASET_PRIVATE_OFF
 NICK_SASET_HIDE_SYNTAX
 	SASET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
-  Die Emailadresse %s wird jetzt bei %s INFO Abrufen versteckt.
+	Die Emailadresse %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_EMAIL_OFF
 	Die Emailadresse %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_MASK_ON
-  Die letzte bekannte user@host Maske von %s wird jetzt bei %s INFO Abrufen versteckt.
+	Die letzte bekannte user@host Maske von %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_MASK_OFF
 	Die letzte bekannte user@host Maske von %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_QUIT_ON
-  Die letzte Quit-Nachricht von %s wird jetzt bei %s INFO Abrufen versteckt.
+	Die letzte Quit-Nachricht von %s wird jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_QUIT_OFF
 	Die letzte Quit-Nachricht von %s wird jetzt bei %s INFO Abrufen angezeigt.
 NICK_SASET_HIDE_STATUS_ON
-  Die Services-Zugriffsberechtigungen von %s werden jetzt bei %s INFO Abrufen versteckt.
+	Die Services-Zugriffsberechtigungen von %s werden jetzt bei %s INFO Abrufen versteckt.
 NICK_SASET_HIDE_STATUS_OFF
 	Die Services-Zugriffsberechtigungen von %s werden jetzt bei %s INFO Abrufen angezeigt.
 	

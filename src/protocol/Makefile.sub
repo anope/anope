@@ -13,7 +13,7 @@ all: module
 
 module: $(OBJECTS) so
 
-distclean: clean spotless
+distclean: spotless
 
 .c.o:
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
@@ -25,5 +25,5 @@ clean:
 	rm -f *.o *.so *.c~ core
 
 spotless: clean
-	rm -f *~ 
+	rm -f *~ *.o *.so *.c~ core
 

@@ -29,7 +29,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 
 all: services
 
-distclean: clean spotless
+distclean: spotless
 distclean_modules: clean_modules spotless
 
 services:  $(OBJS)
@@ -88,20 +88,20 @@ clean: clean_modules clean_protocols clean_core
 	rm -f *.o services a.out
 clean_modules:
 	@touch modules/Makefile.inc # Horribly ugly...
-	(cd modules ; ${MAKE} ${MAKEARGS} clean)
+	(cd modules ; ${MAKE} clean)
 
 clean_protocols:
 	@touch protocol/Makefile.inc
-	(cd protocol ; ${MAKE} ${MAKEARGS} clean)
+	(cd protocol ; ${MAKE} clean)
 
 clean_core:
 	@touch core/Makefile.inc
-	(cd core ; ${MAKE} ${MAKEARGS} clean)
+	(cd core ; ${MAKE} clean)
 
-spotless: clean
-	(cd modules ; ${MAKE} ${MAKEARGS} distclean)
-	(cd protocol ; ${MAKE} ${MAKEARGS} distclean)
-	(cd core ; ${MAKE} ${MAKEARGS} distclean)
+spotless:
+	(cd modules ; ${MAKE} distclean)
+	(cd protocol ; ${MAKE} distclean)
+	(cd core ; ${MAKE} distclean)
 
 install: services
 	test -d ${BINDEST} || mkdir ${BINDEST}

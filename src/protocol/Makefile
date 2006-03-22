@@ -34,11 +34,11 @@ subs:
 subs_clean:
 	@for i in $(SUBS); do \
 	echo "cleaning in $$i..."; \
-	(cd $$i; $(MAKE) $(MAKEARGS) clean); done
+	(cd $$i; $(MAKE) clean); done
 
 clean: subs_clean
 	rm -f *.o *.so *.c~ core
 
-spotless: clean
-	rm -f *.so Makefile.inc
+spotless: subs_clean
+	rm -f *.o *.so *.c~ core *.so Makefile.inc
 

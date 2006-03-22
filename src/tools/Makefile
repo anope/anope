@@ -14,7 +14,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 
 all: ${OBJS}
 
-distclean: clean spotless
+distclean: spotless
 
 anopesmpt:  $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 

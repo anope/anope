@@ -109,12 +109,11 @@ clean:
 	(cd src/tools ; ${MAKE} ${MAKEARGS} clean )
 
 distclean: clean
-	(cd lang ; ${MAKE} ${MAKEARGS} distclean )
-	(cd include ; ${MAKE} ${MAKEARGS} distclean )
-	(cd src ; ${MAKE} ${MAKEARGS} distclean )
-	(cd src/tools ; ${MAKE} ${MAKEARGS} distclean )
-	rm -f config.log config.status config.cache Makefile
-	rm -f src/bin/anoperc
+	(cd lang ; ${MAKE} distclean )
+	(cd include ; ${MAKE} distclean )
+	(cd src ; ${MAKE} distclean )
+	(cd src/tools ; ${MAKE} distclean )
+	rm -f config.log config.status config.cache Makefile src/bin/anoperc
 
 install: DUMMY
 	(cd src ; ${MAKE} ${MAKEARGS} install)

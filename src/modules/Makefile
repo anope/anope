@@ -18,7 +18,7 @@ modules: $(OBJECTS) $(SO_FILES)
 install: 
 	$(CP) ./*.so $(MODULE_PATH) 
 
-distclean: clean spotless
+distclean: spotless
 
 .c.o:
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
@@ -39,6 +39,6 @@ subs_clean:
 clean: subs_clean
 	rm -f *.o *.so *.c~ core
 
-spotless: clean
-	rm -f *.so Makefile.inc
+spotless:
+	rm -f *.o *.so *.c~ core *.so Makefile.inc
 

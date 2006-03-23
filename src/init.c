@@ -485,13 +485,12 @@ int init_secondary(int ac, char **av)
         }
     }
     if (!SupportedWindowsVersion()) {
-        char *winver = GetWindowsVersion();
-        alog("%s is not a supported version of Windows", winver);
-        free(winver); 
-        return -1;
-    }
-
-    if (!nofork) {
+        char *winver = GetWindowsVersion();
+        alog("%s is not a supported version of Windows", winver);
+        free(winver);
+        return -1;
+    }
+    if (!nofork) {
         alog("Launching Anope into the background");
         FreeConsole();
     }
@@ -527,7 +526,7 @@ int init_secondary(int ac, char **av)
 #else
     for (i = 1; i <= 31; i++) {
 #endif
-            signal(i, SIG_IGN);
+        signal(i, SIG_IGN);
     }
 
 #ifndef USE_THREADS

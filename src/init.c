@@ -522,13 +522,10 @@ int init_secondary(int ac, char **av)
      * panic as necessary, and ignore all others.
      */
 
-#if defined(NSIG) && !defined(LINUX20) && !defined(LINUX22)
+#if defined(NSIG)
     for (i = 1; i <= NSIG - 1; i++) {
 #else
     for (i = 1; i <= 31; i++) {
-#endif
-#if defined(USE_THREADS) && defined(LINUX20)
-        if (i != SIGUSR1)
 #endif
             signal(i, SIG_IGN);
     }
@@ -570,10 +567,8 @@ int init_secondary(int ac, char **av)
 #endif
     signal(SIGFPE, sighandler);
 
-#if !defined(USE_THREADS) || !defined(LINUX20)
 #ifndef _WIN32
     signal(SIGUSR1, sighandler);        /* This is our "out-of-memory" panic switch */
-#endif
 #endif
 
     /* Initialize multi-language support */

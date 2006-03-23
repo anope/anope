@@ -40,6 +40,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 03/18 F Fixed charybdis umodes.                                           [#471]
 03/19 F Fixed a gcc4 compiling issue.                                     [#453]
 03/21 F Fixed bot check on /bs kick.                                      [ #00]
+03/23 F Fixed some obsolete defines.                                      [#390]
 
 Provided by nenolod. <nenolod@nenolod.net> - 2006
 02/03 A Support for Charybdis IRCd.                                       [ #00]

@@ -220,7 +220,7 @@ static void services_restart(void)
     anope_cmd_squit(ServerName, quitmsg);
     disconn(servsock);
     close_log();
-#if defined(LINUX20) || defined(LINUX22)
+#ifndef _WIN32
     pthread_kill_other_threads_np();
 #endif
     modules_unload_all(true);
@@ -424,7 +424,7 @@ void sighandler(int signum)
     }
 
     if (
-#if (!defined(USE_THREADS) || !defined(LINUX20)) && !defined(_WIN32)
+#ifndef _WIN32
            signum == SIGUSR1 ||
 #endif
            !(quitmsg = calloc(BUFSIZE, 1))) {
@@ -606,7 +606,7 @@ int main(int ac, char **av, char **envp)
         anope_cmd_squit(ServerName, quitmsg);
         disconn(servsock);
         close_log();
-#if defined(LINUX20) || defined(LINUX22)
+#ifndef _WIN32
         pthread_kill_other_threads_np();
 #endif
         execve(SERVICES_BIN, av, envp);

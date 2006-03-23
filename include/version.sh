@@ -74,29 +74,9 @@ cat >version.h <<EOF
 # define VER_THREAD
 #endif
 
-#if defined(LINUX20)
-# define VER_OS "l"
-#elif defined(LINUX22)
-# define VER_OS "L"
-#elif defined(JAGUAR)
-# define VER_OS "J"
-#elif defined(MACOSX)
-# define VER_OS "X"
-#elif defined(_WIN32)
-# define VER_OS "W"
-#else
+/* the following two could be removed from the codebase */
 # define VER_OS
-#endif
-
-#if defined(HAVE_GETHOSTBYNAME_R6)
-# define VER_GHBNR "6"
-#elif defined(HAVE_GETHOSTBYNAME_R5)
-# define VER_GHBNR "5"
-#elif defined(HAVE_GETHOSTBYNAME_R3)
-# define VER_GHBNR "3"
-#else
 # define VER_GHBNR
-#endif
 
 #if defined(USE_MYSQL)
 # define VER_MYSQL "Q"

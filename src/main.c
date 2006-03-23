@@ -220,9 +220,6 @@ static void services_restart(void)
     anope_cmd_squit(ServerName, quitmsg);
     disconn(servsock);
     close_log();
-#ifndef _WIN32
-    pthread_kill_other_threads_np();
-#endif
     modules_unload_all(true);
     execve(SERVICES_BIN, my_av, my_envp);
     if (!readonly) {
@@ -606,9 +603,6 @@ int main(int ac, char **av, char **envp)
         anope_cmd_squit(ServerName, quitmsg);
         disconn(servsock);
         close_log();
-#ifndef _WIN32
-        pthread_kill_other_threads_np();
-#endif
         execve(SERVICES_BIN, av, envp);
         if (!readonly) {
             open_log();

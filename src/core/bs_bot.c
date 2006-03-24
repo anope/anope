@@ -197,7 +197,7 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, oldnick);
         else if (strlen(nick) > NickLen)
             notice_lang(s_BotServ, u, BOT_BAD_NICK);
-        else if (strlen(user) >= USERMAX)
+        else if (user && strlen(user) >= USERMAX)
             notice_lang(s_BotServ, u, BOT_BAD_IDENT);
         else {
             NickAlias *na;
@@ -242,15 +242,17 @@ int do_bot(User * u)
                 return MOD_CONT;
             }
 
-            if (!isValidHost(host, 3)) {
+            if (host && !isValidHost(host, 3)) {
                 notice_lang(s_BotServ, u, BOT_BAD_HOST);
                 return MOD_CONT;
             }
 
-            for (ch = user; *ch && (ch - user) < USERMAX; ch++) {
-                if (!isalnum(*ch)) {
-                    notice_lang(s_BotServ, u, BOT_BAD_IDENT);
-                    return MOD_CONT;
+            if (user) {
+                for (ch = user; *ch && (ch - user) < USERMAX; ch++) {
+                    if (!isalnum(*ch)) {
+                        notice_lang(s_BotServ, u, BOT_BAD_IDENT);
+                        return MOD_CONT;
+                    }
                 }
             }
 

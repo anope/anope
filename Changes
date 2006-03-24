@@ -54,6 +54,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 03/18 A New icon file for anope win32.                                    [#472]
 03/14 A Anope will now terminate on Win98. Added version check.           [#473]
 03/01 A Clarity on module loading status numbers.                         [#435]
+03/24 F Fixed segfault on /bs change.                                     [#483]
 03/22 F Fixed distclean in all Makefiles.                                 [#481]
 03/19 F Fixed some gcc4 compiling issues.                                 [#453]
 03/18 F Fixed closing of file pointer in langtool.c.                      [#478]

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1023"
+VERSION_BUILD="1025"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1025)
+# BUGS  : 
+# NOTES : Development Framework (1.7.14-svn)
 #
 # BUILD : 1.7.14 (1023)
 # BUGS  : N/A

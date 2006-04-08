@@ -1,6 +1,9 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2006
+04/08 F Fixed Charybdis support on win32.                                 [#487]
+04/08 F Fixed thread stuff on windows.                                    [#488]
+04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]
 
 
 Anope Version 1.7.14

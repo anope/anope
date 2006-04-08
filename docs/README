@@ -164,6 +164,7 @@ Table of Contents
         * Plexus 2.0 or later
         * Ratbox 2.0.6 or later
         * ShadowIRCd 4.0 beta 7 or later
+        * Charybdis
 
     Anope could also work with some of the daemons derived by the ones listed
     above, but there's no support for them if they work or don't work.

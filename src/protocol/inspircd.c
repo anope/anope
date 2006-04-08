@@ -62,7 +62,7 @@ IRCDVar myIrcd[] = {
      "+r",                      /* Mode On Reg          */
      "-r",                      /* Mode on UnReg        */
      "-r",                      /* Mode on Nick Change  */
-     1,                         /* Supports SGlines     */
+     0,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
      1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */

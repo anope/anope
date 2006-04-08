@@ -529,15 +529,7 @@ int init_secondary(int ac, char **av)
         signal(i, SIG_IGN);
     }
 
-#ifndef USE_THREADS
     signal(SIGINT, sighandler);
-#else
-    if (nofork) {
-        signal(SIGINT, sighandler);
-    } else {
-        signal(SIGINT, SIG_DFL);
-    }
-#endif
     signal(SIGTERM, sighandler);
 #ifndef _WIN32
     signal(SIGQUIT, sighandler);

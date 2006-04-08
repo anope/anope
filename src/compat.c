@@ -224,25 +224,5 @@ char *strsignal(int signum)
 }
 #endif
 
-#ifdef _WIN32
-
-#ifdef USE_THREADS
-/* Simulate pthread conditional variable waiting */
-int ano_cond_wait(ano_cond_t cond, ano_mutex_t mutex)
-{
-    ReleaseMutex(mutex);
-    if (WaitForSingleObject(cond, INFINITE) == WAIT_FAILED)
-        return 1;
-    if (WaitForSingleObject(mutex, INFINITE) == WAIT_FAILED)
-        return 1;
-    return 0;
-}
-
-/* Used for the cleanup functions */
-ano_thread_start __declspec(thread) cleanup_func = NULL;
-
-#endif
-
-#endif
 
 /*************************************************************************/

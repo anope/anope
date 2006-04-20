@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1027"
+VERSION_BUILD="1028"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1028)
+# BUGS  : 499
+# NOTES : fixed index of backtrace(), thx craig
 #
 # BUILD : 1.7.14 (1027)
 # BUGS  : 

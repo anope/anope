@@ -640,7 +640,7 @@ void do_backtrace(int show_segheader)
          version_build, version_flags);
     size = backtrace(array, 10);
     strings = backtrace_symbols(array, size);
-    for (i = 1; i < size; i++) {
+    for (i = 0; i < size; i++) {
         alog("Backtrace(%d): %s", i, strings[i]);
     }
     free(strings);

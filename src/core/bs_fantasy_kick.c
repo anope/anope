@@ -80,7 +80,7 @@ int do_fantasy(int argc, char **argv)
             else {
                 u2 = finduser(target);
                 if (u2 && ci->c && is_on_chan(ci->c, u2)) {
-                    else if (!reason && !is_protected(u2))
+                    if (!reason && !is_protected(u2))
                         bot_raw_kick(u, ci, target, "Requested");
                     else if (!is_protected(u2))
                         bot_raw_kick(u, ci, target, reason);

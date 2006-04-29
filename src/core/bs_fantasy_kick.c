@@ -75,14 +75,17 @@ int do_fantasy(int argc, char **argv)
         if (!target && check_access(u, ci, CA_KICKME)) {
             bot_raw_kick(u, ci, u->nick, "Requested");
         } else if (target && check_access(u, ci, CA_KICK)) {
-           u2 = finduser(target);
-            
             if (!stricmp(target, ci->bi->nick))
                 bot_raw_kick(u, ci, u->nick, "Oops!");
-            else if (u2 && !reason && !is_protected(u2))
-                bot_raw_kick(u, ci, target, "Requested");
-            else if (u2 && !is_protected(u2))
-                bot_raw_kick(u, ci, target, reason);
+            else {
+                u2 = finduser(target);
+                if (u2 && ci->c && is_on_chan(ci->c, u2)) {
+                    else if (!reason && !is_protected(u2))
+                        bot_raw_kick(u, ci, target, "Requested");
+                    else if (!is_protected(u2))
+                        bot_raw_kick(u, ci, target, reason);
+                }
+            }
         }
     }
 

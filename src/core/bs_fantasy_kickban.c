@@ -79,12 +79,13 @@ int do_fantasy(int argc, char **argv)
             if (stricmp(target, ci->bi->nick) == 0) {
                 bot_raw_ban(u, ci, u->nick, "Oops!");
             } else {
-               u2 = finduser(target);
-
-                if (u2 && !reason && !is_protected(u2))
-                    bot_raw_ban(u, ci, target, "Requested");
-                else if (u2 && !is_protected(u2))
-                    bot_raw_ban(u, ci, target, reason);
+                u2 = finduser(target);
+                if (u2 && ci->c && is_on_chan(ci->c, u2)) {
+                    if (!reason && !is_protected(u2))
+                        bot_raw_ban(u, ci, target, "Requested");
+                    else if (!is_protected(u2))
+                        bot_raw_ban(u, ci, target, reason);
+                }
             }
         }
     }

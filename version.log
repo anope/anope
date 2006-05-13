@@ -13,6 +13,10 @@ VERSION_BUILD="1030"
 
 # $Log$
 #
+# BUILD : 1.7.14 (1031)
+# BUGS  : 504
+# NOTES : fixed memleak, thx to trystan
+#
 # BUILD : 1.7.14 (1030)
 # BUGS  : 
 # NOTES : fixed coding booboo, thx to viper

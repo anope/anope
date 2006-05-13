@@ -6,6 +6,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]
 04/20 F Fixed index of backtrace().                                       [#499]
 04/29 F Added is_on_chan() check for fantasy kick commands.               [#501]
+05/13 F Fixed memleak in moduleGetConfigDirective().                      [#504]
 
 Anope Version 1.7.14
 --------------------

@@ -1700,7 +1700,7 @@ void expire_chans()
         for (ci = chanlists[i]; ci; ci = next) {
             next = ci->next;
             if (!ci->c && now - ci->last_used >= CSExpire
-                && !(ci->flags & (CI_VERBOTEN | CI_NO_EXPIRE))) {
+                && !(ci->flags & (CI_VERBOTEN | CI_NO_EXPIRE | CI_SUSPENDED))) {
                 send_event(EVENT_CHAN_EXPIRE, 1, ci->name);
                 alog("Expiring channel %s (founder: %s)", ci->name,
                      (ci->founder ? ci->founder->display : "(none)"));

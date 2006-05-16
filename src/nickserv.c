@@ -1145,7 +1145,8 @@ void expire_nicks()
             }
 
             if (NSExpire && now - na->last_seen >= NSExpire
-                && !(na->status & (NS_VERBOTEN | NS_NO_EXPIRE))) {
+                && !(na->status & (NS_VERBOTEN | NS_NO_EXPIRE))
+                && !(na->nc->flags & (NI_SUSPENDED))) {
                 alog("Expiring nickname %s (group: %s) (e-mail: %s)",
                      na->nick, na->nc->display,
                      (na->nc->email ? na->nc->email : "none"));

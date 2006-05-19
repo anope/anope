@@ -14,7 +14,7 @@
 #include "plexus3.h"
 
 IRCDVar myIrcd[] = {
-  {"hybrid-7.2+plexus-3.0.0+",	/* ircd name */
+  {"hybrid-7.2.1+plexus-3.0.0+",/* ircd name */
    "+i",			/* nickserv mode */
    "+i",			/* chanserv mode */
    "+i",			/* memoserv mode */
@@ -1493,9 +1493,10 @@ plexus_cmd_svsnick (char *nick, char *newnick, time_t when)
   if (!nick || !newnick)
     return;
 
-  u = finduser (nick);
-  send_cmd (ServerName, "ENCAP * SVSNICK %s %ld %s %ld",
+  if( (u = finduser (nick))) {
+    send_cmd (ServerName, "ENCAP * SVSNICK %s %ld %s %ld",
 	    u->nick, (long int) u->timestamp, newnick, (long int) when);
+  }
 }
 
 void
@@ -1799,7 +1800,7 @@ AnopeInit (int argc, char **argv)
   moduleAddVersion ("$Id: plexus.c 995 2006-03-01 20:19:11Z rob $");
   moduleSetType (PROTOCOL);
 
-  pmodule_ircd_version ("PleXusIRCd 2.0+");
+  pmodule_ircd_version ("hybrid-7.2.1+plexus-3.0.0+");
   pmodule_ircd_cap (myIrcdcap);
   pmodule_ircd_var (myIrcd);
   pmodule_ircd_cbmodeinfos (myCbmodeinfos);

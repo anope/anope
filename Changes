@@ -11,6 +11,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 05/25 F NICKIP/NICKv2 support on unreal32.                                [#507]
 05/25 F src/bin/register being too case sensitive on YES.                 [#500]
 05/25 F src/bin/register still said ./configured instead of ./Config .    [ #00]
+05/25 F Q:Line not added for bots when only changing nicks.               [#493]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

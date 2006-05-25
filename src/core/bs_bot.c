@@ -299,10 +299,12 @@ int do_bot(User * u)
             }
 
             /* If only the nick changes, we just make the bot change his nick,
-               else we must make it quit and rejoin. */
-            if (!user)
+               else we must make it quit and rejoin. We must not forget to set
+			   the Q:Line either (it's otherwise set in anope_cmd_bot_nick) */
+            if (!user) {
                 anope_cmd_chg_nick(oldnick, bi->nick);
-            else {
+				anope_cmd_sqline(bi->nick, "Reserved for services");
+            } else {
                 anope_cmd_quit(oldnick, "Quit: Be right back");
 
                 anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,

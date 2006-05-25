@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1038"
+VERSION_BUILD="1039"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1039)
+# BUGS  : 493
+# NOTES : Fixed /bs BOT CHANGE not setting new Q:Line when only nick was changed
 #
 # BUILD : 1.7.14 (1038)
 # BUGS  : 500

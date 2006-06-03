@@ -651,7 +651,7 @@ Directive directives[] = {
 
 /* Print an error message to the log (and the console, if open). */
 
-void error(int linenum, char *message, ...)
+void error(int linenum, const char *message, ...)
 {
     char buf[4096];
     va_list args;

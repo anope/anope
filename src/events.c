@@ -36,7 +36,7 @@ EvtHook *find_eventhook(const char *name)
     return m;
 }
 
-void send_event(char *name, int argc, ...)
+void send_event(const char *name, int argc, ...)
 {
     va_list va;
     char *a;

@@ -1324,7 +1324,7 @@ Command *findCommand(CommandHash * cmdTable[], const char *name)
   * @param func a pointer to the function to call when we recive this message
   * @return a new Message object
   **/
-Message *createMessage(char *name,
+Message *createMessage(const char *name,
                        int (*func) (char *source, int ac, char **av))
 {
     Message *m = NULL;
@@ -1615,7 +1615,7 @@ int destroyMessage(Message * m)
  * Add the modules version info.
  * @param version the version of the current module
  **/
-void moduleAddVersion(char *version)
+void moduleAddVersion(const char *version)
 {
     if (mod_current_module && version) {
         mod_current_module->version = sstrdup(version);
@@ -1626,7 +1626,7 @@ void moduleAddVersion(char *version)
  * Add the modules author info
  * @param author the author of the module
  **/
-void moduleAddAuthor(char *author)
+void moduleAddAuthor(const char *author)
 {
     if (mod_current_module && author) {
         mod_current_module->author = sstrdup(author);

@@ -27,12 +27,6 @@
  * prototype of strsignal(). */
 #define _GNU_SOURCE
 
-/* Some AIX boxes define int16 and int32 on their own.  Blarph. */
-#if INTTYPE_WORKAROUND
-# define int16 builtin_int16
-# define int32 builtin_int32
-#endif
-
 /* Some SUN fixs */
 #ifdef __sun
 /* Solaris specific code, types that do not exist in Solaris'

@@ -148,7 +148,7 @@ void event_message_process(char *eventbuf)
     free(av);
 }
 
-void event_process_hook(char *name, int argc, char **argv)
+void event_process_hook(const char *name, int argc, char **argv)
 {
     int retVal = 0;
     EvtHook *current = NULL;

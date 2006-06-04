@@ -273,8 +273,8 @@ int loadModule(Module *m,User *u);	/* Load the given module into the program */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */
-MDE void moduleAddVersion(char *version);
-MDE void moduleAddAuthor(char *author);
+MDE void moduleAddVersion(const char *version);
+MDE void moduleAddAuthor(const char *author);
 void modules_init(void);
 void modules_delayed_init(void);
 void moduleCallBackPrepForUnload(char *mod_name);
@@ -316,7 +316,7 @@ Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a comma
 /*************************************************************************/
 
 /* Message Managment Functions */
-MDE Message *createMessage(char *name,int (*func)(char *source, int ac, char **av));
+MDE Message *createMessage(const char *name,int (*func)(char *source, int ac, char **av));
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */

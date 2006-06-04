@@ -1347,8 +1347,8 @@ E char *host_resolve(char *host);
 
 E void event_message_process(char *eventbuf);
 E void eventprintf(char *fmt, ...);
-E void event_process_hook(char *name, int argc, char **argv);
-E void send_event(char *name, int argc, ...);
+E void event_process_hook(const char *name, int argc, char **argv);
+E void send_event(const char *name, int argc, ...);
 
 #ifdef _WIN32
 E char *GetWindowsVersion(void) ;

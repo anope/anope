@@ -1,6 +1,6 @@
 include ../../Makefile.inc.win32
 
-SRCS=bahamut.c charybdis.c dreamforge.c hybrid.c inspircd.c plexus.c ptlink.c rageircd.c \
+SRCS=bahamut.c charybdis.c dreamforge.c hybrid.c inspircd.c plexus2.c plexus3.c ptlink.c rageircd.c \
      ratbox.c shadowircd.c solidircd.c ultimate2.c ultimate3.c unreal31.c unreal32.c viagra.c
 
 OBJECTS= $(SRCS:.c=.dll)

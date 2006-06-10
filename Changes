@@ -14,6 +14,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 05/25 F Q:Line not added for bots when only changing nicks.               [#493]
 06/03 F Removed INTTYPE_WORKAROUND stuff which could cause warnings.      [#509]
 06/03 F Fixed compiler warnings.                                          [#511]
+06/10 F Win32 Makefile for plexus3 support.                               [#520]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

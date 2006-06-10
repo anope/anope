@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1041"
+VERSION_BUILD="1042"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1042)
+# BUGS  : 520
+# NOTES : Fixed src/protocol/Makefile.win32 for plexus->plexus2/plexus3 change
 #
 # BUILD : 1.7.14 (1041)
 # BUGS  : 514

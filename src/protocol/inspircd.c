@@ -62,7 +62,7 @@ IRCDVar myIrcd[] = {
      "+r",                      /* Mode On Reg          */
      "-r",                      /* Mode on UnReg        */
      "-r",                      /* Mode on Nick Change  */
-     0,                         /* Supports SGlines     */
+     1,                         /* Supports SGlines     */
      1,                         /* Supports SQlines     */
      1,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
@@ -567,7 +567,7 @@ void inspircd_cmd_376(char *source)
 
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
-    /* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
+    // :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,name);
     send_cmd(ServerName, "OPERTYPE Service");
 }
@@ -1327,11 +1327,11 @@ int anope_event_nick(char *source, int ac, char **av)
     if (ac != 1) {
         if (ac == 8) {
             inet_aton(av[6],&addy);
-            user = do_nick("",	 	av[1],	/* nick */
-					av[4],	/* username */
-					av[2],	/* realhost */
-					source, /* server */
-					av[7],	/* realname */
+            user = do_nick("",	 	av[1],	// nick
+					av[4],	// username
+					av[2],	// realhost
+					source, // server
+					av[7],	// realname
 					strtoul(av[0], NULL, 10),
 					0,
 					htonl(*ad),
@@ -1553,12 +1553,6 @@ int inspircd_valid_nick(char *nick)
     return 1;
 }
 
-int inspircd_valid_chan(char *chan)
-{
-    return 1;
-}
-
-
 void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1648,7 +1642,6 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);
-    pmodule_valid_chan(inspircd_valid_chan);
     pmodule_cmd_ctcp(inspircd_cmd_ctcp);
     pmodule_set_umode(inspircd_set_umode);
 }

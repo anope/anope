@@ -2425,7 +2425,8 @@ int moduleGetConfigDirective(Directive * d)
     int linenum = 0;
     int ac = 0;
     char *av[MAXPARAMS];
-    char *s, *t;
+    char *s = NULL;
+	char *t = NULL;
     int retval = 1;
 
     config = fopen(SERVICES_CONF, "r");

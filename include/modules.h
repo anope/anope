@@ -40,7 +40,12 @@ typedef void *	ano_module_t;
 #define ano_moderr()			dlerror()
 #define ano_modsym(file, symbol)	dlsym(file, DL_PREFIX symbol)
 #define ano_modclose(file)		dlclose(file)
-#define ano_modclearerr()		errno = 0
+/* We call dlerror() here because it clears the module error after being
+ * called. This previously read 'errno = 0', but that didn't work on
+ * all POSIX-compliant architectures. This way the error is guaranteed
+ * to be cleared, POSIX-wise. -GD
+ */
+#define ano_modclearerr()		dlerror()
 #define MODULE_EXT			".so"
 
 #endif

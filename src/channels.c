@@ -19,26 +19,6 @@ Channel *chanlist[1024];
 
 #define HASH(chan)	((chan)[1] ? ((chan)[1]&31)<<5 | ((chan)[2]&31) : 0)
 
-void add_ban(Channel * chan, char *mask);
-void add_exception(Channel * chan, char *mask);
-void add_invite(Channel * chan, char *mask);
-void chan_adduser2(User * user, Channel * c);
-Channel *chan_create(char *chan);
-void chan_delete(Channel * c);
-void del_ban(Channel * chan, char *mask);
-void del_exception(Channel * chan, char *mask);
-void del_invite(Channel * chan, char *mask);
-char *get_flood(Channel * chan);
-char *get_key(Channel * chan);
-char *get_limit(Channel * chan);
-char *get_redirect(Channel * chan);
-Channel *join_user_update(User * user, Channel * chan, char *name);
-void set_flood(Channel * chan, char *value);
-void set_key(Channel * chan, char *value);
-void set_limit(Channel * chan, char *value);
-void set_redirect(Channel * chan, char *value);
-void do_mass_mode(char *modes);
-
 /**************************** External Calls *****************************/
 /*************************************************************************/
 
@@ -752,7 +732,8 @@ void do_sjoin(const char *source, int ac, char **av)
     Channel *c;
     User *user;
     Server *serv;
-    char *s, *end, cubuf[7], *end2, *cumodes[6];
+    char *s = NULL;
+    char *end, cubuf[7], *end2, *cumodes[6];
     int is_sqlined = 0;
     int ts = 0;
     int is_created = 0;

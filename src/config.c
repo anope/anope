@@ -711,6 +711,8 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
         }
 #endif
 
+        /* Should we remove PARAM_DEPRECATED because it's
+         * useless right now? -GD */
         if (d->params[i].type == PARAM_DEPRECATED) {
             void (*func) (void);
             error(linenum, "Deprecated directive `%s' used", d->name);

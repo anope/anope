@@ -33,6 +33,7 @@
 E char *uplink;
 
 /* IRC Variables */
+
 E IRCDVar *ircd;
 E IRCDCAPAB *ircdcap;
 E char *flood_mode_char_set;
@@ -82,10 +83,6 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode, char *nick);
 /**** channels.c ****/
 
 E Channel *chanlist[1024];
-E CBMode cbmodes[128];
-E CUMode cumodes[128];
-E CMMode cmmodes[128];
-E char csmodes[128];
 
 E void add_ban(Channel * chan, char *mask);
 E void chan_adduser2(User * user, Channel * c);
@@ -1019,8 +1016,8 @@ E void finish_sync(Server *serv, int sync_links);
 E Exception *exceptions;
 E int16 nexceptions;
 
-Session *sessionlist[1024];
-int32 nsessions;
+E Session *sessionlist[1024];
+E int32 nsessions;
 
 E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
@@ -1295,12 +1292,10 @@ I int anope_event_netctrl(char *source, int ac, char **av);
 I int anope_event_notice(char *source, int ac, char **av);
 I int anope_event_snotice(char *source, int ac, char **av);
 I int anope_event_sqline(char *source, int ac, char **av);
-I int anope_event_error(char *source, int ac, char **av);
 I int anope_event_smo(char *source, int ac, char **av);
 I int anope_event_myid(char *source, int ac, char **av);
 I int anope_event_vctrl(char *source, int ac, char **av);
 I int anope_event_tctrl(char *source, int ac, char **av);
-I int anope_event_netinfo(char *source, int ac, char **av);
 I int anope_event_snetinfo(char *source, int ac, char **av);
 I int anope_event_umode2(char *source, int ac, char **av);
 I int anope_event_globops(char *source, int ac, char **av);

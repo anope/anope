@@ -13,4 +13,3 @@
  */
 
 E int encrypt(const char *src, int len, char *dest, int size);
-E int check_password(const char *plaintext, const char *password);

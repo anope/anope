@@ -15,8 +15,10 @@
 
 #include "module.h"
 
+#ifdef _WIN32
 extern MDE int anope_get_invite_mode();
 extern MDE int anope_get_invis_mode();
+#endif
 
 int do_userlist(User * u);
 void myOperServHelp(User * u);

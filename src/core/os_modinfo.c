@@ -19,12 +19,6 @@ int do_modinfo(User * u);
 void myOperServHelp(User * u);
 int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u);
 int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
-extern MDE Module *findModule(char *name);
-
-extern MDE Module *mod_current_module;
-extern MDE int mod_current_op;
-extern MDE User *mod_current_user;
-extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 
 /**
  * Create the command, and tell anope about it.

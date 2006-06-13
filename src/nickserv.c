@@ -31,22 +31,7 @@ unsigned int guestnum;          /* Current guest number */
 
 /*************************************************************************/
 
-extern char *getvHost(char *nick);
-
-void alpha_insert_alias(NickAlias * na);
-void insert_core(NickCore * nc);
-void insert_requestnick(NickRequest * nr);
-void change_core_display(NickCore * nc, char *newdisplay);
-
-void collide(NickAlias * na, int from_timeout);
-void release(NickAlias * na, int from_timeout);
 static void add_ns_timeout(NickAlias * na, int type, time_t delay);
-void del_ns_timeout(NickAlias * na, int type);
-int delnickrequest(NickRequest * nr);
-NickRequest *findrequestnick(const char *nick);
-
-int do_setmodes(User * u);
-int should_mode_change(int16 status, int16 mode);
 
 /*************************************************************************/
 /* *INDENT-OFF* */

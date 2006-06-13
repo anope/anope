@@ -18,7 +18,7 @@ int servernum = 0;
 
 extern void moduleAddMsgs(void);
 extern void moduleAddIRCDMsgs(void);
-extern int protocol_module_init(void);
+
 /*************************************************************************/
 
 void introduce_user(const char *user)

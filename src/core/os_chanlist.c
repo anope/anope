@@ -17,7 +17,9 @@
 
 int do_chanlist(User * u);
 void myOperServHelp(User * u);
+#ifdef _WIN32
 extern MDE int anope_get_private_mode();
+#endif
 
 /**
  * Create the command, and tell anope about it.

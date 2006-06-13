@@ -15,13 +15,6 @@
 
 #include "module.h"
 
-extern MDE Module *mod_current_module;
-extern MDE int mod_current_op;
-extern MDE User *mod_current_user;
-extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
-
-extern MDE Module *createModule(char *filename);
-
 int do_modlist(User * u);
 void myOperServHelp(User * u);
 

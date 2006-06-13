@@ -21,8 +21,10 @@ int do_stats(User * u);
 void get_operserv_stats(long *nrec, long *memuse);
 void myOperServHelp(User * u);
 
+#ifdef _WIN32
 extern MDE struct clone clonelist[CLONE_DETECT_SIZE];
 extern MDE struct clone warnings[CLONE_DETECT_SIZE];
+#endif
 
 /**
  * Create the command, and tell anope about it.

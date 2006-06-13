@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1047"
+VERSION_BUILD="1048"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1048)
+# BUGS  : 510
+# NOTES : Fixed a lot of redundant function declarations
 #
 # BUILD : 1.7.14 (1047)
 # BUGS  : 464

@@ -15,8 +15,10 @@
 
 #include "module.h"
 
+#ifdef _WIN32
 /* OperServ restart needs access to this if were gonna avoid sending ourself a signal */
 extern MDE void do_restart_services(void);
+#endif
 
 int do_restart(User * u);
 void myOperServHelp(User * u);

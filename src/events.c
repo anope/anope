@@ -15,8 +15,6 @@
 #include "language.h"
 #include "version.h"
 
-extern Module *mod_current_module;
-extern char *mod_current_module_name;
 char *mod_current_evtbuffer = NULL;
 
 EvtMessageHash *EVENT[MAX_CMD_HASH];

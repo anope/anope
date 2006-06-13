@@ -25,10 +25,8 @@ int nbots = 0;
 
 /*************************************************************************/
 
-BotInfo *makebot(char *nick);
 static UserData *get_user_data(Channel * c, User * u);
 
-E void unassign(User * u, ChannelInfo * ci);
 static void check_ban(ChannelInfo * ci, User * u, int ttbtype);
 static void bot_kick(ChannelInfo * ci, User * u, int message, ...);
 

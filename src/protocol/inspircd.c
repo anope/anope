@@ -18,6 +18,10 @@
 #include "pseudo.h"
 #include "inspircd.h"
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #ifdef _WIN32
 #include "winsock.h"
 int inet_aton (const char *name, struct in_addr *addr)
@@ -567,7 +571,7 @@ void inspircd_cmd_376(char *source)
 
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
-    // :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards
+    /* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,name);
     send_cmd(ServerName, "OPERTYPE Service");
 }
@@ -1327,11 +1331,11 @@ int anope_event_nick(char *source, int ac, char **av)
     if (ac != 1) {
         if (ac == 8) {
             inet_aton(av[6],&addy);
-            user = do_nick("",	 	av[1],	// nick
-					av[4],	// username
-					av[2],	// realhost
-					source, // server
-					av[7],	// realname
+            user = do_nick("",	 	av[1],	/* nick */
+					av[4],	/* username */
+					av[2],	/* realhost */
+					source, /* server */
+					av[7],	/* realname */
 					strtoul(av[0], NULL, 10),
 					0,
 					htonl(*ad),

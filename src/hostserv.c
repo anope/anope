@@ -23,26 +23,14 @@ void load_hs_dbase_v2(dbFILE * f);
 void load_hs_dbase_v3(dbFILE * f);
 
 HostCore *head = NULL;          /* head of the HostCore list */
-HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
-                             char *vHost, char *creator, int32 tmp_time);
-HostCore *findHostCore(HostCore * head, char *nick, boolean * found);
-HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
-                         char *vIdent, char *vHost, char *creator,
-                         int32 tmp_time);
-HostCore *deleteHostCore(HostCore * head, HostCore * prev);
-void delHostCore(char *nick);
-
-E int is_host_setter(User * u);
-E int is_host_remover(User * u);
-
-E int do_on_id(User * u);
-E void set_lastmask(User * u);
 
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
                  char *creator, time_t time);
 
 E void moduleAddHostServCmds(void);
+
 /*************************************************************************/
+
 void moduleAddHostServCmds(void)
 {
     modules_core_init(HostServCoreNumber, HostServCoreModules);

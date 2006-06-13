@@ -299,11 +299,11 @@ MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
 MDE void moduleSetType(MODType type);
-MDE Module *mod_current_module;
-MDE char *mod_current_module_name;
-MDE char *mod_current_buffer;
-MDE int mod_current_op;
-MDE User *mod_current_user;
+extern MDE Module *mod_current_module;
+extern MDE char *mod_current_module_name;
+extern MDE char *mod_current_buffer;
+extern MDE int mod_current_op;
+extern MDE User *mod_current_user;
 
 MDE int moduleGetConfigDirective(Directive *h);
 /*************************************************************************/
@@ -329,7 +329,6 @@ MDE int moduleAddMessage(Message *m, int pos);
 int delMessage(MessageHash *msgTable[], Message *m, char *mod_name);		/* Del a Message from a msg table */
 MDE int moduleDelMessage(char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
-Message *findMessage(MessageHash *msgTable[], const char *name);
 
 /*************************************************************************/
 
@@ -360,13 +359,11 @@ MDE void moduleDeleteLanguage(int langNumber);
 
 MDE int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
 MDE void moduleDelCallback(char *name);
-MDE void moduleCallBackRun(void);
 
 MDE char *moduleGetData(ModuleData **md, char *key);			/* Get the value for this key from this struct */
 MDE int moduleAddData(ModuleData **md, char *key, char *value);		/* Set the value for this key for this struct */
 MDE void moduleDelData(ModuleData **md, char *key);				/* Delete this key/value pair */
 MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
-MDE void moduleCleanStruct(ModuleData **moduleData);			/* Clean a moduleData hash */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
 MDE boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */

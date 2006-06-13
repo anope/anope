@@ -482,7 +482,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
               char *server, char *realname, time_t ts, uint32 svid,
               uint32 ip, char *vhost, char *uid)
 {
-    User *user;
+    User *user = NULL;
 
     char *tmp = NULL;
     NickAlias *old_na;          /* Old nick rec */

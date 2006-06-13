@@ -2420,7 +2420,7 @@ void updateProtectDetails(char *level_info_protect_word,
 int moduleGetConfigDirective(Directive * d)
 {
     FILE *config;
-    char *dir;
+    char *dir = NULL;
     char buf[1024];
     int linenum = 0;
     int ac = 0;

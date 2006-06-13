@@ -116,18 +116,8 @@ CSModeUtil csmodeutils[] = {
     { NULL }
 };
 
-/* *INDENT-ON* */
 /*************************************************************************/
 
-void alpha_insert_chan(ChannelInfo * ci);
-ChannelInfo *makechan(const char *chan);
-int delchan(ChannelInfo * ci);
-void reset_levels(ChannelInfo * ci);
-int is_identified(User * user, ChannelInfo * ci);
-
-void moduleAddChanServCmds(void);
-/*************************************************************************/
-/* *INDENT-OFF* */
 void moduleAddChanServCmds(void) {
     modules_core_init(ChanServCoreNumber, ChanServCoreModules);
 }

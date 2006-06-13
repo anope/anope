@@ -20,6 +20,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/11 F Module Clear Error macro was broken on *BSD.                      [#515]
 06/13 F Walking memory using wrong pointer in moduleGetConfigDirective.   [#516]
 06/13 F Added cleanup code to tools/anopesmtp.                            [#464]
+06/13 F Fixed a lot of redundant function declarations.                   [#510]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

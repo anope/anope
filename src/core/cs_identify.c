@@ -17,7 +17,9 @@
 
 int do_identify(User * u);
 void myChanServHelp(User * u);
+#ifdef _WIN32
 extern MDE int check_password(const char *plaintext, const char *password);
+#endif
 
 /**
  * Create the command, and tell anope about it.

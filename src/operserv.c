@@ -51,13 +51,9 @@ static void free_sqline_entry(SList * slist, void *item);
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2);
 static void free_szline_entry(SList * slist, void *item);
 
-void resetDefCon(int level);
-
 time_t DefContimer;
 int DefConModesSet = 0;
-void runDefCon(void);
 char *defconReverseModes(const char *modes);
-void oper_global(char *nick, char *fmt, ...);
 
 
 #ifdef DEBUG_COMMANDS

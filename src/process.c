@@ -15,10 +15,7 @@
 #include "services.h"
 #include "messages.h"
 #include "modules.h"
-extern Module *mod_current_module;
-extern char *mod_current_module_name;
-extern User *mod_current_user;
-extern char *mod_current_buffer;
+
 /*************************************************************************/
 
 /* Use ignore code? */

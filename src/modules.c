@@ -2425,6 +2425,7 @@ int moduleGetConfigDirective(Directive * d)
     int linenum = 0;
     int ac = 0;
     char *av[MAXPARAMS];
+	char *str = NULL;
     char *s = NULL;
 	char *t = NULL;
     int retval = 1;
@@ -2440,17 +2441,18 @@ int moduleGetConfigDirective(Directive * d)
             continue;
         dir = myStrGetOnlyToken(buf, '\t', 0);
         if (dir) {
-            s = myStrGetTokenRemainder(buf, '\t', 1);
+            str = myStrGetTokenRemainder(buf, '\t', 1);
         } else {
             dir = myStrGetOnlyToken(buf, ' ', 0);
             if (dir || (dir = myStrGetOnlyToken(buf, '\n', 0))) {
-                s = myStrGetTokenRemainder(buf, ' ', 1);
+                str = myStrGetTokenRemainder(buf, ' ', 1);
             } else {
                 continue;
             }
         }
         if (stricmp(dir, d->name) == 0) {
-            if (s) {
+            if (str) {
+				s = str;
                 while (isspace(*s))
                     s++;
                 while (*s) {
@@ -2486,8 +2488,8 @@ int moduleGetConfigDirective(Directive * d)
     }
     if (dir)
     	free(dir);
-    if (s)
-       free(s);
+    if (str)
+       free(str);
     fclose(config);
     return retval;
 }

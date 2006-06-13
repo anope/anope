@@ -18,6 +18,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/11 F Two pointers in modules.c weren't NULL-ified by default.          [ #00]
 06/11 F Updated InspIRCd protocol support module.                         [ #00]
 06/11 F Module Clear Error macro was broken on *BSD.                      [#515]
+06/13 F Walking memory using wrong pointer in moduleGetConfigDirective.   [#516]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

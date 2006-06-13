@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1045"
+VERSION_BUILD="1046"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1046)
+# BUGS  : 
+# NOTES : We were walking memory in moduleGetConfigDirecte with an allocated pointer, and free-ing it later when it was past the allocatrd space... We now store the original pointer so we can free it correctly :)
 #
 # BUILD : 1.7.14 (1045)
 # BUGS  : 

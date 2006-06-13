@@ -492,6 +492,35 @@ void smtp_disconnect()
 
 /*************************************************************************/
 
+void mail_cleanup()
+{
+	struct smtp_header *headers, *nexth;
+	struct smtp_body_line *body, *nextb;
+	
+	if (mail.from)
+		free(mail.from);
+	if (mail.to)
+		free(mail.to);
+	
+	headers = mail.smtp_headers;
+	while (headers) {
+		nexth = headers->next;
+		free(headers->header);
+		free(headers);
+		headers = nexth;
+	}
+	
+	body = mail.smtp_body;
+	while (body) {
+		nextb = body->next;
+		free(body->line);
+		free(body);
+		body = nextb;
+	}
+}
+
+/*************************************************************************/
+
 int main(int argc, char *argv[])
 {
     char buf[8192];
@@ -556,12 +585,16 @@ int main(int argc, char *argv[])
 
     if (!smtp_connect(server, port)) {
 	    alog("SMTP: failed to connect to %s:%d",server, port);
+		mail_cleanup();
         return 0;
     }
     if (!smtp_send_email()) {
 	    alog("SMTP: error during sending of mail");
+		mail_cleanup();
         return 0;
     }
     smtp_disconnect();
+	mail_cleanup();
+	
     return 1;
 }

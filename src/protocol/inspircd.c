@@ -18,9 +18,11 @@
 #include "pseudo.h"
 #include "inspircd.h"
 
+#ifndef _WIN32
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 
 #ifdef _WIN32
 #include "winsock.h"

@@ -219,5 +219,6 @@ void parse_line(FILE * fd, char *line)
         } else
             fputc(*c, fd);
     }
-    fprintf(fd, "\r\n");
+	/* We only need \n here - we didn't open the file as binary -GD */
+    fprintf(fd, "\n");
 }

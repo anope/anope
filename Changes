@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2006
+06/14 A Indication in the version string if we're running on win32.       [ #00]
 04/08 F Fixed Charybdis support on win32.                                 [#487]
 04/08 F Fixed thread stuff on windows.                                    [#488]
 04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]
@@ -21,6 +22,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/13 F Walking memory using wrong pointer in moduleGetConfigDirective.   [#516]
 06/13 F Added cleanup code to tools/anopesmtp.                            [#464]
 06/13 F Fixed a lot of redundant function declarations.                   [#510]
+06/14 F Removed last traces of threading support.                         [#498]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

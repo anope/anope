@@ -33,9 +33,6 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define if you have POSIX threads libraries and header files. */
-#undef HAVE_PTHREAD
-
 /* Define to 1 if you have the `setgrent' function. */
 #undef HAVE_SETGRENT
 
@@ -114,10 +111,6 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to the necessary symbol if this constant uses a non-standard name on
-   your system. */
-#undef PTHREAD_CREATE_JOINABLE
-
 /* "Run group" */
 #undef RUNGROUP
 
@@ -153,9 +146,6 @@
 
 /* "Use RDB" */
 #undef USE_RDB
-
-/* "Use threads" */
-#undef USE_THREADS
 
 /* Define to `short' if <sys/types.h> does not define. */
 #undef int16_t

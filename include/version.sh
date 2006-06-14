@@ -68,15 +68,11 @@ cat >version.h <<EOF
 # define VER_ENCRYPTION
 #endif
 
-#ifdef USE_THREADS
-# define VER_THREAD "T"
+#if defined(_WIN32)
+# define VER_OS "W"
 #else
-# define VER_THREAD
-#endif
-
-/* the following two could be removed from the codebase */
 # define VER_OS
-# define VER_GHBNR
+#endif
 
 #if defined(USE_MYSQL)
 # define VER_MYSQL "Q"

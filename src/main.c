@@ -79,8 +79,7 @@ const char version_build[] =
     "build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
 const char version_flags[] =
-    " " VER_DEBUG VER_ENCRYPTION VER_THREAD VER_OS VER_GHBNR VER_MYSQL
-    VER_MODULE;
+    " " VER_DEBUG VER_ENCRYPTION VER_OS VER_MYSQL VER_MODULE;
 
 extern char *mod_current_buffer;
 

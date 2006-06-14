@@ -95,14 +95,6 @@ if test "$x" = "1"; then
 fi
 ])
 
-DIS_THREAD="Threads: No"
-ACX_PTHREAD([
-    CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
-    ANOPELIBS="$ANOPELIBS$PTHREAD_LIBS "
-    AC_DEFINE_UNQUOTED(USE_THREADS,1,"Use threads")    
-    DIS_THREAD="Threads: Yes"
-])
-
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 
@@ -261,7 +253,6 @@ AC_OUTPUT
 cat <<EOT
 
 $DIS_MODULES
-$DIS_THREAD
 $DIS_MYSQL
 
 All done!  Now run "make" (or possibly "gmake") to compile Anope.

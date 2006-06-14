@@ -23,6 +23,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/13 F Added cleanup code to tools/anopesmtp.                            [#464]
 06/13 F Fixed a lot of redundant function declarations.                   [#510]
 06/14 F Removed last traces of threading support.                         [#498]
+06/14 F Changed mysql detection to use mysql_config.                      [ #00]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

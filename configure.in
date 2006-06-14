@@ -43,7 +43,6 @@ AC_CHECK_LIB(nsl,inet_ntoa,ANOPELIBS="$ANOPELIBS-lnsl ")
 AC_CHECK_LIB(socket, socket,ANOPELIBS="$ANOPELIBS-lsocket ")
 AC_CHECK_LIB(resolv, res_query,ANOPELIBS="$ANOPELIBS-lresolv ")
 AC_CHECK_LIB(bsd, revoke,ANOPELIBS="$ANOPELIBS-lbsd ")
-x="0";
 
 dnl Does this platform require array notation to assign to a va_list?
 dnl If cross-compiling, we assume va_list is "normal".  If this breaks
@@ -75,24 +74,32 @@ fi
 
 
 DIS_MYSQL="  MySql: No"
-AC_ARG_WITH(mysql, [ --without-mysql     Do not use MySQL even if we find it],,[ 
-AM_PATH_MYSQLCLIENT(,[
-	AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
-	AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
-	AC_CHECK_HEADER(mysql/mysql.h,AC_DEFINE(MYSQL_HEADER_PREFIX,1,"Has mysql/mysql.h"))
-	MYSQL=" mysql.c "
-	RDB=" rdb.c "
-	AC_SUBST(MYSQL)
-	AC_SUBST(RDB)
-	x="1";
-],)
-
-if test "$x" = "1"; then
-	ANOPELIBS="$ANOPELIBS$MYSQLCLIENT_LIBS "
-	CFLAGS="$CFLAGS $MYSQLCLIENT_CFLAGS "
-	LDFLAGS="$LDFLAGS $MYSQLCLIENT_LDFLAGS "
-        DIS_MYSQL="  MySql: Yes"
-fi
+AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[ 
+	AC_ARG_WITH(mysqlconfig-path, [  --with-mysqlconfig-path=PATH Complete path to the mysql_config executable],
+	mysql_config_path="$withval", mysql_config_path="")
+	MYSQLCONF=""
+	if test "$mysql_config_path" != ""; then
+		if test -x "$mysql_config_path"; then
+			MYSQLCONF="$mysql_config_path"
+			echo "checking for mysql_config... $MYSQLCONF"
+		fi
+	fi
+	if test "$MYSQLCONF" = ""; then
+		AC_PATH_PROG(MYSQLCONF,mysql_config, "")
+	fi
+	if test "$MYSQLCONF" != ""; then
+		AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
+		AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
+		MYSQL=" mysql.c "
+		RDB=" rdb.c "
+		AC_SUBST(MYSQL)
+		AC_SUBST(RDB)
+		MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
+		MYSQL_LIBS="`$MYSQLCONF --libs`"
+		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
+		LDFLAGS="$LDFLAGS $MYSQL_LIBS"
+		DIS_MYSQL="  MySql: Yes"
+	fi
 ])
 
 AC_SUBST(ANOPELIBS)
@@ -187,7 +194,7 @@ AC_DEFINE(USE_MODULES,1,"Modules available")
 ])
 
 AC_ENABLE_DYN
-unreal_CHECK_TYPE_SIZES
+anope_CHECK_TYPE_SIZES
 
 AC_CHECK_HEADER(strings.h,AC_DEFINE(HAVE_STRINGS_H,1,""))
 AC_CHECK_HEADER(sys/select.h,AC_DEFINE(HAVE_SYS_SELECT_H,1,""))

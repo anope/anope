@@ -348,6 +348,7 @@ E int  DontQuoteAddresses;
 E int   NSDefFlags;
 E int   NSDefLanguage;
 E int   NSRegDelay;
+E int   NSResendDelay;
 E int   NSExpire;
 E int   NSRExpire;
 E int   NSForceEmail;

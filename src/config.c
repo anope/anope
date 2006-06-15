@@ -145,6 +145,7 @@ int NSDefMemoReceive;
 int NSDefFlags;
 int NSDefLanguage;
 int NSRegDelay;
+int NSResendDelay;
 int NSExpire;
 int NSRExpire;
 int NSForceEmail;
@@ -555,6 +556,7 @@ Directive directives[] = {
     {"NSMaxAliases", {{PARAM_INT, PARAM_RELOAD, &NSMaxAliases}}},
     {"NSNoGroupChange", {{PARAM_SET, PARAM_RELOAD, &NSNoGroupChange}}},
     {"NSRegDelay", {{PARAM_TIME, PARAM_RELOAD, &NSRegDelay}}},
+    {"NSResendDelay", {{PARAM_TIME, PARAM_RELOAD, &NSResendDelay}}},
     {"NSReleaseTimeout", {{PARAM_TIME, PARAM_RELOAD, &NSReleaseTimeout}}},
     {"NSSecureAdmins", {{PARAM_SET, PARAM_RELOAD, &NSSecureAdmins}}},
     {"NSStrictPrivileges",

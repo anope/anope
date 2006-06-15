@@ -118,7 +118,7 @@ int stringnum(const char *name)
 /* Read a non-comment, non-blank line from the input file.  Return NULL at
  * end of file. */
 
-char *getline(FILE *f)
+char *ano_getline(FILE *f)
 {
     static char buf[1024];
     char *s;
@@ -205,7 +205,7 @@ int main(int ac, char **av)
 	return 1;
     }
 
-    while (maxerr > 0 && (line = getline(in)) != NULL) {
+    while (maxerr > 0 && (line = ano_getline(in)) != NULL) {
 	if (*line == '\t') {
 	    if (curstring == -2) {
 		fprintf(stderr, "%s:%d: Junk at beginning of file\n",

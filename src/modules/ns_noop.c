@@ -136,7 +136,7 @@ int noop(User * u)
     } else if (!toggleStr) {
         if ((na = findnick(u->nick))) {
             char *tmpstr = NULL;
-            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
+            if ((tmpstr = moduleGetData(&na->nc->moduleData, "autoop"))) {
                 moduleNoticeLang(s_NickServ, u, AUTOOP_STATUS_OFF);
                 free(tmpstr);
             } else {
@@ -216,7 +216,7 @@ int mEventJoin(int argc, char **argv)
     if (user && (na = user->na)) {
         if (strcmp(argv[0], EVENT_START) == 0) {
             char *tmpstr = NULL;
-            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
+            if ((tmpstr = moduleGetData(&na->nc->moduleData, "autoop"))) {
                 currentUser = user;
                 if (is_oper(user)) {
                     user->mode &= ~(anope_get_oper_mode());
@@ -228,7 +228,7 @@ int mEventJoin(int argc, char **argv)
         } else {
             char *tmpstr = NULL;
             /* Does the user have the autoop info in his moduleData? */
-            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
+            if ((tmpstr = moduleGetData(&na->nc->moduleData, "autoop"))) {
                 /* The most dirty solution ever! - doc */
                 if (m_isIRCop)
                     user->mode |= anope_get_oper_mode();
@@ -304,7 +304,7 @@ int mSaveData(int argc, char **argv)
                     for (nc = nclists[i]; nc; nc = nc->next) {
                         char *tmpstr = NULL;
                         /* If we have any info on this user */
-                        if (tmpstr = moduleGetData(&nc->moduleData, "autoop")) {
+                        if ((tmpstr = moduleGetData(&nc->moduleData, "autoop"))) {
                             fprintf(out, "%s\n", nc->display);
                             free(tmpstr);
                         }

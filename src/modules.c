@@ -59,7 +59,7 @@ ModuleQueue *mod_operation_queue = NULL;
 
 int displayCommand(Command * c);
 int displayCommandFromHash(CommandHash * cmdTable[], char *name);
-int displayMessageFromHashl(char *name);
+int displayMessageFromHash(char *name);
 int displayMessage(Message * m);
 char *ModuleGetErrStr(int status);
 

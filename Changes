@@ -27,6 +27,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/15 F OpenBSD Config issue.                                             [#519]
 06/15 F langcomp with _GNU_SOURCES defined.                               [ #00]
 06/16 F Fixed several memleaks in ns_noop.c.                              [ #00]
+06/16 F Fixed typo in function name.                                      [#524]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

@@ -135,8 +135,10 @@ int noop(User * u)
         moduleNoticeLang(s_NickServ, u, AUTOOP_NO_NICK);
     } else if (!toggleStr) {
         if ((na = findnick(u->nick))) {
-            if (moduleGetData(&na->nc->moduleData, "autoop")) {
+            char *tmpstr = NULL;
+            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
                 moduleNoticeLang(s_NickServ, u, AUTOOP_STATUS_OFF);
+                free(tmpstr);
             } else {
                 moduleNoticeLang(s_NickServ, u, AUTOOP_STATUS_ON);
             }
@@ -213,21 +215,25 @@ int mEventJoin(int argc, char **argv)
     /* Blame Rob if this user->na should be findnick(user->nick); -GD */
     if (user && (na = user->na)) {
         if (strcmp(argv[0], EVENT_START) == 0) {
-            if (moduleGetData(&na->nc->moduleData, "autoop")) {
+            char *tmpstr = NULL;
+            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
                 currentUser = user;
                 if (is_oper(user)) {
                     user->mode &= ~(anope_get_oper_mode());
                     m_isIRCop = 1;
                 }
                 add_ignore(user->nick, 120);
+                free(tmpstr);
             }
         } else {
+            char *tmpstr = NULL;
             /* Does the user have the autoop info in his moduleData? */
-            if (moduleGetData(&na->nc->moduleData, "autoop")) {
+            if (tmpstr = moduleGetData(&na->nc->moduleData, "autoop")) {
                 /* The most dirty solution ever! - doc */
                 if (m_isIRCop)
                     user->mode |= anope_get_oper_mode();
                 delete_ignore(user->nick);
+                free(tmpstr);
             }
         }
     }
@@ -296,9 +302,11 @@ int mSaveData(int argc, char **argv)
             } else {
                 for (i = 0; i < 1024; i++) {
                     for (nc = nclists[i]; nc; nc = nc->next) {
+                        char *tmpstr = NULL;
                         /* If we have any info on this user */
-                        if (moduleGetData(&nc->moduleData, "autoop")) {
+                        if (tmpstr = moduleGetData(&nc->moduleData, "autoop")) {
                             fprintf(out, "%s\n", nc->display);
+                            free(tmpstr);
                         }
                     }
                 }

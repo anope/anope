@@ -238,16 +238,16 @@ void modules_unload_all(boolean fini)
 		while (mh) {
 			next = mh->next;
 		    if(fini) {
-		        if (prepForUnload(mh->m) != MOD_ERR_OK) {
-			    	mh = next;
-				continue;
-		        }
-			
 		        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
 		        if (func) {
 		            mod_current_module_name = mh->m->name;
 		            func();                 /* exec AnopeFini */
 		            mod_current_module_name = NULL;
+		        }
+			
+		        if (prepForUnload(mh->m) != MOD_ERR_OK) {
+			    	mh = next;
+				continue;
 		        }
 			
 		        if ((ano_modclose(mh->m->handle)) != 0)

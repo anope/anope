@@ -29,9 +29,7 @@ int vsnprintf(char *buf, size_t len, const char *fmt, va_list args)
     if (len <= 0)
         return 0;
     *buf = 0;
-#undef vsnprintf
     vsnprintf(buf, len, fmt, args);
-#define vsnprintf my_vsnprintf
     buf[len - 1] = 0;
     return strlen(buf);
 }

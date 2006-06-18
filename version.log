@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1054"
+VERSION_BUILD="1058"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1058)
+# BUGS  : 496
+# NOTES : Removed legacy my_vsnprintf() code and anything related; detection for it was already gone...
 #
 # BUILD : 1.7.14 (1054)
 # BUGS  : 524

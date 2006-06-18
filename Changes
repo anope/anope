@@ -29,6 +29,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/16 F Fixed several memleaks in ns_noop.c.                              [ #00]
 06/16 F Fixed typo in function name.                                      [#524]
 06/18 F Removed legacy my_vsnprintf code.                                 [#496]
+06/18 F HOP cannot remove VOPs anymore to be consitent with adding.       [#525]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

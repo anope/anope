@@ -356,6 +356,11 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
 
         ulev = get_access(u, ci);
 
+        if ((xlev >= ulev || ulev < ACCESS_AOP) && !is_servadmin) {
+            notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+            return MOD_CONT;
+        }
+
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*nick) && strspn(nick, "1234567890,-") == strlen(nick)) {
             int count, last = -1, perm = 0;

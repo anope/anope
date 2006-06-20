@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1060"
+VERSION_BUILD="1061"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1061)
+# BUGS  : 408
+# NOTES : Added support for Visual Studio 2005, partially by replacing install.vbs by a more robust install.js -- thanks heinz!
 #
 # BUILD : 1.7.14 (1060)
 # BUGS  : 523

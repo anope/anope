@@ -41,7 +41,7 @@ $(PROGRAM): $(OBJS) win32.res
         $(CC) $(OBJS) win32.res /link /out:$(PROGRAM) /implib:anope.lib $(LIBS) $(LFLAGS) $(MLIBS) $(ELIBS)
 
 spotless:
-        -@erase *.obj *.exe *.exp *.lib tools\*.exe *.res
+        -@erase *.obj *.exe *.exp *.lib tools\*.exe *.res win32.rc *.manifest
         
 install:
         -@copy anope.exe ..\anope.exe        

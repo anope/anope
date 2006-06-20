@@ -69,7 +69,11 @@ cat >version.h <<EOF
 #endif
 
 #if defined(_WIN32)
-# define VER_OS "W"
+# if _MSC_VER >= 1400
+#  define VER_OS "W"
+# else
+#  define VER_OS "w"
+# endif
 #else
 # define VER_OS
 #endif

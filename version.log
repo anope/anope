@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1062"
+VERSION_BUILD="1063"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1063)
+# BUGS  : 526
+# NOTES : Applied win32-maintenance patch by heinz
 #
 # BUILD : 1.7.14 (1062)
 # BUGS  : 

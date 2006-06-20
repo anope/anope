@@ -14,6 +14,7 @@
 //
 
 var anopeVersion = "Unknown";
+var vMaj, vMin, vPat, vBuild, vExtra;
 var defaultDrive = "C";
 
 var installerResponses = new Array();
@@ -40,10 +41,36 @@ var installerQuestions = [
                                                                                                         WScript.Echo("\nERROR: Cannot find MySQL - See error messages above for details.\n");
                                                                                                         return false;
                                                                                                 }
+                                                                                                if (!moveMySQLDll()) {
+                                                                                                        WScript.Echo("\nNOTICE: The libmysql.dll file could not be moved into the current directory.");
+                                                                                                        WScript.Echo("You may receive errors about this file not being found when run.");
+                                                                                                        WScript.Echo("Just manually find this file and place it in this folder.\n");        
+                                                                                                }
                                                                                         }
                                                                                         installerResponses['MySQL DB Support'] = answer;
                                                                                         return true;
-                                                                                   }                                                                                        
+                                                                                   },
+                                                        'commit_config' : function() {
+                                                                                        if (installerResponses['MySQL DB Support'] == 'yes') {
+                                                                                                f.WriteLine("USE_MYSQL=1");
+                                                                                                f.WriteLine("MYSQL_LIB=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].libpaths[0]+"\"");
+                                                                                                f.WriteLine("MYSQL_INC=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].incpaths[0]+"\"");
+                                                                                                f.WriteLine("LIBS=$(LIBS) /LIBPATH:$(MYSQL_LIB)");
+                                                                                                f.WriteLine("MYSQL_LIB_PATH=/LIBPATH:$(MYSQL_LIB)");
+                                                                                                f.WriteLine("BASE_CFLAGS=$(BASE_CFLAGS) /I $(MYSQL_INC)");
+                                                                                                f.WriteLine("MYSQL_INC_PATH=/I $(MYSQL_INC)");
+                                                                                                f.WriteLine("RDB_C=rdb.c");
+                                                                                                f.WriteLine("RDB_O=rdb.obj");
+                                                                                                f.WriteLine("MYSQL_C=mysql.c");
+                                                                                                f.WriteLine("MYSQL_O=mysql.obj");
+                                                                                                f.WriteLine("BASE_CFLAGS=/D USE_MYSQL /D USE_RDB $(BASE_CFLAGS) /D HAVE_MYSQL_MYSQL_H");
+                                                                                                f.WriteLine("MYPASQL_BUILD=$(CC) /LD $(MYSQL_INC_PATH) src\\mypasql.c /link $(MYSQL_LIB_PATH) $(LFLAGS) /DEF:src\mypasql.def libmysql.lib zlib.lib ws2_32.lib advapi32.lib /NODEFAULTLIB:LIBCMTD.lib");
+                                                                                                f.WriteLine("LIBS=$(LIBS) libmysql.lib zlib.lib");                                                                             
+                                                                                        }
+                                                                                        else {
+                                                                                                f.WriteLine("USE_MYSQL=0");
+                                                                                        }
+                                                        }                                                                                                                                        
                                                 },
                                                 
                                                 {
@@ -61,26 +88,38 @@ var installerQuestions = [
                                                         'store_answer' : function (answer) {
                                                                                         installerResponses['Encrypted Passwords'] = answer;
                                                                                         return true;
-                                                                                  }
+                                                                                  },
+                                                        'commit_config' : function() {
+                                                                                        if (installerResponses['Encrypted Passwords'] == 'yes') {
+                                                                                                f.WriteLine("DB_ENCRYPTION=1");
+                                                                                                f.WriteLine("BASE_CFLAGS=/D USE_ENCRYPTION /D ENCRYPT_MD5 $(BASE_CFLAGS)");
+                                                                                        }
+                                                                                        else {
+                                                                                                f.WriteLine("DB_ENCRYPTION=0");
+                                                                                        }    
+                                                        }
                                                 }                                           
                                                 
                                        ];
 
 var buildPackages = [
+
                                         {
-                                                        'name' : 'Microsoft Visual Studio 98',
+                                                        'name' : 'Microsoft Visual Studio 2005',
                                                         'libpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Lib'
+                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
+                                                                                'Program Files\\Microsoft Platform SDK\\Lib'
                                                                          ],
                                                         'incpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Include'
+                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Include',
+                                                                                'Program Files\\Microsoft Platform SDK\\Include'
                                                                          ],
                                                         'nmake' : [
-                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Bin',
+                                                                                'Program Files\\Microsoft Platform SDK\\Bin',
                                                                                 ''
                                                                         ],
                                                         'additional_switches' : [
-                                                                                                 '/QIfist'
+                                                                                                '/w'
                                                                                            ]
                                         },
                                         
@@ -100,29 +139,39 @@ var buildPackages = [
                                                                         ],                                                                    
                                                         'additional_switches' : false
                                         },
-                                        
+
                                         {
-                                                        'name' : 'Microsoft Visual Studio 2005',
+                                                        'name' : 'Microsoft Visual Studio 98',
                                                         'libpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
-                                                                                'Program Files\\Microsoft Platform SDK\\Lib'
+                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Lib'
                                                                          ],
                                                         'incpaths' : [
-                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Include',
-                                                                                'Program Files\\Microsoft Platform SDK\\Include'
+                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Include'
                                                                          ],
                                                         'nmake' : [
-                                                                                'Program Files\\Microsoft Platform SDK\\Bin',
+                                                                                'Program Files\\Microsoft Visual Studio\\VC98\\Bin',
                                                                                 ''
                                                                         ],
                                                         'additional_switches' : [
-                                                                                                '/w'
+                                                                                                 '/QIfist'
                                                                                            ]
                                         }
+                                        
                                 ];                  
                                                               
                                 
         var mysqlVersions = [
+								{
+									  'name' : 'MySQL 5.1',
+									  'libpaths' : [
+													  'Program Files\\MySQL\\MySQL Server 5.1\\Lib\\opt'
+											],
+									  'incpaths' : [
+													  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
+											],
+									  'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll'
+								},
+
                                                 {
                                                         'name' : 'MySQL 5.0',
                                                         'libpaths' : [
@@ -131,7 +180,7 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 5.0\\Include'
                                                                         ],
-                                                        'additional_switches' : false
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.0\\Bin\\libmysql.dll'                                                                        
                                                 },
                                                 
                                                 {
@@ -142,7 +191,7 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 4.1\\Include'
                                                                         ],
-                                                        'additional_switches' : false
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.1\\Bin\\libmysql.dll'                                                                        
                                                 },        
                                                 
                                                 {
@@ -153,7 +202,7 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 4.0\\Include'
                                                                         ],
-                                                        'additional_switches' : false
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.0\\Bin\\libmysql.dll'                                                                        
                                                 },                                                                                                                                                                           
                                                         
                                                 {
@@ -164,7 +213,7 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'mysql\\include'
                                                                         ],
-                                                        'additional_switches' : false
+                                                        'dllfile' : 'mysql\\Bin\\libmysql.dll'                                                                        
                                                 }
 
                                 ];                  
@@ -258,6 +307,7 @@ var buildPackages = [
                                 WScript.Echo("\t"+x+" Version:\t\t"+thisVer.name);
                         }        
                 }
+		    WScript.Echo("\tAnope Version:\t\t\t"+anopeVersion);
                 WScript.Echo("\nTo continue, please press Enter...");
                 InstallerInput();    
        
@@ -294,44 +344,24 @@ var buildPackages = [
                 f.WriteLine("BASE_CFLAGS=$(VC6) /O2 /MD $(INCFLAGS)");
                 f.WriteLine("RC_FLAGS="+path_line_rc);
                 f.WriteLine("LIBS=wsock32.lib advapi32.lib /NODEFAULTLIB:libcmtd.lib");
-                f.WriteLine("LFLAGS=$(LIBPATH)");
-                
-                if (installerResponses['MySQL DB Support'] == 'yes') {
-                        f.WriteLine("USE_MYSQL=1");
-                        f.WriteLine("MYSQL_LIB=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].libpaths[0]+"\"");
-                        f.WriteLine("MYSQL_INC=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].incpaths[0]+"\"");
-                        f.WriteLine("LIBS=$(LIBS) /LIBPATH:$(MYSQL_LIB)");
-                        f.WriteLine("MYSQL_LIB_PATH=/LIBPATH:$(MYSQL_LIB)");
-                        f.WriteLine("BASE_CFLAGS=$(BASE_CFLAGS) /I $(MYSQL_INC)");
-                        f.WriteLine("MYSQL_INC_PATH=/I $(MYSQL_INC)");
-                        f.WriteLine("RDB_C=rdb.c");
-                        f.WriteLine("RDB_O=rdb.obj");
-                        f.WriteLine("MYSQL_C=mysql.c");
-                        f.WriteLine("MYSQL_O=mysql.obj");
-                        f.WriteLine("BASE_CFLAGS=/D USE_MYSQL /D USE_RDB $(BASE_CFLAGS) /D HAVE_MYSQL_MYSQL_H");
-                        f.WriteLine("MYPASQL_BUILD=$(CC) /LD $(MYSQL_INC_PATH) src\\mypasql.c /link $(MYSQL_LIB_PATH) $(LFLAGS) /DEF:src\mypasql.def libmysql.lib zlib.lib ws2_32.lib advapi32.lib /NODEFAULTLIB:LIBCMTD.lib");
-                        f.WriteLine("LIBS=$(LIBS) libmysql.lib zlib.lib");                
-                }
-                else {
-                        f.WriteLine("USE_MYSQL=0");
-                }        
-                
-                if (installerResponses['Encrypted Passwords'] == 'yes') {
-                        f.WriteLine("DB_ENCRYPTION=1");
-                        f.WriteLine("BASE_CFLAGS=/D USE_ENCRYPTION /D ENCRYPT_MD5 $(BASE_CFLAGS)");
-                }
-                else {
-                        f.WriteLine("DB_ENCRYPTION=0");
-                }        
+                f.WriteLine("LFLAGS=$(LIBPATH)");               
+                   
+                for (x in installerQuestions) {
+                        var thisQuestion = installerQuestions[x];
+                        thisQuestion.commit_config();
+                } 
                         
                 f.WriteLine("MORE_CFLAGS = /I\"../include\"");
                 f.WriteLine("CFLAGS = /nologo $(CDEFS) $(BASE_CFLAGS) $(MORE_CFLAGS)");
                 f.close();
                 
-                WScript.Echo("Configuration Complete!");
-                WScript.Echo("-------------------------------\n");
+                generateRC();
+                
+                WScript.Echo("\nConfiguration Complete!");
+                WScript.Echo("-----------------------\n");
                 WScript.Echo("Anope has been configured to your system. To compile, simply type:");
                 WScript.Echo("nmake -f Makefile.win32\n");
+		    WScript.Echo("If you update Anope, you should run this script again to ensure\nall available options are set.\n");
           
         }                        
         // Fin.
@@ -344,9 +374,7 @@ var buildPackages = [
                 if (!fso.FileExists('version.log')) {
                         anopeVersion = 'Unknown';
                         return;
-                }
-                
-                var vMaj, vMin, vPat, vBuild, vExtra;
+                }                               
                 
                 var versionLog = fso.OpenTextFile("version.log");
                 while (!versionLog.atEndOfStream) {
@@ -405,6 +433,19 @@ var buildPackages = [
                         return true;
                 }
                 return false;
+        }
+        
+        function moveMySQLDll() {
+                if (!fso.FileExists(defaultDrive + ":\\" + softwareVersions['MySQLDB'].dllfile)) {
+                        WScript.Echo("DEBUG: The libmysql.dll could not be found at '"+defaultDrive+":\\"+softwareVersions['MySQLDB'].dllfile);
+                        return false;
+                }
+                fso.CopyFile(defaultDrive+":\\"+softwareVersions['MySQLDB'].dllfile, "libmysql.dll");
+                if (!fso.FileExists("libmysql.dll")) {
+                        WScript.Echo("DEBUG: The libmyql.dll file could not be copied to the working directory");
+                        return false;
+                }
+                return true;
         }
         
         function findCompiler() {
@@ -466,5 +507,44 @@ var buildPackages = [
                 }
                 return false;                                
         }
-                                                                                                                         
-                                        
+        
+        function generateRC() {
+                var version_matches = [
+                                                                {
+                                                                        'find' : /VERSION_COMMA/g,
+                                                                        'replacement' : vMaj+","+vMin+","+vPat+","+vBuild
+                                                                },
+                                                                
+                                                                {
+                                                                        'find' : /VERSION_FULL/g,
+                                                                        'replacement' : anopeVersion
+                                                                },
+                                                                
+                                                                {
+                                                                        'find' : /VERSION_DOTTED/g,
+                                                                        'replacement' : vMaj+"."+vMin+"."+vPat+"."+vBuild
+                                                                }
+                                                        ];
+                                                        
+                var template = fso.OpenTextFile("src/win32.rc.template", 1);
+                var output = fso.OpenTextFile("src/win32.rc", 2, true);
+                if (!template) {
+                        WScript.Echo("ERROR: Unable to generate win32.rc file - Couldn't open source file..");
+                }
+                if (!output) {
+                        WScript.Echo("ERROR: Unable to generate win32.rc file - Couldn't open output file..");
+                }
+                var templateText = template.ReadAll();
+                template.close();
+                
+                for (x in version_matches) {
+                        var thisVerStr = version_matches[x];
+                        while (templateText.match(thisVerStr.find)) {
+                                templateText = templateText.replace(thisVerStr.find, thisVerStr.replacement);
+                        }
+                }
+                
+                output.WriteLine(templateText);
+                output.close();
+        }
+                                                                                                                                                                

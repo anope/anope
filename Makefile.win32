@@ -50,7 +50,11 @@ spotless:
         cd src\protocol && $(MAKE) spotless && cd ..\..
         cd src\core && $(MAKE) spotless && cd ..\..
         cd src\tools && $(MAKE) spotless && cd ..\..
-        -@erase include\language.h include\version.h *~ anope.exe version.sh.exe *.obj anopesmtp.exe
+        -@erase include\language.h include\version.h *.manifest *~ anope.exe version.sh.exe *.obj anopesmtp.exe
+	-@echo --
+	-@echo NOTICE:
+	-@echo   You will need to run cscript /nologo install.js again
+	-@echo --
 
 mypasql: 
         $(MYPASQL_BUILD)
@@ -91,7 +95,7 @@ include\language.h: lang\language.h
         
 include\version.h: version.sh.exe version.log include\services.h include\pseudo.h include\messages.h
         version.sh.exe
-                copy version.h include\version.h
+        move version.h include\version.h
 
 version.sh.exe:
         $(CC) $(BASE_CFLAGS) include\version.sh.c /link $(LFLAGS)

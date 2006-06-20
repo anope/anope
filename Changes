@@ -33,6 +33,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/18 F HOP cannot remove VOPs anymore to be consitent with adding.       [#525]
 06/18 F Moduledata was cleared before calling AnopeFini.                  [#523]
 06/20 F Make does not recompile everything even on no change anymore.     [ #00]
+06/20 F Versions in win32.rc are now updated correctly.                   [#526]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1063"
+VERSION_BUILD="1064"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1064)
+# BUGS  : 
+# NOTES : Fixed booboo with win32.rc.template.. it was seeing double!
 #
 # BUILD : 1.7.14 (1063)
 # BUGS  : 526

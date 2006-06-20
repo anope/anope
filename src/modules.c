@@ -523,6 +523,7 @@ int loadModule(Module * m, User * u)
     int len;
     const char *err;
     int (*func) (int, char **);
+    int (*version)();
     int ret = 0;
     char *argv[1];
     int argc = 0;
@@ -557,8 +558,6 @@ int loadModule(Module * m, User * u)
     buf[4095] = '\0';
 	/* Don't skip return value checking! -GD */
     if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK) {
-        if (u)
-            notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
         m->filename = sstrdup(buf);
 	return ret;
 	}
@@ -568,22 +567,25 @@ int loadModule(Module * m, User * u)
     m->handle = ano_modopen(m->filename);
     if ((err = ano_moderr()) != NULL) {
         alog(err);
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
-        }
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
     func = (int (*)(int, char **))ano_modsym(m->handle, "AnopeInit");
     if ((err = ano_moderr()) != NULL) {
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
-        }
-
         return MOD_ERR_NOLOAD;
     }
     if (func) {
+	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
+	if(version && version() >= VERSION_BUILD ) {
+	    alog("Module %s compiled against anope revision %d, this is %d",m->name,version(),VERSION_BUILD);
+	} else {
+            ano_modclose(m->handle);
+	    ano_modclearerr();
+	    alog("Module %s is compiled against an old version of anope!",m->name);
+	    return MOD_ERR_NOLOAD;
+	}
+	/* TODO */
         mod_current_module_name = m->name;
         /* argv[0] is the user if there was one, or NULL if not */
         if (u) {
@@ -602,9 +604,6 @@ int loadModule(Module * m, User * u)
             ret = MOD_STOP;
         }
         if (ret == MOD_STOP) {
-            if (u) {
-                notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
-            }
             alog("%s requested unload...", m->name);
             unloadModule(m, NULL);
             mod_current_module_name = NULL;
@@ -623,10 +622,6 @@ int loadModule(Module * m, User * u)
     return MOD_ERR_OK;
 
 #else
-    if (u) {
-        notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name);
-    }
-
     return MOD_ERR_NOLOAD;
 #endif
 }
@@ -2706,8 +2701,12 @@ void handleModuleOperationQueue(void)
 			alog("Trying to load module [%s]", mod_operation_queue->m->name);
 			status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
 			alog("Module loading status: %d", status);
-			if (status != MOD_ERR_OK)
+			if (status != MOD_ERR_OK) {
+			        if(mod_current_user) {
+                                   notice_lang(s_OperServ, mod_current_user, OPER_MODULE_LOAD_FAIL,mod_operation_queue->m->name);
+				}
 				destroyModule(mod_operation_queue->m);
+			}
 		} else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
 			alog("Trying to unload module [%s]", mod_operation_queue->m->name);
 			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);

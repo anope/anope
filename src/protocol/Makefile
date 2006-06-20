@@ -25,6 +25,7 @@ distclean: clean spotless
 
 .o.s:
 	$(CC) ${SHARED} $< -o $*.so ${PROFILE}
+	@$(TOUCH) $*.s
 
 subs:
 	@for i in $(SUBS); do \
@@ -37,8 +38,8 @@ subs_clean:
 	(cd $$i; $(MAKE) clean); done
 
 clean: subs_clean
-	rm -f *.o *.so *.c~ core
+	rm -f *.o *.s *.so *.c~ core
 
 spotless: subs_clean
-	rm -f *.o *.so *.c~ core *.so Makefile.inc
+	rm -f *.o *.s *.so *.c~ core *.so Makefile.inc
 

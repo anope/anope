@@ -253,9 +253,9 @@ int do_confirm(User * u)
     char *email = NULL;
     int forced = 0;
     User *utmp = NULL;
-#ifdef USE_ENCRYPTION
+    char modes[512];
     int len;
-#endif
+
     nr = findrequestnick(u->nick);
 
     if (NSEmailReg) {
@@ -383,12 +383,22 @@ int do_confirm(User * u)
 #endif
             u->lastnickreg = time(NULL);
             if (ircd->modeonreg) {
+                len = strlen(ircd->modeonreg);
+                strncpy(modes,ircd->modeonreg,512);
+	        if(ircd->rootmodeonid && (u->na->nc->flags & NI_SERVICES_ROOT)) { 
+                    strncat(modes,ircd->rootmodeonid,512-len);
+	        } else if(ircd->adminmodeonid && (u->na->nc->flags & NI_SERVICES_ADMIN)) {
+                    strncat(modes,ircd->adminmodeonid,512-len);
+	        } else if(ircd->opermodeonid && (u->na->nc->flags & NI_SERVICES_OPER)) {
+                    strncat(modes,ircd->opermodeonid,512-len);
+                }
+
                 if (ircd->tsonmode) {
                     snprintf(tsbuf, sizeof(tsbuf), "%lu",
                              (unsigned long int) u->timestamp);
-                    common_svsmode(u, ircd->modeonreg, tsbuf);
+                    common_svsmode(u, modes, tsbuf);
                 } else {
-                    common_svsmode(u, ircd->modeonreg, NULL);
+                    common_svsmode(u, modes, NULL);
                 }
             }
 

@@ -3,6 +3,9 @@ Anope Version  S V N
 Provided by Anope Dev. <dev@anope.org> - 2006
 06/14 A Indication in the version string if we're running on win32.       [ #00]
 06/20 A Added support for Visual Studio 2005.                             [#408]
+06/22 A Ability for ircd modules to set extra modes on id.                [ #00]
+06/22 A Support startup flag.                                             [ #00]
+06/21 A Module version check.                                             [ #00]
 04/08 F Fixed Charybdis support on win32.                                 [#487]
 04/08 F Fixed thread stuff on windows.                                    [#488]
 04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]

@@ -47,6 +47,9 @@ IRCDVar myIrcd[] = {
      NULL,                      /* Mode to set for chan admin */
      NULL,                      /* Mode to remove for chan admin */
      "+rd",                     /* Mode On Reg          */
+     NULL,                      /* Mode on ID for Roots */
+     NULL,                      /* Mode on ID for Admins */
+     NULL,                      /* Mode on ID for Opers */
      "-r+d",                    /* Mode on UnReg        */
      "-r+d",                    /* Mode on Nick Change  */
      0,                         /* Supports SGlines     */

@@ -47,6 +47,9 @@ IRCDVar myIrcd[] = {
      "+a",                      /* Mode to set for channel admin */
      "-a",                      /* Mode to unset for channel admin */
      "+rd",                     /* Mode On Reg          */
+     NULL,                      /* Mode on ID for Roots */
+     NULL,                      /* Mode on ID for Admins */
+     NULL,                      /* Mode on ID for Opers */
      "-r+d",                    /* Mode on UnReg        */
      "+d",                      /* Mode on Nick Change  */
      1,                         /* Supports SGlines     */

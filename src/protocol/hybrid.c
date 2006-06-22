@@ -47,6 +47,9 @@ IRCDVar myIrcd[] = {
      NULL,                      /* Mode to set for admin */
      NULL,                      /* Mode to unset for admin */
      NULL,                      /* Mode On Reg          */
+     NULL,                      /* Mode on ID for Roots */
+     NULL,                      /* Mode on ID for Admins */
+     NULL,                      /* Mode on ID for Opers */
      NULL,                      /* Mode on UnReg        */
      NULL,                      /* Mode on Nick Change  */
      0,                         /* Supports SGlines     */

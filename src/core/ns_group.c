@@ -94,6 +94,8 @@ int do_group(User * u)
     char *pass = strtok(NULL, " ");
     int i;
     char tsbuf[16];
+    char modes[512];
+    int len;
 
     if (NSEmailReg && (findrequestnick(u->nick))) {
         notice_lang(s_NickServ, u, NICK_REQUESTED);
@@ -229,10 +231,19 @@ int do_group(User * u)
             snprintf(tsbuf, sizeof(tsbuf), "%lu",
                      (unsigned long int) u->timestamp);
             if (ircd->modeonreg) {
+                len = strlen(ircd->modeonreg);
+                strncpy(modes,ircd->modeonreg,512);
+	       if(ircd->rootmodeonid && (u->na->nc->flags & NI_SERVICES_ROOT)) { 
+                    strncat(modes,ircd->rootmodeonid,512-len);
+	        } else if(ircd->adminmodeonid && (u->na->nc->flags & NI_SERVICES_ADMIN)) {
+                    strncat(modes,ircd->adminmodeonid,512-len);
+	        } else if(ircd->opermodeonid && (u->na->nc->flags & NI_SERVICES_OPER)) {
+                    strncat(modes,ircd->opermodeonid,512-len);
+                }
                 if (ircd->tsonmode) {
-                    common_svsmode(u, ircd->modeonreg, tsbuf);
+                    common_svsmode(u, modes, tsbuf);
                 } else {
-                    common_svsmode(u, ircd->modeonreg, NULL);
+                    common_svsmode(u, modes, NULL);
                 }
             }
 

@@ -79,6 +79,8 @@ int do_identify(User * u)
     NickRequest *nr;
     int res;
     char tsbuf[16];
+    char modes[512];
+    int len;
 
     if (!pass) {
         syntax_error(s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
@@ -121,10 +123,19 @@ int do_identify(User * u)
                  (unsigned long int) u->timestamp);
 
         if (ircd->modeonreg) {
+            len = strlen(ircd->modeonreg);
+	    strncpy(modes,ircd->modeonreg,512);
+	    if(ircd->rootmodeonid && (u->na->nc->flags & NI_SERVICES_ROOT)) { 
+                strncat(modes,ircd->rootmodeonid,512-len);
+	    } else if(ircd->adminmodeonid && (u->na->nc->flags & NI_SERVICES_ADMIN)) {
+                strncat(modes,ircd->adminmodeonid,512-len);
+	    } else if(ircd->opermodeonid && (u->na->nc->flags & NI_SERVICES_OPER)) {
+                strncat(modes,ircd->opermodeonid,512-len);
+	    }
             if (ircd->tsonmode) {
-                common_svsmode(u, ircd->modeonreg, tsbuf);
+                common_svsmode(u, modes, tsbuf);
             } else {
-                common_svsmode(u, ircd->modeonreg, "");
+                common_svsmode(u, modes, "");
             }
         }
         send_event(EVENT_NICK_IDENTIFY, 1, u->nick);

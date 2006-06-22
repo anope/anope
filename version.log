@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1068"
+VERSION_BUILD="1069"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1069)
+# BUGS  : N/A
+# NOTES : Added support for ircd modules to set extra modes based on services access (plexus needs this)
 #
 # BUILD : 1.7.14 (1068)
 # BUGS  : N/A

@@ -586,7 +586,9 @@ int loadModule(Module * m, User * u)
     if (func) {
 	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
 	if(version && version() >= VERSION_BUILD ) {
-	    alog("Module %s compiled against anope revision %d, this is %d",m->name,version(),VERSION_BUILD);
+	    if(debug) {
+      	        alog("Module %s compiled against anope revision %d, this is %d",m->name,version(),VERSION_BUILD);	
+	    }
 	} else {
             ano_modclose(m->handle);
 	    ano_modclearerr();

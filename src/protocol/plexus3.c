@@ -1558,14 +1558,23 @@ plexus_cmd_svid_umode2 (User * u, char *ts)
 void
 plexus_cmd_svid_umode3 (User * u, char *ts)
 {
-  if (u->svid != u->timestamp)
-    {
-      common_svsmode (u, is_services_root (u) ? "+Nrd" : "+rd", ts);
-    }
-  else
-    {
-      common_svsmode (u, is_services_root (u) ? "+Nr" : "+r", NULL);
-    }
+  char modes[512];
+  int len;
+  strncpy(modes,ircd->modeonreg,512);
+  len = strlen(ircd->modeonreg);
+  if(ircd->rootmodeonid && is_services_root(u)) {
+      strncat(modes,ircd->rootmodeonid,512-len);
+  } else if(ircd->adminmodeonid && is_services_admin(u)) {
+      strncat(modes,ircd->adminmodeonid,512-len);
+  } else if(ircd->opermodeonid && is_services_oper(u)) {
+      strncat(modes,ircd->opermodeonid,512-len);
+  }
+  if (u->svid != u->timestamp) {
+      strncat(modes,"d",1);
+      common_svsmode (u, modes, ts);
+  } else {
+      common_svsmode (u, modes, NULL);
+  }
 }
 
 /* NICK <newnick>  */

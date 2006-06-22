@@ -42,6 +42,7 @@ int logchan = 0;                /* -logchan */
 int skeleton = 0;               /* -skeleton */
 int nofork = 0;                 /* -nofork */
 int forceload = 0;              /* -forceload */
+int nothird = 0;                /* -nothrid */
 int noexpire = 0;               /* -noexpire */
 
 #ifdef USE_RDB

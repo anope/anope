@@ -321,6 +321,12 @@ static int parse_options(int ac, char **av)
                 logchan = 1;
             } else if (strcmp(s, "forceload") == 0) {
                 forceload = 1;
+            } else if (strcmp(s, "nothird") == 0) {
+                nothird = 1;
+            } else if (strcmp(s, "support") == 0) {
+                nofork = 1;
+                debug++;
+                nothird = 1;
             } else if (!strcmp(s, "noexpire")) {
                 noexpire = 1;
             } else if (!strcmp(s, "help")) {
@@ -345,6 +351,8 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout, "-logchan       -logchan channelname\n");
                 fprintf(stdout, "-skeleton      -skeleton\n");
                 fprintf(stdout, "-forceload     -forceload\n");
+                fprintf(stdout, "-nothird       -nothird\n");
+                fprintf(stdout, "-support       -support\n");
                 fprintf(stdout, "-readonly      -readonly\n");
                 fprintf(stdout, "-noexpire      -noexpire\n");
                 fprintf(stdout, "-version       -version\n");

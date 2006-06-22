@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1067"
+VERSION_BUILD="1068"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1068)
+# BUGS  : N/A
+# NOTES : Added -nothird and -support command line options
 #
 # BUILD : 1.7.14 (1067)
 # BUGS  : 

@@ -743,6 +743,7 @@ E int   logchan;
 E int   skeleton;
 E int   nofork;
 E int   forceload;
+E int   nothird;
 E int	noexpire;
 
 #ifdef USE_RDB

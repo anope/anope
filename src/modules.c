@@ -93,7 +93,11 @@ void modules_init(void)
     int idx;
 	int ret;
     Module *m;
-	
+
+    if(nothird) {
+        return;
+    }
+
     for (idx = 0; idx < ModulesNumber; idx++) {
         m = findModule(ModulesAutoload[idx]);
         if (!m) {
@@ -197,7 +201,11 @@ void modules_delayed_init(void)
     int idx;
 	int ret;
     Module *m;
-	
+
+    if(nothird) {
+        return;
+    }
+
     for (idx = 0; idx < ModulesDelayedNumber; idx++) {
         m = findModule(ModulesDelayedAutoload[idx]);
         if (!m) {

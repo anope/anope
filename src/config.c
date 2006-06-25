@@ -113,6 +113,7 @@ int KeepLogs;
 int KeepBackups;
 int ForceForbidReason;
 int UsePrivmsg;
+int UseStrictPrivMsg;
 int DumpCore;
 int LogUsers;
 int NickRegDelay;
@@ -610,6 +611,7 @@ Directive directives[] = {
     {"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
     {"UseMail", {{PARAM_SET, PARAM_RELOAD, &UseMail}}},
     {"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
+    {"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
     {"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
     {"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
     {"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},

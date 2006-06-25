@@ -166,6 +166,8 @@ READ_ONLY_MODE
 	Let op: Services zijn in alleen-lezen mode; veranderingen worden niet opgeslagen!
 PASSWORD_INCORRECT
 	Wachtwoord incorrect.
+INVALID_TARGET
+	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
 # What's the difference between "Access denied" and "Permission denied"?
 # Very little; you can safely make them the same message with no real loss

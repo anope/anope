@@ -323,6 +323,7 @@ E int   KeepLogs;
 E int   KeepBackups;
 E int   ForceForbidReason;
 E int   UsePrivmsg;
+E int   UseStrictPrivMsg;
 E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;

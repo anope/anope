@@ -165,6 +165,8 @@ READ_ONLY_MODE
 	Noticia: Els serveis estan en mode read-only; Els canvis no seran guardats!
 PASSWORD_INCORRECT
 	Clau incorrecta.
+INVALID_TARGET
+	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
 # What's the difference between "Access denied" and "Permission denied"?
 # Very little; you can safely make them the same message with no real loss

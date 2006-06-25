@@ -178,6 +178,8 @@ READ_ONLY_MODE
 	odczytu - zmiany nie bêd± zapisywane!
 PASSWORD_INCORRECT
 	Nieprawid³owe has³o.
+INVALID_TARGET
+	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
 # What's the difference between "Access denied" and "Permission denied"?
 # Very little; you can safely make them the same message with no real loss

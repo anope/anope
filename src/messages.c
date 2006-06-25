@@ -139,7 +139,6 @@ int m_privmsg(char *source, char *receiver, char *msg)
             }
         }
     } else {
-
         /* Check if we should ignore.  Operators always get through. */
         if (allow_ignore && !is_oper(u)) {
             IgnoreData *ign = get_ignore(source);
@@ -156,6 +155,13 @@ int m_privmsg(char *source, char *receiver, char *msg)
             *s++ = 0;
             if (stricmp(s, ServerName) != 0)
                 return MOD_CONT;
+        } else if (UseStrictPrivMsg) {
+            if (debug) {
+                alog("Ignored PRIVMSG without @ from %s", source);
+            }
+            notice_lang(receiver, u, INVALID_TARGET, receiver, receiver,
+                        ServerName, receiver);
+            return MOD_CONT;
         }
 
         starttime = time(NULL);

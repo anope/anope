@@ -6,6 +6,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/22 A Ability for ircd modules to set extra modes on id.                [ #00]
 06/22 A Support startup flag.                                             [ #00]
 06/21 A Module version check.                                             [ #00]
+06/25 A Optional strict privmsg format.                                   [ #00]
 04/08 F Fixed Charybdis support on win32.                                 [#487]
 04/08 F Fixed thread stuff on windows.                                    [#488]
 04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]

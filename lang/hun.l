@@ -172,6 +172,8 @@ READ_ONLY_MODE
 	Megjegyzés: A Szervíz csak olvasás módban fut!
 PASSWORD_INCORRECT
 	Hibás jelszó.
+INVALID_TARGET
+	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
 
 # Mi a különbség a "Hozzáférés megtagadva" és az "Engedély letiltva" között?
 # Nagyon kicsi; ha ugyanazt az üzenetet írod mindkettõre, nem igazán veszít

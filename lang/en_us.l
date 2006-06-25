@@ -513,7 +513,7 @@ NICK_SET_HIDE_STATUS_OFF
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
-	SET PRIVATE {ON | OFF}
+	SET MSG {ON | OFF}
 NICK_SET_MSG_ON
 	Services will now reply to you with messages.
 NICK_SET_MSG_OFF

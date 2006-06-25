@@ -1100,7 +1100,8 @@ int anope_event_ping(char *source, int ac, char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    inspircd_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+	/* ((ac > 1) ? av[1] : ServerName) */
+    inspircd_cmd_pong(ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1562,6 +1563,12 @@ int inspircd_valid_nick(char *nick)
     return 1;
 }
 
+int inspircd_valid_chan(char *chan)
+{
+    return 1;
+}
+
+
 void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
 {
     char *s;
@@ -1651,6 +1658,7 @@ void moduleAddAnopeCmds()
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);
+    pmodule_valid_chan(inspircd_valid_chan);
     pmodule_cmd_ctcp(inspircd_cmd_ctcp);
     pmodule_set_umode(inspircd_set_umode);
 }

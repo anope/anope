@@ -385,11 +385,11 @@ int do_confirm(User * u)
             if (ircd->modeonreg) {
                 len = strlen(ircd->modeonreg);
                 strncpy(modes,ircd->modeonreg,512);
-	        if(ircd->rootmodeonid && (u->na->nc->flags & NI_SERVICES_ROOT)) { 
+	        if(ircd->rootmodeonid && is_services_root(u)) { 
                     strncat(modes,ircd->rootmodeonid,512-len);
-	        } else if(ircd->adminmodeonid && (u->na->nc->flags & NI_SERVICES_ADMIN)) {
+	        } else if(ircd->adminmodeonid && is_services_admin(u)) {
                     strncat(modes,ircd->adminmodeonid,512-len);
-	        } else if(ircd->opermodeonid && (u->na->nc->flags & NI_SERVICES_OPER)) {
+	        } else if(ircd->opermodeonid && is_services_oper(u)) {
                     strncat(modes,ircd->opermodeonid,512-len);
                 }
 

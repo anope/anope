@@ -42,6 +42,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]
+06/25 F root/admin/oper mode now honours secure.                          [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
 06/15 F NS Resend delay.                                                  [ #00]

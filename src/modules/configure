@@ -37,6 +37,11 @@ FIRST=1
 for dir in *
 do
         if [ -d $dir ] ; then
+	        if [ -f $dir/configure ] ; then
+			cd $dir
+			./configure
+			cd ..
+		fi
 		if [ -f $dir/Makefile ] ; then
 			if [ "$FIRST" = 1 ] ; then
 				echo2 " "$dir >> ./Makefile.inc

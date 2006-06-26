@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1074"
+VERSION_BUILD="1075"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1075)
+# BUGS  : N/A
+# NOTES : multiple file modules now respect mod_version, and ./configure is checked for and executed.
 #
 # BUILD : 1.7.14 (1074)
 # BUGS  : N/A

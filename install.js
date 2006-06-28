@@ -161,16 +161,16 @@ var buildPackages = [
                                                               
                                 
         var mysqlVersions = [
-								{
-									  'name' : 'MySQL 5.1',
-									  'libpaths' : [
-													  'Program Files\\MySQL\\MySQL Server 5.1\\Lib\\opt'
-											],
-									  'incpaths' : [
-													  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
-											],
-									  'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll'
-								},
+						{
+								'name' : 'MySQL 5.1',
+								'libpaths' : [
+										  'Program Files\\MySQL\\MySQL Server 5.1\\Lib\\opt'
+									],
+								'incpaths' : [
+										  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
+									],
+								'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll'
+						},
 
                                                 {
                                                         'name' : 'MySQL 5.0',

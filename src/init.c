@@ -529,6 +529,7 @@ int init_secondary(int ac, char **av)
      * panic as necessary, and ignore all others.
      */
 
+#ifndef _WIN32
 #if defined(NSIG)
     for (i = 1; i <= NSIG - 1; i++) {
 #else
@@ -536,6 +537,12 @@ int init_secondary(int ac, char **av)
 #endif
         signal(i, SIG_IGN);
     }
+#else
+    /* work around to bug #527 */
+    signal(SIGILL, SIG_IGN);
+    signal(SIGBREAK, SIG_IGN);
+    signal(SIGABRT, SIG_IGN);
+#endif
 
     signal(SIGINT, sighandler);
     signal(SIGTERM, sighandler);

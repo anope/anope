@@ -10,7 +10,7 @@ all: $(OBJECTS) subs
 distclean: clean spotless
 
 .c.dll:
-        $(CC) $(CFLAGS) $(IRCTYPE) $< $(LFLAGS)
+        $(CC) $(CFLAGS) $(IRCTYPE) $< ..\mod_version.c $(LFLAGS)
         
 subs:
         @for %i in ( $(SUBS) ); do \
@@ -24,7 +24,7 @@ subs-clean:
 		@if exist %i; @cd %i && $(MAKE) $(MAKEARGS) clean && cd ..
 
 spotless: clean subs-spotless
-        -@del *.dll *.lib *.exp
+        -@del *.dll *.lib *.exp *.manifest
 
 subs-spotless:
 	@for %i in ( $(SUBS) ); do \

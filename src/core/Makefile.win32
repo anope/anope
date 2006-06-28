@@ -11,13 +11,13 @@ all: $(OBJECTS)
 distclean: clean spotless
 
 .c.dll:
-        $(CC) $(CFLAGS) $< $(LFLAGS)
+        $(CC) $(CFLAGS) $< ..\mod_version.c $(LFLAGS)
 
 clean:
         -@del *.obj
 
 spotless: clean
-        -@del *.dll *.lib *.exp
+        -@del *.dll *.lib *.exp *.manifest
 
 install:
         -@mkdir ..\..\$(DATDEST)\modules

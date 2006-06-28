@@ -89,7 +89,7 @@ E void chan_adduser2(User * user, Channel * c);
 E void add_invite(Channel * chan, char *mask);
 E void chan_delete(Channel * c);
 E void del_ban(Channel * chan, char *mask);
-E void set_key(Channel * chan, char *value);
+E void chan_set_key(Channel * chan, char *value);
 E void set_limit(Channel * chan, char *value);
 E void del_invite(Channel * chan, char *mask);
 E char *get_key(Channel * chan);

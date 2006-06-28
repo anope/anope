@@ -1841,7 +1841,7 @@ void set_flood(Channel * chan, char *value)
 
 /*************************************************************************/
 
-void set_key(Channel * chan, char *value)
+void chan_set_key(Channel * chan, char *value)
 {
     if (chan->key)
         free(chan->key);

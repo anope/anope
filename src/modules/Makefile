@@ -24,7 +24,7 @@ distclean: spotless
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	$(CC) ${SHARED} ../mod_version.o $< -o $*.so ${LDFLAGS} ${PROFILE}
+	$(CC) ${SHARED} ../mod_version.o $< -o $*.so  ${PROFILE}
 	@$(TOUCH) $*.s
 
 subs:

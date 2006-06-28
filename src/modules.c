@@ -592,7 +592,7 @@ int loadModule(Module * m, User * u)
 	} else {
             ano_modclose(m->handle);
 	    ano_modclearerr();
-	    alog("Module %s is compiled against an old version of anope (%d)",m->name,version());
+	    alog("Module %s is compiled against an old version of anope",m->name);
 	    return MOD_ERR_NOLOAD;
 	}
 	/* TODO */

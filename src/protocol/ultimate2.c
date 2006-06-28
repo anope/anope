@@ -355,7 +355,7 @@ CBMode myCbmodes[128] = {
     {0},                        /* h */
     {CMODE_i, 0, NULL, NULL},   /* i */
     {0},                        /* j */
-    {CMODE_k, 0, set_key, cs_set_key},
+    {CMODE_k, 0, chan_set_key, cs_set_key},
     {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
     {CMODE_m, 0, NULL, NULL},   /* m */
     {CMODE_n, 0, NULL, NULL},   /* n */

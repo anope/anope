@@ -19,7 +19,7 @@ distclean: spotless
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
 
 so:
-	$(CC) ${SHARED} ../../mod_version.o  $(OBJECTS) -o ../$(TARGET).so ${LDFLAGS} ${PROFILE}
+	$(CC) ${SHARED} ../../mod_version.o  $(OBJECTS) -o ../$(TARGET).so ${PROFILE}
 
 clean:
 	rm -f *.o *.so *.c~ core

@@ -78,6 +78,9 @@ int do_del(User * u)
         if (!(ci = cs_findchan(chan))) {
             notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
             return MOD_CONT;
+        } else if (readonly) {
+            notice_lang(s_MemoServ, u, READ_ONLY_MODE);
+            return MOD_CONT;
         } else if (ci->flags & CI_VERBOTEN) {
             notice_lang(s_MemoServ, u, CHAN_X_FORBIDDEN, chan);
             return MOD_CONT;

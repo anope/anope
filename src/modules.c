@@ -585,15 +585,24 @@ int loadModule(Module * m, User * u)
     }
     if (func) {
 	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
-	if(version && version() >= VERSION_BUILD ) {
-	    if(debug) {
-      	        alog("Module %s compiled against anope revision %d, this is %d",m->name,version(),VERSION_BUILD);	
-	    }
-	} else {
+	if (version) {
+        if (version() >= VERSION_BUILD ) {
+            if(debug) {
+                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version(),VERSION_BUILD);	
+            }
+        } else {
             ano_modclose(m->handle);
-	    ano_modclearerr();
-	    alog("Module %s is compiled against an old version of anope",m->name);
-	    return MOD_ERR_NOLOAD;
+            ano_modclearerr();
+            alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version(), VERSION_BUILD);
+            alog("Rebuild module %s against the current version to resolve this error", m->name);
+            return MOD_ERR_NOLOAD;
+        }
+    } else {
+        ano_modclose(m->handle);
+        ano_modclearerr();
+        alog("Module %s is compiled against an older version of anope (unknown)", m->name);
+        alog("Rebuild module %s against the current version to resolve this error", m->name);
+        return MOD_ERR_NOLOAD;
 	}
 	/* TODO */
         mod_current_module_name = m->name;

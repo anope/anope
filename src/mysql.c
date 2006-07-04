@@ -983,10 +983,13 @@ void db_mysql_load_news(void)
     mysql_free_result(mysql_res);
 }
 
+#define HASH(host)      (((host)[0]&31)<<5 | ((host)[1]&31))
+
 void db_mysql_load_exceptions(void)
 {
     char sqlcmd[MAX_SQL_BUF];
-    int j;
+    Exception *exception;
+    int index;
 
     if (!do_mysql)
         return;
@@ -1000,19 +1003,25 @@ void db_mysql_load_exceptions(void)
     }
     mysql_res = mysql_store_result(mysql);
     nexceptions = mysql_num_rows(mysql_res);
-    exceptions = scalloc(sizeof(Exception) * nexceptions, 1);
-    j = 0;
+    exception = scalloc(sizeof(Exception), 1);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        exceptions[j].mask = sstrdup(mysql_row[0]);
-        exceptions[j].limit = atoi(mysql_row[1]);
-        snprintf(exceptions[j].who, NICKMAX, "%s", mysql_row[2]);
-        exceptions[j].reason = sstrdup(mysql_row[3]);
-        exceptions[j].time = atoi(mysql_row[4]);
-        exceptions[j].expires = atoi(mysql_row[5]);
-        j++;
+        exception->mask = sstrdup(mysql_row[0]);
+        exception->limit = atoi(mysql_row[1]);
+        snprintf(exception->who, NICKMAX, "%s", mysql_row[2]);
+        exception->reason = sstrdup(mysql_row[3]);
+        exception->time = atoi(mysql_row[4]);
+        exception->expires = atoi(mysql_row[5]);
+        index = HASH(exception->mask);
+        exception->prev = NULL;
+        exception->next = exceptionlist[index];
+        if (exception->next)
+            exception->next->prev = exception;
+        exceptionlist[index] = exception;
     }
     mysql_free_result(mysql_res);
 }
+
+#undef HASH
 
 #define HASH(host) ((tolower((host)[0])&31)<<5 | (tolower((host)[1])&31))
 

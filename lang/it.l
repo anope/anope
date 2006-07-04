@@ -2948,13 +2948,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [parametri]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [parametri]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+durata] mask limite motivo
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mask | lista}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE num posizione
+	EXCEPTION DEL {mask}
 OPER_EXCEPTION_DISABLED
 	Il limite delle sessioni è disabilitato.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -2963,30 +2961,22 @@ OPER_EXCEPTION_TOO_MANY
 	La lista delle eccezioni è piena!
 OPER_EXCEPTION_ADDED
 	Il limite di sessioni per %s è stato impostato a %d.
-OPER_EXCEPTION_MOVED
-	L'eccezione per %s (numero %d) è stata spostata alla posizione %d.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	Il record specificato (%d) non esiste nella lista delle eccezioni.
 OPER_EXCEPTION_NOT_FOUND
 	Impossibile trovare %s nella lista delle eccezioni.
 OPER_EXCEPTION_NO_MATCH
 	Nessun record corrispondente nella lista delle eccezioni.
 OPER_EXCEPTION_DELETED
 	%s eliminato dalla lista delle eccezioni.
-OPER_EXCEPTION_DELETED_ONE
-	Eliminato 1 record dalla lista delle eccezioni.
-OPER_EXCEPTION_DELETED_SEVERAL
-	Eliminati %d record dalla lista delle eccezioni.
 OPER_EXCEPTION_LIST_HEADER
 	Lista delle eccezioni attuale:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Num  Limite Host
+	Limite Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (by %s on %s; %s)
+	%s  (by %s on %s; %s)
 	    Limite: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Limite delle sessioni non valido. Deve essere un numero intero maggiore o uguale a zero e minore di %d.

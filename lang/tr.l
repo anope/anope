@@ -3047,13 +3047,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [parametreler]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [parametreler]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+zamanaþýmý] mask limit sebep
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mask | liste}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE num pozisyon
+	EXCEPTION DEL {mask}
 OPER_EXCEPTION_DISABLED
 	Session limit koyma devre dýþý.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3062,30 +3060,22 @@ OPER_EXCEPTION_TOO_MANY
 	Session-limit exception listesi dolu!
 OPER_EXCEPTION_ADDED
 	%s için session limit %d olarak deðiþtirildi.
-OPER_EXCEPTION_MOVED
-	%s (#%d) için exception %d pozisyonuyla deðiþtirildi.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	(#%d) böyle bir kayýt yok. session-limit exception listesi.
 OPER_EXCEPTION_NOT_FOUND
 	%s session-limit exception listesinde bulunamadý.
 OPER_EXCEPTION_NO_MATCH
 	session-limit exception listesinde uyuþan kayýt bulunamadý.
 OPER_EXCEPTION_DELETED
 	%s session-limit exception listesinden silindi.
-OPER_EXCEPTION_DELETED_ONE
-	Session-limit exception listesinden 1 kayýt silindi.
-OPER_EXCEPTION_DELETED_SEVERAL
-	Session-limit exception listesinden %d kayýt silindi.
 OPER_EXCEPTION_LIST_HEADER
 	Þu anki Session Limit Exception listesi:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Sayý  Limit  Host
+	Limit  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (by %s on %s; %s)
+	%s  (by %s on %s; %s)
 	    Limit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Geçersiz session limiti. Sýfýrdan büyük yada eþit ve %d den az bir geçerli tamsayý olmalýdýr.

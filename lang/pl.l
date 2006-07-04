@@ -3203,13 +3203,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [params]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [params]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+czastrwania] maska limit powód
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {maska | lista}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE nr pozycja
+	EXCEPTION DEL {maska}
 OPER_EXCEPTION_DISABLED
 	Limitowanie sesji jest wy³±czone.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3218,11 +3216,6 @@ OPER_EXCEPTION_TOO_MANY
 	Lista wyj±tków limitów sesji jest pe³na!
 OPER_EXCEPTION_ADDED
 	Limit sesji dla %s zmieniono na %d.
-OPER_EXCEPTION_MOVED
-	Wyj±tek dla %s (#%d) przeniesiono 
-	na pozycje %d.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	No such entry (#%d) session-limit exception list.
 OPER_EXCEPTION_NOT_FOUND
 	%s nie znaleziono na li¶cie wyj±tków limitów 
 	sesji.
@@ -3231,21 +3224,16 @@ OPER_EXCEPTION_NO_MATCH
 	sesji.
 OPER_EXCEPTION_DELETED
 	%s usuniêto z listy wyj±tków limitów sesji.
-OPER_EXCEPTION_DELETED_ONE
-	Usuniêto 1 wpis z listy wyj±tków limitów sesji.
-OPER_EXCEPTION_DELETED_SEVERAL
-	Usuniêto %d wpisy(ów) z listy wyj±tków limitów 
-	sesji.
 OPER_EXCEPTION_LIST_HEADER
 	Aktualna lista wyj±tków limitów sesji:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Nr   Limit  Host
+	Limit  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (przez %s na %s; %s)
+	%s  (przez %s na %s; %s)
 	    Limit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Nieprawid³owy limit sesji. Musi byæ liczb± dodatni±, 

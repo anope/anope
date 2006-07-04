@@ -3052,13 +3052,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [parametres]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [parametres]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+expiració] mascara límit raó
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mascara | llista}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE numero posició
+	EXCEPTION DEL {mascara}
 OPER_EXCEPTION_DISABLED
 	Límits de sessions no disponibles.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3067,30 +3065,22 @@ OPER_EXCEPTION_TOO_MANY
 	La llista d'excepcions al límit de sessiones esta plena!
 OPER_EXCEPTION_ADDED
 	Límit de sessió per a %s establert a %d.
-OPER_EXCEPTION_MOVED
-	Excepció per a %s (#%d) moguda a la posició %d.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	La instància no existeix (#%d)  a la llista d'excepcions al límit de sessions.
 OPER_EXCEPTION_NOT_FOUND
 	%s no trobat a a la llista d'excepcions al límit de sessions.
 OPER_EXCEPTION_NO_MATCH
 	No existeixen instàncies similars a la llista d'excepcions al límit de sessions.
 OPER_EXCEPTION_DELETED
 	%s instàncies esborrades de la llista d'excepcions al límit de sessions.
-OPER_EXCEPTION_DELETED_ONE
-	1 instància esborrada de la llista d'excepcions al límit de sessions.
-OPER_EXCEPTION_DELETED_SEVERAL
-	%d instàncies esborrades de la llista d'excepcions al límit de sessions.
 OPER_EXCEPTION_LIST_HEADER
 	llista d'excepcions al límit de sessions actual:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Num  Límit Host
+	Límit Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (per %s a %s; %s)
+	%s  (per %s a %s; %s)
 	   Límit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Límit de sessió invàlid. Ha de ser un sencer vàlido més gran o igual a zero i mes petit que %d.

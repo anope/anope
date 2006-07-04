@@ -2938,13 +2938,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [params]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [params]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+expiry] mask limit reason
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mask | list}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE num position
+	EXCEPTION DEL {mask}
 OPER_EXCEPTION_DISABLED
 	Session limiting is disabled.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -2953,30 +2951,22 @@ OPER_EXCEPTION_TOO_MANY
 	Session-limit exception list is full!
 OPER_EXCEPTION_ADDED
 	Session limit for %s set to %d.
-OPER_EXCEPTION_MOVED
-	Exception for %s (#%d) moved to position %d.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	No such entry (#%d) session-limit exception list.
 OPER_EXCEPTION_NOT_FOUND
 	%s not found on session-limit exception list.
 OPER_EXCEPTION_NO_MATCH
 	No matching entries on session-limit exception list.
 OPER_EXCEPTION_DELETED
 	%s deleted from session-limit exception list.
-OPER_EXCEPTION_DELETED_ONE
-	Deleted 1 entry from session-limit exception list.
-OPER_EXCEPTION_DELETED_SEVERAL
-	Deleted %d entries from session-limit exception list.
 OPER_EXCEPTION_LIST_HEADER
 	Current Session Limit Exception list:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Num  Limit  Host
+	Limit  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (by %s on %s; %s)
+	%s  (by %s on %s; %s)
 	    Limit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Invalid session limit. It must be a valid integer greater than or equal to zero and less than %d.
@@ -3015,10 +3005,9 @@ OPER_SESSION_VIEW_FORMAT
 
 OPER_HELP_EXCEPTION
 	Syntax: EXCEPTION ADD [+expiry] mask limit reason
-	        EXCEPTION DEL {mask | list}
-	        EXCEPTION MOVE num position
-	        EXCEPTION LIST [mask | list]
-	        EXCEPTION VIEW [mask | list]
+	        EXCEPTION DEL {mask}
+	        EXCEPTION LIST [mask]
+	        EXCEPTION VIEW [mask]
 	
 	Allows Services admins to manipulate the list of hosts that
 	have specific session limits - allowing certain machines, 
@@ -3039,8 +3028,6 @@ OPER_HELP_EXCEPTION
 	unlimited session limit. See the AKILL help for details about
 	the format of the optional expiry parameter.
 	EXCEPTION DEL removes the given mask from the exception list.
-	EXCEPTION MOVE moves exception num to position. The
-	exceptions inbetween will be shifted up or down to fill the gap.
 	EXCEPTION LIST and EXCEPTION VIEW show all current
 	exceptions; if the optional mask is given, the list is limited
 	to those exceptions matching the mask. The difference is that

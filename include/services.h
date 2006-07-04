@@ -1069,16 +1069,13 @@ struct newsitem_ {
 
 
 struct exception_ {
+    Exception *prev, *next;
     char *mask;                 /* Hosts to which this exception applies */
     int limit;                  /* Session limit for exception */
     char who[NICKMAX];          /* Nick of person who added the exception */
     char *reason;               /* Reason for exception's addition */
     time_t time;                /* When this exception was added */
     time_t expires;             /* Time when it expires. 0 == no expiry */
-    int num;                    /* Position in exception list; used to track
-                                 * positions when deleting entries. It is
-                                 * symbolic and used internally. It is
-                                 * calculated at load time and never saved. */
 };
 
 /*************************************************************************/

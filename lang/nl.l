@@ -3008,13 +3008,11 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [paramenters]
+	EXCEPTION {ADD | DEL | LIST | VIEW} [paramenters]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+verloop] mask limiet reden
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mask | lijst}
-OPER_EXCEPTION_MOVE_SYNTAX
-	EXCEPTION MOVE nr positie
+	EXCEPTION DEL {mask}
 OPER_EXCEPTION_DISABLED
 	Sessie limitering is tijdelijk uitgeschakeld.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3023,30 +3021,22 @@ OPER_EXCEPTION_TOO_MANY
 	Sessie limiet uitzonderingenlijst is vol!
 OPER_EXCEPTION_ADDED
 	Sessie limiet voor %s veranderd in %d.
-OPER_EXCEPTION_MOVED
-	Uitzondering voor %s (#%d) verplaatst naar positie %d.
-OPER_EXCEPTION_NO_SUCH_ENTRY
-	#%d bestaat niet op de sessie limiet uitzonderingenlijst.
 OPER_EXCEPTION_NOT_FOUND
 	%s niet gevonden op de sessie limiet uitzonderingenlijst.
 OPER_EXCEPTION_NO_MATCH
 	Geen overeenkomsten op de sessie limiet uitzonderingenlijst.
 OPER_EXCEPTION_DELETED
 	%s verwijderd van de sessie limiet uitzonderingenlijst.
-OPER_EXCEPTION_DELETED_ONE
-	1 uitzondering verwijderd van de sessie limiet uitzonderingenlijst.
-OPER_EXCEPTION_DELETED_SEVERAL
-	%d uitzonderingen verwijderd van de sessie limiet uitzonderingenlijst.
 OPER_EXCEPTION_LIST_HEADER
 	Huidige Sessie Limiet Uitzonderingenlijst:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%3d  %4d   %s
+	%4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Nr   Limiet Host
+	Limiet Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%3d.  %s  (door %s op %s; %s)
+	%s  (door %s op %s; %s)
 	    Limiet: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Ongeldige sessie limiet. Het moet een geldige integer groter dan of gelijk aan nul en kleiner dan %d.

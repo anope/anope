@@ -3054,11 +3054,13 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | LIST | VIEW} [params]
+	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [params]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+χρόνος λήξης] μάσκα όριο λόγος	
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {μάσκα}
+	EXCEPTION DEL {μάσκα | λίστα}
+OPER_EXCEPTION_MOVE_SYNTAX
+	EXCEPTION MOVE νούμερο θέση
 OPER_EXCEPTION_DISABLED
 	Η Session limiting  εντολή είναι απενεργοποιημένη.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3067,22 +3069,30 @@ OPER_EXCEPTION_TOO_MANY
 	Η λίστα Session-limit exception είναι full!
 OPER_EXCEPTION_ADDED
 	Session limit για τον %s ρυθμίστηκε σε %d.
+OPER_EXCEPTION_MOVED
+	Exception για %s (#%d) μετακινήθηκε στη θέση %d.
+OPER_EXCEPTION_NO_SUCH_ENTRY
+	Δεν βρέθηκε θέση (#%d) στη λίστα session-limit exception.
 OPER_EXCEPTION_NOT_FOUND
 	%s δεν βρέθηκε στην λίστα session-limit exception.
 OPER_EXCEPTION_NO_MATCH
 	Δεν βρέθηκαν θέσεις στην λίστα session-limit exception.
 OPER_EXCEPTION_DELETED
 	%s διαγράφηκε από την λίστα session-limit exception.
+OPER_EXCEPTION_DELETED_ONE
+	Διαγράφηκε 1 θέση από την λίστα session-limit exception.
+OPER_EXCEPTION_DELETED_SEVERAL
+	Διαγράφηκαν %d θέσεις από την λίστα session-limit exception.
 OPER_EXCEPTION_LIST_HEADER
 	Η έως τώρα λίστα Session Limit Exception είναι οι εξής:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%4d   %s
+	%3d  %4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Limit  Host
+	Νου  Limit  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%s  (by %s on %s; %s)
+	%3d.  %s  (by %s on %s; %s)
 	    Limit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Λάθος session limit. Πρέπει να είναι λάθος ο integer greater ή πρέπει να είναι μεταξύ μηδέν και %d.

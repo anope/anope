@@ -1016,7 +1016,7 @@ E void finish_sync(Server *serv, int sync_links);
 
 /**** sessions.c ****/
 
-E Exception *exceptionlist[1024];
+E Exception *exceptions;
 E int16 nexceptions;
 
 E Session *sessionlist[1024];
@@ -1038,7 +1038,7 @@ E void expire_exceptions(void);
 E Session *findsession(const char *host);
 
 E Exception *find_host_exception(const char *host);
-E Exception *exception_add(User * u, const char *mask, const int limit,
+E int exception_add(User * u, const char *mask, const int limit,
                          const char *reason, const char *who,
                          const time_t expires);
 

@@ -41,7 +41,6 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/21 F Syntax for NickServ SET MSG showed syntax for SET PRIVATE.        [ #00]
 06/26 F A few small bugs with module configure scripts.                   [ #00]
 07/02 F Fixed readonly stuff on memoserv del.                             [#529]
-07/04 F Rewrote exception system due to a bug we couldn't track down.     [#491]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]
@@ -146,6 +145,7 @@ Provided by Anope Dev. <dev@anope.org> - 2005
 
 Provided by Trystan <trystan@nomadirc.net> - 2005
 11/19 F find_byuid for ircds which didnt give us a uid.                   [ #00]
+01/22 F Updated config.guess and config.sub                               [ #00]
 
 Provided by Vladimir K. <wawaka@gmail.com> - 2005
 12/11 F Enforcers had incorrect user when only user specified.            [#410]

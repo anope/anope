@@ -2989,11 +2989,13 @@ MODULE_HELP_HEADER
 	
 # EXCEPTION válaszok
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | LIST | VIEW} [paraméterek]
+	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [paraméterek]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+elévülés] maszk korlát indok
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {maszk}
+	EXCEPTION DEL {maszk | list}
+OPER_EXCEPTION_MOVE_SYNTAX
+	EXCEPTION MOVE Szám helyzet
 OPER_EXCEPTION_DISABLED
 	Session korlátozás tiltva.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3002,22 +3004,30 @@ OPER_EXCEPTION_TOO_MANY
 	Session-korlát lista megtelt!
 OPER_EXCEPTION_ADDED
 	Session korlát %s részére %d-re állítva.
+OPER_EXCEPTION_MOVED
+	%s kivétel (#%d) áthelyezve a %d pozicíóba.
+OPER_EXCEPTION_NO_SUCH_ENTRY
+	Nincs bejegyezve (#%d) session-korlát a kivétel listán.
 OPER_EXCEPTION_NOT_FOUND
 	%s nem található a session-korlát kivétel listán.
 OPER_EXCEPTION_NO_MATCH
 	Nincs ilyen bejegyzés a session-korlát kivétel listán.
 OPER_EXCEPTION_DELETED
 	%s törölve a session-korlát kivétel listáról.
+OPER_EXCEPTION_DELETED_ONE
+	Törölve 1 bejegyzés a session-korlát kivétel listáról.
+OPER_EXCEPTION_DELETED_SEVERAL
+	Törölve %d bejegyzés a session-korlát kivétel listáról.
 OPER_EXCEPTION_LIST_HEADER
 	Aktuális Session korlát kivétel lista:
 # mask, korlát
 OPER_EXCEPTION_LIST_FORMAT
-	%4d   %s
+	%3d  %4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Korlát  Host
+	Szám  Korlát  Host
 # maszk, set-by, set-idõ,lejárat, korlát, Indok
 OPER_EXCEPTION_VIEW_FORMAT
-	%s  (%s által, ekkor: %s; %s)
+	%3d.  %s  (%s által, ekkor: %s; %s)
 	    Korlát: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Érvénytelen session korlát. Érvényes számnak kell lennie

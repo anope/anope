@@ -2998,11 +2998,13 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | LIST | VIEW} [Parameter]
+	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [Parameter]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+Zeit] Hostmaske Limit Grund
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {Hostmaske}
+	EXCEPTION DEL {Hostmaske | Liste}
+OPER_EXCEPTION_MOVE_SYNTAX
+	EXCEPTION MOVE Nummer Position
 OPER_EXCEPTION_DISABLED
 	Eingeschränkte Verbindungen sind deaktiviert.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3011,6 +3013,11 @@ OPER_EXCEPTION_TOO_MANY
 	Die Liste für eingeschränkte Verbindungen ist voll! 
 OPER_EXCEPTION_ADDED
 	Verbindungslimit für %s geändert auf %d.
+OPER_EXCEPTION_MOVED
+	DIe Exception für %s (#%d) wurde auf die  %d Position verschoben.
+OPER_EXCEPTION_NO_SUCH_ENTRY
+	Kein solcher Eintrag (#%d) in der Liste der Verbindungs-
+	einschränkungen.
 OPER_EXCEPTION_NOT_FOUND
 	%s nicht gefunden in der Liste der Verbindungs-
 	einschränkungen.
@@ -3020,16 +3027,22 @@ OPER_EXCEPTION_NO_MATCH
 OPER_EXCEPTION_DELETED
 	%s wurde von der Liste der Verbindungseinschränkungen 
 	entfernt.
+OPER_EXCEPTION_DELETED_ONE
+	Es wurde 1 Eintrag von der Liste der Verbindungs-
+	einschränkungen entfernt.
+OPER_EXCEPTION_DELETED_SEVERAL
+	Es wurden %d Einträge von der Liste der Verbindungs-
+	einschränkungen entfernt.
 OPER_EXCEPTION_LIST_HEADER
 	Aktuelle Liste für eingeschränkte Verbindungen:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%4d   %s
+	%3d  %4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Limit  Host
+	Nummer  Limit  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%s  (von %s am %s, %s)
+	%3d.  %s  (von %s am %s, %s)
 	    Limit: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Ungültige Verbindungseinschränkung. Es muss eine gültige Integer-Zahl sein, grösser oder gleich
@@ -3069,9 +3082,10 @@ OPER_SESSION_VIEW_FORMAT
 
 OPER_HELP_EXCEPTION
 	Syntax: EXCEPTION ADD [+Zeit] Hostmaske Limit Grund
-	        EXCEPTION DEL {Hostmaske]
-	        EXCEPTION LIST [Hostmaske]
-	        EXCEPTION VIEW [Hostmaske]
+	        EXCEPTION DEL {Hostmaske | Liste}
+	        EXCEPTION MOVE Nummer Position
+	        EXCEPTION LIST [Hostmaske | Liste]
+	        EXCEPTION VIEW [Hostmaske | Liste]
 	
 	Erlaubt Services Administratoren, die Liste der Verbindungs-
 	einschränkungen zu bearbeiten.Dadurch ist es möglich
@@ -3097,6 +3111,10 @@ OPER_HELP_EXCEPTION
 	Parameter.
 	
 	EXCEPTION DEL entfernt den Host von der Liste.
+	
+	EXCEPTION MOVE verschiebt den Eintrag mit der Nummer 
+	auf die Position. Die Einträge dazwischen werden
+	hoch bzw runtergeschoben um die Lücken zu füllen.
 	
 	EXCEPTION LIST und EXCEPTION VIEW zeigt alle aktuellen 
 	Verbindungseinschränkungen. Wird die optionale Hostmaske 

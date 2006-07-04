@@ -3076,11 +3076,13 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | LIST | VIEW} [paramètres]
+	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [paramètres]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+échéance] mask limite raison
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {mask}
+	EXCEPTION DEL {mask | liste}
+OPER_EXCEPTION_MOVE_SYNTAX
+	EXCEPTION MOVE num position
 OPER_EXCEPTION_DISABLED
 	La limitation de sessions est désactivée.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3089,22 +3091,30 @@ OPER_EXCEPTION_TOO_MANY
 	La liste des exceptions à la limitation de sessions est pleine!
 OPER_EXCEPTION_ADDED
 	La limite de sessions de %s est maintenant de %d.
+OPER_EXCEPTION_MOVED
+	L'exception pour %s (#%d) a été déplacée à la position %d.
+OPER_EXCEPTION_NO_SUCH_ENTRY
+	L'entrée %d n'existe pas sur la liste des exceptions à la limitation de sessions.
 OPER_EXCEPTION_NOT_FOUND
 	%s non trouvé sur la liste des exceptions à la limitation de sessions.
 OPER_EXCEPTION_NO_MATCH
 	Aucune entrée correspondante sur la liste des exceptions à la limitation de sessions.
 OPER_EXCEPTION_DELETED
 	%s supprimé de la liste des exceptions à la limitation de sessions.
+OPER_EXCEPTION_DELETED_ONE
+	1 entrée supprimée de la liste des exceptions à la limitation de sessions.
+OPER_EXCEPTION_DELETED_SEVERAL
+	%d entrées supprimées de la liste des exceptions à la limitation de sessions.
 OPER_EXCEPTION_LIST_HEADER
 	Liste actuelle des exceptions à la limitation de sessions:
 # mask, limit
 OPER_EXCEPTION_LIST_FORMAT
-	%4d    %s
+	%3d  %4d    %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Limite  Host
+	Num  Limite  Host
 # mask, set-by, set-time, expires, limit, reason
 OPER_EXCEPTION_VIEW_FORMAT
-	%s  (par %s le %s; %s)
+	%3d.  %s  (par %s le %s; %s)
 	    Limite: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Limite de session invalide. Elle doit être un entier valide supérieur ou égal à zero et plus petit que %d.

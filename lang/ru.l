@@ -3000,11 +3000,13 @@ MODULE_HELP_HEADER
 
 # EXCEPTION responses
 OPER_EXCEPTION_SYNTAX
-	EXCEPTION {ADD | DEL | LIST | VIEW} [параметры]
+	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [параметры]
 OPER_EXCEPTION_ADD_SYNTAX
 	EXCEPTION ADD [+время истечения] маска лимит причина
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {маска}
+	EXCEPTION DEL {маска | list}
+OPER_EXCEPTION_MOVE_SYNTAX
+	EXCEPTION MOVE номер позиция
 OPER_EXCEPTION_DISABLED
 	Ограничение сессий отключено.
 OPER_EXCEPTION_ALREADY_PRESENT
@@ -3013,22 +3015,30 @@ OPER_EXCEPTION_TOO_MANY
 	Список исключений из лимита сессий переполнен!
 OPER_EXCEPTION_ADDED
 	Лимит сессий для %s установлен в %d.
+OPER_EXCEPTION_MOVED
+	Исключение для %s (#%d) перемещено в позицию %d.
+OPER_EXCEPTION_NO_SUCH_ENTRY
+	Нет такой записи (#%d) в списке исключений из лимитв сессий.
 OPER_EXCEPTION_NOT_FOUND
 	%s не найден в списке исключений из лимит сессий.
 OPER_EXCEPTION_NO_MATCH
 	Нет таких значений в списке исключений из лимита сессий.
 OPER_EXCEPTION_DELETED
 	%s удален из списка исключений из лимита сессий.
+OPER_EXCEPTION_DELETED_ONE
+	Удалена 1 запись из списка исключений из лимита сессий.
+OPER_EXCEPTION_DELETED_SEVERAL
+	Удалено %d записей из списка исключений из лимита сессий.
 OPER_EXCEPTION_LIST_HEADER
 	Текущий список исключений из лимита сессий:
 # маска, лимит
 OPER_EXCEPTION_LIST_FORMAT
-	%4d   %s
+	%3d  %4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
-	Лимит  Хост
+	Номер  Лимит  Хост
 # меска, кем установлено, когда установлено, когда истекает, лимит, причина
 OPER_EXCEPTION_VIEW_FORMAT
-	%s  (by %s on %s; %s)
+	%3d.  %s  (by %s on %s; %s)
 	    Лимит: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
 	Некорректный лимит сессий. Он должен быть целым числом больше или равным нуля и меньше %d.

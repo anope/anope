@@ -1,34 +1,3 @@
-/*
- *   IRC - Internet Relay Chat, db-merger.c
- *   (C) Copyright 2005, Florian Schulze (Certus)
- *
- *   Based on the original code of Anope, (C) 2003 Anope Team
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License (see it online
- *   at http://www.gnu.org/copyleft/gpl.html) as published by the Free
- *   Software Foundation;
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   This program tries to merge two standard anope-1.7.7+ database sets,
- *   that includes chanserv, nickserv, botserv and memoserv databases.
- *
- *   - Certus
- *      February 11, 2005
- *
- *
- *   0.2 beta:
- *   Fixed some overflows in the ->flags and the ->status fields. Use db-fix
- *   to fix your broken nick dbs.
- *
- *   - Certus
- *      August 04, 2005
- */
-
 
 #include <stdlib.h>
 #include <string.h>
@@ -331,7 +300,7 @@ int main(int argc, char *argv[])
         NickCore *nc, **nclast, *ncprev;
         int16 tmp16;
         int32 tmp32;
-        int i, j, c;
+        int i, j, c, mycount = 0;
 
         printf("Trying to merge nicks...\n");
 
@@ -356,6 +325,7 @@ int main(int argc, char *argv[])
                 ncprev = nc;
 
                 READ(read_string(&nc->display, f));
+                mycount++;
                 READ(read_string(&nc->pass, f));
                 READ(read_string(&nc->email, f));
                 READ(read_string(&nc->greet, f));
@@ -391,6 +361,7 @@ int main(int argc, char *argv[])
             } /* getc_db() */
             *nclast = NULL;
         } /* for() loop */
+        printf("mycount is %d\n", mycount);
 
         /* Nick aliases */
         for (i = 0; i < 1024; i++) {
@@ -630,13 +601,15 @@ int main(int argc, char *argv[])
             NickCore *nc;
             char **access;
             Memo *memos;
-            int i, j;
+            int i, j, mycount = 0;
 
             /* Nick cores */
             for (i = 0; i < 1024; i++) {
                 for (nc = nclists[i]; nc; nc = nc->next) {
                     SAFE(write_int8(1, f));
+                    mycount++;
                     SAFE(write_string(nc->display, f));
+                    printf("Writing entry for nick %s\n", nc->display);
                     SAFE(write_string(nc->pass, f));
                     SAFE(write_string(nc->email, f));
                     SAFE(write_string(nc->greet, f));
@@ -663,6 +636,7 @@ int main(int argc, char *argv[])
                 } /* for (nc) */
                 SAFE(write_int8(0, f));
             } /* for (i) */
+            printf("%d nicks merged\n", mycount);
 
             /* Nick aliases */
             for (i = 0; i < 1024; i++) {

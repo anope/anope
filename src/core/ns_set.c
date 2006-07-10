@@ -31,6 +31,7 @@ int do_set_secure(User * u, NickCore * nc, char *param);
 int do_set_private(User * u, NickCore * nc, char *param);
 int do_set_msg(User * u, NickCore * nc, char *param);
 int do_set_hide(User * u, NickCore * nc, char *param);
+int do_set_autoop(User *u, NickCore *nc, char *param);
 void myNickServHelp(User * u);
 
 /**
@@ -161,6 +162,8 @@ int do_set(User * u)
         do_set_msg(u, na->nc, param);
     } else if (stricmp(cmd, "HIDE") == 0) {
         do_set_hide(u, na->nc, param);
+    } else if (stricmp(cmd, "AUTOOP") == 0) {
+        do_set_autoop(u, na->nc, param);
     } else {
         notice_lang(s_NickServ, u, NICK_SET_UNKNOWN_OPTION, cmd);
     }
@@ -448,5 +451,26 @@ int do_set_hide(User * u, NickCore * nc, char *param)
     }
     return MOD_CONT;
 }
+
+int do_set_autoop(User *u, NickCore *nc, char *param) {
+
+    /**
+     * This works the other way around, the absence of this flag denotes ON
+     * This is so when people upgrade, and dont have the flag
+     * the default is on
+     **/
+    if (stricmp(param, "ON") == 0) {
+        nc->flags &= ~NI_AUTOOP;
+        notice_lang(s_NickServ, u, NICK_SET_AUTOOP_ON);
+    } else if (stricmp(param, "OFF") == 0) {
+	nc->flags |= NI_AUTOOP;
+        notice_lang(s_NickServ, u, NICK_SET_AUTOOP_OFF);
+    } else {
+        syntax_error(s_NickServ, u, "SET AUTOOP", NICK_SET_AUTOOP_SYNTAX);
+    }
+
+    return MOD_CONT;
+}
+
 
 /* EOF */

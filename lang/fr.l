@@ -537,6 +537,15 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	Les services vous repondrons avec des notice.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET pseudo option paramètres
@@ -3672,6 +3681,7 @@ NICK_HELP_SET
 	                   /msg %S LIST
 	    HIDE       Cache certaines parties des informations du pseudo
 	    MSG        Change le mode de communication des Services
+	    AUTOOP     Should services op you automatically.    
 	
 	Pour utiliser cette commande, vous devez d'abord vous
 	identifier avec votre mot de passe (/msg %S HELP 

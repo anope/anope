@@ -535,6 +535,15 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	Services will now reply to you with notices.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
@@ -3631,6 +3640,7 @@ NICK_HELP_SET
 	    PRIVATE    Nickinizin /msg %S LIST yazýldýðýnda görünmesini
 	                  engeller
 	    HIDE       Nickinizle ilgili bazý bilgileri saklar
+	    AUTOOP     Should services op you automatically.    
 	
 	Bu komutu kullanabilmek için önce, þifrenizle 
 	kendinizi tanýtmanýz gerekir (Daha fazla bilgi için 

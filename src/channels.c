@@ -1368,7 +1368,8 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
     if (debug)
         alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
 
-    if (give_modes && (get_ignore(user->nick) == NULL)) {
+    if (give_modes && (get_ignore(user->nick) == NULL)
+        && (user->na && !(user->na->nc->flags & NI_AUTOOP))) {
         if (ircd->owner && is_founder(user, ci))
             add_modes |= CUS_OWNER;
         else if ((ircd->protect || ircd->admin)

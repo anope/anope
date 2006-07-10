@@ -579,6 +579,15 @@ NICK_SET_MSG_OFF
 	Od teraz serwisy bêd± siê z Tob± komunikowaæ przez 
 	wiadomo¶ci notice.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
@@ -3804,6 +3813,7 @@ NICK_HELP_SET
 	             /msg %S LIST
 	    HIDE       Ukryj pewne informacje o nicku.
 	    MSG        Zmieñ sposób komunikacji z serwisami.
+	    AUTOOP     Should services op you automatically.    
 	
 	Przed u¿yciem tej komendy trzeba siê wpierw 
 	zidentyfikowaæ za pomoc± has³a nicka 

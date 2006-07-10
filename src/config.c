@@ -145,6 +145,7 @@ int NSDefMemoSignon;
 int NSDefMemoReceive;
 int NSDefFlags;
 int NSDefLanguage;
+int NSDefAutoop;
 int NSRegDelay;
 int NSResendDelay;
 int NSExpire;
@@ -545,6 +546,7 @@ Directive directives[] = {
     {"NSDefNone", {{PARAM_SET, PARAM_RELOAD, &NSDefNone}}},
     {"NSDefPrivate", {{PARAM_SET, PARAM_RELOAD, &NSDefPrivate}}},
     {"NSDefSecure", {{PARAM_SET, PARAM_RELOAD, &NSDefSecure}}},
+    {"NSDefAutoop", {{PARAM_SET, PARAM_RELOAD, &NSDefAutoop}}},
     {"NSEnforcerUser", {{PARAM_STRING, PARAM_RELOAD, &temp_nsuserhost}}},
     {"NSExpire", {{PARAM_TIME, PARAM_RELOAD, &NSExpire}}},
     {"NSRExpire", {{PARAM_TIME, PARAM_RELOAD, &NSRExpire}}},
@@ -1131,6 +1133,8 @@ int read_config(int reload)
             NSDefFlags |= NI_MEMO_SIGNON;
         if (NSDefMemoReceive)
             NSDefFlags |= NI_MEMO_RECEIVE;
+        if (!NSDefAutoop)
+            NSDefFlags |= NI_AUTOOP;
     }
 
     if (!ServicesRoot) {

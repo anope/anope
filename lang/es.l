@@ -535,6 +535,14 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	Los servicios te responderan ahora con noticias.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
@@ -3610,6 +3618,7 @@ NICK_HELP_SET
 	    HIDE       Esconde algunas partes de tu informacion
 	    MSG        Cambia el metodo de comunicacion con
 	                    Servicios
+	    AUTOOP     Should services op you automatically.    
 	
 	Para usar este comando, debes primero identificarte con
 	Servicios usando tu clave (/msg %S HELP IDENTIFY

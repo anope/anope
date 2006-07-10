@@ -524,6 +524,14 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	I servizi ora ti risponderanno per mezzo di notice.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET nickname opzione parametri
@@ -3525,6 +3533,7 @@ NICK_HELP_SET
 	    PRIVATE    Nasconde il nick dalla lista (/msg %S LIST)
 	    SECURE     Attiva o disattiva la sicurezza
 	    URL        Associa un URL al tuo nick
+	    AUTOOP     Should services op you automatically.    
 	
 	Per usare questo comando, devi prima identificarti con
 	la tua password (digita /msg %S HELP IDENTIFY per

@@ -528,6 +528,14 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	A szervíz újra notice-t küld a válaszoknál.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
 # SET NOEXPIRE válaszok
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
@@ -3558,6 +3566,7 @@ NICK_HELP_SET
 	    PRIVATE    A nickneved /msg %S LIST -ból való elrejtése
 	    HIDE       A nicknévhez tartozó információk elrejtése
 	    MSG        Megváltoztatja a szervízzel való kommunikációt
+	    AUTOOP     Should services op you automatically.    
 	    
 	Ezen parancs kiadása elõtt, azonositanod kell magad, mint
 	a nick tulajdonosa az IDENTIFY parancsot használva, írd

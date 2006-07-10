@@ -2,9 +2,12 @@ Anope Version  S V N
 --------------------
 *** New Strings:
 	INVALID_TARGET
+	NICK_SET_AUTOOP_SYNTAX
+	NICK_SET_AUTOOP_ON
+	NICK_SET_AUTOOP_OFF
 
 *** Mod Strings:
-
+	NICK_HELP_SET
 *** Del Strings:
 
 Anope Version 1.7.14

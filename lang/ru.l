@@ -529,6 +529,14 @@ NICK_SET_MSG_ON
 NICK_SET_MSG_OFF
 	Теперь сервисы будут отвечать Вам посредством нотисов.
 
+# SET AUTOOP responses
+NICK_SET_AUTOOP_SYNTAX
+	SET AUTOOP {ON | OFF}
+NICK_SET_AUTOOP_ON
+	Services will now autoop you in channels.
+NICK_SET_AUTOOP_OFF
+	Services will no longer autoop you in channels.
+
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
 	SASET nickname option parameters
@@ -3568,6 +3576,7 @@ NICK_HELP_SET
 	               /msg %S LIST
 	    HIDE       Скрыть часть информации о Вас
 	    MSG        Выбрать метод общения сервисов с Вами - приват или нотисы
+	    AUTOOP     Should services op you automatically.    
 	
 	Перед установкой любой опции, Вы должны сначала идентифицироваться
 	с Вашим паролем (/msg %S HELP IDENTIFY для более подробной

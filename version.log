@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1082"
+VERSION_BUILD="1084"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1084)
+# BUGS  : N/A
+# NOTES : Added ns_noop_convert.c
+# 
 #
 # BUILD : 1.7.14 (1082)
 # BUGS  : 423

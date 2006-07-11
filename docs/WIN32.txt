@@ -16,51 +16,72 @@ Anope for Windows
         * Current Anope source:
             http://zero.org:7467/viewcvs/trunk.tar.gz
 
-        If you have Visual C++ 6, 7 or .NET skip ahead to step 2, else you
+        If you have Visual C++ 6, 7 (.NET 2002/2003) or 8 (2005) skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
         downloaded, install these packages.
 
-        * VCToolKit:
-            http://download.microsoft.com/download/3/9/b/39bac755-0a1e-4d0b-b72c-3a158b7444c4/VCToolkitSetup.exe
+        * Microsoft Visual C++ 2005 Express Edition:
+            http://msdn.microsoft.com/vstudio/express/visualc/download/
 
-        * .NET Framework 1.1 Redistributable:
-            http://download.microsoft.com/download/a/a/c/aac39226-8825-44ce-90e3-bf8203e74006/dotnetfx.exe
+        * Microsoft Windows PlatformSDK:
+	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
-        * .NET Framework SDK 1.1:
-            http://download.microsoft.com/download/5/2/0/5202f918-306e-426d-9637-d7ee26fbe507/setup.exe
+	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
+	    versions of Windows. When installing, you should select the Custom option, and ensure
+	    that only the top selection, and the bottom selection are checked. This will cut down
+	    install time dramatically)
 
-        * Core SDK for the needed libraries:
-            http://www.microsoft.com/msdownload/platformsdk/sdkupdate/
+        * MySQL for Windows (only needed if building with MySQL enabled):
+            http://dev.mysql.com/
 
-        * MySQL for Windows (only needed if building with MySQL enabled)
-            http://www.mysql.com/
+	    (NOTE: Anope can be compiled against MySQL Version 3.23 and above)
 
 
     2) Unpack the Anope tarball with your favorite uncompression program
-       (winzip or winrar).
+       (WinZip or WinRAR, etc).
 
-    3) Bring up the Visual C++ toolkit command prompt; This will launch a
-       dos command prompt like windows, which will set the environment
-       properties need to make Anope. Change directories to where you unpacked
-       the source code in step 2.
+    3) Bring up the Visual C++ Command Prompt; This will launch a
+       DOS Command Prompt like window, which will set the environment
+       properties needed to make Anope.
+
+       Change directories to where you unpacked the source code in step 2, by typing:
+
+	cd <path to extracted source>
+	
+	e.g.
+
+	cd c:\anope-trunk
        
     4) You now need to configure Anope to your requirements. At the prompt type:
     
-        cscript /nologo install.vbs
+        cscript /nologo install.js
+
+       NOTE: If you run an Anti-Virus program such as McAfee or Norton, you may
+       be unable to run this command due to the protection in place. Some Anti-
+       Virus programs may detect the Anope Configuration Tool as a worm, however
+       this is not the case. If you are prompted to allow or deny execution of 
+       the script, you should choose allow. If the script fails to run, and no
+       notice is displayed, please check your Anti-Virus settings before seeking
+       assistance.
         
        An interactive configuration program should guide you through the install
        options, and then detect your Microsoft Visual C++ Library files. If it
-       fails to detect them, you can manually specify a path. Please refer to
-       your compilers documentation if you need to specify a manual path.
+       fails to detect them, you should check you have everything installed.
+
+       If you cannot find whats causing the error, please visit our forums or
+       our IRC Support channel for assistance.
  
     5) You are now ready to compile. At the prompt type:
 
         nmake -f Makefile.win32
 
        Once you are back at the command prompt again, if there have been no
-       errors, you are ready to go. Should you encounter errors check how to
-       adjust the Makefile.inc.win32 to help resolve the issue. If those
-       changes in Makefile.inc.win32 didn't help, file a bug report.
+       errors, you are ready to go. 
+
+       Should you encounter errors with the installation process, check the
+       messages displayed for advice on resolving them. If you are unable to
+       resolve the issues yourself, seek assistance on our forums or in our
+       IRC Support channel.
 
     6) Anope will install the files where the belong. The only thing you need
        to do is rename "data/example.conf" to be "services.conf".
@@ -73,6 +94,11 @@ Anope for Windows
     Since Anope for Windows does not use a visual interface, you must do the
     configuration with a text editor before proceeding with running Anope
     itself.
+
+    NOTE: You may need to open the configuration file with Wordpad, or a text
+    editor which supports UNIX line endings. Opening the configuration file in
+    Notepad will cause strange characters to appear, and you may not be able to
+    edit the file correctly.
 
     Open services.conf, and read through it carefully and adjust the settings
     you think you need to adjust. Pay special attention to these settings:

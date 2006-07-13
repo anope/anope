@@ -1718,21 +1718,17 @@ int moduleAddCallback(char *name, time_t when,
 void moduleCallBackRun(void)
 {
     ModuleCallBack *tmp;
-    if (!moduleCallBackHead) {
-        return;
-    }
-    tmp = moduleCallBackHead;
-    if (tmp->when <= time(NULL)) {
-        if (debug)
-            alog("debug: executing callback: %s", tmp->name ? tmp->name : "?");
-        if (tmp->func) {
-            mod_current_module_name = tmp->owner_name;
-            tmp->func(tmp->argc, tmp->argv);
-            mod_current_module = NULL;
-            moduleCallBackDeleteEntry(NULL);    /* delete the head */
-        }
-    }
-    return;
+	
+	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
+		if (debug)
+			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
+		if (tmp->func) {
+			mod_current_module_name = tmp->owner_name;
+			tmp->func(tmp->argc, tmp->argv);
+			mod_current_module = NULL;
+			moduleCallBackDeleteEntry(NULL);
+		}
+	}
 }
 
 /**

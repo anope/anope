@@ -415,6 +415,8 @@ char *sgets(char *buf, int len, ano_socket_t s)
     fd_set fds;
     char *ptr = buf;
 
+    flush_write_buffer(0);
+
     if (len == 0)
         return NULL;
     FD_SET(s, &fds);
@@ -424,6 +426,7 @@ char *sgets(char *buf, int len, ano_socket_t s)
            (c = select(s + 1, &fds, NULL, NULL, &tv)) < 0) {
         if (ano_sockgeterr() != EINTR)
             break;
+        flush_write_buffer(0);
     }
     if (read_buffer_len() == 0 && c == 0)
         return (char *) -1;

@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1085"
+VERSION_BUILD="1086"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1086)
+# BUGS  : N/A
+# NOTES : Applied gds socket buffering patch, we should play nice with inspircd now.
+# 
 #
 # BUILD : 1.7.14 (1085)
 # BUGS  : 544

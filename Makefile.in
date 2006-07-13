@@ -97,7 +97,7 @@ profile_modules: profile_build
 	@echo "*** All done, now (g)make install to install Anope/Modules";
 
 language:
-	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; cp language.h ../include/)
+	(cd lang ; $(MAKE) ${MAKEARGS} all language.h ; )
 
 headers:
 	(cd include ; ${MAKE} ${MAKEARGS} )

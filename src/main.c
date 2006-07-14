@@ -98,6 +98,7 @@ static int started = 0;
 
 extern void expire_all(void)
 {
+    waiting = -30;
     send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
     waiting = -3;
     if (debug)
@@ -124,7 +125,9 @@ extern void expire_all(void)
         waiting = -27;
         expire_szlines();
     }
+    waiting = -29;
     expire_exceptions();
+    waiting = -31;
     send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
 }
 
@@ -132,8 +135,8 @@ extern void expire_all(void)
 
 void save_databases(void)
 {
+    waiting = -19;
     send_event(EVENT_DB_SAVING, 1, EVENT_START);
-
     waiting = -2;
     if (debug)
         alog("debug: Saving FFF databases");
@@ -204,6 +207,7 @@ void save_databases(void)
         }
     }
 #endif
+    waiting = -20;
     send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }
 
@@ -393,6 +397,12 @@ void sighandler(int signum)
             case -18:
                 snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
                 break;
+            case -19:
+                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_SAVING, EVENT_START);
+                break;
+            case -20:
+                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_SAVING, EVENT_STOP);
+                break;
             case -21:
                 snprintf(buf, sizeof(buf), "expiring nicknames");
                 break;
@@ -410,6 +420,15 @@ void sighandler(int signum)
                 break;
             case -28:
                 snprintf(buf, sizeof(buf), "expiring SQLINEs");
+                break;
+            case -29:
+                snprintf(buf, sizeof(buf), "expiring Exceptions");
+                break;
+            case -30:
+                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_EXPIRE, EVENT_START);
+                break;
+            case -31:
+                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_EXPIRE, EVENT_STOP);
                 break;
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
@@ -649,10 +668,6 @@ void do_backtrace(int show_segheader)
     alog("Backtrace: not available on this platform");
 #endif
 #else
-    char *winver;
-    winver = GetWindowsVersion();
-    alog("Backtrace: not available on Windows");
-    alog("Running %S", winver);
-    free(winver);
+    char *winver;    winver = GetWindowsVersion();    alog("Backtrace: not available on Windows");    alog("Running %S", winver);    free(winver);
 #endif
 }

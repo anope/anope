@@ -670,8 +670,8 @@ void do_part(const char *source, int ac, char **av)
                 return;
             }
             channame = sstrdup(c->chan->name);
-            send_event(EVENT_PART_CHANNEL, 3, EVENT_START, user->nick,
-                       channame);
+            send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_START, user->nick,
+                       channame, (ac >= 2 ? av[1] : ""));
 
             chan_deluser(user, c->chan);
             if (c->next)
@@ -682,8 +682,8 @@ void do_part(const char *source, int ac, char **av)
                 user->chans = c->next;
             free(c);
 
-            send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
-                       channame);
+            send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_STOP, user->nick,
+                       channame, (ac >= 2 ? av[1] : ""));
             free(channame);
         }
     }

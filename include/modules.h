@@ -32,11 +32,7 @@ typedef HMODULE ano_module_t;
 #else
 typedef void *	ano_module_t;
 
-#ifdef HAS_RTLD_LOCAL
-#define ano_modopen(file)		dlopen(file, RTLD_LAZY|RTLD_LOCAL)
-#else
 #define ano_modopen(file) 		dlopen(file, RTLD_LAZY)
-#endif
 #define ano_moderr()			dlerror()
 #define ano_modsym(file, symbol)	dlsym(file, DL_PREFIX symbol)
 #define ano_modclose(file)		dlclose(file)

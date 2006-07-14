@@ -1212,6 +1212,7 @@ E void anope_cmd_part(char *nick, char *chan, const char *fmt, ...); 	  		  /* P
 E void anope_cmd_pass(char *pass);                                   	  		  /* PASS */
 E void anope_cmd_pong(char *servname, char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
+E void anope_cmd_action(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_privmsg2(char *source, char *dest, char *msg);		  		  /* PRIVMSG */
 E void anope_cmd_serv_privmsg(char *source, char *dest, char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */

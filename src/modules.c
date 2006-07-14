@@ -588,13 +588,13 @@ int loadModule(Module * m, User * u)
 	if (version) {
         if (version() >= VERSION_BUILD ) {
             if(debug) {
-                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version(),VERSION_BUILD);	
+                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version(),VERSION_BUILD);
             }
         } else {
-            ano_modclose(m->handle);
-            ano_modclearerr();
             alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version(), VERSION_BUILD);
             alog("Rebuild module %s against the current version to resolve this error", m->name);
+            ano_modclose(m->handle);
+            ano_modclearerr();
             return MOD_ERR_NOLOAD;
         }
     } else {

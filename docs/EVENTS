@@ -350,6 +350,8 @@ Anope Internal Events
                this has been done.
         av[1]  The nickname of the user parting the channel.
         av[2]  The name of the channel the user has parted.
+        av[3]  The reason the user parted the channel, this is not always sent
+               so check the count to make sure it was passed. (ac == 4)
 
     EVENT_RELOAD
         This event is emitted after the configuration file has been reloaded.

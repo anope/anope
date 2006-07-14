@@ -9,20 +9,23 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1086"
+VERSION_BUILD="1087"
 
 # $Log$
+#
+
+# BUILD : 1.7.14 (1087)
+# BUGS  : 545 550 541
+# NOTES : Various fixes.
 #
 # BUILD : 1.7.14 (1086)
 # BUGS  : N/A
 # NOTES : Applied gds socket buffering patch, we should play nice with inspircd now.
 # 
-#
 # BUILD : 1.7.14 (1085)
 # BUGS  : 544
 # NOTES : Applied Heinzy-mcHeinzs documentation update
 # 
-#
 # BUILD : 1.7.14 (1084)
 # BUGS  : N/A
 # NOTES : Added ns_noop_convert.c

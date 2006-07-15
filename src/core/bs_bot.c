@@ -102,7 +102,7 @@ int do_bot(User * u)
         else if (strlen(nick) > NickLen)
             notice_lang(s_BotServ, u, BOT_BAD_NICK);
         else if (strlen(user) >= USERMAX)
-            notice_lang(s_BotServ, u, BOT_BAD_IDENT);
+            notice_lang(s_BotServ, u, BOT_LONG_IDENT);
         else {
             NickAlias *na;
 
@@ -132,7 +132,7 @@ int do_bot(User * u)
             }
             for (ch = user; *ch && (ch - user) < USERMAX; ch++) {
                 if (!isalnum(*ch)) {
-                    notice_lang(s_BotServ, u, BOT_BAD_IDENT);
+                    notice_lang(s_BotServ, u, BOT_LONG_IDENT);
                     return MOD_CONT;
                 }
             }
@@ -198,7 +198,7 @@ int do_bot(User * u)
         else if (strlen(nick) > NickLen)
             notice_lang(s_BotServ, u, BOT_BAD_NICK);
         else if (user && strlen(user) >= USERMAX)
-            notice_lang(s_BotServ, u, BOT_BAD_IDENT);
+            notice_lang(s_BotServ, u, BOT_LONG_IDENT);
         else {
             NickAlias *na;
 
@@ -250,7 +250,7 @@ int do_bot(User * u)
             if (user) {
                 for (ch = user; *ch && (ch - user) < USERMAX; ch++) {
                     if (!isalnum(*ch)) {
-                        notice_lang(s_BotServ, u, BOT_BAD_IDENT);
+                        notice_lang(s_BotServ, u, BOT_LONG_IDENT);
                         return MOD_CONT;
                     }
                 }

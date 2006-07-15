@@ -2360,6 +2360,8 @@ BOT_BAD_HOST
 	Bot Hosts mogen alleen geldige host-tekens bevatten.
 BOT_BAD_IDENT
 	Bot Idents mogen alleen geldige tekens bevatten.
+BOT_LONG_IDENT
+	Bot Idents may only contain 9 characters.
 
 ###########################################################################
 #

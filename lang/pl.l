@@ -2545,6 +2545,8 @@ BOT_BAD_HOST
 	Host bota mo¿e zawieraæ tylko prawid³owe znaki.
 BOT_BAD_IDENT
 	Ident bota mo¿e zawieraæ tylko prawid³owe znaki.
+BOT_LONG_IDENT
+	Bot Idents may only contain 9 characters.
 ###########################################################################
 #
 # Komunikaty OperServ 

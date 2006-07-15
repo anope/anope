@@ -2331,6 +2331,8 @@ BOT_BAD_HOST
 	O Host do bot deve conter apenas caracteres válidos a Hosts.
 BOT_BAD_IDENT
 	A Identd do bot deve conter apenas caracteres válidos.
+BOT_LONG_IDENT
+	Bot Idents may only contain 9 characters.
 
 ###########################################################################
 #

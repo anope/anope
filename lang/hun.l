@@ -2354,6 +2354,8 @@ BOT_BAD_HOST
 	Bot Hoszt csak érvényes karaktereket tartalmazhat.
 BOT_BAD_IDENT
 	Bot Ident csak érvényes karaktereket tartalmazhat.
+BOT_LONG_IDENT
+	Bot Idents may only contain 9 characters.
 ###########################################################
 #
 # OperServ üzenetek

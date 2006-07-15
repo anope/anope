@@ -747,7 +747,7 @@ void do_sjoin(const char *source, int ac, char **av)
     }
 
     /* Double check to avoid unknown modes that need parameters */
-    if (ac >= 4 && ac <= 6) {
+    if (ac >= 4) {
         c = findchan(av[1]);
         if (ircd->chansqline) {
             if (!c)

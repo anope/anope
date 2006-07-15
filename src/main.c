@@ -44,6 +44,7 @@ int nofork = 0;                 /* -nofork */
 int forceload = 0;              /* -forceload */
 int nothird = 0;                /* -nothrid */
 int noexpire = 0;               /* -noexpire */
+int protocoldebug = 0;          /* -protocoldebug */
 
 #ifdef USE_RDB
 int do_mysql = 0;               /* use mysql ? */

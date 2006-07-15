@@ -746,6 +746,7 @@ E int   nofork;
 E int   forceload;
 E int   nothird;
 E int	noexpire;
+E int   protocoldebug;
 
 #ifdef USE_RDB
 E int   do_mysql;
@@ -810,6 +811,7 @@ E int match_wild_nocase(const char *pattern, const char *str);
 E int dotime(const char *s);
 E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
 E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
+E void protocol_debug(char *source, char *cmd, int argc, char **argv);
 
 typedef int (*range_callback_t) (User * u, int num, va_list args);
 E int process_numlist(const char *numstr, int *count_ret,

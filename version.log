@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1088"
+VERSION_BUILD="1089"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1089)
+# BUGS  : 549
+# NOTES : applied trystan's patch for the SJOIN issue.
 #
 # BUILD : 1.7.14 (1088)
 # BUGS  :

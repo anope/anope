@@ -232,6 +232,11 @@ void process()
         s = buf + strlen(buf);
     strscpy(cmd, buf, sizeof(cmd));
     ac = split_buf(s, &av, 1);
+
+    if (protocoldebug) {
+        protocol_debug(source, cmd, ac, av);
+    }
+
     if (mod_current_buffer) {
         free(mod_current_buffer);
     }

@@ -55,6 +55,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 07/02 F Fixed module version stuff.                                       [#531]
 07/14 F Another version fix.                                              [#545]
 07/15 F Fixed max param count for SJOINs.                                 [#549]
+07/15 F Fixed !halfop fantasy stuff.                                      [#534]
 07/14 A Added anope_cmd_action() and new param for EVENT_PART_CHANNEL.    [#550]
 
 Anope Version 1.7.14

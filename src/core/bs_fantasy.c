@@ -62,6 +62,15 @@ int do_fantasy(int argc, char **argv)
 
     do {
         if (stricmp(argv[0], util->bsname) == 0) {
+            /* This could have been moved to its own module
+               however it would require more coding to handle the pass holders
+               similar to how PROTECT is done 
+            */
+            if (!ircd->halfop) {
+                if (!stricmp(argv[0], "halfop") || !stricmp(argv[0], "dehalfop")) {
+                    return MOD_CONT;
+                }
+            }
             u = finduser(argv[1]);
             ci = cs_findchan(argv[2]);
             if (!u || !ci)

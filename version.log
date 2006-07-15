@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1090"
+VERSION_BUILD="1091"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1091)
+# BUGS  : 534
+# NOTES : applied trystan's fantasy patch.
 #
 # BUILD : 1.7.14 (1090)
 # BUGS  : 538

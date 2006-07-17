@@ -120,6 +120,7 @@ int AnopeInit(int argc, char **argv)
     moduleSetHostHelp(hs_help);
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);
+    moduleSetType(SUPPORTED);
 
     my_load_config();
     my_add_languages();

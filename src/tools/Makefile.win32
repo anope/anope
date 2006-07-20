@@ -18,7 +18,12 @@ clean:
 spotless: clean
         -@del *.exe *.lib *.exp
 
-install: FRC
+install: exe_install manifest_install
+
+exe_install: FRC
         -@copy *.exe ..\..\$(DATDEST)\
+
+manifest_install: FRC
+        -@copy *.manifest ..\..\$(DATDEST)\
 
 FRC:

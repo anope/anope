@@ -19,6 +19,10 @@
  *
  *   - Certus
  *      February 26, 2005
+ *
+ *   Added win32 fix. Who needs that anyways? :P
+ *   - Certus
+ *     July 20, 2006
  */
 
 
@@ -33,6 +37,7 @@
 #include <unistd.h>
 #else
 #include "sysconf.h"
+#include <windows.h>
 #endif
 
 /* Some SUN fixs */
@@ -593,14 +598,21 @@ dbFILE *open_db_write(const char *service, const char *filename, int version)
     strscpy(f->filename, filename, sizeof(f->filename));
     filename = f->filename;
     f->mode = 'w';
-    /* Use open() to avoid people sneaking a new file in under us */
+#ifndef _WIN32
     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0666);
+#else
+    fd = open(filename, O_WRONLY | O_CREAT | O_EXCL | _O_BINARY, 0666);
+#endif
     f->fp = fdopen(fd, "wb");   /* will fail and return NULL if fd < 0 */
     if (!f->fp || !write_file_version(f, version)) {
         printf("Can't write to %s database %s.\n", service, filename);
         if (f->fp) {
             fclose(f->fp);
+#ifndef _WIN32
             unlink(filename);
+#else
+            DeleteFile(filename);
+#endif
         }
         free(f);
         return NULL;

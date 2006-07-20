@@ -597,6 +597,11 @@ dbFILE *open_db_write(const char *service, const char *filename, int version)
     }
     strscpy(f->filename, filename, sizeof(f->filename));
     filename = f->filename;
+#ifndef _WIN32
+    unlink(filename);
+#else
+    DeleteFile(filename);
+#endif
     f->mode = 'w';
 #ifndef _WIN32
     fd = open(filename, O_WRONLY | O_CREAT | O_EXCL, 0666);

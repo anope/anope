@@ -2053,7 +2053,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD nick user host gerçekismi
+	BOT ADD nick user host gerçekismi
 	BOT CHANGE eskinick yeninick [user [host [gerçekismi]]]
 	BOT DEL nick
 BOT_BOT_ALREADY_EXISTS
@@ -2084,7 +2084,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN kanaladý nick
+	ASSIGN kanaladý nick
 BOT_ASSIGN_READONLY
 	Kanala bot sokma geçici olarak devre dýþý.
 BOT_ASSIGN_ALREADY
@@ -2094,13 +2094,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN kanaladý
+	UNASSIGN kanaladý
 BOT_UNASSIGN_UNASSIGNED
 	%s kanalýndan bot çýkarýldý.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {kanaladý | nick}
+	INFO {kanaladý | nick}
 BOT_INFO_NOT_FOUND
 	%s geçerli bir bot yada kanal deðil.
 BOT_INFO_BOT_HEADER
@@ -2184,7 +2184,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET kanaladý özellik ayarlar
+	SET kanaladý özellik ayarlar
 BOT_SET_DISABLED
 	Bot özellik ayarý geçici olarak devre dýþý.
 BOT_SET_UNKNOWN
@@ -2193,7 +2193,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET kanaladý DONTKICKOPS {ON|OFF}
+	SET kanaladý DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Bot %s kanalýnda oplarý atmayacak .
 BOT_SET_DONTKICKOPS_OFF
@@ -2201,7 +2201,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET kanaladý DONTKICKVOICES {ON|OFF}
+	SET kanaladý DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Bot %s kanalýnda voicelarý atmayacak.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2209,7 +2209,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET kanaladý FANTASY {ON|OFF}
+	SET kanaladý FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Fantazi modu %s kanalýnda AKTÝF.
 BOT_SET_FANTASY_OFF
@@ -2217,7 +2217,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET kanaladý GREET {ON|OFF}
+	SET kanaladý GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Karþýlama modu %s kanalýnda AKTÝF.
 BOT_SET_GREET_OFF
@@ -2225,7 +2225,7 @@ BOT_SET_GREET_OFF
 
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET kanaladý NOBOT {ON|OFF}
+	SET kanaladý NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Bot yok modu %s kanalý için AKTÝF.
 BOT_SET_NOBOT_OFF
@@ -2233,7 +2233,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET kanaladi PRIVATE {ON|OFF}
+	SET kanaladi PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	%s botunun özel seçenegi artik AKTIF.
 BOT_SET_PRIVATE_OFF
@@ -2241,7 +2241,7 @@ BOT_SET_PRIVATE_OFF
 	
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET kanaladý SYMBIOSIS {ON|OFF}
+	SET kanaladý SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Gerçek bot modu %s kanalýnda AKTÝF.
 BOT_SET_SYMBIOSIS_OFF
@@ -2249,7 +2249,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK kanaladý özellik {ON|OFF} [ayarlar]
+	KICK kanaladý özellik {ON|OFF} [ayarlar]
 BOT_KICK_DISABLED
 	Atma ayarlarý geçici olarak devre dýþý.
 BOT_KICK_UNKNOWN
@@ -2355,11 +2355,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY kanaladý yazý
+	SAY kanaladý yazý
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT kanaladý yazý
+	ACT kanaladý yazý
 
 ###########################################################################
 #

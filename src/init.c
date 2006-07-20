@@ -324,7 +324,7 @@ static int parse_options(int ac, char **av)
             } else if (strcmp(s, "nothird") == 0) {
                 nothird = 1;
             } else if (strcmp(s, "protocoldebug") == 0) {
-                protocoldebug = 1;
+                protocoldebug = 1;
             } else if (strcmp(s, "support") == 0) {
                 nofork = 1;
                 debug++;

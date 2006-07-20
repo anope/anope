@@ -2042,7 +2042,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD nick gebruiker host echte naam
+	BOT ADD nick gebruiker host echte naam
 	BOT CHANGE oude-nick nieuwe-nick [gebruiker [host [echte naam]]]
 	BOT DEL nick
 BOT_BOT_ALREADY_EXISTS
@@ -2073,7 +2073,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN kanaal nick
+	ASSIGN kanaal nick
 BOT_ASSIGN_READONLY
 	Sorry, bot toewijzing is tijdelijk uitgeschakeld.
 BOT_ASSIGN_ALREADY
@@ -2083,13 +2083,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN kanaal
+	UNASSIGN kanaal
 BOT_UNASSIGN_UNASSIGNED
 	Er is geen bot meer toegewezen aan %s.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {kanaal | nick}
+	INFO {kanaal | nick}
 BOT_INFO_NOT_FOUND
 	%s is geen geldige bot of geregistreerd kanaal.
 BOT_INFO_BOT_HEADER
@@ -2173,7 +2173,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET kanaal optie instellingen
+	SET kanaal optie instellingen
 BOT_SET_DISABLED
 	Sorry, bot opties instellen is tijdelijk uitgeschakeld.
 BOT_SET_UNKNOWN
@@ -2182,7 +2182,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET kanaal DONTKICKOPS {ON|OFF}
+	SET kanaal DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Bot zal geen ops kicken op kanaal %s.
 BOT_SET_DONTKICKOPS_OFF
@@ -2190,7 +2190,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET kanaal DONTKICKVOICES {ON|OFF}
+	SET kanaal DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Bot zal geen voices kicken op kanaal %s.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2198,7 +2198,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET kanaal FANTASY {ON|OFF}
+	SET kanaal FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Fantasie mode staat nu AAN op kanaal %s.
 BOT_SET_FANTASY_OFF
@@ -2206,7 +2206,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET kanaal GREET {ON|OFF}
+	SET kanaal GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Begroetingsmode staat nu AAN op kanaal %s.
 BOT_SET_GREET_OFF
@@ -2214,7 +2214,7 @@ BOT_SET_GREET_OFF
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET kanaal NOBOT {ON|OFF}
+	SET kanaal NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Geen Bot mode staat nu AAN op kanaal %s.
 BOT_SET_NOBOT_OFF
@@ -2222,7 +2222,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET kanaal PRIVATE {ON|OFF}
+	SET kanaal PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Prive mode van bot %s staat nu AAN.
 BOT_SET_PRIVATE_OFF
@@ -2230,7 +2230,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET kanaal SYMBIOSIS {ON|OFF}
+	SET kanaal SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Symbiose mode staat nu AAN op kanaal %s.
 BOT_SET_SYMBIOSIS_OFF
@@ -2238,7 +2238,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK kanaal optie {ON|OFF} [instellingen]
+	KICK kanaal optie {ON|OFF} [instellingen]
 BOT_KICK_DISABLED
 	Sorry, kicker configuratie is tijdelijk uitgeschakeld.
 BOT_KICK_UNKNOWN
@@ -2345,11 +2345,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY kanaal text
+	SAY kanaal text
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT kanaal text
+	ACT kanaal text
 
 # Errors
 BOT_EXCEPT

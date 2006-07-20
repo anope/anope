@@ -2049,7 +2049,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD ник идент хост реальное имя
+	BOT ADD ник идент хост реальное имя
 	BOT CHANGE старый ник новый ник [идент [хост [реальное имя]]]
 	BOT DEL ник
 BOT_BOT_ALREADY_EXISTS
@@ -2080,7 +2080,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN chan nick
+	ASSIGN chan nick
 BOT_ASSIGN_READONLY
 	Извините, назначение ботов на канал временно недоступно.
 BOT_ASSIGN_ALREADY
@@ -2090,13 +2090,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN #канал
+	UNASSIGN #канал
 BOT_UNASSIGN_UNASSIGNED
 	Боты с канала %s удалены.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {#канал | ник}
+	INFO {#канал | ник}
 BOT_INFO_NOT_FOUND
 	%s не является ботом или зарегистрированным каналом.
 BOT_INFO_BOT_HEADER
@@ -2180,7 +2180,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET #канал опция параметр
+	SET #канал опция параметр
 BOT_SET_DISABLED
 	Извините, установка опций бота временно недоступна.
 BOT_SET_UNKNOWN
@@ -2189,7 +2189,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET #канал DONTKICKOPS {ON|OFF}
+	SET #канал DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Бот не будет кикать операторов канала %s.
 BOT_SET_DONTKICKOPS_OFF
@@ -2197,7 +2197,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET #канал DONTKICKVOICES {ON|OFF}
+	SET #канал DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Бот не будет кикать войсов канала %s.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2205,7 +2205,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET #канал FANTASY {ON|OFF}
+	SET #канал FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Режим Фантазии ВКЛЮЧЕНЫ на канале %s.
 BOT_SET_FANTASY_OFF
@@ -2213,7 +2213,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET #канал GREET {ON|OFF}
+	SET #канал GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Режим приветствий on channel %s ВКЛЮЧЕН.
 BOT_SET_GREET_OFF
@@ -2221,7 +2221,7 @@ BOT_SET_GREET_OFF
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET #канал NOBOT {ON|OFF}
+	SET #канал NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Режим Без-бота ВКЛЮЧЕН на канале %s.
 BOT_SET_NOBOT_OFF
@@ -2229,7 +2229,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET #канал PRIVATE {ON|OFF}
+	SET #канал PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Частный режим на канале %s is now ВКЛЮЧЕН.
 BOT_SET_PRIVATE_OFF
@@ -2237,7 +2237,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET #канал SYMBIOSIS {ON|OFF}
+	SET #канал SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Режим Симбиоза ВКЛЮЧЕН на канале %s.
 BOT_SET_SYMBIOSIS_OFF
@@ -2245,7 +2245,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK #канал опция {ON|OFF} [параметры]
+	KICK #канал опция {ON|OFF} [параметры]
 BOT_KICK_DISABLED
 	Извините, конфигурация киков временно невозможна.
 BOT_KICK_UNKNOWN
@@ -2352,11 +2352,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY #канал текст
+	SAY #канал текст
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT #канал текст
+	ACT #канал текст
 
 # Errors
 BOT_EXCEPT

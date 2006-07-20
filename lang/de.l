@@ -2034,7 +2034,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD Botnick User Hostmaske Realname
+	BOT ADD Botnick User Hostmaske Realname
 	BOT CHANGE Botnick Neuer-Botnick [User [Hostmaske [Realname]]]
 	BOT DEL Nickname
 BOT_BOT_ALREADY_EXISTS
@@ -2065,7 +2065,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN Channel Nickname
+	ASSIGN Channel Nickname
 BOT_ASSIGN_READONLY
 	Das Zuweisen von Bots ist derzeit deaktiviert.
 BOT_ASSIGN_ALREADY
@@ -2075,13 +2075,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN channel
+	UNASSIGN channel
 BOT_UNASSIGN_UNASSIGNED
 	Der Bot von %s wurde entfernt.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {Channel | Nickname}
+	INFO {Channel | Nickname}
 BOT_INFO_NOT_FOUND
 	%s ist kein gültiger Bot bzw. registrierter Channel.
 BOT_INFO_BOT_HEADER
@@ -2165,7 +2165,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET Channel Option Einstellungen
+	SET Channel Option Einstellungen
 BOT_SET_DISABLED
 	Die SET-Optionen sind derzeit deaktiviert.
 BOT_SET_UNKNOWN
@@ -2174,7 +2174,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET Channel DONTKICKOPS {ON|OFF}
+	SET Channel DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Bot wird keine Ops kicken im %s.
 BOT_SET_DONTKICKOPS_OFF
@@ -2182,7 +2182,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET Channel DONTKICKVOICES {ON|OFF}
+	SET Channel DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Bot wird keine Voices kicken im %s.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2190,7 +2190,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET Channel FANTASY {ON|OFF}
+	SET Channel FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Fantasy mode ist jetzt ON im %s.
 BOT_SET_FANTASY_OFF
@@ -2198,7 +2198,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET Channel GREET {ON|OFF}
+	SET Channel GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Begrüssungsnachricht ist jetzt ON im %s.
 BOT_SET_GREET_OFF
@@ -2206,7 +2206,7 @@ BOT_SET_GREET_OFF
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET Channel NOBOT {ON|OFF}
+	SET Channel NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	No-Bot-Mode ist jetzt ON im Channel %s.
 BOT_SET_NOBOT_OFF
@@ -2214,7 +2214,7 @@ BOT_SET_NOBOT_OFF
 	
 # SET SYMBIOSIS
 BOT_SET_PRIVATE_SYNTAX
-	SET Botname PRIVATE {ON|OFF}
+	SET Botname PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Private-Mode des Bots im %s ist jetzt ON.
 BOT_SET_PRIVATE_OFF
@@ -2222,7 +2222,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET Channel SYMBIOSIS {ON|OFF}
+	SET Channel SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Symbiosis-Mode ist jetzt ON im %s.
 BOT_SET_SYMBIOSIS_OFF
@@ -2230,7 +2230,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK Channel Option {ON|OFF} [Einstellungen]
+	KICK Channel Option {ON|OFF} [Einstellungen]
 BOT_KICK_DISABLED
 	Die Konfiguration des Kickers ist derzeit deaktiviert.
 BOT_KICK_UNKNOWN
@@ -2337,11 +2337,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY Channel Text
+	SAY Channel Text
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT Channel Text
+	ACT Channel Text
 
 # Errors
 BOT_EXCEPT

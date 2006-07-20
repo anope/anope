@@ -2058,7 +2058,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD nick user host real
+	BOT ADD nick user host real
 	BOT CHANGE oldnick newnick [user [host [real]]]
 	BOT DEL nick
 BOT_BOT_ALREADY_EXISTS
@@ -2089,7 +2089,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN chan nick
+	ASSIGN chan nick
 BOT_ASSIGN_READONLY
 	Συγνώμη, η υπηρεσία bot assignment είναι απενεργοποιημένη.
 BOT_ASSIGN_ALREADY
@@ -2099,13 +2099,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN chan
+	UNASSIGN chan
 BOT_UNASSIGN_UNASSIGNED
 	Δεν υπάρχει bot που να είναι στο %s τώρα πια.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {chan | nick}
+	INFO {chan | nick}
 BOT_INFO_NOT_FOUND
 	%s δεν είναι σωστό bot ή κατοχυρωμένο κανάλι.
 BOT_INFO_BOT_HEADER
@@ -2189,7 +2189,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET channel option settings
+	SET channel option settings
 BOT_SET_DISABLED
 	Συγνώμη, η υπηρεσία bot είναι απενεργοποιημένη.
 BOT_SET_UNKNOWN
@@ -2198,7 +2198,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET channel DONTKICKOPS {ON|OFF}
+	SET channel DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Το Bot δεν θα κάνει kick τουε ops του καναλιού %s.
 BOT_SET_DONTKICKOPS_OFF
@@ -2206,7 +2206,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET channel DONTKICKVOICES {ON|OFF}
+	SET channel DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Το Bot δεν θα κάνει kick τους voices του καναλιού %s.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2214,7 +2214,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET channel FANTASY {ON|OFF}
+	SET channel FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Η Fantasy επιλογή είναι τώρα ON στο κανάλι %s.
 BOT_SET_FANTASY_OFF
@@ -2222,7 +2222,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET channel GREET {ON|OFF}
+	SET channel GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Η επιλογή χαιρετισμού είναι ON στο κανάλι %s.
 BOT_SET_GREET_OFF
@@ -2230,7 +2230,7 @@ BOT_SET_GREET_OFF
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET channel NOBOT {ON|OFF}
+	SET channel NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Κανένα Bot έχει επιλογή ON στο κανάλι %s.
 BOT_SET_NOBOT_OFF
@@ -2238,7 +2238,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET channel PRIVATE {ON|OFF}
+	SET channel PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Μυστικότητα επιλογής του bot %s είναι τώρα ON.
 BOT_SET_PRIVATE_OFF
@@ -2246,7 +2246,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET channel SYMBIOSIS {ON|OFF}
+	SET channel SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Επιλογή συμβίωσης είναι τώρα ON στο κανάλι %s.
 BOT_SET_SYMBIOSIS_OFF
@@ -2254,7 +2254,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK channel option {ON|OFF} [settings]
+	KICK channel option {ON|OFF} [settings]
 BOT_KICK_DISABLED
 	Συγνώμη, η υπηρεσία kicker είναι απενεργοποιημένη.
 BOT_KICK_UNKNOWN
@@ -2361,11 +2361,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY channel text
+	SAY channel text
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT channel text
+	ACT channel text
 
 ###########################################################################
 #

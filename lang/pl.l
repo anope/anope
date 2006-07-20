@@ -2187,7 +2187,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD nick user host real
+	BOT ADD nick user host real
 	BOT CHANGE starynick nowynick [user [host [real]]]
 	BOT DEL nick
 BOT_BOT_ALREADY_EXISTS
@@ -2219,7 +2219,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN kana³ nick
+	ASSIGN kana³ nick
 BOT_ASSIGN_READONLY
 	B³±d, przydzielanie botów jest tymczasowo 
 	niedostêpne.
@@ -2230,13 +2230,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN responses
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN kana³
+	UNASSIGN kana³
 BOT_UNASSIGN_UNASSIGNED
 	Nie ma ¿adnych botów przydzielonych na %s.
 	
 # INFO responses
 BOT_INFO_SYNTAX
-	INFO {kana³ | nick}
+	INFO {kana³ | nick}
 BOT_INFO_NOT_FOUND
 	%s to nieprawid³owy bot lub kana³.
 BOT_INFO_BOT_HEADER
@@ -2320,7 +2320,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET kana³ opcja ustawienie
+	SET kana³ opcja ustawienie
 BOT_SET_DISABLED
 	B³±d, ustawianie opcji bota jest tymczasowo 
 	niedostêpne.
@@ -2331,7 +2331,7 @@ BOT_SET_UNKNOWN
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET kana³ DONTKICKOPS {ON|OFF}
+	SET kana³ DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	Bot nie bêdzie od teraz kopa³ operatorów 
 	na kanale %s.
@@ -2341,7 +2341,7 @@ BOT_SET_DONTKICKOPS_OFF
 	
 # SET DONTKICKVOICES messages
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET kana³ DONTKICKVOICES {ON|OFF}
+	SET kana³ DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	Bot nie bêdzie kopa³ voiców na kanale %s.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2349,7 +2349,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY messages
 BOT_SET_FANTASY_SYNTAX
-	SET kana³ FANTASY {ON|OFF}
+	SET kana³ FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Komendy fantasy s± od teraz aktywne 
 	na kanale %s.
@@ -2359,7 +2359,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET kana³ GREET {ON|OFF}
+	SET kana³ GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Opcja powitania jest od teraz aktywna 
 	na kanale %s.
@@ -2369,7 +2369,7 @@ BOT_SET_GREET_OFF
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET nickbota NOBOT {ON|OFF}
+	SET nickbota NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Opcja NoBot jest od teraz aktywna 
 	na kanale %s.
@@ -2379,7 +2379,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET nickbota PRIVATE {ON|OFF}
+	SET nickbota PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Opcja prywatno¶ci bota %s jest 
 	od teraz aktywna.
@@ -2389,7 +2389,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET kana³ SYMBIOSIS {ON|OFF}
+	SET kana³ SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Opcja symbiozy jest od teraz aktywna 
 	na kanale %s.
@@ -2399,7 +2399,7 @@ BOT_SET_SYMBIOSIS_OFF
 	
 # KICK responses
 BOT_KICK_SYNTAX
-	KICK kana³ opcja {ON|OFF} [settings]
+	KICK kana³ opcja {ON|OFF} [settings]
 BOT_KICK_DISABLED
 	B³±d, konfiguracja kopów jest tymczasowo 
 	niedostêpna.
@@ -2530,11 +2530,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY responses
 BOT_SAY_SYNTAX
-	SAY kana³ tekst
+	SAY kana³ tekst
 
 # ACT responses
 BOT_ACT_SYNTAX
-	ACT kana³ tekst
+	ACT kana³ tekst
 
 # Errors
 BOT_EXCEPT

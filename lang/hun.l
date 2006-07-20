@@ -2036,7 +2036,7 @@ BOT_SEEN_UNKNOWN
 
 # BOT válaszok
 BOT_BOT_SYNTAX
-	BOT ADD nick user hoszt valósnév
+	BOT ADD nick user hoszt valósnév
 	BOT CHANGE réginickújnick [user [hoszt [valósnév]]]
 	BOT DEL nick
 BOT_BOT_ALREADY_EXISTS
@@ -2067,7 +2067,7 @@ BOT_BOTLIST_EMPTY
 
 # ASSIGN válaszok
 BOT_ASSIGN_SYNTAX
-	ASSIGN #szoba nick
+	ASSIGN #szoba nick
 BOT_ASSIGN_READONLY
 	Bot társítás ideiglenesen nem mûködik.
 BOT_ASSIGN_ALREADY
@@ -2077,13 +2077,13 @@ BOT_ASSIGN_ASSIGNED
 	
 # UNASSIGN válaszok
 BOT_UNASSIGN_SYNTAX
-	UNASSIGN #szoba
+	UNASSIGN #szoba
 BOT_UNASSIGN_UNASSIGNED
 	Nincsen bot kijelölve %s szobában többet.
 
 # INFO válaszok
 BOT_INFO_SYNTAX
-	INFO {#szoba | nick}
+	INFO {#szoba | nick}
 BOT_INFO_NOT_FOUND
 	%s nem érvényes bot vagy regisztrált szoba.
 BOT_INFO_BOT_HEADER
@@ -2167,7 +2167,7 @@ BOT_INFO_OPT_NONE
 
 # SET válaszok
 BOT_SET_SYNTAX
-	SET #szoba opció beállítások
+	SET #szoba opció beállítások
 BOT_SET_DISABLED
 	Bot beállítás idõlegesen szünetel.
 BOT_SET_UNKNOWN
@@ -2176,7 +2176,7 @@ BOT_SET_UNKNOWN
 
 # SET DONTKICKOPS üzenetek
 BOT_SET_DONTKICKOPS_SYNTAX
-	SET #szoba DONTKICKOPS {ON|OFF}
+	SET #szoba DONTKICKOPS {ON|OFF}
 BOT_SET_DONTKICKOPS_ON
 	A Bot nem fog opot kirúgni a %s szobából.
 BOT_SET_DONTKICKOPS_OFF
@@ -2184,7 +2184,7 @@ BOT_SET_DONTKICKOPS_OFF
 
 # SET DONTKICKVOICES üzenetek
 BOT_SET_DONTKICKVOICES_SYNTAX
-	SET #szoba DONTKICKVOICES {ON|OFF}
+	SET #szoba DONTKICKVOICES {ON|OFF}
 BOT_SET_DONTKICKVOICES_ON
 	A Bot nem fogja a hangadókat kirúgni a %s szobában.
 BOT_SET_DONTKICKVOICES_OFF
@@ -2192,7 +2192,7 @@ BOT_SET_DONTKICKVOICES_OFF
 
 # SET FANTASY üzenetek
 BOT_SET_FANTASY_SYNTAX
-	SET #szoba FANTASY {ON|OFF}
+	SET #szoba FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
 	Fantasy mód most ON a %s csatornán.
 BOT_SET_FANTASY_OFF
@@ -2200,7 +2200,7 @@ BOT_SET_FANTASY_OFF
 
 # SET GREET üzenetek
 BOT_SET_GREET_SYNTAX
-	SET szoba GREET {ON|OFF}
+	SET szoba GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Üdvözlõ mód most ON a %s szobán.
 BOT_SET_GREET_OFF
@@ -2208,7 +2208,7 @@ BOT_SET_GREET_OFF
 
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
-	SET botname NOBOT {ON|OFF}
+	SET botname NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
 	Nincs Bot mód most ONa %s szobán.
 BOT_SET_NOBOT_OFF
@@ -2216,7 +2216,7 @@ BOT_SET_NOBOT_OFF
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET botnév PRIVATE {ON|OFF}
+	SET botnév PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
 	Private mód a %s botban most ON.
 BOT_SET_PRIVATE_OFF
@@ -2224,7 +2224,7 @@ BOT_SET_PRIVATE_OFF
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
-	SET szoba SYMBIOSIS {ON|OFF}
+	SET szoba SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
 	Együttélés mód most ONa %s szobán.
 BOT_SET_SYMBIOSIS_OFF
@@ -2232,7 +2232,7 @@ BOT_SET_SYMBIOSIS_OFF
 
 # KICK válaszok
 BOT_KICK_SYNTAX
-	KICK #szoba opció {ON|OFF} [beállítások]
+	KICK #szoba opció {ON|OFF} [beállítások]
 BOT_KICK_DISABLED
 	Kirúgás használata ideiglenesen letiltva.
 BOT_KICK_UNKNOWN
@@ -2339,11 +2339,11 @@ BOT_BADWORDS_CLEAR
 
 # SAY válaszok
 BOT_SAY_SYNTAX
-	SAY #szoba szöveg
+	SAY #szoba szöveg
 
 # ACT válaszok
 BOT_ACT_SYNTAX
-	ACT #szoba szöveg
+	ACT #szoba szöveg
 
 # Hibák
 BOT_EXCEPT

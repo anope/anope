@@ -399,11 +399,13 @@ void sighandler(int signum)
                 snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
                 break;
             case -19:
-                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_SAVING, EVENT_START);
-                break;
-            case -20:
-                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_SAVING, EVENT_STOP);
-                break;
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                          EVENT_DB_SAVING, EVENT_START);
+                break;
+            case -20:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                          EVENT_DB_SAVING, EVENT_STOP);
+                break;
             case -21:
                 snprintf(buf, sizeof(buf), "expiring nicknames");
                 break;
@@ -423,14 +425,16 @@ void sighandler(int signum)
                 snprintf(buf, sizeof(buf), "expiring SQLINEs");
                 break;
             case -29:
-                snprintf(buf, sizeof(buf), "expiring Exceptions");
-                break;
-            case -30:
-                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_EXPIRE, EVENT_START);
-                break;
-            case -31:
-                snprintf(buf, sizeof(buf), "Sending event %s %s", EVENT_DB_EXPIRE, EVENT_STOP);
-                break;
+                snprintf(buf, sizeof(buf), "expiring Exceptions");
+                break;
+            case -30:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                          EVENT_DB_EXPIRE, EVENT_START);
+                break;
+            case -31:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                          EVENT_DB_EXPIRE, EVENT_STOP);
+                break;
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
@@ -669,6 +673,10 @@ void do_backtrace(int show_segheader)
     alog("Backtrace: not available on this platform");
 #endif
 #else
-    char *winver;    winver = GetWindowsVersion();    alog("Backtrace: not available on Windows");    alog("Running %S", winver);    free(winver);
+    char *winver;
+    winver = GetWindowsVersion();
+    alog("Backtrace: not available on Windows");
+    alog("Running %S", winver);
+    free(winver);
 #endif
 }

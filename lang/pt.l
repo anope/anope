@@ -2177,7 +2177,7 @@ BOT_SET_FANTASY_OFF
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
-	SET canal GREET {ON|OFF}
+	SET canal GREET {ON|OFF}
 BOT_SET_GREET_ON
 	Modo mensagem de entrada está agora ATIVADO no canal %s.
 BOT_SET_GREET_OFF

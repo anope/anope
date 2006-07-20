@@ -45,6 +45,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 07/02 F Fixed readonly stuff on memoserv del.                             [#529]
 07/13 F Fixed socket buffering, hopefully should make inspircd play nice. [ #00]
 07/14 F Removed old HAS_RTLD_LOCAL check.                                 [#541]
+07/20 F Removed bold chars from botserv langauge files.                   [#530]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

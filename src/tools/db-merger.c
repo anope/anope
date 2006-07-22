@@ -1662,7 +1662,7 @@ dbFILE *open_db_read(const char *service, const char *filename, int version)
 }
 
 /* Open a database file for reading and check for the version */
-dbFILE *open_db_write(const char *service, const char *filename, uint32 version)
+dbFILE *open_db_write(const char *service, const char *filename, int version)
 {
     dbFILE *f;
     int fd;

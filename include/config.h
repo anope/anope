@@ -33,11 +33,6 @@
 
 /******* OperServ configuration *******/
 
-/* How big a hostname list do we keep for clone detection?  On large nets
- * (over 500 simultaneous users or so), you may want to increase this if
- * you want a good chance of catching clones. */
-#define CLONE_DETECT_SIZE 16
-
 /* Define this to enable OperServ's svs commands (superadmin only). */
  #define USE_OSSVS 
 

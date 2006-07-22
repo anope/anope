@@ -7,6 +7,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 06/22 A Support startup flag.                                             [ #00]
 06/21 A Module version check.                                             [ #00]
 06/25 A Optional strict privmsg format.                                   [ #00]
+07/22 R Removed clone stuff.                                              [ #00]
 07/15 A Added BOT_LONG_IDENT for too long idents.                         [#538]
 07/10 A Moved ns_noop into core and assigned an NI_ flag.                 [#423]
 04/08 F Fixed Charybdis support on win32.                                 [#487]

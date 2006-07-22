@@ -255,14 +255,7 @@ int WallDrop;
 int WallForbid;
 int WallGetpass;
 int WallSetpass;
-int CheckClones;
-int CloneMinUsers;
-int CloneMaxDelay;
-int CloneWarningDelay;
-int KillClones;
 int AddAkiller;
-
-int KillClonesAkillExpire;
 
 int LimitSessions;
 int DefSessionLimit;
@@ -402,10 +395,6 @@ Directive directives[] = {
                       {PARAM_STRING, 0, &desc_ChanServ}}},
     {"ChanServAlias", {{PARAM_STRING, 0, &s_ChanServAlias},
                        {PARAM_STRING, 0, &desc_ChanServAlias}}},
-    {"CheckClones", {{PARAM_SET, PARAM_FULLONLY, &CheckClones},
-                     {PARAM_POSINT, 0, &CloneMinUsers},
-                     {PARAM_TIME, 0, &CloneMaxDelay},
-                     {PARAM_TIME, 0, &CloneWarningDelay}}},
     {"CSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAccessMax}}},
     {"CSAutokickMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAutokickMax}}},
     {"CSAutokickReason",
@@ -479,12 +468,9 @@ Directive directives[] = {
                        {PARAM_STRING, 0, &desc_HelpServAlias}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
-    {"KillClones", {{PARAM_SET, PARAM_FULLONLY, &KillClones}}},
     {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
     {"KillonSQline", {{PARAM_SET, PARAM_RELOAD, &KillonSQline}}},
     {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
-    {"KillClonesAkillExpire",
-     {{PARAM_TIME, PARAM_RELOAD, &KillClonesAkillExpire}}},
     {"LimitSessions", {{PARAM_SET, PARAM_FULLONLY, &LimitSessions}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
@@ -1313,17 +1299,6 @@ int read_config(int reload)
 
         if (MaxSessionKill && !SessionAutoKillExpiry)
             SessionAutoKillExpiry = 30 * 60;    /* 30 minutes */
-
-        if (!reload && CheckClones) {
-            printf
-                ("Warning: You have enabled both session limiting (config "
-                 "option: LimitSessions)\nand clone detection (config option: "
-                 "CheckClones). These two features do not\nfunction correctly "
-                 "when running together. Session limiting is preferred.\n\n");
-#ifndef NOT_MAIN
-            alog("*** Warning: Both LimitSessions and CheckClones are enabled " "- this is bad! Check your config.");
-#endif
-        }
     }
 
     if (s_BotServ) {

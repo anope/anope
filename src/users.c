@@ -620,11 +620,6 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         }
         user->vident = sstrdup(username);
 
-        if (CheckClones) {
-            /* Check to see if it looks like clones. */
-            check_clones(user);
-        }
-
         if (svid == 0) {
             display_news(user, NEWS_LOGON);
             display_news(user, NEWS_RANDOM);

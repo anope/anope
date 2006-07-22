@@ -439,11 +439,6 @@ E int   WallDrop;
 E int   WallForbid;
 E int   WallGetpass;
 E int   WallSetpass;
-E int   CheckClones;
-E int   CloneMinUsers;
-E int   CloneMaxDelay;
-E int   CloneWarningDelay;
-E int   KillClones;
 E int   AddAkiller;
 
 E int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS], int linenum, int reload, char *s);
@@ -476,9 +471,6 @@ E int NickServCoreNumber;
 
 E char **ChanServCoreModules;
 E int ChanServCoreNumber;
-
-
-E int   KillClonesAkillExpire;
 
 E int   LimitSessions;
 E int   DefSessionLimit;
@@ -951,16 +943,11 @@ E int add_szline(User * u, char *mask, const char *by,
 E void expire_szlines(void);
 E int check_szline(char *nick, char *ip);
 
-E void check_clones(User * user);
-
 E Server *server_global(Server * s, char *msg);
 
 E int OSOpersOnly; 
 E time_t DefContimer;
 E void runDefCon(void);
-
-E struct clone clonelist[CLONE_DETECT_SIZE];
-E struct clone warnings[CLONE_DETECT_SIZE];
 
 /**** process.c ****/
 

@@ -17,15 +17,6 @@
 
 /*************************************************************************/
 
-
-
-/* List of most recent users - statically initialized to zeros */
-struct clone clonelist[CLONE_DETECT_SIZE];
-
-/* Which hosts have we warned about, and when? This is used to keep us
- * from sending out notices over and over for clones from the same host. */
-struct clone warnings[CLONE_DETECT_SIZE];
-
 /* List of Services administrators */
 SList servadmins;
 /* List of Services operators */
@@ -57,7 +48,6 @@ char *defconReverseModes(const char *modes);
 
 
 #ifdef DEBUG_COMMANDS
-static int send_clone_lists(User * u);
 static int do_matchwild(User * u);
 #endif
 
@@ -89,7 +79,6 @@ void moduleAddOperServCmds(void) {
 #ifdef DEBUG_COMMANDS
     c = createCommand("LISTTIMERS", send_timeout_list,  is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
     c = createCommand("MATCHWILD",  do_matchwild,       is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("LISTCLONES", send_clone_lists,   is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
 #endif
 }
 
@@ -619,97 +608,6 @@ int nick_is_services_oper(NickCore * nc)
     return 0;
 }
 
-/*************************************************************************/
-/**************************** Clone detection ****************************/
-/*************************************************************************/
-
-/* We just got a new user; does it look like a clone?  If so, send out a
- * wallops.
- */
-
-void check_clones(User * user)
-{
-    int i, clone_count;
-    long last_time;
-
-    if (!CheckClones)
-        return;
-
-    if (clonelist[0].host)
-        free(clonelist[0].host);
-    i = CLONE_DETECT_SIZE - 1;
-    memmove(clonelist, clonelist + 1, sizeof(struct clone) * i);
-    clonelist[i].host = sstrdup(common_get_vhost(user));
-    last_time = clonelist[i].time = time(NULL);
-    clone_count = 1;
-    while (--i >= 0 && clonelist[i].host) {
-        if (clonelist[i].time < last_time - CloneMaxDelay)
-            break;
-        if (stricmp(clonelist[i].host, common_get_vhost(user)) == 0) {
-            ++clone_count;
-            last_time = clonelist[i].time;
-            if (clone_count >= CloneMinUsers)
-                break;
-        }
-    }
-    if (clone_count >= CloneMinUsers) {
-        /* Okay, we have clones.  Check first to see if we already know
-         * about them. */
-        for (i = CLONE_DETECT_SIZE - 1; i >= 0 && warnings[i].host; --i) {
-            if (stricmp(warnings[i].host, common_get_vhost(user)) == 0)
-                break;
-        }
-        if (i < 0
-            || warnings[i].time < user->my_signon - CloneWarningDelay) {
-            /* Send out the warning, and note it. */
-            anope_cmd_global(s_OperServ,
-                             "\2WARNING\2 - possible clones detected from %s",
-                             common_get_vhost(user));
-            alog("%s: possible clones detected from %s", s_OperServ,
-                 user->host);
-            i = CLONE_DETECT_SIZE - 1;
-            if (warnings[0].host)
-                free(warnings[0].host);
-            memmove(warnings, warnings + 1, sizeof(struct clone) * i);
-            warnings[i].host = sstrdup(common_get_vhost(user));
-            warnings[i].time = clonelist[i].time;
-            if (KillClones)
-                kill_user(s_OperServ, user->nick, "Clone kill");
-        }
-    }
-}
-
-/*************************************************************************/
-
-#ifdef DEBUG_COMMANDS
-
-/* Send clone arrays to given nick. */
-
-static int send_clone_lists(User * u)
-{
-    int i;
-
-    if (!CheckClones) {
-        notice_user(s_OperServ, u, "CheckClones not enabled.");
-        return MOD_CONT;
-    }
-
-    notice_user(s_OperServ, u, "clonelist[]");
-    for (i = 0; i < CLONE_DETECT_SIZE; i++) {
-        if (clonelist[i].host)
-            notice_user(s_OperServ, u, "    %10ld  %s", clonelist[i].time,
-                        clonelist[i].host ? clonelist[i].host : "(null)");
-    }
-    notice_user(s_OperServ, u, "warnings[]");
-    for (i = 0; i < CLONE_DETECT_SIZE; i++) {
-        if (clonelist[i].host)
-            notice_user(s_OperServ, u, "    %10ld  %s", warnings[i].time,
-                        warnings[i].host ? warnings[i].host : "(null)");
-    }
-    return MOD_CONT;
-}
-
-#endif                          /* DEBUG_COMMANDS */
 
 /*************************************************************************/
 /*********************** OperServ command functions **********************/

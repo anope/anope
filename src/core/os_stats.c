@@ -21,11 +21,6 @@ int do_stats(User * u);
 void get_operserv_stats(long *nrec, long *memuse);
 void myOperServHelp(User * u);
 
-#ifdef _WIN32
-extern MDE struct clone clonelist[CLONE_DETECT_SIZE];
-extern MDE struct clone warnings[CLONE_DETECT_SIZE];
-#endif
-
 /**
  * Create the command, and tell anope about it.
  * @param argc Argument count
@@ -390,20 +385,6 @@ void get_operserv_stats(long *nrec, long *memuse)
     long mem = 0, count = 0, mem2 = 0, count2 = 0;
     Akill *ak;
     SXLine *sx;
-
-    if (CheckClones) {
-        mem = sizeof(struct clone) * CLONE_DETECT_SIZE * 2;
-        for (i = 0; i < CLONE_DETECT_SIZE; i++) {
-            if (clonelist[i].host) {
-                count++;
-                mem += strlen(clonelist[i].host) + 1;
-            }
-            if (warnings[i].host) {
-                count++;
-                mem += strlen(warnings[i].host) + 1;
-            }
-        }
-    }
 
     count += akills.count;
     mem += akills.capacity;

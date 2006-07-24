@@ -1636,6 +1636,9 @@ int anope_event_error(char *source, int ac, char **av)
         if (debug) {
             alog("debug: %s", av[0]);
         }
+	if(strstr(av[0],"No matching link configuration")!=0) {
+	    alog("Error: Your IRCD's link block may not setup correctly, please check unrealircd.conf");
+	}
     }
     return MOD_CONT;
 }
@@ -2084,7 +2087,6 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("AP",       anope_event_null); addCoreMessage(IRCD,m);
     }
-
 
     /* The none token version of these is in messages.c */
     if (UseTokens) {

@@ -456,7 +456,7 @@ int anope_event_newmask(char *source, int ac, char **av)
         newhost = av[0];
     }
 
-    if (*newhost == '@')
+    if (newhost && *newhost == '@')
         newhost++;
 
     u->mode |= UMODE_VH;

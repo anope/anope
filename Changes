@@ -49,6 +49,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 07/20 F Removed bold chars from botserv langauge files.                   [#530]
 07/20 F Fixed win32 versions of db-merger.c and epona2anope.c.            [#536]
 07/20 F db-merger.c and epona2anope.c will now properly delete old dbs.   [ #00]
+08/02 F Fixed very nasty typecast. GCC Hardened should now work.          [#557]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

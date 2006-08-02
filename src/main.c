@@ -557,6 +557,7 @@ int main(int ac, char **av, char **envp)
 
     while (!quitting) {
         time_t t = time(NULL);
+        char *sgetbuf = NULL;
 
         if (debug >= 2)
             alog("debug: Top of main loop");
@@ -598,11 +599,13 @@ int main(int ac, char **av, char **envp)
         }
 
         waiting = 1;
-        i = (int) (long) sgets2(inbuf, sizeof(inbuf), servsock);
+        /* fixing this nasty, nasty typecast. why should we typecast
+           a char pointer to a long int? -Certus */
+        sgetbuf = sgets2(inbuf, sizeof(inbuf), servsock);
         waiting = 0;
-        if (i > 0) {
+        if (sgetbuf) {
             process();
-        } else if (i == 0) {
+        } else {
             int errno_save = errno;
             quitmsg = scalloc(BUFSIZE, 1);
             if (quitmsg) {

@@ -453,7 +453,7 @@ char *sgets2(char *buf, int len, ano_socket_t s)
     char *str = sgets(buf, len, s);
 
     if (!str || str == (char *) -1)
-        return NULL;
+        return str;
     str = buf + strlen(buf) - 1;
     if (*str == '\n')
         *str-- = 0;

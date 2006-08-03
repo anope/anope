@@ -229,9 +229,9 @@ unsigned long umodes[128] = {
     0, 0, 0,                    /* ^ _ ` */
     UMODE_a, UMODE_b, 0,        /* a b c */
     UMODE_d, 0, 0,              /* d e f */
-    0, 0, UMODE_i,              /* g h i */
+    UMODE_g, 0, UMODE_i,        /* g h i */
     0, 0, UMODE_l,              /* j k l */
-    UMODE_g, UMODE_n, UMODE_o,  /* m n o */
+    0, UMODE_n, UMODE_o,  /* m n o */
     0, 0, 0,                    /* p q r */
     0, 0, UMODE_u,              /* s t u */
     0, UMODE_w, UMODE_x,        /* v w x */

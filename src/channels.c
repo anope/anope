@@ -1368,8 +1368,13 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
     if (debug)
         alog("debug: Setting correct user modes for %s on %s (current status: %d, %sgiving modes)", user->nick, c->name, status, (give_modes ? "" : "not "));
 
+    /* Changed the second line of this if a bit, to make sure unregistered
+     * users can always get modes (IE: they always have autoop enabled). Before
+     * this change, you were required to have a registered nick to be able
+     * to receive modes. I wonder who added that... *looks at Rob* ;) -GD
+     */
     if (give_modes && (get_ignore(user->nick) == NULL)
-        && (user->na && !(user->na->nc->flags & NI_AUTOOP))) {
+        && (!user->na || !(user->na->nc->flags & NI_AUTOOP))) {
         if (ircd->owner && is_founder(user, ci))
             add_modes |= CUS_OWNER;
         else if ((ircd->protect || ircd->admin)

@@ -52,6 +52,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 08/02 F Fixed very nasty typecast. GCC Hardened should now work.          [#557]
 08/03 F Corrected usermodes for ratbox and shadow.                        [#558]
 08/04 F Various small fixes for Charybdis.                                [#561]
+08/04 F Autovoice for unregistered users works again.                     [#569]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

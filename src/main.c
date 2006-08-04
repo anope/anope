@@ -602,7 +602,7 @@ int main(int ac, char **av, char **envp)
            socket stuff -Certus */
         i = (int) (long) sgets2(inbuf, sizeof(inbuf), servsock);
         waiting = 0;
-        if ((i>0) || (i<(-1))) {
+        if ((i > 0) || (i < (-1))) {
             process();
         } else if (i == 0) {
             int errno_save = errno;

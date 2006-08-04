@@ -1803,8 +1803,8 @@ int charybdis_send_account(int argc, char **argv)
     return MOD_CONT;
 }
 
-#if 0
 /* XXX: We need a hook on /ns logout before this is useful! --nenolod */
+/* We have one now! -GD */
 int charybdis_send_deaccount(int argc, char **argv)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * SU %s",
@@ -1812,7 +1812,6 @@ int charybdis_send_deaccount(int argc, char **argv)
 
     return MOD_CONT;
 }
-#endif
 
 /**
  * Tell anope which function we want to perform each task inside of anope.
@@ -1914,7 +1913,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_ircd_cbmodes(myCbmodes);
     pmodule_ircd_cmmodes(myCmmodes);
     pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+    pmodule_ircd_useTSMode(1);
 
         /** Deal with modes anope _needs_ to know **/
     pmodule_invis_umode(UMODE_i);
@@ -1934,11 +1933,19 @@ int AnopeInit(int argc, char **argv)
     hk = createEventHook(EVENT_NICK_REGISTERED, charybdis_send_account);
     moduleAddEventHook(hk);
 
-#if 0
     /* XXX: It'd be nice if we could have an event like this, but it's not there yet :( */
+	/* It's there now! Trystan said so! -GD */
     hk = createEventHook(EVENT_NICK_LOGOUT, charybdis_send_deaccount);
     moduleAddEventHook(hk);
-#endif
 
     return MOD_CONT;
 }
+
+/* Clean up allocated things in here */
+void AnopeFini(void)
+{
+	if (UseTS6)
+		free(TS6SID);
+}
+
+/* EOF */

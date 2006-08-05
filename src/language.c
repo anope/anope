@@ -149,6 +149,30 @@ static void load_lang(int index, const char *filename)
 
 /*************************************************************************/
 
+/* Replace all %M's with "/msg " or "/" */
+void lang_sanitize()
+{
+    int i = 0, j = 0;
+    int len = 0;
+    char buf[256];
+    for (i = 0; i < NUM_LANGS; i++) {
+        for (j = 0; j < NUM_STRINGS; j++) {
+            if (strstr(langtexts[i][j], "%M")) {
+                len = strlen(langtexts[i][j]);
+                if (UseStrictPrivMsg) {
+                    langtexts[i][j] =
+                        strnrepl(langtexts[i][j], len, "%M", "/");
+                } else {
+                    langtexts[i][j] = realloc(langtexts[i][j], len + 5);
+                    langtexts[i][j] =
+                        strnrepl(langtexts[i][j], len + 5, "%M", "/msg ");
+                }
+            }
+        }
+    }
+}
+
+
 /* Initialize list of lists. */
 
 void lang_init()
@@ -198,6 +222,7 @@ void lang_init()
         if (!langtexts[i])
             langtexts[i] = langtexts[DEF_LANGUAGE];
     }
+    lang_sanitize();
 }
 
 /*************************************************************************/

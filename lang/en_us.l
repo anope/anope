@@ -141,7 +141,7 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Unknown command %s.
 UNKNOWN_COMMAND_HELP
-	Unknown command %s.  "/msg %s HELP" for help.
+	Unknown command %s.  "%M%s HELP" for help.
 SYNTAX_ERROR
 	Syntax: %s
 MORE_INFO

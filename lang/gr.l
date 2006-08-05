@@ -141,11 +141,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	’γνωστη εντολή %s.
 UNKNOWN_COMMAND_HELP
-	’γνωστη εντολή %s.  "%M%s HELP" για βοήθεια.
+	’γνωστη εντολή %s.  "%R%s HELP" για βοήθεια.
 SYNTAX_ERROR
 	Σύνταξη εντολής: %s
 MORE_INFO
-	%M%s HELP %s για περισσότερες πληροφορίες.
+	%R%s HELP %s για περισσότερες πληροφορίες.
 NO_HELP_AVAILABLE
 	Δεν υπάρχει διαθέσιμη βοήθεια για %s.
 OBSOLETE_COMMAND
@@ -188,7 +188,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	Αυτό το ψευδώνυμο δεν έχει κατοχυρωθεί.
 NICK_NOT_REGISTERED_HELP
-	Αυτό το ψευδώνυμο δεν έχει κατοχυρωθεί.  Γράψε %M%s HELP για περισσότερες πληροφορίες σχετικά για την κατοχύρωση ψευδωνύμου..
+	Αυτό το ψευδώνυμο δεν έχει κατοχυρωθεί.  Γράψε %R%s HELP για περισσότερες πληροφορίες σχετικά για την κατοχύρωση ψευδωνύμου..
 NICK_X_IS_SERVICES
 	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
@@ -223,10 +223,10 @@ CHAN_X_SUSPENDED
 	      Suspended: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Ο κωδικός αναγνώρισης απαιτείται για αυτή την εντολή.
-	Ξαναπροσπαθήστε αφού γράψετε %M%s IDENTIFY ^_κωδικός^_.
+	Ξαναπροσπαθήστε αφού γράψετε %R%s IDENTIFY ^_κωδικός^_.
 CHAN_IDENTIFY_REQUIRED
 	Ο κωδικός αναγνώρισης απαιτείται για αυτή την εντολή.
-	Ξαναπροσπαθήστε αφού γράψετε %M%s IDENTIFY %s ^_κωδικός^_.
+	Ξαναπροσπαθήστε αφού γράψετε %R%s IDENTIFY %s ^_κωδικός^_.
 	
 MAIL_DISABLED
 	Οι υπηρεσίες έχουν ρυθμιστεί να μην στέλνουν μήνυμα στη διεύθυνση.
@@ -297,10 +297,10 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Αυτό το ψευδώνυμο ανήκει σε κάποιον άλλον.  Παρακαλώ διάλεξε κάποιο άλλο.
-	(Αν αυτό είναι το ψευδώνυμό σου, γράψε %M%s IDENTIFY ^_κωδικό^_.)
+	(Αν αυτό είναι το ψευδώνυμό σου, γράψε %R%s IDENTIFY ^_κωδικό^_.)
 NICK_IS_SECURE
 	Αυτό το ψευδώνυμο είναι κατοχυρωμένο και προστατευμένο.  Αν αυτό είναι το
-	ψευδώνυμο σου, γράψε %M%s IDENTIFY ^_κωδικό^_.  Αλλιώς,
+	ψευδώνυμο σου, γράψε %R%s IDENTIFY ^_κωδικό^_.  Αλλιώς,
 	παρακαλώ διάλεξε κάποιο άλλο ψευδώνυμο.
 NICK_MAY_NOT_BE_USED
 	Αυτό το ψευδώνυμο δεν μπορεί να χρησιμοποιηθεί.  Παρακαλώ διάλεξε κάποιο άλλο.
@@ -349,12 +349,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	Παρακαλώ περίμενε %d δευτερόλεπτα και μετά ξαναχρησιμοποίησε την εντολή ομαδοποίησης.
 NICK_GROUP_CHANGE_DISABLED
-	Αυτό το ψευδώνυμο είναι ήδη κατοχυρωμένο; γράψε %M%s DROP αρχικά.
+	Αυτό το ψευδώνυμο είναι ήδη κατοχυρωμένο; γράψε %R%s DROP αρχικά.
 NICK_GROUP_SAME
 	Είσαι ήδη μέλος της ομάδας του %s.
 NICK_GROUP_TOO_MANY
 	Είναι πάρα πολλά ψευδώνυμα μέσα %s's ομάδα; κράτα μερικά και βγάλε κάποια.
-	Γράψε ^B%M%s HELP GLIST^B και %M%s HELP DROP 
+	Γράψε ^B%R%s HELP GLIST^B και %R%s HELP DROP 
 	για περισσότερες πληροφορίες.
 NICK_GROUP_JOINED
 	Είσαι τώρα μέσα στην ομάδα του %s.
@@ -371,7 +371,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Με αυτό το e-mail θα μπορείς να λάβεις τον κωδικό σου σε
 	περίπτωση που τον ξεχάσεις.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Γράψε %M%S SET EMAIL ^_e-mail^_ για να προσθέσεις το e-mail στις πληροφορίες του ψευδώνυμού σου.
+	Γράψε %R%S SET EMAIL ^_e-mail^_ για να προσθέσεις το e-mail στις πληροφορίες του ψευδώνυμού σου.
 	Η μυστικότητα είναι σεβαστή; αυτό το e-mail και ο κωδικός του δεν πρέπει να δωθεί σε
 	κανένα τρίτο πρόσωπο.
 	
@@ -435,7 +435,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE ^_number^_
 NICK_SET_LANGUAGE_UNKNOWN
-	’γνωστο νούμερο γλώσσας %d.  Γράψε %M%s HELP SET LANGUAGE για την λίστα με τις γλώσσες.
+	’γνωστο νούμερο γλώσσας %d.  Γράψε %R%s HELP SET LANGUAGE για την λίστα με τις γλώσσες.
 NICK_SET_LANGUAGE_CHANGED
 	Η γλώσσα άλλαξε σε Ελληνικά.
 
@@ -744,7 +744,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Αυτό το ψευδώνυμο δεν θα λήξει ποτέ.
 NICK_INFO_FOR_MORE
-	Για περισσότερες πληροφορίες, γράψε %M%s INFO %s ALL.
+	Για περισσότερες πληροφορίες, γράψε %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -797,7 +797,7 @@ NICK_NO_RECOVER_SELF
 	Δεν μπορείς να ψάχνεις τον εαυτό σου!
 NICK_RECOVERED
 	Έκανες kill το χρήστη που σου είχε το ψευδώνυμό σου.
-	%M%s RELEASE %s για να το πάρεις πίσω πριν γίνει αυτόματα μετά από ένα λεπτό.
+	%R%s RELEASE %s για να το πάρεις πίσω πριν γίνει αυτόματα μετά από ένα λεπτό.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -895,9 +895,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	This nick is awaiting an e-mail verification code before completing registration.
 NICK_ENTER_REG_CODE
-	A passcode has been sent to %s, please type %M%s confirm <passcode> to complete registration
+	A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration
 NICK_CONFIRM_NOT_FOUND
-	Registration step 1 may have expired, please use "%M%s register <password> <email>" first.
+	Registration step 1 may have expired, please use "%R%s register <password> <email>" first.
 NICK_CONFIRM_INVALID
 	Invalid passcode has been entered, please check the e-mail again, and retry
 NICK_REG_MAIL_SUBJECT
@@ -907,7 +907,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	You have requested to register the following nickname %s.
 NICK_REG_MAIL_LINE_2
-	Please type " %M%s confirm %s " to complete registration.
+	Please type " %R%s confirm %s " to complete registration.
 NICK_REG_MAIL_LINE_3
 	If you don't know why this mail is sent to you, please ignore it silently.
 NICK_REG_MAIL_LINE_4
@@ -1021,10 +1021,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Κανάλια τοπικά δεν μπορούν να κατοχυρωθούν.
 CHAN_MUST_REGISTER_NICK
-	Πρέπει να κατοχυρώσεις το ψευδώνυμό σου πρώτα.  Γράψε %M%s HELP για πληροφορίες σχετικά με τα ονόματα που έχουν κατοχυρωθεί..
+	Πρέπει να κατοχυρώσεις το ψευδώνυμό σου πρώτα.  Γράψε %R%s HELP για πληροφορίες σχετικά με τα ονόματα που έχουν κατοχυρωθεί..
 CHAN_MUST_IDENTIFY_NICK
 	Παρακαλώ κάνε την εντολή αναγνώρισης με τον %s πρώτα, χρησιμοποιώντας την εντολή:
-	%M%s IDENTIFY password
+	%R%s IDENTIFY password
 CHAN_MAY_NOT_BE_REGISTERED
 	Το κανάλι %s δεν μπορεί να κατοχυρωθεί.
 CHAN_ALREADY_REGISTERED
@@ -1249,7 +1249,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Δεν μπορείς να χρησιμοποιήσεις αυτή την εντολή. Χρησιμοποίησε την ACCESS εντολή αντί για αυτή.
-	Γράψε %M%s HELP ACCESS για περισσότερες πληροφορίες.
+	Γράψε %R%s HELP ACCESS για περισσότερες πληροφορίες.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1389,7 +1389,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Δεν μπορείς να χρησιμοποιήσεις αυτή την εντολή. 
 	Χρησιμοποίησε AOP, SOP και VOP εντολές αντί για την access.
-	Γράψε %M%s HELP command για περισσότερες πληροφορίες.
+	Γράψε %R%s HELP command για περισσότερες πληροφορίες.
 CHAN_ACCESS_DISABLED
 	Συγνώμη, η υπηρεσία για την εντολή access είναι εκτός λειτουργίας.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1490,7 +1490,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	Ο βαθμός για τον %s στο κανάλι %s άλλξε σε %d.
 CHAN_LEVELS_UNKNOWN
-	Η επιλογή %s δεν είναι γνωστή.  Γράψε %M%s HELP LEVELS DESC για τη λίστα με τισ αναλυτικές επιλογές.
+	Η επιλογή %s δεν είναι γνωστή.  Γράψε %R%s HELP LEVELS DESC για τη λίστα με τισ αναλυτικές επιλογές.
 CHAN_LEVELS_DISABLED
 	%s απενεργοποιήθηκαν στο κανάλι %s.
 CHAN_LEVELS_LIST_HEADER
@@ -1716,11 +1716,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	Έχεις %d νέα μηνύματα.
 MEMO_TYPE_READ_LAST
-	Γράψε %M%s READ LAST για να το διαβάσεις.
+	Γράψε %R%s READ LAST για να το διαβάσεις.
 MEMO_TYPE_READ_NUM
-	Γράψε %M%s READ %d για να διαβάσεις.
+	Γράψε %R%s READ %d για να διαβάσεις.
 MEMO_TYPE_LIST_NEW
-	Γράψε %M%s LIST NEW για να δεις την λίστα με τα μηνύματα.
+	Γράψε %R%s LIST NEW για να δεις την λίστα με τα μηνύματα.
 MEMO_AT_LIMIT
 	Προειδοποίηση: Έχει φτάσει στο μέγιστο νούμερο μηνυμάτων (%d).  Δεν θα λάβεις καινούργια μηνύματα αν δεν σβήσεις μερικά από τα παλιά που έχεις.
 MEMO_OVER_LIMIT
@@ -1731,10 +1731,10 @@ MEMO_X_ONE_NOTICE
 	There is %d memo on channel %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	There is a new memo on channel %s.
-	Type %M%s READ %s %d to read it.
+	Type %R%s READ %s %d to read it.
 MEMO_NEW_MEMO_ARRIVED
 	Έχεις ένα νέο μήνυμα από %s.
-	Γράψε %M%s READ %d για να το διαβάσεις.
+	Γράψε %R%s READ %d για να το διαβάσεις.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1782,13 +1782,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	Ο/η %s δεν έχει κανένα νέο μήνυμα.
 MEMO_LIST_MEMOS
-	Μήνυμα για τον %s.  Για να το διαβάσεις, γράψε: %M%s READ num
+	Μήνυμα για τον %s.  Για να το διαβάσεις, γράψε: %R%s READ num
 MEMO_LIST_NEW_MEMOS
-	Νέα μηνύματα για τον %s.  Για να τα διαβάσεις, γράψε: %M%s READ num
+	Νέα μηνύματα για τον %s.  Για να τα διαβάσεις, γράψε: %R%s READ num
 MEMO_LIST_CHAN_MEMOS
-	Μηνύματα για τον %s.  Για να τα διαβάσεις, γράψε: %M%s READ %s num
+	Μηνύματα για τον %s.  Για να τα διαβάσεις, γράψε: %R%s READ %s num
 MEMO_LIST_CHAN_NEW_MEMOS
-	Νέα μηνύματα για το %s.  Για να τα διαβάσεις, γράψε: %M%s READ %s num
+	Νέα μηνύματα για το %s.  Για να τα διαβάσεις, γράψε: %R%s READ %s num
 MEMO_LIST_HEADER
 	 Νούμερο  Αποστολέας            Ημερομηνία/Ώρα
 MEMO_LIST_FORMAT
@@ -1798,9 +1798,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [κανάλι] {list | LAST | NEW}
 MEMO_HEADER
-	Μήνυμα %d από το %s (%s).  Για να το σβήσεις, γράψε: %M%s DEL %d
+	Μήνυμα %d από το %s (%s).  Για να το σβήσεις, γράψε: %R%s DEL %d
 MEMO_CHAN_HEADER
-	Μήνυμα %d από %s (%s).  Για να το σβήσεις, γράψε: %M%s DEL %s %d
+	Μήνυμα %d από %s (%s).  Για να το σβήσεις, γράψε: %R%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -2016,7 +2016,7 @@ BOT_DOES_NOT_EXIST
 	Το Bot %s δεν υπάρχει.
 BOT_NOT_ASSIGNED
 	Πρέπει να κάνεις assign στο bot για να μπεί στο κανάλι.
-	Γράψε %M%S HELP ASSIGN για περισσότερες πληροφορίες.
+	Γράψε %R%S HELP ASSIGN για περισσότερες πληροφορίες.
 BOT_NOT_ON_CHANNEL
 	Το Bot δεν είναι στο κανάλι %s.
 	
@@ -2194,7 +2194,7 @@ BOT_SET_DISABLED
 	Συγνώμη, η υπηρεσία bot είναι απενεργοποιημένη.
 BOT_SET_UNKNOWN
 	’γνωστη επιλογή %s.
-	Γράψε %M%S HELP SET για περισσότερες πληροφορίες.
+	Γράψε %R%S HELP SET για περισσότερες πληροφορίες.
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2259,7 +2259,7 @@ BOT_KICK_DISABLED
 	Συγνώμη, η υπηρεσία kicker είναι απενεργοποιημένη.
 BOT_KICK_UNKNOWN
 	’γνωστη επιλογή %s.
-	Γράψε %M%S HELP KICK για περισσότερες πληροφορίες.
+	Γράψε %R%S HELP KICK για περισσότερες πληροφορίες.
 BOT_KICK_BAD_TTB
 	%s δεν μπορεί να πάρει τόσο χρόνο τo ban.
 
@@ -3036,7 +3036,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Module: %s Version: %s Author: %s loaded: %s
 OPER_MODULE_CMD_LIST
-	Providing command: %M%s %s
+	Providing command: %R%s %s
 OPER_MODULE_MSG_LIST
 	Providing IRCD handler for: %s
 OPER_MODULE_NO_LIST
@@ -3391,24 +3391,24 @@ HELP_HELP
 	τις υπηρεσίες.  Για περισσότερες βοήθειες εκτός του HELP 
 	θα βρείτε στις παρακάτω (υπο)υπηρεσίες με περισσότερη αναλυτικότητ:
 
-	%M%s HELP
+	%R%s HELP
 	     για πληροφορίες σχετικά με την κατοχύρωση ψευδώνυμων
 
-	%M%s HELP
+	%R%s HELP
 	     για πληροφορίες σχετικά με την κατοχύρωση και την διαχείρηση
 	     των καναλιών.
 
-	%M%s HELP
+	%R%s HELP
 	     για πληροφορίες σχετικά με την αποστολή μηνυμάτων στους off-line χρήστες
 
 HELP_HELP_BOT
 
-	%M%s HELP
+	%R%s HELP
 	     για πληροφορίες σχετικά με τις επιλογές του bot στο κανάλι σας
 
 HELP_HELP_HOST
 
-	%M%s HELP
+	%R%s HELP
 	     for information on setting up nick vHosts
 
 ###########################################################################
@@ -3474,9 +3474,9 @@ NICK_HELP
 	O %S σας επιτρέπει να κατοχυρώσετε ένα ψευδώνυμο,
 	εμποδίζοντας έτσι άλλους χρήστες να το χρησιμοποιούν.
 	Οι παρακάτω εντολές, επιτρέπουν την κατοχύρωση και τη διαχείρηση των
-	ψευδωνύμων; για να χρησιμοποιήσετε αυτά, γράψτε %M%S ^_command^_.
+	ψευδωνύμων; για να χρησιμοποιήσετε αυτά, γράψτε %R%S ^_command^_.
 	Για περισσότερες πληροφορίες σε μια συγκεκριμένη εντολή,γράψτε
-	%M%S HELP ^_command^_.
+	%R%S HELP ^_command^_.
 	
 NICK_HELP_FOOTER
 	ΠΑΡΑΤΗΡΗΣΗ: Αυτή η υπηρεσία σκοπεύει να παρέχει ένα τρόπο
@@ -3523,7 +3523,7 @@ NICK_HELP_REGISTER
 	και μπορούν να επιτρέπουν την κατοχύρωση άλλων ψευδονύμων αργότερα 
 	με μοίρασμα ίδιων σεταρισμάτων, ίδιων μηνυμάτων και ίδιων
 	δικαιωμάτων στα κανάλια. Για περισσότερες πληροφορίες για αυτή 
-	τη μελλοντική εντολή, γράψε %M%S HELP GROUP.
+	τη μελλοντική εντολή, γράψε %R%S HELP GROUP.
 	    
 NICK_HELP_GROUP
 	Σύνταξη: GROUP στόχος κωδικός
@@ -3546,7 +3546,7 @@ NICK_HELP_GROUP
 	έχεις κατοχυρώσει κάποιο ψευδώνυμο ακόμα. Αν το ψευδώνυμο είναι
 	κατοχυρωμένο, θα πρέπει να κάνεις εντολή αναγνώρισης πρώτα και 
 	μετά να χρησιμοποιήσεις αυτή την εντολή. Γράψε
-	%M%S HELP IDENTIFY για περισσότερες πληροφορίες. Αυτό το 
+	%R%S HELP IDENTIFY για περισσότερες πληροφορίες. Αυτό το 
 	κομμάτι μπορεί να μην υπάρχει στο δικτυό σου.
 	    
 	Είναι προτιμότερο να χρησιμοποιήσεις αυτή την εντολή με μη-κατοχυρωμένα  
@@ -3595,7 +3595,7 @@ NICK_HELP_DROP
 	
 	Για να χησιμοποιήσεις αυτή την εντολή, πρέπει πρώτα να κάνεις εντολή 
 	αναγνώρισης με τον κωδικό σου για περισσότερες
-	with your password (%M%S HELP IDENTIFY for more
+	with your password (%R%S HELP IDENTIFY for more
 	πληροφορίες.)
 	    
 NICK_HELP_ACCESS
@@ -3638,16 +3638,16 @@ NICK_HELP_SET
 	    KILL       Ενεργοποιεί/απενεργοποιεί την προστασία με αποσύνδεση
 	    SECURE     Ενεργοποιεί/απενεργοποιεί τη λειτουργία ασφάλειας
 	    PRIVATE    Εμποδίζει το ψευδώνυμό σας να εμφανίζεται
-	                   με την εντολή  %M%S LIST
+	                   με την εντολή  %R%S LIST
 	    HIDE       Αποκρύπτει συγκεκριμένα τμήματα πληροφοριών του ψευδωνύμου
 	    MSG        Αλλάζει την μέθοδο επικοινωνίας με τις υπηρεσίες
 	    AUTOOP     Should services op you automatically.    
 	
 	Για να χρησιμοποιήσετε αυτή την εντολή, πρέπει πρώτα να
 	αναγνωριστείτε με τον κωδικό σας (για περισσότερες πληροφορίες,
-	%M%S HELP IDENTIFY).
+	%R%S HELP IDENTIFY).
 	
-	Πληκτρολογήστε %M%S HELP SET επιλογή για περισσότερες πληροφορίες
+	Πληκτρολογήστε %R%S HELP SET επιλογή για περισσότερες πληροφορίες
 	σε μία συγκεκριμένη επιλογή.
 
 NICK_HELP_SET_DISPLAY
@@ -3775,12 +3775,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   %M%S LIST
+	                   %R%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type %M%S HELP SASET option for more information
+	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3926,7 +3926,7 @@ NICK_HELP_RECOVER
 	λεπτά για να βεβαιώσει το ότι ο άλλος χρήστης δε θα
 	επανασυνδεθεί άμεσα. Μετά από τα τρία λεπτά, μπορείτε να
 	ξαναχρησιμοποιήσετε το ψευδώνυμό σας.  Εναλλακτικά,
-	χρησιμοποιήστε την εντολή RELEASE (%M%S HELP RELEASE)
+	χρησιμοποιήστε την εντολή RELEASE (%R%S HELP RELEASE)
 	για να χρησιμοποιήσετε το ψευδώνυμό σας νωρίτερα.
 	
 	Για να χρησιμοποιήσετε την εντολή RECOVER για ένα
@@ -4059,7 +4059,7 @@ NICK_HELP_SENDPASS
 NICK_SERVADMIN_HELP
 	Οι Services admins (επικεφαλείς) μπορούν να διαγράψουν ένα ψευδώνυμο χωρίς να
 	χρειαστεί να κάνουν εντολή αναγνώρισης και καν αλλαγή ψευδώνυμου, και μπορούν να
-	δουν την  λίστα access  για κάθε ψευδώνυμο (%M%S ACCESS LIST nick).
+	δουν την  λίστα access  για κάθε ψευδώνυμο (%R%S ACCESS LIST nick).
 	
 NICK_SERVADMIN_HELP_LOGOUT
 	Σύνταξη: LOGOUT [ψευδώνυμο [REVALIDATE]]
@@ -4280,8 +4280,8 @@ CHAN_HELP
 	κανάλια, με το να περιορίζει τις αρμοδιότητες των
 	διαχειριστών καναλιών.  Οι διαθέσιμες εντολές, βρίσκονται
 	παρακάτω.  Για να τις χρησιμοποιήσετε, πληκτρολογήστε
-	%M%S εντολή.  Για περισσότερες πληροφορίες σε μία
-	συγκεκριμένη εντολή, πληκτρολογήστε %M%S HELP εντολή.
+	%R%S εντολή.  Για περισσότερες πληροφορίες σε μία
+	συγκεκριμένη εντολή, πληκτρολογήστε %R%S HELP εντολή.
 	 
 	
 CHAN_HELP_EXPIRES
@@ -4307,12 +4307,12 @@ CHAN_HELP_REGISTER
 	ρυθμίσεις του;  Ο	%S επίσης θα του δώσει αυτόματα
 	αρμοδιότητες ιδρυτή και διαχειριστή καναλιού, με την είσοδό
 	του στο κανάλι.Δείτε την εντολή ACCESS command.
-	(%M%S HELP ACCESS) για πληροφορίες σχετικά με την παροχή μέρους των
+	(%R%S HELP ACCESS) για πληροφορίες σχετικά με την παροχή μέρους των
 	αρμοδιοτήτων αυτών, σε άλλους χρήστες του καναλιού.
 	    
 	ΣΗΜΕΙΩΣΗ: Για να κατοχυρώσετε ένα κανάλι, πρέπει να έχετε
 	πρώτα κατοχυρώσει το ψευδώνυμό σας.  Αν δεν το έχετε κάνει,
-	%M%s HELP για περισσότερες πληροφορίες σχετικά.
+	%R%s HELP για περισσότερες πληροφορίες σχετικά.
 
 CHAN_HELP_IDENTIFY
 	Σύνταξη: IDENTIFY κανάλι κωδικός
@@ -4368,7 +4368,7 @@ CHAN_HELP_SET
 	    TOPICLOCK     Το Topic μπορεί να αλλάξει με την εντολή TOPIC
 	    XOP           Αν είναι ON δουλεύει με AOP/SOP,αν είναι off με access
 	
-	Γράψε %M%S HELP επιλογή για περισσότερες πληροφορίες
+	Γράψε %R%S HELP επιλογή για περισσότερες πληροφορίες
 	για την κάθε εντολή.
 
 CHAN_HELP_SET_FOUNDER
@@ -4501,7 +4501,7 @@ CHAN_HELP_SET_PRIVATE
 	
 	Ενεργοποιεί ή απενεργοποιεί την επιλογή private για ένα κανάλι.
 	Όταν ενεργοποιείται η private εντολή,  το κανάλι δε συμπεριλαμβάνεται
-	στη λίστα που προκύπτει από την εντολή %M%S LIST.
+	στη λίστα που προκύπτει από την εντολή %R%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
 	Σύνταξη: SET κανάλι RESTRICTED {ON | OFF}
@@ -4546,7 +4546,7 @@ CHAN_HELP_SET_SIGNKICK
 	
 	Αν χρησιμοποιείς LEVEL, αυτοί που έχουν μεγαλύτερη level ή ίση 
 	με την SIGNKICK level του καναλιού δεν θα έχουν 
-	kicks signed. Δες %M%S HELP LEVELS για περισσότερες πληροφορίες. 
+	kicks signed. Δες %R%S HELP LEVELS για περισσότερες πληροφορίες. 
 
 CHAN_HELP_SET_XOP
 	Σύνταξη: SET κανάλι XOP {ON | OFF}
@@ -4608,8 +4608,8 @@ CHAN_HELP_AOP
 	
 	Αυτή η εντολή μπορεί να είναι απενεργοποιημένη από το κανάλι σας, και
 	σε αυτή την περίπτωση θα χρησιμοποιήσετε την εντολή access list. Δείτε 
-	%M%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
-	και %M%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
+	%R%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
+	και %R%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
 	access list και xOP list σύστημα.
 
 CHAN_HELP_HOP
@@ -4648,8 +4648,8 @@ CHAN_HELP_HOP
 	
 	Αυτή η εντολή μπορεί να είναι απενεργοποιημένη από το κανάλι σας, και
 	σε αυτή την περίπτωση θα χρησιμοποιήσετε την εντολή access list. Δείτε 
-	%M%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
-	και %M%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
+	%R%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
+	και %R%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
 	access list και xOP list σύστημα.
 
 CHAN_HELP_SOP
@@ -4688,8 +4688,8 @@ CHAN_HELP_SOP
 	
 	Αυτή η εντολή μπορεί να είναι απενεργοποιημένη από το κανάλι σας, και
 	σε αυτή την περίπτωση θα χρησιμοποιήσετε την εντολή access list. Δείτε 
-	%M%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
-	και %M%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
+	%R%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
+	και %R%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
 	access list και xOP list σύστημα.
 
 CHAN_HELP_VOP
@@ -4727,8 +4727,8 @@ CHAN_HELP_VOP
 	
 	Αυτή η εντολή μπορεί να είναι απενεργοποιημένη από το κανάλι σας, και
 	σε αυτή την περίπτωση θα χρησιμοποιήσετε την εντολή access list. Δείτε 
-	%M%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
-	και %M%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
+	%R%S HELP ACCESS για πληροφορίες σχετικά με την εντολή access list,
+	και %R%S HELP SET XOP για να ξέρετε πως θα επιλέξετε ανάμεσα στο 
 	access list και xOP list σύστημα.
 
 CHAN_HELP_ACCESS
@@ -4741,7 +4741,7 @@ CHAN_HELP_ACCESS
 	καθορίζει ποιοι χρήστες θα έχουν op στο κανάλι ή
 	access στις εντολές μέσω του %S για το κανάλι.  Διαφορετικός βαθμός
 	του χρήστη από την access που έχει,διαφορετικά δικαιώματα θα έχει.
-	%M%S HELP ACCESS LEVELS για περισσότερες και συγκεκριμένες
+	%R%S HELP ACCESS LEVELS για περισσότερες και συγκεκριμένες
 	πληροφορίες.  Οποιοδήποτε ψευδώνυμο που δεν είναι στην λίστα access έχει
 	τυπικά access 0, γιατί τα levels από default δεν δίνουν δικαιώματα στο κανάλι
 	όποιος έχει 0 να κάνει κάτι στο κανάλι, με access 0 είναι στο auto-deop.
@@ -4785,7 +4785,7 @@ CHAN_HELP_ACCESS_LEVELS
 	        <0   Δεν μπορεί να πάρει op.
 	
 	Αυτοί οι βαθμοί (levels) μπορούν να αλλαχτούν, ή να προσθέσετε νέα δικά σας,
-	χρησιμοποιώντας την εντολή LEVELS; γράψτε %M%S HELP LEVELS για
+	χρησιμοποιώντας την εντολή LEVELS; γράψτε %R%S HELP LEVELS για
 	πληροφορίες.
 
 CHAN_HELP_AKICK
@@ -5049,7 +5049,7 @@ CHAN_HELP_TOPIC
 	Ζητάς από τον %S να βάλει το topic που του έχεις πει.
 	Αν το topic δεν δίνεται, θα βάλει άδειο topic
 	στο κανάλι. Αυτή η εντολή είναι χρήσιμη αν έχεις κάνει στο κανάλι
-	SET TOPICLOCK. Δες %M%S HELP SET TOPICLOCK
+	SET TOPICLOCK. Δες %R%S HELP SET TOPICLOCK
 	για περισσότερες πληροφορίες.
 	
 	Από default, χρησιμοποείται μόνο από αυτούς που έχουν founder access στο
@@ -5259,7 +5259,7 @@ MEMO_HELP_OPER
 	not used.
 MEMO_HELP_FOOTER
 	
-	Γράψτε %M%S HELP εντολή για βοήθεια σε
+	Γράψτε %R%S HELP εντολή για βοήθεια σε
 	οποιαδήποτε από τις παραπάνω εντολές.
 	
 	(*) Εξ'ορισμού, κάθε χρήστης με ελάχιστο επίπεδο πρόσβασης
@@ -5335,7 +5335,7 @@ MEMO_HELP_SET
 	    LIMIT       Αλλάζει το μέγιστο αριθμό μηνυμάτων που
 	                    μπορείτε να δεχτείτε
 	
-	Γράψτε %M%S HELP SET επιλογή για περισσότερες πληροφορίες
+	Γράψτε %R%S HELP SET επιλογή για περισσότερες πληροφορίες
 	σε μια συγκεκριμένη επιλογή.
 
 MEMO_HELP_SET_NOTIFY
@@ -6176,8 +6176,8 @@ BOT_HELP
 	να ρυθμίσουν bots ή για δίκτυα που δεν επιτρέπουν οι χρήστες να έχουν
 	ικά τους bots για ασφάλεια. 
 	Διαθέσημες εντολές είναι οι επόμενες, για να τις δείτε γράψτε
-	%M%S command.Για περισσότερες πληροφορίες σε συγκεκριμένες
-	εντολές γράψτε %M%S HELP command. 
+	%R%S command.Για περισσότερες πληροφορίες σε συγκεκριμένες
+	εντολές γράψτε %R%S HELP command. 
 	    
 BOT_HELP_FOOTER
 	Το Bot θα μπεί στο κανάλι όταν είναι τουλάχιστον μέσα
@@ -6220,7 +6220,7 @@ BOT_HELP_SET
 	    FANTASY          Ενεργοποίηση εντολών fantaisist
 	    SYMBIOSIS        Επιτρέπεται στο bot να συμπεριφέρεται σαν πραγματικό bot
 	
-	Γράψε %M%S HELP SET επιλογή για περισσότερες πληροφορίες
+	Γράψε %R%S HELP SET επιλογή για περισσότερες πληροφορίες
 	για μια συγκεκριμένη επιλογή.
 	
 	Σημείωση: η access σε αυτή την εντολή διευθύνεται από την
@@ -6294,7 +6294,7 @@ BOT_HELP_KICK
 	    UNDERLINES    Ρυθμίζει το bot αν θα κάνει kick αυτούς που
 	      γράφουν με υπογραμμισμένους χαρακτήρες
 	
-	Γράψε %M%S HELP KICK επιλογή για περισσότερες πληροφορίες
+	Γράψε %R%S HELP KICK επιλογή για περισσότερες πληροφορίες
 	σε συγκεκριμένες εντολές.
 	
 	Σημείωση: η access σε αυτή την εντολή ελέγχεται από την
@@ -6390,7 +6390,7 @@ BOT_HELP_KICK_BADWORDS
 	το bot θα κάνει kick τους χρήστες που λένε αυτές τις κακές λέξεις στα κανάλια.
 	
 	Μπορείς να βάλεις μια λίστα με τις κακές λέξεις κάνοντας την εντολή
-	BADWORDS. Γράψε %M%S HELP BADWORDS για
+	BADWORDS. Γράψε %R%S HELP BADWORDS για
 	περισσότερες πληροφορίες.
 
 	Το ttb είναι το νούμερο με το οποίο θα γίνεται ο χρήστης αρχικά kick
@@ -6406,7 +6406,7 @@ BOT_HELP_BADWORDS
 	Αλλάζει την bad words λίστα του καναλιού. Η λίστα bad
 	words δείχνει ποιές λέξεις είναι να γίνεται το kick,
 	όταν το bad words kick είναι ενεργοποιημένο. Για περισσότερες πληροφορίες,
-	γράφτε %M%S HELP KICK BADWORDS.
+	γράφτε %R%S HELP KICK BADWORDS.
 	
 	Η εντολή BADWORDS ADD προσθέτει μια κακιά λέξη στην λίστα
 	badword. Αν πεί αυτη τη λέξη (SINGLE), τότε θα γίνεται
@@ -6517,9 +6517,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s not found in the nickserv db.
 HOST_SET_SYNTAX
-	Syntax %M%s set <nick> <hostmask>.
+	Syntax %R%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Syntax %M%s setall <nick> <hostmask>.
+	Syntax %R%s setall <nick> <hostmask>.
 HOST_DENIED
 	Access Denied.
 HOST_NOT_ASSIGNED
@@ -6535,7 +6535,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %M%s del <nick>.
+	Syntax: %R%s del <nick>.
 
 ###########################################################################
 #

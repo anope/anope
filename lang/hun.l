@@ -149,11 +149,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Ismeretlen Parancs %s.
 UNKNOWN_COMMAND_HELP
-	Ismeretlen parancs %s. Írd be: "%M%s HELP".
+	Ismeretlen parancs %s. Írd be: "%R%s HELP".
 SYNTAX_ERROR
 	Szintaktika: %s
 MORE_INFO
-	%M%s HELP %s bõvebb információért.
+	%R%s HELP %s bõvebb információért.
 NO_HELP_AVAILABLE
 	Nincs ezzel kapcsolatban segítség: %s.
 OBSOLETE_COMMAND
@@ -198,7 +198,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	A neved még nem regisztrált.
 NICK_NOT_REGISTERED_HELP
-	A neved még nem regisztrált.  Segítség: %M%s HELP.
+	A neved még nem regisztrált.  Segítség: %R%s HELP.
 NICK_X_IS_SERVICES
 	A %s nick a Hálózat Szervízének egysége.
 NICK_X_NOT_REGISTERED
@@ -233,10 +233,10 @@ CHAN_X_SUSPENDED
 	 Felfüggesztve: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Jelszavas azonositás szükséges ehhez a parancshoz.
-	Próbáld újra miután beírtad: %M%s IDENTIFY jelszó.
+	Próbáld újra miután beírtad: %R%s IDENTIFY jelszó.
 CHAN_IDENTIFY_REQUIRED
 	Jelszavas azonositás szükséges ehhez a parancshoz.
-	Próbáld újra miután beírtad: %M%s IDENTIFY %s jelszó.
+	Próbáld újra miután beírtad: %R%s IDENTIFY %s jelszó.
 	
 MAIL_DISABLED
 	A Szervíz úgy van beállítva, hogy nem küld mailt.
@@ -307,10 +307,10 @@ END_OF_ANY_LIST
 # Automatikus üzenetek
 NICK_IS_REGISTERED
 	Ez a nick már regisztrált.  Kérlek válassz másikat.
-	Ha ez a te nicked, akkor %M%s IDENTIFY jelszó! 
+	Ha ez a te nicked, akkor %R%s IDENTIFY jelszó! 
 NICK_IS_SECURE
 	Ez a nick regisztrált és védett.  Ha ez a te nicked,
-	akkor %M%s IDENTIFY jelszó!
+	akkor %R%s IDENTIFY jelszó!
 	Különben válassz másik nicknevet!
 NICK_MAY_NOT_BE_USED
 	Ez a nicknév nem használható. Kérlek válassz másikat!
@@ -357,12 +357,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	Kérlek várj %d másodpercet, mielõtt ismét használod a GROUP parancsot.
 NICK_GROUP_CHANGE_DISABLED
-	A nicked már regisztrált; írd be %M%s DROP elõször.
+	A nicked már regisztrált; írd be %R%s DROP elõször.
 NICK_GROUP_SAME
 	Már tagja vagy ennek a csoportnak: %s.
 NICK_GROUP_TOO_MANY
 	Túl sok nick van a %s csoportban; listázd  és dropolj párat.
-	Írd: %M%s HELP GLIST és %M%s HELP DROP
+	Írd: %R%s HELP GLIST és %R%s HELP DROP
 	bõvebb információkért.
 NICK_GROUP_JOINED
 	Mostantól tagja vagy a %scsoportnak.
@@ -377,7 +377,7 @@ NICK_IDENTIFY_SUCCEEDED
 NICK_IDENTIFY_EMAIL_REQUIRED
 	Be kell állítanod egy E-mail címet a nicknevedhez.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Írd be: %M%S SET EMAIL e-mail 
+	Írd be: %R%S SET EMAIL e-mail 
 	Az email címed nem lesz kiadva harmadik személynek.
 NICK_ALREADY_IDENTIFIED
 	Már be vagy azonosítva. :-)
@@ -436,7 +436,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE szám
 NICK_SET_LANGUAGE_UNKNOWN
-	Ismeretlen nyelvi sorszám %d %M%s HELP SET LANGUAGE
+	Ismeretlen nyelvi sorszám %d %R%s HELP SET LANGUAGE
 NICK_SET_LANGUAGE_CHANGED
 	Új nyelvezet: Magyar.
 
@@ -743,7 +743,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Ez a nicknév nem fog elévülni.
 NICK_INFO_FOR_MORE
-	Bõvebb információkért, írd be: %M%s INFO %s ALL.
+	Bõvebb információkért, írd be: %R%s INFO %s ALL.
 
 # LIST válaszok
 NICK_INFO_SUSPENDED
@@ -796,7 +796,7 @@ NICK_NO_RECOVER_SELF
 	Nem használhatod az aktiv nickedre!
 NICK_RECOVERED
 	A nevedet használó user killve lett.
-	Írd be:%M%s RELEASE %s és visszaszerzed a nicked.
+	Írd be:%R%s RELEASE %s és visszaszerzed a nicked.
 
 # RELEASE válaszok
 NICK_RELEASE_SYNTAX
@@ -888,9 +888,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	A nick az emailben elküldött kóddal való aktíválásra vár a regisztráció befejezéséhez.
 NICK_ENTER_REG_CODE
-	A kód a %s címre lett küldve, írd be %M%s confirm <kód> a regisztráció befejezéséhez.
+	A kód a %s címre lett küldve, írd be %R%s confirm <kód> a regisztráció befejezéséhez.
 NICK_CONFIRM_NOT_FOUND
-	Regisztráció 1 lépése lehet, hogy elévült, írd be: "%M%s register <jelszó> <email>".
+	Regisztráció 1 lépése lehet, hogy elévült, írd be: "%R%s register <jelszó> <email>".
 NICK_CONFIRM_INVALID
 	Érvénytelen kód, ellenõrizze az e-mailben, majd próbálja újra.
 NICK_REG_MAIL_SUBJECT
@@ -900,7 +900,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	Te kérelmeztad a %s nick regisztrálását.
 NICK_REG_MAIL_LINE_2
-	Írd be: " %M%s confirm %s ", hogy befejezd a regisztrációt.
+	Írd be: " %R%s confirm %s ", hogy befejezd a regisztrációt.
 NICK_REG_MAIL_LINE_3
 	Ha nem tudod miért kaptad a levelet, kérlek hagyd figyelmen kívül!
 NICK_REG_MAIL_LINE_4
@@ -1014,10 +1014,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Helyi csatornák nem regisztrálhatók.
 CHAN_MUST_REGISTER_NICK
-	Elõször regisztrálnod kell a nevedet. %M%s help
+	Elõször regisztrálnod kell a nevedet. %R%s help
 CHAN_MUST_IDENTIFY_NICK
 	Kérlek azonosíts a %s-be, használd ezt a parancsot:
-	%M%s IDENTIFY jelszó
+	%R%s IDENTIFY jelszó
 CHAN_MAY_NOT_BE_REGISTERED
 	Ez a csatorna %s nem regisztrálható. 
 CHAN_ALREADY_REGISTERED
@@ -1242,7 +1242,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Nem használhatod a parancsot. Használd az ACCESS parancsot.
-	Bõvebb információ: %M%s HELP ACCESS
+	Bõvebb információ: %R%s HELP ACCESS
 
 # AOP üzenetek
 CHAN_AOP_SYNTAX
@@ -1382,9 +1382,9 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Nem használhatod ezt a parancsot. 
 	Használd az AOP, SOP és VOP parancsokat helyette.
-	Írd be: %M%s HELP parancs bõvebb információért.
+	Írd be: %R%s HELP parancs bõvebb információért.
 	Ha ki akarod kapcsolni az xOP rendszert, akkor írd be:
-	%MChanServ set #szobanév xop off.
+	%RChanServ set #szobanév xop off.
 CHAN_ACCESS_DISABLED
 	A csatorna hozzáférési listájának módosítása szünetel.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1487,7 +1487,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	%s szintjének új értéke a (%s) csatornán: %d.
 CHAN_LEVELS_UNKNOWN
-	%s beállítás nem ismert. Írd be %M%s HELP LEVELS DESC
+	%s beállítás nem ismert. Írd be %R%s HELP LEVELS DESC
 	az érvényes beállítások listájának megtekintéséhez.  
 CHAN_LEVELS_DISABLED
 	%s letiltva a (%s) csatornán.
@@ -1712,11 +1712,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	%d darab új üzeneted van.
 MEMO_TYPE_READ_LAST
-	Használd a %M%s READ LAST parancsot.
+	Használd a %R%s READ LAST parancsot.
 MEMO_TYPE_READ_NUM
-	Használd a %M%s READ %d parancsot.
+	Használd a %R%s READ %d parancsot.
 MEMO_TYPE_LIST_NEW
-	Használd a: %M%s LIST NEW parancsot
+	Használd a: %R%s LIST NEW parancsot
 MEMO_AT_LIMIT
 	Figyelem: Fogadható üzenetek maximális száma (%d).
 	Nem fogadhatsz több üzenetet, amíg nem törölsz néhányat.
@@ -1729,10 +1729,10 @@ MEMO_X_ONE_NOTICE
 	%d üzenete van a %s szobának.
 MEMO_NEW_X_MEMO_ARRIVED
 	Új üzenete érkezett a %s szobának.
-	Ha szeretnéd elolvasni, írd be: %M%s READ %s %d.
+	Ha szeretnéd elolvasni, írd be: %R%s READ %s %d.
 MEMO_NEW_MEMO_ARRIVED
 	%s küldött egy új üzenetet.
-	Ha szeretnéd elolvasni, írd be: %M%s READ %d.
+	Ha szeretnéd elolvasni, írd be: %R%s READ %d.
 
 # Multi-use válaszok
 MEMO_HAVE_NO_MEMOS
@@ -1778,13 +1778,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	%s nem kapott új üzenetet.
 MEMO_LIST_MEMOS
-	%s üzenetei. Olvasáshoz írd be: %M%s READ szám
+	%s üzenetei. Olvasáshoz írd be: %R%s READ szám
 MEMO_LIST_NEW_MEMOS
-	Új üzenet %s részére. Olvasáshoz: %M%s READ szám
+	Új üzenet %s részére. Olvasáshoz: %R%s READ szám
 MEMO_LIST_CHAN_MEMOS
-	%s üzenetei.  Olvasáshoz : %M%s READ %s szám
+	%s üzenetei.  Olvasáshoz : %R%s READ %s szám
 MEMO_LIST_CHAN_NEW_MEMOS
-	%s új üzenetei.  Olvasáshoz,: %M%s READ %s szám
+	%s új üzenetei.  Olvasáshoz,: %R%s READ %s szám
 MEMO_LIST_HEADER
 	 Sorszám  Küldõ            Dátum/Idõ
 MEMO_LIST_FORMAT
@@ -1794,9 +1794,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [#szoba] {list | LAST | NEW }
 MEMO_HEADER
-	Üzenet szám: %d; feladó: %s (%s). Törléshez: %M%s DEL %d
+	Üzenet szám: %d; feladó: %s (%s). Törléshez: %R%s DEL %d
 MEMO_CHAN_HEADER
-	Üzenet szám: %d; feladó.: %s (%s). Törléshez: %M%s DEL %s %d
+	Üzenet szám: %d; feladó.: %s (%s). Törléshez: %R%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -1994,7 +1994,7 @@ BOT_DOES_NOT_EXIST
 	%s nevû bot nem létezik.
 BOT_NOT_ASSIGNED
 	Társítanod kellene egy botot a csatornára mielõtt használod
-	ezt a parancsot, írd be %M%S HELP ASSIGN bõvebb infókért.
+	ezt a parancsot, írd be %R%S HELP ASSIGN bõvebb infókért.
 BOT_NOT_ON_CHANNEL
 	A Bot nincs a %s csatornán.
 
@@ -2172,7 +2172,7 @@ BOT_SET_DISABLED
 	Bot beállítás idõlegesen szünetel.
 BOT_SET_UNKNOWN
 	Ismeretlen opció: %s.
-	Használd %M%S HELP SET információért.
+	Használd %R%S HELP SET információért.
 
 # SET DONTKICKOPS üzenetek
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2237,7 +2237,7 @@ BOT_KICK_DISABLED
 	Kirúgás használata ideiglenesen letiltva.
 BOT_KICK_UNKNOWN
 	Ismeretlen opció: %s.
-	További információért írd be: %M%S HELP KICK 
+	További információért írd be: %R%S HELP KICK 
 BOT_KICK_BAD_TTB
 	%s nem fogadható el banolási idõnek.
 
@@ -2979,7 +2979,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Modul: %s Verzió: %s Szerzõ: %s Betöltve: %s
 OPER_MODULE_CMD_LIST
-	Modul parancsai: %M%s %s
+	Modul parancsai: %R%s %s
 OPER_MODULE_MSG_LIST
 	IRCD kezelés: %s
 OPER_MODULE_NO_LIST
@@ -3329,24 +3329,24 @@ HELP_HELP
 	adjon a Szervízzel kapcsolatos információkban.
 	A következõ témakörök érhetõk el más Services kliensekrõl:
 
-	%M%s HELP
+	%R%s HELP
 	     A nicknév regisztrációval kapcsolatos információkról.
 
-	%M%s HELP
+	%R%s HELP
 	     A szoba regisztrációval és karbantartással 
 	     kapcsolatos információkról
 
-	%M%s HELP
+	%R%s HELP
 	     Üzenetek küldése offline (regisztrált) usereknek.
 
 HELP_HELP_BOT
 
-	%M%s HELP
+	%R%s HELP
 	     Szervíz bot felállításához a csatornádra.
 
 HELP_HELP_HOST
 
-	%M%s HELP
+	%R%s HELP
 	     Vhost igénylésrõl bõvebb információkért.
 	
 ###########################################################
@@ -3413,8 +3413,8 @@ NICK_HELP
 	a nickneved regisztrálására, ezzel megelõzi, hogy más is
 	használhassa a nicked. A NickServ parancsokkal
 	írányítható. Az adott parancs szintaktikáját megkapod, ha
-	beírod, hogy: %M%S parancs, lásd még a
-	%M%S HELP parancs.
+	beírod, hogy: %R%S parancs, lásd még a
+	%R%S HELP parancs.
 	
 NICK_HELP_FOOTER
 	Megjegyzés: Ez a szolgáltatás szeretné biztosítani az 
@@ -3459,7 +3459,7 @@ NICK_HELP_REGISTER
 	Ez a parancs létrehoz egy új csoportot a nickeddel, ami
 	lehetõvé teszi számodra, hogy másik nickeket regisztrálva
 	megoszthasd a hozzáféréseidet és beállításaidat a nickjeid
-	között. Bõvebb információkért írd be: %M%S HELP GROUP
+	között. Bõvebb információkért írd be: %R%S HELP GROUP
 
 NICK_HELP_GROUP
 	Syntax: GROUP célnicknév jelszó
@@ -3479,7 +3479,7 @@ NICK_HELP_GROUP
 	Akkor is használhatod a parancsot, ha még nem regisztrált
 	a nicked. Ha a nicked regisztrált, akkor elõbb azonosítani
 	kell a jelszavaddal, mielõtt ezt a parancsot használod.
-	Írd be:%M%S HELP IDENTIFY bõvebb információért.
+	Írd be:%R%S HELP IDENTIFY bõvebb információért.
 	
 	Ajánlott, hogy inkább nem regisztrált névvel használd
 	ezt a parancsot, mert ezzel automatikusan regisztrálódik.
@@ -3525,7 +3525,7 @@ NICK_HELP_DROP
 
 	Ezen parancs kiadása elõtt, azonositanod kell magad,
 	mint a nick tulajdonosa, használva az IDENTIFY parancsot,
-	írd be: %M%S HELP IDENTIFY bõvebb információért. 
+	írd be: %R%S HELP IDENTIFY bõvebb információért. 
 
 NICK_HELP_ACCESS
 	Syntax: ACCESS ADD maszk
@@ -3565,16 +3565,16 @@ NICK_HELP_SET
 	    GREET      Köszöntõ üzenet társítása a nicknevedhez
 	    KILL       A kill védelem be-,kikapcsolása
 	    SECURE     A nickneved védelmének be-,kikapcsolása
-	    PRIVATE    A nickneved %M%S LIST -ból való elrejtése
+	    PRIVATE    A nickneved %R%S LIST -ból való elrejtése
 	    HIDE       A nicknévhez tartozó információk elrejtése
 	    MSG        Megváltoztatja a szervízzel való kommunikációt
 	    AUTOOP     Should services op you automatically.    
 	    
 	Ezen parancs kiadása elõtt, azonositanod kell magad, mint
 	a nick tulajdonosa az IDENTIFY parancsot használva, írd
-	be: %M%S HELP IDENTIFY bõvebb információért. 
+	be: %R%S HELP IDENTIFY bõvebb információért. 
 	
-	Írd be: %M%S HELP SET opció bõvebb információért.
+	Írd be: %R%S HELP SET opció bõvebb információért.
 	
 	
 NICK_HELP_SET_DISPLAY
@@ -3697,12 +3697,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   %M%S LIST
+	                   %R%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type %M%S HELP SASET option for more information
+	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3841,7 +3841,7 @@ NICK_HELP_RECOVER
 	másik felhasználó ne tudjon automatikusa újracsatlakozni;
 	ennek az idõnek a letelte után, felveheted a nevedet.
 	Alternatív megoldás, a RELEASE parancs használata
-	(%M%S HELP RELEASE) ezzel hamarabb is visszakaphatod
+	(%R%S HELP RELEASE) ezzel hamarabb is visszakaphatod
 	a neved.
 	
 	Abban az esetben, ha használod a RECOVER parancsot,akkor
@@ -3960,7 +3960,7 @@ NICK_HELP_SENDPASS
 NICK_SERVADMIN_HELP
 	Szervíz adminok is droppolhatnak nickeket, akkor ha
 	beazonosíttotak a nicknevükre, és megnézhetik a nickek
-	hozzáférési listáját. (%M%S ACCESS LIST nick)
+	hozzáférési listáját. (%R%S ACCESS LIST nick)
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Syntax: LOGOUT [nicknév [REVALIDATE]]
@@ -4190,8 +4190,8 @@ CHAN_HELP
 	amit az opjoggal visszaélõ userek okozhatnak. Még pedig
 	úgy, hogy meghatározható az, hogy ki kapjon a csatornán
 	operátori kiváltságokat. A parancsok használatához írd be:
-	%M%S parancs, ha több információ kell a paranccsal
-	kapcsolatban, akkor írd be: %M%S HELP parancs.
+	%R%S parancs, ha több információ kell a paranccsal
+	kapcsolatban, akkor írd be: %R%S HELP parancs.
 	 
 	
 CHAN_HELP_EXPIRES
@@ -4218,14 +4218,14 @@ CHAN_HELP_REGISTER
 	a hozzáférési listáját, az autókirúgás listát, az infókat
 	megváltoztatni; a %S automatikusan megadja belépéskor a
 	founder hozzáférési jogot és szoba operátori jogokat.
-	Nézd meg az ACCESS parancsot (%M%S HELP ACCESS),
+	Nézd meg az ACCESS parancsot (%R%S HELP ACCESS),
 	hogy infomálódj a különbözõ szintû kiváltságok adásáról
 	(a szoba többi felhasználója részére).
 	
 	Megjegyzés: Ha regisztrálsz egy csatornát, elõször 
 	regisztrálnod kell a nickneved és azonosítanod kell
-	magad. (%MNickServ identify jelszó)
-	Ha még nem nézted meg, akkor lásd még: %M%s HELP.
+	magad. (%RNickServ identify jelszó)
+	Ha még nem nézted meg, akkor lásd még: %R%s HELP.
 	
 CHAN_HELP_IDENTIFY
 	Syntax: IDENTIFY #szoba jelszó
@@ -4279,7 +4279,7 @@ CHAN_HELP_SET
 	    TOPICLOCK     Témaváltás letiltása 
 	    XOP           Xop (Sop, Aop, Hop, Vop) lista rendszer bekapcsolása
 	
-	Írd be: %M%S HELP SET opció bõvebb információért az
+	Írd be: %R%S HELP SET opció bõvebb információért az
 	adott opcióról.
 
 CHAN_HELP_SET_FOUNDER
@@ -4408,7 +4408,7 @@ CHAN_HELP_SET_PRIVATE
 	Syntax: SET #szoba PRIVATE {ON | OFF}
 	
 	Engedélyezi vagy letiltja a private opciót a csatornán.
-	Amikor a private be van kapcsolva, a %M%S LIST 
+	Amikor a private be van kapcsolva, a %R%S LIST 
 	parancs által kilistázott csatornák között nem szerepel 
 	a szoba.
 
@@ -4459,7 +4459,7 @@ CHAN_HELP_SET_SIGNKICK
 	Ha használod a LEVEL-t, akkor azok, akiknek a szintje
 	megegyezik vagy magasabb, mint a signkick szintje, azoknak
 	a neve nem fog szerepelni a kick indokjában.
-	Lásd még: %M%S HELP LEVELS bõvebb információkért. 
+	Lásd még: %R%S HELP LEVELS bõvebb információkért. 
 	
 CHAN_HELP_SET_XOP
 	Syntax: SET #szoba XOP {ON | OFF}
@@ -4523,7 +4523,7 @@ CHAN_HELP_AOP
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
 	használhatod az access lista rendszert. Nézd meg: /msg
 	%S HELP ACCESSbõvebb információért az access listáról, és
-	írd be: %M%S HELP SET XOP hogy megnézd, hogyan tudsz 
+	írd be: %R%S HELP SET XOP hogy megnézd, hogyan tudsz 
 	váltani az xOP rendszerrol az access lista rendszerre.
 	
 CHAN_HELP_HOP
@@ -4564,9 +4564,9 @@ CHAN_HELP_HOP
 	HOP LIST parancsot.
 	
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
-	használhatod az access lista rendszert. Nézd meg: %M
+	használhatod az access lista rendszert. Nézd meg: %R
 	%S HELP ACCESS bõvebb információért az access listáról,
-	és írd be: %M%S HELP SET XOP hogy megnézd, hogyan 
+	és írd be: %R%S HELP SET XOP hogy megnézd, hogyan 
 	tudsz váltani az xOP rendszerrõl access lista rendszerre.
 	
 CHAN_HELP_SOP
@@ -4611,7 +4611,7 @@ CHAN_HELP_SOP
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
 	használhatod az access lista rendszert. Nézd meg: /msg
 	%S HELP ACCESS bõvebb információért az access listáról,
-	és írd be: %M%S HELP SET XOP hogy megnézd, hogyan 
+	és írd be: %R%S HELP SET XOP hogy megnézd, hogyan 
 	tudsz váltani az xOP rendszerrõl access lista rendszerre.
 	
 CHAN_HELP_VOP
@@ -4650,9 +4650,9 @@ CHAN_HELP_VOP
 	A VOP CLEAR parancsot csak a founder használhatja.
 	
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
-	használhatod az access listát. Nézd meg: %M%S HELP 
+	használhatod az access listát. Nézd meg: %R%S HELP 
 	ACCESS bõvebb információért az access listáról, és írd
-	be: %M%S HELP SET XOP hogy megnézd, hogyan tudsz 
+	be: %R%S HELP SET XOP hogy megnézd, hogyan tudsz 
 	váltani az xOP rendszerrol az access lista rendszerre.
 	
 CHAN_HELP_ACCESS
@@ -4665,7 +4665,7 @@ CHAN_HELP_ACCESS
 	meghatározza, hogy mely userek kaphatnak op státuszt vagy
 	hozzáférést a %S parancsokhoz a csatornán. Különbözõ
 	user szintek lehetõséget adnak arra, hogy eltérõ jogokat 
-	kaphassanak; információért %M%S HELP ACCESS LEVELS.
+	kaphassanak; információért %R%S HELP ACCESS LEVELS.
 	A nick, amely nem szerepel az access listán 0-ás szintû.
 	
 	Az ACCESS ADD paranccsal hozzáadható a nicknév az
@@ -4707,7 +4707,7 @@ CHAN_HELP_ACCESS_LEVELS
 	        <0   Nem opolható.
 	
 	Ezek a szintek változhatnak, vagy újakat adhatsz hozzá, a
-	LEVELS paranccsal; írd be: %M%S HELP LEVELS bõvebb
+	LEVELS paranccsal; írd be: %R%S HELP LEVELS bõvebb
 	információért.
 	
 CHAN_HELP_AKICK
@@ -4985,7 +4985,7 @@ CHAN_HELP_TOPIC
 	A %S megváltoztatja a szoba témáját arra amit
 	megadtál. Ha a téma nincs megadva, akkor egy üres
 	topicot állít be. Ez a parancs hasznos, akkor ha a 
-	SET TOPICLOCK be van állítva. Használd a %M%S HELP
+	SET TOPICLOCK be van állítva. Használd a %R%S HELP
 	SET TOPICLOCK parancsot bõvebb információért.
 	
 	Alapból a szoba founder szintû userei használhatják
@@ -5189,7 +5189,7 @@ MEMO_HELP_OPER
 MEMO_HELP_FOOTER
 	
 	A parancsokkal kapcsolatos további segítségért
-	írd be: %M%S HELP parancs.
+	írd be: %R%S HELP parancs.
 	
 	(*) Alapból, bármelyik user, minimum 10-es szinttel
 	olvashatja a szoba memo üzeneit. Ez megváltoztatható a
@@ -5263,7 +5263,7 @@ MEMO_HELP_SET
 	               kapni az új üzenetekrol (csak nicknevehez)
 	    LIMIT      Beállítja a maximális üzenetek számát
 	
-	További információért írd be: %M%S HELP SET opció
+	További információért írd be: %R%S HELP SET opció
 	
 MEMO_HELP_SET_NOTIFY
 	Syntax: SET NOTIFY {ON | LOGON | NEW | OFF}
@@ -6068,9 +6068,9 @@ BOT_HELP
 	Ezt olyan felhasználók számára készítették, akik
 	nem tudnak saját botot futtatni, vagy a hálózaton nem
 	engedélyezik ezt. Az elérhetõ parancsok listája alább 
-	található; használatukhoz írd be %M%S parancs.
+	található; használatukhoz írd be %R%S parancs.
 	Bõvebb információt így kaphatsz az adott parancsról:
-	%M%S HELP parancs.
+	%R%S HELP parancs.
 	
 BOT_HELP_FOOTER
 	A Bot akkor fog belépni a csatornára, ha legalább
@@ -6120,7 +6120,7 @@ BOT_HELP_SET
 	    SYMBIOSIS        Megengedi, hogy a bot olyan legyen mint 
 	                     az igazi botok
 	
-	Írd be %M%S HELP SET opció bõvebb információkért
+	Írd be %R%S HELP SET opció bõvebb információkért
 	az adott opcióról.
 	
 	Megjegyzés: ezekhez a parancsokhoz a hozzáférést a
@@ -6186,7 +6186,7 @@ BOT_HELP_KICK
 	    REVERSES      A bot kirúgja visszafelé írókat
 	    UNDERLINES    A bot kirúgja aláhúzással írókat
 	
-	Írd be %M%S HELP KICK opció az adott opcióval
+	Írd be %R%S HELP KICK opció az adott opcióval
 	kapcsolatos bõvebb információkért.
 	
 	Megjegyzés: A parancshoz való hozzáférést a level SET-ben
@@ -6279,7 +6279,7 @@ BOT_HELP_KICK_BADWORDS
 	ami szerepel a csúnyaszavak listáján.
 	
 	A csúnyaszavak listáját a csatornádhoz neked kell megadnod
-	A BADWORDS paranccsal. Írd be %M%S HELP BADWORDS 
+	A BADWORDS paranccsal. Írd be %R%S HELP BADWORDS 
 	bõvebb információkért.
 	
 	A ttb a banolás elotti kickek száma.
@@ -6295,7 +6295,7 @@ BOT_HELP_BADWORDS
 	Karbantartja a szoba csúnyaszó listáját. A tiltott
 	szavak listája meghatározza, hogy mely szavak kiejtésére
 	rúgja ki a bot a usert, ha a kirúgás engedélyezve van,
-	errõl bõvebb információk: %M%S HELP KICK BADWORDS.
+	errõl bõvebb információk: %R%S HELP KICK BADWORDS.
 	
 	A BADWORDS ADD parancs hozzáad egy szót a listához.
 	Ha a SINGLE van megadva, akkor lesz kirúgja a user, ha
@@ -6415,9 +6415,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	%s felhasználó nincs a nickserv db fájlban.
 HOST_SET_SYNTAX
-	Syntax %M%s set <nick> <hosztmaszk>.
+	Syntax %R%s set <nick> <hosztmaszk>.
 HOST_SETALL_SYNTAX
-	Syntax %M%s setall <nick> <hosztmaszk>.
+	Syntax %R%s setall <nick> <hosztmaszk>.
 HOST_DENIED
 	Hozzáférés megtagadva.
 HOST_NOT_ASSIGNED
@@ -6433,7 +6433,7 @@ HOST_NOT_REGED
 HOST_DEL
 	%s vhosztja törölve lett.
 HOST_DEL_SYNTAX
-	Szintaktika: %M%s del <nick>.
+	Szintaktika: %R%s del <nick>.
 HOST_OFF_UNREAL
 	A vhostod kikapcsolva. Hogy újra használd az alap
 	hosztrejtést írd be /mode %s +%s

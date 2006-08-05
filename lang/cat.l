@@ -142,11 +142,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Comanda no coneguda %s.
 UNKNOWN_COMMAND_HELP
-	Comanda no coneguda %s. "%M%s HELP" per ajuda.
+	Comanda no coneguda %s. "%R%s HELP" per ajuda.
 SYNTAX_ERROR
 	Sintàxis: %s
 MORE_INFO
-	%M%s HELP %s per més informació.
+	%R%s HELP %s per més informació.
 NO_HELP_AVAILABLE
 	No existeix ajuda per %s.
 OBSOLETE_COMMAND
@@ -189,7 +189,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	El teu nick no esta registrat.
 NICK_NOT_REGISTERED_HELP
-	El teu nick no esta registrat. Escriu %M%s HELP per mes informació al registrat el teu nickname.
+	El teu nick no esta registrat. Escriu %R%s HELP per mes informació al registrat el teu nickname.
 NICK_X_IS_SERVICES
 	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
@@ -224,10 +224,10 @@ CHAN_X_SUSPENDED
 	      Suspended: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Autentificació per clau requerida per aquesta comanda.
-	Intenta un altre cop després de escriure %M%s IDENTIFY clau.
+	Intenta un altre cop després de escriure %R%s IDENTIFY clau.
 CHAN_IDENTIFY_REQUIRED
 	Autentificació per clau requerida per aquesta comanda.
-	Intenta de nou després d'escriure %M%s IDENTIFY %s clau.
+	Intenta de nou després d'escriure %R%s IDENTIFY %s clau.
 	
 MAIL_DISABLED
 	Els serveis han estat configurats per no enviar email
@@ -298,10 +298,10 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Aquest nick pertany a un altra persona. Per favor escull un altre nick.
-	(Si aquest es el teu nick, escriu %M%s IDENTIFY clau.)
+	(Si aquest es el teu nick, escriu %R%s IDENTIFY clau.)
 NICK_IS_SECURE
 	Aquest nick esta registrat i protegit. Si es el teu
-	nick, escriu %M%s IDENTIFY clau. Si no,
+	nick, escriu %R%s IDENTIFY clau. Si no,
 	per favor escull un nick diferent.
 NICK_MAY_NOT_BE_USED
 	Aquest nickname no pot ser utilitzat. Per favor escull un altre.
@@ -351,12 +351,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	Per favor espera %d segons abans d'utilitzar la comanda GROUP novament.
 NICK_GROUP_CHANGE_DISABLED
-	El teu nick ja esta registrat; escriu %M%s DROP primer.
+	El teu nick ja esta registrat; escriu %R%s DROP primer.
 NICK_GROUP_SAME
 	Ja ets membre del grup de %s.
 NICK_GROUP_TOO_MANY
 	N'hi ha molts nicks en el grup de %s; lllistals i treu-ne alguns.
-	Escriu %M%s HELP GLIST i %M%s HELP DROP
+	Escriu %R%s HELP GLIST i %R%s HELP DROP
 	per més informació.
 NICK_GROUP_JOINED
 	Ara ets membre en el grup de %s.
@@ -373,7 +373,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Aquest e-mail et permetra recuperar la teva clau en
 	cas de que la olvidis.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Escriu %M%S SET EMAIL e-mail per provar el teu e-mail.
+	Escriu %R%S SET EMAIL e-mail per provar el teu e-mail.
 	Respectems la teva privacitat; Aquest e-mail no sera entregat
 	a cap persona.
 	
@@ -437,7 +437,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE numero
 NICK_SET_LANGUAGE_UNKNOWN
-	Numero de llenguatge %d desconegut. Escriu %M%s HELP SET LANGUAGE per una lllista de llenguatges.
+	Numero de llenguatge %d desconegut. Escriu %R%s HELP SET LANGUAGE per una lllista de llenguatges.
 NICK_SET_LANGUAGE_CHANGED
 	Llenguatge canviat a Català.
 
@@ -746,7 +746,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Aquest nickname no caducara.
 NICK_INFO_FOR_MORE
-	Per més informació, escriu %M%s INFO %s ALL.
+	Per més informació, escriu %R%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -799,7 +799,7 @@ NICK_NO_RECOVER_SELF
 	No pots recuperar-te a tu mateix!
 NICK_RECOVERED
 	L'usuari demanant el teu nick ha estat expulsat.
-	%M%s RELEASE %s per recuperar-lo abans del minut de time-out.
+	%R%s RELEASE %s per recuperar-lo abans del minut de time-out.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -896,9 +896,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	This nick is awaiting an e-mail verification code before completing registration.
 NICK_ENTER_REG_CODE
-	A passcode has been sent to %s, please type %M%s confirm <passcode> to complete registration
+	A passcode has been sent to %s, please type %R%s confirm <passcode> to complete registration
 NICK_CONFIRM_NOT_FOUND
-	Registration step 1 may have expired, please use "%M%s register <password> <email>" first.
+	Registration step 1 may have expired, please use "%R%s register <password> <email>" first.
 NICK_CONFIRM_INVALID
 	Invalid passcode has been entered, please check the e-mail again, and retry
 NICK_REG_MAIL_SUBJECT
@@ -908,7 +908,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	You have requested to register the following nickname %s.
 NICK_REG_MAIL_LINE_2
-	Please type " %M%s confirm %s " to complete registration.
+	Please type " %R%s confirm %s " to complete registration.
 NICK_REG_MAIL_LINE_3
 	If you don't know why this mail is sent to you, please ignore it silently.
 NICK_REG_MAIL_LINE_4
@@ -1023,10 +1023,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Canals locals no poden ser enregistrats.
 CHAN_MUST_REGISTER_NICK
-	Has de registrar el teu nickname primer. Escriu %M%s HELP per més informació de com registrar nicknames.
+	Has de registrar el teu nickname primer. Escriu %R%s HELP per més informació de com registrar nicknames.
 CHAN_MUST_IDENTIFY_NICK
 	Per favor primer identifica't amb %s, utilitzant la comanda:
-	%M%s IDENTIFY clau
+	%R%s IDENTIFY clau
 CHAN_MAY_NOT_BE_REGISTERED
 	El canal %s no pot ser enregistrat.
 CHAN_ALREADY_REGISTERED
@@ -1254,7 +1254,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	No pots utilitzar aquesta comanda. Utilitza la comanda ACCESS.
-	Escriu %M%s HELP ACCESS per més informació.
+	Escriu %R%s HELP ACCESS per més informació.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1391,7 +1391,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	No pots utilitzar aquest comanda.
 	Utilitza les comandes AOP, SOP i VOP.
-	Escriu %M%s HELP comanda per a més informació.
+	Escriu %R%s HELP comanda per a més informació.
 CHAN_ACCESS_DISABLED
 	Ho sento, la modificació d'accés a canals esta temporalment inabilitada.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1488,7 +1488,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	Nivell per a %s en el canal %s cambiat a %d.
 CHAN_LEVELS_UNKNOWN
-	Opció %s no coneguda. Escriu %M%s HELP LEVELS DESC per a una llista de opcións valides.
+	Opció %s no coneguda. Escriu %R%s HELP LEVELS DESC per a una llista de opcións valides.
 CHAN_LEVELS_DISABLED
 	%s inhabilitat(s) en el canal %s.
 CHAN_LEVELS_LIST_HEADER
@@ -1714,11 +1714,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	Tens %d memos nous.
 MEMO_TYPE_READ_LAST
-	Escriu %M%s READ LAST per llegir el teu últim memo.
+	Escriu %R%s READ LAST per llegir el teu últim memo.
 MEMO_TYPE_READ_NUM
-	Escriu %M%s READ %d per a llegir-lo.
+	Escriu %R%s READ %d per a llegir-lo.
 MEMO_TYPE_LIST_NEW
-	Escriu %M%s LIST NEW per a llistar els teus memos.
+	Escriu %R%s LIST NEW per a llistar els teus memos.
 MEMO_AT_LIMIT
 	Advertència: Has assolit el màxim numero de memos (%d). No podras rebre mes memos fins que esborris alguns dels existents.
 MEMO_OVER_LIMIT
@@ -1729,10 +1729,10 @@ MEMO_X_ONE_NOTICE
 	There is %d memo on channel %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	There is a new memo on channel %s.
-	Type %M%s READ %s %d to read it.
+	Type %R%s READ %s %d to read it.
 MEMO_NEW_MEMO_ARRIVED
 	Tens un nou memo de %s.
-	Escriu %M%s READ %d per a llegir-lo.
+	Escriu %R%s READ %d per a llegir-lo.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1780,13 +1780,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	%s no te memos nous.
 MEMO_LIST_MEMOS
-	Memos per a %s. per a llegir-los escriu: %M%s READ numero
+	Memos per a %s. per a llegir-los escriu: %R%s READ numero
 MEMO_LIST_NEW_MEMOS
-	Nous memos per a %s. per a llegir-los escriu: %M%s READ numero
+	Nous memos per a %s. per a llegir-los escriu: %R%s READ numero
 MEMO_LIST_CHAN_MEMOS
-	Memos per a %s. per a llegir-los escriu: %M%s READ %s numero
+	Memos per a %s. per a llegir-los escriu: %R%s READ %s numero
 MEMO_LIST_CHAN_NEW_MEMOS
-	Nous memos per a %s. Per a llegir-los escriu: %M%s READ %s numero
+	Nous memos per a %s. Per a llegir-los escriu: %R%s READ %s numero
 MEMO_LIST_HEADER
 	 Num  De                Data/Hora
 MEMO_LIST_FORMAT
@@ -1796,9 +1796,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [canal] {llista | LAST | NEW}
 MEMO_HEADER
-	Memo %d de %s (%s). per a esborrar-lo escriu: %M%s DEL %d
+	Memo %d de %s (%s). per a esborrar-lo escriu: %R%s DEL %d
 MEMO_CHAN_HEADER
-	Memo %d de %s (%s). per a esborrar-lo escriu: %M%s DEL %s %d
+	Memo %d de %s (%s). per a esborrar-lo escriu: %R%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -2014,7 +2014,7 @@ BOT_DOES_NOT_EXIST
 	El bot %s no existeix.
 BOT_NOT_ASSIGNED
 	Has d'assignar un bot al canal abans de poder utilitzar aquesta comanda.
-	Escriu %M%S HELP ASSIGN per a més informació.
+	Escriu %R%S HELP ASSIGN per a més informació.
 BOT_NOT_ON_CHANNEL
 	El bot no esta al canal %s.
 	
@@ -2192,7 +2192,7 @@ BOT_SET_DISABLED
 	Ho sento, l'establiment d'opcions per a bot esta temporalment inhabilitat
 BOT_SET_UNKNOWN
 	Opció %s desconeguda.
-	Escriu %M%S HELP SET per a més informació.
+	Escriu %R%S HELP SET per a més informació.
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2257,7 +2257,7 @@ BOT_KICK_DISABLED
 	Ho sento, la configuració de kicker esta temporalment inabilitada.
 BOT_KICK_UNKNOWN
 	Opció %s desconeguda.
-	Escriu %M%S HELP KICK per a més informació
+	Escriu %R%S HELP KICK per a més informació
 BOT_KICK_BAD_TTB
 	%s no pot ser pres com vegades a banegar
 
@@ -3034,7 +3034,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Module: %s Version: %s Author: %s loaded: %s
 OPER_MODULE_CMD_LIST
-	Providing command: %M%s %s
+	Providing command: %R%s %s
 OPER_MODULE_MSG_LIST
 	Providing IRCD handler for: %s
 OPER_MODULE_NO_LIST
@@ -3401,25 +3401,25 @@ HELP_HELP
 	serveis. Tòpics d'ajuda estan disponibles via les
 	comandes HELP dels altres clients de serveis:
 
-	%M%s HELP
+	%R%s HELP
 	     per mes informació sobre registrar nicknames
 
-	%M%s HELP
+	%R%s HELP
 	     per mes informació sobre registrar i controlar
 	     canals
 
-	%M%s HELP
+	%R%s HELP
 	     per més informació sobre enviar missatges a usuaris no
 	     en linea.
 
 HELP_HELP_BOT
 
-	%M%s HELP
+	%R%s HELP
 	     per més informació sobre establir un bot en el teu canal
 
 HELP_HELP_HOST
 
-	%M%s HELP
+	%R%s HELP
 	     for information on setting up nick vHosts
 
 ###########################################################################
@@ -3484,9 +3484,9 @@ NICK_HELP
 	%S Et permet "registrar" un nickname i
 	prevenir a d'altres utilitzar-lo. Les següents comandes
 	permeten el registre i manteniment de nicknames;
-	per a utilitzar-los, escriu %M%S comanda.
+	per a utilitzar-los, escriu %R%S comanda.
 	per més informació sobre una comanda especifica
-	escriu %M%S HELP comanda.
+	escriu %R%S HELP comanda.
 	
 NICK_HELP_FOOTER
 	NOTESE: Aquest servei intenta proveir una eina
@@ -3530,7 +3530,7 @@ NICK_HELP_REGISTER
 	Aquesta comanda crea un nou grup pel teu nickname
 	que et permetra registrar altres nicks després compartint
 	la mateixa configuració, memos i privilegis. Per més
-	informació sobre aquesta característica, escriu %M%S
+	informació sobre aquesta característica, escriu %R%S
 	HELP GROUP.
 	
 NICK_HELP_GROUP
@@ -3550,7 +3550,7 @@ NICK_HELP_GROUP
 	
 	Pots utilitzar aquesta comanda encara que no estigui registrar el teu
 	nick. Si el teu nick ja esta registrat hauras d'identificar-te
-	abans d'utilitzar aquesta comanda. Escriu %M%S HELP
+	abans d'utilitzar aquesta comanda. Escriu %R%S HELP
 	IDENTIFY per més informació. Potser que no sigui possible
 	a la teva xarxa.
 	
@@ -3599,7 +3599,7 @@ NICK_HELP_DROP
 	parametre nick.
 	
 	Abans d'utilitzar aquesta comanda has d'identificar-te amb la teva
-	clau (%M%S HELP IDENTIFY per més informació).
+	clau (%R%S HELP IDENTIFY per més informació).
 
 NICK_HELP_ACCESS
 	Sintaxis: ACCESS ADD mascara
@@ -3642,17 +3642,17 @@ NICK_HELP_SET
 	    KILL       Activa o desactiva la protecció
 	    SECURE     Activa o desactiva la seguretat de nickname
 	    PRIVATE    Preveu el teu nickname d'apareixer en un
-	                   %M%S LIST
+	                   %R%S LIST
 	    HIDE       Oculta algunes parts de la teva informació
 	    MSG        canvia el metode de comunicació amb els
 	                    serveis
 	    AUTOOP     Should services op you automatically.    
 	
 	Per utilitzar aquest comanda, has d'identificar-te primer 
-	utilitzant la teva clau (%M%S HELP IDENTIFY
+	utilitzant la teva clau (%R%S HELP IDENTIFY
 	per mes informació).
 	
-	Escriu %M%S HELP SET opció per mes
+	Escriu %R%S HELP SET opció per mes
 	informació sobre una opció especifica.
 
 NICK_HELP_SET_DISPLAY
@@ -3775,12 +3775,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   %M%S LIST
+	                   %R%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type %M%S HELP SASET option for more information
+	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3922,7 +3922,7 @@ NICK_HELP_RECOVER
 	un minut per assegurar que l'altre usuari no es reconecti
 	inmediatament; després del minut, pots reclamar el teu
 	nick. Com alternativa, utilitza la comanda RELEASE
-	(%M%S HELP RELEASE) per recuperar el nick més aviat.
+	(%R%S HELP RELEASE) per recuperar el nick més aviat.
 	
 	Per utilitzar la comanda RECOVER per un nick, la teva
 	adreça actual mostrada a /WHOIS ha d'estar a la llista
@@ -4055,7 +4055,7 @@ NICK_SERVADMIN_HELP
 	Administradors de serveis poden també eliminar qualsevol
 	nickname sense tenir que identificar-se pel nick i poden
 	veure la llista d'accés per qualsevol nickname
-	(%M%S ACCESS LIST nick).
+	(%R%S ACCESS LIST nick).
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Sintaxis: LOGOUT [nickname [REVALIDATE]]
@@ -4285,9 +4285,9 @@ CHAN_HELP
 	a usuaris maliciosos "pendre" canals limitant
 	qui esta permés a tenir privilegis d'operador.
 	Les comandes disponibles estan llistades a continuació;
-	Per a utilitzar-los, escriu %M%S comanda.
+	Per a utilitzar-los, escriu %R%S comanda.
 	Per més informació sobre una comanda especifica,
-	escriu %M%S HELP comanda.
+	escriu %R%S HELP comanda.
 	 
 
 CHAN_HELP_EXPIRES
@@ -4314,12 +4314,12 @@ CHAN_HELP_REGISTER
 	%S també donarà al fundador privilegis d'operador
 	automaticamente quant l'usuari entri al canal.
 	Esbrina sobre la comanda ACCESS
-	(%M%S HELP ACCESS) Per més informació sobre
+	(%R%S HELP ACCESS) Per més informació sobre
 	com donar aquests privilegis a altres usuaris del canal.
 	
 	NOTA: Per registrar un canal has d'haver registrat
 	el teu nickname primer. Si encara no ho has fet, escriu
-	%M%s HELP per més informació de com fer-ho.
+	%R%s HELP per més informació de com fer-ho.
 
 CHAN_HELP_IDENTIFY
 	Sintaxis: IDENTIFY canal clau
@@ -4381,7 +4381,7 @@ CHAN_HELP_SET
 	                  TOPIC
 	    XOP           Canvia el sistema de privilegis d'usuari
 	
-	Escriu %M%S HELP opció per més informació
+	Escriu %R%S HELP opció per més informació
 	sobre una opció en particular.
 
 CHAN_HELP_SET_FOUNDER
@@ -4520,7 +4520,7 @@ CHAN_HELP_SET_PRIVATE
 	Sintàxi: SET canal PRIVATE {ON | OFF}
 	
 	Habilita o deshabilita l'opció de privacitat per a un canal.
-	Quan privacitat està establerta, un %M%S LIST no
+	Quan privacitat està establerta, un %R%S LIST no
 	inclourà el canal en cap llista.
 
 CHAN_HELP_SET_RESTRICTED
@@ -4571,7 +4571,7 @@ CHAN_HELP_SET_SIGNKICK
 	
 	Si uses LEVEL, aquells que tenen nivelll superior o
 	igual al nivelll SIGNKICK en el canal no tindran els seus kicks 
-	firmats. Veure %M%S HELP LEVELS per a més informació.
+	firmats. Veure %R%S HELP LEVELS per a més informació.
 
 CHAN_HELP_SET_XOP
 	Sintàxi: SET canal XOP {ON | OFF}
@@ -4643,8 +4643,8 @@ CHAN_HELP_AOP
 	
 	Aquesta comanda pot haVeure sigut deshabilitada per al teu canal.
 	Si aquest és el cas, has de fer servir la llista d'accés. Veure
-	%M%S HELP ACCESS per a informació sobre la llista
-	de accés i %M%S HELP SET XOP per a saber com canviar
+	%R%S HELP ACCESS per a informació sobre la llista
+	de accés i %R%S HELP SET XOP per a saber com canviar
 	entre la llista de accés i el sistema de llistes xOP.
 
 CHAN_HELP_HOP
@@ -4684,8 +4684,8 @@ CHAN_HELP_HOP
 	
 	Aquesta comanda pot haber estat deshabilitada per al teu canal.
 	Si aquest és el cas, has de fer servir la llista d'accés. Veure
-	%M%S HELP ACCESS per a informació sobre la llista
-	d'accés i %M%S HELP SET XOP per a saber com canviar
+	%R%S HELP ACCESS per a informació sobre la llista
+	d'accés i %R%S HELP SET XOP per a saber com canviar
 	entre la llista d'accés i el sistema de llistes xOP.
 
 CHAN_HELP_SOP
@@ -4726,8 +4726,8 @@ CHAN_HELP_SOP
 	
 	Aquesta comanda pot haber sigut deshabilitada per al teu canal.
 	Si aquest és el cas, has de fer servir la llista d'accés. Veure
-	%M%S HELP ACCESS per a informació sobre la llista
-	d'accés i %M%S HELP SET XOP per a saber com canviar
+	%R%S HELP ACCESS per a informació sobre la llista
+	d'accés i %R%S HELP SET XOP per a saber com canviar
 	entre la llista d'accés i el sistema de llistes xOP.
 
 CHAN_HELP_VOP
@@ -4768,8 +4768,8 @@ CHAN_HELP_VOP
 	
 	Aquesta comanda pot haber sigut deshabilitada per al teu canal.
 	Si aquest és el cas, has de fer servir la llista de accés. Veure
-	%M%S HELP ACCESS per a informació sobre la llista
-	d'accés i %M%S HELP SET XOP per a saber como canviar
+	%R%S HELP ACCESS per a informació sobre la llista
+	d'accés i %R%S HELP SET XOP per a saber como canviar
 	entre la llista d'accés i el sistema de llistes xOP.
 
 CHAN_HELP_ACCESS
@@ -4783,7 +4783,7 @@ CHAN_HELP_ACCESS
 	l'estatus d'operador de canal o accés a comandes de
 	%S en el canal.  Diferents nivellls d'usuaris permeten
 	accés a diferents subnivelles de privilegis;
-	%M%S HELP ACCESS LEVELS per a informació més
+	%R%S HELP ACCESS LEVELS per a informació més
 	específica. Qualsevol nick no present a la llista de
 	accés té un nivelll 0.
 	
@@ -4832,7 +4832,7 @@ CHAN_HELP_ACCESS_LEVELS
 	        <0   No pot ser opejat.
 	
 	Aquests nivellls poden ser canviats, o afegir-ne de nous,
-	fent servir la comanda LEVELS; escriu %M%S HELP LEVELS
+	fent servir la comanda LEVELS; escriu %R%S HELP LEVELS
 	per a més informació.
 
 CHAN_HELP_AKICK
@@ -5096,7 +5096,7 @@ CHAN_HELP_TOPIC
 	Fa a %S establir el topic del canal al especificat.
 	Si el topic no és donat, un topic buit és establert.
 	Aquesta comanda és més util utilitzada en conjunt a SET
-	TOPICLOCK. Veure %M%S HELP SET TOPICLOCK
+	TOPICLOCK. Veure %R%S HELP SET TOPICLOCK
 	per a més informació.
 	
 	Per defecte, limitat a aquells amb nivell de fundador
@@ -5315,7 +5315,7 @@ MEMO_HELP_OPER
 	not used.
 MEMO_HELP_FOOTER
 	
-	escriu %M%S HELP comando per a més ajuda en
+	escriu %R%S HELP comando per a més ajuda en
 	qualsevol de les comandes llistades anteriorment.
 	
 	(*) Per defecte, qualsevol usuari amb al menys nivell
@@ -5390,7 +5390,7 @@ MEMO_HELP_SET
 	    LIMIT       Estableix el màxim nombre de memos que
 	                    pots rebre
 	
-	escriu %M%S HELP SET Opció per a més informació
+	escriu %R%S HELP SET Opció per a més informació
 	sobre una opció específica.
 
 MEMO_HELP_SET_NOTIFY
@@ -6273,9 +6273,9 @@ BOT_HELP
 	tenir un bot en un host o configurar un bot, o per a us en xarxes
 	que no permeten bots d'usuaris. Comandes
 	disponibles estan llistades més endavant; per a
-	utilitzar-los, escriu %M%S comanda. per a més
+	utilitzar-los, escriu %R%S comanda. per a més
 	informació sobre un comanda especifica, escriu  
-	%M%S HELP comanda.
+	%R%S HELP comanda.
 	
 	
 BOT_HELP_FOOTER
@@ -6322,7 +6322,7 @@ BOT_HELP_SET
 	    FANTASY          Habilita comandoe de fantasia
 	    SYMBIOSIS        Permet al bot a actuar como un bot real
 	
-	Escriu %M%S HELP SET opció per més informació
+	Escriu %R%S HELP SET opció per més informació
 	sobre una opció especifica.
 	
 	Nota: L'accés a aquesta comanda esta controlat pel
@@ -6395,7 +6395,7 @@ BOT_HELP_KICK
 	    REVERSES      Estableix si el bot kickejara reversos
 	    UNDERLINES    Estableix si el bot kickejara subratllats
 	
-	Escriu %M%S HELP KICK Opció per més
+	Escriu %R%S HELP KICK Opció per més
 	informació sobre una opció especifica.
 	
 	Nota: L'accés a aquesta comanda es control.lat pel
@@ -6494,7 +6494,7 @@ BOT_HELP_KICK_BADWORDS
 	usuaris que utilitzin certes paraules al canal.
 	
 	Pots definir paraules malsonants pel teu canal utilitzant la comanda
-	BADWORDS. Escriu %M%S HELP BADWORDS per més informació.
+	BADWORDS. Escriu %R%S HELP BADWORDS per més informació.
 	
 	ttb es el numero de cops que un usuari sera kickejat
 	abans de ser banejat. No cal especificar ttb per a deshabilitar
@@ -6509,7 +6509,7 @@ BOT_HELP_BADWORDS
 	Mante la llista de paraules malsonants per un canal. La llista
 	de paraules malsonants determina quines paraules han de donar peu a ser kickejats
 	Quan el kick per paraules malsonants esta habilitat. Per més
-	informació, escriu %M%S HELP KICK BADWORDS.
+	informació, escriu %R%S HELP KICK BADWORDS.
 	
 	La comanda BADWORDS ADD afegeix una paraula a la llista
 	de paraules malsonants. Si s'especifica SINGLE, el kick es
@@ -6629,9 +6629,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s not found in the nickserv db.
 HOST_SET_SYNTAX
-	Syntax %M%s set <nick> <hostmask>.
+	Syntax %R%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Syntax %M%s setall <nick> <hostmask>.
+	Syntax %R%s setall <nick> <hostmask>.
 HOST_DENIED
 	Access Denied.
 HOST_NOT_ASSIGNED
@@ -6647,7 +6647,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: %M%s del <nick>.
+	Syntax: %R%s del <nick>.
 
 ###########################################################################
 #

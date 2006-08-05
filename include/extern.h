@@ -807,6 +807,7 @@ E int dotime(const char *s);
 E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
 E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
 E void protocol_debug(char *source, char *cmd, int argc, char **argv);
+E int doValidHost(const char *host, int type);
 
 typedef int (*range_callback_t) (User * u, int num, va_list args);
 E int process_numlist(const char *numstr, int *count_ret,

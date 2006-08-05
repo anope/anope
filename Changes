@@ -55,6 +55,8 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 08/04 F Autovoice for unregistered users works again.                     [#569]
 08/05 F Support for SVSJOIN/SVSPART/SWHOIS in protocol modules.           [#566]
 08/05 F os_info save on unload.                                           [#523]
+08/05 F Externed doValidHost call for modules to use.                     [#570]
+
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

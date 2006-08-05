@@ -738,6 +738,10 @@ int prepForUnload(Module * m)
         return MOD_ERR_PARAMS;
     }
 
+    if (m->type == PROTOCOL) {
+        return MOD_ERR_NOUNLOAD; /* you cant unload protocol modules */
+    }
+
     /* Kill any active callbacks this module has */
     moduleCallBackPrepForUnload(m->name);
 

@@ -116,6 +116,12 @@ int AnopeInit(int argc, char **argv)
  **/
 void AnopeFini(void)
 {
+    char *av[1];
+
+    av[0] = sstrdup(EVENT_START);
+    mSaveData(1, av);
+    free(av[0]);
+
     if (OSInfoDBName)
         free(OSInfoDBName);
 }
@@ -403,7 +409,7 @@ int mSaveData(int argc, char **argv)
     int i = 0;
     int ret = 0;
     FILE *out;
-	char *info = NULL;
+    char *info = NULL;
 
     if (argc >= 1) {
         if (!stricmp(argv[0], EVENT_START)) {

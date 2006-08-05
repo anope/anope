@@ -9,15 +9,18 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1112"
+VERSION_BUILD="1113"
 
 # $Log$
 #
+# BUILD : 1.7.14 (1113)
+# BUGS  : 
+# NOTES : Same for de.l
+# 
 # BUILD : 1.7.14 (1112)
 # BUGS  : 565
 # NOTES : %M will now be replaced by either /msg or / depending on UseStrictPrivMsg - we still need to update the .l files for all langauges tho.
 # 
-#
 # BUILD : 1.7.14 (1111)
 # BUGS  : 570
 # NOTES : Allow doValidHost to be called from modules.
@@ -26,7 +29,6 @@ VERSION_BUILD="1112"
 # BUGS  : 523
 # NOTES : os_info.c now calls mSaveData on AnopeFini
 # 
-#
 # BUILD : 1.7.14 (1109)
 # BUGS  : 566
 # NOTES : Finished support for SVSJOIN/SVSPART/SWHOIS in ircd modules

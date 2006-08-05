@@ -145,11 +145,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Varolmayan komut %s.
 UNKNOWN_COMMAND_HELP
-	Varolmayan komut %s. yardým için "/msg %s HELP" yazýnýz.
+	Varolmayan komut %s. yardým için "%M%s HELP" yazýnýz.
 SYNTAX_ERROR
 	Kullanýmý: %s
 MORE_INFO
-	Daha fazla bilgi için /msg %s HELP %s yazýnýz.
+	Daha fazla bilgi için %M%s HELP %s yazýnýz.
 NO_HELP_AVAILABLE
 	%s hakkýnda yardým bulunamadý.
 OBSOLETE_COMMAND
@@ -192,7 +192,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	Nickiniz kayýtlý deðil.
 NICK_NOT_REGISTERED_HELP
-	Nickiniz kayýtlý deðil.  Nick kayýt hakkýnda bilgi almak için /msg %s HELP yazýn.
+	Nickiniz kayýtlý deðil.  Nick kayýt hakkýnda bilgi almak için %M%s HELP yazýn.
 NICK_X_IS_SERVICES
 	Nick %s is part of this Network's Services.
 NICK_X_NOT_REGISTERED
@@ -227,10 +227,10 @@ CHAN_X_SUSPENDED
 	      Suspended: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Bu komutu kullanabilmek için þifrenizi girmelisiniz.
-	/msg %s IDENTIFY þifreniz yazarak yeniden deneyiniz.
+	%M%s IDENTIFY þifreniz yazarak yeniden deneyiniz.
 CHAN_IDENTIFY_REQUIRED
 	Bu komutu kullanabilmek için þifrenizi girmelisiniz.
-	/msg %s IDENTIFY %s þifreniz yazarak yeniden deneyiniz.
+	%M%s IDENTIFY %s þifreniz yazarak yeniden deneyiniz.
 	
 MAIL_DISABLED
 	Servislerin mail gönderme özelliði devre dýþýdýr.
@@ -302,10 +302,10 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Bu nick baþkasýna ait. Lütfen baþka bir tane seçin.
-	(Eðer bu sizin nickiniz ise, /msg %s IDENTIFY þifreniz yazýnýz.)
+	(Eðer bu sizin nickiniz ise, %M%s IDENTIFY þifreniz yazýnýz.)
 NICK_IS_SECURE
 	Bu nick kayýtlý ve korumalýdýr. Eðer bu sizin nickiniz ise, 
-	/msg %s IDENTIFY þifreniz yazýnýz. Yada, baþka bir nick seçin.
+	%M%s IDENTIFY þifreniz yazýnýz. Yada, baþka bir nick seçin.
 NICK_MAY_NOT_BE_USED
 	Bu nick kullanýlamaz.  Lütfen baþka bir tane seçin.
 FORCENICKCHANGE_IN_1_MINUTE
@@ -353,12 +353,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	GROUP komutunu tekrar kullanmadan önce lütfen %d saniye bekleyin.
 NICK_GROUP_CHANGE_DISABLED
-	Nickiniz zaten kayýtlý; önce /msg %s DROP yazýn.
+	Nickiniz zaten kayýtlý; önce %M%s DROP yazýn.
 NICK_GROUP_SAME
 	%s grubunun zaten bir üyesisiniz.
 NICK_GROUP_TOO_MANY
 	%s nickinin grubunda çok fazla nick var; listeleyip birkaçini silin.
-	Daha fazla bilgi için /msg %s HELP GLIST ve /msg %s HELP DROP 
+	Daha fazla bilgi için %M%s HELP GLIST ve %M%s HELP DROP 
 	yazin.
 NICK_GROUP_JOINED
 	%s grubuna dahil edildiniz.
@@ -375,7 +375,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Bu e-mail adresi þifrenizi unutmanýz halinde þifrenizi
 	isterken kullanýlacaktýr.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Mail adresinizi ayarlamak için /msg %S SET EMAIL e-mailadresiniz 
+	Mail adresinizi ayarlamak için %M%S SET EMAIL e-mailadresiniz 
 	yazýn. Gizliliðiniz korunacaktýr; bu mail adresi herhangi üçüncü 
 	þahýslara verilmeyecektir.
 
@@ -441,7 +441,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE numara
 NICK_SET_LANGUAGE_UNKNOWN
-	Varolmayan dil numarasý %d.  Dil listesi için /msg %s HELP SET LANGUAGE yazýn.
+	Varolmayan dil numarasý %d.  Dil listesi için %M%s HELP SET LANGUAGE yazýn.
 NICK_SET_LANGUAGE_CHANGED
 	Dil Türkçe olarak deðiþtirildi.
 
@@ -751,7 +751,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Bu nick zaman aþýmýna uðramayacak.
 NICK_INFO_FOR_MORE
-	Geniþ bilgi için, /msg %s INFO %s ALL yazýn.
+	Geniþ bilgi için, %M%s INFO %s ALL yazýn.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -804,7 +804,7 @@ NICK_NO_RECOVER_SELF
 	Kendizi recover edemezsiniz!
 NICK_RECOVERED
 	Nickinizi kullanan user kill lendi.
-	/msg %s RELEASE %s yazarak bir dakikadan önce nickinizi serbest býrakabilirsiniz.
+	%M%s RELEASE %s yazarak bir dakikadan önce nickinizi serbest býrakabilirsiniz.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -902,9 +902,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	This nick is awaiting an e-mail verification code before completing registration.
 NICK_ENTER_REG_CODE
-	A passcode has been sent to %s, please type /msg %s confirm <passcode> to complete registration
+	A passcode has been sent to %s, please type %M%s confirm <passcode> to complete registration
 NICK_CONFIRM_NOT_FOUND
-	Registration step 1 may have expired, please use "/msg %s register <password> <email>" first.
+	Registration step 1 may have expired, please use "%M%s register <password> <email>" first.
 NICK_CONFIRM_INVALID
 	Invalid passcode has been entered, please check the e-mail again, and retry
 NICK_REG_MAIL_SUBJECT
@@ -914,7 +914,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	You have requested to register the following nickname %s.
 NICK_REG_MAIL_LINE_2
-	Please type " /msg %s confirm %s " to complete registration.
+	Please type " %M%s confirm %s " to complete registration.
 NICK_REG_MAIL_LINE_3
 	If you don't know why this mail is sent to you, please ignore it silently.
 NICK_REG_MAIL_LINE_4
@@ -1028,10 +1028,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Local kanallar kayýt edilemezler.
 CHAN_MUST_REGISTER_NICK
-	Önce nickinizi kayýt etmeniz gerekiyor.  Nick kayýt hakkýnda bilgi için /msg %s HELP yazýnýz.
+	Önce nickinizi kayýt etmeniz gerekiyor.  Nick kayýt hakkýnda bilgi için %M%s HELP yazýnýz.
 CHAN_MUST_IDENTIFY_NICK
 	Lütfen önce %s ile bu komutu kullanarak nickinizi tanýtýn:
-	/msg %s IDENTIFY þifreniz
+	%M%s IDENTIFY þifreniz
 CHAN_MAY_NOT_BE_REGISTERED
 	%s kanalý kayýt edilemez.
 CHAN_ALREADY_REGISTERED
@@ -1256,7 +1256,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Bu komutu kullanamazsiniz. Yerine ACCESS komutunu kullanin.
-	Daha fazla bilgi için /msg %s HELP ACCESS yazin.
+	Daha fazla bilgi için %M%s HELP ACCESS yazin.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1388,7 +1388,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Bu komutu kullanamazsiniz. 
 	Yerine AOP, SOP veya VOP komutlarini kullanin.
-	Daha fazla bilgi için /msg %s HELP komut yazin.
+	Daha fazla bilgi için %M%s HELP komut yazin.
 CHAN_ACCESS_DISABLED
 	Kanal access listesinin deðiþtirilmesi geçici olarak devre dýþýdýr.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1485,7 +1485,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	%s için level %s kanalýnda %d olarak deðiþtirildi.
 CHAN_LEVELS_UNKNOWN
-	Varolmayan ayar: %s. Geçerli ayar listesi için /msg %s HELP LEVELS DESC yazýnýz.
+	Varolmayan ayar: %s. Geçerli ayar listesi için %M%s HELP LEVELS DESC yazýnýz.
 CHAN_LEVELS_DISABLED
 	%s %s kanalýnda iptal edildi.
 CHAN_LEVELS_LIST_HEADER
@@ -1711,11 +1711,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	%d yeni mesajýnýz var.
 MEMO_TYPE_READ_LAST
-	Okumak için /msg %s READ LAST yazýn.
+	Okumak için %M%s READ LAST yazýn.
 MEMO_TYPE_READ_NUM
-	Okumak için /msg %s READ %d yazýn.
+	Okumak için %M%s READ %d yazýn.
 MEMO_TYPE_LIST_NEW
-	Listelemek için /msg %s LIST NEW yazýn.
+	Listelemek için %M%s LIST NEW yazýn.
 MEMO_AT_LIMIT
 	Dikkat: Maksimum mesaj sayýnýza ulaþtýnýz (%d).  Þimdiki mesajlarýnýzdan bir kaçýný silmezseniz yeni mesaj alamayacaksýnýz.
 MEMO_OVER_LIMIT
@@ -1726,10 +1726,10 @@ MEMO_X_ONE_NOTICE
 	There is %d memo on channel %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	There is a new memo on channel %s.
-	Type /msg %s READ %s %d to read it.
+	Type %M%s READ %s %d to read it.
 MEMO_NEW_MEMO_ARRIVED
 	%s nickinden yeni mesajýnýz var.
-	Okumak için /msg %s READ %d yazýn.
+	Okumak için %M%s READ %d yazýn.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1777,13 +1777,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	%s nickinin hiç yeni mesajý yok.
 MEMO_LIST_MEMOS
-	%s nicki için mesajlar.  Okumak için: /msg %s READ num yazýn.
+	%s nicki için mesajlar.  Okumak için: %M%s READ num yazýn.
 MEMO_LIST_NEW_MEMOS
-	%s nicki için yeni mesajlar.  Okumak için: /msg %s READ num yazýn.
+	%s nicki için yeni mesajlar.  Okumak için: %M%s READ num yazýn.
 MEMO_LIST_CHAN_MEMOS
-	%s kanali için mesajlar.  Okumak için: /msg %s READ %s num yazýn.
+	%s kanali için mesajlar.  Okumak için: %M%s READ %s num yazýn.
 MEMO_LIST_CHAN_NEW_MEMOS
-	%s kanali için yeni mesajlar.  Okumak için: /msg %s READ %s num yazýn.
+	%s kanali için yeni mesajlar.  Okumak için: %M%s READ %s num yazýn.
 MEMO_LIST_HEADER
 	 Num  Gönderen          Tarih/Zaman
 MEMO_LIST_FORMAT
@@ -1793,9 +1793,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [kanaladý] {liste | LAST | NEW}
 MEMO_HEADER
-	%d nolu mesaj %s nickinden (%s).  Silmek için: /msg %s DEL %d yazýn.
+	%d nolu mesaj %s nickinden (%s).  Silmek için: %M%s DEL %d yazýn.
 MEMO_CHAN_HEADER
-	%d nolu mesaj %s nickinden (%s).  Silmek için: /msg %s DEL %s %d yazýn.
+	%d nolu mesaj %s nickinden (%s).  Silmek için: %M%s DEL %s %d yazýn.
 MEMO_TEXT
 	%s
 
@@ -2011,7 +2011,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s mevcut deðil.
 BOT_NOT_ASSIGNED
 	Bu komutu kullanmadan önce kanala bir bot sokmalýsýnýz.
-	Daha fazla bilgi için /msg %S HELP ASSIGN yazýn.
+	Daha fazla bilgi için %M%S HELP ASSIGN yazýn.
 BOT_NOT_ON_CHANNEL
 	Bot %s kanalýnda deðil.
 	
@@ -2189,7 +2189,7 @@ BOT_SET_DISABLED
 	Bot özellik ayarý geçici olarak devre dýþý.
 BOT_SET_UNKNOWN
 	Varolmayan özellik %s.
-	Daha fazla bilgi için /msg %S HELP SET yazýn.
+	Daha fazla bilgi için %M%S HELP SET yazýn.
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2254,7 +2254,7 @@ BOT_KICK_DISABLED
 	Atma ayarlarý geçici olarak devre dýþý.
 BOT_KICK_UNKNOWN
 	Varolmayan özellik %s.
-	Daha fazla bilgi için /msg %S HELP KICK yazýn.
+	Daha fazla bilgi için %M%S HELP KICK yazýn.
 BOT_KICK_BAD_TTB
 	%s deðeri kullanýlamaz.
 BOT_KICK_BADWORDS_ON
@@ -3030,7 +3030,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Module: %s Version: %s Author: %s loaded: %s
 OPER_MODULE_CMD_LIST
-	Providing command: /msg %s %s
+	Providing command: %M%s %s
 OPER_MODULE_MSG_LIST
 	Providing IRCD handler for: %s
 OPER_MODULE_NO_LIST
@@ -3394,24 +3394,24 @@ HELP_HELP
 	%S servisler hakkýnda bilgi vermek için tasarlanmýþtýr.
 	Yardým konularýna diðer servislerin HELP komutuyla ulaþýlýr.
 	
-	/msg %s HELP
+	%M%s HELP
 	     nick kayýt hakkýnda bilgiler içerir.
 	
-	/msg %s HELP
+	%M%s HELP
 	     kanal kayýdý ve kontrolü hakkýnda bilgi içerir.
 	
-	/msg %s HELP
+	%M%s HELP
 	     kullanýcýlara internette olmasalar bile mesaj göndermek
 	     için gerekli bilgileri içerir.
 
 HELP_HELP_BOT
 
-	/msg %s HELP
+	%M%s HELP
 	     kanallara bot sokulmasý ve ayarlarý hakkýnda bilgi içerir.
 
 HELP_HELP_HOST
 
-	/msg %s HELP
+	%M%s HELP
 	     for information on setting up nick vHosts
 
 ###########################################################################
@@ -3477,8 +3477,8 @@ NICK_HELP
 	%S nickinizi "kayýt" etmenizi ve diðerlerinin nickinizi 
 	kullanmalarýný engellemeyi saðlar. Aþaðýdaki komutlar nicki
 	kayýt etmeye ve korumaya izin verir, kullanmak için, 
-	/msg %S komut yazýn. Belirli bir komut hakkýnda daha 
-	fazla bilgi için, /msg %S HELP komut yazýn.
+	%M%S komut yazýn. Belirli bir komut hakkýnda daha 
+	fazla bilgi için, %M%S HELP komut yazýn.
 	
 NICK_HELP_FOOTER
 	NOT: Bu servis kullanýcýlarýn kimliklerini tehlikeye 
@@ -3528,7 +3528,7 @@ NICK_HELP_REGISTER
 	ilerde gruba kaydedeceðiniz nickler için ayný özellikleri, 
 	memo ayarlarýný ve ayný kanal ayrýcalýklarýný paylaþmanýzý 
 	saðlar. Bu özellik hakkýnda daha fazla bilgi için, 
-	/msg %S HELP GROUP yazýn.
+	%M%S HELP GROUP yazýn.
 
 
 NICK_HELP_GROUP
@@ -3548,7 +3548,7 @@ NICK_HELP_GROUP
 	Bu komutu nickinizi kaydetmemiþ olsanýz bile kullanabilirsiniz.
 	Eðer nickiniz zaten kayýtlý ise, bu komutu kullanmadan önce
 	nickinizi tanýtmanýz gerekir, daha fazla bilgi için
-	/msg %S HELP IDENTIFY yazýn. Sizin IRC networkunuzda
+	%M%S HELP IDENTIFY yazýn. Sizin IRC networkunuzda
 	bu mümkün olmayabilir.
 	
 	Bu komutu kayýtlý olmayan bir nickle kullanmanýz önerilir çünkü
@@ -3594,7 +3594,7 @@ NICK_HELP_DROP
 	grubunuzdan silebilirsiniz.
 	
 	Bu komutu kullanmadan önce, þifrenizle kendinizi tanýtmanýz
-	gereklidir (Daha fazla bilgi için /msg %S HELP IDENTIFY 
+	gereklidir (Daha fazla bilgi için %M%S HELP IDENTIFY 
 	yazýn).
 
 NICK_HELP_ACCESS
@@ -3639,17 +3639,17 @@ NICK_HELP_SET
 	    GREET      Nickiniz için bir karþýlama mesajý belirler
 	    KILL       Korumayý açar kapatýr
 	    SECURE     Nick güvenliðini açar kapatýr
-	    PRIVATE    Nickinizin /msg %S LIST yazýldýðýnda görünmesini
+	    PRIVATE    Nickinizin %M%S LIST yazýldýðýnda görünmesini
 	                  engeller
 	    HIDE       Nickinizle ilgili bazý bilgileri saklar
 	    AUTOOP     Should services op you automatically.    
 	
 	Bu komutu kullanabilmek için önce, þifrenizle 
 	kendinizi tanýtmanýz gerekir (Daha fazla bilgi için 
-	/msg %S HELP IDENTIFY yazýn).
+	%M%S HELP IDENTIFY yazýn).
 	
 	Belirli bir özellik(option) hakkýnda bilgi almak için
-	/msg %S HELP SET option yazýn.
+	%M%S HELP SET option yazýn.
 
 NICK_HELP_SET_DISPLAY
 	Kullanýmý: SET DISPLAY yeni-görünüm
@@ -3769,12 +3769,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   /msg %S LIST
+	                   %M%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type /msg %S HELP SASET option for more information
+	Type %M%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3915,7 +3915,7 @@ NICK_HELP_RECOVER
 	hatta kalýr ve diðer kullanýcýnýn tekrar o nickle baðlanmasýna
 	engel olur. Bir dakikadan sonra nickinizi geri alabilirsiniz.
 	Bir dakikadan önce nickinizi geri almak için RELEASE komutunu
-	(/msg %S HELP RELEASE) kullanabilirsiniz.
+	(%M%S HELP RELEASE) kullanabilirsiniz.
 	
 	RECOVER komutunu bir nick üzerinde kullanabilmek için o an
 	/WHOIS inizdeki adresin o nickin access listesinde olmasý, o 
@@ -4042,7 +4042,7 @@ NICK_HELP_SENDPASS
 NICK_SERVADMIN_HELP
 	Servis adminleri herhangi bir nickin tanýtmasýna gerek olmadan 
 	kaydýný silebilir(drop) ve herhangi bir nickin access listesini 
-	görüntüleyebilir. (/msg %S ACCESS LIST nick).
+	görüntüleyebilir. (%M%S ACCESS LIST nick).
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Kullanýmý: LOGOUT [nick [REVALIDATE]]
@@ -4266,9 +4266,9 @@ CHAN_HELP
 	saðlar. %S kötü niyetli kullanýcýlarýn kanallarý ele 
 	geçirmelerini(takeover), kanalda kimlerin op olacaðýný sizin
 	tarafýnýzdan beliryerek engeller. Mevcut komutlar aþaðýda 
-	listelenmiþtir; onlarý kullanmak için /msg %S komut
+	listelenmiþtir; onlarý kullanmak için %M%S komut
 	yazýn. Belirli bir komut hakkýnda daha fazla bilgi için,
-	/msg %S HELP komut yazýn.
+	%M%S HELP komut yazýn.
 	 
 	
 CHAN_HELP_EXPIRES
@@ -4292,10 +4292,10 @@ CHAN_HELP_REGISTER
 	sahip olan kiþidir; %S kanala girdiðiniz zaman size
 	otomatik kanal opu hakkýný verecektir. Kanal opu hakkýný
 	baþkalarýnada vermek için gerekli bilgiyi ACCESS komutunun
-	yardýmýna bakarak alabilirsiniz (/msg %S HELP ACCESS).
+	yardýmýna bakarak alabilirsiniz (%M%S HELP ACCESS).
 	
 	NOT: Bir kanalý kaydedebilmek için, önce nickinizi kaydetmelisiniz.
-	Eðer kaydetmediyseniz /msg %s HELP yazarak nasýl yapacaðýnýz
+	Eðer kaydetmediyseniz %M%s HELP yazarak nasýl yapacaðýnýz
 	hakkýnda bilgi alabilirsiniz.
 
 CHAN_HELP_IDENTIFY
@@ -4354,7 +4354,7 @@ CHAN_HELP_SET
 
 	
 	Belirli bir özellik hakkýnda daha fazla bilgi için
-	/msg %S HELP özellik yazýn.
+	%M%S HELP özellik yazýn.
 
 CHAN_HELP_SET_FOUNDER
 	Kullanýmý: SET kanaladý FOUNDER nick
@@ -4479,7 +4479,7 @@ CHAN_HELP_SET_PRIVATE
 	Kullanýmý: SET kanaladý PRIVATE {ON | OFF}
 	
 	Bir kanal için private özelliðini açar kapatýr. private özelliði
-	aktifse, /msg %S LIST komutuyla kanal listelenemez.
+	aktifse, %M%S LIST komutuyla kanal listelenemez.
 
 CHAN_HELP_SET_RESTRICTED
 	Kullanýmý: SET kanaladý RESTRICTED {ON | OFF}
@@ -4527,7 +4527,7 @@ CHAN_HELP_SET_SIGNKICK
 	Eðer LEVEL parametresini kullanýrsanýz, seviyesi
 	SIGNKICK seviyesine eþit yada fazla olanlarýn yaptýðý
 	atmalarda atanýn nicki sebepte gözükmez. Daha fazla
-	bilgi için /msg %S HELP LEVELS yazýn.
+	bilgi için %M%S HELP LEVELS yazýn.
 
 CHAN_HELP_SET_XOP
 	Kullanimi: SET kanaladi XOP {ON | OFF}
@@ -4594,9 +4594,9 @@ CHAN_HELP_AOP
 	
 	Bu komutu kanaliniz için devre disi birakabilirsiniz. O zaman
 	access komutlarini kullanmalisiniz. Access komutlari hakkinda
-	bilgi almak için  /msg %S HELP ACCESS yazin. 
+	bilgi almak için  %M%S HELP ACCESS yazin. 
 	Access ile xOP arasinda geçis yapabilmek için gerekli bilgilere
-	/msg %S HELP SET XOP yazarak ulasabilirsiniz.
+	%M%S HELP SET XOP yazarak ulasabilirsiniz.
 
 CHAN_HELP_HOP
 	Kullanýmý: HOP kanaladi ADD nick
@@ -4629,9 +4629,9 @@ CHAN_HELP_HOP
 	
 	Bu komutu kanaliniz için devre disi birakabilirsiniz. O zaman
 	access komutlarini kullanmalisiniz. Access komutlari hakkinda
-	bilgi almak için  /msg %S HELP ACCESS yazin. 
+	bilgi almak için  %M%S HELP ACCESS yazin. 
 	Access ile xOP arasinda geçis yapabilmek için gerekli bilgilere
-	/msg %S HELP SET XOP yazarak ulasabilirsiniz.
+	%M%S HELP SET XOP yazarak ulasabilirsiniz.
 
 CHAN_HELP_SOP
 	Kullanýmý: SOP kanaladi ADD nick
@@ -4666,9 +4666,9 @@ CHAN_HELP_SOP
 	
 	Bu komutu kanaliniz için devre disi birakabilirsiniz. O zaman
 	access komutlarini kullanmalisiniz. Access komutlari hakkinda
-	bilgi almak için  /msg %S HELP ACCESS yazin. 
+	bilgi almak için  %M%S HELP ACCESS yazin. 
 	Access ile xOP arasinda geçis yapabilmek için gerekli bilgilere
-	/msg %S HELP SET XOP yazarak ulasabilirsiniz.
+	%M%S HELP SET XOP yazarak ulasabilirsiniz.
 
 CHAN_HELP_VOP
 	Kullanýmý: VOP kanaladi ADD nick
@@ -4700,9 +4700,9 @@ CHAN_HELP_VOP
 	
 	Bu komutu kanaliniz için devre disi birakabilirsiniz. O zaman
 	access komutlarini kullanmalisiniz. Access komutlari hakkinda
-	bilgi almak için  /msg %S HELP ACCESS yazin. 
+	bilgi almak için  %M%S HELP ACCESS yazin. 
 	Access ile xOP arasinda geçis yapabilmek için gerekli bilgilere
-	/msg %S HELP SET XOP yazarak ulasabilirsiniz.
+	%M%S HELP SET XOP yazarak ulasabilirsiniz.
 
 CHAN_HELP_ACCESS
 	Kullanýmý:  ACCESS kanaladý ADD nick seviye
@@ -4714,7 +4714,7 @@ CHAN_HELP_ACCESS
 	kanalda kimlerin op olacaðýný ve %S komutlarýna
 	kimlerin eriþimi olacaðýný belirtir. Deðiþik access
 	seviyeleri deðiþik komutlara eriþim saðlar. Ayrýntýlý bilgi
-	için /msg %S HELP ACCESS LEVELS yazýn. Access
+	için %M%S HELP ACCESS LEVELS yazýn. Access
 	listesinde olmayan kullanýcýlarýn seviyesi 0 dýr.
 	
 	ACCESS ADD komutu belirtilen nicki belirtilen seviyeden
@@ -4756,7 +4756,7 @@ CHAN_HELP_ACCESS_LEVELS
 	        <0   Kanalda oplanamaz.
 	
 	Bu seviyeler LEVELS komutu kullanýlarak deðiþtirilebilir, veya
-	yenileri eklenebilir, bilgi için /msg %S HELP LEVELS 
+	yenileri eklenebilir, bilgi için %M%S HELP LEVELS 
 	yazýn.
 
 CHAN_HELP_AKICK
@@ -5010,7 +5010,7 @@ CHAN_HELP_TOPIC
 	%S belirtilen kanala belirtilen konuyu yazar.Eger
 	topic belirtilmemisse, bos bir konu yazilir. Bu
 	komut SET TOPICLOCK aktif oldugu zaman kullanislidir.
-	Daha fazla bilgi için /msg %S HELP SET TOPICLOCK
+	Daha fazla bilgi için %M%S HELP SET TOPICLOCK
 	yazin.
 	
 	Varsayilan olarak, founderin kullanma yetkisi vardir.
@@ -5216,7 +5216,7 @@ MEMO_HELP_OPER
 MEMO_HELP_FOOTER
 	
 	Yukardaki herhangi bir komut hakkýnda yardým için 
-	/msg %S HELP komut yazýn.
+	%M%S HELP komut yazýn.
 	
 	(*) Varsayýlan olarak, kanal mesajlarýný o kanalda access
 	    seviyesi en az 10 olanlar okuyabilir. Bu %s LEVELS 
@@ -5287,7 +5287,7 @@ MEMO_HELP_SET
 	                    belirler
 	
 	Belirli bir özellik hakkýnda daha fazla bilgi için, 
-	/msg %S HELP SET özellik yazýn.
+	%M%S HELP SET özellik yazýn.
 
 MEMO_HELP_SET_NOTIFY
 	Kullanýmý: SET NOTIFY {ON | LOGON | NEW | OFF}
@@ -6116,8 +6116,8 @@ BOT_HELP
 	servis bot konfigürasyonundan anlamayanlar yada
 	bota izin vermeyen networkler için geliþtirilmiþtir.
 	Mevcut komutlar aþaðýda listelenmiþtir. Kullanmak için
-	/msg %S command yazýn. Belirli bir komut hakkýnda
-	daha fazla bilgi için, /msg %S HELP komut
+	%M%S command yazýn. Belirli bir komut hakkýnda
+	daha fazla bilgi için, %M%S HELP komut
 	yazýn.
 	
 BOT_HELP_FOOTER
@@ -6163,7 +6163,7 @@ BOT_HELP_SET
 	    SYMBIOSIS        Gerçek bot gibi davranmasýný saðlar.
 	
 	Belirli bir komut hakkýnda daha fazla bilgi için 
-	/msg %S HELP SET özellik yazýn.
+	%M%S HELP SET özellik yazýn.
 	
 	Not: Bu komuta access eriþimi seviye(level) ayarýyla saðlanýr.
 
@@ -6229,7 +6229,7 @@ BOT_HELP_KICK
 	    UNDERLINES    Altýçizgili yazýda atar
 	
 	Belirli bir özellik hakkýnda daha fazla bilgi için
-	/msg %S HELP KICK özellik yazýn.
+	%M%S HELP KICK özellik yazýn.
 	
 	Not: Bu komuta eriþim seviye(level) ayarýyla yapýlýr.
 
@@ -6316,7 +6316,7 @@ BOT_HELP_KICK_BADWORDS
 	bu özellik bota küfür edenleri atmasýný söyler.
 	
 	Bir kanal için küfür belirlemek için BADWORDS komutunu
-	kullanabilirsiniz. Ayrýntýlar için  /msg %S HELP BADWORDS
+	kullanabilirsiniz. Ayrýntýlar için  %M%S HELP BADWORDS
 	yazýn.
 	
 	böas banlamadan önce kiþinin kaç kez atýlacaðýný 
@@ -6331,7 +6331,7 @@ BOT_HELP_BADWORDS
 	Bir kanal için küfür listesi düzenler. Küfür listesi
 	küfürde atma aktifleþtirildiði zaman hangi kelimelerde
 	atýlacaðýný belirler. Daha fazla bilgi için 
-	/msg %S HELP KICK BADWORDS yazýn.
+	%M%S HELP KICK BADWORDS yazýn.
 	
 	BADWORDS ADD komutu belirtilen kelimeyi küfür listesine
 	ekler. Eðer SINGLE parametresi belirtilmiþse, atma iþlemi
@@ -6441,9 +6441,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s not found in the nickserv db.
 HOST_SET_SYNTAX
-	Syntax /msg %s set <nick> <hostmask>.
+	Syntax %M%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Syntax /msg %s setall <nick> <hostmask>.
+	Syntax %M%s setall <nick> <hostmask>.
 HOST_DENIED
 	Access Denied.
 HOST_NOT_ASSIGNED
@@ -6459,7 +6459,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: /msg %s del <nick>.
+	Syntax: %M%s del <nick>.
 
 ###########################################################################
 #

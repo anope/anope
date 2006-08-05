@@ -151,11 +151,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Comando desconhecido: %s.
 UNKNOWN_COMMAND_HELP
-	Comando desconhecido %s. Digite /msg %s HELP para ajuda.
+	Comando desconhecido %s. Digite %M%s HELP para ajuda.
 SYNTAX_ERROR
 	Sintaxe: %s
 MORE_INFO
-	Digite /msg %s HELP %s para maiores informações.
+	Digite %M%s HELP %s para maiores informações.
 NO_HELP_AVAILABLE
 	Nenhuma ajuda disponível para %s.
 OBSOLETE_COMMAND
@@ -198,7 +198,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	Seu nick não está registrado.
 NICK_NOT_REGISTERED_HELP
-	Seu nick não está registrado. Digite /msg %s HELP para maiores informações sobre como registrar o nick.
+	Seu nick não está registrado. Digite %M%s HELP para maiores informações sobre como registrar o nick.
 NICK_X_IS_SERVICES
 	Nick %s é parte dos Services desta Rede.
 NICK_X_NOT_REGISTERED
@@ -233,10 +233,10 @@ CHAN_X_SUSPENDED
 	             Suspenso: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Identificação de senha requerida para usar este comando.
-	Tente novamente após digitar /msg %s IDENTIFY senha.
+	Tente novamente após digitar %M%s IDENTIFY senha.
 CHAN_IDENTIFY_REQUIRED
 	Identificação de senha requerida para usar este comando.
-	Tente novamente após digitar /msg %s IDENTIFY %s senha.
+	Tente novamente após digitar %M%s IDENTIFY %s senha.
 	
 MAIL_DISABLED
 	Os services foram configurados para não enviar e-mail.
@@ -307,10 +307,10 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Este nick foi registrado por outra pessoa.  Por favor escolha outro.
-	(Se este for seu nick, digite /msg %s IDENTIFY senha.)
+	(Se este for seu nick, digite %M%s IDENTIFY senha.)
 NICK_IS_SECURE
 	Este nick está registrado e protegido.  Se este for seu
-	nick, digite /msg %s IDENTIFY senha.  Caso contrário,
+	nick, digite %M%s IDENTIFY senha.  Caso contrário,
 	por favor escolha outro nick.
 NICK_MAY_NOT_BE_USED
 	Este nick não pode ser usado.  Por favor escolha outro.
@@ -357,12 +357,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	Por favor espere %d segundos antes de usar o comando GROUP novamente.
 NICK_GROUP_CHANGE_DISABLED
-	Seu nick já está registrado; digite /msg %s DROP primeiro.
+	Seu nick já está registrado; digite %M%s DROP primeiro.
 NICK_GROUP_SAME
 	Você já é um membro do grupo %s.
 NICK_GROUP_TOO_MANY
 	Existem muitos nicks no grupo de %s; liste-os e remova alguns.
-	Digite /msg %s HELP GLIST e /msg %s HELP DROP para
+	Digite %M%s HELP GLIST e %M%s HELP DROP para
 	mais informações.
 NICK_GROUP_JOINED
 	Você é agora um membro do grupo %s.
@@ -379,7 +379,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Este e-mail permitirá que você receba sua senha por ele
 	caso você se esqueça dela.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Digite /msg %S SET EMAIL e-mail para setar seu e-mail.
+	Digite %M%S SET EMAIL e-mail para setar seu e-mail.
 	Sua privacidade é respeitada; seu e-mail não será dado
 	para terceiros.
 	
@@ -443,7 +443,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE número
 NICK_SET_LANGUAGE_UNKNOWN
-	Número de linguagem desconhecida %d. Digite /msg %s HELP SET LANGUAGE para uma lista das linguagens disponíveis.
+	Número de linguagem desconhecida %d. Digite %M%s HELP SET LANGUAGE para uma lista das linguagens disponíveis.
 NICK_SET_LANGUAGE_CHANGED
 	Linguagem alterada para Português.
 
@@ -750,7 +750,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Este nick não irá expirar.
 NICK_INFO_FOR_MORE
-	Para informações mais detalhadas, digite /msg %s INFO %s ALL.
+	Para informações mais detalhadas, digite %M%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -803,7 +803,7 @@ NICK_NO_RECOVER_SELF
 	Você não pode usar o comando RECOVER em si mesmo!
 NICK_RECOVERED
 	Usuário que usava seu nick foi derrubado.
-	/msg %s RELEASE %s para liberar seu nick antes de um minuto.
+	%M%s RELEASE %s para liberar seu nick antes de um minuto.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -895,9 +895,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	Esse nick está aguardando um código de verificação por e-mail antes de completar o registro.
 NICK_ENTER_REG_CODE
-	O passcode foi enviado para %s, por favor digite /msg %s confirm <passcode> para completar o registro.
+	O passcode foi enviado para %s, por favor digite %M%s confirm <passcode> para completar o registro.
 NICK_CONFIRM_NOT_FOUND
-	O primeiro passo do registro deve ter expirado, por favor use /msg %s register <senha> <email> primeiro.
+	O primeiro passo do registro deve ter expirado, por favor use %M%s register <senha> <email> primeiro.
 NICK_CONFIRM_INVALID
 	Um passcode inválido foi digitado, por favor verifique o e-mail e tente novamente
 NICK_REG_MAIL_SUBJECT
@@ -907,7 +907,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	Você solicitou o registro do seguinte nick: %s.
 NICK_REG_MAIL_LINE_2
-	Por favor digite /msg %s confirm %s para completar o registro.
+	Por favor digite %M%s confirm %s para completar o registro.
 NICK_REG_MAIL_LINE_3
 	Se você não sabe porque este e-mail lhe foi enviado, por favor ignore-o com sigilo.
 NICK_REG_MAIL_LINE_4
@@ -1021,10 +1021,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Canais locais não podem ser registrados.
 CHAN_MUST_REGISTER_NICK
-	Você deve registrar seu nick primeiro.  Digite /msg %s HELP para maiores informações sobre registro de nick.
+	Você deve registrar seu nick primeiro.  Digite %M%s HELP para maiores informações sobre registro de nick.
 CHAN_MUST_IDENTIFY_NICK
 	Por favor se identifique com o %s primeiro, usando o comando:
-	/msg %s IDENTIFY senha
+	%M%s IDENTIFY senha
 CHAN_MAY_NOT_BE_REGISTERED
 	O canal %s não pode ser registrado.
 CHAN_ALREADY_REGISTERED
@@ -1248,7 +1248,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Você não pode usar este comando. Ao invés, use o comando ACCESS.
-	Digite /msg %s HELP ACCESS para mais informação.
+	Digite %M%s HELP ACCESS para mais informação.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1380,7 +1380,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Você não pode usar este comando.
 	Ao invés, use os comandos VOP, HOP, AOP e SOP.
-	Digite /msg %s HELP comando para mais informação.
+	Digite %M%s HELP comando para mais informação.
 CHAN_ACCESS_DISABLED
 	Desculpe, o registro de canais está temporariamente desativado.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1477,7 +1477,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	Nível para %s no canal %s alterado para %d.
 CHAN_LEVELS_UNKNOWN
-	Level %s desconhecido. Digite /msg %s HELP LEVELS DESC para uma lista de Levels válidos.
+	Level %s desconhecido. Digite %M%s HELP LEVELS DESC para uma lista de Levels válidos.
 CHAN_LEVELS_DISABLED
 	%s desabilitado no canal %s.
 CHAN_LEVELS_LIST_HEADER
@@ -1703,11 +1703,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	Você tem %d novos memos.
 MEMO_TYPE_READ_LAST
-	Digite /msg %s READ LAST para ler.
+	Digite %M%s READ LAST para ler.
 MEMO_TYPE_READ_NUM
-	Digite /msg %s READ %d para ler.
+	Digite %M%s READ %d para ler.
 MEMO_TYPE_LIST_NEW
-	Digite /msg %s LIST NEW para listar.
+	Digite %M%s LIST NEW para listar.
 MEMO_AT_LIMIT
 	Atenção: Você atingiu seu número máximo de memos (%d). Não será possível receber novos memos enquanto você não apagar alguns.
 MEMO_OVER_LIMIT
@@ -1718,10 +1718,10 @@ MEMO_X_ONE_NOTICE
 	Existe %d memo para o canal %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	Foi recebido um novo memo para o canal %s.
-	Digite /msg %s READ %s %d para ler.
+	Digite %M%s READ %s %d para ler.
 MEMO_NEW_MEMO_ARRIVED
 	Você recebeu um novo memo de %s.
-	Digite /msg %s READ %d para ler.
+	Digite %M%s READ %d para ler.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1767,13 +1767,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	%s não possui novos memos.
 MEMO_LIST_MEMOS
-	Memos para %s. Para ler, digite: /msg %s READ núm
+	Memos para %s. Para ler, digite: %M%s READ núm
 MEMO_LIST_NEW_MEMOS
-	Novos memos para %s. Para ler, digite: /msg %s READ núm
+	Novos memos para %s. Para ler, digite: %M%s READ núm
 MEMO_LIST_CHAN_MEMOS
-	Memos para %s. Para ler, digite: /msg %s READ %s núm
+	Memos para %s. Para ler, digite: %M%s READ %s núm
 MEMO_LIST_CHAN_NEW_MEMOS
-	Novos memos para %s. Para ler, digite: /msg %s READ %s núm
+	Novos memos para %s. Para ler, digite: %M%s READ %s núm
 MEMO_LIST_HEADER
 	 Núm  Remetente            Data/Hora
 MEMO_LIST_FORMAT
@@ -1783,9 +1783,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [canal] {list | LAST | NEW}
 MEMO_HEADER
-	Memo %d de %s (%s). Para apagar, digite: /msg %s DEL %d
+	Memo %d de %s (%s). Para apagar, digite: %M%s DEL %d
 MEMO_CHAN_HEADER
-	Memo %d de %s (%s). Para apagar, digite: /msg %s DEL %s %d
+	Memo %d de %s (%s). Para apagar, digite: %M%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -1970,7 +1970,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s não existe.
 BOT_NOT_ASSIGNED
 	Você precisa primeiro associar um bot ao canal antes de usar este comando.
-	Digite /msg %S HELP ASSIGN para maiores informações.
+	Digite %M%S HELP ASSIGN para maiores informações.
 BOT_NOT_ON_CHANNEL
 	Bot não está no canal %s.
 	
@@ -2149,7 +2149,7 @@ BOT_SET_DISABLED
 	Desculpe, o comando SET está temporariamente desativado.
 BOT_SET_UNKNOWN
 	Opção desconhecida: %s.
-	Digite /msg %S HELP SET para maiores informações.
+	Digite %M%S HELP SET para maiores informações.
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2214,7 +2214,7 @@ BOT_KICK_DISABLED
 	Desculpe, as configurações do kicker estão temporariamente desativadas.
 BOT_KICK_UNKNOWN
 	Opção desconhecida: %s.
-	Digite /msg %S HELP KICK para maiores informações.
+	Digite %M%S HELP KICK para maiores informações.
 BOT_KICK_BAD_TTB
 	%s não pode ser colocado como tempo para ban.
 
@@ -3304,24 +3304,24 @@ HELP_HELP
 	os Services. Os tópicos de ajuda são enviados pelo 
 	comando HELP dos outros clientes dos Services:
 
-	/msg %s HELP
+	%M%s HELP
 	     para informações sobre como registrar nicks
 
-	/msg %s HELP
+	%M%s HELP
 	     para informações sobre como registrar e controlar canais
 
-	/msg %s HELP
+	%M%s HELP
 	     para informações sobre como enviar mensagens para
 	     usuários que não estejam conectados no momento
 
 HELP_HELP_BOT
 
-	/msg %s HELP
+	%M%s HELP
 	     para informações sobre como colocar um bot em seu canal
 
 HELP_HELP_HOST
 
-	/msg %s HELP
+	%M%s HELP
 	     para informação sobre como ajustar vHosts em nicks
 
 ###########################################################################
@@ -3385,8 +3385,8 @@ NICK_HELP
 	%S permite que você "registre" um nick e evita que outras
 	pessoas o utilizem. Os seguintes comandos permitem o
 	registro e a manutenção dos nicks; para utilizá-los, digite
-	/msg %S comando. Para mais informações sobre um
-	comando específico, digite /msg %S HELP comando.
+	%M%S comando. Para mais informações sobre um
+	comando específico, digite %M%S HELP comando.
 	
 NICK_HELP_FOOTER
 	NOTA: Este serviço tem a intenção de prover um modo para
@@ -3433,7 +3433,7 @@ NICK_HELP_REGISTER
 	nick, e irá permitir que você registre outros nicks e divida
 	as mesmas configurações, os mesmos memos e os mesmos 
 	privilégios em canais. Para maiores informações neste recurso,
-	digite /msg %S HELP GROUP.
+	digite %M%S HELP GROUP.
 	
 NICK_HELP_GROUP
 	Sintaxe: GROUP alvo senha
@@ -3454,7 +3454,7 @@ NICK_HELP_GROUP
 	Você pode usar este comando mesmo se não ainda não tiver
 	registrado seu nick. Se seu nick já estiver registrado,
 	você precisará identificá-lo antes de usar este comando.
-	Digite /msg %S HELP IDENTIFY para mais informação; talvez
+	Digite %M%S HELP IDENTIFY para mais informação; talvez
 	isso não seja possível em algumas redes.
 	
 	É recomendável usar este comando com nicks não-registrados,
@@ -3501,7 +3501,7 @@ NICK_HELP_DROP
 	especificando-o com o parâmetro nick.
 	
 	Para você usar este comando, será necessário que primeiro
-	você se identifique usando sua senha (/msg %S HELP IDENTIFY 
+	você se identifique usando sua senha (%M%S HELP IDENTIFY 
 	para maiores informações).
 
 NICK_HELP_ACCESS
@@ -3542,16 +3542,16 @@ NICK_HELP_SET
 	    GREET      Associa uma mensgem de entrada ao seu nick
 	    KILL       Ativa/Desativa a proteção de kill para o seu nick
 	    SECURE     Ativa/Desativa os recursos de segurança para o seu nick
-	    PRIVATE    Previne seu nick de aparecer em um /msg %S LIST
+	    PRIVATE    Previne seu nick de aparecer em um %M%S LIST
 	    HIDE       Esconde certas informações sobre seu nick
 	    MSG        Altera o método de comunicação dos Services
 	    AUTOOP     Should services op you automatically.    
 	
 	Para usar este comando, você deve primeiro se identificar
-	com sua senha (/msg %S HELP IDENTIFY para maiores
+	com sua senha (%M%S HELP IDENTIFY para maiores
 	informações).
 	
-	Digite /msg %S HELP SET opção para maiores informações
+	Digite %M%S HELP SET opção para maiores informações
 	sobre um comando específico.
 
 NICK_HELP_SET_DISPLAY
@@ -3678,12 +3678,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   /msg %S LIST
+	                   %M%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type /msg %S HELP SASET option for more information
+	Type %M%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3825,7 +3825,7 @@ NICK_HELP_RECOVER
 	assegurar que o outro usuário não reconecte imediatamente;
 	Durante este minuto, você pode reivindicar seu nick.
 	Alternativamente, use o comando RELEASE
-	(/msg %S HELP RELEASE) para retomar seu nick mais 
+	(%M%S HELP RELEASE) para retomar seu nick mais 
 	rapidamente.
 	
 	Para usar o comando RECOVER em um nick, seu endereço
@@ -3949,7 +3949,7 @@ NICK_HELP_SENDPASS
 NICK_SERVADMIN_HELP
 	Os Administradores dos Services podem ainda usar o DROP em qualquer nick
 	sem ser necessário se identificar como dono dele, e podem ver a lista de
-	acesso de qualquer nick (/msg %S ACCESS LIST nick).
+	acesso de qualquer nick (%M%S ACCESS LIST nick).
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Sintaxe: LOGOUT [nick [REVALIDATE]]
@@ -4162,8 +4162,8 @@ CHAN_HELP
 	do canal por usuários maliciosos, limitando quem possui
 	o privilégio de OP do canal. Os comandos disponíveis
 	estão listados abaixo; para usá-los, digite
-	/msg %S comando. Para mais informações sobre
-	um comando específico, digite /msg %S HELP comando.
+	%M%S comando. Para mais informações sobre
+	um comando específico, digite %M%S HELP comando.
 	
 	
 CHAN_HELP_EXPIRES
@@ -4189,13 +4189,13 @@ CHAN_HELP_REGISTER
 	do mesmo. Ao fundador do canal é permitido alterar todas as
 	configurações do mesmo; %S irá dar automaticamente ao fundador
 	privilégios de Operador de Canal quando ele entrar no canal.
-	Veja o comando ACCESS (/msg %S HELP ACCESS) para
+	Veja o comando ACCESS (%M%S HELP ACCESS) para
 	informação sobre como liberar uma parte dos seus privilégios
 	a outros usuários do canal.
 	
 	IMPORTANTE: Para registrar um canal, você deve antes ter
 	registrado seu nick. Se ainda não tiver seu nick registrado,
-	digite /msg %s HELP para mais informações de como fazê-lo.
+	digite %M%s HELP para mais informações de como fazê-lo.
 
 CHAN_HELP_IDENTIFY
 	Sintaxe: IDENTIFY canal senha
@@ -4252,7 +4252,7 @@ CHAN_HELP_SET
 	    OPNOTICE      Envia uma notice quando os comandos OP/DEOP são usados
 	    XOP           Altera o sistema de privilégio de usuário
 	
-	Digite /msg %S HELP SET opção para maiores informações
+	Digite %M%S HELP SET opção para maiores informações
 	sobre uma opção em particular.
 
 CHAN_HELP_SET_FOUNDER
@@ -4388,7 +4388,7 @@ CHAN_HELP_SET_PRIVATE
 	Sintaxe: SET canal PRIVATE {ON|OFF}
 	
 	Ativa ou desativa a opção private para um canal. Quando
-	private está ativada, um /msg %S LIST não irá incluir
+	private está ativada, um %M%S LIST não irá incluir
 	o canal em qualquer listagem.
 
 CHAN_HELP_SET_RESTRICTED
@@ -4435,7 +4435,7 @@ CHAN_HELP_SET_SIGNKICK
 	
 	Se você usar LEVEL, aqueles que tiverem um nível igual ou 
 	superior ao nível do SIGNKICK não terão o nick aparecendo no 
-	motivo. Veja /msg %S HELP LEVELS para maiores informações. 
+	motivo. Veja %M%S HELP LEVELS para maiores informações. 
 
 CHAN_HELP_SET_XOP
 	Sintaxe: SET canal XOP {ON | OFF}
@@ -4503,8 +4503,8 @@ CHAN_HELP_AOP
 	
 	Este comando pode ter sido desabilitado para seu canal
 	e, nesse caso, você precisa usar a lista de acesso. Veja
-	/msg %S HELP ACCESS para informações sobre a lista
-	de acesso, e /msg %S HELP SET XOP para saber como
+	%M%S HELP ACCESS para informações sobre a lista
+	de acesso, e %M%S HELP SET XOP para saber como
 	escolher entre a lista de acesso e o sistema de listas xOP.
 
 CHAN_HELP_HOP
@@ -4540,8 +4540,8 @@ CHAN_HELP_HOP
 	
 	Este comando pode ter sido desabilitado para seu canal
 	e, nesse caso, você precisa usar a lista de acesso. Veja
-	/msg %S HELP ACCESS para informações sobre a lista
-	de acesso, e /msg %S HELP SET XOP para saber como
+	%M%S HELP ACCESS para informações sobre a lista
+	de acesso, e %M%S HELP SET XOP para saber como
 	escolher entre a lista de acesso e o sistema de listas xOP.
 
 CHAN_HELP_SOP
@@ -4578,8 +4578,8 @@ CHAN_HELP_SOP
 	
 	Este comando pode ter sido desabilitado para seu canal
 	e, nesse caso, você precisa usar a lista de acesso. Veja
-	/msg %S HELP ACCESS para informações sobre a lista
-	de acesso, e /msg %S HELP SET XOP para saber como
+	%M%S HELP ACCESS para informações sobre a lista
+	de acesso, e %M%S HELP SET XOP para saber como
 	escolher entre a lista de acesso e o sistema de listas xOP.
 
 CHAN_HELP_VOP
@@ -4615,8 +4615,8 @@ CHAN_HELP_VOP
 	
 	Este comando pode ter sido desabilitado para seu canal
 	e, nesse caso, você precisa usar a lista de acesso. Veja
-	/msg %S HELP ACCESS para informações sobre a lista
-	de acesso, e /msg %S HELP SET XOP para saber como
+	%M%S HELP ACCESS para informações sobre a lista
+	de acesso, e %M%S HELP SET XOP para saber como
 	escolher entre a lista de acesso e o sistema de listas xOP.
 
 CHAN_HELP_ACCESS
@@ -4629,7 +4629,7 @@ CHAN_HELP_ACCESS
 	de acesso especifica que usuários tem permissão para
 	status de OP ou tem acesso aos comandos do %S em
 	um canal. Níveis diferentes de usuários permitem acesso
-	a diferentes subníveis de privilégios; /msg %S HELP
+	a diferentes subníveis de privilégios; %M%S HELP
 	ACCESS LEVELS para mais informações específicas. Por
 	padrão, qualquer nick não presente na lista de acesso
 	possui nível 0.
@@ -4677,7 +4677,7 @@ CHAN_HELP_ACCESS_LEVELS
 	        <0   Não pode ser OP.
 	
 	Esses níveis podem ser mudados, ou adicionar novos, usando o
-	comando LEVELS; digite /msg %S HELP LEVELS para informações.
+	comando LEVELS; digite %M%S HELP LEVELS para informações.
 
 CHAN_HELP_AKICK
 	Sintaxe: AKICK canal ADD máscara [razão]
@@ -4955,7 +4955,7 @@ CHAN_HELP_TOPIC
 	Manda %S ajustar o tópico do canal para o que foi especificado.
 	Se tópico não é fornecido, então um tópico vazio será
 	ajustado. Este comando é mais útil se usado junto com a opção
-	SET TOPICLOCK. Veja /msg %S HELP SET TOPICLOCK
+	SET TOPICLOCK. Veja %M%S HELP SET TOPICLOCK
 	para mais informação.
 	
 	Por padrão, limitado àqueles que possuem acesso de Founder no canal.
@@ -5167,7 +5167,7 @@ MEMO_HELP_OPER
 	Não usado.
 MEMO_HELP_FOOTER
 	
-	Digite /msg %S HELP comando para ajuda em qualquer um
+	Digite %M%S HELP comando para ajuda em qualquer um
 	dos comandos acima.
 	
 	(*) Por padrão, qualquer usuário com pelo menos nível 10 de acesso
@@ -5240,7 +5240,7 @@ MEMO_HELP_SET
 	    LIMIT       Ajusta o número máximo de mensagens que você
 	                    pode receber.
 	
-	Digite /msg %S HELP SET opção, para mais informações sobre
+	Digite %M%S HELP SET opção, para mais informações sobre
 	uma opção específica.
 
 MEMO_HELP_SET_NOTIFY
@@ -6071,8 +6071,8 @@ BOT_HELP
 	ou configurar um bot, ou para Redes que não permitem
 	aos usuários terem um bot. Os comandos disponíveis 
 	estão listados abaixo; para usá-los, digite
-	/msg %S comando. Para informações mais específicas
-	sobre um comando, digite /msg %S HELP comando.
+	%M%S comando. Para informações mais específicas
+	sobre um comando, digite %M%S HELP comando.
 	
 BOT_HELP_FOOTER
 	O bot irá entrar no canal sempre que tiver ao menos %d usuário(s) nele.
@@ -6118,7 +6118,7 @@ BOT_HELP_SET
 	    FANTASY          Habilita os comandos Fantasia
 	    SYMBIOSIS        Permite que o bot seja um bot real
 	
-	Digite /msg %S HELP SET opção para maiores informações
+	Digite %M%S HELP SET opção para maiores informações
 	sobre uma opção específica.
 	
 	Aviso: o acesso a este comando é controlado pelo ajuste
@@ -6186,7 +6186,7 @@ BOT_HELP_KICK
 	    REVERSES      Selecione para o bot kickar por reversos
 	    UNDERLINES    Selecione para o bot kickar por sublinhado
 	
-	Digite /msg %S HELP KICK opção para maiores informações
+	Digite %M%S HELP KICK opção para maiores informações
 	sobre uma opção específica.
 	
 	Nota: o acesso a esse comando é controlado pelo ajuste
@@ -6280,7 +6280,7 @@ BOT_HELP_KICK_BADWORDS
 	palavras no canal.
 	
 	Você pode definir os palavrões para um canal usando o
-	comando BADWORDS. Digite /msg %S HELP BADWORDS para
+	comando BADWORDS. Digite %M%S HELP BADWORDS para
 	maiores informações.
 	
 	ttb é o número de vezes que o usuário será kickado
@@ -6297,7 +6297,7 @@ BOT_HELP_BADWORDS
 	Essa lista determina quais são as palavras que deverão
 	ser motivo de kick em um canal quando a opção BADWORDS
 	estiver ativada. Para maiores informações, digite
-	/msg %S HELP KICK BADWORDS.
+	%M%S HELP KICK BADWORDS.
 	
 	O comando BADWORDS ADD adiciona a palavra na lista
 	de palavrões. A opção SINGLE, quando especificada, só
@@ -6418,9 +6418,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Usuário %s não encontrado na DB do NickServ.
 HOST_SET_SYNTAX
-	Sintaxe: /msg %s set <nick> <hostmask>.
+	Sintaxe: %M%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Sintaxe: /msg %s setall <nick> <hostmask>.
+	Sintaxe: %M%s setall <nick> <hostmask>.
 HOST_DENIED
 	Acesso Negado.
 HOST_NOT_ASSIGNED
@@ -6436,7 +6436,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost para %s removido.
 HOST_DEL_SYNTAX
-	Sintaxe: /msg %s del <nick>.
+	Sintaxe: %M%s del <nick>.
 HOST_OFF_UNREAL
 	Seu vhost foi removido. Para reabilitar a encriptação padrão de host, digite /mode %s +%s
 HOST_NO_VIDENT

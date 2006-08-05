@@ -143,11 +143,11 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Onbekend commando %s.
 UNKNOWN_COMMAND_HELP
-	Onbekend commando %s.  "/msg %s HELP" voor help.
+	Onbekend commando %s.  "%M%s HELP" voor help.
 SYNTAX_ERROR
 	Gebruik: %s
 MORE_INFO
-	/msg %s HELP %s voor meer informatie.
+	%M%s HELP %s voor meer informatie.
 NO_HELP_AVAILABLE
 	Geen help beschikbaar voor %s.
 OBSOLETE_COMMAND
@@ -191,7 +191,7 @@ PASSWORD_TRUNCATED
 NICK_NOT_REGISTERED
 	Je nick is niet geregistreerd.
 NICK_NOT_REGISTERED_HELP
-	Je nick is niet geregistreerd.  Type /msg %s HELP voor informatie over het registreren van je nick.
+	Je nick is niet geregistreerd.  Type %M%s HELP voor informatie over het registreren van je nick.
 NICK_X_IS_SERVICES
 	Nick %s is deel van de Services van dit netwerk.
 NICK_X_NOT_REGISTERED
@@ -226,10 +226,10 @@ CHAN_X_SUSPENDED
 	      Tijdelijk buiten werking gesteld: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Wachtwoord verificatie benodigd voor dat commando.
-	Probeer opnieuw na het typen van /msg %s IDENTIFY wachtwoord.
+	Probeer opnieuw na het typen van %M%s IDENTIFY wachtwoord.
 CHAN_IDENTIFY_REQUIRED
 	Wachtwoord verificatie is benodigd voor dat commando.
-	Probeer opnieuw na het typen van /msg %s IDENTIFY %s wachtwoord.
+	Probeer opnieuw na het typen van %M%s IDENTIFY %s wachtwoord.
 	
 MAIL_DISABLED
 	Services zijn geconfigureerd geen e-mail te versturen.
@@ -300,10 +300,10 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Deze nick is eigendom van iemand anders.  Kies een andere.
-	(Als dit jouw nick is, type /msg %s IDENTIFY wachtwoord.)
+	(Als dit jouw nick is, type %M%s IDENTIFY wachtwoord.)
 NICK_IS_SECURE
 	Deze nickname is geregistreerd en beschermd.  Als het jouw
-	nick is, type /msg %s IDENTIFY wachtwoord.  Zo niet,
+	nick is, type %M%s IDENTIFY wachtwoord.  Zo niet,
 	kies een andere nick.
 NICK_MAY_NOT_BE_USED
 	Deze nickname mag niet gebruikt worden.  Kies een andere.
@@ -352,12 +352,12 @@ NICK_GROUP_FAILED
 NICK_GROUP_PLEASE_WAIT
 	Wacht %d seconden voor het opnieuw gebruiken van het GROUP commando.
 NICK_GROUP_CHANGE_DISABLED
-	Je nick is al geregistreerd; type eerst /msg %s DROP.
+	Je nick is al geregistreerd; type eerst %M%s DROP.
 NICK_GROUP_SAME
 	Je bent al lid van de group van %s.
 NICK_GROUP_TOO_MANY
 	Er zijn teveel nicks in %s's groep; geef ze weer en drop er een paar.
-	Type /msg %s HELP GLIST en/msg %s HELP DROP 
+	Type %M%s HELP GLIST en%M%s HELP DROP 
 	voor meer informatie.
 NICK_GROUP_JOINED
 	Je zit nu in de group van %s.
@@ -374,7 +374,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Dit stelt je in staat je wachtwoord terug te halen in
 	het geval dat je het vergeet.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Type /msg %S SET EMAIL e-mail om je e-mail in te stellen.
+	Type %M%S SET EMAIL e-mail om je e-mail in te stellen.
 	Je privacy wordt gerespecteerd; deze e-mail wordt niet aan
 	een derde partij doorgegeven.
 	
@@ -438,7 +438,7 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE nummer
 NICK_SET_LANGUAGE_UNKNOWN
-	Onbekend taal nummer %d.  Type /msg %s HELP SET LANGUAGE voor een lijst van talen.
+	Onbekend taal nummer %d.  Type %M%s HELP SET LANGUAGE voor een lijst van talen.
 NICK_SET_LANGUAGE_CHANGED
 	Taal veranderd in Nederlands.
 
@@ -748,7 +748,7 @@ NICK_INFO_OPT_NONE
 NICK_INFO_NO_EXPIRE
 	Deze nick zal niet verlopen.
 NICK_INFO_FOR_MORE
-	Voor meer informatie, type /msg %s INFO %s ALL.
+	Voor meer informatie, type %M%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -801,7 +801,7 @@ NICK_NO_RECOVER_SELF
 	Je kan jezelf niet herstellen!
 NICK_RECOVERED
 	Gebruiker die je nick claimde is gekilld.
-	/msg %s RELEASE %s om deze voor de 1-minuut timeout terug te krijgen.
+	%M%s RELEASE %s om deze voor de 1-minuut timeout terug te krijgen.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -893,9 +893,9 @@ NICK_REG_UNABLE
 NICK_IS_PREREG
 	Deze nick wacht nog op een e-mail verificatie code coor de registratie is voltooid.
 NICK_ENTER_REG_CODE
-	Een verificatiecode is verstuurd naar %s. Type /msg %s confirm <verificatiecode> om de registratie te voltooien.
+	Een verificatiecode is verstuurd naar %s. Type %M%s confirm <verificatiecode> om de registratie te voltooien.
 NICK_CONFIRM_NOT_FOUND
-	Registratie stap 1 kan verlopen zijn. Gebruik eerst "/msg %s register <wachtwoord> <email>".
+	Registratie stap 1 kan verlopen zijn. Gebruik eerst "%M%s register <wachtwoord> <email>".
 NICK_CONFIRM_INVALID
 	Ongeldige verificatiecode ingevuld. Controleer je e-mail nog eens en probeer opnieuw.
 NICK_REG_MAIL_SUBJECT
@@ -905,7 +905,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	Je hebt een aanvraag ingediend om de nickname %s te registreren.
 NICK_REG_MAIL_LINE_2
-	Type " /msg %s confirm %s " om de registratie te voltooien.
+	Type " %M%s confirm %s " om de registratie te voltooien.
 NICK_REG_MAIL_LINE_3
 	Als je niet weet waarom deze e-mail naar je gestuurd is, negeer deze dan.
 NICK_REG_MAIL_LINE_4
@@ -1019,10 +1019,10 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Lokale kanalen kunnen niet geregistreerd worden.
 CHAN_MUST_REGISTER_NICK
-	Je moet je nickname eerst registreren.  Type /msg %s HELP voor meer informatie over het registreren van nicknames.
+	Je moet je nickname eerst registreren.  Type %M%s HELP voor meer informatie over het registreren van nicknames.
 CHAN_MUST_IDENTIFY_NICK
 	Identificeer eerst met %s, door middel van het commando:
-	/msg %s IDENTIFY wachtwoord
+	%M%s IDENTIFY wachtwoord
 CHAN_MAY_NOT_BE_REGISTERED
 	Kanaal %s mag niet geregistreerd worden.
 CHAN_ALREADY_REGISTERED
@@ -1248,7 +1248,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Je kan dit commando niet gebruiken. Gebruik het ACCESS commando.
-	Type /msg %s HELP ACCESS voor meer informatie.
+	Type %M%s HELP ACCESS voor meer informatie.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1380,7 +1380,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Je kan dit commando niet gebruiken. 
 	Gebruik de AOP, SOP en VOP commando's in plaats van deze.
-	Type /msg %s HELP command voor meer informatie.
+	Type %M%s HELP command voor meer informatie.
 CHAN_ACCESS_DISABLED
 	Sorry, kanaal toegangslijst modificatie is tijdelijk uitgeschakeld.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1477,7 +1477,7 @@ CHAN_LEVELS_RANGE
 CHAN_LEVELS_CHANGED
 	Niveau voor %s op kanaal %s veranderd in %d.
 CHAN_LEVELS_UNKNOWN
-	Instelling %s onbekend.  Type /msg %s HELP LEVELS DESC voor een lijst van geldige instellingen.
+	Instelling %s onbekend.  Type %M%s HELP LEVELS DESC voor een lijst van geldige instellingen.
 CHAN_LEVELS_DISABLED
 	%s uitgeschakeld op kanaal %s.
 CHAN_LEVELS_LIST_HEADER
@@ -1701,11 +1701,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	Je hebt %d nieuwe memo's.
 MEMO_TYPE_READ_LAST
-	Type /msg %s READ LAST om deze te lezen.
+	Type %M%s READ LAST om deze te lezen.
 MEMO_TYPE_READ_NUM
-	Type /msg %s READ %d om deze te lezen.
+	Type %M%s READ %d om deze te lezen.
 MEMO_TYPE_LIST_NEW
-	Type /msg %s LIST NEW om ze weer te geven.
+	Type %M%s LIST NEW om ze weer te geven.
 MEMO_AT_LIMIT
 	Waarschuwing: Je hebt je maximum aantal memo's bereikt (%d).  Je kan geen nieuwe memo's ontvangen totdat je enkele van je huidige memo's verwijdert.
 MEMO_OVER_LIMIT
@@ -1716,10 +1716,10 @@ MEMO_X_ONE_NOTICE
 	Er is %d memo op kanaal %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	Er is een nieuwe memo op kanaal %s.
-	Type /msg %s READ %s %d om deze te lezen.
+	Type %M%s READ %s %d om deze te lezen.
 MEMO_NEW_MEMO_ARRIVED
 	Je hebt een nieuwe memo van %s.
-	Type /msg %s READ %d om deze te lezen.
+	Type %M%s READ %d om deze te lezen.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1767,13 +1767,13 @@ MEMO_HAVE_NO_NEW_MEMOS
 MEMO_X_HAS_NO_NEW_MEMOS
 	%s heeft geen nieuwe memo's.
 MEMO_LIST_MEMOS
-	Memo's voor %s.  Om te lezen, type: /msg %s READ nr
+	Memo's voor %s.  Om te lezen, type: %M%s READ nr
 MEMO_LIST_NEW_MEMOS
-	Nieuwe memo's voor %s.  Om te lezen, type: /msg %s READ nr
+	Nieuwe memo's voor %s.  Om te lezen, type: %M%s READ nr
 MEMO_LIST_CHAN_MEMOS
-	Memo's voor %s.  Om te lezen, type: /msg %s READ %s nr
+	Memo's voor %s.  Om te lezen, type: %M%s READ %s nr
 MEMO_LIST_CHAN_NEW_MEMOS
-	Nieuwe memo's voor %s.  Om te lezen, type: /msg %s READ %s nr
+	Nieuwe memo's voor %s.  Om te lezen, type: %M%s READ %s nr
 MEMO_LIST_HEADER
 	 Nr   Verstuurder       Datum/Tijd
 MEMO_LIST_FORMAT
@@ -1783,9 +1783,9 @@ MEMO_LIST_FORMAT
 MEMO_READ_SYNTAX
 	READ [kanaal] {lijst | LAST | NEW}
 MEMO_HEADER
-	Memo %d van %s (%s).  Om te verwijderen, type: /msg %s DEL %d
+	Memo %d van %s (%s).  Om te verwijderen, type: %M%s DEL %d
 MEMO_CHAN_HEADER
-	Memo %d van %s (%s).  Om te verwijderen, type: /msg %s DEL %s %d
+	Memo %d van %s (%s).  Om te verwijderen, type: %M%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -2000,7 +2000,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s bestaat niet.
 BOT_NOT_ASSIGNED
 	Je moet een bot aan een kanaal toewijzen voordat je dit commando gebruikt.
-	Type /msg %S HELP ASSIGN voor meer informatie.
+	Type %M%S HELP ASSIGN voor meer informatie.
 BOT_NOT_ON_CHANNEL
 	Bot is niet in kanaal %s.
 	
@@ -2178,7 +2178,7 @@ BOT_SET_DISABLED
 	Sorry, bot opties instellen is tijdelijk uitgeschakeld.
 BOT_SET_UNKNOWN
 	Onbekende optie %s.
-	Type /msg %S HELP SET voor meer informatie.
+	Type %M%S HELP SET voor meer informatie.
 	
 # SET DONTKICKOPS messages
 BOT_SET_DONTKICKOPS_SYNTAX
@@ -2243,7 +2243,7 @@ BOT_KICK_DISABLED
 	Sorry, kicker configuratie is tijdelijk uitgeschakeld.
 BOT_KICK_UNKNOWN
 	Onbekende optie %s.
-	Type /msg %S HELP KICK voor meer informatie.
+	Type %M%S HELP KICK voor meer informatie.
 BOT_KICK_BAD_TTB
 	%s kan niet worden ingesteld als aantal keer om te bannen.
 
@@ -2991,7 +2991,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Module: %s Versie: %s Auteur: %s Geladen: %s
 OPER_MODULE_CMD_LIST
-	Stelt het commando: /msg %s %s ter beschikking
+	Stelt het commando: %M%s %s ter beschikking
 OPER_MODULE_MSG_LIST
 	Stelt de IRCD handler voor: %s ter beschikking
 OPER_MODULE_NO_LIST
@@ -3357,24 +3357,24 @@ HELP_HELP
 	Help onderwerpen zijn toegankelijk via de HELP commando's
 	of de andere Service clients:
 	
-	/msg %s HELP
+	%M%s HELP
 	     voor informatie over nickname registratie
 
-	/msg %s HELP
+	%M%s HELP
 	     voor informatie over kanaal instellingen en registratie
 	     
-	/msg %s HELP
+	%M%s HELP
 	     voor informatie over berichten naar offline gebruikers
 	     sturen
 
 HELP_HELP_BOT
 
-	/msg %s HELP
+	%M%s HELP
 	     voor informatie over een bot in je kanaal instellen
 
 HELP_HELP_HOST
 
-	/msg %s HELP
+	%M%s HELP
 	     for information on setting up nick vHosts
 
 ###########################################################################
@@ -3439,9 +3439,9 @@ NICK_HELP
 	%S stelt je in staat een nickname te "registreren", en
 	te voorkomen dat anderen hem gebruiken. De volgende commando's
 	kunnen gebruikt worden voor registratie en onderhoud van
-	nicknames; om ze te gebruiken, type /msg %S commando.
+	nicknames; om ze te gebruiken, type %M%S commando.
 	Voor meer informatie over een specifiek commando, type
-	/msg %S HELP commando.
+	%M%S HELP commando.
 	
 NICK_HELP_FOOTER
 	OPMERKING: Deze service is bedoeld om IRC gebruikers een weg
@@ -3486,7 +3486,7 @@ NICK_HELP_REGISTER
 	Dit commando maakt ook een nieuwe groep voor je nickname, die
 	toestaat andere nicks onder dezelfde configuratie, dezelfde
 	memos en dezelfde kanaalrechten te delen. Voor meer informatie
-	over deze functie, type /msg %S HELP GROUP.
+	over deze functie, type %M%S HELP GROUP.
 	
 NICK_HELP_GROUP
 	Gebruik: GROUP doel wachtwoord
@@ -3507,7 +3507,7 @@ NICK_HELP_GROUP
 	Je kan dit commando zelfs gebruiken als je nog niet
 	geregistreerd hebt. Als je nick al geregistreerd is moet je je
 	eerst identificeren voordat je dit commando gebruikt. Type
-	/msg %S HELP IDENTIFY voor meer informatie. Dit laatste is
+	%M%S HELP IDENTIFY voor meer informatie. Dit laatste is
 	misschien niet mogelijk op je IRC netwerk.
 	
 	Het is aanbevolen om dit commando te gebruiken met een niet-
@@ -3554,7 +3554,7 @@ NICK_HELP_DROP
 	parameter toe te voegen.
 	
 	Om dit commando te kunnen gebruiken moet je je eerst identificeren
-	met je wachtwoord. (/msg %S HELP IDENTIFY voor meer informatie).
+	met je wachtwoord. (%M%S HELP IDENTIFY voor meer informatie).
 
 NICK_HELP_ACCESS
 	Gebruik: ACCESS ADD mask
@@ -3595,16 +3595,16 @@ NICK_HELP_SET
 	    KILL       Zet bescherming aan of uit
 	    SECURE     Zet nickname beveiliging aan of uit
 	    PRIVATE    Zorgt ervoor dat je nick niet verschijnt in een
-	                   /msg %S LIST
+	                   %M%S LIST
 	    HIDE       Verberg verschillende soorten nick informatie
 	    MSG        Verander de communicatiemanier van Services
 	    AUTOOP     Should services op you automatically.    
 	
 	Om dit commando te gebruiken moet je je eerst identificeren
-	met je wachtwoord (/msg %S HELP IDENTIFY voor meer
+	met je wachtwoord (%M%S HELP IDENTIFY voor meer
 	informatie).
 	
-	Type /msg %S HELP SET optie voor meer informatie over een
+	Type %M%S HELP SET optie voor meer informatie over een
 	specifieke optie.
 
 NICK_HELP_SET_DISPLAY
@@ -3725,12 +3725,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   /msg %S LIST
+	                   %M%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type /msg %S HELP SASET option for more information
+	Type %M%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -3874,7 +3874,7 @@ NICK_HELP_RECOVER
 	dat de gebruiker niet meteen opnieuw verbindt met dezelfde
 	nick. Na deze minuut kan je je nick opnieuw claimen, of je kan
 	tussentijds je nick terugkrijgen mbv het RELEASE commando.
-	(Bekijk /msg %S HELP RELEASE voor meer informatie hierover)	
+	(Bekijk %M%S HELP RELEASE voor meer informatie hierover)	
 	
 	Om het RECOVER commando op een nick te mogen gebruiken moet
 	je huidige adres zoals deze in /WHOIS staat op de toegangslijst
@@ -4004,7 +4004,7 @@ NICK_SERVADMIN_HELP
 	Services admins kunnen ook de registratie van elke nick
 	opheffen zonder zich voor die nick te identificeren, en
 	mogen de toegangslijst voor elke nick bekijken.
-	(/msg %S ACCESS LIST nick)
+	(%M%S ACCESS LIST nick)
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Gebruik: LOGOUT [nick [REVALIDATE]]
@@ -4242,8 +4242,8 @@ CHAN_HELP
 	voorkomen dat boosaardig gebruikers een kanaal "overnemen"
 	door te limiteren wie er op het kanaal operator mag zijn.
 	Beschikbare commando's staan hier beneden; om ze te gebruiken
-	type je /msg %S commando. Voor meer informatie over een
-	specifiek commando type je /msg %S HELP commando.
+	type je %M%S commando. Voor meer informatie over een
+	specifiek commando type je %M%S HELP commando.
 	 
 	
 CHAN_HELP_EXPIRES
@@ -4267,12 +4267,12 @@ CHAN_HELP_REGISTER
 	van het kanaal. De kanaalstichter mag alle instellingen
 	van het kanaal veranderen. %S zal ook de stichter automatisch
 	stichterrechten geven wanneer deze het kanaal binnenkomt.
-	Zie het ACCESS commando (/msg %S HELP ACCESS) voor meer
+	Zie het ACCESS commando (%M%S HELP ACCESS) voor meer
 	informatie over het geven van rechten aan andere kanaalgebruikers.
 	
 	OPMERKING: Om een kanaal te registreren moet je je nick
 	eerst geregistreerd hebben. Als je dit niet gedaan hebt
-	bekijk dan /msg %s HELP voor informatie over hoe je
+	bekijk dan %M%s HELP voor informatie over hoe je
 	dit kunt doen.
 
 CHAN_HELP_IDENTIFY
@@ -4333,7 +4333,7 @@ CHAN_HELP_SET
 	    TOPICLOCK     Topic kan alleen veranderd worden met TOPIC
 	    XOP           Schakel het gebruikersprivilegesysteem om
 	
-	Type /msg %S HELP option voor meer informatie over een
+	Type %M%S HELP option voor meer informatie over een
 	specifieke optie.
 
 CHAN_HELP_SET_FOUNDER
@@ -4471,7 +4471,7 @@ CHAN_HELP_SET_PRIVATE
 	Gebruik: SET kanaal PRIVATE {ON | OFF}
 	
 	Zet de prive optie aan of uit voor een kanaal. Wanneer
-	de prive optie aan staat zal /msg %S LIST het kanaal
+	de prive optie aan staat zal %M%S LIST het kanaal
 	in geen enkele lijst weergeven.
 
 CHAN_HELP_SET_RESTRICTED
@@ -4520,7 +4520,7 @@ CHAN_HELP_SET_SIGNKICK
 	Als je LEVEL gebruikt zullen degenen die een niveau hebben
 	gelijk aan of hoger dan het SIGNKICK niveau op het kanaal
 	hun nick niet toegevoegd hebben aan de kicks.
-	Zie /msg %S HELP LEVELS voor meer informatie.
+	Zie %M%S HELP LEVELS voor meer informatie.
 
 CHAN_HELP_SET_XOP
 	Gebruik: SET kanaal XOP {ON | OFF}
@@ -4591,8 +4591,8 @@ CHAN_HELP_AOP
 	
 	Dit commando kan uitgeschakeld zijn voor je kanaal, en in
 	dat geval heb je de toegangslijst nodig. Zie
-	/msg %S HELP ACCESS voor meer informatie over toegangs-
-	lijsten, en /msg %S HELP SET XOP om te weten te komen
+	%M%S HELP ACCESS voor meer informatie over toegangs-
+	lijsten, en %M%S HELP SET XOP om te weten te komen
 	hoe je tussen toegangslijsten en xOP-lijsten schakelt.
 
 CHAN_HELP_HOP
@@ -4630,8 +4630,8 @@ CHAN_HELP_HOP
 	
 	Dit commando kan uitgeschakeld zijn voor je kanaal, en in
 	dat geval heb je de toegangslijst nodig. Zie
-	/msg %S HELP ACCESS voor meer informatie over toegangs-
-	lijsten, en /msg %S HELP SET XOP om te weten te komen
+	%M%S HELP ACCESS voor meer informatie over toegangs-
+	lijsten, en %M%S HELP SET XOP om te weten te komen
 	hoe je tussen toegangslijsten en xOP-lijsten schakelt.
 
 CHAN_HELP_SOP
@@ -4671,8 +4671,8 @@ CHAN_HELP_SOP
 	
 	Dit commando kan uitgeschakeld zijn voor je kanaal, en in
 	dat geval heb je de toegangslijst nodig. Zie
-	/msg %S HELP ACCESS voor meer informatie over toegangs-
-	lijsten, en /msg %S HELP SET XOP om te weten te komen
+	%M%S HELP ACCESS voor meer informatie over toegangs-
+	lijsten, en %M%S HELP SET XOP om te weten te komen
 	hoe je tussen toegangslijsten en xOP-lijsten schakelt.
 
 CHAN_HELP_VOP
@@ -4711,8 +4711,8 @@ CHAN_HELP_VOP
 	
 	Dit commando kan uitgeschakeld zijn voor je kanaal, en in
 	dat geval heb je de toegangslijst nodig. Zie
-	/msg %S HELP ACCESS voor meer informatie over toegangs-
-	lijsten, en /msg %S HELP SET XOP om te weten te komen
+	%M%S HELP ACCESS voor meer informatie over toegangs-
+	lijsten, en %M%S HELP SET XOP om te weten te komen
 	hoe je tussen toegangslijsten en xOP-lijsten schakelt.
 
 CHAN_HELP_ACCESS
@@ -4726,7 +4726,7 @@ CHAN_HELP_ACCESS
 	kanaal operator te worden, of om %S commando's te gebruiken
 	op het kanaal. Verschillende gebruikersniveaus maken het
 	mogelijk om verschillende sets met privileges te maken.
-	/msg %S HELP ACCESS LEVELS voor meer informatie hierover.
+	%M%S HELP ACCESS LEVELS voor meer informatie hierover.
 	Elke gebruiker die niet op de toegangslijst staat heeft een
 	gebruikersniveau van 0.
 	
@@ -4775,7 +4775,7 @@ CHAN_HELP_ACCESS_LEVELS
 	
 	Deze niveaus kunnen worden veranderd, en er kunnen nieuwe
 	worden toegevoegd dmv het LEVELS commando; type
-	/msg %S HELP LEVELS voor meer informatie.
+	%M%S HELP LEVELS voor meer informatie.
 
 CHAN_HELP_AKICK
 	Gebruik: AKICK kanaal ADD mask [reden]
@@ -5044,7 +5044,7 @@ CHAN_HELP_TOPIC
 	Zorgt ervoor dat %S het kanaal topic verandert in het
 	gegeven topic. Als topic niet is gegeven wordt het topic
 	leeg gemaakt. Dit commando is het meest bruikbaar in
-	samenwerking met SET TOPICLOCK. Zie ook /msg %S HELP SET
+	samenwerking met SET TOPICLOCK. Zie ook %M%S HELP SET
 	TOPICLOCK voor meer informatie.
 	
 	Standaard is dit gelimiteerd tot degenen met stichter-toegang
@@ -5259,7 +5259,7 @@ MEMO_HELP_OPER
 	not used.
 MEMO_HELP_FOOTER
 	
-	Type /msg %S HELP commando voor hulp bij een van
+	Type %M%S HELP commando voor hulp bij een van
 	de bovenstaande commando's
 	
 	(*) Standaard kan elke gebruiker met tenminste toegangsniveau
@@ -5332,7 +5332,7 @@ MEMO_HELP_SET
 	    LIMIT       Stelt het maximum aantal memo's dat je kan
 	                    ontvangen in
 	
-	Type /msg %S HELP SET optie voor more informatie over
+	Type %M%S HELP SET optie voor more informatie over
 	een specifieke optie.
 
 MEMO_HELP_SET_NOTIFY
@@ -6193,8 +6193,8 @@ BOT_HELP
 	hosten of configureren, of voor gebruik op netwerken die
 	geen bots van gebruikers toestaan. Beschikbare commando's
 	worden hieronder weergegeven. Om ze te gebruiken moet je
-	/msg %S commando typen. Voor meer informatie over een
-	specifiek commando moet je /msg %S HELP command typen.
+	%M%S commando typen. Voor meer informatie over een
+	specifiek commando moet je %M%S HELP command typen.
 	
 BOT_HELP_FOOTER
 	Bot zal een kanaal joinen wanneer daar tenminste %d
@@ -6242,7 +6242,7 @@ BOT_HELP_SET
 	    SYMBIOSIS        Stel de bot in staat te handelen als een
 	                         echte bot.
 	
-	Type /msg %S HELP SET optie voor meer informatie over een
+	Type %M%S HELP SET optie voor meer informatie over een
 	specifieke optie.
 	
 	Let op: toegang tot dit commando wordt geregeld via het
@@ -6311,7 +6311,7 @@ BOT_HELP_KICK
 	    REVERSES      Stelt in of de bot kickt op inverteringen
 	    UNDERLINES    Stelt in of de bot kickt op onderstrepingen
 	
-	Type /msg %S HELP KICK optie voor meer informatie over
+	Type %M%S HELP KICK optie voor meer informatie over
 	een specifieke optie.
 	
 	Let op: toegang tot dit commando wordt gecontroleerd door
@@ -6405,7 +6405,7 @@ BOT_HELP_KICK_BADWORDS
 	woorden op het kanaal zeggen.
 	
 	Je kan de slechte woorden voor je kanaal instellen met het
-	BADWORDS commando. Type /msg %S HELP BADWORDS voor
+	BADWORDS commando. Type %M%S HELP BADWORDS voor
 	meer informatie.
 
 	ttb is het aantal keren dat een gebruiker gekicked kan
@@ -6421,7 +6421,7 @@ BOT_HELP_BADWORDS
 	Beheert de slechte woorden lijst voor een kanaal. De
 	slechte woorden lijst bepaalt voor welke woorden wordt
 	gekicked als de slechte-woorden-kicker aan staat. Voor
-	meer informatie, type /msg %S HELP KICK BADWORDS.
+	meer informatie, type %M%S HELP KICK BADWORDS.
 	
 	Het BADWORDS ADD commando voegt het gegeven woord toe aan
 	de slechte woorden lijst. Als SINGLE is gespecificeerd zal
@@ -6544,9 +6544,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	Gebruiker %s niet gevonden in de nickserv database.
 HOST_SET_SYNTAX
-	Gebruik /msg %s set <nick> <hostmask>.
+	Gebruik %M%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Gebruik /msg %s setall <nick> <hostmask>.
+	Gebruik %M%s setall <nick> <hostmask>.
 HOST_DENIED
 	Toegang geweigerd.
 HOST_NOT_ASSIGNED
@@ -6562,7 +6562,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost voor %s verwijderd.
 HOST_DEL_SYNTAX
-	Gebruik: /msg %s del <nick>.
+	Gebruik: %M%s del <nick>.
 HOST_OFF_UNREAL
 	Je vhost is verwijderd. Om standaard host verberging weer aan te schakelen, type je /mode %s +%s
 HOST_NO_VIDENT

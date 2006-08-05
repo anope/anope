@@ -150,12 +150,12 @@ USER_RECORD_NOT_FOUND
 UNKNOWN_COMMAND
 	Nieznana komenda %s.
 UNKNOWN_COMMAND_HELP
-	Nieznana komenda %s. Napisz "/msg %s HELP" aby 
+	Nieznana komenda %s. Napisz "%M%s HELP" aby 
 	uzyskaæ pomoc.
 SYNTAX_ERROR
 	Sk³adnia: %s
 MORE_INFO
-	Napisz /msg %s HELP %s aby uzyskaæ wiêcej 
+	Napisz %M%s HELP %s aby uzyskaæ wiêcej 
 	informacji.
 NO_HELP_AVAILABLE
 	Brak dostêpnej pomocy dla %s.
@@ -207,7 +207,7 @@ NICK_NOT_REGISTERED
 	Twój nick jest niezarejestrowany.
 NICK_NOT_REGISTERED_HELP
 	Twój nick jest niezarejestrowany. 
-	Napisz /msg %s HELP aby uzyskaæ pomoc na
+	Napisz %M%s HELP aby uzyskaæ pomoc na
 	temat rejestracji Twojego nicka.
 NICK_X_IS_SERVICES
 	Nick %s jest czê¶ci± serwisów sieci.
@@ -245,11 +245,11 @@ CHAN_X_SUSPENDED
 	      Zawieszony: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Musisz siê zidentyfikowaæ, aby u¿yæ tej komendy.
-	Napisz /msg %s IDENTIFY has³o,
+	Napisz %M%s IDENTIFY has³o,
 	a pó¼niej ponów próbê.
 CHAN_IDENTIFY_REQUIRED
 	Do u¿ycia tej komendy wymagana jest identyfikacja.
-	Napisz /msg %s IDENTIFY %s has³o, 
+	Napisz %M%s IDENTIFY %s has³o, 
 	a pó¼niej ponów próbê.
 	
 MAIL_DISABLED
@@ -323,11 +323,11 @@ END_OF_ANY_LIST
 # Automatic messages
 NICK_IS_REGISTERED
 	Ten nick jest zarejestrowany. Je¶li to Twój nick, 
-	wpisz: /msg %s IDENTIFY has³o
+	wpisz: %M%s IDENTIFY has³o
 NICK_IS_SECURE
 	Ten nick jest zarejestrowany i pod ochron±.
 	Je¶li jest to Twój nick zidentyfikuj siê 
-	pisz±c: /msg %s IDENTIFY has³o. 
+	pisz±c: %M%s IDENTIFY has³o. 
 	Je¶li ten nick nie nale¿y do Ciebie, zmieñ go.
 NICK_MAY_NOT_BE_USED
 	Ten nick nie mo¿e byæ u¿ywany. Wybierz inny nick. 
@@ -382,14 +382,14 @@ NICK_GROUP_PLEASE_WAIT
 	komendy GROUP.
 NICK_GROUP_CHANGE_DISABLED
 	Twój nick jest ju¿ zarejestrowany. 
-	Napisz wpierw: /msg %s DROP 
+	Napisz wpierw: %M%s DROP 
 NICK_GROUP_SAME
 	Nale¿ysz ju¿ do grupy %s.
 NICK_GROUP_TOO_MANY
 	Jest zbyt du¿o nicków w Twojej grupie: %s. 
 	Proszê sprawdziæ i usun±æ czê¶æ z nich.
-	Napisz /msg %s HELP GLIST oraz 
-	/msg %s HELP DROP,
+	Napisz %M%s HELP GLIST oraz 
+	%M%s HELP DROP,
 	aby uzyskaæ wiêcej informacji.
 NICK_GROUP_JOINED
 	Nale¿ysz od teraz do grupy %s.
@@ -406,7 +406,7 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Musisz teraz ustawiæ adres e-mail przy Twoim nicku.
 	Gdy zapomnisz has³a, zostanie ono wys³ane na e-mail.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Napisz /msg %S SET EMAIL e-mail, 
+	Napisz %M%S SET EMAIL e-mail, 
 	aby ustawiæ adres e-mail. Twój e-mail jest pod 
 	ochron± - nie bêdzie wyjawiany osobom trzecim,
 	ani nie bêdzie u¿ywany do celów innych ni¿ na 
@@ -473,7 +473,7 @@ NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE numer
 NICK_SET_LANGUAGE_UNKNOWN
 	Nieznany numer jêzyka %d. 
-	Napisz /msg %s HELP SET LANGUAGE, 
+	Napisz %M%s HELP SET LANGUAGE, 
 	aby uzyskaæ liste dostêpnych jêzyków.
 NICK_SET_LANGUAGE_CHANGED
 	Jêzyk zosta³ zmieniony na English.
@@ -797,7 +797,7 @@ NICK_INFO_NO_EXPIRE
 	Ten nick nie podlega prawu wygasania.
 NICK_INFO_FOR_MORE
 	Aby uzyskaæ jeszcze wiêcej informacji, 
-	napisz /msg %s INFO %s ALL.
+	napisz %M%s INFO %s ALL.
 
 # LIST responses
 NICK_INFO_SUSPENDED
@@ -850,7 +850,7 @@ NICK_NO_RECOVER_SELF
 	Nie mo¿esz sobie samemu odzyskaæ nicka :P
 NICK_RECOVERED
 	Twój nick zosta³ w³a¶nie przejêty przez serwisy.
-	Napisz /msg %s RELEASE %s 
+	Napisz %M%s RELEASE %s 
 	je¶li chcesz, by zosta³ on zwolniony teraz.
 
 # RELEASE responses
@@ -955,11 +955,11 @@ NICK_IS_PREREG
 	przed zakoñczeniem rejestracji.
 NICK_ENTER_REG_CODE
 	Kod zosta³ wys³any na %s. 
-	Napisz /msg %s confirm <kod>, 
+	Napisz %M%s confirm <kod>, 
 	aby dokoñczyæ procedure rejestracji.
 NICK_CONFIRM_NOT_FOUND
 	Termin wa¿no¶ci kodu rejestrcyjnego up³yn±³. 
-	Napisz: "/msg %s REGISTER <password> <email>",
+	Napisz: "%M%s REGISTER <password> <email>",
 	aby znowu zacz±æ rejestracje.
 NICK_CONFIRM_INVALID
 	Podano nieprawid³owy kod. Proszê sprawdziæ e-mail 
@@ -971,7 +971,7 @@ NICK_REG_MAIL_HEAD
 NICK_REG_MAIL_LINE_1
 	Chcesz zarejestrowaæ sobie nastêpuj±cy nick: %s.
 NICK_REG_MAIL_LINE_2
-	Proszê napisaæ na IRC " /msg %s confirm %s " aby dokoñczyæ 
+	Proszê napisaæ na IRC " %M%s confirm %s " aby dokoñczyæ 
 	rejestracje.
 NICK_REG_MAIL_LINE_3
 	Je¶li nie wiesz dlaczego ta wiadomo¶æ dotar³a do Ciebie to 
@@ -1094,11 +1094,11 @@ CHAN_REGISTER_NOT_LOCAL
 	Kana³y lokalne nie mog± byæ rejestrowane.
 CHAN_MUST_REGISTER_NICK
 	Musisz mieæ wpierw zarejestrowany nick. 
-	Napisz /msg %s HELP, aby uzyskaæ 
+	Napisz %M%s HELP, aby uzyskaæ 
 	wiêcej informacji odno¶nie rejestracji nicka.
 CHAN_MUST_IDENTIFY_NICK
 	Proszê zidentyfikowaæ najpierw nicka w %s 
-	komend±: /msg %s IDENTIFY has³o
+	komend±: %M%s IDENTIFY has³o
 CHAN_MAY_NOT_BE_REGISTERED
 	Kana³ %s nie mo¿e byæ zarejestrowany.
 CHAN_ALREADY_REGISTERED
@@ -1333,7 +1333,7 @@ CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Nie mo¿esz u¿yæ tej komendy. U¿yj komendy ACCESS.
-	Napisz /msg %s HELP ACCESS, 
+	Napisz %M%s HELP ACCESS, 
 	aby uzyskaæ wiêcej informacji.
 
 # AOP messages
@@ -1474,7 +1474,7 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Nie mo¿esz u¿yæ tej komendy. 
 	Musisz u¿yæ VOP, HOP, AOP lub SOP.
-	Napisz /msg %s HELP komenda,
+	Napisz %M%s HELP komenda,
 	aby uzyskaæ wiêcej informacji.
 CHAN_ACCESS_DISABLED
 	B³±d, modyfikacje kana³owej listy dostêpu s± 
@@ -1583,7 +1583,7 @@ CHAN_LEVELS_CHANGED
 	na kanale %s zmieniono teraz na %d.
 CHAN_LEVELS_UNKNOWN
 	Ustawienie %s jest nieznane. 
-	Napisz /msg %s HELP LEVELS DESC, 
+	Napisz %M%s HELP LEVELS DESC, 
 	aby uzyskaæ liste dostêpnych mo¿liwo¶ci.
 CHAN_LEVELS_DISABLED
 	%s wy³±czono na kanale %s.
@@ -1817,11 +1817,11 @@ MEMO_HAVE_NEW_MEMO
 MEMO_HAVE_NEW_MEMOS
 	Masz %d nowe(ych) wiadomo¶ci.
 MEMO_TYPE_READ_LAST
-	Napisz /msg %s READ LAST aby przeczytaæ.
+	Napisz %M%s READ LAST aby przeczytaæ.
 MEMO_TYPE_READ_NUM
-	Napisz /msg %s READ %d aby przeczytaæ.
+	Napisz %M%s READ %d aby przeczytaæ.
 MEMO_TYPE_LIST_NEW
-	Napisz /msg %s LIST NEW,
+	Napisz %M%s LIST NEW,
 	aby zobaczyæ liste nowych wiadomo¶ci.
 MEMO_AT_LIMIT
 	Uwaga: Osi±gniêto ju¿ limit wiadomo¶ci (%d). 
@@ -1838,10 +1838,10 @@ MEMO_X_ONE_NOTICE
 	Jest %d wiadomo¶æ dla kan³u %s.
 MEMO_NEW_X_MEMO_ARRIVED
 	Jest nowa wiadomo¶æ dla kana³u %s.
-	Napisz /msg %s READ %s %d aby j± przeczytaæ.
+	Napisz %M%s READ %s %d aby j± przeczytaæ.
 MEMO_NEW_MEMO_ARRIVED
 	Nasz now± wiadomo¶æ od %s.
-	Napisz /msg %s READ %d aby j± przeczytaæ.
+	Napisz %M%s READ %d aby j± przeczytaæ.
 
 # Multi-use responses
 MEMO_HAVE_NO_MEMOS
@@ -1892,16 +1892,16 @@ MEMO_X_HAS_NO_NEW_MEMOS
 	%s nie ma nowych wiadomo¶ci.
 MEMO_LIST_MEMOS
 	Wiadomo¶ci dla %s. Aby przeczytaæ, 
-	napisz: /msg %s READ numer
+	napisz: %M%s READ numer
 MEMO_LIST_NEW_MEMOS
 	Nowe wiadomo¶ci dla %s. Aby przeczytaæ, 
-	napisz: /msg %s READ numer
+	napisz: %M%s READ numer
 MEMO_LIST_CHAN_MEMOS
 	Wiadomo¶ci dla %s. Aby przeczytaæ, 
-	napisz: /msg %s READ %s numer
+	napisz: %M%s READ %s numer
 MEMO_LIST_CHAN_NEW_MEMOS
 	Nowe wiadomo¶ci dla %s. Aby przeczytaæ, 
-	napisz: /msg %s READ %s numer
+	napisz: %M%s READ %s numer
 MEMO_LIST_HEADER
 	 Nr   Nadawca            Data/Czas
 MEMO_LIST_FORMAT
@@ -1912,10 +1912,10 @@ MEMO_READ_SYNTAX
 	READ [kana³] {list | LAST | NEW}
 MEMO_HEADER
 	Wiadomo¶æ %d od %s (%s). Aby usun±æ, 
-	napisz: /msg %s DEL %d
+	napisz: %M%s DEL %d
 MEMO_CHAN_HEADER
 	Wiadomo¶æ %d od %s (%s). Aby usun±æ, 
-	napisz: /msg %s DEL %s %d
+	napisz: %M%s DEL %s %d
 MEMO_TEXT
 	%s
 
@@ -2143,7 +2143,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s nie istnieje.
 BOT_NOT_ASSIGNED
 	Musisz przydzieliæ najpierw bota na kana³.
-	Napisz /msg %S HELP ASSIGN, 
+	Napisz %M%S HELP ASSIGN, 
 	aby uzyskaæ wiêcej informacji.
 BOT_NOT_ON_CHANNEL
 	Nie ma bota na kanale %s.
@@ -2326,7 +2326,7 @@ BOT_SET_DISABLED
 	niedostêpne.
 BOT_SET_UNKNOWN
 	Nieznana opcja %s.
-	Napisz /msg %S HELP SET,
+	Napisz %M%S HELP SET,
 	aby uzyskaæ wiêcej informacji.
 	
 # SET DONTKICKOPS messages
@@ -2405,7 +2405,7 @@ BOT_KICK_DISABLED
 	niedostêpna.
 BOT_KICK_UNKNOWN
 	Nieznana opcja %s.
-	Napisz /msg %S HELP KICK, 
+	Napisz %M%S HELP KICK, 
 	aby uzyskaæ wiêcej informacji.
 BOT_KICK_BAD_TTB
 	%s nie mo¿e byæ wziêty jako czas bana.
@@ -3194,7 +3194,7 @@ OPER_MODULE_INFO_LIST
 	Autor: %s 
 	za³adowano: %s
 OPER_MODULE_CMD_LIST
-	Dodane komendy: /msg %s %s
+	Dodane komendy: %M%s %s
 OPER_MODULE_MSG_LIST
 	Dostarczone opcja IRCD dla(?): %s
 OPER_MODULE_NO_LIST
@@ -3546,27 +3546,27 @@ HELP_HELP
 	informacji na temat innych serwisów. 
 	Dostêpne tematy pomocy: 
 
-	/msg %s HELP
+	%M%s HELP
 	     Informacje na temat rejestrowania i kontroli 
 	     nicków.
 
-	/msg %s HELP
+	%M%s HELP
 	     Informacje na temat rejestrowania i kontroli 
 	     kana³ów.
 
-	/msg %s HELP
+	%M%s HELP
 	     Informacje na temat zostawiania wiadomo¶ci dla 
 	     u¿ytkowników offline.
 
 HELP_HELP_BOT
 
-	/msg %s HELP
+	%M%s HELP
 	     Informacje na temat stawiania bota na swoim 
 	     kanale.
 
 HELP_HELP_HOST
 
-	/msg %s HELP
+	%M%s HELP
 	     informacja na temat ustawiania vhostów.
 
 ###########################################################################
@@ -3631,10 +3631,10 @@ NICK_HELP
 	%S umo¿liwia Tobie zarejestrowanie w³asnego 
 	nicka. Dzieki rejestracji tylko Ty bedziesz go móg³ 
 	u¿ywaæ oraz uzyskasz dostêp do dodatkowych opcji. 
-	Aby ich u¿yæ wpisz /msg %S komenda.
+	Aby ich u¿yæ wpisz %M%S komenda.
 	Wiêcej informacji na temat konkretnej komendy mo¿na 
 	uzyskaæ pisz±c:
-	/msg %S HELP komenda.
+	%M%S HELP komenda.
 	
 NICK_HELP_FOOTER
 	INFO: Ten serwis ma na celu identyfikacjê 
@@ -3688,7 +3688,7 @@ NICK_HELP_REGISTER
 	konfiguracjê, te same prawa na kanale oraz 
 	ustawienia memo. Je¶li chcesz uzyskaæ wiêcej 
 	informacji na ten temat, napisz: 
-	/msg %S HELP GROUP.
+	%M%S HELP GROUP.
 	
 NICK_HELP_GROUP
 	Sk³adnia: GROUP nazwa has³o
@@ -3712,7 +3712,7 @@ NICK_HELP_GROUP
 	zarejestrowanego nicka. Je¶li Twój nick jest ju¿ 
 	zarejestrowany to przed u¿yciem tej komendy musisz 
 	siê zidentyfikowaæ. 
-	Napisz /msg %S HELP IDENTIFY aby uzyskaæ 
+	Napisz %M%S HELP IDENTIFY aby uzyskaæ 
 	wiêcej informacji o identyfikacji. 
 	
 	U¿ycie tej komendy dla niezarejestrowanego 
@@ -3765,7 +3765,7 @@ NICK_HELP_DROP
 	
 	Przed u¿yciem tej komendy nale¿y siê wpierw
 	zidentyfikowaæ za pomoc± has³a nicka 
-	(/msg %S HELP IDENTIFY aby uzyskaæ
+	(%M%S HELP IDENTIFY aby uzyskaæ
 	wiêcej informacji).
 
 NICK_HELP_ACCESS
@@ -3812,17 +3812,17 @@ NICK_HELP_SET
 	    KILL       W³±cz/Wy³±cz ochrone nicka.
 	    SECURE     W³±cz/Wy³±cz bezpieczeñstwo nicka.
 	    PRIVATE    Ukryj dane nicka przy komendzie LIST
-	             /msg %S LIST
+	             %M%S LIST
 	    HIDE       Ukryj pewne informacje o nicku.
 	    MSG        Zmieñ sposób komunikacji z serwisami.
 	    AUTOOP     Should services op you automatically.    
 	
 	Przed u¿yciem tej komendy trzeba siê wpierw 
 	zidentyfikowaæ za pomoc± has³a nicka 
-	(/msg %S HELP IDENTIFY aby uzyskaæ
+	(%M%S HELP IDENTIFY aby uzyskaæ
 	wiêcej informacji).
 	
-	Napisz /msg %S HELP SET opcja aby 
+	Napisz %M%S HELP SET opcja aby 
 	uzyskaæ pomoc na temat wybranej opcji.
 
 NICK_HELP_SET_DISPLAY
@@ -3955,12 +3955,12 @@ NICK_HELP_SASET
 	    KILL       Turn protection on or off
 	    SECURE     Turn nickname security on or off
 	    PRIVATE    Prevent the nickname from appearing in a
-	                   /msg %S LIST
+	                   %M%S LIST
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	
-	Type /msg %S HELP SASET option for more information
+	Type %M%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
 	
@@ -4106,7 +4106,7 @@ NICK_HELP_RECOVER
 	ponownie Twojego nicka. Po up³ywie minuty mo¿esz 
 	wej¶æ na swój nick. Je¶li nie masz zamiaru tyle 
 	czekaæ musis¿ u¿yæ komendy 
-	RELEASE (/msg %S HELP RELEASE) aby 
+	RELEASE (%M%S HELP RELEASE) aby 
 	zarz±daæ natychmiastowego zwrotu nicka od serwisów.
 	
 	Aby móc u¿yæ komendy RECOVER, musisz spe³niaæ, 
@@ -4266,7 +4266,7 @@ NICK_SERVADMIN_HELP
 	Administratorzy Serwisów mog± odrejestrowaæ ka¿dy 
 	nick bez potrzeby identyfikacji dla niego i mog± 
 	widzieæ listê dostêpu dla ka¿dego nicka 
-	(/msg %S ACCESS LIST nick).
+	(%M%S ACCESS LIST nick).
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Sk³adnia: LOGOUT [nick [REVALIDATE]]
@@ -4511,9 +4511,9 @@ CHAN_HELP
 	kana³ów, poprzez ograniczenie dostêpu do statusu 
 	operatora kana³u. Dostêpne komendy zosta³y podane 
 	poni¿ej, aby ich u¿yæ napisz:
-	/msg %S komenda. Aby uzyskaæ wiêcej 
+	%M%S komenda. Aby uzyskaæ wiêcej 
 	informacji o poszczególnych komendach, napisz: 
-	/msg %S HELP komenda.
+	%M%S HELP komenda.
 	 
 	
 CHAN_HELP_EXPIRES
@@ -4540,14 +4540,14 @@ CHAN_HELP_REGISTER
 	automatycznie przyzna przys³uguj±ce uprawnienia 
 	w³a¶ciciela po jego wej¶ciu na kana³.
 	U¿ywaj komendy ACCESS 
-	(/msg %S HELP ACCESS) aby 
+	(%M%S HELP ACCESS) aby 
 	przyznawaæ wszelkie uprawnienia do operowania na 
 	kanale innym u¿ytkownikom.
 	
 	UWAGA: Aby móc zarejestrowaæ w³asny kana³, konieczna
 	jest wcze¶niejsza rejestracja nicka. Opis tej 
 	procedury otrzymasz po wydaniu polecenia: 
-	/msg %s HELP.
+	%M%s HELP.
 
 CHAN_HELP_IDENTIFY
 	Sk³adnia: IDENTIFY kana³ has³o
@@ -4621,7 +4621,7 @@ CHAN_HELP_SET
 	                   uprawnieñ xOP 
 			   (SOP, AOP, HOP, VOP).
 	
-	Napisz /msg %S HELP SET opcja, 
+	Napisz %M%S HELP SET opcja, 
 	aby uzyskaæ wiêcej informacji o poszczególnych 
 	komendach.
 
@@ -4769,7 +4769,7 @@ CHAN_HELP_SET_PRIVATE
 	W³±cza lub wy³±cza opcjê PRIVATE dla kana³u.
 	Kiedy opcja ta jest w³±czona, kana³ nie bêdzie 
 	widoczny po wydaniu polecenia: 
-	/msg %S LIST.
+	%M%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
 	Sk³adnia: SET kana³ RESTRICTED {ON | OFF}
@@ -4822,7 +4822,7 @@ CHAN_HELP_SET_SIGNKICK
 	Parametr LEVEL powoduje ¿e nicki osób z równym 
 	lub wy¿szym od okre¶lonego poziomem dostêpu, nie 
 	bêd± pokazywane przy poleceniu kick. 
-	Zobacz /msg %S HELP LEVELS, 
+	Zobacz %M%S HELP LEVELS, 
 	aby uzyskaæ wiêcej informacji.
 
 CHAN_HELP_SET_XOP
@@ -4906,9 +4906,9 @@ CHAN_HELP_AOP
 	Lista AOP mo¿e byæ wy³±czona dla twojego kana³u, w 
 	takim przypadku nale¿y u¿ywac kana³owej listy 
 	dostêpu (access list). Zobacz 
-	/msg %S HELP ACCESS, aby uzyskaæ 
+	%M%S HELP ACCESS, aby uzyskaæ 
 	wiêcej informacji, oraz
-	/msg %S HELP SET XOP aby dowiedzieæ siê jak 
+	%M%S HELP SET XOP aby dowiedzieæ siê jak 
 	zmieniæ sposób zarz±dzania kana³em na system xOP.
 
 CHAN_HELP_HOP
@@ -4955,9 +4955,9 @@ CHAN_HELP_HOP
 	Lista HOP mo¿e byæ wy³±czona dla twojego kana³u, w 
 	takim przypadku nale¿y u¿ywac kana³owej listy 
 	dostêpu (access list). Zobacz 
-	/msg %S HELP ACCESS, aby uzyskaæ 
+	%M%S HELP ACCESS, aby uzyskaæ 
 	wiêcej informacji, oraz
-	/msg %S HELP SET XOP, aby dowiedzieæ siê 
+	%M%S HELP SET XOP, aby dowiedzieæ siê 
 	jak zmieniæ sposób zarz±dzania kana³em na system xOP.
 
 CHAN_HELP_SOP
@@ -5004,9 +5004,9 @@ CHAN_HELP_SOP
 	
 	Lista SOP mo¿e byæ wy³±czona dla twojego kana³u, w 
 	takim przypadku nale¿y u¿ywac kana³owej listy dostêpu 
-	(access list). Zobacz /msg %S HELP ACCESS, 
+	(access list). Zobacz %M%S HELP ACCESS, 
 	aby uzyskaæ wiêcej informacji, oraz
-	/msg %S HELP SET XOP aby dowiedzieæ siê 
+	%M%S HELP SET XOP aby dowiedzieæ siê 
 	jak zmieniæ sposób zarz±dzania kana³em na system xOP.
 	
 CHAN_HELP_VOP
@@ -5051,9 +5051,9 @@ CHAN_HELP_VOP
 	Lista VOP mo¿e byæ wy³±czona dla twojego kana³u, w 
 	takim przypadku nale¿y u¿ywac kana³owej listy 
 	dostêpu (access list). 
-	Zobacz /msg %S HELP ACCESS, aby uzyskaæ 
+	Zobacz %M%S HELP ACCESS, aby uzyskaæ 
 	wiêcej informacji, oraz 
-	/msg %S HELP SET XOP aby dowiedzieæ siê jak 
+	%M%S HELP SET XOP aby dowiedzieæ siê jak 
 	zmieniæ sposób zarz±dzania kana³em na system xOP.
 
 CHAN_HELP_ACCESS
@@ -5126,7 +5126,7 @@ CHAN_HELP_ACCESS_LEVELS
 	   
 	Standardowe poziomy mog± zostaæ zmienione, mo¿liwe 
 	jest tak¿e definiowanie w³asnych poziomów dostêpu. 
-	Zobacz: /msg %S HELP LEVELS, aby 
+	Zobacz: %M%S HELP LEVELS, aby 
 	uzyskaæ wiêcej informacji.
 
 CHAN_HELP_AKICK
@@ -5449,7 +5449,7 @@ CHAN_HELP_TOPIC
 	%S. Je¶li nie zostanie podana tre¶c nowego 
 	topicu, dotychczasowy zostanie usuniêty. Komendy 
 	mo¿na u¿ywaæ wraz z opcj± SET TOPICLOCK 
-	(zobacz: /msg %S HELP SET TOPICLOCK, aby 
+	(zobacz: %M%S HELP SET TOPICLOCK, aby 
 	uzyskaæ wiêcej informacji).
 	
 	Standardowo komenda ta jest dostêpna dla w³a¶ciciela 
@@ -5679,7 +5679,7 @@ MEMO_HELP_OPER
 	not used.
 MEMO_HELP_FOOTER
 	
-	Napisz /msg %S HELP komenda, aby 
+	Napisz %M%S HELP komenda, aby 
 	uzyskaæ pomoc odno¶nie powy¿szych komend.
 	
 	(*) Standardowo ka¿dy u¿ytkownik z poziomem dostepu 
@@ -5761,7 +5761,7 @@ MEMO_HELP_SET
 	   LIMIT    Ustala maksymaln± ilo¶æ wiadomo¶ci jak± 
 	            mo¿esz przyj±æ.
 	
-	Napisz /msg %S HELP SET opcja, 
+	Napisz %M%S HELP SET opcja, 
 	aby uzyskaæ wiêcej informacji o poszczególnych 
 	opcjach.
 
@@ -6590,8 +6590,8 @@ BOT_HELP
 	hostowaæ w³asnego bota, oraz dla tych sieci które
 	nie pozwalaj± na ich u¿ywanie. Dostêpne komendy
 	s± poni¿ej. Aby ich u¿yæ nale¿y wpisaæ: 
-	/msg %S komenda. Aby uzyskaæ wiêcej 
-	informacji wpisz /msg %S HELP komenda.
+	%M%S komenda. Aby uzyskaæ wiêcej 
+	informacji wpisz %M%S HELP komenda.
 	
 BOT_HELP_FOOTER
 	Bot wejdzie na kana³ je¶li przebywa na nim 
@@ -6638,7 +6638,7 @@ BOT_HELP_SET
 	                    kana³owe (fantasy).
 	   SYMBIOSIS        Rozszerzony tryb bota. 
 	
-	Napisz /msg %S HELP SET opcja, 
+	Napisz %M%S HELP SET opcja, 
 	aby uzyskaæ wiêcej informacji.
 	
 BOT_HELP_SET_DONTKICKOPS
@@ -6698,7 +6698,7 @@ BOT_HELP_KICK
 	   REVERSES     Kopanie za odwrócenie kolorów.
 	   UNDERLINES   Kopanie za u¿ywanie podkre¶leñ.
 	
-	Napisz /msg %S HELP KICK opcja, 
+	Napisz %M%S HELP KICK opcja, 
 	aby uzyskaæ wiêcej informacji po poszczególnych 
 	funkcjach.
 	
@@ -6794,7 +6794,7 @@ BOT_HELP_KICK_BADWORDS
 	
 	Mo¿esz ustaliæ listê zakazanych s³ów za pomoc±
 	polecenia BADWORDS. Napisz 
-	/msg %S HELP BADWORDS,aby 
+	%M%S HELP BADWORDS,aby 
 	uzyskaæ wiêcej informacji.
 
 	ttb to numer który okre¶la ile razy u¿ytkownik 
@@ -6812,7 +6812,7 @@ BOT_HELP_BADWORDS
 	s³ów. Lista definiuja za u¿ywanie których s³ów 
 	u¿ytkownicy mog± zostaæ wyrzuceni z kana³u. Aby 
 	uzyskaæ wiêcej informacji napisz: 
-	/msg %S HELP KICK BADWORDS
+	%M%S HELP KICK BADWORDS
 	
 	Komenda BADWORDS ADD umo¿liwia dodanie 
 	wskazanego s³owa do listy. Parametr SIGLE powoduje, 
@@ -6940,9 +6940,9 @@ HOST_SET_IDENTTOOLONG
 HOST_NOREG
 	User %s not found in the nickserv db.
 HOST_SET_SYNTAX
-	Syntax /msg %s set <nick> <hostmask>.
+	Syntax %M%s set <nick> <hostmask>.
 HOST_SETALL_SYNTAX
-	Syntax /msg %s setall <nick> <hostmask>.
+	Syntax %M%s setall <nick> <hostmask>.
 HOST_DENIED
 	Access Denied.
 HOST_NOT_ASSIGNED
@@ -6958,7 +6958,7 @@ HOST_NOT_REGED
 HOST_DEL
 	vhost for %s removed.
 HOST_DEL_SYNTAX
-	Syntax: /msg %s del <nick>.
+	Syntax: %M%s del <nick>.
 HOST_OFF_UNREAL
 	Your vhost was removed. To re-enable the standard host cloaking, type /mode %s +%s
 HOST_NO_VIDENT

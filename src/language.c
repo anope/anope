@@ -157,15 +157,15 @@ void lang_sanitize()
     char buf[256];
     for (i = 0; i < NUM_LANGS; i++) {
         for (j = 0; j < NUM_STRINGS; j++) {
-            if (strstr(langtexts[i][j], "%M")) {
+            if (strstr(langtexts[i][j], "%R")) {
                 len = strlen(langtexts[i][j]);
                 if (UseStrictPrivMsg) {
                     langtexts[i][j] =
-                        strnrepl(langtexts[i][j], len, "%M", "/");
+                        strnrepl(langtexts[i][j], len, "%R", "/");
                 } else {
                     langtexts[i][j] = realloc(langtexts[i][j], len + 5);
                     langtexts[i][j] =
-                        strnrepl(langtexts[i][j], len + 5, "%M", "/msg ");
+                        strnrepl(langtexts[i][j], len + 5, "%R", "/msg ");
                 }
             }
         }

@@ -1499,6 +1499,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(hybrid_cmd_nc_change);
     pmodule_cmd_svid_umode2(hybrid_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(hybrid_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(hybrid_cmd_svsjoin);
+	pmodule_cmd_svspart(hybrid_cmd_svspart);
+	pmodule_cmd_swhois(hybrid_cmd_swhois);
     pmodule_cmd_eob(hybrid_cmd_eob);
     pmodule_flood_mode_check(hybrid_flood_mode_check);
     pmodule_cmd_jupe(hybrid_cmd_jupe);

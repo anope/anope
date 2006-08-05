@@ -1655,6 +1655,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(solidircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(solidircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(solidircd_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(solidircd_cmd_svsjoin);
+	pmodule_cmd_svspart(solidircd_cmd_svspart);
+	pmodule_cmd_swhois(solidircd_cmd_swhois);
     pmodule_cmd_eob(solidircd_cmd_eob);
     pmodule_flood_mode_check(solidircd_flood_mode_check);
     pmodule_cmd_jupe(solidircd_cmd_jupe);

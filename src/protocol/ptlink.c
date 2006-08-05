@@ -1689,6 +1689,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(ptlink_cmd_nc_change);
     pmodule_cmd_svid_umode2(ptlink_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(ptlink_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(ptlink_cmd_svsjoin);
+	pmodule_cmd_svspart(ptlink_cmd_svspart);
+	pmodule_cmd_swhois(ptlink_cmd_swhois);
     pmodule_cmd_eob(ptlink_cmd_eob);
     pmodule_flood_mode_check(ptlink_flood_mode_check);
     pmodule_cmd_jupe(ptlink_cmd_jupe);

@@ -1682,6 +1682,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(ultimate2_cmd_nc_change);
     pmodule_cmd_svid_umode2(ultimate2_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(ultimate2_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(ultimate2_cmd_svsjoin);
+	pmodule_cmd_svspart(ultimate2_cmd_svspart);
+	pmodule_cmd_swhois(ultimate2_cmd_swhois);
     pmodule_cmd_eob(ultimate2_cmd_eob);
     pmodule_flood_mode_check(ultiamte2_flood_mode_check);
     pmodule_cmd_jupe(ultimate2_cmd_jupe);

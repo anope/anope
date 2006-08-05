@@ -1331,6 +1331,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(dreamforge_cmd_nc_change);
     pmodule_cmd_svid_umode2(dreamforge_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(dreamforge_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(dreamforge_cmd_svsjoin);
+	pmodule_cmd_svspart(dreamforge_cmd_svspart);
+	pmodule_cmd_swhois(dreamforge_cmd_swhois);
     pmodule_cmd_eob(dreamforge_cmd_eob);
     pmodule_flood_mode_check(dreamforge_flood_mode_check);
     pmodule_cmd_jupe(dreamforge_cmd_jupe);

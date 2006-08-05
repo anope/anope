@@ -1626,6 +1626,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(bahamut_cmd_nc_change);
     pmodule_cmd_svid_umode2(bahamut_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(bahamut_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(bahamut_cmd_svsjoin);
+	pmodule_cmd_svspart(bahamut_cmd_svspart);
+	pmodule_cmd_swhois(bahamut_cmd_swhois);
     pmodule_cmd_eob(bahamut_cmd_eob);
     pmodule_flood_mode_check(bahamut_flood_mode_check);
     pmodule_cmd_jupe(bahamut_cmd_jupe);

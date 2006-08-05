@@ -90,6 +90,9 @@ void initIrcdProto()
     ircdproto.ircd_cmd_nc_change = NULL;
     ircdproto.ircd_cmd_svid_umode2 = NULL;
     ircdproto.ircd_cmd_svid_umode3 = NULL;
+    ircdproto.ircd_cmd_svsjoin = NULL;
+    ircdproto.ircd_cmd_svspart = NULL;
+    ircdproto.ircd_cmd_swhois = NULL;
     ircdproto.ircd_cmd_eob = NULL;
     ircdproto.ircd_flood_mode_check = NULL;
     ircdproto.ircd_cmd_jupe = NULL;
@@ -597,6 +600,21 @@ void anope_cmd_svid_umode3(User * u, char *ts)
     ircdproto.ircd_cmd_svid_umode3(u, ts);
 }
 
+void anope_cmd_svsjoin(char *source, char *nick, char *chan)
+{
+    ircdproto.ircd_cmd_svsjoin(source, nick, chan);
+}
+
+void anope_cmd_svspart(char *source, char *nick, char *chan)
+{
+    ircdproto.ircd_cmd_eob(source, nick, chan);
+}
+
+void anope_cmd_swhois(char *source, char *who, char *mask)
+{
+    ircdproto.ircd_cmd_swhois(source, who, mask);
+}
+
 void anope_cmd_eob()
 {
     ircdproto.ircd_cmd_eob();
@@ -992,6 +1010,23 @@ void pmodule_cmd_svid_umode3(void (*func) (User * u, char *ts))
 void pmodule_cmd_ctcp(void (*func) (char *source, char *dest, char *buf))
 {
     ircdproto.ircd_cmd_ctcp = func;
+}
+
+void
+pmodule_cmd_svsjoin(void (*func) (char *source, char *nick, char *chan))
+{
+    ircdproto.ircd_cmd_svsjoin = func;
+}
+
+void
+pmodule_cmd_svspart(void (*func) (char *source, char *nick, char *chan))
+{
+    ircdproto.ircd_cmd_svspart = func;
+}
+
+void pmodule_cmd_swhois(void (*func) (char *source, char *who, char *mask))
+{
+    ircdproto.ircd_cmd_swhois = func;
 }
 
 void pmodule_cmd_eob(void (*func) ())

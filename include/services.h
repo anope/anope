@@ -1153,6 +1153,9 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_svid_umode2)(User * u, char *ts);
     void (*ircd_cmd_svid_umode3)(User * u, char *ts);
     void (*ircd_cmd_ctcp)(char *source, char *dest, char *buf);
+	void (*ircd_cmd_svsjoin)(char *source, char *nick, char *chan);
+	void (*ircd_cmd_svspart)(char *source, char *nick, char *chan);
+	void (*ircd_cmd_swhois)(char *source, char *who, char *mask);
     void (*ircd_cmd_eob)();
     void (*ircd_cmd_jupe)(char *jserver, char *who, char *reason);
     void (*ircd_set_umode)(User *user, int ac, char **av);

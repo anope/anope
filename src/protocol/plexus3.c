@@ -1792,6 +1792,9 @@ moduleAddAnopeCmds ()
   pmodule_cmd_nc_change (plexus_cmd_nc_change);
   pmodule_cmd_svid_umode2 (plexus_cmd_svid_umode2);
   pmodule_cmd_svid_umode3 (plexus_cmd_svid_umode3);
+  pmodule_cmd_svsjoin (plexus_cmd_svsjoin);
+  pmodule_cmd_svspart (plexus_cmd_svspart);
+  pmodule_cmd_swhois (plexus_cmd_swhois);
   pmodule_cmd_eob (plexus_cmd_eob);
   pmodule_flood_mode_check (plexus_flood_mode_check);
   pmodule_cmd_jupe (plexus_cmd_jupe);

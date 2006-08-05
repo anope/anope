@@ -2168,6 +2168,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(unreal_cmd_nc_change);
     pmodule_cmd_svid_umode2(unreal_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(unreal_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(unreal_cmd_svsjoin);
+	pmodule_cmd_svspart(unreal_cmd_svspart);
+	pmodule_cmd_swhois(unreal_cmd_swhois);
     pmodule_cmd_eob(unreal_cmd_eob);
     pmodule_flood_mode_check(unreal_flood_mode_check);
     pmodule_cmd_jupe(unreal_cmd_jupe);

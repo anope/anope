@@ -1883,6 +1883,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(charybdis_cmd_nc_change);
     pmodule_cmd_svid_umode2(charybdis_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(charybdis_cmd_svid_umode3);
+	pmodule_cmd_svsjoin(charybdis_cmd_svsjoin);
+	pmodule_cmd_svspart(charybdis_cmd_svspart);
+	pmodule_cmd_swhois(charybdis_cmd_swhois);
     pmodule_cmd_eob(charybdis_cmd_eob);
     pmodule_flood_mode_check(charybdis_flood_mode_check);
     pmodule_cmd_jupe(charybdis_cmd_jupe);

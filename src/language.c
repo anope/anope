@@ -154,7 +154,8 @@ void lang_sanitize()
 {
     int i = 0, j = 0;
     int len = 0;
-    char buf[256];
+    char tmp[256];
+    char *newstr = NULL;
     for (i = 0; i < NUM_LANGS; i++) {
         for (j = 0; j < NUM_STRINGS; j++) {
             if (strstr(langtexts[i][j], "%R")) {
@@ -163,9 +164,16 @@ void lang_sanitize()
                     langtexts[i][j] =
                         strnrepl(langtexts[i][j], len, "%R", "/");
                 } else {
-                    langtexts[i][j] = realloc(langtexts[i][j], len + 5);
+                    strscpy(tmp, langtexts[i][j], sizeof(tmp));
+                    strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
+                    newstr = sstrdup(tmp);
+                    free(langtexts[i][j]);
+                    langtexts[i][j] = newstr;
+/*		    strncpy(tmp,langtexts[i][j],len);
+		    free(langtexts[i][j]);
+		    langtexts[i][j] = tmp;
                     langtexts[i][j] =
-                        strnrepl(langtexts[i][j], len + 5, "%R", "/msg ");
+                        strnrepl(langtexts[i][j], len + 5, "%R", "/msg ");*/
                 }
             }
         }

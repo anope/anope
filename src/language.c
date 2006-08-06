@@ -160,21 +160,15 @@ void lang_sanitize()
         for (j = 0; j < NUM_STRINGS; j++) {
             if (strstr(langtexts[i][j], "%R")) {
                 len = strlen(langtexts[i][j]);
+                strscpy(tmp, langtexts[i][j], sizeof(tmp));
                 if (UseStrictPrivMsg) {
-                    langtexts[i][j] =
-                        strnrepl(langtexts[i][j], len, "%R", "/");
+                    strnrepl(tmp, sizeof(tmp), "%R", "/");
                 } else {
-                    strscpy(tmp, langtexts[i][j], sizeof(tmp));
                     strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
-                    newstr = sstrdup(tmp);
-                    free(langtexts[i][j]);
-                    langtexts[i][j] = newstr;
-/*		    strncpy(tmp,langtexts[i][j],len);
-		    free(langtexts[i][j]);
-		    langtexts[i][j] = tmp;
-                    langtexts[i][j] =
-                        strnrepl(langtexts[i][j], len + 5, "%R", "/msg ");*/
                 }
+                newstr = sstrdup(tmp);
+                free(langtexts[i][j]);
+                langtexts[i][j] = newstr;
             }
         }
     }

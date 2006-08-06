@@ -1864,7 +1864,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_ircd_cbmodes(myCbmodes);
     pmodule_ircd_cmmodes(myCmmodes);
     pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+    pmodule_ircd_useTSMode(1);
 
         /** Deal with modes anope _needs_ to know **/
     pmodule_invis_umode(UMODE_i);

@@ -66,14 +66,14 @@ int AnopeInit(int argc, char **argv)
 
     my_add_languages();
 
-    alog("[cs_appendtopic] Loaded succesfully");
+    alog("[cs_appendtopic] Loaded successfully");
 
     return MOD_CONT;
 }
 
 void AnopeFini(void)
 {
-    alog("[cs_appendtopic] Unloaded succefully");
+    alog("[cs_appendtopic] Unloaded successfully");
 }
 
 void my_cs_help(User * u)

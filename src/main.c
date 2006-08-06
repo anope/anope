@@ -225,7 +225,9 @@ static void services_restart(void)
     anope_cmd_squit(ServerName, quitmsg);
     disconn(servsock);
     close_log();
-    modules_unload_all(true);
+    /* First don't unload protocol module, then do so */
+    modules_unload_all(true, false);
+    modules_unload_all(true, true);
     execve(SERVICES_BIN, my_av, my_envp);
     if (!readonly) {
         open_log();
@@ -278,7 +280,9 @@ static void services_shutdown(void)
     }
     send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
     disconn(servsock);
-    modules_unload_all(true);   /* Only legitimate use of this function */
+    /* First don't unload protocol module, then do so */
+    modules_unload_all(true, false);
+    modules_unload_all(true, true);
 }
 
 /*************************************************************************/
@@ -363,7 +367,7 @@ void sighandler(int signum)
                 inbuf[448] = 0;
             }
             wallops(NULL, "PANIC! buffer = %s\r\n", inbuf);
-            modules_unload_all(false);
+            modules_unload_all(false, true);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
             static char buf[BUFSIZE];
@@ -440,7 +444,7 @@ void sighandler(int signum)
             }
             wallops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
-            modules_unload_all(false);
+            modules_unload_all(false, true);
         }
     }
 
@@ -462,7 +466,7 @@ void sighandler(int signum)
 
     if (signum == SIGSEGV) {
         do_backtrace(1);
-        modules_unload_all(false);      /* probably cant do this, but might as well try, we have nothing left to loose */
+        modules_unload_all(false, true);        /* probably cant do this, but might as well try, we have nothing left to loose */
     }
     /* Should we send the signum here as well? -GD */
     send_event(EVENT_SIGNAL, 1, quitmsg);

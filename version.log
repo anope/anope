@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1123"
+VERSION_BUILD="1124"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1124)
+# BUGS  : 552
+# NOTES : Added a way to modules_unload_all() to specify if we should unload the protocol module or not
 #
 # BUILD : 1.7.14 (1123)
 # BUGS  : 563

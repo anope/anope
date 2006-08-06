@@ -844,7 +844,7 @@ E char **buildStringList(char *src, int *number);
 
 /**** modules.c ****/
 E void modules_core_init(int number, char **list);
-E void modules_unload_all(boolean fini);	/* Read warnings near function source */
+E void modules_unload_all(boolean fini, boolean unload_proto);	/* Read warnings near function source */
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
 

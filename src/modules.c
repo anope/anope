@@ -234,7 +234,7 @@ void modules_delayed_init(void)
  * And if that isn't enough discouragement, you'll wake up with your
  * both legs broken tomorrow ;) -GD
  */
-void modules_unload_all(boolean fini)
+void modules_unload_all(boolean fini, boolean unload_proto)
 {
 #ifdef USE_MODULES
 	int idx;
@@ -245,26 +245,28 @@ void modules_unload_all(boolean fini)
 		mh = MODULE_HASH[idx];
 		while (mh) {
 			next = mh->next;
-			mod_current_module = mh->m;
-		    if(fini) {
-		        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
-		        if (func) {
-		            mod_current_module_name = mh->m->name;
-		            func();                 /* exec AnopeFini */
-		            mod_current_module_name = NULL;
-		        }
-			
-		        if (prepForUnload(mh->m) != MOD_ERR_OK) {
-			    	mh = next;
-				continue;
-		        }
-			
-		        if ((ano_modclose(mh->m->handle)) != 0)
-		            alog(ano_moderr());
-		        else
-		            delModule(mh->m);
-		    } else {
-                        delModule(mh->m);
+			if (unload_proto || (mh->m->type != PROTOCOL)) {
+				mod_current_module = mh->m;
+			    if(fini) {
+			        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
+		    	    if (func) {
+		        	    mod_current_module_name = mh->m->name;
+		            	func();                 /* exec AnopeFini */
+			            mod_current_module_name = NULL;
+			        }
+				
+		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
+			    		mh = next;
+						continue;
+			        }
+				
+		        	if ((ano_modclose(mh->m->handle)) != 0)
+			            alog(ano_moderr());
+			        else
+			            delModule(mh->m);
+		    	} else {
+                	        delModule(mh->m);
+				}
 		    }
 	   	    mh = next;
 		}

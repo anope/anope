@@ -245,6 +245,7 @@ void modules_unload_all(boolean fini)
 		mh = MODULE_HASH[idx];
 		while (mh) {
 			next = mh->next;
+			mod_current_module = mh->m;
 		    if(fini) {
 		        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
 		        if (func) {
@@ -736,10 +737,6 @@ int prepForUnload(Module * m)
 
     if (!m) {
         return MOD_ERR_PARAMS;
-    }
-
-    if (m->type == PROTOCOL) {
-        return MOD_ERR_NOUNLOAD; /* you cant unload protocol modules */
     }
 
     /* Kill any active callbacks this module has */

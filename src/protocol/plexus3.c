@@ -73,8 +73,8 @@ IRCDVar myIrcd[] = {
    1,				/* svshold              */
    1,				/* time stamp on mode   */
    0,				/* NICKIP               */
-   1,				/* UMODE                */
    0,				/* O:LINE               */
+   1,				/* UMODE                */
    1,				/* VHOST ON NICK        */
    0,				/* Change RealName      */
    CMODE_p,			/* No Knock             */
@@ -1614,13 +1614,13 @@ anope_event_pass (char *source, int ac, char **av)
 void
 plexus_cmd_svsjoin (char *source, char *nick, char *chan)
 {
-  /* Not Supported by this IRCD */
+  send_cmd(ServerName, "ENCAP * SVSJOIN %s %s", nick, chan);
 }
 
 void
 plexus_cmd_svspart (char *source, char *nick, char *chan)
 {
-  /* Not Supported by this IRCD */
+  send_cmd(ServerName, "ENCAP * SVSPART %s %s", nick, chan);
 }
 
 void

@@ -354,7 +354,7 @@ int m_whois(char *source, char *who)
             /* Bots are handled separately */
             anope_cmd_311("%s %s %s %s * :%s", source, bi->nick,
                           bi->user, bi->host, bi->real);
-            anope_cmd_307("%s :%s is a registered nick", source, bi->nick);
+            anope_cmd_307("%s %s :is a registered nick", source, bi->nick);
             anope_cmd_312("%s %s %s :%s", source, bi->nick, ServerName,
                           ServerDesc);
             anope_cmd_317("%s %s %ld %ld :seconds idle, signon time",

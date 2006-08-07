@@ -59,8 +59,9 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 08/05 F Externed doValidHost call for modules to use.                     [#570]
 08/05 F Lang files now support %R for use with StrictPrivMsg.             [#565]
 08/06 F Segfault when shuting down anope.                                 [#491]
-08/06 F Fixed typos in cs_appendtopic.c.                                  [#571] 
+08/06 F Fixed typos in cs_appendtopic.c.                                  [#571]
 08/06 F TSMode support for ratbox; TS6 works for ratbox now.              [#563]
+08/07 F Increased langauge buffer size.                                   [#572]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

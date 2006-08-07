@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="14"
 VERSION_EXTRA=""
-VERSION_BUILD="1124"
+VERSION_BUILD="1125"
 
 # $Log$
+#
+# BUILD : 1.7.14 (1125)
+# BUGS  : 572
+# NOTES : Increasd langauge buffer size to avoid issues 256 wasnt big enough.
+# 
 #
 # BUILD : 1.7.14 (1124)
 # BUGS  : 552

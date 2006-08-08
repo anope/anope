@@ -62,6 +62,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 08/06 F Fixed typos in cs_appendtopic.c.                                  [#571]
 08/06 F TSMode support for ratbox; TS6 works for ratbox now.              [#563]
 08/07 F Increased langauge buffer size.                                   [#572]
+08/08 F Fixed integer types in db-merger.c.                               [#573]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 05/19 A Plexus 3 support.                                                 [ #00]

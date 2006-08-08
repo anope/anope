@@ -34,6 +34,14 @@
  *
  *   - Certus
  *      July 20, 2006
+ *
+ *
+ *   0.4 beta:
+ *   Fixed some compiler warnings about signed/unsigned ints.
+ *
+ *   - Certus
+ *      August 8, 2006
+
  */
 
 
@@ -287,6 +295,8 @@ int write_string(const char *s, dbFILE * f);
 int write_ptr(const void *ptr, dbFILE * f);
 int read_int16(int16 * ret, dbFILE * f);
 int read_int32(int32 * ret, dbFILE * f);
+int read_uint16(uint16 * ret, dbFILE * f);
+int read_uint32(uint32 * ret, dbFILE * f);
 int read_string(char **ret, dbFILE * f);
 int write_int16(uint16 val, dbFILE * f);
 int write_int32(uint32 val, dbFILE * f);
@@ -311,7 +321,7 @@ int main(int argc, char *argv[])
     NickCore *nc, *ncnext;
     HostCore *firsthc = NULL;
 
-    printf("\n"C_LBLUE"DB Merger v0.3 beta for Anope IRC Services by Certus"C_NONE"\n\n");
+    printf("\n"C_LBLUE"DB Merger v0.4 beta for Anope IRC Services by Certus"C_NONE"\n\n");
 
     if (argc >= 2) {
         if (!mystricmp(argv[1], "--PREFEROLDEST")) {
@@ -365,11 +375,11 @@ int main(int argc, char *argv[])
                 READ(read_string(&nc->pass, f));
                 READ(read_string(&nc->email, f));
                 READ(read_string(&nc->greet, f));
-                READ(read_int32(&nc->icq, f));
+                READ(read_uint32(&nc->icq, f));
                 READ(read_string(&nc->url, f));
-                READ(read_int32(&nc->flags, f));
-                READ(read_int16(&nc->language, f));
-                READ(read_int16(&nc->accesscount, f));
+                READ(read_uint32(&nc->flags, f));
+                READ(read_uint16(&nc->language, f));
+                READ(read_uint16(&nc->accesscount, f));
                 if (nc->accesscount) {
                     char **access;
                     access = calloc(sizeof(char *) * nc->accesscount, 1);
@@ -384,15 +394,15 @@ int main(int argc, char *argv[])
                     memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
                     nc->memos.memos = memos;
                     for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                        READ(read_int32(&memos->number, f));
-                        READ(read_int16(&memos->flags, f));
+                        READ(read_uint32(&memos->number, f));
+                        READ(read_uint16(&memos->flags, f));
                         READ(read_int32(&tmp32, f));
                         memos->time = tmp32;
                         READ(read_buffer(memos->sender, f));
                         READ(read_string(&memos->text, f));
                     }
                 }
-                READ(read_int16(&nc->channelcount, f));
+                READ(read_uint16(&nc->channelcount, f));
                 READ(read_int16(&tmp16, f));
             } /* getc_db() */
             *nclast = NULL;
@@ -422,7 +432,7 @@ int main(int argc, char *argv[])
                 na->time_registered = tmp32;
                 READ(read_int32(&tmp32, f));
                 na->last_seen = tmp32;
-                READ(read_int16(&na->status, f));
+                READ(read_uint16(&na->status, f));
                 READ(read_string(&s, f));
                 na->nc = findcore(s, 0);
                 na->nc->aliascount++;
@@ -479,11 +489,11 @@ int main(int argc, char *argv[])
                     nclists[index] = nc;
 
                     READ(read_string(&nc->greet, f));
-                    READ(read_int32(&nc->icq, f));
+                    READ(read_uint32(&nc->icq, f));
                     READ(read_string(&nc->url, f));
-                    READ(read_int32(&nc->flags, f));
-                    READ(read_int16(&nc->language, f));
-                    READ(read_int16(&nc->accesscount, f));
+                    READ(read_uint32(&nc->flags, f));
+                    READ(read_uint16(&nc->language, f));
+                    READ(read_uint16(&nc->accesscount, f));
                     if (nc->accesscount) {
                         char **access;
                         access = calloc(sizeof(char *) * nc->accesscount, 1);
@@ -498,15 +508,15 @@ int main(int argc, char *argv[])
                         memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
                         nc->memos.memos = memos;
                         for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                            READ(read_int32(&memos->number, f));
-                            READ(read_int16(&memos->flags, f));
+                            READ(read_uint32(&memos->number, f));
+                            READ(read_uint16(&memos->flags, f));
                             READ(read_int32(&tmp32, f));
                             memos->time = tmp32;
                             READ(read_buffer(memos->sender, f));
                             READ(read_string(&memos->text, f));
                         }
                     }
-                    READ(read_int16(&nc->channelcount, f));
+                    READ(read_uint16(&nc->channelcount, f));
                     READ(read_int16(&tmp16, f));
                 } /* getc_db() */
             } /* for() loop */
@@ -532,7 +542,7 @@ int main(int argc, char *argv[])
                     na->time_registered = tmp32;
                     READ(read_int32(&tmp32, f));
                     na->last_seen = tmp32;
-                    READ(read_int16(&na->status, f));
+                    READ(read_uint16(&na->status, f));
                     READ(read_string(&s, f));
 
                     naptr = findnick(na->nick);
@@ -740,7 +750,7 @@ int main(int argc, char *argv[])
                 READ(read_buffer(ci->last_topic_setter, f));
                 READ(read_int32(&tmp32, f));
                 ci->last_topic_time = tmp32;
-                READ(read_int32(&ci->flags, f));
+                READ(read_uint32(&ci->flags, f));
                 /* Temporary flags cleanup */
                 ci->flags &= ~0x80000000;
                 READ(read_string(&ci->forbidby, f));
@@ -756,11 +766,11 @@ int main(int argc, char *argv[])
                     else
                         READ(read_int16(&tmp16, f));
                 }
-                READ(read_int16(&ci->accesscount, f));
+                READ(read_uint16(&ci->accesscount, f));
                 if (ci->accesscount) {
                     ci->access = calloc(ci->accesscount, sizeof(ChanAccess));
                     for (j = 0; j < ci->accesscount; j++) {
-                        READ(read_int16(&ci->access[j].in_use, f));
+                        READ(read_uint16(&ci->access[j].in_use, f));
                         if (ci->access[j].in_use) {
                             READ(read_int16(&ci->access[j].level, f));
                             READ(read_string(&s, f));
@@ -777,11 +787,11 @@ int main(int argc, char *argv[])
                 } else {
                     ci->access = NULL;
                 }
-                READ(read_int16(&ci->akickcount, f));
+                READ(read_uint16(&ci->akickcount, f));
                 if (ci->akickcount) {
                     ci->akick = calloc(ci->akickcount, sizeof(AutoKick));
                     for (j = 0; j < ci->akickcount; j++) {
-                        SAFE(read_int16(&ci->akick[j].flags, f));
+                        SAFE(read_uint16(&ci->akick[j].flags, f));
                         if (ci->akick[j].flags & 0x0001) {
                             SAFE(read_string(&s, f));
                             if (ci->akick[j].flags & 0x0002) {
@@ -811,9 +821,9 @@ int main(int argc, char *argv[])
                 } else {
                     ci->akick = NULL;
                 }
-                READ(read_int32(&ci->mlock_on, f));
-                READ(read_int32(&ci->mlock_off, f));
-                READ(read_int32(&ci->mlock_limit, f));
+                READ(read_uint32(&ci->mlock_on, f));
+                READ(read_uint32(&ci->mlock_off, f));
+                READ(read_uint32(&ci->mlock_limit, f));
                 READ(read_string(&ci->mlock_key, f));
                 READ(read_string(&ci->mlock_flood, f));
                 READ(read_string(&ci->mlock_redirect, f));
@@ -824,8 +834,8 @@ int main(int argc, char *argv[])
                     memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
                     ci->memos.memos = memos;
                     for (j = 0; j < ci->memos.memocount; j++, memos++) {
-                        READ(read_int32(&memos->number, f));
-                        READ(read_int16(&memos->flags, f));
+                        READ(read_uint32(&memos->number, f));
+                        READ(read_uint16(&memos->flags, f));
                         READ(read_int32(&tmp32, f));
                         memos->time = tmp32;
                         READ(read_buffer(memos->sender, f));
@@ -860,14 +870,14 @@ int main(int argc, char *argv[])
                 READ(read_int16(&tmp16, f));
                 ci->repeattimes = tmp16;
 
-                READ(read_int16(&ci->bwcount, f));
+                READ(read_uint16(&ci->bwcount, f));
                 if (ci->bwcount) {
                     ci->badwords = calloc(ci->bwcount, sizeof(BadWord));
                     for (j = 0; j < ci->bwcount; j++) {
-                        SAFE(read_int16(&ci->badwords[j].in_use, f));
+                        SAFE(read_uint16(&ci->badwords[j].in_use, f));
                         if (ci->badwords[j].in_use) {
                             SAFE(read_string(&ci->badwords[j].word, f));
-                            SAFE(read_int16(&ci->badwords[j].type, f));
+                            SAFE(read_uint16(&ci->badwords[j].type, f));
                         }
                     }
                 } else {
@@ -922,7 +932,7 @@ int main(int argc, char *argv[])
                     READ(read_buffer(ci->last_topic_setter, f));
                     READ(read_int32(&tmp32, f));
                     ci->last_topic_time = tmp32;
-                    READ(read_int32(&ci->flags, f));
+                    READ(read_uint32(&ci->flags, f));
                     /* Temporary flags cleanup */
                     ci->flags &= ~0x80000000;
                     READ(read_string(&ci->forbidby, f));
@@ -938,11 +948,11 @@ int main(int argc, char *argv[])
                         else
                             READ(read_int16(&tmp16, f));
                     }
-                    READ(read_int16(&ci->accesscount, f));
+                    READ(read_uint16(&ci->accesscount, f));
                     if (ci->accesscount) {
                         ci->access = calloc(ci->accesscount, sizeof(ChanAccess));
                         for (j = 0; j < ci->accesscount; j++) {
-                            READ(read_int16(&ci->access[j].in_use, f));
+                            READ(read_uint16(&ci->access[j].in_use, f));
                             if (ci->access[j].in_use) {
                                 READ(read_int16(&ci->access[j].level, f));
                                 READ(read_string(&s, f));
@@ -959,11 +969,11 @@ int main(int argc, char *argv[])
                     } else {
                         ci->access = NULL;
                     }
-                    READ(read_int16(&ci->akickcount, f));
+                    READ(read_uint16(&ci->akickcount, f));
                     if (ci->akickcount) {
                         ci->akick = calloc(ci->akickcount, sizeof(AutoKick));
                         for (j = 0; j < ci->akickcount; j++) {
-                            SAFE(read_int16(&ci->akick[j].flags, f));
+                            SAFE(read_uint16(&ci->akick[j].flags, f));
                             if (ci->akick[j].flags & 0x0001) {
                                 SAFE(read_string(&s, f));
                                 if (ci->akick[j].flags & 0x0002) {
@@ -993,9 +1003,9 @@ int main(int argc, char *argv[])
                     } else {
                         ci->akick = NULL;
                     }
-                    READ(read_int32(&ci->mlock_on, f));
-                    READ(read_int32(&ci->mlock_off, f));
-                    READ(read_int32(&ci->mlock_limit, f));
+                    READ(read_uint32(&ci->mlock_on, f));
+                    READ(read_uint32(&ci->mlock_off, f));
+                    READ(read_uint32(&ci->mlock_limit, f));
                     READ(read_string(&ci->mlock_key, f));
                     READ(read_string(&ci->mlock_flood, f));
                     READ(read_string(&ci->mlock_redirect, f));
@@ -1006,8 +1016,8 @@ int main(int argc, char *argv[])
                         memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
                         ci->memos.memos = memos;
                         for (j = 0; j < ci->memos.memocount; j++, memos++) {
-                            READ(read_int32(&memos->number, f));
-                            READ(read_int16(&memos->flags, f));
+                            READ(read_uint32(&memos->number, f));
+                            READ(read_uint16(&memos->flags, f));
                             READ(read_int32(&tmp32, f));
                             memos->time = tmp32;
                             READ(read_buffer(memos->sender, f));
@@ -1042,14 +1052,14 @@ int main(int argc, char *argv[])
                     READ(read_int16(&tmp16, f));
                     ci->repeattimes = tmp16;
 
-                    READ(read_int16(&ci->bwcount, f));
+                    READ(read_uint16(&ci->bwcount, f));
                     if (ci->bwcount) {
                         ci->badwords = calloc(ci->bwcount, sizeof(BadWord));
                         for (j = 0; j < ci->bwcount; j++) {
-                            SAFE(read_int16(&ci->badwords[j].in_use, f));
+                            SAFE(read_uint16(&ci->badwords[j].in_use, f));
                             if (ci->badwords[j].in_use) {
                                 SAFE(read_string(&ci->badwords[j].word, f));
-                                SAFE(read_int16(&ci->badwords[j].type, f));
+                                SAFE(read_uint16(&ci->badwords[j].type, f));
                             }
                         }
                     } else {
@@ -1624,8 +1634,7 @@ int main(int argc, char *argv[])
 
     /* MERGING DONE \o/ HURRAY! */
 
-    printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n"); \
-    printf("If you have broken DBs (AND you speak english well and have basic unix knowledge) you may\ncontact me (irc.anope.org - #anope), maybe I'll have a look at them.\n-Certus\n\n"); \
+    printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
 	return 0;
 } /* End of main() */
 
@@ -1721,6 +1730,19 @@ int read_int16(int16 * ret, dbFILE * f)
     return 0;
 }
 
+int read_uint16(uint16 * ret, dbFILE * f)
+{
+    int c1, c2;
+
+    c1 = fgetc(f->fp);
+    c2 = fgetc(f->fp);
+    if (c1 == EOF || c2 == EOF)
+        return -1;
+    *ret = c1 << 8 | c2;
+    return 0;
+}
+
+
 int write_int16(uint16 val, dbFILE * f)
 {
     if (fputc((val >> 8) & 0xFF, f->fp) == EOF
@@ -1730,6 +1752,20 @@ int write_int16(uint16 val, dbFILE * f)
 }
 
 int read_int32(int32 * ret, dbFILE * f)
+{
+    int c1, c2, c3, c4;
+
+    c1 = fgetc(f->fp);
+    c2 = fgetc(f->fp);
+    c3 = fgetc(f->fp);
+    c4 = fgetc(f->fp);
+    if (c1 == EOF || c2 == EOF || c3 == EOF || c4 == EOF)
+        return -1;
+    *ret = c1 << 24 | c2 << 16 | c3 << 8 | c4;
+    return 0;
+}
+
+int read_uint32(uint32 * ret, dbFILE * f)
 {
     int c1, c2, c3, c4;
 
@@ -1781,7 +1817,7 @@ int read_string(char **ret, dbFILE * f)
     char *s;
     uint16 len;
 
-    if (read_int16(&len, f) < 0)
+    if (read_uint16(&len, f) < 0)
         return -1;
     if (len == 0) {
         *ret = NULL;

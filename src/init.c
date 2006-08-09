@@ -224,12 +224,14 @@ static int parse_options(int ac, char **av)
                 s = av[i];
                 t = strchr(s, ':');
                 if (t) {
+                    int portnum;
                     *t++ = 0;
-                    if (atoi(t) > 0)
-                        RemotePort = atoi(t);
+                    portnum = atoi(t);
+                    if ((portnum > 0) && (portnum < 65535))
+                        RemotePort = portnum;
                     else {
                         fprintf(stderr,
-                                "-remote: port number must be a positive integer.  Using default.");
+                                "-remote: Port numbers must be in the range 1..65535. Using default.\n");
                         return -1;
                     }
                 }
@@ -243,12 +245,14 @@ static int parse_options(int ac, char **av)
                 s = av[i];
                 t = strchr(s, ':');
                 if (t) {
+                    int portnum;
                     *t++ = 0;
-                    if (atoi(t) >= 0)
-                        LocalPort = atoi(t);
+                    portnum = atoi(t);
+                    if ((portnum >= 0) && (portnum < 65535))
+                        LocalPort = portnum;
                     else {
                         fprintf(stderr,
-                                "-local: port number must be a positive integer or 0.  Using default.");
+                                "-local: Port numbers must be in the range 1..65535 or 0. Using default.\n");
                         return -1;
                     }
                 }

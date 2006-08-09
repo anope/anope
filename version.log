@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA=""
-VERSION_BUILD="1128"
+VERSION_BUILD="1129"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1129)
+# BUGS  : 575
+# NOTES : fixed port checking when using cmd line switches
 #
 # BUILD : 1.7.15 (1128)
 # BUGS  : 

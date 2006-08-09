@@ -9,9 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA=""
-VERSION_BUILD="1129"
+VERSION_BUILD="1131"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1131)
+# BUGS  :
+# NOTES : fixed revision number, we're missing an entry
+#
+# BUILD : 1.7.15 (1130)
+# BUGS  : 
+# NOTES : fixed revision number, we're missing an entry
 #
 # BUILD : 1.7.15 (1129)
 # BUGS  : 575

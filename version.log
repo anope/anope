@@ -8,10 +8,14 @@
 VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
-VERSION_EXTRA=""
-VERSION_BUILD="1131"
+VERSION_EXTRA="-svn"
+VERSION_BUILD="1132"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1132)
+# BUGS  : 
+# NOTES : Fixed development framework
 #
 # BUILD : 1.7.15 (1131)
 # BUGS  :

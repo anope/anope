@@ -4521,7 +4521,7 @@ CHAN_HELP_AOP
 	AOP LIST parancsot.
 	
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
-	használhatod az access lista rendszert. Nézd meg: /msg
+	használhatod az access lista rendszert. Nézd meg: %R
 	%S HELP ACCESSbõvebb információért az access listáról, és
 	írd be: %R%S HELP SET XOP hogy megnézd, hogyan tudsz 
 	váltani az xOP rendszerrol az access lista rendszerre.
@@ -4609,7 +4609,7 @@ CHAN_HELP_SOP
 
 	
 	Ezt a parancsot letilthatod a csatornádon, és helyette 
-	használhatod az access lista rendszert. Nézd meg: /msg
+	használhatod az access lista rendszert. Nézd meg: %R
 	%S HELP ACCESS bõvebb információért az access listáról,
 	és írd be: %R%S HELP SET XOP hogy megnézd, hogyan 
 	tudsz váltani az xOP rendszerrõl access lista rendszerre.

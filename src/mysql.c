@@ -55,11 +55,11 @@ int db_mysql_init()
     if (!MysqlHost) {
         do_mysql = 0;
         alog("MySQL: has been disabled.");
-	return 0;
+        return 0;
     } else {
         do_mysql = 1;
         alog("MySQL: has been enabled.");
-        alog("MySQL: client version %s.",mysql_get_client_info());
+        alog("MySQL: client version %s.", mysql_get_client_info());
     }
 
     /* The following configuration options are required.
@@ -69,12 +69,12 @@ int db_mysql_init()
     if ((do_mysql) && (!MysqlName || !MysqlUser)) {
         do_mysql = 0;
         alog("MySQL Error: Set all required configuration options.");
-	return 0;
+        return 0;
     }
 
     if (!db_mysql_open()) {
         do_mysql = 0;
-	return 0;
+        return 0;
     }
 
     return 1;
@@ -93,20 +93,22 @@ int db_mysql_open()
         db_mysql_error(MYSQL_WARNING, "Unable to create mysql object");
 
     if (!MysqlPort)
-        MysqlPort = 3306;
+        MysqlPort = MYSQL_DEFAULT_PORT;
 
     if (MysqlSock) {
         if ((!mysql_real_connect
              (mysql, MysqlHost, MysqlUser, MysqlPass, MysqlName, MysqlPort,
               MysqlSock, 0))) {
-            log_perror("MySQL Error: Cant connect to MySQL: %s\n", mysql_error(mysql));
+            log_perror("MySQL Error: Cant connect to MySQL: %s\n",
+                       mysql_error(mysql));
             return 0;
         }
     } else {
         if ((!mysql_real_connect
              (mysql, MysqlHost, MysqlUser, MysqlPass, MysqlName, MysqlPort,
               NULL, 0))) {
-            log_perror("MySQL Error: Cant connect to MySQL: %s\n", mysql_error(mysql));
+            log_perror("MySQL Error: Cant connect to MySQL: %s\n",
+                       mysql_error(mysql));
             return 0;
         }
     }
@@ -133,34 +135,41 @@ int db_mysql_query(char *sql)
 
     }
 
-    result = mysql_query(mysql, sql);
+    /* Try as many times as configured in MysqlRetries */
+    for (lcv = 0; lcv < MysqlRetries; lcv++) {
 
-    if (result) {
-        switch (mysql_errno(mysql)) {
-        case CR_SERVER_GONE_ERROR:
-        case CR_SERVER_LOST:
+        if (db_mysql_open()) {
 
-            for (lcv = 0; lcv < MysqlRetries; lcv++) {
-                if (db_mysql_open()) {
-                    result = mysql_query(mysql, sql);
+            /* Attempt to run query */
+            result = mysql_query(mysql, sql);
+            if (result) {
+                switch (mysql_errno(mysql)) {
+                case CR_COMMANDS_OUT_OF_SYNC:
+                case CR_SERVER_GONE_ERROR:
+                case CR_UNKNOWN_ERROR:
+                case CR_SERVER_LOST:
+
+                    /* If we get here, we could not run the query */
+                    log_perror("Unable to run query: %s\n",
+                               mysql_error(mysql));
+
+                    break;
+
+                default:
+
+                    /* Success... return result */
                     return (result);
+
                 }
-                sleep(MysqlRetryGap);
             }
-
-            /* If we get here, we could not connect. */
-            log_perror("Unable to reconnect to database: %s\n",
-                       mysql_error(mysql));
-            db_mysql_error(MYSQL_ERROR, "connect");
-
-            /* Never reached. */
-            break;
-
-        default:
-            /* Unhandled error. */
-            return (result);
         }
+
+        /* Wait for MysqlRetryGap seconds and try again */
+        sleep(MysqlRetryGap);
+
     }
+
+    db_mysql_error(MYSQL_ERROR, "query");
 
     return (0);
 
@@ -237,10 +246,10 @@ char *db_mysql_secure(char *pass)
     memset(epass, '\0', BUFSIZE);
 
 #ifdef USE_ENCRYPTION
-	if (pass) {
-     /* If we use the builtin encryption don't double encrypt! */
-     snprintf(epass, sizeof(epass), "'%s'", pass);
-	}
+    if (pass) {
+        /* If we use the builtin encryption don't double encrypt! */
+        snprintf(epass, sizeof(epass), "'%s'", pass);
+    }
 #else
 
     if (!pass) {
@@ -413,12 +422,12 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
         *cbadwords, *efounderpass;
 
     ciname = db_mysql_quote(ci->name);
-    if(ci->founder) {
+    if (ci->founder) {
         cifoundernick = db_mysql_quote(ci->founder->display);
     } else {
         cifoundernick = db_mysql_quote("");
     }
-    if(ci->successor) {
+    if (ci->successor) {
         cisuccessornick = db_mysql_quote(ci->successor->display);
     } else {
         cisuccessornick = db_mysql_quote("");
@@ -435,7 +444,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     cimlock_flood = db_mysql_quote(ci->mlock_flood);
     cimlock_redirect = db_mysql_quote(ci->mlock_redirect);
     cientrymsg = db_mysql_quote(ci->entry_message);
-    if(ci->bi) {
+    if (ci->bi) {
         cibotnick = db_mysql_quote(ci->bi->nick);
     } else {
         cibotnick = db_mysql_quote("");
@@ -615,8 +624,8 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     }
 
     free(ciname);
-    free(cifoundernick); /* mark */
-    free(cisuccessornick); /* mark */
+    free(cifoundernick);        /* mark */
+    free(cisuccessornick);      /* mark */
     free(efounderpass);
     free(cidesc);
     free(ciurl);
@@ -627,7 +636,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
     free(cimlock_flood);
     free(cimlock_redirect);
     free(cientrymsg);
-    free(cibotnick); /* mark */
+    free(cibotnick);            /* mark */
     free(ciforbidby);
     free(ciforbidreason);
 
@@ -884,7 +893,7 @@ void db_mysql_load_bs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -921,7 +930,7 @@ void db_mysql_load_hs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -956,7 +965,7 @@ void db_mysql_load_news(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     nnews = mysql_num_rows(mysql_res);
@@ -996,7 +1005,7 @@ void db_mysql_load_exceptions(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     nexceptions = mysql_num_rows(mysql_res);
@@ -1031,7 +1040,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1053,7 +1062,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     slist_setcapacity(&akills, akc);
@@ -1078,7 +1087,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1097,7 +1106,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1116,7 +1125,7 @@ void db_mysql_load_os_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql statement: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1149,7 +1158,7 @@ void db_mysql_load_cs_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1209,7 +1218,7 @@ void db_mysql_load_cs_dbase(void)
         if (db_mysql_query(sqlcmd)) {
             log_perror("Can't create sql query: %s", sqlcmd);
             db_mysql_error(MYSQL_WARNING, "query");
-			return;
+            return;
         }
         res = mysql_store_result(mysql);
         n_levels = mysql_num_rows(res);
@@ -1228,7 +1237,7 @@ void db_mysql_load_cs_dbase(void)
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
-				return;
+                return;
             }
             res = mysql_store_result(mysql);
             j = 0;
@@ -1256,7 +1265,7 @@ void db_mysql_load_cs_dbase(void)
             if (db_mysql_query(sqlcmd)) {
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
-				return;
+                return;
             }
             res = mysql_store_result(mysql);
             j = 0;
@@ -1385,7 +1394,7 @@ void db_mysql_load_ns_req_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1422,7 +1431,7 @@ void db_mysql_load_ns_dbase(void)
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
-		return;
+        return;
     }
     mysql_res = mysql_store_result(mysql);
     if (mysql_num_rows(mysql_res) == 0) {
@@ -1606,5 +1615,3 @@ unsigned int mysql_rand(void)
     mysql_free_result(mysql_res);
     return num;
 }
-
-

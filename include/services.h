@@ -114,6 +114,7 @@
 #ifdef USE_MYSQL
 # define MYSQL_WARNING 2
 # define MYSQL_ERROR   4
+# define MYSQL_DEFAULT_PORT 3306
 #ifdef MYSQL_HEADER_PREFIX
 # include <mysql/mysql.h>
 # include <mysql/errmsg.h>

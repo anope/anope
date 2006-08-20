@@ -853,7 +853,7 @@ void shadowircd_cmd_topic(char *whosets, char *chan, char *whosetit,
 
     ud = find_uid(whosets);
     send_cmd((ud ? ud->uid : whosets), "TOPIC %s %s %ld :%s", chan,
-             whosetit, when, topic);
+             whosetit, (long int) when, topic);
 }
 
 void shadowircd_cmd_vhost_off(User * u)
@@ -1501,7 +1501,7 @@ void shadowircd_cmd_svsnick(char *nick, char *newnick, time_t when)
     if (!nick || !newnick) {
         return;
     }
-    send_cmd(NULL, "SVSNICK %s %s %ld", nick, newnick, when);
+    send_cmd(NULL, "SVSNICK %s %s %ld", nick, newnick, (long int) when);
 }
 
 void shadowircd_cmd_guest_nick(char *nick, char *user, char *host,

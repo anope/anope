@@ -604,7 +604,7 @@ int anope_event_idle(char *source, int ac, char **av)
 {
 	if (ac == 1)
 	{
-		send_cmd(av[0],"IDLE %s %ld 0",source,time(NULL));
+		send_cmd(av[0],"IDLE %s %ld 0",source,(long int) time(NULL));
 	}
 	return MOD_CONT;
 }

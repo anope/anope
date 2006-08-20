@@ -8,6 +8,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#586]
 08/20 F Fixed several compiler warnings.                                  [#584]
 08/20 F log.c rewrite.                                                    [#582]
+08/20 F Fixed bsd compier warning.                                        [#578]
 
 Anope Version 1.7.15
 --------------------

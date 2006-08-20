@@ -293,7 +293,7 @@ int strftime_lang(char *buf, int size, User * u, int format, struct tm *tm)
 
 /* Send a syntax-error message to the user. */
 
-void syntax_error(char *service, User * u, char *command, int msgnum)
+void syntax_error(char *service, User * u, const char *command, int msgnum)
 {
     const char *str;
 

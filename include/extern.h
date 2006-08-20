@@ -695,7 +695,7 @@ E void lang_init(void);
 	(langtexts[((nc)?((NickCore*)nc)->language:NSDefLanguage)][(index)])
 E int strftime_lang(char *buf, int size, User * u, int format,
                     struct tm *tm);
-E void syntax_error(char *service, User * u, char *command,
+E void syntax_error(char *service, User * u, const char *command,
                     int msgnum);
 
 

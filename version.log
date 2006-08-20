@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1134"
+VERSION_BUILD="1135"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1135)
+# BUGS  : 586 584 582
+# NOTES : several fixes
 #
 # BUILD : 1.7.15 (1134)
 # BUGS  : N/A
@@ -31,7 +35,7 @@ VERSION_BUILD="1134"
 #
 # BUILD : 1.7.15 (1130)
 # BUGS  : 
-# NOTES : fixed revision number, we're missing an entry
+# NOTES : missing entry
 #
 # BUILD : 1.7.15 (1129)
 # BUGS  : 575

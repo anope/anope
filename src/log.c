@@ -23,17 +23,17 @@ static int curday = 0;
 
 static int get_logname(char *name, int count, struct tm *tm)
 {
-
     char timestamp[32];
+    time_t t;
+
 
     if (!tm) {
-        time_t t;
-
         time(&t);
         tm = localtime(&t);
     }
-
-    strftime(timestamp, count, "%Y%m%d", tm);
+  
+    /* fix bug 577 */
+    strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
     snprintf(name, count, "logs/%s.%s", log_filename, timestamp);
     curday = tm->tm_yday;
 
@@ -56,8 +56,8 @@ static void remove_log(void)
     t -= (60 * 60 * 24 * KeepLogs);
     tm = *localtime(&t);
 
-    if (!get_logname(name, sizeof(name), &tm))
-        return;
+    /* removed if from here cause get_logchan is always 1 */
+    get_logname(name, sizeof(name), &tm);
 #ifndef _WIN32
     unlink(name);
 #else
@@ -93,15 +93,17 @@ int open_log(void)
 
     if (logfile)
         return 0;
-
-    if (!get_logname(name, sizeof(name), NULL))
-        return 0;
+   
+    /* if removed again.. get_logname is always 1 */
+    get_logname(name, sizeof(name), NULL);
     logfile = fopen(name, "a");
 
     if (logfile)
         setbuf(logfile, NULL);
     return logfile != NULL ? 0 : -1;
 }
+
+/*************************************************************************/
 
 /* Close the log file. */
 
@@ -115,38 +117,12 @@ void close_log(void)
 
 /*************************************************************************/
 
-/* Log stuff to the log file with a datestamp.  Note that errno is
- * preserved by this routine and log_perror().
- */
-
-void alog(const char *fmt, ...)
+/* added cause this is used over and over in the code */
+char *log_gettimestamp(void)
 {
-    va_list args, logargs, consoleargs, logchanargs;
     time_t t;
     struct tm tm;
-    char buf[256];
-    int errno_save = errno;
-
-    checkday();
-
-    if (!fmt) {
-        return;
-    }
-
-    va_start(args, fmt);
-
-    /* 64-bit safety:
-     *
-     * GCC on many 64-bit boxes causes the stack used for the va_list
-     * to become unavailable after you use them, so we need to make copies
-     * of the va_list for all of our logging targets, otherwise Anope will
-     * crash. :(
-     *
-     *   --nenolod
-     */
-    VA_COPY(logargs, args);
-    VA_COPY(consoleargs, args);
-    VA_COPY(logchanargs, args);
+    static char tbuf[256];
 
     time(&t);
     tm = *localtime(&t);
@@ -155,41 +131,58 @@ void alog(const char *fmt, ...)
         char *s;
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
+        strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
+        s = tbuf + strlen(tbuf);
+        s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d",
                       (int) tv.tv_usec);
-        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
+        strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
     } else {
 #endif
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
+        strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
 #if HAVE_GETTIMEOFDAY
     }
 #endif
+    return tbuf;
+}
+
+/*************************************************************************/
+
+/* Log stuff to the log file with a datestamp.  Note that errno is
+ * preserved by this routine and log_perror().
+ */
+
+void alog(const char *fmt, ...)
+{
+    va_list args;
+    char *buf;
+    int errno_save = errno;
+    char str[BUFSIZE];
+
+    checkday();
+
+    if (!fmt) {
+        return;
+    }
+
+    va_start(args, fmt);
+    vsnprintf(str, sizeof(str), fmt, args);
+    va_end(args);
+
+    buf = log_gettimestamp();
+
     if (logfile) {
-        fputs(buf, logfile);
-        vfprintf(logfile, fmt, logargs);
-        fputc('\n', logfile);
+        fprintf(logfile, "%s %s\n", buf, str);
     }
     if (nofork) {
-        fputs(buf, stderr);
-        vfprintf(stderr, fmt, consoleargs);
-        fputc('\n', stderr);
+        fprintf(stderr, "%s %s\n", buf, str);
     }
-
     if (LogChannel && logchan && !debug && findchan(LogChannel)) {
-        char str[BUFSIZE];
-        vsnprintf(str, sizeof(str), fmt, logchanargs);
         privmsg(s_GlobalNoticer, LogChannel, "%s", str);
     }
-
-    va_end(logargs);
-    va_end(consoleargs);
-    va_end(logchanargs);
-    va_end(args);
     errno = errno_save;
 }
 
+/*************************************************************************/
 
 /* Like alog(), but tack a ": " and a system error message (as returned by
  * strerror()) onto the end.
@@ -197,11 +190,10 @@ void alog(const char *fmt, ...)
 
 void log_perror(const char *fmt, ...)
 {
-    va_list args, logargs, consoleargs;
-    time_t t;
-    struct tm tm;
-    char buf[256];
+    va_list args;
+    char *buf;
     int errno_save = errno;
+    char str[BUFSIZE];
 
     checkday();
 
@@ -210,52 +202,18 @@ void log_perror(const char *fmt, ...)
     }
 
     va_start(args, fmt);
+    vsnprintf(str, sizeof(str), fmt, args);
+    va_end(args);
 
-    /* 64-bit safety:
-     *
-     * GCC on many 64-bit boxes causes the stack used for the va_list
-     * to become unavailable after you use them, so we need to make copies
-     * of the va_list for all of our logging targets, otherwise Anope will
-     * crash. :(
-     *
-     *   --nenolod
-     */
-    VA_COPY(logargs, args);
-    VA_COPY(consoleargs, args);
+    buf = log_gettimestamp();
 
-    time(&t);
-    tm = *localtime(&t);
-#if HAVE_GETTIMEOFDAY
-    if (debug) {
-        char *s;
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
-                      (int) tv.tv_usec);
-        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
-    } else {
-#endif
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
-#if HAVE_GETTIMEOFDAY
-    }
-#endif
     if (logfile) {
-        fputs(buf, logfile);
-        vfprintf(logfile, fmt, logargs);
-        fprintf(logfile, ": %s\n", strerror(errno_save));
+        fprintf(logfile, "%s %s : %s\n", buf, str, strerror(errno_save));
     }
     if (nofork) {
-        fputs(buf, stderr);
-        vfprintf(stderr, fmt, consoleargs);
-        fprintf(stderr, ": %s\n", strerror(errno_save));
+        fprintf(stderr, "%s %s : %s\n", buf, str, strerror(errno_save));
     }
     errno = errno_save;
-
-    va_end(logargs);
-    va_end(consoleargs);
-    va_end(args);
 }
 
 /*************************************************************************/
@@ -267,86 +225,64 @@ void log_perror(const char *fmt, ...)
 void fatal(const char *fmt, ...)
 {
     va_list args;
-    time_t t;
-    struct tm tm;
-    char buf[256], buf2[4096];
+    char *buf;
+    char buf2[4096];
 
     checkday();
 
-    va_start(args, fmt);
-    time(&t);
-    tm = *localtime(&t);
-#if HAVE_GETTIMEOFDAY
-    if (debug) {
-        char *s;
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
-                      (int) tv.tv_usec);
-        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
-    } else {
-#endif
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
-#if HAVE_GETTIMEOFDAY
+    if (!fmt) {
+        return;
     }
-#endif
+
+    va_start(args, fmt);
     vsnprintf(buf2, sizeof(buf2), fmt, args);
+    va_end(args);
+
+    buf = log_gettimestamp();
+
     if (logfile)
-        fprintf(logfile, "%sFATAL: %s\n", buf, buf2);
+        fprintf(logfile, "%s FATAL: %s\n", buf, buf2);
     if (nofork)
-        fprintf(stderr, "%sFATAL: %s\n", buf, buf2);
+        fprintf(stderr, "%s FATAL: %s\n", buf, buf2);
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s", buf2);
 
-    va_end(args);
     exit(1);
 }
 
+/*************************************************************************/
 
 /* Same thing, but do it like perror(). */
 
 void fatal_perror(const char *fmt, ...)
 {
     va_list args;
-    time_t t;
-    struct tm tm;
-    char buf[256], buf2[4096];
+    char *buf;
+    char buf2[4096];
     int errno_save = errno;
 
     checkday();
 
-    va_start(args, fmt);
-    time(&t);
-    tm = *localtime(&t);
-#if HAVE_GETTIMEOFDAY
-    if (debug) {
-        char *s;
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d",
-                      (int) tv.tv_usec);
-        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
-    } else {
-#endif
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
-#if HAVE_GETTIMEOFDAY
+    if (!fmt) {
+        return;
     }
-#endif
+
+    va_start(args, fmt);
     vsnprintf(buf2, sizeof(buf2), fmt, args);
+    va_end(args);
+
+    buf = log_gettimestamp();
+
     if (logfile)
-        fprintf(logfile, "%sFATAL: %s: %s\n", buf, buf2,
+        fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
                 strerror(errno_save));
-    if (stderr)
-        fprintf(stderr, "%sFATAL: %s: %s\n", buf, buf2,
+    if (nofork)
+        fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
                 strerror(errno_save));
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
                          strerror(errno_save));
-    va_end(args);
+
     exit(1);
 }
 
@@ -360,39 +296,31 @@ void fatal_perror(const char *fmt, ...)
 void fatal_sockerror(const char *fmt, ...)
 {
     va_list args;
-    time_t t;
-    struct tm tm;
-    char buf[256], buf2[4096];
+    char *buf;
+    char buf2[4096];
     int errno_save = ano_sockgeterr();
+
+    if (!fmt) {
+        return;
+    }
 
     checkday();
 
+    /* this will fix 581 */
     va_start(args, fmt);
-    time(&t);
-    tm = *localtime(&t);
-#if HAVE_GETTIMEOFDAY
-    if (debug) {
-        char *s;
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = buf + strlen(buf);
-        s += snprintf(s, sizeof(buf) - (s - buf), ".%06d", tv.tv_usec);
-        strftime(s, sizeof(buf) - (s - buf) - 1, " %Y] ", &tm);
-    } else {
-#endif
-        strftime(buf, sizeof(buf) - 1, "[%b %d %H:%M:%S %Y] ", &tm);
-#if HAVE_GETTIMEOFDAY
-    }
-#endif
     vsnprintf(buf2, sizeof(buf2), fmt, args);
+    va_end(args);
+
+    buf = log_gettimestamp();
+
     if (logfile)
-        fprintf(logfile, "%sFATAL: %s: %s\n", buf, buf2,
+        fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
                 ano_sockstrerror(errno_save));
     if (stderr)
-        fprintf(stderr, "%sFATAL: %s: %s\n", buf, buf2,
+        fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
                 ano_sockstrerror(errno_save));
     if (servsock >= 0)
-        wallops(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
+        anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
+
     exit(1);
 }

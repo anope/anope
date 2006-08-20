@@ -725,7 +725,7 @@ char *ano_sockstrerror(int error)
 
 int ano_socksetnonb(ano_socket_t fd)
 {
-    int i = 1;
+    u_long i = 1;
     return (!ioctlsocket(fd, FIONBIO, &i) ? -1 : 1);
 }
 #endif

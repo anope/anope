@@ -161,6 +161,9 @@ int db_mysql_query(char *sql)
                     return (result);
 
                 }
+            } else {
+                /* Non-error */
+                return (result);
             }
         }
 

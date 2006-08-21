@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1137"
+VERSION_BUILD="1138"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1138)
+# BUGS  : 585
+# NOTES : Another attempt at fixing db_mysql_query()
 #
 # BUILD : 1.7.15 (1137)
 # BUGS  : n/a

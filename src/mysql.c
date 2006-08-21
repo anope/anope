@@ -121,11 +121,12 @@ int db_mysql_open()
 
 int db_mysql_query(char *sql)
 {
-    int result, lcv;
+    int lcv;
     char *s;
 
     if (!do_mysql) {
-        return -1;
+        /* Error is 1 */
+        return 1;
     }
 
     if (debug) {
@@ -138,43 +139,26 @@ int db_mysql_query(char *sql)
     /* Try as many times as configured in MysqlRetries */
     for (lcv = 0; lcv < MysqlRetries; lcv++) {
 
-        if (db_mysql_open()) {
+        if (db_mysql_open() && (!mysql_query(mysql, sql))) {
+            
+            /* Success is 0 */
+            return 0;
 
-            /* Attempt to run query */
-            result = mysql_query(mysql, sql);
-            if (result) {
-                switch (mysql_errno(mysql)) {
-                case CR_COMMANDS_OUT_OF_SYNC:
-                case CR_SERVER_GONE_ERROR:
-                case CR_UNKNOWN_ERROR:
-                case CR_SERVER_LOST:
-
-                    /* If we get here, we could not run the query */
-                    log_perror("Unable to run query: %s\n",
-                               mysql_error(mysql));
-
-                    break;
-
-                default:
-
-                    /* Success... return result */
-                    return (result);
-
-                }
-            } else {
-                /* Non-error */
-                return (result);
-            }
         }
+
+        /* If we get here, we could not run the query */
+        log_perror("Unable to run query: %s\n", mysql_error(mysql));
 
         /* Wait for MysqlRetryGap seconds and try again */
         sleep(MysqlRetryGap);
 
     }
 
+    /* Unable to run the query */
     db_mysql_error(MYSQL_ERROR, "query");
 
-    return (0);
+    /* Error is 1 */
+    return 1;
 
 }
 
@@ -255,7 +239,7 @@ char *db_mysql_secure(char *pass)
     }
 #else
 
-    if (!pass) {
+    if (pass) {
         snprintf(epass, sizeof(epass), "''");
     } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
         snprintf(epass, sizeof(epass), "'%s'", pass);

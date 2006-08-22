@@ -45,9 +45,9 @@ IRCDVar myIrcd[] = {
    "+a",			/* Mode to set for chan admin */
    "-a",			/* Mode to unset for chan admin */
    "+rd",			/* Mode On Reg          */
-    "N",                        /* Mode on ID for Roots */
-     NULL,                      /* Mode on ID for Admins */
-     NULL,                      /* Mode on ID for Opers */
+   "N",                         /* Mode on ID for Roots */
+   NULL,                        /* Mode on ID for Admins */
+   NULL,                        /* Mode on ID for Opers */
    "-r+d",			/* Mode on UnReg        */
    "+d",			/* Mode on Nick Change  */
    1,				/* Supports SGlines     */
@@ -1559,18 +1559,18 @@ void
 plexus_cmd_svid_umode3 (User * u, char *ts)
 {
   char modes[512];
-  int len;
-  strncpy(modes,ircd->modeonreg,512);
-  len = strlen(ircd->modeonreg);
+  
+  strlcpy(modes, "+r", sizeof(modes));
+
   if(ircd->rootmodeonid && is_services_root(u)) {
-      strncat(modes,ircd->rootmodeonid,512-len);
+      strlcat(modes, ircd->rootmodeonid, sizeof(modes));
   } else if(ircd->adminmodeonid && is_services_admin(u)) {
-      strncat(modes,ircd->adminmodeonid,512-len);
+      strlcat(modes, ircd->adminmodeonid, sizeof(modes));
   } else if(ircd->opermodeonid && is_services_oper(u)) {
-      strncat(modes,ircd->opermodeonid,512-len);
+      strlcat(modes, ircd->opermodeonid, sizeof(modes));
   }
   if (u->svid != u->timestamp) {
-      strncat(modes,"d",1);
+      strlcat(modes, "d", sizeof(modes));
       common_svsmode (u, modes, ts);
   } else {
       common_svsmode (u, modes, NULL);

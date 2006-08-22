@@ -798,6 +798,12 @@ E int m_version(char *source, int ac, char **av);
 E int toupper(char);
 E int tolower(char);
 E char *strscpy(char *d, const char *s, size_t len);
+#ifndef HAVE_STRLCPY
+E size_t strlcpy(char *, const char *, size_t);
+#endif
+#ifndef HAVE_STRLCAT
+E size_t strlcat(char *, const char *, size_t);
+#endif
 E char *stristr(char *s1, char *s2);
 E char *strnrepl(char *s, int32 size, const char *old, const char *new);
 E char *merge_args(int argc, char **argv);

@@ -10,6 +10,9 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F log.c rewrite.                                                    [#582]
 08/20 F Fixed bsd compier warning.                                        [#578]
 
+Provided by ThaPrince <jon@vile.com> - 2006
+08/22 F Plexus3 svid_mode3 support fixed.                                 [ #00]
+
 Anope Version 1.7.15
 --------------------
 Provided by Anope Dev. <dev@anope.org> - 2006

@@ -31,7 +31,7 @@ static int get_logname(char *name, int count, struct tm *tm)
         time(&t);
         tm = localtime(&t);
     }
-  
+
     /* fix bug 577 */
     strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
     snprintf(name, count, "logs/%s.%s", log_filename, timestamp);
@@ -93,7 +93,7 @@ int open_log(void)
 
     if (logfile)
         return 0;
-   
+
     /* if removed again.. get_logname is always 1 */
     get_logname(name, sizeof(name), NULL);
     logfile = fopen(name, "a");
@@ -320,7 +320,8 @@ void fatal_sockerror(const char *fmt, ...)
         fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
                 ano_sockstrerror(errno_save));
     if (servsock >= 0)
-        anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2, strerror(errno_save));
+        anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
+                         strerror(errno_save));
 
     exit(1);
 }

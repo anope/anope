@@ -891,7 +891,7 @@ int anope_event_eob(char *source, int ac, char **av)
 
 void hybrid_cmd_eob()
 {
-    send_cmd(ServerName, "EOB");
+//    send_cmd(ServerName, "EOB");
 }
 
 

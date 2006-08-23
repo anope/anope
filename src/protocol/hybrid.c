@@ -104,7 +104,7 @@ IRCDVar myIrcd[] = {
      0,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
-     1,                         /* reports sync state */
+     0,                         /* reports sync state */
      }
     ,
     {NULL}
@@ -639,7 +639,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m);
+//    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m);
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
 }
@@ -784,7 +784,7 @@ void hybrid_cmd_svinfo()
 void hybrid_cmd_capab()
 {
     send_cmd(NULL,
-             "CAPAB :QS EX CHW IE EOB KLN GLN HOPS HUB AOPS KNOCK TBURST PARA");
+             "CAPAB :QS EX CHW IE KLN GLN HOPS HUB AOPS KNOCK TBURST PARA");
 }
 
 /* PASS */

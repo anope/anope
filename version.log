@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1140"
+VERSION_BUILD="1141"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1141)
+# BUGS  : N/A
+# NOTES : Removed EOB support from hybrid protocol file, this should make things like entry message work even after a remove net-join
+# 
 #
 # BUILD : 1.7.15 (1140)
 # BUGS  : N/A

@@ -912,13 +912,14 @@ plexus_cmd_svinfo ()
   KNOCK  -  supports KNOCK 
   TBURST - supports TBURST
   PARA	 - supports invite broadcasting for +p
-  ENCAP	 - ?
+  ENCAP	 - supports encapsulization of protocol messages
+  SVS    - supports services protocol extensions
 */
 void
 plexus_cmd_capab ()
 {
   send_cmd (NULL,
-	    "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP");
+	    "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
 }
 
 /* PASS */

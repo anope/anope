@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1139"
+VERSION_BUILD="1140"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1140)
+# BUGS  : N/A
+# NOTES : Plexus3 can send global EOBs if we send SVS in the capab string - so now we do, this does NOT help with other hyb based ircds, and they still have an issue.
+# 
 #
 # BUILD : 1.7.15 (1139)
 # BUGS  : N/A

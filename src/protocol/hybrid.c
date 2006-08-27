@@ -639,7 +639,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-//    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m);
+/*    m = createMessage("EOB",       anope_event_eob); addCoreMessage(IRCD,m); */
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
 }
@@ -891,7 +891,7 @@ int anope_event_eob(char *source, int ac, char **av)
 
 void hybrid_cmd_eob()
 {
-//    send_cmd(ServerName, "EOB");
+/*    send_cmd(ServerName, "EOB"); */
 }
 
 

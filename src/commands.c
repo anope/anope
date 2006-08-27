@@ -96,6 +96,7 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
             }
         } else {
             mod_current_module_name = c->mod_name;
+            mod_current_module = NULL;
             if ((c->has_priv == NULL) || c->has_priv(u)) {
                 retVal = c->routine(u);
                 mod_current_module_name = NULL;
@@ -103,6 +104,7 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
                     current = c->next;
                     while (current && retVal == MOD_CONT) {
                         mod_current_module_name = current->mod_name;
+                        mod_current_module = NULL;
                         retVal = current->routine(u);
                         mod_current_module_name = NULL;
                         current = current->next;

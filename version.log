@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1142"
+VERSION_BUILD="1143"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1143)
+# BUGS  : 593
+# NOTES : Fixed mod_current_module not always NULL-ified in mod_run_cmd, resulting in weird segfaults in special situations
 #
 # BUILD : 1.7.15 (1142)
 # BUGS  : N/A

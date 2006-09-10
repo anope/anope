@@ -3795,6 +3795,12 @@ NICK_HELP_SET_MSG
 	avec vous. Si cette option est activée, ils utiliseront des
 	messages, sinon ils utiliseront des notices.
 
+NICK_HELP_SET_AUTOOP
+	Syntax: SET AUTOOP {ON | OFF}
+	
+	Sets whether you will be opped automatically. Set to ON to 
+	allow ChanServ to op you automatically when entering channels.
+
 NICK_HELP_SASET
 	Syntaxe: SASET pseudo option parametres.
 	

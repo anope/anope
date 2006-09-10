@@ -3939,6 +3939,12 @@ NICK_HELP_SET_MSG
 	gdy jest wy³±czona, wtedy bêd± u¿ywaæ komunikatów
 	notice.
 
+NICK_HELP_SET_AUTOOP
+	Syntax: SET AUTOOP {ON | OFF}
+	
+	Sets whether you will be opped automatically. Set to ON to 
+	allow ChanServ to op you automatically when entering channels.
+
 NICK_HELP_SASET
 	Syntax: SASET nickname option parameters.
 	

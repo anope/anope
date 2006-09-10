@@ -3646,6 +3646,12 @@ NICK_HELP_SET_MSG
 	con te. Se MSG è attivo, i Services usano i messaggi (query),
 	altrimenti usano i notices.
 
+NICK_HELP_SET_AUTOOP
+	Syntax: SET AUTOOP {ON | OFF}
+	
+	Sets whether you will be opped automatically. Set to ON to 
+	allow ChanServ to op you automatically when entering channels.
+
 NICK_HELP_SASET
 	Sintassi: SASET nickname opzione parametri.
 	

@@ -83,6 +83,9 @@ int AnopeInit(int argc, char **argv)
     c = createCommand("SET HIDE", NULL, NULL, NICK_HELP_SET_HIDE, -1, -1,
                       -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+    c = createCommand("SET AUTOOP", NULL, NULL, NICK_HELP_SET_AUTOOP, -1, -1,
+                      -1, -1);
+    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);
 

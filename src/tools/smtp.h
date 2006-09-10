@@ -47,6 +47,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #else
 #include <winsock.h>
 #include <windows.h>

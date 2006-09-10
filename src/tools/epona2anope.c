@@ -243,8 +243,10 @@ int main(int argc, char *argv[])
 {
     dbFILE *f;
     int i;
-    NickCore *nc, *ncnext;
     long countr = 0, countw = 0;
+	/* Unused variables - why? -GD
+    NickCore *nc, *ncnext;
+	*/
 
     printf("\n"C_LBLUE"Epona to Anope DB converter by Certus"C_NONE"\n\n");
 
@@ -261,7 +263,9 @@ int main(int argc, char *argv[])
             int n_levels;
             char *s;
             int n_ttb;
+			/* Unused variable - why? -GD
             int J;
+			*/
 
             last = &chanlists[i];
             prev = NULL;
@@ -442,7 +446,9 @@ int main(int argc, char *argv[])
         if ((f = open_db_write("ChanServ", CHAN_DB_ANOPE, 16))) {
             ChannelInfo *ci;
             Memo *memos;
+			/* Unused variable - why? -GD
             static time_t lastwarn = 0;
+			*/
 
             for (i = 0; i < 256; i++) {
                 int16 tmp16;

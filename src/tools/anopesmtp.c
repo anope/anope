@@ -88,23 +88,6 @@ static void remove_log(void)
 
 /*************************************************************************/
 
-static void checkday(void)
-{
-    time_t t;
-    struct tm tm;
-
-    time(&t);
-    tm = *localtime(&t);
-
-    if (curday != tm.tm_yday) {
-        close_log();
-        remove_log();
-        open_log();
-    }
-}
-
-/*************************************************************************/
-
 /* Open the log file.  Return -1 if the log file could not be opened, else
  * return 0. */
 
@@ -122,6 +105,23 @@ int open_log(void)
     if (logfile)
         setbuf(logfile, NULL);
     return logfile != NULL ? 0 : -1;
+}
+
+/*************************************************************************/
+
+static void checkday(void)
+{
+    time_t t;
+    struct tm tm;
+
+    time(&t);
+    tm = *localtime(&t);
+
+    if (curday != tm.tm_yday) {
+        close_log();
+        remove_log();
+        open_log();
+    }
 }
 
 /*************************************************************************/
@@ -524,8 +524,11 @@ void mail_cleanup()
 int main(int argc, char *argv[])
 {
     char buf[8192];
+/*	These are somehow unused - why are they here? -GD
+
     struct smtp_body_line *b;
     struct smtp_header *h;
+*/
     int headers_done = 0;
 /* Win32 stuff */
 #ifdef _WIN32
@@ -546,7 +549,8 @@ int main(int argc, char *argv[])
 
    if (!server) {
         alog("No Server");
-        return;
+	/* Bad, bad, bad. This was a eturn from main with no value! -GD */
+        return 0;
     } else {
         alog("SMTP: server %s port %d",server,port);
     }

@@ -715,7 +715,9 @@ int main(int argc, char *argv[])
             int n_levels;
             char *s;
             int n_ttb;
+			/* Unused variable - why? -GD
             int J;
+			*/
 
             last = &chanlists[i];
             prev = NULL;
@@ -896,14 +898,16 @@ int main(int argc, char *argv[])
             int c;
 
             for (i = 0; i < 256; i++) {
-                char input[1024];
                 int16 tmp16;
                 int32 tmp32;
                 int n_levels;
                 char *s;
-                NickAlias *na;
                 int n_ttb;
+				/* Unused variables - why? -GD
+                char input[1024];
+                NickAlias *na;
                 int J;
+				*/
 
                 while ((c = getc_db(f)) == 1) {
                     ChannelInfo *ci = NULL, *ciptr = NULL;
@@ -1257,7 +1261,9 @@ int main(int argc, char *argv[])
         if ((f = open_db_write("ChanServ", CHAN_DB_NEW, 16))) {
             ChannelInfo *ci;
             Memo *memos;
+			/* Unused variable - why? -GD
             static time_t lastwarn = 0;
+			*/
 
             for (i = 0; i < 256; i++) {
                 int16 tmp16;

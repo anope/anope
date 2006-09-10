@@ -652,6 +652,15 @@ NICK_SASET_NOEXPIRE_ON
 NICK_SASET_NOEXPIRE_OFF
 	Nick %s will expire.
 
+# SASET AUTOOP responses
+NICK_SASET_AUTOOP_SYNTAX
+	SASET nickname AUTOOP {ON | OFF}
+NICK_SASET_AUTOOP_ON
+	Services will now autoop %s in channels.
+NICK_SASET_AUTOOP_OFF
+	Services will no longer autoop %s in channels.
+
+
 # ACCESS responses
 NICK_ACCESS_SYNTAX
 	ACCESS {ADD | DEL | LIST} [mask]
@@ -3655,6 +3664,7 @@ NICK_HELP_SASET
 	    HIDE       Hide certain pieces of nickname information
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
+	    AUTOOP     Turn autoop on or off
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -3781,6 +3791,15 @@ NICK_HELP_SASET_NOEXPIRE
 	
 	Sets whether the given nickname will expire.  Setting this
 	to ON prevents the nickname from expiring.
+	
+	Limited to Services admins.
+
+NICK_HELP_SASET_AUTOOP
+	Syntax: SASET nickname AUTOOP {ON | OFF}
+	
+	Sets whether the given nickname will be opped automatically.
+	Set to ON to allow ChanServ to op you automatically when joining
+	channels.
 	
 	Limited to Services admins.
 

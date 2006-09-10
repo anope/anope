@@ -655,6 +655,15 @@ NICK_SASET_NOEXPIRE_OFF
 	Il nick %s scadrà.
 
 # ACCESS responses
+NICK_SASET_AUTOOP_SYNTAX
+	SASET nickname AUTOOP {ON | OFF}
+NICK_SASET_AUTOOP_ON
+	Services will now autoop %s in channels.
+NICK_SASET_AUTOOP_OFF
+	Services will no longer autoop %s in channels.
+
+
+# ACCESS responses
 NICK_ACCESS_SYNTAX
 	ACCESS {ADD | DEL | LIST} [mask]
 NICK_ACCESS_ALREADY_PRESENT
@@ -3797,6 +3806,15 @@ NICK_HELP_SASET_NOEXPIRE
 	ON eviterà che il nickname scada.
 	
 	Limitato ai Services admins.
+
+NICK_HELP_SASET_AUTOOP
+	Syntax: SASET nickname AUTOOP {ON | OFF}
+	
+	Sets whether the given nickname will be opped automatically.
+	Set to ON to allow ChanServ to op you automatically when joining
+	channels.
+	
+	Limited to Services admins.
 
 NICK_HELP_RECOVER
 	Sintassi: RECOVER nick [password]

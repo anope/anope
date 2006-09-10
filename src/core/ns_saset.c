@@ -31,6 +31,7 @@ int do_saset_private(User * u, NickCore * nc, char *param);
 int do_saset_msg(User * u, NickCore * nc, char *param);
 int do_saset_hide(User * u, NickCore * nc, char *param);
 int do_saset_noexpire(User * u, NickAlias * nc, char *param);
+int do_saset_autoop(User * u, NickCore * nc, char *param);
 void myNickServHelp(User * u);
 
 /**
@@ -86,6 +87,10 @@ int AnopeInit(int argc, char **argv)
     c = createCommand("SASET NOEXPIRE", NULL, is_services_admin, -1, -1,
                       -1, NICK_HELP_SASET_NOEXPIRE,
                       NICK_HELP_SASET_NOEXPIRE);
+    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+    c = createCommand("SASET AUTOOP", NULL, is_services_admin, -1, -1,
+                      -1, NICK_HELP_SASET_AUTOOP,
+                      NICK_HELP_SASET_AUTOOP);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);
@@ -175,6 +180,8 @@ int do_saset(User * u)
         do_saset_hide(u, na->nc, param);
     } else if (stricmp(cmd, "NOEXPIRE") == 0) {
         do_saset_noexpire(u, na, param);
+    } else if (stricmp(cmd, "AUTOOP") == 0) {
+        do_saset_autoop(u, na->nc, param); 
     } else {
         notice_lang(s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd);
     }
@@ -484,5 +491,21 @@ int do_saset_noexpire(User * u, NickAlias * na, char *param)
     }
     return MOD_CONT;
 }
+
+int do_saset_autoop(User * u, NickCore * nc, char *param)
+{
+    if (stricmp(param, "ON") == 0) {
+        nc->flags &= ~NI_AUTOOP;
+        notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_ON, nc->display);
+    } else if (stricmp(param, "OFF") == 0) {
+	nc->flags |= NI_AUTOOP;
+        notice_lang(s_NickServ, u, NICK_SASET_AUTOOP_OFF, nc->display);
+    } else {
+        syntax_error(s_NickServ, u, "SET AUTOOP", NICK_SASET_AUTOOP_SYNTAX);
+    }
+
+    return MOD_CONT;
+}
+
 
 /* EOF */

@@ -1401,6 +1401,10 @@ CHAN_ACCESS_XOP
 	No pots utilitzar aquest comanda.
 	Utilitza les comandes AOP, SOP i VOP.
 	Escriu %R%s HELP comanda per a més informació.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Ho sento, la modificació d'accés a canals esta temporalment inabilitada.
 CHAN_ACCESS_LEVEL_NONZERO

@@ -1380,6 +1380,10 @@ CHAN_ACCESS_SYNTAX
 CHAN_ACCESS_XOP
 	Questo comando non è utilizzabile; usa i comandi SOP, AOP, HOP e VOP.
 	Digita %R%s HELP comando per ottenere maggiori informazioni.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Spiacente, la modifica della lista di accesso dei canali è temporaneamente disabilitata.
 CHAN_ACCESS_LEVEL_NONZERO

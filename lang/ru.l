@@ -1395,6 +1395,10 @@ CHAN_ACCESS_XOP
 	Вы не можете использовать эту команду. Используйте команды AOP, SOP и VOP вместо нее.
 	Напишите %R%s HELP команда для получения
 	более подробной информации.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Извините, модификация списка доступа канала временно недоступна.
 CHAN_ACCESS_LEVEL_NONZERO

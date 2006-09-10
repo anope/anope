@@ -1406,6 +1406,10 @@ CHAN_ACCESS_XOP
 	Du kannst dieses Befehl nicht nutzen. 
 	Nutze stattdessen die AOP, SOP und VOP Befehle.
 	Tippe %R%s HELP Befehl für weitere Informationen.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Das Ändern der Channel-Access-Liste wurde zwischenzeitig deaktiviert.
 CHAN_ACCESS_LEVEL_NONZERO

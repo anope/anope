@@ -1407,6 +1407,10 @@ CHAN_ACCESS_XOP
 	Vous ne pouvez pas utiliser cette commande.
 	Utilisez les commandes AOP, SOP et VOP à la place.
 	Tapez %R%s HELP commande pour plus d'informations.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Désolés, la modification des listes d'accès des canaux est temporairement désactivée.
 CHAN_ACCESS_LEVEL_NONZERO

@@ -1401,6 +1401,10 @@ CHAN_ACCESS_XOP
 	No puedes usar este comando.
 	Usa los comandos AOP, SOP y VOP en vez.
 	Tipea %R%s HELP comando para mayor informacion.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Lo siento, la modificacion de acceso a canales esta temporalmete deshabilitada.
 CHAN_ACCESS_LEVEL_NONZERO

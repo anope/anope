@@ -167,7 +167,10 @@ int do_access(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
         /* We still allow LIST in xOP mode, but not others */
     } else if ((ci->flags & CI_XOP) && !is_list) {
-        notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);
+		if (ircd->halfop)
+	        notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP_HOP, s_ChanServ);
+		else
+	        notice_lang(s_ChanServ, u, CHAN_ACCESS_XOP, s_ChanServ);
     } else if (((is_list && !check_access(u, ci, CA_ACCESS_LIST))
                 || (!is_list && !check_access(u, ci, CA_ACCESS_CHANGE)))
                && !is_servadmin) {

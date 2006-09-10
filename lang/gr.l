@@ -1399,6 +1399,10 @@ CHAN_ACCESS_XOP
 	Δεν μπορείς να χρησιμοποιήσεις αυτή την εντολή. 
 	Χρησιμοποίησε AOP, SOP και VOP εντολές αντί για την access.
 	Γράψε %R%s HELP command για περισσότερες πληροφορίες.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Συγνώμη, η υπηρεσία για την εντολή access είναι εκτός λειτουργίας.
 CHAN_ACCESS_LEVEL_NONZERO

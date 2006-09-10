@@ -1390,6 +1390,10 @@ CHAN_ACCESS_XOP
 	Você não pode usar este comando.
 	Ao invés, use os comandos VOP, HOP, AOP e SOP.
 	Digite %R%s HELP comando para mais informação.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Desculpe, o registro de canais está temporariamente desativado.
 CHAN_ACCESS_LEVEL_NONZERO

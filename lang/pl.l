@@ -1485,6 +1485,10 @@ CHAN_ACCESS_XOP
 	Musisz u¿yæ VOP, HOP, AOP lub SOP.
 	Napisz %R%s HELP komenda,
 	aby uzyskaæ wiêcej informacji.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	B³±d, modyfikacje kana³owej listy dostêpu s± 
 	tymczasowo niedostêpne.

@@ -1398,6 +1398,10 @@ CHAN_ACCESS_XOP
 	Bu komutu kullanamazsiniz. 
 	Yerine AOP, SOP veya VOP komutlarini kullanin.
 	Daha fazla bilgi için %R%s HELP komut yazin.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Kanal access listesinin deðiþtirilmesi geçici olarak devre dýþýdýr.
 CHAN_ACCESS_LEVEL_NONZERO

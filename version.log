@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1148"
+VERSION_BUILD="1149"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1149)
+# BUGS  : 598
+# NOTES : Added HOP to the list of XOP commands in the error from ChanServ ACCESS when XOP is enabled on supported ircds (and that line is too long!)
 #
 # BUILD : 1.7.15 (1148)
 # BUGS  : 588

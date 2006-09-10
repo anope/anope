@@ -1390,6 +1390,10 @@ CHAN_ACCESS_XOP
 	Je kan dit commando niet gebruiken. 
 	Gebruik de AOP, SOP en VOP commando's in plaats van deze.
 	Type %R%s HELP command voor meer informatie.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	Sorry, kanaal toegangslijst modificatie is tijdelijk uitgeschakeld.
 CHAN_ACCESS_LEVEL_NONZERO

@@ -1394,6 +1394,10 @@ CHAN_ACCESS_XOP
 	Írd be: %R%s HELP parancs bõvebb információért.
 	Ha ki akarod kapcsolni az xOP rendszert, akkor írd be:
 	%RChanServ set #szobanév xop off.
+CHAN_ACCESS_XOP_HOP
+	You can't use this command. 
+	Use the AOP, SOP, HOP and VOP commands instead.
+	Type %R%s HELP command for more information.
 CHAN_ACCESS_DISABLED
 	A csatorna hozzáférési listájának módosítása szünetel.
 CHAN_ACCESS_LEVEL_NONZERO

@@ -11,6 +11,7 @@ Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#584]
 08/20 F log.c rewrite.                                                    [#582]
 08/20 F Fixed bsd compier warning.                                        [#578]
+09/10 F Fixed mass compiler warnings on FC5 with make strict.             [#583]
 
 Provided by ThaPrince <jon@vile.com> - 2006
 08/22 F Plexus3 svid_mode3 support fixed.                                 [ #00]

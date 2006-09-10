@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1145"
+VERSION_BUILD="1146"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1146)
+# BUGS  : 583
+# NOTES : Fixed mass compiler warnings with make strict on FC5 (patch by Trystan)
 #
 # BUILD : 1.7.15 (1145)
 # BUGS  : 579

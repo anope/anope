@@ -22,6 +22,8 @@ MYSQL_RES *mysql_res;           /* MySQL Result  */
 MYSQL_FIELD *mysql_fields;      /* MySQL Fields  */
 MYSQL_ROW mysql_row;            /* MySQL Row     */
 
+int mysql_is_connected = 0;		/* Are we currently connected? */
+
 /*************************************************************************/
 
 void db_mysql_error(int severity, char *msg)
@@ -87,7 +89,11 @@ int db_mysql_open()
     /* If MySQL is disabled, return 0 */
     if (!do_mysql)
         return 0;
-
+	
+	/* If we're already connected, return 1 */
+	if (mysql_is_connected)
+		return 1;
+	
     mysql = mysql_init(NULL);
     if (mysql == NULL)
         db_mysql_error(MYSQL_WARNING, "Unable to create mysql object");
@@ -112,7 +118,9 @@ int db_mysql_open()
             return 0;
         }
     }
-
+	
+	mysql_is_connected = 1;
+	
     return 1;
 
 }
@@ -190,6 +198,9 @@ int db_mysql_close()
     if (mysql_res)
         mysql_free_result(mysql_res);
     mysql_close(mysql);
+	
+	mysql_is_connected = 0;
+	
     return 1;
 }
 

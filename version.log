@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1149"
+VERSION_BUILD="1150"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1150)
+# BUGS  : 595
+# NOTES : Fixed MySQL making a new connection for each query (bit TOO enthousiastic?)
 #
 # BUILD : 1.7.15 (1149)
 # BUGS  : 598

@@ -8,6 +8,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 09/10 F Issues with make strict for the src/tools dir.                    [#579]
 09/10 F Help for NickServ SET AUTOOP was missing.                         [#587]
 09/10 F Added HOP to the /CS ACCESS error when XOP is enabled.            [#598]
+09/10 F MySQL no longer connects again on each query.                     [#595]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#586]

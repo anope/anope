@@ -329,6 +329,7 @@ int m_version(char *source, int ac, char **av)
 int m_whois(char *source, char *who)
 {
     BotInfo *bi;
+	NickAlias *na;
     const char *clientdesc;
 
     if (source && who) {
@@ -362,6 +363,15 @@ int m_whois(char *source, char *who)
                           start_time);
             anope_cmd_318(source, bi->nick);
             return MOD_CONT;
+		} else if (!(ircd->svshold && UseSVSHOLD) && (na = findnick(who)) && (na->status & NS_KILL_HELD)) {
+			/* We have a nick enforcer client here that we need to respond to.
+			 * We can't just say it doesn't exist here, even tho it does for
+			 * other servers :) -GD
+			 */
+			anope_cmd_311("%s %s %s %s * :Services Enforcer", source, na->nick, NSEnforcerUser, NSEnforcerHost);
+			anope_cmd_312("%s %s %s :%s", source, na->nick, ServerName, ServerDesc);
+			anope_cmd_318(source, na->nick);
+			return MOD_CONT;
         } else {
             anope_cmd_401(source, who);
             return MOD_CONT;

@@ -9,6 +9,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 09/10 F Help for NickServ SET AUTOOP was missing.                         [#587]
 09/10 F Added HOP to the /CS ACCESS error when XOP is enabled.            [#598]
 09/10 F MySQL no longer connects again on each query.                     [#595]
+09/10 F Nick Enforcers can now be whois'd on services.                    [#601]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#586]

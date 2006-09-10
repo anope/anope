@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1150"
+VERSION_BUILD="1151"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1151)
+# BUGS  : 601
+# NOTES : Fixed us with reposding we didn't know someone when we were WHOIS'd for a nick enforcer client; now we reply correctly
 #
 # BUILD : 1.7.15 (1150)
 # BUGS  : 595

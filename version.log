@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1151"
+VERSION_BUILD="1152"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1152)
+# BUGS  : 599
+# NOTES : Corrected valid nick characters for /OS SVSNICK by making the bs_bot isvalidnick() macro global via services.h
 #
 # BUILD : 1.7.15 (1151)
 # BUGS  : 601

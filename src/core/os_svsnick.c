@@ -101,10 +101,9 @@ int do_svsnick(User * u)
         notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick);
         return MOD_CONT;
     }
-#define isvalid(c) (((c) >= 'A' && (c) <= '~') || isdigit(c) || (c) == '-')
     for (c = newnick; *c && (c - newnick) < NICKMAX; c++) {
-        if (!isvalid(*c) || isspace(*c)) {
-            notice_lang(s_OperServ, u, NICK_X_ILLEGAL, nick);
+        if (!isvalidnick(*c)) {
+            notice_lang(s_OperServ, u, NICK_X_ILLEGAL, newnick);
             return MOD_CONT;
         }
     }

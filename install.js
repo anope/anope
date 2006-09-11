@@ -105,7 +105,25 @@ var installerQuestions = [
 var buildPackages = [
 
                                         {
-                                                        'name' : 'Microsoft Visual Studio 2005',
+                                                        'name' : 'Microsoft Visual Studio 2005 (New PSDK)',
+                                                        'libpaths' : [
+                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
+                                                                                'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+                                                                         ],
+                                                        'incpaths' : [
+                                                                                'Program Files\\Microsoft Visual Studio 8\\VC\\Include',
+                                                                                'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
+                                                                         ],
+                                                        'nmake' : [
+                                                                                'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                                                ''
+                                                                        ],
+                                                        'additional_switches' : [
+                                                                                                '/w'
+                                                                                           ]
+                                        },
+                                        {                                        
+                                                        'name' : 'Microsoft Visual Studio 2005 (Old PSDK)',
                                                         'libpaths' : [
                                                                                 'Program Files\\Microsoft Visual Studio 8\\VC\\Lib',
                                                                                 'Program Files\\Microsoft Platform SDK\\Lib'

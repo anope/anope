@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1152"
+VERSION_BUILD="1153"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1153)
+# BUGS  : 596
+# NOTES : Applied first part of Heinz's win32 patch
 #
 # BUILD : 1.7.15 (1152)
 # BUGS  : 599

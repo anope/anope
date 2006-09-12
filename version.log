@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1153"
+VERSION_BUILD="1154"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1154)
+# BUGS  : N/A
+# NOTES : Fixed plexus3 noop support
+# 
 #
 # BUILD : 1.7.15 (1153)
 # BUGS  : 596

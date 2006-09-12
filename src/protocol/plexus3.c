@@ -770,7 +770,8 @@ plexus_cmd_szline (char *mask, char *reason, char *whom)
 void
 plexus_cmd_svsnoop (char *server, int set)
 {
-  /* does not support */
+  send_cmd(ServerName, "ENCAP %s SVSNOOP %s",
+           server, (set ? "+" : "-"));
 }
 
 void

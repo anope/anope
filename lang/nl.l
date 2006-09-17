@@ -468,7 +468,7 @@ NICK_SET_ICQ_INVALID
 NICK_SET_GREET_CHANGED
 	Groet veranderd in %s.
 NICK_SET_GREET_UNSET
-	Groett verwijderd.
+	Groet verwijderd.
 
 # SET PROTECT responses
 NICK_SET_KILL_SYNTAX

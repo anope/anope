@@ -2239,7 +2239,7 @@ BOT_SET_PRIVATE_SYNTAX
 BOT_SET_PRIVATE_ON
 	Prive mode van bot %s staat nu AAN.
 BOT_SET_PRIVATE_OFF
-	Prive mode van bot %s staat nu AAN.
+	Prive mode van bot %s staat nu UIT.
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
@@ -2247,7 +2247,7 @@ BOT_SET_SYMBIOSIS_SYNTAX
 BOT_SET_SYMBIOSIS_ON
 	Symbiose mode staat nu AAN op kanaal %s.
 BOT_SET_SYMBIOSIS_OFF
-	Symbiose mode staat nu AAN op kanaal %s.
+	Symbiose mode staat nu UIT op kanaal %s.
 	
 # KICK responses
 BOT_KICK_SYNTAX

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1156"
+VERSION_BUILD="1157"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1157)
+# BUGS  : 589
+# NOTES : Fixed restarting under windows, it should now work correctly
 #
 # BUILD : 1.7.15 (1156)
 # BUGS  : 

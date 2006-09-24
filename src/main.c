@@ -46,6 +46,10 @@ int nothird = 0;                /* -nothrid */
 int noexpire = 0;               /* -noexpire */
 int protocoldebug = 0;          /* -protocoldebug */
 
+#ifdef _WIN32
+char *binary_dir;           /* Used to store base path for win32 restart */
+#endif
+
 #ifdef USE_RDB
 int do_mysql = 0;               /* use mysql ? */
 #endif
@@ -228,6 +232,12 @@ static void services_restart(void)
     /* First don't unload protocol module, then do so */
     modules_unload_all(true, false);
     modules_unload_all(true, true);
+#ifdef _WIN32
+    /* This fixes bug #589 - change to binary directory for restart */
+    /*  -- heinz */
+    if (binary_dir)
+        chdir(binary_dir);
+#endif
     execve(SERVICES_BIN, my_av, my_envp);
     if (!readonly) {
         open_log();
@@ -403,13 +413,13 @@ void sighandler(int signum)
                 snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
                 break;
             case -19:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
                           EVENT_DB_SAVING, EVENT_START);
-                break;
-            case -20:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                break;
+            case -20:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
                           EVENT_DB_SAVING, EVENT_STOP);
-                break;
+                break;
             case -21:
                 snprintf(buf, sizeof(buf), "expiring nicknames");
                 break;
@@ -429,16 +439,16 @@ void sighandler(int signum)
                 snprintf(buf, sizeof(buf), "expiring SQLINEs");
                 break;
             case -29:
-                snprintf(buf, sizeof(buf), "expiring Exceptions");
-                break;
-            case -30:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                snprintf(buf, sizeof(buf), "expiring Exceptions");
+                break;
+            case -30:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
                           EVENT_DB_EXPIRE, EVENT_START);
-                break;
-            case -31:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
+                break;
+            case -31:
+                snprintf(buf, sizeof(buf), "Sending event %s %s",
                           EVENT_DB_EXPIRE, EVENT_STOP);
-                break;
+                break;
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
@@ -509,6 +519,18 @@ int main(int ac, char **av, char **envp)
         fprintf(stderr,
                 "    require root privileges to run, and it is discouraged that you run Anope\n");
         fprintf(stderr, "    as the root superuser.\n");
+    }
+#else
+    /*
+     * We need to know which directory we're in for when restart is called.
+     * This only affects Windows as a full path is not specified in services_dir.
+     * This fixes bug #589.
+     * -- heinz
+     */
+    binary_dir = smalloc(MAX_PATH);
+    if (!getcwd(binary_dir, MAX_PATH)) {
+        fprintf(stderr, "error: getcwd() error\n");
+        return -1;
     }
 #endif
 
@@ -633,6 +655,12 @@ int main(int ac, char **av, char **envp)
         anope_cmd_squit(ServerName, quitmsg);
         disconn(servsock);
         close_log();
+#ifdef _WIN32
+    /* This fixes bug #589 - change to binary directory for restart */
+    /*  -- heinz */
+    if (binary_dir)
+        chdir(binary_dir);
+#endif
         execve(SERVICES_BIN, av, envp);
         if (!readonly) {
             open_log();
@@ -648,6 +676,12 @@ int main(int ac, char **av, char **envp)
 
     /* Disconnect and exit */
     services_shutdown();
+
+#ifdef _WIN32
+    if (binary_dir)
+    free(binary_dir);
+#endif
+
     return 0;
 }
 
@@ -680,9 +714,9 @@ void do_backtrace(int show_segheader)
 #endif
 #else
     char *winver;
-    winver = GetWindowsVersion();
-    alog("Backtrace: not available on Windows");
-    alog("Running %S", winver);
-    free(winver);
+    winver = GetWindowsVersion();
+    alog("Backtrace: not available on Windows");
+    alog("Running %S", winver);
+    free(winver);
 #endif
 }

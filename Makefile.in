@@ -32,7 +32,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'RDB=${RDB}'\
 	   'MYSQL=${MYSQL}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
 
-build:
+build: language headers
 	@for i in $(SUBDIRS); do \
             echo "*** Building $$i";\
             ( cd $$i; ${MAKE} ${MAKEARGS} all; ) \

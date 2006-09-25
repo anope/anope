@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1157"
+VERSION_BUILD="1158"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1158)
+# BUGS  : 
+# NOTES : Fixed the Makefile to let make work with multiple threads (tested with 3)
 #
 # BUILD : 1.7.15 (1157)
 # BUGS  : 589

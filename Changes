@@ -15,6 +15,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 09/17 F Small mistakes in Dutch language file.                            [ #00]
 09/23 F Restarting under Windows now works correctly                      [#589]
 09/25 F Make now works with multiple threads.                             [ #00]
+09/28 F We will now process UnrealIRCd's SVS(2)MODE messages.             [#603]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#586]

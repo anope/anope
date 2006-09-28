@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1158"
+VERSION_BUILD="1159"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1159)
+# BUGS  : 603
+# NOTES : we will now process UnrealIRCd's SVS(2)MODE messages
 #
 # BUILD : 1.7.15 (1158)
 # BUGS  : 

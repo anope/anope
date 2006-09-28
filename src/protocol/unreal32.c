@@ -1915,6 +1915,14 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
      m = createMessage(")",        anope_event_topic); addCoreMessage(IRCD,m);
     }
+    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("n",        anope_event_mode); addCoreMessage(IRCD,m);
+    }
+    m = createMessage("SVS2MODE",   anope_event_mode); addCoreMessage(IRCD,m);
+    if (UseTokens) {
+      m = createMessage("v",       anope_event_mode); addCoreMessage(IRCD,m);
+    }
     m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("%",        anope_event_null); addCoreMessage(IRCD,m);
@@ -1954,14 +1962,6 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {
      m = createMessage("h",        anope_event_null); addCoreMessage(IRCD,m);
-    }
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("n",        anope_event_null); addCoreMessage(IRCD,m);
-    }
-    m = createMessage("SVS2MODE",   anope_event_null); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("v",       anope_event_null); addCoreMessage(IRCD,m);
     }
     m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {

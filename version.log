@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1159"
+VERSION_BUILD="1161"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1161)
+# BUGS  : 606
+# NOTES : Fixed Makefile.win32 to fix a typo and `nmake clean` (it now uses spotless)
 #
 # BUILD : 1.7.15 (1159)
 # BUGS  : 603

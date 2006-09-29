@@ -30,19 +30,10 @@ install:
         cd src\core && $(MAKE) install && cd ..
         cd src\tools && $(MAKE) install && cd ..
         -@echo ---
-        -@echo Anope has been insalled successfully!
+        -@echo Anope has been installed successfully!
         -@echo See docs\INSTALL for details on how to configure Anope for use.
         -@echo ---
         
-clean:
-        cd src && $(MAKE) spotless && cd ..
-        cd src\modules && $(MAKE) spotless && cd ..
-        cd src\protocol && $(MAKE) spotless && cd ..
-        cd src\core && $(MAKE) spotless && cd ..
-        cd src\tools && $(MAKE) spotless && cd ..
-        cd lang && $(MAKE) spotless && cd ..
-        -@erase *.exe version.h *.obj
-
 spotless:
         cd lang && $(MAKE) spotless && cd ..
         cd src && $(MAKE) spotless && cd ..
@@ -60,6 +51,8 @@ mypasql:
         $(MYPASQL_BUILD)
 
 distclean: spotless
+
+clean: spotless
 
 ###########################################################################
 

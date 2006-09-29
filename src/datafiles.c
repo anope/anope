@@ -711,3 +711,63 @@ void backup_databases(void)
         send_event(EVENT_DB_BACKUP, 1, EVENT_STOP);
     }
 }
+
+/*************************************************************************/
+
+void ModuleDatabaseBackup(char *dbname)
+{
+
+    time_t t;
+    struct tm tm;
+
+    if (!KeepBackups) {
+        return;
+    }
+
+    time(&t);
+    tm = *localtime(&t);
+
+    if (!curday) {
+        curday = tm.tm_yday;
+        return;
+    }
+
+    if (curday != tm.tm_yday) {
+
+        char ext[9];
+
+	if (debug) {
+	        alog("Module Database Backing up %s", dbname);
+	}
+        ModuleRemoveBackups(dbname);
+        curday = tm.tm_yday;
+        strftime(ext, sizeof(ext), "%Y%m%d", &tm);
+        rename_database(dbname, ext);
+    }
+}
+
+/*************************************************************************/
+
+void ModuleRemoveBackups(char *dbname)
+{
+    char ext[9];
+    char path[PATH_MAX];
+
+    time_t t;
+    struct tm tm;
+
+    time(&t);
+    t -= (60 * 60 * 24 * KeepBackups);
+    tm = *localtime(&t);
+    strftime(ext, sizeof(ext), "%Y%m%d", &tm);
+
+    snprintf(path, sizeof(path), "backups/%s.%s", dbname, ext);
+#ifndef _WIN32
+    unlink(path);
+#else
+    DeleteFile(path);
+#endif
+}
+
+/*************************************************************************/
+

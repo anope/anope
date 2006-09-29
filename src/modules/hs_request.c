@@ -76,6 +76,7 @@ int ns_do_drop(User * u);
 void hsreq_save_db(void);
 void hsreq_load_db(void);
 int hsreqevt_db_saving(int argc, char **argv);
+int hsreqevt_db_backup(int argc, char **argv);
 
 void my_load_config(void);
 void my_add_languages(void);
@@ -115,6 +116,9 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
     hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
+    moduleAddEventHook(hook);
+
+    hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
     moduleAddEventHook(hook);
 
     moduleSetHostHelp(hs_help);
@@ -677,6 +681,18 @@ int hsreqevt_db_saving(int argc, char **argv)
     if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
         hsreq_save_db();
 
+    return MOD_CONT;
+}
+
+int hsreqevt_db_backup(int argc, char **argv)
+{
+    if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0)) {
+	    if (HSRequestDBName)
+    	    ModuleDatabaseBackup(HSRequestDBName);
+	    else
+    	    ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
+	}
+	
     return MOD_CONT;
 }
 

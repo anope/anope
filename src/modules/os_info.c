@@ -55,6 +55,7 @@ void m_AddLanguages(void);
 
 int mLoadData(void);
 int mSaveData(int argc, char **argv);
+int mBackupData(int argc, char **argv);
 int mLoadConfig();
 int mEventReload(int argc, char **argv);
 
@@ -97,6 +98,9 @@ int AnopeInit(int argc, char **argv)
     status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
     hook = createEventHook(EVENT_DB_SAVING, mSaveData);
+    status = moduleAddEventHook(hook);
+
+    hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
     status = moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_RELOAD, mEventReload);
@@ -447,6 +451,17 @@ int mSaveData(int argc, char **argv)
     }
 
     return ret;
+}
+
+/** 
+ * Backup our databases using the commands provided by Anope
+ * @return MOD_CONT
+ **/
+int mBackupData(int argc, char **argv)
+{
+	ModuleDatabaseBackup(OSInfoDBName);
+	
+	return MOD_CONT;
 }
 
 /** 

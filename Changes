@@ -3,6 +3,7 @@ Anope Version  S V N
 Provided by Anope Dev. <dev@anope.org> - 2006
 09/10 A Added SASET AUTOOP to NickServ to match SET AUTOOP.               [#588]
 09/11 A Added detection in install.js for the latest PlatformSDK.         [#596]
+09/29 A Ability for modules to backup their databases.                    [#604]
 08/09 F Fixed port checking when using command line switches.             [#575]
 08/14 F Fixed db_mysql_query for better robustness.                       [#585]
 08/27 F Fixed mod_current_module being incorrect resulting in segfault.   [#593]

@@ -853,6 +853,8 @@ E void modules_core_init(int number, char **list);
 E void modules_unload_all(boolean fini, boolean unload_proto);	/* Read warnings near function source */
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
+E void ModuleDatabaseBackup(char *dbname);
+E void ModuleRemoveBackups(char *dbname);
 
 /**** news.c ****/
 

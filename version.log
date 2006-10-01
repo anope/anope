@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1162"
+VERSION_BUILD="1163"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1163)
+# BUGS  : 
+# NOTES : Various small changes to documentation and example config (and removing void \r from sources)
 #
 # BUILD : 1.7.15 (1162)
 # BUGS  : 604

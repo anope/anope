@@ -156,13 +156,14 @@ Table of Contents
         * Charybdis 1.0 or later
         * DreamForge 4.6.7
         * Hybrid 7 or later
+		* InspIRCd 1.0 or later
         * Plexus 2.0 or later (including 3.0)
         * PTlink 6.15 or later
         * RageIRCd 2.0 beta-6 or later
         * Ratbox 2.0.6 or later
         * ShadowIRCd 4.0 beta 7 or later
         * Solid IRCd 3.4.6 or later
-        * UltimateIRCd 2.8.2 or later (including 3.0.0)
+        * UltimateIRCd 2.8.2 or later (including 3.0)
         * UnrealIRCd 3.1.1 or later (including 3.2)
         * ViagraIRCd 1.3 or later
 
@@ -214,6 +215,10 @@ Table of Contents
         -noexpire       Expiration routines won't be run at all
         -logchan        Startup with logchan enabled
         -version        Display the version of Anope
+		-nothird        Do not load the modules specified in ModulesAutoload
+		                    or ModulesDelayedAutoload in the config file
+		-protocoldebug  Debug each incoming message after protocol parsing
+		-support        Used for support, same as -debug -nofork -nothird
 
     Upon starting, Anope will parse its command-line parameters, open its
     logfile, then (assuming the -nofork option is not given) detach itself

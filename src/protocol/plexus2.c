@@ -750,7 +750,7 @@ moduleAddIRCDMsgs (void)
   addCoreMessage (IRCD, m);
   m = createMessage ("WHOIS", anope_event_whois);
   addCoreMessage (IRCD, m);
-  m = createMessage ("SVSMODE", anope_event_null);
+  m = createMessage ("SVSMODE", anope_event_mode);
   addCoreMessage (IRCD, m);
   m = createMessage ("SVSNICK", anope_event_null);
   addCoreMessage (IRCD, m);

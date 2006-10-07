@@ -736,9 +736,9 @@ void ModuleDatabaseBackup(char *dbname)
 
         char ext[9];
 
-	if (debug) {
-	        alog("Module Database Backing up %s", dbname);
-	}
+        if (debug) {
+            alog("Module Database Backing up %s", dbname);
+        }
         ModuleRemoveBackups(dbname);
         curday = tm.tm_yday;
         strftime(ext, sizeof(ext), "%Y%m%d", &tm);
@@ -770,4 +770,3 @@ void ModuleRemoveBackups(char *dbname)
 }
 
 /*************************************************************************/
-

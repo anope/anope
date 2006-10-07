@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1164"
+VERSION_BUILD="1165"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1165)
+# BUGS  : 603
+# NOTES : Added support for SVSMODE by parsing it as a MODE on supported IRCDs
 #
 # BUILD : 1.7.15 (1164)
 # BUGS  : 607

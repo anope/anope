@@ -741,6 +741,8 @@ moduleAddIRCDMsgs (void)
   addCoreMessage (IRCD, m);
   m = createMessage ("ENCAP", anope_event_encap);
   addCoreMessage (IRCD, m);
+  m = createMessage ("SVSMODE", anope_event_mode);
+  addCoreMessage (IRCD, m);
 }
 
 void

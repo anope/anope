@@ -47,7 +47,7 @@ int noexpire = 0;               /* -noexpire */
 int protocoldebug = 0;          /* -protocoldebug */
 
 #ifdef _WIN32
-char *binary_dir;           /* Used to store base path for win32 restart */
+char *binary_dir;               /* Used to store base path for win32 restart */
 #endif
 
 #ifdef USE_RDB
@@ -414,11 +414,11 @@ void sighandler(int signum)
                 break;
             case -19:
                 snprintf(buf, sizeof(buf), "Sending event %s %s",
-                          EVENT_DB_SAVING, EVENT_START);
+                         EVENT_DB_SAVING, EVENT_START);
                 break;
             case -20:
                 snprintf(buf, sizeof(buf), "Sending event %s %s",
-                          EVENT_DB_SAVING, EVENT_STOP);
+                         EVENT_DB_SAVING, EVENT_STOP);
                 break;
             case -21:
                 snprintf(buf, sizeof(buf), "expiring nicknames");
@@ -443,11 +443,11 @@ void sighandler(int signum)
                 break;
             case -30:
                 snprintf(buf, sizeof(buf), "Sending event %s %s",
-                          EVENT_DB_EXPIRE, EVENT_START);
+                         EVENT_DB_EXPIRE, EVENT_START);
                 break;
             case -31:
                 snprintf(buf, sizeof(buf), "Sending event %s %s",
-                          EVENT_DB_EXPIRE, EVENT_STOP);
+                         EVENT_DB_EXPIRE, EVENT_STOP);
                 break;
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
@@ -656,10 +656,10 @@ int main(int ac, char **av, char **envp)
         disconn(servsock);
         close_log();
 #ifdef _WIN32
-    /* This fixes bug #589 - change to binary directory for restart */
-    /*  -- heinz */
-    if (binary_dir)
-        chdir(binary_dir);
+        /* This fixes bug #589 - change to binary directory for restart */
+        /*  -- heinz */
+        if (binary_dir)
+            chdir(binary_dir);
 #endif
         execve(SERVICES_BIN, av, envp);
         if (!readonly) {
@@ -679,7 +679,7 @@ int main(int ac, char **av, char **envp)
 
 #ifdef _WIN32
     if (binary_dir)
-    free(binary_dir);
+        free(binary_dir);
 #endif
 
     return 0;

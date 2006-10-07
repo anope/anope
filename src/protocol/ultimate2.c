@@ -703,9 +703,9 @@ void moduleAddIRCDMsgs(void) {
     if (UseTokens) {
       m = createMessage("h",       anope_event_null); addCoreMessage(IRCD,m);
     }
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
     if (UseTokens) {
-      m = createMessage("n",       anope_event_null); addCoreMessage(IRCD,m);
+      m = createMessage("n",       anope_event_mode); addCoreMessage(IRCD,m);
     }
     m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
     if (UseTokens) {

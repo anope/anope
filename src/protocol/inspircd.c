@@ -475,7 +475,8 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SAMODE",    anope_event_samode); addCoreMessage(IRCD,m);
     m = createMessage("SANICK",    anope_event_sanick); addCoreMessage(IRCD,m);
     m = createMessage("SAJOIN",    anope_event_sajoin); addCoreMessage(IRCD,m);
-    m = createMessage("SAPART",    anope_event_sapart);addCoreMessage(IRCD,m);
+    m = createMessage("SAPART",    anope_event_sapart); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
     m = createMessage("QLINE",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("GLINE",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("ELINE",     anope_event_null); addCoreMessage(IRCD,m);

@@ -533,7 +533,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);

@@ -205,14 +205,22 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
         if ((ci->botflags & BS_KICK_CAPS)
             && ((c = strlen(buf)) >= ci->capsmin)) {
             int i = 0;
+			int l = 0;
             char *s = buf;
 
             do {
                 if (isupper(*s))
                     i++;
+				else if (islower(*s))
+					l++;
             } while (*s++);
-
-            if (i >= ci->capsmin && i * 100 / c >= ci->capspercent) {
+			
+			/* i counts uppercase chars, l counts lowercase chars. Only
+			 * alphabetic chars (so islower || isupper) qualify for the
+			 * percentage of caps to kick for; the rest is ignored. -GD
+			 */
+			
+            if (i >= ci->capsmin && i * 100 / (i + l) >= ci->capspercent) {
                 check_ban(ci, u, TTB_CAPS);
                 bot_kick(ci, u, BOT_REASON_CAPS);
                 return;

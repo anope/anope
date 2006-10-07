@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1163"
+VERSION_BUILD="1164"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1164)
+# BUGS  : 607
+# NOTES : Fixed the BotServ CAPS-kicker; when calculating the percentage, it now ignores all non-alphabetic characters
 #
 # BUILD : 1.7.15 (1163)
 # BUGS  : 

@@ -772,17 +772,9 @@ void do_umode(const char *source, int ac, char **av)
 {
     User *user;
 
-    if (stricmp(source, av[0]) != 0) {
-        alog("user: MODE %s %s from different nick %s!", av[0], av[1],
-             source);
-        anope_cmd_global(NULL, "%s attempted to change mode %s for %s",
-                         source, av[1], av[0]);
-        return;
-    }
-
-    user = finduser(source);
+    user = finduser(av[0]);
     if (!user) {
-        alog("user: MODE %s for nonexistent nick %s: %s", av[1], source,
+        alog("user: MODE %s for nonexistent nick %s: %s", av[1], av[0],
              merge_args(ac, av));
         return;
     }

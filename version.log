@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1165"
+VERSION_BUILD="1166"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1166)
+# BUGS  : 603
+# NOTES : Modified do_umode() to work with last fix.
 #
 # BUILD : 1.7.15 (1165)
 # BUGS  : 603

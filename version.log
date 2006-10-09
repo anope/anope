@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="15"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1166"
+VERSION_BUILD="1167"
 
 # $Log$
+#
+# BUILD : 1.7.15 (1167)
+# BUGS  : 609
+# NOTES : Removed LANGUAGE from the SASET help for nearly all languages (it was only not there in en_us.l)
 #
 # BUILD : 1.7.15 (1166)
 # BUGS  : 603

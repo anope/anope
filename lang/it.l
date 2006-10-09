@@ -3673,7 +3673,6 @@ NICK_HELP_SASET
 	
 	    DISPLAY    Imposta il nome del gruppo
 	    PASSWORD   Imposta la password del nick
-	    LANGUAGE   Imposta la lingua utilizzata dai servizi
 	    URL        Associa un URL al nickname
 	    EMAIL      Associa un indirizzo e-mail al nickname
 	    ICQ        Associa un numero ICQ al nickname

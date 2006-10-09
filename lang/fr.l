@@ -3821,8 +3821,6 @@ NICK_HELP_SASET
 	
 	    DISPLAY    Affiche les pseudos du groupe du pseudo donné
 	    PASSWORD   Change le mot de passe du pseudo donné
-	    LANGUAGE   Configure le language utiliser par les services pour le pseudo
-	               donné
 	    URL        Associe une url au pseudo donné
 	    EMAIL      Associe un email au pseudo donné
 	    ICQ        Associe un compte ICQ au pseudo donné

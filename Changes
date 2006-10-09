@@ -21,6 +21,7 @@ Provided by Anope Dev. <dev@anope.org> - 2006
 09/29 F The 'nmake clean' on Windows now uses 'spotless' instead          [ #00]
 09/29 F Fixed a typo in Makefile.win32                                    [ #00]
 10/07 F BotServ KICK CAPS now only counts alphabetic chars for percentage.[#607]
+10/09 F Removed LANGUAGE from the SASET help in most languages.           [#609]
 
 Provided by Trystan <trystan@nomadirc.net> - 2006
 08/20 F Fixed several compiler warnings.                                  [#586]

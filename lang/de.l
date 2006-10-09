@@ -3789,8 +3789,6 @@ NICK_HELP_SASET
 	
 	    DISPLAY    Setzt einen Nicknamen als Ursprung der Nickgruppe
 	    PASSWORD   Setzt das Passwort eines Nicknamens
-	    LANGUAGE   Bestimmt die Sprache, welche die Services benutzen,
-	    							wenn sie eine Nachricht senden
 	    URL        Fügt eine URL dem Nicknamen hinzu
 	    EMAIL      Fügt eine Emailadresse dem Nicknamen hinzu
 	    ICQ        Fügt eine ICQ Nummer dem Nicknamen hinzu

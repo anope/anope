@@ -13,19 +13,13 @@ Anope Proxy Detector
     that there are currently good alternatives out there which do the job as
     good as it can be done already.
 
-    For those who can't live without our proxy detector: we are currently busy
-    looking for a solution to bundle Anope with a proxy detector. Most likely
-    this will be a module shipped by default. Keep an eye on our site for more
-    information on the proxy detector. Meanwhile, a few alternatives are noted
-    below.
-
 2) Alternatives
 
     A) Blitzed Open Proxy Monitor (BOPM)
     B) NeoStats + OPSB
 
     Note that these are seperate projects and that the Anope team won't give
-    support on this programs. For support, please refer to the sites of the
+    support on these programs. For support, please refer to the sites of the
     creators of the software packages.
 
     A) Blitzed Open Proxy Monitor (BOPM)

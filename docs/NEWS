@@ -22,21 +22,21 @@ Highlighted News in Anope 1.7 (and soon 1.8)
   * Added a module pack with handy modules.
   * Added IRCd protocol modules.
   * Added support for new IRCd's. Currently supported:
-    - DreamForge 4.6.7
     - Bahamut 1.4.27 or later (including 1.8)
-    - UnrealIRCd 3.1.1 or later (including 3.2)
-    - UltimateIRCd 2.8.2 or later (including 3.0)
+    - Charybdis 1.0 or later
+    - DreamForge 4.6.7
     - Hybrid 7 or later
-    - ViagraIRCd 1.3 or later
-    - PTlink 6.15 or later
-    - RageIRCd 2.0 beta-6 or later
-    - Solid IRCd 3.4.6 or later
+    - InspIRCd 1.0 or later
     - Plexus 2.0 or later (including 3.0)
+    - PTLink 6.15 or later
+    - RageIRCd 2.0 or later
     - Ratbox 2.0.6 or later
     - ShadowIRCd 4.0 beta 7 or later
-	- Charybdis 1.0 or later
-	- InspIRCd 1.0 or later
-	- RageIRCd 2.0 or later
+    - Solid IRCd 3.4.6 or later
+    - UltimateIRCd 2.8.2 or later (including 3.0)
+    - UnrealIRCd 3.1.1 or later (including 3.2)
+    - ViagraIRCd 1.3 or later
+
   * Added new languages. Currently included:
       Catalan, German, English, Spanish, French, Greek,
       Hungarian, Italian, Dutch, Polish, Portugese,

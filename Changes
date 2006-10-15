@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
-
+10/15 F MySQL detection now checks for valid values from mysql_config.    [ #00]
+10/15 F Correctly compiling mod_version with module options now.          [ #00]
 
 Anope Version 1.7.16
 --------------------

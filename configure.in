@@ -73,7 +73,7 @@ else
 fi
 
 
-DIS_MYSQL="  MySql: No"
+DIS_MYSQL="  MySQL: No"
 AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[ 
 	AC_ARG_WITH(mysqlconfig-path, [  --with-mysqlconfig-path=PATH Complete path to the mysql_config executable],
 	mysql_config_path="$withval", mysql_config_path="")
@@ -88,17 +88,36 @@ AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to fin
 		AC_PATH_PROG(MYSQLCONF,mysql_config, "")
 	fi
 	if test "$MYSQLCONF" != ""; then
-		AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
-		AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
-		MYSQL=" mysql.c "
-		RDB=" rdb.c "
-		AC_SUBST(MYSQL)
-		AC_SUBST(RDB)
 		MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
 		MYSQL_LIBS="`$MYSQLCONF --libs`"
-		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
-		LDFLAGS="$LDFLAGS $MYSQL_LIBS"
-		DIS_MYSQL="  MySql: Yes"
+		AC_CACHE_CHECK(if mysql_config returns valid values,ac_cv_mysql_valid,[
+cat >mysql_check.c << __EOF__
+#include <mysql.h>
+int main() {
+	MYSQL *mysql = mysql_init(0);
+	return 0;
+}
+__EOF__
+$CC -o mysql_check $CFLAGS $MYSQL_CFLAGS $MYSQL_LIBS mysql_check.c 1>&5 2>&5
+if test "$?" != "0"; then
+	ac_cv_mysql_valid=no
+else
+	ac_cv_mysql_valid=yes
+fi
+
+rm -f mysql_check mysql_check.c
+])
+		if test "$ac_cv_mysql_valid" = "yes"; then
+			AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
+			AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
+			MYSQL=" mysql.c "
+			RDB=" rdb.c "
+			AC_SUBST(MYSQL)
+			AC_SUBST(RDB)
+			CFLAGS="$CFLAGS $MYSQL_CFLAGS"
+			LDFLAGS="$LDFLAGS $MYSQL_LIBS"
+			DIS_MYSQL="  MySQL: Yes"
+		fi
 	fi
 ])
 

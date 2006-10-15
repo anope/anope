@@ -83,8 +83,8 @@ Anope for Windows
        resolve the issues yourself, seek assistance on our forums or in our
        IRC Support channel.
 
-    6) Anope will install the files where the belong. The only thing you need
-       to do is rename "data/example.conf" to be "services.conf".
+    6) Anope will install the files where they belong. The only thing you need
+       to do is rename "data/example.conf" to be "data/services.conf".
 
     You have now completed the building phase of Anope for Windows. You can
     now move on to the next section, which is related to setting up Anope.

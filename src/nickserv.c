@@ -1406,6 +1406,7 @@ static int delcore(NickCore * nc)
     int i;
 #ifdef USE_RDB
     static char clause[128];
+    char *q_display;
 #endif
     /* (Hopefully complete) cleanup */
     cs_remove_nick(nc);
@@ -1425,17 +1426,18 @@ static int delcore(NickCore * nc)
 #ifdef USE_RDB
     /* Reflect this change in the database right away. */
     if (rdb_open()) {
-
-        snprintf(clause, sizeof(clause), "display='%s'", nc->display);
+        q_display = rdb_quote(nc->display);
+        snprintf(clause, sizeof(clause), "display='%s'", q_display);
         rdb_scrub_table("anope_ns_access", clause);
         rdb_scrub_table("anope_ns_core", clause);
         rdb_scrub_table("anope_cs_access", clause);
         /* I'm unsure how to clean up the OS ADMIN/OPER list on the db */
         /* I wish the "display" primary key would be the same on all tables */
         snprintf(clause, sizeof(clause), "receiver='%s' AND serv='NICK'",
-                 nc->display);
+                 q_display);
         rdb_scrub_table("anope_ms_info", clause);
         rdb_close();
+        free(q_display);
     }
 #endif
 
@@ -1509,6 +1511,7 @@ int delnick(NickAlias * na)
 {
 #ifdef USE_RDB
     static char clause[128];
+    char *q_nick;
 #endif
     /* First thing to do: remove any timeout belonging to the nick we're deleting */
     clean_ns_timeouts(na);
@@ -1552,10 +1555,11 @@ int delnick(NickAlias * na)
 #ifdef USE_RDB
     /* Reflect this change in the database right away. */
     if (rdb_open()) {
-
-        snprintf(clause, sizeof(clause), "nick='%s'", na->nick);
+        q_nick = rdb_quote(na->nick);
+        snprintf(clause, sizeof(clause), "nick='%s'", q_nick);
         rdb_scrub_table("anope_ns_alias", clause);
         rdb_close();
+        free(q_nick);
     }
 #endif
 

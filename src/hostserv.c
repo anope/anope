@@ -318,6 +318,7 @@ void delHostCore(char *nick)
 {
 #ifdef USE_RDB
     static char clause[128];
+    char *q_nick;
 #endif
     HostCore *tmp;
     boolean found = false;
@@ -328,10 +329,11 @@ void delHostCore(char *nick)
 #ifdef USE_RDB
         /* Reflect this change in the database right away. */
         if (rdb_open()) {
-
-            snprintf(clause, sizeof(clause), "nick='%s'", nick);
+            q_nick = rdb_quote(nick);
+            snprintf(clause, sizeof(clause), "nick='%s'", q_nick);
             rdb_scrub_table("anope_hs_core", clause);
             rdb_close();
+            free(q_nick);
         }
 #endif
 

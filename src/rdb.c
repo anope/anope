@@ -48,6 +48,15 @@ int rdb_close()
 
 /*************************************************************************/
 
+char *rdb_quote(char *str)
+{
+#ifdef USE_MYSQL
+    return db_mysql_quote(str);
+#endif
+}
+
+/*************************************************************************/
+
 int rdb_tag_table(char *table)
 {
     static char buf[1024];
@@ -114,47 +123,55 @@ int rdb_direct_query(char *query)
 int rdb_ns_set_display(char *newnick, char *oldnick)
 {
     static char buf[1024];
+    char *q_newnick;
+    char *q_oldnick;
+
+    q_newnick = rdb_quote(newnick);
+    q_oldnick = rdb_quote(oldnick);
 
 #ifdef USE_MYSQL
     /* Change the display on NS_CORE */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_ns_core SET display='%s' WHERE display='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Change the display on NS_ALIAS for all grouped nicks */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_ns_alias SET display='%s' WHERE display='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Change the display on ChanServ ACCESS list */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_cs_access SET display='%s' WHERE display='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Change the display on ChanServ AKICK list */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_cs_akicks SET creator='%s' WHERE creator='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Change the display on MemoServ sent memos */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_ms_info SET sender='%s' WHERE sender='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Change the display on MemoServ received memos */
     snprintf(buf, sizeof(buf),
              "UPDATE anope_ms_info SET receiver='%s' WHERE receiver='%s'",
-             newnick, oldnick);
+             q_newnick, q_oldnick);
     db_mysql_query(buf);
 
     /* Need to do bwords and akills */
 
 #endif
+
+    free(q_newnick);
+    free(q_oldnick);
 
     return 0;
 }
@@ -164,20 +181,27 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
 int rdb_cs_deluser(char *nick)
 {
     static char buf[1024];
+    char *q_nick;
+
+    q_nick = rdb_quote(nick);
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
              "UPDATE anope_cs_info SET successor=NULL WHERE successor='%s'",
-             nick);
+             q_nick);
     db_mysql_query(buf);
 
-    snprintf(buf, sizeof(buf), "display='%s'", nick);
+    snprintf(buf, sizeof(buf), "display='%s'", q_nick);
     rdb_scrub_table("anope_cs_access", buf);
-    snprintf(buf, sizeof(buf), "creator='%s'", nick);
+    snprintf(buf, sizeof(buf), "creator='%s'", q_nick);
     rdb_scrub_table("anope_cs_akicks", buf);
+
+    free(q_nick);
 
     return 1;
 #endif
+
+    free(q_nick);
 
     return 0;
 }
@@ -187,19 +211,23 @@ int rdb_cs_deluser(char *nick)
 int rdb_cs_delchan(ChannelInfo * ci)
 {
     static char buf[1024];
-    char *channel = ci->name;
+    char *q_channel;
+    char *q_founder;
+
+    q_channel = rdb_quote(ci->name);
+    q_founder = rdb_quote(ci->founder->display);
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
              "UPDATE anope_cs_info SET successor=NULL WHERE name='%s'",
-             channel);
+             q_channel);
     db_mysql_query(buf);
 
-    snprintf(buf, sizeof(buf), "name='%s'", channel);
+    snprintf(buf, sizeof(buf), "name='%s'", q_channel);
     rdb_scrub_table("anope_cs_info", buf);
-    snprintf(buf, sizeof(buf), "receiver='%s' AND serv='CHAN'", channel);
+    snprintf(buf, sizeof(buf), "receiver='%s' AND serv='CHAN'", q_channel);
     rdb_scrub_table("anope_ms_info", buf);
-    snprintf(buf, sizeof(buf), "channel='%s'", channel);
+    snprintf(buf, sizeof(buf), "channel='%s'", q_channel);
     rdb_scrub_table("anope_cs_access", buf);
     rdb_scrub_table("anope_cs_akicks", buf);
     rdb_scrub_table("anope_cs_levels", buf);
@@ -207,12 +235,18 @@ int rdb_cs_delchan(ChannelInfo * ci)
     if (ci->founder) {
         snprintf(buf, sizeof(buf),
                  "update anope_ns_core set channelcount=channelcount-1 where display='%s'",
-                 ci->founder->display);
+                 q_founder);
         db_mysql_query(buf);
     }
 
+    free(q_channel);
+    free(q_founder);
+
     return 1;
 #endif
+
+    free(q_channel);
+    free(q_founder);
 
     return 0;
 }
@@ -222,25 +256,36 @@ int rdb_cs_delchan(ChannelInfo * ci)
 int rdb_cs_set_founder(char *channel, char *founder)
 {
     static char buf[1024];
+    char *q_channel;
+    char *q_founder;
+
+    q_channel = rdb_quote(channel);
+    q_founder = rdb_quote(founder);
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
              "UPDATE anope_cs_info SET founder='%s', successor=NULL WHERE name='%s'",
-             founder, channel);
+             q_founder, q_channel);
     db_mysql_query(buf);
 
     snprintf(buf, sizeof(buf),
              "UPDATE anope_ns_core SET channelcount=channelcount+1 WHERE display='%s'",
-             founder);
+             q_founder);
     db_mysql_query(buf);
 
     /* Do i need to scrub the access list for this channel ? */
-    snprintf(buf, sizeof(buf), "display='%s' AND channel='%s'", founder,
-             channel);
+    snprintf(buf, sizeof(buf), "display='%s' AND channel='%s'", q_founder,
+             q_channel);
     rdb_scrub_table("anope_cs_access", buf);
+
+    free(q_channel);
+    free(q_founder);
 
     return 1;
 #endif
+
+    free(q_channel);
+    free(q_founder);
 
     return 0;
 }

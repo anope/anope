@@ -100,7 +100,7 @@ elif [ "$1" = "restart" ] ; then
 	echo "Restarting Anope"
 	kill -15 `cat $ANOPEPID`
 	sleep 1
-	$ANOPROG
+	$ANOPROG $*
 
 elif [ "$1" = "rehash" ] ; then
 	isAnopeRunning

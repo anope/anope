@@ -130,7 +130,6 @@ int db_mysql_open()
 int db_mysql_query(char *sql)
 {
     int lcv;
-    char *s;
 
     if (!do_mysql) {
         /* Error is 1 */
@@ -138,10 +137,7 @@ int db_mysql_query(char *sql)
     }
 
     if (debug) {
-        s = db_mysql_quote(sql);
-        alog("debug: %s", s);
-        free(s);
-
+		alog("debug: MySQL: %s", sql);
     }
 
     /* Try as many times as configured in MysqlRetries */

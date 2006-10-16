@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="16"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1176"
+VERSION_BUILD="1177"
 
 # $Log$
+#
+# BUILD : 1.7.16 (1177)
+# BUGS  : 
+# NOTES : Fixed MySQL query debug to not excessivly quote queries before displaying in debug mode
 #
 # BUILD : 1.7.16 (1176)
 # BUGS  : 611

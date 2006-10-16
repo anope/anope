@@ -2806,7 +2806,7 @@ fi;
 	if test "$mysql_config_path" != ""; then
 		if test -x "$mysql_config_path"; then
 			MYSQLCONF="$mysql_config_path"
-			echo "checking for mysql_config... $MYSQLCONF"
+			echo "checking for mysql_config... $MYSQLCONF" >&6
 		fi
 	fi
 	if test "$MYSQLCONF" = ""; then
@@ -2852,33 +2852,57 @@ fi
 
 	fi
 	if test "$MYSQLCONF" != ""; then
-		MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
-		MYSQL_LIBS="`$MYSQLCONF --libs`"
-		echo "$as_me:$LINENO: checking if mysql_config returns valid values" >&5
-echo $ECHO_N "checking if mysql_config returns valid values... $ECHO_C" >&6
-if test "${ac_cv_mysql_valid+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-
-cat >mysql_check.c << __EOF__
+		hold_cflags="$CFLAGS"
+		hold_ldflags="$LDFLAGS"
+		CFLAGS="$CFLAGS `$MYSQLCONF --cflags`"
+		LDFLAGS="$LDFLAGS `$MYSQLCONF --libs`"
+		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
+		cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
 #include <mysql.h>
-int main() {
-	MYSQL *mysql = mysql_init(0);
-	return 0;
+int
+main ()
+{
+MYSQL *mysql = mysql_init(0);
+  ;
+  return 0;
 }
-__EOF__
-$CC -o mysql_check $CFLAGS $MYSQL_CFLAGS $MYSQL_LIBS mysql_check.c 1>&5 2>&5
-if test "$?" != "0"; then
-	ac_cv_mysql_valid=no
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_mysql_valid=yes
 else
-	ac_cv_mysql_valid=yes
-fi
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
 
-rm -f mysql_check mysql_check.c
-
+ac_cv_mysql_valid=no
 fi
-echo "$as_me:$LINENO: result: $ac_cv_mysql_valid" >&5
-echo "${ECHO_T}$ac_cv_mysql_valid" >&6
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
 
 cat >>confdefs.h <<_ACEOF
@@ -2894,9 +2918,10 @@ _ACEOF
 			RDB=" rdb.c "
 
 
-			CFLAGS="$CFLAGS $MYSQL_CFLAGS"
-			LDFLAGS="$LDFLAGS $MYSQL_LIBS"
-			DIS_MYSQL="  MySQL: Yes"
+			 DIS_MYSQL="  MySQL: Yes"
+		else
+			CFLAGS="$hold_cflags"
+			LDFLAGS="$hold_ldflags"
 		fi
 	fi
 

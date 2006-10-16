@@ -74,39 +74,28 @@ fi
 
 
 DIS_MYSQL="  MySQL: No"
-AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[ 
+AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to find it],,[
 	AC_ARG_WITH(mysqlconfig-path, [  --with-mysqlconfig-path=PATH Complete path to the mysql_config executable],
 	mysql_config_path="$withval", mysql_config_path="")
 	MYSQLCONF=""
 	if test "$mysql_config_path" != ""; then
 		if test -x "$mysql_config_path"; then
 			MYSQLCONF="$mysql_config_path"
-			echo "checking for mysql_config... $MYSQLCONF"
+			echo "checking for mysql_config... $MYSQLCONF" >&6
 		fi
 	fi
 	if test "$MYSQLCONF" = ""; then
 		AC_PATH_PROG(MYSQLCONF,mysql_config, "")
 	fi
 	if test "$MYSQLCONF" != ""; then
-		MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
-		MYSQL_LIBS="`$MYSQLCONF --libs`"
-		AC_CACHE_CHECK(if mysql_config returns valid values,ac_cv_mysql_valid,[
-cat >mysql_check.c << __EOF__
-#include <mysql.h>
-int main() {
-	MYSQL *mysql = mysql_init(0);
-	return 0;
-}
-__EOF__
-$CC -o mysql_check $CFLAGS $MYSQL_CFLAGS $MYSQL_LIBS mysql_check.c 1>&5 2>&5
-if test "$?" != "0"; then
-	ac_cv_mysql_valid=no
-else
-	ac_cv_mysql_valid=yes
-fi
-
-rm -f mysql_check mysql_check.c
-])
+		hold_cflags="$CFLAGS"
+		hold_ldflags="$LDFLAGS"
+		CFLAGS="$CFLAGS `$MYSQLCONF --cflags`"
+		LDFLAGS="$LDFLAGS `$MYSQLCONF --libs`"
+		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <mysql.h>]],[[MYSQL *mysql = mysql_init(0);]])],
+		                                ac_cv_mysql_valid=yes,ac_cv_mysql_valid=no)
+		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
 			AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
 			AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
@@ -114,13 +103,14 @@ rm -f mysql_check mysql_check.c
 			RDB=" rdb.c "
 			AC_SUBST(MYSQL)
 			AC_SUBST(RDB)
-			CFLAGS="$CFLAGS $MYSQL_CFLAGS"
-			LDFLAGS="$LDFLAGS $MYSQL_LIBS"
-			DIS_MYSQL="  MySQL: Yes"
+			 DIS_MYSQL="  MySQL: Yes"
+		else
+			CFLAGS="$hold_cflags"
+			LDFLAGS="$hold_ldflags"
 		fi
 	fi
 ])
-
+																																																																																																																																															
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 

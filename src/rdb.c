@@ -187,7 +187,7 @@ int rdb_cs_deluser(char *nick)
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET successor=NULL WHERE successor='%s'",
+             "UPDATE anope_cs_info SET successor='' WHERE successor='%s'",
              q_nick);
     db_mysql_query(buf);
 
@@ -219,7 +219,7 @@ int rdb_cs_delchan(ChannelInfo * ci)
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET successor=NULL WHERE name='%s'",
+             "UPDATE anope_cs_info SET successor='' WHERE name='%s'",
              q_channel);
     db_mysql_query(buf);
 
@@ -264,7 +264,7 @@ int rdb_cs_set_founder(char *channel, char *founder)
 
 #ifdef USE_MYSQL
     snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET founder='%s', successor=NULL WHERE name='%s'",
+             "UPDATE anope_cs_info SET founder='%s', successor='' WHERE name='%s'",
              q_founder, q_channel);
     db_mysql_query(buf);
 

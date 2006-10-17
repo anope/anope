@@ -2854,8 +2854,14 @@ fi
 	if test "$MYSQLCONF" != ""; then
 		hold_cflags="$CFLAGS"
 		hold_ldflags="$LDFLAGS"
-		CFLAGS="$CFLAGS `$MYSQLCONF --cflags`"
-		LDFLAGS="$LDFLAGS `$MYSQLCONF --libs`"
+		if test "$MYSQL_CFLAGS" = ""; then
+			MYSQL_CFLAGS="`$MYSQLCONF --cflags`"
+		fi
+		if test "$MYSQL_LDFLAGS" = ""; then
+			MYSQL_LDFLAGS="`$MYSQLCONF --libs`"
+		fi
+		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
+		LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
 		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
 		cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */

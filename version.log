@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="16"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1180"
+VERSION_BUILD="1181"
 
 # $Log$
+#
+# BUILD : 1.7.16 (1181)
+# BUGS  : 
+# NOTES : Fixed MySQL detection in configure.in; it should now always work correctly if mysql_config is found
 #
 # BUILD : 1.7.16 (1180)
 # BUGS  : 614

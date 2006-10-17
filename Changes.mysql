@@ -1,4 +1,4 @@
-Anope Version  S V N
+Anope Version 1.7.17
 --------------------
 - CREATE TABLE anope_cs_ttb (
    ct_id int(11) NOT NULL auto_increment,

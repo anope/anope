@@ -58,16 +58,6 @@ cat >version.h <<EOF
 # define VER_DEBUG
 #endif
 
-#if defined(USE_ENCRYPTION)
-# if defined(ENCRYPT_MD5)
-#  define VER_ENCRYPTION "E"
-# else
-#  define VER_ENCRYPTION "E"
-# endif
-#else
-# define VER_ENCRYPTION
-#endif
-
 #if defined(_WIN32)
 # if _MSC_VER >= 1400
 #  define VER_OS "W"

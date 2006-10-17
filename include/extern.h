@@ -17,18 +17,21 @@
 
 #ifndef _WIN32
 #define E extern
-#define I extern
+#define EI extern
 #else
 #ifndef MODULE_COMPILE
 #define E extern __declspec(dllexport)
-#define I extern __declspec(dllimport)
+#define EI extern __declspec(dllimport)
 #else
 #define E extern __declspec(dllimport)
-#define I extern __declspec(dllexport)
+#define EI extern __declspec(dllexport)
 #endif
 #endif
 
 #include "slist.h"
+
+
+
 
 E char *uplink;
 
@@ -39,7 +42,7 @@ E IRCDCAPAB *ircdcap;
 E char *flood_mode_char_set;
 E char *flood_mode_char_remove;
 E int UseTSMODE; /* hack to get around bahamut clones that don't send TSMODE */
-I unsigned long umodes[128];
+EI unsigned long umodes[128];
 E char csmodes[128];
 E CMMode cmmodes[128];
 E CBMode cbmodes[128];
@@ -553,7 +556,18 @@ E long unsigned int UserKey3;
 E int convert_ircservices_44(void);
 
 /**** encrypt.c ****/
-E int check_password(const char *plaintext, const char *password);
+E char *EncModule;
+E void initEncryption();
+E int enc_encrypt(const char *src, int len, char *dest, int size);
+E int enc_encrypt_in_place(char *buf, int size);
+E int enc_encrypt_check_len(int passlen, int bufsize);
+E int enc_decrypt(const char *src, char *dest, int size);
+E int enc_check_password(const char *plaintext, const char *password);
+E void encmodule_encrypt(int (*func)(const char *src, int len, char *dest, int size));
+E void encmodule_encrypt_in_place(int (*func)(char *buf, int size));
+E void encmodule_encrypt_check_len(int (*func)(int passlen, int bufsize));
+E void encmodule_decrypt(int (*func)(const char *src, char *dest, int size));
+E void encmodule_check_password(int (*func)(const char *plaintext, const char *password));
 
 /**** helpserv.c  ****/
 E void helpserv(User * u, char *buf);
@@ -846,6 +860,7 @@ E char *str_signed(unsigned char *str);
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
 E char **buildStringList(char *src, int *number);
+E void binary_to_hex(unsigned char *bin, char *hex, int length);
 
 
 
@@ -905,7 +920,7 @@ E int nick_identified(User * u);
 E int nick_recognized(User * u);
 E void expire_nicks(void);
 E void expire_requests(void);
-I int ns_do_register(User * u);
+EI int ns_do_register(User * u);
 E int delnick(NickAlias * na);
 E NickAlias *findnick(const char *nick);
 E NickCore  *findcore(const char *nick);
@@ -1156,11 +1171,6 @@ E void db_mysql_load_news(void);
 E unsigned int mysql_rand(void);
 #endif
 
-#ifdef USE_ENCRYPTION
-E int encrypt_in_place(char *buf, int size);
-#endif
-
-
 E void privmsg(char *source, char *dest, const char *fmt, ...);
 E void notice(char *source, char *dest, const char *fmt, ...);
 
@@ -1248,72 +1258,72 @@ E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(char *sender, char *nick, char *parm);
 E void anope_cmd_ctcp(char *source, char *dest, const char *fmt, ...);   	  		  /* CTCP */
 
-I int anope_event_482(char *source, int ac, char **av);
-I int anope_event_436(char *source, int ac, char **av);
-I int anope_event_away(char *source, int ac, char **av);
-I int anope_event_ping(char *source, int ac, char **av);
-I int anope_event_motd(char *source, int ac, char **av);
-I int anope_event_join(char *source, int ac, char **av);
-I int anope_event_kick(char *source, int ac, char **av);
-I int anope_event_kill(char *source, int ac, char **av);
-I int anope_event_mode(char *source, int ac, char **av);
-I int anope_event_tmode(char *source, int ac, char **av);
-I int anope_event_quit(char *source, int ac, char **av);
-I int anope_event_squit(char *source, int ac, char **av);
-I int anope_event_topic(char *source, int ac, char **av);
-I int anope_event_whois(char *source, int ac, char **av);
-I int anope_event_part(char *source, int ac, char **av);
-I int anope_event_server(char *source, int ac, char **av);
-I int anope_event_sid(char *source, int ac, char **av);
-I int anope_event_nick(char *source, int ac, char **av);
-I int anope_event_bmask(char *source, int ac, char **av);
-I int anope_event_gnotice(char *source, int ac, char **av);
-I int anope_event_privmsg(char *source, int ac, char **av);
-I int anope_event_capab(char *source, int ac, char **av);
-I int anope_event_sjoin(char *source, int ac, char **av);
-I int anope_event_cs(char *source, int ac, char **av);
-I int anope_event_hs(char *source, int ac, char **av);
-I int anope_event_ms(char *source, int ac, char **av);
-I int anope_event_ns(char *source, int ac, char **av);
-I int anope_event_os(char *source, int ac, char **av);
-I int anope_event_vs(char *source, int ac, char **av);
-I int anope_event_svinfo(char *source, int ac, char **av);
-I int anope_event_chghost(char *source, int ac, char **av);
-I int anope_event_sethost(char *source, int ac, char **av);
-I int anope_event_chgident(char *source, int ac, char **av);
-I int anope_event_setident(char *source, int ac, char **av);
-I int anope_event_chgname(char *source, int ac, char **av);
-I int anope_event_setname(char *source, int ac, char **av);
-I int anope_event_svsinfo(char *source, int ac, char **av);
-I int anope_event_snick(char *source, int ac, char **av);
-I int anope_event_vhost(char *source, int ac, char **av);
-I int anope_event_tkl(char *source, int ac, char **av);
-I int anope_event_eos(char *source, int ac, char **av);
-I int anope_event_eob(char *source, int ac, char **av);
-I int anope_event_pass(char *source, int ac, char **av);
-I int anope_event_netinfo(char *source, int ac, char **av);
-I int anope_event_error(char *source, int ac, char **av);
-I int anope_event_eb(char *source, int ac, char **av);
-I int anope_event_netctrl(char *source, int ac, char **av);
-I int anope_event_notice(char *source, int ac, char **av);
-I int anope_event_snotice(char *source, int ac, char **av);
-I int anope_event_sqline(char *source, int ac, char **av);
-I int anope_event_smo(char *source, int ac, char **av);
-I int anope_event_myid(char *source, int ac, char **av);
-I int anope_event_vctrl(char *source, int ac, char **av);
-I int anope_event_tctrl(char *source, int ac, char **av);
-I int anope_event_snetinfo(char *source, int ac, char **av);
-I int anope_event_umode2(char *source, int ac, char **av);
-I int anope_event_globops(char *source, int ac, char **av);
-I int anope_event_swhois(char *source, int ac, char **av);
-I int anope_event_burst(char *source, int ac, char **av);
-I int anope_event_luserslock(char *source, int ac, char **av);
-I int anope_event_admin(char *source, int ac, char **av);
-I int anope_event_credits(char *source, int ac, char **av);
-I int anope_event_rehash(char *source, int ac, char **av);
-I int anope_event_sdesc(char *source, int ac, char **av);
-I int anope_event_netglobal(char *source, int ac, char **av);
-I int anope_event_invite(char *source, int ac, char **av);
+EI int anope_event_482(char *source, int ac, char **av);
+EI int anope_event_436(char *source, int ac, char **av);
+EI int anope_event_away(char *source, int ac, char **av);
+EI int anope_event_ping(char *source, int ac, char **av);
+EI int anope_event_motd(char *source, int ac, char **av);
+EI int anope_event_join(char *source, int ac, char **av);
+EI int anope_event_kick(char *source, int ac, char **av);
+EI int anope_event_kill(char *source, int ac, char **av);
+EI int anope_event_mode(char *source, int ac, char **av);
+EI int anope_event_tmode(char *source, int ac, char **av);
+EI int anope_event_quit(char *source, int ac, char **av);
+EI int anope_event_squit(char *source, int ac, char **av);
+EI int anope_event_topic(char *source, int ac, char **av);
+EI int anope_event_whois(char *source, int ac, char **av);
+EI int anope_event_part(char *source, int ac, char **av);
+EI int anope_event_server(char *source, int ac, char **av);
+EI int anope_event_sid(char *source, int ac, char **av);
+EI int anope_event_nick(char *source, int ac, char **av);
+EI int anope_event_bmask(char *source, int ac, char **av);
+EI int anope_event_gnotice(char *source, int ac, char **av);
+EI int anope_event_privmsg(char *source, int ac, char **av);
+EI int anope_event_capab(char *source, int ac, char **av);
+EI int anope_event_sjoin(char *source, int ac, char **av);
+EI int anope_event_cs(char *source, int ac, char **av);
+EI int anope_event_hs(char *source, int ac, char **av);
+EI int anope_event_ms(char *source, int ac, char **av);
+EI int anope_event_ns(char *source, int ac, char **av);
+EI int anope_event_os(char *source, int ac, char **av);
+EI int anope_event_vs(char *source, int ac, char **av);
+EI int anope_event_svinfo(char *source, int ac, char **av);
+EI int anope_event_chghost(char *source, int ac, char **av);
+EI int anope_event_sethost(char *source, int ac, char **av);
+EI int anope_event_chgident(char *source, int ac, char **av);
+EI int anope_event_setident(char *source, int ac, char **av);
+EI int anope_event_chgname(char *source, int ac, char **av);
+EI int anope_event_setname(char *source, int ac, char **av);
+EI int anope_event_svsinfo(char *source, int ac, char **av);
+EI int anope_event_snick(char *source, int ac, char **av);
+EI int anope_event_vhost(char *source, int ac, char **av);
+EI int anope_event_tkl(char *source, int ac, char **av);
+EI int anope_event_eos(char *source, int ac, char **av);
+EI int anope_event_eob(char *source, int ac, char **av);
+EI int anope_event_pass(char *source, int ac, char **av);
+EI int anope_event_netinfo(char *source, int ac, char **av);
+EI int anope_event_error(char *source, int ac, char **av);
+EI int anope_event_eb(char *source, int ac, char **av);
+EI int anope_event_netctrl(char *source, int ac, char **av);
+EI int anope_event_notice(char *source, int ac, char **av);
+EI int anope_event_snotice(char *source, int ac, char **av);
+EI int anope_event_sqline(char *source, int ac, char **av);
+EI int anope_event_smo(char *source, int ac, char **av);
+EI int anope_event_myid(char *source, int ac, char **av);
+EI int anope_event_vctrl(char *source, int ac, char **av);
+EI int anope_event_tctrl(char *source, int ac, char **av);
+EI int anope_event_snetinfo(char *source, int ac, char **av);
+EI int anope_event_umode2(char *source, int ac, char **av);
+EI int anope_event_globops(char *source, int ac, char **av);
+EI int anope_event_swhois(char *source, int ac, char **av);
+EI int anope_event_burst(char *source, int ac, char **av);
+EI int anope_event_luserslock(char *source, int ac, char **av);
+EI int anope_event_admin(char *source, int ac, char **av);
+EI int anope_event_credits(char *source, int ac, char **av);
+EI int anope_event_rehash(char *source, int ac, char **av);
+EI int anope_event_sdesc(char *source, int ac, char **av);
+EI int anope_event_netglobal(char *source, int ac, char **av);
+EI int anope_event_invite(char *source, int ac, char **av);
 E int anope_event_null(char *source, int ac, char **av);
 
 E void anope_set_umode(User * user, int ac, char **av);

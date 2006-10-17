@@ -14,9 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#ifdef USE_ENCRYPTION
 #include "encrypt.h"
-#endif
 
 int do_set(User * u);
 int do_set_founder(User * u, ChannelInfo * ci, char *param);
@@ -368,14 +366,14 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
         notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
         return MOD_CONT;
     }
-#ifdef USE_ENCRYPTION
+
     if (len > PASSMAX) {
         len = PASSMAX;
         param[len] = 0;
         notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX);
     }
 
-    if (encrypt(param, len, ci->founderpass, PASSMAX) < 0) {
+    if (enc_encrypt(param, len, ci->founderpass, PASSMAX) < 0) {
         memset(param, 0, strlen(param));
         alog("%s: Failed to encrypt password for %s (set)", s_ChanServ,
              ci->name);
@@ -385,14 +383,6 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
 
     memset(param, 0, strlen(param));
     notice_lang(s_ChanServ, u, CHAN_PASSWORD_CHANGED, ci->name);
-
-#else                           /* !USE_ENCRYPTION */
-    if (strlen(param) > PASSMAX - 1)    /* -1 for null byte */
-        notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX - 1);
-    strscpy(ci->founderpass, param, PASSMAX);
-    notice_lang(s_ChanServ, u, CHAN_PASSWORD_CHANGED_TO, ci->name,
-                ci->founderpass);
-#endif                          /* USE_ENCRYPTION */
 
     if (get_access(u, ci) < ACCESS_FOUNDER) {
         alog("%s: %s!%s@%s set password as Services admin for %s",

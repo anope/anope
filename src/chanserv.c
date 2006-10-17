@@ -496,25 +496,7 @@ void load_cs_dbase(void)
             SAFE(read_int32(&tmp32, f));
             ci->last_topic_time = tmp32;
             SAFE(read_int32(&ci->flags, f));
-#ifdef USE_ENCRYPTION
-            if (!(ci->flags & (CI_ENCRYPTEDPW | CI_VERBOTEN))) {
-                if (debug)
-                    alog("debug: %s: encrypting password for %s on load",
-                         s_ChanServ, ci->name);
-                if (encrypt_in_place(ci->founderpass, PASSMAX) < 0)
-                    fatal("%s: load database: Can't encrypt %s password!",
-                          s_ChanServ, ci->name);
-                ci->flags |= CI_ENCRYPTEDPW;
-            }
-#else
-            if (ci->flags & CI_ENCRYPTEDPW) {
-                /* Bail: it makes no sense to continue with encrypted
-                 * passwords, since we won't be able to verify them */
-                fatal("%s: load database: password for %s encrypted "
-                      "but encryption disabled, aborting",
-                      s_ChanServ, ci->name);
-            }
-#endif
+
             /* Leaveops cleanup */
             if (ver <= 13 && (ci->flags & 0x00000020))
                 ci->flags &= ~0x00000020;

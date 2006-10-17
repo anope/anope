@@ -75,9 +75,8 @@ int do_register(User * u)
     ChannelInfo *ci;
     struct u_chaninfolist *uc;
     int is_servadmin = is_services_admin(u);
-#ifdef USE_ENCRYPTION
     char founderpass[PASSMAX + 1];
-#endif
+    char tmp_pass[PASSMAX];
 
     if (readonly) {
         notice_lang(s_ChanServ, u, CHAN_REGISTER_DISABLED);
@@ -130,15 +129,12 @@ int do_register(User * u)
         alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 
-#ifdef USE_ENCRYPTION
     } else if (strscpy(founderpass, pass, PASSMAX + 1),
-               encrypt_in_place(founderpass, PASSMAX) < 0) {
+               enc_encrypt_in_place(founderpass, PASSMAX) < 0) {
         alog("%s: Couldn't encrypt password for %s (REGISTER)",
              s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
         delchan(ci);
-#endif
-
     } else {
         c->ci = ci;
         ci->c = c;
@@ -148,17 +144,12 @@ int do_register(User * u)
         ci->memos.memomax = MSMaxMemos;
         ci->last_used = ci->time_registered;
         ci->founder = nc;
-#ifdef USE_ENCRYPTION
         if (strlen(pass) > PASSMAX)
             notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX);
         memset(pass, 0, strlen(pass));
         memcpy(ci->founderpass, founderpass, PASSMAX);
-        ci->flags |= CI_ENCRYPTEDPW;
-#else
-        if (strlen(pass) > PASSMAX - 1) /* -1 for null byte */
-            notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX - 1);
-        strscpy(ci->founderpass, pass, PASSMAX);
-#endif
+//        ci->flags |= CI_ENCRYPTEDPW;
+//
         ci->desc = sstrdup(desc);
         if (c->topic) {
             ci->last_topic = sstrdup(c->topic);
@@ -174,9 +165,11 @@ int do_register(User * u)
         alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan,
              u->nick, u->username, u->host);
         notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
-#ifndef USE_ENCRYPTION
-        notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, ci->founderpass);
-#endif
+	
+	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX) == 1) {
+            notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, ci->founderpass);
+	}
+
         uc = scalloc(sizeof(*uc), 1);
         uc->next = u->founder_chans;
         uc->prev = NULL;

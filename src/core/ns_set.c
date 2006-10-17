@@ -14,9 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#ifdef USE_ENCRYPTION
 #include "encrypt.h"
-#endif
 
 int do_set(User * u);
 int do_set_display(User * u, NickCore * nc, char *param);
@@ -205,6 +203,7 @@ int do_set_display(User * u, NickCore * nc, char *param)
 int do_set_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
+    char tmp_pass[PASSMAX];
 
     if (stricmp(nc->display, param) == 0 || (StrictPasswords && len < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
@@ -214,10 +213,9 @@ int do_set_password(User * u, NickCore * nc, char *param)
     if (nc->pass)
         free(nc->pass);
 
-#ifdef USE_ENCRYPTION
     nc->pass = smalloc(PASSMAX);
 
-    if (encrypt(param, len, nc->pass, PASSMAX) < 0) {
+    if (enc_encrypt(param, len, nc->pass, PASSMAX) < 0) {
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,
              nc->display);
@@ -226,11 +224,12 @@ int do_set_password(User * u, NickCore * nc, char *param)
     }
 
     memset(param, 0, len);
-    notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
-#else
-    nc->pass = sstrdup(param);
-    notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, nc->pass);
-#endif
+
+    if(enc_decrypt(nc->pass,tmp_pass,PASSMAX)==1) {
+        notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, nc->pass);
+    } else {
+        notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED);
+    }
 
     alog("%s: %s!%s@%s (e-mail: %s) changed its password.", s_NickServ,
          u->nick, u->username, u->host, (nc->email ? nc->email : "none"));

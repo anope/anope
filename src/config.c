@@ -19,7 +19,7 @@
 /* Configurable variables: */
 
 char *IRCDModule;
-
+char *EncModule;
 char *RemoteServer;
 int RemotePort;
 char *RemotePassword;
@@ -445,6 +445,7 @@ Directive directives[] = {
      {{PARAM_STRING, PARAM_RELOAD, &DefConAkillReason}}},
     {"DefConOffMessage",
      {{PARAM_STRING, PARAM_RELOAD, &DefConOffMessage}}},
+    {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExceptionDB", {{PARAM_STRING, PARAM_RELOAD, &ExceptionDBName}}},
     {"ExceptionExpiry", {{PARAM_TIME, PARAM_RELOAD, &ExceptionExpiry}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
@@ -968,6 +969,7 @@ int read_config(int reload)
     }
 
     CHECK(IRCDModule);
+    CHECK(EncModule);
 
     CHECK(NetworkName);
     if (!reload) {

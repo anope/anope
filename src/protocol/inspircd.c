@@ -786,9 +786,9 @@ void inspircd_cmd_bot_chan_mode(char *nick, char *chan)
 
 void inspircd_cmd_351(char *source)
 {
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s -- %s",
+    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
-             version_build);
+             EncModule, version_build);
 }
 
 /* QUIT */

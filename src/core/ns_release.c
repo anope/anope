@@ -82,7 +82,7 @@ int do_release(User * u)
     } else if (!(na->status & NS_KILL_HELD)) {
         notice_lang(s_NickServ, u, NICK_RELEASE_NOT_HELD, nick);
     } else if (pass) {
-        int res = check_password(pass, na->nc->pass);
+        int res = enc_check_password(pass, na->nc->pass);
         if (res == 1) {
             release(na, 0);
             notice_lang(s_NickServ, u, NICK_RELEASED);

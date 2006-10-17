@@ -233,38 +233,33 @@ void db_mysql_save_ns_req(NickRequest * nr)
 
 char *db_mysql_secure(char *pass)
 {
-
     char epass[BUFSIZE];
+    char tmp_pass[PASSMAX];
 
     /* Initialize the buffer. Bug #86 */
     memset(epass, '\0', BUFSIZE);
 
-#ifdef USE_ENCRYPTION
-    if (pass) {
-        /* If we use the builtin encryption don't double encrypt! */
+    /* We couldnt decrypt the pass... */
+    if(enc_decrypt(pass,tmp_pass,PASSMAX)!=1) { 
         snprintf(epass, sizeof(epass), "'%s'", pass);
+    } else { /* if we could decrypt the pass */
+        if (tmp_pass) {
+            snprintf(epass, sizeof(epass), "''");
+        } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
+            snprintf(epass, sizeof(epass), "'%s'", tmp_pass);
+        } else if (strcmp(MysqlSecure, "des") == 0) {
+            snprintf(epass, sizeof(epass), "ENCRYPT('%s')", tmp_pass);
+        } else if (strcmp(MysqlSecure, "md5") == 0) {
+            snprintf(epass, sizeof(epass), "MD5('%s')", tmp_pass);
+        } else if (strcmp(MysqlSecure, "sha") == 0) {
+            snprintf(epass, sizeof(epass), "SHA('%s')", tmp_pass);
+        } else {
+            snprintf(epass, sizeof(epass), "ENCODE('%s','%s')", tmp_pass,
+                     MysqlSecure);
+	}
     }
-#else
-
-    if (!pass) {
-        snprintf(epass, sizeof(epass), "''");
-    } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
-        snprintf(epass, sizeof(epass), "'%s'", pass);
-    } else if (strcmp(MysqlSecure, "des") == 0) {
-        snprintf(epass, sizeof(epass), "ENCRYPT('%s')", pass);
-    } else if (strcmp(MysqlSecure, "md5") == 0) {
-        snprintf(epass, sizeof(epass), "MD5('%s')", pass);
-    } else if (strcmp(MysqlSecure, "sha") == 0) {
-        snprintf(epass, sizeof(epass), "SHA('%s')", pass);
-    } else {
-        snprintf(epass, sizeof(epass), "ENCODE('%s','%s')", pass,
-                 MysqlSecure);
-    }
-
-#endif
 
     return sstrdup(epass);
-
 }
 
 /*************************************************************************/
@@ -1191,23 +1186,7 @@ void db_mysql_load_cs_dbase(void)
         snprintf(ci->last_topic_setter, NICKMAX, "%s", mysql_row[10]);
         ci->last_topic_time = atoi(mysql_row[11]);
         ci->flags = atoi(mysql_row[12]);
-#ifdef USE_ENCRYPTION
-        if (!(ci->flags & (CI_ENCRYPTEDPW | CI_VERBOTEN))) {
-            if (debug)
-                alog("debug: %s: encrypting password for %s on load",
-                     s_ChanServ, ci->name);
-            if (encrypt_in_place(ci->founderpass, PASSMAX) < 0)
-                fatal("%s: load database: Can't encrypt %s password!",
-                      s_ChanServ, ci->name);
-            ci->flags |= CI_ENCRYPTEDPW;
-        }
-#else
-        if (ci->flags & CI_ENCRYPTEDPW) {
-            fatal
-                ("%s: load database: password for %s encrypted but encryption disabled, aborting",
-                 s_ChanServ, ci->name);
-        }
-#endif
+
         ci->flags &= ~CI_INHABIT;
 
         ci->forbidby = sstrdup(mysql_row[13]);
@@ -1478,23 +1457,6 @@ void db_mysql_load_ns_dbase(void)
         if (!NSAllowKillImmed)
             nc->flags &= ~NI_KILL_IMMED;
 
-#ifdef USE_ENCRYPTION
-        if (nc->pass && !(nc->flags & NI_ENCRYPTEDPW)) {
-            if (debug)
-                alog("debug: %s: encrypting password for `%s' on load",
-                     s_NickServ, nc->display);
-            if (encrypt_in_place(nc->pass, PASSMAX) < 0)
-                fatal("%s: Can't encrypt `%s' nickname password!",
-                      s_NickServ, nc->display);
-
-            nc->flags |= NI_ENCRYPTEDPW;
-        }
-#else
-        if (nc->flags & NI_ENCRYPTEDPW)
-            fatal
-                ("%s: load database: password for %s encrypted but encryption disabled, aborting",
-                 s_NickServ, nc->display);
-#endif
 
         if (nc->flags & NI_SERVICES_ADMIN)
             slist_add(&servadmins, nc);

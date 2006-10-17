@@ -145,6 +145,26 @@ void modules_core_init(int number, char **list)
         }
     }
 }
+/**
+ * 
+ **/
+int encryption_module_init(void) {
+    int ret = 0;
+    Module *m;
+	
+    m = createModule(EncModule);
+    mod_current_module = m;
+    mod_current_user = NULL;
+    alog("Loading Encryption Module: [%s]", mod_current_module->name);
+    ret = loadModule(mod_current_module, NULL);
+    moduleSetType(ENCRYPTION);
+    alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
+    mod_current_module = NULL;
+    if (ret != MOD_ERR_OK) {
+        destroyModule(m);
+    }
+    return ret;
+}
 
 /**
  * Load the ircd protocol module up
@@ -458,6 +478,25 @@ int protocolModuleLoaded()
     return 0;
 }
 
+/**
+ * Search all loaded modules looking for an encryption module.
+ * @ return 1 if one is loaded
+ **/
+int encryptionModuleLoaded()
+{
+    int idx = 0;
+    ModuleHash *current = NULL;
+
+    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
+        for (current = MODULE_HASH[idx]; current; current = current->next) {
+            if (current->m->type == ENCRYPTION) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /** 
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
@@ -624,6 +663,9 @@ int loadModule(Module * m, User * u)
         if (m->type == PROTOCOL && protocolModuleLoaded()) {
             alog("You cannot load two protocol modules");
             ret = MOD_STOP;
+        } else if (m->type == ENCRYPTION && encryptionModuleLoaded()) {
+            alog("You cannot load two encryption modules");
+            ret = MOD_STOP;
         }
         if (ret == MOD_STOP) {
             alog("%s requested unload...", m->name);
@@ -667,6 +709,11 @@ int unloadModule(Module * m, User * u)
     }
 
     if (m->type == PROTOCOL) {
+        if (u) {
+            notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
+        }
+        return MOD_ERR_NOUNLOAD;
+    } else if(m->type == ENCRYPTION) {
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
         }

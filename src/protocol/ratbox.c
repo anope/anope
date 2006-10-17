@@ -1498,8 +1498,9 @@ int anope_event_tmode(char *source, int ac, char **av)
 void ratbox_cmd_351(char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
-             "351 %s Anope-%s %s :%s - %s -- %s", source, version_number,
-             ServerName, ircd->name, version_flags, version_build);
+             "351 %s Anope-%s %s :%s - %s (%s) -- %s", source, version_number,
+             ServerName, ircd->name, version_flags, EncModule, version_build);
+
 }
 
 /* Event: PROTOCTL */

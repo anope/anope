@@ -83,7 +83,7 @@ int do_recover(User * u)
     } else if (stricmp(nick, u->nick) == 0) {
         notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
     } else if (pass) {
-        int res = check_password(pass, na->nc->pass);
+        int res = enc_check_password(pass, na->nc->pass);
 
         if (res == 1) {
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);

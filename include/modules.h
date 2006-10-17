@@ -97,7 +97,7 @@ typedef void *	ano_module_t;
 #endif
 /*************************************************************************/
 
-typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED } MODType;
+typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION } MODType;
 typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
 
 /*************************************************************************/

@@ -262,11 +262,6 @@ AC_ARG_WITH(datadir, [ --with-datadir=datadir     Specify the location of the se
 AC_SUBST(DATDEST)
 AC_SUBST(MODULE_PATH)
 
-AC_ARG_WITH(encryption, [ --with-encryption     Use md5 database encryption], [
-    AC_DEFINE_UNQUOTED(USE_ENCRYPTION,,"has encryption")
-    AC_DEFINE_UNQUOTED(ENCRYPT_MD5,,"Use md5")
-])
-
 AC_CONFIG_FILES(		\
 	Makefile		\
 	src/bin/anoperc	\

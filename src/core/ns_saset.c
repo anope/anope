@@ -14,9 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#ifdef USE_ENCRYPTION
 #include "encrypt.h"
-#endif
 
 int do_saset(User * u);
 int do_saset_display(User * u, NickCore * nc, char *param);
@@ -221,6 +219,7 @@ int do_saset_display(User * u, NickCore * nc, char *param)
 int do_saset_password(User * u, NickCore * nc, char *param)
 {
     int len = strlen(param);
+    char tmp_pass[PASSMAX];
 
     if (NSSecureAdmins && u->na->nc != nc && nick_is_services_admin(nc)
         && !is_services_root(u)) {
@@ -235,10 +234,9 @@ int do_saset_password(User * u, NickCore * nc, char *param)
     if (nc->pass)
         free(nc->pass);
 
-#ifdef USE_ENCRYPTION
     nc->pass = smalloc(PASSMAX);
 
-    if (encrypt(param, len, nc->pass, PASSMAX) < 0) {
+    if (enc_encrypt(param, len, nc->pass, PASSMAX) < 0) {
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,
              nc->display);
@@ -248,12 +246,13 @@ int do_saset_password(User * u, NickCore * nc, char *param)
     }
 
     memset(param, 0, len);
-    notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
-#else
-    nc->pass = sstrdup(param);
-    notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display,
-                nc->pass);
-#endif
+    
+    if(enc_decrypt(nc->pass,tmp_pass,PASSMAX)==1) {
+        notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display,
+                    nc->pass);
+    } else {
+        notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
+    }
 
     alog("%s: %s!%s@%s used SASET PASSWORD on %s (e-mail: %s)", s_NickServ,
          u->nick, u->username, u->host, nc->display,

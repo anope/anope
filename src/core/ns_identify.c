@@ -96,7 +96,7 @@ int do_identify(User * u)
         notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
     } else if (nick_identified(u)) {
         notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
-    } else if (!(res = check_password(pass, na->nc->pass))) {
+    } else if (!(res = enc_check_password(pass, na->nc->pass))) {
         alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
              u->username, u->host);
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);

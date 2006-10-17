@@ -73,6 +73,7 @@ int do_modlist(User * u)
     int showCore = 0;
     int showThird = 1;
     int showProto = 1;
+    int showEnc = 1;
     int showSupported = 1;
     int showQA = 1;
 
@@ -82,6 +83,7 @@ int do_modlist(User * u)
     char core[] = "Core";
     char third[] = "3rd";
     char proto[] = "Protocol";
+    char enc[] = "Encryption";
     char supported[] = "Supported";
     char qa[] = "QATested";
 
@@ -91,6 +93,7 @@ int do_modlist(User * u)
             showCore = 1;
             showThird = 0;
             showProto = 0;
+            showEnc = 0;
             showSupported = 0;
             showQA = 0;
         } else if (stricmp(param, third) == 0) {
@@ -99,10 +102,12 @@ int do_modlist(User * u)
             showSupported = 0;
             showQA = 0;
             showProto = 0;
+            showEnc = 0;
         } else if (stricmp(param, proto) == 0) {
             showCore = 0;
             showThird = 0;
             showProto = 1;
+            showEnc = 0;
             showSupported = 0;
             showQA = 0;
         } else if (stricmp(param, supported) == 0) {
@@ -110,13 +115,22 @@ int do_modlist(User * u)
             showThird = 0;
             showProto = 0;
             showSupported = 1;
+            showEnc = 0;
             showQA = 0;
         } else if (stricmp(param, qa) == 0) {
             showCore = 0;
             showThird = 0;
             showProto = 0;
             showSupported = 0;
+            showEnc = 0;
             showQA = 1;
+        } else if (stricmp(param, enc) == 0) {
+            showCore = 0;
+            showThird = 0;
+            showProto = 0;
+            showSupported = 0;
+            showEnc = 1;
+            showQA = 0;
         }
     }
 
@@ -161,6 +175,14 @@ int do_modlist(User * u)
                     count++;
                 }
                 break;
+            case ENCRYPTION:
+                if (showEnc) {
+                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+                                current->name, current->m->version, enc);
+                    count++;
+                }
+                break;
+
             }
 
         }

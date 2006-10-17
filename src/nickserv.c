@@ -323,25 +323,7 @@ void load_old_ns_dbase(void)
 
             SAFE(read_int16(&na->status, f));
             na->status &= ~NS_TEMPORARY;
-#ifdef USE_ENCRYPTION
-            if (!(na->status & (NS_OLD_ENCRYPTEDPW | NS_VERBOTEN))) {
-                if (debug)
-                    alog("debug: %s: encrypting password for `%s' on load",
-                         s_NickServ, na->nick);
-                if (encrypt_in_place(bufp, PASSMAX) < 0)
-                    fatal("%s: Can't encrypt `%s' nickname password!",
-                          s_NickServ, na->nick);
-                na->status |= NS_OLD_ENCRYPTEDPW;
-            }
-#else
-            if (na->status & NS_OLD_ENCRYPTEDPW) {
-                /* Bail: it makes no sense to continue with encrypted
-                 * passwords, since we won't be able to verify them */
-                fatal
-                    ("%s: load database: password for %s encrypted but encryption disabled, aborting",
-                     s_NickServ, na->nick);
-            }
-#endif
+
             if (ver >= 9) {
                 SAFE(read_string(&forbidby, f));
                 SAFE(read_string(&forbidreason, f));
@@ -606,25 +588,6 @@ void load_ns_dbase(void)
             SAFE(read_int32(&nc->flags, f));
             if (!NSAllowKillImmed)
                 nc->flags &= ~NI_KILL_IMMED;
-#ifdef USE_ENCRYPTION
-            if (nc->pass && !(nc->flags & NI_ENCRYPTEDPW)) {
-                if (debug)
-                    alog("debug: %s: encrypting password for `%s' on load",
-                         s_NickServ, nc->display);
-                if (encrypt_in_place(nc->pass, PASSMAX) < 0)
-                    fatal("%s: Can't encrypt `%s' nickname password!",
-                          s_NickServ, nc->display);
-                nc->flags |= NI_ENCRYPTEDPW;
-            }
-#else
-            if (nc->flags & NI_ENCRYPTEDPW) {
-                /* Bail: it makes no sense to continue with encrypted
-                 * passwords, since we won't be able to verify them */
-                fatal
-                    ("%s: load database: password for %s encrypted but encryption disabled, aborting",
-                     s_NickServ, nc->display);
-            }
-#endif
             SAFE(read_int16(&nc->language, f));
 
             /* Add services opers and admins to the appropriate list, but

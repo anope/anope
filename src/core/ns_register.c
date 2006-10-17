@@ -14,9 +14,7 @@
 /*************************************************************************/
 
 #include "module.h"
-#ifdef USE_ENCRYPTION
 #include "encrypt.h"
-#endif
 
 int do_confirm(User * u);
 int do_register(User * u);
@@ -190,17 +188,10 @@ int do_register(User * u)
     } else if (email && !MailValidate(email)) {
         notice_lang(s_NickServ, u, MAIL_X_INVALID, email);
     } else {
-#ifdef USE_ENCRYPTION
         if (strlen(pass) > PASSMAX) {
             pass[PASSMAX] = 0;
             notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX);
         }
-#else
-        if (strlen(pass) > PASSMAX - 1) {       /* -1 for null byte */
-            pass[PASSMAX] = 0;
-            notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX - 1);
-        }
-#endif
         for (idx = 0; idx < 9; idx++) {
             passcode[idx] =
                 chars[(1 +
@@ -316,11 +307,11 @@ int do_confirm(User * u)
     if (na) {
         int i;
         char tsbuf[16];
+	char tmp_pass[PASSMAX];
 
-#ifdef USE_ENCRYPTION
         len = strlen(pass);
         na->nc->pass = smalloc(PASSMAX);
-        if (encrypt(pass, len, na->nc->pass, PASSMAX) < 0) {
+        if (enc_encrypt(pass, len, na->nc->pass, PASSMAX) < 0) {
             memset(pass, 0, strlen(pass));
             alog("%s: Failed to encrypt password for %s (register)",
                  s_NickServ, nr->nick);
@@ -329,11 +320,8 @@ int do_confirm(User * u)
         }
         memset(pass, 0, strlen(pass));
         na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
-        na->nc->flags |= NI_ENCRYPTEDPW;
-#else
-        na->nc->pass = sstrdup(pass);
-        na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
-#endif
+/*        na->nc->flags |= NI_ENCRYPTEDPW; */
+
         na->nc->flags |= NSDefFlags;
         for (i = 0; i < RootNumber; i++) {
             if (!stricmp(ServicesRoots[i], nr->nick)) {
@@ -378,9 +366,10 @@ int do_confirm(User * u)
                 notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK,
                             u->nick);
             send_event(EVENT_NICK_REGISTERED, 1, u->nick);
-#ifndef USE_ENCRYPTION
-            notice_lang(s_NickServ, u, NICK_PASSWORD_IS, na->nc->pass);
-#endif
+	    
+	    if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) 
+                notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
+
             u->lastnickreg = time(NULL);
             if (ircd->modeonreg) {
                 len = strlen(ircd->modeonreg);
@@ -507,3 +496,4 @@ int do_sendregmail(User * u, NickRequest * nr)
     MailEnd(mail);
     return 0;
 }
+

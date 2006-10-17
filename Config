@@ -53,10 +53,6 @@ if [ "$DATDEST" != "" ] ; then
     WITH_DATA=" --with-datadir=$DATDEST"
 fi
 
-if [ "$ENCRYPTION" != "" ] ; then
-    WITH_ENC=" --with-encryption"
-fi
-
 if [ "$RUNGROUP" != "" ] ; then
     WITH_RUN="  --with-rungroup=$RUNGROUP"
 fi
@@ -97,7 +93,6 @@ DATDEST=$HOME/services
 RUNGROUP=
 UMASK=
 IRCTYPE="no default"
-ENCRYPTION=
 CAN_QUICK="no"
 
 ###########################################################################
@@ -277,42 +272,6 @@ echo ""
 
 ####
 
-if [ "$ENCRYPTION" = "ENCRYPT_MD5" ] ; then
-        DEF=yes
-else
-        DEF=no
-fi
-
-ok=0
-echo "Do you want to use the MD5 message-digest algorithm to encrypt passwords?"
-echo "(Selecting "\"yes\"" protects your passwords from being stolen if someone"
-echo "gains access to the Services databases, but makes it impossible to recover"
-echo "forgotten passwords. There is no way to reverse this operation, so make"
-echo "sure you really want to enable it.)"
-while [ $ok -eq 0 ] ; do
-        echo2 "[$DEF] "
-        if read INPUT ; then : ; else echo "" ; exit 1 ; fi
-        if [ ! "$INPUT" ] ; then
-                INPUT=$DEF
-        fi
-        case $INPUT in
-                n*|N*)
-                        ENCRYPTION=
-                        ok=1
-                        ;;
-                y*|Y*)
-                        ENCRYPTION=ENCRYPT_MD5
-                        ok=1
-                        ;;
-                *)
-                        echo "Please enter 'yes' or 'no'."
-                        ;;
-        esac
-done
-echo ""
-
-####
-
 ok=0
 DEF=yes
 echo "Allow anope to automatically check for mysql libaries?"
@@ -355,7 +314,6 @@ RUNGROUP="$RUNGROUP"
 UMASK=$UMASK
 IRCTYPE="$IRCTYPE"
 IRCTYPE_DEF="$IRCTYPE_DEF"
-ENCRYPTION="$ENCRYPTION"
 MYSQL="$MYSQL"
 EOT
 echo "done."

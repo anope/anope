@@ -85,7 +85,7 @@ int do_ghost(User * u)
     } else if (stricmp(nick, u->nick) == 0) {
         notice_lang(s_NickServ, u, NICK_NO_GHOST_SELF);
     } else if (pass) {
-        int res = check_password(pass, na->nc->pass);
+        int res = enc_check_password(pass, na->nc->pass);
         if (res == 1) {
             char buf[NICKMAX + 32];
             snprintf(buf, sizeof(buf), "GHOST command used by %s",

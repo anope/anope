@@ -165,7 +165,7 @@ int do_group(User * u)
                && !nick_is_services_admin(target->nc)) {
         notice_lang(s_NickServ, u, NICK_GROUP_TOO_MANY, target->nick,
                     s_NickServ, s_NickServ);
-    } else if (check_password(pass, target->nc->pass) != 1) {
+    } else if (enc_check_password(pass, target->nc->pass) != 1) {
         alog("%s: Failed GROUP for %s!%s@%s (invalid password)",
              s_NickServ, u->nick, u->username, u->host);
         notice_lang(s_NickServ, u, PASSWORD_INCORRECT);

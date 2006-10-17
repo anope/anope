@@ -17,9 +17,6 @@
 
 int do_identify(User * u);
 void myChanServHelp(User * u);
-#ifdef _WIN32
-extern MDE int check_password(const char *plaintext, const char *password);
-#endif
 
 /**
  * Create the command, and tell anope about it.
@@ -92,7 +89,7 @@ int do_identify(User * u)
     } else {
         int res;
 
-        if ((res = check_password(pass, ci->founderpass)) == 1) {
+        if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
             if (!is_identified(u, ci)) {
                 uc = scalloc(sizeof(*uc), 1);
                 uc->next = u->founder_chans;

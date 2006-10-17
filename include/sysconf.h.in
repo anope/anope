@@ -6,9 +6,6 @@
 /* "No prefix needed for dlopen" */
 #undef DL_PREFIX
 
-/* "Use md5" */
-#undef ENCRYPT_MD5
-
 /* "Has sys/types.h" */
 #undef HAS_SYS_TYPES_H
 
@@ -140,9 +137,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
-
-/* "has encryption" */
-#undef USE_ENCRYPTION
 
 /* "Modules available" */
 #undef USE_MODULES

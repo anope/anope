@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1184"
+VERSION_BUILD="1185"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1185)
+# BUGS  : N/A
+# NOTES : Encryption now offers the choice of none, old and md5 - the md5 module is nicely taken from irc-services and actaully works, yes, real md5, in anope, wow eh?
+# 
 #
 # BUILD : 1.7.17 (1184)
 # BUGS  : 

@@ -37,15 +37,12 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);
-#ifdef USE_ENCRYPTION
-    return MOD_STOP;
-#else
+
     if (UseMail) {
         return MOD_CONT;
     } else {
         return MOD_STOP;
     }
-#endif
 }
 
 /**
@@ -89,35 +86,40 @@ int do_sendpass(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else {
         char buf[BUFSIZE];
-        MailInfo *mail;
+	char tmp_pass[PASSMAX];
+	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX)==1) {
+            MailInfo *mail;
 
-        snprintf(buf, sizeof(buf),
-                 getstring2(founder, CHAN_SENDPASS_SUBJECT), ci->name);
-        mail = MailBegin(u, founder, buf, s_ChanServ);
-        if (!mail)
-            return MOD_CONT;
+            snprintf(buf, sizeof(buf),
+                     getstring2(founder, CHAN_SENDPASS_SUBJECT), ci->name);
+            mail = MailBegin(u, founder, buf, s_ChanServ);
+            if (!mail)
+                return MOD_CONT;
 
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_HEAD));
-        fprintf(mail->pipe, "\n\n");
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_1),
-                ci->name);
-        fprintf(mail->pipe, "\n\n");
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_2),
-                ci->founderpass);
-        fprintf(mail->pipe, "\n\n");
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_3));
-        fprintf(mail->pipe, "\n\n");
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_4));
-        fprintf(mail->pipe, "\n\n");
-        fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_5),
-                NetworkName);
-        fprintf(mail->pipe, "\n.\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_HEAD));
+            fprintf(mail->pipe, "\n\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_1),
+                    ci->name);
+            fprintf(mail->pipe, "\n\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_2),
+                    tmp_pass);
+            fprintf(mail->pipe, "\n\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_3));
+            fprintf(mail->pipe, "\n\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_4));
+            fprintf(mail->pipe, "\n\n");
+            fprintf(mail->pipe, getstring2(founder, CHAN_SENDPASS_LINE_5),
+                    NetworkName);
+            fprintf(mail->pipe, "\n.\n");
+ 
+            MailEnd(mail);
 
-        MailEnd(mail);
-
-        alog("%s: %s!%s@%s used SENDPASS on %s", s_ChanServ, u->nick,
-             u->username, u->host, chan);
-        notice_lang(s_ChanServ, u, CHAN_SENDPASS_OK, chan);
+            alog("%s: %s!%s@%s used SENDPASS on %s", s_ChanServ, u->nick,
+                 u->username, u->host, chan);
+            notice_lang(s_ChanServ, u, CHAN_SENDPASS_OK, chan);
+        } else {
+	    notice_lang(s_ChanServ, u, CHAN_SENDPASS_UNAVAILABLE);
+	}
     }
     return MOD_CONT;
 }

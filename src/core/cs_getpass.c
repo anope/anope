@@ -38,11 +38,8 @@ int AnopeInit(int argc, char **argv)
     moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
     moduleSetChanHelp(myChanServHelp);
-#ifdef USE_ENCRYPTION
-    return MOD_STOP;
-#else
+
     return MOD_CONT;
-#endif
 }
 
 /**
@@ -75,6 +72,7 @@ void myChanServHelp(User * u)
 int do_getpass(User * u)
 {
     char *chan = strtok(NULL, " ");
+    char tmp_pass[PASSMAX];
     ChannelInfo *ci;
 
     if (!chan) {
@@ -86,15 +84,19 @@ int do_getpass(User * u)
     } else if (CSRestrictGetPass && !is_services_root(u)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        alog("%s: %s!%s@%s used GETPASS on %s",
-             s_ChanServ, u->nick, u->username, u->host, ci->name);
-        if (WallGetpass) {
-            anope_cmd_global(s_ChanServ,
-                             "\2%s\2 used GETPASS on channel \2%s\2",
-                             u->nick, chan);
-        }
-        notice_lang(s_ChanServ, u, CHAN_GETPASS_PASSWORD_IS,
-                    chan, ci->founderpass);
+	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX)==1) {
+            alog("%s: %s!%s@%s used GETPASS on %s",
+                 s_ChanServ, u->nick, u->username, u->host, ci->name);
+            if (WallGetpass) {
+                anope_cmd_global(s_ChanServ,
+                                 "\2%s\2 used GETPASS on channel \2%s\2",
+                                 u->nick, chan);
+            }
+            notice_lang(s_ChanServ, u, CHAN_GETPASS_PASSWORD_IS,
+                        chan, ci->founderpass);
+	} else {
+	    notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
+	}
     }
     return MOD_CONT;
 }

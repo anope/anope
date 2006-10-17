@@ -18,9 +18,8 @@
 Encryption encryption;
 
 /******************************************************************************/
-void
-encmodule_encrypt(int (*func)
-                  (const char *src, int len, char *dest, int size))
+void encmodule_encrypt(int (*func)
+                        (const char *src, int len, char *dest, int size))
 {
     encryption.encrypt = func;
 }
@@ -40,9 +39,9 @@ void encmodule_decrypt(int (*func) (const char *src, char *dest, int size))
     encryption.decrypt = func;
 }
 
-void
-encmodule_check_password(int (*func)
-                         (const char *plaintext, const char *password))
+void encmodule_check_password(int (*func)
+                               (const char *plaintext,
+                                const char *password))
 {
     encryption.check_password = func;
 }

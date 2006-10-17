@@ -72,34 +72,7 @@ var installerQuestions = [
                                                                                         }
                                                         }                                                                                                                                        
                                                 },
-                                                
-                                                {
-                                                        'question' : [
-                                                                                'Do you want to compile Anope with Encrypted Passwords?',
-                                                                                'NOTE: Once passwords are encrypted, they CANNOT be recovered!',
-                                                                                'NOTE: Enabling Encrypted Passwords will also disable GETPASS/SENDPASS'
-                                                                          ],
-                                                        'short' : 'Enable Encrypted Passwords?',
-                                                        'options' : [
-                                                                                'yes',
-                                                                                'no'
-                                                                        ],
-                                                        'default_answer' : 'no',
-                                                        'store_answer' : function (answer) {
-                                                                                        installerResponses['Encrypted Passwords'] = answer;
-                                                                                        return true;
-                                                                                  },
-                                                        'commit_config' : function() {
-                                                                                        if (installerResponses['Encrypted Passwords'] == 'yes') {
-                                                                                                f.WriteLine("DB_ENCRYPTION=1");
-                                                                                                f.WriteLine("BASE_CFLAGS=/D USE_ENCRYPTION /D ENCRYPT_MD5 $(BASE_CFLAGS)");
-                                                                                        }
-                                                                                        else {
-                                                                                                f.WriteLine("DB_ENCRYPTION=0");
-                                                                                        }    
-                                                        }
-                                                }                                           
-                                                
+                                               
                                        ];
 
 var buildPackages = [

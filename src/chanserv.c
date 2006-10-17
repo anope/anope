@@ -1022,6 +1022,7 @@ void save_cs_rdb_dbase(void)
     rdb_clear_table("anope_cs_levels");
     rdb_clear_table("anope_cs_akicks");
     rdb_clear_table("anope_cs_badwords");
+    rdb_clear_table("anope_cs_ttb");
 
     for (i = 0; i < 256; i++) {
         for (ci = chanlists[i]; ci; ci = ci->next) {

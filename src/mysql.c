@@ -246,7 +246,7 @@ char *db_mysql_secure(char *pass)
     }
 #else
 
-    if (pass) {
+    if (!pass) {
         snprintf(epass, sizeof(epass), "''");
     } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
         snprintf(epass, sizeof(epass), "'%s'", pass);
@@ -455,7 +455,7 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
              "forbidby='%s',forbidreason='%s',bantype='%d',accesscount='%d',"
              "akickcount='%d',mlock_on='%d',mlock_off='%d',mlock_limit='%d',"
              "mlock_key='%s',mlock_flood='%s',mlock_redirect='%s',entry_message='%s',"
-             "memomax='%d',botnick='%s',botflags='%d',ttb='%d',bwcount='%d',"
+             "memomax='%d',botnick='%s',botflags='%d',bwcount='%d',"
              "capsmin='%d',capspercent='%d',floodlines='%d',floodsecs='%d',"
              "repeattimes='%d',active='1' WHERE name='%s'",
              cifoundernick,
@@ -474,7 +474,6 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
              (int) ci->memos.memomax,
              cibotnick,
              (int) ci->botflags,
-             (int) ci->ttb,
              (int) ci->bwcount,
              (int) ci->capsmin,
              (int) ci->capspercent,
@@ -614,6 +613,16 @@ void db_mysql_save_cs_info(ChannelInfo * ci)
                 log_perror("Can't create sql query: %s", sqlcmd);
                 db_mysql_error(MYSQL_WARNING, "query");
             }
+        }
+    }
+
+    /* TTB's */
+    for (j = 0; j < TTB_SIZE; j++) {
+        snprintf(sqlcmd, MAX_SQL_BUF, "INSERT DELAYED INTO anope_cs_ttb (channel, ttb_id, value)"
+				      " VALUES ('%s', %d, %d)", ciname, j, ci->ttb[j]);
+        if (db_mysql_query(sqlcmd)) {
+	        log_perror("Can't create sql query: %s", sqlcmd);
+                db_mysql_error(MYSQL_WARNING, "query");
         }
     }
 
@@ -1148,7 +1157,7 @@ void db_mysql_load_cs_dbase(void)
         return;
 
     snprintf(sqlcmd, MAX_SQL_BUF,
-             "SELECT `name`,`founder`,`successor`,`founderpass`,`descr`,`url`,`email`,`time_registered`,`last_used`,`last_topic`,`last_topic_setter`,`last_topic_time`,`flags`,`forbidby`,`forbidreason`,`bantype`,`accesscount`,`akickcount`,`mlock_on`,`mlock_off`,`mlock_limit`,`mlock_key`,`mlock_flood`,`mlock_redirect`,`entry_message`,`memomax`,`botnick`,`botflags`,`ttb`,`bwcount`,`capsmin`,`capspercent`,`floodlines`,`floodsecs`,`repeattimes` FROM `anope_cs_info`");
+             "SELECT `name`,`founder`,`successor`,`founderpass`,`descr`,`url`,`email`,`time_registered`,`last_used`,`last_topic`,`last_topic_setter`,`last_topic_time`,`flags`,`forbidby`,`forbidreason`,`bantype`,`accesscount`,`akickcount`,`mlock_on`,`mlock_off`,`mlock_limit`,`mlock_key`,`mlock_flood`,`mlock_redirect`,`entry_message`,`memomax`,`botnick`,`botflags`,`bwcount`,`capsmin`,`capspercent`,`floodlines`,`floodsecs`,`repeattimes` FROM `anope_cs_info`");
     if (db_mysql_query(sqlcmd)) {
         log_perror("Can't create sql query: %s", sqlcmd);
         db_mysql_error(MYSQL_WARNING, "query");
@@ -1323,15 +1332,27 @@ void db_mysql_load_cs_dbase(void)
 
         ci->bi = findbot(mysql_row[26]);
         ci->botflags = atoi(mysql_row[27]);
-        ci->ttb = scalloc(2 * TTB_SIZE, 1);
-        for (j = 0; j < TTB_SIZE; j++) {
-            ci->ttb[j] = 0;
-        }
         ci->capsmin = atoi(mysql_row[30]);
         ci->capspercent = atoi(mysql_row[31]);
         ci->floodlines = atoi(mysql_row[32]);
         ci->floodsecs = atoi(mysql_row[33]);
         ci->repeattimes = atoi(mysql_row[34]);
+
+        ci->ttb = scalloc(2 * TTB_SIZE, 1);
+        snprintf(sqlcmd, MAX_SQL_BUF, "SELECT `ttb_id`, `value` FROM `anope_cs_ttb` WHERE `channel` = '%s'", tempstr);
+        if (db_mysql_query(sqlcmd)) {
+            log_perror("Can't create sql query: %s", sqlcmd);
+            db_mysql_error(MYSQL_WARNING, "query");
+        }
+        res = mysql_store_result(mysql);
+        while ((row = mysql_fetch_row(res))) {
+	    j = atoi(row[0]);
+	    ci->ttb[j] = atoi(row[1]);
+        }
+        for (j = 0; j < TTB_SIZE; j++) {
+	    if (!ci->ttb[j])
+	        ci->ttb[j] = 0;
+        }
 
         ci->bwcount = atoi(mysql_row[29]);
         if (ci->bwcount) {

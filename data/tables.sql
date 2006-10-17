@@ -111,7 +111,6 @@ CREATE TABLE anope_cs_info (
   memomax smallint(5) unsigned NOT NULL default '0',
   botnick varchar(255) NOT NULL default '',
   botflags int(10) unsigned NOT NULL default '0',
-  ttb smallint(6) NOT NULL default '0',
   bwcount smallint(6) NOT NULL default '0',
   capsmin smallint(6) NOT NULL default '0',
   capspercent smallint(6) NOT NULL default '0',
@@ -135,6 +134,18 @@ CREATE TABLE anope_cs_levels (
   position int(11) NOT NULL default '0',
   level int(11) NOT NULL default '0',
   PRIMARY KEY  (cl_id)
+) TYPE=MyISAM;
+
+--
+-- Table structure for table `anope_cs_ttb`
+--
+DROP TABLE IF EXISTS anope_cs_ttb;
+CREATE TABLE anope_cs_ttb (
+  ct_id int(11) NOT NULL auto_increment,
+  channel varchar(255) NOT NULL default '',
+  ttb_id int(11) NOT NULL default '0',
+  value int(11) NOT NULL default '0',
+  PRIMARY KEY  (ct_id)
 ) TYPE=MyISAM;
 
 --

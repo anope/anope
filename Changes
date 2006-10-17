@@ -5,7 +5,9 @@ Anope Version  S V N
 10/16 F MySQL functions did not always escape all values correctly.       [#612]
 10/16 F Made anoperc restart to accepts arguments like anoperc start.     [#611]
 10/16 F MySQL query debug quoted displayed queries just a tad too much.   [ #00]
-01/16 F MySQL query error in RDB functions.                               [ #00]
+10/16 F MySQL query error in RDB functions.                               [ #00]
+10/17 F Erroneous code caused MySQL to store all passwords as blank.      [#614]
+10/17 F Saving of ttb-data when using MySQL.                              [ #00]
 
 Anope Version 1.7.16
 --------------------

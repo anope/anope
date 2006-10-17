@@ -1,6 +1,13 @@
 Anope Version  S V N
 --------------------
-- NONE
+- CREATE TABLE anope_cs_ttb (
+   ct_id int(11) NOT NULL auto_increment,
+   channel varchar(255) NOT NULL default '',
+   ttb_id int(11) NOT NULL default '0',
+   value int(11) NOT NULL default '0',
+   PRIMARY KEY  (ct_id)
+  ) TYPE=MyISAM
+- ALTER TABLE anope_cs_info DROP ttb
 
 Anope Version 1.7.16
 --------------------

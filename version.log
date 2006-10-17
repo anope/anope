@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="16"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1179"
+VERSION_BUILD="1180"
 
 # $Log$
+#
+# BUILD : 1.7.16 (1180)
+# BUGS  : 614
+# NOTES : Fixed: [1] MySQL not storing passwords at all (blank passes) [2] saving of ttb with MySQL/RDB was completely fubar [3] do not send PONG-flood anymore on db-load...
 #
 # BUILD : 1.7.16 (1179)
 # BUGS  : 

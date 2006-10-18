@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1188"
+VERSION_BUILD="1189"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1189)
+# BUGS  : 
+# NOTES : Support for mlocking +c on ultimate3 was missing
 #
 # BUILD : 1.7.17 (1188)
 # BUGS  : N/A

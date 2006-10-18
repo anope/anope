@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 10/17 F Encryption, users can now pick none, old or real md5.             [ #00]
+10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
 
 Anope Version 1.7.17
 --------------------

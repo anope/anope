@@ -350,7 +350,12 @@ int md5_encrypt(const char *src, int len, char *dest, int size)
     if(debug) {
         memset(tmp,0,33);
         binary_to_hex(dest,tmp,16);
-        alog("enc_md5: Converted [%s] to [%s]",src,tmp); 
+	/* Dont log source if we were encrypting in place :) */
+        if (memcmp(src, dest, 16) != 0) {
+            alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
+	} else {
+            alog("enc_md5: hashed password to [%s]",tmp); 
+	}
     }
     
     return 0;

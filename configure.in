@@ -116,7 +116,23 @@ AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to fin
 		fi
 	fi
 ])
-																																																																																																																																															
+
+AC_MSG_CHECKING(whether this is a bit or little endian system)
+AC_TRY_RUN([
+int main()
+{
+	short s = 1;
+	short* ptr = &s;
+	unsigned char c = *((char*)ptr);
+	return c;	
+}
+]
+, AC_DEFINE(BIG_ENDIAN)
+  AC_MSG_RESULT(big)
+, AC_DEFINE(LITTLE_ENDIAN) 
+  AC_MSG_RESULT(little)
+)
+
 AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 

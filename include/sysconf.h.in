@@ -161,6 +161,26 @@
 
 /* Static config, copy from here to below before running autoheader! */
 
+#ifndef BIG_ENDIAN
+
+/* Big Endian system */
+#undef BIG_ENDIAN
+
+#endif
+
+#ifndef LITTLE_ENDIAN
+
+/* Little Endian system */
+#undef LITTLE_ENDIAN
+
+#endif
+
+/**
+ * NOTE: BIG_ENDIAN and LITTLE_ENDIAN defines should not be left in
+ * by autoheader as they may be defined or may not be, as such we check
+ * if there defined before messing with them!
+ **/
+
 #ifdef HAS_SYS_TYPES_H
 #include <sys/types.h>
 #endif

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1186"
+VERSION_BUILD="1187"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1187)
+# BUGS  : N/A
+# NOTES : Put mysql secure back to how it should be - i think
 #
 # BUILD : 1.7.17 (1186)
 # BUGS  : N/A

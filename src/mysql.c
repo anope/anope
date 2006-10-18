@@ -238,12 +238,13 @@ char *db_mysql_secure(char *pass)
 
     /* Initialize the buffer. Bug #86 */
     memset(epass, '\0', BUFSIZE);
+    memset(tmp_pass, 0, PASSMAX);
 
     /* We couldnt decrypt the pass... */
     if(enc_decrypt(pass,tmp_pass,PASSMAX)!=1) { 
         snprintf(epass, sizeof(epass), "'%s'", pass);
     } else { /* if we could decrypt the pass */
-        if (tmp_pass) {
+        if (!tmp_pass) {
             snprintf(epass, sizeof(epass), "''");
         } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
             snprintf(epass, sizeof(epass), "'%s'", tmp_pass);
@@ -258,7 +259,6 @@ char *db_mysql_secure(char *pass)
                      MysqlSecure);
 	}
     }
-
     return sstrdup(epass);
 }
 

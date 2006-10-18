@@ -244,7 +244,7 @@ char *db_mysql_secure(char *pass)
     if(enc_decrypt(pass,tmp_pass,PASSMAX)!=1) { 
         snprintf(epass, sizeof(epass), "'%s'", pass);
     } else { /* if we could decrypt the pass */
-        if (!tmp_pass) {
+        if (!pass) {
             snprintf(epass, sizeof(epass), "''");
         } else if ((!MysqlSecure) || (strcmp(MysqlSecure, "") == 0)) {
             snprintf(epass, sizeof(epass), "'%s'", tmp_pass);

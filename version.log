@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1187"
+VERSION_BUILD="1188"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1188)
+# BUGS  : N/A
+# NOTES : Make the mysql secure check easier to read... its ugly :(
+# 
 #
 # BUILD : 1.7.17 (1187)
 # BUGS  : N/A

@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1190"
+VERSION_BUILD="1191"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1191)
+# BUGS  : 616
+# NOTES : Error message changed when trying to register a nick before NSRegDelay is up.
+# 
 #
 # BUILD : 1.7.17 (1190)
 # BUGS  : N/A

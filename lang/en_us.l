@@ -335,7 +335,7 @@ NICK_REGISTERED_NO_MASK
 NICK_PASSWORD_IS
 	Your password is %s - remember this for later use.
 NICK_REG_DELAY
-	You have to be connected longer than %d seconds to register your nick.
+	You must have been using this nick for at least %d seconds to register.
 
 # GROUP responses
 NICK_GROUP_SYNTAX

@@ -2,6 +2,7 @@ Anope Version  S V N
 --------------------
 10/17 F Encryption, users can now pick none, old, md5 or sha1.            [ #00]
 10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
+10/20 F Error message when unable to register due to NSRegDelay.          [#616]
 
 Anope Version 1.7.17
 --------------------

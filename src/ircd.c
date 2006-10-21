@@ -607,7 +607,7 @@ void anope_cmd_svsjoin(char *source, char *nick, char *chan)
 
 void anope_cmd_svspart(char *source, char *nick, char *chan)
 {
-    ircdproto.ircd_cmd_eob(source, nick, chan);
+    ircdproto.ircd_cmd_svspart(source, nick, chan);
 }
 
 void anope_cmd_swhois(char *source, char *who, char *mask)

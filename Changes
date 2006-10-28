@@ -5,7 +5,6 @@ Anope Version  S V N
 10/20 F Error message when unable to register due to NSRegDelay.          [#616]
 10/21 F svspart sends svspart instead of eob.                             [#617]
 
-
 Anope Version 1.7.17
 --------------------
 10/15 F MySQL detection now checks for valid values from mysql_config.    [ #00]

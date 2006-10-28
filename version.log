@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1192"
+VERSION_BUILD="1193"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1193)
+# BUGS  : N/A
+# NOTES : really just making sure i can still commit properly
 #
 # BUILD : 1.7.17 (1192)
 # BUGS  : 617

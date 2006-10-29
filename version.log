@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1193"
+VERSION_BUILD="1194"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1194)
+# BUGS  : N/A
+# NOTES : Hmm it sent the mail but didnt commit... 
 #
 # BUILD : 1.7.17 (1193)
 # BUGS  : N/A

@@ -148,8 +148,6 @@ int do_register(User * u)
             notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX);
         memset(pass, 0, strlen(pass));
         memcpy(ci->founderpass, founderpass, PASSMAX);
-//        ci->flags |= CI_ENCRYPTEDPW;
-//
         ci->desc = sstrdup(desc);
         if (c->topic) {
             ci->last_topic = sstrdup(c->topic);

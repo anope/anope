@@ -23,7 +23,7 @@ my $fhint="version.log";
 
 # Default values, change or use environment variables instead.
 my $copy="anope";
-my $svnuser="geniusdex";
+my $svnuser="rob";
 my $svnpath="/usr/bin";
 my $svnroot="svn://zero.org/repos/$copy";
 my $editor="/usr/bin/mcedit";

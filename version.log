@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1195"
+VERSION_BUILD="1196"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1196)
+# BUGS  : 623
+# NOTES : Applied marks 623 patch, didnt apply the 621 patch as only en_us.l has been updated in it.
+# 
 #
 # BUILD : 1.7.17 (1195)
 # BUGS  : N/A

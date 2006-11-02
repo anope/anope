@@ -4,6 +4,8 @@ Anope Version  S V N
 10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
 10/20 F Error message when unable to register due to NSRegDelay.          [#616]
 10/21 F svspart sends svspart instead of eob.                             [#617]
+11/02 F hs_request no longer returns MOD_STOP.                            [ #00]
+11/02 F anoperc sends correct signalls.                                   [#623]
 
 Anope Version 1.7.17
 --------------------

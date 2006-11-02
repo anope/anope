@@ -98,14 +98,14 @@ elif [ "$1" = "status" ] ; then
 elif [ "$1" = "restart" ] ; then
 	isAnopeRunning
 	echo "Restarting Anope"
-	kill -15 `cat $ANOPEPID`
+	kill -1 `cat $ANOPEPID`
 	sleep 1
 	$ANOPROG $*
 
 elif [ "$1" = "rehash" ] ; then
 	isAnopeRunning
 	echo "Saving Databases and Rehashing Configuration"
-	kill -1 `cat $ANOPEPID`
+	kill -12 `cat $ANOPEPID`
 
 elif [ "$1" = "version" ] ; then
 	$ANOPROG -version

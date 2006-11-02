@@ -171,7 +171,7 @@ int hs_do_request(User * u)
         if (rawhostmask)
             free(rawhostmask);
         moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-        return MOD_STOP;
+        return MOD_CONT;
     }
 
     vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);    /* Get the first substring, @ as delimiter */
@@ -180,20 +180,20 @@ int hs_do_request(User * u)
         if (!rawhostmask) {
             moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
             free(vIdent);
-            return MOD_STOP;
+            return MOD_CONT;
         }
         if (strlen(vIdent) > USERMAX - 1) {
             notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
             free(vIdent);
             free(rawhostmask);
-            return MOD_STOP;
+            return MOD_CONT;
         } else {
             for (s = vIdent; *s; s++) {
                 if (!my_isvalidchar(*s)) {
                     notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
                     free(vIdent);
                     free(rawhostmask);
-                    return MOD_STOP;
+                    return MOD_CONT;
                 }
             }
         }
@@ -201,7 +201,7 @@ int hs_do_request(User * u)
             notice_lang(s_HostServ, u, HOST_NO_VIDENT);
             free(vIdent);
             free(rawhostmask);
-            return MOD_STOP;
+            return MOD_CONT;
         }
     }
     if (strlen(rawhostmask) < HOSTMAX - 1) {
@@ -211,7 +211,7 @@ int hs_do_request(User * u)
         if (vIdent)
             free(vIdent);
         free(rawhostmask);
-        return MOD_STOP;
+        return MOD_CONT;
     }
 
     if (!isValidHost(hostmask, 3)) {
@@ -219,7 +219,7 @@ int hs_do_request(User * u)
         if (vIdent)
             free(vIdent);
         free(rawhostmask);
-        return MOD_STOP;
+        return MOD_CONT;
     }
 
     tmp_time = time(NULL);
@@ -233,7 +233,7 @@ int hs_do_request(User * u)
                 if (vIdent)
                     free(vIdent);
                 free(rawhostmask);
-                return MOD_STOP;
+                return MOD_CONT;
             }
         }
         my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
@@ -249,7 +249,7 @@ int hs_do_request(User * u)
         free(vIdent);
     free(rawhostmask);
 
-    return MOD_STOP;
+    return MOD_CONT;
 }
 
 void my_memo_lang(User * u, char *name, int z, int number, ...)
@@ -359,7 +359,7 @@ int hs_do_reject(User * u)
         moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
         if (reason)
             free(reason);
-        return MOD_STOP;
+        return MOD_CONT;
     }
 
     tmp = findHostCore(hs_request_head, nick, &found);
@@ -389,7 +389,7 @@ int hs_do_reject(User * u)
     if (reason)
         free(reason);
 
-    return MOD_STOP;
+    return MOD_CONT;
 }
 
 int hs_do_activate(User * u)
@@ -405,7 +405,7 @@ int hs_do_activate(User * u)
 
     if (!nick) {
         moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-        return MOD_STOP;
+        return MOD_CONT;
     }
 
     if ((na = findnick(nick))) {
@@ -434,7 +434,7 @@ int hs_do_activate(User * u)
     }
 
     free(nick);
-    return MOD_STOP;
+    return MOD_CONT;
 }
 
 
@@ -483,7 +483,7 @@ int hs_do_list_out(User * u)
 
     show_list(u);
 
-    return MOD_STOP;
+    return MOD_CONT;
 }
 
 int hs_do_waiting(User * u)

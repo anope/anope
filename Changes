@@ -4,10 +4,11 @@ Anope Version  S V N
 10/17 F Encryption, users can now pick none, old, md5 or sha1.            [ #00]
 10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
 10/20 F Error message when unable to register due to NSRegDelay.          [#616]
-10/21 F svspart sends svspart instead of eob.                             [#617]
-11/02 F hs_request no longer returns MOD_STOP.                            [ #00]
-11/02 F anoperc sends correct signalls.                                   [#623]
+10/21 F SVSPART sends SVSPART instead of EOB.                             [#617]
+11/02 F HostServ REQUEST module no longer returns MOD_STOP.               [ #00]
+11/02 F AnopeRC sends correct signals.                                    [#623]
 12/07 F BotServ KICK incorrectly reported assigned status of bots.        [#632]
+12/07 F Windows install.js script is now able to check multiple drives.   [#634]
 12/09 F Reviewed and updated all of the MySQL code.                       [ #00]
 
 Anope Version 1.7.17

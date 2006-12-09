@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1200"
+VERSION_BUILD="1201"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1201)
+# BUGS  : 634
+# NOTES : Fixed install.js by adding the possibility to search for files on multiple drives instead of just C:
 #
 # BUILD : 1.7.17 (1200)
 # BUGS  : 632

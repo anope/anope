@@ -15,7 +15,7 @@
 
 var anopeVersion = "Unknown";
 var vMaj, vMin, vPat, vBuild, vExtra;
-var defaultDrive = "C";
+var drivesToCheck = ['C', 'D', 'E', 'F', 'G', 'H'];
 
 var installerResponses = new Array();
 var softwareVersions = {
@@ -41,11 +41,6 @@ var installerQuestions = [
                                                                                                         WScript.Echo("\nERROR: Cannot find MySQL - See error messages above for details.\n");
                                                                                                         return false;
                                                                                                 }
-                                                                                                if (!moveMySQLDll()) {
-                                                                                                        WScript.Echo("\nNOTICE: The libmysql.dll file could not be moved into the current directory.");
-                                                                                                        WScript.Echo("You may receive errors about this file not being found when run.");
-                                                                                                        WScript.Echo("Just manually find this file and place it in this folder.\n");        
-                                                                                                }
                                                                                         }
                                                                                         installerResponses['MySQL DB Support'] = answer;
                                                                                         return true;
@@ -53,8 +48,8 @@ var installerQuestions = [
                                                         'commit_config' : function() {
                                                                                         if (installerResponses['MySQL DB Support'] == 'yes') {
                                                                                                 f.WriteLine("USE_MYSQL=1");
-                                                                                                f.WriteLine("MYSQL_LIB=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].libpaths[0]+"\"");
-                                                                                                f.WriteLine("MYSQL_INC=\""+defaultDrive+":\\"+softwareVersions['MySQLDB'].incpaths[0]+"\"");
+                                                                                                f.WriteLine("MYSQL_LIB=\""+softwareVersions['MySQLDB'].installedDrive+":\\"+softwareVersions['MySQLDB'].libpaths[0]+"\"");
+                                                                                                f.WriteLine("MYSQL_INC=\""+softwareVersions['MySQLDB'].installedDrive+":\\"+softwareVersions['MySQLDB'].incpaths[0]+"\"");
                                                                                                 f.WriteLine("LIBS=$(LIBS) /LIBPATH:$(MYSQL_LIB)");
                                                                                                 f.WriteLine("MYSQL_LIB_PATH=/LIBPATH:$(MYSQL_LIB)");
                                                                                                 f.WriteLine("BASE_CFLAGS=$(BASE_CFLAGS) /I $(MYSQL_INC)");
@@ -93,7 +88,8 @@ var buildPackages = [
                                                                         ],
                                                         'additional_switches' : [
                                                                                                 '/w'
-                                                                                           ]
+                                                                      	],
+							'installedDrive' : 'C'
                                         },
                                         {                                        
                                                         'name' : 'Microsoft Visual Studio 2005 (Old PSDK)',
@@ -111,7 +107,8 @@ var buildPackages = [
                                                                         ],
                                                         'additional_switches' : [
                                                                                                 '/w'
-                                                                                           ]
+                                                               		],
+							'installedDrive' : 'C'
                                         },
                                         
                                         {
@@ -128,7 +125,8 @@ var buildPackages = [
                                                                                 'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Bin',
                                                                                 ''
                                                                         ],                                                                    
-                                                        'additional_switches' : false
+                                                        'additional_switches' : false,
+							'installedDrive' : 'C'
                                         },
 
                                         {
@@ -145,7 +143,8 @@ var buildPackages = [
                                                                         ],
                                                         'additional_switches' : [
                                                                                                  '/QIfist'
-                                                                                           ]
+                                                                    	],
+							'installedDrive' : 'C'
                                         }
                                         
                                 ];                  
@@ -153,14 +152,15 @@ var buildPackages = [
                                 
         var mysqlVersions = [
 						{
-								'name' : 'MySQL 5.1',
-								'libpaths' : [
-										  'Program Files\\MySQL\\MySQL Server 5.1\\Lib\\opt'
-									],
-								'incpaths' : [
-										  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
-									],
-								'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll'
+							'name' : 'MySQL 5.1',
+							'libpaths' : [
+									  'Program Files\\MySQL\\MySQL Server 5.1\\Lib\\opt'
+								],
+							'incpaths' : [
+									  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
+								],
+							'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll',
+							'installedDrive' : 'C'
 						},
 
                                                 {
@@ -171,7 +171,8 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 5.0\\Include'
                                                                         ],
-                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.0\\Bin\\libmysql.dll'                                                                        
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.0\\Bin\\libmysql.dll', 
+							'installedDrive' : 'C'
                                                 },
                                                 
                                                 {
@@ -182,8 +183,9 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 4.1\\Include'
                                                                         ],
-                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.1\\Bin\\libmysql.dll'                                                                        
-                                                },        
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.1\\Bin\\libmysql.dll', 
+                                                	'installedDrive' : 'C'
+						},        
                                                 
                                                 {
                                                         'name' : 'MySQL 4.0',
@@ -193,7 +195,8 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'Program Files\\MySQL\\MySQL Server 4.0\\Include'
                                                                         ],
-                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.0\\Bin\\libmysql.dll'                                                                        
+                                                        'dllfile' : 'Program Files\\MySQL\\MySQL Server 4.0\\Bin\\libmysql.dll',
+							'installedDrive' : 'C'
                                                 },                                                                                                                                                                           
                                                         
                                                 {
@@ -204,7 +207,8 @@ var buildPackages = [
                                                         'incpaths' : [
                                                                                 'mysql\\include'
                                                                         ],
-                                                        'dllfile' : 'mysql\\Bin\\libmysql.dll'                                                                        
+                                                        'dllfile' : 'mysql\\Bin\\libmysql.dll',
+							'installedDrive' : 'C'                               
                                                 }
 
                                 ];                  
@@ -316,14 +320,14 @@ var buildPackages = [
                 }
                 var path_line = '';
                 for (x in softwareVersions['Compiler'].libpaths) {
-                        path_line += "/LIBPATH:\""+defaultDrive+":\\"+softwareVersions['Compiler'].libpaths[x]+"\" ";
+                        path_line += "/LIBPATH:\""+softwareVersions['Compiler'].installedDrive+":\\"+softwareVersions['Compiler'].libpaths[x]+"\" ";
                 }
                 f.WriteLine("LIBPATH="+path_line);
                 path_line = '';
                 var path_line_rc = '';
                 for (x in softwareVersions['Compiler'].incpaths) {
-                        path_line += "/I \""+defaultDrive+":\\"+softwareVersions['Compiler'].incpaths[x]+"\" ";
-                        path_line_rc += "/i \""+defaultDrive+":\\"+softwareVersions['Compiler'].incpaths[x]+"\" ";
+                        path_line += "/I \""+softwareVersions['Compiler'].installedDrive+":\\"+softwareVersions['Compiler'].incpaths[x]+"\" ";
+                        path_line_rc += "/i \""+softwareVersions['Compiler'].installedDrive+":\\"+softwareVersions['Compiler'].incpaths[x]+"\" ";
                 }
                 f.WriteLine("INCFLAGS="+path_line);
                 f.WriteLine("VERSION="+anopeVersion);
@@ -408,10 +412,11 @@ var buildPackages = [
         
         function findMySQL() {
                 WScript.Echo("\nLooking for MySQL...\n");
+		var installedDrive = "";
                 for (x in mysqlVersions) {
                         var thisSQLVer = mysqlVersions[x];
                         WScript.Echo("Looking for: "+thisSQLVer.name+"...");
-                        if (!findFile("libmysql.lib", thisSQLVer.libpaths)) {
+                        if (!(installedDrive = findFile("libmysql.lib", thisSQLVer.libpaths))) {
                                 WScript.Echo("ERROR: Cannot find libmysql.lib - This version is probably not installed...\n");
                                 continue;
                         }
@@ -420,32 +425,21 @@ var buildPackages = [
                                 continue;
                         }
                         WScript.Echo("SUCCESS: "+thisSQLVer.name+" is installed, and is complete!\n");
+			thisSQLVer.installedDrive = installedDrive;
                         softwareVersions.MySQLDB = thisSQLVer;
                         return true;
                 }
                 return false;
         }
         
-        function moveMySQLDll() {
-                if (!fso.FileExists(defaultDrive + ":\\" + softwareVersions['MySQLDB'].dllfile)) {
-                        WScript.Echo("DEBUG: The libmysql.dll could not be found at '"+defaultDrive+":\\"+softwareVersions['MySQLDB'].dllfile);
-                        return false;
-                }
-                fso.CopyFile(defaultDrive+":\\"+softwareVersions['MySQLDB'].dllfile, "libmysql.dll");
-                if (!fso.FileExists("libmysql.dll")) {
-                        WScript.Echo("DEBUG: The libmyql.dll file could not be copied to the working directory");
-                        return false;
-                }
-                return true;
-        }
-        
         function findCompiler() {
                 WScript.Echo("\nLooking for a suitable compiler...\n");
-                var noPSDK = false;                
+                var noPSDK = false;
+		var installedDrive = "";                
                 for (x in buildPackages) {
                         var thisPack = buildPackages[x];
                         WScript.Echo("Looking for: "+thisPack.name+"...");
-                        if (!findFile("MSVCRT.lib", thisPack.libpaths)) {
+                        if (!(installedDrive = findFile("MSVCRT.lib", thisPack.libpaths))) {
                                 WScript.Echo("ERROR: Cannot find MSVCRT.lib - This version is probably not installed...\n");
                                 continue;
                         }
@@ -477,6 +471,7 @@ var buildPackages = [
                                 break;
                         }                                
                         WScript.Echo("SUCCESS: "+thisPack.name+" was found, and is complete!");
+			thisPack.installedDrive = installedDrive;
                         softwareVersions.Compiler = thisPack;
                         return true;
                 }
@@ -492,10 +487,13 @@ var buildPackages = [
         function findFile(fileName, arrayOfPaths) {
                 for (z in arrayOfPaths) {
                         var thisPath = arrayOfPaths[z];
-                        if (fso.FileExists(defaultDrive+":\\"+thisPath+"\\"+fileName)) {
-                                return true;
-                        }
-                }
+			for (y in drivesToCheck) {
+	                	var thisDrive = drivesToCheck[y];
+			        if (fso.FileExists(thisDrive+":\\"+thisPath+"\\"+fileName)) {
+        	                        return thisDrive;
+                	        }
+                	}
+		}
                 return false;                                
         }
         

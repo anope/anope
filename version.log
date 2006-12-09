@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1202"
+VERSION_BUILD="1203"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1203)
+# BUGS  : 
+# NOTES : Small MySQL fix which should have already been in
 #
 # BUILD : 1.7.17 (1202)
 # BUGS  : 640

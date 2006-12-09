@@ -899,7 +899,7 @@ void db_mysql_save_news(NewsItem * ni)
     q_text = db_mysql_quote(ni->text);
     q_who = db_mysql_quote(ni->who);
 
-    db_mysql_try("UPDATE anope_os_news SET ntext = '%s', who = '%s' "
+    db_mysql_try("UPDATE anope_os_news SET ntext = '%s', who = '%s', "
                  "active = 1 WHERE type = %d AND num = %d AND `time` = %d",
                  q_text, q_who, ni->type, ni->num, (int) ni->time);
     if (mysql_affected_rows(mysql) == 0) {

@@ -2669,7 +2669,7 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Az AKILL lista törölve.
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+lejárat] {#szoba} [indok]
+	CHANKILL [+lejárat] {#szoba} [indok]
 
 # SGLINE válaszok
 OPER_SGLINE_SYNTAX

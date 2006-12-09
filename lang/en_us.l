@@ -2626,7 +2626,7 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	The AKILL list has been cleared.
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+expiry] {#channel} [reason]
+	CHANKILL [+expiry] {#channel} [reason]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiry] {mask | entry-list}[:reason]]

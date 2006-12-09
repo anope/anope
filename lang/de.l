@@ -2674,7 +2674,7 @@ OPER_AKILL_CLEAR
 	
 # SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+Zeit] {Channel} [Grund]
+	CHANKILL [+Zeit] {Channel} [Grund]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+Zeit] {Hostmask | entry-liste}[:Grund]]

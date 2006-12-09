@@ -2730,7 +2730,7 @@ OPER_AKILL_CLEAR
 
 # SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+expiry] {#canal} [raison]
+	CHANKILL [+expiry] {#canal} [raison]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+échéance] {masque | liste d'entrées} [raison]]

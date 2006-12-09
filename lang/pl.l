@@ -2871,7 +2871,7 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	Lista AKILL zosta³a wyczyszczona.
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+czastrwania] {#kana³} [powód]
+	CHANKILL [+czastrwania] {#kana³} [powód]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+czaswygasania] {maska | pozycja}[:powód]]

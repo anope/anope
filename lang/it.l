@@ -2634,7 +2634,7 @@ OPER_AKILL_VIEW_FORMAT
 OPER_AKILL_CLEAR
 	La lista AKILL è stata svuotata.
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+scadenza] {#canale} [motivo]
+	CHANKILL [+scadenza] {#canale} [motivo]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+durata] {mask | numero-lista}[:motivo]]

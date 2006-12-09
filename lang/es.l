@@ -2680,7 +2680,7 @@ OPER_AKILL_CLEAR
 	
 # SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANAKILL [+expiry] {#channel} [reason]
+	CHANKILL [+expiry] {#channel} [reason]
 # SGLINE responses
 OPER_SGLINE_SYNTAX
 	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+expiracion] {mascara | lista}[:razon]]

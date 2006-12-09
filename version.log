@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1199"
+VERSION_BUILD="1200"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1200)
+# BUGS  : 632
+# NOTES : Fixed BotServ KICK incorrectly reporting assigned status
 #
 # BUILD : 1.7.17 (1199)
 # BUGS  : 621

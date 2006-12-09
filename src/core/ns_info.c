@@ -240,6 +240,12 @@ int do_info(User * u)
                                 getstring(u->na, NICK_INFO_OPT_MSG));
                 need_comma = 1;
             }
+            if (!(na->nc->flags & NI_AUTOOP)) {
+                end += snprintf(end, sizeof(buf) - (end - buf), "%s%s",
+                                need_comma ? commastr : "",
+                                getstring(u->na, NICK_INFO_OPT_AUTOOP));
+                need_comma = 1;
+            }
 
             notice_lang(s_NickServ, u, NICK_INFO_OPTIONS,
                         *buf ? buf : getstring(u->na, NICK_INFO_OPT_NONE));

@@ -748,6 +748,8 @@ NICK_INFO_OPT_PRIVATE
 	Приватность
 NICK_INFO_OPT_MSG
 	Режим приватных сообщений
+NICK_INFO_OPT_AUTOOP
+	Auto-op
 NICK_INFO_OPT_NONE
 	нет
 NICK_INFO_NO_EXPIRE

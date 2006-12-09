@@ -6,6 +6,7 @@ Anope Version  S V N
 10/21 F svspart sends svspart instead of eob.                             [#617]
 11/02 F hs_request no longer returns MOD_STOP.                            [ #00]
 11/02 F anoperc sends correct signalls.                                   [#623]
+12/09 F Reviewed and updated all of the MySQL code.                       [ #00]
 
 Anope Version 1.7.17
 --------------------

@@ -540,13 +540,16 @@ void save_bs_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_clear_table("anope_bs_core");
+    rdb_tag_table("anope_bs_core");
 
     for (i = 0; i < 256; i++) {
         for (bi = botlists[i]; bi; bi = bi->next) {
             rdb_save_bs_core(bi);
         }
     }
+
+    rdb_clean_table("anope_bs_core");
+
     rdb_close();
 #endif
 }

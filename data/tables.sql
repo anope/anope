@@ -27,6 +27,7 @@ CREATE TABLE anope_bs_core (
   flags int(11) NOT NULL default '0',
   created int(11) NOT NULL default '0',
   chancount int(11) NOT NULL default '0',
+  active int(1) NOT NULL default '1',
   PRIMARY KEY  (bs_id),
   UNIQUE KEY nick (nick),
   KEY nick_index (nick(10))
@@ -44,6 +45,7 @@ CREATE TABLE anope_cs_access (
   display varchar(255) NOT NULL default '',
   channel varchar(255) NOT NULL default '',
   last_seen int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (ca_id)
 ) TYPE=MyISAM;
 
@@ -60,6 +62,7 @@ CREATE TABLE anope_cs_akicks (
   reason text NOT NULL,
   creator text NOT NULL,
   addtime int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (ck_id)
 ) TYPE=MyISAM;
 
@@ -73,6 +76,7 @@ CREATE TABLE anope_cs_badwords (
   channel varchar(255) NOT NULL default '',
   word text NOT NULL,
   type int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (cw_id)
 ) TYPE=MyISAM;
 
@@ -133,6 +137,7 @@ CREATE TABLE anope_cs_levels (
   channel varchar(255) NOT NULL default '',
   position int(11) NOT NULL default '0',
   level int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (cl_id)
 ) TYPE=MyISAM;
 
@@ -145,6 +150,7 @@ CREATE TABLE anope_cs_ttb (
   channel varchar(255) NOT NULL default '',
   ttb_id int(11) NOT NULL default '0',
   value int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (ct_id)
 ) TYPE=MyISAM;
 
@@ -160,6 +166,7 @@ CREATE TABLE anope_hs_core (
   vhost text NOT NULL,
   creator text NOT NULL,
   time int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (bs_id),
   UNIQUE KEY nick (nick),
   KEY nick_index (nick(10))
@@ -179,6 +186,7 @@ CREATE TABLE anope_ms_info (
   sender text NOT NULL,
   text blob NOT NULL,
   serv enum('NICK','CHAN') NOT NULL default 'NICK',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (nm_id)
 ) TYPE=MyISAM;
 
@@ -191,6 +199,7 @@ CREATE TABLE anope_ns_access (
   na_id int(11) NOT NULL auto_increment,
   display varchar(255) NOT NULL default '',
   access text NOT NULL,
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (na_id)
 ) TYPE=MyISAM;
 
@@ -253,7 +262,7 @@ CREATE TABLE anope_ns_request (
   password tinyblob NOT NULL,
   email text NOT NULL,
   requested int(11) NOT NULL default '0',
-  active int(1) NOT NULL default '1',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (nr_id),
   UNIQUE KEY nick (nick),
   KEY nick_index (nick(10))
@@ -272,6 +281,7 @@ CREATE TABLE anope_os_akills (
   reason text NOT NULL,
   seton int(11) NOT NULL default '0',
   expire int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (ok_id)
 ) TYPE=MyISAM;
 
@@ -304,6 +314,7 @@ CREATE TABLE anope_os_exceptions (
   reason text NOT NULL,
   time int(11) NOT NULL default '0',
   expires int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (oe_id)
 ) TYPE=MyISAM;
 
@@ -319,6 +330,7 @@ CREATE TABLE anope_os_news (
   ntext text NOT NULL,
   who text NOT NULL,
   time int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (on_id)
 ) TYPE=MyISAM;
 
@@ -334,6 +346,7 @@ CREATE TABLE anope_os_sglines (
   reason text NOT NULL,
   seton int(11) NOT NULL default '0',
   expire int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (og_id)
 ) TYPE=MyISAM;
 
@@ -349,20 +362,8 @@ CREATE TABLE anope_os_sqlines (
   reason text NOT NULL,
   seton int(11) NOT NULL default '0',
   expire int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (og_id)
-) TYPE=MyISAM;
-
---
--- Table structure for table `anope_os_status`
---
-
-DROP TABLE IF EXISTS anope_os_status;
-CREATE TABLE anope_os_status (
-  os_id int(11) NOT NULL auto_increment,
-  host text NOT NULL,
-  status int(11) NOT NULL default '0',
-  used int(11) NOT NULL default '0',
-  PRIMARY KEY  (os_id)
 ) TYPE=MyISAM;
 
 --
@@ -377,5 +378,6 @@ CREATE TABLE anope_os_szlines (
   reason text NOT NULL,
   seton int(11) NOT NULL default '0',
   expire int(11) NOT NULL default '0',
+  active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (og_id)
 ) TYPE=MyISAM;

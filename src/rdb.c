@@ -15,6 +15,7 @@
 
 /*************************************************************************/
 
+/* Initialize the current RDB database engine */
 int rdb_init()
 {
 
@@ -22,10 +23,12 @@ int rdb_init()
     return db_mysql_init();
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
+/* Check if RDB can be used to load/save data */
 int rdb_open()
 {
 
@@ -33,10 +36,15 @@ int rdb_open()
     return do_mysql;            /* db_mysql_open(); */
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
+/* Strictly spoken this should close the database. However, it's not too
+ * efficient to close it every time after a write or so, so we just
+ * pretend we closed it while in reality it's still open.
+ */
 int rdb_close()
 {
 
@@ -44,19 +52,27 @@ int rdb_close()
     return 1;                   /* db_mysql_close(); */
 #endif
 
+    return 1;
 }
 
 /*************************************************************************/
 
+/* Quote the string to be used in inclused for the current RDB database */
 char *rdb_quote(char *str)
 {
 #ifdef USE_MYSQL
     return db_mysql_quote(str);
 #endif
+
+    return sstrdup(str);
 }
 
 /*************************************************************************/
 
+/* Tag a table by setting the 'active' field to 0 for all rows. After an
+ * update, all rows with active still 0 will be deleted; this is done to
+ * easily delete old entries from the database.
+ */
 int rdb_tag_table(char *table)
 {
     static char buf[1024];
@@ -70,9 +86,25 @@ int rdb_tag_table(char *table)
 
 }
 
+/* Be sure to quote all user input in the clause! */
+int rdb_tag_table_where(char *table, char *clause)
+{
+    static char buf[1024];
+
+#ifdef USE_MYSQL
+    snprintf(buf, sizeof(buf), "UPDATE %s SET active='0' WHERE %s", table,
+             clause);
+    return db_mysql_query(buf);
+#endif
+
+    return 0;
+
+}
+
 /*************************************************************************/
 
-int rdb_clear_table(char *table)
+/* Empty an entire database table */
+int rdb_empty_table(char *table)
 {
     static char buf[1024];
 
@@ -87,6 +119,38 @@ int rdb_clear_table(char *table)
 
 /*************************************************************************/
 
+/* Clean up a table with 'dirty' records (active = 0) */
+int rdb_clean_table(char *table)
+{
+    static char buf[1024];
+
+#ifdef USE_MYSQL
+    snprintf(buf, sizeof(buf), "DELETE FROM %s WHERE active = 0", table);
+    return db_mysql_query(buf);
+#endif
+
+    return 0;
+}
+
+/* Be sure to quote user input in the clause! */
+int rdb_clean_table_where(char *table, char *clause)
+{
+    static char buf[1024];
+
+#ifdef USE_MYSQL
+    snprintf(buf, sizeof(buf), "DELETE FROM %s WHERE active = 0 AND (%s)",
+             table, clause);
+    return db_mysql_query(buf);
+#endif
+
+    return 0;
+}
+
+/*************************************************************************/
+
+/* Delete specific records from a table. The clause is MySQL syntax, and
+ * should be all quoted up nicely in the calling code.
+ */
 int rdb_scrub_table(char *table, char *clause)
 {
 
@@ -103,6 +167,7 @@ int rdb_scrub_table(char *table, char *clause)
 
 /*************************************************************************/
 
+/* Execute a direct MySQL query. Do NOT forget to quote all user input! */
 int rdb_direct_query(char *query)
 {
 
@@ -117,8 +182,9 @@ int rdb_direct_query(char *query)
 
 /*************************************************************************/
 
-/* I still don't really like doing it this way, it should really be done
- * inside mysql.c and not here. So I'll revisit this later
+/* Update the needed tables when someone changes their display.
+ * The original author didn't even like this (claimed it should be in
+ * mysql.c), and i do agree muchly.
  */
 int rdb_ns_set_display(char *newnick, char *oldnick)
 {
@@ -166,127 +232,29 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
              q_newnick, q_oldnick);
     db_mysql_query(buf);
 
-    /* Need to do bwords and akills */
+    /* Change the akills set on the person's nick */
+    snprintf(buf, sizeof(buf),
+             "UPDATE anope_cs_akicks SET dmask='%s' WHERE dmask='%s' AND flags & %d",
+             q_newnick, q_oldnick, AK_ISNICK);
+    db_mysql_query(buf);
+
+    /* Chane the display on NickServ ACCESS list */
+    snprintf(buf, sizeof(buf),
+             "UPDATE anope_na_access SET display='%s' WHERE display='%s'",
+             q_newnick, q_oldnick);
+    db_mysql_query(buf);
+
+    /* No need to update anope_cs_info here as it is updated when we
+     * save the database.
+     *
+     * anope_hs_core is per nick, not per display; a changed display
+     * won't change anything there
+     */
 
 #endif
 
     free(q_newnick);
     free(q_oldnick);
-
-    return 0;
-}
-
-/*************************************************************************/
-
-int rdb_cs_deluser(char *nick)
-{
-    static char buf[1024];
-    char *q_nick;
-
-    q_nick = rdb_quote(nick);
-
-#ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET successor='' WHERE successor='%s'",
-             q_nick);
-    db_mysql_query(buf);
-
-    snprintf(buf, sizeof(buf), "display='%s'", q_nick);
-    rdb_scrub_table("anope_cs_access", buf);
-    snprintf(buf, sizeof(buf), "creator='%s'", q_nick);
-    rdb_scrub_table("anope_cs_akicks", buf);
-
-    free(q_nick);
-
-    return 1;
-#endif
-
-    free(q_nick);
-
-    return 0;
-}
-
-/*************************************************************************/
-
-int rdb_cs_delchan(ChannelInfo * ci)
-{
-    static char buf[1024];
-    char *q_channel;
-    char *q_founder;
-
-    q_channel = rdb_quote(ci->name);
-    q_founder = rdb_quote(ci->founder->display);
-
-#ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET successor='' WHERE name='%s'",
-             q_channel);
-    db_mysql_query(buf);
-
-    snprintf(buf, sizeof(buf), "name='%s'", q_channel);
-    rdb_scrub_table("anope_cs_info", buf);
-    snprintf(buf, sizeof(buf), "receiver='%s' AND serv='CHAN'", q_channel);
-    rdb_scrub_table("anope_ms_info", buf);
-    snprintf(buf, sizeof(buf), "channel='%s'", q_channel);
-    rdb_scrub_table("anope_cs_access", buf);
-    rdb_scrub_table("anope_cs_akicks", buf);
-    rdb_scrub_table("anope_cs_levels", buf);
-    rdb_scrub_table("anope_cs_badwords", buf);
-    rdb_scrub_table("anope_cs_ttb", buf);
-    if (ci->founder) {
-        snprintf(buf, sizeof(buf),
-                 "update anope_ns_core set channelcount=channelcount-1 where display='%s'",
-                 q_founder);
-        db_mysql_query(buf);
-    }
-
-    free(q_channel);
-    free(q_founder);
-
-    return 1;
-#endif
-
-    free(q_channel);
-    free(q_founder);
-
-    return 0;
-}
-
-/*************************************************************************/
-
-int rdb_cs_set_founder(char *channel, char *founder)
-{
-    static char buf[1024];
-    char *q_channel;
-    char *q_founder;
-
-    q_channel = rdb_quote(channel);
-    q_founder = rdb_quote(founder);
-
-#ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_info SET founder='%s', successor='' WHERE name='%s'",
-             q_founder, q_channel);
-    db_mysql_query(buf);
-
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_ns_core SET channelcount=channelcount+1 WHERE display='%s'",
-             q_founder);
-    db_mysql_query(buf);
-
-    /* Do i need to scrub the access list for this channel ? */
-    snprintf(buf, sizeof(buf), "display='%s' AND channel='%s'", q_founder,
-             q_channel);
-    rdb_scrub_table("anope_cs_access", buf);
-
-    free(q_channel);
-    free(q_founder);
-
-    return 1;
-#endif
-
-    free(q_channel);
-    free(q_founder);
 
     return 0;
 }
@@ -503,9 +471,9 @@ void rdb_load_dbases(void)
 
 void rdb_save_exceptions(Exception * e)
 {
-
 #ifdef USE_MYSQL
     db_mysql_save_exceptions(e);
 #endif
-
 }
+
+/* EOF */

@@ -999,12 +999,12 @@ void save_cs_rdb_dbase(void)
         return;
 
     rdb_tag_table("anope_cs_info");
-    rdb_scrub_table("anope_ms_info", "serv='CHAN'");
-    rdb_clear_table("anope_cs_access");
-    rdb_clear_table("anope_cs_levels");
-    rdb_clear_table("anope_cs_akicks");
-    rdb_clear_table("anope_cs_badwords");
-    rdb_clear_table("anope_cs_ttb");
+    rdb_tag_table("anope_cs_access");
+    rdb_tag_table("anope_cs_levels");
+    rdb_tag_table("anope_cs_akicks");
+    rdb_tag_table("anope_cs_badwords");
+    rdb_tag_table("anope_cs_ttb");
+    rdb_tag_table_where("anope_ms_info", "serv='CHAN'");
 
     for (i = 0; i < 256; i++) {
         for (ci = chanlists[i]; ci; ci = ci->next) {
@@ -1012,7 +1012,14 @@ void save_cs_rdb_dbase(void)
         }                       /* for (chanlists[i]) */
     }                           /* for (i) */
 
-    rdb_scrub_table("anope_cs_info", "active='0'");
+    rdb_clean_table("anope_cs_info");
+    rdb_clean_table("anope_cs_access");
+    rdb_clean_table("anope_cs_levels");
+    rdb_clean_table("anope_cs_akicks");
+    rdb_clean_table("anope_cs_badwords");
+    rdb_clean_table("anope_cs_ttb");
+    rdb_clean_table_where("anope_ms_info", "serv='CHAN'");
+
     rdb_close();
 #endif
 }
@@ -1712,12 +1719,6 @@ void cs_remove_nick(const NickCore * nc)
                         ci->founder = nc2;
                         ci->successor = NULL;
                         nc2->channelcount++;
-#ifdef USE_RDB
-                        if (rdb_open()) {
-                            rdb_cs_set_founder(ci->name, nc2->display);
-                            rdb_close();
-                        }
-#endif
                     }
                 } else {
                     alog("%s: Deleting channel %s owned by deleted nick %s", s_ChanServ, ci->name, nc->display);
@@ -1762,12 +1763,6 @@ void cs_remove_nick(const NickCore * nc)
             }
         }
     }
-#ifdef USE_RDB
-    if (rdb_open()) {
-        rdb_cs_deluser(nc->display);
-        rdb_close();
-    }
-#endif
 }
 
 /*************************************************************************/
@@ -1942,18 +1937,7 @@ int delchan(ChannelInfo * ci)
     if (debug >= 2) {
         alog("debug: delchan() Bot has been removed moving on");
     }
-#ifdef USE_RDB
-    if (debug >= 2) {
-        alog("debug: delchan() rdb updating");
-    }
-    if (rdb_open()) {
-        rdb_cs_delchan(ci);
-        rdb_close();
-    }
-    if (debug >= 2) {
-        alog("debug: delchan() rdb done");
-    }
-#endif
+
     if (debug >= 2) {
         alog("debug: delchan() founder cleanup");
     }

@@ -1,6 +1,22 @@
 Anope Version  S V N
 --------------------
-- NONE
+- DROP TABLE IF EXISTS `anope_os_status`
+- ALTER TABLE `anope_bs_core` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_cs_access` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_cs_akicks` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_cs_badwords` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_cs_levels` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_cs_ttb` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_hs_core` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_ms_info` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_ns_access` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_ns_request` CHANGE `active` `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_akills` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_exceptions` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_news` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_sglines` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_sqlines` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
+- ALTER TABLE `anope_os_szlines` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL
 
 Anope Version 1.7.17
 --------------------

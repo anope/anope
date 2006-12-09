@@ -467,11 +467,12 @@ void save_rdb_exceptions()
 
     if (!rdb_open())
         return;
-    rdb_clear_table("anope_os_exceptions");
+    rdb_tag_table("anope_os_exceptions");
     for (i = 0; i < nexceptions; i++) {
         e = &exceptions[i];
         rdb_save_exceptions(e);
     }
+    rdb_clean_table("anope_os_exceptions");
     rdb_close();
 #endif
 }

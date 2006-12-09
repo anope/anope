@@ -241,12 +241,15 @@ void save_rdb_news()
     if (!rdb_open())
         return;
 
-    rdb_clear_table("anope_os_news");
+    rdb_tag_table("anope_os_news");
+	
     for (i = 0; i < nnews; i++) {
         ni = &news[i];
         rdb_save_news(ni);
     }
-
+	
+	rdb_clean_table("anope_os_news");
+	
     rdb_close();
 #endif
 }

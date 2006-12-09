@@ -846,8 +846,8 @@ void save_ns_rdb_dbase(void)
 
     rdb_tag_table("anope_ns_core");
     rdb_tag_table("anope_ns_alias");
-    rdb_scrub_table("anope_ms_info", "serv='NICK'");
-    rdb_clear_table("anope_ns_access");
+    rdb_tag_table("anope_ns_access");
+    rdb_tag_table_where("anope_ms_info", "serv='NICK'");
 
     for (i = 0; i < 1024; i++) {
         for (nc = nclists[i]; nc; nc = nc->next) {
@@ -863,8 +863,11 @@ void save_ns_rdb_dbase(void)
         }                       /* for (na) */
     }                           /* for (i) */
 
-    rdb_scrub_table("anope_ns_core", "active='0'");
-    rdb_scrub_table("anope_ns_alias", "active='0'");
+    rdb_clean_table("anope_ns_core");
+    rdb_clean_table("anope_ns_alias");
+    rdb_clean_table("anope_ns_access");
+    rdb_clean_table_where("anope_ms_info", "serv='NICK'");
+
     rdb_close();
 #endif
 }
@@ -886,7 +889,8 @@ void save_ns_req_rdb_dbase(void)
         }
     }
 
-    rdb_scrub_table("anope_ns_request", "active='0'");
+    rdb_clean_table("anope_ns_request");
+
     rdb_close();
 #endif
 

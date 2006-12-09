@@ -506,13 +506,16 @@ void save_hs_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_clear_table("anope_hs_core");
+    rdb_tag_table("anope_hs_core");
 
     current = head;
     while (current != NULL) {
         rdb_save_hs_core(current);
         current = current->next;
     }
+
+    rdb_clean_table("anope_hs_core");
+
     rdb_close();
 #endif
 }

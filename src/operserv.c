@@ -504,8 +504,22 @@ void save_os_rdb_dbase(void)
 #ifdef USE_RDB
     if (!rdb_open())
         return;
+
+    rdb_tag_table("anope_os_akills");
+    rdb_tag_table("anope_os_sglines");
+    rdb_tag_table("anope_os_sqlines");
+    rdb_tag_table("anope_os_szlines");
+    /* We empty anope_os_core as required */
+    rdb_empty_table("anope_os_core");
+
     rdb_save_os_db(maxusercnt, maxusertime, &akills, &sglines, &sqlines,
                    &szlines);
+
+    rdb_clean_table("anope_os_akills");
+    rdb_clean_table("anope_os_sglines");
+    rdb_clean_table("anope_os_sqlines");
+    rdb_clean_table("anope_os_szlines");
+
     rdb_close();
 #endif
 }

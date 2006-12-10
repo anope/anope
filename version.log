@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1203"
+VERSION_BUILD="1204"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1204)
+# BUGS  : 629
+# NOTES : Fixed ns_alist which did not accept Founder as a correct min_lev
 #
 # BUILD : 1.7.17 (1203)
 # BUGS  : 

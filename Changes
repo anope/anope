@@ -11,6 +11,7 @@ Anope Version  S V N
 12/07 F Windows install.js script is now able to check multiple drives.   [#634]
 12/09 F Reviewed and updated all of the MySQL code.                       [ #00]
 12/09 F Langfiles had CHANAKILL instead of CHANKILL in syntax lines.      [#640]
+12/10 F NickServ ALIST not accepting Founder as level param.              [#629]
 
 Anope Version 1.7.17
 --------------------

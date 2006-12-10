@@ -131,7 +131,7 @@ int do_alist(User * u)
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
     } else if (na->status & NS_VERBOTEN) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else if (min_level <= ACCESS_INVALID || min_level >= ACCESS_FOUNDER) {
+    } else if (min_level <= ACCESS_INVALID || min_level > ACCESS_FOUNDER) {
         notice_lang(s_NickServ, u, CHAN_ACCESS_LEVEL_RANGE,
                     ACCESS_INVALID + 1, ACCESS_FOUNDER - 1);
     } else {

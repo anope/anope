@@ -3575,7 +3575,7 @@ NICK_HELP_SET_EMAIL
 	
 	Associates the given E-mail address with your nickname.
 	This address will be displayed whenever someone requests
-	information on the channel with the INFO command.
+	information on the nickname with the INFO command.
 	
 NICK_HELP_SET_ICQ
 	Syntax: SET ICQ number

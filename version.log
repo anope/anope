@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1205"
+VERSION_BUILD="1206"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1206)
+# BUGS  : 631
+# NOTES : Fixed small language mistake in en_us.l and nl.l
 #
 # BUILD : 1.7.17 (1205)
 # BUGS  : 630

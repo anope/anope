@@ -3653,8 +3653,8 @@ NICK_HELP_SET_EMAIL
 	Gebruik: SET EMAIL adres
 	
 	Associeert het gegeven e-mail adres met jouw nick. Dit adres
-	zal worden weergegeven wanneer iemand informatie over een van
-	je kanalen opvraagt met het INFO commando.
+	zal worden weergegeven wanneer iemand informatie over je nick
+	opvraagt met het INFO commando.
 	
 NICK_HELP_SET_ICQ
 	Gebruik: SET ICQ nummer

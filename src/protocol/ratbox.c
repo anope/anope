@@ -646,6 +646,11 @@ int anope_event_topic(char *source, int ac, char **av)
         c->topic_time = topic_time;
 
         record_topic(av[0]);
+		
+		if (ac > 1 && *av[1])
+		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
+		else
+		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
     }
     return MOD_CONT;
 }

@@ -12,6 +12,7 @@ Anope Version  S V N
 12/09 F Reviewed and updated all of the MySQL code.                       [ #00]
 12/09 F Langfiles had CHANAKILL instead of CHANKILL in syntax lines.      [#640]
 12/10 F NickServ ALIST not accepting Founder as level param.              [#629]
+12/10 F EVENT_TOPIC_UPDATES was not always sent when it should be.        [#641]
 
 Anope Version 1.7.17
 --------------------

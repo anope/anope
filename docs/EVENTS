@@ -176,6 +176,12 @@ Anope Internal Events
         av[0]  Name of the channel the bot has been assigned to.
         av[1]  The nickname of the bot that has been assigned to the channel.
 
+    EVENT_BOT_BAN
+        A BotServ bot has banned a user, e.g. kickers.
+	av[0]  The nick of the user banned.
+	av[1]  The Channel the user was banned from.
+	av[2]  The mask that was banned.
+
     EVENT_BOT_CHANGE
         The properties of a BotServ bot have been changed.
         av[0]  The nickname of the bot involved.
@@ -220,6 +226,12 @@ Anope Internal Events
         A BotServ bot has joined a channel and opped itself.
         av[0]  The channel name the bot has just joined.
         av[1]  The nickname of the bot that has joined the channel.
+
+    EVENT_BOT_KICK
+        A BotServ bot has kicked a user from a channel.
+	av[0]  The name of the user that has been kicked.
+	av[1]  The name of the channel the user was kicked from.
+	av[2]  The reason for the kick.
 
     EVENT_BOT_UNASSIGN
         A BotServ bot is being unassigned from a channel. This event is being

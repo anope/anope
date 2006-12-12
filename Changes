@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 12/09 A Ability to see if AutoOp is enabled in NickServ INFO displays.    [#621]
+12/12 A EVENT_BOT_KICK and EVENT_BOT_BAN added for modules.               [ #00]
 10/17 F Encryption, users can now pick none, old, md5 or sha1.            [ #00]
 10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
 10/20 F Error message when unable to register due to NSRegDelay.          [#616]

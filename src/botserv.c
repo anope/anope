@@ -831,6 +831,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
         av[2] = mask;
         anope_cmd_mode(ci->bi->nick, av[0], "+b %s", av[2]);
         do_cmode(ci->bi->nick, 3, av);
+	send_event(EVENT_BOT_BAN,3,u->nick, ci->name, mask);
         free(av[1]);
     }
 }
@@ -861,6 +862,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     av[2] = buf;
     anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
+    send_event(EVENT_BOT_KICK,3,u->nick,ci->name,buf);
 }
 
 /*************************************************************************/

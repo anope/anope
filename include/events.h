@@ -26,6 +26,8 @@
 #define EVENT_BOT_FANTASY_NO_ACCESS "bot_command_no_access"
 #define EVENT_BOT_DEL "bot_del"
 #define EVENT_BOT_ASSIGN "bot_assign"
+#define EVENT_BOT_KICK "bot_kick"
+#define EVENT_BOT_BAN "bot_ban"
 #define EVENT_TOPIC_UPDATED "chan_topic_updated"
 #define EVENT_CHAN_EXPIRE "chan_expire"
 #define EVENT_CHAN_REGISTERED "chan_registered"

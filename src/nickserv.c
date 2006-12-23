@@ -885,7 +885,11 @@ void save_ns_req_rdb_dbase(void)
 
     for (i = 0; i < 1024; i++) {
         for (nr = nrlists[i]; nr; nr = nr->next) {
-            rdb_save_ns_req(nr);
+            if (!rdb_save_ns_req(nr)) {
+                /* Something went wrong - abort saving */
+                alog("Unable to save NickRequest (nick '%s')", nr->nick);
+                return;
+            }
         }
     }
 

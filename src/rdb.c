@@ -33,7 +33,7 @@ int rdb_open()
 {
 
 #ifdef USE_MYSQL
-    return do_mysql;            /* db_mysql_open(); */
+    return db_mysql_open();     /* db_mysql_open(); */
 #endif
 
     return 0;
@@ -75,11 +75,8 @@ char *rdb_quote(char *str)
  */
 int rdb_tag_table(char *table)
 {
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "UPDATE %s SET active='0'", table);
-    return db_mysql_query(buf);
+    return db_mysql_try("UPDATE %s SET active = 0", table);
 #endif
 
     return 0;
@@ -89,12 +86,9 @@ int rdb_tag_table(char *table)
 /* Be sure to quote all user input in the clause! */
 int rdb_tag_table_where(char *table, char *clause)
 {
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "UPDATE %s SET active='0' WHERE %s", table,
-             clause);
-    return db_mysql_query(buf);
+    return db_mysql_try("UPDATE %s SET active = 0 WHERE %s", table,
+                        clause);
 #endif
 
     return 0;
@@ -106,11 +100,8 @@ int rdb_tag_table_where(char *table, char *clause)
 /* Empty an entire database table */
 int rdb_empty_table(char *table)
 {
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "TRUNCATE TABLE %s", table);
-    return db_mysql_query(buf);
+    return db_mysql_try("TRUNCATE TABLE %s", table);
 #endif
 
     return 0;
@@ -122,11 +113,8 @@ int rdb_empty_table(char *table)
 /* Clean up a table with 'dirty' records (active = 0) */
 int rdb_clean_table(char *table)
 {
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "DELETE FROM %s WHERE active = 0", table);
-    return db_mysql_query(buf);
+    return db_mysql_try("DELETE FROM %s WHERE active = 0", table);
 #endif
 
     return 0;
@@ -135,12 +123,9 @@ int rdb_clean_table(char *table)
 /* Be sure to quote user input in the clause! */
 int rdb_clean_table_where(char *table, char *clause)
 {
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "DELETE FROM %s WHERE active = 0 AND (%s)",
-             table, clause);
-    return db_mysql_query(buf);
+    return db_mysql_try("DELETE FROM %s WHERE active = 0 AND (%s)", table,
+                        clause);
 #endif
 
     return 0;
@@ -153,12 +138,8 @@ int rdb_clean_table_where(char *table, char *clause)
  */
 int rdb_scrub_table(char *table, char *clause)
 {
-
-    static char buf[1024];
-
 #ifdef USE_MYSQL
-    snprintf(buf, sizeof(buf), "DELETE FROM %s WHERE %s", table, clause);
-    return db_mysql_query(buf);
+    return db_mysql_try("DELETE FROM %s WHERE %s", table, clause);
 #endif
 
     return 0;
@@ -167,7 +148,9 @@ int rdb_scrub_table(char *table, char *clause)
 
 /*************************************************************************/
 
-/* Execute a direct MySQL query. Do NOT forget to quote all user input! */
+/* Execute a direct MySQL query. Do NOT forget to quote all user input!
+ * NOTE: this ideally shouldn't be used, but that's probably a phase3 utopia
+ */
 int rdb_direct_query(char *query)
 {
 
@@ -188,7 +171,7 @@ int rdb_direct_query(char *query)
  */
 int rdb_ns_set_display(char *newnick, char *oldnick)
 {
-    static char buf[1024];
+    int ret = 0;
     char *q_newnick;
     char *q_oldnick;
 
@@ -197,52 +180,59 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
 
 #ifdef USE_MYSQL
     /* Change the display on NS_CORE */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_ns_core SET display='%s' WHERE display='%s'",
-             q_newnick, q_oldnick);
-    db_mysql_query(buf);
+    ret =
+        db_mysql_try
+        ("UPDATE anope_ns_core SET display = '%s' WHERE display = '%s'",
+         q_newnick, q_oldnick);
 
     /* Change the display on NS_ALIAS for all grouped nicks */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_ns_alias SET display='%s' WHERE display='%s'",
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_ns_alias SET display='%s' WHERE display='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
     /* Change the display on ChanServ ACCESS list */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_access SET display='%s' WHERE display='%s'",
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_cs_access SET display='%s' WHERE display='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
     /* Change the display on ChanServ AKICK list */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_akicks SET creator='%s' WHERE creator='%s'",
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_cs_akicks SET creator='%s' WHERE creator='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
-    /* Change the display on MemoServ sent memos */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_ms_info SET sender='%s' WHERE sender='%s'",
+    /* Change the display on MemoServ sent memos -- is it required? */
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_ms_info SET sender='%s' WHERE sender='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
-    /* Change the display on MemoServ received memos */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_ms_info SET receiver='%s' WHERE receiver='%s'",
+    /* Change the display on MemoServ received memos -- is it required? */
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_ms_info SET receiver='%s' WHERE receiver='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
     /* Change the akills set on the person's nick */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_cs_akicks SET dmask='%s' WHERE dmask='%s' AND flags & %d",
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_cs_akicks SET dmask='%s' WHERE dmask='%s' AND flags & %d",
              q_newnick, q_oldnick, AK_ISNICK);
-    db_mysql_query(buf);
 
-    /* Chane the display on NickServ ACCESS list */
-    snprintf(buf, sizeof(buf),
-             "UPDATE anope_na_access SET display='%s' WHERE display='%s'",
+    /* Change the display on NickServ ACCESS list */
+    if (ret)
+        ret =
+            db_mysql_try
+            ("UPDATE anope_na_access SET display='%s' WHERE display='%s'",
              q_newnick, q_oldnick);
-    db_mysql_query(buf);
 
     /* No need to update anope_cs_info here as it is updated when we
      * save the database.
@@ -256,224 +246,252 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
     free(q_newnick);
     free(q_oldnick);
 
+    return ret;
+}
+
+/*************************************************************************/
+
+int rdb_save_ns_core(NickCore * nc)
+{
+
+#ifdef USE_MYSQL
+    return db_mysql_save_ns_core(nc);
+#endif
+
     return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_ns_core(NickCore * nc)
+int rdb_save_ns_alias(NickAlias * na)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_ns_core(nc);
+    return db_mysql_save_ns_alias(na);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_ns_alias(NickAlias * na)
+int rdb_save_ns_req(NickRequest * nr)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_ns_alias(na);
+    return db_mysql_save_ns_req(nr);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_ns_req(NickRequest * nr)
+int rdb_save_cs_info(ChannelInfo * ci)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_ns_req(nr);
+    return db_mysql_save_cs_info(ci);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_cs_info(ChannelInfo * ci)
+int rdb_save_bs_core(BotInfo * bi)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_cs_info(ci);
+    return db_mysql_save_bs_core(bi);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_bs_core(BotInfo * bi)
+int rdb_save_hs_core(HostCore * hc)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_bs_core(bi);
+    return db_mysql_save_hs_core(hc);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_hs_core(HostCore * hc)
+int rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
+                   SList * ak, SList * sgl, SList * sql, SList * szl)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_hs_core(hc);
+    return db_mysql_save_os_db(maxusercnt, maxusertime, ak, sgl, sql, szl);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                    SList * ak, SList * sgl, SList * sql, SList * szl)
+int rdb_save_news(NewsItem * ni)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_os_db(maxusercnt, maxusertime, ak, sgl, sql, szl);
+    return db_mysql_save_news(ni);
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_save_news(NewsItem * ni)
+int rdb_load_bs_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_save_news(ni);
+    return db_mysql_load_bs_dbase();
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_bs_dbase(void)
+int rdb_load_hs_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_load_bs_dbase();
+    return db_mysql_load_hs_dbase();
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_hs_dbase(void)
+int rdb_load_ns_dbase(void)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_load_hs_dbase();
+    return db_mysql_load_ns_dbase();
 #endif
 
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_ns_dbase(void)
+int rdb_load_news(void)
 {
 
 #ifdef USE_MYSQL
-    db_mysql_load_ns_dbase();
+    return db_mysql_load_news();
 #endif
+
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_news(void)
+int rdb_load_exceptions(void)
 {
+
 #ifdef USE_MYSQL
-    db_mysql_load_news();
+    return db_mysql_load_exceptions();
 #endif
+
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_exceptions(void)
+int rdb_load_cs_dbase(void)
 {
+
 #ifdef USE_MYSQL
-    db_mysql_load_exceptions();
+    return db_mysql_load_cs_dbase();
 #endif
+
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_cs_dbase(void)
+int rdb_load_os_dbase(void)
 {
+
 #ifdef USE_MYSQL
-    db_mysql_load_cs_dbase();
+    return db_mysql_load_os_dbase();
 #endif
+
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_os_dbase(void)
+int rdb_load_ns_req_dbase(void)
 {
+
 #ifdef USE_MYSQL
-    db_mysql_load_os_dbase();
+    return db_mysql_load_ns_req_dbase();
 #endif
+
+    return 0;
 }
 
 /*************************************************************************/
 
-void rdb_load_ns_req_dbase(void)
-{
-#ifdef USE_MYSQL
-    db_mysql_load_ns_req_dbase();
-#endif
+#define LOAD_DBASE(num, name, func) {\
+	if (!func) {\
+		alog("RDB unable to load %s database (%d/8) !!!", name, num);\
+		return 0;\
+	}\
+	if (debug)\
+		alog("debug: RDB Loaded %s DataBase (%d/8)", name, num);\
 }
 
-/*************************************************************************/
-
-void rdb_load_dbases(void)
+int rdb_load_dbases(void)
 {
     if (!skeleton) {
-        rdb_load_ns_dbase();
-        if (debug)
-            alog("debug: RDB Loaded NickServ DataBase (1/8)");
+        LOAD_DBASE(1, "NickServ", rdb_load_ns_dbase());
+
         if (s_HostServ) {
-            rdb_load_hs_dbase();
-            if (debug)
-                alog("debug: RDB Loaded HostServ DataBase (2/8)");
+            LOAD_DBASE(2, "HostServ", rdb_load_hs_dbase());
         }
+
         if (s_BotServ) {
-            rdb_load_bs_dbase();
-            if (debug)
-                alog("debug: RDB Loaded BotServ DataBase (3/8)");
+            LOAD_DBASE(3, "BotServ", rdb_load_bs_dbase());
         }
-        rdb_load_cs_dbase();
-        if (debug)
-            alog("debug: RDB Loaded ChanServ DataBase (4/8)");
+
+        LOAD_DBASE(4, "ChanServ", rdb_load_cs_dbase());
     }
-    rdb_load_os_dbase();
-    if (debug)
-        alog("debug: RDB Loaded OperServ DataBase (5/8)");
-    rdb_load_news();
-    if (debug)
-        alog("debug: RDB Loaded News DataBase (6/8)");
-    rdb_load_exceptions();
-    if (debug)
-        alog("debug: RDB Loaded Exception Database (7/8)");
+
+    LOAD_DBASE(5, "OperServ", rdb_load_os_dbase());
+    LOAD_DBASE(6, "News", rdb_load_news());
+    LOAD_DBASE(7, "Exception", rdb_load_exceptions());
+
     if (PreNickDBName) {
-        rdb_load_ns_req_dbase();
-        if (debug)
-            alog("debug: RDB Loaded PreNick DataBase (8/8)");
-    } else {
-        if (debug)
-            alog("debug: RDB No need to load PreNickDB (8/8)");
+        LOAD_DBASE(8, "PreNick", rdb_load_ns_req_dbase());
+    } else if (debug) {
+        alog("debug: RDB No need to load PreNickDB (8/8)");
     }
+
     alog("RDB: All DataBases loaded.");
 }
 
 /*************************************************************************/
 
-void rdb_save_exceptions(Exception * e)
+int rdb_save_exceptions(Exception * e)
 {
+
 #ifdef USE_MYSQL
-    db_mysql_save_exceptions(e);
+    return db_mysql_save_exceptions(e);
 #endif
+
+    return 0;
 }
 
 /* EOF */

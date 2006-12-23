@@ -502,21 +502,21 @@ E int rdb_clean_table_where(char *table, char *clause);
 E int rdb_scrub_table(char *table, char *clause);
 E int rdb_direct_query(char *query);
 E int rdb_ns_set_display(char *newnick, char *oldnick);
-E void rdb_save_ns_core(NickCore * nc);
-E void rdb_save_ns_alias(NickAlias * na);
-E void rdb_save_ns_req(NickRequest * nr);
-E void rdb_save_cs_info(ChannelInfo * ci);
-E void rdb_save_bs_core(BotInfo * bi);
-E void rdb_save_bs_rdb_core(BotInfo * bi);
-E void rdb_save_hs_core(HostCore * hc);
-E void rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
+E int rdb_save_ns_core(NickCore * nc);
+E int rdb_save_ns_alias(NickAlias * na);
+E int rdb_save_ns_req(NickRequest * nr);
+E int rdb_save_cs_info(ChannelInfo * ci);
+E int rdb_save_bs_core(BotInfo * bi);
+E int rdb_save_bs_rdb_core(BotInfo * bi);
+E int rdb_save_hs_core(HostCore * hc);
+E int rdb_save_os_db(unsigned int maxucnt, unsigned int maxutime,
                     SList * ak, SList * sgl, SList * sql, SList * szl);
-E void rdb_save_news(NewsItem * ni);
-E void rdb_save_exceptions(Exception * e);
-E void rdb_load_bs_dbase(void);
-E void rdb_load_hs_dbase(void);
-E void rdb_load_ns_dbase(void);
-E void rdb_load_dbases(void);
+E int rdb_save_news(NewsItem * ni);
+E int rdb_save_exceptions(Exception * e);
+E int rdb_load_bs_dbase(void);
+E int rdb_load_hs_dbase(void);
+E int rdb_load_ns_dbase(void);
+E int rdb_load_dbases(void);
 #endif
 
 #ifdef USE_MYSQL
@@ -1149,25 +1149,26 @@ E int db_mysql_open();
 E int db_mysql_close();
 E int db_mysql_query(char *sql);
 E char *db_mysql_quote(char *sql);
-E void db_mysql_save_ns_core(NickCore * nc);
-E void db_mysql_save_ns_alias(NickAlias * na);
-E void db_mysql_save_ns_req(NickRequest * nr);
-E void db_mysql_save_cs_info(ChannelInfo * ci);
-E void db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
+E int db_mysql_try(const char *fmt, ...);
+E int db_mysql_save_ns_core(NickCore * nc);
+E int db_mysql_save_ns_alias(NickAlias * na);
+E int db_mysql_save_ns_req(NickRequest * nr);
+E int db_mysql_save_cs_info(ChannelInfo * ci);
+E int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
                            SList * ak, SList * sgl, SList * sql,
                            SList * szl);
-E void db_mysql_save_news(NewsItem * ni);
-E void db_mysql_save_exceptions(Exception * e);
-E void db_mysql_save_hs_core(HostCore * hc);
-E void db_mysql_save_bs_core(BotInfo * bi);
-E void db_mysql_load_bs_dbase(void);
-E void db_mysql_load_hs_dbase(void);
-E void db_mysql_load_ns_dbase(void);
-E void db_mysql_load_ns_req_dbase(void);
-E void db_mysql_load_cs_dbase(void);
-E void db_mysql_load_os_dbase(void);
-E void db_mysql_load_exceptions(void);
-E void db_mysql_load_news(void);
+E int db_mysql_save_news(NewsItem * ni);
+E int db_mysql_save_exceptions(Exception * e);
+E int db_mysql_save_hs_core(HostCore * hc);
+E int db_mysql_save_bs_core(BotInfo * bi);
+E int db_mysql_load_bs_dbase(void);
+E int db_mysql_load_hs_dbase(void);
+E int db_mysql_load_ns_dbase(void);
+E int db_mysql_load_ns_req_dbase(void);
+E int db_mysql_load_cs_dbase(void);
+E int db_mysql_load_os_dbase(void);
+E int db_mysql_load_exceptions(void);
+E int db_mysql_load_news(void);
 E unsigned int mysql_rand(void);
 #endif
 

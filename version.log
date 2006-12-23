@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1208"
+VERSION_BUILD="1209"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1209)
+# BUGS  : 
+# NOTES : Another batch of changes regarding RDB/MySQL; all functions are now doing proper error reporting; errors are not yet handled properly
 #
 # BUILD : 1.7.17 (1208)
 # BUGS  : N/A

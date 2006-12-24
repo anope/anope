@@ -505,20 +505,51 @@ void save_os_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_os_akills");
-    rdb_tag_table("anope_os_sglines");
-    rdb_tag_table("anope_os_sqlines");
-    rdb_tag_table("anope_os_szlines");
+    if (rdb_tag_table("anope_os_akills") == 0) {
+        alog("Unable to tag table 'anope_os_akills' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_os_sglines") == 0) {
+        alog("Unable to tag table 'anope_os_sglines' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_os_sqlines") == 0) {
+        alog("Unable to tag table 'anope_os_sqlines' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_os_szlines") == 0) {
+        alog("Unable to tag table 'anope_os_szlines' - OperServ RDB save failed.");
+        return;
+    }
     /* We empty anope_os_core as required */
-    rdb_empty_table("anope_os_core");
+    if (rdb_empty_table("anope_os_core") == 0) {
+        alog("Unable to empty table 'anope_os_core' - OperServ RDB save failed");
+        return;
+    }
 
-    rdb_save_os_db(maxusercnt, maxusertime, &akills, &sglines, &sqlines,
-                   &szlines);
+    if (rdb_save_os_db
+        (maxusercnt, maxusertime, &akills, &sglines, &sqlines,
+         &szlines) == 0) {
+        alog("Unable to save OperServ data - OperServ RDB save failed");
+        return;
+    }
 
-    rdb_clean_table("anope_os_akills");
-    rdb_clean_table("anope_os_sglines");
-    rdb_clean_table("anope_os_sqlines");
-    rdb_clean_table("anope_os_szlines");
+    if (rdb_clean_table("anope_os_akills") == 0) {
+        alog("Unable to clean table 'anope_os_akills' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_os_sglines") == 0) {
+        alog("Unable to clean table 'anope_os_sglines' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_os_sqlines") == 0) {
+        alog("Unable to clean table 'anope_os_sqlines' - OperServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_os_szlines") == 0) {
+        alog("Unable to clean table 'anope_os_szlines' - OperServ RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif

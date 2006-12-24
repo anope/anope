@@ -467,12 +467,21 @@ void save_rdb_exceptions()
 
     if (!rdb_open())
         return;
-    rdb_tag_table("anope_os_exceptions");
+    if (rdb_tag_table("anope_os_exceptions") == 0) {
+        alog("Unable to tag table 'anope_os_exceptions' - Exception RDB save failed.");
+        return;
+    }
     for (i = 0; i < nexceptions; i++) {
         e = &exceptions[i];
-        rdb_save_exceptions(e);
+        if (rdb_save_exceptions(e) == 0) {
+            alog("Unable to save Exception '%s' - Exception RDB save failed.", e->mask);
+            return;
+        }
     }
-    rdb_clean_table("anope_os_exceptions");
+    if (rdb_clean_table("anope_os_exceptions") == 0) {
+        alog("Unable to clean table 'anope_os_exceptions' - Exception RDB save failed.");
+        return;
+    }
     rdb_close();
 #endif
 }

@@ -241,14 +241,23 @@ void save_rdb_news()
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_os_news");
+    if (rdb_tag_table("anope_os_news") == 0) {
+        alog("Unable to tag table 'anope_os_news' - News RDB save failed.");
+        return;
+    }
 	
     for (i = 0; i < nnews; i++) {
         ni = &news[i];
-        rdb_save_news(ni);
+        if (rdb_save_news(ni) == 0) {
+            alog("Unable to save NewsItem %d - News RDB save failed.", ni->num);
+            return;
+        }
     }
 	
-	rdb_clean_table("anope_os_news");
+    if (rdb_clean_table("anope_os_news") == 0) {
+        alog("Unable to clean table 'anope_os_news' - News RDB save failed.");
+        return;
+    }
 	
     rdb_close();
 #endif

@@ -14,6 +14,10 @@ Anope Version  S V N
 12/09 F Langfiles had CHANAKILL instead of CHANKILL in syntax lines.      [#640]
 12/10 F NickServ ALIST not accepting Founder as level param.              [#629]
 12/10 F EVENT_TOPIC_UPDATES was not always sent when it should be.        [#641]
+12/24 F anoperc sends SIGTERM for restart and uses command line params    [#645]
+12/24 F Nickname changes were not recognised on TS6-based IRCd's          [#646]
+12/24 F Small typo in CHAN_REGISTER_NONE_CHANNEL                          [#647]
+12/24 F Display error messages when RDB functions fail                    [ #00]
 
 Anope Version 1.7.17
 --------------------

@@ -1046,7 +1046,7 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	Csatorna jelszava: %s - Jegyezd fel a késõbbi használathoz.
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a none existant channel %s
+	You have attempted to register a nonexistent channel %s
 CHAN_SYMBOL_REQUIRED
 	Please use the symbol of # or & when attempting to register
 

@@ -1049,7 +1049,7 @@ CHAN_REGISTERED
 CHAN_PASSWORD_IS
 	Пароль Вашего канала -  %s - не забывайте его!
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a none existant channel %s
+	You have attempted to register a nonexistent channel %s
 CHAN_SYMBOL_REQUIRED
 	Please use the symbol of # or & when attempting to register
 

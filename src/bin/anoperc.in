@@ -98,8 +98,9 @@ elif [ "$1" = "status" ] ; then
 elif [ "$1" = "restart" ] ; then
 	isAnopeRunning
 	echo "Restarting Anope"
-	kill -1 `cat $ANOPEPID`
+	kill -15 `cat $ANOPEPID`
 	sleep 1
+	shift
 	$ANOPROG $*
 
 elif [ "$1" = "rehash" ] ; then
@@ -119,10 +120,13 @@ elif [ "$1" = "help" ] ; then
 		echo "$0 start          Start Anope"
 		echo "	   	       	Additional parameters may be passed"
 		echo "	   	       	(e.g. $0 start -nofork)"
-		echo "	   	       	For a list of type $0 $1 paramlist"
+		echo "	   	       	For a list type $0 $1 paramlist"
 		echo "$0 stop           Shutdown Anope"
 		echo "$0 status         Show Anope's Status"
 		echo "$0 restart        Restart Anope (Databases will be saved)"
+		echo "			Additional parameters may be passed"
+		echo "			(e.g. $0 restart -logchan)"
+		echi "			For a list type $0 $1 paramlist"
 		echo "$0 rehash         Rehash Configuration and Save Databases"
 		echo "$0 version        Return Anope Version and Build Information"
 		echo "$0 help           Show this help menu"

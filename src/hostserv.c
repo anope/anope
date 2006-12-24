@@ -331,7 +331,8 @@ void delHostCore(char *nick)
         if (rdb_open()) {
             q_nick = rdb_quote(nick);
             snprintf(clause, sizeof(clause), "nick='%s'", q_nick);
-            rdb_scrub_table("anope_hs_core", clause);
+            if (rdb_scrub_table("anope_hs_core", clause) == 0)
+                alog("Unable to scrub table 'anope_hs_core' - HostServ RDB update failed.");
             rdb_close();
             free(q_nick);
         }
@@ -506,15 +507,24 @@ void save_hs_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_hs_core");
+    if (rdb_tag_table("anope_hs_core") == 0) {
+        alog("Unable to tag table 'anope_hs_core' - HostServ RDB save failed.");
+        return;
+    }
 
     current = head;
     while (current != NULL) {
-        rdb_save_hs_core(current);
+        if (rdb_save_hs_core(current) == 0) {
+            alog("Unable to save HostCore for %s - HostServ RDB save failed.", current->nick);
+            return;
+        }
         current = current->next;
     }
 
-    rdb_clean_table("anope_hs_core");
+    if (rdb_clean_table("anope_hs_core") == 0) {
+        alog("Unable to clean table 'anope_hs_core' - HostServ RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif

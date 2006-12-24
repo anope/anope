@@ -998,27 +998,72 @@ void save_cs_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_cs_info");
-    rdb_tag_table("anope_cs_access");
-    rdb_tag_table("anope_cs_levels");
-    rdb_tag_table("anope_cs_akicks");
-    rdb_tag_table("anope_cs_badwords");
-    rdb_tag_table("anope_cs_ttb");
-    rdb_tag_table_where("anope_ms_info", "serv='CHAN'");
+    if (rdb_tag_table("anope_cs_info") == 0) {
+        alog("Unable to tag table 'anope_cs_info' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_cs_access") == 0) {
+        alog("Unable to tag table 'anope_cs_access' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_cs_levels") == 0) {
+        alog("Unable to tag table 'anope_cs_levels' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_cs_akicks") == 0) {
+        alog("Unable to tag table 'anope_cs_akicks' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_cs_badwords") == 0) {
+        alog("Unable to tag table 'anope_cs_badwords' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_cs_ttb") == 0) {
+        alog("Unable to tag table 'anope_cs_ttb' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table_where("anope_ms_info", "serv='CHAN'") == 0) {
+        alog("Unable to tag table 'anope_ms_info' - ChanServ RDB save failed.");
+        return;
+    }
 
     for (i = 0; i < 256; i++) {
         for (ci = chanlists[i]; ci; ci = ci->next) {
-            rdb_save_cs_info(ci);
+            if (rdb_save_cs_info(ci) == 0) {
+                alog("Unable to save ChanInfo for %s - ChanServ RDB save failed.", ci->name);
+                return;
+            }
         }                       /* for (chanlists[i]) */
     }                           /* for (i) */
 
-    rdb_clean_table("anope_cs_info");
-    rdb_clean_table("anope_cs_access");
-    rdb_clean_table("anope_cs_levels");
-    rdb_clean_table("anope_cs_akicks");
-    rdb_clean_table("anope_cs_badwords");
-    rdb_clean_table("anope_cs_ttb");
-    rdb_clean_table_where("anope_ms_info", "serv='CHAN'");
+    if (rdb_clean_table("anope_cs_info") == 0) {
+        alog("Unable to clean table 'anope_cs_info' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_cs_access") == 0) {
+        alog("Unable to clean table 'anope_cs_access' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_cs_levels") == 0) {
+        alog("Unable to clean table 'anope_cs_levels' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_cs_akicks") == 0) {
+        alog("Unable to clean table 'anope_cs_akicks' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_cs_badwords") == 0) {
+        alog("Unable to clean table 'anope_cs_badwords' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_cs_ttb") == 0) {
+        alog("Unable to clean table 'anope_cs_ttb' - ChanServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table_where("anope_ms_info", "serv='CHAN'") == 0) {
+        alog("Unable to clean table 'anope_ms_info' - ChanServ RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif

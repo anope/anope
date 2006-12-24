@@ -651,9 +651,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
         /* An old user changing nicks. */
         if (UseTS6)
             user = find_byuid(source);
-        if (!user) {
-            user = finduser(source);
-        } else
+
+        if (!user)
             user = finduser(source);
 
         if (!user) {

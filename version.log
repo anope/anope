@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1209"
+VERSION_BUILD="1210"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1210)
+# BUGS  : 645 646 647
+# NOTES : Fixed anoperc restart, nickchanges on TS6, typo in CHAN_REGISTER_NONE_CHANNEL; added error messages when RDB functions fail (thx heinz)
 #
 # BUILD : 1.7.17 (1209)
 # BUGS  : 

@@ -1406,7 +1406,10 @@ int db_mysql_load_cs_dbase(void)
         /* Name, founder, successor, password */
         snprintf(ci->name, CHANMAX, "%s", mysql_row[0]);
         ci->founder = findcore(mysql_row[1]);
-        ci->successor = findcore(mysql_row[2]);
+        if (mysql_row[2] && *(mysql_row[2]))
+            ci->successor = findcore(mysql_row[2]);
+        else
+            ci->successor = NULL;
         snprintf(ci->founderpass, PASSMAX, "%s", mysql_row[3]);
 
         /* Description, URL, email -- scalloc() initializes to 0/NULL */

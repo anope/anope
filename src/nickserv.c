@@ -844,29 +844,57 @@ void save_ns_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_ns_core");
-    rdb_tag_table("anope_ns_alias");
-    rdb_tag_table("anope_ns_access");
-    rdb_tag_table_where("anope_ms_info", "serv='NICK'");
+    if (rdb_tag_table("anope_ns_core") == 0) {
+        alog("Unable to tag 'anope_ns_core' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_ns_alias") == 0) {
+        alog("Unable to tag 'anope_ns_alias' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table("anope_ns_access") == 0) {
+        alog("Unable to tag 'anope_ns_access' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_tag_table_where("anope_ms_info", "serv='NICK'") == 0) {
+        alog("Unable to tag 'anope_ms_info' - NickServ RDB save failed.");
+        return;
+    }
 
     for (i = 0; i < 1024; i++) {
         for (nc = nclists[i]; nc; nc = nc->next) {
-            rdb_save_ns_core(nc);
-
+            if (rdb_save_ns_core(nc) == 0) {
+                alog("Unable to save NickCore for '%s' - NickServ RDB save failed.", nc->display);
+                return;
+            }
         }                       /* for (nc) */
     }                           /* for (i) */
 
     for (i = 0; i < 1024; i++) {
         for (na = nalists[i]; na; na = na->next) {
-            rdb_save_ns_alias(na);
-
+            if (rdb_save_ns_alias(na) == 0) {
+                alog("Unable to save NickAlias for '%s' - NickServ RDB save failed.", na->nick);
+                return;
+            }
         }                       /* for (na) */
     }                           /* for (i) */
 
-    rdb_clean_table("anope_ns_core");
-    rdb_clean_table("anope_ns_alias");
-    rdb_clean_table("anope_ns_access");
-    rdb_clean_table_where("anope_ms_info", "serv='NICK'");
+    if (rdb_clean_table("anope_ns_core") == 0) {
+        alog("Unable to clean table 'anope_ns_core' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_ns_alias") == 0) {
+        alog("Unable to clean table 'anope_ns_alias' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table("anope_ns_access") == 0) {
+        alog("Unable to clean table 'anope_ns_access' - NickServ RDB save failed.");
+        return;
+    }
+    if (rdb_clean_table_where("anope_ms_info", "serv='NICK'") == 0) {
+        alog("Unable to clean table 'anope_ms_info' - NickServ RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif
@@ -881,19 +909,25 @@ void save_ns_req_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_ns_request");
+    if (rdb_tag_table("anope_ns_request") == 0) {
+        alog("Unable to tag table 'anope_ns_request' - NickServ Request RDB save failed.");
+        return;
+    }
 
     for (i = 0; i < 1024; i++) {
         for (nr = nrlists[i]; nr; nr = nr->next) {
-            if (!rdb_save_ns_req(nr)) {
+            if (rdb_save_ns_req(nr) == 0) {
                 /* Something went wrong - abort saving */
-                alog("Unable to save NickRequest (nick '%s')", nr->nick);
+                alog("Unable to save NickRequest (nick '%s') - NickServ Request RDB save failed.", nr->nick);
                 return;
             }
         }
     }
 
-    rdb_clean_table("anope_ns_request");
+    if (rdb_clean_table("anope_ns_request") == 0) {
+        alog("Unable to clean table 'anope_ns_request' - NickServ Request RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif
@@ -1346,7 +1380,9 @@ void change_core_display(NickCore * nc, char *newdisplay)
      * on the next /OS UPDATE might need it on /NS DROP too...
      */
     if (rdb_open()) {
-        rdb_ns_set_display(newdisplay, nc->display);
+        if (rdb_ns_set_display(newdisplay, nc->display) == 0) {
+            alog("Unable to update display for %s - Nick Display RDB update failed.", nc->display);
+        }
         rdb_close();
     }
 #endif
@@ -1399,14 +1435,20 @@ static int delcore(NickCore * nc)
     if (rdb_open()) {
         q_display = rdb_quote(nc->display);
         snprintf(clause, sizeof(clause), "display='%s'", q_display);
-        rdb_scrub_table("anope_ns_access", clause);
-        rdb_scrub_table("anope_ns_core", clause);
-        rdb_scrub_table("anope_cs_access", clause);
-        /* I'm unsure how to clean up the OS ADMIN/OPER list on the db */
-        /* I wish the "display" primary key would be the same on all tables */
-        snprintf(clause, sizeof(clause), "receiver='%s' AND serv='NICK'",
-                 q_display);
-        rdb_scrub_table("anope_ms_info", clause);
+        if (rdb_scrub_table("anope_ns_access", clause) == 0)
+            alog("Unable to scrub table 'anope_ns_access' - RDB update failed.");
+        else if (rdb_scrub_table("anope_ns_core", clause) == 0)
+            alog("Unable to scrub table 'anope_ns_core' - RDB update failed.");
+        else if (rdb_scrub_table("anope_cs_access", clause) == 0)
+            alog("Unable to scrub table 'anope_cs_access' - RDB update failed.");
+        else {
+            /* I'm unsure how to clean up the OS ADMIN/OPER list on the db */
+            /* I wish the "display" primary key would be the same on all tables */
+            snprintf(clause, sizeof(clause),
+                     "receiver='%s' AND serv='NICK'", q_display);
+            if (rdb_scrub_table("anope_ms_info", clause) == 0)
+                alog("Unable to scrub table 'anope_ms_info' - RDB update failed.");
+        }
         rdb_close();
         free(q_display);
     }
@@ -1528,7 +1570,8 @@ int delnick(NickAlias * na)
     if (rdb_open()) {
         q_nick = rdb_quote(na->nick);
         snprintf(clause, sizeof(clause), "nick='%s'", q_nick);
-        rdb_scrub_table("anope_ns_alias", clause);
+        if (rdb_scrub_table("anope_ns_alias", clause) == 0)
+            alog("Unable to scrub table 'anope_ns_alias' - RDB update failed");
         rdb_close();
         free(q_nick);
     }

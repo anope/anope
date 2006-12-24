@@ -540,15 +540,24 @@ void save_bs_rdb_dbase(void)
     if (!rdb_open())
         return;
 
-    rdb_tag_table("anope_bs_core");
+    if (rdb_tag_table("anope_bs_core") == 0) {
+        alog("Unable to tag table 'anope_bs_core' - BotServ RDB save failed.");
+        return;
+    }
 
     for (i = 0; i < 256; i++) {
         for (bi = botlists[i]; bi; bi = bi->next) {
-            rdb_save_bs_core(bi);
+            if (rdb_save_bs_core(bi) == 0) {
+                alog("Unable to save BotInfo for %s - BotServ RDB save failed.", bi->nick);
+                return;
+            }
         }
     }
 
-    rdb_clean_table("anope_bs_core");
+    if (rdb_clean_table("anope_bs_core") == 0) {
+        alog("Unable to clean table 'anope_bs_core' - BotServ RDB save failed.");
+        return;
+    }
 
     rdb_close();
 #endif

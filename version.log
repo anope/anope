@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1210"
+VERSION_BUILD="1211"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1211)
+# BUGS  : 650
+# NOTES : Fixed ModuleNoticeLang which was formatting the string twice
 #
 # BUILD : 1.7.17 (1210)
 # BUGS  : 645 646 647

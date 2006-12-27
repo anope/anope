@@ -2627,7 +2627,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
             if (*s)
                 *s++ = '\0';
             strscpy(outbuf, t, sizeof(outbuf));
-            notice(source, u->nick, outbuf);
+            notice(source, u->nick, "%s", outbuf);
         }
 		free(buf);
     } else {

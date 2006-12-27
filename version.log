@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="17"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1211"
+VERSION_BUILD="1212"
 
 # $Log$
+#
+# BUILD : 1.7.17 (1212)
+# BUGS  : 652
+# NOTES : Fixed handleModuleOperationQueue to also include error messages instead of only error numbers
 #
 # BUILD : 1.7.17 (1211)
 # BUGS  : 650

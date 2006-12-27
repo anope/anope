@@ -19,6 +19,7 @@ Anope Version  S V N
 12/24 F Small typo in CHAN_REGISTER_NONE_CHANNEL.                         [#647]
 12/24 F Display error messages when RDB functions fail.                   [ #00]
 12/27 F ModuleNoticeLang was printf'ing twice.                            [#650]
+12/27 F Module (un)loading was only giving error numbers, not messages.   [#652]
 
 Anope Version 1.7.17
 --------------------

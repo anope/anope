@@ -2765,7 +2765,7 @@ void handleModuleOperationQueue(void)
 		if (mod_operation_queue->op == MOD_OP_LOAD) {
 			alog("Trying to load module [%s]", mod_operation_queue->m->name);
 			status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
-			alog("Module loading status: %d", status);
+			alog("Module loading status: %d (%s)", status, ModuleGetErrStr(status));
 			if (status != MOD_ERR_OK) {
 			        if(mod_current_user) {
                                    notice_lang(s_OperServ, mod_current_user, OPER_MODULE_LOAD_FAIL,mod_operation_queue->m->name);
@@ -2775,7 +2775,7 @@ void handleModuleOperationQueue(void)
 		} else if (mod_operation_queue->op == MOD_OP_UNLOAD) {
 			alog("Trying to unload module [%s]", mod_operation_queue->m->name);
 			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);
-			alog("Module unloading status: %d", status);
+			alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
 		}
 		
 		/* Remove the ModuleQueue from memory */

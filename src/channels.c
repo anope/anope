@@ -525,8 +525,6 @@ void do_join(const char *source, int ac, char **av)
         t = s + strcspn(s, ",");
         if (*t)
             *t++ = 0;
-        if (debug)
-            alog("debug: %s joins %s", source, s);
 
         if (*s == '0') {
             c = user->chans;

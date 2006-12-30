@@ -20,6 +20,8 @@ Anope Version  S V N
 12/24 F Display error messages when RDB functions fail.                   [ #00]
 12/27 F ModuleNoticeLang was printf'ing twice.                            [#650]
 12/27 F Module (un)loading was only giving error numbers, not messages.   [#652]
+12/29 F Channel joins logged twice on some IRCd's with debug mode on.     [#651]
+12/29 F Botserv incorrectly attempted to remove bans with BSSmartJoin     [#653]
 
 Anope Version 1.7.17
 --------------------

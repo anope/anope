@@ -776,7 +776,8 @@ void bot_join(ChannelInfo * ci)
             av[1] = sstrdup("-b");
             for (i = 0; i < count; i++) {
                 if (match_wild_nocase(ci->c->bans[i], botmask)) {
-                    anope_cmd_mode(ci->bi->nick, ci->name, "%s", bans[i]);
+                    anope_cmd_mode(ci->bi->nick, ci->name, "-b %s",
+                                   bans[i]);
                     av[2] = sstrdup(bans[i]);
                     do_cmode(ci->bi->nick, 3, av);
                     free(av[2]);

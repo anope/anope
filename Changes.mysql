@@ -1,4 +1,4 @@
-Anope Version  S V N
+Anope Version 1.7.18
 --------------------
 - DROP TABLE IF EXISTS `anope_os_status`
 - ALTER TABLE `anope_bs_core` ADD `active` TINYINT( 1 ) DEFAULT '1' NOT NULL

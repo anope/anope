@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1215"
+VERSION_BUILD="1216"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1216)
+# BUGS  : 
+# NOTES : Added support for inspircd 1.1 (b8+)
 #
 # BUILD : 1.7.18 (1215)
 # BUGS  : 

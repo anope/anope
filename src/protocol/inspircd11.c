@@ -1,7 +1,7 @@
-/* inspircd beta 6+ functions
+/* inspircd 1.1 beta 6+ functions
  *
- * (C) 2005 Craig Edwards <brain@inspircd.org>
- * (C) 2003-2005 Anope Team
+ * (C) 2005-2007 Craig Edwards <brain@inspircd.org>
+ * (C) 2003-2007 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for further details.
@@ -16,7 +16,7 @@
 
 #include "services.h"
 #include "pseudo.h"
-#include "inspircd.h"
+#include "inspircd11.h"
 
 #ifndef _WIN32
 #include <sys/socket.h>
@@ -26,35 +26,35 @@
 
 #ifdef _WIN32
 #include "winsock.h"
-int inet_aton (const char *name, struct in_addr *addr)
+int inet_aton(const char *name, struct in_addr *addr)
 {
-     uint32 a = inet_addr (name);
-     addr->s_addr = a;
-     return a != (uint32)-1;
+    uint32 a = inet_addr(name);
+    addr->s_addr = a;
+    return a != (uint32) - 1;
 }
 #endif
 
 IRCDVar myIrcd[] = {
-    {"InspIRCd Beta 6",         /* ircd name */
-     "+o",                     /* nickserv mode */
-     "+o",                     /* chanserv mode */
-     "+o",                     /* memoserv mode */
-     "+o",                     /* hostserv mode */
-     "+io",                    /* operserv mode */
-     "+o",                     /* botserv mode  */
-     "+o",                     /* helpserv mode */
-     "+i",                     /* Dev/Null mode */
-     "+io",                    /* Global mode   */
-     "+o",                     /* nickserv alias mode */
-     "+o",                     /* chanserv alias mode */
-     "+o",                     /* memoserv alias mode */
-     "+io",                    /* hostserv alias mode */
-     "+io",                    /* operserv alias mode */
-     "+o",                     /* botserv alias mode  */
-     "+o",                     /* helpserv alias mode */
-     "+i",                     /* Dev/Null alias mode */
-     "+io",                    /* Global alias mode   */
-     "+s",                     /* Used by BotServ Bots */
+    {"InspIRCd 1.1",            /* ircd name */
+     "+oI",                     /* nickserv mode */
+     "+oI",                     /* chanserv mode */
+     "+oI",                     /* memoserv mode */
+     "+oI",                     /* hostserv mode */
+     "+ioI",                    /* operserv mode */
+     "+oI",                     /* botserv mode  */
+     "+oI",                     /* helpserv mode */
+     "+iI",                     /* Dev/Null mode */
+     "+ioI",                    /* Global mode   */
+     "+oI",                     /* nickserv alias mode */
+     "+oI",                     /* chanserv alias mode */
+     "+oI",                     /* memoserv alias mode */
+     "+ioI",                    /* hostserv alias mode */
+     "+ioI",                    /* operserv alias mode */
+     "+oI",                     /* botserv alias mode  */
+     "+oI",                     /* helpserv alias mode */
+     "+iI",                     /* Dev/Null alias mode */
+     "+ioI",                    /* Global alias mode   */
+     "+sI",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
      "-cilmnpstuzACGHKNOQRSV",  /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */
@@ -380,6 +380,8 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
+int has_servicesmod = 0;
+int has_globopsmod = 0;
 
 void inspircd_set_umode(User * user, int ac, char **av)
 {
@@ -460,7 +462,9 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
     m = createMessage("NOTICE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("BURST",     anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("ENDBURST",  anope_event_null); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
@@ -518,9 +522,10 @@ void inspircd_cmd_remove_akill(char *user, char *host)
 }
 
 void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+                        char *topic, time_t when)
 {
-    send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, (unsigned long int) when, whosetit, topic);
+    send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan,
+             (unsigned long int) when, whosetit, topic);
 }
 
 void inspircd_cmd_vhost_off(User * u)
@@ -529,27 +534,27 @@ void inspircd_cmd_vhost_off(User * u)
 }
 
 void inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+                        time_t expires, char *reason)
 {
-    send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, (long int) when, (long int) 86400 * 2, reason);
+    send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who,
+             (long int) when, (long int) 86400 * 2, reason);
 }
 
 void inspircd_cmd_svskill(char *source, char *user, char *buf)
 {
-    if (!buf) {
+    if (!buf || !source || !user)
         return;
-    }
-
-    if (!source || !user) {
-        return;
-    }
 
     send_cmd(source, "KILL %s :%s", user, buf);
 }
 
 void inspircd_cmd_svsmode(User * u, int ac, char **av)
 {
-    send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
+    /* This was originally done using this:
+       send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
+       * but that's the dirty way of doing things...
+     */
+    send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 }
 
 
@@ -578,14 +583,18 @@ void inspircd_cmd_376(char *source)
 void inspircd_cmd_nick(char *nick, char *name, char *modes)
 {
     /* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,name);
-    send_cmd(ServerName, "OPERTYPE Service");
+    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
+             (long int) time(NULL), nick, ServiceHost, ServiceHost,
+             ServiceUser, modes, name);
+    /* Don't send ServerName as the source here... -GD */
+    send_cmd(nick, "OPERTYPE Service");
 }
 
-void inspircd_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void inspircd_cmd_guest_nick(char *nick, char *user, char *host,
+                             char *real, char *modes)
 {
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,host,host,user,modes,real);
+    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
+             (long int) time(NULL), nick, host, host, user, modes, real);
 }
 
 void inspircd_cmd_mode(char *source, char *dest, char *buf)
@@ -603,47 +612,61 @@ int anope_event_version(char *source, int ac, char **av)
 
 int anope_event_idle(char *source, int ac, char **av)
 {
-	if (ac == 1)
-	{
-		send_cmd(av[0],"IDLE %s %ld 0",source,(long int) time(NULL));
-	}
-	return MOD_CONT;
+    if (ac == 1) {
+        send_cmd(av[0], "IDLE %s %ld 0", source, (long int) time(NULL));
+    }
+    return MOD_CONT;
 }
 
 int anope_event_ftopic(char *source, int ac, char **av)
 {
     /* :source FTOPIC channel ts setby :topic */
-    char* temp;
+    char *temp;
     if (ac < 4)
         return MOD_CONT;
-    temp = av[1];  /* temp now holds ts */
-    av[1] = av[2]; /* av[1] now holds set by */
-    av[2] = temp;  /* av[2] now holds ts */
+    temp = av[1];               /* temp now holds ts */
+    av[1] = av[2];              /* av[1] now holds set by */
+    av[2] = temp;               /* av[2] now holds ts */
     do_topic(source, ac, av);
     return MOD_CONT;
 }
 
-int anope_event_opertype(char* source, int ac, char**av)
+int anope_event_opertype(char *source, int ac, char **av)
 {
     /* opertype is equivalent to mode +o because servers
        dont do this directly */
-    User* u;
+    User *u;
     u = finduser(source);
     if (u && !is_oper(u)) {
-      char* newav[2];
-      newav[0] = source;
-      newav[1] = "+o";
-      return anope_event_mode(source, 2, newav);
-    }
-    else return MOD_CONT;
+        char *newav[2];
+        newav[0] = source;
+        newav[1] = "+o";
+        return anope_event_mode(source, 2, newav);
+    } else
+        return MOD_CONT;
 }
 
 int anope_event_fmode(char *source, int ac, char **av)
 {
-    /* :source FMODE #test +nt */
-    if (ac != 2)
+    char *newav[25];
+    int n, o;
+
+    /* :source FMODE #test 12345678 +nto foo */
+    if (ac < 3)
         return MOD_CONT;
-    return anope_event_mode(source, ac, av);
+
+    n = o = 0;
+    while (n < ac) {
+        if (n != 1) {
+            newav[o] = av[n];
+            o++;
+            if (debug)
+                alog("Param: %s", newav[o - 1]);
+        }
+        n++;
+    }
+
+    return anope_event_mode(source, ac - 1, newav);
 }
 
 int anope_event_samode(char *source, int ac, char **av)
@@ -666,7 +689,7 @@ int anope_event_sanick(char *source, int ac, char **av)
 
 int anope_event_sajoin(char *source, int ac, char **av)
 {
-    char* newav[1];
+    char *newav[1];
     if (ac != 2)
         return MOD_CONT;
     newav[0] = av[1];
@@ -676,7 +699,7 @@ int anope_event_sajoin(char *source, int ac, char **av)
 
 int anope_event_sapart(char *source, int ac, char **av)
 {
-    char* newav[1];
+    char *newav[1];
     if (ac < 2)
         return MOD_CONT;
     newav[0] = av[1];
@@ -686,35 +709,69 @@ int anope_event_sapart(char *source, int ac, char **av)
 
 int anope_event_fjoin(char *source, int ac, char **av)
 {
-    char* newav[127];
-    char people[1024];
-    int i = 0;
+    char *newav[10];
+
+    /* storing the current nick */
+    char *curnick;
+
+    /* these are used to generate the final string that is passed to ircservices' core */
+    int nlen = 0;
+    char nicklist[514];
+
+    /* temporary buffer */
+    char prefixandnick[60];
+
+    /* temporary pointer, not used except for strtok_r */
+    char *lasts;
+
+    *nicklist = '\0';
+    *prefixandnick = '\0';
 
     if (ac < 3)
         return MOD_CONT;
 
-    newav[0] = av[1];
-    newav[1] = av[0];
-    newav[2] = "+";
-    newav[3] = people;
-
-    *people = '\0';
-
-    for (i = 2; i < ac; i++)
-    {
-        if (i > 2)
-                strncat(people," ",1024);
-        strncat(people,av[i],1024);
+    curnick = strtok_r(av[2], " ", &lasts);
+    while (curnick != NULL) {
+        for (; *curnick; curnick++) {
+            /* I bet theres a better way to do this... */
+            if ((*curnick == '&') ||
+                (*curnick == '~') ||
+                (*curnick == '@') ||
+                (*curnick == '%') || (*curnick == '+')) {
+                prefixandnick[nlen++] = *curnick;
+                continue;
+            } else {
+                if (*curnick == ',') {
+                    curnick++;
+                    strncpy(prefixandnick + nlen, curnick,
+                            sizeof(prefixandnick) - nlen);
+                    break;
+                } else {
+                    alog("fjoin: unrecognised prefix: %c", *curnick);
+                }
+            }
+        }
+        strncat(nicklist, prefixandnick, 513);
+        strncat(nicklist, " ", 513);
+        curnick = strtok_r(NULL, " ", &lasts);
+        nlen = 0;
     }
+
+    newav[0] = av[1];           /* timestamp */
+    newav[1] = av[0];           /* channel name */
+    newav[2] = "+";             /* channel modes */
+    newav[3] = nicklist;
     do_sjoin(source, 4, newav);
+
     return MOD_CONT;
 }
 
 void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+                           char *modes)
 {
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,host,host,user,modes,real);
-    send_cmd(ServerName, "OPERTYPE Bot");
+    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
+             (long int) time(NULL), nick, host, host, user, modes, real);
+    send_cmd(nick, "OPERTYPE Bot");
 }
 
 void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)
@@ -811,13 +868,14 @@ static char currentpass[1024];
 /* PASS */
 void inspircd_cmd_pass(char *pass)
 {
-    strncpy(currentpass,pass,1024);
+    strncpy(currentpass, pass, 1024);
 }
 
 /* SERVER services-dev.chatspike.net password 0 :Description here */
 void inspircd_cmd_server(char *servname, int hop, char *descript)
 {
-    send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
+    send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop,
+             descript);
 }
 
 /* PONG */
@@ -827,8 +885,6 @@ void inspircd_cmd_pong(char *servname, char *who)
 }
 
 /* JOIN */
-/* Althought inspircd 3.2 does not need the timestamp others do so
-   we get it in the common function call */
 void inspircd_cmd_join(char *user, char *channel, time_t chantime)
 {
     send_cmd(user, "JOIN %s", channel);
@@ -849,7 +905,7 @@ void inspircd_cmd_chghost(char *nick, char *vhost)
     if (!nick || !vhost) {
         return;
     }
-    send_cmd(s_OperServ,"CHGHOST %s %s", nick, vhost);
+    send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
 }
 
 /* CHGIDENT */
@@ -1025,7 +1081,8 @@ void inspircd_cmd_sqline(char *mask, char *reason)
         return;
     }
 
-    send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, (long int) time(NULL), reason);
+    send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ,
+             (long int) time(NULL), reason);
 }
 
 /* SQUIT */
@@ -1060,7 +1117,8 @@ void inspircd_cmd_svsnick(char *source, char *guest, time_t when)
         return;
     }
     /* Please note that inspircd will now echo back a nickchange for this SVSNICK */
-    send_cmd(ServerName, "SVSNICK %s %s :%lu", source, guest, (unsigned long)when);
+    send_cmd(ServerName, "SVSNICK %s %s :%lu", source, guest,
+             (unsigned long) when);
 }
 
 /* Functions that use serval cmd functions */
@@ -1088,8 +1146,10 @@ void inspircd_cmd_connect(int servernum)
         inspircd_cmd_pass(RemotePassword3);
     }
     inspircd_cmd_server(ServerName, 0, ServerDesc);
-    send_cmd(NULL,"BURST");
-    send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s -- %s", version_number, ServerName, ircd->name, version_flags, version_build);
+    send_cmd(NULL, "BURST");
+    send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s",
+             version_number, ServerName, ircd->name, version_flags,
+             EncModule, version_build);
 
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1101,7 +1161,7 @@ int anope_event_ping(char *source, int ac, char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-	/* ((ac > 1) ? av[1] : ServerName) */
+    /* ((ac > 1) ? av[1] : ServerName) */
     inspircd_cmd_pong(ServerName, av[0]);
     return MOD_CONT;
 }
@@ -1153,12 +1213,12 @@ int anope_event_topic(char *source, int ac, char **av)
     c->topic_time = topic_time;
 
     record_topic(av[0]);
-	
-	if (ac > 1 && *av[1])
-	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
-	else
-	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-			
+
+    if (ac > 1 && *av[1])
+        send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
+    else
+        send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+
     return MOD_CONT;
 }
 
@@ -1187,18 +1247,15 @@ int anope_event_mode(char *source, int ac, char **av)
     if (*av[0] == '#' || *av[0] == '&') {
         do_cmode(source, ac, av);
     } else {
-	/* InspIRCd lets opers change another
+        /* InspIRCd lets opers change another
            users modes, we have to kludge this
            as it slightly breaks RFC1459
          */
-	if (!strcasecmp(source,av[0]))
-	{
-        	do_umode(source, ac, av);
-	}
-	else
-	{
-		do_umode(av[0], ac, av);
-	}
+        if (!strcasecmp(source, av[0])) {
+            do_umode(source, ac, av);
+        } else {
+            do_umode(av[0], ac, av);
+        }
     }
     return MOD_CONT;
 }
@@ -1224,9 +1281,9 @@ int anope_event_kick(char *source, int ac, char **av)
 
 int anope_event_join(char *source, int ac, char **av)
 {
-    if (ac != 1)
+    if (ac != 2)
         return MOD_CONT;
-    do_join(source, ac, av);
+    do_join(source, 1, av);
     return MOD_CONT;
 }
 
@@ -1339,23 +1396,20 @@ int anope_event_nick(char *source, int ac, char **av)
 {
     User *user;
     struct in_addr addy;
-    uint32* ad = (uint32*)&addy;
+    uint32 *ad = (uint32 *) & addy;
 
     if (ac != 1) {
         if (ac == 8) {
-            inet_aton(av[6],&addy);
-            user = do_nick("",	 	av[1],	/* nick */
-					av[4],	/* username */
-					av[2],	/* realhost */
-					source, /* server */
-					av[7],	/* realname */
-					strtoul(av[0], NULL, 10),
-					0,
-					htonl(*ad),
-					av[3],
-					NULL);
-             if (user)
-	            anope_set_umode(user, 1, &av[5]);
+            inet_aton(av[6], &addy);
+            user = do_nick("", av[1],   /* nick */
+                           av[4],       /* username */
+                           av[2],       /* realhost */
+                           source,      /* server */
+                           av[7],       /* realname */
+                           strtoul(av[0], NULL, 10),
+                           0, htonl(*ad), av[3], NULL);
+            if (user)
+                anope_set_umode(user, 1, &av[5]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
@@ -1419,6 +1473,42 @@ int anope_event_whois(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+int anope_event_capab(char *source, int ac, char **av)
+{
+    if (strcasecmp(av[0], "START") == 0) {
+        /* reset CAPAB */
+        has_servicesmod = 0;
+        has_globopsmod = 0;
+    } else if (strcasecmp(av[0], "MODULES") == 0) {
+        if (strstr(av[1], "m_globops.so")) {
+            has_globopsmod = 1;
+        }
+        if (strstr(av[1], "m_services.so")) {
+            has_servicesmod = 1;
+        }
+    } else if (strcasecmp(av[0], "END") == 0) {
+        if (has_globopsmod == 0) {
+            send_cmd(NULL,
+                     "ERROR :m_globops.so is not loaded. This is required by Anope");
+            strscpy(quitmsg,
+                    "Remote server does not have the m_globops.so module loaded, and this is required.",
+                    sizeof(quitmsg));
+            quitting = 1;
+            return MOD_STOP;
+        }
+        if (has_servicesmod == 0) {
+            send_cmd(NULL,
+                     "ERROR :m_services.so is not loaded. This is required by Anope");
+            strscpy(quitmsg,
+                    "Remote server does not have the m_services.so module loaded, and this is required.",
+                    sizeof(quitmsg));
+            quitting = 1;
+            return MOD_STOP;
+        }
+    }
+    return MOD_CONT;
+}
+
 /* SVSHOLD - set */
 void inspircd_cmd_svshold(char *nick)
 {
@@ -1446,7 +1536,8 @@ void inspircd_cmd_unszline(char *mask)
 /* SZLINE */
 void inspircd_cmd_szline(char *mask, char *reason, char *whom)
 {
-    send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, (long int) time(NULL), reason);
+    send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom,
+             (long int) time(NULL), reason);
 }
 
 /* SGLINE */
@@ -1488,9 +1579,9 @@ void inspircd_cmd_nc_change(User * u)
 /* SVSMODE +r */
 void inspircd_cmd_svid_umode2(User * u, char *ts)
 {
-   if (debug)
-       alog("debug: common_svsmode(2)");
-   common_svsmode(u, "+r", NULL);
+    if (debug)
+        alog("debug: common_svsmode(2)");
+    common_svsmode(u, "+r", NULL);
 }
 
 void inspircd_cmd_svid_umode3(User * u, char *ts)
@@ -1514,7 +1605,7 @@ void inspircd_cmd_swhois(char *source, char *who, char *mask)
 
 void inspircd_cmd_eob()
 {
-    send_cmd(NULL,"ENDBURST");
+    send_cmd(NULL, "ENDBURST");
 }
 
 
@@ -1661,9 +1752,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(inspircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(inspircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(inspircd_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
-	pmodule_cmd_svspart(inspircd_cmd_svspart);
-	pmodule_cmd_swhois(inspircd_cmd_swhois);
+    pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
+    pmodule_cmd_svspart(inspircd_cmd_svspart);
+    pmodule_cmd_swhois(inspircd_cmd_swhois);
     pmodule_cmd_eob(inspircd_cmd_eob);
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);
@@ -1680,10 +1771,11 @@ int AnopeInit(int argc, char **argv)
 {
 
     moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
+    moduleAddVersion
+        ("$Id: inspircd.c 1207 2006-12-10 12:27:56Z geniusdex $");
     moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("inspircdIRCd Beta 6+");
+    pmodule_ircd_version("inspircdIRCd 1.1");
     pmodule_ircd_cap(myIrcdcap);
     pmodule_ircd_var(myIrcd);
     pmodule_ircd_cbmodeinfos(myCbmodeinfos);

@@ -508,12 +508,12 @@ void moduleAddIRCDMsgs(void) {
 
 void inspircd_cmd_svsnoop(char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+    /* Not Supported by this IRCD */
 }
 
 void inspircd_cmd_svsadmin(char *server, int set)
 {
-    inspircd_cmd_svsnoop(server, set);
+    /* Not Supported by this IRCD */
 }
 
 void inspircd_cmd_remove_akill(char *user, char *host)
@@ -1423,7 +1423,7 @@ int anope_event_chghost(char *source, int ac, char **av)
 {
     User *u;
 
-    if (ac != 2)
+    if (ac != 1)
         return MOD_CONT;
 
     u = finduser(source);

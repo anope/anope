@@ -35,7 +35,7 @@ int inet_aton (const char *name, struct in_addr *addr)
 #endif
 
 IRCDVar myIrcd[] = {
-    {"InspIRCd Beta 6",         /* ircd name */
+    {"InspIRCd 1.0",           /* ircd name */
      "+o",                     /* nickserv mode */
      "+o",                     /* chanserv mode */
      "+o",                     /* memoserv mode */
@@ -504,12 +504,12 @@ void moduleAddIRCDMsgs(void) {
 
 void inspircd_cmd_svsnoop(char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+    /* Not Supported by this IRCD */
 }
 
 void inspircd_cmd_svsadmin(char *server, int set)
 {
-    inspircd_cmd_svsnoop(server, set);
+    /* Not Supported by this IRCD */
 }
 
 void inspircd_cmd_remove_akill(char *user, char *host)
@@ -1683,7 +1683,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("inspircdIRCd Beta 6+");
+    pmodule_ircd_version("inspircdIRCd 1.0");
     pmodule_ircd_cap(myIrcdcap);
     pmodule_ircd_var(myIrcd);
     pmodule_ircd_cbmodeinfos(myCbmodeinfos);

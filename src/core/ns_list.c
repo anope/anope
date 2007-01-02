@@ -114,11 +114,13 @@ int do_list(User * u)
             if (pattern[0] == '#') {
                 tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
                 if (!tmp) {
+                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
                         free(tmp);
+	                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
                         return MOD_CONT;
                     }
                 }
@@ -126,11 +128,13 @@ int do_list(User * u)
                 free(tmp);
                 tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
                 if (!tmp) {
+                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
                         free(tmp);
+	                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
                         return MOD_CONT;
                     }
                 }

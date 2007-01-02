@@ -295,6 +295,19 @@ END_OF_ANY_LIST
 ###########################################################################
 
 # Automatic messages
+LIST_INCORRECT_RANGE
+	Incorrect range specified. The correct syntax is #from-to.
+CS_LIST_INCORRECT_RANGE
+	To search for channels starting with #, search for the channel
+	name without the #-sign prepended (anope instead of #anope).
+
+###########################################################################
+#
+# NickServ messages
+#
+###########################################################################
+
+# Automatic messages
 NICK_IS_REGISTERED
 	Αυτό το ψευδώνυμο ανήκει σε κάποιον άλλον.  Παρακαλώ διάλεξε κάποιο άλλο.
 	(Αν αυτό είναι το ψευδώνυμό σου, γράψε %R%s IDENTIFY ^_κωδικό^_.)

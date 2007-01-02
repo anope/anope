@@ -46,7 +46,7 @@
 # For languages other than English, this string should have the following
 # format:
 #     language-name-in-language (language-name-in-English)
-# For example, "Español (Spanish)" or "Français (French)".
+# For example, "Espaï¿½l (Spanish)" or "Franï¿½is (French)".
 
 LANG_NAME
 	English
@@ -287,6 +287,13 @@ EXPIRES_1D
 # Generic Footer message
 END_OF_ANY_LIST
 	End of %s list.
+
+# Generic List error messages
+LIST_INCORRECT_RANGE
+	Incorrect range specified. The correct syntax is #from-to.
+CS_LIST_INCORRECT_RANGE
+	To search for channels starting with #, search for the channel
+	name without the #-sign prepended (anope instead of #anope).
 
 ###########################################################################
 #

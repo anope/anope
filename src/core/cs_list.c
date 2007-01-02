@@ -72,6 +72,8 @@ void myChanServHelp(User * u)
 int do_list(User * u)
 {
     char *pattern = strtok(NULL, " ");
+    int spattern_size;
+    char *spattern;
     ChannelInfo *ci;
     int nchans, i;
     char buf[BUFSIZE];
@@ -97,11 +99,15 @@ int do_list(User * u)
             if (pattern[0] == '#') {
                 tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
                 if (!tmp) {
+                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+                	notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
                         free(tmp);
+        		       	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+		               	notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
                         return MOD_CONT;
                     }
                 }
@@ -109,11 +115,15 @@ int do_list(User * u)
                 free(tmp);
                 tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
                 if (!tmp) {
+                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+                	notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
                     return MOD_CONT;
                 }
                 for (s = tmp; *s; s++) {
                     if (!isdigit(*s)) {
                         free(tmp);
+	                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+    	            	notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
                         return MOD_CONT;
                     }
                 }
@@ -134,6 +144,11 @@ int do_list(User * u)
             if (stricmp(keyword, "NOEXPIRE") == 0)
                 matchflags |= CI_NO_EXPIRE;
         }
+        
+        spattern_size = (strlen(pattern) + 2) * sizeof(char);
+        spattern = smalloc(spattern_size);
+        snprintf(spattern, spattern_size, "#%s", pattern);
+        
 
         notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
         for (i = 0; i < 256; i++) {
@@ -144,8 +159,10 @@ int do_list(User * u)
                 if ((matchflags != 0) && !(ci->flags & matchflags))
                     continue;
 
-                if (stricmp(pattern, ci->name) == 0
-                    || match_wild_nocase(pattern, ci->name)) {
+                if ((stricmp(pattern, ci->name) == 0)
+                	|| (stricmp(spattern, ci->name) == 0)
+                    || match_wild_nocase(pattern, ci->name)
+                    || match_wild_nocase(spattern, ci->name)) {
                     if ((((count + 1 >= from) && (count + 1 <= to))
                          || ((from == 0) && (to == 0)))
                         && (++nchans <= CSListMax)) {

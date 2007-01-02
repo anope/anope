@@ -300,6 +300,19 @@ END_OF_ANY_LIST
 ###########################################################################
 
 # Automatic messages
+LIST_INCORRECT_RANGE
+	Incorrect range specified. The correct syntax is #from-to.
+CS_LIST_INCORRECT_RANGE
+	To search for channels starting with #, search for the channel
+	name without the #-sign prepended (anope instead of #anope).
+
+###########################################################################
+#
+# NickServ messages
+#
+###########################################################################
+
+# Automatic messages
 NICK_IS_REGISTERED
 	Bu nick baþkasýna ait. Lütfen baþka bir tane seçin.
 	(Eðer bu sizin nickiniz ise, %R%s IDENTIFY þifreniz yazýnýz.)

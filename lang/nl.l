@@ -298,6 +298,20 @@ END_OF_ANY_LIST
 ###########################################################################
 
 # Automatic messages
+LIST_INCORRECT_RANGE
+	Ongeldig bereik opgegeven. Het correct gebruik is #van-tot.
+CS_LIST_INCORRECT_RANGE
+	Om te zoeken naar kanalen die met een # beginnen moet gezocht
+	worden naar de kanaalnaam zonder het #-teken ervoor (anope
+	in plaats van #anope).
+
+###########################################################################
+#
+# NickServ messages
+#
+###########################################################################
+
+# Automatic messages
 NICK_IS_REGISTERED
 	Deze nick is eigendom van iemand anders.  Kies een andere.
 	(Als dit jouw nick is, type %R%s IDENTIFY wachtwoord.)

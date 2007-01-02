@@ -2,6 +2,8 @@ Anope Version  S V N
 --------------------
 01/01 A Support for InspIRCd 1.1.                                         [ #00]
 01/02 F Issues with both InspIRCd protocol modules.                       [ #00]
+01/02 F Error reporting on LIST commands accepting ranges.                [#622]
+01/02 F ChanServ LIST now searches for '#chan' if only 'chan' is given.   [#622]
 
 Anope Version 1.7.18
 --------------------

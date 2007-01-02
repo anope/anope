@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1217"
+VERSION_BUILD="1218"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1218)
+# BUGS  : 622
+# NOTES : Fixed ChanServ LIST to now search for <#chan> if only <chan> is given; Fixed all LIST commands to give error reporting when specifying incorrect ranges.
 #
 # BUILD : 1.7.18 (1217)
 # BUGS  : 

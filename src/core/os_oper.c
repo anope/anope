@@ -34,7 +34,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
-    c = createCommand("OPER", do_oper, is_oper, OPER_HELP_OPER, -1, -1, -1,
+    c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1,
                       -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -58,7 +58,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_oper(u)) {
+    if (is_oper(u) || is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_OPER);
     }
 }
@@ -165,6 +165,11 @@ int do_oper(User * u)
     } else if (!stricmp(cmd, "LIST")) {
         int sent_header = 0;
 
+		if (!is_oper(u)) {
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
+			return MOD_CONT;
+		}
+		
         if (servopers.count == 0) {
             notice_lang(s_OperServ, u, OPER_OPER_LIST_EMPTY);
             return MOD_CONT;

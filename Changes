@@ -5,6 +5,7 @@ Anope Version  S V N
 01/02 F Error reporting on LIST commands accepting ranges.                [#622]
 01/02 F ChanServ LIST now searches for '#chan' if only 'chan' is given.   [#622]
 01/06 F Missing backtick in SQL query for saving news items.              [ #00]
+01/06 F Some OperServ commands not respecting OSOpersOnly when disabled.  [#657]
 
 Anope Version 1.7.18
 --------------------

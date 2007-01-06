@@ -35,7 +35,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("STAFF", do_staff, is_oper, OPER_HELP_STAFF, -1, -1,
+    c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1,
                       -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -59,9 +59,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_oper(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
-    }
+    notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
 }
 
 /**

@@ -30,7 +30,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
-    c = createCommand("HELP", do_help, is_oper, -1, -1, -1, -1, -1);
+    c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
     return MOD_CONT;

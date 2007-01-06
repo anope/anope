@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1218"
+VERSION_BUILD="1219"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1219)
+# BUGS  : 
+# NOTES : Fixed a missing backtick in the INSERT query for newsitems
 #
 # BUILD : 1.7.18 (1218)
 # BUGS  : 622

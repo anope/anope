@@ -941,7 +941,7 @@ int db_mysql_save_news(NewsItem * ni)
     
     if (ret && (mysql_affected_rows(mysql) == 0)) {
         ret = db_mysql_try("INSERT DELAYED INTO anope_os_news "
-                           "(type, num, ntext, who, time`, active) "
+                           "(type, num, ntext, who, `time`, active) "
                            "VALUES (%d, %d, '%s', '%s', %d, 1)",
                            ni->type, ni->num, q_text, q_who, (int) ni->time);
     }

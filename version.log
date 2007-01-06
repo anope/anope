@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1220"
+VERSION_BUILD="1221"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1221)
+# BUGS  : 659
+# NOTES : Fixed a mistake in the MySQL code with identifying services roots
 #
 # BUILD : 1.7.18 (1220)
 # BUGS  : 657

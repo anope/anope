@@ -1853,7 +1853,7 @@ int db_mysql_load_ns_dbase(void)
         /* Make sure the SERVICES_ROOT flag is only set for services roots */
         na->nc->flags &= ~NI_SERVICES_ROOT;
         for (i = 0; i < RootNumber; i++) {
-            if (stricmp(ServicesRoots[i], na->nick))
+            if (stricmp(ServicesRoots[i], na->nick) == 0)
                 na->nc->flags |= NI_SERVICES_ROOT;
         }
 

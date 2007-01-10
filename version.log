@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1223"
+VERSION_BUILD="1224"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1224)
+# BUGS  : 663
+# NOTES : Fixed BotServ kicks to now obey the SignKick setting of the channel
 #
 # BUILD : 1.7.18 (1223)
 # BUGS  : 666

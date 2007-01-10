@@ -9,6 +9,7 @@ Anope Version  S V N
 01/06 F MySQL code not always reporting Services Root flags correctly.    [#659]
 01/10 F Minor syntax error in anoperc.                                    [#665]
 01/10 F CHAN_SYMBOL_REQUIRED claimed one can register local (&) channels. [#666]
+01/10 F BotServ kicks now obeys the channel's SignKick option.            [#663]
 
 Anope Version 1.7.18
 --------------------

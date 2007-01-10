@@ -947,7 +947,15 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         av[2] = reason;
     }
 
-    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+    /* Check if we need to do a signkick or not -GD */
+    if ((ci->flags & CI_SIGNKICK)
+        || ((ci->flags & CI_SIGNKICK_LEVEL)
+            && !check_access(requester, ci, CA_SIGNKICK)))
+        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+                       requester->nick);
+    else
+        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+
     do_kick(ci->bi->nick, 3, av);
 }
 
@@ -987,7 +995,13 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
         av[2] = reason;
     }
 
-    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+    if ((ci->flags & CI_SIGNKICK)
+        || ((ci->flags & CI_SIGNKICK_LEVEL)
+            && !check_access(requester, ci, CA_SIGNKICK)))
+        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+                       requester->nick);
+    else
+        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
 }
 

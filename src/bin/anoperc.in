@@ -126,7 +126,7 @@ elif [ "$1" = "help" ] ; then
 		echo "$0 restart        Restart Anope (Databases will be saved)"
 		echo "			Additional parameters may be passed"
 		echo "			(e.g. $0 restart -logchan)"
-		echi "			For a list type $0 $1 paramlist"
+		echo "			For a list type $0 $1 paramlist"
 		echo "$0 rehash         Rehash Configuration and Save Databases"
 		echo "$0 version        Return Anope Version and Build Information"
 		echo "$0 help           Show this help menu"

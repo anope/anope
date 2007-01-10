@@ -7,6 +7,7 @@ Anope Version  S V N
 01/06 F Missing backtick in SQL query for saving news items.              [ #00]
 01/06 F Some OperServ commands not respecting OSOpersOnly when disabled.  [#657]
 01/06 F MySQL code not always reporting Services Root flags correctly.    [#659]
+01/10 F Minor syntax error in anoperc.                                    [#665]
 
 Anope Version 1.7.18
 --------------------

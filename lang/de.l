@@ -1083,7 +1083,7 @@ CHAN_PASSWORD_IS
 CHAN_REGISTER_NONE_CHANNEL
 	Du hast versucht ein nicht existierender Channel %s zu registrieren.
 CHAN_SYMBOL_REQUIRED
-	Verwende bitte nur das Symbol # oder & wenn du versuchst ein
+	Verwende bitte nur das Symbol # wenn du versuchst ein
 	Channel zu registrieren.
 
 # IDENTIFY responses

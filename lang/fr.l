@@ -1081,7 +1081,7 @@ CHAN_PASSWORD_IS
 CHAN_REGISTER_NONE_CHANNEL
 	Vous avez essayé d'enregistrer le canal %s qui n'éxiste pas.
 CHAN_SYMBOL_REQUIRED
-	Veuillez utiliser les symbole # ou & quand vous voulez enregistrer
+	Veuillez utiliser les symbole # quand vous voulez enregistrer
 	un canal.
 	
 # IDENTIFY responses

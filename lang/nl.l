@@ -1067,7 +1067,7 @@ CHAN_PASSWORD_IS
 CHAN_REGISTER_NONE_CHANNEL
 	Je hebt geprobeerd om niet-bestaand kanaal %s te registeren.
 CHAN_SYMBOL_REQUIRED
-	Gebruik het # of & symbool wanner je probeert een kanaal te registeren.
+	Gebruik het # symbool wanner je probeert een kanaal te registeren.
 
 
 # IDENTIFY responses

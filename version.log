@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1222"
+VERSION_BUILD="1223"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1223)
+# BUGS  : 666
+# NOTES : Fixed CHAN_SYMBOL_REQUIRED which claimed one can register local (&) channels (sorry Rob, i should have left this bug for you)
 #
 # BUILD : 1.7.18 (1222)
 # BUGS  : 665

@@ -1058,7 +1058,7 @@ CHAN_PASSWORD_IS
 CHAN_REGISTER_NONE_CHANNEL
 	Hai provato a registrare un canale non esistente %s
 CHAN_SYMBOL_REQUIRED
-	Per favore usa il simbolo # o & provando a registrare
+	Per favore usa il simbolo # provando a registrare
 
 
 # IDENTIFY responses

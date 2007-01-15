@@ -11,6 +11,7 @@ Anope Version  S V N
 01/10 F CHAN_SYMBOL_REQUIRED claimed one can register local (&) channels. [#666]
 01/10 F BotServ kicks now obeys the channel's SignKick option.            [#663]
 01/15 F Only send PONG during MySQL save when we're not syncing.          [#669]
+01/15 F InspIRCD 1.1 protocol module used windows incompatible strtok_r.  [#667]
 
 Anope Version 1.7.18
 --------------------

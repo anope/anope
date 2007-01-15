@@ -721,16 +721,16 @@ int anope_event_fjoin(char *source, int ac, char **av)
     /* temporary buffer */
     char prefixandnick[60];
 
-    /* temporary pointer, not used except for strtok_r */
-    char *lasts;
-
     *nicklist = '\0';
     *prefixandnick = '\0';
+	
+	/* value used for myStrGetToken */
+	int curtoken = 0;
 
     if (ac < 3)
         return MOD_CONT;
-
-    curnick = strtok_r(av[2], " ", &lasts);
+	
+	curnick = myStrGetToken(av[2], ' ', curtoken);
     while (curnick != NULL) {
         for (; *curnick; curnick++) {
             /* I bet theres a better way to do this... */
@@ -753,7 +753,8 @@ int anope_event_fjoin(char *source, int ac, char **av)
         }
         strncat(nicklist, prefixandnick, 513);
         strncat(nicklist, " ", 513);
-        curnick = strtok_r(NULL, " ", &lasts);
+		curtoken++;
+		curnick = myStrGetToken(av[2], ' ', curtoken);
         nlen = 0;
     }
 

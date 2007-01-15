@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1225"
+VERSION_BUILD="1226"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1226)
+# BUGS  : 668
+# NOTES : Fixed win32 makefile for the inspircd protocol module changes
 #
 # BUILD : 1.7.18 (1225)
 # BUGS  : 669

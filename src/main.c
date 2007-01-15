@@ -179,34 +179,47 @@ void save_databases(void)
         if (!skeleton) {
             waiting = -11;
             save_ns_rdb_dbase();
-            anope_cmd_pong(ServerName, ServerName);
+            /* We send these PONG's when we're not syncing to avoid timeouts.
+             * If we send them during the sync, we fuck something up there and
+             * break the syncing process, resulting in lost (literally lost)
+             * data. -GD
+             */
+            if (!is_sync(serv_uplink))
+                anope_cmd_pong(ServerName, ServerName);
             waiting = -12;
             save_cs_rdb_dbase();
-            anope_cmd_pong(ServerName, ServerName);
+            if (!is_sync(serv_uplink))
+                anope_cmd_pong(ServerName, ServerName);
             if (PreNickDBName) {
                 save_ns_req_rdb_dbase();
-                anope_cmd_pong(ServerName, ServerName);
+                if (!is_sync(serv_uplink))
+                    anope_cmd_pong(ServerName, ServerName);
                 waiting = -13;
             }
             if (s_BotServ) {
                 waiting = -14;
                 save_bs_rdb_dbase();
-                anope_cmd_pong(ServerName, ServerName);
+                if (!is_sync(serv_uplink))
+                    anope_cmd_pong(ServerName, ServerName);
             }
             if (s_HostServ) {
                 waiting = -15;
                 save_hs_rdb_dbase();
-                anope_cmd_pong(ServerName, ServerName);
+                if (!is_sync(serv_uplink))
+                    anope_cmd_pong(ServerName, ServerName);
             }
             waiting = -16;
             save_os_rdb_dbase();
-            anope_cmd_pong(ServerName, ServerName);
+            if (!is_sync(serv_uplink))
+                anope_cmd_pong(ServerName, ServerName);
             waiting = -17;
             save_rdb_news();
-            anope_cmd_pong(ServerName, ServerName);
+            if (!is_sync(serv_uplink))
+                anope_cmd_pong(ServerName, ServerName);
             waiting = -18;
             save_rdb_exceptions();
-            anope_cmd_pong(ServerName, ServerName);
+            if (!is_sync(serv_uplink))
+                anope_cmd_pong(ServerName, ServerName);
 
         }
     }

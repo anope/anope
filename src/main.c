@@ -183,42 +183,46 @@ void save_databases(void)
              * If we send them during the sync, we fuck something up there and
              * break the syncing process, resulting in lost (literally lost)
              * data. -GD
+             * This used is_sync(serv_uplink) to check for sync states. There's
+             * only a minor error with this: serv_uplink doesn't exist during
+             * the first save. So now we check for serv_uplink only; if it
+             * exists we're safe. -GD
              */
-            if (!is_sync(serv_uplink))
+            if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
             waiting = -12;
             save_cs_rdb_dbase();
-            if (!is_sync(serv_uplink))
+            if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
             if (PreNickDBName) {
                 save_ns_req_rdb_dbase();
-                if (!is_sync(serv_uplink))
+                if (serv_uplink)
                     anope_cmd_pong(ServerName, ServerName);
                 waiting = -13;
             }
             if (s_BotServ) {
                 waiting = -14;
                 save_bs_rdb_dbase();
-                if (!is_sync(serv_uplink))
+                if (serv_uplink)
                     anope_cmd_pong(ServerName, ServerName);
             }
             if (s_HostServ) {
                 waiting = -15;
                 save_hs_rdb_dbase();
-                if (!is_sync(serv_uplink))
+                if (serv_uplink)
                     anope_cmd_pong(ServerName, ServerName);
             }
             waiting = -16;
             save_os_rdb_dbase();
-            if (!is_sync(serv_uplink))
+            if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
             waiting = -17;
             save_rdb_news();
-            if (!is_sync(serv_uplink))
+            if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
             waiting = -18;
             save_rdb_exceptions();
-            if (!is_sync(serv_uplink))
+            if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
 
         }

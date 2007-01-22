@@ -12,6 +12,7 @@ Anope Version  S V N
 01/10 F BotServ kicks now obeys the channel's SignKick option.            [#663]
 01/15 F Only send PONG during MySQL save when we're not syncing.          [#669]
 01/15 F InspIRCD 1.1 protocol module used windows incompatible strtok_r.  [#667]
+01/22 F Crash during first save when MySQL is enabled.                    [#672]
 
 Anope Version 1.7.18
 --------------------

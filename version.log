@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1227"
+VERSION_BUILD="1228"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1228)
+# BUGS  : 672
+# NOTES : Fixed a crash when MySQL was enabled; it checked the (unset) uplink server flags resulting in a segfault
 #
 # BUILD : 1.7.18 (1227)
 # BUGS  : 667

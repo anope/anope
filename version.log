@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1229"
+VERSION_BUILD="1230"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1230)
+# BUGS  : 656
+# NOTES : We now send out UNKLINE on hybridircd
 #
 # BUILD : 1.7.18 (1229)
 # BUGS  : 690

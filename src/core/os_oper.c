@@ -111,6 +111,10 @@ int do_oper(User * u)
         } else {
             if (na->nc->flags & NI_SERVICES_ADMIN
                 && (res = slist_indexof(&servadmins, na->nc)) != -1) {
+                if (!is_services_root(u)) {
+                    notice_lang(s_OperServ, u, PERMISSION_DENIED);
+                    return MOD_CONT;
+                }
                 slist_delete(&servadmins, res);
                 na->nc->flags |= NI_SERVICES_OPER;
                 notice_lang(s_OperServ, u, OPER_OPER_MOVED, nick);

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1228"
+VERSION_BUILD="1229"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1229)
+# BUGS  : 690
+# NOTES : SAs can no longer move down other SAs to the SO list.
 #
 # BUILD : 1.7.18 (1228)
 # BUGS  : 672

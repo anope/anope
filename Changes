@@ -15,6 +15,7 @@ Anope Version  S V N
 01/22 F Crash during first save when MySQL is enabled.                    [#672]
 03/03 F SAs can no longer move other SAs down to ServicesOpers.           [#690]
 03/03 F We now send out UNKLINE on hybrid when /os akill del is issued.   [#656]
+03/14 F /os modunload dosnt clear moduleData before calling AnopeFini.    [ #00]
 
 Anope Version 1.7.18
 --------------------

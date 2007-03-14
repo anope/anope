@@ -720,15 +720,15 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     }
 
-    if (prepForUnload(mod_current_module) != MOD_ERR_OK) {
-        return MOD_ERR_UNKNOWN;
-    }
-
     func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
     if (func) {
         mod_current_module_name = m->name;
         func();                 /* exec AnopeFini */
         mod_current_module_name = NULL;
+    }
+
+    if (prepForUnload(m) != MOD_ERR_OK) {
+        return MOD_ERR_UNKNOWN;
     }
 
     if ((ano_modclose(m->handle)) != 0) {

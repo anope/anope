@@ -2808,7 +2808,7 @@ OPER_SET_SQL_ERROR_DISABLED
 	SQL is not configured for this network. Please edit the
 	configuration file (services.conf).
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s is enabled
 OPER_SET_LIST_OPTION_OFF
 	%s is disabled
 
@@ -5856,7 +5856,7 @@ OPER_HELP_SET_SUPERADMIN
 OPER_HELP_SET_SQL
 	Syntax: SET SQL {ON | OFF}
 
-	Setting this will toggle Anope's from usage of SQL, this should
+	Setting this will toggle Anope's usage of SQL, this should
 	be used to disable and enable SQL should your SQL server go down
 	while services are running.
 

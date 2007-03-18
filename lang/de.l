@@ -5041,6 +5041,9 @@ CHAN_HELP_LIST
 	Listet alle registrierten Channels, die dem Muster
 	entsprechen, auf. (Alle Channels mit aktiviertem
 	PRIVATE-Flag werden nicht angezeigt.)
+	Anmerkung: Beachte, dass ein führendes '#' einen
+	numerischen Bereich angibt, Channelnamen müssen
+	ohne '#' angegeben werden.
 
 CHAN_HELP_OP
 	Syntax: OP [Channel [Nickname]]

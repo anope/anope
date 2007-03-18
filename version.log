@@ -9,14 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1231"
+VERSION_BUILD="1232"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1232)
+# BUGS  : 622
+# NOTES : Modified en_us.l, de.l and Changes.lang to fix 622.
 #
 # BUILD : 1.7.18 (1231)
 # BUGS  : N/A
 # NOTES : Ensure moduleData is still populated when anopeFini gets called when explicitaly unloading a single module.
-# 
 #
 # BUILD : 1.7.18 (1230)
 # BUGS  : 656

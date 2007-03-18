@@ -4796,6 +4796,8 @@ CHAN_HELP_LIST
 	
 	Lists all registered channels matching the given pattern.
 	(Channels with the PRIVATE option set are not listed.)
+	Note that a preceding '#' specifies a range, channel names
+	are to be written without '#'.
 
 CHAN_HELP_OP
 	Syntax: OP [#channel [nick]]

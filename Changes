@@ -16,6 +16,7 @@ Anope Version  S V N
 03/03 F SAs can no longer move other SAs down to ServicesOpers.           [#690]
 03/03 F We now send out UNKLINE on hybrid when /os akill del is issued.   [#656]
 03/14 F /os modunload dosnt clear moduleData before calling AnopeFini.    [ #00]
+03/18 F DefCon's AKILL will now honor the server's sync flag.             [#643]
 
 Anope Version 1.7.18
 --------------------

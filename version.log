@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1234"
+VERSION_BUILD="1235"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1235)
+# BUGS  : 643
+# NOTES : Defcon's AKILL will now honor the server's sync flag
 #
 # BUILD : 1.7.18 (1234)
 # BUGS  : 680 681

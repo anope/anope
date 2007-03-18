@@ -569,7 +569,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
  * DefCon AKILL system, if we want to akill all connecting user's here's where to do it
  * then force check_akill again on them...
  **/
-        if (checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
+        // don't akill on netmerges -Certus
+        if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
             strncpy(mask, "*@", 3);
             strncat(mask, host, HOSTMAX);
             alog("DEFCON: adding akill for %s", mask);

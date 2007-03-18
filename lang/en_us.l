@@ -2150,7 +2150,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET channel option settings
+	SET (channel | bot) option settings
 BOT_SET_DISABLED
 	Sorry, bot option setting is temporarily disabled.
 BOT_SET_UNKNOWN
@@ -6099,7 +6099,7 @@ BOT_HELP_INFO
 	time or number of channels it is on.
 	
 BOT_HELP_SET
-	Syntax: SET channel option parameters
+	Syntax: SET (channel | bot) option parameters
 	
 	Configures bot options.  option can be one of:
 	

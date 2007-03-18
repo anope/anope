@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1232"
+VERSION_BUILD="1233"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1233)
+# BUGS  : 670
+# NOTES : Fixed minor booboo in en_us.l and de.l
 #
 # BUILD : 1.7.18 (1232)
 # BUGS  : 622

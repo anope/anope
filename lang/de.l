@@ -2193,7 +2193,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET Channel Option Einstellungen
+	SET (Channel | Bot) Option Einstellungen
 BOT_SET_DISABLED
 	Die SET-Optionen sind derzeit deaktiviert.
 BOT_SET_UNKNOWN
@@ -6461,7 +6461,7 @@ BOT_HELP_INFO
 	Erstellungsdatum oder Anzahl der Channels angezeigt.
 
 BOT_HELP_SET
-	Syntax: SET Channel Option Parameter
+	Syntax: SET (Channel | Bot) Option Parameter
 	
 	Konfiguriert Optionen für einen Bot.
 	Option kann folgende Werte annehmen:

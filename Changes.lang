@@ -4,6 +4,8 @@ Anope Version  S V N
 
 *** Mod Strings:
 	CHAN_HELP_LIST
+	BOT_SET_SYNTAX
+	BOT_HELP_SET
 
 *** Del Strings:
 

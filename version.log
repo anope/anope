@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1235"
+VERSION_BUILD="1236"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1236)
+# BUGS  :
+# NOTES : Applied Rob's password length patch
 #
 # BUILD : 1.7.18 (1235)
 # BUGS  : 643

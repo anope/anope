@@ -231,6 +231,12 @@ int do_saset_password(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
+    if (len > PASSMAX) {
+        len = PASSMAX;
+        param[len] = 0;
+        notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX);
+    }
+
     if (nc->pass)
         free(nc->pass);
 

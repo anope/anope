@@ -301,21 +301,22 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
         if (!change) {
+            /* All entries should be in use so we no longer need
+             * to go over the entire list..
             for (i = 0; i < ci->accesscount; i++)
                 if (!ci->access[i].in_use)
                     break;
+             */
 
-            if (i == ci->accesscount) {
-                if (i < CSAccessMax) {
-                    ci->accesscount++;
-                    ci->access =
-                        srealloc(ci->access,
-                                 sizeof(ChanAccess) * ci->accesscount);
-                } else {
-                    notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT,
-                                CSAccessMax);
-                    return MOD_CONT;
-                }
+            if (i < CSAccessMax) {
+                ci->accesscount++;
+                ci->access =
+                    srealloc(ci->access,
+                             sizeof(ChanAccess) * ci->accesscount);
+            } else {
+                notice_lang(s_ChanServ, u, CHAN_XOP_REACHED_LIMIT,
+                            CSAccessMax);
+                return MOD_CONT;
             }
 
             access = &ci->access[i];
@@ -431,6 +432,19 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                     }
                 }
             }
+
+            /* If the patch provided in bug #706 is applied, this should be placed
+             * before sending the events! */
+            /* After reordering only the entries at the end could still be empty.
+             * We ll free the places no longer in use... */
+            for (i = ci->accesscount - 1; i >= 0; i--) {
+                if (ci->access[i].in_use == 1)
+                    break;
+
+                ci->accesscount--;
+            }
+            ci->access =
+                srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

@@ -20,6 +20,9 @@ Anope Version  S V N
 03/18 F Password length checking in some cases was out.                   [ #00]
 04/21 F DefCon did not force DefCon modes while in DefCon mode.           [#661]
 
+Provided by Jan Milants <jan_renee@msn.com> - 2007
+04/21 F Array count decremention in the ChanServ access lists.            [#662]
+
 Anope Version 1.7.18
 --------------------
 12/09 A Ability to see if AutoOp is enabled in NickServ INFO displays.    [#621]

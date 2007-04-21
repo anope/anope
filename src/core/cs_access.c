@@ -233,21 +233,23 @@ int do_access(User * u)
             }
         }
 
+        /* All entries should be in use so we no longer need
+         * to go over the entire list..
         for (i = 0; i < ci->accesscount; i++) {
             if (!ci->access[i].in_use)
                 break;
         }
-        if (i == ci->accesscount) {
-            if (i < CSAccessMax) {
-                ci->accesscount++;
-                ci->access =
-                    srealloc(ci->access,
-                             sizeof(ChanAccess) * ci->accesscount);
-            } else {
-                notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT,
-                            CSAccessMax);
-                return MOD_CONT;
-            }
+         */
+
+        if (i < CSAccessMax) {
+            ci->accesscount++;
+            ci->access =
+                srealloc(ci->access,
+                        sizeof(ChanAccess) * ci->accesscount);
+        } else {
+            notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT,
+                        CSAccessMax);
+            return MOD_CONT;
         }
 
         access = &ci->access[i];
@@ -346,6 +348,18 @@ int do_access(User * u)
                     }
                 }
             }
+
+            /* After reordering only the entries at the end could still be empty.
+             * We ll free the places no longer in use... */
+            for (i = ci->accesscount - 1; i >= 0; i--) {
+                if (ci->access[i].in_use == 1)
+                    break;
+
+                ci->accesscount--;
+            }
+            ci->access =
+                srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
+
             /* We don't know the nick if someone used numbers, so we trigger the event without
              * nick param. We just do this once, even if someone enters a range. -Certus */
             if (na)

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1237"
+VERSION_BUILD="1238"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1238)
+# BUGS  : 662
+# NOTES : Fixed array count not being decremented on ChanServ access lists (provided by Jan Milants)
 #
 # BUILD : 1.7.18 (1237)
 # BUGS  : 661

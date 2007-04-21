@@ -218,7 +218,8 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 }
             }
 
-            if (!(user = finduser(*av))) {
+            if (!(user = finduser(*av))
+                && !(UseTS6 && ircd->ts6 && (user = find_byuid(*av)))) {
                 if (debug) {
                     alog("debug: MODE %s %c%c for nonexistent user %s",
                          chan->name, (add ? '+' : '-'), mode, *av);
@@ -1080,7 +1081,7 @@ void do_cmode(const char *source, int ac, char **av)
 {
     Channel *chan;
     ChannelInfo *ci = NULL;
-    int i, tofree0 = 0, tofree1 = 0, tofree2 = 0;
+    int i;
     char *t;
 
     if (ircdcap->tsmode) {
@@ -1106,37 +1107,10 @@ void do_cmode(const char *source, int ac, char **av)
     }
 
     /* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
-
     if (UseTS6 && ircd->ts6) {
-        if (*av[0] == '#' || *av[0] == '&') {
-            if (debug) {
-                alog("debug: Before TS6 swap: do_cmode() chan %s : mode %s : extra %s", av[1], av[2], av[3]);
-            }
-            if (ac >= 2) {
-                av[0] = sstrdup(av[1]);
-                tofree0 = 1;
-            } else {
-                av[0] = NULL;
-            }
-            if (ac >= 3) {
-                av[1] = sstrdup(av[2]);
-                tofree1 = 1;
-            } else {
-                av[1] = NULL;
-            }
-            if (ac >= 4) {
-                av[2] = sstrdup(av[3]);
-                tofree2 = 1;
-            } else {
-                av[2] = NULL;
-            }
-            if (debug) {
-                alog("debug: After TS swap: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
-            }
-        } else {
-            if (debug) {
-                alog("debug: TS swap not needed: do_cmode() chan %s : mode %s : extra %s", av[0], av[1], av[2]);
-            }
+        if (isdigit(av[0][0])) {
+            ac--;
+            av++;
         }
     }
 
@@ -1148,12 +1122,6 @@ void do_cmode(const char *source, int ac, char **av)
                 alog("debug: MODE %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
             }
-        if (tofree0)
-            free(av[0]);
-        if (tofree1)
-            free(av[1]);
-        if (tofree2)
-            free(av[2]);
         return;
     }
 
@@ -1169,12 +1137,6 @@ void do_cmode(const char *source, int ac, char **av)
     ac--;
     av++;
     chan_set_modes(source, chan, ac, av, 1);
-    if (tofree0)
-        free(av[0]);
-    if (tofree1)
-        free(av[1]);
-    if (tofree2)
-        free(av[2]);
 }
 
 /*************************************************************************/

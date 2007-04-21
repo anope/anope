@@ -25,6 +25,9 @@ Provided by Jan Milants <jan_renee@msn.com> - 2007
 04/21 F Array count decremention in the ChanServ access lists.            [#662]
 04/21 F Swapped ACCESS_ADD and ACCESS_CHANGE events in cs_xop.            [#705]
 
+Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
+04/21 F Various Charybdis and TS6 related fixes.                          [#707]
+
 Anope Version 1.7.18
 --------------------
 12/09 A Ability to see if AutoOp is enabled in NickServ INFO displays.    [#621]

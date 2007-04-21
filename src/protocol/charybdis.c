@@ -73,12 +73,12 @@ IRCDVar myIrcd[] = {
      0,                         /* Chan Reg             */
      0,                         /* Channel Mode         */
      0,                         /* vidents              */
-     0,                         /* svshold              */
+     1,                         /* svshold              */
      0,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
      0,                         /* UMODE                */
      0,                         /* O:LINE               */
-     0,                         /* VHOST ON NICK        */
+     1,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
      CMODE_p,                   /* No Knock             */
      0,                         /* Admin Only           */
@@ -596,19 +596,54 @@ int anope_event_nick(char *source, int ac, char **av)
         /* Source is always the server */
         *source = '\0';
         user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
-                       strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
+                       strtoul(av[2], NULL, 10), 0, 0, NULL, av[7]);
         if (user) {
             anope_set_umode(user, 1, &av[3]);
         }
     } else {
         if (ac != 2) {
             user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
-                           strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
+                           strtoul(av[2], NULL, 10), 0, 0, NULL, NULL);
             if (user)
                 anope_set_umode(user, 1, &av[3]);
         } else {
             do_nick(source, av[0], NULL, NULL, NULL, NULL,
                     strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+        }
+    }
+    return MOD_CONT;
+}
+
+/*
+   TS6
+   av[0] = nick
+   av[1] = hop
+   av[2] = ts
+   av[3] = modes
+   av[4] = user
+   av[5] = vhost
+   av[6] = IP
+   av[7] = UID
+   ac[8] = host or *
+   ac[9] = services login
+   av[10] = info
+
+*/
+int anope_event_euid(char *source, int ac, char **av)
+{
+    Server *s;
+    User *user;
+    time_t ts;
+
+    if (UseTS6 && ac == 11) {
+        s = findserver_uid(servlist, source);
+        /* Source is always the server */
+        *source = '\0';
+	ts = strtoul(av[2], NULL, 10);
+        user = do_nick(source, av[0], av[4], !strcmp(av[8], "*") ? av[5] : av[8], s->name, av[10],
+                       ts, !stricmp(av[0], av[9]) ? ts : 0, 0, av[5], av[7]);
+        if (user) {
+            anope_set_umode(user, 1, &av[3]);
         }
     }
     return MOD_CONT;
@@ -737,7 +772,6 @@ void moduleAddIRCDMsgs(void)
 
     if (UseTS6) {
         TS6SID = sstrdup(Numeric);
-        UseTSMODE = 1;  /* TMODE */
     }
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
@@ -777,6 +811,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);    
     m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
+    m = createMessage("EUID",      anope_event_euid); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -967,11 +1002,12 @@ void charybdis_cmd_svsinfo()
   PARA	   - supports invite broadcasting for +p
   ENCAP	   - supports message encapsulation
   SERVICES - supports services-oriented TS6 extensions
+  EUID     - supports EUID and non-ENCAP CHGHOST
 */
 void charybdis_cmd_capab()
 {
     send_cmd(NULL,
-             "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES");
+             "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES EUID");
 }
 
 /* PASS */
@@ -1069,10 +1105,16 @@ int anope_event_away(char *source, int ac, char **av)
 
 int anope_event_kill(char *source, int ac, char **av)
 {
+    User *u = NULL;
+
     if (ac != 2)
         return MOD_CONT;
 
-    m_kill(av[0], av[1]);
+    if (UseTS6) {
+        u = find_byuid(av[0]);
+    }
+
+    m_kill(u ? u->nick : av[0], av[1]);
     return MOD_CONT;
 }
 
@@ -1092,7 +1134,8 @@ void charybdis_cmd_eob()
 int anope_event_join(char *source, int ac, char **av)
 {
     if (ac != 1) {
-        do_sjoin(source, ac, av);
+	/* ignore cmodes in JOIN as per TS6 v8 */
+        do_sjoin(source, ac > 2 ? 2 : ac, av);
         return MOD_CONT;
     } else {
         do_join(source, ac, av);
@@ -1524,7 +1567,7 @@ int anope_event_mode(char *source, int ac, char **av)
 
 int anope_event_tmode(char *source, int ac, char **av)
 {
-    if (*av[1] == '#' || *av[1] == '&') {
+    if (ac > 2 && (*av[1] == '#' || *av[1] == '&')) {
         do_cmode(source, ac, av);
     }
     return MOD_CONT;
@@ -1574,19 +1617,29 @@ int anope_event_capab(char *source, int ac, char **av)
 /* SVSHOLD - set */
 void charybdis_cmd_svshold(char *nick)
 {
-    /* Not supported by this IRCD */
+    send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
 }
 
 /* SVSHOLD - release */
 void charybdis_cmd_release_svshold(char *nick)
 {
-    /* Not Supported by this IRCD */
+    send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
 }
 
 /* SVSNICK */
 void charybdis_cmd_svsnick(char *nick, char *newnick, time_t when)
 {
-    /* RSFNC blah */
+    User *u;
+
+    if (!nick || !newnick) {
+        return;
+    }
+
+    u = finduser(nick);
+    if (!u)
+        return;
+    send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name,
+             u->nick, newnick, (long int)when, (long int)u->timestamp);
 }
 
 void charybdis_cmd_guest_nick(char *nick, char *user, char *host, char *real,
@@ -1928,7 +1981,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_ircd_cbmodes(myCbmodes);
     pmodule_ircd_cmmodes(myCmmodes);
     pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(1);
+    pmodule_ircd_useTSMode(0);
 
         /** Deal with modes anope _needs_ to know **/
     pmodule_invis_umode(UMODE_i);

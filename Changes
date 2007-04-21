@@ -19,6 +19,7 @@ Anope Version  S V N
 03/18 F DefCon's AKILL will now honor the server's sync flag.             [#643]
 03/18 F Password length checking in some cases was out.                   [ #00]
 04/21 F DefCon did not force DefCon modes while in DefCon mode.           [#661]
+04/21 F Event ACCESS_DEL not sent on mass-deleted in cs_xop.              [#706]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2007
 04/21 F Array count decremention in the ChanServ access lists.            [#662]

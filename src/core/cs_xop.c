@@ -172,7 +172,7 @@ int do_vop(User * u)
  * `perm' is incremented whenever a permission-denied error occurs
  */
 
-int xop_del(User * u, ChanAccess * access, int *perm, int uacc, int xlev)
+int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
 {
     if (!access->in_use || access->level != xlev)
         return 0;
@@ -180,6 +180,7 @@ int xop_del(User * u, ChanAccess * access, int *perm, int uacc, int xlev)
         (*perm)++;
         return 0;
     }
+    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, access->nc->display);
     access->nc = NULL;
     access->in_use = 0;
     return 1;
@@ -197,7 +198,7 @@ int xop_del_callback(User * u, int num, va_list args)
         return 0;
     *last = num;
 
-    return xop_del(u, &ci->access[num - 1], perm, uacc, xlev);
+    return xop_del(u, ci, &ci->access[num - 1], perm, uacc, xlev);
 }
 
 

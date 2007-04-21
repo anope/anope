@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1239"
+VERSION_BUILD="1240"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1240)
+# BUGS  : 706
+# NOTES : Fixed EVENT_ACCESS_DEL nog being sent on each delete when mass-deleting in cs_xop
 #
 # BUILD : 1.7.18 (1239)
 # BUGS  : 705

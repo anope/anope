@@ -46,6 +46,14 @@ time_t DefContimer;
 int DefConModesSet = 0;
 char *defconReverseModes(const char *modes);
 
+uint32 DefConModesOn;           /* Modes to be enabled during DefCon */
+uint32 DefConModesOff;          /* Modes to be disabled during DefCon */
+ChannelInfo DefConModesCI;      /* ChannelInfo containg params for locked modes
+                                 * during DefCon; I would've done this nicer if i
+                                 * could, but all damn mode functions require a
+                                 * ChannelInfo struct! --gdex
+                                 */
+
 
 #ifdef DEBUG_COMMANDS
 static int do_matchwild(User * u);
@@ -1657,5 +1665,87 @@ char *defconReverseModes(const char *modes)
     return newmodes;
 }
 
+/* Parse the defcon mlock mode string and set the correct global vars.
+ *
+ * @param str mode string to parse
+ * @return 1 if accepted, 0 if failed
+ */
+int defconParseModeString(const char *str)
+{
+    int add = -1;               /* 1 if adding, 0 if deleting, -1 if neither */
+    unsigned char mode;
+    CBMode *cbm;
+
+    /* Reinitialize everything */
+    DefConModesOn = 0;
+    DefConModesOff = 0;
+    DefConModesCI.mlock_limit = 0;
+    DefConModesCI.mlock_key = NULL;
+    DefConModesCI.mlock_flood = NULL;
+    DefConModesCI.mlock_redirect = NULL;
+
+    /* Loop while there are modes to set */
+    while ((mode = *str++)) {
+        switch (mode) {
+        case '+':
+            add = 1;
+            continue;
+        case '-':
+            add = 0;
+            continue;
+        default:
+            if (add < 0)
+                continue;
+        }
+
+        if ((int) mode < 128 && (cbm = &cbmodes[(int) mode])->flag != 0) {
+            if (cbm->flags & CBM_NO_MLOCK) {
+                alog("DefConChanModes mode character '%c' cannot be locked", mode);
+                return 0;
+            } else if (add) {
+                DefConModesOn |= cbm->flag;
+                DefConModesOff &= ~cbm->flag;
+                if (cbm->cssetvalue)
+                    cbm->cssetvalue(&DefConModesCI, strtok(NULL, " "));
+            } else {
+                DefConModesOff |= cbm->flag;
+                if (DefConModesOn & cbm->flag) {
+                    DefConModesOn &= ~cbm->flag;
+                    if (cbm->cssetvalue)
+                        cbm->cssetvalue(&DefConModesCI, NULL);
+                }
+            }
+        } else {
+            alog("DefConChanModes unknown mode character '%c'", mode);
+            return 0;
+        }
+    }                           /* while (*param) */
+
+    if (ircd->Lmode) {
+        /* We can't mlock +L if +l is not mlocked as well. */
+        if ((DefConModesOn & ircd->chan_lmode)
+            && !(DefConModesOn & anope_get_limit_mode())) {
+            DefConModesOn &= ~ircd->chan_lmode;
+            free(DefConModesCI.mlock_redirect);
+            DefConModesCI.mlock_redirect = NULL;
+            alog("DefConChanModes must lock mode +l as well to lock mode +L");
+            return 0;
+        }
+    }
+
+    /* Some ircd we can't set NOKNOCK without INVITE */
+    /* So check if we need there is a NOKNOCK MODE and that we need INVITEONLY */
+    if (ircd->noknock && ircd->knock_needs_i) {
+        if ((DefConModesOn & ircd->noknock)
+            && !(DefConModesOn & anope_get_invite_mode())) {
+            DefConModesOn &= ~ircd->noknock;
+            alog("DefConChanModes must lock mode +i as well to lock mode +K");
+            return 0;
+        }
+    }
+
+    /* Everything is set fine, return 1 */
+    return 1;
+}
 
 /*************************************************************************/

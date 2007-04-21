@@ -570,7 +570,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
  * then force check_akill again on them...
  **/
         // don't akill on netmerges -Certus
-        if (is_sync(findserver(servlist, server)) && checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
+        if (is_sync(findserver(servlist, server))
+            && checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
             strncpy(mask, "*@", 3);
             strncat(mask, host, HOSTMAX);
             alog("DEFCON: adding akill for %s", mask);

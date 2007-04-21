@@ -475,6 +475,17 @@ int init_secondary(int ac, char **av)
     /* Parse all remaining command-line options. */
     parse_options(ac, av);
 
+    /* Parse the defcon mode string if needed */
+    if (DefConLevel) {
+        int defconCount;
+        for (defconCount = 1; defconCount <= 5; defconCount++) {
+            if (!defconParseModeString(DefConChanModes)) {
+                fprintf(stderr,
+                        "services.conf: The given DefConChanModes mode string was incorrect (see log for exact errors)\n");
+                return -1;
+            }
+        }
+    }
 #ifndef _WIN32
     if (!nofork) {
         if ((i = fork()) < 0) {
@@ -503,12 +514,17 @@ int init_secondary(int ac, char **av)
         }
     }
     if (!SupportedWindowsVersion()) {
-        char *winver = GetWindowsVersion();
-        alog("%s is not a supported version of Windows", winver);
-        free(winver);
-        return -1;
-    }
-    if (!nofork) {
+
+        char *winver = GetWindowsVersion();
+
+        alog("%s is not a supported version of Windows", winver);
+
+        free(winver);
+
+        return -1;
+
+    }
+    if (!nofork) {
         alog("Launching Anope into the background");
         FreeConsole();
     }

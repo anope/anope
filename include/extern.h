@@ -938,6 +938,11 @@ E SList akills, sglines, sqlines, szlines;
 E SList servadmins;
 E SList servopers;
 
+E int DefConModesSet;
+E uint32 DefConModesOn;
+E uint32 DefConModesOff;
+E ChannelInfo DefConModesCI;
+
 E void operserv(User *u, char *buf);
 E void os_init(void);
 E void load_os_dbase(void);
@@ -976,6 +981,7 @@ E Server *server_global(Server * s, char *msg);
 E int OSOpersOnly; 
 E time_t DefContimer;
 E void runDefCon(void);
+E int defconParseModeString(const char *str);
 
 /**** process.c ****/
 

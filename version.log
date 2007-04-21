@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1236"
+VERSION_BUILD="1237"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1237)
+# BUGS  : 661
+# NOTES : Fixed DefCon which did not force DefConChanModes when it was enabled
 #
 # BUILD : 1.7.18 (1236)
 # BUGS  :

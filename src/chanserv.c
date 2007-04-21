@@ -1072,7 +1072,12 @@ void save_cs_rdb_dbase(void)
 /*************************************************************************/
 
 /* Check the current modes on a channel; if they conflict with a mode lock,
- * fix them. */
+ * fix them.
+ *
+ * Also check to make sure that every mode set or unset is allowed by the
+ * defcon mlock settings. This is more important than any normal channel
+ * mlock'd mode. --gdex (21-04-07)
+ */
 
 void check_modes(Channel * c)
 {
@@ -1109,6 +1114,7 @@ void check_modes(Channel * c)
     }
     c->chanserv_modecount++;
 
+    /* Check if the channel is registered; if not remove mode -r */
     if (!(ci = c->ci)) {
         if (ircd->regmode) {
             if (c->mode & ircd->regmode) {
@@ -1119,8 +1125,14 @@ void check_modes(Channel * c)
         return;
     }
 
+    /* Initialize te modes-var to set all modes not set yet but which should
+     * be set as by mlock and defcon.
+     */
     modes = ~c->mode & ci->mlock_on;
+    if (DefConModesSet)
+        modes |= (~c->mode & DefConModesOn);
 
+    /* Initialize the buffers */
     *end++ = '+';
     cbmi = cbmodeinfos;
 
@@ -1131,7 +1143,12 @@ void check_modes(Channel * c)
 
             /* Add the eventual parameter and modify the Channel structure */
             if (cbmi->getvalue && cbmi->csgetvalue) {
-                char *value = cbmi->csgetvalue(ci);
+                char *value;
+                /* Check if it's a defcon or mlock mode */
+                if (DefConModesOn & cbmi->flag)
+                    value = cbmi->csgetvalue(&DefConModesCI);
+                else
+                    value = cbmi->csgetvalue(ci);
 
                 cbm = &cbmodes[(int) cbmi->mode];
                 cbm->setvalue(c, value);
@@ -1143,10 +1160,17 @@ void check_modes(Channel * c)
                 }
             }
         } else if (cbmi->getvalue && cbmi->csgetvalue
-                   && (ci->mlock_on & cbmi->flag)
+                   && ((ci->mlock_on & cbmi->flag)
+                       || (DefConModesOn & cbmi->flag))
                    && (c->mode & cbmi->flag)) {
             char *value = cbmi->getvalue(c);
-            char *csvalue = cbmi->csgetvalue(ci);
+            char *csvalue;
+
+            /* Check if it's a defcon or mlock mode */
+            if (DefConModesOn & cbmi->flag)
+                csvalue = cbmi->csgetvalue(&DefConModesCI);
+            else
+                csvalue = cbmi->csgetvalue(ci);
 
             /* Lock and actual values don't match, so fix the mode */
             if (value && csvalue && strcmp(value, csvalue)) {
@@ -1166,6 +1190,8 @@ void check_modes(Channel * c)
         end--;
 
     modes = c->mode & ci->mlock_off;
+    if (DefConModesSet)
+        modes |= (~c->mode & DefConModesOff);
 
     if (modes) {
         *end++ = '-';

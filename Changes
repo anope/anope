@@ -18,6 +18,7 @@ Anope Version  S V N
 03/14 F /os modunload dosnt clear moduleData before calling AnopeFini.    [ #00]
 03/18 F DefCon's AKILL will now honor the server's sync flag.             [#643]
 03/18 F Password length checking in some cases was out.                   [ #00]
+04/21 F DefCon did not force DefCon modes while in DefCon mode.           [#661]
 
 Anope Version 1.7.18
 --------------------

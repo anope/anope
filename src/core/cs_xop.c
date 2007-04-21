@@ -332,12 +332,12 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         snprintf(event_access, BUFSIZE, "%d", access->level);
 
         if (!change) {
-            send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick,
+            send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick,
                        event_access);
             notice_lang(s_ChanServ, u, xmsgs[3], access->nc->display,
                         ci->name);
         } else {
-            send_event(EVENT_ACCESS_ADD, 4, ci->name, u->nick, na->nick,
+            send_event(EVENT_ACCESS_CHANGE, 4, ci->name, u->nick, na->nick,
                        event_access);
             notice_lang(s_ChanServ, u, xmsgs[4], access->nc->display,
                         ci->name);

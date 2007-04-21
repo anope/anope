@@ -22,6 +22,7 @@ Anope Version  S V N
 
 Provided by Jan Milants <jan_renee@msn.com> - 2007
 04/21 F Array count decremention in the ChanServ access lists.            [#662]
+04/21 F Swapped ACCESS_ADD and ACCESS_CHANGE events in cs_xop.            [#705]
 
 Anope Version 1.7.18
 --------------------

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1238"
+VERSION_BUILD="1239"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1239)
+# BUGS  : 705
+# NOTES : Applied patch by Jan Milants to fix the swapped ACCESS_ADD and ACCESS_CHANGED events in cs_xop
 #
 # BUILD : 1.7.18 (1238)
 # BUGS  : 662

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1241"
+VERSION_BUILD="1242"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1242)
+# BUGS  : 
+# NOTES : Minor tweaks to the ns_noop_convert output
 #
 # BUILD : 1.7.18 (1241)
 # BUGS  : 707

@@ -74,12 +74,13 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion(VERSION);
     moduleSetType(SUPPORTED);
 
-    alog("ns_noop_convert: Your auto-op database has been converted, and this module will now");
-    alog("ns_noop_convert: unload itsself.  You can now remove this module from your config");
     if (mLoadConfig(0, NULL))
         return MOD_STOP;
 
     mLoadData();
+	
+    alog("ns_noop_convert: Your auto-op database has been converted and this module will now");
+    alog("ns_noop_convert: unload itself.  You can now remove this module from your config");
 
     return MOD_STOP;
 }

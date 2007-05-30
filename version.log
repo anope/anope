@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1242"
+VERSION_BUILD="1243"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1243)
+# BUGS  : 
+# NOTES : Fixed a typo in example.conf
 #
 # BUILD : 1.7.18 (1242)
 # BUGS  : 

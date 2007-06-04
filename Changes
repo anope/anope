@@ -28,6 +28,10 @@ Provided by Jan Milants <jan_renee@msn.com> - 2007
 Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
 04/21 F Various Charybdis and TS6 related fixes.                          [#707]
 
+06/04 F prenick database was not backed up                                [#713]
+06/04 F Typo in SQL query in rdb.c                                        [#719]
+06/04 F remove_backups() did not check that s_Bot/HostServ != NULL        [ #00]
+
 Anope Version 1.7.18
 --------------------
 12/09 A Ability to see if AutoOp is enabled in NickServ INFO displays.    [#621]

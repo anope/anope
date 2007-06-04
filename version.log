@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1243"
+VERSION_BUILD="1244"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1244)
+# BUGS  : 713 719
+# NOTES : Corrected typo in rdb.c, added code in backup_databases() and remove_backups() to backup the prenick db, and added checks in remove_backups() for s_BotServ and s_HostServ being NULL
 #
 # BUILD : 1.7.18 (1243)
 # BUGS  : 

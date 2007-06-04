@@ -619,12 +619,6 @@ static void remove_backups(void)
 #else
     DeleteFile(path);
 #endif
-    snprintf(path, sizeof(path), "backups/%s.%s", BotDBName, ext);
-#ifndef _WIN32
-    unlink(path);
-#else
-    DeleteFile(path);
-#endif
     snprintf(path, sizeof(path), "backups/%s.%s", ChanDBName, ext);
 #ifndef _WIN32
     unlink(path);
@@ -649,12 +643,31 @@ static void remove_backups(void)
 #else
     DeleteFile(path);
 #endif
-    snprintf(path, sizeof(path), "backups/%s.%s", HostDBName, ext);
+
+    if (s_BotServ) {
+        snprintf(path, sizeof(path), "backups/%s.%s", BotDBName, ext);
 #ifndef _WIN32
-    unlink(path);
+        unlink(path);
 #else
-    DeleteFile(path);
+        DeleteFile(path);
 #endif
+    }
+    if (s_HostServ) {
+        snprintf(path, sizeof(path), "backups/%s.%s", HostDBName, ext);
+#ifndef _WIN32
+        unlink(path);
+#else
+        DeleteFile(path);
+#endif
+    }
+    if (NSEmailReg) {
+        snprintf(path, sizeof(path), "backups/%s.%s", PreNickDBName, ext);
+#ifndef _WIN32
+        unlink(path);
+#else
+        DeleteFile(path);
+#endif
+    }
 }
 
 /*************************************************************************/
@@ -702,6 +715,9 @@ void backup_databases(void)
             rename_database(ChanDBName, ext);
             if (s_HostServ) {
                 rename_database(HostDBName, ext);
+            }
+            if (NSEmailReg) {
+                rename_database(PreNickDBName, ext);
             }
         }
 

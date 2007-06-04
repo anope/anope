@@ -231,7 +231,7 @@ int rdb_ns_set_display(char *newnick, char *oldnick)
     if (ret)
         ret =
             db_mysql_try
-            ("UPDATE anope_na_access SET display='%s' WHERE display='%s'",
+            ("UPDATE anope_ns_access SET display='%s' WHERE display='%s'",
              q_newnick, q_oldnick);
 
     /* No need to update anope_cs_info here as it is updated when we

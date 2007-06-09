@@ -97,7 +97,7 @@ void notice_server(char *source, Server * s, char *fmt, ...)
             return;
         }
 
-        if (UsePrivmsg) {
+        if (NSDefFlags & NI_MSG) {
             anope_cmd_serv_privmsg(source, s->name, buf);
         } else {
             anope_cmd_serv_notice(source, s->name, buf);
@@ -131,7 +131,14 @@ void notice_user(char *source, User * u, const char *fmt, ...)
             return;
         }
 
-        if (UsePrivmsg && (!u->na || (u->na->nc->flags & NI_MSG))) {
+        /* Send privmsg instead of notice if:
+         * - UsePrivmsg is enabled
+         * - The user is not registered and NSDefMsg is enabled
+         * - The user is registered and has set /ns set msg on
+         */
+        if (UsePrivmsg
+            && ((!u->na && (NSDefFlags & NI_MSG))
+                || (u->na && (u->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, u->nick, buf);
         } else {
             anope_cmd_notice2(source, u->nick, buf);
@@ -196,7 +203,14 @@ void notice_lang(char *source, User * dest, int message, ...)
         s += strcspn(s, "\n");
         if (*s)
             *s++ = 0;
-        if (UsePrivmsg && (!dest->na || (dest->na->nc->flags & NI_MSG))) {
+        /* Send privmsg instead of notice if:
+         * - UsePrivmsg is enabled
+         * - The user is not registered and NSDefMsg is enabled
+         * - The user is registered and has set /ns set msg on
+         */
+        if (UsePrivmsg
+            && ((!dest->na && (NSDefFlags & NI_MSG))
+                || (dest->na && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, dest->nick, *t ? t : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *t ? t : " ");
@@ -245,7 +259,14 @@ void notice_help(char *source, User * dest, int message, ...)
             *s++ = 0;
         strscpy(outbuf, t, sizeof(outbuf));
         strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
-        if (UsePrivmsg && (!dest->na || (dest->na->nc->flags & NI_MSG))) {
+        /* Send privmsg instead of notice if:
+         * - UsePrivmsg is enabled
+         * - The user is not registered and NSDefMsg is enabled
+         * - The user is registered and has set /ns set msg on
+         */
+        if (UsePrivmsg
+            && ((!dest->na && (NSDefFlags & NI_MSG))
+                || (dest->na && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, dest->nick, *outbuf ? outbuf : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *outbuf ? outbuf : " ");
@@ -279,7 +300,7 @@ void notice(char *source, char *dest, const char *fmt, ...)
             return;
         }
 
-        if (UsePrivmsg) {
+        if (NSDefFlags & NI_MSG) {
             anope_cmd_privmsg2(source, dest, buf);
         } else {
             anope_cmd_notice2(source, dest, buf);

@@ -876,7 +876,7 @@ void rageircd_cmd_notice(char *source, char *dest, char *buf)
         return;
     }
 
-    if (UsePrivmsg) {
+    if (NSDefFlags & NI_MSG) {
         rageircd_cmd_privmsg2(source, dest, buf);
     } else {
         send_cmd(source, "NOTICE %s :%s", dest, buf);

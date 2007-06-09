@@ -468,7 +468,7 @@ void shadowircd_cmd_notice(char *source, char *dest, char *buf)
         return;
     }
 
-    if (UsePrivmsg) {
+    if (NSDefFlags & NI_MSG) {
         shadowircd_cmd_privmsg2(source, dest, buf);
     } else {
         ud = find_uid(source);

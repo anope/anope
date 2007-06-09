@@ -539,7 +539,7 @@ plexus_cmd_notice (char *source, char *dest, char *buf)
       return;
     }
 
-  if (UsePrivmsg)
+  if (NSDefFlags & NI_MSG)
     {
       plexus_cmd_privmsg2 (source, dest, buf);
     }

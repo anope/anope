@@ -450,7 +450,7 @@ void ratbox_cmd_notice(char *source, char *dest, char *buf)
         return;
     }
 
-    if (UsePrivmsg) {
+    if (NSDefFlags & NI_MSG) {
         ratbox_cmd_privmsg2(source, dest, buf);
     } else {
         ud = find_uid(source);

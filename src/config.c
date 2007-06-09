@@ -1109,8 +1109,12 @@ int read_config(int reload)
             NSDefFlags |= NI_SECURE;
         if (NSDefPrivate)
             NSDefFlags |= NI_PRIVATE;
-        if (NSDefMsg)
-            NSDefFlags |= NI_MSG;
+        if (NSDefMsg) {
+            if (!UsePrivmsg)
+                alog("NSDefMsg can only be used when UsePrivmsg is set - unsetting NSDefMsg");
+            else
+                NSDefFlags |= NI_MSG;
+        }
         if (NSDefHideEmail)
             NSDefFlags |= NI_HIDE_EMAIL;
         if (NSDefHideUsermask)

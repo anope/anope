@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="18"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1244"
+VERSION_BUILD="1245"
 
 # $Log$
+#
+# BUILD : 1.7.18 (1245)
+# BUGS  : 671
+# NOTES : NSDefKill can now only be enabled if UsePrivmsg is also enabled; NSDefKill is now used instead of UsePrivmsg to determine whether unregistered users receive PRIVMSGs or NOTICEs
 #
 # BUILD : 1.7.18 (1244)
 # BUGS  : 713 719

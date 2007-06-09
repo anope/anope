@@ -664,7 +664,7 @@ void unreal_cmd_notice(char *source, char *dest, char *buf)
         return;
     }
 
-    if (UsePrivmsg) {
+    if (NSDefFlags & NI_MSG) {
         unreal_cmd_privmsg2(source, dest, buf);
     } else {
         send_cmd(source, "%s %s :%s", send_token("NOTICE", "B"), dest,

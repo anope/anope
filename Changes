@@ -20,6 +20,11 @@ Anope Version  S V N
 03/18 F Password length checking in some cases was out.                   [ #00]
 04/21 F DefCon did not force DefCon modes while in DefCon mode.           [#661]
 04/21 F Event ACCESS_DEL not sent on mass-deleted in cs_xop.              [#706]
+06/04 F prenick database was not backed up.                               [#713]
+06/04 F Typo in SQL query in rdb.c                                        [#719]
+06/04 F remove_backups() did not check that s_Bot/HostServ != NULL.       [ #00]
+06/09 F NSDefMsg can now only be enabled when UsePrivmsg is enabled.      [#671]
+06/09 F NSDefMsg now controls send behaviour for unregistered users.      [#671]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2007
 04/21 F Array count decremention in the ChanServ access lists.            [#662]
@@ -27,10 +32,6 @@ Provided by Jan Milants <jan_renee@msn.com> - 2007
 
 Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
 04/21 F Various Charybdis and TS6 related fixes.                          [#707]
-
-06/04 F prenick database was not backed up                                [#713]
-06/04 F Typo in SQL query in rdb.c                                        [#719]
-06/04 F remove_backups() did not check that s_Bot/HostServ != NULL        [ #00]
 
 Anope Version 1.7.18
 --------------------

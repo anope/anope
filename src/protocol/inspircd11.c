@@ -711,6 +711,9 @@ int anope_event_fjoin(char *source, int ac, char **av)
 {
     char *newav[10];
 
+    /* value used for myStrGetToken */
+    int curtoken = 0;
+
     /* storing the current nick */
     char *curnick;
 
@@ -724,9 +727,6 @@ int anope_event_fjoin(char *source, int ac, char **av)
     *nicklist = '\0';
     *prefixandnick = '\0';
 	
-	/* value used for myStrGetToken */
-	int curtoken = 0;
-
     if (ac < 3)
         return MOD_CONT;
 	

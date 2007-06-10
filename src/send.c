@@ -136,9 +136,8 @@ void notice_user(char *source, User * u, const char *fmt, ...)
          * - The user is not registered and NSDefMsg is enabled
          * - The user is registered and has set /ns set msg on
          */
-        if (UsePrivmsg
-            && ((!u->na && (NSDefFlags & NI_MSG))
-                || (u->na && (u->na->nc->flags & NI_MSG)))) {
+        if (UsePrivmsg && ((!u->na && (NSDefFlags & NI_MSG))
+                           || (u->na && (u->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, u->nick, buf);
         } else {
             anope_cmd_notice2(source, u->nick, buf);
@@ -208,9 +207,9 @@ void notice_lang(char *source, User * dest, int message, ...)
          * - The user is not registered and NSDefMsg is enabled
          * - The user is registered and has set /ns set msg on
          */
-        if (UsePrivmsg
-            && ((!dest->na && (NSDefFlags & NI_MSG))
-                || (dest->na && (dest->na->nc->flags & NI_MSG)))) {
+        if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
+                           || (dest->na
+                               && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, dest->nick, *t ? t : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *t ? t : " ");
@@ -264,9 +263,9 @@ void notice_help(char *source, User * dest, int message, ...)
          * - The user is not registered and NSDefMsg is enabled
          * - The user is registered and has set /ns set msg on
          */
-        if (UsePrivmsg
-            && ((!dest->na && (NSDefFlags & NI_MSG))
-                || (dest->na && (dest->na->nc->flags & NI_MSG)))) {
+        if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
+                           || (dest->na
+                               && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg2(source, dest->nick, *outbuf ? outbuf : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *outbuf ? outbuf : " ");

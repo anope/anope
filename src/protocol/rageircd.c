@@ -1507,7 +1507,8 @@ void rageircd_cmd_jupe(char *jserver, char *who, char *reason)
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
-    rageircd_cmd_squit(jserver, rbuf);
+    if (findserver(servlist, jserver))
+        rageircd_cmd_squit(jserver, rbuf);
     rageircd_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

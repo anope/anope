@@ -1,5 +1,7 @@
 Anope Version  S V N
 --------------------
+06/15 F Non-existing servers being SQUIT'd when they were juped.          [#726]
+06/15 F Back online notice being sent to juped servers.                   [#726]
 
 Anope Version 1.7.19
 --------------------

@@ -1725,7 +1725,8 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason)
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
-    ratbox_cmd_squit(jserver, rbuf);
+    if (findserver(servlist, jserver))
+        ratbox_cmd_squit(jserver, rbuf);
     ratbox_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

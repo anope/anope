@@ -158,11 +158,9 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     if ((uplink == me_server) && !(flags & SERVER_JUPED))
         serv_uplink = serv;
 
-    /* Write the StartGlobal */
-    if (GlobalOnCycle) {
-        if (GlobalOnCycleUP)
-            notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
-    }
+    /* Write the StartGlobal (to non-juped servers) */
+    if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))
+        notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
 
     return serv;
 }

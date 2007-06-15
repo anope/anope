@@ -1540,7 +1540,8 @@ void solidircd_cmd_jupe(char *jserver, char *who, char *reason)
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
-    solidircd_cmd_squit(jserver, rbuf);
+    if (findserver(servlist, jserver))
+        solidircd_cmd_squit(jserver, rbuf);
     solidircd_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

@@ -1416,7 +1416,8 @@ void unreal_cmd_jupe(char *jserver, char *who, char *reason)
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
-    unreal_cmd_squit(jserver, rbuf);
+    if (findserver(servlist, jserver))
+        unreal_cmd_squit(jserver, rbuf);
     unreal_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

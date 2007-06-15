@@ -1574,7 +1574,8 @@ void ptlink_cmd_jupe(char *jserver, char *who, char *reason)
     snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
              reason ? ": " : "", reason ? reason : "");
 
-    ptlink_cmd_squit(jserver, rbuf);
+    if (findserver(servlist, jserver))
+        ptlink_cmd_squit(jserver, rbuf);
     ptlink_cmd_server(jserver, 1, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }

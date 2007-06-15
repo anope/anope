@@ -402,6 +402,15 @@ void do_squit(const char *source, int ac, char **av)
     }
     send_event(EVENT_SERVER_SQUIT, 1, s->name);
 
+    /* If this is a juped server, send a nice global to inform the online
+     * opers that we received it.
+     */
+    if (s->flags & SERVER_JUPED) {
+        snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
+                 s->name);
+        anope_cmd_global(s_OperServ, buf);
+    }
+
     snprintf(buf, sizeof(buf), "%s %s", s->name,
              (s->uplink ? s->uplink->name : ""));
 

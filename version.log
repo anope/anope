@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1249"
+VERSION_BUILD="1250"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1250)
+# BUGS  : 718
+# NOTES : Fixed the fact that we did not send a receive-notification for the SQUIT for a juped server
 #
 # BUILD : 1.7.19 (1249)
 # BUGS  : 726

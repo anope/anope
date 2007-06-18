@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1250"
+VERSION_BUILD="1251"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1251)
+# BUGS  : 732
+# NOTES : Fixed /os MODINFO showing 'no information about module' when it was loaded but had no hooked commands
 #
 # BUILD : 1.7.19 (1250)
 # BUGS  : 718

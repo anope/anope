@@ -72,7 +72,6 @@ int do_modinfo(User * u)
     char timebuf[64];
     Module *m;
     int idx = 0;
-    int display = 0;
 
     file = strtok(NULL, "");
     if (!file) {
@@ -88,18 +87,17 @@ int do_modinfo(User * u)
                     m->version ? m->version : "?",
                     m->author ? m->author : "?", timebuf);
         for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-            display += showModuleCmdLoaded(HOSTSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(OPERSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(NICKSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(CHANSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(BOTSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(MEMOSERV[idx], m->name, u);
-            display += showModuleCmdLoaded(HELPSERV[idx], m->name, u);
-            display += showModuleMsgLoaded(IRCD[idx], m->name, u);
+            showModuleCmdLoaded(HOSTSERV[idx], m->name, u);
+            showModuleCmdLoaded(OPERSERV[idx], m->name, u);
+            showModuleCmdLoaded(NICKSERV[idx], m->name, u);
+            showModuleCmdLoaded(CHANSERV[idx], m->name, u);
+            showModuleCmdLoaded(BOTSERV[idx], m->name, u);
+            showModuleCmdLoaded(MEMOSERV[idx], m->name, u);
+            showModuleCmdLoaded(HELPSERV[idx], m->name, u);
+            showModuleMsgLoaded(IRCD[idx], m->name, u);
 
         }
-    }
-    if (display == 0) {
+    } else {
         notice_lang(s_OperServ, u, OPER_MODULE_NO_INFO, file);
     }
     return MOD_CONT;

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1252"
+VERSION_BUILD="1253"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1253)
+# BUGS  : 737
+# NOTES : Fixed GlobalOnCycle notices being sent to Anope itself and juped servers
 #
 # BUILD : 1.7.19 (1252)
 # BUGS  : 729

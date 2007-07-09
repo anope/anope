@@ -674,7 +674,10 @@ Server *server_global(Server * s, char *msg)
     Server *sl;
 
     while (s) {
-        notice_server(s_GlobalNoticer, s, "%s", msg);
+        /* Do not send the notice to ourselves our juped servers */
+        if (!(s->flags & (SERVER_ISME | SERVER_JUPED)))
+            notice_server(s_GlobalNoticer, s, "%s", msg);
+
         if (s->links) {
             sl = server_global(s->links, msg);
             if (sl)

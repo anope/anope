@@ -5,6 +5,7 @@ Anope Version  S V N
 06/15 F Not informing opers a SQUIT for a juped server was received.      [#718]
 06/18 F OperServ MODINFO giving misleading errors.                        [#732]
 07/09 F Various access levels for oper-commands.                          [#729]
+07/09 F GlobalOnCycle notices being sent to Anope itself or juped servers.[#737]
 
 Anope Version 1.7.19
 --------------------

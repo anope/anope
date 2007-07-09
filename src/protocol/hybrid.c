@@ -687,7 +687,7 @@ void hybrid_cmd_sgline(char *mask, char *reason)
 
 void hybrid_cmd_remove_akill(char *user, char *host)
 {
-    // hybrid seems to support UNKLINE  -Certus
+    /* hybrid seems to support UNKLINE  -Certus */
     send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
 

@@ -271,6 +271,7 @@ int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
 MDE Module *findModule(char *name);                /* Find a module */
 int loadModule(Module *m,User *u);	/* Load the given module into the program */
+int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */

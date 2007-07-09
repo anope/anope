@@ -36,7 +36,7 @@ int AnopeInit(int argc, char **argv)
      * For some unknown reason, do_randomnews is actaully defined in news.c
      * we can look at moving it here later
      **/
-    c = createCommand("RANDOMNEWS", do_randomnews, is_services_oper,
+    c = createCommand("RANDOMNEWS", do_randomnews, is_services_admin,
                       NEWS_HELP_RANDOM, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -60,7 +60,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_oper(u)) {
+    if (is_services_admin(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
     }
 }

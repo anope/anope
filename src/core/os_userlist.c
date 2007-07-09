@@ -37,7 +37,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("USERLIST", do_userlist, is_services_admin,
+    c = createCommand("USERLIST", do_userlist, NULL,
                       OPER_HELP_USERLIST, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -61,9 +61,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
-    }
+    notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
 }
 
 /**

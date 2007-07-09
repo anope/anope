@@ -75,7 +75,7 @@ int do_sendpass(User * u)
 
     if (!nick) {
         syntax_error(s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
-    } else if (RestrictMail && !is_oper(u)) {
+    } else if (RestrictMail && !is_services_oper(u)) {
         notice_lang(s_NickServ, u, PERMISSION_DENIED);
     } else if (!(na = findnick(nick))) {
         notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);

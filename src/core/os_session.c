@@ -34,10 +34,10 @@ int AnopeInit(int argc, char **argv)
     /**
      * do_session/do_exception are exported from sessions.c - we just want to provide an interface.
      **/
-    c = createCommand("SESSION", do_session, is_services_admin,
+    c = createCommand("SESSION", do_session, is_services_oper,
                       OPER_HELP_SESSION, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("EXCEPTION", do_exception, is_services_admin,
+    c = createCommand("EXCEPTION", do_exception, is_services_oper,
                       OPER_HELP_EXCEPTION, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -61,7 +61,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
+    if (is_services_oper(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_SESSION);
         notice_lang(s_OperServ, u, OPER_HELP_CMD_EXCEPTION);
     }

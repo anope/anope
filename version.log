@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1251"
+VERSION_BUILD="1252"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1252)
+# BUGS  : 729
+# NOTES : Fixed various access levels for oper commands
 #
 # BUILD : 1.7.19 (1251)
 # BUGS  : 732

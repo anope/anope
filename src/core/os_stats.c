@@ -35,10 +35,10 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("STATS", do_stats, is_services_oper, OPER_HELP_STATS,
+    c = createCommand("STATS", do_stats, NULL, OPER_HELP_STATS,
                       -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("UPTIME", do_stats, is_services_oper,
+    c = createCommand("UPTIME", do_stats, NULL,
                       OPER_HELP_STATS, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -62,9 +62,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_oper(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
-    }
+    notice_lang(s_OperServ, u, OPER_HELP_CMD_STATS);
 }
 
 /**

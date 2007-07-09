@@ -35,7 +35,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("CHANLIST", do_chanlist, is_services_admin,
+    c = createCommand("CHANLIST", do_chanlist, NULL,
                       OPER_HELP_CHANLIST, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -60,9 +60,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANLIST);
-    }
+    notice_lang(s_OperServ, u, OPER_HELP_CMD_CHANLIST);
 }
 
 /**

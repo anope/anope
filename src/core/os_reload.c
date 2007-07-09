@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("RELOAD", do_reload, is_services_admin,
+    c = createCommand("RELOAD", do_reload, is_services_root,
                       OPER_HELP_RELOAD, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
@@ -56,7 +56,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
+    if (is_services_root(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
     }
 }

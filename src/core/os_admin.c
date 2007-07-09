@@ -60,9 +60,7 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_oper(u) || is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
-    }
+    notice_lang(s_OperServ, u, OPER_HELP_CMD_ADMIN);
 }
 
 /**
@@ -172,11 +170,6 @@ int do_admin(User * u)
             notice_lang(s_OperServ, u, READ_ONLY_MODE);
     } else if (!stricmp(cmd, "LIST")) {
         int sent_header = 0;
-		
-		if (!is_oper(u)) {
-			notice_lang(s_OperServ, u, PERMISSION_DENIED);
-			return MOD_CONT;
-		}
 		
         if (servadmins.count == 0) {
             notice_lang(s_OperServ, u, OPER_ADMIN_LIST_EMPTY);

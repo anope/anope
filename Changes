@@ -6,6 +6,7 @@ Anope Version  S V N
 06/18 F OperServ MODINFO giving misleading errors.                        [#732]
 07/09 F Various access levels for oper-commands.                          [#729]
 07/09 F GlobalOnCycle notices being sent to Anope itself or juped servers.[#737]
+07/09 F Possible buffer overflow in inspircd10.c                          [#741]
 
 Anope Version 1.7.19
 --------------------

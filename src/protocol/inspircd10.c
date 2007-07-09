@@ -703,8 +703,8 @@ int anope_event_fjoin(char *source, int ac, char **av)
     for (i = 2; i < ac; i++)
     {
         if (i > 2)
-                strncat(people," ",1024);
-        strncat(people,av[i],1024);
+                strncat(people," ",1023);
+        strncat(people,av[i],1023);
     }
     do_sjoin(source, 4, newav);
     return MOD_CONT;

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1255"
+VERSION_BUILD="1256"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1256)
+# BUGS  : 
+# NOTES : Moved the displaying of command infos on command add/remove to debug level 2 instead of 1
 #
 # BUILD : 1.7.19 (1255)
 # BUGS  : 743

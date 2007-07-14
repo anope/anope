@@ -8,6 +8,7 @@ Anope Version  S V N
 07/09 F GlobalOnCycle notices being sent to Anope itself or juped servers.[#737]
 07/09 F Possible buffer overflow in inspircd10.c                          [#741]
 07/09 F Various compile errors with `make strict`.                        [#743]
+07/14 F No longer displaying commands on add/remove in debug mode 1.      [ #00]
 
 Anope Version 1.7.19
 --------------------

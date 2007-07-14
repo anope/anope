@@ -1073,10 +1073,10 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
     } else
         c->service = sstrdup("Unknown");
 
-    if (debug)
+    if (debug >= 2)
         displayCommandFromHash(cmdTable, c->name);
     status = addCommand(cmdTable, c, pos);
-    if (debug)
+    if (debug >= 2)
         displayCommandFromHash(cmdTable, c->name);
     if (status != MOD_ERR_OK) {
         alog("ERROR! [%d]", status);
@@ -1109,11 +1109,11 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
     for (cmd = c; cmd; cmd = cmd->next) {
         if (cmd->mod_name
             && stricmp(cmd->mod_name, mod_current_module->name) == 0) {
-            if (debug) {
+            if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
             status = delCommand(cmdTable, cmd, mod_current_module->name);
-            if (debug) {
+            if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
         }

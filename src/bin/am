@@ -329,7 +329,8 @@ sub do_put() {
 
     $ctrlfile = "$dst/$fhint";
     # Grab the current revision number. Clunky way, I know!
-    $ver_revision=`$wget -qO - $svnrev`;
+#    $ver_revision=`$wget -qO - $svnrev`;
+    $ver_revision=`svnversion . | cut -d 'M' -f 1`;
     chomp($ver_revision);
 
         unless ($ver_revision =~ /^\d+/ and $ver_revision > 0)

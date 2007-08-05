@@ -14,6 +14,10 @@ VERSION_BUILD="1258"
 # $Log$
 #
 # BUILD : 1.7.19 (1258)
+# BUGS  : 
+# NOTES : Quick fix to src/bin/am to make it work (sort of) again...
+#
+# BUILD : 1.7.19 (1258)
 # BUGS  : 750
 # NOTES : Fixed CA_AUTODEOP not working anymore (since 1.7.9 or so probably)
 #

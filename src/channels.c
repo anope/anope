@@ -1352,8 +1352,10 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
      * the modes that they're not allowed to have. But only if SECUREOPS is
      * on, because else every mode is legal. -GD
      * Unless the channel has just been created. -heinz
+     *     Or the user matches CA_AUTODEOP... -GD
      */
-    if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1))
+    if (((ci->flags & CI_SECUREOPS) || (c->usercount == 1)
+         || check_access(user, ci, CA_AUTODEOP))
         && !is_ulined(user->server->name)) {
         if (ircd->owner && (status & CUS_OWNER) && !is_founder(user, ci))
             rem_modes |= CUS_OWNER;

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1256"
+VERSION_BUILD="1258"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1258)
+# BUGS  : 750
+# NOTES : Fixed CA_AUTODEOP not working anymore (since 1.7.9 or so probably)
 #
 # BUILD : 1.7.19 (1256)
 # BUGS  : 

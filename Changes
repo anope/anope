@@ -11,6 +11,7 @@ Anope Version  S V N
 07/14 F No longer displaying commands on add/remove in debug mode 1.      [ #00]
 08/05 F ChanServ access level AUTODEOP works again.                       [#750]
 08/08 F Wrong debug notice when killing people due to the session limit.  [#734]
+08/08 F DefCon modes being re-set after mass-unset when leaving DefCon.   [#727]
 
 Anope Version 1.7.19
 --------------------

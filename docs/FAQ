@@ -58,6 +58,8 @@ Table of Contents
     4.2) Anope crashed with a segmentation fault.
     4.3) I've found a bug that's not mentioned here or in the README or BUGS
          files.  What should I do?
+    4.4) My FreeBSD box complains about 'Shared object "nss_dns.so.1" not
+         found'
 
 5) ChanServ
     5.1) Anope's channel mode setting doesn't work.  I can't set modes with
@@ -70,6 +72,8 @@ Table of Contents
 
 6) BotServ
     6.1) How do I add bots to BotServ?
+    6.2) Why do kick triggers and fantasy commands fail to work with my Bahamut
+         IRCd?
 
 7) Language
     7.1) Anope complains in the logfile about being unable to load the default
@@ -294,7 +298,8 @@ Table of Contents
 
     Make sure you the USE_OSSVS is defined on config.h. Since these are very
     controversial commands, they are turned off by default. Then, make clean ;
-    make ; make install
+    make ; make install . Also, you need to be a SuperAdmin to be able to use
+    these commands.
 
 3.8) What is a Super-Admin? How does it work? Why might it not work?
 
@@ -359,6 +364,13 @@ Table of Contents
 
     See section 6 of the README file.
 
+4.4) My FreeBSD box complains about 'Shared object "nss_dns.so.1" not found'
+
+    We haven't figured out the exact cause yet, but as a quickfix you can
+    delete the /etc/nsswitch.conf file. Please keep in mind that removing a
+    configuration file can be dangerous, so only do this if you know what you
+    are doing.
+
 
 5) ChanServ
 
@@ -404,7 +416,19 @@ Table of Contents
 
 6.1) How do I add bots to BotServ?
 
-    Read /msg BotServ HELP and /msg BotServ HELP BOT.
+    Read /msg BotServ HELP and /msg BotServ HELP BOT. Note that you need to be
+    opered up and identified as a Services Administrator before you can use the
+    BOT command.
+
+6.2) Why do kick triggers and fantasy commands fail to work with my Bahamut
+     IRCd?
+
+    Bahamut allows you to setup a server as 'serviceshub'. This will filter
+    certain data services usually don't need to process. This option also
+    filters channel messages, because DALnet's services have no use for them.
+    Anope parses the channel messages for kick triggers and fantasy commands.
+    To make sure these work the server type of the hub they're linked to should
+    be simply 'hub' and not 'serviceshub'.
 
 
 7) Language

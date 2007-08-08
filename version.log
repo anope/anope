@@ -14,6 +14,10 @@ VERSION_BUILD="1260"
 # $Log$
 #
 # BUILD : 1.7.19 (1260)
+# BUGS  : 734
+# NOTES : Fixed a false debug notice claiming the killed user did not exist when it was killed due to a session limit exceeded
+#
+# BUILD : 1.7.19 (1260)
 # BUGS  : 
 # NOTES : Updated FAQ to reflect the changes on wiki/site
 #

@@ -67,7 +67,7 @@ void kill_user(char *source, char *user, char *reason)
 
     anope_cmd_svskill(source, user, buf);
 
-    if (!ircd->quitonkill) {
+    if (!ircd->quitonkill && finduser(user)) {
         do_kill(user, buf);
     }
 }

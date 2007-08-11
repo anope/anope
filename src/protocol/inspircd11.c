@@ -521,8 +521,9 @@ void inspircd_cmd_remove_akill(char *user, char *host)
     send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
 
-void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
-                        char *topic, time_t when)
+void
+inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
+                   char *topic, time_t when)
 {
     send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan,
              (unsigned long int) when, whosetit, topic);
@@ -533,8 +534,9 @@ void inspircd_cmd_vhost_off(User * u)
     send_cmd(s_HostServ, "MODE %s -x", u->nick);
 }
 
-void inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
-                        time_t expires, char *reason)
+void
+inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
+                   time_t expires, char *reason)
 {
     send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who,
              (long int) when, (long int) 86400 * 2, reason);
@@ -590,8 +592,9 @@ void inspircd_cmd_nick(char *nick, char *name, char *modes)
     send_cmd(nick, "OPERTYPE Service");
 }
 
-void inspircd_cmd_guest_nick(char *nick, char *user, char *host,
-                             char *real, char *modes)
+void
+inspircd_cmd_guest_nick(char *nick, char *user, char *host,
+                        char *real, char *modes)
 {
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
              (long int) time(NULL), nick, host, host, user, modes, real);
@@ -726,18 +729,17 @@ int anope_event_fjoin(char *source, int ac, char **av)
 
     *nicklist = '\0';
     *prefixandnick = '\0';
-	
+
     if (ac < 3)
         return MOD_CONT;
-	
-	curnick = myStrGetToken(av[2], ' ', curtoken);
+
+    curnick = myStrGetToken(av[2], ' ', curtoken);
     while (curnick != NULL) {
         for (; *curnick; curnick++) {
             /* I bet theres a better way to do this... */
             if ((*curnick == '&') ||
-                (*curnick == '~') ||
-                (*curnick == '@') ||
-                (*curnick == '%') || (*curnick == '+')) {
+                (*curnick == '~') || (*curnick == '@') || (*curnick == '%')
+                || (*curnick == '+')) {
                 prefixandnick[nlen++] = *curnick;
                 continue;
             } else {
@@ -753,8 +755,8 @@ int anope_event_fjoin(char *source, int ac, char **av)
         }
         strncat(nicklist, prefixandnick, 513);
         strncat(nicklist, " ", 513);
-		curtoken++;
-		curnick = myStrGetToken(av[2], ' ', curtoken);
+        curtoken++;
+        curnick = myStrGetToken(av[2], ' ', curtoken);
         nlen = 0;
     }
 
@@ -767,8 +769,9 @@ int anope_event_fjoin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void
+inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
+                      char *modes)
 {
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
              (long int) time(NULL), nick, host, host, user, modes, real);
@@ -1354,6 +1357,7 @@ int anope_event_setident(char *source, int ac, char **av)
     change_user_username(u, av[0]);
     return MOD_CONT;
 }
+
 int anope_event_chgident(char *source, int ac, char **av)
 {
     User *u;
@@ -1403,18 +1407,18 @@ int anope_event_nick(char *source, int ac, char **av)
         if (ac == 8) {
             inet_aton(av[6], &addy);
             user = do_nick("", av[1],   /* nick */
-                           av[4],       /* username */
-                           av[2],       /* realhost */
-                           source,      /* server */
-                           av[7],       /* realname */
+                           av[4],   /* username */
+                           av[2],   /* realhost */
+                           source,  /* server */
+                           av[7],   /* realname */
                            strtoul(av[0], NULL, 10),
                            0, htonl(*ad), av[3], NULL);
             if (user)
                 anope_set_umode(user, 1, &av[5]);
         }
     } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL,
-                0, 0, 0, NULL, NULL);
+        do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL,
+                NULL);
     }
     return MOD_CONT;
 }
@@ -1476,6 +1480,9 @@ int anope_event_whois(char *source, int ac, char **av)
 
 int anope_event_capab(char *source, int ac, char **av)
 {
+    int argc;
+    char **argv;
+
     if (strcasecmp(av[0], "START") == 0) {
         /* reset CAPAB */
         has_servicesmod = 0;
@@ -1506,6 +1513,19 @@ int anope_event_capab(char *source, int ac, char **av)
             quitting = 1;
             return MOD_STOP;
         }
+
+        /* Generate a fake capabs parsing call so things like NOQUIT work
+         * fine. It's ugly, but it works....
+         */
+        argc = 5;
+        argv = scalloc(5, sizeof(char *));
+        argv[0] = "NOQUIT";
+        argv[1] = "SSJ3";
+        argv[2] = "NICK2";
+        argv[3] = "VL";
+        argv[4] = "TLKEXT";
+
+        capab_parse(ac, av);
     }
     return MOD_CONT;
 }
@@ -1789,7 +1809,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_ircd_csmodes(myCsmodes);
     pmodule_ircd_useTSMode(0);
 
-        /** Deal with modes anope _needs_ to know **/
+    /** Deal with modes anope _needs_ to know **/
     pmodule_invis_umode(UMODE_i);
     pmodule_oper_umode(UMODE_o);
     pmodule_invite_cmode(CMODE_i);

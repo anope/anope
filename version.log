@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1262"
+VERSION_BUILD="1263"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1263)
+# BUGS  : 742
+# NOTES : Fixed inspircd11.c so it generates a fake capab parse call to enable things like NOQUIT... also ran indent on inspircd11.c
 #
 # BUILD : 1.7.19 (1262)
 # BUGS  : 727

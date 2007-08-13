@@ -1525,7 +1525,7 @@ int anope_event_capab(char *source, int ac, char **av)
         argv[3] = "VL";
         argv[4] = "TLKEXT";
 
-        capab_parse(ac, av);
+        capab_parse(argc, argv);
     }
     return MOD_CONT;
 }

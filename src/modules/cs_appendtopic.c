@@ -1,14 +1,22 @@
-#include "module.h"
-
-/* Original module: cs_appendtopic by SGR
+/* cs_appendtopic.c - Add text to a channels topic
  *
- * Included in the Anope module pack since 1.7.9
+ * (C) 2003-2007 Anope Team
+ * Contact us at info@anope.org
+ *
+ * Based on the original module by SGR <Alex_SGR@ntlworld.com>
+ * Included in the Anope module pack since Anope 1.7.9
  * Anope Coder: GeniusDex <geniusdex@anope.org>
+ *
+ * Please read COPYING and README for further details.
  *
  * Send bug reports to the Anope Coder instead of the module
  * author, because any changes since the inclusion into anope
  * are not supported by the original author.
+ *
  */
+/*************************************************************************/
+
+#include "module.h"
 
 #define AUTHOR "SGR"
 #define VERSION "$Id$"
@@ -34,11 +42,11 @@
 /* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING         */
 /* ---------------------------------------------------------------------- */
 
-#define LNG_NUM_STRINGS		3
+#define LNG_NUM_STRINGS	          3
 
-#define LNG_CHAN_HELP				0
-#define LNG_CHAN_HELP_APPENDTOPIC	1
-#define LNG_APPENDTOPIC_SYNTAX		2
+#define LNG_CHAN_HELP             0
+#define LNG_CHAN_HELP_APPENDTOPIC 1
+#define LNG_APPENDTOPIC_SYNTAX    2
 
 int my_cs_appendtopic(User * u);
 void my_cs_help(User * u);
@@ -221,7 +229,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

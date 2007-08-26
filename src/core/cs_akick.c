@@ -468,6 +468,7 @@ int do_akick(User * u)
                     }
                 }
             }
+            ci->akickcount--;
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

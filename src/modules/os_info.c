@@ -72,7 +72,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
     EvtHook *hook = NULL;
 
-    int status;
+    int status = 0;
 
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);
@@ -85,26 +85,31 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mNickHelp);
-    status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
+    status += moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
+    status += moduleAddCommand(NICKSERV, c, MOD_TAIL);
 
     c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mChanHelp);
-    status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
+    status += moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
+    status += moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
     hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-    status = moduleAddEventHook(hook);
+    status += moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-    status = moduleAddEventHook(hook);
+    status += moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_RELOAD, mEventReload);
-    status = moduleAddEventHook(hook);
+    status += moduleAddEventHook(hook);
+
+    if (status != MOD_ERR_OK) {
+            alog("os_info: ERROR when trying to create module commands. Unloading...");
+        return MOD_STOP;
+    }
 
     moduleSetNickHelp(mMainNickHelp);
     moduleSetChanHelp(mMainChanHelp);
@@ -547,9 +552,9 @@ void m_AddLanguages(void)
             "This will show up when any oper /cs info's the channel.\n"
             "and can be used for 'tagging' channels etc....",
         /* OINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a nick",
+        "    OINFO      Add / Del an OperInfo line to a nick",
         /* OCINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a channel"
+        "    OINFO      Add / Del an OperInfo line to a channel"
     };
 
     char *langtable_es[] = {
@@ -704,7 +709,7 @@ void m_AddLanguages(void)
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 }
 
 /*************************************************************************/

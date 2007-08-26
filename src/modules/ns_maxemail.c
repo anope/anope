@@ -214,7 +214,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

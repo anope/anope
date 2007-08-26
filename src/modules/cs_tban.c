@@ -1,3 +1,21 @@
+/* cs_tban.c - Bans the user for a given length of time
+ *
+ * (C) 2003-2007 Anope Team
+ * Contact us at info@anope.org
+ *
+ * Based on the original module by Rob <rob@anope.org>
+ * Included in the Anope module pack since Anope 1.7.8
+ * Anope Coder: Rob <rob@anope.org>
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Send bug reports to the Anope Coder instead of the module
+ * author, because any changes since the inclusion into anope
+ * are not supported by the original author.
+ *
+ */
+/*************************************************************************/
+
 #include "module.h"
 
 #define AUTHOR "Rob"
@@ -217,7 +235,7 @@ void mAddLanguages(void)
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 }
 
 

@@ -217,7 +217,15 @@ int do_badwords(User * u)
                     }
                 }
             }
-            ci->bwcount--;
+            /* After reordering only the entries at the end could still be empty.
+             * We ll free the places no longer in use... - Viper */
+            for (i = ci->bwcount - 1; i >= 0; i--) {
+                if (ci->badwords[i].in_use)
+                    break;
+                ci->bwcount--;
+            }
+            ci->badwords =
+                srealloc(ci->badwords,sizeof(BadWord) * ci->bwcount);
         }
 
     } else if (stricmp(cmd, "LIST") == 0) {

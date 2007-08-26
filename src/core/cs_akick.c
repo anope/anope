@@ -248,20 +248,15 @@ int do_akick(User * u)
             }
         }
 
-        for (i = 0; i < ci->akickcount; i++) {
-            if (!(ci->akick[i].flags & AK_USED))
-                break;
+        /* All entries should be in use so we don't have to go over
+         * the entire list. We simply add new entries at the end. */
+        if (ci->akickcount >= CSAutokickMax) {
+            notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
+            return MOD_CONT;
         }
-        if (i == ci->akickcount) {
-            if (ci->akickcount >= CSAutokickMax) {
-                notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT,
-                            CSAutokickMax);
-                return MOD_CONT;
-            }
-            ci->akickcount++;
-            ci->akick =
-                srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount);
-        }
+        ci->akickcount++;
+        ci->akick =
+            srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount);
         akick = &ci->akick[i];
         akick->flags = AK_USED;
         if (nc) {
@@ -468,7 +463,16 @@ int do_akick(User * u)
                     }
                 }
             }
-            ci->akickcount--;
+            /* After reordering only the entries at the end could still be empty.
+             * We ll free the places no longer in use... - Viper */
+            for (i = ci->akickcount - 1; i >= 0; i--) {
+                if (ci->akick[i].flags & AK_USED)
+                    break;
+
+                ci->akickcount--;
+            }
+            ci->akick =
+                srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount);
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

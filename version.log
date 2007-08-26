@@ -15,6 +15,10 @@ VERSION_BUILD="1268"
 #
 # BUILD : 1.7.19 (1268)
 # BUGS  : 662
+# NOTES : Optimized akick and badwords lists, provided by Viper.
+#
+# BUILD : 1.7.19 (1268)
+# BUGS  : 662
 # NOTES : badword counting fixed, and now the list is sorted also. fixed remaining bug in akick sorting.
 #
 # BUILD : 1.7.19 (1267)

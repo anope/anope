@@ -147,6 +147,7 @@ int do_badwords(User * u)
         notice_lang(s_BotServ, u, BOT_BADWORDS_ADDED, bw->word, ci->name);
 
     } else if (stricmp(cmd, "DEL") == 0) {
+        int deleted = 0, a, b;
 
         if (readonly) {
             notice_lang(s_BotServ, u, BOT_BADWORDS_DISABLED);
@@ -155,7 +156,7 @@ int do_badwords(User * u)
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*word) && strspn(word, "1234567890,-") == strlen(word)) {
-            int count, deleted, last = -1;
+            int count, last = -1;
             deleted =
                 process_numlist(word, &count, badwords_del_callback, u, ci,
                                 &last);
@@ -192,6 +193,31 @@ int do_badwords(User * u)
                 free(bw->word);
             bw->word = NULL;
             bw->in_use = 0;
+            deleted = 1;
+        }
+
+        if (deleted) {
+            /* Reordering - DrStein */
+            for (b = 0; b < ci->bwcount; b++) {
+                if (ci->badwords[b].in_use) {
+                    for (a = 0; a < ci->bwcount; a++) {
+                        if (a > b)
+                            break;
+                        if (!(ci->badwords[a].in_use)) {
+                            ci->badwords[a].in_use = ci->badwords[b].in_use;
+                            ci->badwords[a].type = ci->badwords[b].type;
+                            if (ci->badwords[b].word) {
+                                ci->badwords[a].word = sstrdup(ci->badwords[b].word);
+                                free(ci->badwords[b].word);
+                            }
+                            ci->badwords[b].word = NULL;
+                            ci->badwords[b].in_use = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+            ci->bwcount--;
         }
 
     } else if (stricmp(cmd, "LIST") == 0) {

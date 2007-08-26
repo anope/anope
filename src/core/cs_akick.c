@@ -440,7 +440,7 @@ int do_akick(User * u)
             /* Reordering - DrStein */
             for (b = 0; b < ci->akickcount; b++) {
                 if (ci->akick[b].flags & AK_USED) {
-                    for (a = 1; a < ci->akickcount; a++) {
+                    for (a = 0; a < ci->akickcount; a++) {
                         if (a > b)
                             break;
                         if (!(ci->akick[a].flags & AK_USED)) {

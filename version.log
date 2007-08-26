@@ -1,4 +1,4 @@
-# (C) 2003-2005 Anope 
+# (C) 2003-2007 Anope 
 # Contact us at info@anope.org
 #
 # Please read COPYING and README for furhter details.
@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1263"
+VERSION_BUILD="1265"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1265)
+# BUGS  : 
+# NOTES : Updated copyright information
 #
 # BUILD : 1.7.19 (1263)
 # BUGS  : 

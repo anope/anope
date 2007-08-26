@@ -1,7 +1,7 @@
 /* cs_enforce - Add a /cs ENFORCE command to enforce various set
  *              options and channelmodes on a channel.
  * 
- * (C) 2003-2005 Anope Team
+ * (C) 2003-2007 Anope Team
  * Contact us at info@anope.org
  * 
  * Included in the Anope module pack since Anope 1.7.9

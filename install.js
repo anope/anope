@@ -1,7 +1,7 @@
 //
 // install.js - Windows Configuration
 //
-// (C) 2003-2005 Anope Team
+// (C) 2003-2007 Anope Team
 // Contact us at info@anope.org
 //
 // This program is free but copyrighted software; see the file COPYING for

@@ -1,8 +1,8 @@
 /*
  *   IRC - Internet Relay Chat, db-merger.c
- *   (C) Copyright 2005, Florian Schulze (Certus)
+ *   (C) Copyright 2005-2006, Florian Schulze (Certus)
  *
- *   Based on the original code of Anope, (C) 2003 Anope Team
+ *   Based on the original code of Anope, (C) 2003-2005 Anope Team
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License (see it online

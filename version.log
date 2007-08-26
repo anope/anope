@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1265"
+VERSION_BUILD="1266"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1266)
+# BUGS  : 
+# NOTES : Updated src/bin/am for now SVN host some more
 #
 # BUILD : 1.7.19 (1265)
 # BUGS  : 

@@ -1359,6 +1359,8 @@ CHAN_XOP_ACCESS
 	Nie mo¿esz u¿yæ tej komendy. U¿yj komendy ACCESS.
 	Napisz %R%s HELP ACCESS, 
 	aby uzyskaæ wiêcej informacji.
+CHAN_XOP_NOT_AVAILABLE
+	xOP system is not available.
 
 # AOP messages
 CHAN_AOP_SYNTAX

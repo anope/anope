@@ -264,7 +264,11 @@ int do_set(User * u)
     } else if (stricmp(cmd, "OPNOTICE") == 0) {
         do_set_opnotice(u, ci, param);
     } else if (stricmp(cmd, "XOP") == 0) {
-        do_set_xop(u, ci, param);
+        if (!(findModule("cs_xop"))) {
+            notice_lang(s_ChanServ, u, CHAN_XOP_NOT_AVAILABLE, cmd);
+        } else {
+            do_set_xop(u, ci, param);
+        }
     } else if (stricmp(cmd, "PEACE") == 0) {
         do_set_peace(u, ci, param);
     } else if (stricmp(cmd, "NOEXPIRE") == 0) {

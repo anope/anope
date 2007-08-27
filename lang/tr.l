@@ -1281,6 +1281,8 @@ CHAN_XOP_LIST_FORMAT
 CHAN_XOP_ACCESS
 	Bu komutu kullanamazsiniz. Yerine ACCESS komutunu kullanin.
 	Daha fazla bilgi için %R%s HELP ACCESS yazin.
+CHAN_XOP_NOT_AVAILABLE
+	xOP system is not available.
 
 # AOP messages
 CHAN_AOP_SYNTAX

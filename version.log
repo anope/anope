@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1274"
+VERSION_BUILD="1275"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1275)
+# BUGS  : 747
+# NOTES : CS SET XOP can not be used if cs_xop is not loaded.
 #
 # BUILD : 1.7.19 (1274)
 # BUGS  : 764

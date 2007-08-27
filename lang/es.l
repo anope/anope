@@ -1279,6 +1279,8 @@ CHAN_XOP_LIST_FORMAT
 CHAN_XOP_ACCESS
 	No puedes usar este comando. Usa el comando ACCESS en su lugar.
 	Tipea %R%s HELP ACCESS para mayor informacion.
+CHAN_XOP_NOT_AVAILABLE
+	El sistema xOP no esta disponible.
 
 # AOP messages
 CHAN_AOP_SYNTAX

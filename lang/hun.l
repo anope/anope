@@ -1267,6 +1267,8 @@ CHAN_XOP_LIST_FORMAT
 CHAN_XOP_ACCESS
 	Nem használhatod a parancsot. Használd az ACCESS parancsot.
 	Bõvebb információ: %R%s HELP ACCESS
+CHAN_XOP_NOT_AVAILABLE
+	xOP system is not available.
 
 # AOP üzenetek
 CHAN_AOP_SYNTAX

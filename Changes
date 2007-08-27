@@ -16,6 +16,7 @@ Anope Version  S V N
 08/21 F Updated the WIN32.txt document a bit                              [ #00]
 08/21 F Re-worded the CHAN_LEVELS_XOP string in en_us                     [ #00]
 08/27 F Functions firstuser and first_uid now don't collide when used.    [#764]
+08/27 F Is not posible to use CS SET XOP when cs_xop is not loaded.       [#747]
 
 Anope Version 1.7.19
 --------------------

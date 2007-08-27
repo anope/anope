@@ -1093,7 +1093,7 @@ struct session_ {
  * functions, we then call the correct function for the anope_ commands.
  **/
 typedef struct ircd_proto_ {
-	void (*ircd_set_mod_current_buffer)(int ac, char **av);
+    void (*ircd_set_mod_current_buffer)(int ac, char **av);
     void (*ircd_cmd_svsnoop)(char *server, int set);
     void (*ircd_cmd_remove_akill)(char *user, char *host);
     void (*ircd_cmd_topic)(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
@@ -1159,9 +1159,9 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_svid_umode2)(User * u, char *ts);
     void (*ircd_cmd_svid_umode3)(User * u, char *ts);
     void (*ircd_cmd_ctcp)(char *source, char *dest, char *buf);
-	void (*ircd_cmd_svsjoin)(char *source, char *nick, char *chan);
-	void (*ircd_cmd_svspart)(char *source, char *nick, char *chan);
-	void (*ircd_cmd_swhois)(char *source, char *who, char *mask);
+    void (*ircd_cmd_svsjoin)(char *source, char *nick, char *chan);
+    void (*ircd_cmd_svspart)(char *source, char *nick, char *chan);
+    void (*ircd_cmd_swhois)(char *source, char *who, char *mask);
     void (*ircd_cmd_eob)();
     void (*ircd_cmd_jupe)(char *jserver, char *who, char *reason);
     void (*ircd_set_umode)(User *user, int ac, char **av);

@@ -1484,7 +1484,7 @@ int check_kick(User * user, char *chan)
     if (!ci)
         return 0;
 
-    if (is_oper(user) || is_services_admin(user))
+    if (user->isSuperAdmin == 1)
         return 0;
 
     if (ci->flags & CI_VERBOTEN) {

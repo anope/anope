@@ -4068,6 +4068,16 @@ NICK_HELP_SENDPASS
 	
 	Este comando no esta disponible cuando encripcion esta habilitada.
 
+NICK_HELP_CONFIRM
+	Sintaxis: CONFIRM passcode
+	
+	Este es el segundo paso en el proceso de registro de nicknames.
+	Debes ejecutar este comando para que tu nick sea registrado con %S.
+	El passcode (tambien conocido como codigo de autorizacion) es
+	enviado a tu direccion e-mail en el primer paso del proceso de 
+	registo. Para mas informacion sobre la primera etpa del proceso 
+	de registro, escribe: %R%S HELP REGISTER
+
 NICK_SERVADMIN_HELP
 	Administradores de Servicios pueden tambien botar cualquier
 	nickname sin tener que identificarse por el nick y pueden

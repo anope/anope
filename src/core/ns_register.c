@@ -43,7 +43,7 @@ int AnopeInit(int argc, char **argv)
                       -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("CONFIRM", do_confirm, NULL, -1, -1, -1, -1, -1);
+    c = createCommand("CONFIRM", do_confirm, NULL, NICK_HELP_CONFIRM, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     c = createCommand("RESEND", do_resend, NULL, -1, -1, -1, -1, -1);

@@ -3999,6 +3999,16 @@ NICK_HELP_SENDPASS
 	Korlátozni lehet IRC operátorokra egyes hálózatokon.
 	
 	Parancs nem elérhetõ, ha az encryption használatban van.
+
+NICK_HELP_CONFIRM
+	Syntax: CONFIRM passcodE
+	
+	This is the second step of nickname registration process.
+	You must perform this command in order to get your nickname
+	registered with %S. The passcode (or called auth code also)
+	is sent to your e-mail address in the first step of the
+	registration process. For more information about the first
+	stage of the registration process, type: %R%S HELP REGISTER
 	
 NICK_SERVADMIN_HELP
 	Szervíz adminok is droppolhatnak nickeket, akkor ha

@@ -3989,6 +3989,16 @@ NICK_HELP_SENDPASS
 	
 	Este comando não está disponível quando estiver usando encriptação.
 
+NICK_HELP_CONFIRM
+	Syntax: CONFIRM passcode
+	
+	This is the second step of nickname registration process.
+	You must perform this command in order to get your nickname
+	registered with %S. The passcode (or called auth code also)
+	is sent to your e-mail address in the first step of the
+	registration process. For more information about the first
+	stage of the registration process, type: %R%S HELP REGISTER
+
 NICK_SERVADMIN_HELP
 	Os Administradores dos Services podem ainda usar o DROP em qualquer nick
 	sem ser necessário se identificar como dono dele, e podem ver a lista de

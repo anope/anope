@@ -319,8 +319,6 @@ int db_mysql_save_ns_core(NickCore * nc)
 {
     int ret;
     int i;
-    char **access;
-    Memo *memos;
     char *q_display, *q_pass, *epass, *q_email, *q_greet, *q_url,
         *q_access, *q_sender, *q_text;
 
@@ -491,7 +489,6 @@ int db_mysql_save_cs_info(ChannelInfo * ci)
 {
     int ret;
     int i;
-    Memo *memos;
     char *q_name;
     char *q_founder;
     char *q_successor;

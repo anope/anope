@@ -480,6 +480,8 @@ int rdb_load_dbases(void)
     }
 
     alog("RDB: All DataBases loaded.");
+
+    return 0;
 }
 
 /*************************************************************************/

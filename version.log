@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1271"
+VERSION_BUILD="1272"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1272)
+# BUGS  : N/A
+# NOTES : Patch provided by teh heinz: [1] Updated the WIN32.txt document a bit [2] Re-worded the CHAN_LEVELS_XOP string in en_us.l
 #
 # BUILD : 1.7.19 (1271)
 # BUGS  : 

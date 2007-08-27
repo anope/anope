@@ -14,7 +14,7 @@ Anope for Windows
     1) Download the required files:
 
         * Current Anope source:
-            http://zero.org:7467/viewcvs/trunk.tar.gz
+            http://sourceforge.net/project/showfiles.php?group_id=94081
 
         If you have Visual C++ 6, 7 (.NET 2002/2003) or 8 (2005) skip ahead to step 2, else you
         need to download the following free components from Microsoft. Once
@@ -167,5 +167,5 @@ Anope for Windows
         
     Anope's Windows Installer was made using:
     
-        * Inno Setup 5          <http://www.jrsoftware.org>
+        * NSIS 2.20          <http://nsis.sourceforge.net>
         

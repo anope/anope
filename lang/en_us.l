@@ -1479,7 +1479,7 @@ CHAN_AKICK_CLEAR
 CHAN_LEVELS_SYNTAX
 	LEVELS channel {SET | DIS[ABLE] | LIST | RESET} [item [level]]
 CHAN_LEVELS_XOP
-	This command is useless in this mode.
+	Levels are not available as xOP is enabled on this channel.
 CHAN_LEVELS_RANGE
 	Level must be between %d and %d inclusive.
 CHAN_LEVELS_CHANGED

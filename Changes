@@ -13,6 +13,8 @@ Anope Version  S V N
 08/08 F Wrong debug notice when killing people due to the session limit.  [#734]
 08/08 F DefCon modes being re-set after mass-unset when leaving DefCon.   [#727]
 08/11 F CAPAB tokens for InspIRCd 1.1 never parsed.                       [#742]
+08/21 F Updated the WIN32.txt document a bit                              [ #00]
+08/21 F Re-worded the CHAN_LEVELS_XOP string in en_us                     [ #00]
 
 Anope Version 1.7.19
 --------------------

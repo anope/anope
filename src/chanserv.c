@@ -368,17 +368,7 @@ void get_chanserv_stats(long *nrec, long *memuse)
 
 void cs_init(void)
 {
-    Command *cmd;
     moduleAddChanServCmds();
-    cmd = findCommand(CHANSERV, "REGISTER");
-    if (cmd)
-        cmd->help_param1 = s_NickServ;
-    cmd = findCommand(CHANSERV, "SET SECURE");
-    if (cmd)
-        cmd->help_param1 = s_NickServ;
-    cmd = findCommand(CHANSERV, "SET SUCCESSOR");
-    if (cmd)
-        cmd->help_param1 = (char *) (long) CSMaxReg;
 }
 
 /*************************************************************************/

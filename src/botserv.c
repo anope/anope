@@ -71,12 +71,8 @@ void get_botserv_stats(long *nrec, long *memuse)
 
 void bs_init(void)
 {
-    Command *cmd;
     if (s_BotServ) {
         moduleAddBotServCmds();
-        cmd = findCommand(BOTSERV, "SET SYMBIOSIS");
-        if (cmd)
-            cmd->help_param1 = s_ChanServ;
     }
 }
 

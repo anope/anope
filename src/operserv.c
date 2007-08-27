@@ -98,17 +98,7 @@ void moduleAddOperServCmds(void) {
 
 void os_init(void)
 {
-    Command *cmd;
     moduleAddOperServCmds();
-    cmd = findCommand(OPERSERV, "GLOBAL");
-    if (cmd)
-        cmd->help_param1 = s_GlobalNoticer;
-    cmd = findCommand(OPERSERV, "ADMIN");
-    if (cmd)
-        cmd->help_param1 = s_NickServ;
-    cmd = findCommand(OPERSERV, "OPER");
-    if (cmd)
-        cmd->help_param1 = s_NickServ;
 
     /* Initialization of the lists */
     slist_init(&servadmins);

@@ -14,6 +14,10 @@ VERSION_BUILD="1268"
 # $Log$
 #
 # BUILD : 1.7.19 (1268)
+# BUGS  : 714
+# NOTES : Moved left settings for commands to core modules.
+#
+# BUILD : 1.7.19 (1268)
 # BUGS  : 662
 # NOTES : Optimized akick and badwords lists, provided by Viper.
 #

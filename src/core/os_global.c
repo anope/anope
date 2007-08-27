@@ -34,6 +34,7 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("GLOBAL", do_global, is_services_admin,
                       OPER_HELP_GLOBAL, -1, -1, -1, -1);
+    c->help_param1 = s_GlobalNoticer;
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
     moduleSetOperHelp(myOperServHelp);
 

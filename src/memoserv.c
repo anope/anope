@@ -39,11 +39,7 @@ void moduleAddMemoServCmds(void) {
  */
 void ms_init(void)
 {
-    Command *cmd;
     moduleAddMemoServCmds();
-    cmd = findCommand(MEMOSERV, "SET LIMIT");
-    if (cmd)
-        cmd->help_param1 = (char *) (long) MSMaxMemos;
 }
 
 /*************************************************************************/

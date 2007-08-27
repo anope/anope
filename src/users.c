@@ -350,6 +350,7 @@ static int next_index;
 User *firstuser(void)
 {
     next_index = 0;
+    current = NULL;
     while (next_index < 1024 && current == NULL)
         current = userlist[next_index++];
     if (debug)
@@ -395,34 +396,38 @@ User *find_byuid(const char *uid)
     return NULL;
 }
 
+static User *current_uid;
+static int next_index_uid;
+
 User *first_uid(void)
 {
-    next_index = 0;
-    while (next_index < 1024 && current == NULL) {
-        current = userlist[next_index++];
+    next_index_uid = 0;
+    current_uid = NULL;
+    while (next_index_uid < 1024 && current_uid == NULL) {
+        current_uid = userlist[next_index_uid++];
     }
     if (debug >= 2) {
         alog("debug: first_uid() returning %s %s",
-             current ? current->nick : "NULL (end of list)",
-             current ? current->uid : "");
+             current_uid ? current_uid->nick : "NULL (end of list)",
+             current_uid ? current_uid->uid : "");
     }
-    return current;
+    return current_uid;
 }
 
 User *next_uid(void)
 {
-    if (current)
-        current = current->next;
-    if (!current && next_index < 1024) {
-        while (next_index < 1024 && current == NULL)
-            current = userlist[next_index++];
+    if (current_uid)
+        current_uid = current_uid->next;
+    if (!current_uid && next_index_uid < 1024) {
+        while (next_index_uid < 1024 && current_uid == NULL)
+            current_uid = userlist[next_index_uid++];
     }
     if (debug >= 2) {
         alog("debug: next_uid() returning %s %s",
-             current ? current->nick : "NULL (end of list)",
-             current ? current->uid : "");
+             current_uid ? current_uid->nick : "NULL (end of list)",
+             current_uid ? current_uid->uid : "");
     }
-    return current;
+    return current_uid;
 }
 
 Uid *new_uid(const char *nick, char *uid)

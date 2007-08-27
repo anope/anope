@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1273"
+VERSION_BUILD="1274"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1274)
+# BUGS  : 764
+# NOTES : Fixed firstuser/nextuser and first_uid/next_uid using the same globals thus being unable to be used at the same time
 #
 # BUILD : 1.7.19 (1273)
 # BUGS  : 

@@ -15,6 +15,7 @@ Anope Version  S V N
 08/11 F CAPAB tokens for InspIRCd 1.1 never parsed.                       [#742]
 08/21 F Updated the WIN32.txt document a bit                              [ #00]
 08/21 F Re-worded the CHAN_LEVELS_XOP string in en_us                     [ #00]
+08/27 F Functions firstuser and first_uid now don't collide when used.    [#764]
 
 Anope Version 1.7.19
 --------------------

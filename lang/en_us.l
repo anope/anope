@@ -3830,7 +3830,7 @@ NICK_HELP_RECOVER
 	user online with the same nickname as the user you're
 	trying to recover your nick from.  This causes the IRC
 	servers to disconnect the other user.  This fake user will
-	will remain online for one minute to ensure that the other
+	remain online for one minute to ensure that the other
 	user does not immediately reconnect; after that minute, you
 	can reclaim your nick.  Alternatively, use the RELEASE
 	command (%R%S HELP RELEASE) to get the nick

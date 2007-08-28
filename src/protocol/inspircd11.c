@@ -382,6 +382,7 @@ CUMode myCumodes[128] = {
 
 int has_servicesmod = 0;
 int has_globopsmod = 0;
+int has_svsholdmod = 0;
 
 void inspircd_set_umode(User * user, int ac, char **av)
 {
@@ -1487,12 +1488,16 @@ int anope_event_capab(char *source, int ac, char **av)
         /* reset CAPAB */
         has_servicesmod = 0;
         has_globopsmod = 0;
+	has_svsholdmod = 0;
     } else if (strcasecmp(av[0], "MODULES") == 0) {
         if (strstr(av[1], "m_globops.so")) {
             has_globopsmod = 1;
         }
         if (strstr(av[1], "m_services.so")) {
             has_servicesmod = 1;
+        }
+	if (strstr(av[1], "m_svshold.so")) {      
+            has_svsholdmod = 1;
         }
     } else if (strcasecmp(av[0], "END") == 0) {
         if (has_globopsmod == 0) {
@@ -1533,13 +1538,18 @@ int anope_event_capab(char *source, int ac, char **av)
 /* SVSHOLD - set */
 void inspircd_cmd_svshold(char *nick)
 {
-    /* Not supported by this IRCD */
+    if (has_svsholdmod == 1) {
+	send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout,
+             "Being held for registered user");
+    }
 }
 
 /* SVSHOLD - release */
 void inspircd_cmd_release_svshold(char *nick)
 {
-    /* Not Supported by this IRCD */
+    if (has_svsholdmod == 1) {
+	send_cmd(s_OperServ, "SVSHOLD %s", nick);
+   }
 }
 
 /* UNSGLINE */
@@ -1794,7 +1804,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id: inspircd.c 1207 2006-12-10 12:27:56Z geniusdex $");
+        ("$Id: inspircd11.c 2007-08-27 20:45 GMT -5 katsklaw $");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("inspircdIRCd 1.1");

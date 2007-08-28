@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1277"
+VERSION_BUILD="1278"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1278)
+# BUGS  : 683, 767
+# NOTES : [1] typo in en_us.l [2] Provided by katsklaws patch: inspircd11 protocol now uses svshold.
 #
 # BUILD : 1.7.19 (1277)
 # BUGS  : 759

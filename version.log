@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1282"
+VERSION_BUILD="1283"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1283)
+# BUGS  : 773
+# NOTES : Patch provided by katsklaw: This patch makes us check commands existance before issuing and we scream like a girl if its 
+# not.
 #
 # BUILD : 1.7.19 (1282)
 # BUGS  : 729

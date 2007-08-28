@@ -382,7 +382,16 @@ CUMode myCumodes[128] = {
 
 int has_servicesmod = 0;
 int has_globopsmod = 0;
+
+/* These are sanity checks to insure we are supported. 
+   The ircd tends to /squit us if we issue unsupported cmds.
+   - katsklaw */
 int has_svsholdmod = 0;
+int has_sajoinmod = 0;
+int has_sapartmod = 0;
+int has_sanickmod = 0;
+int has_chghostmod = 0;
+int has_chgidentmod = 0;
 
 void inspircd_set_umode(User * user, int ac, char **av)
 {
@@ -684,30 +693,45 @@ int anope_event_samode(char *source, int ac, char **av)
 
 int anope_event_sanick(char *source, int ac, char **av)
 {
-    /* :source SANICK old new */
-    if (ac != 2)
-        return MOD_CONT;
-    do_nick(av[0], av[1], NULL, NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+    if (has_sanickmod == 1) {
+	/* :source SANICK old new */
+    	if (ac != 2)
+        	return MOD_CONT;
+    	do_nick(av[0], av[1], NULL, NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+    	return MOD_CONT;
+    } else {
+	anope_cmd_global(s_OperServ, "m_sanick not loaded!");
+    }
     return MOD_CONT;
 }
 
 int anope_event_sajoin(char *source, int ac, char **av)
 {
-    char *newav[1];
-    if (ac != 2)
-        return MOD_CONT;
-    newav[0] = av[1];
-    do_join(av[0], 1, newav);
+    if (has_sajoinmod == 1) {
+    	char *newav[1];
+    	if (ac != 2)
+        	return MOD_CONT;
+    	newav[0] = av[1];
+    	do_join(av[0], 1, newav);
+    	return MOD_CONT;
+    } else {
+	anope_cmd_global(s_OperServ, "m_sajoin not loaded!");
+    }
     return MOD_CONT;
 }
 
 int anope_event_sapart(char *source, int ac, char **av)
 {
-    char *newav[1];
-    if (ac < 2)
-        return MOD_CONT;
-    newav[0] = av[1];
-    do_part(av[0], 1, newav);
+    if (has_sapartmod == 1) {
+    	char *newav[1];
+    	if (ac < 2)
+        	return MOD_CONT;
+    	newav[0] = av[1];
+    	do_part(av[0], 1, newav);
+    	return MOD_CONT;
+    } else {
+	anope_cmd_global(s_OperServ, "m_sapart not loaded!");
+    }
     return MOD_CONT;
 }
 
@@ -907,19 +931,27 @@ void inspircd_cmd_unsqline(char *user)
 /* CHGHOST */
 void inspircd_cmd_chghost(char *nick, char *vhost)
 {
+    if (has_chghostmod == 1) {
     if (!nick || !vhost) {
         return;
     }
     send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
+    } else {
+	anope_cmd_global(s_OperServ, "CHGHOST not loaded!");
+    }
 }
 
 /* CHGIDENT */
 void inspircd_cmd_chgident(char *nick, char *vIdent)
 {
+    if (has_chgidentmod ==1) {
     if (!nick || !vIdent) {
         return;
     }
     send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
+    } else {
+	anope_cmd_global(s_OperServ, "CHGIDENT not loaded!");
+    }
 }
 
 /* INVITE */
@@ -1489,6 +1521,12 @@ int anope_event_capab(char *source, int ac, char **av)
         has_servicesmod = 0;
         has_globopsmod = 0;
 	has_svsholdmod = 0;
+	has_sajoinmod = 0;
+	has_sapartmod = 0;
+	has_sanickmod = 0;
+	has_chghostmod = 0;
+	has_chgidentmod = 0;
+
     } else if (strcasecmp(av[0], "MODULES") == 0) {
         if (strstr(av[1], "m_globops.so")) {
             has_globopsmod = 1;
@@ -1499,24 +1537,63 @@ int anope_event_capab(char *source, int ac, char **av)
 	if (strstr(av[1], "m_svshold.so")) {      
             has_svsholdmod = 1;
         }
+	if (strstr(av[1], "m_sajoin.so")) {
+            has_sajoinmod = 1;
+        }             
+        if (strstr(av[1], "m_sapart.so")) {
+            has_sapartmod = 1;
+        }
+	if (strstr(av[1], "m_sanick.so")) {
+            has_sanickmod = 1;
+        }
+	if (strstr(av[1], "m_chghost.so")) {
+            has_chghostmod = 1;
+        }
+	if (strstr(av[1], "m_chghident.so")) {      
+            has_chgidentmod = 1;
+        }
     } else if (strcasecmp(av[0], "END") == 0) {
         if (has_globopsmod == 0) {
             send_cmd(NULL,
-                     "ERROR :m_globops.so is not loaded. This is required by Anope");
+                     "ERROR :m_globops is not loaded. This is required by Anope");
             strscpy(quitmsg,
-                    "Remote server does not have the m_globops.so module loaded, and this is required.",
+                    "Remote server does not have the m_globops module loaded, and this is required.",
                     sizeof(quitmsg));
             quitting = 1;
             return MOD_STOP;
         }
         if (has_servicesmod == 0) {
             send_cmd(NULL,
-                     "ERROR :m_services.so is not loaded. This is required by Anope");
+                     "ERROR :m_services is not loaded. This is required by Anope");
             strscpy(quitmsg,
-                    "Remote server does not have the m_services.so module loaded, and this is required.",
+                    "Remote server does not have the m_services module loaded, and this is required.",
                     sizeof(quitmsg));
             quitting = 1;
             return MOD_STOP;
+        }
+	if (has_svsholdmod == 0) {
+		anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+		return MOD_CONT;
+	}
+	if (has_sajoinmod == 0) {
+                anope_cmd_global(s_OperServ, "SAJOIN missing, Usage disabled until module is loaded.");
+                return MOD_CONT;
+        }
+	if (has_sapartmod == 0) {
+                anope_cmd_global(s_OperServ, "SAPART missing, Usage disabled until module is loaded.");
+                return MOD_CONT;
+        }
+	if (has_sanickmod == 0) {
+                anope_cmd_global(s_OperServ, "SANICK missing, Usage disabled until module is loaded.");
+                return MOD_CONT;
+        }
+	if (has_chghostmod == 0) {
+                anope_cmd_global(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+                return MOD_CONT;
+        }
+	if (has_chgidentmod == 0) {
+                anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+                return MOD_CONT;
         }
 
         /* Generate a fake capabs parsing call so things like NOQUIT work
@@ -1622,16 +1699,25 @@ void inspircd_cmd_svid_umode3(User * u, char *ts)
 
 void inspircd_cmd_svsjoin(char *source, char *nick, char *chan)
 {
-    send_cmd(source, "SAJOIN %s %s", nick, chan);
+    if (has_sajoinmod == 1) {
+    	send_cmd(source, "SAJOIN %s %s", nick, chan);
+   } else {
+  	anope_cmd_global(s_OperServ, "WARNING! m_sajoin not loaded!, Please fix this!");
+  }
 }
 
 void inspircd_cmd_svspart(char *source, char *nick, char *chan)
 {
-    send_cmd(source, "SAPART %s %s", nick, chan);
+    if (has_sapartmod == 1) {
+        send_cmd(source, "SAPART %s %s", nick, chan);
+   } else {
+        anope_cmd_global(s_OperServ, "WARNING! m_sapart not loaded!, Please fix this!");
+  }
 }
 
 void inspircd_cmd_swhois(char *source, char *who, char *mask)
 {
+	/* Not used currently */
 }
 
 void inspircd_cmd_eob()
@@ -1804,7 +1890,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id: inspircd11.c 2007-08-27 20:45 GMT -5 katsklaw $");
+        ("$Id: inspircd11.c 2007-08-28 10:09 GMT -5 katsklaw $");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("inspircdIRCd 1.1");
@@ -1833,3 +1919,4 @@ int AnopeInit(int argc, char **argv)
 
     return MOD_CONT;
 }
+

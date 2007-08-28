@@ -24,6 +24,7 @@ Anope Version  S V N
 08/28 F Bug when truncating passwords to PASSMAX with enc_none.           [#765]
 08/28 F Bug in PTLink protocol where topic time was not being sent.       [#763]
 08/28 F Automatic displaying of 'Limited to ...' lines in help.           [#729]
+08/28 F We now check required commands existance on inspircd11 protocol   [#773] 
 
 Anope Version 1.7.19
 --------------------

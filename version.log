@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1281"
+VERSION_BUILD="1282"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1282)
+# BUGS  : 729
+# NOTES : Changed the "Limited to ..." lines in help replies to automatically appended lines
 #
 # BUILD : 1.7.19 (1281)
 # BUGS  : 

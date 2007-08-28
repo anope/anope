@@ -312,6 +312,33 @@ CS_LIST_INCORRECT_RANGE
 ###########################################################################
 
 # Automatic messages
+HELP_LIMIT_SERV_OPER
+	
+	Gelimiteerd tot Services Operators.
+HELP_LIMIT_SERV_ADMIN
+	
+	Gelimiteerd tot Services Administrators.
+HELP_LIMIT_SERV_ROOT
+	
+	Gelimiteerd tot Services Roots.
+HELP_LIMIT_IRC_OPER
+	
+	Gelimiteerd tot IRC Operators.
+HELP_LIMIT_HOST_SETTER
+	
+	Gelimiteerd tot Host Setters.
+HELP_LIMIT_HOST_REMOVER
+	
+	Gelimiteerd tot Host Removers.
+
+
+###########################################################################
+#
+# NickServ messages
+#
+###########################################################################
+
+# Automatic messages
 NICK_IS_REGISTERED
 	Deze nick is eigendom van iemand anders.  Kies een andere.
 	(Als dit jouw nick is, type %R%s IDENTIFY wachtwoord.)
@@ -3169,8 +3196,6 @@ OPER_HELP_EXCEPTION
 	met zijn host overeenkomt "gebruiken". Grote uitzonderingen-
 	lijsten en breed overeenkomende uitzondering-masks zullen
 	zeer waarschijnlijk de prestaties van de services verminderen.
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_SESSION
 	Gebruik: SESSION LIST drempel
@@ -3189,8 +3214,6 @@ OPER_HELP_SESSION
 	Bekijk de EXCEPTION help voor meer informatie over sessie
 	limiteringen en hoe sessie limieten in te stellen voor
 	specifieken hosts en groepen daarvan.
-	
-	Gelimiteerd tot Services admins.
 
 ###########################################################################
 #
@@ -3768,23 +3791,17 @@ NICK_HELP_SASET
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
 	nickname. 
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
 	
 	Changes the display used to refer to the nickname group in 
 	Services. The new display MUST be a nick of the group.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
@@ -3792,15 +3809,11 @@ NICK_HELP_SASET_URL
 	Associates the given URL with the nickname.  This URL
 	will be displayed whenever someone requests information
 	on the nick with the INFO command.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
 	
 	Associates the given E-mail address with the nickname.
-	
-	Limited to Services admins.
 	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
@@ -3809,8 +3822,6 @@ NICK_HELP_SASET_ICQ
 	number will be displayed whenever someone requests 
 	information on the nick with the INFO command.
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
 	
@@ -3818,8 +3829,6 @@ NICK_HELP_SASET_GREET
 	will be displayed when joining a channel that has GREET
 	option enabled, provided that the user has the necessary 
 	access on it.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
@@ -3836,8 +3845,6 @@ NICK_HELP_SASET_KILL
 	warned first or given a chance to change their nick; please
 	do not use this option unless necessary.  Also, your
 	network's administrators may have disabled this option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
@@ -3849,8 +3856,6 @@ NICK_HELP_SASET_SECURE
 	list.  However, if you are on the access list, %S
 	will not auto-kill you regardless of the setting of the
 	KILL option.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
@@ -3860,8 +3865,6 @@ NICK_HELP_SASET_PRIVATE
 	nickname lists generated with %S's LIST command.
 	(However, anyone who knows the nickname can still get
 	information on it using the INFO command.)
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3874,24 +3877,18 @@ NICK_HELP_SASET_HIDE
 	The second parameter specifies whether the information should
 	be displayed (OFF) or hidden (ON).
 	
-	Limited to Services admins.
-	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
 	Allows you to choose the way Services are communicating with 
 	the given user. With MSG set, Services will use messages,
 	else they'll use notices.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
 	
 	Sets whether the given nickname will expire.  Setting this
 	to ON prevents the nickname from expiring.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -3899,8 +3896,6 @@ NICK_HELP_SASET_AUTOOP
 	Sets whether the given nickname will be opped automatically.
 	Set to ON to allow ChanServ to op you automatically when joining
 	channels.
-	
-	Limited to Services admins.
 
 NICK_HELP_RECOVER
 	Gebruik: RECOVER nick [wachtwoord]
@@ -4102,7 +4097,7 @@ NICK_SERVADMIN_HELP_LIST
 	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
 	NOEXPIRE flag set will be displayed. If all three options are
 	given, all three types of nicks will be displayed. These options
-	are limited to Services admins.  
+	are Gelimiteerd tot Services admins.  
 	
 	Voorbeelden:
 	
@@ -4148,8 +4143,6 @@ NICK_SERVADMIN_HELP_GETPASS
 	het is gebruikt zal worden gelogd en verstuurd zal worden
 	als WALLOPS/GLOBOPS.
 	
-	Gelimiteerd tot Services admins.
-	
 	Dit commando is onbeschikbaar wanneer encryptie is ingeschakeld.
 
 NICK_SERVADMIN_HELP_GETEMAIL
@@ -4162,8 +4155,6 @@ NICK_SERVADMIN_HELP_GETEMAIL
 	die dit commando uitvoerde samen met de emailhost waarop
 	het werd gebruikt. 
 
-	Gelimiteerd tot Services admins.
-
 NICK_SERVADMIN_HELP_FORBID
 	Gebruik: FORBID nick [reden]
 	
@@ -4172,8 +4163,6 @@ NICK_SERVADMIN_HELP_FORBID
 	door de registratie van de nick ongedaan te maken (DROP).
 	
 	Op sommige netwerken is een reden verplicht.
-	
-	Gelimiteerd tot Services admins.
 
 
 ###########################################################################
@@ -4187,8 +4176,6 @@ NICK_SERVADMIN_HELP_SUSPEND
 
 	Stelt een nick tijdelijk buiten werking. Een nick die buiten werking
 	is gesteld kan niet worden gebruikt: identificatie wordt uitgeschakeld.
-	
-	Gelimited to Services admins.
 
 ###########################################################################
 #
@@ -4200,8 +4187,6 @@ NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND nickname
 
 	UNSUSPENDS a nickname from being used.
-
-	Limited to Services admins.
 
 ###########################################################################
 #
@@ -5187,8 +5172,6 @@ CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	
 	Stelt in of het gegeven kanaal zal verlopen. Door deze optie
 	AAN te zetten kun je verhinderen dan het kanaal verloopt.
-	
-	Gelimiteerd tot Services adminstrators.
 
 CHAN_SERVADMIN_HELP_INFO
 	
@@ -5218,8 +5201,6 @@ CHAN_SERVADMIN_HELP_GETPASS
 	Let op: wanneer je dit commando gebruikt zal er een bericht
 	waarin staat wie het commando op welk kanaal heeft gebruikt
 	worden gelogged en verstuurd als WALLOPS/GLOBOPS.
-	
-	Gelimiteerd tot Services adminstrators.
 
 CHAN_SERVADMIN_HELP_FORBID
 	Gebruik: FORBID kanaal [reden]
@@ -5229,8 +5210,6 @@ CHAN_SERVADMIN_HELP_FORBID
 	droppen van het kanaal.
 	
 	Reden kan verplicht zijn op sommige netwerken.
-	
-	Gelimiteerd tot Services adminstrators.
 
 CHAN_SERVADMIN_HELP_SUSPEND
 	Gebruik: SUSPEND kanaal [reden]
@@ -5241,8 +5220,6 @@ CHAN_SERVADMIN_HELP_SUSPEND
 	instellingen te behouden.
 	
 	Op sommige netwerken is een reden verplicht.
-	
-	Limited to Services admins.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND channel
@@ -5252,8 +5229,6 @@ CHAN_SERVADMIN_HELP_UNSUSPEND
 	buitenwerkingstelling.
 	Releases a suspended channel. All data and settings
 	are preserved from before the suspention.
-	
-	Limited to Services admins.
 
 CHAN_SERVADMIN_HELP_STATUS
 	Gebruik: STATUS kanaal nick
@@ -5266,8 +5241,6 @@ CHAN_SERVADMIN_HELP_STATUS
 	Als er een fout optreed zal het antwoord zijn in het formaat:
 	
 	    STATUS ERROR fout-bericht
-	
-	Gelimiteerd tot Services adminstrators.
 
 ###########################################################################
 #
@@ -5719,8 +5692,6 @@ OPER_HELP_MODE
 	Stelt Services operators in staat om de modes van elk willekeurig
 	kanaal in te stellen. De paramenters zijn het zelfde als bij een
 	standaard /MODE commando.
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_UMODE
 	Gebruik: UMODE gebruiker modes
@@ -5747,8 +5718,6 @@ OPER_HELP_CLEARMODES
 	Verwijdert alle binaire modes (i,k,l,m,n,p,s,t) en bans van
 	een kanaal. Als ALL is opgegeven, worden ook alle ops en
 	voices (+o en +v modes) van het kanaal verwijderd.
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_KICK
 	Gebruik: KICK kanaal gebruiker reden
@@ -5760,15 +5729,11 @@ OPER_HELP_KICK
 	Bijvoorbeeld:
 	
 	*** Gebruiker has been kicked off channel #mijn_kanaal by %S (IRCOp (Misbruik))
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_SVSNICK
 	Gebruik: SVSNICK nick nieuwe nick
 
 	Veranderd een gebruiker's nick van nick naar nieuwe nick.	
-	
-	Gelimiteerd tot Services administrators
 
 OPER_HELP_AKILL
 	Gebruik: AKILL ADD [+verlooptijd] mask reden
@@ -5817,8 +5782,6 @@ OPER_HELP_AKILL
 	
 	AKILL CLEAR maakt de AKILL lijst leeg.
 	
-	Gelimiteerd tot Services operators.
-	
 OPER_HELP_SGLINE
 	Gebruik: SGLINE ADD [+verlooptijd] mask reden
 	         SGLINE DEL {mask | entry-nr | lijst}
@@ -5863,8 +5826,6 @@ OPER_HELP_SGLINE
 	en de reden.
 	
 	SGLINE CLEAR maakt de SGLINE lijst leeg.
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_SQLINE
 	Gebruik: SQLINE ADD [+verlooptijd] mask reden
@@ -5913,8 +5874,6 @@ OPER_HELP_SQLINE
 	waarop dit gebeurde, waneer deze verloopt, en de mask en de reden.
 	
 	SQLINE CLEAR maakt de SQLINE lijst leeg.
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_SZLINE
 	Gebruik: SZLINE ADD [+verlooptijd] mask reden
@@ -5960,8 +5919,6 @@ OPER_HELP_SZLINE
 	adres en de reden.
 	
 	SZLINE CLEAR maakt de SZLINE lijst leeg
-	
-	Gelimiteerd tot Services operators.
 
 OPER_HELP_SET
 	Gebruik: SET optie instelling
@@ -5976,8 +5933,6 @@ OPER_HELP_SET
 	    SQL   	 Activate or deactivate sql mode
 	    IGNORE     Activate or deactivate ignore mode
 	    LIST       List the options
-	
-	Gelimiteerd tot Services adminstrators.
 
 OPER_HELP_SET_READONLY
 	Gebruik: SET READONLY {ON | OFF}
@@ -6066,8 +6021,6 @@ OPER_HELP_NOOP
 	server weer beschikbaar.
 	
 	Pas op: De server wordt niet gecontroleerd door Services.
-	
-	Gelimiteerd tot Services admintrators.
 
 OPER_HELP_JUPE
 	GEBRUIK: JUPE server [reden]
@@ -6080,8 +6033,6 @@ OPER_HELP_JUPE
 	deze in het server informatie veld geplaatsd, anders zal het
 	informatie veld de text "Juped by <nick>" bevatten, waar
 	<nick> vervangen wordt door de <nick> die de server JUPEt.
-	
-	Gelimiteerd tot Services adminstrators.
 
 OPER_HELP_RAW
 	Gebruik: RAW text
@@ -6091,16 +6042,12 @@ OPER_HELP_RAW
 	kan voor chaos zorgen op een netwerk als het onjuist gebruikt
 	wordt. GEBRUIK DIT COMMANDO NIET tenzij je absoluut zeker
 	bent van wat je doet!
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_UPDATE
 	Gebruik: UPDATE
 	
 	Zorgt ervoor dat Services de database bestanden op de harde
 	schijf bijwerken zodra je dit commando vertsuurt.
-	
-	Gelimiteerd tot Services admins.
 	
 OPER_HELP_RELOAD
 	Gebruik: RELOAD
@@ -6109,8 +6056,6 @@ OPER_HELP_RELOAD
 	inladen. Let er wel op dat sommige instellingen nog steeds
 	vereisen dat de Services opnieuw gestart worden (bijvoorbeeld
 	Services' nicknames, activatie van de sessie limiet, etc.)
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_QUIT
 	Gebruik: QUIT
@@ -6120,24 +6065,18 @@ OPER_HELP_QUIT
 	tenzij schade aan de kopieen van de databases in het geheugen
 	wordt gevreesd en ze niet moeten worden opgeslagen. Voor
 	normaal afsluiten moet je het SHUTDOWN commando gebruiken.
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_SHUTDOWN
 	Gebruik: SHUTDOWN
 	
 	Zorgt ervoor dat Services alle databases opslaat en dan
 	afsluit.
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_RESTART
 	Gebruik: RESTART
 	
 	Zorgt ervoor dat Services alle databases opslaat en dan
 	opnieuw opstart.
-	
-	Gelimiteerd tot Services admins.	
 
 OPER_HELP_KILLCLONES
 	Gebruik: KILLCLONES nick
@@ -6150,8 +6089,6 @@ OPER_HELP_KILLCLONES
 	gebuiker se geKILLed zijn. Dit commando is bruikbaar om
 	een groot aantal klonen van het netwerk te verwijderen.
 	
-	Gelimiteerd tot Services operators.
-	
 OPER_HELP_CHANLIST
 	Gebruik: CHANLIST [{trefbeeld | nick} [SECRET]]
 	
@@ -6163,8 +6100,6 @@ OPER_HELP_CHANLIST
 	alleen de kanalen waar de betreffende gebruiker aanwezig is
 	weergegeven. Als SECRET is gegeven worden alleen kanalen
 	die met trefbeeld overeenkomen en +s of +p mode hebben.
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_USERLIST
 	Gebruik: USERLIST [{trefbeeld | kanaal} [INVISIBLE]]
@@ -6178,8 +6113,6 @@ OPER_HELP_USERLIST
 	alleen gebruikers die op het betreffende kanaal zijn
 	weergegeven. Als INVISBLE is gespecifificeerd worden alleen
 	gebruikers met gebruikersmode +i weergegeven.
-	
-	Gelimiteerd tot Services admins.
 
 OPER_HELP_MODLOAD
 	Gebruik: MODLOAD bestandsnaam
@@ -6187,15 +6120,11 @@ OPER_HELP_MODLOAD
 	Dit commando laadt de module genaamd bestandsnaam uit de
 	modules directory.
 
-	Gelimiteerd tot Services Roots.
-
 OPER_HELP_MODUNLOAD
 	Gebruik: MODUNLOAD bestandsnaam
 
 	Dit commando ontlaadt de module genaamd bestandsnaam uit
 	de modules directory.
-
-	Gelimiteerd tot Services Roots.
 
 OPER_HELP_MODINFO
 	Gebruik: MODINFO bestandsnaam
@@ -6209,8 +6138,6 @@ OPER_HELP_MODLIST
 	Gebruik: MODLIST
 
 	Geeft alle momenteel geladen modules weer.
-
-	Gelimiteerd tot IRC Operators.
 
 
 ###########################################################################
@@ -6552,8 +6479,6 @@ BOT_SERVADMIN_HELP_SET_NOBOT
 	Als er al een bot aan het kanaal is toegewezen wordt deze
 	automatisch van het kanaal gehaald wanneer je deze optie
 	aan zet.
-	
-	Gelimiteerd tot Services admins.
 
 BOT_SERVADMIN_HELP_SET_PRIVATE
 	Gebruik: SET bot-nick PRIVATE {ON|OFF}
@@ -6561,8 +6486,6 @@ BOT_SERVADMIN_HELP_SET_PRIVATE
 	Deze optie szorgt ervoor dat een bot niet kan worden
 	toegewezen aan een kanaal door gebruikers die geen
 	IRC operator zijn.
-	
-	Gelimiteerd tot Services admins.
 
 ###########################################################################
 #
@@ -6691,16 +6614,12 @@ HOST_HELP_SET
 	meegegeven heeft. Als de IRCD vIdent's ondersteund kun je
 	ook SET <nick> <ident>@<hostmask> gebruiken om de ident
 	voor een gebruiker aan te passen gelijk met de hostname.
-	
-	Gelimiteerd tot Services operators.
 
 HOST_HELP_DELALL
 	Syntax: DELALL <nick>.
 
 	Verwijderd de vhost voor alle nick's in dezelfde groep
 	als de gegeven nick.
-
-	Gelimiteerd tot Host Removers.
 
 
 HOST_HELP_SETALL
@@ -6713,8 +6632,6 @@ HOST_HELP_SETALL
 	
 	* LET OP, dit wijzigt niet de vhost voor elke nick lid
 	wordt van de groep nadat dit commando is gebruikt.
-	
-	Gelimiteerd tot Services operators.
 
 HOST_HELP_OFF
 	Gebruik: OFF
@@ -6729,8 +6646,6 @@ HOST_HELP_DEL
 	
 	Verwijdert de vhost die toegewezen is aan de gegeven nick
 	uit de database.
-	
-	Gelimiteerd tot Services operators.
 
 HOST_HELP_LIST
 	Gebruik: LIST [<nick>|<vhost>]
@@ -6739,8 +6654,6 @@ HOST_HELP_LIST
 	een nick of vhost meegeeft zulleen alleen die nick/vhost
 	worden weergegeven. LET OP: er is momenteel geen flood-
 	bescherming voor grote databases.
-	
-	Gelimiteerd tor Services admins.
 
 HOST_HELP_GROUP
 	Gebruik: GROUP

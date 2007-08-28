@@ -127,6 +127,31 @@ void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
 /*************************************************************************/
 
 /**
+ * Output the 'Limited to' line for the given command
+ * @param service Services Client
+ * @param u User Struct
+ * @param c Command Struct
+ * @return void
+ */
+void do_help_limited(char *service, User * u, Command * c)
+{
+    if (c->has_priv == is_services_oper)
+        notice_lang(service, u, HELP_LIMIT_SERV_OPER);
+    else if (c->has_priv == is_services_admin)
+        notice_lang(service, u, HELP_LIMIT_SERV_ADMIN);
+    else if (c->has_priv == is_services_root)
+        notice_lang(service, u, HELP_LIMIT_SERV_ROOT);
+    else if (c->has_priv == is_oper)
+        notice_lang(service, u, HELP_LIMIT_IRC_OPER);
+    else if (c->has_priv == is_host_setter)
+        notice_lang(service, u, HELP_LIMIT_HOST_SETTER);
+    else if (c->has_priv == is_host_remover)
+        notice_lang(service, u, HELP_LIMIT_HOST_REMOVER);
+}
+
+/*************************************************************************/
+
+/**
  * Print a help message for the given command.
  * @param services Services Client
  * @param u User Struct
@@ -202,6 +227,8 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     }
     if (has_had_help == 0) {
         notice_lang(service, u, NO_HELP_AVAILABLE, cmd);
+    } else {
+        do_help_limited(service, u, c);
     }
 
     mod_current_module = calling_module;

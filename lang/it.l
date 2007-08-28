@@ -310,6 +310,27 @@ CS_LIST_INCORRECT_RANGE
 ###########################################################################
 
 # Automatic messages
+HELP_LIMIT_SERV_OPER
+	Limited to Services Operators.
+HELP_LIMIT_SERV_ADMIN
+	Limited to Services Administrators.
+HELP_LIMIT_SERV_ROOT
+	Limited to Services Roots.
+HELP_LIMIT_IRC_OPER
+	Limited to IRC Operators.
+HELP_LIMIT_HOST_SETTER
+	Limited to Host Setters.
+HELP_LIMIT_HOST_REMOVER
+	Limited to Host Removers.
+
+
+###########################################################################
+#
+# NickServ messages
+#
+###########################################################################
+
+# Automatic messages
 NICK_IS_REGISTERED
 	Questo nick appartiene a qualcun altro. Per favore scegline un altro.
 	(Se questo è il tuo nick, digita %R%s IDENTIFY password.)

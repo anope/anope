@@ -187,11 +187,13 @@ void notice_lang(char *source, User * dest, int message, ...)
     char buf[4096];             /* because messages can be really big */
     char *s, *t;
     const char *fmt;
+
     if (!dest || !message) {
         return;
     }
     va_start(args, message);
     fmt = getstring(dest->na, message);
+
     if (!fmt)
         return;
     memset(buf, 0, 4096);

@@ -59,6 +59,7 @@ void myOperServHelp(User * u)
 {
     if (is_services_root(u)) {
         notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLOAD);
+		notice_lang(s_OperServ, u, HELP_LIMIT_SERV_ROOT);
     }
 }
 

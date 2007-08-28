@@ -23,6 +23,7 @@ Anope Version  S V N
 08/27 F Protocol for InspIRCd 1.1 now uses SVSHOLD.                       [#683]
 08/28 F Bug when truncating passwords to PASSMAX with enc_none.           [#765]
 08/28 F Bug in PTLink protocol where topic time was not being sent.       [#763]
+08/28 F Automatic displaying of 'Limited to ...' lines in help.           [#729]
 
 Anope Version 1.7.19
 --------------------

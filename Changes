@@ -21,6 +21,7 @@ Anope Version  S V N
 08/27 F Added missed help for NS CONFIRM.                                 [#759]
 08/27 F Fixed typo in en_us.l                                             [#767]
 08/27 F inspircd11 protocol now uses svshold                              [#683]
+08/28 F Fixed bug when truncating passwords to PASSMAX with enc_none      [#765]
 
 Anope Version 1.7.19
 --------------------

@@ -43,6 +43,7 @@ int plain_encrypt(const char *src,int len,char *dest,int size) {
     if(size>=len) {
 	memset(dest,0,size);
         strncpy(dest,src,len);
+        dest[len] = '\0';
 	return 0;
     }
     return -1;

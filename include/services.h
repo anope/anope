@@ -570,10 +570,15 @@ typedef struct {
 /* Note that these two levels also serve as exclusive boundaries for valid
  * access levels.  ACCESS_FOUNDER may be assumed to be strictly greater
  * than any valid access level, and ACCESS_INVALID may be assumed to be
- * strictly less than any valid access level.
+ * strictly less than any valid access level. Also read below.
  */
 #define ACCESS_FOUNDER	10000	/* Numeric level indicating founder access */
 #define ACCESS_INVALID	-10000	/* Used in levels[] for disabled settings */
+/* There is one exception to the above access levels: SuperAdmins will have
+ * access level 10001. This level is never stored, however; it is only used
+ * in comparison and to let SuperAdmins win from founders where needed
+ */
+#define ACCESS_SUPERADMIN 10001
 
 /* Levels for xOP */
 

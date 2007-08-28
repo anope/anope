@@ -1889,7 +1889,7 @@ int check_access(User * user, ChannelInfo * ci, int what)
     if (level > 0)
         ci->last_used = time(NULL);
 
-    if (level == ACCESS_FOUNDER)
+    if (level >= ACCESS_FOUNDER)
         return (what == CA_AUTODEOP || what == CA_NOJOIN) ? 0 : 1;
     /* Hacks to make flags work */
     if (what == CA_AUTODEOP && (ci->flags & CI_SECUREOPS) && level == 0)
@@ -2233,6 +2233,10 @@ int get_access(User * user, ChannelInfo * ci)
 
     if (!ci || !user)
         return -1;
+
+    // SuperAdmin always has highest level
+    if (user->isSuperAdmin)
+        return ACCESS_SUPERADMIN;
 
     if (is_founder(user, ci))
         return ACCESS_FOUNDER;

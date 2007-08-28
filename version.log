@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1283"
+VERSION_BUILD="1284"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1284)
+# BUGS  : 770
+# NOTES : SuperAdmins now have a higher channel level than channel founders so they will always win from founders
 #
 # BUILD : 1.7.19 (1283)
 # BUGS  : 773

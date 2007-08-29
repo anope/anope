@@ -115,6 +115,11 @@ int do_sgline(User * u)
         }
 
         if (mask && (reason = strtok(NULL, ""))) {
+			/* Clean up the last character of the mask if it is a space. */
+			size_t masklen = strlen(mask);
+			if (mask[masklen - 1] == ' ')
+				mask[masklen - 1] = '\0';
+			
             /* We first do some sanity check on the proposed mask. */
 
             if (mask && strspn(mask, "*?") == strlen(mask)) {

@@ -28,6 +28,7 @@ Anope Version  S V N
 08/28 F We now check required commands existance on inspircd11 protocol.  [#773]
 08/28 F SuperAdmin now always overrules channel founder.                  [#770]
 08/29 F InspIRCD11 protocol now uses SVSJOIN/PART instead of SAJOIN/PART. [#772]
+08/29 F OperServ SGLINE ADD now strips a trailing space from the mask.    [#761]
 08/29 F TS6 UID generation for all supported TS6 IRCDs.                   [#731]
 
 Provided by nenolod <nenolod@nenolod.net> - 2007

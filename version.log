@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1286"
+VERSION_BUILD="1287"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1287)
+# BUGS  : 761
+# NOTES : Fixed OperServ SGLINE to now remove trailing spaces from the mask... this is not 100% syntactically correct, but spaces on the end are not usually needed anyways
 #
 # BUILD : 1.7.19 (1286)
 # BUGS  : 731

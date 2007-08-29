@@ -351,13 +351,26 @@ void expire_exceptions(void)
 
 Exception *find_host_exception(const char *host)
 {
+    char *ipbuf = NULL;
+    char *myhost = NULL;
     int i;
 
+    /* we try to resolve the hostname to an IP in case
+     * the exception was added by IP instead of hostname - DrStein */
+    if (host)
+        myhost = sstrdup(host);
+    ipbuf = host_resolve(myhost);
+
     for (i = 0; i < nexceptions; i++) {
-        if (match_wild_nocase(exceptions[i].mask, host)) {
+        if ((match_wild_nocase(exceptions[i].mask, host))
+            || ((ipbuf != NULL)
+                && match_wild_nocase(exceptions[i].mask, ipbuf))) {
+            Anope_Free(myhost);
             return &exceptions[i];
         }
     }
+
+    Anope_Free(myhost);
 
     return NULL;
 }

@@ -15,8 +15,6 @@
 #include "pseudo.h"
 #include "ratbox.h"
 
-int ts6nickcount = 0;
-
 IRCDVar myIrcd[] = {
     {"Ratbox 2.0+",             /* ircd name */
      "+oi",                     /* nickserv mode */
@@ -989,16 +987,13 @@ void ratbox_cmd_connect(int servernum)
 void ratbox_cmd_bot_nick(char *nick, char *user, char *host, char *real,
                          char *modes)
 {
-    char nicknumbuf[10];
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
-        snprintf(nicknumbuf, 10, "%sAAAAA%c", Numeric,
-                 (ts6nickcount + 'A'));
+		char *uidbuf = ts6_uid_retrieve();
         send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
-                 (long int) time(NULL), modes, user, host, nicknumbuf,
+                 (long int) time(NULL), modes, user, host, uidbuf,
                  real);
-        new_uid(nick, nicknumbuf);
-        ts6nickcount++;
+        new_uid(nick, uidbuf);
     } else {
         send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
                  (long int) time(NULL), modes, user, host, ServerName,
@@ -1360,22 +1355,19 @@ void ratbox_cmd_tmode(char *source, char *dest, const char *fmt, ...)
 
 void ratbox_cmd_nick(char *nick, char *name, char *mode)
 {
-    char nicknumbuf[10];
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
-        snprintf(nicknumbuf, 10, "%sAAAAA%c", Numeric,
-                 (ts6nickcount + 'A'));
+		char *uidbuf = ts6_uid_retrieve();
         send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
                  (long int) time(NULL), mode, ServiceUser, ServiceHost,
-                 nicknumbuf, name);
-        new_uid(nick, nicknumbuf);
-        ts6nickcount++;
+                 uidbuf, name);
+        new_uid(nick, uidbuf);
     } else {
         send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
                  (long int) time(NULL), mode, ServiceUser, ServiceHost,
                  ServerName, name);
     }
-    send_cmd(UseTS6 ? nicknumbuf : nick, "RESV * %s :%s", nick, "Reserved for services");
+	ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
 void ratbox_cmd_kick(char *source, char *chan, char *user, char *buf)

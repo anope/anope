@@ -1037,6 +1037,10 @@ E int anope_check_sync(const char *name);
 
 E void finish_sync(Server *serv, int sync_links);
 
+E void ts6_uid_init(void);
+E void ts6_uid_increment(unsigned int slot);
+E char *ts6_uid_retrieve(void);
+
 /**** sessions.c ****/
 
 E Exception *exceptions;

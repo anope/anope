@@ -16,9 +16,6 @@
 #include "pseudo.h"
 #include "shadowircd.h"
 
-/* 6 slot array, 35 possible combinations per slot, exponential. */
-int ts6nickcount[6] = { 0, 0, 0, 0, 0, 0 };
-
 IRCDVar myIrcd[] = {
     {"ShadowIRCd 4.0+",         /* ircd name */
      "+oiqSK",                  /* nickserv mode */
@@ -992,19 +989,13 @@ void shadowircd_cmd_connect(int servernum)
 void shadowircd_cmd_bot_nick(char *nick, char *user, char *host,
                              char *real, char *modes)
 {
-    char nicknumbuf[10];
+	char *uidbuf = ts6_uid_retrieve();
+	
     EnforceQlinedNick(nick, NULL);
-    snprintf(nicknumbuf, 10, "%sAAAA%c%c", Numeric,
-             (ts6nickcount[1] + 'A'), (ts6nickcount[0] + 'A'));
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
-             (long int) time(NULL), modes, user, host, nicknumbuf, host,
+             (long int) time(NULL), modes, user, host, uidbuf, host,
              real);
-    new_uid(nick, nicknumbuf);
-    ts6nickcount[0]++;
-    if (ts6nickcount[0] > 35) { /* AAAAA9 */
-        ts6nickcount[1]++;
-        ts6nickcount[0] = 0;    /* AAAABA */
-    }
+    new_uid(nick, uidbuf);
     shadowircd_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1360,14 +1351,13 @@ void shadowircd_cmd_tmode(char *source, char *dest, char *buf)
 
 void shadowircd_cmd_nick(char *nick, char *name, char *mode)
 {
-    char nicknumbuf[10];
+	char *uidbuf = ts6_uid_retrieve();
+	
     EnforceQlinedNick(nick, NULL);
-    snprintf(nicknumbuf, 10, "%sAAAAA%c", TS6SID, (ts6nickcount[0] + 'A'));
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
              (long int) time(NULL), mode, ServiceUser, ServiceHost,
-             nicknumbuf, ServiceHost, name);
-    new_uid(nick, nicknumbuf);
-    ts6nickcount[0]++;
+             uidbuf, ServiceHost, name);
+    new_uid(nick, uidbuf);
     shadowircd_cmd_sqline(nick, "Reserved for services");
 }
 

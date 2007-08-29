@@ -83,10 +83,13 @@ are given, detailed information about those nicks is displayed.\n\
 
     if (chdir(services_dir) < 0) {
         fprintf(stderr, "chdir(%s): %s\n", services_dir, strerror(errno));
+        ModuleRunTimeDirCleanUp();
         exit(1);
     }
-    if (!read_config(0))
+    if (!read_config(0)) {
+        ModuleRunTimeDirCleanUp();
         exit(1);
+    }
     load_ns_dbase();
 
     lang_init();
@@ -169,10 +172,13 @@ are given, detailed information about those channels is displayed.\n\
 
     if (chdir(services_dir) < 0) {
         fprintf(stderr, "chdir(%s): %s\n", services_dir, strerror(errno));
+        ModuleRunTimeDirCleanUp();
         exit(1);
     }
-    if (!read_config(0))
+    if (!read_config(0)) {
+        ModuleRunTimeDirCleanUp();
         exit(1);
+    }
     load_ns_dbase();
     load_cs_dbase();
 

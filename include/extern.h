@@ -30,7 +30,7 @@
 
 #include "slist.h"
 
-
+E void ModuleRunTimeDirCleanUp(void);
 
 
 E char *uplink;

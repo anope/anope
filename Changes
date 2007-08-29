@@ -31,6 +31,9 @@ Anope Version  S V N
 08/29 F OperServ SGLINE ADD now strips a trailing space from the mask.    [#761]
 08/29 F TS6 UID generation for all supported TS6 IRCDs.                   [#731]
 
+Provided by Trystan <trystan@nomadirc.net> - 2007
+08/29 F Module runtime directory not always properly cleaned up.          [#768]
+
 Provided by nenolod <nenolod@nenolod.net> - 2007
 08/29 F TS6 UID generation for Charybdis.                                 [#731]
 

@@ -309,6 +309,8 @@ static void services_shutdown(void)
     /* First don't unload protocol module, then do so */
     modules_unload_all(true, false);
     modules_unload_all(true, true);
+    /* just in case they weren't all removed at least run once */
+    ModuleRunTimeDirCleanUp();
 }
 
 /*************************************************************************/
@@ -567,6 +569,9 @@ int main(int ac, char **av, char **envp)
 #endif
     {
         do_listnicks(ac, av);
+        modules_unload_all(1, 0);
+        modules_unload_all(1, 1);
+        ModuleRunTimeDirCleanUp();
         return 0;
     }
 #ifdef _WIN32
@@ -576,6 +581,9 @@ int main(int ac, char **av, char **envp)
 #endif
     {
         do_listchans(ac, av);
+        modules_unload_all(1, 0);
+        modules_unload_all(1, 1);
+        ModuleRunTimeDirCleanUp();
         return 0;
     }
 

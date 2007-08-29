@@ -2788,4 +2788,84 @@ void handleModuleOperationQueue(void)
 	mod_current_user = NULL;
 }
 
+void ModuleRunTimeDirCleanUp(void)
+{
+#ifndef _WIN32
+    DIR *dirp;
+    struct dirent *dp;
+#else
+    BOOL fFinished;
+    HANDLE hList;
+    TCHAR szDir[MAX_PATH + 1];
+    TCHAR szSubDir[MAX_PATH + 1];
+    WIN32_FIND_DATA FileData;
+    char buffer[_MAX_PATH];
+#endif
+    char dirbuf[BUFSIZE];
+    char filebuf[BUFSIZE];
+
+
+#ifndef _WIN32
+    snprintf(dirbuf, BUFSIZE, "%s/modules/runtime", services_dir);
+#else
+    snprintf(dirbuf, BUFSIZE, "\\%s", "modules/runtime");
+#endif
+
+	if (debug) {
+		alog("debug: Cleaning out Module run time directory (%s) - this may take a moment please wait", dirbuf);
+	}
+
+#ifndef _WIN32
+    if ((dirp = opendir(dirbuf)) == NULL) {
+		if (debug) {
+	        alog("debug: cannot open directory (%s)", dirbuf);
+		}
+        return;
+    }
+    while ((dp = readdir(dirp)) != NULL) {
+        if (dp->d_ino == 0) {
+            continue;
+        }
+        if (!stricmp(dp->d_name, ".") || !stricmp(dp->d_name, "..")) {
+            continue;
+        }
+	    snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, dp->d_name);
+		unlink(filebuf);
+    }
+    closedir(dirp);
+#else
+    /* Get the current working directory: */
+    if (_getcwd(buffer, _MAX_PATH) == NULL) {
+		if (debug) {
+	        alog("debug: Unable to set Current working directory");
+		}
+    }
+    snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirname);
+
+    hList = FindFirstFile(szDir, &FileData);
+    if (hList != INVALID_HANDLE_VALUE) {
+        fFinished = FALSE;
+        while (!fFinished) {
+            if (!(FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			    snprintf(filebuf, BUFSIZE, "%s/%s", dirbuf, FileData.cFileName);
+				DeleteFile(filebuf);
+            }
+            if (!FindNextFile(hList, &FileData)) {
+                if (GetLastError() == ERROR_NO_MORE_FILES) {
+                    fFinished = TRUE;
+                }
+            }
+        }
+    } else {
+		if (debug) {
+	        alog("debug: Invalid File Handle. GetLastError reports %d\n", GetLastError());
+		}
+    }
+    FindClose(hList);
+#endif
+	if (debug) {
+		alog("debug: Module run time directory has been cleaned out");
+	}
+}
+
 /* EOF */

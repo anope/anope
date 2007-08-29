@@ -109,6 +109,10 @@
 #endif
 #endif
 
+#ifndef _WIN32
+#include <dirent.h>
+#endif
+
 #ifdef USE_RDB
 # define MAX_SQL_BUF   4096
 #endif

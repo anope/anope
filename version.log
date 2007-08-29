@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1288"
+VERSION_BUILD="1289"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1289)
+# BUGS  : 768
+# NOTES : Fixed module runtime directory not always being cleaned up nicely
 #
 # BUILD : 1.7.19 (1288)
 # BUGS  : 761

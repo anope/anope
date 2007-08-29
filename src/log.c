@@ -247,6 +247,9 @@ void fatal(const char *fmt, ...)
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s", buf2);
 
+    /* one of the many places this needs to be called from */
+    ModuleRunTimeDirCleanUp();
+
     exit(1);
 }
 
@@ -282,6 +285,9 @@ void fatal_perror(const char *fmt, ...)
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
                          strerror(errno_save));
+
+    /* one of the many places this needs to be called from */
+    ModuleRunTimeDirCleanUp();
 
     exit(1);
 }
@@ -322,6 +328,9 @@ void fatal_sockerror(const char *fmt, ...)
     if (servsock >= 0)
         anope_cmd_global(NULL, "FATAL ERROR!  %s: %s", buf2,
                          strerror(errno_save));
+
+    /* one of the many places this needs to be called from */
+    ModuleRunTimeDirCleanUp();
 
     exit(1);
 }

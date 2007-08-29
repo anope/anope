@@ -30,7 +30,7 @@ cat >version.h <<EOF
  * (C) 2003-2007 Anope Team
  * Contact us at info@anope.org
  *
- * Please read COPYING and CREDITS for furhter details.
+ * Please read COPYING and CREDITS for further details.
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church. 

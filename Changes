@@ -1,5 +1,6 @@
 Anope Version  S V N
 --------------------
+08/29 A Added InspIRCd11 vIdent support.                                  [#684]
 06/15 F Non-existing servers being SQUIT'd when they were juped.          [#726]
 06/15 F Back online notice being sent to juped servers.                   [#726]
 06/15 F Not informing opers a SQUIT for a juped server was received.      [#718]
@@ -26,6 +27,7 @@ Anope Version  S V N
 08/28 F Automatic displaying of 'Limited to ...' lines in help.           [#729]
 08/28 F We now check required commands existance on inspircd11 protocol.  [#773]
 08/28 F SuperAdmin now always overrules channel founder.                  [#770]
+08/29 F InspIRCD11 protocol now uses SVSJOIN/PART instead of SAJOIN/PART. [#772]
 
 Anope Version 1.7.19
 --------------------

@@ -90,7 +90,7 @@ IRCDVar myIrcd[] = {
      1,                         /* Reverse              */
      1,                         /* Chan Reg             */
      CMODE_r,                   /* Channel Mode         */
-     0,                         /* vidents              */
+     1,                         /* vidents              */
      0,                         /* svshold              */
      0,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
@@ -944,7 +944,7 @@ void inspircd_cmd_chghost(char *nick, char *vhost)
 /* CHGIDENT */
 void inspircd_cmd_chgident(char *nick, char *vIdent)
 {
-    if (has_chgidentmod ==1) {
+    if (has_chgidentmod == 1) {
     if (!nick || !vIdent) {
         return;
     }
@@ -1699,20 +1699,12 @@ void inspircd_cmd_svid_umode3(User * u, char *ts)
 
 void inspircd_cmd_svsjoin(char *source, char *nick, char *chan)
 {
-    if (has_sajoinmod == 1) {
-    	send_cmd(source, "SAJOIN %s %s", nick, chan);
-   } else {
-  	anope_cmd_global(s_OperServ, "WARNING! m_sajoin not loaded!, Please fix this!");
-  }
+    	send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
 
 void inspircd_cmd_svspart(char *source, char *nick, char *chan)
 {
-    if (has_sapartmod == 1) {
-        send_cmd(source, "SAPART %s %s", nick, chan);
-   } else {
-        anope_cmd_global(s_OperServ, "WARNING! m_sapart not loaded!, Please fix this!");
-  }
+        send_cmd(source, "SVSPART %s %s", nick, chan);
 }
 
 void inspircd_cmd_swhois(char *source, char *who, char *mask)

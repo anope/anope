@@ -1353,10 +1353,15 @@ void unreal_cmd_svid_umode3(User * u, char *ts)
 	parv[0] - sender
 	parv[1] - nick to make join
 	parv[2] - channel(s) to join
+        parv[3] - (optional) channel key(s)
 */
-void unreal_cmd_svsjoin(char *source, char *nick, char *chan)
+void unreal_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
-    send_cmd(source, "SVSJOIN %s :%s", nick, chan);
+    if (param) {
+        send_cmd(source, "SVSJOIN %s %s :%s", nick, chan, param);
+    } else {
+        send_cmd(source, "SVSJOIN %s :%s", nick, chan);
+    }
 }
 
 /* svspart
@@ -1536,9 +1541,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(unreal_cmd_nc_change);
     pmodule_cmd_svid_umode2(unreal_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(unreal_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(unreal_cmd_svsjoin);
-	pmodule_cmd_svspart(unreal_cmd_svspart);
-	pmodule_cmd_swhois(unreal_cmd_swhois);
+    pmodule_cmd_svsjoin(unreal_cmd_svsjoin);
+    pmodule_cmd_svspart(unreal_cmd_svspart);
+    pmodule_cmd_swhois(unreal_cmd_swhois);
     pmodule_cmd_eob(unreal_cmd_eob);
     pmodule_flood_mode_check(unreal_flood_mode_check);
     pmodule_cmd_jupe(unreal_cmd_jupe);

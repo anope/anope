@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1290"
+VERSION_BUILD="1291"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1291)
+# BUGS  : 774
+# NOTES : Unreals (3.2) SVSJOIN command now supports channel keys
 #
 # BUILD : 1.7.19 (1290)
 # BUGS  : 723

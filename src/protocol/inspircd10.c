@@ -1498,7 +1498,7 @@ void inspircd_cmd_svid_umode3(User * u, char *ts)
     /* not used */
 }
 
-void inspircd_cmd_svsjoin(char *source, char *nick, char *chan)
+void inspircd_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     send_cmd(source, "SAJOIN %s %s", nick, chan);
 }
@@ -1662,9 +1662,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(inspircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(inspircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(inspircd_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
-	pmodule_cmd_svspart(inspircd_cmd_svspart);
-	pmodule_cmd_swhois(inspircd_cmd_swhois);
+    pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
+    pmodule_cmd_svspart(inspircd_cmd_svspart);
+    pmodule_cmd_swhois(inspircd_cmd_swhois);
     pmodule_cmd_eob(inspircd_cmd_eob);
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);

@@ -1656,16 +1656,19 @@ int anope_event_smo(char *source, int ac, char **av)
 /* svsjoin
 	parv[0] - sender
 	parv[1] - nick to make join
-	parv[2] - channel(s) to join
+	parv[2] - channel to join
 	parv[3] - (optional) channel key(s)
-	- current we do not support the keys part
 */
 /* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
    when coming from a none TOKEN'd server
 */
-void unreal_cmd_svsjoin(char *source, char *nick, char *chan)
+void unreal_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
-    send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
+    if (param) {
+        send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
+    } else {
+        send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
+    }
 }
 
 /* svspart

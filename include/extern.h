@@ -661,7 +661,7 @@ E void pmodule_cmd_nc_change(void (*func) (User * u));
 E void pmodule_cmd_svid_umode2(void (*func) (User * u, char *ts));
 E void pmodule_cmd_svid_umode3(void (*func) (User * u, char *ts));
 E void pmodule_cmd_ctcp(void (*func) (char *source, char *dest, char *buf));
-E void pmodule_cmd_svsjoin(void (*func) (char *source, char *nick, char *chan));
+E void pmodule_cmd_svsjoin(void (*func) (char *source, char *nick, char *chan, char *param));
 E void pmodule_cmd_svspart(void (*func) (char *source, char *nick, char *chan));
 E void pmodule_cmd_swhois(void (*func) (char *source, char *who, char *mask));
 E void pmodule_cmd_eob(void (*func) ());
@@ -1251,7 +1251,7 @@ E void anope_cmd_svsadmin(char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
 E void anope_cmd_release_svshold(char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
-E void anope_cmd_svsjoin(char *source, char *nick,char *chan);          	  		  /* SVSJOIN */
+E void anope_cmd_svsjoin(char *source, char *nick,char *chan, char *param);          	  /* SVSJOIN */
 E void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
 E void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
 E void anope_cmd_svsmode_chan(char *name, char *mode, char *nick);				  /* SVSMODE */

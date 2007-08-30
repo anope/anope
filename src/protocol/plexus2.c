@@ -1645,7 +1645,7 @@ anope_event_pass (char *source, int ac, char **av)
 }
 
 void
-plexus_cmd_svsjoin (char *source, char *nick, char *chan)
+plexus_cmd_svsjoin (char *source, char *nick, char *chan, char *param)
 {
   /* Not Supported by this IRCD */
 }

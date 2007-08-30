@@ -1455,7 +1455,7 @@ int anope_event_sqline(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void rageircd_cmd_svsjoin(char *source, char *nick, char *chan)
+void rageircd_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     /* Find no reference to it in the code and docs */
 }
@@ -1625,9 +1625,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(rageircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(rageircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(rageircd_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(rageircd_cmd_svsjoin);
-	pmodule_cmd_svspart(rageircd_cmd_svspart);
-	pmodule_cmd_swhois(rageircd_cmd_swhois);
+    pmodule_cmd_svsjoin(rageircd_cmd_svsjoin);
+    pmodule_cmd_svspart(rageircd_cmd_svspart);
+    pmodule_cmd_swhois(rageircd_cmd_swhois);
     pmodule_cmd_eob(rageircd_cmd_eob);
     pmodule_flood_mode_check(rageircd_flood_mode_check);
     pmodule_cmd_jupe(rageircd_cmd_jupe);

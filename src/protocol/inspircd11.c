@@ -1697,7 +1697,7 @@ void inspircd_cmd_svid_umode3(User * u, char *ts)
     /* not used */
 }
 
-void inspircd_cmd_svsjoin(char *source, char *nick, char *chan)
+void inspircd_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     	send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }

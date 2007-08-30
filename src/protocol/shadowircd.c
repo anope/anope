@@ -1584,7 +1584,7 @@ int anope_event_pass(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void shadowircd_cmd_svsjoin(char *source, char *nick, char *chan)
+void shadowircd_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     /* Not Supported by this IRCD */
 }
@@ -1782,9 +1782,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(shadowircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(shadowircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(shadowircd_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(shadowircd_cmd_svsjoin);
-	pmodule_cmd_svspart(shadowircd_cmd_svspart);
-	pmodule_cmd_swhois(shadowircd_cmd_swhois);
+    pmodule_cmd_svsjoin(shadowircd_cmd_svsjoin);
+    pmodule_cmd_svspart(shadowircd_cmd_svspart);
+    pmodule_cmd_swhois(shadowircd_cmd_swhois);
     pmodule_cmd_eob(shadowircd_cmd_eob);
     pmodule_flood_mode_check(shadowircd_flood_mode_check);
     pmodule_cmd_jupe(shadowircd_cmd_jupe);

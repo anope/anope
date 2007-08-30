@@ -1549,7 +1549,7 @@ void ptlink_cmd_chg_nick(char *oldnick, char *newnick)
 	parv[2] = channels list 
   	:OperServ SVSJOIN Trystan #Admin
 */
-void ptlink_cmd_svsjoin(char *source, char *nick, char *chan)
+void ptlink_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }

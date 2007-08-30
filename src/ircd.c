@@ -600,9 +600,9 @@ void anope_cmd_svid_umode3(User * u, char *ts)
     ircdproto.ircd_cmd_svid_umode3(u, ts);
 }
 
-void anope_cmd_svsjoin(char *source, char *nick, char *chan)
+void anope_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
-    ircdproto.ircd_cmd_svsjoin(source, nick, chan);
+    ircdproto.ircd_cmd_svsjoin(source, nick, chan, param);
 }
 
 void anope_cmd_svspart(char *source, char *nick, char *chan)
@@ -1013,7 +1013,8 @@ void pmodule_cmd_ctcp(void (*func) (char *source, char *dest, char *buf))
 }
 
 void
-pmodule_cmd_svsjoin(void (*func) (char *source, char *nick, char *chan))
+pmodule_cmd_svsjoin(void (*func)
+                    (char *source, char *nick, char *chan, char *param))
 {
     ircdproto.ircd_cmd_svsjoin = func;
 }

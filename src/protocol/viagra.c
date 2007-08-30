@@ -1489,7 +1489,7 @@ void viagra_cmd_chg_nick(char *oldnick, char *newnick)
  *  parv[1] = nick to make join
  *  parv[2] = channel(s) to join
  */
-void viagra_cmd_svsjoin(char *source, char *nick, char *chan)
+void viagra_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 {
     send_cmd(source, "SVSJOIN %s :%s", nick, chan);
 }
@@ -1665,9 +1665,9 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nc_change(viagra_cmd_nc_change);
     pmodule_cmd_svid_umode2(viagra_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(viagra_cmd_svid_umode3);
-	pmodule_cmd_svsjoin(viagra_cmd_svsjoin);
-	pmodule_cmd_svspart(viagra_cmd_svspart);
-	pmodule_cmd_swhois(viagra_cmd_swhois);
+    pmodule_cmd_svsjoin(viagra_cmd_svsjoin);
+    pmodule_cmd_svspart(viagra_cmd_svspart);
+    pmodule_cmd_swhois(viagra_cmd_swhois);
     pmodule_cmd_eob(viagra_cmd_eob);
     pmodule_flood_mode_check(viagra_flood_mode_check);
     pmodule_cmd_jupe(viagra_cmd_jupe);

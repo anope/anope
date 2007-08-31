@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1296"
+VERSION_BUILD="1297"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1297)
+# BUGS  : N/A
+# NOTES : In the last commit, I forgot to store the just resolved IP in common_unban() so we wont need to 
+# resolve the host again.
 #
 # BUILD : 1.7.19 (1296)
 # BUGS  : N/A

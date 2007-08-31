@@ -146,6 +146,11 @@ void common_unban(ChannelInfo * ci, char *nick)
 
     if (u->hostip == NULL) {
         host = host_resolve(u->host);
+        /* we store the just resolved hostname so we don't
+         * need to do this again */
+        if (host) {
+            u->hostip = sstrdup(host);
+        }
     } else {
         host = sstrdup(u->hostip);
     }

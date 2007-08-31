@@ -1012,9 +1012,9 @@ void pmodule_cmd_ctcp(void (*func) (char *source, char *dest, char *buf))
     ircdproto.ircd_cmd_ctcp = func;
 }
 
-void
-pmodule_cmd_svsjoin(void (*func)
-                    (char *source, char *nick, char *chan, char *param))
+void pmodule_cmd_svsjoin(void (*func)
+                          (char *source, char *nick, char *chan,
+                           char *param))
 {
     ircdproto.ircd_cmd_svsjoin = func;
 }

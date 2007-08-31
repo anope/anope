@@ -94,9 +94,12 @@ int akick_del_callback(User * u, int num, va_list args)
 {
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *last = va_arg(args, int *);
+
+    *last = num;
+
     if (num < 1 || num > ci->akickcount)
         return 0;
-    *last = num;
+
     return akick_del(u, &ci->akick[num - 1]);
 }
 

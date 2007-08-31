@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1291"
+VERSION_BUILD="1292"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1292)
+# BUGS  : 776
+# NOTES : Fixed wrong reply when deleting entries by number (akick, badwords)
 #
 # BUILD : 1.7.19 (1291)
 # BUGS  : 774

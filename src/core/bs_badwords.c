@@ -279,9 +279,11 @@ int badwords_del_callback(User * u, int num, va_list args)
     BadWord *bw;
     ChannelInfo *ci = va_arg(args, ChannelInfo *);
     int *last = va_arg(args, int *);
+
+    *last = num;
+
     if (num < 1 || num > ci->bwcount)
         return 0;
-    *last = num;
 
     bw = &ci->badwords[num - 1];
     if (bw->word)

@@ -934,8 +934,10 @@ int is_excepted(ChannelInfo * ci, User * user)
         if (match_usermask(excepts[i], user)
             || (hostip && match_userip(excepts[i], user, hostip))) {
             isexcepted = 1;
+            break;
         }
     }
+    Anope_Free(hostip);
     free(excepts);
     return isexcepted;
 }

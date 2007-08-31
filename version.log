@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1293"
+VERSION_BUILD="1294"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1294)
+# BUGS  : N/A
+# NOTES : in is_excepted() if we found the exception, break(). There is no point on continue exploring the 
+# array. Also, I forgot to free hostip in my previous commit.
 #
 # BUILD : 1.7.19 (1293)
 # BUGS  : 778

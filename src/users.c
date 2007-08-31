@@ -915,6 +915,7 @@ int is_excepted(ChannelInfo * ci, User * user)
     int count, i;
     int isexcepted = 0;
     char **excepts;
+    char *hostip = NULL;
 
     if (!ci->c)
         return 0;
@@ -927,8 +928,11 @@ int is_excepted(ChannelInfo * ci, User * user)
     excepts = scalloc(sizeof(char *) * count, 1);
     memcpy(excepts, ci->c->excepts, sizeof(char *) * count);
 
+    hostip = host_resolve(user->host);
+
     for (i = 0; i < count; i++) {
-        if (match_usermask(excepts[i], user)) {
+        if (match_usermask(excepts[i], user)
+            || (hostip && match_userip(excepts[i], user, hostip))) {
             isexcepted = 1;
         }
     }

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1292"
+VERSION_BUILD="1293"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1293)
+# BUGS  : 778
+# NOTES : is_excepted() now uses match_userip() also.
 #
 # BUILD : 1.7.19 (1292)
 # BUGS  : 776

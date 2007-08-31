@@ -3,6 +3,7 @@ Anope Version  S V N
 08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command  [#774]
 08/29 A Session limit exceptions now support IP numbers as hostmask       [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]
+08/31 F is_excepted() now uses match_userip() also.                       [#778]
 08/31 F Wrong reply when deleting entries by number (akick, badwords)     [#776]
 06/15 F Non-existing servers being SQUIT'd when they were juped.          [#726]
 06/15 F Back online notice being sent to juped servers.                   [#726]

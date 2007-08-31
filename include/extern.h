@@ -1053,7 +1053,7 @@ E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
 E int do_session(User *u);
-E int add_session(char *nick, char *host);
+E int add_session(char *nick, char *host, char *hostip);
 E void del_session(const char *host);
 
 E void load_exceptions(void);
@@ -1065,6 +1065,7 @@ E void expire_exceptions(void);
 E Session *findsession(const char *host);
 
 E Exception *find_host_exception(const char *host);
+E Exception *find_hostip_exception(const char *host, const char *hostip);
 E int exception_add(User * u, const char *mask, const int limit,
                          const char *reason, const char *who,
                          const time_t expires);

@@ -203,7 +203,7 @@ Session *findsession(const char *host)
  * Returns 1 if the host was added or 0 if the user was killed.
  */
 
-int add_session(char *nick, char *host)
+int add_session(char *nick, char *host, char *hostip)
 {
     Session *session, **list;
     Exception *exception;
@@ -212,7 +212,8 @@ int add_session(char *nick, char *host)
     session = findsession(host);
 
     if (session) {
-        exception = find_host_exception(host);
+        exception = find_hostip_exception(host, hostip);
+
         if (checkDefCon(DEFCON_REDUCE_SESSION)) {
             sessionlimit =
                 exception ? exception->limit : DefConSessionLimit;
@@ -348,29 +349,32 @@ void expire_exceptions(void)
 }
 
 /* Find the first exception this host matches and return it. */
-
 Exception *find_host_exception(const char *host)
 {
-    char *ipbuf = NULL;
-    char *myhost = NULL;
     int i;
 
-    /* we try to resolve the hostname to an IP in case
-     * the exception was added by IP instead of hostname - DrStein */
-    if (host)
-        myhost = sstrdup(host);
-    ipbuf = host_resolve(myhost);
-
     for (i = 0; i < nexceptions; i++) {
-        if ((match_wild_nocase(exceptions[i].mask, host))
-            || ((ipbuf != NULL)
-                && match_wild_nocase(exceptions[i].mask, ipbuf))) {
-            Anope_Free(myhost);
+        if ((match_wild_nocase(exceptions[i].mask, host))) {
             return &exceptions[i];
         }
     }
 
-    Anope_Free(myhost);
+    return NULL;
+}
+
+/* Same as find_host_exception() except
+ * this tries to find the exception by IP also. */
+Exception *find_hostip_exception(const char *host, const char *hostip)
+{
+    int i;
+
+    for (i = 0; i < nexceptions; i++) {
+        if ((match_wild_nocase(exceptions[i].mask, host))
+            || ((ircd->nickip && hostip)
+                && (match_wild_nocase(exceptions[i].mask, hostip)))) {
+            return &exceptions[i];
+        }
+    }
 
     return NULL;
 }

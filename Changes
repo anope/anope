@@ -1,5 +1,6 @@
 Anope Version  S V N
 --------------------
+08/31 A Added hostip member to user_ struct so we can now use users's IPs [ #00]
 08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command  [#774]
 08/29 A Session limit exceptions now support IP numbers as hostmask       [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]

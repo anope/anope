@@ -849,6 +849,7 @@ struct user_ {
 
     char *username;		/* ident			*/
     char *host;             	/* User's real hostname 	*/
+    char *hostip;               /* User's IP number             */
     char *vhost;            	/* User's virtual hostname 	*/
     char *vident;           	/* User's virtual ident 	*/
     char *realname;		/* Realname 			*/

@@ -232,6 +232,7 @@ void delete_user(User * user)
         free(user->uid);
     }
     Anope_Free(user->realname);
+    Anope_Free(user->hostip);
     if (debug >= 2) {
         alog("debug: delete_user(): remove from channels");
     }
@@ -607,9 +608,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                 return NULL;
         }
         /* Now check for session limits */
-        if (LimitSessions && !add_session(nick, host))
+        if (LimitSessions && !add_session(nick, host, ipbuf))
             return NULL;
-
 
         /* Allocate User structure and fill it in. */
         user = new_user(nick);
@@ -626,6 +626,13 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             user->uid = NULL;
         }
         user->vident = sstrdup(username);
+        /* We now store the user's ip in the user_ struct,
+         * because we will use it in serveral places -- DrStein */
+        if (ircd->nickip) {
+            user->hostip = sstrdup(ipbuf);
+        } else {
+            user->hostip = NULL;
+        }
 
         if (svid == 0) {
             display_news(user, NEWS_LOGON);
@@ -915,7 +922,6 @@ int is_excepted(ChannelInfo * ci, User * user)
     int count, i;
     int isexcepted = 0;
     char **excepts;
-    char *hostip = NULL;
 
     if (!ci->c)
         return 0;
@@ -928,16 +934,13 @@ int is_excepted(ChannelInfo * ci, User * user)
     excepts = scalloc(sizeof(char *) * count, 1);
     memcpy(excepts, ci->c->excepts, sizeof(char *) * count);
 
-    hostip = host_resolve(user->host);
-
     for (i = 0; i < count; i++) {
         if (match_usermask(excepts[i], user)
-            || (hostip && match_userip(excepts[i], user, hostip))) {
+            || match_userip(excepts[i], user, user->hostip)) {
             isexcepted = 1;
             break;
         }
     }
-    Anope_Free(hostip);
     free(excepts);
     return isexcepted;
 }

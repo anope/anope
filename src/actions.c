@@ -133,7 +133,7 @@ void common_unban(ChannelInfo * ci, char *nick)
     int count, i;
     char *av[3], **bans;
     User *u;
-    char *host;
+    char *host = NULL;
     int matchfound = 0;
 
     if (!ci || !ci->c || !nick) {
@@ -144,7 +144,11 @@ void common_unban(ChannelInfo * ci, char *nick)
         return;
     }
 
-    host = host_resolve(u->host);
+    if (u->hostip == NULL) {
+        host = host_resolve(u->host);
+    } else {
+        host = sstrdup(u->hostip);
+    }
 
     if (ircd->svsmode_unban) {
         anope_cmd_unban(ci->name, nick);

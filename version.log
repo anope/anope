@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1295"
+VERSION_BUILD="1296"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1296)
+# BUGS  : N/A
+# NOTES : Since we now have u->hostip, lets use it in common_unban()
 #
 # BUILD : 1.7.19 (1295)
 # BUGS  : N/A

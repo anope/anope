@@ -1,6 +1,33 @@
 Anope Version  S V N
 --------------------
-- NONE
+ALTER TABLE `anope_ns_request` DROP INDEX `nick_index` ;
+ALTER TABLE `anope_ns_core` DROP INDEX `display_index` ;
+ALTER TABLE `anope_ns_access` ADD UNIQUE (`display`) ;
+ALTER TABLE `anope_ms_info` ADD UNIQUE (`nm_id` , `serv`) ;
+ALTER TABLE `anope_ns_alias` DROP INDEX `nick_index` ;
+ALTER TABLE `anope_cs_info` DROP INDEX `name_index` ;
+ALTER TABLE `anope_cs_access` ADD UNIQUE (`channel` , `display`) ;
+ALTER TABLE `anope_cs_levels` ADD UNIQUE (`channel` , `position`) ;
+ALTER TABLE `anope_cs_akicks` CHANGE `dmask` `dmask` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_cs_akicks` ADD UNIQUE (`channel` , `dmask`) ;
+ALTER TABLE `anope_cs_badwords` CHANGE `word` `word` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_cs_badwords` ADD UNIQUE (`channel` , `word`) ;
+ALTER TABLE `anope_cs_ttb` ADD UNIQUE (`channel` , `ttb_id`) ;
+ALTER TABLE `anope_os_akills` CHANGE `user` `user` VARCHAR( 255 ) NOT NULL , CHANGE `host` `host` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_os_akills` ADD UNIQUE (`user` , `host`) ;
+ALTER TABLE `anope_os_sglines` CHANGE `mask` `mask` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_os_sglines` ADD UNIQUE (`mask`) ;
+ALTER TABLE `anope_os_sqlines` CHANGE `mask` `mask` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_os_sqlines` ADD UNIQUE (`mask`) ;
+ALTER TABLE `anope_os_szlines` CHANGE `mask` `mask` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_os_szlines` ADD UNIQUE (`mask`) ;
+ALTER TABLE `anope_os_news` ADD UNIQUE (`type` , `num` , `time`) ;
+ALTER TABLE `anope_os_exceptions` CHANGE `mask` `mask` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_os_exceptions` ADD UNIQUE (`mask`) ;
+ALTER TABLE `anope_hs_core` DROP INDEX `nick_index` ;
+ALTER TABLE `anope_bs_core` DROP INDEX `nick_index` ;
+ALTER TABLE `anope_ms_info` CHANGE `receiver` `receiver` VARCHAR( 255 ) NOT NULL ;
+ALTER TABLE `anope_ms_info` ADD INDEX ( `receiver` , `serv` ) ;
 
 Anope Version 1.7.19
 --------------------

@@ -70,9 +70,8 @@ void binary_to_hex(unsigned char *bin, char *hex, int length)
     static const char trans[] = "0123456789ABCDEF";
     int i;
 
-    for(i = 0; i < length; i++)
-    {
-        hex[i  << 1]      = trans[bin[i] >> 4];
+    for (i = 0; i < length; i++) {
+        hex[i << 1] = trans[bin[i] >> 4];
         hex[(i << 1) + 1] = trans[bin[i] & 0xf];
     }
 
@@ -208,9 +207,9 @@ static int do_match_wild(const char *pattern, const char *str, int docase)
     char c;
     const char *s;
 
-    if (!str || !*str || !pattern || !*pattern) { 
-	return 0;
-     }
+    if (!str || !*str || !pattern || !*pattern) {
+        return 0;
+    }
 
     /* This WILL eventually terminate: either by *pattern == 0, or by a
      * trailing '*'. */
@@ -296,10 +295,10 @@ int process_numlist(const char *numstr, int *count_ret,
 {
     int n1, n2, i;
     int res = 0, retval = 0, count = 0;
-    va_list args,preserve;
+    va_list args, preserve;
 
     if (!numstr || !*numstr) {
-	return -1;
+        return -1;
     }
 
     va_start(args, u);
@@ -321,9 +320,9 @@ int process_numlist(const char *numstr, int *count_ret,
             }
         }
         for (i = n1; i <= n2 && i >= 0; i++) {
-            VA_COPY(preserve,args);
+            VA_COPY(preserve, args);
             res = callback(u, i, preserve);
-	    va_end(preserve);
+            va_end(preserve);
             count++;
             if (res < 0)
                 break;
@@ -345,7 +344,7 @@ int process_numlist(const char *numstr, int *count_ret,
     if (count_ret)
         *count_ret = count;
 
-	va_end(args);
+    va_end(args);
 
     return retval;
 }
@@ -368,7 +367,7 @@ int dotime(const char *s)
     int amount;
 
     if (!s || !*s) {
-	return -1;
+        return -1;
     }
 
     amount = strtol(s, (char **) &s, 10);
@@ -805,7 +804,7 @@ void doCleanBuffer(char *str)
     char ch;
 
     if (!str) {
-	return;
+        return;
     }
 
     in = str;
@@ -862,7 +861,7 @@ int nickIsServices(char *tempnick, int bot)
     char *s, *nick;
 
     if (!tempnick) {
-    	return found;
+        return found;
     }
 
     nick = sstrdup(tempnick);
@@ -925,10 +924,10 @@ int nickIsServices(char *tempnick, int bot)
             }
         }
     }
-	
-	/* Somehow, something tells me we should free this :) -GD */
-	free(nick);
-	
+
+    /* Somehow, something tells me we should free this :) -GD */
+    free(nick);
+
     return found;
 }
 
@@ -987,11 +986,11 @@ void rand_init(void)
         int sqlrand;
 #endif
 #ifndef _WIN32
-        struct timeval nowt;        /* time */
-        char rnd[32];                 /* /dev/urandom */
+        struct timeval nowt;    /* time */
+        char rnd[32];           /* /dev/urandom */
 #else
-        MEMORYSTATUS mstat;  /* memory status */
-        struct _timeb nowt;	        /* time */
+        MEMORYSTATUS mstat;     /* memory status */
+        struct _timeb nowt;     /* time */
 #endif
     } rdat;
 
@@ -1016,7 +1015,7 @@ void rand_init(void)
     /* win32: time */
     _ftime(&rdat.nowt);
     /* win32: memory status */
-    GlobalMemoryStatus (&rdat.mstat);
+    GlobalMemoryStatus(&rdat.mstat);
 #endif
 
     arc4_addrandom(&rdat, sizeof(rdat));
@@ -1097,12 +1096,11 @@ u_int32_t getrandom32(void)
  */
 char *send_token(char *token1, char *token2)
 {
- if (UseTokens && ircd->token && ircdcap->token) {
-      return token2;
-  }
-  else {
-   return token1;
-  }
+    if (UseTokens && ircd->token && ircdcap->token) {
+        return token2;
+    } else {
+        return token1;
+    }
 }
 
 /*************************************************************************/
@@ -1122,8 +1120,8 @@ int myNumToken(const char *str, const char dilim)
     len = strlen(str);
     for (idx = 0; idx <= len; idx++) {
         if ((str[idx] == dilim) || (idx == len)) {
-                start_pos = idx + 1;
-                counter++;
+            start_pos = idx + 1;
+            counter++;
         }
     }
     return counter;
@@ -1154,11 +1152,11 @@ char *host_resolve(char *host)
         ntoa(addr, ipbuf, sizeof(ipbuf));
         ipreturn = sstrdup(ipbuf);
         if (debug) {
-	        alog("debug: resolved %s to %s",host, ipbuf);
+            alog("debug: resolved %s to %s", host, ipbuf);
         }
         return ipreturn;
     } else {
-	    return ipreturn;
+        return ipreturn;
     }
 }
 
@@ -1173,15 +1171,16 @@ char *host_resolve(char *host)
 
 char *str_signed(unsigned char *str)
 {
-	char *nstr;
-	
-	nstr = (char *)str;
-	while (*str) {
-		*nstr = (char)*str;
-		str++; nstr++;
-	}
-	
-	return nstr;
+    char *nstr;
+
+    nstr = (char *) str;
+    while (*str) {
+        *nstr = (char) *str;
+        str++;
+        nstr++;
+    }
+
+    return nstr;
 }
 
 /**
@@ -1189,9 +1188,10 @@ char *str_signed(unsigned char *str)
  *  Useful for using the modes stored in things like ircd->ownerset etc.. 
  **/
 
-char *stripModePrefix(const char *str) {
+char *stripModePrefix(const char *str)
+{
     if (str && ((*str == '+') || (*str == '-'))) {
-        return sstrdup(str+1);
+        return sstrdup(str + 1);
     }
     return NULL;
 }
@@ -1265,63 +1265,57 @@ char **buildStringList(char *src, int *number)
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz)
 {
-  char *d = dst;
-  const char *s = src;
-  size_t n = siz, dlen;
+    char *d = dst;
+    const char *s = src;
+    size_t n = siz, dlen;
 
-  while(n-- != 0 && *d != '\0')
-    d++;
+    while (n-- != 0 && *d != '\0')
+        d++;
 
-  dlen = d - dst;
-  n = siz - dlen;
+    dlen = d - dst;
+    n = siz - dlen;
 
-  if(n == 0)
-    return (dlen + strlen(s));
+    if (n == 0)
+        return (dlen + strlen(s));
 
-  while(*s != '\0')
-  {
-    if(n != 1)
-    {
-      *d++ = *s;
-      n--;
+    while (*s != '\0') {
+        if (n != 1) {
+            *d++ = *s;
+            n--;
+        }
+
+        s++;
     }
 
-    s++;
-  }
-
-  *d = '\0';
-  return dlen + (s - src);        /* count does not include NUL */
+    *d = '\0';
+    return dlen + (s - src);    /* count does not include NUL */
 }
 #endif
 
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz)
 {
-  char *d = dst;
-  const char *s = src;
-  size_t n = siz;
+    char *d = dst;
+    const char *s = src;
+    size_t n = siz;
 
-  /* Copy as many bytes as will fit */
-  if(n != 0 && --n != 0)
-  {
-    do
-    {
-      if((*d++ = *s++) == 0)
-        break;
+    /* Copy as many bytes as will fit */
+    if (n != 0 && --n != 0) {
+        do {
+            if ((*d++ = *s++) == 0)
+                break;
+        }
+        while (--n != 0);
     }
-    while(--n != 0);
-  }
 
-  /* Not enough room in dst, add NUL and traverse rest of src */
-  if(n == 0)
-  {
-    if(siz != 0)
-      *d = '\0';      /* NUL-terminate dst */
-    while(*s++)
-      ;
-  }
+    /* Not enough room in dst, add NUL and traverse rest of src */
+    if (n == 0) {
+        if (siz != 0)
+            *d = '\0';          /* NUL-terminate dst */
+        while (*s++);
+    }
 
-  return s - src - 1;     /* count does not include NUL */
+    return s - src - 1;         /* count does not include NUL */
 }
 #endif
 
@@ -1329,146 +1323,149 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 
 
 #ifdef _WIN32
-char *GetWindowsVersion(void) 
+char *GetWindowsVersion(void)
 {
-  OSVERSIONINFOEX osvi;
-  BOOL bOsVersionInfoEx;
-  char buf[BUFSIZE];
-  char *extra;
+    OSVERSIONINFOEX osvi;
+    BOOL bOsVersionInfoEx;
+    char buf[BUFSIZE];
+    char *extra;
 
-  ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-  if(!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) &osvi))) {
-      osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-      if (!GetVersionEx((OSVERSIONINFO *)&osvi)) {
-			return sstrdup("");
-      }
-  }
+    if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+            return sstrdup("");
+        }
+    }
 
-   switch (osvi.dwPlatformId) {
-		// test for the Windows NT product family.
-		case VER_PLATFORM_WIN32_NT:
-			if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
-                   if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-						    extra = sstrdup("Enterprise Edition");
- 				   } else if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-    						extra = sstrdup("Datacenter Edition");
-                   } else {
-                            extra = sstrdup(" ");
-                   }
-   			       snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s", extra);
-                   free(extra);
+    switch (osvi.dwPlatformId) {
+        /* test for the Windows NT product family. */
+    case VER_PLATFORM_WIN32_NT:
+        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
+            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+                extra = sstrdup("Enterprise Edition");
+            } else if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+                extra = sstrdup("Datacenter Edition");
+            } else {
+                extra = sstrdup(" ");
             }
-			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
- 					 if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-						extra = sstrdup("Datacenter Edition");
-					 } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-						extra = sstrdup("Enterprise Edition");
-					 } else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
-						extra = sstrdup("Compute Cluster Edition");
-					 } else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
-						extra = sstrdup("Web Edition");
-					 } else {
-						extra = sstrdup("Standard Edition");
-                     }
-    				 snprintf(buf, sizeof(buf), "Microsoft Windows Server 2003 Family %s", extra);
-                     free(extra);
+            snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s",
+                     extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
+            if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+                extra = sstrdup("Datacenter Edition");
+            } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+                extra = sstrdup("Enterprise Edition");
+            } else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
+                extra = sstrdup("Compute Cluster Edition");
+            } else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
+                extra = sstrdup("Web Edition");
+            } else {
+                extra = sstrdup("Standard Edition");
             }
-			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
-					if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
-						extra = sstrdup("Embedded");
-					} else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-						extra = sstrdup("Home Edition");
+            snprintf(buf, sizeof(buf),
+                     "Microsoft Windows Server 2003 Family %s", extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
+            if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
+                extra = sstrdup("Embedded");
+            } else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
+                extra = sstrdup("Home Edition");
 #ifdef SM_MEDIACENTER
-                    } else if (GetSystemMetrics(SM_MEDIACENTER)) {
-                        extra = sstrdup("Media Center Edition");
+            } else if (GetSystemMetrics(SM_MEDIACENTER)) {
+                extra = sstrdup("Media Center Edition");
 #endif
 #ifdef SM_TABLETPC
-                    } else if (GetSystemMetrics(SM_TABLETPC)) {
-                        extra = sstrdup("Tablet Edition");
+            } else if (GetSystemMetrics(SM_TABLETPC)) {
+                extra = sstrdup("Tablet Edition");
 #endif
-					} else {
-						extra = sstrdup(" ");
-                    }
-    				snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
-                    free(extra);
+            } else {
+                extra = sstrdup(" ");
             }
-			if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
-					if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-						extra = sstrdup("Datacenter Server");
-					} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-						extra = sstrdup("Advanced Server");
-					} else {
-						extra = sstrdup("Server");
-                    }
-    				snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
-                    free(extra);
+            snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
+            if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+                extra = sstrdup("Datacenter Server");
+            } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+                extra = sstrdup("Advanced Server");
+            } else {
+                extra = sstrdup("Server");
             }
-			if (osvi.dwMajorVersion <= 4) {
-					if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-						extra = sstrdup("Server 4.0, Enterprise Edition");
-					} else {
-						extra = sstrdup("Server 4.0");
-                    }
-    				snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
-                    free(extra);
+            snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion <= 4) {
+            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+                extra = sstrdup("Server 4.0, Enterprise Edition");
+            } else {
+                extra = sstrdup("Server 4.0");
             }
-		case VER_PLATFORM_WIN32_WINDOWS:
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
-				    if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
-					    extra = sstrdup("OSR2");
-                    } else {
-                        extra = sstrdup(" ");
-                    }
-    				snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
-                    free(extra);
-			}
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
-				    if (osvi.szCSDVersion[1] == 'A') {
-					    extra = sstrdup("SE");
-                    } else {
-                        extra = sstrdup(" ");
-                    }
-    				snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
-                    free(extra);
-			}
-			if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
-    				snprintf(buf, sizeof(buf), "Microsoft Windows Millennium Edition");
-			} 
-   }
-   return sstrdup(buf); 
+            snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
+            free(extra);
+        }
+    case VER_PLATFORM_WIN32_WINDOWS:
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
+            if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
+                extra = sstrdup("OSR2");
+            } else {
+                extra = sstrdup(" ");
+            }
+            snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
+            if (osvi.szCSDVersion[1] == 'A') {
+                extra = sstrdup("SE");
+            } else {
+                extra = sstrdup(" ");
+            }
+            snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
+            free(extra);
+        }
+        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
+            snprintf(buf, sizeof(buf),
+                     "Microsoft Windows Millennium Edition");
+        }
+    }
+    return sstrdup(buf);
 }
 
-int SupportedWindowsVersion(void) 
+int SupportedWindowsVersion(void)
 {
-  OSVERSIONINFOEX osvi;
-  BOOL bOsVersionInfoEx;
+    OSVERSIONINFOEX osvi;
+    BOOL bOsVersionInfoEx;
 
-  ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-  if(!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) &osvi))) {
-      osvi.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-      if (!GetVersionEx((OSVERSIONINFO *)&osvi)) {
-			return 0;
-      }
-  }
+    if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+        if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+            return 0;
+        }
+    }
 
-   switch (osvi.dwPlatformId) {
-		// test for the Windows NT product family.
-		case VER_PLATFORM_WIN32_NT:
-            /* win nt4 */
-			if (osvi.dwMajorVersion <= 4) {
-                return 0;
-            }
-            /* the rest */
-			return 1;
+    switch (osvi.dwPlatformId) {
+        /* test for the Windows NT product family. */
+    case VER_PLATFORM_WIN32_NT:
+        /* win nt4 */
+        if (osvi.dwMajorVersion <= 4) {
+            return 0;
+        }
+        /* the rest */
+        return 1;
         /* win95 win98 winME */
-		case VER_PLATFORM_WIN32_WINDOWS:
-			return 0;
-   }
-   return 0; 
+    case VER_PLATFORM_WIN32_WINDOWS:
+        return 0;
+    }
+    return 0;
 }
 
 #endif

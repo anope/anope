@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1299"
+VERSION_BUILD="1300"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1300)
+# BUGS  : 
+# NOTES : Changed 2 // (C++-style) comments in /* (C-style) */ comments in src/misc.s and ran indent on the same file
 #
 # BUILD : 1.7.19 (1299)
 # BUGS  : 

@@ -8,6 +8,9 @@ Anope for Windows
 
 1) Building the Source
 
+    NOTE: If you have downloaded one of the pre-compiled installers, you do
+          NOT need to complete this step, and you can proceed to step 2.
+
     If you want to build Anope from source on a Win32 system, you will need
     to follow this instructions:
 

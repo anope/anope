@@ -2234,7 +2234,7 @@ int get_access(User * user, ChannelInfo * ci)
     if (!ci || !user)
         return -1;
 
-    // SuperAdmin always has highest level
+    /* SuperAdmin always has highest level */
     if (user->isSuperAdmin)
         return ACCESS_SUPERADMIN;
 

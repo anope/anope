@@ -35,6 +35,7 @@ Anope Version  S V N
 08/29 F InspIRCD11 protocol now uses SVSJOIN/PART instead of SAJOIN/PART. [#772]
 08/29 F OperServ SGLINE ADD now strips a trailing space from the mask.    [#761]
 08/29 F TS6 UID generation for all supported TS6 IRCDs.                   [#731]
+09/01 F Added a note in WIN32.txt about pre-compiled installers           [# 00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

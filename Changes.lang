@@ -11,6 +11,7 @@ Anope Version  S V N
 	HELP_LIMIT_HOST_REMOVER
 
 *** Mod Strings:
+	OPER_HELP_SET
 In all of the following strings only the trailing 'Limited to ...' line has been removed:
 	OPER_HELP_EXCEPTION
 	OPER_HELP_SESSION

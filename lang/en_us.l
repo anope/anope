@@ -5748,14 +5748,14 @@ OPER_HELP_SET
 
 	Sets various global Services options.  Option names
 	currently defined are:
-	    READONLY   Set read-only or read-write mode
-	    LOGCHAN    Report log messages to a channel
-	    DEBUG      Activate or deactivate debug mode
-	    NOEXPIRE   Activate or deactivate no expire mode
-	    SUPERADMIN Activate or deactivate super-admin mode
-	    SQL        Activate or deactivate sql mode
-	    IGNORE     Activate or deactivate ignore mode
-	    LIST       List the options
+	    READONLY   Set read-only or read-write mode
+	    LOGCHAN    Report log messages to a channel
+	    DEBUG      Activate or deactivate debug mode
+	    NOEXPIRE   Activate or deactivate no expire mode
+	    SUPERADMIN Activate or deactivate super-admin mode
+	    SQL        Activate or deactivate sql mode
+	    IGNORE     Activate or deactivate ignore mode
+	    LIST       List the options
 
 OPER_HELP_SET_READONLY
 	Syntax: SET READONLY {ON | OFF}

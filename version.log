@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1300"
+VERSION_BUILD="1301"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1301)
+# BUGS  : 780, 781
+# NOTES : [1] Removed extra bolds from OS HELP SET [2] Removed extra Limited to... messages from os_akill and 
+# os_modload.
 #
 # BUILD : 1.7.19 (1300)
 # BUGS  : 

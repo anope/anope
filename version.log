@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1302"
+VERSION_BUILD="1303"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1303)
+# BUGS  : 703
+# NOTES : Fixed user being able to change channel modes on empty channels without permission (eg SECUREOPS)
 #
 # BUILD : 1.7.19 (1302)
 # BUGS  : 

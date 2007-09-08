@@ -165,13 +165,34 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     CUMode *cum;
     unsigned char botmode = 0;
     BotInfo *bi;
-    User *user;
+    User *u, *user;
     int i, real_ac = ac;
     char **real_av = av;
 
     if (debug)
         alog("debug: Changing modes for %s to %s", chan->name,
              merge_args(ac, av));
+
+    u = finduser(source);
+    if (u && (chan_get_user_status(chan, u) & CUS_DEOPPED)) {
+        char *s;
+
+        if (debug)
+            alog("debug: Removing instead of setting due to DEOPPED flag");
+
+        /* Swap adding and removing of the modes */
+        for (s = av[0]; *s; s++) {
+            if (*s == '+')
+                *s = '-';
+            else if (*s == '-')
+                *s = '+';
+        }
+
+        /* Set the resulting mode buffer */
+        anope_cmd_mode(whosends(chan->ci), chan->name, merge_args(ac, av));
+
+        return;
+    }
 
     ac--;
 
@@ -231,10 +252,14 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
                 alog("debug: Setting %c%c on %s for %s", (add ? '+' : '-'),
                      mode, chan->name, user->nick);
 
-            if (add)
+            if (add) {
                 chan_set_user_status(chan, user, cum->status);
-            else
+                /* If this does +o, remove any DEOPPED flag */
+                if (cum->status & CUS_OP)
+                    chan_remove_user_status(chan, user, CUS_DEOPPED);
+            } else {
                 chan_remove_user_status(chan, user, cum->status);
+            }
 
         } else if ((cbm = &cbmodes[(int) mode])->flag != 0) {
             if (check >= 0) {
@@ -1405,6 +1430,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, "o");
             strcat(userbuf, " ");
             strcat(userbuf, user->nick);
+            rem_modes |= CUS_DEOPPED;
         } else {
             add_modes &= ~CUS_OP;
         }
@@ -1443,6 +1469,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
             strcat(modebuf, "o");
             strcat(userbuf, " ");
             strcat(userbuf, user->nick);
+            add_modes |= CUS_DEOPPED;
         }
         if (rem_modes & CUS_HALFOP) {
             strcat(modebuf, "h");

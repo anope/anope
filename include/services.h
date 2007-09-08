@@ -1287,6 +1287,7 @@ typedef struct ircd_modes_ {
 #define CUS_HALFOP		0x0004		/* Halfop (+h) */
 #define CUS_OWNER		0x0008		/* Owner/Founder (+q) */
 #define CUS_PROTECT		0x0010		/* Protected users (+a) */
+#define CUS_DEOPPED		0x0080		/* User has been specifically deopped */
 
 #define MUT_DEOP   		0
 #define MUT_OP			1

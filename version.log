@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1301"
+VERSION_BUILD="1302"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1302)
+# BUGS  : 
+# NOTES : Minor style changes in Changes
 #
 # BUILD : 1.7.19 (1301)
 # BUGS  : 780, 781

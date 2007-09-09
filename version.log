@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1304"
+VERSION_BUILD="1305"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1305)
+# BUGS  : 757
+# NOTES : Fixed mysql_config values only being tried to compile/link sources and not running the result to see if it actually works
 #
 # BUILD : 1.7.19 (1304)
 # BUGS  : 782

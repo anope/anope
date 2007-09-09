@@ -99,8 +99,16 @@ AC_ARG_WITH(mysql, [  --without-mysql         Do not use MySQL or attempt to fin
 		CFLAGS="$CFLAGS $MYSQL_CFLAGS"
 		LDFLAGS="$LDFLAGS $MYSQL_LDFLAGS"
 		echo $ECHO_N "checking if mysql_config produces valid values... $ECHO_C" >&6
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <mysql.h>]],[[MYSQL *mysql = mysql_init(0);]])],
-		                                ac_cv_mysql_valid=yes,ac_cv_mysql_valid=no)
+		AC_TRY_RUN([
+#include <mysql.h>
+
+int main()
+{
+	MYSQL *mysql = mysql_init(0);
+	
+	return 0;
+}
+		], ac_cv_mysql_valid=yes, ac_cv_mysql_valid=no)
 		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
 			AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")

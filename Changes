@@ -41,6 +41,7 @@ Anope Version  S V N
 09/02 F Created MySQL indexes to decrease load on the database.           [# 00]
 09/08 F User being able to set modes on empty channels without permission.[#703]
 09/09 F Undeclared identifiers in module cleaning code on windows.        [#782]
+09/09 F Missing test to check mysql_config sanity in ./configure.         [#757]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

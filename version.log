@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1303"
+VERSION_BUILD="1304"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1304)
+# BUGS  : 782
+# NOTES : Fixed an undeclared identifier in the new code for cleaning up the modules dir on win32
 #
 # BUILD : 1.7.19 (1303)
 # BUGS  : 703

@@ -2840,7 +2840,7 @@ void ModuleRunTimeDirCleanUp(void)
 	        alog("debug: Unable to set Current working directory");
 		}
     }
-    snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirname);
+    snprintf(szDir, sizeof(szDir), "%s\\%s\\*", buffer, dirbuf);
 
     hList = FindFirstFile(szDir, &FileData);
     if (hList != INVALID_HANDLE_VALUE) {

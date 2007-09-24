@@ -510,7 +510,7 @@ NICK_SET_LANGUAGE_UNKNOWN
 	Napisz %R%s HELP SET LANGUAGE, 
 	aby uzyskaæ liste dostêpnych jêzyków.
 NICK_SET_LANGUAGE_CHANGED
-	Jêzyk zosta³ zmieniony na English.
+	Jêzyk zosta³ zmieniony na Polski.
 
 # SET URL responses
 NICK_SET_URL_CHANGED

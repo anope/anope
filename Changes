@@ -1,13 +1,9 @@
 Anope Version  S V N
 --------------------
-08/31 A Added hostip member to user_ struct so we can now use users' IPs. [ #00]
-08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command. [#774]
 08/29 A Session limit exceptions now support IP numbers as hostmask.      [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]
-09/05 F Removed Limited to... message from os_akill.c and os_modload.c    [#780]
-09/05 F Removed extra bolded commands in OS HELP SET                      [#781]
-08/31 F is_excepted() now uses match_userip() also.                       [#778]
-08/31 F Wrong reply when deleting entries by number (akick, badwords)     [#776]
+08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command. [#774]
+08/31 A Added hostip member to user_ struct so we can now use users' IPs. [ #00]
 06/15 F Non-existing servers being SQUIT'd when they were juped.          [#726]
 06/15 F Back online notice being sent to juped servers.                   [#726]
 06/15 F Not informing opers a SQUIT for a juped server was received.      [#718]
@@ -37,11 +33,16 @@ Anope Version  S V N
 08/29 F InspIRCD11 protocol now uses SVSJOIN/PART instead of SAJOIN/PART. [#772]
 08/29 F OperServ SGLINE ADD now strips a trailing space from the mask.    [#761]
 08/29 F TS6 UID generation for all supported TS6 IRCDs.                   [#731]
+08/31 F is_excepted() now uses match_userip() also.                       [#778]
+08/31 F Wrong reply when deleting entries by number (akick, badwords)     [#776]
 09/01 F Added a note in WIN32.txt about pre-compiled installers           [# 00]
 09/02 F Created MySQL indexes to decrease load on the database.           [# 00]
+09/05 F Removed Limited to... message from os_akill.c and os_modload.c    [#780]
+09/05 F Removed extra bolded commands in OS HELP SET                      [#781]
 09/08 F User being able to set modes on empty channels without permission.[#703]
 09/09 F Undeclared identifiers in module cleaning code on windows.        [#782]
 09/09 F Missing test to check mysql_config sanity in ./configure.         [#757]
+09/24 F Polish language reported itself as English when switching to it.  [#789]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1305"
+VERSION_BUILD="1306"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1306)
+# BUGS  : 789
+# NOTES : Fixed Polish language reporting itself as English when switching to it
 #
 # BUILD : 1.7.19 (1305)
 # BUGS  : 757

@@ -5468,7 +5468,7 @@ OPER_HELP_OPER
 	Services operator list.
 	
 	Any IRC operator may use the OPER LIST form of the command.
-	All other use limited to Services admins.
+	All other use limited to Services roots.
 
 OPER_HELP_ADMIN
 	Syntax: ADMIN ADD nick

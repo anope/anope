@@ -43,6 +43,7 @@ Anope Version  S V N
 09/09 F Undeclared identifiers in module cleaning code on windows.        [#782]
 09/09 F Missing test to check mysql_config sanity in ./configure.         [#757]
 09/24 F Polish language reported itself as English when switching to it.  [#789]
+09/24 F OperServ HELP OPER showing incorrect access levels.               [#788]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

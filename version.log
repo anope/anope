@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1306"
+VERSION_BUILD="1307"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1307)
+# BUGS  : 788
+# NOTES : Fixed OS HELP OPER showing admin instead of root (OH NOES)
 #
 # BUILD : 1.7.19 (1306)
 # BUGS  : 789

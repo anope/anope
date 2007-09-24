@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1307"
+VERSION_BUILD="1308"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1308)
+# BUGS  : 787
+# NOTES : Applied a patch by T fixing moduleGetConfigDirective disliking CRLF line-ends
 #
 # BUILD : 1.7.19 (1307)
 # BUGS  : 788

@@ -2482,6 +2482,7 @@ int moduleGetConfigDirective(Directive * d)
     FILE *config;
     char *dir = NULL;
     char buf[1024];
+	char *directive;
     int linenum = 0;
     int ac = 0;
     char *av[MAXPARAMS];
@@ -2497,8 +2498,9 @@ int moduleGetConfigDirective(Directive * d)
     }
     while (fgets(buf, sizeof(buf), config)) {
         linenum++;
-        if (*buf == '#' || *buf == '\r' || *buf == '\n')
+        if (*buf == '#' || *buf == '\r' || *buf == '\n') {
             continue;
+		}
         dir = myStrGetOnlyToken(buf, '\t', 0);
         if (dir) {
             str = myStrGetTokenRemainder(buf, '\t', 1);
@@ -2510,7 +2512,13 @@ int moduleGetConfigDirective(Directive * d)
                 continue;
             }
         }
-        if (stricmp(dir, d->name) == 0) {
+		if (dir) {
+			directive = normalizeBuffer(dir);
+		} else {
+			continue;
+		}	
+
+        if (stricmp(directive, d->name) == 0) {
             if (str) {
 				s = str;
                 while (isspace(*s))
@@ -2543,8 +2551,11 @@ int moduleGetConfigDirective(Directive * d)
                         s++;
                 }
             }
-            retval = parse_directive(d, dir, ac, av, linenum, 0, s);
+            retval = parse_directive(d, directive, ac, av, linenum, 0, s);
         }
+		if (directive) {
+			free(directive);
+		}
     }
     if (dir)
     	free(dir);

@@ -47,6 +47,7 @@ Anope Version  S V N
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]
+09/24 F ModuleGetConfigDirective having issues with CRLF line-ends.       [#787]
 
 Provided by nenolod <nenolod@nenolod.net> - 2007
 08/29 F TS6 UID generation for Charybdis.                                 [#731]

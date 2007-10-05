@@ -1549,7 +1549,7 @@ int anope_event_capab(char *source, int ac, char **av)
 	if (strstr(av[1], "m_chghost.so")) {
             has_chghostmod = 1;
         }
-	if (strstr(av[1], "m_chghident.so")) {      
+	if (strstr(av[1], "m_chgident.so")) {      
             has_chgidentmod = 1;
         }
     } else if (strcasecmp(av[0], "END") == 0) {

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1308"
+VERSION_BUILD="1309"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1309)
+# BUGS  : 793
+# NOTES : Fixed a typo in inspircd11.c where it checked for chgident.so
 #
 # BUILD : 1.7.19 (1308)
 # BUGS  : 787

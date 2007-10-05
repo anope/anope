@@ -44,6 +44,7 @@ Anope Version  S V N
 09/09 F Missing test to check mysql_config sanity in ./configure.         [#757]
 09/24 F Polish language reported itself as English when switching to it.  [#789]
 09/24 F OperServ HELP OPER showing incorrect access levels.               [#788]
+10/05 F Typo in inspircd11.c checking for m_chgident.so loaded.           [#793]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

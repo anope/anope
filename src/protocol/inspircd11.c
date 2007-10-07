@@ -1556,18 +1556,14 @@ int anope_event_capab(char *source, int ac, char **av)
         if (has_globopsmod == 0) {
             send_cmd(NULL,
                      "ERROR :m_globops is not loaded. This is required by Anope");
-            strscpy(quitmsg,
-                    "Remote server does not have the m_globops module loaded, and this is required.",
-                    sizeof(quitmsg));
+            quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
             quitting = 1;
             return MOD_STOP;
         }
         if (has_servicesmod == 0) {
             send_cmd(NULL,
                      "ERROR :m_services is not loaded. This is required by Anope");
-            strscpy(quitmsg,
-                    "Remote server does not have the m_services module loaded, and this is required.",
-                    sizeof(quitmsg));
+            quitmsg = "Remote server does not have the m_services module loaded, and this is required.";
             quitting = 1;
             return MOD_STOP;
         }

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1310"
+VERSION_BUILD="1311"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1311)
+# BUGS  : 804,805,806
+# NOTES : Applied the patches of my beer buddy.
 #
 # BUILD : 1.7.19 (1310)
 # BUGS  : 794

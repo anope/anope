@@ -46,6 +46,9 @@ Anope Version  S V N
 09/24 F Polish language reported itself as English when switching to it.  [#789]
 09/24 F OperServ HELP OPER showing incorrect access levels.               [#788]
 10/05 F Typo in inspircd11.c checking for m_chgident.so loaded.           [#793]
+12/02 F Fixed a typo in en_us.l.                                          [#806]
+12/02 F Fixed a typo in install.js.                                       [#804]
+12/02 F Fixed the protect commands in inspircd11.c.                       [#805]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

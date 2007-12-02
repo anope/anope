@@ -460,7 +460,7 @@ void inspircd_set_umode(User * user, int ac, char **av)
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
-    updateProtectDetails("PROTECT","PROTECTME","!protect","!deprotect","AUTOPROTECT","+a","-a");
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
 
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);

@@ -5811,7 +5811,7 @@ OPER_HELP_SET_SUPERADMIN
 	Setting this will grant you extra privileges such as the
 	ability to be "founder" on all channel's etc...
 
-	This option is not persistant, and should only be used when
+	This option is not persistaet, and should only be used when
 	needed, and set back to OFF when no longer needed.
 
 OPER_HELP_SET_SQL

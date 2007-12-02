@@ -159,7 +159,7 @@ var buildPackages = [
 							'incpaths' : [
 									  'Program Files\\MySQL\\MySQL Server 5.1\\Include'
 								],
-							'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmyql.dll',
+							'dllfile' : 'Program Files\\MySQL\\MySQL Server 5.1\\bin\\libmsyql.dll',
 							'installedDrive' : 'C'
 						},
 

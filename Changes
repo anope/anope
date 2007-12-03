@@ -50,6 +50,7 @@ Anope Version  S V N
 12/02 F Fixed a typo in install.js.                                       [#804]
 12/02 F Fixed the protect commands in inspircd11.c.                       [#805]
 12/03 F Unregistered users now have access level 0 instead of -1.         [#796]
+12/03 F Malformed command for InspIRCd 1.1.                               [#797]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

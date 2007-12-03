@@ -1,6 +1,5 @@
 Anope Version  S V N
 --------------------
-10/07 F Segfault on missing required InspIRCd11 modules.                  [#794]
 08/29 A Session limit exceptions now support IP numbers as hostmask.      [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]
 08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command. [#774]
@@ -46,9 +45,11 @@ Anope Version  S V N
 09/24 F Polish language reported itself as English when switching to it.  [#789]
 09/24 F OperServ HELP OPER showing incorrect access levels.               [#788]
 10/05 F Typo in inspircd11.c checking for m_chgident.so loaded.           [#793]
+10/07 F Segfault on missing required InspIRCd11 modules.                  [#794]
 12/02 F Fixed a typo in en_us.l.                                          [#806]
 12/02 F Fixed a typo in install.js.                                       [#804]
 12/02 F Fixed the protect commands in inspircd11.c.                       [#805]
+12/03 F Unregistered users now have access level 0 instead of -1.         [#796]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

@@ -2232,7 +2232,7 @@ int get_access(User * user, ChannelInfo * ci)
     ChanAccess *access;
 
     if (!ci || !user)
-        return -1;
+        return 0;
 
     /* SuperAdmin always has highest level */
     if (user->isSuperAdmin)
@@ -2242,7 +2242,7 @@ int get_access(User * user, ChannelInfo * ci)
         return ACCESS_FOUNDER;
 
     if (!user->na)
-        return -1;
+        return 0;
 
     if (nick_identified(user)
         || (nick_recognized(user) && !(ci->flags & CI_SECURE)))
@@ -2252,7 +2252,7 @@ int get_access(User * user, ChannelInfo * ci)
     if (nick_identified(user))
         return 0;
 
-    return -1;
+    return 0;
 }
 
 /*************************************************************************/

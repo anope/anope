@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1311"
+VERSION_BUILD="1313"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1313)
+# BUGS  : 796
+# NOTES : Fixed unregistered users getting access level -1 instead of 0 so they could never get opped
 #
 # BUILD : 1.7.19 (1311)
 # BUGS  : 804,805,806

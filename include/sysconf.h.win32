@@ -38,7 +38,6 @@ typedef unsigned __int8 u_int8_t;
 
 /* Windows/MSVC likes to name things differently */
 #define snprintf		_snprintf
-#define vsnprintf		_vsnprintf
 #define popen			_popen
 #define pclose			_pclose
 #define ftruncate		_chsize

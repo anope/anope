@@ -113,6 +113,11 @@
 #include <dirent.h>
 #endif
 
+#ifdef _WIN32
+/* VS2008 hates having this define before its own */
+#define vsnprintf               _vsnprintf
+#endif
+
 #ifdef USE_RDB
 # define MAX_SQL_BUF   4096
 #endif

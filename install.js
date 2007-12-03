@@ -71,7 +71,22 @@ var installerQuestions = [
                                        ];
 
 var buildPackages = [
-
+                                        {
+                                                        'name' : 'Microsoft Visual Studio 2008 (New PSDK)',
+                                                        'libpaths' : [                                                                               
+                                                                     'Program Files\\Microsoft Visual Studio 9.0\\VC\\Lib',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Lib'
+                                                                     ],
+                                                        'incpaths' : [                                                                               
+                                                                     'Program Files\\Microsoft Visual Studio 9.0\\VC\\Include',
+                                                                     'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Include'
+                                                                     ],
+                                                        'nmake' : [
+														             'Program Files\\Microsoft Platform SDK for Windows Server 2003 R2\\Bin',
+                                                                  ],
+                                                        'additional_switches' : [ '/w' ],
+                                                        'installedDrive' : 'C'
+                                        }, 
                                         {
                                                         'name' : 'Microsoft Visual Studio 2005 (New PSDK)',
                                                         'libpaths' : [

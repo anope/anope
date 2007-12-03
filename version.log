@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1315"
+VERSION_BUILD="1316"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1316)
+# BUGS  : 802
+# NOTES : Added support for MSVC++ 2008 Express (damn names.. gcc-4.4 would be so much shorter)
 #
 # BUILD : 1.7.19 (1315)
 # BUGS  : 

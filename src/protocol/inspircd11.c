@@ -944,8 +944,6 @@ void inspircd_cmd_chghost(char *nick, char *vhost)
 /* CHGIDENT */
 void inspircd_cmd_chgident(char *nick, char *vIdent)
 {
-void inspircd_cmd_chgident(char *nick, char *vIdent)
-{
 	if (has_chgidentmod == 1) {
 		if (!nick || !vIdent || !*vIdent) {
         	return;

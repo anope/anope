@@ -40,7 +40,7 @@ Note: You should also read the README and FAQ files!
     all the needed files in the paths you specified with the configure
     script, and setup file permissions. You should ensure that the data
     directory is not accessible by other users, as malicious users may
-    cause troubles on your network if passwords are not encrypted, or read
+    cause trouble on your network if passwords are not encrypted, or read
     the memos of any user.
 
     If you see errors during this process, please mail us with the *complete*

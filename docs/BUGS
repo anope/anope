@@ -1,13 +1,4 @@
 Reported Bugs from Bugzilla: http://bugs.anope.org/
 ---------------------------------------------------
 
-.- Strange Segfault on expiring nicknames. Almost arbitrary, very hard
-   to reproduce.
-
-.- If there is absolutely no activity on your network, Services may delay
-   timed events (nick kills, database saving, etc.) until the next message
-   comes in from Services' uplink server.
-
-.- Due to the usage of execve() once we SIGHUP from the shell, we can only
-   do it once, after that execve() resets our signals.
 

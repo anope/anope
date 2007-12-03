@@ -8,6 +8,7 @@ Anope Modules
 5) More Modules
 6) Support
 7) Information for Developers
+8) Modules Repository
 
 1) Introduction
 
@@ -114,3 +115,10 @@ Anope Modules
     
     * http://wiki.anope.org/
 
+
+8) Modules Repository
+
+You can find modules at http://modules.anope.org
+
+These modules are 3rd party and as such are not supported by the Anope Team.
+Contact the Module Author directly with problems, not the Anope Team.

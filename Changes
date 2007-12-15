@@ -53,6 +53,7 @@ Anope Version  S V N
 12/03 F Unregistered users now have access level 0 instead of -1.         [#796]
 12/03 F Malformed command for InspIRCd 1.1.                               [#797]
 12/03 F Updates to various documentation.                                 [ #00]
+12/15 F Inconsistent use of ACESS events.                                 [#791]
 
 Provided by Trystan <trystan@nomadirc.net> - 2007
 08/29 F Module runtime directory not always properly cleaned up.          [#768]

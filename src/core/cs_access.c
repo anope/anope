@@ -71,8 +71,9 @@ void myChanServHelp(User * u)
 }
 
 
-static int access_del(User * u, ChanAccess * access, int *perm, int uacc)
+static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm, int uacc)
 {
+	char *nick = access->nc->display;
     if (!access->in_use)
         return 0;
     if (!is_services_admin(u) && uacc <= access->level) {
@@ -81,6 +82,7 @@ static int access_del(User * u, ChanAccess * access, int *perm, int uacc)
     }
     access->nc = NULL;
     access->in_use = 0;
+    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
     return 1;
 }
 
@@ -93,7 +95,7 @@ static int access_del_callback(User * u, int num, va_list args)
     if (num < 1 || num > ci->accesscount)
         return 0;
     *last = num;
-    return access_del(u, &ci->access[num - 1], perm, uacc);
+    return access_del(u, ci, &ci->access[num - 1], perm, uacc);
 }
 
 
@@ -405,6 +407,8 @@ int do_access(User * u)
         free(ci->access);
         ci->access = NULL;
         ci->accesscount = 0;
+        
+        send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
 
         notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);
         alog("%s: %s!%s@%s (level %d) cleared access list on %s",

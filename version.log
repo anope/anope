@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1317"
+VERSION_BUILD="1318"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1318)
+# BUGS  : 791
+# NOTES : Fixed inconsistent use of ACCESS events
 #
 # BUILD : 1.7.19 (1317)
 # BUGS  : 

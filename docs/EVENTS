@@ -163,6 +163,11 @@ Anope Internal Events
                modified.
         av[3]  The new access level for the user.
 
+    EVENT_ACCESS_CLEAR
+        A channel access list has been cleared.
+        av[0]  Name of the channel the access list has been cleared of
+        av[1]  The nickname of the user that has cleared the access list
+
     EVENT_ACCESS_DEL
         An user has been deleted of a channel access list.
         av[0]  Name of the channel the access entry has been deleted which.

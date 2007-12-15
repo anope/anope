@@ -180,9 +180,9 @@ int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc
         (*perm)++;
         return 0;
     }
-    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, access->nc->display);
     access->nc = NULL;
     access->in_use = 0;
+    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, access->nc->display);
     return 1;
 }
 
@@ -404,12 +404,12 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
                 deleted = 0;
                 notice_lang(s_ChanServ, u, PERMISSION_DENIED);
             } else {
-                send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick,
-                           na->nick);
                 notice_lang(s_ChanServ, u, xmsgs[8], access->nc->display,
                             ci->name);
                 access->nc = NULL;
                 access->in_use = 0;
+                send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick,
+                           na->nick);
                 deleted = 1;
             }
         }
@@ -498,6 +498,8 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
             }
         }
 
+        send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
+        
         notice_lang(s_ChanServ, u, xmsgs[13], ci->name);
     } else {
         syntax_error(s_ChanServ, u, xname, xmsgs[0]);

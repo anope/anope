@@ -1,5 +1,6 @@
 Anope Version  S V N
 --------------------
+12/24 F inspircd11 module now uses FMODE instead of MODE                  [#724]
 08/29 A Session limit exceptions now support IP numbers as hostmask.      [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]
 08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command. [#774]

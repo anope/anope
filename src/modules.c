@@ -66,18 +66,20 @@ char *ModuleGetErrStr(int status);
 char *ModuleGetErrStr(int status)
 {
     const char *module_err_str[] = {
-        "Module, Okay - No Error",
-        "Module Error, allocating memory",
-        "Module Error, not enough parameters",
-        "Module Error, already loaded",
-        "Module Error, file does not exist",
-        "Module Error, No User",
-        "Module Error, Error during load time or module returned MOD_STOP",
-        "Module Error, Unable to unload"
-        "Module Error, Unknown Error occuried",
-        "Module Error, File I/O Error",
-        "Module Error, No Service found for request",
-        "Module Error, No module name for request",
+        "Module, Okay - No Error",                                             /* MOD_ERR_OK */
+        "Module Error, Allocating memory",                                     /* MOD_ERR_MEMORY */
+        "Module Error, Not enough parameters",                                 /* MOD_ERR_PARAMS */
+        "Module Error, Already loaded",                                        /* MOD_ERR_EXISTS */
+        "Module Error, File does not exist",                                   /* MOD_ERR_NOEXIST */
+        "Module Error, No User",                                               /* MOD_ERR_NOUSER */
+        "Module Error, Error during load time or module returned MOD_STOP",    /* MOD_ERR_NOLOAD */
+        "Module Error, Unable to unload",                                      /* MOD_ERR_NOUNLOAD */
+        "Module Error, Incorrect syntax",                                      /* MOD_ERR_SYNTAX */
+        "Module Error, Unable to delete",                                      /* MOD_ERR_NODELETE */
+        "Module Error, Unknown Error occuried",                                /* MOD_ERR_UNKOWN */
+        "Module Error, File I/O Error",                                        /* MOD_ERR_FILE_IO */
+        "Module Error, No Service found for request",                          /* MOD_ERR_NOSERVICE */
+        "Module Error, No module name for request"                             /* MOD_ERR_NO_MOD_NAME */
     };
     return (char *) module_err_str[status];
 }

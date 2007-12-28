@@ -1,5 +1,7 @@
 Anope Version  S V N
 --------------------
+12/28 F Some silly logic errors in anope_event_capab() in inspircd11.c    [ #00]
+12/28 F RSQUIT support for InspIRCd 1.1                                   [#692]
 12/24 F inspircd11 module now uses FMODE instead of MODE                  [#724]
 08/29 A Session limit exceptions now support IP numbers as hostmask.      [#723]
 08/29 A Added InspIRCd11 vIdent support.                                  [#684]

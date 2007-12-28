@@ -134,7 +134,7 @@ IRCDCAPAB myIrcdcap[] = {
     {
      CAPAB_NOQUIT,              /* NOQUIT       */
      0,                         /* TSMODE       */
-     0,                         /* UNCONNECT    */
+     1,                         /* UNCONNECT    */
      0,                         /* NICKIP       */
      0,                         /* SJOIN        */
      0,                         /* ZIP          */
@@ -481,6 +481,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("RSQUIT",    anope_event_rsquit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
     m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
@@ -616,7 +617,7 @@ void inspircd_cmd_mode(char *source, char *dest, char *buf)
         return;
     }
     
-    send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, findchan(dest)->creation_time, buf);
+    send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, (unsigned int)findchan(dest)->creation_time, buf);
 }
 
 int anope_event_version(char *source, int ac, char **av)
@@ -1268,6 +1269,20 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
+int anope_event_rsquit(char *source, int ac, char **av)
+{
+    if (ac < 1 || ac > 3)
+        return MOD_CONT;
+    
+    /* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
+    if (ac > 1 && strcmp(ServerName, av[0]) == 0)
+        do_squit(source, ac - 1, av + 1);
+    else
+        do_squit(source, ac, av);
+    
+    return MOD_CONT;
+}
+
 int anope_event_quit(char *source, int ac, char **av)
 {
     if (ac != 1)
@@ -1568,41 +1583,36 @@ int anope_event_capab(char *source, int ac, char **av)
             quitting = 1;
             return MOD_STOP;
         }
-	if (has_svsholdmod == 0) {
-		anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
-		return MOD_CONT;
-	}
-	if (has_sajoinmod == 0) {
-                anope_cmd_global(s_OperServ, "SAJOIN missing, Usage disabled until module is loaded.");
-                return MOD_CONT;
+        if (has_svsholdmod == 0) {
+            anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
         }
-	if (has_sapartmod == 0) {
-                anope_cmd_global(s_OperServ, "SAPART missing, Usage disabled until module is loaded.");
-                return MOD_CONT;
+        if (has_sajoinmod == 0) {
+            anope_cmd_global(s_OperServ, "SAJOIN missing, Usage disabled until module is loaded.");
         }
-	if (has_sanickmod == 0) {
-                anope_cmd_global(s_OperServ, "SANICK missing, Usage disabled until module is loaded.");
-                return MOD_CONT;
+        if (has_sapartmod == 0) {
+            anope_cmd_global(s_OperServ, "SAPART missing, Usage disabled until module is loaded.");
         }
-	if (has_chghostmod == 0) {
-                anope_cmd_global(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
-                return MOD_CONT;
+        if (has_sanickmod == 0) {
+            anope_cmd_global(s_OperServ, "SANICK missing, Usage disabled until module is loaded.");
         }
-	if (has_chgidentmod == 0) {
-                anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
-                return MOD_CONT;
+        if (has_chghostmod == 0) {
+            anope_cmd_global(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+        }
+        if (has_chgidentmod == 0) {
+            anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
         }
 
         /* Generate a fake capabs parsing call so things like NOQUIT work
          * fine. It's ugly, but it works....
          */
-        argc = 5;
-        argv = scalloc(5, sizeof(char *));
+        argc = 6;
+        argv = scalloc(6, sizeof(char *));
         argv[0] = "NOQUIT";
         argv[1] = "SSJ3";
         argv[2] = "NICK2";
         argv[3] = "VL";
         argv[4] = "TLKEXT";
+        argv[5] = "UNCONNECT";
 
         capab_parse(argc, argv);
     }

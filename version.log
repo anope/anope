@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1322"
+VERSION_BUILD="1323"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1323)
+# BUGS  : 692
+# NOTES : Added RSQUIT support to the InspIRCd 1.1 protocol module
 #
 # BUILD : 1.7.19 (1322)
 # BUGS  : 685
@@ -23,11 +27,11 @@ VERSION_BUILD="1322"
 #
 # BUILD : 1.7.19 (1320)
 # BUGS  : 
-# NOTES : 
+# NOTES : Commit of Changes from 1319
 #
 # BUILD : 1.7.19 (1319)
-# BUGS  : 
-# NOTES : 
+# BUGS  : 724
+# NOTES : Fixed the use of MODE instead of FMODE in the InspIRCd 1.1 protocol module
 #
 # BUILD : 1.7.19 (1318)
 # BUGS  : 791

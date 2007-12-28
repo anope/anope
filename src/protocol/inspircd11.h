@@ -131,3 +131,4 @@ int anope_event_sapart(char *source, int ac, char **av);
 int anope_event_version(char *source, int ac, char **av);
 int anope_event_opertype(char *source, int ac, char **av);
 int anope_event_idle(char* source, int ac, char **av);
+int anope_event_rsquit(char *source, int ac, char **av);

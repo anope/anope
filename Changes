@@ -64,6 +64,9 @@ Provided by Trystan <trystan@nomadirc.net> - 2007
 Provided by nenolod <nenolod@nenolod.net> - 2007
 08/29 F TS6 UID generation for Charybdis.                                 [#731]
 
+Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
+12/28 F Wrong TS sometimes sent in SJOIN.                                 [#685]
+
 Anope Version 1.7.19
 --------------------
 01/01 A Support for InspIRCd 1.1.                                         [ #00]

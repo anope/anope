@@ -866,7 +866,7 @@ plexus_cmd_unsqline (char *user)
 void
 plexus_cmd_join (char *user, char *channel, time_t chantime)
 {
-  send_cmd (ServerName, "SJOIN %ld %s + :%s", (long int) time (NULL), channel,
+  send_cmd (ServerName, "SJOIN %ld %s + :%s", (long int) chantime, channel,
 	    user);
 }
 

@@ -103,7 +103,7 @@ int do_cs_topic(User * u)
                  s_ChanServ, u->nick, u->username, u->host, c->name);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
-                anope_cmd_join(s_ChanServ, c->name, time(NULL));
+                anope_cmd_join(s_ChanServ, c->name, c->creation_time);
                 anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }

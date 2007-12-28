@@ -97,6 +97,7 @@ int do_set(User * u)
     char *option = strtok(NULL, " ");
     char *setting = strtok(NULL, " ");
     int index;
+    Channel *c;
 
     if (!option) {
         syntax_error(s_OperServ, u, "SET", OPER_SET_SYNTAX);
@@ -185,7 +186,8 @@ int do_set(User * u)
          */
         if (LogChannel && (stricmp(setting, "on") == 0)) {
             if (ircd->join2msg) {
-                anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
+                c = findchan(LogChannel);
+                anope_cmd_join(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
             }
             logchan = 1;
             alog("Now sending log messages to %s", LogChannel);

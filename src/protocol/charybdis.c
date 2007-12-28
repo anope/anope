@@ -907,16 +907,9 @@ void charybdis_cmd_unsqline(char *user)
 void charybdis_cmd_join(char *user, char *channel, time_t chantime)
 {
     Uid *ud;
-    time_t tstosend;
 
-    /* Working around anope's TS brokenness, also making sure
-     * to *never* send an SJOIN with TS zero -- jilles */
-    if (chantime == 0 || chantime == time(NULL))
-        tstosend = 0x7FFFFFFF;
-    else
-        tstosend = chantime;
     ud = find_uid(user);
-    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) tstosend,
+    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime,
              channel, (UseTS6 ? (ud ? ud->uid : user) : user));
 }
 

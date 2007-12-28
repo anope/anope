@@ -284,7 +284,7 @@ int do_akick(User * u)
             cu = c->users;
             while (cu) {
                 next = cu->next;
-                if (check_kick(cu->user, c->name)) {
+                if (check_kick(cu->user, c->name, c->creation_time)) {
                     argv[0] = sstrdup(c->name);
                     argv[1] = sstrdup(cu->user->nick);
                     if (akick->reason)
@@ -553,7 +553,7 @@ int do_akick(User * u)
 
         while (cu) {
             next = cu->next;
-            if (check_kick(cu->user, c->name)) {
+            if (check_kick(cu->user, c->name, c->creation_time)) {
                 argv[0] = sstrdup(c->name);
                 argv[1] = sstrdup(cu->user->nick);
                 argv[2] = sstrdup(CSAutokickReason);

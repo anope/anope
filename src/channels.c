@@ -575,11 +575,13 @@ void do_join(const char *source, int ac, char **av)
 
         /* Make sure check_kick comes before chan_adduser, so banned users
          * don't get to see things like channel keys. */
-        if (check_kick(user, s))
+        /* If channel already exists, check_kick() will use correct TS.
+         * Otherwise, we lose. */
+        if (check_kick(user, s, time(NULL)))
             continue;
 
         chan = findchan(s);
-        chan = join_user_update(user, chan, s);
+        chan = join_user_update(user, chan, s, time(NULL));
         chan_set_correct_modes(user, chan, 1);
 
         send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, source, s);
@@ -756,11 +758,13 @@ void do_sjoin(const char *source, int ac, char **av)
     Channel *c;
     User *user;
     Server *serv;
+    struct c_userlist *cu;
     char *s = NULL;
     char *end, cubuf[7], *end2, *cumodes[6];
     int is_sqlined = 0;
     int ts = 0;
     int is_created = 0;
+    int keep_their_modes = 1;
 
     serv = findserver(servlist, source);
 
@@ -769,10 +773,32 @@ void do_sjoin(const char *source, int ac, char **av)
     } else {
         ts = strtoul(av[0], NULL, 10);
     }
+    c = findchan(av[1]);
+    if (c != NULL) {
+        if (c->creation_time == 0 || ts == 0)
+            c->creation_time = 0;
+        else if (c->creation_time > ts) {
+            c->creation_time = ts;
+            for (cu = c->users; cu; cu = cu->next) {
+                /* XXX */
+                cumodes[0] = "-ov";
+                cumodes[1] = user->nick;
+                cumodes[2] = user->nick;
+                chan_set_modes(source, c, 3, cumodes, 2);
+            }
+            if (c->ci && c->ci->bi) {
+                /* This is ugly, but it always works */
+                anope_cmd_part(c->ci->bi->nick, c->name, "TS reop");
+                bot_join(c->ci);
+            }
+            /* XXX simple modes and bans */
+        } else if (c->creation_time < ts)
+            keep_their_modes = 0;
+    } else
+        is_created = 1;
 
     /* Double check to avoid unknown modes that need parameters */
     if (ac >= 4) {
-        c = findchan(av[1]);
         if (ircd->chansqline) {
             if (!c)
                 is_sqlined = check_chan_sqline(av[1]);
@@ -793,7 +819,7 @@ void do_sjoin(const char *source, int ac, char **av)
 
 
             if (ircd->sjoinbanchar) {
-                if (*s == ircd->sjoinbanchar) {
+                if (*s == ircd->sjoinbanchar && keep_their_modes) {
                     add_ban(c, myStrGetToken(s, ircd->sjoinbanchar, 1));
                     if (!end)
                         break;
@@ -802,7 +828,7 @@ void do_sjoin(const char *source, int ac, char **av)
                 }
             }
             if (ircd->sjoinexchar) {
-                if (*s == ircd->sjoinexchar) {
+                if (*s == ircd->sjoinexchar && keep_their_modes) {
                     add_exception(c,
                                   myStrGetToken(s, ircd->sjoinexchar, 1));
                     if (!end)
@@ -813,7 +839,7 @@ void do_sjoin(const char *source, int ac, char **av)
             }
 
             if (ircd->sjoininvchar) {
-                if (*s == ircd->sjoininvchar) {
+                if (*s == ircd->sjoininvchar && keep_their_modes) {
                     add_invite(c, myStrGetToken(s, ircd->sjoininvchar, 1));
                     if (!end)
                         break;
@@ -846,7 +872,7 @@ void do_sjoin(const char *source, int ac, char **av)
             if (is_sqlined && !is_oper(user)) {
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
-                if (!check_kick(user, av[1])) {
+                if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
                                user->nick, av[1]);
 
@@ -856,10 +882,10 @@ void do_sjoin(const char *source, int ac, char **av)
                      * that the locked key or topic is not shown to anyone
                      * who joins the channel when empty.
                      */
-                    c = join_user_update(user, c, av[1]);
+                    c = join_user_update(user, c, av[1], ts);
 
                     /* We update user mode on the channel */
-                    if (end2 - cubuf > 1) {
+                    if (end2 - cubuf > 1 && keep_their_modes) {
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
@@ -883,16 +909,13 @@ void do_sjoin(const char *source, int ac, char **av)
             s = end + 1;
         }
 
-        if (c) {
-            /* Set the timestamp */
-            c->creation_time = ts;
+        if (c && keep_their_modes) {
             /* We now update the channel mode. */
             chan_set_modes(source, c, ac - 3, &av[2], 2);
         }
 
         /* Unreal just had to be different */
     } else if (ac == 3 && !ircd->ts6) {
-        c = findchan(av[1]);
         if (ircd->chansqline) {
             if (!c)
                 is_sqlined = check_chan_sqline(av[1]);
@@ -934,7 +957,7 @@ void do_sjoin(const char *source, int ac, char **av)
             if (is_sqlined && !is_oper(user)) {
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
-                if (!check_kick(user, av[1])) {
+                if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
                                user->nick, av[1]);
 
@@ -944,10 +967,10 @@ void do_sjoin(const char *source, int ac, char **av)
                      * that the locked key or topic is not shown to anyone
                      * who joins the channel when empty.
                      */
-                    c = join_user_update(user, c, av[1]);
+                    c = join_user_update(user, c, av[1], ts);
 
                     /* We update user mode on the channel */
-                    if (end2 - cubuf > 1) {
+                    if (end2 - cubuf > 1 && keep_their_modes) {
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
@@ -967,12 +990,7 @@ void do_sjoin(const char *source, int ac, char **av)
                 break;
             s = end + 1;
         }
-
-        if (c) {
-            c->creation_time = ts;
-        }
     } else if (ac == 3 && ircd->ts6) {
-        c = findchan(av[1]);
         if (ircd->chansqline) {
             if (!c)
                 is_sqlined = check_chan_sqline(av[1]);
@@ -1014,7 +1032,7 @@ void do_sjoin(const char *source, int ac, char **av)
             if (is_sqlined && !is_oper(user)) {
                 anope_cmd_kick(s_OperServ, av[1], s, "Q-Lined");
             } else {
-                if (!check_kick(user, av[1])) {
+                if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
                                user->nick, av[1]);
 
@@ -1024,10 +1042,10 @@ void do_sjoin(const char *source, int ac, char **av)
                      * that the locked key or topic is not shown to anyone
                      * who joins the channel when empty.
                      */
-                    c = join_user_update(user, c, av[1]);
+                    c = join_user_update(user, c, av[1], ts);
 
                     /* We update user mode on the channel */
-                    if (end2 - cubuf > 1) {
+                    if (end2 - cubuf > 1 && keep_their_modes) {
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
@@ -1047,10 +1065,6 @@ void do_sjoin(const char *source, int ac, char **av)
                 break;
             s = end + 1;
         }
-
-        if (c) {
-            c->creation_time = ts;
-        }
         free(s);
     } else if (ac == 2) {
         if (UseTS6 && ircd->ts6) {
@@ -1068,12 +1082,9 @@ void do_sjoin(const char *source, int ac, char **av)
             return;
         }
 
-        if (check_kick(user, av[1]))
+        if (check_kick(user, av[1], ts))
             return;
 
-        c = findchan(av[1]);
-        if (!c)
-            is_created = 1;
         if (ircd->chansqline) {
             if (!c)
                 is_sqlined = check_chan_sqline(av[1]);
@@ -1085,8 +1096,7 @@ void do_sjoin(const char *source, int ac, char **av)
             send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, user->nick,
                        av[1]);
 
-            c = join_user_update(user, c, av[1]);
-            c->creation_time = ts;
+            c = join_user_update(user, c, av[1], ts);
             if (is_created && c->ci)
                 restore_topic(c->name);
             chan_set_correct_modes(user, c, 1);
@@ -1559,7 +1569,7 @@ void chan_adduser2(User * user, Channel * c)
    chan_adduser, but splitted to make it more efficient to use for
    SJOINs). */
 
-Channel *chan_create(char *chan)
+Channel *chan_create(char *chan, time_t ts)
 {
     Channel *c;
     Channel **list;
@@ -1574,7 +1584,7 @@ Channel *chan_create(char *chan)
     if (*list)
         (*list)->prev = c;
     *list = c;
-    c->creation_time = time(NULL);
+    c->creation_time = ts;
     /* Store ChannelInfo pointer in channel record */
     c->ci = cs_findchan(chan);
     if (c->ci)
@@ -1798,13 +1808,14 @@ char *get_redirect(Channel * chan)
 
 /*************************************************************************/
 
-Channel *join_user_update(User * user, Channel * chan, char *name)
+Channel *join_user_update(User * user, Channel * chan, char *name,
+                          time_t chants)
 {
     struct u_chanlist *c;
 
     /* If it's a new channel, so we need to create it first. */
     if (!chan)
-        chan = chan_create(name);
+        chan = chan_create(name, chants);
 
     if (debug)
         alog("debug: %s joins %s", user->nick, chan->name);

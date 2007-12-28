@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="19"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1321"
+VERSION_BUILD="1322"
 
 # $Log$
+#
+# BUILD : 1.7.19 (1322)
+# BUGS  : 685
+# NOTES : Applied a patch by Jilles which should fix SJOIN not always sending the correct TS
 #
 # BUILD : 1.7.19 (1321)
 # BUGS  : 810

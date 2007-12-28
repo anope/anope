@@ -854,7 +854,7 @@ void ratbox_cmd_join(char *user, char *channel, time_t chantime)
     Uid *ud;
 
     ud = find_uid(user);
-    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) time(NULL),
+    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime,
              channel, (UseTS6 ? (ud ? ud->uid : user) : user));
 }
 

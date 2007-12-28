@@ -1466,10 +1466,10 @@ static void timeout_leave(Timeout * to)
  * else, kickban the user with an appropriate message (could be either
  * AKICK or restricted access) and return 1.  Note that this is called
  * _before_ the user is added to internal channel lists (so do_kick() is
- * not called).
+ * not called). The channel TS must be given for a new channel.
  */
 
-int check_kick(User * user, char *chan)
+int check_kick(User * user, char *chan, time_t chants)
 {
     ChannelInfo *ci = cs_findchan(chan);
     Channel *c;
@@ -1563,8 +1563,7 @@ int check_kick(User * user, char *chan)
      * c may be NULL even if it exists */
     if ((!(c = findchan(chan)) || c->usercount == 0)
         && !(ci->flags & CI_INHABIT)) {
-        anope_cmd_join(s_ChanServ, chan,
-                       (c ? c->creation_time : time(NULL)));
+        anope_cmd_join(s_ChanServ, chan, (c ? c->creation_time : chants));
         t = add_timeout(CSInhabit, timeout_leave, 0);
         t->data = sstrdup(chan);
         ci->flags |= CI_INHABIT;
@@ -1646,7 +1645,7 @@ void restore_topic(char *chan)
     }
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_join(s_ChanServ, chan, time(NULL));
+            anope_cmd_join(s_ChanServ, chan, c->creation_time);
             anope_cmd_mode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
@@ -1708,7 +1707,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_join(s_ChanServ, c->name, time(NULL));
+            anope_cmd_join(s_ChanServ, c->name, c->creation_time);
             anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
         }
     }

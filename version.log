@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1325"
+VERSION_BUILD="1328"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1328)
+# BUGS  : 812
+# NOTES : Fixed a bug where multiple grouped nicks and not all of them listed in ServicesRoot could result in services roots not becoming services root when using MySQL
 #
 # BUILD : 1.7.20 (1325)
 # BUGS  : 

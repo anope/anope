@@ -1742,6 +1742,10 @@ int db_mysql_load_ns_dbase(void)
         if (nc->flags & NI_SERVICES_OPER)
             slist_add(&servopers, nc);
 
+        /* Unset the SERVICES_ROOT flag; we will set it again later if this
+         * user is really a services root (checked per NickAlias) -GD
+         */
+        nc->flags &= ~NI_SERVICES_ROOT;
 
         /* Get info from other tables; we'll need the display */
         q_display = db_mysql_quote(nc->display);
@@ -1847,8 +1851,7 @@ int db_mysql_load_ns_dbase(void)
         /* Assign to the nickcore aliases */
         slist_add(&na->nc->aliases, na);
 
-        /* Make sure the SERVICES_ROOT flag is only set for services roots */
-        na->nc->flags &= ~NI_SERVICES_ROOT;
+        /* Check if this user is a services root */
         for (i = 0; i < RootNumber; i++) {
             if (stricmp(ServicesRoots[i], na->nick) == 0)
                 na->nc->flags |= NI_SERVICES_ROOT;

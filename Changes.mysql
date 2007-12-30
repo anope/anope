@@ -1,3 +1,7 @@
+Anope Version  S V N
+--------------------
+- NONE
+
 Anope Version 1.7.20
 --------------------
 ALTER TABLE `anope_ns_request` DROP INDEX `nick_index` ;

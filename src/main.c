@@ -665,6 +665,10 @@ int main(int ac, char **av, char **envp)
                 quitmsg = "Read error from server";
             }
             quitting = 1;
+            
+            /* Save the databases */
+            if (!readonly)
+            	save_databases();
         }
         waiting = -4;
     }

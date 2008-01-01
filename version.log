@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1328"
+VERSION_BUILD="1329"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1329)
+# BUGS  : 811
+# NOTES : Fixed databases not being saved when anope quit due to a connection error
 #
 # BUILD : 1.7.20 (1328)
 # BUGS  : 812

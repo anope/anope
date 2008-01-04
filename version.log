@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1331"
+VERSION_BUILD="1332"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1332)
+# BUGS  : 
+# NOTES : Updated Russian language file provided by Kein and added his Russian translations to bundled modules as well
 #
 # BUILD : 1.7.20 (1331)
 # BUGS  : 816

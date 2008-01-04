@@ -42,11 +42,11 @@
 /* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING         */
 /* ---------------------------------------------------------------------- */
 
-#define LNG_NUM_STRINGS	          3
+#define LNG_NUM_STRINGS		3
 
-#define LNG_CHAN_HELP             0
-#define LNG_CHAN_HELP_APPENDTOPIC 1
-#define LNG_APPENDTOPIC_SYNTAX    2
+#define LNG_CHAN_HELP				0
+#define LNG_CHAN_HELP_APPENDTOPIC	1
+#define LNG_APPENDTOPIC_SYNTAX		2
 
 int my_cs_appendtopic(User * u);
 void my_cs_help(User * u);
@@ -213,6 +213,18 @@ void my_add_languages(void)
         "Sintaxe: APPENDTOPIC canal texto\n"
     };
 
+    /* Russian (RU) */
+    char *langtable_ru[] = {
+        /* LNG_CHAN_HELP */
+        "    APPENDTOPIC   Добавляет текст к топику канала",
+        /* LNG_CHAN_HELP_APPENDTOPIC */
+        "Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
+            "канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
+            "Примечание: текст будет ДОБАВЛЕН к топику, то есть старый топик удален НЕ БУДЕТ.\n",
+        /* LNG_APPENDTOPIC_SYNTAX */
+        "Синтаксис: APPENDTOPIC #канал текст\n"
+    };
+
     /* Italian (IT) */
     char *langtable_it[] = {
         /* LNG_CHAN_HELP */
@@ -229,7 +241,8 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
+	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 
 /* EOF */

@@ -3,15 +3,14 @@
 # (C) 2003-2007 Anope Team
 # Contact us at info@anope.org
 #
-# Please read COPYING and README for furhter details.
+# Please read COPYING and README for further details.
 #
 # Based on the original code of Epona by Lara.
 # Based on the original code of Services by Andy Church.
 #
-# Translated by Oleg Nikolaev aka Isot <isot@complife.ru>
-# - Special thanks to Mishgan and Leeho for testing
+# Unofficial translate by Kein <kein-of@yandex.ru> 
 #
-# Translated: 7.12.2003
+# Translated: 23.10.2007
 # Charaster set is cp1251
 #
 # When translating this file to another language, keep in mind that the
@@ -65,10 +64,10 @@ LANG_NAME
 
 # strftime() format strings.  man 3 strftime for information on the
 # meanings of the format specifiers.  Short version:
-#	%a = weekday name (short)	%H = hour
-#	%b = month name (short)		%M = minute
-#	%d = day of month		%S = second
-#	%Y = year			%Z = time zone
+#	%a = день недели (сокр.)	%H = часы
+#	%b = месяц (сокр.)		%M = минуты
+#	%d = число			%S = секунды
+#	%Y = год			%Z = временная зона
 
 # This is used as the format string for strftime() for a date and time
 # together.
@@ -155,23 +154,23 @@ MORE_INFO
 NO_HELP_AVAILABLE
 	Нет помощи по %s.
 OBSOLETE_COMMAND
-	Данная команда устарела; используйте вместо нее %s.
+	Данная команда устарела, вместо нее используйте %s.
 
 BAD_USERHOST_MASK
-	Маска должна быть в формате user@host.
+	Маска должна быть в формате идент@хост.
 BAD_EXPIRY_TIME
-	Неверное время истекания.
+	Неверное время истечения.
 USERHOST_MASK_TOO_WIDE
-	Границы %s слишком широки; Пожалуйста уточните маску.
+	Границы %s слишком широки, пожалуйста, уточните маску.
 
 SERVICE_OFFLINE
 	%s сейчас в оффлайне.
 READ_ONLY_MODE
-	Примечание: сейчас сервисы работают в режиме только-чтение; изменения НЕ будут сохранены!
+	Примечание: сейчас сервисы работают в режиме только-чтения, изменения НЕ будут сохранены!
 PASSWORD_INCORRECT
 	Неверный пароль.
 INVALID_TARGET
-	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
+	"/msg %s" больше не поддерживается. Используйте "/msg %s@%s" или "/%s".
 
 # What's the difference between "Access denied" and "Permission denied"?
 # Very little; you can safely make them the same message with no real loss
@@ -184,19 +183,20 @@ ACCESS_DENIED
 PERMISSION_DENIED
 	Недостаточно прав для доступа.
 RAW_DISABLED
-	Опция RAW отключена. Если Вы желаете использовать ее, сконфигурируйте директиву DisableRaw в файле конфигурации сервисов.
+	Опция RAW отключена. Если Вы желаете использовать ее, сконфигурируйте директиву
+	DisableRaw в конфигурационном файле сервисов.
 
 MORE_OBSCURE_PASSWORD
-	Пожалуйста попробуйте снова с более сложным паролем.  Пароль должен иметь длину не менее 5 символов, должен состоять только из латинских букв, не должен быть легко отгадываемым (т.е. Вашим именем или Вашим ником), и не должен содержать пробелов и табуляций.
+	Пожалуйста, попробуйте снова с более сложным паролем. Пароль должен иметь длину не менее 5 символов, состоять только из латинских букв или цифр, не быть легко отгадываемым (т.е. Вашим именем или Вашим ником), и не должен содержать пробелов и табуляций.
 PASSWORD_TRUNCATED
-	Сообщение:  Ваш пароль был усечен до %d символов.
+	Примечание: Ваш пароль был усечен до %d символов.
 
 NICK_NOT_REGISTERED
 	Ваш ник не зарегистрирован.
 NICK_NOT_REGISTERED_HELP
-	Ваш ник не зарегистрирован.  Напишите %R%s HELP для получения информации о том, как зарегистрировать ник.
+	Ваш ник не зарегистрирован. Напишите %R%s HELP для получения информации о том, как зарегистрировать ник.
 NICK_X_IS_SERVICES
-	Nick %s is part of this Network's Services.
+	Ник %s является ником одного из Сервисов данной сети.
 NICK_X_NOT_REGISTERED
 	Ник %s не зарегистрирован.
 NICK_X_IN_USE
@@ -215,7 +215,7 @@ NICK_X_ILLEGAL
 NICK_X_TRUNCATED
 	Ник %s был усечен до %d символов.
 NICK_X_SUSPENDED
-	Nick %s is currently suspended.
+	Ник %s находится в режиме саспенда.
 CHAN_X_NOT_REGISTERED
 	Канал %s не зарегистрирован.
 CHAN_X_NOT_IN_USE
@@ -226,24 +226,24 @@ CHAN_X_FORBIDDEN_OPER
 	Канал %s запрещен к использованию %s:
 	%s
 CHAN_X_SUSPENDED
-	      Приостановлено: [%s] %s
+	Приостановлено: [%s] %s
 NICK_IDENTIFY_REQUIRED
 	Для выполнения данной команды Вы должны идентифицироваться. Попробуйте снова после того, 
-	как напишете команду %R%s IDENTIFY password.
+	как напишете команду %R%s IDENTIFY пароль.
 CHAN_IDENTIFY_REQUIRED
 	Для выполнения данной команды Вы должны идентифицироваться. Попробуйте снова после того,
-	как напишете команду %R%s IDENTIFY %s password.
+	как напишете команду %R%s IDENTIFY %s пароль.
 	
 MAIL_DISABLED
 	Сервисы не сконфигурированы для отправки почты.
 MAIL_INVALID
-	Адрес электронной почты %s неверен.
+	Email-адрес %s некорректен.
 MAIL_X_INVALID
 	%s не является правильным адресом email.
 MAIL_LATER
-	Не удается отправить email; попробуйте, пожалуйста, пожже.
+	Не удается отправить email, попробуйте, пожалуйста, позже.
 MAIL_DELAYED
-	Подождите пожалуйста %d секунд и повторите.
+	Пожалуйста, подождите %d секунд и повторите запрос.
 	
 NO_REASON
 	Нет причины
@@ -294,39 +294,32 @@ EXPIRES_1D
 END_OF_ANY_LIST
 	Конец списка %s.
 
-###########################################################################
-#
-# NickServ messages
-#
-###########################################################################
-
-# Automatic messages
+# Generic List error messages
 LIST_INCORRECT_RANGE
-	Incorrect range specified. The correct syntax is #from-to.
+	Задан не верный диапазон. Синтаксис #from-to.
 CS_LIST_INCORRECT_RANGE
-	To search for channels starting with #, search for the channel
-	name without the #-sign prepended (anope instead of #anope).
+	Что бы найти канал, начинающийся с символа #, просто укажите его
+	название, без #. Например anope вместо #anope.
 
-###########################################################################
-#
-# NickServ messages
-#
-###########################################################################
-
-# Automatic messages
+# Generic help limited to messages
 HELP_LIMIT_SERV_OPER
-	Limited to Services Operators.
+	
+	Для использования этой команды необходимы права Оператора сервисов.
 HELP_LIMIT_SERV_ADMIN
-	Limited to Services Administrators.
+	
+	Для использования этой команды необходимы права Администратора сервисов.
 HELP_LIMIT_SERV_ROOT
-	Limited to Services Roots.
+	
+	Для использования этой команды необходимы права Рута сервисов.
 HELP_LIMIT_IRC_OPER
-	Limited to IRC Operators.
+	
+	Для использования этой команды необходимы права IRC-оператора.
 HELP_LIMIT_HOST_SETTER
-	Limited to Host Setters.
+	
+	Для использования этой команды необходимы права Оператора хостов.
 HELP_LIMIT_HOST_REMOVER
-	Limited to Host Removers.
-
+	
+	Для использования этой команды необходимы права Оператора хостов.
 
 ###########################################################################
 #
@@ -336,34 +329,33 @@ HELP_LIMIT_HOST_REMOVER
 
 # Automatic messages
 NICK_IS_REGISTERED
-	Этот ник зарегистрирован и используется. Выберите, пожалуйста, другой ник.
-	(Если это Ваш ник, напишите команду %R%s IDENTIFY password.)
+	Этот ник уже зарегистрирован и используется. Выберите, пожалуйста, другой ник.
+	(Если это Ваш ник, напишите команду %R%s IDENTIFY пароль.)
 NICK_IS_SECURE
-	Этот ник зарегистрирован и защищен.  Если это ваш ник, напишите
-	команду %R%s IDENTIFY password.  В ином случае,
-	выберите, пожалуйста, другой ник.
+	Этот ник зарегистрирован и защищен. Если это ваш ник, напишите
+	команду %R%s IDENTIFY пароль. Иначе, выберите, пожалуйста, другой ник.
 NICK_MAY_NOT_BE_USED
-	Этот ник не может быть использован. Пожалуйста выберите любой другой.
+	Этот ник не может быть использован. Пожалуйста, выберите любой другой.
 FORCENICKCHANGE_IN_1_MINUTE
 	Если вы не выполните указанные рекомендации, Ваш ник будет принудительно изменен в течении минуты.
 FORCENICKCHANGE_IN_20_SECONDS
 	Если вы не выполните указанные рекомендации, Ваш ник будет принудительно изменен в течении 20 секунд.
 FORCENICKCHANGE_NOW
-	Этот ник был зарегистрирован; Вы не можете его использовать.
+	Этот ник был зарегистрирован, Вы не можете его использовать.
 FORCENICKCHANGE_CHANGING
 	Ваш ник был изменен на %s
 
 # REGISTER responses
 NICK_REGISTER_SYNTAX
-	REGISTER password [email]
+	REGISTER пароль [email]
 NICK_REGISTER_SYNTAX_EMAIL
-	REGISTER password email
+	REGISTER пароль email
 NICK_REGISTRATION_DISABLED
-	Извините, регистрация ников временно приостановлена.
+	Извините, но регистрация ников временно приостановлена.
 NICK_REGISTRATION_FAILED
 	Извините, ошибка регистрации.
 NICK_REG_PLEASE_WAIT
-	Пожалуйста подождите %d секунд перед повторным использованием команды REGISTER.
+	Пожалуйста, подождите %d секунд перед повторным использованием команды REGISTER.
 NICK_CANNOT_BE_REGISTERED
 	Ник %s не может быть зарегистрирован.
 NICK_ALREADY_REGISTERED
@@ -371,37 +363,36 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Ник %s зарегистрирован на Вашу учетную запись: %s
 NICK_REGISTERED_NO_MASK
-	Nickname %s registered.
+	Ник %s зарегистрирован.
 NICK_PASSWORD_IS
 	Ваш пароль - %s - используйте его в дальнейшем и не забывайте.
-
-# GROUP responses
 NICK_REG_DELAY
-	You have to be connected longer than %d seconds to register your nick.
+	Вы должны использовать данный ник не менее %d секунд, что бы начать его регистрацию.
+
 
 # GROUP responses
 NICK_GROUP_SYNTAX
-	GROUP target password
+	GROUP главный_ник пароль
 NICK_GROUP_DISABLED
 	Извините, группирование ников временно недоступно.
 NICK_GROUP_FAILED
 	Извините, ошибка группирования ников.
 NICK_GROUP_PLEASE_WAIT
-	Пожалуйста подождите %d секунд перед повторным использованием команды GROUP.
+	Пожалуйста, подождите %d секунд перед повторным использованием команды GROUP.
 NICK_GROUP_CHANGE_DISABLED
-	Ваш ник уже зарегистрирован; Сначала удалите ник командой %R%s DROP.
+	Ваш ник уже зарегистрирован, сначала удалите ник командой %R%s DROP.
 NICK_GROUP_SAME
 	Вы уже являетесь членом группы %s.
 NICK_GROUP_TOO_MANY
-	Слишком много ников в группе %s's ; просмотрите список и удалите часть.
-	Напишите %R%s HELP GLIST и %R%s HELP DROP 
+	Слишком много ников в группе %s, просмотрите список и удалите ненужные.
+	Напишите %R%s HELP GLIST и %R%s HELP DROP
 	для более подробной информации.
 NICK_GROUP_JOINED
 	Вы успешно внесены в группу %s.
 
 # IDENTIFY responses
 NICK_IDENTIFY_SYNTAX
-	IDENTIFY password
+	IDENTIFY пароль
 NICK_IDENTIFY_FAILED
 	Извините, но попытка идентификации неудачна.
 NICK_IDENTIFY_SUCCEEDED
@@ -410,14 +401,14 @@ NICK_IDENTIFY_EMAIL_REQUIRED
 	Сначала Вы должны указать Ваш e-mail. Правильный e-mail позволит Вам получить на него пароль,
 	если Вы его забудете.
 NICK_IDENTIFY_EMAIL_HOWTO
-	Напишите команду %R%S SET EMAIL e-mail чтобы установить e-mail. Ваша приватность защищена;
-	этот e-mail не может быть узнан третьим лицом.
+	Напишите команду %R%S SET EMAIL e-mail чтобы установить e-mail. Ваша приватность
+	гарантирована, этот e-mail не может быть узнан третьим лицом.
 NICK_ALREADY_IDENTIFIED
 	Вы уже идентифицированы.
 
 # UPDATE responses
 NICK_UPDATE_SUCCESS
-	Статус обновлен (мемки, вирутальные хосты, режимы на каналах, флаги).
+	Статус обновлен (мемо-сообщения, вирутальные хосты, режимы на каналах, флаги).
 	
 # LOGOUT responses
 NICK_LOGOUT_SYNTAX
@@ -427,11 +418,11 @@ NICK_LOGOUT_SUCCEEDED
 NICK_LOGOUT_X_SUCCEEDED
 	Ник %s был деидентифицирован.
 NICK_LOGOUT_SERVICESADMIN
-	Невозможно отлогинить %s, так как это администратор сервисов.
+	Невозможно деидентифицировать %s, так как он Администратор Сервисов.
 
 # DROP responses
 NICK_DROP_DISABLED
-	Извините, ник временно не может быть разрегистрирован.
+	Извините, удаление ников временно запрещено.
 NICK_DROPPED
 	Ваш ник был удален из базы данных.
 NICK_X_DROPPED
@@ -439,21 +430,21 @@ NICK_X_DROPPED
 
 # SET responses
 NICK_SET_SYNTAX
-	SET option parameters
+	SET опция параметры
 NICK_SET_SERVADMIN_SYNTAX
-	SET [nick] option parameters
+	SET [ник] опция параметры
 NICK_SET_DISABLED
 	Извините, установка параметров ника временно недоступна.
 NICK_SET_UNKNOWN_OPTION
-	Неизвестный SET параметр %s.
+	Неизвестный SET-параметр %s.
 NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Неизвестный SET параметр %s, или ник не зарегистрирован.
+	Неизвестный SET-параметр %s, или ник не зарегистрирован.
 NICK_SET_OPTION_DISABLED
 	Параметр %s не может быть установлен в этой IRC сети.
 
 # SET DISPLAY responses
 NICK_SET_DISPLAY_INVALID
-	Новый основной ник, ДОЛЖЕН быть зарегистрированным ником или ником в Вашей группе!
+	Новый основной ник должен быть ЗАРЕГИСТРИРОВАННЫМ ником и состоять в Вашей группе!
 NICK_SET_DISPLAY_CHANGED
 	Новый основной ник изменен на %s.
 
@@ -469,9 +460,9 @@ NICK_SET_PASSWORD_CHANGED_TO
 NICK_SET_LANGUAGE_SYNTAX
 	SET LANGUAGE номер
 NICK_SET_LANGUAGE_UNKNOWN
-	неизвестный номер языка %d.  Напишите %R%s HELP SET LANGUAGE для получения списка доступных языков.
+	Неизвестный номер языка %d. Напишите %R%s HELP SET LANGUAGE для получения списка доступных языков.
 NICK_SET_LANGUAGE_CHANGED
-	Язык изменен на Русский.
+	Язык сервисов изменен на Русский.
 
 # SET URL responses
 NICK_SET_URL_CHANGED
@@ -485,19 +476,19 @@ NICK_SET_EMAIL_CHANGED
 NICK_SET_EMAIL_UNSET
 	Адрес E-mail удален.
 NICK_SET_EMAIL_UNSET_IMPOSSIBLE
-	Вы не можете отключить адрес email в этой IRC сети.
+	Вы не можете удалить адрес email в этой IRC сети.
 	
 # SET ICQ responses
 NICK_SET_ICQ_CHANGED
-	Номер ICQ установлен: %s.
+	ICQ-номер %s успешно установлен.
 NICK_SET_ICQ_UNSET
-	Номер ICQ удален.
+	ICQ-номер удален.
 NICK_SET_ICQ_INVALID
-	%s не является правильным номером.
+	%s не является правильным ICQ-номером.
 	
 # SET GREET responses
 NICK_SET_GREET_CHANGED
-	Приветственное сообщение изменено на %s.
+	Приветственное сообщение изменено на: %s.
 NICK_SET_GREET_UNSET
 	Приветственное сообщение удалено.
 
@@ -507,31 +498,31 @@ NICK_SET_KILL_SYNTAX
 NICK_SET_KILL_IMMED_SYNTAX
 	SET KILL {ON | QUICK | IMMED | OFF}
 NICK_SET_KILL_ON
-	Защита от захвата ника: ВКЛЮЧЕНА.
+	Защита от захвата ника ВКЛЮЧЕНА, лимит времени на ввод пароля: 60 секунд.
 NICK_SET_KILL_QUICK
-	Защита от захвата ника: ВКЛЮЧЕНА, с небольшой задержкой.
+	Защита от захвата ника ВКЛЮЧЕНА, лимит времени на ввод пароля: 20 секунд.
 NICK_SET_KILL_IMMED
-	Защита от захвата ника: ВКЛЮЧЕНА, без задержки.
+	Защита от захвата ника ВКЛЮЧЕНА, лимит времени на ввод пароля: 0 секунд.
 NICK_SET_KILL_IMMED_DISABLED
 	Параметр IMMED недоступен в этой IRC сети.
 NICK_SET_KILL_OFF
-	Защита от захвата ника: ВЫКЛЮЧЕНА.
+	Защита от захвата ника ВЫКЛЮЧЕНА.
 
 # SET SECURE responses
 NICK_SET_SECURE_SYNTAX
 	SET SECURE {ON | OFF}
 NICK_SET_SECURE_ON
-	Безопасность: ВКЛЮЧЕНА.
+	Безопасность ВКЛЮЧЕНА.
 NICK_SET_SECURE_OFF
-	Безопасность: ВЫКЛЮЧЕНА.
+	Безопасность ВЫКЛЮЧЕНА.
 
 # SET PRIVATE responses
 NICK_SET_PRIVATE_SYNTAX
 	SET PRIVATE {ON | OFF}
 NICK_SET_PRIVATE_ON
-	Приватность: ВКЛЮЧЕНА.
+	Приватность ника ВКЛЮЧЕНА.
 NICK_SET_PRIVATE_OFF
-	Приватность: ВЫКЛЮЧЕНА.
+	Приватность ника ВЫКЛЮЧЕНА.
 
 # SET HIDE responses
 NICK_SET_HIDE_SYNTAX
@@ -541,25 +532,23 @@ NICK_SET_HIDE_EMAIL_ON
 NICK_SET_HIDE_EMAIL_OFF
 	Теперь Ваш email будет показываться по запросу %s INFO.
 NICK_SET_HIDE_MASK_ON
-	Теперь Ваша последняя маска user@host будет скрыта из запроса %s INFO.
+	Теперь Ваша последняя маска идент@хост будет скрыта из запроса %s INFO.
 NICK_SET_HIDE_MASK_OFF
-	Теперь Ваша последняя маска user@host будет показана по запросу %s INFO.
+	Теперь Ваша последняя маска идент@хост будет показана по запросу %s INFO.
 NICK_SET_HIDE_QUIT_ON
 	Ваше последнее сообщение при выходе будет скрыто из запроса %s INFO.
 NICK_SET_HIDE_QUIT_OFF
 	Ваше последнее сообщение при выходе будет показано по запросу %s INFO.
-	
-# SET MSG responses
 NICK_SET_HIDE_STATUS_ON
-	Your services access status will now be hidden from %s INFO displays.
+	Ваш уровень доступа к сервисам теперь скрыт из запроса %s INFO.
 NICK_SET_HIDE_STATUS_OFF
-	Your services access status will now be shown in %s INFO displays.
+	Ваш уровень доступа к сервисам теперь будет показан по запросу %s INFO.
 	
 # SET MSG responses
 NICK_SET_MSG_SYNTAX
-	SET PRIVATE {ON | OFF}
+	SET MSG {ON | OFF}
 NICK_SET_MSG_ON
-	Теперь сервисы будут отвечать Вам посредством привата.
+	Теперь сервисы будут отвечать Вам посредством приватных сообщений.
 NICK_SET_MSG_OFF
 	Теперь сервисы будут отвечать Вам посредством нотисов.
 
@@ -567,146 +556,146 @@ NICK_SET_MSG_OFF
 NICK_SET_AUTOOP_SYNTAX
 	SET AUTOOP {ON | OFF}
 NICK_SET_AUTOOP_ON
-	Services will now autoop you in channels.
+	Теперь сервисы будут автоматически давать вам статус при заходе на канал.
 NICK_SET_AUTOOP_OFF
-	Services will no longer autoop you in channels.
+	Теперь сервисы не будут автоматически давать вам статус при заходе на канал.
 
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
-	SASET nickname option parameters
+	SASET ник опция параметры
 NICK_SASET_DISABLED
-	Sorry, nickname option setting is temporarily disabled.
+	Извините, установка параметров ника временно недоступна.
 NICK_SASET_UNKNOWN_OPTION
-	Unknown SASET option %s.
+	Неизвестный SASET параметр %s.
 NICK_SASET_BAD_NICK
-	Nickname %s not registered.
+	Ник %s незарегистрирован.
 NICK_SASET_OPTION_DISABLED
-	Option %s cannot be set on this network.
+	Параметр %s не может быть установлен в этой IRC сети.
 
 # SASET DISPLAY responses
 NICK_SASET_DISPLAY_INVALID
-	The new display for %s MUST be a nickname of the nickname group!
+	Новый главный ник для %s должен быть ЗАРЕГИСТРИРОВАННЫМ ником и состоять в его группе!
 NICK_SASET_DISPLAY_CHANGED
-	The new display is now %s.
+	Новый главный ник теперь: %s.
 
 # SASET PASSWORD responses
 NICK_SASET_PASSWORD_FAILED
-	Sorry, couldn't change password for %s.
+	Извините, невозможно изменить пароль для %s.
 NICK_SASET_PASSWORD_CHANGED
-	Password for %s changed.
+	Пароль для %s изменен.
 NICK_SASET_PASSWORD_CHANGED_TO
-	Password for %s changed to %s.
+	Пароль для %s изменен на %s.
 
 # SASET LANGUAGE responses
 NICK_SASET_URL_CHANGED
-	URL for %s changed to %s.
+	URL для %s изменен на %s.
 NICK_SASET_URL_UNSET
-	URL %s unset.
+	URL для %s удален.
 
 # SASET EMAIL responses
 NICK_SASET_EMAIL_CHANGED
-	E-mail address for %s changed to %s.
+	E-mail адрес для %s изменен на %s.
 NICK_SASET_EMAIL_UNSET
-	E-mail address for %s unset.
+	E-mail адрес для %s удален.
 NICK_SASET_EMAIL_UNSET_IMPOSSIBLE
-	You cannot unset the e-mail on this network.
+	Вы не можете удалить адрес email в этой IRC сети.
 	
 # SASET ICQ responses
 NICK_SASET_ICQ_CHANGED
-	ICQ number for %s set to %s.
+	ICQ-номер для %s теперь %s.
 NICK_SASET_ICQ_UNSET
-	ICQ number for %s unset.
+	ICQ-номер для %s удален.
 NICK_SASET_ICQ_INVALID
-	%s is not a valid number.
+	%s не является правильным ICQ-номером.
 	
 # SASET GREET responses
 NICK_SASET_GREET_CHANGED
-	Greet message for %s changed to %s.
+	Приветствие для %s изменено на %s.
 NICK_SASET_GREET_UNSET
-	Greet message for %s unset.
+	Приветствие для %s удалено.
 
 # SASET PROTECT responses
 NICK_SASET_KILL_SYNTAX
-	SASET nickname KILL {ON | QUICK | OFF}
+	SASET ник KILL {ON | QUICK | OFF}
 NICK_SASET_KILL_IMMED_SYNTAX
-	SASET nickname KILL {ON | QUICK | IMMED | OFF}
+	SASET ник KILL {ON | QUICK | IMMED | OFF}
 NICK_SASET_KILL_ON
-	Protection is now ON for %s.
+	Защита для %s теперь ВКЛЮЧЕНА, лимит времени на ввод пароля: 60 секунд.
 NICK_SASET_KILL_QUICK
-	Protection is now ON for %s, with a reduced delay.
+	Защита для %s теперь ВКЛЮЧЕНА,лимит времени на ввод пароля: 20 секунд.
 NICK_SASET_KILL_IMMED
-	Protection is now ON for %s, with no delay.
+	Защита для %s теперь ВКЛЮЧЕНА, лимит времени на ввод пароля: 0 секунд.
 NICK_SASET_KILL_IMMED_DISABLED
-	The IMMED option is not available on this network.
+	Опция IMMED недоступна в этой IRC-сети.
 NICK_SASET_KILL_OFF
-	Protection is now OFF for %s.
+	Защита для %s теперь ВЫКЛЮЧЕНА.
 
 # SASET SECURE responses
 NICK_SASET_SECURE_SYNTAX
-	SASET nickname SECURE {ON | OFF}
+	SASET ник SECURE {ON | OFF}
 NICK_SASET_SECURE_ON
-	Secure option is now ON for %s.
+	Безопасность для %s теперь ВКЛЮЧЕНА.
 NICK_SASET_SECURE_OFF
-	Secure option is now OFF for %s.
+	Безопасность для %s теперь ВЫКЛЮЧЕНА.
 
 # SASET PRIVATE responses
 NICK_SASET_PRIVATE_SYNTAX
-	SASET nickname PRIVATE {ON | OFF}
+	SASET ник PRIVATE {ON | OFF}
 NICK_SASET_PRIVATE_ON
-	Private option is now ON for %s.
+	Приватность для %s теперь ВКЛЮЧЕНА.
 NICK_SASET_PRIVATE_OFF
-	Private option is now OFF for %s.
+	Приватность для %s теперь ВЫКЛЮЧЕНА.
 
 # SASET HIDE responses
 NICK_SASET_HIDE_SYNTAX
-	SET nickname HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
+	SET ник HIDE {EMAIL | USERMASK | QUIT} {ON | OFF}
 NICK_SASET_HIDE_EMAIL_ON
-	The E-mail address of %s will now be hidden from %s INFO displays.
+	E-mail адрес для %s теперь будет скрыт из запроса %s INFO.
 NICK_SASET_HIDE_EMAIL_OFF
-	The E-mail address of %s will now be shown in %s INFO displays.
+	E-mail адрес для %s теперь будет показан по запросу %s INFO.
 NICK_SASET_HIDE_MASK_ON
-	The last seen user@host mask of %s will now be hidden from %s INFO displays.
+	Последняя маска (идент@хост) для %s теперь будет скрыта из запроса %s INFO.
 NICK_SASET_HIDE_MASK_OFF
-	The last seen user@host mask of %s will now be shown in %s INFO displays.
+	Последняя маска (идент@хост) для %s теперь будет показана по запросу %s INFO.
 NICK_SASET_HIDE_QUIT_ON
-	The last quit message of %s will now be hidden from %s INFO displays.
+	Последнее quit-сообщение для %s теперь будет скрыто из запроса %s INFO.
 NICK_SASET_HIDE_QUIT_OFF
-	The last quit message of %s will now be shown in %s INFO displays.
+	Последнее quit-сообщение для %s теперь будет показано по запросу %s INFO.
 NICK_SASET_HIDE_STATUS_ON
-	The services access status of %s will now be hidden from %s INFO displays.
+	Уровень доступа к сервисам для %s теперь будет скрыт из запроса %s INFO.
 NICK_SASET_HIDE_STATUS_OFF
-	The services access status of %s will now be shown in %s INFO displays.
+	TУровень доступа к сервисам для %s теперь будет показан по запросу %s INFO.
 	
 # SASET MSG responses
 NICK_SASET_MSG_SYNTAX
-	SSAET nickname PRIVATE {ON | OFF}
+	SSAET ник MSG {ON | OFF}
 NICK_SASET_MSG_ON
-	Services will now reply to %s with messages.
+	Теперь, сервисы будут отвечать %s посредством приватных сообщений.
 NICK_SASET_MSG_OFF
-	Services will now reply to %s with notices.
+	Теперь, сервисы будут отвечать %s посредством нотисов.
 
 # SET NOEXPIRE responses
 NICK_SASET_NOEXPIRE_SYNTAX
-	SASET nickname NOEXPIRE {ON | OFF}
+	SASET ник NOEXPIRE {ON | OFF}
 NICK_SASET_NOEXPIRE_ON
-	Nick %s will not expire.
+	Теперь, регистрация ника %s никогда не истечет.
 NICK_SASET_NOEXPIRE_OFF
-	Nick %s will expire.
+	Теперь, ник %s снова в режиме истечения.
 
-# ACCESS responses
+# SASET AUTOOP responses
 NICK_SASET_AUTOOP_SYNTAX
-	SASET nickname AUTOOP {ON | OFF}
+	SASET ник AUTOOP {ON | OFF}
 NICK_SASET_AUTOOP_ON
-	Services will now autoop %s in channels.
+	Теперь, сервисы будут автоматически давать статус для %s на каналах.
 NICK_SASET_AUTOOP_OFF
-	Services will no longer autoop %s in channels.
+	Теперь, сервисы больше не будут автоматически давать статус для %s на каналах.
 
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
-	ACCESS {ADD | DEL | LIST} [mask]
+	ACCESS {ADD | DEL | LIST} [маска]
 NICK_ACCESS_ALREADY_PRESENT
-	Маска %s уже есть в вашем списке доступа.
+	Маска %s уже присутствует в вашем списке доступа.
 NICK_ACCESS_REACHED_LIMIT
 	Извините, вы можете иметь только %d записей в списке доступа.
 NICK_ACCESS_ADDED
@@ -720,59 +709,59 @@ NICK_ACCESS_LIST
 NICK_ACCESS_LIST_X
 	Список доступа для %s:
 NICK_ACCESS_LIST_EMPTY
-	Your access list is empty.
+	Ва список доступа пуст.
 NICK_ACCESS_LIST_X_EMPTY
-	Access list for %s is empty.
+	Список доступа для %s пуст.
 
 # Status messages
 NICK_STATUS_0
-	STATUS %s 0
+	STATUS %s 0 (ник не зарегистрирован или его нету в сети)
 NICK_STATUS_1
-	STATUS %s 1
+	STATUS %s 1 (ник зарегистрирован и в сети, но пользователь не идентифицировался к нему)
 NICK_STATUS_2
-	STATUS %s 2
+	STATUS %s 2 (ник зарегистрирован и в сети, пользователь идентифицирован к нему через список масок)
 NICK_STATUS_3
-	STATUS %s 3
+	STATUS %s 3 (пользователь идентифицирован как владелец ника через идентификацию паролем)
 
 # INFO responses
 NICK_INFO_SYNTAX
-	INFO nick [ALL]
+	INFO ник [ALL]
 NICK_INFO_REALNAME
 	%s это %s
 NICK_INFO_SERVICES_OPER
-	%s оператор сервисов.
+	%s это Оператор сервисов.
 NICK_INFO_SERVICES_ADMIN
-	%s администратор сервисов.
+	%s это Администратор сервисов.
 NICK_INFO_SERVICES_ROOT
-	%s is a services root administrator.
+	%s это Рут сервисов.
 NICK_INFO_ADDRESS
-	Последняя маска:                 %s
+	         Последняя маска: %s
 NICK_INFO_ADDRESS_ONLINE
-	Сейчас в онлайне c маской:       %s
+	 Сейчас онлайн, c маской: %s
 NICK_INFO_ADDRESS_ONLINE_NOHOST
-	%s сейчас в онлайне.
+	     %s сейчас в онлайне.
 NICK_INFO_TIME_REGGED
-	Зарегистрирован:                 %s
+	         Зарегистрирован: %s
 NICK_INFO_LAST_SEEN
-	Последний раз замечен:           %s
+	   Последний раз замечен: %s
 NICK_INFO_LAST_QUIT
-	Последнее сообщение при выходе:  %s
+	Последнее quit-сообщение: %s
 NICK_INFO_URL
-	URL:                             %s
+	                     URL: %s
 NICK_INFO_EMAIL
-	адрес E-mail:                    %s
+	             Email-адрес: %s
 NICK_INFO_VHOST
-	Виртуальный хост:                %s
+	        Виртуальный хост: %s
 NICK_INFO_VHOST2
-	vhost: 				 %s@%s
+	        Виртуальный хост: %s@%s
 NICK_INFO_ICQ
-	ICQ #:                           %d
+	                   ICQ #: %d
 NICK_INFO_GREET
-	Сообщение приветствия:           %s
+	   Сообщение приветствия: %s
 NICK_INFO_OPTIONS
-	Параметры:                       %s
+	               Параметры: %s
 NICK_INFO_EXPIRE
-	Expires in: %s
+	    Регистрация истекает: %s
 # These strings MUST NOT be empty
 NICK_INFO_OPT_KILL
 	Защита
@@ -783,19 +772,17 @@ NICK_INFO_OPT_PRIVATE
 NICK_INFO_OPT_MSG
 	Режим приватных сообщений
 NICK_INFO_OPT_AUTOOP
-	Auto-op
+	Авто-оп
 NICK_INFO_OPT_NONE
 	нет
 NICK_INFO_NO_EXPIRE
-	Этот ник никогда не истечет.
+	Этот ник никогда не истечет.
 NICK_INFO_FOR_MORE
-	Для получения более подробной информации напишите %R%s INFO %s ALL.
-
-# LIST responses
+	Для более подробной информации напишите %R%s INFO %s ALL.
 NICK_INFO_SUSPENDED
-	This nickname is currently suspended, reason: %s
+	Этот ник в режиме саспенда по причине: %s
 NICK_INFO_SUSPENDED_NO_REASON
-	This nickname is currently suspended
+	Этот ник находится в режима саспенда.
 
 # LIST responses
 NICK_LIST_SYNTAX
@@ -805,7 +792,7 @@ NICK_LIST_SERVADMIN_SYNTAX
 NICK_LIST_HEADER
 	Список, содержащий %s:
 NICK_LIST_RESULTS
-	Конец списка - %d/%d записей.
+	Конец списка - %d/%d записей показано.
 
 # ALIST responses
 NICK_ALIST_SYNTAX
@@ -833,16 +820,16 @@ NICK_GLIST_FOOTER
 NICK_GLIST_REPLY
 	   %c%s
 NICK_GLIST_REPLY_ADMIN
-	   %c%s (expires in %s)
+	   %c%s (истекает %s)
 
 # RECOVER responses
 NICK_RECOVER_SYNTAX
 	RECOVER ник [пароль]
 NICK_NO_RECOVER_SELF
-	Вы не можете восстановить самого себя!
+	Вы не можете применить RECOVER на самого себя!
 NICK_RECOVERED
-	По требованию пользователя Ваш ник был убит. Напишите %R%s RELEASE %s
-	в течение минуты, чтобы Вы смогли его использовать.
+	По вашему запросу, пользователь, взявший ваш ник себе, был переименован на случайный ник.
+	Напишите %R%s RELEASE %s в течение минуты, чтобы снять защиту сервисов с Вашего ника.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX
@@ -850,69 +837,69 @@ NICK_RELEASE_SYNTAX
 NICK_RELEASE_NOT_HELD
 	Ник %s не был удержан.
 NICK_RELEASED
-	Сервисы удержали Ваш ник и освободили.
+	Ваш ник освобожден от удержания Сервисами.
 
 # GHOST responses
 NICK_GHOST_SYNTAX
 	GHOST ник [пароль]
 NICK_NO_GHOST_SELF
-	Вы не можете вышибить самого себя!
+	Вы не можете закрыть свою сессию!
 NICK_GHOST_KILLED
 	Ваш зависший ник был убит.
 
 # GETPASS responses
 NICK_GETPASS_SYNTAX
-	GETPASS nickname
+	GETPASS ник
 NICK_GETPASS_UNAVAILABLE
-	команда GETPASS недоступна так как включено шифрование.
+	Команда GETPASS недоступна, так как включено шифрование.
 NICK_GETPASS_PASSWORD_IS
-	Пароль %s - %s.
+	Пароль для %s - %s.
 
 # GETEMAIL responses
 NICK_GETEMAIL_SYNTAX
-	GETEMAIL user@email-host не используйте символьные маски !!
+	GETEMAIL user@email-host Никаких символьных масок!!
 NICK_GETEMAIL_EMAILS_ARE
-	Email'ы подходящие под %s: %s.
+	Email-адреса подходящие под %s: %s.
 NICK_GETEMAIL_NOT_USED
-	Нет Email'ов для %s.
+	Нет совпадений Email-адресов для %s.
 
 # SENDPASS responses
 NICK_SENDPASS_SYNTAX
 	SENDPASS ник
 NICK_SENDPASS_UNAVAILABLE
-	команда SENDPASS недоступна так как включено шифрование.
+	Команда SENDPASS недоступна, так как включено шифрование.
 NICK_SENDPASS_SUBJECT
 	Пароль на ник (%s)
 NICK_SENDPASS_HEAD
-	Hi,
+	Здраствуйте,
 NICK_SENDPASS_LINE_1
 	Вы просили %s выслать пароль от Вашего ника на e-mail.
 NICK_SENDPASS_LINE_2
-	Ваш пароль %s Для большей безопасности, Вам рекомендуется изменить как можно скорее.
+	Ваш пароль %s. Для большей безопасности, Вам рекомендуется изменить его как можно скорее.
 NICK_SENDPASS_LINE_3
-	Если Вы не запрашивали это письмо, пожалуйста проигнорируйте его.
+	Если Вы не запрашивали это письмо, просто проигнорируйте его.
 NICK_SENDPASS_LINE_4
-	ПОЖАЛУЙСТА НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
+	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
 NICK_SENDPASS_LINE_5
 	Администраторы %s.
 NICK_SENDPASS_OK
 	Пароль %s был отправлен.
 
-# FORBID responses
+# SUSPEND responses
 NICK_SUSPEND_SYNTAX
-	SUSPEND nickname reason
+	SUSPEND ник причина
 NICK_SUSPEND_SUCCEEDED
-	Nick %s is now suspended.
+	Ник %s теперь в режиме саспенда.
 NICK_SUSPEND_FAILED
-	Couldn't suspend nick %s!
+	Невозможно установить режим саспенда на %s!
 
 # UNSUSPEND responses
 NICK_UNSUSPEND_SYNTAX
-	UNSUSPEND nickname
+	UNSUSPEND ник
 NICK_UNSUSPEND_SUCCEEDED
-	Nick %s is now released.
+	Режим саспенда с %s снят.
 NICK_UNSUSPEND_FAILED
-	Couldn't release nick %s!
+	Невозможно снять режим саспенда с %s!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -926,39 +913,37 @@ NICK_FORBID_FAILED
 
 # Nick Registraion responses
 NICK_REQUESTED
-	Этот ник уже запрашивал регистрацию, пожалуйста проверьте Ваш e-mail на предмет получения пароля
+	Этот ник уже запрашивал регистрацию, пожалуйста, проверьте Ваш e-mail на предмет получения auth-кода.
 NICK_REG_RESENT
-	Ваш пароль был снова отправлен на %s.
+	Ваш код аутенфикации был заново выслан на %s.
 NICK_REG_UNABLE
 	Ник НЕ ЗАРЕГИСТРИРОВАН, попробуйте, пожалуйста, позднее.
 NICK_IS_PREREG
-	Этот ник ожидает подтверждения по e-mail перед завершением регистрации.
+	Этот ник ожидает подтверждения через e-mail перед завершением регистрации.
 NICK_ENTER_REG_CODE
-	Пароль был выслан на %s, пожалуйста напишите команду %R%s confirm <пароль> для завершения регистрации
+	Auth-код был выслан на %s, пожалуйста, напишите команду %R%s confirm auth-код для завершения регистрации
 NICK_CONFIRM_NOT_FOUND
-	Время первой части регистрации истекло, пожалуйста используйте сначала "%R%s register <пароль> <email>" .
+	Время первой части регистрации истекло, пожалуйста, воспользуйтесь сначала "%R%s register <пароль> <email>" .
 NICK_CONFIRM_INVALID
-	Был введен неверный пароль, пожалуйста проверьте Ваш e-mail снова, и попробуйте еще раз
+	Был введен неверный auth-код, пожалуйста, проверьте Ваш e-mail снова, и попробуйте еще раз.
 NICK_REG_MAIL_SUBJECT
 	Регистрация ника (%s)
 NICK_REG_MAIL_HEAD
-	Hi,
+	Здраствуйте,
 NICK_REG_MAIL_LINE_1
-	Вы хотели зарегистрировать Ваш ник на %s.
+	Вы запросили регистрацию ника %s.
 NICK_REG_MAIL_LINE_2
-	Пожалуйста напишите команду " %R%s confirm %s " чтобы завершить регистрацию.
+	Пожалуйста, напишите команду " %R%s confirm %s " чтобы завершить регистрацию ника.
 NICK_REG_MAIL_LINE_3
-	Если Вы не запрашивали это письмо, пожалуйста проигнорируйте его.
+	Если Вы не запрашивали это письмо, просто проигнорируйте его.
 NICK_REG_MAIL_LINE_4
-	ПОЖАЛУЙСТА НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
+	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
 NICK_REG_MAIL_LINE_5
 	Администраторы %s.
 NICK_GETPASS_PASSCODE_IS
-	Пароль %s - %s.
+	Пароль для %s - %s.
 NICK_FORCE_REG
-	Ник %s подтвердил регистрацию
-
-
+	Ник %s подтвердил свою регистрацию.
 
 ###########################################################################
 #
@@ -968,7 +953,7 @@ NICK_FORCE_REG
 
 # Access level descriptions
 CHAN_LEVEL_AUTOOP
-	Автоматически устанавливает статус оператора канала
+	Автоматически устанавливает статус оператора (+o)
 CHAN_LEVEL_AUTOVOICE
 	Автоматически ставит режим +v
 CHAN_LEVEL_AUTOHALFOP
@@ -978,7 +963,7 @@ CHAN_LEVEL_AUTOPROTECT
 CHAN_LEVEL_AUTODEOP
 	Статус оператора канала запрещен
 CHAN_LEVEL_NOJOIN
-	Невозможно зайти в канал: доступ ограничен
+	Невозможно зайти на канал: доступ ограничен
 CHAN_LEVEL_INVITE
 	Можно использовать команду INVITE
 CHAN_LEVEL_AKICK
@@ -1004,7 +989,7 @@ CHAN_LEVEL_BADWORDS
 CHAN_LEVEL_NOKICK
 	Никогда не будет кикнут ботом
 CHAN_LEVEL_FANTASIA
-	Можно использовать fantaisist команды BotServ'a
+	Можно использовать FANTASY-команды у бота
 CHAN_LEVEL_SAY
 	Можно использовать команды SAY и ACT
 CHAN_LEVEL_GREET
@@ -1030,7 +1015,7 @@ CHAN_LEVEL_KICKME
 CHAN_LEVEL_KICK
 	Можно использовать KICK
 CHAN_LEVEL_SIGNKICK
-	Невозможно кикать, когда используется SIGNKICK LEVEL
+	Без подписи кика, если используется SIGNKICK LEVEL
 CHAN_LEVEL_BANME
 	Можно использовать команду BAN на себя
 CHAN_LEVEL_BAN
@@ -1044,15 +1029,13 @@ CHAN_LEVEL_INFO
 CHAN_IS_REGISTERED
 	Этот канал был зарегистрирован %s.
 CHAN_NOT_ALLOWED_OP
-	Вы должны быть оператором канала %s.
+	Статус оператора на канале %s для вас запрещен.
 CHAN_MAY_NOT_BE_USED
 	Этот канал нельзя использовать.
 CHAN_NOT_ALLOWED_TO_JOIN
 	Вам не разрешено находиться на этом канале.
-
-# REGISTER responses
 CHAN_X_INVALID
-	Channel %s is not a valid channel.
+	Недопустимый канал %s.
 
 # REGISTER responses
 CHAN_REGISTER_SYNTAX
@@ -1062,9 +1045,9 @@ CHAN_REGISTER_DISABLED
 CHAN_REGISTER_NOT_LOCAL
 	Локальные каналы не могут быть зарегистрированы.
 CHAN_MUST_REGISTER_NICK
-	Сначала Вы должны зарегистрировать свой ник. Напишите %R%s HELP для получения информации о том, как зарегистрировать ник.
+	Сначала Вы должны зарегистрировать свой ник. Напишите %R%s HELP для получения информации о регистрации.
 CHAN_MUST_IDENTIFY_NICK
-	Сперва идентифицируйтесь пожалуйста на %s, используя команду:
+	Сперва идентифицируйте свой ник на %s, используя команду:
 	%R%s IDENTIFY пароль
 CHAN_MAY_NOT_BE_REGISTERED
 	Канал %s не может быть зарегистрирован.
@@ -1075,26 +1058,26 @@ CHAN_MUST_BE_CHANOP
 CHAN_REACHED_CHANNEL_LIMIT
 	Извините, Вы уже зарегистрировали %d каналов, больше, к сожалению, нельзя.
 CHAN_EXCEEDED_CHANNEL_LIMIT
-	Извините, Вы уже превысили лимит (%d) зарегистрированных каналов.
+	Извините, но Вы уже превысили лимит (%d) зарегистрированных каналов.
 CHAN_REGISTRATION_FAILED
 	Извините, ошибка регистрации.
 CHAN_REGISTERED
-	Канал %s зарегистрирован на Вас: %s
+	Канал %s зарегистрирован на Ваш ник: %s
 CHAN_PASSWORD_IS
-	Пароль Вашего канала -  %s - не забывайте его!
+	Пароль Вашего канала -  %s - не забывайте его! Ни в коем случае не давайте свой пароль посторонним людям!
 CHAN_REGISTER_NONE_CHANNEL
-	You have attempted to register a nonexistent channel %s
+	Вы пытаетесь зарегистрировать не существующий канал %s
 CHAN_SYMBOL_REQUIRED
-	Please use the symbol of # when attempting to register
+	Пожалуйста, используйте символы # перед названием канала, когда пытаетесь зарегистрировать его.
 
 
 # IDENTIFY responses
 CHAN_IDENTIFY_SYNTAX
 	IDENTIFY #канал пароль
 CHAN_IDENTIFY_FAILED
-	Неверный пароль.
+	Ошибка идентификации - неверный пароль.
 CHAN_IDENTIFY_SUCCEEDED
-	Пароль принят - Теперь Ваш уровень доступа на %s - владелец.
+	Пароль принят, теперь Ваш уровень доступа на %s - владелец.
 
 # LOGOUT responses
 CHAN_LOGOUT_SYNTAX
@@ -1102,9 +1085,9 @@ CHAN_LOGOUT_SYNTAX
 CHAN_LOGOUT_SERVADMIN_SYNTAX
 	LOGOUT #канал [ник]
 CHAN_LOGOUT_SUCCEEDED
-	Пользователь %s ьыл деидентифицирован на канал %s.
+	Пользователь %s был деидентифицирован от канала %s.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Все идентифицированные пользователи были деидентифицированы на канал %s.
+	Все идентифицированные пользователи были деидентифицированы от канала %s.
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -1120,7 +1103,7 @@ CHAN_SET_SYNTAX
 CHAN_SET_DISABLED
 	Извините, установка опций для каналов временно недоступна.
 CHAN_SET_UNKNOWN_OPTION
-	Неизвестная опция SET %s.
+	Неизвестная SET-опция %s.
 
 # SET FOUNDER responses
 CHAN_SET_FOUNDER_TOO_MANY_CHANS
@@ -1152,17 +1135,17 @@ CHAN_DESC_CHANGED
 CHAN_URL_CHANGED
 	URL канала %s изменен на %s.
 CHAN_URL_UNSET
-	URL на канал %s удален.
+	URL канала %s удален.
 
 # SET EMAIL responses
 CHAN_EMAIL_CHANGED
-	Адрес E-mail для канала %s изменен на %s.
+	Email-адрес для канала %s изменен на %s.
 CHAN_EMAIL_UNSET
-	Адрес E-mail для канала %s удален.
+	Email-адрес для канала %s удален.
 
 # SET ENTRYMSG responses
 CHAN_ENTRY_MSG_CHANGED
-	Сообщение при входе на канал for %s изменено.
+	Сообщение при входе на канал %s изменено.
 CHAN_ENTRY_MSG_UNSET
 	Сообщение при входе на канал %s удалено.
 	
@@ -1176,11 +1159,11 @@ CHAN_SET_BANTYPE_CHANGED
 CHAN_SET_MLOCK_UNKNOWN_CHAR
 	Неизвестный режим %c - проигнорирован.
 CHAN_SET_MLOCK_IMPOSSIBLE_CHAR
-	Режим %c не установлен, так как Вы не можете заблокировать его.
+	Режим %c проигнорирован, так как Вы не можете заблокировать его.
 CHAN_SET_MLOCK_L_REQUIRED
-	Чтобы заблокировать режим +l Вы должны также заблокировать и режим +L.
+	Чтобы заблокировать режим +L Вы должны сперва заблокировать режим +l.
 CHAN_SET_MLOCK_K_REQUIRED
-	тобы заблокировать режим +i Вы должны также заблокировать и режим +K.
+	Чтобы заблокировать режим +K Вы должны сперва заблокировать режим +i.
 CHAN_MLOCK_CHANGED
 	Заблокированные режимы на канале %s изменены на %s.
 
@@ -1188,92 +1171,92 @@ CHAN_MLOCK_CHANGED
 CHAN_SET_KEEPTOPIC_SYNTAX
 	SET #канал KEEPTOPIC {ON | OFF}
 CHAN_SET_KEEPTOPIC_ON
-	Topic retention option for %s is now ON.
+	Хранение топика для канала %s теперь ВКЛЮЧЕНО.
 CHAN_SET_KEEPTOPIC_OFF
-	Topic retention option for %s is now OFF.
+	Хранение топика для канала %s теперь ВЫКЛЮЧЕНО.
 
 # SET TOPICLOCK responses
 CHAN_SET_TOPICLOCK_SYNTAX
 	SET #канал TOPICLOCK {ON | OFF}
 CHAN_SET_TOPICLOCK_ON
-	Topic lock option for %s is now ON.
+	Блокировка топика для канала %s теперь ВКЛЮЧЕНА.
 CHAN_SET_TOPICLOCK_OFF
-	Topic lock option for %s is now OFF.
+	Блокировка топика для канала %s теперь ВЫКЛЮЧЕНА.
 
 # SET PEACE responses
 CHAN_SET_PEACE_SYNTAX
 	SET #канал PEACE {ON | OFF}
 CHAN_SET_PEACE_ON
-	Peace option for %s is now ON.
+	Режим Спокойствия для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_PEACE_OFF
-	Peace option for %s is now OFF.
+	Режим Спокойствия для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET PRIVATE responses
 CHAN_SET_PRIVATE_SYNTAX
 	SET #канал PRIVATE {ON | OFF}
 CHAN_SET_PRIVATE_ON
-	Private option for %s is now ON.
+	Приватность для канала %s теперь ВКЛЮЧЕНА.
 CHAN_SET_PRIVATE_OFF
-	Private option for %s is now OFF.
+	Приватность для канала %s теперь ВЫКЛЮЧЕНА.
 
 # SET SECUREOPS responses
 CHAN_SET_SECUREOPS_SYNTAX
 	SET #канал SECUREOPS {ON | OFF}
 CHAN_SET_SECUREOPS_ON
-	Secure ops option for %s is now ON.
+	Режим Безопасности Операторов для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_SECUREOPS_OFF
-	Secure ops option for %s is now OFF.
+	Режим Безопасности Операторов для канала %s теперь ВЫКЛЮЧЕН.
 	
 # SET SECUREFOUNDER responses
 CHAN_SET_SECUREFOUNDER_SYNTAX
 	SET #канал SECUREFOUNDER {ON | OFF}
 CHAN_SET_SECUREFOUNDER_ON
-	Secure founder option for %s is now ON.
+	Режим Безопасности Владельца для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_SECUREFOUNDER_OFF
-	Secure founder option for %s is now OFF.
+	Режим Безопасности Владельца для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET RESTRICTED responses
 CHAN_SET_RESTRICTED_SYNTAX
 	SET #канал RESTRICTED {ON | OFF}
 CHAN_SET_RESTRICTED_ON
-	Restricted access option for %s is now ON.
+	Режим Запретный для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_RESTRICTED_OFF
-	Restricted access option for %s is now OFF.
+	Режим Запретный для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET SECURE responses
 CHAN_SET_SECURE_SYNTAX
 	SET #канал SECURE {ON | OFF}
 CHAN_SET_SECURE_ON
-	Secure option for %s is now ON.
+	Режим Безопасности для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_SECURE_OFF
-	Secure option for %s is now OFF.
+	Режим Безопасности для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET SIGNKICK responses
 CHAN_SET_SIGNKICK_SYNTAX
 	SET #канал SIGNKICK {ON | LEVEL | OFF}
 CHAN_SET_SIGNKICK_ON
-	Signed kick option for %s is now ON.
+	Режим Подписанных Киков для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_SIGNKICK_LEVEL
-	Signed kick option for %s is now ON, but depends of the
-	level of the user that is using the command.
+	Режим Подписанных Киков для канала %s теперь ВКЛЮЧЕН,
+	но зависит от уровня пользователя, который использует эту команду.
 CHAN_SET_SIGNKICK_OFF
-	Signed kick option for %s is now OFF.
+	Режим Подписанных Киков для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET OPNOTICE responses
 CHAN_SET_OPNOTICE_SYNTAX
 	SET #канал OPNOTICE {ON | OFF}
 CHAN_SET_OPNOTICE_ON
-	Op-notice option for %s is now ON.
+	Режим OP-уведомления (об ОПе\деОПе) для канала %s теперь ВКЛЮЧЕН.
 CHAN_SET_OPNOTICE_OFF
-	Op-notice option for %s is now OFF.
+	Режим OP-уведомления (об ОПе\деОПе) для канала %s теперь ВЫКЛЮЧЕН.
 
 # SET XOP responses
 CHAN_SET_XOP_SYNTAX
 	SET #канал XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP lists system for %s is now ON.
+	Система привелегий xOP для канала %s теперь ВКЛЮЧЕНА.
 CHAN_SET_XOP_OFF
-	xOP lists system for %s is now OFF.
+	Система привелегий xOP для канала %s теперь ВЫКЛЮЧЕНА.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX
@@ -1281,34 +1264,34 @@ CHAN_SET_NOEXPIRE_SYNTAX
 CHAN_SET_NOEXPIRE_ON
 	Канал %s никогда не истечет.
 CHAN_SET_NOEXPIRE_OFF
-	Канал %s может истекать.
+	Режим истечения по времени для канала %s теперь включен.
 
 # xOP messages
 CHAN_XOP_REACHED_LIMIT
-	Извините, Вы можете использовать только %d AOP/SOP/VOP на канале.
+	Извините, но доступно лишь %d VOP/HOP/AOP/SOP записей на канале.
 CHAN_XOP_LIST_FORMAT
 	  %3d  %s
 CHAN_XOP_ACCESS
 	Вы не можете использоват эту команду. Вместо нее используйте команду ACCESS.
 	Напишите %R%s HELP ACCESS для получения более подробной информации.
 CHAN_XOP_NOT_AVAILABLE
-	xOP system is not available.
+	Система привелегий xOP недоступна.
 
 # AOP messages
 CHAN_AOP_SYNTAX
-	AOP #канал {ADD|DEL|LIST|CLEAR} [ник | номера записей]
+	AOP #канал {ADD|DEL|LIST|CLEAR} [ник | номер запис]
 CHAN_AOP_DISABLED
 	Извините, модификация списка AOP'ов временно недоступна.
 CHAN_AOP_NICKS_ONLY
-	Список AOP может включать только зарегистрированные ники.
+	Список AOP'ов может включать только зарегистрированные ники.
 CHAN_AOP_ADDED
 	%s добавлен в AOP'ы канала %s.
 CHAN_AOP_MOVED
-	%s перемещен в AOP'ы %s.
+	%s перемещен в AOP'ы канала %s.
 CHAN_AOP_NO_SUCH_ENTRY
-	Нет такой записи (#%d) в AOP'ах %s.
+	Нет такой записи (#%d) в AOP'ах канала %s.
 CHAN_AOP_NOT_FOUND
-	%s не найден в AOP'ах %s.
+	%s не найден в AOP'ах канала %s.
 CHAN_AOP_NO_MATCH
 	Нет таких записей в AOP'ах канала %s.
 CHAN_AOP_DELETED
@@ -1322,26 +1305,24 @@ CHAN_AOP_LIST_EMPTY
 CHAN_AOP_LIST_HEADER
 	Список AOP'ов канала %s:
 	 Номер  Ник
-
-# HOP messages
 CHAN_AOP_CLEAR
-	Channel %s AOP list has been cleared.
+	Список AOP'ов на канале %s был полностью очищен.
 
 # HOP messages
 CHAN_HOP_SYNTAX
-	HOP #канал {ADD|DEL|LIST|CLEAR} [ник | номера записей]
+	HOP #канал {ADD|DEL|LIST|CLEAR} [ник | номер запис]
 CHAN_HOP_DISABLED
 	Извините, модификация списка HOP'ов временно недоступна.
 CHAN_HOP_NICKS_ONLY
-	Список HOP может включать только зарегистрированные ники.
+	Список HOP'ов может включать только зарегистрированные ники.
 CHAN_HOP_ADDED
 	%s добавлен в HOP'ы канала %s.
 CHAN_HOP_MOVED
-	%s перемещен в HOP'ы %s.
+	%s перемещен в HOP'ы канала %s.
 CHAN_HOP_NO_SUCH_ENTRY
-	Нет такой записи (#%d) в HOP'ах %s.
+	Нет такой записи (#%d) в HOP'ах канала %s.
 CHAN_HOP_NOT_FOUND
-	%s не найден в HOP'ах %s.
+	%s не найден в HOP'ах канала %s.
 CHAN_HOP_NO_MATCH
 	Нет таких записей в HOP'ах канала %s.
 CHAN_HOP_DELETED
@@ -1355,26 +1336,24 @@ CHAN_HOP_LIST_EMPTY
 CHAN_HOP_LIST_HEADER
 	Список HOP'ов канала %s:
 	  Номер  Ник
-
-# SOP messages
 CHAN_HOP_CLEAR
-	Channel %s HOP list has been cleared.
+	Список HOP'ов на канале %s был полностью очищен.
 
 # SOP messages
 CHAN_SOP_SYNTAX
-	SOP #канал {ADD|DEL|LIST|CLEAR} [ник | номера записей]
+	SOP #канал {ADD|DEL|LIST|CLEAR} [ник | номер записи]
 CHAN_SOP_DISABLED
 	Извините, модификация списка SOP'ов временно недоступна.
 CHAN_SOP_NICKS_ONLY
-	Список SOP может включать только зарегистрированные ники.
+	Список SOP'ов может включать только зарегистрированные ники.
 CHAN_SOP_ADDED
 	%s добавлен в SOP'ы канала %s.
 CHAN_SOP_MOVED
 	%s перемещен в SOP'ы %s.
 CHAN_SOP_NO_SUCH_ENTRY
-	Нет такой записи (#%d) в SOP'ах %s.
+	Нет такой записи (#%d) в SOP'ах канала %s.
 CHAN_SOP_NOT_FOUND
-	%s не найден в SOP'ах %s.
+	%s не найден в SOP'ах канала %s.
 CHAN_SOP_NO_MATCH
 	Нет таких записей в SOP'ах канала %s.
 CHAN_SOP_DELETED
@@ -1388,26 +1367,24 @@ CHAN_SOP_LIST_EMPTY
 CHAN_SOP_LIST_HEADER
 	Список SOP'ов канала %s:
 	  Номер  Ник
-
-# VOP messages
 CHAN_SOP_CLEAR
-	Channel %s SOP list has been cleared.
+	Список SOP'ов на канале %s был полностью очищен.
 
 # VOP messages
 CHAN_VOP_SYNTAX
-	VOP #канал {ADD|DEL|LIST|CLEAR} [ник | номера записей]
+	VOP #канал {ADD|DEL|LIST|CLEAR} [ник | номер записи]
 CHAN_VOP_DISABLED
 	Извините, модификация списка VOP'ов временно недоступна.
 CHAN_VOP_NICKS_ONLY
-	Список VOP может включать только зарегистрированные ники.
+	Список VOP'ов может включать только зарегистрированные ники.
 CHAN_VOP_ADDED
 	%s добавлен в VOP'ы канала %s.
 CHAN_VOP_MOVED
-	%s перемещен в VOP'ы %s.
+	%s перемещен в VOP'ы канала %s.
 CHAN_VOP_NO_SUCH_ENTRY
-	Нет такой записи (#%d) в VOP'ах %s.
+	Нет такой записи (#%d) в VOP'ах канала %s.
 CHAN_VOP_NOT_FOUND
-	%s не найден в VOP'ах %s.
+	%s не найден в VOP'ах канала %s.
 CHAN_VOP_NO_MATCH
 	Нет таких записей в VOP'ах канала %s.
 CHAN_VOP_DELETED
@@ -1421,22 +1398,20 @@ CHAN_VOP_LIST_EMPTY
 CHAN_VOP_LIST_HEADER
 	Список VOP'ов канала %s:
 	  Номер  Ник
-
-# ACCESS messages
 CHAN_VOP_CLEAR
-	Channel %s VOP list has been cleared.
+	Список VOP'ов на канале %s был полностью очищен.
 
 # ACCESS messages
 CHAN_ACCESS_SYNTAX
-	ACCESS #канал {ADD|DEL|LIST|CLEAR} [ник [уровень] | список записей]
+	ACCESS #канал {ADD|DEL|LIST|CLEAR} [ник [уровень] | номер записи]
 CHAN_ACCESS_XOP
-	Вы не можете использовать эту команду. Используйте команды AOP, SOP и VOP вместо нее.
-	Напишите %R%s HELP команда для получения
-	более подробной информации.
+	Вы не можете использовать эту команду.
+	Используйте команды VOP, AOP и SOP вместо нее.
+	Напишите %R%s HELP команда для получения более подробной информации.
 CHAN_ACCESS_XOP_HOP
-	You can't use this command. 
-	Use the AOP, SOP, HOP and VOP commands instead.
-	Type %R%s HELP command for more information.
+	Вы не можете использовать эту команду. 
+	Вместо нее, используйте команды AOP, SOP, HOP и VOP .
+	Введите %R%s HELP команда для более подробной информации.
 CHAN_ACCESS_DISABLED
 	Извините, модификация списка доступа канала временно недоступна.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1448,9 +1423,9 @@ CHAN_ACCESS_NICKS_ONLY
 CHAN_ACCESS_REACHED_LIMIT
 	Извините, в списке доступа канала может быть не более %d записей.
 CHAN_ACCESS_LEVEL_UNCHANGED
-	Уровень доступа для %s на канал %s остался прежним - %d.
+	Уровень доступа для %s на канале %s остался прежним - %d.
 CHAN_ACCESS_LEVEL_CHANGED
-	Уровень доступа для %s на канал %s изменен на %d.
+	Уровень доступа для %s на канале %s изменен на %d.
 CHAN_ACCESS_ADDED
 	%s добавлен в список доступа канала %s с уровнем доступа %d.
 CHAN_ACCESS_NO_SUCH_ENTRY
@@ -1476,20 +1451,18 @@ CHAN_ACCESS_LIST_XOP_FORMAT
 	  %3d   %s  %s
 CHAN_ACCESS_LIST_AXS_FORMAT
 	  %3d  %4d  %s
-
-# AKICK responses
 CHAN_ACCESS_CLEAR
-	Channel %s access list has been cleared.
+	Список доступа для канала %s был полностью очищен.
 
 # AKICK responses
 CHAN_AKICK_SYNTAX
-	AKICK #канал {ADD | STICK | UNSTICK | DEL | LIST | VIEW | ENFORCE | CLEAR} [ник-или-маска-пользователя] [причина]
+	AKICK #канал {ADD | STICK | UNSTICK | DEL | LIST | VIEW | ENFORCE | CLEAR} [ник-или-маска] [причина]
 CHAN_AKICK_DISABLED
 	Извините, модификация списка автокиков канала временно недоступна.
 CHAN_AKICK_ALREADY_EXISTS
 	%s уже есть в списке автокиков канала %s.
 CHAN_AKICK_REACHED_LIMIT
-	Извините, Вы можете использовать для автокика только маски %d на канале.
+	Извините, но список автокика на канале может содержать лишь %d масок.
 CHAN_AKICK_ADDED
 	%s добавлен в список автокиков канала %s.
 CHAN_AKICK_NO_SUCH_ENTRY
@@ -1497,7 +1470,7 @@ CHAN_AKICK_NO_SUCH_ENTRY
 CHAN_AKICK_NOT_FOUND
 	%s не найден в списке автокиков канала %s.
 CHAN_AKICK_NO_MATCH
-	Нет таких значение в списке автокиков канала %s.
+	Нет совпадающих значений в списке автокиков канала %s.
 CHAN_AKICK_STUCK
 	%s теперь всегда активен на канале %s.
 CHAN_AKICK_UNSTUCK
@@ -1515,27 +1488,25 @@ CHAN_AKICK_LIST_HEADER
 CHAN_AKICK_LIST_FORMAT
 	  %3d %s (%s)
 CHAN_AKICK_VIEW_FORMAT
-	%3d %s (by %s on %s)
+	%3d %s (от %s в %s)
 	    %s
 CHAN_AKICK_VIEW_FORMAT_STUCK
-	%3d %s (перманентный) (by %s on %s)
+	%3d %s (перманентный) (от %s в %s)
 	    %s
 CHAN_AKICK_ENFORCE_DONE
-	AKICK ENFORCE на канале %s завершен; %d пользователей выкинуто.
-
-# LEVELS responses
+	AKICK ENFORCE на канале %s завершен, результаты: %d пользователей выкинуто.
 CHAN_AKICK_CLEAR
-	Channel %s akick list has been cleared.
+	Список AKICK'ов на канале %s был полностью очищен.
 
 # LEVELS responses
 CHAN_LEVELS_SYNTAX
 	LEVELS #канал {SET | DIS[ABLE] | LIST | RESET} [пункт [уровень]]
 CHAN_LEVELS_XOP
-	Эта команда не может быть использована в данном режиме.
+	Система уровней не доступна, так как используется система привилегий xOP.
 CHAN_LEVELS_RANGE
 	Уровень должен быть цифрой между %d и %d включительно.
 CHAN_LEVELS_CHANGED
-	Уровень %s на канале %s изменен на %d.
+	Уровень для %s на канале %s изменен на %d.
 CHAN_LEVELS_UNKNOWN
 	Неизвестный параметр %s. Напишите %R%s HELP LEVELS DESC для получения списка возможных значений.
 CHAN_LEVELS_DISABLED
@@ -1549,17 +1520,17 @@ CHAN_LEVELS_LIST_FOUNDER
 CHAN_LEVELS_LIST_NORMAL
 	    %-*s  %d
 CHAN_LEVELS_RESET
-	Уровни доступа для канала %s сброшены на значения по умолчанию.
+	Уровни доступа для канала %s сброшены на значения по-умолчанию.
 
 # Status Messages
 CHAN_STATUS_SYNTAX
-	STATUS ERROR Syntax error
+	STATUS ERROR Ошибка синтакса
 CHAN_STATUS_NOT_REGGED
-	STATUS ERROR Channel %s not registered
+	STATUS ERROR Канал %s не зарегистрирован
 CHAN_STATUS_FORBIDDEN
-	STATUS ERROR Channel %s forbidden
+	STATUS ERROR Канал %s запрещен к использованию
 CHAN_STATUS_NOTONLINE
-	STATUS ERROR Nick %s not online
+	STATUS ERROR Ник %s не в сети.
 CHAN_STATUS_INFO
 	STATUS %s %s %d
 
@@ -1569,43 +1540,43 @@ CHAN_INFO_SYNTAX
 CHAN_INFO_HEADER
 	Информация о канале %s:
 CHAN_INFO_FOUNDER
-	Владелец:                  %s (%s)
+	                  Владелец: %s (%s)
 CHAN_INFO_NO_FOUNDER
-	Владелец:                  %s
+	                  Владелец: %s
 CHAN_INFO_SUCCESSOR
-	Наследник:                 %s (%s)
+	                 Наследник: %s (%s)
 CHAN_INFO_NO_SUCCESSOR
-	Наследник:                 %s
+	                 Наследник: %s
 CHAN_INFO_DESCRIPTION
-	Описание:                  %s
+	                  Описание: %s
 CHAN_INFO_ENTRYMSG
-	Сообщение при входе:       %s
+	       Сообщение при входе: %s
 CHAN_INFO_TIME_REGGED
-	Зарегистрирован:           %s
+	           Зарегистрирован: %s
 CHAN_INFO_LAST_USED
-	Последний раз использован: %s
+	 Последний раз использован: %s
 CHAN_INFO_LAST_TOPIC
-	Последний топик:           %s
+	           Последний топик: %s
 CHAN_INFO_TOPIC_SET_BY
-	Топик установил:           %s
+	           Топик установил: %s
 CHAN_INFO_URL
-	URL:                       %s
+	                 URL-адрес: %s
 CHAN_INFO_EMAIL
-	Адрес E-mail:              %s
+	               Email-адрес: %s
 CHAN_INFO_BANTYPE
-	Тип бана:                  %d
+	                  Тип бана: %d
 CHAN_INFO_OPTIONS
-	Опции:                     %s
+	                     Опции: %s
 CHAN_INFO_OPT_KEEPTOPIC
-	Удерживание Топика
+	Хранение Топика
 CHAN_INFO_OPT_OPNOTICE
-	OP Уведомление
+	OP-уведомление
 CHAN_INFO_OPT_PEACE
 	Спокойствие
 CHAN_INFO_OPT_PRIVATE
 	Приватный
 CHAN_INFO_OPT_RESTRICTED
-	Ограниченный Доступ
+	Запретный
 CHAN_INFO_OPT_SECURE
 	Безопасность
 CHAN_INFO_OPT_SECUREOPS
@@ -1617,27 +1588,27 @@ CHAN_INFO_OPT_SIGNKICK
 CHAN_INFO_OPT_TOPICLOCK
 	Блокировка Топика
 CHAN_INFO_OPT_XOP
-	Система Списка Доступа xOP
+	Система привелегий xOP
 CHAN_INFO_OPT_NONE
 	Нет
 CHAN_INFO_MODE_LOCK
-	Блокировка режимов: %s
+	        Блокировка режимов: %s
 CHAN_INFO_EXPIRE
-	      Expires in: %s
+	      Регистрация истекает: %s
 CHAN_INFO_NO_EXPIRE
-	Этот канал никогда не истечет.
+	Этот канал никогда не истечет.
 
 # LIST responses
 CHAN_LIST_SYNTAX
-	LIST шаблон
+	LIST маска
 CHAN_LIST_SERVADMIN_SYNTAX
-	LIST шаблон [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
+	LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 CHAN_LIST_HEADER
-	Список записей, содержащий %s:
+	Список записей, совпадающий с %s:
 CHAN_LIST_FORMAT
 	    %-20s  %s
 CHAN_LIST_END
-	Конец списка - найдено %d/%d записей.
+	Конец списка - %d/%d совпадений показано.
 	
 # INVITE responses
 CHAN_INVITE_SYNTAX
@@ -1651,11 +1622,11 @@ CHAN_UNBANNED
 
 # TOPIC responses
 CHAN_TOPIC_SYNTAX
-	TOPIC #канал [топик]
+	TOPIC #канал [текст_топика]
 
 # CLEAR responses
 CHAN_CLEAR_SYNTAX
-	CLEAR #канал опция
+	CLEAR #канал что_именно
 CHAN_CLEARED_BANS
 	Все баны на канале %s были удалены.
 CHAN_CLEARED_EXCEPTS
@@ -1663,49 +1634,49 @@ CHAN_CLEARED_EXCEPTS
 CHAN_CLEARED_MODES
 	Все режимы на канале %s были сброшены.
 CHAN_CLEARED_OPS
-	Все опы были сняты на канале %s.
+	Все опы (+о) были сняты на канале %s.
 CHAN_CLEARED_HOPS
-	Mode +h has been cleared from channel %s.
+	Все хопы (+h) были сняты на канале %s.
 CHAN_CLEARED_VOICES
-	Все войсы были сняты на канале %s.
+	Все войсы (+v) были сняты на канале %s.
 CHAN_CLEARED_USERS
 	Все пользователи были выкинуты с канала %s.
 CHAN_CLEARED_INVITES
-	All invites on channel %s have been removed.
+	Все исключения на приглашение на канале %s были удалены.
 
 # GETPASS responses
 CHAN_GETPASS_SYNTAX
 	GETPASS #канал
 CHAN_GETPASS_UNAVAILABLE
-	Команда GETPASS недоступна при включенном шифровании.
+	Команда GETPASS недоступна, так как используется шифрование.
 CHAN_GETPASS_PASSWORD_IS
 	Пароль на канал %s - %s.
 	
-# SENDPASS responses
+# GETKEY responses
 CHAN_GETKEY_SYNTAX
-	GETKEY channel
+	GETKEY #канал
 CHAN_GETKEY_NOKEY
-	The channel %s has no key.
+	Канал %s не имеет ключа (no key).
 CHAN_GETKEY_KEY
-	Key for channel %s is %s.
+	Ключ для канала %s - %s.
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX
 	SENDPASS #канал
 CHAN_SENDPASS_UNAVAILABLE
-	Команда SENDPASS недоступна при включенном шифровании.
+	Команда SENDPASS недоступна, так как используется шифрование.
 CHAN_SENDPASS_SUBJECT
 	Пароль канала (%s)
 CHAN_SENDPASS_HEAD
-	Hi,
+	Здраствуйте,
 CHAN_SENDPASS_LINE_1
-	Вы просили %s выслать пароль от Вашего канала на e-mail.
+	Вы просили выслать пароль от Вашего канала %s на Ваш e-mail.
 CHAN_SENDPASS_LINE_2
-	Пароль Вашего канала %s. Для большей безопасности, Вам рекомендуется изменить как можно скорее.
+	Пароль канала %s. Для большей безопасности, Вам рекомендуется изменить его как можно скорее.
 CHAN_SENDPASS_LINE_3
-	Если Вы не запрашивали это письмо, пожалуйста проигнорируйте его.
+	Если Вы не запрашивали это письмо, просто проигнорируйте его.
 CHAN_SENDPASS_LINE_4
-	ПОЖАЛУЙСТА НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
+	ПОЖАЛУЙСТА, НЕ ОТВЕЧАЙТЕ НА ЭТО ПИСЬМО!
 CHAN_SENDPASS_LINE_5
 	Администраторы %s.
 CHAN_SENDPASS_OK
@@ -1741,13 +1712,13 @@ CHAN_UNSUSPEND_SYNTAX
 CHAN_UNSUSPEND_ERROR
 	Отсутствует # перед названием канала.
 CHAN_UNSUSPEND_SUCCEEDED
-	Канал %s восстановлен.
+	Канал %s был восстановлен из режима саспенда.
 CHAN_UNSUSPEND_FAILED
 	Невозможно восстановить канал %s!
 
 # Misc responses
 CHAN_EXCEPTED
-	Значения %s исключены на %s и не могут быть забанены пока исключения не будут удалены.
+	Значения %s исключены из бана на %s и не могут быть забанены, пока исключения не будут удалены.
 
 ###########################################################################
 #
@@ -1767,9 +1738,9 @@ MEMO_TYPE_READ_NUM
 MEMO_TYPE_LIST_NEW
 	Напишите %R%s LIST NEW чтобы посмотреть список соощений.
 MEMO_AT_LIMIT
-	Внимание: Ваш почтовый ящик для сообщений переполнен! У Вас уже (%d) сообщений. Вы не сможете принимать новые сообщения, пока Вы не удалите часть сообщений из ящика.
+	Внимание: Вы достигли максимально допустимого числа храненимых сообщений (%d). Вы не сможете принимать новые сообщения, пока Вы не удалите какие-нибудь лишние сообщения.
 MEMO_OVER_LIMIT
-	Внимание: Ваш почтовый ящик для сообщений переполнен! У Вас уже (%d) сообщений. Вы не сможете принимать новые сообщения, пока Вы не удалите часть сообщений из ящика.
+	Внимание: Вы превысили лимит максимального числа храненим сообщений (%d). Вы не сможете принимать новые сообщения, пока Вы не удалите какие-нибудь лишние сообщения.
 MEMO_X_MANY_NOTICE
 	%d сообщений на канале %s.
 MEMO_X_ONE_NOTICE
@@ -1793,46 +1764,45 @@ MEMO_LIST_NOT_FOUND
 
 # SEND responses
 MEMO_SEND_SYNTAX
-	SEND {ник | #канал} текст сообщения
+	SEND {ник | #канал} текст_сообщения
 MEMO_SEND_DISABLED
 	Извините, отправка сообщений временно приостановлена.
 MEMO_SEND_PLEASE_WAIT
-	Пожалуйста подождите %d секунд перед тем, как использовать команду SEND снова.
+	Пожалуйста, подождите %d секунд перед тем, как использовать команду SEND снова.
 MEMO_X_GETS_NO_MEMOS
 	%s не может принимать сообщения.
 MEMO_X_HAS_TOO_MANY_MEMOS
-	У %s переполнен ящик и в данный момент он не может принимать сообщения.
+	У %s переполнен ящик и в данный момент он не может больше принимать сообщения.
 MEMO_SENT
-	Сообщение отправлено %s.
+	Сообщение для %s отправлено.
 MEMO_MASS_SENT
-	Массовое сообщение было отправлено всем заргеистрированным пользователям.
+	Массовое сообщение было отправлено всем зарегистрированным пользователям.
 
-	
 # CANCEL responses
 MEMO_CANCEL_SYNTAX
 	CANCEL {ник | #канал}
 MEMO_CANCEL_DISABLED
 	Извините, отмена сообщений временно недоступна.
 MEMO_CANCEL_NONE
-	Нет сообщений, доступных дл отмены.
+	Нет сообщений, доступных для отмены.
 MEMO_CANCELLED
 	Последнее сообщение для %s было отменено.
 
 # LIST responses
 MEMO_LIST_SYNTAX
-	LIST [#канал] [list | NEW]
+	LIST [#канал] [список_записей | NEW]
 MEMO_HAVE_NO_NEW_MEMOS
 	У вас нет новых сообщений.
 MEMO_X_HAS_NO_NEW_MEMOS
 	У %s нет новых сообщений.
 MEMO_LIST_MEMOS
-	Сообщения для %s. Чтобы прочесть их, напишите: %R%s READ номер сообщения
+	Сообщения для %s. Чтобы прочесть их, напишите: %R%s READ номер_сообщения
 MEMO_LIST_NEW_MEMOS
-	Новые сообщения для %s. Чтобы прочесть их, напишите: %R%s READ номер сообщения
+	Новые сообщения для %s. Чтобы прочесть их, напишите: %R%s READ номер_сообщения
 MEMO_LIST_CHAN_MEMOS
-	Сообщения для %s. Чтобы прочесть их, напишите: %R%s READ %s номер сообщения
+	Сообщения для %s. Чтобы прочесть их, напишите: %R%s READ %s номер_сообщения
 MEMO_LIST_CHAN_NEW_MEMOS
-	Новые сообщения для %s.  Чтобы прочесть их, напишите: %R%s READ %s номер сообщения
+	Новые сообщения для %s. Чтобы прочесть их, напишите: %R%s READ %s номер сообщения
 MEMO_LIST_HEADER
 	Номер  Отправитель           Дата/Время
 MEMO_LIST_FORMAT
@@ -1840,7 +1810,7 @@ MEMO_LIST_FORMAT
 
 # READ responses
 MEMO_READ_SYNTAX
-	READ [#канал] {list | LAST | NEW}
+	READ [#канал] {список_записей | LAST | NEW}
 MEMO_HEADER
 	Сообщение %d от %s (%s). Чтобы удалить его, напишите команду: %R%s DEL %d
 MEMO_CHAN_HEADER
@@ -1850,7 +1820,7 @@ MEMO_TEXT
 
 # DEL responses
 MEMO_DEL_SYNTAX
-	DEL [#канал] {номер сообщения | list | ALL}
+	DEL [#канал] {номер сообщения | список_записей | ALL}
 MEMO_DELETED_NONE
 	Нет сообщений для удаления.
 MEMO_DELETED_ONE
@@ -1868,55 +1838,53 @@ MEMO_SET_SYNTAX
 MEMO_SET_DISABLED
 	Извините, установка опций для службы сообщений временно невозможна.
 MEMO_SET_UNKNOWN_OPTION
-	Неизвестная опуия SET %s.
+	Неизвестная SET-опция %s.
 
 # SET NOTIFY responses
 MEMO_SET_NOTIFY_SYNTAX
 	SET NOTIFY {ON | LOGON | NEW | OFF}
 MEMO_SET_NOTIFY_ON
-	%s будет уведомлять Вас о новых сообщениях, когда Вы зайдете в сеть и когда сообщения будут отправлены Вам.
+	%s будет уведомлять Вас о новых сообщениях, когда Вы идентифицируетесь и когда сообщения будут отправлены Вам.
 MEMO_SET_NOTIFY_LOGON
-	%s будет уведомлять Вас о новых сообщениях, когда Вы зайдете в сеть или снимете с себя флаг /AWAY.
+	%s будет уведомлять Вас о новых сообщениях, когда Вы идентифицируетесь или снимете с себя режим /AWAY.
 MEMO_SET_NOTIFY_NEW
 	%s будет уведомлять Вас о новых сообщениях, когда они будет отправлены Вам.
 MEMO_SET_NOTIFY_OFF
 	%s не будет уведомлять Вас о новых сообщениях.
-
-# SET LIMIT responses
 MEMO_SET_NOTIFY_MAIL
-	You will now be informed about new memos via email.
+	Теперь вы будете информированы о новых сообщениях с помощью email.
 MEMO_SET_NOTIFY_NOMAIL
-	You will no longer be informed via email.
+	Вы больше не будете информированы о новых сообщениях по email.
 MEMO_SET_NOTIFY_INVALIDMAIL
-	There's no email address set for your nick.
+	Для вашего ника не установлен email-адрес.
 
 # SET LIMIT responses
 MEMO_SET_LIMIT_SYNTAX
-	SET LIMIT [#канал] limit
+	SET LIMIT [#канал] предел
 MEMO_SET_LIMIT_SERVADMIN_SYNTAX
-	SET LIMIT [пользователь | #канал] {limit | NONE} [HARD]
+	SET LIMIT [пользователь | #канал] {предел | NONE} [HARD]
 MEMO_SET_YOUR_LIMIT_FORBIDDEN
-	Вы не можете изменить лимит сообщений для Вас.
+	Вам запрещено изменять свой лимит сообщений.
 MEMO_SET_LIMIT_FORBIDDEN
-	Лимит сообщений для %s был изменен.
+	Лимит сообщений для %s не может быть изменен.
 MEMO_SET_YOUR_LIMIT_TOO_HIGH
-	Вы не можете установить лимит сообщений больше, чем %d.
+	Вы не можете установить лимит сообщений больше чем %d.
 MEMO_SET_LIMIT_TOO_HIGH
 	Вы не можете установить лимит сообщений для %s больше чем %d.
 MEMO_SET_LIMIT_OVERFLOW
-	Лимит сообщений чересчур велик; уменьшите его до %d.
+	Лимит сообщений чересчур велик, уменьшите его до %d.
 MEMO_SET_YOUR_LIMIT
-	Лимит сообщений был установлен в %d.
+	Лимит сообщений был установлен на %d.
 MEMO_SET_YOUR_LIMIT_ZERO
 	Вы больше не будете принимать сообщения.
 MEMO_UNSET_YOUR_LIMIT
 	Лимит сообщений для Вас отключен.
 MEMO_SET_LIMIT
-	Лимит собщений для %s установлен равным %d.
+	Лимит собщений для %s установлен на %d.
 MEMO_SET_LIMIT_ZERO
-	Лимит сообщений для %s установлен равным 0.
+	Лимит сообщений для %s установлен на 0.
 MEMO_UNSET_LIMIT
-	Лимит сообщений для %s отключен.
+	Лимит сообщений для %s отключен.
 
 # INFO responses
 MEMO_INFO_SYNTAX
@@ -1932,29 +1900,29 @@ MEMO_INFO_MEMO_UNREAD
 MEMO_INFO_MEMOS
 	На данный момент у Вас есть %d сообщений.
 MEMO_INFO_MEMOS_ONE_UNREAD
-	На данный момент у Вас есть %d сообщений, из них 1 непрочитанное.
+	На данный момент у Вас есть %d сообщений, из них 1 непрочитанно.
 MEMO_INFO_MEMOS_SOME_UNREAD
 	На данный момент у Вас есть %d сообщений, из них %d непрочитанных.
 MEMO_INFO_MEMOS_ALL_UNREAD
-	На данный момент у Вас есть %d сообщений; все они не прочитаны Вами.
+	На данный момент у Вас есть %d сообщений и все они не прочитаны Вами.
 MEMO_INFO_LIMIT
 	Ваш лимит сообщений равен %d.
 MEMO_INFO_HARD_LIMIT
-	Ваш лимит сообщений равен %d, и не может быть изменен.
+	Ваш лимит сообщений равен %d и не может быть изменен.
 MEMO_INFO_LIMIT_ZERO
-	Ваш лимит сообщений равен 0; Вы не будете принимать любые новые сообщения.
+	Ваш лимит сообщений равен 0. Вы не будете принимать любые новые сообщения.
 MEMO_INFO_HARD_LIMIT_ZERO
-	Ваш лимит сообщений равен 0; Вы не будете принимать любые новые сообщения.  Вы не можете изменить этот лимит.
+	Ваш лимит сообщений равен 0, Вы не будете принимать любые новые сообщения и не можете изменить этот лимит.
 MEMO_INFO_NO_LIMIT
-	У вас нет ограничеиня на количество хранимых сообщений.
+	У вас нет ограничения на количество хранимых сообщений.
 MEMO_INFO_NOTIFY_OFF
 	Вы не будете уведомляться о новых собщениях.
 MEMO_INFO_NOTIFY_ON
-	Вы будете уведомляться о новых сообщениях при входе в сеть и по мере прихода новых сообщений.
+	Вы будете уведомляться о новых сообщениях при идентификации и по мере прихода новых сообщений.
 MEMO_INFO_NOTIFY_RECEIVE
-	Вы будете уведовляться сразу по приходе новых сообщений.
+	Вы будете уведовляться сразу по приходу новых сообщений.
 MEMO_INFO_NOTIFY_SIGNON
-	Вы будете уведомляться о приходе новых сообщений после входа в сеть.
+	Вы будете уведомляться о приходе новых сообщений после идентификации.
 MEMO_INFO_X_NO_MEMOS
 	%s сейчас не имеет сообщений.
 MEMO_INFO_X_MEMO
@@ -1968,84 +1936,57 @@ MEMO_INFO_X_MEMOS_ONE_UNREAD
 MEMO_INFO_X_MEMOS_SOME_UNREAD
 	%s сейчас имеет %d сообщений, %d из которых не прочитаны.
 MEMO_INFO_X_MEMOS_ALL_UNREAD
-	%s сейчас имеет %d сообщений; все они не прочитаны.
+	%s сейчас имеет %d сообщений, все они не прочитаны.
 MEMO_INFO_X_LIMIT
 	Лимит сообщений для %s равен %d.
 MEMO_INFO_X_HARD_LIMIT
-	Лимит собщений для %s равен %d, и не может быть изменен.
+	Лимит собщений для %s равен %d и не может быть изменен.
 MEMO_INFO_X_NO_LIMIT
 	У %s нет ограничения количества сообщений.
 MEMO_INFO_X_NOTIFY_OFF
 	%s не уведомляется о новых собщениях.
 MEMO_INFO_X_NOTIFY_ON
-	%s уведомляется о новых сообщениях после входа в сеть и по мере прихода собщений.
+	%s уведомляется о новых сообщениях после идентификации и по мере прихода собщений.
 MEMO_INFO_X_NOTIFY_RECEIVE
 	%s уведомляется о новых сообщениях по мере их прихода.
 MEMO_INFO_X_NOTIFY_SIGNON
-	%s уведомляется о новых сообщениях после захода в сеть.
+	%s уведомляется о новых сообщениях после идентификации.
 	
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+# Memo2Mail responses
 MEMO_MAIL_SUBJECT
-	New memo
+	Новое мемо-сообщение
 MEMO_MAIL_TEXT1
-	Hi %s
+	Здраствуйте %s
 MEMO_MAIL_TEXT2
-	You've just received a new memo from %s. This is memo number %d.
+	Вы получили новое мемо-сообщение от %s. Номер этого сообщения: %d.
 MEMO_MAIL_TEXT3
-	Memo Text:
-
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
+	Текст сообщения:
 	
-# Standard responses
+# RSEND responses
 MEMO_RSEND_PLEASE_WAIT
-	Please wait %d seconds before using the RSEND command again.
+	Пожалуйста, подождите %d секунд прежде чем использовать команду RSEND снова.
 MEMO_RSEND_DISABLED
-	Sorry, RSEND has been disabled on this network.
+	Извините, но команда RSEND запрещена в этой IRC-сети.
 MEMO_RSEND_SYNTAX
-	RSEND {nick | channel} memo-text
+	RSEND {ник | #канал} текст
 MEMO_RSEND_NICK_MEMO_TEXT
-	[auto-memo] The memo you sent has been viewed.
+	[авто-сообщение] Мемо-сообщение, которые вы посылали, было прочитано.
 MEMO_RSEND_CHAN_MEMO_TEXT
-	[auto-memo] The memo you sent to %s has been viewed.
+	[авто-сообщение] Мемо-сообщение, которые вы посылали %s, было прочитано.
 MEMO_RSEND_USER_NOTIFICATION
-	A notification memo has been sent to %s informing him/her you have
-	read his/her memo.
+	Мемо-извещение было послано для %s, информирующее его/ее о том, что вы прочитали его/ее сообщение.
 
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+# CHECK responses
 MEMO_CHECK_SYNTAX
-	CHECK nickname
+	CHECK ник
 MEMO_CHECK_NOT_READ
-	The last memo you sent to %s (sent on %s) has not yet been read.
+	Последнее сообщение, которое вы посылали для %s (дата: %s) еще не прочитано.
 MEMO_CHECK_READ
-	The last memo you sent to %s (sent on %s) has been read.
+	Последнее сообщение, которое вы посылали для %s (дата: %s) уже прочитано.
 MEMO_CHECK_NO_MEMO
-	Nick %s doesn't have a memo from you.
-
-###########################################################################
-#
-# BotServ messages
-#
-###########################################################################
-	
-# Standard responses
+	Ник %s не получал от вас никаких сообщений.
 MEMO_NO_RSEND_SELF
-	You can not request a receipt when sending a memo to yourself.
+	Вы не можете запросить информацию о получении, когда посылаете сообщение себе.
 
 ###########################################################################
 #
@@ -2064,44 +2005,44 @@ BOT_NOT_ON_CHANNEL
 	
 # Kick reasons (must be a single line)
 BOT_REASON_BADWORD
-	Запрещено использовать слово %s на этом канале!
+	Слово %s запрещено на этом канале!
 BOT_REASON_BADWORD_GENTLE
 	Следи за своим языком!
 BOT_REASON_BOLD
-	Не используйте жирный шрифт на этом канале!
+	Не используй жирный шрифт на этом канале!
 BOT_REASON_CAPS
-	Выключите CapsLOCK!
+	Выключи CapsLOCK!
 BOT_REASON_COLOR
-	Не используйте выделение цветом на этом канале!
+	В глазах уже рябит от твоих цветов в словах!
 BOT_REASON_FLOOD
 	Хватит флудить!
 BOT_REASON_REPEAT
-	Хватить повторов!
+	Хватит повторов!
 BOT_REASON_REVERSE
-	Не используйте инверсию на этом канале!
+	Не используй инверсию на этом канале!
 BOT_REASON_UNDERLINE
-	Не используйте цвета на этом канале!
+	Не используй подчеркивания на этом канале!
 	
 # !seen replies
 BOT_SEEN_BOT
-	Ты нашел меня, %s!
+	Да-да, %s, умный ход спрашивать у бота где он...
 BOT_SEEN_YOU
-	Любуешься собой, %s?
+	Любуешься собой в зеркале, да, %s?
 BOT_SEEN_ON_CHANNEL
-	%s на канале прямо сейчас!
+	Если вы не видите %s на этом канале, то вам нужны новые глаза...
 BOT_SEEN_ON_CHANNEL_AS
-	%s на канале прямо сейчас (под ником %s) ! 
+	Хитрюга %s шифруется! Он на канале, но под ником %s! 
 BOT_SEEN_ON
-	%s последний раз был %s назад.
+	Дух %s последний раз был здесь %s назад.
 BOT_SEEN_NEVER
-	Я никогда не видел %s на канале.
+	Что? Какой еще %s? Никогда не видел его на канале...
 BOT_SEEN_UNKNOWN
-	Я не знаю кто такой %s.
+	Кто такой %s я не знаю и знать не хочу.
 
 # BOT responses
 BOT_BOT_SYNTAX
-	BOT ADD ник идент хост реальное имя
-	BOT CHANGE старый ник новый ник [идент [хост [реальное имя]]]
+	BOT ADD ник идент хост реальное_имя
+	BOT CHANGE старый ник новый ник [идент [хост [реальное_имя]]]
 	BOT DEL ник
 BOT_BOT_ALREADY_EXISTS
 	Бот %s уже существует.
@@ -2112,7 +2053,7 @@ BOT_BOT_READONLY
 BOT_BOT_ADDED
 	%s!%s@%s (%s) добавлен в список ботов.
 BOT_BOT_ANY_CHANGES
-	Старая информация эквивалентна новой.
+	Старая информация не отличается от новой.
 BOT_BOT_CHANGED
 	Бот %s был изменен на %s!%s@%s (%s)
 BOT_BOT_DELETED
@@ -2122,7 +2063,7 @@ BOT_BOT_DELETED
 BOT_BOTLIST_HEADER
 	Список ботов:
 BOT_BOTLIST_PRIVATE_HEADER
-	Боты, зарезервированные для IRC Операторов:
+	Боты, зарезервированные для IRC-Операторов:
 BOT_BOTLIST_FOOTER
 	%d ботов доступно.
 BOT_BOTLIST_EMPTY
@@ -2131,7 +2072,7 @@ BOT_BOTLIST_EMPTY
 	
 # ASSIGN responses
 BOT_ASSIGN_SYNTAX
-	ASSIGN chan nick
+	ASSIGN #канал ник
 BOT_ASSIGN_READONLY
 	Извините, назначение ботов на канал временно недоступно.
 BOT_ASSIGN_ALREADY
@@ -2149,19 +2090,19 @@ BOT_UNASSIGN_UNASSIGNED
 BOT_INFO_SYNTAX
 	INFO {#канал | ник}
 BOT_INFO_NOT_FOUND
-	%s не является ботом или зарегистрированным каналом.
+	%s не является ником бота или зарегистрированным каналом.
 BOT_INFO_BOT_HEADER
 	Информация о боте %s:
 BOT_INFO_BOT_MASK
-	       Маска    : %s@%s
+	          Маска : %s@%s
 BOT_INFO_BOT_REALNAME
-	Реальное имя    : %s
+	   Реальное имя : %s
 BOT_INFO_BOT_CREATED
-	      Создан    : %s
+	         Создан : %s
 BOT_INFO_BOT_USAGE
-	Используется на : %d channel(s)
+	Используется на : %d каналe(ах)
 BOT_INFO_BOT_OPTIONS
-	    Опции       : %s
+	          Опции : %s
 BOT_INFO_OPT_PRIVATE
 	Частный
 BOT_INFO_CHAN_HEADER
@@ -2223,7 +2164,7 @@ BOT_INFO_OPT_FANTASY
 BOT_INFO_OPT_GREET
 	Приветствие
 BOT_INFO_OPT_NOBOT
-	Без-бота
+	Без бота
 BOT_INFO_OPT_SYMBIOSIS
 	Симбиоз
 BOT_INFO_OPT_NONE
@@ -2231,7 +2172,7 @@ BOT_INFO_OPT_NONE
 	
 # SET responses
 BOT_SET_SYNTAX
-	SET #канал опция параметр
+	SET (#канал | бот) опция установка
 BOT_SET_DISABLED
 	Извините, установка опций бота временно недоступна.
 BOT_SET_UNKNOWN
@@ -2258,41 +2199,41 @@ BOT_SET_DONTKICKVOICES_OFF
 BOT_SET_FANTASY_SYNTAX
 	SET #канал FANTASY {ON|OFF}
 BOT_SET_FANTASY_ON
-	Режим Фантазии ВКЛЮЧЕНЫ на канале %s.
+	Режим Фантазии на канале %s ВКЛЮЧЕНЫ.
 BOT_SET_FANTASY_OFF
-	Режим Фантазии ВЫКЛЮЧЕН на канале %s.
+	Режим Фантазии на канале %s ВЫКЛЮЧЕН.
 	
 # SET GREET messages
 BOT_SET_GREET_SYNTAX
 	SET #канал GREET {ON|OFF}
 BOT_SET_GREET_ON
-	Режим приветствий on channel %s ВКЛЮЧЕН.
+	Режим приветствий на канале %s ВКЛЮЧЕН.
 BOT_SET_GREET_OFF
-	Режим приветствий on channel %s ВЫКЛЮЧЕН.
+	Режим приветствий на канале %s ВЫКЛЮЧЕН.
 	
 # SET NOBOT
 BOT_SET_NOBOT_SYNTAX
 	SET #канал NOBOT {ON|OFF}
 BOT_SET_NOBOT_ON
-	Режим Без-бота ВКЛЮЧЕН на канале %s.
+	Режим Без-бота на канале %s ВКЛЮЧЕН.
 BOT_SET_NOBOT_OFF
-	Режим Без-бота ВЫКЛЮЧЕН на канале %s.
+	Режим Без-бота на канале %s ВЫКЛЮЧЕН.
 
 # SET PRIVATE
 BOT_SET_PRIVATE_SYNTAX
-	SET #канал PRIVATE {ON|OFF}
+	SET ник_бота PRIVATE {ON|OFF}
 BOT_SET_PRIVATE_ON
-	Частный режим на канале %s is now ВКЛЮЧЕН.
+	Частный режим на бота %s УСТАНОВЛЕН.
 BOT_SET_PRIVATE_OFF
-	Частный режим на канале %s is now ВЫКЛЮЧЕН.
+	Частный режим с бота %s был СНЯТ.
 
 # SET SYMBIOSIS
 BOT_SET_SYMBIOSIS_SYNTAX
 	SET #канал SYMBIOSIS {ON|OFF}
 BOT_SET_SYMBIOSIS_ON
-	Режим Симбиоза ВКЛЮЧЕН на канале %s.
+	Режим Симбиоза на канале %s ВКЛЮЧЕН.
 BOT_SET_SYMBIOSIS_OFF
-	Режим Симбиоза ВЫКЛЮЧЕН на канале %s.
+	Режим Симбиоза на канале %s ВЫКЛЮЧЕН.
 	
 # KICK responses
 BOT_KICK_SYNTAX
@@ -2303,7 +2244,7 @@ BOT_KICK_UNKNOWN
 	Неизвестная опция %s.
 	Напишите %R%S HELP KICK для получения более полной информации.
 BOT_KICK_BAD_TTB
-	%s не может быть забанен сейчас.
+	%s не может быть установлено как кол-во киков до бана.
 
 BOT_KICK_BADWORDS_ON
 	Бот будет кикать за плохие слова. Используйте команду BADWORDS
@@ -2325,7 +2266,7 @@ BOT_KICK_CAPS_ON
 	Бот будет кикать за использование CapsLOCK (фраза должна содержать
 	%d больших символов или они должны составлять не менее %d%% от всего сообщения).
 BOT_KICK_CAPS_ON_BAN
-	Бот будет кикать за использование CapsLOCK фраза должна содержать
+	Бот будет кикать за использование CapsLOCK (фраза должна содержать
 	%d больших символов или они должны составлять не менее %d%% от всего сообщения), и банить
 	после %d киков данного пользователя.
 BOT_KICK_CAPS_OFF
@@ -2356,14 +2297,14 @@ BOT_KICK_REPEAT_OFF
 BOT_KICK_REVERSES_ON
 	Бот будет кикать за инверсии.
 BOT_KICK_REVERSES_ON_BAN
-	Бот будет кикать за инверсии, и банить через %d 
+	Бот будет кикать за инверсии, и банить после %d 
 	киков данного пользователя.
 BOT_KICK_REVERSES_OFF
 	Бот не будет кикать за инверсии.
 BOT_KICK_UNDERLINES_ON
 	Бот будет кикать за использование подчеркивания.
 BOT_KICK_UNDERLINES_ON_BAN
-	Бот будет кикать за использование подчеркивания., и банить после %d 
+	Бот будет кикать за использование подчеркивания, и банить после %d 
 	киков данного пользователя.
 BOT_KICK_UNDERLINES_OFF
 	Бот не будет кикать за использование подчеркивания.
@@ -2394,7 +2335,7 @@ BOT_BADWORDS_DELETED_SEVERAL
 BOT_BADWORDS_LIST_EMPTY
 	Список плохих слов %s пуст.
 BOT_BADWORDS_LIST_HEADER
-	Список плохих слов %s:
+	Список плохих слов для %s:
 	 Номер   Слово                           Тип
 BOT_BADWORDS_LIST_FORMAT
 	  %3d   %-30s %s
@@ -2419,7 +2360,7 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	Идент бота должен содержать только допустимые символы для идента.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Идент бота не должен превышать 9 символов.
 
 ###########################################################################
 #
@@ -2439,7 +2380,7 @@ OPER_GLOBAL_SYNTAX
 
 # STATS responses
 OPER_STATS_UNKNOWN_OPTION
-	Неизвестная опция STATS %s.
+	Неизвестная STATS-опция %s.
 OPER_STATS_CURRENT_USERS
 	Пользователи: %d (%d Операторов)
 OPER_STATS_MAX_USERS
@@ -2477,99 +2418,97 @@ OPER_STATS_UPTIME_1MS
 OPER_STATS_UPTIME_1M1S
 	Сервисы работают %d минуту, %d секунду
 OPER_STATS_BYTES_READ
-	Байт прочитано                        : %5d kB
+	Байт считано    : %5d kB
 OPER_STATS_BYTES_WRITTEN
-	Байт записано                         : %5d kB
+	Байт записано   : %5d kB
 OPER_STATS_USER_MEM
-	Пользователи                          : %6d записей, %5d kB
+	Пользователи    : %6d записей, %5d kB
 OPER_STATS_CHANNEL_MEM
-	Каналы                                : %6d записей, %5d kB
+	Каналы          : %6d записей, %5d kB
 OPER_STATS_GROUPS_MEM
-	Групп ников                           : %6d записей, %5d kB
+	NS-Групп        : %6d записей, %5d kB
 OPER_STATS_ALIASES_MEM
-	Алиасов ников                         : %6d записей, %5d kB
+	NS-Алиасов      : %6d записей, %5d kB
 OPER_STATS_CHANSERV_MEM
-	ChanServ                              : %6d записей, %5d kB
+	ChanServ        : %6d записей, %5d kB
 OPER_STATS_BOTSERV_MEM
-	BotServ                               : %6d записей, %5d kB
+	BotServ         : %6d записей, %5d kB
 OPER_STATS_OPERSERV_MEM
-	OperServ                              : %6d записей, %5d kB
+	OperServ        : %6d записей, %5d kB
 OPER_STATS_SESSIONS_MEM
-	Сессии                                : %6d записей, %5d kB
+	Сессии          : %6d записей, %5d kB
 OPER_STATS_AKILL_COUNT
-	Количество AKILL'ов                   : %d
+	Текущее количество AKILL'ов           : %d
 OPER_STATS_AKILL_EXPIRE_DAYS
-	Время истечения AKILL'а по умолчанию  : %d дней
+	Время истечения AKILL'а по-умолчанию  : %d дней
 OPER_STATS_AKILL_EXPIRE_DAY
-	Время истечения AKILL'а по умолчанию  : 1 день
+	Время истечения AKILL'а по-умолчанию  : 1 день
 OPER_STATS_AKILL_EXPIRE_HOURS
-	Время истечения AKILL'а по умолчанию  : %d часов
+	Время истечения AKILL'а по-умолчанию  : %d часов
 OPER_STATS_AKILL_EXPIRE_HOUR
-	Время истечения AKILL'а по умолчанию  : 1 час
+	Время истечения AKILL'а по-умолчанию  : 1 час
 OPER_STATS_AKILL_EXPIRE_MINS
-	Время истечения AKILL'а по умолчанию  : %d минут
+	Время истечения AKILL'а по-умолчанию  : %d минут
 OPER_STATS_AKILL_EXPIRE_MIN
-	Время истечения AKILL'а по умолчанию  : 1 минута
+	Время истечения AKILL'а по-умолчанию  : 1 минута
 OPER_STATS_AKILL_EXPIRE_NONE
-	Время истечения AKILL'а по умолчанию  : Не истекает
+	Время истечения AKILL'а по-умолчанию  : Не истекает
 OPER_STATS_SGLINE_COUNT
-	Количество SGLINEs                    : %d
+	Текущее количество SGLINE'ов          : %d
 OPER_STATS_SGLINE_EXPIRE_DAYS
-	Время истечения SGLINE'а по умолчанию : %d дней
+	Время истечения SGLINE'а по-умолчанию : %d дней
 OPER_STATS_SGLINE_EXPIRE_DAY
-	Время истечения SGLINE'а по умолчанию : 1 день
+	Время истечения SGLINE'а по-умолчанию : 1 день
 OPER_STATS_SGLINE_EXPIRE_HOURS
-	Время истечения SGLINE'а по умолчанию : %d часов
+	Время истечения SGLINE'а по-умолчанию : %d часов
 OPER_STATS_SGLINE_EXPIRE_HOUR
-	Время истечения SGLINE'а по умолчанию : 1 час
+	Время истечения SGLINE'а по-умолчанию : 1 час
 OPER_STATS_SGLINE_EXPIRE_MINS
-	Время истечения SGLINE'а по умолчанию : %d минут
+	Время истечения SGLINE'а по-умолчанию : %d минут
 OPER_STATS_SGLINE_EXPIRE_MIN
-	Время истечения SGLINE'а по умолчанию : 1 минута
+	Время истечения SGLINE'а по-умолчанию : 1 минута
 OPER_STATS_SGLINE_EXPIRE_NONE
-	Время истечения SGLINE'а по умолчанию : Не истекает
+	Время истечения SGLINE'а по-умолчанию : Не истекает
 OPER_STATS_SQLINE_COUNT
-	Количество SQLINE'ов                  : %d
+	Текущее количество SQLINE'ов          : %d
 OPER_STATS_SQLINE_EXPIRE_DAYS
-	Время истечения SQGLINE'а по умолчанию: %d дней
+	Время истечения SQGLINE'а по-умолчанию: %d дней
 OPER_STATS_SQLINE_EXPIRE_DAY
-	Время истечения SQGLINE'а по умолчанию: 1 день
+	Время истечения SQGLINE'а по-умолчанию: 1 день
 OPER_STATS_SQLINE_EXPIRE_HOURS
-	Время истечения SQGLINE'а по умолчанию: %d часов
+	Время истечения SQGLINE'а по-умолчанию: %d часов
 OPER_STATS_SQLINE_EXPIRE_HOUR
-	Время истечения SQGLINE'а по умолчанию: 1 час
+	Время истечения SQGLINE'а по-умолчанию: 1 час
 OPER_STATS_SQLINE_EXPIRE_MINS
-	Время истечения SQGLINE'а по умолчанию: %d минут
+	Время истечения SQGLINE'а по-умолчанию: %d минут
 OPER_STATS_SQLINE_EXPIRE_MIN
-	Время истечения SQGLINE'а по умолчанию: 1 минута
+	Время истечения SQGLINE'а по-умолчанию: 1 минута
 OPER_STATS_SQLINE_EXPIRE_NONE
-	Время истечения SQGLINE'а по умолчанию: Не истекает
+	Время истечения SQGLINE'а по-умолчанию: Не истекает
 OPER_STATS_SZLINE_COUNT
-	Количество SZLINE'ов                  : %d
+	Текущее количество SZLINE'ов          : %d
 OPER_STATS_SZLINE_EXPIRE_DAYS
-	Время истечения SZLINE'а по умолчанию : %d дней
+	Время истечения SZLINE'а по-умолчанию : %d дней
 OPER_STATS_SZLINE_EXPIRE_DAY
-	Время истечения SZLINE'а по умолчанию : 1 день
+	Время истечения SZLINE'а по-умолчанию : 1 день
 OPER_STATS_SZLINE_EXPIRE_HOURS
-	Время истечения SZLINE'а по умолчанию : %d часов
+	Время истечения SZLINE'а по-умолчанию : %d часов
 OPER_STATS_SZLINE_EXPIRE_HOUR
-	Время истечения SZLINE'а по умолчанию : 1 час
+	Время истечения SZLINE'а по-умолчанию : 1 час
 OPER_STATS_SZLINE_EXPIRE_MINS
-	Время истечения SZLINE'а по умолчанию : %d минут
+	Время истечения SZLINE'а по-умолчанию : %d минут
 OPER_STATS_SZLINE_EXPIRE_MIN
-	Время истечения SZLINE'а по умолчанию : 1 минута
+	Время истечения SZLINE'а по-умолчанию : 1 минута
 OPER_STATS_SZLINE_EXPIRE_NONE
-	Время истечения SZLINE'а по умолчанию : Не истекает
+	Время истечения SZLINE'а по-умолчанию : Не истекает
 OPER_STATS_RESET
 	Статистика сброшена.
-
-# MODE responses
 OPER_STATS_UPLINK_SERVER
-	Uplink server: %s
+	Uplink-сервер: %s
 OPER_STATS_UPLINK_CAPAB
 	Uplink capab: %s
 OPER_STATS_UPLINK_SERVER_COUNT
-	Servers found: %d
+	Серверов найдено: %d
 
 # MODE responses
 OPER_MODE_SYNTAX
@@ -2579,7 +2518,7 @@ OPER_MODE_SYNTAX
 OPER_UMODE_SYNTAX
 	UMODE ник режимы
 OPER_UMODE_SUCCESS
-	Режимы изменены %s.
+	Режимы %s изменены.
 OPER_UMODE_CHANGED
 	%s изменил Ваши режимы пользователя.
 
@@ -2587,9 +2526,9 @@ OPER_UMODE_CHANGED
 OPER_OLINE_SYNTAX
 	OLINE ник флаги
 OPER_OLINE_SUCCESS
-	Оперфлаги %s были добавлены для %s.
+	Оперфлаги для %s изменены на %s
 OPER_OLINE_IRCOP
-	Теперь Вы IRC Оператор.
+	Теперь Вы IRC-Оператор.
 
 # CLEARMODES responses
 OPER_CLEARMODES_SYNTAX
@@ -2597,7 +2536,7 @@ OPER_CLEARMODES_SYNTAX
 OPER_CLEARMODES_DONE
 	Двоичные режимы и баны очищены на канале %s.
 OPER_CLEARMODES_ALL_DONE
-	Все режимы очищены на канале %s.
+	Все режимы на канале %s были сброшены.
 
 
 # KICK responses
@@ -2614,17 +2553,17 @@ OPER_SVSNICK_NEWNICK
 OPER_ADMIN_SYNTAX
 	ADMIN {ADD|DEL|LIST|CLEAR} [ник | номер записи]
 OPER_ADMIN_SKELETON
-	Сервисы работают в режиме skeleton; команда ADMIN недоступна.
+	Сервисы работают в skeleton-режиме, команда ADMIN недоступна.
 OPER_ADMIN_EXISTS
 	%s уже есть в списках Администраторов сервисов.
 OPER_ADMIN_REACHED_LIMIT
-	Извините, в Вас может быть только %d Администраторов сервисов.
+	Извините, может быть только %d Администраторов сервисов.
 OPER_ADMIN_ADDED
 	%s добавлен в список Администраторов сервисов.
 OPER_ADMIN_NOT_FOUND
 	%s не найден в списке Администраторов сервисов.
 OPER_ADMIN_NO_MATCH
-	Нет таких значений в списке Администраторов сервисок.
+	Нет совпадающих значений в списке Администраторов сервисов.
 OPER_ADMIN_DELETED
 	%s удален из списка Администраторов сервисов.
 OPER_ADMIN_DELETED_ONE
@@ -2641,23 +2580,23 @@ OPER_ADMIN_LIST_FORMAT
 OPER_ADMIN_CLEAR
 	Список Администраторов сервисов очищен.
 OPER_ADMIN_MOVED
-	%s has been moved to Services Administrators list.
+	%s был перемещен в список Администраторов Сервисов.
 
 # OPER responses
 OPER_OPER_SYNTAX
 	OPER {ADD|DEL|LIST|CLEAR} [ник | номер записи]
 OPER_OPER_SKELETON
-	Сервисы работают в режиме skeleton; команда OPER недоступна.
+	Сервисы работают в skeleton-режиме, команда OPER недоступна.
 OPER_OPER_EXISTS
 	%s уже есть в списках Операторов сервисов.
 OPER_OPER_REACHED_LIMIT
-	Извините, в Вас может быть только %d Операторов сервисов.
+	Извините, но может быть только %d Операторов сервисов.
 OPER_OPER_ADDED
 	%s добавлен в список Операторов сервисов.
 OPER_OPER_NOT_FOUND
 	%s не найден в списке Операторов сервисов.
 OPER_OPER_NO_MATCH
-	Нет таких значений в списке Операторов сервисок.
+	Нет совпадающих значений в списке Операторов сервисов.
 OPER_OPER_DELETED
 	%s удален из списка Операторов сервисов.
 OPER_OPER_DELETED_ONE
@@ -2674,11 +2613,11 @@ OPER_OPER_LIST_FORMAT
 OPER_OPER_CLEAR
 	Список Операторов сервисов очищен.
 OPER_OPER_MOVED
-	%s has been moved to Services Operators list.
+	%s был перемещен в список Операторов Сервисов.
 
 # AKILL responses
 OPER_AKILL_SYNTAX
-	AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+время истечения] {маска | номер записи} [причина]]
+	AKILL {ADD | DEL | LIST | VIEW | CLEAR} [[+время_истечения] {маска | номер записи} [причина]]
 OPER_AKILL_EXISTS
 	%s уже есть в списке AKILL'ов.
 OPER_AKILL_ALREADY_COVERED
@@ -2686,7 +2625,7 @@ OPER_AKILL_ALREADY_COVERED
 OPER_AKILL_REACHED_LIMIT
 	Извините, Вы можете иметь только %d AKILL'ов.
 OPER_AKILL_NO_NICK
-	Помните: маска AKILL'а не может содержать ники; удостоверьтесь, что ник не не включен в указанную Вами маску.
+	Помните: маска AKILL'а не может содержать ники, удостоверьтесь, что ник не не включен в указанную Вами маску.
 OPER_AKILL_ADDED
 	%s добавлен в список AKILL'ов.
 OPER_AKILL_CHANGED
@@ -2694,7 +2633,7 @@ OPER_AKILL_CHANGED
 OPER_AKILL_NOT_FOUND
 	%s не найден в списке AKILL'ов.
 OPER_AKILL_NO_MATCH
-	Нет таких записей в списке AKILL'ов.
+	Нет совпадающих записей в списке AKILL'ов.
 OPER_AKILL_DELETED
 	%s удален из списка AKILL'ов.
 OPER_AKILL_DELETED_ONE
@@ -2710,19 +2649,17 @@ OPER_AKILL_LIST_FORMAT
 	  %3d   %-32s  %s
 OPER_AKILL_VIEW_HEADER
 	Текущий список AKILL'ов:
-# номер, маска, кем поставлен, когда поставлен, когда истекает, причина
+# номер, маска, поставил, когда, истекает, причина
 OPER_AKILL_VIEW_FORMAT
-	%3d  %s (by %s on %s; %s)
+	%3d  %s (от %s в %s; %s)
 	      %s
 OPER_AKILL_CLEAR
 	Список AKILL'ов очищен.
-	
-# SGLINE responses
 OPER_CHANKILL_SYNTAX
-	CHANKILL [+expiry] {#channel} [reason]
-# SGLINE responses
+	CHANKILL [+истечение] {#канал} [причина]
+	# SGLINE responses
 OPER_SGLINE_SYNTAX
-	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время истечения] {маска | номер записи}[:причина]]
+	SGLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время_истечения] {маска | номер записи}[:причина]]
 OPER_SGLINE_UNSUPPORTED
 	Извините, использование SGLINE недоступно в этой сети.
 OPER_SGLINE_EXISTS
@@ -2730,7 +2667,7 @@ OPER_SGLINE_EXISTS
 OPER_SGLINE_ALREADY_COVERED
 	%s уже прикрыт %s.
 OPER_SGLINE_REACHED_LIMIT
-	Извините, Вы можете иметь только %d SGLINE'ов.
+	Извините, Вы можете иметь только %d записей SGLINE'ов.
 OPER_SGLINE_ADDED
 	%s добавлен в список SGLINE'ов.
 OPER_SGLINE_CHANGED
@@ -2754,24 +2691,24 @@ OPER_SGLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 OPER_SGLINE_VIEW_HEADER
 	Текущий список SGLINE'ов:
-# номер, маска, кем поставлен, когда поставлен, когда истекает, причина
+# номер, маска, поставил, когда, истекает, причина
 OPER_SGLINE_VIEW_FORMAT
-	%3d  %s (by %s on %s; %s)
+	%3d  %s (от %s в %s; %s)
 	      %s
 OPER_SGLINE_CLEAR
 	Список SGLINE'ов очищен.
 
 # SQLINE responses
 OPER_SQLINE_SYNTAX
-	SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время истечения] {маска | номер записи} [причина]]
+	SQLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время_истечения] {маска | номер записи} [причина]]
 OPER_SQLINE_CHANNELS_UNSUPPORTED
-	Извините, использование SQLINE недоступно в этой сети.
+	Извините, использование SQLINE для каналов недоступно в этой сети.
 OPER_SQLINE_EXISTS
 	%s уже есть в списке SQLINE'ов.
 OPER_SQLINE_ALREADY_COVERED
 	%s уже прикрыт %s.
 OPER_SQLINE_REACHED_LIMIT
-	Извините, Вы можете иметь только %d SQLINE'ов.
+	Извините, но Вы можете иметь только %d записей SQLINE'ов.
 OPER_SQLINE_ADDED
 	%s добавлен в список SQLINE'ов.
 OPER_SQLINE_CHANGED
@@ -2795,16 +2732,16 @@ OPER_SQLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 OPER_SQLINE_VIEW_HEADER
 	Текущий список SQLINE'ов:
-# номер, маска, кем поставлен, когда поставлен, когда истекает, причина
+# номер, маска, поставил, когда, истекает, причина
 OPER_SQLINE_VIEW_FORMAT
-	%3d  %s (by %s on %s; %s)
+	%3d  %s (от %s в %s; %s)
 	      %s
 OPER_SQLINE_CLEAR
 	Список SQLINE'ов очищен.
 
 # SZLINE responses
 OPER_SZLINE_SYNTAX
-	SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время истечения] {маска | номер записи} [причина]]
+	SZLINE {ADD | DEL | LIST | VIEW | CLEAR} [[+время_истечения] {маска | номер записи} [причина]]
 OPER_SZLINE_UNSUPPORTED
 	Извините, использование SZLINE недоступно в этой сети.
 OPER_SZLINE_EXISTS
@@ -2822,7 +2759,7 @@ OPER_SZLINE_CHANGED
 OPER_SZLINE_NOT_FOUND
 	%s не найден в списке SZLINE'ов.
 OPER_SZLINE_NO_MATCH
-	Нет таких записей в списке SZLINE'ов.
+	Нет совпадающих записей в списке SZLINE'ов.
 OPER_SZLINE_DELETED
 	%s удален из списка SZLINE'ов.
 OPER_SZLINE_DELETED_ONE
@@ -2838,9 +2775,9 @@ OPER_SZLINE_LIST_FORMAT
 	  %3d   %-32s  %s
 OPER_SZLINE_VIEW_HEADER
 	Текущий список SZLINE'ов:
-# номер, маска, кем поставлен, когда поставлен, когда истекает, причина
+# номер, маска, поставил, когда, истекает, причина
 OPER_SZLINE_VIEW_FORMAT
-	%3d  %s (by %s on %s; %s)
+	%3d  %s (от %s в %s; %s)
 	      %s
 OPER_SZLINE_CLEAR
 	Список SZLINE'ов очищен.
@@ -2855,60 +2792,60 @@ OPER_SET_IGNORE_OFF
 OPER_SET_IGNORE_ERROR
 	Опция IGNORE должна иметь значения только ON или OFF.
 OPER_SET_READONLY_ON
-	Сервисы сейчас в режиме только чтение.
+	Теперь сервисы в режиме только чтение.
 OPER_SET_READONLY_OFF
-	Сервисы сейчас в режиме чтения-записи.
+	Теперь сервисы в режиме чтения-записи.
 OPER_SET_READONLY_ERROR
 	Опция READONLY должна иметь значения только ON или OFF.
 OPER_SET_LOGCHAN_ON
-	Теперь сервисы будут вести лог в канал %s.
+	Теперь сервисы будут вести лог на канал %s.
 OPER_SET_LOGCHAN_OFF
-	Сервисы больше не будут вести лог в канал.
+	Сервисы больше не будут вести лог на канал.
 OPER_SET_LOGCHAN_ERROR
-	Опция LOGCHAN должна иметь значения только ON или OFF и должен быть определен параметр LogChannel в конфигурации сервисов.
+	Опция LOGCHAN должна иметь значения только ON или OFF и должен быть определен параметр LogChannel.
 OPER_SET_DEBUG_ON
 	Сервисы находятся в режиме отладки.
 OPER_SET_DEBUG_OFF
-	Сервисы больше не находятся в режиме отладки.
+	Режим отладки сервисов отключен.
 OPER_SET_DEBUG_LEVEL
 	Сервисы находятся в режиме отладки (уровень %d).
 OPER_SET_DEBUG_ERROR
-	Опция DEBUG должна иметь значения только ON, OFF, или полозительное число.
+	Опция DEBUG должна иметь значения ON, OFF или положительное число.
 OPER_SET_NOEXPIRE_ON
 	Сервисы находятся в режиме не истечения.
 OPER_SET_NOEXPIRE_OFF
-	Сервисы теперь находятся в режиме истечения.
+	Режим не истечения для сервисов отключен.
 OPER_SET_NOEXPIRE_ERROR
 	Опция NOEXPIRE должна иметь значения только ON или OFF.
 OPER_SET_UNKNOWN_OPTION
 	Неизвестная опция %s.
 OPER_SET_SQL_ON
-	SQL code will be used.
+	SQL-код теперь будет использоваться.
 OPER_SET_SQL_OFF
-	SQL code will not be used.
+	SQL-код теперь не будет использоваться.
 OPER_SET_SQL_ERROR
-	Setting for SQL must be ON or OFF.
+	Установка для SQL должна быть либо ON, либо OFF.
 OPER_SET_SQL_ERROR_INIT
-	Error during init of SQL, check your logs to correct.
+	Ошибка при инициализации SQL, проверьте логи для исправления.
 OPER_SET_SQL_ERROR_DISABLED
-	SQL is not configured for this network. Please edit the
-	configuration file (services.conf).
+	SQL не настроено для данной сети. Пожалуйста, отредактируйте
+	конфигурационный файл (services.conf).
 OPER_SET_LIST_OPTION_ON
-	%s is enable
+	%s включено.
 OPER_SET_LIST_OPTION_OFF
-	%s is disabled
+	%s выключено.
 
 # NOOP responses
 OPER_NOOP_SYNTAX
 	NOOP {SET|REVOKE} сервер
 OPER_NOOP_SET
-	Все O:lines на %s удалены.
+	Все O:lines на %s были удалены.
 OPER_NOOP_REVOKE
-	Все O:lines на %s восстановлены.
+	Все O:lines на %s были восстановлены.
 
 # JUPE responses
 OPER_JUPE_SYNTAX
-	JUPE имя сервера [причина]
+	JUPE имя_сервера [причина]
 OPER_JUPE_HOST_ERROR
 	Пожалуйста используйте действительное имя сервера при джупинге.
 
@@ -2926,17 +2863,17 @@ OPER_RELOAD
 
 # RESTART responses
 OPER_CANNOT_RESTART
-	SERVICES_BIN не определен; перезапуск невозможен. Запустите скрипт \2configure\2  откомпилируйте сервисы, чтобы включить команду RESTART.
+	SERVICES_BIN не определен, перезапуск невозможен. Запустите скрипт \2configure\2  перекомпилируйте сервисы, чтобы включить команду RESTART.
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
 	Синтакстс: IGNORE {ADD|DEL|LIST|CLEAR} [время] [ник]
 OPER_IGNORE_VALID_TIME
-	Вы должны правильно ввести время.
+	Вы должны ввести правильное значение времени.
 OPER_IGNORE_TIME_DONE
 	Ник %s теперь будет игнорироваться в течение %s.
 OPER_IGNORE_PERM_DONE
-	Ник %s будет постоянно игнорироваться.
+	Ник %s теперь будет игнорироваться постоянно.
 OPER_IGNORE_DEL_DONE
 	Ник %s больше не будет игнорироваться.
 OPER_IGNORE_LIST
@@ -2980,22 +2917,19 @@ OPER_USERLIST_END
 
 # CACHE responses
 OPER_SUPER_ADMIN_ON
-	Теперь Вы Супер-Админ
+	Режим Супер-Администратора активирован.
 OPER_SUPER_ADMIN_OFF
-	Вы больше не Суперадмин
+	Режим Супер-Администратора деактивирован.
 OPER_SUPER_ADMIN_SYNTAX
-	Опция SuperAdmin может быть только ON или OFF (должно быть включено в services.conf)
+	Опция SuperAdmin может быть только ON или OFF (должно быть прописано в services.conf)
 OPER_SUPER_ADMIN_WALL_ON
-	%s теперь Супер-Админ
+	%s теперь Супер-Администратор.
 OPER_SUPER_ADMIN_WALL_OFF
-	%s больше не Супер-Админ
+	%s снял с себя режим Супер-Администратора.
 OPER_SUPER_ADMIN_ONLY
-	Только Супер-Админы могут использовать эту команду.
+	Только Супер-Администраторы могут использовать эту команду.
 OPER_STAFF_LIST_HEADER
-	On Level Nick
-
-# DefCon Messages
-
+	В сети Уровень Ник
 OPER_STAFF_FORMAT
 	 %c %s  %s
 OPER_STAFF_AFORMAT
@@ -3006,15 +2940,15 @@ OPER_STAFF_AFORMAT
 OPER_DEFCON_SYNTAX
 	Синтаксис: DEFCON [1|2|3|4|5]
 OPER_DEFCON_DENIED
-	Сервисы теперь работают в режиме Defcon, Пожалуйста, попытайтесь позже.
+	Сервисы работают в режиме DEFCON, Пожалуйста, попытайтесь позже.
 OPER_DEFCON_NO_CONF
-	Режим Defcon должен быть включен в файле services.conf
+	Режим DEFCON должен быть включен в файле services.conf
 OPER_DEFCON_CHANGED
 	Сейчас сервисы в режиме DEFCON %d
 OPER_DEFCON_WALL
-	%s Изменил уровень DEFCON на %d
+	%s изменил уровень DEFCON на %d
 DEFCON_GLOBAL
-	Уровень Defcon теперь равен: %d
+	Уровень DEFCON теперь равен: %d
 
 # Module strings
 
@@ -3027,23 +2961,23 @@ OPER_MODULE_LOAD_FAIL
 OPER_MODULE_REMOVE_FAIL
 	Невозможно выгрузить модуль %s
 OPER_MODULE_NO_UNLOAD
-	This module can not be unloaded.
+	Этот модуль не может быть выгружен.
 OPER_MODULE_LOAD_SYNTAX
 	MODLOAD ИмяФайла
 OPER_MODULE_UNLOAD_SYNTAX
 	MODUNLOAD ИмяФайла
 OPER_MODULE_LIST_HEADER
-	Current Module list:
+	Текущий список модулей:
 OPER_MODULE_LIST
 	Модуль: %s [%s] [%s]
 OPER_MODULE_LIST_FOOTER
-	%d Modules loaded.
+	%d модулей загружено.
 OPER_MODULE_INFO_LIST
 	Модуль: %s Версия: %s Автор: %s загружен: %s
 OPER_MODULE_CMD_LIST
 	Допустимые команды: %R%s %s
 OPER_MODULE_MSG_LIST
-	Допустимы IRCD заголовки для: %s
+	Допустимые IRCD заголовки для: %s
 OPER_MODULE_NO_LIST
 	Не загружено ни одного модуля
 OPER_MODULE_NO_INFO
@@ -3063,9 +2997,9 @@ MODULE_HELP_HEADER
 OPER_EXCEPTION_SYNTAX
 	EXCEPTION {ADD | DEL | MOVE | LIST | VIEW} [параметры]
 OPER_EXCEPTION_ADD_SYNTAX
-	EXCEPTION ADD [+время истечения] маска лимит причина
+	EXCEPTION ADD [+время_истечения] маска лимит причина
 OPER_EXCEPTION_DEL_SYNTAX
-	EXCEPTION DEL {маска | list}
+	EXCEPTION DEL {маска | список_записей}
 OPER_EXCEPTION_MOVE_SYNTAX
 	EXCEPTION MOVE номер позиция
 OPER_EXCEPTION_DISABLED
@@ -3075,21 +3009,21 @@ OPER_EXCEPTION_ALREADY_PRESENT
 OPER_EXCEPTION_TOO_MANY
 	Список исключений из лимита сессий переполнен!
 OPER_EXCEPTION_ADDED
-	Лимит сессий для %s установлен в %d.
+	Лимит сессий для %s установлен на %d.
 OPER_EXCEPTION_MOVED
 	Исключение для %s (#%d) перемещено в позицию %d.
 OPER_EXCEPTION_NO_SUCH_ENTRY
-	Нет такой записи (#%d) в списке исключений из лимитв сессий.
+	Нет такой записи (#%d) в списке исключений из лимита сессий.
 OPER_EXCEPTION_NOT_FOUND
-	%s не найден в списке исключений из лимит сессий.
+	%s не найден в списке исключений из лимита сессий.
 OPER_EXCEPTION_NO_MATCH
 	Нет таких значений в списке исключений из лимита сессий.
 OPER_EXCEPTION_DELETED
-	%s удален из списка исключений из лимита сессий.
+	%s удален из списка исключений лимита сессий.
 OPER_EXCEPTION_DELETED_ONE
-	Удалена 1 запись из списка исключений из лимита сессий.
+	Удалена 1 запись из списка исключений лимита сессий.
 OPER_EXCEPTION_DELETED_SEVERAL
-	Удалено %d записей из списка исключений из лимита сессий.
+	Удалено %d записей из списка исключений лимита сессий.
 OPER_EXCEPTION_LIST_HEADER
 	Текущий список исключений из лимита сессий:
 # маска, лимит
@@ -3097,18 +3031,18 @@ OPER_EXCEPTION_LIST_FORMAT
 	%3d  %4d   %s
 OPER_EXCEPTION_LIST_COLHEAD
 	Номер  Лимит  Хост
-# меска, кем установлено, когда установлено, когда истекает, лимит, причина
+# меска, поставил, когда, истекает, лимит, причина
 OPER_EXCEPTION_VIEW_FORMAT
 	%3d.  %s  (by %s on %s; %s)
 	    Лимит: %-4d  - %s
 OPER_EXCEPTION_INVALID_LIMIT
-	Некорректный лимит сессий. Он должен быть целым числом больше или равным нуля и меньше %d.
+	Некорректный лимит сессий. Он должен быть целым числом больше или равным нулю и меньше %d.
 OPER_EXCEPTION_INVALID_HOSTMASK
-	Некорректная хостмаска. Только реальная хостмаска может быть добавлена в исключения, она не должна содержать ников или имен пользователей.
+	Некорректная хостмаска. Только реальная хостмаска может быть добавлена в исключения, она не должна содержать ников или идентов пользователей.
 OPER_EXCEPTION_EXISTS
-	%s already exists on the EXCEPTION list.
+	%s уже есть в списке ИСКЛЮЧЕНИЙ.
 OPER_EXCEPTION_CHANGED
-	Exception for %s has been updated to %d.
+	Исключение для %s было обновлено на %d.
 
 # SESSION responses
 OPER_SESSION_SYNTAX
@@ -3124,24 +3058,24 @@ OPER_SESSION_INVALID_THRESHOLD
 OPER_SESSION_NOT_FOUND
 	%s не найден в списке сессий.
 OPER_SESSION_LIST_HEADER
-	Хосты с меньшим чем %d количеством сессий:
+	Хосты с количеством сесси %d и более:
 OPER_SESSION_LIST_COLHEAD
 	Сессия  Хост
 # лимит, хост
 OPER_SESSION_LIST_FORMAT
 	%6d    %s
-# host, sessions, limit
+# хост, сессии, лимит
 OPER_SESSION_VIEW_FORMAT
-	Хост %s сейчас использует %d сессий из %d максимально допустимых.
+	Хост %s сейчас используют %d сессий из %d максимально допустимых.
 
 # EXCEPTION help
 
 OPER_HELP_EXCEPTION
 	Синтаксис: EXCEPTION ADD [+время истечения] маска лимит причина
-	           EXCEPTION DEL {маска | list}
+	           EXCEPTION DEL {маска | список_записей}
 	           EXCEPTION MOVE номер позиция
-	           EXCEPTION LIST [маска | list]
-	           EXCEPTION VIEW [маска | list]
+	           EXCEPTION LIST [маска | список_записей]
+	           EXCEPTION VIEW [маска | список_записей]
 	
 	Позволяет Администраторам сервисов управлять списком хостов,
 	имеющих отдельные ограничения на количество сессий - разрешит определеным машинам, 
@@ -3149,7 +3083,7 @@ OPER_HELP_EXCEPTION
 	разрешено по умолчанию. Как только количество сессий с хоста достигнет лимита,
 	все последующие клиенты, пытающиеся коннектиться с данного хоста будут
 	прибиваться. Перед отсоединением пользователя, он будет уведомлен
-	/NOTICE от %S, что с данного хоста превышен лимит
+	/NOTICE'ом от %S, что с данного хоста превышен лимит
 	сессий. Содержание этого уведомления настраивается в конфигурации.
 	
 	EXCEPTION ADD добавляет указанную маску в список исключений.
@@ -3174,8 +3108,6 @@ OPER_HELP_EXCEPTION
 	Примечание: коннектящийся клиент будет "использовать" первое в списке исключение,
 	содержащее его хост. Большие списки исключений с малоспецифичными масками
 	исключений могут снизить производительность сервисов.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 OPER_HELP_SESSION
 	Синтаксис: SESSION LIST порог
@@ -3184,30 +3116,28 @@ OPER_HELP_SESSION
 	Позволяет Администраторам сервисов просмотреть список сессий.
 	
 	SESSION LIST покажет хосты с меньшим, чем порог количеством сессий.
-	Порог должен быть целым больше 1. Это предохранит
+	Порог должен быть целым и больше 1. Это предохранит
 	от случайной выдачи списка с большим числом единичных
 	сессий.
 	SESSION VIEW покажет детальную информацию об указанном
 	хосте - включая текущий счетчик сессий и лимит сессий.
-	host не может включать в себя символьные маски (*, ? и т.п.).
+	Хосты не могут включать в себя символьные маски (*, ? и т.п.).
 	
 	См. EXCEPTION help для более подробной информации о лимитировании
-	сессий, как установить отдельный лимит сессий для определенного
+	сессий и как установить отдельный лимит сессий для определенного
 	хоста или группы хостов.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 OPER_HELP_STAFF
 	Синтаксис: STAFF
 
-	Показывает всех, прописанных на сервисах (Операторов, Администраторов..) 
+	Показывает всех, прописанных на сервисах (Операторов, Администраторов, Рутов) 
 	включая их уровень и онлайн статус.
 
 OPER_HELP_DEFCON
 	Синтаксис: DEFCON [1|2|3|4|5]
 
-	Система defcon может быть использована для осуществления различных
-	сервисных действий, удобно использовать при попытках
+	Система DEFCON может быть использована для установки определенных
+	сервисных ограничений, удобно использовать при попытках
 	атаки на сеть.
 
 OPER_HELP_DEFCON_NO_NEW_CHANNELS
@@ -3223,18 +3153,18 @@ OPER_HELP_DEFCON_REDUCE_SESSION
 OPER_HELP_DEFCON_NO_NEW_CLIENTS
 	* Прибивать всех коннектящихся клиентов
 OPER_HELP_DEFCON_OPER_ONLY
-	* Игнорировать любые сообщения от не-операторов
+	* Игнорировать любые сообщения, за исключением сообщений ирк-операторов, и оповещать об игноре.
 OPER_HELP_DEFCON_SILENT_OPER_ONLY
-	* Молча игнорировать не-операторов
+	* Игнорировать всех, кроме ирк-операторов, БЕЗ оповещения об этом.
 OPER_HELP_DEFCON_AKILL_NEW_CLIENTS
-	* Добавлять AKILL всем коннектящимся клиентам
+	* Ставить AKILL всем новым соединениям (с этого момента).
 OPER_HELP_DEFCON_NO_NEW_MEMOS
-	* Запрет отправлять мемки
+	* Запрет отправлять мемо-сообщения
 OPER_HELP_CHANKILL
 	Синтаксис: CHANKILL [+истечение] #канал причина
 
 	Установить AKILL для каждого ника, зашедшего на определенный канал. Будет
-	использован полностью реальный ident@host для каждого ника,
+	использован полностью реальный идент@хост для каждого ника,
 	который подпадет под данный AKILL. 
 
 ###########################################################################
@@ -3246,7 +3176,7 @@ OPER_HELP_CHANKILL
 NEWS_LOGON_TEXT
 	[Новость - %s] %s
 NEWS_OPER_TEXT
-	[Новости для Операторов - %s] %s
+	[Новости Операторов - %s] %s
 NEWS_RANDOM_TEXT
 	[Случайная новость - %s] %s
 
@@ -3255,7 +3185,7 @@ NEWS_LOGON_SYNTAX
 NEWS_LOGON_LIST_HEADER
 	Текущие новости:
 NEWS_LOGON_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s от %s)
 	    %s
 NEWS_LOGON_LIST_NONE
 	Новостей нет.
@@ -3274,14 +3204,14 @@ NEWS_LOGON_DELETED
 NEWS_LOGON_DEL_NONE
 	Нет новостей, подлежащих удалению!
 NEWS_LOGON_DELETED_ALL
-	Все новости удалены.
+	Все новости были удалены.
 
 NEWS_OPER_SYNTAX
 	Синтаксис: OPERNEWS {ADD|DEL|LIST} [текст|номер]
 NEWS_OPER_LIST_HEADER
 	Список новостей для Операторов:
 NEWS_OPER_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s от %s)
 	    %s
 NEWS_OPER_LIST_NONE
 	Нет новостей для Операторов.
@@ -3307,7 +3237,7 @@ NEWS_RANDOM_SYNTAX
 NEWS_RANDOM_LIST_HEADER
 	Список случайных новостей:
 NEWS_RANDOM_LIST_ENTRY
-	%5d (%s by %s)
+	%5d (%s от %s)
 	    %s
 NEWS_RANDOM_LIST_NONE
 	Нет случайных новостей.
@@ -3333,16 +3263,15 @@ NEWS_HELP_LOGON
 	           LOGONNEWS DEL {номер | ALL}
 	           LOGONNEWS LIST
 	
-	Управление списком новостей. Когда пользователь
-	заходит в IRC сеть, эти новости будут отправлены
-	ему. (Тем не менее, не более трех сообщений будет
-	отправлено, чтобы не допустить флуда. Если у Вас новостей
-	больше трех, только три последние новости
-	будут посланы.)
+	Управление списком новостей. Когда пользователь заходит
+	в IRC сеть, эти новости будут отправлены ему. (Тем не
+	менее, не более трех сообщений будет отправлено, чтобы
+	не допустить флуда. Если у Вас новостей больше трех,
+	только три последние новости будут посланы.)
 	
-	Команда LOGONNEWS LIST может быть использована любым IRC Оператором для просмотра
-	текущих новостей. Команды ADD и DEL могут использовать только
-	Администраторы сервисов.
+	Команда LOGONNEWS LIST может быть использована любым
+	IRC-Оператором для просмотра текущих новостей. Команды
+	ADD и DEL могут использовать только Администраторы сервисов.
 
 NEWS_HELP_OPER
 	Синтаксис: OPERNEWS ADD текст
@@ -3350,15 +3279,15 @@ NEWS_HELP_OPER
 	           OPERNEWS LIST
 	
 	Управление списком новостей для Операторов. Когда пользователь
-	станет IRC Оператором (использовав команду /OPER), эти сообщения
+	станет IRC-Оператором (использовав команду /OPER), эти сообщения
 	будут ему отправлены. (Тем не менее, не более трех сообщений будет
 	отправлено, чтобы не допустить флуда. Если у Вас новостей
 	больше трех, только три последние новости
 	будут посланы.)
 	
-	Команда OPERNEWS LIST может быть использована любым IRC Оператором для просмотра
-	текущих новостей. Команды ADD и DEL могут использовать только
-	Администраторы сервисов.
+	Команда OPERNEWS LIST может быть использована любым IRC-Оператором 
+	ля просмотра текущих новостей. Команды ADD и DEL могут использовать
+	только Администраторы сервисов.
 
 NEWS_HELP_RANDOM
 	Синтаксис: RANDOMNEWS ADD текст
@@ -3369,9 +3298,9 @@ NEWS_HELP_RANDOM
 	заходит в IRC сеть, одна (и только одна) из
 	случайных новостей будет выбрана наугад и отправлена ему.
 	
-	Команда RANDOMNEWS LIST может быть использована любым IRC Оператором для просмотра
-	текущих новостей. Команды ADD и DEL могут использовать только
-	Администраторы сервисов.
+	Команда RANDOMNEWS LIST может быть использована любым
+	IRC-Оператором для просмотра текущих новостей. Команды
+	ADD и DEL могут использовать только Администраторы сервисов.
 
 ###########################################################################
 #
@@ -3380,39 +3309,41 @@ NEWS_HELP_RANDOM
 ###########################################################################
 
 HELP_HELP
-	%S сообщит вам информацию о сервисах.
+	%S это сервис помощи, который сообщит вам информацию об
+	основных сервисах сети.
 	Начните работу с сервисами с команд:
 
 	%R%s HELP
-	информация о регистрации ников
+	     для информации о регистрации ников
 
 	%R%s HELP
-	информация о регистрации каналов и управлении ими
+	     для информации о регистрации каналов
+	     и управления ими
 	     
 	%R%s HELP
-	информация о том, как оставлять сообщения пользователям,
-	которые в данный момент в оффлайне.
+	     для информации о том, как оставлять сообщения
+	     пользователям, которые на данный момент не в сети.
 
 HELP_HELP_BOT
 
 	%R%s HELP
-	информация о том, как установить сервисвного бота на свой канал
+	     для информации о том, как установить сервисного бота на свой канал
 
 HELP_HELP_HOST
 
 	%R%s HELP
-	     for information on setting up nick vHosts
+	     для информации о том, как установить на ник vHost (виртуальный хост).
 
 ###########################################################################
 #
 # NickServ help messages
 #
 ###########################################################################
-NICK_HELP_CMD_CONFIRM
-	    CONFIRM    Confirm a nickserv auth code
-NICK_HELP_CMD_RESEND
-	    RESEND     Resend a nickserv auth code
 
+NICK_HELP_CMD_CONFIRM
+	    CONFIRM    Подтвердить регистрацию кодом аутенфикации
+NICK_HELP_CMD_RESEND
+	    RESEND     Переслать код аутенфикации еще раз
 NICK_HELP_CMD_REGISTER
 	    REGISTER   Регистрация ника
 NICK_HELP_CMD_GROUP
@@ -3424,63 +3355,67 @@ NICK_HELP_CMD_ACCESS
 NICK_HELP_CMD_SET
 	    SET        Установка параметров, включая защиту kill'ом
 NICK_HELP_CMD_SASET
-	    SASET      Set SET-options on another nickname
+	    SASET      Устанавливает SET-параметры какого-либо ника
 NICK_HELP_CMD_DROP
-	    DROP       Отмена регистрации ника
+	    DROP       Отмена регистрации ника (удаление)
 NICK_HELP_CMD_RECOVER
-	    RECOVER    Выбросить из чата пользователя, взявшего Ваш ник
+	    RECOVER    Сменить ник пользователя, взявшего Ваш ник
 NICK_HELP_CMD_RELEASE
-	    RELEASE    Восстановление использования Вашего ника после команды RECOVER
+	    RELEASE    Снятие защиты сервисов с Вашего ника после команды RECOVER
 NICK_HELP_CMD_SENDPASS
 	    SENDPASS   Забыли пароль? Попробуйте эту команду
 NICK_HELP_CMD_GHOST
-	    GHOST      Disconnects a "ghost" IRC session using your nick
+	    GHOST      Закрыть "мертвую" IRC-сессию, использующую ваш ник
 NICK_HELP_CMD_ALIST
-	    ALIST      List channels you have access on
+	    ALIST      Показывает список каналов, на которых у вас есть доступ
 NICK_HELP_CMD_GLIST
-	    GLIST      Lists all nicknames in your group
+	    GLIST      Список всех ников в группе
 NICK_HELP_CMD_INFO
-	    INFO       Displays information about a given nickname
+	    INFO       Информация о каком-либо нике
 NICK_HELP_CMD_LIST
-	    LIST       List all registered nicknames that match a given pattern
+	    LIST       Список всех зарегистрированных ников по маске
 NICK_HELP_CMD_LOGOUT
-	    LOGOUT     Reverses the effect of the IDENTIFY command
+	    LOGOUT     Деидентифицирует вас от используемого вами ника
 NICK_HELP_CMD_STATUS
-	    STATUS     Returns the owner status of the given nickname
+	    STATUS     Возвращает статус какого-либо ника на NickServ
 NICK_HELP_CMD_UPDATE
-	    UPDATE     Updates your current status, i.e. it checks for new memos
+	    UPDATE     Обновляет ваш текущий статус (проверка на новые мемо и т. д.)
 NICK_HELP_CMD_GETPASS
 	    GETPASS    Возвращает пароль ника
-	               (только если шифрование выключено)
 NICK_HELP_CMD_GETEMAIL
-	    GETEMAIL   Matches and returns all users that registered using given email
+	    GETEMAIL   Выдает список всех пользователей, которые зарегистрировались с данным e-mail
 NICK_HELP_CMD_FORBID
-	    FORBID     Предохраняет ник от использования
+	    FORBID     Предохраняет ник от использования и регистрации
 NICK_HELP_CMD_SUSPEND
-	    SUSPEND    Suspend a given nick
+	    SUSPEND    Устанавливает режим саспенда ("заморозки") на ник
 NICK_HELP_CMD_UNSUSPEND
-	    UNSUSPEND  Unsuspend a given nick
+	    UNSUSPEND  Снимает режим саспенда с ника
 
 NICK_HELP
-	%S это сервис, предназначенный для "регистрации" Вашего ника и его защиты
-	от использования кем-либо, кроме Вас. Существует несколько команд для 
-	регистрации ника и различных настроек; чтобы использовать 
-	данные команды, напишите %R%S команда.
+	%S это сервис, предназначенный для "регистрации"
+	Вашего ника и его защиты от использования еще кем-либо,
+	кроме Вас. Нижеупомянутые команды предназначены для регистрации 
+	ника и управления его настройками, чтобы использовать данные
+	команды, напишите %R%S команда.
 	Для более подробной информации по какой-либо
 	команде напишите: %R%S HELP команда.
+
 	
 NICK_HELP_FOOTER
-	ВАЖНО: Данный сервис предназначен для того, чтобы пользователи IRC  
-	могли воспользоваться многими удобными возможностями.
+
+	ПРИМЕЧАНИЕ: Данный сервис предназначен для того,
+	чтобы гарантировать подлинность того или иного пользователя
+	IRC и защитить его ник от использования посторонним лицом.
 	NickServ НЕ предназначен для облегчения "воровства" ников,
-	"киберсквоттинга" (захвата большого количества ников) или других зловредных действий.
-	Злоупотребление %S приведет, как минимум, к уничтожению Вашего ника(ников).
+	"киберсквоттинга" (захвата большого количества ников)
+	или других зловредных действий. Злоупотребление %S приведет,
+	как минимум, к уничтожению Вашего ника(ников).
 	
 NICK_HELP_EXPIRES
 	
-	Неиспользуемые в течение длительного времени ники автоматически
-	удаляются из базы данных - ник будет удален, если его не использовать
-	в течение %d дней.
+	Неиспользуемые в течение длительного времени ники
+	автоматически удаляются из базы данных. Ник будет удален,
+	если его не использовать в течение %d дней.
 
 NICK_HELP_REGISTER
 	Синтаксис: REGISTER пароль [email]
@@ -3488,61 +3423,60 @@ NICK_HELP_REGISTER
 	Регистрирует Ваш ник в базе данных %S.  После того, как Вы
 	зарегистрировали ник, вы можете использовать команды SET и ACCESS,
 	чтобы сконфигурировать параметры Вашего ника по Вашему вкусу.
-	Не забывайте пароль, который Вы укажете при регистрации! Не используйте
-	пароли, являющиеся Вашим ником или Вашим именем. Помните, что регистр символов
-	в пароле - различается.
-	(Примечание: пароли чувствительны к регистру!  MYPASSWORD, MyPassword, и mypassword - это РАЗНЫЕ пароли!)
+	Не забывайте пароль, который Вы укажете при регистрации -
+	он будет нужен вам для дальнейшего использования ника!
+	(Примечание: пароли чувствительны к регистру!
+	MYPASSWORD, MyPassword, и mypassword - это РАЗНЫЕ пароли!)
+
 	Принципы выбора пароля:
 	
 	Пароли не должны быть легко угадываемы.  Например,
 	использование Вашего реального имени в качестве пароля - плохая идея.
-
-	Пароль не должен легко угадываться - например являться Вашим ником или паролем,
-	и %S не допустит их использовать.  Также, 
-	короткие пароли очень легко подбираются простым 
-	перебором, поэтому длина пароля должна быть
-	больше 5 символов.Пробелы и знаки табуляции в пароле 
-	недопустимы. Используйте в качестве пароля только 
-	латинские буквы.
+	Использование вашего ника в качестве пароля совсем плохая идея ;),
+	да и %S не позволит этого. Также, короткие пароли очень легко
+	подбираются простым перебором, поэтому длина пароля должна быть
+	больше 5 символов. Пробелы и знаки табуляции в пароле недопустимы.
+	Используйте в качестве пароля только латинские буквы или цифры.
 	
-	Параметр email является необязательным. 
-	Но, тем не менее, его требуется указывать
-	в большинстве сетей.
-	Ваша приватность будет соблюдена; этот e-mail не будет 
-	передан третьим лицам.
+	Параметр email является опциональным и, если указан,
+	сразу же ассоциирует с вашим ником указанный email.
+	Однако, в большинстве сетей, параметр email
+	может быть обязательным.
+	Ваша конфидециальность будет соблюдена - этот e-mail
+	не будет передан третьим лицам.
 	
-	Эта команда также создает новую группу для Вашего ника,	 использование которой позволит регистрировать другие ники, все из них
-	будут являться частью главного ника - в группу которого вы регистрируете другие ники;
-	соответственно под любым и них можно будет получить короткое сообщение, будут сохранены все настройки главного ника группы, и у Вас будут все привилегии на каналах, 
-	на которых Вы прописаны в списке доступа. Для получения более полной информации
-	напишите %R%S HELP GROUP.
+	Так же, команда регистрации автоматически создает новую группу
+	для Вашего ника, использование которой позволит регистрировать
+	другие ники,которые будут являться частью главного ника -
+	общими будут настройки, мемо-сообщения и привелегии на каналах.
+	Для получения более полной информации напишите %R%S HELP GROUP.
 	
 NICK_HELP_GROUP
 	Синтаксис: GROUP главный_ник пароль
 	
-	Эта команда позволяет Вам присоединить Ваш ник к группе главного_ника 
-	пароль - это пароль главного ника.
+	Эта команда позволяет Вам присоединить Ваш ник
+	к группе главного_ника. пароль - это пароль главного ника.
 	
 	Использование групп позволит Вам объединить Ваши настройки,
-	получать и отправлять короткие сообщения и привилегии на каналах со всеми никами группы и
-	многое другое!
+	получать и отправлять короткие сообщения, использовать привелегии
+	на каналах всеми никами группы и многое другое!
 	 
 	Группа существует до тех пор, пока используется.
-	если Вы удалите (дропнете) один из ников в группе, Вы не потеряете
-	регистрацию по крайней мере до тех пор, пока,
+	Если Вы удалите (дропнете) один из ников в группе,
+	Вы не потеряете регистрацию по крайней мере до тех пор, пока,
 	в группе остается хотя бы 1 ник.
 	
-	Вы можете использовать эту команду, даже если Вы все еще не зарегистрировали
-	Ваш ник. Если Ваш ник уже зарегистрирован, Вам необходимо
-	проидентифицироваться перед использованием этой команды. Напишите 
-	%R%S HELP IDENTIFY для получения более полной информации. Впрочем, есть вероятность,
-	что  в Вашей IRC сети это будет невозможно.
+	Вы можете использовать эту команду, даже если Вы все еще
+	не зарегистрировали Ваш ник. Если Ваш ник уже зарегистрирован,
+	Вам необходимо идентифицироваться перед использованием этой команды.
+	Напишите %R%S HELP IDENTIFY для получения более полной информации.
+	Впрочем, есть вероятность, что в Вашей IRC-сети это будет невозможно.
 	
-	Однако, рекомендуется использовать эту команду с незарегистрированного
-	ника, потому что он автоматически зарегистрируется при успешном использовании 
-	данной команды. Вы также можете использовать эту команду с зарегистрированного ника (чтобы 
-	перейти в другую группу) только если администраторы Вашей IRC сети это
-	разрешили.
+	Рекомендуется использовать эту команду с незарегистрированного
+	ника, потому что он автоматически зарегистрируется при успешном
+	использовании данной команды. Вы также можете использовать эту
+	команду с зарегистрированного ника (чтобы перейти в другую группу)
+	только если администраторы Вашей IRC сети это разрешили.
 	
 	Вы можно быть только в одной группе одновреиенно. Слияние групп
 	невозможно.
@@ -3553,9 +3487,9 @@ NICK_HELP_IDENTIFY
 	Синтаксис: IDENTIFY пароль
 	
 	Сообщает %S что Вы действительно являетесь владельцем
-	ника.  Многие команды требуют идентификации, без этого
+	ника. Многие команды требуют идентификации, без этого
 	Вы не сможете их использовать. Пароль должен быть
-	полностью идентичен тому, который вы указывали когда 
+	полностью идентичен тому, который вы указывали, когда 
 	использовали команду REGISTER.
 	
 NICK_HELP_UPDATE
@@ -3563,86 +3497,85 @@ NICK_HELP_UPDATE
 
 	Обновляет Ваш текущий статус, т.е. проверяет наличие новых мемок,
 	устанавливает необходимые режимы на каналах (ModeonID) и обновляет ваши
-	виртуальные хосты и флаги (а также последнее время посещения IRC, и т.д.).
+	виртуальные хосты и флаги (последнее время посещения IRC, и т.д.).
 
 NICK_HELP_LOGOUT
 	Синтаксис: LOGOUT
 	
 	Эта команда имеет эффект, обратный эффекту команды IDENTIFY, т.е.
-	снимает с Вас статус владельца ника. 
-	Примечание: тем не менее, данная команда не будет требовать, чтобы вы
-	идентифицаировали себя.
+	снимает с Вас статус владельца ника (ДЕидентифицирует) 
+	Примечание: тем не менее, после использования данной команды
+	NickServ не попросит вас идентифицировать себя снова.
 
 NICK_HELP_DROP
-	Синтаксис: DROP [nickname]
+	Синтаксис: DROP [ник]
 	
-	Удаляет ваш ник из базы данных %S.  Удаленный таким образом ник
+	Удаляет ваш ник из базы данных %S. Удаленный таким образом ник
 	становится свободным для регистрации любым человеком.
 	
-	Вы можете удалять ник в пределах Вашей группы, при этом если вы удаляете не главный ник,
-	то он остается вместе с группой, удаляется только Ваш текущий ник.
-	
-	Порядок использования данной команды: сначала Вы должны идентифицироваться
-	на NickServ (%R%S HELP IDENTIFY для более полной
-	информации).
+	Вы можете удалять ник в пределах Вашей группы,
+	используя дополнительный параметр ник.
+
+	Что бы использовать данную команду, Вы должны
+	идентифицироваться на NickServ как владелец ника.
+	(%R%S HELP IDENTIFY для более полной информации).
 
 NICK_HELP_ACCESS
-	Синтаксис: ACCESS ADD mask
-	           ACCESS DEL mask
+	Синтаксис: ACCESS ADD маска
+	           ACCESS DEL маска
 	           ACCESS LIST
 	
-	Изменяет или показывает список масок доступа на Ваш ник. Имеется в виду
-	список адресов, которые будут автоматически идентифицированы
-	%S как адреса, с которых допустимо использовать Ваш ник. Если
-	Вы хотите использовать ник с различных адресов, Вам нобходимо
-	использовать команду IDENTIFY чтобы %S
+	Позволяет менять/просматривать список масок доступа на Ваш ник.
+	Имеется в виду список адресов, с которых %S позволит использовать
+	Ваш ник. Если Вы хотите использовать ник с различных адресов,
+	Вам нобходимо использовать команду IDENTIFY чтобы %S
 	идентифицировал Вас.
 	
 	Примеры:
 	
-	    ACCESS ADD anyone@*.bepeg.com
-	    Разрешает доступ пользователю anyone с любого компьютера
-	    в домене bepeg.com.
+	    ACCESS ADD anyone@*.set.ru
+	        Разрешает доступ пользователю с идентом anyone
+		с любого компьютера в домене set.ru.
 	
-	    ACCESS DEL anyone@*.bepeg.com
-	    Антоним предыдущей команды.
+	    ACCESS DEL anyone@*.set.ru
+	        Антоним предыдущей команды - удаляет маску.
 	
 	    ACCESS LIST
-	    Покажет текущий список адресов доступа.
+	        Покажет текущий список адресов доступа.
 
 NICK_HELP_SET
 	Синтаксис: SET опция параметры
 	
-	Устанавливает различные опции ника.  опция может быть:
+	Устанавливает различные опции ника. Опция может быть:
 	
 	    DISPLAY    Установить главный ник группы
-	    PASSWORD   Установить или изменить пароль на ник
+	    PASSWORD   Изменить пароль на ник
 	    LANGUAGE   Установить язык, на котором сервисы будут
-	               посылать Вам сообщения
-	    URL        Ассоциировать URL с Вашим ником
-	    EMAIL      Ассоциировать E-mail с Вашим ником
-	    ICQ        Ассоциировать номер ICQ с Вашим ником
+	                   посылать Вам сообщения
+	    URL        Ассоциировать URL-адрес с Вашим ником
+	    EMAIL      Ассоциировать Email-адрес с Вашим ником
+	    ICQ        Ассоциировать ICQ-номер с Вашим ником
 	    GREET      Ассоциировать приветствие с Вашим ником
-	    KILL       Включен или выключить и выбрать тип защиты, 
+	    KILL       Включить или выключить режим защиты ника.
 	    SECURE     Включить или выключить режим безопасности ника 
 	    PRIVATE    Предохранить ваш ник от появления в 
-	               %R%S LIST
-	    HIDE       Скрыть часть информации о Вас
+	                   %R%S LIST
+	    HIDE       Скрыть какую-либо информацию о Вас
 	    MSG        Выбрать метод общения сервисов с Вами - приват или нотисы
-	    AUTOOP     Should services op you automatically.    
+	    AUTOOP     Будут ли сервисы ставить вам статус автоматически.    
 	
-	Перед установкой любой опции, Вы должны сначала идентифицироваться
-	с Вашим паролем (%R%S HELP IDENTIFY для более подробной
-	информации).
+	Перед установкой любой опции, Вы должны сначала
+	идентифицироваться с Вашим паролем
+	(%R%S HELP IDENTIFY для более подробной информации).
 	
-	Напишите %R%S HELP SET опция для более подробной информации
-	по конкретной опции.
+	Напишите %R%S HELP SET опция для более подробной
+	информации по конкретной опции.
 
 NICK_HELP_SET_DISPLAY
 	Синтаксис: SET DISPLAY новый_главный_ник
 	
 	Изменяет Ваш главный ник в группе.  
-	Новый главный ник должен присутствовать в Ваше группе.
+	Новый главный ник должен присутствовать в Вашей группе.
 
 NICK_HELP_SET_PASSWORD
 	Синтаксис: SET PASSWORD новый_пароль
@@ -3662,21 +3595,21 @@ NICK_HELP_SET_LANGUAGE
 NICK_HELP_SET_URL
 	Синтаксис: SET URL url
 	
-	Ассоциирует URL с Вашим ником.  Этот URL
+	Ассоциирует URL-адрес с Вашим ником.  Этот URL
 	будет показан, когда кто-либо запросит информацию
 	о Вашем нике с помощью команды INFO.
 
 NICK_HELP_SET_EMAIL
-	Синтаксис: SET EMAIL адреc@email
+	Синтаксис: SET EMAIL адрес@email
 	
-	Ассоциирует адрес E-mail с Вашим ником. Этот адрес
+	Ассоциирует Email-адрес с Вашим ником. Этот адрес
 	будет показан, когда кто-либо запросит информацию
 	о Вашем нике с помощью команды INFO.
 	
 NICK_HELP_SET_ICQ
 	Синтаксис: SET ICQ номер ICQ
 	
-	Ассоциирует номер ICQ с Вашим ником. Этот номер
+	Ассоциирует ICQ-номер с Вашим ником. Этот номер
 	будет показан, когда кто-либо запросит информацию
 	о Вашем нике с помощью команды INFO.
 	
@@ -3684,44 +3617,45 @@ NICK_HELP_SET_GREET
 	Синтаксис: SET GREET сообщение
 	
 	Создает приветсвие для Вашего ника, которое
-	будет показываться при заходе на канал на котором включена опция GREET;
-	учтите, что Вам понадобится необходимый уровень  
-	доступа на этот канал, чтобы использовать приветствие.
+	будет показываться при заходе на канал, на котором
+	включена опция GREET и висит сервисный бот. Учтите,
+	что Вам понадобится необходимый уровень доступа
+	на этот канал, чтобы использовать приветствие.
 
 NICK_HELP_SET_KILL
 	Синтаксис: SET KILL {ON | QUICK | IMMED | OFF}
 	
-	Переключает автоматическую защиту для Вашего ника:
-	включает или выключает.  Когда защита в состоянии ON, если другой пользователь
-	попытается взять ваш ник, у него будет 1 минута для того, чтобы
-	выбрать себе другой ник, после этого %S изменит
-	его ник.
+	Активирует\деактивирует автоматическую защиту для Вашего ника.
+	Когда защита включена, любой другой пользователь, который
+	попытается взять ваш ник, будет иметь 1 минуту для того, чтобы
+	выбрать себе другой ник, иначе %S принудительно изменит его ник.
 	
 	Если Вы выберете QUICK, у пользователя будет только 20 секунд
-	ятобы сменить ник.  Если вы выберете
-	IMMED, ник пользователя будет изменен немедленно без без
-	предупреждения и шанса сменить ник; пожалуйста
-	не используйте эту опцию без необходимости. Также, администратор
-	вашей IRC сети может отключить эту опцию.
+	на то, чтобы сменить ник.  Если вы выберете IMMED,
+	ник пользователя будет изменен немедленно, БЕЗ 
+	предупреждения и возможности сменить ник самому.
+	Пожалуйста, не используйте эту опцию без КРАЙНЕЙ
+	необходимости. Также, администратор вашей IRC-сети
+	может отключить эту опцию.
 
 NICK_HELP_SET_SECURE
 	Синтаксис: SET SECURE {ON | OFF}
 	
-	Включает или выключает опцию Безопасность на %S для Вашего
-	ника. При включенном SECURE, Вы должны идентифицироваться на NickServ
-	чтобы подтвердить, что именно Вы владелец данного ника,
-	при этом на список доступа сервисы не обращают внимания.
-	Тем не менее, если Вы есть в списке доступа, %S
-	не будет автоматически отсоединять Вас не обращая внимания на установку
-	опции KILL.
+	Активирует\деактивирует опцию Безопасности на %S для Вашего
+	ника. При включенной SECURE, Вы должны идентифицироваться
+	на NickServ через пароль, чтобы подтвердить, что именно Вы
+	владелец данного ника, при этом на список доступа сервисы
+	не обращают внимания. Тем не менее, если Вы есть в списке доступа,
+	%S не будет автоматически менять Ваш ник, не обращая внимания
+	на установку опции KILL.
 
 NICK_HELP_SET_PRIVATE
 	Синтаксис: SET PRIVATE {ON | OFF}
 	
-	Переключает %S опци приватности в положение on или off для Вашего ника.
+	Активирует\деактивирует опцию приватности вашего ника на %S.
 	Когда PRIVATE включена, Ваш ник не будет показываться
 	по команде %S's LIST.
-	(Тем не менее, любой, кто знает Ваш ник имеет возможность получить
+	(Тем не менее, любой, кто знает Ваш ник, имеет возможность получить
 	информацию о Вас, используя команду INFO.)
 
 NICK_HELP_SET_HIDE
@@ -3729,198 +3663,173 @@ NICK_HELP_SET_HIDE
 	
 	Позволяет Вам скрыть часть информации о Вас, которая
 	будет показываться по команде %S INFO на Ваш ник.
-	Вы можете скрыть Ваш адрес email (EMAIL), время последнего захода в сеть
-	и маску с которой Вы заходили (USERMASK) и последнее сообщение выхода (QUIT).
-	Второй параметр определяет будет ли эта информация
+	Вы можете скрыть Ваш email-адрес (EMAIL), время
+	последнего захода в сеть и маску, с которой Вы
+	заходили (USERMASK), а так же, последнее сообщение
+	при выходе (QUIT).
+	Второй параметр определяет, будет ли эта информация
 	показываться (OFF) или скрываться (ON).
 	
 NICK_HELP_SET_MSG
 	Синтаксис: SET MSG {ON | OFF}
 	
-	Позволяет Вам выбрать способ общения сервисов с Вами.
-	Если установить режим MSG, сервисы будут использовать собщения в приват, в ином случае 
+	Позволяет Вам выбрать способ сообщения сервисов с Вами.
+	Если установить режим MSG, сервисы будут использовать
+	в общении с вами приватные сообщения, в ином случае 
 	будут использовать нотисы.
 
 NICK_HELP_SET_AUTOOP
-	Syntax: SET AUTOOP {ON | OFF}
+	Синтаксис: SET AUTOOP {ON | OFF}
 	
-	Sets whether you will be opped automatically. Set to ON to 
-	allow ChanServ to op you automatically when entering channels.
+	Устанавливает режим автоматического получения статуса.
+	ВКЛЮЧИТЕ (ON), если хотите, что бы ChanServ автоматически
+	давал вам статус при входе на канал.
 
 NICK_HELP_SASET
-	Syntax: SASET nickname option parameters.
+	Синтаксис: SASET ник опции параметры.
 	
-	Sets various nickname options.  option can be one of:
+	Устанавливает различные опции ника.  Опции могут быть:
 	
-	    DISPLAY    Set the display of the group in Services
-	    PASSWORD   Set the nickname password
-	    URL        Associate a URL with the nickname
-	    EMAIL      Associate an E-mail address with the nickname
-	    ICQ        Associate an ICQ number with the nickname
-	    GREET      Associate a greet message with the nickname
-	    KILL       Turn protection on or off
-	    SECURE     Turn nickname security on or off
-	    PRIVATE    Prevent the nickname from appearing in a
+	    DISPLAY    Устанавливает главный ник группы
+	    PASSWORD   Изменяет пароль ника
+	    URL        Ассоциирует URL-адрес с ником
+	    EMAIL      Ассоциирует Email-адрес с ником
+	    ICQ        Ассоциирует ICQ-номер с ником
+	    GREET      Устанавливает приветствие на ник.
+	    KILL       Включает или выключает Защиту для ника
+	    SECURE     Включает или выключает Безопасность для ника
+	    PRIVATE    Скрывает появление ника в списке ников по
 	                   %R%S LIST
-	    HIDE       Hide certain pieces of nickname information
-	    MSG        Change the communication method of Services
-	    NOEXPIRE   Prevent the nickname from expiring
+	    HIDE       Скрывает какую-либо информацию о нике
+	    MSG        Изменяет режим сообщения с сервисами
+	    NOEXPIRE   Устанавливает на ник режим не-истечения
+	    AUTOOP     Включает или выключает режим автостатуса
 	
-	Type %R%S HELP SASET option for more information
-	on a specific option. The options will be set on the given
-	nickname. 
-	
-	Limited to Services admins.
+	Введите %R%S HELP SASET опция для большей информации
+	о какой-либо опции. Опции будут установлены для указаного
+	ника. 
 
 NICK_HELP_SASET_DISPLAY
-	Syntax: SASET nickname DISPLAY new-display
+	Синтаксис: SASET ник DISPLAY новый_главный_ник 
 	
-	Changes the display used to refer to the nickname group in 
-	Services. The new display MUST be a nick of the group.
-	
-	Limited to Services admins.
+	Изменяет главный ник в группе ников. Новый главный ник 
+	ДОЛЖЕН находится в группе указанного ника.
 
 NICK_HELP_SASET_PASSWORD
-	Syntax: SET nickname PASSWORD new-password
+	Синтаксис: SASET ник PASSWORD новый_пароль 
 	
-	Changes the password used to identify as the nick's	owner.
-	
-	Limited to Services admins.
+	Изменяет пароль, который используется для идентификации как владелец ника.
 
 NICK_HELP_SASET_URL
-	Syntax: SASET nickname URL url
+	Синтаксис: SASET ник URL url-адрес
 	
-	Associates the given URL with the nickname.  This URL
-	will be displayed whenever someone requests information
-	on the nick with the INFO command.
-	
-	Limited to Services admins.
+	Ассоциирует указанный URL с указаным ником. Этот URL
+	будет показан в информации, когда кто-то запросит ее,
+	используя команду INFO.
 
 NICK_HELP_SASET_EMAIL
-	Syntax: SASET nickname EMAIL address
+	Синтаксис: SASET ник EMAIL адрес
 	
-	Associates the given E-mail address with the nickname.
-	
-	Limited to Services admins.
+	Ассоциирует указанный Email-адрес с указанным ником.
 	
 NICK_HELP_SASET_ICQ
-	Syntax: SASET nickname ICQ number
+	Синтаксис: SASET ник ICQ номер
 	
-	Associates the given ICQ number with the nickname.  This 
-	number will be displayed whenever someone requests 
-	information on the nick with the INFO command.
-	
-	Limited to Services admins.
+	Ассоциирует указанный ICQ-номер с указаным ником. Этот номер
+	будет показан в информации, когда кто-то запросит ее,
+	используя команду INFO.
 	
 NICK_HELP_SASET_GREET
-	Syntax: SASET nickname GREET message
+	Синтаксис: SASET ник GREET текст
 	
-	Makes the given message the greet of the nickname, that
-	will be displayed when joining a channel that has GREET
-	option enabled, provided that the user has the necessary 
-	access on it.
-	
-	Limited to Services admins.
+	Устанавливает приветствие на указанный ник, которое будет
+	сказано ботом, когда ник заходит на какой либо канал, где функция
+	ПРИВЕТСТВИЯ включена, и ник имеет какой-либо доступ на этом канале.
 
 NICK_HELP_SASET_KILL
-	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
+	Синтаксис: SASET ник KILL {ON | QUICK | IMMED | OFF}
 	
-	Turns the automatic protection option for the nick
-	on or off.  With protection on, if another user
-	tries to take the nick, they will be given one minute to
-	change to another nick, after which %S will forcibly change
-	their nick.
+	Активирует\деактивирует автоматическую защиту для указанного ника.
+	Когда защита ВКЛЮЧЕНА (ON), любой другой пользователь, который
+	попытается взять указанный ник, будет иметь 1 минуту для того, чтобы
+	выбрать себе другой ник, иначе %S принудительно сменит его ник.
 	
-	If you select QUICK, the user will be given only 20 seconds
-	to change nicks instead of the usual 60.  If you select
-	IMMED, user's nick will be changed immediately without being
-	warned first or given a chance to change their nick; please
-	do not use this option unless necessary.  Also, your
-	network's administrators may have disabled this option.
-	
-	Limited to Services admins.
+	Если Вы выберете QUICK, у пользователя будет только 20 секунд
+	чтобы сменить ник.  Если вы выберете IMMED, ник пользователя
+	будет изменен немедленно, без предупреждения и шанса сменить ник.
+	Пожалуйста, не используйте опцию IMMED без КРАЙНЕЙ необходимости.
+	Также, администратор вашей IRC сети может отключить эту опцию. 
 
 NICK_HELP_SASET_SECURE
-	Syntax: SASET nickname SECURE {ON | OFF}
+	Синтаксис: SASET ник SECURE {ON | OFF}
 	
-	Turns %S's security features on or off for your
-	nick.  With SECURE set, you must enter your password
-	before you will be recognized as the owner of the nick,
-	regardless of whether your address is on the access
-	list.  However, if you are on the access list, %S
-	will not auto-kill you regardless of the setting of the
-	KILL option.
-	
-	Limited to Services admins.
+	Активирует\деактивирует опции Безопасности на %S для указанного
+	ника. При включенном SECURE, ник должны идентифицироваться
+	на NickServ, чтобы подтвердить, что именно он владелец данного
+	ника, при этом на список доступа сервисы не обращают внимания.
+	Тем не менее, если ник есть в списке доступа, %S
+	не будет автоматически переименовывать его, не обращая внимания
+	на установку опции KILL. 
 
 NICK_HELP_SASET_PRIVATE
-	Syntax: SASET nickname PRIVATE {ON | OFF}
+	Синтаксис: SASET ник PRIVATE {ON | OFF}
 	
-	Turns %S's privacy option on or off for the nick.
-	With PRIVATE set, the nickname will not appear in
-	nickname lists generated with %S's LIST command.
-	(However, anyone who knows the nickname can still get
-	information on it using the INFO command.)
-	
-	Limited to Services admins.
+	Активирует\деактивирует опций приватности на %S для указанного ника.
+	Когда PRIVATE включена, указанный ник не будет показываться
+	по команде %S's LIST.
+	(Тем не менее, любой, кто знает данный ник, имеет возможность
+	получить информацию о нем, используя команду INFO.) 
 
 NICK_HELP_SASET_HIDE
-	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
+	Синтаксис: SASET ник HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
-	Allows you to prevent certain pieces of information from
-	being displayed when someone does a %S INFO on the
-	nick.  You can hide the E-mail address (EMAIL), last seen
-	user@host mask (USERMASK), the services access status
-	(STATUS) and  last quit message (QUIT).
-	The second parameter specifies whether the information should
-	be displayed (OFF) or hidden (ON).
-	
-	Limited to Services admins.
+	Устанавливает опции скрытия информации для указаного ника,
+	которая будет показываться по команде %S INFO на данный ник.
+	Вы можете скрыть email-адрес (EMAIL) ника, время последнего
+	захода в сеть и маску (идент@хост), с которой он заходил (USERMASK),
+	доступ на сервисах (STATUS) и последнее сообщение выхода (QUIT).
+	Второй параметр определяет, будет ли эта информация
+	показываться (OFF) или скрываться (ON). 
 	
 NICK_HELP_SASET_MSG
-	Syntax: SASET nickname MSG {ON | OFF}
+	Синтаксис: SASET ник MSG {ON | OFF}
 	
-	Allows you to choose the way Services are communicating with 
-	the given user. With MSG set, Services will use messages,
-	else they'll use notices.
-	
-	Limited to Services admins.
+	Позволяет установить способ общения сервисов с указаным ником.
+	Если установить режим MSG, сервисы будут использовать приватные
+	сообщения, в ином случае будут использоваться нотисы. 
 
 NICK_HELP_SASET_NOEXPIRE
-	Syntax: SASET nickname NOEXPIRE {ON | OFF}
+	Синтаксис: SASET ник NOEXPIRE {ON | OFF}
 	
-	Sets whether the given nickname will expire.  Setting this
-	to ON prevents the nickname from expiring.
-	
-	Limited to Services admins.
+	Устанавливает, будет ли распространяться правило истечения
+	регистрации на указанный ник. Установите ON, если хотите
+	активировать режим не-истечения для данного ника.
 
 NICK_HELP_SASET_AUTOOP
-	Syntax: SASET nickname AUTOOP {ON | OFF}
+	Синтаксис: SASET ник AUTOOP {ON | OFF}
 	
-	Sets whether the given nickname will be opped automatically.
-	Set to ON to allow ChanServ to op you automatically when joining
-	channels.
-	
-	Limited to Services admins.
+	Активирует\деактивирует режим автоматического получения статуса
+	на каналах. Установите в ON, если хотите, что бы ChanServ
+	автоматически давал статус нику при заходе на канал.
 
 NICK_HELP_RECOVER
 	Синтаксис: RECOVER ник [пароль]
 	
-	Позволяет Вам вернуть Ваш ник, если кто-то еще
-	взял его; %S будет делать это автоматически
-	если у вас установлена автоматическая защита.
+	Позволяет Вам вернуть Ваш ник, если кто-то другой
+	взял его. %S будет делать это автоматически,
+	если у вас установлена опция Защиты на ник.
 	
-	При использовании данной команды, %S создает псевдопользователя
-	с указанным ником. Это заставит IRC сервер отключить
-	другого пользователя с данным ником. Этот псевдопользователь
-	будет оставаться в онлайне в течении минуты, чтобы гарантировать,
-	что другой пользователь не сможет немедленно снова взять этот ник;
-	через минуту вы можете вернуть себе Ваш ник. Также, вы можете использовать
-	команду RELEASE (%R%S HELP RELEASE) чтобы вернуть свой ник
-	раньше.
+	При использовании данной команды, %S создает
+	псевдопользователя с указанным ником. Это заставит IRC сервер
+	изменить ник пользователя, что взял ваш ник на случайный ник.
+	Данный псевдопользователь будет оставаться в онлайне в течении минуты,
+	чтобы гарантировать, что другой пользователь не сможет снова взять
+	ваш ник. Через минуту, вы можете вернуть себе Ваш ник. Также,
+	вы можете использовать команду RELEASE (%R%S HELP RELEASE)
+	чтобы вернуть свой ник раньше.
 	
 	При использовании команды RECOVER, Ваш текущий адрес, который
-	показывается в /WHOIS должен быть в списке доступа,
+	показывается в /WHOIS, должен быть в списке доступа,
 	вы должны быть идентифицированы, как владелец группы ника,
 	который возвращаете, или вы должны указать верный пароль на
 	данный ник.
@@ -3928,96 +3837,96 @@ NICK_HELP_RECOVER
 NICK_HELP_RELEASE
 	Синтаксис: RELEASE ник [пароль]
 	
-	Приказывает %S удалить любого, удерживающего ник пользователя,
+	Приказывает %S удалить любого, взявшего ваш ник,
 	включая защиту ника или используя команду RECOVER.
-	По умолчанию, удерживается в течении минуты;
-	эта команда освобождает ник довольно быстро.
+	По умолчанию, ник удерживается в течении минуты,
+	данная же команда освобождает ник довольно быстро.
 	
 	Порядок использования команды RELEASE для ника: Ваш
-	текущий адрес, который виден по команде /WHOIS должен быть одним из адресов
-	в списке доступа, вы должны быть идентифицированы и находиться в группе
-	этого ника, или Вы должны ввести верный пароль на
-	этот ник.
+	текущий адрес, который виден по команде /WHOIS должен
+	быть одним из адресов в списке доступа, вы должны быть
+	идентифицированы и находиться в группе этого ника, или,
+	Вы должны ввести верный пароль на этот ник.
 
 NICK_HELP_GHOST
 	Синтаксис: GHOST ник [пароль]
 	
 	Уничтожает "мертвое" IRC соединение, использующее Ваш ник.
-	"мертвое" соединение - это когда реально его не существует,
+	"Мертвое" соединение - это когда реально его не существует,
 	но когда IRC сервер думает, что оно все еще онлайн.
 	Обычно это происходит, если Ваш компьютер перезагрузился,
 	или Ваше соединение с локальной сетью или Интернет
 	оборвалось в тот момент, когда Вы были в IRC.
 	
 	Порядок использования команды GHOST для ника: Ваш
-	текущий адрес, который виден по команде /WHOIS должен быть одним из адресов
-	в списке доступа, вы должны быть идентифицированы и находиться в группе
-	этого ника, или Вы должны ввести верный пароль на
-	этот ник.
+	текущий адрес, который виден по команде /WHOIS должен
+	быть одним из адресов в списке доступа, вы должны быть
+	идентифицированы и находиться в группе этого ника, или,
+	Вы должны ввести верный пароль на этот ник.
 
 NICK_HELP_INFO
 	Синтаксис: INFO ник [ALL]
 	
-	Показывает информацию о нике, владельца
-	ника, его последнюю маску и время, когда он заходил в IRC,
+	Показывает информацию о нике: имя владельца ника,
+	его последнюю маску и время, когда он заходил в IRC,
 	параметры ника. Если Вы идентифицировали Ваш ник, Вы 
-	получите больше информации и если Вы укажете параметр ALL, Вы
-	увидите всю доступную информацию; не обращая внимания на то скрыта она 
-	или нет.
+	получите больше информации о Вашем нике, если укажете
+	параметр ALL, вне зависимости от того, скрыта она или нет.
 
 NICK_HELP_LIST
 	Синтаксис: LIST маска
 	
-	Показывает список всех зарегистрированных ников, которые содержат
-	введенную маску, в формате nick!user@host. Ники, у которых включена опция
-	PRIVATE не будут показаны.
+	Показывает список всех зарегистрированных ников,
+	которые содержат введенную маску, в формате ник!идент@хост.
+	Ники, у которых включена опция PRIVATE, не будут показаны.
 	
 	Примеры:
 	
 	    LIST *!joeuser@foo.com
-	    Покажет все ники, владельцы которых имеют маску joeuser@foo.com.
+	        Покажет все ники, владельцы которых имеют маску joeuser@foo.com.
 	
 	    LIST *Bot*!*@*
-	    Покажет все зарегистрированные ники со словом Bot в их
-	    нике (регистр неважен).
+	        Покажет все зарегистрированные ники со словом Bot в их
+	        нике (регистр неважен).
 	
 	    LIST *!*@*.bar.org
-	    Покажет все ники, принадлежащие пользователям
-	    в домене bar.org.
+	        Покажет все ники, принадлежащие пользователям
+	        в домене bar.org.
 
 NICK_HELP_ALIST
-	Синтаксис: ALIST [level]
+	Синтаксис: ALIST [уровень]
 	
-	Покажет все каналы, в списках доступа которых Вы числитесь. Опционально, Вы можете выбрать
-	определенный уровень в формате XOP или ACCESS. Результирующий список
-	выведет каналы, на которых у Вас есть соответствующий уровень.
+	Покажет все каналы, в списках доступа которых Вы числитесь.
+	Опционально, Вы можете выбрать определенный уровень в формате
+	xOP или ACCESS. Результирующий список выведет каналы, на которых
+	у Вас есть соответствующий уровень.
 
 	Примеры:
-	        ALIST Founder
+	     ALIST Founder
 	        Покажет все каналы, на которых Вы являетесь
 	        фаундером (владельцем).
 
-	        ALIST AOP
+	     ALIST AOP
 	        Покажет все каналы, на которых Вы являетесь аопом
 	        или выше.
 
-	        ALIST 10
+	     ALIST 10
 	        Покажет все каналы, на которых Ваш уровень равен 10
 	        или выше.
 	
-	Каналы, помеченные как NOEXPIRE будут показаны с восклицательным знаком
+	Каналы, помеченные как NOEXPIRE, будут показаны с восклицательным знаком
 	в качестве префикса.
 	
 NICK_HELP_GLIST
-	Syntax: GLIST
+	Синтаксис: GLIST
 	
 	Показывает все ники в Вашей группе.
 
 NICK_HELP_STATUS
-	Синтаксис: STATUS ник...
+	Синтаксис: STATUS ник1 ник2 ник3...
 	
-	Возвращает информацию о данном нике
-	идентифицировался ли он как владелец ника. Ответ выводится
+	Возвращает информацию о статсуе ника - идентифицировался ли
+	использующий его как владелец ника. Ответ выводится
 	в формате:
 	
 	    ник код-статуса
@@ -4030,86 +3939,90 @@ NICK_HELP_STATUS
 	    2 - пользователь идентифицирован как владелец ника только по списку доступа
 	    3 - пользователь идентифицирован как владелец ника через идентификацию паролем
 	
-	До 16 ников сразу может быть запрошено этой командой;
-	остальные будут проигнорированы. If no nickname is given, your status
-	will be returned.
+	До 16 ников сразу может быть запрошено этой командой,
+	остальные будут проигнорированы. Если ник не указан,
+	возвратит Ваш текущий статус
 
 NICK_HELP_SENDPASS
-	Синтаксис: SENDPASS nickname
+	Синтаксис: SENDPASS ник
 	
-	Отправляет пароль ника на адрес e-mail
-	указанный при регистрации ника. Эту команду учень удобно использовать
-	чтобы восстановить забытый пароль.
+	Отправляет пароль ника на email-адрес указанный
+	при регистрации ника. Эту команду учень удобно
+	использовать, чтобы восстановить забытый пароль.
 	
-	Может быть ограничена к использованию только для IRC операторов в данной сети.
+	Может быть ограничена для использования только
+	IRC-операторами данной сети.
 	
 	При включенном шифровании паролей эта команда недоступна.
 
 NICK_HELP_CONFIRM
-	Syntax: CONFIRM passcode
+	Синтаксис: CONFIRM auth-код
 	
-	This is the second step of nickname registration process.
-	You must perform this command in order to get your nickname
-	registered with %S. The passcode (or called auth code also)
-	is sent to your e-mail address in the first step of the
-	registration process. For more information about the first
-	stage of the registration process, type: %R%S HELP REGISTER
+	Данная команда необходима, что бы завершить второй шаг
+	регистрации ника - подтверждение. После выполнения данного
+	тербования, ваш ник будет зарегистрирован у %S.
+	Кодовая фраза, которая указывается в качестве параметра,
+	высылается на ваш e-mail в первой части процесса регистрации
+	ника. Для более подробной информации используйте:
+	%R%S HELP REGISTER
 
 NICK_SERVADMIN_HELP
-	Администраторы сервисов могут также удалить любой ник без идентификации
-	для него, и могут смотреть список доступа для любого ника
-	(%R%S ACCESS LIST ник).
+	Администраторы сервисов могут удалить любой ник
+	без идентификации к нему, а так же, могут смотреть
+	список доступа для любого ника (%R%S ACCESS LIST ник).
 
 NICK_SERVADMIN_HELP_LOGOUT
 	Синтаксис: LOGOUT [ник [REVALIDATE]]
 	
 	Без параметров, совершает обратный IDENTIFY эффект,
 	т.е. делает Вас неидентифицированным как владельца ника.
-	Примечание, однако, Вас не будут просить идентифицировать
-	себя.
+	Однако, сервисы не будут просить Вас идентифицировать
+	себя заново.
 	
-	с параметром, делает тоже самое с введенным ником. Если Вы
-	укажете еще и REVALIDATE, сервисы попросят данный ник переидентифицировать
-	себя. Это могут использовать только Администраторы сервисов.
+	Если ввести ник как параметр, деидентифицирует указанный ник.
+	Если же Вы укажете еще и REVALIDATE, сервисы попросят данный ник
+	переидентифицировать себя. Данные параметры могут использовать
+	только Администраторы сервисов.
 
 NICK_SERVADMIN_HELP_DROP
 	Синтаксис: DROP [ник]
 	
-	Без параметров, удаляет Ваш ник из
-	базы данных %S.
+	Без параметров, удаляет Ваш ник из базы данных %S.
 	
-	С параметром, удаляет выбранный нин из базы данных.
-	Вы можете удалить любой ник из Вашей группы не имя каких-либо 
-	особых привилегий. Удалить любой ник могут только
-	Администраторы сервисов.
+	С параметром, удаляет указанный ник из базы данных.
+	Вы можете удалить любой ник из Вашей группы не имея
+	каких-либо особых привилегий. Удалить абсолютно ЛЮБОЙ
+	ник могут только Администраторы сервисов.
 
 NICK_SERVADMIN_HELP_INFO
 	
-	Администраторы сервисов могу использовать параметр ALL для любого ника.
+	Администраторы сервисов могу использовать параметр
+	ALL для любого ника.
 
 NICK_SERVADMIN_HELP_LIST
 	Синтаксис: LIST маска [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
 	
-	Показывает список всех зарегистрированных ников which которые содержат
-	введенную маску, в формате nick!user@host. Ники, у которых включена опция
-	PRIVATE будут показаны только Администраторам сервисов. Ники
+	Показывает список всех зарегистрированных ников которые попадают под
+	введенную маску, в формате ник!идент@хост. Ники, у которых включена
+	опция PRIVATE, будут показаны только Администраторам сервисов. Ники
 	с включенным параметром NOEXPIRE будут показаны с префиксом ! перед
 	ником.
 	
-	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
-	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
-	NOEXPIRE flag set will be displayed. If all three options are
-	given, all three types of nicks will be displayed. These options
-	are limited to Services admins.  
+	Если указаны опции FORBIDDEN, NOEXPIRE или UNCONFIRMED, будут
+	показаны только те ники, которые в режиме FORBIDDEN (запрещен),
+	UNCONFIRMED (не подтвержден) или имеют установку
+	NOEXPIRE (режим не-истечения). Если указаны все три опци,
+	все три типа ников будут показаны. 
 	
 	Примеры:
 	
 	    LIST *!joeuser@foo.com
-	    Покажет все зарегистрированные ники, владелец которых является joeuser@foo.com.
+	    Покажет все зарегистрированные ники, владелец которых является
+	    joeuser@foo.com.
 	
 	    LIST *Bot*!*@*
 	    Покажет все зарегистрированные ники, в которых есть слово Bot
-	    (не зависит от регистра).
+	    (вне зависимости от регистра).
 	
 	    LIST * NOEXPIRE
 	    Покажет все зарегистрированные ники у которых включена опция
@@ -4118,93 +4031,75 @@ NICK_SERVADMIN_HELP_LIST
 NICK_SERVADMIN_HELP_ALIST
 	Синтаксис: ALIST [ник] [уровень]
 	
-	Без параметров покажет список каналов, на которых Вы прописаны. С
-	первым параметром, покажет каналы, на которых прописан nickname.
-	С двумя параметрами покажет каналы, где прописан nickname с уровнем
-	level или выше.
+	Без параметров, покажет список каналов, на которых Вы прописаны.
+	С первым параметром, покажет каналы, на которых прописан указанный
+	ник. С обоими параметрами, покажет каналы, где прописан указанный
+	ник с указанным уровнем или выше.
 
-	Эту команду могут использовать только Администраторы сервисов.
+	Для использования этой команды необходимы права Администратора сервисов.
 
 NICK_SERVADMIN_HELP_GLIST
 	Синтаксис: GLIST [ник]
 	
-	Без параметров, покажет список ников
-	в Вашей группе.
+	Без параметров, покажет список ников в Вашей группе.
 	
 	С параметром, покажет все ники, находящиеся в 
 	группе указанного ника.
-	Эту команду могут использовать только Администраторы сервисов.
+	Для использования этой команды необходимы права Администратора сервисов.
 
 NICK_SERVADMIN_HELP_GETPASS
 	Синтаксис: GETPASS ник
 	
-	Возвращает пароль указанного ника.  ПРимечание при
-	использовании данной команды, сообщение, включающее ник,
-	вызвавший данную команду и ник, на который был запрошен пароль
-	будет записан в лог и отправлен в WALLOPS/GLOBOPS.
+	Возвращает пароль указанного ника.  Примечание: при
+	использовании данной команды, по WALLOPS/GLOBOPS
+	посылается сообщение, включающее ник,
+	который использовал данную команду и ник, пароль
+	которого был запрошен. Одновременно с этим, сообщение
+	записывается в лог.
 	
-	Эту команду могут использовать только Администраторы сервисов.
-	
-	Эта команда недоступна, если шифрование включено.
+	Данная команда недоступна, если включено шифрование паролей.
 
 NICK_SERVADMIN_HELP_GETEMAIL
 	Синтаксис: GETEMAIL user@emailhost
 
-	Возвращает ники, у которых в настройках стоит указанный email. Внимание
-	запрещено использовать символьные маски ни для user ни для emailhost. Каждый раз
-	при использовании данной команды, сообщение, включающее человека, вызвавшего
-	команду и указанный email будет записано в лог.
-
-	Эту команду могут использовать только Администраторы сервисов.
+	Возвращает ники, у которых в настройках стоит указанный email.
+	Примечание: вы не можете использовать симольные маски ни для user,
+	ни для emailhost. Каждый раз при использовании данной команды,
+	сообщение, включающее ник вызвавшего команду и указанный email,
+	будет записано в лог.
 
 NICK_SERVADMIN_HELP_FORBID
 	Синтаксис: FORBID ник [причина]
 	
-	Запрещает регистрировать или исползовать ник
+	Запрещает регистрировать или использовать ник указанный ник.
 	Может быть отменено путем удаления ника (DROP).
 	
-	В некоторых сетях причина является необходимым параметром.
-	
-	Эту команду могут использовать только Администраторы сервисов.
-
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
+	В некоторых сетях, причина является обязательным параметром.
 
 NICK_SERVADMIN_HELP_SUSPEND
-	Syntax: SUSPEND nickname reason / UNSUSPEND nickname
+	Синтаксис: SUSPEND ник причина
 
-	SUSPENDs / UNSUSPENDs a nickname from being identified to
-	
-	Limited to Services admins.
-
-###########################################################################
-#
-# ChanServ help messages
-#
-###########################################################################
+	Устанавливает режим саспенда ("заморозки") на ник,
+	предотвращая возможность идентификации к нему или использования.
 
 NICK_SERVADMIN_HELP_UNSUSPEND
-	Syntax: UNSUSPEND nickname
+	Syntax: UNSUSPEND ник
 
-	UNSUSPENDS a nickname from being used.
-
-	Limited to Services admins.
+	Симает режим саспенда с ника.
 
 ###########################################################################
 #
 # ChanServ help messages
 #
 ###########################################################################
+
 CHAN_HELP_CMD_GETPASS
 	    GETPASS    Получить пароль владельца канала
 CHAN_HELP_CMD_FORBID
 	    FORBID     Запретить использовать канал
 CHAN_HELP_CMD_SUSPEND
-	    SUSPEND    Приостановить работу канала с сохранением
-	               данных и настроек канала.
+	    SUSPEND    Приостановить работу канала, с сохранением
+	               данных и настроек канала
 CHAN_HELP_CMD_UNSUSPEND
 	    UNSUSPEND  Восстановить работу приостановленного канала.
 CHAN_HELP_CMD_STATUS
@@ -4215,13 +4110,13 @@ CHAN_HELP_CMD_REGISTER
 CHAN_HELP_CMD_IDENTIFY
 	    IDENTIFY   Идентифицироваться как владелец канала
 CHAN_HELP_CMD_SET
-	    SET        Установить информацию о канале и опции канала
+	    SET        Установить информацию о канале и его опции
 CHAN_HELP_CMD_AOP
-	    AOP        Модифицировать список AOP'ов
+	    AOP        Управляет списком AOP'ов на канале
 CHAN_HELP_CMD_SOP
-	    SOP        Модифицировать список SOP'ов
+	    SOP        Управляет списком SOP'ов на канале
 CHAN_HELP_CMD_ACCESS
-	    ACCESS     Модифицировать список привилегированных пользователей
+	    ACCESS     Управляет ACCESS-списком привилегий пользователей
 CHAN_HELP_CMD_LEVELS
 	    LEVELS     Переустановить значения уровней доступа
 CHAN_HELP_CMD_AKICK
@@ -4231,122 +4126,128 @@ CHAN_HELP_CMD_DROP
 CHAN_HELP_CMD_SENDPASS
 	    SENDPASS   Поможет восстановить забытый пароль
 CHAN_HELP_CMD_BAN
-	    BAN        Bans a selected nick on a channel
+	    BAN        Банит указанного пользователя на канале
 CHAN_HELP_CMD_CLEAR
-	    CLEAR      Tells ChanServ to clear certain settings on a channel
+	    CLEAR      Очищает определенные режимы на канале
 CHAN_HELP_CMD_DEVOICE
-	    DEVOICE    Devoices a selected nick on a channel
+	    DEVOICE    Снимает режим войса (-v) с указанного ника
 CHAN_HELP_CMD_GETKEY
-	    GETKEY     Returns the key of the given channel
+	    GETKEY     Возвращает ключ канала
 CHAN_HELP_CMD_INFO
-	    INFO       Lists information about the named registered channel
+	    INFO       Выдает информацию об указанном канале
 CHAN_HELP_CMD_INVITE
-	    INVITE     Tells ChanServ to invite you or a given nick into a channel
+	    INVITE     Заставляет ChanServ пригласить вас на указанный канал.
 CHAN_HELP_CMD_KICK
-	    KICK       Kicks a selected nick from a channel
+	    KICK       Выкидывает указанного пользователя с канала
 CHAN_HELP_CMD_LIST
-	    LIST       Lists all registered channels matching the given pattern
+	    LIST       Список всех зарегистрированных каналов по указанной маске
 CHAN_HELP_CMD_LOGOUT
-	    LOGOUT     This command will logout the selected nickname
+	    LOGOUT     Данная команда деидентифицирует указанный ник от канала
 CHAN_HELP_CMD_OP
-	    OP         Gives Op status to a selected nick on a channel
+	    OP         Дает статус оператора (+o) указанному нику на канале
 CHAN_HELP_CMD_TOPIC
-	    TOPIC      Manipulate the topic of the specified channel
+	    TOPIC      Позволяет устанавливать топик на канале посредством ChanServ
 CHAN_HELP_CMD_UNBAN
-	    UNBAN      Remove all bans preventing you from entering a channel
+	    UNBAN      Удаляет все баны , которые не позволяют вам зайти на канал
 CHAN_HELP_CMD_VOICE
-	    VOICE      Voices a selected nick on a channel
+	    VOICE      Дает статус голоса (+v) указаному нику на канале
 CHAN_HELP_CMD_VOP
-	    VOP        Maintains the VOP (VOicePeople) list for a channel
+	    VOP        Управляет списокм VOP'ов на канале
 CHAN_HELP_CMD_DEHALFOP
-	    DEHALFOP   Dehalfops a selected nick on a channel
+	    DEHALFOP   Снимает статус полуоператора (-h) с указанного ника на канале
 CHAN_HELP_CMD_DEOWNER
-	    DEOWNER    Removes your owner status on a channel
+	    DEOWNER    Снимает с вас статус владельца канала
 CHAN_HELP_CMD_DEPROTECT
-	    DEPROTECT  Deprotects a selected nick on a channel
+	    DEPROTECT  Снимает режим защиты с указанного ника на канале
 CHAN_HELP_CMD_HALFOP
-	    HALFOP     Halfops a selected nick on a channel
+	    HALFOP     Дает статус полуоператора (+h) указанному нику на канале
 CHAN_HELP_CMD_HOP
-	    HOP        Maintains the HOP (HalfOP) list for a channel
+	    HOP        Управляет списоком HOP'ов на канале
 CHAN_HELP_CMD_OWNER
-	    OWNER      Gives you owner status on channel
+	    OWNER      Дает вам статус владельца канала
 CHAN_HELP_CMD_PROTECT
-	    PROTECT    Protects a selected nick on a channel
+	    PROTECT    Устанавливает режим защиты указаному нику на канале
 CHAN_HELP_CMD_ADMIN
-	    ADMIN      Protects a selected nick on a channel
+	    ADMIN      Устанавливает режим защиты указаному нику на канале
 CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Deprotects a selected nick on a channel
+	    DEADMIN    Снимает режим защиты с указанного ника на канале
 CHAN_HELP_CMD_DEOP
-	    DEOP       Deops a selected nick on a channel
+	    DEOP       Снимает статус оператора (-o) с указанного ника на канале
 
 CHAN_HELP
-	%S позволяет Вам регистрировать канал и управлять
-	каналом.  %S может предохранить
-	от злобных пользователей, желающих "захватить" канал, используя
-	ограничение возможности получения опа на канале. Доступные
-	команды показаны ниже; чтобы использовать их пишите
-	%R%S команда. Для более подробной информации о конкретной
-	команде, напишите %R%S HELP команда.
+	%S позволяет Вам регистрировать канал и управлять его
+	различными настройками. Также, %S поможет вам обезопасить
+	ваш канал от злонамеренных пользователей, желающих его
+	"захватить", используя ограничение возможности получения
+	опа на канале и др. настройки безопасности. Доступные команды
+	показаны ниже, чтобы использовать их, напишите
+	%R%S команда. Для более подробной информации
+	о конкретной команде, напишите %R%S HELP команда.
 	 
 	
 CHAN_HELP_EXPIRES
 	
 	Помните, что любой канал, не использующийся в течение %d дней
-	(т.е. ни один пользователь, прописанный в списке доступа канала
-	не посетит канал в течении данного времени) будет автоматически удален.
+	(т.е. ни один пользователь, прописанный в списке доступа канала,
+	не посетит канал в течении данного времени), будет автоматически
+	удален.
 
 CHAN_HELP_REGISTER
 	Синтаксис: REGISTER #канал пароль описание
 	
-	Регистрирует канал в базе данных %S. Чтобы использовать эту команду
-	Вы должны быть оператором канала, который Вы
-	пытаетесь зарегистрировать. Пароль должен быть
-	использован с командой IDENTIFY, чтобы иметь возможность
-	изменять различные параметры канала.
-	Последний параметр (описание), который обязательно должен присутствовать,
-	является описанием канала и, возможно, его тематикой.
+	Регистрирует канал в базе данных %S. Чтобы использовать
+	эту команду, Вы должны быть оператором канала, который Вы
+	пытаетесь зарегистрировать. Указанный при регистрации пароль,
+	может использоваться (командой IDENTIFY) для получения доступа
+	к каналу, его различным настройкам.
+	Последний параметр (описание), который обязательно должен
+	присутствовать, является описанием канала и/или, возможно, его тематикой.
 	
-	Когда Вы зарегистрируете канал, Вы будете записаны в список доступа канала
-	как "владелец" канала.  Владелец канала может
-	изменять любые параметры канала;
-	%S также автоматически даст статус оператора канала
-	владельцу при заходе его на канал.
-	Используйте команду ACCESS (%R%S HELP ACCESS) для
-	для получения информации о том, как давать дополнительные привилегии
-	на канале для других пользователей.
+	Когда Вы зарегистрируете канал, Вы автоматически будете
+	внесены в список доступа канала как "владелец" (founder).
+	Владелец канала может изменять любые его (канала) параметры.
+	Так же, %S автоматически будет давать владельцу статус
+	оператора канала, когда он/она заходит на канал.
+	Вы можете использовать команду ACCESS (%R%S HELP ACCESS),
+	для для получения информации о том, как давать дополнительные
+	привилегии на канале для других пользователей.
 	
-	ПРИМЕЧАНИЕ: Чтобы зарегистрировать канал, сперва
-	Вы должны зарегистрировать Ваш ник. Если Вы этого еще не сделали,
-	%R%s HELP для получения информации о том, как зарегистрировать ник.
+	ПРИМЕЧАНИЕ: Чтобы зарегистрировать канал, Вы ДОЛЖНЫ
+	зарегистрировать Ваш ник. Если Вы этого еще не сделали,
+	напишите %R%s HELP для получения информации о том,
+	как зарегистрировать ник.
 
 CHAN_HELP_IDENTIFY
 	Синтаксис: IDENTIFY #канал пароль
 	
-	Идентифицирует Вас на %S как владельца данного
-	канала. Многие команды для канала недоступны, пока Вы не
-	идентифицируетесь. Пароль должен быть тем паролем, который
-	Вы указывали, когда использовали команду REGISTER.
+	Идентифицирует Вас на %S как владельца указанного
+	канала. Многие команды для канала будут недоступны,
+	пока Вы не идентифицируетесь. Пароль должен быть тем
+	паролем, который Вы указывали, когда использовали команду
+	REGISTER при регистрации канала.
 	
 CHAN_HELP_LOGOUT
 	Синтаксис: LOGOUT #канал ник
 	
-	Эта команда делает указанный ник неидентифицированным как
-	владелец данного канала.
+	Эта команда деидентифицирует указанный ник,
+	который идентифицировался как владелец канала
+	с помощью пароля.
 	
-	Если Вы являетесь владельцем, Вы можете деидентифицировать кого угодно,
-	в ином случае только себя.
+	Если Вы являетесь владельцем, Вы можете деидентифицировать
+	кого угодно, в ином случае - только себя.
 
 CHAN_HELP_DROP
 	Синтаксис: DROP #канал
 	
-	Удаляет указанный канал. Команда может быть использована только
-	владельцем канала, который должен сначала дать команду IDENTIFY.
+	Удаляет указанный канал. Команда может быть использована
+	ТОЛЬКО владельцем канала, который должен сперва
+	использовать команду IDENTIFY.
 
 CHAN_HELP_SET
 	Синтаксис: SET #канал опция параметры
 	
 	Позволяет владельцу канала менять различные настройки
-	канала и другое.
+	канала и какую-либо информацию.
 	
 	Доступные опции:
 	
@@ -4354,11 +4255,11 @@ CHAN_HELP_SET
 	    SUCCESSOR     Установить наследника канала
 	    PASSWORD      Установить пароль владельца
 	    DESC          Установить описание канала
-	    URL           Установить URL канала
-	    EMAIL         Установить адрес E-mail для канала
+	    URL           Установить URL-адрес канала
+	    EMAIL         Установить Email-адрес канала
 	    ENTRYMSG      Установить сообщение, которое будет отправлено
-	                  пользователям, вошедшим в канал
-	    BANTYPE       Установить тип банов сервисов на канале
+	                  всем пользователям, вошедшим в канал
+	    BANTYPE       Установить тип банов сервисами на канале
 	    MLOCK         Включить или выключить блокировку режимов канала
 	    KEEPTOPIC     Хранить топик, если все покинули канал
 	    OPNOTICE      Уведомлять об использовании команд OP/DEOP
@@ -4367,13 +4268,13 @@ CHAN_HELP_SET
 	    RESTRICTED    Ограничить доступ на канал
 	    SECURE        Активировать дополнительные возможности %S'а по безопасности.
 	    SECUREOPS     Ограничить получение статуса оператора канала
-	    SECUREFOUNDER Ограничить получение статуса владельца канала
+	    SECUREFOUNDER Ограничить получение статуса ПОЛНОГО владельца канала
 	    SIGNKICK      Подписывать или нет кик при использовании команды KICK
 	    TOPICLOCK     Изменять топик только с помощью команды TOPIC
 	    XOP           Выбрать систему привилегий
 	
-	Напишите %R%S HELP опция для получения более подробной информации
-	о конкретной опции.
+	Напишите %R%S HELP опция для получения более подробной
+	информации о конкретной опции.
 
 CHAN_HELP_SET_FOUNDER
 	Синтаксис: SET #канал FOUNDER ник
@@ -4384,8 +4285,8 @@ CHAN_HELP_SET_FOUNDER
 CHAN_HELP_SET_SUCCESSOR
 	Синтаксис: SET #канал SUCCESSOR ник
 	
-	Установить наследника канала. Если ник владельца истечет
-	или будет удален, пока канал существует,
+	Установить наследника канала. Если ник владельца
+	истечет или будет удален, пока канал существует,
 	наследник станет новым владельцем канала.
 	Тем не менее, если наследник уже зарегистрировал
 	чересчур много каналов (более %d), канал будет удален,
@@ -4396,20 +4297,20 @@ CHAN_HELP_SET_PASSWORD
 	Синтаксис: SET #канал PASSWORD пароль
 	
 	Установить пароль, используемый для идентификации
-	на канале как его владелец.
+	к каналу как его владелец.
 
 CHAN_HELP_SET_DESC
 	Синтаксис: SET #канал DESC описание
 	
-	Устанавливает описание канала, которое будет показано при использовании
-	команд LIST и INFO.
+	Устанавливает описание канала, которое будет показано
+	при использовании команд LIST и INFO.
 
 CHAN_HELP_SET_URL
-	Синтаксис: SET #канал URL [http://адрес.странички]
+	Синтаксис: SET #канал URL [адрес]
 	
-	Установить URL канала. Этот URL
-	будет показан, когда кто-либо запросит информацию о канале
-	с помощью коанды INFO. Если команду дать без параметров,
+	Установить URL-адрес канала. Этот URL будет показан,
+	когда кто-либо запросит информацию о канале с помощью
+	команды INFO. Если команду дать без параметров,
 	удалит текущий URL канала.
 
 CHAN_HELP_SET_EMAIL
@@ -4425,21 +4326,21 @@ CHAN_HELP_SET_ENTRYMSG
 	Синтаксис: SET #канал ENTRYMSG [сообщение]
 	
 	Установить сообщение, которое будет отправлено нотисом
-	каждому вошедшему на канал пользователю. Если команду дать без параметров,
-	удалит сообщение входа.
+	(/notice) каждому вошедшему на канал пользователю.
+	Если команду дать без параметров, удалит сообщение при входе.
 
 CHAN_HELP_SET_BANTYPE
-	Синтаксис: SET #канал BANTYPE тип бана
+	Синтаксис: SET #канал BANTYPE тип_бана
 	
-	Установить тип бана, который будет использован, когда
-	кто-то будет забанен сервисами на Вашем канале.
+	Установить тип бана, который будет использован сервисами,
+	когда кто-либо запрашивает команду BAN на Вашем канале.
 	
-	тип бана должен быть номером между 0 и 3 включительно:
+	тип_бана должен быть номером между 0 и 3 включительно:
 	
-	0: бан вида *!user@host
-	1: бан вида *!*user@host
-	2: бан вида *!*@host
-	3: бан вида *!*user@*.domain
+	0: бан вида *!идент@хост
+	1: бан вида *!*идент@хост
+	2: бан вида *!*@хост
+	3: бан вида *!*идент@*.домен
 
 CHAN_HELP_SET_KEEPTOPIC
 	Синтаксис: SET #канал KEEPTOPIC {ON | OFF}
@@ -4453,124 +4354,128 @@ CHAN_HELP_SET_KEEPTOPIC
 CHAN_HELP_SET_TOPICLOCK
 	Синтаксис: SET #канал TOPICLOCK {ON | OFF}
 	
-	Включает или выключает опцию блокировать топик на канале.
+	Включает или выключает опцию блокировки топика на канале.
 	Когда блокирование топика включено, %S разрешит менять
-	топик канала только используя команду 
-	TOPIC.
+	топик канала только с использованием команды TOPIC.
 
 CHAN_HELP_SET_MLOCK
 	Синтаксис: SET #канал MLOCK режимы
 	
 	Устанавливает и блокирует определенные режимы канала. %S
 	позволяет Вам установить режимы канала, которые Вы хотите
-	включить, выключить, или сделать свободными для включения/выключения.
+	заблокировать, разблокировать, или сделать свободными для
+	установки/снятия.
 	
-	Параметр режимы в прнципе напоминает команду
-	/MODE; режимы, начинающиеся с + блокируются в
-	состоянии включено, а режимы, начинающиеся с - в состоянии выключено. Примечание:
-	тем не менее, это не то же самое, кто команда /MODE, использование
-	SET MLOCK удалит все предыдущие режимы
-	и заменит их новыми!
+	Параметр режимы своим использованием напоминает команду
+	/MODE - режимы, начинающиеся с + блокируются в
+	состоянии включено (заблокированы от снятия), а режимы,
+	начинающиеся с - в состоянии выключено (заблокированы от установки).
+	Примечание: однако, вы должны помнить, что повторное использование
+	SET MLOCK удалит все предыдущие заблокированные режимы и заменит
+	их новыми!
 	
-	Внимание:  Если вы установили и заблокировали ключ канала, как во втором
-	примере ниже, вы должны также установить опцию RESTRICTED
+	Внимание: Если вы установили и заблокировали ключ канала, как во
+	втором примере ниже, вы должны также установить опцию RESTRICTED
 	на канал (см. HELP SET RESTRICTED), или любой, кто зайдет на канал
-	когда тот будет пуст сможет увидеть ключ!
+	когда тот будет пуст, сможет увидеть установленный ключ!
 	
 	Примеры:
 	
 	    SET #канал MLOCK +nt-iklps
-	    Блокирует включенными режимы n и t, и выключенными i, k, l, p, и s.
-	    Режим m остается свободным к включению/выключению любым оператором.
+	        Блокирует включенными режимы n и t, и выключенными i, k, l, p, и s.
+	        Режим m остается свободным к установке/снятию любым оператором.
 	
 	    SET #канал MLOCK +knst-ilmp мой-ключ-пароль
-	    Блокирует включенным режимы k, n, s, и t, и выключенными i, l, m, и p.
-	    Также устанавливает ключ для входа на канал
-	    "мой-ключ-пароль".
+	        Блокирует включенным режимы k, n, s, и t, и выключенными
+		i, l, m, и p. Также? устанавливает ключ для входа на канал
+	        ("мой-ключ-пароль").
 	
 	    SET #канал MLOCK +
-	    Удаляет блокировку режимов; Все режимы каналов свободно могут быть
-	    изменены любым оператором канала.
+	        Удаляет блокировку режимов. Все режимы каналов свободно могут быть
+	        изменены любым оператором канала.
 
 CHAN_HELP_SET_PEACE
 	Синтаксис: SET #канал PEACE {ON | OFF}
 	
 	Включает или выключает опцию спокойствия на канале.
 	Когда спокойствие включено, пользователь не может кикать,
-	банить или удалять статус на канале с другого пользователя с уровнем
-	выше или равным командами %S.
+	банить или снимать статус на канале с другого пользователя
+	с уровнем выше или равным ему посредством команд %S.
 
 CHAN_HELP_SET_PRIVATE
 	Синтаксис: SET #канал PRIVATE {ON | OFF}
 	
 	Включает или выключает опцию приватности на канале.
-	Когда приватность включена, использование %R%S LIST не покажет
-	данный канал в списке.
+	Когда приватность включена, канал не будет показан
+	в списке при использовании команды %R%S LIST.
 
 CHAN_HELP_SET_RESTRICTED
 	Синтаксис: SET #канал RESTRICTED {ON | OFF}
 	
 	Включает или выключает ограниченный доступ на
 	канал. Когда ограниченный доступ включен, пользователи,
-	не имеющие права на получение статуса оператора канала
+	не имеющие права на получение статуса на канале
 	(пользователи с отрицательными уровнями доступа, и, если
-	безопасность статуса опа включена и пользователя нет в списке доступа) будут
-	немедленно забанены и выкинуты с канала.
+	безопасность статуса опа включена и пользователя нет
+	в списке доступа) будут немедленно забанены и выкинуты с канала.
 
 CHAN_HELP_SET_SECURE
 	Синтаксис: SET #канал SECURE {ON | OFF}
 	
-	Включает или выключает опции безопасности %S для
-	канала. Когда SECURE включено, только пользователи
-	с зарегистрированными никами, проидентифицировавшиеся
-	на %s и включенные в список доступа канала
-	смогут войти на канал.
+	Включает или выключает опции безопасности %S для канала.
+	Когда SECURE включено, только пользователи с зарегистрированными никами,
+	проидентифицировавшиеся к своему нику через пароль и включенные
+	в список доступа канала смогут запросить через сервисы статус на канале.
+	Если Безопасность выключена, пользователи, прописанные на канале,
+	могут запросить статус даже если имеют авторизацию к своему нику
+	всего лишь через список масок на %s.
 
 CHAN_HELP_SET_SECUREOPS
 	Синтаксис: SET #канал SECUREOPS {ON | OFF}
 	
 	Включает или выключает безопасность статуса оператора канала.
-	Когда безопасность статуса оператора включена, пользователи, не прописанные операторами
-	в списке доступа не могут получить статус опа на канале.
+	Когда безопасность статуса оператора включена, пользователи,
+	не прописанные операторами в списке доступа не могут получить
+	статус опа на канале.
 	
 CHAN_HELP_SET_SECUREFOUNDER
 	Синтаксис: SET #канал SECUREFOUNDER {ON | OFF}
 	
 	Включает или выключает безопасность владельца на канале.
 	Когда безопасность владельца включена, только настоящий владелец
-	может удалить канал, изменить его пароль, его владельца и его
-	наследника, а не любой, кто идентифицируется на %S.
+	может удалить канал, изменить его пароль, сменить владельца канала и его
+	наследника, а не любой, кто идентифицируется к каналу на %S через пароль.
 	
 CHAN_HELP_SET_SIGNKICK
 	Синтаксис: SET #канал SIGNKICK {ON | LEVEL | OFF}
 	
-	Включает или выключает подписанные кики
-	на канале. Когда SIGNKICK включен, кики через команду
-	%S KICK будут "подписаны" тем, кто испоьзовал эту команду
-	с указанием причины.
+	Включает или выключает подписанные кики на канале.
+	Когда SIGNKICK включен, кики через команду
+	%S KICK будут "подписаны" тем, кто использовал эту
+	команду с указанием причины кика (если была указана причина).
 	
 	Если Вы используете LEVEL, тот, у кого уровень выше или равен 
-	Вам (если Вы пытаетесь его кикнуть) то
-	кик не произойдет. См. %R%S HELP LEVELS для получения более подробной информации.
+	указаному в установке сможет кикать и его ник не будет указан в причине кика.
+	См. %R%S HELP LEVELS для получения более подробной информации.
 
 CHAN_HELP_SET_XOP
 	Синтаксис: SET #канал XOP {ON | OFF}
 	
-	Включает или выключает систему списка доступа xOP на канале.
-	Когда XOP включен, Вы можете использовать только команды AOP/SOP/VOP
-	чтобы изменять привилегии пользователей на канале,
-	в противоположном случае, вы можете использовать команду ACCESS.
+	Включает или выключает систему привелегий xOP на канале.
+	Когда XOP включен, Вы можете использовать только команды
+	SOP/AOP/HOP/VOP чтобы изменять привилегии пользователей на канале,
+	в ином случае, вы можете использовать команду ACCESS.
 	
-	Техническое примечание: когда Вы переключите систему привилегий в xOP,
-	ваши установки уровней дла канала и пользователей будут изменены,
-	и Вы не сможете вернуть эти значение, переключившись
-	обратно в систему привилегий ACCESS! 
+	Техническое примечание: когда Вы переключитесь из системы ACCESS
+	в систему привилегий в xOP, ваши установки уровней для канала и уровни
+	пользователей будут изменены, и Вы не сможете вернуть эти значения,
+	переключившись обратно в систему привилегий ACCESS! 
 	
-	Также, Вы должны удостовериться в том, что Ваши полльзователи правильно прописаны в xOP 
-	листе после переключения из системы ACCESS в xOP, потому что
-	это может пройти вовсе не безупречно... вообще, крайне не рекомендуется
-	использовать систему xOP если Вы изменили значения уровней, используя
-	команду LEVELS.
+	Также, Вы должны удостовериться в том, что Ваши пользователи
+	правильно прописаны в xOP-листе после переключения из системы
+	ACCESS в xOP, потому что переход может пройти не всегда гладко...
+	и вообще, крайне не рекомендуется использовать систему xOP,
+	если Вы изменили значения уровней, используя команду LEVELS.
 	
 	Переключение из системы xOP в систему ACCESS обычно
 	проходит без проблем.
@@ -4578,40 +4483,39 @@ CHAN_HELP_SET_XOP
 CHAN_HELP_SET_OPNOTICE
 	Синтаксис: SET #канал OPNOTICE {ON | OFF}
 	
-	Включает или выключает оп-уведомление на канале.
+	Включает или выключает режим OP-уведомление на канале.
 	Когда оп-уведомление включено, %S будет посылать нотис
-	на канал когда кто-либо использует команду OP или DEOP
-	на канале.
+	на канал, когда кто-либо использует команду OP или DEOP.
 
 CHAN_HELP_AOP
 	Синтаксис: AOP #канал ADD ник
-	           AOP #канал DEL {nick | номер-записи | list}
-	           AOP #канал LIST [маска | list]
+	           AOP #канал DEL {nick | номер-записи | список_записей}
+	           AOP #канал LIST [маска | список_записей]
 	           AOP #канал CLEAR
 	
-	Поддерживает список AOP (АвтоОператоров) канала. AOP 
-	дает возможность пользователю получить опа при входе на канал,
-	снимать с себя баны, приглашать по необходимости, иметь приветственное
-	сообщение входа на канал, и многое другое.
+	Позволяет управлять списоком AOP (АвтоОператоров) канала.
+	AOP дает возможность пользователю получить опа при входе на канал,
+	снимать с себя баны, при необходимости, приглашать себя, получать
+	приветственное сообщение от бота, входя на канал, и многое другое.
 	
 	Команда AOP ADD добавляет указанный ник в список
 	AOP'ов.
 	
 	Команда AOP DEL удаляет указанный ник из списка
-	AOP'ов. Если параметр указывает на номер записи, данные
-	записи будут удалены. (См. примеры команды LIST ниже.)
+	AOP'ов. Если в качестве параметра указан номер/а записи,
+	данные записи будут удалены. (См. примеры команды LIST ниже.)
 	
 	Команда AOP LIST показывает список AOP'ов. Если
-	использовать символьную маску, только совпадающие с ней записи
-	будут показаны. Если указан список номеров записей,
-	только эти записи будут показаны; например:
+	использовать символьную маску, только совпадающие
+	с ней записи будут показаны. Если указан список
+	номеров записей, только эти записи будут показаны.
+	Например:
 
 	   AOP #канал LIST 2-5,7-9
-	   Покажет AOP'ов, записи со 2 до 5 и с
-	   7 до 9.
+	      Покажет AOP'ов, записи со 2 до 5 и с
+	      7 до 9.
 	      
-	Команда AOP CLEAR удаляет все записи из списка
-	AOP'ов.
+	Команда AOP CLEAR удаляет ВСЕ записи из списка AOP'ов.
 	
 	Команды AOP ADD и AOP DEL могут использовать только
 	SOP'ы или выше, а команду AOP CLEAR может использовать только
@@ -4619,117 +4523,121 @@ CHAN_HELP_AOP
 	AOP'ов может использовать команду AOP LIST.
 	
 	Эта команда может быть отключена на Вашем канале, и
-	тогда вы должен использовать команды списка доступа (access list). См. 
-	%R%S HELP ACCESS для получения информации об использовании списка доступа,
-	и %R%S HELP SET XOP чтобы узнать как переключиться между системами
-	список доступа и системой xOP.
+	тогда вы должны использовать систему ACCESS. См. %R%S HELP ACCESS
+	для получения информации об использовании системы ACCESS,
+	и %R%S HELP SET XOP чтобы узнать как переключиться между
+	системами привелегий.
 
 CHAN_HELP_HOP
 	Синтаксис: HOP #канал ADD ник
-	           HOP #канал DEL {ник | номер записи | list}
-	           HOP #канал LIST [маска | list]
+	           HOP #канал DEL {ник | номер записи | список_записей}
+	           HOP #канал LIST [маска | список_записей]
 	           HOP #канал CLEAR
 	
-	Поддерживает список HOP (ПолуОператоров) канала. Список HOP 
-	включает пользователей, которые могу получить статус полуоператора
-	на канале.
+	Позволяет управлять списком HOP'ов (ПолуОператоров) канала.
+	Список HOP'ов включает пользователей, которые могу получить
+	статус полуоператора на канале при входе (или по запросу).
 	
 	Команда HOP ADD добавляет указанный ник в список
 	HOP'ов.
 	
 	Команда HOP DEL удаляет указанный ник из списка
-	HOP'ов. Если параметр указывает на номер записи, данные
-	записи будут удалены. (См. примеры команды LIST ниже.)
+	HOP'ов. Если в качестве параметра указан номер/а записи,
+	данные записи будут удалены. (См. примеры команды LIST ниже.)
 	
 	Команда HOP LIST показывает список HOP'ов. Если
-	использовать символьную маску, только совпадающие с ней записи
-	будут показаны. Если указан список номеров записей,
-	только эти записи будут показаны; например:
+	использовать символьную маску, только совпадающие
+	с ней записи будут показаны. Если указан список номеров
+	записей, только эти записи будут показаны.
+	Например:
 
 	   HOP #канал LIST 2-5,7-9
-	   Покажет записи HOP'ов с номерами с 2 до 5 и с
-	   7 по 9.
+	      Покажет записи HOP'ов с номерами с 2 по 5 и с
+	      7 по 9.
 	      
-	Команда HOP CLEAR удаляет все записи из списка
+	Команда HOP CLEAR удаляет ВСЕ записи из списка
 	HOP'ов.
 	
 	Команды HOP ADD и HOP DEL могут использовать только
-	AOP'ы или выше, а команду HOP CLEAR может использовать только
-	владелец канала.
+	AOP'ы или выше, а команду HOP CLEAR может использовать
+	только владелец канала.
 	
 	Эта команда может быть отключена на Вашем канале, и
-	тогда вы должен использовать команды списка доступа (access list). См. 
-	%R%S HELP ACCESS для получения информации об использовании списка доступа,
-	и %R%S HELP SET XOP чтобы узнать как переключиться между системами
-	список доступа и системой xOP.
+	тогда вы должны использовать систему ACCESS.
+	См. %R%S HELP ACCESS для получения информации
+	об использовании системы ACCESS, и %R%S HELP SET XOP
+	чтобы узнать как переключиться между системами привелегий.
 
 CHAN_HELP_SOP
 	Синтаксис: SOP #канал ADD ник
-	           SOP #канал DEL {ник | номер записи | list}
-	           SOP #канал LIST [маска | list]
+	           SOP #канал DEL {ник | номер записи | список_записей}
+	           SOP #канал LIST [маска | список_записей]
 	           SOP #канал CLEAR
 	
-	Включает список SOP (СуперОператоров) канала. Список SOP'ов
-	включает пользователей, у которых есть все права AOP'ов, и кроме того
-	они могут использовать автокик и цензуру слов, 
-	отправлять и читать сообщения канал, и многое другое.
+	Позволяет управлять списком SOP (СуперОператоров) канала.
+	Список SOP'ов включает пользователей, у которых есть все права
+	AOP'ов, и кроме того, они могут использовать автокик и цензуру слов, 
+	отправлять и читать сообщения каналп, и многое другое.
 	
 	Команда SOP ADD добавляет указанный ник в список
 	SOP'ов.
 	
 	Команда SOP DEL удаляет указанный ник из списка
-	SOP'ов. Если параметр указывает на номер записи, данные
-	записи будут удалены. (См. примеры команды LIST ниже.)
+	SOP'ов. Если в качестве параметра указан номер/а записи,
+	данные записи будут удалены. (См. примеры команды LIST ниже.)
 	
 	Команда SOP LIST показывает список SOP'ов. Если
-	использовать символьную маску, только совпадающие с ней записи
-	будут показаны. Если указан список номеров записей,
-	только эти записи будут показаны; например:
+	использовать символьную маску, только совпадающие
+	с ней записи будут показаны. Если указан список
+	номеров записей, только эти записи будут показаны.
+	Например:
 
 	   SOP #канал LIST 2-5,7-9
-	   Покажет список AOP'ов с номерами записей от 2 до 5 и от
-	   7 до 9.
+	      Покажет список SOP'ов с номерами записей c 2 по 5
+	      и с 7 по 9.
 	      
-	Команда SOP CLEAR удалит все записи из списка
+	Команда SOP CLEAR удалит ВСЕ записи из списка
 	SOP'ов.
 	
-	Команды SOP ADD, SOP DEL и SOP CLEAR могут быть использованы
-	только владельцем канала. Тем не менее, любой пользователь из списка
-	AOP'ов может использовать команду SOP LIST.
+	Команды SOP ADD, SOP DEL и SOP CLEAR могут быть
+	использованы только владельцем канала. Тем не менее,
+	любой пользователь из списка SOP'ов может использовать
+	команду SOP LIST.
 	
 	Эта команда может быть отключена на Вашем канале, и
-	тогда вы должен использовать команды списка доступа (access list). См. 
-	%R%S HELP ACCESS для получения информации об использовании списка доступа,
-	и %R%S HELP SET XOP чтобы узнать как переключиться между системами
-	список доступа и системой xOP.
+	тогда вы должны использовать систему ACCESS. См.
+	%R%S HELP ACCESS для получения информации об
+	использовании системы ACCESS, и %R%S HELP SET XOP
+	чтобы узнать как переключиться между системами привелегий.
 
 CHAN_HELP_VOP
 	Синтаксис: VOP #канал ADD ник
-	           VOP #канал DEL {ник | номер записи | list}
-	           VOP #канал LIST [маска | list]
+	           VOP #канал DEL {ник | номер записи | список_записей}
+	           VOP #канал LIST [маска | список_записей]
 	           VOP #канал CLEAR
 	
-	Включает список VOP (Войсов) канала.  
-	Список VOP включают пользователей, которые могут получить войс
-	на канале по необходимости.
+	Позволяет управлять списком VOP'ов (АвтоВойсов) канала.  
+	Список VOP включают пользователей, которые могут
+	получить войс на канале при входе или по запросу.
 	
 	Команда VOP ADD добавляет указанный ник в список
 	VOP'ов.
 	
 	Команда VOP DEL удаляет указанный ник из списка
-	VOP'ов. Если параметр указывает на номер записи, данные
-	записи будут удалены. (См. примеры команды LIST ниже.)
+	VOP'ов. Если в качестве параметра указан номер/а записи,
+	данные записи будут удалены. (См. примеры команды LIST ниже.)
 	
 	Команда VOP LIST показывает список VOP'ов. Если
-	использовать символьную маску, только совпадающие с ней записи
-	будут показаны. Если указан список номеров записей,
-	только эти записи будут показаны; например:
+	использовать символьную маску, только совпадающие
+	с ней записи будут показаны. Если указан список
+	номеров записей, только эти записи будут показаны.
+	Например:
 
 	   VOP #канал LIST 2-5,7-9
-	   Покажет список VOP'ов с номерами записей от 2 до 5 и от
-	   7 до 9.
+	      Покажет список VOP'ов с номерами записей с 2 по 5
+	      и с 7 по 9.
 	      
-	Команда VOP CLEAR удалит все записи из списка
+	Команда VOP CLEAR удалит ВСЕ записи из списка
 	VOP'ов.
 	
 	Команды VOP ADD и VOP DEL могут использовать только
@@ -4737,48 +4645,50 @@ CHAN_HELP_VOP
 	владелец канала.
 	
 	Эта команда может быть отключена на Вашем канале, и
-	тогда вы должен использовать команды списка доступа (access list). См. 
-	%R%S HELP ACCESS для получения информации об использовании списка доступа,
-	и %R%S HELP SET XOP чтобы узнать как переключиться между системами
-	список доступа и системой xOP.
+	тогда вы должны использовать систему ACCESS. См.
+	%R%S HELP ACCESS для получения информации об
+	использовании системы ACCESS, и %R%S HELP SET XOP
+	чтобы узнать как переключиться между системами привелегий.
 
 CHAN_HELP_ACCESS
 	Синтаксис: ACCESS #канал ADD ник уровень
-	           ACCESS #канал DEL {ник | номер записи | list}
-	           ACCESS #канал LIST [маска | list]
+	           ACCESS #канал DEL {ник | номер_записи | список_записей}
+	           ACCESS #канал LIST [маска | список_записей]
 	           ACCESS #канал CLEAR
 	
-	Управляет списком доступа канала. Список доступа
-	определяет какие пользователи могут быть операторами канала,
-	иметь доступ к командам %S на канал. Различные уровни доступа
-	разрешают доступ к различным настройкам канала и определяют пользовательские
-	привилегии; %R%S HELP ACCESS LEVELS для получения более
-	подробной информации. Любой, не включенный в список доступа пользователь
-	считается пользователем в уровнем доступа 0.
+	Позволяет управлять списком доступа канала. Список доступа
+	определяет какие пользователи могут быть операторами канала или
+	иметь доступ к командам %S на канале. Различные уровни доступа
+	разрешают доступ к различным настройкам канала и определяют
+	пользовательские привилегии. %R%S HELP ACCESS LEVELS для
+	получения более подробной информации. Любой, не включенный
+	в список доступа пользователь, считается пользователем с
+	уровнем доступа 0.
 	
 	Команда ACCESS ADD добавляет указанный ник в
-	список доступа с указанным же уровнем; если данный ник уже
+	список доступа с указанным уровнем. Если данный ник уже
 	уже есть в списке, его уровень будет изменен на указанный
-	в этой команде. Указанный уровень
-	должен быть меньше чем уровень пользователя, вызвавшего это команду, и
+	в этой команде. Указанный уровень должен быть меньше,
+	чем уровень пользователя, использующего это команду, и
 	если ник уже есть в списке доступа, текущий
-	уровень доступа данного ника должен быть меньше, чем уровнь доступа
-	пользователя, вызвавшего эту команду.
+	уровень доступа УКАЗАННОГО для прописи ника должен быть
+	МЕНЬШЕ, чем уровнь доступа пользователя, вызвавшего эту команду.
 	
 	Команда ACCESS DEL удаляет указанный ник из
-	списка доступа. если указаны номера записей, данные записи
-	будут удалены. (см. пример использования команды LIST ниже.)
+	списка доступа. Если в качестве параметра указан номер/а записи,
+	данные записи будут удалены. (См. примеры команды LIST ниже.)
 	
 	Команда ACCESS LIST показывает список доступа. Если
-	указать символьную маску, только совпадающие с ней значения
-	будут показаны. Если указать номера записей, то только,
-	эти записи будет показаны; например:
+	указать символьную маску, только совпадающие с ней
+	значения будут показаны. Если указать номера записей,
+	то только, эти записи будет показаны.
+	Например:
 
 	   ACCESS #канал LIST 2-5,7-9
-	   Покажет в списке доступа канала записи со 2 по 5 и с
-	   7 по 9.
+	      Покажет в списке доступа канала записи со 2 по 5 и с
+	      7 по 9.
 	      
-	Команда ACCESS CLEAR удаляет все записи из
+	Команда ACCESS CLEAR удаляет ВСЕ записи из
 	списка доступа.
 
 CHAN_HELP_ACCESS_LEVELS
@@ -4786,21 +4696,22 @@ CHAN_HELP_ACCESS_LEVELS
 	
 	По умолчанию, определены нижеследующие значения уровней доступа:
 	
-	   Founder   Полный доступ к функциям %S; автоматическое получение
-	                     статуса оператора при входе на канал. Помните,
-	                     что только один человек может иметь статус
-	                     владельца (и это нельзя никак изменить командой
-	                     ACCESS).
-	        10   Доступ к команде AKICK; автооп.
-	         5   Автооп.
-	         3   Автовойс.
-	         0   Никаких особых привилегий; может быть опнут другим
-	                     опом (только если безопасность статуса опа выключена).
-	        <0   Не может получиь опа на канале.
+	   Founder - Полный доступ к функциям %S, автоматическое получение
+	               статуса оператора при входе на канал. Помните,
+	               что только один человек может иметь статус
+	               владельца (и это нельзя никак изменить командой
+	               ACCESS).
+	        10 - Доступ к команде AKICK, автооп.
+	         5 - Автооп.
+	         3 - Автовойс.
+	         0 - Никаких особых привилегий, может дать получить статус опа
+	               от другого опа
+	               (только если безопасность статуса опа отключена).
+	        <0 - Автодеоп. Статус опа будет сразу же сниматься сервисами.
 	
-	Эти уровни могут быть изменены, возможно добавление новых уровней, используя
-	команду LEVELS; напишите %R%S HELP LEVELS для более полной
-	информации.
+	Эти уровни могут быть изменены, возможно добавление новых уровней,
+	используя команду LEVELS. Напишите %R%S HELP LEVELS для более
+	подробной информации.
 
 CHAN_HELP_AKICK
 	Синтаксис: AKICK #канал ADD маска [причина]
@@ -4812,44 +4723,41 @@ CHAN_HELP_AKICK
 	           AKICK #канал ENFORCE
 	           AKICK #канал CLEAR
 	
-	Поддерживает список автокиков канала. Если пользователь,
-	включенный в список автокиков попытается зайти на канал,
-	%S забанит его на канале, а затем выкинет
-	его.
+	Позволяет управлять список автокиков канала. Если
+	пользователь, включенный в список автокиков, попытается
+	зайти на канал, %S забанит его на канале и сразу же выкинет.
 	
 	Команда AKICK ADD добавляет ник или маску
 	в список автокиков. Если указана причина,
 	то она будет использована, когда пользователь будет
-	кикнут; если причина не указана, будет использована причина по умолчанию: "You have been
-	banned from the channel".
+	кикнут. Если причина не указана, будет использована
+	причина по умолчанию: "User has been banned from the channel".
 	
 	Команда AKICK STICK создает постоянный бан указанной маски
 	на канале. Если кто-то попытается удалить этот бан, %S
-	автоматически установит его снова. Вы можете использовать это
-	для зарегистрированных ников.
+	автоматически установит его снова. Вы не можете использовать
+	это для зарегистрированных ников.
 	
-	Команда AKICK UNSTICK отменяет эффект, вызываетмый командой
-	AKICK STICK, но бан с канала Вы должны
-	удалить вручную.
+	Команда AKICK UNSTICK отменяет эффект,
+	вызываемый командой AKICK STICK, но бан с
+	канала Вы должны удалить вручную.
 	
 	Команда AKICK DEL удаляет указанный ник или маску
 	из списка автокиков. Тем не менее, это не удалит баны
-	с канала; они должны быть удалены
-	вручную.
+	с канала, они должны быть удалены вручную.
 	
-	Команда AKICK LIST показывает текущий список автокиков, или
-	опционально показывает автокики из указанной
-	маски.
+	Команда AKICK LIST показывает текущий список автокиков,
+	или, опционально, показывает автокики по указанной
+	маске.
 	
 	Команда AKICK VIEW это более подробная версия команды
 	AKICK LIST.
 	
 	Команда AKICK ENFORCE заставляет %S немедлено
-	проверить список акиков и удалить с канала пользователей, включенных
-	в него.
+	перепроверить список акиков и удалить с канала пользователей,
+	включенных в него.
 	
-	Команда AKICK CLEAR удаляет все записи
-	из списка автокиков.
+	Команда AKICK CLEAR удаляет ВСЕ записи из списка автокиков.
 
 CHAN_HELP_LEVELS
 	Синтаксис: LEVELS #канал SET тип уровень
@@ -4858,28 +4766,27 @@ CHAN_HELP_LEVELS
 	           LEVELS #канал RESET
 	
 	Команда LEVELS позволяет удобно управлять уровнями
-	доступа, используемыми для списков доступа. Используй эту
-	команду, Вы можете определить уровень доступа, требуемый для большинства
-	функций %S'а. (Команды SET FOUNDER и SET PASSWORD,
-	также как эту команда, может использовать только
-	владелец канала.)
+	доступа, используемыми для списков доступа. Используя эту
+	команду, Вы можете определить уровень доступа, требуемый
+	для большинства функций %S'а. (Команды SET FOUNDER и 
+	SET PASSWORD, а также, эту команду (LEVELS), может
+	использовать ТОЛЬКО владелец канала.)
 	
 	LEVELS SET устанавливает уровень доступа для функции или группы функций.
-	LEVELS DISABLE (или DIS - так короче ;)
-	отключает функцию или запрещает доступ к функции
-	всем, кроме владельца канала.
+	LEVELS DISABLE (или DIS - так короче) отключает функцию или запрещает
+	доступ к функции всем, кроме владельца канала.
 	LEVELS LIST покажет текущие уровни доступа для каждой функции или
 	группы функций. LEVELS RESET сбросит все настройки уровней
-	доступа на настройки по умолчанию (см.
-	HELP ACCESS LEVELS).
+	доступа на настройки по умолчанию (см. HELP ACCESS LEVELS).
 	
-	Чтобы посмотреть список функций, на которые можно определять уровни доступа,
-	см. HELP LEVELS DESC.
+	Чтобы посмотреть список функций, на которые можно определять уровни
+	доступа, см. HELP LEVELS DESC.
 
 CHAN_HELP_LEVELS_DESC
-	Следующая функция принята. Примечание:
-	уровни для Автодеоп и запрета на вход являются минимальными,
-	в то время как все остальные являются максимальными.
+	Нижеследующие функции доступны. Примечание:
+	уровни для Автодеоп и запрета на вход (NOJOIN)
+	являются минимальными, в то время как все остальные
+	являются максимальными.
 
 CHAN_HELP_LEVELS_DESC_FORMAT
 	    %-*s  %s
@@ -4887,11 +4794,11 @@ CHAN_HELP_LEVELS_DESC_FORMAT
 CHAN_HELP_INFO
 	Синтаксис: INFO #канал [ALL]
 	
-	Показывает информацию об указанном канале,
-	включая его владельца, время регистрации, когда был последний
-	раз использован, описание, заблокированные режимы, если они имеют место быть. Если 
-	указан параметр ALL, также будет показано сообщение входа и
-	наследник.
+	Показывает информацию об указанном канале, включая ник
+	его владельца, время регистрации, когда был последний
+	раз использован, описание, заблокированные режимы,
+	если они имеют место быть. Если указан параметр ALL,
+	также будет показано сообщение входа и наследник канала.
 	
 	По умолчанию, опцию ALL может использовать только
 	владелец канала.
@@ -4901,98 +4808,96 @@ CHAN_HELP_LIST
 	
 	Покажет все зарегистрированные каналы по указанной символьной маске.
 	(Каналы с включенной опцией PRIVATE не будут показаны.)
+	Примечание: при поиске каналов, начинающихся с "#", сам символ
+	"#" писать не надо.
 
 CHAN_HELP_OP
 	Синтаксис: OP [#канал [ник]]
 	
-	Дает статус оператора канала указанному нику на указанном канале. Если ник не указан,
-	дает статус оператора канала Вам. Если канал и ник не указаны,
-	дает статус оператора на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	Дает статус оператора канала указанному нику на указанном канале.
+	Если ник не указан, дает вам статус оператора на указанном канале.
+	Если канал и ник не указаны, дает вам статус оператора на всех каналах,
+	на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа
+	5 и выше.
 
 CHAN_HELP_DEOP
 	Синтаксис: DEOP [#канал [ник]]
 	
-	Снимает статус оператора канала с указанного ника на указанном канале. Если ник не указан,
-	снимает статус оператора с Вас. Если ни канал, ни ник не указаны, снимает статус,
-	оператора с Вас на всех каналх, на которых у Вас есть соответствующие
-	права доступа.
+	Снимает статус оператора канала с указанного ника на указанном канале.
+	Если ник не указан, снимает статус оператора с Вас. Если ни канал,
+	ни ник не указаны, снимает статус, оператора с Вас на всех каналх,
+	на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа
+	5 и выше.
 	
 CHAN_HELP_VOICE
 	Синтаксис: VOICE [#канал [ник]]
 	
 	Дает войс указанному нику на указанном канале. Если ник не указан,
-	дает войс Вам. Если канал и ник не указаны,
-	дает войс Вам на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	дает войс Вам. Если канал и ник не указаны, дает войс Вам на всех
+	каналах, на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше. Может быть использована VOP'ами (либо лицами с уровнем доступа больше 3)
-	чтобы дать войс самому себе.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем
+	доступа 5 и выше. Может быть использована VOP'ами (либо лицами с
+	уровнем доступа 3 и выше) чтобы дать войс самому себе.
 
 CHAN_HELP_DEVOICE
 	Синтаксис: DEVOICE [#канал [ник]]
 	
 	Снимает войс с указанного ника на указаном канале. Если ник не указан,
-	снимет войса с Вас. Если канал и ник не указаны,
-	снимет войс с Вас на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	снимет войса с Вас. Если канал и ник не указаны, снимет войс с Вас
+	на всех каналах, на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше. Может быть использована VOP'ами (либо лицами с уровнем доступа больше 3)
-	чтобы снять войс с себя.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем
+	доступа 5 и выше. Может быть использована VOP'ами (либо лицами с
+	уровнем доступа 3 и выше) чтобы снять войс с самого себя.
 	
 CHAN_HELP_HALFOP
 	Синтаксис: HALFOP [#канал [ник]]
 	
-	Дает статус полуоператора канала указанному нику на указанном канале. Если ник не указан,
-	дает статус полуоператора канала Вам. Если канал и ник не указаны,
-	дает статус полуоператора на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	Дает статус полуоператора канала указанному нику на указанном канале.
+	Если ник не указан, дает статус полуоператора канала Вам. Если канал
+	и ник не указаны, дает статус полуоператора на всех каналах, на которых
+	у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше. Может быть использована HOP'ами (либо лицами с уровнем доступа больше 4)
-	чтобы дать статус полуоператора себе.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем
+	доступа 5 и выше. Может быть использована HOP'ами (либо лицами с
+	уровнем доступа 4 и выше) чтобы дать хопа себе.
 
 CHAN_HELP_DEHALFOP
 	Синтаксис: DEHALFOP [#канал [ник]]
 	
-	Снимает статус полуоператора канала с указанного ника на указанном канале. Если ник не указан,
-	снимает статус полуоператора с Вас. Если ни канал, ни ник не указаны, снимает статус,
-	полуоператора с Вас на всех каналх, на которых у Вас есть соответствующие
-	права доступа.
+	Снимает статус полуоператора канала с указанного ника на указанном канале.
+	Если ник не указан, снимает статус полуоператора с Вас. Если ни канал,
+	ни ник не указаны, снимает статус, полуоператора с Вас на всех каналах,
+	на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию, может быть использована AOP'ами или лицами с уровнем доступа 5
-	и выше. Может быть использована HOP'ами (либо лицами с уровнем доступа больше 4)
-	чтобы снять статус полуоператора с себя.
+	По умолчанию, может быть использована AOP'ами или лицами с уровнем
+	доступа 5 и выше. Может быть использована HOP'ами (либо лицами с
+	уровнем доступа 4 и выше) чтобы снять хопа с самого себя.
 	
 CHAN_HELP_PROTECT
 	Синтаксис: PROTECT [#канал [ник]]
 	
 	Ставит защиту на указанный ник на указанном канале. Если ник не указан,
-	ставит защиту на Вас. Если канал и ник не указаны,
-	ставит защиту на Вас на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	ставит защиту на Вас. Если канал и ник не указаны, ставит защиту на Вас
+	на всех каналах, на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию может быть использована только владельцем. SOP'ы либо лица с уровнем
-	доступа 10 и лучше могут использовать эту команду только на себя.
+	По умолчанию, может быть использована владельцем или лицами с уровнем
+	доступа 10 (SOP) и выше для того, что бы дать статус защиты себе.
 
 CHAN_HELP_DEPROTECT
 	Синтаксис: DEPROTECT [#канал [ник]]
 	
-	Снимает защиту на указанный ник на указанном канале. Если ник не указан,
-	снимает защиту с Вас. Если канал и ник не указаны,
-	снимает защиту с Вас на всех каналах, на которых у Вас есть
-	соответствующие права доступа.
+	Снимает защиту с указанного ника на указанном канале. Если ник не указан,
+	снимает защиту с Вас. Если канал и ник не указаны, снимает защиту с Вас
+	на всех каналах, на которых у Вас есть соответствующие права доступа.
 	
-	По умолчанию может быть использована только владельцем. SOP'ы либо лица с уровнем
-	доступа 10 и лучше могут использовать эту команду только на себя.
+	По умолчанию, может быть использована владельцем или лицами с уровнем
+	доступа 10 (SOP) и выше для того, что бы снять статус защиты с себя.
 
 CHAN_HELP_OWNER
 	Синтаксис: OWNER [#канал]
@@ -5017,8 +4922,8 @@ CHAN_HELP_INVITE
 	
 	Заставит %S пригласить Вас на указанный канал.  
 	
-	По умолчанию, может быть испоьзована только AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По умолчанию, может быть испоьзована только AOP'ами
+	или лицами с уровнем доступа 5 и выше.
 
 CHAN_HELP_UNBAN
 	Синтаксис: UNBAN канал
@@ -5026,41 +4931,42 @@ CHAN_HELP_UNBAN
 	Заставит %S удалить с указанного канала все баны, не позволяющие
 	Вам зайти на него.  
 	
-	По умолчанию, может быть испоьзована только AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По-умолчанию, может быть использована только AOP'ами
+	или лицами с уровнем доступа 5 и выше.
 	
 CHAN_HELP_KICK
 	Синтаксис: KICK [#канал [ник [причина]]]
 	
-	Выкидывает указанного пользователя с указанного канала. Если ник не указан,
-	выкидывает Вас. Если канал и ник не указаны,
-	выкинет Вас со всех каналов, на которых у Вас есть соответствующие права
-	доступа.
+	Выкидывает указанного пользователя с указанного канала.
+	Если ник не указан, выкидывает Вас. Если канал и ник не указаны,
+	выкинет Вас со всех каналов, на которых у Вас есть соответствующие
+	права доступа.
 	
-	По умолчанию, может быть испоьзована только AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По-умолчанию, может быть использована только AOP'ами или лицами
+	с уровнем доступа 5 и выше.
 
 CHAN_HELP_BAN
 	Синтаксис: BAN [#канал [ник [причина]]]
 	
-	Банит указанный ник на указанном канале. Если ник не указан,
-	банит Вас. Если канал и ник не указан,
-	банит Вас на всех каналах, на которых у Вас есть соответствующие
-	права доступа.
+	Банит указанный ник на указанном канале по установленному
+	типу_бана. Если ник не указан, банит Вас. Если канал и ник
+	не указаны, банит Вас на всех каналах, на которых у Вас есть
+	соответствующие права доступа.
 	
-	По умолчанию, может быть испоьзована только AOP'ами или лицами с уровнем доступа 5
-	и выше.
+	По-умолчанию, может быть использована только AOP'амии
+	или лицами с уровнем доступа 5 и выше.
 
 CHAN_HELP_TOPIC
 	Синтаксис: TOPIC #канал [топик]
 	
 	Заставит %S изменить топик канала на указанный
 	Вами. Если топик не указан, то он будет полностью
-	удален. Эту команду обычно используют для установки топика при включенной
-	опции SET TOPICLOCK. Напишите %R%S HELP SET TOPICLOCK
-	для более подробной информации.
+	удален. Эту команду обычно используют для установки
+	топика при включенной опции SET TOPICLOCK. Напишите
+	%R%S HELP SET TOPICLOCK для более подробной
+	информации.
 	
-	По умолчанию, может быть использована только
+	По-умолчанию, может быть использована только
 	владельцем канала. 
 
 CHAN_HELP_CLEAR
@@ -5073,15 +4979,16 @@ CHAN_HELP_CLEAR
 	              режимы i,k,l,m,n,p,s,t).
 	     BANS     Удалить все баны на канале.
 	     EXCEPTS  Удалить все исключения из банов на канале.
+	     INVITES  Удалить все исключения на приглашение на канале
 	     OPS      Снять статус оператора (режим +o) со
 	              всех операторов канала.
-	     HOPS     Removes channel-halfoperator status (mode +h) from
-	              all channel halfoperators, if supported.
+	     HOPS     Снять статус полуоператора (mode +h) со всех
+	              полуоператоров канала.
 	     VOICES   Снять "войсы" (режим +v) со всех, 
 	              на ком установлен этот режим.
 	     USERS    Удалить (выкинуть) всех пользователей с канала.
 	
-	По умолчанию, может быть использована только
+	По-умолчанию, может быть использована только
 	владельцем канала. 
 	
 CHAN_HELP_GETKEY
@@ -5089,7 +4996,7 @@ CHAN_HELP_GETKEY
 	
 	Возвращает секретный ключ (пароль для входа) канала. Эта команда
 	обычно используется ботами и/или скриптами, команда возвращает
-	такую строку:
+	соедующую строку:
 	
 	KEY <#канал> <секретный ключ>
 	
@@ -5098,32 +5005,33 @@ CHAN_HELP_GETKEY
 CHAN_HELP_SENDPASS
 	Синтаксис: SENDPASS #канал
 	
-	Отправляет пароль канала по адресу e-mail,
-	указанному в настройках владельца канала. Эту команду удобно использовать
-	чтобы вернуть забытый пароль.
+	Отправляет пароль канала по email-адресу, указанному
+	в настройках владельца канала. Эту команду удобно
+	использовать, чтобы вернуть забытый пароль.
 	
-	В некоторых сетях эту команду могут использовать только IRC операторы.
+	В некоторых сетях эту команду могут использовать только
+	IRC-операторы.
 	
 	Эта команда недоступна при включенном шифровании.
 
 CHAN_SERVADMIN_HELP
 	
-	Администраторы сервисов могут также удалить любой канал без
-	идентификации как владелец канала, могут просматривать список доступа, список акиков,
-	и установки уровней доступа на канале.
+	Администраторы сервисов могут удалить любой канал без идентификации
+	к нему в качестве владельца, могут просматривать список доступа,
+	список акиков, и установки уровней доступа на канале.
 	
 CHAN_SERVADMIN_HELP_LOGOUT
 	Синтаксис: LOGOUT #канал [ник]
 	
 	Эта команда деидентифицирует указанный ник
-	на указаном канале.
+	на указаном канале, снимая с него статус владельца.
 	
-	Если Вы владелец канала, вы можете деидентифицировать любого,
-	иначе же, только себя.
+	Если Вы владелец канала, вы можете деидентифицировать
+	любого, в противном случае - только себя.
 	
 	Если Вы Администратор сервисов, вы можете деидентифицировать
-	любого на любом канале без какой-либо дополнительной идентификации
-	на канале. Также, если Вы не укажете ник;
+	любого пользователя от любого канале без какой-либо дополнительной
+	идентификации к каналу. Также, если Вы не укажете ник,
 	эта команда деидентифицирует всех пользователей на указанном канале.
 
 CHAN_SERVADMIN_HELP_DROP
@@ -5134,18 +5042,17 @@ CHAN_SERVADMIN_HELP_DROP
 
 CHAN_SERVADMIN_HELP_SET
 	
-	Администраторы сервисов также могут установить опцию NOEXPIRE,
-	если ее включить, данный канал никогда не истечет.
+	Администраторы сервисов могут установить опцию NOEXPIRE,
+	которая отключит истечение по времени для указанного канала.
 	Также, Администраторы сервисов могут устанавливать любую опцию
 	на любом канале без какой либо дополнительной идентификации.
 
 CHAN_SERVADMIN_HELP_SET_NOEXPIRE
 	Синтаксис: SET #канал NOEXPIRE {ON | OFF}
 	
-	Делает указанный канал неистекаемым. Установка этой опции
-	в положение ON предохраняет канал от истекания.
-	
-	Может быть испоьзована только Администраторами сервисов.
+	Активирует/деактивирует режим не-истечения для указанного канала.
+	Установка этой опции в положение ON предохраняет канал от истечения
+	по времени.
 
 CHAN_SERVADMIN_HELP_INFO
 	
@@ -5154,26 +5061,25 @@ CHAN_SERVADMIN_HELP_INFO
 CHAN_SERVADMIN_HELP_LIST
 	Синтаксис: LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 	
-	Список всех зарегистрированных каналов по указанной маске.
-	Каналы с параметром PRIVATE будут показаны только
+	Выводит список всех зарегистрированных каналов по указанной
+	маске. Каналы с параметром PRIVATE будут показаны только
 	Администраторам сервисов. Каналы с параметром NOEXPIRE будут
 	показаны с префиксом ! перед именем канала.
 	
-	Если указать опции FORBIDDEN, SUSPENDED или NOEXPIRE то
-	будут показаны только каналы с параметрами FORBID, SUSPEND или
-	NOEXPIRE соответственно. Если указать все эти опции,
-	будут показаны все типы каналов. Эти параметры могут использовать
+	Если указать опции FORBIDDEN, SUSPENDED или NOEXPIRE, то
+	будут показаны только каналы с параметрами FORBIDDEN, SUSPENDED
+	или NOEXPIRE соответственно. Если указать все эти опции, будут
+	показаны все типы каналов. Эти параметры могут использовать
 	только Администраторы сервисов.
 
 CHAN_SERVADMIN_HELP_GETPASS
 	Синтаксис: GETPASS #канал
 	
-	Возвращает пароль указанного канала. ПРимечание при
-	использовании этой команды, сообщение, включающее того,
-	использовал эту команду и канал, пароль на который был запрошен,
-	будут записаны в лог и отправлены WALLOPS/GLOBOPS.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Возвращает пароль указанного канала. ПРимечание: при
+	использовании этой команды, сообщение, включающее ник того,
+	кто использовал эту команду и название канала, пароль на
+	который был запрошен, будут записаны в лог и отправлены по
+	WALLOPS/GLOBOPS.
 
 CHAN_SERVADMIN_HELP_FORBID
 	Синтаксис: FORBID #канал [причина]
@@ -5181,9 +5087,7 @@ CHAN_SERVADMIN_HELP_FORBID
 	Запрещает регистрировать или использовать указанный канал.
 	Отменяется путем удаления канала.
 	
-	В некоторых сетях причина является обязательным параметром.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	В некоторых сетях, причина является обязательным параметром.
 
 CHAN_SERVADMIN_HELP_SUSPEND
 	Синтаксис: SUSPEND #канал [причина]
@@ -5193,16 +5097,12 @@ CHAN_SERVADMIN_HELP_SUSPEND
 	восстанавливает все настройки и данные канала.
 	
 	В некоторых сетях причина является обязательным параметром.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
 	Синтаксис: UNSUSPEND #канал
 	
 	Восстанавливает приостановленный канал. Все данные и настройки
 	канала будут также восстановлены.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 CHAN_SERVADMIN_HELP_STATUS
 	Синтаксис: STATUS #канал ник
@@ -5210,13 +5110,11 @@ CHAN_SERVADMIN_HELP_STATUS
 	Возвращает текущий уровень доступа указанного ника на
 	указанном канале. Ответ может быть таким:
 	
-	    STATUS #канал ник уровень доступа
+	    STATUS #канал ник уровень_доступа
 	
 	Если произойдет ошибка, ответ будет таким:
 	
-	    STATUS ERROR сообщение об ошибке
-	
-	Могут использовать только Администраторы сервисов.
+	    STATUS ERROR сообщение_об_ошибке
 
 ###########################################################################
 #
@@ -5225,58 +5123,62 @@ CHAN_SERVADMIN_HELP_STATUS
 ###########################################################################
 
 MEMO_HELP_CMD_SEND
-	    SEND   Отправить мемо на ник или канал
+	    SEND   Отправить мемо-сообщение нику или каналу
 MEMO_HELP_CMD_CANCEL
-	    CANCEL Отменить последнюю отправленную Вами мемку
+	    CANCEL Отменить последнее посланное Вами мемо-сообщение
 MEMO_HELP_CMD_LIST
-	    LIST   Список Ваших мемок
+	    LIST   Список Ваших мемо-сообщений
 MEMO_HELP_CMD_READ
-	    READ   Читать мемки
+	    READ   Чтение мемо-сообщений
 MEMO_HELP_CMD_DEL
-	    DEL    Удалять мемки
+	    DEL    Удаление мемо-сообщений
 MEMO_HELP_CMD_SET
-	    SET    Установка опций для мемок
+	    SET    Установка опций для мемо-сообщений
 MEMO_HELP_CMD_INFO
-	    INFO   показать информацию о Ваших мемках
+	    INFO   Показать информацию о Ваших мемо-сообщениях
 MEMO_HELP_CMD_RSEND
-	    RSEND  Sends a memo and requests a read receipt
+	    RSEND  Посылает мемо-сообщение и запрашивает подтверждение о прочтении
 MEMO_HELP_CMD_CHECK
-	    CHECK  Checks if last memo to a nick was read
+	    CHECK  Проверить, прочел ли последнее отправленное вами сообщение указанный ник
 MEMO_HELP_CMD_SENDALL
-	    SENDALL  отправляет мемку всем зарегистрированным пользователям
+	    SENDALL  Отправляет мемо-сообщение всем зарегистрированным пользователям
 MEMO_HELP_CMD_STAFF
-	    STAFF  Отправляет мемку всем операторам/администраторам сервисов
+	    STAFF  Отправляет мемо-сообщение всем операторам/администраторам
 
 MEMO_HELP_HEADER
-	%S это удобный сервис, позволяющий пользователям IRC отправлять
-	короткие сообщения другим пользователям, которых нет в данный момент в сети,
-	или на каналы(*). Ник отправителя, как и
-	ник получатели или имя канала должны быть
-	зарегистрированы, для отправки мемки.
+	%S это удобный сервис, позволяющий IRC-пользователям
+	отправлять короткие сообщения другим пользователям,
+	которых нет в данный момент в сети, или на каналы(*).
+	Ник отправителя, так же, как и ник получателя или имя канала,
+	должны быть зарегистрированы, для возможности отправки/получения
+	мемо-сообщения.
 
-	%S's включает команды:
+	%S включает следующие команды:
 
 
 MEMO_HELP_ADMIN
-	not used.
+	не используется.
 MEMO_HELP_OPER
-	not used.
+	не используется.
+
 MEMO_HELP_FOOTER
 	
 	Напишите %R%S HELP команда для получения более подробной
 	информации.
 
-	(*) По умолчанию, любой пользователь с уровнем доступа на канале 
-	    не менее 10 может читать мемки, отправленные каналу. Это может быть
-	    изменено использованием команды %s LEVELS.
+	(*) По-умолчанию, любой пользователь, с уровнем доступа на канале 
+	    не менее 10, может читать мемо-сообщения, отправленные каналу.
+	    Данная установка может быть изменена с помощью команды
+	    %s LEVELS.
 
 MEMO_HELP_SEND
-	Синтаксис: SEND {ник | #канал} текст сообщения
+	Синтаксис: SEND {ник | #канал} текст_сообщения
 	
-	Отправляет сообщения для ника или для #канала, содержащее
-	текст сообщения. Если получатель ник, то он будет уведомлен
+	Отправляет сообщение для ника или для #канала, содержащее
+	текст_сообщения. Если получатель ник, то он будет уведомлен
 	что Вы отправили ему собщение. Получатель, будь то ник или канал,
-	должен быть зарегистрирован на NickServ или ChanServ соответственно.
+	должены быть зарегистрированы для возможности отправки/получения
+	сообщения.
 	
 MEMO_HELP_CANCEL
 	Синтаксис: CANCEL {ник | #канал}
@@ -5285,34 +5187,34 @@ MEMO_HELP_CANCEL
 	предохраняя его от прочтения адресатом.
 
 MEMO_HELP_LIST
-	Синтаксис: LIST [#канал] [list | NEW]
+	Синтаксис: LIST [#канал] [список_записей | NEW]
 	
-	Показывает текущий список сообщений. С параметром NEW, покажет только
-	новые (непрочитанные) сообщения. Непрочитанные сообщения будут с пометкой в виде "*"
-	слева от номера сообщения. Вы можете также указать диапазон
-	номеров, например так:
+	Показывает текущий список сообщений. С параметром NEW, покажет
+	только новые (непрочитанные) сообщения. Непрочитанные сообщения
+	будут помаркированы значком "*" слева от номера сообщения. Также,
+	Вы можете указать диапазон номеров, например:
 
 	   LIST 2-5,7-9
-	   Покажет сообщения со 2 до 5 и с 7 до 9.
+	      Покажет сообщения со 2 до 5 и с 7 по 9.
 
 MEMO_HELP_READ
-	Синтаксис: READ [#канал] {номер | list | LAST | NEW}
+	Синтаксис: READ [#канал] {номер | список_записей | LAST | NEW}
 	
-	Выведет Вам текст сообщения. Если указан параметр LAST, то
-	выведет последнее отправленное Вам сообщение. Если указан параметр
-	NEW, выведет Вам все непрочитанные ранее сообщения. Иначе,
-	выведет Вам сообщение под номером номер. Вы можете запросить сразу несколько
-	сообщений, например так:
+	Выведет Вам текст указанных сообщений. Если указан параметр LAST, то
+	выведет последнее полученное Вами сообщение. Если указан параметр
+	NEW, выведет Вам все непрочитанные Вами сообщения. Если указан номер,
+	выведет Вам сообщение под номером номер. Вы можете запросить сразу
+	несколько сообщений, например так:
 	
 	   READ 2-5,7-9
-	   Покажет сообщения со 2 по 5 и с 7 по 9.
+	      Покажет сообщения со 2 по 5 и с 7 по 9.
 
 MEMO_HELP_DEL
-	Синтаксис: DEL [#канал] {номер | list | LAST | ALL}
+	Синтаксис: DEL [#канал] {номер | список_записей | LAST | ALL}
 	
-	Удалит указанное сообщение. Вы можете указать
-	несколько номеров сообщений или диапазон номеров сообщений, необязательно указывать
-	только один номер, как во втором примере выше.
+	Удалит указанное сообщение/ия. Вы можете указать несколько
+	номеров сообщений или диапазон номеров сообщений, необязательно
+	указывать только один номер (см. пример ниже).
 	
 	Если указан параметр LAST, будет удалено последнее сообщение.
 	Если указан параметр ALL, все Ваши сообщения будут удалены.
@@ -5320,140 +5222,125 @@ MEMO_HELP_DEL
 	Примеры:
 	
 	   DEL 1
-	   Удалить сообщение под номером 1.
+	      Удалит сообщение под номером 1.
 	
 	   DEL 2-5,7-9
-	   Удалить сообщения с 2 до 5 и с 7 до 9.
+	      Удалит сообщения с 2 по 5 и с 7 по 9 включительно.
 
 MEMO_HELP_SET
 	Синтаксис: SET опция параметры
 	
-	Устанавливает различные параметры для службы сообщений. опция может быть одной из:
+	Устанавливает различные параметры для службы сообщений, опция может быть:
 	
-	    NOTIFY      Выбрать способ уведомления Вас
-	                о новых собщениях (только для ников)
-	    LIMIT       Устанавливает ограничение на количество сообщений, которое
-	                Вы можете принимать
+	    NOTIFY      Выбрать способ уведомления Вас о новых
+	                      собщениях (только для ников)
+	    LIMIT       Устанавливает ограничение на количество
+	                 сообщений, которое Вы можете принимать
 	
-	Напишите %R%S HELP SET опция для получения более подробной информации
-	о конкретной опции.
+	Напишите %R%S HELP SET опция для получения более
+	подробной информации о конкретной опции.
 
 MEMO_HELP_SET_NOTIFY
 	Синтаксис: SET NOTIFY {ON | LOGON | NEW | OFF}
 	
-	Изменить способ уведомления Вас о новых сообщениях:
+	Выбрать, каким образом вы будете информироваться о новых сообщениях:
 	
-	    ON      Вы будете уведомлены о новом сообщении при входе в сеть,
-	            когда Вы снимете с себя флаг /AWAY, и как только кто-то отправит Вам
-	            сообщение.
-	    LOGON   Вы будете уведомлены о новом сообщении только при входе в сеть,
-	            или когда Вы снимете с себя флаг /AWAY.
-	    NEW     Вы будете уведомлены о новом сообщении только когда они,
-	            будут Вам отправлены.
+	    ON      Вы будете уведомлены о новом сообщении при идентификации,
+	                когда снимете с себя режим /AWAY, или как только
+			кто-то отправит Вам сообщение.
+	    LOGON   Вы будете уведомлены о новом сообщении при идентификации,
+	                или когда Вы снимете с себя режим /AWAY.
+	    NEW     Вы будете уведомлены о новом сообщении только когда они
+	                будут отправлены Вам.
 	    OFF     Вы не будете уведомляться о получении новых сообщений.
 	
-	В принципе, ON является комбинацией LOGON и NEW.
+	В принципе, опция ON является комбинацией LOGON и NEW.
 
 MEMO_HELP_SET_LIMIT
-	Синтаксис: SET LIMIT [#канал] limit
+	Синтаксис: SET LIMIT [#канал] предел
 	
-	Ограничивает максимальное количество сообщений которое Вы (или канал)
-	можете принимать. Если Вы установите его равным 0, никто
-	не сможет отправить Вам сообщение. Также, Вы не можете установить ограничение
-	больше, чем %d.
+	Ограничивает максимальное количество сообщений, которое
+	Вы (или канал) можете принять. Если Вы установите его
+	равным 0, никто не сможет отправить Вам сообщение. Однако,
+	Вы не можете установить ограничение больше, чем %d.
 
 MEMO_HELP_INFO
 	Синтаксис: INFO [#канал]
 	
-	Показывает информацию о количестве сообщений для Вас, сколько
-	из них непрочитано, и сколько всего сообщений было Вами
-	принято. С параметром, покажет ту же информацию
-	для данного канала.
+	Показывает информацию о количестве сообщений для Вас,
+	сколько из них непрочитано, и сколько всего сообщений
+	вы можете принять. С параметром, покажет ту же информацию
+	для указанного канала.
 
 MEMO_SERVADMIN_HELP_SET_LIMIT
-	Синтаксис: SET LIMIT [пользователь | #канал] {limit | NONE} [HARD]
+	Синтаксис: SET LIMIT [пользователь | #канал] {предел | NONE} [HARD]
 	
-	Ограничивает максимальное количество сообщений которое пользователь (или канал)
-	может принимать. Установка лимита равным 0 не дает возможности
-	принимать сообщения вообще; установка в NONE разрешает
-	пользователю принимать и сохранять столько сообщений, сколько он пожелает. Если
-	Вы не укажете пользователя или канал, то это будет установлено для
-	Вас.
+	Устанавливает лимит на максимальное количество сообщений,
+	которое пользователь (или канал) смогут принимать. Установка
+	лимита равным 0 не дает возможности принимать сообщения вообще,
+	установка в NONE разрешает пользователю принимать и сохранять
+	столько сообщений, сколько он пожелает. Если Вы не укажете
+	пользователя или канал, настройки буду применены для Вас.
 	
-	Опция HARD не позволит пользователю изменить лимит. Если
-	HARD не идобавить - будет противоположный эффект, т.е. пользователь сможет
-	изменять лимит (даже если предыдущий лимит был установлен с параметром
-	HARD).
+	Опция HARD не позволит указанному пользователю менять свой лимит.
+	Если HARD не добавить - будет противоположный эффект, т.е.,
+	пользователь сможет изменять лимит (даже если предыдущий лимит
+	был установлен с параметром HARD).
 	
-	Данную команду SET LIMIT могут использовать только Администраторы
-	сервисов. Другие пользователи могуть менять лимит только для себя
-	или для канала, на котором у низ есть соответствующие привилегии, не могут
-	удалить свой лимит, не могут установить лимит выше %d, и не могут
-	установить опцию HARD.
+	Пасширенное использование команды SET LIMIT доступно только для
+	Администраторы сервисов. Обычные пользователи могуть менять лимит
+	только для себя или для канала, на котором у них есть соответствующие
+	привилегии. Они не могут удалить свой лимит, не могут установить лимит
+	выше %d, и не могут использовать опцию HARD.
 
 MEMO_SERVADMIN_HELP_INFO
 	Синтаксис: INFO [ник | #канал]
 	
-	Без параметров, покажет количество сообщений в Вашем ящике,
-	сколько из них непрочитано, и сколько всего
-	сообщений Вы можете принимать.
+	Без параметров, покажет общее количество сообщений,
+	которое вы имеете, сколько из них непрочитано, и сколько
+	всего сообщений Вы можете принимать.
 	
 	Если указать канал, покажет ту же информацию
-	о данном канале.
+	об указанном канале.
 	
-	Если указать ник, покажет ту же информацию
-	о данном нике. Эту команду могут использовать только Администраторы
-	сервисов.
+	Если указать в качестве параметра ник, покажет ту же
+	информацию об указанном нике. Данную опцию могут
+	использовать только Администраторы сервисов.
 
 MEMO_HELP_STAFF
-	Синтаксис: STAFF текст сообщения
+	Синтаксис: STAFF текст_сообщения
 
-	Отправляет всем операторам/администраторам сервисов мемку, содержащую текст сообщения.
-	Внимание: Если Вы прописаны дважды, например как оператор,и как 
-	администратор, Вы получите это сообщение дважды. То же
-	самое произойдет для прописанных как суперпользователи сервисов и 
-	в то же время в других листах.
+	Отправляет всем операторам/администраторам сервисов мемо-сообщение,
+	содержащее текст_сообщения. Примечание: Если Вы имеете операторов
+	в списке операторов и администраторов сервисов, они получат это
+	сообщение дважды. Данная особенность применительна и к рутам сервисов.
 
 MEMO_HELP_SENDALL
-	Синтаксис: SENDALL текст сообщения
+	Синтаксис: SENDALL текст_сообщения
 
-	Отправляет всем зарегистрированным пользователям текст сообщения.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
+	Отправляет всем зарегистрированным пользователям текст_сообщения.
 
 MEMO_HELP_RSEND
-	Syntax: RSEND {nick | channel} memo-text
+	Синтаксис: RSEND {ник | #канал} текст_сообщения
 	
-	Sends the named nick or channel a memo containing
-	memo-text.  When sending to a nickname, the recipient will
-	receive a notice that he/she has a new memo.  The target
-	nickname/channel must be registered.
-	Once the memo is read by its recepient, an automatic notification
-	memo will be sent to the sender informing him/her that the memo
-	has been read.
-
-###########################################################################
-#
-# OperServ help messages
-#
-###########################################################################
+	Посылает указанному нику или каналу мемо-сообщение.
+	Когда указан ник, получатель будет извещен нотисом о том, что он/она
+	получил/а новое сообщение. Указанные ник/канал должны быть зарегистрированы.
+	Как только мемо-сообщение будет прочитано получателем, отправитель будет
+	автоматически извещен о том, что посланное им сообщение было прочитано.
 
 MEMO_HELP_CHECK
-	Syntax: CHECK nick
+	Синтаксис: CHECK ник
 	
-	Checks whether the _last_ memo you sent to nick has been read
-	or not. Note that this does only work with nicks, not with chans.
+	Проверяет, было ли прочитано последнее посланное вами
+	сообщения для указанного ника. Примечание: опция работает
+	ТОЛЬКО для ников, НЕ для каналов.
 
 ###########################################################################
 #
 # OperServ help messages
 #
 ###########################################################################
-
 OPER_HELP_CMD_GLOBAL
 	    GLOBAL      Послать сообщение всем пользователям
 OPER_HELP_CMD_STATS
@@ -5461,15 +5348,15 @@ OPER_HELP_CMD_STATS
 OPER_HELP_CMD_OPER
 	    OPER        Управление списком Операторов сервисов
 OPER_HELP_CMD_ADMIN
-	    ADMIN       Управление списком администраторов сервисов
+	    ADMIN       Управление списком Администраторов сервисов
 OPER_HELP_CMD_STAFF
 	    STAFF       Список всех прописанных на сервисах и их онлайн-статус
 OPER_HELP_CMD_MODE
-	    MODE        Изменяет режим на канале
+	    MODE        Изменить какой-либо режим на канале
 OPER_HELP_CMD_KICK
 	    KICK        Кикнуть пользователя с канала
 OPER_HELP_CMD_CLEARMODES
-	    CLEARMODES  Очистка режимов на канале
+	    CLEARMODES  Очистка всех режимов на канале
 OPER_HELP_CMD_KILLCLONES
 	    KILLCLONES  Прибить всех пользователей с определенного хоста
 OPER_HELP_CMD_AKILL
@@ -5487,10 +5374,9 @@ OPER_HELP_CMD_USERLIST
 OPER_HELP_CMD_LOGONNEWS
 	    LOGONNEWS   Установить сообщения при входе в сеть
 OPER_HELP_CMD_RANDOMNEWS
-	    RANDOMNEWS  Установить случайные сообщения
-	                при входе в сеть
+	    RANDOMNEWS  Установить случайные сообщения при входе в сеть
 OPER_HELP_CMD_OPERNEWS
-	    OPERNEWS    Установить сообщения, показываемые при /oper
+	    OPERNEWS    Установить сообщения для IRC-операторов
 OPER_HELP_CMD_SESSION
 	    SESSION     Посмотреть список текущих соединений
 OPER_HELP_CMD_EXCEPTION
@@ -5501,15 +5387,14 @@ OPER_HELP_CMD_NOOP
 OPER_HELP_CMD_JUPE
 	    JUPE        "Джупнуть" сервер
 OPER_HELP_CMD_IGNORE
-	    IGNORE      Управление списком игноров сервисов
+	    IGNORE      Управление игнор-списком сервисов
 OPER_HELP_CMD_SET
 	    SET         Установить различные опции сервисов
 OPER_HELP_CMD_RELOAD
-	    RELOAD      Перезагрузить конфигурационный файл сервисов
+	    RELOAD      Перечитать конфигурационный файл сервисов
 OPER_HELP_CMD_UPDATE
 	    UPDATE      Заставить сервисы немедленно сохранить
 	                все базы данных на диск
-
 OPER_HELP_CMD_RESTART
 	    RESTART     Сохранить базы данных и перезапустить сервисы
 OPER_HELP_CMD_QUIT
@@ -5517,15 +5402,15 @@ OPER_HELP_CMD_QUIT
 OPER_HELP_CMD_SHUTDOWN
 	    SHUTDOWN    Завершить работу сервисов с сохранением данных
 OPER_HELP_CMD_DEFCON
-	    DEFCON      Управление системой DefCon
+	    DEFCON      Управление системой DefCon (защитных контрмер)
 OPER_HELP_CMD_CHANKILL
 	    CHANKILL    Прибить всех пользователей на определенном канале
 OPER_HELP_CMD_OLINE
-	    OLINE       Установить флаги IRC Операторов определенному пользователю
+	    OLINE       Установить флаги IRC-Операторов определенному пользователю
 OPER_HELP_CMD_UMODE
-	    UMODE       Изменение режимов пользователя
+	    UMODE       Измененить режимы какого-либо пользователя
 OPER_HELP_CMD_SVSNICK
-	    SVSNICK     Сменить ник пользователю
+	    SVSNICK     Изменить ник пользователя
 OPER_HELP_CMD_MODLOAD
 	    MODLOAD     Загрузить модуль
 OPER_HELP_CMD_MODUNLOAD
@@ -5536,55 +5421,61 @@ OPER_HELP_CMD_MODLIST
 	    MODLIST     Список загруженных модулей
 
 OPER_HELP
-	%S commands:
+	Команды %S:
 
 OPER_HELP_LOGGED
-	Внимание: Все команды %S'у записываются в лог!
+	Примечание: Все команды %S'у записываются в лог!
 
 OPER_HELP_GLOBAL
 	Синтаксис: GLOBAL сообщение
 	
-	Позволяет IRC Операторам отправить сообщение всем пользователям IRC сети.
-	Это сообщение будет отправлено от ника %s.
+	Позволяет IRC-Операторам отправить сообщение всемпользователям
+	IRC сети. Данное сообщение будет отправлено от ника %s.
 
 OPER_HELP_STATS
-	Синтаксис: STATS [AKILL | ALL | RESET]
+	Синтаксис: STATS [AKILL | ALL | RESET | MEMORY | UPLINK]
 	
 	Без параметров, покажет текущее количество пользователей и
-	IRC Операторов в онлайне (кроме Сервисных), максимальное число пользователей
-	онлайн зарегистрированное сервисами с момента старта, и длительность
-	бесперебойной работы сервисов.
+	IRC-Операторов в онлайне (за исключением Сервисов),
+	максимальное число пользователей онлайн запомненное сервисами
+	с момента старта, и длительность бесперебойной работы сервисов.
 	
 	С опцией AKILL, покажет текущий размер списка AKILL'ов
-	и время истекания AKILL'ов по умолчанию.
+	и время истечения AKILL'ов по-умолчанию.
+
+	Опция RESET сбрасывает счетчик маскимально запомненного
+	сервисами количества пользователей в онлайне.
+
+	Опция MEMORY покажет информацию об использовании сервисами
+	памяти. Использование данной опции затормаживает работу сервисов
+	на определенный промежуток времени, поэтому, НЕ злоупотребляйте ею!
+
+	Опция UPLINK покажет информацию о сервере, который сервисы
+	используют для связи с сетью.
 	
-	Опция ALL доступна только для Администраторов сервисов, и
-	покажет информацию об использовании памяти сервисами. Ипользование
-	этой опции может затормозить сервисы на небольшой промежуток времени в
-	больших сетях, не используйте эту опцию чересчур часто!
-	
-	Опция RESET сбрасывает счетчик маскимально зарегистрированного сервисами
-	количества пользователей в онлайне.
+	Опция ALL покажет статистику пользователей и аптайма, плюс всю
+	информацию из опций MEMORY и UPLINK.
 	
 	UPTIME это синоним команды STATS.
 
 OPER_HELP_OPER
 	Синтаксис: OPER ADD ник
-	           OPER DEL {ник | номер записи | list}
-	           OPER LIST [маска | list]
+	           OPER DEL {ник | номер записи | список_записей}
+	           OPER LIST [маска | список_записей]
 	           OPER CLEAR
 	
 	Позволяет Администраторам сервисов управлять списком
-	Операторов сервисов. Пользователь, чей ник
-	присутствует в списке Операторов сервисов, идентифицировавшись на
-	%s получает доступ к командам Операторов сервисов.
+	Операторов сервисов. Пользователь, чей ник присутствует
+	в списке Операторов сервисов, идентифицировавшись на
+	%s, получает доступ к командам Операторов сервисов.
 	
 	Команда OPER ADD добавляет указанный ник в список
 	Операторов сервисов.
 	
 	Команда OPER DEL удаляет указанный ник из списка
-	Операторов сервисов. Если указаны номера записей, 
-	эти записи будут удалены. (См. пример ипользования команды LIST ниже.)
+	Операторов сервисов. Если в качестве параметра указаны
+	номера записей, данные записи будут удалены.
+	(См. пример ипользования команды LIST ниже.)
 	
 	Команда OPER LIST показывает список Операторов сервисов.
 	Если указана символьная маска, только соответствующие ей
@@ -5592,331 +5483,317 @@ OPER_HELP_OPER
 	только эти записи будут показаны; например:
 
 	   OPER LIST 2-5,7-9
-	   Покажет Операторов сервисов с номерами записей от 2 до
-	   5 и от 7 до 9.
+	      Покажет Операторов сервисов с номерами записей со 2 по
+	      5 и с 7 по 9.
 	      
-	Команда OPER CLEAR удаляет все записи из списка
+	Команда OPER CLEAR удаляет ВСЕ записи из списка
 	Операторов сервисов.
 	
-	Любой IRC Оператор может использовать команду OPER LIST.
-	Все остальные команды могут использовать только Администраторы сервисов.
+	Любой IRC-Оператор может использовать команду OPER LIST.
+	Остальные команды могут использовать только Руты сервисов.
 
 OPER_HELP_ADMIN
 	Синтаксис: ADMIN ADD ник
-	           ADMIN DEL {ник | номер записи | list}
-	           ADMIN LIST [маска | list]
+	           ADMIN DEL {ник | номер записи | список_записей}
+	           ADMIN LIST [маска | список_записей]
 	           ADMIN CLEAR
 	
-	Позволяет суперпользователю сервисов добавлять или удалять ники
-	из списка Администраторов сервисов. Пользователь, чей ник
-	находится с списке Администраторов сервисов и который идентифицировался
-	%s получае доступ к командам Администраторов сервисов.
+	Позволяет Руту сервисов управлять списком Администраторов сервисов.
+	Пользователь, чей ник находится с списке Администраторов сервисов,
+	идентифицировавшись на %s, получает доступ к командам Администраторов
+	сервисов.
 	
 	Команда ADMIN ADD добавляет указанный ник в список
 	администраторов сервисов.
 	
 	Команда ADMIN DEL удаляет указанный ник из списка
-	администраторов сервисов. Если указать номер(а) записи(записей),
-	все они будут удалены. (См. пример использования команды LIST ниже.)
+	администраторов сервисов. Если в качестве параметра указаны
+	номера записей, данные записи будут удалены.
+	(См. пример ипользования команды LIST ниже.)
 	
 	Команда ADMIN LIST показывает список администраторов сервисов.  
 	Если указать символьную маску, только подпадающие под нее значения
-	будут показаны. Если указать номера записей, то
-	будут показаны только они; например:
+	будут показаны. Если указать номера записей, то будут показаны только
+	они. Например:
 
 	   ADMIN LIST 2-5,7-9
 	      Покажет администраторов сервисов с номерами записей от 2 до
-	      5 и от 7 до 9.
+	      5 и от 7 до 9 включительно.
 	      
-	Команда ADMIN CLEAR удалит все записи из списка
+	Команда ADMIN CLEAR удалит ВСЕ записи из списка
 	администраторов сервисов.
 	
-	Любой IRC оператор может использовать команду ADMIN LIST.
-	Остальное может использоваеть только Суперпользователь сервисов.
+	Любой IRC-Оператор может использовать команду ADMIN LIST.
+	Остальные команды может использоваеть только Рут сервисов.
 
 OPER_HELP_IGNORE
 	Синтаксис: IGNORE {ADD|DEL|LIST|CLEAR} [время] [ник]
 
-	Позволяет Администраторам сервисов управлять списком игнорируемых сервисами ников
-	на указанное время или до перезапуска сервисов. По умолчанию формат указания времени
-	игнорирования - секунды. Вы можете также указать иные единицы измерения, используя:
-	s секунд, m минут, h часов и
-	d дней. Комбинации этих единиц измерения не допустимы. Чтобы сделать
-	постоянный игнор пользователя, установите время игнора равным 0.
+	Позволяет Администраторам сервисов управлять списком игнорируемых
+	сервисами ников на указанное время или до перезапуска сервисов.
+	По-умолчанию формат указания времени игнорирования - секунды. Вы
+	можете также указать иные единицы измерения, используя: s для секунд,
+	m для минут, h для часов и d для дней. Комбинации этих единиц
+	измерения не допустимы. Чтобы сделать постоянный игнор пользователя,
+	установите время игнора равным 0.
 
 OPER_HELP_MODE
 	Синтаксис: MODE #канал режимы
 	
-	Позволяет Операторам сервисов изменять режимы канала на любом
-	канале. Параметры данной команды такие же, что и при использовании
-	команды /MODE.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	Позволяет Операторам сервисов изменять режимы на любом
+	канале. Параметры данной команды такие же, что и при
+	использовании команды /MODE.
 
 OPER_HELP_UMODE
 	Синтаксис: UMODE пользователь режимы
 	
-	Позволяет Администраторам сервисов изменять пользовательские режимы для любого пользователя.
-	Параметры данной команды такие же, что и при использовании
-	команды /MODE.
+	Позволяет Администраторам сервисов устанавливать пользовательские
+	режимы для любого пользователя. Параметры данной команды такие же,
+	что и при использовании команды /MODE.
 	
-	Эту команду могут использовать только Администраторы сервисов.
+	Для использования этой команды необходимы права Супер-Администратора.
 
 OPER_HELP_OLINE
 	Синтаксис: OLINE пользователь флаги
 	
-	Позволяет Администраторам сервисов установить флаги IRC Операторов любому пользователю.
-	Перед флагами должен присутствовать префикс "+" или "-". Чтобы
-	удалить все флаги, используйте "-" вместо любого флага.
+	Позволяет Администраторам сервисов установить флаги
+	IRC-Операторов любому пользователю. Перед флагами должен
+	присутствовать префикс "+" или "-". Чтобы удалить все флаги,
+	используйте просто "-" вместо какого-либо флага.
 
-	Эту команду могут использовать только Администраторы сервисов.
+	Для использования этой команды необходимы права Супер-Администратора.
 
 OPER_HELP_CLEARMODES
 	Синтаксис: CLEARMODES #канал [ALL]
 	
 	Очищает все двоичные режимы (i,k,l,m,n,p,s,t) и баны на указанном
-	канале. Если указан параметр ALL, также снимет со всех статус оператора канала,
-	войсы (режимы +o и +v) на канале.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	канале. Если указан параметр ALL, также снимет со всех статус
+	оператора/войса (режимы +o и +v) на канале.
 
 OPER_HELP_KICK
 	Синтаксис: KICK #канал пользователь причина
 	
-	Позволяет IRC Операторам выкинуть пользователя с любого канала.
-	Параметры данной команды такие же, что и при испоьзовании команды /KICK.
-	Сообщение кика будет включать имя IRC Оператора, использовавшего команду
+	Позволяет IRC-Операторам выкинуть пользователя с любого канала.
+	Параметры данной команды такие же, что и при использовании команды /KICK.
+	Сообщение кика будет включать имя IRC-Оператора, использовавшего команду
 	и указанную им причину, например:
 	
-	*** SpamMan has been kicked off channel #my_channel by %S (Alcan (Flood))
-	
-	Эту команду могут использовать только Операторы сервисов.
+	*** SpamMan was kicked by %S (Alcan (Flood))
 
 OPER_HELP_SVSNICK
-	Синтаксис: SVSNICK ник новый ник
+	Синтаксис: SVSNICK ник новый_ник
 	
-	Изменить ник на новый ник.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Принудительно изменить указанный ник на новый_ник.
 
 OPER_HELP_AKILL
-	Синтаксис: AKILL ADD [+время истечения] маска причина
-	           AKILL DEL {маска | номер записи | list}
-	           AKILL LIST [маска | list]
-	           AKILL VIEW [маска | list]
+	Синтаксис: AKILL ADD [+время_истечения] маска причина
+	           AKILL DEL {маска | номер_записи | список_записей}
+	           AKILL LIST [маска | список_записей]
+	           AKILL VIEW [маска | список_записей]
 	           AKILL CLEAR
 	
 	Позволяет Операторам сервисов управлять списком AKILL'ов. Если
-	пользователь, подпадающий под маску AKILL'а попытается приконнектиться, сервисы
-	используют на него KILL, и, Если Ваш IRC сервер это поддерживает,
-	установит на всех серверах IRC сети K-line на
-	маску данного пользователя.
+	пользователь, подпадающий под маску AKILL'а попытается
+	присоединиться к серверу сети, сервисы используют на него KILL, и,
+	Если Ваш IRC-сервер это поддерживает, установит на всех серверах
+	IRC-сети K-line на маску данного пользователя.
 	
-	AKILL ADD добавляет маску вида user@host/ip в список AKILL'ов
+	AKILL ADD добавляет маску вида идент@хост/ip в список AKILL'ов
 	с указанной причиной (которая обязательно должна быть указана).
-	время истечения - это целое число, которое может быть одним из: d 
-	(дней), h (часов), или m (минут). Сочетания (то есть, к примеру
+	время истечения - это целое число, которое может быть одним из:
+	d (дней), h (часов), или m (минут). Сочетания (например
 	1h30m) не допускаются. Если единица измерения не указана,
-	по умолчанию она будет установлена в "дни" (таким образом +30 будет означать 30 
-	дней). Чтобы добавить вечный AKILL, используйте время истечения равным +0. Если
-	маска пользователя to была добавлена, начиная с +, время истечения
-	будет задано по умолчанию. Текущее время AKILL'а
-	по умолчанию можно узнать командой
+	по-умолчанию она будет установлена в "дни" (таким образом, +30
+	будет означать 30 дней). Чтобы добавить вечный AKILL, используйте
+	время истечения равным +0. Если маска пользователя была добавлена
+	начиная с +, время истечения будет задано по-умолчанию. Текущее
+	время истечения AKILL'а по-умолчанию, можно узнать командой
 	STATS AKILL.
 	
 	Команда AKILL DEL удаляет указанную маску из списка
-	AKILL'ов. Если указаны номера записей,
-	эти записи будут удалены. (См. пример испоьзования команды LIST 
-	ниже.)
+	AKILL'ов. Если в качестве параметра указаны
+	номера записей, данные записи будут удалены.
+	(См. пример ипользования команды LIST ниже.)
 	
 	Команда AKILL LIST показывает текущий список AKILL'ов.  
-	Если указать символьную маску, будут показаны только совпадающие с ней
-	значения. Если указать номера записей, только,
-	эти записи будут показаны; например:
+	Если указать символьную маску, будут показаны только
+	совпадающие с ней значения. Если указать номера записей,
+	только, эти записи будут показаны.
+	Например:
 
 	   AKILL LIST 2-5,7-9
-	   Список AKILL'ов с номерами записей со 2 до 5 и с 7 
-	   по 9.
+	      Список AKILL'ов с номерами записей от 2 до 5 и от 7 
+	      до 9 включительно.
 	      
-	AKILL VIEW покажет более подробную информацию, чем AKILL LIST, и
-	покажет также кто добавил AKILL, время установления AKILL'а, когда
-	он истекает, ну и конечно же маску вида user@host/ip и причину AKILL'а.
+	AKILL VIEW более подробная версия AKILL LIST, она
+	покажет кто добавил AKILL, время установки AKILL'а, когда
+	он истекает, ну и, конечно же, маску вида идент@хост/ip с
+	причиной AKILL'а.
 	
-	AKILL CLEAR удаляет все записи из списка AKILL'ов.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	AKILL CLEAR удаляет ВСЕ записи из списка AKILL'ов.
 	
 OPER_HELP_SGLINE
-	Синтаксис: SGLINE ADD [+время истечения] маска:причина
-	    	   SGLINE DEL {маска | номер записи | list}
-	           SGLINE LIST [маска | list]
-	           SGLINE VIEW [маска | list]
+	Синтаксис: SGLINE ADD [+время_истечения] маска:причина
+	           SGLINE DEL {маска | номер записи | список_записей}
+	           SGLINE LIST [маска | список_записей]
+	           SGLINE VIEW [маска | список_записей]
 	           SGLINE CLEAR
 	
 	Позволяет Операторам сервисов управлять списком SGLINE'ов. Если
-	пользователь с реальным именем, подпадающим под маску SGLINE'апопытается
-	приконнектиться, сервисы не разрешат ему установить
-	соединение.
+	пользователь с реальным именем, подпадающим под маску SGLINE'а
+	попытается присоединиться к серверу сети, сервисы не разрешат
+	ему установить соединение.
 	
 	SGLINE ADD добавляет маску реального имени в список SGLINE'ов
 	с указанной причиной (которая обязательно должна быть указана).
-	время истечения - это целое число, которое может быть одним из: d 
-	(дней), h (часов), или m (минут). Сочетания (то есть, к примеру
-	1h30m) не допускаются. Если единица измерения не указана,
-	по умолчанию она будет установлена в "дни" (таким образом +30 будет означать 30 
-	дней). Чтобы добавить вечный SGLINE, используйте время истечения равным +0. Если
-	маска пользователя to была добавлена, начиная с +, время истечения
-	будет задано по умолчанию. Текущее время SGLINE'а
-	по умолчанию можно узнать командой
+	время_истечения - это целое число, которое может быть одним из:
+	d (дней), h (часов), или m (минут). Комбинации значений
+	(например 1h30m) не допускаются. Если единица измерения не указана,
+	по-умолчанию, она будет установлена в "дни" (таким образом, +30
+	будет означать 30 дней). Чтобы добавить вечный SGLINE, используйте
+	время истечения равным +0. Если маска имени пользователя была
+	добавлена, начиная с +, время истечения будет задано по-умолчанию.
+	Текущее время истечения SGLINE'а по-умолчанию, можно узнать командой
 	STATS AKILL.
 	Примечание: так как маски реальных имен могут содержать пробелы,
-	разделителем между реальным именем и причиной будет двоеточие.
+	разделителем между реальным именем и причиной будет двоеточие.
 	
 	Команда SGLINE DEL удаляет указанную маску из списка
-	SGLINE'ов. Если указаны номера записей,
-	эти записи будут удалены. (См. пример испоьзования команды LIST 
-	ниже.)
+	SGLINE'ов. Если в качестве параметра указаны
+	номера записей, данные записи будут удалены.
+	(См. пример ипользования команды LIST ниже.)
 	
 	Команда SGLINE LIST показывает текущий список SGLINE'ов.  
-	Если указать символьную маску, будут показаны только совпадающие с ней
-	значения. Если указать номера записей, только,
-	эти записи будут показаны; например:
+	Если указать символьную маску, будут показаны только
+	совпадающие с ней значения. Если указать номера записей,
+	только, эти записи будут показаны. Например:
 
 	   SGLINE LIST 2-5,7-9
-	   Список SGLINE'ов с номерами записей со 2 до 5 и с 7 
-	   по 9.
+	      Список SGLINE'ов с номерами записей от 2 до 5 и от 7 
+	      до 9 включительно.
 	      
-	SGLINE VIEW покажет более подробную информацию, чем SGLINE LIST, и
-	покажет также кто добавил SGLINE, время установления SGLINE'а, когда
-	он истекает, ну и конечно же маску реального имени и причину SGLINE'а.
+	SGLINE VIEW более подробная версия  SGLINE LIST, она
+	покажет кто добавил SGLINE, время установки SGLINE'а, когда
+	он истекает, ну и, конечно же, маску реального имени и причину SGLINE'а.
 	
-	SGLINE CLEAR удаляет все записи из списка SGLINE'ов.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	SGLINE CLEAR удаляет ВСЕ записи из списка SGLINE'ов.
 
 OPER_HELP_SQLINE
-	Синтаксис: SQLINE ADD [+время истечения] маска:причина
-	    	   SQLINE DEL {маска | номер записи | list}
-	           SQLINE LIST [маска | list]
-	           SQLINE VIEW [маска | list]
+	Синтаксис: SQLINE ADD [+время_истечения] маска причина
+	           SQLINE DEL {маска | номер_записи | список_записей}
+	           SQLINE LIST [маска | список_записей]
+	           SQLINE VIEW [маска | список_записей]
 	           SQLINE CLEAR
 	
 	Позволяет Операторам сервисов управлять списком SQLINE'ов. Если
-	пользователь с ником, подпадающий под маску SQLINE'а попытается
-	приконнектиться, сервисы не разрешат ему установить
+	пользователь, ник которого подпадает под маску SQLINE'а попытается
+	присоединиться к серверу сети, сервисы не разрешат ему установить
 	соединение.
 	
-	Если первый символ маски #, сервисы не разрешат
-	использовать подпадающие под маску каналы (на IRC серверах, которые
-	это поддерживают).
+	Если первый символ маски указан как #, сервисы не разрешат
+	использовать подпадающие под маску каналы (только если ваше
+	IRCD это поддерживает).
 	
 	SQLINE ADD добавляет указанную маску в список SQLINE'ов
 	с указанной причиной (которая обязательно должна быть указана).
-	время истечения - это целое число, которое может быть одним из: d 
-	(дней), h (часов), или m (минут). Сочетания (то есть, к примеру
-	1h30m) не допускаются. Если единица измерения не указана,
-	по умолчанию она будет установлена в "дни" (таким образом +30 будет означать 30 
-	дней). Чтобы добавить вечный SQLINE, используйте время истечения равным +0. Если
-	маска пользователя to была добавлена, начиная с +, время истечения
-	будет задано по умолчанию. Текущее время SQLINE'а
-	по умолчанию можно узнать командой
+	время_истечения - это целое число, которое может быть одним из:
+	d (дней), h (часов), или m (минут). Комбинации значений
+	(например 1h30m) не допускаются. Если единица измерения не указана,
+	по-умолчанию, она будет установлена в "дни" (таким образом, +30
+	будет означать 30 дней). Чтобы добавить вечный SQLINE, используйте
+	время истечения равным +0. Если маска ника/канала была добавлена
+	начиная с +, время истечения будет задано по-умолчанию. Текущее
+	время истечения SQLINE'а по-умолчанию можно узнать командой
 	STATS AKILL.
 	
 	Команда SQLINE DEL удаляет указанную маску из списка
-	SGLINE'ов. Если указаны номера записей,
-	эти записи будут удалены. (См. пример испоьзования команды LIST 
-	ниже.)
+	SQLINE'ов. Если в качестве параметра указаны
+	номера записей, данные записи будут удалены.
+	(См. пример ипользования команды LIST ниже.)
 	
 	Команда SQLINE LIST показывает текущий список SQLINE'ов.  
-	Если указать символьную маску, будут показаны только совпадающие с ней
-	значения. Если указать номера записей, только,
-	эти записи будут показаны; например:
+	Если указать символьную маску, будут показаны только
+	совпадающие с ней значения. Если указать номера записей,
+	только, эти записи будут показаны. Например:
 
 	   SQLINE LIST 2-5,7-9
-	   Список SQLINE'ов с номерами записей со 2 до 5 и с 7 
-	   по 9.
+	      Список SQLINE'ов с номерами записей от 2 до 5 и от 7 
+	      пд 9 включительно.
 	      
-	SQLINE VIEW покажет более подробную информацию, чем SQLINE LIST, и
-	покажет также кто добавил SQLINE, время установления SQLINE'а, когда
-	он истекает, ну и конечно же маску реального имени и причину SQLINE'а.
+	SQLINE VIEW более подробная версия SQLINE LIST, она
+	покажет кто установил SQLINE, время установки SQLINE'а, когда
+	он истекает, ну и, конечно же, маску ника/канала и причину SQLINE'а.
 	
-	SQLINE CLEAR удаляет все записи из списка SQLINE'ов.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	SQLINE CLEAR удаляет ВСЕ записи из списка SQLINE'ов.
 
 OPER_HELP_SZLINE
-	Синтаксис: SZLINE ADD [+время истечения] маска причина
-	           SZLINE DEL {маска | номер записи | list}
-	           SZLINE LIST [маска | list]
-	           SZLINE VIEW [маска | list]
+	Синтаксис: SZLINE ADD [+время_истечения] маска причина
+	           SZLINE DEL {маска | номер записи | список_записей}
+	           SZLINE LIST [маска | список_записей]
+	           SZLINE VIEW [маска | список_записей]
 	           SZLINE CLEAR
 	
-	Позволяет Операторам сервисов управлять списком SZLINE'ов. Если
-	пользователь с IP адресом, подпадающим под маску SZLINE'а попытается 
-	приконнектиться, сервисы не разрешат ему установить
-	соединение (неважно, есть ли для этого IP запись PTR RR или нет).
+	Позволяет Операторам сервисов управлять списком SZLINE'ов.
+	Если пользователь, с IP адресом, подпадающим под маску SZLINE'а
+	попытается присоединиться к серверу, сервисы не разрешат ему
+	установить соединение (и неважно, есть ли для этого IP запись
+	PTR RR или нет).
 	
-	SZLINE ADD добавляет IP маску в список SZLINE'ов
+	SZLINE ADD добавляет указанную IP-маску в список SZLINE'ов
 	с указанной причиной (которая обязательно должна быть указана).
-	время истечения - это целое число, которое может быть одним из: d 
-	(дней), h (часов), или m (минут). Сочетания (то есть, к примеру
-	1h30m) не допускаются. Если единица измерения не указана,
-	по умолчанию она будет установлена в "дни" (таким образом +30 будет означать 30 
-	дней). Чтобы добавить вечный SGLINE, используйте время истечения равным +0. Если
-	маска пользователя to была добавлена, начиная с +, время истечения
-	будет задано по умолчанию. Текущее время SZLINE'а
-	по умолчанию можно узнать командой
-	STATS AKILL.
+	время истечения - это целое число, которое может быть одним из:
+	d (дней), h (часов), или m (минут). Комбинации значений
+	(например 1h30m) не допускаются. Если единица измерения не указана,
+	по-умолчанию, она будет установлена в "дни" (таким образом, +30
+	будет означать 30 дней). Чтобы добавить вечный SZLINE, используйте
+	время истечения равным +0. Если IP-маска пользователя была добавлена,
+	начиная с +, время истечения будет задано по-умолчанию. Текущее время
+	истечения SZLINE'а по-умолчанию, можно узнать командой STATS AKILL.
 	
-	Команда SZLINE DEL удаляет указанную маску из списка
-	SZLINE'ов. Если указаны номера записей,
-	эти записи будут удалены. (См. пример испоьзования команды LIST 
-	ниже.)
+	Команда SZLINE DEL удаляет указанную IP-маску из списка
+	SZLINE'ов. Если в качестве параметра указаны номера
+	записей, данные записи будут удалены. (См. пример
+	ипользования команды LIST ниже.)
 	
 	Команда SZLINE LIST показывает текущий список SZLINE'ов.  
-	Если указать символьную маску, будут показаны только совпадающие с ней
-	значения. Если указать номера записей, только,
-	эти записи будут показаны; например:
+	Если указать символьную маску, будут показаны только
+	совпадающие с ней значения. Если указать номера записей,
+	только, эти записи будут показаны. Например:
 
 	   SZLINE LIST 2-5,7-9
-	   Список SZLINE'ов с номерами записей со 2 до 5 и с 7 
-	   по 9.
+	      Список SZLINE'ов с номерами записей от 2 до 5 и от 7 
+	      до 9 включительно.
 	      
-	SZLINE VIEW покажет более подробную информацию, чем SZLINE LIST, и
-	покажет также кто добавил SZLINE, время установления SZLINE'а, когда
-	он истекает, ну и конечно же маску реального имени и причину SZLINE'а.
+	SZLINE VIEW более подробная версия SZLINE LIST, она
+	покажет кто добавил SZLINE, время установки SZLINE'а, когда
+	он истекает, ну и, конечно же, IP-маску и причину SZLINE'а.
 	
-	SZLINE CLEAR удаляет все записи из списка SZLINE'ов.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	SZLINE CLEAR удаляет ВСЕ записи из списка SZLINE'ов.
 
 OPER_HELP_SET
 	Синтаксис: SET опция параметр
 
 	Устанавливает различные глобальные опции сервисов. Опции
-	такие:
+	могут быть следующими:
 	    READONLY   Установить режим только-чтение или чтение-запись
-	    LOGCHAN    Вести лог сервисов в канал
+	    LOGCHAN    Вести лог сервисов на сервисный канал
 	    DEBUG      Активировать/деактивировать режим отладки
 	    NOEXPIRE   Активировать/деактивировать режим не-истечения
-	    SUPERADMIN Активировать/деактивировать режим Суперадмина
-	    SQL   	 Activate or deactivate sql mode
-	    IGNORE     Activate or deactivate ignore mode
-	    LIST       List the options
-
-	Эту команду могут использовать только Администраторы сервисов.
+	    SUPERADMIN Активировать/деактивировать режим Супер-Администратора
+	    SQL        Активировать/деактивировать SQL-режим
+	    IGNORE     Активировать/деактивировать режим игнора
+	    LIST       Список опций
 
 OPER_HELP_SET_READONLY
 	Синтаксис: SET READONLY {ON | OFF}
 	
-	Включает или выключает режим только-чтения. В режиме только-чтения
-	обычные пользователи не могу изменять любые данные,
-	включая списки доступа для ников и каналов, и многое другое. IRC Операторы
+	Включает или выключает режим только-чтения. В режиме только-чтения,
+	обычные пользователи не могу изменять никакие данные, включая списки
+	доступа для ников и каналов, их настройи и т. д. IRC-Операторы
 	с достаточными привилегиями на сервисах могут модифицировать список
-	AKILL'ов и удалять или запрещать ники и
-	каналы, но все эти изменения не будут сохранены пока режим
-	только-чтения не будет деактивирован либо сервисы не завершат работу
-	или не перезапустятся.
+	AKILL'ов и удалять или запрещать ники и каналы, но все эти изменения
+	не будут сохранены, пока режим только-чтения не будет деактивирован
+	прежде, чем сервисы завершат работу или перезапустятся.
 	
 	Эта опция является эквивалентом параметра командной строки
 	-readonly.
@@ -5924,22 +5801,22 @@ OPER_HELP_SET_READONLY
 OPER_HELP_SET_LOGCHAN
 	Синтаксис: SET LOGCHAN {ON | OFF}
 
-	С включенным LOHCHAN, сервисы будут не только записывать все сообщения в лог, но и отправлять их
-	на специальный канал. Этот канал должен быть определен в
-	конфигурационном файле сервисов чтобы эта опция могла быть
-	использована.
+	С включенным LOHCHAN, сервисы будут не только записывать
+	все сообщения в лог, но и отправлять их на специальный канал.
+	Этот канал должен быть определен в конфигурационном файле
+	сервисов, чтобы данная опция могла быть использована.
 
-	Примечание: Из соображений безопасности, рекомендуется обратить особое
-	внимание на безопасность доступа на этот канал.
+	Примечание: Из соображений безопасности, рекомендуется
+	обратить особое внимание на ограничение доступа на этот канал.
 
 OPER_HELP_SET_DEBUG
 	Синтаксис: SET DEBUG {ON | OFF | номер}
 	
-	Включает/выключает режим отладки. В режиме отладки, данные, которыми сервисы
-	обмениваются с IRC сервером, количество данных зависит от уровня (номера) отладки
-	будут записаны в лог. Если указать номер,
-	режим отладки активируется с уровнем отладки, установленным в
-	номер.
+	Включает/выключает режим отладки. В режиме отладки, данные,
+	посланные или принятые сервисами, количество которых зависит
+	от уровня (номера) отладки, будут записаны в лог. Если указать
+	номер, режим отладки активируется с уровнем отладки, указанным
+	как номер.
 
 	Эта опция является эквивалентом параметра командной строки
 	-debug.
@@ -5947,8 +5824,8 @@ OPER_HELP_SET_DEBUG
 OPER_HELP_SET_NOEXPIRE
 	Синтаксис: SET NOEXPIRE {ON | OFF}
 
-	Включает/выключает режим не-истекания. В этом режиме ники,
-	каналы, AKILL'ы и исключения никогда не истекут, пока опция
+	Включает/выключает режим глобального не-истечения. В этом режиме,
+	ники, каналы, AKILL'ы и исключения никогда не истекут, пока опция
 	не будет отключена.
 
 	Эта опция является эквивалентом параметра командной строки
@@ -5957,60 +5834,55 @@ OPER_HELP_SET_NOEXPIRE
 OPER_HELP_SET_SUPERADMIN
 	Синтаксис: SET SUPERADMIN {ON | OFF}
 
-	Эта опция позволяет Вам получить супер привилегии - например такие как
-	"владелец" на всех каналах и другое...
+	Эта опция позволяет Вам получить супер привилегии,
+	например такие, как "владелец" на всех каналах и многое
+	другое...
 
-	Эта опция не постоянная, и должна использоваться только при крайней
-	необходимости, установите ее в OFF как только перестанете нуждаться в ней.
+	Эта опция не постоянная, и должна использоваться только при
+	крайней необходимости, установите ее обратно в OFF как только
+	перестанете нуждаться в ней.
 
 OPER_HELP_SET_SQL
-	Syntax: SET SQL {ON | OFF}
+	Синтаксис: SET SQL {ON | OFF}
 
-	Setting this will toggle Anope's from usage of SQL, this should
-	be used to disable and enable SQL should your SQL server go down
-	while services are running.
+	Данная установка позволяет включать или выключать
+	использование сервисами Anope SQL-режима.
 
 OPER_HELP_SET_IGNORE
-	Syntax: SET IGNORE {ON | OFF}
+	Синтаксис: SET IGNORE {ON | OFF}
 
-	Setting this will toggle Anope's usage of the IGNORE system 
-	on or off.
+	Устанавливает, будет использоваться режим ИГНОРА сервисами или нет.
 
 OPER_HELP_SET_LIST
-	Syntax: SET LIST
+	Синтаксис: SET LIST
 
-	Display the various OperServ settings
+	Показывает различные настройки OperServ
 
 OPER_HELP_NOOP
 	Синтаксис: NOOP SET сервер
 	           NOOP REVOKE сервер
 
-	NOOP SET удаляет все O:lines на указанном
-	сервере и прибивает всех IRC Операторов, находящихся на нем,
-	чтобы не дать им возможность рехашнуть сервер (так как это
-	отменит эффект данной команды).
+	NOOP SET удаляет все O:lines на указанном сервере
+	и прибивает всех IRC-Операторов, находящихся на нем,
+	чтобы не дать им возможность rehash'нуть сервер (так
+	как это отменит эффект данной команды).
 
 	NOOP REVOKE делает все ранее удаленные O:lines доступными
 	для использования на сервере.
 
-	Примечание: сервер не будет полностью ограничен
-	сервисами.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Примечание: наличие сервера в сети не проверяется сервисами.
 
 OPER_HELP_JUPE
 	Синтаксис: JUPE сервер [причина]
 	
-	Джупнуть сервисы -- это создаст
-	фальшивый "сервер" приконнекченный к сервисам, который
-	не даст реальному серверу с этим именем приконнектиться к сети. Джуп
-	может быть удален, используя стандартный SQUIT. Если указана причина,
-	она будет показана в информации, выдаваемой коннектящемуся серверу;
-	в ином случае, эта информационная строка будет содержать текст
-	"Juped by <ник>", то есть покажет человека, который
-	джупнул данный сервер.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Приказывает сервисам джупнуть серер -- это создаст
+	фальшивый "сервер", присоединенный к сервисам, который
+	не даст реальному серверу с этим именем присоединиться к сети.
+	Джуп может быть удален, использованием стандартного SQUIT на
+	фальшивый сервер. Если указана причина, она будет показана в
+	информации сервера, в ином случае, эта информационная строка
+	будет содержать текст "Juped by <ник>", то есть покажет ник
+	человека, который джупнул данный сервер.
 
 OPER_HELP_RAW
 	Синтаксис: RAW текст
@@ -6018,132 +5890,105 @@ OPER_HELP_RAW
 	Отправляет текстовую строку напрямую на IRC сервер, к которому
 	прилинкованы сервисы. Эта команда имеет очень ограниченное
 	использование, она может вызвать фатальную ошибку в сети при
-	неверном испоьзовании. НЕ ИСПОЛЬЗУЙТЕ ЭТУ КОМАНДУ без
-	абсолютной уверенности в том, что Вы делаете!
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	неверном испоьзовании. НЕ ИСПОЛЬЗУЙТЕ ЭТУ КОМАНДУ БЕЗ
+	АБСОЛЮТНОЙ УВЕРЕННОСТИ В ТОМ, ЧТО ВЫ ДЕЛАЕТЕ!
 
 OPER_HELP_UPDATE
 	Синтаксис: UPDATE
 	
-	Заставляет сервисы немедленно обновить файды баз данных
+	Заставляет сервисы немедленно обновить все файлы баз данных
 	на диске.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 	
 OPER_HELP_RELOAD
 	Синтаксис: RELOAD
 	
 	Заставляет сервисы перечитать конфигурационный файл. Примечание:
-	некоторые вещи требуют перезапуска сервисов.
-	(например изменение ников псевдоклиентов сервисов, активация
+	некоторые директивы будут требовать перезапуска сервисов для
+	вступления в силу (например: изменение ников сервисов, активация
 	лимитирования сессий, и т.д.)
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 OPER_HELP_QUIT
 	Синтаксис: QUIT
 	
-	Заставляет сервисы немедленно завершить свою работу; базы данных
-	не будут сохранены. Эта команда не должна использоваться кроме случаев
-	повреждения базы данных в памяти, чтобы поврежденная база
-	данных не была сохранена. Для нормального завершения работы используйте
-	команду SHUTDOWN.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Заставляет сервисы немедленно завершить свою работу. Базы данных
+	не будут сохранены. Эта команда должна использоваться только в
+	тех случаях, когда наличиствует повреждения базы данных в памяти,
+	и надо избежать сохранения поврежденной базы данных. Для нормального
+	завершения работы сервисов используйте команду SHUTDOWN.
 
 OPER_HELP_SHUTDOWN
 	Синтаксис: SHUTDOWN
 	
 	Заставляет сервисы сохранить все базы данных и завершить работу.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 OPER_HELP_RESTART
 	Синтаксис: RESTART
 	
 	Заставляет сервисы сохранить все базы данных и перезапуститься
-	(т.е. завершить работу и немедленно снова запустить сервисы на исполнение).
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	(т.е., завершить работу немедленно снова запустить сервисы на исполнение).
 
 OPER_HELP_KILLCLONES
 	Синтаксис: KILLCLONES ник
 	
-	Прибивает всех пользователей, хост которых такой же, как у указанного ника.
-	Добавляется временный AKILL, в виде *@host, чтобы предотвратить
-	немедленный реконнект прибитых клиентов.
-	Также при использовании этой команды будет отправлен wallop,
-	который сообщит о прибитом хосте и количестве прибитых клиентов.
-	Эту команду очень удобно применять, чтобы убрать
-	клонов из IRC сети.
-	
-	Эту команду могут использовать только Операторы сервисов.
+	Прибивает всех пользователей, хост у которых такой же,
+	как у указанного ника. Добавляется временный AKILL,
+	в виде *@хост, чтобы предотвратить немедленный реконнект
+	прибитых клиентов. Также, при использовании этой команды
+	будет отправлен wallop, который сообщит о том, кто использовал
+	команду, хост, на который распространилось действие команды и
+	количество прибитых клиентов. Эту команду очень удобно применять,
+	чтобы убрать клонов из IRC-сети.
 	
 OPER_HELP_CHANLIST
 	Синтаксис: CHANLIST [{символная маска | ник} [SECRET]]
 	
-	Показывает все созданные на данный момент каналы в IRC сети, неважно
-	зарегистрированы они или нет.
+	Показывает все созданные на данный момент каналы в IRC-сети,
+	вне зависимости от того, зарегистрированы они или нет.
 	
-	Если указана символьная маска, покажет только те каналы, которые совпадают с ней. Если указан ник,
-	покажет только те каналы, на которых находится этот ник. Если указан параметр SECRET,
-	покажет только каналы с указанной символьной маской на которых
+	Если указана символьная маска, покажет только те каналы,
+	которые совпадают с ней. Если указан ник, покажет только те
+	каналы, на которых находится этот ник. Если указан параметр SECRET,
+	покажет только каналы с указанной символьной_маской на которых
 	стоит режим +s или +p.
-	
-	Эту команду могут использовать только Администраторы сервисов.
 
 OPER_HELP_USERLIST
 	Синтаксис: USERLIST [{символьная маска | #канал} [INVISIBLE]]
 	
-	Показать всех пользователей, находящихся в данный момент в IRC сети, без разницы
-	зарегистрирован у них ник или нет.
+	Показывает всех пользователей, находящихся в данный момент в IRC-сети,
+	вне зависимости от того, зарегистрирован у них ник или нет.
 	
-	Если указана символьная маска, покажет только пользователей совпадающих с ней (маска должна быть
-	в формате nick!user@host). Если указан #канал, покажет только пользователей,
-	находящихся на этом канале. Если указан пареметр INVISIBLE будут показаны
-	только те пользователи, на которых стоит флаг +i.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Если указана символьная маска, покажет только совпадающих с ней пользователей
+	(маска должна быть в формате ник!идент@хост). Если указан #канал, покажет
+	только тех пользователей, которые находяться на этом канале. Если указан пареметр
+	INVISIBLE, будут показаны только те пользователи, на которых стоит флаг +i.
 
 OPER_HELP_MODLOAD
 	Синтаксис: MODLOAD ИмяФайла
 
 	Эта команда загрузит указанный модуль из директории
-	с модулями.
-
-	Эту команду могут использовать только Суперпользователи сервисов.
+	с модулями..
 
 OPER_HELP_MODUNLOAD
 	Синтаксис: MODUNLOAD ИмяФайла
 
-	Эта команда загрузит указанный модуль из директории
+	Эта команда выгрузит указанный модуль из директории
 	с модулями.
-
-	Эту команду могут использовать только Суперпользователи сервисов.
 
 OPER_HELP_MODINFO
 	Синтаксис: MODINFO ИмяФайла
 
-	Эта команда покажет информацию об указанном модуле
-
-	Эту команду могут использовать только Суперпользователи сервисов.
+	Эта команда покажет информацию об указанном загруженом модуле
 
 OPER_HELP_MODLIST
 	Синтаксис: MODLIST
 
 	Список всех загруженных модулей
 
-	Эту команду могут использовать только Суперпользователи сервисов.
-
-
 ###########################################################################
 #
 # BotServ help messages
 #
 ###########################################################################
-
-
 BOT_HELP_CMD_BOTLIST
 	BOTLIST            Список доступных для установки ботов
 BOT_HELP_CMD_ASSIGN
@@ -6151,28 +5996,29 @@ BOT_HELP_CMD_ASSIGN
 BOT_HELP_CMD_SET
 	SET                Конфигурировать настройки бота
 BOT_HELP_CMD_KICK
-	KICK               Конфигурировать за что бот будет кикать и банить
+	KICK               Установить, за что бот будет кикать и банить
 BOT_HELP_CMD_BADWORDS
 	BADWORDS           Управление списком плохих слов
 BOT_HELP_CMD_ACT
-	ACT                Makes the bot do the equivalent of a "/me" command
+	ACT                Заставляет бота выполнить команду, эквивалентную команде "/me" в mIRC
 BOT_HELP_CMD_INFO
-	INFO               Allows you to see BotServ information about a channel or a bot
+	INFO               Позволяет вам посмотреть информацию о боте или канале
 BOT_HELP_CMD_SAY
-	SAY                Makes the bot say the given text on the given channel
+	SAY                Заставляет бота сказать определенный текст на канал
 BOT_HELP_CMD_UNASSIGN
-	UNASSIGN           Unassigns a bot from a channel
+	UNASSIGN           Удаляет бота с канала
 BOT_HELP_CMD_BOT
 	BOT                Управление ботами
 
 BOT_HELP
-	%S позволяет Вам повесить бота на свой канал.
-	Это сделано для тех, кто не может иначе установить или
-	настроить бота, или если использование ботов запрещено
-	в Вашей IRC сети. Доступные команды перечислены ниже;
-	чтобы использовать их, напишите %R%S команда. Для получения 
-	более подробной информации по конкретной команде, напишите %R
-	%S HELP команда.
+	%S позволяет Вам установить бота на свой канал.
+	Даный сервис сделан для тех пользователей, которые
+	не могут иначе установить или настроить бота, или же,
+	использование ботов запрещено в IRC сети. Доступные
+	команды перечислены ниже, чтобы использовать их, напишите
+	%R%S команда. Для получения более подробной
+	информации по конкретной команде, напишите
+	%R %S HELP команда.
 	
 BOT_HELP_FOOTER
 	Бот присоединится к каналу после того, как на нем окажется
@@ -6187,37 +6033,35 @@ BOT_HELP_ASSIGN
 	Синтаксис: ASSIGN #канал ник
 	
 	Установит бота под указанным ником на указанный канал. Теперь
-	Вы можете настраивать опции бота так, как Вам
-	необходимо.  
+	Вы можете настраивать опции бота так, как Вам необходимо.  
 	
 BOT_HELP_UNASSIGN
 	Синтаксис: UNASSIGN #канал
 	
 	Убирает бота с указанного канала. При использовании этой команды
 	бот больше не будет заходить на канал. Тем не менее, конфигурация
-	бота для данного канала будет сохранена, поэтому если Вы позднее
+	бота для данного канала будет сохранена, поэтому, если Вы позднее
 	снова установите этого бота на канал, все его настройки будут
 	восстановлены.
 	
 BOT_HELP_INFO
 	Синтаксис: INFO {#канал | ник}
 	
-	ПОзволяет Вам увидеть информацию %S о канале или о боте.
+	ПОзволяет Вам увидеть информацию через %S о канале или о боте.
 	Если указать #канал, то Вы получите информацию о канале
-	и настройках киков. Если указать ник,
-	Вы получите информацию о боте, когда бот был создан
-	и число каналов на котором он находится.
+	и настройках киков. Если указать ник, Вы получите информацию о
+	боте, когда бот был создан и число каналов, на котором он находится.
 	
 BOT_HELP_SET
-	Синтаксис: SET #канал опция параметры
+	Синтаксис: SET (#канал| бот) опция параметры
 	
 	Конфигурация опций бота. Настраиваемые опции:
 	
 	    DONTKICKOPS      Не кикать операторов
 	    DONTKICKVOICES   Не кикать войсов
-	    GREET            Включить сообщение приветствий
+	    GREET            Включить сообщения приветствий
 	    FANTASY          Включить режим Фантазии
-	    SYMBIOSIS        Позволить боту кикать/банить/менять режимы, используя ChanServ
+	    SYMBIOSIS        Позволить боту кикать/банить/менять режимы "от себя"
 	
 	Напишите %R%S HELP SET опция для более подробной информации
 	о конкретной опции.
@@ -6229,30 +6073,30 @@ BOT_HELP_SET_DONTKICKOPS
 	Синтаксис: SET #канал DONTKICKOPS {ON|OFF}
 	
 	Включает или выключает защиту операторов канала на указанном канале.
-	Если включено, операторы не будут кикнуты ботом
-	даже если их уровень доступа не соответствует уровню NOKICK.
+	Если включено, операторы не будут кикнуты ботом даже если их уровень
+	доступа не соответствует уровню NOKICK.
 	
 BOT_HELP_SET_DONTKICKVOICES
 	Синтаксис: SET #канал DONTKICKVOICES {ON|OFF}
 	
 	Включает или выключает защиту войсов на указанном канале.
-	Если включено, войсы не будут кикнуты ботом
-	даже если их уровень доступа не соответствует уровню NOKICK.
+	Если включено, войсы не будут кикнуты ботом даже если их
+	уровень доступа не соответствует уровню NOKICK.
 	
 BOT_HELP_SET_FANTASY
 	Синтаксис: SET #канал FANTASY {ON|OFF}
 	
 	Включает или выключает режим Фантазии на канале.
 	Если включено, пользователи могут использовать
-	команды !op, !deop, !voice, !devoice,
-	!kick, !kb, !unban, !seen на канале (можно использовать,
-	указывая ник (необязательно), 
-	или причину (для команд !kick, !kb)).
+	команды !op, !deop, !voice, !devoice, !kick, !kb,
+	!unban, !seen на канале (можно использовать,
+	указывая ник (необязательно), или причину
+	(для команд !kick, !kb)).
 	
 	Примечание: чтобы использовать команды Фантазии,
 	пользователи ДОЛЖНЫ иметь соответствующий уровень доступа
-	к командам Фантазии и другие привилегии,
-	требуемые для этих команд (например, чтобы использовать команду
+	к командам режима Фантазии и другие привилегии, требуемые
+	для определенных команд (например, чтобы использовать команду
 	!op, пользователь должен иметь права на использование команд 
 	OP/DEOP).
 
@@ -6260,44 +6104,43 @@ BOT_HELP_SET_GREET
 	Синтаксис: SET #канал GREET {ON|OFF}
 	
 	Включает или выключает режим приветствий на канале.
-	Если включено, бот будет показывать приветственные сообщения
-	для пользователей, заходящих на канал и имеющих
-	достаточный уровень доступа.
+	Если включено, бот будет показывать приветственные
+	сообщения для пользователей, заходящих на канал,
+	и имеющих достаточный уровень доступа.
 
 BOT_HELP_SET_SYMBIOSIS
 	Синтаксис: SET #канал SYMBIOSIS {ON|OFF}
 	
 	Включает или выключает режим симбиоза на канале.
-	Если включено, бот будет выполнять многие действия
-	на канале через %s, например изменение режимов канала,
-	кики, и др.
+	Если включено, бот будет выполнять большинство действий
+	на канале посредством %s, например: изменение режимов
+	канала, кики, и др.
 
 BOT_HELP_KICK
 	Синтаксис: KICK #канал опция параметры
 	
-	Конфигурировать за что бот будет кикать и банить. Доступные опции:
+	Установки, за что бот будет кикать и банить. Доступные опции:
 	
 	    BOLDS         Будет ли бот кикать за выделение жирным шрифтом
 	    BADWORDS      Будет ли бот кикать за плохие слова
 	    CAPS          Будет ли бот кикать за использование CapsLOCK
 	    COLORS        Будет ли бот кикать за выделение цветами
 	    FLOOD         Будет ли бот кикать за флуд
-	    REPEAT        Будет ли бот кикать за
-	                       повторы
+	    REPEAT        Будет ли бот кикать за повторы
 	    REVERSES      Будет ли бот кикать за реверсы
 	    UNDERLINES    Будет ли бот кикать за выделение подчеркиванием
 	
-	Напишите %R%S HELP KICK опция для получения более полной
-	информации о конкретной опции.
+	Напишите %R%S HELP KICK опция для получения более
+	подробной информации о конкретной опции.
 	
-	Примечание: доступ к этой команде может быть изменен через
-	level SET.
+	Примечание: доступ к этой команде может быть изменен
+	через level SET.
 
 BOT_HELP_KICK_BOLDS
 	Синтаксис: KICK #канал BOLDS {ON|OFF} [ttb]
 
-	Будет ли бот кикать за выделение жирным шрифтом.
-	Если включено - будет.
+	Если опция включена, бот будет кикать за использование
+	жирного шрифта на канале.
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6306,8 +6149,8 @@ BOT_HELP_KICK_BOLDS
 BOT_HELP_KICK_COLORS
 	Синтаксис: KICK #канал COLORS {ON|OFF} [ttb]
 
-	Будет ли бот кикать за выделение цветами.
-	Если включено - будет.
+	Если опция включена, бот будет кикать за использование
+	цветного текста на канале.
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6316,8 +6159,8 @@ BOT_HELP_KICK_COLORS
 BOT_HELP_KICK_REVERSES
 	Синтаксис: KICK #канал REVERSES {ON|OFF} [ttb]
 
-	Будет ли бот кикать за реверсы.
-	Если включено - будет.
+	Если опция включена, бот будет кикать за использование
+	реверсивного текста на канале.
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6326,8 +6169,8 @@ BOT_HELP_KICK_REVERSES
 BOT_HELP_KICK_UNDERLINES
 	Синтаксис: KICK #канал UNDERLINES {ON|OFF} [ttb]
 
-	Будет ли бот кикать за выделение подчеркиванием.
-	Если включено - будет.
+	Если опция включена, бот будет кикать за использование
+	подчеркнутого текста на канале.
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6337,13 +6180,13 @@ BOT_HELP_KICK_CAPS
 	Синтаксис: KICK #канал CAPS {ON|OFF} [ttb [минимум [проценты]]]
 
 	Будет ли бот кикать за использование CapsLOCK.
-	Если включено - бот будет кикать тех, кто любит разговаривать
-	большими буквами.
+	Если включено - бот будет кикать тех, кто любит
+	разговаривать большими буквами.
 
 	Бот кикнет пользователя, если он использует минимум больших букв,
-	количество которых составит проценты%% от общего количества
-	букв (Если не указаны, то значения по умолчанию 10 символов
-	и 25%%).
+	количество которых составит проценты%% от общего количества букв
+	тектовой линии (Если параметры не указаны, то будут установлены
+	значения по-умолчанию: 10 символов и 25%).
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6353,21 +6196,22 @@ BOT_HELP_KICK_FLOOD
 	Синтаксис: KICK #канал FLOOD {ON|OFF} [ttb [линий [секунды]]]
 
 	Будет ли бот кикать за флуд. Если включено,
-	бот будет кикать флудеров с канала,
-	если они сказали более линий строк текста за секунды секунд
-	(Если не указано, значения по умолчанию 6 строк за 10 секунд).
+	бот будет кикать флудеров с канала, если они сказали
+	более линий строк текста за секунды секунд
+	(Если параметры не указаны, то будут установлены
+	значения по-умолчанию: 6 строк за 10 секунд).
 	
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
 	пользователь никогда не будет баниться.
 
 BOT_HELP_KICK_REPEAT
-	Синтаксис: KICK #канал REPEAT {ON|OFF} [ttb [число повторов]]
+	Синтаксис: KICK #канал REPEAT {ON|OFF} [ttb [число_повторов]]
 
-	Будет ли бот кикать за повторы. Если включено,
-	бот будет кикать пользователей, которые повторяют один и тот же
-	текст число повторов раз (Если не указано, значение по умолчанию
-	равно 3).
+	Будет ли бот кикать за повторы. Если включено, бот будет кикат
+	пользователей, которые повторяют один и тот же текст
+	число повторов раз (Если параметры не указаны, то будут
+	установлены значения по-умолчанию: 3).
 
 	ttb это количество киков, после которых
 	бот поставит бан. Если Вы не укажете ttb,
@@ -6377,8 +6221,8 @@ BOT_HELP_KICK_BADWORDS
 	Синтаксис: KICK #канал BADWORDS {ON|OFF} [ttb]
 
 	Будет ли бот кикать за плохие слова. Если включено,
-	бот будет кикать пользователей, использующих плохие слова
-	на канале.
+	бот будет кикать пользователей, использующих различные
+	плохие слова на канале.
 
 	Вы можете установить плохие слова на канале, используя
 	команду BADWORDS. Напишите %R%S HELP BADWORDS для
@@ -6390,39 +6234,39 @@ BOT_HELP_KICK_BADWORDS
 	
 BOT_HELP_BADWORDS
 	Синтаксис: BADWORDS #канал ADD слово [SINGLE | START | END]
-	           BADWORDS #канал DEL {слово | номер записи | list}
-	           BADWORDS #канал LIST [маска | list]
+	           BADWORDS #канал DEL {слово | номер записи | список_записей}
+	           BADWORDS #канал LIST [маска | список_записей]
 	           BADWORDS #канал CLEAR
 	
 	Управляет списком плохих слов для канала. Список плохих слов
-	определяет за использование каких слов пользователь будет кикнут,
-	при условии что данная возможность включена. Для получения более полной информации,
-	напишите %R%S HELP KICK BADWORDS.
+	определяет, за использование каких слов пользователь будет
+	кикнут ботом, при условии, что данная возможность включена.
+	Для получения более полной информации, напишите
+	%R%S HELP KICK BADWORDS.
 	
 	Команда BADWORDS ADD добавит указанное слово в список
 	плохих слов. Если указан параметр SINGLE, пользователь будет
-	кикнут, только если польностью произнесет это слово. Если указать параметр START,
-	пользователь будет кикнут, когда произнесет слово, начинающееся
-	на слово. Если указать параметр END, то кик будет произведен,
-	если пользователь произнесет слово, заканчивающееся на
-	слово. Если Вы не укажете ни один из этих параметров, любой пользователь
-	будет кикнут всякий раз по произнесении слова.
+	кикнут, только если польностью произнесет это слово. Если указать
+	параметр START, пользователь будет кикнут, когда произнесет слово,
+	начинающееся на слово*. Если указать параметр END, то кик будет
+	произведен, если пользователь произнесет слово, заканчивающееся на
+	*слово. Если Вы не укажете ни один из этих параметров, любой
+	пользователь будет кикнут всякий раз при упоминании *слова*.
 	
 	Команда BADWORDS DEL удаляет указанное слово из списка плохих слов.
-	Если указать номера записей, указанные записи
+	Если указать в качестве параметра номера записей, указанные записи
 	будут удалены. (См. пример использования команды LIST ниже.)
 	
 	Команда BADWORDS LIST покажет текущий список плохих слов. Если указать
-	символьную маску, только совпадающие с ней слова будут
-	показаны. Если указать номера записей, будут показаны только
-	указанные записи; например:
+	символьную маску, только совпадающие с ней слова будут показаны.
+	Если указать номера записей, будут показаны только указанные записи.
+	Например:
 
-	   BADWORDS #channel LIST 2-5,7-9
-	   Покажет плохие слова с номерами записей со 2 по 5 и с
-	   7 по 9.
+	   BADWORDS #канал LIST 2-5,7-9
+	      Покажет плохие слова с номерами записей от 2 до 5 и
+	      с 7 по 9 включительно.
 	      
-	Команда BADWORDS CLEAR удалит все плохие слова
-	из списка.
+	Команда BADWORDS CLEAR удалит ВСЕ плохие слова из списка.
 
 BOT_HELP_SAY
 	Синтаксис: SAY #канал текст
@@ -6433,16 +6277,16 @@ BOT_HELP_ACT
 	Синтаксис: ACT #канал текст
 	
 	Заставляет бота выполнить команду, эквивалентную команду "/me"
-	на указанном канале, использовав указанный текст.
+	в mIRC на указанном канале, использовав указанный текст.
 
 BOT_SERVADMIN_HELP_BOT
-	Синтаксис: BOT ADD ник идент хост реальное имя
-	           BOT CHANGE старый ник новый ник [идент [хост [реальное имя]]]
+	Синтаксис: BOT ADD ник идент хост реальное_имя
+	           BOT CHANGE старый ник новый ник [идент [хост [реальное_имя]]]
 	           BOT DEL ник
 	
-	Позволяет Администраторам сервисов создавать, изменять и удалять
-	ботов, которые могут быть в дальнейшем использованы пользователями
-	на своих каналах.
+	Позволяет Администраторам сервисов создавать, изменять
+	и удалять ботов, которые могут быть в дальнейшем
+	использованы пользователями на своих каналах.
 	
 	BOT ADD добавляет бота с указанным ником, идентом,
 	хостом и реальным именем. Так как корректность этих значений
@@ -6452,9 +6296,10 @@ BOT_SERVADMIN_HELP_BOT
 	его настроек).
 	BOT DEL удаляет указанного бота из списка ботов.  
 	
-	Примечание: Если Вы создали бота с ником, ранее кем-то зарегистрированным,
-	этот ник будет удален. А также, если кто-то использует данный ник
-	в момент создания бота, он будет прибит.
+	Примечание: Вы не можете создать бота с ником, который уже кем-то
+	зарегистриован. Если вы создаете бота с незарегистрированным ником,
+	любой, кто использует этот ник будет тут же "прибит", то есть - 
+	отключен от сети.
 
 BOT_SERVADMIN_HELP_SET
 	
@@ -6463,24 +6308,20 @@ BOT_SERVADMIN_HELP_SET
 	    NOBOT            Запретить использование ботов
 	                     на каком-либо канале
 	    PRIVATE          Запретить использование бота кем-либо, кроме
-	                     IRC Операторов
+	                     IRC-Операторов
 
 BOT_SERVADMIN_HELP_SET_NOBOT
 	Синтаксис: SET #канал NOBOT {ON|OFF}
 	
-	Эта опция запрещает использовать ботов на канале. Если бот
-	уже установлен на канал, он будет автоматически удален с него
-	сразу после включения данной опции.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Эта опция запрещает использовать ботов на указанном канале.
+	Если бот уже установлен на канал, он будет автоматически удален
+	с него сразу после включения данной опции.
 
 BOT_SERVADMIN_HELP_SET_PRIVATE
-	Синтаксис: SET ник бота PRIVATE {ON|OFF}
+	Синтаксис: SET ник_бота PRIVATE {ON|OFF}
 	
-	Эта опция запрещает устанавливать бота на канал обычным пользователям.
-	Такого бота могут установить только IRC Операторы.
-	
-	Эту команду могут использовать только Администраторы сервисов.
+	Эта опция запрещает устанавливать бота на канал обычным
+	пользователям. Такого бота могут установить только IRC-Операторы.
 
 ###########################################################################
 #
@@ -6490,15 +6331,15 @@ BOT_SERVADMIN_HELP_SET_PRIVATE
 HOST_EMPTY
 	Лист виртуальных хостов пуст.
 HOST_ENTRY
-	#%d Ник:%s, виртуальный хост:%s (%s - %s)
+	#%d Ник: %s, виртуальный хост: %s (%s - %s)
 HOST_IDENT_ENTRY
-	#%d Ник:%s, виртуальный хост:%s@%s (%s - %s)
+	#%d Ник: %s, виртуальный хост: %s@%s (%s - %s)
 HOST_SET
-	Виртуальный хост для %s установлен в %s.
+	Виртуальный хост для %s установлен на %s.
 HOST_IDENT_SET
-	Виртуальный хост %s установлен в %s@%s.
+	Виртуальный хост для %s установлен на %s@%s.
 HOST_SETALL
-	Виртуальный хост для группы %s установлен в %s.
+	Виртуальных хост для группы %s установлен на %s.
 HOST_DELALL
 	Виртуальные хосты для группы %s были удалены.
 HOST_DELALL_SYNTAX
@@ -6506,13 +6347,13 @@ HOST_DELALL_SYNTAX
 HOST_IDENT_SETALL
 	Виртуальный хост для группы %s установлен в %s@%s.
 HOST_SET_ERROR
-	Виртуальный хост должен быть в правильном формате или действительной хостмаской.
+	Маска виртуального хоста должна быть указана в правильном формате.
 HOST_SET_IDENT_ERROR
-	Идент виртуального хоста должен быть в правильном формате.
+	Идент виртуального хоста должен быть указан в правильном формате.
 HOST_SET_TOOLONG
-	Ошибка! Виртуальный хост слишком длинный, пожалуйста используйте хост длиной меньше %d символов.
+	Ошибка! Виртуальный хост слишком длинный, пожалуйста, используйте хост длиной меньше %d символов.
 HOST_SET_IDENTTOOLONG
-	Ошибка! Идент слишком длинный, пожалуйста используйте идент длиной меньше %d символов.
+	Ошибка! Идент слишком длинный, пожалуйста, используйте идент длиной меньше %d символов.
 HOST_NOREG
 	Пользователь %s не найден в базе данных NickServ.
 HOST_SET_SYNTAX
@@ -6520,15 +6361,15 @@ HOST_SET_SYNTAX
 HOST_SETALL_SYNTAX
 	Синтаксис %R%s setall <ник> <хостмаска>.
 HOST_DENIED
-	ДОступ запрещен.
+	Доступ запрещен.
 HOST_NOT_ASSIGNED
-	Пожалуйста обратитесь к IRC Оператору, чтобы получить виртуальный хост.
+	Пожалуйста, обратитесь к IRC -ператору, чтобы получить виртуальный хост.
 HOST_ACTIVATED
 	Ваш виртуальный хост %s активирован.
 HOST_IDENT_ACTIVATED
 	Ваш виртуальный хост %s@%s активирован.
 HOST_ID
-	Сначала, пожалуйста, идентифицируйте свой ник.
+	Сперва, вы должны идентифицировать свой ник.
 HOST_NOT_REGED
 	Ваш ник должен быть зарегистрирован, чтобы Вы смогли использовать виртуальный хост.
 HOST_DEL
@@ -6536,19 +6377,19 @@ HOST_DEL
 HOST_DEL_SYNTAX
 	Синтаксис: %R%s del <ник>.
 HOST_OFF_UNREAL
-	Ваш виртуальный хост удален. чтобы снова установить его на Вас, напишите /mode %s +%s
+	Ваш виртуальный хост снят. Чтобы снова установить его , напишите /mode %s +%s
 HOST_NO_VIDENT
-	Ваш IRC сервер не поддерживает виртуальные иденты, если это не так, пожалуйста обратитесь к нас, это может быть ошибка в программе.
+	Ваш IRC-сервер не поддерживает виртуальные иденты. Если это не так, пожалуйста, сообщите нам о найденной ошибке.
 HOST_GROUP
-	Все виртуальные хосты в группе %s были установлены в %s
+	Все виртуальные хосты в группе %s были установлены на %s
 HOST_IDENT_GROUP
-	Все виртуальные хосты в группе %s были установлены в %s@%s
+	Все виртуальные хосты в группе %s были установлены на %s@%s
 HOST_LIST_FOOTER
-	Показывает все записи (Count: %d)
+	Показаны все записи (Кол-во: %d)
 HOST_LIST_RANGE_FOOTER
-	Показывает записи с %d по %d
+	Показаны записи с %d по %d
 HOST_LIST_KEY_FOOTER
-	Показывает записи, содержащие ключ %s (Счетчик: %d)
+	Показаны записи, содержащие ключ %s (Кол-во: %d)
 
 ###########################################################################
 #
@@ -6557,48 +6398,52 @@ HOST_LIST_KEY_FOOTER
 ###########################################################################
 HOST_HELP_CMD_ON
 	    ON          Активирует назначенный Вам виртуальный хост
+
 HOST_HELP_CMD_OFF
 	    OFF         Деактивирует виртуальный хост
-HOST_HELP_CMD_GROUP
-	    GROUP       Устанавливает и синхронизирует виртуальный хост для всех ников в Вашей группе
 
+HOST_HELP_CMD_GROUP
+	    GROUP       Синхронизирует виртуальный хост для всех ников в Вашей группе
 
 HOST_HELP_CMD_SET
 	    SET         Установить вирутальный хост пользователю
+
 HOST_HELP_CMD_SETALL
-	    SETALL      Установить виртуальный хост для всех нков в группе
+	    SETALL      Установить виртуальный хост для всех ников в группе
+
 HOST_HELP_CMD_DEL
 	    DEL         Удалить виртуальный хост пользователя
+
 HOST_HELP_CMD_DELALL
 	    DELALL      Удалить виртуальные хосты для всех ников в группе
+
 HOST_HELP_CMD_LIST
-	    LIST        Покажет список виртуальных хостов.
+	    LIST        Показать список всех виртуальных хостов.
 
 HOST_OPER_HELP
-	not used.
+	не используется.
 
 HOST_ADMIN_HELP
-	not used.
+	не используется.
 
 HOST_HELP
-	%S commands:
+	Команды %S:
 
 HOST_HELP_ON
 	Синтаксис: ON
 
 	Активирует виртуальный хост, назначенный Вашему нику.
-	Когда Вы испоьзуете эту команду любой пользователь, сделавший /whois
-	на Вас увидит виртуальный хост вместо Вашего реального IP адреса.
+	Когда Вы используете эту команду, любой пользователь,
+	сделавший /whois на Вас увидит виртуальный хост вместо
+	Вашего реального IP-адреса/хоста.
 
 HOST_HELP_SET
 	Синтаксис: SET <ник> <хостмаска>.
 
-	Устанавливает виртуальный хост на указанный ник в указанную
-	хостмаску. Если Ваш IRC сервер подерживает виртуальные иденты, можно использовать
-	SET <ник> <идент>@<хостмаска> для установки идента и
-	виртуального хоста одновременно.
-
-	Эту команду могут использовать только Операторы хостов(setters).
+	Устанавливает виртуальный хост указанному нику на указанную
+	хостмаску. Если Ваш IRC-сервер подерживает виртуальные иденты,
+	можно использовать SET <ник> <идент>@<хостмаска> для установки
+	идента и виртуального хоста одновременно.
 
 HOST_HELP_DELALL
 	Синтаксис: DELALL <ник>.
@@ -6606,72 +6451,60 @@ HOST_HELP_DELALL
 	Удаляет виртуальные хосты для всех ников в группе
 	указанного ника.
 
-	Эту команду могут использовать только Операторы хостов(removers).
-
 HOST_HELP_SETALL
 	Синтаксис: SETALL <ник> <хостмаска>.
 
 	Устанавливает виртуальный хост для всех ников в группе
-	указанного ника. Если Ваш IRC сервер поддерживает виртуальные иденты, Вы можете
-	использовать SETALL <ник> <идент>@<хостмаска> чтобы установить идент и
-	виртуальный хост одновременно.
+	указанного ника. Если Ваш IRC-сервер поддерживает виртуальные
+	иденты, Вы можете использовать SETALL <ник> <идент>@<хостмаска>,
+	чтобы установить идент и виртуальный хост одновременно.
 
 	* Примечание, виртуальный хост НЕ будет обновляться автоматически для любого
 	ника, добавленного в группу после использования этой команды.
-
-	Эту команду могут использовать только Операторы хостов(setters).
 
 HOST_HELP_OFF
 	Синтаксис: OFF
 
 	Деактивирует виртуальный хост, назначенный Вашему нику.
-	Когда Вы испоьзуете эту команду любой пользователь, сделавший /whois
-	на Вас увидит Ваш реальный IP адрес.
+	Когда Вы используете эту команду любой пользователь,
+	сделавший /whois на Вас, увидит Ваш реальный IP-адрес/хост.
 
 HOST_HELP_DEL
 	Синтаксис: DEL <ник>
 
-	Удаляет виртуальный хост, назначенный указанному нику из
+	Удаляет виртуальный хост, назначенный указанному нику, из
 	базы данных.
-
-	Эту команду могут использовать только Операторы хостов.
 
 HOST_HELP_LIST
 	Синтаксис: LIST [<ключ>|<#X-Y>]
 
 	Эта команда показывает зарегистрированные виртуальные хосты оператору.
-	Если указан Ключ, то будут показаны только те записи, которые
-	содержат указанный шаблон, т.е. Rob* для всех записей,
-	начинающихся с "Rob"
+	Если указан Ключ, то будут показаны только те записи, которые содержат
+	указанный шаблон, т.е. Rob* для всех записей, начинающихся с "Rob"
 
-	Если использован стиль #X-Y, будут показаны записи от X
-	до Y, т.е. #1-3 покажет первые 3
-	записи ник/виртуальный хост.
+	Если использован параметр #X-Y, будут показаны записи от X
+	до Y, т.е. #1-3 покажет первые 3 записи ник/виртуальный хост.
 
-	Лимит одновременно показываемых значений ограничен числом NSListMax
-	в конфигурационном файле сервисов.
-
-	Эту команду могут использовать только Операторы сервисов.
+	Лимит одновременно показываемых значений ограничен числом
+	NSListMax в конфигурационном файле сервисов.
 
 HOST_HELP_GROUP
 	Синтаксис: GROUP
 	
-	Эта команда позволяет пользователям установить виртуальный хост с их
-	ТЕКУЩЕГО ника на все ники
-	группы.
+	Эта команда позволяет пользователям установить виртуальный хост
+	с их ТЕКУЩЕГО ника на все ники группы.
 
 OPER_SVSNICK_UNSUPPORTED
-	Sorry, SVSNICK is not available on this network.
+	Извините, но команда SVSNICK недоступна в этой сети.
 
 OPER_SQLINE_UNSUPPORTED
-	Sorry, SQLINE is not available on this network.
+	Извините, но команда SQLINE недоступна в этой сети.
 
 OPER_SVSO_UNSUPPORTED
-	Sorry, OLINE is not available on this network.
+	Извините, но команда OLINE недоступна в этой сети.
 
 OPER_UMODE_UNSUPPORTED
-	Sorry, UMODE is not available on this network.
+	Извините, но команда UMODE недоступна в этой сети.
 
 OPER_SUPER_ADMIN_NOT_ENABLED
-	SuperAdmin setting not enabled in services.conf
-
+	Установка SuperAdmin не включена в services.conf

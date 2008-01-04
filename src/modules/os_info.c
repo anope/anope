@@ -72,7 +72,7 @@ int AnopeInit(int argc, char **argv)
     Command *c;
     EvtHook *hook = NULL;
 
-    int status = 0;
+    int status;
 
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);
@@ -85,31 +85,26 @@ int AnopeInit(int argc, char **argv)
 
     c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mNickHelp);
-    status += moduleAddCommand(NICKSERV, c, MOD_HEAD);
+    status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
-    status += moduleAddCommand(NICKSERV, c, MOD_TAIL);
+    status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
 
     c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
     moduleAddHelp(c, mChanHelp);
-    status += moduleAddCommand(CHANSERV, c, MOD_HEAD);
+    status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
     c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
-    status += moduleAddCommand(CHANSERV, c, MOD_TAIL);
+    status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
     hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-    status += moduleAddEventHook(hook);
+    status = moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-    status += moduleAddEventHook(hook);
+    status = moduleAddEventHook(hook);
 
     hook = createEventHook(EVENT_RELOAD, mEventReload);
-    status += moduleAddEventHook(hook);
-
-    if (status != MOD_ERR_OK) {
-            alog("os_info: ERROR when trying to create module commands. Unloading...");
-        return MOD_STOP;
-    }
+    status = moduleAddEventHook(hook);
 
     moduleSetNickHelp(mMainNickHelp);
     moduleSetChanHelp(mMainChanHelp);
@@ -300,7 +295,7 @@ int myNickInfo(User * u)
                 if ((na = findnick(nick))) {
                     /* If we have any info on this user */
                     if ((info = moduleGetData(&na->nc->moduleData, "info"))) {
-                        notice_user(s_NickServ, u, "         OperInfo: %s", info);
+                        notice_user(s_NickServ, u, "                Опер-Инфо: %s", info);
 						free(info);
                     }
                     /* NickCore not found! */
@@ -336,7 +331,7 @@ int myChanInfo(User * u)
                 if ((ci = cs_findchan(chan))) {
                     /* If we have any info on this channel */
                     if ((info = moduleGetData(&ci->moduleData, "info"))) {
-                        notice_user(s_ChanServ, u, "       OperInfo: %s", info);
+                        notice_user(s_ChanServ, u, "                  Опер-Инфо: %s", info);
 						free(info);
                     }
                 }
@@ -552,9 +547,9 @@ void m_AddLanguages(void)
             "This will show up when any oper /cs info's the channel.\n"
             "and can be used for 'tagging' channels etc....",
         /* OINFO_HELP_CMD */
-        "    OINFO      Add / Del an OperInfo line to a nick",
+        "    OINFO         Add / Del an OperInfo line to a nick",
         /* OCINFO_HELP_CMD */
-        "    OINFO      Add / Del an OperInfo line to a channel"
+        "    OINFO         Add / Del an OperInfo line to a channel"
     };
 
     char *langtable_es[] = {
@@ -675,6 +670,35 @@ void m_AddLanguages(void)
         "    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
     };
 
+    char *langtable_ru[] = {
+        /* OINFO_SYNTAX */
+        "Синтаксис: OINFO ADD|DEL ник тест",
+        /* OINFO_ADD_SUCCESS */
+        "Опер-Информация для ника %s добавлена",
+        /* OINFO_DEL_SUCCESS */
+        "Опер-Информация для ника %s была удалена",
+        /* OCINFO_SYNTAX */
+        "Синтаксис: OINFO ADD|DEL #канал текст",
+        /* OCINFO_ADD_SUCCESS */
+        "Опер-Информация для канала %s успешно установлена",
+        /* OCINFO_DEL_SUCCESS */
+        "Опер-Информация для канала %s была удалена",
+        /* OINFO_HELP */
+        "Синтаксис: OINFO ADD|DEL ник текст\n"
+            "Устанавливает или удаляет Опер-Информацию для указанного ника,\n"
+            "которая будет показана любому оператору, запрашивающему INFO ника.\n"
+            "Может быть использована для 'пометки' пользователей и т. д...",
+        /* OCINFO_HELP */
+        "Синтаксис: OINFO ADD|DEL #канал текст\n"
+            "Устанавливает или удаляет Опер-Информацию для указанного канала,\n"
+            "которая будет показана любому оператору, запрашивающему INFO канала.\n"
+            "Может быть использована для 'пометки' каналов и т. д...",
+        /* OINFO_HELP_CMD */
+        "    OINFO      Добавляет/Удаляет опер-инфо для ника",
+        /* OCINFO_HELP_CMD */
+        "    OINFO      Добавляет/Удаляет опер-инфо для канала"
+    };
+
 	char *langtable_it[] = {
         /* OINFO_SYNTAX */
         "Sintassi: OINFO [ADD|DEL] nick <info>",
@@ -709,7 +733,8 @@ void m_AddLanguages(void)
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
+	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 }
 
 /*************************************************************************/

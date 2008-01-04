@@ -399,6 +399,37 @@ void my_add_languages(void)
 	"Verificado %s"
     };
 
+    /* Russian (RU) */
+    char *langtable_ru[] = {
+        /* LNG_CHAN_HELP */
+        "    ENFORCE    Перепроверка и установка различных режимов и опций канала",
+        /* LNG_ENFORCE_SYNTAX */
+        "Синтаксис: \002ENFORCE \037#канал\037 \037параметр\037\002",
+        /* LNG_CHAN_HELP_ENFORCE */
+        "Перепроверка и установка различных режимов и опций канала.\n"
+            "\037Параметр\037 указывает какие опции или режимы канала должны быть\n"
+            "перепроверены. В качестве параметра могут быть указаны: SET, SECUREOPS,\n"
+            "RESTRICTED, MODES, или +R. Если параметр не указан, по-умолчанию будет SET.\n"
+            " \n"
+            "Если в качестве \037параметра\037 указано SET, будут перепроверены опции\n"
+            "SECUREOPS и RESTRICTED относительно пользователей на указанном канале\n"
+            "(при условии, что опции включены). Отдельно указанный параметр SECUREOPS\n"
+            "применит опцию SECUREOPS (даже если она \037НЕ\037 установлена). Параметр\n"
+            "RESTRICTED применит опцию RESTRICTED (даже если она \037НЕ\037 установлена)",
+        /* LNG_CHAN_HELP_ENFORCE_R_ENABLED */
+        "Если в качестве \037параметра\037 указано MODES, будет перепроверен режим +R\n"
+            "(если он установлен). Отдельно указанный параметр \037+R\037 применит\n"
+            "канальный режим +R, даже если он не установлен, и забанит всех пользователей,\n"
+            "которые не идентифицировались к своему нику или не имеют зарегистрированного ника.",
+        /* LNG_CHAN_HELP_ENFORCE_R_DISABLED */
+        "Если в качестве \037параметра\037 указано MODES, перепроверка осуществлена\n"
+            "НЕ БУДЕТ, так как текущий IRCD не поддерживает необходимые режимы.\n"
+            "Отдельно указанный параметр \037+R\037 применит канальный режим, эквивалентный\n"
+            "режиму +R и забанит всех пользователей, которые не идентифицировались к своему\n"
+            "нику или не имеют зарегистрированного ника.",
+	"Перепроверено: %s"
+    };
+
     /* Italian (IT) */
     char *langtable_it[] = {
         /* LNG_CHAN_HELP */
@@ -435,6 +466,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+    moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
 	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 

@@ -203,6 +203,13 @@ void my_add_languages(void)
         "O endereзo de email fornecido alcanзou seu limite de uso de 1 usuбrio."
     };
 
+    char *langtable_ru[] = {
+        /* LNG_NSEMAILMAX_REACHED */
+        "”казанный вами email-адрес используетс€ максимально допустимое кол-во раз: %d",
+        /* LNG_NSEMAILMAX_REACHED_ONE */
+        "”казанный вами email-адрес уже кем-то используетс€."
+    };
+
     char *langtable_it[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
@@ -214,6 +221,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+    moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
     moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 

@@ -9,6 +9,10 @@ Provided by Trystan <trystan@nomadirc.net> - 2008
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/04 F EVENT_ACCESS_DEL being sent with NULL-param when using XOP.       [#816]
 
+Provided by Kein <kein-of@yandex.ru> - 2008
+01/04 A Russian translation for bundled modules.                          [ #00]
+01/04 F Updated Russian language file.                                    [ #00]
+
 Anope Version 1.7.20
 --------------------
 12/28 F Some silly logic errors in anope_event_capab() in inspircd11.c    [ #00]

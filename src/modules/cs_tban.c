@@ -223,6 +223,15 @@ void mAddLanguages(void)
         "%s foi banido do %s, irб auto-expirar em %s"
     };
 
+    char *langtable_ru[] = {
+        "    TBAN       Банит пользователя на указанный промежуток времени",
+        "Синтаксис: TBAN #канал ник время",
+        "Банит пользователя на указанный промежуток времени в секундах\n"
+            "Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
+            "переустановлен сервисами автоматически!",
+        "Установленный бан %s на канале %s истечет через %s секунд"
+    };
+
 	char *langtable_it[] = {
         "    TBAN       Banna l'utente per un periodo di tempo specificato",
         "Sintassi: TBAN canale nick tempo",
@@ -235,7 +244,9 @@ void mAddLanguages(void)
     moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
     moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+    moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
+	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
+
 }
 
 

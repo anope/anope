@@ -878,6 +878,56 @@ void my_add_languages(void)
             "o mesmo que fazer um LIST +req"
     };
 
+    char *langtable_ru[] = {
+        /* LNG_REQUEST_SYNTAX */
+        "Синтаксис: \002REQUEST \037vHost\037\002",
+        /* LNG_REQUESTED */
+        "Ваш запрос на vHost отправлен.",
+        /* LNG_REQUEST_WAIT */
+        "Пожалуйста, подождите %d секунд, прежде чем запрашивать новый vHost",
+        /* LNG_REQUEST_MEMO */
+        "[авто-сообщение] Был запрошен vHost \002%s\002",
+        /* LNG_ACTIVATE_SYNTAX */
+        "Синтаксис: \002ACTIVATE \037ник\037\002",
+        /* LNG_ACTIVATED */
+        "vHost для %s успешно активирован",
+        /* LNG_ACTIVATE_MEMO */
+        "[авто-сообщение] Запрашиваемый вами vHost утвержден и активирован.",
+        /* LNG_REJECT_SYNTAX */
+        "Синтаксис: \002REJECT \037ник\037\002",
+        /* LNG_REJECTED */
+        "vHost для %s отклонен.",
+        /* LNG_REJECT_MEMO */
+        "[авто-сообщение] Запрашиваемый вами vHost отклонен.",
+        /* LNG_REJECT_MEMO_REASON */
+        "[авто-сообщение] Запрашиваемый вами vHost отклонен. Причина: %s",
+        /* LNG_NO_REQUEST */
+        "Запрос на vHost для ника %s не найден.",
+        /* LNG_HELP */
+        "    REQUEST     Запрос на vHost для вашего текущего ника",
+        /* LNG_HELP_SETTER */
+        "    ACTIVATE    Утвердить запрашиваемый пользователем  vHost\n"
+            "    REJECT      Отклонить запрашиваемый пользователем  vHost\n"
+            "    WAITING     Список запросов ожидающих обработки (аналог LIST +req)",
+        /* LNG_HELP_REQUEST */
+        "Отправляет запрос на активацию vHost, который будет рассмотрен одним из\n"
+            "администраторов сети. Просьба проявить терпение, пока запрос\n"
+            "рассматривается администрацией.",
+        /* LNG_HELP_ACTIVATE */
+        "Утвердить запрашиваемый vHost для указанного ника.",
+        /* LNG_HELP_ACTIVATE_MEMO */
+        "Пользователю будет послано авто-уведомление об активации его запроса.",
+        /* LNG_HELP_REJECT */
+        "Отклонить запрашиваемый vHost для указанного ника.",
+        /* LNG_HELP_REJECT_MEMO */
+        "Пользователю будет послано авто-уведомление об отклонении его запроса.",
+        /* LNG_WAITING_SYNTAX */
+        "Синтаксис: \002WAITING\002",
+        /* LNG_HELP_WAITING */
+        "Данная команда создана для удобства использования и выводит список запросов,\n"
+            "ожидающих обработки. Аналогичная команда: LIST +req ."
+    };
+
     char *langtable_it[] = {
         /* LNG_REQUEST_SYNTAX */
         "Sintassi: \002REQUEST \037vhost\037\002",
@@ -930,6 +980,7 @@ void my_add_languages(void)
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
     moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
     moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+    moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
     moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 }
 

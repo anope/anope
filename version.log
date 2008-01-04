@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1330"
+VERSION_BUILD="1331"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1331)
+# BUGS  : 816
+# NOTES : Applied patch by Jan Milants to fix EVENT_ACCESS_DEL being sent with NULL-param when using XOP
 #
 # BUILD : 1.7.20 (1330)
 # BUGS  : 815

@@ -174,6 +174,7 @@ int do_vop(User * u)
 
 int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc, int xlev)
 {
+    char *nick = access->nc->display;
     if (!access->in_use || access->level != xlev)
         return 0;
     if (!is_services_admin(u) && uacc <= access->level) {
@@ -182,7 +183,7 @@ int xop_del(User * u, ChannelInfo * ci, ChanAccess * access, int *perm, int uacc
     }
     access->nc = NULL;
     access->in_use = 0;
-    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, access->nc->display);
+    send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);
     return 1;
 }
 

@@ -3,6 +3,8 @@ Anope Version  S V N
 12/30 F Grouped root nicks could result in loss of power when using MySQL.[#812]
 01/01 F Databases not being saved on quit caused by connection error.     [#811]
 
+Provided by Trystan <trystan@nomadirc.net> - 2008
+01/04 F Detection of Windows Vista and Windows Server 2008.               [#815]
 
 Anope Version 1.7.20
 --------------------

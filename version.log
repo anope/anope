@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1332"
+VERSION_BUILD="1333"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1333)
+# BUGS  : 817
+# NOTES : Fixed users not being re-identified automatically after a netsplit on insp
 #
 # BUILD : 1.7.20 (1332)
 # BUGS  : 

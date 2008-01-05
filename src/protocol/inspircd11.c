@@ -443,6 +443,7 @@ void inspircd_set_umode(User * user, int ac, char **av)
             }
             break;
         case 'r':
+			user->svid = (add ? user->timestamp : 0);
             if (add && !nick_identified(user)) {
                 common_svsmode(user, "-r", NULL);
                 user->mode &= ~UMODE_r;
@@ -1454,14 +1455,19 @@ int anope_event_nick(char *source, int ac, char **av)
 
     if (ac != 1) {
         if (ac == 8) {
+			int svid = 0;
+			int ts = strtoul(av[0], NULL, 10);
+			
+			if (strchr(av[5], 'r') != NULL)
+				svid = ts;
+			
             inet_aton(av[6], &addy);
             user = do_nick("", av[1],   /* nick */
                            av[4],   /* username */
                            av[2],   /* realhost */
                            source,  /* server */
                            av[7],   /* realname */
-                           strtoul(av[0], NULL, 10),
-                           0, htonl(*ad), av[3], NULL);
+                           ts, svid, htonl(*ad), av[3], NULL);
             if (user)
                 anope_set_umode(user, 1, &av[5]);
         }

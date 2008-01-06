@@ -111,7 +111,7 @@ Table of Contents
 1.3) Does Anope run under Windows?
 
     Yes. For more information on how to obtain the windows version of Anope
-    visit http://windows.anope.org/
+    visit http://wiki.anope.org/Windows
 
 1.4) Can I send you questions without reading the FAQ, INSTALL or README files?
 
@@ -299,19 +299,16 @@ Table of Contents
 
 3.7) I can't get /OS UMODES and /OS SVSNICK to work!
 
-    Make sure you the USE_OSSVS is defined on config.h. Since these are very
-    controversial commands, they are turned off by default. Then, make clean ;
-    make ; make install . Also, you need to be a SuperAdmin to be able to use
-    these commands.
+    You need to be a SuperAdmin to be able to use these commands.
 
 3.8) What is a Super-Admin? How does it work? Why might it not work?
 
     Super-Admin's have extra privileges, including being founder on all
     channels. It must be activated on a per user basis and is only available to
-    Services Admins and Services Roots. It is set using OperServ and is not
-    persistent. It only works if SuperAdmin is not commented in the services
-    configuration file. This is commented by default. Read /msg OperServ HELP
-    SET SUPERADMIN for further help.
+    Services Roots. It is set using OperServ and is not persistent. It only
+    works if SuperAdmin is not commented in the services configuration file.
+    This is commented by default. Read /msg OperServ HELP SET SUPERADMIN for
+    further help.
 
 3.9) How can i enable the OperServ RAW command?
 

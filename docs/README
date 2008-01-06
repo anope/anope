@@ -248,10 +248,10 @@ Table of Contents
         -noexpire       Expiration routines won't be run at all
         -logchan        Startup with logchan enabled
         -version        Display the version of Anope
-		-nothird        Do not load the modules specified in ModulesAutoload
-		                    or ModulesDelayedAutoload in the config file
-		-protocoldebug  Debug each incoming message after protocol parsing
-		-support        Used for support, same as -debug -nofork -nothird
+        -nothird        Do not load the modules specified in ModulesAutoload
+                            or ModulesDelayedAutoload in the config file
+        -protocoldebug  Debug each incoming message after protocol parsing
+        -support        Used for support, same as -debug -nofork -nothird
 
     Upon starting, Anope will parse its command-line parameters, open its
     logfile, then (assuming the -nofork option is not given) detach itself

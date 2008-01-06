@@ -221,19 +221,19 @@ int my_cs_enforce(User * u)
         what = myStrGetToken(cur_buffer, ' ', 1);
         if (!what || (stricmp(what, "SET") == 0)) {
             do_enforce_set(c);
-	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "MODES") == 0) {
             do_enforce_modes(c);
-	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "SECUREOPS") == 0) {
             do_enforce_secureops(c);
-	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "RESTRICTED") == 0) {
             do_enforce_restricted(c);
-	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else if (stricmp(what, "+R") == 0) {
             do_enforce_cmode_R(c);
-	    moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
         } else {
             moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
         }
@@ -297,7 +297,8 @@ void my_add_languages(void)
             "other ircds will be enforced. All users that are in the channel\n"
             "but have not identified for their nickname will be kicked and\n"
             "banned from the channel.",
-	"Enforced %s"
+        /* LNG_CHAN_RESPONSE */
+        "Enforced %s"
     };
 
     /* Dutch (NL) */
@@ -332,7 +333,8 @@ void my_add_languages(void)
             "zullen alle gebruikers die in het kanaal zitten maar zich niet\n"
             "hebben geidentificeerd voor hun nick uit het kanaal gekicked en\n"
             "verbannen worden.",
-	"Enforced %s"
+        /* LNG_CHAN_RESPONSE */
+        "Enforced %s"
     };
 
    /* German (DE) */
@@ -364,6 +366,7 @@ void my_add_languages(void)
             "oder ein Modes was auf ein anderen IRCD gleich +R ist, wird es\n"
             "erzwungen. Alle User die nicht fьr deren Nicknamen identifiziert\n"
             "sind werden aus den Channel gekickt und gebannt.",
+        /* LNG_CHAN_RESPONSE */
         "Erzwungen %s"
     };
 
@@ -396,7 +399,8 @@ void my_add_languages(void)
             "para \037opзгo\037, um equivalente ao modo de canal +R em outros IRCds\n"
             "serб verificado. Todos os usuбrios que estгo no canal, mas nгo estejam\n"
             "identificados para seus nicks serгo kickados e banidos do canal.",
-	"Verificado %s"
+        /* LNG_CHAN_RESPONSE */
+        "Verificado %s"
     };
 
     /* Russian (RU) */
@@ -427,7 +431,8 @@ void my_add_languages(void)
             "Отдельно указанный параметр \037+R\037 применит канальный режим, эквивалентный\n"
             "режиму +R и забанит всех пользователей, которые не идентифицировались к своему\n"
             "нику или не имеют зарегистрированного ника.",
-	"Перепроверено: %s"
+        /* LNG_CHAN_RESPONSE */
+        "Перепроверено: %s"
     };
 
     /* Italian (IT) */
@@ -459,7 +464,8 @@ void my_add_languages(void)
             "per \037cosa\037, un modo equivalente a +R sui altri ircd verrа\n"
             "forzato. Tutti gli utenti presenti nel canale ma non identificati\n"
             "per il loro nickname verranno bannati ed espulsi dal canale.\n",
-	"Forzato %s"
+        /* LNG_CHAN_RESPONSE */
+        "Forzato %s"
     };
 
     moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);

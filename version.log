@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1335"
+VERSION_BUILD="1336"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1336)
+# BUGS  : 
+# NOTES : Fixed swapped prefixes for +a and +q on inspircd11
 #
 # BUILD : 1.7.20 (1335)
 # BUGS  : 

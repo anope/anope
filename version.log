@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1337"
+VERSION_BUILD="1338"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1338)
+# BUGS  : 821
+# NOTES : Temporary patch for the crash in inspircd_cmd_mode()
 #
 # BUILD : 1.7.20 (1337)
 # BUGS  : 

@@ -613,11 +613,13 @@ inspircd_cmd_guest_nick(char *nick, char *user, char *host,
 
 void inspircd_cmd_mode(char *source, char *dest, char *buf)
 {
+    Channel *c;
     if (!buf) {
         return;
     }
     
-    send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, (unsigned int)findchan(dest)->creation_time, buf);
+    c = findchan(dest);
+    send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, (unsigned int)((c) ? c->creation_time : time(NULL)), buf);
 }
 
 int anope_event_version(char *source, int ac, char **av)

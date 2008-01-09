@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1336"
+VERSION_BUILD="1337"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1337)
+# BUGS  : 
+# NOTES : Updating something in NEWS, just because i want r1337 instead of letting mark have it >:(
 #
 # BUILD : 1.7.20 (1336)
 # BUGS  : 

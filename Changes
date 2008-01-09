@@ -1,12 +1,12 @@
 Anope Version  S V N
 --------------------
-01/09 F InspIRCd crash on certain FMODE sends                             [#821]
 12/30 F Grouped root nicks could result in loss of power when using MySQL.[#812]
 01/01 F Databases not being saved on quit caused by connection error.     [#811]
 01/05 F Re-idenficiation after netsplit on InspIRCd.                      [#817]
 01/05 F Founder channelmode (+q) not correctly parsed in FJOIN.           [ #00]
 01/06 F Updated documentation where needed.                               [ #00]
 01/06 F InspIRCD +q and +a prefixes were swapped.                         [ #00]
+01/09 F InspIRCd crash on certain FMODE sends                             [#821]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 01/04 F Detection of Windows Vista and Windows Server 2008.               [#815]

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="20"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1338"
+VERSION_BUILD="1339"
 
 # $Log$
+#
+# BUILD : 1.7.20 (1339)
+# BUGS  : 
+# NOTES : mark is a retard when it comes to editing Changes :(
 #
 # BUILD : 1.7.20 (1338)
 # BUGS  : 821

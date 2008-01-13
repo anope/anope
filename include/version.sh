@@ -27,7 +27,7 @@ fi
 cat >version.h <<EOF
 /* Version information for Services.
  *
- * (C) 2003-2007 Anope Team
+ * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and CREDITS for further details.

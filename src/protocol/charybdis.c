@@ -1,7 +1,7 @@
 /* Charybdis IRCD functions
  *
  * (C) 2006 William Pitcock <nenolod -at- charybdis.be>
- * (C) 2003-2007 Anope Team
+ * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
  *
  * Please read COPYING and README for furhter details.

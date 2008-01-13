@@ -1,4 +1,4 @@
-# (C) 2003-2007 Anope 
+# (C) 2003-2008 Anope 
 # Contact us at info@anope.org
 #
 # Please read COPYING and README for furhter details.
@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1344"
+VERSION_BUILD="1345"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1345)
+# BUGS  : 
+# NOTES : Updated copyright information
 #
 # BUILD : 1.7.21 (1344)
 # BUGS  : 824

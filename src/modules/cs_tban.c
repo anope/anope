@@ -1,6 +1,6 @@
 /* cs_tban.c - Bans the user for a given length of time
  *
- * (C) 2003-2007 Anope Team
+ * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
  *
  * Based on the original module by Rob <rob@anope.org>

@@ -2000,7 +2000,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s does not exist.
 BOT_NOT_ASSIGNED
 	You must assign a bot to the channel before using this command.
-	Type %R%S HELP ASSIGN for more information.
+	Type %R%S HELP ASSIGN for more information.
 BOT_NOT_ON_CHANNEL
 	Bot is not on channel %s.
 	

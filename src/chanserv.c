@@ -272,8 +272,15 @@ void listchans(int count_only, const char *chan)
                 }
                 printf("\n");
             }
-            if (ci->mlock_on || ci->mlock_off)
+            if (ci->mlock_on || ci->mlock_off) {
                 printf("      Mode lock: %s\n", get_mlock_modes(ci, 1));
+            }
+            if (ci->flags & CI_SUSPENDED) {
+                printf
+                    ("This nickname is currently suspended by %s, reason: %s\n",
+                     ci->forbidby,
+                     (ci->forbidreason ? ci->forbidreason : "No reason"));
+            }
         }
 
     } else {
@@ -282,9 +289,10 @@ void listchans(int count_only, const char *chan)
             for (ci = chanlists[i]; ci; ci = ci->next) {
                 printf("  %s %-20s  %s\n",
                        ci->flags & CI_NO_EXPIRE ? "!" : " ", ci->name,
-                       ci->
-                       flags & CI_VERBOTEN ? "Disallowed (FORBID)" : ci->
-                       desc);
+                       ci->flags & CI_VERBOTEN ?
+                       "Disallowed (FORBID)" : (ci->flags & CI_SUSPENDED ?
+                                                "Disallowed (SUSPENDED)" :
+                                                ci->desc));
                 count++;
             }
         }

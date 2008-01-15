@@ -119,6 +119,17 @@ void listnicks(int count_only, const char *nick)
         }
         printf("          Options: %s\n", *buf ? buf : "None");
 
+        if (na->nc->flags & NI_SUSPENDED) {
+            if (na->last_quit) {
+                printf
+                    ("This nickname is currently suspended, reason: %s\n",
+                     na->last_quit);
+            } else {
+                printf("This nickname is currently suspended.\n");
+            }
+        }
+
+
     } else {
 
         for (i = 0; i < 1024; i++) {
@@ -126,7 +137,10 @@ void listnicks(int count_only, const char *nick)
                 printf("    %s %-20s  %s\n",
                        na->status & NS_NO_EXPIRE ? "!" : " ",
                        na->nick, na->status & NS_VERBOTEN ?
-                       "Disallowed (FORBID)" : na->last_usermask);
+                       "Disallowed (FORBID)" : (na->nc->
+                                                flags & NI_SUSPENDED ?
+                                                "Disallowed (SUSPENDED)" :
+                                                na->last_usermask));
                 count++;
             }
         }

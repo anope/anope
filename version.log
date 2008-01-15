@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1347"
+VERSION_BUILD="1348"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1348)
+# BUGS  : 825
+# NOTES : listnicks/listchans now shows if a nickname/channel is SUSPENDED.
 #
 # BUILD : 1.7.21 (1347)
 # BUGS  : 827

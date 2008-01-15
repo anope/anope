@@ -2058,7 +2058,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s bestaat niet.
 BOT_NOT_ASSIGNED
 	Je moet een bot aan een kanaal toewijzen voordat je dit commando gebruikt.
-	Type %R%S HELP ASSIGN voor meer informatie.
+	Type %R%S HELP ASSIGN voor meer informatie.
 BOT_NOT_ON_CHANNEL
 	Bot is niet in kanaal %s.
 	

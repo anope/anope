@@ -2043,7 +2043,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s gibt es nicht.
 BOT_NOT_ASSIGNED
 	Ein Bot muss dem Channel zugewiesen werden, bevor dieser Befehl funktioniert.
-	Tippe %R%S HELP ASSIGN für weitere Informationen.
+	Tippe %R%S HELP ASSIGN für weitere Informationen.
 BOT_NOT_ON_CHANNEL
 	Der Bot ist nicht im Channel %s.
 	

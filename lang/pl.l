@@ -2194,7 +2194,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s nie istnieje.
 BOT_NOT_ASSIGNED
 	Musisz przydzieliæ najpierw bota na kana³.
-	Napisz %R%S HELP ASSIGN, 
+	Napisz %R%S HELP ASSIGN, 
 	aby uzyskaæ wiêcej informacji.
 BOT_NOT_ON_CHANNEL
 	Nie ma bota na kanale %s.

@@ -2077,7 +2077,7 @@ BOT_DOES_NOT_EXIST
 BOT_NOT_ASSIGNED
 	Vous devez attribuer un bot au canal avant d'utiliser 
 	cette commande.
-	Tapez %R%S HELP ASSIGN pour plus d'informations.
+	Tapez %R%S HELP ASSIGN pour plus d'informations.
 BOT_NOT_ON_CHANNEL
 	Le bot n'est pas sur le canal %s.
 	

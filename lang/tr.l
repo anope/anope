@@ -2062,7 +2062,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s mevcut deðil.
 BOT_NOT_ASSIGNED
 	Bu komutu kullanmadan önce kanala bir bot sokmalýsýnýz.
-	Daha fazla bilgi için %R%S HELP ASSIGN yazýn.
+	Daha fazla bilgi için %R%S HELP ASSIGN yazýn.
 BOT_NOT_ON_CHANNEL
 	Bot %s kanalýnda deðil.
 	

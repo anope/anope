@@ -2021,7 +2021,7 @@ BOT_DOES_NOT_EXIST
 	Bot %s não existe.
 BOT_NOT_ASSIGNED
 	Você precisa primeiro associar um bot ao canal antes de usar este comando.
-	Digite %R%S HELP ASSIGN para maiores informações.
+	Digite %R%S HELP ASSIGN para maiores informações.
 BOT_NOT_ON_CHANNEL
 	Bot não está no canal %s.
 	

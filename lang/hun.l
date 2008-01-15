@@ -2045,7 +2045,7 @@ BOT_DOES_NOT_EXIST
 	%s nevû bot nem létezik.
 BOT_NOT_ASSIGNED
 	Társítanod kellene egy botot a csatornára mielõtt használod
-	ezt a parancsot, írd be %R%S HELP ASSIGN bõvebb infókért.
+	ezt a parancsot, írd be %R%S HELP ASSIGN bõvebb infókért.
 BOT_NOT_ON_CHANNEL
 	A Bot nincs a %s csatornán.
 

@@ -2012,7 +2012,7 @@ BOT_DOES_NOT_EXIST
 	Il bot %s non esiste.
 BOT_NOT_ASSIGNED
 	Devi assegnare un bot al canale prima di usare questo comando.
-	Digita %R%S HELP ASSIGN per maggiori informazioni.
+	Digita %R%S HELP ASSIGN per maggiori informazioni.
 BOT_NOT_ON_CHANNEL
 	Il bot non è sul canale %s.
 

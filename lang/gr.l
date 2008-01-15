@@ -2067,7 +2067,7 @@ BOT_DOES_NOT_EXIST
 	Το Bot %s δεν υπάρχει.
 BOT_NOT_ASSIGNED
 	Πρέπει να κάνεις assign στο bot για να μπεί στο κανάλι.
-	Γράψε %R%S HELP ASSIGN για περισσότερες πληροφορίες.
+	Γράψε %R%S HELP ASSIGN για περισσότερες πληροφορίες.
 BOT_NOT_ON_CHANNEL
 	Το Bot δεν είναι στο κανάλι %s.
 	

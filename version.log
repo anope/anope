@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1350"
+VERSION_BUILD="1351"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1351)
+# BUGS  : 831
+# NOTES : Fixed a bug in next_server() which skipped over all servers right away when passing -1 as param
 #
 # BUILD : 1.7.21 (1350)
 # BUGS  : 828

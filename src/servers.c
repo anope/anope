@@ -98,7 +98,7 @@ Server *next_server(int flags)
                 }
             } while (server_cur);
         }
-    } while (server_cur && ((flags > -1) || (server_cur->flags != flags)));
+    } while (server_cur && ((flags > -1) && (server_cur->flags != flags)));
 
     return server_cur;
 }

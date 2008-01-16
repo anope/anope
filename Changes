@@ -1,9 +1,12 @@
 Anope Version  S V N
 --------------------
-01/15 F BOT_NOT_ASSIGNED language string error                            [#828]
-01/15 F listchans now shows if a channel is suspended                     [#825]
-01/15 F listnicks now shows if a nickname is suspended                    [#825]
-01/15 F Re-assigned access to OS CHANLIST to Services Opers               [#827]
+01/15 F BOT_NOT_ASSIGNED language string error.                           [#828]
+01/15 F listchans now shows if a channel is suspended.                    [#825]
+01/15 F listnicks now shows if a nickname is suspended.                   [#825]
+01/15 F Re-assigned access to OS CHANLIST to Services Opers.              [#827]
+
+Provided by Jan Milants <jan_renee@msn.com> - 2008
+01/16 F Server traversion with next_server() failed to list all servers.  [#831]
 
 Anope Version 1.7.21
 --------------------

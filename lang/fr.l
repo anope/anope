@@ -2463,7 +2463,10 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	Les identds des bots doivent contenir que des caractères valide.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Bot Idents may only contain %d characters.
+BOT_LONG_HOST
+	Bot Hosts may only contain %d characters.
+
 ###########################################################################
 #
 # OperServ messages
@@ -3974,7 +3977,7 @@ NICK_HELP_SASET_HIDE
 	Syntaxe: SASET pseudo HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
 	
 	Vous permet d'empêcher l'affichage de certaines parties
-	des informations quand quelqu'un fait un %R%S INFO sur le pseudo
+	des informations quand quelqu'un fait un %S INFO sur le pseudo
 	donné. Vous pouvez cacher son adresse e-mail (EMAIL), masque
 	user@host vu pour la dernière fois (USERMASK), et la dernière
 	raison de /QUIT (QUIT). Le second paramètre indique si

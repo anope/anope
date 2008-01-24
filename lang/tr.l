@@ -2436,7 +2436,10 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	Bot Idents may only contain valid characters.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Bot Idents may only contain %d characters.
+BOT_LONG_HOST
+	Bot Hosts may only contain %d characters.
+
 ###########################################################################
 #
 # OperServ messages

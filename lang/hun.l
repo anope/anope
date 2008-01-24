@@ -1430,8 +1430,6 @@ CHAN_ACCESS_XOP
 	Nem használhatod ezt a parancsot. 
 	Használd az AOP, SOP és VOP parancsokat helyette.
 	Írd be: %R%s HELP parancs bõvebb információért.
-	Ha ki akarod kapcsolni az xOP rendszert, akkor írd be:
-	%RChanServ set #szobanév xop off.
 CHAN_ACCESS_XOP_HOP
 	You can't use this command. 
 	Use the AOP, SOP, HOP and VOP commands instead.
@@ -2406,7 +2404,10 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	Bot Ident csak érvényes karaktereket tartalmazhat.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Bot Idents may only contain %d characters.
+BOT_LONG_HOST
+	Bot Hosts may only contain %d characters.
+
 ###########################################################
 #
 # OperServ üzenetek
@@ -4298,7 +4299,7 @@ CHAN_HELP_REGISTER
 	
 	Megjegyzés: Ha regisztrálsz egy csatornát, elõször 
 	regisztrálnod kell a nickneved és azonosítanod kell
-	magad. (%RNickServ identify jelszó)
+	magad. (NickServ identify jelszó)
 	Ha még nem nézted meg, akkor lásd még: %R%s HELP.
 	
 CHAN_HELP_IDENTIFY

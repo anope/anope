@@ -2383,7 +2383,9 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	A Identd do bot deve conter apenas caracteres válidos.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Bot Idents may only contain %d characters.
+BOT_LONG_HOST
+	Bot Hosts may only contain %d characters.
 
 ###########################################################################
 #
@@ -3003,7 +3005,7 @@ OPER_MODULE_LIST_FOOTER
 OPER_MODULE_INFO_LIST
 	Módulo: %s Versão: %s Autor: %s Carregado: %s
 OPER_MODULE_CMD_LIST
-	Comando fornecido: /%s %s
+	Comando fornecido: /%R%s %s
 OPER_MODULE_MSG_LIST
 	Fornecendo IRCd handler para: %s
 OPER_MODULE_NO_LIST

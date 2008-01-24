@@ -2597,7 +2597,10 @@ BOT_BAD_HOST
 BOT_BAD_IDENT
 	Ident bota mo¿e zawieraæ tylko prawid³owe znaki.
 BOT_LONG_IDENT
-	Bot Idents may only contain 9 characters.
+	Bot Idents may only contain %d characters.
+BOT_LONG_HOST
+	Bot Hosts may only contain %d characters.
+
 ###########################################################################
 #
 # Komunikaty OperServ 
@@ -5142,7 +5145,7 @@ CHAN_HELP_ACCESS
 	funkcje operatorów kana³u, oraz posiadaæ dostêp do 
 	komend %S. Ró¿ne poziomy okre¶laj± inne 
 	przywileje. 
-	Napisz msg %S HELP ACCESS LEVELS,
+	Napisz msg %R%S HELP ACCESS LEVELS,
 	aby uzyskaæ wiêcej informacji. Ka¿dy u¿ytkownik, 
 	który nie zosta³ wpisany na listê dostepu, posiada 
 	poziom uprawnieñ równy 0.

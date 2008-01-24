@@ -4,6 +4,8 @@ Anope Version  S V N
 01/15 F listchans now shows if a channel is suspended.                    [#825]
 01/15 F listnicks now shows if a nickname is suspended.                   [#825]
 01/15 F Re-assigned access to OS CHANLIST to Services Opers.              [#827]
+01/24 F Several language errors.                                          [ #00]
+01/24 A Added a check for hosts too long in BotServs bots.                [ #00]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

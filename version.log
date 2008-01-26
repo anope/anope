@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1352"
+VERSION_BUILD="1353"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1353)
+# BUGS  : 
+# NOTES : Rules for Changes: [[1]] A always goes before F (and anything else in between) [[2]] Anything within an A-block or F-block for 1 version is sorted ascending on the date (newer lines on the bottom) [[3]] Lines end with a period.
 #
 # BUILD : 1.7.21 (1352)
 # BUGS  : N/A

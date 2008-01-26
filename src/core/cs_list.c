@@ -190,6 +190,7 @@ int do_list(User * u)
         }
         notice_lang(s_ChanServ, u, CHAN_LIST_END,
                     nchans > CSListMax ? CSListMax : nchans, nchans);
+        free(spattern);
     }
     if (tofree)
         free(pattern);

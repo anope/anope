@@ -2143,19 +2143,7 @@ int moduleDataDebug(ModuleData ** md)
  **/
 int moduleAddData(ModuleData ** md, char *key, char *value)
 {
-    /* Do we really need this sstrdup here? Why can't we just use
-     * mod_current_module_name itself inside this function? It's not like
-     * we're changing it or anything, we just pass it to yet another
-     * sstrdup() somewhere down there.... -GD
-     */
-    char *mod_name = sstrdup(mod_current_module_name);
     ModuleData *newData = NULL;
-
-    if (!key || !value) {
-        alog("A module tried to use ModuleAddData() with one ore more NULL arguments... returning");
-        free(mod_name);
-        return MOD_ERR_PARAMS;
-    }
 
     if (mod_current_module_name == NULL) {
         alog("moduleAddData() called with mod_current_module_name being NULL");
@@ -2163,21 +2151,23 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
             do_backtrace(0);
     }
 
+    if (!key || !value) {
+        alog("A module (%s) tried to use ModuleAddData() with one or more NULL arguments... returning", mod_current_module_name);
+        return MOD_ERR_PARAMS;
+    }
+
     moduleDelData(md, key);     /* Remove any existing module data for this module with the same key */
 
     newData = malloc(sizeof(ModuleData));
     if (!newData) {
-        free(mod_name);
         return MOD_ERR_MEMORY;
     }
 
-    newData->moduleName = sstrdup(mod_name);
+    newData->moduleName = sstrdup(mod_current_module_name);
     newData->key = sstrdup(key);
     newData->value = sstrdup(value);
     newData->next = *md;
     *md = newData;
-
-    free(mod_name);
 
     if (debug) {
         moduleDataDebug(md);

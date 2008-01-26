@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1361"
+VERSION_BUILD="1362"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1362)
+# BUGS  : 841
+# NOTES : Fixed memleaks in hs_setall
 #
 # BUILD : 1.7.21 (1361)
 # BUGS  : 840

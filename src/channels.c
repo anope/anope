@@ -697,7 +697,7 @@ void do_part(const char *source, int ac, char **av)
             }
             channame = sstrdup(c->chan->name);
             send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_START,
-                       user->nick, channame, (ac >= 2 ? av[1] : ""));
+                       user->nick, channame, (ac >= 2 ? av[1] : ""));
 
             chan_deluser(user, c->chan);
             if (c->next)
@@ -709,7 +709,7 @@ void do_part(const char *source, int ac, char **av)
             free(c);
 
             send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_STOP,
-                       user->nick, channame, (ac >= 2 ? av[1] : ""));
+                       user->nick, channame, (ac >= 2 ? av[1] : ""));
             free(channame);
         }
     }
@@ -1884,7 +1884,7 @@ void set_redirect(Channel * chan, char *value)
 
 void do_mass_mode(char *modes)
 {
-    int ac, i;
+    int ac;
     char **av;
     Channel *c;
     char *myModes;
@@ -1897,16 +1897,14 @@ void do_mass_mode(char *modes)
     myModes = sstrdup(modes);
     ac = split_buf(myModes, &av, 1);
 
-    for (i = 0; i < 1024; i++) {
-        for (c = chanlist[i]; c; c = c->next) {
-            if (c->bouncy_modes) {
-                free(av);
-                free(myModes);
-                return;
-            } else {
-                anope_cmd_mode(s_OperServ, c->name, "%s", modes);
-                chan_set_modes(s_OperServ, c, ac, av, 1);
-            }
+    for (c = firstchan(); c; c = nextchan()) {
+        if (c->bouncy_modes) {
+            free(av);
+            free(myModes);
+            return;
+        } else {
+            anope_cmd_mode(s_OperServ, c->name, "%s", modes);
+            chan_set_modes(s_OperServ, c, ac, av, 1);
         }
     }
     free(av);
@@ -1918,13 +1916,10 @@ void do_mass_mode(char *modes)
 void restore_unsynced_topics(void)
 {
     Channel *c;
-    int i;
 
-    for (i = 0; i < 1024; i++) {
-        for (c = chanlist[i]; c; c = c->next) {
-            if (!(c->topic_sync))
-                restore_topic(c->name);
-        }
+    for (c = firstchan(); c; c = nextchan()) {
+        if (!(c->topic_sync))
+            restore_topic(c->name);
     }
 }
 

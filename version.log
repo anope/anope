@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1355"
+VERSION_BUILD="1356"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1356)
+# BUGS  : 835
+# NOTES : Fixed channel walking for do_mass_mode() and restore_unsynced_topics() to use firstchan/nextchan
 #
 # BUILD : 1.7.21 (1355)
 # BUGS  : 834

@@ -86,7 +86,7 @@ int do_say(User * u)
         if (text[0] != '\001') {
             anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", text);
             ci->bi->lastmsg = time(NULL);
-            if (logchan && LogBot)
+	        if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
                 anope_cmd_privmsg(ci->bi->nick, LogChannel,
                                   "SAY %s %s %s", u->nick, ci->name, text);
         } else {

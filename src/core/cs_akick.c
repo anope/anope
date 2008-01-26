@@ -209,6 +209,7 @@ int do_akick(User * u)
         NickAlias *na = findnick(mask);
         NickCore *nc = NULL;
         char *nick, *user, *host;
+        int freemask = 0;
 
         if (readonly) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_DISABLED);
@@ -219,6 +220,7 @@ int do_akick(User * u)
             split_usermask(mask, &nick, &user, &host);
             mask =
                 scalloc(strlen(nick) + strlen(user) + strlen(host) + 3, 1);
+            freemask = 1;
             sprintf(mask, "%s!%s@%s", nick, user, host);
             free(nick);
             free(user);
@@ -235,6 +237,8 @@ int do_akick(User * u)
         if (ircd->except) {
             if (is_excepted_mask(ci, mask) == 1) {
                 notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask, chan);
+                if (freemask)
+                	free(mask);
                 return MOD_CONT;
             }
         }
@@ -247,6 +251,8 @@ int do_akick(User * u)
                 notice_lang(s_ChanServ, u, CHAN_AKICK_ALREADY_EXISTS,
                             (akick->flags & AK_ISNICK) ? akick->u.nc->
                             display : akick->u.mask, chan);
+                if (freemask)
+                	free(mask);
                 return MOD_CONT;
             }
         }
@@ -255,6 +261,8 @@ int do_akick(User * u)
          * the entire list. We simply add new entries at the end. */
         if (ci->akickcount >= CSAutokickMax) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
+			if (freemask)
+				free(mask);
             return MOD_CONT;
         }
         ci->akickcount++;
@@ -308,6 +316,9 @@ int do_akick(User * u)
         if (count)
             notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, chan,
                         count);
+        
+		if (freemask)
+			free(mask);
 
     } else if (stricmp(cmd, "STICK") == 0) {
         NickAlias *na;

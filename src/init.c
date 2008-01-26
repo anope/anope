@@ -307,7 +307,7 @@ static int parse_options(int ac, char **av)
                 s = av[i];
                 if (atoi(s) <= 0) {
                     fprintf(stderr,
-                            "-expire: number of seconds must be positive");
+                            "-expire: number of seconds must be positive\n");
                     return -1;
                 } else
                     ExpireTimeout = atol(s);
@@ -322,7 +322,13 @@ static int parse_options(int ac, char **av)
             } else if (strcmp(s, "nofork") == 0) {
                 nofork = 1;
             } else if (strcmp(s, "logchan") == 0) {
-                logchan = 1;
+                if (!LogChannel) {
+                    fprintf(stderr,
+                            "-logchan: LogChannel must be defined in services.conf\n");
+                } else {        /* LogChannel */
+
+                    logchan = 1;
+                }
             } else if (strcmp(s, "forceload") == 0) {
                 forceload = 1;
             } else if (strcmp(s, "nothird") == 0) {

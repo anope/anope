@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1357"
+VERSION_BUILD="1358"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1358)
+# BUGS  : 837
+# NOTES : Added a check for LogChannel when running with -logchan switch
 #
 # BUILD : 1.7.21 (1357)
 # BUGS  : 836

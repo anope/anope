@@ -16,6 +16,7 @@ Anope Version  S V N
 01/26 F Memory leak in ChanServ LIST.                                     [#840]
 01/26 F Memory leaks in HostServ SETALL.                                  [#841]
 01/26 F Memory leak in ChanServ AKICK.                                    [#842]
+01/26 F Removed broken detection of Windows MCE/Tablet edition.           [#845]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

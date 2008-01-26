@@ -1405,14 +1405,6 @@ char *GetWindowsVersion(void)
                 extra = sstrdup("Embedded");
             } else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
                 extra = sstrdup("Home Edition");
-#ifdef SM_MEDIACENTER
-            } else if (GetSystemMetrics(SM_MEDIACENTER)) {
-                extra = sstrdup("Media Center Edition");
-#endif
-#ifdef SM_TABLETPC
-            } else if (GetSystemMetrics(SM_TABLETPC)) {
-                extra = sstrdup("Tablet Edition");
-#endif
             } else {
                 extra = sstrdup(" ");
             }

@@ -9,6 +9,7 @@ Anope Version  S V N
 01/26 F Various oddities in moduleAddData().                              [#833]
 01/26 F Various oddities in ChanServ suspend code.                        [#834]
 01/26 F Channel walking for mass modes and restoring topics.              [#835]
+01/26 F Memory leaks in OperServ CLEARMODES.                              [#836]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

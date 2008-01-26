@@ -155,7 +155,7 @@ int do_clearmodes(User * u)
                     if (!chan_has_user_status(c, cu->user, CUS_VOICE))
                         continue;
                     argv[0] = sstrdup("-v");
-                    argv[1] = sstrdup(cu->user->nick);
+                    argv[1] = cu->user->nick;
                     anope_cmd_mode(s_OperServ, c->name, "-v %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
@@ -182,7 +182,7 @@ int do_clearmodes(User * u)
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
                         continue;
                     argv[0] = sstrdup("-h");
-                    argv[1] = sstrdup(cu->user->nick);
+                    argv[1] = cu->user->nick;
                     anope_cmd_mode(s_OperServ, c->name, "-h %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
@@ -208,7 +208,7 @@ int do_clearmodes(User * u)
                     if (!chan_has_user_status(c, cu->user, CUS_OWNER))
                         continue;
                     argv[0] = sstrdup(ircd->ownerunset);
-                    argv[1] = sstrdup(cu->user->nick);
+                    argv[1] = cu->user->nick;
                     anope_cmd_mode(s_OperServ, c->name, "%s %s",
                                    ircd->ownerunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
@@ -235,7 +235,7 @@ int do_clearmodes(User * u)
                     if (!chan_has_user_status(c, cu->user, CUS_PROTECT))
                         continue;
                     argv[0] = sstrdup(ircd->adminunset);
-                    argv[1] = sstrdup(cu->user->nick);
+                    argv[1] = cu->user->nick;
                     anope_cmd_mode(s_OperServ, c->name, "%s %s",
                                    ircd->adminunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);

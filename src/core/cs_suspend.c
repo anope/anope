@@ -88,6 +88,11 @@ int do_suspend(User * u)
         return MOD_CONT;
     }
 
+    if (chan[0] != '#') {
+        notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
+        return MOD_CONT;
+    }
+    
     /* Only SUSPEND existing channels, otherwise use FORBID (bug #54) */
     if ((ci = cs_findchan(chan)) == NULL) {
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
@@ -163,12 +168,30 @@ int do_unsuspend(User * u)
     if (readonly)
         notice_lang(s_ChanServ, u, READ_ONLY_MODE);
 
-    ci = cs_findchan(chan);
+    /* Only UNSUSPEND already suspended channels */
+    if ((ci = cs_findchan(chan)) == NULL) {
+        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+        return MOD_CONT;
+    }
+    
+    if (!(ci->flags & CI_SUSPENDED))
+    {
+        notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);
+        return MOD_CONT;
+    }
 
     if (ci) {
         ci->flags &= ~CI_SUSPENDED;
-        ci->forbidreason = NULL;
-        ci->forbidby = NULL;
+        if (ci->forbidreason)
+        {
+        	free(ci->forbidreason);
+        	ci->forbidreason = NULL;
+        }
+        if (ci->forbidby)
+        {
+        	free(ci->forbidby);
+        	ci->forbidby = NULL;
+        }
 
         if (WallForbid)
             anope_cmd_global(s_ChanServ,

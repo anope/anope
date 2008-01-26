@@ -7,6 +7,7 @@ Anope Version  S V N
 01/15 F Re-assigned access to OS CHANLIST to Services Opers.              [#827]
 01/24 F Several language errors.                                          [ #00]
 01/26 F Various oddities in moduleAddData().                              [#833]
+01/26 F Various oddities in ChanServ suspend code.                        [#834]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

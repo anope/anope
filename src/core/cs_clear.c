@@ -146,7 +146,6 @@ int do_clear(User * u)
         free(invites);
 
     } else if (stricmp(what, "modes") == 0) {
-        char buf[BUFSIZE], *end = buf;
         char *argv[2];
 
         if (c->mode) {
@@ -190,45 +189,7 @@ int do_clear(User * u)
             }
             check_modes(c);
         }
-
-
-
-        /* TODO: decide if the above implementation is better than this one. */
-
-        if (0) {
-            CBModeInfo *cbmi = cbmodeinfos;
-            CBMode *cbm;
-
-            do {
-                if (c->mode & cbmi->flag)
-                    *end++ = cbmi->mode;
-            } while ((++cbmi)->flag != 0);
-
-            cbmi = cbmodeinfos;
-
-            do {
-                if (cbmi->getvalue && (c->mode & cbmi->flag)
-                    && !(cbmi->flags & CBM_MINUS_NO_ARG)) {
-                    char *value = cbmi->getvalue(c);
-
-                    if (value) {
-                        *end++ = ' ';
-                        while (*value)
-                            *end++ = *value++;
-
-                        /* Free the value */
-                        cbm = &cbmodes[(int) cbmi->mode];
-                        cbm->setvalue(c, NULL);
-                    }
-                }
-            } while ((++cbmi)->flag != 0);
-
-            *end = 0;
-
-            anope_cmd_mode(whosends(ci), c->name, "-%s", buf);
-            c->mode = 0;
-            check_modes(c);
-        }
+        
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
         char *av[3];
@@ -245,7 +206,6 @@ int do_clear(User * u)
             }
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
-                av[0] = sstrdup(chan);
                 if (!chan_has_user_status(c, cu->user, CUS_OP)) {
                     if (!chan_has_user_status(c, cu->user, CUS_PROTECT)) {
                         if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
@@ -267,8 +227,8 @@ int do_clear(User * u)
                 do_cmode(s_ChanServ, 3, av);
                 free(av[2]);
                 free(av[1]);
-                free(av[0]);
             }
+            free(av[0]);
         } else {
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;

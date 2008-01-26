@@ -12,6 +12,7 @@ Anope Version  S V N
 01/26 F Memory leaks in OperServ CLEARMODES.                              [#836]
 01/26 F Check for LogChannel when running with -logchan option.           [#837]
 01/26 F Enough LogChannel checks for bs_say and bs_act with LogBot on.    [#838]
+01/26 F Memory leak and old code in ChanServ CLEAr.                       [#839]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

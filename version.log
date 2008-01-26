@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1359"
+VERSION_BUILD="1360"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1360)
+# BUGS  : 839
+# NOTES : Removed old code from cs_clear and fixed a memory leak in there as well
 #
 # BUILD : 1.7.21 (1359)
 # BUGS  : 838

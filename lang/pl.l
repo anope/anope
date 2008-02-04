@@ -894,9 +894,8 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	Nie mo¿esz sobie samemu odzyskaæ nicka :P
 NICK_RECOVERED
-	Twój nick zosta³ w³a¶nie przejêty przez serwisy.
-	Napisz %R%s RELEASE %s 
-	je¶li chcesz, by zosta³ on zwolniony teraz.
+	User claiming your nick has been killed.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

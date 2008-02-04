@@ -853,7 +853,7 @@ NICK_NO_RECOVER_SELF
 	Je kan jezelf niet herstellen!
 NICK_RECOVERED
 	Gebruiker die je nick claimde is gekilld.
-	%R%s RELEASE %s om deze voor de 1-minuut timeout terug te krijgen.
+	%R%s RELEASE %s om deze voor de %s timeout terug te krijgen.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

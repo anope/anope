@@ -841,8 +841,8 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	Δεν μπορείς να ψάχνεις τον εαυτό σου!
 NICK_RECOVERED
-	Έκανες kill το χρήστη που σου είχε το ψευδώνυμό σου.
-	%R%s RELEASE %s για να το πάρεις πίσω πριν γίνει αυτόματα μετά από ένα λεπτό.
+	User claiming your nick has been killed.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

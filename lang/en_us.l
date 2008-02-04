@@ -827,7 +827,7 @@ NICK_NO_RECOVER_SELF
 	You can't recover yourself!
 NICK_RECOVERED
 	User claiming your nick has been killed.
-	%R%s RELEASE %s to get it back before the one-minute timeout.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

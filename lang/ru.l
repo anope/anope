@@ -828,8 +828,8 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	¬ы не можете применить RECOVER на самого себ€!
 NICK_RECOVERED
-	ѕо вашему запросу, пользователь, вз€вший ваш ник себе, был переименован на случайный ник.
-	Ќапишите %R%s RELEASE %s в течение минуты, чтобы сн€ть защиту сервисов с ¬ашего ника.
+	User claiming your nick has been killed.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

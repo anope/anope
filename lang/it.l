@@ -835,7 +835,7 @@ NICK_NO_RECOVER_SELF
 	Non puoi recuperare te stesso!
 NICK_RECOVERED
 	L'utente che usava il tuo nick è stato disconnesso.
-	Digita %R%s RELEASE %s per usarlo prima che termini il blocco di un minuto.
+	Digita %R%s RELEASE %s per usarlo prima che termini il blocco di %s.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

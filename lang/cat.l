@@ -844,7 +844,7 @@ NICK_NO_RECOVER_SELF
 	No pots recuperar-te a tu mateix!
 NICK_RECOVERED
 	L'usuari demanant el teu nick ha estat expulsat.
-	%R%s RELEASE %s per recuperar-lo abans del minut de time-out.
+	%R%s RELEASE %s per recuperar-lo abans %s time-out.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

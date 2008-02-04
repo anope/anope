@@ -849,7 +849,7 @@ NICK_NO_RECOVER_SELF
 	No puedes recuperarte a ti mismo!
 NICK_RECOVERED
 	El usuario que ocupaba tu nick ha sido killeado.
-	%R%s RELEASE %s para recuperarlo antes del minuto de time-out.
+	%R%s RELEASE %s para recuperarlo antes de %s.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

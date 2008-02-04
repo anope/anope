@@ -848,8 +848,8 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	Kendizi recover edemezsiniz!
 NICK_RECOVERED
-	Nickinizi kullanan user kill lendi.
-	%R%s RELEASE %s yazarak bir dakikadan önce nickinizi serbest býrakabilirsiniz.
+	User claiming your nick has been killed.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

@@ -848,7 +848,7 @@ NICK_NO_RECOVER_SELF
 	Você não pode usar o comando RECOVER em si mesmo!
 NICK_RECOVERED
 	Usuário que usava seu nick foi derrubado.
-	%R%s RELEASE %s para liberar seu nick antes de um minuto.
+	%R%s RELEASE %s para liberar seu nick antes de %s.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

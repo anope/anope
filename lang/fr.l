@@ -855,7 +855,7 @@ NICK_NO_RECOVER_SELF
 	Vous ne pouvez utiliser RECOVER sur vous-même!
 NICK_RECOVERED
 	L'utilisateur se servant de votre pseudo a été déconnecté.
-	%R%s RELEASE %s pour le récupérer avant que la minute ne s'écoule.
+	%R%s RELEASE %s pour le récupérer avant que la %s ne s'écoule.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

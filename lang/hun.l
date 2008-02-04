@@ -840,8 +840,8 @@ NICK_RECOVER_SYNTAX
 NICK_NO_RECOVER_SELF
 	Nem használhatod az aktiv nickedre!
 NICK_RECOVERED
-	A nevedet használó user killve lett.
-	Írd be:%R%s RELEASE %s és visszaszerzed a nicked.
+	User claiming your nick has been killed.
+	%R%s RELEASE %s to get it back before %s timeout.
 
 # RELEASE válaszok
 NICK_RELEASE_SYNTAX

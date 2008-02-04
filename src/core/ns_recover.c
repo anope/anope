@@ -86,9 +86,15 @@ int do_recover(User * u)
         int res = enc_check_password(pass, na->nc->pass);
 
         if (res == 1) {
+            char relstr[192];
+
             notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
             collide(na, 0);
-            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick);
+
+            /* Convert NSReleaseTimeout seconds to string format */
+            duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
+
+            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
         } else {
             notice_lang(s_NickServ, u, ACCESS_DENIED);
             if (res == 0) {

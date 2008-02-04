@@ -861,7 +861,7 @@ NICK_NO_RECOVER_SELF
 	Du kannst dich nicht selber recovern!
 NICK_RECOVERED
 	Der User, der mit deinem Nicknamen online gewesen ist, wurde entfernt.Tippe:
-	%R%s RELEASE %s ein, um ihn vor dem 1-Minute-Timeout zurückzubekommen.
+	%R%s RELEASE %s ein, um ihn vor dem %s-Timeout zurückzubekommen.
 
 # RELEASE responses
 NICK_RELEASE_SYNTAX

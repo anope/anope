@@ -3968,6 +3968,12 @@ NICK_HELP_CONFIRM
 	ника. Для более подробной информации используйте:
 	%R%S HELP REGISTER
 
+NICK_HELP_RESEND
+	Syntax: RESEND
+	
+	This command will re-send the auth code (also called passcode)
+	to the e-mail address of the user whom is performing it.
+
 NICK_SERVADMIN_HELP
 	Администраторы сервисов могут удалить любой ник
 	без идентификации к нему, а так же, могут смотреть

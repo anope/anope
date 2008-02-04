@@ -4101,6 +4101,12 @@ NICK_HELP_CONFIRM
 	registo. Para mas informacion sobre la primera etpa del proceso 
 	de registro, escribe: %R%S HELP REGISTER
 
+NICK_HELP_RESEND
+	Sintaxis: RESEND
+	
+	Este comando envia el codigo de autorizacion (conocido como passcode)
+	a la direccion e-mail del usuario que lo esta ejecutando.
+
 NICK_SERVADMIN_HELP
 	Administradores de Servicios pueden tambien botar cualquier
 	nickname sin tener que identificarse por el nick y pueden

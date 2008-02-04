@@ -4170,6 +4170,12 @@ NICK_HELP_CONFIRM
 	registration process. For more information about the first
 	stage of the registration process, type: %R%S HELP REGISTER
 
+NICK_HELP_RESEND
+	Syntax: RESEND
+	
+	This command will re-send the auth code (also called passcode)
+	to the e-mail address of the user whom is performing it.
+
 NICK_SERVADMIN_HELP
 	
 	Les Services admins peuvent également effacer n'importe quel

@@ -1,6 +1,7 @@
 Anope Version  S V N
 --------------------
 *** New Strings:
+	NICK_HELP_RESEND
 
 *** Mod Strings:
 	NICK_RECOVERED

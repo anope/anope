@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1364"
+VERSION_BUILD="1365"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1365)
+# BUGS  : 850, 851, 852
+# NOTES : Fixed several memory leaks reported by Trystan. Do not forget to free allocated memory!
 #
 # BUILD : 1.7.21 (1364)
 # BUGS  : 844

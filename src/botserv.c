@@ -282,6 +282,9 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                                     && (stristr(nbuf, wordbuf)))) {
                                 mustkick = 1;
                             }
+
+                            /* free previous (sc)allocated memory (#850) */
+                            free(wordbuf);
                         }
                     }
                 } else if (bw->type == BW_START) {
@@ -341,13 +344,16 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                         bot_kick(ci, u, BOT_REASON_BADWORD_GENTLE);
                     else
                         bot_kick(ci, u, BOT_REASON_BADWORD, bw->word);
+
+                    /* free the normalized buffer before return (#850) */
+                    Anope_Free(nbuf);
+
                     return;
                 }
             }
 
             /* Free the normalized buffer */
-            if (nbuf)
-                free(nbuf);
+            Anope_Free(nbuf);
         }
 
         /* Flood kicker */

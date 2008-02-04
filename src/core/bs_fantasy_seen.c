@@ -131,6 +131,8 @@ int do_fantasy(int argc, char **argv)
                      target);
             anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
         }
+        /* free myStrGetToken(ed) variable target (#851) */
+        Anope_Free(target);
     }
 
     return MOD_CONT;

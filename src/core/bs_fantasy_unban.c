@@ -73,6 +73,9 @@ int do_fantasy(int argc, char **argv)
             common_unban(ci, u->nick);
         else
             common_unban(ci, target);
+
+        /* free target if needed (#852) */
+        Anope_Free(target);
     }
 
     return MOD_CONT;

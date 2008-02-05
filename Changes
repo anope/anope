@@ -24,6 +24,7 @@ Anope Version  S V N
 02/04 F Added missed NickServ HELP for RESEND command.                    [#847]
 02/08 F Updated config.guess and config.sub from upstream.                [#853]
 02/08 F Various small compiler warnings.                                  [#685]
+02/08 F Updated docs/WIN32.txt.                                           [#846]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

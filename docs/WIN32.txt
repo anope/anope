@@ -4,7 +4,8 @@ Anope for Windows
 1) Building the Source
 2) Installation
 3) Compiling Modules
-4) Credits
+4) Other compile options
+5) Credits
 
 1) Building the Source
 
@@ -23,10 +24,17 @@ Anope for Windows
         need to download the following free components from Microsoft. Once
         downloaded, install these packages.
 
+		* Microsoft Visual C++ 2008 Express Edition:
+			http://www.microsoft.com/express/vc/
+
+		or
+
         * Microsoft Visual C++ 2005 Express Edition:
             http://msdn.microsoft.com/vstudio/express/visualc/download/
+            
+		then download and install:
 
-        * Microsoft Windows PlatformSDK:
+        * Microsoft Windows PlatformSDK: (Requires WGA validation)
 	    http://www.microsoft.com/downloads/details.aspx?FamilyId=0BAF2B35-C656-4969-ACE8-E4C0C0716ADB&displaylang=en
 
 	    (NOTE: Although this says for Windows Server 2003, it does infact work on all supported
@@ -157,7 +165,34 @@ Anope for Windows
     C) You should now be able to load your modules on IRC via OperServ, or via
        the services.conf file.
 
-4) Credits
+
+4) Other compile options
+
+	A) If you have trouble recompiling Anope, you should try:
+	
+		nmake -f Makefile.win32 distclean
+		
+		This will clean up the source directory and allow for chages to be applied
+		to previously compiled files.
+		
+	B) A list of valid options are:
+	
+		install
+		distclean
+		clean
+		spotless
+		all
+		core
+		protocols
+		mypasql
+		languages
+		modules
+		
+		The syntax for these options is:
+		
+		nmake -f Makefile.win32 [option]
+	
+5) Credits
 
     Anope is based on Epona and IRCServices. See CREDITS for more credits and
     a complete list of all developers.

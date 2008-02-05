@@ -129,13 +129,13 @@ int my_cs_appendtopic(User * u)
             strscpy(topic, newtopic, sizeof(topic));
         }
 
-        ci->last_topic = topic ? sstrdup(topic) : NULL;
+        ci->last_topic = *topic ? sstrdup(topic) : NULL;
         strscpy(ci->last_topic_setter, u->nick, NICKMAX);
         ci->last_topic_time = time(NULL);
 
         if (c->topic)
             free(c->topic);
-        c->topic = topic ? sstrdup(topic) : NULL;
+        c->topic = *topic ? sstrdup(topic) : NULL;
         strscpy(c->topic_setter, u->nick, NICKMAX);
         if (ircd->topictsbackward)
             c->topic_time = c->topic_time - 1;
@@ -151,8 +151,7 @@ int my_cs_appendtopic(User * u)
                 anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
-        anope_cmd_topic(whosends(ci), c->name, u->nick, topic ? topic : "",
-                        c->topic_time);
+        anope_cmd_topic(whosends(ci), c->name, u->nick, topic, c->topic_time);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_cmd_part(s_ChanServ, c->name, NULL);

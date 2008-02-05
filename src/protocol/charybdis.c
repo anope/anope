@@ -1410,7 +1410,7 @@ void charybdis_cmd_tmode(char *source, char *dest, const char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
     }
-    if (!buf) {
+    if (!*buf) {
         return;
     }
 

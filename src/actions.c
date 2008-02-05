@@ -131,7 +131,9 @@ void sqline(char *mask, char *reason)
 void common_unban(ChannelInfo * ci, char *nick)
 {
     int count, i;
-    char *av[3], **bans;
+    char *av[4], **bans;
+    int ac;
+    char buf[BUFSIZE];
     User *u;
     char *host = NULL;
     int matchfound = 0;
@@ -158,16 +160,29 @@ void common_unban(ChannelInfo * ci, char *nick)
     if (ircd->svsmode_unban) {
         anope_cmd_unban(ci->name, nick);
     } else {
-        av[0] = ci->name;
-        av[1] = sstrdup("-b");
+        if (ircdcap->tsmode) {
+            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+            av[0] = ci->name;
+            av[1] = buf;
+            av[2] = sstrdup("-b");
+            ac = 4;
+        } else {
+            av[0] = ci->name;
+            av[1] = sstrdup("-b");
+            ac = 3;
+        }
         count = ci->c->bancount;
         bans = scalloc(sizeof(char *) * count, 1);
         memcpy(bans, ci->c->bans, sizeof(char *) * count);
         for (i = 0; i < count; i++) {
             if (match_usermask(bans[i], u)) {
                 anope_cmd_mode(whosends(ci), ci->name, "-b %s", bans[i]);
-                av[2] = bans[i];
-                do_cmode(whosends(ci), 3, av);
+                if (ircdcap->tsmode)
+                    av[3] = bans[i];
+                else
+                    av[2] = bans[i];
+
+                do_cmode(whosends(ci), ac, av);
                 matchfound++;
             }
             if (host) {
@@ -182,15 +197,22 @@ void common_unban(ChannelInfo * ci, char *nick)
                     if (match_userip(bans[i], u, host)) {
                         anope_cmd_mode(whosends(ci), ci->name, "-b %s",
                                        bans[i]);
-                        av[2] = bans[i];
-                        do_cmode(whosends(ci), 3, av);
+                        if (ircdcap->tsmode)
+                            av[3] = bans[i];
+                        else
+                            av[2] = bans[i];
+
+                        do_cmode(whosends(ci), ac, av);
                     }
                 }
             }
             matchfound = 0;
         }
         free(bans);
-        free(av[1]);
+        if (ircdcap->tsmode)
+            free(av[2]);
+        else
+            free(av[1]);
     }
     /* host_resolve() sstrdup us this info so we gotta free it */
     if (host) {

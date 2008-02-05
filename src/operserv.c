@@ -1668,9 +1668,9 @@ int defconParseModeString(const char *str)
     int add = -1;               /* 1 if adding, 0 if deleting, -1 if neither */
     unsigned char mode;
     CBMode *cbm;
-	char *str_copy = sstrdup(str); /* We need this copy as str is const -GD */
-	char *param; /* Store parameters during mode parsing */
-	
+    char *str_copy = sstrdup(str);      /* We need this copy as str is const -GD */
+    char *param;                /* Store parameters during mode parsing */
+
     /* Reinitialize everything */
     DefConModesOn = 0;
     DefConModesOff = 0;
@@ -1678,9 +1678,9 @@ int defconParseModeString(const char *str)
     DefConModesCI.mlock_key = NULL;
     DefConModesCI.mlock_flood = NULL;
     DefConModesCI.mlock_redirect = NULL;
-	
-	/* Initialize strtok() internal buffer */
-	strtok(str_copy, " ");
+
+    /* Initialize strtok() internal buffer */
+    strtok(str_copy, " ");
 
     /* Loop while there are modes to set */
     while ((mode = *str++) && (mode != ' ')) {
@@ -1699,40 +1699,37 @@ int defconParseModeString(const char *str)
         if ((int) mode < 128 && (cbm = &cbmodes[(int) mode])->flag != 0) {
             if (cbm->flags & CBM_NO_MLOCK) {
                 alog("DefConChanModes mode character '%c' cannot be locked", mode);
-				free(str_copy);
+                free(str_copy);
                 return 0;
             } else if (add) {
                 DefConModesOn |= cbm->flag;
                 DefConModesOff &= ~cbm->flag;
-                if (cbm->cssetvalue)
-				{
-					if (!(param = strtok(NULL, " ")))
-					{
-						alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
-						free(str_copy);
-						return 0;
-					}
+                if (cbm->cssetvalue) {
+                    if (!(param = strtok(NULL, " "))) {
+                        alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
+                        free(str_copy);
+                        return 0;
+                    }
                     cbm->cssetvalue(&DefConModesCI, param);
-				}
+                }
             } else {
                 DefConModesOff |= cbm->flag;
                 if (DefConModesOn & cbm->flag) {
                     DefConModesOn &= ~cbm->flag;
-                    if (cbm->cssetvalue)
-					{
+                    if (cbm->cssetvalue) {
                         cbm->cssetvalue(&DefConModesCI, NULL);
-					}
+                    }
                 }
             }
         } else {
             alog("DefConChanModes unknown mode character '%c'", mode);
-			free(str_copy);
+            free(str_copy);
             return 0;
         }
     }                           /* while (*param) */
-	
-	free(str_copy);
-	
+
+    free(str_copy);
+
     if (ircd->Lmode) {
         /* We can't mlock +L if +l is not mlocked as well. */
         if ((DefConModesOn & ircd->chan_lmode)

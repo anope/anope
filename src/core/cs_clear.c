@@ -192,7 +192,9 @@ int do_clear(User * u)
         
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
-        char *av[3];
+        char *av[4];
+        int ac;
+        char buf[BUFSIZE];
         struct c_userlist *cu, *next;
 
         if (ircd->svsmode_ucmode) {
@@ -213,20 +215,54 @@ int do_clear(User * u)
                         } else {
                             snprintf(tmp, BUFSIZE, "%so",
                                      ircd->ownerunset);
-                            av[1] = sstrdup(tmp);
+
+                            if (ircdcap->tsmode) {
+                                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                                av[1] = buf;
+                                av[2] = sstrdup(tmp);
+                            } else {
+                                av[1] = sstrdup(tmp);
+                            }
 
                         }
                     } else {
                         snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
-                        av[1] = sstrdup(tmp);
+
+                        if (ircdcap->tsmode) {
+                            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                            av[1] = buf;
+                            av[2] = sstrdup(tmp);
+                        } else {
+                            av[1] = sstrdup(tmp);
+                        }
                     }
                 } else {
-                    av[1] = sstrdup("-o");
+                    if (ircdcap->tsmode) {
+                        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                        av[1] = buf;
+                        av[2] = sstrdup("-o");
+                    } else {
+                        av[1] = sstrdup("-o");
+                    }
                 }
-                av[2] = sstrdup(cu->user->nick);
-                do_cmode(s_ChanServ, 3, av);
-                free(av[2]);
-                free(av[1]);
+
+                if (ircdcap->tsmode) {
+                    av[3] = sstrdup(cu->user->nick);
+                    ac = 4;
+                } else {
+                    av[2] = sstrdup(cu->user->nick);
+                    ac = 3;
+                }
+
+                do_cmode(s_ChanServ, ac, av);
+
+                if (ircdcap->tsmode) {
+                    free(av[3]);
+                    free(av[2]);
+                } else {
+                    free(av[2]);
+                    free(av[1]);
+                }
             }
             free(av[0]);
         } else {
@@ -240,73 +276,169 @@ int do_clear(User * u)
                         } else {
                             snprintf(tmp, BUFSIZE, "%so",
                                      ircd->ownerunset);
-                            av[1] = sstrdup(tmp);
+                            if (ircdcap->tsmode) {
+                                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                                av[1] = buf;
+                                av[2] = sstrdup(tmp);
+                            } else {
+                                av[1] = sstrdup(tmp);
+                            }
                         }
                     } else {
                         snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
-                        av[1] = sstrdup(tmp);
+                        if (ircdcap->tsmode) {
+                            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                            av[1] = buf;
+                            av[2] = sstrdup(tmp);
+                        } else {
+                            av[1] = sstrdup(tmp);
+                        }
                     }
                 } else {
-                    av[1] = sstrdup("-o");
+                    if (ircdcap->tsmode) {
+                        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                        av[1] = buf;
+                        av[2] = sstrdup("-o");
+                    } else {
+                        av[1] = sstrdup("-o");
+                    }
                 }
-                av[2] = sstrdup(cu->user->nick);
-                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
-                               av[2]);
-                do_cmode(s_ChanServ, 3, av);
-                free(av[2]);
-                free(av[1]);
-                free(av[0]);
+
+                if (ircdcap->tsmode) {
+                    av[3] = sstrdup(cu->user->nick);
+                    ac = 4;
+
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
+                                   av[3]);
+                } else {
+                    av[2] = sstrdup(cu->user->nick);
+                    ac = 3;
+
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                                   av[2]);
+                }
+
+                do_cmode(s_ChanServ, ac, av);
+
+                if (ircdcap->tsmode) {
+                    free(av[3]);
+                    free(av[2]);
+                    free(av[0]);
+                } else {
+                    free(av[2]);
+                    free(av[1]);
+                    free(av[0]);
+                }
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
     } else if (ircd->halfop && stricmp(what, "hops") == 0) {
-        char *av[3];
+        char *av[4];
+        int ac;
+        char buf[BUFSIZE];
         struct c_userlist *cu, *next;
 
         for (cu = c->users; cu; cu = next) {
             next = cu->next;
             if (!chan_has_user_status(c, cu->user, CUS_HALFOP))
                 continue;
-            av[0] = sstrdup(chan);
-            av[1] = sstrdup("-h");
-            av[2] = sstrdup(cu->user->nick);
+
+            if (ircdcap->tsmode) {
+                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                av[0] = sstrdup(chan);
+                av[1] = buf;
+                av[2] = sstrdup("-h");
+                av[3] = sstrdup(cu->user->nick);
+                ac = 4;
+            } else {
+                av[0] = sstrdup(chan);
+                av[1] = sstrdup("-h");
+                av[2] = sstrdup(cu->user->nick);
+                ac = 3;
+            }
+
             if (ircd->svsmode_ucmode) {
-                anope_cmd_svsmode_chan(av[0], av[1], NULL);
-                do_cmode(s_ChanServ, 3, av);
+                if (ircdcap->tsmode)
+                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
+                else
+                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+
+                do_cmode(s_ChanServ, ac, av);
                 break;
             } else {
-                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
-                               av[2]);
+                if (ircdcap->tsmode)
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
+                                   av[3]);
+                else
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                                   av[2]);
             }
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
-            free(av[1]);
-            free(av[0]);
+            do_cmode(s_ChanServ, ac, av);
+
+            if (ircdcap->tsmode) {
+                free(av[3]);
+                free(av[2]);
+                free(av[0]);
+            } else {
+                free(av[2]);
+                free(av[1]);
+                free(av[0]);
+            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
     } else if (stricmp(what, "voices") == 0) {
-        char *av[3];
+        char *av[4];
+        int ac;
+        char buf[BUFSIZE];
         struct c_userlist *cu, *next;
 
         for (cu = c->users; cu; cu = next) {
             next = cu->next;
             if (!chan_has_user_status(c, cu->user, CUS_VOICE))
                 continue;
-            av[0] = sstrdup(chan);
-            av[1] = sstrdup("-v");
-            av[2] = sstrdup(cu->user->nick);
+
+            if (ircdcap->tsmode) {
+                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                av[0] = sstrdup(chan);
+                av[1] = buf;
+                av[2] = sstrdup("-v");
+                av[3] = sstrdup(cu->user->nick);
+                ac = 4;
+            } else {
+                av[0] = sstrdup(chan);
+                av[1] = sstrdup("-v");
+                av[2] = sstrdup(cu->user->nick);
+                ac = 3;
+            }
+
             if (ircd->svsmode_ucmode) {
-                anope_cmd_svsmode_chan(av[0], av[1], NULL);
-                do_cmode(s_ChanServ, 3, av);
+                if (ircdcap->tsmode)
+                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
+                else
+                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+
+                do_cmode(s_ChanServ, ac, av);
                 break;
             } else {
-                anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
-                               av[2]);
+                if (ircdcap->tsmode) {
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
+                                   av[3]);
+                } else {
+                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                                   av[2]);
+                }
             }
-            do_cmode(s_ChanServ, 3, av);
-            free(av[2]);
-            free(av[1]);
-            free(av[0]);
+            do_cmode(s_ChanServ, ac, av);
+
+            if (ircdcap->tsmode) {
+                free(av[3]);
+                free(av[2]);
+                free(av[0]);
+            } else {
+                free(av[2]);
+                free(av[1]);
+                free(av[0]);
+            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
     } else if (stricmp(what, "users") == 0) {

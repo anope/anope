@@ -767,25 +767,50 @@ void bot_join(ChannelInfo * ci)
         int count = ci->c->bancount;
         if (count) {
             char botmask[BUFSIZE];
+            char buf[BUFSIZE];
             char **bans = scalloc(sizeof(char *) * count, 1);
-            char *av[3];
+            char *av[4];
+            int ac;
 
             memcpy(bans, ci->c->bans, sizeof(char *) * count);
             snprintf(botmask, sizeof(botmask), "%s!%s@%s", ci->bi->nick,
                      ci->bi->user, ci->bi->host);
 
-            av[0] = ci->c->name;
-            av[1] = sstrdup("-b");
+            if (ircdcap->tsmode) {
+                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                av[0] = ci->c->name;
+                av[1] = buf;
+                av[2] = sstrdup("-b");
+                ac = 4;
+            } else {
+                av[0] = ci->c->name;
+                av[1] = sstrdup("-b");
+                ac = 3;
+            }
+
             for (i = 0; i < count; i++) {
                 if (match_wild_nocase(ci->c->bans[i], botmask)) {
                     anope_cmd_mode(ci->bi->nick, ci->name, "-b %s",
                                    bans[i]);
-                    av[2] = sstrdup(bans[i]);
-                    do_cmode(ci->bi->nick, 3, av);
-                    free(av[2]);
+                    if (ircdcap->tsmode)
+                        av[3] = sstrdup(bans[i]);
+                    else
+                        av[2] = sstrdup(bans[i]);
+
+                    do_cmode(ci->bi->nick, ac, av);
+
+                    if (ircdcap->tsmode)
+                        free(av[3]);
+                    else
+                        free(av[2]);
                 }
             }
-            free(av[1]);
+
+            if (ircdcap->tsmode)
+                free(av[2]);
+            else
+                free(av[1]);
+
             free(bans);
         }
 
@@ -832,19 +857,36 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 
     bd->ttb[ttbtype]++;
     if (bd->ttb[ttbtype] == ci->ttb[ttbtype]) {
-        char *av[3];
+        char *av[4];
+        int ac;
         char mask[BUFSIZE];
+        char buf[BUFSIZE];
 
         bd->ttb[ttbtype] = 0;
 
-        av[0] = ci->name;
-        av[1] = sstrdup("+b");
         get_idealban(ci, u, mask, sizeof(mask));
-        av[2] = mask;
-        anope_cmd_mode(ci->bi->nick, av[0], "+b %s", av[2]);
-        do_cmode(ci->bi->nick, 3, av);
+
+        if (ircdcap->tsmode) {
+            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+            av[0] = ci->name;
+            av[1] = buf;
+            av[2] = sstrdup("+b");
+            av[3] = mask;
+            ac = 4;
+        } else {
+            av[0] = ci->name;
+            av[1] = sstrdup("+b");
+            av[2] = mask;
+            ac = 3;
+        }
+
+        anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
+        do_cmode(ci->bi->nick, ac, av);
         send_event(EVENT_BOT_BAN, 3, u->nick, ci->name, mask);
-        free(av[1]);
+        if (ircdcap->tsmode)
+            free(av[2]);
+        else
+            free(av[1]);
     }
 }
 

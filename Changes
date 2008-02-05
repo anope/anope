@@ -27,6 +27,7 @@ Anope Version  S V N
 02/08 F Updated docs/WIN32.txt.                                           [#846]
 02/08 F Removed bs_fantasy_unban from core modules.                       [#854]
 02/08 F Defcon mode parsing breaking when fed with modes with parameters. [#855]
+02/08 F do_cmode() called without passing TS.                             [#820]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

@@ -1484,7 +1484,9 @@ int check_kick(User * user, char *chan, time_t chants)
     AutoKick *akick;
     int i;
     NickCore *nc;
-    char *av[3];
+    char *av[4];
+    int ac;
+    char buf[BUFSIZE];
     char mask[BUFSIZE];
     const char *reason;
     Timeout *t;
@@ -1578,11 +1580,26 @@ int check_kick(User * user, char *chan, time_t chants)
     }
 
     if (c) {
-        av[0] = chan;
-        av[1] = sstrdup("+b");
-        av[2] = mask;
-        do_cmode(whosends(ci), 3, av);
-        free(av[1]);
+        if (ircdcap->tsmode) {
+            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+            av[0] = chan;
+            av[1] = buf;
+            av[2] = sstrdup("+b");
+            av[3] = mask;
+            ac = 4;
+        } else {
+            av[0] = chan;
+            av[1] = sstrdup("+b");
+            av[2] = mask;
+            ac = 3;
+        }
+
+        do_cmode(whosends(ci), ac, av);
+
+        if (ircdcap->tsmode)
+            free(av[2]);
+        else
+            free(av[1]);
     }
 
     anope_cmd_mode(whosends(ci), chan, "+b %s", mask);

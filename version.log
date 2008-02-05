@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1371"
+VERSION_BUILD="1372"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1372)
+# BUGS  : 854
+# NOTES : Removed bs_fantasy_unban from core modules.
 #
 # BUILD : 1.7.21 (1371)
 # BUGS  : 849

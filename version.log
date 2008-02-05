@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1372"
+VERSION_BUILD="1373"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1373)
+# BUGS  : 855
+# NOTES : Fixed various issues in handling of DefCon modes with params
 #
 # BUILD : 1.7.21 (1372)
 # BUGS  : 854

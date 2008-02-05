@@ -316,9 +316,6 @@ int do_akick(User * u)
         if (count)
             notice_lang(s_ChanServ, u, CHAN_AKICK_ENFORCE_DONE, chan,
                         count);
-        
-		if (freemask)
-			free(mask);
 
     } else if (stricmp(cmd, "STICK") == 0) {
         NickAlias *na;

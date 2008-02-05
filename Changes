@@ -28,6 +28,7 @@ Anope Version  S V N
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]
+02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
 
 Anope Version 1.7.21
 --------------------

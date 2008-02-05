@@ -22,6 +22,7 @@ Anope Version  S V N
 02/04 F Memleak in bs_fantasy_unban.c                                     [#852]
 02/04 F No variable for NSReleaseTimeout in NICK_RECOVERED message.       [#848]
 02/04 F Added missed NickServ HELP for RESEND command.                    [#847]
+02/08 F Updated config.guess and config.sub from upstream.                [#853]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

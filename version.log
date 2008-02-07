@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1374"
+VERSION_BUILD="1375"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1375)
+# BUGS  : 858
+# NOTES : do_sjoin() called finduser(NULL)
 #
 # BUILD : 1.7.21 (1374)
 # BUGS  : 820

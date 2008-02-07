@@ -1070,7 +1070,7 @@ void do_sjoin(const char *source, int ac, char **av)
         if (UseTS6 && ircd->ts6) {
             user = find_byuid(source);
             if (!user)
-                user = finduser(s);
+                user = finduser(source);
         } else {
             user = finduser(source);
         }

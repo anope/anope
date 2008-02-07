@@ -371,8 +371,11 @@ Channel *findchan(const char *chan)
         alog("debug: findchan(%p)", chan);
     c = chanlist[HASH(chan)];
     while (c) {
-        if (stricmp(c->name, chan) == 0)
+        if (stricmp(c->name, chan) == 0) {
+            if (debug >= 3)
+                alog("debug: findchan(%s) -> %p", chan, (void *) c);
             return c;
+        }
         c = c->next;
     }
     if (debug >= 3)

@@ -30,6 +30,7 @@ Anope Version  S V N
 02/05 F do_cmode() called without passing TS.                             [#820]
 02/07 F do_sjoin() looking for NULL-nick sometimes with TS6.              [#858]
 02/07 F Oddity in do_cmode().                                             [#859]
+02/07 F findchan() debug messages not being logical.                      [#857]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]

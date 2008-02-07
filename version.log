@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1376"
+VERSION_BUILD="1377"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1377)
+# BUGS  : 857
+# NOTES : Fixed the findchan() debug messages so you now have ubercool debug stuff when you enter debug level 3\!
 #
 # BUILD : 1.7.21 (1376)
 # BUGS  : 859

@@ -1151,12 +1151,12 @@ void do_cmode(const char *source, int ac, char **av)
 
     chan = findchan(av[0]);
     if (!chan) {
-        ci = cs_findchan(av[0]);
-        if (!(ci && (ci->flags & CI_VERBOTEN)))
-            if (debug) {
+        if (debug) {
+            ci = cs_findchan(av[0]);
+            if (!(ci && (ci->flags & CI_VERBOTEN)))
                 alog("debug: MODE %s for nonexistent channel %s",
                      merge_args(ac - 1, av + 1), av[0]);
-            }
+        }
         return;
     }
 

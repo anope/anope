@@ -91,7 +91,7 @@ int do_svsnick(User * u)
 
     /* Truncate long nicknames to NICKMAX-2 characters */
     if (strlen(newnick) > (NICKMAX - 2)) {
-        notice_lang(s_NickServ, u, NICK_X_TRUNCATED,
+        notice_lang(s_OperServ, u, NICK_X_TRUNCATED,
                     newnick, NICKMAX - 2, newnick);
         newnick[NICKMAX - 2] = '\0';
     }
@@ -112,9 +112,9 @@ int do_svsnick(User * u)
     if (!finduser(nick)) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else if (finduser(newnick)) {
-        notice_lang(s_NickServ, u, NICK_X_IN_USE, newnick);
+        notice_lang(s_OperServ, u, NICK_X_IN_USE, newnick);
     } else if ((na = findnick(newnick)) && (na->status & NS_VERBOTEN)) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, newnick);
+        notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick);
     } else {
         notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick);
         anope_cmd_global(s_OperServ, "%s used SVSNICK to change %s to %s",

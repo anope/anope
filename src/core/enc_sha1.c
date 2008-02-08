@@ -20,14 +20,14 @@ A million repetitions of "a"
 #include <string.h>
 
 typedef struct {
-    unsigned long state[5];
-    unsigned long count[2];
+    uint32 state[5];
+    uint32 count[2];
     unsigned char buffer[64];
 } SHA1_CTX;
 
-void SHA1Transform(unsigned long state[5], const unsigned char buffer[64]);
+void SHA1Transform(uint32 state[5], unsigned char const buffer[64]);
 void SHA1Init(SHA1_CTX* context);
-void SHA1Update(SHA1_CTX* context, const unsigned char* data, unsigned int len);
+void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len);
 void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
@@ -53,12 +53,12 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context);
 
 /* Hash a single 512-bit block. This is the core of the algorithm. */
 
-void SHA1Transform(unsigned long state[5], const unsigned char buffer[64])
+void SHA1Transform(uint32 state[5], unsigned char const buffer[64])
 {
-unsigned long a, b, c, d, e;
+uint32 a, b, c, d, e;
 typedef union {
     unsigned char c[64];
-    unsigned long l[16];
+    uint32 l[16];
 } CHAR64LONG16;
 CHAR64LONG16* block;
 #ifdef SHA1HANDSOFF
@@ -122,9 +122,9 @@ void SHA1Init(SHA1_CTX* context)
 
 /* Run your data through this. */
 
-void SHA1Update(SHA1_CTX* context, const unsigned char* data, unsigned int len)
+void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len)
 {
-unsigned int i, j;
+uint32 i, j;
 
     j = (context->count[0] >> 3) & 63;
     if ((context->count[0] += len << 3) < (len << 3)) context->count[1]++;
@@ -146,7 +146,7 @@ unsigned int i, j;
 
 void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 {
-unsigned long i, j;
+uint32 i;
 unsigned char finalcount[8];
 
     for (i = 0; i < 8; i++) {
@@ -163,7 +163,7 @@ unsigned char finalcount[8];
          ((context->state[i>>2] >> ((3-(i & 3)) * 8) ) & 255);
     }
     /* Wipe variables */
-    i = j = 0;
+    i = 0;
     memset(context->buffer, 0, 64);
     memset(context->state, 0, 20);
     memset(context->count, 0, 8);
@@ -172,49 +172,6 @@ unsigned char finalcount[8];
     SHA1Transform(context->state, context->buffer);
 #endif
 }
-
-
-/*************************************************************/
-
-/*
-int main(int argc, char** argv)
-{
-    int i, j;
-    SHA1_CTX context;
-    unsigned char digest[20], buffer[16384];
-    FILE* file;
-
-    if (argc > 2) {
-        puts("Public domain SHA-1 implementation - by Steve Reid <steve@edmweb.com>");
-        puts("Produces the SHA-1 hash of a file, or stdin if no file is specified.");
-        exit(0);
-    }
-    if (argc < 2) {
-        file = stdin;
-    }
-    else {
-        if (!(file = fopen(argv[1], "rb"))) {
-            fputs("Unable to open file.", stderr);
-            exit(-1);
-        }
-    } 
-    SHA1Init(&context);
-    while (!feof(file)) { 
-        i = fread(buffer, 1, 16384, file);
-        SHA1Update(&context, buffer, i);
-    }
-    SHA1Final(digest, &context);
-    fclose(file);
-    for (i = 0; i < 5; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("%02X", digest[i*4+j]);
-        }
-        putchar(' ');
-    }
-    putchar('\n');
-    exit(0);
-}
-    */
 
 /*****************************************************************************/
 

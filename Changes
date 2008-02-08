@@ -33,6 +33,9 @@ Anope Version  S V N
 02/07 F findchan() debug messages not being logical.                      [#857]
 02/07 F NickServ replying to SVSNICK command when OperServ must.          [#861]
 
+Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
+02/08 F x86_64 generating improper SHA1 hash values.                      [#856]
+
 Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]
 02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]

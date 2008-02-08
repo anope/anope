@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1378"
+VERSION_BUILD="1379"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1379)
+# BUGS  : 856
+# NOTES : x86_64 generating improper SHA1 hash values. Thanks Johno Crawford ;)
 #
 # BUILD : 1.7.21 (1378)
 # BUGS  : 861

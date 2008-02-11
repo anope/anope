@@ -1259,7 +1259,7 @@ Optional Packages:
  --with-rungroup=group     Specify the rungroup for anope
  --with-permissions=permissions     Specify the default permissions for anope
  --with-bindir=bindir     Specify the default binary dir for anope
- --with-datadir=datadir     Specify the location of the services data folder
+ --with-datadir=datadir   Specify the location of the services data folder
 
 Some influential environment variables:
   CC          C compiler command
@@ -1694,11 +1694,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-if test $# = 0; then
-   echo "You might want to run ./Config or provide some parameters to this script."
-   echo "./configure --help for information about this script"
-   exit 0
+# If no bindir, we tell him to run ./Config.
+if test "${with_bindir+set}" != set || test "${with_datadir+set}" != set; then
+  echo "You might want to run ./Config or provide some parameters to this script."
+  echo "./configure --help for information about this script"
+  exit 0
 fi
+
 
 ac_config_headers="$ac_config_headers include/sysconf.h"
 
@@ -8328,7 +8330,6 @@ _ACEOF
 
 fi
 done
-
 
 
 

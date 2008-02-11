@@ -9,15 +9,16 @@ dnl details.
 dnl Based heavily on the Unreal configure.in script, and extra thanks to
 dnl codemastr from UnrealIRCD.
 
-
 AC_INIT
-AC_CONFIG_SRCDIR([src/actions.c])
-if test $# = 0; then
-   echo "You might want to run ./Config or provide some parameters to this script."
-   echo "./configure --help for information about this script"
-   exit 0
+
+# If no bindir, we tell him to run ./Config.
+if test "${with_bindir+set}" != set || test "${with_datadir+set}" != set; then
+  echo "You might want to run ./Config or provide some parameters to this script."
+  echo "./configure --help for information about this script"
+  exit 0
 fi
 
+AC_CONFIG_SRCDIR([src/actions.c])
 AC_CONFIG_HEADER(include/sysconf.h)
 AC_PROG_CC
 if test "$ac_cv_c_compiler_gnu" = "yes"; then
@@ -256,7 +257,6 @@ AC_CHECK_FUNCS(gethostbyname_r,AC_DEFINE(HAVE_GETHOSTBYNAME_R,1))
 AC_CHECK_FUNCS(strlcpy,AC_DEFINE(HAVE_STRLCPY,1))
 AC_CHECK_FUNCS(strlcat,AC_DEFINE(HAVE_STRLCAT,1))
 
-
 AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope], [ 
     AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group")
     RUNGROUP=$withval
@@ -276,7 +276,7 @@ AC_ARG_WITH(bindir, [ --with-bindir=bindir     Specify the default binary dir fo
 
 AC_SUBST(BINDEST)
 
-AC_ARG_WITH(datadir, [ --with-datadir=datadir     Specify the location of the services data folder], [
+AC_ARG_WITH(datadir, [ --with-datadir=datadir   Specify the location of the services data folder], [
  AC_DEFINE_UNQUOTED(SERVICES_DIR,"$withval","services bin dir")
  AC_DEFINE_UNQUOTED(MODULE_PATH,"${withval}/modules/","Module dir")
  DATDEST=$withval

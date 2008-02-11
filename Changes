@@ -32,6 +32,7 @@ Anope Version  S V N
 02/07 F Oddity in do_cmode().                                             [#859]
 02/07 F findchan() debug messages not being logical.                      [#857]
 02/07 F NickServ replying to SVSNICK command when OperServ must.          [#861]
+02/11 F Fixed configure script so it will complain about args.            [#864]
 
 Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
 02/08 F x86_64 generating improper SHA1 hash values.                      [#856]

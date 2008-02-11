@@ -793,15 +793,22 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     /* We can now (really) add the AKILL. */
     mask2 = sstrdup(mask);
     host = strchr(mask2, '@');
-    if (!host)
+
+    if (!host) {
+        free(mask2);
         return -1;
+    }
+
     user = mask2;
     *host = 0;
     host++;
 
     entry = scalloc(sizeof(Akill), 1);
-    if (!entry)
+
+    if (!entry) {
+        free(mask2);
         return -1;
+    }
 
     entry->user = sstrdup(user);
     entry->host = sstrdup(host);

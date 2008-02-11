@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1381"
+VERSION_BUILD="1382"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1382)
+# BUGS  : 870
+# NOTES : Fixed memory leak in cs_akick().
 #
 # BUILD : 1.7.21 (1381)
 # BUGS  : 868

@@ -662,14 +662,17 @@ int init_secondary(int ac, char **av)
                 if (debug)
                     alog("debug: Loaded %s database (2/%d)", s_HostServ,
                          (PreNickDBName ? 8 : 7));
+            } else if (debug) {
+                alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
             }
             if (s_BotServ) {
                 load_bs_dbase();
                 if (debug)
                     alog("debug: Loaded %s database (3/%d)", s_BotServ,
                          (PreNickDBName ? 8 : 7));
-            } else if (debug)
+            } else if (debug) {
                 alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
+            }
             load_cs_dbase();
             if (debug)
                 alog("debug: Loaded %s database (4/%d)", s_ChanServ,

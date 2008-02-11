@@ -35,6 +35,7 @@ Anope Version  S V N
 02/11 F Fixed configure script so it will complain about args.            [#864]
 02/11 F Fixed memory leak in add_akill().                                 [#868]
 02/11 F Fixed memory leak in cs_akick().                                  [#870]
+02/11 F Added missed debug message when HostServ is disabled.             [#863]
 
 Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
 02/08 F x86_64 generating improper SHA1 hash values.                      [#856]

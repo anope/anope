@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1382"
+VERSION_BUILD="1383"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1383)
+# BUGS  : 863
+# NOTES : Added missed debug message when HostServ is disabled.
 #
 # BUILD : 1.7.21 (1382)
 # BUGS  : 870

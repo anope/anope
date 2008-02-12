@@ -81,6 +81,8 @@ int do_list(User * u)
  * SADMINS will be shown forbidden nicks and the "!" indicator.
  * Syntax for sadmins: LIST pattern [FORBIDDEN] [NOEXPIRE]
  * -TheShadow
+ *
+ * UPDATE: SUSPENDED keyword is now accepted as well.
  */
 
 
@@ -94,6 +96,7 @@ int do_list(User * u)
     int16 matchflags = 0;
     NickRequest *nr = NULL;
     int nronly = 0;
+    int susp_keyword = 0;
     char noexpire_char = ' ';
     int count = 0, from = 0, to = 0, tofree = 0;
     char *tmp = NULL;
@@ -152,6 +155,8 @@ int do_list(User * u)
                 matchflags |= NS_VERBOTEN;
             if (stricmp(keyword, "NOEXPIRE") == 0)
                 matchflags |= NS_NO_EXPIRE;
+            if (stricmp(keyword, "SUSPENDED") == 0)
+                susp_keyword = 1;
             if (stricmp(keyword, "UNCONFIRMED") == 0)
                 nronly = 1;
         }
@@ -168,7 +173,9 @@ int do_list(User * u)
                     if ((na->nc->flags & NI_PRIVATE) && !is_servadmin
                         && na->nc != mync)
                         continue;
-                    if ((matchflags != 0) && !(na->status & matchflags))
+                    if ((matchflags != 0) && !(na->status & matchflags) && (susp_keyword == 0))
+                        continue;
+		    else if ((susp_keyword == 1) && !(na->nc->flags & NI_SUSPENDED))
                         continue;
 
                     /* We no longer compare the pattern against the output buffer.
@@ -198,6 +205,9 @@ int do_list(User * u)
                             } else if (na->status & NS_VERBOTEN) {
                                 snprintf(buf, sizeof(buf),
                                          "%-20s  [Forbidden]", na->nick);
+                            } else if (na->nc->flags & NI_SUSPENDED) {
+                                snprintf(buf, sizeof(buf),
+                                         "%-20s  [Suspended]", na->nick);
                             } else {
                                 snprintf(buf, sizeof(buf), "%-20s  %s",
                                          na->nick, na->last_usermask);

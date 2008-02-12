@@ -483,13 +483,10 @@ int init_secondary(int ac, char **av)
 
     /* Parse the defcon mode string if needed */
     if (DefConLevel) {
-        int defconCount;
-        for (defconCount = 1; defconCount <= 5; defconCount++) {
-            if (!defconParseModeString(DefConChanModes)) {
-                fprintf(stderr,
-                        "services.conf: The given DefConChanModes mode string was incorrect (see log for exact errors)\n");
-                return -1;
-            }
+        if (!defconParseModeString(DefConChanModes)) {
+            fprintf(stderr,
+                    "services.conf: The given DefConChanModes mode string was incorrect (see log for exact errors)\n");
+            return -1;
         }
     }
 #ifndef _WIN32

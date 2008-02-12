@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1385"
+VERSION_BUILD="1386"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1386)
+# BUGS  : 867
+# NOTES : Removed extra loop when parsing defcon modes.
 #
 # BUILD : 1.7.21 (1385)
 # BUGS  : 862

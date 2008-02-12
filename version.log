@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1383"
+VERSION_BUILD="1384"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1384)
+# BUGS  : 870
+# NOTES : Fixed segfault introduced y me trying to fix 870.
 #
 # BUILD : 1.7.21 (1383)
 # BUGS  : 863

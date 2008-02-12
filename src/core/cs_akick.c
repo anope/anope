@@ -274,7 +274,7 @@ int do_akick(User * u)
             akick->flags |= AK_ISNICK;
             akick->u.nc = nc;
         } else {
-            akick->u.mask = mask;
+            akick->u.mask = sstrdup(mask);
         }
         akick->creator = sstrdup(u->nick);
         akick->addtime = time(NULL);

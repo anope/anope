@@ -36,6 +36,7 @@ Anope Version  S V N
 02/11 F Fixed memory leak in add_akill().                                 [#868]
 02/11 F Fixed memory leak in cs_akick().                                  [#870]
 02/11 F Added missed debug message when HostServ is disabled.             [#863]
+02/12 F rdb_close() where rdb_open() is used in rdb_dbase() functions.    [#862]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]

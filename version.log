@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1384"
+VERSION_BUILD="1385"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1385)
+# BUGS  : 862
+# NOTES : rdb_close() where rdb_open() is used in rdb_dbase() functions.
 #
 # BUILD : 1.7.21 (1384)
 # BUGS  : 870

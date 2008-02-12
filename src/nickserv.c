@@ -860,18 +860,22 @@ void save_ns_rdb_dbase(void)
 
     if (rdb_tag_table("anope_ns_core") == 0) {
         alog("Unable to tag 'anope_ns_core' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
     if (rdb_tag_table("anope_ns_alias") == 0) {
         alog("Unable to tag 'anope_ns_alias' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
     if (rdb_tag_table("anope_ns_access") == 0) {
         alog("Unable to tag 'anope_ns_access' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
     if (rdb_tag_table_where("anope_ms_info", "serv='NICK'") == 0) {
         alog("Unable to tag 'anope_ms_info' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
 
@@ -879,6 +883,7 @@ void save_ns_rdb_dbase(void)
         for (nc = nclists[i]; nc; nc = nc->next) {
             if (rdb_save_ns_core(nc) == 0) {
                 alog("Unable to save NickCore for '%s' - NickServ RDB save failed.", nc->display);
+                rdb_close();
                 return;
             }
         }                       /* for (nc) */
@@ -888,6 +893,7 @@ void save_ns_rdb_dbase(void)
         for (na = nalists[i]; na; na = na->next) {
             if (rdb_save_ns_alias(na) == 0) {
                 alog("Unable to save NickAlias for '%s' - NickServ RDB save failed.", na->nick);
+                rdb_close();
                 return;
             }
         }                       /* for (na) */
@@ -895,20 +901,21 @@ void save_ns_rdb_dbase(void)
 
     if (rdb_clean_table("anope_ns_core") == 0) {
         alog("Unable to clean table 'anope_ns_core' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
     if (rdb_clean_table("anope_ns_alias") == 0) {
         alog("Unable to clean table 'anope_ns_alias' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
     if (rdb_clean_table("anope_ns_access") == 0) {
         alog("Unable to clean table 'anope_ns_access' - NickServ RDB save failed.");
+        rdb_close();
         return;
     }
-    if (rdb_clean_table_where("anope_ms_info", "serv='NICK'") == 0) {
+    if (rdb_clean_table_where("anope_ms_info", "serv='NICK'") == 0)
         alog("Unable to clean table 'anope_ms_info' - NickServ RDB save failed.");
-        return;
-    }
 
     rdb_close();
 #endif
@@ -925,6 +932,7 @@ void save_ns_req_rdb_dbase(void)
 
     if (rdb_tag_table("anope_ns_request") == 0) {
         alog("Unable to tag table 'anope_ns_request' - NickServ Request RDB save failed.");
+        rdb_close();
         return;
     }
 
@@ -933,15 +941,14 @@ void save_ns_req_rdb_dbase(void)
             if (rdb_save_ns_req(nr) == 0) {
                 /* Something went wrong - abort saving */
                 alog("Unable to save NickRequest (nick '%s') - NickServ Request RDB save failed.", nr->nick);
+                rdb_close();
                 return;
             }
         }
     }
 
-    if (rdb_clean_table("anope_ns_request") == 0) {
+    if (rdb_clean_table("anope_ns_request") == 0)
         alog("Unable to clean table 'anope_ns_request' - NickServ Request RDB save failed.");
-        return;
-    }
 
     rdb_close();
 #endif

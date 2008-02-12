@@ -509,6 +509,7 @@ void save_hs_rdb_dbase(void)
 
     if (rdb_tag_table("anope_hs_core") == 0) {
         alog("Unable to tag table 'anope_hs_core' - HostServ RDB save failed.");
+        rdb_close();
         return;
     }
 
@@ -516,15 +517,14 @@ void save_hs_rdb_dbase(void)
     while (current != NULL) {
         if (rdb_save_hs_core(current) == 0) {
             alog("Unable to save HostCore for %s - HostServ RDB save failed.", current->nick);
+            rdb_close();
             return;
         }
         current = current->next;
     }
 
-    if (rdb_clean_table("anope_hs_core") == 0) {
+    if (rdb_clean_table("anope_hs_core") == 0)
         alog("Unable to clean table 'anope_hs_core' - HostServ RDB save failed.");
-        return;
-    }
 
     rdb_close();
 #endif

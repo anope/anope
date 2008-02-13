@@ -803,7 +803,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST patro
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST patro [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST patro [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Lllista de resultats concordant %s:
 NICK_LIST_RESULTS
@@ -4168,7 +4168,7 @@ NICK_SERVADMIN_HELP_INFO
 	ALL amb qualsevol nick.
 
 NICK_SERVADMIN_HELP_LIST
-	Sintaxis: LIST patró [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Sintaxis: LIST patró [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Llista tots els nicknames registrats que concordin amb el
 	patró donat, en el format nick!usuari@host. Nicks amb
@@ -4177,8 +4177,8 @@ NICK_SERVADMIN_HELP_LIST
 	un ! avantposat al nickname per a administradors de
 	serveis.
 	
-	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
-	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
 	NOEXPIRE flag set will be displayed. If all three options are
 	given, all three types of nicks will be displayed. These options
 	are limited to Services admins.  

@@ -812,7 +812,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST trefbeeld
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST trefbeeld [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST trefbeeld [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Lijst van nicks overeenkomend met %s:
 NICK_LIST_RESULTS
@@ -4092,7 +4092,7 @@ NICK_SERVADMIN_HELP_INFO
 	Services admins mogen het ALL parameter met elke nick gebruiken.
 
 NICK_SERVADMIN_HELP_LIST
-	Gebruik: trefbeeld [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Gebruik: trefbeeld [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Geeft alle geregistreerde nicknames weer die overeen komen
 	met het gegeven trefbeeld, in nick!gebruiker@host formaat.
@@ -4101,8 +4101,8 @@ NICK_SERVADMIN_HELP_LIST
 	een ! voor de naam hebben als een Services admin de lijst
 	bekijkt.
 	
-	If the FORBIDDEN, NOEXPIRE or UNCONFIRMED options are given, only
-	nicks which, respectively, are FORBIDden, UNCONFIRMED or have the
+	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
+	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
 	NOEXPIRE flag set will be displayed. If all three options are
 	given, all three types of nicks will be displayed. These options
 	are Gelimiteerd tot Services admins.  

@@ -794,7 +794,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST pattern
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Lista dei nick che corrispondono a %s:
 NICK_LIST_RESULTS
@@ -4060,7 +4060,7 @@ NICK_SERVADMIN_HELP_INFO
 	I Services admin possono usare il parametro ALL con tutti i nick.
 
 NICK_SERVADMIN_HELP_LIST
-	Sintassi: LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Sintassi: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Mostra tutti i nick registrati che corrispondono al
 	pattern specificato, nel formato nick!user@host.
@@ -4069,8 +4069,8 @@ NICK_SERVADMIN_HELP_LIST
 	attiva avranno un ! prima del nick stesso (solo per i
 	Services admin).
 	
-	Se sono specificate le opzioni FORBIDDEN, NOEXPIRE o UNCONFIRMED,
-	unicamente i nick che sono rispettivamente vietati (FORBIDden),
+	Se sono specificate le opzioni FORBIDDEN, SUSPENDED, NOEXPIRE o UNCONFIRMED,
+	unicamente i nick che sono rispettivamente vietati (FORBIDden), SUSPENDED, 
 	non confermati (UNCONFIRMED) oppure hanno la flag NOEXPIRE impostata
 	verranno mostrati. Se tutte e tre le opzioni sono specificate, tutti
 	e tre i tipi di nick verranno mostrati. Queste opzioni sono

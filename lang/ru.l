@@ -788,7 +788,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST маска
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST маска [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	—писок, содержащий %s:
 NICK_LIST_RESULTS
@@ -4008,7 +4008,7 @@ NICK_SERVADMIN_HELP_INFO
 	ALL дл€ любого ника.
 
 NICK_SERVADMIN_HELP_LIST
-	—интаксис: LIST маска [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	—интаксис: LIST маска [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	ѕоказывает список всех зарегистрированных ников которые попадают под
 	введенную маску, в формате ник!идент@хост. Ќики, у которых включена
@@ -4016,8 +4016,8 @@ NICK_SERVADMIN_HELP_LIST
 	с включенным параметром NOEXPIRE будут показаны с префиксом ! перед
 	ником.
 	
-	≈сли указаны опции FORBIDDEN, NOEXPIRE или UNCONFIRMED, будут
-	показаны только те ники, которые в режиме FORBIDDEN (запрещен),
+	≈сли указаны опции FORBIDDEN, SUSPENDED, NOEXPIRE или UNCONFIRMED, будут
+	показаны только те ники, которые в режиме FORBIDDEN (запрещен), SUSPENDED,
 	UNCONFIRMED (не подтвержден) или имеют установку
 	NOEXPIRE (режим не-истечени€). ≈сли указаны все три опци,
 	все три типа ников будут показаны. 

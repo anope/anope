@@ -5,6 +5,8 @@ Anope Version  S V N
 
 *** Mod Strings:
 	NICK_RECOVERED
+	NICK_LIST_SERVADMIN_SYNTAX
+	NICK_SERVADMIN_HELP_LIST
 
 *** Del Strings:
 

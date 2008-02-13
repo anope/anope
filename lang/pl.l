@@ -854,7 +854,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST wzór
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST wzór [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST wzór [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Lista pasuj±cych wpisów %s:
 NICK_LIST_RESULTS
@@ -4383,7 +4383,7 @@ NICK_SERVADMIN_HELP_INFO
 	ALL dla ka¿dego nicka.
 
 NICK_SERVADMIN_HELP_LIST
-	Sk³adnia: LIST wzór [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Sk³adnia: LIST wzór [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Wy¶wietla wszystkie zarejestrowane nicki zgodnie z 
 	podanym wzorem w postaci nick!ident@host. Nicki, 
@@ -4392,7 +4392,7 @@ NICK_SERVADMIN_HELP_LIST
 	flag± NOEXPIRE zostan± oznaczone znakiem ! 
 	na li¶cie dla administratorów serwisów.
 	
-	Je¶li podane bêd± flagi FORBIDDEN, NOEXPIRE lub 
+	Je¶li podane bêd± flagi FORBIDDEN, SUSPENDED, NOEXPIRE lub 
 	UNCONFIRMED to wtedy nicki, które je posiadaj± bêd± 
 	wy¶wietlone. Je¶li wszystkie 3 opcje bêd± ustawione 
 	to wszystkie 3 typy nicków bêd± wy¶wietlone. Ta 

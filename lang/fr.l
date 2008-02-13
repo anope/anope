@@ -814,7 +814,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST modèle
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST modèle [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST modèle [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Liste des entrées correspondantes à %s:
 NICK_LIST_RESULTS
@@ -4214,7 +4214,7 @@ NICK_SERVADMIN_HELP_INFO
 	avec n'importe quel pseudo.
 
 NICK_SERVADMIN_HELP_LIST
-	Syntaxe: LIST modèle [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Syntaxe: LIST modèle [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 	
 	Liste tous les pseudos enregistrés qui correspondent au modèle
 	donné, de format nick!user@host. Les pseudos ayant l'option
@@ -4222,8 +4222,8 @@ NICK_SERVADMIN_HELP_LIST
 	pseudos ayant l'option NOEXPIRE seront préfixés par un !
 	devant leur pseudo pour les Services admins. 
 	
-	Si les option FORBIDDEN, NOEXPIRE ou UNCONFIRMED sont donné,
-	les pseudos qui sont FORBID, NON CONFIRMER ou ont l'option
+	Si les option FORBIDDEN, SUSPENDED, NOEXPIRE ou UNCONFIRMED sont donné,
+	les pseudos qui sont FORBID, SUSPENDED, NON CONFIRMER ou ont l'option
 	NOEXPIRE seront affiché. Si les 3 options sont indiquées,
 	tout les pseudos correspondant aux 3 critères seront affichés.
 	Réservé aux Services admins.  

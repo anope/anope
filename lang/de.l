@@ -820,7 +820,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST Muster
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST Muster [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST Muster [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Liste der gefundenen Einträge %s:
 NICK_LIST_RESULTS
@@ -4230,7 +4230,7 @@ NICK_SERVADMIN_HELP_INFO
 	jeden beliebigen Nickname benutzen.
 
 NICK_SERVADMIN_HELP_LIST
-	Syntax: LIST Muster [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	Syntax: LIST Muster [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 
 	Zeigt alle registrierten Nicknamen an, die einem bestimmten
 	Muster, nickname!user@host, entsprechen. Nicknamen mit 
@@ -4239,9 +4239,9 @@ NICK_SERVADMIN_HELP_LIST
 	NOEXPIRE eingeschaltet ist, werden ein ! vor ihrem
 	Eintrag in der Liste haben.
 	
-	Wenn die Option FORBIDDEN, NOEXPIRE oder UNCONFIRMED angegeben wird,
+	Wenn die Option FORBIDDEN, SUSPENDED, NOEXPIRE oder UNCONFIRMED angegeben wird,
 	werden nur Nicknamen angezeigt die das entsprechene Muster haben
-	(FORBIDDEN, UNCONFIRMED oder NOEXPIRE). Wenn alle 3 Optionen angegeben
+	(FORBIDDEN, SUSPENDED, UNCONFIRMED oder NOEXPIRE). Wenn alle 3 Optionen angegeben
 	werden, werden alle Nicknamen angezeigt die den 3 Muster entsprechen. 
 	
 	Diese Funktion ist beschränkt auf Services Administratoren.

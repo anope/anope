@@ -800,7 +800,7 @@ NICK_INFO_SUSPENDED_NO_REASON
 NICK_LIST_SYNTAX
 	LIST pattern
 NICK_LIST_SERVADMIN_SYNTAX
-	LIST pattern [FORBIDDEN] [NOEXPIRE] [UNCONFIRMED]
+	LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
 NICK_LIST_HEADER
 	Azon bejegyzések listája, melyek egyeznek ezzel, %s:
 NICK_LIST_RESULTS
@@ -4072,7 +4072,7 @@ NICK_SERVADMIN_HELP_INFO
 	Szervíz adminok használhatják az ALL paramétert.
 
 NICK_SERVADMIN_HELP_LIST
-	Syntax: LIST pattern [FORBIDDEN] [NOEXPIRE]
+	Syntax: LIST pattern [FORBIDDEN] [SUSPENDED] [NOEXPIRE]
 	
 	Listáz minden regisztrált nicknevet, amely vagy nicknév
 	vagy az utoljára látott cím (user@hostformában), amely
@@ -4081,7 +4081,7 @@ NICK_SERVADMIN_HELP_LIST
 	NOEXPIRE opcióval beállítva !prefixel jelennek meg
 	a szervíz adminoknak.
 	
-	Ha a FORBIDDEN vagy NOEXPIRE opció meg van adva, csak azok
+	Ha a FORBIDDEN, SUSPENDED vagy NOEXPIRE opció meg van adva, csak azok
 	a nickek amelyek vagy forbidoltak vagy NOEXPIRE flegjük van
 	fognak  megjelenik. Ha mindkét opció meg van adva mindkét
 	tipus megjelenik. Az opciók korlátozva Services adminoknak.

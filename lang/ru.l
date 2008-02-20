@@ -690,6 +690,14 @@ NICK_SASET_AUTOOP_ON
 NICK_SASET_AUTOOP_OFF
 	Теперь, сервисы больше не будут автоматически давать статус для %s на каналах.
 
+# SASET LANGUAGE responses
+NICK_SASET_LANGUAGE_SYNTAX
+	SASET LANGUAGE number
+NICK_SASET_LANGUAGE_UNKNOWN
+	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
+NICK_SASET_LANGUAGE_CHANGED
+	Language changed to Russian.
+
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
@@ -3706,6 +3714,8 @@ NICK_HELP_SASET
 	    MSG        Изменяет режим сообщения с сервисами
 	    NOEXPIRE   Устанавливает на ник режим не-истечения
 	    AUTOOP     Включает или выключает режим автостатуса
+	    LANGUAGE   Set the language Services will use when
+	               sending messages to nickname
 	
 	Введите %R%S HELP SASET опция для большей информации
 	о какой-либо опции. Опции будут установлены для указаного
@@ -3813,6 +3823,14 @@ NICK_HELP_SASET_AUTOOP
 	Активирует\деактивирует режим автоматического получения статуса
 	на каналах. Установите в ON, если хотите, что бы ChanServ
 	автоматически давал статус нику при заходе на канал.
+
+NICK_HELP_SASET_LANGUAGE
+	Syntax: SASET nickname LANGUAGE number
+	
+	Changes the language Services uses when sending messages to
+	nickname (for example, when responding to a command he sends).
+	number should be chosen from a list of supported languages
+	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
 	Синтаксис: RECOVER ник [пароль]

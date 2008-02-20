@@ -39,6 +39,7 @@ Anope Version  S V N
 02/12 F rdb_close() where rdb_open() is used in rdb_dbase() functions.    [#862]
 02/12 F Removed extra loop when parsing defcon modes.                     [#867]
 02/12 A Added SUSPENDED to NS LIST keywords.                              [#869]
+02/12 A Added NS SASET LANGUAGE.                                          [#872]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]

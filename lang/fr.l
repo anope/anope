@@ -713,6 +713,14 @@ NICK_SASET_AUTOOP_ON
 NICK_SASET_AUTOOP_OFF
 	Services will no longer autoop %s in channels.
 
+# SASET LANGUAGE responses
+NICK_SASET_LANGUAGE_SYNTAX
+	SASET LANGUAGE number
+NICK_SASET_LANGUAGE_UNKNOWN
+	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
+NICK_SASET_LANGUAGE_CHANGED
+	Language changed to French.
+
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
@@ -3873,6 +3881,8 @@ NICK_HELP_SASET
 	    HIDE       Cache certaine informations personnel au pseudo
 	    MSG        Change le mode de communication des services
 	    NOEXPIRE   Empêche le pseudo d'expirer
+	    LANGUAGE   Set the language Services will use when
+	               sending messages to nickname
 	
 	Taper %R%S HELP SASET option pour plus d'information
 	sur une option spécifique. L'option devra etre mise avec le pseudo
@@ -4011,6 +4021,14 @@ NICK_HELP_SASET_AUTOOP
 	channels.
 	
 	Limited to Services admins.
+
+NICK_HELP_SASET_LANGUAGE
+	Syntax: SASET nickname LANGUAGE number
+	
+	Changes the language Services uses when sending messages to
+	nickname (for example, when responding to a command he sends).
+	number should be chosen from a list of supported languages
+	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
 	Syntaxe: RECOVER pseudo [motdepasse]

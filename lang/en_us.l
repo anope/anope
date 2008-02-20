@@ -688,6 +688,14 @@ NICK_SASET_AUTOOP_ON
 NICK_SASET_AUTOOP_OFF
 	Services will no longer autoop %s in channels.
 
+# SASET LANGUAGE responses
+NICK_SASET_LANGUAGE_SYNTAX
+	SASET LANGUAGE number
+NICK_SASET_LANGUAGE_UNKNOWN
+	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
+NICK_SASET_LANGUAGE_CHANGED
+	Language changed to English.
+
 
 # ACCESS responses
 NICK_ACCESS_SYNTAX
@@ -3700,6 +3708,8 @@ NICK_HELP_SASET
 	    MSG        Change the communication method of Services
 	    NOEXPIRE   Prevent the nickname from expiring
 	    AUTOOP     Turn autoop on or off
+	    LANGUAGE   Set the language Services will use when
+	               sending messages to nickname
 	
 	Type %R%S HELP SASET option for more information
 	on a specific option. The options will be set on the given
@@ -3809,6 +3819,14 @@ NICK_HELP_SASET_AUTOOP
 	Sets whether the given nickname will be opped automatically.
 	Set to ON to allow ChanServ to op you automatically when joining
 	channels.
+
+NICK_HELP_SASET_LANGUAGE
+	Syntax: SASET nickname LANGUAGE number
+	
+	Changes the language Services uses when sending messages to
+	nickname (for example, when responding to a command he sends).
+	number should be chosen from a list of supported languages
+	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
 	Syntax: RECOVER nickname [password]

@@ -30,6 +30,7 @@ int do_saset_msg(User * u, NickCore * nc, char *param);
 int do_saset_hide(User * u, NickCore * nc, char *param);
 int do_saset_noexpire(User * u, NickAlias * nc, char *param);
 int do_saset_autoop(User * u, NickCore * nc, char *param);
+int do_saset_language(User * u, NickCore * nc, char *param);
 void myNickServHelp(User * u);
 
 /**
@@ -89,6 +90,9 @@ int AnopeInit(int argc, char **argv)
     c = createCommand("SASET AUTOOP", NULL, is_services_oper, -1, -1,
                       -1, NICK_HELP_SASET_AUTOOP,
                       NICK_HELP_SASET_AUTOOP);
+    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+    c = createCommand("SASET LANGUAGE", NULL, is_services_oper,
+                      -1, -1, -1, -1, NICK_HELP_SASET_LANGUAGE);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);
@@ -180,6 +184,8 @@ int do_saset(User * u)
         do_saset_noexpire(u, na, param);
     } else if (stricmp(cmd, "AUTOOP") == 0) {
         do_saset_autoop(u, na->nc, param); 
+    } else if (stricmp(cmd, "LANGUAGE") == 0) {
+        do_saset_language(u, na->nc, param);
     } else {
         notice_lang(s_NickServ, u, NICK_SASET_UNKNOWN_OPTION, cmd);
     }
@@ -512,5 +518,25 @@ int do_saset_autoop(User * u, NickCore * nc, char *param)
     return MOD_CONT;
 }
 
+int do_saset_language(User * u, NickCore * nc, char *param)
+{
+    int langnum;
+
+    if (param[strspn(param, "0123456789")] != 0) {      /* i.e. not a number */
+        syntax_error(s_NickServ, u, "SASET LANGUAGE",
+                     NICK_SASET_LANGUAGE_SYNTAX);
+        return MOD_CONT;
+    }
+    langnum = atoi(param) - 1;
+    if (langnum < 0 || langnum >= NUM_LANGS || langlist[langnum] < 0) {
+        notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_UNKNOWN, langnum + 1,
+                    s_NickServ);
+        return MOD_CONT;
+    }
+    nc->language = langlist[langnum];
+    notice_lang(s_NickServ, u, NICK_SASET_LANGUAGE_CHANGED);
+
+    return MOD_CONT;
+}
 
 /* EOF */

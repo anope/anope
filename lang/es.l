@@ -709,7 +709,7 @@ NICK_SASET_AUTOOP_OFF
 
 # SASET LANGUAGE responses
 NICK_SASET_LANGUAGE_SYNTAX
-	SASET LANGUAGE number
+	SASET nickname LANGUAGE number
 NICK_SASET_LANGUAGE_UNKNOWN
 	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
 NICK_SASET_LANGUAGE_CHANGED

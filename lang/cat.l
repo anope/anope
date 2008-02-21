@@ -705,7 +705,7 @@ NICK_SASET_AUTOOP_OFF
 
 # SASET LANGUAGE responses
 NICK_SASET_LANGUAGE_SYNTAX
-	SASET LANGUAGE number
+	SASET nickname LANGUAGE number
 NICK_SASET_LANGUAGE_UNKNOWN
 	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
 NICK_SASET_LANGUAGE_CHANGED
@@ -3987,10 +3987,10 @@ NICK_HELP_SASET_AUTOOP
 NICK_HELP_SASET_LANGUAGE
 	Syntax: SASET nickname LANGUAGE number
 	
-        Changes the language Services uses when sending messages to
-        nickname (for example, when responding to a command he sends).
-        number should be chosen from a list of supported languages
-        that you can get by typing %R%S HELP SET LANGUAGE.
+	Changes the language Services uses when sending messages to
+	nickname (for example, when responding to a command he sends).
+	number should be chosen from a list of supported languages
+	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
 	Sintaxis: RECOVER nickname [clau]

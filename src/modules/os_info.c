@@ -295,7 +295,7 @@ int myNickInfo(User * u)
                 if ((na = findnick(nick))) {
                     /* If we have any info on this user */
                     if ((info = moduleGetData(&na->nc->moduleData, "info"))) {
-                        notice_user(s_NickServ, u, "                Опер-Инфо: %s", info);
+                        notice_user(s_NickServ, u, " OperInfo: %s", info);
 						free(info);
                     }
                     /* NickCore not found! */
@@ -331,7 +331,7 @@ int myChanInfo(User * u)
                 if ((ci = cs_findchan(chan))) {
                     /* If we have any info on this channel */
                     if ((info = moduleGetData(&ci->moduleData, "info"))) {
-                        notice_user(s_ChanServ, u, "                  Опер-Инфо: %s", info);
+                        notice_user(s_ChanServ, u, " OperInfo: %s", info);
 						free(info);
                     }
                 }

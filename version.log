@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1390"
+VERSION_BUILD="1392"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1392)
+# BUGS  : 
+# NOTES : <Hal9000> fixes a potential crash in channels.c and does handle the TS on incoming FMODE in inspircd.11
 #
 # BUILD : 1.7.21 (1390)
 # BUGS  : 881

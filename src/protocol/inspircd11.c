@@ -667,11 +667,23 @@ int anope_event_fmode(char *source, int ac, char **av)
 {
     char *newav[25];
     int n, o;
+    Channel *c;
 
     /* :source FMODE #test 12345678 +nto foo */
     if (ac < 3)
         return MOD_CONT;
 
+    /* Checking the TS for validity to avoid desyncs */
+    c = findchan(av[0]);
+    if (c->creation_time > strtol(av[1], NULL, 10)) {
+    	/* Our TS is bigger, we should lower it */
+    	c->creation_time = strtol(av[1], NULL, 10);
+    } else if (c->creation_time < strtol(av[1], NULL, 10)) {
+    	/* The TS we got is bigger, we should ignore the message. */
+    	return MOD_CONT;
+    }
+    
+    /* TS's are equal now, so we can proceed with parsing */
     n = o = 0;
     while (n < ac) {
         if (n != 1) {

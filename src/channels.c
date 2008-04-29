@@ -785,8 +785,8 @@ void do_sjoin(const char *source, int ac, char **av)
             for (cu = c->users; cu; cu = cu->next) {
                 /* XXX */
                 cumodes[0] = "-ov";
-                cumodes[1] = user->nick;
-                cumodes[2] = user->nick;
+                cumodes[1] = cu->user->nick;
+                cumodes[2] = cu->user->nick;
                 chan_set_modes(source, c, 3, cumodes, 2);
             }
             if (c->ci && c->ci->bi) {

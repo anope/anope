@@ -52,6 +52,10 @@ Provided by Jan Milants <jan_renee@msn.com> - 2008
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]
 02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
 
+Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
+04/29 F Potential crash in channels.c.                                    [ #00]
+04/29 F TS handling on incoming FMODE with InspIRCd 1.1.                  [ #00]
+
 Anope Version 1.7.21
 --------------------
 12/30 F Grouped root nicks could result in loss of power when using MySQL.[#812]

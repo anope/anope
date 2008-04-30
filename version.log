@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1392"
+VERSION_BUILD="1393"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1393)
+# BUGS  : 
+# NOTES : Services Operators can now also use NickServ INFO ALL
 #
 # BUILD : 1.7.21 (1392)
 # BUGS  : 

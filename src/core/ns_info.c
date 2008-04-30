@@ -82,7 +82,8 @@ int do_info(User * u)
 
     NickAlias *na;
     NickRequest *nr = NULL;
-    int is_servadmin = is_services_admin(u);
+	/* Being an oper is enough from now on -GD */
+    int is_servadmin = is_services_oper(u);
 
     if (!nick) {
         syntax_error(s_NickServ, u, "INFO", NICK_INFO_SYNTAX);

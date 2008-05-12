@@ -654,7 +654,7 @@ void unreal_cmd_notice_ops(char *source, char *dest, char *buf)
         return;
     }
 
-    send_cmd(NULL, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
+    send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
 }
 
 

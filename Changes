@@ -42,6 +42,8 @@ Anope Version  S V N
 02/12 F Removed extra loop when parsing defcon modes.                     [#867]
 02/21 F Fixed errors in lang files related to NS SASET LANGUAGE           [#881]
 04/30 F Operators can now also use NickServ INFO ALL.                     [ #00]
+05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
+05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]

@@ -45,6 +45,9 @@ Anope Version  S V N
 05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 
+Provided by Scott Seufert <katsklaw@ircmojo.net> - 2008
+05/12 F install.js now works properly on x64 machines                     [#897]
+
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]
 

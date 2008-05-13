@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1393"
+VERSION_BUILD="1395"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1395)
+# BUGS  : 897
+# NOTES : install.js script now works properly on x64 machines
 #
 # BUILD : 1.7.21 (1393)
 # BUGS  : 

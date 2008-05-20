@@ -674,12 +674,16 @@ int anope_event_fmode(char *source, int ac, char **av)
         return MOD_CONT;
 
     /* Checking the TS for validity to avoid desyncs */
-    c = findchan(av[0]);
-    if (c->creation_time > strtol(av[1], NULL, 10)) {
-    	/* Our TS is bigger, we should lower it */
-    	c->creation_time = strtol(av[1], NULL, 10);
-    } else if (c->creation_time < strtol(av[1], NULL, 10)) {
-    	/* The TS we got is bigger, we should ignore the message. */
+    if ((c = findchan(av[0]))) {
+        if (c->creation_time > strtol(av[1], NULL, 10)) {
+            /* Our TS is bigger, we should lower it */
+            c->creation_time = strtol(av[1], NULL, 10);
+        } else if (c->creation_time < strtol(av[1], NULL, 10)) {
+            /* The TS we got is bigger, we should ignore this message. */
+            return MOD_CONT;
+        }
+    } else {
+        /* Got FMODE for a non-existing channel */
     	return MOD_CONT;
     }
     

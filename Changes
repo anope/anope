@@ -61,6 +61,7 @@ Provided by Jan Milants <jan_renee@msn.com> - 2008
 Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
 04/29 F Potential crash in channels.c.                                    [ #00]
 04/29 F TS handling on incoming FMODE with InspIRCd 1.1.                  [ #00]
+05/20 F Possible crash in new TS handling for InspIRCd 1.1.               [ #00]
 
 Anope Version 1.7.21
 --------------------

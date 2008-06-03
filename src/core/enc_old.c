@@ -8,7 +8,7 @@
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
  *
- * $Id: encrypt.c 953 2006-01-14 11:36:29Z certus $
+ * $Id$
  *
  */
 

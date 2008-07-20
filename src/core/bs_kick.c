@@ -112,7 +112,7 @@ int do_kickcmd(User * u)
     else if (!is_services_admin(u) && !check_access(u, ci, CA_SET))
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else if (!ci->bi)
-        notice_lang(s_BotServ, u, BOT_NOT_ASSIGNED);
+        notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
     else {
         if (!stricmp(option, "BADWORDS")) {
             if (!stricmp(value, "ON")) {

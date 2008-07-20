@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1400"
+VERSION_BUILD="1401"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1401)
+# BUGS  : 894
+# NOTES : Botserv replying with /(null). Thanks Jan
 #
 # BUILD : 1.7.21 (1400)
 # BUGS  : 892

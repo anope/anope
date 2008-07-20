@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1395"
+VERSION_BUILD="1398"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1398)
+# BUGS  : 910
+# NOTES : EVENT_BOT_KICK not being send under all circumstances. Thanks to Jan Milants for reporting and fixing.
 #
 # BUILD : 1.7.21 (1395)
 # BUGS  : 897

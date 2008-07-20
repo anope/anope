@@ -1001,6 +1001,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
 
     do_kick(ci->bi->nick, 3, av);
+    send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
 }
 
 /*************************************************************************/
@@ -1047,6 +1048,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
     else
         anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
+    send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
 }
 
 /*************************************************************************/

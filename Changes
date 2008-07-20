@@ -45,6 +45,9 @@ Anope Version  S V N
 05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 
+Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
+07/20 F Updated Deutch language file.                                     [#892]
+
 Provided by Scott Seufert <katsklaw@ircmojo.net> - 2008
 05/12 F install.js now works properly on x64 machines                     [#897]
 

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1399"
+VERSION_BUILD="1400"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1400)
+# BUGS  : 892
+# NOTES : Updated Deutch language file. Thanks to Christian
 #
 # BUILD : 1.7.21 (1399)
 # BUGS  : 909

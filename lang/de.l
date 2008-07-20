@@ -332,17 +332,17 @@ CS_LIST_INCORRECT_RANGE
 
 # Automatic messages
 HELP_LIMIT_SERV_OPER
-	Limited to Services Operators.
+	Diese Funktion  ist beschränkt auf Services Operatoren.
 HELP_LIMIT_SERV_ADMIN
-	Limited to Services Administrators.
+	Diese Funktion  ist beschränkt auf Services Administratoren.
 HELP_LIMIT_SERV_ROOT
-	Limited to Services Roots.
+	Diese Funktion  ist beschränkt auf Services Root-Administratoren.
 HELP_LIMIT_IRC_OPER
-	Limited to IRC Operators.
+	Diese Funktion  ist beschränkt auf IRC Operatoren.
 HELP_LIMIT_HOST_SETTER
-	Limited to Host Setters.
+	Diese Funktion  ist beschränkt auf Host Setters.
 HELP_LIMIT_HOST_REMOVER
-	Limited to Host Removers.
+	Diese Funktion  ist beschränkt auf Host Removers.
 
 
 ###########################################################################
@@ -3200,8 +3200,6 @@ OPER_HELP_EXCEPTION
 	die auf seinen Host zutrifft, "benutzen" wird. Grosse und
 	weit treffende Einträge in der Liste der Verbindungs-
 	einschränkungen senken die Performance der Services.
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_SESSION
 	Syntax: SESSION LIST threshold
@@ -3223,8 +3221,6 @@ OPER_HELP_SESSION
 	
 	Siehe die Hilfe zu EXCEPTION um weitere Informationen
 	über das Einschränken von Verbindungen zu erhalten.
-	
-	Beschränkt auf Services Administratoren.
 
 ###########################################################################
 #
@@ -3866,8 +3862,6 @@ NICK_HELP_SASET_DISPLAY
 	Ändert den Nicknamen der als Ursprung einer Nicknamengruppe
 	angezeigt wird. Der neue Ursprung muss ein Nickname der 
 	entsprechenden Gruppe sein.
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_PASSWORD
 	Syntax: SET nickname PASSWORD new-password
@@ -3875,16 +3869,12 @@ NICK_HELP_SASET_PASSWORD
 	Ändert das Passwort um sich als Besitzer eines Nicknamens
 	zu identifizieren.
 	
-	Beschränkt auf Services Admins.
-
 NICK_HELP_SASET_URL
 	Syntax: SASET nickname URL url
 	
 	Verknüpft eine URL mit dem Nicknamen. Diese URL wird
 	angezeigt wenn jemand mit dem INFO Befehl nähere 
 	Informationen zu dem Nicknamen abruft.
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_EMAIL
 	Syntax: SASET nickname EMAIL address
@@ -3892,16 +3882,12 @@ NICK_HELP_SASET_EMAIL
 	Verknüpft die angegeben Emailadresse mit dem
 	Nicknamen.
 	
-	Beschränkt auf Services Admins.
-	
 NICK_HELP_SASET_ICQ
 	Syntax: SASET nickname ICQ number
 	
 	Verknüpft die angegebene ICQ Nummer mit dem Nicknamen.
 	Diese ICQ Nummer wird angezeigt wenn jemand mit dem 
 	INFO Befehl nähere Informationen zu dem Nicknamen abruft.
-	
-	Beschränkt auf Services Admins.
 	
 NICK_HELP_SASET_GREET
 	Syntax: SASET nickname GREET message
@@ -3911,8 +3897,6 @@ NICK_HELP_SASET_GREET
 	den Channel betritt und die GREET Einstellung aktiviert
 	ist. Vorraussetzung ist, dass der Benutzer die entsprechenden
 	Rechte besitzt.
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_KILL
 	Syntax: SASET nickname KILL {ON | QUICK | IMMED | OFF}
@@ -3931,8 +3915,6 @@ NICK_HELP_SASET_KILL
 	unnötigerweise.
 	Ausserdem ist es möglich, dass die Netz-Admins
 	diese Option deaktiviert haben.
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_SECURE
 	Syntax: SASET nickname SECURE {ON | OFF}
@@ -3945,8 +3927,6 @@ NICK_HELP_SASET_SECURE
 	der Zugriffsliste stehst, wird %S bei 
 	fehlender Identifizierung den Nicknamen nicht killen
 	(ist von der KILL Option unabhängig).
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_PRIVATE
 	Syntax: SASET nickname PRIVATE {ON | OFF}
@@ -3959,8 +3939,6 @@ NICK_HELP_SASET_PRIVATE
 	(Jeder der den Nicknamen kennt, kann gezielt mit 
 	dem INFO Befehl Informationen über den Nicknamen 
 	abrufen, unabhängig vom Privat-Modus.)
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_HIDE
 	Syntax: SASET nickname HIDE {EMAIL | STATUS | USERMASK | QUIT} {ON | OFF}
@@ -3974,8 +3952,6 @@ NICK_HELP_SASET_HIDE
 	Der zweite Parameter bestimmt, ob die Information angezeigt
 	werden soll (OFF) oder nicht (ON).
 	
-	Beschränkt auf Services Admins.
-	
 NICK_HELP_SASET_MSG
 	Syntax: SASET nickname MSG {ON | OFF}
 	
@@ -3984,8 +3960,6 @@ NICK_HELP_SASET_MSG
 	Ist MSG eingeschaltet, benutzen die Services Messages
 	(Queries), ansonsten werden die Antworten als Notices
 	geschickt (Standard).
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_NOEXPIRE
 	Syntax: SASET nickname NOEXPIRE {ON | OFF}
@@ -3993,8 +3967,6 @@ NICK_HELP_SASET_NOEXPIRE
 	Bestimmt ob ein Nickname nach einer gewissen Zeit 
 	verfällt. Wird NOEXPIRE auf ON gesetzt verfällt
 	der Nickname nie.
-	
-	Beschränkt auf Services Admins.
 
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
@@ -4002,8 +3974,6 @@ NICK_HELP_SASET_AUTOOP
 	Sets whether the given nickname will be opped automatically.
 	Set to ON to allow ChanServ to op you automatically when joining
 	channels.
-	
-	Limited to Services admins.
 
 NICK_HELP_SASET_LANGUAGE
 	Syntax: SASET nickname LANGUAGE number
@@ -4288,8 +4258,6 @@ NICK_SERVADMIN_HELP_ALIST
 	Parametern werden alle Channel aufgelistet, in denen Nickname 
 	Zugriffslevel Level oder höher hat.
 
-	Beschränkt auf Services Administratoren.
-
 NICK_SERVADMIN_HELP_GLIST
 	Syntax: GLIST [Nickname]
 	
@@ -4298,8 +4266,6 @@ NICK_SERVADMIN_HELP_GLIST
 	
 	Ansonsten werden alle Nicknamen, die in der Gruppe des
 	angegebenen Nicknamens sind, aufgelistet.
-	
-	Diese Funktion  ist beschränkt auf Services Administratoren.
 
 NICK_SERVADMIN_HELP_GETPASS
 	Syntax: GETPASS Nickname
@@ -4309,8 +4275,6 @@ NICK_SERVADMIN_HELP_GETPASS
 	diese Aktion im Logbuch der Services vermerkt wird.
 	Zusätzlich wird eine Nachricht an alle IRC Operatoren
 	per WALLOPS/GLOBOPS ausgesandt.
-	
-	Beschränkt auf Services Administratoren.
 	
 	Dieser Befehl ist nicht verfügbar bei aktivierter
 	Verschlüsselung.
@@ -4323,8 +4287,6 @@ NICK_SERVADMIN_HELP_GETEMAIL
 	verwenden kannst. Immer, wenn dieser Befehl benutzt wird, wird
 	eine Nachricht mit dem Nickname der Person mitgeloggt.
 
-	Beschränkt auf Services Administratoren.
-
 NICK_SERVADMIN_HELP_FORBID
 	Syntax: FORBID Nickname [Grund]
 	
@@ -4334,22 +4296,16 @@ NICK_SERVADMIN_HELP_FORBID
 	
 	In bestimmten Netzen wird ein Grund für das
 	Verbot benötigt.
-	
-	Beschränkt auf Services Administratoren.
 
 NICK_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND Nickname Grund
 
 	SUSPEND verhindert das der angegebene Nickname sich identifizieren kann.
 
-	Beschränkt auf Services Administratoren.
-
 NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND Nickname
 
 	Gibt ein Nickname der SUSPENDED ist wieder frei.
-
-	Beschränkt auf Services Administratoren.
 
 ###########################################################################
 #
@@ -5404,8 +5360,6 @@ CHAN_SERVADMIN_HELP_GETPASS
 	diese Aktion im Logbuch der Services vermerkt wird.
 	Zusätzlich wird eine Nachricht an alle IRC Operatoren 
 	per WALLOPS/GLOBOPS ausgesandt.
-	
-	Beschränkt auf Services Administratoren.
 
 CHAN_SERVADMIN_HELP_FORBID
 	Syntax: FORBID Channel [Grund]
@@ -5417,8 +5371,6 @@ CHAN_SERVADMIN_HELP_FORBID
 	
 	Bei einigen Netzen muss evtl ein Grund angegeben
 	werden.
-	
-	Beschränkt auf Services Administratoren.
 
 CHAN_SERVADMIN_HELP_SUSPEND
 	Syntax: SUSPEND Channel [Grund]
@@ -5429,8 +5381,6 @@ CHAN_SERVADMIN_HELP_SUSPEND
 	werden.
 	
 	Ein Grund kann auf manchen Netzwerke notwendig sein.
-	
-	Beschränkt auf Services Administratoren.
 
 CHAN_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND Channel
@@ -5438,9 +5388,7 @@ CHAN_SERVADMIN_HELP_UNSUSPEND
 	Gibt einen Channel, der auf SUSPEND gesetzt ist,
 	wieder frei. Alle vorherigen Einstellungen werden
 	übernommen.
-
-	Beschränkt auf Services Administratoren.
-
+	
 CHAN_SERVADMIN_HELP_STATUS
 	Syntax: STATUS Channel Nickname
 	
@@ -5453,8 +5401,6 @@ CHAN_SERVADMIN_HELP_STATUS
 	zurückgeliefert:
 	
 	    STATUS ERROR error-message
-	
-	Beschränkt auf Services Admonistratoren.
 
 ###########################################################################
 #
@@ -5910,16 +5856,12 @@ OPER_HELP_IGNORE
 	Kombinationen dieser Units sind nicht erlaubt. Um einen User
 	permanent ignorieren zu lassen, tippe 0 als Zeit.
 
-	Beschränkt auf Services Administratoren.
-
 OPER_HELP_MODE
 	Syntax: MODE Channel Modi
 	
 	Erlaubt es Services Operatoren die Channel Modes eines
 	beliebigen Channels zu verändern. Der Paramater hat das
 	gleiche Format wie der normale /MODE Befehl.
-	
-	Beschränkt auf Services Operatoren.
 
 OPER_HELP_UMODE
 	Syntax: UMODE User Modi
@@ -5927,8 +5869,6 @@ OPER_HELP_UMODE
 	Erlaubt es Services Administratoren die Usermodi eines 
 	beliebigen Users zu ändern. Der Paramater hat das gleiche 
 	Format wie der normale /MODE Befehl.
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_OLINE
 	Syntax: OLINE User Flags
@@ -5938,16 +5878,12 @@ OPER_HELP_OLINE
 	werden. Um alle Operflags zu entfernen, nutze einfach ein 
 	"-" ohne Operflags.
 
-	Beschränkt auf Services Administratoren.
-
 OPER_HELP_CLEARMODES
 	Syntax: CLEARMODES Channel [ALL]
 	
 	Entfernt alle Modi und Bans eines Channels. 
 	Wird ALL angegeben, werden ebenfalls alle
 	Op-Flags und Voices (+o und +v Modi) entfernt.
-	
-	Beschränkt auf Services Operatoren.
 
 OPER_HELP_KICK
 	Syntax: KICK Channel User Grund
@@ -5959,15 +5895,11 @@ OPER_HELP_KICK
 	vor dem Grund haben. Zum Beispiel:
 	
 	*** SpamMan has been kicked off channel #my_channel by %S (chemical (Flood))
-	
-	Beschränkt auf Services Operators.
 
 OPER_HELP_SVSNICK
 	Syntax: SVSNICK Nickname Neuer-Nickname
 	
 	Erzwingt die Änderung des Nicknamens eines User zu dem neuen Nicknamen.
-	
-	Beschränkt auf Services Administratoren
 
 OPER_HELP_AKILL
 	Syntax: AKILL ADD [+Zeit] Maske Grund
@@ -6017,8 +5949,6 @@ OPER_HELP_AKILL
 	Maske mit dem Grund.
 	
 	AKILL CLEAR entfernt alle Einträge aus der AKILL-Liste.
-	
-	Beschränkt auf Services Operatoren.
 	
 OPER_HELP_SGLINE
 	Syntax: SGLINE ADD [+Zeit] Maske:Grund
@@ -6075,8 +6005,6 @@ OPER_HELP_SGLINE
 	
 	SGLINE CLEAR entfernt alle Einträge aus der 
 	SGLINE-Liste.
-	
-	Beschränkt auf Services Operatoren.
 
 OPER_HELP_SQLINE
 	Syntax: SQLINE ADD [+Zeit] Maske Grund
@@ -6125,8 +6053,6 @@ OPER_HELP_SQLINE
 	diese ausläuft, ausserdem die Maske und den Grund.
 	
 	SQLINE CLEAR löscht alle Einträge der SQLINE Liste.
-	
-	Beschränkt auf Services Operatoren.
 
 OPER_HELP_SZLINE
 	Syntax: SZLINE ADD [+Zeit] Maske Grund
@@ -6178,8 +6104,6 @@ OPER_HELP_SZLINE
 	die IP Maske mit dem Grund.
 	
 	SZLINE CLEAR entfernt alle Einträge aus der SZLINE-Liste.
-	
-	Beschränkt auf Services Operatoren.
 
 OPER_HELP_SET
 	Syntax: SET Option Einstellungen
@@ -6197,8 +6121,6 @@ OPER_HELP_SET
 	    SQL   	 SQL-Modus an oder aus
 	    IGNORE     Ignore-Modus an oder aus
 	    LIST       Optionen-Liste
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_SET_READONLY
 	Syntax: SET READONLY {ON | OFF}
@@ -6292,8 +6214,6 @@ OPER_HELP_NOOP
 	
 	Achtung: Der Server wird in keinster Weise
 	von den Services geprüft.
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_JUPE
 	Syntax: JUPE Server [Grund]
@@ -6305,8 +6225,6 @@ OPER_HELP_JUPE
 	entfernt werden. Wird ein Grund angegeben,
 	wird dieser im Server Informationsfeld angezeigt,
 	ansonsten nur "Jupitered by <nick>".
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_RAW
 	Syntax: RAW Text
@@ -6317,16 +6235,12 @@ OPER_HELP_RAW
 	leicht den Ablauf des Netzes stören, wenn es falsch
 	benutz wird. BENUTZE DIESES KOMMANDO NICHT so lange
 	du nicht genau weisst, was du tust!
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_UPDATE
 	Syntax: UPDATE
 	
 	Erzwingt die Services, sofort alle Datenbanken auf der
 	Festplatte zu aktualisieren.
-	
-	Beschränkt auf Services Administratoren.
 	
 OPER_HELP_RELOAD
 	Syntax: RELOAD
@@ -6336,8 +6250,6 @@ OPER_HELP_RELOAD
 	trotzdem ein Neustart der Services erforderlich ist, um
 	sie wirksam zu machen (so wie die Services Nicknamen,
 	Aktivierung der Verbindungseinschränkungen, etc.)
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_QUIT
 	Syntax: QUIT
@@ -6348,25 +6260,19 @@ OPER_HELP_QUIT
 	die Datenbanken sollen wirklich nicht aktualisiert
 	werden. Für das normale Beenden der Services sollte
 	der SHUTDOWN Befehl benutzt werden.
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_SHUTDOWN
 	Syntax: SHUTDOWN
 	
 	Die Services werden durch dieses Befehl normal
 	beendet und die Datenbanken werden gespeichert.
-	
-	Beschränkt auf Services Administratoren.
 
 OPER_HELP_RESTART
 	Syntax: RESTART
 	
 	Die Services werden sich bei diesem Befehl beenden,
 	die Datenbanken speichern, und danach neustarten
-	(die ausführbare Datei erneut aufrufen).
-	
-	Beschränkt auf Services Administratoren.	
+	(die ausführbare Datei erneut aufrufen).	
 
 OPER_HELP_KILLCLONES
 	Syntax: KILLCLONES Nickname
@@ -6379,8 +6285,6 @@ OPER_HELP_KILLCLONES
 	wer den Befehl genutzt hat und wieviele Hosts
 	betroffen waren. Es ist nützlich, wenn man mehrere
 	Klones vom Netz entfernen möchte.
-	
-	Beschränkt auf Services Administratoren.
 	
 OPER_HELP_CHANLIST
 	Syntax: CHANLIST [{Muster | Nickname} [SECRET]]
@@ -6395,8 +6299,6 @@ OPER_HELP_CHANLIST
 	Parameter SECRET angegeben, werden nur Channel aufgelistet, 
 	die Mode +s oder Mode +p gesetzt haben.
 	
-	Beschränkt auf Services Administratoren.
-	
 OPER_HELP_USERLIST
 	Syntax: USERLIST [{Muster | Channel} [INVISIBLE]]
 	
@@ -6410,24 +6312,17 @@ OPER_HELP_USERLIST
 	zusätzlich INVISIBLE angegeben, werden nur User mit dem Flag
 	+i angezeigt.
 	
-	Beschränkt auf Services Administratoren.
-	
 OPER_HELP_MODLOAD
 	Syntax: MODLOAD Modul-Name
 
 	Dieser Befehl lädt das benannte Module aus dem 
 	modules - Verzeichnis.
 	
-
-	Beschränkt auf Services Roots.
-
 OPER_HELP_MODUNLOAD
 	Syntax: MODUNLOAD Modul-Name
 
 	Dieser Befehl entfernt das benannte Module aus dem 
 	modules - Verzeichnis.
-
-	Beschränkt auf Services Roots.
 
 OPER_HELP_MODINFO
 	Syntax: MODINFO Modul-Name
@@ -6435,15 +6330,10 @@ OPER_HELP_MODINFO
 	Dieser Befehl listet Informationen über das benannte, geladene 
 	Module auf.
 
-	Beschränkt auf Services Roots.
-
 OPER_HELP_MODLIST
 	Syntax: MODLIST
 
 	Listet alle derzeit geladenen Module auf.
-
-	Beschränkt auf Services Roots.
-
 
 ###########################################################################
 #
@@ -6798,15 +6688,11 @@ BOT_SERVADMIN_HELP_SET_NOBOT
 	Option gewählt wird, bereits ein Bot zugewiesen 
 	sein, so verfällt die Zuweisung.
 	
-	Beschränkt auf Services Administratoren.
-	
 BOT_SERVADMIN_HELP_SET_PRIVATE
 	Syntax: SET Botnick PRIVATE {ON|OFF}
 	
 	Verhindert, das der Bot durch Nicht-IRC Operatoren
 	assigned werden kann.
-	
-	Beschränkt auf Services Administratoren.
 
 ###########################################################################
 #
@@ -6921,16 +6807,11 @@ HOST_HELP_SET
 	du mit SET <nickname> <ident>@<hostmaske> auch eine Ident
 	wie einen vHost setzen.
 
-	Beschränkt auf Services Operatoren.
-
 HOST_HELP_DELALL
 	Syntax: DELALL Nickname.
 
 	Löscht den vHost aller Nicknamen aus der gleichen Gruppe 
 	des angegeben Nicknamens.
-
-	Beschränkt auf Host Removers.
-
 
 HOST_HELP_SETALL
 	Syntax: SETALL Nickname Hostmaske.
@@ -6942,8 +6823,6 @@ HOST_HELP_SETALL
 
 	* Anmerkung: Dieser Befehl betrifft keine Nicknamen,
 	die nachträglich zu der Gruppe hinzugefügt wurden.
-
-	Beschränkt auf Services Operatoren.
 
 HOST_HELP_OFF
 	Syntax: OFF
@@ -6957,8 +6836,6 @@ HOST_HELP_DEL
 	Syntax: DEL Nickname
 
 	Löscht den vHost des angegebenen Nicknamens.
-
-	Beschränkt auf Services Operatoren.
 
 HOST_HELP_LIST
 	Syntax: LIST [Muster|#X-Y]
@@ -6975,8 +6852,6 @@ HOST_HELP_LIST
 	Die Liste benutzt jedes mal den Wert von NSListMax als ein 
 	festes Limit für die Anzahl der dem Operator anzuzeigenden 
 	Einträge.
-
-	Beschränkt auf Services Operatoren.
 
 HOST_HELP_GROUP
 	Syntax:GROUP

@@ -17,6 +17,9 @@ modules: $(OBJECTS) $(SO_FILES)
 
 install: 
 	$(CP) ./*.so $(MODULE_PATH) 
+	@for i in $(SUBS); do \
+	echo "make install in $$i..."; \
+	(cd $$i; $(MAKE) $(MAKEARGS) install);done
 
 distclean: spotless
 

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1402"
+VERSION_BUILD="1403"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1403)
+# BUGS  : 916
+# NOTES : Fixes weird hs_setall behaviour (memory issues). Thanks Jan again
 #
 # BUILD : 1.7.21 (1402)
 # BUGS  : 899

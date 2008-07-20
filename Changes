@@ -58,6 +58,7 @@ Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
 02/08 F x86_64 generating improper SHA1 hash values.                      [#856]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
+07/20 F Fixes weird hs_setall behaviour (memory issues).                  [#916]
 07/20 F DEFCON was akilling ulined servers clients.                       [#899]
 07/20 F Botserv replying with /(null).                                    [#894]
 07/20 F Anope will not limit sessions for ulined servers.                 [#909]

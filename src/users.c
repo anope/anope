@@ -608,7 +608,8 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                 return NULL;
         }
         /* Now check for session limits */
-        if (LimitSessions && !add_session(nick, host, ipbuf))
+        if (LimitSessions && !is_ulined(server)
+            && !add_session(nick, host, ipbuf))
             return NULL;
 
         /* Allocate User structure and fill it in. */
@@ -843,7 +844,7 @@ void do_quit(const char *source, int ac, char **av)
             free(na->last_quit);
         na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
     }
-    if (LimitSessions) {
+    if (LimitSessions && !is_ulined(user->server)) {
         del_session(user->host);
     }
     delete_user(user);
@@ -880,7 +881,7 @@ void do_kill(char *nick, char *msg)
         na->last_quit = *msg ? sstrdup(msg) : NULL;
 
     }
-    if (LimitSessions) {
+    if (LimitSessions && !is_ulined(user->server)) {
         del_session(user->host);
     }
     delete_user(user);

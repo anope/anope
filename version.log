@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1398"
+VERSION_BUILD="1399"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1399)
+# BUGS  : 909
+# NOTES : Anope will not limit sessions for ulined servers. Thanks Jan
 #
 # BUILD : 1.7.21 (1398)
 # BUGS  : 910

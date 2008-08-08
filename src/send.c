@@ -52,10 +52,6 @@ void vsend_cmd(const char *source, const char *fmt, va_list args)
     if (fmt) {
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-        if (!buf) {
-            return;
-        }
-
         if (source) {
             sockprintf(servsock, ":%s %s\r\n", source, buf);
             eventprintf(":%s %s", source, buf);
@@ -92,11 +88,6 @@ void notice_server(char *source, Server * s, char *fmt, ...)
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-        if (!buf) {
-            va_end(args);
-            return;
-        }
-
         if (NSDefFlags & NI_MSG) {
             anope_cmd_serv_privmsg(source, s->name, buf);
         } else {
@@ -125,11 +116,6 @@ void notice_user(char *source, User * u, const char *fmt, ...)
     if (fmt) {
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-        if (!buf) {
-            va_end(args);
-            return;
-        }
 
         /* Send privmsg instead of notice if:
          * - UsePrivmsg is enabled
@@ -296,11 +282,6 @@ void notice(char *source, char *dest, const char *fmt, ...)
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-        if (!buf) {
-            va_end(args);
-            return;
-        }
-
         if (NSDefFlags & NI_MSG) {
             anope_cmd_privmsg2(source, dest, buf);
         } else {
@@ -332,9 +313,6 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
         va_end(args);
     }
 
-    if (!buf) {
-        return;
-    }
     anope_cmd_privmsg2(source, dest, buf);
 }
 
@@ -357,9 +335,6 @@ void wallops(char *source, const char *fmt, ...)
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
         va_end(args);
-    }
-    if (!buf) {
-        return;
     }
 
     anope_cmd_global_legacy(source, buf);

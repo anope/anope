@@ -386,7 +386,6 @@ int has_globopsmod = 0;
    The ircd tends to /squit us if we issue unsupported cmds.
    - katsklaw */
 int has_svsholdmod = 0;
-int has_sajoinmod = 0;
 int has_sapartmod = 0;
 int has_sanickmod = 0;
 int has_chghostmod = 0;
@@ -489,7 +488,6 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SAMODE",    anope_event_samode); addCoreMessage(IRCD,m);
     m = createMessage("SANICK",    anope_event_sanick); addCoreMessage(IRCD,m);
-    m = createMessage("SAJOIN",    anope_event_sajoin); addCoreMessage(IRCD,m);
     m = createMessage("SAPART",    anope_event_sapart); addCoreMessage(IRCD,m);
     m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
     m = createMessage("QLINE",     anope_event_null); addCoreMessage(IRCD,m);
@@ -721,21 +719,6 @@ int anope_event_sanick(char *source, int ac, char **av)
     	return MOD_CONT;
     } else {
 	anope_cmd_global(s_OperServ, "m_sanick not loaded!");
-    }
-    return MOD_CONT;
-}
-
-int anope_event_sajoin(char *source, int ac, char **av)
-{
-    if (has_sajoinmod == 1) {
-    	char *newav[1];
-    	if (ac != 2)
-        	return MOD_CONT;
-    	newav[0] = av[1];
-    	do_join(av[0], 1, newav);
-    	return MOD_CONT;
-    } else {
-	anope_cmd_global(s_OperServ, "m_sajoin not loaded!");
     }
     return MOD_CONT;
 }
@@ -1560,7 +1543,6 @@ int anope_event_capab(char *source, int ac, char **av)
         has_servicesmod = 0;
         has_globopsmod = 0;
 	has_svsholdmod = 0;
-	has_sajoinmod = 0;
 	has_sapartmod = 0;
 	has_sanickmod = 0;
 	has_chghostmod = 0;
@@ -1576,9 +1558,6 @@ int anope_event_capab(char *source, int ac, char **av)
 	if (strstr(av[1], "m_svshold.so")) {      
             has_svsholdmod = 1;
         }
-	if (strstr(av[1], "m_sajoin.so")) {
-            has_sajoinmod = 1;
-        }             
         if (strstr(av[1], "m_sapart.so")) {
             has_sapartmod = 1;
         }
@@ -1608,9 +1587,6 @@ int anope_event_capab(char *source, int ac, char **av)
         }
         if (has_svsholdmod == 0) {
             anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
-        }
-        if (has_sajoinmod == 0) {
-            anope_cmd_global(s_OperServ, "SAJOIN missing, Usage disabled until module is loaded.");
         }
         if (has_sapartmod == 0) {
             anope_cmd_global(s_OperServ, "SAPART missing, Usage disabled until module is loaded.");

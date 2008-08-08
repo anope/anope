@@ -45,6 +45,9 @@ Anope Version  S V N
 05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 
+Provided by Robin Burchell <w00t@inspircd.org> - 2008
+08/08 F Removed sajoin fro minspircd protocol support.                    [ #00]
+
 Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
 07/20 F Updated Deutch language file.                                     [#892]
 

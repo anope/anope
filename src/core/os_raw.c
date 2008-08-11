@@ -29,7 +29,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+    moduleSetType(THIRD);
 
     c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1,
                       -1, -1, -1);

@@ -44,6 +44,7 @@ Anope Version  S V N
 04/30 F Operators can now also use NickServ INFO ALL.                     [ #00]
 05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
+11/08 F Updated os_raw.c to show up as a 3rd party module.                [ #00]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]

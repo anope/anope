@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1404"
+VERSION_BUILD="1409"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1409)
+# BUGS  : 922 
+# NOTES : Changes 'check' argument in calls to chan_set_modes() from cs_modes.c/do_util() to 2 to avoid calling chan_set_proper_modes()
 #
 # BUILD : 1.7.21 (1404)
 # BUGS  : 917

@@ -342,7 +342,7 @@ int do_util(User * u, CSModeUtil * util)
                 && check_access(u, ci, util->levelself)) {
                 anope_cmd_mode(whosends(ci), uc->chan->name, "%s %s",
                                util->mode, u->nick);
-                chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
+                chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
 
                 if (util->notice && ci->flags & util->notice)
                     notice(whosends(ci), uc->chan->name,
@@ -382,7 +382,7 @@ int do_util(User * u, CSModeUtil * util)
 
         av[0] = util->mode;
         av[1] = u2->nick;
-        chan_set_modes(s_ChanServ, c, 2, av, 1);
+        chan_set_modes(s_ChanServ, c, 2, av, 2);
 
         if (util->notice && ci->flags & util->notice)
             notice(whosends(ci), c->name, "%s command used for %s by %s",

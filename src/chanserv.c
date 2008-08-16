@@ -1586,6 +1586,10 @@ int check_kick(User * user, char *chan, time_t chants)
     if ((!(c = findchan(chan)) || c->usercount == 0)
         && !(ci->flags & CI_INHABIT)) {
         anope_cmd_join(s_ChanServ, chan, (c ? c->creation_time : chants));
+        /* Lets hide the channel from /list just incase someone does /list
+         * while we are here. - katsklaw
+         */
+        anope_cmd_mode(s_ChanServ, chan, "+ntsi");
         t = add_timeout(CSInhabit, timeout_leave, 0);
         t->data = sstrdup(chan);
         ci->flags |= CI_INHABIT;

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1409"
+VERSION_BUILD="1410"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1410)
+# BUGS  : 924
+# NOTES : Bug fixed where forbidden channels will appear in /list when inhabited by ChanServ
 #
 # BUILD : 1.7.21 (1409)
 # BUGS  : 922 

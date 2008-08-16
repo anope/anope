@@ -21,7 +21,7 @@ IRCDVar myIrcd[] = {
      "+o",                      /* chanserv mode */
      "+o",                      /* memoserv mode */
      NULL,                      /* hostserv mode */
-     "+io",                     /* operserv mode */
+     "+aio",                    /* operserv mode */
      "+o",                      /* botserv mode  */
      "+h",                      /* helpserv mode */
      "+i",                      /* Dev/Null mode */
@@ -30,7 +30,7 @@ IRCDVar myIrcd[] = {
      "+o",                      /* chanserv alias mode */
      "+o",                      /* memoserv alias mode */
      NULL,                      /* hostserv alias mode */
-     "+io",                     /* operserv alias mode */
+     "+aio",                    /* operserv alias mode */
      "+o",                      /* botserv alias mode  */
      "+h",                      /* helpserv alias mode */
      "+i",                      /* Dev/Null alias mode */
@@ -52,8 +52,8 @@ IRCDVar myIrcd[] = {
      NULL,                      /* Mode on ID for Opers */
      NULL,                      /* Mode on UnReg        */
      NULL,                      /* Mode on Nick Change  */
-     0,                         /* Supports SGlines     */
-     0,                         /* Supports SQlines     */
+     1,                         /* Supports SGlines     */
+     1,                         /* Supports SQlines     */
      0,                         /* Supports SZlines     */
      1,                         /* Supports Halfop +h   */
      3,                         /* Number of server args */
@@ -654,11 +654,19 @@ void moduleAddIRCDMsgs(void) {
 
 void hybrid_cmd_sqline(char *mask, char *reason)
 {
-
+    if (!mask || !reason) {
+        return;
+    }
+    
+    send_cmd(ServerName, "RESV * %s :%s", mask, reason);
 }
 void hybrid_cmd_unsgline(char *mask)
 {
-/* Does not support */
+    if (!mask) {
+        return;
+    }
+    
+    send_cmd(ServerName, "UNXLINE * %s", mask);
 }
 
 void hybrid_cmd_unszline(char *mask)
@@ -682,7 +690,11 @@ void hybrid_cmd_svsadmin(char *server, int set)
 
 void hybrid_cmd_sgline(char *mask, char *reason)
 {
-    /* does not support */
+    if (!mask || !reason) {
+        return;
+    }
+    
+    send_cmd(ServerName, "XLINE * %s 0 :%s", mask, reason);
 }
 
 void hybrid_cmd_remove_akill(char *user, char *host)
@@ -709,7 +721,11 @@ void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
 
 void hybrid_cmd_unsqline(char *user)
 {
-    /* Hybrid does not support SQLINEs */
+    if (!user) {
+        return;
+    }
+    
+    send_cmd(ServerName, "UNRESV * %s", user);
 }
 
 void hybrid_cmd_join(char *user, char *channel, time_t chantime)

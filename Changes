@@ -46,7 +46,6 @@ Anope Version  S V N
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 08/11 F Updated os_raw.c to show up as a 3rd party module.                [ #00]
 08/15 F CS OP now correctly works if there is only 1 user in the channel. [#922]
-08/16 F Forbidden channels no longer appear in /list when inhabited.      [#924]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]
@@ -57,6 +56,7 @@ Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
 
 Provided by Scott Seufert <katsklaw@ircmojo.net> - 2008
 05/12 F install.js now works properly on x64 machines                     [#897]
+08/16 F Forbidden channels no longer appear in /list when inhabited.      [#924]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]
@@ -73,6 +73,9 @@ Provided by Jan Milants <jan_renee@msn.com> - 2008
 07/20 F EVENT_BOT_KICK not being send under all circumstances             [#910]
 01/16 F Server traversion with next_server() failed to list all servers.  [#831]
 02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
+
+Provided by Martin J. Green <mail@martinjgreen.me.uk> - 2008
+08/17 A SQLINE and SGLINE support for Hybrid.                             [#887]
 
 Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
 04/29 F Potential crash in channels.c.                                    [ #00]

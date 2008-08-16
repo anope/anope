@@ -1831,7 +1831,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion
-        ("$Id: inspircd11.c 2007-08-28 10:09 GMT -5 katsklaw $");
+        ("$Id$");
     moduleSetType(PROTOCOL);
 
     pmodule_ircd_version("inspircdIRCd 1.1");

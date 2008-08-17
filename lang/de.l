@@ -1702,7 +1702,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	Der Channel %s hat keinen Schlüßel.
 CHAN_GETKEY_KEY
-	Schlüßel für den Channel %s ist %s.
+	KEY %s %s
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX

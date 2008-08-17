@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1415"
+VERSION_BUILD="1416"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1416)
+# BUGS  : 880
+# NOTES : Changed CS GETKEY response to what the help for GS GETKEY says it should be
 #
 # BUILD : 1.7.21 (1415)
 # BUGS  : 905

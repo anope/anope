@@ -1697,7 +1697,7 @@ CHAN_GETKEY_SYNTAX
 CHAN_GETKEY_NOKEY
 	The channel %s has no key.
 CHAN_GETKEY_KEY
-	Key for channel %s is %s.
+	KEY %s %s
 
 # SENDPASS responses
 CHAN_SENDPASS_SYNTAX

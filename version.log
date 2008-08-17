@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1414"
+VERSION_BUILD="1415"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1415)
+# BUGS  : 905
+# NOTES : Applied patch by Viper to add missing config file changes in Changes.conf
 #
 # BUILD : 1.7.21 (1414)
 # BUGS  : 832 925

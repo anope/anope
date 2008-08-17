@@ -66,14 +66,15 @@ Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
 02/08 F x86_64 generating improper SHA1 hash values.                      [#856]
 
 Provided by Jan Milants <jan_renee@msn.com> - 2008
+01/16 F Server traversion with next_server() failed to list all servers.  [#831]
+02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
 07/20 F make install now runs install routine for modules subdirs also.   [#917]
 07/20 F Fixes weird hs_setall behaviour (memory issues).                  [#916]
 07/20 F DEFCON was akilling ulined servers clients.                       [#899]
 07/20 F Botserv replying with /(null).                                    [#894]
 07/20 F Anope will not limit sessions for ulined servers.                 [#909]
 07/20 F EVENT_BOT_KICK not being send under all circumstances             [#910]
-01/16 F Server traversion with next_server() failed to list all servers.  [#831]
-02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
+08/17 F Changes.conf updated with forgotten deleted directives.           [#905]
 
 Provided by Martin J. Green <mail@martinjgreen.me.uk> - 2008
 08/17 A SQLINE and SGLINE support for Hybrid.                             [#887]

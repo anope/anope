@@ -279,7 +279,7 @@ CBMode myCbmodes[128] = {
     {CMODE_c, 0, NULL, NULL},
     {0},                        /* d */
     {0},                        /* e */
-    {CMODE_f, 0, set_flood, cs_set_flood},
+    {0},                        /* f */
     {0},                        /* g */
     {0},                        /* h */
     {CMODE_i, 0, NULL, NULL},
@@ -304,8 +304,8 @@ CBMode myCbmodes[128] = {
 };
 
 CBModeInfo myCbmodeinfos[] = {
+    {'f', CMODE_f, 0, NULL, NULL},
     {'c', CMODE_c, 0, NULL, NULL},
-    {'f', CMODE_f, 0, get_flood, cs_get_flood},
     {'i', CMODE_i, 0, NULL, NULL},
     {'k', CMODE_k, 0, get_key, cs_get_key},
     {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
@@ -379,15 +379,18 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
-int has_servicesmod = 0;
-int has_globopsmod = 0;
+static int has_servicesmod = 0;
+static int has_globopsmod = 0;
 
 /* These are sanity checks to insure we are supported. 
    The ircd tends to /squit us if we issue unsupported cmds.
    - katsklaw */
-int has_svsholdmod = 0;
-int has_chghostmod = 0;
-int has_chgidentmod = 0;
+static int has_svsholdmod = 0;
+static int has_chghostmod = 0;
+static int has_chgidentmod = 0;
+static int has_messagefloodmod = 0;
+static int has_banexceptionmod = 0;
+static int has_inviteexceptionmod = 0;
 
 void inspircd_set_umode(User * user, int ac, char **av)
 {
@@ -1494,6 +1497,7 @@ int anope_event_capab(char *source, int ac, char **av)
 {
     int argc;
     char **argv;
+    CBModeInfo *cbmi;
 
     if (strcasecmp(av[0], "START") == 0) {
         /* reset CAPAB */
@@ -1519,36 +1523,91 @@ int anope_event_capab(char *source, int ac, char **av)
 	if (strstr(av[1], "m_chgident.so")) {      
             has_chgidentmod = 1;
         }
+        if (strstr(av[1], "m_messageflood.so")) {
+            has_messagefloodmod = 1;
+        }
+        if (strstr(av[1], "m_banexception.so")) {
+            has_banexceptionmod = 1;
+        }
+        if (strstr(av[1], "m_inviteexception.so")) {
+            has_inviteexceptionmod = 1;
+        }
     } else if (strcasecmp(av[0], "END") == 0) {
-        if (has_globopsmod == 0) {
+        if (!has_globopsmod) {
             send_cmd(NULL,
                      "ERROR :m_globops is not loaded. This is required by Anope");
             quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
             quitting = 1;
             return MOD_STOP;
         }
-        if (has_servicesmod == 0) {
+        if (!has_servicesmod) {
             send_cmd(NULL,
                      "ERROR :m_services is not loaded. This is required by Anope");
             quitmsg = "Remote server does not have the m_services module loaded, and this is required.";
             quitting = 1;
             return MOD_STOP;
         }
-        if (has_svsholdmod == 0) {
+        if (!has_svsholdmod) {
             anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
         }
-        if (has_chghostmod == 0) {
+        if (!has_chghostmod) {
             anope_cmd_global(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
         }
-        if (has_chgidentmod == 0) {
+        if (!has_chgidentmod) {
             anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
         }
+        if (has_messagefloodmod) {       
+            cbmi = myCbmodeinfos;
+            
+            /* Find 'f' in myCbmodeinfos and add the relevant bits to myCbmodes and myCbmodeinfos
+             * to enable +f support if found. This is needed because we're really not set up to
+             * handle modular ircds which can have modes enabled/disabled as they please :( - mark
+             */
+            while ((cbmi->mode != 'f')) {
+                cbmi++;
+            }
+            if (cbmi) {
+                myCbmodeinfos->getvalue = get_flood;
+                myCbmodeinfos->csgetvalue = cs_get_flood;
+                
+                myCbmodes['f'].flag = CMODE_f;
+                myCbmodes['f'].flags = 0;
+                myCbmodes['f'].setvalue = set_flood;
+                myCbmodes['f'].cssetvalue = cs_set_flood;
+                
+                pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+                pmodule_ircd_cbmodes(myCbmodes);
+                
+                ircd->fmode = 1;
+            }
+            else {
+                alog("Support for channelmode +f can not be enabled");
+                if (debug) {
+                    alog("debug: 'f' missing from myCbmodeinfos");
+                }
+            }
+        }
+        if (has_banexceptionmod) {
+            myCmmodes['e'].addmask = add_exception;
+            myCmmodes['e'].delmask = del_exception;
+            ircd->except = 1;
+        }
+        if (has_inviteexceptionmod) {
+            myCmmodes['I'].addmask = add_invite;
+            myCmmodes['I'].delmask = del_invite;
+            ircd->invitemode = 1;
+        }
+        ircd->svshold = has_svsholdmod;
 
+        if (has_banexceptionmod || has_inviteexceptionmod) {
+            pmodule_ircd_cmmodes(myCmmodes);
+        }
+        
         /* Generate a fake capabs parsing call so things like NOQUIT work
          * fine. It's ugly, but it works....
          */
         argc = 6;
-        argv = scalloc(6, sizeof(char *));
+        argv = scalloc(argc, sizeof(char *));
         argv[0] = "NOQUIT";
         argv[1] = "SSJ3";
         argv[2] = "NICK2";
@@ -1564,18 +1623,14 @@ int anope_event_capab(char *source, int ac, char **av)
 /* SVSHOLD - set */
 void inspircd_cmd_svshold(char *nick)
 {
-    if (has_svsholdmod == 1) {
 	send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout,
              "Being held for registered user");
-    }
 }
 
 /* SVSHOLD - release */
 void inspircd_cmd_release_svshold(char *nick)
 {
-    if (has_svsholdmod == 1) {
 	send_cmd(s_OperServ, "SVSHOLD %s", nick);
-   }
 }
 
 /* UNSGLINE */

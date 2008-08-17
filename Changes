@@ -46,6 +46,7 @@ Anope Version  S V N
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 08/11 F Updated os_raw.c to show up as a 3rd party module.                [ #00]
 08/15 F CS OP now correctly works if there is only 1 user in the channel. [#922]
+08/17 F Various InspIRCd issues.                                          [#832]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]

@@ -78,10 +78,13 @@ Provided by Jan Milants <jan_renee@msn.com> - 2008
 Provided by Martin J. Green <mail@martinjgreen.me.uk> - 2008
 08/17 A SQLINE and SGLINE support for Hybrid.                             [#887]
 
-Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
+Provided by Twitch <mitch@zomgirc.net> - 2008
+08/17 F Warnings in users.c.                                              [#925]
+
+Provided by Hal9000 <hal9000@pimpmylinux.org> - 2008
 04/29 F Potential crash in channels.c.                                    [ #00]
 04/29 F TS handling on incoming FMODE with InspIRCd 1.1.                  [ #00]
-05/20 F Possible crash in new TS handling for InspIRCd 1.1.               [ #00]
+05/20 F Possible crash in new TS handling for InspIRCd 1.1.               [#904]
 
 Anope Version 1.7.21
 --------------------

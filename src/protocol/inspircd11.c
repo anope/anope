@@ -1567,8 +1567,8 @@ int anope_event_capab(char *source, int ac, char **av)
                 cbmi++;
             }
             if (cbmi) {
-                myCbmodeinfos->getvalue = get_flood;
-                myCbmodeinfos->csgetvalue = cs_get_flood;
+                cbmi->getvalue = get_flood;
+                cbmi->csgetvalue = cs_get_flood;
                 
                 myCbmodes['f'].flag = CMODE_f;
                 myCbmodes['f'].flags = 0;

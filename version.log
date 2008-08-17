@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1413"
+VERSION_BUILD="1414"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1414)
+# BUGS  : 832 925
+# NOTES : Applied patch from Twitch to fix warnings in users.c. Also corrected a typo made in previous commit to add +f support to inspircd11.c, and corrected various mistakes in Changes and version.log
 #
 # BUILD : 1.7.21 (1413)
 # BUGS  : 832
@@ -32,6 +36,22 @@ VERSION_BUILD="1413"
 # BUILD : 1.7.21 (1409)
 # BUGS  : 922 
 # NOTES : Changes 'check' argument in calls to chan_set_modes() from cs_modes.c/do_util() to 2 to avoid calling chan_set_proper_modes()
+#
+# BUILD : 1.7.21 (1408)
+# BUGS  : 
+# NOTES : Set os_raw to show up as a 3rd party module...
+#
+# BUILD : 1.7.21 (1407)
+# BUGS  : 
+# NOTES : Removed pointless checks for buf existing, as they always will for non pointers.
+#
+# BUILD : 1.7.21 (1406)
+# BUGS  : 883
+# NOTES : w00t removed more sa commands from inspircd, as they no longer work
+#
+# BUILD : 1.7.21 (1405)
+# BUGS  : 883
+# NOTES : Applied patch from w00t to remove sajoin in inspircd.
 #
 # BUILD : 1.7.21 (1404)
 # BUGS  : 917

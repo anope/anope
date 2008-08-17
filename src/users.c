@@ -845,7 +845,7 @@ void do_quit(const char *source, int ac, char **av)
             free(na->last_quit);
         na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
     }
-    if (LimitSessions && !is_ulined(user->server)) {
+    if (LimitSessions && !is_ulined(user->server->name)) {
         del_session(user->host);
     }
     delete_user(user);
@@ -882,7 +882,7 @@ void do_kill(char *nick, char *msg)
         na->last_quit = *msg ? sstrdup(msg) : NULL;
 
     }
-    if (LimitSessions && !is_ulined(user->server)) {
+    if (LimitSessions && !is_ulined(user->server->name)) {
         del_session(user->host);
     }
     delete_user(user);

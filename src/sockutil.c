@@ -559,6 +559,7 @@ int conn(const char *host, int port, const char *lhost, int lport)
 #endif
     struct sockaddr_in sa, lsa;
     ano_socket_t sock;
+    int sockopt = 1;
 
     memset(&lsa, 0, sizeof(lsa));
     if (lhost) {
@@ -597,6 +598,11 @@ int conn(const char *host, int port, const char *lhost, int lport)
 
     if ((sock = socket(sa.sin_family, SOCK_STREAM, 0)) < 0)
         return -1;
+
+    if (setsockopt
+        (sock, SOL_SOCKET, SO_REUSEADDR, (char *) &sockopt,
+         sizeof(int)) < 0)
+        alog("debug: couldn't set SO_REUSEADDR on socket");
 
     if ((lhost || lport)
         && bind(sock, (struct sockaddr *) &lsa, sizeof(lsa)) < 0) {

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1416"
+VERSION_BUILD="1417"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1417)
+# BUGS  : 
+# NOTES : Set SO_REUSEADDR on sock to prevent potential issues with bind() failing after a restart
 #
 # BUILD : 1.7.21 (1416)
 # BUGS  : 880

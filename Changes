@@ -48,6 +48,7 @@ Anope Version  S V N
 08/15 F CS OP now correctly works if there is only 1 user in the channel. [#922]
 08/17 F Various InspIRCd issues.                                          [#832]
 08/18 F CS GETKEY response.                                               [#880]
+08/21 F Potential issues caused by not setting SO_REUSEADDR on socket.    [ #00]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]

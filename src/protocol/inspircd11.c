@@ -1297,7 +1297,7 @@ int anope_event_join(char *source, int ac, char **av)
 {
     if (ac != 2)
         return MOD_CONT;
-    do_join(source, 1, av);
+    do_join(source, ac, av);
     return MOD_CONT;
 }
 

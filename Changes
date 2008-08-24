@@ -53,6 +53,7 @@ Anope Version  S V N
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]
 08/08 F Removed sa-commands from inspircd protocol support.               [ #00]
+08/24 F InspIRCd FMODE timestamp issue.                                   [#927]
 
 Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
 07/20 F Updated Deutch language file.                                     [#892]

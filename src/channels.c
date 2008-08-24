@@ -583,8 +583,18 @@ void do_join(const char *source, int ac, char **av)
         if (check_kick(user, s, time(NULL)))
             continue;
 
+        time_t ts = time(NULL);
+
+        if (ac == 2) {
+            if (debug) {
+                alog("debug: recieved a new TS for JOIN: %ld",
+                     (long int) ts);
+            }
+            ts = strtoul(av[1], NULL, 10);
+        }
+
         chan = findchan(s);
-        chan = join_user_update(user, chan, s, time(NULL));
+        chan = join_user_update(user, chan, s, ts);
         chan_set_correct_modes(user, chan, 1);
 
         send_event(EVENT_JOIN_CHANNEL, 3, EVENT_STOP, source, s);

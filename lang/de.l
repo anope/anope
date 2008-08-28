@@ -4956,10 +4956,12 @@ CHAN_HELP_ACCESS_LEVELS
 	%S HELP LEVELS für weitere Informationen.
 
 CHAN_HELP_AKICK
-	Syntax: AKICK Channel ADD Maske [Grund]
-	        AKICK Channel DEL Maske
-	        AKICK Channel LIST [Maske]
-	        AKICK Channel VIEW [Maske]
+	Syntax: AKICK channel ADD {nick | mask} [reason]
+	        AKICK channel STICK mask
+	        AKICK channel UNSTICK mask
+	        AKICK channel DEL {nick | mask | entry-num | list}
+	        AKICK channel LIST [mask | entry-num | list]
+	        AKICK channel VIEW [mask | entry-num | list]
 	        AKICK Channel ENFORCE
 	        AKICK Channel CLEAR
 	
@@ -4973,6 +4975,9 @@ CHAN_HELP_AKICK
 	Befehl angegeben, wird dieser als Kick-Grund für den
 	User genutzt, ohne Reason wird standardmässig 
 	"You have been banned from the channel" verwendet.
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	Durch den AKICK DEL Befehls wird ein Eintrag von der
 	AutoKick-Liste entfernt. Es entfernt jedoch nicht die Bans,

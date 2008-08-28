@@ -4985,12 +4985,12 @@ CHAN_HELP_ACCESS_LEVELS
 	pour plus d'informations.
 
 CHAN_HELP_AKICK
-	Syntaxe: AKICK canal ADD masque [raison]
-	         AKICK canal STICK masque
-	         AKICK canal UNSTICK masque
-	         AKICK canal DEL masque
-	         AKICK canal LIST [masque]
-	         AKICK canal VIEW [masque]
+	Syntaxe: AKICK channel ADD {nick | masque} [raison]
+	         AKICK channel STICK masque
+	         AKICK channel UNSTICK masque
+	         AKICK channel DEL {nick | mask | entry-num | liste}
+	         AKICK channel LIST [masque | entry-num | liste]
+	         AKICK channel VIEW [masque | entry-num | liste]
 	         AKICK canal ENFORCE
 	         AKICK canal CLEAR
 	
@@ -5004,6 +5004,9 @@ CHAN_HELP_AKICK
 	raison est donnée avec la commande, cette raison sera utilisée 
 	lorsque l'utilisateur est kické, sinon, la raison par défaut est
 	"Vous n'ètes plus le bienvenue sur ce canal". 
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	La commande AKICK DEL supprime le pseudo ou le masque donné
 	de la liste de kicks automatiques. Cependant, il n'enlève pas 

@@ -4859,12 +4859,12 @@ CHAN_HELP_ACCESS_LEVELS
 	yazýn.
 
 CHAN_HELP_AKICK
-	Kullanýmý:  AKICK kanaladý ADD mask [sebep]
-	            AKICK kanaladi STICK mask
-	            AKICK kanaladi UNSTICK mask
-	            AKICK kanaladý DEL mask
-	            AKICK kanaladý LIST [mask]
-	            AKICK kanaladý VIEW [mask]
+	Kullanýmý:  AKICK channel ADD {nick | mask} [reason]
+	            AKICK channel STICK mask
+	            AKICK channel UNSTICK mask
+	            AKICK channel DEL {nick | mask | entry-num | list}
+	            AKICK channel LIST [mask | entry-num | list]
+	            AKICK channel VIEW [mask | entry-num | list]
 	            AKICK kanaladý ENFORCE
 	            AKICK kanaladý CLEAR
 	

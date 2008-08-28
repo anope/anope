@@ -4738,12 +4738,12 @@ CHAN_HELP_ACCESS_LEVELS
 	подробной информации.
 
 CHAN_HELP_AKICK
-	Синтаксис: AKICK #канал ADD маска [причина]
-	           AKICK #канал STICK маска
-	           AKICK #канал UNSTICK маска
-	           AKICK #канал DEL маска
-	           AKICK #канал LIST [маска]
-	           AKICK #канал VIEW [маска]
+	Синтаксис: AKICK channel ADD {nick | mask} [reason]
+	           AKICK channel STICK mask
+	           AKICK channel UNSTICK mask
+	           AKICK channel DEL {nick | mask | entry-num | list}
+	           AKICK channel LIST [mask | entry-num | list]
+	           AKICK channel VIEW [mask | entry-num | list]
 	           AKICK #канал ENFORCE
 	           AKICK #канал CLEAR
 	

@@ -4934,14 +4934,14 @@ CHAN_HELP_ACCESS_LEVELS
 	per a més informació.
 
 CHAN_HELP_AKICK
-	Sintàxi: AKICK canal ADD mascara [raó]
-	          AKICK canal STICK mascara
-	          AKICK canal UNSTICK mascara
-	          AKICK canal DEL mascara
-	          AKICK canal LIST [mascara]
-	          AKICK canal VIEW [mascara]
-	          AKICK canal ENFORCE
-	          AKICK canal CLEAR
+	Sintàxi: AKICK channel ADD {nick | mask} [reason]
+	         AKICK channel STICK mask
+	         AKICK channel UNSTICK mask
+	         AKICK channel DEL {nick | mask | entry-num | list}
+	         AKICK channel LIST [mask | entry-num | list]
+	         AKICK channel VIEW [mask | entry-num | list]
+	         AKICK canal ENFORCE
+	         AKICK canal CLEAR
 	
 	Manté la llista d'AutoKicks per a un canal. Si
 	un usuari de la llista de Autokicks intenta entrar
@@ -4953,6 +4953,9 @@ CHAN_HELP_AKICK
 	es donada amb la comanda, aquesta raó serà utilitzada quan 
 	l'usuari sigui kickejat; si no, la raó per defecte és
 	"Has sigut banejat del canal".
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	La comanda AKICK STICK baneja permanent la mascara
 	donada en el canal. Si algú intenta treure el ban,

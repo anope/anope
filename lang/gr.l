@@ -4888,14 +4888,14 @@ CHAN_HELP_ACCESS_LEVELS
 	πληροφορίες.
 
 CHAN_HELP_AKICK
-	Σύνταξη: AKICK κανάλι ADD μάσκα [λόγος]
-	        AKICK κανάλι STICK μάσκα
-	        AKICK κανάλι UNSTICK μάσκα
-	        AKICK κανάλι DEL μάσκα
-	        AKICK κανάλι LIST [μάσκα]
-	        AKICK κανάλι VIEW [μάσκα]
-	        AKICK κανάλι ENFORCE
-	        AKICK κανάλι CLEAR
+	Σύνταξη: AKICK channel ADD {nick | mask} [reason]
+	         AKICK channel STICK mask
+	         AKICK channel UNSTICK mask
+	         AKICK channel DEL {nick | mask | entry-num | list}
+	         AKICK channel LIST [mask | entry-num | list]
+	         AKICK channel VIEW [mask | entry-num | list]
+	         AKICK κανάλι ENFORCE
+	         AKICK κανάλι CLEAR
 	
 	Αλλάζει τη λίστα αυτόματης απόρριψης για ένα κανάλι.
 	Εάν ένας χρήστης που βρίσκεται στη λίστα αυτόματης απόρριψης,

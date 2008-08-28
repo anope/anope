@@ -4908,12 +4908,12 @@ CHAN_HELP_ACCESS_LEVELS
 	para mayor informacion.
 
 CHAN_HELP_AKICK
-	Sintaxis: AKICK canal ADD mascara [razon]
-	          AKICK canal STICK mascara
-	          AKICK canal UNSTICK mascara
-	          AKICK canal DEL mascara
-	          AKICK canal LIST [mascara]
-	          AKICK canal VIEW [mascara]
+	Sintaxis: AKICK channel ADD {nick | mask} [reason]
+	          AKICK channel STICK mask
+	          AKICK channel UNSTICK mask
+	          AKICK channel DEL {nick | mask | entry-num | list}
+	          AKICK channel LIST [mask | entry-num | list]
+	          AKICK channel VIEW [mask | entry-num | list]
 	          AKICK canal ENFORCE
 	          AKICK canal CLEAR
 	
@@ -4927,6 +4927,9 @@ CHAN_HELP_AKICK
 	es dada con el comando, esta razon sera usada cuando el
 	usuario es kickeado; si no, la razon por defecto es
 	"Has sido baneado del canal".
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	El comando AKICK STICK banea permanente la mascara
 	dada en el canal. Si alguien intenta remover el ban,

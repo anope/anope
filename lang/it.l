@@ -4820,12 +4820,12 @@ CHAN_HELP_ACCESS_LEVELS
 	%R%S HELP LEVELS per maggiori informazioni.
 
 CHAN_HELP_AKICK
-	Sintassi: AKICK canale ADD nick-mask [motivo]
+	Sintassi: AKICK canale ADD {nick | mask} [motivo]
 	          AKICK canale STICK mask
 	          AKICK canale UNSTICK mask
-	          AKICK canale DEL nick-mask
-	          AKICK canale LIST [mask]
-	          AKICK canale VIEW [mask]
+	          AKICK canale DEL {nick | mask | entry-num | list}
+	          AKICK canale LIST [mask | entry-num | list]
+	          AKICK canale VIEW [mask | entry-num | list]
 	          AKICK canale ENFORCE
 	          AKICK canale CLEAR
 	
@@ -4839,6 +4839,9 @@ CHAN_HELP_AKICK
 	verrà utilizzata la frase standard ""You have been banned from
 	the channel". In alternativa al nick può essere usata una
 	hostmask.
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	Il comando AKICK STICK mantiene permanentemente il ban
 	sulla mask specificata. Se qualcuno cerca di rimuovere il ban,

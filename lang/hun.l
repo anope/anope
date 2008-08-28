@@ -4808,12 +4808,12 @@ CHAN_HELP_ACCESS_LEVELS
 	információért.
 	
 CHAN_HELP_AKICK
-	Syntax: AKICK #szoba ADD maszk [indok]
+	Syntax: AKICK #szoba ADD {nick | maszk} [indok]
 	        AKICK #szoba STICK maszk
 	        AKICK #szoba UNSTICK maszk
-	        AKICK #szoba DEL maszk
-	        AKICK #szoba LIST [maszk]
-	        AKICK #szoba VIEW [maszk]
+	        AKICK #szoba DEL {nick | maszk | entry-num | list}
+	        AKICK #szoba LIST [maszk | entry-num | list]
+	        AKICK #szoba VIEW [maszk | entry-num | list]
 	        AKICK #szoba ENFORCE
 	        AKICK #szoba CLEAR
 	

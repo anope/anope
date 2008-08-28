@@ -5227,12 +5227,12 @@ CHAN_HELP_ACCESS_LEVELS
 	uzyskaæ wiêcej informacji.
 
 CHAN_HELP_AKICK
-	Sk³adnia: AKICK kana³ ADD maska [powód]
+	Sk³adnia: AKICK kana³ ADD {nick | maska} [powód]
 	          AKICK kana³ STICK maska
-	          AKICK kana³ UNSTICK maska
-	          AKICK kana³ DEL maska
-	          AKICK kana³ LIST [maska]
-	          AKICK kana³ VIEW [maska]
+	          AKICK kana³ UNSTICK mask
+	          AKICK kana³ DEL {nick | maska | entry-num | list}
+	          AKICK kana³ LIST [maska | entry-num | list]
+	          AKICK kana³ VIEW [maska | entry-num | list]
 	          AKICK kana³ ENFORCE
 	          AKICK kana³ CLEAR
 	
@@ -5247,6 +5247,9 @@ CHAN_HELP_AKICK
 	u¿ytkownika dodanego do listy z kana³u, je¶li nie 
 	zostanie podany, u¿ywany bêdzie standardowy zwrot: 
 	You have been banned from channel.
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	Komenda AKICK STICK umo¿liwia permanentne 
 	dodanie podanej maski do banów na kanale. Za ka¿dym 

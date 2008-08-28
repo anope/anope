@@ -4843,12 +4843,12 @@ CHAN_HELP_ACCESS_LEVELS
 	%R%S HELP LEVELS voor meer informatie.
 
 CHAN_HELP_AKICK
-	Gebruik: AKICK kanaal ADD mask [reden]
-	         AKICK kanaal STICK mask
-	         AKICK kanaal UNSTICK mask
-	         AKICK kanaal DEL mask
-	         AKICK kanaal LIST [mask]
-	         AKICK kanaal VIEW [mask]
+	Gebruik: AKICK channel ADD {nick | mask} [reden]
+	         AKICK channel STICK mask
+	         AKICK channel UNSTICK mask
+	         AKICK channel DEL {nick | mask | entry-num | lijst}
+	         AKICK channel LIST [mask | entry-num | lijst]
+	         AKICK channel VIEW [mask | entry-num | lijst]
 	         AKICK kanaal ENFORCE
 	         AKICK kanaal CLEAR
 	
@@ -4862,6 +4862,9 @@ CHAN_HELP_AKICK
 	met het commando zal die reden gebruikt worden om de gebruiker
 	te kicken; zo niet is de reden "You have been banned from the
 	channel".
+	Als een geregistreerde nick wordt toegevoegd, wordt de nickserv
+	account toegevoegd in plaats van de mask. Alle gebruikers binnen
+	deze groep zullen automatisch worden gekicked.
 	
 	Het AKICK STICK commando bant het gegeven mask permanent
 	op het kanaal. Als iemand de ban probeert te verwijderen

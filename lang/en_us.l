@@ -4714,12 +4714,12 @@ CHAN_HELP_ACCESS_LEVELS
 	information.
 
 CHAN_HELP_AKICK
-	Syntax: AKICK channel ADD mask [reason]
+	Syntax: AKICK channel ADD {nick | mask} [reason]
 	        AKICK channel STICK mask
 	        AKICK channel UNSTICK mask
-	        AKICK channel DEL mask
-	        AKICK channel LIST [mask]
-	        AKICK channel VIEW [mask]
+	        AKICK channel DEL {nick | mask | entry-num | list}
+	        AKICK channel LIST [mask | entry-num | list]
+	        AKICK channel VIEW [mask | entry-num | list]
 	        AKICK channel ENFORCE
 	        AKICK channel CLEAR
 	
@@ -4733,6 +4733,9 @@ CHAN_HELP_AKICK
 	the command, that reason will be used when the user is
 	kicked; if not, the default reason is "You have been
 	banned from the channel".
+	When akicking a registered nick the nickserv account
+	will be added to the akick list instead of the mask.
+	All users within that nickgroup will then be akicked.
 	
 	The AKICK STICK command permanently bans the given mask 
 	on the channel. If someone tries to remove the ban, %S

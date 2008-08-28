@@ -326,8 +326,6 @@ HELP_LIMIT_HOST_SETTER
 	Limited to Host Setters.
 HELP_LIMIT_HOST_REMOVER
 	Limited to Host Removers.
-HELP_LIMIT_SUPER_ADMIN
-	Limited to Super Administrators.
 
 ###########################################################################
 #
@@ -3443,10 +3441,10 @@ NEWS_HELP_LOGON
 	
 	Edite ou affiche la liste de messages logon news. Lorsqu'un
 	utilisateur se connecte au réseau, ces messages leur seront
-	envoyés. (Cependant, pas plus de trois messages ne seront
+	envoyés. (Cependant, pas plus de NewsCount messages ne seront
 	envoyés pour éviter le flood des utilisateurs. Si il y a
-	plus de trois messages de news, seuls les trois plus récents
-	seront envoyés.)
+	plus messages de news, seuls les plus récents seront envoyés.)
+	NewsCount peut être configuré en services.conf.
 	
 	LOGONNEWS LIST peut être utilisée par tout IRC operator pour
 	lister les messages de news courants. ADD et DEL peuvent
@@ -3459,10 +3457,10 @@ NEWS_HELP_OPER
 	
 	Edite ou affiche la liste des messages oper news. Quand un
 	utilisateur utilise la commande /OPER, ces messages lui seront
-	envoyés. (Cependant, pas plus de trois messages ne seront 
-	envoyés afin de ne pas flooder l'utilisateur. Si il y a plus
-	de trois messages news, seuls les trois plus récents seront
-	envoyés.)
+	envoyés. (Cependant, pas plus de NewsCount messages ne seront 
+	envoyés afin de ne pas flooder l'utilisateur. Si il y a plus 
+	messages news, seuls les plus récents seront envoyés.)
+	NewsCount peut être configuré en services.conf.
 	
 	OPERNEWS LIST peut être utilisée par tout IRC operator pour
 	lister les messages oper news actuels. ADD et DEL peuvent 

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1418"
+VERSION_BUILD="1420"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1420)
+# BUGS  : 882
+# NOTES : Replaces the static count in logon&oper -news by a reference to NewsCount. Also fixes a booboo in my first commit. 
 #
 # BUILD : 1.7.21 (1419)
 # BUGS  : 875

@@ -3368,6 +3368,7 @@ NEWS_HELP_LOGON
 	angezeigt. (Es werden jedoch nur max. 3 angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr als 3 News
 	existieren, werden nur die 3 neuesten angezeigt.)
+	NewsCount can be configured in services.conf.
 	
 	LOGONNEWS LIST kann von jedem IRC Operator benutzt werden
 	um die aktuelle Liste der Logon News anzeigen zu lassen.
@@ -3385,6 +3386,7 @@ NEWS_HELP_OPER
 	(Es werden jedoch nur max. 3 Nachrichten angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr als 3 News
 	existieren, werden nur die 3 neüsten angezeigt.)
+	NewsCount can be configured in services.conf.
 	
 	OPERNEWS LIST kann von jedem IRC Operator benutzt werden
 	um die aktuelle Liste der Oper-News anzeigen zu lassen.

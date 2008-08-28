@@ -3368,9 +3368,10 @@ NEWS_HELP_LOGON
 	Wijzigt de lijst met login nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker met het netwerk verbindt, worden deze
 	berichten naar hem/haar verzonden.  (Echter, er zullen nooit
-	meer dan drie berichten worden verstuurd om het flooden van de
-	gebruiker te voorkomen. Als er meer dan drie nieuwsberichten
-	zijn worden alleen de drie meest recente vestuurd.)
+	meer dan NewsCount berichten worden verstuurd om het flooden van de
+	gebruiker te voorkomen. Als er meer dan NewsCount nieuwsberichten
+	zijn worden alleen de meest recente vestuurd.)
+	NewsCount kan geconfigureerd worden in services.conf.
 	
 	LOGONNEWS LIST mag door elke IRC operator worden gebruikt om
 	de huidige nieuwsberichten weer te geven. ADD en DEL mogen
@@ -3385,9 +3386,10 @@ NEWS_HELP_OPER
 	Wijzigt de lijst met oper nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker opert (dmv het /OPER commando), worden
 	deze berichtennaar hem/haar verzonden.  (Echter, er zullen
-	nooit meer dan drie berichten worden verstuurd om het flooden
-	van de gebruiker te voorkomen. Als er meer dan drie nieuws-
-	berichten zijn worden alleen de drie meest recente vestuurd.)
+	nooit meer dan NewsCount berichten worden verstuurd om het flooden
+	van de gebruiker te voorkomen. Als er meer nieuwsberichten 
+	zijn worden alleen de meest recente vestuurd.)
+	NewsCount kan geconfigureerd worden in services.conf.
 	
 	OPERNEWS LIST mag door elke IRC operator worden gebruikt om
 	de huidige nieuwsberichten weer te geven. ADD en DEL mogen

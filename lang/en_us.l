@@ -3273,10 +3273,10 @@ NEWS_HELP_LOGON
 	
 	Edits or displays the list of logon news messages.  When a
 	user connects to the network, these messages will be sent
-	to them.  (However, no more than three messages will be
+	to them.  (However, no more than NewsCount messages will be
 	sent in order to avoid flooding the user.  If there are
-	more than three news messages, only the three most recent
-	will be sent.)
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
 	LOGONNEWS LIST may be used by any IRC operator to list the
 	current news messages.  ADD and DEL may only be used by
@@ -3289,10 +3289,10 @@ NEWS_HELP_OPER
 	
 	Edits or displays the list of oper news messages.  When a
 	user opers up (with the /OPER command), these messages will
-	be sent to them.  (However, no more than three messages will
+	be sent to them.  (However, no more than NewsCount messages will
 	be sent in order to avoid flooding the user.  If there are
-	more than three news messages, only the three most recent
-	will be sent.)
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
 	OPERNEWS LIST may be used by any IRC operator to list the
 	current oper news messages.  ADD and DEL may only be used by

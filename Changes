@@ -50,6 +50,7 @@ Anope Version  S V N
 08/18 F CS GETKEY response.                                               [#880]
 08/21 F Potential issues caused by not setting SO_REUSEADDR on socket.    [ #00]
 08/28 F Fixed several language & help related errors.                     [#875]
+08/28 F Replaced static count in login/opernews help.                     [#882]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]

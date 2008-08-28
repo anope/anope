@@ -442,8 +442,6 @@ NICK_SET_DISABLED
 	Spiacente, l'impostazione delle opzioni dei nick è temporaneamente disabilitata.
 NICK_SET_UNKNOWN_OPTION
 	Opzione SET %s sconosciuta.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Opzione SET %s sconosciuta, o nick non registrato.
 NICK_SET_OPTION_DISABLED
 	L'opzione %s non può essere impostata su questa rete.
 
@@ -5715,21 +5713,17 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sintassi: UMODE nick modi
 	
-	Permette ai Services Admin di impostare i modi per
+	Permette ai Super Admins di impostare i modi per
 	qualsiasi utente. I parametri sono gli stessi del
 	comando /MODE standard.
-	
-	Limitato ai Services admin.
 
 OPER_HELP_OLINE
 	Sintassi: OLINE nick flag
 	
-	Permette ai Services admin di impostare le Operflag
+	Permette ai Super Admins di impostare le Operflag
 	per qualsiasi utente. Le flag devono essere introdotte
 	da "+" o "-". Per rimuovere tutte le flag, è sufficiente
 	usare "-" senza altri parametri.
-	
-	Limitato ai Services admin.
 
 OPER_HELP_CLEARMODES
 	Sintassi: CLEARMODES canale [ALL]
@@ -5756,8 +5750,7 @@ OPER_HELP_SVSNICK
 	Sintassi: SVSNICK nick nuovonick
 	
 	Forza il cambio del nickname di un utente da nick a newnick.
-	
-	Limitato ai Services admin
+	Limited to Super Admins.
 
 OPER_HELP_AKILL
 	Sintassi: AKILL ADD [+durata] mask motivo
@@ -5991,7 +5984,9 @@ OPER_HELP_SET_LOGCHAN
 	in un canale specificato oltre che al log file. LogChannel dev'essere
 	definito nel file di configurazione dei services per permettere a
 	questa opzione di funzionare.
-
+	
+	This option is equivalent to the command-line option -logchan.
+	
 	Nota: Potrebbero esserci problemi di sicurezza se il canale non
 	viene impostato con restrizioni adeguate.
 
@@ -6044,7 +6039,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Sintassi: SET LIST
 
-	Mostra le varie impostazioni di OperServ
+	Mostra le varie impostazioni di %S
 
 OPER_HELP_NOOP
 	Sintassi: NOOP SET server
@@ -6136,19 +6131,6 @@ OPER_HELP_RESTART
 	
 	Limitato ai Services admin.
 
-OPER_HELP_KILLCLONES
-	Sintassi: KILLCLONES nick
-	
-	Killa tutti gli utenti che hanno lo stesso host di nick.
-	Una AKILL temporanea, nel formato *@host, viene aggiunta
-	in modo da evitare che i client killati si riconnettano
-	immediatamente. Viene inoltre inviato un wallop per indicare
-	chi ha usato il comando, a quale host era rivolto e quanti
-	utenti sono stati killati. Questo comando è utile per
-	rimuovere numerosi cloni dalla rete.
-	
-	Limitato ai Services operator.
-	
 OPER_HELP_CHANLIST
 	Sintassi: CHANLIST [{pattern | nick} [SECRET]]
 	

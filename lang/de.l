@@ -466,8 +466,6 @@ NICK_SET_DISABLED
 	Das Ändern der Optionen wurde deaktiviert.
 NICK_SET_UNKNOWN_OPTION
 	Unbekannte SET Option %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Unbekannte SET Option %s, oder der Nickname ist nicht registriert.
 NICK_SET_OPTION_DISABLED
 	Option %s kann in diesem Netzwerk nicht benutzt werden.
 
@@ -4227,12 +4225,13 @@ NICK_SERVADMIN_HELP_LIST
 	NOEXPIRE eingeschaltet ist, werden ein ! vor ihrem
 	Eintrag in der Liste haben.
 	
-	Wenn die Option FORBIDDEN, SUSPENDED, NOEXPIRE oder UNCONFIRMED angegeben wird,
-	werden nur Nicknamen angezeigt die das entsprechene Muster haben
-	(FORBIDDEN, SUSPENDED, UNCONFIRMED oder NOEXPIRE). Wenn alle 3 Optionen angegeben
-	werden, werden alle Nicknamen angezeigt die den 3 Muster entsprechen. 
+	Wenn die Option FORBIDDEN, SUSPENDED, NOEXPIRE oder UNCONFIRMED
+	angegeben wird, werden nur Nicknamen angezeigt die das entsprechene
+	Muster haben (FORBIDDEN, SUSPENDED, UNCONFIRMED oder NOEXPIRE). 
+	Wenn mehr Optionen angegeben werden, werden alle Nicknamen angezeigt
+	die den Muster entsprechen. 
 	
-	Diese Funktion ist beschränkt auf Services Administratoren.
+	Diese optionen ist beschränkt auf Services Administratoren.
 	
 	Beispiele:
 	
@@ -5346,7 +5345,7 @@ CHAN_SERVADMIN_HELP_LIST
 	dem Eintrag haben.
 	
 	Wird FORBIDDEN oder NOEXPIRE angegeben, werden nur Channels
-	mit dem entsprechenden Flag angezeigt. Werden beide Optionen
+	mit dem entsprechenden Flag angezeigt. Werden mehr Optionen
 	angegeben, werden nur Channels angezeigt, die mindestens eins
 	der entsprechenden Flags gesetzt haben. Diese Funktionen sind
 	beschränkt auf Services Administratoren.
@@ -5741,7 +5740,7 @@ OPER_HELP_LOGGED
 OPER_HELP_GLOBAL
 	Syntax: GLOBAL Nachricht
 	
-	Ermöglicht IRCops eine Nachricht an alle User auf
+	Ermöglicht Administratoren eine Nachricht an alle User auf
 	dem Netzwerk zu senden. Die Nachricht wird als
 	Absender %s tragen.
 
@@ -5866,14 +5865,14 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE User Modi
 	
-	Erlaubt es Services Administratoren die Usermodi eines 
+	Erlaubt es Super Adminstratoren die Usermodi eines 
 	beliebigen Users zu ändern. Der Paramater hat das gleiche 
 	Format wie der normale /MODE Befehl.
 
 OPER_HELP_OLINE
 	Syntax: OLINE User Flags
 	
-	Erlaubt es Services Administratoren einem User Operflags 
+	Erlaubt es Super Adminstratoren einem User Operflags 
 	zu setzen.Den Flags muss ein "+" oder ein "-" vorangestellt 
 	werden. Um alle Operflags zu entfernen, nutze einfach ein 
 	"-" ohne Operflags.
@@ -5888,7 +5887,7 @@ OPER_HELP_CLEARMODES
 OPER_HELP_KICK
 	Syntax: KICK Channel User Grund
 	
-	Erlaubt IRCops einen User aus einem beliebigen
+	Erlaubt staff einen User aus einem beliebigen
 	Channel zu kicken. Die Parameter sind dieselben
 	wie für das normale /KICK Befehl.
 	Die Kick-Nachricht wird den Nicknamen des IRCops
@@ -5900,6 +5899,7 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK Nickname Neuer-Nickname
 	
 	Erzwingt die Änderung des Nicknamens eines User zu dem neuen Nicknamen.
+	Limited to Super Admins.
 
 OPER_HELP_AKILL
 	Syntax: AKILL ADD [+Zeit] Maske Grund
@@ -6144,7 +6144,10 @@ OPER_HELP_SET_LOGCHAN
 	Mit dieser Option senden die Services alle Logeinträge zum
 	angegebenen Channel. LogChannel muss in der Services Config
 	Datei aktiviert sein.
-
+	
+	Diese Option ist äquivalent mit der Befehlszeilen-
+	Option -logchan.
+	
 	Anmerkung: Diese Option kann ein großes Sicherheitsproblem
 	               darstellen, wenn der Logchannel nicht ausreichend
 	               gesichert ist.
@@ -6197,7 +6200,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Zeigt dir eine Liste der verfügbaren Einstellungen von OperServ
+	Zeigt dir eine Liste der verfügbaren Einstellungen von %S
 
 OPER_HELP_NOOP
 	Syntax: NOOP SET Server
@@ -6274,18 +6277,6 @@ OPER_HELP_RESTART
 	die Datenbanken speichern, und danach neustarten
 	(die ausführbare Datei erneut aufrufen).	
 
-OPER_HELP_KILLCLONES
-	Syntax: KILLCLONES Nickname
-	
-	Killt alle User die den gleichen Hostnamen haben wie
-	Nickname. Ein temporärer AKILL, in der Form *@host
-	wird ebenfalls aktiviert, dass die Klone daran hindert,
-	sofort neu zu connecten. Es wird zusätzlich eine
-	wallops gesendet, die alle Oper darüber informiert,
-	wer den Befehl genutzt hat und wieviele Hosts
-	betroffen waren. Es ist nützlich, wenn man mehrere
-	Klones vom Netz entfernen möchte.
-	
 OPER_HELP_CHANLIST
 	Syntax: CHANLIST [{Muster | Nickname} [SECRET]]
 	

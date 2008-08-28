@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("OLINE", do_operoline, is_services_admin,
+    c = createCommand("OLINE", do_operoline, is_services_root,
                       OPER_HELP_OLINE, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 

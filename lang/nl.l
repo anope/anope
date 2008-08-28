@@ -456,8 +456,6 @@ NICK_SET_DISABLED
 	Sorry, nickname opties aanpassen is tijdelijk uitgeschakeld.
 NICK_SET_UNKNOWN_OPTION
 	Onbekende SET optie %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Onbekende SET optie %s, of nickname is niet geregistreerd.
 NICK_SET_OPTION_DISABLED
 	Optie %s kan niet gezet worden op dit netwerk.
 
@@ -4121,9 +4119,9 @@ NICK_SERVADMIN_HELP_LIST
 	
 	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
 	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
-	NOEXPIRE flag set will be displayed. If all three options are
-	given, all three types of nicks will be displayed. These options
-	are Gelimiteerd tot Services admins.  
+	NOEXPIRE flag set will be displayed. If multiple options are
+	given, all nicks matching at least one option will be displayed.
+	These options are limited to Services admins.  
 	
 	Voorbeelden:
 	
@@ -5604,9 +5602,9 @@ OPER_HELP_LOGGED
 OPER_HELP_GLOBAL
 	Gebruik: GLOBAL bericht
 	
-	Stelt IRCops in staat om berichten te versturen naar alle gebruikers
-	op het netwerk.
-	Berichten zullen verstuurd worden vanaf de nick %s.
+	Stelt Administrators in staat om berichten te versturen
+	naar alle gebruikers op het netwerk. Berichten zullen 
+	verstuurd worden vanaf de nick %s.
 
 OPER_HELP_STATS
 	Gebruik: STATS [AKILL | ALL | RESET]
@@ -5722,21 +5720,17 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Gebruik: UMODE gebruiker modes
 	
-	Stelt Services administrators in staat gebruikersmodes van
+	Stelt Super Admins in staat gebruikersmodes van
 	elke willekeurige gebruiker in te stellen. De paramenters
 	zijn hetzelfde als van een standaard /MODE commando.
-	
-	Gelimiteerd tot Services adminstrators.
 
 OPER_HELP_OLINE
 	Gebruik: OLINE gebruiker flags
 	
-	Stelt Services administrators in staat om Operflags te geven
+	Stelt Super Admins in staat om Operflags te geven
 	aan elke willekeurig gebruiker. Flags moeten worden vooraf
 	gegeaan door een "+" of een "-". Om alle flags te verwijderen
 	kun je simpelweg een "-" typen in plaats van de flags.
-	
-	Gelimiteerd tot Services adminstrators.
 
 OPER_HELP_CLEARMODES
 	Gebruik: CLEARMODES kanaal [ALL]
@@ -5748,7 +5742,7 @@ OPER_HELP_CLEARMODES
 OPER_HELP_KICK
 	Gebruik: KICK kanaal gebruiker reden
 	
-	Stelt IRCops in staat om een gebruik van elk willekeurig
+	Stelt de staf in staat om een gebruik van elk willekeurig
 	kanaal te kicken. De paramenters zijn hetzelfde als die van
 	een standaard /KICK commando. Het kick-bericht zal de nickname
 	van de IRCop die het KICK commando uitvoert bevatten.
@@ -5759,7 +5753,8 @@ OPER_HELP_KICK
 OPER_HELP_SVSNICK
 	Gebruik: SVSNICK nick nieuwe nick
 
-	Veranderd een gebruiker's nick van nick naar nieuwe nick.	
+	Veranderd een gebruiker's nick van nick naar nieuwe nick.
+	Gelimiteerd tot Super Admins.
 
 OPER_HELP_AKILL
 	Gebruik: AKILL ADD [+verlooptijd] mask reden
@@ -5982,7 +5977,9 @@ OPER_HELP_SET_LOGCHAN
 	naast de log-bestanden ook naar een gespecificeerd kanaal
 	sturen. LogChannel moet ik ook gedefineerd zijn in het Services
 	configuratie bestand om deze instelling bruikbaar te laten zijn.
-
+	
+	Deze optie komt overeen met de commandline-optie -logchan.
+	
 	Let op: Dit kan grote beveiligingsimplicaties met zich mee
 	bregen als het log-kanaal niet goed beveiligd is.
 
@@ -6032,7 +6029,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Gebruik: SET LIST
 	
-	Geef de verschillende OperServ instellingen weer.
+	Geef de verschillende %S instellingen weer.
 
 OPER_HELP_NOOP
 	Gebruik: NOOP SET server
@@ -6104,17 +6101,6 @@ OPER_HELP_RESTART
 	Zorgt ervoor dat Services alle databases opslaat en dan
 	opnieuw opstart.
 
-OPER_HELP_KILLCLONES
-	Gebruik: KILLCLONES nick
-	
-	KILLt alle gebruikers die dezelfde hostname als nick hebben.
-	Een tijdelijk AKILL, in de vorm *@host, wordt toegevoegd om
-	te voorkomen dat de getroffen clients meteen opnieuw verbinden.
-	Er wordt ook een WALLOPS verstuurd waarin staat wie het
-	commando gebruikte, welke host er getroffen is en hoeveel
-	gebuiker se geKILLed zijn. Dit commando is bruikbaar om
-	een groot aantal klonen van het netwerk te verwijderen.
-	
 OPER_HELP_CHANLIST
 	Gebruik: CHANLIST [{trefbeeld | nick} [SECRET]]
 	
@@ -6157,8 +6143,6 @@ OPER_HELP_MODINFO
 
 	Dit command geeft informatie weer over de gespecificeerde
 	geladen module.
-
-	Gelimiteerd to Services Roots.
 
 OPER_HELP_MODLIST
 	Gebruik: MODLIST

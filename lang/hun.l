@@ -447,8 +447,6 @@ NICK_SET_DISABLED
 	Sajnálom,  a nicknév opció beállítás jelenleg szünetel.
 NICK_SET_UNKNOWN_OPTION
 	Ismeretlen SET opció: %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Ismeretlen SET opció: %s,  vagy a nick nem regisztrált.
 NICK_SET_OPTION_DISABLED
 	Ez az opció: %snem állítható be ezen a hálózaton.
 
@@ -5710,8 +5708,7 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick újnick
 	
 	Erõszakkal meváltóztatja a user nickevét újnicknévre.
-	
-	Korlátozva Szuper adminnak
+	Limited to Super Admins.
 	
 OPER_HELP_AKILL
 	Syntax: AKILL  ADD [ +lejárat] maszk indok
@@ -5924,7 +5921,9 @@ OPER_HELP_SET_LOGCHAN
 	a részletes napló adatokat és persze a naplófájlba.
 	A Naplózó Csatornát (LogChannel) meg kell határozni a
 	szervíz config fáljában, hogy	használhasd ezt az opciót.
-	 	
+	
+	This option is equivalent to the command-line option -logchan.
+	
 	Jegyzet: súlyos biztonsági gondokat okozhat, ha ez a
 	naplózó szoba nincs kellõen védve.
 	
@@ -5975,7 +5974,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Display the various %S settings
 	
 OPER_HELP_NOOP
 	Syntax: NOOP SET szerver
@@ -6062,19 +6061,6 @@ OPER_HELP_RESTART
 	(Kilép, majd újraindul.)
 	
 	Korlátozva Szervíz adminoknak.	
-	
-OPER_HELP_KILLCLONES
-	Syntax: KILLCLONES nick 
-	
-	Killel minden usert, aki az adott nick hosztjáról van fent
-	Egy idõzített, *@host formátumú AKILL hozzáadásra kerül,
-	hogy megelõzze, hogy a kliensek azonnal visszalépjenek.
-	Egy wallops üzenet kerül elküldésre a parancs használója,
-	az érintett hoszt és a killelt userek számával.
-	Ez akkor hasznos, ha sok klónt kell eltávolítani
-	a hálózatról.
-	
-	Korlátozva Szervíz operátornak.
 	
 OPER_HELP_CHANLIST
 	Syntax: CHANLIST [{pattern | nick} [SECRET]]

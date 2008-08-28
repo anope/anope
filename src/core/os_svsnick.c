@@ -32,7 +32,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("SVSNICK", do_svsnick, is_services_admin,
+    c = createCommand("SVSNICK", do_svsnick, is_services_root,
                       OPER_HELP_SVSNICK, -1, -1, -1, -1);
     moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 

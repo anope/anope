@@ -446,8 +446,6 @@ NICK_SET_DISABLED
 	Συγνώμη, η υπηρεσία για τον καθορισμό και τις επιλογές του ψευδώνυμου είναι για την ώρα απενεργοποιημένη.
 NICK_SET_UNKNOWN_OPTION
 	’γνωστη SET επιλογή %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	’γνωστη SET επιλογή %s, ή το ψευδώνυμο δεν είναι κατοχυρωμένο.
 NICK_SET_OPTION_DISABLED
 	Η επιλογή %s δεν μπορεί να χρησιμοποιηθεί στο δίκτυο αυτό.
 
@@ -5765,20 +5763,16 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE user modes
 	
-	Allows Services admins to set user modes for any user.
+	Allows Super Admins to set user modes for any user.
 	Parameters are the same as for the standard /MODE
 	command.
-	
-	Limited to Services admins.
 
 OPER_HELP_OLINE
 	Syntax: OLINE user flags
 	
-	Allows Services admins to give Operflags to any user.
+	Allows Super Admins to give Operflags to any user.
 	Flags have to be prefixed with a "+" or a "-". To
 	remove all flags simply type a "-" instead of any flags.
-
-	Limited to Services admins.
 
 OPER_HELP_CLEARMODES
 	Σύνταξη: CLEARMODES κανάλι [ALL]
@@ -5805,8 +5799,7 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick newnick
 	
 	Forcefully changes a user's nickname from nick to newnick.
-	
-	Limited to Services admins
+	Limited to Super Admins.
 
 OPER_HELP_AKILL
 	Σύνταξη: AKILL ADD [+expiry] μάσκα λόγος
@@ -6036,7 +6029,9 @@ OPER_HELP_SET_LOGCHAN
 	channel as well as the log file. LogChannel must also be defined
 	in the Services configuration file for this setting to be of any
 	use.
-
+	
+	This option is equivalent to the command-line option -logchan.
+	
 	Note: This can have strong security implications if your log
 	channel is not properly secured.
 
@@ -6087,7 +6082,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Display the various %S settings
 
 OPER_HELP_NOOP
 	Σύνταξη: NOOP SET server
@@ -6176,17 +6171,6 @@ OPER_HELP_RESTART
 	
 	Μόνο για τους Services admins.	
 
-OPER_HELP_KILLCLONES
-	Σύνταξη: KILLCLONES ψευδώνυμο
-	
-	Κάνει Kills όλους τους ψευτο-χρήστες που έχουν την ίδια μάσκα. Η
-	εντολή AKILL, σε μορφή *@host, προστίθεται 
-	αμέσως. Οι wallops βλέπουν ποιοι χρησιμοποιούν την εντολή αυτή, 
-	ποιο host είναι και πόσοι χρήστες σκοτώνονται (killed). 
-	Είναι χρήσιμο να απομακρύνονται οι κλώνοι από το δίκτυο.
-	    
-	Μόνο για τους Services operators.
-	
 OPER_HELP_CHANLIST
 	Σύνταξη: CHANLIST [{επιλογή | ψευδώνυμο} [SECRET]]	
 	

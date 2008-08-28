@@ -452,8 +452,6 @@ NICK_SET_DISABLED
 	Lo siento, el seteo de opciones para nicknames esta temporalmente deshabilitado.
 NICK_SET_UNKNOWN_OPTION
 	Opcion SET desconocida %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Opcion SET desconocida %s, o nickname no registrado.
 NICK_SET_OPTION_DISABLED
 	Opcion %s no puede ser seteada en esta red.
 
@@ -5682,8 +5680,8 @@ OPER_HELP_LOGGED
 OPER_HELP_GLOBAL
 	Sintaxis: GLOBAL mensaje
 	
-	Permite a los IRCops a enviar mensajes a los usuarios en
-	la red. El mensaje sera enviado desde el nick %s.
+	Permite a los Administrators a enviar mensajes a los usuarios
+	en la red. El mensaje sera enviado desde el nick %s.
 
 OPER_HELP_STATS
 	Sintaxis: STATS [AKILL | ALL | RESET]
@@ -5804,22 +5802,18 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sintaxis: UMODE usuario modos
 	
-	Permite a administradores de servicios a setear modos de
+	Permite a Super Admins a setear modos de
 	usuarios para cualquier usuario. Los parametros son los
 	mismos que para el comando /MODE.
-	
-	Limitado a administradores de Servicios.
 
 OPER_HELP_OLINE
 	Sintaxis: OLINE usuario opciones
 	
-	Permite a administradores de servicios a dar permisos de
+	Permite a Super Admins a dar permisos de
 	operador a cualquier usuario. Las opciones deben estar
 	antepuestas con un "+" o un "-". Para remover todas las
 	opciones simplemente tipear un "-" en vez de cualquier
 	opcion.
-
-	Limitado a administradores de Servicios.
 
 OPER_HELP_CLEARMODES
 	Sintaxis: CLEARMODES canal [ALL]
@@ -5846,8 +5840,7 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick nuevonick
 	
 	Cambia, a la fuerza, el nick del usuario from nick a nuevonick.
-	
-	Limitado a Administradores de Servicios
+	Limitado a Super Admins.
 
 OPER_HELP_AKILL
 	Sintaxis: AKILL ADD [+expiracion] mascara razon
@@ -6096,7 +6089,10 @@ OPER_HELP_SET_LOGCHAN
 	En modo on, los Servicios envian sus logs a un canal especificado
 	y a sus debidos archivos. LogChannel debe estar definido en la
 	configuracion de los Servicios para poder usar esta opcion.
-
+	
+	Esta opcion es equivalente a la opcion -logchan en
+	la linea de comando.
+	
 	Nota: Es importante que el canal sea apropriadamente 
 	seguro con ingreso a Administradores solamente.
 
@@ -6147,7 +6143,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Display the various %S settings
 
 OPER_HELP_NOOP
 	Sintaxis: NOOP SET servidor
@@ -6240,19 +6236,6 @@ OPER_HELP_RESTART
 	el ejecutable nuevamente).
 	
 	Limitado a administradores de Servicios.
-
-OPER_HELP_KILLCLONES
-	Sintaxis: KILLCLONES nick
-	
-	Killea todos los usuarios con el mismo host a nick.
-	Un AKILL temporario, de la forma *@host, es añadido
-	para prevenir al cliente ofensor de reconectarse
-	inmediatamente. Un wallops es tambien enviado indicando
-	quien usi el comando, que host fue afectadi y cuantos
-	usuarios fueron killeados. Este comando es util para
-	remover multiples clones de la red.
-	
-	Limitado a operadores de Servicios.
 
 OPER_HELP_CHANLIST
 	Sintaxis: CHANLIST [{patron | nick} [SECRET]]

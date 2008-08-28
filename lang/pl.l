@@ -482,9 +482,6 @@ NICK_SET_DISABLED
 	niedostêpne.
 NICK_SET_UNKNOWN_OPTION
 	Nieznana opcja komendy SET %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Nieznana opcja komendy SET %s, 
-	lub ten nick jest niezarejestrowany.
 NICK_SET_OPTION_DISABLED
 	Opcja %s jest niedostêpna na tej sieci.
 
@@ -6063,8 +6060,8 @@ OPER_HELP_LOGGED
 OPER_HELP_GLOBAL
 	Syntax: GLOBAL message
 	
-	Allows IRCops to send messages to all users on the network.
-	The message will be sent from the nick %s.
+	Allows Administrators to send messages to all users on the 
+	network. The message will be sent from the nick %s.
 
 OPER_HELP_STATS
 	Syntax: STATS [AKILL | ALL | RESET]
@@ -6175,20 +6172,16 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE user modes
 	
-	Allows Services admins to set user modes for any user.
+	Allows Super Admins to set user modes for any user.
 	Parameters are the same as for the standard /MODE
 	command.
-	
-	Limited to Super admins.
 
 OPER_HELP_OLINE
 	Syntax: OLINE user flags
 	
-	Allows Services admins to give Operflags to any user.
+	Allows Super Admins to give Operflags to any user.
 	Flags have to be prefixed with a "+" or a "-". To
 	remove all flags simply type a "-" instead of any flags.
-
-	Limited to Super admins.
 
 OPER_HELP_CLEARMODES
 	Syntax: CLEARMODES channel [ALL]
@@ -6202,7 +6195,7 @@ OPER_HELP_CLEARMODES
 OPER_HELP_KICK
 	Syntax: KICK channel user reason
 	
-	Allows IRCops to kick a user from any channel.
+	Allows staff to kick a user from any channel.
 	Parameters are the same as for the standard /KICK
 	command.  The kick message will have the nickname of the
 	IRCop sending the KICK command prepended; for example:
@@ -6215,7 +6208,6 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick newnick
 	
 	Forcefully changes a user's nickname from nick to newnick.
-	
 	Limited to Super admins
 
 OPER_HELP_AKILL
@@ -6447,7 +6439,9 @@ OPER_HELP_SET_LOGCHAN
 	channel as well as the log file. LogChannel must also be defined
 	in the Services configuration file for this setting to be of any
 	use.
-
+	
+	This option is equivalent to the command-line option -logchan.
+	
 	Note: This can have strong security implications if your log
 	channel is not properly secured.
 
@@ -6498,7 +6492,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Display the various %S settings
 
 OPER_HELP_NOOP
 	Syntax: NOOP SET server
@@ -6586,19 +6580,6 @@ OPER_HELP_RESTART
 	
 	Limited to Services admins.	
 
-OPER_HELP_KILLCLONES
-	Syntax: KILLCLONES nick
-	
-	Kills all users who have the same hostname as nick. A
-	temporary AKILL, in the form *@host, is added to 
-	prevent the offending clients from immediately 
-	reconnecting. A wallops is also sent indicating who 
-	used the command, which host was affected and how many
-	users were killed. It's usefull for removing numerous 
-	clones from the network.
-
-	Limited to Services operators.
-	
 OPER_HELP_CHANLIST
 	Syntax: CHANLIST [{pattern | nick} [SECRET]]
 	

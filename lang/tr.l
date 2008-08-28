@@ -450,8 +450,6 @@ NICK_SET_DISABLED
 	NickServ'ün SET komutu geçici olarak devre dýþýdýr.
 NICK_SET_UNKNOWN_OPTION
 	Varolmayan SET özelliði: %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Varolmayan SET özelliði: %s, yada nick kayýtlý deðil.
 
 # SET DISPLAY responses
 NICK_SET_OPTION_DISABLED
@@ -4183,9 +4181,9 @@ NICK_SERVADMIN_HELP_LIST
 	
 	If the FORBIDDEN, SUSPENDED, NOEXPIRE or UNCONFIRMED options are given, only
 	nicks which, respectively, are FORBIDDEN, SUSPENDED, UNCONFIRMED or have the
-	NOEXPIRE flag set will be displayed. If all three options are
-	given, all three types of nicks will be displayed. These options
-	are limited to Services admins.  
+	NOEXPIRE flag set will be displayed. If multiple options are
+	given, all nicks matching at least one option will be displayed.
+	These options are limited to Services admins.  
 	
 	Örnekler:
 	
@@ -5719,20 +5717,16 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntax: UMODE user modes
 	
-	Allows Services admins to set user modes for any user.
+	Allows Super Admins to set user modes for any user.
 	Parameters are the same as for the standard /MODE
 	command.
-	
-	Limited to Services admins.
 
 OPER_HELP_OLINE
 	Syntax: OLINE user flags
 	
-	Allows Services admins to give Operflags to any user.
+	Allows Super Admins to give Operflags to any user.
 	Flags have to be prefixed with a "+" or a "-". To
 	remove all flags simply type a "-" instead of any flags.
-
-	Limited to Services admins.
 
 OPER_HELP_CLEARMODES
 	Kullanýmý: CLEARMODES kanaladý [ALL]
@@ -5759,8 +5753,7 @@ OPER_HELP_SVSNICK
 	Syntax: SVSNICK nick newnick
 	
 	Forcefully changes a user's nickname from nick to newnick.
-	
-	Limited to Services admins
+	Limited to Super Admins.
 
 OPER_HELP_AKILL
 	Kullanýmý: AKILL ADD [+zamanaþýmý] mask sebep
@@ -5979,6 +5972,8 @@ OPER_HELP_SET_LOGCHAN
 	channel as well as the log file. LogChannel must also be defined
 	in the Services configuration file for this setting to be of any
 	use.
+	
+	This option is equivalent to the command-line option -logchan.
 
 	Note: This can have strong security implications if your log
 	channel is not properly secured.
@@ -6028,7 +6023,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntax: SET LIST
 
-	Display the various OperServ settings
+	Display the various %S settings
 
 OPER_HELP_NOOP
 	Kullanýmý: NOOP SET server
@@ -6112,19 +6107,6 @@ OPER_HELP_RESTART
 	baþlamasýný saðlar.
 	
 	Servis adminlerinin Kullanýmýyla sýnýrlýdýr.	
-
-OPER_HELP_KILLCLONES
-	Kullanýmý: KILLCLONES nick
-	
-	Hostnameleri ayný olan tüm kullanýcýlarý kill ler.
-	Geçici bir AKILL, *@host formatýnda, eklenerek
-	kullanýcýnýn hemen yeniden baðlanmasýna engel olunur.
-	Komutu kullananý, hangi hostname in etkilendiðini ve
-	kaç tane kullanýcýnýn kill lendiðini belirten bir wallop
-	gönderilir. Networkten sayýsýz clone larý temizlemek için
-	kullanýþlýdýr.
-	
-	Servis operatörlerinin kullanýmýyla sýnýrlýdýr.
 
 OPER_HELP_CHANLIST
 	Kullanýmý: CHANLIST [{model | nick} [SECRET]]

@@ -454,8 +454,6 @@ NICK_SET_DISABLED
 	Desculpe, a opção SET está temporariamente desativada.
 NICK_SET_UNKNOWN_OPTION
 	Opção SET desconhecida: %s.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	Opção SET desconhecida: %s, ou nick não registrado.
 NICK_SET_OPTION_DISABLED
 	Opção %s não pode ser usada nesta Rede.
 
@@ -5662,21 +5660,17 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Sintaxe: UMODE usuário modos
 	
-	Permite aos Administradores dos Services ajustar os
+	Permite aos Super Admins ajustar os
 	modos de usuário para qualquer usuário. Os parâmetros
 	são os mesmos do comando /MODE padrão.
-	
-	Limitado aos Super-Admins.
 
 OPER_HELP_OLINE
 	Sintaxe: OLINE usuário flags
 	
-	Permite aos Administradores dos Services dar flags de Oper
+	Permite aos Super Admins dar flags de Oper
 	a qualquer usuário. Flags devem ser prefixadas com "+" ou
 	"-". Para remover todas as flags apenas digite um "-" em
 	vez de usar alguma flag.
-
-	Limitado aos Super-Admins.
 
 OPER_HELP_CLEARMODES
 	Sintaxe: CLEARMODES canal [ALL]
@@ -5703,7 +5697,6 @@ OPER_HELP_SVSNICK
 	Sintaxe: SVSNICK nick novo-nick
 	
 	Força a mudança do nick de um usuário, de nick a novo-nick.
-	
 	Limitado aos Super-Admins.
 
 OPER_HELP_AKILL
@@ -5931,6 +5924,8 @@ OPER_HELP_SET_LOGCHAN
 	para um canal especificado. LogChannel deve estar definido
 	na configuração dos Services para esta opção poder ser usada.
 	
+	This option is equivalent to the command-line option -logchan.
+	
 	Nota: Pode haver graves implicações de segurança se o canal
 	de log não estive devidamente seguro.
 
@@ -5982,7 +5977,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Sintaxe: SET LIST
 	
-	Exibe as várias configurações do OperServ.
+	Exibe as várias configurações do %S.
 
 OPER_HELP_NOOP
 	Sintaxe: NOOP SET servidor
@@ -6069,19 +6064,6 @@ OPER_HELP_RESTART
 	
 	Limitado aos Administradores dos Services.
 
-OPER_HELP_KILLCLONES
-	Sintaxe: KILLCLONES nick
-	
-	Expulsa ("killa") todos os usuários que tenham os mesmos
-	hosts que o nick especificado, adicionando um AKILL temporário
-	no formato *@host para prevenir que os usuários indesejados
-	reconectem imediatamente. Uma mensagem em WallOps é também
-	enviada para indicar quem usou o comando, quais hosts foram
-	afetados e quantos usuários foram expulsos ("killados").
-	É usado para remover vários clones da rede.
-	
-	Limitado aos Operadores dos Services.
-	
 OPER_HELP_CHANLIST
 	Sintaxe: CHANLIST [{padrão | nick} [SECRET]]
 	

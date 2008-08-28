@@ -326,7 +326,8 @@ HELP_LIMIT_HOST_SETTER
 	Limited to Host Setters.
 HELP_LIMIT_HOST_REMOVER
 	Limited to Host Removers.
-
+HELP_LIMIT_SUPER_ADMIN
+	Limited to Super Administrators.
 
 ###########################################################################
 #
@@ -454,8 +455,6 @@ NICK_SET_DISABLED
 	Désolés, la configuration des options du pseudo est temporairement désactivée.
 NICK_SET_UNKNOWN_OPTION
 	L'option SET %s est inconnue.
-NICK_SET_UNKNOWN_OPTION_OR_BAD_NICK
-	L'option SET %s est inconnue, ou le pseudo n'est pas enregistré.
 NICK_SET_OPTION_DISABLED
 	L'option %s ne peut être changée sur ce réseau.
 
@@ -4242,8 +4241,8 @@ NICK_SERVADMIN_HELP_LIST
 	
 	Si les option FORBIDDEN, SUSPENDED, NOEXPIRE ou UNCONFIRMED sont donné,
 	les pseudos qui sont FORBID, SUSPENDED, NON CONFIRMER ou ont l'option
-	NOEXPIRE seront affiché. Si les 3 options sont indiquées,
-	tout les pseudos correspondant aux 3 critères seront affichés.
+	NOEXPIRE seront affiché. Si plus options sont indiquées,
+	tout les pseudos correspondant aux une des critères seront affichés.
 	Réservé aux Services admins.  
 	
 	Exemples:
@@ -5360,7 +5359,7 @@ CHAN_SERVADMIN_HELP_LIST
 	
 	Si les options FORBIDDEN ou NOEXPIRE sont données, seuls 
 	les canaux qui, respectivement, sont interdits ou ont l'option
-	NOEXPIRE active seront affichés. Si les deux options sont
+	NOEXPIRE active seront affichés. Si plus options sont
 	données, les deux types de canaux seront affichés. Ces options
 	sont réservées aux Services admins.
 
@@ -5769,8 +5768,8 @@ OPER_HELP_LOGGED
 OPER_HELP_GLOBAL
 	Syntaxe: GLOBAL message
 	
-	Permet aux IRCops d'envoyer des messages à tous les 
-	utilisateurs du réseau. Le message sera envoyé avec
+	Permet aux Administrators d'envoyer des messages à tous
+	les utilisateurs du réseau. Le message sera envoyé avec
 	le pseudo %s.
 
 OPER_HELP_STATS
@@ -5897,7 +5896,7 @@ OPER_HELP_MODE
 OPER_HELP_UMODE
 	Syntaxe: UMODE pseudo modes
 	
-	Permet aux ServicesAdmin de changer un mode d'un utilisateur.
+	Permet aux Super Admins de changer un mode d'un utilisateur.
 
 OPER_HELP_OLINE
 	Syntaxe: OLINE pseudo flags
@@ -5905,7 +5904,7 @@ OPER_HELP_OLINE
 	Permet de mettre un OperFlag à un utilisateur.
 	Préfixes: "+" et "-". Pour tout supprimer, spécifiez "-"
 
-	Limité aux ServicesAdmins.
+	Limité aux Super Admins.
 
 OPER_HELP_CLEARMODES
 	Syntaxe: CLEARMODES canal [ALL]
@@ -5919,7 +5918,7 @@ OPER_HELP_CLEARMODES
 OPER_HELP_KICK
 	Syntaxe: KICK canal utilisateur raison
 	
-	Permet aux IRCops de kicker un utilisateur d'un canal.
+	Permet aux staff de kicker un utilisateur d'un canal.
 	Les paramètres sont les mêmes que pour la commande /KICK
 	normale. Le message de kick sera préfixé du pseudo de
 	l'IRCop ayant utilisé la commande KICK, par exemple:
@@ -5932,8 +5931,7 @@ OPER_HELP_SVSNICK
 	Syntaxe: SVSNICK pseudo nouveau-pseudo
 	
 	Force le changement de pseudo d'un pseudo.
-	
-	Limité aux Services admins
+	Limité aux Super Admins.
 
 OPER_HELP_AKILL
 	Syntaxe: AKILL ADD [+échéance] masque raison
@@ -6171,7 +6169,10 @@ OPER_HELP_SET_LOGCHAN
 	Permet d'envoyer les logs sur un canal en plus d'écrire dans le
 	fichier de log. LogChannel doit être défini dans le fichier
 	de configuration des services.
-
+	
+	Cette option est équivalente à l'option de la ligne de commande
+	-logchan.
+	
 	Note: En mettant cette option sur OFF vous renforcerez la sécurité...
 
 OPER_HELP_SET_DEBUG
@@ -6219,7 +6220,7 @@ OPER_HELP_SET_IGNORE
 OPER_HELP_SET_LIST
 	Syntaxe: SET LIST
 
-	Afficher diverse option à propos de OperServ
+	Afficher diverse option à propos de %S
 
 OPER_HELP_NOOP
 	Syntaxe: NOOP SET serveur
@@ -6311,20 +6312,6 @@ OPER_HELP_RESTART
 	
 	Réservée aux Services admins.
 
-OPER_HELP_KILLCLONES
-	Syntaxe: KILLCLONES pseudo
-	
-	Déconnecte tous les utilisateurs qui ont la même host que
-	pseudo. Une AKILL temporaire, de la forme *@host, est
-	ajoutée pour empêcher les clients de se reconnecter
-	immédiatement. Un wallops est également envoyé indiquant
-	qui a utilisé la commande, quelle host est affectée et
-	combien d'utilisateurs ont été déconnectés. Elle est
-	utile pour supprimer un nombre important de clones du
-	réseau.
-	
-	Réservée aux Services admins.
-	
 OPER_HELP_CHANLIST
 	Syntaxe: CHANLIST [{modèle | pseudo} [SECRET]]
 	

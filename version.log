@@ -13,6 +13,10 @@ VERSION_BUILD="1418"
 
 # $Log$
 #
+# BUILD : 1.7.21 (1419)
+# BUGS  : 875
+# NOTES : Fixes a number of minor language errors. Restricts access to svsnick, oline and umode to SRA as superadmin too requires SRA. Prevents them from showing up in SA help.
+#
 # BUILD : 1.7.21 (1418)
 # BUGS  : 927
 # NOTES : Applied a patch by w00t to store the timestamp supplied by insp in FJOIN on channel creation

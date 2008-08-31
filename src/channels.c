@@ -533,6 +533,7 @@ void do_join(const char *source, int ac, char **av)
     char *s, *t;
     struct u_chanlist *c, *nextc;
     char *channame;
+    time_t ts = time(NULL);
 
     if (UseTS6 && ircd->ts6) {
         user = find_byuid(source);
@@ -580,10 +581,8 @@ void do_join(const char *source, int ac, char **av)
          * don't get to see things like channel keys. */
         /* If channel already exists, check_kick() will use correct TS.
          * Otherwise, we lose. */
-        if (check_kick(user, s, time(NULL)))
+        if (check_kick(user, s, ts))
             continue;
-
-        time_t ts = time(NULL);
 
         if (ac == 2) {
             if (debug) {

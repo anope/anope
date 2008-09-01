@@ -73,13 +73,14 @@ void myChanServHelp(User * u)
 
 static int access_del(User * u, ChannelInfo *ci, ChanAccess * access, int *perm, int uacc)
 {
-	char *nick = access->nc->display;
+	char *nick;
     if (!access->in_use)
         return 0;
     if (!is_services_admin(u) && uacc <= access->level) {
         (*perm)++;
         return 0;
     }
+    nick = access->nc->display;
     access->nc = NULL;
     access->in_use = 0;
     send_event(EVENT_ACCESS_DEL, 3, ci->name, u->nick, nick);

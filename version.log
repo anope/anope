@@ -9,15 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1422"
+VERSION_BUILD="1423"
 
 # $Log$
 #
+# BUILD : 1.7.21 (1423)
+# BUGS  : 932 
+# NOTES : Fixed crashbug in cs_access.
+#
 # BUILD : 1.7.21 (1422)
 # BUGS  : 927
-# NOTES : Fixes compiling on windows. We should define new variables 
-# above the code not in between.
-#
+# NOTES : Fixes compiling on windows. We should define new variables above the code not in between.
 #
 # BUILD : 1.7.21 (1421)
 # BUGS  : 879

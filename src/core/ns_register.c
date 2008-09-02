@@ -189,7 +189,7 @@ int do_register(User * u)
         notice_lang(s_NickServ, u, MAIL_X_INVALID, email);
     } else {
         if (strlen(pass) > PASSMAX) {
-            pass[PASSMAX] = 0;
+            pass[PASSMAX] = '\0';
             notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX);
         }
         for (idx = 0; idx < 9; idx++) {
@@ -307,7 +307,7 @@ int do_confirm(User * u)
     if (na) {
         int i;
         char tsbuf[16];
-	char tmp_pass[PASSMAX];
+        char tmp_pass[PASSMAX];
 
         len = strlen(pass);
         na->nc->pass = smalloc(PASSMAX);
@@ -366,19 +366,19 @@ int do_confirm(User * u)
                 notice_lang(s_NickServ, u, NICK_REGISTERED_NO_MASK,
                             u->nick);
             send_event(EVENT_NICK_REGISTERED, 1, u->nick);
-	    
-	    if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) 
+        
+        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) 
                 notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
 
             u->lastnickreg = time(NULL);
             if (ircd->modeonreg) {
                 len = strlen(ircd->modeonreg);
                 strncpy(modes,ircd->modeonreg,512);
-	        if(ircd->rootmodeonid && is_services_root(u)) { 
+            if(ircd->rootmodeonid && is_services_root(u)) { 
                     strncat(modes,ircd->rootmodeonid,512-len);
-	        } else if(ircd->adminmodeonid && is_services_admin(u)) {
+            } else if(ircd->adminmodeonid && is_services_admin(u)) {
                     strncat(modes,ircd->adminmodeonid,512-len);
-	        } else if(ircd->opermodeonid && is_services_oper(u)) {
+            } else if(ircd->opermodeonid && is_services_oper(u)) {
                     strncat(modes,ircd->opermodeonid,512-len);
                 }
 

@@ -1036,8 +1036,8 @@ struct c_elist_entry {
 /* Ignorance list data. */
 
 typedef struct ignore_data {
-    struct ignore_data *next;
-    char who[NICKMAX];
+    struct ignore_data *prev, *next;
+    char *mask;
     time_t time;	/* When do we stop ignoring them? */
 } IgnoreData;
 

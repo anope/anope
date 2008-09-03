@@ -2935,11 +2935,11 @@ OPER_IGNORE_SYNTAX
 OPER_IGNORE_VALID_TIME
 	Du musst eine zulässige Zahl als Zeit eingeben.
 OPER_IGNORE_TIME_DONE
-	Der Nickname %s wird jetzt für %s ignoriert.
+	%s wird jetzt für %s ignoriert.
 OPER_IGNORE_PERM_DONE
-	Der Nickname %s will wird jetzt permanent ignoriert.
+	%s will wird jetzt permanent ignoriert.
 OPER_IGNORE_DEL_DONE
-	Der Nickname %s wird nicht länger ignoriert.
+	%s wird nicht länger ignoriert.
 OPER_IGNORE_LIST
 	Services Ignore-Liste:
 OPER_IGNORE_LIST_NOMATCH

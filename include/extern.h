@@ -1007,10 +1007,12 @@ E int defconParseModeString(const char *str);
 /**** process.c ****/
 
 E int allow_ignore;
-E IgnoreData *ignore[];
+E IgnoreData *ignore;
 
 E void add_ignore(const char *nick, time_t delta);
 E IgnoreData *get_ignore(const char *nick);
+E int delete_ignore(const char *nick);
+E int clear_ignores();
 
 E int split_buf(char *buf, char ***argv, int colon_special);
 E void process(void);

@@ -2942,11 +2942,11 @@ OPER_IGNORE_SYNTAX
 OPER_IGNORE_VALID_TIME
 	Je moet een geldig nummer als tijd invoeren.
 OPER_IGNORE_TIME_DONE
-	Nick %s zal nu genegeerd worden voor %s.
+	%s zal nu genegeerd worden voor %s.
 OPER_IGNORE_PERM_DONE
-	Nick %s zal nu permanent genegeerd worden.
+	%s zal nu permanent genegeerd worden.
 OPER_IGNORE_DEL_DONE
-	Nick %s zal niet meer genegeerd worden.
+	%s zal niet meer genegeerd worden.
 OPER_IGNORE_LIST
 	Services negeer-lijst:
 OPER_IGNORE_LIST_NOMATCH

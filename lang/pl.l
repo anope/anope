@@ -3141,11 +3141,11 @@ OPER_IGNORE_SYNTAX
 OPER_IGNORE_VALID_TIME
 	Musisz podaæ prawid³ow± liczbê dla czasu.
 OPER_IGNORE_TIME_DONE
-	Nick %s bêdzie od teraz igorowany na %s.
+	%s bêdzie od teraz igorowany na %s.
 OPER_IGNORE_PERM_DONE
-	Nick %s bêdzie od teraz igorowany ca³y czas.
+	%s bêdzie od teraz igorowany ca³y czas.
 OPER_IGNORE_DEL_DONE
-	Nick %s nie bêdzie ju¿ d³u¿ej ignorowany.
+	%s nie bêdzie ju¿ d³u¿ej ignorowany.
 OPER_IGNORE_LIST
 	Lista ignore serwisów:
 OPER_IGNORE_LIST_NOMATCH

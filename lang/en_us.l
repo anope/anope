@@ -2880,11 +2880,11 @@ OPER_IGNORE_SYNTAX
 OPER_IGNORE_VALID_TIME
 	You have to enter a valid number as time.
 OPER_IGNORE_TIME_DONE
-	Nick %s will now be ignored for %s.
+	%s will now be ignored for %s.
 OPER_IGNORE_PERM_DONE
-	Nick %s will now permanently be ignored.
+	%s will now permanently be ignored.
 OPER_IGNORE_DEL_DONE
-	Nick %s will no longer be ignored.
+	%s will no longer be ignored.
 OPER_IGNORE_LIST
 	Services ignore list:
 OPER_IGNORE_LIST_NOMATCH

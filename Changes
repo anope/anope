@@ -57,6 +57,7 @@ Anope Version  S V N
 09/01 F Fixed crashbug in cs_access.                                      [#932]
 09/02 F Fixed bug in enc_none in combination with truncated pass.         [#934]
 09/03 F Fixed variables not correctly shown in help.                      [#873]
+09/04 F Rewrote the ignore system to fix several issues.                  [#930]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]

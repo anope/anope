@@ -9,9 +9,14 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1427"
+VERSION_BUILD="1428"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1428)
+# BUGS  : 930
+# NOTES : Rewrote the ignore system to handle both nicks and masks 
+# properly.
 #
 # BUILD : 1.7.21 (1427)
 # BUGS  : 931 

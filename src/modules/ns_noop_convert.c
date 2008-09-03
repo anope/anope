@@ -56,7 +56,6 @@ int mSaveData(int argc, char **argv);
 int mLoadConfig(int argc, char **argv);
 
 void m_AddLanguages(void);
-void delete_ignore(const char *nick);
 
 /*************************************************************************/
 

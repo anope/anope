@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1426"
+VERSION_BUILD="1427"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1427)
+# BUGS  : 931 
+# NOTES : Added anope build scripts for windows to /src/tools
 #
 # BUILD : 1.7.21 (1426)
 # BUGS  : 876 

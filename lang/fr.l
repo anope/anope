@@ -3441,7 +3441,7 @@ NEWS_HELP_LOGON
 	
 	Edite ou affiche la liste de messages logon news. Lorsqu'un
 	utilisateur se connecte au réseau, ces messages leur seront
-	envoyés. (Cependant, pas plus de NewsCount messages ne seront
+	envoyés. (Cependant, pas plus de %d messages ne seront
 	envoyés pour éviter le flood des utilisateurs. Si il y a
 	plus messages de news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
@@ -3457,7 +3457,7 @@ NEWS_HELP_OPER
 	
 	Edite ou affiche la liste des messages oper news. Quand un
 	utilisateur utilise la commande /OPER, ces messages lui seront
-	envoyés. (Cependant, pas plus de NewsCount messages ne seront 
+	envoyés. (Cependant, pas plus de %d messages ne seront 
 	envoyés afin de ne pas flooder l'utilisateur. Si il y a plus 
 	messages news, seuls les plus récents seront envoyés.)
 	NewsCount peut être configuré en services.conf.
@@ -4039,9 +4039,9 @@ NICK_HELP_RECOVER
 	utilisateur avec le même pseudo que l'utilisateur dont
 	vous essayez de récupérer le pseudo. Cela provoque la déconnexion
 	par les serveurs IRC de l'autre utilisateur. Ce faux utilisateur
-	restera connecté pendant une minute pour s'assurer que l'autre
-	utilisateur ne se reconnecte pas immédiatement. Après cette
-	minute, vous pouvez reprendre votre pseudo. Alternativement,
+	restera connecté pendant %s pour s'assurer que l'autre
+	utilisateur ne se reconnecte pas immédiatement. Après ces
+	temps, vous pouvez reprendre votre pseudo. Alternativement,
 	utilisez la commande RELEASE (%R%S HELP RELEASE) pour
 	reprendre votre pseudo plus tôt.
 	
@@ -4057,8 +4057,7 @@ NICK_HELP_RELEASE
 	Ordonne à %S de supprimer toute tutelle sur votre pseudo
 	provoquée par la protection de SET KILL ou 
 	l'utilisation de la commande RECOVER. Par défaut, les
-	tutelles durent une minute, cette commande les
-	arrête plus tôt.
+	tutelles durent %s, cette commande les arrête plus tôt.
 	
 	Pour utiliser la commande RELEASE pour un pseudo, l'adresse
 	telle qu'elle est montrée dans un /WHOIS doit être sur la

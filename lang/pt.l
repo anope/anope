@@ -3309,35 +3309,36 @@ NEWS_RANDOM_DELETED_ALL
 	Todos os itens RandomNews deletados.
 
 NEWS_HELP_LOGON
-	Sintaxe: LOGONNEWS ADD texto
-	         LOGONNEWS DEL {núm | ALL}
-	         LOGONNEWS LIST
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
+	        LOGONNEWS LIST
 	
-	Edita ou mostra a lista de logon news. Quando um usuário
-	se conecta à rede, estas mensagens são enviadas para ele.
-	(No entanto, não mais que três mensagens serão enviadas
-	simultaneamente para evitar flood. Se houver mais que três
-	mensagens novas, apenas as mais novas serão mostradas.)
+	Edits or displays the list of logon news messages.  When a
+	user connects to the network, these messages will be sent
+	to them.  (However, no more than %d messages will be
+	sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST pode ser usado por qualquer Operador
-	para listar as mensagens atuais. ADD e DEL só podem
-	ser usados pelos Administradores dos Services.
+	LOGONNEWS LIST may be used by any IRC operator to list the
+	current news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_OPER
-	Sintaxe: OPERNEWS ADD texto
-	         OPERNEWS DEL {núm | ALL}
-	         OPERNEWS LIST
+	Syntax: OPERNEWS ADD text
+	        OPERNEWS DEL {num | ALL}
+	        OPERNEWS LIST
 	
-	Edita ou mostra a lista de oper news. Quando um usuário
-	se torna operador (pelo comando /OPER), estas mensagens
-	lhe serão enviadas. (No entanto, não mais que três
-	mensagens serão enviadas simultaneamente para evitar
-	flood. Se houver mais que três mensagens novas, apenas
-	as três mais novas serão mostradas).
+	Edits or displays the list of oper news messages.  When a
+	user opers up (with the /OPER command), these messages will
+	be sent to them.  (However, no more than %d messages will
+	be sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST pode ser usado por qualquer Operador
-	para listar as oper news. ADD e DEL só podem ser usados
-	pelos Administradores dos Services.
+	OPERNEWS LIST may be used by any IRC operator to list the
+	current oper news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_RANDOM
 	Sintaxe: RANDOMNEWS ADD texto
@@ -3903,9 +3904,9 @@ NICK_HELP_RECOVER
 	Quando você usa este comando, o %S trará um falso
 	usuário online com o mesmo nick de quem o está usando.
 	Isto causará uma desconexão pelo servidor de IRC do outro
-	usuário. O falso usuário ficará online por 1 minuto para
+	usuário. O falso usuário ficará online por %s para
 	assegurar que o outro usuário não reconecte imediatamente;
-	Durante este minuto, você pode reivindicar seu nick.
+	Durante você pode reivindicar seu nick.
 	Alternativamente, use o comando RELEASE
 	(%R%S HELP RELEASE) para retomar seu nick mais 
 	rapidamente.
@@ -3920,7 +3921,7 @@ NICK_HELP_RELEASE
 	
 	Instrui o %S a remover qualquer espera no seu nick
 	causada pelo kill automático de proteção ou pelo uso do
-	comando RECOVER. Por padrão, essa espera dura 1 minuto;
+	comando RECOVER. Por padrão, essa espera dura %s;
 	este comando libera o seu nick mais cedo.
 	
 	Para usar o comando RELEASE em um nick, seu endereço

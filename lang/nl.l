@@ -3368,8 +3368,8 @@ NEWS_HELP_LOGON
 	Wijzigt de lijst met login nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker met het netwerk verbindt, worden deze
 	berichten naar hem/haar verzonden.  (Echter, er zullen nooit
-	meer dan NewsCount berichten worden verstuurd om het flooden van de
-	gebruiker te voorkomen. Als er meer dan NewsCount nieuwsberichten
+	meer dan %d berichten worden verstuurd om het flooden van de
+	gebruiker te voorkomen. Als er meer nieuwsberichten
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
 	
@@ -3386,7 +3386,7 @@ NEWS_HELP_OPER
 	Wijzigt de lijst met oper nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker opert (dmv het /OPER commando), worden
 	deze berichtennaar hem/haar verzonden.  (Echter, er zullen
-	nooit meer dan NewsCount berichten worden verstuurd om het flooden
+	nooit meer dan %d berichten worden verstuurd om het flooden
 	van de gebruiker te voorkomen. Als er meer nieuwsberichten 
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
@@ -3929,9 +3929,9 @@ NICK_HELP_RECOVER
 	online brengen met dezelfde nickname als de gebruiker waarvan
 	je de nick terugneemt. Dit zorgt ervoor dat de IRC server de
 	andere gebruiker zijn/haar verbinding sluiten. Deze nep-
-	gebruiker zal voor 1 minuut online blijven om ervoor te zorgen
+	gebruiker zal voor %s online blijven om ervoor te zorgen
 	dat de gebruiker niet meteen opnieuw verbindt met dezelfde
-	nick. Na deze minuut kan je je nick opnieuw claimen, of je kan
+	nick. Na deze tijd kan je je nick opnieuw claimen, of je kan
 	tussentijds je nick terugkrijgen mbv het RELEASE commando.
 	(Bekijk %R%S HELP RELEASE voor meer informatie hierover)	
 	
@@ -3946,7 +3946,7 @@ NICK_HELP_RELEASE
 	Geeft %S de opdracht elke nep-gebruiker met jouw nick te
 	verwijderen. Deze nep-gebruiker wordt aangemaakt na een
 	automatische kill-bescherming of na gebruik van het RECOVER
-	commando. Standaard blijft zo'n nep-gebruiker 1 minuut staan;
+	commando. Standaard blijft zo'n nep-gebruiker %s staan;
 	dit commando zorgt ervoor dat deze eerder wegghaald wordt.
 	
 	Om het RELEASE commando op een nick te mogen gebruiken moet

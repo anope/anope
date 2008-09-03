@@ -3402,34 +3402,36 @@ NEWS_RANDOM_DELETED_ALL
 	Tüm karisik haberler silindi.
 
 NEWS_HELP_LOGON
-	Kullanýmý: LOGONNEWS ADD text
-	           LOGONNEWS DEL {num | ALL}
-	           LOGONNEWS LIST
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
+	        LOGONNEWS LIST
 	
-	Baðlantý haberleri listesini deðiþtirmeye ve görüntülemeye
-	yarar. Bir kullanýcý network e baðlandýðý zaman bu haberler
-	onlara gönderilir.(Fakat üçten fazla mesaj kullanýcýyý 
-	floodlamamak için gönderilmez. Eðer üçten fazla haber varsa
-	bunlardan en güncel olan üç tanesi gönderilir.)
+	Edits or displays the list of logon news messages.  When a
+	user connects to the network, these messages will be sent
+	to them.  (However, no more than %d messages will be
+	sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	BAÐLANTI HABERLERÝ LÝSTESÝ(LOGONNEWS LIST) herhangi bir IRCop
-	tarafýndan görüntülenebilir. ADD ve DEL komutlarý sadece servis
-	adminleri tarafýndan kullanýlýr.
+	LOGONNEWS LIST may be used by any IRC operator to list the
+	current news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_OPER
-	Kullanýmý: OPERNEWS ADD yazý
-	           OPERNEWS DEL {num | ALL}
-	           OPERNEWS LIST
+	Syntax: OPERNEWS ADD text
+	        OPERNEWS DEL {num | ALL}
+	        OPERNEWS LIST
 	
-	Operatör haberlerinin listesini deðiþtirmeye ve görüntülemeye
-	yarar. Bir kullanýcý oper olduðu zaman (/OPER komutuyla), bu 
-	haberler ona gönderilir. (Fakat üçten fazla mesaj kullanýcýyý
-	floodlamamak için gönderilmez.  Eðer üçten fazla mesaj varsa 
-	en güncel olan üç tanesi göderilir.)
+	Edits or displays the list of oper news messages.  When a
+	user opers up (with the /OPER command), these messages will
+	be sent to them.  (However, no more than %d messages will
+	be sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	OPERATÖR HABERLERÝ LÝSTESÝ(OPERNEWS LIST) herhangi bir IRCop 
-	tarafýndan	görüntülenebilir. ADD ve DEL komutlarý sadece 
-	Servis adminleri tarafýndan kullanýlýr.
+	OPERNEWS LIST may be used by any IRC operator to list the
+	current oper news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_RANDOM
 	Kullanimi: RANDOMNEWS ADD yazi
@@ -3986,38 +3988,42 @@ NICK_HELP_SASET_LANGUAGE
 	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
-	Kullanýmý: RECOVER nick [þifre]
+	Syntax: RECOVER nickname [password]
 	
-	Eðer birisi nickinizi kullanýyorsa ondan nicki geri almanýzý
-	saðlar; bu komut kill korumasý olan bir nicke %S'ün
-	yaptýðýnýn aynýsýný yapar.
+	Allows you to recover your nickname if someone else has
+	taken it; this does the same thing that %S does
+	automatically if someone tries to use a kill-protected
+	nick.
 	
-	Bu komutu kullandýðýnýzda, %S o nicke sahip sahte bir 
-	kullanýcýyý servera sokar. Bu diðer kullanýcýnýn serverdan
-	kopmasýna neden olur. Bu sahte kullanýcý bir dakika kadar 
-	hatta kalýr ve diðer kullanýcýnýn tekrar o nickle baðlanmasýna
-	engel olur. Bir dakikadan sonra nickinizi geri alabilirsiniz.
-	Bir dakikadan önce nickinizi geri almak için RELEASE komutunu
-	(%R%S HELP RELEASE) kullanabilirsiniz.
+	When you give this command, %S will bring a fake
+	user online with the same nickname as the user you're
+	trying to recover your nick from.  This causes the IRC
+	servers to disconnect the other user.  This fake user will
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
+	can reclaim your nick.  Alternatively, use the RELEASE
+	command (%R%S HELP RELEASE) to get the nick
+	back sooner.
 	
-	RECOVER komutunu bir nick üzerinde kullanabilmek için o an
-	/WHOIS inizdeki adresin o nickin access listesinde olmasý, o 
-	nickin grubundaki baþka bir nickin tanýtýlmýþ olmasý yada o 
-	nick için doðru þifenin belirtilmiþ olmasý gerekir.
+	In order to use the RECOVER command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_RELEASE
-	Kullanýmý: RELEASE nick [þifre]
+	Syntax: RELEASE nickname [password]
 	
-	Otomatik kill korumasý veya RECOVER komutunun kullanýlmasýndan
-	kaynaklanan nickin %S tarafýndan tutulmasý durumunda nicki 
-	serbest býrakmak için kullanýlýr. Varsayýlan olarak, nick tutma 
-	olayý bir dakika sonunda sona erer. Bu komut bunun bir dakikadan 
-	önce olmasýný saðlar.
+	Instructs %S to remove any hold on your nickname
+	caused by automatic kill protection or use of the RECOVER
+	command.  This holds lasts for %s;
+	this command gets rid of them sooner.
 	
-	RELEASE komutunu bir nick üzerinde kullanabilmek için o an
-	/WHOIS inizdeki adresin o nickin access listesinde olmasý, o 
-	nickin grubundaki baþka bir nickin tanýtýlmýþ olmasý yada o 
-	nick için doðru þifenin belirtilmiþ olmasý gerekir.
+	In order to use the RELEASE command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_GHOST
 	Kullanýmý: GHOST nick [þifre]

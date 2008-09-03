@@ -32,8 +32,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
-    c = createCommand("RELEASE", do_release, NULL, NICK_HELP_RELEASE, -1,
-                      -1, -1, -1);
+    c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
     moduleSetNickHelp(myNickServHelp);

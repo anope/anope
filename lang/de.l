@@ -3365,9 +3365,9 @@ NEWS_HELP_LOGON
 	
 	Zeigt oder bearbeitet die Liste der LogonNews.
 	Nach der Verbindung des Users werden diese Nachrichten
-	angezeigt. (Es werden jedoch nur max. 3 angezeigt, um ein
-	Flooding des Users zu verhindern. Wenn mehr als 3 News
-	existieren, werden nur die 3 neuesten angezeigt.)
+	angezeigt. (Es werden jedoch nur max. %d angezeigt, um ein
+	Flooding des Users zu verhindern. Wenn mehr News
+	existieren, werden nur die neuesten angezeigt.)
 	NewsCount can be configured in services.conf.
 	
 	LOGONNEWS LIST kann von jedem IRC Operator benutzt werden
@@ -3383,9 +3383,9 @@ NEWS_HELP_OPER
 	Zeigt oder bearbeitet die Liste der Oper-News.Nachdem 
 	sich ein User die Oper-Flags gesetzt hat (mit dem
 	/OPER Befehl) werden ihm diese Nachrichten angezeigt.
-	(Es werden jedoch nur max. 3 Nachrichten angezeigt, um ein
-	Flooding des Users zu verhindern. Wenn mehr als 3 News
-	existieren, werden nur die 3 neüsten angezeigt.)
+	(Es werden jedoch nur max. %d Nachrichten angezeigt, um ein
+	Flooding des Users zu verhindern. Wenn mehr News
+	existieren, werden nur die neüsten angezeigt.)
 	NewsCount can be configured in services.conf.
 	
 	OPERNEWS LIST kann von jedem IRC Operator benutzt werden
@@ -3996,9 +3996,9 @@ NICK_HELP_RECOVER
 	recovern willst. Die Folge davon ist, dass der User,
 	der deinen Nickname angenommen hatte, vom Server getrennt
 	wird. Der virtuelle User von den Services wird noch
-	1 Minute online bleiben, um sicherzustellen, dass der
+	%s online bleiben, um sicherzustellen, dass der
 	andere User nicht sofort neu connected; Nach dieser
-	Minute wird der Nickname wieder freigegeben und du kannst
+	zeit wird der Nickname wieder freigegeben und du kannst
 	ihn annehmen.
 	
 	Als Alternative gibt es das RELEASE Befehl,
@@ -4017,7 +4017,7 @@ NICK_HELP_RELEASE
 	Durch %S wird die Nickname-Sperre, ausgelöst
 	durch z.B. den automatischen Kill-Schutz oder durch
 	Verwendung des RECOVER Befehls, aufgehoben.
-	Standardmässig hält diese Sperre 1 Minute, dieser
+	Standardmässig hält diese Sperre %s, dieser
 	Befehl setzt den Nickname früher wieder frei.
 	
 	Als Vorraussetzung für die Verwendung des RELEASE 

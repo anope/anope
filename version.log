@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1424"
+VERSION_BUILD="1425"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1425)
+# BUGS  : 873 
+# NOTES : We now show config variables in the help.
 #
 # BUILD : 1.7.21 (1424)
 # BUGS  : 934 

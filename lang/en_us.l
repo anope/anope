@@ -3273,7 +3273,7 @@ NEWS_HELP_LOGON
 	
 	Edits or displays the list of logon news messages.  When a
 	user connects to the network, these messages will be sent
-	to them.  (However, no more than NewsCount messages will be
+	to them.  (However, no more than %d messages will be
 	sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
@@ -3289,7 +3289,7 @@ NEWS_HELP_OPER
 	
 	Edits or displays the list of oper news messages.  When a
 	user opers up (with the /OPER command), these messages will
-	be sent to them.  (However, no more than NewsCount messages will
+	be sent to them.  (However, no more than %d messages will
 	be sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
@@ -3838,8 +3838,8 @@ NICK_HELP_RECOVER
 	user online with the same nickname as the user you're
 	trying to recover your nick from.  This causes the IRC
 	servers to disconnect the other user.  This fake user will
-	remain online for one minute to ensure that the other
-	user does not immediately reconnect; after that minute, you
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
 	can reclaim your nick.  Alternatively, use the RELEASE
 	command (%R%S HELP RELEASE) to get the nick
 	back sooner.
@@ -3855,7 +3855,7 @@ NICK_HELP_RELEASE
 	
 	Instructs %S to remove any hold on your nickname
 	caused by automatic kill protection or use of the RECOVER
-	command.  By default, such holds last for one minute;
+	command.  This holds lasts for %s;
 	this command gets rid of them sooner.
 	
 	In order to use the RELEASE command for a nick, your

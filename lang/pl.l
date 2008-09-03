@@ -3549,13 +3549,13 @@ NEWS_RANDOM_DELETED_ALL
 	Wszystkie losowe niusy zosta³y skasowane :(.
 
 NEWS_HELP_LOGON
-	Sk³adnia: LOGONNEWS ADD text
-	          LOGONNEWS DEL {num | ALL}
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
 	        LOGONNEWS LIST
 	
 	Edits or displays the list of logon news messages.  When a
 	user connects to the network, these messages will be sent
-	to them.  (However, no more than NewsCount messages will be
+	to them.  (However, no more than %d messages will be
 	sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
@@ -3571,7 +3571,7 @@ NEWS_HELP_OPER
 	
 	Edits or displays the list of oper news messages.  When a
 	user opers up (with the /OPER command), these messages will
-	be sent to them.  (However, no more than NewsCount messages will
+	be sent to them.  (However, no more than %d messages will
 	be sent in order to avoid flooding the user.  If there are
 	more news messages, only the most recent will be sent.)
 	NewsCount can be configured in services.conf.
@@ -4170,50 +4170,42 @@ NICK_HELP_SASET_LANGUAGE
 	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
-	Sk³adnia: RECOVER nick [has³o]
+	Syntax: RECOVER nickname [password]
 	
-	Umo¿liwia odzyskanie Twojego nicka w wypadku gdy 
-	kto¶ go aktualnie u¿ywa. Tej opcji u¿ywa %S 
-	automatycznie, gdy kto¶ próbuje u¿yæ nicka 
-	chronionego opcj± KILL.
+	Allows you to recover your nickname if someone else has
+	taken it; this does the same thing that %S does
+	automatically if someone tries to use a kill-protected
+	nick.
 	
-	Gdy u¿yjesz tej komendy, %S wprowadzi na sieæ 
-	serwis bota z identycznym nickiem jak nick tego 
-	u¿ytkownika, który u¿ywa Twojego nicka. To 
-	spowoduje, ¿e serwer IRC od³±czy od sieci 
-	u¿ytkownika u¿ywaj±cego Twojego nicka. Ten serwis 
-	bot bêdzie obecny minutê na sieci zabezpieczaj±c,
-	aby u¿ytkownik po ponownym po³±czeniu nie zaj±³ 
-	ponownie Twojego nicka. Po up³ywie minuty mo¿esz 
-	wej¶æ na swój nick. Je¶li nie masz zamiaru tyle 
-	czekaæ musis¿ u¿yæ komendy 
-	RELEASE (%R%S HELP RELEASE) aby 
-	zarz±daæ natychmiastowego zwrotu nicka od serwisów.
+	When you give this command, %S will bring a fake
+	user online with the same nickname as the user you're
+	trying to recover your nick from.  This causes the IRC
+	servers to disconnect the other user.  This fake user will
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
+	can reclaim your nick.  Alternatively, use the RELEASE
+	command (%R%S HELP RELEASE) to get the nick
+	back sooner.
 	
-	Aby móc u¿yæ komendy RECOVER, musisz spe³niaæ, 
-	który¶ z warunków: 
-	1. Twój obecny adres (ten z /whois) musi byæ na 
-	li¶cie dostêpu, 
-	2. musisz byæ zidentyfikowany i byæ w grupie tego 
-	nicka albo 
-	3. musisz podaæ has³o do nicka.
-					
+	In order to use the RECOVER command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
+
 NICK_HELP_RELEASE
-	Sk³adnia: RELEASE nick [has³o]
+	Syntax: RELEASE nickname [password]
 	
-	Informuje %S aby przesta³ trzymaæ Twojego nicka po
-	opcji RECOVER lub skutkach dzia³ania opcji 
-	KILL. Domy¶lnie nic jest trzymany przez jedn± 
-	minutê, ta komenda ma za zadanie zwolniæ nicka 
-	wcze¶niej.
+	Instructs %S to remove any hold on your nickname
+	caused by automatic kill protection or use of the RECOVER
+	command.  This holds lasts for %s;
+	this command gets rid of them sooner.
 	
-	Aby móc u¿yæ komendy RELEASE, musisz spe³niaæ, 
-	który¶ z warunków: 
-	1. Twój obecny adres (ten z /whois) musi byæ na 
-	li¶cie dostêpu, 
-	2. musisz byæ zidentyfikowany i byæ w grupie tego 
-	nicka albo 
-	3. musisz podaæ has³o do nicka.
+	In order to use the RELEASE command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 				
 			
 NICK_HELP_GHOST

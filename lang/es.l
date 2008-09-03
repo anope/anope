@@ -3381,34 +3381,36 @@ NEWS_RANDOM_DELETED_ALL
 	Todas las noticias al azar borradas.
 
 NEWS_HELP_LOGON
-	Sintaxis: LOGONNEWS ADD texto
-	        LOGONNEWS DEL {numero | ALL}
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
 	        LOGONNEWS LIST
 	
-	Edita o muestra la lista de noticias de entrada. Cuando un
-	usuario se conecta a la red, estos mensajes les seran
-	enviados. (Como sea, no mas de 3 mensajes seran enviados
-	para evitar floodear al usuario. Si hay mas de 3 noticias,
-	los 3 ultimos les seran enviados.)
+	Edits or displays the list of logon news messages.  When a
+	user connects to the network, these messages will be sent
+	to them.  (However, no more than %d messages will be
+	sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	LOGONNEWS LIST puede ser usado por cualquier operador de
-	IRC para listar las noticias actuales. ADD o DEL solo
-	pueden ser usados por administradores de Servicios.
+	LOGONNEWS LIST may be used by any IRC operator to list the
+	current news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_OPER
-	Sintaxis: OPERNEWS ADD texto
-	          OPERNEWS DEL {numero | ALL}
-	          OPERNEWS LIST
+	Syntax: OPERNEWS ADD text
+	        OPERNEWS DEL {num | ALL}
+	        OPERNEWS LIST
 	
-	Edita o muestra la lista de noticias. Cuando un usuario se
-	transforma en operador (con el comando /oper), estos
-	mensajes les seran enviados. (Como sea, no mas de 3 mensajes
-	seran enviados para evitar floodear al usuario. Si hay mas
-	de 3 noticias, las ultimas 3 seran enviadas.)
+	Edits or displays the list of oper news messages.  When a
+	user opers up (with the /OPER command), these messages will
+	be sent to them.  (However, no more than %d messages will
+	be sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST puede ser usado por cualquier operador de IRC
-	para listar las noticias de operador actuales. ADD y DEL solo
-	pueden ser usadas por administradores de Servicios.
+	OPERNEWS LIST may be used by any IRC operator to list the
+	current oper news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_RANDOM
 	Sintaxis: RANDOMNEWS ADD texto
@@ -3965,40 +3967,42 @@ NICK_HELP_SASET_LANGUAGE
 	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
-	Sintaxis: RECOVER nickname [clave]
+	Syntax: RECOVER nickname [password]
 	
-	Te permite recuperar tu nickname si alguien mas lo
-	ha tomado; Esto hace lo mismo que %S hace automaticamente
-	si alguien trata de usar un nick con proteccion de kill.
+	Allows you to recover your nickname if someone else has
+	taken it; this does the same thing that %S does
+	automatically if someone tries to use a kill-protected
+	nick.
 	
-	Cuando usas este comando, %S traera a un falso usuario en
-	linea con el mismo nickname del usuario que estas tratando
-	de recuperar. Esto causa que los servidores IRC desconecten
-	al otro usuario. El usuario falso permanecera en linea por
-	un minuto para asegurar que el otro usuario no se reconecte
-	inmediatamente; Despues del minuto, puedes reclamar tu
-	nick. Como alternatica, usa el comando RELEASE
-	(%R%S HELP RELEASE) para recuperar el nick antes.
+	When you give this command, %S will bring a fake
+	user online with the same nickname as the user you're
+	trying to recover your nick from.  This causes the IRC
+	servers to disconnect the other user.  This fake user will
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
+	can reclaim your nick.  Alternatively, use the RELEASE
+	command (%R%S HELP RELEASE) to get the nick
+	back sooner.
 	
-	Para usar el comando RECOVER para un nick, tu
-	direccion actual mostrada en /WHOIS debe estar en la lista
-	de acceso de ese nick, debes estar identificado y en el
-	grupo de ese nick, o debes proveer la clave correcta
-	para ese nickname.
+	In order to use the RECOVER command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_RELEASE
-	Sintaxis: RELEASE nickname [clave]
+	Syntax: RELEASE nickname [password]
 	
-	Instruye a %S a remover cualquier suspencion que tenga tu nick
-	causada por proteccion automatica de kill o por uso del comando
-	RECOVER. Por defecto, la suspencion dura por un minuto;
-	este comando la termina antes.
+	Instructs %S to remove any hold on your nickname
+	caused by automatic kill protection or use of the RECOVER
+	command.  This holds lasts for %s;
+	this command gets rid of them sooner.
 	
-	Para usar el comando RELEASE para un nick, tu
-	direccion actual mostrada en /WHOIS debe estar en la lista
-	de acceso de ese nick, debes estar identificado y en el
-	grupo de ese nick, o debes proveer la clave correcta
-	para ese nickname.
+	In order to use the RELEASE command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_GHOST
 	Sintaxis: GHOST nickname [clave]

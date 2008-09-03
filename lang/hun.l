@@ -3333,35 +3333,36 @@ NEWS_RANDOM_DELETED_ALL
 	Összes random news tétel törölve.
 
 NEWS_HELP_LOGON
-	Syntax: LOGONNEWS ADD szöveg
-	        LOGONNEWS DEL {sorszám  | ALL}
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
 	        LOGONNEWS LIST
 	
-	Szerkeszti, vagy kiirja a logon news üzeneteket.Amikor
-	egy felhasználó csatlakozik a hálózathoz ezeket az
-	üzeneteket küldi neki. (Bármennyi is van csak három 
-	üzenetet küld, mindig a három legutolsót küldi el.)
-		
-	LOGONNEWS LIST lehetõség van használatára IRC operátornak,
-	részére listázza az aktuális news üzeneteket. Az ADD és a 
-	DEL  parancsokat csak szervíz adminok használhatják.
-		
+	Edits or displays the list of logon news messages.  When a
+	user connects to the network, these messages will be sent
+	to them.  (However, no more than %d messages will be
+	sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
+	
+	LOGONNEWS LIST may be used by any IRC operator to list the
+	current news messages.  ADD and DEL may only be used by
+	Services admins.
+
 NEWS_HELP_OPER
-	Syntax: OPERNEWS ADD szöveg
-	        OPERNEWS DEL {szám | ALL}
+	Syntax: OPERNEWS ADD text
+	        OPERNEWS DEL {num | ALL}
 	        OPERNEWS LIST
 	
-	Szerkeszti és listázza az oper news üzeneteket. Amikor 
-	egy oper felhasználó csatlakozik a /OPER paranccal a 
-	hálózathoz ezeket az üzeneteket fogaj neki küldeni.
-	(Bármennyi is van csak három üzenetet küld, hogy elkerülje
-	a floodot a felhasználó.Háromnál több üzenetbül a három
-	legutólsót küldi el)
-
+	Edits or displays the list of oper news messages.  When a
+	user opers up (with the /OPER command), these messages will
+	be sent to them.  (However, no more than %d messages will
+	be sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
 	
-	OPERNEWS LIST  IRC operátorok,használhatják a parancsot
-	részükre listázza az aktuális oper news üzeneteket. Add és 
-	Del -t csak szervíz adminok használhatják
+	OPERNEWS LIST may be used by any IRC operator to list the
+	current oper news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_RANDOM
 	Syntax: RANDOMNEWS ADD szöveg
@@ -3912,33 +3913,42 @@ NICK_HELP_SASET_LANGUAGE
 	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
-	Syntax: RECOVER nicknév [jelszó]
+	Syntax: RECOVER nickname [password]
 	
-	Amikor használod ezt a parancsot, akkor a %S fel fog hozni
-	egy álfelhasználót ugyanazzal a névvel, amit vissza
-	akarsz venni a másik usertõl. Ezzel egyidõben az IRC 
-	szerver megbontja a másik felhasználó kapcsolatát.
-	A %S álfelhasználója egy percig online marad, hogy a
-	másik felhasználó ne tudjon automatikusa újracsatlakozni;
-	ennek az idõnek a letelte után, felveheted a nevedet.
-	Alternatív megoldás, a RELEASE parancs használata
-	(%R%S HELP RELEASE) ezzel hamarabb is visszakaphatod
-	a neved.
+	Allows you to recover your nickname if someone else has
+	taken it; this does the same thing that %S does
+	automatically if someone tries to use a kill-protected
+	nick.
 	
-	Abban az esetben, ha használod a RECOVER parancsot,akkor
-	tudnod kell a pontos jelszót a nickhez.
+	When you give this command, %S will bring a fake
+	user online with the same nickname as the user you're
+	trying to recover your nick from.  This causes the IRC
+	servers to disconnect the other user.  This fake user will
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
+	can reclaim your nick.  Alternatively, use the RELEASE
+	command (%R%S HELP RELEASE) to get the nick
+	back sooner.
+	
+	In order to use the RECOVER command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_RELEASE
-	Syntax: RELEASE nicknév [jelszó]
+	Syntax: RELEASE nickname [password]
 	
-	Utasítja a %S -et, hogy ne tartsa tovább az
-	automatikus kill védelem vagy a RECOVER
-	parancs használatából kifolyólag felvett neved.
-	Alapbeállítás szerint csak egy percig tartja, de
-	ezzel a paranccsal hamarabb átvehetõ újra a neved.
+	Instructs %S to remove any hold on your nickname
+	caused by automatic kill protection or use of the RECOVER
+	command.  This holds lasts for %s;
+	this command gets rid of them sooner.
 	
-	Ha a RELEASE parancsot akarod használni, tudnod kell a
-	pontos jelszót a nickhez.
+	In order to use the RELEASE command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 
 NICK_HELP_GHOST
 	Syntax: GHOST nickév [jelszó]

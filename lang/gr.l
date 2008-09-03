@@ -3399,33 +3399,36 @@ NEWS_RANDOM_DELETED_ALL
 	Όλα τα μηνύματα διαγράφηκαν.
 
 NEWS_HELP_LOGON
-	Σύνταξη: LOGONNEWS ADD περιεχόμενο
-	        LOGONNEWS DEL {νούμερο | ALL}
+	Syntax: LOGONNEWS ADD text
+	        LOGONNEWS DEL {num | ALL}
 	        LOGONNEWS LIST
 	
-	Προσθέτεις ή αφαιρείς ή βλέπεις την λίστα των μυνημάτων.
-	Όταν συνδέεται ένας χρήστης στο δίκτυο, αυτά τα μηνύματα τα λαμβάνει
-	(Οχι παραπάνω από τρία μηνύματα, γιατί μπορεί να θεωρηθεί ως flood.
-	Αν είναι παραπάνω από τρια,  τότε μόνο τα τρία πρώτα θα σταλθούν).
-	    
-	LOGONNEWS LIST χρησιμοποιείται μόνο από τους IRC operator για να δούν
-	την λίστα των νέων μηνυμάτων.  ADD και DEL χρησιμοποιείται μόνο από τους
-	επικεφαλείς των υπηρεσιών (services admins).
+	Edits or displays the list of logon news messages.  When a
+	user connects to the network, these messages will be sent
+	to them.  (However, no more than %d messages will be
+	sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
+	
+	LOGONNEWS LIST may be used by any IRC operator to list the
+	current news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_OPER
-	Σύνταξη: OPERNEWS ADD περιεχόμενο
-	        OPERNEWS DEL {νούμερο | ALL}
+	Syntax: OPERNEWS ADD text
+	        OPERNEWS DEL {num | ALL}
 	        OPERNEWS LIST
 	
-	Προσθέτεις ή αφαιρείς ή βλέπεις την λίστα των opers.  Όταν ένας
-	χρήστης κάνει την εντολή oper (δηλαδη /OPER εντολή), αυτά τα μηνύματα
-	θα του σταλθούν.  (παραπάνω από τρια μηνύματα δεν πρέπει να είναι
-	γιατί θεωρείται σαν ενοχλητικό flood.  Αν είναι παραπάνω από τρία
-	μηνύματα, μόνο τα τρια πρώτα θα εμφανιστούν και θα σταλούν.)
-	    
-	OPERNEWS LIST μπορεί να χρησιμοποιηθεί μόνο από IRC operators.
-	Και βέβαια να δεί την λίστα των μυνημάτων.  ADD και DEL μπορεί να χρησιμοποιηθεί
-	από τους επικεφαλής υπηρεσιών.
+	Edits or displays the list of oper news messages.  When a
+	user opers up (with the /OPER command), these messages will
+	be sent to them.  (However, no more than %d messages will
+	be sent in order to avoid flooding the user.  If there are
+	more news messages, only the most recent will be sent.)
+	NewsCount can be configured in services.conf.
+	
+	OPERNEWS LIST may be used by any IRC operator to list the
+	current oper news messages.  ADD and DEL may only be used by
+	Services admins.
 
 NEWS_HELP_RANDOM
 	Σύνταξη: RANDOMNEWS ADD περιεχόμενα
@@ -3992,44 +3995,42 @@ NICK_HELP_SASET_LANGUAGE
 	that you can get by typing %R%S HELP SET LANGUAGE.
 
 NICK_HELP_RECOVER
-	Σύνταξη: RECOVER nickname [password]
+	Syntax: RECOVER nickname [password]
 	
-	Σας επιτρέπει να πάρετε πίσω το ψευδώνυμό σας αν κάποιος
-	άλλος το χρησιμοποιεί.  Η χρήση της εντολής αυτής, έχει το
-	ίδιο αποτέλεσμα με την αυτόματη αποσύνδεση που κάνει ο
-	%S όταν κάποιος προσπαθήσει να να χρησιμοποιήσει ένα
-	ψευδώνυμο που έχει ενεργοποιημένη την προστασία με
-	αποσύνδεση.
+	Allows you to recover your nickname if someone else has
+	taken it; this does the same thing that %S does
+	automatically if someone tries to use a kill-protected
+	nick.
 	
-	Όταν χρησιμοποιείτε αυτή την εντολή, ο %S συνδέει έναν
-	ψεύτικο χρήστη με το ίδιο ψευδώνυμο εκείνου του χρήστη του
-	οποίου το ψευδώνυμο θέλετε να πάρετε πίσω.  Αυτό αναγκάζει	
-	τους IRC servers να αποσυνδέουν εκείνο το χρήστη.  Ο
-	ψεύτικος χρήστης, θα παραμείνει τότε συνδεδεμένος για τρία
-	λεπτά για να βεβαιώσει το ότι ο άλλος χρήστης δε θα
-	επανασυνδεθεί άμεσα. Μετά από τα τρία λεπτά, μπορείτε να
-	ξαναχρησιμοποιήσετε το ψευδώνυμό σας.  Εναλλακτικά,
-	χρησιμοποιήστε την εντολή RELEASE (%R%S HELP RELEASE)
-	για να χρησιμοποιήσετε το ψευδώνυμό σας νωρίτερα.
+	When you give this command, %S will bring a fake
+	user online with the same nickname as the user you're
+	trying to recover your nick from.  This causes the IRC
+	servers to disconnect the other user.  This fake user will
+	remain online for %s to ensure that the other
+	user does not immediately reconnect; after that time, you
+	can reclaim your nick.  Alternatively, use the RELEASE
+	command (%R%S HELP RELEASE) to get the nick
+	back sooner.
 	
-	Για να χρησιμοποιήσετε την εντολή RECOVER για ένα
-	ψευδώνυμο, πρέπει η τρέχουσα διεύθυνσή σας όπως εμφανίζεται
-	στο /WHOIS να βρίσκεται στη λίστα πρόσβασης του ψευδωνύμου,
-	ή να έχετε δώσει τον σωστό κωδικό για το ψευδώνυμο.
-	
+	In order to use the RECOVER command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
+
 NICK_HELP_RELEASE
-	Σύνταξη: RELEASE ψευδώνυμο [κωδικός]
+	Syntax: RELEASE nickname [password]
 	
-	Απελευθερώνει κάθε κατακράτηση του ψευδωνύμου σας από τον
-	%S εξ' αιτίας αυτόματης αποσύνδεσης ή της χρήσης της
-	εντολής RECOVER.  Προκαθορισμένα, τέτοιες κατακρατήσεις
-	διαρκούν για ένα λεπτό;  Αυτή η εντολή τις απελευθερώνει
-	νωρίτερα.
+	Instructs %S to remove any hold on your nickname
+	caused by automatic kill protection or use of the RECOVER
+	command.  This holds lasts for %s;
+	this command gets rid of them sooner.
 	
-	Για να χρησιμοποιήσετε την εντολή RELEASE για ένα
-	ψευδώνυμο, πρέπει η τρέχουσα διεύθυνσή σας όπως εμφανίζεται
-	στο /WHOIS να βρίσκεται στη λίστα πρόσβασης του ψευδωνύμου,
-	ή να έχετε δώσει τον σωστό κωδικό για το ψευδώνυμο.
+	In order to use the RELEASE command for a nick, your
+	current address as shown in /WHOIS must be on that nick's
+	access list, you must be identified and in the group of
+	that nick, or you must supply the correct password for
+	the nickname.
 	
 NICK_HELP_GHOST
 	Σύνταξη: GHOST ψευδώνυμο [κωδικός]

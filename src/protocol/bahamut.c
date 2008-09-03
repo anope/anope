@@ -107,6 +107,7 @@ IRCDVar myIrcd[] = {
      0,                         /* p10 */
      NULL,                      /* character set */
      1,                         /* reports sync state */
+     0,                         /* CIDR channelbans */
      }
     ,
     {NULL}
@@ -634,7 +635,7 @@ void moduleAddIRCDMsgs(void) {
 
     /* first update the cs protect info about this ircd */
     updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
-	
+
     /* now add the commands */
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);

@@ -427,7 +427,7 @@ void get_channel_stats(long *nrec, long *memuse)
     Channel *chan;
     struct c_userlist *cu;
     BanData *bd;
-    int i, j;
+    int i;
 
     for (i = 0; i < 1024; i++) {
         for (chan = chanlist[i]; chan; chan = chan->next) {
@@ -445,24 +445,12 @@ void get_channel_stats(long *nrec, long *memuse)
                 if (chan->redirect)
                     mem += strlen(chan->redirect) + 1;
             }
-            mem += sizeof(char *) * chan->bansize;
-            for (j = 0; j < chan->bancount; j++) {
-                if (chan->bans[j])
-                    mem += strlen(chan->bans[j]) + 1;
-            }
+            mem += get_memuse(chan->bans);
             if (ircd->except) {
-                mem += sizeof(char *) * chan->exceptsize;
-                for (j = 0; j < chan->exceptcount; j++) {
-                    if (chan->excepts[j])
-                        mem += strlen(chan->excepts[j]) + 1;
-                }
+                mem += get_memuse(chan->excepts);
             }
             if (ircd->invitemode) {
-                mem += sizeof(char *) * chan->invitesize;
-                for (j = 0; j < chan->invitecount; j++) {
-                    if (chan->invite[j])
-                        mem += strlen(chan->invite[j]) + 1;
-                }
+                mem += get_memuse(chan->invites);
             }
             for (cu = chan->users; cu; cu = cu->next) {
                 mem += sizeof(*cu);
@@ -1270,6 +1258,7 @@ void do_topic(const char *source, int ac, char **av)
 
 void add_ban(Channel * chan, char *mask)
 {
+    Entry *ban;
     /* check for NULL values otherwise we will segfault */
     if (!chan || !mask) {
         if (debug) {
@@ -1278,24 +1267,27 @@ void add_ban(Channel * chan, char *mask)
         return;
     }
 
+    /* Check if the list already exists, if not create it.
+     * Create a new ban and add it to the list.. ~ Viper */
+    if (!chan->bans)
+        chan->bans = list_create();
+    ban = entry_add(chan->bans, mask);
+
+    if (!ban)
+        fatal("Creating new ban entry failed");
+
+    /* Check whether it matches a botserv bot after adding internally
+     * and parsing it through cidr support. ~ Viper */
     if (s_BotServ && BSSmartJoin && chan->ci && chan->ci->bi
         && chan->usercount >= BSMinUsers) {
-        char botmask[BUFSIZE];
         BotInfo *bi = chan->ci->bi;
 
-        snprintf(botmask, sizeof(botmask), "%s!%s@%s", bi->nick, bi->user,
-                 bi->host);
-        if (match_wild_nocase(mask, botmask)) {
+        if (entry_match(ban, bi->nick, bi->user, bi->host, 0)) {
             anope_cmd_mode(bi->nick, chan->name, "-b %s", mask);
+            entry_delete(chan->bans, ban);
             return;
         }
     }
-
-    if (chan->bancount >= chan->bansize) {
-        chan->bansize += 8;
-        chan->bans = srealloc(chan->bans, sizeof(char *) * chan->bansize);
-    }
-    chan->bans[chan->bancount++] = sstrdup(mask);
 
     if (debug)
         alog("debug: Added ban %s to channel %s", mask, chan->name);
@@ -1305,18 +1297,22 @@ void add_ban(Channel * chan, char *mask)
 
 void add_exception(Channel * chan, char *mask)
 {
+    Entry *exception;
+
     if (!chan || !mask) {
         if (debug)
             alog("debug: add_exception called with NULL values");
         return;
     }
 
-    if (chan->exceptcount >= chan->exceptsize) {
-        chan->exceptsize += 8;
-        chan->excepts =
-            srealloc(chan->excepts, sizeof(char *) * chan->exceptsize);
-    }
-    chan->excepts[chan->exceptcount++] = sstrdup(mask);
+    /* Check if the list already exists, if not create it.
+     * Create a new exception and add it to the list.. ~ Viper */
+    if (!chan->excepts)
+        chan->excepts = list_create();
+    exception = entry_add(chan->excepts, mask);
+
+    if (!exception)
+        fatal("Creating new exception entry failed");
 
     if (debug)
         alog("debug: Added except %s to channel %s", mask, chan->name);
@@ -1326,18 +1322,22 @@ void add_exception(Channel * chan, char *mask)
 
 void add_invite(Channel * chan, char *mask)
 {
+    Entry *invite;
+
     if (!chan || !mask) {
         if (debug)
             alog("debug: add_invite called with NULL values");
         return;
     }
 
-    if (chan->invitecount >= chan->invitesize) {
-        chan->invitesize += 8;
-        chan->invite =
-            srealloc(chan->invite, sizeof(char *) * chan->invitesize);
-    }
-    chan->invite[chan->invitecount++] = sstrdup(mask);
+    /* Check if the list already exists, if not create it.
+     * Create a new invite and add it to the list.. ~ Viper */
+    if (!chan->invites)
+        chan->invites = list_create();
+    invite = entry_add(chan->invites, mask);
+
+    if (!invite)
+        fatal("Creating new exception entry failed");
 
     if (debug)
         alog("debug: Added invite %s to channel %s", mask, chan->name);
@@ -1621,7 +1621,6 @@ Channel *chan_create(char *chan, time_t ts)
 void chan_delete(Channel * c)
 {
     BanData *bd, *next;
-    int i;
 
     if (debug)
         alog("debug: Deleting channel %s", c->name);
@@ -1650,37 +1649,26 @@ void chan_delete(Channel * c)
             free(c->redirect);
     }
 
-    for (i = 0; i < c->bancount; ++i) {
-        if (c->bans[i])
-            free(c->bans[i]);
-        else
-            alog("channel: BUG freeing %s: bans[%d] is NULL!", c->name, i);
+    if (c->bans && c->bans->count) {
+        while (c->bans->entries) {
+            entry_delete(c->bans, c->bans->entries);
+        }
     }
-    if (c->bansize)
-        free(c->bans);
 
     if (ircd->except) {
-        for (i = 0; i < c->exceptcount; ++i) {
-            if (c->excepts[i])
-                free(c->excepts[i]);
-            else
-                alog("channel: BUG freeing %s: excepts[%d] is NULL!",
-                     c->name, i);
+        if (c->excepts && c->excepts->count) {
+            while (c->excepts->entries) {
+                entry_delete(c->excepts, c->excepts->entries);
+            }
         }
-        if (c->exceptsize)
-            free(c->excepts);
     }
 
     if (ircd->invitemode) {
-        for (i = 0; i < c->invitecount; ++i) {
-            if (c->invite[i])
-                free(c->invite[i]);
-            else
-                alog("channel: BUG freeing %s: invite[%d] is NULL!",
-                     c->name, i);
+        if (c->invites && c->invites->count) {
+            while (c->invites->entries) {
+                entry_delete(c->invites, c->invites->entries);
+            }
         }
-        if (c->invitesize)
-            free(c->invite);
     }
 
     if (c->next)
@@ -1697,28 +1685,20 @@ void chan_delete(Channel * c)
 
 void del_ban(Channel * chan, char *mask)
 {
-    char **s = chan->bans;
-    int i = 0;
     AutoKick *akick;
+    Entry *ban;
 
     /* Sanity check as it seems some IRCD will just send -b without a mask */
-    if (!mask) {
+    if (!mask || !chan->bans || (chan->bans->count == 0))
         return;
-    }
 
-    while (i < chan->bancount && strcmp(*s, mask) != 0) {
-        i++;
-        s++;
-    }
+    ban = elist_find_mask(chan->bans, mask);
 
-    if (i < chan->bancount) {
-        chan->bancount--;
-        if (i < chan->bancount)
-            memmove(s, s + 1, sizeof(char *) * (chan->bancount - i));
+    if (ban) {
+        entry_delete(chan->bans, ban);
 
         if (debug)
-            alog("debug: Deleted ban %s from channel %s", mask,
-                 chan->name);
+            alog("debug: Deleted ban %s from channel %s", mask, chan->name);
     }
 
     if (chan->ci && (akick = is_stuck(chan->ci, mask)))
@@ -1729,58 +1709,41 @@ void del_ban(Channel * chan, char *mask)
 
 void del_exception(Channel * chan, char *mask)
 {
-    int i;
-    int reset = 0;
+    Entry *exception;
 
     /* Sanity check as it seems some IRCD will just send -e without a mask */
-    if (!mask) {
+    if (!mask|| !chan->excepts || (chan->excepts->count == 0))
         return;
+
+    exception = elist_find_mask(chan->excepts, mask);
+
+    if (exception) {
+        entry_delete(chan->excepts, exception);
+
+        if (debug)
+            alog("debug: Deleted except %s to channel %s", mask, chan->name);
     }
-
-    for (i = 0; i < chan->exceptcount; i++) {
-        if ((!reset) && (stricmp(chan->excepts[i], mask) == 0)) {
-            free(chan->excepts[i]);
-            reset = 1;
-        }
-        if (reset)
-            chan->excepts[i] =
-                (i == chan->exceptcount) ? NULL : chan->excepts[i + 1];
-    }
-
-    if (reset)
-        chan->exceptcount--;
-
-    if (debug)
-        alog("debug: Deleted except %s to channel %s", mask, chan->name);
 }
 
 /*************************************************************************/
 
 void del_invite(Channel * chan, char *mask)
 {
-    int i;
-    int reset = 0;
+    Entry *invite;
 
     /* Sanity check as it seems some IRCD will just send -I without a mask */
-    if (!mask) {
+    if (!mask || !chan->invites || (chan->invites->count == 0)) {
         return;
     }
 
-    for (i = 0; i < chan->invitecount; i++) {
-        if ((!reset) && (stricmp(chan->invite[i], mask) == 0)) {
-            free(chan->invite[i]);
-            reset = 1;
-        }
-        if (reset)
-            chan->invite[i] =
-                (i == chan->invitecount) ? NULL : chan->invite[i + 1];
+    invite = elist_find_mask(chan->invites, mask);
+
+    if (invite) {
+        entry_delete(chan->invites, invite);
+
+        if (debug)
+            alog("debug: Deleted invite %s to channel %s", mask, chan->name);
     }
-
-    if (reset)
-        chan->invitecount--;
-
-    if (debug)
-        alog("debug: Deleted invite %s to channel %s", mask, chan->name);
 }
 
 
@@ -1933,6 +1896,417 @@ void restore_unsynced_topics(void)
         if (!(c->topic_sync))
             restore_topic(c->name);
     }
+}
+
+/*************************************************************************/
+
+/**
+ * This handles creating a new Entry.
+ * This function destroys and free's the given mask as a side effect.
+ * @param mask Host/IP/CIDR mask to convert to an entry
+ * @return Entry struct for the given mask, NULL if creation failed
+ */
+Entry *entry_create(char *mask)
+{
+    Entry *entry;
+    char *nick = NULL, *user, *host, *cidrhost;
+    int do_free;
+    uint32 ip, cidr;
+
+    entry = scalloc(1, sizeof(Entry));
+    entry->type = ENTRYTYPE_NONE;
+    entry->prev = NULL;
+    entry->next = NULL;
+    entry->nick = NULL;
+    entry->user = NULL;
+    entry->host = NULL;
+    entry->mask = sstrdup(mask);
+
+    host = strchr(mask, '@');
+    if (host) {
+        *host++ = '\0';
+        /* If the user is purely a wildcard, ignore it */
+        if (str_is_pure_wildcard(mask))
+            user = NULL;
+        else {
+
+            /* There might be a nick too  */
+            user = strchr(mask, '!');
+            if (user) {
+                *user++ = '\0';
+                /* If the nick is purely a wildcard, ignore it */
+                if (str_is_pure_wildcard(mask))
+                    nick = NULL;
+                else
+                    nick = mask;
+            } else {
+                nick = NULL;
+                user = mask;
+            }
+        }
+    } else {
+        /* It is possibly an extended ban/invite mask, but we do
+         * not support these at this point.. ~ Viper */
+        /* If there's no user in the mask, assume a pure wildcard */
+        user = NULL;
+        host = mask;
+    }
+
+    if (nick) {
+        entry->nick = sstrdup(nick);
+        /* Check if we have a wildcard user */
+        if (str_is_wildcard(nick))
+            entry->type |= ENTRYTYPE_NICK_WILD;
+        else
+            entry->type |= ENTRYTYPE_NICK;
+    }
+
+    if (user) {
+        entry->user = sstrdup(user);
+        /* Check if we have a wildcard user */
+        if (str_is_wildcard(user))
+            entry->type |= ENTRYTYPE_USER_WILD;
+        else
+            entry->type |= ENTRYTYPE_USER;
+    }
+
+    /* Only check the host if it's not a pure wildcard */
+    if (*host && !str_is_pure_wildcard(host)) {
+        if (ircd->cidrchanbei && str_is_cidr(host, &ip, &cidr, &cidrhost)) {
+            entry->cidr_ip = ip;
+            entry->cidr_mask = cidr;
+            entry->type |= ENTRYTYPE_CIDR4;
+            host = cidrhost;
+            do_free = 1;
+        } else if (ircd->cidrchanbei && strchr(host, '/')) {
+            /* Most IRCd's don't enforce sane bans therefore it is not
+             * so unlikely we will encounter this.
+             * Currently we only support strict CIDR without taking into
+             * account quirks of every single ircd (nef) that ignore everything
+             * after the first /cidr. To add this, sanitaze before sending to
+             * str_is_cidr() as this expects a standard cidr.
+             * Add it to the internal list (so it is included in for example clear)
+             * but do not use if during matching.. ~ Viper */
+            entry->type = ENTRYTYPE_NONE;
+        } else {
+            entry->host = sstrdup(host);
+            if (str_is_wildcard(host))
+                entry->type |= ENTRYTYPE_HOST_WILD;
+            else
+                entry->type |= ENTRYTYPE_HOST;
+        }
+    }
+    free(mask);
+
+    return entry;
+}
+
+
+/**
+ * Create an entry and add it at the beginning of given list.
+ * @param list The List the mask should be added to
+ * @param mask The mask to parse and add to the list
+ * @return Pointer to newly added entry. NULL if it fails.
+ */
+Entry *entry_add(EList *list, char *mask)
+{
+    Entry *e;
+    char *hostmask;
+
+    hostmask = sstrdup(mask);
+    e = entry_create(hostmask);
+
+    if (!e)
+        return NULL;
+
+    e->next = list->entries;
+    e->prev = NULL;
+
+    if (list->entries)
+        list->entries->prev = e;
+    list->entries = e;
+    list->count++;
+
+    return e;
+}
+
+
+/**
+ * Delete the given entry from a given list.
+ * @param list Linked list from which entry needs to be removed.
+ * @param e The entry to be deleted, must be member of list.
+ */
+void entry_delete(EList *list, Entry *e)
+{
+    if (!list || !e)
+        return;
+
+    if (e->next)
+        e->next->prev = e->prev;
+    if (e->prev)
+        e->prev->next = e->next;
+
+    if (list->entries == e)
+        list->entries = e->next;
+
+    if (e->nick)
+        free(e->nick);
+    if (e->user)
+        free(e->user);
+    if (e->host)
+        free(e->host);
+    free(e->mask);
+    free(e);
+
+    list->count--;
+}
+
+
+/**
+ * Create and initialize a new entrylist
+ * @return Pointer to the created EList object
+ **/
+EList *list_create() {
+    EList *list;
+
+    list = scalloc(1, sizeof(EList));
+    list->entries = NULL;
+    list->count = 0;
+
+    return list;
+}
+
+
+/**
+ * Match the given Entry to the given user/host and optional IP addy
+ * @param e Entry struct to match against
+ * @param nick Nick to match against
+ * @param user User to match against
+ * @param host Host to match against
+ * @param ip IP to match against, set to 0 to not match this
+ * @return 1 for a match, 0 for no match
+ */
+int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip)
+{
+    /* If we don't get an entry, or it s an invalid one, no match ~ Viper*/
+    if (!e || e->type == ENTRYTYPE_NONE)
+        return 0;
+
+    if (ircd->cidrchanbei && (e->type & ENTRYTYPE_CIDR4) &&
+            (!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
+        return 0;
+    if ((e->type & ENTRYTYPE_NICK) && (stricmp(e->nick, nick) != 0))
+        return 0;
+    if ((e->type & ENTRYTYPE_USER) && (stricmp(e->user, user) != 0))
+        return 0;
+    if ((e->type & ENTRYTYPE_HOST) && (stricmp(e->host, host) != 0))
+        return 0;
+    if ((e->type & ENTRYTYPE_NICK_WILD) && !match_wild_nocase(e->nick, nick))
+        return 0;
+    if ((e->type & ENTRYTYPE_USER_WILD) && !match_wild_nocase(e->user, user))
+        return 0;
+    if ((e->type & ENTRYTYPE_HOST_WILD) && !match_wild_nocase(e->host, host))
+        return 0;
+
+    return 1;
+}
+
+/**
+ * Match the given Entry to the given hostmask and optional IP addy.
+ * @param e Entry struct to match against
+ * @param mask Hostmask to match against
+ * @param ip IP to match against, set to 0 to not match this
+ * @return 1 for a match, 0 for no match
+ */
+int entry_match_mask(Entry *e, char *mask, uint32 ip)
+{
+    char *hostmask, *nick, *user, *host;
+    int res;
+
+    hostmask = sstrdup(mask);
+
+    host = strchr(hostmask, '@');
+    if (host) {
+        *host++ = '\0';
+        user = strchr(hostmask, '!');
+        if (user) {
+            *user++ = '\0';
+            nick = hostmask;
+         } else {
+            nick = NULL;
+            user = hostmask;
+        }
+    } else {
+        nick = NULL;
+        user = NULL;
+        host = hostmask;
+    }
+
+    res = entry_match(e, nick, user, host, ip);
+
+    /* Free the destroyed mask. */
+    free(hostmask);
+
+    return res;
+}
+
+/**
+ * Match a nick, user, host, and ip to a list entry
+ * @param e List that should be matched against
+ * @param nick The nick to match
+ * @param user The user to match
+ * @param host The host to match
+ * @param ip The ip to match
+ * @return Returns the first matching entry, if none, NULL is returned.
+ */
+Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip)
+{
+    Entry *e;
+
+    if (!list || !list->entries)
+        return NULL;
+
+    for (e = list->entries; e; e = e->next) {
+        if (entry_match(e, nick, user, host, ip))
+            return e;
+    }
+
+    /* We matched none */
+    return NULL;
+}
+
+/**
+ * Match a mask and ip to a list.
+ * @param list EntryList that should be matched against
+ * @param mask The nick!user@host mask to match
+ * @param ip The ip to match
+ * @return Returns the first matching entry, if none, NULL is returned.
+ */
+Entry *elist_match_mask(EList *list, char *mask, uint32 ip)
+{
+    char *hostmask, *nick, *user, *host;
+    Entry *res;
+
+    if (!list || !list->entries || !mask)
+        return NULL;
+
+    hostmask = sstrdup(mask);
+
+    host = strchr(hostmask, '@');
+    if (host) {
+        *host++ = '\0';
+        user = strchr(hostmask, '!');
+        if (user) {
+            *user++ = '\0';
+            nick = hostmask;
+         } else {
+            nick = NULL;
+            user = hostmask;
+        }
+    } else {
+        nick = NULL;
+        user = NULL;
+        host = hostmask;
+    }
+
+    res = elist_match(list, nick, user, host, ip);
+
+    /* Free the destroyed mask. */
+    free(hostmask);
+
+    return res;
+}
+
+/**
+ * Check if a user matches an entry on a list.
+ * @param list EntryList that should be matched against
+ * @param user The user to match against the entries
+ * @return Returns the first matching entry, if none, NULL is returned.
+ */
+Entry *elist_match_user(EList *list, User *u)
+{
+    Entry *res;
+    char *host;
+    uint32 ip = 0;
+
+    if (!list || !list->entries || !u)
+        return NULL;
+
+    if (u->hostip == NULL) {
+        host = host_resolve(u->host);
+        /* we store the just resolved hostname so we don't
+         * need to do this again */
+        if (host) {
+            u->hostip = sstrdup(host);
+        }
+    } else {
+        host = sstrdup(u->hostip);
+    }
+
+    /* Convert the host to an IP.. */
+    if (host)
+        ip = str_is_ip(host);
+
+    /* Match what we ve got against the lists.. */
+    res = elist_match(list, u->nick, u->username, u->host, ip);
+    if (!res)
+        elist_match(list, u->nick, u->username, u->vhost, ip);
+
+    if (host)
+        free(host);
+
+    return res;
+}
+
+/**
+ * Find a entry identical to the given mask..
+ * @param list EntryList that should be matched against
+ * @param mask The *!*@* mask to match
+ * @return Returns the first matching entry, if none, NULL is returned.
+ */
+Entry *elist_find_mask(EList *list, char *mask)
+{
+    Entry *e;
+
+    if (!list || !list->entries || !mask)
+        return NULL;
+
+        for (e = list->entries; e; e = e->next) {
+            if (!stricmp(e->mask, mask))
+                return e;
+    }
+
+    return NULL;
+}
+
+/**
+ * Gets the total memory use of an entrylit.
+ * @param list The list we should estimate the mem use of.
+ * @return Returns the memory useage of the given list.
+ */
+long get_memuse(EList *list) {
+    Entry *e;
+    long mem = 0;
+
+    if (!list)
+        return 0;
+
+    mem += sizeof(EList *);
+    mem += sizeof(Entry *) * list->count;
+    if (list->entries) {
+        for (e = list->entries; e; e = e->next) {
+            if (e->nick)
+                mem += strlen(e->nick) + 1;
+            if (e->user)
+                mem += strlen(e->user) + 1;
+            if (e->host)
+                mem += strlen(e->host) + 1;
+            if (e->mask)
+                mem += strlen(e->mask) + 1;
+        }
+    }
+
+    return mem;
 }
 
 /*************************************************************************/

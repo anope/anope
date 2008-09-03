@@ -506,7 +506,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                 if (!strcmp(vhost, "*")) {
                     vhost = NULL;
                     if (debug)
-                        alog("debug: new user with no vhost in NICK command: %s", nick);
+                        alog("debug: new userï¿½with no vhost in NICK command: %s", nick);
                 }
             }
         }
@@ -921,30 +921,13 @@ int is_oper(User * user)
 /* Is the given user ban-excepted? */
 int is_excepted(ChannelInfo * ci, User * user)
 {
-    int count, i;
-    int isexcepted = 0;
-    char **excepts;
-
-    if (!ci->c)
+    if (!ci->c || !ircd->except)
         return 0;
 
-    if (!ircd->except) {
-        return 0;
-    }
+    if (elist_match_user(ci->c->excepts, user))
+        return 1;
 
-    count = ci->c->exceptcount;
-    excepts = scalloc(sizeof(char *) * count, 1);
-    memcpy(excepts, ci->c->excepts, sizeof(char *) * count);
-
-    for (i = 0; i < count; i++) {
-        if (match_usermask(excepts[i], user)
-            || match_userip(excepts[i], user, user->hostip)) {
-            isexcepted = 1;
-            break;
-        }
-    }
-    free(excepts);
-    return isexcepted;
+    return 0;
 }
 
 /*************************************************************************/
@@ -952,28 +935,13 @@ int is_excepted(ChannelInfo * ci, User * user)
 /* Is the given MASK ban-excepted? */
 int is_excepted_mask(ChannelInfo * ci, char *mask)
 {
-    int count, i;
-    int isexcepted = 0;
-    char **excepts;
-
-    if (!ci->c)
+    if (!ci->c || !ircd->except)
         return 0;
 
-    if (!ircd->except) {
-        return 0;
-    }
+    if (elist_match_mask(ci->c->excepts, mask, 0))
+        return 1;
 
-    count = ci->c->exceptcount;
-    excepts = scalloc(sizeof(char *) * count, 1);
-    memcpy(excepts, ci->c->excepts, sizeof(char *) * count);
-
-    for (i = 0; i < count; i++) {
-        if (match_wild_nocase(excepts[i], mask)) {
-            isexcepted = 1;
-        }
-    }
-    free(excepts);
-    return isexcepted;
+    return 0;
 }
 
 

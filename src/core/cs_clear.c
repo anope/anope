@@ -85,65 +85,54 @@ int do_clear(User * u)
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else if (stricmp(what, "bans") == 0) {
         char *av[2];
-        int i;
+        Entry *ban, *next;
 
-        /* Save original ban info */
-        int count = c->bancount;
-        char **bans = scalloc(sizeof(char *) * count, 1);
-        for (i = 0; i < count; i++)
-            bans[i] = sstrdup(c->bans[i]);
-
-        for (i = 0; i < count; i++) {
-            av[0] = sstrdup("-b");
-            av[1] = bans[i];
-            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
-            chan_set_modes(whosends(ci), c, 2, av, 0);
-            free(av[1]);
-            free(av[0]);
+        if (c->bans && c->bans->count) {
+            for (ban = c->bans->entries; ban; ban = next) {
+                next = ban->next;
+                av[0] = sstrdup("-b");
+                av[1] = sstrdup(ban->mask);
+                anope_cmd_mode(whosends(ci), chan, "-b %s", ban->mask);
+                chan_set_modes(whosends(ci), c, 2, av, 0);
+                free(av[0]);
+                free(av[1]);
+            }
         }
+
         notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
-        free(bans);
     } else if (ircd->except && stricmp(what, "excepts") == 0) {
         char *av[2];
-        int i;
+        Entry *except, *next;
 
-        /* Save original except info */
-        int count = c->exceptcount;
-        char **excepts = scalloc(sizeof(char *) * count, 1);
-        for (i = 0; i < count; i++)
-            excepts[i] = sstrdup(c->excepts[i]);
-
-        for (i = 0; i < count; i++) {
-            av[0] = sstrdup("-e");
-            av[1] = excepts[i];
-            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
-            chan_set_modes(whosends(ci), c, 2, av, 0);
-            free(av[1]);
-            free(av[0]);
+        if (c->excepts && c->excepts->count) {
+            for (except = c->excepts->entries; except; except = next) {
+                next = except->next;
+                av[0] = sstrdup("-e");
+                av[1] = sstrdup(except->mask);
+                anope_cmd_mode(whosends(ci), chan, "-e %s", except->mask);
+                chan_set_modes(whosends(ci), c, 2, av, 0);
+                free(av[0]);
+                free(av[1]);
+            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
-        free(excepts);
 
     } else if (ircd->invitemode && stricmp(what, "invites") == 0) {
         char *av[2];
-        int i;
+        Entry *invite, *next;
 
-        /* Save original except info */
-        int count = c->invitecount;
-        char **invites = scalloc(sizeof(char *) * count, 1);
-        for (i = 0; i < count; i++)
-            invites[i] = sstrdup(c->invite[i]);
-
-        for (i = 0; i < count; i++) {
-            av[0] = sstrdup("-I");
-            av[1] = invites[i];
-            anope_cmd_mode(whosends(ci), chan, "%s %s", av[0], av[1]);
-            chan_set_modes(whosends(ci), c, 2, av, 0);
-            free(av[1]);
-            free(av[0]);
+        if (c->invites && c->invites->count) {
+            for (invite = c->invites->entries; invite; invite = next) {
+                next = invite->next;
+                av[0] = sstrdup("-I");
+                av[1] = sstrdup(invite->mask);
+                anope_cmd_mode(whosends(ci), chan, "-I %s", invite->mask);
+                chan_set_modes(whosends(ci), c, 2, av, 0);
+                free(av[0]);
+                free(av[1]);
+            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
-        free(invites);
 
     } else if (stricmp(what, "modes") == 0) {
         char *argv[2];
@@ -189,7 +178,7 @@ int do_clear(User * u)
             }
             check_modes(c);
         }
-        
+
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
         char *av[4];

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1425"
+VERSION_BUILD="1426"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1426)
+# BUGS  : 876 
+# NOTES : We now support CIDR in channel ban/invite/except lists. Introduces new CIDR capable generic lists system.
 #
 # BUILD : 1.7.21 (1425)
 # BUGS  : 873 

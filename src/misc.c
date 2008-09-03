@@ -1492,4 +1492,172 @@ int SupportedWindowsVersion(void)
 
 #endif
 
+
+/*************************************************************************/
+/* This 2 functions were originally found in Bahamut */
+
+/**
+ * Turn a cidr value into a netmask
+ * @param cidr CIDR value
+ * @return Netmask value
+ */
+uint32 cidr_to_netmask(uint16 cidr)
+{
+    if (cidr == 0)
+        return 0;
+
+    return (0xFFFFFFFF - (1 << (32 - cidr)) + 1);
+}
+
+/**
+ * Turn a netmask into a cidr value
+ * @param mask Netmask
+ * @return CIDR value
+ */
+uint16 netmask_to_cidr(uint32 mask)
+{
+    int tmp = 0;
+
+    while (!(mask & (1 << tmp)) && (tmp < 32))
+        tmp++;
+
+    return (32 - tmp);
+}
+
+/*************************************************************************/
+
+/**
+ * Check if the given string is some sort of wildcard
+ * @param str String to check
+ * @return 1 for wildcard, 0 for anything else
+ */
+int str_is_wildcard(const char *str)
+{
+    while (*str) {
+        if ((*str == '*') || (*str == '?'))
+            return 1;
+        str++;
+    }
+
+    return 0;
+}
+
+/**
+ * Check if the given string is a pure wildcard
+ * @param str String to check
+ * @return 1 for pure wildcard, 0 for anything else
+ */
+int str_is_pure_wildcard(const char *str)
+{
+    while (*str) {
+        if (*str != '*')
+            return 0;
+        str++;
+    }
+
+    return 1;
+}
+
+/*************************************************************************/
+
+/**
+ * Check if the given string is an IP, and return the IP.
+ * @param str String to check
+ * @return The IP, if one found. 0 if none.
+ */
+uint32 str_is_ip(char *str)
+{
+    int i;
+    int octets[4] = { -1, -1, -1, -1 };
+    char *s = str;
+    uint32 ip;
+
+    for (i = 0; i < 4; i++) {
+        octets[i] = strtol(s, &s, 10);
+        /* Bail out if the octet is invalid or wrongly terminated */
+        if ((octets[i] < 0) || (octets[i] > 255)
+            || ((i < 3) && (*s != '.')))
+            return 0;
+        if (i < 3)
+            s++;
+    }
+
+    /* Fill the IP - the dirty way */
+    ip = octets[3];
+    ip += octets[2] * 256;
+    ip += octets[1] * 65536;
+    ip += octets[0] * 16777216;
+
+    return ip;
+}
+
+/*************************************************************************/
+
+/**
+ * Check if the given string is an IP or CIDR mask, and fill the given
+ * ip/cidr params if so.
+ * @param str String to check
+ * @param ip The ipmask to fill when a CIDR is found
+ * @param mask The CIDR mask to fill when a CIDR is found
+ * @param host Displayed host
+ * @return 1 for IP/CIDR, 0 for anything else
+ */
+int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
+{
+    int i;
+    int octets[4] = { -1, -1, -1, -1 };
+    char *s = str;
+    char buf[512];
+    uint16 cidr;
+
+    for (i = 0; i < 4; i++) {
+        octets[i] = strtol(s, &s, 10);
+        /* Bail out if the octet is invalid or wrongly terminated */
+        if ((octets[i] < 0) || (octets[i] > 255)
+            || ((i < 3) && (*s != '.')))
+            return 0;
+        if (i < 3)
+            s++;
+    }
+
+    /* Fill the IP - the dirty way */
+    *ip = octets[3];
+    *ip += octets[2] * 256;
+    *ip += octets[1] * 65536;
+    *ip += octets[0] * 16777216;
+
+    if (*s == '/') {
+        s++;
+        /* There's a CIDR mask here! */
+        cidr = strtol(s, &s, 10);
+        /* Bail out if the CIDR is invalid or the string isn't done yet */
+        if ((cidr > 32) || (*s))
+            return 0;
+    } else {
+        /* No CIDR mask here - use 32 so the whole ip will be matched */
+        cidr = 32;
+    }
+
+    *mask = cidr_to_netmask(cidr);
+    /* Apply the mask to avoid 255.255.255.255/8 bans */
+    *ip &= *mask;
+
+    /* Refill the octets to fill the host */
+    octets[0] = (*ip & 0xFF000000) / 16777216;
+    octets[1] = (*ip & 0x00FF0000) / 65536;
+    octets[2] = (*ip & 0x0000FF00) / 256;
+    octets[3] = (*ip & 0x000000FF);
+
+    if (cidr == 32)
+        snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2],
+                 octets[3]);
+    else
+        snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1],
+                 octets[2], octets[3], cidr);
+
+    *host = sstrdup(buf);
+
+    return 1;
+}
+
 /* EOF */

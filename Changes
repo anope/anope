@@ -3,6 +3,7 @@ Anope Version  S V N
 01/24 A Added a check for hosts too long in BotServs bots.                [ #00]
 02/12 A Added SUSPENDED to NS LIST keywords.                              [#869]
 02/20 A Added NS SASET LANGUAGE.                                          [#872]
+09/03 A Added CIDR support in channel bans/excepts.                       [#876]
 01/15 F BOT_NOT_ASSIGNED language string error.                           [#828]
 01/15 F listchans now shows if a channel is suspended.                    [#825]
 01/15 F listnicks now shows if a nickname is suspended.                   [#825]

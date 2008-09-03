@@ -75,13 +75,8 @@ int do_clearmodes(User * u)
     char *chan = strtok(NULL, " ");
     Channel *c;
     int all = 0;
-    int count;                  /* For saving ban info */
-    char **bans;                /* For saving ban info */
-    int exceptcount;            /* For saving except info */
-    char **excepts;             /* For saving except info */
-    int invitecount;            /* For saving invite info */
-    char **invites;             /* For saving invite info */
     struct c_userlist *cu, *next;
+    Entry *entry, *nexte;
 
     if (!chan) {
         syntax_error(s_OperServ, u, "CLEARMODES", OPER_CLEARMODES_SYNTAX);
@@ -286,67 +281,43 @@ int do_clearmodes(User * u)
         }
 
         /* Clear bans */
-        count = c->bancount;
-        bans = scalloc(sizeof(char *) * count, 1);
-
-        for (i = 0; i < count; i++)
-            bans[i] = sstrdup(c->bans[i]);
-
-        for (i = 0; i < count; i++) {
-            argv[0] = sstrdup("-b");
-            argv[1] = bans[i];
-            anope_cmd_mode(s_OperServ, c->name, "-b %s", argv[1]);
-            chan_set_modes(s_OperServ, c, 2, argv, 0);
-            free(argv[1]);
-            free(argv[0]);
+        if (c->bans && c->bans->count) {
+            for (entry = c->bans->entries; entry; entry = nexte) {
+                nexte = entry->next;
+                argv[0] = sstrdup("-b");
+                argv[1] = sstrdup(entry->mask);
+                anope_cmd_mode(s_OperServ, c->name, "-b %s", entry->mask);
+                chan_set_modes(s_OperServ, c, 2, argv, 0);
+                free(argv[0]);
+                free(argv[1]);
+            }
         }
 
-        free(bans);
-
-        excepts = NULL;
-
-        if (ircd->except) {
-            /* Clear excepts */
-            exceptcount = c->exceptcount;
-            excepts = scalloc(sizeof(char *) * exceptcount, 1);
-
-            for (i = 0; i < exceptcount; i++)
-                excepts[i] = sstrdup(c->excepts[i]);
-
-            for (i = 0; i < exceptcount; i++) {
+        /* Clear excepts */
+        if (ircd->except && c->excepts && c->excepts->count) {
+            for (entry = c->excepts->entries; entry; entry = nexte) {
+                nexte = entry->next;
                 argv[0] = sstrdup("-e");
-                argv[1] = excepts[i];
-                anope_cmd_mode(s_OperServ, c->name, "-e %s", argv[1]);
+                argv[1] = sstrdup(entry->mask);
+                anope_cmd_mode(s_OperServ, c->name, "-e %s", entry->mask);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
-                free(argv[1]);
                 free(argv[0]);
-            }
-
-            if (excepts) {
-                free(excepts);
+                free(argv[1]);
             }
         }
 
-        if (ircd->invitemode) {
-            /* Clear invites */
-            invitecount = c->invitecount;
-            invites = scalloc(sizeof(char *) * invitecount, 1);
-
-            for (i = 0; i < invitecount; i++)
-                invites[i] = sstrdup(c->invite[i]);
-
-            for (i = 0; i < invitecount; i++) {
+        /* Clear invites */
+        if (ircd->invitemode && c->invites && c->invites->count) {
+            for (entry = c->invites->entries; entry; entry = nexte) {
+                nexte = entry->next;
                 argv[0] = sstrdup("-I");
-                argv[1] = invites[i];
-                anope_cmd_mode(s_OperServ, c->name, "-I %s", argv[1]);
+                argv[1] = sstrdup(entry->mask);
+                anope_cmd_mode(s_OperServ, c->name, "-I %s", entry->mask);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
-                free(argv[1]);
                 free(argv[0]);
+                free(argv[1]);
             }
-
-            free(invites);
         }
-
     }
 
     if (all) {

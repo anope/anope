@@ -217,6 +217,8 @@ extern int shutdown(int, int);
 typedef struct server_ Server;
 typedef struct user_ User;
 typedef struct channel_ Channel;
+typedef struct c_elist EList;
+typedef struct c_elist_entry Entry;
 typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
 typedef struct memo_ Memo;
 typedef struct nickrequest_ NickRequest;
@@ -356,12 +358,15 @@ struct ircdvars_ {
 	int p10;					/* ircd is P10  */
 	char *nickchars;			/* character set */
 	int sync;					/* reports sync state */
+	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
+							 * 0 for no support, 1 for strict cidr support, anything else
+							 * for ircd specific support (nefarious only cares about first /mask) */
 };
 
 struct ircdcapab_ {
   uint32 noquit;
   uint32 tsmode;
-  uint32 unconnect;  
+  uint32 unconnect;
   uint32 nickip;
   uint32 nsjoin;
   uint32 zip;
@@ -962,6 +967,16 @@ struct userdata_ {
     int16 times;
 };
 
+/* Channelban type flags */
+#define ENTRYTYPE_NONE           0x00000000
+#define ENTRYTYPE_CIDR4          0x00000001
+#define ENTRYTYPE_NICK_WILD      0x00000004
+#define ENTRYTYPE_NICK           0x00000008
+#define ENTRYTYPE_USER_WILD      0x00000010
+#define ENTRYTYPE_USER           0x00000020
+#define ENTRYTYPE_HOST_WILD      0x00000040
+#define ENTRYTYPE_HOST           0x00000080
+
 struct channel_ {
     Channel *next, *prev;
     char name[CHANMAX];
@@ -975,12 +990,9 @@ struct channel_ {
     char *key;				/* NULL if none */
     char *redirect;			/* +L; NULL if none */
     char *flood;			/* +f; NULL if none */
-    int32 bancount, bansize;
-    char **bans;
-    int32 exceptcount, exceptsize;
-    char **excepts;
-    int32 invitecount, invitesize;
-    char **invite;
+    EList *bans;
+    EList *excepts;
+    EList *invites;
     struct c_userlist {
 		struct c_userlist *next, *prev;
 		User *user;
@@ -996,6 +1008,19 @@ struct channel_ {
     int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
     int16 bouncy_modes;			/* Did we fail to set modes here? */
 	int16 topic_sync;           /* Is the topic in sync? */
+};
+
+struct c_elist {
+	Entry *entries;
+	int32 count;
+};
+
+struct c_elist_entry {
+    Entry *next, *prev;
+    uint32 type;
+    uint32 cidr_ip;             /* IP mask for CIDR matching */
+    uint32 cidr_mask;           /* Netmask for CIDR matching */
+    char *nick, *user, *host, *mask;
 };
 
 /*************************************************************************/

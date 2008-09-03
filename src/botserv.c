@@ -757,24 +757,16 @@ static UserData *get_user_data(Channel * c, User * u)
 
 void bot_join(ChannelInfo * ci)
 {
-    int i;
-
     if (!ci || !ci->c || !ci->bi)
         return;
 
     if (BSSmartJoin) {
         /* We check for bans */
-        int count = ci->c->bancount;
-        if (count) {
-            char botmask[BUFSIZE];
+        if (ci->c->bans && ci->c->bans->count) {
             char buf[BUFSIZE];
-            char **bans = scalloc(sizeof(char *) * count, 1);
             char *av[4];
+            Entry *ban, *next;
             int ac;
-
-            memcpy(bans, ci->c->bans, sizeof(char *) * count);
-            snprintf(botmask, sizeof(botmask), "%s!%s@%s", ci->bi->nick,
-                     ci->bi->user, ci->bi->host);
 
             if (ircdcap->tsmode) {
                 snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
@@ -788,21 +780,16 @@ void bot_join(ChannelInfo * ci)
                 ac = 3;
             }
 
-            for (i = 0; i < count; i++) {
-                if (match_wild_nocase(ci->c->bans[i], botmask)) {
-                    anope_cmd_mode(ci->bi->nick, ci->name, "-b %s",
-                                   bans[i]);
+            for (ban = ci->c->bans->entries; ban; ban = next) {
+                next = ban->next;
+                if (entry_match(ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0)) {
+                    anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
                     if (ircdcap->tsmode)
-                        av[3] = sstrdup(bans[i]);
+                        av[3] = ban->mask;
                     else
-                        av[2] = sstrdup(bans[i]);
+                        av[2] = ban->mask;
 
-                    do_cmode(ci->bi->nick, ac, av);
-
-                    if (ircdcap->tsmode)
-                        free(av[3]);
-                    else
-                        free(av[2]);
+                    do_cmode(whosends(ci), ac, av);
                 }
             }
 
@@ -810,8 +797,6 @@ void bot_join(ChannelInfo * ci)
                 free(av[2]);
             else
                 free(av[1]);
-
-            free(bans);
         }
 
         /* Should we be invited? */

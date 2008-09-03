@@ -2570,29 +2570,30 @@ AutoKick *is_stuck(ChannelInfo * ci, char *mask)
 
 void stick_mask(ChannelInfo * ci, AutoKick * akick)
 {
-    int i;
     char *av[2];
+    Entry *ban;
 
     if (!ci) {
         return;
     }
 
-    for (i = 0; i < ci->c->bancount; i++) {
-        /* If akick is already covered by a wider ban.
-           Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
-        if (match_wild_nocase(ci->c->bans[i], akick->u.mask))
-            return;
-
-        if (ircd->reversekickcheck) {
-            /* If akick is wider than a ban already in place.
-               Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
-            if (match_wild_nocase(akick->u.mask, ci->c->bans[i]))
+    if (ci->c->bans && ci->c->bans->entries != 0) {
+        for (ban = ci->c->bans->entries; ban; ban = ban->next) {
+            /* If akick is already covered by a wider ban.
+               Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
+            if (entry_match_mask(ban, sstrdup(akick->u.mask), 0))
                 return;
+
+            if (ircd->reversekickcheck) {
+                /* If akick is wider than a ban already in place.
+                   Example: c->bans[i] = *!*@irc.epona.org and akick->u.mask = *!*@*.epona.org */
+                if (match_wild_nocase(akick->u.mask, ban->mask))
+                    return;
+            }
         }
     }
 
     /* Falling there means set the ban */
-
     av[0] = sstrdup("+b");
     av[1] = akick->u.mask;
     anope_cmd_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);

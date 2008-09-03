@@ -141,6 +141,19 @@ E void do_mass_mode(char *modes);
 E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
 E void restore_unsynced_topics(void);
 
+E Entry *entry_create(char *mask);
+E Entry *entry_add(EList *list, char *mask);
+E void entry_delete(EList *list, Entry *e);
+E EList *list_create();
+E int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip);
+E int entry_match_mask(Entry *e, char *mask, uint32 ip);
+E Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip);
+E Entry *elist_match_mask(EList *list, char *mask, uint32 ip);
+E Entry *elist_match_user(EList *list, User *u);
+E Entry *elist_find_mask(EList *list, char *mask);
+E long get_memuse(EList *list);
+
+
 #define whosends(ci) ((!(ci) || !((ci)->botflags & BS_SYMBIOSIS) || !(ci)->bi || !(ci)->c || (ci)->c->usercount < BSMinUsers) ? s_ChanServ : (ci)->bi->nick)
 
 /**** chanserv.c ****/
@@ -862,6 +875,14 @@ E void ntoa(struct in_addr addr, char *ipaddr, int len);
 E char **buildStringList(char *src, int *number);
 E void binary_to_hex(unsigned char *bin, char *hex, int length);
 
+E uint32 cidr_to_netmask(uint16 cidr);
+E uint16 netmask_to_cidr(uint32 mask);
+
+E int str_is_wildcard(const char *str);
+E int str_is_pure_wildcard(const char *str);
+
+E uint32 str_is_ip(char *str);
+E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 
 
 /**** modules.c ****/

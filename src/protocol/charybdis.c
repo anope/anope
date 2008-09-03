@@ -104,6 +104,7 @@ IRCDVar myIrcd[] = {
      0,                         /* p10 */
      NULL,                      /* character set */
      0,                         /* reports sync state */
+     1,                         /* CIDR channelbans */
      }
     ,
     {NULL}
@@ -237,7 +238,7 @@ unsigned long umodes[128] = {
     0,                          /* y */
     UMODE_z,                    /* z */
     0, 0, 0,                    /* { | } */
-    0, 0                        /* ~ ‚ */
+    0, 0                        /* ~ ï¿½ */
 };
 
 
@@ -741,15 +742,15 @@ int anope_event_tburst(char *source, int ac, char **av)
     c->topic_time = topic_time;
 
     record_topic(av[0]);
-	
+
 	if (ac > 1 && *av[3])
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[3]);
 	else
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-			
+
     if (setter)
         free(setter);
-	
+
     return MOD_CONT;
 }
 

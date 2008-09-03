@@ -103,6 +103,7 @@ IRCDVar myIrcd[] = {
    0,				/* p10 */
    NULL,			/* character set */
    1,				/* reports sync state */
+   0,               /* CIDR channelbans */
    }
   ,
   {NULL}
@@ -264,7 +265,7 @@ unsigned long umodes[128] = {
   0,				/* y */
   0,				/* z */
   0, 0, 0,			/* { | } */
-  0, 0				/* ~ ‚ */
+  0, 0				/* ~ ï¿½ */
 };
 
 

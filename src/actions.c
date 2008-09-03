@@ -130,13 +130,13 @@ void sqline(char *mask, char *reason)
  */
 void common_unban(ChannelInfo * ci, char *nick)
 {
-    int count, i;
-    char *av[4], **bans;
-    int ac;
-    char buf[BUFSIZE];
-    User *u;
+    char *av[4];
     char *host = NULL;
-    int matchfound = 0;
+    char buf[BUFSIZE];
+    int ac;
+    uint32 ip = 0;
+    User *u;
+    Entry *ban, *next;
 
     if (!ci || !ci->c || !nick) {
         return;
@@ -145,6 +145,9 @@ void common_unban(ChannelInfo * ci, char *nick)
     if (!(u = finduser(nick))) {
         return;
     }
+
+    if (!ci->c->bans || (ci->c->bans->count == 0))
+        return;
 
     if (u->hostip == NULL) {
         host = host_resolve(u->host);
@@ -156,6 +159,9 @@ void common_unban(ChannelInfo * ci, char *nick)
     } else {
         host = sstrdup(u->hostip);
     }
+    /* Convert the host to an IP.. */
+    if (host)
+        ip = str_is_ip(host);
 
     if (ircd->svsmode_unban) {
         anope_cmd_unban(ci->name, nick);
@@ -171,44 +177,21 @@ void common_unban(ChannelInfo * ci, char *nick)
             av[1] = sstrdup("-b");
             ac = 3;
         }
-        count = ci->c->bancount;
-        bans = scalloc(sizeof(char *) * count, 1);
-        memcpy(bans, ci->c->bans, sizeof(char *) * count);
-        for (i = 0; i < count; i++) {
-            if (match_usermask(bans[i], u)) {
-                anope_cmd_mode(whosends(ci), ci->name, "-b %s", bans[i]);
+
+        for (ban = ci->c->bans->entries; ban; ban = next) {
+            next = ban->next;
+            if (entry_match(ban, u->nick, u->username, u->host, ip) ||
+                    entry_match(ban, u->nick, u->username, u->vhost, ip)) {
+                anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
                 if (ircdcap->tsmode)
-                    av[3] = bans[i];
+                    av[3] = ban->mask;
                 else
-                    av[2] = bans[i];
+                    av[2] = ban->mask;
 
                 do_cmode(whosends(ci), ac, av);
-                matchfound++;
             }
-            if (host) {
-                /* prevent multiple unbans if the first one was successful in
-                   locating the ban for us. This is due to match_userip() checks
-                   the vhost again, and thus can return false positive results
-                   for the function. but won't prevent thus from clearing out
-                   the bans against an IP address since the first would fail and
-                   the second would match - TSL
-                 */
-                if (!matchfound) {
-                    if (match_userip(bans[i], u, host)) {
-                        anope_cmd_mode(whosends(ci), ci->name, "-b %s",
-                                       bans[i]);
-                        if (ircdcap->tsmode)
-                            av[3] = bans[i];
-                        else
-                            av[2] = bans[i];
-
-                        do_cmode(whosends(ci), ac, av);
-                    }
-                }
-            }
-            matchfound = 0;
         }
-        free(bans);
+
         if (ircdcap->tsmode)
             free(av[2]);
         else

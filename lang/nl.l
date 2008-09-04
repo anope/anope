@@ -5704,16 +5704,19 @@ OPER_HELP_ADMIN
 	Services root.
 
 OPER_HELP_IGNORE
-	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick]
+	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
 	
 	Stelt Services administrators in staat de Services een nick
-	voor een bepaalde tijd of tot de volgende herstart te laten
-	negeren. Stdnaard wordt de tijd gegeven in seconden. Je kan
-	de tijd opgegeven met behulup van units. Geldige units zijn:
-	s voor seconden, m voor minuten, h voor uur and d
-	voor dagen. Combinaties hiervan zijn niet toegestaan. Om
-	Services iemand permanent te laten negeren kun je 0 typen
-	als tijd.
+	of mask voor een bepaalde tijd of tot de volgende herstart te
+	laten negeren. Standaard wordt de tijd gegeven in seconden.
+	Je kan de tijd opgegeven met behulup van units. Geldige units 
+	zijn: s voor seconden, m voor minuten, h voor uren
+	en d voor dagen. Combinaties hiervan zijn niet toegestaan. 
+	Om Services iemand permanent (tot de volgende heropstart) te laten
+	negeren kun je 0 opgeven als tijd.
+	Als je een mask toevoegd moet deze in volgende format zijn:
+	user@host of nick!user@host, iets anders wordt een nick beschouwd.
+	Wildcards zijn toegestaan.
 
 OPER_HELP_MODE
 	Gebruik: MODE kanaal modes

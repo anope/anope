@@ -5554,15 +5554,19 @@ OPER_HELP_ADMIN
 	ќстальные команды может использоваеть только –ут сервисов.
 
 OPER_HELP_IGNORE
-	—интаксис: IGNORE {ADD|DEL|LIST|CLEAR} [врем€] [ник]
-
-	ѕозвол€ет јдминистраторам сервисов управл€ть списком игнорируемых
-	сервисами ников на указанное врем€ или до перезапуска сервисов.
-	ѕо-умолчанию формат указани€ времени игнорировани€ - секунды. ¬ы
-	можете также указать иные единицы измерени€, использу€: s дл€ секунд,
-	m дл€ минут, h дл€ часов и d дл€ дней.  омбинации этих единиц
-	измерени€ не допустимы. „тобы сделать посто€нный игнор пользовател€,
-	установите врем€ игнора равным 0.
+	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	
+	Allows Services Admins to make Services ignore a nick or mask
+	for a certain time or until the next restart. The default
+	time format is seconds. You can specify it by using units.
+	Valid units are: s for seconds, m for minutes, 
+	h for hours and d for days. 
+	Combinations of these units are not permitted. To make
+	Services permanently (untill next restart) ignore the user,
+	type 0 as time.
+	When adding a mask, it should be in the format user@host
+	or nick!user@host, everything else will be considered a nick.
+	Wildcards are permitted.
 
 OPER_HELP_MODE
 	—интаксис: MODE #канал режимы

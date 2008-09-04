@@ -5787,15 +5787,19 @@ OPER_HELP_ADMIN
 	root de Servicios.
 
 OPER_HELP_IGNORE
-	Sintaxis: IGNORE {ADD|DEL|LIST} [tiempo] [nick]
-
-	Permite a los administradores de servicios a ignorar a un usuario por
-	cierto tiempo o hasta el proximo reinicio. El formato del tiempo es
-	en segundos y puede ser especificado en unidades. Unidades validas
-	son: s por segundos, m por minutos, h por horas y
-	d por dias. Combinaciones de estas unidades no estan permitidas.
-	Para hacer a los Servicios ignorar a un usuario permanente tipea 0
-	como tiempo.
+	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
+	
+	Allows Services Admins to make Services ignore a nick or mask
+	for a certain time or until the next restart. The default
+	time format is seconds. You can specify it by using units.
+	Valid units are: s for seconds, m for minutes, 
+	h for hours and d for days. 
+	Combinations of these units are not permitted. To make
+	Services permanently (untill next restart) ignore the user,
+	type 0 as time.
+	When adding a mask, it should be in the format user@host
+	or nick!user@host, everything else will be considered a nick.
+	Wildcards are permitted.
 
 OPER_HELP_MODE
 	Sintaxis: MODE canal modos

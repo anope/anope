@@ -2095,17 +2095,17 @@ int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip)
     if (ircd->cidrchanbei && (e->type & ENTRYTYPE_CIDR4) &&
             (!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
         return 0;
-    if (nick && (e->type & ENTRYTYPE_NICK) && (stricmp(e->nick, nick) != 0))
+    if ((e->type & ENTRYTYPE_NICK) && (!nick || stricmp(e->nick, nick) != 0))
         return 0;
-    if (user && (e->type & ENTRYTYPE_USER) && (stricmp(e->user, user) != 0))
+    if ((e->type & ENTRYTYPE_USER) && (!user || stricmp(e->user, user) != 0))
         return 0;
-    if (host && (e->type & ENTRYTYPE_HOST) && (stricmp(e->host, host) != 0))
+    if ((e->type & ENTRYTYPE_HOST) && (!user || stricmp(e->host, host) != 0))
         return 0;
-    if (nick && (e->type & ENTRYTYPE_NICK_WILD) && !match_wild_nocase(e->nick, nick))
+    if ((e->type & ENTRYTYPE_NICK_WILD) && !match_wild_nocase(e->nick, nick))
         return 0;
-    if (user && (e->type & ENTRYTYPE_USER_WILD) && !match_wild_nocase(e->user, user))
+    if ((e->type & ENTRYTYPE_USER_WILD) && !match_wild_nocase(e->user, user))
         return 0;
-    if (host && (e->type & ENTRYTYPE_HOST_WILD) && !match_wild_nocase(e->host, host))
+    if ((e->type & ENTRYTYPE_HOST_WILD) && !match_wild_nocase(e->host, host))
         return 0;
 
     return 1;

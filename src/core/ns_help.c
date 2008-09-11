@@ -64,37 +64,16 @@ int do_help(User * u)
             notice_help(s_NickServ, u, NICK_HELP_EXPIRES,
                         NSExpire / 86400);
         notice_help(s_NickServ, u, NICK_HELP_FOOTER);
-    } else if ((stricmp(cmd, "SET LANGUAGE") == 0) &&
-            findModule("ns_set")) {
+    } else if (stricmp(cmd, "SET LANGUAGE") == 0) {
         int i;
-        Command *c = findCommand(NICKSERV, cmd);
-        
         notice_help(s_NickServ, u, NICK_HELP_SET_LANGUAGE);
         for (i = 0; i < NUM_LANGS && langlist[i] >= 0; i++)
             notice_user(s_NickServ, u, "    %2d) %s", i + 1,
                         langnames[langlist[i]]);
-        do_help_limited(s_NickServ, u, c);
-    } else if ((stricmp(cmd, "RECOVER") == 0) &&
-            findModule("ns_recover")) {
-        char relstr[192];
-        Command *c = findCommand(NICKSERV, cmd);
-
-        /* Convert NSReleaseTimeout seconds to string format */
-        duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
-        notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
-        do_help_limited(s_NickServ, u, c);
-
-    } else if ((stricmp(cmd, "RELEASE") == 0) &&
-            findModule("ns_release")) {
-        char relstr[192];
-        Command *c = findCommand(NICKSERV, cmd);
-
-        /* Convert NSReleaseTimeout seconds to string format */
-        duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
-        notice_help(s_NickServ, u, NICK_HELP_RELEASE, relstr);
-        do_help_limited(s_NickServ, u, c);
     } else {
         mod_help_cmd(s_NickServ, u, NICKSERV, cmd);
     }
     return MOD_CONT;
 }
+
+/* EOF */

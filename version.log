@@ -9,15 +9,18 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1432"
+VERSION_BUILD="1433"
 
 # $Log$
 #
+# BUILD : 1.7.21 (1433)
+# BUGS  : 
+# NOTES : Help now handled by respective modules. Should fix compiling on 
+# windows.
+#
 # BUILD : 1.7.21 (1432)
 # BUGS  : 
-# NOTES : The newscount in help is now handled by modules instead of 
-# os_help.
-# 
+# NOTES : The newscount in help is now handled by modules instead of os_help.
 #
 # BUILD : 1.7.21 (1431)
 # BUGS  : 

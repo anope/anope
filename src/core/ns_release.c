@@ -15,8 +15,11 @@
 
 #include "module.h"
 
+Command *c;
+
 int do_release(User * u);
 void myNickServHelp(User * u);
+int myHelpResonse(User * u);
 
 /**
  * Create the command, and tell anope about it.
@@ -26,14 +29,13 @@ void myNickServHelp(User * u);
  **/
 int AnopeInit(int argc, char **argv)
 {
-    Command *c;
-
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
     moduleSetType(CORE);
 
     c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);
     moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+    moduleAddHelp(c, myHelpResonse);
 
     moduleSetNickHelp(myNickServHelp);
 
@@ -57,6 +59,23 @@ void AnopeFini(void)
 void myNickServHelp(User * u)
 {
     notice_lang(s_NickServ, u, NICK_HELP_CMD_RELEASE);
+}
+
+/**
+ * Show the extended help on the RELEASE command.
+ * @param u The user who is requesting help
+ **/
+int myHelpResonse(User * u)
+{
+    char relstr[192];
+
+    /* Convert NSReleaseTimeout seconds to string format */
+    duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
+    
+    notice_help(s_NickServ, u, NICK_HELP_RELEASE, relstr);
+    do_help_limited(s_NickServ, u, c);
+
+    return MOD_CONT;
 }
 
 /**
@@ -104,3 +123,5 @@ int do_release(User * u)
     }
     return MOD_CONT;
 }
+
+/* EOF */

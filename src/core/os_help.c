@@ -59,20 +59,6 @@ int do_help(User * u)
         notice_help(s_OperServ, u, OPER_HELP);
         moduleDisplayHelp(5, u);
         notice_help(s_OperServ, u, OPER_HELP_LOGGED);
-    } else if ((stricmp(cmd, "LOGONNEWS") == 0) &&
-            findModule("os_logonnews")) {
-        Command *c = findCommand(OPERSERV, cmd);
-        
-        notice_help(s_OperServ, u, NEWS_HELP_LOGON, NewsCount);
-        do_help_limited(s_OperServ, u, c);
-        
-    } else if ((stricmp(cmd, "OPERNEWS") == 0) &&
-            findModule("os_opernews")) {
-        Command *c = findCommand(OPERSERV, cmd);
-        
-        notice_help(s_OperServ, u, NEWS_HELP_OPER, NewsCount);
-        do_help_limited(s_OperServ, u, c);
-
     } else {
         mod_help_cmd(s_OperServ, u, OPERSERV, cmd);
     }

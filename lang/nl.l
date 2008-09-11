@@ -3368,7 +3368,7 @@ NEWS_HELP_LOGON
 	Wijzigt de lijst met login nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker met het netwerk verbindt, worden deze
 	berichten naar hem/haar verzonden.  (Echter, er zullen nooit
-	meer dan %d berichten worden verstuurd om het flooden van de
+	meer dan %s berichten worden verstuurd om het flooden van de
 	gebruiker te voorkomen. Als er meer nieuwsberichten
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.
@@ -3386,7 +3386,7 @@ NEWS_HELP_OPER
 	Wijzigt de lijst met oper nieuwsberichten of geeft deze weer.
 	Wanneer een gebruiker opert (dmv het /OPER commando), worden
 	deze berichtennaar hem/haar verzonden.  (Echter, er zullen
-	nooit meer dan %d berichten worden verstuurd om het flooden
+	nooit meer dan %s berichten worden verstuurd om het flooden
 	van de gebruiker te voorkomen. Als er meer nieuwsberichten 
 	zijn worden alleen de meest recente vestuurd.)
 	NewsCount kan geconfigureerd worden in services.conf.

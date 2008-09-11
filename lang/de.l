@@ -3365,7 +3365,7 @@ NEWS_HELP_LOGON
 	
 	Zeigt oder bearbeitet die Liste der LogonNews.
 	Nach der Verbindung des Users werden diese Nachrichten
-	angezeigt. (Es werden jedoch nur max. %d angezeigt, um ein
+	angezeigt. (Es werden jedoch nur max. %s angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr News
 	existieren, werden nur die neuesten angezeigt.)
 	NewsCount can be configured in services.conf.
@@ -3383,7 +3383,7 @@ NEWS_HELP_OPER
 	Zeigt oder bearbeitet die Liste der Oper-News.Nachdem 
 	sich ein User die Oper-Flags gesetzt hat (mit dem
 	/OPER Befehl) werden ihm diese Nachrichten angezeigt.
-	(Es werden jedoch nur max. %d Nachrichten angezeigt, um ein
+	(Es werden jedoch nur max. %s Nachrichten angezeigt, um ein
 	Flooding des Users zu verhindern. Wenn mehr News
 	existieren, werden nur die neüsten angezeigt.)
 	NewsCount can be configured in services.conf.

@@ -9,14 +9,19 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1431"
+VERSION_BUILD="1432"
 
 # $Log$
 #
+# BUILD : 1.7.21 (1432)
+# BUGS  : 
+# NOTES : The newscount in help is now handled by modules instead of 
+# os_help.
+# 
+#
 # BUILD : 1.7.21 (1431)
 # BUGS  : 
-# NOTES : Fixes possible mismatches in entry_match() introduced in 
-# previous commit.
+# NOTES : Fixes possible mismatches in entry_match() introduced in previous commit.
 #
 # BUILD : 1.7.21 (1430)
 # BUGS  : 

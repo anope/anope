@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1434"
+VERSION_BUILD="1435"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1435)
+# BUGS  : 935 
+# NOTES : AKICK now respects ChanServ PEACE. Checks are performed before adding a nick/mask.
 #
 # BUILD : 1.7.21 (1434)
 # BUGS  : 937 

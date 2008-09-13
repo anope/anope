@@ -18,6 +18,7 @@
 
 int do_akick(User * u);
 void myChanServHelp(User * u);
+int get_access_nc(NickCore *nc, ChannelInfo *ci);
 
 /**
  * Create the command, and tell anope about it.
@@ -190,6 +191,7 @@ int do_akick(User * u)
     Channel *c;
     struct c_userlist *cu = NULL;
     struct c_userlist *next;
+    User *u2;
     char *argv[3];
     int count = 0;
 
@@ -205,8 +207,7 @@ int do_akick(User * u)
     } else if (!check_access(u, ci, CA_AKICK) && !is_services_admin(u)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else if (stricmp(cmd, "ADD") == 0) {
-
-        NickAlias *na = findnick(mask);
+        NickAlias *na = findnick(mask), *na2;
         NickCore *nc = NULL;
         char *nick, *user, *host;
         int freemask = 0;
@@ -238,8 +239,53 @@ int do_akick(User * u)
             if (is_excepted_mask(ci, mask) == 1) {
                 notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask, chan);
                 if (freemask)
-                	free(mask);
+                    free(mask);
                 return MOD_CONT;
+            }
+        }
+
+        /* Check whether target nick has equal/higher access 
+         * or whether the mask matches a user with higher/equal access - Viper */
+        if ((ci->flags & CI_PEACE) && nc) {
+            if ((nc == ci->founder) || (get_access_nc(nc, ci) >= get_access(u, ci))) {
+                notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+                if (freemask)
+                    free(mask);
+                return MOD_CONT;
+            }
+        } else if ((ci->flags & CI_PEACE)) {
+            char buf[BUFSIZE];
+            /* Match against all currently online users with equal or
+             * higher access. - Viper */
+            for (i = 0; i < 1024; i++) {
+                for (u2 = userlist[i]; u2; u2 = u2->next) {
+                    if (is_founder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci))) {
+                        if (match_usermask(mask, u2)) {
+                            notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+                            free(mask);
+                            return MOD_CONT;
+                        }
+                    }
+                }
+            }
+
+            /* Match against the lastusermask of all nickalias's with equal
+             * or higher access. - Viper */
+            for (i = 0; i < 1024; i++) {
+                for (na2 = nalists[i]; na2; na2 = na2->next) {
+                    if (na2->status & NS_VERBOTEN)
+                        continue;
+
+                    if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci) 
+                            >= get_access(u, ci)))) {
+                        snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
+                        if (match_wild_nocase(mask, buf)) {
+                            notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+                            free(mask);
+                            return MOD_CONT;
+                        }
+                    }
+                }
             }
         }
 
@@ -252,7 +298,7 @@ int do_akick(User * u)
                             (akick->flags & AK_ISNICK) ? akick->u.nc->
                             display : akick->u.mask, chan);
                 if (freemask)
-                	free(mask);
+                    free(mask);
                 return MOD_CONT;
             }
         }
@@ -261,8 +307,8 @@ int do_akick(User * u)
          * the entire list. We simply add new entries at the end. */
         if (ci->akickcount >= CSAutokickMax) {
             notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
-			if (freemask)
-				free(mask);
+            if (freemask)
+                free(mask);
             return MOD_CONT;
         }
         ci->akickcount++;
@@ -606,3 +652,17 @@ int do_akick(User * u)
     }
     return MOD_CONT;
 }
+
+
+int get_access_nc(NickCore *nc, ChannelInfo *ci)
+{
+    ChanAccess *access;
+    if (!ci || !nc)
+        return 0;
+
+    if ((access = get_access_entry(nc, ci)))
+        return access->level;
+    return 0;
+}
+
+/* EOF */

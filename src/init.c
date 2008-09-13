@@ -33,6 +33,13 @@ void introduce_user(const char *user)
     lasttimes[LTSIZE - 1] = time(NULL);
 #undef LTSIZE
 
+    /* Introduce OperServ first because on some IRCd's send
+     * we send data from OperServ before introduction completes.
+     * Patch fixing ratbox RESV support provided by Jobe. */
+    if (!user || stricmp(user, s_OperServ) == 0) {
+        anope_cmd_nick(s_OperServ, desc_OperServ, ircd->operservmode);
+    }
+
     /* NickServ */
     if (!user || stricmp(user, s_NickServ) == 0) {
         anope_cmd_nick(s_NickServ, desc_NickServ, ircd->nickservmode);
@@ -57,10 +64,6 @@ void introduce_user(const char *user)
 
     if (!user || stricmp(user, s_HelpServ) == 0) {
         anope_cmd_nick(s_HelpServ, desc_HelpServ, ircd->helpservmode);
-    }
-
-    if (!user || stricmp(user, s_OperServ) == 0) {
-        anope_cmd_nick(s_OperServ, desc_OperServ, ircd->operservmode);
     }
 
     if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0)) {

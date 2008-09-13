@@ -9,14 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1433"
+VERSION_BUILD="1434"
 
 # $Log$
 #
+# BUILD : 1.7.21 (1434)
+# BUGS  : 937 
+# NOTES : Applied patch by Jobe to fix a bug with ratbox RESV caused by incorrect client introduction order.
+#
 # BUILD : 1.7.21 (1433)
 # BUGS  : 
-# NOTES : Help now handled by respective modules. Should fix compiling on 
-# windows.
+# NOTES : Help now handled by respective modules. Should fix compiling on windows.
 #
 # BUILD : 1.7.21 (1432)
 # BUGS  : 
@@ -53,8 +56,7 @@ VERSION_BUILD="1433"
 #
 # BUILD : 1.7.21 (1424)
 # BUGS  : 934 
-# NOTES : Fixed bogus password being returned by enc_none when password 
-# was truncated.
+# NOTES : Fixed bogus password being returned by enc_none when password was truncated.
 #
 # BUILD : 1.7.21 (1423)
 # BUGS  : 932 

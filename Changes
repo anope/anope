@@ -59,6 +59,9 @@ Anope Version  S V N
 09/03 F Fixed variables not correctly shown in help.                      [#873]
 09/04 F Rewrote the ignore system to fix several issues.                  [#930]
 
+Provided by Jobe <jobe@anope.org> - 2008
+09/13 F Fixed bug in ratbox RESV support.                                 [#937]
+
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]
 08/08 F Removed sa-commands from inspircd protocol support.               [ #00]

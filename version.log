@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1438"
+VERSION_BUILD="1439"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1439)
+# BUGS  : 
+# NOTES : Fixed compiling on windows. We needed access to do_help_limited(). 
 #
 # BUILD : 1.7.21 (1438)
 # BUGS  : 

@@ -1,4 +1,4 @@
-Anope Version  S V N
+Anope Version 1.7.22
 --------------------
 01/24 A Added a check for hosts too long in BotServs bots.                [ #00]
 02/12 A Added SUSPENDED to NS LIST keywords.                              [#869]
@@ -44,10 +44,12 @@ Anope Version  S V N
 02/12 F Removed extra loop when parsing defcon modes.                     [#867]
 02/21 F Fixed errors in lang files related to NS SASET LANGUAGE           [#881]
 04/30 F Operators can now also use NickServ INFO ALL.                     [ #00]
+05/12 F install.js now works properly on x64 machines                     [#897]
 05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
 05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
 08/11 F Updated os_raw.c to show up as a 3rd party module.                [ #00]
 08/15 F CS OP now correctly works if there is only 1 user in the channel. [#922]
+08/16 F Forbidden channels no longer appear in /list when inhabited.      [#924]
 08/17 F Various InspIRCd issues.                                          [#832]
 08/18 F CS GETKEY response.                                               [#880]
 08/21 F Potential issues caused by not setting SO_REUSEADDR on socket.    [ #00]
@@ -59,13 +61,9 @@ Anope Version  S V N
 09/03 F Fixed variables not correctly shown in help.                      [#873]
 09/04 F Rewrote the ignore system to fix several issues.                  [#930]
 09/13 F AKICK now respects the PEACE setting.                             [#935]
-09/14 F Fixed CLEAR not always sending correct modes.                     [#938]
-
-Provided by Charles Kingsley <chaz@anope.org> - 2008
-09/14 F Fixed compile warning in os_clearmodes.c.                         [#939]
-
-Provided by Jobe <jobe@anope.org> - 2008
 09/13 F Fixed bug in ratbox RESV support.                                 [#937]
+09/14 F Fixed CLEAR not always sending correct modes.                     [#938]
+09/14 F Fixed compile warning in os_clearmodes.c.                         [#939]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]
@@ -74,10 +72,6 @@ Provided by Robin Burchell <w00t@inspircd.org> - 2008
 
 Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
 07/20 F Updated Deutch language file.                                     [#892]
-
-Provided by Scott Seufert <katsklaw@ircmojo.net> - 2008
-05/12 F install.js now works properly on x64 machines                     [#897]
-08/16 F Forbidden channels no longer appear in /list when inhabited.      [#924]
 
 Provided by Trystan <trystan@nomadirc.net> - 2008
 02/11 F Last part of memory leak in cs_akick()                            [#870]

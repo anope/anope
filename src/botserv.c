@@ -782,8 +782,10 @@ void bot_join(ChannelInfo * ci)
 
             for (ban = ci->c->bans->entries; ban; ban = next) {
                 next = ban->next;
-                if (entry_match(ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0)) {
-                    anope_cmd_mode(whosends(ci), ci->name, "-b %s", ban->mask);
+                if (entry_match
+                    (ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0)) {
+                    anope_cmd_mode(whosends(ci), ci->name, "-b %s",
+                                   ban->mask);
                     if (ircdcap->tsmode)
                         av[3] = ban->mask;
                     else

@@ -1698,7 +1698,8 @@ void del_ban(Channel * chan, char *mask)
         entry_delete(chan->bans, ban);
 
         if (debug)
-            alog("debug: Deleted ban %s from channel %s", mask, chan->name);
+            alog("debug: Deleted ban %s from channel %s", mask,
+                 chan->name);
     }
 
     if (chan->ci && (akick = is_stuck(chan->ci, mask)))
@@ -1712,7 +1713,7 @@ void del_exception(Channel * chan, char *mask)
     Entry *exception;
 
     /* Sanity check as it seems some IRCD will just send -e without a mask */
-    if (!mask|| !chan->excepts || (chan->excepts->count == 0))
+    if (!mask || !chan->excepts || (chan->excepts->count == 0))
         return;
 
     exception = elist_find_mask(chan->excepts, mask);
@@ -1721,7 +1722,8 @@ void del_exception(Channel * chan, char *mask)
         entry_delete(chan->excepts, exception);
 
         if (debug)
-            alog("debug: Deleted except %s to channel %s", mask, chan->name);
+            alog("debug: Deleted except %s to channel %s", mask,
+                 chan->name);
     }
 }
 
@@ -1742,7 +1744,8 @@ void del_invite(Channel * chan, char *mask)
         entry_delete(chan->invites, invite);
 
         if (debug)
-            alog("debug: Deleted invite %s to channel %s", mask, chan->name);
+            alog("debug: Deleted invite %s to channel %s", mask,
+                 chan->name);
     }
 }
 
@@ -2008,7 +2011,7 @@ Entry *entry_create(char *mask)
  * @param mask The mask to parse and add to the list
  * @return Pointer to newly added entry. NULL if it fails.
  */
-Entry *entry_add(EList *list, char *mask)
+Entry *entry_add(EList * list, char *mask)
 {
     Entry *e;
     char *hostmask;
@@ -2036,7 +2039,7 @@ Entry *entry_add(EList *list, char *mask)
  * @param list Linked list from which entry needs to be removed.
  * @param e The entry to be deleted, must be member of list.
  */
-void entry_delete(EList *list, Entry *e)
+void entry_delete(EList * list, Entry * e)
 {
     if (!list || !e)
         return;
@@ -2066,7 +2069,8 @@ void entry_delete(EList *list, Entry *e)
  * Create and initialize a new entrylist
  * @return Pointer to the created EList object
  **/
-EList *list_create() {
+EList *list_create()
+{
     EList *list;
 
     list = scalloc(1, sizeof(EList));
@@ -2086,26 +2090,32 @@ EList *list_create() {
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip)
+int entry_match(Entry * e, char *nick, char *user, char *host, uint32 ip)
 {
-    /* If we don't get an entry, or it s an invalid one, no match ~ Viper*/
+    /* If we don't get an entry, or it s an invalid one, no match ~ Viper */
     if (!e || e->type == ENTRYTYPE_NONE)
         return 0;
 
     if (ircd->cidrchanbei && (e->type & ENTRYTYPE_CIDR4) &&
-            (!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
+        (!ip || (ip && ((ip & e->cidr_mask) != e->cidr_ip))))
         return 0;
-    if ((e->type & ENTRYTYPE_NICK) && (!nick || stricmp(e->nick, nick) != 0))
+    if ((e->type & ENTRYTYPE_NICK)
+        && (!nick || stricmp(e->nick, nick) != 0))
         return 0;
-    if ((e->type & ENTRYTYPE_USER) && (!user || stricmp(e->user, user) != 0))
+    if ((e->type & ENTRYTYPE_USER)
+        && (!user || stricmp(e->user, user) != 0))
         return 0;
-    if ((e->type & ENTRYTYPE_HOST) && (!user || stricmp(e->host, host) != 0))
+    if ((e->type & ENTRYTYPE_HOST)
+        && (!user || stricmp(e->host, host) != 0))
         return 0;
-    if ((e->type & ENTRYTYPE_NICK_WILD) && !match_wild_nocase(e->nick, nick))
+    if ((e->type & ENTRYTYPE_NICK_WILD)
+        && !match_wild_nocase(e->nick, nick))
         return 0;
-    if ((e->type & ENTRYTYPE_USER_WILD) && !match_wild_nocase(e->user, user))
+    if ((e->type & ENTRYTYPE_USER_WILD)
+        && !match_wild_nocase(e->user, user))
         return 0;
-    if ((e->type & ENTRYTYPE_HOST_WILD) && !match_wild_nocase(e->host, host))
+    if ((e->type & ENTRYTYPE_HOST_WILD)
+        && !match_wild_nocase(e->host, host))
         return 0;
 
     return 1;
@@ -2118,7 +2128,7 @@ int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip)
  * @param ip IP to match against, set to 0 to not match this
  * @return 1 for a match, 0 for no match
  */
-int entry_match_mask(Entry *e, char *mask, uint32 ip)
+int entry_match_mask(Entry * e, char *mask, uint32 ip)
 {
     char *hostmask, *nick, *user, *host;
     int res;
@@ -2132,7 +2142,7 @@ int entry_match_mask(Entry *e, char *mask, uint32 ip)
         if (user) {
             *user++ = '\0';
             nick = hostmask;
-         } else {
+        } else {
             nick = NULL;
             user = hostmask;
         }
@@ -2159,7 +2169,8 @@ int entry_match_mask(Entry *e, char *mask, uint32 ip)
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip)
+Entry *elist_match(EList * list, char *nick, char *user, char *host,
+                   uint32 ip)
 {
     Entry *e;
 
@@ -2182,7 +2193,7 @@ Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip)
  * @param ip The ip to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_mask(EList *list, char *mask, uint32 ip)
+Entry *elist_match_mask(EList * list, char *mask, uint32 ip)
 {
     char *hostmask, *nick, *user, *host;
     Entry *res;
@@ -2199,7 +2210,7 @@ Entry *elist_match_mask(EList *list, char *mask, uint32 ip)
         if (user) {
             *user++ = '\0';
             nick = hostmask;
-         } else {
+        } else {
             nick = NULL;
             user = hostmask;
         }
@@ -2223,7 +2234,7 @@ Entry *elist_match_mask(EList *list, char *mask, uint32 ip)
  * @param user The user to match against the entries
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_match_user(EList *list, User *u)
+Entry *elist_match_user(EList * list, User * u)
 {
     Entry *res;
     char *host;
@@ -2264,16 +2275,16 @@ Entry *elist_match_user(EList *list, User *u)
  * @param mask The *!*@* mask to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_find_mask(EList *list, char *mask)
+Entry *elist_find_mask(EList * list, char *mask)
 {
     Entry *e;
 
     if (!list || !list->entries || !mask)
         return NULL;
 
-        for (e = list->entries; e; e = e->next) {
-            if (!stricmp(e->mask, mask))
-                return e;
+    for (e = list->entries; e; e = e->next) {
+        if (!stricmp(e->mask, mask))
+            return e;
     }
 
     return NULL;
@@ -2284,7 +2295,8 @@ Entry *elist_find_mask(EList *list, char *mask)
  * @param list The list we should estimate the mem use of.
  * @return Returns the memory useage of the given list.
  */
-long get_memuse(EList *list) {
+long get_memuse(EList * list)
+{
     Entry *e;
     long mem = 0;
 

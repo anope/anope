@@ -61,6 +61,9 @@ Anope Version  S V N
 09/13 F AKICK now respects the PEACE setting.                             [#935]
 09/14 F Fixed CLEAR not always sending correct modes.                     [#938]
 
+Provided by Charles Kingsley <chaz@anope.org> - 2008
+09/14 F Fixed compile warning in os_clearmodes.c.                         [#939]
+
 Provided by Jobe <jobe@anope.org> - 2008
 09/13 F Fixed bug in ratbox RESV support.                                 [#937]
 

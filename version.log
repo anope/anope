@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="21"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1436"
+VERSION_BUILD="1437"
 
 # $Log$
+#
+# BUILD : 1.7.21 (1437)
+# BUGS  : 939 
+# NOTES : Applied patch by chaz to fix compile warning in os_clearmodes.c.
 #
 # BUILD : 1.7.21 (1436)
 # BUGS  : 937 

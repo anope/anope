@@ -70,7 +70,6 @@ void myOperServHelp(User * u)
 int do_clearmodes(User * u)
 {
     char *s;
-    int i;
     char *argv[2];
     char *chan = strtok(NULL, " ");
     Channel *c;

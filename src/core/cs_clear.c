@@ -69,7 +69,6 @@ int do_clear(User * u)
 {
     char *chan = strtok(NULL, " ");
     char *what = strtok(NULL, " ");
-    char tmp[BUFSIZE];
     Channel *c;
     ChannelInfo *ci;
 
@@ -181,13 +180,13 @@ int do_clear(User * u)
 
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
-        char *av[4];
-        int ac;
-        char buf[BUFSIZE];
+        char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
+        int ac, isop, isadmin, isown, count, i;
+        char buf[BUFSIZE], tmp[BUFSIZE], tmp2[BUFSIZE];
         struct c_userlist *cu, *next;
 
         if (ircd->svsmode_ucmode) {
-            av[0] = sstrdup(chan);
+            av[0] = chan;
             anope_cmd_svsmode_chan(av[0], "-o", NULL);
             if (ircd->owner) {
                 anope_cmd_svsmode_chan(av[0], ircd->ownerunset, NULL);
@@ -197,127 +196,77 @@ int do_clear(User * u)
             }
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
-                if (!chan_has_user_status(c, cu->user, CUS_OP)) {
-                    if (!chan_has_user_status(c, cu->user, CUS_PROTECT)) {
-                        if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
-                            continue;
-                        } else {
-                            snprintf(tmp, BUFSIZE, "%so",
-                                     ircd->ownerunset);
+                isop = chan_has_user_status(c, cu->user, CUS_OP);
+                isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
+                isown = chan_has_user_status(c, cu->user, CUS_OWNER);
+                count = (isop ? 1 : 0) + (isadmin ? 1 : 0) + (isown ? 1 : 0);
 
-                            if (ircdcap->tsmode) {
-                                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                                av[1] = buf;
-                                av[2] = sstrdup(tmp);
-                            } else {
-                                av[1] = sstrdup(tmp);
-                            }
+                if (!isop && !isadmin && !isown)
+                    continue;
 
-                        }
-                    } else {
-                        snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
-
-                        if (ircdcap->tsmode) {
-                            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                            av[1] = buf;
-                            av[2] = sstrdup(tmp);
-                        } else {
-                            av[1] = sstrdup(tmp);
-                        }
-                    }
-                } else {
-                    if (ircdcap->tsmode) {
-                        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                        av[1] = buf;
-                        av[2] = sstrdup("-o");
-                    } else {
-                        av[1] = sstrdup("-o");
-                    }
-                }
+                snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
+                        ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
 
                 if (ircdcap->tsmode) {
-                    av[3] = sstrdup(cu->user->nick);
-                    ac = 4;
+                    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                    av[1] = buf;
+                    av[2] = tmp;
+                    /* We have to give as much nicks as modes.. - Viper */
+                    for (i = 0; i < count; i++)
+                        av[i+3] = cu->user->nick;
+                    ac = 3 + i;
                 } else {
-                    av[2] = sstrdup(cu->user->nick);
-                    ac = 3;
+                    av[1] = tmp;
+                    /* We have to give as much nicks as modes.. - Viper */
+                    for (i = 0; i < count; i++)
+                        av[i+2] = cu->user->nick;
+                    ac = 2 + i;
                 }
 
                 do_cmode(s_ChanServ, ac, av);
-
-                if (ircdcap->tsmode) {
-                    free(av[3]);
-                    free(av[2]);
-                } else {
-                    free(av[2]);
-                    free(av[1]);
-                }
             }
-            free(av[0]);
         } else {
+            av[0] = chan;
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
-                av[0] = sstrdup(chan);
-                if (!chan_has_user_status(c, cu->user, CUS_OP)) {
-                    if (!chan_has_user_status(c, cu->user, CUS_PROTECT)) {
-                        if (!chan_has_user_status(c, cu->user, CUS_OWNER)) {
-                            continue;
-                        } else {
-                            snprintf(tmp, BUFSIZE, "%so",
-                                     ircd->ownerunset);
-                            if (ircdcap->tsmode) {
-                                snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                                av[1] = buf;
-                                av[2] = sstrdup(tmp);
-                            } else {
-                                av[1] = sstrdup(tmp);
-                            }
-                        }
-                    } else {
-                        snprintf(tmp, BUFSIZE, "%so", ircd->adminunset);
-                        if (ircdcap->tsmode) {
-                            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                            av[1] = buf;
-                            av[2] = sstrdup(tmp);
-                        } else {
-                            av[1] = sstrdup(tmp);
-                        }
-                    }
-                } else {
-                    if (ircdcap->tsmode) {
-                        snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                        av[1] = buf;
-                        av[2] = sstrdup("-o");
-                    } else {
-                        av[1] = sstrdup("-o");
-                    }
-                }
+                isop = chan_has_user_status(c, cu->user, CUS_OP);
+                isadmin = chan_has_user_status(c, cu->user, CUS_PROTECT);
+                isown = chan_has_user_status(c, cu->user, CUS_OWNER);
+                count = (isop ? 1 : 0) + (isadmin ? 1 : 0) + (isown ? 1 : 0);
+
+                if (!isop && !isadmin && !isown)
+                    continue;
+
+                snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ? 
+                        ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
+                /* We need to send the IRCd a nick for every mode.. - Viper */
+                snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""), 
+                        (isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
+
+                if (!tmp)
+                    continue;
 
                 if (ircdcap->tsmode) {
-                    av[3] = sstrdup(cu->user->nick);
-                    ac = 4;
+                    snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+                    av[1] = buf;
+                    av[2] = tmp;
+                    /* We have to give as much nicks as modes.. - Viper */
+                    for (i = 0; i < count; i++)
+                        av[i+3] = cu->user->nick;
+                    ac = 3 + i;
 
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
-                                   av[3]);
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2], tmp2);
                 } else {
-                    av[2] = sstrdup(cu->user->nick);
-                    ac = 3;
+                    av[1] = tmp;
+                    /* We have to give as much nicks as modes.. - Viper */
+                    for (i = 0; i < count; i++)
+                        av[i+2] = cu->user->nick;
+                    ac = 2 + i;
 
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
-                                   av[2]);
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1], tmp2);
                 }
 
                 do_cmode(s_ChanServ, ac, av);
-
-                if (ircdcap->tsmode) {
-                    free(av[3]);
-                    free(av[2]);
-                    free(av[0]);
-                } else {
-                    free(av[2]);
-                    free(av[1]);
-                    free(av[0]);
-                }
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
@@ -356,10 +305,10 @@ int do_clear(User * u)
                 break;
             } else {
                 if (ircdcap->tsmode)
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
                                    av[3]);
                 else
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
                                    av[2]);
             }
             do_cmode(s_ChanServ, ac, av);
@@ -410,10 +359,10 @@ int do_clear(User * u)
                 break;
             } else {
                 if (ircdcap->tsmode) {
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[2],
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
                                    av[3]);
                 } else {
-                    anope_cmd_mode(whosends(ci), av[0], "%s :%s", av[1],
+                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
                                    av[2]);
                 }
             }

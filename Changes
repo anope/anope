@@ -59,6 +59,7 @@ Anope Version  S V N
 09/03 F Fixed variables not correctly shown in help.                      [#873]
 09/04 F Rewrote the ignore system to fix several issues.                  [#930]
 09/13 F AKICK now respects the PEACE setting.                             [#935]
+09/14 F Fixed CLEAR not always sending correct modes.                     [#938]
 
 Provided by Jobe <jobe@anope.org> - 2008
 09/13 F Fixed bug in ratbox RESV support.                                 [#937]

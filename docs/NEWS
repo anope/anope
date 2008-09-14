@@ -1,23 +1,18 @@
 Highlighted News in Anope 1.7 (and soon 1.8)
 ============================================
-  * Fixed various exploits and vulnerabilities.
-  * Fixed various language typos and inconsistencies.
   * Added a new and improved ./Config script.
   * Added MySQL phase 2 implementation (see docs/MYSQL).
   * Added NickServ registration delays.
   * Added read receipts for memos.
   * Added a way for modules to store data with internal structures.
   * Added nick tracking support.
-  * Improved random number algorithm.
   * Added support for SVSHOLD.
-  * Addes support for U:Lined servers.
+  * Added support for U:Lined servers.
   * Added support for TS6 IRCd's.
-  * Removed proxy detector (see docs/PROXY).
   * Added support for Windows.
   * Added internal events for modules.
   * Added a way to suspend nicks.
   * Added support for module configuration directives.
-  * Converted the core to be completely modular.
   * Added translation support for modules.
   * Added a module pack with handy modules.
   * Added IRCd protocol modules.
@@ -36,11 +31,16 @@ Highlighted News in Anope 1.7 (and soon 1.8)
     - UltimateIRCd 2.8.2 or later (including 3.0)
     - UnrealIRCd 3.1.1 or later (including 3.2)
     - ViagraIRCd 1.3 or later
-
   * Added new languages. Currently included:
       Catalan, German, English, Spanish, French, Greek,
       Hungarian, Italian, Dutch, Polish, Portugese,
       Russian, Turkish
+  * Added support for CIDR channel lists.
+  * Converted the core to be completely modular.
+  * Improved random number algorithm.
+  * Removed proxy detector (see docs/PROXY).
+  * Fixed various exploits and vulnerabilities.
+  * Fixed various language typos and inconsistencies.
 
 Highlighted News in Anope 1.6
 =============================

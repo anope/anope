@@ -1,5 +1,6 @@
 Anope Version  S V N
 --------------------
+09/15 F Dealt with the nss_dns.so.1 issue on freebsd 7.                   [ #00]
 
 Anope Version 1.7.22
 --------------------

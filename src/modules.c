@@ -617,13 +617,13 @@ int loadModule(Module * m, User * u)
     m->filename = sstrdup(buf);
     ano_modclearerr();
     m->handle = ano_modopen(m->filename);
-    if ((err = ano_moderr()) != NULL) {
+    if ( m=>handle == NULL && (err = ano_moderr()) != NULL) {
         alog(err);
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
     func = (int (*)(int, char **))ano_modsym(m->handle, "AnopeInit");
-    if ((err = ano_moderr()) != NULL) {
+    if ( func == NULL && (err = ano_moderr()) != NULL) {
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
         return MOD_ERR_NOLOAD;
     }

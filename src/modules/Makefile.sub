@@ -26,4 +26,3 @@ clean:
 
 spotless:
 	rm -f *~ *.o *.so *.c~ core
-

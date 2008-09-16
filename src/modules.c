@@ -617,7 +617,7 @@ int loadModule(Module * m, User * u)
     m->filename = sstrdup(buf);
     ano_modclearerr();
     m->handle = ano_modopen(m->filename);
-    if ( m=>handle == NULL && (err = ano_moderr()) != NULL) {
+    if ( m->handle == NULL && (err = ano_moderr()) != NULL) {
         alog(err);
         return MOD_ERR_NOLOAD;
     }

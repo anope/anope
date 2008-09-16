@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1444"
+VERSION_BUILD="1445"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1445)
+# BUGS  : 
+# NOTES : Added missing entries for .22 release to Changes.lang. 
 #
 # BUILD : 1.7.22 (1444)
 # BUGS  : 

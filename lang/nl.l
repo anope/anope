@@ -185,8 +185,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Probeer aub opnieuw met een onduidelijker wachtwoord.  Wachtwoorden moeten tenminste 5 tekens lang zijn, niet iets makkelijk raadbaars (bijv. je echte naam of je nick), en kan geen tab of spatie bevatten.
-PASSWORD_TRUNCATED
-	Let op:  Je wachtwoord is ingekort tot %d tekens.
+PASSWORD_TOO_LONG
+	Je wachtwoord is te lang. Probeer het opnieuw met een korter wachtwoord.
 
 NICK_NOT_REGISTERED
 	Je nick is niet geregistreerd.

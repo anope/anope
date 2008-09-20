@@ -373,10 +373,9 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
         return MOD_CONT;
     }
 
-    if (len > PASSMAX) {
-        len = PASSMAX;
-        param[len] = 0;
-        notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX);
+    if (enc_encrypt_check_len(len ,PASSMAX)) {
+        notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
+        return MOD_CONT;
     }
 
     if (enc_encrypt(param, len, ci->founderpass, PASSMAX) < 0) {

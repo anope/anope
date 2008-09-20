@@ -199,9 +199,8 @@ MORE_OBSCURE_PASSWORD
 	Proszê spróbowaæ ponownie z trudniejszym has³em. 
 	Has³o powinno mieæ minimum 5 znaków oraz powinno 
 	zawieraæ cyfry i litery.
-PASSWORD_TRUNCATED
-	Informacja: Twoje has³o zosta³o skrócone 
-	do %d znaków.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Twój nick jest niezarejestrowany.

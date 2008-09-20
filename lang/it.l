@@ -184,8 +184,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Per favore, prova di nuovo con una password più oscura. Le password devono essere lunghe almeno 5 caratteri, non devono essere indovinate facilmente (ad es. il proprio nome o nick), e non possono contenere i caratteri di spazio e di tabulazione.
-PASSWORD_TRUNCATED
-	Nota: La tua password è stata troncata a %d caratteri.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Il tuo nick non è registrato.

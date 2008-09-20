@@ -192,8 +192,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Por favor tente novamente com uma senha mais difícil. Não use TAB ou espaços.
-PASSWORD_TRUNCATED
-	Atenção: Sua senha foi reduzida a %d caracteres.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Seu nick não está registrado.

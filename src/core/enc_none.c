@@ -61,8 +61,9 @@ int plain_encrypt_check_len(int passlen, int bufsize) {
 }
 
 int plain_decrypt(const char *src, char *dest, int size) {
-    memset(dest,0,size+1);
+    memset(dest,0,size);
     strncpy(dest,src,size);
+    dest[size] = '\0';
     return 1;
 }
 

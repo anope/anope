@@ -205,8 +205,8 @@ MORE_OBSCURE_PASSWORD
 	nichts mit deinem Nicknamen zu tun haben. Weiterhin 
 	kann keine Leer oder Tabulatortaste enthalten sein.
 
-PASSWORD_TRUNCATED
-	Achtung: Dein Passwort wurde auf %d Zeichen gekürzt.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Dein Nickname ist nicht registriert.

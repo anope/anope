@@ -188,8 +188,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Veuillez réessayer avec un mot de passe plus difficile à trouver.  Les mots de passe doivent contenir au moins cinq caractères, ne doivent pas être trop facilement devinables (par exemple votre vrai nom ou votre pseudo), et ne doit pas contenir d'espaces ou de tabulations.
-PASSWORD_TRUNCATED
-	Note:  Votre mot de passe a été tronqué à %d caractères.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Votre pseudo n'est pas enregistré.

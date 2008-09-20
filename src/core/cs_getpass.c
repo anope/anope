@@ -84,7 +84,7 @@ int do_getpass(User * u)
     } else if (CSRestrictGetPass && !is_services_root(u)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX)==1) {
+        if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX)==1) {
             alog("%s: %s!%s@%s used GETPASS on %s",
                  s_ChanServ, u->nick, u->username, u->host, ci->name);
             if (WallGetpass) {
@@ -93,10 +93,10 @@ int do_getpass(User * u)
                                  u->nick, chan);
             }
             notice_lang(s_ChanServ, u, CHAN_GETPASS_PASSWORD_IS,
-                        chan, ci->founderpass);
-	} else {
-	    notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
-	}
+                        chan, tmp_pass);
+        } else {
+            notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
+        }
     }
     return MOD_CONT;
 }

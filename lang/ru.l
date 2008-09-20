@@ -188,8 +188,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Пожалуйста, попробуйте снова с более сложным паролем. Пароль должен иметь длину не менее 5 символов, состоять только из латинских букв или цифр, не быть легко отгадываемым (т.е. Вашим именем или Вашим ником), и не должен содержать пробелов и табуляций.
-PASSWORD_TRUNCATED
-	Примечание: Ваш пароль был усечен до %d символов.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Ваш ник не зарегистрирован.

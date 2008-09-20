@@ -193,8 +193,8 @@ MORE_OBSCURE_PASSWORD
 	Próbálj nehezebb jelszót használni .Jelszavad  min. öt
 	karakter legyen,	és nem kitalálható legyen, (ne a
 	nickneved/valósneved),  ne legyen benne írásjel.
-PASSWORD_TRUNCATED
-	Megjegyzés:  A jelszavad %d karakter hosszúságúra lett csonkítva.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 NICK_NOT_REGISTERED
 	A neved még nem regisztrált.
 NICK_NOT_REGISTERED_HELP

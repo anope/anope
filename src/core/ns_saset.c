@@ -235,12 +235,9 @@ int do_saset_password(User * u, NickCore * nc, char *param)
                || (StrictPasswords && len < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
         return MOD_CONT;
-    }
-
-    if (len > PASSMAX) {
-        len = PASSMAX;
-        param[len] = 0;
-        notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX);
+    } else if (enc_encrypt_check_len(len ,PASSMAX)) {
+        notice_lang(s_NickServ, u, PASSWORD_TOO_LONG);
+        return MOD_CONT;
     }
 
     if (nc->pass)
@@ -261,7 +258,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
     
     if(enc_decrypt(nc->pass,tmp_pass,PASSMAX)==1) {
         notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display,
-                    nc->pass);
+                    tmp_pass);
     } else {
         notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED, nc->display);
     }

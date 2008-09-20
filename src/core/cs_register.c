@@ -118,14 +118,14 @@ int do_register(User * u)
 
     } else if (!is_servadmin && nc->channelmax > 0
                && nc->channelcount >= nc->channelmax) {
-        notice_lang(s_ChanServ, u,
-                    nc->channelcount >
-                    nc->
-                    channelmax ? CHAN_EXCEEDED_CHANNEL_LIMIT :
+        notice_lang(s_ChanServ, u, nc->channelcount >
+                    nc->channelmax ? CHAN_EXCEEDED_CHANNEL_LIMIT :
                     CHAN_REACHED_CHANNEL_LIMIT, nc->channelmax);
     } else if (stricmp(u->nick, pass) == 0
                || (StrictPasswords && strlen(pass) < 5)) {
         notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
+    } else if(enc_encrypt_check_len(strlen(pass) ,PASSMAX)) {
+        notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
     } else if (!(ci = makechan(chan))) {
         alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
@@ -145,8 +145,7 @@ int do_register(User * u)
         ci->memos.memomax = MSMaxMemos;
         ci->last_used = ci->time_registered;
         ci->founder = nc;
-        if (strlen(pass) > PASSMAX)
-            notice_lang(s_ChanServ, u, PASSWORD_TRUNCATED, PASSMAX);
+
         memset(pass, 0, strlen(pass));
         memcpy(ci->founderpass, founderpass, PASSMAX);
         ci->desc = sstrdup(desc);
@@ -164,10 +163,10 @@ int do_register(User * u)
         alog("%s: Channel '%s' registered by %s!%s@%s", s_ChanServ, chan,
              u->nick, u->username, u->host);
         notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
-	
-	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX) == 1) {
-            notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, ci->founderpass);
-	}
+
+        if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX) == 1) {
+            notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, tmp_pass);
+        }
 
         uc = scalloc(sizeof(*uc), 1);
         uc->next = u->founder_chans;

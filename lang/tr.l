@@ -186,8 +186,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Lütfen daha zor bir þifre deneyin.  Þifreler en az 5 karakter uzunlukta, kolayca tahmin edilemeyecek birþey olmalýdýr(ör: gerçek isminiz, nickiniz v.b. olmamalýdýr), ve boþlukla tab kullanýlmamalýdýr.
-PASSWORD_TRUNCATED
-	Uyarý:  Þifreniz %d karaktere kadar kýsaltýldý.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Nickiniz kayýtlý deðil.

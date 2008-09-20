@@ -183,8 +183,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Per favor intenti novamente amb una clau mes oculta. Les claus han de ser de com a mínim 5 caràcters, no han de ser fàcils d'encertar (ex. Nom real o Nick), i no poden contenir el caràcter d'espai o tabulació.
-PASSWORD_TRUNCATED
-	Noticia:  La clau ha estat retallada a %d caracters.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	El teu nick no esta registrat.

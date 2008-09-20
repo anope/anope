@@ -1,10 +1,12 @@
 Anope Version  S V N
 --------------------
 *** New Strings:
+	PASSWORD_TOO_LONG
 
 *** Mod Strings:
 
 *** Del Strings:
+	PASSWORD_TRUNCATED
 
 Anope Version 1.7.22
 --------------------

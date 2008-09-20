@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1445"
+VERSION_BUILD="1446"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1446)
+# BUGS  : 
+# NOTES : Removed password truncating and fixed a crashbug in enc_none. This build still crashes on CS GETPASS on some systems though. Someone take a look at termination of ci->founderpass pls. 
 #
 # BUILD : 1.7.22 (1445)
 # BUGS  : 

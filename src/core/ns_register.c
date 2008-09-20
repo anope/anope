@@ -185,13 +185,11 @@ int do_register(User * u)
     } else if (stricmp(u->nick, pass) == 0
                || (StrictPasswords && strlen(pass) < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
+    } else if (enc_encrypt_check_len(strlen(pass), PASSMAX)) {
+        notice_lang(s_NickServ, u, PASSWORD_TOO_LONG);
     } else if (email && !MailValidate(email)) {
         notice_lang(s_NickServ, u, MAIL_X_INVALID, email);
     } else {
-        if (strlen(pass) > PASSMAX) {
-            pass[PASSMAX] = '\0';
-            notice_lang(s_NickServ, u, PASSWORD_TRUNCATED, PASSMAX);
-        }
         for (idx = 0; idx < 9; idx++) {
             passcode[idx] =
                 chars[(1 +

@@ -187,8 +187,8 @@ MORE_OBSCURE_PASSWORD
 	Las claves deben tener al menos 5 caracteres, no deben
 	ser algo facil de adivinar (ej. Nombre real o Nick),
 	y no pueden contener el caracter de espacio o tabulacion.
-PASSWORD_TRUNCATED
-	Noticia:  Tu clave ha sido reducida a %d caracteres.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Tu nick no esta registrado.

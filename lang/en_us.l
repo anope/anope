@@ -182,8 +182,8 @@ RAW_DISABLED
 
 MORE_OBSCURE_PASSWORD
 	Please try again with a more obscure password.  Passwords should be at least five characters long, should not be something easily guessed (e.g. your real name or your nick), and cannot contain the space or tab characters.
-PASSWORD_TRUNCATED
-	Notice:  Your password has been truncated to %d characters.
+PASSWORD_TOO_LONG
+	Your password is too long. Please try again with a shorter password.
 
 NICK_NOT_REGISTERED
 	Your nick isn't registered.

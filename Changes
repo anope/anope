@@ -3,6 +3,9 @@ Anope Version  S V N
 09/18 R Removed password truncating.                                      [ #00]
 09/15 F Dealt with the nss_dns.so.1 issue on freebsd 7.                   [ #00]
 
+Provided by Robin Burchell <w00t@inspircd.org> - 2008
+09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]
+
 Anope Version 1.7.22
 --------------------
 01/24 A Added a check for hosts too long in BotServs bots.                [ #00]

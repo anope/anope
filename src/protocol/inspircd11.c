@@ -95,7 +95,7 @@ IRCDVar myIrcd[] = {
      0,                         /* time stamp on mode   */
      0,                         /* NICKIP               */
      1,                         /* O:LINE               */
-     0,                         /* UMODE               */
+     1,                         /* UMODE               */
      1,                         /* VHOST ON NICK        */
      0,                         /* Change RealName      */
      CMODE_K,                   /* No Knock             */

@@ -185,7 +185,7 @@ int do_register(User * u)
     } else if (stricmp(u->nick, pass) == 0
                || (StrictPasswords && strlen(pass) < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
-    } else if (enc_encrypt_check_len(strlen(pass), PASSMAX)) {
+    } else if (enc_encrypt_check_len(strlen(pass), PASSMAX - 1)) {
         notice_lang(s_NickServ, u, PASSWORD_TOO_LONG);
     } else if (email && !MailValidate(email)) {
         notice_lang(s_NickServ, u, MAIL_X_INVALID, email);
@@ -309,7 +309,7 @@ int do_confirm(User * u)
 
         len = strlen(pass);
         na->nc->pass = smalloc(PASSMAX);
-        if (enc_encrypt(pass, len, na->nc->pass, PASSMAX) < 0) {
+        if (enc_encrypt(pass, len, na->nc->pass, PASSMAX - 1) < 0) {
             memset(pass, 0, strlen(pass));
             alog("%s: Failed to encrypt password for %s (register)",
                  s_NickServ, nr->nick);
@@ -365,7 +365,7 @@ int do_confirm(User * u)
                             u->nick);
             send_event(EVENT_NICK_REGISTERED, 1, u->nick);
         
-        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) 
+        if(enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1)==1) 
                 notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
 
             u->lastnickreg = time(NULL);

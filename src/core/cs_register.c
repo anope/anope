@@ -76,7 +76,7 @@ int do_register(User * u)
     ChannelInfo *ci;
     struct u_chaninfolist *uc;
     int is_servadmin = is_services_admin(u);
-    char founderpass[PASSMAX + 1];
+    char founderpass[PASSMAX];
     char tmp_pass[PASSMAX];
 
     if (readonly) {
@@ -124,13 +124,13 @@ int do_register(User * u)
     } else if (stricmp(u->nick, pass) == 0
                || (StrictPasswords && strlen(pass) < 5)) {
         notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);
-    } else if(enc_encrypt_check_len(strlen(pass) ,PASSMAX)) {
+    } else if(enc_encrypt_check_len(strlen(pass), PASSMAX - 1)) {
         notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
     } else if (!(ci = makechan(chan))) {
         alog("%s: makechan() failed for REGISTER %s", s_ChanServ, chan);
         notice_lang(s_ChanServ, u, CHAN_REGISTRATION_FAILED);
 
-    } else if (strscpy(founderpass, pass, PASSMAX + 1),
+    } else if (strscpy(founderpass, pass, PASSMAX),
                enc_encrypt_in_place(founderpass, PASSMAX) < 0) {
         alog("%s: Couldn't encrypt password for %s (REGISTER)",
              s_ChanServ, chan);
@@ -164,7 +164,7 @@ int do_register(User * u)
              u->nick, u->username, u->host);
         notice_lang(s_ChanServ, u, CHAN_REGISTERED, chan, u->nick);
 
-        if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX) == 1) {
+        if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX - 1) == 1) {
             notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, tmp_pass);
         }
 

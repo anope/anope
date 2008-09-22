@@ -243,9 +243,6 @@ int do_clear(User * u)
                 snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""), 
                         (isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
 
-                if (!tmp)
-                    continue;
-
                 if (ircdcap->tsmode) {
                     snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
                     av[1] = buf;

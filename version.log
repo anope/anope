@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1447"
+VERSION_BUILD="1448"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1448)
+# BUGS  : 
+# NOTES : Applied patch by w00t to remove a pointer comparison on a non-ptr in cs_clear.c 
 #
 # BUILD : 1.7.22 (1447)
 # BUGS  : 

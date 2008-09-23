@@ -238,7 +238,7 @@ char *db_mysql_secure(char *pass)
     memset(tmp_pass, '\0', PASSMAX);
 
     /* We couldnt decrypt the pass... */
-    if (enc_decrypt(pass, tmp_pass, PASSMAX) != 1) {
+    if (enc_decrypt(pass, tmp_pass, PASSMAX - 1) != 1) {
         snprintf(epass, sizeof(epass), "'%s'", pass);
     } else {                    /* if we could decrypt the pass */
         if (!pass) {

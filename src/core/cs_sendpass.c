@@ -86,8 +86,8 @@ int do_sendpass(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
     } else {
         char buf[BUFSIZE];
-	char tmp_pass[PASSMAX];
-	if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX)==1) {
+        char tmp_pass[PASSMAX];
+        if(enc_decrypt(ci->founderpass,tmp_pass,PASSMAX - 1)==1) {
             MailInfo *mail;
 
             snprintf(buf, sizeof(buf),
@@ -118,8 +118,8 @@ int do_sendpass(User * u)
                  u->username, u->host, chan);
             notice_lang(s_ChanServ, u, CHAN_SENDPASS_OK, chan);
         } else {
-	    notice_lang(s_ChanServ, u, CHAN_SENDPASS_UNAVAILABLE);
-	}
+            notice_lang(s_ChanServ, u, CHAN_SENDPASS_UNAVAILABLE);
+        }
     }
     return MOD_CONT;
 }

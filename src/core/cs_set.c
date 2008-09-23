@@ -373,12 +373,12 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
         return MOD_CONT;
     }
 
-    if (enc_encrypt_check_len(len ,PASSMAX)) {
+    if (enc_encrypt_check_len(len ,PASSMAX - 1)) {
         notice_lang(s_ChanServ, u, PASSWORD_TOO_LONG);
         return MOD_CONT;
     }
 
-    if (enc_encrypt(param, len, ci->founderpass, PASSMAX) < 0) {
+    if (enc_encrypt(param, len, ci->founderpass, PASSMAX -1) < 0) {
         memset(param, 0, strlen(param));
         alog("%s: Failed to encrypt password for %s (set)", s_ChanServ,
              ci->name);

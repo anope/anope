@@ -365,7 +365,7 @@ int do_confirm(User * u)
                             u->nick);
             send_event(EVENT_NICK_REGISTERED, 1, u->nick);
         
-        if(enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1)==1) 
+            if(enc_decrypt(na->nc->pass, tmp_pass, PASSMAX - 1)==1) 
                 notice_lang(s_NickServ, u, NICK_PASSWORD_IS, tmp_pass);
 
             u->lastnickreg = time(NULL);

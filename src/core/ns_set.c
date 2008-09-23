@@ -208,7 +208,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
     if (stricmp(nc->display, param) == 0 || (StrictPasswords && len < 5)) {
         notice_lang(s_NickServ, u, MORE_OBSCURE_PASSWORD);
         return MOD_CONT;
-    } else if (enc_encrypt_check_len(len ,PASSMAX)) {
+    } else if (enc_encrypt_check_len(len ,PASSMAX - 1)) {
         notice_lang(s_NickServ, u, PASSWORD_TOO_LONG);
         return MOD_CONT;
     }
@@ -217,18 +217,16 @@ int do_set_password(User * u, NickCore * nc, char *param)
         free(nc->pass);
 
     nc->pass = smalloc(PASSMAX);
-
-    if (enc_encrypt(param, len, nc->pass, PASSMAX) < 0) {
+    if (enc_encrypt(param, len, nc->pass, PASSMAX - 1) < 0) {
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,
              nc->display);
         notice_lang(s_NickServ, u, NICK_SET_PASSWORD_FAILED);
         return MOD_CONT;
     }
-
     memset(param, 0, len);
 
-    if(enc_decrypt(nc->pass,tmp_pass,PASSMAX)==1) {
+    if(enc_decrypt(nc->pass,tmp_pass,PASSMAX - 1)==1) {
         notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED_TO, tmp_pass);
     } else {
         notice_lang(s_NickServ, u, NICK_SET_PASSWORD_CHANGED);

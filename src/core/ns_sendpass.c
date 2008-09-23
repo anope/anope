@@ -83,8 +83,8 @@ int do_sendpass(User * u)
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
     } else {
         char buf[BUFSIZE];
-	char tmp_pass[PASSMAX];
-        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) {
+        char tmp_pass[PASSMAX];
+        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
             MailInfo *mail;
 
             snprintf(buf, sizeof(buf), getstring(na, NICK_SENDPASS_SUBJECT),
@@ -113,9 +113,9 @@ int do_sendpass(User * u)
             alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
-	} else {
-	    notice_lang(s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
-	}
+        } else {
+            notice_lang(s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
+        }
     }
 
     return MOD_CONT;

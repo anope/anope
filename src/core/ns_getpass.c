@@ -96,7 +96,7 @@ int do_getpass(User * u)
     } else if (NSRestrictGetPass && !is_services_root(u)) {
         notice_lang(s_NickServ, u, PERMISSION_DENIED);
     } else {
-        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX)==1) {
+        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             if (WallGetpass)

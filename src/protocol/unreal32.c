@@ -469,6 +469,15 @@ void unreal_set_umode(User * user, int ac, char **av)
                 opcnt--;
             }
             break;
+        case 'a':
+            if (UnRestrictSAdmin) {
+                break;
+            }
+            if (add && !is_services_admin(user)) {
+                common_svsmode(user, "-a", NULL);
+                user->mode &= ~UMODE_a;
+            }
+            break;
         case 'r':
             if (add && !nick_identified(user)) {
                 common_svsmode(user, "-r", NULL);

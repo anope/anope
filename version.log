@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1450"
+VERSION_BUILD="1451"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1451)
+# BUGS  : 942 
+# NOTES : We now enforce UnRestrictSAdmin on Unreal and InspIRCd.
 #
 # BUILD : 1.7.22 (1450)
 # BUGS  : 
@@ -19,7 +23,7 @@ VERSION_BUILD="1450"
 #
 # BUILD : 1.7.22 (1449)
 # BUGS  : 
-# NOTES :  Applied a patch by w00t to fix possible buffer overflows in NS/CS REGISTER. As of now the max pass length is 31 instead of 32 characters. 
+# NOTES : Applied a patch by w00t to fix possible buffer overflows in NS/CS REGISTER. As of now the max pass length is 31 instead of 32 characters. 
 #
 # BUILD : 1.7.22 (1448)
 # BUGS  : 

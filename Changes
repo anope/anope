@@ -4,6 +4,7 @@ Anope Version  S V N
 09/15 F Dealt with the nss_dns.so.1 issue on freebsd 7.                   [ #00]
 09/23 F Fixed numerous possible buffer overflows in NS and CS.            [ #00]
 09/25 F Fixed UnRestrictSAdmin on Unreal and Inspircd.                    [#942]
+09/25 F Fixed menu not properly removed after uninstall on windows.       [#944]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]

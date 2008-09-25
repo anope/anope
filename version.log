@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1451"
+VERSION_BUILD="1452"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1452)
+# BUGS  : 944
+# NOTES : Updated NSIS Build script and added anope.bat to properly remove windows menus after uninstall. Provided by chaz.
 #
 # BUILD : 1.7.22 (1451)
 # BUGS  : 942 

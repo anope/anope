@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1453"
+VERSION_BUILD="1454"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1454)
+# BUGS  : 
+# NOTES : Applied patch by w00t to fix math bug in strnrepl(). 
 #
 # BUILD : 1.7.22 (1453)
 # BUGS  : 947 

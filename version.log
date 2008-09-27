@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1452"
+VERSION_BUILD="1453"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1453)
+# BUGS  : 947 
+# NOTES : Fixed a buffer overflow in enc_sha1.
 #
 # BUILD : 1.7.22 (1452)
 # BUGS  : 944

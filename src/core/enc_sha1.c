@@ -124,7 +124,7 @@ void SHA1Init(SHA1_CTX* context)
 
 void SHA1Update(SHA1_CTX* context, unsigned char const * data, uint32 len)
 {
-uint32 i, j;
+    uint32 i, j;
 
     j = (context->count[0] >> 3) & 63;
     if ((context->count[0] += len << 3) < (len << 3)) context->count[1]++;
@@ -138,7 +138,7 @@ uint32 i, j;
         j = 0;
     }
     else i = 0;
-    memcpy(&context->buffer[j], &data[i], len - i);
+        memcpy(&context->buffer[j], &data[i], len - i);
 }
 
 
@@ -146,8 +146,8 @@ uint32 i, j;
 
 void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
 {
-uint32 i;
-unsigned char finalcount[8];
+    uint32 i;
+    unsigned char finalcount[8];
 
     for (i = 0; i < 8; i++) {
         finalcount[i] = (unsigned char)((context->count[(i >= 4 ? 0 : 1)]
@@ -181,9 +181,9 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
     unsigned char tmp[41];
 
     if (size < 20)
-	return -1;
+        return -1;
 
-    memset(dest,0,20);
+    memset(dest,0,size);
 
     SHA1Init(&context);
     SHA1Update(&context, src, len);
@@ -192,12 +192,12 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
     if(debug) {
         memset(tmp,0,41);
         binary_to_hex(dest,tmp,20);
-	/* Dont log source if we were encrypting in place :) */
+       /* Dont log source if we were encrypting in place :) */
         if (memcmp(src, dest, 20) != 0) {
             alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 
-	} else {
+        } else {
             alog("enc_sha1: hashed password to [%s]",tmp); 
-	}
+        }
     }
     
     return 0;
@@ -207,9 +207,10 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
 int sha1_encrypt_in_place(char *buf, int size)
 {
     char tmp[41];
+
     memset(tmp,0,41);
     if(sha1_encrypt(buf, strlen(buf), tmp, size)==0) {
-        memcpy(buf,tmp,40);
+        memcpy(buf, tmp, size);
     } else {
         return -1;
     }
@@ -220,7 +221,7 @@ int sha1_encrypt_in_place(char *buf, int size)
 int sha1_encrypt_check_len(int passlen, int bufsize)
 {
     if (bufsize < 20)
-	fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
+        fatal("enc_sha1: sha1_check_len(): buffer too small (%d)", bufsize);
     return 0;
 }
 
@@ -236,9 +237,10 @@ int sha1_check_password(const char *plaintext, const char *password)
     char buf[BUFSIZE];
 
     if (sha1_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
-	return -1;
+        return -1;
     if (memcmp(buf, password, 20) == 0)
-	return 1;
+        return 1;
+
     return 0;
 }
 
@@ -268,4 +270,6 @@ void AnopeFini(void) {
     encmodule_decrypt(NULL);
     encmodule_check_password(NULL);
 }
+
+/* EOF */
 

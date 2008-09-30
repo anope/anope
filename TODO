@@ -1,0 +1,42 @@
+VIPER'S CHRISTMAS LIST
+----------------------
+
+- way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
+ the MOD_HEAD MOD_TAIL allows for too few combinations
+ NOTES:
+	I already want this anyway, I'd like to move a lot of, e.g, botserv.c into a bs_main, and make bs_* depend on bs_main.
+	We could do this quite easily using interface code like insp.
+
+- building on previous example, a way for one module to interact with another.. moduleGetData() only works for current module..
+ NOTES:
+	moduleGetData() needs to die in a fire.
+
+	We should replace this with proper inheritance of a class MetadataObject, which allows Shrink(), Extend(), GetExt().
+	We may also wish to add additional methods for laziness (ShrinkString(), ExtendString(), GetExt()), as most of the use
+	of metadata is strings, but not all.
+
+	This also allows modules to tie whatever data they want onto any object.
+
+- generic database routines modules can use to create their own database
+ NOTES:
+	Partly addressed by burning moduleGetData() above, but I also want an "easy" way for modules to write their *own* databases.
+	This will be tricky, and requires more thought.
+
+- generic way to check which modes a user has set has_umode("h") for example that would be passed to protocol module
+ NOTES:
+	I like the idea, I don't like the interface. I want the umodes to be constants based on features rather than characters, as that
+	is just asking for confusion and hell.
+
+	e.g.
+
+	User *u = findnick("w00t");
+	u->HasUmode(UMODE_OPER); // etc.
+
+- a way for a module to queue itself (or even another module) for unloading
+ NOTES:
+	Needs clarification, or possibly burning. I'm not sure why dependancies are needed in this way, but it seems scary?
+
+- additional field where users' masked host can be stored so both masked IP and vhost are available instead of just one.
+ NOTES:
+	Already done (CBX).
+

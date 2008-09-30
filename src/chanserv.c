@@ -441,7 +441,7 @@ void load_cs_dbase(void)
         while ((c = getc_db(f)) != 0) {
             if (c != 1)
                 fatal("Invalid format in %s", ChanDBName);
-            ci = scalloc(sizeof(ChannelInfo), 1);
+            ci = (ChannelInfo *)scalloc(sizeof(ChannelInfo), 1);
             *last = ci;
             last = &ci->next;
             ci->prev = prev;
@@ -515,7 +515,7 @@ void load_cs_dbase(void)
             ci->bantype = tmp16;
             SAFE(read_int16(&tmp16, f));
             n_levels = tmp16;
-            ci->levels = scalloc(2 * CA_SIZE, 1);
+            ci->levels = (int16 *)scalloc(2 * CA_SIZE, 1);
             reset_levels(ci);
             for (j = 0; j < n_levels; j++) {
                 SAFE(read_int16(&tmp16, f));
@@ -547,7 +547,7 @@ void load_cs_dbase(void)
 
             SAFE(read_int16(&ci->accesscount, f));
             if (ci->accesscount) {
-                ci->access = scalloc(ci->accesscount, sizeof(ChanAccess));
+                ci->access = (ChanAccess *)scalloc(ci->accesscount, sizeof(ChanAccess));
                 for (j = 0; j < ci->accesscount; j++) {
                     SAFE(read_int16(&ci->access[j].in_use, f));
                     if (ci->access[j].in_use) {
@@ -582,7 +582,7 @@ void load_cs_dbase(void)
 
             SAFE(read_int16(&ci->akickcount, f));
             if (ci->akickcount) {
-                ci->akick = scalloc(ci->akickcount, sizeof(AutoKick));
+                ci->akick = (AutoKick *)scalloc(ci->akickcount, sizeof(AutoKick));
                 for (j = 0; j < ci->akickcount; j++) {
                     if (ver >= 15) {
                         SAFE(read_int16(&ci->akick[j].flags, f));
@@ -683,7 +683,7 @@ void load_cs_dbase(void)
             ci->memos.memomax = (int16) tmp16;
             if (ci->memos.memocount) {
                 Memo *memos;
-                memos = scalloc(sizeof(Memo) * ci->memos.memocount, 1);
+                memos = (Memo *)scalloc(sizeof(Memo) * ci->memos.memocount, 1);
                 ci->memos.memos = memos;
                 for (j = 0; j < ci->memos.memocount; j++, memos++) {
                     SAFE(read_int32(&memos->number, f));
@@ -726,7 +726,7 @@ void load_cs_dbase(void)
                 ci->botflags = tmp32;
                 SAFE(read_int16(&tmp16, f));
                 n_ttb = tmp16;
-                ci->ttb = scalloc(2 * TTB_SIZE, 1);
+                ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
                 for (j = 0; j < n_ttb; j++) {
                     SAFE(read_int16(&tmp16, f));
                     if (j < TTB_SIZE)
@@ -747,7 +747,7 @@ void load_cs_dbase(void)
 
                 SAFE(read_int16(&ci->bwcount, f));
                 if (ci->bwcount) {
-                    ci->badwords = scalloc(ci->bwcount, sizeof(BadWord));
+                    ci->badwords = (BadWord *)scalloc(ci->bwcount, sizeof(BadWord));
                     for (j = 0; j < ci->bwcount; j++) {
                         SAFE(read_int16(&ci->badwords[j].in_use, f));
                         if (ci->badwords[j].in_use) {
@@ -761,7 +761,7 @@ void load_cs_dbase(void)
             } else {
                 ci->bi = NULL;
                 ci->botflags = 0;
-                ci->ttb = scalloc(2 * TTB_SIZE, 1);
+                ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
                 for (j = 0; j < TTB_SIZE; j++)
                     ci->ttb[j] = 0;
                 ci->bwcount = 0;
@@ -1471,7 +1471,7 @@ int check_should_protect(User * user, char *chan)
 
 static void timeout_leave(Timeout * to)
 {
-    char *chan = to->data;
+    const char *chan = (const char *)to->data;
     ChannelInfo *ci = cs_findchan(chan);
 
     if (ci)                     /* Check cos the channel may be dropped in the meantime */
@@ -1986,11 +1986,11 @@ ChannelInfo *makechan(const char *chan)
     int i;
     ChannelInfo *ci;
 
-    ci = scalloc(sizeof(ChannelInfo), 1);
+    ci = (ChannelInfo *)scalloc(sizeof(ChannelInfo), 1);
     strscpy(ci->name, chan, CHANMAX);
     ci->time_registered = time(NULL);
     reset_levels(ci);
-    ci->ttb = scalloc(2 * TTB_SIZE, 1);
+    ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
     for (i = 0; i < TTB_SIZE; i++)
         ci->ttb[i] = 0;
     alpha_insert_chan(ci);
@@ -2181,7 +2181,7 @@ void reset_levels(ChannelInfo * ci)
 
     if (ci->levels)
         free(ci->levels);
-    ci->levels = scalloc(CA_SIZE * sizeof(*ci->levels), 1);
+    ci->levels = (int16 *)scalloc(CA_SIZE * sizeof(*ci->levels), 1);
     for (i = 0; def_levels[i][0] >= 0; i++)
         ci->levels[def_levels[i][0]] = def_levels[i][1];
 }

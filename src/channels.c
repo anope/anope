@@ -1524,7 +1524,7 @@ void chan_adduser2(User * user, Channel * c)
 {
     struct c_userlist *u;
 
-    u = scalloc(sizeof(struct c_userlist), 1);
+    u = (struct c_userlist *)scalloc(sizeof(struct c_userlist), 1);
     u->next = c->users;
     if (c->users)
         c->users->prev = u;
@@ -1589,7 +1589,7 @@ Channel *chan_create(char *chan, time_t ts)
     if (debug)
         alog("debug: Creating channel %s", chan);
     /* Allocate pre-cleared memory */
-    c = scalloc(sizeof(Channel), 1);
+    c = (Channel *)scalloc(sizeof(Channel), 1);
     strscpy(c->name, chan, sizeof(c->name));
     list = &chanlist[HASH(c->name)];
     c->next = *list;
@@ -1798,7 +1798,7 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
     if (debug)
         alog("debug: %s joins %s", user->nick, chan->name);
 
-    c = scalloc(sizeof(*c), 1);
+    c = (u_chanlist *)scalloc(sizeof(*c), 1);
     c->next = user->chans;
     if (user->chans)
         user->chans->prev = c;
@@ -1916,7 +1916,7 @@ Entry *entry_create(char *mask)
     int do_free;
     uint32 ip, cidr;
 
-    entry = scalloc(1, sizeof(Entry));
+    entry = (Entry *)scalloc(1, sizeof(Entry));
     entry->type = ENTRYTYPE_NONE;
     entry->prev = NULL;
     entry->next = NULL;
@@ -2073,7 +2073,7 @@ EList *list_create()
 {
     EList *list;
 
-    list = scalloc(1, sizeof(EList));
+    list = (EList *)scalloc(1, sizeof(EList));
     list->entries = NULL;
     list->count = 0;
 

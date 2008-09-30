@@ -1255,7 +1255,7 @@ E void anope_cmd_notice(char *source, char *dest, const char *fmt, ...);     		 
 E void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...); 		  /* NOTICE */
 E void anope_cmd_notice2(char *source, char *dest, char *msg);		  		  /* NOTICE */
 E void anope_cmd_serv_notice(char *source, char *dest, char *msg);		  		  /* NOTICE */
-E void anope_cmd_part(char *nick, char *chan, const char *fmt, ...); 	  		  /* PART */
+E void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(char *pass);                                   	  		  /* PASS */
 E void anope_cmd_pong(char *servname, char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
@@ -1284,7 +1284,7 @@ E void anope_cmd_svsnoop(char *server, int set);			  	  		  /* SVSNOOP */
 E void anope_cmd_svso(char *source,char *nick, char *flag);          	  		  /* SVSO   */
 E void anope_cmd_svspart(char *source, char *nick,char *chan);          	  		  /* SVSPART   */
 E void anope_cmd_swhois(char *source, char *who, char *mask);	  	  		  /* SWHOIS */
-E void anope_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when); /* TOPIC */
+E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */
 E void anope_cmd_unsgline(char *mask);				  	  		  /* UNSGLINE */
 E void anope_cmd_unsqline(char *user);                               	  		  /* UNSQLINE */
 E void anope_cmd_unszline(char *mask);				  	  		  /* UNSZLINE */

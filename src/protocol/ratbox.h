@@ -46,7 +46,6 @@
 
 
 void ratbox_set_umode(User * user, int ac, const char **av);
-void ratbox_cmd_vhost_off(User * u);
 void ratbox_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
 void ratbox_cmd_svskill(const char *source, const char *user, const char *buf);
 void ratbox_cmd_svsmode(User * u, int ac, const char **av);

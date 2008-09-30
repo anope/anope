@@ -1340,11 +1340,6 @@ void bahamut_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhos
     /* Not Supported by this IRCD */
 }
 
-void bahamut_cmd_vhost_off(User * u)
-{
-    /* Not Supported by this IRCD */
-}
-
 /* SVSMODE +d */
 /* sent if svid is something weird */
 void bahamut_cmd_svid_umode(const char *nick, time_t ts)
@@ -1552,7 +1547,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_vhost_off(bahamut_cmd_vhost_off);
     pmodule_cmd_akill(bahamut_cmd_akill);
     pmodule_cmd_svskill(bahamut_cmd_svskill);
     pmodule_cmd_svsmode(bahamut_cmd_svsmode);

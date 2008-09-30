@@ -59,7 +59,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 void bahamut_set_umode(User * user, int ac, const char **av);
-void bahamut_cmd_vhost_off(User * u);
 void bahamut_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
 void bahamut_cmd_svskill(const char *source, const char *user, const char *buf);
 void bahamut_cmd_svsmode(User * u, int ac, const char **av);

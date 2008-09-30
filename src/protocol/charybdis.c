@@ -841,8 +841,7 @@ void CharybdisProto::cmd_topic(const char *whosets, const char *chan, const char
 
 void charybdis_cmd_vhost_off(User * u)
 {
-    send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * CHGHOST %s :%s",
-             u->nick, u->host);
+	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
 }
 
 void charybdis_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
@@ -1828,7 +1827,6 @@ int charybdis_send_deaccount(int argc, char **argv)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_vhost_off(charybdis_cmd_vhost_off);
     pmodule_cmd_akill(charybdis_cmd_akill);
     pmodule_cmd_svskill(charybdis_cmd_svskill);
     pmodule_cmd_svsmode(charybdis_cmd_svsmode);

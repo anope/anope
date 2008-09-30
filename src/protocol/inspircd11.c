@@ -538,9 +538,9 @@ void InspIRCdProto::cmd_topic(const char *whosets, const char *chan, const char 
 	send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
 }
 
-void inspircd_cmd_vhost_off(User * u)
+void InspIRCdProto::cmd_vhost_off(User *u)
 {
-    send_cmd(s_HostServ, "MODE %s -x", u->nick);
+	send_cmd(s_HostServ, "MODE %s -x", u->nick);
 }
 
 void
@@ -1786,7 +1786,6 @@ void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_vhost_off(inspircd_cmd_vhost_off);
     pmodule_cmd_akill(inspircd_cmd_akill);
     pmodule_cmd_svskill(inspircd_cmd_svskill);
     pmodule_cmd_svsmode(inspircd_cmd_svsmode);

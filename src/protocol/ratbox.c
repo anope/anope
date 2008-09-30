@@ -787,11 +787,6 @@ void RatboxProto::cmd_topic(const char *whosets, const char *chan, const char *w
 	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
-void ratbox_cmd_vhost_off(User * u)
-{
-    /* not supported  */
-}
-
 void ratbox_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     /* not supported  */
@@ -1724,7 +1719,6 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_vhost_off(ratbox_cmd_vhost_off);
     pmodule_cmd_akill(ratbox_cmd_akill);
     pmodule_cmd_svskill(ratbox_cmd_svskill);
     pmodule_cmd_svsmode(ratbox_cmd_svsmode);

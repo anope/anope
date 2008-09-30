@@ -522,17 +522,11 @@ void UnrealIRCdProto::cmd_topic(const char *whosets, const char *chan, const cha
 	send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
 }
 
-void unreal_cmd_vhost_off(User * u)
+void UnrealIRCdProto::cmd_vhost_off(User *u)
 {
-    if (UseSVS2MODE) {
-        send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"),
-                 u->nick);
-    } else {
-        send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"),
-                 u->nick);
-    }
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick,
-                myIrcd->vhostchar);
+	if (UseSVS2MODE) send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"), u->nick);
+	else send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"), u->nick);
+	notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
 }
 
 void unreal_cmd_akill(const char *user, const char *host, const char *who, time_t when,
@@ -2104,7 +2098,6 @@ void moduleAddIRCDMsgs(void) {
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_vhost_off(unreal_cmd_vhost_off);
     pmodule_cmd_akill(unreal_cmd_akill);
     pmodule_cmd_svskill(unreal_cmd_svskill);
     pmodule_cmd_svsmode(unreal_cmd_svsmode);

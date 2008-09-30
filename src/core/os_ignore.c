@@ -95,7 +95,6 @@ int do_ignoreuser(User * u)
                 notice_lang(s_OperServ, u, OPER_IGNORE_VALID_TIME);
                 return MOD_CONT;
             } else if (t == 0) {
-                t = 157248000;  /* if 0 is given, we set time to 157248000 seconds == 5 years (let's hope the next restart will  be before that time ;-)) */
                 add_ignore(nick, t);
                 notice_lang(s_OperServ, u, OPER_IGNORE_PERM_DONE, nick);
             } else {

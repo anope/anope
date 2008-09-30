@@ -3864,7 +3864,7 @@ NICK_HELP_SASET_DISPLAY
 	entsprechenden Gruppe sein.
 
 NICK_HELP_SASET_PASSWORD
-	Syntax: SET nickname PASSWORD new-password
+	Syntax: SASET nickname PASSWORD new-password
 	
 	Ändert das Passwort um sich als Besitzer eines Nicknamens
 	zu identifizieren.

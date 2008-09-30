@@ -3748,7 +3748,7 @@ NICK_HELP_SASET_DISPLAY
 	Limitato ai Services admins.
 
 NICK_HELP_SASET_PASSWORD
-	Sintassi: SET nickname PASSWORD nuova-password
+	Sintassi: SASET nickname PASSWORD nuova-password
 	
 	Cambia la password utilizzata per identificarsi come
 	proprietario del nick.

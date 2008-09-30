@@ -3811,7 +3811,7 @@ NICK_HELP_SASET_DISPLAY
 	Services. The new display MUST be a nick of the group.
 
 NICK_HELP_SASET_PASSWORD
-	Syntax: SET nickname PASSWORD new-password
+	Syntax: SASET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
 

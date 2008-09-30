@@ -136,7 +136,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
         /* Check if we should ignore.  Operators always get through. */
         if (allow_ignore && !is_oper(u)) {
             IgnoreData *ign = get_ignore(source);
-            if (ign && ign->time > time(NULL)) {
+            if (ign) {
                 alog("Ignored message from %s: \"%s\"", source, inbuf);
                 return MOD_CONT;
             }

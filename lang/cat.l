@@ -3862,7 +3862,7 @@ NICK_HELP_SASET_DISPLAY
 	Limited to Services admins.
 
 NICK_HELP_SASET_PASSWORD
-	Syntax: SET nickname PASSWORD new-password
+	Syntax: SASET nickname PASSWORD new-password
 	
 	Changes the password used to identify as the nick's	owner.
 	

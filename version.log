@@ -9,9 +9,21 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1455"
+VERSION_BUILD="1458"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1458)
+# BUGS  : 950 
+# NOTES : Fixed an error in the help docs on SASET. Patch provided by chaz.
+#
+# BUILD : 1.7.22 (1457)
+# BUGS  : 
+# NOTES : Forgot Changes log. Autoformatters during commit ought to die.. last try to get process.c properly formatted in SVN. 
+#
+# BUILD : 1.7.22 (1456)
+# BUGS  : 948 
+# NOTES : We now support real permanent ignoring. When ignoring a nick we now also use the hostmask if the user exists. 
 #
 # BUILD : 1.7.22 (1455)
 # BUGS  : 943 

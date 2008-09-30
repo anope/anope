@@ -91,3 +91,5 @@ int do_staff(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_staff")

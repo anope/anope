@@ -184,3 +184,5 @@ int do_alist(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_alist")

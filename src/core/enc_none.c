@@ -76,3 +76,5 @@ int plain_check_password(const char *plaintext, const char *password) {
 
 /* EOF */
 
+
+MODULE_INIT("enc_none")

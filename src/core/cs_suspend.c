@@ -209,3 +209,5 @@ int do_unsuspend(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_suspend")

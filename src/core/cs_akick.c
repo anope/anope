@@ -667,3 +667,5 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci)
 }
 
 /* EOF */
+
+MODULE_INIT("cs_akick")

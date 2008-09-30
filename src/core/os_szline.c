@@ -348,3 +348,5 @@ int szline_list(int number, SXLine * sx, User * u, int *sent_header)
 
     return 1;
 }
+
+MODULE_INIT("os_szline")

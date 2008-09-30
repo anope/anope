@@ -80,3 +80,5 @@ int do_os_quit(User * u)
     quitting = 1;
     return MOD_CONT;
 }
+
+MODULE_INIT("os_quit")

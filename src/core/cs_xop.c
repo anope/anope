@@ -507,3 +507,5 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_xop")

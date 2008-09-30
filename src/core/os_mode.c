@@ -100,3 +100,5 @@ int do_os_mode(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("os_mode")

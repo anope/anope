@@ -92,3 +92,5 @@ int do_status(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_status")

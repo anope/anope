@@ -118,3 +118,5 @@ int do_rsend(User * u)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_rsend")

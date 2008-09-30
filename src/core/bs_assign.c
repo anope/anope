@@ -93,3 +93,5 @@ int do_assign(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("bs_assign")

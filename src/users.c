@@ -31,7 +31,7 @@ User::User(const std::string &nick)
 {
 	User **list;
 	// XXX: we could do well to steal CoreException from insp
-	if (!nick.empty())
+	if (nick.empty())
 		throw "what the craq, empty nick passed to constructor";
 
 	// XXX: we should also duplicate-check here.

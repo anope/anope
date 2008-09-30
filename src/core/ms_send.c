@@ -72,3 +72,5 @@ int do_send(User * u)
     memo_send(u, name, text, z);
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_send")

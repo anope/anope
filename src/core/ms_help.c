@@ -64,3 +64,5 @@ int do_help(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_help")

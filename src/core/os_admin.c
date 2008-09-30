@@ -242,3 +242,5 @@ int admin_list(int number, NickCore * nc, User * u, int *sent_header)
                 nc->display);
     return 1;
 }
+
+MODULE_INIT("os_admin")

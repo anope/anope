@@ -86,3 +86,5 @@ int do_getkey(User * u)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_getkey")

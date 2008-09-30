@@ -387,3 +387,5 @@ int akill_list(int number, Akill * ak, User * u, int *sent_header)
 
     return 1;
 }
+
+MODULE_INIT("os_akill")

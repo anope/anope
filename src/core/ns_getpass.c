@@ -110,3 +110,5 @@ int do_getpass(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_getpass")

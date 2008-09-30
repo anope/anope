@@ -185,3 +185,5 @@ int listOut(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("hs_list")

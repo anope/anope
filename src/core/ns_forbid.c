@@ -153,3 +153,5 @@ NickAlias *makenick(const char *nick)
     alpha_insert_alias(na);
     return na;
 }
+
+MODULE_INIT("ns_forbid")

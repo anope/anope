@@ -135,3 +135,5 @@ int do_recover(User * u)
 }
 
 /* EOF */
+
+MODULE_INIT("ns_recover")

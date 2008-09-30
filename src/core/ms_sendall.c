@@ -94,3 +94,5 @@ int do_sendall(User * u)
     notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_sendall")

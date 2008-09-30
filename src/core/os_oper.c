@@ -245,3 +245,5 @@ int oper_list_callback(SList * slist, int number, void *item, va_list args)
 
     return oper_list(number, (NickCore *)item, u, sent_header);
 }
+
+MODULE_INIT("os_oper")

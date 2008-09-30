@@ -248,3 +248,5 @@ void mAddLanguages(void)
 
 
 /* EOF */
+
+MODULE_INIT("cs_tban")

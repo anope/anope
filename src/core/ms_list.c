@@ -193,3 +193,5 @@ int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, co
                 m->number, m->sender, timebuf);
     return 1;
 }
+
+MODULE_INIT("ms_list")

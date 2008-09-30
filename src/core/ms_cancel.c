@@ -103,3 +103,5 @@ int do_cancel(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_cancel")

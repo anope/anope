@@ -120,3 +120,5 @@ int do_ghost(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_ghost")

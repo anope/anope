@@ -541,3 +541,5 @@ int do_levels(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_access")

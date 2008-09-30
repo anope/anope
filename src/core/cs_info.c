@@ -247,3 +247,5 @@ int do_info(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_info")

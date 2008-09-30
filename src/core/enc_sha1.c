@@ -273,3 +273,5 @@ void AnopeFini(void) {
 
 /* EOF */
 
+
+MODULE_INIT("enc_sha1")

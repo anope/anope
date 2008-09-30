@@ -169,3 +169,5 @@ int do_identify(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_identify")

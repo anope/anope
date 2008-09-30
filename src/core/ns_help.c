@@ -77,3 +77,5 @@ int do_help(User * u)
 }
 
 /* EOF */
+
+MODULE_INIT("ns_help")

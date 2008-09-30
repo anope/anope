@@ -360,3 +360,5 @@ int delbot(BotInfo * bi)
     return 1;
 }
 
+
+MODULE_INIT("bs_bot")

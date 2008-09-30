@@ -126,3 +126,5 @@ int do_logout(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_logout")

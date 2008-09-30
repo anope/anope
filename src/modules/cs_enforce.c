@@ -477,3 +477,5 @@ void my_add_languages(void)
 }
 
 /* EOF */
+
+MODULE_INIT("cs_enforce")

@@ -1490,3 +1490,5 @@ int AnopeInit(int argc, char **argv)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("ratbox")

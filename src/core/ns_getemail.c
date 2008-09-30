@@ -100,3 +100,5 @@ int do_getemail(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_getemail")

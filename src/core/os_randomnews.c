@@ -64,3 +64,5 @@ void myOperServHelp(User * u)
         notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
     }
 }
+
+MODULE_INIT("os_randomnews")

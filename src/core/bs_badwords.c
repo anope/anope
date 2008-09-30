@@ -324,3 +324,5 @@ int badwords_list_callback(User * u, int num, va_list args)
         return 0;
     return badwords_list(u, num - 1, ci, sent_header);
 }
+
+MODULE_INIT("bs_badwords")

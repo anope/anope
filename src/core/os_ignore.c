@@ -145,3 +145,5 @@ int do_ignorelist(User * u)
 }
 
 /* EOF */
+
+MODULE_INIT("os_ignore")

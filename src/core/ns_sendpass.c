@@ -120,3 +120,5 @@ int do_sendpass(User * u)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_sendpass")

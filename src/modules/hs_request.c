@@ -985,3 +985,5 @@ void my_add_languages(void)
 }
 
 /* EOF */
+
+MODULE_INIT("hs_request")

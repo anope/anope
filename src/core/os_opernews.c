@@ -95,3 +95,5 @@ int reload_config(int argc, char **argv) {
 }
 
 /* EOF */
+
+MODULE_INIT("os_opernews")

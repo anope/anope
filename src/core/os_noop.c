@@ -104,3 +104,5 @@ int do_noop(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("os_noop")

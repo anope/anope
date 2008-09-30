@@ -72,3 +72,5 @@ int do_update(User * u)
     save_data = 1;
     return MOD_CONT;
 }
+
+MODULE_INIT("os_update")

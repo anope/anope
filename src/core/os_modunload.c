@@ -83,3 +83,5 @@ int do_modunload(User * u)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("os_modunload")

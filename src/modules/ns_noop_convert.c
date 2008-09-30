@@ -171,3 +171,5 @@ int mLoadConfig(int argc, char **argv)
 /*************************************************************************/
 
 /* EOF */
+
+MODULE_INIT("ns_noop_convert")

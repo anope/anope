@@ -176,3 +176,5 @@ int myDoSet(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("hs_set")

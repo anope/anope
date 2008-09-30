@@ -81,3 +81,5 @@ int do_shutdown(User * u)
     delayed_quit = 1;
     return MOD_CONT;
 }
+
+MODULE_INIT("os_shutdown")

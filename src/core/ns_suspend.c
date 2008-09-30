@@ -191,3 +191,5 @@ int do_unsuspend(User * u)
     return MOD_CONT;
 
 }
+
+MODULE_INIT("ns_suspend")

@@ -87,3 +87,5 @@ int do_unassign(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("bs_unassign")

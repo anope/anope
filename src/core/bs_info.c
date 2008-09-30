@@ -280,3 +280,5 @@ void send_bot_channels(User * u, BotInfo * bi)
         notice_user(s_BotServ, u, buf);
     return;
 }
+
+MODULE_INIT("bs_info")

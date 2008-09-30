@@ -655,15 +655,24 @@ int init_secondary(int ac, char **av)
 	BotInfo *bi = findbot("NickServ");
 	if (!bi)
 	{
-		bi = new BotInfo(s_OperServ, ServiceUser, ServiceHost, desc_OperServ);
-		bi = new BotInfo(s_NickServ, ServiceUser, ServiceHost, desc_NickServ);
-		bi = new BotInfo(s_ChanServ, ServiceUser, ServiceHost, desc_ChanServ);
-		bi = new BotInfo(s_HostServ, ServiceUser, ServiceHost, desc_HostServ);
-		bi = new BotInfo(s_MemoServ, ServiceUser, ServiceHost, desc_MemoServ);
-		bi = new BotInfo(s_BotServ, ServiceUser, ServiceHost, desc_BotServ);
-		bi = new BotInfo(s_HelpServ, ServiceUser, ServiceHost, desc_HelpServ);
-		bi = new BotInfo(s_DevNull, ServiceUser, ServiceHost, desc_DevNull);
-		bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
+		if (s_OperServ)
+			bi = new BotInfo(s_OperServ, ServiceUser, ServiceHost, desc_OperServ);
+		if (s_NickServ)
+			bi = new BotInfo(s_NickServ, ServiceUser, ServiceHost, desc_NickServ);
+		if (s_ChanServ)
+			bi = new BotInfo(s_ChanServ, ServiceUser, ServiceHost, desc_ChanServ);
+		if (s_HostServ)
+			bi = new BotInfo(s_HostServ, ServiceUser, ServiceHost, desc_HostServ);
+		if (s_MemoServ)
+			bi = new BotInfo(s_MemoServ, ServiceUser, ServiceHost, desc_MemoServ);
+		if (s_BotServ)
+			bi = new BotInfo(s_BotServ, ServiceUser, ServiceHost, desc_BotServ);
+		if (s_HelpServ)
+			bi = new BotInfo(s_HelpServ, ServiceUser, ServiceHost, desc_HelpServ);
+		if (s_DevNull)
+			bi = new BotInfo(s_DevNull, ServiceUser, ServiceHost, desc_DevNull);
+		if (s_GlobalNoticer)
+			bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
 	}
 
     /* Save the databases back to file/mysql to reflect any changes */

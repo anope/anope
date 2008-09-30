@@ -106,3 +106,5 @@ int do_botlist(User * u)
         notice_lang(s_BotServ, u, BOT_BOTLIST_FOOTER, count);
     return MOD_CONT;
 }
+
+MODULE_INIT("bs_botlist")

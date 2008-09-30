@@ -245,3 +245,5 @@ int do_list(User * u)
         free(pattern);
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_list")

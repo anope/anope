@@ -80,3 +80,5 @@ int do_global(User * u)
     oper_global(u->nick, "%s", msg);
     return MOD_CONT;
 }
+
+MODULE_INIT("os_global")

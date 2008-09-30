@@ -98,3 +98,5 @@ int do_os_kick(User * u)
     free((void *)argv[0]);
     return MOD_CONT;
 }
+
+MODULE_INIT("os_kick")

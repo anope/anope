@@ -88,3 +88,5 @@ int do_invite(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_invite")

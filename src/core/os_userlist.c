@@ -119,3 +119,5 @@ int do_userlist(User * u)
     notice_lang(s_OperServ, u, OPER_USERLIST_END);
     return MOD_CONT;
 }
+
+MODULE_INIT("os_userlist")

@@ -90,3 +90,5 @@ int do_act(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("bs_act")

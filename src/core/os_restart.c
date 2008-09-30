@@ -89,3 +89,5 @@ int do_restart(User * u)
 #endif
     return MOD_CONT;
 }
+
+MODULE_INIT("os_restart")

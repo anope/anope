@@ -85,3 +85,5 @@ int do_off(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("hs_off")

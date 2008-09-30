@@ -82,3 +82,5 @@ int do_reload(User * u)
     notice_lang(s_OperServ, u, OPER_RELOAD);
     return MOD_CONT;
 }
+
+MODULE_INIT("os_reload")

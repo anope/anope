@@ -114,3 +114,5 @@ int do_chanlist(User * u)
     notice_lang(s_OperServ, u, OPER_CHANLIST_END);
     return MOD_CONT;
 }
+
+MODULE_INIT("os_chanlist")

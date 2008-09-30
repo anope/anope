@@ -226,3 +226,5 @@ int do_unban(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_ban")

@@ -106,3 +106,5 @@ int do_operoline(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("os_oline")

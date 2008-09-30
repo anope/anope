@@ -154,3 +154,5 @@ int do_unlink(User * u)
     notice_lang(s_NickServ, u, OBSOLETE_COMMAND, "DROP");
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_drop")

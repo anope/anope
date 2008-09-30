@@ -154,3 +154,5 @@ int opers_list(int number, NickCore * nc, User * u, char *level)
 
     return 1;
 }
+
+MODULE_INIT("os_staff")

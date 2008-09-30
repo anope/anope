@@ -193,3 +193,5 @@ int do_modlist(User * u)
 
     return MOD_CONT;
 }
+
+MODULE_INIT("os_modlist")

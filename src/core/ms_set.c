@@ -264,3 +264,5 @@ int do_set_limit(User * u, MemoInfo * mi, char *param)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("ms_set")

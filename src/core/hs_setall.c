@@ -178,3 +178,5 @@ int do_setall(User * u)
     free(hostmask);
     return MOD_CONT;
 }
+
+MODULE_INIT("hs_setall")

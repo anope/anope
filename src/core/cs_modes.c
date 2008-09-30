@@ -386,3 +386,5 @@ int do_util(User * u, CSModeUtil * util)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_modes")

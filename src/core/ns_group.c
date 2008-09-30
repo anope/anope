@@ -335,3 +335,5 @@ int do_listlinks(User * u)
     notice_lang(s_NickServ, u, OBSOLETE_COMMAND, "GLIST");
     return MOD_CONT;
 }
+
+MODULE_INIT("ns_group")

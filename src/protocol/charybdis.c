@@ -1634,3 +1634,5 @@ void AnopeFini(void)
 }
 
 /* EOF */
+
+MODULE_INIT("charybdis")

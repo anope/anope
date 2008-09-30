@@ -125,3 +125,5 @@ int do_release(User * u)
 }
 
 /* EOF */
+
+MODULE_INIT("ns_release")

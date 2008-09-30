@@ -137,3 +137,5 @@ int do_forbid(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_forbid")

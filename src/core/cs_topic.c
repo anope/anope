@@ -117,3 +117,5 @@ int do_cs_topic(User * u)
     }
     return MOD_CONT;
 }
+
+MODULE_INIT("cs_topic")

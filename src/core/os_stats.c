@@ -444,3 +444,5 @@ void get_operserv_stats(long *nrec, long *memuse)
     *nrec = count;
     *memuse = mem;
 }
+
+MODULE_INIT("os_stats")

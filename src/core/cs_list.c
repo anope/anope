@@ -197,3 +197,5 @@ int do_list(User * u)
     return MOD_CONT;
 
 }
+
+MODULE_INIT("cs_list")

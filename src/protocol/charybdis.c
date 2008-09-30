@@ -459,7 +459,7 @@ void CharybdisProto::cmd_message(const char *source, const char *dest, const cha
 	else cmd_notice(source, dest, buf);
 }
 
-void charybdis_cmd_notice2(const char *source, const char *dest, const char *msg)
+void CharybdisProto::cmd_notice(const char *source, const char *dest, const char *msg)
 {
 	Uid *ud = find_uid(source);
 	User *u = finduser(dest);

@@ -705,7 +705,7 @@ void BahamutIRCdProto::cmd_unszline(const char *mask)
 }
 
 /* SZLINE */
-void bahamut_cmd_szline(const char *mask, const char *reason, const char *whom)
+void BahamutIRCdProto::cmd_szline(const char *mask, const char *reason, const char *whom)
 {
 	/* this will likely fail so its only here for legacy */
 	send_cmd(NULL, "SZLINE %s :%s", mask, reason);

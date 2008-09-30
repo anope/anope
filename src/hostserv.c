@@ -104,16 +104,16 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
                              char *vHost, char *creator, int32 tmp_time)
 {
 
-    next = malloc(sizeof(HostCore));
+    next = (HostCore *)malloc(sizeof(HostCore));
     if (next == NULL) {
         anope_cmd_global(s_HostServ,
                          "Unable to allocate memory to create the vHost LL, problems i sense..");
     } else {
-        next->nick = malloc(sizeof(char) * strlen(nick) + 1);
-        next->vHost = malloc(sizeof(char) * strlen(vHost) + 1);
-        next->creator = malloc(sizeof(char) * strlen(creator) + 1);
+        next->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
+        next->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
+        next->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
         if (vIdent)
-            next->vIdent = malloc(sizeof(char) * strlen(vIdent) + 1);
+            next->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((next->nick == NULL) || (next->vHost == NULL)
             || (next->creator == NULL)) {
             anope_cmd_global(s_HostServ,
@@ -149,7 +149,7 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
  * @param found If found
  * @return HostCore
  */
-HostCore *findHostCore(HostCore * head, char *nick, boolean * found)
+HostCore *findHostCore(HostCore * head, char *nick, bool* found)
 {
     HostCore *previous, *current;
 
@@ -192,17 +192,17 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
         return NULL;
     }
 
-    newCore = malloc(sizeof(HostCore));
+    newCore = (HostCore *)malloc(sizeof(HostCore));
     if (newCore == NULL) {
         anope_cmd_global(s_HostServ,
                          "Unable to allocate memory to insert into the vHost LL, problems i sense..");
         return NULL;
     } else {
-        newCore->nick = malloc(sizeof(char) * strlen(nick) + 1);
-        newCore->vHost = malloc(sizeof(char) * strlen(vHost) + 1);
-        newCore->creator = malloc(sizeof(char) * strlen(creator) + 1);
+        newCore->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
+        newCore->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
+        newCore->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
         if (vIdent)
-            newCore->vIdent = malloc(sizeof(char) * strlen(vIdent) + 1);
+            newCore->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((newCore->nick == NULL) || (newCore->vHost == NULL)
             || (newCore->creator == NULL)) {
             anope_cmd_global(s_HostServ,
@@ -264,7 +264,7 @@ void addHostCore(char *nick, char *vIdent, char *vhost, char *creator,
                  int32 tmp_time)
 {
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
 
     if (head == NULL) {
         head =
@@ -287,7 +287,7 @@ void addHostCore(char *nick, char *vIdent, char *vhost, char *creator,
 char *getvHost(char *nick)
 {
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
     tmp = findHostCore(head, nick, &found);
     if (found) {
         if (tmp == NULL)
@@ -302,7 +302,7 @@ char *getvHost(char *nick)
 char *getvIdent(char *nick)
 {
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
     tmp = findHostCore(head, nick, &found);
     if (found) {
         if (tmp == NULL)
@@ -321,7 +321,7 @@ void delHostCore(char *nick)
     char *q_nick;
 #endif
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
     tmp = findHostCore(head, nick, &found);
     if (found) {
         head = deleteHostCore(head, tmp);
@@ -544,7 +544,7 @@ int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
     NickAlias *na;
 
     for (i = 0; i < nc->aliases.count; i++) {
-        na = nc->aliases.list[i];
+        na = (NickAlias *)nc->aliases.list[i];
         addHostCore(na->nick, vIdent, hostmask, creator, time);
     }
     return MOD_CONT;
@@ -592,7 +592,7 @@ int is_host_setter(User * u)
 
     /* Look through all user's aliases (0000412) */
     for (i = 0; i < u->na->nc->aliases.count; i++) {
-        na = u->na->nc->aliases.list[i];
+        na = (NickAlias *)u->na->nc->aliases.list[i];
         for (j = 0; j < HostNumber; j++) {
             if (stricmp(HostSetters[j], na->nick) == 0) {
                 return 1;
@@ -617,7 +617,7 @@ void set_lastmask(User * u)
         free(u->na->last_usermask);
 
     u->na->last_usermask =
-        smalloc(strlen(common_get_vident(u)) +
+        (char *)smalloc(strlen(common_get_vident(u)) +
                 strlen(common_get_vhost(u)) + 2);
     sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
             common_get_vhost(u));

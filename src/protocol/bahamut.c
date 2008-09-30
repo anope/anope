@@ -1283,13 +1283,11 @@ void bahamut_cmd_351(const char *source)
 
 }
 
-void bahamut_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
-                          const char *modes)
+void BahamutIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
-    bahamut_cmd_sqline(nick, "Reserved for services");
+	EnforceQlinedNick(nick, s_BotServ);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+	bahamut_cmd_sqline(nick, "Reserved for services");
 }
 
 /* SVSNICK */
@@ -1532,7 +1530,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_bot_nick(bahamut_cmd_bot_nick);
     pmodule_cmd_kick(bahamut_cmd_kick);
     pmodule_cmd_notice_ops(bahamut_cmd_notice_ops);
     pmodule_cmd_notice(bahamut_cmd_notice);

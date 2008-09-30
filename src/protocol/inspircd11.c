@@ -761,13 +761,10 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void
-inspircd_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
-                      const char *modes)
+void InspIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
-             (long int) time(NULL), nick, host, host, user, modes, real);
-    send_cmd(nick, "OPERTYPE Bot");
+	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+	send_cmd(nick, "OPERTYPE Bot");
 }
 
 void inspircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1781,7 +1778,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_bot_nick(inspircd_cmd_bot_nick);
     pmodule_cmd_kick(inspircd_cmd_kick);
     pmodule_cmd_notice_ops(inspircd_cmd_notice_ops);
     pmodule_cmd_notice(inspircd_cmd_notice);

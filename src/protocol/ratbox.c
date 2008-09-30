@@ -918,22 +918,16 @@ void ratbox_cmd_connect(int servernum)
     ratbox_cmd_svinfo();
 }
 
-void ratbox_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
-                         const char *modes)
+void RatboxProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    EnforceQlinedNick(nick, NULL);
-    if (UseTS6) {
+	EnforceQlinedNick(nick, NULL);
+	if (UseTS6) {
 		char *uidbuf = ts6_uid_retrieve();
-        send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
-                 (long int) time(NULL), modes, user, host, uidbuf,
-                 real);
-        new_uid(nick, uidbuf);
-    } else {
-        send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-                 (long int) time(NULL), modes, user, host, ServerName,
-                 real);
-    }
-    ratbox_cmd_sqline(nick, "Reserved for services");
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
+		new_uid(nick, uidbuf);
+	}
+	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+	ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
 void ratbox_cmd_part(const char *nick, const char *chan, const char *buf)
@@ -1688,7 +1682,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_bot_nick(ratbox_cmd_bot_nick);
     pmodule_cmd_kick(ratbox_cmd_kick);
     pmodule_cmd_notice_ops(ratbox_cmd_notice_ops);
     pmodule_cmd_notice(ratbox_cmd_notice);

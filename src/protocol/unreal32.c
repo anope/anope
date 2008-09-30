@@ -608,15 +608,12 @@ void UnrealIRCdProto::cmd_mode(const char *source, const char *dest, const char 
 	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
 }
 
-void unreal_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
-                         const char *modes)
+void UnrealIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
-             send_token("NICK", "&"), nick, (long int) time(NULL), user,
-             host, ServerName, modes, host, (myIrcd->nickip ? " *" : " "),
-             real);
-    unreal_cmd_sqline(nick, "Reserved for services");
+	EnforceQlinedNick(nick, s_BotServ);
+	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
+		myIrcd->nickip ? " *" : " ", real);
+	unreal_cmd_sqline(nick, "Reserved for services");
 }
 
 void unreal_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -2083,7 +2080,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_bot_nick(unreal_cmd_bot_nick);
     pmodule_cmd_kick(unreal_cmd_kick);
     pmodule_cmd_notice_ops(unreal_cmd_notice_ops);
     pmodule_cmd_notice(unreal_cmd_notice);

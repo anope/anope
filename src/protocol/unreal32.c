@@ -629,11 +629,6 @@ void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const
 }
 
 
-void unreal_cmd_notice2(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "%s %s :%s", send_token("NOTICE", "B"), dest, msg);
-}
-
 void unreal_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "%s $%s :%s", send_token("NOTICE", "B"), dest, msg);
@@ -2050,7 +2045,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_notice2(unreal_cmd_notice2);
     pmodule_cmd_serv_notice(unreal_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(unreal_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(unreal_cmd_bot_chan_mode);

@@ -291,7 +291,7 @@ void User::SendMessage(const char *source, const std::string &msg)
 	}
 	else
 	{
-		anope_cmd_notice2(source, this->nick, msg.c_str());
+		anope_cmd_notice(source, this->nick, msg.c_str());
 	}
 }
 

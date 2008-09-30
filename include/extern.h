@@ -611,7 +611,6 @@ E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
 E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
 E void pmodule_cmd_376(void (*func) (const char *source));
-E void pmodule_cmd_notice2(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_serv_notice(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_serv_privmsg(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_bot_chan_mode(void (*func) (const char *nick, const char *chan));
@@ -1221,7 +1220,7 @@ E void anope_cmd_bot_nick(const char *nick, const char *user,const char *host,co
 E void anope_cmd_guest_nick(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
 E void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
 E void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
-E void anope_cmd_notice2(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
+E void anope_cmd_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
 E void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
 E void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */

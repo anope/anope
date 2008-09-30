@@ -172,7 +172,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            anope_cmd_privmsg2(source, dest->nick, *t ? t : " ");
+            anope_cmd_privmsg(source, dest->nick, *t ? t : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *t ? t : " ");
         }
@@ -228,7 +228,7 @@ void notice_help(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            anope_cmd_privmsg2(source, dest->nick, *outbuf ? outbuf : " ");
+            anope_cmd_privmsg(source, dest->nick, *outbuf ? outbuf : " ");
         } else {
             anope_cmd_notice2(source, dest->nick, *outbuf ? outbuf : " ");
         }
@@ -257,7 +257,7 @@ void notice(char *source, const char *dest, const char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (NSDefFlags & NI_MSG) {
-            anope_cmd_privmsg2(source, dest, buf);
+            anope_cmd_privmsg(source, dest, buf);
         } else {
             anope_cmd_notice2(source, dest, buf);
         }
@@ -287,7 +287,7 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
         va_end(args);
     }
 
-    anope_cmd_privmsg2(source, dest, buf);
+    anope_cmd_privmsg(source, dest, buf);
 }
 
 /*************************************************************************/

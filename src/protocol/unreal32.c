@@ -673,7 +673,7 @@ void unreal_cmd_notice(const char *source, const char *dest, const char *buf)
     }
 
     if (NSDefFlags & NI_MSG) {
-        unreal_cmd_privmsg2(source, dest, buf);
+        unreal_cmd_privmsg(source, dest, buf);
     } else {
         send_cmd(source, "%s %s :%s", send_token("NOTICE", "B"), dest,
                  buf);
@@ -692,11 +692,6 @@ void unreal_cmd_privmsg(const char *source, const char *dest, const char *buf)
     }
 
     send_cmd(source, "%s %s :%s", send_token("PRIVMSG", "!"), dest, buf);
-}
-
-void unreal_cmd_privmsg2(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "%s %s :%s", send_token("PRIVMSG", "!"), dest, msg);
 }
 
 void unreal_cmd_serv_notice(const char *source, const char *dest, const char *msg)
@@ -2136,7 +2131,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice(unreal_cmd_notice);
     pmodule_cmd_notice2(unreal_cmd_notice2);
     pmodule_cmd_privmsg(unreal_cmd_privmsg);
-    pmodule_cmd_privmsg2(unreal_cmd_privmsg2);
     pmodule_cmd_serv_notice(unreal_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(unreal_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(unreal_cmd_bot_chan_mode);

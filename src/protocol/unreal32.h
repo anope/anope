@@ -99,7 +99,6 @@ void unreal_cmd_notice_ops(const char *source, const char *dest, const char *buf
 void unreal_cmd_notice(const char *source, const char *dest, const char *buf);
 void unreal_cmd_notice2(const char *source, const char *dest, const char *msg);
 void unreal_cmd_privmsg(const char *source, const char *dest, const char *buf);
-void unreal_cmd_privmsg2(const char *source, const char *dest, const char *msg);
 void unreal_cmd_serv_notice(const char *source, const char *dest, const char *msg);
 void unreal_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
 void unreal_cmd_bot_chan_mode(const char *nick, const char *chan);

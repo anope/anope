@@ -627,7 +627,6 @@ E void pmodule_cmd_notice_ops(void (*func) (const char *source, const char *dest
 E void pmodule_cmd_notice(void (*func) (const char *source, const char *dest, const char *buf));
 E void pmodule_cmd_notice2(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_privmsg(void (*func) (const char *source, const char *dest, const char *buf));
-E void pmodule_cmd_privmsg2(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_serv_notice(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_serv_privmsg(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_bot_chan_mode(void (*func) (const char *nick, const char *chan));
@@ -1245,7 +1244,6 @@ E void anope_cmd_pass(const char *pass);                                   	  		
 E void anope_cmd_pong(const char *servname, const char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
-E void anope_cmd_privmsg2(const char *source, const char *dest, const char *msg);		  		  /* PRIVMSG */
 E void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_cmd_quit(const char *source, const char *fmt, ...);           	  		  /* QUIT */

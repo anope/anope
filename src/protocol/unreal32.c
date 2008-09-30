@@ -696,12 +696,6 @@ void unreal_cmd_server(const char *servname, int hop, const char *descript)
     }
 }
 
-/* PONG */
-void unreal_cmd_pong(const char *servname, const char *who)
-{
-    send_cmd(servname, "%s %s", send_token("PONG", "9"), who);
-}
-
 /* JOIN */
 void unreal_cmd_join(const char *user, const char *channel, time_t chantime)
 {
@@ -1014,7 +1008,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    unreal_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -2026,7 +2020,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_pong(unreal_cmd_pong);
     pmodule_cmd_join(unreal_cmd_join);
     pmodule_cmd_unsqline(unreal_cmd_unsqline);
     pmodule_cmd_invite(unreal_cmd_invite);

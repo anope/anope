@@ -835,12 +835,6 @@ void bahamut_cmd_squit(const char *servname, const char *message)
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
-/* PONG */
-void bahamut_cmd_pong(const char *servname, const char *who)
-{
-    send_cmd(servname, "PONG %s", who);
-}
-
 /*
  * SVINFO
  *       parv[0] = sender prefix
@@ -1219,7 +1213,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    bahamut_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1479,7 +1473,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_pong(bahamut_cmd_pong);
     pmodule_cmd_join(bahamut_cmd_join);
     pmodule_cmd_unsqline(bahamut_cmd_unsqline);
     pmodule_cmd_invite(bahamut_cmd_invite);

@@ -51,7 +51,6 @@ void ratbox_cmd_372_error(const char *source);
 void ratbox_cmd_375(const char *source);
 void ratbox_cmd_376(const char *source);
 void ratbox_cmd_351(const char *source);
-void ratbox_cmd_pong(const char *servname, const char *who);
 void ratbox_cmd_join(const char *user, const char *channel, time_t chantime);
 void ratbox_cmd_unsqline(const char *user);
 void ratbox_cmd_invite(const char *source, const char *chan, const char *nick);
@@ -111,4 +110,5 @@ class RatboxProto : public IRCDProtoNew {
 		void cmd_privmsg(const char *, const char *, const char *);
 		void cmd_bot_chan_mode(const char *, const char *);
 		void cmd_quit(const char *, const char *);
+		void cmd_pong(const char *, const char *);
 } ircd_proto;

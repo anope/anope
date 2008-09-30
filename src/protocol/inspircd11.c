@@ -812,12 +812,6 @@ void inspircd_cmd_server(const char *servname, int hop, const char *descript)
              descript);
 }
 
-/* PONG */
-void inspircd_cmd_pong(const char *servname, const char *who)
-{
-    send_cmd(servname, "PONG %s", who);
-}
-
 /* JOIN */
 void inspircd_cmd_join(const char *user, const char *channel, time_t chantime)
 {
@@ -1091,7 +1085,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
     if (ac < 1)
         return MOD_CONT;
     /* ((ac > 1) ? av[1] : ServerName) */
-    inspircd_cmd_pong(ServerName, av[0]);
+    ircd_proto.cmd_pong(ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1725,7 +1719,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_pong(inspircd_cmd_pong);
     pmodule_cmd_join(inspircd_cmd_join);
     pmodule_cmd_unsqline(inspircd_cmd_unsqline);
     pmodule_cmd_invite(inspircd_cmd_invite);

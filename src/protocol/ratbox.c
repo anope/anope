@@ -913,7 +913,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ratbox_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1285,13 +1285,10 @@ void RatboxProto::cmd_quit(const char *source, const char *buf)
 }
 
 /* PONG */
-void ratbox_cmd_pong(const char *servname, const char *who)
+void RatboxProto::cmd_pong(const char *servname, const char *who)
 {
-    if (UseTS6) {
-        send_cmd(TS6SID, "PONG %s", who);
-    } else {
-        send_cmd(servname, "PONG %s", who);
-    }
+	if (UseTS6) send_cmd(TS6SID, "PONG %s", who);
+	else send_cmd(servname, "PONG %s", who);
 }
 
 /* INVITE */
@@ -1626,7 +1623,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_pong(ratbox_cmd_pong);
     pmodule_cmd_join(ratbox_cmd_join);
     pmodule_cmd_unsqline(ratbox_cmd_unsqline);
     pmodule_cmd_invite(ratbox_cmd_invite);

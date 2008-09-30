@@ -973,7 +973,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    charybdis_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1353,14 +1353,11 @@ void CharybdisProto::cmd_quit(const char *source, const char *buf)
 }
 
 /* PONG */
-void charybdis_cmd_pong(const char *servname, const char *who)
+void CharybdisProto::cmd_pong(const char *servname, const char *who)
 {
-    if (UseTS6) {
-        /* deliberately no SID in the first parameter -- jilles */
-        send_cmd(TS6SID, "PONG %s :%s", servname, who);
-    } else {
-        send_cmd(servname, "PONG %s :%s", servname, who);
-    }
+	/* deliberately no SID in the first parameter -- jilles */
+	if (UseTS6) send_cmd(TS6SID, "PONG %s :%s", servname, who);
+	else send_cmd(servname, "PONG %s :%s", servname, who);
 }
 
 /* INVITE */
@@ -1732,7 +1729,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_pong(charybdis_cmd_pong);
     pmodule_cmd_join(charybdis_cmd_join);
     pmodule_cmd_unsqline(charybdis_cmd_unsqline);
     pmodule_cmd_invite(charybdis_cmd_invite);

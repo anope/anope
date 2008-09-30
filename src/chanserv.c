@@ -308,6 +308,9 @@ void load_cs_dbase(void)
 
     ver = get_file_version(f);
 
+	if (ver != 16)
+		fatal("Invalid database version! (I only understand %d)", CHAN_VERSION);
+
     for (i = 0; i < 256 && !failed; i++) {
         uint16 tmp16;
         uint32 tmp32;
@@ -328,15 +331,7 @@ void load_cs_dbase(void)
             SAFE(read_buffer(ci->name, f));
             SAFE(read_string(&s, f));
             if (s) {
-                if (ver >= 13)
-                    ci->founder = findcore(s);
-                else {
-                    na = findnick(s);
-                    if (na)
-                        ci->founder = na->nc;
-                    else
-                        ci->founder = NULL;
-                }
+                ci->founder = findcore(s);
                 free(s);
             } else
                 ci->founder = NULL;
@@ -380,17 +375,9 @@ void load_cs_dbase(void)
             /* Temporary flags cleanup */
             ci->flags &= ~CI_INHABIT;
 
-            if (ver >= 9) {
-                SAFE(read_string(&ci->forbidby, f));
-                SAFE(read_string(&ci->forbidreason, f));
-            } else {
-                ci->forbidreason = NULL;
-                ci->forbidby = NULL;
-            }
-            if (ver >= 9)
-                SAFE(read_int16(&tmp16, f));
-            else
-                tmp16 = CSDefBantype;
+            SAFE(read_string(&ci->forbidby, f));
+            SAFE(read_string(&ci->forbidreason, f));
+            SAFE(read_int16(&tmp16, f));
             ci->bantype = tmp16;
             SAFE(read_int16(&tmp16, f));
             n_levels = tmp16;
@@ -400,28 +387,6 @@ void load_cs_dbase(void)
                 SAFE(read_int16(&tmp16, f));
                 if (j < CA_SIZE)
                     ci->levels[j] = (int16) tmp16;
-            }
-            /* To avoid levels list silly hacks */
-            if (ver < 10)
-                ci->levels[CA_OPDEOPME] = ci->levels[CA_OPDEOP];
-            if (ver < 11) {
-                ci->levels[CA_KICKME] = ci->levels[CA_OPDEOP];
-                ci->levels[CA_KICK] = ci->levels[CA_OPDEOP];
-            }
-            if (ver < 15) {
-
-                /* Old Ultimate levels import */
-                /* We now conveniently use PROTECT internals for Ultimate's ADMIN support - ShadowMaster */
-                /* Doh, must of course be done before we change the values were trying to import - ShadowMaster */
-                ci->levels[CA_AUTOPROTECT] = ci->levels[32];
-                ci->levels[CA_PROTECTME] = ci->levels[33];
-                ci->levels[CA_PROTECT] = ci->levels[34];
-
-                ci->levels[CA_BANME] = ci->levels[CA_OPDEOP];
-                ci->levels[CA_BAN] = ci->levels[CA_OPDEOP];
-                ci->levels[CA_TOPIC] = ACCESS_INVALID;
-
-
             }
 
             SAFE(read_int16(&ci->accesscount, f));
@@ -434,25 +399,13 @@ void load_cs_dbase(void)
                         ci->access[j].level = (int16) tmp16;
                         SAFE(read_string(&s, f));
                         if (s) {
-                            if (ver >= 13)
-                                ci->access[j].nc = findcore(s);
-                            else {
-                                na = findnick(s);
-                                if (na)
-                                    ci->access[j].nc = na->nc;
-                                else
-                                    ci->access[j].nc = NULL;
-                            }
+                            ci->access[j].nc = findcore(s);
                             free(s);
                         }
                         if (ci->access[j].nc == NULL)
                             ci->access[j].in_use = 0;
-                        if (ver >= 11) {
-                            SAFE(read_int32(&tmp32, f));
-                            ci->access[j].last_seen = tmp32;
-                        } else {
-                            ci->access[j].last_seen = 0;        /* Means we have never seen the user */
-                        }
+                        SAFE(read_int32(&tmp32, f));
+                        ci->access[j].last_seen = tmp32;
                     }
                 }
             } else {
@@ -463,30 +416,11 @@ void load_cs_dbase(void)
             if (ci->akickcount) {
                 ci->akick = (AutoKick *)scalloc(ci->akickcount, sizeof(AutoKick));
                 for (j = 0; j < ci->akickcount; j++) {
-                    if (ver >= 15) {
-                        SAFE(read_int16(&ci->akick[j].flags, f));
-                    } else {
-                        SAFE(read_int16(&tmp16, f));
-                        if (tmp16)
-                            ci->akick[j].flags |= AK_USED;
-                    }
+                    SAFE(read_int16(&ci->akick[j].flags, f));
                     if (ci->akick[j].flags & AK_USED) {
-                        if (ver < 15) {
-                            SAFE(read_int16(&tmp16, f));
-                            if (tmp16)
-                                ci->akick[j].flags |= AK_ISNICK;
-                        }
                         SAFE(read_string(&s, f));
                         if (ci->akick[j].flags & AK_ISNICK) {
-                            if (ver >= 13) {
-                                ci->akick[j].u.nc = findcore(s);
-                            } else {
-                                na = findnick(s);
-                                if (na)
-                                    ci->akick[j].u.nc = na->nc;
-                                else
-                                    ci->akick[j].u.nc = NULL;
-                            }
+                            ci->akick[j].u.nc = findcore(s);
                             if (!ci->akick[j].u.nc)
                                 ci->akick[j].flags &= ~AK_USED;
                             free(s);
@@ -498,62 +432,38 @@ void load_cs_dbase(void)
                             ci->akick[j].reason = s;
                         else if (s)
                             free(s);
-                        if (ver >= 9) {
-                            SAFE(read_string(&s, f));
-                            if (ci->akick[j].flags & AK_USED) {
-                                ci->akick[j].creator = s;
-                            } else if (s) {
-                                free(s);
-                            }
-                            SAFE(read_int32(&tmp32, f));
-                            if (ci->akick[j].flags & AK_USED)
-                                ci->akick[j].addtime = tmp32;
-                        } else {
-                            ci->akick[j].creator = NULL;
-                            ci->akick[j].addtime = 0;
+                        SAFE(read_string(&s, f));
+                        if (ci->akick[j].flags & AK_USED) {
+                            ci->akick[j].creator = s;
+                        } else if (s) {
+                            free(s);
                         }
-                    }
-
-                    /* Bugfix */
-                    if ((ver == 15) && ci->akick[j].flags > 8) {
-                        ci->akick[j].flags = 0;
-                        ci->akick[j].u.nc = NULL;
-                        ci->akick[j].u.nc = NULL;
-                        ci->akick[j].addtime = 0;
-                        ci->akick[j].creator = NULL;
-                        ci->akick[j].reason = NULL;
+                        SAFE(read_int32(&tmp32, f));
+                        if (ci->akick[j].flags & AK_USED)
+                            ci->akick[j].addtime = tmp32;
                     }
                 }
             } else {
                 ci->akick = NULL;
             }
 
-            if (ver >= 10) {
-                SAFE(read_int32(&ci->mlock_on, f));
-                SAFE(read_int32(&ci->mlock_off, f));
-            } else {
-                SAFE(read_int16(&tmp16, f));
-                ci->mlock_on = tmp16;
-                SAFE(read_int16(&tmp16, f));
-                ci->mlock_off = tmp16;
-            }
+            SAFE(read_int32(&ci->mlock_on, f));
+            SAFE(read_int32(&ci->mlock_off, f));
             SAFE(read_int32(&ci->mlock_limit, f));
             SAFE(read_string(&ci->mlock_key, f));
-            if (ver >= 10) {
-                if (ircd->fmode) {
-                    SAFE(read_string(&ci->mlock_flood, f));
-                } else {
-                    SAFE(read_string(&s, f));
-                    if (s)
-                        free(s);
-                }
-                if (ircd->Lmode) {
-                    SAFE(read_string(&ci->mlock_redirect, f));
-                } else {
-                    SAFE(read_string(&s, f));
-                    if (s)
-                        free(s);
-                }
+            if (ircd->fmode) {
+                SAFE(read_string(&ci->mlock_flood, f));
+            } else {
+                SAFE(read_string(&s, f));
+                if (s)
+                    free(s);
+            }
+            if (ircd->Lmode) {
+                SAFE(read_string(&ci->mlock_redirect, f));
+            } else {
+                SAFE(read_string(&s, f));
+                if (s)
+                    free(s);
             }
 
             SAFE(read_int16(&tmp16, f));
@@ -579,74 +489,52 @@ void load_cs_dbase(void)
 
             ci->c = NULL;
 
-            /* Some cleanup */
-            if (ver <= 11) {
-                /* Cleanup: Founder must be != than successor */
-                if (!(ci->flags & CI_VERBOTEN)
-                    && ci->successor == ci->founder) {
-                    alog("Warning: founder and successor of %s are equal. Cleaning up.", ci->name);
-                    ci->successor = NULL;
-                }
-            }
-
             /* BotServ options */
+            int n_ttb;
 
-            if (ver >= 8) {
-                int n_ttb;
+            SAFE(read_string(&s, f));
+            if (s) {
+                ci->bi = findbot(s);
+                free(s);
+            } else
+                ci->bi = NULL;
 
-                SAFE(read_string(&s, f));
-                if (s) {
-                    ci->bi = findbot(s);
-                    free(s);
-                } else
-                    ci->bi = NULL;
+            SAFE(read_int32(&tmp32, f));
+            ci->botflags = tmp32;
+            SAFE(read_int16(&tmp16, f));
+            n_ttb = tmp16;
+            ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
+            for (j = 0; j < n_ttb; j++) {
+                SAFE(read_int16(&tmp16, f));
+                if (j < TTB_SIZE)
+                    ci->ttb[j] = (int16) tmp16;
+            }
+            for (j = n_ttb; j < TTB_SIZE; j++)
+                ci->ttb[j] = 0;
+            SAFE(read_int16(&tmp16, f));
+            ci->capsmin = tmp16;
+            SAFE(read_int16(&tmp16, f));
+            ci->capspercent = tmp16;
+            SAFE(read_int16(&tmp16, f));
+            ci->floodlines = tmp16;
+            SAFE(read_int16(&tmp16, f));
+            ci->floodsecs = tmp16;
+            SAFE(read_int16(&tmp16, f));
+            ci->repeattimes = tmp16;
 
-                SAFE(read_int32(&tmp32, f));
-                ci->botflags = tmp32;
-                SAFE(read_int16(&tmp16, f));
-                n_ttb = tmp16;
-                ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
-                for (j = 0; j < n_ttb; j++) {
-                    SAFE(read_int16(&tmp16, f));
-                    if (j < TTB_SIZE)
-                        ci->ttb[j] = (int16) tmp16;
-                }
-                for (j = n_ttb; j < TTB_SIZE; j++)
-                    ci->ttb[j] = 0;
-                SAFE(read_int16(&tmp16, f));
-                ci->capsmin = tmp16;
-                SAFE(read_int16(&tmp16, f));
-                ci->capspercent = tmp16;
-                SAFE(read_int16(&tmp16, f));
-                ci->floodlines = tmp16;
-                SAFE(read_int16(&tmp16, f));
-                ci->floodsecs = tmp16;
-                SAFE(read_int16(&tmp16, f));
-                ci->repeattimes = tmp16;
-
-                SAFE(read_int16(&ci->bwcount, f));
-                if (ci->bwcount) {
-                    ci->badwords = (BadWord *)scalloc(ci->bwcount, sizeof(BadWord));
-                    for (j = 0; j < ci->bwcount; j++) {
-                        SAFE(read_int16(&ci->badwords[j].in_use, f));
-                        if (ci->badwords[j].in_use) {
-                            SAFE(read_string(&ci->badwords[j].word, f));
-                            SAFE(read_int16(&ci->badwords[j].type, f));
-                        }
+            SAFE(read_int16(&ci->bwcount, f));
+            if (ci->bwcount) {
+                ci->badwords = (BadWord *)scalloc(ci->bwcount, sizeof(BadWord));
+                for (j = 0; j < ci->bwcount; j++) {
+                    SAFE(read_int16(&ci->badwords[j].in_use, f));
+                    if (ci->badwords[j].in_use) {
+                        SAFE(read_string(&ci->badwords[j].word, f));
+                        SAFE(read_int16(&ci->badwords[j].type, f));
                     }
-                } else {
-                    ci->badwords = NULL;
                 }
             } else {
-                ci->bi = NULL;
-                ci->botflags = 0;
-                ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
-                for (j = 0; j < TTB_SIZE; j++)
-                    ci->ttb[j] = 0;
-                ci->bwcount = 0;
                 ci->badwords = NULL;
             }
-
         }                       /* while (getc_db(f) != 0) */
 
         *last = NULL;

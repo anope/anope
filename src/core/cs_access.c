@@ -247,7 +247,7 @@ int do_access(User * u)
         if (i < CSAccessMax) {
             ci->accesscount++;
             ci->access =
-                srealloc(ci->access,
+                (ChanAccess *)srealloc(ci->access,
                         sizeof(ChanAccess) * ci->accesscount);
         } else {
             notice_lang(s_ChanServ, u, CHAN_ACCESS_REACHED_LIMIT,
@@ -361,7 +361,7 @@ int do_access(User * u)
                 ci->accesscount--;
             }
             ci->access =
-                srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
+                (ChanAccess *)srealloc(ci->access,sizeof(ChanAccess) * ci->accesscount);
 
             /* We don't know the nick if someone used numbers, so we trigger the event without
              * nick param. We just do this once, even if someone enters a range. -Certus */

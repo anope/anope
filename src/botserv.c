@@ -886,7 +886,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     va_list args;
     char buf[1024];
     const char *fmt;
-    char *av[3];
+    const char *av[3];
 
     if (!ci || !ci->bi || !ci->c || !u)
         return;
@@ -915,6 +915,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 {
     int ac;
     char *av[4];
+	const char *kav[4]; // seperate as not everything is constified XXX -- w00t
     char mask[BUFSIZE];
     char buf[BUFSIZE];
     User *u = finduser(nick);
@@ -967,28 +968,28 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     else
         free(av[1]);
 
-    av[0] = ci->name;
-    av[1] = nick;
+    kav[0] = ci->name;
+    kav[1] = nick;
 
     if (!reason) {
-        av[2] = ci->bi->nick;
+        kav[2] = ci->bi->nick;
     } else {
         if (strlen(reason) > 200)
             reason[200] = '\0';
-        av[2] = reason;
+        kav[2] = reason;
     }
 
     /* Check if we need to do a signkick or not -GD */
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+        anope_cmd_kick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
                        requester->nick);
     else
-        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+        anope_cmd_kick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
 
-    do_kick(ci->bi->nick, 3, av);
-    send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
+    do_kick(ci->bi->nick, 3, kav);
+    send_event(EVENT_BOT_KICK, 3, kav[1], kav[0], kav[2]);
 }
 
 /*************************************************************************/
@@ -998,7 +999,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
                   char *reason)
 {
-    char *av[3];
+    const char *av[3];
     User *u = finduser(nick);
 
     if (!u || !is_on_chan(ci->c, u))

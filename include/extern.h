@@ -132,7 +132,7 @@ E const char *get_xop_level(int level);
 
 E void do_cmode(const char *source, int ac, char **av);
 E void do_join(const char *source, int ac, char **av);
-E void do_kick(const char *source, int ac, char **av);
+E void do_kick(const char *source, int ac, const char **av);
 E void do_part(const char *source, int ac, char **av);
 E void do_sjoin(const char *source, int ac, char **av);
 E void do_topic(const char *source, int ac, char **av);

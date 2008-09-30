@@ -220,7 +220,7 @@ int do_akick(User * u)
         if (!na) {
             split_usermask(mask, &nick, &user, &host);
             mask =
-                scalloc(strlen(nick) + strlen(user) + strlen(host) + 3, 1);
+                (char *)scalloc(strlen(nick) + strlen(user) + strlen(host) + 3, 1);
             freemask = 1;
             sprintf(mask, "%s!%s@%s", nick, user, host);
             free(nick);
@@ -313,7 +313,7 @@ int do_akick(User * u)
         }
         ci->akickcount++;
         ci->akick =
-            srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount);
+            (AutoKick *)srealloc(ci->akick, sizeof(AutoKick) * ci->akickcount);
         akick = &ci->akick[i];
         akick->flags = AK_USED;
         if (nc) {
@@ -532,7 +532,7 @@ int do_akick(User * u)
                 ci->akickcount--;
             }
             ci->akick =
-                srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount);
+                (AutoKick *)srealloc(ci->akick,sizeof(AutoKick) * ci->akickcount);
         }
     } else if (stricmp(cmd, "LIST") == 0) {
         int sent_header = 0;

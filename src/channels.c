@@ -596,7 +596,7 @@ void do_join(const char *source, int ac, char **av)
  *	av[2] = reason
  */
 
-void do_kick(const char *source, int ac, char **av)
+void do_kick(const char *source, int ac, const char **av)
 {
     BotInfo *bi;
     ChannelInfo *ci;
@@ -604,7 +604,7 @@ void do_kick(const char *source, int ac, char **av)
     char *s, *t;
     struct u_chanlist *c;
 
-    t = av[1];
+    t = (char *)av[1]; // XXX unsafe cast, this needs reviewing -- w00t
     while (*(s = t)) {
         t = s + strcspn(s, ",");
         if (*t)

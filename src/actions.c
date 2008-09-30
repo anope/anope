@@ -84,7 +84,7 @@ void sqline(char *mask, char *reason)
 {
     int i;
     Channel *c, *next;
-    char *av[3];
+    const char *av[3];
     struct c_userlist *cu, *cunext;
 
     if (ircd->chansqline) {

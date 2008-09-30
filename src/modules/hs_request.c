@@ -331,7 +331,7 @@ void req_send_memos(User * u, char *vHost)
 int ns_do_drop(User * u)
 {
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
     NickAlias *na;
 
     na = findnick(u->nick);
@@ -349,7 +349,7 @@ int hs_do_reject(User * u)
     char *nick;
     char *reason;
     HostCore *tmp, *hc;
-    boolean found = false;
+    bool found = false;
 
     cur_buffer = moduleGetLastBuffer();
     nick = myStrGetToken(cur_buffer, ' ', 0);
@@ -398,7 +398,7 @@ int hs_do_activate(User * u)
     char *nick;
     NickAlias *na;
     HostCore *tmp, *hc;
-    boolean found = false;
+    bool found = false;
 
     cur_buffer = moduleGetLastBuffer();
     nick = myStrGetToken(cur_buffer, ' ', 0);
@@ -442,7 +442,7 @@ void my_add_host_request(char *nick, char *vIdent, char *vhost,
                          char *creator, int32 tmp_time)
 {
     HostCore *tmp;
-    boolean found = false;
+    bool found = false;
 
     if (!hs_request_head) {
         hs_request_head =
@@ -647,7 +647,7 @@ void hsreq_save_db(void)
 {
     FILE *fp;
     char *filename;
-    char *vident;
+    const char *vident;
     HostCore *current;
 
     if (HSRequestDBName)

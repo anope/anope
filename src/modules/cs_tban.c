@@ -132,36 +132,33 @@ int do_tban(User * u)
 
 void addBan(Channel * c, time_t timeout, char *banmask)
 {
-    char *av[3];
+    const char *av[3];
     char *cb[2];
 
     cb[0] = c->name;
     cb[1] = banmask;
 
-    av[0] = sstrdup("+b");
+    av[0] = "+b";
     av[1] = banmask;
 
     anope_cmd_mode(whosends(c->ci), c->name, "+b %s", av[1]);
     chan_set_modes(s_ChanServ, c, 2, av, 1);
 
-    free(av[0]);
     moduleAddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
 }
 
 int delBan(int argc, char **argv)
 {
-    char *av[3];
+    const char *av[3];
     Channel *c;
 
-    av[0] = sstrdup("-b");
+    av[0] = "-b";
     av[1] = argv[1];
 
     if ((c = findchan(argv[0])) && c->ci) {
         anope_cmd_mode(whosends(c->ci), c->name, "-b %s", av[1]);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
     }
-
-    free(av[0]);
 
     return MOD_CONT;
 }

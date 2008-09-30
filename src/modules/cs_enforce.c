@@ -100,7 +100,7 @@ void do_enforce_restricted(Channel * c)
     int16 old_nojoin_level;
     char mask[BUFSIZE];
     char *reason;
-    char *av[3];
+    const char *av[3];
     User *u;
 
     if (!(ci = c->ci))
@@ -141,7 +141,7 @@ void do_enforce_cmode_R(Channel * c)
     ChannelInfo *ci;
     char mask[BUFSIZE];
     char *reason;
-    char *av[3];
+    const char *av[3];
     User *u;
     CBMode *cbm;
 

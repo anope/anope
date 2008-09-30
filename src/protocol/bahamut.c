@@ -765,9 +765,9 @@ void BahamutIRCdProto::cmd_topic(const char *whosets, const char *chan, const ch
 }
 
 /* UNSQLINE */
-void bahamut_cmd_unsqline(const char *user)
+void BahamutIRCdProto::cmd_unsqline(const char *user)
 {
-    send_cmd(NULL, "UNSQLINE %s", user);
+	send_cmd(NULL, "UNSQLINE %s", user);
 }
 
 /* JOIN - SJOIN */
@@ -1473,7 +1473,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_unsqline(bahamut_cmd_unsqline);
     pmodule_cmd_invite(bahamut_cmd_invite);
     pmodule_cmd_part(bahamut_cmd_part);
     pmodule_cmd_391(bahamut_cmd_391);

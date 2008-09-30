@@ -819,12 +819,10 @@ void InspIRCdProto::cmd_join(const char *user, const char *channel, time_t chant
 }
 
 /* UNSQLINE */
-void inspircd_cmd_unsqline(const char *user)
+void InspIRCdProto::cmd_unsqline(const char *user)
 {
-    if (!user) {
-        return;
-    }
-    send_cmd(s_OperServ, "QLINE %s", user);
+	if (!user) return;
+	send_cmd(s_OperServ, "QLINE %s", user);
 }
 
 /* CHGIDENT */
@@ -1719,7 +1717,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_unsqline(inspircd_cmd_unsqline);
     pmodule_cmd_invite(inspircd_cmd_invite);
     pmodule_cmd_part(inspircd_cmd_part);
     pmodule_cmd_391(inspircd_cmd_391);
@@ -1744,7 +1741,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(inspircd_cmd_unsqline);
+    pmodule_cmd_unsgline(inspircd_cmd_unsgline);
     pmodule_cmd_unszline(inspircd_cmd_unszline);
     pmodule_cmd_szline(inspircd_cmd_szline);
     pmodule_cmd_sgline(inspircd_cmd_sgline);

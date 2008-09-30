@@ -816,13 +816,10 @@ void charybdis_cmd_vhost_on(const char *nick, const char *vIdent, const char *vh
              nick, vhost);
 }
 
-void charybdis_cmd_unsqline(const char *user)
+void CharybdisProto::cmd_unsqline(const char *user)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "UNRESV * %s", user);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
 void CharybdisProto::cmd_join(const char *user, const char *channel, time_t chantime)
@@ -1726,7 +1723,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_unsqline(charybdis_cmd_unsqline);
     pmodule_cmd_invite(charybdis_cmd_invite);
     pmodule_cmd_part(charybdis_cmd_part);
     pmodule_cmd_391(charybdis_cmd_391);

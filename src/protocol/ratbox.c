@@ -758,13 +758,10 @@ void ratbox_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost
     /* not supported  */
 }
 
-void ratbox_cmd_unsqline(const char *user)
+void RatboxProto::cmd_unsqline(const char *user)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "UNRESV * %s", user);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
 void RatboxProto::cmd_join(const char *user, const char *channel, time_t chantime)
@@ -1620,7 +1617,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_unsqline(ratbox_cmd_unsqline);
     pmodule_cmd_invite(ratbox_cmd_invite);
     pmodule_cmd_part(ratbox_cmd_part);
     pmodule_cmd_391(ratbox_cmd_391);

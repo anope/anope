@@ -86,7 +86,6 @@ void unreal_cmd_372_error(const char *source);
 void unreal_cmd_375(const char *source);
 void unreal_cmd_376(const char *source);
 void unreal_cmd_351(const char *source);
-void unreal_cmd_unsqline(const char *user);
 void unreal_cmd_invite(const char *source, const char *chan, const char *nick);
 void unreal_cmd_part(const char *nick, const char *chan, const char *buf);
 void unreal_cmd_391(const char *source, const char *timestr);
@@ -144,4 +143,5 @@ class UnrealIRCdProto : public IRCDProtoNew {
 		void cmd_notice_ops(const char *, const char *, const char *);
 		void cmd_bot_chan_mode(const char *, const char *);
 		void cmd_join(const char *, const char *, time_t);
+		void cmd_unsqline(const char *);
 } ircd_proto;

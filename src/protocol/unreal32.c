@@ -707,12 +707,10 @@ void UnrealIRCdProto::cmd_join(const char *user, const char *channel, time_t cha
 **	parv[0] = sender
 **	parv[1] = nickmask
 */
-void unreal_cmd_unsqline(const char *user)
+void UnrealIRCdProto::cmd_unsqline(const char *user)
 {
-    if (!user) {
-        return;
-    }
-    send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
+	if (!user) return;
+	send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
 }
 
 /* CHGHOST */
@@ -2018,7 +2016,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_unsqline(unreal_cmd_unsqline);
     pmodule_cmd_invite(unreal_cmd_invite);
     pmodule_cmd_part(unreal_cmd_part);
     pmodule_cmd_391(unreal_cmd_391);

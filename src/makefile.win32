@@ -17,14 +17,14 @@ include ../Makefile.inc.win32
 
 ###########################################################################
 
-OBJS =  actions.obj base64.obj botserv.obj channels.obj chanserv.obj commands.obj compat.obj \
+OBJS =  actions.obj base64.obj bots.obj botserv.obj channels.obj chanserv.obj commands.obj compat.obj \
         config.obj datafiles.obj encrypt.obj events.obj helpserv.obj hostserv.obj \
         init.obj ircd.obj language.obj list.obj log.obj mail.obj main.obj memory.obj \
         memoserv.obj messages.obj misc.obj modules.obj mod_version.obj news.obj nickserv.obj operserv.obj \
         process.obj send.obj servers.obj sessions.obj slist.obj sockutil.obj \
         timeout.obj users.obj $(RDB_O) $(MYSQL_O)
         
-SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c \
+SRCS =  actions.c base64.c botserv.c bots.cpp channels.c chanserv.c commands.c compat.c \
         config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c \
         language.c list.c log.c mail.c main.c memory.c memoserv.c messages.c misc.c \
         modules.c mod_version.c news.c nickserv.c operserv.c process.c send.c servers.obj sessions.c \
@@ -34,6 +34,10 @@ SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c \
         
 .c.obj:
         $(CC) $(CFLAGS) -c $<
+
+.cpp.obj:
+        $(CC) $(CFLAGS) -c $<
+
 
 all: $(PROGRAM)
 
@@ -60,6 +64,7 @@ $(OBJS):
 
 actions.obj:        actions.c        ..\include\services.h
 base64.obj:        base64.c        ..\include\services.h
+bots.obj:           bots.cpp         ..\include\services.h
 botserv.obj:        botserv.c        ..\include\services.h ..\include\pseudo.h ..\include\language.h
 channels.obj:        channels.c        ..\include\services.h
 chanserv.obj:        chanserv.c        ..\include\services.h ..\include\pseudo.h

@@ -1,11 +1,11 @@
 MYSQL_OBJ = $(MYSQL:.c=.o)
 RDB_OBJ = $(RDB:.c=.o)
-OBJS =  actions.o base64.o botserv.o channels.o chanserv.o commands.o compat.o \
+OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
 		config.o datafiles.o encrypt.o events.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o  \
 		$(RDB_OBJ) $(MYSQL_OBJ) 
-SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c \
+SRCS =  actions.c base64.c bots.cpp botserv.c channels.c chanserv.c commands.c compat.c \
 		config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
 		memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
 		process.c send.c servers.c sessions.c s sockutil.c timeout.c users.c \
@@ -27,6 +27,9 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 .c.o:
 	$(CC) $(CFLAGS) -I../include/ -c $<
 
+.cpp.o:
+	$(CC) $(CFLAGS) -I../include/ -c $<
+
 all: services
 
 distclean: spotless
@@ -38,6 +41,7 @@ services:  $(OBJS) mod_version
 $(OBJS): Makefile
 actions.o:      actions.c   $(INCLUDES)
 base64.o:       base64.c    $(INCLUDES)    
+bots.o:         bots.cpp    $(INCLUDES)
 botserv.o:      botserv.c   $(INCLUDES)    
 channels.o:     channels.c  $(INCLUDES) 
 chanserv.o:     chanserv.c  $(INCLUDES)   

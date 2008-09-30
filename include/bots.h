@@ -29,5 +29,20 @@ class BotInfo
 	int16 chancount;		/* Number of channels that use the bot. */
 	/* Dynamic data */
 	time_t lastmsg;			/* Last time we said something */
+
+	/** Create a new bot.
+	 * @param nick The nickname to assign to the bot.
+	 */
+	BotInfo(const char *nick);
+
+	/** Change the nickname set on a bot.
+	 * @param newnick The nick to change to
+	 */
+	void ChangeNick(const char *newnick);
+
+	/** Rejoins all channels that this bot is assigned to.
+	 * Used on /kill, rename, etc.
+	 */
+	void RejoinAll();
 };
 

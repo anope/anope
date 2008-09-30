@@ -18,7 +18,6 @@
 int do_bot(User * u);
 int delbot(BotInfo * bi);
 void myBotServHelp(User * u);
-void change_bot_nick(BotInfo * bi, char *newnick);
 
 /**
  * Create the command, and tell anope about it.
@@ -150,7 +149,7 @@ int do_bot(User * u)
                 return MOD_CONT;
             }
 
-            bi = makebot(nick);
+            bi = new BotInfo(nick);
             if (!bi) {
                 notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
                 return MOD_CONT;
@@ -277,7 +276,7 @@ int do_bot(User * u)
             }
 
             if (strcmp(nick, bi->nick))
-                change_bot_nick(bi, nick);
+                bi->ChangeNick(nick);
 
             if (user && strcmp(user, bi->user)) {
                 free(bi->user);
@@ -303,7 +302,7 @@ int do_bot(User * u)
 
                 anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
-                bot_rejoin_all(bi);
+                bi->RejoinAll();
             }
 
             notice_lang(s_BotServ, u, BOT_BOT_CHANGED, oldnick, bi->nick,
@@ -361,18 +360,3 @@ int delbot(BotInfo * bi)
     return 1;
 }
 
-void change_bot_nick(BotInfo * bi, char *newnick)
-{
-    if (bi->next)
-        bi->next->prev = bi->prev;
-    if (bi->prev)
-        bi->prev->next = bi->next;
-    else
-        botlists[tolower(*bi->nick)] = bi->next;
-
-    if (bi->nick)
-        free(bi->nick);
-    bi->nick = sstrdup(newnick);
-
-    insert_bot(bi);
-}

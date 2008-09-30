@@ -49,7 +49,7 @@ int m_kill(const char *nick, const char *msg)
         introduce_user(nick);
     } else if (s_BotServ && (bi = findbot(nick))) {
         introduce_user(nick);
-        bot_rejoin_all(bi);
+        bi->RejoinAll();
     } else {
         do_kill(nick, msg);
     }

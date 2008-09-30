@@ -1,7 +1,7 @@
 CC=g++ # probably wrong but oh well.
 INCLUDEDIR=../include
 ANOPELIBS=@ANOPELIBS@
-CFLAGS=@CFLAGS@
+CFLAGS=@CFLAGS@ -Wall -pedantic -Wshadow
 STRICT=-Wall -ansi -pedantic
 PROFILE=-pg
 LDPROFILE=

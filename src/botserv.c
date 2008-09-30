@@ -464,7 +464,7 @@ void load_bs_dbase(void)
             fatal("Invalid format in %s %d", BotDBName, c);
 
         SAFE(read_string(&s, f));
-        bi = makebot(s);
+        bi = new BotInfo(s);
         free(s);
         SAFE(read_string(&bi->user, f));
         SAFE(read_string(&bi->host, f));
@@ -585,32 +585,6 @@ void insert_bot(BotInfo * bi)
 }
 
 /*************************************************************************/
-
-BotInfo *makebot(char *nick)
-{
-    BotInfo *bi;
-
-    if (!nick) {
-        if (debug) {
-            alog("debug: makebot called with NULL values");
-        }
-        return NULL;
-    }
-
-    bi = (BotInfo *)scalloc(sizeof(BotInfo), 1);
-    bi->nick = sstrdup(nick);
-    bi->lastmsg = time(NULL);
-    insert_bot(bi);
-    nbots++;
-    return bi;
-}
-
-/*************************************************************************/
-
-
-/*************************************************************************/
-
-
 /*************************************************************************/
 
 BotInfo *findbot(const char *nick)
@@ -804,23 +778,6 @@ void bot_join(ChannelInfo * ci)
     anope_cmd_join(ci->bi->nick, ci->c->name, ci->c->creation_time);
     anope_cmd_bot_chan_mode(ci->bi->nick, ci->c->name);
     send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
-}
-
-/*************************************************************************/
-
-/* This makes the bot rejoin all channel he is on when he gets killed
- * or changed.
- */
-
-void bot_rejoin_all(BotInfo * bi)
-{
-    int i;
-    ChannelInfo *ci;
-
-    for (i = 0; i < 256; i++)
-        for (ci = chanlists[i]; ci; ci = ci->next)
-            if (ci->bi == bi && ci->c && (ci->c->usercount >= BSMinUsers))
-                bot_join(ci);
 }
 
 /*************************************************************************/

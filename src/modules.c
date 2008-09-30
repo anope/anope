@@ -256,7 +256,7 @@ void modules_delayed_init(void)
  * And if that isn't enough discouragement, you'll wake up with your
  * both legs broken tomorrow ;) -GD
  */
-void modules_unload_all(boolean fini, boolean unload_proto)
+void modules_unload_all(bool fini, bool unload_proto)
 {
 #ifdef USE_MODULES
 	int idx;
@@ -308,7 +308,7 @@ Module *createModule(char *filename)
     if (!filename) {
         return NULL;
     }
-    if ((m = malloc(sizeof(Module))) == NULL) {
+    if ((m = (Module *)malloc(sizeof(Module))) == NULL) {
         fatal("Out of memory!");
     }
 
@@ -389,7 +389,7 @@ int addModule(Module * m)
         lastHash = current;
     }
 
-    if ((newHash = malloc(sizeof(ModuleHash))) == NULL) {
+    if ((newHash = (ModuleHash *)malloc(sizeof(ModuleHash))) == NULL) {
         fatal("Out of memory");
     }
     m->time = time(NULL);
@@ -912,7 +912,7 @@ Command *createCommand(const char *name, int (*func) (User * u),
         return NULL;
     }
 
-    if ((c = malloc(sizeof(Command))) == NULL) {
+    if ((c = (Command *)malloc(sizeof(Command))) == NULL) {
         fatal("Out of memory!");
     }
     c->name = sstrdup(name);
@@ -1271,7 +1271,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
         lastHash = current;
     }
 
-    if ((newHash = malloc(sizeof(CommandHash))) == NULL) {
+    if ((newHash = (CommandHash *)malloc(sizeof(CommandHash))) == NULL) {
         fatal("Out of memory");
     }
     newHash->next = NULL;
@@ -1397,7 +1397,7 @@ Message *createMessage(const char *name,
     if (!name || !func) {
         return NULL;
     }
-    if ((m = malloc(sizeof(Message))) == NULL) {
+    if ((m = (Message *)malloc(sizeof(Message))) == NULL) {
         fatal("Out of memory!");
     }
     m->name = sstrdup(name);
@@ -1497,7 +1497,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
         lastHash = current;
     }
 
-    if ((newHash = malloc(sizeof(MessageHash))) == NULL) {
+    if ((newHash = (MessageHash *)malloc(sizeof(MessageHash))) == NULL) {
         fatal("Out of memory");
     }
     newHash->next = NULL;
@@ -1717,50 +1717,50 @@ int moduleAddCallback(char *name, time_t when,
                       int (*func) (int argc, char *argv[]), int argc,
                       char **argv)
 {
-    ModuleCallBack *new, *tmp, *prev;
+    ModuleCallBack *newcb, *tmp, *prev;
     int i;
-    new = malloc(sizeof(ModuleCallBack));
-    if (!new)
+    newcb = (ModuleCallBack *)malloc(sizeof(ModuleCallBack));
+    if (!newcb)
         return MOD_ERR_MEMORY;
 
     if (name)
-        new->name = sstrdup(name);
+        newcb->name = sstrdup(name);
     else
-        new->name = NULL;
-    new->when = when;
+        newcb->name = NULL;
+    newcb->when = when;
     if (mod_current_module_name) {
-        new->owner_name = sstrdup(mod_current_module_name);
+        newcb->owner_name = sstrdup(mod_current_module_name);
     } else {
-        new->owner_name = NULL;
+        newcb->owner_name = NULL;
     }
-    new->func = func;
-    new->argc = argc;
-    new->argv = malloc(sizeof(char *) * argc);
+    newcb->func = func;
+    newcb->argc = argc;
+    newcb->argv = (char **)malloc(sizeof(char *) * argc);
     for (i = 0; i < argc; i++) {
-        new->argv[i] = sstrdup(argv[i]);
+        newcb->argv[i] = sstrdup(argv[i]);
     }
-    new->next = NULL;
+    newcb->next = NULL;
 
     if (moduleCallBackHead == NULL) {
-        moduleCallBackHead = new;
+        moduleCallBackHead = newcb;
     } else {                    /* find place in list */
         tmp = moduleCallBackHead;
         prev = tmp;
-        if (new->when < tmp->when) {
-            new->next = tmp;
-            moduleCallBackHead = new;
+        if (newcb->when < tmp->when) {
+            newcb->next = tmp;
+            moduleCallBackHead = newcb;
         } else {
-            while (tmp && new->when >= tmp->when) {
+            while (tmp && newcb->when >= tmp->when) {
                 prev = tmp;
                 tmp = tmp->next;
             }
-            prev->next = new;
-            new->next = tmp;
+            prev->next = newcb;
+            newcb->next = tmp;
         }
     }
     if (debug)
         alog("debug: added module CallBack: [%s] due to execute at %ld",
-             new->name ? new->name : "?", (long int) new->when);
+             newcb->name ? newcb->name : "?", (long int) newcb->when);
     return MOD_ERR_OK;
 }
 
@@ -1817,7 +1817,7 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
  * @param found have we found it?
  * @return a pointer to the ModuleCallBack struct or NULL - dont forget to check the found paramter!
  **/
-ModuleCallBack *moduleCallBackFindEntry(char *mod_name, boolean * found)
+ModuleCallBack *moduleCallBackFindEntry(char *mod_name, bool * found)
 {
     ModuleCallBack *prev = NULL, *current = NULL;
     *found = false;
@@ -1886,7 +1886,7 @@ void moduleDelCallback(char *name)
  **/
 void moduleCallBackPrepForUnload(char *mod_name)
 {
-    boolean found = false;
+    bool found = false;
     ModuleCallBack *tmp = NULL;
 
     tmp = moduleCallBackFindEntry(mod_name, &found);
@@ -2158,7 +2158,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
 
     moduleDelData(md, key);     /* Remove any existing module data for this module with the same key */
 
-    newData = malloc(sizeof(ModuleData));
+    newData = (ModuleData *)malloc(sizeof(ModuleData));
     if (!newData) {
         return MOD_ERR_MEMORY;
     }
@@ -2302,7 +2302,7 @@ void moduleDelAllData(ModuleData ** md)
  **/
 void moduleDelAllDataMod(Module * m)
 {
-    boolean freeme = false;
+    bool freeme = false;
     int i, j;
     User *user;
     NickAlias *na;
@@ -2381,9 +2381,9 @@ void moduleCleanStruct(ModuleData ** moduleData)
  * @param build The build revision of anope from SVN
  * @return True if the version newer than the version specified.
  **/
-boolean moduleMinVersion(int major, int minor, int patch, int build)
+bool moduleMinVersion(int major, int minor, int patch, int build)
 {
-    boolean ret = false;
+    bool ret = false;
     if (VERSION_MAJOR > major) {        /* Def. new */
         ret = true;
     } else if (VERSION_MAJOR == major) {        /* Might be newer */
@@ -2580,7 +2580,7 @@ void moduleInsertLanguage(int langNumber, int ac, char **av)
 
     mod_current_module->lang[langNumber].argc = ac;
     mod_current_module->lang[langNumber].argv =
-        malloc(sizeof(char *) * ac);
+        (char **)malloc(sizeof(char *) * ac);
     for (i = 0; i < ac; i++) {
         mod_current_module->lang[langNumber].argv[i] = sstrdup(av[i]);
     }
@@ -2698,7 +2698,7 @@ void queueModuleOperation(Module *m, ModuleOperation op, User *u)
 {
 	ModuleQueue *qm;
 	
-	qm = scalloc(1, sizeof(ModuleQueue));
+	qm = (ModuleQueue *)scalloc(1, sizeof(ModuleQueue));
 	qm->m = m;
 	qm->op = op;
 	qm->u = u;

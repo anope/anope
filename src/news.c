@@ -91,13 +91,13 @@ struct newsmsgs msgarray[] = {
      }
 };
 
-static int *findmsgs(int16 type, char **typename)
+static int *findmsgs(int16 type, char **type_name)
 {
     int i;
     for (i = 0; i < lenof(msgarray); i++) {
         if (msgarray[i].type == type) {
-            if (typename)
-                *typename = msgarray[i].name;
+            if (type_name)
+                *type_name = msgarray[i].name;
             return msgarray[i].msgs;
         }
     }
@@ -114,12 +114,12 @@ static void do_news_list(User * u, int16 type, int *msgs);
 
 /* Add news items. */
 static void do_news_add(User * u, int16 type, int *msgs,
-                        const char *typename);
+                        const char *type_name);
 static int add_newsitem(User * u, const char *text, int16 type);
 
 /* Delete news items. */
 static void do_news_del(User * u, int16 type, int *msgs,
-                        const char *typename);
+                        const char *type_name);
 static int del_newsitem(int num, int16 type);
 
 /*************************************************************************/
@@ -172,7 +172,7 @@ void load_news()
             news_size = 32767;
         else
             news_size = 2 * nnews;
-        news = scalloc(sizeof(*news) * news_size, 1);
+        news = (NewsItem *)scalloc(sizeof(*news) * news_size, 1);
         if (!nnews) {
             close_db(f);
             return;
@@ -362,10 +362,10 @@ void do_news(User * u, short type)
 {
     int is_servadmin = is_services_admin(u);
     char *cmd = strtok(NULL, " ");
-    char *typename;
+    char *type_name;
     int *msgs;
 
-    msgs = findmsgs(type, &typename);
+    msgs = findmsgs(type, &type_name);
     if (!msgs) {
         alog("news: Invalid type to do_news()");
         return;
@@ -378,19 +378,19 @@ void do_news(User * u, short type)
         do_news_list(u, type, msgs);
     } else if (stricmp(cmd, "ADD") == 0) {
         if (is_servadmin)
-            do_news_add(u, type, msgs, typename);
+            do_news_add(u, type, msgs, type_name);
         else
             notice_lang(s_OperServ, u, PERMISSION_DENIED);
 
     } else if (stricmp(cmd, "DEL") == 0) {
         if (is_servadmin)
-            do_news_del(u, type, msgs, typename);
+            do_news_del(u, type, msgs, type_name);
         else
             notice_lang(s_OperServ, u, PERMISSION_DENIED);
 
     } else {
         char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", typename);
+        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
         syntax_error(s_OperServ, u, buf, msgs[MSG_SYNTAX]);
     }
 }
@@ -431,14 +431,14 @@ static void do_news_list(User * u, int16 type, int *msgs)
 /* Handle a {LOGON,OPER}NEWS ADD command. */
 
 static void do_news_add(User * u, int16 type, int *msgs,
-                        const char *typename)
+                        const char *type_name)
 {
     char *text = strtok(NULL, "");
 	int n;
 
     if (!text) {
         char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", typename);
+        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
         syntax_error(s_OperServ, u, buf, msgs[MSG_ADD_SYNTAX]);
     } else {
         if (readonly) {
@@ -470,7 +470,7 @@ static int add_newsitem(User * u, const char *text, short type)
             news_size = 8;
         else
             news_size *= 2;
-        news = srealloc(news, sizeof(*news) * news_size);
+        news = (NewsItem *)srealloc(news, sizeof(*news) * news_size);
     }
     num = 0;
     for (i = nnews - 1; i >= 0; i--) {
@@ -493,14 +493,14 @@ static int add_newsitem(User * u, const char *text, short type)
 /* Handle a {LOGON,OPER}NEWS DEL command. */
 
 static void do_news_del(User * u, int16 type, int *msgs,
-                        const char *typename)
+                        const char *type_name)
 {
     char *text = strtok(NULL, " ");
     int i, num;
 
     if (!text) {
         char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", typename);
+        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
         syntax_error(s_OperServ, u, buf, msgs[MSG_DEL_SYNTAX]);
     } else {
         if (readonly) {

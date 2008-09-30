@@ -1222,7 +1222,7 @@ char **buildStringList(char *src, int *number)
         do {
             if (s) {
                 i++;
-                list = realloc(list, sizeof(char *) * i);
+                list = (char **)realloc(list, sizeof(char *) * i);
                 list[i - 1] = sstrdup(s);
             }
         } while ((s = strtok(NULL, " ")));

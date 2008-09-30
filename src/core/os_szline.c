@@ -236,7 +236,7 @@ int do_szline(User * u)
                 amask = ((SXLine *) szlines.list[i])->mask;
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    szline_list(i + 1, szlines.list[i], u, &sent_header);
+                    szline_list(i + 1, (SXLine *)szlines.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -270,7 +270,7 @@ int do_szline(User * u)
                 amask = ((SXLine *) szlines.list[i])->mask;
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    szline_view(i + 1, szlines.list[i], u, &sent_header);
+                    szline_view(i + 1, (SXLine *)szlines.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -317,7 +317,7 @@ int szline_view_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return szline_view(number, item, u, sent_header);
+    return szline_view(number, (SXLine *)item, u, sent_header);
 }
 
 /* Callback for enumeration purposes */
@@ -328,7 +328,7 @@ int szline_list_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return szline_list(number, item, u, sent_header);
+    return szline_list(number, (SXLine *)item, u, sent_header);
 }
 
 /* Lists an SZLINE entry, prefixing it with the header if needed */

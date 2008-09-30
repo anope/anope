@@ -767,13 +767,10 @@ void InspIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char 
 	send_cmd(nick, "OPERTYPE Bot");
 }
 
-void inspircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void InspIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
-    if (buf) {
-        send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-    } else {
-        send_cmd(source, "KICK %s %s :%s", chan, user, user);
-    }
+	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
+	else send_cmd(source, "KICK %s %s :%s", chan, user, user);
 }
 
 void inspircd_cmd_notice_ops(const char *source, const char *dest, const char *buf)
@@ -1778,7 +1775,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_kick(inspircd_cmd_kick);
     pmodule_cmd_notice_ops(inspircd_cmd_notice_ops);
     pmodule_cmd_notice(inspircd_cmd_notice);
     pmodule_cmd_notice2(inspircd_cmd_notice2);

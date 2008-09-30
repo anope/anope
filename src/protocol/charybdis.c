@@ -1354,22 +1354,12 @@ void CharybdisProto::cmd_nick(const char *nick, const char *name, const char *mo
 	charybdis_cmd_sqline(nick, "Reserved for services");
 }
 
-void charybdis_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void CharybdisProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
-    Uid *ud;
-    User *u;
-
-    ud = find_uid(source);
-    u = finduser(user);
-
-    if (buf) {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source),
-                 "KICK %s %s :%s", chan,
-                 (UseTS6 ? (u ? u->uid : user) : user), buf);
-    } else {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "KICK %s %s",
-                 chan, (UseTS6 ? (u ? u->uid : user) : user));
-    }
+	Uid *ud = find_uid(source);
+	User *u = finduser(user);
+	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
+	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
 void charybdis_cmd_notice_ops(const char *source, const char *dest, const char *buf)
@@ -1790,7 +1780,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
-    pmodule_cmd_kick(charybdis_cmd_kick);
     pmodule_cmd_notice_ops(charybdis_cmd_notice_ops);
     pmodule_cmd_notice(charybdis_cmd_notice);
     pmodule_cmd_notice2(charybdis_cmd_notice2);

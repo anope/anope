@@ -1207,13 +1207,10 @@ void BahamutIRCdProto::cmd_nick(const char *nick, const char *name, const char *
 	bahamut_cmd_sqline(nick, "Reserved for services");
 }
 
-void bahamut_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void BahamutIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
-    if (buf) {
-        send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-    } else {
-        send_cmd(source, "KICK %s %s", chan, user);
-    }
+	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
+	else send_cmd(source, "KICK %s %s", chan, user);
 }
 
 void bahamut_cmd_372(const char *source, const char *msg)
@@ -1530,7 +1527,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_kick(bahamut_cmd_kick);
     pmodule_cmd_notice_ops(bahamut_cmd_notice_ops);
     pmodule_cmd_notice(bahamut_cmd_notice);
     pmodule_cmd_notice2(bahamut_cmd_notice2);

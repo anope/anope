@@ -819,16 +819,10 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void ratbox_cmd_akill(const char *user, const char *host, const char *who, time_t when,
-                      time_t expires, const char *reason)
+void RatboxProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "KLINE * %ld %s %s :%s",
-             (long int) (expires - (long) time(NULL)), user, host, reason);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
 void ratbox_cmd_svskill(const char *source, const char *user, const char *buf)
@@ -1719,7 +1713,6 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_akill(ratbox_cmd_akill);
     pmodule_cmd_svskill(ratbox_cmd_svskill);
     pmodule_cmd_svsmode(ratbox_cmd_svsmode);
     pmodule_cmd_372(ratbox_cmd_372);

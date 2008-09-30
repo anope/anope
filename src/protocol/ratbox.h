@@ -46,7 +46,6 @@
 
 
 void ratbox_set_umode(User * user, int ac, const char **av);
-void ratbox_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
 void ratbox_cmd_svskill(const char *source, const char *user, const char *buf);
 void ratbox_cmd_svsmode(User * u, int ac, const char **av);
 void ratbox_cmd_372(const char *source, const char *msg);
@@ -114,4 +113,5 @@ class RatboxProto : public IRCDProtoNew {
 	public:
 		void cmd_remove_akill(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
+		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
 } ircd_proto;

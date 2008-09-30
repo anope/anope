@@ -543,12 +543,12 @@ void InspIRCdProto::cmd_vhost_off(User *u)
 	send_cmd(s_HostServ, "MODE %s -x", u->nick);
 }
 
-void
-inspircd_cmd_akill(const char *user, const char *host, const char *who, time_t when,
-                   time_t expires, const char *reason)
+void InspIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-    send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who,
-             (long int) when, (long int) 86400 * 2, reason);
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = expires - time(NULL);
+	if (timeleft > 172800) timeleft = 172800;
+	send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
 }
 
 void inspircd_cmd_svskill(const char *source, const char *user, const char *buf)
@@ -1786,7 +1786,6 @@ void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_akill(inspircd_cmd_akill);
     pmodule_cmd_svskill(inspircd_cmd_svskill);
     pmodule_cmd_svsmode(inspircd_cmd_svsmode);
     pmodule_cmd_372(inspircd_cmd_372);

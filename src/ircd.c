@@ -46,7 +46,6 @@ void initIrcdProto()
 {
     ircdproto.ircd_set_mod_current_buffer = NULL;
     ircdproto.ircd_set_umode = NULL;
-    ircdproto.ircd_cmd_akill = NULL;
     ircdproto.ircd_cmd_svskill = NULL;
     ircdproto.ircd_cmd_svsmode = NULL;
     ircdproto.ircd_cmd_372 = NULL;
@@ -151,10 +150,9 @@ void anope_cmd_vhost_off(User *u)
 	ircdprotonew->cmd_vhost_off(u);
 }
 
-void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when,
-                     time_t expires, const char *reason)
+void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-    ircdproto.ircd_cmd_akill(user, host, who, when, expires, reason);
+	ircdprotonew->cmd_akill(user, host, who, when, expires, reason);
 }
 
 void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ...)
@@ -685,13 +683,6 @@ void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av))
 {
     ircdproto.ircd_set_mod_current_buffer = func;
-}
-
-void pmodule_cmd_akill(void (*func)
-                        (const char *user, const char *host, const char *who, time_t when,
-                         time_t expires, const char *reason))
-{
-    ircdproto.ircd_cmd_akill = func;
 }
 
 void

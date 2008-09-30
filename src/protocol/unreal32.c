@@ -529,12 +529,12 @@ void UnrealIRCdProto::cmd_vhost_off(User *u)
 	notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
 }
 
-void unreal_cmd_akill(const char *user, const char *host, const char *who, time_t when,
-                      time_t expires, const char *reason)
+void UnrealIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-    send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"),
-             user, host, who, (long int) time(NULL) + 86400 * 2,
-             (long int) when, reason);
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = expires - time(NULL);
+	if (timeleft > 172800) timeleft = 172800;
+	send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"), user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
 }
 
 /*
@@ -2098,7 +2098,6 @@ void moduleAddIRCDMsgs(void) {
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_akill(unreal_cmd_akill);
     pmodule_cmd_svskill(unreal_cmd_svskill);
     pmodule_cmd_svsmode(unreal_cmd_svsmode);
     pmodule_cmd_372(unreal_cmd_372);

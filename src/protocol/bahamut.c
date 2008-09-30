@@ -798,11 +798,12 @@ void bahamut_cmd_burst()
  * parv[5]=time set
  * parv[6]=reason
  */
-void bahamut_cmd_akill(const char *user, const char *host, const char *who, time_t when,
-                       time_t expires, const char *reason)
+void BahamutIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-    send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
-             (long int) time(NULL), reason);
+	// Calculate the time left before this would expire, capping it at 2 days
+	time_t timeleft = expires - time(NULL);
+	if (timeleft > 172800) timeleft = 172800;
+	send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, timeleft, who, static_cast<long>(time(NULL)), reason);
 }
 
 /* SVSKILL */
@@ -1547,7 +1548,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_akill(bahamut_cmd_akill);
     pmodule_cmd_svskill(bahamut_cmd_svskill);
     pmodule_cmd_svsmode(bahamut_cmd_svsmode);
     pmodule_cmd_372(bahamut_cmd_372);

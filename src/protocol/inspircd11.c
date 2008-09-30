@@ -1487,11 +1487,9 @@ void InspIRCdProto::cmd_nc_change(User *u)
 }
 
 /* SVSMODE +r */
-void inspircd_cmd_svid_umode2(User * u, const char *ts)
+void InspIRCdProto::cmd_svid_umode2(User *u, const char *ts)
 {
-    if (debug)
-        alog("debug: common_svsmode(2)");
-    common_svsmode(u, "+r", NULL);
+	common_svsmode(u, "+r", NULL);
 }
 
 void inspircd_cmd_svid_umode3(User * u, const char *ts)
@@ -1611,7 +1609,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_svid_umode2(inspircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(inspircd_cmd_svid_umode3);
     pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
     pmodule_cmd_svspart(inspircd_cmd_svspart);

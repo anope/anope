@@ -1193,13 +1193,6 @@ void BahamutIRCdProto::cmd_nc_change(User *u)
 	common_svsmode(u, "+d", "1");
 }
 
-/* SVSMODE +d */
-void bahamut_cmd_svid_umode2(User * u, const char *ts)
-{
-    /* not used by bahamut ircds */
-}
-
-
 void bahamut_cmd_svid_umode3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
@@ -1391,7 +1384,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svid_umode2(bahamut_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(bahamut_cmd_svid_umode3);
     pmodule_cmd_svsjoin(bahamut_cmd_svsjoin);
     pmodule_cmd_svspart(bahamut_cmd_svspart);

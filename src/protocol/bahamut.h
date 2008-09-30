@@ -76,7 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-void bahamut_cmd_svid_umode2(User * u, const char *ts);
 void bahamut_cmd_svid_umode3(User * u, const char *ts);
 void bahamut_cmd_eob();
 int bahamut_flood_mode_check(const char *value);

@@ -1321,12 +1321,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* SVSMODE +d */
-void ratbox_cmd_svid_umode2(User * u, const char *ts)
-{
-    /* not supported */
-}
-
 void ratbox_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
@@ -1506,7 +1500,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_svid_umode2(ratbox_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(ratbox_cmd_svid_umode3);
     pmodule_cmd_svsjoin(ratbox_cmd_svsjoin);
     pmodule_cmd_svspart(ratbox_cmd_svspart);

@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_svid_umode2(void (*func) (User * u, const char *ts));
 E void pmodule_cmd_svid_umode3(void (*func) (User * u, const char *ts));
 E void pmodule_cmd_ctcp(void (*func) (const char *source, const char *dest, const char *buf));
 E void pmodule_cmd_svsjoin(void (*func) (const char *source, const char *nick, const char *chan, const char *param));

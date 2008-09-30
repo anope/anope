@@ -1415,12 +1415,6 @@ void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_
 	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
 }
 
-/* SVSMODE +d */
-void charybdis_cmd_svid_umode2(User * u, const char *ts)
-{
-    /* not supported */
-}
-
 void charybdis_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
@@ -1628,7 +1622,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svid_umode2(charybdis_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(charybdis_cmd_svid_umode3);
     pmodule_cmd_svsjoin(charybdis_cmd_svsjoin);
     pmodule_cmd_svspart(charybdis_cmd_svspart);

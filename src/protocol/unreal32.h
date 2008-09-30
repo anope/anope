@@ -98,7 +98,6 @@ void unreal_cmd_318(const char *source, const char *who);
 void unreal_cmd_242(const char *buf);
 void unreal_cmd_243(const char *buf);
 void unreal_cmd_211(const char *buf);
-void unreal_cmd_svid_umode2(User * u, const char *ts);
 void unreal_cmd_svid_umode3(User * u, const char *ts);
 void unreal_cmd_eob();
 int unreal_flood_mode_check(const char *value);
@@ -139,4 +138,5 @@ class UnrealIRCdProto : public IRCDProtoNew {
 		void cmd_svsmode_chan(const char *, const char *, const char *);
 		void cmd_svid_umode(const char *, time_t);
 		void cmd_nc_change(User *);
+		void cmd_svid_umode2(User *, const char *);
 } ircd_proto;

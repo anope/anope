@@ -707,18 +707,16 @@ void backup_databases(void)
         curday = tm.tm_yday;
         strftime(ext, sizeof(ext), "%Y%m%d", &tm);
 
-        if (!skeleton) {
-            rename_database(NickDBName, ext);
-            if (s_BotServ) {
-                rename_database(BotDBName, ext);
-            }
-            rename_database(ChanDBName, ext);
-            if (s_HostServ) {
-                rename_database(HostDBName, ext);
-            }
-            if (NSEmailReg) {
-                rename_database(PreNickDBName, ext);
-            }
+        rename_database(NickDBName, ext);
+        if (s_BotServ) {
+            rename_database(BotDBName, ext);
+        }
+        rename_database(ChanDBName, ext);
+        if (s_HostServ) {
+            rename_database(HostDBName, ext);
+        }
+        if (NSEmailReg) {
+            rename_database(PreNickDBName, ext);
         }
 
         rename_database(OperDBName, ext);

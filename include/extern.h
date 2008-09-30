@@ -763,7 +763,6 @@ E char *log_filename;
 E int   debug;
 E int   readonly;
 E int   logchan;
-E int   skeleton;
 E int   nofork;
 E int   forceload;
 E int   nothird;

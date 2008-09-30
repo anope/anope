@@ -318,10 +318,6 @@ static int parse_options(int ac, char **av)
                 debug++;
             } else if (strcmp(s, "readonly") == 0) {
                 readonly = 1;
-                skeleton = 0;
-            } else if (strcmp(s, "skeleton") == 0) {
-                readonly = 0;
-                skeleton = 1;
             } else if (strcmp(s, "nofork") == 0) {
                 nofork = 1;
             } else if (strcmp(s, "logchan") == 0) {
@@ -364,7 +360,6 @@ static int parse_options(int ac, char **av)
                 fprintf(stdout, "-debug         -debug\n");
                 fprintf(stdout, "-nofork        -nofork\n");
                 fprintf(stdout, "-logchan       -logchan channelname\n");
-                fprintf(stdout, "-skeleton      -skeleton\n");
                 fprintf(stdout, "-forceload     -forceload\n");
                 fprintf(stdout, "-nothird       -nothird\n");
                 fprintf(stdout, "-support       -support\n");
@@ -540,11 +535,10 @@ int init_secondary(int ac, char **av)
     write_pidfile();
 
     /* Announce ourselves to the logfile. */
-    if (debug || readonly || skeleton) {
-        alog("Anope %s (ircd protocol: %s) starting up (options:%s%s%s)",
+    if (debug || readonly) {
+        alog("Anope %s (ircd protocol: %s) starting up (options:%s%s)",
              version_number, version_protocol,
-             debug ? " debug" : "", readonly ? " readonly" : "",
-             skeleton ? " skeleton" : "");
+             debug ? " debug" : "", readonly ? " readonly" : "");
     } else {
         alog("Anope %s (ircd protocol: %s) starting up",
              version_number, version_protocol);
@@ -652,32 +646,30 @@ int init_secondary(int ac, char **av)
     /* Need a better way to handle this -dane */
     if (!UseRDB) {
 #endif
-        if (!skeleton) {
-            load_ns_dbase();
+        load_ns_dbase();
+        if (debug)
+            alog("debug: Loaded %s database (1/%d)", s_NickServ,
+                 (PreNickDBName ? 8 : 7));
+        if (s_HostServ) {
+            load_hs_dbase();
             if (debug)
-                alog("debug: Loaded %s database (1/%d)", s_NickServ,
+                alog("debug: Loaded %s database (2/%d)", s_HostServ,
                      (PreNickDBName ? 8 : 7));
-            if (s_HostServ) {
-                load_hs_dbase();
-                if (debug)
-                    alog("debug: Loaded %s database (2/%d)", s_HostServ,
-                         (PreNickDBName ? 8 : 7));
-            } else if (debug) {
-                alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
-            }
-            if (s_BotServ) {
-                load_bs_dbase();
-                if (debug)
-                    alog("debug: Loaded %s database (3/%d)", s_BotServ,
-                         (PreNickDBName ? 8 : 7));
-            } else if (debug) {
-                alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
-            }
-            load_cs_dbase();
-            if (debug)
-                alog("debug: Loaded %s database (4/%d)", s_ChanServ,
-                     (PreNickDBName ? 8 : 7));
+        } else if (debug) {
+            alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
         }
+        if (s_BotServ) {
+            load_bs_dbase();
+            if (debug)
+                alog("debug: Loaded %s database (3/%d)", s_BotServ,
+                     (PreNickDBName ? 8 : 7));
+        } else if (debug) {
+            alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
+        }
+        load_cs_dbase();
+        if (debug)
+            alog("debug: Loaded %s database (4/%d)", s_ChanServ,
+                 (PreNickDBName ? 8 : 7));
         load_os_dbase();
         if (debug)
             alog("debug: Loaded %s database (5/%d)", s_OperServ,

@@ -39,7 +39,6 @@ char *log_filename = LOG_FILENAME;      /* -log filename */
 int debug = 0;                  /* -debug */
 int readonly = 0;               /* -readonly */
 int logchan = 0;                /* -logchan */
-int skeleton = 0;               /* -skeleton */
 int nofork = 0;                 /* -nofork */
 int forceload = 0;              /* -forceload */
 int nothird = 0;                /* -nothrid */
@@ -107,14 +106,12 @@ extern void expire_all(void)
     waiting = -3;
     if (debug)
         alog("debug: Running expire routines");
-    if (!skeleton) {
-        waiting = -21;
-        expire_nicks();
-        waiting = -22;
-        expire_chans();
-        waiting = -23;
-        expire_requests();
-    }
+    waiting = -21;
+    expire_nicks();
+    waiting = -22;
+    expire_chans();
+    waiting = -23;
+    expire_requests();
     waiting = -25;
     expire_akills();
     if (ircd->sgline) {
@@ -146,23 +143,21 @@ void save_databases(void)
         alog("debug: Saving FFF databases");
     waiting = -10;
     backup_databases();
-    if (!skeleton) {
-        waiting = -11;
-        save_ns_dbase();
-        waiting = -12;
-        if (PreNickDBName) {
-            save_ns_req_dbase();
-            waiting = -13;
-        }
-        save_cs_dbase();
-        if (s_BotServ) {
-            waiting = -14;
-            save_bs_dbase();
-        }
-        if (s_HostServ) {
-            waiting = -15;
-            save_hs_dbase();
-        }
+    waiting = -11;
+    save_ns_dbase();
+    waiting = -12;
+    if (PreNickDBName) {
+        save_ns_req_dbase();
+        waiting = -13;
+    }
+    save_cs_dbase();
+    if (s_BotServ) {
+        waiting = -14;
+        save_bs_dbase();
+    }
+    if (s_HostServ) {
+        waiting = -15;
+        save_hs_dbase();
     }
     waiting = -16;
     save_os_dbase();
@@ -176,56 +171,53 @@ void save_databases(void)
         if (debug)
             alog("debug: Saving RDB databases");
         waiting = -10;
-        if (!skeleton) {
-            waiting = -11;
-            save_ns_rdb_dbase();
-            /* We send these PONG's when we're not syncing to avoid timeouts.
-             * If we send them during the sync, we fuck something up there and
-             * break the syncing process, resulting in lost (literally lost)
-             * data. -GD
-             * This used is_sync(serv_uplink) to check for sync states. There's
-             * only a minor error with this: serv_uplink doesn't exist during
-             * the first save. So now we check for serv_uplink only; if it
-             * exists we're safe. -GD
-             */
+        waiting = -11;
+        save_ns_rdb_dbase();
+        /* We send these PONG's when we're not syncing to avoid timeouts.
+         * If we send them during the sync, we fuck something up there and
+         * break the syncing process, resulting in lost (literally lost)
+         * data. -GD
+         * This used is_sync(serv_uplink) to check for sync states. There's
+         * only a minor error with this: serv_uplink doesn't exist during
+         * the first save. So now we check for serv_uplink only; if it
+         * exists we're safe. -GD
+         */
+        if (serv_uplink)
+            anope_cmd_pong(ServerName, ServerName);
+        waiting = -12;
+        save_cs_rdb_dbase();
+        if (serv_uplink)
+            anope_cmd_pong(ServerName, ServerName);
+        if (PreNickDBName) {
+            save_ns_req_rdb_dbase();
             if (serv_uplink)
                 anope_cmd_pong(ServerName, ServerName);
-            waiting = -12;
-            save_cs_rdb_dbase();
-            if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
-            if (PreNickDBName) {
-                save_ns_req_rdb_dbase();
-                if (serv_uplink)
-                    anope_cmd_pong(ServerName, ServerName);
-                waiting = -13;
-            }
-            if (s_BotServ) {
-                waiting = -14;
-                save_bs_rdb_dbase();
-                if (serv_uplink)
-                    anope_cmd_pong(ServerName, ServerName);
-            }
-            if (s_HostServ) {
-                waiting = -15;
-                save_hs_rdb_dbase();
-                if (serv_uplink)
-                    anope_cmd_pong(ServerName, ServerName);
-            }
-            waiting = -16;
-            save_os_rdb_dbase();
-            if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
-            waiting = -17;
-            save_rdb_news();
-            if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
-            waiting = -18;
-            save_rdb_exceptions();
-            if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
-
+            waiting = -13;
         }
+        if (s_BotServ) {
+            waiting = -14;
+            save_bs_rdb_dbase();
+            if (serv_uplink)
+                anope_cmd_pong(ServerName, ServerName);
+        }
+        if (s_HostServ) {
+            waiting = -15;
+            save_hs_rdb_dbase();
+            if (serv_uplink)
+                anope_cmd_pong(ServerName, ServerName);
+        }
+        waiting = -16;
+        save_os_rdb_dbase();
+        if (serv_uplink)
+            anope_cmd_pong(ServerName, ServerName);
+        waiting = -17;
+        save_rdb_news();
+        if (serv_uplink)
+            anope_cmd_pong(ServerName, ServerName);
+        waiting = -18;
+        save_rdb_exceptions();
+        if (serv_uplink)
+            anope_cmd_pong(ServerName, ServerName);
     }
 #endif
     waiting = -20;

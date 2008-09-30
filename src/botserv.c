@@ -93,8 +93,6 @@ void botserv(User * u, char *buf)
             s = "";
         }
         anope_cmd_ctcp(s_BotServ, u->nick, "PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_BotServ, u, SERVICE_OFFLINE, s_BotServ);
     } else {
         mod_run_cmd(s_BotServ, u, BOTSERV, cmd);
     }

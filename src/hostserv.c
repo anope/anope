@@ -70,8 +70,6 @@ void hostserv(User * u, char *buf)
             s = "";
         }
         anope_cmd_ctcp(s_HostServ, u->nick, "PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
     } else {
         if (ircd->vhost) {
             mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);

@@ -76,11 +76,6 @@ int do_admin(User * u)
     NickAlias *na;
     int res = 0;
 
-    if (skeleton) {
-        notice_lang(s_OperServ, u, OPER_ADMIN_SKELETON);
-        return MOD_CONT;
-    }
-
     if (!cmd || (!nick && stricmp(cmd, "LIST") && stricmp(cmd, "CLEAR"))) {
         syntax_error(s_OperServ, u, "ADMIN", OPER_ADMIN_SYNTAX);
     } else if (!stricmp(cmd, "ADD")) {

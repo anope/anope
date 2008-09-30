@@ -20,8 +20,7 @@
 
 int m_nickcoll(char *user)
 {
-    if (!skeleton && !readonly)
-        introduce_user(user);
+    introduce_user(user);
     return MOD_CONT;
 }
 
@@ -47,13 +46,10 @@ int m_kill(char *nick, char *msg)
     /* Recover if someone kills us. */
     /* use nickIsServices() to reduce the number of lines of code  - TSL */
     if (nickIsServices(nick, 0)) {
-        if (!readonly && !skeleton)
-            introduce_user(nick);
+        introduce_user(nick);
     } else if (s_BotServ && (bi = findbot(nick))) {
-        if (!readonly && !skeleton) {
-            introduce_user(nick);
-            bot_rejoin_all(bi);
-        }
+        introduce_user(nick);
+        bot_rejoin_all(bi);
     } else {
         do_kill(nick, msg);
     }

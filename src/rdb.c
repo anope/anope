@@ -455,20 +455,17 @@ int rdb_load_ns_req_dbase(void)
 
 int rdb_load_dbases(void)
 {
-    if (!skeleton) {
-        LOAD_DBASE(1, "NickServ", rdb_load_ns_dbase());
+    LOAD_DBASE(1, "NickServ", rdb_load_ns_dbase());
 
-        if (s_HostServ) {
-            LOAD_DBASE(2, "HostServ", rdb_load_hs_dbase());
-        }
-
-        if (s_BotServ) {
-            LOAD_DBASE(3, "BotServ", rdb_load_bs_dbase());
-        }
-
-        LOAD_DBASE(4, "ChanServ", rdb_load_cs_dbase());
+    if (s_HostServ) {
+        LOAD_DBASE(2, "HostServ", rdb_load_hs_dbase());
     }
 
+    if (s_BotServ) {
+        LOAD_DBASE(3, "BotServ", rdb_load_bs_dbase());
+    }
+
+    LOAD_DBASE(4, "ChanServ", rdb_load_cs_dbase());
     LOAD_DBASE(5, "OperServ", rdb_load_os_dbase());
     LOAD_DBASE(6, "News", rdb_load_news());
     LOAD_DBASE(7, "Exception", rdb_load_exceptions());

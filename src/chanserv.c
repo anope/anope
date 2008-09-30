@@ -396,8 +396,6 @@ void chanserv(User * u, char *buf)
             s = "";
         }
         anope_cmd_ctcp(s_ChanServ, u->nick, "PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_ChanServ, u, SERVICE_OFFLINE, s_ChanServ);
     } else {
         mod_run_cmd(s_ChanServ, u, CHANSERV, cmd);
     }

@@ -74,11 +74,6 @@ int do_oper(User * u)
     NickAlias *na;
     int res = 0;
 
-    if (skeleton) {
-        notice_lang(s_OperServ, u, OPER_OPER_SKELETON);
-        return MOD_CONT;
-    }
-
     if (!cmd || (!nick && stricmp(cmd, "LIST") && stricmp(cmd, "CLEAR"))) {
         syntax_error(s_OperServ, u, "OPER", OPER_OPER_SYNTAX);
     } else if (!stricmp(cmd, "ADD")) {

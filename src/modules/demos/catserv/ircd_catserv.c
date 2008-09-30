@@ -103,8 +103,6 @@ void catserv(User * u, char *buf)
         if (!(s = strtok(NULL, "")))
             s = "\1";
         notice(s_CatServ, u->nick, "\1PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_CatServ, u, SERVICE_OFFLINE, s_CatServ);
     } else {
         mod_run_cmd(s_CatServ, u, Catserv_cmdTable, cmd);
     }

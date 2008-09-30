@@ -578,9 +578,9 @@ void os_remove_nick(NickCore * nc)
 int is_services_root(User * u)
 {
     if ((NSStrictPrivileges && !is_oper(u))
-        || (!skeleton && !nick_identified(u)))
+        || (!nick_identified(u)))
         return 0;
-    if (skeleton || (u->na->nc->flags & NI_SERVICES_ROOT))
+    if ((u->na->nc->flags & NI_SERVICES_ROOT))
         return 1;
     return 0;
 }
@@ -592,10 +592,9 @@ int is_services_root(User * u)
 int is_services_admin(User * u)
 {
     if ((NSStrictPrivileges && !is_oper(u))
-        || (!skeleton && !nick_identified(u)))
+        || (!nick_identified(u)))
         return 0;
-    if (skeleton
-        || (u->na->nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT)))
+    if ((u->na->nc->flags & (NI_SERVICES_ADMIN | NI_SERVICES_ROOT)))
         return 1;
     return 0;
 }
@@ -607,10 +606,9 @@ int is_services_admin(User * u)
 int is_services_oper(User * u)
 {
     if ((NSStrictPrivileges && !is_oper(u))
-        || (!skeleton && !nick_identified(u)))
+        || (!nick_identified(u)))
         return 0;
-    if (skeleton
-        || (u->na->nc->
+    if ((u->na->nc->
             flags & (NI_SERVICES_OPER | NI_SERVICES_ADMIN |
                      NI_SERVICES_ROOT)))
         return 1;

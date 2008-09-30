@@ -64,8 +64,6 @@ void memoserv(User * u, char *buf)
             s = "";
         }
         anope_cmd_ctcp(s_MemoServ, u->nick, "PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_MemoServ, u, SERVICE_OFFLINE, s_MemoServ);
     } else {
         if (!u->na && stricmp(cmd, "HELP") != 0)
             notice_lang(s_MemoServ, u, NICK_NOT_REGISTERED_HELP,

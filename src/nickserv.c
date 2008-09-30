@@ -255,8 +255,6 @@ void nickserv(User * u, char *buf)
             s = "";
         }
         anope_cmd_ctcp(s_NickServ, u->nick, "PING %s", s);
-    } else if (skeleton) {
-        notice_lang(s_NickServ, u, SERVICE_OFFLINE, s_NickServ);
     } else {
         mod_run_cmd(s_NickServ, u, NICKSERV, cmd);
     }

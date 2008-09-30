@@ -56,7 +56,6 @@ void inspircd_cmd_372(const char *source, const char *msg);
 void inspircd_cmd_372_error(const char *source);
 void inspircd_cmd_375(const char *source);
 void inspircd_cmd_376(const char *source);
-void inspircd_cmd_serv_notice(const char *source, const char *dest, const char *msg);
 void inspircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
 void inspircd_cmd_bot_chan_mode(const char *nick, const char *chan);
 void inspircd_cmd_351(const char *source);

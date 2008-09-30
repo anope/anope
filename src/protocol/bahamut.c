@@ -1028,11 +1028,6 @@ void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, cons
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void bahamut_cmd_serv_notice(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "NOTICE $%s :%s", dest, msg);
-}
-
 void bahamut_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
@@ -1498,7 +1493,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_serv_notice(bahamut_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(bahamut_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(bahamut_cmd_bot_chan_mode);
     pmodule_cmd_351(bahamut_cmd_351);

@@ -781,11 +781,6 @@ void InspIRCdProto::cmd_notice_ops(const char *source, const char *dest, const c
 }
 
 
-void inspircd_cmd_serv_notice(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "NOTICE $%s :%s", dest, msg);
-}
-
 void inspircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
@@ -1746,7 +1741,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_serv_notice(inspircd_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(inspircd_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(inspircd_cmd_bot_chan_mode);
     pmodule_cmd_351(inspircd_cmd_351);

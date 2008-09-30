@@ -611,7 +611,6 @@ E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
 E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
 E void pmodule_cmd_376(void (*func) (const char *source));
-E void pmodule_cmd_serv_notice(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_serv_privmsg(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_bot_chan_mode(void (*func) (const char *nick, const char *chan));
 E void pmodule_cmd_351(void (*func) (const char *source));

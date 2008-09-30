@@ -1060,7 +1060,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_372_error)(const char *source);
     void (*ircd_cmd_375)(const char *source);
     void (*ircd_cmd_376)(const char *source);
-    void (*ircd_cmd_serv_notice)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_serv_privmsg)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_bot_chan_mode)(const char *nick, const char *chan);
     void (*ircd_cmd_351)(const char *source);
@@ -1319,6 +1318,10 @@ class IRCDProtoNew {
 		{
 			if (!buf || !dest) return;
 			send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+		}
+		virtual void cmd_serv_notice(const char *source, const char *dest, const char *msg)
+		{
+			send_cmd(source, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 };
 

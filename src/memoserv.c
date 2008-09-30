@@ -256,7 +256,7 @@ void memo_send(User * u, char *name, char *text, int z)
     } else {
         u->lastmemosend = now;
         mi->memocount++;
-        mi->memos = srealloc(mi->memos, sizeof(Memo) * mi->memocount);
+        mi->memos = (Memo *)srealloc(mi->memos, sizeof(Memo) * mi->memocount);
         m = &mi->memos[mi->memocount - 1];
         strscpy(m->sender, source, NICKMAX);
         m->moduleData = NULL;
@@ -293,7 +293,7 @@ void memo_send(User * u, char *name, char *text, int z)
                     int i;
 
                     for (i = 0; i < nc->aliases.count; i++) {
-                        na = nc->aliases.list[i];
+                        na = (NickAlias *)nc->aliases.list[i];
                         if (na->u && nick_identified(na->u))
                             notice_lang(s_MemoServ, na->u,
                                         MEMO_NEW_MEMO_ARRIVED, source,

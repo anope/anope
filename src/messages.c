@@ -281,10 +281,10 @@ int m_stats(char *source, int ac, char **av)
             for (i = 0; i < RootNumber; i++)
                 anope_cmd_243("%s O * * %s Root 0", source,
                               ServicesRoots[i]);
-            for (i = 0; i < servadmins.count && (nc = servadmins.list[i]);
+            for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]);
                  i++)
                 anope_cmd_243("%s O * * %s Admin 0", source, nc->display);
-            for (i = 0; i < servopers.count && (nc = servopers.list[i]);
+            for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]);
                  i++)
                 anope_cmd_243("%s O * * %s Oper 0", source, nc->display);
 

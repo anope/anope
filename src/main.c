@@ -354,8 +354,7 @@ void sighandler(int signum)
             save_databases();
 
             if (!read_config(1)) {
-                sprintf(quitmsg,
-                        "Error Reading Configuration File (Received SIGUSR2)");
+                quitmsg = "Error Reading Configuration File (Received SIGUSR2)";
                 quitting = 1;
             }
             send_event(EVENT_RELOAD, 1, EVENT_START);
@@ -480,15 +479,15 @@ void sighandler(int signum)
 #ifndef _WIN32
            signum == SIGUSR1 ||
 #endif
-           !(quitmsg = calloc(BUFSIZE, 1))) {
+           !(quitmsg = (const char *)calloc(BUFSIZE, 1))) {
         quitmsg = "Out of memory!";
     } else {
+
+	// Yes, this isn't the "nicest" of ideas, but we know it's safe, if bad practice. -- w00t
 #if HAVE_STRSIGNAL
-        snprintf(quitmsg, BUFSIZE, "Services terminating: %s",
-                 strsignal(signum));
+        snprintf((char *)quitmsg, BUFSIZE, "Services terminating: %s", strsignal(signum));
 #else
-        snprintf(quitmsg, BUFSIZE, "Services terminating on signal %d",
-                 signum);
+        snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
 #endif
     }
 
@@ -656,9 +655,10 @@ int main(int ac, char **av, char **envp)
             process();
         } else if (i == 0) {
             int errno_save = errno;
-            quitmsg = scalloc(BUFSIZE, 1);
+            quitmsg = (const char *)scalloc(BUFSIZE, 1);
             if (quitmsg) {
-                snprintf(quitmsg, BUFSIZE,
+		// Naughty, but oh well. :)
+                snprintf((char *)quitmsg, BUFSIZE,
                          "Read error from server: %s (error num: %d)",
                          strerror(errno_save), errno_save);
             } else {

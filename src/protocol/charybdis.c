@@ -1320,20 +1320,14 @@ void charybdis_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void charybdis_cmd_mode(const char *source, const char *dest, const char *buf)
+void CharybdisProto::cmd_mode(const char *source, const char *dest, const char *buf)
 {
-    Uid *ud;
-    if (!buf) {
-        return;
-    }
-
-    if (source) {
-        ud = find_uid(source);
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "MODE %s %s",
-                 dest, buf);
-    } else {
-        send_cmd(source, "MODE %s %s", dest, buf);
-    }
+	if (!buf) return;
+	if (source) {
+		Uid *ud = find_uid(source);
+		send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "MODE %s %s", dest, buf);
+	}
+	else send_cmd(source, "MODE %s %s", dest, buf);
 }
 
 void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
@@ -1802,7 +1796,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
-    pmodule_cmd_mode(charybdis_cmd_mode);
     pmodule_cmd_bot_nick(charybdis_cmd_bot_nick);
     pmodule_cmd_kick(charybdis_cmd_kick);
     pmodule_cmd_notice_ops(charybdis_cmd_notice_ops);

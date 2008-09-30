@@ -50,7 +50,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
-    ircdproto.ircd_cmd_mode = NULL;
     ircdproto.ircd_cmd_bot_nick = NULL;
     ircdproto.ircd_cmd_kick = NULL;
     ircdproto.ircd_cmd_notice_ops = NULL;
@@ -200,15 +199,14 @@ void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, 
 
 void anope_cmd_mode(const char *source, const char *dest, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_mode(source, dest, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_mode(source, dest, buf);
 }
 
 void anope_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -698,11 +696,6 @@ void pmodule_cmd_375(void (*func) (const char *source))
 void pmodule_cmd_376(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_376 = func;
-}
-
-void pmodule_cmd_mode(void (*func) (const char *source, const char *dest, const char *buf))
-{
-    ircdproto.ircd_cmd_mode = func;
 }
 
 void pmodule_cmd_bot_nick(void (*func)

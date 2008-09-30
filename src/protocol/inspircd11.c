@@ -615,15 +615,11 @@ void InspIRCdProto::cmd_guest_nick(const char *nick, const char *user, const cha
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 }
 
-void inspircd_cmd_mode(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
 {
-    Channel *c;
-    if (!buf) {
-        return;
-    }
-
-    c = findchan(dest);
-    send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, (unsigned int)((c) ? c->creation_time : time(NULL)), buf);
+	if (!buf) return;
+	Channel *c = findchan(dest);
+	send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 }
 
 int anope_event_version(const char *source, int ac, const char **av)
@@ -1785,7 +1781,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_mode(inspircd_cmd_mode);
     pmodule_cmd_bot_nick(inspircd_cmd_bot_nick);
     pmodule_cmd_kick(inspircd_cmd_kick);
     pmodule_cmd_notice_ops(inspircd_cmd_notice_ops);

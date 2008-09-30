@@ -1253,20 +1253,14 @@ void ratbox_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void ratbox_cmd_mode(const char *source, const char *dest, const char *buf)
+void RatboxProto::cmd_mode(const char *source, const char *dest, const char *buf)
 {
-    Uid *ud;
-    if (!buf) {
-        return;
-    }
-
-    if (source) {
-        ud = find_uid(source);
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "MODE %s %s",
-                 dest, buf);
-    } else {
-        send_cmd(source, "MODE %s %s", dest, buf);
-    }
+	if (!buf) return;
+	if (source) {
+		Uid *ud = find_uid(source);
+		send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "MODE %s %s", dest, buf);
+	}
+	else send_cmd(source, "MODE %s %s", dest, buf);
 }
 
 void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
@@ -1694,7 +1688,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_mode(ratbox_cmd_mode);
     pmodule_cmd_bot_nick(ratbox_cmd_bot_nick);
     pmodule_cmd_kick(ratbox_cmd_kick);
     pmodule_cmd_notice_ops(ratbox_cmd_notice_ops);

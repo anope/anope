@@ -602,13 +602,10 @@ void UnrealIRCdProto::cmd_guest_nick(const char *nick, const char *user, const c
 		myIrcd->nickip ? " *" : " ", real);
 }
 
-void unreal_cmd_mode(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
+	if (!buf) return;
+	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
 }
 
 void unreal_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
@@ -2086,7 +2083,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_mode(unreal_cmd_mode);
     pmodule_cmd_bot_nick(unreal_cmd_bot_nick);
     pmodule_cmd_kick(unreal_cmd_kick);
     pmodule_cmd_notice_ops(unreal_cmd_notice_ops);

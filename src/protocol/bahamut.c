@@ -471,21 +471,11 @@ CUMode myCumodes[128] = {
 
 
 
-void bahamut_cmd_mode(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-
-    if (ircdcap->tsmode) {
-        if (uplink_capab & ircdcap->tsmode) {
-            send_cmd(source, "MODE %s 0 %s", dest, buf);
-        } else {
-            send_cmd(source, "MODE %s %s", dest, buf);
-        }
-    } else {
-        send_cmd(source, "MODE %s %s", dest, buf);
-    }
+	if (!buf) return;
+	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source, "MODE %s 0 %s", dest, buf);
+	else send_cmd(source, "MODE %s %s", dest, buf);
 }
 
 /* SVSHOLD - set */
@@ -1542,7 +1532,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_mode(bahamut_cmd_mode);
     pmodule_cmd_bot_nick(bahamut_cmd_bot_nick);
     pmodule_cmd_kick(bahamut_cmd_kick);
     pmodule_cmd_notice_ops(bahamut_cmd_notice_ops);

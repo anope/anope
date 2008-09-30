@@ -309,7 +309,7 @@ void load_old_ns_dbase(void)
             if (c != 1)
                 fatal("Invalid format in %s", NickDBName);
 
-            na = scalloc(sizeof(NickAlias), 1);
+            na = (NickAlias *)scalloc(sizeof(NickAlias), 1);
 
             SAFE(read_buffer(bufn, f));
             na->nick = sstrdup(bufn);
@@ -380,7 +380,7 @@ void load_old_ns_dbase(void)
                 /* This nick was a master nick, so it also has all the
                  * core info! =)
                  */
-                nc = scalloc(1, sizeof(NickCore));
+                nc = (NickCore *)scalloc(1, sizeof(NickCore));
                 slist_init(&nc->aliases);
 
                 /* The initial display is what used to be the master nick */
@@ -433,7 +433,7 @@ void load_old_ns_dbase(void)
                 SAFE(read_int16(&nc->accesscount, f));
                 if (nc->accesscount) {
                     char **access;
-                    access = scalloc(sizeof(char *) * nc->accesscount, 1);
+                    access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
                     nc->access = access;
                     for (j = 0; j < nc->accesscount; j++, access++)
                         SAFE(read_string(access, f));
@@ -445,7 +445,7 @@ void load_old_ns_dbase(void)
                 nc->memos.memomax = (int16) tmp16;
                 if (nc->memos.memocount) {
                     Memo *memos;
-                    memos = scalloc(sizeof(Memo) * nc->memos.memocount, 1);
+                    memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
                     nc->memos.memos = memos;
 
                     for (j = 0; j < nc->memos.memocount; j++, memos++) {
@@ -540,7 +540,7 @@ void load_ns_req_db(void)
         while ((c = getc_db(f)) == 1) {
             if (c != 1)
                 fatal("Invalid format in %s", PreNickDBName);
-            nr = scalloc(1, sizeof(NickRequest));
+            nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
             SAFE(read_string(&nr->nick, f));
             SAFE(read_string(&nr->passcode, f));
             SAFE(read_string(&nr->password, f));
@@ -584,7 +584,7 @@ void load_ns_dbase(void)
             if (c != 1)
                 fatal("Invalid format in %s", NickDBName);
 
-            nc = scalloc(1, sizeof(NickCore));
+            nc = (NickCore *)scalloc(1, sizeof(NickCore));
             *nclast = nc;
             nclast = &nc->next;
             nc->prev = ncprev;
@@ -614,7 +614,7 @@ void load_ns_dbase(void)
             SAFE(read_int16(&nc->accesscount, f));
             if (nc->accesscount) {
                 char **access;
-                access = scalloc(sizeof(char *) * nc->accesscount, 1);
+                access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
                 nc->access = access;
                 for (j = 0; j < nc->accesscount; j++, access++)
                     SAFE(read_string(access, f));
@@ -626,7 +626,7 @@ void load_ns_dbase(void)
             nc->memos.memomax = (int16) tmp16;
             if (nc->memos.memocount) {
                 Memo *memos;
-                memos = scalloc(sizeof(Memo) * nc->memos.memocount, 1);
+                memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
                 nc->memos.memos = memos;
                 for (j = 0; j < nc->memos.memocount; j++, memos++) {
                     SAFE(read_int32(&memos->number, f));
@@ -662,7 +662,7 @@ void load_ns_dbase(void)
             if (c != 1)
                 fatal("Invalid format in %s", NickDBName);
 
-            na = scalloc(1, sizeof(NickAlias));
+            na = (NickAlias *)scalloc(1, sizeof(NickAlias));
 
             SAFE(read_string(&na->nick, f));
 
@@ -1001,7 +1001,7 @@ int validate_user(User * u)
         if (na->last_usermask)
             free(na->last_usermask);
         na->last_usermask =
-            scalloc(strlen(common_get_vident(u)) +
+            (char *)scalloc(strlen(common_get_vident(u)) +
                     strlen(common_get_vhost(u)) + 2, 1);
         sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
                 common_get_vhost(u));
@@ -1270,11 +1270,11 @@ int is_on_access(User * u, NickCore * nc)
     if (nc->accesscount == 0)
         return 0;
 
-    buf = scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
+    buf = (char *)scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
     sprintf(buf, "%s@%s", u->username, u->host);
     if (ircd->vhost) {
         if (u->vhost) {
-            buf2 = scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
+            buf2 = (char *)scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
             sprintf(buf2, "%s@%s", u->username, u->vhost);
         }
     }
@@ -1387,7 +1387,7 @@ void change_core_display(NickCore * nc, char *newdisplay)
         if (nc->aliases.count <= 0)
             return;
 
-        na = nc->aliases.list[0];
+        na = (NickAlias *)nc->aliases.list[0];
         newdisplay = na->nick;
     }
 
@@ -1718,7 +1718,7 @@ static void rem_ns_timeout(NickAlias * na, int type)
 
 static void timeout_collide(Timeout * t)
 {
-    NickAlias *na = t->data;
+    NickAlias *na = (NickAlias *)t->data;
 
     rem_ns_timeout(na, TO_COLLIDE);
     /* If they identified or don't exist anymore, don't kill them. */
@@ -1737,7 +1737,7 @@ static void timeout_collide(Timeout * t)
 
 static void timeout_release(Timeout * t)
 {
-    NickAlias *na = t->data;
+    NickAlias *na = (NickAlias *)t->data;
 
     rem_ns_timeout(na, TO_RELEASE);
     release(na, 1);
@@ -1766,7 +1766,7 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay)
     to = add_timeout(delay, timeout_routine, 0);
     to->data = na;
 
-    t = scalloc(sizeof(struct my_timeout), 1);
+    t = (struct my_timeout *)scalloc(sizeof(struct my_timeout), 1);
     t->na = na;
     t->to = to;
     t->type = type;

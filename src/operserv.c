@@ -182,7 +182,7 @@ static void load_old_akill(void)
     slist_setcapacity(&akills, tmp16);
 
     for (j = 0; j < akills.capacity; j++) {
-        ak = scalloc(sizeof(Akill), 1);
+        ak = (Akill *)scalloc(sizeof(Akill), 1);
 
         SAFE(read_string(&mask, f));
         s = strchr(mask, '@');
@@ -230,7 +230,7 @@ static void load_old_akill(void)
 
                 char amask[BUFSIZE];
 
-                entry = akills.list[i];
+                entry = (Akill *)akills.list[i];
 
                 if (!entry)
                     continue;
@@ -336,7 +336,7 @@ void load_os_dbase(void)
         slist_setcapacity(&akills, tmp16);
 
         for (i = 0; i < akills.capacity; i++) {
-            ak = scalloc(sizeof(Akill), 1);
+            ak = (Akill *)scalloc(sizeof(Akill), 1);
 
             SAFE(read_string(&ak->user, f));
             SAFE(read_string(&ak->host, f));
@@ -358,7 +358,7 @@ void load_os_dbase(void)
         slist_setcapacity(&sglines, tmp16);
 
         for (i = 0; i < sglines.capacity; i++) {
-            sx = scalloc(sizeof(SXLine), 1);
+            sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
             SAFE(read_string(&sx->mask, f));
             SAFE(read_string(&sx->by, f));
@@ -376,7 +376,7 @@ void load_os_dbase(void)
             slist_setcapacity(&sqlines, tmp16);
 
             for (i = 0; i < sqlines.capacity; i++) {
-                sx = scalloc(sizeof(SXLine), 1);
+                sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
                 SAFE(read_string(&sx->mask, f));
                 SAFE(read_string(&sx->by, f));
@@ -394,7 +394,7 @@ void load_os_dbase(void)
         slist_setcapacity(&szlines, tmp16);
 
         for (i = 0; i < szlines.capacity; i++) {
-            sx = scalloc(sizeof(SXLine), 1);
+            sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
             SAFE(read_string(&sx->mask, f));
             SAFE(read_string(&sx->by, f));
@@ -446,7 +446,7 @@ void save_os_dbase(void)
 
     SAFE(write_int16(akills.count, f));
     for (i = 0; i < akills.count; i++) {
-        ak = akills.list[i];
+        ak = (Akill *)akills.list[i];
 
         SAFE(write_string(ak->user, f));
         SAFE(write_string(ak->host, f));
@@ -458,7 +458,7 @@ void save_os_dbase(void)
 
     SAFE(write_int16(sglines.count, f));
     for (i = 0; i < sglines.count; i++) {
-        sx = sglines.list[i];
+        sx = (SXLine *)sglines.list[i];
 
         SAFE(write_string(sx->mask, f));
         SAFE(write_string(sx->by, f));
@@ -469,7 +469,7 @@ void save_os_dbase(void)
 
     SAFE(write_int16(sqlines.count, f));
     for (i = 0; i < sqlines.count; i++) {
-        sx = sqlines.list[i];
+        sx = (SXLine *)sqlines.list[i];
 
         SAFE(write_string(sx->mask, f));
         SAFE(write_string(sx->by, f));
@@ -480,7 +480,7 @@ void save_os_dbase(void)
 
     SAFE(write_int16(szlines.count, f));
     for (i = 0; i < szlines.count; i++) {
-        sx = szlines.list[i];
+        sx = (SXLine *)szlines.list[i];
 
         SAFE(write_string(sx->mask, f));
         SAFE(write_string(sx->by, f));
@@ -745,7 +745,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
         for (i = akills.count - 1; i >= 0; i--) {
             char amask[BUFSIZE];
 
-            entry = akills.list[i];
+            entry = (Akill *)akills.list[i];
 
             if (!entry)
                 continue;
@@ -810,7 +810,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     *host = 0;
     host++;
 
-    entry = scalloc(sizeof(Akill), 1);
+    entry = (Akill *)scalloc(sizeof(Akill), 1);
 
     if (!entry) {
         free(mask2);
@@ -855,7 +855,7 @@ int check_akill(char *nick, const char *username, const char *host,
         return 0;
 
     for (i = 0; i < akills.count; i++) {
-        ak = akills.list[i];
+        ak = (Akill *)akills.list[i];
         if (!ak)
             continue;
         if (match_wild_nocase(ak->user, username)
@@ -899,7 +899,7 @@ void expire_akills(void)
     Akill *ak;
 
     for (i = akills.count - 1; i >= 0; i--) {
-        ak = akills.list[i];
+        ak = (Akill *)akills.list[i];
 
         if (!ak->expires || ak->expires > now)
             continue;
@@ -913,7 +913,7 @@ void expire_akills(void)
 
 static void free_akill_entry(SList * slist, void *item)
 {
-    Akill *ak = item;
+    Akill *ak = (Akill *)item;
 
     /* Remove the AKILLs from all the servers */
     anope_cmd_remove_akill(ak->user, ak->host);
@@ -931,8 +931,8 @@ static void free_akill_entry(SList * slist, void *item)
 
 static int is_akill_entry_equal(SList * slist, void *item1, void *item2)
 {
-    char *ak1 = item1, buf[BUFSIZE];
-    Akill *ak2 = item2;
+    char *ak1 = (char *)item1, buf[BUFSIZE];
+    Akill *ak2 = (Akill *)item2;
 
     if (!ak1 || !ak2)
         return 0;
@@ -976,7 +976,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
     if (sglines.count > 0) {
 
         for (i = sglines.count - 1; i >= 0; i--) {
-            entry = sglines.list[i];
+            entry = (SXLine *)sglines.list[i];
 
             if (!entry)
                 continue;
@@ -1022,7 +1022,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
     }
 
     /* We can now (really) add the SGLINE. */
-    entry = scalloc(sizeof(SXLine), 1);
+    entry = (SXLine *)scalloc(sizeof(SXLine), 1);
     if (!entry)
         return -1;
 
@@ -1063,7 +1063,7 @@ int check_sgline(char *nick, const char *realname)
         return 0;
 
     for (i = 0; i < sglines.count; i++) {
-        sx = sglines.list[i];
+        sx = (SXLine *)sglines.list[i];
         if (!sx)
             continue;
 
@@ -1087,7 +1087,7 @@ void expire_sglines(void)
     SXLine *sx;
 
     for (i = sglines.count - 1; i >= 0; i--) {
-        sx = sglines.list[i];
+        sx = (SXLine *)sglines.list[i];
 
         if (!sx->expires || sx->expires > now)
             continue;
@@ -1101,7 +1101,7 @@ void expire_sglines(void)
 
 static void free_sgline_entry(SList * slist, void *item)
 {
-    SXLine *sx = item;
+    SXLine *sx = (SXLine *)item;
 
     /* Remove the SGLINE from all the servers */
     anope_cmd_unsgline(sx->mask);
@@ -1117,8 +1117,8 @@ static void free_sgline_entry(SList * slist, void *item)
 
 static int is_sgline_entry_equal(SList * slist, void *item1, void *item2)
 {
-    char *sx1 = item1;
-    SXLine *sx2 = item2;
+    char *sx1 = (char *)item1;
+    SXLine *sx2 = (SXLine *)item2;
 
     if (!sx1 || !sx2)
         return 0;
@@ -1159,7 +1159,7 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
     if (sqlines.count > 0) {
 
         for (i = sqlines.count - 1; i >= 0; i--) {
-            entry = sqlines.list[i];
+            entry = (SXLine *)sqlines.list[i];
 
             if (!entry)
                 continue;
@@ -1209,7 +1209,7 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
     }
 
     /* We can now (really) add the SQLINE. */
-    entry = scalloc(sizeof(SXLine), 1);
+    entry = (SXLine *)scalloc(sizeof(SXLine), 1);
     if (!entry)
         return -1;
 
@@ -1252,7 +1252,7 @@ int check_sqline(char *nick, int nick_change)
         return 0;
 
     for (i = 0; i < sqlines.count; i++) {
-        sx = sqlines.list[i];
+        sx = (SXLine *)sqlines.list[i];
         if (!sx)
             continue;
 
@@ -1282,7 +1282,7 @@ int check_chan_sqline(const char *chan)
         return 0;
 
     for (i = 0; i < sqlines.count; i++) {
-        sx = sqlines.list[i];
+        sx = (SXLine *)sqlines.list[i];
         if (!sx)
             continue;
 
@@ -1307,7 +1307,7 @@ void expire_sqlines(void)
     SXLine *sx;
 
     for (i = sqlines.count - 1; i >= 0; i--) {
-        sx = sqlines.list[i];
+        sx = (SXLine *)sqlines.list[i];
 
         if (!sx->expires || sx->expires > now)
             continue;
@@ -1322,7 +1322,7 @@ void expire_sqlines(void)
 
 static void free_sqline_entry(SList * slist, void *item)
 {
-    SXLine *sx = item;
+    SXLine *sx = (SXLine *)item;
 
     /* Remove the SQLINE from all the servers */
     anope_cmd_unsqline(sx->mask);
@@ -1338,8 +1338,8 @@ static void free_sqline_entry(SList * slist, void *item)
 
 static int is_sqline_entry_equal(SList * slist, void *item1, void *item2)
 {
-    char *sx1 = item1;
-    SXLine *sx2 = item2;
+    char *sx1 = (char *)item1;
+    SXLine *sx2 = (SXLine *)item2;
 
     if (!sx1 || !sx2)
         return 0;
@@ -1377,7 +1377,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     if (szlines.count > 0) {
 
         for (i = szlines.count - 1; i >= 0; i--) {
-            entry = szlines.list[i];
+            entry = (SXLine *)szlines.list[i];
 
             if (!entry)
                 continue;
@@ -1421,7 +1421,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     }
 
     /* We can now (really) add the SZLINE. */
-    entry = scalloc(sizeof(SXLine), 1);
+    entry = (SXLine *)scalloc(sizeof(SXLine), 1);
     if (!entry)
         return -1;
 
@@ -1452,7 +1452,7 @@ int check_szline(char *nick, char *ip)
     }
 
     for (i = 0; i < szlines.count; i++) {
-        sx = szlines.list[i];
+        sx = (SXLine *)szlines.list[i];
         if (!sx) {
             continue;
         }
@@ -1476,7 +1476,7 @@ void expire_szlines(void)
     SXLine *sx;
 
     for (i = szlines.count - 1; i >= 0; i--) {
-        sx = szlines.list[i];
+        sx = (SXLine *)szlines.list[i];
 
         if (!sx->expires || sx->expires > now)
             continue;
@@ -1490,7 +1490,7 @@ void expire_szlines(void)
 
 static void free_szline_entry(SList * slist, void *item)
 {
-    SXLine *sx = item;
+    SXLine *sx = (SXLine *)item;
 
     /* Remove the SZLINE from all the servers */
     anope_cmd_unszline(sx->mask);
@@ -1507,8 +1507,8 @@ static void free_szline_entry(SList * slist, void *item)
 
 static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 {
-    char *sx1 = item1;
-    SXLine *sx2 = item2;
+    char *sx1 = (char *)item1;
+    SXLine *sx2 = (SXLine *)item2;
 
     if (!sx1 || !sx2)
         return 0;
@@ -1526,7 +1526,7 @@ static int is_szline_entry_equal(SList * slist, void *item1, void *item2)
 static int compare_adminlist_entries(SList * slist, void *item1,
                                      void *item2)
 {
-    NickCore *nc1 = item1, *nc2 = item2;
+    NickCore *nc1 = (NickCore *)item1, *nc2 = (NickCore *)item2;
     if (!nc1 || !nc2)
         return -1;              /* To tell to continue */
     return stricmp(nc1->display, nc2->display);
@@ -1536,7 +1536,7 @@ static int compare_adminlist_entries(SList * slist, void *item1,
 
 static void free_adminlist_entry(SList * slist, void *item)
 {
-    NickCore *nc = item;
+    NickCore *nc = (NickCore *)item;
     nc->flags &= ~NI_SERVICES_ADMIN;
 }
 
@@ -1547,7 +1547,7 @@ static void free_adminlist_entry(SList * slist, void *item)
 static int compare_operlist_entries(SList * slist, void *item1,
                                     void *item2)
 {
-    NickCore *nc1 = item1, *nc2 = item2;
+    NickCore *nc1 = (NickCore *)item1, *nc2 = (NickCore *)item2;
     if (!nc1 || !nc2)
         return -1;              /* To tell to continue */
     return stricmp(nc1->display, nc2->display);
@@ -1557,7 +1557,7 @@ static int compare_operlist_entries(SList * slist, void *item1,
 
 static void free_operlist_entry(SList * slist, void *item)
 {
-    NickCore *nc = item;
+    NickCore *nc = (NickCore *)item;
     nc->flags &= ~NI_SERVICES_OPER;
 }
 
@@ -1657,7 +1657,7 @@ char *defconReverseModes(const char *modes)
     if (!modes) {
         return NULL;
     }
-    if (!(newmodes = malloc(sizeof(char) * strlen(modes) + 1))) {
+    if (!(newmodes = (char *)malloc(sizeof(char) * strlen(modes) + 1))) {
         return NULL;
     }
     for (i = 0; i < strlen(modes); i++) {

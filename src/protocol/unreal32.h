@@ -86,7 +86,6 @@ void unreal_cmd_372_error(const char *source);
 void unreal_cmd_375(const char *source);
 void unreal_cmd_376(const char *source);
 void unreal_cmd_351(const char *source);
-void unreal_cmd_quit(const char *source, const char *buf);
 void unreal_cmd_pong(const char *servname, const char *who);
 void unreal_cmd_join(const char *user, const char *channel, time_t chantime);
 void unreal_cmd_unsqline(const char *user);

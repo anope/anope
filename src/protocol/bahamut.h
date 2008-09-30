@@ -64,7 +64,6 @@ void bahamut_cmd_372_error(const char *source);
 void bahamut_cmd_375(const char *source);
 void bahamut_cmd_376(const char *source);
 void bahamut_cmd_351(const char *source);
-void bahamut_cmd_quit(const char *source, const char *buf);
 void bahamut_cmd_pong(const char *servname, const char *who);
 void bahamut_cmd_join(const char *user, const char *channel, time_t chantime);
 void bahamut_cmd_unsqline(const char *user);

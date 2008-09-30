@@ -792,16 +792,6 @@ void inspircd_cmd_351(const char *source)
              EncModule, version_build);
 }
 
-/* QUIT */
-void inspircd_cmd_quit(const char *source, const char *buf)
-{
-    if (buf) {
-        send_cmd(source, "QUIT :%s", buf);
-    } else {
-        send_cmd(source, "QUIT :Exiting");
-    }
-}
-
 /* PROTOCTL */
 void inspircd_cmd_protoctl()
 {
@@ -1735,7 +1725,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_quit(inspircd_cmd_quit);
     pmodule_cmd_pong(inspircd_cmd_pong);
     pmodule_cmd_join(inspircd_cmd_join);
     pmodule_cmd_unsqline(inspircd_cmd_unsqline);

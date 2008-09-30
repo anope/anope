@@ -1206,16 +1206,6 @@ void bahamut_cmd_invite(const char *source, const char *chan, const char *nick)
     send_cmd(source, "INVITE %s %s", nick, chan);
 }
 
-/* QUIT */
-void bahamut_cmd_quit(const char *source, const char *buf)
-{
-    if (buf) {
-        send_cmd(source, "QUIT :%s", buf);
-    } else {
-        send_cmd(source, "QUIT");
-    }
-}
-
 int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
@@ -1489,7 +1479,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_quit(bahamut_cmd_quit);
     pmodule_cmd_pong(bahamut_cmd_pong);
     pmodule_cmd_join(bahamut_cmd_join);
     pmodule_cmd_unsqline(bahamut_cmd_unsqline);

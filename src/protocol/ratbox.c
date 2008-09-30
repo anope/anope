@@ -1277,17 +1277,11 @@ void RatboxProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 }
 
 /* QUIT */
-void ratbox_cmd_quit(const char *source, const char *buf)
+void RatboxProto::cmd_quit(const char *source, const char *buf)
 {
-    Uid *ud;
-    ud = find_uid(source);
-
-    if (buf) {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT :%s",
-                 buf);
-    } else {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT");
-    }
+	Uid *ud = find_uid(source);
+	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT :%s", buf);
+	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT");
 }
 
 /* PONG */
@@ -1632,7 +1626,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_quit(ratbox_cmd_quit);
     pmodule_cmd_pong(ratbox_cmd_pong);
     pmodule_cmd_join(ratbox_cmd_join);
     pmodule_cmd_unsqline(ratbox_cmd_unsqline);

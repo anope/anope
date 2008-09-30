@@ -611,7 +611,6 @@ E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
 E void pmodule_cmd_376(void (*func) (const char *source));
 E void pmodule_cmd_351(void (*func) (const char *source));
-E void pmodule_cmd_quit(void (*func) (const char *source, const char *buf));
 E void pmodule_cmd_pong(void (*func) (const char *servname, const char *who));
 E void pmodule_cmd_join(void (*func) (const char *user, const char *channel, time_t chantime));
 E void pmodule_cmd_unsqline(void (*func) (const char *user));

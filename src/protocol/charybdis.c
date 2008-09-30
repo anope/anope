@@ -1345,17 +1345,11 @@ void CharybdisProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 }
 
 /* QUIT */
-void charybdis_cmd_quit(const char *source, const char *buf)
+void CharybdisProto::cmd_quit(const char *source, const char *buf)
 {
-    Uid *ud;
-    ud = find_uid(source);
-
-    if (buf) {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT :%s",
-                 buf);
-    } else {
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "QUIT");
-    }
+	Uid *ud = find_uid(source);
+	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT :%s", buf);
+	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT");
 }
 
 /* PONG */
@@ -1738,7 +1732,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_quit(charybdis_cmd_quit);
     pmodule_cmd_pong(charybdis_cmd_pong);
     pmodule_cmd_join(charybdis_cmd_join);
     pmodule_cmd_unsqline(charybdis_cmd_unsqline);

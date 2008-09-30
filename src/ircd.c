@@ -51,7 +51,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
     ircdproto.ircd_cmd_351 = NULL;
-    ircdproto.ircd_cmd_quit = NULL;
     ircdproto.ircd_cmd_pong = NULL;
     ircdproto.ircd_cmd_join = NULL;
     ircdproto.ircd_cmd_unsqline = NULL;
@@ -295,15 +294,14 @@ void anope_cmd_351(const char *source)
 
 void anope_cmd_quit(const char *source, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_quit(source, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_quit(source, buf);
 }
 
 void anope_cmd_pong(const char *servname, const char *who)
@@ -661,11 +659,6 @@ void pmodule_cmd_376(void (*func) (const char *source))
 void pmodule_cmd_351(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_351 = func;
-}
-
-void pmodule_cmd_quit(void (*func) (const char *source, const char *buf))
-{
-    ircdproto.ircd_cmd_quit = func;
 }
 
 void pmodule_cmd_pong(void (*func) (const char *servname, const char *who))

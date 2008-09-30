@@ -642,16 +642,6 @@ void unreal_cmd_351(const char *source)
              version_flags, EncModule, version_build);
 }
 
-/* QUIT */
-void unreal_cmd_quit(const char *source, const char *buf)
-{
-    if (buf) {
-        send_cmd(source, "%s :%s", send_token("QUIT", ","), buf);
-    } else {
-        send_cmd(source, "%s", send_token("QUIT", ","));
-    }
-}
-
 /* PROTOCTL */
 /*
    NICKv2 = Nick Version 2
@@ -2036,7 +2026,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_quit(unreal_cmd_quit);
     pmodule_cmd_pong(unreal_cmd_pong);
     pmodule_cmd_join(unreal_cmd_join);
     pmodule_cmd_unsqline(unreal_cmd_unsqline);

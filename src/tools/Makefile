@@ -22,18 +22,16 @@ anopesmpt:  $(OBJS)
 $(OBJS): Makefile
 anopesmtp.o:    anopesmtp.c $(INCLUDES)
 db-merger.o:    db-merger.c $(INCLUDES)
-epona2anope.o:  epona2anope.c $(INCLUDES)
 
 clean:
-	rm -f *.o anopesmtp a.out db-merger epona2anope
+	rm -f *.o anopesmtp a.out db-merger
 
 spotless: clean
 
-install: anopesmtp db-merger epona2anope
+install: anopesmtp db-merger
 	test -d ${BINDEST} || mkdir ${BINDEST}
 	test -d $(BINDEST)/tools || mkdir $(BINDEST)/tools
 	$(INSTALL) anopesmtp $(BINDEST)/tools/anopesmtp
 	$(INSTALL) db-merger $(BINDEST)/tools/db-merger
-	$(INSTALL) epona2anope $(BINDEST)/tools/epona2anope
 
 DUMMY:

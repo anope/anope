@@ -785,7 +785,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
  *	av[1] = modes
  */
 
-void do_umode(const char *source, int ac, char **av)
+void do_umode(const char *source, int ac, const char **av)
 {
     User *user;
 
@@ -803,7 +803,7 @@ void do_umode(const char *source, int ac, char **av)
  *	av[0] = modes
  */
 
-void do_umode2(const char *source, int ac, char **av)
+void do_umode2(const char *source, int ac, const char **av)
 {
     User *user;
 
@@ -858,7 +858,7 @@ void do_quit(const char *source, int ac, char **av)
  *	av[1] = reason
  */
 
-void do_kill(char *nick, char *msg)
+void do_kill(const char *nick, const char *msg)
 {
     User *user;
     NickAlias *na;

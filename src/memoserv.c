@@ -18,7 +18,6 @@
 /*************************************************************************/
 /* *INDENT-OFF* */
 
-NickCore *nclists[1024];
 E void moduleAddMemoServCmds(void);
 static void new_memo_mail(NickCore *nc, Memo *m);
 E void rsend_notify(User *u, Memo *m, const char *chan);

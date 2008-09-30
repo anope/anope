@@ -16,8 +16,6 @@
 #include "messages.h"
 #include "language.h"
 
-int servernum;
-
 /*************************************************************************/
 
 int m_nickcoll(char *user)

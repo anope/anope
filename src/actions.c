@@ -212,10 +212,10 @@ void common_unban(ChannelInfo * ci, char *nick)
  * @param arg the arguments for the user modes
  * @return void
  */
-void common_svsmode(User * u, char *modes, char *arg)
+void common_svsmode(User * u, const char *modes, const char *arg)
 {
     int ac = 1;
-    char *av[2];
+    const char *av[2];
 
     av[0] = modes;
     if (arg) {

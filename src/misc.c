@@ -178,7 +178,23 @@ char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
  * @param argv Array
  * @return string of the merged array
  */
-char *merge_args(int argc, char **argv)
+const char *merge_args(int argc, const char **argv)
+{
+    int i;
+    static char s[4096];
+    char *t;
+
+    t = s;
+    for (i = 0; i < argc; i++)
+        t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
+                      (i < argc - 1) ? " " : "");
+    return s;
+}
+
+/*
+ * XXX: temporary "safe" version to avoid casting, it's still ugly.
+ */
+const char *merge_args(int argc, char **argv)
 {
     int i;
     static char s[4096];

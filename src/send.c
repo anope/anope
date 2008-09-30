@@ -218,7 +218,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_help(char *source, User * dest, int message, ...)
+void notice_help(const char *source, User * dest, int message, ...)
 {
     va_list args;
     char buf[4096], buf2[4096], outbuf[BUFSIZE];
@@ -325,7 +325,7 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
  * @param ... any number of parameters
  * @return void
  */
-void wallops(char *source, const char *fmt, ...)
+void wallops(const char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];

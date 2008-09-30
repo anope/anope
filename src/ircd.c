@@ -590,12 +590,6 @@ void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 /**
  * Set routines for modules to set the prefered function for dealing with things.
  **/
-
-void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av))
-{
-    ircdproto.ircd_set_mod_current_buffer = func;
-}
-
 void pmodule_cmd_372(void (*func) (const char *source, const char *msg))
 {
     ircdproto.ircd_cmd_372 = func;

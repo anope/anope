@@ -605,7 +605,6 @@ E int servernum;
 
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProtoNew *);
-E void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av));
 E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
 E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
@@ -1141,8 +1140,6 @@ E void privmsg(char *source, char *dest, const char *fmt, ...);
 E void notice(char *source, const char *dest, const char *fmt, ...);
 
 /******************************************************************************/
-
-E int anope_set_mod_current_buffer(int ac, char **av);
 
 E void anope_cmd_211(const char *fmt, ...);                          	  		  /* 211 */
 E void anope_cmd_219(const char *source, const char *who); 			  	  		  /* 219 */

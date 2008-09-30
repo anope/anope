@@ -351,40 +351,23 @@ void process()
     if (protocoldebug) {
         protocol_debug(source, cmd, ac, av);
     }
+
     if (mod_current_buffer) {
         free(mod_current_buffer);
     }
-    /* fix to moduleGetLastBuffer() bug 296 */
-    /* old logic was that since its meant for PRIVMSG that we would get
-       the NICK as AV[0] and the rest would be in av[1], however on Bahamut
-       based systems when you do /cs it assumes we will translate the command
-       to the NICK and thus AV[0] is the message. The new logic is to check
-       av[0] to see if its a service nick if so assign mod_current_buffer the
-       value from AV[1] else just assign av[0] - TSL */
-    /* First check if the ircd proto module overrides this -GD */
-    /* fix to moduleGetLastBuffer() bug 476:
-       fixed in part by adding {} to nickIsServices()
-       however if you have a pseudo they could not use moduleGetLastBuffer()
-       cause they are not part of nickIsServices, even those the ac count is 2
-       that was ignored and only the first param was passed on which is fine for
-       Bahmut ircd aliases but not for pseudo clients on. So additional logic is
-       that if the ac is greater then 1 copy av[1] else copy av[0]
-       I also changed from if statments, cause attempting to access a array member
-       that is not set can lead to odd things - TSL (3/12/06) */
-	// The function below is never declared in any protocol modules -- CyberBotX
-    //if (!anope_set_mod_current_buffer(ac, av)) {
-        if (ac >= 1) {
-            if (nickIsServices(av[0], 1)) {
-                mod_current_buffer =
-                    (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-            } else {
-                mod_current_buffer =
-                    (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-            }
+
+    if (ac >= 1) {
+        if (nickIsServices(av[0], 1)) {
+            mod_current_buffer =
+                (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
         } else {
-            mod_current_buffer = NULL;
+            mod_current_buffer =
+                (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
         }
-    //}
+    } else {
+        mod_current_buffer = NULL;
+    }
+
     /* Do something with the message. */
     m = find_message(cmd);
     if (m) {

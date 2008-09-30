@@ -363,7 +363,7 @@ MDE void moduleDelData(ModuleData **md, char *key);				/* Delete this key/value 
 MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
-MDE boolean moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
+MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
 
 /*************************************************************************/
 /* Module Queue Operations */

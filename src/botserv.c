@@ -269,7 +269,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                                      nbuf + strlen(nbuf) - len)))) {
                             mustkick = 1;
                         } else {
-                            char *wordbuf = scalloc(len + 3, 1);
+                            char *wordbuf = (char *)scalloc(len + 3, 1);
 
                             wordbuf[0] = ' ';
                             wordbuf[len + 1] = ' ';
@@ -296,7 +296,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                             && (!strnicmp(nbuf, bw->word, len)))) {
                         mustkick = 1;
                     } else {
-                        char *wordbuf = scalloc(len + 2, 1);
+                        char *wordbuf = (char *)scalloc(len + 2, 1);
 
                         memcpy(wordbuf + 1, bw->word, len);
                         wordbuf[0] = ' ';
@@ -323,7 +323,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
                               len)))) {
                         mustkick = 1;
                     } else {
-                        char *wordbuf = scalloc(len + 2, 1);
+                        char *wordbuf = (char *)scalloc(len + 2, 1);
 
                         memcpy(wordbuf, bw->word, len);
                         wordbuf[len] = ' ';
@@ -599,7 +599,7 @@ BotInfo *makebot(char *nick)
         return NULL;
     }
 
-    bi = scalloc(sizeof(BotInfo), 1);
+    bi = (BotInfo *)scalloc(sizeof(BotInfo), 1);
     bi->nick = sstrdup(nick);
     bi->lastmsg = time(NULL);
     insert_bot(bi);
@@ -698,7 +698,7 @@ static BanData *get_ban_data(Channel * c, User * u)
     }
 
     /* If we fall here it is that we haven't found the record */
-    bd = scalloc(sizeof(BanData), 1);
+    bd = (BanData *)scalloc(sizeof(BanData), 1);
     bd->mask = sstrdup(mask);
     bd->last_use = now;
 
@@ -741,7 +741,7 @@ static UserData *get_user_data(Channel * c, User * u)
 
                 return user->ud;
             } else {
-                user->ud = scalloc(sizeof(UserData), 1);
+                user->ud = (UserData *)scalloc(sizeof(UserData), 1);
                 user->ud->last_use = time(NULL);
                 return user->ud;
             }

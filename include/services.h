@@ -246,23 +246,6 @@ typedef struct uid_ Uid;
 
 /*************************************************************************/
 
-/* Windows defines a boolean type as an 
- * unsigned char. It does however need
- * true/false. -- codemastr
- */
-#ifndef _WIN32
-typedef enum { false, true } boolean;
-#else
- #ifndef true
-  #define true 1
- #endif
- #ifndef false
-  #define false 0
- #endif
-#endif /* _WIN32 */
-
-/*************************************************************************/
-
 /* Protocol tweaks */
 
 typedef struct ircdvars_ IRCDVar;
@@ -850,6 +833,16 @@ struct server_ {
 #define SERVER_JUPED 0x0002
 
 /*************************************************************************/
+struct u_chanlist {
+	struct u_chanlist *next, *prev;
+	Channel *chan;
+	int16 status;		/* Associated flags; see CSTATUS_* below. */
+};
+
+struct u_chaninfolist {
+	struct u_chaninfolist *next, *prev;
+	ChannelInfo *chan;
+};
 
 /* Online user and channel data. */
 struct user_ {
@@ -877,16 +870,8 @@ struct user_ {
     
     int isSuperAdmin;		/* is SuperAdmin on or off? */
 
-    struct u_chanlist {
-		struct u_chanlist *next, *prev;
-		Channel *chan;
-		int16 status;		/* Associated flags; see CSTATUS_* below. */
-    } *chans;				/* Channels user has joined */
-
-    struct u_chaninfolist {
-		struct u_chaninfolist *next, *prev;
-		ChannelInfo *chan;
-    } *founder_chans;			/* Channels user has identified for */
+	struct u_chanlist *chans;			/* Channels user has joined */
+	struct u_chaninfolist *founder_chans; 		/* Channels user has identified for */
 
     short invalid_pw_count;		/* # of invalid password attempts */
     time_t invalid_pw_time;		/* Time of last invalid password */
@@ -977,6 +962,12 @@ struct userdata_ {
 #define ENTRYTYPE_HOST_WILD      0x00000040
 #define ENTRYTYPE_HOST           0x00000080
 
+struct c_userlist {
+	struct c_userlist *next, *prev;
+	User *user;
+	UserData *ud;
+};
+
 struct channel_ {
     Channel *next, *prev;
     char name[CHANMAX];
@@ -993,11 +984,8 @@ struct channel_ {
     EList *bans;
     EList *excepts;
     EList *invites;
-    struct c_userlist {
-		struct c_userlist *next, *prev;
-		User *user;
-		UserData *ud;
-    } *users;
+
+	struct c_userlist *users;
     int16 usercount;
 
     BanData *bd;

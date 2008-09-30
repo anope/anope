@@ -76,11 +76,11 @@ int read_index_file()
     }
     while (fgets(buf, sizeof(buf), f))
 	numstrings++;
-    if (!(stringnames = calloc(sizeof(char *), numstrings))) {
+    if (!(stringnames = (char **)calloc(sizeof(char *), numstrings))) {
 	perror("calloc(stringnames)");
 	return -1;
     }
-    if (!(strings = calloc(sizeof(char *), numstrings))) {
+    if (!(strings = (char **)calloc(sizeof(char *), numstrings))) {
 	perror("calloc(strings)");
 	return -1;
     }
@@ -215,7 +215,7 @@ int main(int ac, char **av)
 		line++;
 		i = strings[curstring] ? strlen(strings[curstring]) : 0;
 		if (!(strings[curstring] =
-			realloc(strings[curstring], i+strlen(line)+2))) {
+			(char *)realloc(strings[curstring], i+strlen(line)+2))) {
 		    fprintf(stderr, "%s:%d: Out of memory!\n",filename,linenum);
 		    return 2;
 		}
@@ -234,7 +234,7 @@ int main(int ac, char **av)
 		retval = 1;
 		maxerr--;
 	    } else {
-		if (!(strings[curstring] = malloc(1))) {
+		if (!(strings[curstring] = (char *)malloc(1))) {
 		    fprintf(stderr, "%s:%d: Out of memory!\n",filename,linenum);
 		    return 2;
 		}

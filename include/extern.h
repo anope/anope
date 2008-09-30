@@ -53,7 +53,7 @@ E IRCDProto ircdproto;
 
 /**** actions.c ****/
 
-E void kill_user(char *source, char *user, char *reason);
+E void kill_user(const char *source, const char *user, const char *reason);
 E void bad_password(User * u);
 E void sqline(char *mask, char *reason);
 E void common_unban(ChannelInfo * ci, char *nick);
@@ -594,7 +594,7 @@ E char *getvHost(char *nick);
 E int is_host_remover(User * u);
 E int is_host_setter(User *u);
 E HostCore *hostCoreListHead();
-E HostCore *findHostCore(HostCore * head, char *nick, boolean * found);
+E HostCore *findHostCore(HostCore * head, char *nick, bool *found);
 E HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
 E HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
 E HostCore *deleteHostCore(HostCore * head, HostCore * prev);
@@ -833,7 +833,7 @@ E size_t strlcpy(char *, const char *, size_t);
 E size_t strlcat(char *, const char *, size_t);
 #endif
 E char *stristr(char *s1, char *s2);
-E char *strnrepl(char *s, int32 size, const char *old, const char *new);
+E char *strnrepl(char *s, int32 size, const char *old, const char *nstr);
 E char *merge_args(int argc, char **argv);
 E int match_wild(const char *pattern, const char *str);
 E int match_wild_nocase(const char *pattern, const char *str);
@@ -887,7 +887,7 @@ E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 
 /**** modules.c ****/
 E void modules_core_init(int number, char **list);
-E void modules_unload_all(boolean fini, boolean unload_proto);	/* Read warnings near function source */
+E void modules_unload_all(bool fini, bool unload_proto);	/* Read warnings near function source */
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
 E void ModuleDatabaseBackup(char *dbname);
@@ -1157,7 +1157,7 @@ E User *do_nick(const char *source, char *nick, char *username, char *host,
 E void do_umode(const char *source, int ac, char **av);
 E void do_umode2(const char *source, int ac, char **av);
 E void do_quit(const char *source, int ac, char **av);
-E void do_kill(char *source, char *reason);
+E void do_kill(const char *source, const char *reason);
 
 E int is_oper(User * user);
 E int is_protected(User * user);
@@ -1276,7 +1276,7 @@ E void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */
 E void anope_cmd_release_svshold(char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_cmd_svsjoin(char *source, char *nick,char *chan, char *param);          	  /* SVSJOIN */
-E void anope_cmd_svskill(char *source,char *user, const char *fmt, ...);     		  /* SVSKILL */
+E void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ...);     		  /* SVSKILL */
 E void anope_cmd_svsmode(User * u, int ac, char **av);   	        	  		  /* SVSMODE */
 E void anope_cmd_svsmode_chan(char *name, char *mode, char *nick);				  /* SVSMODE */
 E void anope_cmd_svsnick(char *nick,char *newnick, time_t when);     	  		  /* SVSNICK */

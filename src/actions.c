@@ -49,7 +49,7 @@ void bad_password(User * u)
  * @param reason for the kill
  * @return void
  */
-void kill_user(char *source, char *user, char *reason)
+void kill_user(const char *source, const char *user, const char *reason)
 {
     char buf[BUFSIZE];
 

@@ -52,7 +52,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 void inspircd_set_umode(User * user, int ac, const char **av);
-void inspircd_cmd_svskill(const char *source, const char *user, const char *buf);
 void inspircd_cmd_svsmode(User * u, int ac, const char **av);
 void inspircd_cmd_372(const char *source, const char *msg);
 void inspircd_cmd_372_error(const char *source);
@@ -132,4 +131,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 		void cmd_vhost_off(User *);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
+		void cmd_svskill(const char *source, const char *user, const char *buf);
 } ircd_proto;

@@ -883,22 +883,11 @@ void CharybdisProto::cmd_akill(const char *user, const char *host, const char *w
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
-void charybdis_cmd_svskill(const char *source, const char *user, const char *buf)
+void CharybdisProto::cmd_svskill(const char *source, const char *user, const char *buf)
 {
-    Uid *ud, *ud2;
-
-    if (!buf) {
-        return;
-    }
-
-    if (!source || !user) {
-        return;
-    }
-
-    ud = find_uid(source);
-    ud2 = find_uid(user);
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "KILL %s :%s",
-             (UseTS6 ? (ud2 ? ud2->uid : user) : user), buf);
+	if (!source || !user || !buf) return;
+	Uid *ud = find_uid(source), *ud2 = find_uid(user);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
 }
 
 void charybdis_cmd_svsmode(User * u, int ac, const char **av)
@@ -1821,7 +1810,6 @@ int charybdis_send_deaccount(int argc, char **argv)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svskill(charybdis_cmd_svskill);
     pmodule_cmd_svsmode(charybdis_cmd_svsmode);
     pmodule_cmd_372(charybdis_cmd_372);
     pmodule_cmd_372_error(charybdis_cmd_372_error);

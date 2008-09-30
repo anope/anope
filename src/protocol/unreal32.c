@@ -543,12 +543,10 @@ void UnrealIRCdProto::cmd_akill(const char *user, const char *host, const char *
 **	parv[1] = client
 **	parv[2] = kill message
 */
-void unreal_cmd_svskill(const char *source, const char *user, const char *buf)
+void UnrealIRCdProto::cmd_svskill(const char *source, const char *user, const char *buf)
 {
-    if (!source || !user || !buf) {
-        return;
-    }
-    send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);
+	if (!source || !user || !buf) return;
+	send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);
 }
 
 /*
@@ -2098,7 +2096,6 @@ void moduleAddIRCDMsgs(void) {
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svskill(unreal_cmd_svskill);
     pmodule_cmd_svsmode(unreal_cmd_svsmode);
     pmodule_cmd_372(unreal_cmd_372);
     pmodule_cmd_372_error(unreal_cmd_372_error);

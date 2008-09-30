@@ -59,7 +59,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 void bahamut_set_umode(User * user, int ac, const char **av);
-void bahamut_cmd_svskill(const char *source, const char *user, const char *buf);
 void bahamut_cmd_svsmode(User * u, int ac, const char **av);
 void bahamut_cmd_372(const char *source, const char *msg);
 void bahamut_cmd_372_error(const char *source);
@@ -128,4 +127,5 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_remove_akill(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
+		void cmd_svskill(const char *source, const char *user, const char *buf);
 } ircd_proto;

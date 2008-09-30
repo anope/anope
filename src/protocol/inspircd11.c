@@ -565,12 +565,10 @@ void InspIRCdProto::cmd_akill(const char *user, const char *host, const char *wh
 	send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
 }
 
-void inspircd_cmd_svskill(const char *source, const char *user, const char *buf)
+void InspIRCdProto::cmd_svskill(const char *source, const char *user, const char *buf)
 {
-    if (!buf || !source || !user)
-        return;
-
-    send_cmd(source, "KILL %s :%s", user, buf);
+	if (!buf || !source || !user) return;
+	send_cmd(source, "KILL %s :%s", user, buf);
 }
 
 void inspircd_cmd_svsmode(User * u, int ac, const char **av)
@@ -1789,7 +1787,6 @@ void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svskill(inspircd_cmd_svskill);
     pmodule_cmd_svsmode(inspircd_cmd_svsmode);
     pmodule_cmd_372(inspircd_cmd_372);
     pmodule_cmd_372_error(inspircd_cmd_372_error);

@@ -1151,6 +1151,7 @@ class IRCDProtoNew {
 		virtual void cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when) = 0;
 		virtual void cmd_vhost_off(User *) { }
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
+		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
 };
 
 typedef struct ircd_modes_ {

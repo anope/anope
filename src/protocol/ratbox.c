@@ -825,22 +825,11 @@ void RatboxProto::cmd_akill(const char *user, const char *host, const char *who,
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
-void ratbox_cmd_svskill(const char *source, const char *user, const char *buf)
+void RatboxProto::cmd_svskill(const char *source, const char *user, const char *buf)
 {
-    Uid *ud, *ud2;
-
-    if (!buf) {
-        return;
-    }
-
-    if (!source || !user) {
-        return;
-    }
-
-    ud = find_uid(source);
-    ud2 = find_uid(user);
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "KILL %s :%s",
-             (UseTS6 ? (ud2 ? ud2->uid : user) : user), buf);
+	if (!source || !user || !buf) return;
+	Uid *ud = find_uid(source), *ud2 = find_uid(user);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
 }
 
 void ratbox_cmd_svsmode(User * u, int ac, const char **av)
@@ -1713,7 +1702,6 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svskill(ratbox_cmd_svskill);
     pmodule_cmd_svsmode(ratbox_cmd_svsmode);
     pmodule_cmd_372(ratbox_cmd_372);
     pmodule_cmd_372_error(ratbox_cmd_372_error);

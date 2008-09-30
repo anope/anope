@@ -815,14 +815,10 @@ void BahamutIRCdProto::cmd_akill(const char *user, const char *host, const char 
 /*
   Note: if the stamp is null 0, the below usage is correct of Bahamut
 */
-void bahamut_cmd_svskill(const char *source, const char *user, const char *buf)
+void BahamutIRCdProto::cmd_svskill(const char *source, const char *user, const char *buf)
 {
-
-    if (!source || !user || !buf) {
-        return;
-    }
-
-    send_cmd(source, "SVSKILL %s :%s", user, buf);
+	if (!source || !user || !buf) return;
+	send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
 
 /* SVSMODE */
@@ -1548,7 +1544,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svskill(bahamut_cmd_svskill);
     pmodule_cmd_svsmode(bahamut_cmd_svsmode);
     pmodule_cmd_372(bahamut_cmd_372);
     pmodule_cmd_372_error(bahamut_cmd_372_error);

@@ -50,7 +50,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
-    ircdproto.ircd_cmd_serv_privmsg = NULL;
     ircdproto.ircd_cmd_bot_chan_mode = NULL;
     ircdproto.ircd_cmd_351 = NULL;
     ircdproto.ircd_cmd_quit = NULL;
@@ -282,7 +281,7 @@ void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg
 
 void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
-    ircdproto.ircd_cmd_serv_privmsg(source, dest, msg);
+	ircdprotonew->cmd_serv_privmsg(source, dest, msg);
 }
 
 void anope_cmd_bot_chan_mode(const char *nick, const char *chan)
@@ -658,12 +657,6 @@ void pmodule_cmd_375(void (*func) (const char *source))
 void pmodule_cmd_376(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_376 = func;
-}
-
-void pmodule_cmd_serv_privmsg(void (*func)
-                               (const char *source, const char *dest, const char *msg))
-{
-    ircdproto.ircd_cmd_serv_privmsg = func;
 }
 
 void pmodule_cmd_bot_chan_mode(void (*func) (const char *nick, const char *chan))

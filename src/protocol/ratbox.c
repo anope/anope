@@ -462,12 +462,6 @@ void RatboxProto::cmd_privmsg(const char *source, const char *dest, const char *
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
 }
 
-void ratbox_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
-}
-
-
 void ratbox_cmd_global(const char *source, const char *buf)
 {
     Uid *u;
@@ -1641,7 +1635,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_serv_privmsg(ratbox_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(ratbox_cmd_bot_chan_mode);
     pmodule_cmd_351(ratbox_cmd_351);
     pmodule_cmd_quit(ratbox_cmd_quit);

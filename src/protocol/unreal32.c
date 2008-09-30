@@ -630,11 +630,6 @@ void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const
 }
 
 
-void unreal_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
-{
-    send_cmd(source, "%s $%s :%s", send_token("PRIVMSG", "!"), dest, msg);
-}
-
 void unreal_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick,
@@ -2041,7 +2036,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_serv_privmsg(unreal_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(unreal_cmd_bot_chan_mode);
     pmodule_cmd_351(unreal_cmd_351);
     pmodule_cmd_quit(unreal_cmd_quit);

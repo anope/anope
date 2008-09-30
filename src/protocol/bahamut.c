@@ -494,19 +494,16 @@ void BahamutIRCdProto::cmd_release_svshold(const char *nick)
 /* SVSMODE -b */
 void BahamutIRCdProto::cmd_unban(const char *name, const char *nick)
 {
-	bahamut_cmd_svsmode_chan(name, "-b", nick);
+	cmd_svsmode_chan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void bahamut_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void BahamutIRCdProto::cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
-    if (nick) {
-        send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
-    } else {
-        send_cmd(ServerName, "SVSMODE %s %s", name, mode);
-    }
+	if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
+	else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
 }
 
 void BahamutIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
@@ -1395,7 +1392,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svsmode_chan(bahamut_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(bahamut_cmd_svid_umode);
     pmodule_cmd_nc_change(bahamut_cmd_nc_change);
     pmodule_cmd_svid_umode2(bahamut_cmd_svid_umode2);

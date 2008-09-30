@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_svsmode_chan = NULL;
     ircdproto.ircd_cmd_svid_umode = NULL;
     ircdproto.ircd_cmd_nc_change = NULL;
     ircdproto.ircd_cmd_svid_umode2 = NULL;
@@ -525,7 +524,7 @@ void anope_cmd_unban(const char *name, const char *nick)
 
 void anope_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
-    ircdproto.ircd_cmd_svsmode_chan(name, mode, nick);
+	ircdprotonew->cmd_svsmode_chan(name, mode, nick);
 }
 
 void anope_cmd_svid_umode(const char *nick, time_t ts)
@@ -696,12 +695,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void
-pmodule_cmd_svsmode_chan(void (*func) (const char *name, const char *mode, const char *nick))
-{
-    ircdproto.ircd_cmd_svsmode_chan = func;
 }
 
 void pmodule_cmd_svid_umode(void (*func) (const char *nick, time_t ts))

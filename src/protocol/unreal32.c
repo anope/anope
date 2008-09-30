@@ -1401,15 +1401,10 @@ void UnrealIRCdProto::cmd_svsmode_chan(const char *name, const char *mode, const
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void unreal_cmd_svid_umode(const char *nick, time_t ts)
+void UnrealIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 {
-    if (UseSVS2MODE) {
-        send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"),
-                 nick);
-    } else {
-        send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"),
-                 nick);
-    }
+	if (UseSVS2MODE) send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"), nick);
+	else send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"), nick);
 }
 
 /* SVSMODE +d */
@@ -1929,7 +1924,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_svid_umode(unreal_cmd_svid_umode);
     pmodule_cmd_nc_change(unreal_cmd_nc_change);
     pmodule_cmd_svid_umode2(unreal_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(unreal_cmd_svid_umode3);

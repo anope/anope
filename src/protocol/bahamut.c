@@ -1180,10 +1180,9 @@ void BahamutIRCdProto::cmd_guest_nick(const char *nick, const char *user, const 
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void bahamut_cmd_svid_umode(const char *nick, time_t ts)
+void BahamutIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 {
-    send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
-             (unsigned long int) ts);
+	send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, static_cast<unsigned long>(ts));
 }
 
 
@@ -1392,7 +1391,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svid_umode(bahamut_cmd_svid_umode);
     pmodule_cmd_nc_change(bahamut_cmd_nc_change);
     pmodule_cmd_svid_umode2(bahamut_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(bahamut_cmd_svid_umode3);

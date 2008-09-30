@@ -76,7 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-void bahamut_cmd_svid_umode(const char *nick, time_t ts);
 void bahamut_cmd_nc_change(User * u);
 void bahamut_cmd_svid_umode2(User * u, const char *ts);
 void bahamut_cmd_svid_umode3(User * u, const char *ts);
@@ -113,4 +112,5 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_sgline(const char *, const char *);
 		void cmd_unban(const char *, const char *);
 		void cmd_svsmode_chan(const char *, const char *, const char *);
+		void cmd_svid_umode(const char *, time_t);
 } ircd_proto;

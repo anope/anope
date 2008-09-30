@@ -145,18 +145,119 @@ void User::SetRealname(const std::string &realname)
 
 	if (this->realname)
 		free(this->realname);
-	this->realname = sstrdup(realname);
+	this->realname = sstrdup(realname.c_str());
 
 	if (this->na && (nick_identified(this) ||
 			(!(this->na->nc->flags & NI_SECURE) && nick_recognized(this))))
 	{
 		if (this->na->last_realname)
 			free(this->na->last_realname);
-		this->na->last_realname = sstrdup(realname);
+		this->na->last_realname = sstrdup(realname.c_str());
 	}
 
 	if (debug)
-		alog("debug: %s changed realname to %s", this->nick, realname);
+		alog("debug: %s changed realname to %s", this->nick, realname.c_str());
+}
+
+User::~User()
+{
+	struct u_chanlist *c, *c2;
+	struct u_chaninfolist *ci, *ci2;
+	char *realname;
+
+	if (LogUsers)
+	{
+		realname = normalizeBuffer(this->realname);
+
+		if (ircd->vhost)
+		{
+			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
+				this->nick, this->username, this->host,
+				(this->vhost ? this->vhost : "(none)"), realname, this->server->name);
+		}
+		else
+		{
+			alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
+				this->nick, this->username, this->host,
+				realname, this->server->name);
+		}
+
+		free(realname);
+	}
+
+	send_event(EVENT_USER_LOGOFF, 1, this->nick);
+
+	if (debug >= 2)
+		alog("debug: User::~User() called");
+
+	usercnt--;
+
+	if (is_oper(this))
+		opcnt--;
+
+	if (debug >= 2)
+		alog("debug: User::~User(): free user data");
+
+	free(this->username);
+	free(this->host);
+
+	if (this->vhost)
+		free(this->vhost);
+	if (this->vident)
+		free(this->vident);
+	if (this->uid)
+		free(this->uid);
+
+	Anope_Free(this->realname);
+	Anope_Free(this->hostip);
+
+	if (debug >= 2)
+		alog("debug: User::~User(): remove from channels");
+
+	c = this->chans;
+
+	while (c)
+	{
+		c2 = c->next;
+		chan_deluser(this, c->chan);
+		free(c);
+		c = c2;
+	}
+
+	/* Cancel pending nickname enforcers, etc */
+	cancel_user(this);
+
+	if (this->na)
+		this->na->u = NULL;
+
+	if (debug >= 2)
+		alog("debug: User::~User(): free founder data");
+	ci = this->founder_chans;
+	while (ci)
+	{
+		ci2 = ci->next;
+		free(ci);
+		ci = ci2;
+	}
+
+	if (this->nickTrack)
+		free(this->nickTrack);
+
+	moduleCleanStruct(&this->moduleData);
+
+	if (debug >= 2)
+		alog("debug: User::~User(): delete from list");
+
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		userlist[HASH(this->nick)] = this->next;
+
+	if (this->next)
+		this->next->prev = this->prev;
+
+	if (debug >= 2)
+		alog("debug: User::~User() done");
 }
 
 /*************************************************************************/
@@ -183,92 +284,6 @@ void update_host(User * user)
 }
 
 /*************************************************************************/
-
-/* Remove and free a User structure. */
-
-void delete_user(User * user)
-{
-    struct u_chanlist *c, *c2;
-    struct u_chaninfolist *ci, *ci2;
-    char *realname;
-
-    if (LogUsers) {
-        realname = normalizeBuffer(user->realname);
-        if (ircd->vhost) {
-            alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
-                 user->nick, user->username, user->host,
-                 (user->vhost ? user->vhost : "(none)"),
-                 realname, user->server->name);
-        } else {
-            alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
-                 user->nick, user->username, user->host,
-                 realname, user->server->name);
-        }
-        free(realname);
-    }
-    send_event(EVENT_USER_LOGOFF, 1, user->nick);
-
-    if (debug >= 2)
-        alog("debug: delete_user() called");
-    usercnt--;
-    if (is_oper(user))
-        opcnt--;
-    if (debug >= 2)
-        alog("debug: delete_user(): free user data");
-    free(user->username);
-    free(user->host);
-    if (user->vhost)
-        free(user->vhost);
-    if (user->vident)
-        free(user->vident);
-    if (user->uid) {
-        free(user->uid);
-    }
-    Anope_Free(user->realname);
-    Anope_Free(user->hostip);
-    if (debug >= 2) {
-        alog("debug: delete_user(): remove from channels");
-    }
-    c = user->chans;
-    while (c) {
-        c2 = c->next;
-        chan_deluser(user, c->chan);
-        free(c);
-        c = c2;
-    }
-    /* This called only here now */
-    cancel_user(user);
-    if (user->na)
-        user->na->u = NULL;
-    if (debug >= 2)
-        alog("debug: delete_user(): free founder data");
-    ci = user->founder_chans;
-    while (ci) {
-        ci2 = ci->next;
-        free(ci);
-        ci = ci2;
-    }
-
-    if (user->nickTrack)
-        free(user->nickTrack);
-
-    moduleCleanStruct(&user->moduleData);
-
-    if (debug >= 2)
-        alog("debug: delete_user(): delete from list");
-    if (user->prev)
-        user->prev->next = user->next;
-    else
-        userlist[HASH(user->nick)] = user->next;
-    if (user->next)
-        user->next->prev = user->prev;
-    if (debug >= 2)
-        alog("debug: delete_user(): free user structure");
-    free(user);
-    if (debug >= 2)
-        alog("debug: delete_user() done");
-}
-
 /*************************************************************************/
 /*************************************************************************/
 
@@ -841,7 +856,7 @@ void do_quit(const char *source, int ac, char **av)
     if (LimitSessions && !is_ulined(user->server->name)) {
         del_session(user->host);
     }
-    delete_user(user);
+    delete user;
 }
 
 /*************************************************************************/
@@ -878,7 +893,7 @@ void do_kill(const char *nick, const char *msg)
     if (LimitSessions && !is_ulined(user->server->name)) {
         del_session(user->host);
     }
-    delete_user(user);
+    delete user;
 }
 
 /*************************************************************************/

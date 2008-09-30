@@ -69,6 +69,10 @@ class User
 	 */
 	User(const std::string &nick);
 
+	/** Destroy a user.
+	 */
+	~User();
+
 	/** Update the nickname of a user record accordingly, should be
 	 * called from ircd protocol.
 	 */

@@ -212,7 +212,7 @@ static void delete_server(Server * serv, const char *quitreason)
                     if (LimitSessions) {
                         del_session(u->host);
                     }
-                    delete_user(u);
+                    delete u;
                 }
                 u = unext;
             }

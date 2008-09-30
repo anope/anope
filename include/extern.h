@@ -1131,8 +1131,6 @@ E int32 usercnt, opcnt;
 E uint32 maxusercnt;
 E time_t maxusertime;
 
-E void delete_user(User *user);
-
 E void get_user_stats(long *nusers, long *memuse);
 E User *finduser(const char *nick);
 E User *firstuser(void);

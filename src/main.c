@@ -300,7 +300,7 @@ static void services_shutdown(void)
         u = firstuser();
         while (u) {
             next = nextuser();
-            delete_user(u);
+            delete u;
             u = next;
         }
     }

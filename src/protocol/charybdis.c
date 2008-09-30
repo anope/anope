@@ -752,13 +752,10 @@ void CharybdisProto::cmd_sqline(const char *mask, const char *reason)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
-void charybdis_cmd_unsgline(const char *mask)
+void CharybdisProto::cmd_unsgline(const char *mask)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "UNXLINE * %s", mask);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
 }
 
 void charybdis_cmd_unszline(const char *mask)
@@ -1670,7 +1667,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_unsgline(charybdis_cmd_unsgline);
     pmodule_cmd_unszline(charybdis_cmd_unszline);
     pmodule_cmd_szline(charybdis_cmd_szline);
     pmodule_cmd_sgline(charybdis_cmd_sgline);

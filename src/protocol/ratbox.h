@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_unsgline(const char *mask);
 void ratbox_cmd_unszline(const char *mask);
 void ratbox_cmd_szline(const char *mask, const char *reason, const char *whom);
 void ratbox_cmd_sgline(const char *mask, const char *reason);
@@ -105,4 +104,5 @@ class RatboxProto : public IRCDProtoNew {
 		void cmd_sqline(const char *, const char *);
 		void cmd_svsnick(const char *, const char *, time_t) { } // Ratbox doesn't have an SVSNICK command
 		void cmd_connect();
+		void cmd_unsgline(const char *);
 } ircd_proto;

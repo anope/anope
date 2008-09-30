@@ -1354,9 +1354,9 @@ void UnrealIRCdProto::cmd_release_svshold(const char *nick)
 /*
  * SVSNLINE - :realname mask
 */
-void unreal_cmd_unsgline(const char *mask)
+void UnrealIRCdProto::cmd_unsgline(const char *mask)
 {
-    send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
+	send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
 }
 
 /* UNSZLINE */
@@ -1938,7 +1938,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_unsgline(unreal_cmd_unsgline);
     pmodule_cmd_unszline(unreal_cmd_unszline);
     pmodule_cmd_szline(unreal_cmd_szline);
     pmodule_cmd_sgline(unreal_cmd_sgline);

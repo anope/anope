@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_unsgline(void (*func) (const char *mask));
 E void pmodule_cmd_unszline(void (*func) (const char *mask));
 E void pmodule_cmd_szline(void (*func) (const char *mask, const char *reason, const char *whom));
 E void pmodule_cmd_sgline(void (*func) (const char *mask, const char *reason));

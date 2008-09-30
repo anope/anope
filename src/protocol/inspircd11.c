@@ -1467,12 +1467,6 @@ void InspIRCdProto::cmd_release_svshold(const char *nick)
 	send_cmd(s_OperServ, "SVSHOLD %s", nick);
 }
 
-/* UNSGLINE */
-void inspircd_cmd_unsgline(const char *mask)
-{
-    /* Not Supported by this IRCD */
-}
-
 /* UNSZLINE */
 void inspircd_cmd_unszline(const char *mask)
 {
@@ -1647,7 +1641,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_unsgline(inspircd_cmd_unsgline);
     pmodule_cmd_unszline(inspircd_cmd_unszline);
     pmodule_cmd_szline(inspircd_cmd_szline);
     pmodule_cmd_sgline(inspircd_cmd_sgline);

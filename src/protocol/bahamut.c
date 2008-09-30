@@ -693,9 +693,9 @@ void BahamutIRCdProto::cmd_sqline(const char *mask, const char *reason)
 }
 
 /* UNSGLINE */
-void bahamut_cmd_unsgline(const char *mask)
+void BahamutIRCdProto::cmd_unsgline(const char *mask)
 {
-    send_cmd(NULL, "UNSGLINE 0 :%s", mask);
+	send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
 /* UNSZLINE */
@@ -1396,7 +1396,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_unsgline(bahamut_cmd_unsgline);
     pmodule_cmd_unszline(bahamut_cmd_unszline);
     pmodule_cmd_szline(bahamut_cmd_szline);
     pmodule_cmd_sgline(bahamut_cmd_sgline);

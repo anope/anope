@@ -146,11 +146,6 @@ void anope_cmd_376(const char *source)
     ircdproto.ircd_cmd_376(source);
 }
 
-void anope_cmd_nick(const char *nick, const char *name, const char *modes)
-{
-	ircdprotonew->cmd_nick(nick, name, modes);
-}
-
 void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	ircdprotonew->cmd_guest_nick(nick, user, host, real, modes);

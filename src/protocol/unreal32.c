@@ -589,14 +589,6 @@ void unreal_cmd_376(const char *source)
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void UnrealIRCdProto::cmd_nick(const char *nick, const char *name, const char *modes)
-{
-	EnforceQlinedNick(nick, NULL);
-	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), ServiceUser, ServiceHost, ServerName, modes,
-		ServiceHost, myIrcd->nickip ? " *" : " ", name);
-	cmd_sqline(nick, "Reserved for services");
-}
-
 void UnrealIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,

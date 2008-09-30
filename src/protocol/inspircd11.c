@@ -603,14 +603,6 @@ void inspircd_cmd_376(const char *source)
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void InspIRCdProto::cmd_nick(const char *nick, const char *name, const char *modes)
-{
-	/* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
-	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, ServiceHost, ServiceHost, ServiceUser, modes, name);
-	/* Don't send ServerName as the source here... -GD */
-	send_cmd(nick, "OPERTYPE Service");
-}
-
 void InspIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
@@ -765,7 +757,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 void InspIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
-	send_cmd(nick, "OPERTYPE Bot");
+	send_cmd(nick, "OPERTYPE Service");
 }
 
 void InspIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)

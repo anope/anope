@@ -32,51 +32,41 @@ void introduce_user(const char *user)
     memmove(lasttimes, lasttimes + 1, sizeof(lasttimes) - sizeof(int));
     lasttimes[LTSIZE - 1] = time(NULL);
 #undef LTSIZE
-
     /* We make aliases go online */
     if (s_NickServAlias && (!user || stricmp(user, s_NickServAlias) == 0)) {
-        anope_cmd_nick(s_NickServAlias, desc_NickServAlias,
-                       ircd->nickservaliasmode);
+        anope_cmd_bot_nick(s_NickServAlias, ServiceUser, ServiceHost, desc_NickServAlias, ircd->nickservaliasmode);
     }
 
     if (s_ChanServAlias && (!user || stricmp(user, s_ChanServAlias) == 0)) {
-        anope_cmd_nick(s_ChanServAlias, desc_ChanServAlias,
-                       ircd->chanservaliasmode);
+        anope_cmd_bot_nick(s_ChanServAlias, ServiceUser, ServiceHost, desc_ChanServAlias, ircd->chanservaliasmode);
     }
 
     if (s_MemoServAlias && (!user || stricmp(user, s_MemoServAlias) == 0)) {
-        anope_cmd_nick(s_MemoServAlias, desc_MemoServAlias,
-                       ircd->memoservaliasmode);
+        anope_cmd_bot_nick(s_MemoServAlias, ServiceUser, ServiceHost, desc_MemoServAlias, ircd->memoservaliasmode);
     }
 
     if (s_BotServAlias && (!user || stricmp(user, s_BotServAlias) == 0)) {
-        anope_cmd_nick(s_BotServAlias, desc_BotServAlias,
-                       ircd->botservaliasmode);
+        anope_cmd_bot_nick(s_BotServAlias, ServiceUser, ServiceHost, desc_BotServAlias, ircd->botservaliasmode);
     }
 
     if (s_HelpServAlias && (!user || stricmp(user, s_HelpServAlias) == 0)) {
-        anope_cmd_nick(s_HelpServAlias, desc_HelpServAlias,
-                       ircd->helpservaliasmode);
+        anope_cmd_bot_nick(s_HelpServAlias, ServiceUser, ServiceHost, desc_HelpServAlias, ircd->helpservaliasmode);
     }
 
     if (s_OperServAlias && (!user || stricmp(user, s_OperServAlias) == 0)) {
-        anope_cmd_nick(s_OperServAlias, desc_OperServAlias,
-                       ircd->operservaliasmode);
+        anope_cmd_bot_nick(s_OperServAlias, ServiceUser, ServiceHost, desc_OperServAlias, ircd->operservaliasmode);
     }
 
     if (s_DevNullAlias && (!user || stricmp(user, s_DevNullAlias) == 0)) {
-        anope_cmd_nick(s_DevNullAlias, desc_DevNullAlias,
-                       ircd->devnullvaliasmode);
+        anope_cmd_bot_nick(s_DevNullAlias, ServiceUser, ServiceHost, desc_DevNullAlias, ircd->devnullvaliasmode);
     }
     if (s_HostServAlias && ircd->vhost
         && (!user || stricmp(user, s_HostServAlias) == 0)) {
-        anope_cmd_nick(s_HostServAlias, desc_HostServAlias,
-                       ircd->hostservaliasmode);
+        anope_cmd_bot_nick(s_HostServAlias, ServiceUser, ServiceHost, desc_HostServAlias, ircd->hostservaliasmode);
     }
     if (s_GlobalNoticerAlias
         && (!user || stricmp(user, s_GlobalNoticerAlias) == 0)) {
-        anope_cmd_nick(s_GlobalNoticerAlias, desc_GlobalNoticerAlias,
-                       ircd->globalaliasmode);
+        anope_cmd_bot_nick(s_GlobalNoticerAlias, ServiceUser, ServiceHost, desc_GlobalNoticerAlias, ircd->globalaliasmode);
     }
 
     /* We make the bots go online */

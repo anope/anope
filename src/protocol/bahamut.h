@@ -87,7 +87,6 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void cmd_svskill(const char *, const char *, const char *);
 		void cmd_svsmode(User *, int, const char **);
-		void cmd_nick(const char *, const char *, const char *);
 		void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_mode(const char *, const char *, const char *);
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);

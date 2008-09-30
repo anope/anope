@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -458,7 +458,7 @@ int anope_event_vhost(char *source, int ac, char **av)
 
 /*
 ** SNICK
-**      source  = NULL       
+**      source  = NULL
 **	parv[0] = nickname     Trystan
 **      parv[1] = timestamp    1090113640
 **      parv[2] = hops         1
@@ -500,7 +500,7 @@ int anope_event_436(char *source, int ac, char **av)
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
-    
+
     updateProtectDetails("ADMIN","ADMINME","admin","deadmin","AUTOADMIN","+a","-a");
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
@@ -1430,7 +1430,7 @@ int anope_event_pass(char *source, int ac, char **av)
  *		parv[3] = standalone or connected to non-TS (unused)
  *		parv[4] = UTC time
  *		parv[5] = ircd codename
- *		parv[6] = masking keys 
+ *		parv[6] = masking keys
  */
 int anope_event_svinfo(char *source, int ac, char **av)
 {
@@ -1520,7 +1520,7 @@ void rageircd_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1530,7 +1530,7 @@ int rageircd_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1638,7 +1638,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(rageircd_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1671,6 +1671,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

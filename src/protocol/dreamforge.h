@@ -6,12 +6,12 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
-#define UMODE_a 0x00000001  /* Services Admin */ 
+#define UMODE_a 0x00000001  /* Services Admin */
 #define UMODE_h 0x00000002  /* Help system operator */
 #define UMODE_i 0x00000004  /* makes user invisible */
 #define UMODE_o 0x00000008  /* Operator */
@@ -109,3 +109,6 @@ void dreamforge_cmd_jupe(char *jserver, char *who, char *reason);
 int dreamforge_valid_nick(char *nick);
 void dreamforge_cmd_ctcp(char *source, char *dest, char *buf);
 
+class DreamForgeProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

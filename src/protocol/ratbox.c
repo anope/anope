@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -645,7 +645,7 @@ int anope_event_topic(char *source, int ac, char **av)
         c->topic_time = topic_time;
 
         record_topic(av[0]);
-		
+
 		if (ac > 1 && *av[1])
 		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
 		else
@@ -712,10 +712,10 @@ int anope_event_436(char *source, int ac, char **av)
 
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) 
+void moduleAddIRCDMsgs(void)
 {
     Message *m;
-    
+
     updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 
     if (UseTS6) {
@@ -758,7 +758,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);    
+    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
 }
 
@@ -925,18 +925,18 @@ void ratbox_cmd_svsinfo()
 /* CAPAB */
 /*
   QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions 
+  EX     - Can do channel +e exemptions
   CHW    - Can do channel wall @#
-  LL     - Can do lazy links 
-  IE     - Can do invite exceptions 
+  LL     - Can do lazy links
+  IE     - Can do invite exceptions
   EOB    - Can do EOB message
-  KLN    - Can do KLINE message 
-  GLN    - Can do GLINE message 
-  HUB    - This server is a HUB 
+  KLN    - Can do KLINE message
+  GLN    - Can do GLINE message
+  HUB    - This server is a HUB
   UID    - Can do UIDs
   ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links 
-  KNOCK  -  supports KNOCK 
+  ENC    - Can do ENCrypted links
+  KNOCK  -  supports KNOCK
   TBURST - supports TBURST
   PARA	 - supports invite broadcasting for +p
   ENCAP	 - ?
@@ -1724,7 +1724,7 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1736,7 +1736,7 @@ int ratbox_valid_nick(char *nick)
 	return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1844,7 +1844,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(ratbox_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1876,6 +1876,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

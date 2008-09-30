@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -1578,7 +1578,7 @@ void ultimate2_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1588,7 +1588,7 @@ int ultiamte2_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1696,7 +1696,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(ultiamte2_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1728,6 +1728,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -131,3 +131,7 @@ int anope_event_sapart(char *source, int ac, char **av);
 int anope_event_version(char *source, int ac, char **av);
 int anope_event_opertype(char *source, int ac, char **av);
 int anope_event_idle(char* source, int ac, char **av);
+
+class InspIRCdProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

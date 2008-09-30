@@ -6,9 +6,9 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * Provided by the ShadowIRCd development group. See 
+ * Based on the original code of Services by Andy Church.
+ *
+ * Provided by the ShadowIRCd development group. See
  * http://www.shadowircd.net for details.
  */
 
@@ -608,10 +608,10 @@ int anope_event_nick(char *source, int ac, char **av)
             anope_set_umode(user, 1, &av[3]);
         }
     } else if (ac == 8) {
-        /* Changed use of s->name to av[6], as s will be NULL 
+        /* Changed use of s->name to av[6], as s will be NULL
          * if i can believe the above comments, this should be fine
          * if anyone from shadowircd see's this, and its wrong, let
-         * me know? :)    
+         * me know? :)
          */
         user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
                        strtoul(av[2], NULL, 10), 0, 0, NULL, NULL);
@@ -683,7 +683,7 @@ int anope_event_topic(char *source, int ac, char **av)
         c->topic_time = topic_time;
 
         record_topic(av[0]);
-		
+
 		if (ac > 1 && *av[1])
 		    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
 		else
@@ -734,15 +734,15 @@ int anope_event_tburst(char *source, int ac, char **av)
     c->topic_time = topic_time;
 
     record_topic(av[0]);
-	
+
 	if (ac > 1 && *av[3])
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[3]);
 	else
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-			
+
     if (setter)
         free(setter);
-	
+
     return MOD_CONT;
 }
 
@@ -757,10 +757,10 @@ int anope_event_436(char *source, int ac, char **av)
 
 
 /* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) 
+void moduleAddIRCDMsgs(void)
 {
     Message *m;
-    
+
     updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
 
     TS6SID = sstrdup(Numeric);
@@ -802,7 +802,7 @@ void moduleAddIRCDMsgs(void)
     m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
     m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);   
+    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);
     m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
     m = createMessage("EOB",       anope_event_eos); addCoreMessage(IRCD,m);
     m = createMessage("TSSYNC",    anope_event_null); addCoreMessage(IRCD,m);
@@ -991,7 +991,7 @@ void shadowircd_cmd_bot_nick(char *nick, char *user, char *host,
                              char *real, char *modes)
 {
 	char *uidbuf = ts6_uid_retrieve();
-	
+
     EnforceQlinedNick(nick, NULL);
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
              (long int) time(NULL), modes, user, host, uidbuf, host,
@@ -1353,7 +1353,7 @@ void shadowircd_cmd_tmode(char *source, char *dest, char *buf)
 void shadowircd_cmd_nick(char *nick, char *name, char *mode)
 {
 	char *uidbuf = ts6_uid_retrieve();
-	
+
     EnforceQlinedNick(nick, NULL);
     send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0.0.0.0 %s %s :%s", nick,
              (long int) time(NULL), mode, ServiceUser, ServiceHost,
@@ -1676,7 +1676,7 @@ void shadowircd_cmd_jupe(char *jserver, char *who, char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1688,7 +1688,7 @@ int shadowircd_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1827,6 +1827,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

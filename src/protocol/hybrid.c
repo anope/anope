@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -658,7 +658,7 @@ void hybrid_cmd_sqline(char *mask, char *reason)
     if (!mask || !reason) {
         return;
     }
-    
+
     send_cmd(ServerName, "RESV * %s :%s", mask, reason);
 }
 void hybrid_cmd_unsgline(char *mask)
@@ -666,7 +666,7 @@ void hybrid_cmd_unsgline(char *mask)
     if (!mask) {
         return;
     }
-    
+
     send_cmd(ServerName, "UNXLINE * %s", mask);
 }
 
@@ -694,7 +694,7 @@ void hybrid_cmd_sgline(char *mask, char *reason)
     if (!mask || !reason) {
         return;
     }
-    
+
     send_cmd(ServerName, "XLINE * %s 0 :%s", mask, reason);
 }
 
@@ -725,7 +725,7 @@ void hybrid_cmd_unsqline(char *user)
     if (!user) {
         return;
     }
-    
+
     send_cmd(ServerName, "UNRESV * %s", user);
 }
 
@@ -786,20 +786,20 @@ void hybrid_cmd_svinfo()
 /* CAPAB */
 /*
   QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions 
+  EX     - Can do channel +e exemptions
   CHW    - Can do channel wall @#
-  LL     - Can do lazy links 
-  IE     - Can do invite exceptions 
+  LL     - Can do lazy links
+  IE     - Can do invite exceptions
   EOB    - Can do EOB message
-  KLN    - Can do KLINE message 
-  GLN    - Can do GLINE message 
+  KLN    - Can do KLINE message
+  GLN    - Can do GLINE message
   HOPS   - can do half ops (+h)
-  HUB    - This server is a HUB 
-  AOPS   - Can do anon ops (+a) 
+  HUB    - This server is a HUB
+  AOPS   - Can do anon ops (+a)
   UID    - Can do UIDs
   ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links 
-  KNOCK  -  supports KNOCK 
+  ENC    - Can do ENCrypted links
+  KNOCK  -  supports KNOCK
   TBURST - supports TBURST
   PARA	 - supports invite broadcasting for +p
   ENCAP	 - ?
@@ -1234,10 +1234,10 @@ int anope_event_capab(char *source, int ac, char **av)
 	int argc;
 	char **argv;
 	char *str;
-	
+
 	if (ac < 1)
 		return MOD_CONT;
-	
+
 	/* We get the params as one arg, we should split it for capab_parse */
 	argv = scalloc(argvsize, sizeof(char *));
 	argc = 0;
@@ -1249,15 +1249,15 @@ int anope_event_capab(char *source, int ac, char **av)
 		argv[argc] = str;
 		argc++;
 	}
-	
+
     capab_parse(argc, argv);
-	
+
 	/* Free our built ac/av */
 	for (argvsize = 0; argvsize < argc; argvsize++) {
 		free(argv[argvsize]);
 	}
 	free(argv);
-	
+
     return MOD_CONT;
 }
 
@@ -1417,7 +1417,7 @@ void hybrid_cmd_jupe(char *jserver, char *who, char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1427,7 +1427,7 @@ int hybrid_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1535,7 +1535,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(hybrid_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1567,6 +1567,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -157,7 +157,7 @@
 # else
 #   define VA_COPY(DEST, SRC) va_copy(DEST, SRC)
 # endif
-#endif 
+#endif
 
 #ifdef _AIX
 /* Some AIX boxes seem to have bogus includes that don't have these
@@ -386,7 +386,7 @@ struct ircdcapab_ {
   uint32 nickchars;
 };
 
-/* tiny struct needed for P10 and other UID servers so we can track 
+/* tiny struct needed for P10 and other UID servers so we can track
    services UID
 */
 struct uid_ {
@@ -457,7 +457,7 @@ struct ModuleData_ {
 	char *value;							/* The Value */
 	ModuleData *next;						/* The next ModuleData record */
 };
- 
+
  /*************************************************************************/
 
 /* Memo info structures.  Since both nicknames and channels can have memos,
@@ -664,7 +664,7 @@ struct chaninfo_ {
 
     struct channel_ *c;			/* Pointer to channel record (if   *
 					 			 *    channel is currently in use) */
-								 
+
     ModuleData *moduleData; 	/* Module saved data attached to the ChannelInfo */
 
     /* For BotServ */
@@ -823,7 +823,7 @@ typedef enum {
 
 struct server_ {
     Server *next, *prev;
-    
+
     char *name;     /* Server name                        */
     uint16 hops;    /* Hops between services and server   */
     char *desc;     /* Server description                 */
@@ -839,7 +839,6 @@ struct server_ {
 #define SERVER_JUPED 0x0002
 
 /*************************************************************************/
-
 #include "users.h"
 
 
@@ -1157,6 +1156,10 @@ typedef struct ircd_proto_ {
     int (*ircd_valid_chan)(const char *chan);
     int (*ircd_flood_mode_check)(const char *value);
 } IRCDProto;
+
+class IRCDProtoNew {
+	public:
+};
 
 typedef struct ircd_modes_ {
         int user_invis;

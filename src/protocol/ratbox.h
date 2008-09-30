@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -116,4 +116,6 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason);
 int ratbox_valid_nick(char *nick);
 void ratbox_cmd_ctcp(char *source, char *dest, char *buf);
 
-
+class RatboxProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

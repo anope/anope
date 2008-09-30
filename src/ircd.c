@@ -16,10 +16,11 @@
 #include "extern.h"
 
 IRCDProto ircdproto;
+IRCDProtoNew *ircdprotonew;
 IRCDModes ircd_modes;
 
 /**
- * Globals we want from the protocol file 
+ * Globals we want from the protocol file
  **/
 IRCDVar *ircd;
 IRCDCAPAB *ircdcap;
@@ -32,6 +33,11 @@ CBMode cbmodes[128];
 CMMode cmmodes[128];
 char csmodes[128];
 int UseTSMODE;
+
+void pmodule_ircd_proto(IRCDProtoNew *proto)
+{
+	ircdprotonew = proto;
+}
 
 /**
  * Initiate a protocol struct ready for use
@@ -268,27 +274,49 @@ void anope_cmd_notice2(const char *source, const char *dest, const char *msg)
     ircdproto.ircd_cmd_notice2(source, dest, msg);
 }
 
-void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...) 
+void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    char actionbuf[BUFSIZE];
-    *buf = '\0';
-    *actionbuf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    } else {
-        return;
-    }
-    if (!buf) {
-        return;
-    }
-    snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
-    ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
-}
-void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...)
+
+va_list args;
+
+char buf[BUFSIZE];
+
+char actionbuf[BUFSIZE];
+
+
+*buf = '\0';
+
+*actionbuf = '\0';
+
+
+if (fmt) {
+
+va_start(args, fmt);
+
+vsnprintf(buf, BUFSIZE - 1, fmt, args);
+
+va_end(args);
+
+} else {
+
+return;
+
+}
+
+
+if (!buf) {
+
+return;
+
+}
+
+snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
+
+ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
+
+}
+
+void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];

@@ -7,8 +7,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -383,7 +383,7 @@ CUMode myCumodes[128] = {
 static int has_servicesmod = 0;
 static int has_globopsmod = 0;
 
-/* These are sanity checks to insure we are supported. 
+/* These are sanity checks to insure we are supported.
    The ircd tends to /squit us if we issue unsupported cmds.
    - katsklaw */
 static int has_svsholdmod = 0;
@@ -623,7 +623,7 @@ void inspircd_cmd_mode(char *source, char *dest, char *buf)
     if (!buf) {
         return;
     }
-    
+
     c = findchan(dest);
     send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, (unsigned int)((c) ? c->creation_time : time(NULL)), buf);
 }
@@ -692,7 +692,7 @@ int anope_event_fmode(char *source, int ac, char **av)
         /* Got FMODE for a non-existing channel */
     	return MOD_CONT;
     }
-    
+
     /* TS's are equal now, so we can proceed with parsing */
     n = o = 0;
     while (n < ac) {
@@ -1244,13 +1244,13 @@ int anope_event_rsquit(char *source, int ac, char **av)
 {
     if (ac < 1 || ac > 3)
         return MOD_CONT;
-    
+
     /* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
     if (ac > 1 && strcmp(ServerName, av[0]) == 0)
         do_squit(source, ac - 1, av + 1);
     else
         do_squit(source, ac, av);
-    
+
     return MOD_CONT;
 }
 
@@ -1427,10 +1427,10 @@ int anope_event_nick(char *source, int ac, char **av)
         if (ac == 8) {
 			int svid = 0;
 			int ts = strtoul(av[0], NULL, 10);
-			
+
 			if (strchr(av[5], 'r') != NULL)
 				svid = ts;
-			
+
             inet_aton(av[6], &addy);
             user = do_nick("", av[1],   /* nick */
                            av[4],   /* username */
@@ -1524,13 +1524,13 @@ int anope_event_capab(char *source, int ac, char **av)
         if (strstr(av[1], "m_services.so")) {
             has_servicesmod = 1;
         }
-	if (strstr(av[1], "m_svshold.so")) {      
+	if (strstr(av[1], "m_svshold.so")) {
             has_svsholdmod = 1;
         }
 	if (strstr(av[1], "m_chghost.so")) {
             has_chghostmod = 1;
         }
-	if (strstr(av[1], "m_chgident.so")) {      
+	if (strstr(av[1], "m_chgident.so")) {
             has_chgidentmod = 1;
         }
         if (strstr(av[1], "m_messageflood.so")) {
@@ -1566,9 +1566,9 @@ int anope_event_capab(char *source, int ac, char **av)
         if (!has_chgidentmod) {
             anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
         }
-        if (has_messagefloodmod) {       
+        if (has_messagefloodmod) {
             cbmi = myCbmodeinfos;
-            
+
             /* Find 'f' in myCbmodeinfos and add the relevant bits to myCbmodes and myCbmodeinfos
              * to enable +f support if found. This is needed because we're really not set up to
              * handle modular ircds which can have modes enabled/disabled as they please :( - mark
@@ -1579,15 +1579,15 @@ int anope_event_capab(char *source, int ac, char **av)
             if (cbmi) {
                 cbmi->getvalue = get_flood;
                 cbmi->csgetvalue = cs_get_flood;
-                
+
                 myCbmodes['f'].flag = CMODE_f;
                 myCbmodes['f'].flags = 0;
                 myCbmodes['f'].setvalue = set_flood;
                 myCbmodes['f'].cssetvalue = cs_set_flood;
-                
+
                 pmodule_ircd_cbmodeinfos(myCbmodeinfos);
                 pmodule_ircd_cbmodes(myCbmodes);
-                
+
                 ircd->fmode = 1;
             }
             else {
@@ -1612,7 +1612,7 @@ int anope_event_capab(char *source, int ac, char **av)
         if (has_banexceptionmod || has_inviteexceptionmod) {
             pmodule_ircd_cmmodes(myCmmodes);
         }
-        
+
         /* Generate a fake capabs parsing call so things like NOQUIT work
          * fine. It's ugly, but it works....
          */
@@ -1888,7 +1888,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(inspircd_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1921,6 +1921,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

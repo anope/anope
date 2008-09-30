@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -113,3 +113,7 @@ int hybrid_flood_mode_check(char *value);
 void hybrid_cmd_jupe(char *jserver, char *who, char *reason);
 int hybrid_valid_nick(char *nick);
 void hybrid_cmd_ctcp(char *source, char *dest, char *buf);
+
+class HybridIRCdProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

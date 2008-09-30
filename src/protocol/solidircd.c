@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -553,7 +553,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
 **	parv[7] = servicestamp
 **      parv[8] = IP
 **	parv[9] = info
-** NICK - change 
+** NICK - change
 **      source  = oldnick
 **	parv[0] = new nickname
 **      parv[1] = hopcount
@@ -640,7 +640,7 @@ int anope_event_436(char *source, int ac, char **av)
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
-    
+
     updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 
     m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
@@ -812,7 +812,7 @@ void solidircd_cmd_join(char *user, char *channel, time_t chantime)
 }
 
 /* AKILL */
-/* parv[1]=host 
+/* parv[1]=host
  * parv[2]=user
  * parv[3]=length
  * parv[4]=akiller
@@ -861,8 +861,8 @@ void solidircd_cmd_svsmode(User * u, int ac, char **av)
 
 /* SQUIT */
 /*
- *        parv[0] = sender prefix 
- *        parv[1] = server name 
+ *        parv[0] = sender prefix
+ *        parv[1] = server name
  *        parv[2] = comment
 */
 void solidircd_cmd_squit(char *servname, char *message)
@@ -883,11 +883,11 @@ void solidircd_cmd_burst()
 
 
 /*
- * SVINFO 
- *       parv[0] = sender prefix 
- *       parv[1] = TS_CURRENT for the server 
- *       parv[2] = TS_MIN for the server 
- *       parv[3] = server is standalone or connected to non-TS only 
+ * SVINFO
+ *       parv[0] = sender prefix
+ *       parv[1] = TS_CURRENT for the server
+ *       parv[2] = TS_MIN for the server
+ *       parv[3] = server is standalone or connected to non-TS only
  *       parv[4] = server's idea of UTC time
  */
 void solidircd_cmd_svinfo()
@@ -956,10 +956,10 @@ int anope_event_privmsg(char *source, int ac, char **av)
 
 /* EVENT : SVINFO */
 /*
- *       parv[0] = sender prefix 
- *       parv[1] = TS_CURRENT for the server 
- *       parv[2] = TS_MIN for the server 
- *       parv[3] = server is standalone or connected to non-TS only 
+ *       parv[0] = sender prefix
+ *       parv[1] = TS_CURRENT for the server
+ *       parv[2] = TS_MIN for the server
+ *       parv[3] = server is standalone or connected to non-TS only
  *       parv[4] = server's idea of UTC time
  */
 int anope_event_svinfo(char *source, int ac, char **av)
@@ -1553,7 +1553,7 @@ void solidircd_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1563,7 +1563,7 @@ int solidircd_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1671,7 +1671,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(solidircd_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1704,6 +1704,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

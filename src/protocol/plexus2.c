@@ -206,7 +206,7 @@ plexus_set_umode (User * user, int ac, char **av)
     }
 }
 
-/*  
+/*
  * Local valid_op, and valid_halfop overrides.
  * These are nessecary due to the way hybrid-based ircds handle halfops.
  * hybrid-based ircds treat a -o as a -h as well. So if a user is set -o,
@@ -667,12 +667,12 @@ anope_event_topic (char *source, int ac, char **av)
       c->topic_time = topic_time;
 
       record_topic (av[0]);
-	  
+
 	  if (ac > 1 && *av[1])
 	      send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
 	  else
 	      send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-			  
+
     }
   return MOD_CONT;
 }
@@ -930,20 +930,20 @@ plexus_cmd_svinfo ()
 /* CAPAB */
 /*
   QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions 
+  EX     - Can do channel +e exemptions
   CHW    - Can do channel wall @#
-  LL     - Can do lazy links 
-  IE     - Can do invite exceptions 
+  LL     - Can do lazy links
+  IE     - Can do invite exceptions
   EOB    - Can do EOB message
-  KLN    - Can do KLINE message 
-  GLN    - Can do GLINE message 
+  KLN    - Can do KLINE message
+  GLN    - Can do GLINE message
   HOPS   - can do half ops (+h)
-  HUB    - This server is a HUB 
-  AOPS   - Can do anon ops (+a) 
+  HUB    - This server is a HUB
+  AOPS   - Can do anon ops (+a)
   UID    - Can do UIDs
   ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links 
-  KNOCK  -  supports KNOCK 
+  ENC    - Can do ENCrypted links
+  KNOCK  -  supports KNOCK
   TBURST - supports TBURST
   PARA	 - supports invite broadcasting for +p
   ENCAP	 - ?
@@ -1714,7 +1714,7 @@ plexus_cmd_jupe (char *jserver, char *who, char *reason)
   new_server (me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1725,7 +1725,7 @@ plexus_valid_nick (char *nick)
   return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1839,7 +1839,7 @@ moduleAddAnopeCmds ()
   pmodule_set_umode (plexus_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int
@@ -1872,6 +1872,7 @@ AnopeInit (int argc, char **argv)
   pmodule_limit_mode (CMODE_l);
 
   moduleAddAnopeCmds ();
+	pmodule_ircd_proto(&ircd_proto);
   moduleAddIRCDMsgs ();
 
   return MOD_CONT;

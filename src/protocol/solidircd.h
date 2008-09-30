@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -135,3 +135,7 @@ int solidircd_flood_mode_check(char *value);
 void solidircd_cmd_jupe(char *jserver, char *who, char *reason);
 int solidircd_valid_nick(char *nick);
 void solidircd_cmd_ctcp(char *source, char *dest, char *buf);
+
+class SolidIRCdProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

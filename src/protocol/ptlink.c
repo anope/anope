@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -396,7 +396,7 @@ void ptlink_cmd_bot_chan_mode(char *nick, char *chan)
 	parv[0] = sender
 	parv[1] = channel TS (channel creation time)
 	parv[2] = channel
-	parv[3] = modes + n arguments (key and/or limit) 
+	parv[3] = modes + n arguments (key and/or limit)
 	... [n]  = if(key and/or limit) mode arguments
 	parv[4+n] = flags+nick list (all in one parameter)
 	NOTE: ignore channel modes if we already have the channel with a gr
@@ -474,7 +474,7 @@ int anope_event_newmask(char *source, int ac, char **av)
 /*
  NICK %s %d %lu %s %s %s %s %s :%s
 	parv[0] = nickname
-	parv[1] = hopcount 
+	parv[1] = hopcount
 	parv[2] = nick TS (nick introduction time)
 	parv[3] = umodes
     parv[4] = username
@@ -512,7 +512,7 @@ int anope_event_nick(char *source, int ac, char **av)
 
 /*
   :%s SERVER %s %d %s :%s
-	parv[0] = server from where the server was introduced to us 
+	parv[0] = server from where the server was introduced to us
   	parv[1] = server name
 	parv[2] = hop count (1 wen are directly connected)
 	parv[3] = server version
@@ -663,7 +663,7 @@ int anope_event_capab(char *source, int ac, char **av)
 
 /*
    :%s SQLINE %s :%s
-	parv[0] = sender 
+	parv[0] = sender
 	parv[1] = sqlined nick/mask
 	parv[2] = reason
 */
@@ -714,7 +714,7 @@ void anope_topic(char *whosets, char *chan, char *whosetit, char *topic,
 
 /*
  :%s UNSQLINE %s
-	parv[0] = sender 
+	parv[0] = sender
 	parv[1] = sqlined nick/mask
 */
 void ptlink_cmd_unsqline(char *user)
@@ -733,7 +733,7 @@ void ptlink_cmd_join(char *user, char *channel, time_t chantime)
 	parv[0] = sender (server if on network synchronization)
 	parv[1] = glined usert@host mask
 	parv[2] = gline duration time (seconds)
-	parv[3] = who added the gline 
+	parv[3] = who added the gline
 	parv[4] = reason
 */
 void ptlink_cmd_akill(char *user, char *host, char *who, time_t when,
@@ -837,8 +837,8 @@ void ptlink_cmd_svsinfo()
 
 /*
   PASS %s :TS
-	parv[1] = connection password 
-	(TS indicates this is server uses TS protocol and SVINFO will be sent 
+	parv[1] = connection password
+	(TS indicates this is server uses TS protocol and SVINFO will be sent
 	for protocol compatibility checking)
 */
 void ptlink_cmd_pass(char *pass)
@@ -848,7 +848,7 @@ void ptlink_cmd_pass(char *pass)
 
 /*
   CAPAB :%s
-	parv[1] = capability list 
+	parv[1] = capability list
 */
 void ptlink_cmd_capab()
 {
@@ -1190,7 +1190,7 @@ void ptlink_cmd_mode(char *source, char *dest, char *buf)
 /*
  NICK %s %d %lu %s %s %s %s %s :%s
 	parv[1] = nickname
-	parv[2] = hopcount 
+	parv[2] = hopcount
 	parv[3] = nick TS (nick introduction time)
 	parv[4] = umodes
     parv[5] = username
@@ -1413,7 +1413,7 @@ void ptlink_cmd_release_svshold(char *nick)
 
 /*
 :%s UNZLINE %s
-	parv[0] = sender 
+	parv[0] = sender
 	parv[1] = zlined host
 */
 void ptlink_cmd_unszline(char *mask)
@@ -1423,7 +1423,7 @@ void ptlink_cmd_unszline(char *mask)
 
 /*
 :%s ZLINE %s :%s
-	parv[0] = sender 
+	parv[0] = sender
 	parv[1] = zlined host
 	parv[2] = time
 	parv[3] = reason
@@ -1434,9 +1434,9 @@ void ptlink_cmd_szline(char *mask, char *reason, char *whom)
              (long int) time(NULL) + 86400 * 2, reason);
 }
 
-/*  
+/*
 :%s UNSXLINE %s
-	parv[0] = sender 
+	parv[0] = sender
 	parv[1] = info ban mask
 */
 void ptlink_cmd_unsgline(char *mask)
@@ -1547,7 +1547,7 @@ void ptlink_cmd_chg_nick(char *oldnick, char *newnick)
  :%s SVSJOIN %s :%s
   	parv[0] = sender (services client)
 	parv[1]	= target client nick
-	parv[2] = channels list 
+	parv[2] = channels list
   	:OperServ SVSJOIN Trystan #Admin
 */
 void ptlink_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
@@ -1559,7 +1559,7 @@ void ptlink_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
   :%s SVSPART %s :%s
   	parv[0] = sender (services client)
 	parv[1]	= target client nick
-	parv[2] = channels list 
+	parv[2] = channels list
   e.g.:	:ChanServ SVSPART mynick 4163321 #Chan1,#Chan2
 */
 void ptlink_cmd_svspart(char *source, char *nick, char *chan)
@@ -1640,7 +1640,7 @@ void ptlink_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1650,7 +1650,7 @@ int ptlink_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1758,7 +1758,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(ptlink_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1792,6 +1792,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

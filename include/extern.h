@@ -6,9 +6,9 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -562,7 +562,7 @@ E char *DefConAkillReason;
 E char *DefConOffMessage;
 
 E long unsigned int UserKey1;
-E long unsigned int UserKey2;     
+E long unsigned int UserKey2;
 E long unsigned int UserKey3;
 /**** converter.c ****/
 
@@ -608,6 +608,7 @@ E int init_secondary(int ac, char **av);
 E int servernum;
 
 /**** ircd.c ****/
+E void pmodule_ircd_proto(IRCDProtoNew *);
 E void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av));
 E void pmodule_cmd_svsnoop(void (*func) (const char *server, int set));
 E void pmodule_cmd_remove_akill(void (*func) (const char *user, const char *host));
@@ -1001,7 +1002,7 @@ E int check_szline(char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
-E int OSOpersOnly; 
+E int OSOpersOnly;
 E time_t DefContimer;
 E void runDefCon(void);
 E int defconParseModeString(const char *str);

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -691,7 +691,7 @@ void unreal_cmd_protoctl()
 {
     /*
        See Unreal's protoctl.txt for reference
-       VHP - Send hostnames in NICKv2 even if not sethosted 
+       VHP - Send hostnames in NICKv2 even if not sethosted
      */
     send_cmd(NULL, "PROTOCTL NICKv2 VHP");
 }
@@ -1191,10 +1191,10 @@ int anope_event_nick(char *source, int ac, char **av)
 
     if (ac != 2) {
         if (ac == 7) {
-            /* 
+            /*
                <codemastr> that was a bug that is now fixed in 3.2.1
                <codemastr> in  some instances it would use the non-nickv2 format
-               <codemastr> it's sent when a nick collision occurs 
+               <codemastr> it's sent when a nick collision occurs
                - so we have to leave it around for now -TSL
              */
             do_nick(source, av[0], av[3], av[4], av[5], av[6],
@@ -1435,7 +1435,7 @@ void unreal_cmd_global_legacy(char *source, char *fmt)
              send_token("GLOBOPS", "]"), fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1554,7 +1554,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(unreal_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1586,6 +1586,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

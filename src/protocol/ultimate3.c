@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -512,7 +512,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
 **	parv[7] = servicestamp
 **      parv[8] = IP
 **	parv[9] = info
-** NICK - change 
+** NICK - change
 **      source  = oldnick
 **	parv[0] = new nickname
 **      parv[1] = hopcount
@@ -560,7 +560,7 @@ int anope_event_capab(char *source, int ac, char **av)
 
 /*
 ** CLIENT
-**      source  = NULL       
+**      source  = NULL
 **	parv[0] = nickname   Trystan
 **      parv[1] = hopcount   1
 **      parv[2] = timestamp  1090083810
@@ -570,7 +570,7 @@ int anope_event_capab(char *source, int ac, char **av)
 **      parv[6] = hostname   c-24-2-101-227.client.comcast.net
 **      parv[7] = vhost      3223f75b.2b32ee69.client.comcast.net
 **	parv[8] = server     WhiteRose.No.Eu.Shadow-Realm.org
-**      parv[9] = svid       0 
+**      parv[9] = svid       0
 **	parv[10] = ip         402810339
 ** 	parv[11] = info      Dreams are answers to questions not yet asked
 */
@@ -1427,11 +1427,11 @@ void ultimate3_cmd_svsnick(char *source, char *guest, time_t when)
 
 /* Functions that use serval cmd functions */
 /*
- * SVINFO 
- *       parv[0] = sender prefix 
- *       parv[1] = TS_CURRENT for the server 
- *       parv[2] = TS_MIN for the server 
- *       parv[3] = server is standalone or connected to non-TS only 
+ * SVINFO
+ *       parv[0] = sender prefix
+ *       parv[1] = TS_CURRENT for the server
+ *       parv[2] = TS_MIN for the server
+ *       parv[3] = server is standalone or connected to non-TS only
  *       parv[4] = server's idea of UTC time
  */
 void ultimate3_cmd_svinfo()
@@ -1661,7 +1661,7 @@ void ultimate3_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -1671,7 +1671,7 @@ int ultiamte3_valid_nick(char *nick)
     return 1;
 }
 
-/* 
+/*
   1 = valid chan
   0 = chan is in valid
 */
@@ -1779,7 +1779,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(ultimate3_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1812,6 +1812,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

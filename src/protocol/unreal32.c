@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -737,7 +737,7 @@ void unreal_cmd_quit(char *source, char *buf)
 /* PROTOCTL */
 /*
    NICKv2 = Nick Version 2
-   VHP    = Sends hidden host 
+   VHP    = Sends hidden host
    UMODE2 = sends UMODE2 on user modes
    NICKIP = Sends IP on NICK
    TOKEN  = Use tokens to talk
@@ -1005,7 +1005,7 @@ void unreal_cmd_global_legacy(char *source, char *fmt)
 **	parv[0] = sender
 **	parv[1] = nickmask
 **	parv[2] = reason
-** 
+**
 ** - Unreal will translate this to TKL for us
 **
 */
@@ -1151,8 +1151,8 @@ int anope_event_netinfo(char *source, int ac, char **av)
  * parv[ 6]: expire_at            expire_at (0)  expire_at (0)      expire_at
  * parv[ 7]: set_at               set_at         set_at             set_at
  * parv[ 8]: reason               regex          tkl duration       reason
- * parv[ 9]:                                     tkl reason [A]        
- * parv[10]:                                     regex              
+ * parv[ 9]:                                     tkl reason [A]
+ * parv[10]:                                     regex
  *
 */
 int anope_event_tkl(char *source, int ac, char **av)
@@ -1202,7 +1202,7 @@ int anope_event_away(char *source, int ac, char **av)
 **	parv[0] = sender prefix
 **	parv[1] = topic text
 **
-**	For servers using TS: 
+**	For servers using TS:
 **	parv[0] = sender prefix
 **	parv[1] = channel name
 **	parv[2] = topic nickname
@@ -1417,8 +1417,8 @@ int anope_event_sethost(char *source, int ac, char **av)
 **  if NICKIP:
 **      parv[9] = ip
 **      parv[10] = info
-** 
-** NICK - change 
+**
+** NICK - change
 **      source  = oldnick
 **	parv[0] = new nickname
 **      parv[1] = hopcount
@@ -1434,10 +1434,10 @@ int anope_event_nick(char *source, int ac, char **av)
 
     if (ac != 2) {
         if (ac == 7) {
-            /* 
+            /*
                <codemastr> that was a bug that is now fixed in 3.2.1
                <codemastr> in  some instances it would use the non-nickv2 format
-               <codemastr> it's sent when a nick collision occurs 
+               <codemastr> it's sent when a nick collision occurs
                - so we have to leave it around for now -TSL
              */
             do_nick(source, av[0], av[3], av[4], av[5], av[6],
@@ -1819,7 +1819,7 @@ void unreal_cmd_jupe(char *jserver, char *who, char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* 
+/*
   1 = valid nick
   0 = nick is in valid
 */
@@ -2194,7 +2194,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(unreal_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -2226,6 +2226,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

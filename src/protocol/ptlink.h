@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -62,7 +62,7 @@
 
 /*
    The following variables are set to define the TS protocol version
-   that we support. 
+   that we support.
 
    PTLink 6.14 to 6.17  TS CURRENT is 6  and MIN is 3
    PTlink 6.18          TS CURRENT is 9  and MIN is 3
@@ -149,4 +149,6 @@ void ptlink_cmd_jupe(char *jserver, char *who, char *reason);
 int ptlink_valid_nick(char *nick);
 void ptlink_cmd_ctcp(char *source, char *dest, char *buf);
 
-
+class PTlinkProto : public IRCDProtoNew {
+	public:
+} ircd_proto;

@@ -7,8 +7,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -1154,12 +1154,12 @@ int anope_event_topic(char *source, int ac, char **av)
     c->topic_time = topic_time;
 
     record_topic(av[0]);
-	
+
 	if (ac > 1 && *av[1])
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
 	else
 	    send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
-			
+
     return MOD_CONT;
 }
 
@@ -1675,7 +1675,7 @@ void moduleAddAnopeCmds()
     pmodule_set_umode(inspircd_set_umode);
 }
 
-/** 
+/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1707,6 +1707,7 @@ int AnopeInit(int argc, char **argv)
     pmodule_limit_mode(CMODE_l);
 
     moduleAddAnopeCmds();
+	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 
     return MOD_CONT;

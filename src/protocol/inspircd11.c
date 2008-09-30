@@ -1502,11 +1502,6 @@ void InspIRCdProto::cmd_svspart(const char *source, const char *nick, const char
 	send_cmd(source, "SVSPART %s %s", nick, chan);
 }
 
-void inspircd_cmd_swhois(const char *source, const char *who, const char *mask)
-{
-	/* Not used currently */
-}
-
 void inspircd_cmd_eob()
 {
     send_cmd(NULL, "ENDBURST");
@@ -1589,7 +1584,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_swhois(inspircd_cmd_swhois);
     pmodule_cmd_eob(inspircd_cmd_eob);
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);

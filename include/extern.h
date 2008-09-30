@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_swhois(void (*func) (const char *source, const char *who, const char *mask));
 E void pmodule_cmd_eob(void (*func) ());
 E void pmodule_cmd_jupe(void (*func) (const char *jserver, const char *who, const char *reason));
 E void pmodule_set_umode(void (*func) (User * user, int ac, const char **av));

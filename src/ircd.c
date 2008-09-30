@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_swhois = NULL;
     ircdproto.ircd_cmd_eob = NULL;
     ircdproto.ircd_flood_mode_check = NULL;
     ircdproto.ircd_cmd_jupe = NULL;
@@ -552,7 +551,7 @@ void anope_cmd_svspart(const char *source, const char *nick, const char *chan)
 
 void anope_cmd_swhois(const char *source, const char *who, const char *mask)
 {
-    ircdproto.ircd_cmd_swhois(source, who, mask);
+	ircdprotonew->cmd_swhois(source, who, mask);
 }
 
 void anope_cmd_eob()
@@ -687,11 +686,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_swhois(void (*func) (const char *source, const char *who, const char *mask))
-{
-    ircdproto.ircd_cmd_swhois = func;
 }
 
 void pmodule_cmd_eob(void (*func) ())

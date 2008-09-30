@@ -1343,11 +1343,6 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_swhois(const char *source, const char *who, const char *mask)
-{
-    /* not supported */
-}
-
 int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
@@ -1470,7 +1465,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_swhois(ratbox_cmd_swhois);
     pmodule_cmd_eob(ratbox_cmd_eob);
     pmodule_flood_mode_check(ratbox_flood_mode_check);
     pmodule_cmd_jupe(ratbox_cmd_jupe);

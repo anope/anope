@@ -1230,12 +1230,6 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void bahamut_cmd_swhois(const char *source, const char *who, const char *mask)
-{
-    /* not supported */
-}
-
-
 void bahamut_cmd_eob()
 {
     send_cmd(NULL, "BURST 0");
@@ -1358,7 +1352,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_swhois(bahamut_cmd_swhois);
     pmodule_cmd_eob(bahamut_cmd_eob);
     pmodule_flood_mode_check(bahamut_flood_mode_check);
     pmodule_cmd_jupe(bahamut_cmd_jupe);

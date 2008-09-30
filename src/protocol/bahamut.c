@@ -728,9 +728,9 @@ void bahamut_cmd_svsadmin(const char *server, int set)
 }
 
 /* SGLINE */
-void bahamut_cmd_sgline(const char *mask, const char *reason)
+void BahamutIRCdProto::cmd_sgline(const char *mask, const char *reason)
 {
-    send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
+	send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(mask)), mask, reason);
 }
 
 /* RAKILL */
@@ -1395,7 +1395,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_sgline(bahamut_cmd_sgline);
     pmodule_cmd_unban(bahamut_cmd_unban);
     pmodule_cmd_svsmode_chan(bahamut_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(bahamut_cmd_svid_umode);

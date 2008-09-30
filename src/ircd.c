@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_sgline = NULL;
     ircdproto.ircd_cmd_unban = NULL;
     ircdproto.ircd_cmd_svsmode_chan = NULL;
     ircdproto.ircd_cmd_svid_umode = NULL;
@@ -517,7 +516,7 @@ void anope_cmd_szline(const char *mask, const char *reason, const char *whom)
 
 void anope_cmd_sgline(const char *mask, const char *reason)
 {
-    ircdproto.ircd_cmd_sgline(mask, reason);
+	ircdprotonew->cmd_sgline(mask, reason);
 }
 
 void anope_cmd_unban(const char *name, const char *nick)
@@ -698,11 +697,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_sgline(void (*func) (const char *mask, const char *reason))
-{
-    ircdproto.ircd_cmd_sgline = func;
 }
 
 void pmodule_cmd_unban(void (*func) (const char *name, const char *nick))

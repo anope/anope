@@ -762,13 +762,10 @@ void charybdis_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void charybdis_cmd_sgline(const char *mask, const char *reason)
+void CharybdisProto::cmd_sgline(const char *mask, const char *reason)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "XLINE * %s 0 :%s", mask, reason);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
 void CharybdisProto::cmd_remove_akill(const char *user, const char *host)
@@ -1657,7 +1654,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_sgline(charybdis_cmd_sgline);
     pmodule_cmd_unban(charybdis_cmd_unban);
     pmodule_cmd_svsmode_chan(charybdis_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(charybdis_cmd_svid_umode);

@@ -1375,13 +1375,12 @@ void UnrealIRCdProto::cmd_szline(const char *mask, const char *reason, const cha
 /*
  * SVSNLINE + reason_where_is_space :realname mask with spaces
 */
-void unreal_cmd_sgline(const char *mask, const char *reason)
+void UnrealIRCdProto::cmd_sgline(const char *mask, const char *reason)
 {
 	char edited_reason[BUFSIZE];
 	strlcpy(edited_reason, reason, BUFSIZE);
-    strnrepl(edited_reason, BUFSIZE, " ", "_");
-    send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason,
-             mask);
+	strnrepl(edited_reason, BUFSIZE, " ", "_");
+	send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason, mask);
 }
 
 /* SVSMODE -b */
@@ -1935,7 +1934,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_sgline(unreal_cmd_sgline);
     pmodule_cmd_unban(unreal_cmd_unban);
     pmodule_cmd_svsmode_chan(unreal_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(unreal_cmd_svid_umode);

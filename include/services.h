@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_sgline)(const char *mask, const char *reason);
     void (*ircd_cmd_unban)(const char *name, const char *nick);
     void (*ircd_cmd_svsmode_chan)(const char *name, const char *mode, const char *nick);
     void (*ircd_cmd_svid_umode)(const char *nick, time_t ts);
@@ -1358,6 +1357,7 @@ class IRCDProtoNew {
 		virtual void cmd_unsgline(const char *) { }
 		virtual void cmd_unszline(const char *) { }
 		virtual void cmd_szline(const char *, const char *, const char *) { }
+		virtual void cmd_sgline(const char *, const char *) { }
 };
 
 /*************************************************************************/

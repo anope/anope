@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_sgline(void (*func) (const char *mask, const char *reason));
 E void pmodule_cmd_unban(void (*func) (const char *name, const char *nick));
 E void pmodule_cmd_svsmode_chan(void (*func) (const char *name, const char *mode, const char *nick));
 E void pmodule_cmd_svid_umode(void (*func) (const char *nick, time_t ts));

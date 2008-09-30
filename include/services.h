@@ -1294,17 +1294,17 @@ class IRCDProtoNew {
 	public:
 		virtual void cmd_svsnoop(const char *, int) { }
 		virtual void cmd_remove_akill(const char *, const char *) = 0;
-		virtual void cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when) = 0;
+		virtual void cmd_topic(const char *, const char *, const char *, const char *, time_t) = 0;
 		virtual void cmd_vhost_off(User *) { }
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
-		virtual void cmd_svsmode(User *u, int ac, const char **av) = 0;
+		virtual void cmd_svskill(const char *, const char *, const char *) = 0;
+		virtual void cmd_svsmode(User *, int, const char **) = 0;
 		virtual void cmd_nick(const char *, const char *, const char *) = 0;
 		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
-		virtual void cmd_mode(const char *source, const char *dest, const char *buf) = 0;
+		virtual void cmd_mode(const char *, const char *, const char *) = 0;
 		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
-		virtual void cmd_kick(const char *source, const char *chan, const char *user, const char *buf) = 0;
-		virtual void cmd_notice_ops(const char *, const char *dest, const char *buf) = 0;
+		virtual void cmd_kick(const char *, const char *, const char *, const char *) = 0;
+		virtual void cmd_notice_ops(const char *, const char *, const char *) = 0;
 		virtual void cmd_message(const char *source, const char *dest, const char *buf)
 		{
 			if (!buf || !dest) return;

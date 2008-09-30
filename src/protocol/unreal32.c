@@ -697,12 +697,10 @@ void unreal_cmd_server(const char *servname, int hop, const char *descript)
 }
 
 /* JOIN */
-void unreal_cmd_join(const char *user, const char *channel, time_t chantime)
+void UnrealIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    send_cmd(ServerName, "%s !%s %s :%s",
-             send_token("SJOIN", "~"), base64enc((long int) chantime),
-             channel, user);
-    /* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
+	send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user);
+	/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
 }
 
 /* unsqline
@@ -2020,7 +2018,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_join(unreal_cmd_join);
     pmodule_cmd_unsqline(unreal_cmd_unsqline);
     pmodule_cmd_invite(unreal_cmd_invite);
     pmodule_cmd_part(unreal_cmd_part);

@@ -771,9 +771,9 @@ void bahamut_cmd_unsqline(const char *user)
 }
 
 /* JOIN - SJOIN */
-void bahamut_cmd_join(const char *user, const char *channel, time_t chantime)
+void BahamutIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
+	send_cmd(user, "SJOIN %ld %s", static_cast<long>(chantime), channel);
 }
 
 void bahamut_cmd_burst()
@@ -1473,7 +1473,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_join(bahamut_cmd_join);
     pmodule_cmd_unsqline(bahamut_cmd_unsqline);
     pmodule_cmd_invite(bahamut_cmd_invite);
     pmodule_cmd_part(bahamut_cmd_part);

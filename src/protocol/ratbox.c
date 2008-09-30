@@ -767,13 +767,10 @@ void ratbox_cmd_unsqline(const char *user)
              "UNRESV * %s", user);
 }
 
-void ratbox_cmd_join(const char *user, const char *channel, time_t chantime)
+void RatboxProto::cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    Uid *ud;
-
-    ud = find_uid(user);
-    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime,
-             channel, (UseTS6 ? (ud ? ud->uid : user) : user));
+	Uid *ud = find_uid(user);
+	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
 }
 
 /*
@@ -1623,7 +1620,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_join(ratbox_cmd_join);
     pmodule_cmd_unsqline(ratbox_cmd_unsqline);
     pmodule_cmd_invite(ratbox_cmd_invite);
     pmodule_cmd_part(ratbox_cmd_part);

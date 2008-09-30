@@ -813,9 +813,9 @@ void inspircd_cmd_server(const char *servname, int hop, const char *descript)
 }
 
 /* JOIN */
-void inspircd_cmd_join(const char *user, const char *channel, time_t chantime)
+void InspIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    send_cmd(user, "JOIN %s", channel);
+	send_cmd(user, "JOIN %s", channel);
 }
 
 /* UNSQLINE */
@@ -1719,7 +1719,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_join(inspircd_cmd_join);
     pmodule_cmd_unsqline(inspircd_cmd_unsqline);
     pmodule_cmd_invite(inspircd_cmd_invite);
     pmodule_cmd_part(inspircd_cmd_part);

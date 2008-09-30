@@ -825,13 +825,10 @@ void charybdis_cmd_unsqline(const char *user)
              "UNRESV * %s", user);
 }
 
-void charybdis_cmd_join(const char *user, const char *channel, time_t chantime)
+void CharybdisProto::cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    Uid *ud;
-
-    ud = find_uid(user);
-    send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime,
-             channel, (UseTS6 ? (ud ? ud->uid : user) : user));
+	Uid *ud = find_uid(user);
+	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
 }
 
 /*
@@ -1729,7 +1726,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_join(charybdis_cmd_join);
     pmodule_cmd_unsqline(charybdis_cmd_unsqline);
     pmodule_cmd_invite(charybdis_cmd_invite);
     pmodule_cmd_part(charybdis_cmd_part);

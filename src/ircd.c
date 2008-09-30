@@ -51,7 +51,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
     ircdproto.ircd_cmd_351 = NULL;
-    ircdproto.ircd_cmd_join = NULL;
     ircdproto.ircd_cmd_unsqline = NULL;
     ircdproto.ircd_cmd_invite = NULL;
     ircdproto.ircd_cmd_part = NULL;
@@ -310,7 +309,7 @@ void anope_cmd_pong(const char *servname, const char *who)
 
 void anope_cmd_join(const char *user, const char *channel, time_t chantime)
 {
-    ircdproto.ircd_cmd_join(user, channel, chantime);
+	ircdprotonew->cmd_join(user, channel, chantime);
 }
 
 void anope_cmd_unsqline(const char *user)
@@ -658,12 +657,6 @@ void pmodule_cmd_376(void (*func) (const char *source))
 void pmodule_cmd_351(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_351 = func;
-}
-
-void
-pmodule_cmd_join(void (*func) (const char *user, const char *channel, time_t chantime))
-{
-    ircdproto.ircd_cmd_join = func;
 }
 
 void pmodule_cmd_unsqline(void (*func) (const char *user))

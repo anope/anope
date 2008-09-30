@@ -731,14 +731,14 @@ void bahamut_cmd_szline(char *mask, char *reason, char *whom)
 }
 
 /* SVSNOOP */
-void bahamut_cmd_svsnoop(char *server, int set)
+void BahamutIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void bahamut_cmd_svsadmin(char *server, int set)
 {
-    bahamut_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 /* SGLINE */
@@ -1565,7 +1565,6 @@ void bahamut_cmd_chghost(char *nick, char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(bahamut_cmd_svsnoop);
     pmodule_cmd_remove_akill(bahamut_cmd_remove_akill);
     pmodule_cmd_topic(bahamut_cmd_topic);
     pmodule_cmd_vhost_off(bahamut_cmd_vhost_off);

@@ -846,14 +846,8 @@ void charybdis_cmd_szline(char *mask, char *reason, char *whom)
     /* not supported */
 }
 
-void charybdis_cmd_svsnoop(char *server, int set)
-{
-    /* does not support */
-}
-
 void charybdis_cmd_svsadmin(char *server, int set)
 {
-    charybdis_cmd_svsnoop(server, set);
 }
 
 void charybdis_cmd_sgline(char *mask, char *reason)
@@ -1873,7 +1867,6 @@ int charybdis_send_deaccount(int argc, char **argv)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(charybdis_cmd_svsnoop);
     pmodule_cmd_remove_akill(charybdis_cmd_remove_akill);
     pmodule_cmd_topic(charybdis_cmd_topic);
     pmodule_cmd_vhost_off(charybdis_cmd_vhost_off);

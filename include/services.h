@@ -1081,7 +1081,6 @@ struct session_ {
  **/
 typedef struct ircd_proto_ {
     void (*ircd_set_mod_current_buffer)(int ac, char **av);
-    void (*ircd_cmd_svsnoop)(const char *server, int set);
     void (*ircd_cmd_remove_akill)(const char *user, const char *host);
     void (*ircd_cmd_topic)(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
     void (*ircd_cmd_vhost_off)(User * u);
@@ -1159,6 +1158,7 @@ typedef struct ircd_proto_ {
 
 class IRCDProtoNew {
 	public:
+		virtual void cmd_svsnoop(const char *, int) { }
 };
 
 typedef struct ircd_modes_ {

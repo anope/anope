@@ -833,14 +833,8 @@ void shadowircd_cmd_szline(char *mask, char *reason, char *whom)
     /* Does not support */
 }
 
-void shadowircd_cmd_svsnoop(char *server, int set)
-{
-    /* does not support */
-}
-
 void shadowircd_cmd_svsadmin(char *server, int set)
 {
-    shadowircd_cmd_svsnoop(server, set);
 }
 
 void shadowircd_cmd_sgline(char *mask, char *reason)
@@ -1719,7 +1713,6 @@ void shadowircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(shadowircd_cmd_svsnoop);
     pmodule_cmd_remove_akill(shadowircd_cmd_remove_akill);
     pmodule_cmd_topic(shadowircd_cmd_topic);
     pmodule_cmd_vhost_off(shadowircd_cmd_vhost_off);

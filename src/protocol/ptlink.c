@@ -680,14 +680,14 @@ void ptlink_cmd_sqline(char *mask, char *reason)
 	  operations:
 		noopers - remove existing opers and disable o:lines
 */
-void ptlink_cmd_svsnoop(char *server, int set)
+void PTlinkProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSADMIN %s :%s", server, set ? "noopers" : "rehash");
+	send_cmd(NULL, "SVSADMIN %s :%s", server, set ? "noopers" : "rehash");
 }
 
 void ptlink_cmd_svsadmin(char *server, int set)
 {
-    ptlink_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 /*
@@ -1682,7 +1682,6 @@ void ptlink_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(ptlink_cmd_svsnoop);
     pmodule_cmd_remove_akill(ptlink_cmd_remove_akill);
     pmodule_cmd_topic(ptlink_cmd_topic);
     pmodule_cmd_vhost_off(ptlink_cmd_vhost_off);

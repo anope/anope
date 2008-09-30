@@ -521,14 +521,14 @@ void dreamforge_cmd_sqline(char *mask, char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void dreamforge_cmd_svsnoop(char *server, int set)
+void DreamForgeProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void dreamforge_cmd_svsadmin(char *server, int set)
 {
-    dreamforge_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void dreamforge_cmd_remove_akill(char *user, char *host)
@@ -1270,7 +1270,6 @@ void dreamforge_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(dreamforge_cmd_svsnoop);
     pmodule_cmd_remove_akill(dreamforge_cmd_remove_akill);
     pmodule_cmd_topic(dreamforge_cmd_topic);
     pmodule_cmd_vhost_off(dreamforge_cmd_vhost_off);

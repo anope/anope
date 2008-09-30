@@ -755,14 +755,14 @@ void solidircd_cmd_szline(char *mask, char *reason, char *whom)
 }
 
 /* SVSNOOP */
-void solidircd_cmd_svsnoop(char *server, int set)
+void SolidIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void solidircd_cmd_svsadmin(char *server, int set)
 {
-    solidircd_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 /* SGLINE */
@@ -1595,7 +1595,6 @@ void solidircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(solidircd_cmd_svsnoop);
     pmodule_cmd_remove_akill(solidircd_cmd_remove_akill);
     pmodule_cmd_topic(solidircd_cmd_topic);
     pmodule_cmd_vhost_off(solidircd_cmd_vhost_off);

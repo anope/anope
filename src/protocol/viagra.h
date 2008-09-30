@@ -133,4 +133,5 @@ void viagra_cmd_ctcp(char *source, char *dest, char *buf);
 
 class ViagraIRCdProto : public IRCDProtoNew {
 	public:
+		void cmd_svsnoop(const char *, int);
 } ircd_proto;

@@ -119,4 +119,5 @@ void ultimate2_cmd_ctcp(char *source, char *dest, char *buf);
 
 class UltimateIRCdProto : public IRCDProtoNew {
 	public:
+		void cmd_svsnoop(const char *, int);
 } ircd_proto;

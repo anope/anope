@@ -46,7 +46,6 @@ void initIrcdProto()
 {
     ircdproto.ircd_set_mod_current_buffer = NULL;
     ircdproto.ircd_set_umode = NULL;
-    ircdproto.ircd_cmd_svsnoop = NULL;
     ircdproto.ircd_cmd_remove_akill = NULL;
     ircdproto.ircd_cmd_topic = NULL;
     ircdproto.ircd_cmd_vhost_off = NULL;
@@ -139,7 +138,7 @@ void anope_set_umode(User * user, int ac, const char **av)
 
 void anope_cmd_svsnoop(const char *server, int set)
 {
-    ircdproto.ircd_cmd_svsnoop(server, set);
+    ircdprotonew->cmd_svsnoop(server, set);
 }
 
 void anope_cmd_remove_akill(const char *user, const char *host)
@@ -702,11 +701,6 @@ void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av))
 {
     ircdproto.ircd_set_mod_current_buffer = func;
-}
-
-void pmodule_cmd_svsnoop(void (*func) (const char *server, int set))
-{
-    ircdproto.ircd_cmd_svsnoop = func;
 }
 
 void pmodule_cmd_remove_akill(void (*func) (const char *user, const char *host))

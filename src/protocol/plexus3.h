@@ -112,4 +112,5 @@ void plexus_cmd_ctcp(char *source, char *dest, char *buf);
 
 class PleXusIRCdProto : public IRCDProtoNew {
 	public:
+		void cmd_svsnoop(const char *, int);
 } ircd_proto;

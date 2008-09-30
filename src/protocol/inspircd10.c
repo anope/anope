@@ -503,11 +503,6 @@ void moduleAddIRCDMsgs(void) {
 
 /* *INDENT-ON* */
 
-void inspircd_cmd_svsnoop(char *server, int set)
-{
-    /* Not Supported by this IRCD */
-}
-
 void inspircd_cmd_svsadmin(char *server, int set)
 {
     /* Not Supported by this IRCD */
@@ -1599,7 +1594,6 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(inspircd_cmd_svsnoop);
     pmodule_cmd_remove_akill(inspircd_cmd_remove_akill);
     pmodule_cmd_topic(inspircd_cmd_topic);
     pmodule_cmd_vhost_off(inspircd_cmd_vhost_off);

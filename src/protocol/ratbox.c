@@ -793,14 +793,8 @@ void ratbox_cmd_szline(char *mask, char *reason, char *whom)
     /* Does not support */
 }
 
-void ratbox_cmd_svsnoop(char *server, int set)
-{
-    /* does not support */
-}
-
 void ratbox_cmd_svsadmin(char *server, int set)
 {
-    ratbox_cmd_svsnoop(server, set);
 }
 
 void ratbox_cmd_sgline(char *mask, char *reason)
@@ -1768,7 +1762,6 @@ void ratbox_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(ratbox_cmd_svsnoop);
     pmodule_cmd_remove_akill(ratbox_cmd_remove_akill);
     pmodule_cmd_topic(ratbox_cmd_topic);
     pmodule_cmd_vhost_off(ratbox_cmd_vhost_off);

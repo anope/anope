@@ -782,14 +782,14 @@ void ultimate2_cmd_sqline(char *mask, char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void ultimate2_cmd_svsnoop(char *server, int set)
+void UltimateIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void ultimate2_cmd_svsadmin(char *server, int set)
 {
-    ultimate2_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void ultimate2_cmd_remove_akill(char *user, char *host)
@@ -1620,7 +1620,6 @@ void ultimate2_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(ultimate2_cmd_svsnoop);
     pmodule_cmd_remove_akill(ultimate2_cmd_remove_akill);
     pmodule_cmd_topic(ultimate2_cmd_topic);
     pmodule_cmd_vhost_off(ultimate2_cmd_vhost_off);

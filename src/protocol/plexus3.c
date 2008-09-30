@@ -776,17 +776,15 @@ plexus_cmd_szline (char *mask, char *reason, char *whom)
   /* Does not support */
 }
 
-void
-plexus_cmd_svsnoop (char *server, int set)
+void PleXusIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-  send_cmd(ServerName, "ENCAP %s SVSNOOP %s",
-           server, (set ? "+" : "-"));
+	send_cmd(ServerName, "ENCAP %s SVSNOOP %s", server, set ? "+" : "-");
 }
 
 void
 plexus_cmd_svsadmin (char *server, int set)
 {
-  plexus_cmd_svsnoop (server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void
@@ -1740,7 +1738,6 @@ plexus_cmd_ctcp (char *source, char *dest, char *buf)
 void
 moduleAddAnopeCmds ()
 {
-  pmodule_cmd_svsnoop (plexus_cmd_svsnoop);
   pmodule_cmd_remove_akill (plexus_cmd_remove_akill);
   pmodule_cmd_topic (plexus_cmd_topic);
   pmodule_cmd_vhost_off (plexus_cmd_vhost_off);

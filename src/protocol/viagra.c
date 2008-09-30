@@ -766,14 +766,14 @@ void viagra_cmd_szline(char *mask, char *reason, char *whom)
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
 
-void viagra_cmd_svsnoop(char *server, int set)
+void ViagraIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void viagra_cmd_svsadmin(char *server, int set)
 {
-    viagra_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void viagra_cmd_sgline(char *mask, char *reason)
@@ -1602,7 +1602,6 @@ void viagra_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(viagra_cmd_svsnoop);
     pmodule_cmd_remove_akill(viagra_cmd_remove_akill);
     pmodule_cmd_topic(viagra_cmd_topic);
     pmodule_cmd_vhost_off(viagra_cmd_vhost_off);

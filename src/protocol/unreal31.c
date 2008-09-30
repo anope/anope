@@ -491,14 +491,14 @@ int anope_event_capab(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void unreal_cmd_svsnoop(char *server, int set)
+void UnrealIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void unreal_cmd_svsadmin(char *server, int set)
 {
-    unreal_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void unreal_cmd_remove_akill(char *user, char *host)
@@ -1478,7 +1478,6 @@ void unreal_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(unreal_cmd_svsnoop);
     pmodule_cmd_remove_akill(unreal_cmd_remove_akill);
     pmodule_cmd_topic(unreal_cmd_topic);
     pmodule_cmd_vhost_off(unreal_cmd_vhost_off);

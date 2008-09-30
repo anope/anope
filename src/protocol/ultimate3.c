@@ -695,14 +695,14 @@ void ultimate3_cmd_szline(char *mask, char *reason, char *whom)
     /* send_cmd(NULL, "SZLINE %s :%s", mask, reason); */
 }
 
-void ultimate3_cmd_svsnoop(char *server, int set)
+void UltimateIRCdProto::cmd_svsnoop(const char *server, int set)
 {
-    send_cmd(NULL, "SVSNOOP %s %s", server, (set ? "+" : "-"));
+	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void ultimate3_cmd_svsadmin(char *server, int set)
 {
-    ultimate3_cmd_svsnoop(server, set);
+	ircd_proto.cmd_svsnoop(server, set);
 }
 
 void ultimate3_cmd_sgline(char *mask, char *reason)
@@ -1703,7 +1703,6 @@ void ultimate3_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsnoop(ultimate3_cmd_svsnoop);
     pmodule_cmd_remove_akill(ultimate3_cmd_remove_akill);
     pmodule_cmd_topic(ultimate3_cmd_topic);
     pmodule_cmd_vhost_off(ultimate3_cmd_vhost_off);

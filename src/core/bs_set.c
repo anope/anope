@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -180,7 +180,7 @@ int do_set(User * u)
             if (!stricmp(value, "ON")) {
                 ci->botflags |= BS_NOBOT;
                 if (ci->bi)
-                    unassign(u, ci);
+                    ci->bi->UnAssign(u, ci);
                 notice_lang(s_BotServ, u, BOT_SET_NOBOT_ON, ci->name);
             } else if (!stricmp(value, "OFF")) {
                 ci->botflags &= ~BS_NOBOT;

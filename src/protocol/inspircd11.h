@@ -69,7 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-void inspircd_cmd_unszline(const char *mask);
 void inspircd_cmd_szline(const char *mask, const char *reason, const char *whom);
 void inspircd_cmd_sgline(const char *mask, const char *reason);
 void inspircd_cmd_unban(const char *name, const char *nick);
@@ -118,4 +117,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_connect();
 		void cmd_svshold(const char *);
 		void cmd_release_svshold(const char *);
+		void cmd_unszline(const char *);
 } ircd_proto;

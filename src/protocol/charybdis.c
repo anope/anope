@@ -758,11 +758,6 @@ void CharybdisProto::cmd_unsgline(const char *mask)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
 }
 
-void charybdis_cmd_unszline(const char *mask)
-{
-    /* not supported */
-}
-
 void charybdis_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* not supported */
@@ -1667,7 +1662,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_unszline(charybdis_cmd_unszline);
     pmodule_cmd_szline(charybdis_cmd_szline);
     pmodule_cmd_sgline(charybdis_cmd_sgline);
     pmodule_cmd_unban(charybdis_cmd_unban);

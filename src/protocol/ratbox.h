@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_unszline(const char *mask);
 void ratbox_cmd_szline(const char *mask, const char *reason, const char *whom);
 void ratbox_cmd_sgline(const char *mask, const char *reason);
 void ratbox_cmd_unban(const char *name, const char *nick);

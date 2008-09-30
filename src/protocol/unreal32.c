@@ -1360,10 +1360,9 @@ void UnrealIRCdProto::cmd_unsgline(const char *mask)
 }
 
 /* UNSZLINE */
-void unreal_cmd_unszline(const char *mask)
+void UnrealIRCdProto::cmd_unszline(const char *mask)
 {
-    send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask,
-             s_OperServ);
+	send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask, s_OperServ);
 }
 
 /* SZLINE */
@@ -1938,7 +1937,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_unszline(unreal_cmd_unszline);
     pmodule_cmd_szline(unreal_cmd_szline);
     pmodule_cmd_sgline(unreal_cmd_sgline);
     pmodule_cmd_unban(unreal_cmd_unban);

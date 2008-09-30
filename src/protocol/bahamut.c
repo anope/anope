@@ -699,12 +699,12 @@ void BahamutIRCdProto::cmd_unsgline(const char *mask)
 }
 
 /* UNSZLINE */
-void bahamut_cmd_unszline(const char *mask)
+void BahamutIRCdProto::cmd_unszline(const char *mask)
 {
-    /* this will likely fail so its only here for legacy */
-    send_cmd(NULL, "UNSZLINE 0 %s", mask);
-    /* this is how we are supposed to deal with it */
-    send_cmd(NULL, "RAKILL %s *", mask);
+	/* this will likely fail so its only here for legacy */
+	send_cmd(NULL, "UNSZLINE 0 %s", mask);
+	/* this is how we are supposed to deal with it */
+	send_cmd(NULL, "RAKILL %s *", mask);
 }
 
 /* SZLINE */
@@ -1396,7 +1396,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_unszline(bahamut_cmd_unszline);
     pmodule_cmd_szline(bahamut_cmd_szline);
     pmodule_cmd_sgline(bahamut_cmd_sgline);
     pmodule_cmd_unban(bahamut_cmd_unban);

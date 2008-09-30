@@ -705,11 +705,6 @@ void RatboxProto::cmd_unsgline(const char *mask)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
 }
 
-void ratbox_cmd_unszline(const char *mask)
-{
-    /* Does not support */
-}
-
 void ratbox_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* Does not support */
@@ -1545,7 +1540,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_unszline(ratbox_cmd_unszline);
     pmodule_cmd_szline(ratbox_cmd_szline);
     pmodule_cmd_sgline(ratbox_cmd_sgline);
     pmodule_cmd_unban(ratbox_cmd_unban);

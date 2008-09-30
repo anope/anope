@@ -1468,9 +1468,9 @@ void InspIRCdProto::cmd_release_svshold(const char *nick)
 }
 
 /* UNSZLINE */
-void inspircd_cmd_unszline(const char *mask)
+void InspIRCdProto::cmd_unszline(const char *mask)
 {
-    send_cmd(s_OperServ, "ZLINE %s", mask);
+	send_cmd(s_OperServ, "ZLINE %s", mask);
 }
 
 /* SZLINE */
@@ -1641,7 +1641,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_unszline(inspircd_cmd_unszline);
     pmodule_cmd_szline(inspircd_cmd_szline);
     pmodule_cmd_sgline(inspircd_cmd_sgline);
     pmodule_cmd_unban(inspircd_cmd_unban);

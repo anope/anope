@@ -120,6 +120,21 @@ void User::SetDisplayedHost(const std::string &host)
     update_host(this);
 }
 
+void User::SetIdent(const std::string &ident)
+{
+	if (ident.empty())
+		throw "empty ident in SetIdent";
+
+    if (this->vident)
+        free(this->vident);
+    this->vident = sstrdup(ident.c_str());
+
+    if (debug)
+        alog("debug: %s changed ident to %s", this->nick, username);
+
+	update_host(this);
+}
+
 /*************************************************************************/
 /*************************************************************************/
 
@@ -168,32 +183,6 @@ void change_user_realname(User * user, const char *realname)
 
     if (debug)
         alog("debug: %s changes its realname to %s", user->nick, realname);
-}
-
-
-/*************************************************************************/
-
-/* Change the username of a user. */
-
-void change_user_username(User * user, const char *username)
-{
-    if (user->vident)
-        free(user->vident);
-    user->vident = sstrdup(username);
-    if (user->na && (nick_identified(user)
-                     || (!(user->na->nc->flags & NI_SECURE)
-                         && nick_recognized(user)))) {
-        if (user->na->last_usermask)
-            free(user->na->last_usermask);
-
-        user->na->last_usermask =
-            (char *)smalloc(strlen(common_get_vident(user)) +
-                    strlen(common_get_vhost(user)) + 2);
-        sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
-                common_get_vhost(user));
-    }
-    if (debug)
-        alog("debug: %s changes its username to %s", user->nick, username);
 }
 
 /*************************************************************************/

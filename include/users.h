@@ -78,5 +78,9 @@ class User
 	 * This is used (if set) instead of real host.
 	 */
 	void SetDisplayedHost(const std::string &host);
+
+	/** Update the displayed ident (username) of a user record.
+	 */
+	void SetIdent(const std::string &ident);
 };
 

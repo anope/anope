@@ -1473,7 +1473,7 @@ void InspIRCdProto::cmd_unszline(const char *mask)
 }
 
 /* SZLINE */
-void inspircd_cmd_szline(const char *mask, const char *reason, const char *whom)
+void InspIRCdProto::cmd_szline(const char *mask, const char *reason, const char *whom)
 {
 	send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 }
@@ -1582,36 +1582,37 @@ void moduleAddAnopeCmds()
 int AnopeInit(int argc, char **argv)
 {
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(PROTOCOL);
+	moduleAddAuthor("Anope");
+	moduleAddVersion
+		("$Id$");
+	moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("inspircdIRCd 1.1");
-    pmodule_ircd_cap(myIrcdcap);
-    pmodule_ircd_var(myIrcd);
-    pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-    pmodule_ircd_cumodes(myCumodes);
-    pmodule_ircd_flood_mode_char_set("+f");
-    pmodule_ircd_flood_mode_char_remove("-f");
-    pmodule_ircd_cbmodes(myCbmodes);
-    pmodule_ircd_cmmodes(myCmmodes);
-    pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+	pmodule_ircd_version("inspircdIRCd 1.1");
+	pmodule_ircd_cap(myIrcdcap);
+	pmodule_ircd_var(myIrcd);
+	pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+	pmodule_ircd_cumodes(myCumodes);
+	pmodule_ircd_flood_mode_char_set("+f");
+	pmodule_ircd_flood_mode_char_remove("-f");
+	pmodule_ircd_cbmodes(myCbmodes);
+	pmodule_ircd_cmmodes(myCmmodes);
+	pmodule_ircd_csmodes(myCsmodes);
+	pmodule_ircd_useTSMode(0);
 
-    /** Deal with modes anope _needs_ to know **/
-    pmodule_invis_umode(UMODE_i);
-    pmodule_oper_umode(UMODE_o);
-    pmodule_invite_cmode(CMODE_i);
-    pmodule_secret_cmode(CMODE_s);
-    pmodule_private_cmode(CMODE_p);
-    pmodule_key_mode(CMODE_k);
-    pmodule_limit_mode(CMODE_l);
+	/** Deal with modes anope _needs_ to know **/
+	pmodule_invis_umode(UMODE_i);
+	pmodule_oper_umode(UMODE_o);
+	pmodule_invite_cmode(CMODE_i);
+	pmodule_secret_cmode(CMODE_s);
+	pmodule_private_cmode(CMODE_p);
+	pmodule_key_mode(CMODE_k);
+	pmodule_limit_mode(CMODE_l);
 
-    moduleAddAnopeCmds();
+	moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
-    moduleAddIRCDMsgs();
+	moduleAddIRCDMsgs();
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
+MODULE_INIT("inspircd11")

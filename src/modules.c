@@ -624,6 +624,7 @@ int loadModule(Module * m, User * u)
     ano_modclearerr();
     func = (int (*)(int, char **))ano_modsym(m->handle, "AnopeInit");
     if ( func == NULL && (err = ano_moderr()) != NULL) {
+		alog("No AnopeInit found, not an Anope module.");
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
         return MOD_ERR_NOLOAD;
     }

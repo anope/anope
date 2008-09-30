@@ -201,6 +201,17 @@ extern int strncasecmp(const char *, const char *, size_t);
 	#define MARK_DEPRECATED
 #endif
 
+
+#ifndef _WIN32
+	#define MODULE_INIT(x) \
+		extern "C" int anope_modinit(int argc, char **argv) \
+		{ \
+			return AnopeInit(argc, argv); \
+		}
+#else
+	#error Not yet supported on Windows, XXX
+#endif
+
 /* Miscellaneous definitions. */
 #include "defs.h"
 #include "slist.h"

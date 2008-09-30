@@ -13,24 +13,30 @@
 #endif
 #endif
 
-E int getAnopeBuildVersion();
-E int getAnopeMajorVersion();
-E int getAnopeMinorVersion();
-E int getAnopePatchVersion();
+extern "C"
+{
+	E int getAnopeBuildVersion();
+	E int getAnopeMajorVersion();
+	E int getAnopeMinorVersion();
+	E int getAnopePatchVersion();
 
-int getAnopeBuildVersion() {
-    return VERSION_BUILD;
+	int getAnopeBuildVersion()
+	{
+		return VERSION_BUILD;
+	}
+
+	int getAnopeMajorVersion()
+	{
+		return VERSION_MAJOR;
+	}
+
+	int getAnopeMinorVersion()
+	{
+		return VERSION_MINOR;
+	}
+
+	int getAnopePatchVersion()
+	{
+		return VERSION_PATCH;
+	}
 }
-
-int getAnopeMajorVersion() {
-    return VERSION_MAJOR;
-}
-
-int getAnopeMinorVersion() { 
-    return VERSION_MINOR;
-}
-
-int getAnopePatchVersion() {
-    return VERSION_PATCH;
-}
-

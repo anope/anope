@@ -131,18 +131,18 @@ void anope_set_umode(User * user, int ac, char **av)
     ircdproto.ircd_set_umode(user, ac, av);
 }
 
-void anope_cmd_svsnoop(char *server, int set)
+void anope_cmd_svsnoop(const char *server, int set)
 {
     ircdproto.ircd_cmd_svsnoop(server, set);
 }
 
-void anope_cmd_remove_akill(char *user, char *host)
+void anope_cmd_remove_akill(const char *user, const char *host)
 {
     ircdproto.ircd_cmd_remove_akill(user, host);
 }
 
-void anope_cmd_topic(char *whosets, char *chan, char *whosetit,
-                     char *topic, time_t when)
+void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                     const char *topic, time_t when)
 {
     ircdproto.ircd_cmd_topic(whosets, chan, whosetit, topic, when);
 }
@@ -152,13 +152,13 @@ void anope_cmd_vhost_off(User * u)
     ircdproto.ircd_cmd_vhost_off(u);
 }
 
-void anope_cmd_akill(char *user, char *host, char *who, time_t when,
-                     time_t expires, char *reason)
+void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                     time_t expires, const char *reason)
 {
     ircdproto.ircd_cmd_akill(user, host, who, when, expires, reason);
 }
 
-void anope_cmd_svskill(char *source, char *user, const char *fmt, ...)
+void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -176,38 +176,37 @@ void anope_cmd_svsmode(User * u, int ac, char **av)
     ircdproto.ircd_cmd_svsmode(u, ac, av);
 }
 
-void anope_cmd_372(char *source, char *msg)
+void anope_cmd_372(const char *source, const char *msg)
 {
     ircdproto.ircd_cmd_372(source, msg);
 }
 
-void anope_cmd_372_error(char *source)
+void anope_cmd_372_error(const char *source)
 {
     ircdproto.ircd_cmd_372_error(source);
 }
 
-void anope_cmd_375(char *source)
+void anope_cmd_375(const char *source)
 {
     ircdproto.ircd_cmd_375(source);
 }
 
-void anope_cmd_376(char *source)
+void anope_cmd_376(const char *source)
 {
     ircdproto.ircd_cmd_376(source);
 }
 
-void anope_cmd_nick(char *nick, char *name, char *modes)
+void anope_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     ircdproto.ircd_cmd_nick(nick, name, modes);
 }
 
-void anope_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                          char *modes)
+void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
     ircdproto.ircd_cmd_guest_nick(nick, user, host, real, modes);
 }
 
-void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
+void anope_cmd_mode(const char *source, const char *dest, const const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -220,14 +219,12 @@ void anope_cmd_mode(char *source, char *dest, const char *fmt, ...)
     ircdproto.ircd_cmd_mode(source, dest, buf);
 }
 
-void anope_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                        char *modes)
+void anope_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
     ircdproto.ircd_cmd_bot_nick(nick, user, host, real, modes);
 }
 
-void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
-                    ...)
+void anope_cmd_kick(const char *source, const char *chan, const char *user, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -240,7 +237,7 @@ void anope_cmd_kick(char *source, char *chan, char *user, const char *fmt,
     ircdproto.ircd_cmd_kick(source, chan, user, buf);
 }
 
-void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...)
+void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -253,7 +250,7 @@ void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...)
     ircdproto.ircd_cmd_notice_ops(source, dest, buf);
 }
 
-void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
+void anope_cmd_notice(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -266,12 +263,12 @@ void anope_cmd_notice(char *source, char *dest, const char *fmt, ...)
     ircdproto.ircd_cmd_notice(source, dest, buf);
 }
 
-void anope_cmd_notice2(char *source, char *dest, char *msg)
+void anope_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     ircdproto.ircd_cmd_notice2(source, dest, msg);
 }
 
-void anope_cmd_action(char *source, char *dest, const char *fmt, ...) 
+void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...) 
 {
     va_list args;
     char buf[BUFSIZE];
@@ -291,7 +288,7 @@ void anope_cmd_action(char *source, char *dest, const char *fmt, ...)
     snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
     ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
 }
-void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...)
+void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -304,32 +301,32 @@ void anope_cmd_action(char *source, char *dest, const char *fmt, ...)
     ircdproto.ircd_cmd_privmsg(source, dest, buf);
 }
 
-void anope_cmd_privmsg2(char *source, char *dest, char *msg)
+void anope_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     ircdproto.ircd_cmd_privmsg2(source, dest, msg);
 }
 
-void anope_cmd_serv_notice(char *source, char *dest, char *msg)
+void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     ircdproto.ircd_cmd_serv_notice(source, dest, msg);
 }
 
-void anope_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     ircdproto.ircd_cmd_serv_privmsg(source, dest, msg);
 }
 
-void anope_cmd_bot_chan_mode(char *nick, char *chan)
+void anope_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     ircdproto.ircd_cmd_bot_chan_mode(nick, chan);
 }
 
-void anope_cmd_351(char *source)
+void anope_cmd_351(const char *source)
 {
     ircdproto.ircd_cmd_351(source);
 }
 
-void anope_cmd_quit(char *source, const char *fmt, ...)
+void anope_cmd_quit(const char *source, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -342,27 +339,27 @@ void anope_cmd_quit(char *source, const char *fmt, ...)
     ircdproto.ircd_cmd_quit(source, buf);
 }
 
-void anope_cmd_pong(char *servname, char *who)
+void anope_cmd_pong(const char *servname, const char *who)
 {
     ircdproto.ircd_cmd_pong(servname, who);
 }
 
-void anope_cmd_join(char *user, char *channel, time_t chantime)
+void anope_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     ircdproto.ircd_cmd_join(user, channel, chantime);
 }
 
-void anope_cmd_unsqline(char *user)
+void anope_cmd_unsqline(const char *user)
 {
     ircdproto.ircd_cmd_unsqline(user);
 }
 
-void anope_cmd_invite(char *source, char *chan, char *nick)
+void anope_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     ircdproto.ircd_cmd_invite(source, chan, nick);
 }
 
-void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
+void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...)
 {
     if (fmt) {
         va_list args;
@@ -377,7 +374,7 @@ void anope_cmd_part(char *nick, char *chan, const char *fmt, ...)
     }
 }
 
-void anope_cmd_391(char *source, char *timestr)
+void anope_cmd_391(const char *source, const char *timestr)
 {
     ircdproto.ircd_cmd_391(source, timestr);
 }

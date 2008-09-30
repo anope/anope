@@ -828,11 +828,9 @@ void BahamutIRCdProto::cmd_svskill(const char *source, const char *user, const c
  * parv[3] - mode (or services id if old svs version)
  * parv[4] - optional arguement (services id)
  */
-void bahamut_cmd_svsmode(User * u, int ac, const char **av)
+void BahamutIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 {
-    send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
-             (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
-             (ac == 2 ? av[1] : ""));
+	send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
 }
 
 /* SQUIT */
@@ -1544,7 +1542,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsmode(bahamut_cmd_svsmode);
     pmodule_cmd_372(bahamut_cmd_372);
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);

@@ -47,7 +47,6 @@ void initIrcdProto()
     ircdproto.ircd_set_mod_current_buffer = NULL;
     ircdproto.ircd_set_umode = NULL;
     ircdproto.ircd_cmd_svskill = NULL;
-    ircdproto.ircd_cmd_svsmode = NULL;
     ircdproto.ircd_cmd_372 = NULL;
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
@@ -168,9 +167,9 @@ void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ..
     ircdproto.ircd_cmd_svskill(source, user, buf);
 }
 
-void anope_cmd_svsmode(User * u, int ac, const char **av)
+void anope_cmd_svsmode(User *u, int ac, const char **av)
 {
-    ircdproto.ircd_cmd_svsmode(u, ac, av);
+	ircdprotonew->cmd_svsmode(u, ac, av);
 }
 
 void anope_cmd_372(const char *source, const char *msg)
@@ -689,11 +688,6 @@ void
 pmodule_cmd_svskill(void (*func) (const char *source, const char *user, const char *buf))
 {
     ircdproto.ircd_cmd_svskill = func;
-}
-
-void pmodule_cmd_svsmode(void (*func) (User * u, int ac, const char **av))
-{
-    ircdproto.ircd_cmd_svsmode = func;
 }
 
 void pmodule_cmd_372(void (*func) (const char *source, const char *msg))

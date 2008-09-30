@@ -571,13 +571,12 @@ void InspIRCdProto::cmd_svskill(const char *source, const char *user, const char
 	send_cmd(source, "KILL %s :%s", user, buf);
 }
 
-void inspircd_cmd_svsmode(User * u, int ac, const char **av)
+void InspIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 {
-    /* This was originally done using this:
-       send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
-       * but that's the dirty way of doing things...
-     */
-    send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
+	/* This was originally done using this:
+	   send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
+	   * but that's the dirty way of doing things... */
+	send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 }
 
 
@@ -1787,7 +1786,6 @@ void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsmode(inspircd_cmd_svsmode);
     pmodule_cmd_372(inspircd_cmd_372);
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);

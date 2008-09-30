@@ -1076,7 +1076,6 @@ struct session_ {
 typedef struct ircd_proto_ {
     void (*ircd_set_mod_current_buffer)(int ac, char **av);
     void (*ircd_cmd_svskill)(const char *source, const char *user, const char *buf);
-    void (*ircd_cmd_svsmode)(User * u, int ac, const char **av);
     void (*ircd_cmd_372)(const char *source, const char *msg);
     void (*ircd_cmd_372_error)(const char *source);
     void (*ircd_cmd_375)(const char *source);
@@ -1152,6 +1151,7 @@ class IRCDProtoNew {
 		virtual void cmd_vhost_off(User *) { }
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
 		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
+		virtual void cmd_svsmode(User *u, int ac, const char **av) = 0;
 };
 
 typedef struct ircd_modes_ {

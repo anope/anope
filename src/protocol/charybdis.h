@@ -47,7 +47,6 @@
 
 
 void charybdis_set_umode(User * user, int ac, const char **av);
-void charybdis_cmd_svsmode(User * u, int ac, const char **av);
 void charybdis_cmd_372(const char *source, const char *msg);
 void charybdis_cmd_372_error(const char *source);
 void charybdis_cmd_375(const char *source);
@@ -116,4 +115,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_vhost_off(User *);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void cmd_svskill(const char *source, const char *user, const char *buf);
+		void cmd_svsmode(User *u, int ac, const char **av);
 } ircd_proto;

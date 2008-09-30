@@ -890,10 +890,9 @@ void CharybdisProto::cmd_svskill(const char *source, const char *user, const cha
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
 }
 
-void charybdis_cmd_svsmode(User * u, int ac, const char **av)
+void CharybdisProto::cmd_svsmode(User *u, int ac, const char **av)
 {
-    send_cmd((UseTS6 ? TS6SID : ServerName), "SVSMODE %s %s", u->nick,
-             av[0]);
+	send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
 }
 
 /*
@@ -1810,7 +1809,6 @@ int charybdis_send_deaccount(int argc, char **argv)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsmode(charybdis_cmd_svsmode);
     pmodule_cmd_372(charybdis_cmd_372);
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);

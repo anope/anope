@@ -832,10 +832,9 @@ void RatboxProto::cmd_svskill(const char *source, const char *user, const char *
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
 }
 
-void ratbox_cmd_svsmode(User * u, int ac, const char **av)
+void RatboxProto::cmd_svsmode(User *u, int ac, const char **av)
 {
-    send_cmd((UseTS6 ? TS6SID : ServerName), "SVSMODE %s %s", u->nick,
-             av[0]);
+	send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
 }
 
 /*
@@ -1702,7 +1701,6 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsmode(ratbox_cmd_svsmode);
     pmodule_cmd_372(ratbox_cmd_372);
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);

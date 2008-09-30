@@ -556,22 +556,13 @@ void UnrealIRCdProto::cmd_svskill(const char *source, const char *user, const ch
  * parv[2] - modes to change
  * parv[3] - Service Stamp (if mode == d)
  */
-void unreal_cmd_svsmode(User * u, int ac, const char **av)
+void UnrealIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 {
-    if (ac >= 1) {
-        if (!u || !av[0]) {
-            return;
-        }
-        if (UseSVS2MODE) {
-            send_cmd(ServerName, "%s %s %s%s%s",
-                     send_token("SVS2MODE", "v"), u->nick, av[0],
-                     (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
-        } else {
-            send_cmd(ServerName, "%s %s %s%s%s",
-                     send_token("SVSMODE", "n"), u->nick, av[0],
-                     (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
-        }
-    }
+	if (ac >= 1) {
+		if (!u || !av[0]) return;
+		if (UseSVS2MODE) send_cmd(ServerName, "%s %s %s", send_token("SVS2MODE", "v"), u->nick, merge_args(ac, av));
+		else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), u->nick, merge_args(ac, av));
+	}
 }
 
 /* 372 */
@@ -2096,7 +2087,6 @@ void moduleAddIRCDMsgs(void) {
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_svsmode(unreal_cmd_svsmode);
     pmodule_cmd_372(unreal_cmd_372);
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);

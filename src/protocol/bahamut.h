@@ -111,4 +111,5 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_nc_change(User *);
 		void cmd_svid_umode3(User *, const char *);
 		void cmd_eob();
+		void cmd_server(const char *, int, const char *);
 } ircd_proto;

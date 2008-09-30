@@ -806,10 +806,9 @@ void inspircd_cmd_pass(const char *pass)
 }
 
 /* SERVER services-dev.chatspike.net password 0 :Description here */
-void inspircd_cmd_server(const char *servname, int hop, const char *descript)
+void InspIRCdProto::cmd_server(const char *servname, int hop, const char *descript)
 {
-    send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop,
-             descript);
+	send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
 }
 
 /* JOIN */
@@ -989,7 +988,7 @@ void InspIRCdProto::cmd_connect()
 	if (servernum == 1) inspircd_cmd_pass(RemotePassword);
 	else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
 	else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
-	inspircd_cmd_server(ServerName, 0, ServerDesc);
+	cmd_server(ServerName, 0, ServerDesc);
 	send_cmd(NULL, "BURST");
 	send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
 	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1546,7 +1545,7 @@ void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         ircd_proto.cmd_squit(jserver, rbuf);
-    inspircd_cmd_server(jserver, 1, rbuf);
+    ircd_proto.cmd_server(jserver, 1, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 

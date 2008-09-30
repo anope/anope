@@ -885,9 +885,9 @@ void charybdis_cmd_pass(const char *pass)
 }
 
 /* SERVER name hop descript */
-void charybdis_cmd_server(const char *servname, int hop, const char *descript)
+void CharybdisProto::cmd_server(const char *servname, int hop, const char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 void CharybdisProto::cmd_connect()
@@ -899,7 +899,7 @@ void CharybdisProto::cmd_connect()
 	else if (servernum == 2) charybdis_cmd_pass(RemotePassword2);
 	else if (servernum == 3) charybdis_cmd_pass(RemotePassword3);
 	charybdis_cmd_capab();
-	charybdis_cmd_server(ServerName, 1, ServerDesc);
+	cmd_server(ServerName, 1, ServerDesc);
 	charybdis_cmd_svinfo();
 }
 
@@ -1515,7 +1515,7 @@ void charybdis_cmd_jupe(const char *jserver, const char *who, const char *reason
 
     if (findserver(servlist, jserver))
         ircd_proto.cmd_squit(jserver, rbuf);
-    charybdis_cmd_server(jserver, 2, rbuf);
+    ircd_proto.cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 

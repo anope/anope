@@ -820,9 +820,9 @@ void ratbox_cmd_pass(const char *pass)
 }
 
 /* SERVER name hop descript */
-void ratbox_cmd_server(const char *servname, int hop, const char *descript)
+void RatboxProto::cmd_server(const char *servname, int hop, const char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 void RatboxProto::cmd_connect()
@@ -834,7 +834,7 @@ void RatboxProto::cmd_connect()
 	else if (servernum == 2) ratbox_cmd_pass(RemotePassword2);
 	else if (servernum == 3) ratbox_cmd_pass(RemotePassword3);
 	ratbox_cmd_capab();
-	ratbox_cmd_server(ServerName, 1, ServerDesc);
+	cmd_server(ServerName, 1, ServerDesc);
 	ratbox_cmd_svinfo();
 }
 
@@ -1410,7 +1410,7 @@ void ratbox_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         ircd_proto.cmd_squit(jserver, rbuf);
-    ratbox_cmd_server(jserver, 2, rbuf);
+    ircd_proto.cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 

@@ -114,4 +114,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_svsjoin(const char *, const char *, const char *, const char *);
 		void cmd_svspart(const char *, const char *, const char *);
 		void cmd_eob();
+		void cmd_server(const char *, int, const char *);
 } ircd_proto;

@@ -1364,6 +1364,7 @@ class IRCDProtoNew {
 		virtual void cmd_svspart(const char *, const char *, const char *) { }
 		virtual void cmd_swhois(const char *, const char *, const char *) { }
 		virtual void cmd_eob() { }
+		virtual void cmd_server(const char *, int, const char *) = 0;
 };
 
 /*************************************************************************/

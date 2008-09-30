@@ -686,14 +686,10 @@ void unreal_cmd_pass(const char *pass)
 
 /* SERVER name hop descript */
 /* Unreal 3.2 actually sends some info about itself in the descript area */
-void unreal_cmd_server(const char *servname, int hop, const char *descript)
+void UnrealIRCdProto::cmd_server(const char *servname, int hop, const char *descript)
 {
-    if (Numeric) {
-        send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric,
-                 descript);
-    } else {
-        send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
-    }
+	if (Numeric) send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric, descript);
+	else send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 /* JOIN */
@@ -907,7 +903,7 @@ void UnrealIRCdProto::cmd_connect()
 	if (servernum == 1) unreal_cmd_pass(RemotePassword);
 	else if (servernum == 2) unreal_cmd_pass(RemotePassword2);
 	else if (servernum == 3) unreal_cmd_pass(RemotePassword3);
-	unreal_cmd_server(ServerName, 1, ServerDesc);
+	cmd_server(ServerName, 1, ServerDesc);
 }
 
 /* Events */
@@ -1593,7 +1589,7 @@ void unreal_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         ircd_proto.cmd_squit(jserver, rbuf);
-    unreal_cmd_server(jserver, 2, rbuf);
+    ircd_proto.cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 

@@ -100,4 +100,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_release_svshold(const char *);
 		void cmd_unsgline(const char *);
 		void cmd_sgline(const char *, const char *);
+		void cmd_server(const char *, int, const char *);
 } ircd_proto;

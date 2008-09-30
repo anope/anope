@@ -1196,7 +1196,6 @@ E void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_cmd_quit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
 E void anope_cmd_remove_akill(const char *user, const char *host);			  		  /* RAKILL */
-E void anope_cmd_server(const char *servname, int hop, const char *descript);    	  		  /* SERVER */
 E void anope_cmd_sgline(const char *mask, const char *reason);			  	  		  /* SGLINE */
 E void anope_cmd_sqline(const char *mask, const char *reason);                   	  		  /* SQLINE */
 E void anope_cmd_szline(const char *mask, const char *reason, const char *whom);				  /* SZLINE */

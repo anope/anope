@@ -1027,20 +1027,6 @@ void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, cons
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-/* NOTICE */
-void bahamut_cmd_notice(const char *source, const char *dest, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    if (NSDefFlags & NI_MSG) {
-        ircd_proto.cmd_privmsg(source, dest, buf);
-    } else {
-        send_cmd(source, "NOTICE %s :%s", dest, buf);
-    }
-}
-
 void bahamut_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
@@ -1516,7 +1502,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_notice(bahamut_cmd_notice);
     pmodule_cmd_notice2(bahamut_cmd_notice2);
     pmodule_cmd_serv_notice(bahamut_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(bahamut_cmd_serv_privmsg);

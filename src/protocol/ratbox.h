@@ -50,7 +50,6 @@ void ratbox_cmd_372(const char *source, const char *msg);
 void ratbox_cmd_372_error(const char *source);
 void ratbox_cmd_375(const char *source);
 void ratbox_cmd_376(const char *source);
-void ratbox_cmd_notice(const char *source, const char *dest, const char *buf);
 void ratbox_cmd_notice2(const char *source, const char *dest, const char *msg);
 void ratbox_cmd_serv_notice(const char *source, const char *dest, const char *msg);
 void ratbox_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
@@ -112,5 +111,6 @@ class RatboxProto : public IRCDProtoNew {
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_kick(const char *, const char *, const char *, const char *);
 		void cmd_notice_ops(const char *, const char *, const char *);
+		void cmd_message(const char *, const char *, const char *);
 		void cmd_privmsg(const char *, const char *, const char *);
 } ircd_proto;

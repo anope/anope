@@ -440,24 +440,15 @@ CUMode myCumodes[128] = {
 
 
 
-void ratbox_cmd_notice(const char *source, const char *dest, const char *buf)
+void RatboxProto::cmd_message(const char *source, const char *dest, const char *buf)
 {
-    Uid *ud;
-    User *u;
-
-    if (!buf) {
-        return;
-    }
-
-    if (NSDefFlags & NI_MSG) {
-        ircd_proto.cmd_privmsg(source, dest, buf);
-    } else {
-        ud = find_uid(source);
-        u = finduser(dest);
-        send_cmd((UseTS6 ? (ud ? ud->uid : source) : source),
-                 "NOTICE %s :%s", (UseTS6 ? (u ? u->uid : dest) : dest),
-                 buf);
-    }
+	if (!buf) return;
+	if (NSDefFlags & NI_MSG) cmd_privmsg(source, dest, buf);
+	else {
+		Uid *ud = find_uid(source);
+		User *u = finduser(dest);
+		send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, buf);
+	}
 }
 
 void ratbox_cmd_notice2(const char *source, const char *dest, const char *msg)
@@ -1662,7 +1653,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_notice(ratbox_cmd_notice);
     pmodule_cmd_notice2(ratbox_cmd_notice2);
     pmodule_cmd_serv_notice(ratbox_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(ratbox_cmd_serv_privmsg);

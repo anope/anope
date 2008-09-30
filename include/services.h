@@ -1059,7 +1059,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_372_error)(const char *source);
     void (*ircd_cmd_375)(const char *source);
     void (*ircd_cmd_376)(const char *source);
-    void (*ircd_cmd_notice)(const char *source, const char *dest, const char *buf);
     void (*ircd_cmd_notice2)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_serv_notice)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_serv_privmsg)(const char *source, const char *dest, const char *msg);
@@ -1306,6 +1305,12 @@ class IRCDProtoNew {
 		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
 		virtual void cmd_kick(const char *source, const char *chan, const char *user, const char *buf) = 0;
 		virtual void cmd_notice_ops(const char *, const char *dest, const char *buf) = 0;
+		virtual void cmd_message(const char *source, const char *dest, const char *buf)
+		{
+			if (!buf || !dest) return;
+			if (NSDefFlags & NI_MSG) cmd_privmsg(source, dest, buf);
+			else send_cmd(source, "NOTICE %s :%s", dest, buf);
+		}
 		virtual void cmd_privmsg(const char *source, const char *dest, const char *buf)
 		{
 			if (!buf || !dest) return;

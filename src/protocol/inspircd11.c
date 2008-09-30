@@ -780,19 +780,6 @@ void InspIRCdProto::cmd_notice_ops(const char *source, const char *dest, const c
 }
 
 
-void inspircd_cmd_notice(const char *source, const char *dest, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    if (NSDefFlags & NI_MSG) {
-        ircd_proto.cmd_privmsg(source, dest, buf);
-    } else {
-        send_cmd(source, "NOTICE %s :%s", dest, buf);
-    }
-}
-
 void inspircd_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
@@ -1763,7 +1750,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_notice(inspircd_cmd_notice);
     pmodule_cmd_notice2(inspircd_cmd_notice2);
     pmodule_cmd_serv_notice(inspircd_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(inspircd_cmd_serv_privmsg);

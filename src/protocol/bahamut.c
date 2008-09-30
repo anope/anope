@@ -486,9 +486,9 @@ void BahamutIRCdProto::cmd_svshold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void bahamut_cmd_release_svshold(const char *nick)
+void BahamutIRCdProto::cmd_release_svshold(const char *nick)
 {
-    send_cmd(ServerName, "SVSHOLD %s 0", nick);
+	send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
 
 /* SVSMODE -b */
@@ -1396,7 +1396,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_release_svshold(bahamut_cmd_release_svshold);
     pmodule_cmd_unsgline(bahamut_cmd_unsgline);
     pmodule_cmd_unszline(bahamut_cmd_unszline);
     pmodule_cmd_szline(bahamut_cmd_szline);

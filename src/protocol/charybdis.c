@@ -1417,9 +1417,9 @@ void CharybdisProto::cmd_svshold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void charybdis_cmd_release_svshold(const char *nick)
+void CharybdisProto::cmd_release_svshold(const char *nick)
 {
-    send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
+	send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
 }
 
 /* SVSNICK */
@@ -1670,7 +1670,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_release_svshold(charybdis_cmd_release_svshold);
     pmodule_cmd_unsgline(charybdis_cmd_unsgline);
     pmodule_cmd_unszline(charybdis_cmd_unszline);
     pmodule_cmd_szline(charybdis_cmd_szline);

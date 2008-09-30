@@ -1345,10 +1345,9 @@ void UnrealIRCdProto::cmd_svshold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void unreal_cmd_release_svshold(const char *nick)
+void UnrealIRCdProto::cmd_release_svshold(const char *nick)
 {
-    send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick,
-             ServerName);
+	send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
 }
 
 /* UNSGLINE */
@@ -1939,7 +1938,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_release_svshold(unreal_cmd_release_svshold);
     pmodule_cmd_unsgline(unreal_cmd_unsgline);
     pmodule_cmd_unszline(unreal_cmd_unszline);
     pmodule_cmd_szline(unreal_cmd_szline);

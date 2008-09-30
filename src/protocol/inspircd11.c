@@ -1481,11 +1481,9 @@ void inspircd_cmd_szline(const char *mask, const char *reason, const char *whom)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void inspircd_cmd_nc_change(User * u)
+void InspIRCdProto::cmd_nc_change(User *u)
 {
-    if (debug)
-        alog("debug: common_svsmode(1)");
-    common_svsmode(u, "-r", NULL);
+	common_svsmode(u, "-r", NULL);
 }
 
 /* SVSMODE +r */
@@ -1613,7 +1611,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_nc_change(inspircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(inspircd_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(inspircd_cmd_svid_umode3);
     pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);

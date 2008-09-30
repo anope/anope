@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_nc_change = NULL;
     ircdproto.ircd_cmd_svid_umode2 = NULL;
     ircdproto.ircd_cmd_svid_umode3 = NULL;
     ircdproto.ircd_cmd_svsjoin = NULL;
@@ -531,9 +530,9 @@ void anope_cmd_svid_umode(const char *nick, time_t ts)
 	ircdprotonew->cmd_svid_umode(nick, ts);
 }
 
-void anope_cmd_nc_change(User * u)
+void anope_cmd_nc_change(User *u)
 {
-    ircdproto.ircd_cmd_nc_change(u);
+	ircdprotonew->cmd_nc_change(u);
 }
 
 void anope_cmd_svid_umode2(User * u, const char *ts)
@@ -694,11 +693,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_nc_change(void (*func) (User * u))
-{
-    ircdproto.ircd_cmd_nc_change = func;
 }
 
 void pmodule_cmd_svid_umode2(void (*func) (User * u, const char *ts))

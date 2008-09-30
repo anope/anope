@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_nc_change(User * u);
 void ratbox_cmd_svid_umode2(User * u, const char *ts);
 void ratbox_cmd_svid_umode3(User * u, const char *ts);
 void ratbox_cmd_eob();

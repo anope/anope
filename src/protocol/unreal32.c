@@ -1409,9 +1409,9 @@ void UnrealIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void unreal_cmd_nc_change(User * u)
+void UnrealIRCdProto::cmd_nc_change(User *u)
 {
-    common_svsmode(u, "-r+d", "1");
+	common_svsmode(u, "-r+d", "1");
 }
 
 /* SVSMODE +r */
@@ -1924,7 +1924,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_nc_change(unreal_cmd_nc_change);
     pmodule_cmd_svid_umode2(unreal_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(unreal_cmd_svid_umode3);
 	pmodule_cmd_svsjoin(unreal_cmd_svsjoin);

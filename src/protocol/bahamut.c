@@ -1188,9 +1188,9 @@ void BahamutIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void bahamut_cmd_nc_change(User * u)
+void BahamutIRCdProto::cmd_nc_change(User *u)
 {
-    common_svsmode(u, "+d", "1");
+	common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
@@ -1391,7 +1391,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_nc_change(bahamut_cmd_nc_change);
     pmodule_cmd_svid_umode2(bahamut_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(bahamut_cmd_svid_umode3);
     pmodule_cmd_svsjoin(bahamut_cmd_svsjoin);

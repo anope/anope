@@ -1416,13 +1416,6 @@ void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_
 }
 
 /* SVSMODE +d */
-/* nc_change was = 1, and there is no na->status */
-void charybdis_cmd_nc_change(User * u)
-{
-    /* not supported */
-}
-
-/* SVSMODE +d */
 void charybdis_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not supported */
@@ -1635,7 +1628,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_nc_change(charybdis_cmd_nc_change);
     pmodule_cmd_svid_umode2(charybdis_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(charybdis_cmd_svid_umode3);
     pmodule_cmd_svsjoin(charybdis_cmd_svsjoin);

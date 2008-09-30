@@ -1322,13 +1322,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSMODE +d */
-/* nc_change was = 1, and there is no na->status */
-void ratbox_cmd_nc_change(User * u)
-{
-    /* not supported */
-}
-
-/* SVSMODE +d */
 void ratbox_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not supported */
@@ -1513,7 +1506,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_nc_change(ratbox_cmd_nc_change);
     pmodule_cmd_svid_umode2(ratbox_cmd_svid_umode2);
     pmodule_cmd_svid_umode3(ratbox_cmd_svid_umode3);
     pmodule_cmd_svsjoin(ratbox_cmd_svsjoin);

@@ -1,4 +1,4 @@
-CC=@CC@
+CC=g++ # probably wrong but oh well.
 INCLUDEDIR=../include
 ANOPELIBS=@ANOPELIBS@
 CFLAGS=@CFLAGS@

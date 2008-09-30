@@ -838,16 +838,6 @@ void inspircd_cmd_chgident(const char *nick, const char *vIdent)
     }
 }
 
-/* INVITE */
-void inspircd_cmd_invite(const char *source, const char *chan, const char *nick)
-{
-    if (!source || !chan || !nick) {
-        return;
-    }
-
-    send_cmd(source, "INVITE %s %s", nick, chan);
-}
-
 /* PART */
 void inspircd_cmd_part(const char *nick, const char *chan, const char *buf)
 {
@@ -1717,7 +1707,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_invite(inspircd_cmd_invite);
     pmodule_cmd_part(inspircd_cmd_part);
     pmodule_cmd_391(inspircd_cmd_391);
     pmodule_cmd_250(inspircd_cmd_250);

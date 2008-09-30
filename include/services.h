@@ -1061,7 +1061,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_375)(const char *source);
     void (*ircd_cmd_376)(const char *source);
     void (*ircd_cmd_351)(const char *source);
-    void (*ircd_cmd_invite)(const char *source, const char *chan, const char *nick);
     void (*ircd_cmd_part)(const char *nick, const char *chan, const char *buf);
     void (*ircd_cmd_391)(const char *source, const char *timestr);
     void (*ircd_cmd_250)(const char *buf);
@@ -1333,6 +1332,11 @@ class IRCDProtoNew {
 		}
 		virtual void cmd_join(const char *, const char *, time_t) = 0;
 		virtual void cmd_unsqline(const char *) = 0;
+		virtual void cmd_invite(const char *source, const char *chan, const char *nick)
+		{
+			if (!source || !chan || !nick) return;
+			send_cmd(source, "INVITE %s %s", nick, chan);
+		}
 };
 
 /*************************************************************************/

@@ -1190,16 +1190,6 @@ void bahamut_cmd_376(const char *source)
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-/* INVITE */
-void bahamut_cmd_invite(const char *source, const char *chan, const char *nick)
-{
-    if (!source || !chan || !nick) {
-        return;
-    }
-
-    send_cmd(source, "INVITE %s %s", nick, chan);
-}
-
 int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
@@ -1473,7 +1463,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_invite(bahamut_cmd_invite);
     pmodule_cmd_part(bahamut_cmd_part);
     pmodule_cmd_391(bahamut_cmd_391);
     pmodule_cmd_250(bahamut_cmd_250);

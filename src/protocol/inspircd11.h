@@ -57,7 +57,6 @@ void inspircd_cmd_372_error(const char *source);
 void inspircd_cmd_375(const char *source);
 void inspircd_cmd_376(const char *source);
 void inspircd_cmd_351(const char *source);
-void inspircd_cmd_invite(const char *source, const char *chan, const char *nick);
 void inspircd_cmd_part(const char *nick, const char *chan, const char *buf);
 void inspircd_cmd_391(const char *source, const char *timestr);
 void inspircd_cmd_250(const char *buf);

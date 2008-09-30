@@ -52,7 +52,6 @@ void charybdis_cmd_372_error(const char *source);
 void charybdis_cmd_375(const char *source);
 void charybdis_cmd_376(const char *source);
 void charybdis_cmd_351(const char *source);
-void charybdis_cmd_invite(const char *source, const char *chan, const char *nick);
 void charybdis_cmd_part(const char *nick, const char *chan, const char *buf);
 void charybdis_cmd_391(const char *source, const char *timestr);
 void charybdis_cmd_250(const char *buf);
@@ -113,4 +112,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_pong(const char *, const char *);
 		void cmd_join(const char *, const char *, time_t);
 		void cmd_unsqline(const char *);
+		void cmd_invite(const char *, const char *, const char *);
 } ircd_proto;

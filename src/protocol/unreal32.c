@@ -733,16 +733,6 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
              vIdent);
 }
 
-/* INVITE */
-void unreal_cmd_invite(const char *source, const char *chan, const char *nick)
-{
-    if (!source || !chan || !nick) {
-        return;
-    }
-
-    send_cmd(source, "%s %s %s", send_token("INVITE", "*"), nick, chan);
-}
-
 /* PART */
 void unreal_cmd_part(const char *nick, const char *chan, const char *buf)
 {
@@ -2016,7 +2006,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_invite(unreal_cmd_invite);
     pmodule_cmd_part(unreal_cmd_part);
     pmodule_cmd_391(unreal_cmd_391);
     pmodule_cmd_250(unreal_cmd_250);

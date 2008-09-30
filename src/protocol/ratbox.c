@@ -1286,20 +1286,12 @@ void RatboxProto::cmd_pong(const char *servname, const char *who)
 }
 
 /* INVITE */
-void ratbox_cmd_invite(const char *source, const char *chan, const char *nick)
+void RatboxProto::cmd_invite(const char *source, const char *chan, const char *nick)
 {
-    Uid *ud;
-    User *u;
-
-    if (!source || !chan || !nick) {
-        return;
-    }
-
-    ud = find_uid(source);
-    u = finduser(nick);
-
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "INVITE %s %s",
-             (UseTS6 ? (u ? u->uid : nick) : nick), chan);
+	if (!source || !chan || !nick) return;
+	Uid *ud = find_uid(source);
+	User *u = finduser(nick);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 /* SQUIT */
@@ -1617,7 +1609,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_invite(ratbox_cmd_invite);
     pmodule_cmd_part(ratbox_cmd_part);
     pmodule_cmd_391(ratbox_cmd_391);
     pmodule_cmd_250(ratbox_cmd_250);

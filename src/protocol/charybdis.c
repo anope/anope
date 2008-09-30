@@ -1355,20 +1355,12 @@ void CharybdisProto::cmd_pong(const char *servname, const char *who)
 }
 
 /* INVITE */
-void charybdis_cmd_invite(const char *source, const char *chan, const char *nick)
+void CharybdisProto::cmd_invite(const char *source, const char *chan, const char *nick)
 {
-    Uid *ud;
-    User *u;
-
-    if (!source || !chan || !nick) {
-        return;
-    }
-
-    ud = find_uid(source);
-    u = finduser(nick);
-
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "INVITE %s %s",
-             (UseTS6 ? (u ? u->uid : nick) : nick), chan);
+	if (!source || !chan || !nick) return;
+	Uid *ud = find_uid(source);
+	User *u = finduser(nick);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 /* SQUIT */
@@ -1723,7 +1715,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_invite(charybdis_cmd_invite);
     pmodule_cmd_part(charybdis_cmd_part);
     pmodule_cmd_391(charybdis_cmd_391);
     pmodule_cmd_250(charybdis_cmd_250);

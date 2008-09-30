@@ -1299,8 +1299,8 @@ E int anope_flood_mode_check(const char *value);
 
 E void anope_cmd_jupe(const char *jserver, const char *who, const char *reason);
 
-E int anope_valid_nick(char *nick);
-E int anope_valid_chan(char *chan);
+E int anope_valid_nick(const char *nick);
+E int anope_valid_chan(const char *chan);
 
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);

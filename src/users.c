@@ -36,6 +36,17 @@ User::User(const std::string &nick)
 
 	// XXX: we should also duplicate-check here.
 
+	/* we used to do this by calloc, no more. */
+	this->next = NULL;
+	this->prev = NULL;
+	username = host = hostip = vhost = vident = realname = nickTrack = uid = NULL;
+	server = NULL;
+	na = NULL;
+	chans = NULL;
+	founder_chans = NULL;
+	moduleData = NULL;
+	timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
+
 	strscpy(this->nick, nick.c_str(), NICKMAX);
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;

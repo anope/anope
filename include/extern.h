@@ -171,7 +171,6 @@ E void save_cs_dbase(void);
 E void save_cs_rdb_dbase(void);
 E void expire_chans(void);
 E void cs_remove_nick(const NickCore * nc);
-E void cs_remove_bot(const BotInfo * bi);
 
 E int is_real_founder(User * user, ChannelInfo * ci);
 

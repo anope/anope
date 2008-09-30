@@ -16,7 +16,6 @@
 #include "module.h"
 
 int do_bot(User * u);
-int delbot(BotInfo * bi);
 void myBotServHelp(User * u);
 
 /**
@@ -327,7 +326,7 @@ int do_bot(User * u)
             if (ircd->sqline) {
                 anope_cmd_unsqline(bi->nick);
             }
-            delbot(bi);
+            delete bi;
 
             notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
         }
@@ -335,29 +334,6 @@ int do_bot(User * u)
         syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 
     return MOD_CONT;
-}
-
-int delbot(BotInfo * bi)
-{
-    cs_remove_bot(bi);
-
-    if (bi->next)
-        bi->next->prev = bi->prev;
-    if (bi->prev)
-        bi->prev->next = bi->next;
-    else
-        botlists[tolower(*bi->nick)] = bi->next;
-
-    nbots--;
-
-    free(bi->nick);
-    free(bi->user);
-    free(bi->host);
-    free(bi->real);
-
-    free(bi);
-
-    return 1;
 }
 
 

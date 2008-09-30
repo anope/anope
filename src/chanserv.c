@@ -1742,21 +1742,6 @@ void cs_remove_nick(const NickCore * nc)
 
 /*************************************************************************/
 
-/* Removes any reference to a bot */
-
-void cs_remove_bot(const BotInfo * bi)
-{
-    int i;
-    ChannelInfo *ci;
-
-    for (i = 0; i < 256; i++)
-        for (ci = chanlists[i]; ci; ci = ci->next)
-            if (ci->bi == bi)
-                ci->bi = NULL;
-}
-
-/*************************************************************************/
-
 /* Return the ChannelInfo structure for the given channel, or NULL if the
  * channel isn't registered. */
 

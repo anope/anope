@@ -44,6 +44,10 @@ class BotInfo
 	 */
 	BotInfo(const char *nick, const char *user, const char *host, const char *real);
 
+	/** Destroy a bot, clearing up appropriately.
+	 */
+	~BotInfo();
+
 	/** Change the nickname set on a bot.
 	 * @param newnick The nick to change to
 	 */

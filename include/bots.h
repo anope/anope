@@ -20,6 +20,7 @@ class BotInfo
  public:
 	BotInfo *next, *prev;
 
+	std::string uid;		/* required for UID supporting servers, as opposed to the shitty struct Uid. */
 	char *nick;    			/* Nickname of the bot */
 	char *user;    			/* Its user name */
 	char *host;    			/* Its hostname */
@@ -31,9 +32,17 @@ class BotInfo
 	time_t lastmsg;			/* Last time we said something */
 
 	/** Create a new bot.
+	 * XXX: Note - this constructor is considered obsolete. Use the four parameter form.
 	 * @param nick The nickname to assign to the bot.
 	 */
 	BotInfo(const char *nick);
+	/** Create a new bot.
+	 * @param nick The nickname to assign to the bot.
+	 * @param user The ident to give the bot.
+	 * @param host The hostname to give the bot.
+	 * @param real The realname to give the bot.
+	 */
+	BotInfo(const char *nick, const char *user, const char *host, const char *real);
 
 	/** Change the nickname set on a bot.
 	 * @param newnick The nick to change to

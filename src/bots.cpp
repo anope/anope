@@ -15,9 +15,25 @@ BotInfo::BotInfo(const char *nnick)
 {
 	this->nick = sstrdup(nnick);
 	this->lastmsg = time(NULL);
+	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
+	new_uid(nnick, (char *)this->uid.c_str()); // XXX: this is required because we still pass nick prefix to protocol modules, DO AWAY WITH IT.
 	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
 	nbots++;
 }
+
+BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const char *nreal)
+{
+	this->nick = sstrdup(nnick);
+	this->user = sstrdup(nuser);
+	this->host = sstrdup(nhost);
+	this->real = sstrdup(nreal);
+	this->lastmsg = time(NULL);
+	this->uid = ts6_uid_retrieve(); // XXX is this safe? has ts6 been setup yet?
+	new_uid(nnick, (char *)this->uid.c_str()); // XXX: this is required because we still pass nick prefix to protocol modules, DO AWAY WITH IT.
+	insert_bot(this); // XXX, this is ugly, but it needs to stay until hashing of bots is redone in STL.
+	nbots++;
+}
+
 
 void BotInfo::ChangeNick(const char *newnick)
 {

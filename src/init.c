@@ -33,48 +33,6 @@ void introduce_user(const char *user)
     lasttimes[LTSIZE - 1] = time(NULL);
 #undef LTSIZE
 
-    /* Introduce OperServ first because on some IRCd's send
-     * we send data from OperServ before introduction completes.
-     * Patch fixing ratbox RESV support provided by Jobe. */
-    if (!user || stricmp(user, s_OperServ) == 0) {
-        anope_cmd_nick(s_OperServ, desc_OperServ, ircd->operservmode);
-    }
-
-    /* NickServ */
-    if (!user || stricmp(user, s_NickServ) == 0) {
-        anope_cmd_nick(s_NickServ, desc_NickServ, ircd->nickservmode);
-    }
-
-    /* ChanServ */
-    if (!user || stricmp(user, s_ChanServ) == 0) {
-        anope_cmd_nick(s_ChanServ, desc_ChanServ, ircd->chanservmode);
-    }
-    if (s_HostServ && ircd->vhost
-        && (!user || stricmp(user, s_HostServ) == 0)) {
-        anope_cmd_nick(s_HostServ, desc_HostServ, ircd->hostservmode);
-    }
-
-    if (!user || stricmp(user, s_MemoServ) == 0) {
-        anope_cmd_nick(s_MemoServ, desc_MemoServ, ircd->memoservmode);
-    }
-
-    if (s_BotServ && (!user || stricmp(user, s_BotServ) == 0)) {
-        anope_cmd_nick(s_BotServ, desc_BotServ, ircd->botservmode);
-    }
-
-    if (!user || stricmp(user, s_HelpServ) == 0) {
-        anope_cmd_nick(s_HelpServ, desc_HelpServ, ircd->helpservmode);
-    }
-
-    if (s_DevNull && (!user || stricmp(user, s_DevNull) == 0)) {
-        anope_cmd_nick(s_DevNull, desc_DevNull, ircd->devnullmode);
-    }
-
-    if (!user || stricmp(user, s_GlobalNoticer) == 0) {
-        anope_cmd_nick(s_GlobalNoticer, desc_GlobalNoticer,
-                       ircd->globalmode);
-    }
-
     /* We make aliases go online */
     if (s_NickServAlias && (!user || stricmp(user, s_NickServAlias) == 0)) {
         anope_cmd_nick(s_NickServAlias, desc_NickServAlias,
@@ -122,18 +80,18 @@ void introduce_user(const char *user)
     }
 
     /* We make the bots go online */
-    if (s_BotServ) {
-        BotInfo *bi;
-        int i;
+	BotInfo *bi;
+	int i;
 
-        for (i = 0; i < 256; i++)
-            for (bi = botlists[i]; bi; bi = bi->next) {
-
-                if (!user || !stricmp(user, bi->nick))
-                    anope_cmd_bot_nick(bi->nick, bi->user, bi->host,
-                                       bi->real, ircd->botserv_bot_mode);
-            }
-    }
+	/* XXX: it might be nice to have this inside BotInfo's constructor, or something? */
+	for (i = 0; i < 256; i++)
+	{
+		for (bi = botlists[i]; bi; bi = bi->next)
+		{
+			if (!user || !stricmp(user, bi->nick))
+				anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real, ircd->botserv_bot_mode);
+		}
+	}
 }
 
 /*************************************************************************/
@@ -691,6 +649,22 @@ int init_secondary(int ac, char **av)
     }
 #endif
     alog("Databases loaded");
+
+
+	/* this is only used on the first run of Anope. */
+	BotInfo *bi = findbot("NickServ");
+	if (!bi)
+	{
+		bi = new BotInfo(s_OperServ, ServiceUser, ServiceHost, desc_OperServ);
+		bi = new BotInfo(s_NickServ, ServiceUser, ServiceHost, desc_NickServ);
+		bi = new BotInfo(s_ChanServ, ServiceUser, ServiceHost, desc_ChanServ);
+		bi = new BotInfo(s_HostServ, ServiceUser, ServiceHost, desc_HostServ);
+		bi = new BotInfo(s_MemoServ, ServiceUser, ServiceHost, desc_MemoServ);
+		bi = new BotInfo(s_BotServ, ServiceUser, ServiceHost, desc_BotServ);
+		bi = new BotInfo(s_HelpServ, ServiceUser, ServiceHost, desc_HelpServ);
+		bi = new BotInfo(s_DevNull, ServiceUser, ServiceHost, desc_DevNull);
+		bi = new BotInfo(s_GlobalNoticer, ServiceUser, ServiceHost, desc_GlobalNoticer);
+	}
 
     /* Save the databases back to file/mysql to reflect any changes */
 #ifdef USE_RDB

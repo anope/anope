@@ -609,7 +609,6 @@ E int servernum;
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProtoNew *);
 E void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av));
-E void pmodule_cmd_svskill(void (*func) (const char *source, const char *user, const char *buf));
 E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
 E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));

@@ -459,6 +459,7 @@ void inspircd_set_umode(User * user, int ac, const char **av)
             }
             break;
         case 'x':
+			if (add) user->chost = user->vhost;
             update_host(user);
             break;
         }
@@ -538,9 +539,22 @@ void InspIRCdProto::cmd_topic(const char *whosets, const char *chan, const char 
 	send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
 }
 
+/* CHGHOST */
+void inspircd_cmd_chghost(const char *nick, const char *vhost)
+{
+    if (has_chghostmod == 1) {
+    if (!nick || !vhost) {
+        return;
+    }
+    send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
+    } else {
+	anope_cmd_global(s_OperServ, "CHGHOST not loaded!");
+    }
+}
+
 void InspIRCdProto::cmd_vhost_off(User *u)
 {
-	send_cmd(s_HostServ, "MODE %s -x", u->nick);
+	inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
 }
 
 void InspIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -886,19 +900,6 @@ void inspircd_cmd_unsqline(const char *user)
         return;
     }
     send_cmd(s_OperServ, "QLINE %s", user);
-}
-
-/* CHGHOST */
-void inspircd_cmd_chghost(const char *nick, const char *vhost)
-{
-    if (has_chghostmod == 1) {
-    if (!nick || !vhost) {
-        return;
-    }
-    send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
-    } else {
-	anope_cmd_global(s_OperServ, "CHGHOST not loaded!");
-    }
 }
 
 /* CHGIDENT */
@@ -1425,8 +1426,10 @@ int anope_event_nick(const char *source, int ac, const char **av)
                            source,  /* server */
                            av[7],   /* realname */
                            ts, svid, htonl(*ad), av[3], NULL);
-            if (user)
+            if (user) {
                 anope_set_umode(user, 1, &av[5]);
+				user->chost = av[3];
+			}
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL,

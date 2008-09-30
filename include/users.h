@@ -5,8 +5,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -33,6 +33,7 @@ class User
 	char *host;		/* User's real hostname 	*/
 	char *hostip;		/* User's IP number             */
 	char *vhost;		/* User's virtual hostname 	*/
+	std::string chost;	/* User's cloaked hostname */
 	char *vident;		/* User's virtual ident 	*/
 	char *realname;		/* Realname 			*/
 	Server *server;		/* Server user is connected to  */
@@ -45,7 +46,7 @@ class User
 
 	NickAlias *na;
 
-	ModuleData *moduleData;	/* defined for it, it should allow the module Add/Get */	
+	ModuleData *moduleData;	/* defined for it, it should allow the module Add/Get */
 
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 

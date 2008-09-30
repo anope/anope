@@ -88,7 +88,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
     dbFILE *f;
     FILE *fp;
 
-    f = scalloc(sizeof(*f), 1);
+    f = (dbFILE *)scalloc(sizeof(*f), 1);
     if (!f) {
 #ifndef NOT_MAIN
         log_perror("Can't read %s database %s", service, filename);
@@ -149,7 +149,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
     }
 #endif
 
-    f = scalloc(sizeof(*f), 1);
+    f = (dbFILE *)scalloc(sizeof(*f), 1);
     if (!f) {
 #ifndef NOT_MAIN
         log_perror("Can not read %s database %s", service, filename);
@@ -534,7 +534,7 @@ int read_string(char **ret, dbFILE * f)
         *ret = NULL;
         return 0;
     }
-    s = scalloc(len, 1);
+    s = (char *)scalloc(len, 1);
     if (len != fread(s, 1, len, f->fp)) {
         free(s);
         return -1;

@@ -278,7 +278,7 @@ EvtMessage *createEventHandler(char *name,
     if (!func) {
         return NULL;
     }
-    if ((evm = malloc(sizeof(EvtMessage))) == NULL) {
+    if ((evm = (EvtMessage *)malloc(sizeof(EvtMessage))) == NULL) {
         fatal("Out of memory!");
     }
     evm->name = sstrdup(name);
@@ -300,7 +300,7 @@ EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv))
     if (!func) {
         return NULL;
     }
-    if ((evh = malloc(sizeof(EvtHook))) == NULL) {
+    if ((evh = (EvtHook *)malloc(sizeof(EvtHook))) == NULL) {
         fatal("Out of memory!");
     }
     evh->name = sstrdup(name);
@@ -406,7 +406,7 @@ int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
         lastHash = current;
     }
 
-    if ((newHash = malloc(sizeof(EvtMessageHash))) == NULL) {
+    if ((newHash = (EvtMessageHash *)malloc(sizeof(EvtMessageHash))) == NULL) {
         fatal("Out of memory");
     }
     newHash->next = NULL;
@@ -452,7 +452,7 @@ int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
         lastHash = current;
     }
 
-    if ((newHash = malloc(sizeof(EvtHookHash))) == NULL) {
+    if ((newHash = (EvtHookHash *)malloc(sizeof(EvtHookHash))) == NULL) {
         fatal("Out of memory");
     }
     newHash->next = NULL;

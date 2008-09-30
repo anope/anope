@@ -64,7 +64,6 @@ void charybdis_cmd_318(const char *source, const char *who);
 void charybdis_cmd_242(const char *buf);
 void charybdis_cmd_243(const char *buf);
 void charybdis_cmd_211(const char *buf);
-void charybdis_cmd_chg_nick(const char *oldnick, const char *newnick);
 void charybdis_cmd_svsnick(const char *source, const char *guest, time_t when);
 void charybdis_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);
 void charybdis_cmd_connect(int servernum);

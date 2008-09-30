@@ -76,7 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-void bahamut_cmd_chg_nick(const char *oldnick, const char *newnick);
 void bahamut_cmd_svsnick(const char *source, const char *guest, time_t when);
 void bahamut_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);
 void bahamut_cmd_connect(int servernum);

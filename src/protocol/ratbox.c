@@ -1406,16 +1406,6 @@ void ratbox_cmd_svid_umode3(User * u, const char *ts)
     /* not used */
 }
 
-/* NICK <newnick>  */
-void ratbox_cmd_chg_nick(const char *oldnick, const char *newnick)
-{
-    if (!oldnick || !newnick) {
-        return;
-    }
-
-    send_cmd(oldnick, "NICK %s", newnick);
-}
-
 /*
  * SVINFO
  *      parv[0] = sender prefix
@@ -1590,7 +1580,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_chg_nick(ratbox_cmd_chg_nick);
     pmodule_cmd_svsnick(ratbox_cmd_svsnick);
     pmodule_cmd_vhost_on(ratbox_cmd_vhost_on);
     pmodule_cmd_connect(ratbox_cmd_connect);

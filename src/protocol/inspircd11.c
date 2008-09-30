@@ -975,16 +975,6 @@ void InspIRCdProto::cmd_squit(const char *servname, const char *message)
 	send_cmd(ServerName, "SQUIT %s :%s", servname, message);
 }
 
-/* NICK <newnick>  */
-void inspircd_cmd_chg_nick(const char *oldnick, const char *newnick)
-{
-    if (!oldnick || !newnick) {
-        return;
-    }
-
-    send_cmd(oldnick, "NICK %s", newnick);
-}
-
 /* SVSNICK */
 void inspircd_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
@@ -1683,7 +1673,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_chg_nick(inspircd_cmd_chg_nick);
     pmodule_cmd_svsnick(inspircd_cmd_svsnick);
     pmodule_cmd_vhost_on(inspircd_cmd_vhost_on);
     pmodule_cmd_connect(inspircd_cmd_connect);

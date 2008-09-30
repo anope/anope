@@ -1240,16 +1240,6 @@ void bahamut_cmd_svid_umode3(User * u, const char *ts)
     }
 }
 
-/* NICK <newnick>  */
-void bahamut_cmd_chg_nick(const char *oldnick, const char *newnick)
-{
-    if (!oldnick || !newnick) {
-        return;
-    }
-
-    send_cmd(oldnick, "NICK %s", newnick);
-}
-
 int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
@@ -1432,7 +1422,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_chg_nick(bahamut_cmd_chg_nick);
     pmodule_cmd_svsnick(bahamut_cmd_svsnick);
     pmodule_cmd_vhost_on(bahamut_cmd_vhost_on);
     pmodule_cmd_connect(bahamut_cmd_connect);

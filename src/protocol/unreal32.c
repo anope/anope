@@ -884,14 +884,10 @@ void UnrealIRCdProto::cmd_svso(const char *source, const char *nick, const char 
 }
 
 /* NICK <newnick>  */
-void unreal_cmd_chg_nick(const char *oldnick, const char *newnick)
+void UnrealIRCdProto::cmd_chg_nick(const char *oldnick, const char *newnick)
 {
-    if (!oldnick || !newnick) {
-        return;
-    }
-
-    send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick,
-             (long int) time(NULL));
+	if (!oldnick || !newnick) return;
+	send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
 }
 
 /* SVSNICK */
@@ -1976,7 +1972,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_chg_nick(unreal_cmd_chg_nick);
     pmodule_cmd_svsnick(unreal_cmd_svsnick);
     pmodule_cmd_vhost_on(unreal_cmd_vhost_on);
     pmodule_cmd_connect(unreal_cmd_connect);

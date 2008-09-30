@@ -1485,16 +1485,6 @@ void charybdis_cmd_svid_umode3(User * u, const char *ts)
     /* not used */
 }
 
-/* NICK <newnick>  */
-void charybdis_cmd_chg_nick(const char *oldnick, const char *newnick)
-{
-    if (!oldnick || !newnick) {
-        return;
-    }
-
-    send_cmd(oldnick, "NICK %s", newnick);
-}
-
 /*
  * SVINFO
  *      parv[0] = sender prefix
@@ -1697,7 +1687,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_chg_nick(charybdis_cmd_chg_nick);
     pmodule_cmd_svsnick(charybdis_cmd_svsnick);
     pmodule_cmd_vhost_on(charybdis_cmd_vhost_on);
     pmodule_cmd_connect(charybdis_cmd_connect);

@@ -1230,6 +1230,11 @@ NickAlias *findnick(const char *nick)
     return NULL;
 }
 
+NickAlias *findnick(const std::string &nick)
+{
+	return findnick(nick.c_str());
+}
+
 /*************************************************************************/
 
 /* Return the NickCore structure for the given nick, or NULL if the core

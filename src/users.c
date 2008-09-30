@@ -27,38 +27,45 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-/* Allocate a new User structure, fill in basic values, link it to the
- * overall list, and return it.  Always successful.
- */
-
-static User *new_user(const char *nick)
+User::User(const std::string &nick)
 {
-    User *user, **list;
+	User **list;
+	// XXX: we could do well to steal CoreException from insp
+	if (!nick.empty())
+		throw "what the craq, empty nick passed to constructor";
 
-    user = (User *)scalloc(sizeof(User), 1);
-    if (!nick)
-        nick = "";
-    strscpy(user->nick, nick, NICKMAX);
-    list = &userlist[HASH(user->nick)];
-    user->next = *list;
-    if (*list)
-        (*list)->prev = user;
-    *list = user;
-    user->na = findnick(nick);
-    if (user->na)
-        user->na->u = user;
-    usercnt++;
-    if (usercnt > maxusercnt) {
-        maxusercnt = usercnt;
-        maxusertime = time(NULL);
-        if (LogMaxUsers)
-            alog("user: New maximum user count: %d", maxusercnt);
-    }
-    user->isSuperAdmin = 0;     /* always set SuperAdmin to 0 for new users */
-    user->nickTrack = NULL;     /* ensure no default tracking nick */
-    return user;
+	// XXX: we should also duplicate-check here.
+
+	strscpy(this->nick, nick.c_str(), NICKMAX);
+	list = &userlist[HASH(this->nick)];
+	this->next = *list;
+
+	if (*list)
+		(*list)->prev = this;
+
+	*list = this;
+
+	this->na = findnick(nick);
+
+	if (this->na)
+		this->na->u = this;
+
+	usercnt++;
+
+	if (usercnt > maxusercnt)
+	{
+		maxusercnt = usercnt;
+		maxusertime = time(NULL);
+		if (LogMaxUsers)
+			alog("user: New maximum user count: %d", maxusercnt);
+	}
+
+	this->isSuperAdmin = 0;     /* always set SuperAdmin to 0 for new users */
+	this->nickTrack = NULL;     /* ensure no default tracking nick */
 }
 
+
+/*************************************************************************/
 /*************************************************************************/
 
 /* Change the nickname of a user, and move pointers as necessary. */
@@ -614,7 +621,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             return NULL;
 
         /* Allocate User structure and fill it in. */
-        user = new_user(nick);
+		user = new User(nick);
         user->username = sstrdup(username);
         user->host = sstrdup(host);
         user->server = findserver(servlist, server);

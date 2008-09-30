@@ -1,0 +1,72 @@
+/*
+ * Copyright (C) 2008 Robin Burchell <w00t@inspircd.org>
+ * Copyright (C) 2008 Anope Team <info@anope.org>
+ *
+ * Please read COPYING and README for further details.
+ *
+ * Based on the original code of Epona by Lara.
+ * Based on the original code of Services by Andy Church. 
+ * 
+ * $Id$
+ *
+ */
+struct u_chanlist {
+	struct u_chanlist *next, *prev;
+	Channel *chan;
+	int16 status;		/* Associated flags; see CSTATUS_* below. */
+};
+
+struct u_chaninfolist {
+	struct u_chaninfolist *next, *prev;
+	ChannelInfo *chan;
+};
+
+/* Online user and channel data. */
+class User
+{
+ public: // XXX: exposing a tiny bit too much
+	User *next, *prev;
+
+	char nick[NICKMAX];
+
+	char *username;		/* ident			*/
+	char *host;		/* User's real hostname 	*/
+	char *hostip;		/* User's IP number             */
+	char *vhost;		/* User's virtual hostname 	*/
+	char *vident;		/* User's virtual ident 	*/
+	char *realname;		/* Realname 			*/
+	Server *server;		/* Server user is connected to  */
+	char *nickTrack;	/* Nick Tracking 		*/
+	time_t timestamp;	/* Timestamp of the nick 	*/
+	time_t my_signon;	/* When did _we_ see the user?  */
+	uint32 svid;		/* Services ID 			*/
+	uint32 mode;		/* See below 			*/
+	char *uid;		/* Univeral ID			*/
+
+	NickAlias *na;
+
+	ModuleData *moduleData;	/* defined for it, it should allow the module Add/Get */	
+
+	int isSuperAdmin;	/* is SuperAdmin on or off? */
+
+	struct u_chanlist *chans;	/* Channels user has joined */
+	struct u_chaninfolist *founder_chans;	/* Channels user has identified for */
+
+	short invalid_pw_count;	/* # of invalid password attempts */
+	time_t invalid_pw_time;	/* Time of last invalid password */
+
+	time_t lastmemosend;	/* Last time MS SEND command used */
+	time_t lastnickreg;	/* Last time NS REGISTER cmd used */
+	time_t lastmail;	/* Last time this user sent a mail */
+
+
+	/****************************************************************/
+
+	/** Create a new user object, initialising necessary fields and
+	 * adds it to the hash
+	 *
+	 * @parameter nick The nickname of the user account.
+	 */
+	User(const std::string &nick);
+};
+

@@ -212,10 +212,16 @@ extern int shutdown(int, int);
 #include "slist.h"
 #include "events.h"
 
+/* pull in the various bits of STL to pull in */
+#include <string>
+
 /*************************************************************************/
 
+/* forward declarations, mostly used by older code */
+class User;
+
+
 typedef struct server_ Server;
-typedef struct user_ User;
 typedef struct channel_ Channel;
 typedef struct c_elist EList;
 typedef struct c_elist_entry Entry;
@@ -833,54 +839,8 @@ struct server_ {
 #define SERVER_JUPED 0x0002
 
 /*************************************************************************/
-struct u_chanlist {
-	struct u_chanlist *next, *prev;
-	Channel *chan;
-	int16 status;		/* Associated flags; see CSTATUS_* below. */
-};
 
-struct u_chaninfolist {
-	struct u_chaninfolist *next, *prev;
-	ChannelInfo *chan;
-};
-
-/* Online user and channel data. */
-struct user_ {
-    User *next, *prev;
-
-    char nick[NICKMAX];
-
-    char *username;		/* ident			*/
-    char *host;             	/* User's real hostname 	*/
-    char *hostip;               /* User's IP number             */
-    char *vhost;            	/* User's virtual hostname 	*/
-    char *vident;           	/* User's virtual ident 	*/
-    char *realname;		/* Realname 			*/
-    Server *server;		/* Server user is connected to  */
-    char *nickTrack;		/* Nick Tracking 		*/
-    time_t timestamp;		/* Timestamp of the nick 	*/
-    time_t my_signon;		/* When did _we_ see the user?  */
-    uint32 svid;		/* Services ID 			*/
-    uint32 mode;		/* See below 			*/
-    char *uid;			/* Univeral ID			*/
-
-    NickAlias *na;
-
-    ModuleData *moduleData;		/* defined for it, it should allow the module Add/Get */	
-    
-    int isSuperAdmin;		/* is SuperAdmin on or off? */
-
-	struct u_chanlist *chans;			/* Channels user has joined */
-	struct u_chaninfolist *founder_chans; 		/* Channels user has identified for */
-
-    short invalid_pw_count;		/* # of invalid password attempts */
-    time_t invalid_pw_time;		/* Time of last invalid password */
-
-    time_t lastmemosend;		/* Last time MS SEND command used */
-    time_t lastnickreg;			/* Last time NS REGISTER cmd used */
-    time_t lastmail;			/* Last time this user sent a mail */
-};
-
+#include "users.h"
 
 
 struct cbmode_ {

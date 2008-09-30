@@ -64,49 +64,49 @@ User::User(const std::string &nick)
 	this->nickTrack = NULL;     /* ensure no default tracking nick */
 }
 
-
-/*************************************************************************/
-/*************************************************************************/
-
-/* Change the nickname of a user, and move pointers as necessary. */
-
-static void change_user_nick(User * user, const char *nick)
+void User::SetNewNick(const std::string &newnick)
 {
-    User **list;
-    int is_same;
+	User **list;
+	int is_same;
 
-    /* Sanity check to make sure we don't segfault */
-    if (!user || !nick || !*nick) {
-        return;
-    }
+	/* Sanity check to make sure we don't segfault */
+	if (newnick.empty())
+	{
+		throw "User::SetNewNick() got a bad argument";
+	}
 
-    is_same = (!stricmp(user->nick, nick) ? 1 : 0);
+	is_same = (!stricmp(this->nick, nick) ? 1 : 0);
 
-    if (user->prev)
-        user->prev->next = user->next;
-    else
-        userlist[HASH(user->nick)] = user->next;
-    if (user->next)
-        user->next->prev = user->prev;
-    user->nick[1] = 0;          /* paranoia for zero-length nicks */
-    strscpy(user->nick, nick, NICKMAX);
-    list = &userlist[HASH(user->nick)];
-    user->next = *list;
-    user->prev = NULL;
-    if (*list)
-        (*list)->prev = user;
-    *list = user;
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		userlist[HASH(this->nick)] = this->next;
 
-    /* Only if old and new nick aren't the same; no need to waste time */
-    if (!is_same) {
-        if (user->na)
-            user->na->u = NULL;
-        user->na = findnick(nick);
-        if (user->na)
-            user->na->u = user;
-    }
+	if (this->next)
+		this->next->prev = this->prev;
+
+	strscpy(this->nick, nick, NICKMAX);
+	list = &userlist[HASH(this->nick)];
+	this->next = *list;
+	this->prev = NULL;
+
+	if (*list)
+		(*list)->prev = this;
+	*list = this;
+
+	/* Only if old and new nick aren't the same; no need to waste time */
+	if (!is_same)
+	{
+		if (this->na)
+			this->na->u = NULL;
+		this->na = findnick(nick);
+		if (this->na)
+			this->na->u = this;
+	}
 }
 
+
+/*************************************************************************/
 /*************************************************************************/
 
 void update_host(User * user)
@@ -704,7 +704,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
 
         if (stricmp(nick, user->nick) == 0) {
             /* No need to redo things */
-            change_user_nick(user, nick);
+			user->SetNewNick(nick);
             nc_changed = 0;
         } else {
             /* Update this only if nicks aren't the same */
@@ -718,7 +718,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
                 cancel_user(user);
             }
 
-            change_user_nick(user, nick);
+			user->SetNewNick(nick);
             send_event(EVENT_CHANGE_NICK, 1, nick);
 
             if ((old_na ? old_na->nc : NULL) ==

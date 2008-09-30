@@ -68,5 +68,10 @@ class User
 	 * @parameter nick The nickname of the user account.
 	 */
 	User(const std::string &nick);
+
+	/** Update the nickname of a user record accordingly, should be
+	 * called from ircd protocol.
+	 */
+	void SetNewNick(const std::string &newnick);
 };
 

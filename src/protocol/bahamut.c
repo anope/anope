@@ -710,11 +710,10 @@ void BahamutIRCdProto::cmd_unszline(const char *mask)
 /* SZLINE */
 void bahamut_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
-    /* this will likely fail so its only here for legacy */
-    send_cmd(NULL, "SZLINE %s :%s", mask, reason);
-    /* this is how we are supposed to deal with it */
-    send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 86400 * 2, whom,
-             (long int) time(NULL), reason);
+	/* this will likely fail so its only here for legacy */
+	send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+	/* this is how we are supposed to deal with it */
+	send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 172800, whom, static_cast<long>(time(NULL)), reason);
 }
 
 /* SVSNOOP */
@@ -1396,7 +1395,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_szline(bahamut_cmd_szline);
     pmodule_cmd_sgline(bahamut_cmd_sgline);
     pmodule_cmd_unban(bahamut_cmd_unban);
     pmodule_cmd_svsmode_chan(bahamut_cmd_svsmode_chan);

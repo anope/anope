@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);
 void ratbox_cmd_connect(int servernum);
 void ratbox_cmd_svshold(const char *nick);
 void ratbox_cmd_release_svshold(const char *nick);

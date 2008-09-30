@@ -977,15 +977,11 @@ void InspIRCdProto::cmd_squit(const char *servname, const char *message)
 
 /* Functions that use serval cmd functions */
 
-void inspircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void InspIRCdProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
-    if (!nick) {
-        return;
-    }
-    if (vIdent) {
-        inspircd_cmd_chgident(nick, vIdent);
-    }
-    inspircd_cmd_chghost(nick, vhost);
+	if (!nick) return;
+	if (vIdent) inspircd_cmd_chgident(nick, vIdent);
+	inspircd_cmd_chghost(nick, vhost);
 }
 
 void inspircd_cmd_connect(int servernum)
@@ -1662,7 +1658,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_vhost_on(inspircd_cmd_vhost_on);
     pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);

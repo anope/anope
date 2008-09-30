@@ -743,11 +743,6 @@ void RatboxProto::cmd_topic(const char *whosets, const char *chan, const char *w
 	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
-void ratbox_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
-{
-    /* not supported  */
-}
-
 void RatboxProto::cmd_unsqline(const char *user)
 {
 	Uid *ud = find_uid(s_OperServ);
@@ -1574,7 +1569,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_vhost_on(ratbox_cmd_vhost_on);
     pmodule_cmd_connect(ratbox_cmd_connect);
     pmodule_cmd_svshold(ratbox_cmd_svshold);
     pmodule_cmd_release_svshold(ratbox_cmd_release_svshold);

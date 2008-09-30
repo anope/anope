@@ -796,15 +796,14 @@ void CharybdisProto::cmd_topic(const char *whosets, const char *chan, const char
 	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
-void charybdis_cmd_vhost_off(User * u)
+void CharybdisProto::cmd_vhost_off(User *u)
 {
 	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
 }
 
-void charybdis_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void CharybdisProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
-    send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * CHGHOST %s :%s",
-             nick, vhost);
+	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", nick, vhost);
 }
 
 void CharybdisProto::cmd_unsqline(const char *user)
@@ -1680,7 +1679,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_vhost_on(charybdis_cmd_vhost_on);
     pmodule_cmd_connect(charybdis_cmd_connect);
     pmodule_cmd_svshold(charybdis_cmd_svshold);
     pmodule_cmd_release_svshold(charybdis_cmd_release_svshold);

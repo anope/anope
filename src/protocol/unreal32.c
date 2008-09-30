@@ -892,15 +892,11 @@ void UnrealIRCdProto::cmd_chg_nick(const char *oldnick, const char *newnick)
 
 /* Functions that use serval cmd functions */
 
-void unreal_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void UnrealIRCdProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
-    if (!nick) {
-        return;
-    }
-    if (vIdent) {
-        unreal_cmd_chgident(nick, vIdent);
-    }
-    unreal_cmd_chghost(nick, vhost);
+	if (!nick) return;
+	if (vIdent) unreal_cmd_chgident(nick, vIdent);
+	unreal_cmd_chghost(nick, vhost);
 }
 
 void unreal_cmd_connect(int servernum)
@@ -1956,7 +1952,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_vhost_on(unreal_cmd_vhost_on);
     pmodule_cmd_connect(unreal_cmd_connect);
     pmodule_cmd_svshold(unreal_cmd_svshold);
     pmodule_cmd_release_svshold(unreal_cmd_release_svshold);

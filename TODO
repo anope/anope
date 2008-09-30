@@ -40,3 +40,11 @@ VIPER'S CHRISTMAS LIST
  NOTES:
 	Already done (CBX).
 
+-------------------------
+
+w00t's CHRISTMAS LIST
+---------------------
+
+- no struct Uid bollocks. that's insane, and now, unnecessary that we store UID in BotInfo.
+- Move AnopeInit and AnopeFini(?) into a derived module class, change MODULE_INIT to return a pointer.
+- Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)

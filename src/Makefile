@@ -1,14 +1,14 @@
 MYSQL_OBJ = $(MYSQL:.c=.o)
 RDB_OBJ = $(RDB:.c=.o)
 OBJS =  actions.o base64.o botserv.o channels.o chanserv.o commands.o compat.o \
-		config.o datafiles.o encrypt.o events.o helpserv.o hostserv.o init.o ircd.o language.o list.o log.o mail.o main.o \
+		config.o datafiles.o encrypt.o events.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o  \
 		$(RDB_OBJ) $(MYSQL_OBJ) 
 SRCS =  actions.c base64.c botserv.c channels.c chanserv.c commands.c compat.c \
-		config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c language.c list.c log.c mail.c main.c \
+		config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
 		memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
-		process.c send.c servers.c sessions.c slist.c sockutil.c timeout.c users.c \
+		process.c send.c servers.c sessions.c s sockutil.c timeout.c users.c \
 		$(RDB) $(MYSQL) 
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
@@ -52,7 +52,6 @@ ircd.o:         ircd.c      $(INCLUDES)
 helpserv.o:     helpserv.c  $(INCLUDES)   
 hostserv.o:     hostserv.c  $(INCLUDES)   
 language.o:     language.c  $(INCLUDES)   
-list.o:         list.c      $(INCLUDES)
 log.o:          log.c       $(INCLUDES)
 mail.o:         mail.c      $(INCLUDES)
 main.o:         main.c      $(INCLUDES)
@@ -111,9 +110,6 @@ install: services
 	test -d ${BINDEST} || mkdir ${BINDEST}
 	$(INSTALL) services $(BINDEST)/services
 	$(INSTALL) bin/anoperc $(BINDEST)/anoperc
-	rm -f $(BINDEST)/listnicks $(BINDEST)/listchans
-	ln $(BINDEST)/services $(BINDEST)/listnicks
-	ln $(BINDEST)/services $(BINDEST)/listchans
 	(cd ../lang ; $(MAKE) install)
 	$(CP) ../data/* $(DATDEST)
 	$(INSTALL) bin/mydbgen $(DATDEST)/mydbgen

@@ -553,31 +553,6 @@ int main(int ac, char **av, char **envp)
     else
         progname = av[0];
 
-#ifdef _WIN32
-    if (strcmp(progname, "listnicks.exe") == 0)
-#else
-    if (strcmp(progname, "listnicks") == 0)
-#endif
-    {
-        do_listnicks(ac, av);
-        modules_unload_all(1, 0);
-        modules_unload_all(1, 1);
-        ModuleRunTimeDirCleanUp();
-        return 0;
-    }
-#ifdef _WIN32
-    else if (strcmp(progname, "listchans.exe") == 0)
-#else
-    else if (strcmp(progname, "listchans") == 0)
-#endif
-    {
-        do_listchans(ac, av);
-        modules_unload_all(1, 0);
-        modules_unload_all(1, 1);
-        ModuleRunTimeDirCleanUp();
-        return 0;
-    }
-
     /* Initialization stuff. */
     if ((i = init_secondary(ac, av)) != 0)
         return i;

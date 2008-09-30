@@ -162,7 +162,6 @@ E ChannelInfo *chanlists[256];
 E CSModeUtil csmodeutils[];
 E LevelInfo levelinfo[];
 
-E void listchans(int count_only, const char *chan);
 E void get_chanserv_stats(long *nrec, long *memuse);
 
 E int delchan(ChannelInfo * ci);
@@ -726,12 +725,6 @@ E void syntax_error(char *service, User * u, const char *command,
                     int msgnum);
 
 
-/**** list.c ****/
-
-E void do_listnicks(int ac, char **av);
-E void do_listchans(int ac, char **av);
-
-
 /**** log.c ****/
 
 E int open_log(void);
@@ -916,7 +909,6 @@ E unsigned int guestnum;
 E void insert_requestnick(NickRequest * nr);
 E void alpha_insert_alias(NickAlias * na);
 E void insert_core(NickCore * nc);
-E void listnicks(int count_only, const char *nick);
 E void get_aliases_stats(long *nrec, long *memuse);
 E void get_core_stats(long *nrec, long *memuse);
 E void collide(NickAlias * na, int from_timeout);

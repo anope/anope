@@ -1481,12 +1481,6 @@ void ratbox_cmd_svsnick(const char *nick, const char *newnick, time_t when)
     /* not supported */
 }
 
-void ratbox_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
-                           const char *modes)
-{
-    /* not supported  */
-}
-
 void ratbox_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
@@ -1700,7 +1694,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_guest_nick(ratbox_cmd_guest_nick);
     pmodule_cmd_mode(ratbox_cmd_mode);
     pmodule_cmd_bot_nick(ratbox_cmd_bot_nick);
     pmodule_cmd_kick(ratbox_cmd_kick);

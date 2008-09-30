@@ -1316,11 +1316,9 @@ void bahamut_cmd_svsnick(const char *source, const char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void bahamut_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
-                            const char *modes)
+void BahamutIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
 }
 
 void bahamut_cmd_svso(const char *source, const char *nick, const char *flag)
@@ -1544,7 +1542,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_guest_nick(bahamut_cmd_guest_nick);
     pmodule_cmd_mode(bahamut_cmd_mode);
     pmodule_cmd_bot_nick(bahamut_cmd_bot_nick);
     pmodule_cmd_kick(bahamut_cmd_kick);

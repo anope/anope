@@ -610,12 +610,9 @@ void InspIRCdProto::cmd_nick(const char *nick, const char *name, const char *mod
 	send_cmd(nick, "OPERTYPE Service");
 }
 
-void
-inspircd_cmd_guest_nick(const char *nick, const char *user, const char *host,
-                        const char *real, const char *modes)
+void InspIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
-             (long int) time(NULL), nick, host, host, user, modes, real);
+	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 }
 
 void inspircd_cmd_mode(const char *source, const char *dest, const char *buf)
@@ -1788,7 +1785,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_guest_nick(inspircd_cmd_guest_nick);
     pmodule_cmd_mode(inspircd_cmd_mode);
     pmodule_cmd_bot_nick(inspircd_cmd_bot_nick);
     pmodule_cmd_kick(inspircd_cmd_kick);

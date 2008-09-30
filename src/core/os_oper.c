@@ -198,7 +198,7 @@ int do_oper(User * u)
                     || match_wild_nocase(nick,
                                          ((NickCore *) servopers.list[i])->
                                          display))
-                    oper_list(i + 1, servopers.list[i], u, &sent_header);
+                    oper_list(i + 1, (NickCore *)servopers.list[i], u, &sent_header);
 
             if (!sent_header)
                 notice_lang(s_OperServ, u, OPER_OPER_NO_MATCH);
@@ -248,5 +248,5 @@ int oper_list_callback(SList * slist, int number, void *item, va_list args)
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return oper_list(number, item, u, sent_header);
+    return oper_list(number, (NickCore *)item, u, sent_header);
 }

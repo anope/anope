@@ -69,12 +69,12 @@ void myOperServHelp(User * u)
 int do_reload(User * u)
 {
     if (!read_config(1)) {
-        quitmsg = calloc(28 + strlen(u->nick), 1);
+        quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
         if (!quitmsg)
             quitmsg =
                 "Error during the reload of the configuration file, but out of memory!";
         else
-            sprintf(quitmsg,
+            sprintf((char *)quitmsg, /* XXX */
                     "Error during the reload of the configuration file!");
         quitting = 1;
     }

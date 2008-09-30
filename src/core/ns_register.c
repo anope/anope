@@ -146,14 +146,14 @@ int do_register(User * u)
                 return MOD_CONT;
             }
         }
-        for (i = 0; i < servadmins.count && (nc = servadmins.list[i]); i++) {
+        for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]); i++) {
             if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
-        for (i = 0; i < servopers.count && (nc = servopers.list[i]); i++) {
+        for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]); i++) {
             if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
@@ -308,7 +308,7 @@ int do_confirm(User * u)
         char tmp_pass[PASSMAX];
 
         len = strlen(pass);
-        na->nc->pass = smalloc(PASSMAX);
+        na->nc->pass = (char *)smalloc(PASSMAX);
         if (enc_encrypt(pass, len, na->nc->pass, PASSMAX - 1) < 0) {
             memset(pass, 0, strlen(pass));
             alog("%s: Failed to encrypt password for %s (register)",
@@ -334,7 +334,7 @@ int do_confirm(User * u)
             na->last_realname = sstrdup("unknown");
         } else {
             na->last_usermask =
-                scalloc(strlen(common_get_vident(u)) +
+                (char *)scalloc(strlen(common_get_vident(u)) +
                         strlen(common_get_vhost(u)) + 2, 1);
             sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
                     common_get_vhost(u));
@@ -343,7 +343,7 @@ int do_confirm(User * u)
         na->time_registered = na->last_seen = time(NULL);
         if (NSAddAccessOnReg) {
             na->nc->accesscount = 1;
-            na->nc->access = scalloc(sizeof(char *), 1);
+            na->nc->access = (char **)scalloc(sizeof(char *), 1);
             na->nc->access[0] = create_mask(u);
         } else {
             na->nc->accesscount = 0;
@@ -409,7 +409,7 @@ NickRequest *makerequest(const char *nick)
 {
     NickRequest *nr;
 
-    nr = scalloc(1, sizeof(NickRequest));
+    nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
     nr->nick = sstrdup(nick);
     insert_requestnick(nr);
     alog("%s: Nick %s has been requested", s_NickServ, nr->nick);
@@ -424,14 +424,14 @@ NickAlias *makenick(const char *nick)
     NickCore *nc;
 
     /* First make the core */
-    nc = scalloc(1, sizeof(NickCore));
+    nc = (NickCore *)scalloc(1, sizeof(NickCore));
     nc->display = sstrdup(nick);
     slist_init(&nc->aliases);
     insert_core(nc);
     alog("%s: group %s has been created", s_NickServ, nc->display);
 
     /* Then make the alias */
-    na = scalloc(1, sizeof(NickAlias));
+    na = (NickAlias *)scalloc(1, sizeof(NickAlias));
     na->nick = sstrdup(nick);
     na->nc = nc;
     slist_add(&nc->aliases, na);

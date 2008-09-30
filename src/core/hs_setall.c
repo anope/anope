@@ -71,9 +71,9 @@ void myHostServHelp(User * u)
 int do_setall(User * u)
 {
 
-    char *nick = strtok(NULL, " ");
+    char *nick = (char *)strtok(NULL, " ");
     char *rawhostmask = strtok(NULL, " ");
-    char *hostmask = smalloc(HOSTMAX);
+    char *hostmask = (char *)smalloc(HOSTMAX);
 
     NickAlias *na;
     int32 tmp_time;

@@ -139,14 +139,14 @@ NickAlias *makenick(const char *nick)
     NickCore *nc;
 
     /* First make the core */
-    nc = scalloc(1, sizeof(NickCore));
+    nc = (NickCore *)scalloc(1, sizeof(NickCore));
     nc->display = sstrdup(nick);
     slist_init(&nc->aliases);
     insert_core(nc);
     alog("%s: group %s has been created", s_NickServ, nc->display);
 
     /* Then make the alias */
-    na = scalloc(1, sizeof(NickAlias));
+    na = (NickAlias *)scalloc(1, sizeof(NickAlias));
     na->nick = sstrdup(nick);
     na->nc = nc;
     slist_add(&nc->aliases, na);

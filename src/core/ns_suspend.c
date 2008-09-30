@@ -111,7 +111,7 @@ int do_suspend(User * u)
         na->nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
 
         for (i = 0; i < na->nc->aliases.count; i++) {
-            na2 = na->nc->aliases.list[i];
+            na2 = (NickAlias *)na->nc->aliases.list[i];
             if (na2->nc == na->nc) {
                 na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
                 na2->last_quit = sstrdup(reason);

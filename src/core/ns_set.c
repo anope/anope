@@ -178,7 +178,7 @@ int do_set_display(User * u, NickCore * nc, char *param)
 
     /* First check whether param is a valid nick of the group */
     for (i = 0; i < nc->aliases.count; i++) {
-        na = nc->aliases.list[i];
+        na = (NickAlias *)nc->aliases.list[i];
         if (!stricmp(na->nick, param)) {
             param = na->nick;   /* Because case may differ */
             break;
@@ -216,7 +216,7 @@ int do_set_password(User * u, NickCore * nc, char *param)
     if (nc->pass)
         free(nc->pass);
 
-    nc->pass = smalloc(PASSMAX);
+    nc->pass = (char *)smalloc(PASSMAX);
     if (enc_encrypt(param, len, nc->pass, PASSMAX - 1) < 0) {
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,

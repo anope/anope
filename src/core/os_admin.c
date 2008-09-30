@@ -197,7 +197,7 @@ int do_admin(User * u)
                     || match_wild_nocase(nick,
                                          ((NickCore *) servadmins.
                                           list[i])->display))
-                    admin_list(i + 1, servadmins.list[i], u, &sent_header);
+                    admin_list(i + 1, (NickCore *)servadmins.list[i], u, &sent_header);
 
             if (!sent_header)
                 notice_lang(s_OperServ, u, OPER_ADMIN_NO_MATCH);
@@ -230,7 +230,7 @@ int admin_list_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return admin_list(number, item, u, sent_header);
+    return admin_list(number, (NickCore *)item, u, sent_header);
 }
 
 int admin_list(int number, NickCore * nc, User * u, int *sent_header)

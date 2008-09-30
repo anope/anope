@@ -16,8 +16,7 @@
 #include "module.h"
 int do_list(User * u);
 int list_memo_callback(User * u, int num, va_list args);
-int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
-              int new, const char *chan);
+int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, const char *chan);
 void myMemoServHelp(User * u);
 
 /**
@@ -159,12 +158,11 @@ int list_memo_callback(User * u, int num, va_list args)
  * @param int Memo index
  * @param mi MemoInfo Struct
  * @param send_header If we are to send the headers
- * @param new If we are listing new memos
+ * @param newi If we are listing new memos
  * @param chan Channel name
  * @return MOD_CONT
  */
-int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
-              int new, const char *chan)
+int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, const char *chan)
 {
     Memo *m;
     char timebuf[64];
@@ -175,11 +173,11 @@ int list_memo(User * u, int index, MemoInfo * mi, int *sent_header,
     if (!*sent_header) {
         if (chan) {
             notice_lang(s_MemoServ, u,
-                        new ? MEMO_LIST_CHAN_NEW_MEMOS :
+                        newi ? MEMO_LIST_CHAN_NEW_MEMOS :
                         MEMO_LIST_CHAN_MEMOS, chan, s_MemoServ, chan);
         } else {
             notice_lang(s_MemoServ, u,
-                        new ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS,
+                        newi ? MEMO_LIST_NEW_MEMOS : MEMO_LIST_MEMOS,
                         u->nick, s_MemoServ);
         }
         notice_lang(s_MemoServ, u, MEMO_LIST_HEADER);

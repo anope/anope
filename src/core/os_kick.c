@@ -68,7 +68,7 @@ void myOperServHelp(User * u)
  **/
 int do_os_kick(User * u)
 {
-    char *argv[3];
+    const char *argv[3];
     char *chan, *nick, *s;
     Channel *c;
 
@@ -93,8 +93,8 @@ int do_os_kick(User * u)
     argv[1] = sstrdup(nick);
     argv[2] = sstrdup(s);
     do_kick(s_OperServ, 3, argv);
-    free(argv[2]);
-    free(argv[1]);
-    free(argv[0]);
+    free((void *)argv[2]);
+    free((void *)argv[1]);
+    free((void *)argv[0]);
     return MOD_CONT;
 }

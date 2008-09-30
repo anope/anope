@@ -84,7 +84,7 @@ int do_delall(User * u)
         }
         nc = na->nc;
         for (i = 0; i < nc->aliases.count; i++) {
-            na = nc->aliases.list[i];
+            na = (NickAlias *)nc->aliases.list[i];
             delHostCore(na->nick);
         }
         alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);

@@ -77,7 +77,7 @@ int do_group(User * u)
     char *creator = NULL;
     HostCore *head = NULL;
     time_t time;
-    boolean found = false;
+    bool found = false;
 
     head = hostCoreListHead();
 

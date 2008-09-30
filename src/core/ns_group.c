@@ -119,14 +119,14 @@ int do_group(User * u)
                 return MOD_CONT;
             }
         }
-        for (i = 0; i < servadmins.count && (nc = servadmins.list[i]); i++) {
+        for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]); i++) {
             if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
                 return MOD_CONT;
             }
         }
-        for (i = 0; i < servopers.count && (nc = servopers.list[i]); i++) {
+        for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]); i++) {
             if (stristr(u->nick, nc->display) && !is_oper(u)) {
                 notice_lang(s_NickServ, u, NICK_CANNOT_BE_REGISTERED,
                             u->nick);
@@ -193,7 +193,7 @@ int do_group(User * u)
 
         if (na) {
             na->last_usermask =
-                scalloc(strlen(common_get_vident(u)) +
+                (char *)scalloc(strlen(common_get_vident(u)) +
                         strlen(common_get_vhost(u)) + 2, 1);
             sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
                     common_get_vhost(u));
@@ -264,7 +264,7 @@ NickAlias *makealias(const char *nick, NickCore * nc)
     NickAlias *na;
 
     /* Just need to make the alias */
-    na = scalloc(1, sizeof(NickAlias));
+    na = (NickAlias *)scalloc(1, sizeof(NickAlias));
     na->nick = sstrdup(nick);
     na->nc = nc;
     slist_add(&nc->aliases, na);
@@ -309,7 +309,7 @@ int do_glist(User * u)
                     nick ? NICK_GLIST_HEADER_X : NICK_GLIST_HEADER,
                     na->nc->display);
         for (i = 0; i < na->nc->aliases.count; i++) {
-            na2 = na->nc->aliases.list[i];
+            na2 = (NickAlias *)na->nc->aliases.list[i];
             if (na2->nc == na->nc) {
                 if (!(wont_expire = na2->status & NS_NO_EXPIRE)) {
                     expt = na2->last_seen + NSExpire;

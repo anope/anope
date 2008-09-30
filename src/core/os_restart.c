@@ -73,11 +73,11 @@ void myOperServHelp(User * u)
 int do_restart(User * u)
 {
 #ifdef SERVICES_BIN
-    quitmsg = calloc(31 + strlen(u->nick), 1);
+    quitmsg = (char *)calloc(31 + strlen(u->nick), 1);
     if (!quitmsg)
         quitmsg = "RESTART command received, but out of memory!";
     else
-        sprintf(quitmsg, "RESTART command received from %s", u->nick);
+        sprintf((char *)quitmsg, /* XXX */ "RESTART command received from %s", u->nick);
 
     if (GlobalOnCycle) {
         oper_global(NULL, "%s", GlobalOnCycleMessage);

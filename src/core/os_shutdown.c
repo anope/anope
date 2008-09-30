@@ -68,11 +68,11 @@ void myOperServHelp(User * u)
  **/
 int do_shutdown(User * u)
 {
-    quitmsg = calloc(32 + strlen(u->nick), 1);
+    quitmsg = (char *)calloc(32 + strlen(u->nick), 1);
     if (!quitmsg)
         quitmsg = "SHUTDOWN command received, but out of memory!";
     else
-        sprintf(quitmsg, "SHUTDOWN command received from %s", u->nick);
+        sprintf((char *)quitmsg, /* XXX */ "SHUTDOWN command received from %s", u->nick);
 
     if (GlobalOnCycle) {
         oper_global(NULL, "%s", GlobalOnCycleMessage);

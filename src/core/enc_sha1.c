@@ -186,12 +186,12 @@ int sha1_encrypt(const char *src, int len, char *dest, int size)
     memset(dest,0,size);
 
     SHA1Init(&context);
-    SHA1Update(&context, src, len);
-    SHA1Final(dest, &context);
+    SHA1Update(&context, (unsigned char *)src, len);
+    SHA1Final((unsigned char *)dest, &context);
 
     if(debug) {
         memset(tmp,0,41);
-        binary_to_hex(dest,tmp,20);
+        binary_to_hex((unsigned char *)dest,(char *)tmp,20);
        /* Dont log source if we were encrypting in place :) */
         if (memcmp(src, dest, 20) != 0) {
             alog("enc_sha1: hashed from [%s] to [%s]",src,tmp); 

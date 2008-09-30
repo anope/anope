@@ -244,7 +244,7 @@ int do_sgline(User * u)
                 amask = ((SXLine *) sglines.list[i])->mask;
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    sgline_list(i + 1, sglines.list[i], u, &sent_header);
+                    sgline_list(i + 1, (SXLine *)sglines.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -281,7 +281,7 @@ int do_sgline(User * u)
                 amask = ((SXLine *) sglines.list[i])->mask;
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    sgline_view(i + 1, sglines.list[i], u, &sent_header);
+                    sgline_view(i + 1, (SXLine *)sglines.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -329,7 +329,7 @@ int sgline_view_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return sgline_view(number, item, u, sent_header);
+    return sgline_view(number, (SXLine *)item, u, sent_header);
 }
 
 /* Lists an SGLINE entry, prefixing it with the header if needed */
@@ -358,5 +358,5 @@ int sgline_list_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return sgline_list(number, item, u, sent_header);
+    return sgline_list(number, (SXLine *)item, u, sent_header);
 }

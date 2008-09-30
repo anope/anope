@@ -68,11 +68,11 @@ void myOperServHelp(User * u)
  **/
 int do_os_quit(User * u)
 {
-    quitmsg = calloc(28 + strlen(u->nick), 1);
+    quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
     if (!quitmsg)
         quitmsg = "QUIT command received, but out of memory!";
     else
-        sprintf(quitmsg, "QUIT command received from %s", u->nick);
+        sprintf((char *)quitmsg, "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
 
     if (GlobalOnCycle) {
         oper_global(NULL, "%s", GlobalOnCycleMessage);

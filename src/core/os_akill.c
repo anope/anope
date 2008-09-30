@@ -80,8 +80,11 @@ int do_akill(User * u)
     char *cmd = strtok(NULL, " ");
     char breason[BUFSIZE];
 
-    if (!cmd)
-        cmd = "";
+	if (!cmd)
+	{
+		syntax_error(s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);
+		return MOD_CONT;
+	}
 
     if (!stricmp(cmd, "ADD")) {
         int deleted = 0;
@@ -264,7 +267,7 @@ int do_akill(User * u)
                          ((Akill *) akills.list[i])->host);
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    akill_list(i + 1, akills.list[i], u, &sent_header);
+                    akill_list(i + 1, (Akill *)akills.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -303,7 +306,7 @@ int do_akill(User * u)
                          ((Akill *) akills.list[i])->host);
                 if (!stricmp(mask, amask)
                     || match_wild_nocase(mask, amask))
-                    akill_view(i + 1, akills.list[i], u, &sent_header);
+                    akill_view(i + 1, (Akill *)akills.list[i], u, &sent_header);
             }
 
             if (!sent_header)
@@ -351,7 +354,7 @@ int akill_list_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return akill_list(number, item, u, sent_header);
+    return akill_list(number, (Akill *)item, u, sent_header);
 }
 
 /* Callback for enumeration purposes */
@@ -362,7 +365,7 @@ int akill_view_callback(SList * slist, int number, void *item,
     User *u = va_arg(args, User *);
     int *sent_header = va_arg(args, int *);
 
-    return akill_view(number, item, u, sent_header);
+    return akill_view(number, (Akill *)item, u, sent_header);
 }
 
 /* Lists an AKILL entry, prefixing it with the header if needed */

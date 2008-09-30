@@ -108,7 +108,7 @@ int do_identify(User * u)
             if (na->last_usermask)
                 free(na->last_usermask);
             na->last_usermask =
-                scalloc(strlen(common_get_vident(u)) +
+                (char *)scalloc(strlen(common_get_vident(u)) +
                         strlen(common_get_vhost(u)) + 2, 1);
             sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
                     common_get_vhost(u));

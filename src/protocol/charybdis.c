@@ -1433,19 +1433,12 @@ void charybdis_cmd_release_svshold(const char *nick)
 }
 
 /* SVSNICK */
-void charybdis_cmd_svsnick(const char *nick, const char *newnick, time_t when)
+void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_t when)
 {
-    User *u;
-
-    if (!nick || !newnick) {
-        return;
-    }
-
-    u = finduser(nick);
-    if (!u)
-        return;
-    send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name,
-             u->nick, newnick, (long int)when, (long int)u->timestamp);
+	if (!oldnick || !newnick) return;
+	User *u = finduser(oldnick);
+	if (!u) return;
+	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
 }
 
 void charybdis_cmd_unban(const char *name, const char *nick)
@@ -1687,7 +1680,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svsnick(charybdis_cmd_svsnick);
     pmodule_cmd_vhost_on(charybdis_cmd_vhost_on);
     pmodule_cmd_connect(charybdis_cmd_connect);
     pmodule_cmd_svshold(charybdis_cmd_svshold);

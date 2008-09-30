@@ -890,22 +890,6 @@ void UnrealIRCdProto::cmd_chg_nick(const char *oldnick, const char *newnick)
 	send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
 }
 
-/* SVSNICK */
-/*
-**      parv[0] = sender
-**      parv[1] = old nickname
-**      parv[2] = new nickname
-**      parv[3] = timestamp
-*/
-void unreal_cmd_svsnick(const char *source, const char *guest, time_t when)
-{
-    if (!source || !guest) {
-        return;
-    }
-    send_cmd(NULL, "%s %s %s :%ld", send_token("SVSNICK", "e"), source,
-             guest, (long int) when);
-}
-
 /* Functions that use serval cmd functions */
 
 void unreal_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
@@ -1972,7 +1956,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_svsnick(unreal_cmd_svsnick);
     pmodule_cmd_vhost_on(unreal_cmd_vhost_on);
     pmodule_cmd_connect(unreal_cmd_connect);
     pmodule_cmd_svshold(unreal_cmd_svshold);

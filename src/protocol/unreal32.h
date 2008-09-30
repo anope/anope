@@ -98,7 +98,6 @@ void unreal_cmd_318(const char *source, const char *who);
 void unreal_cmd_242(const char *buf);
 void unreal_cmd_243(const char *buf);
 void unreal_cmd_211(const char *buf);
-void unreal_cmd_svsnick(const char *source, const char *guest, time_t when);
 void unreal_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);
 void unreal_cmd_connect(int servernum);
 void unreal_cmd_svshold(const char *nick);

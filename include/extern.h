@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_svsnick(void (*func) (const char *source, const char *guest, time_t when));
 E void pmodule_cmd_vhost_on(void (*func) (const char *nick, const char *vIdent, const char *vhost));
 E void pmodule_cmd_connect(void (*func) (int servernum));
 E void pmodule_cmd_svshold(void (*func) (const char *nick));

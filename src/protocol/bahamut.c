@@ -1184,20 +1184,6 @@ void BahamutIRCdProto::cmd_bot_nick(const char *nick, const char *user, const ch
 	cmd_sqline(nick, "Reserved for services");
 }
 
-/* SVSNICK */
-/* parv[0] = sender
- * parv[1] = old nickname
- * parv[2] = new nickname
- * parv[3] = timestamp
- */
-void bahamut_cmd_svsnick(const char *source, const char *guest, time_t when)
-{
-    if (!source || !guest) {
-        return;
-    }
-    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
-}
-
 void BahamutIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
@@ -1422,7 +1408,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svsnick(bahamut_cmd_svsnick);
     pmodule_cmd_vhost_on(bahamut_cmd_vhost_on);
     pmodule_cmd_connect(bahamut_cmd_connect);
     pmodule_cmd_svshold(bahamut_cmd_svshold);

@@ -975,17 +975,6 @@ void InspIRCdProto::cmd_squit(const char *servname, const char *message)
 	send_cmd(ServerName, "SQUIT %s :%s", servname, message);
 }
 
-/* SVSNICK */
-void inspircd_cmd_svsnick(const char *source, const char *guest, time_t when)
-{
-    if (!source || !guest) {
-        return;
-    }
-    /* Please note that inspircd will now echo back a nickchange for this SVSNICK */
-    send_cmd(ServerName, "SVSNICK %s %s :%lu", source, guest,
-             (unsigned long) when);
-}
-
 /* Functions that use serval cmd functions */
 
 void inspircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
@@ -1673,7 +1662,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_svsnick(inspircd_cmd_svsnick);
     pmodule_cmd_vhost_on(inspircd_cmd_vhost_on);
     pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);

@@ -135,6 +135,25 @@ void User::SetIdent(const std::string &ident)
 	update_host(this);
 }
 
+
+
+void change_user_realname(User * user, const char *realname)
+{
+    if (user->realname)
+        free(user->realname);
+    user->realname = sstrdup(realname);
+
+    if (user->na && (nick_identified(user)
+                     || (!(user->na->nc->flags & NI_SECURE)
+                         && nick_recognized(user)))) {
+        if (user->na->last_realname)
+            free(user->na->last_realname);
+        user->na->last_realname = sstrdup(realname);
+    }
+
+    if (debug)
+        alog("debug: %s changes its realname to %s", user->nick, realname);
+}
 /*************************************************************************/
 /*************************************************************************/
 
@@ -156,33 +175,6 @@ void update_host(User * user)
         sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
                 common_get_vhost(user));
     }
-
-    if (debug)
-        alog("debug: %s changes its host to %s", user->nick,
-             common_get_vhost(user));
-}
-
-
-/*************************************************************************/
-
-/* Change the realname of a user. */
-
-void change_user_realname(User * user, const char *realname)
-{
-    if (user->realname)
-        free(user->realname);
-    user->realname = sstrdup(realname);
-
-    if (user->na && (nick_identified(user)
-                     || (!(user->na->nc->flags & NI_SECURE)
-                         && nick_recognized(user)))) {
-        if (user->na->last_realname)
-            free(user->na->last_realname);
-        user->na->last_realname = sstrdup(realname);
-    }
-
-    if (debug)
-        alog("debug: %s changes its realname to %s", user->nick, realname);
 }
 
 /*************************************************************************/

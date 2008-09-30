@@ -877,13 +877,10 @@ void UnrealIRCdProto::cmd_sqline(const char *mask, const char *reason)
 **      parv[1] = nick
 **      parv[2] = options
 */
-void unreal_cmd_svso(const char *source, const char *nick, const char *flag)
+void UnrealIRCdProto::cmd_svso(const char *source, const char *nick, const char *flag)
 {
-    if (!source || !nick || !flag) {
-        return;
-    }
-
-    send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
+	if (!source || !nick || !flag) return;
+	send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
 }
 
 /* NICK <newnick>  */
@@ -1979,7 +1976,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_svso(unreal_cmd_svso);
     pmodule_cmd_chg_nick(unreal_cmd_chg_nick);
     pmodule_cmd_svsnick(unreal_cmd_svsnick);
     pmodule_cmd_vhost_on(unreal_cmd_vhost_on);

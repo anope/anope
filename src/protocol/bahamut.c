@@ -1203,11 +1203,6 @@ void BahamutIRCdProto::cmd_guest_nick(const char *nick, const char *user, const 
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
 }
 
-void bahamut_cmd_svso(const char *source, const char *nick, const char *flag)
-{
-    /* Not Supported by this IRCD */
-}
-
 void bahamut_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     /* Not Supported by this IRCD */
@@ -1437,7 +1432,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svso(bahamut_cmd_svso);
     pmodule_cmd_chg_nick(bahamut_cmd_chg_nick);
     pmodule_cmd_svsnick(bahamut_cmd_svsnick);
     pmodule_cmd_vhost_on(bahamut_cmd_vhost_on);

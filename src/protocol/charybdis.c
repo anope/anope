@@ -1448,11 +1448,6 @@ void charybdis_cmd_svsnick(const char *nick, const char *newnick, time_t when)
              u->nick, newnick, (long int)when, (long int)u->timestamp);
 }
 
-void charybdis_cmd_svso(const char *source, const char *nick, const char *flag)
-{
-    /* Not Supported by this IRCD */
-}
-
 void charybdis_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
@@ -1702,7 +1697,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svso(charybdis_cmd_svso);
     pmodule_cmd_chg_nick(charybdis_cmd_chg_nick);
     pmodule_cmd_svsnick(charybdis_cmd_svsnick);
     pmodule_cmd_vhost_on(charybdis_cmd_vhost_on);

@@ -91,7 +91,7 @@ int do_cs_kick(User * u)
             next = uc->next;
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && check_access(u, ci, CA_KICKME)) {
-                char *av[3];
+                const char *av[3];
 
                 if ((ci->flags & CI_SIGNKICK)
                     || ((ci->flags & CI_SIGNKICK_LEVEL)
@@ -134,7 +134,7 @@ int do_cs_kick(User * u)
     } else if (is_protected(u2)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        char *av[3];
+        const char *av[3];
 
         if ((ci->flags & CI_SIGNKICK)
             || ((ci->flags & CI_SIGNKICK_LEVEL)

@@ -91,7 +91,7 @@ int do_identify(User * u)
 
         if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
             if (!is_identified(u, ci)) {
-                uc = scalloc(sizeof(*uc), 1);
+                uc = (struct u_chaninfolist *)scalloc(sizeof(*uc), 1);
                 uc->next = u->founder_chans;
                 if (u->founder_chans)
                     u->founder_chans->prev = uc;

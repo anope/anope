@@ -146,7 +146,7 @@ int do_list(User * u)
         }
         
         spattern_size = (strlen(pattern) + 2) * sizeof(char);
-        spattern = smalloc(spattern_size);
+        spattern = (char *)smalloc(spattern_size);
         snprintf(spattern, spattern_size, "#%s", pattern);
         
 

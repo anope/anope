@@ -82,7 +82,7 @@ int do_ban(User * u)
     int is_same;
 
     if (!reason) {
-        reason = "Requested";
+        reason = (char *)"Requested"; // XXX unsafe cast -- w00t
     } else {
         if (strlen(reason) > 200)
             reason[200] = '\0';
@@ -131,10 +131,12 @@ int do_ban(User * u)
                 else
                     anope_cmd_kick(whosends(ci), ci->name, u->nick, "%s",
                                    reason);
-                av[0] = ci->name;
-                av[1] = u->nick;
-                av[2] = reason;
-                do_kick(s_ChanServ, 3, av);
+
+		const char *kav[4];
+                kav[0] = ci->name;
+                kav[1] = u->nick;
+                kav[2] = reason;
+                do_kick(s_ChanServ, 3, kav);
             }
         }
 
@@ -190,10 +192,11 @@ int do_ban(User * u)
         else
             anope_cmd_kick(whosends(ci), ci->name, params, "%s", reason);
 
-        av[0] = ci->name;
-        av[1] = params;
-        av[2] = reason;
-        do_kick(s_ChanServ, 3, av);
+	const char *kav[4];
+        kav[0] = ci->name;
+        kav[1] = params;
+        kav[2] = reason;
+        do_kick(s_ChanServ, 3, kav);
     }
     return MOD_CONT;
 }

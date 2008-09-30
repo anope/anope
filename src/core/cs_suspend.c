@@ -116,7 +116,7 @@ int do_suspend(User * u)
 
         if ((c = findchan(ci->name))) {
             struct c_userlist *cu, *next;
-            char *av[3];
+            const char *av[3];
 
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;

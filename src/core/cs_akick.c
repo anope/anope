@@ -192,7 +192,7 @@ int do_akick(User * u)
     struct c_userlist *cu = NULL;
     struct c_userlist *next;
     User *u2;
-    char *argv[3];
+    const char *argv[3];
     int count = 0;
 
     if (!cmd || (!mask && (!stricmp(cmd, "ADD") || !stricmp(cmd, "STICK")
@@ -348,9 +348,10 @@ int do_akick(User * u)
 
                     do_kick(s_ChanServ, 3, argv);
 
-                    free(argv[2]);
-                    free(argv[1]);
-                    free(argv[0]);
+			// XXX: casting is necessary thanks to strict g++ stuff, really, we should be using std::string here though.
+                    free((void *)argv[2]);
+                    free((void *)argv[1]);
+                    free((void *)argv[0]);
                     count++;
 
                 }
@@ -598,7 +599,7 @@ int do_akick(User * u)
         Channel *c = findchan(ci->name);
         struct c_userlist *cu = NULL;
         struct c_userlist *next;
-        char *argv[3];
+        const char *argv[3];
         int count = 0;
 
         if (!c) {
@@ -617,9 +618,9 @@ int do_akick(User * u)
 
                 do_kick(s_ChanServ, 3, argv);
 
-                free(argv[2]);
-                free(argv[1]);
-                free(argv[0]);
+                free((void *)argv[2]);
+                free((void *)argv[1]);
+                free((void *)argv[0]);
 
                 count++;
             }

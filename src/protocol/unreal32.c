@@ -1622,19 +1622,6 @@ int unreal_valid_chan(const char *chan) {
     return 1;
 }
 
-void unreal_cmd_ctcp(const char *source, const char *dest, const char *buf)
-{
-    char *s;
-    if (!buf) {
-        return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
-
-    send_cmd(source, "%s %s :\1%s \1", send_token("NOTICE", "B"), dest, s);
-    free(s);
-}
-
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
@@ -1924,7 +1911,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_jupe(unreal_cmd_jupe);
     pmodule_valid_nick(unreal_valid_nick);
     pmodule_valid_chan(unreal_valid_chan);
-    pmodule_cmd_ctcp(unreal_cmd_ctcp);
     pmodule_set_umode(unreal_set_umode);
 }
 

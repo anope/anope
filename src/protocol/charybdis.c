@@ -1562,20 +1562,6 @@ int charybdis_valid_chan(const char *chan)
 }
 
 
-void charybdis_cmd_ctcp(const char *source, const char *dest, const char *buf)
-{
-    char *s;
-
-    if (!buf) {
-        return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
-
-    send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
-    free(s);
-}
-
 int charybdis_send_account(int argc, char **argv)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * SU %s :%s",
@@ -1625,7 +1611,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_jupe(charybdis_cmd_jupe);
     pmodule_valid_nick(charybdis_valid_nick);
     pmodule_valid_chan(charybdis_valid_chan);
-    pmodule_cmd_ctcp(charybdis_cmd_ctcp);
     pmodule_set_umode(charybdis_set_umode);
 }
 

@@ -1566,21 +1566,6 @@ int inspircd_valid_chan(const char *chan)
 }
 
 
-void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
-{
-    char *s;
-
-    if (!buf) {
-        return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
-
-    send_cmd(source, "NOTICE %s :\1%s\1", dest, s);
-    free(s);
-}
-
-
 /**
  * Tell anope which function we want to perform each task inside of anope.
  * These prototypes must match what anope expects.
@@ -1612,7 +1597,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);
     pmodule_valid_chan(inspircd_valid_chan);
-    pmodule_cmd_ctcp(inspircd_cmd_ctcp);
     pmodule_set_umode(inspircd_set_umode);
 }
 

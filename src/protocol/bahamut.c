@@ -1336,19 +1336,6 @@ int bahamut_valid_chan(const char *chan)
     return 1;
 }
 
-void bahamut_cmd_ctcp(const char *source, const char *dest, const char *buf)
-{
-    char *s;
-    if (!buf) {
-        return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
-
-    send_cmd(source, "NOTICE %s :\1%s \1", dest, s);
-    free(s);
-}
-
 /* this avoids "undefined symbol" messages of those whom try to load mods that
    call on this function */
 void bahamut_cmd_chghost(const char *nick, const char *vhost)
@@ -1389,7 +1376,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_jupe(bahamut_cmd_jupe);
     pmodule_valid_nick(bahamut_valid_nick);
     pmodule_valid_chan(bahamut_valid_chan);
-    pmodule_cmd_ctcp(bahamut_cmd_ctcp);
     pmodule_set_umode(bahamut_set_umode);
 }
 

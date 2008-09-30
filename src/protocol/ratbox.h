@@ -67,7 +67,6 @@ void ratbox_cmd_eob();
 int ratbox_flood_mode_check(const char *value);
 void ratbox_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int ratbox_valid_nick(const char *nick);
-void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf);
 
 class RatboxProto : public IRCDProtoNew {
 	public:

@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_ctcp)(const char *source, const char *dest, const char *buf);
     void (*ircd_cmd_svsjoin)(const char *source, const char *nick, const char *chan, const char *param);
     void (*ircd_cmd_svspart)(const char *source, const char *nick, const char *chan);
     void (*ircd_cmd_swhois)(const char *source, const char *who, const char *mask);
@@ -1358,6 +1357,13 @@ class IRCDProtoNew {
 		virtual void cmd_nc_change(User *) { }
 		virtual void cmd_svid_umode2(User *, const char *) { }
 		virtual void cmd_svid_umode3(User *, const char *) { }
+		virtual void cmd_ctcp(const char *source, const char *dest, const char *buf)
+		{
+			if (!buf) return;
+			char *s = normalizeBuffer(buf);
+			send_cmd(source, "NOTICE %s :\1%s\1", dest, s);
+			free(s);
+		}
 };
 
 /*************************************************************************/

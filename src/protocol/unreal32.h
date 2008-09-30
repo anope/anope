@@ -102,7 +102,6 @@ void unreal_cmd_eob();
 int unreal_flood_mode_check(const char *value);
 void unreal_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int unreal_valid_nick(const char *nick);
-void unreal_cmd_ctcp(const char *source, const char *dest, const char *buf);
 
 class UnrealIRCdProto : public IRCDProtoNew {
 	public:

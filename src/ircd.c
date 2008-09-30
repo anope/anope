@@ -71,7 +71,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_jupe = NULL;
     ircdproto.ircd_valid_nick = NULL;
     ircdproto.ircd_valid_chan = NULL;
-    ircdproto.ircd_cmd_ctcp = NULL;
 }
 
 /* Special function, returns 1 if executed, 0 if not */
@@ -586,15 +585,14 @@ int anope_valid_chan(const char *chan)
 
 void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_ctcp(source, dest, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_ctcp(source, dest, buf);
 }
 
 
@@ -691,11 +689,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_ctcp(void (*func) (const char *source, const char *dest, const char *buf))
-{
-    ircdproto.ircd_cmd_ctcp = func;
 }
 
 void pmodule_cmd_svsjoin(void (*func)

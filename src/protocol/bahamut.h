@@ -80,7 +80,6 @@ void bahamut_cmd_eob();
 int bahamut_flood_mode_check(const char *value);
 void bahamut_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int bahamut_valid_nick(const char *nick);
-void bahamut_cmd_ctcp(const char *source, const char *dest, const char *buf);
 
 class BahamutIRCdProto : public IRCDProtoNew {
 	public:

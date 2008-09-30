@@ -528,9 +528,9 @@ void inspircd_cmd_svsadmin(char *server, int set)
     /* Not Supported by this IRCD */
 }
 
-void inspircd_cmd_remove_akill(char *user, char *host)
+void InspIRCd::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(s_OperServ, "GLINE %s@%s", user, host);
+	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
 
 void
@@ -1807,7 +1807,6 @@ void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(inspircd_cmd_remove_akill);
     pmodule_cmd_topic(inspircd_cmd_topic);
     pmodule_cmd_vhost_off(inspircd_cmd_vhost_off);
     pmodule_cmd_akill(inspircd_cmd_akill);

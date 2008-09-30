@@ -710,9 +710,9 @@ void ultimate3_cmd_sgline(char *mask, char *reason)
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
-void ultimate3_cmd_remove_akill(char *user, char *host)
+void UltimateIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 void ultimate3_cmd_vhost_off(User * u)
@@ -1703,7 +1703,6 @@ void ultimate3_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(ultimate3_cmd_remove_akill);
     pmodule_cmd_topic(ultimate3_cmd_topic);
     pmodule_cmd_vhost_off(ultimate3_cmd_vhost_off);
     pmodule_cmd_akill(ultimate3_cmd_akill);

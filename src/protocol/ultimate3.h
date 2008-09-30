@@ -52,8 +52,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 void ultimate3_set_umode(User * user, int ac, char **av);
-void ultimate3_cmd_svsnoop(char *server, int set);
-void ultimate3_cmd_remove_akill(char *user, char *host);
 void ultimate3_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
 void ultimate3_cmd_vhost_off(User * u);
 void ultimate3_cmd_akill(char *user, char *host, char *who, time_t when,time_t expires, char *reason);
@@ -125,4 +123,5 @@ void ultimate3_cmd_ctcp(char *source, char *dest, char *buf);
 class UltimateIRCdProto : public IRCDProtoNew {
 	public:
 		void cmd_svsnoop(const char *, int);
+		void cmd_remove_akill(const char *, const char *);
 } ircd_proto;

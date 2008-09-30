@@ -531,9 +531,9 @@ void dreamforge_cmd_svsadmin(char *server, int set)
 	ircd_proto.cmd_svsnoop(server, set);
 }
 
-void dreamforge_cmd_remove_akill(char *user, char *host)
+void DreamForgeProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 void dreamforge_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1270,7 +1270,6 @@ void dreamforge_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(dreamforge_cmd_remove_akill);
     pmodule_cmd_topic(dreamforge_cmd_topic);
     pmodule_cmd_vhost_off(dreamforge_cmd_vhost_off);
     pmodule_cmd_akill(dreamforge_cmd_akill);

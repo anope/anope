@@ -71,8 +71,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 void shadowircd_set_umode(User * user, int ac, char **av);
-void shadowircd_cmd_svsnoop(char *server, int set);
-void shadowircd_cmd_remove_akill(char *user, char *host);
 void shadowircd_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
 void shadowircd_cmd_vhost_off(User * u);
 void shadowircd_cmd_akill(char *user, char *host, char *who, time_t when,time_t expires, char *reason);
@@ -143,4 +141,5 @@ void shadowircd_cmd_ctcp(char *source, char *dest, char *buf);
 
 class ShadowIRCdProto : public IRCDProtoNew {
 	public:
+		void cmd_remove_akill(const char *, const char *);
 } ircd_proto;

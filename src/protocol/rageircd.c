@@ -636,9 +636,9 @@ void rageircd_cmd_sgline(char *mask, char *reason)
 
 }
 
-void rageircd_cmd_remove_akill(char *user, char *host)
+void RageIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 
@@ -1562,7 +1562,6 @@ void rageircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(rageircd_cmd_remove_akill);
     pmodule_cmd_topic(rageircd_cmd_topic);
     pmodule_cmd_vhost_off(rageircd_cmd_vhost_off);
     pmodule_cmd_akill(rageircd_cmd_akill);

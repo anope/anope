@@ -793,10 +793,9 @@ plexus_cmd_sgline (char *mask, char *reason)
   send_cmd (s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
-void
-plexus_cmd_remove_akill (char *user, char *host)
+void PleXusIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-  send_cmd (s_OperServ, "UNKLINE * %s %s", user, host);
+	send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void
@@ -1738,7 +1737,6 @@ plexus_cmd_ctcp (char *source, char *dest, char *buf)
 void
 moduleAddAnopeCmds ()
 {
-  pmodule_cmd_remove_akill (plexus_cmd_remove_akill);
   pmodule_cmd_topic (plexus_cmd_topic);
   pmodule_cmd_vhost_off (plexus_cmd_vhost_off);
   pmodule_cmd_akill (plexus_cmd_akill);

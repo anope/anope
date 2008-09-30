@@ -781,9 +781,9 @@ void viagra_cmd_sgline(char *mask, char *reason)
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
-void viagra_cmd_remove_akill(char *user, char *host)
+void ViagraIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 /* PART */
@@ -1602,7 +1602,6 @@ void viagra_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(viagra_cmd_remove_akill);
     pmodule_cmd_topic(viagra_cmd_topic);
     pmodule_cmd_vhost_off(viagra_cmd_vhost_off);
     pmodule_cmd_akill(viagra_cmd_akill);

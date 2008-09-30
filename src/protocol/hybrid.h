@@ -44,8 +44,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 void hybrid_set_umode(User * user, int ac, char **av);
-void hybrid_cmd_svsnoop(char *server, int set);
-void hybrid_cmd_remove_akill(char *user, char *host);
 void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
 void hybrid_cmd_vhost_off(User * u);
 void hybrid_cmd_akill(char *user, char *host, char *who, time_t when,time_t expires, char *reason);
@@ -116,4 +114,5 @@ void hybrid_cmd_ctcp(char *source, char *dest, char *buf);
 
 class HybridIRCdProto : public IRCDProtoNew {
 	public:
+		void cmd_remove_akill(const char *, const char *);
 } ircd_proto;

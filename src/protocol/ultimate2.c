@@ -792,9 +792,9 @@ void ultimate2_cmd_svsadmin(char *server, int set)
 	ircd_proto.cmd_svsnoop(server, set);
 }
 
-void ultimate2_cmd_remove_akill(char *user, char *host)
+void UltimateIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 
@@ -1620,7 +1620,6 @@ void ultimate2_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(ultimate2_cmd_remove_akill);
     pmodule_cmd_topic(ultimate2_cmd_topic);
     pmodule_cmd_vhost_off(ultimate2_cmd_vhost_off);
     pmodule_cmd_akill(ultimate2_cmd_akill);

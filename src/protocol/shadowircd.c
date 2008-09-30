@@ -842,12 +842,10 @@ void shadowircd_cmd_sgline(char *mask, char *reason)
     /* does not support */
 }
 
-void shadowircd_cmd_remove_akill(char *user, char *host)
+void ShadowIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((ud ? ud->uid : s_OperServ), "UNKLINE * %s %s", user, host);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(ud ? ud->uid : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void shadowircd_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1713,7 +1711,6 @@ void shadowircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(shadowircd_cmd_remove_akill);
     pmodule_cmd_topic(shadowircd_cmd_topic);
     pmodule_cmd_vhost_off(shadowircd_cmd_vhost_off);
     pmodule_cmd_akill(shadowircd_cmd_akill);

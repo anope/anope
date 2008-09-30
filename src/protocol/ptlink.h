@@ -79,8 +79,6 @@
 #define PTLINK_TS_MIN 3
 
 void ptlink_set_umode(User * user, int ac, char **av);
-void ptlink_cmd_svsnoop(char *server, int set);
-void ptlink_cmd_remove_akill(char *user, char *host);
 void ptlink_cmd_topic(char *whosets, char *chan, char *whosetit, char *topic, time_t when);
 void ptlink_cmd_vhost_off(User * u);
 void ptlink_cmd_akill(char *user, char *host, char *who, time_t when,time_t expires, char *reason);
@@ -152,4 +150,5 @@ void ptlink_cmd_ctcp(char *source, char *dest, char *buf);
 class PTlinkProto : public IRCDProtoNew {
 	public:
 		void cmd_svsnoop(const char *, int);
+		void cmd_remove_akill(const char *, const char *);
 } ircd_proto;

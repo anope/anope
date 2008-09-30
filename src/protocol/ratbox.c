@@ -806,13 +806,10 @@ void ratbox_cmd_sgline(char *mask, char *reason)
              "XLINE * %s 0 :%s", mask, reason);
 }
 
-void ratbox_cmd_remove_akill(char *user, char *host)
+void RatboxProto::cmd_remove_akill(const char *user, const char *host)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "UNKLINE * %s %s", user, host);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void ratbox_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1762,7 +1759,6 @@ void ratbox_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(ratbox_cmd_remove_akill);
     pmodule_cmd_topic(ratbox_cmd_topic);
     pmodule_cmd_vhost_off(ratbox_cmd_vhost_off);
     pmodule_cmd_akill(ratbox_cmd_akill);

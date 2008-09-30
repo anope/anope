@@ -859,13 +859,10 @@ void charybdis_cmd_sgline(char *mask, char *reason)
              "XLINE * %s 0 :%s", mask, reason);
 }
 
-void charybdis_cmd_remove_akill(char *user, char *host)
+void Charybdis::cmd_remove_akill(const char *user, const char *host)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "UNKLINE * %s %s", user, host);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void charybdis_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1867,7 +1864,6 @@ int charybdis_send_deaccount(int argc, char **argv)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(charybdis_cmd_remove_akill);
     pmodule_cmd_topic(charybdis_cmd_topic);
     pmodule_cmd_vhost_off(charybdis_cmd_vhost_off);
     pmodule_cmd_akill(charybdis_cmd_akill);

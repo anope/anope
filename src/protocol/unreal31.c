@@ -501,9 +501,9 @@ void unreal_cmd_svsadmin(char *server, int set)
 	ircd_proto.cmd_svsnoop(server, set);
 }
 
-void unreal_cmd_remove_akill(char *user, char *host)
+void UnrealIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "TKL - G %s %s %s", user, host, s_OperServ);
+	send_cmd(NULL, "TKL - G %s %s %s", user, host, s_OperServ);
 }
 
 void unreal_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1478,7 +1478,6 @@ void unreal_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(unreal_cmd_remove_akill);
     pmodule_cmd_topic(unreal_cmd_topic);
     pmodule_cmd_vhost_off(unreal_cmd_vhost_off);
     pmodule_cmd_akill(unreal_cmd_akill);

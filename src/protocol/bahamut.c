@@ -748,9 +748,9 @@ void bahamut_cmd_sgline(char *mask, char *reason)
 }
 
 /* RAKILL */
-void bahamut_cmd_remove_akill(char *user, char *host)
+void BahamutIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 /* PART */
@@ -1565,7 +1565,6 @@ void bahamut_cmd_chghost(char *nick, char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(bahamut_cmd_remove_akill);
     pmodule_cmd_topic(bahamut_cmd_topic);
     pmodule_cmd_vhost_off(bahamut_cmd_vhost_off);
     pmodule_cmd_akill(bahamut_cmd_akill);

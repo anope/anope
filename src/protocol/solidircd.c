@@ -772,9 +772,9 @@ void solidircd_cmd_sgline(char *mask, char *reason)
 }
 
 /* RAKILL */
-void solidircd_cmd_remove_akill(char *user, char *host)
+void SolidIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "RAKILL %s %s", host, user);
+	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
 /* PART */
@@ -1595,7 +1595,6 @@ void solidircd_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(solidircd_cmd_remove_akill);
     pmodule_cmd_topic(solidircd_cmd_topic);
     pmodule_cmd_vhost_off(solidircd_cmd_vhost_off);
     pmodule_cmd_akill(solidircd_cmd_akill);

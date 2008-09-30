@@ -695,9 +695,9 @@ void ptlink_cmd_svsadmin(char *server, int set)
 	parv[0] = sender (server if on network synchronization)
 	parv[1] = glined usert@host mask or ALL to remove all glines
 */
-void ptlink_cmd_remove_akill(char *user, char *host)
+void PTlinkProto::cmd_remove_akill(const char *user, const char *host)
 {
-    send_cmd(NULL, "UNGLINE %s@%s", user, host);
+	send_cmd(NULL, "UNGLINE %s@%s", user, host);
 }
 
 
@@ -1682,7 +1682,6 @@ void ptlink_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(ptlink_cmd_remove_akill);
     pmodule_cmd_topic(ptlink_cmd_topic);
     pmodule_cmd_vhost_off(ptlink_cmd_vhost_off);
     pmodule_cmd_akill(ptlink_cmd_akill);

@@ -692,10 +692,10 @@ void hybrid_cmd_sgline(char *mask, char *reason)
     send_cmd(ServerName, "XLINE * %s 0 :%s", mask, reason);
 }
 
-void hybrid_cmd_remove_akill(char *user, char *host)
+void HybridIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
-    /* hybrid seems to support UNKLINE  -Certus */
-    send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
+	/* hybrid seems to support UNKLINE  -Certus */
+	send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
@@ -1453,7 +1453,6 @@ void hybrid_cmd_ctcp(char *source, char *dest, char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_remove_akill(hybrid_cmd_remove_akill);
     pmodule_cmd_topic(hybrid_cmd_topic);
     pmodule_cmd_vhost_off(hybrid_cmd_vhost_off);
     pmodule_cmd_akill(hybrid_cmd_akill);

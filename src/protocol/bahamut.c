@@ -1210,13 +1210,11 @@ void bahamut_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void bahamut_cmd_nick(const char *nick, const char *name, const char *modes)
+void BahamutIRCdProto::cmd_nick(const char *nick, const char *name, const char *modes)
 {
-    EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, ServiceUser, ServiceHost,
-             ServerName, name);
-    bahamut_cmd_sqline(nick, "Reserved for services");
+	EnforceQlinedNick(nick, NULL);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, ServiceUser, ServiceHost, ServerName, name);
+	bahamut_cmd_sqline(nick, "Reserved for services");
 }
 
 void bahamut_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1546,7 +1544,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_nick(bahamut_cmd_nick);
     pmodule_cmd_guest_nick(bahamut_cmd_guest_nick);
     pmodule_cmd_mode(bahamut_cmd_mode);
     pmodule_cmd_bot_nick(bahamut_cmd_bot_nick);

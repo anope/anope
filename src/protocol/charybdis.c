@@ -1354,21 +1354,16 @@ void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, 
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void charybdis_cmd_nick(const char *nick, const char *name, const char *mode)
+void CharybdisProto::cmd_nick(const char *nick, const char *name, const char *mode)
 {
-    EnforceQlinedNick(nick, NULL);
-    if (UseTS6) {
-        char *uidbuf = ts6_uid_retrieve();
-        send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
-                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
-                 uidbuf, name);
-        new_uid(nick, uidbuf);
-    } else {
-        send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
-                 ServerName, name);
-    }
-    charybdis_cmd_sqline(nick, "Reserved for services");
+	EnforceQlinedNick(nick, NULL);
+	if (UseTS6) {
+		char *uidbuf = ts6_uid_retrieve();
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, uidbuf, name);
+		new_uid(nick, uidbuf);
+	}
+	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, ServerName, name);
+	charybdis_cmd_sqline(nick, "Reserved for services");
 }
 
 void charybdis_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1813,7 +1808,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
-    pmodule_cmd_nick(charybdis_cmd_nick);
     pmodule_cmd_guest_nick(charybdis_cmd_guest_nick);
     pmodule_cmd_mode(charybdis_cmd_mode);
     pmodule_cmd_bot_nick(charybdis_cmd_bot_nick);

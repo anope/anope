@@ -1287,20 +1287,15 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void ratbox_cmd_nick(const char *nick, const char *name, const char *mode)
+void RatboxProto::cmd_nick(const char *nick, const char *name, const char *mode)
 {
-    EnforceQlinedNick(nick, NULL);
-    if (UseTS6) {
+	EnforceQlinedNick(nick, NULL);
+	if (UseTS6) {
 		char *uidbuf = ts6_uid_retrieve();
-        send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick,
-                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
-                 uidbuf, name);
-        new_uid(nick, uidbuf);
-    } else {
-        send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
-                 (long int) time(NULL), mode, ServiceUser, ServiceHost,
-                 ServerName, name);
-    }
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, uidbuf, name);
+		new_uid(nick, uidbuf);
+	}
+	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, ServerName, name);
 	ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
@@ -1705,7 +1700,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_nick(ratbox_cmd_nick);
     pmodule_cmd_guest_nick(ratbox_cmd_guest_nick);
     pmodule_cmd_mode(ratbox_cmd_mode);
     pmodule_cmd_bot_nick(ratbox_cmd_bot_nick);

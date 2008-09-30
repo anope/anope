@@ -602,14 +602,12 @@ void inspircd_cmd_376(const char *source)
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void inspircd_cmd_nick(const char *nick, const char *name, const char *modes)
+void InspIRCdProto::cmd_nick(const char *nick, const char *name, const char *modes)
 {
-    /* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
-    send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",
-             (long int) time(NULL), nick, ServiceHost, ServiceHost,
-             ServiceUser, modes, name);
-    /* Don't send ServerName as the source here... -GD */
-    send_cmd(nick, "OPERTYPE Service");
+	/* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
+	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, ServiceHost, ServiceHost, ServiceUser, modes, name);
+	/* Don't send ServerName as the source here... -GD */
+	send_cmd(nick, "OPERTYPE Service");
 }
 
 void
@@ -1790,7 +1788,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_nick(inspircd_cmd_nick);
     pmodule_cmd_guest_nick(inspircd_cmd_guest_nick);
     pmodule_cmd_mode(inspircd_cmd_mode);
     pmodule_cmd_bot_nick(inspircd_cmd_bot_nick);

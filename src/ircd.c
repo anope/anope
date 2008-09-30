@@ -50,7 +50,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
-    ircdproto.ircd_cmd_nick = NULL;
     ircdproto.ircd_cmd_guest_nick = NULL;
     ircdproto.ircd_cmd_mode = NULL;
     ircdproto.ircd_cmd_bot_nick = NULL;
@@ -192,7 +191,7 @@ void anope_cmd_376(const char *source)
 
 void anope_cmd_nick(const char *nick, const char *name, const char *modes)
 {
-    ircdproto.ircd_cmd_nick(nick, name, modes);
+	ircdprotonew->cmd_nick(nick, name, modes);
 }
 
 void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -700,11 +699,6 @@ void pmodule_cmd_375(void (*func) (const char *source))
 void pmodule_cmd_376(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_376 = func;
-}
-
-void pmodule_cmd_nick(void (*func) (const char *nick, const char *name, const char *modes))
-{
-    ircdproto.ircd_cmd_nick = func;
 }
 
 void pmodule_cmd_guest_nick(void (*func)

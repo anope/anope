@@ -1079,7 +1079,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_372_error)(const char *source);
     void (*ircd_cmd_375)(const char *source);
     void (*ircd_cmd_376)(const char *source);
-    void (*ircd_cmd_nick)(const char *nick, const char *name, const char *modes);
     void (*ircd_cmd_guest_nick)(const char *nick, const char *user, const char *host, const char *real, const char *modes);
     void (*ircd_cmd_mode)(const char *source, const char *dest, const char *buf);
     void (*ircd_cmd_bot_nick)(const char *nick, const char *user, const char *host, const char *real, const char *modes);
@@ -1151,6 +1150,7 @@ class IRCDProtoNew {
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
 		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
 		virtual void cmd_svsmode(User *u, int ac, const char **av) = 0;
+		virtual void cmd_nick(const char *, const char *, const char *) = 0;
 };
 
 typedef struct ircd_modes_ {

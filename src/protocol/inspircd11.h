@@ -69,7 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-void inspircd_cmd_eob();
 int inspircd_flood_mode_check(const char *value);
 void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int inspircd_valid_nick(const char *nick);
@@ -114,4 +113,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_svid_umode2(User *, const char *);
 		void cmd_svsjoin(const char *, const char *, const char *, const char *);
 		void cmd_svspart(const char *, const char *, const char *);
+		void cmd_eob();
 } ircd_proto;

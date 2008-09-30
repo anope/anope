@@ -1502,9 +1502,9 @@ void InspIRCdProto::cmd_svspart(const char *source, const char *nick, const char
 	send_cmd(source, "SVSPART %s %s", nick, chan);
 }
 
-void inspircd_cmd_eob()
+void InspIRCdProto::cmd_eob()
 {
-    send_cmd(NULL, "ENDBURST");
+	send_cmd(NULL, "ENDBURST");
 }
 
 
@@ -1584,7 +1584,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_eob(inspircd_cmd_eob);
     pmodule_flood_mode_check(inspircd_flood_mode_check);
     pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);

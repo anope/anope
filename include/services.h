@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_eob)();
     void (*ircd_cmd_jupe)(const char *jserver, const char *who, const char *reason);
     void (*ircd_set_umode)(User *user, int ac, const char **av);
     int (*ircd_valid_nick)(const char *nick);
@@ -1364,6 +1363,7 @@ class IRCDProtoNew {
 		virtual void cmd_svsjoin(const char *, const char *, const char *, const char *) { }
 		virtual void cmd_svspart(const char *, const char *, const char *) { }
 		virtual void cmd_swhois(const char *, const char *, const char *) { }
+		virtual void cmd_eob() { }
 };
 
 /*************************************************************************/

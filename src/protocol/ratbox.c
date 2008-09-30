@@ -895,11 +895,6 @@ int anope_event_kick(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_eob()
-{
-    /* doesn't support EOB */
-}
-
 int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1) {
@@ -1465,7 +1460,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_eob(ratbox_cmd_eob);
     pmodule_flood_mode_check(ratbox_flood_mode_check);
     pmodule_cmd_jupe(ratbox_cmd_jupe);
     pmodule_valid_nick(ratbox_valid_nick);

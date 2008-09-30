@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_eob = NULL;
     ircdproto.ircd_flood_mode_check = NULL;
     ircdproto.ircd_cmd_jupe = NULL;
     ircdproto.ircd_valid_nick = NULL;
@@ -556,7 +555,7 @@ void anope_cmd_swhois(const char *source, const char *who, const char *mask)
 
 void anope_cmd_eob()
 {
-    ircdproto.ircd_cmd_eob();
+	ircdprotonew->cmd_eob();
 }
 
 int anope_flood_mode_check(const char *value)
@@ -686,11 +685,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_eob(void (*func) ())
-{
-    ircdproto.ircd_cmd_eob = func;
 }
 
 void

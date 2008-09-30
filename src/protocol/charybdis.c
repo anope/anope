@@ -966,11 +966,6 @@ int anope_event_kick(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_eob()
-{
-    /* doesn't support EOB */
-}
-
 int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1) {
@@ -1588,7 +1583,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_eob(charybdis_cmd_eob);
     pmodule_flood_mode_check(charybdis_flood_mode_check);
     pmodule_cmd_jupe(charybdis_cmd_jupe);
     pmodule_valid_nick(charybdis_valid_nick);

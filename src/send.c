@@ -100,17 +100,8 @@ void notice_user(char *source, User * u, const char *fmt, ...)
         va_start(args, fmt);
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-        /* Send privmsg instead of notice if:
-         * - UsePrivmsg is enabled
-         * - The user is not registered and NSDefMsg is enabled
-         * - The user is registered and has set /ns set msg on
-         */
-        if (UsePrivmsg && ((!u->na && (NSDefFlags & NI_MSG))
-                           || (u->na && (u->na->nc->flags & NI_MSG)))) {
-            anope_cmd_privmsg2(source, u->nick, buf);
-        } else {
-            anope_cmd_notice2(source, u->nick, buf);
-        }
+		u->SendMessage(source, buf);
+
         va_end(args);
     }
 }

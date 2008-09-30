@@ -55,12 +55,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* Windows does not have:
- * unistd.h, grp.h,
- * netdb.h, netinet/in.h,
- * sys/socket.h, sys/time.h
- * Windows requires:
- * winsock.h
+/* Windows does not have: unistd.h, grp.h, netdb.h, netinet/in.h, sys/socket.h, sys/time.h
+ * Windows requires: winsock.h
  * -- codemastr
  */
 
@@ -164,13 +160,6 @@
  * prototypes. */
 extern int strcasecmp(const char *, const char *);
 extern int strncasecmp(const char *, const char *, size_t);
-# if 0	/* These break on some AIX boxes (4.3.1 reported). */
-extern int gettimeofday(struct timeval *, struct timezone *);
-extern int socket(int, int, int);
-extern int bind(int, struct sockaddr *, int);
-extern int connect(int, struct sockaddr *, int);
-extern int shutdown(int, int);
-# endif
 # undef FD_ZERO
 # define FD_ZERO(p) memset((p), 0, sizeof(*(p)))
 #endif /* _AIX */
@@ -206,6 +195,11 @@ extern int shutdown(int, int);
 # undef int32
 #endif
 
+#ifndef _WIN32
+	#define MARK_DEPRECATED __attribute((deprecated))
+#else
+	#define MARK_DEPRECATED
+#endif
 
 /* Miscellaneous definitions. */
 #include "defs.h"

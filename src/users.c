@@ -260,6 +260,42 @@ User::~User()
 		alog("debug: User::~User() done");
 }
 
+void User::SendMessage(const char *source, const char *fmt, ...)
+{
+	va_list args;
+	char buf[BUFSIZE];
+	*buf = '\0';
+
+	if (fmt)
+	{
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+
+		this->SendMessage(source, std::string(buf));
+
+		va_end(args);
+	}
+}
+
+void User::SendMessage(const char *source, const std::string &msg)
+{
+	/* Send privmsg instead of notice if:
+	* - UsePrivmsg is enabled
+	* - The user is not registered and NSDefMsg is enabled
+	* - The user is registered and has set /ns set msg on
+	*/
+	if (UsePrivmsg &&
+		((!this->na && NSDefFlags & NI_MSG) || (this->na && this->na->nc->flags & NI_MSG)))
+	{
+		anope_cmd_privmsg2(source, this->nick, msg.c_str());
+	}
+	else
+	{
+		anope_cmd_notice2(source, this->nick, msg.c_str());
+	}
+}
+
+
 /*************************************************************************/
 /*************************************************************************/
 

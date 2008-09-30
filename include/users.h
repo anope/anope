@@ -90,5 +90,15 @@ class User
 	/** Updates the realname of the user record.
 	 */
 	void SetRealname(const std::string &realname);
+
+	/**
+	 * Send a message (notice or privmsg, depending on settings) to a user
+	 * @param source Sender nick
+	 * @param fmt Format of the Message
+	 * @param ... any number of parameters
+	 * @return void
+	 */
+	void SendMessage(const char *source, const char *fmt, ...);
+	void SendMessage(const char *source, const std::string &msg);
 };
 

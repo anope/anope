@@ -1019,9 +1019,9 @@ E void notice_server(char *source, Server * s, char *fmt, ...)
 E void notice_user(char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
-E void notice_list(const char *source, const char *dest, char **text);
-E void notice_lang(const char *source, User *dest, int message, ...);
-E void notice_help(const char *source, User *dest, int message, ...);
+E void notice_list(const char *source, const char *dest, char **text) MARK_DEPRECATED;
+E void notice_lang(const char *source, User *dest, int message, ...) MARK_DEPRECATED;
+E void notice_help(const char *source, User *dest, int message, ...) MARK_DEPRECATED;
 
 
 /**** servers.c ****/

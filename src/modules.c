@@ -118,7 +118,7 @@ void modules_init(void)
 #endif
 }
 
-/** 
+/**
  * Load up a list of core modules from the conf.
  * @param number The number of modules to load
  * @param list The list of modules to load
@@ -148,12 +148,12 @@ void modules_core_init(int number, char **list)
     }
 }
 /**
- * 
+ *
  **/
 int encryption_module_init(void) {
     int ret = 0;
     Module *m;
-	
+
     m = createModule(EncModule);
     mod_current_module = m;
     mod_current_user = NULL;
@@ -175,7 +175,7 @@ int protocol_module_init(void)
 {
     int ret = 0;
     Module *m;
-	
+
     m = createModule(IRCDModule);
     mod_current_module = m;
     mod_current_user = NULL;
@@ -184,7 +184,7 @@ int protocol_module_init(void)
     moduleSetType(PROTOCOL);
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
-	
+
 	if (ret == MOD_ERR_OK) {
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
@@ -194,12 +194,12 @@ int protocol_module_init(void)
     	    alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
         	UseTokens = 0;
 	    }
-		
+
 		if (UseTS6 && !(ircd->ts6)) {
 			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
 			UseTS6 = 0;
 		}
-		
+
 		/* We can assume the ircd supports TS6 here */
     	if (UseTS6 && !Numeric) {
         	alog("UseTS6 requires the setting of Numeric to be enabled.");
@@ -208,7 +208,7 @@ int protocol_module_init(void)
 	} else {
 		destroyModule(m);
 	}
-	
+
     return ret;
 }
 
@@ -262,7 +262,7 @@ void modules_unload_all(bool fini, bool unload_proto)
 	int idx;
 	ModuleHash *mh, *next;
         void (*func) (void);
-       	
+
 	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
 		mh = MODULE_HASH[idx];
 		while (mh) {
@@ -276,12 +276,12 @@ void modules_unload_all(bool fini, bool unload_proto)
 		            	func();                 /* exec AnopeFini */
 			            mod_current_module_name = NULL;
 			        }
-				
+
 		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
 			    		mh = next;
 						continue;
 			        }
-				
+
 		        	if ((ano_modclose(mh->m->handle)) != 0)
 			            alog(ano_moderr());
 			        else
@@ -499,10 +499,10 @@ int encryptionModuleLoaded()
     return 0;
 }
 
-/** 
+/**
  * Copy the module from the modules folder to the runtime folder.
  * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actaul file in use will be in the 
+ * triggering a segfault, as the actaul file in use will be in the
  * runtime folder.
  * @param name the name of the module to copy
  * @param output the destination to copy the module to
@@ -530,10 +530,10 @@ int moduleCopyFile(char *name, char *output)
 	if (!mktemp(output))
 		return MOD_ERR_FILE_IO;
 #endif
-	
+
 	if (debug)
 		alog("Runtime module location: %s", output);
-	
+
 	/* Linux/UNIX should ignore the b param, why do we still have seperate
 	 * calls for it here? -GD
 	 */
@@ -590,7 +590,7 @@ int loadModule(Module * m, User * u)
     if ((m2 = findModule(m->name)) != NULL) {
         return MOD_ERR_EXISTS;
     }
-	
+
 	/* Generate the filename for the temporary copy of the module */
     strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
     len = strlen(buf);
@@ -754,7 +754,7 @@ int unloadModule(Module * m, User * u)
 }
 
 /**
- * Module setType() 
+ * Module setType()
  * Lets the module set a type, CORE,PROTOCOL,3RD etc..
  **/
 void moduleSetType(MODType type)
@@ -767,7 +767,7 @@ void moduleSetType(MODType type)
 
 /**
  * Prepare a module to be unloaded.
- * Remove all commands and messages this module is providing, and delete 
+ * Remove all commands and messages this module is providing, and delete
  * any callbacks which are still pending.
  * @param m the module to prepare for unload
  * @return MOD_ERR_OK on success
@@ -1197,7 +1197,7 @@ int displayMessageFromHash(char *name)
  * Displays a message list for a given message.
  * Again this is of little use other than debugging.
  * @param m the message to display
- * @return 0 is returned and has no meaning 
+ * @return 0 is returned and has no meaning
  */
 int displayMessage(Message * m)
 {
@@ -1391,7 +1391,7 @@ Command *findCommand(CommandHash * cmdTable[], const char *name)
   * @return a new Message object
   **/
 Message *createMessage(const char *name,
-                       int (*func) (char *source, int ac, char **av))
+                       int (*func) (const char *source, int ac, const char **av))
 {
     Message *m = NULL;
     if (!name || !func) {
@@ -1407,8 +1407,8 @@ Message *createMessage(const char *name,
     return m;
 }
 
-/** 
- * find a message in the given table. 
+/**
+ * find a message in the given table.
  * Looks up the message <name> in the MessageHash given
  * @param MessageHash the message table to search for this command, will almost always be IRCD
  * @param name the name of the command were looking for
@@ -1447,7 +1447,7 @@ Message *findMessage(MessageHash * msgTable[], const char *name)
  * Add a message to the MessageHash.
  * @param msgTable the MessageHash we want to add a message to
  * @param m the Message we want to add
- * @param pos the position we want to add the message to, E.G. MOD_HEAD, MOD_TAIL, MOD_UNIQUE 
+ * @param pos the position we want to add the message to, E.G. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
  * @return MOD_ERR_OK on a successful add.
  **/
 
@@ -1707,7 +1707,7 @@ void moduleAddAuthor(const char *author)
   * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
   * @param name the name of the callback, this is used for refrence mostly, but is needed it you want to delete this particular callback later on
   * @param when when should the function be executed, this is a time in the future, seconds since 00:00:00 1970-01-01 UTC
-  * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv); 
+  * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv);
   * @param argc the argument count for the argv paramter
   * @param atgv a argument list to be passed to the called function.
   * @return MOD_ERR_OK on success, anything else on fail.
@@ -1770,7 +1770,7 @@ int moduleAddCallback(char *name, time_t when,
 void moduleCallBackRun(void)
 {
     ModuleCallBack *tmp;
-	
+
 	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
 		if (debug)
 			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
@@ -1882,7 +1882,7 @@ void moduleDelCallback(char *name)
 /**
  * Remove all outstanding module callbacks for the given module.
  * When a module is unloaded, any callbacks it had outstanding must be removed, else when they attempt to execute the func pointer will no longer be valid, and we'll seg.
- * @param mod_name the name of the module we are preping for unload 
+ * @param mod_name the name of the module we are preping for unload
  **/
 void moduleCallBackPrepForUnload(char *mod_name)
 {
@@ -2090,7 +2090,7 @@ void moduleDisplayHelp(int service, User * u)
         for (current = MODULE_HASH[idx]; current; current = current->next) {
 			mod_current_module_name = current->name;
 			mod_current_module = current->m;
-			
+
             if ((service == 1) && current->m->nickHelp) {
                 current->m->nickHelp(u);
             } else if ((service == 2) && current->m->chanHelp) {
@@ -2108,7 +2108,7 @@ void moduleDisplayHelp(int service, User * u)
             }
         }
     }
-	
+
 	mod_current_module = calling_module;
 	mod_current_module_name = calling_module_name;
 #endif
@@ -2180,7 +2180,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
  * This allows module coders to retrive any data they have previuosly stored in any given struct
  * @param md The module data for the struct to be used
  * @param key The key to find the data for
- * @return the value paired to the given key will be returned, or NULL 
+ * @return the value paired to the given key will be returned, or NULL
  **/
 char *moduleGetData(ModuleData ** md, char *key)
 {
@@ -2257,7 +2257,7 @@ void moduleDelData(ModuleData ** md, char *key)
 
 /**
  * This will remove all data for a particular module from existing structs.
- * Its primary use is modulePrepForUnload() however, based on past expericance with module coders wanting to 
+ * Its primary use is modulePrepForUnload() however, based on past expericance with module coders wanting to
  * do just about anything and everything, its safe to use from inside the module.
  * @param md The module data for the struct to be used
  **/
@@ -2374,7 +2374,7 @@ void moduleCleanStruct(ModuleData ** moduleData)
 
 /**
  * Check the current version of anope against a given version number
- * Specifiying -1 for minor,patch or build 
+ * Specifiying -1 for minor,patch or build
  * @param major The major version of anope, the first part of the verison number
  * @param minor The minor version of anope, the second part of the version number
  * @param patch The patch version of anope, the third part of the version number
@@ -2508,7 +2508,7 @@ int moduleGetConfigDirective(Directive * d)
 			directive = normalizeBuffer(dir);
 		} else {
 			continue;
-		}	
+		}
 
         if (stricmp(directive, d->name) == 0) {
             if (str) {
@@ -2570,10 +2570,10 @@ void moduleInsertLanguage(int langNumber, int ac, char **av)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-	
+
 	if (debug)
 		alog("debug: %s Adding %d texts for language %d", mod_current_module->name, ac, langNumber);
-	
+
     if (mod_current_module->lang[langNumber].argc > 0) {
         moduleDeleteLanguage(langNumber);
     }
@@ -2604,7 +2604,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
         mod_current_module = findModule(mod_current_module_name);
     }
-	
+
     /* Find the users lang, and use it if we can */
     if (u && u->na && u->na->nc) {
         lang = u->na->nc->language;
@@ -2650,7 +2650,7 @@ char *moduleGetLangString(User * u, int number)
 
     if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name)))
         mod_current_module = findModule(mod_current_module_name);
-	
+
     /* Find the users lang, and use it if we can */
     if (u && u->na && u->na->nc)
         lang = u->na->nc->language;
@@ -2697,7 +2697,7 @@ void moduleDeleteLanguage(int langNumber)
 void queueModuleOperation(Module *m, ModuleOperation op, User *u)
 {
 	ModuleQueue *qm;
-	
+
 	qm = (ModuleQueue *)scalloc(1, sizeof(ModuleQueue));
 	qm->m = m;
 	qm->op = op;
@@ -2715,15 +2715,15 @@ void queueModuleOperation(Module *m, ModuleOperation op, User *u)
 int queueModuleLoad(char *name, User *u)
 {
 	Module *m;
-	
+
 	if (!name || !u)
 		return 0;
-	
+
 	if (findModule(name))
 		return 0;
 	m = createModule(name);
 	queueModuleOperation(m, MOD_OP_LOAD, u);
-	
+
 	return 1;
 }
 
@@ -2736,15 +2736,15 @@ int queueModuleLoad(char *name, User *u)
 int queueModuleUnload(char *name, User *u)
 {
 	Module *m;
-	
+
 	if (!name || !u)
 		return 0;
-	
+
 	m = findModule(name);
 	if (!m)
 		return 0;
 	queueModuleOperation(m, MOD_OP_UNLOAD, u);
-	
+
 	return 1;
 }
 
@@ -2755,13 +2755,13 @@ void handleModuleOperationQueue(void)
 {
 	ModuleQueue *next;
 	int status;
-	
+
 	if (!mod_operation_queue)
 		return;
-	
+
 	while (mod_operation_queue) {
 		next = mod_operation_queue->next;
-		
+
 		mod_current_module = mod_operation_queue->m;
 		mod_current_user = mod_operation_queue->u;
 
@@ -2780,13 +2780,13 @@ void handleModuleOperationQueue(void)
 			status = unloadModule(mod_operation_queue->m, mod_operation_queue->u);
 			alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
 		}
-		
+
 		/* Remove the ModuleQueue from memory */
 		free(mod_operation_queue);
-		
+
 		mod_operation_queue = next;
 	}
-	
+
 	mod_current_module = NULL;
 	mod_current_user = NULL;
 }

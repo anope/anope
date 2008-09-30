@@ -18,7 +18,7 @@
 
 /*************************************************************************/
 
-int m_nickcoll(char *user)
+int m_nickcoll(const char *user)
 {
     introduce_user(user);
     return MOD_CONT;
@@ -26,7 +26,7 @@ int m_nickcoll(char *user)
 
 /*************************************************************************/
 
-int m_away(char *source, char *msg)
+int m_away(const char *source, const char *msg)
 {
     User *u;
 
@@ -39,7 +39,7 @@ int m_away(char *source, char *msg)
 
 /*************************************************************************/
 
-int m_kill(char *nick, char *msg)
+int m_kill(const char *nick, const char *msg)
 {
     BotInfo *bi;
 
@@ -58,7 +58,7 @@ int m_kill(char *nick, char *msg)
 
 /*************************************************************************/
 
-int m_time(char *source, int ac, char **av)
+int m_time(const char *source, int ac, const char **av)
 {
     time_t t;
     struct tm *tm;
@@ -77,7 +77,7 @@ int m_time(char *source, int ac, char **av)
 
 /*************************************************************************/
 
-int m_motd(char *source)
+int m_motd(const char *source)
 {
     FILE *f;
     char buf[BUFSIZE];
@@ -103,7 +103,7 @@ int m_motd(char *source)
 
 /*************************************************************************/
 
-int m_privmsg(char *source, char *receiver, char *msg)
+int m_privmsg(const char *source, const char *receiver, const char *msg)
 {
     char *s;
     time_t starttime, stoptime; /* When processing started and finished */
@@ -129,7 +129,7 @@ int m_privmsg(char *source, char *receiver, char *msg)
         if (s_BotServ && (ci = cs_findchan(receiver))) {
             /* Some paranoia checks */
             if (!(ci->flags & CI_VERBOTEN) && ci->c && ci->bi) {
-                botchanmsgs(u, ci, msg);
+                botchanmsgs(u, ci, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
             }
         }
     } else {
@@ -171,42 +171,42 @@ int m_privmsg(char *source, char *receiver, char *msg)
                                      s_OperServ, u->nick, u->username,
                                      u->host);
             } else {
-                operserv(u, msg);
+                operserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
             }
         } else if ((stricmp(receiver, s_NickServ) == 0)
                    || (s_NickServAlias
                        && (stricmp(receiver, s_NickServAlias) == 0))) {
-            nickserv(u, msg);
+            nickserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if ((stricmp(receiver, s_ChanServ) == 0)
                    || (s_ChanServAlias
                        && (stricmp(receiver, s_ChanServAlias) == 0))) {
             if (!is_oper(u) && CSOpersOnly)
                 notice_lang(s_ChanServ, u, ACCESS_DENIED);
             else
-                chanserv(u, msg);
+                chanserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if ((stricmp(receiver, s_MemoServ) == 0)
                    || (s_MemoServAlias
                        && (stricmp(receiver, s_MemoServAlias) == 0))) {
-            memoserv(u, msg);
+            memoserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if (s_HostServ && ((stricmp(receiver, s_HostServ) == 0)
                                   || (s_HostServAlias
                                       &&
                                       (stricmp(receiver, s_HostServAlias)
                                        == 0)))) {
-            hostserv(u, msg);
+            hostserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if (s_HelpServ && ((stricmp(receiver, s_HelpServ) == 0)
                                   || (s_HelpServAlias
                                       &&
                                       (stricmp(receiver, s_HelpServAlias)
                                        == 0)))) {
-            helpserv(u, msg);
+            helpserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if (s_BotServ && ((stricmp(receiver, s_BotServ) == 0)
                                  || (s_BotServAlias
                                      && (stricmp(receiver, s_BotServAlias)
                                          == 0)))) {
-            botserv(u, msg);
+            botserv(u, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         } else if (s_BotServ && (bi = findbot(receiver))) {
-            botmsgs(u, bi, msg);
+            botmsgs(u, bi, (char *)msg); // XXX Unsafe cast, this needs reviewing -- CyberBotX
         }
 
         /* Add to ignore list if the command took a significant amount of time. */
@@ -221,7 +221,7 @@ int m_privmsg(char *source, char *receiver, char *msg)
 
 /*************************************************************************/
 
-int m_stats(char *source, int ac, char **av)
+int m_stats(const char *source, int ac, const char **av)
 {
     int i;
     User *u;
@@ -309,7 +309,7 @@ int m_stats(char *source, int ac, char **av)
 
 /*************************************************************************/
 
-int m_version(char *source, int ac, char **av)
+int m_version(const char *source, int ac, const char **av)
 {
     if (source) {
         anope_cmd_351(source);
@@ -320,7 +320,7 @@ int m_version(char *source, int ac, char **av)
 
 /*************************************************************************/
 
-int m_whois(char *source, char *who)
+int m_whois(const char *source, const char *who)
 {
     BotInfo *bi;
     NickAlias *na;
@@ -384,7 +384,7 @@ int m_whois(char *source, char *who)
 }
 
 /* NULL route messages */
-int anope_event_null(char *source, int ac, char **av)
+int anope_event_null(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }

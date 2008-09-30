@@ -144,10 +144,10 @@ IRCDCAPAB myIrcdcap[] = {
      0, 0, 0}
 };
 
-void ultimate3_set_umode(User * user, int ac, char **av)
+void ultimate3_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -475,7 +475,7 @@ CUMode myCumodes[128] = {
 };
 
 /* SVSMODE -b */
-void ultimate3_cmd_unban(char *name, char *nick)
+void ultimate3_cmd_unban(const char *name, const char *nick)
 {
     ultimate3_cmd_svsmode_chan(name, "-b", nick);
 }
@@ -483,7 +483,7 @@ void ultimate3_cmd_unban(char *name, char *nick)
 
 /* SVSMODE channel modes */
 
-void ultimate3_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void ultimate3_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
@@ -492,7 +492,7 @@ void ultimate3_cmd_svsmode_chan(char *name, char *mode, char *nick)
     }
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
@@ -517,7 +517,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
 **	parv[0] = new nickname
 **      parv[1] = hopcount
 */
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     if (ac != 2) {
         User *user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
@@ -533,7 +533,7 @@ int anope_event_nick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sethost(char *source, int ac, char **av)
+int anope_event_sethost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -548,11 +548,11 @@ int anope_event_sethost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[1]);
+    u->SetDisplayedHost(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     capab_parse(ac, av);
     return MOD_CONT;
@@ -574,7 +574,7 @@ int anope_event_capab(char *source, int ac, char **av)
 **	parv[10] = ip         402810339
 ** 	parv[11] = info      Dreams are answers to questions not yet asked
 */
-int anope_event_client(char *source, int ac, char **av)
+int anope_event_client(const char *source, int ac, const char **av)
 {
     if (ac != 2) {
         User *user = do_nick(source, av[0], av[5], av[6], av[8], av[11],
@@ -663,7 +663,7 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 
-void ultimate3_cmd_sqline(char *mask, char *reason)
+void ultimate3_cmd_sqline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -672,12 +672,12 @@ void ultimate3_cmd_sqline(char *mask, char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void ultimate3_cmd_unsgline(char *mask)
+void ultimate3_cmd_unsgline(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
-void ultimate3_cmd_unszline(char *mask)
+void ultimate3_cmd_unszline(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
@@ -687,7 +687,7 @@ void ultimate3_cmd_unszline(char *mask)
    Complete rewrite of the kline/akill/zline system. (s)zlines no longer exist.
    K: lines set on IP addresses without username portions (or *) are treated as Z: lines used to be.
 */
-void ultimate3_cmd_szline(char *mask, char *reason, char *whom)
+void ultimate3_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 86400 * 2, whom,
              (long int) time(NULL), reason);
@@ -700,12 +700,12 @@ void UltimateIRCdProto::cmd_svsnoop(const char *server, int set)
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
-void ultimate3_cmd_svsadmin(char *server, int set)
+void ultimate3_cmd_svsadmin(const char *server, int set)
 {
 	ircd_proto.cmd_svsnoop(server, set);
 }
 
-void ultimate3_cmd_sgline(char *mask, char *reason)
+void ultimate3_cmd_sgline(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
@@ -721,25 +721,25 @@ void ultimate3_cmd_vhost_off(User * u)
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
-void ultimate3_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void ultimate3_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     send_cmd(s_HostServ, "SVSMODE %s +x", nick);
     send_cmd(ServerName, "SETHOST %s %s", nick, vhost);
 }
 
-void ultimate3_cmd_join(char *user, char *channel, time_t chantime)
+void ultimate3_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
 
-void ultimate3_cmd_akill(char *user, char *host, char *who, time_t when,
-                         time_t expires, char *reason)
+void ultimate3_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                         time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
              (long int) time(NULL), reason);
 }
 
-void ultimate3_cmd_svskill(char *source, char *user, char *buf)
+void ultimate3_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -749,7 +749,7 @@ void ultimate3_cmd_svskill(char *source, char *user, char *buf)
 }
 
 
-void ultimate3_cmd_svsmode(User * u, int ac, char **av)
+void ultimate3_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
              (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
@@ -768,7 +768,7 @@ void anope_pong(char *servname)
 
 /* Events */
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -776,7 +776,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -785,7 +785,7 @@ int anope_event_436(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -794,7 +794,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     if (ac != 4)
         return MOD_CONT;
@@ -802,7 +802,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -810,7 +810,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -819,7 +819,7 @@ int anope_event_quit(char *source, int ac, char **av)
 }
 
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -833,7 +833,7 @@ int anope_event_mode(char *source, int ac, char **av)
 }
 
 /* EVENT : OS */
-int anope_event_os(char *source, int ac, char **av)
+int anope_event_os(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -842,7 +842,7 @@ int anope_event_os(char *source, int ac, char **av)
 }
 
 /* EVENT : NS */
-int anope_event_ns(char *source, int ac, char **av)
+int anope_event_ns(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -851,7 +851,7 @@ int anope_event_ns(char *source, int ac, char **av)
 }
 
 /* EVENT : MS */
-int anope_event_ms(char *source, int ac, char **av)
+int anope_event_ms(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -860,7 +860,7 @@ int anope_event_ms(char *source, int ac, char **av)
 }
 
 /* EVENT : HS */
-int anope_event_hs(char *source, int ac, char **av)
+int anope_event_hs(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -869,7 +869,7 @@ int anope_event_hs(char *source, int ac, char **av)
 }
 
 /* EVENT : CS */
-int anope_event_cs(char *source, int ac, char **av)
+int anope_event_cs(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -878,7 +878,7 @@ int anope_event_cs(char *source, int ac, char **av)
 }
 
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -887,7 +887,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -896,7 +896,7 @@ int anope_event_kick(char *source, int ac, char **av)
 }
 
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -904,7 +904,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -914,7 +914,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_setname(char *source, int ac, char **av)
+int anope_event_setname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -929,11 +929,11 @@ int anope_event_setname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[0]);
+    u->SetRealname(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_chgname(char *source, int ac, char **av)
+int anope_event_chgname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -948,11 +948,11 @@ int anope_event_chgname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[1]);
+    u->SetRealname(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_setident(char *source, int ac, char **av)
+int anope_event_setident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -967,10 +967,10 @@ int anope_event_setident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[0]);
+    u->SetIdent(av[0]);
     return MOD_CONT;
 }
-int anope_event_chgident(char *source, int ac, char **av)
+int anope_event_chgident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -985,12 +985,12 @@ int anope_event_chgident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[1]);
+    u->SetIdent(av[1]);
     return MOD_CONT;
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -1000,7 +1000,7 @@ int anope_event_server(char *source, int ac, char **av)
 }
 
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1008,7 +1008,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -1016,7 +1016,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -1024,36 +1024,36 @@ int anope_event_whois(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void ultimate3_cmd_topic(char *whosets, char *chan, char *whosetit,
-                         char *topic, time_t when)
+void ultimate3_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                         const char *topic, time_t when)
 {
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
              (unsigned long int) when, topic);
 }
 
-void ultimate3_cmd_372(char *source, char *msg)
+void ultimate3_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void ultimate3_cmd_372_error(char *source)
+void ultimate3_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void ultimate3_cmd_375(char *source)
+void ultimate3_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void ultimate3_cmd_376(char *source)
+void ultimate3_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void ultimate3_cmd_nick(char *nick, char *name, char *modes)
+void ultimate3_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
@@ -1062,14 +1062,14 @@ void ultimate3_cmd_nick(char *nick, char *name, char *modes)
     ultimate3_cmd_sqline(nick, "Reserved for services");
 }
 
-void ultimate3_cmd_guest_nick(char *nick, char *user, char *host,
-                              char *real, char *modes)
+void ultimate3_cmd_guest_nick(const char *nick, const char *user, const char *host,
+                              const char *real, const char *modes)
 {
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void ultimate3_cmd_mode(char *source, char *dest, char *buf)
+void ultimate3_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1078,8 +1078,8 @@ void ultimate3_cmd_mode(char *source, char *dest, char *buf)
     send_cmd(source, "MODE %s %s", dest, buf);
 }
 
-void ultimate3_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                            char *modes)
+void ultimate3_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                            const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
@@ -1087,7 +1087,7 @@ void ultimate3_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     ultimate3_cmd_sqline(nick, "Reserved for services");
 }
 
-void ultimate3_cmd_kick(char *source, char *chan, char *user, char *buf)
+void ultimate3_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1096,7 +1096,7 @@ void ultimate3_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void ultimate3_cmd_notice_ops(char *source, char *dest, char *buf)
+void ultimate3_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1106,7 +1106,7 @@ void ultimate3_cmd_notice_ops(char *source, char *dest, char *buf)
 }
 
 
-void ultimate3_cmd_notice(char *source, char *dest, char *buf)
+void ultimate3_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1119,12 +1119,12 @@ void ultimate3_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void ultimate3_cmd_notice2(char *source, char *dest, char *msg)
+void ultimate3_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
-void ultimate3_cmd_privmsg(char *source, char *dest, char *buf)
+void ultimate3_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1133,27 +1133,27 @@ void ultimate3_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
-void ultimate3_cmd_privmsg2(char *source, char *dest, char *msg)
+void ultimate3_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void ultimate3_cmd_serv_notice(char *source, char *dest, char *msg)
+void ultimate3_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void ultimate3_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void ultimate3_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
-void ultimate3_cmd_bot_chan_mode(char *nick, char *chan)
+void ultimate3_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
-void ultimate3_cmd_351(char *source)
+void ultimate3_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
@@ -1162,7 +1162,7 @@ void ultimate3_cmd_351(char *source)
 }
 
 /* QUIT */
-void ultimate3_cmd_quit(char *source, char *buf)
+void ultimate3_cmd_quit(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1183,26 +1183,26 @@ void ultimate3_cmd_capab()
 }
 
 /* PASS */
-void ultimate3_cmd_pass(char *pass)
+void ultimate3_cmd_pass(const char *pass)
 {
     send_cmd(NULL, "PASS %s :TS", pass);
 }
 
 /* SERVER name hop descript */
 /* Unreal 3.2 actually sends some info about itself in the descript area */
-void ultimate3_cmd_server(char *servname, int hop, char *descript)
+void ultimate3_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
 /* PONG */
-void ultimate3_cmd_pong(char *servname, char *who)
+void ultimate3_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
 
 /* UNSQLINE */
-void ultimate3_cmd_unsqline(char *user)
+void ultimate3_cmd_unsqline(const char *user)
 {
     if (!user) {
         return;
@@ -1211,7 +1211,7 @@ void ultimate3_cmd_unsqline(char *user)
 }
 
 /* CHGHOST */
-void ultimate3_cmd_chghost(char *nick, char *vhost)
+void ultimate3_cmd_chghost(const char *nick, const char *vhost)
 {
     if (!nick || !vhost) {
         return;
@@ -1220,7 +1220,7 @@ void ultimate3_cmd_chghost(char *nick, char *vhost)
 }
 
 /* CHGIDENT */
-void ultimate3_cmd_chgident(char *nick, char *vIdent)
+void ultimate3_cmd_chgident(const char *nick, const char *vIdent)
 {
     if (!nick || !vIdent) {
         return;
@@ -1229,7 +1229,7 @@ void ultimate3_cmd_chgident(char *nick, char *vIdent)
 }
 
 /* INVITE */
-void ultimate3_cmd_invite(char *source, char *chan, char *nick)
+void ultimate3_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1239,7 +1239,7 @@ void ultimate3_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* PART */
-void ultimate3_cmd_part(char *nick, char *chan, char *buf)
+void ultimate3_cmd_part(const char *nick, const char *chan, const char *buf)
 {
 
     if (!nick || !chan) {
@@ -1254,7 +1254,7 @@ void ultimate3_cmd_part(char *nick, char *chan, char *buf)
 }
 
 /* 391 */
-void ultimate3_cmd_391(char *source, char *timestr)
+void ultimate3_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -1263,7 +1263,7 @@ void ultimate3_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void ultimate3_cmd_250(char *buf)
+void ultimate3_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -1273,7 +1273,7 @@ void ultimate3_cmd_250(char *buf)
 }
 
 /* 307 */
-void ultimate3_cmd_307(char *buf)
+void ultimate3_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -1283,7 +1283,7 @@ void ultimate3_cmd_307(char *buf)
 }
 
 /* 311 */
-void ultimate3_cmd_311(char *buf)
+void ultimate3_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -1293,7 +1293,7 @@ void ultimate3_cmd_311(char *buf)
 }
 
 /* 312 */
-void ultimate3_cmd_312(char *buf)
+void ultimate3_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -1303,7 +1303,7 @@ void ultimate3_cmd_312(char *buf)
 }
 
 /* 317 */
-void ultimate3_cmd_317(char *buf)
+void ultimate3_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -1313,7 +1313,7 @@ void ultimate3_cmd_317(char *buf)
 }
 
 /* 219 */
-void ultimate3_cmd_219(char *source, char *letter)
+void ultimate3_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -1328,7 +1328,7 @@ void ultimate3_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void ultimate3_cmd_401(char *source, char *who)
+void ultimate3_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1337,7 +1337,7 @@ void ultimate3_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void ultimate3_cmd_318(char *source, char *who)
+void ultimate3_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1347,7 +1347,7 @@ void ultimate3_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void ultimate3_cmd_242(char *buf)
+void ultimate3_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -1357,7 +1357,7 @@ void ultimate3_cmd_242(char *buf)
 }
 
 /* 243 */
-void ultimate3_cmd_243(char *buf)
+void ultimate3_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -1367,7 +1367,7 @@ void ultimate3_cmd_243(char *buf)
 }
 
 /* 211 */
-void ultimate3_cmd_211(char *buf)
+void ultimate3_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1377,7 +1377,7 @@ void ultimate3_cmd_211(char *buf)
 }
 
 /* GLOBOPS */
-void ultimate3_cmd_global(char *source, char *buf)
+void ultimate3_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1387,7 +1387,7 @@ void ultimate3_cmd_global(char *source, char *buf)
 }
 
 /* SQUIT */
-void ultimate3_cmd_squit(char *servname, char *message)
+void ultimate3_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1397,7 +1397,7 @@ void ultimate3_cmd_squit(char *servname, char *message)
 }
 
 /* SVSO */
-void ultimate3_cmd_svso(char *source, char *nick, char *flag)
+void ultimate3_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     if (!source || !nick || !flag) {
         return;
@@ -1407,7 +1407,7 @@ void ultimate3_cmd_svso(char *source, char *nick, char *flag)
 }
 
 /* NICK <newnick>  */
-void ultimate3_cmd_chg_nick(char *oldnick, char *newnick)
+void ultimate3_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1417,7 +1417,7 @@ void ultimate3_cmd_chg_nick(char *oldnick, char *newnick)
 }
 
 /* SVSNICK */
-void ultimate3_cmd_svsnick(char *source, char *guest, time_t when)
+void ultimate3_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1466,20 +1466,20 @@ void ultimate3_cmd_connect(int servernum)
 }
 
 /* SVSHOLD - set */
-void ultimate3_cmd_svshold(char *nick)
+void ultimate3_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void ultimate3_cmd_release_svshold(char *nick)
+void ultimate3_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void ultimate3_cmd_svid_umode(char *nick, time_t ts)
+void ultimate3_cmd_svid_umode(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
              (unsigned long int) ts);
@@ -1493,12 +1493,12 @@ void ultimate3_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +d */
-void ultimate3_cmd_svid_umode2(User * u, char *ts)
+void ultimate3_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not used by bahamut ircds */
 }
 
-void ultimate3_cmd_svid_umode3(User * u, char *ts)
+void ultimate3_cmd_svid_umode3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1508,53 +1508,53 @@ void ultimate3_cmd_svid_umode3(User * u, char *ts)
 
 }
 
-int anope_event_svinfo(char *source, int ac, char **av)
+int anope_event_svinfo(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_gnotice(char *source, int ac, char **av)
+int anope_event_gnotice(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_netctrl(char *source, int ac, char **av)
+int anope_event_netctrl(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_sqline(char *source, int ac, char **av)
+int anope_event_sqline(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-void ultimate3_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void ultimate3_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void ultimate3_cmd_svspart(char *source, char *nick, char *chan)
+void ultimate3_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
 
-void ultimate3_cmd_swhois(char *source, char *who, char *mask)
+void ultimate3_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
@@ -1565,7 +1565,7 @@ void ultimate3_cmd_eob()
     send_cmd(NULL, "BURST 0");
 }
 
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -1576,7 +1576,7 @@ int anope_event_error(char *source, int ac, char **av)
 }
 
 
-int anope_event_eob(char *source, int ac, char **av)
+int anope_event_eob(const char *source, int ac, const char **av)
 {
     Server *s;
 
@@ -1594,7 +1594,7 @@ int anope_event_eob(char *source, int ac, char **av)
 }
 
 
-int anope_event_burst(char *source, int ac, char **av)
+int anope_event_burst(const char *source, int ac, const char **av)
 {
     Server *s;
     s = findserver(servlist, source);
@@ -1612,7 +1612,7 @@ int anope_event_burst(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_rehash(char *source, int ac, char **av)
+int anope_event_rehash(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
@@ -1622,27 +1622,27 @@ int anope_event_credits(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_netglobal(char *source, int ac, char **av)
+int anope_event_netglobal(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_invite(char *source, int ac, char **av)
+int anope_event_invite(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int ultiamte3_flood_mode_check(char *value)
+int ultiamte3_flood_mode_check(const char *value)
 {
     return 0;
 }
 
-void ultimate3_cmd_jupe(char *jserver, char *who, char *reason)
+void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1656,7 +1656,7 @@ void ultimate3_cmd_jupe(char *jserver, char *who, char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void ultimate3_cmd_global_legacy(char *source, char *fmt)
+void ultimate3_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1665,7 +1665,7 @@ void ultimate3_cmd_global_legacy(char *source, char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int ultiamte3_valid_nick(char *nick)
+int ultiamte3_valid_nick(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1675,14 +1675,14 @@ int ultiamte3_valid_nick(char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int ultiamte3_valid_chan(char *chan)
+int ultiamte3_valid_chan(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
 }
 
 
-void ultimate3_cmd_ctcp(char *source, char *dest, char *buf)
+void ultimate3_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

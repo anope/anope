@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  */
 
@@ -167,7 +167,7 @@ struct ModuleQueue_ {
 	Module *m;
 	ModuleOperation op;
 	User *u;
-	
+
 	ModuleQueue *next;
 };
 
@@ -211,7 +211,7 @@ struct CommandHash_ {
 
 struct Message_ {
     char *name;
-    int (*func)(char *source, int ac, char **av);
+    int (*func)(const char *source, int ac, const char **av);
     int core;
     char *mod_name;
     Message *next;
@@ -235,7 +235,7 @@ struct ModuleCallBack_ {
 
 struct EvtMessage_ {
     char *name;
-    int (*func)(char *source, int ac, char **av);
+    int (*func)(const char *source, int ac, const char **av);
     int core;
     char *mod_name;
     EvtMessage *next;
@@ -318,7 +318,7 @@ Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a comma
 /*************************************************************************/
 
 /* Message Managment Functions */
-MDE Message *createMessage(const char *name,int (*func)(char *source, int ac, char **av));
+MDE Message *createMessage(const char *name,int (*func)(const char *source, int ac, const char **av));
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
@@ -329,7 +329,7 @@ int destroyMessage(Message *m);					/* destroy a Message*/
 
 /*************************************************************************/
 
-MDE EvtMessage *createEventHandler(char *name, int (*func) (char *source, int ac, char **av));
+MDE EvtMessage *createEventHandler(char *name, int (*func) (const char *source, int ac, const char **av));
 EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
 int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 MDE int moduleAddEventHandler(EvtMessage * evm);

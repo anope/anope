@@ -72,10 +72,10 @@ E void load_bs_dbase(void);
 E void save_bs_dbase(void);
 E void save_bs_rdb_dbase(void);
 E BotInfo *makebot(char *nick);
-E BotInfo *findbot(char *nick);
+E BotInfo *findbot(const char *nick);
 E void bot_join(ChannelInfo *ci);
 E void bot_rejoin_all(BotInfo *bi);
-E char *normalizeBuffer(char *);
+E char *normalizeBuffer(const char *);
 E void unassign(User * u, ChannelInfo * ci);
 E void insert_bot(BotInfo * bi);
 
@@ -87,25 +87,25 @@ E void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode, char *nick);
 
 E Channel *chanlist[1024];
 
-E void add_ban(Channel * chan, char *mask);
+E void add_ban(Channel * chan, const char *mask);
 E void chan_adduser2(User * user, Channel * c);
-E void add_invite(Channel * chan, char *mask);
+E void add_invite(Channel * chan, const char *mask);
 E void chan_delete(Channel * c);
-E void del_ban(Channel * chan, char *mask);
-E void chan_set_key(Channel * chan, char *value);
-E void set_limit(Channel * chan, char *value);
-E void del_invite(Channel * chan, char *mask);
+E void del_ban(Channel * chan, const char *mask);
+E void chan_set_key(Channel * chan, const char *value);
+E void set_limit(Channel * chan, const char *value);
+E void del_invite(Channel * chan, const char *mask);
 E char *get_key(Channel * chan);
 E char *get_limit(Channel * chan);
-E Channel *chan_create(char *chan, time_t ts);
-E Channel *join_user_update(User * user, Channel * chan, char *name, time_t chants);
+E Channel *chan_create(const char *chan, time_t ts);
+E Channel *join_user_update(User * user, Channel * chan, const char *name, time_t chants);
 
-E void add_exception(Channel * chan, char *mask);
-E void del_exception(Channel * chan, char *mask);
+E void add_exception(Channel * chan, const char *mask);
+E void del_exception(Channel * chan, const char *mask);
 E char *get_flood(Channel * chan);
-E void set_flood(Channel * chan, char *value);
+E void set_flood(Channel * chan, const char *value);
 E char *get_redirect(Channel * chan);
-E void set_redirect(Channel * chan, char *value);
+E void set_redirect(Channel * chan, const char *value);
 
 
 E void get_channel_stats(long *nrec, long *memuse);
@@ -120,7 +120,7 @@ E User *nc_on_chan(Channel * c, NickCore * nc);
 
 E char *chan_get_modes(Channel * chan, int complete, int plus);
 E void chan_set_modes(const char *source, Channel * chan, int ac,
-                      char **av, int check);
+                      const char **av, int check);
 
 E int chan_get_user_status(Channel * chan, User * user);
 E int chan_has_user_status(Channel * chan, User * user, int16 status);
@@ -130,19 +130,19 @@ E void chan_set_user_status(Channel * chan, User * user, int16 status);
 E int get_access_level(ChannelInfo * ci, NickAlias * na);
 E const char *get_xop_level(int level);
 
-E void do_cmode(const char *source, int ac, char **av);
-E void do_join(const char *source, int ac, char **av);
+E void do_cmode(const char *source, int ac, const char **av);
+E void do_join(const char *source, int ac, const char **av);
 E void do_kick(const char *source, int ac, const char **av);
-E void do_part(const char *source, int ac, char **av);
-E void do_sjoin(const char *source, int ac, char **av);
-E void do_topic(const char *source, int ac, char **av);
+E void do_part(const char *source, int ac, const char **av);
+E void do_sjoin(const char *source, int ac, const char **av);
+E void do_topic(const char *source, int ac, const char **av);
 E void do_mass_mode(char *modes);
 
 E void chan_set_correct_modes(User * user, Channel * c, int give_modes);
 E void restore_unsynced_topics(void);
 
 E Entry *entry_create(char *mask);
-E Entry *entry_add(EList *list, char *mask);
+E Entry *entry_add(EList *list, const char *mask);
 E void entry_delete(EList *list, Entry *e);
 E EList *list_create();
 E int entry_match(Entry *e, char *nick, char *user, char *host, uint32 ip);
@@ -150,7 +150,7 @@ E int entry_match_mask(Entry *e, char *mask, uint32 ip);
 E Entry *elist_match(EList *list, char *nick, char *user, char *host, uint32 ip);
 E Entry *elist_match_mask(EList *list, char *mask, uint32 ip);
 E Entry *elist_match_user(EList *list, User *u);
-E Entry *elist_find_mask(EList *list, char *mask);
+E Entry *elist_find_mask(EList *list, const char *mask);
 E long get_memuse(EList *list);
 
 
@@ -186,9 +186,9 @@ E int check_should_voice(User * user, char *chan);
 E int check_should_halfop(User * user, char *chan);
 E int check_should_owner(User * user, char *chan);
 E int check_should_protect(User * user, char *chan);
-E int check_kick(User * user, char *chan, time_t chants);
+E int check_kick(User * user, const char *chan, time_t chants);
 E void record_topic(const char *chan);
-E void restore_topic(char *chan);
+E void restore_topic(const char *chan);
 E int check_topiclock(Channel * c, time_t topic_time);
 
 E ChannelInfo *cs_findchan(const char *chan);
@@ -198,17 +198,17 @@ E int get_access(User * user, ChannelInfo * ci);
 E ChanAccess *get_access_entry(NickCore * nc, ChannelInfo * ci);
 E void update_cs_lastseen(User * user, ChannelInfo * ci);
 E int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen);
-E AutoKick *is_stuck(ChannelInfo * ci, char *mask);
+E AutoKick *is_stuck(ChannelInfo * ci, const char *mask);
 E void stick_mask(ChannelInfo * ci, AutoKick * akick);
 E void stick_all(ChannelInfo * ci);
 E char *cs_get_flood(ChannelInfo * ci);
-E void cs_set_flood(ChannelInfo * ci, char *value);
+E void cs_set_flood(ChannelInfo * ci, const char *value);
 E char *cs_get_key(ChannelInfo * ci);
-E void cs_set_key(ChannelInfo * ci, char *value);
+E void cs_set_key(ChannelInfo * ci, const char *value);
 E char *cs_get_limit(ChannelInfo * ci);
-E void cs_set_limit(ChannelInfo * ci, char *value);
+E void cs_set_limit(ChannelInfo * ci, const char *value);
 E char *cs_get_redirect(ChannelInfo * ci);
-E void cs_set_redirect(ChannelInfo * ci, char *value);
+E void cs_set_redirect(ChannelInfo * ci, const char *value);
 
 E int levelinfo_maxwidth;
 E ChannelInfo *makechan(const char *chan);
@@ -801,15 +801,15 @@ E int delmemo(MemoInfo * mi, int num);
 
 /**** messages.c ****/
 
-E int m_nickcoll(char *user);
-E int m_away(char *source, char *msg);
-E int m_kill(char *nick, char *msg);
-E int m_motd(char *source);
-E int m_privmsg(char *source, char *receiver, char *msg);
-E int m_stats(char *source, int ac, char **av);
-E int m_whois(char *source, char *who);
-E int m_time(char *source, int ac, char **av);
-E int m_version(char *source, int ac, char **av);
+E int m_nickcoll(const char *user);
+E int m_away(const char *source, const char *msg);
+E int m_kill(const char *nick, const char *msg);
+E int m_motd(const char *source);
+E int m_privmsg(const char *source, const char *receiver, const char *msg);
+E int m_stats(const char *source, int ac, const char **av);
+E int m_whois(const char *source, const char *who);
+E int m_time(const char *source, int ac, const char **av);
+E int m_version(const char *source, int ac, const char **av);
 
 
 /**** misc.c ****/
@@ -832,7 +832,7 @@ E int match_wild_nocase(const char *pattern, const char *str);
 E int dotime(const char *s);
 E char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds);
 E char *expire_left(NickAlias * na, char *buf, int len, time_t expires);
-E void protocol_debug(char *source, char *cmd, int argc, char **argv);
+E void protocol_debug(char *source, char *cmd, int argc, const char **argv);
 E int doValidHost(const char *host, int type);
 
 typedef int (*range_callback_t) (User * u, int num, va_list args);
@@ -851,8 +851,8 @@ E char *myStrGetTokenRemainder(const char *str, const char dilim,
 E char *stripModePrefix(const char *str);
 E int myNumToken(const char *str, const char dilim);
 E void doCleanBuffer(char *str);
-E void EnforceQlinedNick(char *nick, char *killer);
-E int nickIsServices(char *nick, int bot);
+E void EnforceQlinedNick(const char *nick, const char *killer);
+E int nickIsServices(const char *nick, int bot);
 
 E void add_entropy_userkeys(void);
 E void rand_init(void);
@@ -971,23 +971,23 @@ E int nick_is_services_admin(NickCore *nc);
 E int nick_is_services_oper(NickCore *nc);
 
 E int add_akill(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_akill(char *nick, const char *username, const char *host, const char *vhost, const char *ip);
+E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
 E void expire_akills(void);
 E void oper_global(char *nick, char *fmt, ...);
 
 E int add_sgline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_sgline(char *nick, const char *realname);
+E int check_sgline(const char *nick, const char *realname);
 E void expire_sglines(void);
 
 E int add_sqline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
-E int check_sqline(char *nick, int nick_change);
+E int check_sqline(const char *nick, int nick_change);
 E void expire_sqlines(void);
 E int check_chan_sqline(const char *chan);
 
 E int add_szline(User * u, char *mask, const char *by,
                  const time_t expires, const char *reason);
 E void expire_szlines(void);
-E int check_szline(char *nick, char *ip);
+E int check_szline(const char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
@@ -1006,7 +1006,7 @@ E IgnoreData *get_ignore(const char *nick);
 E int delete_ignore(const char *nick);
 E int clear_ignores();
 
-E int split_buf(char *buf, char ***argv, int colon_special);
+E int split_buf(char *buf, const char ***argv, int colon_special);
 E void process(void);
 
 /**** send.c ****/
@@ -1037,17 +1037,17 @@ E CapabInfo capab_info[];
 E Server *first_server(int flags);
 E Server *next_server(int flags);
 
-E int is_ulined(char *server);
+E int is_ulined(const char *server);
 E int is_sync(Server *server);
 
 E Server *new_server(Server * uplink, const char *name, const char *desc,
-                   uint16 flags, char *suid);
+                   uint16 flags, const char *suid);
 
 E Server *findserver(Server *s, const char *name);
 
-E void do_server(const char *source, char *servername, char *hops, char *descript, char *numeric);
-E void do_squit(const char *source, int ac, char **av);
-E void capab_parse(int ac, char **av);
+E void do_server(const char *source, const char *servername, const char *hops, const char *descript, const char *numeric);
+E void do_squit(const char *source, int ac, const char **av);
+E void capab_parse(int ac, const char **av);
 E int anope_check_sync(const char *name);
 
 E void finish_sync(Server *serv, int sync_links);
@@ -1068,7 +1068,7 @@ E void get_session_stats(long *nrec, long *memuse);
 E void get_exception_stats(long *nrec, long *memuse);
 
 E int do_session(User *u);
-E int add_session(char *nick, char *host, char *hostip);
+E int add_session(const char *nick, const char *host, char *hostip);
 E void del_session(const char *host);
 
 E void load_exceptions(void);
@@ -1138,12 +1138,12 @@ E char *TS6UPLINK;
 
 E void update_host(User * user);
 
-E User *do_nick(const char *source, char *nick, char *username, char *host,
-              char *server, char *realname, time_t ts, uint32 svid, uint32 ip, char *vhost, char *uid);
+E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
+              const char *server, const char *realname, time_t ts, uint32 svid, uint32 ip, const char *vhost, const char *uid);
 
 E void do_umode(const char *source, int ac, const char **av);
 E void do_umode2(const char *source, int ac, const char **av);
-E void do_quit(const char *source, int ac, char **av);
+E void do_quit(const char *source, int ac, const char **av);
 E void do_kill(const char *source, const char *reason);
 
 E int is_oper(User * user);
@@ -1194,7 +1194,7 @@ E unsigned int mysql_rand(void);
 #endif
 
 E void privmsg(char *source, char *dest, const char *fmt, ...);
-E void notice(char *source, char *dest, const char *fmt, ...);
+E void notice(char *source, const char *dest, const char *fmt, ...);
 
 /******************************************************************************/
 
@@ -1368,11 +1368,11 @@ E char *common_get_vhost(User *u);
 E char *send_token(char *token1, char *token2);
 E char *base64enc(long i);
 E long base64dec(char *b64);
-E long base64dects(char *ts);
+E long base64dects(const char *ts);
 E int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
-E int b64_decode(char *src, char *target, size_t targsize);
+E int b64_decode(const char *src, char *target, size_t targsize);
 E char *encode_ip(unsigned char *ip);
-E int decode_ip(char *buf);
+E int decode_ip(const char *buf);
 
 #define Anope_Free(x)       if ((x) != NULL) free(x)
 

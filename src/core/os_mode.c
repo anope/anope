@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -69,7 +69,7 @@ void myOperServHelp(User * u)
 int do_os_mode(User * u)
 {
     int ac;
-    char **av;
+    const char **av;
     char *chan = strtok(NULL, " "), *modes = strtok(NULL, "");
     Channel *c;
 

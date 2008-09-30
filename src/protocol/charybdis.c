@@ -145,10 +145,10 @@ IRCDCAPAB myIrcdcap[] = {
 
 /*******************************************************************/
 
-void charybdis_set_umode(User * user, int ac, char **av)
+void charybdis_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -451,7 +451,7 @@ CUMode myCumodes[128] = {
 
 
 
-void charybdis_cmd_notice(char *source, char *dest, char *buf)
+void charybdis_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     Uid *ud;
     User *u;
@@ -471,7 +471,7 @@ void charybdis_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void charybdis_cmd_notice2(char *source, char *dest, char *msg)
+void charybdis_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     Uid *ud;
     User *u;
@@ -482,7 +482,7 @@ void charybdis_cmd_notice2(char *source, char *dest, char *msg)
              (UseTS6 ? (u ? u->uid : dest) : dest), msg);
 }
 
-void charybdis_cmd_privmsg(char *source, char *dest, char *buf)
+void charybdis_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     Uid *ud, *ud2;
 
@@ -496,7 +496,7 @@ void charybdis_cmd_privmsg(char *source, char *dest, char *buf)
              (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), buf);
 }
 
-void charybdis_cmd_privmsg2(char *source, char *dest, char *msg)
+void charybdis_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     Uid *ud, *ud2;
 
@@ -507,18 +507,18 @@ void charybdis_cmd_privmsg2(char *source, char *dest, char *msg)
              (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), msg);
 }
 
-void charybdis_cmd_serv_notice(char *source, char *dest, char *msg)
+void charybdis_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $$%s :%s", dest, msg);
 }
 
-void charybdis_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void charybdis_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
 }
 
 
-void charybdis_cmd_global(char *source, char *buf)
+void charybdis_cmd_global(const char *source, const char *buf)
 {
     Uid *u;
 
@@ -539,7 +539,7 @@ void charybdis_cmd_global(char *source, char *buf)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void charybdis_cmd_global_legacy(char *source, char *fmt)
+void charybdis_cmd_global_legacy(const char *source, const char *fmt)
 {
     Uid *u;
 
@@ -557,7 +557,7 @@ void charybdis_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
@@ -587,7 +587,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
    av[8] = info
 
 */
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     Server *s;
     User *user;
@@ -595,8 +595,7 @@ int anope_event_nick(char *source, int ac, char **av)
     if (UseTS6 && ac == 9) {
         s = findserver_uid(servlist, source);
         /* Source is always the server */
-        *source = '\0';
-        user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
+        user = do_nick("", av[0], av[4], av[5], s->name, av[8],
                        strtoul(av[2], NULL, 10), 0, 0, NULL, av[7]);
         if (user) {
             anope_set_umode(user, 1, &av[3]);
@@ -630,7 +629,7 @@ int anope_event_nick(char *source, int ac, char **av)
    av[10] = info
 
 */
-int anope_event_euid(char *source, int ac, char **av)
+int anope_event_euid(const char *source, int ac, const char **av)
 {
     Server *s;
     User *user;
@@ -639,9 +638,8 @@ int anope_event_euid(char *source, int ac, char **av)
     if (UseTS6 && ac == 11) {
         s = findserver_uid(servlist, source);
         /* Source is always the server */
-        *source = '\0';
 	ts = strtoul(av[2], NULL, 10);
-        user = do_nick(source, av[0], av[4], !strcmp(av[8], "*") ? av[5] : av[8], s->name, av[10],
+        user = do_nick("", av[0], av[4], !strcmp(av[8], "*") ? av[5] : av[8], s->name, av[10],
                        ts, !stricmp(av[0], av[9]) ? ts : 0, 0, av[5], av[7]);
         if (user) {
             anope_set_umode(user, 1, &av[3]);
@@ -650,7 +648,7 @@ int anope_event_euid(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -700,7 +698,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tburst(char *source, int ac, char **av)
+int anope_event_tburst(const char *source, int ac, const char **av)
 {
     char *setter;
     Channel *c;
@@ -754,7 +752,7 @@ int anope_event_tburst(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -818,7 +816,7 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void charybdis_cmd_sqline(char *mask, char *reason)
+void charybdis_cmd_sqline(const char *mask, const char *reason)
 {
     Uid *ud;
 
@@ -827,7 +825,7 @@ void charybdis_cmd_sqline(char *mask, char *reason)
              "RESV * %s :%s", mask, reason);
 }
 
-void charybdis_cmd_unsgline(char *mask)
+void charybdis_cmd_unsgline(const char *mask)
 {
     Uid *ud;
 
@@ -836,21 +834,21 @@ void charybdis_cmd_unsgline(char *mask)
              "UNXLINE * %s", mask);
 }
 
-void charybdis_cmd_unszline(char *mask)
+void charybdis_cmd_unszline(const char *mask)
 {
     /* not supported */
 }
 
-void charybdis_cmd_szline(char *mask, char *reason, char *whom)
+void charybdis_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* not supported */
 }
 
-void charybdis_cmd_svsadmin(char *server, int set)
+void charybdis_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void charybdis_cmd_sgline(char *mask, char *reason)
+void charybdis_cmd_sgline(const char *mask, const char *reason)
 {
     Uid *ud;
 
@@ -859,14 +857,14 @@ void charybdis_cmd_sgline(char *mask, char *reason)
              "XLINE * %s 0 :%s", mask, reason);
 }
 
-void Charybdis::cmd_remove_akill(const char *user, const char *host)
+void CharybdisProto::cmd_remove_akill(const char *user, const char *host)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
-void charybdis_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void charybdis_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     Uid *ud;
 
@@ -881,13 +879,13 @@ void charybdis_cmd_vhost_off(User * u)
              u->nick, u->host);
 }
 
-void charybdis_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void charybdis_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "ENCAP * CHGHOST %s :%s",
              nick, vhost);
 }
 
-void charybdis_cmd_unsqline(char *user)
+void charybdis_cmd_unsqline(const char *user)
 {
     Uid *ud;
 
@@ -896,7 +894,7 @@ void charybdis_cmd_unsqline(char *user)
              "UNRESV * %s", user);
 }
 
-void charybdis_cmd_join(char *user, char *channel, time_t chantime)
+void charybdis_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     Uid *ud;
 
@@ -914,8 +912,8 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void charybdis_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void charybdis_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     Uid *ud;
 
@@ -926,7 +924,7 @@ void charybdis_cmd_akill(char *user, char *host, char *who, time_t when,
              (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
-void charybdis_cmd_svskill(char *source, char *user, char *buf)
+void charybdis_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     Uid *ud, *ud2;
 
@@ -944,7 +942,7 @@ void charybdis_cmd_svskill(char *source, char *user, char *buf)
              (UseTS6 ? (ud2 ? ud2->uid : user) : user), buf);
 }
 
-void charybdis_cmd_svsmode(User * u, int ac, char **av)
+void charybdis_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "SVSMODE %s %s", u->nick,
              av[0]);
@@ -996,7 +994,7 @@ void charybdis_cmd_capab()
 }
 
 /* PASS */
-void charybdis_cmd_pass(char *pass)
+void charybdis_cmd_pass(const char *pass)
 {
     if (UseTS6) {
         send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
@@ -1006,7 +1004,7 @@ void charybdis_cmd_pass(char *pass)
 }
 
 /* SERVER name hop descript */
-void charybdis_cmd_server(char *servname, int hop, char *descript)
+void charybdis_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -1033,8 +1031,8 @@ void charybdis_cmd_connect(int servernum)
     charybdis_cmd_svinfo();
 }
 
-void charybdis_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void charybdis_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
@@ -1051,7 +1049,7 @@ void charybdis_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     charybdis_cmd_sqline(nick, "Reserved for services");
 }
 
-void charybdis_cmd_part(char *nick, char *chan, char *buf)
+void charybdis_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     Uid *ud;
 
@@ -1064,7 +1062,7 @@ void charybdis_cmd_part(char *nick, char *chan, char *buf)
     }
 }
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1072,7 +1070,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     User *u = NULL;
 
@@ -1085,7 +1083,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     User *u = NULL;
 
@@ -1100,7 +1098,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -1113,7 +1111,7 @@ void charybdis_cmd_eob()
     /* doesn't support EOB */
 }
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1) {
 	/* ignore cmodes in JOIN as per TS6 v8 */
@@ -1125,7 +1123,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1135,7 +1133,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     User *u;
     Uid *ud;
@@ -1151,7 +1149,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1165,7 +1163,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     Uid *ud;
 
@@ -1177,7 +1175,7 @@ int anope_event_whois(char *source, int ac, char **av)
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -1192,7 +1190,7 @@ int anope_event_server(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sid(char *source, int ac, char **av)
+int anope_event_sid(const char *source, int ac, const char **av)
 {
     Server *s;
 
@@ -1204,7 +1202,7 @@ int anope_event_sid(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1212,7 +1210,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1226,32 +1224,32 @@ int anope_event_quit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_372(char *source, char *msg)
+void charybdis_cmd_372(const char *source, const char *msg)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "372 %s :- %s", source, msg);
 }
 
-void charybdis_cmd_372_error(char *source)
+void charybdis_cmd_372_error(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void charybdis_cmd_375(char *source)
+void charybdis_cmd_375(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "375 %s :- %s Message of the Day", source, ServerName);
 }
 
-void charybdis_cmd_376(char *source)
+void charybdis_cmd_376(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "376 %s :End of /MOTD command.", source);
 }
 
 /* 391 */
-void charybdis_cmd_391(char *source, char *timestr)
+void charybdis_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -1260,7 +1258,7 @@ void charybdis_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void charybdis_cmd_250(char *buf)
+void charybdis_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -1270,7 +1268,7 @@ void charybdis_cmd_250(char *buf)
 }
 
 /* 307 */
-void charybdis_cmd_307(char *buf)
+void charybdis_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -1280,7 +1278,7 @@ void charybdis_cmd_307(char *buf)
 }
 
 /* 311 */
-void charybdis_cmd_311(char *buf)
+void charybdis_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -1290,7 +1288,7 @@ void charybdis_cmd_311(char *buf)
 }
 
 /* 312 */
-void charybdis_cmd_312(char *buf)
+void charybdis_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -1300,7 +1298,7 @@ void charybdis_cmd_312(char *buf)
 }
 
 /* 317 */
-void charybdis_cmd_317(char *buf)
+void charybdis_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -1310,7 +1308,7 @@ void charybdis_cmd_317(char *buf)
 }
 
 /* 219 */
-void charybdis_cmd_219(char *source, char *letter)
+void charybdis_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -1325,7 +1323,7 @@ void charybdis_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void charybdis_cmd_401(char *source, char *who)
+void charybdis_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1335,7 +1333,7 @@ void charybdis_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void charybdis_cmd_318(char *source, char *who)
+void charybdis_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1346,7 +1344,7 @@ void charybdis_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void charybdis_cmd_242(char *buf)
+void charybdis_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -1356,7 +1354,7 @@ void charybdis_cmd_242(char *buf)
 }
 
 /* 243 */
-void charybdis_cmd_243(char *buf)
+void charybdis_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -1366,7 +1364,7 @@ void charybdis_cmd_243(char *buf)
 }
 
 /* 211 */
-void charybdis_cmd_211(char *buf)
+void charybdis_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1375,7 +1373,7 @@ void charybdis_cmd_211(char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void charybdis_cmd_mode(char *source, char *dest, char *buf)
+void charybdis_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     Uid *ud;
     if (!buf) {
@@ -1391,7 +1389,7 @@ void charybdis_cmd_mode(char *source, char *dest, char *buf)
     }
 }
 
-void charybdis_cmd_tmode(char *source, char *dest, const char *fmt, ...)
+void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -1409,7 +1407,7 @@ void charybdis_cmd_tmode(char *source, char *dest, const char *fmt, ...)
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void charybdis_cmd_nick(char *nick, char *name, char *mode)
+void charybdis_cmd_nick(const char *nick, const char *name, const char *mode)
 {
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
@@ -1426,7 +1424,7 @@ void charybdis_cmd_nick(char *nick, char *name, char *mode)
     charybdis_cmd_sqline(nick, "Reserved for services");
 }
 
-void charybdis_cmd_kick(char *source, char *chan, char *user, char *buf)
+void charybdis_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     Uid *ud;
     User *u;
@@ -1444,7 +1442,7 @@ void charybdis_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void charybdis_cmd_notice_ops(char *source, char *dest, char *buf)
+void charybdis_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     Uid *ud;
     ud = find_uid(source);
@@ -1456,7 +1454,7 @@ void charybdis_cmd_notice_ops(char *source, char *dest, char *buf)
     send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "NOTICE @%s :%s", dest, buf);
 }
 
-void charybdis_cmd_bot_chan_mode(char *nick, char *chan)
+void charybdis_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     Uid *u;
 
@@ -1470,7 +1468,7 @@ void charybdis_cmd_bot_chan_mode(char *nick, char *chan)
 }
 
 /* QUIT */
-void charybdis_cmd_quit(char *source, char *buf)
+void charybdis_cmd_quit(const char *source, const char *buf)
 {
     Uid *ud;
     ud = find_uid(source);
@@ -1484,7 +1482,7 @@ void charybdis_cmd_quit(char *source, char *buf)
 }
 
 /* PONG */
-void charybdis_cmd_pong(char *servname, char *who)
+void charybdis_cmd_pong(const char *servname, const char *who)
 {
     if (UseTS6) {
         /* deliberately no SID in the first parameter -- jilles */
@@ -1495,7 +1493,7 @@ void charybdis_cmd_pong(char *servname, char *who)
 }
 
 /* INVITE */
-void charybdis_cmd_invite(char *source, char *chan, char *nick)
+void charybdis_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     Uid *ud;
     User *u;
@@ -1512,7 +1510,7 @@ void charybdis_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* SQUIT */
-void charybdis_cmd_squit(char *servname, char *message)
+void charybdis_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1521,7 +1519,7 @@ void charybdis_cmd_squit(char *servname, char *message)
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     User *u, *u2;
 
@@ -1544,7 +1542,7 @@ int anope_event_mode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tmode(char *source, int ac, char **av)
+int anope_event_tmode(const char *source, int ac, const char **av)
 {
     if (ac > 2 && (*av[1] == '#' || *av[1] == '&')) {
         do_cmode(source, ac, av);
@@ -1552,7 +1550,7 @@ int anope_event_tmode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_351(char *source)
+void charybdis_cmd_351(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "351 %s Anope-%s %s :%s - %s (%s) -- %s", source, version_number,
@@ -1560,23 +1558,23 @@ void charybdis_cmd_351(char *source)
 }
 
 /* Event: PROTOCTL */
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     int argvsize = 8;
     int argc;
-    char **argv;
+    const char **argv;
     char *str;
 
     if (ac < 1)
         return MOD_CONT;
 
     /* We get the params as one arg, we should split it for capab_parse */
-    argv = scalloc(argvsize, sizeof(char *));
+    argv = (const char **)scalloc(argvsize, sizeof(const char *));
     argc = 0;
     while ((str = myStrGetToken(av[0], ' ', argc))) {
         if (argc == argvsize) {
             argvsize += 8;
-            argv = srealloc(argv, argvsize * sizeof(char *));
+            argv = (const char **)srealloc(argv, argvsize * sizeof(const char *));
         }
         argv[argc] = str;
         argc++;
@@ -1586,27 +1584,27 @@ int anope_event_capab(char *source, int ac, char **av)
 
     /* Free our built ac/av */
     for (argvsize = 0; argvsize < argc; argvsize++) {
-        free(argv[argvsize]);
+        free((char *)argv[argvsize]);
     }
-    free(argv);
+    free((char **)argv);
 
     return MOD_CONT;
 }
 
 /* SVSHOLD - set */
-void charybdis_cmd_svshold(char *nick)
+void charybdis_cmd_svshold(const char *nick)
 {
     send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
 }
 
 /* SVSHOLD - release */
-void charybdis_cmd_release_svshold(char *nick)
+void charybdis_cmd_release_svshold(const char *nick)
 {
     send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
 }
 
 /* SVSNICK */
-void charybdis_cmd_svsnick(char *nick, char *newnick, time_t when)
+void charybdis_cmd_svsnick(const char *nick, const char *newnick, time_t when)
 {
     User *u;
 
@@ -1621,32 +1619,32 @@ void charybdis_cmd_svsnick(char *nick, char *newnick, time_t when)
              u->nick, newnick, (long int)when, (long int)u->timestamp);
 }
 
-void charybdis_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void charybdis_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     /* not supported  */
 }
 
-void charybdis_cmd_svso(char *source, char *nick, char *flag)
+void charybdis_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
 
-void charybdis_cmd_unban(char *name, char *nick)
+void charybdis_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE channel modes */
 
-void charybdis_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void charybdis_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void charybdis_cmd_svid_umode(char *nick, time_t ts)
+void charybdis_cmd_svid_umode(const char *nick, time_t ts)
 {
     /* not supported */
 }
@@ -1659,18 +1657,18 @@ void charybdis_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +d */
-void charybdis_cmd_svid_umode2(User * u, char *ts)
+void charybdis_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not supported */
 }
 
-void charybdis_cmd_svid_umode3(User * u, char *ts)
+void charybdis_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
 /* NICK <newnick>  */
-void charybdis_cmd_chg_nick(char *oldnick, char *newnick)
+void charybdis_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1687,13 +1685,13 @@ void charybdis_cmd_chg_nick(char *oldnick, char *newnick)
  *      parv[3] = server is standalone or connected to non-TS only
  *      parv[4] = server's idea of UTC time
  */
-int anope_event_svinfo(char *source, int ac, char **av)
+int anope_event_svinfo(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     if (UseTS6) {
         TS6UPLINK = sstrdup(av[3]);
@@ -1701,37 +1699,37 @@ int anope_event_pass(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void charybdis_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void charybdis_cmd_svspart(char *source, char *nick, char *chan)
+void charybdis_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
 
-void charybdis_cmd_swhois(char *source, char *who, char *mask)
+void charybdis_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_invite(char *source, int ac, char **av)
+int anope_event_invite(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_bmask(char *source, int ac, char **av)
+int anope_event_bmask(const char *source, int ac, const char **av)
 {
     Channel *c;
     char *bans;
@@ -1764,7 +1762,7 @@ int anope_event_bmask(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int charybdis_flood_mode_check(char *value)
+int charybdis_flood_mode_check(const char *value)
 {
     char *dp, *end;
 
@@ -1780,7 +1778,7 @@ int charybdis_flood_mode_check(char *value)
     return 0;
 }
 
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -1790,7 +1788,7 @@ int anope_event_error(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_jupe(char *jserver, char *who, char *reason)
+void charybdis_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1807,7 +1805,7 @@ void charybdis_cmd_jupe(char *jserver, char *who, char *reason)
   1 = valid nick
   0 = nick is in valid
 */
-int charybdis_valid_nick(char *nick)
+int charybdis_valid_nick(const char *nick)
 {
     /* TS6 Save extension -Certus */
     if (isdigit(*nick))
@@ -1819,14 +1817,14 @@ int charybdis_valid_nick(char *nick)
   1 = valid chan
   0 = chan is invalid
 */
-int charybdis_valid_chan(char *chan)
+int charybdis_valid_chan(const char *chan)
 {
     /* no hard coded invalid chan */
     return 1;
 }
 
 
-void charybdis_cmd_ctcp(char *source, char *dest, char *buf)
+void charybdis_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -492,9 +492,9 @@ Uid *find_nickuid(const char *uid)
 
 /* Handle a server NICK command. */
 
-User *do_nick(const char *source, char *nick, char *username, char *host,
-              char *server, char *realname, time_t ts, uint32 svid,
-              uint32 ip, char *vhost, char *uid)
+User *do_nick(const char *source, const char *nick, const char *username, const char *host,
+              const char *server, const char *realname, time_t ts, uint32 svid,
+              uint32 ip, const char *vhost, const char *uid)
 {
     User *user = NULL;
 
@@ -831,7 +831,7 @@ void do_umode2(const char *source, int ac, const char **av)
  *	av[0] = reason
  */
 
-void do_quit(const char *source, int ac, char **av)
+void do_quit(const char *source, int ac, const char **av)
 {
     User *user;
     NickAlias *na;

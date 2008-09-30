@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -19,31 +19,31 @@
 
 /* SESSION LIMITING
  *
- * The basic idea of session limiting is to prevent one host from having more 
- * than a specified number of sessions (client connections/clones) on the 
- * network at any one time. To do this we have a list of sessions and 
+ * The basic idea of session limiting is to prevent one host from having more
+ * than a specified number of sessions (client connections/clones) on the
+ * network at any one time. To do this we have a list of sessions and
  * exceptions. Each session structure records information about a single host,
- * including how many clients (sessions) that host has on the network. When a 
- * host reaches it's session limit, no more clients from that host will be 
+ * including how many clients (sessions) that host has on the network. When a
+ * host reaches it's session limit, no more clients from that host will be
  * allowed to connect.
  *
- * When a client connects to the network, we check to see if their host has 
- * reached the default session limit per host, and thus whether it is allowed 
- * any more. If it has reached the limit, we kill the connecting client; all 
- * the other clients are left alone. Otherwise we simply increment the counter 
- * within the session structure. When a client disconnects, we decrement the 
+ * When a client connects to the network, we check to see if their host has
+ * reached the default session limit per host, and thus whether it is allowed
+ * any more. If it has reached the limit, we kill the connecting client; all
+ * the other clients are left alone. Otherwise we simply increment the counter
+ * within the session structure. When a client disconnects, we decrement the
  * counter. When the counter reaches 0, we free the session.
  *
- * Exceptions allow one to specify custom session limits for a specific host 
- * or a range thereof. The first exception that the host matches is the one 
+ * Exceptions allow one to specify custom session limits for a specific host
+ * or a range thereof. The first exception that the host matches is the one
  * used.
  *
- * "Session Limiting" is likely to slow down services when there are frequent 
- * client connects and disconnects. The size of the exception list can also 
- * play a large role in this performance decrease. It is therefore recommened 
- * that you keep the number of exceptions to a minimum. A very simple hashing 
- * method is currently used to store the list of sessions. I'm sure there is 
- * room for improvement and optimisation of this, along with the storage of 
+ * "Session Limiting" is likely to slow down services when there are frequent
+ * client connects and disconnects. The size of the exception list can also
+ * play a large role in this performance decrease. It is therefore recommened
+ * that you keep the number of exceptions to a minimum. A very simple hashing
+ * method is currently used to store the list of sessions. I'm sure there is
+ * room for improvement and optimisation of this, along with the storage of
  * exceptions. Comments and suggestions are more than welcome!
  *
  * -TheShadow (02 April 1999)
@@ -104,7 +104,7 @@ void get_exception_stats(long *nrec, long *memuse)
 
 /* Syntax: SESSION LIST threshold
  *	Lists all sessions with atleast threshold clients.
- *	The threshold value must be greater than 1. This is to prevent 
+ *	The threshold value must be greater than 1. This is to prevent
  * 	accidental listing of the large number of single client sessions.
  *
  * Syntax: SESSION VIEW host
@@ -203,7 +203,7 @@ Session *findsession(const char *host)
  * Returns 1 if the host was added or 0 if the user was killed.
  */
 
-int add_session(char *nick, char *host, char *hostip)
+int add_session(const char *nick, const char *host, char *hostip)
 {
     Session *session, **list;
     Exception *exception;
@@ -774,8 +774,8 @@ int do_exception(User * u)
                 notice_lang(s_OperServ, u, OPER_EXCEPTION_NOT_FOUND, mask);
         }
 
-        /* Renumber the exception list. I don't believe in having holes in 
-         * lists - it makes code more complex, harder to debug and we end up 
+        /* Renumber the exception list. I don't believe in having holes in
+         * lists - it makes code more complex, harder to debug and we end up
          * with huge index numbers. Imho, fixed numbering is only beneficial
          * when one doesn't have range capable manipulation. -TheShadow */
 

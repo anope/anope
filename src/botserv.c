@@ -7,7 +7,7 @@
  *
  * Based on the original code of Epona by Lara.
  * Based on the original code of Services by Andy Church.
- * 
+ *
  * $Id$
  *
  */
@@ -613,7 +613,7 @@ BotInfo *makebot(char *nick)
 
 /*************************************************************************/
 
-BotInfo *findbot(char *nick)
+BotInfo *findbot(const char *nick)
 {
     BotInfo *bi;
     Uid *ud;
@@ -762,7 +762,7 @@ void bot_join(ChannelInfo * ci)
         /* We check for bans */
         if (ci->c->bans && ci->c->bans->count) {
             char buf[BUFSIZE];
-            char *av[4];
+            const char *av[4];
             Entry *ban, *next;
             int ac;
 
@@ -770,11 +770,11 @@ void bot_join(ChannelInfo * ci)
                 snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
                 av[0] = ci->c->name;
                 av[1] = buf;
-                av[2] = sstrdup("-b");
+                av[2] = "-b";
                 ac = 4;
             } else {
                 av[0] = ci->c->name;
-                av[1] = sstrdup("-b");
+                av[1] = "-b";
                 ac = 3;
             }
 
@@ -792,11 +792,6 @@ void bot_join(ChannelInfo * ci)
                     do_cmode(whosends(ci), ac, av);
                 }
             }
-
-            if (ircdcap->tsmode)
-                free(av[2]);
-            else
-                free(av[1]);
         }
 
         /* Should we be invited? */
@@ -842,7 +837,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
 
     bd->ttb[ttbtype]++;
     if (bd->ttb[ttbtype] == ci->ttb[ttbtype]) {
-        char *av[4];
+        const char *av[4];
         int ac;
         char mask[BUFSIZE];
         char buf[BUFSIZE];
@@ -855,12 +850,12 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
             snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
             av[0] = ci->name;
             av[1] = buf;
-            av[2] = sstrdup("+b");
+            av[2] = "+b";
             av[3] = mask;
             ac = 4;
         } else {
             av[0] = ci->name;
-            av[1] = sstrdup("+b");
+            av[1] = "+b";
             av[2] = mask;
             ac = 3;
         }
@@ -868,10 +863,6 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
         anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
         do_cmode(ci->bi->nick, ac, av);
         send_event(EVENT_BOT_BAN, 3, u->nick, ci->name, mask);
-        if (ircdcap->tsmode)
-            free(av[2]);
-        else
-            free(av[1]);
     }
 }
 
@@ -912,7 +903,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
                  char *reason)
 {
     int ac;
-    char *av[4];
+    const char *av[4];
 	const char *kav[4]; // seperate as not everything is constified XXX -- w00t
     char mask[BUFSIZE];
     char buf[BUFSIZE];
@@ -947,24 +938,18 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
         av[0] = ci->name;
         av[1] = buf;
-        av[2] = sstrdup("+b");
+        av[2] = "+b";
         av[3] = mask;
         ac = 4;
     } else {
         av[0] = ci->name;
-        av[1] = sstrdup("+b");
+        av[1] = "+b";
         av[2] = mask;
         ac = 3;
     }
 
     anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
     do_cmode(ci->bi->nick, ac, av);
-
-    /* We need to free our sstrdup'd "+b" -GD */
-    if (ircdcap->tsmode)
-        free(av[2]);
-    else
-        free(av[1]);
 
     kav[0] = ci->name;
     kav[1] = nick;
@@ -1044,7 +1029,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
                   char *nick)
 {
-    char *av[4];
+    const char *av[4];
     int ac;
     char buf[BUFSIZE];
     User *u;
@@ -1094,7 +1079,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
  * @param A string to be parsed for control and color codes
  * @return A string stripped of control and color codes
  */
-char *normalizeBuffer(char *buf)
+char *normalizeBuffer(const char *buf)
 {
     char *newbuf;
     int i, len, j = 0;

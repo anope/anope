@@ -144,10 +144,10 @@ IRCDCAPAB myIrcdcap[] = {
      0, 0, 0}
 };
 
-void ratbox_set_umode(User * user, int ac, char **av)
+void ratbox_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -440,7 +440,7 @@ CUMode myCumodes[128] = {
 
 
 
-void ratbox_cmd_notice(char *source, char *dest, char *buf)
+void ratbox_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     Uid *ud;
     User *u;
@@ -460,7 +460,7 @@ void ratbox_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void ratbox_cmd_notice2(char *source, char *dest, char *msg)
+void ratbox_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     Uid *ud;
     User *u;
@@ -471,7 +471,7 @@ void ratbox_cmd_notice2(char *source, char *dest, char *msg)
              (UseTS6 ? (u ? u->uid : dest) : dest), msg);
 }
 
-void ratbox_cmd_privmsg(char *source, char *dest, char *buf)
+void ratbox_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     Uid *ud, *ud2;
 
@@ -485,7 +485,7 @@ void ratbox_cmd_privmsg(char *source, char *dest, char *buf)
              (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), buf);
 }
 
-void ratbox_cmd_privmsg2(char *source, char *dest, char *msg)
+void ratbox_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     Uid *ud, *ud2;
 
@@ -496,18 +496,18 @@ void ratbox_cmd_privmsg2(char *source, char *dest, char *msg)
              (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), msg);
 }
 
-void ratbox_cmd_serv_notice(char *source, char *dest, char *msg)
+void ratbox_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $$%s :%s", dest, msg);
 }
 
-void ratbox_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void ratbox_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
 }
 
 
-void ratbox_cmd_global(char *source, char *buf)
+void ratbox_cmd_global(const char *source, const char *buf)
 {
     Uid *u;
 
@@ -528,7 +528,7 @@ void ratbox_cmd_global(char *source, char *buf)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void ratbox_cmd_global_legacy(char *source, char *fmt)
+void ratbox_cmd_global_legacy(const char *source, const char *fmt)
 {
     Uid *u;
 
@@ -546,7 +546,7 @@ void ratbox_cmd_global_legacy(char *source, char *fmt)
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
@@ -576,7 +576,7 @@ int anope_event_sjoin(char *source, int ac, char **av)
    av[8] = info
 
 */
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     Server *s;
     User *user;
@@ -584,8 +584,7 @@ int anope_event_nick(char *source, int ac, char **av)
     if (UseTS6 && ac == 9) {
         s = findserver_uid(servlist, source);
         /* Source is always the server */
-        *source = '\0';
-        user = do_nick(source, av[0], av[4], av[5], s->name, av[8],
+        user = do_nick("", av[0], av[4], av[5], s->name, av[8],
                        strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
         if (user) {
             anope_set_umode(user, 1, &av[3]);
@@ -604,7 +603,7 @@ int anope_event_nick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -654,7 +653,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tburst(char *source, int ac, char **av)
+int anope_event_tburst(const char *source, int ac, const char **av)
 {
     char *setter;
     Channel *c;
@@ -701,7 +700,7 @@ int anope_event_tburst(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -765,7 +764,7 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void ratbox_cmd_sqline(char *mask, char *reason)
+void ratbox_cmd_sqline(const char *mask, const char *reason)
 {
     Uid *ud;
 
@@ -774,7 +773,7 @@ void ratbox_cmd_sqline(char *mask, char *reason)
              "RESV * %s :%s", mask, reason);
 }
 
-void ratbox_cmd_unsgline(char *mask)
+void ratbox_cmd_unsgline(const char *mask)
 {
     Uid *ud;
 
@@ -783,21 +782,21 @@ void ratbox_cmd_unsgline(char *mask)
              "UNXLINE * %s", mask);
 }
 
-void ratbox_cmd_unszline(char *mask)
+void ratbox_cmd_unszline(const char *mask)
 {
     /* Does not support */
 }
 
-void ratbox_cmd_szline(char *mask, char *reason, char *whom)
+void ratbox_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* Does not support */
 }
 
-void ratbox_cmd_svsadmin(char *server, int set)
+void ratbox_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void ratbox_cmd_sgline(char *mask, char *reason)
+void ratbox_cmd_sgline(const char *mask, const char *reason)
 {
     Uid *ud;
 
@@ -812,8 +811,8 @@ void RatboxProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
-void ratbox_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void ratbox_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     Uid *ud;
 
@@ -827,12 +826,12 @@ void ratbox_cmd_vhost_off(User * u)
     /* not supported  */
 }
 
-void ratbox_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void ratbox_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     /* not supported  */
 }
 
-void ratbox_cmd_unsqline(char *user)
+void ratbox_cmd_unsqline(const char *user)
 {
     Uid *ud;
 
@@ -841,7 +840,7 @@ void ratbox_cmd_unsqline(char *user)
              "UNRESV * %s", user);
 }
 
-void ratbox_cmd_join(char *user, char *channel, time_t chantime)
+void ratbox_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     Uid *ud;
 
@@ -859,8 +858,8 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void ratbox_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void ratbox_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     Uid *ud;
 
@@ -871,7 +870,7 @@ void ratbox_cmd_akill(char *user, char *host, char *who, time_t when,
              (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
-void ratbox_cmd_svskill(char *source, char *user, char *buf)
+void ratbox_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     Uid *ud, *ud2;
 
@@ -889,7 +888,7 @@ void ratbox_cmd_svskill(char *source, char *user, char *buf)
              (UseTS6 ? (ud2 ? ud2->uid : user) : user), buf);
 }
 
-void ratbox_cmd_svsmode(User * u, int ac, char **av)
+void ratbox_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "SVSMODE %s %s", u->nick,
              av[0]);
@@ -939,7 +938,7 @@ void ratbox_cmd_capab()
 }
 
 /* PASS */
-void ratbox_cmd_pass(char *pass)
+void ratbox_cmd_pass(const char *pass)
 {
     if (UseTS6) {
         send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
@@ -949,7 +948,7 @@ void ratbox_cmd_pass(char *pass)
 }
 
 /* SERVER name hop descript */
-void ratbox_cmd_server(char *servname, int hop, char *descript)
+void ratbox_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -976,8 +975,8 @@ void ratbox_cmd_connect(int servernum)
     ratbox_cmd_svinfo();
 }
 
-void ratbox_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void ratbox_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
@@ -994,7 +993,7 @@ void ratbox_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
-void ratbox_cmd_part(char *nick, char *chan, char *buf)
+void ratbox_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     Uid *ud;
 
@@ -1007,7 +1006,7 @@ void ratbox_cmd_part(char *nick, char *chan, char *buf)
     }
 }
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1015,7 +1014,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     User *u = NULL;
 
@@ -1028,7 +1027,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1037,7 +1036,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -1050,7 +1049,7 @@ void ratbox_cmd_eob()
     /* doesn't support EOB */
 }
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1) {
         do_sjoin(source, ac, av);
@@ -1061,7 +1060,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1071,7 +1070,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     User *u;
     Uid *ud;
@@ -1087,7 +1086,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1101,7 +1100,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     Uid *ud;
 
@@ -1113,7 +1112,7 @@ int anope_event_whois(char *source, int ac, char **av)
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -1128,7 +1127,7 @@ int anope_event_server(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sid(char *source, int ac, char **av)
+int anope_event_sid(const char *source, int ac, const char **av)
 {
     Server *s;
 
@@ -1140,7 +1139,7 @@ int anope_event_sid(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1148,7 +1147,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1162,32 +1161,32 @@ int anope_event_quit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_372(char *source, char *msg)
+void ratbox_cmd_372(const char *source, const char *msg)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName), "372 %s :- %s", source, msg);
 }
 
-void ratbox_cmd_372_error(char *source)
+void ratbox_cmd_372_error(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void ratbox_cmd_375(char *source)
+void ratbox_cmd_375(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "375 %s :- %s Message of the Day", source, ServerName);
 }
 
-void ratbox_cmd_376(char *source)
+void ratbox_cmd_376(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "376 %s :End of /MOTD command.", source);
 }
 
 /* 391 */
-void ratbox_cmd_391(char *source, char *timestr)
+void ratbox_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -1196,7 +1195,7 @@ void ratbox_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void ratbox_cmd_250(char *buf)
+void ratbox_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -1206,7 +1205,7 @@ void ratbox_cmd_250(char *buf)
 }
 
 /* 307 */
-void ratbox_cmd_307(char *buf)
+void ratbox_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -1216,7 +1215,7 @@ void ratbox_cmd_307(char *buf)
 }
 
 /* 311 */
-void ratbox_cmd_311(char *buf)
+void ratbox_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -1226,7 +1225,7 @@ void ratbox_cmd_311(char *buf)
 }
 
 /* 312 */
-void ratbox_cmd_312(char *buf)
+void ratbox_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -1236,7 +1235,7 @@ void ratbox_cmd_312(char *buf)
 }
 
 /* 317 */
-void ratbox_cmd_317(char *buf)
+void ratbox_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -1246,7 +1245,7 @@ void ratbox_cmd_317(char *buf)
 }
 
 /* 219 */
-void ratbox_cmd_219(char *source, char *letter)
+void ratbox_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -1261,7 +1260,7 @@ void ratbox_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void ratbox_cmd_401(char *source, char *who)
+void ratbox_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1271,7 +1270,7 @@ void ratbox_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void ratbox_cmd_318(char *source, char *who)
+void ratbox_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1282,7 +1281,7 @@ void ratbox_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void ratbox_cmd_242(char *buf)
+void ratbox_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -1292,7 +1291,7 @@ void ratbox_cmd_242(char *buf)
 }
 
 /* 243 */
-void ratbox_cmd_243(char *buf)
+void ratbox_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -1302,7 +1301,7 @@ void ratbox_cmd_243(char *buf)
 }
 
 /* 211 */
-void ratbox_cmd_211(char *buf)
+void ratbox_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1311,7 +1310,7 @@ void ratbox_cmd_211(char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void ratbox_cmd_mode(char *source, char *dest, char *buf)
+void ratbox_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     Uid *ud;
     if (!buf) {
@@ -1327,7 +1326,7 @@ void ratbox_cmd_mode(char *source, char *dest, char *buf)
     }
 }
 
-void ratbox_cmd_tmode(char *source, char *dest, const char *fmt, ...)
+void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];
@@ -1345,7 +1344,7 @@ void ratbox_cmd_tmode(char *source, char *dest, const char *fmt, ...)
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void ratbox_cmd_nick(char *nick, char *name, char *mode)
+void ratbox_cmd_nick(const char *nick, const char *name, const char *mode)
 {
     EnforceQlinedNick(nick, NULL);
     if (UseTS6) {
@@ -1362,7 +1361,7 @@ void ratbox_cmd_nick(char *nick, char *name, char *mode)
 	ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
-void ratbox_cmd_kick(char *source, char *chan, char *user, char *buf)
+void ratbox_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     Uid *ud;
     User *u;
@@ -1380,7 +1379,7 @@ void ratbox_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void ratbox_cmd_notice_ops(char *source, char *dest, char *buf)
+void ratbox_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1389,7 +1388,7 @@ void ratbox_cmd_notice_ops(char *source, char *dest, char *buf)
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void ratbox_cmd_bot_chan_mode(char *nick, char *chan)
+void ratbox_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     Uid *u;
 
@@ -1403,7 +1402,7 @@ void ratbox_cmd_bot_chan_mode(char *nick, char *chan)
 }
 
 /* QUIT */
-void ratbox_cmd_quit(char *source, char *buf)
+void ratbox_cmd_quit(const char *source, const char *buf)
 {
     Uid *ud;
     ud = find_uid(source);
@@ -1417,7 +1416,7 @@ void ratbox_cmd_quit(char *source, char *buf)
 }
 
 /* PONG */
-void ratbox_cmd_pong(char *servname, char *who)
+void ratbox_cmd_pong(const char *servname, const char *who)
 {
     if (UseTS6) {
         send_cmd(TS6SID, "PONG %s", who);
@@ -1427,7 +1426,7 @@ void ratbox_cmd_pong(char *servname, char *who)
 }
 
 /* INVITE */
-void ratbox_cmd_invite(char *source, char *chan, char *nick)
+void ratbox_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     Uid *ud;
     User *u;
@@ -1444,7 +1443,7 @@ void ratbox_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* SQUIT */
-void ratbox_cmd_squit(char *servname, char *message)
+void ratbox_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1453,7 +1452,7 @@ void ratbox_cmd_squit(char *servname, char *message)
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     User *u, *u2;
 
@@ -1476,7 +1475,7 @@ int anope_event_mode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tmode(char *source, int ac, char **av)
+int anope_event_tmode(const char *source, int ac, const char **av)
 {
     if (*av[1] == '#' || *av[1] == '&') {
         do_cmode(source, ac, av);
@@ -1484,7 +1483,7 @@ int anope_event_tmode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_351(char *source)
+void ratbox_cmd_351(const char *source)
 {
     send_cmd((UseTS6 ? TS6SID : ServerName),
              "351 %s Anope-%s %s :%s - %s (%s) -- %s", source, version_number,
@@ -1493,23 +1492,23 @@ void ratbox_cmd_351(char *source)
 }
 
 /* Event: PROTOCTL */
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     int argvsize = 8;
     int argc;
-    char **argv;
+    const char **argv;
     char *str;
 
     if (ac < 1)
         return MOD_CONT;
 
     /* We get the params as one arg, we should split it for capab_parse */
-    argv = scalloc(argvsize, sizeof(char *));
+    argv = (const char **)scalloc(argvsize, sizeof(const char *));
     argc = 0;
     while ((str = myStrGetToken(av[0], ' ', argc))) {
         if (argc == argvsize) {
             argvsize += 8;
-            argv = srealloc(argv, argvsize * sizeof(char *));
+            argv = (const char **)srealloc(argv, argvsize * sizeof(const char *));
         }
         argv[argc] = str;
         argc++;
@@ -1519,57 +1518,57 @@ int anope_event_capab(char *source, int ac, char **av)
 
     /* Free our built ac/av */
     for (argvsize = 0; argvsize < argc; argvsize++) {
-        free(argv[argvsize]);
+        free((char *)argv[argvsize]);
     }
-    free(argv);
+    free((char **)argv);
 
     return MOD_CONT;
 }
 
 /* SVSHOLD - set */
-void ratbox_cmd_svshold(char *nick)
+void ratbox_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void ratbox_cmd_release_svshold(char *nick)
+void ratbox_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSNICK */
-void ratbox_cmd_svsnick(char *nick, char *newnick, time_t when)
+void ratbox_cmd_svsnick(const char *nick, const char *newnick, time_t when)
 {
     /* not supported */
 }
 
-void ratbox_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void ratbox_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     /* not supported  */
 }
 
-void ratbox_cmd_svso(char *source, char *nick, char *flag)
+void ratbox_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
 
-void ratbox_cmd_unban(char *name, char *nick)
+void ratbox_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE channel modes */
 
-void ratbox_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void ratbox_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void ratbox_cmd_svid_umode(char *nick, time_t ts)
+void ratbox_cmd_svid_umode(const char *nick, time_t ts)
 {
     /* not supported */
 }
@@ -1582,18 +1581,18 @@ void ratbox_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +d */
-void ratbox_cmd_svid_umode2(User * u, char *ts)
+void ratbox_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not supported */
 }
 
-void ratbox_cmd_svid_umode3(User * u, char *ts)
+void ratbox_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
 /* NICK <newnick>  */
-void ratbox_cmd_chg_nick(char *oldnick, char *newnick)
+void ratbox_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1610,13 +1609,13 @@ void ratbox_cmd_chg_nick(char *oldnick, char *newnick)
  *      parv[3] = server is standalone or connected to non-TS only
  *      parv[4] = server's idea of UTC time
  */
-int anope_event_svinfo(char *source, int ac, char **av)
+int anope_event_svinfo(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     if (UseTS6) {
         TS6UPLINK = sstrdup(av[3]);
@@ -1624,37 +1623,37 @@ int anope_event_pass(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void ratbox_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void ratbox_cmd_svspart(char *source, char *nick, char *chan)
+void ratbox_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
 
-void ratbox_cmd_swhois(char *source, char *who, char *mask)
+void ratbox_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_invite(char *source, int ac, char **av)
+int anope_event_invite(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_bmask(char *source, int ac, char **av)
+int anope_event_bmask(const char *source, int ac, const char **av)
 {
     Channel *c;
     char *bans;
@@ -1687,12 +1686,12 @@ int anope_event_bmask(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int ratbox_flood_mode_check(char *value)
+int ratbox_flood_mode_check(const char *value)
 {
     return 0;
 }
 
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -1702,7 +1701,7 @@ int anope_event_error(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_jupe(char *jserver, char *who, char *reason)
+void ratbox_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1719,7 +1718,7 @@ void ratbox_cmd_jupe(char *jserver, char *who, char *reason)
   1 = valid nick
   0 = nick is in valid
 */
-int ratbox_valid_nick(char *nick)
+int ratbox_valid_nick(const char *nick)
 {
     /* TS6 Save extension -Certus */
     if (isdigit(*nick))
@@ -1731,14 +1730,14 @@ int ratbox_valid_nick(char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int ratbox_valid_chan(char *chan)
+int ratbox_valid_chan(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
 }
 
 
-void ratbox_cmd_ctcp(char *source, char *dest, char *buf)
+void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -83,92 +83,82 @@ int do_clear(User * u)
     } else if (!u || !check_access(u, ci, CA_CLEAR)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else if (stricmp(what, "bans") == 0) {
-        char *av[2];
+        const char *av[2];
         Entry *ban, *next;
 
         if (c->bans && c->bans->count) {
             for (ban = c->bans->entries; ban; ban = next) {
                 next = ban->next;
-                av[0] = sstrdup("-b");
-                av[1] = sstrdup(ban->mask);
+                av[0] = "-b";
+                av[1] = ban->mask;
                 anope_cmd_mode(whosends(ci), chan, "-b %s", ban->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
-                free(av[0]);
-                free(av[1]);
             }
         }
 
         notice_lang(s_ChanServ, u, CHAN_CLEARED_BANS, chan);
     } else if (ircd->except && stricmp(what, "excepts") == 0) {
-        char *av[2];
+        const char *av[2];
         Entry *except, *next;
 
         if (c->excepts && c->excepts->count) {
             for (except = c->excepts->entries; except; except = next) {
                 next = except->next;
-                av[0] = sstrdup("-e");
-                av[1] = sstrdup(except->mask);
+                av[0] = "-e";
+                av[1] = except->mask;
                 anope_cmd_mode(whosends(ci), chan, "-e %s", except->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
-                free(av[0]);
-                free(av[1]);
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
 
     } else if (ircd->invitemode && stricmp(what, "invites") == 0) {
-        char *av[2];
+        const char *av[2];
         Entry *invite, *next;
 
         if (c->invites && c->invites->count) {
             for (invite = c->invites->entries; invite; invite = next) {
                 next = invite->next;
-                av[0] = sstrdup("-I");
-                av[1] = sstrdup(invite->mask);
+                av[0] = "-I";
+                av[1] = invite->mask;
                 anope_cmd_mode(whosends(ci), chan, "-I %s", invite->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
-                free(av[0]);
-                free(av[1]);
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
 
     } else if (stricmp(what, "modes") == 0) {
-        char *argv[2];
+        const char *argv[2];
 
         if (c->mode) {
             /* Clear modes the bulk of the modes */
             anope_cmd_mode(whosends(ci), c->name, "%s",
                            ircd->modestoremove);
-            argv[0] = sstrdup(ircd->modestoremove);
+            argv[0] = ircd->modestoremove;
             chan_set_modes(whosends(ci), c, 1, argv, 0);
-            free(argv[0]);
 
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
                to send them - TSL */
             if (c->key) {
                 anope_cmd_mode(whosends(ci), c->name, "-k %s", c->key);
-                argv[0] = sstrdup("-k");
+                argv[0] = "-k";
                 argv[1] = c->key;
                 chan_set_modes(whosends(ci), c, 2, argv, 0);
-                free(argv[0]);
             }
             if (ircd->Lmode && c->redirect) {
                 anope_cmd_mode(whosends(ci), c->name, "-L %s",
                                c->redirect);
-                argv[0] = sstrdup("-L");
+                argv[0] = "-L";
                 argv[1] = c->redirect;
                 chan_set_modes(whosends(ci), c, 2, argv, 0);
-                free(argv[0]);
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
                     anope_cmd_mode(whosends(ci), c->name, "%s %s",
                                    flood_mode_char_remove, c->flood);
-                    argv[0] = sstrdup(flood_mode_char_remove);
+                    argv[0] = flood_mode_char_remove;
                     argv[1] = c->flood;
                     chan_set_modes(whosends(ci), c, 2, argv, 0);
-                    free(argv[0]);
                 } else {
                     if (debug) {
                         alog("debug: flood_mode_char_remove was not set unable to remove flood/throttle modes");
@@ -180,7 +170,7 @@ int do_clear(User * u)
 
         notice_lang(s_ChanServ, u, CHAN_CLEARED_MODES, chan);
     } else if (stricmp(what, "ops") == 0) {
-        char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
+        const char *av[6];  /* The max we have to hold: chan, ts, modes(max3), nick, nick, nick */
         int ac, isop, isadmin, isown, count, i;
         char buf[BUFSIZE], tmp[BUFSIZE], tmp2[BUFSIZE];
         struct c_userlist *cu, *next;
@@ -237,10 +227,10 @@ int do_clear(User * u)
                 if (!isop && !isadmin && !isown)
                     continue;
 
-                snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ? 
+                snprintf(tmp, BUFSIZE, "-%s%s%s", (isop ? "o" : ""), (isadmin ?
                         ircd->adminunset+1 : ""), (isown ? ircd->ownerunset+1 : ""));
                 /* We need to send the IRCd a nick for every mode.. - Viper */
-                snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""), 
+                snprintf(tmp2, BUFSIZE, "%s %s %s", (isop ? cu->user->nick : ""),
                         (isadmin ? cu->user->nick : ""), (isown ? cu->user->nick : ""));
 
                 if (ircdcap->tsmode) {
@@ -268,7 +258,7 @@ int do_clear(User * u)
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_OPS, chan);
     } else if (ircd->halfop && stricmp(what, "hops") == 0) {
-        char *av[4];
+        const char *av[4];
         int ac;
         char buf[BUFSIZE];
         struct c_userlist *cu, *next;
@@ -280,15 +270,15 @@ int do_clear(User * u)
 
             if (ircdcap->tsmode) {
                 snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                av[0] = sstrdup(chan);
+                av[0] = chan;
                 av[1] = buf;
-                av[2] = sstrdup("-h");
-                av[3] = sstrdup(cu->user->nick);
+                av[2] = "-h";
+                av[3] = cu->user->nick;
                 ac = 4;
             } else {
-                av[0] = sstrdup(chan);
-                av[1] = sstrdup("-h");
-                av[2] = sstrdup(cu->user->nick);
+                av[0] = chan;
+                av[1] = "-h";
+                av[2] = cu->user->nick;
                 ac = 3;
             }
 
@@ -309,20 +299,10 @@ int do_clear(User * u)
                                    av[2]);
             }
             do_cmode(s_ChanServ, ac, av);
-
-            if (ircdcap->tsmode) {
-                free(av[3]);
-                free(av[2]);
-                free(av[0]);
-            } else {
-                free(av[2]);
-                free(av[1]);
-                free(av[0]);
-            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_HOPS, chan);
     } else if (stricmp(what, "voices") == 0) {
-        char *av[4];
+        const char *av[4];
         int ac;
         char buf[BUFSIZE];
         struct c_userlist *cu, *next;
@@ -334,15 +314,15 @@ int do_clear(User * u)
 
             if (ircdcap->tsmode) {
                 snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-                av[0] = sstrdup(chan);
+                av[0] = chan;
                 av[1] = buf;
-                av[2] = sstrdup("-v");
-                av[3] = sstrdup(cu->user->nick);
+                av[2] = "-v";
+                av[3] = cu->user->nick;
                 ac = 4;
             } else {
-                av[0] = sstrdup(chan);
-                av[1] = sstrdup("-v");
-                av[2] = sstrdup(cu->user->nick);
+                av[0] = chan;
+                av[1] = "-v";
+                av[2] = cu->user->nick;
                 ac = 3;
             }
 
@@ -364,16 +344,6 @@ int do_clear(User * u)
                 }
             }
             do_cmode(s_ChanServ, ac, av);
-
-            if (ircdcap->tsmode) {
-                free(av[3]);
-                free(av[2]);
-                free(av[0]);
-            } else {
-                free(av[2]);
-                free(av[1]);
-                free(av[0]);
-            }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_VOICES, chan);
     } else if (stricmp(what, "users") == 0) {

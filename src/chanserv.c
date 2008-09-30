@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -1368,14 +1368,14 @@ static void timeout_leave(Timeout * to)
  * not called). The channel TS must be given for a new channel.
  */
 
-int check_kick(User * user, char *chan, time_t chants)
+int check_kick(User * user, const char *chan, time_t chants)
 {
     ChannelInfo *ci = cs_findchan(chan);
     Channel *c;
     AutoKick *akick;
     int i;
     NickCore *nc;
-    char *av[4];
+    const char *av[4];
     int ac;
     char buf[BUFSIZE];
     char mask[BUFSIZE];
@@ -1479,22 +1479,17 @@ int check_kick(User * user, char *chan, time_t chants)
             snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
             av[0] = chan;
             av[1] = buf;
-            av[2] = sstrdup("+b");
+            av[2] = "+b";
             av[3] = mask;
             ac = 4;
         } else {
             av[0] = chan;
-            av[1] = sstrdup("+b");
+            av[1] = "+b";
             av[2] = mask;
             ac = 3;
         }
 
         do_cmode(whosends(ci), ac, av);
-
-        if (ircdcap->tsmode)
-            free(av[2]);
-        else
-            free(av[1]);
     }
 
     anope_cmd_mode(whosends(ci), chan, "+b %s", mask);
@@ -1535,7 +1530,7 @@ void record_topic(const char *chan)
 
 /* Restore the topic in a channel when it's created, if we should. */
 
-void restore_topic(char *chan)
+void restore_topic(const char *chan)
 {
     Channel *c = findchan(chan);
     ChannelInfo *ci;
@@ -2282,7 +2277,7 @@ char *cs_get_redirect(ChannelInfo * ci)
 
 /*************************************************************************/
 
-void cs_set_flood(ChannelInfo * ci, char *value)
+void cs_set_flood(ChannelInfo * ci, const char *value)
 {
     if (!ci) {
         return;
@@ -2302,7 +2297,7 @@ void cs_set_flood(ChannelInfo * ci, char *value)
 
 /*************************************************************************/
 
-void cs_set_key(ChannelInfo * ci, char *value)
+void cs_set_key(ChannelInfo * ci, const char *value)
 {
     if (!ci) {
         return;
@@ -2322,7 +2317,7 @@ void cs_set_key(ChannelInfo * ci, char *value)
 
 /*************************************************************************/
 
-void cs_set_limit(ChannelInfo * ci, char *value)
+void cs_set_limit(ChannelInfo * ci, const char *value)
 {
     if (!ci) {
         return;
@@ -2336,7 +2331,7 @@ void cs_set_limit(ChannelInfo * ci, char *value)
 
 /*************************************************************************/
 
-void cs_set_redirect(ChannelInfo * ci, char *value)
+void cs_set_redirect(ChannelInfo * ci, const char *value)
 {
     if (!ci) {
         return;
@@ -2419,7 +2414,7 @@ const char *get_xop_level(int level)
 
 /* Is the mask stuck? */
 
-AutoKick *is_stuck(ChannelInfo * ci, char *mask)
+AutoKick *is_stuck(ChannelInfo * ci, const char *mask)
 {
     int i;
     AutoKick *akick;
@@ -2449,7 +2444,7 @@ AutoKick *is_stuck(ChannelInfo * ci, char *mask)
 
 void stick_mask(ChannelInfo * ci, AutoKick * akick)
 {
-    char *av[2];
+    const char *av[2];
     Entry *ban;
 
     if (!ci) {
@@ -2473,11 +2468,10 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
     }
 
     /* Falling there means set the ban */
-    av[0] = sstrdup("+b");
+    av[0] = "+b";
     av[1] = akick->u.mask;
     anope_cmd_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
     chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
-    free(av[0]);
 }
 
 /* Ban the stuck mask in a safe manner. */
@@ -2485,7 +2479,7 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 void stick_all(ChannelInfo * ci)
 {
     int i;
-    char *av[2];
+    const char *av[2];
     AutoKick *akick;
 
     if (!ci) {
@@ -2497,10 +2491,9 @@ void stick_all(ChannelInfo * ci)
             || !(akick->flags & AK_STUCK))
             continue;
 
-        av[0] = sstrdup("+b");
+        av[0] = "+b";
         av[1] = akick->u.mask;
         anope_cmd_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
         chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
-        free(av[0]);
     }
 }

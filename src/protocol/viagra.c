@@ -149,10 +149,10 @@ IRCDCAPAB myIrcdcap[] = {
 
 
 
-void viagra_set_umode(User * user, int ac, char **av)
+void viagra_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -424,12 +424,12 @@ CUMode myCumodes[128] = {
 };
 
 
-void viagra_cmd_bot_unban(ChannelInfo * ci, char *nick)
+void viagra_cmd_bot_unban(ChannelInfo * ci, const char *nick)
 {
     send_cmd(ServerName, "SVSMODE %s -b %s", ci->name, nick);
 }
 
-int anope_event_setname(char *source, int ac, char **av)
+int anope_event_setname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -444,17 +444,17 @@ int anope_event_setname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[0]);
+    u->SetRealname(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
 }
 
-int anope_event_chgname(char *source, int ac, char **av)
+int anope_event_chgname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -469,11 +469,11 @@ int anope_event_chgname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[1]);
+    u->SetRealname(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_setident(char *source, int ac, char **av)
+int anope_event_setident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -488,11 +488,11 @@ int anope_event_setident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[0]);
+    u->SetIdent(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_chgident(char *source, int ac, char **av)
+int anope_event_chgident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -507,7 +507,7 @@ int anope_event_chgident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[1]);
+    u->SetIdent(av[1]);
     return MOD_CONT;
 }
 
@@ -516,7 +516,7 @@ int anope_event_chgident(char *source, int ac, char **av)
  *  parv[0] = sender
  *  parv[1] = newhost
  */
-int anope_event_sethost(char *source, int ac, char **av)
+int anope_event_sethost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -531,11 +531,11 @@ int anope_event_sethost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[0]);
+    u->SetDisplayedHost(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     User *user;
 
@@ -553,7 +553,7 @@ int anope_event_nick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_vs(char *source, int ac, char **av)
+int anope_event_vs(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -568,12 +568,12 @@ int anope_event_vs(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[1]);
+    u->SetDisplayedHost(av[1]);
     return MOD_CONT;
 
 }
 
-int anope_event_chghost(char *source, int ac, char **av)
+int anope_event_chghost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -588,11 +588,11 @@ int anope_event_chghost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[1]);
+    u->SetDisplayedHost(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -601,17 +601,17 @@ int anope_event_436(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_svinfo(char *source, int ac, char **av)
+int anope_event_svinfo(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
@@ -621,17 +621,17 @@ int anope_event_svinfo(char *source, int ac, char **av)
  *  parv[0] = sender prefix
  *  parv[1] = message text
  */
-int anope_event_gnotice(char *source, int ac, char **av)
+int anope_event_gnotice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_sqline(char *source, int ac, char **av)
+int anope_event_sqline(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_burst(char *source, int ac, char **av)
+int anope_event_burst(const char *source, int ac, const char **av)
 {
     Server *s;
     s = findserver(servlist, source);
@@ -649,7 +649,7 @@ int anope_event_burst(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tctrl(char *source, int ac, char **av)
+int anope_event_tctrl(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
@@ -659,7 +659,7 @@ int anope_event_tctrl(char *source, int ac, char **av)
  *  parv[0] = sender prefix
  *  parv[*] = parameters
  */
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -742,7 +742,7 @@ void moduleAddIRCDMsgs(void) {
 
 
 /* SQLINE */
-void viagra_cmd_sqline(char *mask, char *reason)
+void viagra_cmd_sqline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -751,17 +751,17 @@ void viagra_cmd_sqline(char *mask, char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void viagra_cmd_unsgline(char *mask)
+void viagra_cmd_unsgline(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
-void viagra_cmd_unszline(char *mask)
+void viagra_cmd_unszline(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
-void viagra_cmd_szline(char *mask, char *reason, char *whom)
+void viagra_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
@@ -771,12 +771,12 @@ void ViagraIRCdProto::cmd_svsnoop(const char *server, int set)
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
-void viagra_cmd_svsadmin(char *server, int set)
+void viagra_cmd_svsadmin(const char *server, int set)
 {
 	ircd_proto.cmd_svsnoop(server, set);
 }
 
-void viagra_cmd_sgline(char *mask, char *reason)
+void viagra_cmd_sgline(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
@@ -787,7 +787,7 @@ void ViagraIRCdProto::cmd_remove_akill(const char *user, const char *host)
 }
 
 /* PART */
-void viagra_cmd_part(char *nick, char *chan, char *buf)
+void viagra_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -800,8 +800,8 @@ void viagra_cmd_part(char *nick, char *chan, char *buf)
     }
 }
 
-void viagra_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void viagra_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
              (unsigned long int) when, topic);
@@ -813,7 +813,7 @@ void viagra_cmd_vhost_off(User * u)
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
-void viagra_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void viagra_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     if (vIdent) {
         send_cmd(NULL, "CHGIDENT %s %s", nick, vIdent);
@@ -822,12 +822,12 @@ void viagra_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
     send_cmd(NULL, "SVSCHGHOST %s %s", nick, vhost);
 }
 
-void viagra_cmd_unsqline(char *user)
+void viagra_cmd_unsqline(const char *user)
 {
     send_cmd(NULL, "UNSQLINE %s", user);
 }
 
-void viagra_cmd_join(char *user, char *channel, time_t chantime)
+void viagra_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
@@ -842,8 +842,8 @@ void viagra_cmd_join(char *user, char *channel, time_t chantime)
  *  parv[5]=time set
  *  parv[6]=reason
  */
-void viagra_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void viagra_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
              (long int) time(NULL), reason);
@@ -857,7 +857,7 @@ void viagra_cmd_akill(char *user, char *host, char *who, time_t when,
  *  parv[2] = nick stamp
  *  parv[3] = kill message
  */
-void viagra_cmd_svskill(char *source, char *user, char *buf)
+void viagra_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "SVSKILL %s :%s", user, buf);
@@ -865,7 +865,7 @@ void viagra_cmd_svskill(char *source, char *user, char *buf)
     return;
 }
 
-void viagra_cmd_mode(char *source, char *dest, char *buf)
+void viagra_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -883,7 +883,7 @@ void viagra_cmd_mode(char *source, char *dest, char *buf)
 }
 
 /* QUIT */
-void viagra_cmd_quit(char *source, char *buf)
+void viagra_cmd_quit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -892,7 +892,7 @@ void viagra_cmd_quit(char *source, char *buf)
     }
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -901,7 +901,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -909,20 +909,20 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void viagra_cmd_svsmode(User * u, int ac, char **av)
+void viagra_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
              (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
              (ac == 2 ? av[1] : ""));
 }
 
-void viagra_cmd_squit(char *servname, char *message)
+void viagra_cmd_squit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
 /* PONG */
-void viagra_cmd_pong(char *servname, char *who)
+void viagra_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
@@ -947,13 +947,13 @@ void viagra_cmd_capab()
 }
 
 /* PASS */
-void viagra_cmd_pass(char *pass)
+void viagra_cmd_pass(const char *pass)
 {
     send_cmd(NULL, "PASS %s :TS", pass);
 }
 
 /* SERVER */
-void viagra_cmd_server(char *servname, int hop, char *descript)
+void viagra_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -982,7 +982,7 @@ void viagra_cmd_connect(int servernum)
 }
 
 /* EVENT : OS */
-int anope_event_os(char *source, int ac, char **av)
+int anope_event_os(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -991,7 +991,7 @@ int anope_event_os(char *source, int ac, char **av)
 }
 
 /* EVENT : NS */
-int anope_event_ns(char *source, int ac, char **av)
+int anope_event_ns(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1000,7 +1000,7 @@ int anope_event_ns(char *source, int ac, char **av)
 }
 
 /* EVENT : MS */
-int anope_event_ms(char *source, int ac, char **av)
+int anope_event_ms(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1009,7 +1009,7 @@ int anope_event_ms(char *source, int ac, char **av)
 }
 
 /* EVENT : HS */
-int anope_event_hs(char *source, int ac, char **av)
+int anope_event_hs(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1018,7 +1018,7 @@ int anope_event_hs(char *source, int ac, char **av)
 }
 
 /* EVENT : CS */
-int anope_event_cs(char *source, int ac, char **av)
+int anope_event_cs(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1026,7 +1026,7 @@ int anope_event_cs(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -1036,7 +1036,7 @@ int anope_event_server(char *source, int ac, char **av)
 }
 
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1044,7 +1044,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -1052,7 +1052,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -1060,7 +1060,7 @@ int anope_event_whois(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     if (ac != 4)
         return MOD_CONT;
@@ -1068,7 +1068,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1076,7 +1076,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1085,7 +1085,7 @@ int anope_event_quit(char *source, int ac, char **av)
 }
 
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -1098,7 +1098,7 @@ int anope_event_mode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1107,7 +1107,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -1115,7 +1115,7 @@ int anope_event_kick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1123,7 +1123,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1133,7 +1133,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void viagra_cmd_notice_ops(char *source, char *dest, char *buf)
+void viagra_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (buf) {
         send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
@@ -1141,7 +1141,7 @@ void viagra_cmd_notice_ops(char *source, char *dest, char *buf)
     return;
 }
 
-void viagra_cmd_notice(char *source, char *dest, char *buf)
+void viagra_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1154,12 +1154,12 @@ void viagra_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void viagra_cmd_notice2(char *source, char *dest, char *msg)
+void viagra_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
-void viagra_cmd_privmsg(char *source, char *dest, char *buf)
+void viagra_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1168,23 +1168,23 @@ void viagra_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
-void viagra_cmd_privmsg2(char *source, char *dest, char *msg)
+void viagra_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void viagra_cmd_serv_notice(char *source, char *dest, char *msg)
+void viagra_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void viagra_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void viagra_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
 /* GLOBOPS */
-void viagra_cmd_global(char *source, char *buf)
+void viagra_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1194,7 +1194,7 @@ void viagra_cmd_global(char *source, char *buf)
 }
 
 /* 391 */
-void viagra_cmd_391(char *source, char *timestr)
+void viagra_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -1203,7 +1203,7 @@ void viagra_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void viagra_cmd_250(char *buf)
+void viagra_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -1213,7 +1213,7 @@ void viagra_cmd_250(char *buf)
 }
 
 /* 307 */
-void viagra_cmd_307(char *buf)
+void viagra_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -1223,7 +1223,7 @@ void viagra_cmd_307(char *buf)
 }
 
 /* 311 */
-void viagra_cmd_311(char *buf)
+void viagra_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -1233,7 +1233,7 @@ void viagra_cmd_311(char *buf)
 }
 
 /* 312 */
-void viagra_cmd_312(char *buf)
+void viagra_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -1243,7 +1243,7 @@ void viagra_cmd_312(char *buf)
 }
 
 /* 317 */
-void viagra_cmd_317(char *buf)
+void viagra_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -1253,7 +1253,7 @@ void viagra_cmd_317(char *buf)
 }
 
 /* 219 */
-void viagra_cmd_219(char *source, char *letter)
+void viagra_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -1268,7 +1268,7 @@ void viagra_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void viagra_cmd_401(char *source, char *who)
+void viagra_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1277,7 +1277,7 @@ void viagra_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void viagra_cmd_318(char *source, char *who)
+void viagra_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1287,7 +1287,7 @@ void viagra_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void viagra_cmd_242(char *buf)
+void viagra_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -1297,7 +1297,7 @@ void viagra_cmd_242(char *buf)
 }
 
 /* 243 */
-void viagra_cmd_243(char *buf)
+void viagra_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -1307,7 +1307,7 @@ void viagra_cmd_243(char *buf)
 }
 
 /* 211 */
-void viagra_cmd_211(char *buf)
+void viagra_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1316,15 +1316,15 @@ void viagra_cmd_211(char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void viagra_cmd_351(char *source)
+void viagra_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
              EncModule, version_build);
 }
 
-void viagra_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void viagra_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
@@ -1332,7 +1332,7 @@ void viagra_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     viagra_cmd_sqline(nick, "Reserved for services");
 }
 
-void viagra_cmd_kick(char *source, char *chan, char *user, char *buf)
+void viagra_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1341,7 +1341,7 @@ void viagra_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void viagra_cmd_nick(char *nick, char *name, char *modes)
+void viagra_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
@@ -1350,30 +1350,30 @@ void viagra_cmd_nick(char *nick, char *name, char *modes)
     viagra_cmd_sqline(nick, "Reserved for services");
 }
 
-void viagra_cmd_372(char *source, char *msg)
+void viagra_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void viagra_cmd_372_error(char *source)
+void viagra_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void viagra_cmd_375(char *source)
+void viagra_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void viagra_cmd_376(char *source)
+void viagra_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
 /* INVITE */
-void viagra_cmd_invite(char *source, char *chan, char *nick)
+void viagra_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1382,31 +1382,31 @@ void viagra_cmd_invite(char *source, char *chan, char *nick)
     send_cmd(source, "INVITE %s %s", nick, chan);
 }
 
-void viagra_cmd_bot_chan_mode(char *nick, char *chan)
+void viagra_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     capab_parse(ac, av);
     return MOD_CONT;
 }
 
 /* SVSHOLD - set */
-void viagra_cmd_svshold(char *nick)
+void viagra_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void viagra_cmd_release_svshold(char *nick)
+void viagra_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSNICK */
-void viagra_cmd_svsnick(char *source, char *guest, time_t when)
+void viagra_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1414,28 +1414,28 @@ void viagra_cmd_svsnick(char *source, char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void viagra_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void viagra_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void viagra_cmd_svso(char *source, char *nick, char *flag)
+void viagra_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
 
 
 /* SVSMODE -b */
-void viagra_cmd_unban(char *name, char *nick)
+void viagra_cmd_unban(const char *name, const char *nick)
 {
     viagra_cmd_svsmode_chan(name, "-b", nick);
 }
 
 /* SVSMODE channel modes */
 
-void viagra_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void viagra_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
@@ -1446,7 +1446,7 @@ void viagra_cmd_svsmode_chan(char *name, char *mode, char *nick)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void viagra_cmd_svid_umode(char *nick, time_t ts)
+void viagra_cmd_svid_umode(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
              (unsigned long int) ts);
@@ -1460,12 +1460,12 @@ void viagra_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +d */
-void viagra_cmd_svid_umode2(User * u, char *ts)
+void viagra_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not used by bahamut ircds */
 }
 
-void viagra_cmd_svid_umode3(User * u, char *ts)
+void viagra_cmd_svid_umode3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1475,7 +1475,7 @@ void viagra_cmd_svid_umode3(User * u, char *ts)
 }
 
 /* NICK <newnick>  */
-void viagra_cmd_chg_nick(char *oldnick, char *newnick)
+void viagra_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1490,7 +1490,7 @@ void viagra_cmd_chg_nick(char *oldnick, char *newnick)
  *  parv[1] = nick to make join
  *  parv[2] = channel(s) to join
  */
-void viagra_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void viagra_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     send_cmd(source, "SVSJOIN %s :%s", nick, chan);
 }
@@ -1501,37 +1501,37 @@ void viagra_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
  *  parv[1] = nick to make part
  *  parv[2] = channel(s) to part
  */
-void viagra_cmd_svspart(char *source, char *nick, char *chan)
+void viagra_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     send_cmd(source, "SVSPART %s :%s", nick, chan);
 }
 
-void viagra_cmd_swhois(char *source, char *who, char *mask)
+void viagra_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-int viagra_flood_mode_check(char *value)
+int viagra_flood_mode_check(const char *value)
 {
     return 0;
 }
 
-int anope_event_rehash(char *source, int ac, char **av)
+int anope_event_rehash(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_snotice(char *source, int ac, char **av)
+int anope_event_snotice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_invite(char *source, int ac, char **av)
+int anope_event_invite(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
@@ -1541,7 +1541,7 @@ void viagra_cmd_eob()
     send_cmd(NULL, "BURST 0");
 }
 
-void viagra_cmd_jupe(char *jserver, char *who, char *reason)
+void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1555,7 +1555,7 @@ void viagra_cmd_jupe(char *jserver, char *who, char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void viagra_cmd_global_legacy(char *source, char *fmt)
+void viagra_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1564,7 +1564,7 @@ void viagra_cmd_global_legacy(char *source, char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int viagra_valid_nick(char *nick)
+int viagra_valid_nick(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1574,14 +1574,14 @@ int viagra_valid_nick(char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int viagra_valid_chan(char *chan)
+int viagra_valid_chan(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
 }
 
 
-void viagra_cmd_ctcp(char *source, char *dest, char *buf)
+void viagra_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

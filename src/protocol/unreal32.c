@@ -414,10 +414,10 @@ CUMode myCumodes[128] = {
 };
 
 
-void unreal_set_umode(User * user, int ac, char **av)
+void unreal_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -495,7 +495,7 @@ void unreal_set_umode(User * user, int ac, char **av)
 
 
 /* Event: PROTOCTL */
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     capab_parse(ac, av);
     return MOD_CONT;
@@ -507,7 +507,7 @@ void UnrealIRCdProto::cmd_svsnoop(const char *server, int set)
 	send_cmd(NULL, "%s %s %s", send_token("SVSNOOP", "f"), server, set ? "+" : "-");
 }
 
-void unreal_cmd_svsadmin(char *server, int set)
+void unreal_cmd_svsadmin(const char *server, int set)
 {
 	ircd_proto.cmd_svsnoop(server, set);
 }
@@ -517,8 +517,8 @@ void UnrealIRCdProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
 }
 
-void unreal_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void unreal_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan,
              whosetit, (unsigned long int) when, topic);
@@ -537,8 +537,8 @@ void unreal_cmd_vhost_off(User * u)
                 myIrcd->vhostchar);
 }
 
-void unreal_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void unreal_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"),
              user, host, who, (long int) time(NULL) + 86400 * 2,
@@ -551,7 +551,7 @@ void unreal_cmd_akill(char *user, char *host, char *who, time_t when,
 **	parv[1] = client
 **	parv[2] = kill message
 */
-void unreal_cmd_svskill(char *source, char *user, char *buf)
+void unreal_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (!source || !user || !buf) {
         return;
@@ -566,7 +566,7 @@ void unreal_cmd_svskill(char *source, char *user, char *buf)
  * parv[2] - modes to change
  * parv[3] - Service Stamp (if mode == d)
  */
-void unreal_cmd_svsmode(User * u, int ac, char **av)
+void unreal_cmd_svsmode(User * u, int ac, const char **av)
 {
     if (ac >= 1) {
         if (!u || !av[0]) {
@@ -585,29 +585,29 @@ void unreal_cmd_svsmode(User * u, int ac, char **av)
 }
 
 /* 372 */
-void unreal_cmd_372(char *source, char *msg)
+void unreal_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void unreal_cmd_372_error(char *source)
+void unreal_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void unreal_cmd_375(char *source)
+void unreal_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void unreal_cmd_376(char *source)
+void unreal_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void unreal_cmd_nick(char *nick, char *name, char *modes)
+void unreal_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
@@ -617,8 +617,8 @@ void unreal_cmd_nick(char *nick, char *name, char *modes)
     unreal_cmd_sqline(nick, "Reserved for services");
 }
 
-void unreal_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void unreal_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
              send_token("NICK", "&"), nick, (long int) time(NULL), user,
@@ -626,7 +626,7 @@ void unreal_cmd_guest_nick(char *nick, char *user, char *host, char *real,
              real);
 }
 
-void unreal_cmd_mode(char *source, char *dest, char *buf)
+void unreal_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -635,8 +635,8 @@ void unreal_cmd_mode(char *source, char *dest, char *buf)
     send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
 }
 
-void unreal_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void unreal_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s",
@@ -646,7 +646,7 @@ void unreal_cmd_bot_nick(char *nick, char *user, char *host, char *real,
     unreal_cmd_sqline(nick, "Reserved for services");
 }
 
-void unreal_cmd_kick(char *source, char *chan, char *user, char *buf)
+void unreal_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "%s %s %s :%s", send_token("KICK", "H"), chan,
@@ -656,7 +656,7 @@ void unreal_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void unreal_cmd_notice_ops(char *source, char *dest, char *buf)
+void unreal_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -666,7 +666,7 @@ void unreal_cmd_notice_ops(char *source, char *dest, char *buf)
 }
 
 
-void unreal_cmd_notice(char *source, char *dest, char *buf)
+void unreal_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -680,12 +680,12 @@ void unreal_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void unreal_cmd_notice2(char *source, char *dest, char *msg)
+void unreal_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "%s %s :%s", send_token("NOTICE", "B"), dest, msg);
 }
 
-void unreal_cmd_privmsg(char *source, char *dest, char *buf)
+void unreal_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -694,28 +694,28 @@ void unreal_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "%s %s :%s", send_token("PRIVMSG", "!"), dest, buf);
 }
 
-void unreal_cmd_privmsg2(char *source, char *dest, char *msg)
+void unreal_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "%s %s :%s", send_token("PRIVMSG", "!"), dest, msg);
 }
 
-void unreal_cmd_serv_notice(char *source, char *dest, char *msg)
+void unreal_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "%s $%s :%s", send_token("NOTICE", "B"), dest, msg);
 }
 
-void unreal_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void unreal_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "%s $%s :%s", send_token("PRIVMSG", "!"), dest, msg);
 }
 
-void unreal_cmd_bot_chan_mode(char *nick, char *chan)
+void unreal_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick,
                    nick);
 }
 
-void unreal_cmd_351(char *source)
+void unreal_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, myIrcd->name,
@@ -723,7 +723,7 @@ void unreal_cmd_351(char *source)
 }
 
 /* QUIT */
-void unreal_cmd_quit(char *source, char *buf)
+void unreal_cmd_quit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "%s :%s", send_token("QUIT", ","), buf);
@@ -769,14 +769,14 @@ void unreal_cmd_capab()
 }
 
 /* PASS */
-void unreal_cmd_pass(char *pass)
+void unreal_cmd_pass(const char *pass)
 {
     send_cmd(NULL, "PASS :%s", pass);
 }
 
 /* SERVER name hop descript */
 /* Unreal 3.2 actually sends some info about itself in the descript area */
-void unreal_cmd_server(char *servname, int hop, char *descript)
+void unreal_cmd_server(const char *servname, int hop, const char *descript)
 {
     if (Numeric) {
         send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric,
@@ -787,13 +787,13 @@ void unreal_cmd_server(char *servname, int hop, char *descript)
 }
 
 /* PONG */
-void unreal_cmd_pong(char *servname, char *who)
+void unreal_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "%s %s", send_token("PONG", "9"), who);
 }
 
 /* JOIN */
-void unreal_cmd_join(char *user, char *channel, time_t chantime)
+void unreal_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(ServerName, "%s !%s %s :%s",
              send_token("SJOIN", "~"), base64enc((long int) chantime),
@@ -805,7 +805,7 @@ void unreal_cmd_join(char *user, char *channel, time_t chantime)
 **	parv[0] = sender
 **	parv[1] = nickmask
 */
-void unreal_cmd_unsqline(char *user)
+void unreal_cmd_unsqline(const char *user)
 {
     if (!user) {
         return;
@@ -814,7 +814,7 @@ void unreal_cmd_unsqline(char *user)
 }
 
 /* CHGHOST */
-void unreal_cmd_chghost(char *nick, char *vhost)
+void unreal_cmd_chghost(const char *nick, const char *vhost)
 {
     if (!nick || !vhost) {
         return;
@@ -824,7 +824,7 @@ void unreal_cmd_chghost(char *nick, char *vhost)
 }
 
 /* CHGIDENT */
-void unreal_cmd_chgident(char *nick, char *vIdent)
+void unreal_cmd_chgident(const char *nick, const char *vIdent)
 {
     if (!nick || !vIdent) {
         return;
@@ -834,7 +834,7 @@ void unreal_cmd_chgident(char *nick, char *vIdent)
 }
 
 /* INVITE */
-void unreal_cmd_invite(char *source, char *chan, char *nick)
+void unreal_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -844,7 +844,7 @@ void unreal_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* PART */
-void unreal_cmd_part(char *nick, char *chan, char *buf)
+void unreal_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -858,7 +858,7 @@ void unreal_cmd_part(char *nick, char *chan, char *buf)
 }
 
 /* 391    RPL_TIME ":%s 391 %s %s :%s" */
-void unreal_cmd_391(char *source, char *timestr)
+void unreal_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -867,7 +867,7 @@ void unreal_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void unreal_cmd_250(char *buf)
+void unreal_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -877,7 +877,7 @@ void unreal_cmd_250(char *buf)
 }
 
 /* 307 */
-void unreal_cmd_307(char *buf)
+void unreal_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -887,7 +887,7 @@ void unreal_cmd_307(char *buf)
 }
 
 /* 311 */
-void unreal_cmd_311(char *buf)
+void unreal_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -897,7 +897,7 @@ void unreal_cmd_311(char *buf)
 }
 
 /* 312 */
-void unreal_cmd_312(char *buf)
+void unreal_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -907,7 +907,7 @@ void unreal_cmd_312(char *buf)
 }
 
 /* 317 */
-void unreal_cmd_317(char *buf)
+void unreal_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -917,7 +917,7 @@ void unreal_cmd_317(char *buf)
 }
 
 /* 219 */
-void unreal_cmd_219(char *source, char *letter)
+void unreal_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -932,7 +932,7 @@ void unreal_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void unreal_cmd_401(char *source, char *who)
+void unreal_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -941,7 +941,7 @@ void unreal_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void unreal_cmd_318(char *source, char *who)
+void unreal_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -951,7 +951,7 @@ void unreal_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void unreal_cmd_242(char *buf)
+void unreal_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -961,7 +961,7 @@ void unreal_cmd_242(char *buf)
 }
 
 /* 243 */
-void unreal_cmd_243(char *buf)
+void unreal_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -971,7 +971,7 @@ void unreal_cmd_243(char *buf)
 }
 
 /* 211 */
-void unreal_cmd_211(char *buf)
+void unreal_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -981,7 +981,7 @@ void unreal_cmd_211(char *buf)
 }
 
 /* GLOBOPS */
-void unreal_cmd_global(char *source, char *buf)
+void unreal_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -992,7 +992,7 @@ void unreal_cmd_global(char *source, char *buf)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void unreal_cmd_global_legacy(char *source, char *fmt)
+void unreal_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "%s :%s",
              send_token("GLOBOPS", "]"), fmt);
@@ -1007,7 +1007,7 @@ void unreal_cmd_global_legacy(char *source, char *fmt)
 ** - Unreal will translate this to TKL for us
 **
 */
-void unreal_cmd_sqline(char *mask, char *reason)
+void unreal_cmd_sqline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -1017,7 +1017,7 @@ void unreal_cmd_sqline(char *mask, char *reason)
 }
 
 /* SQUIT */
-void unreal_cmd_squit(char *servname, char *message)
+void unreal_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1033,7 +1033,7 @@ void unreal_cmd_squit(char *servname, char *message)
 **      parv[1] = nick
 **      parv[2] = options
 */
-void unreal_cmd_svso(char *source, char *nick, char *flag)
+void unreal_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     if (!source || !nick || !flag) {
         return;
@@ -1043,7 +1043,7 @@ void unreal_cmd_svso(char *source, char *nick, char *flag)
 }
 
 /* NICK <newnick>  */
-void unreal_cmd_chg_nick(char *oldnick, char *newnick)
+void unreal_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1060,7 +1060,7 @@ void unreal_cmd_chg_nick(char *oldnick, char *newnick)
 **      parv[2] = new nickname
 **      parv[3] = timestamp
 */
-void unreal_cmd_svsnick(char *source, char *guest, time_t when)
+void unreal_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1071,7 +1071,7 @@ void unreal_cmd_svsnick(char *source, char *guest, time_t when)
 
 /* Functions that use serval cmd functions */
 
-void unreal_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void unreal_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     if (!nick) {
         return;
@@ -1107,7 +1107,7 @@ void unreal_cmd_connect(int servernum)
 
 /* Events */
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1115,7 +1115,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void unreal_cmd_netinfo(int ac, char **av)
+void unreal_cmd_netinfo(int ac, const char **av)
 {
     send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
              send_token("NETINFO", "AO"), (long int) maxusercnt,
@@ -1132,7 +1132,7 @@ void unreal_cmd_netinfo(int ac, char **av)
  *  argv[6] = free(**)
  *  argv[7] = ircnet
  */
-int anope_event_netinfo(char *source, int ac, char **av)
+int anope_event_netinfo(const char *source, int ac, const char **av)
 {
     unreal_cmd_netinfo(ac, av);
     return MOD_CONT;
@@ -1153,12 +1153,12 @@ int anope_event_netinfo(char *source, int ac, char **av)
  * parv[10]:                                     regex
  *
 */
-int anope_event_tkl(char *source, int ac, char **av)
+int anope_event_tkl(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_eos(char *source, int ac, char **av)
+int anope_event_eos(const char *source, int ac, const char **av)
 {
     Server *s;
     s = findserver(servlist, source);
@@ -1172,7 +1172,7 @@ int anope_event_eos(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1186,7 +1186,7 @@ int anope_event_436(char *source, int ac, char **av)
 **      parv[0] = sender prefix
 **      parv[1] = away message
 */
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1207,7 +1207,7 @@ int anope_event_away(char *source, int ac, char **av)
 **	parv[3] = topic time
 **	parv[4] = topic text
 */
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     if (ac != 4)
         return MOD_CONT;
@@ -1215,7 +1215,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1223,7 +1223,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1231,13 +1231,13 @@ int anope_event_quit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -1256,7 +1256,7 @@ int anope_event_mode(char *source, int ac, char **av)
     parv[0] - sender
     parv[1] - modes to change
 */
-int anope_event_umode2(char *source, int ac, char **av)
+int anope_event_umode2(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1265,7 +1265,7 @@ int anope_event_umode2(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1274,7 +1274,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -1283,7 +1283,7 @@ int anope_event_kick(char *source, int ac, char **av)
 }
 
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1291,7 +1291,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1301,7 +1301,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_setname(char *source, int ac, char **av)
+int anope_event_setname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1316,11 +1316,11 @@ int anope_event_setname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[0]);
+    u->SetRealname(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_chgname(char *source, int ac, char **av)
+int anope_event_chgname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1335,11 +1335,11 @@ int anope_event_chgname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[1]);
+    u->SetRealname(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_setident(char *source, int ac, char **av)
+int anope_event_setident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1354,10 +1354,10 @@ int anope_event_setident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[0]);
+    u->SetIdent(av[0]);
     return MOD_CONT;
 }
-int anope_event_chgident(char *source, int ac, char **av)
+int anope_event_chgident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1372,11 +1372,11 @@ int anope_event_chgident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[1]);
+    u->SetIdent(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_sethost(char *source, int ac, char **av)
+int anope_event_sethost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1391,7 +1391,7 @@ int anope_event_sethost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[0]);
+    u->SetDisplayedHost(av[0]);
     return MOD_CONT;
 }
 
@@ -1426,7 +1426,7 @@ int anope_event_sethost(char *source, int ac, char **av)
               char *server, char *realname, time_t ts, uint32 svid,
               uint32 ip, char *vhost, char *uid)
 */
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     User *user;
 
@@ -1466,7 +1466,7 @@ int anope_event_nick(char *source, int ac, char **av)
 }
 
 
-int anope_event_chghost(char *source, int ac, char **av)
+int anope_event_chghost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1481,12 +1481,12 @@ int anope_event_chghost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[1]);
+    u->SetDisplayedHost(av[1]);
     return MOD_CONT;
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     char *desc;
     char *vl;
@@ -1508,7 +1508,7 @@ int anope_event_server(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1516,7 +1516,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -1524,7 +1524,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -1533,7 +1533,7 @@ int anope_event_whois(char *source, int ac, char **av)
 }
 
 /* SVSHOLD - set */
-void unreal_cmd_svshold(char *nick)
+void unreal_cmd_svshold(const char *nick)
 {
     send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"),
              nick, ServerName, (long int) time(NULL) + NSReleaseTimeout,
@@ -1541,7 +1541,7 @@ void unreal_cmd_svshold(char *nick)
 }
 
 /* SVSHOLD - release */
-void unreal_cmd_release_svshold(char *nick)
+void unreal_cmd_release_svshold(const char *nick)
 {
     send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick,
              ServerName);
@@ -1551,20 +1551,20 @@ void unreal_cmd_release_svshold(char *nick)
 /*
  * SVSNLINE - :realname mask
 */
-void unreal_cmd_unsgline(char *mask)
+void unreal_cmd_unsgline(const char *mask)
 {
     send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
 }
 
 /* UNSZLINE */
-void unreal_cmd_unszline(char *mask)
+void unreal_cmd_unszline(const char *mask)
 {
     send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask,
              s_OperServ);
 }
 
 /* SZLINE */
-void unreal_cmd_szline(char *mask, char *reason, char *whom)
+void unreal_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"),
              mask, whom, (long int) time(NULL) + 86400 * 2,
@@ -1575,15 +1575,17 @@ void unreal_cmd_szline(char *mask, char *reason, char *whom)
 /*
  * SVSNLINE + reason_where_is_space :realname mask with spaces
 */
-void unreal_cmd_sgline(char *mask, char *reason)
+void unreal_cmd_sgline(const char *mask, const char *reason)
 {
-    strnrepl(reason, BUFSIZE, " ", "_");
-    send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), reason,
+	char edited_reason[BUFSIZE];
+	strlcpy(edited_reason, reason, BUFSIZE);
+    strnrepl(edited_reason, BUFSIZE, " ", "_");
+    send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason,
              mask);
 }
 
 /* SVSMODE -b */
-void unreal_cmd_unban(char *name, char *nick)
+void unreal_cmd_unban(const char *name, const char *nick)
 {
     unreal_cmd_svsmode_chan(name, "-b", nick);
 }
@@ -1591,7 +1593,7 @@ void unreal_cmd_unban(char *name, char *nick)
 
 /* SVSMODE channel modes */
 
-void unreal_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void unreal_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"),
@@ -1605,7 +1607,7 @@ void unreal_cmd_svsmode_chan(char *name, char *mode, char *nick)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void unreal_cmd_svid_umode(char *nick, time_t ts)
+void unreal_cmd_svid_umode(const char *nick, time_t ts)
 {
     if (UseSVS2MODE) {
         send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"),
@@ -1624,7 +1626,7 @@ void unreal_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +r */
-void unreal_cmd_svid_umode2(User * u, char *ts)
+void unreal_cmd_svid_umode2(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1633,12 +1635,12 @@ void unreal_cmd_svid_umode2(User * u, char *ts)
     }
 }
 
-void unreal_cmd_svid_umode3(User * u, char *ts)
+void unreal_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (av[0]) {
         if (debug) {
@@ -1651,12 +1653,12 @@ int anope_event_error(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_smo(char *source, int ac, char **av)
+int anope_event_smo(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
@@ -1670,7 +1672,7 @@ int anope_event_smo(char *source, int ac, char **av)
 /* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
    when coming from a none TOKEN'd server
 */
-void unreal_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void unreal_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     if (param) {
         send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
@@ -1684,55 +1686,55 @@ void unreal_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
 	parv[1] - nick to make part
 	parv[2] - channel(s) to part
 */
-void unreal_cmd_svspart(char *source, char *nick, char *chan)
+void unreal_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
 }
 
-int anope_event_globops(char *source, int ac, char **av)
+int anope_event_globops(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_swhois(char *source, int ac, char **av)
+int anope_event_swhois(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_rehash(char *source, int ac, char **av)
+int anope_event_rehash(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_credits(char *source, int ac, char **av)
+int anope_event_credits(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_sdesc(char *source, int ac, char **av)
+int anope_event_sdesc(const char *source, int ac, const char **av)
 {
     Server *s;
     s = findserver(servlist, source);
 
     if (s) {
-        s->desc = av[0];
+        s->desc = (char *)av[0]; // XXX Unsafe cast -- CyberBotX
     }
 
     return MOD_CONT;
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
 }
 
-void unreal_cmd_swhois(char *source, char *who, char *mask)
+void unreal_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
 }
@@ -1747,7 +1749,7 @@ void unreal_cmd_eob()
  * parv[1] - target nick
  * parv[2] - parameters
  */
-void unreal_cmd_svswatch(char *sender, char *nick, char *parm)
+void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 {
     send_cmd(sender, "%s %s :%s", send_token("SVSWATCH", "Bw"), nick,
              parm);
@@ -1755,7 +1757,7 @@ void unreal_cmd_svswatch(char *sender, char *nick, char *parm)
 
 /* check if +f mode is valid for the ircd */
 /* borrowed part of the new check from channels.c in Unreal */
-int unreal_flood_mode_check(char *value)
+int unreal_flood_mode_check(const char *value)
 {
     char *dp, *end;
     /* NEW +F */
@@ -1804,7 +1806,7 @@ int unreal_flood_mode_check(char *value)
     }
 }
 
-void unreal_cmd_jupe(char *jserver, char *who, char *reason)
+void unreal_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1821,7 +1823,7 @@ void unreal_cmd_jupe(char *jserver, char *who, char *reason)
   1 = valid nick
   0 = nick is in valid
 */
-int unreal_valid_nick(char *nick)
+int unreal_valid_nick(const char *nick)
 {
     if (!stricmp("ircd", nick)) {
         return 0;
@@ -1832,14 +1834,14 @@ int unreal_valid_nick(char *nick)
     return 1;
 }
 
-int unreal_valid_chan(char *chan) {
+int unreal_valid_chan(const char *chan) {
     if (strchr(chan, ':')) {
       return 0;
     }
     return 1;
 }
 
-void unreal_cmd_ctcp(char *source, char *dest, char *buf)
+void unreal_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
     if (!buf) {

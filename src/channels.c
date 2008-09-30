@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -155,11 +155,12 @@ void chan_remove_user_status(Channel * chan, User * user, int16 status)
 
 /*************************************************************************/
 
-void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
+void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
                     int check)
 {
     int add = 1;
-    char *modes = av[0], mode;
+    const char *modes = av[0];
+	char mode;
     CBMode *cbm;
     CMMode *cmm;
     CUMode *cum;
@@ -167,7 +168,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
     BotInfo *bi;
     User *u, *user;
     int i, real_ac = ac;
-    char **real_av = av;
+    const char **real_av = av;
 
     if (debug)
         alog("debug: Changing modes for %s to %s", chan->name,
@@ -181,7 +182,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, char **av,
             alog("debug: Removing instead of setting due to DEOPPED flag");
 
         /* Swap adding and removing of the modes */
-        for (s = av[0]; *s; s++) {
+        for (s = (char *)av[0]; *s; s++) { // XXX Unsafe cast, this needs reviewing -- CyberBotX
             if (*s == '+')
                 *s = '-';
             else if (*s == '-')
@@ -514,7 +515,7 @@ User *nc_on_chan(Channel * c, NickCore * nc)
  *	av[0] = channels to join
  */
 
-void do_join(const char *source, int ac, char **av)
+void do_join(const char *source, int ac, const char **av)
 {
     User *user;
     Channel *chan;
@@ -538,7 +539,7 @@ void do_join(const char *source, int ac, char **av)
         return;
     }
 
-    t = av[0];
+    t = (char *)av[0]; // XXX Unsafe cast, this needs reviewing -- CyberBotX
     while (*(s = t)) {
         t = s + strcspn(s, ",");
         if (*t)
@@ -660,7 +661,7 @@ void do_kick(const char *source, int ac, const char **av)
  *	av[1] = reason (optional)
  */
 
-void do_part(const char *source, int ac, char **av)
+void do_part(const char *source, int ac, const char **av)
 {
     User *user;
     char *s, *t;
@@ -681,7 +682,7 @@ void do_part(const char *source, int ac, char **av)
         }
         return;
     }
-    t = av[0];
+    t = (char *)av[0]; // XXX Unsafe cast, this needs reviewing -- CyberBotX
     while (*(s = t)) {
         t = s + strcspn(s, ",");
         if (*t)
@@ -753,14 +754,15 @@ void do_part(const char *source, int ac, char **av)
 
 */
 
-void do_sjoin(const char *source, int ac, char **av)
+void do_sjoin(const char *source, int ac, const char **av)
 {
     Channel *c;
     User *user;
     Server *serv;
     struct c_userlist *cu;
-    char *s = NULL;
-    char *end, cubuf[7], *end2, *cumodes[6];
+    const char *s = NULL;
+    char *end, cubuf[7], *end2;
+	const char *cumodes[6];
     int is_sqlined = 0;
     int ts = 0;
     int is_created = 0;
@@ -1025,7 +1027,7 @@ void do_sjoin(const char *source, int ac, char **av)
                     alog("debug: SJOIN for nonexistent user %s on %s", s,
                          av[1]);
                 }
-                free(s);
+                free((char *)s);
                 return;
             }
 
@@ -1065,7 +1067,7 @@ void do_sjoin(const char *source, int ac, char **av)
                 break;
             s = end + 1;
         }
-        free(s);
+        free((char *)s);
     } else if (ac == 2) {
         if (UseTS6 && ircd->ts6) {
             user = find_byuid(source);
@@ -1112,12 +1114,12 @@ void do_sjoin(const char *source, int ac, char **av)
 
 /* Handle a channel MODE command. */
 
-void do_cmode(const char *source, int ac, char **av)
+void do_cmode(const char *source, int ac, const char **av)
 {
     Channel *chan;
     ChannelInfo *ci = NULL;
     int i;
-    char *t;
+    const char *t;
 
     if (ircdcap->tsmode) {
         /* TSMODE for bahamut - leave this code out to break MODEs. -GD */
@@ -1178,7 +1180,7 @@ void do_cmode(const char *source, int ac, char **av)
 
 /* Handle a TOPIC command. */
 
-void do_topic(const char *source, int ac, char **av)
+void do_topic(const char *source, int ac, const char **av)
 {
     Channel *c = findchan(av[0]);
     ChannelInfo *ci;
@@ -1256,7 +1258,7 @@ void do_topic(const char *source, int ac, char **av)
 /**************************** Internal Calls *****************************/
 /*************************************************************************/
 
-void add_ban(Channel * chan, char *mask)
+void add_ban(Channel * chan, const char *mask)
 {
     Entry *ban;
     /* check for NULL values otherwise we will segfault */
@@ -1295,7 +1297,7 @@ void add_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-void add_exception(Channel * chan, char *mask)
+void add_exception(Channel * chan, const char *mask)
 {
     Entry *exception;
 
@@ -1320,7 +1322,7 @@ void add_exception(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-void add_invite(Channel * chan, char *mask)
+void add_invite(Channel * chan, const char *mask)
 {
     Entry *invite;
 
@@ -1551,9 +1553,9 @@ void chan_adduser2(User * user, Channel * c)
     }
 
     /**
-     * We let the bot join even if it was an ignored user, as if we don't, 
+     * We let the bot join even if it was an ignored user, as if we don't,
      * and the ignored user dosnt just leave, the bot will never
-     * make it into the channel, leaving the channel botless even for 
+     * make it into the channel, leaving the channel botless even for
      * legit users - Rob
      **/
     if (s_BotServ && c->ci && c->ci->bi) {
@@ -1581,7 +1583,7 @@ void chan_adduser2(User * user, Channel * c)
    chan_adduser, but splitted to make it more efficient to use for
    SJOINs). */
 
-Channel *chan_create(char *chan, time_t ts)
+Channel *chan_create(const char *chan, time_t ts)
 {
     Channel *c;
     Channel **list;
@@ -1683,7 +1685,7 @@ void chan_delete(Channel * c)
 
 /*************************************************************************/
 
-void del_ban(Channel * chan, char *mask)
+void del_ban(Channel * chan, const char *mask)
 {
     AutoKick *akick;
     Entry *ban;
@@ -1708,7 +1710,7 @@ void del_ban(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-void del_exception(Channel * chan, char *mask)
+void del_exception(Channel * chan, const char *mask)
 {
     Entry *exception;
 
@@ -1729,7 +1731,7 @@ void del_exception(Channel * chan, char *mask)
 
 /*************************************************************************/
 
-void del_invite(Channel * chan, char *mask)
+void del_invite(Channel * chan, const char *mask)
 {
     Entry *invite;
 
@@ -1786,7 +1788,7 @@ char *get_redirect(Channel * chan)
 
 /*************************************************************************/
 
-Channel *join_user_update(User * user, Channel * chan, char *name,
+Channel *join_user_update(User * user, Channel * chan, const char *name,
                           time_t chants)
 {
     struct u_chanlist *c;
@@ -1812,7 +1814,7 @@ Channel *join_user_update(User * user, Channel * chan, char *name,
 
 /*************************************************************************/
 
-void set_flood(Channel * chan, char *value)
+void set_flood(Channel * chan, const char *value)
 {
     if (chan->flood)
         free(chan->flood);
@@ -1825,7 +1827,7 @@ void set_flood(Channel * chan, char *value)
 
 /*************************************************************************/
 
-void chan_set_key(Channel * chan, char *value)
+void chan_set_key(Channel * chan, const char *value)
 {
     if (chan->key)
         free(chan->key);
@@ -1838,7 +1840,7 @@ void chan_set_key(Channel * chan, char *value)
 
 /*************************************************************************/
 
-void set_limit(Channel * chan, char *value)
+void set_limit(Channel * chan, const char *value)
 {
     chan->limit = value ? strtoul(value, NULL, 10) : 0;
 
@@ -1849,7 +1851,7 @@ void set_limit(Channel * chan, char *value)
 
 /*************************************************************************/
 
-void set_redirect(Channel * chan, char *value)
+void set_redirect(Channel * chan, const char *value)
 {
     if (chan->redirect)
         free(chan->redirect);
@@ -1863,7 +1865,7 @@ void set_redirect(Channel * chan, char *value)
 void do_mass_mode(char *modes)
 {
     int ac;
-    char **av;
+    const char **av;
     Channel *c;
     char *myModes;
 
@@ -2011,7 +2013,7 @@ Entry *entry_create(char *mask)
  * @param mask The mask to parse and add to the list
  * @return Pointer to newly added entry. NULL if it fails.
  */
-Entry *entry_add(EList * list, char *mask)
+Entry *entry_add(EList * list, const char *mask)
 {
     Entry *e;
     char *hostmask;
@@ -2275,7 +2277,7 @@ Entry *elist_match_user(EList * list, User * u)
  * @param mask The *!*@* mask to match
  * @return Returns the first matching entry, if none, NULL is returned.
  */
-Entry *elist_find_mask(EList * list, char *mask)
+Entry *elist_find_mask(EList * list, const char *mask)
 {
     Entry *e;
 

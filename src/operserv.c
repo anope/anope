@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -81,8 +81,8 @@ void moduleAddOperServCmds(void) {
 #ifdef DEBUG_COMMANDS
     Command *c;
 #endif
-    
-    modules_core_init(OperServCoreNumber, OperServCoreModules); 
+
+    modules_core_init(OperServCoreNumber, OperServCoreModules);
 
 #ifdef DEBUG_COMMANDS
     c = createCommand("LISTTIMERS", send_timeout_list,  is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
@@ -835,7 +835,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 
 /* Does the user match any AKILLs? */
 
-int check_akill(char *nick, const char *username, const char *host,
+int check_akill(const char *nick, const char *username, const char *host,
                 const char *vhost, const char *ip)
 {
     int i;
@@ -1052,7 +1052,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 
 /* Does the user match any SGLINEs? */
 
-int check_sgline(char *nick, const char *realname)
+int check_sgline(const char *nick, const char *realname)
 {
     int i;
     SXLine *sx;
@@ -1240,7 +1240,7 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
 
 /* Does the user match any SQLINEs? */
 
-int check_sqline(char *nick, int nick_change)
+int check_sqline(const char *nick, int nick_change)
 {
     int i;
     SXLine *sx;
@@ -1436,7 +1436,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
 }
 
 /* Check and enforce any Zlines that we have */
-int check_szline(char *nick, char *ip)
+int check_szline(const char *nick, char *ip)
 {
     int i;
     SXLine *sx;

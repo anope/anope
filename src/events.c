@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -89,7 +89,7 @@ void event_message_process(char *eventbuf)
     char buf[512];              /* Longest legal IRC command line */
     char *s;
     int ac;                     /* Parameters for the command */
-    char **av;
+    const char **av;
     EvtMessage *evm;
 
     /* zero out the buffers before we do much else */
@@ -178,7 +178,7 @@ void event_process_hook(const char *name, int argc, char **argv)
  * Displays a message list for a given message.
  * Again this is of little use other than debugging.
  * @param m the message to display
- * @return 0 is returned and has no meaning 
+ * @return 0 is returned and has no meaning
  */
 int displayEventMessage(EvtMessage * evm)
 {
@@ -196,7 +196,7 @@ int displayEventMessage(EvtMessage * evm)
  * Displays a message list for a given message.
  * Again this is of little use other than debugging.
  * @param m the message to display
- * @return 0 is returned and has no meaning 
+ * @return 0 is returned and has no meaning
  */
 int displayEventHook(EvtHook * evh)
 {
@@ -271,8 +271,8 @@ int displayEvtMessageFromHash(char *name)
   * @return a new Message object
   **/
 EvtMessage *createEventHandler(char *name,
-                               int (*func) (char *source, int ac,
-                                            char **av))
+                               int (*func) (const char *source, int ac,
+                                            const char **av))
 {
     EvtMessage *evm = NULL;
     if (!func) {
@@ -310,8 +310,8 @@ EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv))
     return evh;
 }
 
-/** 
- * find a message in the given table. 
+/**
+ * find a message in the given table.
  * Looks up the message <name> in the MessageHash given
  * @param MessageHash the message table to search for this command, will almost always be IRCD
  * @param name the name of the command were looking for
@@ -335,8 +335,8 @@ EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[],
     return NULL;
 }
 
-/** 
- * find a message in the given table. 
+/**
+ * find a message in the given table.
  * Looks up the message <name> in the MessageHash given
  * @param MessageHash the message table to search for this command, will almost always be IRCD
  * @param name the name of the command were looking for

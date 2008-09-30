@@ -144,10 +144,10 @@ IRCDCAPAB myIrcdcap[] = {
      0, 0, 0}
 };
 
-void dreamforge_set_umode(User * user, int ac, char **av)
+void dreamforge_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -434,7 +434,7 @@ CUMode myCumodes[128] = {
 
 
 
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     if (ac != 2) {
         do_nick(source, av[0], av[3], av[4], av[5], av[7],
@@ -447,7 +447,7 @@ int anope_event_nick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -510,13 +510,13 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 /* Event: PROTOCTL */
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
     capab_parse(ac, av);
     return MOD_CONT;
 }
 
-void dreamforge_cmd_sqline(char *mask, char *reason)
+void dreamforge_cmd_sqline(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
@@ -526,7 +526,7 @@ void DreamForgeProto::cmd_svsnoop(const char *server, int set)
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
-void dreamforge_cmd_svsadmin(char *server, int set)
+void dreamforge_cmd_svsadmin(const char *server, int set)
 {
 	ircd_proto.cmd_svsnoop(server, set);
 }
@@ -536,15 +536,15 @@ void DreamForgeProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
-void dreamforge_cmd_topic(char *whosets, char *chan, char *whosetit,
-                          char *topic, time_t when)
+void dreamforge_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                          const char *topic, time_t when)
 {
     send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
              (unsigned long int) when, topic);
 }
 
 /* PART */
-void dreamforge_cmd_part(char *nick, char *chan, char *buf)
+void dreamforge_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -558,24 +558,24 @@ void dreamforge_cmd_part(char *nick, char *chan, char *buf)
 }
 
 
-void dreamforge_cmd_unsqline(char *user)
+void dreamforge_cmd_unsqline(const char *user)
 {
     send_cmd(NULL, "UNSQLINE %s", user);
 }
 
-void dreamforge_cmd_join(char *user, char *channel, time_t chantime)
+void dreamforge_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "JOIN %s", channel);
 }
 
-void dreamforge_cmd_akill(char *user, char *host, char *who, time_t when,
-                          time_t expires, char *reason)
+void dreamforge_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                          time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s :%s", host, user, reason);
 }
 
 
-void dreamforge_cmd_svskill(char *source, char *user, char *buf)
+void dreamforge_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -588,14 +588,14 @@ void dreamforge_cmd_svskill(char *source, char *user, char *buf)
     send_cmd(source, "KILL %s :%s", user, buf);
 }
 
-void dreamforge_cmd_svsmode(User * u, int ac, char **av)
+void dreamforge_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %s%s%s", u->nick, av[0],
              (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
 }
 
 
-void dreamforge_cmd_squit(char *servname, char *message)
+void dreamforge_cmd_squit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -606,7 +606,7 @@ void anope_pong(char *servname)
 }
 
 /* PASS */
-void dreamforge_cmd_pass(char *pass)
+void dreamforge_cmd_pass(const char *pass)
 {
     send_cmd(NULL, "PASS :%s", pass);
 }
@@ -617,7 +617,7 @@ void dreamforge_cmd_capab()
 }
 
 /* SERVER name hop descript */
-void dreamforge_cmd_server(char *servname, int hop, char *descript)
+void dreamforge_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -637,7 +637,7 @@ void dreamforge_cmd_connect(int servernum)
     dreamforge_cmd_server(ServerName, 1, ServerDesc);
 }
 
-void dreamforge_cmd_bot_chan_mode(char *nick, char *chan)
+void dreamforge_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
@@ -645,7 +645,7 @@ void dreamforge_cmd_bot_chan_mode(char *nick, char *chan)
 
 
 /* GLOBOPS */
-void dreamforge_cmd_global(char *source, char *buf)
+void dreamforge_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -654,7 +654,7 @@ void dreamforge_cmd_global(char *source, char *buf)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -663,7 +663,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     if (ac != 4)
         return MOD_CONT;
@@ -671,7 +671,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -679,7 +679,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -688,7 +688,7 @@ int anope_event_quit(char *source, int ac, char **av)
 }
 
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -702,7 +702,7 @@ int anope_event_mode(char *source, int ac, char **av)
 }
 
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -711,7 +711,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -720,7 +720,7 @@ int anope_event_kick(char *source, int ac, char **av)
 }
 
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -728,7 +728,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -738,7 +738,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void dreamforge_cmd_mode(char *source, char *dest, char *buf)
+void dreamforge_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -747,7 +747,7 @@ void dreamforge_cmd_mode(char *source, char *dest, char *buf)
     send_cmd(source, "MODE %s %s", dest, buf);
 }
 
-void dreamforge_cmd_notice_ops(char *source, char *dest, char *buf)
+void dreamforge_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -757,7 +757,7 @@ void dreamforge_cmd_notice_ops(char *source, char *dest, char *buf)
 }
 
 
-void dreamforge_cmd_notice(char *source, char *dest, char *buf)
+void dreamforge_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -770,12 +770,12 @@ void dreamforge_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void dreamforge_cmd_notice2(char *source, char *dest, char *msg)
+void dreamforge_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
-void dreamforge_cmd_privmsg(char *source, char *dest, char *buf)
+void dreamforge_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -784,22 +784,22 @@ void dreamforge_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
-void dreamforge_cmd_privmsg2(char *source, char *dest, char *msg)
+void dreamforge_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void dreamforge_cmd_serv_notice(char *source, char *dest, char *msg)
+void dreamforge_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void dreamforge_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void dreamforge_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
-void dreamforge_cmd_351(char *source)
+void dreamforge_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
@@ -808,7 +808,7 @@ void dreamforge_cmd_351(char *source)
 }
 
 /* QUIT */
-void dreamforge_cmd_quit(char *source, char *buf)
+void dreamforge_cmd_quit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -818,7 +818,7 @@ void dreamforge_cmd_quit(char *source, char *buf)
 }
 
 /* 391 */
-void dreamforge_cmd_391(char *source, char *timestr)
+void dreamforge_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -827,7 +827,7 @@ void dreamforge_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void dreamforge_cmd_250(char *buf)
+void dreamforge_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -837,7 +837,7 @@ void dreamforge_cmd_250(char *buf)
 }
 
 /* 307 */
-void dreamforge_cmd_307(char *buf)
+void dreamforge_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -847,7 +847,7 @@ void dreamforge_cmd_307(char *buf)
 }
 
 /* 311 */
-void dreamforge_cmd_311(char *buf)
+void dreamforge_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -857,7 +857,7 @@ void dreamforge_cmd_311(char *buf)
 }
 
 /* 312 */
-void dreamforge_cmd_312(char *buf)
+void dreamforge_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -867,7 +867,7 @@ void dreamforge_cmd_312(char *buf)
 }
 
 /* 317 */
-void dreamforge_cmd_317(char *buf)
+void dreamforge_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -877,7 +877,7 @@ void dreamforge_cmd_317(char *buf)
 }
 
 /* 219 */
-void dreamforge_cmd_219(char *source, char *letter)
+void dreamforge_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -892,7 +892,7 @@ void dreamforge_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void dreamforge_cmd_401(char *source, char *who)
+void dreamforge_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -901,7 +901,7 @@ void dreamforge_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void dreamforge_cmd_318(char *source, char *who)
+void dreamforge_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -911,7 +911,7 @@ void dreamforge_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void dreamforge_cmd_242(char *buf)
+void dreamforge_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -921,7 +921,7 @@ void dreamforge_cmd_242(char *buf)
 }
 
 /* 243 */
-void dreamforge_cmd_243(char *buf)
+void dreamforge_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -931,7 +931,7 @@ void dreamforge_cmd_243(char *buf)
 }
 
 /* 211 */
-void dreamforge_cmd_211(char *buf)
+void dreamforge_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -940,7 +940,7 @@ void dreamforge_cmd_211(char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void dreamforge_cmd_nick(char *nick, char *name, char *modes)
+void dreamforge_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
@@ -950,7 +950,7 @@ void dreamforge_cmd_nick(char *nick, char *name, char *modes)
     dreamforge_cmd_sqline(nick, "Reserved for services");
 }
 
-void dreamforge_cmd_kick(char *source, char *chan, char *user, char *buf)
+void dreamforge_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -960,7 +960,7 @@ void dreamforge_cmd_kick(char *source, char *chan, char *user, char *buf)
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -970,7 +970,7 @@ int anope_event_server(char *source, int ac, char **av)
 }
 
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -978,7 +978,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -986,7 +986,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -994,7 +994,7 @@ int anope_event_whois(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1002,30 +1002,30 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void dreamforge_cmd_372(char *source, char *msg)
+void dreamforge_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void dreamforge_cmd_372_error(char *source)
+void dreamforge_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void dreamforge_cmd_375(char *source)
+void dreamforge_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void dreamforge_cmd_376(char *source)
+void dreamforge_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
 /* INVITE */
-void dreamforge_cmd_invite(char *source, char *chan, char *nick)
+void dreamforge_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1035,13 +1035,13 @@ void dreamforge_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* PONG */
-void dreamforge_cmd_pong(char *servname, char *who)
+void dreamforge_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
 
-void dreamforge_cmd_bot_nick(char *nick, char *user, char *host,
-                             char *real, char *modes)
+void dreamforge_cmd_bot_nick(const char *nick, const char *user, const char *host,
+                             const char *real, const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
@@ -1051,43 +1051,43 @@ void dreamforge_cmd_bot_nick(char *nick, char *user, char *host,
 }
 
 /* SVSHOLD - set */
-void dreamforge_cmd_svshold(char *nick)
+void dreamforge_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void dreamforge_cmd_release_svshold(char *nick)
+void dreamforge_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* UNSGLINE */
-void dreamforge_cmd_unsgline(char *mask)
+void dreamforge_cmd_unsgline(const char *mask)
 {
     /* Not Supported by this IRCD */
 }
 
 /* UNSZLINE */
-void dreamforge_cmd_unszline(char *mask)
+void dreamforge_cmd_unszline(const char *mask)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SZLINE */
-void dreamforge_cmd_szline(char *mask, char *reason, char *whom)
+void dreamforge_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SGLINE */
-void dreamforge_cmd_sgline(char *mask, char *reason)
+void dreamforge_cmd_sgline(const char *mask, const char *reason)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSNICK */
-void dreamforge_cmd_svsnick(char *source, char *guest, time_t when)
+void dreamforge_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1095,32 +1095,32 @@ void dreamforge_cmd_svsnick(char *source, char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void dreamforge_cmd_guest_nick(char *nick, char *user, char *host,
-                               char *real, char *modes)
+void dreamforge_cmd_guest_nick(const char *nick, const char *user, const char *host,
+                               const char *real, const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s 0 :%s", nick,
              (long int) time(NULL), user, host, ServerName, real);
     anope_cmd_mode(nick, nick, "MODE %s", modes);
 }
 
-void dreamforge_cmd_svso(char *source, char *nick, char *flag)
+void dreamforge_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
 
-void dreamforge_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void dreamforge_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     /* Not Supported by this IRCD */
 }
 
-void dreamforge_cmd_unban(char *name, char *nick)
+void dreamforge_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE channel modes */
 
-void dreamforge_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void dreamforge_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1132,7 +1132,7 @@ void dreamforge_cmd_vhost_off(User * u)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void dreamforge_cmd_svid_umode(char *nick, time_t ts)
+void dreamforge_cmd_svid_umode(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s +d 1", nick);
 }
@@ -1145,7 +1145,7 @@ void dreamforge_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +r */
-void dreamforge_cmd_svid_umode2(User * u, char *ts)
+void dreamforge_cmd_svid_umode2(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1154,13 +1154,13 @@ void dreamforge_cmd_svid_umode2(User * u, char *ts)
     }
 }
 
-void dreamforge_cmd_svid_umode3(User * u, char *ts)
+void dreamforge_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
 /* NICK <newnick>  */
-void dreamforge_cmd_chg_nick(char *oldnick, char *newnick)
+void dreamforge_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1169,37 +1169,37 @@ void dreamforge_cmd_chg_nick(char *oldnick, char *newnick)
     send_cmd(oldnick, "NICK %s", newnick);
 }
 
-void dreamforge_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void dreamforge_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void dreamforge_cmd_svspart(char *source, char *nick, char *chan)
+void dreamforge_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
 
-void dreamforge_cmd_swhois(char *source, char *who, char *mask)
+void dreamforge_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-int anope_event_rehash(char *source, int ac, char **av)
+int anope_event_rehash(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_credits(char *source, int ac, char **av)
+int anope_event_credits(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int dreamforge_flood_mode_check(char *value)
+int dreamforge_flood_mode_check(const char *value)
 {
     return 0;
 }
@@ -1209,7 +1209,7 @@ void dreamforge_cmd_eob()
     /* Not supported  */
 }
 
-void dreamforge_cmd_jupe(char *jserver, char *who, char *reason)
+void dreamforge_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1223,7 +1223,7 @@ void dreamforge_cmd_jupe(char *jserver, char *who, char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void dreamforge_cmd_global_legacy(char *source, char *fmt)
+void dreamforge_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1232,7 +1232,7 @@ void dreamforge_cmd_global_legacy(char *source, char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int dreamforge_valid_nick(char *nick)
+int dreamforge_valid_nick(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1242,14 +1242,14 @@ int dreamforge_valid_nick(char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int dreamforge_valid_chan(char *chan)
+int dreamforge_valid_chan(const char *chan)
 {
     /* no hard coded invalid chan */
     return 1;
 }
 
 
-void dreamforge_cmd_ctcp(char *source, char *dest, char *buf)
+void dreamforge_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
 
     char *s;

@@ -7,9 +7,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -300,7 +300,7 @@ int match_wild_nocase(const char *pattern, const char *str)
  * The callback should be of type range_callback_t, which is defined as:
  *	int (*range_callback_t)(User *u, int num, va_list args)
  * @param numstr
- * @param count_ret 
+ * @param count_ret
  * @param callback Call back function
  * @param u User Struct
  * @param ... various args
@@ -787,7 +787,7 @@ char *myStrSubString(const char *src, int start, int end)
 
 /*************************************************************************/
 
-void protocol_debug(char *source, char *cmd, int argc, char **argv)
+void protocol_debug(char *source, char *cmd, int argc, const char **argv)
 {
     int i;
 
@@ -851,7 +851,7 @@ void doCleanBuffer(char *str)
  * @param killer whom is doing the killing
  * @return void
  */
-void EnforceQlinedNick(char *nick, char *killer)
+void EnforceQlinedNick(const char *nick, const char *killer)
 {
     User *u2;
 
@@ -871,7 +871,7 @@ void EnforceQlinedNick(char *nick, char *killer)
  * @param int Check if botserv bots
  * @return int
  */
-int nickIsServices(char *tempnick, int bot)
+int nickIsServices(const char *tempnick, int bot)
 {
     int found = 0;
     char *s, *nick;
@@ -1106,7 +1106,7 @@ u_int32_t getrandom32(void)
 
 /**
  * Determine if we need to send the TOKEN
- * @param token1 
+ * @param token1
  * @param token2
  * @return token to send
  */
@@ -1201,7 +1201,7 @@ char *str_signed(unsigned char *str)
 
 /**
  *  Strip the mode prefix from the given string.
- *  Useful for using the modes stored in things like ircd->ownerset etc.. 
+ *  Useful for using the modes stored in things like ircd->ownerset etc..
  **/
 
 char *stripModePrefix(const char *str)

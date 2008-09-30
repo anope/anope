@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -118,7 +118,7 @@ Server *next_server(int flags)
  * @return Server Struct
  */
 Server *new_server(Server * uplink, const char *name, const char *desc,
-                   uint16 flags, char *suid)
+                   uint16 flags, const char *suid)
 {
     Server *serv;
 
@@ -351,8 +351,8 @@ int anope_check_sync(const char *name)
  * @param numeric Server Numberic/SUID
  * @return void
  */
-void do_server(const char *source, char *servername, char *hops,
-               char *descript, char *numeric)
+void do_server(const char *source, const char *servername, const char *hops,
+               const char *descript, const char *numeric)
 {
     Server *s;
 
@@ -383,7 +383,7 @@ void do_server(const char *source, char *servername, char *hops,
  * @param av Agruments as part of the SQUIT
  * @return void
  */
-void do_squit(const char *source, int ac, char **av)
+void do_squit(const char *source, int ac, const char **av)
 {
     char buf[BUFSIZE];
     Server *s;
@@ -433,16 +433,16 @@ void do_squit(const char *source, int ac, char **av)
 /**
  * Handle parsing the CAPAB/PROTOCTL messages
  * @param ac Number of arguments in av
- * @param av Agruments 
+ * @param av Agruments
  * @return void
  */
-void capab_parse(int ac, char **av)
+void capab_parse(int ac, const char **av)
 {
     int i;
     int j;
     char *s, *tmp;
 
-    char *temp;
+    const char *temp;
 
     for (i = 0; i < ac; i++) {
         temp = av[i];
@@ -480,7 +480,7 @@ void capab_parse(int ac, char **av)
  * @param server Server Setting the mode
  * @return int 0 if not found, 1 if found
  */
-int is_ulined(char *server)
+int is_ulined(const char *server)
 {
     int j;
 

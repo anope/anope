@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -88,9 +88,9 @@ static const char Pad64 = '=';
    end of the data is performed using the '=' character.
 
    Since all base64 input is an integral number of octets, only the
-         -------------------------------------------------                       
+         -------------------------------------------------
    following cases can arise:
-   
+
        (1) the final quantum of encoding input is an integral
            multiple of 24 bits; here, the final unit of encoded
 	   output will be an integral multiple of 4 characters
@@ -162,7 +162,7 @@ int b64_encode(char *src, size_t srclength, char *target, size_t targsize)
    it returns the number of data bytes stored at the target, or -1 on error.
  */
 
-int b64_decode(char *src, char *target, size_t targsize)
+int b64_decode(const char *src, char *target, size_t targsize)
 {
     int tarindex, state, ch;
     char *pos;
@@ -301,7 +301,7 @@ char *encode_ip(unsigned char *ip)
     return buf;
 }
 
-int decode_ip(char *buf)
+int decode_ip(const char *buf)
 {
     int len = strlen(buf);
     char targ[25];
@@ -351,8 +351,8 @@ char base64_to_int6_map[] = {
 
 static char *int_to_base64(long val)
 {
-    /* 32/6 == max 6 bytes for representation, 
-     * +1 for the null, +1 for byte boundaries 
+    /* 32/6 == max 6 bytes for representation,
+     * +1 for the null, +1 for byte boundaries
      */
     static char base64buf[8];
     long i = 7;
@@ -391,7 +391,7 @@ static long base64_to_int(char *b64)
     return v;
 }
 
-long base64dects(char *ts)
+long base64dects(const char *ts)
 {
     char *token;
     long value;

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -97,7 +97,7 @@ int do_ban(User * u)
             next = uc->next;
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && check_access(u, ci, CA_BANME)) {
-                char *av[3];
+                const char *av[3];
                 char mask[BUFSIZE];
 
                 /*
@@ -115,13 +115,12 @@ int do_ban(User * u)
                     continue;
                 }
 
-                av[0] = sstrdup("+b");
+                av[0] = "+b";
                 get_idealban(ci, u, mask, sizeof(mask));
                 av[1] = mask;
                 anope_cmd_mode(whosends(ci), uc->chan->name, "+b %s",
                                av[1]);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
-                free(av[0]);
 
                 if ((ci->flags & CI_SIGNKICK)
                     || ((ci->flags & CI_SIGNKICK_LEVEL)
@@ -170,15 +169,14 @@ int do_ban(User * u)
     } else if (ircd->protectedumode && is_protected(u2)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        char *av[3];
+        const char *av[3];
         char mask[BUFSIZE];
 
-        av[0] = sstrdup("+b");
+        av[0] = "+b";
         get_idealban(ci, u2, mask, sizeof(mask));
         av[1] = mask;
         anope_cmd_mode(whosends(ci), c->name, "+b %s", av[1]);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
-        free(av[0]);
 
         /* We still allow host banning while not allowing to kick */
         if (!is_on_chan(c, u2))

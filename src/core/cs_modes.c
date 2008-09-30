@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -207,7 +207,7 @@ int do_deprotect(User * u)
 
 int do_owner(User * u)
 {
-    char *av[2];
+    const char *av[2];
     char *chan = strtok(NULL, " ");
 
     Channel *c;
@@ -219,7 +219,7 @@ int do_owner(User * u)
     }
 
     if (!chan) {
-        av[0] = sstrdup(ircd->ownerset);
+        av[0] = ircd->ownerset;
         av[1] = u->nick;
 
         /* Sets the mode to the user on every channels he is on. */
@@ -233,7 +233,6 @@ int do_owner(User * u)
             }
         }
 
-        free(av[0]);
         return MOD_CONT;
     }
 
@@ -251,10 +250,9 @@ int do_owner(User * u)
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerset,
                        u->nick);
 
-        av[0] = sstrdup(ircd->ownerset);
+        av[0] = ircd->ownerset;
         av[1] = u->nick;
         chan_set_modes(s_ChanServ, c, 2, av, 1);
-        free(av[0]);
     }
     return MOD_CONT;
 }
@@ -263,7 +261,7 @@ int do_owner(User * u)
 
 int do_deowner(User * u)
 {
-    char *av[2];
+    const char *av[2];
     char *chan = strtok(NULL, " ");
 
     Channel *c;
@@ -275,7 +273,7 @@ int do_deowner(User * u)
     }
 
     if (!chan) {
-        av[0] = sstrdup(ircd->ownerunset);
+        av[0] = ircd->ownerunset;
         av[1] = u->nick;
 
         /* Sets the mode to the user on every channels he is on. */
@@ -289,7 +287,6 @@ int do_deowner(User * u)
             }
         }
 
-        free(av[0]);
         return MOD_CONT;
     }
 
@@ -307,10 +304,9 @@ int do_deowner(User * u)
         anope_cmd_mode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
                        u->nick);
 
-        av[0] = sstrdup(ircd->ownerunset);
+        av[0] = ircd->ownerunset;
         av[1] = u->nick;
         chan_set_modes(s_ChanServ, c, 2, av, 1);
-        free(av[0]);
     }
     return MOD_CONT;
 }
@@ -319,7 +315,7 @@ int do_deowner(User * u)
 
 int do_util(User * u, CSModeUtil * util)
 {
-    char *av[2];
+    const char *av[2];
     char *chan = strtok(NULL, " ");
     char *nick = strtok(NULL, " ");
 

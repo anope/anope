@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -272,7 +272,7 @@ void notice_help(const char *source, User * dest, int message, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice(char *source, char *dest, const char *fmt, ...)
+void notice(char *source, const char *dest, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];

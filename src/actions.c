@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -130,7 +130,7 @@ void sqline(char *mask, char *reason)
  */
 void common_unban(ChannelInfo * ci, char *nick)
 {
-    char *av[4];
+    const char *av[4];
     char *host = NULL;
     char buf[BUFSIZE];
     int ac;
@@ -170,11 +170,11 @@ void common_unban(ChannelInfo * ci, char *nick)
             snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
             av[0] = ci->name;
             av[1] = buf;
-            av[2] = sstrdup("-b");
+            av[2] = "-b";
             ac = 4;
         } else {
             av[0] = ci->name;
-            av[1] = sstrdup("-b");
+            av[1] = "-b";
             ac = 3;
         }
 
@@ -191,11 +191,6 @@ void common_unban(ChannelInfo * ci, char *nick)
                 do_cmode(whosends(ci), ac, av);
             }
         }
-
-        if (ircdcap->tsmode)
-            free(av[2]);
-        else
-            free(av[1]);
     }
     /* host_resolve() sstrdup us this info so we gotta free it */
     if (host) {

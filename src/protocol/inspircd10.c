@@ -382,10 +382,10 @@ CUMode myCumodes[128] = {
 };
 
 
-void inspircd_set_umode(User * user, int ac, char **av)
+void inspircd_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -503,18 +503,18 @@ void moduleAddIRCDMsgs(void) {
 
 /* *INDENT-ON* */
 
-void inspircd_cmd_svsadmin(char *server, int set)
+void inspircd_cmd_svsadmin(const char *server, int set)
 {
     /* Not Supported by this IRCD */
 }
 
-void InspIRCd::cmd_remove_akill(const char *user, const char *host)
+void InspIRCdProto::cmd_remove_akill(const char *user, const char *host)
 {
 	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
 
-void inspircd_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void inspircd_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, (unsigned long int) when, whosetit, topic);
 }
@@ -524,13 +524,13 @@ void inspircd_cmd_vhost_off(User * u)
     send_cmd(s_HostServ, "MODE %s -x", u->nick);
 }
 
-void inspircd_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void inspircd_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, (long int) when, (long int) 86400 * 2, reason);
 }
 
-void inspircd_cmd_svskill(char *source, char *user, char *buf)
+void inspircd_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -543,48 +543,48 @@ void inspircd_cmd_svskill(char *source, char *user, char *buf)
     send_cmd(source, "KILL %s :%s", user, buf);
 }
 
-void inspircd_cmd_svsmode(User * u, int ac, char **av)
+void inspircd_cmd_svsmode(User * u, int ac, const char **av)
 {
     send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
 }
 
 
-void inspircd_cmd_372(char *source, char *msg)
+void inspircd_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void inspircd_cmd_372_error(char *source)
+void inspircd_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void inspircd_cmd_375(char *source)
+void inspircd_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void inspircd_cmd_376(char *source)
+void inspircd_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
-void inspircd_cmd_nick(char *nick, char *name, char *modes)
+void inspircd_cmd_nick(const char *nick, const char *name, const char *modes)
 {
     /* :test.chatspike.net NICK 1133519355 Brain synapse.brainbox.winbot.co.uk netadmin.chatspike.net ~brain +xwsioS 10.0.0.2 :Craig Edwards */
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,ServiceHost,ServiceHost,ServiceUser,modes,name);
     send_cmd(ServerName, "OPERTYPE Service");
 }
 
-void inspircd_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void inspircd_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,host,host,user,modes,real);
 }
 
-void inspircd_cmd_mode(char *source, char *dest, char *buf)
+void inspircd_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -592,12 +592,12 @@ void inspircd_cmd_mode(char *source, char *dest, char *buf)
     send_cmd(source ? source : s_OperServ, "MODE %s %s", dest, buf);
 }
 
-int anope_event_version(char *source, int ac, char **av)
+int anope_event_version(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_idle(char *source, int ac, char **av)
+int anope_event_idle(const char *source, int ac, const char **av)
 {
 	if (ac == 1)
 	{
@@ -606,10 +606,10 @@ int anope_event_idle(char *source, int ac, char **av)
 	return MOD_CONT;
 }
 
-int anope_event_ftopic(char *source, int ac, char **av)
+int anope_event_ftopic(const char *source, int ac, const char **av)
 {
     /* :source FTOPIC channel ts setby :topic */
-    char* temp;
+    const char* temp;
     if (ac < 4)
         return MOD_CONT;
     temp = av[1];  /* temp now holds ts */
@@ -619,14 +619,14 @@ int anope_event_ftopic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_opertype(char* source, int ac, char**av)
+int anope_event_opertype(const char *source, int ac, const char **av)
 {
     /* opertype is equivalent to mode +o because servers
        dont do this directly */
     User* u;
     u = finduser(source);
     if (u && !is_oper(u)) {
-      char* newav[2];
+      const char* newav[2];
       newav[0] = source;
       newav[1] = "+o";
       return anope_event_mode(source, 2, newav);
@@ -634,7 +634,7 @@ int anope_event_opertype(char* source, int ac, char**av)
     else return MOD_CONT;
 }
 
-int anope_event_fmode(char *source, int ac, char **av)
+int anope_event_fmode(const char *source, int ac, const char **av)
 {
     /* :source FMODE #test +nt */
     if (ac != 2)
@@ -642,7 +642,7 @@ int anope_event_fmode(char *source, int ac, char **av)
     return anope_event_mode(source, ac, av);
 }
 
-int anope_event_samode(char *source, int ac, char **av)
+int anope_event_samode(const char *source, int ac, const char **av)
 {
     /* :source SAMODE targets modes */
     if (ac < 2)
@@ -651,7 +651,7 @@ int anope_event_samode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sanick(char *source, int ac, char **av)
+int anope_event_sanick(const char *source, int ac, const char **av)
 {
     /* :source SANICK old new */
     if (ac != 2)
@@ -660,9 +660,9 @@ int anope_event_sanick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sajoin(char *source, int ac, char **av)
+int anope_event_sajoin(const char *source, int ac, const char **av)
 {
-    char* newav[1];
+    const char* newav[1];
     if (ac != 2)
         return MOD_CONT;
     newav[0] = av[1];
@@ -670,9 +670,9 @@ int anope_event_sajoin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_sapart(char *source, int ac, char **av)
+int anope_event_sapart(const char *source, int ac, const char **av)
 {
-    char* newav[1];
+    const char* newav[1];
     if (ac < 2)
         return MOD_CONT;
     newav[0] = av[1];
@@ -680,9 +680,9 @@ int anope_event_sapart(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_fjoin(char *source, int ac, char **av)
+int anope_event_fjoin(const char *source, int ac, const char **av)
 {
-    char* newav[127];
+    const char* newav[127];
     char people[1024];
     int i = 0;
 
@@ -706,14 +706,14 @@ int anope_event_fjoin(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void inspircd_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void inspircd_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s",(long int) time(NULL),nick,host,host,user,modes,real);
     send_cmd(ServerName, "OPERTYPE Bot");
 }
 
-void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)
+void inspircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -722,7 +722,7 @@ void inspircd_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void inspircd_cmd_notice_ops(char *source, char *dest, char *buf)
+void inspircd_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -732,7 +732,7 @@ void inspircd_cmd_notice_ops(char *source, char *dest, char *buf)
 }
 
 
-void inspircd_cmd_notice(char *source, char *dest, char *buf)
+void inspircd_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -745,12 +745,12 @@ void inspircd_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void inspircd_cmd_notice2(char *source, char *dest, char *msg)
+void inspircd_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
-void inspircd_cmd_privmsg(char *source, char *dest, char *buf)
+void inspircd_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -759,28 +759,28 @@ void inspircd_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
-void inspircd_cmd_privmsg2(char *source, char *dest, char *msg)
+void inspircd_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void inspircd_cmd_serv_notice(char *source, char *dest, char *msg)
+void inspircd_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void inspircd_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void inspircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
 
-void inspircd_cmd_bot_chan_mode(char *nick, char *chan)
+void inspircd_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
-void inspircd_cmd_351(char *source)
+void inspircd_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
@@ -788,7 +788,7 @@ void inspircd_cmd_351(char *source)
 }
 
 /* QUIT */
-void inspircd_cmd_quit(char *source, char *buf)
+void inspircd_cmd_quit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -805,19 +805,19 @@ void inspircd_cmd_protoctl()
 static char currentpass[1024];
 
 /* PASS */
-void inspircd_cmd_pass(char *pass)
+void inspircd_cmd_pass(const char *pass)
 {
     strncpy(currentpass,pass,1024);
 }
 
 /* SERVER services-dev.chatspike.net password 0 :Description here */
-void inspircd_cmd_server(char *servname, int hop, char *descript)
+void inspircd_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
 }
 
 /* PONG */
-void inspircd_cmd_pong(char *servname, char *who)
+void inspircd_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
@@ -825,13 +825,13 @@ void inspircd_cmd_pong(char *servname, char *who)
 /* JOIN */
 /* Althought inspircd 3.2 does not need the timestamp others do so
    we get it in the common function call */
-void inspircd_cmd_join(char *user, char *channel, time_t chantime)
+void inspircd_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "JOIN %s", channel);
 }
 
 /* UNSQLINE */
-void inspircd_cmd_unsqline(char *user)
+void inspircd_cmd_unsqline(const char *user)
 {
     if (!user) {
         return;
@@ -840,7 +840,7 @@ void inspircd_cmd_unsqline(char *user)
 }
 
 /* CHGHOST */
-void inspircd_cmd_chghost(char *nick, char *vhost)
+void inspircd_cmd_chghost(const char *nick, const char *vhost)
 {
     if (!nick || !vhost) {
         return;
@@ -849,7 +849,7 @@ void inspircd_cmd_chghost(char *nick, char *vhost)
 }
 
 /* CHGIDENT */
-void inspircd_cmd_chgident(char *nick, char *vIdent)
+void inspircd_cmd_chgident(const char *nick, const char *vIdent)
 {
     if (!nick || !vIdent) {
         return;
@@ -858,7 +858,7 @@ void inspircd_cmd_chgident(char *nick, char *vIdent)
 }
 
 /* INVITE */
-void inspircd_cmd_invite(char *source, char *chan, char *nick)
+void inspircd_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -868,7 +868,7 @@ void inspircd_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* PART */
-void inspircd_cmd_part(char *nick, char *chan, char *buf)
+void inspircd_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -882,7 +882,7 @@ void inspircd_cmd_part(char *nick, char *chan, char *buf)
 }
 
 /* 391 */
-void inspircd_cmd_391(char *source, char *timestr)
+void inspircd_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -891,7 +891,7 @@ void inspircd_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void inspircd_cmd_250(char *buf)
+void inspircd_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -901,7 +901,7 @@ void inspircd_cmd_250(char *buf)
 }
 
 /* 307 */
-void inspircd_cmd_307(char *buf)
+void inspircd_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -911,7 +911,7 @@ void inspircd_cmd_307(char *buf)
 }
 
 /* 311 */
-void inspircd_cmd_311(char *buf)
+void inspircd_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -921,7 +921,7 @@ void inspircd_cmd_311(char *buf)
 }
 
 /* 312 */
-void inspircd_cmd_312(char *buf)
+void inspircd_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -931,7 +931,7 @@ void inspircd_cmd_312(char *buf)
 }
 
 /* 317 */
-void inspircd_cmd_317(char *buf)
+void inspircd_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -941,7 +941,7 @@ void inspircd_cmd_317(char *buf)
 }
 
 /* 219 */
-void inspircd_cmd_219(char *source, char *letter)
+void inspircd_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -956,7 +956,7 @@ void inspircd_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void inspircd_cmd_401(char *source, char *who)
+void inspircd_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -965,7 +965,7 @@ void inspircd_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void inspircd_cmd_318(char *source, char *who)
+void inspircd_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -975,7 +975,7 @@ void inspircd_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void inspircd_cmd_242(char *buf)
+void inspircd_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -985,7 +985,7 @@ void inspircd_cmd_242(char *buf)
 }
 
 /* 243 */
-void inspircd_cmd_243(char *buf)
+void inspircd_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -995,7 +995,7 @@ void inspircd_cmd_243(char *buf)
 }
 
 /* 211 */
-void inspircd_cmd_211(char *buf)
+void inspircd_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1005,7 +1005,7 @@ void inspircd_cmd_211(char *buf)
 }
 
 /* GLOBOPS */
-void inspircd_cmd_global(char *source, char *buf)
+void inspircd_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1015,7 +1015,7 @@ void inspircd_cmd_global(char *source, char *buf)
 }
 
 /* SQLINE */
-void inspircd_cmd_sqline(char *mask, char *reason)
+void inspircd_cmd_sqline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -1025,7 +1025,7 @@ void inspircd_cmd_sqline(char *mask, char *reason)
 }
 
 /* SQUIT */
-void inspircd_cmd_squit(char *servname, char *message)
+void inspircd_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1035,12 +1035,12 @@ void inspircd_cmd_squit(char *servname, char *message)
 }
 
 /* SVSO */
-void inspircd_cmd_svso(char *source, char *nick, char *flag)
+void inspircd_cmd_svso(const char *source, const char *nick, const char *flag)
 {
 }
 
 /* NICK <newnick>  */
-void inspircd_cmd_chg_nick(char *oldnick, char *newnick)
+void inspircd_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1050,7 +1050,7 @@ void inspircd_cmd_chg_nick(char *oldnick, char *newnick)
 }
 
 /* SVSNICK */
-void inspircd_cmd_svsnick(char *source, char *guest, time_t when)
+void inspircd_cmd_svsnick(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1061,7 +1061,7 @@ void inspircd_cmd_svsnick(char *source, char *guest, time_t when)
 
 /* Functions that use serval cmd functions */
 
-void inspircd_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void inspircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     if (!nick) {
         return;
@@ -1093,7 +1093,7 @@ void inspircd_cmd_connect(int servernum)
 
 /* Events */
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1102,7 +1102,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -1111,7 +1111,7 @@ int anope_event_436(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1122,7 +1122,7 @@ int anope_event_away(char *source, int ac, char **av)
 
 /* Taken from hybrid.c, topic syntax is identical */
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     Channel *c = findchan(av[0]);
     time_t topic_time = time(NULL);
@@ -1158,7 +1158,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1166,7 +1166,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1175,7 +1175,7 @@ int anope_event_quit(char *source, int ac, char **av)
 }
 
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -1200,7 +1200,7 @@ int anope_event_mode(char *source, int ac, char **av)
 }
 
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1209,7 +1209,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -1218,7 +1218,7 @@ int anope_event_kick(char *source, int ac, char **av)
 }
 
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -1226,7 +1226,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -1236,7 +1236,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_setname(char *source, int ac, char **av)
+int anope_event_setname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1251,11 +1251,11 @@ int anope_event_setname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[0]);
+    u->SetRealname(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_chgname(char *source, int ac, char **av)
+int anope_event_chgname(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1270,11 +1270,11 @@ int anope_event_chgname(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_realname(u, av[0]);
+    u->SetRealname(av[0]);
     return MOD_CONT;
 }
 
-int anope_event_setident(char *source, int ac, char **av)
+int anope_event_setident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1289,10 +1289,10 @@ int anope_event_setident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[0]);
+    u->SetIdent(av[0]);
     return MOD_CONT;
 }
-int anope_event_chgident(char *source, int ac, char **av)
+int anope_event_chgident(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1307,11 +1307,11 @@ int anope_event_chgident(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_username(u, av[1]);
+    u->SetIdent(av[1]);
     return MOD_CONT;
 }
 
-int anope_event_sethost(char *source, int ac, char **av)
+int anope_event_sethost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1326,12 +1326,12 @@ int anope_event_sethost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[0]);
+    u->SetDisplayedHost(av[0]);
     return MOD_CONT;
 }
 
 
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     User *user;
     struct in_addr addy;
@@ -1361,7 +1361,7 @@ int anope_event_nick(char *source, int ac, char **av)
 }
 
 
-int anope_event_chghost(char *source, int ac, char **av)
+int anope_event_chghost(const char *source, int ac, const char **av)
 {
     User *u;
 
@@ -1376,12 +1376,12 @@ int anope_event_chghost(char *source, int ac, char **av)
         return MOD_CONT;
     }
 
-    change_user_host(u, av[0]);
+    u->SetDisplayedHost(av[0]);
     return MOD_CONT;
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -1391,7 +1391,7 @@ int anope_event_server(char *source, int ac, char **av)
 }
 
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -1399,7 +1399,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -1407,7 +1407,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -1416,49 +1416,49 @@ int anope_event_whois(char *source, int ac, char **av)
 }
 
 /* SVSHOLD - set */
-void inspircd_cmd_svshold(char *nick)
+void inspircd_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void inspircd_cmd_release_svshold(char *nick)
+void inspircd_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* UNSGLINE */
-void inspircd_cmd_unsgline(char *mask)
+void inspircd_cmd_unsgline(const char *mask)
 {
     /* Not Supported by this IRCD */
 }
 
 /* UNSZLINE */
-void inspircd_cmd_unszline(char *mask)
+void inspircd_cmd_unszline(const char *mask)
 {
     send_cmd(s_OperServ, "ZLINE %s", mask);
 }
 
 /* SZLINE */
-void inspircd_cmd_szline(char *mask, char *reason, char *whom)
+void inspircd_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, (long int) time(NULL), reason);
 }
 
 /* SGLINE */
-void inspircd_cmd_sgline(char *mask, char *reason)
+void inspircd_cmd_sgline(const char *mask, const char *reason)
 {
     /* Not Supported by this IRCD */
 }
 
-void inspircd_cmd_unban(char *name, char *nick)
+void inspircd_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE channel modes */
 
-void inspircd_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void inspircd_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1466,7 +1466,7 @@ void inspircd_cmd_svsmode_chan(char *name, char *mode, char *nick)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void inspircd_cmd_svid_umode(char *nick, time_t ts)
+void inspircd_cmd_svid_umode(const char *nick, time_t ts)
 {
     if (debug)
         alog("debug: common_svsmode(0)");
@@ -1482,29 +1482,29 @@ void inspircd_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +r */
-void inspircd_cmd_svid_umode2(User * u, char *ts)
+void inspircd_cmd_svid_umode2(User * u, const char *ts)
 {
    if (debug)
        alog("debug: common_svsmode(2)");
    common_svsmode(u, "+r", NULL);
 }
 
-void inspircd_cmd_svid_umode3(User * u, char *ts)
+void inspircd_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
-void inspircd_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void inspircd_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     send_cmd(source, "SAJOIN %s %s", nick, chan);
 }
 
-void inspircd_cmd_svspart(char *source, char *nick, char *chan)
+void inspircd_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     send_cmd(source, "SAPART %s %s", nick, chan);
 }
 
-void inspircd_cmd_swhois(char *source, char *who, char *mask)
+void inspircd_cmd_swhois(const char *source, const char *who, const char *mask)
 {
 }
 
@@ -1514,22 +1514,22 @@ void inspircd_cmd_eob()
 }
 
 
-int anope_event_rehash(char *source, int ac, char **av)
+int anope_event_rehash(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_credits(char *source, int ac, char **av)
+int anope_event_credits(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int inspircd_flood_mode_check(char *value)
+int inspircd_flood_mode_check(const char *value)
 {
     char *dp, *end;
 
@@ -1543,7 +1543,7 @@ int inspircd_flood_mode_check(char *value)
     }
 }
 
-void inspircd_cmd_jupe(char *jserver, char *who, char *reason)
+void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1557,23 +1557,23 @@ void inspircd_cmd_jupe(char *jserver, char *who, char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void inspircd_cmd_global_legacy(char *source, char *fmt)
+void inspircd_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : s_OperServ, "GLOBOPS :%s", fmt);
 }
 
-int inspircd_valid_nick(char *nick)
+int inspircd_valid_nick(const char *nick)
 {
     return 1;
 }
 
-int inspircd_valid_chan(char *chan)
+int inspircd_valid_chan(const char *chan)
 {
     return 1;
 }
 
 
-void inspircd_cmd_ctcp(char *source, char *dest, char *buf)
+void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

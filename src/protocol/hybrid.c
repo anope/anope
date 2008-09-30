@@ -146,10 +146,10 @@ IRCDCAPAB myIrcdcap[] = {
 
 
 
-void hybrid_set_umode(User * user, int ac, char **av)
+void hybrid_set_umode(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
-    char *modes = av[0];
+    const char *modes = av[0];
 
     ac--;
 
@@ -461,7 +461,7 @@ CUMode myCumodes[128] = {
 
 
 
-void hybrid_cmd_notice(char *source, char *dest, char *buf)
+void hybrid_cmd_notice(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -474,12 +474,12 @@ void hybrid_cmd_notice(char *source, char *dest, char *buf)
     }
 }
 
-void hybrid_cmd_notice2(char *source, char *dest, char *msg)
+void hybrid_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
-void hybrid_cmd_privmsg(char *source, char *dest, char *buf)
+void hybrid_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -488,23 +488,23 @@ void hybrid_cmd_privmsg(char *source, char *dest, char *buf)
     send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
-void hybrid_cmd_privmsg2(char *source, char *dest, char *msg)
+void hybrid_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void hybrid_cmd_serv_notice(char *source, char *dest, char *msg)
+void hybrid_cmd_serv_notice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $$%s :%s", dest, msg);
 }
 
-void hybrid_cmd_serv_privmsg(char *source, char *dest, char *msg)
+void hybrid_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
 }
 
 
-void hybrid_cmd_global(char *source, char *buf)
+void hybrid_cmd_global(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -514,18 +514,18 @@ void hybrid_cmd_global(char *source, char *buf)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void hybrid_cmd_global_legacy(char *source, char *fmt)
+void hybrid_cmd_global_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
 
-int anope_event_sjoin(char *source, int ac, char **av)
+int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
 }
 
-int anope_event_nick(char *source, int ac, char **av)
+int anope_event_nick(const char *source, int ac, const char **av)
 {
     if (ac != 2) {
         User *user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
@@ -539,7 +539,7 @@ int anope_event_nick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_topic(char *source, int ac, char **av)
+int anope_event_topic(const char *source, int ac, const char **av)
 {
     if (ac == 4) {
         do_topic(source, ac, av);
@@ -578,7 +578,7 @@ int anope_event_topic(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_tburst(char *source, int ac, char **av)
+int anope_event_tburst(const char *source, int ac, const char **av)
 {
     if (ac != 5)
         return MOD_CONT;
@@ -590,7 +590,7 @@ int anope_event_tburst(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_436(char *source, int ac, char **av)
+int anope_event_436(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -653,7 +653,7 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 
-void hybrid_cmd_sqline(char *mask, char *reason)
+void hybrid_cmd_sqline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -661,7 +661,7 @@ void hybrid_cmd_sqline(char *mask, char *reason)
 
     send_cmd(ServerName, "RESV * %s :%s", mask, reason);
 }
-void hybrid_cmd_unsgline(char *mask)
+void hybrid_cmd_unsgline(const char *mask)
 {
     if (!mask) {
         return;
@@ -670,20 +670,20 @@ void hybrid_cmd_unsgline(char *mask)
     send_cmd(ServerName, "UNXLINE * %s", mask);
 }
 
-void hybrid_cmd_unszline(char *mask)
+void hybrid_cmd_unszline(const char *mask)
 {
     /* Does not support */
 }
-void hybrid_cmd_szline(char *mask, char *reason, char *whom)
+void hybrid_cmd_szline(const char *mask, const char *reason, const char *whom)
 {
     /* Does not support */
 }
 
-void hybrid_cmd_svsadmin(char *server, int set)
+void hybrid_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void hybrid_cmd_sgline(char *mask, char *reason)
+void hybrid_cmd_sgline(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -698,8 +698,8 @@ void HybridIRCdProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
-void hybrid_cmd_topic(char *whosets, char *chan, char *whosetit,
-                      char *topic, time_t when)
+void hybrid_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
+                      const char *topic, time_t when)
 {
     send_cmd(whosets, "TOPIC %s :%s", chan, topic);
 }
@@ -709,12 +709,12 @@ void hybrid_cmd_vhost_off(User * u)
     /* does not support vhosting */
 }
 
-void hybrid_cmd_vhost_on(char *nick, char *vIdent, char *vhost)
+void hybrid_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 {
     /* does not support vhosting */
 }
 
-void hybrid_cmd_unsqline(char *user)
+void hybrid_cmd_unsqline(const char *user)
 {
     if (!user) {
         return;
@@ -723,7 +723,7 @@ void hybrid_cmd_unsqline(char *user)
     send_cmd(ServerName, "UNRESV * %s", user);
 }
 
-void hybrid_cmd_join(char *user, char *channel, time_t chantime)
+void hybrid_cmd_join(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime, channel,
              user);
@@ -738,14 +738,14 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void hybrid_cmd_akill(char *user, char *host, char *who, time_t when,
-                      time_t expires, char *reason)
+void hybrid_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+                      time_t expires, const char *reason)
 {
     send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
              (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
-void hybrid_cmd_svskill(char *source, char *user, char *buf)
+void hybrid_cmd_svskill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -759,7 +759,7 @@ void hybrid_cmd_svskill(char *source, char *user, char *buf)
 }
 
 
-void hybrid_cmd_svsmode(User * u, int ac, char **av)
+void hybrid_cmd_svsmode(User * u, int ac, const char **av)
 {
     /* Hybrid does not support SVSMODE */
 }
@@ -805,13 +805,13 @@ void hybrid_cmd_capab()
 }
 
 /* PASS */
-void hybrid_cmd_pass(char *pass)
+void hybrid_cmd_pass(const char *pass)
 {
     send_cmd(NULL, "PASS %s :TS", pass);
 }
 
 /* SERVER name hop descript */
-void hybrid_cmd_server(char *servname, int hop, char *descript)
+void hybrid_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -839,8 +839,8 @@ void hybrid_cmd_svsinfo()
 
 
 
-void hybrid_cmd_bot_nick(char *nick, char *user, char *host, char *real,
-                         char *modes)
+void hybrid_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+                         const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
@@ -848,7 +848,7 @@ void hybrid_cmd_bot_nick(char *nick, char *user, char *host, char *real,
 
 }
 
-void hybrid_cmd_part(char *nick, char *chan, char *buf)
+void hybrid_cmd_part(const char *nick, const char *chan, const char *buf)
 {
     if (buf) {
         send_cmd(nick, "PART %s :%s", chan, buf);
@@ -857,7 +857,7 @@ void hybrid_cmd_part(char *nick, char *chan, char *buf)
     }
 }
 
-int anope_event_ping(char *source, int ac, char **av)
+int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
@@ -865,7 +865,7 @@ int anope_event_ping(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_away(char *source, int ac, char **av)
+int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -874,7 +874,7 @@ int anope_event_away(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kill(char *source, int ac, char **av)
+int anope_event_kill(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -883,7 +883,7 @@ int anope_event_kill(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_kick(char *source, int ac, char **av)
+int anope_event_kick(const char *source, int ac, const char **av)
 {
     if (ac != 3)
         return MOD_CONT;
@@ -891,7 +891,7 @@ int anope_event_kick(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_eob(char *source, int ac, char **av)
+int anope_event_eob(const char *source, int ac, const char **av)
 {
     Server *s;
     s = findserver(servlist, source);
@@ -912,7 +912,7 @@ void hybrid_cmd_eob()
 }
 
 
-int anope_event_join(char *source, int ac, char **av)
+int anope_event_join(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -920,7 +920,7 @@ int anope_event_join(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_motd(char *source, int ac, char **av)
+int anope_event_motd(const char *source, int ac, const char **av)
 {
     if (!source) {
         return MOD_CONT;
@@ -930,7 +930,7 @@ int anope_event_motd(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_privmsg(char *source, int ac, char **av)
+int anope_event_privmsg(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -938,7 +938,7 @@ int anope_event_privmsg(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_part(char *source, int ac, char **av)
+int anope_event_part(const char *source, int ac, const char **av)
 {
     if (ac < 1 || ac > 2)
         return MOD_CONT;
@@ -946,7 +946,7 @@ int anope_event_part(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_whois(char *source, int ac, char **av)
+int anope_event_whois(const char *source, int ac, const char **av)
 {
     if (source && ac >= 1) {
         m_whois(source, av[0]);
@@ -955,7 +955,7 @@ int anope_event_whois(char *source, int ac, char **av)
 }
 
 /* EVENT: SERVER */
-int anope_event_server(char *source, int ac, char **av)
+int anope_event_server(const char *source, int ac, const char **av)
 {
     if (!stricmp(av[1], "1")) {
         uplink = sstrdup(av[0]);
@@ -964,7 +964,7 @@ int anope_event_server(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_squit(char *source, int ac, char **av)
+int anope_event_squit(const char *source, int ac, const char **av)
 {
     if (ac != 2)
         return MOD_CONT;
@@ -972,7 +972,7 @@ int anope_event_squit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-int anope_event_quit(char *source, int ac, char **av)
+int anope_event_quit(const char *source, int ac, const char **av)
 {
     if (ac != 1)
         return MOD_CONT;
@@ -980,30 +980,30 @@ int anope_event_quit(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_372(char *source, char *msg)
+void hybrid_cmd_372(const char *source, const char *msg)
 {
     send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
-void hybrid_cmd_372_error(char *source)
+void hybrid_cmd_372_error(const char *source)
 {
     send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
              "contact your IRC administrator.", source);
 }
 
-void hybrid_cmd_375(char *source)
+void hybrid_cmd_375(const char *source)
 {
     send_cmd(ServerName, "375 %s :- %s Message of the Day",
              source, ServerName);
 }
 
-void hybrid_cmd_376(char *source)
+void hybrid_cmd_376(const char *source)
 {
     send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
 /* 391 */
-void hybrid_cmd_391(char *source, char *timestr)
+void hybrid_cmd_391(const char *source, const char *timestr)
 {
     if (!timestr) {
         return;
@@ -1012,7 +1012,7 @@ void hybrid_cmd_391(char *source, char *timestr)
 }
 
 /* 250 */
-void hybrid_cmd_250(char *buf)
+void hybrid_cmd_250(const char *buf)
 {
     if (!buf) {
         return;
@@ -1022,7 +1022,7 @@ void hybrid_cmd_250(char *buf)
 }
 
 /* 307 */
-void hybrid_cmd_307(char *buf)
+void hybrid_cmd_307(const char *buf)
 {
     if (!buf) {
         return;
@@ -1032,7 +1032,7 @@ void hybrid_cmd_307(char *buf)
 }
 
 /* 311 */
-void hybrid_cmd_311(char *buf)
+void hybrid_cmd_311(const char *buf)
 {
     if (!buf) {
         return;
@@ -1042,7 +1042,7 @@ void hybrid_cmd_311(char *buf)
 }
 
 /* 312 */
-void hybrid_cmd_312(char *buf)
+void hybrid_cmd_312(const char *buf)
 {
     if (!buf) {
         return;
@@ -1052,7 +1052,7 @@ void hybrid_cmd_312(char *buf)
 }
 
 /* 317 */
-void hybrid_cmd_317(char *buf)
+void hybrid_cmd_317(const char *buf)
 {
     if (!buf) {
         return;
@@ -1062,7 +1062,7 @@ void hybrid_cmd_317(char *buf)
 }
 
 /* 219 */
-void hybrid_cmd_219(char *source, char *letter)
+void hybrid_cmd_219(const char *source, const char *letter)
 {
     if (!source) {
         return;
@@ -1077,7 +1077,7 @@ void hybrid_cmd_219(char *source, char *letter)
 }
 
 /* 401 */
-void hybrid_cmd_401(char *source, char *who)
+void hybrid_cmd_401(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1086,7 +1086,7 @@ void hybrid_cmd_401(char *source, char *who)
 }
 
 /* 318 */
-void hybrid_cmd_318(char *source, char *who)
+void hybrid_cmd_318(const char *source, const char *who)
 {
     if (!source || !who) {
         return;
@@ -1096,7 +1096,7 @@ void hybrid_cmd_318(char *source, char *who)
 }
 
 /* 242 */
-void hybrid_cmd_242(char *buf)
+void hybrid_cmd_242(const char *buf)
 {
     if (!buf) {
         return;
@@ -1106,7 +1106,7 @@ void hybrid_cmd_242(char *buf)
 }
 
 /* 243 */
-void hybrid_cmd_243(char *buf)
+void hybrid_cmd_243(const char *buf)
 {
     if (!buf) {
         return;
@@ -1116,7 +1116,7 @@ void hybrid_cmd_243(char *buf)
 }
 
 /* 211 */
-void hybrid_cmd_211(char *buf)
+void hybrid_cmd_211(const char *buf)
 {
     if (!buf) {
         return;
@@ -1125,7 +1125,7 @@ void hybrid_cmd_211(char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void hybrid_cmd_mode(char *source, char *dest, char *buf)
+void hybrid_cmd_mode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1134,7 +1134,7 @@ void hybrid_cmd_mode(char *source, char *dest, char *buf)
     send_cmd(source, "MODE %s %s", dest, buf);
 }
 
-void hybrid_cmd_nick(char *nick, char *name, char *mode)
+void hybrid_cmd_nick(const char *nick, const char *name, const char *mode)
 {
     EnforceQlinedNick(nick, NULL);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
@@ -1142,7 +1142,7 @@ void hybrid_cmd_nick(char *nick, char *name, char *mode)
              ServerName, (name));
 }
 
-void hybrid_cmd_kick(char *source, char *chan, char *user, char *buf)
+void hybrid_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1151,7 +1151,7 @@ void hybrid_cmd_kick(char *source, char *chan, char *user, char *buf)
     }
 }
 
-void hybrid_cmd_notice_ops(char *source, char *dest, char *buf)
+void hybrid_cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1160,13 +1160,13 @@ void hybrid_cmd_notice_ops(char *source, char *dest, char *buf)
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void hybrid_cmd_bot_chan_mode(char *nick, char *chan)
+void hybrid_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
     anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
-void hybrid_cmd_quit(char *source, char *buf)
+void hybrid_cmd_quit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1176,13 +1176,13 @@ void hybrid_cmd_quit(char *source, char *buf)
 }
 
 /* PONG */
-void hybrid_cmd_pong(char *servname, char *who)
+void hybrid_cmd_pong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
 
 /* INVITE */
-void hybrid_cmd_invite(char *source, char *chan, char *nick)
+void hybrid_cmd_invite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1192,7 +1192,7 @@ void hybrid_cmd_invite(char *source, char *chan, char *nick)
 }
 
 /* SQUIT */
-void hybrid_cmd_squit(char *servname, char *message)
+void hybrid_cmd_squit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1201,7 +1201,7 @@ void hybrid_cmd_squit(char *servname, char *message)
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
-int anope_event_mode(char *source, int ac, char **av)
+int anope_event_mode(const char *source, int ac, const char **av)
 {
     if (ac < 2)
         return MOD_CONT;
@@ -1214,7 +1214,7 @@ int anope_event_mode(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_351(char *source)
+void hybrid_cmd_351(const char *source)
 {
     send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
              source, version_number, ServerName, ircd->name, version_flags,
@@ -1222,23 +1222,23 @@ void hybrid_cmd_351(char *source)
 }
 
 /* Event: PROTOCTL */
-int anope_event_capab(char *source, int ac, char **av)
+int anope_event_capab(const char *source, int ac, const char **av)
 {
 	int argvsize = 8;
 	int argc;
-	char **argv;
+	const char **argv;
 	char *str;
 
 	if (ac < 1)
 		return MOD_CONT;
 
 	/* We get the params as one arg, we should split it for capab_parse */
-	argv = scalloc(argvsize, sizeof(char *));
+	argv = (const char **)scalloc(argvsize, sizeof(const char *));
 	argc = 0;
 	while ((str = myStrGetToken(av[0], ' ', argc))) {
 		if (argc == argvsize) {
 			argvsize += 8;
-			argv = srealloc(argv, argvsize * sizeof(char *));
+			argv = (const char **)srealloc(argv, argvsize * sizeof(const char *));
 		}
 		argv[argc] = str;
 		argc++;
@@ -1248,58 +1248,58 @@ int anope_event_capab(char *source, int ac, char **av)
 
 	/* Free our built ac/av */
 	for (argvsize = 0; argvsize < argc; argvsize++) {
-		free(argv[argvsize]);
+		free((char *)argv[argvsize]);
 	}
-	free(argv);
+	free((char **)argv);
 
     return MOD_CONT;
 }
 
 /* SVSHOLD - set */
-void hybrid_cmd_svshold(char *nick)
+void hybrid_cmd_svshold(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void hybrid_cmd_release_svshold(char *nick)
+void hybrid_cmd_release_svshold(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSNICK */
-void hybrid_cmd_svsnick(char *nick, char *newnick, time_t when)
+void hybrid_cmd_svsnick(const char *nick, const char *newnick, time_t when)
 {
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_guest_nick(char *nick, char *user, char *host, char *real,
-                           char *modes)
+void hybrid_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+                           const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void hybrid_cmd_svso(char *source, char *nick, char *flag)
+void hybrid_cmd_svso(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_unban(char *name, char *nick)
+void hybrid_cmd_unban(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE channel modes */
 
-void hybrid_cmd_svsmode_chan(char *name, char *mode, char *nick)
+void hybrid_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void hybrid_cmd_svid_umode(char *nick, time_t ts)
+void hybrid_cmd_svid_umode(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s +d 1", nick);
 }
@@ -1312,19 +1312,19 @@ void hybrid_cmd_nc_change(User * u)
 }
 
 /* SVSMODE +d */
-void hybrid_cmd_svid_umode2(User * u, char *ts)
+void hybrid_cmd_svid_umode2(User * u, const char *ts)
 {
     /* not used */
 }
 
 
-void hybrid_cmd_svid_umode3(User * u, char *ts)
+void hybrid_cmd_svid_umode3(User * u, const char *ts)
 {
     /* not used */
 }
 
 /* NICK <newnick>  */
-void hybrid_cmd_chg_nick(char *oldnick, char *newnick)
+void hybrid_cmd_chg_nick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1341,54 +1341,54 @@ void hybrid_cmd_chg_nick(char *oldnick, char *newnick)
  *      parv[3] = server is standalone or connected to non-TS only
  *      parv[4] = server's idea of UTC time
  */
-int anope_event_svinfo(char *source, int ac, char **av)
+int anope_event_svinfo(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-int anope_event_pass(char *source, int ac, char **av)
+int anope_event_pass(const char *source, int ac, const char **av)
 {
     /* currently not used but removes the message : unknown message from server */
     return MOD_CONT;
 }
 
-void hybrid_cmd_svsjoin(char *source, char *nick, char *chan, char *param)
+void hybrid_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_svspart(char *source, char *nick, char *chan)
+void hybrid_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_swhois(char *source, char *who, char *mask)
+void hybrid_cmd_swhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-int anope_event_notice(char *source, int ac, char **av)
+int anope_event_notice(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_admin(char *source, int ac, char **av)
+int anope_event_admin(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int anope_event_invite(char *source, int ac, char **av)
+int anope_event_invite(const char *source, int ac, const char **av)
 {
     return MOD_CONT;
 }
 
-int hybrid_flood_mode_check(char *value)
+int hybrid_flood_mode_check(const char *value)
 {
     return 0;
 }
 
-int anope_event_error(char *source, int ac, char **av)
+int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
         if (debug) {
@@ -1398,7 +1398,7 @@ int anope_event_error(char *source, int ac, char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_jupe(char *jserver, char *who, char *reason)
+void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1415,7 +1415,7 @@ void hybrid_cmd_jupe(char *jserver, char *who, char *reason)
   1 = valid nick
   0 = nick is in valid
 */
-int hybrid_valid_nick(char *nick)
+int hybrid_valid_nick(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1425,14 +1425,14 @@ int hybrid_valid_nick(char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int hybrid_valid_chan(char *chan)
+int hybrid_valid_chan(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
 }
 
 
-void hybrid_cmd_ctcp(char *source, char *dest, char *buf)
+void hybrid_cmd_ctcp(const char *source, const char *dest, const char *buf)
 {
     char *s;
 

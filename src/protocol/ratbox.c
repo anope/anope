@@ -693,13 +693,10 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void ratbox_cmd_sqline(const char *mask, const char *reason)
+void RatboxProto::cmd_sqline(const char *mask, const char *reason)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "RESV * %s :%s", mask, reason);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
 void ratbox_cmd_unsgline(const char *mask)
@@ -880,7 +877,7 @@ void RatboxProto::cmd_bot_nick(const char *nick, const char *user, const char *h
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	ratbox_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void RatboxProto::cmd_part(const char *nick, const char *chan, const char *buf)
@@ -1231,7 +1228,7 @@ void RatboxProto::cmd_nick(const char *nick, const char *name, const char *mode)
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, ServerName, name);
-	ratbox_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void RatboxProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1608,7 +1605,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_sqline(ratbox_cmd_sqline);
     pmodule_cmd_squit(ratbox_cmd_squit);
     pmodule_cmd_svso(ratbox_cmd_svso);
     pmodule_cmd_chg_nick(ratbox_cmd_chg_nick);

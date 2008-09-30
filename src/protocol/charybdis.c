@@ -746,13 +746,10 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void charybdis_cmd_sqline(const char *mask, const char *reason)
+void CharybdisProto::cmd_sqline(const char *mask, const char *reason)
 {
-    Uid *ud;
-
-    ud = find_uid(s_OperServ);
-    send_cmd((UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ),
-             "RESV * %s :%s", mask, reason);
+	Uid *ud = find_uid(s_OperServ);
+	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
 void charybdis_cmd_unsgline(const char *mask)
@@ -941,7 +938,7 @@ void CharybdisProto::cmd_bot_nick(const char *nick, const char *user, const char
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	charybdis_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void CharybdisProto::cmd_part(const char *nick, const char *chan, const char *buf)
@@ -1299,7 +1296,7 @@ void CharybdisProto::cmd_nick(const char *nick, const char *name, const char *mo
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), mode, ServiceUser, ServiceHost, ServerName, name);
-	charybdis_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void CharybdisProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1715,7 +1712,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_sqline(charybdis_cmd_sqline);
     pmodule_cmd_squit(charybdis_cmd_squit);
     pmodule_cmd_svso(charybdis_cmd_svso);
     pmodule_cmd_chg_nick(charybdis_cmd_chg_nick);

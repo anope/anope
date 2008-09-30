@@ -687,13 +687,10 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 /* SQLINE */
-void bahamut_cmd_sqline(const char *mask, const char *reason)
+void BahamutIRCdProto::cmd_sqline(const char *mask, const char *reason)
 {
-    if (!mask || !reason) {
-        return;
-    }
-
-    send_cmd(NULL, "SQLINE %s :%s", mask, reason);
+	if (!mask || !reason) return;
+	send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
 /* UNSGLINE */
@@ -1135,7 +1132,7 @@ void BahamutIRCdProto::cmd_nick(const char *nick, const char *name, const char *
 {
 	EnforceQlinedNick(nick, NULL);
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, ServiceUser, ServiceHost, ServerName, name);
-	bahamut_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void BahamutIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1195,7 +1192,7 @@ void BahamutIRCdProto::cmd_bot_nick(const char *nick, const char *user, const ch
 {
 	EnforceQlinedNick(nick, s_BotServ);
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	bahamut_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 /* SVSNICK */
@@ -1451,7 +1448,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_sqline(bahamut_cmd_sqline);
     pmodule_cmd_squit(bahamut_cmd_squit);
     pmodule_cmd_svso(bahamut_cmd_svso);
     pmodule_cmd_chg_nick(bahamut_cmd_chg_nick);

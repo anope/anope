@@ -962,14 +962,10 @@ void inspircd_cmd_211(const char *buf)
 }
 
 /* SQLINE */
-void inspircd_cmd_sqline(const char *mask, const char *reason)
+void InspIRCdProto::cmd_sqline(const char *mask, const char *reason)
 {
-    if (!mask || !reason) {
-        return;
-    }
-
-    send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ,
-             (long int) time(NULL), reason);
+	if (!mask || !reason) return;
+	send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
 }
 
 /* SQUIT */
@@ -1695,7 +1691,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_sqline(inspircd_cmd_sqline);
     pmodule_cmd_squit(inspircd_cmd_squit);
     pmodule_cmd_svso(inspircd_cmd_svso);
     pmodule_cmd_chg_nick(inspircd_cmd_chg_nick);

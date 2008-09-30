@@ -594,7 +594,7 @@ void UnrealIRCdProto::cmd_nick(const char *nick, const char *name, const char *m
 	EnforceQlinedNick(nick, NULL);
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), ServiceUser, ServiceHost, ServerName, modes,
 		ServiceHost, myIrcd->nickip ? " *" : " ", name);
-	unreal_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void UnrealIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -614,7 +614,7 @@ void UnrealIRCdProto::cmd_bot_nick(const char *nick, const char *user, const cha
 	EnforceQlinedNick(nick, s_BotServ);
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
 		myIrcd->nickip ? " *" : " ", real);
-	unreal_cmd_sqline(nick, "Reserved for services");
+	cmd_sqline(nick, "Reserved for services");
 }
 
 void UnrealIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
@@ -865,13 +865,10 @@ void unreal_cmd_211(const char *buf)
 ** - Unreal will translate this to TKL for us
 **
 */
-void unreal_cmd_sqline(const char *mask, const char *reason)
+void UnrealIRCdProto::cmd_sqline(const char *mask, const char *reason)
 {
-    if (!mask || !reason) {
-        return;
-    }
-
-    send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
+	if (!mask || !reason) return;
+	send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
 }
 
 /* SQUIT */
@@ -1993,7 +1990,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_sqline(unreal_cmd_sqline);
     pmodule_cmd_squit(unreal_cmd_squit);
     pmodule_cmd_svso(unreal_cmd_svso);
     pmodule_cmd_chg_nick(unreal_cmd_chg_nick);

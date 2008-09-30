@@ -969,13 +969,10 @@ void InspIRCdProto::cmd_sqline(const char *mask, const char *reason)
 }
 
 /* SQUIT */
-void inspircd_cmd_squit(const char *servname, const char *message)
+void InspIRCdProto::cmd_squit(const char *servname, const char *message)
 {
-    if (!servname || !message) {
-        return;
-    }
-
-    send_cmd(ServerName, "SQUIT %s :%s", servname, message);
+	if (!servname || !message) return;
+	send_cmd(ServerName, "SQUIT %s :%s", servname, message);
 }
 
 /* SVSO */
@@ -1637,7 +1634,7 @@ void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        inspircd_cmd_squit(jserver, rbuf);
+        ircd_proto.cmd_squit(jserver, rbuf);
     inspircd_cmd_server(jserver, 1, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1691,7 +1688,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_squit(inspircd_cmd_squit);
     pmodule_cmd_svso(inspircd_cmd_svso);
     pmodule_cmd_chg_nick(inspircd_cmd_chg_nick);
     pmodule_cmd_svsnick(inspircd_cmd_svsnick);

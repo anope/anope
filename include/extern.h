@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_squit(void (*func) (const char *servname, const char *message));
 E void pmodule_cmd_svso(void (*func) (const char *source, const char *nick, const char *flag));
 E void pmodule_cmd_chg_nick(void (*func) (const char *oldnick, const char *newnick));
 E void pmodule_cmd_svsnick(void (*func) (const char *source, const char *guest, time_t when));

@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_squit = NULL;
     ircdproto.ircd_cmd_svso = NULL;
     ircdproto.ircd_cmd_chg_nick = NULL;
     ircdproto.ircd_cmd_svsnick = NULL;
@@ -473,7 +472,7 @@ void anope_cmd_sqline(const char *mask, const char *reason)
 
 void anope_cmd_squit(const char *servname, const char *message)
 {
-    ircdproto.ircd_cmd_squit(servname, message);
+	ircdprotonew->cmd_squit(servname, message);
 }
 
 void anope_cmd_svso(const char *source, const char *nick, const char *flag)
@@ -709,11 +708,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_squit(void (*func) (const char *servname, const char *message))
-{
-    ircdproto.ircd_cmd_squit = func;
 }
 
 void pmodule_cmd_svso(void (*func) (const char *source, const char *nick, const char *flag))

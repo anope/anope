@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_squit)(const char *servname, const char *message);
     void (*ircd_cmd_svso)(const char *source, const char *nick, const char *flag);
     void (*ircd_cmd_chg_nick)(const char *oldnick, const char *newnick);
     void (*ircd_cmd_svsnick)(const char *source, const char *guest, time_t when);
@@ -1346,6 +1345,11 @@ class IRCDProtoNew {
 			send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 		}
 		virtual void cmd_sqline(const char *, const char *) = 0;
+		virtual void cmd_squit(const char *servname, const char *message)
+		{
+			if (!servname || !message) return;
+			send_cmd(NULL, "SQUIT %s :%s", servname, message);
+		}
 };
 
 /*************************************************************************/

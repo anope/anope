@@ -807,17 +807,6 @@ void BahamutIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 	send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
 }
 
-/* SQUIT */
-/*
- *        parv[0] = sender prefix
- *        parv[1] = server name
- *        parv[2] = comment
-*/
-void bahamut_cmd_squit(const char *servname, const char *message)
-{
-    send_cmd(NULL, "SQUIT %s :%s", servname, message);
-}
-
 /*
  * SVINFO
  *       parv[0] = sender prefix
@@ -1378,7 +1367,7 @@ void bahamut_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        bahamut_cmd_squit(jserver, rbuf);
+        ircd_proto.cmd_squit(jserver, rbuf);
     bahamut_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1448,7 +1437,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_squit(bahamut_cmd_squit);
     pmodule_cmd_svso(bahamut_cmd_svso);
     pmodule_cmd_chg_nick(bahamut_cmd_chg_nick);
     pmodule_cmd_svsnick(bahamut_cmd_svsnick);

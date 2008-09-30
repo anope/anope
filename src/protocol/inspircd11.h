@@ -69,7 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-void inspircd_cmd_squit(const char *servname, const char *message);
 void inspircd_cmd_svso(const char *source, const char *nick, const char *flag);
 void inspircd_cmd_chg_nick(const char *oldnick, const char *newnick);
 void inspircd_cmd_svsnick(const char *source, const char *guest, time_t when);
@@ -122,4 +121,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_join(const char *, const char *, time_t);
 		void cmd_unsqline(const char *);
 		void cmd_sqline(const char *, const char *);
+		void cmd_squit(const char *, const char *);
 } ircd_proto;

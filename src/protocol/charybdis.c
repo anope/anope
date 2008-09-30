@@ -1348,16 +1348,6 @@ void CharybdisProto::cmd_invite(const char *source, const char *chan, const char
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
-/* SQUIT */
-void charybdis_cmd_squit(const char *servname, const char *message)
-{
-    if (!servname || !message) {
-        return;
-    }
-
-    send_cmd(NULL, "SQUIT %s :%s", servname, message);
-}
-
 int anope_event_mode(const char *source, int ac, const char **av)
 {
     User *u, *u2;
@@ -1629,7 +1619,7 @@ void charybdis_cmd_jupe(const char *jserver, const char *who, const char *reason
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        charybdis_cmd_squit(jserver, rbuf);
+        ircd_proto.cmd_squit(jserver, rbuf);
     charybdis_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1712,7 +1702,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_squit(charybdis_cmd_squit);
     pmodule_cmd_svso(charybdis_cmd_svso);
     pmodule_cmd_chg_nick(charybdis_cmd_chg_nick);
     pmodule_cmd_svsnick(charybdis_cmd_svsnick);

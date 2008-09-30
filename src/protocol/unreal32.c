@@ -871,17 +871,6 @@ void UnrealIRCdProto::cmd_sqline(const char *mask, const char *reason)
 	send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
 }
 
-/* SQUIT */
-void unreal_cmd_squit(const char *servname, const char *message)
-{
-    if (!servname || !message) {
-        return;
-    }
-
-    send_cmd(NULL, "%s %s :%s", send_token("SQUIT", "-"), servname,
-             message);
-}
-
 /*
 ** svso
 **      parv[0] = sender prefix
@@ -1669,7 +1658,7 @@ void unreal_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        unreal_cmd_squit(jserver, rbuf);
+        ircd_proto.cmd_squit(jserver, rbuf);
     unreal_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1990,7 +1979,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_squit(unreal_cmd_squit);
     pmodule_cmd_svso(unreal_cmd_svso);
     pmodule_cmd_chg_nick(unreal_cmd_chg_nick);
     pmodule_cmd_svsnick(unreal_cmd_svsnick);

@@ -462,24 +462,17 @@ void RatboxProto::cmd_privmsg(const char *source, const char *dest, const char *
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
 }
 
-void ratbox_cmd_global(const char *source, const char *buf)
+void RatboxProto::cmd_global(const char *source, const char *buf)
 {
-    Uid *u;
-
-    if (!buf) {
-        return;
-    }
-
-    if (source) {
-        u = find_uid(source);
-        if (u) {
-            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", buf);
-        } else {
-            send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", buf);
-        }
-    } else {
-        send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", buf);
-    }
+	if (!buf) return;
+	if (source) {
+		Uid *u = find_uid(source);
+		if (u) {
+			send_cmd(UseTS6 ? u->uid : source, "OPERWALL :%s", buf);
+			return;
+		}
+	}
+	send_cmd(UseTS6 ? TS6SID : ServerName, "OPERWALL :%s", buf);
 }
 
 int anope_event_sjoin(const char *source, int ac, const char **av)
@@ -1615,7 +1608,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_global(ratbox_cmd_global);
     pmodule_cmd_sqline(ratbox_cmd_sqline);
     pmodule_cmd_squit(ratbox_cmd_squit);
     pmodule_cmd_svso(ratbox_cmd_svso);

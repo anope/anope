@@ -961,16 +961,6 @@ void inspircd_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-/* GLOBOPS */
-void inspircd_cmd_global(const char *source, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
-}
-
 /* SQLINE */
 void inspircd_cmd_sqline(const char *mask, const char *reason)
 {
@@ -1705,7 +1695,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_global(inspircd_cmd_global);
     pmodule_cmd_sqline(inspircd_cmd_sqline);
     pmodule_cmd_squit(inspircd_cmd_squit);
     pmodule_cmd_svso(inspircd_cmd_svso);

@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_global(const char *source, const char *buf);
 void ratbox_cmd_sqline(const char *mask, const char *reason);
 void ratbox_cmd_squit(const char *servname, const char *message);
 void ratbox_cmd_svso(const char *source, const char *nick, const char *flag);
@@ -111,4 +110,5 @@ class RatboxProto : public IRCDProtoNew {
 		void cmd_unsqline(const char *);
 		void cmd_invite(const char *, const char *, const char *);
 		void cmd_part(const char *, const char *, const char *);
+		void cmd_global(const char *, const char *);
 } ircd_proto;

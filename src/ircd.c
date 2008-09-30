@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_global = NULL;
     ircdproto.ircd_cmd_sqline = NULL;
     ircdproto.ircd_cmd_squit = NULL;
     ircdproto.ircd_cmd_svso = NULL;
@@ -458,15 +457,14 @@ void anope_cmd_211(const char *fmt, ...)
 
 void anope_cmd_global(const char *source, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_global(source, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_global(source, buf);
 }
 
 void anope_cmd_sqline(const char *mask, const char *reason)
@@ -712,11 +710,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_global(void (*func) (const char *source, const char *buf))
-{
-    ircdproto.ircd_cmd_global = func;
 }
 
 void pmodule_cmd_sqline(void (*func) (const char *mask, const char *reason))

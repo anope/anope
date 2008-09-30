@@ -473,24 +473,18 @@ void CharybdisProto::cmd_privmsg(const char *source, const char *dest, const cha
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
 }
 
-void charybdis_cmd_global(const char *source, const char *buf)
+void CharybdisProto::cmd_global(const char *source, const char *buf)
 {
-    Uid *u;
-
-    if (!buf) {
-        return;
-    }
-
-    if (source) {
-        u = find_uid(source);
-        if (u) {
-            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", buf);
-        } else {
-            send_cmd((UseTS6 ? TS6SID : ServerName), "WALLOPS :%s", buf);
-        }
-    } else {
-        send_cmd((UseTS6 ? TS6SID : ServerName), "WALLOPS :%s", buf);
-    }
+	if (!buf) return;
+	if (source) {
+		Uid *u = find_uid(source);
+		if (u) {
+			send_cmd(UseTS6 ? u->uid : source, "OPERWALL :%s", buf);
+			return;
+		}
+	}
+	// The original code uses WALLOPS here, but above is OPERWALL, Ratbox uses OPERWALL as well, so I changed this one as well -- CyberBotX
+	send_cmd(UseTS6 ? TS6SID : ServerName, "OPERWALL :%s", buf);
 }
 
 int anope_event_sjoin(const char *source, int ac, const char **av)
@@ -1721,7 +1715,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_global(charybdis_cmd_global);
     pmodule_cmd_sqline(charybdis_cmd_sqline);
     pmodule_cmd_squit(charybdis_cmd_squit);
     pmodule_cmd_svso(charybdis_cmd_svso);

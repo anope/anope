@@ -76,7 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-void bahamut_cmd_global(const char *source, const char *buf);
 void bahamut_cmd_sqline(const char *mask, const char *reason);
 void bahamut_cmd_squit(const char *servname, const char *message);
 void bahamut_cmd_svso(const char *source, const char *nick, const char *flag);

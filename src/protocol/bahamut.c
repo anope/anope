@@ -1008,16 +1008,6 @@ void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, cons
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-/* GLOBOPS */
-void bahamut_cmd_global(const char *source, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
-}
-
 /* 391 */
 void bahamut_cmd_391(const char *source, const char *timestr)
 {
@@ -1461,7 +1451,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_global(bahamut_cmd_global);
     pmodule_cmd_sqline(bahamut_cmd_sqline);
     pmodule_cmd_squit(bahamut_cmd_squit);
     pmodule_cmd_svso(bahamut_cmd_svso);

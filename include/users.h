@@ -82,5 +82,9 @@ class User
 	/** Update the displayed ident (username) of a user record.
 	 */
 	void SetIdent(const std::string &ident);
+
+	/** Updates the realname of the user record.
+	 */
+	void SetRealname(const std::string &realname);
 };
 

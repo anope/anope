@@ -103,6 +103,9 @@ void User::SetNewNick(const std::string &newnick)
 		if (this->na)
 			this->na->u = this;
 	}
+
+    if (debug)
+        alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
 }
 
 void User::SetDisplayedHost(const std::string &host)
@@ -115,7 +118,7 @@ void User::SetDisplayedHost(const std::string &host)
     this->vhost = sstrdup(host.c_str());
 
     if (debug)
-        alog("debug: %s changes its vhost to %s", this->nick, host.c_str());
+        alog("debug: %s changed vhost to %s", this->nick, host.c_str());
 
     update_host(this);
 }
@@ -135,25 +138,27 @@ void User::SetIdent(const std::string &ident)
 	update_host(this);
 }
 
-
-
-void change_user_realname(User * user, const char *realname)
+void User::SetRealname(const std::string &realname)
 {
-    if (user->realname)
-        free(user->realname);
-    user->realname = sstrdup(realname);
+	if (realname.empty())
+		throw "realname empty in SetRealname";
 
-    if (user->na && (nick_identified(user)
-                     || (!(user->na->nc->flags & NI_SECURE)
-                         && nick_recognized(user)))) {
-        if (user->na->last_realname)
-            free(user->na->last_realname);
-        user->na->last_realname = sstrdup(realname);
-    }
+	if (this->realname)
+		free(this->realname);
+	this->realname = sstrdup(realname);
 
-    if (debug)
-        alog("debug: %s changes its realname to %s", user->nick, realname);
+	if (this->na && (nick_identified(this) ||
+			(!(this->na->nc->flags & NI_SECURE) && nick_recognized(this))))
+	{
+		if (this->na->last_realname)
+			free(this->na->last_realname);
+		this->na->last_realname = sstrdup(realname);
+	}
+
+	if (debug)
+		alog("debug: %s changed realname to %s", this->nick, realname);
 }
+
 /*************************************************************************/
 /*************************************************************************/
 

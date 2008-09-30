@@ -139,16 +139,16 @@ char *stristr(char *s1, char *s2)
  * @param s String
  * @param size size of s
  * @param old character to replace
- * @param new character to replace with
+ * @param newstr character to replace with
  * @return updated s
  */
-char *strnrepl(char *s, int32 size, const char *old, const char *new)
+char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
 {
     char *ptr = s;
     int32 left = strlen(s);
     int32 avail = size - (left + 1);
     int32 oldlen = strlen(old);
-    int32 newlen = strlen(new);
+    int32 newlen = strlen(newstr);
     int32 diff = newlen - oldlen;
 
     while (left >= oldlen) {
@@ -161,7 +161,7 @@ char *strnrepl(char *s, int32 size, const char *old, const char *new)
             break;
         if (diff != 0)
             memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
-        strncpy(ptr, new, newlen);
+        strncpy(ptr, newstr, newlen);
         ptr += newlen;
         left -= oldlen;
     }

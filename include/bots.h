@@ -44,5 +44,17 @@ class BotInfo
 	 * Used on /kill, rename, etc.
 	 */
 	void RejoinAll();
+
+	/** Assign this bot to a given channel, removing the existing assigned bot if one exists.
+	 * @param u The user assigning the bot, or NULL
+	 * @param ci The channel registration to assign the bot to.
+	 */
+	void Assign(User *u, ChannelInfo *ci);
+
+	/** Remove this bot from a given channel.
+	 * @param u The user requesting the unassign, or NULL.
+	 * @param ci The channel registration to remove the bot from.
+	 */
+	void UnAssign(User *u, ChannelInfo *ci);
 };
 

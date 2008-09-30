@@ -45,3 +45,32 @@ void BotInfo::RejoinAll()
 			if (ci->bi == this && ci->c && (ci->c->usercount >= BSMinUsers))
 				bot_join(ci);
 }
+
+void BotInfo::Assign(User *u, ChannelInfo *ci)
+{
+	if (ci->bi)
+	{
+		if (u)
+			ci->bi->UnAssign(u, ci);
+		else
+			ci->bi->UnAssign(NULL, ci);
+	}
+
+	ci->bi = this;
+	this->chancount++;
+	if (ci->c && ci->c->usercount >= BSMinUsers)
+		bot_join(ci);
+}
+
+void BotInfo::UnAssign(User *u, ChannelInfo *ci)
+{
+	send_event(EVENT_BOT_UNASSIGN, 2, ci->name, ci->bi->nick);
+
+	if (u && ci->c && ci->c->usercount >= BSMinUsers)
+		anope_cmd_part(ci->bi->nick, ci->name, "UNASSIGN from %s", u->nick);
+
+	ci->bi->chancount--;
+	ci->bi = NULL;
+}
+
+

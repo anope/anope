@@ -617,22 +617,6 @@ BotInfo *findbot(const char *nick)
 
 /*************************************************************************/
 
-/* Unassign a bot from a channel. Assumes u, ci and ci->bi are not NULL */
-
-void unassign(User * u, ChannelInfo * ci)
-{
-    send_event(EVENT_BOT_UNASSIGN, 2, ci->name, ci->bi->nick);
-
-    if (ci->c && ci->c->usercount >= BSMinUsers) {
-        anope_cmd_part(ci->bi->nick, ci->name, "UNASSIGN from %s",
-                       u->nick);
-    }
-    ci->bi->chancount--;
-    ci->bi = NULL;
-}
-
-/*************************************************************************/
-
 /* Returns ban data associated with an user if it exists, allocates it
    otherwise. */
 

@@ -74,7 +74,6 @@ E void save_bs_rdb_dbase(void);
 E BotInfo *findbot(const char *nick);
 E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
-E void unassign(User * u, ChannelInfo * ci);
 E void insert_bot(BotInfo * bi);
 
 E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, char *reason);

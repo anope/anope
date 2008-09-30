@@ -82,7 +82,7 @@ int do_unassign(User * u)
     else if (!ci->bi)
         notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
     else {
-        unassign(u, ci);
+        ci->bi->UnAssign(u, ci);
         notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
     }
     return MOD_CONT;

@@ -125,12 +125,12 @@ void User::SetIdent(const std::string &ident)
 	if (ident.empty())
 		throw "empty ident in SetIdent";
 
-    if (this->vident)
-        free(this->vident);
-    this->vident = sstrdup(ident.c_str());
+	if (this->vident)
+		free(this->vident);
+	this->vident = sstrdup(ident.c_str());
 
-    if (debug)
-        alog("debug: %s changed ident to %s", this->nick, username);
+	if (debug)
+		alog("debug: %s changed ident to %s", this->nick, username);
 
 	update_host(this);
 }

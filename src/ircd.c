@@ -50,7 +50,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
-    ircdproto.ircd_cmd_notice_ops = NULL;
     ircdproto.ircd_cmd_notice = NULL;
     ircdproto.ircd_cmd_notice2 = NULL;
     ircdproto.ircd_cmd_privmsg = NULL;
@@ -226,15 +225,14 @@ void anope_cmd_kick(const char *source, const char *chan, const char *user, cons
 
 void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_notice_ops(source, dest, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_notice_ops(source, dest, buf);
 }
 
 void anope_cmd_notice(const char *source, const char *dest, const char *fmt, ...)
@@ -693,12 +691,6 @@ void pmodule_cmd_375(void (*func) (const char *source))
 void pmodule_cmd_376(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_376 = func;
-}
-
-void
-pmodule_cmd_notice_ops(void (*func) (const char *source, const char *dest, const char *buf))
-{
-    ircdproto.ircd_cmd_notice_ops = func;
 }
 
 void pmodule_cmd_notice(void (*func) (const char *source, const char *dest, const char *buf))

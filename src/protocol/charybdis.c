@@ -1362,16 +1362,11 @@ void CharybdisProto::cmd_kick(const char *source, const char *chan, const char *
 	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void charybdis_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void CharybdisProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
-    Uid *ud;
-    ud = find_uid(source);
-
-    if (!buf) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "NOTICE @%s :%s", dest, buf);
+	if (!buf) return;
+	Uid *ud = find_uid(source);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE @%s :%s", dest, buf);
 }
 
 void charybdis_cmd_bot_chan_mode(const char *nick, const char *chan)
@@ -1780,7 +1775,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
-    pmodule_cmd_notice_ops(charybdis_cmd_notice_ops);
     pmodule_cmd_notice(charybdis_cmd_notice);
     pmodule_cmd_notice2(charybdis_cmd_notice2);
     pmodule_cmd_privmsg(charybdis_cmd_privmsg);

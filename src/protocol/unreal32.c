@@ -622,13 +622,10 @@ void UnrealIRCdProto::cmd_kick(const char *source, const char *chan, const char 
 	else send_cmd(source, "%s %s %s", send_token("KICK", "H"), chan, user);
 }
 
-void unreal_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
+	if (!buf) return;
+	send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
 }
 
 
@@ -2076,7 +2073,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(unreal_cmd_372_error);
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_notice_ops(unreal_cmd_notice_ops);
     pmodule_cmd_notice(unreal_cmd_notice);
     pmodule_cmd_notice2(unreal_cmd_notice2);
     pmodule_cmd_privmsg(unreal_cmd_privmsg);

@@ -1295,13 +1295,10 @@ void RatboxProto::cmd_kick(const char *source, const char *chan, const char *use
 	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void ratbox_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void RatboxProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+	if (!buf) return;
+	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
 void ratbox_cmd_bot_chan_mode(const char *nick, const char *chan)
@@ -1672,7 +1669,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_notice_ops(ratbox_cmd_notice_ops);
     pmodule_cmd_notice(ratbox_cmd_notice);
     pmodule_cmd_notice2(ratbox_cmd_notice2);
     pmodule_cmd_privmsg(ratbox_cmd_privmsg);

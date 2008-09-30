@@ -773,13 +773,10 @@ void InspIRCdProto::cmd_kick(const char *source, const char *chan, const char *u
 	else send_cmd(source, "KICK %s %s :%s", chan, user, user);
 }
 
-void inspircd_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
+	if (!buf) return;
+	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
 }
 
 
@@ -1775,7 +1772,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_notice_ops(inspircd_cmd_notice_ops);
     pmodule_cmd_notice(inspircd_cmd_notice);
     pmodule_cmd_notice2(inspircd_cmd_notice2);
     pmodule_cmd_privmsg(inspircd_cmd_privmsg);

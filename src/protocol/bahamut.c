@@ -1021,12 +1021,10 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void bahamut_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
-    send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+	if (!buf) return;
+	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
 /* NOTICE */
@@ -1527,7 +1525,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_notice_ops(bahamut_cmd_notice_ops);
     pmodule_cmd_notice(bahamut_cmd_notice);
     pmodule_cmd_notice2(bahamut_cmd_notice2);
     pmodule_cmd_privmsg(bahamut_cmd_privmsg);

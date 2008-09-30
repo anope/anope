@@ -613,7 +613,6 @@ E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
 E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
 E void pmodule_cmd_376(void (*func) (const char *source));
-E void pmodule_cmd_notice_ops(void (*func) (const char *source, const char *dest, const char *buf));
 E void pmodule_cmd_notice(void (*func) (const char *source, const char *dest, const char *buf));
 E void pmodule_cmd_notice2(void (*func) (const char *source, const char *dest, const char *msg));
 E void pmodule_cmd_privmsg(void (*func) (const char *source, const char *dest, const char *buf));

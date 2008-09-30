@@ -224,7 +224,6 @@ typedef struct memo_ Memo;
 typedef struct nickrequest_ NickRequest;
 typedef struct nickalias_ NickAlias;
 typedef struct nickcore_ NickCore;
-typedef struct botinfo_ BotInfo;
 typedef struct chaninfo_ ChannelInfo;
 typedef struct badword_ BadWord;
 typedef struct bandata_ BanData;
@@ -243,6 +242,8 @@ typedef struct cumode_ CUMode;
 typedef struct csmodeutil_ CSModeUtil;
 typedef struct session_ Session;
 typedef struct uid_ Uid;
+
+#include "bots.h"
 
 /*************************************************************************/
 
@@ -529,27 +530,6 @@ struct nickcore_ {
 
 
 /*************************************************************************/
-
-/* Bot info structures. Note that since there won't be many bots,
- * they're not in a hash list.
- *	--lara
- */
-
-struct botinfo_ {
- 	BotInfo *next, *prev;
-
- 	char *nick;    			/* Nickname of the bot */
- 	char *user;    			/* Its user name */
- 	char *host;    			/* Its hostname */
- 	char *real;     		/* Its real name */
- 	int16 flags;			/* Bot flags -- see BI_* below */
- 	time_t created; 		/* Birth date ;) */
-	int16 chancount;		/* Number of channels that use the bot. */
-	/* Dynamic data */
- 	time_t lastmsg;			/* Last time we said something */
-};
-
-
 
 /* Channel info structures.  Stored similarly to the nicks, except that
  * the second character of the channel name, not the first, is used to

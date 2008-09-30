@@ -44,7 +44,7 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
     } else {
         MailInfo *mail;
 
-        mail = scalloc(sizeof(MailInfo), 1);
+        mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
         mail->sender = u;
         mail->recipient = NULL;
         mail->recip = nr;
@@ -97,7 +97,7 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
     } else {
         MailInfo *mail;
 
-        mail = scalloc(sizeof(MailInfo), 1);
+        mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
         mail->sender = u;
         mail->recipient = nc;
         mail->recip = NULL;
@@ -142,7 +142,7 @@ MailInfo *MailMemoBegin(NickCore * nc)
     } else {
         MailInfo *mail;
 
-        mail = scalloc(sizeof(MailInfo), 1);
+        mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
         mail->sender = NULL;
         mail->recipient = nc;
         mail->recip = NULL;

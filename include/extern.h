@@ -778,7 +778,7 @@ E int   do_mysql;
 E int   is44;
 E int   quitting;
 E int   delayed_quit;
-E char *quitmsg;
+E const char *quitmsg;
 E char  inbuf[BUFSIZE];
 E int   servsock;
 E int   save_data;
@@ -1269,7 +1269,7 @@ E void anope_cmd_server(char *servname, int hop, char *descript);    	  		  /* S
 E void anope_cmd_sgline(char *mask, char *reason);			  	  		  /* SGLINE */
 E void anope_cmd_sqline(char *mask, char *reason);                   	  		  /* SQLINE */
 E void anope_cmd_szline(char *mask, char *reason, char *whom);				  /* SZLINE */
-E void anope_cmd_squit(char *servname, char *message);               	  		  /* SQUIT  */
+E void anope_cmd_squit(const char *servname, const char *message);               	  		  /* SQUIT  */
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svshold(char *nick);				  	  		  /* SVSHOLD */

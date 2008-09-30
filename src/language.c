@@ -88,7 +88,7 @@ static void load_lang(int index, const char *filename)
         alog("Warning: Bad number of strings (%d, wanted %d) "
              "for language %d (%s)", num, NUM_STRINGS, index, filename);
     }
-    langtexts[index] = scalloc(sizeof(char *), NUM_STRINGS);
+    langtexts[index] = (char **)scalloc(sizeof(char *), NUM_STRINGS);
     if (num > NUM_STRINGS)
         num = NUM_STRINGS;
     for (i = 0; i < num; i++) {
@@ -128,7 +128,7 @@ static void load_lang(int index, const char *filename)
             langtexts[index] = NULL;
             return;
         } else {
-            langtexts[index][i] = scalloc(len + 1, 1);
+            langtexts[index][i] = (char *)scalloc(len + 1, 1);
             fseek(f, pos, SEEK_SET);
             if (fread(langtexts[index][i], 1, len, f) != len) {
                 alog("Failed to read string %d in language %d (%s)",

@@ -61,7 +61,7 @@ int quitting = 0;
 int delayed_quit = 0;
 
 /* Contains a message as to why services is terminating */
-char *quitmsg = NULL;
+const char *quitmsg = NULL;
 
 /* Input buffer - global, so we can dump it if something goes wrong */
 char inbuf[BUFSIZE];

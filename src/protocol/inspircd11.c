@@ -1492,9 +1492,9 @@ void InspIRCdProto::cmd_svid_umode2(User *u, const char *ts)
 	common_svsmode(u, "+r", NULL);
 }
 
-void inspircd_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void InspIRCdProto::cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
-    	send_cmd(source, "SVSJOIN %s %s", nick, chan);
+	send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
 
 void inspircd_cmd_svspart(const char *source, const char *nick, const char *chan)
@@ -1589,7 +1589,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_svsjoin(inspircd_cmd_svsjoin);
     pmodule_cmd_svspart(inspircd_cmd_svspart);
     pmodule_cmd_swhois(inspircd_cmd_swhois);
     pmodule_cmd_eob(inspircd_cmd_eob);

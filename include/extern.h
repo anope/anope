@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_svsjoin(void (*func) (const char *source, const char *nick, const char *chan, const char *param));
 E void pmodule_cmd_svspart(void (*func) (const char *source, const char *nick, const char *chan));
 E void pmodule_cmd_swhois(void (*func) (const char *source, const char *who, const char *mask));
 E void pmodule_cmd_eob(void (*func) ());

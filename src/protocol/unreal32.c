@@ -1453,13 +1453,10 @@ int anope_event_smo(const char *source, int ac, const char **av)
 /* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
    when coming from a none TOKEN'd server
 */
-void unreal_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void UnrealIRCdProto::cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
 {
-    if (param) {
-        send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
-    } else {
-        send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
-    }
+	if (param) send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
+	else send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
 }
 
 /* svspart
@@ -1903,7 +1900,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-	pmodule_cmd_svsjoin(unreal_cmd_svsjoin);
 	pmodule_cmd_svspart(unreal_cmd_svspart);
 	pmodule_cmd_swhois(unreal_cmd_swhois);
     pmodule_cmd_eob(unreal_cmd_eob);

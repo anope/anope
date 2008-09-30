@@ -137,4 +137,5 @@ class UnrealIRCdProto : public IRCDProtoNew {
 		void cmd_svid_umode(const char *, time_t);
 		void cmd_nc_change(User *);
 		void cmd_svid_umode2(User *, const char *);
+		void cmd_svsjoin(const char *, const char *, const char *, const char *);
 } ircd_proto;

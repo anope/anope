@@ -1343,11 +1343,6 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
-{
-    /* Not Supported by this IRCD */
-}
-
 void ratbox_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
@@ -1480,7 +1475,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_svsjoin(ratbox_cmd_svsjoin);
     pmodule_cmd_svspart(ratbox_cmd_svspart);
     pmodule_cmd_swhois(ratbox_cmd_swhois);
     pmodule_cmd_eob(ratbox_cmd_eob);

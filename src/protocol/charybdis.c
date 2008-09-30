@@ -1437,11 +1437,6 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void charybdis_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
-{
-    /* Not Supported by this IRCD */
-}
-
 void charybdis_cmd_svspart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
@@ -1603,7 +1598,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svsjoin(charybdis_cmd_svsjoin);
     pmodule_cmd_svspart(charybdis_cmd_svspart);
     pmodule_cmd_swhois(charybdis_cmd_swhois);
     pmodule_cmd_eob(charybdis_cmd_eob);

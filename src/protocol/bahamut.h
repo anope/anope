@@ -65,7 +65,6 @@ void bahamut_cmd_375(const char *source);
 void bahamut_cmd_376(const char *source);
 void bahamut_cmd_notice(const char *source, const char *dest, const char *buf);
 void bahamut_cmd_notice2(const char *source, const char *dest, const char *msg);
-void bahamut_cmd_privmsg(const char *source, const char *dest, const char *buf);
 void bahamut_cmd_serv_notice(const char *source, const char *dest, const char *msg);
 void bahamut_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
 void bahamut_cmd_bot_chan_mode(const char *nick, const char *chan);

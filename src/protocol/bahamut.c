@@ -1035,7 +1035,7 @@ void bahamut_cmd_notice(const char *source, const char *dest, const char *buf)
     }
 
     if (NSDefFlags & NI_MSG) {
-        bahamut_cmd_privmsg(source, dest, buf);
+        ircd_proto.cmd_privmsg(source, dest, buf);
     } else {
         send_cmd(source, "NOTICE %s :%s", dest, buf);
     }
@@ -1044,15 +1044,6 @@ void bahamut_cmd_notice(const char *source, const char *dest, const char *buf)
 void bahamut_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
-}
-
-void bahamut_cmd_privmsg(const char *source, const char *dest, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
 void bahamut_cmd_serv_notice(const char *source, const char *dest, const char *msg)
@@ -1527,7 +1518,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_notice(bahamut_cmd_notice);
     pmodule_cmd_notice2(bahamut_cmd_notice2);
-    pmodule_cmd_privmsg(bahamut_cmd_privmsg);
     pmodule_cmd_serv_notice(bahamut_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(bahamut_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(bahamut_cmd_bot_chan_mode);

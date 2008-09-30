@@ -52,7 +52,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_376 = NULL;
     ircdproto.ircd_cmd_notice = NULL;
     ircdproto.ircd_cmd_notice2 = NULL;
-    ircdproto.ircd_cmd_privmsg = NULL;
     ircdproto.ircd_cmd_serv_notice = NULL;
     ircdproto.ircd_cmd_serv_privmsg = NULL;
     ircdproto.ircd_cmd_bot_chan_mode = NULL;
@@ -255,57 +254,29 @@ void anope_cmd_notice2(const char *source, const char *dest, const char *msg)
 
 void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...)
 {
-
-va_list args;
-
-char buf[BUFSIZE];
-
-char actionbuf[BUFSIZE];
-
-
-*buf = '\0';
-
-*actionbuf = '\0';
-
-
-if (fmt) {
-
-va_start(args, fmt);
-
-vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-va_end(args);
-
-} else {
-
-return;
-
-}
-
-
-if (!buf) {
-
-return;
-
-}
-
-snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s %c", 1, buf, 1);
-
-ircdproto.ircd_cmd_privmsg(source, dest, actionbuf);
-
+	va_list args;
+	char buf[BUFSIZE] = "", actionbuf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	else return;
+	if (!*buf) return;
+	snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s%c", 1, buf, 1);
+	ircdprotonew->cmd_privmsg(source, dest, actionbuf);
 }
 
 void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    ircdproto.ircd_cmd_privmsg(source, dest, buf);
+	va_list args;
+	char buf[BUFSIZE] = "";
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+	}
+	ircdprotonew->cmd_privmsg(source, dest, buf);
 }
 
 void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg)
@@ -702,12 +673,6 @@ void
 pmodule_cmd_notice2(void (*func) (const char *source, const char *dest, const char *msg))
 {
     ircdproto.ircd_cmd_notice2 = func;
-}
-
-void
-pmodule_cmd_privmsg(void (*func) (const char *source, const char *dest, const char *buf))
-{
-    ircdproto.ircd_cmd_privmsg = func;
 }
 
 void

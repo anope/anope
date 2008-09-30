@@ -461,7 +461,7 @@ void charybdis_cmd_notice(const char *source, const char *dest, const char *buf)
     }
 
     if (NSDefFlags & NI_MSG) {
-        charybdis_cmd_privmsg(source, dest, buf);
+        ircd_proto.cmd_privmsg(source, dest, buf);
     } else {
         ud = find_uid(source);
         u = finduser(dest);
@@ -482,18 +482,11 @@ void charybdis_cmd_notice2(const char *source, const char *dest, const char *msg
              (UseTS6 ? (u ? u->uid : dest) : dest), msg);
 }
 
-void charybdis_cmd_privmsg(const char *source, const char *dest, const char *buf)
+void CharybdisProto::cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
-    Uid *ud, *ud2;
-
-    if (!buf) {
-        return;
-    }
-    ud = find_uid(source);
-    ud2 = find_uid(dest);
-
-    send_cmd((UseTS6 ? (ud ? ud->uid : source) : source), "PRIVMSG %s :%s",
-             (UseTS6 ? (ud2 ? ud2->uid : dest) : dest), buf);
+	if (!buf) return;
+	Uid *ud = find_uid(source), *ud2 = find_uid(dest);
+	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
 }
 
 void charybdis_cmd_serv_notice(const char *source, const char *dest, const char *msg)
@@ -1777,7 +1770,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_notice(charybdis_cmd_notice);
     pmodule_cmd_notice2(charybdis_cmd_notice2);
-    pmodule_cmd_privmsg(charybdis_cmd_privmsg);
     pmodule_cmd_serv_notice(charybdis_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(charybdis_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(charybdis_cmd_bot_chan_mode);

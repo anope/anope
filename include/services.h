@@ -1061,7 +1061,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_376)(const char *source);
     void (*ircd_cmd_notice)(const char *source, const char *dest, const char *buf);
     void (*ircd_cmd_notice2)(const char *source, const char *dest, const char *msg);
-    void (*ircd_cmd_privmsg)(const char *source, const char *dest, const char *buf);
     void (*ircd_cmd_serv_notice)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_serv_privmsg)(const char *source, const char *dest, const char *msg);
     void (*ircd_cmd_bot_chan_mode)(const char *nick, const char *chan);
@@ -1115,23 +1114,6 @@ typedef struct ircd_proto_ {
     int (*ircd_valid_chan)(const char *chan);
     int (*ircd_flood_mode_check)(const char *value);
 } IRCDProto;
-
-class IRCDProtoNew {
-	public:
-		virtual void cmd_svsnoop(const char *, int) { }
-		virtual void cmd_remove_akill(const char *, const char *) = 0;
-		virtual void cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when) = 0;
-		virtual void cmd_vhost_off(User *) { }
-		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
-		virtual void cmd_svsmode(User *u, int ac, const char **av) = 0;
-		virtual void cmd_nick(const char *, const char *, const char *) = 0;
-		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
-		virtual void cmd_mode(const char *source, const char *dest, const char *buf) = 0;
-		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
-		virtual void cmd_kick(const char *source, const char *chan, const char *user, const char *buf) = 0;
-		virtual void cmd_notice_ops(const char *, const char *dest, const char *buf) = 0;
-};
 
 typedef struct ircd_modes_ {
         int user_invis;
@@ -1305,7 +1287,31 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
+class IRCDProtoNew;
+
 #include "extern.h"
+
+class IRCDProtoNew {
+	public:
+		virtual void cmd_svsnoop(const char *, int) { }
+		virtual void cmd_remove_akill(const char *, const char *) = 0;
+		virtual void cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when) = 0;
+		virtual void cmd_vhost_off(User *) { }
+		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
+		virtual void cmd_svskill(const char *source, const char *user, const char *buf) = 0;
+		virtual void cmd_svsmode(User *u, int ac, const char **av) = 0;
+		virtual void cmd_nick(const char *, const char *, const char *) = 0;
+		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
+		virtual void cmd_mode(const char *source, const char *dest, const char *buf) = 0;
+		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
+		virtual void cmd_kick(const char *source, const char *chan, const char *user, const char *buf) = 0;
+		virtual void cmd_notice_ops(const char *, const char *dest, const char *buf) = 0;
+		virtual void cmd_privmsg(const char *source, const char *dest, const char *buf)
+		{
+			if (!buf || !dest) return;
+			send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+		}
+};
 
 /*************************************************************************/
 

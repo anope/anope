@@ -787,7 +787,7 @@ void inspircd_cmd_notice(const char *source, const char *dest, const char *buf)
     }
 
     if (NSDefFlags & NI_MSG) {
-        inspircd_cmd_privmsg(source, dest, buf);
+        ircd_proto.cmd_privmsg(source, dest, buf);
     } else {
         send_cmd(source, "NOTICE %s :%s", dest, buf);
     }
@@ -796,15 +796,6 @@ void inspircd_cmd_notice(const char *source, const char *dest, const char *buf)
 void inspircd_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE %s :%s", dest, msg);
-}
-
-void inspircd_cmd_privmsg(const char *source, const char *dest, const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
 void inspircd_cmd_serv_notice(const char *source, const char *dest, const char *msg)
@@ -1774,7 +1765,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_376(inspircd_cmd_376);
     pmodule_cmd_notice(inspircd_cmd_notice);
     pmodule_cmd_notice2(inspircd_cmd_notice2);
-    pmodule_cmd_privmsg(inspircd_cmd_privmsg);
     pmodule_cmd_serv_notice(inspircd_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(inspircd_cmd_serv_privmsg);
     pmodule_cmd_bot_chan_mode(inspircd_cmd_bot_chan_mode);

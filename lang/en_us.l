@@ -5471,7 +5471,7 @@ OPER_HELP_OPER
 	        OPER LIST [mask | list]
 	        OPER CLEAR
 	
-	Allows the Services admins to add or remove nicknames
+	Allows the Services Root Admins to add or remove nicknames
 	to or from the Services operator list.  A user whose nickname
 	is on the Services operator list and who has identified to
 	%s will be able to access Services operator commands.
@@ -5496,7 +5496,6 @@ OPER_HELP_OPER
 	Services operator list.
 	
 	Any IRC operator may use the OPER LIST form of the command.
-	All other use limited to Services roots.
 
 OPER_HELP_ADMIN
 	Syntax: ADMIN ADD nick

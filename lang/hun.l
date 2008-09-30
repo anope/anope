@@ -5596,7 +5596,7 @@ OPER_HELP_OPER
 			OPER LIST [maszk | lista]
 			OPER CLEAR
 
-	Megengedi a szervíz adminnak, hogy hozzáadjon/töröljön
+	Megengedi a szervíz root, hogy hozzáadjon/töröljön
 	nicknevet a szervíz operátor listáról. A nick használója
 	aki a szervíz operátor listáján van és be van jelentkezve
 	%s -hoz használni tudja az operátor parancsokat	
@@ -5621,7 +5621,6 @@ OPER_HELP_OPER
 	Szervíz operátor listáról.
 	
 	Valamennyi IRC operátor használhat OPER LIST parancsot.
-	Összes egyéb felhasználás korlátozva Szervíz adminoknak
 	
 OPER_HELP_ADMIN
 	Syntax:	ADMIN  ADD nick

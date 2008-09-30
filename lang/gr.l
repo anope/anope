@@ -5683,7 +5683,7 @@ OPER_HELP_OPER
 	        OPER LIST [μάσκα | λίστα]
 	        OPER CLEAR
 	
-	Η εντολή αυτή επιτρέπει στους Services admins να προσθέσουν ή να αφαιρέσουν
+	Η εντολή αυτή επιτρέπει στους Services Root να προσθέσουν ή να αφαιρέσουν
 	ψευδώνυμα από την λίστα Services operator.  Ο χρήστης ο οποίος είναι στην λίστα
 	Services operator και ο οποίος έχει κάνει εντολή αναγνώρισης με τον  %s
 	έχει πρόσβαση στις εντολές των Services operator.
@@ -5708,7 +5708,6 @@ OPER_HELP_OPER
 	Services operator.
 	
 	Κάθε IRC operator μπορεί να χρησιμοποιήσει την εντολή OPER LIST.
-	Όλες τις άλλες επιλογές μόνο οι Services admins.
 
 OPER_HELP_ADMIN
 	Σύνταξη: ADMIN ADD ψευδώνυμο

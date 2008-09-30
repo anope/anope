@@ -5639,7 +5639,7 @@ OPER_HELP_OPER
 	         OPER LIST [mask | lijst]
 	         OPER CLEAR
 	
-	Stelt Services administrators in staat om nicknames toe te
+	Stelt Services Root in staat om nicknames toe te
 	voegen of te verwijderen uit de Services operator lijst. Een
 	gebruiker van wie de nickname op de Services operator lijst
 	staat en die geidentificeerd is bij %s zal in staat
@@ -5665,8 +5665,7 @@ OPER_HELP_OPER
 	Het OPER CLEAR commando verwijdert alle nicks van de Services
 	operator lijst.
 	
-	Elke IRCop mag OPER LIST gebruiken. De rest is gelimiteerd tot
-	Services administrators.
+	Elke IRCop mag OPER LIST gebruiken.
 
 OPER_HELP_ADMIN
 	Gebruik: ADMIN ADD nick

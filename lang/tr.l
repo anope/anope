@@ -5642,7 +5642,7 @@ OPER_HELP_OPER
 	           OPER LIST [mask | liste]
 	           OPER CLEAR
 	
-	Servis adminlerinin Servis operatörleri listesine belirtilen 
+	Servis Root Servis operatörleri listesine belirtilen 
 	nicki ekleyip çýkarmasýný saðlar. Nicki Servis operatörleri
 	listesinde olan ve kendini %s ile tanýtmýþ olan kullanýcýlar
 	Servis operatörleri komutlarýný kullanabilir.
@@ -5667,7 +5667,6 @@ OPER_HELP_OPER
 	siler.
 	
 	Herhangi bir IRC operatörü OPER LIST komutunu kullanabilir.
-	Diðer tüm OPER komutlarýný Servis adminleri kullanabilir.
 
 OPER_HELP_ADMIN
 	Kullanýmý: ADMIN ADD nick

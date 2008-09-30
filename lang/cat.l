@@ -5751,7 +5751,7 @@ OPER_HELP_OPER
 	          OPER LIST [mascara | llista]
 	          OPER CLEAR
 	
-	Permet als administradors de serveis afegir o
+	Permet als root de serveis afegir o
 	eliminar nicknames a la llista d'operadors de
 	serveis. Un usuari amb el seu nickname a la llista
 	d'operadors de serveis i que ha estat identificat
@@ -5780,8 +5780,7 @@ OPER_HELP_OPER
 	de la llista d'operadors de serveis.
 	
 	Qualsevol operador d'IRC pot utilitzar la forma
-	OPER LIST de la comanda. Tots les altres utilitats estan
-	limitats als administradors de serveis.
+	OPER LIST de la comanda.
 
 OPER_HELP_ADMIN
 	Sintàxi: ADMIN ADD nick

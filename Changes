@@ -6,6 +6,7 @@ Anope Version  S V N
 09/25 F Fixed UnRestrictSAdmin on Unreal and Inspircd.                    [#942]
 09/25 F Fixed menu not properly removed after uninstall on windows.       [#944]
 09/27 F Fixed a buffer overflow in enc_sha1.                              [#947]
+09/30 F Fixed error in OPER help.                                         [#943]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]

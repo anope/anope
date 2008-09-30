@@ -5571,7 +5571,7 @@ OPER_HELP_OPER
 	         OPER LIST [máscara | lista-entradas]
 	         OPER CLEAR
 	
-	Permite aos Administradores dos Services adicionar ou remover
+	Permite aos Root dos Services adicionar ou remover
 	nicks da lista de Operadores dos Services. O usuário que
 	tem o nick na lista de Operadores dos Services e que está
 	identificado no %s é capaz de acessar os comandos de
@@ -5600,8 +5600,6 @@ OPER_HELP_OPER
 	de Operadores dos Services.
 	
 	Qualquer Operador de IRC pode usar o OPER LIST.
-	Todos os outros usos do comando são limitados aos
-	Administradores dos Services.
 
 OPER_HELP_ADMIN
 	Sintaxe: ADMIN ADD nick

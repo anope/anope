@@ -5808,7 +5808,7 @@ OPER_HELP_OPER
 	         OPER LIST [mask | liste]
 	         OPER CLEAR
 	
-	Permet aux Services admins d'ajouter ou de supprimer des
+	Permet aux Services Root d'ajouter ou de supprimer des
 	pseudo à ou de la liste des Services operators. Un utilisateur 
 	dont le pseudo est dans la liste des Services operators et qui est 
 	identifié auprès de %s aura accès aux commandes de Services
@@ -5835,8 +5835,7 @@ OPER_HELP_OPER
 	de la liste des Services operateurs.
 	
 	Un opérateur IRC peut utiliser la forme OPER LIST de 
-	la commande. Toutes les autres utilisations sont réservées 
-	aux Services admins.
+	la commande.
 
 OPER_HELP_ADMIN
 	Syntaxe: ADMIN ADD pseudo

@@ -1415,11 +1415,6 @@ void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_
 	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
 }
 
-void charybdis_cmd_svid_umode3(User * u, const char *ts)
-{
-    /* not used */
-}
-
 /*
  * SVINFO
  *      parv[0] = sender prefix
@@ -1622,7 +1617,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svid_umode3(charybdis_cmd_svid_umode3);
     pmodule_cmd_svsjoin(charybdis_cmd_svsjoin);
     pmodule_cmd_svspart(charybdis_cmd_svspart);
     pmodule_cmd_swhois(charybdis_cmd_swhois);

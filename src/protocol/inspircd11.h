@@ -69,7 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-void inspircd_cmd_svid_umode3(User * u, const char *ts);
 void inspircd_cmd_eob();
 int inspircd_flood_mode_check(const char *value);
 void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason);

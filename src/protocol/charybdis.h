@@ -64,7 +64,6 @@ void charybdis_cmd_318(const char *source, const char *who);
 void charybdis_cmd_242(const char *buf);
 void charybdis_cmd_243(const char *buf);
 void charybdis_cmd_211(const char *buf);
-void charybdis_cmd_svid_umode3(User * u, const char *ts);
 void charybdis_cmd_eob();
 int charybdis_flood_mode_check(const char *value);
 void charybdis_cmd_jupe(const char *jserver, const char *who, const char *reason);

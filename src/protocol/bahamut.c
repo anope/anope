@@ -1193,13 +1193,10 @@ void BahamutIRCdProto::cmd_nc_change(User *u)
 	common_svsmode(u, "+d", "1");
 }
 
-void bahamut_cmd_svid_umode3(User * u, const char *ts)
+void BahamutIRCdProto::cmd_svid_umode3(User *u, const char *ts)
 {
-    if (u->svid != u->timestamp) {
-        common_svsmode(u, "+rd", ts);
-    } else {
-        common_svsmode(u, "+r", NULL);
-    }
+	if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
+	else common_svsmode(u, "+r", NULL);
 }
 
 int anope_event_error(const char *source, int ac, const char **av)
@@ -1384,7 +1381,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svid_umode3(bahamut_cmd_svid_umode3);
     pmodule_cmd_svsjoin(bahamut_cmd_svsjoin);
     pmodule_cmd_svspart(bahamut_cmd_svspart);
     pmodule_cmd_swhois(bahamut_cmd_swhois);

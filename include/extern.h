@@ -1013,8 +1013,6 @@ E void process(void);
 
 E void send_cmd(const char *source, const char *fmt, ...)
 	FORMAT(printf,2,3);
-E void vsend_cmd(const char *source, const char *fmt, va_list args)
-	FORMAT(printf,2,0);
 
 E void notice_server(char *source, Server * s, char *fmt, ...)
 	FORMAT(printf,3,4);

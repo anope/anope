@@ -26,46 +26,29 @@
  */
 void send_cmd(const char *source, const char *fmt, ...)
 {
-    va_list args;
+	va_list args;
+	static char buf[BUFSIZE];
 
-    if (fmt) {
-        va_start(args, fmt);
-        vsend_cmd(source, fmt, args);
-        va_end(args);
-    }
-}
+	va_start(args, fmt);
 
-/*************************************************************************/
+	vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-/**
- * actually Send a command to the server.
- * @param source Orgin of the Message (some times NULL)
- * @param fmt Format of the Message
- * @param args List of the arguments
- * @return void
- */
-void vsend_cmd(const char *source, const char *fmt, va_list args)
-{
-    char buf[BUFSIZE];
-    *buf = '\0';
+	if (source)
+	{
+		sockprintf(servsock, ":%s %s\r\n", source, buf);
+		eventprintf(":%s %s", source, buf);
+		if (debug)
+			alog("debug: Sent: :%s %s", source, buf);
+	}
+	else
+	{
+		sockprintf(servsock, "%s\r\n", buf);
+		eventprintf("%s", buf);
+		if (debug)
+			alog("debug: Sent: %s", buf);
+	}
 
-    if (fmt) {
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-        if (source) {
-            sockprintf(servsock, ":%s %s\r\n", source, buf);
-            eventprintf(":%s %s", source, buf);
-            if (debug) {
-                alog("debug: Sent: :%s %s", source, buf);
-            }
-        } else {
-            sockprintf(servsock, "%s\r\n", buf);
-            eventprintf("%s", buf);
-            if (debug) {
-                alog("debug: Sent: %s", buf);
-            }
-        }
-    }
+	va_end(args);
 }
 
 /*************************************************************************/

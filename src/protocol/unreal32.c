@@ -517,11 +517,9 @@ void UnrealIRCdProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
 }
 
-void unreal_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                      const char *topic, time_t when)
+void UnrealIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-    send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan,
-             whosetit, (unsigned long int) when, topic);
+	send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
 }
 
 void unreal_cmd_vhost_off(User * u)
@@ -2106,7 +2104,6 @@ void moduleAddIRCDMsgs(void) {
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_topic(unreal_cmd_topic);
     pmodule_cmd_vhost_off(unreal_cmd_vhost_off);
     pmodule_cmd_akill(unreal_cmd_akill);
     pmodule_cmd_svskill(unreal_cmd_svskill);

@@ -46,7 +46,6 @@ void initIrcdProto()
 {
     ircdproto.ircd_set_mod_current_buffer = NULL;
     ircdproto.ircd_set_umode = NULL;
-    ircdproto.ircd_cmd_topic = NULL;
     ircdproto.ircd_cmd_vhost_off = NULL;
     ircdproto.ircd_cmd_akill = NULL;
     ircdproto.ircd_cmd_svskill = NULL;
@@ -143,10 +142,9 @@ void anope_cmd_remove_akill(const char *user, const char *host)
 	ircdprotonew->cmd_remove_akill(user, host);
 }
 
-void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                     const char *topic, time_t when)
+void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-    ircdproto.ircd_cmd_topic(whosets, chan, whosetit, topic, when);
+	ircdprotonew->cmd_topic(whosets, chan, whosetit, topic, when);
 }
 
 void anope_cmd_vhost_off(User * u)
@@ -688,13 +686,6 @@ void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 void pmodule_set_mod_current_buffer(void (*func) (int ac, char **av))
 {
     ircdproto.ircd_set_mod_current_buffer = func;
-}
-
-void pmodule_cmd_topic(void (*func)
-                        (const char *whosets, const char *chan, const char *whosetit,
-                         const char *topic, time_t when))
-{
-    ircdproto.ircd_cmd_topic = func;
 }
 
 void pmodule_cmd_vhost_off(void (*func) (User * u))

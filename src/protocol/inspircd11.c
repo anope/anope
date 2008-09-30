@@ -533,12 +533,9 @@ void InspIRCdProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
 
-void
-inspircd_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                   const char *topic, time_t when)
+void InspIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-    send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan,
-             (unsigned long int) when, whosetit, topic);
+	send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
 }
 
 void inspircd_cmd_vhost_off(User * u)
@@ -1789,7 +1786,6 @@ void inspircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_topic(inspircd_cmd_topic);
     pmodule_cmd_vhost_off(inspircd_cmd_vhost_off);
     pmodule_cmd_akill(inspircd_cmd_akill);
     pmodule_cmd_svskill(inspircd_cmd_svskill);

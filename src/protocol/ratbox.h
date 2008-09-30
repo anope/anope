@@ -46,7 +46,6 @@
 
 
 void ratbox_set_umode(User * user, int ac, const char **av);
-void ratbox_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
 void ratbox_cmd_vhost_off(User * u);
 void ratbox_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
 void ratbox_cmd_svskill(const char *source, const char *user, const char *buf);
@@ -115,4 +114,5 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf);
 class RatboxProto : public IRCDProtoNew {
 	public:
 		void cmd_remove_akill(const char *, const char *);
+		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 } ircd_proto;

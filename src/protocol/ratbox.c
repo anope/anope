@@ -781,14 +781,10 @@ void RatboxProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
-void ratbox_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                      const char *topic, time_t when)
+void RatboxProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-    Uid *ud;
-
-    ud = find_uid(whosets);
-    send_cmd((UseTS6 ? (ud ? ud->uid : whosets) : whosets), "TOPIC %s :%s",
-             chan, topic);
+	Uid *ud = find_uid(whosets);
+	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
 void ratbox_cmd_vhost_off(User * u)
@@ -1728,7 +1724,6 @@ void ratbox_cmd_ctcp(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_topic(ratbox_cmd_topic);
     pmodule_cmd_vhost_off(ratbox_cmd_vhost_off);
     pmodule_cmd_akill(ratbox_cmd_akill);
     pmodule_cmd_svskill(ratbox_cmd_svskill);

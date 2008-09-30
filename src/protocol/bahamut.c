@@ -768,11 +768,9 @@ void bahamut_cmd_part(const char *nick, const char *chan, const char *buf)
 }
 
 /* TOPIC */
-void bahamut_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                       const char *topic, time_t when)
+void BahamutIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
-             (unsigned long int) when, topic);
+	send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
 }
 
 /* UNSQLINE */
@@ -1554,7 +1552,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_topic(bahamut_cmd_topic);
     pmodule_cmd_vhost_off(bahamut_cmd_vhost_off);
     pmodule_cmd_akill(bahamut_cmd_akill);
     pmodule_cmd_svskill(bahamut_cmd_svskill);

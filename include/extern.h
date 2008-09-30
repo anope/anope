@@ -1149,7 +1149,6 @@ E char *TS6SID;
 E char *TS6UPLINK;
 
 E void update_host(User * user);
-E void change_user_host(User * user, const char *host);
 E void change_user_username(User * user, const char *username);
 E void change_user_realname(User * user, const char *realname);
 

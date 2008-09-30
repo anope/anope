@@ -105,10 +105,28 @@ void User::SetNewNick(const std::string &newnick)
 	}
 }
 
+void User::SetDisplayedHost(const std::string &host)
+{
+	if (host.empty())
+		throw "empty host? in MY services? it seems it's more likely than I thought.";
+
+    if (this->vhost)
+        free(this->vhost);
+    this->vhost = sstrdup(host.c_str());
+
+    if (debug)
+        alog("debug: %s changes its vhost to %s", this->nick, host.c_str());
+
+    update_host(this);
+}
 
 /*************************************************************************/
 /*************************************************************************/
 
+/*
+ * XXX: I don't like how this "smells". I think it belongs in NickAlias/NickCore.
+ * -- w00t
+ */
 void update_host(User * user)
 {
     if (user->na && (nick_identified(user)
@@ -129,24 +147,6 @@ void update_host(User * user)
              common_get_vhost(user));
 }
 
-
-/*************************************************************************/
-
-/* Change the (virtual) hostname of a user. */
-
-void change_user_host(User * user, const char *host)
-{
-    if (user->vhost)
-        free(user->vhost);
-    user->vhost = sstrdup(host);
-
-    if (debug)
-        alog("debug: %s changes its vhost to %s", user->nick, host);
-
-
-
-    update_host(user);
-}
 
 /*************************************************************************/
 

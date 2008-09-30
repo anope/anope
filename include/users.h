@@ -73,5 +73,10 @@ class User
 	 * called from ircd protocol.
 	 */
 	void SetNewNick(const std::string &newnick);
+
+	/** Update the displayed (vhost) of a user record.
+	 * This is used (if set) instead of real host.
+	 */
+	void SetDisplayedHost(const std::string &host);
 };
 

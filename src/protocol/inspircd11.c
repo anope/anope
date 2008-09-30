@@ -1757,12 +1757,6 @@ void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* GLOBOPS - to handle old WALLOPS */
-void inspircd_cmd_global_legacy(const char *source, const char *fmt)
-{
-    send_cmd(source ? source : s_OperServ, "GLOBOPS :%s", fmt);
-}
-
 int inspircd_valid_nick(const char *nick)
 {
     return 1;
@@ -1836,7 +1830,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
     pmodule_cmd_global(inspircd_cmd_global);
-    pmodule_cmd_global_legacy(inspircd_cmd_global_legacy);
     pmodule_cmd_sqline(inspircd_cmd_sqline);
     pmodule_cmd_squit(inspircd_cmd_squit);
     pmodule_cmd_svso(inspircd_cmd_svso);

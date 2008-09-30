@@ -986,13 +986,6 @@ void unreal_cmd_global(const char *source, const char *buf)
              send_token("GLOBOPS", "]"), buf);
 }
 
-/* GLOBOPS - to handle old WALLOPS */
-void unreal_cmd_global_legacy(const char *source, const char *fmt)
-{
-    send_cmd(source ? source : ServerName, "%s :%s",
-             send_token("GLOBOPS", "]"), fmt);
-}
-
 /* SQLINE */
 /*
 **	parv[0] = sender
@@ -2154,7 +2147,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
     pmodule_cmd_global(unreal_cmd_global);
-    pmodule_cmd_global_legacy(unreal_cmd_global_legacy);
     pmodule_cmd_sqline(unreal_cmd_sqline);
     pmodule_cmd_squit(unreal_cmd_squit);
     pmodule_cmd_svso(unreal_cmd_svso);

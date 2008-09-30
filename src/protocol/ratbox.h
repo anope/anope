@@ -87,7 +87,6 @@ void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
 void ratbox_cmd_global(const char *source, const char *buf);
-void ratbox_cmd_global_legacy(const char *source, const char *fmt);
 void ratbox_cmd_sqline(const char *mask, const char *reason);
 void ratbox_cmd_squit(const char *servname, const char *message);
 void ratbox_cmd_svso(const char *source, const char *nick, const char *flag);

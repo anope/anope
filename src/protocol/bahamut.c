@@ -1506,12 +1506,6 @@ void bahamut_cmd_jupe(const char *jserver, const char *who, const char *reason)
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
-/* GLOBOPS - to handle old WALLOPS */
-void bahamut_cmd_global_legacy(const char *source, const char *fmt)
-{
-    send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
-}
-
 /*
   1 = valid nick
   0 = nick is in valid
@@ -1601,7 +1595,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
     pmodule_cmd_global(bahamut_cmd_global);
-    pmodule_cmd_global_legacy(bahamut_cmd_global_legacy);
     pmodule_cmd_sqline(bahamut_cmd_sqline);
     pmodule_cmd_squit(bahamut_cmd_squit);
     pmodule_cmd_svso(bahamut_cmd_svso);

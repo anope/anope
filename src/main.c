@@ -385,7 +385,7 @@ void sighandler(int signum)
                 inbuf[447] = '>';
                 inbuf[448] = 0;
             }
-            wallops(NULL, "PANIC! buffer = %s\r\n", inbuf);
+            anope_cmd_global(NULL, "PANIC! buffer = %s\r\n", inbuf);
             modules_unload_all(false, true);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
@@ -461,7 +461,7 @@ void sighandler(int signum)
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            wallops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
+            anope_cmd_global(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
             modules_unload_all(false, true);
         }

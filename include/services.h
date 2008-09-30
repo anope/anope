@@ -1116,7 +1116,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
     void (*ircd_cmd_global)(const char *source, const char *buf);
-    void (*ircd_cmd_global_legacy)(const char *source, const char *fmt);
     void (*ircd_cmd_sqline)(const char *mask, const char *reason);
     void (*ircd_cmd_squit)(const char *servname, const char *message);
     void (*ircd_cmd_svso)(const char *source, const char *nick, const char *flag);

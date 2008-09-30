@@ -650,7 +650,6 @@ E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
 E void pmodule_cmd_global(void (*func) (const char *source, const char *buf));
-E void pmodule_cmd_global_legacy(void (*func) (const char *source, const char *fmt));
 E void pmodule_cmd_sqline(void (*func) (const char *mask, const char *reason));
 E void pmodule_cmd_squit(void (*func) (const char *servname, const char *message));
 E void pmodule_cmd_svso(void (*func) (const char *source, const char *nick, const char *flag));
@@ -1352,9 +1351,6 @@ E void anope_cmd_nc_change(User *u);
 E int anope_flood_mode_check(const char *value);
 
 E void anope_cmd_jupe(const char *jserver, const char *who, const char *reason);
-
-E void anope_cmd_global_legacy(const char *source, const char *fmt);
-E void wallops(const char *source, const char *fmt, ...);
 
 E int anope_valid_nick(char *nick);
 E int anope_valid_chan(char *chan);

@@ -88,7 +88,6 @@ void charybdis_cmd_242(const char *buf);
 void charybdis_cmd_243(const char *buf);
 void charybdis_cmd_211(const char *buf);
 void charybdis_cmd_global(const char *source, const char *buf);
-void charybdis_cmd_global_legacy(const char *source, const char *fmt);
 void charybdis_cmd_sqline(const char *mask, const char *reason);
 void charybdis_cmd_squit(const char *servname, const char *message);
 void charybdis_cmd_svso(const char *source, const char *nick, const char *flag);

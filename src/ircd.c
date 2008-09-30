@@ -87,7 +87,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
     ircdproto.ircd_cmd_global = NULL;
-    ircdproto.ircd_cmd_global_legacy = NULL;
     ircdproto.ircd_cmd_sqline = NULL;
     ircdproto.ircd_cmd_squit = NULL;
     ircdproto.ircd_cmd_svso = NULL;
@@ -531,11 +530,6 @@ void anope_cmd_global(const char *source, const char *fmt, ...)
     ircdproto.ircd_cmd_global(source, buf);
 }
 
-void anope_cmd_global_legacy(const char *source, const char *fmt)
-{
-    ircdproto.ircd_cmd_global_legacy(source, fmt);
-}
-
 void anope_cmd_sqline(const char *mask, const char *reason)
 {
     ircdproto.ircd_cmd_sqline(mask, reason);
@@ -916,11 +910,6 @@ void pmodule_cmd_211(void (*func) (const char *buf))
 void pmodule_cmd_global(void (*func) (const char *source, const char *buf))
 {
     ircdproto.ircd_cmd_global = func;
-}
-
-void pmodule_cmd_global_legacy(void (*func) (const char *source, const char *fmt))
-{
-    ircdproto.ircd_cmd_global_legacy = func;
 }
 
 void pmodule_cmd_sqline(void (*func) (const char *mask, const char *reason))

@@ -527,25 +527,6 @@ void charybdis_cmd_global(const char *source, const char *buf)
     }
 }
 
-/* GLOBOPS - to handle old WALLOPS */
-void charybdis_cmd_global_legacy(const char *source, const char *fmt)
-{
-    Uid *u;
-
-    if (source) {
-        u = find_uid(source);
-        if (u) {
-            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", fmt);
-        } else {
-            send_cmd((UseTS6 ? TS6SID : ServerName), "WALLOPS :%s", fmt);
-        }
-    } else {
-        send_cmd((UseTS6 ? TS6SID : ServerName), "WALLOPS :%s", fmt);
-    }
-
-    send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
-}
-
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
@@ -1892,7 +1873,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
     pmodule_cmd_global(charybdis_cmd_global);
-    pmodule_cmd_global_legacy(charybdis_cmd_global_legacy);
     pmodule_cmd_sqline(charybdis_cmd_sqline);
     pmodule_cmd_squit(charybdis_cmd_squit);
     pmodule_cmd_svso(charybdis_cmd_svso);

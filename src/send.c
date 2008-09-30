@@ -290,26 +290,4 @@ void privmsg(char *source, char *dest, const char *fmt, ...)
     anope_cmd_privmsg(source, dest, buf);
 }
 
-/*************************************************************************/
 
-/**
- * Send out a WALLOP, this is here for legacy only, same day we will pull it out
- * @param source Orgin of the Message
- * @param fmt Format of the Message
- * @param ... any number of parameters
- * @return void
- */
-void wallops(const char *source, const char *fmt, ...)
-{
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-
-    anope_cmd_global_legacy(source, buf);
-}

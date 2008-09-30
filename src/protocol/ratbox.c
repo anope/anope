@@ -516,25 +516,6 @@ void ratbox_cmd_global(const char *source, const char *buf)
     }
 }
 
-/* GLOBOPS - to handle old WALLOPS */
-void ratbox_cmd_global_legacy(const char *source, const char *fmt)
-{
-    Uid *u;
-
-    if (source) {
-        u = find_uid(source);
-        if (u) {
-            send_cmd((UseTS6 ? u->uid : source), "OPERWALL :%s", fmt);
-        } else {
-            send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", fmt);
-        }
-    } else {
-        send_cmd((UseTS6 ? TS6SID : ServerName), "OPERWALL :%s", fmt);
-    }
-
-    send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
-}
-
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
@@ -1788,7 +1769,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
     pmodule_cmd_global(ratbox_cmd_global);
-    pmodule_cmd_global_legacy(ratbox_cmd_global_legacy);
     pmodule_cmd_sqline(ratbox_cmd_sqline);
     pmodule_cmd_squit(ratbox_cmd_squit);
     pmodule_cmd_svso(ratbox_cmd_svso);

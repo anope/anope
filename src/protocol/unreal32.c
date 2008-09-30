@@ -1464,9 +1464,9 @@ void UnrealIRCdProto::cmd_svsjoin(const char *source, const char *nick, const ch
 	parv[1] - nick to make part
 	parv[2] - channel(s) to part
 */
-void unreal_cmd_svspart(const char *source, const char *nick, const char *chan)
+void UnrealIRCdProto::cmd_svspart(const char *source, const char *nick, const char *chan)
 {
-    send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
+	send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
 }
 
 int anope_event_globops(const char *source, int ac, const char **av)
@@ -1900,7 +1900,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-	pmodule_cmd_svspart(unreal_cmd_svspart);
 	pmodule_cmd_swhois(unreal_cmd_swhois);
     pmodule_cmd_eob(unreal_cmd_eob);
     pmodule_flood_mode_check(unreal_flood_mode_check);

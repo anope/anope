@@ -384,7 +384,7 @@ int slist_setcapacity(SList * slist, int16 capacity)
     slist->capacity = capacity;
     if (slist->capacity)
         slist->list =
-            srealloc(slist->list, sizeof(void *) * slist->capacity);
+            (void **)srealloc(slist->list, sizeof(void *) * slist->capacity);
     else {
         free(slist->list);
         slist->list = NULL;

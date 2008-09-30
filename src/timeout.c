@@ -93,7 +93,7 @@ void check_timeouts(void)
 
 Timeout *add_timeout(int delay, void (*code) (Timeout *), int repeat)
 {
-    Timeout *t = scalloc(sizeof(Timeout), 1);
+    Timeout *t = (Timeout *)scalloc(sizeof(Timeout), 1);
     t->settime = time(NULL);
     t->timeout = t->settime + delay;
     t->code = code;

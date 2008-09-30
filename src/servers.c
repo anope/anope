@@ -122,7 +122,7 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
 {
     Server *serv;
 
-    serv = scalloc(sizeof(Server), 1);
+    serv = (Server *)scalloc(sizeof(Server), 1);
     if (!name)
         name = "";
     serv->name = sstrdup(name);

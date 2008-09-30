@@ -251,7 +251,7 @@ int add_session(char *nick, char *host, char *hostip)
     }
 
     nsessions++;
-    session = scalloc(sizeof(Session), 1);
+    session = (Session *)scalloc(sizeof(Session), 1);
     session->host = sstrdup(host);
     list = &sessionlist[HASH(session->host)];
     session->next = *list;
@@ -343,7 +343,7 @@ void expire_exceptions(void)
         nexceptions--;
         memmove(exceptions + i, exceptions + i + 1,
                 sizeof(Exception) * (nexceptions - i));
-        exceptions = srealloc(exceptions, sizeof(Exception) * nexceptions);
+        exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
         i--;
     }
 }
@@ -409,7 +409,7 @@ void load_exceptions()
     case 7:
         SAFE(read_int16(&n, f));
         nexceptions = n;
-        exceptions = scalloc(sizeof(Exception) * nexceptions, 1);
+        exceptions = (Exception *)scalloc(sizeof(Exception) * nexceptions, 1);
         if (!nexceptions) {
             close_db(f);
             return;
@@ -532,7 +532,7 @@ int exception_add(User * u, const char *mask, const int limit,
     }
 
     nexceptions++;
-    exceptions = srealloc(exceptions, sizeof(Exception) * nexceptions);
+    exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
 
     exceptions[nexceptions - 1].mask = sstrdup(mask);
     exceptions[nexceptions - 1].limit = limit;
@@ -557,7 +557,7 @@ static int exception_del(const int index)
     nexceptions--;
     memmove(exceptions + index, exceptions + index + 1,
             sizeof(Exception) * (nexceptions - index));
-    exceptions = srealloc(exceptions, sizeof(Exception) * nexceptions);
+    exceptions = (Exception *)srealloc(exceptions, sizeof(Exception) * nexceptions);
 
     return 1;
 }
@@ -802,7 +802,7 @@ int do_exception(User * u)
 
         if ((n1 >= 0 && n1 < nexceptions) && (n2 >= 0 && n2 < nexceptions)
             && (n1 != n2)) {
-            exception = scalloc(sizeof(Exception), 1);
+            exception = (Exception *)scalloc(sizeof(Exception), 1);
             memcpy(exception, &exceptions[n1], sizeof(Exception));
 
             if (n1 < n2) {

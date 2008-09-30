@@ -35,7 +35,7 @@ static User *new_user(const char *nick)
 {
     User *user, **list;
 
-    user = scalloc(sizeof(User), 1);
+    user = (User *)scalloc(sizeof(User), 1);
     if (!nick)
         nick = "";
     strscpy(user->nick, nick, NICKMAX);
@@ -111,7 +111,7 @@ void update_host(User * user)
             free(user->na->last_usermask);
 
         user->na->last_usermask =
-            smalloc(strlen(common_get_vident(user)) +
+            (char *)smalloc(strlen(common_get_vident(user)) +
                     strlen(common_get_vhost(user)) + 2);
         sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
                 common_get_vhost(user));
@@ -180,7 +180,7 @@ void change_user_username(User * user, const char *username)
             free(user->na->last_usermask);
 
         user->na->last_usermask =
-            smalloc(strlen(common_get_vident(user)) +
+            (char *)smalloc(strlen(common_get_vident(user)) +
                     strlen(common_get_vhost(user)) + 2);
         sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
                 common_get_vhost(user));
@@ -435,7 +435,7 @@ Uid *new_uid(const char *nick, char *uid)
 {
     Uid *u, **list;
 
-    u = scalloc(sizeof(Uid), 1);
+    u = (Uid *)scalloc(sizeof(Uid), 1);
     if (!nick || !uid) {
         return NULL;
     }
@@ -750,7 +750,7 @@ User *do_nick(const char *source, char *nick, char *username, char *host,
             if (user->na->last_usermask)
                 free(user->na->last_usermask);
             user->na->last_usermask =
-                smalloc(strlen(common_get_vident(user)) +
+                (char *)smalloc(strlen(common_get_vident(user)) +
                         strlen(common_get_vhost(user)) + 2);
             sprintf(user->na->last_usermask, "%s@%s",
                     common_get_vident(user), common_get_vhost(user));
@@ -1089,7 +1089,7 @@ char *create_mask(User * u)
      * will never be longer than this (and will often be shorter), thus we
      * can use strcpy() and sprintf() safely.
      */
-    end = mask = smalloc(ulen + strlen(common_get_vhost(u)) + 3);
+    end = mask = (char *)smalloc(ulen + strlen(common_get_vhost(u)) + 3);
     end += sprintf(end, "%s%s@",
                    (ulen <
                     (*(common_get_vident(u)) ==

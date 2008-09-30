@@ -167,7 +167,7 @@ void notice_list(char *source, char *dest, char **text)
  * @param ... any number of parameters
  * @return void
  */
-void notice_lang(char *source, User * dest, int message, ...)
+void notice_lang(const char *source, User * dest, int message, ...)
 {
     va_list args;
     char buf[4096];             /* because messages can be really big */

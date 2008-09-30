@@ -74,7 +74,7 @@ void add_ignore(const char *nick, time_t delta)
         
             /* Create new entry.. */ 
     } else {
-        ign = scalloc(sizeof(*ign), 1);
+        ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
         ign->mask = mask;
         ign->time = now + delta;
         ign->prev = NULL;
@@ -263,12 +263,12 @@ int split_buf(char *buf, char ***argv, int colon_special)
     int argc;
     char *s;
 
-    *argv = scalloc(sizeof(char *) * argvsize, 1);
+    *argv = (char **)scalloc(sizeof(char *) * argvsize, 1);
     argc = 0;
     while (*buf) {
         if (argc == argvsize) {
             argvsize += 8;
-            *argv = srealloc(*argv, sizeof(char *) * argvsize);
+            *argv = (char **)srealloc(*argv, sizeof(char *) * argvsize);
         }
         if (*buf == ':') {
             (*argv)[argc++] = buf + 1;

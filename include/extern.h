@@ -1029,9 +1029,9 @@ E void notice_server(char *source, Server * s, char *fmt, ...)
 E void notice_user(char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);
 
-E void notice_list(char *source, char *dest, char **text);
-E void notice_lang(char *source, User *dest, int message, ...);
-E void notice_help(char *source, User *dest, int message, ...);
+E void notice_list(const char *source, const char *dest, char **text);
+E void notice_lang(const char *source, User *dest, int message, ...);
+E void notice_help(const char *source, User *dest, int message, ...);
 
 
 /**** servers.c ****/
@@ -1251,16 +1251,16 @@ E void anope_cmd_nick(char *nick, char *name, char *mode);			  		  /* NICK */
 E void anope_cmd_chg_nick(char *oldnick, char *newnick);             	  		  /* NICK */
 E void anope_cmd_bot_nick(char *nick, char *user,char *host,char *real,char *modes);	  /* NICK */
 E void anope_cmd_guest_nick(char *nick, char *user,char *host,char *real,char *modes);	  /* NICK */
-E void anope_cmd_notice(char *source, char *dest, const char *fmt, ...);     		  /* NOTICE */
-E void anope_cmd_notice_ops(char *source, char *dest, const char *fmt, ...); 		  /* NOTICE */
-E void anope_cmd_notice2(char *source, char *dest, char *msg);		  		  /* NOTICE */
+E void anope_cmd_notice(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
+E void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
+E void anope_cmd_notice2(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
 E void anope_cmd_serv_notice(char *source, char *dest, char *msg);		  		  /* NOTICE */
 E void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(char *pass);                                   	  		  /* PASS */
 E void anope_cmd_pong(char *servname, char *who);                    	  		  /* PONG */
-E void anope_cmd_privmsg(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
-E void anope_cmd_action(char *source, char *dest, const char *fmt, ...);    		  /* PRIVMSG */
-E void anope_cmd_privmsg2(char *source, char *dest, char *msg);		  		  /* PRIVMSG */
+E void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
+E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
+E void anope_cmd_privmsg2(const char *source, const char *dest, const char *msg);		  		  /* PRIVMSG */
 E void anope_cmd_serv_privmsg(char *source, char *dest, char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_cmd_quit(char *source, const char *fmt, ...);           	  		  /* QUIT */

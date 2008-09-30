@@ -1267,17 +1267,13 @@ void RatboxProto::cmd_notice_ops(const char *source, const char *dest, const cha
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void ratbox_cmd_bot_chan_mode(const char *nick, const char *chan)
+void RatboxProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    Uid *u;
-
-    if (UseTS6) {
-        u = find_uid(nick);
-        ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode,
-                         (u ? u->uid : nick));
-    } else {
-        anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
-    }
+	if (UseTS6) {
+		Uid *u = find_uid(nick);
+		ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
+	}
+	else anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
@@ -1635,7 +1631,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(ratbox_cmd_372_error);
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_bot_chan_mode(ratbox_cmd_bot_chan_mode);
     pmodule_cmd_351(ratbox_cmd_351);
     pmodule_cmd_quit(ratbox_cmd_quit);
     pmodule_cmd_pong(ratbox_cmd_pong);

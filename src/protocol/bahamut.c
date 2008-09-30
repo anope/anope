@@ -510,9 +510,9 @@ void bahamut_cmd_svsmode_chan(const char *name, const char *mode, const char *ni
     }
 }
 
-void bahamut_cmd_bot_chan_mode(const char *nick, const char *chan)
+void BahamutIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */
@@ -1488,7 +1488,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(bahamut_cmd_372_error);
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_bot_chan_mode(bahamut_cmd_bot_chan_mode);
     pmodule_cmd_351(bahamut_cmd_351);
     pmodule_cmd_quit(bahamut_cmd_quit);
     pmodule_cmd_pong(bahamut_cmd_pong);

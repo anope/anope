@@ -1335,17 +1335,13 @@ void CharybdisProto::cmd_notice_ops(const char *source, const char *dest, const 
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE @%s :%s", dest, buf);
 }
 
-void charybdis_cmd_bot_chan_mode(const char *nick, const char *chan)
+void CharybdisProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    Uid *u;
-
-    if (UseTS6) {
-        u = find_uid(nick);
-        charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode,
-                         (u ? u->uid : nick));
-    } else {
-        anope_cmd_mode(ServerName, chan, "%s %s", ircd->botchanumode, nick);
-    }
+	if (UseTS6) {
+		Uid *u = find_uid(nick);
+		charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
+	}
+	else anope_cmd_mode(ServerName, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
@@ -1741,7 +1737,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(charybdis_cmd_372_error);
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
-    pmodule_cmd_bot_chan_mode(charybdis_cmd_bot_chan_mode);
     pmodule_cmd_351(charybdis_cmd_351);
     pmodule_cmd_quit(charybdis_cmd_quit);
     pmodule_cmd_pong(charybdis_cmd_pong);

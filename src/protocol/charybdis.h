@@ -51,7 +51,6 @@ void charybdis_cmd_372(const char *source, const char *msg);
 void charybdis_cmd_372_error(const char *source);
 void charybdis_cmd_375(const char *source);
 void charybdis_cmd_376(const char *source);
-void charybdis_cmd_bot_chan_mode(const char *nick, const char *chan);
 void charybdis_cmd_351(const char *source);
 void charybdis_cmd_quit(const char *source, const char *buf);
 void charybdis_cmd_pong(const char *servname, const char *who);
@@ -113,4 +112,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_message(const char *, const char *, const char *);
 		void cmd_notice(const char *, const char *, const char *);
 		void cmd_privmsg(const char *, const char *, const char *);
+		void cmd_bot_chan_mode(const char *, const char *);
 } ircd_proto;

@@ -780,9 +780,9 @@ void InspIRCdProto::cmd_notice_ops(const char *source, const char *dest, const c
 	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
 }
 
-void inspircd_cmd_bot_chan_mode(const char *nick, const char *chan)
+void InspIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
+	anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
 void inspircd_cmd_351(const char *source)
@@ -1734,7 +1734,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_372_error(inspircd_cmd_372_error);
     pmodule_cmd_375(inspircd_cmd_375);
     pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_bot_chan_mode(inspircd_cmd_bot_chan_mode);
     pmodule_cmd_351(inspircd_cmd_351);
     pmodule_cmd_quit(inspircd_cmd_quit);
     pmodule_cmd_pong(inspircd_cmd_pong);

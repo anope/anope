@@ -63,7 +63,6 @@ void bahamut_cmd_372(const char *source, const char *msg);
 void bahamut_cmd_372_error(const char *source);
 void bahamut_cmd_375(const char *source);
 void bahamut_cmd_376(const char *source);
-void bahamut_cmd_bot_chan_mode(const char *nick, const char *chan);
 void bahamut_cmd_351(const char *source);
 void bahamut_cmd_quit(const char *source, const char *buf);
 void bahamut_cmd_pong(const char *servname, const char *who);
@@ -123,4 +122,5 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_kick(const char *, const char *, const char *, const char *);
 		void cmd_notice_ops(const char *, const char *, const char *);
+		void cmd_bot_chan_mode(const char *, const char *);
 } ircd_proto;

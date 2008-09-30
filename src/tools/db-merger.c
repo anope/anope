@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
 
-                nc = calloc(1, sizeof(NickCore));
+                nc = (NickCore *)calloc(1, sizeof(NickCore));
                 nc->aliascount = 0;
                 nc->unused = 0;
 
@@ -382,7 +382,7 @@ int main(int argc, char *argv[])
                 READ(read_uint16(&nc->accesscount, f));
                 if (nc->accesscount) {
                     char **access;
-                    access = calloc(sizeof(char *) * nc->accesscount, 1);
+                    access = (char **)calloc(sizeof(char *) * nc->accesscount, 1);
                     nc->access = access;
                     for (j = 0; j < nc->accesscount; j++, access++)
                         READ(read_string(access, f));
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
                 READ(read_int16(&nc->memos.memomax, f));
                 if (nc->memos.memocount) {
                     Memo *memos;
-                    memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
+                    memos = (Memo *)calloc(sizeof(Memo) * nc->memos.memocount, 1);
                     nc->memos.memos = memos;
                     for (j = 0; j < nc->memos.memocount; j++, memos++) {
                         READ(read_uint32(&memos->number, f));
@@ -421,7 +421,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
 
-                na = calloc(1, sizeof(NickAlias));
+                na = (NickAlias *)calloc(1, sizeof(NickAlias));
 
                 READ(read_string(&na->nick, f));
                 READ(read_string(&na->last_usermask, f));
@@ -468,7 +468,7 @@ int main(int argc, char *argv[])
                         exit(0);
                     }
 
-                    nc = calloc(1, sizeof(NickCore));
+                    nc = (NickCore *)calloc(1, sizeof(NickCore));
                     READ(read_string(&nc->display, f));
                     READ(read_string(&nc->pass, f));
                     READ(read_string(&nc->email, f));
@@ -496,7 +496,7 @@ int main(int argc, char *argv[])
                     READ(read_uint16(&nc->accesscount, f));
                     if (nc->accesscount) {
                         char **access;
-                        access = calloc(sizeof(char *) * nc->accesscount, 1);
+                        access = (char **)calloc(sizeof(char *) * nc->accesscount, 1);
                         nc->access = access;
                         for (j = 0; j < nc->accesscount; j++, access++)
                             READ(read_string(access, f));
@@ -505,7 +505,7 @@ int main(int argc, char *argv[])
                     READ(read_int16(&nc->memos.memomax, f));
                     if (nc->memos.memocount) {
                         Memo *memos;
-                        memos = calloc(sizeof(Memo) * nc->memos.memocount, 1);
+                        memos = (Memo *)calloc(sizeof(Memo) * nc->memos.memocount, 1);
                         nc->memos.memos = memos;
                         for (j = 0; j < nc->memos.memocount; j++, memos++) {
                             READ(read_uint32(&memos->number, f));
@@ -532,7 +532,7 @@ int main(int argc, char *argv[])
                         exit(0);
                     }
 
-                    na = calloc(1, sizeof(NickAlias));
+                    na = (NickAlias *)calloc(1, sizeof(NickAlias));
 
                     READ(read_string(&na->nick, f));
                     READ(read_string(&na->last_usermask, f));
@@ -730,7 +730,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
 
-                ci = calloc(sizeof(ChannelInfo), 1);
+                ci = (ChannelInfo *)calloc(sizeof(ChannelInfo), 1);
                 *last = ci;
                 last = &ci->next;
                 ci->prev = prev;
@@ -761,7 +761,7 @@ int main(int argc, char *argv[])
                 ci->bantype = tmp16;
                 READ(read_int16(&tmp16, f));
                 n_levels = tmp16;
-                ci->levels = calloc(36 * sizeof(*ci->levels), 1);
+                ci->levels = (int16 *)calloc(36 * sizeof(*ci->levels), 1);
                 for (j = 0; j < n_levels; j++) {
                     if (j < 36)
                         READ(read_int16(&ci->levels[j], f));
@@ -770,7 +770,7 @@ int main(int argc, char *argv[])
                 }
                 READ(read_uint16(&ci->accesscount, f));
                 if (ci->accesscount) {
-                    ci->access = calloc(ci->accesscount, sizeof(ChanAccess));
+                    ci->access = (ChanAccess *)calloc(ci->accesscount, sizeof(ChanAccess));
                     for (j = 0; j < ci->accesscount; j++) {
                         READ(read_uint16(&ci->access[j].in_use, f));
                         if (ci->access[j].in_use) {
@@ -791,7 +791,7 @@ int main(int argc, char *argv[])
                 }
                 READ(read_uint16(&ci->akickcount, f));
                 if (ci->akickcount) {
-                    ci->akick = calloc(ci->akickcount, sizeof(AutoKick));
+                    ci->akick = (AutoKick *)calloc(ci->akickcount, sizeof(AutoKick));
                     for (j = 0; j < ci->akickcount; j++) {
                         SAFE(read_uint16(&ci->akick[j].flags, f));
                         if (ci->akick[j].flags & 0x0001) {
@@ -833,7 +833,7 @@ int main(int argc, char *argv[])
                 READ(read_int16(&ci->memos.memomax, f));
                 if (ci->memos.memocount) {
                     Memo *memos;
-                    memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
+                    memos = (Memo *)calloc(sizeof(Memo) * ci->memos.memocount, 1);
                     ci->memos.memos = memos;
                     for (j = 0; j < ci->memos.memocount; j++, memos++) {
                         READ(read_uint32(&memos->number, f));
@@ -852,7 +852,7 @@ int main(int argc, char *argv[])
                 ci->botflags = tmp32;
                 READ(read_int16(&tmp16, f));
                 n_ttb = tmp16;
-                ci->ttb = calloc(2 * 8, 1);
+                ci->ttb = (int16 *)calloc(2 * 8, 1);
                 for (j = 0; j < n_ttb; j++) {
                     if (j < 8)
                         READ(read_int16(&ci->ttb[j], f));
@@ -874,7 +874,7 @@ int main(int argc, char *argv[])
 
                 READ(read_uint16(&ci->bwcount, f));
                 if (ci->bwcount) {
-                    ci->badwords = calloc(ci->bwcount, sizeof(BadWord));
+                    ci->badwords = (BadWord *)calloc(ci->bwcount, sizeof(BadWord));
                     for (j = 0; j < ci->bwcount; j++) {
                         SAFE(read_uint16(&ci->badwords[j].in_use, f));
                         if (ci->badwords[j].in_use) {
@@ -918,7 +918,7 @@ int main(int argc, char *argv[])
                         exit(0);
                     }
 
-                    ci = calloc(sizeof(ChannelInfo), 1);
+                    ci = (ChannelInfo *)calloc(sizeof(ChannelInfo), 1);
                     READ(read_buffer(ci->name, f));
                     READ(read_string(&ci->founder, f));
                     READ(read_string(&ci->successor, f));
@@ -945,7 +945,7 @@ int main(int argc, char *argv[])
                     ci->bantype = tmp16;
                     READ(read_int16(&tmp16, f));
                     n_levels = tmp16;
-                    ci->levels = calloc(36 * sizeof(*ci->levels), 1);
+                    ci->levels = (int16 *)calloc(36 * sizeof(*ci->levels), 1);
                     for (j = 0; j < n_levels; j++) {
                         if (j < 36)
                             READ(read_int16(&ci->levels[j], f));
@@ -954,7 +954,7 @@ int main(int argc, char *argv[])
                     }
                     READ(read_uint16(&ci->accesscount, f));
                     if (ci->accesscount) {
-                        ci->access = calloc(ci->accesscount, sizeof(ChanAccess));
+                        ci->access = (ChanAccess *)calloc(ci->accesscount, sizeof(ChanAccess));
                         for (j = 0; j < ci->accesscount; j++) {
                             READ(read_uint16(&ci->access[j].in_use, f));
                             if (ci->access[j].in_use) {
@@ -975,7 +975,7 @@ int main(int argc, char *argv[])
                     }
                     READ(read_uint16(&ci->akickcount, f));
                     if (ci->akickcount) {
-                        ci->akick = calloc(ci->akickcount, sizeof(AutoKick));
+                        ci->akick = (AutoKick *)calloc(ci->akickcount, sizeof(AutoKick));
                         for (j = 0; j < ci->akickcount; j++) {
                             SAFE(read_uint16(&ci->akick[j].flags, f));
                             if (ci->akick[j].flags & 0x0001) {
@@ -1017,7 +1017,7 @@ int main(int argc, char *argv[])
                     READ(read_int16(&ci->memos.memomax, f));
                     if (ci->memos.memocount) {
                         Memo *memos;
-                        memos = calloc(sizeof(Memo) * ci->memos.memocount, 1);
+                        memos = (Memo *)calloc(sizeof(Memo) * ci->memos.memocount, 1);
                         ci->memos.memos = memos;
                         for (j = 0; j < ci->memos.memocount; j++, memos++) {
                             READ(read_uint32(&memos->number, f));
@@ -1036,7 +1036,7 @@ int main(int argc, char *argv[])
                     ci->botflags = tmp32;
                     READ(read_int16(&tmp16, f));
                     n_ttb = tmp16;
-                    ci->ttb = calloc(32, 1);
+                    ci->ttb = (int16 *)calloc(32, 1);
                     for (j = 0; j < n_ttb; j++) {
                         if (j < 8)
                             READ(read_int16(&ci->ttb[j], f));
@@ -1058,7 +1058,7 @@ int main(int argc, char *argv[])
 
                     READ(read_uint16(&ci->bwcount, f));
                     if (ci->bwcount) {
-                        ci->badwords = calloc(ci->bwcount, sizeof(BadWord));
+                        ci->badwords = (BadWord *)calloc(ci->bwcount, sizeof(BadWord));
                         for (j = 0; j < ci->bwcount; j++) {
                             SAFE(read_uint16(&ci->badwords[j].in_use, f));
                             if (ci->badwords[j].in_use) {
@@ -1384,7 +1384,7 @@ int main(int argc, char *argv[])
                 exit(0);
             }
 
-            bi = calloc(sizeof(BotInfo), 1);
+            bi = (BotInfo *)calloc(sizeof(BotInfo), 1);
             READ(read_string(&bi->nick, f));
             READ(read_string(&bi->user, f));
             READ(read_string(&bi->host, f));
@@ -1415,7 +1415,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
 
-                bi = calloc(sizeof(BotInfo), 1);
+                bi = (BotInfo *)calloc(sizeof(BotInfo), 1);
                 READ(read_string(&bi->nick, f));
                 READ(read_string(&bi->user, f));
                 READ(read_string(&bi->host, f));
@@ -1517,7 +1517,7 @@ int main(int argc, char *argv[])
                 printf("Invalid format in %s.\n", HOST_DB_1);
                 exit(0);
             }
-            hc = calloc(1, sizeof(HostCore));
+            hc = (HostCore *)calloc(1, sizeof(HostCore));
             READ(read_string(&hc->nick, f));
             READ(read_string(&hc->vIdent, f));
             READ(read_string(&hc->vHost, f));
@@ -1548,7 +1548,7 @@ int main(int argc, char *argv[])
                     exit(0);
                 }
                 collision = 0;
-                hc = calloc(1, sizeof(HostCore));
+                hc = (HostCore *)calloc(1, sizeof(HostCore));
                 READ(read_string(&hc->nick, f));
                 READ(read_string(&hc->vIdent, f));
                 READ(read_string(&hc->vHost, f));
@@ -1651,7 +1651,7 @@ dbFILE *open_db_read(const char *service, const char *filename, int version)
     FILE *fp;
     int myversion;
 
-    f = calloc(sizeof(*f), 1);
+    f = (dbFILE *)calloc(sizeof(*f), 1);
     if (!f) {
         printf("Can't allocate memory for %s database %s.\n", service, filename);
         exit(0);
@@ -1682,7 +1682,7 @@ dbFILE *open_db_write(const char *service, const char *filename, int version)
     dbFILE *f;
     int fd;
 
-    f = calloc(sizeof(*f), 1);
+    f = (dbFILE *)calloc(sizeof(*f), 1);
     if (!f) {
         printf("Can't allocate memory for %s database %s.\n", service, filename);
         exit(0);
@@ -1829,7 +1829,7 @@ int read_string(char **ret, dbFILE * f)
         *ret = NULL;
         return 0;
     }
-    s = calloc(len, 1);
+    s = (char *)calloc(len, 1);
     if (len != fread(s, 1, len, f->fp)) {
         free(s);
         return -1;

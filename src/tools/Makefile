@@ -1,4 +1,4 @@
-SRCS =  anopesmtp.c db-merger.c epona2anope.c
+SRCS =  anopesmtp.c db-merger.c
 OBJS =  $(SRCS:.c=.o)
 
 INCLUDES = ../../include/services.h

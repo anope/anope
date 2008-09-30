@@ -181,7 +181,7 @@ char *strip(char *buf)
  */
 char *lftocrlf(char *buf)
 {
-    char *result = malloc(strlen(buf) + 2);
+    char *result = (char *)malloc(strlen(buf) + 2);
     strip(buf);
     strcpy(result, buf);
     strcat(result, "\r\n");
@@ -193,7 +193,7 @@ char *lftocrlf(char *buf)
 /* Add a header to the list */
 void smtp_add_header(char *header)
 {
-    struct smtp_header *head = malloc(sizeof(struct smtp_header));
+    struct smtp_header *head = (struct smtp_header *)malloc(sizeof(struct smtp_header));
 
     head->header = lftocrlf(header);
     head->next = NULL;
@@ -276,7 +276,7 @@ void smtp_add_body_line(char *line)
 {
     struct smtp_body_line *body;
 
-    body = malloc(sizeof(struct smtp_body_line));
+    body = (struct smtp_body_line *)malloc(sizeof(struct smtp_body_line));
 
     body->line = lftocrlf(line);
     body->next = NULL;

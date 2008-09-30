@@ -345,6 +345,7 @@ struct ircdvars_ {
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
+	char *globaltldprefix;		/* TLD prefix used for Global */
 };
 
 struct ircdcapab_ {

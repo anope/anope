@@ -125,6 +125,7 @@ IRCDVar myIrcd[] = {
      NULL,                      /* character set */
      0,                         /* reports sync state */
      1,                         /* CIDR channelbans */
+     "$",                       /* TLD Prefix for Global */
      }
     ,
     {NULL}

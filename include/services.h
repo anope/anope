@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_jupe)(const char *jserver, const char *who, const char *reason);
     void (*ircd_set_umode)(User *user, int ac, const char **av);
     int (*ircd_valid_nick)(const char *nick);
     int (*ircd_valid_chan)(const char *chan);
@@ -1365,6 +1364,14 @@ class IRCDProtoNew {
 		virtual void cmd_swhois(const char *, const char *, const char *) { }
 		virtual void cmd_eob() { }
 		virtual void cmd_server(const char *, int, const char *) = 0;
+		virtual void cmd_jupe(const char *jserver, const char *who, const char *reason)
+		{
+			char rbuf[256];
+			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who, reason ? ": " : "", reason ? reason : "");
+			if (findserver(servlist, jserver)) cmd_squit(jserver, rbuf);
+			cmd_server(jserver, 2, rbuf);
+			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+		}
 };
 
 /*************************************************************************/

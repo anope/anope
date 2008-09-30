@@ -1401,19 +1401,6 @@ int anope_event_error(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_jupe(const char *jserver, const char *who, const char *reason)
-{
-    char rbuf[256];
-
-    snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
-             reason ? ": " : "", reason ? reason : "");
-
-    if (findserver(servlist, jserver))
-        ircd_proto.cmd_squit(jserver, rbuf);
-    ircd_proto.cmd_server(jserver, 2, rbuf);
-    new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
-}
-
 /*
   1 = valid nick
   0 = nick is in valid
@@ -1461,7 +1448,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
     pmodule_flood_mode_check(ratbox_flood_mode_check);
-    pmodule_cmd_jupe(ratbox_cmd_jupe);
     pmodule_valid_nick(ratbox_valid_nick);
     pmodule_valid_chan(ratbox_valid_chan);
     pmodule_set_umode(ratbox_set_umode);

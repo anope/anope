@@ -99,7 +99,6 @@ void unreal_cmd_242(const char *buf);
 void unreal_cmd_243(const char *buf);
 void unreal_cmd_211(const char *buf);
 int unreal_flood_mode_check(const char *value);
-void unreal_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int unreal_valid_nick(const char *nick);
 
 class UnrealIRCdProto : public IRCDProtoNew {

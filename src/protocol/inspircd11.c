@@ -1536,19 +1536,6 @@ int inspircd_flood_mode_check(const char *value)
     }
 }
 
-void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
-{
-    char rbuf[256];
-
-    snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
-             reason ? ": " : "", reason ? reason : "");
-
-    if (findserver(servlist, jserver))
-        ircd_proto.cmd_squit(jserver, rbuf);
-    ircd_proto.cmd_server(jserver, 1, rbuf);
-    new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
-}
-
 int inspircd_valid_nick(const char *nick)
 {
     return 1;
@@ -1584,7 +1571,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
     pmodule_flood_mode_check(inspircd_flood_mode_check);
-    pmodule_cmd_jupe(inspircd_cmd_jupe);
     pmodule_valid_nick(inspircd_valid_nick);
     pmodule_valid_chan(inspircd_valid_chan);
     pmodule_set_umode(inspircd_set_umode);

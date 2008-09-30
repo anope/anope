@@ -64,7 +64,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
     ircdproto.ircd_flood_mode_check = NULL;
-    ircdproto.ircd_cmd_jupe = NULL;
     ircdproto.ircd_valid_nick = NULL;
     ircdproto.ircd_valid_chan = NULL;
 }
@@ -565,7 +564,7 @@ int anope_flood_mode_check(const char *value)
 
 void anope_cmd_jupe(const char *jserver, const char *who, const char *reason)
 {
-    ircdproto.ircd_cmd_jupe(jserver, who, reason);
+	ircdprotonew->cmd_jupe(jserver, who, reason);
 }
 
 int anope_valid_nick(const char *nick)
@@ -685,12 +684,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void
-pmodule_cmd_jupe(void (*func) (const char *jserver, const char *who, const char *reason))
-{
-    ircdproto.ircd_cmd_jupe = func;
 }
 
 void pmodule_set_umode(void (*func) (User * user, int ac, const char **av))

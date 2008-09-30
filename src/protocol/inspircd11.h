@@ -70,7 +70,6 @@ void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
 int inspircd_flood_mode_check(const char *value);
-void inspircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int inspircd_valid_nick(const char *nick);
 int anope_event_fjoin(const char *source, int ac, const char **av);
 int anope_event_fmode(const char *source, int ac, const char **av);

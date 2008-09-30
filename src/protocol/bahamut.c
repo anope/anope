@@ -492,9 +492,9 @@ void BahamutIRCdProto::cmd_release_svshold(const char *nick)
 }
 
 /* SVSMODE -b */
-void bahamut_cmd_unban(const char *name, const char *nick)
+void BahamutIRCdProto::cmd_unban(const char *name, const char *nick)
 {
-    bahamut_cmd_svsmode_chan(name, "-b", nick);
+	bahamut_cmd_svsmode_chan(name, "-b", nick);
 }
 
 
@@ -1395,7 +1395,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_unban(bahamut_cmd_unban);
     pmodule_cmd_svsmode_chan(bahamut_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(bahamut_cmd_svid_umode);
     pmodule_cmd_nc_change(bahamut_cmd_nc_change);

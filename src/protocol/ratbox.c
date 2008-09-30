@@ -1321,11 +1321,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_unban(const char *name, const char *nick)
-{
-    /* Not Supported by this IRCD */
-}
-
 /* SVSMODE channel modes */
 
 void ratbox_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
@@ -1532,7 +1527,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_unban(ratbox_cmd_unban);
     pmodule_cmd_svsmode_chan(ratbox_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ratbox_cmd_svid_umode);
     pmodule_cmd_nc_change(ratbox_cmd_nc_change);

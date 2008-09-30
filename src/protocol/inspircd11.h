@@ -69,7 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-void inspircd_cmd_unban(const char *name, const char *nick);
 void inspircd_cmd_svsmode_chan(const char *name, const char *mode, const char *nick);
 void inspircd_cmd_svid_umode(const char *nick, time_t ts);
 void inspircd_cmd_nc_change(User * u);

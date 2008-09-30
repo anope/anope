@@ -1479,11 +1479,6 @@ void inspircd_cmd_szline(const char *mask, const char *reason, const char *whom)
 	send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 }
 
-void inspircd_cmd_unban(const char *name, const char *nick)
-{
-    /* Not Supported by this IRCD */
-}
-
 /* SVSMODE channel modes */
 
 void inspircd_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
@@ -1634,7 +1629,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_unban(inspircd_cmd_unban);
     pmodule_cmd_svsmode_chan(inspircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(inspircd_cmd_svid_umode);
     pmodule_cmd_nc_change(inspircd_cmd_nc_change);

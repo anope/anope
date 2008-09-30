@@ -1415,11 +1415,6 @@ void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_
 	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
 }
 
-void charybdis_cmd_unban(const char *name, const char *nick)
-{
-    /* Not Supported by this IRCD */
-}
-
 /* SVSMODE channel modes */
 
 void charybdis_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
@@ -1654,7 +1649,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_unban(charybdis_cmd_unban);
     pmodule_cmd_svsmode_chan(charybdis_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(charybdis_cmd_svid_umode);
     pmodule_cmd_nc_change(charybdis_cmd_nc_change);

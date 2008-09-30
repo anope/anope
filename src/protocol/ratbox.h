@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_unban(const char *name, const char *nick);
 void ratbox_cmd_svsmode_chan(const char *name, const char *mode, const char *nick);
 void ratbox_cmd_svid_umode(const char *nick, time_t ts);
 void ratbox_cmd_nc_change(User * u);

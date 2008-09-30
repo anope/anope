@@ -60,6 +60,8 @@ void BotInfo::Assign(User *u, ChannelInfo *ci)
 	this->chancount++;
 	if (ci->c && ci->c->usercount >= BSMinUsers)
 		bot_join(ci);
+
+	send_event(EVENT_BOT_ASSIGN, 2, ci->name, this->nick);
 }
 
 void BotInfo::UnAssign(User *u, ChannelInfo *ci)

@@ -88,9 +88,8 @@ int do_assign(User * u)
              || (!check_access(u, ci, CA_ASSIGN) && !is_services_admin(u)))
         notice_lang(s_BotServ, u, PERMISSION_DENIED);
     else {
-
+		bi->Assign(u, ci);
         notice_lang(s_BotServ, u, BOT_ASSIGN_ASSIGNED, bi->nick, ci->name);
-        send_event(EVENT_BOT_ASSIGN, 2, ci->name, bi->nick);
     }
     return MOD_CONT;
 }

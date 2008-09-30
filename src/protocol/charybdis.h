@@ -64,7 +64,6 @@ void charybdis_cmd_318(const char *source, const char *who);
 void charybdis_cmd_242(const char *buf);
 void charybdis_cmd_243(const char *buf);
 void charybdis_cmd_211(const char *buf);
-void charybdis_cmd_svshold(const char *nick);
 void charybdis_cmd_release_svshold(const char *nick);
 void charybdis_cmd_unsgline(const char *mask);
 void charybdis_cmd_unszline(const char *mask);
@@ -110,4 +109,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_svsnick(const char *, const char *, time_t);
 		void cmd_vhost_on(const char *, const char *, const char *);
 		void cmd_connect();
+		void cmd_svshold(const char *);
 } ircd_proto;

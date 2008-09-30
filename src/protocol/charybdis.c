@@ -1411,9 +1411,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void charybdis_cmd_svshold(const char *nick)
+void CharybdisProto::cmd_svshold(const char *nick)
 {
-    send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
+	send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
 }
 
 /* SVSHOLD - release */
@@ -1670,7 +1670,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_cmd_svshold(charybdis_cmd_svshold);
     pmodule_cmd_release_svshold(charybdis_cmd_release_svshold);
     pmodule_cmd_unsgline(charybdis_cmd_unsgline);
     pmodule_cmd_unszline(charybdis_cmd_unszline);

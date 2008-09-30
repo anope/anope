@@ -1337,12 +1337,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* SVSHOLD - set */
-void ratbox_cmd_svshold(const char *nick)
-{
-    /* Not supported by this IRCD */
-}
-
 /* SVSHOLD - release */
 void ratbox_cmd_release_svshold(const char *nick)
 {
@@ -1560,7 +1554,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_svshold(ratbox_cmd_svshold);
     pmodule_cmd_release_svshold(ratbox_cmd_release_svshold);
     pmodule_cmd_unsgline(ratbox_cmd_unsgline);
     pmodule_cmd_unszline(ratbox_cmd_unszline);

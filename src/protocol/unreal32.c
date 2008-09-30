@@ -1338,11 +1338,10 @@ int anope_event_whois(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void unreal_cmd_svshold(const char *nick)
+void UnrealIRCdProto::cmd_svshold(const char *nick)
 {
-    send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"),
-             nick, ServerName, (long int) time(NULL) + NSReleaseTimeout,
-             (long int) time(NULL), "Being held for registered user");
+	send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
+		static_cast<long>(time(NULL)), "Being held for registered user");
 }
 
 /* SVSHOLD - release */
@@ -1940,7 +1939,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_cmd_svshold(unreal_cmd_svshold);
     pmodule_cmd_release_svshold(unreal_cmd_release_svshold);
     pmodule_cmd_unsgline(unreal_cmd_unsgline);
     pmodule_cmd_unszline(unreal_cmd_unszline);

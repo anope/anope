@@ -480,10 +480,9 @@ void BahamutIRCdProto::cmd_mode(const char *source, const char *dest, const char
 }
 
 /* SVSHOLD - set */
-void bahamut_cmd_svshold(const char *nick)
+void BahamutIRCdProto::cmd_svshold(const char *nick)
 {
-    send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
-             "Being held for registered user");
+	send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
 }
 
 /* SVSHOLD - release */
@@ -1397,7 +1396,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_svshold(bahamut_cmd_svshold);
     pmodule_cmd_release_svshold(bahamut_cmd_release_svshold);
     pmodule_cmd_unsgline(bahamut_cmd_unsgline);
     pmodule_cmd_unszline(bahamut_cmd_unszline);

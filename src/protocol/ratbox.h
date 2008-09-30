@@ -63,7 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-void ratbox_cmd_svshold(const char *nick);
 void ratbox_cmd_release_svshold(const char *nick);
 void ratbox_cmd_unsgline(const char *mask);
 void ratbox_cmd_unszline(const char *mask);

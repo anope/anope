@@ -744,20 +744,6 @@ void BahamutIRCdProto::cmd_remove_akill(const char *user, const char *host)
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
-/* PART */
-void bahamut_cmd_part(const char *nick, const char *chan, const char *buf)
-{
-    if (!nick || !chan) {
-        return;
-    }
-
-    if (buf) {
-        send_cmd(nick, "PART %s :%s", chan, buf);
-    } else {
-        send_cmd(nick, "PART %s", chan);
-    }
-}
-
 /* TOPIC */
 void BahamutIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
@@ -1463,7 +1449,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(bahamut_cmd_375);
     pmodule_cmd_376(bahamut_cmd_376);
     pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_part(bahamut_cmd_part);
     pmodule_cmd_391(bahamut_cmd_391);
     pmodule_cmd_250(bahamut_cmd_250);
     pmodule_cmd_307(bahamut_cmd_307);

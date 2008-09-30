@@ -890,17 +890,11 @@ void RatboxProto::cmd_bot_nick(const char *nick, const char *user, const char *h
 	ratbox_cmd_sqline(nick, "Reserved for services");
 }
 
-void ratbox_cmd_part(const char *nick, const char *chan, const char *buf)
+void RatboxProto::cmd_part(const char *nick, const char *chan, const char *buf)
 {
-    Uid *ud;
-
-    ud = find_uid(nick);
-
-    if (buf) {
-        send_cmd((UseTS6 ? ud->uid : nick), "PART %s :%s", chan, buf);
-    } else {
-        send_cmd((UseTS6 ? ud->uid : nick), "PART %s", chan);
-    }
+	Uid *ud = find_uid(nick);
+	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
+	else send_cmd(UseTS6 ? ud->uid : nick, "PART %s", chan);
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
@@ -1609,7 +1603,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ratbox_cmd_375);
     pmodule_cmd_376(ratbox_cmd_376);
     pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_part(ratbox_cmd_part);
     pmodule_cmd_391(ratbox_cmd_391);
     pmodule_cmd_250(ratbox_cmd_250);
     pmodule_cmd_307(ratbox_cmd_307);

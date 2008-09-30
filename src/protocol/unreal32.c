@@ -733,20 +733,6 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
              vIdent);
 }
 
-/* PART */
-void unreal_cmd_part(const char *nick, const char *chan, const char *buf)
-{
-    if (!nick || !chan) {
-        return;
-    }
-
-    if (buf) {
-        send_cmd(nick, "%s %s :%s", send_token("PART", "D"), chan, buf);
-    } else {
-        send_cmd(nick, "%s %s", send_token("PART", "D"), chan);
-    }
-}
-
 /* 391    RPL_TIME ":%s 391 %s %s :%s" */
 void unreal_cmd_391(const char *source, const char *timestr)
 {
@@ -2006,7 +1992,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(unreal_cmd_375);
     pmodule_cmd_376(unreal_cmd_376);
     pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_part(unreal_cmd_part);
     pmodule_cmd_391(unreal_cmd_391);
     pmodule_cmd_250(unreal_cmd_250);
     pmodule_cmd_307(unreal_cmd_307);

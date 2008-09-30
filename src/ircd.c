@@ -51,7 +51,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_375 = NULL;
     ircdproto.ircd_cmd_376 = NULL;
     ircdproto.ircd_cmd_351 = NULL;
-    ircdproto.ircd_cmd_part = NULL;
     ircdproto.ircd_cmd_391 = NULL;
     ircdproto.ircd_cmd_250 = NULL;
     ircdproto.ircd_cmd_307 = NULL;
@@ -322,17 +321,15 @@ void anope_cmd_invite(const char *source, const char *chan, const char *nick)
 
 void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...)
 {
-    if (fmt) {
-        va_list args;
-        char buf[BUFSIZE];
-        *buf = '\0';
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-        ircdproto.ircd_cmd_part(nick, chan, buf);
-    } else {
-        ircdproto.ircd_cmd_part(nick, chan, NULL);
-    }
+	if (fmt) {
+		va_list args;
+		char buf[BUFSIZE] = "";
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
+		va_end(args);
+		ircdprotonew->cmd_part(nick, chan, buf);
+	}
+	else ircdprotonew->cmd_part(nick, chan, NULL);
 }
 
 void anope_cmd_391(const char *source, const char *timestr)
@@ -655,11 +652,6 @@ void pmodule_cmd_376(void (*func) (const char *source))
 void pmodule_cmd_351(void (*func) (const char *source))
 {
     ircdproto.ircd_cmd_351 = func;
-}
-
-void pmodule_cmd_part(void (*func) (const char *nick, const char *chan, const char *buf))
-{
-    ircdproto.ircd_cmd_part = func;
 }
 
 void pmodule_cmd_391(void (*func) (const char *source, const char *timestr))

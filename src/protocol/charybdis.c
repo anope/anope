@@ -950,17 +950,11 @@ void CharybdisProto::cmd_bot_nick(const char *nick, const char *user, const char
 	charybdis_cmd_sqline(nick, "Reserved for services");
 }
 
-void charybdis_cmd_part(const char *nick, const char *chan, const char *buf)
+void CharybdisProto::cmd_part(const char *nick, const char *chan, const char *buf)
 {
-    Uid *ud;
-
-    ud = find_uid(nick);
-
-    if (buf) {
-        send_cmd((UseTS6 ? ud->uid : nick), "PART %s :%s", chan, buf);
-    } else {
-        send_cmd((UseTS6 ? ud->uid : nick), "PART %s", chan);
-    }
+	Uid *ud = find_uid(nick);
+	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
+	else send_cmd(UseTS6 ? ud->uid : nick, "PART %s", chan);
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
@@ -1715,7 +1709,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(charybdis_cmd_375);
     pmodule_cmd_376(charybdis_cmd_376);
     pmodule_cmd_351(charybdis_cmd_351);
-    pmodule_cmd_part(charybdis_cmd_part);
     pmodule_cmd_391(charybdis_cmd_391);
     pmodule_cmd_250(charybdis_cmd_250);
     pmodule_cmd_307(charybdis_cmd_307);

@@ -611,7 +611,6 @@ E void pmodule_cmd_372_error(void (*func) (const char *source));
 E void pmodule_cmd_375(void (*func) (const char *source));
 E void pmodule_cmd_376(void (*func) (const char *source));
 E void pmodule_cmd_351(void (*func) (const char *source));
-E void pmodule_cmd_part(void (*func) (const char *nick, const char *chan, const char *buf));
 E void pmodule_cmd_391(void (*func) (const char *source, const char *timestr));
 E void pmodule_cmd_250(void (*func) (const char *buf));
 E void pmodule_cmd_307(void (*func) (const char *buf));

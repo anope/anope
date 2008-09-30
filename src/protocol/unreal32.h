@@ -86,7 +86,6 @@ void unreal_cmd_372_error(const char *source);
 void unreal_cmd_375(const char *source);
 void unreal_cmd_376(const char *source);
 void unreal_cmd_351(const char *source);
-void unreal_cmd_part(const char *nick, const char *chan, const char *buf);
 void unreal_cmd_391(const char *source, const char *timestr);
 void unreal_cmd_250(const char *buf);
 void unreal_cmd_307(const char *buf);

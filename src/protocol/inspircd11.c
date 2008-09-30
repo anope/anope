@@ -984,25 +984,15 @@ void InspIRCdProto::cmd_vhost_on(const char *nick, const char *vIdent, const cha
 	inspircd_cmd_chghost(nick, vhost);
 }
 
-void inspircd_cmd_connect(int servernum)
+void InspIRCdProto::cmd_connect()
 {
-    if (servernum == 1) {
-        inspircd_cmd_pass(RemotePassword);
-    }
-    if (servernum == 2) {
-        inspircd_cmd_pass(RemotePassword2);
-    }
-    if (servernum == 3) {
-        inspircd_cmd_pass(RemotePassword3);
-    }
-    inspircd_cmd_server(ServerName, 0, ServerDesc);
-    send_cmd(NULL, "BURST");
-    send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s",
-             version_number, ServerName, ircd->name, version_flags,
-             EncModule, version_build);
-
-    me_server =
-        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+	if (servernum == 1) inspircd_cmd_pass(RemotePassword);
+	else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
+	else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
+	inspircd_cmd_server(ServerName, 0, ServerDesc);
+	send_cmd(NULL, "BURST");
+	send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
+	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 }
 
 /* Events */
@@ -1658,7 +1648,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(inspircd_cmd_242);
     pmodule_cmd_243(inspircd_cmd_243);
     pmodule_cmd_211(inspircd_cmd_211);
-    pmodule_cmd_connect(inspircd_cmd_connect);
     pmodule_cmd_svshold(inspircd_cmd_svshold);
     pmodule_cmd_release_svshold(inspircd_cmd_release_svshold);
     pmodule_cmd_unsgline(inspircd_cmd_unsgline);

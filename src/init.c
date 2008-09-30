@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -739,7 +739,7 @@ int init_secondary(int ac, char **av)
              RemotePort);
     }
 
-    anope_cmd_connect(servernum);
+    anope_cmd_connect();
     send_event(EVENT_CONNECT, 1, EVENT_STOP);
 
     sgets2(inbuf, sizeof(inbuf), servsock);

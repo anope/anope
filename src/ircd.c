@@ -63,7 +63,6 @@ void initIrcdProto()
     ircdproto.ircd_cmd_242 = NULL;
     ircdproto.ircd_cmd_243 = NULL;
     ircdproto.ircd_cmd_211 = NULL;
-    ircdproto.ircd_cmd_connect = NULL;
     ircdproto.ircd_cmd_svshold = NULL;
     ircdproto.ircd_cmd_release_svshold = NULL;
     ircdproto.ircd_cmd_unsgline = NULL;
@@ -491,9 +490,9 @@ void anope_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
 	ircdprotonew->cmd_vhost_on(nick, vIdent, vhost);
 }
 
-void anope_cmd_connect(int servernum)
+void anope_cmd_connect()
 {
-    ircdproto.ircd_cmd_connect(servernum);
+	ircdprotonew->cmd_connect();
 }
 
 void anope_cmd_svshold(const char *nick)
@@ -704,11 +703,6 @@ void pmodule_cmd_243(void (*func) (const char *buf))
 void pmodule_cmd_211(void (*func) (const char *buf))
 {
     ircdproto.ircd_cmd_211 = func;
-}
-
-void pmodule_cmd_connect(void (*func) (int servernum))
-{
-    ircdproto.ircd_cmd_connect = func;
 }
 
 void pmodule_cmd_svshold(void (*func) (const char *nick))

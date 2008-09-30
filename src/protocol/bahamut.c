@@ -839,22 +839,16 @@ void bahamut_cmd_capab()
              "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
 }
 
-void bahamut_cmd_connect(int servernum)
+void BahamutIRCdProto::cmd_connect()
 {
-    me_server =
-        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-
-    if (servernum == 1) {
-        bahamut_cmd_pass(RemotePassword);
-    } else if (servernum == 2) {
-        bahamut_cmd_pass(RemotePassword2);
-    } else if (servernum == 3) {
-        bahamut_cmd_pass(RemotePassword3);
-    }
-    bahamut_cmd_capab();
-    bahamut_cmd_server(ServerName, 1, ServerDesc);
-    bahamut_cmd_svinfo();
-    bahamut_cmd_burst();
+	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+	if (servernum == 1) bahamut_cmd_pass(RemotePassword);
+	else if (servernum == 2) bahamut_cmd_pass(RemotePassword2);
+	else if (servernum == 3) bahamut_cmd_pass(RemotePassword3);
+	bahamut_cmd_capab();
+	bahamut_cmd_server(ServerName, 1, ServerDesc);
+	bahamut_cmd_svinfo();
+	bahamut_cmd_burst();
 }
 
 
@@ -1403,7 +1397,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_cmd_connect(bahamut_cmd_connect);
     pmodule_cmd_svshold(bahamut_cmd_svshold);
     pmodule_cmd_release_svshold(bahamut_cmd_release_svshold);
     pmodule_cmd_unsgline(bahamut_cmd_unsgline);

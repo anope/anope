@@ -841,26 +841,17 @@ void ratbox_cmd_server(const char *servname, int hop, const char *descript)
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
-void ratbox_cmd_connect(int servernum)
+void RatboxProto::cmd_connect()
 {
-    /* Make myself known to myself in the serverlist */
-    if (UseTS6) {
-        me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
-    } else {
-        me_server =
-            new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-    }
-    if (servernum == 1)
-        ratbox_cmd_pass(RemotePassword);
-    else if (servernum == 2)
-        ratbox_cmd_pass(RemotePassword2);
-    else if (servernum == 3)
-        ratbox_cmd_pass(RemotePassword3);
-
-    ratbox_cmd_capab();
-    ratbox_cmd_server(ServerName, 1, ServerDesc);
-    ratbox_cmd_svinfo();
+	/* Make myself known to myself in the serverlist */
+	if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+	else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+	if (servernum == 1) ratbox_cmd_pass(RemotePassword);
+	else if (servernum == 2) ratbox_cmd_pass(RemotePassword2);
+	else if (servernum == 3) ratbox_cmd_pass(RemotePassword3);
+	ratbox_cmd_capab();
+	ratbox_cmd_server(ServerName, 1, ServerDesc);
+	ratbox_cmd_svinfo();
 }
 
 void RatboxProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -1569,7 +1560,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_cmd_connect(ratbox_cmd_connect);
     pmodule_cmd_svshold(ratbox_cmd_svshold);
     pmodule_cmd_release_svshold(ratbox_cmd_release_svshold);
     pmodule_cmd_unsgline(ratbox_cmd_unsgline);

@@ -98,7 +98,6 @@ void unreal_cmd_318(const char *source, const char *who);
 void unreal_cmd_242(const char *buf);
 void unreal_cmd_243(const char *buf);
 void unreal_cmd_211(const char *buf);
-void unreal_cmd_connect(int servernum);
 void unreal_cmd_svshold(const char *nick);
 void unreal_cmd_release_svshold(const char *nick);
 void unreal_cmd_unsgline(const char *mask);
@@ -139,4 +138,5 @@ class UnrealIRCdProto : public IRCDProtoNew {
 		void cmd_svso(const char *, const char *, const char *);
 		void cmd_chg_nick(const char *, const char *);
 		void cmd_vhost_on(const char *, const char *, const char *);
+		void cmd_connect();
 } ircd_proto;

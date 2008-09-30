@@ -1073,7 +1073,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_cmd_connect)(int servernum);
     void (*ircd_cmd_svshold)(const char *nick);
     void (*ircd_cmd_release_svshold)(const char *nick);
     void (*ircd_cmd_unsgline)(const char *mask);
@@ -1358,6 +1357,7 @@ class IRCDProtoNew {
 			send_cmd(NULL, "SVSNICK %s %s :%ld", oldnick, newnick, static_cast<long>(when));
 		}
 		virtual void cmd_vhost_on(const char *, const char *, const char *) { }
+		virtual void cmd_connect() = 0;
 };
 
 /*************************************************************************/

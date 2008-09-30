@@ -76,7 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-void bahamut_cmd_connect(int servernum);
 void bahamut_cmd_svshold(const char *nick);
 void bahamut_cmd_release_svshold(const char *nick);
 void bahamut_cmd_unsgline(const char *mask);
@@ -113,4 +112,5 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_join(const char *, const char *, time_t);
 		void cmd_unsqline(const char *);
 		void cmd_sqline(const char *, const char *);
+		void cmd_connect();
 } ircd_proto;

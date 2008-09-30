@@ -623,7 +623,6 @@ E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
 E void pmodule_cmd_242(void (*func) (const char *buf));
 E void pmodule_cmd_243(void (*func) (const char *buf));
 E void pmodule_cmd_211(void (*func) (const char *buf));
-E void pmodule_cmd_connect(void (*func) (int servernum));
 E void pmodule_cmd_svshold(void (*func) (const char *nick));
 E void pmodule_cmd_release_svshold(void (*func) (const char *nick));
 E void pmodule_cmd_unsgline(void (*func) (const char *mask));
@@ -1186,7 +1185,7 @@ E void anope_cmd_chghost(const char *nick, const char *vhost);                  
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
 E void anope_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_cmd_vhost_off(User *u);
-E void anope_cmd_connect(int servernum);                             	           	  /* Connect */
+E void anope_cmd_connect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
 E void anope_cmd_global(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
 E void anope_cmd_invite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */

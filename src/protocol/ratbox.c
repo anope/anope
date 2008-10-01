@@ -1374,11 +1374,6 @@ int anope_event_bmask(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int ratbox_flood_mode_check(const char *value)
-{
-    return 0;
-}
-
 int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
@@ -1435,10 +1430,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ratbox_cmd_242);
     pmodule_cmd_243(ratbox_cmd_243);
     pmodule_cmd_211(ratbox_cmd_211);
-    pmodule_flood_mode_check(ratbox_flood_mode_check);
-    pmodule_valid_nick(ratbox_valid_nick);
-    pmodule_valid_chan(ratbox_valid_chan);
-    pmodule_set_umode(ratbox_set_umode);
 }
 
 /**

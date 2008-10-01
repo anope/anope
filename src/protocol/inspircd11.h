@@ -69,8 +69,6 @@ void inspircd_cmd_318(const char *source, const char *who);
 void inspircd_cmd_242(const char *buf);
 void inspircd_cmd_243(const char *buf);
 void inspircd_cmd_211(const char *buf);
-int inspircd_flood_mode_check(const char *value);
-int inspircd_valid_nick(const char *nick);
 int anope_event_fjoin(const char *source, int ac, const char **av);
 int anope_event_fmode(const char *source, int ac, const char **av);
 int anope_event_ftopic(const char *source, int ac, const char **av);
@@ -113,4 +111,6 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_svspart(const char *, const char *, const char *);
 		void cmd_eob();
 		void cmd_server(const char *, int, const char *);
+		void set_umode(User *, int, const char **);
+		int flood_mode_check(const char *);
 } ircd_proto;

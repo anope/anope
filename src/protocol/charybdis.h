@@ -64,8 +64,6 @@ void charybdis_cmd_318(const char *source, const char *who);
 void charybdis_cmd_242(const char *buf);
 void charybdis_cmd_243(const char *buf);
 void charybdis_cmd_211(const char *buf);
-int charybdis_flood_mode_check(const char *value);
-int charybdis_valid_nick(const char *nick);
 
 class CharybdisProto : public IRCDProtoNew {
 	public:
@@ -99,4 +97,7 @@ class CharybdisProto : public IRCDProtoNew {
 		void cmd_unsgline(const char *);
 		void cmd_sgline(const char *, const char *);
 		void cmd_server(const char *, int, const char *);
+		void set_umode(User *, int, const char **);
+		int valid_nick(const char *);
+		int flood_mode_check(const char *);
 } ircd_proto;

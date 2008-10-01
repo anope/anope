@@ -76,8 +76,6 @@ void bahamut_cmd_318(const char *source, const char *who);
 void bahamut_cmd_242(const char *buf);
 void bahamut_cmd_243(const char *buf);
 void bahamut_cmd_211(const char *buf);
-int bahamut_flood_mode_check(const char *value);
-int bahamut_valid_nick(const char *nick);
 
 class BahamutIRCdProto : public IRCDProtoNew {
 	public:
@@ -110,4 +108,6 @@ class BahamutIRCdProto : public IRCDProtoNew {
 		void cmd_svid_umode3(User *, const char *);
 		void cmd_eob();
 		void cmd_server(const char *, int, const char *);
+		void set_umode(User *, int, const char **);
+		int flood_mode_check(const char *);
 } ircd_proto;

@@ -1523,53 +1523,33 @@ void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 
 /* check if +f mode is valid for the ircd */
 /* borrowed part of the new check from channels.c in Unreal */
-int unreal_flood_mode_check(const char *value)
+int UnrealIRCdProto::flood_mode_check(const char *value)
 {
-    char *dp, *end;
-    /* NEW +F */
-    char xbuf[256], *p, *p2, *x = xbuf + 1;
-    int v;
-
-    if (!value) {
-        return 0;
-    }
-
-    if (*value != ':'
-        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
-        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
-        && (*end == 0)) {
-        return 1;
-    } else {
-        /* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-        strncpy(xbuf, value, sizeof(xbuf));
-        p2 = strchr(xbuf + 1, ']');
-        if (!p2) {
-            return 0;
-        }
-        *p2 = '\0';
-        if (*(p2 + 1) != ':') {
-            return 0;
-        }
-        for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
-            /* <number><1 letter>[optional: '#'+1 letter] */
-            p = x;
-            while (isdigit(*p)) {
-                p++;
-            }
-            if ((*p == '\0')
-                || !((*p == 'c') || (*p == 'j') || (*p == 'k')
-                     || (*p == 'm') || (*p == 'n') || (*p == 't'))) {
-                continue;       /* continue instead of break for forward compatability. */
-            }
-            *p = '\0';
-            v = atoi(x);
-            if ((v < 1) || (v > 999)) {
-                return 0;
-            }
-            p++;
-        }
-        return 1;
-    }
+	char *dp, *end;
+	/* NEW +F */
+	char xbuf[256], *p, *p2, *x = xbuf + 1;
+	int v;
+	if (!value) return 0;
+	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	else {
+		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
+		strncpy(xbuf, value, sizeof(xbuf));
+		p2 = strchr(xbuf + 1, ']');
+		if (!p2) return 0;
+		*p2 = '\0';
+		if (*(p2 + 1) != ':') return 0;
+		for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
+			/* <number><1 letter>[optional: '#'+1 letter] */
+			p = x;
+			while (isdigit(*p)) ++p;
+			if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
+			*p = '\0';
+			v = atoi(x);
+			if (v < 1 || v > 999) return 0;
+			++p;
+		}
+		return 1;
+	}
 }
 
 /*
@@ -1875,10 +1855,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(unreal_cmd_242);
     pmodule_cmd_243(unreal_cmd_243);
     pmodule_cmd_211(unreal_cmd_211);
-    pmodule_flood_mode_check(unreal_flood_mode_check);
-    pmodule_valid_nick(unreal_valid_nick);
-    pmodule_valid_chan(unreal_valid_chan);
-    pmodule_set_umode(unreal_set_umode);
 }
 
 /**

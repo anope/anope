@@ -1266,18 +1266,11 @@ int anope_event_admin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int bahamut_flood_mode_check(const char *value)
+int BahamutIRCdProto::flood_mode_check(const char *value)
 {
-    char *dp, *end;
-
-    if (value && *value != ':'
-        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
-        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
-        && (*end == 0)) {
-        return 1;
-    } else {
-        return 0;
-    }
+	char *dp, *end;
+	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	else return 0;
 }
 
 /*
@@ -1332,10 +1325,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(bahamut_cmd_242);
     pmodule_cmd_243(bahamut_cmd_243);
     pmodule_cmd_211(bahamut_cmd_211);
-    pmodule_flood_mode_check(bahamut_flood_mode_check);
-    pmodule_valid_nick(bahamut_valid_nick);
-    pmodule_valid_chan(bahamut_valid_chan);
-    pmodule_set_umode(bahamut_set_umode);
 }
 
 /**

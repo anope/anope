@@ -1468,20 +1468,11 @@ int anope_event_bmask(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int charybdis_flood_mode_check(const char *value)
+int CharybdisProto::flood_mode_check(const char *value)
 {
-    char *dp, *end;
-
-    if (value && *value != ':'
-        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
-        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
-        && (*end == 0)) {
-        return 1;
-    } else {
-        return 0;
-    }
-
-    return 0;
+	char *dp, *end;
+	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+	else return 0;
 }
 
 int anope_event_error(const char *source, int ac, const char **av)
@@ -1558,10 +1549,6 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(charybdis_cmd_242);
     pmodule_cmd_243(charybdis_cmd_243);
     pmodule_cmd_211(charybdis_cmd_211);
-    pmodule_flood_mode_check(charybdis_flood_mode_check);
-    pmodule_valid_nick(charybdis_valid_nick);
-    pmodule_valid_chan(charybdis_valid_chan);
-    pmodule_set_umode(charybdis_set_umode);
 }
 
 /**

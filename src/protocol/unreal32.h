@@ -98,8 +98,6 @@ void unreal_cmd_318(const char *source, const char *who);
 void unreal_cmd_242(const char *buf);
 void unreal_cmd_243(const char *buf);
 void unreal_cmd_211(const char *buf);
-int unreal_flood_mode_check(const char *value);
-int unreal_valid_nick(const char *nick);
 
 class UnrealIRCdProto : public IRCDProtoNew {
 	public:
@@ -139,4 +137,8 @@ class UnrealIRCdProto : public IRCDProtoNew {
 		void cmd_swhois(const char *, const char *, const char *);
 		void cmd_eob();
 		void cmd_server(const char *, int, const char *);
+		void set_umode(User *, int, const char **);
+		int valid_nick(const char *);
+		int valid_chan(const char *);
+		int flood_mode_check(const char *);
 } ircd_proto;

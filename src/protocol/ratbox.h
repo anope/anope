@@ -63,8 +63,6 @@ void ratbox_cmd_318(const char *source, const char *who);
 void ratbox_cmd_242(const char *buf);
 void ratbox_cmd_243(const char *buf);
 void ratbox_cmd_211(const char *buf);
-int ratbox_flood_mode_check(const char *value);
-int ratbox_valid_nick(const char *nick);
 
 class RatboxProto : public IRCDProtoNew {
 	public:

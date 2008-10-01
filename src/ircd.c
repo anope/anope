@@ -65,7 +65,7 @@ void initIrcdProto()
 
 void anope_set_umode(User *user, int ac, const char **av)
 {
-    ircdproto.ircd_set_umode(user, ac, av);
+	ircdprotonew->set_umode(user, ac, av);
 }
 
 void anope_cmd_svsnoop(const char *server, int set)
@@ -548,12 +548,12 @@ void anope_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
 int anope_valid_nick(const char *nick)
 {
-    return ircdproto.ircd_valid_nick(nick);
+	return ircdprotonew->valid_nick(nick);
 }
 
 int anope_valid_chan(const char *chan)
 {
-    return ircdproto.ircd_valid_chan(chan);
+	return ircdprotonew->valid_chan(chan);
 }
 
 

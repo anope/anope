@@ -1083,10 +1083,6 @@ typedef struct ircd_proto_ {
     void (*ircd_cmd_242)(const char *buf);
     void (*ircd_cmd_243)(const char *buf);
     void (*ircd_cmd_211)(const char *buf);
-    void (*ircd_set_umode)(User *user, int ac, const char **av);
-    int (*ircd_valid_nick)(const char *nick);
-    int (*ircd_valid_chan)(const char *chan);
-    int (*ircd_flood_mode_check)(const char *value);
 } IRCDProto;
 
 typedef struct ircd_modes_ {
@@ -1381,7 +1377,6 @@ class IRCDProtoNew {
 			cmd_server(jserver, 2, rbuf);
 			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 		}
-
 		virtual void set_umode(User *, int, const char **) = 0;
 		virtual int valid_nick(const char *) { return 1; }
 		virtual int valid_chan(const char *) { return 1; }

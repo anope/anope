@@ -51,7 +51,6 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void inspircd_set_umode(User * user, int ac, const char **av);
 void inspircd_cmd_372(const char *source, const char *msg);
 void inspircd_cmd_372_error(const char *source);
 void inspircd_cmd_375(const char *source);

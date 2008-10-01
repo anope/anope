@@ -58,7 +58,6 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void bahamut_set_umode(User * user, int ac, const char **av);
 void bahamut_cmd_372(const char *source, const char *msg);
 void bahamut_cmd_372_error(const char *source);
 void bahamut_cmd_375(const char *source);

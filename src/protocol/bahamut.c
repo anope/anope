@@ -148,75 +148,55 @@ IRCDCAPAB myIrcdcap[] = {
 };
 
 
-void bahamut_set_umode(User * user, int ac, const char **av)
+void BahamutIRCdProto::set_umode(User *user, int ac, const char **av)
 {
-    int add = 1;                /* 1 if adding modes, 0 if deleting */
-    const char *modes = av[0];
-
-    ac--;
-
-    if (debug)
-        alog("debug: Changing mode for %s to %s", user->nick, modes);
-
-    while (*modes) {
-
-        /* This looks better, much better than "add ? (do_add) : (do_remove)".
-         * At least this is readable without paying much attention :) -GD
-         */
-        if (add)
-            user->mode |= umodes[(int) *modes];
-        else
-            user->mode &= ~umodes[(int) *modes];
-
-        switch (*modes++) {
-        case '+':
-            add = 1;
-            break;
-        case '-':
-            add = 0;
-            break;
-        case 'a':
-            if (UnRestrictSAdmin) {
-                break;
-            }
-            if (add && !is_services_admin(user)) {
-                common_svsmode(user, "-a", NULL);
-                user->mode &= ~UMODE_a;
-            }
-            break;
-        case 'd':
-            if (ac == 0) {
-                alog("user: umode +d with no parameter (?) for user %s",
-                     user->nick);
-                break;
-            }
-
-            ac--;
-            av++;
-            user->svid = strtoul(*av, NULL, 0);
-            break;
-        case 'o':
-            if (add) {
-                opcnt++;
-
-                if (WallOper)
-                    anope_cmd_global(s_OperServ,
-                                     "\2%s\2 is now an IRC operator.",
-                                     user->nick);
-                display_news(user, NEWS_OPER);
-
-            } else {
-                opcnt--;
-            }
-            break;
-        case 'r':
-            if (add && !nick_identified(user)) {
-                common_svsmode(user, "-r", NULL);
-                user->mode &= ~UMODE_r;
-            }
-            break;
-        }
-    }
+	int add = 1; /* 1 if adding modes, 0 if deleting */
+	const char *modes = av[0];
+	--ac;
+	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+	while (*modes) {
+		/* This looks better, much better than "add ? (do_add) : (do_remove)".
+		 * At least this is readable without paying much attention :) -GD */
+		if (add) user->mode |= umodes[static_cast<int>(*modes)];
+		else user->mode &= ~umodes[static_cast<int>(*modes)];
+		switch (*modes++) {
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			case 'a':
+				if (UnRestrictSAdmin) break;
+				if (add && !is_services_admin(user)) {
+					common_svsmode(user, "-a", NULL);
+					user->mode &= ~UMODE_a;
+				}
+				break;
+			case 'd':
+				if (!ac) {
+					alog("user: umode +d with no parameter (?) for user %s", user->nick);
+					break;
+				}
+				--ac;
+				++av;
+				user->svid = strtoul(*av, NULL, 0);
+				break;
+			case 'o':
+				if (add) {
+					++opcnt;
+					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					display_news(user, NEWS_OPER);
+				}
+				else --opcnt;
+				break;
+			case 'r':
+				if (add && !nick_identified(user)) {
+					common_svsmode(user, "-r", NULL);
+					user->mode &= ~UMODE_r;
+				}
+		}
+	}
 }
 
 
@@ -1271,26 +1251,6 @@ int BahamutIRCdProto::flood_mode_check(const char *value)
 	char *dp, *end;
 	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 	else return 0;
-}
-
-/*
-  1 = valid nick
-  0 = nick is in valid
-*/
-int bahamut_valid_nick(const char *nick)
-{
-    /* no hard coded invalid nicks */
-    return 1;
-}
-
-/*
-  1 = valid chan
-  0 = nick is in chan
-*/
-int bahamut_valid_chan(const char *chan)
-{
-    /* no silly invalid chans */
-    return 1;
 }
 
 /* this avoids "undefined symbol" messages of those whom try to load mods that

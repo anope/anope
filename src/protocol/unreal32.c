@@ -415,81 +415,56 @@ CUMode myCumodes[128] = {
 };
 
 
-void unreal_set_umode(User * user, int ac, const char **av)
+void UnrealIRCdProto::set_umode(User *user, int ac, const char **av)
 {
-    int add = 1;                /* 1 if adding modes, 0 if deleting */
-    const char *modes = av[0];
-
-    ac--;
-
-    if (!user || !modes) {
-        /* Prevent NULLs from doing bad things */
-        return;
-    }
-
-    if (debug)
-        alog("debug: Changing mode for %s to %s", user->nick, modes);
-
-    while (*modes) {
-
-        /* This looks better, much better than "add ? (do_add) : (do_remove)".
-         * At least this is readable without paying much attention :) -GD
-         */
-        if (add)
-            user->mode |= umodes[(int) *modes];
-        else
-            user->mode &= ~umodes[(int) *modes];
-
-        switch (*modes++) {
-        case '+':
-            add = 1;
-            break;
-        case '-':
-            add = 0;
-            break;
-        case 'd':
-            if (ac <= 0) {
-                break;
-            }
-            ac--;
-            av++;
-            if (av) {
-                user->svid = strtoul(*av, NULL, 0);
-            }
-            break;
-        case 'o':
-            if (add) {
-                opcnt++;
-                if (WallOper) {
-                    anope_cmd_global(s_OperServ,
-                                     "\2%s\2 is now an IRC operator.",
-                                     user->nick);
-                }
-                display_news(user, NEWS_OPER);
-            } else {
-                opcnt--;
-            }
-            break;
-        case 'a':
-            if (UnRestrictSAdmin) {
-                break;
-            }
-            if (add && !is_services_admin(user)) {
-                common_svsmode(user, "-a", NULL);
-                user->mode &= ~UMODE_a;
-            }
-            break;
-        case 'r':
-            if (add && !nick_identified(user)) {
-                common_svsmode(user, "-r", NULL);
-                user->mode &= ~UMODE_r;
-            }
-            break;
-        case 'x':
-            update_host(user);
-            break;
-        }
-    }
+	int add = 1; /* 1 if adding modes, 0 if deleting */
+	const char *modes = av[0];
+	--ac;
+	if (!user || !modes) return; /* Prevent NULLs from doing bad things */
+	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+	while (*modes) {
+		/* This looks better, much better than "add ? (do_add) : (do_remove)".
+		 * At least this is readable without paying much attention :) -GD */
+		if (add) user->mode |= umodes[static_cast<int>(*modes)];
+		else user->mode &= ~umodes[static_cast<int>(*modes)];
+		switch (*modes++) {
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			case 'd':
+				if (ac <= 0) break;
+				--ac;
+				++av;
+				if (av) user->svid = strtoul(*av, NULL, 0);
+				break;
+			case 'o':
+				if (add) {
+					++opcnt;
+					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					display_news(user, NEWS_OPER);
+				}
+				else --opcnt;
+				break;
+			case 'a':
+				if (UnRestrictSAdmin) break;
+				if (add && !is_services_admin(user)) {
+					common_svsmode(user, "-a", NULL);
+					user->mode &= ~UMODE_a;
+				}
+				break;
+			case 'r':
+				if (add && !nick_identified(user)) {
+					common_svsmode(user, "-r", NULL);
+					user->mode &= ~UMODE_r;
+				}
+				break;
+			case 'x':
+				update_host(user);
+		}
+	}
 }
 
 
@@ -1556,22 +1531,16 @@ int UnrealIRCdProto::flood_mode_check(const char *value)
   1 = valid nick
   0 = nick is in valid
 */
-int unreal_valid_nick(const char *nick)
+int UnrealIRCdProto::valid_nick(const char *nick)
 {
-    if (!stricmp("ircd", nick)) {
-        return 0;
-    }
-    if (!stricmp("irc", nick)) {
-        return 0;
-    }
-    return 1;
+	if (!stricmp("ircd", nick) || !stricmp("irc", nick)) return 0;
+	return 1;
 }
 
-int unreal_valid_chan(const char *chan) {
-    if (strchr(chan, ':')) {
-      return 0;
-    }
-    return 1;
+int UnrealIRCdProto::valid_chan(const char *chan)
+{
+	if (strchr(chan, ':')) return 0;
+	return 1;
 }
 
 /* *INDENT-OFF* */

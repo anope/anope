@@ -46,7 +46,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 
-void charybdis_set_umode(User * user, int ac, const char **av);
 void charybdis_cmd_372(const char *source, const char *msg);
 void charybdis_cmd_372_error(const char *source);
 void charybdis_cmd_375(const char *source);

@@ -45,7 +45,6 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 
-void ratbox_set_umode(User * user, int ac, const char **av);
 void ratbox_cmd_372(const char *source, const char *msg);
 void ratbox_cmd_372_error(const char *source);
 void ratbox_cmd_375(const char *source);
@@ -92,4 +91,6 @@ class RatboxProto : public IRCDProtoNew {
 		void cmd_unsgline(const char *);
 		void cmd_sgline(const char *, const char *);
 		void cmd_server(const char *, int, const char *);
+		void set_umode(User *, int, const char **);
+		int valid_nick(const char *);
 } ircd_proto;

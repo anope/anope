@@ -146,49 +146,33 @@ IRCDCAPAB myIrcdcap[] = {
 
 /*******************************************************************/
 
-void charybdis_set_umode(User * user, int ac, const char **av)
+void CharybdisProto::set_umode(User *user, int ac, const char **av)
 {
-    int add = 1;                /* 1 if adding modes, 0 if deleting */
-    const char *modes = av[0];
-
-    ac--;
-
-    if (debug)
-        alog("debug: Changing mode for %s to %s", user->nick, modes);
-
-    while (*modes) {
-
-        /* This looks better, much better than "add ? (do_add) : (do_remove)".
-         * At least this is readable without paying much attention :) -GD
-         */
-        if (add)
-            user->mode |= umodes[(int) *modes];
-        else
-            user->mode &= ~umodes[(int) *modes];
-
-        switch (*modes++) {
-        case '+':
-            add = 1;
-            break;
-        case '-':
-            add = 0;
-            break;
-        case 'o':
-            if (add) {
-                opcnt++;
-
-                if (WallOper)
-                    anope_cmd_global(s_OperServ,
-                                     "\2%s\2 is now an IRC operator.",
-                                     user->nick);
-                display_news(user, NEWS_OPER);
-
-            } else {
-                opcnt--;
-            }
-            break;
-        }
-    }
+	int add = 1; /* 1 if adding modes, 0 if deleting */
+	const char *modes = av[0];
+	--ac;
+	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+	while (*modes) {
+		/* This looks better, much better than "add ? (do_add) : (do_remove)".
+		 * At least this is readable without paying much attention :) -GD */
+		if (add) user->mode |= umodes[static_cast<int>(*modes)];
+		else user->mode &= ~umodes[static_cast<int>(*modes)];
+		switch (*modes++) {
+			case '+':
+				add = 1;
+				break;
+			case '-':
+				add = 0;
+				break;
+			case 'o':
+				if (add) {
+					++opcnt;
+					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					display_news(user, NEWS_OPER);
+				}
+				else --opcnt;
+		}
+	}
 }
 
 unsigned long umodes[128] = {
@@ -1489,24 +1473,12 @@ int anope_event_error(const char *source, int ac, const char **av)
   1 = valid nick
   0 = nick is in valid
 */
-int charybdis_valid_nick(const char *nick)
+int CharybdisProto::valid_nick(const char *nick)
 {
-    /* TS6 Save extension -Certus */
-    if (isdigit(*nick))
-        return 0;
-    return 1;
+	/* TS6 Save extension -Certus */
+	if (isdigit(*nick)) return 0;
+	return 1;
 }
-
-/*
-  1 = valid chan
-  0 = chan is invalid
-*/
-int charybdis_valid_chan(const char *chan)
-{
-    /* no hard coded invalid chan */
-    return 1;
-}
-
 
 int charybdis_send_account(int argc, char **argv)
 {

@@ -197,6 +197,7 @@ void load_ignore_db(void) {
 	time_t expiry_time;
 	IgnoreData *ign;
 
+	expiry_time = time(NULL);
 	fill_db_ptr(dbptr, 0, IGNOREDBVERSION, s_OperServ, IgnoreDB);
 
 	/* let's remove existing temp files here, because we only load dbs on startup */

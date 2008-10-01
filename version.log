@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1460"
+VERSION_BUILD="1461"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1461)
+# BUGS  : 
+# NOTES : Fixed possible compile warning in os_ignore_db. 
 #
 # BUILD : 1.7.22 (1460)
 # BUGS  : 948 

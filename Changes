@@ -1,5 +1,6 @@
 Anope Version  S V N
 --------------------
+10/01 A Added modular database back-end for IGNORE.                       [#948]
 09/18 R Removed password truncating.                                      [ #00]
 09/15 F Dealt with the nss_dns.so.1 issue on freebsd 7.                   [ #00]
 09/23 F Fixed numerous possible buffer overflows in NS and CS.            [ #00]
@@ -9,6 +10,7 @@ Anope Version  S V N
 09/30 F Fixed error in OPER help.                                         [#943]
 09/30 F Fixed OS IGNORE behaviour.                                        [#941]
 09/30 F Fixed error in the SASET help.                                    [#950]
+10/01 F Fixed an error in the OS IGNORE documentation.                    [#948]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]

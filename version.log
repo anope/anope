@@ -9,9 +9,17 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1458"
+VERSION_BUILD="1460"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1460)
+# BUGS  : 948 
+# NOTES : Corrected some errors in the OS IGNORE help.
+#
+# BUILD : 1.7.22 (1459)
+# BUGS  : 948 
+# NOTES : Added a supported module to provide a database back-end for OS IGNORE.
 #
 # BUILD : 1.7.22 (1458)
 # BUGS  : 950 

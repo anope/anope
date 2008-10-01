@@ -2989,7 +2989,7 @@ OPER_CANNOT_RESTART
 
 # LISTIGNORE responses
 OPER_IGNORE_SYNTAX
-	Syntaxe: IGNORE {ADD|DEL|LIST|CLEAR} [durée] [pseudo]
+	Syntaxe: IGNORE {ADD|DEL|LIST|CLEAR} [durée] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Vous devez entrer une durée valide
 OPER_IGNORE_TIME_DONE
@@ -5882,11 +5882,12 @@ OPER_HELP_IGNORE
 	Valid units are: s for seconds, m for minutes, 
 	h for hours and d for days. 
 	Combinations of these units are not permitted. To make
-	Services permanently (untill next restart) ignore the user,
-	type 0 as time.
+	Services permanently ignore the user, type 0 as time.
 	When adding a mask, it should be in the format user@host
 	or nick!user@host, everything else will be considered a nick.
 	Wildcards are permitted.
+	
+	Ignores will not be enforced on IRC Operators.
 
 OPER_HELP_MODE
 	Syntaxe: MODE canal modes

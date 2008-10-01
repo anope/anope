@@ -2938,7 +2938,7 @@ OPER_CANNOT_RESTART
 
 # IGNORE respondes
 OPER_IGNORE_SYNTAX
-	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick]
+	Gebruik: IGNORE {ADD|DEL|LIST|CLEAR} [tijd] [nick | mask]
 OPER_IGNORE_VALID_TIME
 	Je moet een geldig nummer als tijd invoeren.
 OPER_IGNORE_TIME_DONE
@@ -5711,11 +5711,13 @@ OPER_HELP_IGNORE
 	Je kan de tijd opgegeven met behulup van units. Geldige units 
 	zijn: s voor seconden, m voor minuten, h voor uren
 	en d voor dagen. Combinaties hiervan zijn niet toegestaan. 
-	Om Services iemand permanent (tot de volgende heropstart) te laten
-	negeren kun je 0 opgeven als tijd.
+	Om Services iemand permanent te laten negeren kun je 0 opgeven als tijd.
 	Als je een mask toevoegd moet deze in volgende format zijn:
 	user@host of nick!user@host, iets anders wordt een nick beschouwd.
 	Wildcards zijn toegestaan.
+	
+	IRC Operators zullen niet genegeerd worden, zelfs al komen
+	ze overeen met een mask uit de lijst.
 
 OPER_HELP_MODE
 	Gebruik: MODE kanaal modes

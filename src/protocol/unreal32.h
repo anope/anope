@@ -80,25 +80,7 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void unreal_cmd_372(const char *source, const char *msg);
-void unreal_cmd_372_error(const char *source);
-void unreal_cmd_375(const char *source);
-void unreal_cmd_376(const char *source);
-void unreal_cmd_351(const char *source);
-void unreal_cmd_391(const char *source, const char *timestr);
-void unreal_cmd_250(const char *buf);
-void unreal_cmd_307(const char *buf);
-void unreal_cmd_311(const char *buf);
-void unreal_cmd_312(const char *buf);
-void unreal_cmd_317(const char *buf);
-void unreal_cmd_219(const char *source, const char *letter);
-void unreal_cmd_401(const char *source, const char *who);
-void unreal_cmd_318(const char *source, const char *who);
-void unreal_cmd_242(const char *buf);
-void unreal_cmd_243(const char *buf);
-void unreal_cmd_211(const char *buf);
-
-class UnrealIRCdProto : public IRCDProtoNew {
+class UnrealIRCdProto : public IRCDProto {
 	public:
 		void cmd_svsnoop(const char *, int);
 		void cmd_remove_akill(const char *, const char *);

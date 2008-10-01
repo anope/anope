@@ -560,27 +560,9 @@ void InspIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 	send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 }
 
-
-void inspircd_cmd_372(const char *source, const char *msg)
+void InspIRCdProto::cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
 {
-    send_cmd(ServerName, "372 %s :- %s", source, msg);
-}
-
-void inspircd_cmd_372_error(const char *source)
-{
-    send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
-             "contact your IRC administrator.", source);
-}
-
-void inspircd_cmd_375(const char *source)
-{
-    send_cmd(ServerName, "375 %s :- %s Message of the Day",
-             source, ServerName);
-}
-
-void inspircd_cmd_376(const char *source)
-{
-    send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
+	send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
 }
 
 void InspIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -757,13 +739,6 @@ void InspIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 	anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
-void inspircd_cmd_351(const char *source)
-{
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
-             source, version_number, ServerName, ircd->name, version_flags,
-             EncModule, version_build);
-}
-
 /* PROTOCTL */
 void inspircd_cmd_protoctl()
 {
@@ -807,129 +782,6 @@ void inspircd_cmd_chgident(const char *nick, const char *vIdent)
     } else {
 		anope_cmd_global(s_OperServ, "CHGIDENT not loaded!");
     }
-}
-
-/* 391 */
-void inspircd_cmd_391(const char *source, const char *timestr)
-{
-    if (!timestr) {
-        return;
-    }
-    send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
-}
-
-/* 250 */
-void inspircd_cmd_250(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "250 %s", buf);
-}
-
-/* 307 */
-void inspircd_cmd_307(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "307 %s", buf);
-}
-
-/* 311 */
-void inspircd_cmd_311(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "311 %s", buf);
-}
-
-/* 312 */
-void inspircd_cmd_312(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "312 %s", buf);
-}
-
-/* 317 */
-void inspircd_cmd_317(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "317 %s", buf);
-}
-
-/* 219 */
-void inspircd_cmd_219(const char *source, const char *letter)
-{
-    if (!source) {
-        return;
-    }
-
-    if (letter) {
-        send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
-                 *letter);
-    } else {
-        send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
-}
-
-/* 401 */
-void inspircd_cmd_401(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-    send_cmd(ServerName, "401 %s %s :No such service.", source, who);
-}
-
-/* 318 */
-void inspircd_cmd_318(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-
-    send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
-}
-
-/* 242 */
-void inspircd_cmd_242(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "242 %s", buf);
-}
-
-/* 243 */
-void inspircd_cmd_243(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "243 %s", buf);
-}
-
-/* 211 */
-void inspircd_cmd_211(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "211 %s", buf);
 }
 
 /* SQLINE */
@@ -1502,31 +1354,6 @@ int InspIRCdProto::flood_mode_check(const char *value)
 }
 
 /**
- * Tell anope which function we want to perform each task inside of anope.
- * These prototypes must match what anope expects.
- **/
-void moduleAddAnopeCmds()
-{
-    pmodule_cmd_372(inspircd_cmd_372);
-    pmodule_cmd_372_error(inspircd_cmd_372_error);
-    pmodule_cmd_375(inspircd_cmd_375);
-    pmodule_cmd_376(inspircd_cmd_376);
-    pmodule_cmd_351(inspircd_cmd_351);
-    pmodule_cmd_391(inspircd_cmd_391);
-    pmodule_cmd_250(inspircd_cmd_250);
-    pmodule_cmd_307(inspircd_cmd_307);
-    pmodule_cmd_311(inspircd_cmd_311);
-    pmodule_cmd_312(inspircd_cmd_312);
-    pmodule_cmd_317(inspircd_cmd_317);
-    pmodule_cmd_219(inspircd_cmd_219);
-    pmodule_cmd_401(inspircd_cmd_401);
-    pmodule_cmd_318(inspircd_cmd_318);
-    pmodule_cmd_242(inspircd_cmd_242);
-    pmodule_cmd_243(inspircd_cmd_243);
-    pmodule_cmd_211(inspircd_cmd_211);
-}
-
-/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1558,7 +1385,6 @@ int AnopeInit(int argc, char **argv)
 	pmodule_key_mode(CMODE_k);
 	pmodule_limit_mode(CMODE_l);
 
-	moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
 	moduleAddIRCDMsgs();
 

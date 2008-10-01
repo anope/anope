@@ -1060,31 +1060,6 @@ struct session_ {
 };
 
 /*************************************************************************/
-/**
- * IRCD Protocol module support struct.
- * protocol modules register the command they want touse for function X with our set
- * functions, we then call the correct function for the anope_ commands.
- **/
-typedef struct ircd_proto_ {
-    void (*ircd_cmd_372)(const char *source, const char *msg);
-    void (*ircd_cmd_372_error)(const char *source);
-    void (*ircd_cmd_375)(const char *source);
-    void (*ircd_cmd_376)(const char *source);
-    void (*ircd_cmd_351)(const char *source);
-    void (*ircd_cmd_391)(const char *source, const char *timestr);
-    void (*ircd_cmd_250)(const char *buf);
-    void (*ircd_cmd_307)(const char *buf);
-    void (*ircd_cmd_311)(const char *buf);
-    void (*ircd_cmd_312)(const char *buf);
-    void (*ircd_cmd_317)(const char *buf);
-    void (*ircd_cmd_219)(const char *source, const char *letter);
-    void (*ircd_cmd_401)(const char *source, const char *who);
-    void (*ircd_cmd_318)(const char *source, const char *who);
-    void (*ircd_cmd_242)(const char *buf);
-    void (*ircd_cmd_243)(const char *buf);
-    void (*ircd_cmd_211)(const char *buf);
-} IRCDProto;
-
 typedef struct ircd_modes_ {
         int user_invis;
         int user_oper;
@@ -1257,11 +1232,11 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
-class IRCDProtoNew;
+class IRCDProto;
 
 #include "extern.h"
 
-class IRCDProtoNew {
+class IRCDProto {
 	public:
 		virtual void cmd_svsnoop(const char *, int) { }
 		virtual void cmd_remove_akill(const char *, const char *) = 0;
@@ -1381,6 +1356,10 @@ class IRCDProtoNew {
 		virtual int valid_nick(const char *) { return 1; }
 		virtual int valid_chan(const char *) { return 1; }
 		virtual int flood_mode_check(const char *) { return 0; }
+		virtual void cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
+		{
+			send_cmd(source, "%03d %s %s", numeric, dest, buf);
+		}
 };
 
 /*************************************************************************/

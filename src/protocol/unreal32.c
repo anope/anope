@@ -541,29 +541,6 @@ void UnrealIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
 	}
 }
 
-/* 372 */
-void unreal_cmd_372(const char *source, const char *msg)
-{
-    send_cmd(ServerName, "372 %s :- %s", source, msg);
-}
-
-void unreal_cmd_372_error(const char *source)
-{
-    send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
-             "contact your IRC administrator.", source);
-}
-
-void unreal_cmd_375(const char *source)
-{
-    send_cmd(ServerName, "375 %s :- %s Message of the Day",
-             source, ServerName);
-}
-
-void unreal_cmd_376(const char *source)
-{
-    send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
-}
-
 void UnrealIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
@@ -600,13 +577,6 @@ void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const
 void UnrealIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
 	anope_cmd_mode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
-}
-
-void unreal_cmd_351(const char *source)
-{
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
-             source, version_number, ServerName, myIrcd->name,
-             version_flags, EncModule, version_build);
 }
 
 /* PROTOCTL */
@@ -694,129 +664,6 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
     }
     send_cmd(ServerName, "%s %s %s", send_token("CHGIDENT", "AZ"), nick,
              vIdent);
-}
-
-/* 391    RPL_TIME ":%s 391 %s %s :%s" */
-void unreal_cmd_391(const char *source, const char *timestr)
-{
-    if (!timestr) {
-        return;
-    }
-    send_cmd(ServerName, "391 %s %s :%s", source, ServerName, timestr);
-}
-
-/* 250 */
-void unreal_cmd_250(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "250 %s", buf);
-}
-
-/* 307 */
-void unreal_cmd_307(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "307 %s", buf);
-}
-
-/* 311 */
-void unreal_cmd_311(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "311 %s", buf);
-}
-
-/* 312 */
-void unreal_cmd_312(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "312 %s", buf);
-}
-
-/* 317 */
-void unreal_cmd_317(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "317 %s", buf);
-}
-
-/* 219 */
-void unreal_cmd_219(const char *source, const char *letter)
-{
-    if (!source) {
-        return;
-    }
-
-    if (letter) {
-        send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
-                 *letter);
-    } else {
-        send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
-}
-
-/* 401 */
-void unreal_cmd_401(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-    send_cmd(ServerName, "401 %s %s :No such service.", source, who);
-}
-
-/* 318 */
-void unreal_cmd_318(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-
-    send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
-}
-
-/* 242 */
-void unreal_cmd_242(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "242 %s", buf);
-}
-
-/* 243 */
-void unreal_cmd_243(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "243 %s", buf);
-}
-
-/* 211 */
-void unreal_cmd_211(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "211 %s", buf);
 }
 
 /* SQLINE */
@@ -1802,31 +1649,6 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 /**
- * Tell anope which function we want to perform each task inside of anope.
- * These prototypes must match what anope expects.
- **/
-void moduleAddAnopeCmds()
-{
-    pmodule_cmd_372(unreal_cmd_372);
-    pmodule_cmd_372_error(unreal_cmd_372_error);
-    pmodule_cmd_375(unreal_cmd_375);
-    pmodule_cmd_376(unreal_cmd_376);
-    pmodule_cmd_351(unreal_cmd_351);
-    pmodule_cmd_391(unreal_cmd_391);
-    pmodule_cmd_250(unreal_cmd_250);
-    pmodule_cmd_307(unreal_cmd_307);
-    pmodule_cmd_311(unreal_cmd_311);
-    pmodule_cmd_312(unreal_cmd_312);
-    pmodule_cmd_317(unreal_cmd_317);
-    pmodule_cmd_219(unreal_cmd_219);
-    pmodule_cmd_401(unreal_cmd_401);
-    pmodule_cmd_318(unreal_cmd_318);
-    pmodule_cmd_242(unreal_cmd_242);
-    pmodule_cmd_243(unreal_cmd_243);
-    pmodule_cmd_211(unreal_cmd_211);
-}
-
-/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1857,7 +1679,6 @@ int AnopeInit(int argc, char **argv)
     pmodule_key_mode(CMODE_k);
     pmodule_limit_mode(CMODE_l);
 
-    moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 

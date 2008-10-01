@@ -46,25 +46,7 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 
-void charybdis_cmd_372(const char *source, const char *msg);
-void charybdis_cmd_372_error(const char *source);
-void charybdis_cmd_375(const char *source);
-void charybdis_cmd_376(const char *source);
-void charybdis_cmd_351(const char *source);
-void charybdis_cmd_391(const char *source, const char *timestr);
-void charybdis_cmd_250(const char *buf);
-void charybdis_cmd_307(const char *buf);
-void charybdis_cmd_311(const char *buf);
-void charybdis_cmd_312(const char *buf);
-void charybdis_cmd_317(const char *buf);
-void charybdis_cmd_219(const char *source, const char *letter);
-void charybdis_cmd_401(const char *source, const char *who);
-void charybdis_cmd_318(const char *source, const char *who);
-void charybdis_cmd_242(const char *buf);
-void charybdis_cmd_243(const char *buf);
-void charybdis_cmd_211(const char *buf);
-
-class CharybdisProto : public IRCDProtoNew {
+class CharybdisProto : public IRCDProto {
 	public:
 		void cmd_remove_akill(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
@@ -99,4 +81,5 @@ class CharybdisProto : public IRCDProtoNew {
 		void set_umode(User *, int, const char **);
 		int valid_nick(const char *);
 		int flood_mode_check(const char *);
+		void cmd_numeric(const char *, int, const char *, const char *);
 } ircd_proto;

@@ -49,7 +49,7 @@ E CBMode cbmodes[128];
 E CBModeInfo *cbmodeinfos;
 E CUMode cumodes[128];
 E char *IRCDModule;
-E IRCDProto ircdproto;
+E IRCDProto *ircdproto;
 
 /**** actions.c ****/
 
@@ -603,24 +603,7 @@ E int init_secondary(int ac, char **av);
 E int servernum;
 
 /**** ircd.c ****/
-E void pmodule_ircd_proto(IRCDProtoNew *);
-E void pmodule_cmd_372(void (*func) (const char *source, const char *msg));
-E void pmodule_cmd_372_error(void (*func) (const char *source));
-E void pmodule_cmd_375(void (*func) (const char *source));
-E void pmodule_cmd_376(void (*func) (const char *source));
-E void pmodule_cmd_351(void (*func) (const char *source));
-E void pmodule_cmd_391(void (*func) (const char *source, const char *timestr));
-E void pmodule_cmd_250(void (*func) (const char *buf));
-E void pmodule_cmd_307(void (*func) (const char *buf));
-E void pmodule_cmd_311(void (*func) (const char *buf));
-E void pmodule_cmd_312(void (*func) (const char *buf));
-E void pmodule_cmd_317(void (*func) (const char *buf));
-E void pmodule_cmd_219(void (*func) (const char *source, const char *letter));
-E void pmodule_cmd_401(void (*func) (const char *source, const char *who));
-E void pmodule_cmd_318(void (*func) (const char *source, const char *who));
-E void pmodule_cmd_242(void (*func) (const char *buf));
-E void pmodule_cmd_243(void (*func) (const char *buf));
-E void pmodule_cmd_211(void (*func) (const char *buf));
+E void pmodule_ircd_proto(IRCDProto *);
 E void pmodule_ircd_var(IRCDVar * ircdvar);
 E void pmodule_ircd_cap(IRCDCAPAB * cap);
 E void pmodule_ircd_version(const char *version);
@@ -1135,23 +1118,6 @@ E void notice(char *source, const char *dest, const char *fmt, ...);
 
 /******************************************************************************/
 
-E void anope_cmd_211(const char *fmt, ...);                          	  		  /* 211 */
-E void anope_cmd_219(const char *source, const char *who); 			  	  		  /* 219 */
-E void anope_cmd_242(const char *fmt, ...);                          	  		  /* 242 */
-E void anope_cmd_243(const char *fmt, ...);                          	  		  /* 243 */
-E void anope_cmd_250(const char *fmt, ...);			  	  		  /* 250 */
-E void anope_cmd_307(const char *fmt, ...);			    	  		  /* 307 */
-E void anope_cmd_311(const char *fmt, ...);                          	  		  /* 311 */
-E void anope_cmd_312(const char *fmt, ...);                          	  		  /* 312 */
-E void anope_cmd_317(const char *fmt, ...);                          	  		  /* 317 */
-E void anope_cmd_318(const char *source, const char *who);           		  	  		  /* 318 */
-E void anope_cmd_351(const char *source);				  	  		  /* 351 */
-E void anope_cmd_372(const char *source, const char *msg);			 	  		  /* 372 */
-E void anope_cmd_372_error(const char *source);				  	  		  /* 372 */
-E void anope_cmd_375(const char *source);				 	  		  /* 375 */
-E void anope_cmd_376(const char *source);				 	  		  /* 376 */
-E void anope_cmd_391(const char *source, const char *timestr);                             		  /* 391 */
-E void anope_cmd_401(const char *source, const char *who);			  	  		  /* 401 */
 E void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason); /* AKILL */
 E void anope_cmd_capab();						  	  		  /* CAPAB */
 E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
@@ -1211,6 +1177,7 @@ E void anope_cmd_eob();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);
 E void anope_cmd_ctcp(const char *source, const char *dest,  const char *fmt, ...);   	  		  /* CTCP */
+E void anope_cmd_numeric(const char *, int, const char *, const char *, ...) FORMAT(printf, 4, 5); /* Numerics */
 
 EI int anope_event_482(const char *source, int ac, const char **av);
 EI int anope_event_436(const char *source, int ac, const char **av);

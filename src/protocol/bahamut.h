@@ -58,25 +58,7 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void bahamut_cmd_372(const char *source, const char *msg);
-void bahamut_cmd_372_error(const char *source);
-void bahamut_cmd_375(const char *source);
-void bahamut_cmd_376(const char *source);
-void bahamut_cmd_351(const char *source);
-void bahamut_cmd_391(const char *source, const char *timestr);
-void bahamut_cmd_250(const char *buf);
-void bahamut_cmd_307(const char *buf);
-void bahamut_cmd_311(const char *buf);
-void bahamut_cmd_312(const char *buf);
-void bahamut_cmd_317(const char *buf);
-void bahamut_cmd_219(const char *source, const char *letter);
-void bahamut_cmd_401(const char *source, const char *who);
-void bahamut_cmd_318(const char *source, const char *who);
-void bahamut_cmd_242(const char *buf);
-void bahamut_cmd_243(const char *buf);
-void bahamut_cmd_211(const char *buf);
-
-class BahamutIRCdProto : public IRCDProtoNew {
+class BahamutIRCdProto : public IRCDProto {
 	public:
 		void cmd_svsnoop(const char *, int);
 		void cmd_remove_akill(const char *, const char *);

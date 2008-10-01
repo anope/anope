@@ -51,23 +51,6 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void inspircd_cmd_372(const char *source, const char *msg);
-void inspircd_cmd_372_error(const char *source);
-void inspircd_cmd_375(const char *source);
-void inspircd_cmd_376(const char *source);
-void inspircd_cmd_351(const char *source);
-void inspircd_cmd_391(const char *source, const char *timestr);
-void inspircd_cmd_250(const char *buf);
-void inspircd_cmd_307(const char *buf);
-void inspircd_cmd_311(const char *buf);
-void inspircd_cmd_312(const char *buf);
-void inspircd_cmd_317(const char *buf);
-void inspircd_cmd_219(const char *source, const char *letter);
-void inspircd_cmd_401(const char *source, const char *who);
-void inspircd_cmd_318(const char *source, const char *who);
-void inspircd_cmd_242(const char *buf);
-void inspircd_cmd_243(const char *buf);
-void inspircd_cmd_211(const char *buf);
 int anope_event_fjoin(const char *source, int ac, const char **av);
 int anope_event_fmode(const char *source, int ac, const char **av);
 int anope_event_ftopic(const char *source, int ac, const char **av);
@@ -80,7 +63,7 @@ int anope_event_opertype(const char *source, int ac, const char **av);
 int anope_event_idle(const char *source, int ac, const char **av);
 int anope_event_rsquit(const char *source, int ac, const char **av);
 
-class InspIRCdProto : public IRCDProtoNew {
+class InspIRCdProto : public IRCDProto {
 	public:
 		void cmd_remove_akill(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
@@ -112,4 +95,5 @@ class InspIRCdProto : public IRCDProtoNew {
 		void cmd_server(const char *, int, const char *);
 		void set_umode(User *, int, const char **);
 		int flood_mode_check(const char *);
+		void cmd_numeric(const char *, int, const char *, const char *);
 } ircd_proto;

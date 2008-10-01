@@ -963,155 +963,10 @@ void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, cons
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-/* 391 */
-void bahamut_cmd_391(const char *source, const char *timestr)
-{
-    if (!timestr) {
-        return;
-    }
-    send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
-}
-
-/* 250 */
-void bahamut_cmd_250(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "250 %s", buf);
-}
-
-/* 307 */
-void bahamut_cmd_307(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "307 %s", buf);
-}
-
-/* 311 */
-void bahamut_cmd_311(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "311 %s", buf);
-}
-
-/* 312 */
-void bahamut_cmd_312(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "312 %s", buf);
-}
-
-/* 317 */
-void bahamut_cmd_317(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(ServerName, "317 %s", buf);
-}
-
-/* 219 */
-void bahamut_cmd_219(const char *source, const char *letter)
-{
-    if (!source) {
-        return;
-    }
-
-    if (letter) {
-        send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
-                 *letter);
-    } else {
-        send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
-}
-
-/* 401 */
-void bahamut_cmd_401(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-    send_cmd(ServerName, "401 %s %s :No such service.", source, who);
-}
-
-/* 318 */
-void bahamut_cmd_318(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-
-    send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
-}
-
-/* 242 */
-void bahamut_cmd_242(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "242 %s", buf);
-}
-
-/* 243 */
-void bahamut_cmd_243(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "243 %s", buf);
-}
-
-/* 211 */
-void bahamut_cmd_211(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "211 %s", buf);
-}
-
 void BahamutIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
 	else send_cmd(source, "KICK %s %s", chan, user);
-}
-
-void bahamut_cmd_372(const char *source, const char *msg)
-{
-    send_cmd(ServerName, "372 %s :- %s", source, msg);
-}
-
-void bahamut_cmd_372_error(const char *source)
-{
-    send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
-             "contact your IRC administrator.", source);
-}
-
-void bahamut_cmd_375(const char *source)
-{
-    send_cmd(ServerName, "375 %s :- %s Message of the Day",
-             source, ServerName);
-}
-
-void bahamut_cmd_376(const char *source)
-{
-    send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
 int anope_event_away(const char *source, int ac, const char **av)
@@ -1129,14 +984,6 @@ int anope_event_ping(const char *source, int ac, const char **av)
         return MOD_CONT;
     ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
-}
-
-void bahamut_cmd_351(const char *source)
-{
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
-             source, version_number, ServerName, ircd->name, version_flags,
-             EncModule, version_build);
-
 }
 
 void BahamutIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -1263,31 +1110,6 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
 }
 
 /**
- * Tell anope which function we want to perform each task inside of anope.
- * These prototypes must match what anope expects.
- **/
-void moduleAddAnopeCmds()
-{
-    pmodule_cmd_372(bahamut_cmd_372);
-    pmodule_cmd_372_error(bahamut_cmd_372_error);
-    pmodule_cmd_375(bahamut_cmd_375);
-    pmodule_cmd_376(bahamut_cmd_376);
-    pmodule_cmd_351(bahamut_cmd_351);
-    pmodule_cmd_391(bahamut_cmd_391);
-    pmodule_cmd_250(bahamut_cmd_250);
-    pmodule_cmd_307(bahamut_cmd_307);
-    pmodule_cmd_311(bahamut_cmd_311);
-    pmodule_cmd_312(bahamut_cmd_312);
-    pmodule_cmd_317(bahamut_cmd_317);
-    pmodule_cmd_219(bahamut_cmd_219);
-    pmodule_cmd_401(bahamut_cmd_401);
-    pmodule_cmd_318(bahamut_cmd_318);
-    pmodule_cmd_242(bahamut_cmd_242);
-    pmodule_cmd_243(bahamut_cmd_243);
-    pmodule_cmd_211(bahamut_cmd_211);
-}
-
-/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1319,7 +1141,6 @@ int AnopeInit(int argc, char **argv)
     pmodule_key_mode(CMODE_k);
     pmodule_limit_mode(CMODE_l);
 
-    moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 

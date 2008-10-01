@@ -991,153 +991,10 @@ int anope_event_quit(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ratbox_cmd_372(const char *source, const char *msg)
+void RatboxProto::cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
 {
-    send_cmd((UseTS6 ? TS6SID : ServerName), "372 %s :- %s", source, msg);
-}
-
-void ratbox_cmd_372_error(const char *source)
-{
-    send_cmd((UseTS6 ? TS6SID : ServerName),
-             "422 %s :- MOTD file not found!  Please "
-             "contact your IRC administrator.", source);
-}
-
-void ratbox_cmd_375(const char *source)
-{
-    send_cmd((UseTS6 ? TS6SID : ServerName),
-             "375 %s :- %s Message of the Day", source, ServerName);
-}
-
-void ratbox_cmd_376(const char *source)
-{
-    send_cmd((UseTS6 ? TS6SID : ServerName),
-             "376 %s :End of /MOTD command.", source);
-}
-
-/* 391 */
-void ratbox_cmd_391(const char *source, const char *timestr)
-{
-    if (!timestr) {
-        return;
-    }
-    send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
-}
-
-/* 250 */
-void ratbox_cmd_250(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "250 %s", buf);
-}
-
-/* 307 */
-void ratbox_cmd_307(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? TS6SID : ServerName), "307 %s", buf);
-}
-
-/* 311 */
-void ratbox_cmd_311(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? TS6SID : ServerName), "311 %s", buf);
-}
-
-/* 312 */
-void ratbox_cmd_312(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? TS6SID : ServerName), "312 %s", buf);
-}
-
-/* 317 */
-void ratbox_cmd_317(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? TS6SID : ServerName), "317 %s", buf);
-}
-
-/* 219 */
-void ratbox_cmd_219(const char *source, const char *letter)
-{
-    if (!source) {
-        return;
-    }
-
-    if (letter) {
-        send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
-                 *letter);
-    } else {
-        send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
-}
-
-/* 401 */
-void ratbox_cmd_401(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-    send_cmd((UseTS6 ? TS6SID : ServerName), "401 %s %s :No such service.",
-             source, who);
-}
-
-/* 318 */
-void ratbox_cmd_318(const char *source, const char *who)
-{
-    if (!source || !who) {
-        return;
-    }
-
-    send_cmd((UseTS6 ? TS6SID : ServerName),
-             "318 %s %s :End of /WHOIS list.", source, who);
-}
-
-/* 242 */
-void ratbox_cmd_242(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "242 %s", buf);
-}
-
-/* 243 */
-void ratbox_cmd_243(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "243 %s", buf);
-}
-
-/* 211 */
-void ratbox_cmd_211(const char *buf)
-{
-    if (!buf) {
-        return;
-    }
-
-    send_cmd(NULL, "211 %s", buf);
+	// This might need to be set in the call to cmd_numeric instead of here, will review later -- CyberBotX
+	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 
 void RatboxProto::cmd_mode(const char *source, const char *dest, const char *buf)
@@ -1244,14 +1101,6 @@ int anope_event_tmode(const char *source, int ac, const char **av)
         do_cmode(source, ac, av);
     }
     return MOD_CONT;
-}
-
-void ratbox_cmd_351(const char *source)
-{
-    send_cmd((UseTS6 ? TS6SID : ServerName),
-             "351 %s Anope-%s %s :%s - %s (%s) -- %s", source, version_number,
-             ServerName, ircd->name, version_flags, EncModule, version_build);
-
 }
 
 /* Event: PROTOCTL */
@@ -1380,31 +1229,6 @@ int RatboxProto::valid_nick(const char *nick)
 }
 
 /**
- * Tell anope which function we want to perform each task inside of anope.
- * These prototypes must match what anope expects.
- **/
-void moduleAddAnopeCmds()
-{
-    pmodule_cmd_372(ratbox_cmd_372);
-    pmodule_cmd_372_error(ratbox_cmd_372_error);
-    pmodule_cmd_375(ratbox_cmd_375);
-    pmodule_cmd_376(ratbox_cmd_376);
-    pmodule_cmd_351(ratbox_cmd_351);
-    pmodule_cmd_391(ratbox_cmd_391);
-    pmodule_cmd_250(ratbox_cmd_250);
-    pmodule_cmd_307(ratbox_cmd_307);
-    pmodule_cmd_311(ratbox_cmd_311);
-    pmodule_cmd_312(ratbox_cmd_312);
-    pmodule_cmd_317(ratbox_cmd_317);
-    pmodule_cmd_219(ratbox_cmd_219);
-    pmodule_cmd_401(ratbox_cmd_401);
-    pmodule_cmd_318(ratbox_cmd_318);
-    pmodule_cmd_242(ratbox_cmd_242);
-    pmodule_cmd_243(ratbox_cmd_243);
-    pmodule_cmd_211(ratbox_cmd_211);
-}
-
-/**
  * Now tell anope how to use us.
  **/
 int AnopeInit(int argc, char **argv)
@@ -1435,7 +1259,6 @@ int AnopeInit(int argc, char **argv)
     pmodule_key_mode(CMODE_k);
     pmodule_limit_mode(CMODE_l);
 
-    moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
     moduleAddIRCDMsgs();
 

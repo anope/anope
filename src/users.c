@@ -18,7 +18,6 @@
 User *userlist[1024];
 
 #define HASH2(nick)	(((nick)[0]&31)<<5 | ((nick)[1]&31))
-Uid *uidlist[1024];
 
 int32 usercnt = 0, opcnt = 0;
 uint32 maxusercnt = 0;
@@ -27,11 +26,11 @@ time_t maxusertime;
 /*************************************************************************/
 /*************************************************************************/
 
-User::User(const std::string &nick)
+User::User(const std::string &snick)
 {
 	User **list;
 	// XXX: we could do well to steal CoreException from insp
-	if (nick.empty())
+	if (snick.empty())
 		throw "what the craq, empty nick passed to constructor";
 
 	// XXX: we should also duplicate-check here.
@@ -47,7 +46,7 @@ User::User(const std::string &nick)
 	moduleData = NULL;
 	timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 
-	strscpy(this->nick, nick.c_str(), NICKMAX);
+	strscpy(this->nick, snick.c_str(), NICKMAX);
 	list = &userlist[HASH(this->nick)];
 	this->next = *list;
 
@@ -56,7 +55,7 @@ User::User(const std::string &nick)
 
 	*list = this;
 
-	this->na = findnick(nick);
+	this->na = findnick(snick);
 
 	if (this->na)
 		this->na->u = this;
@@ -119,17 +118,17 @@ void User::SetNewNick(const std::string &newnick)
         alog("debug: %s changed nick to %s", this->nick, newnick.c_str());
 }
 
-void User::SetDisplayedHost(const std::string &host)
+void User::SetDisplayedHost(const std::string &shost)
 {
-	if (host.empty())
+	if (shost.empty())
 		throw "empty host? in MY services? it seems it's more likely than I thought.";
 
     if (this->vhost)
         free(this->vhost);
-    this->vhost = sstrdup(host.c_str());
+    this->vhost = sstrdup(shost.c_str());
 
     if (debug)
-        alog("debug: %s changed vhost to %s", this->nick, host.c_str());
+        alog("debug: %s changed vhost to %s", this->nick, shost.c_str());
 
     update_host(this);
 }
@@ -149,51 +148,51 @@ void User::SetIdent(const std::string &ident)
 	update_host(this);
 }
 
-void User::SetRealname(const std::string &realname)
+void User::SetRealname(const std::string &srealname)
 {
-	if (realname.empty())
+	if (srealname.empty())
 		throw "realname empty in SetRealname";
 
 	if (this->realname)
 		free(this->realname);
-	this->realname = sstrdup(realname.c_str());
+	this->realname = sstrdup(srealname.c_str());
 
 	if (this->na && (nick_identified(this) ||
 			(!(this->na->nc->flags & NI_SECURE) && nick_recognized(this))))
 	{
 		if (this->na->last_realname)
 			free(this->na->last_realname);
-		this->na->last_realname = sstrdup(realname.c_str());
+		this->na->last_realname = sstrdup(srealname.c_str());
 	}
 
 	if (debug)
-		alog("debug: %s changed realname to %s", this->nick, realname.c_str());
+		alog("debug: %s changed realname to %s", this->nick, srealname.c_str());
 }
 
 User::~User()
 {
 	struct u_chanlist *c, *c2;
 	struct u_chaninfolist *ci, *ci2;
-	char *realname;
+	char *srealname;
 
 	if (LogUsers)
 	{
-		realname = normalizeBuffer(this->realname);
+		srealname = normalizeBuffer(this->realname);
 
 		if (ircd->vhost)
 		{
 			alog("LOGUSERS: %s (%s@%s => %s) (%s) left the network (%s).",
 				this->nick, this->username, this->host,
-				(this->vhost ? this->vhost : "(none)"), realname, this->server->name);
+				(this->vhost ? this->vhost : "(none)"), srealname, this->server->name);
 		}
 		else
 		{
 			alog("LOGUSERS: %s (%s@%s) (%s) left the network (%s).",
 				this->nick, this->username, this->host,
-				realname, this->server->name);
+				srealname, this->server->name);
 		}
 
-		free(realname);
+		free(srealname);
 	}
 
 	send_event(EVENT_USER_LOGOFF, 1, this->nick);
@@ -484,54 +483,6 @@ User *next_uid(void)
              current_uid ? current_uid->uid : "");
     }
     return current_uid;
-}
-
-Uid *new_uid(const char *nick, char *uid)
-{
-    Uid *u, **list;
-
-    u = (Uid *)scalloc(sizeof(Uid), 1);
-    if (!nick || !uid) {
-        return NULL;
-    }
-    strscpy(u->nick, nick, NICKMAX);
-    list = &uidlist[HASH2(u->nick)];
-    u->next = *list;
-    if (*list)
-        (*list)->prev = u;
-    *list = u;
-    u->uid = sstrdup(uid);
-    return u;
-}
-
-Uid *find_uid(const char *nick)
-{
-    Uid *u;
-    int i;
-
-    for (i = 0; i < 1024; i++) {
-        for (u = uidlist[i]; u; u = u->next) {
-            if (!stricmp(nick, u->nick)) {
-                return u;
-            }
-        }
-    }
-    return NULL;
-}
-
-Uid *find_nickuid(const char *uid)
-{
-    Uid *u;
-    int i;
-
-    for (i = 0; i < 1024; i++) {
-        for (u = uidlist[i]; u; u = u->next) {
-            if (!stricmp(uid, u->uid)) {
-                return u;
-            }
-        }
-    }
-    return NULL;
 }
 
 /*************************************************************************/

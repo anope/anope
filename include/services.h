@@ -252,7 +252,6 @@ typedef struct csmode_ CSMode;
 typedef struct cumode_ CUMode;
 typedef struct csmodeutil_ CSModeUtil;
 typedef struct session_ Session;
-typedef struct uid_ Uid;
 
 #include "bots.h"
 
@@ -391,15 +390,6 @@ struct ircdcapab_ {
   uint32 chanmodes;
   uint32 sjb64;
   uint32 nickchars;
-};
-
-/* tiny struct needed for P10 and other UID servers so we can track
-   services UID
-*/
-struct uid_ {
-    Uid *next, *prev;
-    char nick[NICKMAX];
-    char *uid;
 };
 
 /*************************************************************************/

@@ -589,30 +589,21 @@ void insert_bot(BotInfo * bi)
 
 BotInfo *findbot(const char *nick)
 {
-    BotInfo *bi;
-    Uid *ud;
+	BotInfo *bi;
 
-    /* to keep make strict happy */
-    ud = NULL;
+	if (!nick || !*nick)
+	return NULL;
 
-    if (!nick || !*nick)
-        return NULL;
+	for (bi = botlists[tolower(*nick)]; bi; bi = bi->next)
+	{
+		if (!stricmp(nick, bi->nick))
+			return bi;
 
-    for (bi = botlists[tolower(*nick)]; bi; bi = bi->next) {
-        if (UseTS6 && ircd->ts6) {
-            ud = find_nickuid(nick);
-        }
-        if (!stricmp(nick, bi->nick)) {
-            return bi;
-        }
-        if (ud && UseTS6 && ircd->ts6) {
-            if (!stricmp(ud->nick, bi->nick)) {
-                return bi;
-            }
-        }
-    }
+		if (nick == bi->uid)
+			return bi;
+	}
 
-    return NULL;
+	return NULL;
 }
 
 /*************************************************************************/

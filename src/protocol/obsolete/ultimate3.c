@@ -739,7 +739,7 @@ void ultimate3_cmd_akill(const char *user, const char *host, const char *who, ti
              (long int) time(NULL), reason);
 }
 
-void ultimate3_cmd_svskill(const char *source, const char *user, const char *buf)
+void ultimate3_SendSVSKill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -1706,7 +1706,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(ultimate3_cmd_topic);
     pmodule_cmd_vhost_off(ultimate3_cmd_vhost_off);
     pmodule_cmd_akill(ultimate3_cmd_akill);
-    pmodule_cmd_svskill(ultimate3_cmd_svskill);
+    pmodule_SendSVSKill(ultimate3_cmd_svskill);
     pmodule_cmd_svsmode(ultimate3_cmd_svsmode);
     pmodule_cmd_372(ultimate3_cmd_372);
     pmodule_cmd_372_error(ultimate3_cmd_372_error);

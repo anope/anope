@@ -863,7 +863,7 @@ plexus_cmd_akill (const char *user, const char *host, const char *who, time_t wh
 }
 
 void
-plexus_cmd_svskill (const char *source, const char *user, const char *buf)
+plexus_SendSVSKill (const char *source, const char *user, const char *buf)
 {
   if (!buf)
     {
@@ -1740,7 +1740,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_topic (plexus_cmd_topic);
   pmodule_cmd_vhost_off (plexus_cmd_vhost_off);
   pmodule_cmd_akill (plexus_cmd_akill);
-  pmodule_cmd_svskill (plexus_cmd_svskill);
+  pmodule_SendSVSKill (plexus_cmd_svskill);
   pmodule_cmd_svsmode (plexus_cmd_svsmode);
   pmodule_cmd_372 (plexus_cmd_372);
   pmodule_cmd_372_error (plexus_cmd_372_error);

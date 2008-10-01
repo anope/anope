@@ -943,7 +943,7 @@ void cancel_user(User * u)
                                              "Services Enforcer", "+");
                         add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                     } else {
-                        anope_cmd_svskill(s_NickServ, u->nick,
+                        anope_SendSVSKill(s_NickServ, u->nick,
                                           "Killing to enforce nick");
                     }
                 }
@@ -954,7 +954,7 @@ void cancel_user(User * u)
                                          "Services Enforcer", "+");
                     add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                 } else {
-                    anope_cmd_svskill(s_NickServ, u->nick,
+                    anope_SendSVSKill(s_NickServ, u->nick,
                                       "Killing to enforce nick");
                 }
             }

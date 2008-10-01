@@ -738,7 +738,7 @@ void RatboxProto::cmd_akill(const char *user, const char *host, const char *who,
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
-void RatboxProto::cmd_svskill(const char *source, const char *user, const char *buf)
+void RatboxProto::SendSVSKill(const char *source, const char *user, const char *buf)
 {
 	if (!source || !user || !buf) return;
 	Uid *ud = find_uid(source), *ud2 = find_uid(user);

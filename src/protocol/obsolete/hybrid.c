@@ -745,7 +745,7 @@ void hybrid_cmd_akill(const char *user, const char *host, const char *who, time_
              (long int) (expires - (long) time(NULL)), user, host, reason);
 }
 
-void hybrid_cmd_svskill(const char *source, const char *user, const char *buf)
+void hybrid_SendSVSKill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -1456,7 +1456,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(hybrid_cmd_topic);
     pmodule_cmd_vhost_off(hybrid_cmd_vhost_off);
     pmodule_cmd_akill(hybrid_cmd_akill);
-    pmodule_cmd_svskill(hybrid_cmd_svskill);
+    pmodule_SendSVSKill(hybrid_cmd_svskill);
     pmodule_cmd_svsmode(hybrid_cmd_svsmode);
     pmodule_cmd_372(hybrid_cmd_372);
     pmodule_cmd_372_error(hybrid_cmd_372_error);

@@ -700,7 +700,7 @@ void rageircd_cmd_akill(const char *user, const char *host, const char *who, tim
              (long int) time(NULL), reason);
 }
 
-void rageircd_cmd_svskill(const char *source, const char *user, const char *buf)
+void rageircd_SendSVSKill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -1565,7 +1565,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(rageircd_cmd_topic);
     pmodule_cmd_vhost_off(rageircd_cmd_vhost_off);
     pmodule_cmd_akill(rageircd_cmd_akill);
-    pmodule_cmd_svskill(rageircd_cmd_svskill);
+    pmodule_SendSVSKill(rageircd_cmd_svskill);
     pmodule_cmd_svsmode(rageircd_cmd_svsmode);
     pmodule_cmd_372(rageircd_cmd_372);
     pmodule_cmd_372_error(rageircd_cmd_372_error);

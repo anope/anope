@@ -857,7 +857,7 @@ void viagra_cmd_akill(const char *user, const char *host, const char *who, time_
  *  parv[2] = nick stamp
  *  parv[3] = kill message
  */
-void viagra_cmd_svskill(const char *source, const char *user, const char *buf)
+void viagra_SendSVSKill(const char *source, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "SVSKILL %s :%s", user, buf);
@@ -1605,7 +1605,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(viagra_cmd_topic);
     pmodule_cmd_vhost_off(viagra_cmd_vhost_off);
     pmodule_cmd_akill(viagra_cmd_akill);
-    pmodule_cmd_svskill(viagra_cmd_svskill);
+    pmodule_SendSVSKill(viagra_cmd_svskill);
     pmodule_cmd_svsmode(viagra_cmd_svsmode);
     pmodule_cmd_372(viagra_cmd_372);
     pmodule_cmd_372_error(viagra_cmd_372_error);

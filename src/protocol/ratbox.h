@@ -50,7 +50,7 @@ class RatboxProto : public IRCDProto {
 		void cmd_remove_akill(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
-		void cmd_svskill(const char *, const char *, const char *);
+		void SendSVSKill(const char *, const char *, const char *);
 		void cmd_svsmode(User *, int, const char **);
 		void cmd_mode(const char *, const char *, const char *);
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);

@@ -744,7 +744,7 @@ void ptlink_cmd_akill(const char *user, const char *host, const char *who, time_
 }
 
 
-void ptlink_cmd_svskill(const char *source, const char *user, const char *buf)
+void ptlink_SendSVSKill(const char *source, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -1685,7 +1685,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(ptlink_cmd_topic);
     pmodule_cmd_vhost_off(ptlink_cmd_vhost_off);
     pmodule_cmd_akill(ptlink_cmd_akill);
-    pmodule_cmd_svskill(ptlink_cmd_svskill);
+    pmodule_SendSVSKill(ptlink_cmd_svskill);
     pmodule_cmd_svsmode(ptlink_cmd_svsmode);
     pmodule_cmd_372(ptlink_cmd_372);
     pmodule_cmd_372_error(ptlink_cmd_372_error);

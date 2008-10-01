@@ -835,7 +835,7 @@ void solidircd_cmd_akill(const char *user, const char *host, const char *who, ti
 /*
   Note: if the stamp is null 0, the below usage is correct of Bahamut
 */
-void solidircd_cmd_svskill(const char *source, const char *user, const char *buf)
+void solidircd_SendSVSKill(const char *source, const char *user, const char *buf)
 {
 
     if (!source || !user || !buf) {
@@ -1598,7 +1598,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_topic(solidircd_cmd_topic);
     pmodule_cmd_vhost_off(solidircd_cmd_vhost_off);
     pmodule_cmd_akill(solidircd_cmd_akill);
-    pmodule_cmd_svskill(solidircd_cmd_svskill);
+    pmodule_SendSVSKill(solidircd_cmd_svskill);
     pmodule_cmd_svsmode(solidircd_cmd_svsmode);
     pmodule_cmd_372(solidircd_cmd_372);
     pmodule_cmd_372_error(solidircd_cmd_372_error);

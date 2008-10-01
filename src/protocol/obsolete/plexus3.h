@@ -43,7 +43,7 @@ void plexus_set_umode(User * user, int ac, const char **av);
 void plexus_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
 void plexus_cmd_vhost_off(User * u);
 void plexus_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
-void plexus_cmd_svskill(const char *source, const char *user, const char *buf);
+void plexus_SendSVSKill(const char *source, const char *user, const char *buf);
 void plexus_cmd_svsmode(User * u, int ac, const char **av);
 void plexus_cmd_372(const char *source, const char *msg);
 void plexus_cmd_372_error(const char *source);

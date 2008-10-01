@@ -1068,7 +1068,7 @@ int check_sgline(const char *nick, const char *realname)
         if (match_wild_nocase(sx->mask, realname)) {
             anope_cmd_sgline(sx->mask, sx->reason);
             /* We kill nick since s_sgline can't */
-            anope_cmd_svskill(ServerName, nick, "G-Lined: %s", sx->reason);
+            anope_SendSVSKill(ServerName, nick, "G-Lined: %s", sx->reason);
             return 1;
         }
     }

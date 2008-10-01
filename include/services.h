@@ -1236,7 +1236,7 @@ class IRCDProto {
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void cmd_vhost_off(User *) { }
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void cmd_svskill(const char *, const char *, const char *) = 0;
+		virtual void SendSVSKill(const char *, const char *, const char *) = 0;
 		virtual void cmd_svsmode(User *, int, const char **) = 0;
 		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
 		virtual void cmd_mode(const char *, const char *, const char *) = 0;

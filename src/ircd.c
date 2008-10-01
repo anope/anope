@@ -68,7 +68,7 @@ void anope_cmd_akill(const char *user, const char *host, const char *who, time_t
 	ircdproto->cmd_akill(user, host, who, when, expires, reason);
 }
 
-void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ...)
+void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -77,7 +77,7 @@ void anope_cmd_svskill(const char *source, const char *user, const char *fmt, ..
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_svskill(source, user, buf);
+	ircdproto->SendSVSKill(source, user, buf);
 }
 
 void anope_cmd_svsmode(User *u, int ac, const char **av)

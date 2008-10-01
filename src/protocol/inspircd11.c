@@ -546,7 +546,7 @@ void InspIRCdProto::cmd_akill(const char *user, const char *host, const char *wh
 	send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
 }
 
-void InspIRCdProto::cmd_svskill(const char *source, const char *user, const char *buf)
+void InspIRCdProto::SendSVSKill(const char *source, const char *user, const char *buf)
 {
 	if (!buf || !source || !user) return;
 	send_cmd(source, "KILL %s :%s", user, buf);

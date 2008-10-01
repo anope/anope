@@ -16,25 +16,23 @@
 #include "language.h"
 #include "version.h"
 
-#if defined(USE_MODULES) && !defined(_WIN32)
-#include <dlfcn.h>
-/* Define these for systems without them */
-#ifndef RTLD_NOW
-#define RTLD_NOW 0
-#endif
-#ifndef RTLD_LAZY
-#define RTLD_LAZY RTLD_NOW
-#endif
-#ifndef RTLD_GLOBAL
-#define RTLD_GLOBAL 0
-#endif
-#ifndef RTLD_LOCAL
-#define RTLD_LOCAL 0
-#endif
-#endif
-
-#ifdef _WIN32
-const char *ano_moderr(void);
+#if !defined(_WIN32)
+	#include <dlfcn.h>
+	/* Define these for systems without them */
+	#ifndef RTLD_NOW
+		#define RTLD_NOW 0
+	#endif
+	#ifndef RTLD_LAZY
+		#define RTLD_LAZY RTLD_NOW
+	#endif
+	#ifndef RTLD_GLOBAL
+		#define RTLD_GLOBAL 0
+	#endif
+	#ifndef RTLD_LOCAL
+		#define RTLD_LOCAL 0
+	#endif
+#else
+	const char *ano_moderr(void);
 #endif
 
 /**
@@ -91,7 +89,6 @@ char *ModuleGetErrStr(int status)
  */
 void modules_init(void)
 {
-#ifdef USE_MODULES
     int idx;
 	int ret;
     Module *m;
@@ -115,7 +112,6 @@ void modules_init(void)
             mod_current_user = NULL;
         }
     }
-#endif
 }
 
 /**
@@ -219,7 +215,6 @@ int protocol_module_init(void)
  */
 void modules_delayed_init(void)
 {
-#ifdef USE_MODULES
     int idx;
 	int ret;
     Module *m;
@@ -243,7 +238,6 @@ void modules_delayed_init(void)
 				destroyModule(m);
         }
     }
-#endif
 }
 
 /**
@@ -258,7 +252,6 @@ void modules_delayed_init(void)
  */
 void modules_unload_all(bool fini, bool unload_proto)
 {
-#ifdef USE_MODULES
 	int idx;
 	ModuleHash *mh, *next;
         void (*func) (void);
@@ -293,7 +286,6 @@ void modules_unload_all(bool fini, bool unload_proto)
 	   	    mh = next;
 		}
 	}
-#endif
 }
 
 /**
@@ -510,7 +502,6 @@ int encryptionModuleLoaded()
  */
 int moduleCopyFile(char *name, char *output)
 {
-#ifdef USE_MODULES
     int ch;
     FILE *source, *target;
 	int srcfp;
@@ -558,7 +549,6 @@ int moduleCopyFile(char *name, char *output)
     if (fclose(target) != 0) {
         return MOD_ERR_FILE_IO;
     }
-#endif
     return MOD_ERR_OK;
 }
 
@@ -570,7 +560,6 @@ int moduleCopyFile(char *name, char *output)
  */
 int loadModule(Module * m, User * u)
 {
-#ifdef USE_MODULES
     char buf[4096];
     int len;
     const char *err;
@@ -687,10 +676,6 @@ int loadModule(Module * m, User * u)
     }
     addModule(m);
     return MOD_ERR_OK;
-
-#else
-    return MOD_ERR_NOLOAD;
-#endif
 }
 
 /**
@@ -701,7 +686,6 @@ int loadModule(Module * m, User * u)
  */
 int unloadModule(Module * m, User * u)
 {
-#ifdef USE_MODULES
     void (*func) (void);
 
     if (!m || !m->handle) {
@@ -749,9 +733,6 @@ int unloadModule(Module * m, User * u)
         delModule(m);
         return MOD_ERR_OK;
     }
-#else
-    return MOD_ERR_NOUNLOAD;
-#endif
 }
 
 /**
@@ -2081,7 +2062,6 @@ void moduleSetHelpHelp(void (*func) (User * u))
  **/
 void moduleDisplayHelp(int service, User * u)
 {
-#ifdef USE_MODULES
     int idx;
     ModuleHash *current = NULL;
 	Module *calling_module = mod_current_module;
@@ -2112,7 +2092,6 @@ void moduleDisplayHelp(int service, User * u)
 
 	mod_current_module = calling_module;
 	mod_current_module_name = calling_module_name;
-#endif
 }
 
 /**

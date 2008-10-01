@@ -4191,8 +4191,6 @@ fi
 
 
 
-DIS_MODULES="Modules: Yes"
-
 
 
 
@@ -4345,23 +4343,11 @@ if test $ac_cv_lib_dl_dlopen = yes; then
 
   ANOPELIBS="$ANOPELIBS -ldl"
 
-cat >>confdefs.h <<\_ACEOF
-#define USE_MODULES 1
-_ACEOF
-
-  USE_MODULES="yes"
-  DIS_MODULES="Modules: Yes"
-
 else
 
-{ echo "$as_me:$LINENO: WARNING: Dynamic linking is not enabled because dlopen was not found" >&5
-echo "$as_me: WARNING: Dynamic linking is not enabled because dlopen was not found" >&2;}
-
-cat >>confdefs.h <<\_ACEOF
-#define STATIC_LINKING "NO_MODULES"
-_ACEOF
-
-  DIS_MODULES="Modules: No"
+  { { echo "$as_me:$LINENO: error: \"dlopen() is required for Anope to be compiled and used. Sorry.\"" >&5
+echo "$as_me: error: \"dlopen() is required for Anope to be compiled and used. Sorry.\"" >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 
@@ -4507,11 +4493,6 @@ _ACEOF
 fi
 
 MODULEFLAGS=$ac_cv_pic
-
-
-cat >>confdefs.h <<\_ACEOF
-#define USE_MODULES 1
-_ACEOF
 
 
 { echo "$as_me:$LINENO: checking for short" >&5

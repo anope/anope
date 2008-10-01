@@ -147,21 +147,14 @@ AC_SUBST(LDFLAGS)
 
 AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
 
-DIS_MODULES="Modules: Yes"
-
 dnl module checking based on Unreal's module checking code
 AC_DEFUN(AC_ENABLE_DYN,
 [
 AC_CHECK_FUNC(dlopen,, AC_CHECK_LIB(dl,dlopen,[
   ANOPELIBS="$ANOPELIBS -ldl"
-  AC_DEFINE(USE_MODULES,1,"Modules are available")
-  USE_MODULES="yes"
-  DIS_MODULES="Modules: Yes"
 ],
 [
-AC_MSG_WARN(Dynamic linking is not enabled because dlopen was not found)
-AC_DEFINE(STATIC_LINKING,"NO_MODULES","modules not available")
-  DIS_MODULES="Modules: No"
+  AC_ERROR("dlopen() is required for Anope to be compiled and used. Sorry.")
 ]))
 
 hold_cflags=$CFLAGS
@@ -230,7 +223,6 @@ fi
 
 MODULEFLAGS=$ac_cv_pic
 AC_SUBST(MODULEFLAGS)
-AC_DEFINE(USE_MODULES,1,"Modules available")
 ])
 
 AC_ENABLE_DYN

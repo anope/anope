@@ -138,9 +138,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* "Modules available" */
-#undef USE_MODULES
-
 /* "Use Mysql" */
 #undef USE_MYSQL
 

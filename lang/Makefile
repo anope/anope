@@ -4,7 +4,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 'USE_MODULES=${USE_MODULES}'
+   	   'RUNGROUP=${RUNGROUP}'
 
 LANGOBJS = cat de en_us es fr gr hun it nl pl pt ru tr
 LANGSRCS = cat.l de.l en_us.l es.l fr.l gr.l hun.l it.l nl.l pl.l pt.l ru.l tr.l

@@ -191,7 +191,7 @@ int backup_ignoredb(int argc, char **argv) {
  **************************************************************************/
 
 void load_ignore_db(void) {
-	DBFile *dbptr = scalloc(1, sizeof(DBFile));
+	DBFile *dbptr = (DBFile *)scalloc(1, sizeof(DBFile));
 	char *key, *value, *mask = NULL;
 	int retval = 0;
 	time_t expiry_time;
@@ -232,8 +232,8 @@ void load_ignore_db(void) {
  
  				if (!ign) {
 					/* Create a fresh entry.. */
-					ign = scalloc(sizeof(*ign), 1);
-					ign->mask = sstrdup(mask);
+					ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
+					ign->mask = (char *)sstrdup(mask);
 					ign->time = expiry_time;
 					ign->prev = NULL;
 					ign->next = ignore;
@@ -284,7 +284,7 @@ void load_ignore_db(void) {
 
 
 void save_ignore_db(void) {
-	DBFile *dbptr = scalloc(1, sizeof(DBFile));
+	DBFile *dbptr = (DBFile *)scalloc(1, sizeof(DBFile));
 	time_t now;
 	IgnoreData *ign, *next;
 
@@ -345,8 +345,8 @@ void save_ignore_db(void) {
 
 
 int new_open_db_read(DBFile *dbptr, char **key, char **value) {
-	*key = malloc(MAXKEYLEN);
-	*value = malloc(MAXVALLEN);
+	*key = (char *)malloc(MAXKEYLEN);
+	*value = (char *)malloc(MAXVALLEN);
 
 	if (!(dbptr->fptr = fopen(dbptr->filename, "rb"))) {
 		if (debug) {

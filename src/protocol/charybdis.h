@@ -46,10 +46,9 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 
-class CharybdisProto : public IRCDProto {
+class CharybdisProto : public IRCDTS6Proto {
 	public:
 		void cmd_remove_akill(const char *, const char *);
-		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 		void cmd_vhost_off(User *);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void cmd_svskill(const char *, const char *, const char *);
@@ -58,9 +57,6 @@ class CharybdisProto : public IRCDProto {
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_kick(const char *, const char *, const char *, const char *);
 		void cmd_notice_ops(const char *, const char *, const char *);
-		void cmd_message(const char *, const char *, const char *);
-		void cmd_notice(const char *, const char *, const char *);
-		void cmd_privmsg(const char *, const char *, const char *);
 		void cmd_bot_chan_mode(const char *, const char *);
 		void cmd_quit(const char *, const char *);
 		void cmd_pong(const char *, const char *);

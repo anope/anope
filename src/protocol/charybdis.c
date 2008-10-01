@@ -434,29 +434,6 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
-
-
-void CharybdisProto::cmd_message(const char *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	if (NSDefFlags & NI_MSG) cmd_privmsg(source, dest, buf);
-	else cmd_notice(source, dest, buf);
-}
-
-void CharybdisProto::cmd_notice(const char *source, const char *dest, const char *msg)
-{
-	Uid *ud = find_uid(source);
-	User *u = finduser(dest);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, msg);
-}
-
-void CharybdisProto::cmd_privmsg(const char *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	Uid *ud = find_uid(source), *ud2 = find_uid(dest);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
-}
-
 void CharybdisProto::cmd_global(const char *source, const char *buf)
 {
 	if (!buf) return;
@@ -756,12 +733,6 @@ void CharybdisProto::cmd_remove_akill(const char *user, const char *host)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
-}
-
-void CharybdisProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-{
-	Uid *ud = find_uid(whosets);
-	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
 void CharybdisProto::cmd_vhost_off(User *u)

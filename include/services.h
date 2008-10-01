@@ -1222,15 +1222,18 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
-class IRCDProto;
 
+/*
+ * Forward declaration reqired, because the base IRCDProto class uses some crap from in here.
+ */
+class IRCDProto;
 #include "extern.h"
 
 class IRCDProto {
 	public:
 		virtual void cmd_svsnoop(const char *, int) { }
 		virtual void cmd_remove_akill(const char *, const char *) = 0;
-		virtual void cmd_topic(const char *, const char *, const char *, const char *, time_t) = 0;
+		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void cmd_vhost_off(User *) { }
 		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
 		virtual void cmd_svskill(const char *, const char *, const char *) = 0;
@@ -1240,17 +1243,18 @@ class IRCDProto {
 		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
 		virtual void cmd_kick(const char *, const char *, const char *, const char *) = 0;
 		virtual void cmd_notice_ops(const char *, const char *, const char *) = 0;
-		virtual void cmd_message(const char *source, const char *dest, const char *buf)
+		virtual void SendMessage(BotInfo *bi, const char *dest, const char *buf)
 		{
-			if (!buf || !dest) return;
-			if (NSDefFlags & NI_MSG) cmd_privmsg(source, dest, buf);
-			else cmd_notice(source, dest, buf);
+			if (NSDefFlags & NI_MSG)
+				cmd_privmsg(bi, dest, buf);
+			else
+				cmd_notice(bi, dest, buf);
 		}
-		virtual void cmd_notice(const char *source, const char *dest, const char *msg)
+		virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
 		{
 			send_cmd(source, "NOTICE %s :%s", dest, msg);
 		}
-		virtual void cmd_privmsg(const char *source, const char *dest, const char *buf)
+		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *buf)
 		{
 			if (!buf || !dest) return;
 			send_cmd(source, "PRIVMSG %s :%s", dest, buf);
@@ -1351,6 +1355,26 @@ class IRCDProto {
 			send_cmd(source, "%03d %s %s", numeric, dest, buf);
 		}
 };
+
+class IRCdProtoTS6 : public IRCdProto
+{
+	virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
+	{
+		User *u = finduser(dest);
+		send_cmd(UseTS6 ? bi->uid.c_str() : bi->nick, "NOTICE %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, msg);
+	}
+
+	virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *buf)
+	{
+		User *u = finduser(dest);
+		send_cmd(UseTS6 ? bi->uid.c_str() ? bi->nick) : source, "PRIVMSG %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, buf);
+	}
+
+	virtual void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	{
+		send_cmd(UseTS6 ? whosetsts->uid.c_str() : whosetsts->nick, "TOPIC %s :%s", chan, topic);
+	}
+}
 
 /*************************************************************************/
 

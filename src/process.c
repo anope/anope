@@ -372,9 +372,22 @@ void process()
         s = buf + strlen(buf);
     strscpy(cmd, buf, sizeof(cmd));
     ac = split_buf(s, &av, 1);
-    if (protocoldebug) {
-        protocol_debug(source, cmd, ac, av);
-    }
+
+	if (protocoldebug)
+	{
+		if (*source)
+			alog("debug: Source %s", source);
+		if (*cmd)
+			alog("debug: Token %s", cmd);
+		if (ac)
+		{
+			int i;
+			for (i = 0; i < ac; i++)
+				alog("debug: av[%d] = %s", i, av[i]);
+		}
+		else
+			alog("debug: av[0] = NULL");
+	}
 
     if (mod_current_buffer) {
         free(mod_current_buffer);

@@ -787,28 +787,6 @@ char *myStrSubString(const char *src, int start, int end)
 
 /*************************************************************************/
 
-void protocol_debug(char *source, char *cmd, int argc, const char **argv)
-{
-    int i;
-
-    if (protocoldebug) {
-        if (source)
-            alog("debug: Source %s", source);
-        if (cmd)
-            alog("debug: Token %s", cmd);
-        if (argc) {
-            for (i = 0; i < argc; i++) {
-                alog("debug: av[%d] = %s", i, argv[i]);
-            }
-        } else {
-            alog("debug: av[0] = NULL");
-        }
-    }
-    return;
-}
-
-/*************************************************************************/
-
 /**
  * Clean up the buffer for extra spaces
  * @param str to clean up

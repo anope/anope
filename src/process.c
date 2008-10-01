@@ -38,10 +38,12 @@ void add_ignore(const char *nick, time_t delta)
     char *mask, *user, *host;
     User *u;
     time_t now;
-    if (!nick)
+    
+if (!nick)
         return;
     now = time(NULL);
-    
+    
+
         /* If it s an existing user, we ignore the hostmask. */ 
         if ((u = finduser(nick))) {
         snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
@@ -63,7 +65,8 @@ void add_ignore(const char *nick, time_t delta)
         
             /* We only got a nick.. */ 
     } else {
-        snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
+        
+snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
         mask = sstrdup(tmp);
     }
     
@@ -109,15 +112,20 @@ IgnoreData *get_ignore(const char *nick)
     char *user, *host;
     time_t now;
     User *u;
-    if (!nick)
+    
+if (!nick)
         return NULL;
-    
+    
+
         /* User has disabled the IGNORE system */
         if (!allow_ignore)
         return NULL;
-    now = time(NULL);
-    u = finduser(nick);
-    
+    
+now = time(NULL);
+    
+u = finduser(nick);
+    
+
         /* If we find a real user, match his mask against the ignorelist. */
         if (u) {
         /* Opers are not ignored, even if a matching entry may be present. */
@@ -126,7 +134,8 @@ IgnoreData *get_ignore(const char *nick)
         for (ign = ignore; ign; ign = ign->next)
             if (match_usermask(ign->mask, u))
                 break;
-    } else {
+    
+} else {
         /* We didn't get a user.. generate a valid mask. */ 
             if ((host = strchr(nick, '@'))) {
             if ((user = strchr(nick, '!'))) {
@@ -141,8 +150,10 @@ IgnoreData *get_ignore(const char *nick)
             
                 /* We only got a nick.. */ 
         } else
-            snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
-        for (ign = ignore; ign; ign = ign->next)
+            
+snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
+        
+for (ign = ignore; ign; ign = ign->next)
             if (match_wild_nocase(ign->mask, tmp))
                 break;
     }
@@ -161,7 +172,8 @@ IgnoreData *get_ignore(const char *nick)
         free(ign);
         ign = NULL;
     }
-    if (ign && debug)
+    
+if (ign && debug)
         alog("debug: Found ignore entry (%s) for %s", ign->mask, nick);
     return ign;
 }
@@ -180,7 +192,8 @@ int delete_ignore(const char *nick)
     char tmp[BUFSIZE];
     char *user, *host;
     User *u;
-    if (!nick)
+    
+if (!nick)
         return 0;
     
         /* If it s an existing user, we ignore the hostmask. */ 
@@ -202,7 +215,8 @@ int delete_ignore(const char *nick)
         
             /* We only got a nick.. */ 
     } else
-        snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
+        
+snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 
     for (ign = ignore; ign; ign = ign->next)
         if (stricmp(ign->mask, tmp) == 0)
@@ -211,7 +225,8 @@ int delete_ignore(const char *nick)
         /* No matching ignore found. */ 
         if (!ign)
         return 0;
-    if (debug)
+    
+if (debug)
         alog("Deleting ignore entry %s", ign->mask);
     
         /* Delete the entry and all references to it. */ 
@@ -221,13 +236,18 @@ int delete_ignore(const char *nick)
         ignore = ign->next;
     if (ign->next)
         ign->next->prev = ign->prev;
-    free(ign->mask);
+    
+
+free(ign->mask);
     free(ign);
     ign = NULL;
-    return 1;
-}
+    
+return 1;
 
-
+}
+
+
+
 /*************************************************************************/ 
     
 /**
@@ -238,9 +258,11 @@ int clear_ignores()
 {
     IgnoreData *ign, *next;
     int i = 0;
-    if (!ignore)
+    
+if (!ignore)
         return 0;
-    for (ign = ignore; ign; ign = next) {
+    
+for (ign = ignore; ign; ign = next) {
         next = ign->next;
         if (debug)
             alog("Deleting ignore entry %s", ign->mask);
@@ -248,9 +270,11 @@ int clear_ignores()
         free(ign);
         i++;
     }
-    ignore = NULL;
+    
+ignore = NULL;
     return i;
-}
+
+}
 
 
 /*************************************************************************/

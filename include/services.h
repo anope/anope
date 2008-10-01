@@ -1066,7 +1066,6 @@ struct session_ {
  * functions, we then call the correct function for the anope_ commands.
  **/
 typedef struct ircd_proto_ {
-    void (*ircd_set_mod_current_buffer)(int ac, char **av);
     void (*ircd_cmd_372)(const char *source, const char *msg);
     void (*ircd_cmd_372_error)(const char *source);
     void (*ircd_cmd_375)(const char *source);

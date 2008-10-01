@@ -44,8 +44,6 @@ void pmodule_ircd_proto(IRCDProtoNew *proto)
  **/
 void initIrcdProto()
 {
-    ircdproto.ircd_set_mod_current_buffer = NULL;
-    ircdproto.ircd_set_umode = NULL;
     ircdproto.ircd_cmd_372 = NULL;
     ircdproto.ircd_cmd_372_error = NULL;
     ircdproto.ircd_cmd_375 = NULL;
@@ -68,18 +66,7 @@ void initIrcdProto()
     ircdproto.ircd_valid_chan = NULL;
 }
 
-/* Special function, returns 1 if executed, 0 if not */
-int anope_set_mod_current_buffer(int ac, char **av)
-{
-    if (ircdproto.ircd_set_mod_current_buffer) {
-        ircdproto.ircd_set_mod_current_buffer(ac, av);
-        return 1;
-    }
-
-    return 0;
-}
-
-void anope_set_umode(User * user, int ac, const char **av)
+void anope_set_umode(User *user, int ac, const char **av)
 {
     ircdproto.ircd_set_umode(user, ac, av);
 }

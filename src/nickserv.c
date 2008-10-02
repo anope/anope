@@ -1574,7 +1574,7 @@ void release(NickAlias * na, int from_timeout)
         del_ns_timeout(na, TO_RELEASE);
     if (ircd->svshold) {
         if (UseSVSHOLD) {
-            anope_SendSVSHOLDDel(na->nick);
+            ircdproto->SendSVSHoldDel(na->nick);
         } else {
             ircdproto->SendQuit(na->nick, NULL);
         }

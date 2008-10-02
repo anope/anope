@@ -1125,7 +1125,6 @@ E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGL
 E void anope_SendSZLine(const char *mask, const char *reason, const char *whom);				  /* SZLINE */
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
-E void anope_SendSVSHOLDDel(const char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_SendSVSJoin(const char *source, const char *nick,const char *chan, const char *param);          	  /* SVSJOIN */
 E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */

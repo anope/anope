@@ -466,7 +466,7 @@ void BahamutIRCdProto::SendSVSHold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void BahamutIRCdProto::SendSVSHOLDDel(const char *nick)
+void BahamutIRCdProto::SendSVSHoldDel(const char *nick)
 {
 	send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }

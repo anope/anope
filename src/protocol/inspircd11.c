@@ -1274,7 +1274,7 @@ void InspIRCdProto::SendSVSHold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void InspIRCdProto::SendSVSHOLDDel(const char *nick)
+void InspIRCdProto::SendSVSHoldDel(const char *nick)
 {
 	send_cmd(s_OperServ, "SVSHOLD %s", nick);
 }

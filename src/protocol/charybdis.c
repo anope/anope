@@ -1132,7 +1132,7 @@ void CharybdisProto::SendSVSHold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void CharybdisProto::SendSVSHOLDDel(const char *nick)
+void CharybdisProto::SendSVSHoldDel(const char *nick)
 {
 	send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
 }

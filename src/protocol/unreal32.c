@@ -1124,7 +1124,7 @@ void UnrealIRCdProto::SendSVSHold(const char *nick)
 }
 
 /* SVSHOLD - release */
-void UnrealIRCdProto::SendSVSHOLDDel(const char *nick)
+void UnrealIRCdProto::SendSVSHoldDel(const char *nick)
 {
 	send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
 }

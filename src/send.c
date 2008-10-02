@@ -104,7 +104,7 @@ void notice_server(char *source, Server * s, char *fmt, ...)
         if (NSDefFlags & NI_MSG) {
             anope_SendGlobalPrivmsg(source, s->name, buf);
         } else {
-            anope_SendGlobalNotice(source, s->name, buf);
+            ircdproto->SendGlobalNotice(source, s->name, buf);
         }
         va_end(args);
     }

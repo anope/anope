@@ -69,7 +69,7 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendForceNickChange(const char *, const char *, time_t);
 		void SendVhost(const char *, const char *, const char *);
 		void SendConnect();
-		void SendSVSHOLD(const char *);
+		void SendSVSHold(const char *);
 		void SendSVSHOLDDel(const char *);
 		void SendSGLineDel(const char *);
 		void SendSGLine(const char *, const char *);

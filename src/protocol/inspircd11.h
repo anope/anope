@@ -71,7 +71,7 @@ class InspIRCdProto : public IRCDProto {
 		void SendSquit(const char *, const char *);
 		void SendVhost(const char *, const char *, const char *);
 		void SendConnect();
-		void SendSVSHOLD(const char *);
+		void SendSVSHold(const char *);
 		void SendSVSHOLDDel(const char *);
 		void SendSZLineDel(const char *);
 		void SendSZLine(const char *, const char *, const char *);

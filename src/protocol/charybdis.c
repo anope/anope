@@ -1126,7 +1126,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void CharybdisProto::SendSVSHOLD(const char *nick)
+void CharybdisProto::SendSVSHold(const char *nick)
 {
 	send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
 }

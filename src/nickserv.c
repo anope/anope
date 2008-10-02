@@ -954,7 +954,7 @@ void cancel_user(User * u)
         if (na->status & NS_GUESTED) {
             if (ircd->svshold) {
                 if (UseSVSHOLD) {
-                    anope_SendSVSHOLD(na->nick);
+                    ircdproto->SendSVSHold(na->nick);
                 } else {
                     if (ircd->svsnick) {
                         ircdproto->SendGuestNick(u->nick, NSEnforcerUser,

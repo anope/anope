@@ -460,7 +460,7 @@ void BahamutIRCdProto::SendModeInternal(const char *source, const char *dest, co
 }
 
 /* SVSHOLD - set */
-void BahamutIRCdProto::SendSVSHOLD(const char *nick)
+void BahamutIRCdProto::SendSVSHold(const char *nick)
 {
 	send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
 }

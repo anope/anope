@@ -1268,7 +1268,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void InspIRCdProto::SendSVSHOLD(const char *nick)
+void InspIRCdProto::SendSVSHold(const char *nick)
 {
 	send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
 }

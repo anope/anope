@@ -1117,7 +1117,7 @@ int anope_event_whois(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void UnrealIRCdProto::SendSVSHOLD(const char *nick)
+void UnrealIRCdProto::SendSVSHold(const char *nick)
 {
 	send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
 		static_cast<long>(time(NULL)), "Being held for registered user");

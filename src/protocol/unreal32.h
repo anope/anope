@@ -102,7 +102,7 @@ class UnrealIRCdProto : public IRCDProto {
 		void SendChangeBotNick(const char *, const char *);
 		void SendVhost(const char *, const char *, const char *);
 		void SendConnect();
-		void SendSVSHOLD(const char *);
+		void SendSVSHold(const char *);
 		void SendSVSHOLDDel(const char *);
 		void SendSGLineDel(const char *);
 		void SendSZLineDel(const char *);

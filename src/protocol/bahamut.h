@@ -76,7 +76,7 @@ class BahamutIRCdProto : public IRCDProto {
 		void SendSQLineDel(const char *);
 		void SendSQLine(const char *, const char *);
 		void SendConnect();
-		void SendSVSHOLD(const char *);
+		void SendSVSHold(const char *);
 		void SendSVSHOLDDel(const char *);
 		void SendSGLineDel(const char *);
 		void SendSZLineDel(const char *);

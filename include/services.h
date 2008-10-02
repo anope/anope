@@ -1445,7 +1445,7 @@ class IRCDProto {
 		}
 		virtual void SendVhost(const char *, const char *, const char *) { }
 		virtual void SendConnect() = 0;
-		virtual void SendSVSHOLD(const char *) { }
+		virtual void SendSVSHold(const char *) { }
 		virtual void SendSVSHOLDDel(const char *) { }
 		virtual void SendSGLineDel(const char *) { }
 		virtual void SendSZLineDel(const char *) { }

@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendBotOp(const char *nick, const char *chan)
-{
-	ircdproto->SendBotOp(nick, chan);
-}
-
 void anope_SendQuit(const char *source, const char *fmt, ...)
 {
 	va_list args;

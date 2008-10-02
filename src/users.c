@@ -301,7 +301,7 @@ void User::SendMessage(const char *source, const std::string &msg)
 	}
 	else
 	{
-		anope_cmd_notice(source, this->nick, msg.c_str());
+		ircdproto->SendNotice(source, this->nick, msg.c_str());
 	}
 }
 

@@ -56,12 +56,6 @@ void anope_cmd_message(const char *source, const char *dest, const char *fmt, ..
 	ircdproto->SendMessage(bi, dest, buf);
 }
 
-void anope_cmd_notice(const char *source, const char *dest, const char *msg)
-{
-	BotInfo *bi = findbot(source);
-	ircdproto->SendNotice(bi, dest, msg);
-}
-
 void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;

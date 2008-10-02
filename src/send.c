@@ -153,9 +153,9 @@ void notice_list(char *source, char *dest, char **text)
          * with a single space.
          */
         if (**text) {
-            anope_cmd_notice(source, dest, *text);
+            ircdproto->SendNotice(source, dest, *text);
         } else {
-            anope_cmd_notice(source, dest, " ");
+            ircdproto->SendNotice(source, dest, " ");
         }
         text++;
     }
@@ -204,7 +204,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
                                && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg(source, dest->nick, *t ? t : " ");
         } else {
-            anope_cmd_notice(source, dest->nick, *t ? t : " ");
+            ircdproto->SendNotice(source, dest->nick, *t ? t : " ");
         }
     }
     va_end(args);
@@ -260,7 +260,7 @@ void notice_help(const char *source, User * dest, int message, ...)
                                && (dest->na->nc->flags & NI_MSG)))) {
             anope_cmd_privmsg(source, dest->nick, *outbuf ? outbuf : " ");
         } else {
-            anope_cmd_notice(source, dest->nick, *outbuf ? outbuf : " ");
+            ircdproto->SendNotice(source, dest->nick, *outbuf ? outbuf : " ");
         }
     }
     va_end(args);
@@ -289,7 +289,7 @@ void notice(char *source, const char *dest, const char *fmt, ...)
         if (NSDefFlags & NI_MSG) {
             anope_cmd_privmsg(source, dest, buf);
         } else {
-            anope_cmd_notice(source, dest, buf);
+            ircdproto->SendNotice(source, dest, buf);
         }
         va_end(args);
     }

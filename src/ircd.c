@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSVSNOOP(const char *server, int set)
-{
-	ircdproto->SendSVSNOOP(server, set);
-}
-
 void anope_SendAkillDel(const char *user, const char *host)
 {
 	ircdproto->SendAkillDel(user, host);

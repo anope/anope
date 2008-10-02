@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -79,7 +79,7 @@ int do_noop(User * u)
         char reason[NICKMAX + 32];
 
         /* Remove the O:lines */
-        anope_SendSVSNOOP(server, 1);
+        ircdproto->SendSVSNOOP(server, 1);
 
         snprintf(reason, sizeof(reason), "NOOP command used by %s",
                  u->nick);
@@ -97,7 +97,7 @@ int do_noop(User * u)
             }
         }
     } else if (!stricmp(cmd, "REVOKE")) {
-        anope_SendSVSNOOP(server, 0);
+        ircdproto->SendSVSNOOP(server, 0);
         notice_lang(s_OperServ, u, OPER_NOOP_REVOKE, server);
     } else {
         syntax_error(s_OperServ, u, "NOOP", OPER_NOOP_SYNTAX);

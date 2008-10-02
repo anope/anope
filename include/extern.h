@@ -1162,7 +1162,6 @@ E void anope_SendSVSKill(const char *source, const char *user, const char *fmt, 
 E void anope_SendSVSMode(User * u, int ac, const char **av);   	        	  		  /* SVSMODE */
 E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
 E void anope_SendForceNickChange(const char *nick,const char *newnick, time_t when);     	  		  /* SVSNICK */
-E void anope_SendSVSNOOP(const char *server, int set);			  	  		  /* SVSNOOP */
 E void anope_SendSVSO(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */

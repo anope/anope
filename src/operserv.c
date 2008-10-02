@@ -1323,7 +1323,7 @@ static void free_sqline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SQLINE from all the servers */
-    anope_SendSQLineDel(sx->mask);
+    ircdproto->SendSQLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);

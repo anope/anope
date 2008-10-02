@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSQLineDel(const char *user)
-{
-	ircdproto->SendSQLineDel(user);
-}
-
 void anope_SendInvite(const char *source, const char *chan, const char *nick)
 {
 	ircdproto->SendInvite(source, chan, nick);

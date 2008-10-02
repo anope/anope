@@ -1143,7 +1143,6 @@ E void anope_SendSVSO(const char *source,const char *nick, const char *flag);   
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_SendSGLineDel(const char *mask);				  	  		  /* UNSGLINE */
-E void anope_SendSQLineDel(const char *user);                               	  		  /* UNSQLINE */
 E void anope_SendSZLineDel(const char *mask);				  	  		  /* UNSZLINE */
 E void anope_SendEOB();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */

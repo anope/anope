@@ -104,7 +104,7 @@ int do_drop(User * u)
         }
 
         if (ircd->chansqline && (ci->flags & CI_VERBOTEN)) {
-            anope_SendSQLineDel(ci->name);
+            ircdproto->SendSQLineDel(ci->name);
         }
 
         alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",

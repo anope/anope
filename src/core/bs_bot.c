@@ -267,7 +267,7 @@ int do_bot(User * u)
                 /* The new nick is really different, so we remove the Q line for
                    the old nick. */
                 if (ircd->sqline) {
-                    anope_SendSQLineDel(bi->nick);
+                    ircdproto->SendSQLineDel(bi->nick);
                 }
 
                 /* We check whether user with this nick is online, and kill it if so */
@@ -324,7 +324,7 @@ int do_bot(User * u)
                            "Quit: Help! I'm being deleted by %s!",
                            u->nick);
             if (ircd->sqline) {
-                anope_SendSQLineDel(bi->nick);
+                ircdproto->SendSQLineDel(bi->nick);
             }
             delete bi;
 

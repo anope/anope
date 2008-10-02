@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -120,7 +120,7 @@ int do_drop(User * u)
             notice_lang(s_NickServ, u, READ_ONLY_MODE);
 
         if (ircd->sqline && (na->status & NS_VERBOTEN)) {
-            anope_SendSQLineDel(na->nick);
+            ircdproto->SendSQLineDel(na->nick);
         }
 
         alog("%s: %s!%s@%s dropped nickname %s (group %s) (e-mail: %s)",

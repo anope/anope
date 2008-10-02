@@ -294,7 +294,7 @@ int do_bot(User * u)
                else we must make it quit and rejoin. We must not forget to set
 			   the Q:Line either (it's otherwise set in SendClientIntroduction) */
             if (!user) {
-                anope_SendChangeBotNick(oldnick, bi->nick);
+                ircdproto->SendChangeBotNick(oldnick, bi->nick);
 				ircdproto->SendSQLine(bi->nick, "Reserved for services");
             } else {
                 ircdproto->SendQuit(oldnick, "Quit: Be right back");

@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendChangeBotNick(const char *oldnick, const char *newnick)
-{
-	ircdproto->SendChangeBotNick(oldnick, newnick);
-}
-
 void anope_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
 	ircdproto->SendForceNickChange(source, guest, when);

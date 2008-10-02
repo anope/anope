@@ -87,7 +87,7 @@ int do_os_kick(User * u)
     }
     anope_SendKick(s_OperServ, chan, nick, "%s (%s)", u->nick, s);
     if (WallOSKick)
-        anope_cmd_global(s_OperServ, "%s used KICK on %s/%s", u->nick,
+        anope_SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick,
                          nick, chan);
     argv[0] = sstrdup(chan);
     argv[1] = sstrdup(nick);

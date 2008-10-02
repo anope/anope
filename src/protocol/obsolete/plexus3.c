@@ -195,7 +195,7 @@ plexus_set_umode (User * user, int ac, const char **av)
 	      opcnt++;
 
 	      if (WallOper)
-		anope_cmd_global (s_OperServ,
+		anope_SendGlobops (s_OperServ,
 				  "\2%s\2 is now an IRC operator.",
 				  user->nick);
 	      display_news (user, NEWS_OPER);
@@ -530,7 +530,7 @@ plexus_SendGlobalPrivmsg (const char *source, const char *dest, const char *msg)
 
 
 void
-plexus_cmd_global (const char *source, const char *buf)
+plexus_SendGlobops (const char *source, const char *buf)
 {
   if (!buf)
     {
@@ -542,7 +542,7 @@ plexus_cmd_global (const char *source, const char *buf)
 
 /* GLOBOPS - to handle old WALLOPS */
 void
-plexus_cmd_global_legacy (const char *source, const char *fmt)
+plexus_SendGlobops_legacy (const char *source, const char *fmt)
 {
   send_cmd (source ? source : ServerName, "OPERWALL :%s", fmt);
 }
@@ -833,13 +833,13 @@ plexus_cmd_vhost_on (const char *nick, const char *vIdent, const char *vhost)
 }
 
 void
-plexus_cmd_unsqline (const char *user)
+plexus_SendSQLineDel (const char *user)
 {
   send_cmd (s_OperServ, "UNRESV * %s", user);
 }
 
 void
-plexus_cmd_join (const char *user, const char *channel, time_t chantime)
+plexus_SendJoin (const char *user, const char *channel, time_t chantime)
 {
   send_cmd (ServerName, "SJOIN %ld %s + :%s", (long int) chantime, channel,
 	    user);
@@ -981,7 +981,7 @@ plexus_SendClientIntroduction (const char *nick, const char *user, const char *h
 }
 
 void
-plexus_cmd_part (const char *nick, const char *chan, const char *buf)
+plexus_SendPart (const char *nick, const char *chan, const char *buf)
 {
   if (buf)
     {
@@ -998,7 +998,7 @@ anope_event_ping (const char *source, int ac, const char **av)
 {
   if (ac < 1)
     return MOD_CONT;
-  plexus_cmd_pong (ac > 1 ? av[1] : ServerName, av[0]);
+  plexus_SendPong (ac > 1 ? av[1] : ServerName, av[0]);
   return MOD_CONT;
 }
 
@@ -1377,14 +1377,14 @@ plexus_SendQuit (const char *source, const char *buf)
 
 /* PONG */
 void
-plexus_cmd_pong (const char *servname, const char *who)
+plexus_SendPong (const char *servname, const char *who)
 {
   send_cmd (servname, "PONG %s", who);
 }
 
 /* INVITE */
 void
-plexus_cmd_invite (const char *source, const char *chan, const char *nick)
+plexus_SendInvite (const char *source, const char *chan, const char *nick)
 {
   if (!source || !chan || !nick)
     {
@@ -1761,11 +1761,11 @@ moduleAddAnopeCmds ()
   pmodule_SendBotOp (plexus_cmd_bot_chan_mode);
   pmodule_cmd_351 (plexus_cmd_351);
   pmodule_SendQuit (plexus_cmd_quit);
-  pmodule_cmd_pong (plexus_cmd_pong);
-  pmodule_cmd_join (plexus_cmd_join);
-  pmodule_cmd_unsqline (plexus_cmd_unsqline);
-  pmodule_cmd_invite (plexus_cmd_invite);
-  pmodule_cmd_part (plexus_cmd_part);
+  pmodule_SendPong (plexus_cmd_pong);
+  pmodule_SendJoin (plexus_cmd_join);
+  pmodule_SendSQLineDel (plexus_cmd_unsqline);
+  pmodule_SendInvite (plexus_cmd_invite);
+  pmodule_SendPart (plexus_cmd_part);
   pmodule_cmd_391 (plexus_cmd_391);
   pmodule_cmd_250 (plexus_cmd_250);
   pmodule_cmd_307 (plexus_cmd_307);
@@ -1778,8 +1778,8 @@ moduleAddAnopeCmds ()
   pmodule_cmd_242 (plexus_cmd_242);
   pmodule_cmd_243 (plexus_cmd_243);
   pmodule_cmd_211 (plexus_cmd_211);
-  pmodule_cmd_global (plexus_cmd_global);
-  pmodule_cmd_global_legacy (plexus_cmd_global_legacy);
+  pmodule_SendGlobops (plexus_cmd_global);
+  pmodule_SendGlobops_legacy (plexus_cmd_global_legacy);
   pmodule_cmd_sqline (plexus_cmd_sqline);
   pmodule_cmd_squit (plexus_cmd_squit);
   pmodule_cmd_svso (plexus_cmd_svso);

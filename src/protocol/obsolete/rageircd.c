@@ -643,7 +643,7 @@ void RageIRCdProto::SendAkillDel(const char *user, const char *host)
 
 
 /* PART */
-void rageircd_cmd_part(const char *nick, const char *chan, const char *buf)
+void rageircd_SendPart(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -683,12 +683,12 @@ void rageircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vho
     rageircd_cmd_chghost(nick, vhost);
 }
 
-void rageircd_cmd_unsqline(const char *user)
+void rageircd_SendSQLineDel(const char *user)
 {
     send_cmd(NULL, "UNSQLINE %s", user);
 }
 
-void rageircd_cmd_join(const char *user, const char *channel, time_t chantime)
+void rageircd_SendJoin(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
@@ -726,7 +726,7 @@ void rageircd_cmd_squit(const char *servname, const char *message)
 }
 
 /* PONG */
-void rageircd_cmd_pong(const char *servname, const char *who)
+void rageircd_SendPong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
@@ -826,7 +826,7 @@ void rageircd_set_umode(User * user, int ac, const char **av)
                 opcnt++;
 
                 if (WallOper)
-                    anope_cmd_global(s_OperServ,
+                    anope_SendGlobops(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
                 display_news(user, NEWS_OPER);
@@ -852,7 +852,7 @@ void rageircd_set_umode(User * user, int ac, const char **av)
 }
 
 /* GLOBOPS */
-void rageircd_cmd_global(const char *source, const char *buf)
+void rageircd_SendGlobops(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -926,7 +926,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    rageircd_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    rageircd_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -987,7 +987,7 @@ void rageircd_cmd_376(const char *source)
 }
 
 /* INVITE */
-void rageircd_cmd_invite(const char *source, const char *chan, const char *nick)
+void rageircd_SendInvite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1515,7 +1515,7 @@ void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void rageircd_cmd_global_legacy(const char *source, const char *fmt)
+void rageircd_SendGlobops_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1586,11 +1586,11 @@ void moduleAddAnopeCmds()
     pmodule_SendBotOp(rageircd_cmd_bot_chan_mode);
     pmodule_cmd_351(rageircd_cmd_351);
     pmodule_SendQuit(rageircd_cmd_quit);
-    pmodule_cmd_pong(rageircd_cmd_pong);
-    pmodule_cmd_join(rageircd_cmd_join);
-    pmodule_cmd_unsqline(rageircd_cmd_unsqline);
-    pmodule_cmd_invite(rageircd_cmd_invite);
-    pmodule_cmd_part(rageircd_cmd_part);
+    pmodule_SendPong(rageircd_cmd_pong);
+    pmodule_SendJoin(rageircd_cmd_join);
+    pmodule_SendSQLineDel(rageircd_cmd_unsqline);
+    pmodule_SendInvite(rageircd_cmd_invite);
+    pmodule_SendPart(rageircd_cmd_part);
     pmodule_cmd_391(rageircd_cmd_391);
     pmodule_cmd_250(rageircd_cmd_250);
     pmodule_cmd_307(rageircd_cmd_307);
@@ -1603,8 +1603,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(rageircd_cmd_242);
     pmodule_cmd_243(rageircd_cmd_243);
     pmodule_cmd_211(rageircd_cmd_211);
-    pmodule_cmd_global(rageircd_cmd_global);
-    pmodule_cmd_global_legacy(rageircd_cmd_global_legacy);
+    pmodule_SendGlobops(rageircd_cmd_global);
+    pmodule_SendGlobops_legacy(rageircd_cmd_global_legacy);
     pmodule_cmd_sqline(rageircd_cmd_sqline);
     pmodule_cmd_squit(rageircd_cmd_squit);
     pmodule_cmd_svso(rageircd_cmd_svso);

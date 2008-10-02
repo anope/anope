@@ -421,7 +421,7 @@ void InspIRCdProto::set_umode(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -529,7 +529,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
     }
     send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
     } else {
-	anope_cmd_global(s_OperServ, "CHGHOST not loaded!");
+	anope_SendGlobops(s_OperServ, "CHGHOST not loaded!");
     }
 }
 
@@ -759,13 +759,13 @@ void InspIRCdProto::cmd_server(const char *servname, int hop, const char *descri
 }
 
 /* JOIN */
-void InspIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
+void InspIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	send_cmd(user, "JOIN %s", channel);
 }
 
 /* UNSQLINE */
-void InspIRCdProto::cmd_unsqline(const char *user)
+void InspIRCdProto::SendSQLineDel(const char *user)
 {
 	if (!user) return;
 	send_cmd(s_OperServ, "QLINE %s", user);
@@ -780,7 +780,7 @@ void inspircd_cmd_chgident(const char *nick, const char *vIdent)
     	}
     	send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
     } else {
-		anope_cmd_global(s_OperServ, "CHGIDENT not loaded!");
+		anope_SendGlobops(s_OperServ, "CHGIDENT not loaded!");
     }
 }
 
@@ -825,7 +825,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
     if (ac < 1)
         return MOD_CONT;
     /* ((ac > 1) ? av[1] : ServerName) */
-    ircd_proto.cmd_pong(ServerName, av[0]);
+    ircd_proto.SendPong(ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1212,13 +1212,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
             return MOD_STOP;
         }
         if (!has_svsholdmod) {
-            anope_cmd_global(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+            anope_SendGlobops(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
         }
         if (!has_chghostmod) {
-            anope_cmd_global(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+            anope_SendGlobops(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
         }
         if (!has_chgidentmod) {
-            anope_cmd_global(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+            anope_SendGlobops(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
         }
         if (has_messagefloodmod) {
             cbmi = myCbmodeinfos;

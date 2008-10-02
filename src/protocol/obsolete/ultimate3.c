@@ -204,7 +204,7 @@ void ultimate3_set_umode(User * user, int ac, const char **av)
             if (add) {
                 opcnt++;
                 if (WallOper) {
-                    anope_cmd_global(s_OperServ,
+                    anope_SendGlobops(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
                 }
@@ -727,7 +727,7 @@ void ultimate3_cmd_vhost_on(const char *nick, const char *vIdent, const char *vh
     send_cmd(ServerName, "SETHOST %s %s", nick, vhost);
 }
 
-void ultimate3_cmd_join(const char *user, const char *channel, time_t chantime)
+void ultimate3_SendJoin(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
@@ -772,7 +772,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ultimate3_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ultimate3_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1196,13 +1196,13 @@ void ultimate3_cmd_server(const char *servname, int hop, const char *descript)
 }
 
 /* PONG */
-void ultimate3_cmd_pong(const char *servname, const char *who)
+void ultimate3_SendPong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
 
 /* UNSQLINE */
-void ultimate3_cmd_unsqline(const char *user)
+void ultimate3_SendSQLineDel(const char *user)
 {
     if (!user) {
         return;
@@ -1229,7 +1229,7 @@ void ultimate3_cmd_chgident(const char *nick, const char *vIdent)
 }
 
 /* INVITE */
-void ultimate3_cmd_invite(const char *source, const char *chan, const char *nick)
+void ultimate3_SendInvite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1239,7 +1239,7 @@ void ultimate3_cmd_invite(const char *source, const char *chan, const char *nick
 }
 
 /* PART */
-void ultimate3_cmd_part(const char *nick, const char *chan, const char *buf)
+void ultimate3_SendPart(const char *nick, const char *chan, const char *buf)
 {
 
     if (!nick || !chan) {
@@ -1377,7 +1377,7 @@ void ultimate3_cmd_211(const char *buf)
 }
 
 /* GLOBOPS */
-void ultimate3_cmd_global(const char *source, const char *buf)
+void ultimate3_SendGlobops(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1656,7 +1656,7 @@ void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void ultimate3_cmd_global_legacy(const char *source, const char *fmt)
+void ultimate3_SendGlobops_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1727,11 +1727,11 @@ void moduleAddAnopeCmds()
     pmodule_SendBotOp(ultimate3_cmd_bot_chan_mode);
     pmodule_cmd_351(ultimate3_cmd_351);
     pmodule_SendQuit(ultimate3_cmd_quit);
-    pmodule_cmd_pong(ultimate3_cmd_pong);
-    pmodule_cmd_join(ultimate3_cmd_join);
-    pmodule_cmd_unsqline(ultimate3_cmd_unsqline);
-    pmodule_cmd_invite(ultimate3_cmd_invite);
-    pmodule_cmd_part(ultimate3_cmd_part);
+    pmodule_SendPong(ultimate3_cmd_pong);
+    pmodule_SendJoin(ultimate3_cmd_join);
+    pmodule_SendSQLineDel(ultimate3_cmd_unsqline);
+    pmodule_SendInvite(ultimate3_cmd_invite);
+    pmodule_SendPart(ultimate3_cmd_part);
     pmodule_cmd_391(ultimate3_cmd_391);
     pmodule_cmd_250(ultimate3_cmd_250);
     pmodule_cmd_307(ultimate3_cmd_307);
@@ -1744,8 +1744,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ultimate3_cmd_242);
     pmodule_cmd_243(ultimate3_cmd_243);
     pmodule_cmd_211(ultimate3_cmd_211);
-    pmodule_cmd_global(ultimate3_cmd_global);
-    pmodule_cmd_global_legacy(ultimate3_cmd_global_legacy);
+    pmodule_SendGlobops(ultimate3_cmd_global);
+    pmodule_SendGlobops_legacy(ultimate3_cmd_global_legacy);
     pmodule_cmd_sqline(ultimate3_cmd_sqline);
     pmodule_cmd_squit(ultimate3_cmd_squit);
     pmodule_cmd_svso(ultimate3_cmd_svso);

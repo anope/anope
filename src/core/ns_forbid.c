@@ -119,7 +119,7 @@ int do_forbid(User * u)
         }
 
         if (WallForbid)
-            anope_cmd_global(s_NickServ, "\2%s\2 used FORBID on \2%s\2",
+            anope_SendGlobops(s_NickServ, "\2%s\2 used FORBID on \2%s\2",
                              u->nick, nick);
 
         alog("%s: %s set FORBID for nick %s", s_NickServ, u->nick, nick);

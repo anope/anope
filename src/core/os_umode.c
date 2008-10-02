@@ -109,7 +109,7 @@ int do_operumodes(User * u)
         notice_lang(s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
 
         if (WallOSMode)
-            anope_cmd_global(s_OperServ, "\2%s\2 used UMODE on %s",
+            anope_SendGlobops(s_OperServ, "\2%s\2 used UMODE on %s",
                              u->nick, nick);
     }
     return MOD_CONT;

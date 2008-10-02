@@ -104,7 +104,7 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
 
     next = (HostCore *)malloc(sizeof(HostCore));
     if (next == NULL) {
-        anope_cmd_global(s_HostServ,
+        anope_SendGlobops(s_HostServ,
                          "Unable to allocate memory to create the vHost LL, problems i sense..");
     } else {
         next->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
@@ -114,7 +114,7 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
             next->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((next->nick == NULL) || (next->vHost == NULL)
             || (next->creator == NULL)) {
-            anope_cmd_global(s_HostServ,
+            anope_SendGlobops(s_HostServ,
                              "Unable to allocate memory to create the vHost LL, problems i sense..");
             return NULL;
         }
@@ -123,7 +123,7 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
         strcpy(next->creator, creator);
         if (vIdent) {
             if ((next->vIdent == NULL)) {
-                anope_cmd_global(s_HostServ,
+                anope_SendGlobops(s_HostServ,
                                  "Unable to allocate memory to create the vHost LL, problems i sense..");
                 return NULL;
             }
@@ -192,7 +192,7 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
 
     newCore = (HostCore *)malloc(sizeof(HostCore));
     if (newCore == NULL) {
-        anope_cmd_global(s_HostServ,
+        anope_SendGlobops(s_HostServ,
                          "Unable to allocate memory to insert into the vHost LL, problems i sense..");
         return NULL;
     } else {
@@ -203,7 +203,7 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
             newCore->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
         if ((newCore->nick == NULL) || (newCore->vHost == NULL)
             || (newCore->creator == NULL)) {
-            anope_cmd_global(s_HostServ,
+            anope_SendGlobops(s_HostServ,
                              "Unable to allocate memory to create the vHost LL, problems i sense..");
             return NULL;
         }
@@ -212,7 +212,7 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
         strcpy(newCore->creator, creator);
         if (vIdent) {
             if ((newCore->vIdent == NULL)) {
-                anope_cmd_global(s_HostServ,
+                anope_SendGlobops(s_HostServ,
                                  "Unable to allocate memory to create the vHost LL, problems i sense..");
                 return NULL;
             }
@@ -463,7 +463,7 @@ void load_hs_dbase_v3(dbFILE * f)
 	restore_db(f);						\
 	log_perror("Write error on %s", HostDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_cmd_global(NULL, "Write error on %s: %s", HostDBName,	\
+	    anope_SendGlobops(NULL, "Write error on %s: %s", HostDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\

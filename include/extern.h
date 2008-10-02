@@ -1123,9 +1123,9 @@ E void anope_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhos
 E void anope_SendVhostDel(User *u);
 E void anope_cmd_connect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
-E void anope_cmd_global(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
-E void anope_cmd_invite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */
-E void anope_cmd_join(const char *user, const char *channel, time_t chantime);   	  		  /* JOIN */
+E void anope_SendGlobops(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
+E void anope_SendInvite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */
+E void anope_SendJoin(const char *user, const char *channel, time_t chantime);   	  		  /* JOIN */
 E void anope_SendKick(const char *source, const char *chan, const char *user, const char *fmt, ...);		  /* KICK */
 E void anope_SendMode(const char *source, const char *dest, const char *fmt, ...);   	  		  /* MODE */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
@@ -1139,9 +1139,9 @@ E void anope_cmd_message(const char *source, const char *dest, const char *fmt, 
 E void anope_SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
 E void anope_cmd_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
 E void anope_SendGlobalNotice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
-E void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
+E void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
-E void anope_cmd_pong(const char *servname, const char *who);                    	  		  /* PONG */
+E void anope_SendPong(const char *servname, const char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
@@ -1168,7 +1168,7 @@ E void anope_cmd_svspart(const char *source, const char *nick,const char *chan);
 E void anope_cmd_swhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */
 E void anope_cmd_unsgline(const char *mask);				  	  		  /* UNSGLINE */
-E void anope_cmd_unsqline(const char *user);                               	  		  /* UNSQLINE */
+E void anope_SendSQLineDel(const char *user);                               	  		  /* UNSQLINE */
 E void anope_cmd_unszline(const char *mask);				  	  		  /* UNSZLINE */
 E void anope_cmd_eob();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */

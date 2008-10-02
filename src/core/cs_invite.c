@@ -84,7 +84,7 @@ int do_invite(User * u)
     } else if (!u || !check_access(u, ci, CA_INVITE)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        anope_cmd_invite(whosends(ci), chan, u->nick);
+        anope_SendInvite(whosends(ci), chan, u->nick);
     }
     return MOD_CONT;
 }

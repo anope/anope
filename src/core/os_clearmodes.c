@@ -99,7 +99,7 @@ int do_clearmodes(User * u)
         }
 
         if (WallOSClearmodes) {
-            anope_cmd_global(s_OperServ, "%s used CLEARMODES%s on %s",
+            anope_SendGlobops(s_OperServ, "%s used CLEARMODES%s on %s",
                              u->nick, all ? " ALL" : "", chan);
         }
         if (all) {

@@ -95,8 +95,8 @@ class UnrealIRCdProto : public IRCDProto {
 		void SendKick(const char *, const char *, const char *, const char *);
 		void SendNoticeChanops(const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
-		void cmd_join(const char *, const char *, time_t);
-		void cmd_unsqline(const char *);
+		void SendJoin(const char *, const char *, time_t);
+		void SendSQLineDel(const char *);
 		void cmd_sqline(const char *, const char *);
 		void cmd_svso(const char *, const char *, const char *);
 		void cmd_chg_nick(const char *, const char *);

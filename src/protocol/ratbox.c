@@ -166,7 +166,7 @@ void RatboxProto::set_umode(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -446,7 +446,7 @@ void RatboxProto::cmd_privmsg(const char *source, const char *dest, const char *
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
 }
 
-void RatboxProto::cmd_global(const char *source, const char *buf)
+void RatboxProto::SendGlobops(const char *source, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
@@ -711,13 +711,13 @@ void RatboxProto::cmd_topic(const char *whosets, const char *chan, const char *w
 	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
-void RatboxProto::cmd_unsqline(const char *user)
+void RatboxProto::SendSQLineDel(const char *user)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
-void RatboxProto::cmd_join(const char *user, const char *channel, time_t chantime)
+void RatboxProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	Uid *ud = find_uid(user);
 	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
@@ -834,7 +834,7 @@ void RatboxProto::SendClientIntroduction(const char *nick, const char *user, con
 	cmd_sqline(nick, "Reserved for services");
 }
 
-void RatboxProto::cmd_part(const char *nick, const char *chan, const char *buf)
+void RatboxProto::SendPart(const char *nick, const char *chan, const char *buf)
 {
 	Uid *ud = find_uid(nick);
 	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
@@ -845,7 +845,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1057,14 +1057,14 @@ void RatboxProto::SendQuit(const char *source, const char *buf)
 }
 
 /* PONG */
-void RatboxProto::cmd_pong(const char *servname, const char *who)
+void RatboxProto::SendPong(const char *servname, const char *who)
 {
 	if (UseTS6) send_cmd(TS6SID, "PONG %s", who);
 	else send_cmd(servname, "PONG %s", who);
 }
 
 /* INVITE */
-void RatboxProto::cmd_invite(const char *source, const char *chan, const char *nick)
+void RatboxProto::SendInvite(const char *source, const char *chan, const char *nick)
 {
 	if (!source || !chan || !nick) return;
 	Uid *ud = find_uid(source);

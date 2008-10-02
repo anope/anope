@@ -191,7 +191,7 @@ void viagra_set_umode(User * user, int ac, const char **av)
             if (add) {
                 opcnt++;
                 if (WallOper) {
-                    anope_cmd_global(s_OperServ,
+                    anope_SendGlobops(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
                 }
@@ -787,7 +787,7 @@ void ViagraIRCdProto::SendAkillDel(const char *user, const char *host)
 }
 
 /* PART */
-void viagra_cmd_part(const char *nick, const char *chan, const char *buf)
+void viagra_SendPart(const char *nick, const char *chan, const char *buf)
 {
     if (!nick || !chan) {
         return;
@@ -822,12 +822,12 @@ void viagra_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost
     send_cmd(NULL, "SVSCHGHOST %s %s", nick, vhost);
 }
 
-void viagra_cmd_unsqline(const char *user)
+void viagra_SendSQLineDel(const char *user)
 {
     send_cmd(NULL, "UNSQLINE %s", user);
 }
 
-void viagra_cmd_join(const char *user, const char *channel, time_t chantime)
+void viagra_SendJoin(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
@@ -905,7 +905,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    viagra_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    viagra_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -922,7 +922,7 @@ void viagra_cmd_squit(const char *servname, const char *message)
 }
 
 /* PONG */
-void viagra_cmd_pong(const char *servname, const char *who)
+void viagra_SendPong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
@@ -1184,7 +1184,7 @@ void viagra_SendGlobalPrivmsg(const char *source, const char *dest, const char *
 }
 
 /* GLOBOPS */
-void viagra_cmd_global(const char *source, const char *buf)
+void viagra_SendGlobops(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1373,7 +1373,7 @@ void viagra_cmd_376(const char *source)
 }
 
 /* INVITE */
-void viagra_cmd_invite(const char *source, const char *chan, const char *nick)
+void viagra_SendInvite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1555,7 +1555,7 @@ void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void viagra_cmd_global_legacy(const char *source, const char *fmt)
+void viagra_SendGlobops_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1626,11 +1626,11 @@ void moduleAddAnopeCmds()
     pmodule_SendBotOp(viagra_cmd_bot_chan_mode);
     pmodule_cmd_351(viagra_cmd_351);
     pmodule_SendQuit(viagra_cmd_quit);
-    pmodule_cmd_pong(viagra_cmd_pong);
-    pmodule_cmd_join(viagra_cmd_join);
-    pmodule_cmd_unsqline(viagra_cmd_unsqline);
-    pmodule_cmd_invite(viagra_cmd_invite);
-    pmodule_cmd_part(viagra_cmd_part);
+    pmodule_SendPong(viagra_cmd_pong);
+    pmodule_SendJoin(viagra_cmd_join);
+    pmodule_SendSQLineDel(viagra_cmd_unsqline);
+    pmodule_SendInvite(viagra_cmd_invite);
+    pmodule_SendPart(viagra_cmd_part);
     pmodule_cmd_391(viagra_cmd_391);
     pmodule_cmd_250(viagra_cmd_250);
     pmodule_cmd_307(viagra_cmd_307);
@@ -1643,8 +1643,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(viagra_cmd_242);
     pmodule_cmd_243(viagra_cmd_243);
     pmodule_cmd_211(viagra_cmd_211);
-    pmodule_cmd_global(viagra_cmd_global);
-    pmodule_cmd_global_legacy(viagra_cmd_global_legacy);
+    pmodule_SendGlobops(viagra_cmd_global);
+    pmodule_SendGlobops_legacy(viagra_cmd_global_legacy);
     pmodule_cmd_sqline(viagra_cmd_sqline);
     pmodule_cmd_squit(viagra_cmd_squit);
     pmodule_cmd_svso(viagra_cmd_svso);

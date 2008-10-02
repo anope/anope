@@ -202,27 +202,27 @@ void anope_SendQuit(const char *source, const char *fmt, ...)
 	ircdproto->SendQuit(source, buf);
 }
 
-void anope_cmd_pong(const char *servname, const char *who)
+void anope_SendPong(const char *servname, const char *who)
 {
-	ircdproto->cmd_pong(servname, who);
+	ircdproto->SendPong(servname, who);
 }
 
-void anope_cmd_join(const char *user, const char *channel, time_t chantime)
+void anope_SendJoin(const char *user, const char *channel, time_t chantime)
 {
-	ircdproto->cmd_join(user, channel, chantime);
+	ircdproto->SendJoin(user, channel, chantime);
 }
 
-void anope_cmd_unsqline(const char *user)
+void anope_SendSQLineDel(const char *user)
 {
-	ircdproto->cmd_unsqline(user);
+	ircdproto->SendSQLineDel(user);
 }
 
-void anope_cmd_invite(const char *source, const char *chan, const char *nick)
+void anope_SendInvite(const char *source, const char *chan, const char *nick)
 {
-	ircdproto->cmd_invite(source, chan, nick);
+	ircdproto->SendInvite(source, chan, nick);
 }
 
-void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...)
+void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...)
 {
 	if (fmt) {
 		va_list args;
@@ -230,12 +230,12 @@ void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...)
 		va_start(args, fmt);
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
-		ircdproto->cmd_part(nick, chan, buf);
+		ircdproto->SendPart(nick, chan, buf);
 	}
-	else ircdproto->cmd_part(nick, chan, NULL);
+	else ircdproto->SendPart(nick, chan, NULL);
 }
 
-void anope_cmd_global(const char *source, const char *fmt, ...)
+void anope_SendGlobops(const char *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -244,7 +244,7 @@ void anope_cmd_global(const char *source, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_global(source, buf);
+	ircdproto->SendGlobops(source, buf);
 }
 
 void anope_cmd_sqline(const char *mask, const char *reason)

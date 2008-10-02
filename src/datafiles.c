@@ -93,7 +93,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 #ifndef NOT_MAIN
         log_perror("Can't read %s database %s", service, filename);
         if (time(NULL) - lastwarn > WarningTimeout) {
-            anope_cmd_global(NULL,
+            anope_SendGlobops(NULL,
                              "Write error on %s: Memory allocation failed",
                              filename);
             lastwarn = time(NULL);
@@ -111,7 +111,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
             log_perror("Can not read %s database %s", service,
                        f->filename);
         if (time(NULL) - lastwarn > WarningTimeout) {
-            anope_cmd_global(NULL, "Write error on %s: %s", f->filename,
+            anope_SendGlobops(NULL, "Write error on %s: %s", f->filename,
                              strerror(errno));
             lastwarn = time(NULL);
         }
@@ -198,7 +198,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            anope_cmd_global(NULL, "Can not back up %s database %s",
+            anope_SendGlobops(NULL, "Can not back up %s database %s",
                              service, filename);
         }
 #ifdef _WIN32
@@ -248,7 +248,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            anope_cmd_global(NULL, "Can't write to %s database %s",
+            anope_SendGlobops(NULL, "Can't write to %s database %s",
                              service, filename);
         }
         errno = errno_save;
@@ -587,7 +587,7 @@ static void rename_database(char *name, char *ext)
     snprintf(destpath, sizeof(destpath), "backups/%s.%s", name, ext);
     if (rename(name, destpath) != 0) {
         alog("Backup of %s failed.", name);
-        anope_cmd_global(s_OperServ, "WARNING! Backup of %s failed.",
+        anope_SendGlobops(s_OperServ, "WARNING! Backup of %s failed.",
                          name);
     }
 }

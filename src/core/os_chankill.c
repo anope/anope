@@ -118,7 +118,7 @@ int do_chankill(User * u)
                             cu->user->host, NULL, NULL);
             }
             if (WallOSAkill) {
-                anope_cmd_global(s_OperServ, "%s used CHANKILL on %s (%s)",
+                anope_SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)",
                                  u->nick, channel, reason);
             }
         } else {

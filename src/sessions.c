@@ -239,7 +239,7 @@ int add_session(const char *nick, const char *host, char *hostip)
                 add_akill(NULL, akillmask, s_OperServ,
                           time(NULL) + SessionAutoKillExpiry,
                           "Session limit exceeded");
-                anope_cmd_global(s_OperServ,
+                anope_SendGlobops(s_OperServ,
                                  "Added a temporary AKILL for \2%s\2 due to excessive connections",
                                  akillmask);
             }
@@ -288,7 +288,7 @@ void del_session(const char *host)
 
     if (!session) {
         if (debug) {
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              "WARNING: Tried to delete non-existant session: \2%s",
                              host);
             alog("session: Tried to delete non-existant session: %s",
@@ -335,7 +335,7 @@ void expire_exceptions(void)
         if (exceptions[i].expires == 0 || exceptions[i].expires > now)
             continue;
         if (WallExceptionExpire)
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              "Session limit exception for %s has expired.",
                              exceptions[i].mask);
         free(exceptions[i].mask);
@@ -443,7 +443,7 @@ void load_exceptions()
         restore_db(f);                                          \
         log_perror("Write error on %s", ExceptionDBName);       \
         if (time(NULL) - lastwarn > WarningTimeout) {           \
-            anope_cmd_global(NULL, "Write error on %s: %s", ExceptionDBName,  \
+            anope_SendGlobops(NULL, "Write error on %s: %s", ExceptionDBName,  \
                         strerror(errno));                       \
             lastwarn = time(NULL);                              \
         }                                                       \

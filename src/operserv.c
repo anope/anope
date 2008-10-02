@@ -423,7 +423,7 @@ void load_os_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", OperDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_cmd_global(NULL, "Write error on %s: %s", OperDBName,	\
+	    anope_SendGlobops(NULL, "Write error on %s: %s", OperDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -903,7 +903,7 @@ void expire_akills(void)
             continue;
 
         if (WallAkillExpire)
-            anope_cmd_global(s_OperServ, "AKILL on %s@%s has expired",
+            anope_SendGlobops(s_OperServ, "AKILL on %s@%s has expired",
                              ak->user, ak->host);
         slist_delete(&akills, i);
     }
@@ -1091,7 +1091,7 @@ void expire_sglines(void)
             continue;
 
         if (WallSGLineExpire)
-            anope_cmd_global(s_OperServ, "SGLINE on \2%s\2 has expired",
+            anope_SendGlobops(s_OperServ, "SGLINE on \2%s\2 has expired",
                              sx->mask);
         slist_delete(&sglines, i);
     }
@@ -1311,7 +1311,7 @@ void expire_sqlines(void)
             continue;
 
         if (WallSQLineExpire)
-            anope_cmd_global(s_OperServ, "SQLINE on \2%s\2 has expired",
+            anope_SendGlobops(s_OperServ, "SQLINE on \2%s\2 has expired",
                              sx->mask);
 
         slist_delete(&sqlines, i);
@@ -1323,7 +1323,7 @@ static void free_sqline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SQLINE from all the servers */
-    anope_cmd_unsqline(sx->mask);
+    anope_SendSQLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);
@@ -1480,7 +1480,7 @@ void expire_szlines(void)
             continue;
 
         if (WallSZLineExpire)
-            anope_cmd_global(s_OperServ, "SZLINE on \2%s\2 has expired",
+            anope_SendGlobops(s_OperServ, "SZLINE on \2%s\2 has expired",
                              sx->mask);
         slist_delete(&szlines, i);
     }
@@ -1598,7 +1598,7 @@ void resetDefCon(int level)
             DefConLevel = level;
             send_event(EVENT_DEFCON_LEVEL, 1, strLevel);
             alog("Defcon level timeout, returning to lvl %d", level);
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              getstring2(NULL, OPER_DEFCON_WALL),
                              s_OperServ, level);
             if (GlobalOnDefcon) {

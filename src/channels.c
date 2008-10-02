@@ -49,7 +49,7 @@ void chan_deluser(User * user, Channel * c)
     c->usercount--;
 
     if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1) {
-        anope_cmd_part(c->ci->bi->nick, c->name, NULL);
+        anope_SendPart(c->ci->bi->nick, c->name, NULL);
     }
 
     if (!c->users)
@@ -790,7 +790,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
             if (c->ci && c->ci->bi) {
                 /* This is ugly, but it always works */
-                anope_cmd_part(c->ci->bi->nick, c->name, "TS reop");
+                anope_SendPart(c->ci->bi->nick, c->name, "TS reop");
                 bot_join(c->ci);
             }
             /* XXX simple modes and bans */

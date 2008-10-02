@@ -105,7 +105,7 @@ int do_defcon(User * u)
     notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
     defcon_sendlvls(u);
     alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-    anope_cmd_global(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
+    anope_SendGlobops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
                      u->nick, newLevel);
     /* Global notice the user what is happening. Also any Message that
        the Admin would like to add. Set in config file. */

@@ -265,7 +265,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
          u->nick, u->username, u->host, nc->display,
          (nc->email ? nc->email : "none"));
     if (WallSetpass)
-        anope_cmd_global(s_NickServ,
+        anope_SendGlobops(s_NickServ,
                          "\2%s\2 used SASET PASSWORD on \2%s\2",
                          u->nick, nc->display);
     return MOD_CONT;

@@ -611,7 +611,7 @@ void load_cs_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", ChanDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_cmd_global(NULL, "Write error on %s: %s", ChanDBName,	\
+	    anope_SendGlobops(NULL, "Write error on %s: %s", ChanDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -876,7 +876,7 @@ void check_modes(Channel * c)
 
     /* Check for mode bouncing */
     if (c->server_modecount >= 3 && c->chanserv_modecount >= 3) {
-        anope_cmd_global(NULL,
+        anope_SendGlobops(NULL,
                          "Warning: unable to set modes on channel %s.  "
                          "Are your servers' U:lines configured correctly?",
                          c->name);
@@ -1244,7 +1244,7 @@ static void timeout_leave(Timeout * to)
     if (ci)                     /* Check cos the channel may be dropped in the meantime */
         ci->flags &= ~CI_INHABIT;
 
-    anope_cmd_part(s_ChanServ, chan, NULL);
+    anope_SendPart(s_ChanServ, chan, NULL);
     free(to->data);
 }
 
@@ -1352,7 +1352,7 @@ int check_kick(User * user, const char *chan, time_t chants)
      * c may be NULL even if it exists */
     if ((!(c = findchan(chan)) || c->usercount == 0)
         && !(ci->flags & CI_INHABIT)) {
-        anope_cmd_join(s_ChanServ, chan, (c ? c->creation_time : chants));
+        anope_SendJoin(s_ChanServ, chan, (c ? c->creation_time : chants));
         /* Lets hide the channel from /list just incase someone does /list
          * while we are here. - katsklaw
          */
@@ -1448,7 +1448,7 @@ void restore_topic(const char *chan)
     }
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_join(s_ChanServ, chan, c->creation_time);
+            anope_SendJoin(s_ChanServ, chan, c->creation_time);
             anope_SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
@@ -1456,7 +1456,7 @@ void restore_topic(const char *chan)
                     c->topic ? c->topic : "", c->topic_time);
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_part(s_ChanServ, c->name, NULL);
+            anope_SendPart(s_ChanServ, c->name, NULL);
         }
     }
 }
@@ -1510,7 +1510,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_join(s_ChanServ, c->name, c->creation_time);
+            anope_SendJoin(s_ChanServ, c->name, c->creation_time);
             anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
         }
     }
@@ -1520,7 +1520,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_cmd_part(s_ChanServ, c->ci->name, NULL);
+            anope_SendPart(s_ChanServ, c->ci->name, NULL);
         }
     }
     return 1;
@@ -1778,7 +1778,7 @@ int delchan(ChannelInfo * ci)
     }
     if (ci->c) {
         if (ci->bi && ci->c->usercount >= BSMinUsers) {
-            anope_cmd_part(ci->bi->nick, ci->c->name, NULL);
+            anope_SendPart(ci->bi->nick, ci->c->name, NULL);
         }
         ci->c->ci = NULL;
     }

@@ -408,7 +408,7 @@ void do_squit(const char *source, int ac, const char **av)
     if (s->flags & SERVER_JUPED) {
         snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
                  s->name);
-        anope_cmd_global(s_OperServ, buf);
+        anope_SendGlobops(s_OperServ, buf);
     }
 
     snprintf(buf, sizeof(buf), "%s %s", s->name,

@@ -443,7 +443,7 @@ void UnrealIRCdProto::set_umode(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -630,7 +630,7 @@ void UnrealIRCdProto::cmd_server(const char *servname, int hop, const char *desc
 }
 
 /* JOIN */
-void UnrealIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
+void UnrealIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user);
 	/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
@@ -640,7 +640,7 @@ void UnrealIRCdProto::cmd_join(const char *user, const char *channel, time_t cha
 **	parv[0] = sender
 **	parv[1] = nickmask
 */
-void UnrealIRCdProto::cmd_unsqline(const char *user)
+void UnrealIRCdProto::SendSQLineDel(const char *user)
 {
 	if (!user) return;
 	send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
@@ -726,7 +726,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 

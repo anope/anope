@@ -189,7 +189,7 @@ void hybrid_set_umode(User * user, int ac, const char **av)
                 opcnt++;
 
                 if (WallOper)
-                    anope_cmd_global(s_OperServ,
+                    anope_SendGlobops(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
                 display_news(user, NEWS_OPER);
@@ -504,7 +504,7 @@ void hybrid_SendGlobalPrivmsg(const char *source, const char *dest, const char *
 }
 
 
-void hybrid_cmd_global(const char *source, const char *buf)
+void hybrid_SendGlobops(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -514,7 +514,7 @@ void hybrid_cmd_global(const char *source, const char *buf)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void hybrid_cmd_global_legacy(const char *source, const char *fmt)
+void hybrid_SendGlobops_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "OPERWALL :%s", fmt);
 }
@@ -714,7 +714,7 @@ void hybrid_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost
     /* does not support vhosting */
 }
 
-void hybrid_cmd_unsqline(const char *user)
+void hybrid_SendSQLineDel(const char *user)
 {
     if (!user) {
         return;
@@ -723,7 +723,7 @@ void hybrid_cmd_unsqline(const char *user)
     send_cmd(ServerName, "UNRESV * %s", user);
 }
 
-void hybrid_cmd_join(const char *user, const char *channel, time_t chantime)
+void hybrid_SendJoin(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(NULL, "SJOIN %ld %s + :%s", (long int) chantime, channel,
              user);
@@ -848,7 +848,7 @@ void hybrid_SendClientIntroduction(const char *nick, const char *user, const cha
 
 }
 
-void hybrid_cmd_part(const char *nick, const char *chan, const char *buf)
+void hybrid_SendPart(const char *nick, const char *chan, const char *buf)
 {
     if (buf) {
         send_cmd(nick, "PART %s :%s", chan, buf);
@@ -861,7 +861,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    hybrid_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    hybrid_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1176,13 +1176,13 @@ void hybrid_SendQuit(const char *source, const char *buf)
 }
 
 /* PONG */
-void hybrid_cmd_pong(const char *servname, const char *who)
+void hybrid_SendPong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
 
 /* INVITE */
-void hybrid_cmd_invite(const char *source, const char *chan, const char *nick)
+void hybrid_SendInvite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1477,11 +1477,11 @@ void moduleAddAnopeCmds()
     pmodule_SendBotOp(hybrid_cmd_bot_chan_mode);
     pmodule_cmd_351(hybrid_cmd_351);
     pmodule_SendQuit(hybrid_cmd_quit);
-    pmodule_cmd_pong(hybrid_cmd_pong);
-    pmodule_cmd_join(hybrid_cmd_join);
-    pmodule_cmd_unsqline(hybrid_cmd_unsqline);
-    pmodule_cmd_invite(hybrid_cmd_invite);
-    pmodule_cmd_part(hybrid_cmd_part);
+    pmodule_SendPong(hybrid_cmd_pong);
+    pmodule_SendJoin(hybrid_cmd_join);
+    pmodule_SendSQLineDel(hybrid_cmd_unsqline);
+    pmodule_SendInvite(hybrid_cmd_invite);
+    pmodule_SendPart(hybrid_cmd_part);
     pmodule_cmd_391(hybrid_cmd_391);
     pmodule_cmd_250(hybrid_cmd_250);
     pmodule_cmd_307(hybrid_cmd_307);
@@ -1494,8 +1494,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(hybrid_cmd_242);
     pmodule_cmd_243(hybrid_cmd_243);
     pmodule_cmd_211(hybrid_cmd_211);
-    pmodule_cmd_global(hybrid_cmd_global);
-    pmodule_cmd_global_legacy(hybrid_cmd_global_legacy);
+    pmodule_SendGlobops(hybrid_cmd_global);
+    pmodule_SendGlobops_legacy(hybrid_cmd_global_legacy);
     pmodule_cmd_sqline(hybrid_cmd_sqline);
     pmodule_cmd_squit(hybrid_cmd_squit);
     pmodule_cmd_svso(hybrid_cmd_svso);

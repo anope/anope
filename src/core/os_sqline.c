@@ -157,7 +157,7 @@ int do_sqline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                anope_cmd_global(s_OperServ,
+                anope_SendGlobops(s_OperServ,
                                  "%s added an SQLINE for %s (%s)", u->nick,
                                  mask, buf);
             }

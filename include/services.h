@@ -1273,24 +1273,24 @@ class IRCDProto {
 			if (buf) send_cmd(source, "QUIT :%s", buf);
 			else send_cmd(source, "QUIT");
 		}
-		virtual void cmd_pong(const char *servname, const char *who)
+		virtual void SendPong(const char *servname, const char *who)
 		{
 			send_cmd(servname, "PONG %s", who);
 		}
-		virtual void cmd_join(const char *, const char *, time_t) = 0;
-		virtual void cmd_unsqline(const char *) = 0;
-		virtual void cmd_invite(const char *source, const char *chan, const char *nick)
+		virtual void SendJoin(const char *, const char *, time_t) = 0;
+		virtual void SendSQLineDel(const char *) = 0;
+		virtual void SendInvite(const char *source, const char *chan, const char *nick)
 		{
 			if (!source || !chan || !nick) return;
 			send_cmd(source, "INVITE %s %s", nick, chan);
 		}
-		virtual void cmd_part(const char *nick, const char *chan, const char *buf)
+		virtual void SendPart(const char *nick, const char *chan, const char *buf)
 		{
 			if (!nick || !chan) return;
 			if (buf) send_cmd(nick, "PART %s :%s", chan, buf);
 			else send_cmd(nick, "PART %s", chan);
 		}
-		virtual void cmd_global(const char *source, const char *buf)
+		virtual void SendGlobops(const char *source, const char *buf)
 		{
 			if (!buf) return;
 			send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);

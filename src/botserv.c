@@ -491,7 +491,7 @@ void load_bs_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", BotDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_cmd_global(NULL, "Write error on %s: %s", BotDBName,	\
+	    anope_SendGlobops(NULL, "Write error on %s: %s", BotDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -750,7 +750,7 @@ void bot_join(ChannelInfo * ci)
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);
     }
-    anope_cmd_join(ci->bi->nick, ci->c->name, ci->c->creation_time);
+    anope_SendJoin(ci->bi->nick, ci->c->name, ci->c->creation_time);
     anope_SendBotOp(ci->bi->nick, ci->c->name);
     send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
 }

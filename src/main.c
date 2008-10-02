@@ -183,41 +183,41 @@ void save_databases(void)
          * exists we're safe. -GD
          */
         if (serv_uplink)
-            anope_cmd_pong(ServerName, ServerName);
+            anope_SendPong(ServerName, ServerName);
         waiting = -12;
         save_cs_rdb_dbase();
         if (serv_uplink)
-            anope_cmd_pong(ServerName, ServerName);
+            anope_SendPong(ServerName, ServerName);
         if (PreNickDBName) {
             save_ns_req_rdb_dbase();
             if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
+                anope_SendPong(ServerName, ServerName);
             waiting = -13;
         }
         if (s_BotServ) {
             waiting = -14;
             save_bs_rdb_dbase();
             if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
+                anope_SendPong(ServerName, ServerName);
         }
         if (s_HostServ) {
             waiting = -15;
             save_hs_rdb_dbase();
             if (serv_uplink)
-                anope_cmd_pong(ServerName, ServerName);
+                anope_SendPong(ServerName, ServerName);
         }
         waiting = -16;
         save_os_rdb_dbase();
         if (serv_uplink)
-            anope_cmd_pong(ServerName, ServerName);
+            anope_SendPong(ServerName, ServerName);
         waiting = -17;
         save_rdb_news();
         if (serv_uplink)
-            anope_cmd_pong(ServerName, ServerName);
+            anope_SendPong(ServerName, ServerName);
         waiting = -18;
         save_rdb_exceptions();
         if (serv_uplink)
-            anope_cmd_pong(ServerName, ServerName);
+            anope_SendPong(ServerName, ServerName);
     }
 #endif
     waiting = -20;
@@ -385,7 +385,7 @@ void sighandler(int signum)
                 inbuf[447] = '>';
                 inbuf[448] = 0;
             }
-            anope_cmd_global(NULL, "PANIC! buffer = %s\r\n", inbuf);
+            anope_SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
             modules_unload_all(false, true);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
@@ -461,7 +461,7 @@ void sighandler(int signum)
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            anope_cmd_global(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
+            anope_SendGlobops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
             modules_unload_all(false, true);
         }
@@ -585,7 +585,7 @@ int main(int ac, char **av, char **envp)
 
         if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
             if (delayed_quit)
-                anope_cmd_global(NULL,
+                anope_SendGlobops(NULL,
                                  "Updating databases on shutdown, please wait.");
 
             save_databases();

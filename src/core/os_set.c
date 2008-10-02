@@ -187,7 +187,7 @@ int do_set(User * u)
         if (LogChannel && (stricmp(setting, "on") == 0)) {
             if (ircd->join2msg) {
                 c = findchan(LogChannel);
-                anope_cmd_join(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
+                anope_SendJoin(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
             }
             logchan = 1;
             alog("Now sending log messages to %s", LogChannel);
@@ -195,7 +195,7 @@ int do_set(User * u)
         } else if (LogChannel && (stricmp(setting, "off") == 0)) {
             alog("No longer sending log messages to a channel");
             if (ircd->join2msg) {
-                anope_cmd_part(s_GlobalNoticer, LogChannel, NULL);
+                anope_SendPart(s_GlobalNoticer, LogChannel, NULL);
             }
             logchan = 0;
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);
@@ -214,14 +214,14 @@ int do_set(User * u)
             u->isSuperAdmin = 1;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
             alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON),
                              u->nick);
         } else if (stricmp(setting, "off") == 0) {
             u->isSuperAdmin = 0;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
             alog("%s: %s is no longer a SuperAdmin", s_OperServ, u->nick);
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              getstring2(NULL, OPER_SUPER_ADMIN_WALL_OFF),
                              u->nick);
         } else {

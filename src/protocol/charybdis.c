@@ -167,7 +167,7 @@ void CharybdisProto::set_umode(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -434,7 +434,7 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
-void CharybdisProto::cmd_global(const char *source, const char *buf)
+void CharybdisProto::SendGlobops(const char *source, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
@@ -745,13 +745,13 @@ void CharybdisProto::cmd_vhost_on(const char *nick, const char *vIdent, const ch
 	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", nick, vhost);
 }
 
-void CharybdisProto::cmd_unsqline(const char *user)
+void CharybdisProto::SendSQLineDel(const char *user)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
-void CharybdisProto::cmd_join(const char *user, const char *channel, time_t chantime)
+void CharybdisProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	Uid *ud = find_uid(user);
 	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
@@ -870,7 +870,7 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 	cmd_sqline(nick, "Reserved for services");
 }
 
-void CharybdisProto::cmd_part(const char *nick, const char *chan, const char *buf)
+void CharybdisProto::SendPart(const char *nick, const char *chan, const char *buf)
 {
 	Uid *ud = find_uid(nick);
 	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
@@ -881,7 +881,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1101,7 +1101,7 @@ void CharybdisProto::SendQuit(const char *source, const char *buf)
 }
 
 /* PONG */
-void CharybdisProto::cmd_pong(const char *servname, const char *who)
+void CharybdisProto::SendPong(const char *servname, const char *who)
 {
 	/* deliberately no SID in the first parameter -- jilles */
 	if (UseTS6) send_cmd(TS6SID, "PONG %s :%s", servname, who);
@@ -1109,7 +1109,7 @@ void CharybdisProto::cmd_pong(const char *servname, const char *who)
 }
 
 /* INVITE */
-void CharybdisProto::cmd_invite(const char *source, const char *chan, const char *nick)
+void CharybdisProto::SendInvite(const char *source, const char *chan, const char *nick)
 {
 	if (!source || !chan || !nick) return;
 	Uid *ud = find_uid(source);

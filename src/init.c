@@ -726,7 +726,7 @@ int init_secondary(int ac, char **av)
 
     /* Announce a logfile error if there was one */
     if (openlog_failed) {
-        anope_cmd_global(NULL, "Warning: couldn't open logfile: %s",
+        anope_SendGlobops(NULL, "Warning: couldn't open logfile: %s",
                          strerror(openlog_errno));
     }
 
@@ -736,7 +736,7 @@ int init_secondary(int ac, char **av)
     /* And hybrid needs Global joined in the logchan */
     if (logchan && ircd->join2msg) {
         /* XXX might desync */
-        anope_cmd_join(s_GlobalNoticer, LogChannel, time(NULL));
+        anope_SendJoin(s_GlobalNoticer, LogChannel, time(NULL));
     }
 
     anope_cmd_eob();

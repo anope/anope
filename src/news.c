@@ -203,7 +203,7 @@ void load_news()
 	restore_db(f);						\
 	log_perror("Write error on %s", NewsDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_cmd_global(NULL, "Write error on %s: %s", NewsDBName,	\
+	    anope_SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\

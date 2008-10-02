@@ -419,7 +419,7 @@ int mSaveData(int argc, char **argv)
         if (!stricmp(argv[0], EVENT_START)) {
             if ((out = fopen(OSInfoDBName, "w")) == NULL) {
                 alog("os_info: ERROR: can not open the database file!");
-                anope_cmd_global(s_OperServ,
+                anope_SendGlobops(s_OperServ,
                                  "os_info: ERROR: can not open the database file!");
                 ret = 1;
             } else {

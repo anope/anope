@@ -178,7 +178,7 @@ int do_akill(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                anope_cmd_global(s_OperServ,
+                anope_SendGlobops(s_OperServ,
                                  "%s added an AKILL for %s (%s) (%s)",
                                  u->nick, mask, reason, buf);
             }

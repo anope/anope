@@ -88,7 +88,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s",
                  s_ChanServ, u->nick, u->username, u->host, ci->name);
             if (WallGetpass) {
-                anope_cmd_global(s_ChanServ,
+                anope_SendGlobops(s_ChanServ,
                                  "\2%s\2 used GETPASS on channel \2%s\2",
                                  u->nick, chan);
             }

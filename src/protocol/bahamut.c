@@ -185,7 +185,7 @@ void BahamutIRCdProto::set_umode(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_cmd_global(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -723,13 +723,13 @@ void BahamutIRCdProto::cmd_topic(const char *whosets, const char *chan, const ch
 }
 
 /* UNSQLINE */
-void BahamutIRCdProto::cmd_unsqline(const char *user)
+void BahamutIRCdProto::SendSQLineDel(const char *user)
 {
 	send_cmd(NULL, "UNSQLINE %s", user);
 }
 
 /* JOIN - SJOIN */
-void BahamutIRCdProto::cmd_join(const char *user, const char *channel, time_t chantime)
+void BahamutIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	send_cmd(user, "SJOIN %ld %s", static_cast<long>(chantime), channel);
 }
@@ -982,7 +982,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 

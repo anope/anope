@@ -80,7 +80,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             if (WallGetpass)
-                anope_cmd_global(s_NickServ,
+                anope_SendGlobops(s_NickServ,
                                  "\2%s\2 used GETPASS on \2%s\2", u->nick,
                                  nick);
             notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick,
@@ -100,7 +100,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             if (WallGetpass)
-                anope_cmd_global(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
+                anope_SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
                                  u->nick, nick);
             notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick,
                         tmp_pass);

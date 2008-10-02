@@ -717,12 +717,12 @@ void anope_topic(char *whosets, char *chan, char *whosetit, char *topic,
 	parv[0] = sender
 	parv[1] = sqlined nick/mask
 */
-void ptlink_cmd_unsqline(const char *user)
+void ptlink_SendSQLineDel(const char *user)
 {
     send_cmd(NULL, "UNSQLINE %s", user);
 }
 
-void ptlink_cmd_join(const char *user, const char *channel, time_t chantime)
+void ptlink_SendJoin(const char *user, const char *channel, time_t chantime)
 {
     send_cmd(ServerName, "SJOIN %ld %s + :%s", (long int) chantime,
              channel, user);
@@ -798,7 +798,7 @@ void ptlink_cmd_squit(const char *servname, const char *message)
 }
 
 /* PONG */
-void ptlink_cmd_pong(const char *servname, const char *who)
+void ptlink_SendPong(const char *servname, const char *who)
 {
     send_cmd(servname, "PONG %s", who);
 }
@@ -1046,7 +1046,7 @@ void ptlink_SendGlobalPrivmsg(const char *source, const char *dest, const char *
 }
 
 /* GLOBOPS */
-void ptlink_cmd_global(const char *source, const char *buf)
+void ptlink_SendGlobops(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1231,7 +1231,7 @@ void ptlink_SendQuit(const char *source, const char *buf)
     }
 }
 
-void ptlink_cmd_part(const char *nick, const char *chan, const char *buf)
+void ptlink_SendPart(const char *nick, const char *chan, const char *buf)
 {
     if (buf) {
         send_cmd(nick, "PART %s :%s", chan, buf);
@@ -1275,7 +1275,7 @@ void ptlink_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost
 }
 
 /* INVITE */
-void ptlink_cmd_invite(const char *source, const char *chan, const char *nick)
+void ptlink_SendInvite(const char *source, const char *chan, const char *nick)
 {
     if (!source || !chan || !nick) {
         return;
@@ -1339,7 +1339,7 @@ void ptlink_set_umode(User * user, int ac, const char **av)
                 opcnt++;
 
                 if (WallOper)
-                    anope_cmd_global(s_OperServ,
+                    anope_SendGlobops(s_OperServ,
                                      "\2%s\2 is now an IRC operator.",
                                      user->nick);
                 display_news(user, NEWS_OPER);
@@ -1366,7 +1366,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ptlink_cmd_pong(ac > 1 ? av[1] : ServerName, av[0]);
+    ptlink_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1635,7 +1635,7 @@ void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason)
 }
 
 /* GLOBOPS - to handle old WALLOPS */
-void ptlink_cmd_global_legacy(const char *source, const char *fmt)
+void ptlink_SendGlobops_legacy(const char *source, const char *fmt)
 {
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
@@ -1706,11 +1706,11 @@ void moduleAddAnopeCmds()
     pmodule_SendBotOp(ptlink_cmd_bot_chan_mode);
     pmodule_cmd_351(ptlink_cmd_351);
     pmodule_SendQuit(ptlink_cmd_quit);
-    pmodule_cmd_pong(ptlink_cmd_pong);
-    pmodule_cmd_join(ptlink_cmd_join);
-    pmodule_cmd_unsqline(ptlink_cmd_unsqline);
-    pmodule_cmd_invite(ptlink_cmd_invite);
-    pmodule_cmd_part(ptlink_cmd_part);
+    pmodule_SendPong(ptlink_cmd_pong);
+    pmodule_SendJoin(ptlink_cmd_join);
+    pmodule_SendSQLineDel(ptlink_cmd_unsqline);
+    pmodule_SendInvite(ptlink_cmd_invite);
+    pmodule_SendPart(ptlink_cmd_part);
     pmodule_cmd_391(ptlink_cmd_391);
     pmodule_cmd_250(ptlink_cmd_250);
     pmodule_cmd_307(ptlink_cmd_307);
@@ -1723,8 +1723,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_242(ptlink_cmd_242);
     pmodule_cmd_243(ptlink_cmd_243);
     pmodule_cmd_211(ptlink_cmd_211);
-    pmodule_cmd_global(ptlink_cmd_global);
-    pmodule_cmd_global_legacy(ptlink_cmd_global_legacy);
+    pmodule_SendGlobops(ptlink_cmd_global);
+    pmodule_SendGlobops_legacy(ptlink_cmd_global_legacy);
     pmodule_cmd_sqline(ptlink_cmd_sqline);
     pmodule_cmd_squit(ptlink_cmd_squit);
     pmodule_cmd_svso(ptlink_cmd_svso);

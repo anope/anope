@@ -670,7 +670,7 @@ int loadModule(Module * m, User * u)
     }
 
     if (u) {
-        anope_cmd_global(s_OperServ, "%s loaded module %s", u->nick,
+        anope_SendGlobops(s_OperServ, "%s loaded module %s", u->nick,
                          m->name);
         notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name);
     }
@@ -726,7 +726,7 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     } else {
         if (u) {
-            anope_cmd_global(s_OperServ, "%s unloaded module %s", u->nick,
+            anope_SendGlobops(s_OperServ, "%s unloaded module %s", u->nick,
                              m->name);
             notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name);
         }

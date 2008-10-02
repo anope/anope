@@ -75,7 +75,7 @@ int do_global(User * u)
         return MOD_CONT;
     }
     if (WallOSGlobal)
-        anope_cmd_global(s_OperServ, "\2%s\2 just used GLOBAL command.",
+        anope_SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.",
                          u->nick);
     oper_global(u->nick, "%s", msg);
     return MOD_CONT;

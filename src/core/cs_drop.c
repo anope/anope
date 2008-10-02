@@ -104,7 +104,7 @@ int do_drop(User * u)
         }
 
         if (ircd->chansqline && (ci->flags & CI_VERBOTEN)) {
-            anope_cmd_unsqline(ci->name);
+            anope_SendSQLineDel(ci->name);
         }
 
         alog("%s: Channel %s dropped by %s!%s@%s (founder: %s)",
@@ -117,7 +117,7 @@ int do_drop(User * u)
          * drop the channel before issuing the wallops.
          */
         if (WallDrop && is_servadmin && level < ACCESS_FOUNDER)
-            anope_cmd_global(s_ChanServ,
+            anope_SendGlobops(s_ChanServ,
                              "\2%s\2 used DROP on channel \2%s\2", u->nick,
                              chan);
 

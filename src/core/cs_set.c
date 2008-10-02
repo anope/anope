@@ -393,7 +393,7 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
         alog("%s: %s!%s@%s set password as Services admin for %s",
              s_ChanServ, u->nick, u->username, u->host, ci->name);
         if (WallSetpass)
-            anope_cmd_global(s_ChanServ,
+            anope_SendGlobops(s_ChanServ,
                              "\2%s\2 set password as Services admin for channel \2%s\2",
                              u->nick, ci->name);
     } else {

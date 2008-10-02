@@ -67,7 +67,7 @@ int do_raw(User * u)
             char *kw = strtok(text, " ");
             while (kw && *kw == ':')
                 kw = strtok(NULL, " ");
-            anope_cmd_global(s_OperServ,
+            anope_SendGlobops(s_OperServ,
                              "\2%s\2 used RAW command for \2%s\2",
                              u->nick,
                              (kw ? kw : "\2non RFC compliant message\2"));

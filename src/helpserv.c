@@ -60,7 +60,7 @@ void helpserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_cmd_ctcp(s_HelpServ, u->nick, "PING %s", s);
+        anope_SendCTCP(s_HelpServ, u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_HelpServ, u, HELPSERV, cmd);
     }

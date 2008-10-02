@@ -69,7 +69,7 @@ void hostserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_cmd_ctcp(s_HostServ, u->nick, "PING %s", s);
+        anope_SendCTCP(s_HostServ, u->nick, "PING %s", s);
     } else {
         if (ircd->vhost) {
             mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);

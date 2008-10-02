@@ -662,7 +662,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             /* Resets the svid because it doesn't match */
             user->svid = 1;
 
-            anope_cmd_svid_umode(user->nick, user->timestamp);
+            anope_SendSVID(user->nick, user->timestamp);
 
         } else {
             user->svid = 1;
@@ -727,7 +727,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             if (!nc_changed && (user->na))
                 user->na->status |= status;
             else {
-                anope_cmd_nc_change(user);
+                anope_SendUnregisteredNick(user);
             }
         }
 
@@ -763,7 +763,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
             snprintf(tsbuf, sizeof(tsbuf), "%lu",
                      (unsigned long int) user->timestamp);
-            anope_cmd_svid_umode2(user, tsbuf);
+            anope_SendSVID2(user, tsbuf);
 
             alog("%s: %s!%s@%s automatically identified for nick %s",
                  s_NickServ, user->nick, user->username,
@@ -777,7 +777,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             char tsbuf[16];
             snprintf(tsbuf, sizeof(tsbuf), "%lu",
                      (unsigned long int) user->timestamp);
-            anope_cmd_svid_umode3(user, tsbuf);
+            anope_SendSVID3(user, tsbuf);
         }
     }
 

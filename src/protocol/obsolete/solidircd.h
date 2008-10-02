@@ -124,15 +124,15 @@ void solidircd_SendSZLine(const char *mask, const char *reason, const char *whom
 void solidircd_SendSGLine(const char *mask, const char *reason);
 void solidircd_SendBanDel(const char *name, const char *nick);
 void solidircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void solidircd_cmd_svid_umode(const char *nick, time_t ts);
-void solidircd_cmd_nc_change(User * u);
-void solidircd_cmd_svid_umode2(User * u, const char *ts);
-void solidircd_cmd_svid_umode3(User * u, const char *ts);
+void solidircd_SendSVID(const char *nick, time_t ts);
+void solidircd_SendUnregisteredNick(User * u);
+void solidircd_SendSVID2(User * u, const char *ts);
+void solidircd_SendSVID3(User * u, const char *ts);
 void solidircd_cmd_eob();
 int solidircd_flood_mode_check(const char *value);
 void solidircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int solidircd_valid_nick(const char *nick);
-void solidircd_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void solidircd_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class SolidIRCdProto : public IRCDProtoNew {
 	public:

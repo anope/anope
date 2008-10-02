@@ -1299,26 +1299,26 @@ void hybrid_SendSVSMode_chan(const char *name, const char *mode, const char *nic
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void hybrid_cmd_svid_umode(const char *nick, time_t ts)
+void hybrid_SendSVID(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s +d 1", nick);
 }
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void hybrid_cmd_nc_change(User * u)
+void hybrid_SendUnregisteredNick(User * u)
 {
     /* not used */
 }
 
 /* SVSMODE +d */
-void hybrid_cmd_svid_umode2(User * u, const char *ts)
+void hybrid_SendSVID2(User * u, const char *ts)
 {
     /* not used */
 }
 
 
-void hybrid_cmd_svid_umode3(User * u, const char *ts)
+void hybrid_SendSVID3(User * u, const char *ts)
 {
     /* not used */
 }
@@ -1353,12 +1353,12 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void hybrid_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_svspart(const char *source, const char *nick, const char *chan)
+void hybrid_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
@@ -1432,7 +1432,7 @@ int hybrid_valid_chan(const char *chan)
 }
 
 
-void hybrid_cmd_ctcp(const char *source, const char *dest, const char *buf)
+void hybrid_SendCTCP(const char *source, const char *dest, const char *buf)
 {
     char *s;
 
@@ -1511,19 +1511,19 @@ void moduleAddAnopeCmds()
     pmodule_SendSGLine(hybrid_cmd_sgline);
     pmodule_SendBanDel(hybrid_cmd_unban);
     pmodule_SendSVSMode_chan(hybrid_cmd_svsmode_chan);
-    pmodule_cmd_svid_umode(hybrid_cmd_svid_umode);
-    pmodule_cmd_nc_change(hybrid_cmd_nc_change);
-    pmodule_cmd_svid_umode2(hybrid_cmd_svid_umode2);
-    pmodule_cmd_svid_umode3(hybrid_cmd_svid_umode3);
-    pmodule_cmd_svsjoin(hybrid_cmd_svsjoin);
-    pmodule_cmd_svspart(hybrid_cmd_svspart);
+    pmodule_SendSVID(hybrid_cmd_svid_umode);
+    pmodule_SendUnregisteredNick(hybrid_cmd_nc_change);
+    pmodule_SendSVID2(hybrid_cmd_svid_umode2);
+    pmodule_SendSVID3(hybrid_cmd_svid_umode3);
+    pmodule_SendSVSJoin(hybrid_cmd_svsjoin);
+    pmodule_SendSVSPart(hybrid_cmd_svspart);
     pmodule_cmd_swhois(hybrid_cmd_swhois);
     pmodule_cmd_eob(hybrid_cmd_eob);
     pmodule_flood_mode_check(hybrid_flood_mode_check);
     pmodule_cmd_jupe(hybrid_cmd_jupe);
     pmodule_valid_nick(hybrid_valid_nick);
     pmodule_valid_chan(hybrid_valid_chan);
-    pmodule_cmd_ctcp(hybrid_cmd_ctcp);
+    pmodule_SendCTCP(hybrid_cmd_ctcp);
     pmodule_set_umode(hybrid_set_umode);
 }
 

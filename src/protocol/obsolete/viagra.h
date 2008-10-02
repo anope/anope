@@ -119,15 +119,15 @@ void viagra_SendSZLine(const char *mask, const char *reason, const char *whom);
 void viagra_SendSGLine(const char *mask, const char *reason);
 void viagra_SendBanDel(const char *name, const char *nick);
 void viagra_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void viagra_cmd_svid_umode(const char *nick, time_t ts);
-void viagra_cmd_nc_change(User * u);
-void viagra_cmd_svid_umode2(User * u, const char *ts);
-void viagra_cmd_svid_umode3(User * u, const char *ts);
+void viagra_SendSVID(const char *nick, time_t ts);
+void viagra_SendUnregisteredNick(User * u);
+void viagra_SendSVID2(User * u, const char *ts);
+void viagra_SendSVID3(User * u, const char *ts);
 void viagra_cmd_eob();
 int viagra_flood_mode_check(const char *value);
 void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int viagra_valid_nick(const char *nick);
-void viagra_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void viagra_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class ViagraIRCdProto : public IRCDProtoNew {
 	public:

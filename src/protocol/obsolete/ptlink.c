@@ -1503,26 +1503,26 @@ void ptlink_SendSVSO(const char *source, const char *nick, const char *flag)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void ptlink_cmd_svid_umode(const char *nick, time_t ts)
+void ptlink_SendSVID(const char *nick, time_t ts)
 {
     /* Not Supported by this ircd */
 }
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void ptlink_cmd_nc_change(User * u)
+void ptlink_SendUnregisteredNick(User * u)
 {
     /* Not Supported by this ircd */
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void ptlink_cmd_svid_umode2(User * u, const char *ts)
+void ptlink_SendSVID2(User * u, const char *ts)
 {
     common_svsmode(u, "+r", NULL);
 }
 
-void ptlink_cmd_svid_umode3(User * u, const char *ts)
+void ptlink_SendSVID3(User * u, const char *ts)
 {
     /* Bahamuts have this extra one, since they can check on even nick changes */
 }
@@ -1550,7 +1550,7 @@ void ptlink_SendChangeBotNick(const char *oldnick, const char *newnick)
 	parv[2] = channels list
   	:OperServ SVSJOIN Trystan #Admin
 */
-void ptlink_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void ptlink_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
@@ -1562,7 +1562,7 @@ void ptlink_cmd_svsjoin(const char *source, const char *nick, const char *chan, 
 	parv[2] = channels list
   e.g.:	:ChanServ SVSPART mynick 4163321 #Chan1,#Chan2
 */
-void ptlink_cmd_svspart(const char *source, const char *nick, const char *chan)
+void ptlink_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
     send_cmd(source, "SVSPART %s :%s", nick, chan);
 }
@@ -1661,7 +1661,7 @@ int ptlink_valid_chan(const char *cahn)
 }
 
 
-void ptlink_cmd_ctcp(const char *source, const char *dest, const char *buf)
+void ptlink_SendCTCP(const char *source, const char *dest, const char *buf)
 {
     char *s;
 
@@ -1740,19 +1740,19 @@ void moduleAddAnopeCmds()
     pmodule_SendSGLine(ptlink_cmd_sgline);
     pmodule_SendBanDel(ptlink_cmd_unban);
     pmodule_SendSVSMode_chan(ptlink_cmd_svsmode_chan);
-    pmodule_cmd_svid_umode(ptlink_cmd_svid_umode);
-    pmodule_cmd_nc_change(ptlink_cmd_nc_change);
-    pmodule_cmd_svid_umode2(ptlink_cmd_svid_umode2);
-    pmodule_cmd_svid_umode3(ptlink_cmd_svid_umode3);
-    pmodule_cmd_svsjoin(ptlink_cmd_svsjoin);
-    pmodule_cmd_svspart(ptlink_cmd_svspart);
+    pmodule_SendSVID(ptlink_cmd_svid_umode);
+    pmodule_SendUnregisteredNick(ptlink_cmd_nc_change);
+    pmodule_SendSVID2(ptlink_cmd_svid_umode2);
+    pmodule_SendSVID3(ptlink_cmd_svid_umode3);
+    pmodule_SendSVSJoin(ptlink_cmd_svsjoin);
+    pmodule_SendSVSPart(ptlink_cmd_svspart);
     pmodule_cmd_swhois(ptlink_cmd_swhois);
     pmodule_cmd_eob(ptlink_cmd_eob);
     pmodule_flood_mode_check(ptlink_flood_mode_check);
     pmodule_cmd_jupe(ptlink_cmd_jupe);
     pmodule_valid_nick(ptlink_valid_nick);
     pmodule_valid_chan(ptlink_valid_chan);
-    pmodule_cmd_ctcp(ptlink_cmd_ctcp);
+    pmodule_SendCTCP(ptlink_cmd_ctcp);
     pmodule_set_umode(ptlink_set_umode);
 }
 

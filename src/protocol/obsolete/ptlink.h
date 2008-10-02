@@ -137,15 +137,15 @@ void ptlink_SendSZLine(const char *mask, const char *reason, const char *whom);
 void ptlink_SendSGLine(const char *mask, const char *reason);
 void ptlink_SendBanDel(const char *name, const char *nick);
 void ptlink_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void ptlink_cmd_svid_umode(const char *nick, time_t ts);
-void ptlink_cmd_nc_change(User * u);
-void ptlink_cmd_svid_umode2(User * u, const char *ts);
-void ptlink_cmd_svid_umode3(User * u, const char *ts);
+void ptlink_SendSVID(const char *nick, time_t ts);
+void ptlink_SendUnregisteredNick(User * u);
+void ptlink_SendSVID2(User * u, const char *ts);
+void ptlink_SendSVID3(User * u, const char *ts);
 void ptlink_cmd_eob();
 int ptlink_flood_mode_check(const char *value);
 void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int ptlink_valid_nick(const char *nick);
-void ptlink_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void ptlink_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class PTlinkProto : public IRCDProtoNew {
 	public:

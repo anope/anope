@@ -63,7 +63,7 @@ void memoserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_cmd_ctcp(s_MemoServ, u->nick, "PING %s", s);
+        anope_SendCTCP(s_MemoServ, u->nick, "PING %s", s);
     } else {
         if (!u->na && stricmp(cmd, "HELP") != 0)
             notice_lang(s_MemoServ, u, NICK_NOT_REGISTERED_HELP,

@@ -1367,7 +1367,7 @@ void rageircd_SendSVSO(const char *source, const char *nick, const char *flag)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void rageircd_cmd_svid_umode(const char *nick, time_t ts)
+void rageircd_SendSVID(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
              (unsigned long int) ts);
@@ -1375,18 +1375,18 @@ void rageircd_cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void rageircd_cmd_nc_change(User * u)
+void rageircd_SendUnregisteredNick(User * u)
 {
     common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
-void rageircd_cmd_svid_umode2(User * u, const char *ts)
+void rageircd_SendSVID2(User * u, const char *ts)
 {
     /* not used by bahamut ircds */
 }
 
-void rageircd_cmd_svid_umode3(User * u, const char *ts)
+void rageircd_SendSVID3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1456,12 +1456,12 @@ int anope_event_sqline(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void rageircd_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void rageircd_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Find no reference to it in the code and docs */
 }
 
-void rageircd_cmd_svspart(const char *source, const char *nick, const char *chan)
+void rageircd_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
     /* Find no reference to it in the code and docs */
 }
@@ -1541,7 +1541,7 @@ int rageircd_valid_chan(const char *chan)
 }
 
 
-void rageircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
+void rageircd_SendCTCP(const char *source, const char *dest, const char *buf)
 {
     char *s;
 
@@ -1620,19 +1620,19 @@ void moduleAddAnopeCmds()
     pmodule_SendSGLine(rageircd_cmd_sgline);
     pmodule_SendBanDel(rageircd_cmd_unban);
     pmodule_SendSVSMode_chan(rageircd_cmd_svsmode_chan);
-    pmodule_cmd_svid_umode(rageircd_cmd_svid_umode);
-    pmodule_cmd_nc_change(rageircd_cmd_nc_change);
-    pmodule_cmd_svid_umode2(rageircd_cmd_svid_umode2);
-    pmodule_cmd_svid_umode3(rageircd_cmd_svid_umode3);
-    pmodule_cmd_svsjoin(rageircd_cmd_svsjoin);
-    pmodule_cmd_svspart(rageircd_cmd_svspart);
+    pmodule_SendSVID(rageircd_cmd_svid_umode);
+    pmodule_SendUnregisteredNick(rageircd_cmd_nc_change);
+    pmodule_SendSVID2(rageircd_cmd_svid_umode2);
+    pmodule_SendSVID3(rageircd_cmd_svid_umode3);
+    pmodule_SendSVSJoin(rageircd_cmd_svsjoin);
+    pmodule_SendSVSPart(rageircd_cmd_svspart);
     pmodule_cmd_swhois(rageircd_cmd_swhois);
     pmodule_cmd_eob(rageircd_cmd_eob);
     pmodule_flood_mode_check(rageircd_flood_mode_check);
     pmodule_cmd_jupe(rageircd_cmd_jupe);
     pmodule_valid_nick(rageircd_valid_nick);
     pmodule_valid_chan(rageircd_valid_chan);
-    pmodule_cmd_ctcp(rageircd_cmd_ctcp);
+    pmodule_SendCTCP(rageircd_cmd_ctcp);
     pmodule_set_umode(rageircd_set_umode);
 }
 

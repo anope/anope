@@ -98,15 +98,15 @@ void plexus_SendSZLine(const char *mask, const char *reason, const char *whom);
 void plexus_SendSGLine(const char *mask, const char *reason);
 void plexus_SendBanDel(const char *name, const char *nick);
 void plexus_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void plexus_cmd_svid_umode(const char *nick, time_t ts);
-void plexus_cmd_nc_change(User * u);
-void plexus_cmd_svid_umode2(User * u, const char *ts);
-void plexus_cmd_svid_umode3(User * u, const char *ts);
+void plexus_SendSVID(const char *nick, time_t ts);
+void plexus_SendUnregisteredNick(User * u);
+void plexus_SendSVID2(User * u, const char *ts);
+void plexus_SendSVID3(User * u, const char *ts);
 void plexus_cmd_eob();
 int plexus_flood_mode_check(const char *value);
 void plexus_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int plexus_valid_nick(const char *nick);
-void plexus_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void plexus_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class PleXusIRCdProto : public IRCDProtoNew {
 	public:

@@ -1000,7 +1000,7 @@ void BahamutIRCdProto::SendGuestNick(const char *nick, const char *user, const c
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void BahamutIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
+void BahamutIRCdProto::SendSVID(const char *nick, time_t ts)
 {
 	send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, static_cast<unsigned long>(ts));
 }
@@ -1008,12 +1008,12 @@ void BahamutIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void BahamutIRCdProto::cmd_nc_change(User *u)
+void BahamutIRCdProto::SendUnregisteredNick(User *u)
 {
 	common_svsmode(u, "+d", "1");
 }
 
-void BahamutIRCdProto::cmd_svid_umode3(User *u, const char *ts)
+void BahamutIRCdProto::SendSVID3(User *u, const char *ts)
 {
 	if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
 	else common_svsmode(u, "+r", NULL);

@@ -1304,23 +1304,23 @@ void InspIRCdProto::SendSZLine(const char *mask, const char *reason, const char 
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void InspIRCdProto::cmd_nc_change(User *u)
+void InspIRCdProto::SendUnregisteredNick(User *u)
 {
 	common_svsmode(u, "-r", NULL);
 }
 
 /* SVSMODE +r */
-void InspIRCdProto::cmd_svid_umode2(User *u, const char *ts)
+void InspIRCdProto::SendSVID2(User *u, const char *ts)
 {
 	common_svsmode(u, "+r", NULL);
 }
 
-void InspIRCdProto::cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void InspIRCdProto::SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
 	send_cmd(source, "SVSJOIN %s %s", nick, chan);
 }
 
-void InspIRCdProto::cmd_svspart(const char *source, const char *nick, const char *chan)
+void InspIRCdProto::SendSVSPart(const char *source, const char *nick, const char *chan)
 {
 	send_cmd(source, "SVSPART %s %s", nick, chan);
 }

@@ -144,7 +144,7 @@ void nickserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_cmd_ctcp(s_NickServ, u->nick, "PING %s", s);
+        anope_SendCTCP(s_NickServ, u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_NickServ, u, NICKSERV, cmd);
     }

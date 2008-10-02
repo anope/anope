@@ -87,10 +87,10 @@ class InspIRCdProto : public IRCDProto {
 		void SendSVSHOLDDel(const char *);
 		void SendSZLineDel(const char *);
 		void SendSZLine(const char *, const char *, const char *);
-		void cmd_nc_change(User *);
-		void cmd_svid_umode2(User *, const char *);
-		void cmd_svsjoin(const char *, const char *, const char *, const char *);
-		void cmd_svspart(const char *, const char *, const char *);
+		void SendUnregisteredNick(User *);
+		void SendSVID2(User *, const char *);
+		void SendSVSJoin(const char *, const char *, const char *, const char *);
+		void SendSVSPart(const char *, const char *, const char *);
 		void cmd_eob();
 		void cmd_server(const char *, int, const char *);
 		void set_umode(User *, int, const char **);

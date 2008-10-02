@@ -84,9 +84,9 @@ class BahamutIRCdProto : public IRCDProto {
 		void SendSGLine(const char *, const char *);
 		void SendBanDel(const char *, const char *);
 		void SendSVSMode_chan(const char *, const char *, const char *);
-		void cmd_svid_umode(const char *, time_t);
-		void cmd_nc_change(User *);
-		void cmd_svid_umode3(User *, const char *);
+		void SendSVID(const char *, time_t);
+		void SendUnregisteredNick(User *);
+		void SendSVID3(User *, const char *);
 		void cmd_eob();
 		void cmd_server(const char *, int, const char *);
 		void set_umode(User *, int, const char **);

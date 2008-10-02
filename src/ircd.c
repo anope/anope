@@ -322,34 +322,34 @@ void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick
 	ircdproto->SendSVSMode_chan(name, mode, nick);
 }
 
-void anope_cmd_svid_umode(const char *nick, time_t ts)
+void anope_SendSVID(const char *nick, time_t ts)
 {
-	ircdproto->cmd_svid_umode(nick, ts);
+	ircdproto->SendSVID(nick, ts);
 }
 
-void anope_cmd_nc_change(User *u)
+void anope_SendUnregisteredNick(User *u)
 {
-	ircdproto->cmd_nc_change(u);
+	ircdproto->SendUnregisteredNick(u);
 }
 
-void anope_cmd_svid_umode2(User *u, const char *ts)
+void anope_SendSVID2(User *u, const char *ts)
 {
-	ircdproto->cmd_svid_umode2(u, ts);
+	ircdproto->SendSVID2(u, ts);
 }
 
-void anope_cmd_svid_umode3(User *u, const char *ts)
+void anope_SendSVID3(User *u, const char *ts)
 {
-	ircdproto->cmd_svid_umode3(u, ts);
+	ircdproto->SendSVID3(u, ts);
 }
 
-void anope_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void anope_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
-	ircdproto->cmd_svsjoin(source, nick, chan, param);
+	ircdproto->SendSVSJoin(source, nick, chan, param);
 }
 
-void anope_cmd_svspart(const char *source, const char *nick, const char *chan)
+void anope_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
-	ircdproto->cmd_svspart(source, nick, chan);
+	ircdproto->SendSVSPart(source, nick, chan);
 }
 
 void anope_cmd_swhois(const char *source, const char *who, const char *mask)
@@ -383,7 +383,7 @@ int anope_valid_chan(const char *chan)
 }
 
 
-void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
+void anope_SendCTCP(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -392,7 +392,7 @@ void anope_cmd_ctcp(const char *source, const char *dest, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_ctcp(source, dest, buf);
+	ircdproto->SendCTCP(source, dest, buf);
 }
 
 void anope_cmd_numeric(const char *source, int numeric, const char *dest, const char *fmt, ...)

@@ -100,15 +100,15 @@ void rageircd_SendSZLine(const char *mask, const char *reason, const char *whom)
 void rageircd_SendSGLine(const char *mask, const char *reason);
 void rageircd_SendBanDel(const char *name, const char *nick);
 void rageircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void rageircd_cmd_svid_umode(const char *nick, time_t ts);
-void rageircd_cmd_nc_change(User * u);
-void rageircd_cmd_svid_umode2(User * u, const char *ts);
-void rageircd_cmd_svid_umode3(User * u, const char *ts);
+void rageircd_SendSVID(const char *nick, time_t ts);
+void rageircd_SendUnregisteredNick(User * u);
+void rageircd_SendSVID2(User * u, const char *ts);
+void rageircd_SendSVID3(User * u, const char *ts);
 void rageircd_cmd_eob();
 int rageircd_flood_mode_check(const char *value);
 void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int rageircd_valid_nick(const char *nick);
-void rageircd_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void rageircd_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class RageIRCdProto : public IRCDProtoNew {
 	public:

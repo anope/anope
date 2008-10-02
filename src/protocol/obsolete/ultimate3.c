@@ -1479,7 +1479,7 @@ void ultimate3_SendSVSHOLDDel(const char *nick)
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void ultimate3_cmd_svid_umode(const char *nick, time_t ts)
+void ultimate3_SendSVID(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
              (unsigned long int) ts);
@@ -1487,18 +1487,18 @@ void ultimate3_cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void ultimate3_cmd_nc_change(User * u)
+void ultimate3_SendUnregisteredNick(User * u)
 {
     common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
-void ultimate3_cmd_svid_umode2(User * u, const char *ts)
+void ultimate3_SendSVID2(User * u, const char *ts)
 {
     /* not used by bahamut ircds */
 }
 
-void ultimate3_cmd_svid_umode3(User * u, const char *ts)
+void ultimate3_SendSVID3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1544,12 +1544,12 @@ int anope_event_sqline(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ultimate3_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void ultimate3_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     /* Not Supported by this IRCD */
 }
 
-void ultimate3_cmd_svspart(const char *source, const char *nick, const char *chan)
+void ultimate3_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
     /* Not Supported by this IRCD */
 }
@@ -1682,7 +1682,7 @@ int ultiamte3_valid_chan(const char *chan)
 }
 
 
-void ultimate3_cmd_ctcp(const char *source, const char *dest, const char *buf)
+void ultimate3_SendCTCP(const char *source, const char *dest, const char *buf)
 {
     char *s;
 
@@ -1761,19 +1761,19 @@ void moduleAddAnopeCmds()
     pmodule_SendSGLine(ultimate3_cmd_sgline);
     pmodule_SendBanDel(ultimate3_cmd_unban);
     pmodule_SendSVSMode_chan(ultimate3_cmd_svsmode_chan);
-    pmodule_cmd_svid_umode(ultimate3_cmd_svid_umode);
-    pmodule_cmd_nc_change(ultimate3_cmd_nc_change);
-    pmodule_cmd_svid_umode2(ultimate3_cmd_svid_umode2);
-    pmodule_cmd_svid_umode3(ultimate3_cmd_svid_umode3);
-    pmodule_cmd_svsjoin(ultimate3_cmd_svsjoin);
-    pmodule_cmd_svspart(ultimate3_cmd_svspart);
+    pmodule_SendSVID(ultimate3_cmd_svid_umode);
+    pmodule_SendUnregisteredNick(ultimate3_cmd_nc_change);
+    pmodule_SendSVID2(ultimate3_cmd_svid_umode2);
+    pmodule_SendSVID3(ultimate3_cmd_svid_umode3);
+    pmodule_SendSVSJoin(ultimate3_cmd_svsjoin);
+    pmodule_SendSVSPart(ultimate3_cmd_svspart);
     pmodule_cmd_swhois(ultimate3_cmd_swhois);
     pmodule_cmd_eob(ultimate3_cmd_eob);
     pmodule_flood_mode_check(ultiamte3_flood_mode_check);
     pmodule_cmd_jupe(ultimate3_cmd_jupe);
     pmodule_valid_nick(ultiamte3_valid_nick);
     pmodule_valid_chan(ultiamte3_valid_chan);
-    pmodule_cmd_ctcp(ultimate3_cmd_ctcp);
+    pmodule_SendCTCP(ultimate3_cmd_ctcp);
     pmodule_set_umode(ultimate3_set_umode);
 }
 

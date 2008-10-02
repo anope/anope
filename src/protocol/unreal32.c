@@ -1211,7 +1211,7 @@ void UnrealIRCdProto::SendSVSMode_chan(const char *name, const char *mode, const
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void UnrealIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
+void UnrealIRCdProto::SendSVID(const char *nick, time_t ts)
 {
 	if (UseSVS2MODE) send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"), nick);
 	else send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"), nick);
@@ -1219,13 +1219,13 @@ void UnrealIRCdProto::cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void UnrealIRCdProto::cmd_nc_change(User *u)
+void UnrealIRCdProto::SendUnregisteredNick(User *u)
 {
 	common_svsmode(u, "-r+d", "1");
 }
 
 /* SVSMODE +r */
-void UnrealIRCdProto::cmd_svid_umode2(User *u, const char *ts)
+void UnrealIRCdProto::SendSVID2(User *u, const char *ts)
 {
 	if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
 	else common_svsmode(u, "+r", NULL);
@@ -1263,7 +1263,7 @@ int anope_event_smo(const char *source, int ac, const char **av)
 /* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
    when coming from a none TOKEN'd server
 */
-void UnrealIRCdProto::cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void UnrealIRCdProto::SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
 	if (param) send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
 	else send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
@@ -1274,7 +1274,7 @@ void UnrealIRCdProto::cmd_svsjoin(const char *source, const char *nick, const ch
 	parv[1] - nick to make part
 	parv[2] - channel(s) to part
 */
-void UnrealIRCdProto::cmd_svspart(const char *source, const char *nick, const char *chan)
+void UnrealIRCdProto::SendSVSPart(const char *source, const char *nick, const char *chan)
 {
 	send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
 }

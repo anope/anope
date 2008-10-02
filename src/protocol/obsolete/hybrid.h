@@ -102,15 +102,15 @@ void hybrid_SendSZLine(const char *mask, const char *reason, const char *whom);
 void hybrid_SendSGLine(const char *mask, const char *reason);
 void hybrid_SendBanDel(const char *name, const char *nick);
 void hybrid_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
-void hybrid_cmd_svid_umode(const char *nick, time_t ts);
-void hybrid_cmd_nc_change(User * u);
-void hybrid_cmd_svid_umode2(User * u, const char *ts);
-void hybrid_cmd_svid_umode3(User * u, const char *ts);
+void hybrid_SendSVID(const char *nick, time_t ts);
+void hybrid_SendUnregisteredNick(User * u);
+void hybrid_SendSVID2(User * u, const char *ts);
+void hybrid_SendSVID3(User * u, const char *ts);
 void hybrid_cmd_eob();
 int hybrid_flood_mode_check(const char *value);
 void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason);
 int hybrid_valid_nick(const char *nick);
-void hybrid_cmd_ctcp(const char *source, const char *dest, const char *buf);
+void hybrid_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class HybridIRCdProto : public IRCDProtoNew {
 	public:

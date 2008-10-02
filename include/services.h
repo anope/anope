@@ -1322,19 +1322,19 @@ class IRCDProto {
 		virtual void SendSGLine(const char *, const char *) { }
 		virtual void SendBanDel(const char *, const char *) { }
 		virtual void SendSVSMode_chan(const char *, const char *, const char *) { }
-		virtual void cmd_svid_umode(const char *, time_t) { }
-		virtual void cmd_nc_change(User *) { }
-		virtual void cmd_svid_umode2(User *, const char *) { }
-		virtual void cmd_svid_umode3(User *, const char *) { }
-		virtual void cmd_ctcp(const char *source, const char *dest, const char *buf)
+		virtual void SendSVID(const char *, time_t) { }
+		virtual void SendUnregisteredNick(User *) { }
+		virtual void SendSVID2(User *, const char *) { }
+		virtual void SendSVID3(User *, const char *) { }
+		virtual void SendCTCP(const char *source, const char *dest, const char *buf)
 		{
 			if (!buf) return;
 			char *s = normalizeBuffer(buf);
 			send_cmd(source, "NOTICE %s :\1%s\1", dest, s);
 			free(s);
 		}
-		virtual void cmd_svsjoin(const char *, const char *, const char *, const char *) { }
-		virtual void cmd_svspart(const char *, const char *, const char *) { }
+		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
+		virtual void SendSVSPart(const char *, const char *, const char *) { }
 		virtual void cmd_swhois(const char *, const char *, const char *) { }
 		virtual void cmd_eob() { }
 		virtual void cmd_server(const char *, int, const char *) = 0;

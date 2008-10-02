@@ -1542,7 +1542,7 @@ plexus_SendSVSMode_chan (const char *name, const char *mode, const char *nick)
 /* SVSMODE +d */
 /* sent if svid is something weird */
 void
-plexus_cmd_svid_umode (const char *nick, time_t ts)
+plexus_SendSVID (const char *nick, time_t ts)
 {
   send_cmd (ServerName, "ENCAP * SVSMODE %s %lu +d 1", nick,
 	    (unsigned long int) ts);
@@ -1551,20 +1551,20 @@ plexus_cmd_svid_umode (const char *nick, time_t ts)
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
 void
-plexus_cmd_nc_change (User * u)
+plexus_SendUnregisteredNick (User * u)
 {
   common_svsmode (u, "+d", "1");
 }
 
 /* SVSMODE +d */
 void
-plexus_cmd_svid_umode2 (User * u, const char *ts)
+plexus_SendSVID2 (User * u, const char *ts)
 {
   /* not used */
 }
 
 void
-plexus_cmd_svid_umode3 (User * u, const char *ts)
+plexus_SendSVID3 (User * u, const char *ts)
 {
   char modes[512];
 
@@ -1620,13 +1620,13 @@ anope_event_pass (const char *source, int ac, const char **av)
 }
 
 void
-plexus_cmd_svsjoin (const char *source, const char *nick, const char *chan, const char *param)
+plexus_SendSVSJoin (const char *source, const char *nick, const char *chan, const char *param)
 {
   send_cmd(ServerName, "ENCAP * SVSJOIN %s %s", nick, chan);
 }
 
 void
-plexus_cmd_svspart (const char *source, const char *nick, const char *chan)
+plexus_SendSVSPart (const char *source, const char *nick, const char *chan)
 {
   send_cmd(ServerName, "ENCAP * SVSPART %s %s", nick, chan);
 }
@@ -1712,7 +1712,7 @@ plexus_valid_chan (const char *chan)
 
 
 void
-plexus_cmd_ctcp (const char *source, const char *dest, const char *buf)
+plexus_SendCTCP (const char *source, const char *dest, const char *buf)
 {
   char *s;
 
@@ -1795,19 +1795,19 @@ moduleAddAnopeCmds ()
   pmodule_SendSGLine (plexus_cmd_sgline);
   pmodule_SendBanDel (plexus_cmd_unban);
   pmodule_SendSVSMode_chan (plexus_cmd_svsmode_chan);
-  pmodule_cmd_svid_umode (plexus_cmd_svid_umode);
-  pmodule_cmd_nc_change (plexus_cmd_nc_change);
-  pmodule_cmd_svid_umode2 (plexus_cmd_svid_umode2);
-  pmodule_cmd_svid_umode3 (plexus_cmd_svid_umode3);
-  pmodule_cmd_svsjoin (plexus_cmd_svsjoin);
-  pmodule_cmd_svspart (plexus_cmd_svspart);
+  pmodule_SendSVID (plexus_cmd_svid_umode);
+  pmodule_SendUnregisteredNick (plexus_cmd_nc_change);
+  pmodule_SendSVID2 (plexus_cmd_svid_umode2);
+  pmodule_SendSVID3 (plexus_cmd_svid_umode3);
+  pmodule_SendSVSJoin (plexus_cmd_svsjoin);
+  pmodule_SendSVSPart (plexus_cmd_svspart);
   pmodule_cmd_swhois (plexus_cmd_swhois);
   pmodule_cmd_eob (plexus_cmd_eob);
   pmodule_flood_mode_check (plexus_flood_mode_check);
   pmodule_cmd_jupe (plexus_cmd_jupe);
   pmodule_valid_nick (plexus_valid_nick);
   pmodule_valid_chan (plexus_valid_chan);
-  pmodule_cmd_ctcp (plexus_cmd_ctcp);
+  pmodule_SendCTCP (plexus_cmd_ctcp);
   pmodule_set_umode (plexus_set_umode);
 }
 

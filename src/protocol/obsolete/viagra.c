@@ -1446,7 +1446,7 @@ void viagra_SendSVSMode_chan(const char *name, const char *mode, const char *nic
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
-void viagra_cmd_svid_umode(const char *nick, time_t ts)
+void viagra_SendSVID(const char *nick, time_t ts)
 {
     send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
              (unsigned long int) ts);
@@ -1454,18 +1454,18 @@ void viagra_cmd_svid_umode(const char *nick, time_t ts)
 
 /* SVSMODE +d */
 /* nc_change was = 1, and there is no na->status */
-void viagra_cmd_nc_change(User * u)
+void viagra_SendUnregisteredNick(User * u)
 {
     common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
-void viagra_cmd_svid_umode2(User * u, const char *ts)
+void viagra_SendSVID2(User * u, const char *ts)
 {
     /* not used by bahamut ircds */
 }
 
-void viagra_cmd_svid_umode3(User * u, const char *ts)
+void viagra_SendSVID3(User * u, const char *ts)
 {
     if (u->svid != u->timestamp) {
         common_svsmode(u, "+rd", ts);
@@ -1490,7 +1490,7 @@ void viagra_SendChangeBotNick(const char *oldnick, const char *newnick)
  *  parv[1] = nick to make join
  *  parv[2] = channel(s) to join
  */
-void viagra_cmd_svsjoin(const char *source, const char *nick, const char *chan, const char *param)
+void viagra_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
     send_cmd(source, "SVSJOIN %s :%s", nick, chan);
 }
@@ -1501,7 +1501,7 @@ void viagra_cmd_svsjoin(const char *source, const char *nick, const char *chan, 
  *  parv[1] = nick to make part
  *  parv[2] = channel(s) to part
  */
-void viagra_cmd_svspart(const char *source, const char *nick, const char *chan)
+void viagra_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
     send_cmd(source, "SVSPART %s :%s", nick, chan);
 }
@@ -1581,7 +1581,7 @@ int viagra_valid_chan(const char *chan)
 }
 
 
-void viagra_cmd_ctcp(const char *source, const char *dest, const char *buf)
+void viagra_SendCTCP(const char *source, const char *dest, const char *buf)
 {
     char *s;
 
@@ -1660,19 +1660,19 @@ void moduleAddAnopeCmds()
     pmodule_SendSGLine(viagra_cmd_sgline);
     pmodule_SendBanDel(viagra_cmd_unban);
     pmodule_SendSVSMode_chan(viagra_cmd_svsmode_chan);
-    pmodule_cmd_svid_umode(viagra_cmd_svid_umode);
-    pmodule_cmd_nc_change(viagra_cmd_nc_change);
-    pmodule_cmd_svid_umode2(viagra_cmd_svid_umode2);
-    pmodule_cmd_svid_umode3(viagra_cmd_svid_umode3);
-    pmodule_cmd_svsjoin(viagra_cmd_svsjoin);
-    pmodule_cmd_svspart(viagra_cmd_svspart);
+    pmodule_SendSVID(viagra_cmd_svid_umode);
+    pmodule_SendUnregisteredNick(viagra_cmd_nc_change);
+    pmodule_SendSVID2(viagra_cmd_svid_umode2);
+    pmodule_SendSVID3(viagra_cmd_svid_umode3);
+    pmodule_SendSVSJoin(viagra_cmd_svsjoin);
+    pmodule_SendSVSPart(viagra_cmd_svspart);
     pmodule_cmd_swhois(viagra_cmd_swhois);
     pmodule_cmd_eob(viagra_cmd_eob);
     pmodule_flood_mode_check(viagra_flood_mode_check);
     pmodule_cmd_jupe(viagra_cmd_jupe);
     pmodule_valid_nick(viagra_valid_nick);
     pmodule_valid_chan(viagra_valid_chan);
-    pmodule_cmd_ctcp(viagra_cmd_ctcp);
+    pmodule_SendCTCP(viagra_cmd_ctcp);
     pmodule_set_umode(viagra_set_umode);
 }
 

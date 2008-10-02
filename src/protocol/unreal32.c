@@ -1378,13 +1378,13 @@ int UnrealIRCdProto::flood_mode_check(const char *value)
   1 = valid nick
   0 = nick is in valid
 */
-int UnrealIRCdProto::valid_nick(const char *nick)
+int UnrealIRCdProto::IsNickValid(const char *nick)
 {
 	if (!stricmp("ircd", nick) || !stricmp("irc", nick)) return 0;
 	return 1;
 }
 
-int UnrealIRCdProto::valid_chan(const char *chan)
+int UnrealIRCdProto::IsChannelValid(const char *chan)
 {
 	if (strchr(chan, ':')) return 0;
 	return 1;

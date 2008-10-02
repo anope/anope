@@ -144,7 +144,7 @@ void ptlink_SendSVID3(User * u, const char *ts);
 void ptlink_SendEOB();
 int ptlink_flood_mode_check(const char *value);
 void ptlink_SendJupe(const char *jserver, const char *who, const char *reason);
-int ptlink_valid_nick(const char *nick);
+int ptlink_IsNickValid(const char *nick);
 void ptlink_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class PTlinkProto : public IRCDProtoNew {

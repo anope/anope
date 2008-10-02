@@ -1665,7 +1665,7 @@ void ultimate3_SendGlobops_legacy(const char *source, const char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int ultiamte3_valid_nick(const char *nick)
+int ultiamte3_IsNickValid(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1675,7 +1675,7 @@ int ultiamte3_valid_nick(const char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int ultiamte3_valid_chan(const char *chan)
+int ultiamte3_IsChannelValid(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
@@ -1771,8 +1771,8 @@ void moduleAddAnopeCmds()
     pmodule_SendEOB(ultimate3_cmd_eob);
     pmodule_flood_mode_check(ultiamte3_flood_mode_check);
     pmodule_SendJupe(ultimate3_cmd_jupe);
-    pmodule_valid_nick(ultiamte3_valid_nick);
-    pmodule_valid_chan(ultiamte3_valid_chan);
+    pmodule_IsNickValid(ultiamte3_valid_nick);
+    pmodule_IsChannelValid(ultiamte3_valid_chan);
     pmodule_SendCTCP(ultimate3_cmd_ctcp);
     pmodule_ProcessUsermodes(ultimate3_set_umode);
 }

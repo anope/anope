@@ -131,7 +131,7 @@ void solidircd_SendSVID3(User * u, const char *ts);
 void solidircd_SendEOB();
 int solidircd_flood_mode_check(const char *value);
 void solidircd_SendJupe(const char *jserver, const char *who, const char *reason);
-int solidircd_valid_nick(const char *nick);
+int solidircd_IsNickValid(const char *nick);
 void solidircd_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class SolidIRCdProto : public IRCDProtoNew {

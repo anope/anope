@@ -85,7 +85,7 @@ int do_forbid(User * u)
 
     if (readonly)
         notice_lang(s_NickServ, u, READ_ONLY_MODE);
-    if (!anope_valid_nick(nick)) {
+    if (!anope_IsNickValid(nick)) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, nick);
         return MOD_CONT;
     }

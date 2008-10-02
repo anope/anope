@@ -109,7 +109,7 @@ void hybrid_SendSVID3(User * u, const char *ts);
 void hybrid_SendEOB();
 int hybrid_flood_mode_check(const char *value);
 void hybrid_SendJupe(const char *jserver, const char *who, const char *reason);
-int hybrid_valid_nick(const char *nick);
+int hybrid_IsNickValid(const char *nick);
 void hybrid_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class HybridIRCdProto : public IRCDProtoNew {

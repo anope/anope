@@ -133,7 +133,7 @@ int do_register(User * u)
         return MOD_CONT;
     }
 
-    if (!anope_valid_nick(u->nick)) {
+    if (!anope_IsNickValid(u->nick)) {
         notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u->nick);
         return MOD_CONT;
     }

@@ -1693,7 +1693,7 @@ plexus_SendJupe (const char *jserver, const char *who, const char *reason)
   0 = nick is in valid
 */
 int
-plexus_valid_nick (const char *nick)
+plexus_IsNickValid (const char *nick)
 {
   /* no hard coded invalid nicks */
   return 1;
@@ -1704,7 +1704,7 @@ plexus_valid_nick (const char *nick)
   0 = chan is in valid
 */
 int
-plexus_valid_chan (const char *chan)
+plexus_IsChannelValid (const char *chan)
 {
   /* no hard coded invalid chan */
   return 1;
@@ -1805,8 +1805,8 @@ moduleAddAnopeCmds ()
   pmodule_SendEOB (plexus_cmd_eob);
   pmodule_flood_mode_check (plexus_flood_mode_check);
   pmodule_SendJupe (plexus_cmd_jupe);
-  pmodule_valid_nick (plexus_valid_nick);
-  pmodule_valid_chan (plexus_valid_chan);
+  pmodule_IsNickValid (plexus_valid_nick);
+  pmodule_IsChannelValid (plexus_valid_chan);
   pmodule_SendCTCP (plexus_cmd_ctcp);
   pmodule_ProcessUsermodes (plexus_set_umode);
 }

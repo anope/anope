@@ -1415,7 +1415,7 @@ void hybrid_SendJupe(const char *jserver, const char *who, const char *reason)
   1 = valid nick
   0 = nick is in valid
 */
-int hybrid_valid_nick(const char *nick)
+int hybrid_IsNickValid(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1425,7 +1425,7 @@ int hybrid_valid_nick(const char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int hybrid_valid_chan(const char *chan)
+int hybrid_IsChannelValid(const char *chan)
 {
     /* no hard coded invalid chans */
     return 1;
@@ -1521,8 +1521,8 @@ void moduleAddAnopeCmds()
     pmodule_SendEOB(hybrid_cmd_eob);
     pmodule_flood_mode_check(hybrid_flood_mode_check);
     pmodule_SendJupe(hybrid_cmd_jupe);
-    pmodule_valid_nick(hybrid_valid_nick);
-    pmodule_valid_chan(hybrid_valid_chan);
+    pmodule_IsNickValid(hybrid_valid_nick);
+    pmodule_IsChannelValid(hybrid_valid_chan);
     pmodule_SendCTCP(hybrid_cmd_ctcp);
     pmodule_ProcessUsermodes(hybrid_set_umode);
 }

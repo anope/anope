@@ -1644,7 +1644,7 @@ void ptlink_SendGlobops_legacy(const char *source, const char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int ptlink_valid_nick(const char *nick)
+int ptlink_IsNickValid(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1654,7 +1654,7 @@ int ptlink_valid_nick(const char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int ptlink_valid_chan(const char *cahn)
+int ptlink_IsChannelValid(const char *cahn)
 {
     /* no hard coded invalid chan */
     return 1;
@@ -1750,8 +1750,8 @@ void moduleAddAnopeCmds()
     pmodule_SendEOB(ptlink_cmd_eob);
     pmodule_flood_mode_check(ptlink_flood_mode_check);
     pmodule_SendJupe(ptlink_cmd_jupe);
-    pmodule_valid_nick(ptlink_valid_nick);
-    pmodule_valid_chan(ptlink_valid_chan);
+    pmodule_IsNickValid(ptlink_valid_nick);
+    pmodule_IsChannelValid(ptlink_valid_chan);
     pmodule_SendCTCP(ptlink_cmd_ctcp);
     pmodule_ProcessUsermodes(ptlink_set_umode);
 }

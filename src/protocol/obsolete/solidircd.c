@@ -1557,7 +1557,7 @@ void solidircd_SendGlobops_legacy(const char *source, const char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int solidircd_valid_nick(const char *nick)
+int solidircd_IsNickValid(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1567,7 +1567,7 @@ int solidircd_valid_nick(const char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int solidircd_valid_chan(const char *chan)
+int solidircd_IsChannelValid(const char *chan)
 {
     /* no hard coded invalid chan*/
     return 1;
@@ -1663,8 +1663,8 @@ void moduleAddAnopeCmds()
     pmodule_SendEOB(solidircd_cmd_eob);
     pmodule_flood_mode_check(solidircd_flood_mode_check);
     pmodule_SendJupe(solidircd_cmd_jupe);
-    pmodule_valid_nick(solidircd_valid_nick);
-    pmodule_valid_chan(solidircd_valid_chan);
+    pmodule_IsNickValid(solidircd_valid_nick);
+    pmodule_IsChannelValid(solidircd_valid_chan);
     pmodule_SendCTCP(solidircd_cmd_ctcp);
     pmodule_ProcessUsermodes(solidircd_set_umode);
 }

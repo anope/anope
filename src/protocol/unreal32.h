@@ -119,7 +119,7 @@ class UnrealIRCdProto : public IRCDProto {
 		void SendEOB();
 		void SendServer(const char *, int, const char *);
 		void ProcessUsermodes(User *, int, const char **);
-		int valid_nick(const char *);
-		int valid_chan(const char *);
+		int IsNickValid(const char *);
+		int IsChannelValid(const char *);
 		int flood_mode_check(const char *);
 } ircd_proto;

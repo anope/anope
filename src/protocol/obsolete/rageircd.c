@@ -1524,7 +1524,7 @@ void rageircd_SendGlobops_legacy(const char *source, const char *fmt)
   1 = valid nick
   0 = nick is in valid
 */
-int rageircd_valid_nick(const char *nick)
+int rageircd_IsNickValid(const char *nick)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1534,7 +1534,7 @@ int rageircd_valid_nick(const char *nick)
   1 = valid chan
   0 = chan is in valid
 */
-int rageircd_valid_chan(const char *chan)
+int rageircd_IsChannelValid(const char *chan)
 {
     /* no hard coded invalid nicks */
     return 1;
@@ -1630,8 +1630,8 @@ void moduleAddAnopeCmds()
     pmodule_SendEOB(rageircd_cmd_eob);
     pmodule_flood_mode_check(rageircd_flood_mode_check);
     pmodule_SendJupe(rageircd_cmd_jupe);
-    pmodule_valid_nick(rageircd_valid_nick);
-    pmodule_valid_chan(rageircd_valid_chan);
+    pmodule_IsNickValid(rageircd_valid_nick);
+    pmodule_IsChannelValid(rageircd_valid_chan);
     pmodule_SendCTCP(rageircd_cmd_ctcp);
     pmodule_ProcessUsermodes(rageircd_set_umode);
 }

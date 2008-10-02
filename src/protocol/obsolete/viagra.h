@@ -126,7 +126,7 @@ void viagra_SendSVID3(User * u, const char *ts);
 void viagra_SendEOB();
 int viagra_flood_mode_check(const char *value);
 void viagra_SendJupe(const char *jserver, const char *who, const char *reason);
-int viagra_valid_nick(const char *nick);
+int viagra_IsNickValid(const char *nick);
 void viagra_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class ViagraIRCdProto : public IRCDProtoNew {

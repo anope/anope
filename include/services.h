@@ -1348,8 +1348,8 @@ class IRCDProto {
 			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 		}
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
-		virtual int valid_nick(const char *) { return 1; }
-		virtual int valid_chan(const char *) { return 1; }
+		virtual int IsNickValid(const char *) { return 1; }
+		virtual int IsChannelValid(const char *) { return 1; }
 		virtual int flood_mode_check(const char *) { return 0; }
 		virtual void cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
 		{

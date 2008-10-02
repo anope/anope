@@ -107,7 +107,7 @@ void rageircd_SendSVID3(User * u, const char *ts);
 void rageircd_SendEOB();
 int rageircd_flood_mode_check(const char *value);
 void rageircd_SendJupe(const char *jserver, const char *who, const char *reason);
-int rageircd_valid_nick(const char *nick);
+int rageircd_IsNickValid(const char *nick);
 void rageircd_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class RageIRCdProto : public IRCDProtoNew {

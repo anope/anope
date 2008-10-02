@@ -372,14 +372,14 @@ void anope_SendJupe(const char *jserver, const char *who, const char *reason)
 	ircdproto->SendJupe(jserver, who, reason);
 }
 
-int anope_valid_nick(const char *nick)
+int anope_IsNickValid(const char *nick)
 {
-	return ircdproto->valid_nick(nick);
+	return ircdproto->IsNickValid(nick);
 }
 
-int anope_valid_chan(const char *chan)
+int anope_IsChannelValid(const char *chan)
 {
-	return ircdproto->valid_chan(chan);
+	return ircdproto->IsChannelValid(chan);
 }
 
 

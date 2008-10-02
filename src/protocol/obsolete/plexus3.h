@@ -105,7 +105,7 @@ void plexus_SendSVID3(User * u, const char *ts);
 void plexus_SendEOB();
 int plexus_flood_mode_check(const char *value);
 void plexus_SendJupe(const char *jserver, const char *who, const char *reason);
-int plexus_valid_nick(const char *nick);
+int plexus_IsNickValid(const char *nick);
 void plexus_SendCTCP(const char *source, const char *dest, const char *buf);
 
 class PleXusIRCdProto : public IRCDProtoNew {

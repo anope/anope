@@ -1221,7 +1221,7 @@ int anope_event_error(const char *source, int ac, const char **av)
   1 = valid nick
   0 = nick is in valid
 */
-int RatboxProto::valid_nick(const char *nick)
+int RatboxProto::IsNickValid(const char *nick)
 {
 	/* TS6 Save extension -Certus */
 	if (isdigit(*nick)) return 0;

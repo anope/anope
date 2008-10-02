@@ -223,9 +223,9 @@ int add_session(const char *nick, const char *host, char *hostip)
 
         if (sessionlimit != 0 && session->count >= sessionlimit) {
             if (SessionLimitExceeded)
-                ircdproto->SendMessage(s_OperServ, nick, SessionLimitExceeded, host);
+                ircdproto->SendMessage(findbot(s_OperServ), nick, SessionLimitExceeded, host);
             if (SessionLimitDetailsLoc)
-                ircdproto->SendMessage(s_OperServ, nick, "%s", SessionLimitDetailsLoc);
+                ircdproto->SendMessage(findbot(s_OperServ), nick, "%s", SessionLimitDetailsLoc);
 
             /* We don't use kill_user() because a user stucture has not yet
              * been created. Simply kill the user. -TheShadow

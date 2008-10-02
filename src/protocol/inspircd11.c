@@ -538,7 +538,7 @@ void InspIRCdProto::SendVhostDel(User *u)
 	inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
 }
 
-void InspIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+void InspIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
 	// Calculate the time left before this would expire, capping it at 2 days
 	time_t timeleft = expires - time(NULL);
@@ -552,7 +552,7 @@ void InspIRCdProto::SendSVSKill(const char *source, const char *user, const char
 	send_cmd(source, "KILL %s :%s", user, buf);
 }
 
-void InspIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
+void InspIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 {
 	/* This was originally done using this:
 	   send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));

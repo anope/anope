@@ -1235,9 +1235,9 @@ class IRCDProto {
 		virtual void SendAkillDel(const char *, const char *) = 0;
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void SendVhostDel(User *) { }
-		virtual void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
+		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
 		virtual void SendSVSKill(const char *, const char *, const char *) = 0;
-		virtual void cmd_svsmode(User *, int, const char **) = 0;
+		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
 		virtual void cmd_mode(const char *, const char *, const char *) = 0;
 		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
@@ -1321,7 +1321,7 @@ class IRCDProto {
 		virtual void cmd_szline(const char *, const char *, const char *) { }
 		virtual void cmd_sgline(const char *, const char *) { }
 		virtual void cmd_unban(const char *, const char *) { }
-		virtual void cmd_svsmode_chan(const char *, const char *, const char *) { }
+		virtual void SendSVSMode_chan(const char *, const char *, const char *) { }
 		virtual void cmd_svid_umode(const char *, time_t) { }
 		virtual void cmd_nc_change(User *) { }
 		virtual void cmd_svid_umode2(User *, const char *) { }

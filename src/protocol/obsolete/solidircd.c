@@ -513,13 +513,13 @@ void solidircd_cmd_release_svshold(const char *nick)
 /* SVSMODE -b */
 void solidircd_cmd_unban(const char *name, const char *nick)
 {
-    solidircd_cmd_svsmode_chan(name, "-b", nick);
+    solidircd_SendSVSMode_chan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void solidircd_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void solidircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
@@ -819,7 +819,7 @@ void solidircd_cmd_join(const char *user, const char *channel, time_t chantime)
  * parv[5]=time set
  * parv[6]=reason
  */
-void solidircd_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+void solidircd_SendAkill(const char *user, const char *host, const char *who, time_t when,
                          time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
@@ -852,7 +852,7 @@ void solidircd_SendSVSKill(const char *source, const char *user, const char *buf
  * parv[3] - mode (or services id if old svs version)
  * parv[4] - optional arguement (services id)
  */
-void solidircd_cmd_svsmode(User * u, int ac, const char **av)
+void solidircd_SendSVSMode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
              (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
@@ -1597,9 +1597,9 @@ void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(solidircd_cmd_topic);
     pmodule_SendVhostDel(solidircd_cmd_vhost_off);
-    pmodule_cmd_akill(solidircd_cmd_akill);
+    pmodule_SendAkill(solidircd_cmd_akill);
     pmodule_SendSVSKill(solidircd_SendSVSKill);
-    pmodule_cmd_svsmode(solidircd_cmd_svsmode);
+    pmodule_SendSVSMode(solidircd_cmd_svsmode);
     pmodule_cmd_372(solidircd_cmd_372);
     pmodule_cmd_372_error(solidircd_cmd_372_error);
     pmodule_cmd_375(solidircd_cmd_375);
@@ -1652,7 +1652,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_szline(solidircd_cmd_szline);
     pmodule_cmd_sgline(solidircd_cmd_sgline);
     pmodule_cmd_unban(solidircd_cmd_unban);
-    pmodule_cmd_svsmode_chan(solidircd_cmd_svsmode_chan);
+    pmodule_SendSVSMode_chan(solidircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(solidircd_cmd_svid_umode);
     pmodule_cmd_nc_change(solidircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(solidircd_cmd_svid_umode2);

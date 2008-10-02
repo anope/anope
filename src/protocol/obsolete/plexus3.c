@@ -855,7 +855,7 @@ reason:		the reason for the kline.
 */
 
 void
-plexus_cmd_akill (const char *user, const char *host, const char *who, time_t when,
+plexus_SendAkill (const char *user, const char *host, const char *who, time_t when,
 		  time_t expires, const char *reason)
 {
   send_cmd (s_OperServ, "KLINE * %ld %s %s :%s",
@@ -879,7 +879,7 @@ plexus_SendSVSKill (const char *source, const char *user, const char *buf)
 }
 
 void
-plexus_cmd_svsmode (User * u, int ac, const char **av)
+plexus_SendSVSMode (User * u, int ac, const char **av)
 {
   send_cmd (ServerName, "ENCAP * SVSMODE %s %ld %s%s%s", u->nick,
 	    (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
@@ -1534,7 +1534,7 @@ plexus_cmd_unban (const char *name, const char *nick)
 /* SVSMODE channel modes */
 
 void
-plexus_cmd_svsmode_chan (const char *name, const char *mode, const char *nick)
+plexus_SendSVSMode_chan (const char *name, const char *mode, const char *nick)
 {
   /* Not Supported by this IRCD */
 }
@@ -1739,9 +1739,9 @@ moduleAddAnopeCmds ()
 {
   pmodule_cmd_topic (plexus_cmd_topic);
   pmodule_SendVhostDel (plexus_cmd_vhost_off);
-  pmodule_cmd_akill (plexus_cmd_akill);
+  pmodule_SendAkill (plexus_cmd_akill);
   pmodule_SendSVSKill (plexus_SendSVSKill);
-  pmodule_cmd_svsmode (plexus_cmd_svsmode);
+  pmodule_SendSVSMode (plexus_cmd_svsmode);
   pmodule_cmd_372 (plexus_cmd_372);
   pmodule_cmd_372_error (plexus_cmd_372_error);
   pmodule_cmd_375 (plexus_cmd_375);
@@ -1794,7 +1794,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_szline (plexus_cmd_szline);
   pmodule_cmd_sgline (plexus_cmd_sgline);
   pmodule_cmd_unban (plexus_cmd_unban);
-  pmodule_cmd_svsmode_chan (plexus_cmd_svsmode_chan);
+  pmodule_SendSVSMode_chan (plexus_cmd_svsmode_chan);
   pmodule_cmd_svid_umode (plexus_cmd_svid_umode);
   pmodule_cmd_nc_change (plexus_cmd_nc_change);
   pmodule_cmd_svid_umode2 (plexus_cmd_svid_umode2);

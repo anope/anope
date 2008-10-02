@@ -1115,7 +1115,7 @@ E void notice(char *source, const char *dest, const char *fmt, ...);
 
 /******************************************************************************/
 
-E void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason); /* AKILL */
+E void anope_SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason); /* AKILL */
 E void anope_cmd_capab();						  	  		  /* CAPAB */
 E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
@@ -1159,8 +1159,8 @@ E void anope_cmd_release_svshold(const char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_cmd_svsjoin(const char *source, const char *nick,const char *chan, const char *param);          	  /* SVSJOIN */
 E void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ...);     		  /* SVSKILL */
-E void anope_cmd_svsmode(User * u, int ac, const char **av);   	        	  		  /* SVSMODE */
-E void anope_cmd_svsmode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
+E void anope_SendSVSMode(User * u, int ac, const char **av);   	        	  		  /* SVSMODE */
+E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
 E void anope_cmd_svsnick(const char *nick,const char *newnick, time_t when);     	  		  /* SVSNICK */
 E void anope_SendSVSNOOP(const char *server, int set);			  	  		  /* SVSNOOP */
 E void anope_cmd_svso(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */

@@ -766,7 +766,7 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void CharybdisProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+void CharybdisProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
@@ -779,7 +779,7 @@ void CharybdisProto::SendSVSKill(const char *source, const char *user, const cha
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
 }
 
-void CharybdisProto::cmd_svsmode(User *u, int ac, const char **av)
+void CharybdisProto::SendSVSMode(User *u, int ac, const char **av)
 {
 	send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
 }

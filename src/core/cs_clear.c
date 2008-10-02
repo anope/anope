@@ -177,12 +177,12 @@ int do_clear(User * u)
 
         if (ircd->svsmode_ucmode) {
             av[0] = chan;
-            anope_cmd_svsmode_chan(av[0], "-o", NULL);
+            anope_SendSVSMode_chan(av[0], "-o", NULL);
             if (ircd->owner) {
-                anope_cmd_svsmode_chan(av[0], ircd->ownerunset, NULL);
+                anope_SendSVSMode_chan(av[0], ircd->ownerunset, NULL);
             }
             if (ircd->protect || ircd->admin) {
-                anope_cmd_svsmode_chan(av[0], ircd->adminunset, NULL);
+                anope_SendSVSMode_chan(av[0], ircd->adminunset, NULL);
             }
             for (cu = c->users; cu; cu = next) {
                 next = cu->next;
@@ -284,9 +284,9 @@ int do_clear(User * u)
 
             if (ircd->svsmode_ucmode) {
                 if (ircdcap->tsmode)
-                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
+                    anope_SendSVSMode_chan(av[0], av[2], NULL);
                 else
-                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                    anope_SendSVSMode_chan(av[0], av[1], NULL);
 
                 do_cmode(s_ChanServ, ac, av);
                 break;
@@ -328,9 +328,9 @@ int do_clear(User * u)
 
             if (ircd->svsmode_ucmode) {
                 if (ircdcap->tsmode)
-                    anope_cmd_svsmode_chan(av[0], av[2], NULL);
+                    anope_SendSVSMode_chan(av[0], av[2], NULL);
                 else
-                    anope_cmd_svsmode_chan(av[0], av[1], NULL);
+                    anope_SendSVSMode_chan(av[0], av[1], NULL);
 
                 do_cmode(s_ChanServ, ac, av);
                 break;

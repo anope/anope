@@ -693,7 +693,7 @@ void rageircd_cmd_join(const char *user, const char *channel, time_t chantime)
     send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
 
-void rageircd_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+void rageircd_SendAkill(const char *user, const char *host, const char *who, time_t when,
                         time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
@@ -713,7 +713,7 @@ void rageircd_SendSVSKill(const char *source, const char *user, const char *buf)
     send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
 
-void rageircd_cmd_svsmode(User * u, int ac, const char **av)
+void rageircd_SendSVSMode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
              (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
@@ -1195,13 +1195,13 @@ void rageircd_cmd_bot_nick(const char *nick, const char *user, const char *host,
 /* SVSMODE -b */
 void rageircd_cmd_unban(const char *name, const char *nick)
 {
-    rageircd_cmd_svsmode_chan(name, "-b", nick);
+    rageircd_SendSVSMode_chan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void rageircd_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void rageircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
@@ -1564,9 +1564,9 @@ void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(rageircd_cmd_topic);
     pmodule_SendVhostDel(rageircd_cmd_vhost_off);
-    pmodule_cmd_akill(rageircd_cmd_akill);
+    pmodule_SendAkill(rageircd_cmd_akill);
     pmodule_SendSVSKill(rageircd_SendSVSKill);
-    pmodule_cmd_svsmode(rageircd_cmd_svsmode);
+    pmodule_SendSVSMode(rageircd_cmd_svsmode);
     pmodule_cmd_372(rageircd_cmd_372);
     pmodule_cmd_372_error(rageircd_cmd_372_error);
     pmodule_cmd_375(rageircd_cmd_375);
@@ -1619,7 +1619,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_szline(rageircd_cmd_szline);
     pmodule_cmd_sgline(rageircd_cmd_sgline);
     pmodule_cmd_unban(rageircd_cmd_unban);
-    pmodule_cmd_svsmode_chan(rageircd_cmd_svsmode_chan);
+    pmodule_SendSVSMode_chan(rageircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(rageircd_cmd_svid_umode);
     pmodule_cmd_nc_change(rageircd_cmd_nc_change);
     pmodule_cmd_svid_umode2(rageircd_cmd_svid_umode2);

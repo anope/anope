@@ -24,7 +24,7 @@
    anope_cmd_bot_nick(nick,user,host,real,modes)
 
 #define s_akill(user, host, who, when, expires, reason) \
-  anope_cmd_akill(user, host, who, when, expires, reason)
+  anope_SendAkill(user, host, who, when, expires, reason)
 
 #define set_umode(user, ac, av) anope_set_umode(user, ac, av)
 

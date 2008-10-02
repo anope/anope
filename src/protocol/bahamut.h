@@ -63,9 +63,9 @@ class BahamutIRCdProto : public IRCDProto {
 		void SendSVSNOOP(const char *, int);
 		void SendAkillDel(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
-		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
+		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);
-		void cmd_svsmode(User *, int, const char **);
+		void SendSVSMode(User *, int, const char **);
 		void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_mode(const char *, const char *, const char *);
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);
@@ -83,7 +83,7 @@ class BahamutIRCdProto : public IRCDProto {
 		void cmd_szline(const char *, const char *, const char *);
 		void cmd_sgline(const char *, const char *);
 		void cmd_unban(const char *, const char *);
-		void cmd_svsmode_chan(const char *, const char *, const char *);
+		void SendSVSMode_chan(const char *, const char *, const char *);
 		void cmd_svid_umode(const char *, time_t);
 		void cmd_nc_change(User *);
 		void cmd_svid_umode3(User *, const char *);

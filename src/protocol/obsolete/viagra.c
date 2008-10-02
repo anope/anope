@@ -842,7 +842,7 @@ void viagra_cmd_join(const char *user, const char *channel, time_t chantime)
  *  parv[5]=time set
  *  parv[6]=reason
  */
-void viagra_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+void viagra_SendAkill(const char *user, const char *host, const char *who, time_t when,
                       time_t expires, const char *reason)
 {
     send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
@@ -909,7 +909,7 @@ int anope_event_ping(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void viagra_cmd_svsmode(User * u, int ac, const char **av)
+void viagra_SendSVSMode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
              (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
@@ -1430,12 +1430,12 @@ void viagra_cmd_svso(const char *source, const char *nick, const char *flag)
 /* SVSMODE -b */
 void viagra_cmd_unban(const char *name, const char *nick)
 {
-    viagra_cmd_svsmode_chan(name, "-b", nick);
+    viagra_SendSVSMode_chan(name, "-b", nick);
 }
 
 /* SVSMODE channel modes */
 
-void viagra_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void viagra_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
     if (nick) {
         send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
@@ -1604,9 +1604,9 @@ void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(viagra_cmd_topic);
     pmodule_SendVhostDel(viagra_cmd_vhost_off);
-    pmodule_cmd_akill(viagra_cmd_akill);
+    pmodule_SendAkill(viagra_cmd_akill);
     pmodule_SendSVSKill(viagra_SendSVSKill);
-    pmodule_cmd_svsmode(viagra_cmd_svsmode);
+    pmodule_SendSVSMode(viagra_cmd_svsmode);
     pmodule_cmd_372(viagra_cmd_372);
     pmodule_cmd_372_error(viagra_cmd_372_error);
     pmodule_cmd_375(viagra_cmd_375);
@@ -1659,7 +1659,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_szline(viagra_cmd_szline);
     pmodule_cmd_sgline(viagra_cmd_sgline);
     pmodule_cmd_unban(viagra_cmd_unban);
-    pmodule_cmd_svsmode_chan(viagra_cmd_svsmode_chan);
+    pmodule_SendSVSMode_chan(viagra_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(viagra_cmd_svid_umode);
     pmodule_cmd_nc_change(viagra_cmd_nc_change);
     pmodule_cmd_svid_umode2(viagra_cmd_svid_umode2);

@@ -505,7 +505,7 @@ void UnrealIRCdProto::SendVhostDel(User *u)
 	notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
 }
 
-void UnrealIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+void UnrealIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
 	// Calculate the time left before this would expire, capping it at 2 days
 	time_t timeleft = expires - time(NULL);
@@ -532,7 +532,7 @@ void UnrealIRCdProto::SendSVSKill(const char *source, const char *user, const ch
  * parv[2] - modes to change
  * parv[3] - Service Stamp (if mode == d)
  */
-void UnrealIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
+void UnrealIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 {
 	if (ac >= 1) {
 		if (!u || !av[0]) return;
@@ -1196,13 +1196,13 @@ void UnrealIRCdProto::cmd_sgline(const char *mask, const char *reason)
 /* SVSMODE -b */
 void UnrealIRCdProto::cmd_unban(const char *name, const char *nick)
 {
-	cmd_svsmode_chan(name, "-b", nick);
+	SendSVSMode_chan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void UnrealIRCdProto::cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void UnrealIRCdProto::SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
 	if (nick) send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"), name, mode, nick);
 	else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name, mode);

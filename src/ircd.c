@@ -63,9 +63,9 @@ void anope_SendVhostDel(User *u)
 	ircdproto->SendVhostDel(u);
 }
 
-void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+void anope_SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-	ircdproto->cmd_akill(user, host, who, when, expires, reason);
+	ircdproto->SendAkill(user, host, who, when, expires, reason);
 }
 
 void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ...)
@@ -80,9 +80,9 @@ void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ..
 	ircdproto->SendSVSKill(source, user, buf);
 }
 
-void anope_cmd_svsmode(User *u, int ac, const char **av)
+void anope_SendSVSMode(User *u, int ac, const char **av)
 {
-	ircdproto->cmd_svsmode(u, ac, av);
+	ircdproto->SendSVSMode(u, ac, av);
 }
 
 void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -317,9 +317,9 @@ void anope_cmd_unban(const char *name, const char *nick)
 	ircdproto->cmd_unban(name, nick);
 }
 
-void anope_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
-	ircdproto->cmd_svsmode_chan(name, mode, nick);
+	ircdproto->SendSVSMode_chan(name, mode, nick);
 }
 
 void anope_cmd_svid_umode(const char *nick, time_t ts)

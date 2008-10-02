@@ -736,7 +736,7 @@ void ptlink_cmd_join(const char *user, const char *channel, time_t chantime)
 	parv[3] = who added the gline
 	parv[4] = reason
 */
-void ptlink_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+void ptlink_SendAkill(const char *user, const char *host, const char *who, time_t when,
                       time_t expires, const char *reason)
 {
     send_cmd(ServerName, "GLINE %s@%s %i %s :%s", user, host, 86400 * 2,
@@ -765,7 +765,7 @@ void ptlink_SendSVSKill(const char *source, const char *user, const char *buf)
 	parv[3] = extra parameter ( if news setting mode(+n) )
   e.g.:	:NickServ SVSMODE Lamego +rn 1991234
 */
-void ptlink_cmd_svsmode(User * u, int ac, const char **av)
+void ptlink_SendSVSMode(User * u, int ac, const char **av)
 {
     send_cmd(ServerName, "SVSMODE %s %s%s%s", u->nick, av[0],
              (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
@@ -1490,7 +1490,7 @@ void ptlink_cmd_unban(const char *name, const char *nick)
 
 /* SVSMODE channel modes */
 
-void ptlink_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void ptlink_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1684,9 +1684,9 @@ void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(ptlink_cmd_topic);
     pmodule_SendVhostDel(ptlink_cmd_vhost_off);
-    pmodule_cmd_akill(ptlink_cmd_akill);
+    pmodule_SendAkill(ptlink_cmd_akill);
     pmodule_SendSVSKill(ptlink_SendSVSKill);
-    pmodule_cmd_svsmode(ptlink_cmd_svsmode);
+    pmodule_SendSVSMode(ptlink_cmd_svsmode);
     pmodule_cmd_372(ptlink_cmd_372);
     pmodule_cmd_372_error(ptlink_cmd_372_error);
     pmodule_cmd_375(ptlink_cmd_375);
@@ -1739,7 +1739,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_szline(ptlink_cmd_szline);
     pmodule_cmd_sgline(ptlink_cmd_sgline);
     pmodule_cmd_unban(ptlink_cmd_unban);
-    pmodule_cmd_svsmode_chan(ptlink_cmd_svsmode_chan);
+    pmodule_SendSVSMode_chan(ptlink_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ptlink_cmd_svid_umode);
     pmodule_cmd_nc_change(ptlink_cmd_nc_change);
     pmodule_cmd_svid_umode2(ptlink_cmd_svid_umode2);

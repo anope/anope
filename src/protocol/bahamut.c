@@ -474,13 +474,13 @@ void BahamutIRCdProto::cmd_release_svshold(const char *nick)
 /* SVSMODE -b */
 void BahamutIRCdProto::cmd_unban(const char *name, const char *nick)
 {
-	cmd_svsmode_chan(name, "-b", nick);
+	SendSVSMode_chan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void BahamutIRCdProto::cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void BahamutIRCdProto::SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
 	if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
 	else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
@@ -747,7 +747,7 @@ void bahamut_cmd_burst()
  * parv[5]=time set
  * parv[6]=reason
  */
-void BahamutIRCdProto::cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+void BahamutIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
 	// Calculate the time left before this would expire, capping it at 2 days
 	time_t timeleft = expires - time(NULL);
@@ -777,7 +777,7 @@ void BahamutIRCdProto::SendSVSKill(const char *source, const char *user, const c
  * parv[3] - mode (or services id if old svs version)
  * parv[4] - optional arguement (services id)
  */
-void BahamutIRCdProto::cmd_svsmode(User *u, int ac, const char **av)
+void BahamutIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 {
 	send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
 }

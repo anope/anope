@@ -825,7 +825,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
     slist_add(&akills, entry);
 
     if (AkillOnAdd)
-        anope_cmd_akill(entry->user, entry->host, entry->by, entry->seton,
+        anope_SendAkill(entry->user, entry->host, entry->by, entry->seton,
                         entry->expires, entry->reason);
 
     free(mask2);
@@ -858,7 +858,7 @@ int check_akill(const char *nick, const char *username, const char *host,
             continue;
         if (match_wild_nocase(ak->user, username)
             && match_wild_nocase(ak->host, host)) {
-            anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+            anope_SendAkill(ak->user, ak->host, ak->by, ak->seton,
                             ak->expires, ak->reason);
             return 1;
         }
@@ -866,7 +866,7 @@ int check_akill(const char *nick, const char *username, const char *host,
             if (vhost) {
                 if (match_wild_nocase(ak->user, username)
                     && match_wild_nocase(ak->host, vhost)) {
-                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                    anope_SendAkill(ak->user, ak->host, ak->by, ak->seton,
                                     ak->expires, ak->reason);
                     return 1;
                 }
@@ -876,7 +876,7 @@ int check_akill(const char *nick, const char *username, const char *host,
             if (ip) {
                 if (match_wild_nocase(ak->user, username)
                     && match_wild_nocase(ak->host, ip)) {
-                    anope_cmd_akill(ak->user, ak->host, ak->by, ak->seton,
+                    anope_SendAkill(ak->user, ak->host, ak->by, ak->seton,
                                     ak->expires, ak->reason);
                     return 1;
                 }

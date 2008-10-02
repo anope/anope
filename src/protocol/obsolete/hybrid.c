@@ -738,7 +738,7 @@ host:		the 'host' portion of the kline
 reason:		the reason for the kline.
 */
 
-void hybrid_cmd_akill(const char *user, const char *host, const char *who, time_t when,
+void hybrid_SendAkill(const char *user, const char *host, const char *who, time_t when,
                       time_t expires, const char *reason)
 {
     send_cmd(s_OperServ, "KLINE * %ld %s %s :%s",
@@ -759,7 +759,7 @@ void hybrid_SendSVSKill(const char *source, const char *user, const char *buf)
 }
 
 
-void hybrid_cmd_svsmode(User * u, int ac, const char **av)
+void hybrid_SendSVSMode(User * u, int ac, const char **av)
 {
     /* Hybrid does not support SVSMODE */
 }
@@ -1292,7 +1292,7 @@ void hybrid_cmd_unban(const char *name, const char *nick)
 
 /* SVSMODE channel modes */
 
-void hybrid_cmd_svsmode_chan(const char *name, const char *mode, const char *nick)
+void hybrid_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1455,9 +1455,9 @@ void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(hybrid_cmd_topic);
     pmodule_SendVhostDel(hybrid_cmd_vhost_off);
-    pmodule_cmd_akill(hybrid_cmd_akill);
+    pmodule_SendAkill(hybrid_cmd_akill);
     pmodule_SendSVSKill(hybrid_SendSVSKill);
-    pmodule_cmd_svsmode(hybrid_cmd_svsmode);
+    pmodule_SendSVSMode(hybrid_cmd_svsmode);
     pmodule_cmd_372(hybrid_cmd_372);
     pmodule_cmd_372_error(hybrid_cmd_372_error);
     pmodule_cmd_375(hybrid_cmd_375);
@@ -1510,7 +1510,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_szline(hybrid_cmd_szline);
     pmodule_cmd_sgline(hybrid_cmd_sgline);
     pmodule_cmd_unban(hybrid_cmd_unban);
-    pmodule_cmd_svsmode_chan(hybrid_cmd_svsmode_chan);
+    pmodule_SendSVSMode_chan(hybrid_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(hybrid_cmd_svid_umode);
     pmodule_cmd_nc_change(hybrid_cmd_nc_change);
     pmodule_cmd_svid_umode2(hybrid_cmd_svid_umode2);

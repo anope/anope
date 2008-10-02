@@ -1130,7 +1130,6 @@ E void anope_SendBanDel(const char *name, const char *nick);				  		  			      /
 E void anope_SendBotOp(const char *nick, const char *chan);			  		  /* MODE BotServ */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_SendChangeBotNick(const char *oldnick, const char *newnick);             	  		  /* NICK */
-E void anope_SendClientIntroduction(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
 E void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
 E void anope_SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
 E void anope_cmd_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */

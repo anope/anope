@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -164,7 +164,7 @@ int do_bot(User * u)
             EnforceQlinedNick(nick, s_BotServ);
 
             /* We make the bot online, ready to serve */
-            anope_SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
+            ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                ircd->botserv_bot_mode);
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
@@ -292,14 +292,14 @@ int do_bot(User * u)
 
             /* If only the nick changes, we just make the bot change his nick,
                else we must make it quit and rejoin. We must not forget to set
-			   the Q:Line either (it's otherwise set in anope_SendClientIntroduction) */
+			   the Q:Line either (it's otherwise set in SendClientIntroduction) */
             if (!user) {
                 anope_SendChangeBotNick(oldnick, bi->nick);
 				anope_SendSQLine(bi->nick, "Reserved for services");
             } else {
                 anope_SendQuit(oldnick, "Quit: Be right back");
 
-                anope_SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
+                ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
                 bi->RejoinAll();
             }

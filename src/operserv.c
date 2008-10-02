@@ -205,7 +205,7 @@ static void load_old_akill(void)
 
         /* No nicknames allowed! */
         if (strchr(ak->user, '!')) {
-            anope_SendAkillDel(ak->user, ak->host);
+            ircdproto->SendAkillDel(ak->user, ak->host);
             free(ak);
             continue;
         }
@@ -241,7 +241,7 @@ static void load_old_akill(void)
                 if (match_wild_nocase(amask, mask2)
                     && (entry->expires >= ak->expires
                         || entry->expires == 0)) {
-                    anope_SendAkillDel(ak->user, ak->host);
+                    ircdproto->SendAkillDel(ak->user, ak->host);
                     free(ak);
                     ak = NULL;
                     break;
@@ -914,7 +914,7 @@ static void free_akill_entry(SList * slist, void *item)
     Akill *ak = (Akill *)item;
 
     /* Remove the AKILLs from all the servers */
-    anope_SendAkillDel(ak->user, ak->host);
+    ircdproto->SendAkillDel(ak->user, ak->host);
 
     /* Free the structure */
     free(ak->user);

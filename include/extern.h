@@ -1147,7 +1147,6 @@ E void anope_cmd_action(const char *source, const char *dest, const char *fmt, .
 E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendQuit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
-E void anope_SendAkillDel(const char *user, const char *host);			  		  /* RAKILL */
 E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGLINE */
 E void anope_SendSQLine(const char *mask, const char *reason);                   	  		  /* SQLINE */
 E void anope_SendSZLine(const char *mask, const char *reason, const char *whom);				  /* SZLINE */

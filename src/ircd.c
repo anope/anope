@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendAkillDel(const char *user, const char *host)
-{
-	ircdproto->SendAkillDel(user, host);
-}
-
 void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
 	BotInfo *bi = findbot(whosets);

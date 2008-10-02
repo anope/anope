@@ -92,7 +92,7 @@ int do_clear(User * u)
                 av[0] = "-b";
                 av[1] = ban->mask;
                 ircdproto->SendMode(whosends(ci), chan, "-b %s", ban->mask);
-                chan_set_modes(whosends(ci), c, 2, av, 0);
+                chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
             }
         }
 
@@ -107,7 +107,7 @@ int do_clear(User * u)
                 av[0] = "-e";
                 av[1] = except->mask;
                 ircdproto->SendMode(whosends(ci), chan, "-e %s", except->mask);
-                chan_set_modes(whosends(ci), c, 2, av, 0);
+                chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_EXCEPTS, chan);
@@ -122,7 +122,7 @@ int do_clear(User * u)
                 av[0] = "-I";
                 av[1] = invite->mask;
                 ircdproto->SendMode(whosends(ci), chan, "-I %s", invite->mask);
-                chan_set_modes(whosends(ci), c, 2, av, 0);
+                chan_set_modes(whosends(ci)->nick, c, 2, av, 0);
             }
         }
         notice_lang(s_ChanServ, u, CHAN_CLEARED_INVITES, chan);
@@ -135,7 +135,7 @@ int do_clear(User * u)
             ircdproto->SendMode(whosends(ci), c->name, "%s",
                            ircd->modestoremove);
             argv[0] = ircd->modestoremove;
-            chan_set_modes(whosends(ci), c, 1, argv, 0);
+            chan_set_modes(whosends(ci)->nick, c, 1, argv, 0);
 
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
                to send them - TSL */
@@ -143,14 +143,14 @@ int do_clear(User * u)
                 ircdproto->SendMode(whosends(ci), c->name, "-k %s", c->key);
                 argv[0] = "-k";
                 argv[1] = c->key;
-                chan_set_modes(whosends(ci), c, 2, argv, 0);
+                chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
             }
             if (ircd->Lmode && c->redirect) {
                 ircdproto->SendMode(whosends(ci), c->name, "-L %s",
                                c->redirect);
                 argv[0] = "-L";
                 argv[1] = c->redirect;
-                chan_set_modes(whosends(ci), c, 2, argv, 0);
+                chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
@@ -158,7 +158,7 @@ int do_clear(User * u)
                                    flood_mode_char_remove, c->flood);
                     argv[0] = flood_mode_char_remove;
                     argv[1] = c->flood;
-                    chan_set_modes(whosends(ci), c, 2, argv, 0);
+                    chan_set_modes(whosends(ci)->nick, c, 2, argv, 0);
                 } else {
                     if (debug) {
                         alog("debug: flood_mode_char_remove was not set unable to remove flood/throttle modes");

@@ -89,7 +89,7 @@ void sqline(char *mask, char *reason)
 
     if (ircd->chansqline) {
         if (*mask == '#') {
-            anope_SendSQLine(mask, reason);
+            ircdproto->SendSQLine(mask, reason);
 
             for (i = 0; i < 1024; i++) {
                 for (c = chanlist[i]; c; c = next) {
@@ -113,10 +113,10 @@ void sqline(char *mask, char *reason)
                 }
             }
         } else {
-            anope_SendSQLine(mask, reason);
+            ircdproto->SendSQLine(mask, reason);
         }
     } else {
-        anope_SendSQLine(mask, reason);
+        ircdproto->SendSQLine(mask, reason);
     }
 }
 

@@ -295,7 +295,7 @@ int do_bot(User * u)
 			   the Q:Line either (it's otherwise set in SendClientIntroduction) */
             if (!user) {
                 anope_SendChangeBotNick(oldnick, bi->nick);
-				anope_SendSQLine(bi->nick, "Reserved for services");
+				ircdproto->SendSQLine(bi->nick, "Reserved for services");
             } else {
                 ircdproto->SendQuit(oldnick, "Quit: Be right back");
 

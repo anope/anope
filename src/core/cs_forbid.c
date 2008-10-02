@@ -123,7 +123,7 @@ int do_forbid(User * u)
                              u->nick, ci->name);
 
         if (ircd->chansqline) {
-            anope_SendSQLine(ci->name, ((reason) ? reason : "Forbidden"));
+            ircdproto->SendSQLine(ci->name, ((reason) ? reason : "Forbidden"));
         }
 
         alog("%s: %s set FORBID for channel %s", s_ChanServ, u->nick,

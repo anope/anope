@@ -1233,6 +1233,7 @@ class IRCDProto {
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
 		virtual void SendModeInternal(const char *, const char *, const char *) = 0;
 		virtual void SendKickInternal(const char *, const char *, const char *, const char *) = 0;
+		virtual void SendNoticeChanopsInternal(const char *, const char *, const char *) = 0;
 	public:
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
@@ -1275,7 +1276,17 @@ class IRCDProto {
 			}
 			SendKickInternal(source, chan, user, buf);
 		}
-		virtual void SendNoticeChanops(const char *, const char *, const char *) = 0;
+		virtual void SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...)
+		{
+			va_list args;
+			char buf[BUFSIZE] = "";
+			if (fmt) {
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+			}
+			SendNoticeChanopsInternal(source, dest, buf);
+		}
 		virtual void SendMessage(BotInfo *bi, const char *dest, const char *buf)
 		{
 			if (NSDefFlags & NI_MSG)

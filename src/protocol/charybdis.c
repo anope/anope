@@ -1019,7 +1019,7 @@ void CharybdisProto::SendKickInternal(const char *source, const char *chan, cons
 	else send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void CharybdisProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
+void CharybdisProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	BotInfo *bi = findbot(source);

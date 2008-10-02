@@ -746,7 +746,7 @@ void bot_join(ChannelInfo * ci)
         /* Should we be invited? */
         if ((ci->c->mode & anope_get_invite_mode())
             || (ci->c->limit && ci->c->usercount >= ci->c->limit))
-            anope_SendNoticeChanops(NULL, ci->c->name,
+            ircdproto->SendNoticeChanops(NULL, ci->c->name,
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);
     }

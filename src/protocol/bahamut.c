@@ -872,7 +872,7 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void BahamutIRCdProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);

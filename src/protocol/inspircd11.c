@@ -739,7 +739,7 @@ void InspIRCdProto::SendKickInternal(const char *source, const char *chan, const
 	else send_cmd(source, "KICK %s %s :%s", chan, user, user);
 }
 
-void InspIRCdProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);

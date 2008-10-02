@@ -562,7 +562,7 @@ void UnrealIRCdProto::SendKickInternal(const char *source, const char *chan, con
 	else send_cmd(source, "%s %s %s", send_token("KICK", "H"), chan, user);
 }
 
-void UnrealIRCdProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);

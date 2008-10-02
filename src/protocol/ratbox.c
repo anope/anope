@@ -949,7 +949,7 @@ void RatboxProto::SendKickInternal(const char *source, const char *chan, const c
 	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void RatboxProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
+void RatboxProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);

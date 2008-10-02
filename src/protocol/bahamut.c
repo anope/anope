@@ -694,14 +694,14 @@ void BahamutIRCdProto::cmd_szline(const char *mask, const char *reason, const ch
 }
 
 /* SVSNOOP */
-void BahamutIRCdProto::cmd_svsnoop(const char *server, int set)
+void BahamutIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void bahamut_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 /* SGLINE */
@@ -711,7 +711,7 @@ void BahamutIRCdProto::cmd_sgline(const char *mask, const char *reason)
 }
 
 /* RAKILL */
-void BahamutIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void BahamutIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }

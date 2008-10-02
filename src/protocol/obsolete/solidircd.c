@@ -755,14 +755,14 @@ void solidircd_cmd_szline(const char *mask, const char *reason, const char *whom
 }
 
 /* SVSNOOP */
-void SolidIRCdProto::cmd_svsnoop(const char *server, int set)
+void SolidIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void solidircd_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 /* SGLINE */
@@ -772,7 +772,7 @@ void solidircd_cmd_sgline(const char *mask, const char *reason)
 }
 
 /* RAKILL */
-void SolidIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void SolidIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
@@ -1383,7 +1383,7 @@ void solidircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vh
     solidircd_cmd_chghost(nick, vhost);
 }
 
-void solidircd_cmd_vhost_off(User * u)
+void solidircd_SendVhostDel(User * u)
 {
     send_cmd(s_HostServ, "SVSMODE %s -v", u->nick);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
@@ -1596,9 +1596,9 @@ void solidircd_cmd_ctcp(const char *source, const char *dest, const char *buf)
 void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(solidircd_cmd_topic);
-    pmodule_cmd_vhost_off(solidircd_cmd_vhost_off);
+    pmodule_SendVhostDel(solidircd_cmd_vhost_off);
     pmodule_cmd_akill(solidircd_cmd_akill);
-    pmodule_SendSVSKill(solidircd_cmd_svskill);
+    pmodule_SendSVSKill(solidircd_SendSVSKill);
     pmodule_cmd_svsmode(solidircd_cmd_svsmode);
     pmodule_cmd_372(solidircd_cmd_372);
     pmodule_cmd_372_error(solidircd_cmd_372_error);

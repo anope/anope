@@ -82,10 +82,10 @@
 
 class UnrealIRCdProto : public IRCDProto {
 	public:
-		void cmd_svsnoop(const char *, int);
-		void cmd_remove_akill(const char *, const char *);
+		void SendSVSNOOP(const char *, int);
+		void SendAkillDel(const char *, const char *);
 		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
-		void cmd_vhost_off(User *);
+		void SendVhostDel(User *);
 		void cmd_akill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);
 		void cmd_svsmode(User *, int, const char **);

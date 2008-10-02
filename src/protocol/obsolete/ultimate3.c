@@ -695,14 +695,14 @@ void ultimate3_cmd_szline(const char *mask, const char *reason, const char *whom
     /* send_cmd(NULL, "SZLINE %s :%s", mask, reason); */
 }
 
-void UltimateIRCdProto::cmd_svsnoop(const char *server, int set)
+void UltimateIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void ultimate3_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 void ultimate3_cmd_sgline(const char *mask, const char *reason)
@@ -710,12 +710,12 @@ void ultimate3_cmd_sgline(const char *mask, const char *reason)
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
-void UltimateIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void UltimateIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
 
-void ultimate3_cmd_vhost_off(User * u)
+void ultimate3_SendVhostDel(User * u)
 {
     send_cmd(s_HostServ, "SVSMODE %s -x", u->nick);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
@@ -1704,9 +1704,9 @@ void ultimate3_cmd_ctcp(const char *source, const char *dest, const char *buf)
 void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(ultimate3_cmd_topic);
-    pmodule_cmd_vhost_off(ultimate3_cmd_vhost_off);
+    pmodule_SendVhostDel(ultimate3_cmd_vhost_off);
     pmodule_cmd_akill(ultimate3_cmd_akill);
-    pmodule_SendSVSKill(ultimate3_cmd_svskill);
+    pmodule_SendSVSKill(ultimate3_SendSVSKill);
     pmodule_cmd_svsmode(ultimate3_cmd_svsmode);
     pmodule_cmd_372(ultimate3_cmd_372);
     pmodule_cmd_372_error(ultimate3_cmd_372_error);

@@ -729,13 +729,13 @@ void CharybdisProto::cmd_sgline(const char *mask, const char *reason)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
-void CharybdisProto::cmd_remove_akill(const char *user, const char *host)
+void CharybdisProto::SendAkillDel(const char *user, const char *host)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
-void CharybdisProto::cmd_vhost_off(User *u)
+void CharybdisProto::SendVhostDel(User *u)
 {
 	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
 }

@@ -28,7 +28,7 @@
 
 #define set_umode(user, ac, av) anope_set_umode(user, ac, av)
 
-#define s_svsnoop(server, set) anope_cmd_svsnoop(server, set)
+#define s_svsnoop(server, set) anope_SendSVSNOOP(server, set)
 
 #define s_sqline(mask, reason) anope_cmd_sqline(mask, reason)
 
@@ -38,7 +38,7 @@
 #define s_unsqline(mask) anope_cmd_unsqline(mask)
 #define s_unszline(mask) anope_cmd_unszline(mask)
 
-#define s_rakill(user, host) anope_cmd_remove_akill(user, host)
+#define s_rakill(user, host) anope_SendAkillDel(user, host)
 
 
 # define NICKSERV_MODE ircd->nickservmode

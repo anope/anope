@@ -766,14 +766,14 @@ void viagra_cmd_szline(const char *mask, const char *reason, const char *whom)
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
 
-void ViagraIRCdProto::cmd_svsnoop(const char *server, int set)
+void ViagraIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
 void viagra_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 void viagra_cmd_sgline(const char *mask, const char *reason)
@@ -781,7 +781,7 @@ void viagra_cmd_sgline(const char *mask, const char *reason)
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
-void ViagraIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void ViagraIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "RAKILL %s %s", host, user);
 }
@@ -807,7 +807,7 @@ void viagra_cmd_topic(const char *whosets, const char *chan, const char *whoseti
              (unsigned long int) when, topic);
 }
 
-void viagra_cmd_vhost_off(User * u)
+void viagra_SendVhostDel(User * u)
 {
     send_cmd(NULL, "SVSMODE %s -x", u->nick);
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
@@ -1603,9 +1603,9 @@ void viagra_cmd_ctcp(const char *source, const char *dest, const char *buf)
 void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(viagra_cmd_topic);
-    pmodule_cmd_vhost_off(viagra_cmd_vhost_off);
+    pmodule_SendVhostDel(viagra_cmd_vhost_off);
     pmodule_cmd_akill(viagra_cmd_akill);
-    pmodule_SendSVSKill(viagra_cmd_svskill);
+    pmodule_SendSVSKill(viagra_SendSVSKill);
     pmodule_cmd_svsmode(viagra_cmd_svsmode);
     pmodule_cmd_372(viagra_cmd_372);
     pmodule_cmd_372_error(viagra_cmd_372_error);

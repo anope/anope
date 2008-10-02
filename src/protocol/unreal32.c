@@ -478,17 +478,17 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSNOOP */
-void UnrealIRCdProto::cmd_svsnoop(const char *server, int set)
+void UnrealIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "%s %s %s", send_token("SVSNOOP", "f"), server, set ? "+" : "-");
 }
 
 void unreal_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
-void UnrealIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void UnrealIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
 }
@@ -498,7 +498,7 @@ void UnrealIRCdProto::cmd_topic(const char *whosets, const char *chan, const cha
 	send_cmd(whosets, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
 }
 
-void UnrealIRCdProto::cmd_vhost_off(User *u)
+void UnrealIRCdProto::SendVhostDel(User *u)
 {
 	if (UseSVS2MODE) send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"), u->nick);
 	else send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"), u->nick);

@@ -43,14 +43,14 @@ void anope_set_umode(User *user, int ac, const char **av)
 	ircdproto->set_umode(user, ac, av);
 }
 
-void anope_cmd_svsnoop(const char *server, int set)
+void anope_SendSVSNOOP(const char *server, int set)
 {
-	ircdproto->cmd_svsnoop(server, set);
+	ircdproto->SendSVSNOOP(server, set);
 }
 
-void anope_cmd_remove_akill(const char *user, const char *host)
+void anope_SendAkillDel(const char *user, const char *host)
 {
-	ircdproto->cmd_remove_akill(user, host);
+	ircdproto->SendAkillDel(user, host);
 }
 
 void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
@@ -58,9 +58,9 @@ void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit
 	ircdproto->cmd_topic(whosets, chan, whosetit, topic, when);
 }
 
-void anope_cmd_vhost_off(User *u)
+void anope_SendVhostDel(User *u)
 {
-	ircdproto->cmd_vhost_off(u);
+	ircdproto->SendVhostDel(u);
 }
 
 void anope_cmd_akill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)

@@ -699,7 +699,7 @@ void RatboxProto::cmd_sgline(const char *mask, const char *reason)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
-void RatboxProto::cmd_remove_akill(const char *user, const char *host)
+void RatboxProto::SendAkillDel(const char *user, const char *host)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);

@@ -80,7 +80,7 @@
 
 void ptlink_set_umode(User * user, int ac, const char **av);
 void ptlink_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
-void ptlink_cmd_vhost_off(User * u);
+void ptlink_SendVhostDel(User * u);
 void ptlink_cmd_akill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);
 void ptlink_SendSVSKill(const char *source, const char *user, const char *buf);
 void ptlink_cmd_svsmode(User * u, int ac, const char **av);
@@ -149,6 +149,6 @@ void ptlink_cmd_ctcp(const char *source, const char *dest, const char *buf);
 
 class PTlinkProto : public IRCDProtoNew {
 	public:
-		void cmd_svsnoop(const char *, int);
-		void cmd_remove_akill(const char *, const char *);
+		void SendSVSNOOP(const char *, int);
+		void SendAkillDel(const char *, const char *);
 } ircd_proto;

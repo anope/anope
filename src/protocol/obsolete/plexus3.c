@@ -776,7 +776,7 @@ plexus_cmd_szline (const char *mask, const char *reason, const char *whom)
   /* Does not support */
 }
 
-void PleXusIRCdProto::cmd_svsnoop(const char *server, int set)
+void PleXusIRCdProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(ServerName, "ENCAP %s SVSNOOP %s", server, set ? "+" : "-");
 }
@@ -784,7 +784,7 @@ void PleXusIRCdProto::cmd_svsnoop(const char *server, int set)
 void
 plexus_cmd_svsadmin (const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 void
@@ -793,7 +793,7 @@ plexus_cmd_sgline (const char *mask, const char *reason)
   send_cmd (s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
-void PleXusIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void PleXusIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(s_OperServ, "UNKLINE * %s %s", user, host);
 }
@@ -807,7 +807,7 @@ plexus_cmd_topic (const char *whosets, const char *chan, const char *whosetit,
 }
 
 void
-plexus_cmd_vhost_off (User * u)
+plexus_SendVhostDel (User * u)
 {
   common_svsmode (u, "-x", NULL);
 }
@@ -1738,9 +1738,9 @@ void
 moduleAddAnopeCmds ()
 {
   pmodule_cmd_topic (plexus_cmd_topic);
-  pmodule_cmd_vhost_off (plexus_cmd_vhost_off);
+  pmodule_SendVhostDel (plexus_cmd_vhost_off);
   pmodule_cmd_akill (plexus_cmd_akill);
-  pmodule_SendSVSKill (plexus_cmd_svskill);
+  pmodule_SendSVSKill (plexus_SendSVSKill);
   pmodule_cmd_svsmode (plexus_cmd_svsmode);
   pmodule_cmd_372 (plexus_cmd_372);
   pmodule_cmd_372_error (plexus_cmd_372_error);

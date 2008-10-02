@@ -680,14 +680,14 @@ void ptlink_cmd_sqline(const char *mask, const char *reason)
 	  operations:
 		noopers - remove existing opers and disable o:lines
 */
-void PTlinkProto::cmd_svsnoop(const char *server, int set)
+void PTlinkProto::SendSVSNOOP(const char *server, int set)
 {
 	send_cmd(NULL, "SVSADMIN %s :%s", server, set ? "noopers" : "rehash");
 }
 
 void ptlink_cmd_svsadmin(const char *server, int set)
 {
-	ircd_proto.cmd_svsnoop(server, set);
+	ircd_proto.SendSVSNOOP(server, set);
 }
 
 /*
@@ -695,7 +695,7 @@ void ptlink_cmd_svsadmin(const char *server, int set)
 	parv[0] = sender (server if on network synchronization)
 	parv[1] = glined usert@host mask or ALL to remove all glines
 */
-void PTlinkProto::cmd_remove_akill(const char *user, const char *host)
+void PTlinkProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(NULL, "UNGLINE %s@%s", user, host);
 }
@@ -1255,7 +1255,7 @@ void ptlink_cmd_topic(const char *whosets, const char *chan, const char *whoseti
              (long int) time(NULL), topic);
 }
 
-void ptlink_cmd_vhost_off(User * u)
+void ptlink_SendVhostDel(User * u)
 {
     /* does not support vhosting */
 }
@@ -1683,9 +1683,9 @@ void ptlink_cmd_ctcp(const char *source, const char *dest, const char *buf)
 void moduleAddAnopeCmds()
 {
     pmodule_cmd_topic(ptlink_cmd_topic);
-    pmodule_cmd_vhost_off(ptlink_cmd_vhost_off);
+    pmodule_SendVhostDel(ptlink_cmd_vhost_off);
     pmodule_cmd_akill(ptlink_cmd_akill);
-    pmodule_SendSVSKill(ptlink_cmd_svskill);
+    pmodule_SendSVSKill(ptlink_SendSVSKill);
     pmodule_cmd_svsmode(ptlink_cmd_svsmode);
     pmodule_cmd_372(ptlink_cmd_372);
     pmodule_cmd_372_error(ptlink_cmd_372_error);

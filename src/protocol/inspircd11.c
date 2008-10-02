@@ -510,7 +510,7 @@ void inspircd_cmd_svsadmin(const char *server, int set)
     /* Not Supported by this IRCD */
 }
 
-void InspIRCdProto::cmd_remove_akill(const char *user, const char *host)
+void InspIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
@@ -533,7 +533,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
     }
 }
 
-void InspIRCdProto::cmd_vhost_off(User *u)
+void InspIRCdProto::SendVhostDel(User *u)
 {
 	inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
 }

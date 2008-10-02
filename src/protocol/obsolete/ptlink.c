@@ -1483,7 +1483,7 @@ void ptlink_SendGuestNick(const char *nick, const char *user, const char *host, 
 }
 
 
-void ptlink_cmd_unban(const char *name, const char *nick)
+void ptlink_SendBanDel(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1738,7 +1738,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(ptlink_cmd_unszline);
     pmodule_SendSZLine(ptlink_cmd_szline);
     pmodule_SendSGLine(ptlink_cmd_sgline);
-    pmodule_cmd_unban(ptlink_cmd_unban);
+    pmodule_SendBanDel(ptlink_cmd_unban);
     pmodule_SendSVSMode_chan(ptlink_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ptlink_cmd_svid_umode);
     pmodule_cmd_nc_change(ptlink_cmd_nc_change);

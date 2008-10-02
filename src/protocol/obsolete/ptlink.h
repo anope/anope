@@ -135,7 +135,7 @@ void ptlink_SendSGLineDel(const char *mask);
 void ptlink_SendSZLineDel(const char *mask);
 void ptlink_SendSZLine(const char *mask, const char *reason, const char *whom);
 void ptlink_SendSGLine(const char *mask, const char *reason);
-void ptlink_cmd_unban(const char *name, const char *nick);
+void ptlink_SendBanDel(const char *name, const char *nick);
 void ptlink_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
 void ptlink_cmd_svid_umode(const char *nick, time_t ts);
 void ptlink_cmd_nc_change(User * u);

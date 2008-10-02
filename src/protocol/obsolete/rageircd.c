@@ -1193,7 +1193,7 @@ void rageircd_SendClientIntroduction(const char *nick, const char *user, const c
 }
 
 /* SVSMODE -b */
-void rageircd_cmd_unban(const char *name, const char *nick)
+void rageircd_SendBanDel(const char *name, const char *nick)
 {
     rageircd_SendSVSMode_chan(name, "-b", nick);
 }
@@ -1618,7 +1618,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(rageircd_cmd_unszline);
     pmodule_SendSZLine(rageircd_cmd_szline);
     pmodule_SendSGLine(rageircd_cmd_sgline);
-    pmodule_cmd_unban(rageircd_cmd_unban);
+    pmodule_SendBanDel(rageircd_cmd_unban);
     pmodule_SendSVSMode_chan(rageircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(rageircd_cmd_svid_umode);
     pmodule_cmd_nc_change(rageircd_cmd_nc_change);

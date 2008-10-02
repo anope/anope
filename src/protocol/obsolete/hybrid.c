@@ -1285,7 +1285,7 @@ void hybrid_SendSVSO(const char *source, const char *nick, const char *flag)
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_unban(const char *name, const char *nick)
+void hybrid_SendBanDel(const char *name, const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1509,7 +1509,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(hybrid_cmd_unszline);
     pmodule_SendSZLine(hybrid_cmd_szline);
     pmodule_SendSGLine(hybrid_cmd_sgline);
-    pmodule_cmd_unban(hybrid_cmd_unban);
+    pmodule_SendBanDel(hybrid_cmd_unban);
     pmodule_SendSVSMode_chan(hybrid_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(hybrid_cmd_svid_umode);
     pmodule_cmd_nc_change(hybrid_cmd_nc_change);

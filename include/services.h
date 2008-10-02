@@ -1320,7 +1320,7 @@ class IRCDProto {
 		virtual void SendSZLineDel(const char *) { }
 		virtual void SendSZLine(const char *, const char *, const char *) { }
 		virtual void SendSGLine(const char *, const char *) { }
-		virtual void cmd_unban(const char *, const char *) { }
+		virtual void SendBanDel(const char *, const char *) { }
 		virtual void SendSVSMode_chan(const char *, const char *, const char *) { }
 		virtual void cmd_svid_umode(const char *, time_t) { }
 		virtual void cmd_nc_change(User *) { }

@@ -475,7 +475,7 @@ CUMode myCumodes[128] = {
 };
 
 /* SVSMODE -b */
-void ultimate3_cmd_unban(const char *name, const char *nick)
+void ultimate3_SendBanDel(const char *name, const char *nick)
 {
     ultimate3_SendSVSMode_chan(name, "-b", nick);
 }
@@ -1759,7 +1759,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(ultimate3_cmd_unszline);
     pmodule_SendSZLine(ultimate3_cmd_szline);
     pmodule_SendSGLine(ultimate3_cmd_sgline);
-    pmodule_cmd_unban(ultimate3_cmd_unban);
+    pmodule_SendBanDel(ultimate3_cmd_unban);
     pmodule_SendSVSMode_chan(ultimate3_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ultimate3_cmd_svid_umode);
     pmodule_cmd_nc_change(ultimate3_cmd_nc_change);

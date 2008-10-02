@@ -1526,7 +1526,7 @@ plexus_SendSVSO (const char *source, const char *nick, const char *flag)
 }
 
 void
-plexus_cmd_unban (const char *name, const char *nick)
+plexus_SendBanDel (const char *name, const char *nick)
 {
   /* Not Supported by this IRCD */
 }
@@ -1793,7 +1793,7 @@ moduleAddAnopeCmds ()
   pmodule_SendSZLineDel (plexus_cmd_unszline);
   pmodule_SendSZLine (plexus_cmd_szline);
   pmodule_SendSGLine (plexus_cmd_sgline);
-  pmodule_cmd_unban (plexus_cmd_unban);
+  pmodule_SendBanDel (plexus_cmd_unban);
   pmodule_SendSVSMode_chan (plexus_cmd_svsmode_chan);
   pmodule_cmd_svid_umode (plexus_cmd_svid_umode);
   pmodule_cmd_nc_change (plexus_cmd_nc_change);

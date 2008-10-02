@@ -312,9 +312,9 @@ void anope_SendSGLine(const char *mask, const char *reason)
 	ircdproto->SendSGLine(mask, reason);
 }
 
-void anope_cmd_unban(const char *name, const char *nick)
+void anope_SendBanDel(const char *name, const char *nick)
 {
-	ircdproto->cmd_unban(name, nick);
+	ircdproto->SendBanDel(name, nick);
 }
 
 void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick)

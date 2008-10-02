@@ -108,7 +108,7 @@ void ultimate3_SendSGLineDel(const char *mask);
 void ultimate3_SendSZLineDel(const char *mask);
 void ultimate3_SendSZLine(const char *mask, const char *reason, const char *whom);
 void ultimate3_SendSGLine(const char *mask, const char *reason);
-void ultimate3_cmd_unban(const char *name, const char *nick);
+void ultimate3_SendBanDel(const char *name, const char *nick);
 void ultimate3_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
 void ultimate3_cmd_svid_umode(const char *nick, time_t ts);
 void ultimate3_cmd_nc_change(User * u);

@@ -98,7 +98,7 @@ void rageircd_SendSGLineDel(const char *mask);
 void rageircd_SendSZLineDel(const char *mask);
 void rageircd_SendSZLine(const char *mask, const char *reason, const char *whom);
 void rageircd_SendSGLine(const char *mask, const char *reason);
-void rageircd_cmd_unban(const char *name, const char *nick);
+void rageircd_SendBanDel(const char *name, const char *nick);
 void rageircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
 void rageircd_cmd_svid_umode(const char *nick, time_t ts);
 void rageircd_cmd_nc_change(User * u);

@@ -1194,7 +1194,7 @@ void UnrealIRCdProto::SendSGLine(const char *mask, const char *reason)
 }
 
 /* SVSMODE -b */
-void UnrealIRCdProto::cmd_unban(const char *name, const char *nick)
+void UnrealIRCdProto::SendBanDel(const char *name, const char *nick)
 {
 	SendSVSMode_chan(name, "-b", nick);
 }

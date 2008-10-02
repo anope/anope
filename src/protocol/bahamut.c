@@ -472,7 +472,7 @@ void BahamutIRCdProto::SendSVSHOLDDel(const char *nick)
 }
 
 /* SVSMODE -b */
-void BahamutIRCdProto::cmd_unban(const char *name, const char *nick)
+void BahamutIRCdProto::SendBanDel(const char *name, const char *nick)
 {
 	SendSVSMode_chan(name, "-b", nick);
 }

@@ -1428,7 +1428,7 @@ void viagra_SendSVSO(const char *source, const char *nick, const char *flag)
 
 
 /* SVSMODE -b */
-void viagra_cmd_unban(const char *name, const char *nick)
+void viagra_SendBanDel(const char *name, const char *nick)
 {
     viagra_SendSVSMode_chan(name, "-b", nick);
 }
@@ -1658,7 +1658,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(viagra_cmd_unszline);
     pmodule_SendSZLine(viagra_cmd_szline);
     pmodule_SendSGLine(viagra_cmd_sgline);
-    pmodule_cmd_unban(viagra_cmd_unban);
+    pmodule_SendBanDel(viagra_cmd_unban);
     pmodule_SendSVSMode_chan(viagra_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(viagra_cmd_svid_umode);
     pmodule_cmd_nc_change(viagra_cmd_nc_change);

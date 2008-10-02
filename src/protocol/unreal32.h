@@ -108,7 +108,7 @@ class UnrealIRCdProto : public IRCDProto {
 		void SendSZLineDel(const char *);
 		void SendSZLine(const char *, const char *, const char *);
 		void SendSGLine(const char *, const char *);
-		void cmd_unban(const char *, const char *);
+		void SendBanDel(const char *, const char *);
 		void SendSVSMode_chan(const char *, const char *, const char *);
 		void cmd_svid_umode(const char *, time_t);
 		void cmd_nc_change(User *);

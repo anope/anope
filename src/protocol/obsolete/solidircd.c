@@ -511,7 +511,7 @@ void solidircd_SendSVSHOLDDel(const char *nick)
 }
 
 /* SVSMODE -b */
-void solidircd_cmd_unban(const char *name, const char *nick)
+void solidircd_SendBanDel(const char *name, const char *nick)
 {
     solidircd_SendSVSMode_chan(name, "-b", nick);
 }
@@ -1651,7 +1651,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSZLineDel(solidircd_cmd_unszline);
     pmodule_SendSZLine(solidircd_cmd_szline);
     pmodule_SendSGLine(solidircd_cmd_sgline);
-    pmodule_cmd_unban(solidircd_cmd_unban);
+    pmodule_SendBanDel(solidircd_cmd_unban);
     pmodule_SendSVSMode_chan(solidircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(solidircd_cmd_svid_umode);
     pmodule_cmd_nc_change(solidircd_cmd_nc_change);

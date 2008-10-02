@@ -96,7 +96,7 @@ void plexus_SendSGLineDel(const char *mask);
 void plexus_SendSZLineDel(const char *mask);
 void plexus_SendSZLine(const char *mask, const char *reason, const char *whom);
 void plexus_SendSGLine(const char *mask, const char *reason);
-void plexus_cmd_unban(const char *name, const char *nick);
+void plexus_SendBanDel(const char *name, const char *nick);
 void plexus_SendSVSMode_chan(const char *name, const char *mode, const char *nick);
 void plexus_cmd_svid_umode(const char *nick, time_t ts);
 void plexus_cmd_nc_change(User * u);

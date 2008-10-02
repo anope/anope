@@ -101,7 +101,7 @@ int do_operumodes(User * u)
     if (!(u2 = finduser(nick))) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else {
-        ircdproto->SendMode(s_OperServ, nick, "%s", modes);
+        ircdproto->SendMode(findbot(s_OperServ), nick, "%s", modes);
 
         common_svsmode(u2, modes, NULL);
 

@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
-{
-	ircdproto->SendGlobalPrivmsg(source, dest, msg);
-}
-
 void anope_SendBotOp(const char *nick, const char *chan)
 {
 	ircdproto->SendBotOp(nick, chan);

@@ -1375,15 +1375,16 @@ class IRCDProto {
 			BotInfo *bi = findbot(source);
 			SendPrivmsgInternal(bi, dest, buf);
 		}
-		virtual void SendGlobalNotice(const char *source, const char *dest, const char *msg)
+		virtual void SendGlobalNotice(BotInfo *bi, const char *dest, const char *msg)
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
-		virtual void SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
+		virtual void SendGlobalPrivmsg(BotInfo *bi, const char *dest, const char *msg)
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
+		virtual void SendQuit(BotInfo *bi, const char *fmt, ...)
 		virtual void SendQuit(const char *source, const char *fmt, ...)
 		{
 			va_list args;
@@ -1401,11 +1402,11 @@ class IRCDProto {
 		}
 		virtual void SendJoin(const char *, const char *, time_t) = 0;
 		virtual void SendSQLineDel(const char *) = 0;
-		virtual void SendInvite(const char *source, const char *chan, const char *nick)
+		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick)
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
 		}
-		virtual void SendPart(const char *nick, const char *chan, const char *fmt, ...)
+		virtual void SendPart(BotInfo *bi, const char *chan, const char *fmt, ...)
 		{
 			if (fmt) {
 				va_list args;
@@ -1431,18 +1432,15 @@ class IRCDProto {
 		virtual void SendSQLine(const char *, const char *) = 0;
 		virtual void SendSquit(const char *servname, const char *message)
 		{
-			if (!servname || !message) return;
 			send_cmd(NULL, "SQUIT %s :%s", servname, message);
 		}
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(const char *oldnick, const char *newnick)
 		{
-			if (!oldnick || !newnick) return;
-			send_cmd(oldnick, "NICK %s", newnick);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NICK %s", newnick);
 		}
 		virtual void SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
 		{
-			if (!oldnick || !newnick) return;
 			send_cmd(NULL, "SVSNICK %s %s :%ld", oldnick, newnick, static_cast<long>(when));
 		}
 		virtual void SendVhost(const char *, const char *, const char *) { }
@@ -1461,7 +1459,6 @@ class IRCDProto {
 		virtual void SendSVID3(User *, const char *) { }
 		virtual void SendCTCP(const char *source, const char *dest, const char *buf)
 		{
-			if (!buf) return;
 			char *s = normalizeBuffer(buf);
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
 			free(s);

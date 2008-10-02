@@ -802,7 +802,7 @@ void do_umode(const char *source, int ac, const char **av)
         return;
     }
 
-    anope_set_umode(user, ac - 1, &av[1]);
+    anope_ProcessUsermodes(user, ac - 1, &av[1]);
 }
 
 /* Handle a UMODE2 command for a user.
@@ -820,7 +820,7 @@ void do_umode2(const char *source, int ac, const char **av)
         return;
     }
 
-    anope_set_umode(user, ac, &av[0]);
+    anope_ProcessUsermodes(user, ac, &av[0]);
 }
 
 /*************************************************************************/

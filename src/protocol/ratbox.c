@@ -145,7 +145,7 @@ IRCDCAPAB myIrcdcap[] = {
      0, 0, 0}
 };
 
-void RatboxProto::set_umode(User *user, int ac, const char **av)
+void RatboxProto::ProcessUsermodes(User *user, int ac, const char **av)
 {
 	int add = 1; /* 1 if adding modes, 0 if deleting */
 	const char *modes = av[0];
@@ -500,14 +500,14 @@ int anope_event_nick(const char *source, int ac, const char **av)
         user = do_nick("", av[0], av[4], av[5], s->name, av[8],
                        strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
         if (user) {
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         if (ac != 2) {
             user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
                            strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
             if (user)
-                anope_set_umode(user, 1, &av[3]);
+                anope_ProcessUsermodes(user, 1, &av[3]);
         } else {
             do_nick(source, av[0], NULL, NULL, NULL, NULL,
                     strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);

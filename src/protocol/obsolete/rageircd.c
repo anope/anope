@@ -422,7 +422,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                        strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
                        strtoul(av[8], NULL, 0), "*", NULL);
         if (user)
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
                 strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
@@ -481,7 +481,7 @@ int anope_event_snick(const char *source, int ac, const char **av)
                        strtoul(av[1], NULL, 10), strtoul(av[8], NULL, 0),
                        strtoul(av[5], NULL, 0), av[6], NULL);
         if (user) {
-            anope_set_umode(user, 1, &av[9]);
+            anope_ProcessUsermodes(user, 1, &av[9]);
         }
     }
     return MOD_CONT;
@@ -783,7 +783,7 @@ void rageircd_SendConnect(int servernum)
     rageircd_cmd_burst();
 }
 
-void rageircd_set_umode(User * user, int ac, const char **av)
+void rageircd_ProcessUsermodes(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
     const char *modes = av[0];
@@ -1633,7 +1633,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_nick(rageircd_valid_nick);
     pmodule_valid_chan(rageircd_valid_chan);
     pmodule_SendCTCP(rageircd_cmd_ctcp);
-    pmodule_set_umode(rageircd_set_umode);
+    pmodule_ProcessUsermodes(rageircd_set_umode);
 }
 
 /**

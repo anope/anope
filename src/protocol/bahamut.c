@@ -148,7 +148,7 @@ IRCDCAPAB myIrcdcap[] = {
 };
 
 
-void BahamutIRCdProto::set_umode(User *user, int ac, const char **av)
+void BahamutIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
 {
 	int add = 1; /* 1 if adding modes, 0 if deleting */
 	const char *modes = av[0];
@@ -525,7 +525,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                        strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
                        strtoul(av[8], NULL, 0), NULL, NULL);
         if (user) {
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,

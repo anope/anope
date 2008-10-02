@@ -1347,7 +1347,7 @@ class IRCDProto {
 			SendServer(jserver, 2, rbuf);
 			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 		}
-		virtual void set_umode(User *, int, const char **) = 0;
+		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int valid_nick(const char *) { return 1; }
 		virtual int valid_chan(const char *) { return 1; }
 		virtual int flood_mode_check(const char *) { return 0; }

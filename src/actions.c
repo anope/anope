@@ -219,7 +219,7 @@ void common_svsmode(User * u, const char *modes, const char *arg)
     }
 
     anope_SendSVSMode(u, ac, av);
-    anope_set_umode(u, ac, av);
+    anope_ProcessUsermodes(u, ac, av);
 }
 
 /*************************************************************************/

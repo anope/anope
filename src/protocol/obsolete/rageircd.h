@@ -41,7 +41,7 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-void rageircd_set_umode(User * user, int ac, const char **av);
+void rageircd_ProcessUsermodes(User * user, int ac, const char **av);
 void rageircd_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
 void rageircd_SendVhostDel(User * u);
 void rageircd_SendAkill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);

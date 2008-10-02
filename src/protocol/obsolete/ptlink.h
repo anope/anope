@@ -78,7 +78,7 @@
 #define PTLINK_TS_CURRENT 9
 #define PTLINK_TS_MIN 3
 
-void ptlink_set_umode(User * user, int ac, const char **av);
+void ptlink_ProcessUsermodes(User * user, int ac, const char **av);
 void ptlink_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when);
 void ptlink_SendVhostDel(User * u);
 void ptlink_SendAkill(const char *user, const char *host, const char *who, time_t when,time_t expires, const char *reason);

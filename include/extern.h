@@ -1244,7 +1244,7 @@ EI int anope_event_netglobal(const char *source, int ac, const char **av);
 EI int anope_event_invite(const char *source, int ac, const char **av);
 E int anope_event_null(const char *source, int ac, const char **av);
 
-E void anope_set_umode(User * user, int ac, const char **av);
+E void anope_ProcessUsermodes(User * user, int ac, const char **av);
 E void anope_SendSVID(const char *nick, time_t ts);
 E void anope_SendSVID2(User *u, const char *ts);
 E void anope_SendSVID3(User *u, const char *ts);

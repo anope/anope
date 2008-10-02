@@ -145,7 +145,7 @@ IRCDCAPAB myIrcdcap[] = {
 
 
 void
-plexus_set_umode (User * user, int ac, const char **av)
+plexus_ProcessUsermodes (User * user, int ac, const char **av)
 {
   int add = 1;			/* 1 if adding modes, 0 if deleting */
   const char *modes = av[0];
@@ -563,7 +563,7 @@ anope_event_nick (const char *source, int ac, const char **av)
 			    strtoul (av[2], NULL, 10),
 			    strtoul (av[7], NULL, 0), 0, av[5], NULL);
       if (user)
-	anope_set_umode (user, 1, &av[3]);
+	anope_ProcessUsermodes (user, 1, &av[3]);
     }
   else
     {
@@ -1808,7 +1808,7 @@ moduleAddAnopeCmds ()
   pmodule_valid_nick (plexus_valid_nick);
   pmodule_valid_chan (plexus_valid_chan);
   pmodule_SendCTCP (plexus_cmd_ctcp);
-  pmodule_set_umode (plexus_set_umode);
+  pmodule_ProcessUsermodes (plexus_set_umode);
 }
 
 /**

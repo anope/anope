@@ -26,7 +26,7 @@
 #define s_akill(user, host, who, when, expires, reason) \
   anope_SendAkill(user, host, who, when, expires, reason)
 
-#define set_umode(user, ac, av) anope_set_umode(user, ac, av)
+#define ProcessUsermodes(user, ac, av) anope_set_umode(user, ac, av)
 
 #define s_svsnoop(server, set) anope_SendSVSNOOP(server, set)
 

@@ -502,7 +502,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
         user = do_nick(source, av[0], av[4], av[5], av[7], av[8],
                        strtoul(av[2], NULL, 10), 0, 0, av[6], NULL);
         if (user)
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
                 strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
@@ -1307,7 +1307,7 @@ void ptlink_cmd_376(const char *source)
 }
 
 
-void ptlink_set_umode(User * user, int ac, const char **av)
+void ptlink_ProcessUsermodes(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
     const char *modes = av[0];
@@ -1753,7 +1753,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_nick(ptlink_valid_nick);
     pmodule_valid_chan(ptlink_valid_chan);
     pmodule_SendCTCP(ptlink_cmd_ctcp);
-    pmodule_set_umode(ptlink_set_umode);
+    pmodule_ProcessUsermodes(ptlink_set_umode);
 }
 
 /**

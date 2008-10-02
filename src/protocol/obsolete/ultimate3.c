@@ -144,7 +144,7 @@ IRCDCAPAB myIrcdcap[] = {
      0, 0, 0}
 };
 
-void ultimate3_set_umode(User * user, int ac, const char **av)
+void ultimate3_ProcessUsermodes(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
     const char *modes = av[0];
@@ -525,7 +525,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                                                                0),
                              strtoul(av[8], NULL, 0), "*", NULL);
         if (user)
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
                 strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
@@ -582,7 +582,7 @@ int anope_event_client(const char *source, int ac, const char **av)
                                                                0),
                              strtoul(av[10], NULL, 0), av[7], NULL);
         if (user) {
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
         }
     }
     return MOD_CONT;
@@ -1774,7 +1774,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_nick(ultiamte3_valid_nick);
     pmodule_valid_chan(ultiamte3_valid_chan);
     pmodule_SendCTCP(ultimate3_cmd_ctcp);
-    pmodule_set_umode(ultimate3_set_umode);
+    pmodule_ProcessUsermodes(ultimate3_set_umode);
 }
 
 /**

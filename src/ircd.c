@@ -38,9 +38,9 @@ void pmodule_ircd_proto(IRCDProto *proto)
 	ircdproto = proto;
 }
 
-void anope_set_umode(User *user, int ac, const char **av)
+void anope_ProcessUsermodes(User *user, int ac, const char **av)
 {
-	ircdproto->set_umode(user, ac, av);
+	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
 void anope_SendSVSNOOP(const char *server, int set)

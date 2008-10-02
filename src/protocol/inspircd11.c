@@ -394,7 +394,7 @@ static int has_messagefloodmod = 0;
 static int has_banexceptionmod = 0;
 static int has_inviteexceptionmod = 0;
 
-void InspIRCdProto::set_umode(User *user, int ac, const char **av)
+void InspIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
 {
 	int add = 1; /* 1 if adding modes, 0 if deleting */
 	const char *modes = av[0];
@@ -1092,7 +1092,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                            av[7],   /* realname */
                            ts, svid, htonl(*ad), av[3], NULL);
             if (user) {
-                anope_set_umode(user, 1, &av[5]);
+                anope_ProcessUsermodes(user, 1, &av[5]);
 				user->chost = av[3];
 			}
         }

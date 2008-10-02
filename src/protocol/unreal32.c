@@ -415,7 +415,7 @@ CUMode myCumodes[128] = {
 };
 
 
-void UnrealIRCdProto::set_umode(User *user, int ac, const char **av)
+void UnrealIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
 {
 	int add = 1; /* 1 if adding modes, 0 if deleting */
 	const char *modes = av[0];
@@ -1062,7 +1062,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                                                              0),
                            ntohl(decode_ip(av[9])), av[8], NULL);
             if (user)
-                anope_set_umode(user, 1, &av[7]);
+                anope_ProcessUsermodes(user, 1, &av[7]);
 
         } else {
             /* NON NICKIP */
@@ -1071,7 +1071,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                                                              0), 0, av[8],
                            NULL);
             if (user)
-                anope_set_umode(user, 1, &av[7]);
+                anope_ProcessUsermodes(user, 1, &av[7]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,

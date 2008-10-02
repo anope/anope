@@ -149,7 +149,7 @@ IRCDCAPAB myIrcdcap[] = {
 
 
 
-void viagra_set_umode(User * user, int ac, const char **av)
+void viagra_ProcessUsermodes(User * user, int ac, const char **av)
 {
     int add = 1;                /* 1 if adding modes, 0 if deleting */
     const char *modes = av[0];
@@ -544,7 +544,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                        strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
                        strtoul(av[8], NULL, 0), "*", NULL);
         if (user) {
-            anope_set_umode(user, 1, &av[3]);
+            anope_ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
@@ -1673,7 +1673,7 @@ void moduleAddAnopeCmds()
     pmodule_valid_nick(viagra_valid_nick);
     pmodule_valid_chan(viagra_valid_chan);
     pmodule_SendCTCP(viagra_cmd_ctcp);
-    pmodule_set_umode(viagra_set_umode);
+    pmodule_ProcessUsermodes(viagra_set_umode);
 }
 
 /**

@@ -297,7 +297,7 @@ void User::SendMessage(const char *source, const std::string &msg)
 	if (UsePrivmsg &&
 		((!this->na && NSDefFlags & NI_MSG) || (this->na && this->na->nc->flags & NI_MSG)))
 	{
-		anope_cmd_privmsg(source, this->nick, msg.c_str());
+		ircdproto->SendPrivmsg(source, this->nick, msg.c_str());
 	}
 	else
 	{

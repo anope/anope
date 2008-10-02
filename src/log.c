@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -177,7 +177,7 @@ void alog(const char *fmt, ...)
         fprintf(stderr, "%s %s\n", buf, str);
     }
     if (LogChannel && logchan && !debug && findchan(LogChannel)) {
-        privmsg(s_GlobalNoticer, LogChannel, "%s", str);
+        ircdproto->SendPrivmsg(s_GlobalNoticer, LogChannel, "%s", str);
     }
     errno = errno_save;
 }
@@ -294,7 +294,7 @@ void fatal_perror(const char *fmt, ...)
 
 /*************************************************************************/
 
-/* Same thing, but do it like perror(). 
+/* Same thing, but do it like perror().
  * This is for socket errors. On *nix, it works just like fatal_perror,
  * on Win32, it uses the socket error code and formatting functions.
  */

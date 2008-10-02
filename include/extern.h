@@ -1110,7 +1110,6 @@ E int db_mysql_load_news(void);
 E unsigned int mysql_rand(void);
 #endif
 
-E void privmsg(char *source, char *dest, const char *fmt, ...);
 E void notice(char *source, const char *dest, const char *fmt, ...);
 
 /******************************************************************************/
@@ -1133,7 +1132,6 @@ E void anope_SendGlobalNotice(const char *source, const char *dest, const char *
 E void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
 E void anope_SendPong(const char *servname, const char *who);                    	  		  /* PONG */
-E void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */

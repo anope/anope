@@ -846,7 +846,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && (requester != u)) {
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }
@@ -858,7 +858,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->except) {
         if (is_excepted(ci, u) == 1) {
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
                               getstring2(NULL, BOT_EXCEPT));
             return;
         }
@@ -922,7 +922,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && (requester != u)) {
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }
@@ -976,7 +976,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && *mode == '-' && (requester != u)) {
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }

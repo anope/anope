@@ -202,7 +202,7 @@ void notice_lang(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            anope_cmd_privmsg(source, dest->nick, *t ? t : " ");
+            ircdproto->SendPrivmsg(source, dest->nick, *t ? t : " ");
         } else {
             ircdproto->SendNotice(source, dest->nick, *t ? t : " ");
         }
@@ -258,7 +258,7 @@ void notice_help(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            anope_cmd_privmsg(source, dest->nick, *outbuf ? outbuf : " ");
+            ircdproto->SendPrivmsg(source, dest->nick, *outbuf ? outbuf : " ");
         } else {
             ircdproto->SendNotice(source, dest->nick, *outbuf ? outbuf : " ");
         }
@@ -287,37 +287,10 @@ void notice(char *source, const char *dest, const char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (NSDefFlags & NI_MSG) {
-            anope_cmd_privmsg(source, dest, buf);
+            ircdproto->SendPrivmsg(source, dest, buf);
         } else {
             ircdproto->SendNotice(source, dest, buf);
         }
         va_end(args);
     }
 }
-
-/*************************************************************************/
-
-/**
- * Send a PRIVMSG from the given source to the given nick.
- * @param source Orgin of the Message
- * @param dest Destination of the Message
- * @param fmt Format of the Message
- * @param ... any number of parameters
- * @return void
- */
-void privmsg(char *source, char *dest, const char *fmt, ...)
-{
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-
-    anope_cmd_privmsg(source, dest, buf);
-}
-
-

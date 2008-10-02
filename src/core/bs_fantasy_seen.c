@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -77,12 +77,12 @@ int do_fantasy(int argc, char **argv)
             /* If we look for the bot */
             snprintf(buf, sizeof(buf), getstring(u->na, BOT_SEEN_BOT),
                      u->nick);
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         } else if (!(na = findnick(target)) || (na->status & NS_VERBOTEN)) {
             /* If the nick is not registered or forbidden */
             snprintf(buf, sizeof(buf), getstring(u->na, BOT_SEEN_UNKNOWN),
                      target);
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         } else if ((u2 = nc_on_chan(ci->c, na->nc))) {
             /* If the nick we're looking for is on the channel,
              * there are three possibilities: it's yourself,
@@ -100,7 +100,7 @@ int do_fantasy(int argc, char **argv)
                          getstring(u->na, BOT_SEEN_ON_CHANNEL_AS), target,
                          u2->nick);
 
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         } else if ((access = get_access_entry(na->nc, ci))) {
             /* User is on the access list but not present actually.
                Special case: if access->last_seen is 0 it's that we
@@ -116,7 +116,7 @@ int do_fantasy(int argc, char **argv)
                 snprintf(buf, sizeof(buf),
                          getstring(u->na, BOT_SEEN_NEVER), target);
             }
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         } else if (na->nc == ci->founder) {
             /* User is the founder of the channel */
             char durastr[192];
@@ -124,12 +124,12 @@ int do_fantasy(int argc, char **argv)
                      time(NULL) - na->last_seen);
             snprintf(buf, sizeof(buf), getstring(u->na, BOT_SEEN_ON),
                      target, durastr);
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         } else {
             /* All other cases */
             snprintf(buf, sizeof(buf), getstring(u->na, BOT_SEEN_UNKNOWN),
                      target);
-            anope_cmd_privmsg(ci->bi->nick, ci->name, "%s", buf);
+            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", buf);
         }
         /* free myStrGetToken(ed) variable target (#851) */
         Anope_Free(target);

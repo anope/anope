@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -85,7 +85,7 @@ int do_act(User * u)
         anope_cmd_action(ci->bi->nick, ci->name, "%s", text);
         ci->bi->lastmsg = time(NULL);
         if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
-            anope_cmd_privmsg(ci->bi->nick, LogChannel, "ACT %s %s %s",
+            ircdproto->SendPrivmsg(ci->bi->nick, LogChannel, "ACT %s %s %s",
                               u->nick, ci->name, text);
     }
     return MOD_CONT;

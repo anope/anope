@@ -1569,7 +1569,7 @@ void chan_adduser2(User * user, Channel * c)
              * recovers from a netsplit. -GD
              */
             if (is_sync(user->server)) {
-                anope_cmd_privmsg(c->ci->bi->nick, c->name, "[%s] %s",
+                ircdproto->SendPrivmsg(c->ci->bi->nick, c->name, "[%s] %s",
                                   user->na->nick, user->na->nc->greet);
                 c->ci->bi->lastmsg = time(NULL);
             }

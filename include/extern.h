@@ -1127,7 +1127,6 @@ E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_SendChangeBotNick(const char *oldnick, const char *newnick);             	  		  /* NICK */
 E void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
-E void anope_SendPong(const char *servname, const char *who);                    	  		  /* PONG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGLINE */
 E void anope_SendSQLine(const char *mask, const char *reason);                   	  		  /* SQLINE */

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -183,41 +183,41 @@ void save_databases(void)
          * exists we're safe. -GD
          */
         if (serv_uplink)
-            anope_SendPong(ServerName, ServerName);
+            ircdproto->SendPong(ServerName, ServerName);
         waiting = -12;
         save_cs_rdb_dbase();
         if (serv_uplink)
-            anope_SendPong(ServerName, ServerName);
+            ircdproto->SendPong(ServerName, ServerName);
         if (PreNickDBName) {
             save_ns_req_rdb_dbase();
             if (serv_uplink)
-                anope_SendPong(ServerName, ServerName);
+                ircdproto->SendPong(ServerName, ServerName);
             waiting = -13;
         }
         if (s_BotServ) {
             waiting = -14;
             save_bs_rdb_dbase();
             if (serv_uplink)
-                anope_SendPong(ServerName, ServerName);
+                ircdproto->SendPong(ServerName, ServerName);
         }
         if (s_HostServ) {
             waiting = -15;
             save_hs_rdb_dbase();
             if (serv_uplink)
-                anope_SendPong(ServerName, ServerName);
+                ircdproto->SendPong(ServerName, ServerName);
         }
         waiting = -16;
         save_os_rdb_dbase();
         if (serv_uplink)
-            anope_SendPong(ServerName, ServerName);
+            ircdproto->SendPong(ServerName, ServerName);
         waiting = -17;
         save_rdb_news();
         if (serv_uplink)
-            anope_SendPong(ServerName, ServerName);
+            ircdproto->SendPong(ServerName, ServerName);
         waiting = -18;
         save_rdb_exceptions();
         if (serv_uplink)
-            anope_SendPong(ServerName, ServerName);
+            ircdproto->SendPong(ServerName, ServerName);
     }
 #endif
     waiting = -20;

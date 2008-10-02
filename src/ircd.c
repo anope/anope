@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendPong(const char *servname, const char *who)
-{
-	ircdproto->SendPong(servname, who);
-}
-
 void anope_SendJoin(const char *user, const char *channel, time_t chantime)
 {
 	ircdproto->SendJoin(user, channel, chantime);

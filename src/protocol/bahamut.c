@@ -452,7 +452,7 @@ CUMode myCumodes[128] = {
 
 
 
-void BahamutIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source, "MODE %s 0 %s", dest, buf);
@@ -488,7 +488,7 @@ void BahamutIRCdProto::SendSVSMode_chan(const char *name, const char *mode, cons
 
 void BahamutIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */

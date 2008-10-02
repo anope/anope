@@ -913,7 +913,7 @@ void RatboxProto::SendNumeric(const char *source, int numeric, const char *dest,
 	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 
-void RatboxProto::SendMode(const char *source, const char *dest, const char *buf)
+void RatboxProto::SendModeInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
@@ -961,7 +961,7 @@ void RatboxProto::SendBotOp(const char *nick, const char *chan)
 		Uid *u = find_uid(nick);
 		ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
 	}
-	else anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	else SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */

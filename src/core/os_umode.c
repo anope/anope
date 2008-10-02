@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -101,7 +101,7 @@ int do_operumodes(User * u)
     if (!(u2 = finduser(nick))) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else {
-        anope_SendMode(s_OperServ, nick, "%s", modes);
+        ircdproto->SendMode(s_OperServ, nick, "%s", modes);
 
         common_svsmode(u2, modes, NULL);
 

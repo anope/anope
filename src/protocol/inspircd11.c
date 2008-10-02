@@ -565,7 +565,7 @@ void InspIRCdProto::SendGuestNick(const char *nick, const char *user, const char
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 }
 
-void InspIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	Channel *c = findchan(dest);
@@ -747,7 +747,7 @@ void InspIRCdProto::SendNoticeChanops(const char *source, const char *dest, cons
 
 void InspIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	anope_SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
+	SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */

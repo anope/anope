@@ -104,7 +104,7 @@ int do_cs_topic(User * u)
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_SendJoin(s_ChanServ, c->name, c->creation_time);
-                anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
+                ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
         ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic ? topic : "",

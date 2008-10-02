@@ -53,6 +53,7 @@
 
 class InspIRCdProto : public IRCDProto {
 		void SendSVSKillInternal(const char *, const char *, const char *);
+		void SendModeInternal(const char *, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
@@ -60,7 +61,6 @@ class InspIRCdProto : public IRCDProto {
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSMode(User *, int, const char **);
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
-		void SendMode(const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendKick(const char *, const char *, const char *, const char *);
 		void SendNoticeChanops(const char *, const char *, const char *);

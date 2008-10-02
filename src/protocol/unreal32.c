@@ -542,7 +542,7 @@ void UnrealIRCdProto::SendGuestNick(const char *nick, const char *user, const ch
 		myIrcd->nickip ? " *" : " ", real);
 }
 
-void UnrealIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
@@ -571,7 +571,7 @@ void UnrealIRCdProto::SendNoticeChanops(const char *source, const char *dest, co
 
 void UnrealIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	anope_SendMode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
+	SendMode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -99,7 +99,7 @@ int do_drop(User * u)
         if (ci->c) {
             if (ircd->regmode) {
                 ci->c->mode &= ~ircd->regmode;
-                anope_SendMode(whosends(ci), ci->name, "-r");
+                ircdproto->SendMode(whosends(ci), ci->name, "-r");
             }
         }
 

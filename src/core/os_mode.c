@@ -88,7 +88,7 @@ int do_os_mode(User * u)
         notice_lang(s_OperServ, u, PERMISSION_DENIED);
         return MOD_CONT;
     } else {
-        anope_SendMode(s_OperServ, chan, "%s", modes);
+        ircdproto->SendMode(s_OperServ, chan, "%s", modes);
 
         ac = split_buf(modes, &av, 1);
         chan_set_modes(s_OperServ, c, ac, av, -1);

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -179,11 +179,11 @@ int do_register(User * u)
         check_modes(c);
         /* On most ircds you do not receive the admin/owner mode till its registered */
         if (ircd->admin) {
-            anope_SendMode(s_ChanServ, chan, "%s %s", ircd->adminset,
+            ircdproto->SendMode(s_ChanServ, chan, "%s %s", ircd->adminset,
                            u->nick);
         }
         if (ircd->owner && ircd->ownerset) {
-            anope_SendMode(s_ChanServ, chan, "%s %s", ircd->ownerset,
+            ircdproto->SendMode(s_ChanServ, chan, "%s %s", ircd->ownerset,
                            u->nick);
         }
         send_event(EVENT_CHAN_REGISTERED, 1, chan);

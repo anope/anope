@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -90,7 +90,7 @@ int do_operoline(User * u)
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
             anope_SendSVSO(s_OperServ, nick, flags);
-            anope_SendMode(s_OperServ, nick, "+o");
+            ircdproto->SendMode(s_OperServ, nick, "+o");
             common_svsmode(u2, "+o", NULL);
             notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);

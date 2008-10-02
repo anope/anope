@@ -227,7 +227,7 @@ int do_owner(User * u)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
-                anope_SendMode(whosends(ci), uc->chan->name, "%s %s",
+                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
                                av[0], u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
@@ -247,7 +247,7 @@ int do_owner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        anope_SendMode(whosends(ci), c->name, "%s %s", ircd->ownerset,
+        ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerset,
                        u->nick);
 
         av[0] = ircd->ownerset;
@@ -281,7 +281,7 @@ int do_deowner(User * u)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && is_founder(u, ci)) {
-                anope_SendMode(whosends(ci), uc->chan->name, "%s %s",
+                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
                                av[0], u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
             }
@@ -301,7 +301,7 @@ int do_deowner(User * u)
     } else if (!is_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
     } else {
-        anope_SendMode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
+        ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
                        u->nick);
 
         av[0] = ircd->ownerunset;
@@ -336,7 +336,7 @@ int do_util(User * u, CSModeUtil * util)
         for (uc = u->chans; uc; uc = uc->next) {
             if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
                 && check_access(u, ci, util->levelself)) {
-                anope_SendMode(whosends(ci), uc->chan->name, "%s %s",
+                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
                                util->mode, u->nick);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
 
@@ -373,7 +373,7 @@ int do_util(User * u, CSModeUtil * util)
     } else if (*util->mode == '-' && is_protected(u2) && !is_same) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        anope_SendMode(whosends(ci), c->name, "%s %s", util->mode,
+        ircdproto->SendMode(whosends(ci), c->name, "%s %s", util->mode,
                        u2->nick);
 
         av[0] = util->mode;

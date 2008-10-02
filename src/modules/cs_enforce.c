@@ -1,12 +1,12 @@
 /* cs_enforce - Add a /cs ENFORCE command to enforce various set
  *              options and channelmodes on a channel.
- * 
+ *
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
- * 
+ *
  * Included in the Anope module pack since Anope 1.7.9
  * Anope Coder: GeniusDex <geniusdex@anope.org>
- * 
+ *
  * Please read COPYING and README for further details.
  *
  * Send any bug reports to the Anope Coder, as he will be able
@@ -120,7 +120,7 @@ void do_enforce_restricted(Channel * c)
         if (check_access(u, c->ci, CA_NOJOIN)) {
             get_idealban(ci, u, mask, sizeof(mask));
             reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
-            anope_SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
+            ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
                            time(NULL));
             anope_SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
             av[0] = ci->name;
@@ -160,7 +160,7 @@ void do_enforce_cmode_R(Channel * c)
             reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
             if (((cbm = &cbmodes['R'])->flag == 0)
                 || !(c->mode & cbm->flag))
-                anope_SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
+                ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
                                time(NULL));
             anope_SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
             av[0] = ci->name;

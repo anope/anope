@@ -1125,7 +1125,6 @@ E void anope_SendGlobops(const char *source, const char *fmt, ...);         	  	
 E void anope_SendInvite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */
 E void anope_SendJoin(const char *user, const char *channel, time_t chantime);   	  		  /* JOIN */
 E void anope_SendKick(const char *source, const char *chan, const char *user, const char *fmt, ...);		  /* KICK */
-E void anope_SendMode(const char *source, const char *dest, const char *fmt, ...);   	  		  /* MODE */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_SendBanDel(const char *name, const char *nick);				  		  			      /* MODE -b */
 E void anope_SendBotOp(const char *nick, const char *chan);			  		  /* MODE BotServ */

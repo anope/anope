@@ -736,7 +736,7 @@ int init_secondary(int ac, char **av)
     /* And hybrid needs Global joined in the logchan */
     if (logchan && ircd->join2msg) {
         /* XXX might desync */
-        anope_SendJoin(s_GlobalNoticer, LogChannel, time(NULL));
+        ircdproto->SendJoin(s_GlobalNoticer, LogChannel, time(NULL));
     }
 
     anope_SendEOB();

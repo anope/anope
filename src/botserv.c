@@ -750,7 +750,7 @@ void bot_join(ChannelInfo * ci)
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);
     }
-    anope_SendJoin(ci->bi->nick, ci->c->name, ci->c->creation_time);
+    ircdproto->SendJoin(ci->bi->nick, ci->c->name, ci->c->creation_time);
     ircdproto->SendBotOp(ci->bi->nick, ci->c->name);
     send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
 }

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -187,7 +187,7 @@ int do_set(User * u)
         if (LogChannel && (stricmp(setting, "on") == 0)) {
             if (ircd->join2msg) {
                 c = findchan(LogChannel);
-                anope_SendJoin(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
+                ircdproto->SendJoin(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
             }
             logchan = 1;
             alog("Now sending log messages to %s", LogChannel);

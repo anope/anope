@@ -1352,7 +1352,7 @@ int check_kick(User * user, const char *chan, time_t chants)
      * c may be NULL even if it exists */
     if ((!(c = findchan(chan)) || c->usercount == 0)
         && !(ci->flags & CI_INHABIT)) {
-        anope_SendJoin(s_ChanServ, chan, (c ? c->creation_time : chants));
+        ircdproto->SendJoin(s_ChanServ, chan, (c ? c->creation_time : chants));
         /* Lets hide the channel from /list just incase someone does /list
          * while we are here. - katsklaw
          */
@@ -1448,7 +1448,7 @@ void restore_topic(const char *chan)
     }
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_SendJoin(s_ChanServ, chan, c->creation_time);
+            ircdproto->SendJoin(s_ChanServ, chan, c->creation_time);
             ircdproto->SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
@@ -1510,7 +1510,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_SendJoin(s_ChanServ, c->name, c->creation_time);
+            ircdproto->SendJoin(s_ChanServ, c->name, c->creation_time);
             ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
         }
     }

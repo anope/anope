@@ -1362,6 +1362,16 @@ class IRCDProto {
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
+
+		/** XXX: This is a hack for NickServ enforcers. It is deprecated.
+		 * If I catch any developer using this in new code, I will RIP YOUR BALLS OFF.
+		 * Thanks.
+		 * -- w00t
+		 */
+		virtual void SendQuit(const char *nick, const char *buf) MARK_DEPRECATED
+		{
+			send_cmd(nick, "QUIT");
+		}
 		virtual void SendQuit(BotInfo *bi, const char *fmt, ...)
 		{
 			va_list args;

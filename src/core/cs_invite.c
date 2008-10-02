@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -84,7 +84,7 @@ int do_invite(User * u)
     } else if (!u || !check_access(u, ci, CA_INVITE)) {
         notice_lang(s_ChanServ, u, PERMISSION_DENIED);
     } else {
-        anope_SendInvite(whosends(ci), chan, u->nick);
+        ircdproto->SendInvite(whosends(ci), chan, u->nick);
     }
     return MOD_CONT;
 }

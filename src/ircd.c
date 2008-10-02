@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendInvite(const char *source, const char *chan, const char *nick)
-{
-	ircdproto->SendInvite(source, chan, nick);
-}
-
 void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...)
 {
 	if (fmt) {

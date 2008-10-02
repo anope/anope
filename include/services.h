@@ -1232,8 +1232,8 @@ class IRCDProto;
 class IRCDProto {
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
 		virtual void SendModeInternal(const char *, const char *, const char *) = 0;
-		virtual void SendKickInternal(const char *, const char *, const char *, const char *) = 0;
-		virtual void SendNoticeChanopsInternal(const char *, const char *, const char *) = 0;
+		virtual void SendKickInternal(BotInfo *bi, const char *, const char *, const char *) = 0;
+		virtual void SendNoticeChanopsInternal(BotInfo *bi, const char *, const char *) = 0;
 		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf)
 		{
 			if (NSDefFlags & NI_MSG)
@@ -1249,19 +1249,19 @@ class IRCDProto {
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s :%s", dest, buf);
 		}
-		virtual void SendQuitInternal(const char *source, const char *buf)
+		virtual void SendQuitInternal(BotInfo *bi, const char *buf)
 		{
 			if (buf)
 				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT :%s", buf);
 			else
 				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT");
 		}
-		virtual void SendPartInternal(const char *nick, const char *chan, const char *buf)
+		virtual void SendPartInternal(BotInfo *bi, const char *chan, const char *buf)
 		{
 			if (buf)
-				send_cmd(nick, "PART %s :%s", chan, buf);
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s :%s", chan, buf);
 			else
-				send_cmd(nick, "PART %s", chan);
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s", chan);
 		}
 		virtual void SendGlobopsInternal(const char *source, const char *buf)
 		{
@@ -1281,11 +1281,9 @@ class IRCDProto {
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendSVSKillInternal(source, user, buf);
 		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
@@ -1294,85 +1292,65 @@ class IRCDProto {
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendModeInternal(source, dest, buf);
 		}
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *) = 0;
-		virtual void SendKick(const char *source, const char *chan, const char *user, const char *fmt, ...)
+		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			SendKickInternal(source, chan, user, buf);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
+			SendKickInternal(bi, chan, user, buf);
 		}
-		virtual void SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendNoticeChanops(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			SendNoticeChanopsInternal(source, dest, buf);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
+			SendNoticeChanopsInternal(bi, dest, buf);
 		}
-		virtual void SendMessage(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendMessage(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			BotInfo *bi = findbot(source);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendMessageInternal(bi, dest, buf);
 		}
-		virtual void SendNotice(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendNotice(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			BotInfo *bi = findbot(source);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendNoticeInternal(bi, dest, buf);
 		}
-		virtual void SendAction(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendAction(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "", actionbuf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			else return;
-			if (!*buf) return;
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s%c", 1, buf, 1);
-			BotInfo *bi = findbot(source);
 			SendPrivmsgInternal(bi, dest, actionbuf);
 		}
-		virtual void SendPrivmsg(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			BotInfo *bi = findbot(source);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendPrivmsgInternal(bi, dest, buf);
 		}
 		virtual void SendGlobalNotice(BotInfo *bi, const char *dest, const char *msg)
@@ -1384,23 +1362,20 @@ class IRCDProto {
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
-		virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
-		virtual void SendQuit(const char *source, const char *fmt, ...)
+		virtual void SendQuit(BotInfo *bi, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
-			SendQuitInternal(source, buf);
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
+			SendQuitInternal(bi, buf);
 		}
 		virtual void SendPong(const char *servname, const char *who)
 		{
 			send_cmd(servname, "PONG %s", who);
 		}
-		virtual void SendJoin(const char *, const char *, time_t) = 0;
+		virtual void SendJoin(BotInfo *bi, const char *, time_t) = 0;
 		virtual void SendSQLineDel(const char *) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick)
 		{
@@ -1414,19 +1389,17 @@ class IRCDProto {
 				va_start(args, fmt);
 				vsnprintf(buf, BUFSIZE - 1, fmt, args);
 				va_end(args);
-				SendPartInternal(nick, chan, buf);
+				SendPartInternal(bi, chan, buf);
 			}
-			else SendPartInternal(nick, chan, NULL);
+			else SendPartInternal(bi, chan, NULL);
 		}
 		virtual void SendGlobops(const char *source, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
-			if (fmt) {
-				va_start(args, fmt);
-				vsnprintf(buf, BUFSIZE - 1, fmt, args);
-				va_end(args);
-			}
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
 			SendGlobopsInternal(source, buf);
 		}
 		virtual void SendSQLine(const char *, const char *) = 0;
@@ -1435,7 +1408,7 @@ class IRCDProto {
 			send_cmd(NULL, "SQUIT %s :%s", servname, message);
 		}
 		virtual void SendSVSO(const char *, const char *, const char *) { }
-		virtual void SendChangeBotNick(const char *oldnick, const char *newnick)
+		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick)
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "NICK %s", newnick);
 		}
@@ -1457,7 +1430,7 @@ class IRCDProto {
 		virtual void SendUnregisteredNick(User *) { }
 		virtual void SendSVID2(User *, const char *) { }
 		virtual void SendSVID3(User *, const char *) { }
-		virtual void SendCTCP(const char *source, const char *dest, const char *buf)
+		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *buf)
 		{
 			char *s = normalizeBuffer(buf);
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);

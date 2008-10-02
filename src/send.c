@@ -51,6 +51,36 @@ void send_cmd(const char *source, const char *fmt, ...)
 	va_end(args);
 }
 
+
+/*
+ * Copypasta version that accepts std::string source.
+void send_cmd(const std::string &source, const char *fmt, ...)
+{
+	va_list args;
+	static char buf[BUFSIZE];
+
+	va_start(args, fmt);
+
+	vsnprintf(buf, BUFSIZE - 1, fmt, args);
+
+	if (!source.empty())
+	{
+		sockprintf(servsock, ":%s %s\r\n", source.c_str(), buf);
+		eventprintf(":%s %s", source, buf);
+		if (debug)
+			alog("debug: Sent: :%s %s", source.c_str(), buf);
+	}
+	else
+	{
+		sockprintf(servsock, "%s\r\n", buf);
+		eventprintf("%s", buf);
+		if (debug)
+			alog("debug: Sent: %s", buf);
+	}
+
+	va_end(args);
+}
+
 /*************************************************************************/
 
 /**

@@ -933,8 +933,8 @@ E void process(void);
 
 /**** send.c ****/
 
-E void send_cmd(const char *source, const char *fmt, ...)
-	FORMAT(printf,2,3);
+E void send_cmd(const char *source, const char *fmt, ...) FORMAT(printf,2,3);
+E void send_cmd(const std::string &source, const char *fmt, ...) FORMAT(printf,2,3);
 
 E void notice_server(char *source, Server * s, char *fmt, ...)
 	FORMAT(printf,3,4);

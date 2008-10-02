@@ -1122,7 +1122,6 @@ E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGLINE */
-E void anope_SendSZLine(const char *mask, const char *reason, const char *whom);				  /* SZLINE */
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svsinfo();								  /* SVSINFO */

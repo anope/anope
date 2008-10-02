@@ -1430,7 +1430,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     entry->expires = expires;
 
     slist_add(&szlines, entry);
-    anope_SendSZLine(entry->mask, entry->reason, entry->by);
+    ircdproto->SendSZLine(entry->mask, entry->reason, entry->by);
 
     return deleted;
 }
@@ -1456,7 +1456,7 @@ int check_szline(const char *nick, char *ip)
         }
 
         if (match_wild_nocase(sx->mask, ip)) {
-            anope_SendSZLine(sx->mask, sx->reason, sx->by);
+            ircdproto->SendSZLine(sx->mask, sx->reason, sx->by);
             return 1;
         }
     }

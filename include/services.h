@@ -1252,26 +1252,27 @@ class IRCDProto {
 		}
 		virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
 		{
-			send_cmd(source, "NOTICE %s :%s", dest, msg);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
 		}
 		virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *buf)
 		{
-			if (!buf || !dest) return;
-			send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s :%s", dest, buf);
 		}
 		virtual void SendGlobalNotice(const char *source, const char *dest, const char *msg)
 		{
-			send_cmd(source, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 		{
-			send_cmd(source, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
 		virtual void SendQuit(const char *source, const char *buf)
 		{
-			if (buf) send_cmd(source, "QUIT :%s", buf);
-			else send_cmd(source, "QUIT");
+			if (buf)
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT :%s", buf);
+			else
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT");
 		}
 		virtual void SendPong(const char *servname, const char *who)
 		{
@@ -1281,19 +1282,22 @@ class IRCDProto {
 		virtual void SendSQLineDel(const char *) = 0;
 		virtual void SendInvite(const char *source, const char *chan, const char *nick)
 		{
-			if (!source || !chan || !nick) return;
-			send_cmd(source, "INVITE %s %s", nick, chan);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
 		}
 		virtual void SendPart(const char *nick, const char *chan, const char *buf)
 		{
-			if (!nick || !chan) return;
-			if (buf) send_cmd(nick, "PART %s :%s", chan, buf);
-			else send_cmd(nick, "PART %s", chan);
+			if (buf)
+				send_cmd(nick, "PART %s :%s", chan, buf);
+			else
+				send_cmd(nick, "PART %s", chan);
 		}
 		virtual void SendGlobops(const char *source, const char *buf)
 		{
-			if (!buf) return;
-			send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
+			BotInfo *bi = findbot(source)
+			if (bi)
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
+			else
+				send_cmd(ServerName, "GLOBOPS :%s", buf);
 		}
 		virtual void SendSQLine(const char *, const char *) = 0;
 		virtual void SendSquit(const char *servname, const char *message)
@@ -1330,7 +1334,7 @@ class IRCDProto {
 		{
 			if (!buf) return;
 			char *s = normalizeBuffer(buf);
-			send_cmd(source, "NOTICE %s :\1%s\1", dest, s);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
 			free(s);
 		}
 		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
@@ -1359,22 +1363,6 @@ class IRCDProto {
 
 class IRCdProtoTS6 : public IRCdProto
 {
-	virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
-	{
-		User *u = finduser(dest);
-		send_cmd(UseTS6 ? bi->uid.c_str() : bi->nick, "NOTICE %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, msg);
-	}
-
-	virtual void SendPrivmsg(BotInfo *bi, const char *dest, const char *buf)
-	{
-		User *u = finduser(dest);
-		send_cmd(UseTS6 ? bi->uid.c_str() ? bi->nick) : source, "PRIVMSG %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, buf);
-	}
-
-	virtual void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-	{
-		send_cmd(UseTS6 ? whosetsts->uid.c_str() : whosetsts->nick, "TOPIC %s :%s", chan, topic);
-	}
 }
 
 /*************************************************************************/

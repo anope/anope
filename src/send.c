@@ -72,9 +72,9 @@ void notice_server(char *source, Server * s, char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (NSDefFlags & NI_MSG) {
-            anope_cmd_serv_privmsg(source, s->name, buf);
+            anope_SendGlobalPrivmsg(source, s->name, buf);
         } else {
-            anope_cmd_serv_notice(source, s->name, buf);
+            anope_SendGlobalNotice(source, s->name, buf);
         }
         va_end(args);
     }

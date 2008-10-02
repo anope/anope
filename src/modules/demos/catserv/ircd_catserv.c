@@ -86,7 +86,7 @@ void addClient(char *nick, char *realname)
 
 void delClient(void)
 {
-    anope_cmd_quit(s_CatServ, "QUIT :Module Unloaded!");
+    anope_SendQuit(s_CatServ, "QUIT :Module Unloaded!");
 }
 
 /*****************************************************************************/

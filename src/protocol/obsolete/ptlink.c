@@ -1035,12 +1035,12 @@ void ptlink_cmd_privmsg2(const char *source, const char *dest, const char *msg)
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void ptlink_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void ptlink_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void ptlink_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void ptlink_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
@@ -1222,7 +1222,7 @@ void ptlink_SendKick(const char *source, const char *chan, const char *user, con
 }
 
 /* QUIT */
-void ptlink_cmd_quit(const char *source, const char *buf)
+void ptlink_SendQuit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1701,11 +1701,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(ptlink_cmd_notice2);
     pmodule_cmd_privmsg(ptlink_cmd_privmsg);
     pmodule_cmd_privmsg2(ptlink_cmd_privmsg2);
-    pmodule_cmd_serv_notice(ptlink_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(ptlink_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(ptlink_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(ptlink_cmd_serv_privmsg);
     pmodule_SendBotOp(ptlink_cmd_bot_chan_mode);
     pmodule_cmd_351(ptlink_cmd_351);
-    pmodule_cmd_quit(ptlink_cmd_quit);
+    pmodule_SendQuit(ptlink_cmd_quit);
     pmodule_cmd_pong(ptlink_cmd_pong);
     pmodule_cmd_join(ptlink_cmd_join);
     pmodule_cmd_unsqline(ptlink_cmd_unsqline);

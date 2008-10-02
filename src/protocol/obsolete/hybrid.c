@@ -493,12 +493,12 @@ void hybrid_cmd_privmsg2(const char *source, const char *dest, const char *msg)
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void hybrid_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void hybrid_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $$%s :%s", dest, msg);
 }
 
-void hybrid_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void hybrid_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $$%s :%s", dest, msg);
 }
@@ -1166,7 +1166,7 @@ void hybrid_SendBotOp(const char *nick, const char *chan)
 }
 
 /* QUIT */
-void hybrid_cmd_quit(const char *source, const char *buf)
+void hybrid_SendQuit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1472,11 +1472,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(hybrid_cmd_notice2);
     pmodule_cmd_privmsg(hybrid_cmd_privmsg);
     pmodule_cmd_privmsg2(hybrid_cmd_privmsg2);
-    pmodule_cmd_serv_notice(hybrid_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(hybrid_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(hybrid_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(hybrid_cmd_serv_privmsg);
     pmodule_SendBotOp(hybrid_cmd_bot_chan_mode);
     pmodule_cmd_351(hybrid_cmd_351);
-    pmodule_cmd_quit(hybrid_cmd_quit);
+    pmodule_SendQuit(hybrid_cmd_quit);
     pmodule_cmd_pong(hybrid_cmd_pong);
     pmodule_cmd_join(hybrid_cmd_join);
     pmodule_cmd_unsqline(hybrid_cmd_unsqline);

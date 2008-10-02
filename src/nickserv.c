@@ -1561,10 +1561,10 @@ void release(NickAlias * na, int from_timeout)
         if (UseSVSHOLD) {
             anope_cmd_release_svshold(na->nick);
         } else {
-            anope_cmd_quit(na->nick, NULL);
+            anope_SendQuit(na->nick, NULL);
         }
     } else {
-        anope_cmd_quit(na->nick, NULL);
+        anope_SendQuit(na->nick, NULL);
     }
     na->status &= ~NS_KILL_HELD;
 }

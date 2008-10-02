@@ -1259,16 +1259,16 @@ class IRCDProto {
 			if (!buf || !dest) return;
 			send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 		}
-		virtual void cmd_serv_notice(const char *source, const char *dest, const char *msg)
+		virtual void SendGlobalNotice(const char *source, const char *dest, const char *msg)
 		{
 			send_cmd(source, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
-		virtual void cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+		virtual void SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 		{
 			send_cmd(source, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
-		virtual void cmd_quit(const char *source, const char *buf)
+		virtual void SendQuit(const char *source, const char *buf)
 		{
 			if (buf) send_cmd(source, "QUIT :%s", buf);
 			else send_cmd(source, "QUIT");

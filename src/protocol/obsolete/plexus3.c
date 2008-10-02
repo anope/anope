@@ -517,13 +517,13 @@ plexus_cmd_privmsg2 (const char *source, const char *dest, const char *msg)
 }
 
 void
-plexus_cmd_serv_notice (const char *source, const char *dest, const char *msg)
+plexus_SendGlobalNotice (const char *source, const char *dest, const char *msg)
 {
   send_cmd (source, "NOTICE $$%s :%s", dest, msg);
 }
 
 void
-plexus_cmd_serv_privmsg (const char *source, const char *dest, const char *msg)
+plexus_SendGlobalPrivmsg (const char *source, const char *dest, const char *msg)
 {
   send_cmd (source, "PRIVMSG $$%s :%s", dest, msg);
 }
@@ -1363,7 +1363,7 @@ plexus_SendBotOp (const char *nick, const char *chan)
 
 /* QUIT */
 void
-plexus_cmd_quit (const char *source, const char *buf)
+plexus_SendQuit (const char *source, const char *buf)
 {
   if (buf)
     {
@@ -1756,11 +1756,11 @@ moduleAddAnopeCmds ()
   pmodule_cmd_notice2 (plexus_cmd_notice2);
   pmodule_cmd_privmsg (plexus_cmd_privmsg);
   pmodule_cmd_privmsg2 (plexus_cmd_privmsg2);
-  pmodule_cmd_serv_notice (plexus_cmd_serv_notice);
-  pmodule_cmd_serv_privmsg (plexus_cmd_serv_privmsg);
+  pmodule_SendGlobalNotice (plexus_cmd_serv_notice);
+  pmodule_SendGlobalPrivmsg (plexus_cmd_serv_privmsg);
   pmodule_SendBotOp (plexus_cmd_bot_chan_mode);
   pmodule_cmd_351 (plexus_cmd_351);
-  pmodule_cmd_quit (plexus_cmd_quit);
+  pmodule_SendQuit (plexus_cmd_quit);
   pmodule_cmd_pong (plexus_cmd_pong);
   pmodule_cmd_join (plexus_cmd_join);
   pmodule_cmd_unsqline (plexus_cmd_unsqline);

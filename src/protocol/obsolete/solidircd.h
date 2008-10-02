@@ -85,11 +85,11 @@ void solidircd_cmd_notice(const char *source, const char *dest, const char *buf)
 void solidircd_cmd_notice2(const char *source, const char *dest, const char *msg);
 void solidircd_cmd_privmsg(const char *source, const char *dest, const char *buf);
 void solidircd_cmd_privmsg2(const char *source, const char *dest, const char *msg);
-void solidircd_cmd_serv_notice(const char *source, const char *dest, const char *msg);
-void solidircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
+void solidircd_SendGlobalNotice(const char *source, const char *dest, const char *msg);
+void solidircd_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);
 void solidircd_SendBotOp(const char *nick, const char *chan);
 void solidircd_cmd_351(const char *source);
-void solidircd_cmd_quit(const char *source, const char *buf);
+void solidircd_SendQuit(const char *source, const char *buf);
 void solidircd_cmd_pong(const char *servname, const char *who);
 void solidircd_cmd_join(const char *user, const char *channel, time_t chantime);
 void solidircd_cmd_unsqline(const char *user);

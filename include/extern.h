@@ -1138,15 +1138,15 @@ E void anope_SendGuestNick(const char *nick, const char *user,const char *host,c
 E void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
 E void anope_SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
 E void anope_cmd_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
-E void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
+E void anope_SendGlobalNotice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */
 E void anope_cmd_part(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
 E void anope_cmd_pong(const char *servname, const char *who);                    	  		  /* PONG */
 E void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
-E void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
+E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
-E void anope_cmd_quit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
+E void anope_SendQuit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
 E void anope_SendAkillDel(const char *user, const char *host);			  		  /* RAKILL */
 E void anope_cmd_sgline(const char *mask, const char *reason);			  	  		  /* SGLINE */
 E void anope_cmd_sqline(const char *mask, const char *reason);                   	  		  /* SQLINE */

@@ -1103,12 +1103,12 @@ void solidircd_cmd_privmsg2(const char *source, const char *dest, const char *ms
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void solidircd_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void solidircd_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void solidircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void solidircd_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
@@ -1297,7 +1297,7 @@ void solidircd_cmd_invite(const char *source, const char *chan, const char *nick
 }
 
 /* QUIT */
-void solidircd_cmd_quit(const char *source, const char *buf)
+void solidircd_SendQuit(const char *source, const char *buf)
 {
 
     if (buf) {
@@ -1614,11 +1614,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(solidircd_cmd_notice2);
     pmodule_cmd_privmsg(solidircd_cmd_privmsg);
     pmodule_cmd_privmsg2(solidircd_cmd_privmsg2);
-    pmodule_cmd_serv_notice(solidircd_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(solidircd_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(solidircd_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(solidircd_cmd_serv_privmsg);
     pmodule_SendBotOp(solidircd_cmd_bot_chan_mode);
     pmodule_cmd_351(solidircd_cmd_351);
-    pmodule_cmd_quit(solidircd_cmd_quit);
+    pmodule_SendQuit(solidircd_cmd_quit);
     pmodule_cmd_pong(solidircd_cmd_pong);
     pmodule_cmd_join(solidircd_cmd_join);
     pmodule_cmd_unsqline(solidircd_cmd_unsqline);

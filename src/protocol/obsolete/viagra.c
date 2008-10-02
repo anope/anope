@@ -883,7 +883,7 @@ void viagra_SendMode(const char *source, const char *dest, const char *buf)
 }
 
 /* QUIT */
-void viagra_cmd_quit(const char *source, const char *buf)
+void viagra_SendQuit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1173,12 +1173,12 @@ void viagra_cmd_privmsg2(const char *source, const char *dest, const char *msg)
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void viagra_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void viagra_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void viagra_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void viagra_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
@@ -1621,11 +1621,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(viagra_cmd_notice2);
     pmodule_cmd_privmsg(viagra_cmd_privmsg);
     pmodule_cmd_privmsg2(viagra_cmd_privmsg2);
-    pmodule_cmd_serv_notice(viagra_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(viagra_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(viagra_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(viagra_cmd_serv_privmsg);
     pmodule_SendBotOp(viagra_cmd_bot_chan_mode);
     pmodule_cmd_351(viagra_cmd_351);
-    pmodule_cmd_quit(viagra_cmd_quit);
+    pmodule_SendQuit(viagra_cmd_quit);
     pmodule_cmd_pong(viagra_cmd_pong);
     pmodule_cmd_join(viagra_cmd_join);
     pmodule_cmd_unsqline(viagra_cmd_unsqline);

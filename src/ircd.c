@@ -175,14 +175,14 @@ void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ..
 	ircdproto->cmd_privmsg(source, dest, buf);
 }
 
-void anope_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void anope_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
-	ircdproto->cmd_serv_notice(source, dest, msg);
+	ircdproto->SendGlobalNotice(source, dest, msg);
 }
 
-void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
-	ircdproto->cmd_serv_privmsg(source, dest, msg);
+	ircdproto->SendGlobalPrivmsg(source, dest, msg);
 }
 
 void anope_SendBotOp(const char *nick, const char *chan)
@@ -190,7 +190,7 @@ void anope_SendBotOp(const char *nick, const char *chan)
 	ircdproto->SendBotOp(nick, chan);
 }
 
-void anope_cmd_quit(const char *source, const char *fmt, ...)
+void anope_SendQuit(const char *source, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -199,7 +199,7 @@ void anope_cmd_quit(const char *source, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_quit(source, buf);
+	ircdproto->SendQuit(source, buf);
 }
 
 void anope_cmd_pong(const char *servname, const char *who)

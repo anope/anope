@@ -60,7 +60,7 @@ class RatboxProto : public IRCDProto {
 		void cmd_notice(const char *, const char *, const char *);
 		void cmd_privmsg(const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
-		void cmd_quit(const char *, const char *);
+		void SendQuit(const char *, const char *);
 		void cmd_pong(const char *, const char *);
 		void cmd_join(const char *, const char *, time_t);
 		void cmd_unsqline(const char *);

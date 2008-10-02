@@ -1138,12 +1138,12 @@ void ultimate3_cmd_privmsg2(const char *source, const char *dest, const char *ms
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void ultimate3_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void ultimate3_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void ultimate3_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void ultimate3_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
@@ -1162,7 +1162,7 @@ void ultimate3_cmd_351(const char *source)
 }
 
 /* QUIT */
-void ultimate3_cmd_quit(const char *source, const char *buf)
+void ultimate3_SendQuit(const char *source, const char *buf)
 {
     if (!buf) {
         return;
@@ -1722,11 +1722,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(ultimate3_cmd_notice2);
     pmodule_cmd_privmsg(ultimate3_cmd_privmsg);
     pmodule_cmd_privmsg2(ultimate3_cmd_privmsg2);
-    pmodule_cmd_serv_notice(ultimate3_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(ultimate3_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(ultimate3_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(ultimate3_cmd_serv_privmsg);
     pmodule_SendBotOp(ultimate3_cmd_bot_chan_mode);
     pmodule_cmd_351(ultimate3_cmd_351);
-    pmodule_cmd_quit(ultimate3_cmd_quit);
+    pmodule_SendQuit(ultimate3_cmd_quit);
     pmodule_cmd_pong(ultimate3_cmd_pong);
     pmodule_cmd_join(ultimate3_cmd_join);
     pmodule_cmd_unsqline(ultimate3_cmd_unsqline);

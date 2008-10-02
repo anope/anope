@@ -903,12 +903,12 @@ void rageircd_cmd_privmsg2(const char *source, const char *dest, const char *msg
     send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
-void rageircd_cmd_serv_notice(const char *source, const char *dest, const char *msg)
+void rageircd_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
-void rageircd_cmd_serv_privmsg(const char *source, const char *dest, const char *msg)
+void rageircd_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
@@ -1174,7 +1174,7 @@ int anope_event_cs(const char *source, int ac, const char **av)
 }
 
 /* QUIT */
-void rageircd_cmd_quit(const char *source, const char *buf)
+void rageircd_SendQuit(const char *source, const char *buf)
 {
     if (buf) {
         send_cmd(source, "QUIT :%s", buf);
@@ -1581,11 +1581,11 @@ void moduleAddAnopeCmds()
     pmodule_cmd_notice2(rageircd_cmd_notice2);
     pmodule_cmd_privmsg(rageircd_cmd_privmsg);
     pmodule_cmd_privmsg2(rageircd_cmd_privmsg2);
-    pmodule_cmd_serv_notice(rageircd_cmd_serv_notice);
-    pmodule_cmd_serv_privmsg(rageircd_cmd_serv_privmsg);
+    pmodule_SendGlobalNotice(rageircd_cmd_serv_notice);
+    pmodule_SendGlobalPrivmsg(rageircd_cmd_serv_privmsg);
     pmodule_SendBotOp(rageircd_cmd_bot_chan_mode);
     pmodule_cmd_351(rageircd_cmd_351);
-    pmodule_cmd_quit(rageircd_cmd_quit);
+    pmodule_SendQuit(rageircd_cmd_quit);
     pmodule_cmd_pong(rageircd_cmd_pong);
     pmodule_cmd_join(rageircd_cmd_join);
     pmodule_cmd_unsqline(rageircd_cmd_unsqline);

@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSVSO(const char *source, const char *nick, const char *flag)
-{
-	ircdproto->SendSVSO(source, nick, flag);
-}
-
 void anope_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
 	ircdproto->SendChangeBotNick(oldnick, newnick);

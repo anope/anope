@@ -1130,7 +1130,6 @@ E void anope_SendSVSJoin(const char *source, const char *nick,const char *chan, 
 E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
-E void anope_SendSZLineDel(const char *mask);				  	  		  /* UNSZLINE */
 E void anope_SendEOB();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);

@@ -1491,7 +1491,7 @@ static void free_szline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SZLINE from all the servers */
-    anope_SendSZLineDel(sx->mask);
+    ircdproto->SendSZLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);

@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSZLineDel(const char *mask)
-{
-	ircdproto->SendSZLineDel(mask);
-}
-
 void anope_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
 	ircdproto->SendSZLine(mask, reason, whom);

@@ -611,7 +611,7 @@ void load_cs_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", ChanDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_SendGlobops(NULL, "Write error on %s: %s", ChanDBName,	\
+	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", ChanDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -876,7 +876,7 @@ void check_modes(Channel * c)
 
     /* Check for mode bouncing */
     if (c->server_modecount >= 3 && c->chanserv_modecount >= 3) {
-        anope_SendGlobops(NULL,
+        ircdproto->SendGlobops(NULL,
                          "Warning: unable to set modes on channel %s.  "
                          "Are your servers' U:lines configured correctly?",
                          c->name);

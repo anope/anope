@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -75,7 +75,7 @@ int do_global(User * u)
         return MOD_CONT;
     }
     if (WallOSGlobal)
-        anope_SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.",
+        ircdproto->SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.",
                          u->nick);
     oper_global(u->nick, "%s", msg);
     return MOD_CONT;

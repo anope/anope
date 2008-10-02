@@ -7,9 +7,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -203,7 +203,7 @@ void load_news()
 	restore_db(f);						\
 	log_perror("Write error on %s", NewsDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
+	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\
@@ -245,7 +245,7 @@ void save_rdb_news()
         alog("Unable to tag table 'anope_os_news' - News RDB save failed.");
         return;
     }
-	
+
     for (i = 0; i < nnews; i++) {
         ni = &news[i];
         if (rdb_save_news(ni) == 0) {
@@ -253,12 +253,12 @@ void save_rdb_news()
             return;
         }
     }
-	
+
     if (rdb_clean_table("anope_os_news") == 0) {
         alog("Unable to clean table 'anope_os_news' - News RDB save failed.");
         return;
     }
-	
+
     rdb_close();
 #endif
 }

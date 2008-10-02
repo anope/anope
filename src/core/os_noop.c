@@ -84,7 +84,7 @@ int do_noop(User * u)
         snprintf(reason, sizeof(reason), "NOOP command used by %s",
                  u->nick);
         if (WallOSNoOp)
-            anope_SendGlobops(s_OperServ, "\2%s\2 used NOOP on \2%s\2",
+            ircdproto->SendGlobops(s_OperServ, "\2%s\2 used NOOP on \2%s\2",
                              u->nick, server);
         notice_lang(s_OperServ, u, OPER_NOOP_SET, server);
 

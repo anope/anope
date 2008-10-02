@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -119,7 +119,7 @@ int do_suspend(User * u)
         }
 
         if (WallForbid)
-            anope_SendGlobops(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2",
+            ircdproto->SendGlobops(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2",
                              u->nick, nick);
 
         alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
@@ -172,7 +172,7 @@ int do_unsuspend(User * u)
         na->nc->flags &= ~NI_SUSPENDED;
 
         if (WallForbid)
-            anope_SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2",
+            ircdproto->SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2",
                              u->nick, nick);
 
         alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick,

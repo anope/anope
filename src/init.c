@@ -726,7 +726,7 @@ int init_secondary(int ac, char **av)
 
     /* Announce a logfile error if there was one */
     if (openlog_failed) {
-        anope_SendGlobops(NULL, "Warning: couldn't open logfile: %s",
+        ircdproto->SendGlobops(NULL, "Warning: couldn't open logfile: %s",
                          strerror(openlog_errno));
     }
 

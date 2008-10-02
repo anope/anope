@@ -385,7 +385,7 @@ void sighandler(int signum)
                 inbuf[447] = '>';
                 inbuf[448] = 0;
             }
-            anope_SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
+            ircdproto->SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
             modules_unload_all(false, true);
         } else if (waiting < 0) {
             /* This is static on the off-chance we run low on stack */
@@ -461,7 +461,7 @@ void sighandler(int signum)
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            anope_SendGlobops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
+            ircdproto->SendGlobops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
             alog("PANIC! %s (%s)", buf, strsignal(signum));
             modules_unload_all(false, true);
         }
@@ -585,7 +585,7 @@ int main(int ac, char **av, char **envp)
 
         if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
             if (delayed_quit)
-                anope_SendGlobops(NULL,
+                ircdproto->SendGlobops(NULL,
                                  "Updating databases on shutdown, please wait.");
 
             save_databases();

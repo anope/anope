@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -157,7 +157,7 @@ int do_sqline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                anope_SendGlobops(s_OperServ,
+                ircdproto->SendGlobops(s_OperServ,
                                  "%s added an SQLINE for %s (%s)", u->nick,
                                  mask, buf);
             }

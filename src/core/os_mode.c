@@ -95,7 +95,7 @@ int do_os_mode(User * u)
         free(av);
 
         if (WallOSMode)
-            anope_SendGlobops(s_OperServ, "%s used MODE %s on %s", u->nick,
+            ircdproto->SendGlobops(s_OperServ, "%s used MODE %s on %s", u->nick,
                              modes, chan);
     }
     return MOD_CONT;

@@ -136,7 +136,7 @@ void AnopeFini(void)
  * Provide the user interface to add/remove/update oper information
  * about a nick.
  * We are going to assume that anyone who gets this far is an oper;
- * the createCommand should have handled this checking for us and its 
+ * the createCommand should have handled this checking for us and its
  * tedious / a waste to do it twice.
  * @param u The user who executed this command
  * @return MOD_CONT if we want to process other commands in this command
@@ -205,8 +205,8 @@ int myAddNickInfo(User * u)
 /**
  * Provide the user interface to add/remove/update oper information
  * about a channel.
- * We are going to assume that anyone who gets this far is an oper; 
- * the createCommand should have handled this checking for us and 
+ * We are going to assume that anyone who gets this far is an oper;
+ * the createCommand should have handled this checking for us and
  * its tedious / a waste to do it twice.
  * @param u The user who executed this command
  * @return MOD_CONT if we want to process other commands in this command
@@ -273,7 +273,7 @@ int myAddChanInfo(User * u)
 /*************************************************************************/
 
 /**
- * Called after a user does a /msg nickserv info [nick] 
+ * Called after a user does a /msg nickserv info [nick]
  * @param u The user who requested info
  * @return MOD_CONT to continue processing commands or MOD_STOP to stop
  **/
@@ -310,7 +310,7 @@ int myNickInfo(User * u)
 }
 
 /**
- * Called after a user does a /msg chanserv info chan 
+ * Called after a user does a /msg chanserv info chan
  * @param u The user who requested info
  * @return MOD_CONT to continue processing commands or MOD_STOP to stop
  **/
@@ -344,7 +344,7 @@ int myChanInfo(User * u)
 
 /*************************************************************************/
 
-/** 
+/**
  * Load data from the db file, and populate our OperInfo lines
  * @return 0 for success
  **/
@@ -399,7 +399,7 @@ int mLoadData(void)
     return ret;
 }
 
-/** 
+/**
  * Save all our data to our db file
  * First walk through the nick CORE list, and any nick core which has
  * oper info attached to it, write to the file.
@@ -419,7 +419,7 @@ int mSaveData(int argc, char **argv)
         if (!stricmp(argv[0], EVENT_START)) {
             if ((out = fopen(OSInfoDBName, "w")) == NULL) {
                 alog("os_info: ERROR: can not open the database file!");
-                anope_SendGlobops(s_OperServ,
+                ircdproto->SendGlobops(s_OperServ,
                                  "os_info: ERROR: can not open the database file!");
                 ret = 1;
             } else {
@@ -453,18 +453,18 @@ int mSaveData(int argc, char **argv)
     return ret;
 }
 
-/** 
+/**
  * Backup our databases using the commands provided by Anope
  * @return MOD_CONT
  **/
 int mBackupData(int argc, char **argv)
 {
 	ModuleDatabaseBackup(OSInfoDBName);
-	
+
 	return MOD_CONT;
 }
 
-/** 
+/**
  * Load the configuration directives from Services configuration file.
  * @return 0 for success
  **/
@@ -494,7 +494,7 @@ int mLoadConfig(void)
     return 0;
 }
 
-/** 
+/**
  * Manage the RELOAD EVENT
  * @return MOD_CONT
  **/

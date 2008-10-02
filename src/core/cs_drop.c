@@ -117,7 +117,7 @@ int do_drop(User * u)
          * drop the channel before issuing the wallops.
          */
         if (WallDrop && is_servadmin && level < ACCESS_FOUNDER)
-            anope_SendGlobops(s_ChanServ,
+            ircdproto->SendGlobops(s_ChanServ,
                              "\2%s\2 used DROP on channel \2%s\2", u->nick,
                              chan);
 

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -121,7 +121,7 @@ int do_sgline(User * u)
 			size_t masklen = strlen(mask);
 			if (mask[masklen - 1] == ' ')
 				mask[masklen - 1] = '\0';
-			
+
             /* We first do some sanity check on the proposed mask. */
 
             if (mask && strspn(mask, "*?") == strlen(mask)) {
@@ -162,7 +162,7 @@ int do_sgline(User * u)
                              (wall_expiry == 1) ? "" : "s");
                 }
 
-                anope_SendGlobops(s_OperServ,
+                ircdproto->SendGlobops(s_OperServ,
                                  "%s added an SGLINE for %s (%s)", u->nick,
                                  mask, buf);
             }

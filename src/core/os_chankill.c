@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -68,7 +68,7 @@ void myOperServHelp(User * u)
  *
  * /msg OperServ ChanKill +expire #channel reason
  * @param u The user who issued the command
- * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing. 
+ * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  *
  **/
 int do_chankill(User * u)
@@ -118,7 +118,7 @@ int do_chankill(User * u)
                             cu->user->host, NULL, NULL);
             }
             if (WallOSAkill) {
-                anope_SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)",
+                ircdproto->SendGlobops(s_OperServ, "%s used CHANKILL on %s (%s)",
                                  u->nick, channel, reason);
             }
         } else {

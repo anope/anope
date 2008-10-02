@@ -214,14 +214,14 @@ int do_set(User * u)
             u->isSuperAdmin = 1;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ON);
             alog("%s: %s is a SuperAdmin ", s_OperServ, u->nick);
-            anope_SendGlobops(s_OperServ,
+            ircdproto->SendGlobops(s_OperServ,
                              getstring2(NULL, OPER_SUPER_ADMIN_WALL_ON),
                              u->nick);
         } else if (stricmp(setting, "off") == 0) {
             u->isSuperAdmin = 0;
             notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_OFF);
             alog("%s: %s is no longer a SuperAdmin", s_OperServ, u->nick);
-            anope_SendGlobops(s_OperServ,
+            ircdproto->SendGlobops(s_OperServ,
                              getstring2(NULL, OPER_SUPER_ADMIN_WALL_OFF),
                              u->nick);
         } else {

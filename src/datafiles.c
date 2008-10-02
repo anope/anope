@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -93,7 +93,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 #ifndef NOT_MAIN
         log_perror("Can't read %s database %s", service, filename);
         if (time(NULL) - lastwarn > WarningTimeout) {
-            anope_SendGlobops(NULL,
+            ircdproto->SendGlobops(NULL,
                              "Write error on %s: Memory allocation failed",
                              filename);
             lastwarn = time(NULL);
@@ -111,7 +111,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
             log_perror("Can not read %s database %s", service,
                        f->filename);
         if (time(NULL) - lastwarn > WarningTimeout) {
-            anope_SendGlobops(NULL, "Write error on %s: %s", f->filename,
+            ircdproto->SendGlobops(NULL, "Write error on %s: %s", f->filename,
                              strerror(errno));
             lastwarn = time(NULL);
         }
@@ -198,7 +198,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            anope_SendGlobops(NULL, "Can not back up %s database %s",
+            ircdproto->SendGlobops(NULL, "Can not back up %s database %s",
                              service, filename);
         }
 #ifdef _WIN32
@@ -248,7 +248,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         static int walloped = 0;
         if (!walloped) {
             walloped++;
-            anope_SendGlobops(NULL, "Can't write to %s database %s",
+            ircdproto->SendGlobops(NULL, "Can't write to %s database %s",
                              service, filename);
         }
         errno = errno_save;
@@ -587,7 +587,7 @@ static void rename_database(char *name, char *ext)
     snprintf(destpath, sizeof(destpath), "backups/%s.%s", name, ext);
     if (rename(name, destpath) != 0) {
         alog("Backup of %s failed.", name);
-        anope_SendGlobops(s_OperServ, "WARNING! Backup of %s failed.",
+        ircdproto->SendGlobops(s_OperServ, "WARNING! Backup of %s failed.",
                          name);
     }
 }

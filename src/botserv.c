@@ -491,7 +491,7 @@ void load_bs_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", BotDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_SendGlobops(NULL, "Write error on %s: %s", BotDBName,	\
+	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", BotDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\

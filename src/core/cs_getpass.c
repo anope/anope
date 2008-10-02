@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -88,7 +88,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s",
                  s_ChanServ, u->nick, u->username, u->host, ci->name);
             if (WallGetpass) {
-                anope_SendGlobops(s_ChanServ,
+                ircdproto->SendGlobops(s_ChanServ,
                                  "\2%s\2 used GETPASS on channel \2%s\2",
                                  u->nick, chan);
             }

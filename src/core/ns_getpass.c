@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -80,7 +80,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             if (WallGetpass)
-                anope_SendGlobops(s_NickServ,
+                ircdproto->SendGlobops(s_NickServ,
                                  "\2%s\2 used GETPASS on \2%s\2", u->nick,
                                  nick);
             notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick,
@@ -100,7 +100,7 @@ int do_getpass(User * u)
             alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
                  u->username, u->host, nick);
             if (WallGetpass)
-                anope_SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
+                ircdproto->SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
                                  u->nick, nick);
             notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick,
                         tmp_pass);

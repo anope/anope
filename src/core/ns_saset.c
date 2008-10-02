@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $
  *
  */
@@ -183,7 +183,7 @@ int do_saset(User * u)
     } else if (stricmp(cmd, "NOEXPIRE") == 0) {
         do_saset_noexpire(u, na, param);
     } else if (stricmp(cmd, "AUTOOP") == 0) {
-        do_saset_autoop(u, na->nc, param); 
+        do_saset_autoop(u, na->nc, param);
     } else if (stricmp(cmd, "LANGUAGE") == 0) {
         do_saset_language(u, na->nc, param);
     } else {
@@ -261,7 +261,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
          u->nick, u->username, u->host, nc->display,
          (nc->email ? nc->email : "none"));
     if (WallSetpass)
-        anope_SendGlobops(s_NickServ,
+        ircdproto->SendGlobops(s_NickServ,
                          "\2%s\2 used SASET PASSWORD on \2%s\2",
                          u->nick, nc->display);
     return MOD_CONT;

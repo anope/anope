@@ -118,7 +118,7 @@ int do_forbid(User * u)
         }
 
         if (WallForbid)
-            anope_SendGlobops(s_ChanServ,
+            ircdproto->SendGlobops(s_ChanServ,
                              "\2%s\2 used FORBID on channel \2%s\2",
                              u->nick, ci->name);
 

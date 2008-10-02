@@ -166,7 +166,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
             if (!is_oper(u) && OSOpersOnly) {
                 notice_lang(s_OperServ, u, ACCESS_DENIED);
                 if (WallBadOS)
-                    anope_SendGlobops(s_OperServ,
+                    ircdproto->SendGlobops(s_OperServ,
                                      "Denied access to %s from %s!%s@%s (non-oper)",
                                      s_OperServ, u->nick, u->username,
                                      u->host);

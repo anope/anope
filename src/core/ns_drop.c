@@ -88,7 +88,7 @@ int do_drop(User * u)
                 if (readonly)
                     notice_lang(s_NickServ, u, READ_ONLY_MODE);
                 if (WallDrop)
-                    anope_SendGlobops(s_NickServ,
+                    ircdproto->SendGlobops(s_NickServ,
                                      "\2%s\2 used DROP on \2%s\2", u->nick,
                                      nick);
                 alog("%s: %s!%s@%s dropped nickname %s (e-mail: %s)",
@@ -132,7 +132,7 @@ int do_drop(User * u)
 
         if (!is_mine) {
             if (WallDrop)
-                anope_SendGlobops(s_NickServ, "\2%s\2 used DROP on \2%s\2",
+                ircdproto->SendGlobops(s_NickServ, "\2%s\2 used DROP on \2%s\2",
                                  u->nick, nick);
             notice_lang(s_NickServ, u, NICK_X_DROPPED, nick);
         } else {

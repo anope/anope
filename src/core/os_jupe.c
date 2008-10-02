@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -80,7 +80,7 @@ int do_jupe(User * u)
             anope_SendJupe(jserver, u->nick, reason);
 
             if (WallOSJupe)
-                anope_SendGlobops(s_OperServ, "\2%s\2 used JUPE on \2%s\2",
+                ircdproto->SendGlobops(s_OperServ, "\2%s\2 used JUPE on \2%s\2",
                                  u->nick, jserver);
         }
     }

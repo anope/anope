@@ -640,7 +640,7 @@ void load_ns_dbase(void)
 	restore_db(f);						\
 	log_perror("Write error on %s", NickDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    anope_SendGlobops(NULL, "Write error on %s: %s", NickDBName,	\
+	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", NickDBName,	\
 			strerror(errno));			\
 	    lastwarn = time(NULL);				\
 	}							\

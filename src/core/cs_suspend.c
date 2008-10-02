@@ -133,7 +133,7 @@ int do_suspend(User * u)
         }
 
         if (WallForbid)
-            anope_SendGlobops(s_ChanServ,
+            ircdproto->SendGlobops(s_ChanServ,
                              "\2%s\2 used SUSPEND on channel \2%s\2",
                              u->nick, ci->name);
 
@@ -194,7 +194,7 @@ int do_unsuspend(User * u)
         }
 
         if (WallForbid)
-            anope_SendGlobops(s_ChanServ,
+            ircdproto->SendGlobops(s_ChanServ,
                              "\2%s\2 used UNSUSPEND on channel \2%s\2",
                              u->nick, ci->name);
 

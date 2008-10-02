@@ -421,7 +421,7 @@ void InspIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
 			case 'o':
 				if (add) {
 					++opcnt;
-					if (WallOper) anope_SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+					if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
 					display_news(user, NEWS_OPER);
 				}
 				else --opcnt;
@@ -524,7 +524,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
     }
     send_cmd(s_OperServ, "CHGHOST %s %s", nick, vhost);
     } else {
-	anope_SendGlobops(s_OperServ, "CHGHOST not loaded!");
+	ircdproto->SendGlobops(s_OperServ, "CHGHOST not loaded!");
     }
 }
 
@@ -791,7 +791,7 @@ void inspircd_cmd_chgident(const char *nick, const char *vIdent)
     	}
     	send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
     } else {
-		anope_SendGlobops(s_OperServ, "CHGIDENT not loaded!");
+		ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
     }
 }
 
@@ -1201,13 +1201,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
             return MOD_STOP;
         }
         if (!has_svsholdmod) {
-            anope_SendGlobops(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
+            ircdproto->SendGlobops(s_OperServ, "SVSHOLD missing, Usage disabled until module is loaded.");
         }
         if (!has_chghostmod) {
-            anope_SendGlobops(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
+            ircdproto->SendGlobops(s_OperServ, "CHGHOST missing, Usage disabled until module is loaded.");
         }
         if (!has_chgidentmod) {
-            anope_SendGlobops(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
+            ircdproto->SendGlobops(s_OperServ, "CHGIDENT missing, Usage disabled until module is loaded.");
         }
         if (has_messagefloodmod) {
             cbmi = myCbmodeinfos;

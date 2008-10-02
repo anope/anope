@@ -1263,6 +1263,14 @@ class IRCDProto {
 			else
 				send_cmd(nick, "PART %s", chan);
 		}
+		virtual void SendGlobopsInternal(const char *source, const char *buf)
+		{
+			BotInfo *bi = findbot(source);
+			if (bi)
+				send_cmd(UseTS6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
+			else
+				send_cmd(ServerName, "GLOBOPS :%s", buf);
+		}
 	public:
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
@@ -1409,13 +1417,16 @@ class IRCDProto {
 			}
 			else SendPartInternal(nick, chan, NULL);
 		}
-		virtual void SendGlobops(const char *source, const char *buf)
+		virtual void SendGlobops(const char *source, const char *fmt, ...)
 		{
-			BotInfo *bi = findbot(source)
-			if (bi)
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
-			else
-				send_cmd(ServerName, "GLOBOPS :%s", buf);
+			va_list args;
+			char buf[BUFSIZE] = "";
+			if (fmt) {
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+			}
+			SendGlobopsInternal(source, buf);
 		}
 		virtual void SendSQLine(const char *, const char *) = 0;
 		virtual void SendSquit(const char *servname, const char *message)

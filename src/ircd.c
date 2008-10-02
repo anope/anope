@@ -43,18 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendGlobops(const char *source, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	ircdproto->SendGlobops(source, buf);
-}
-
 void anope_SendSQLine(const char *mask, const char *reason)
 {
 	ircdproto->SendSQLine(mask, reason);

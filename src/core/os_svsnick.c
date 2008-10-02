@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -117,7 +117,7 @@ int do_svsnick(User * u)
         notice_lang(s_OperServ, u, NICK_X_FORBIDDEN, newnick);
     } else {
         notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick);
-        anope_SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s",
+        ircdproto->SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s",
                          u->nick, nick, newnick);
         anope_SendForceNickChange(nick, newnick, time(NULL));
     }

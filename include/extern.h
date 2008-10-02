@@ -1118,7 +1118,6 @@ E void anope_cmd_chgident(const char *nick, const char *vIdent);                
 E void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_SendConnect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
-E void anope_SendGlobops(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_SendBanDel(const char *name, const char *nick);				  		  			      /* MODE -b */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */

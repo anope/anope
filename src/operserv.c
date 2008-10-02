@@ -1102,7 +1102,7 @@ static void free_sgline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SGLINE from all the servers */
-    anope_SendSGLineDel(sx->mask);
+    ircdproto->SendSGLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);

@@ -1313,13 +1313,13 @@ class IRCDProto {
 			send_cmd(NULL, "SVSNICK %s %s :%ld", oldnick, newnick, static_cast<long>(when));
 		}
 		virtual void SendVhost(const char *, const char *, const char *) { }
-		virtual void cmd_connect() = 0;
-		virtual void cmd_svshold(const char *) { }
-		virtual void cmd_release_svshold(const char *) { }
-		virtual void cmd_unsgline(const char *) { }
-		virtual void cmd_unszline(const char *) { }
-		virtual void cmd_szline(const char *, const char *, const char *) { }
-		virtual void cmd_sgline(const char *, const char *) { }
+		virtual void SendConnect() = 0;
+		virtual void SendSVSHOLD(const char *) { }
+		virtual void SendSVSHOLDDel(const char *) { }
+		virtual void SendSGLineDel(const char *) { }
+		virtual void SendSZLineDel(const char *) { }
+		virtual void SendSZLine(const char *, const char *, const char *) { }
+		virtual void SendSGLine(const char *, const char *) { }
 		virtual void cmd_unban(const char *, const char *) { }
 		virtual void SendSVSMode_chan(const char *, const char *, const char *) { }
 		virtual void cmd_svid_umode(const char *, time_t) { }

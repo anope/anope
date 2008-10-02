@@ -277,39 +277,39 @@ void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 	ircdproto->SendVhost(nick, vIdent, vhost);
 }
 
-void anope_cmd_connect()
+void anope_SendConnect()
 {
-	ircdproto->cmd_connect();
+	ircdproto->SendConnect();
 }
 
-void anope_cmd_svshold(const char *nick)
+void anope_SendSVSHOLD(const char *nick)
 {
-	ircdproto->cmd_svshold(nick);
+	ircdproto->SendSVSHOLD(nick);
 }
 
-void anope_cmd_release_svshold(const char *nick)
+void anope_SendSVSHOLDDel(const char *nick)
 {
-	ircdproto->cmd_release_svshold(nick);
+	ircdproto->SendSVSHOLDDel(nick);
 }
 
-void anope_cmd_unsgline(const char *mask)
+void anope_SendSGLineDel(const char *mask)
 {
-	ircdproto->cmd_unsgline(mask);
+	ircdproto->SendSGLineDel(mask);
 }
 
-void anope_cmd_unszline(const char *mask)
+void anope_SendSZLineDel(const char *mask)
 {
-	ircdproto->cmd_unszline(mask);
+	ircdproto->SendSZLineDel(mask);
 }
 
-void anope_cmd_szline(const char *mask, const char *reason, const char *whom)
+void anope_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
-	ircdproto->cmd_szline(mask, reason, whom);
+	ircdproto->SendSZLine(mask, reason, whom);
 }
 
-void anope_cmd_sgline(const char *mask, const char *reason)
+void anope_SendSGLine(const char *mask, const char *reason)
 {
-	ircdproto->cmd_sgline(mask, reason);
+	ircdproto->SendSGLine(mask, reason);
 }
 
 void anope_cmd_unban(const char *name, const char *nick)

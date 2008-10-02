@@ -861,7 +861,7 @@ void ptlink_cmd_server(const char *servname, int hop, const char *descript)
     send_cmd(NULL, "SERVER %s %d Anope.Services%s :%s", servname, hop,
              version_number_dotted, descript);
 }
-void ptlink_cmd_connect(int servernum)
+void ptlink_SendConnect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1400,13 +1400,13 @@ void ptlink_cmd_351(const char *source)
 }
 
 /* SVSHOLD - set */
-void ptlink_cmd_svshold(const char *nick)
+void ptlink_SendSVSHOLD(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void ptlink_cmd_release_svshold(const char *nick)
+void ptlink_SendSVSHOLDDel(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1416,7 +1416,7 @@ void ptlink_cmd_release_svshold(const char *nick)
 	parv[0] = sender
 	parv[1] = zlined host
 */
-void ptlink_cmd_unszline(const char *mask)
+void ptlink_SendSZLineDel(const char *mask)
 {
     send_cmd(s_OperServ, "UNZLINE %s", mask);
 }
@@ -1428,7 +1428,7 @@ void ptlink_cmd_unszline(const char *mask)
 	parv[2] = time
 	parv[3] = reason
 */
-void ptlink_cmd_szline(const char *mask, const char *reason, const char *whom)
+void ptlink_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(s_OperServ, "ZLINE %s %ld :%s", mask,
              (long int) time(NULL) + 86400 * 2, reason);
@@ -1439,7 +1439,7 @@ void ptlink_cmd_szline(const char *mask, const char *reason, const char *whom)
 	parv[0] = sender
 	parv[1] = info ban mask
 */
-void ptlink_cmd_unsgline(const char *mask)
+void ptlink_SendSGLineDel(const char *mask)
 {
     send_cmd(ServerName, "UNSXLINE :%s", mask);
 }
@@ -1452,7 +1452,7 @@ void ptlink_cmd_unsgline(const char *mask)
  *  	parv[1] = mask length
  *	parv[2] = real name banned mask:reason
  */
-void ptlink_cmd_sgline(const char *mask, const char *reason)
+void ptlink_SendSGLine(const char *mask, const char *reason)
 {
     send_cmd(ServerName, "SXLINE %d :%s:%s", (int) strlen(mask), mask,
              reason);
@@ -1731,13 +1731,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(ptlink_cmd_chg_nick);
     pmodule_SendForceNickChange(ptlink_cmd_svsnick);
     pmodule_SendVhost(ptlink_cmd_vhost_on);
-    pmodule_cmd_connect(ptlink_cmd_connect);
-    pmodule_cmd_svshold(ptlink_cmd_svshold);
-    pmodule_cmd_release_svshold(ptlink_cmd_release_svshold);
-    pmodule_cmd_unsgline(ptlink_cmd_unsgline);
-    pmodule_cmd_unszline(ptlink_cmd_unszline);
-    pmodule_cmd_szline(ptlink_cmd_szline);
-    pmodule_cmd_sgline(ptlink_cmd_sgline);
+    pmodule_SendConnect(ptlink_cmd_connect);
+    pmodule_SendSVSHOLD(ptlink_cmd_svshold);
+    pmodule_SendSVSHOLDDel(ptlink_cmd_release_svshold);
+    pmodule_SendSGLineDel(ptlink_cmd_unsgline);
+    pmodule_SendSZLineDel(ptlink_cmd_unszline);
+    pmodule_SendSZLine(ptlink_cmd_szline);
+    pmodule_SendSGLine(ptlink_cmd_sgline);
     pmodule_cmd_unban(ptlink_cmd_unban);
     pmodule_SendSVSMode_chan(ptlink_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ptlink_cmd_svid_umode);

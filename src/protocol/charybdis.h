@@ -68,11 +68,11 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendSQLine(const char *, const char *);
 		void SendForceNickChange(const char *, const char *, time_t);
 		void SendVhost(const char *, const char *, const char *);
-		void cmd_connect();
-		void cmd_svshold(const char *);
-		void cmd_release_svshold(const char *);
-		void cmd_unsgline(const char *);
-		void cmd_sgline(const char *, const char *);
+		void SendConnect();
+		void SendSVSHOLD(const char *);
+		void SendSVSHOLDDel(const char *);
+		void SendSGLineDel(const char *);
+		void SendSGLine(const char *, const char *);
 		void cmd_server(const char *, int, const char *);
 		void set_umode(User *, int, const char **);
 		int valid_nick(const char *);

@@ -32,11 +32,11 @@
 
 #define s_sqline(mask, reason) anope_SendSQLine(mask, reason)
 
-#define s_sgline(mask, reason) anope_cmd_sgline(mask, reason)
-#define s_szline(mask, reason) anope_cmd_szline(mask, reason)
-#define s_unsgline(mask) anope_cmd_unsgline(mask)
+#define s_sgline(mask, reason) anope_SendSGLine(mask, reason)
+#define s_szline(mask, reason) anope_SendSZLine(mask, reason)
+#define s_unsgline(mask) anope_SendSGLineDel(mask)
 #define s_unsqline(mask) anope_SendSQLineDel(mask)
-#define s_unszline(mask) anope_cmd_unszline(mask)
+#define s_unszline(mask) anope_SendSZLineDel(mask)
 
 #define s_rakill(user, host) anope_SendAkillDel(user, host)
 

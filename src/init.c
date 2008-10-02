@@ -712,7 +712,7 @@ int init_secondary(int ac, char **av)
              RemotePort);
     }
 
-    anope_cmd_connect();
+    anope_SendConnect();
     send_event(EVENT_CONNECT, 1, EVENT_STOP);
 
     sgets2(inbuf, sizeof(inbuf), servsock);

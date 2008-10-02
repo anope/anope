@@ -683,7 +683,7 @@ void RatboxProto::SendSQLine(const char *mask, const char *reason)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
-void RatboxProto::cmd_unsgline(const char *mask)
+void RatboxProto::SendSGLineDel(const char *mask)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
@@ -693,7 +693,7 @@ void ratbox_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void RatboxProto::cmd_sgline(const char *mask, const char *reason)
+void RatboxProto::SendSGLine(const char *mask, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
@@ -809,7 +809,7 @@ void RatboxProto::cmd_server(const char *servname, int hop, const char *descript
 	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
-void RatboxProto::cmd_connect()
+void RatboxProto::SendConnect()
 {
 	/* Make myself known to myself in the serverlist */
 	if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);

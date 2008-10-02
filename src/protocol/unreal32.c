@@ -709,7 +709,7 @@ void UnrealIRCdProto::SendVhost(const char *nick, const char *vIdent, const char
 	unreal_cmd_chghost(nick, vhost);
 }
 
-void UnrealIRCdProto::cmd_connect()
+void UnrealIRCdProto::SendConnect()
 {
 	if (Numeric) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
 	else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1148,14 +1148,14 @@ int anope_event_whois(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void UnrealIRCdProto::cmd_svshold(const char *nick)
+void UnrealIRCdProto::SendSVSHOLD(const char *nick)
 {
 	send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
 		static_cast<long>(time(NULL)), "Being held for registered user");
 }
 
 /* SVSHOLD - release */
-void UnrealIRCdProto::cmd_release_svshold(const char *nick)
+void UnrealIRCdProto::SendSVSHOLDDel(const char *nick)
 {
 	send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
 }
@@ -1164,19 +1164,19 @@ void UnrealIRCdProto::cmd_release_svshold(const char *nick)
 /*
  * SVSNLINE - :realname mask
 */
-void UnrealIRCdProto::cmd_unsgline(const char *mask)
+void UnrealIRCdProto::SendSGLineDel(const char *mask)
 {
 	send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
 }
 
 /* UNSZLINE */
-void UnrealIRCdProto::cmd_unszline(const char *mask)
+void UnrealIRCdProto::SendSZLineDel(const char *mask)
 {
 	send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask, s_OperServ);
 }
 
 /* SZLINE */
-void UnrealIRCdProto::cmd_szline(const char *mask, const char *reason, const char *whom)
+void UnrealIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
 {
 	send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"), mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
 }
@@ -1185,7 +1185,7 @@ void UnrealIRCdProto::cmd_szline(const char *mask, const char *reason, const cha
 /*
  * SVSNLINE + reason_where_is_space :realname mask with spaces
 */
-void UnrealIRCdProto::cmd_sgline(const char *mask, const char *reason)
+void UnrealIRCdProto::SendSGLine(const char *mask, const char *reason)
 {
 	char edited_reason[BUFSIZE];
 	strlcpy(edited_reason, reason, BUFSIZE);

@@ -661,7 +661,7 @@ void hybrid_SendSQLine(const char *mask, const char *reason)
 
     send_cmd(ServerName, "RESV * %s :%s", mask, reason);
 }
-void hybrid_cmd_unsgline(const char *mask)
+void hybrid_SendSGLineDel(const char *mask)
 {
     if (!mask) {
         return;
@@ -670,11 +670,11 @@ void hybrid_cmd_unsgline(const char *mask)
     send_cmd(ServerName, "UNXLINE * %s", mask);
 }
 
-void hybrid_cmd_unszline(const char *mask)
+void hybrid_SendSZLineDel(const char *mask)
 {
     /* Does not support */
 }
-void hybrid_cmd_szline(const char *mask, const char *reason, const char *whom)
+void hybrid_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     /* Does not support */
 }
@@ -683,7 +683,7 @@ void hybrid_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void hybrid_cmd_sgline(const char *mask, const char *reason)
+void hybrid_SendSGLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -815,7 +815,7 @@ void hybrid_cmd_server(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
-void hybrid_cmd_connect(int servernum)
+void hybrid_SendConnect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1256,13 +1256,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void hybrid_cmd_svshold(const char *nick)
+void hybrid_SendSVSHOLD(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void hybrid_cmd_release_svshold(const char *nick)
+void hybrid_SendSVSHOLDDel(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1502,13 +1502,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(hybrid_cmd_chg_nick);
     pmodule_SendForceNickChange(hybrid_cmd_svsnick);
     pmodule_SendVhost(hybrid_cmd_vhost_on);
-    pmodule_cmd_connect(hybrid_cmd_connect);
-    pmodule_cmd_svshold(hybrid_cmd_svshold);
-    pmodule_cmd_release_svshold(hybrid_cmd_release_svshold);
-    pmodule_cmd_unsgline(hybrid_cmd_unsgline);
-    pmodule_cmd_unszline(hybrid_cmd_unszline);
-    pmodule_cmd_szline(hybrid_cmd_szline);
-    pmodule_cmd_sgline(hybrid_cmd_sgline);
+    pmodule_SendConnect(hybrid_cmd_connect);
+    pmodule_SendSVSHOLD(hybrid_cmd_svshold);
+    pmodule_SendSVSHOLDDel(hybrid_cmd_release_svshold);
+    pmodule_SendSGLineDel(hybrid_cmd_unsgline);
+    pmodule_SendSZLineDel(hybrid_cmd_unszline);
+    pmodule_SendSZLine(hybrid_cmd_szline);
+    pmodule_SendSGLine(hybrid_cmd_sgline);
     pmodule_cmd_unban(hybrid_cmd_unban);
     pmodule_SendSVSMode_chan(hybrid_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(hybrid_cmd_svid_umode);

@@ -935,7 +935,7 @@ void cancel_user(User * u)
         if (na->status & NS_GUESTED) {
             if (ircd->svshold) {
                 if (UseSVSHOLD) {
-                    anope_cmd_svshold(na->nick);
+                    anope_SendSVSHOLD(na->nick);
                 } else {
                     if (ircd->svsnick) {
                         anope_SendGuestNick(u->nick, NSEnforcerUser,
@@ -1559,7 +1559,7 @@ void release(NickAlias * na, int from_timeout)
         del_ns_timeout(na, TO_RELEASE);
     if (ircd->svshold) {
         if (UseSVSHOLD) {
-            anope_cmd_release_svshold(na->nick);
+            anope_SendSVSHOLDDel(na->nick);
         } else {
             anope_SendQuit(na->nick, NULL);
         }

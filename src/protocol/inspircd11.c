@@ -807,7 +807,7 @@ void InspIRCdProto::SendVhost(const char *nick, const char *vIdent, const char *
 	inspircd_cmd_chghost(nick, vhost);
 }
 
-void InspIRCdProto::cmd_connect()
+void InspIRCdProto::SendConnect()
 {
 	if (servernum == 1) inspircd_cmd_pass(RemotePassword);
 	else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
@@ -1279,25 +1279,25 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void InspIRCdProto::cmd_svshold(const char *nick)
+void InspIRCdProto::SendSVSHOLD(const char *nick)
 {
 	send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
 }
 
 /* SVSHOLD - release */
-void InspIRCdProto::cmd_release_svshold(const char *nick)
+void InspIRCdProto::SendSVSHOLDDel(const char *nick)
 {
 	send_cmd(s_OperServ, "SVSHOLD %s", nick);
 }
 
 /* UNSZLINE */
-void InspIRCdProto::cmd_unszline(const char *mask)
+void InspIRCdProto::SendSZLineDel(const char *mask)
 {
 	send_cmd(s_OperServ, "ZLINE %s", mask);
 }
 
 /* SZLINE */
-void InspIRCdProto::cmd_szline(const char *mask, const char *reason, const char *whom)
+void InspIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
 {
 	send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 }

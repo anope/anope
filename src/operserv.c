@@ -1032,7 +1032,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 
     slist_add(&sglines, entry);
 
-    anope_cmd_sgline(entry->mask, entry->reason);
+    anope_SendSGLine(entry->mask, entry->reason);
 
     if (KillonSGline && !ircd->sglineenforce) {
         snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
@@ -1066,7 +1066,7 @@ int check_sgline(const char *nick, const char *realname)
             continue;
 
         if (match_wild_nocase(sx->mask, realname)) {
-            anope_cmd_sgline(sx->mask, sx->reason);
+            anope_SendSGLine(sx->mask, sx->reason);
             /* We kill nick since s_sgline can't */
             anope_SendSVSKill(ServerName, nick, "G-Lined: %s", sx->reason);
             return 1;
@@ -1102,7 +1102,7 @@ static void free_sgline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SGLINE from all the servers */
-    anope_cmd_unsgline(sx->mask);
+    anope_SendSGLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);
@@ -1430,7 +1430,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
     entry->expires = expires;
 
     slist_add(&szlines, entry);
-    anope_cmd_szline(entry->mask, entry->reason, entry->by);
+    anope_SendSZLine(entry->mask, entry->reason, entry->by);
 
     return deleted;
 }
@@ -1456,7 +1456,7 @@ int check_szline(const char *nick, char *ip)
         }
 
         if (match_wild_nocase(sx->mask, ip)) {
-            anope_cmd_szline(sx->mask, sx->reason, sx->by);
+            anope_SendSZLine(sx->mask, sx->reason, sx->by);
             return 1;
         }
     }
@@ -1491,7 +1491,7 @@ static void free_szline_entry(SList * slist, void *item)
     SXLine *sx = (SXLine *)item;
 
     /* Remove the SZLINE from all the servers */
-    anope_cmd_unszline(sx->mask);
+    anope_SendSZLineDel(sx->mask);
 
     /* Free the structure */
     free(sx->mask);

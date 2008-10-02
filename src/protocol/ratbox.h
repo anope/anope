@@ -69,9 +69,9 @@ class RatboxProto : public IRCDProto {
 		void SendGlobops(const char *, const char *);
 		void SendSQLine(const char *, const char *);
 		void SendForceNickChange(const char *, const char *, time_t) { } // Ratbox doesn't have an SVSNICK command
-		void cmd_connect();
-		void cmd_unsgline(const char *);
-		void cmd_sgline(const char *, const char *);
+		void SendConnect();
+		void SendSGLineDel(const char *);
+		void SendSGLine(const char *, const char *);
 		void cmd_server(const char *, int, const char *);
 		void set_umode(User *, int, const char **);
 		int valid_nick(const char *);

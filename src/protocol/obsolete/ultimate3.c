@@ -672,12 +672,12 @@ void ultimate3_SendSQLine(const char *mask, const char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void ultimate3_cmd_unsgline(const char *mask)
+void ultimate3_SendSGLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
-void ultimate3_cmd_unszline(const char *mask)
+void ultimate3_SendSZLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
@@ -687,7 +687,7 @@ void ultimate3_cmd_unszline(const char *mask)
    Complete rewrite of the kline/akill/zline system. (s)zlines no longer exist.
    K: lines set on IP addresses without username portions (or *) are treated as Z: lines used to be.
 */
-void ultimate3_cmd_szline(const char *mask, const char *reason, const char *whom)
+void ultimate3_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 86400 * 2, whom,
              (long int) time(NULL), reason);
@@ -705,7 +705,7 @@ void ultimate3_cmd_svsadmin(const char *server, int set)
 	ircd_proto.SendSVSNOOP(server, set);
 }
 
-void ultimate3_cmd_sgline(const char *mask, const char *reason)
+void ultimate3_SendSGLine(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
@@ -1445,7 +1445,7 @@ void ultimate3_cmd_burst()
 }
 
 
-void ultimate3_cmd_connect(int servernum)
+void ultimate3_SendConnect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1466,13 +1466,13 @@ void ultimate3_cmd_connect(int servernum)
 }
 
 /* SVSHOLD - set */
-void ultimate3_cmd_svshold(const char *nick)
+void ultimate3_SendSVSHOLD(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void ultimate3_cmd_release_svshold(const char *nick)
+void ultimate3_SendSVSHOLDDel(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1752,13 +1752,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(ultimate3_cmd_chg_nick);
     pmodule_SendForceNickChange(ultimate3_cmd_svsnick);
     pmodule_SendVhost(ultimate3_cmd_vhost_on);
-    pmodule_cmd_connect(ultimate3_cmd_connect);
-    pmodule_cmd_svshold(ultimate3_cmd_svshold);
-    pmodule_cmd_release_svshold(ultimate3_cmd_release_svshold);
-    pmodule_cmd_unsgline(ultimate3_cmd_unsgline);
-    pmodule_cmd_unszline(ultimate3_cmd_unszline);
-    pmodule_cmd_szline(ultimate3_cmd_szline);
-    pmodule_cmd_sgline(ultimate3_cmd_sgline);
+    pmodule_SendConnect(ultimate3_cmd_connect);
+    pmodule_SendSVSHOLD(ultimate3_cmd_svshold);
+    pmodule_SendSVSHOLDDel(ultimate3_cmd_release_svshold);
+    pmodule_SendSGLineDel(ultimate3_cmd_unsgline);
+    pmodule_SendSZLineDel(ultimate3_cmd_unszline);
+    pmodule_SendSZLine(ultimate3_cmd_szline);
+    pmodule_SendSGLine(ultimate3_cmd_sgline);
     pmodule_cmd_unban(ultimate3_cmd_unban);
     pmodule_SendSVSMode_chan(ultimate3_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(ultimate3_cmd_svid_umode);

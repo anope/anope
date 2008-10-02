@@ -498,14 +498,14 @@ void solidircd_SendMode(const char *source, const char *dest, const char *buf)
 }
 
 /* SVSHOLD - set */
-void solidircd_cmd_svshold(const char *nick)
+void solidircd_SendSVSHOLD(const char *nick)
 {
     send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
              "Being held for registered user");
 }
 
 /* SVSHOLD - release */
-void solidircd_cmd_release_svshold(const char *nick)
+void solidircd_SendSVSHOLDDel(const char *nick)
 {
     send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
@@ -737,19 +737,19 @@ void solidircd_SendSQLine(const char *mask, const char *reason)
 }
 
 /* UNSGLINE */
-void solidircd_cmd_unsgline(const char *mask)
+void solidircd_SendSGLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
 /* UNSZLINE */
-void solidircd_cmd_unszline(const char *mask)
+void solidircd_SendSZLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
 /* SZLINE */
-void solidircd_cmd_szline(const char *mask, const char *reason, const char *whom)
+void solidircd_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
@@ -766,7 +766,7 @@ void solidircd_cmd_svsadmin(const char *server, int set)
 }
 
 /* SGLINE */
-void solidircd_cmd_sgline(const char *mask, const char *reason)
+void solidircd_SendSGLine(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
@@ -914,7 +914,7 @@ void solidircd_cmd_capab()
     send_cmd(NULL, "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE");
 }
 
-void solidircd_cmd_connect(int servernum)
+void solidircd_SendConnect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1644,13 +1644,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(solidircd_cmd_chg_nick);
     pmodule_SendForceNickChange(solidircd_cmd_svsnick);
     pmodule_SendVhost(solidircd_cmd_vhost_on);
-    pmodule_cmd_connect(solidircd_cmd_connect);
-    pmodule_cmd_svshold(solidircd_cmd_svshold);
-    pmodule_cmd_release_svshold(solidircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(solidircd_cmd_unsgline);
-    pmodule_cmd_unszline(solidircd_cmd_unszline);
-    pmodule_cmd_szline(solidircd_cmd_szline);
-    pmodule_cmd_sgline(solidircd_cmd_sgline);
+    pmodule_SendConnect(solidircd_cmd_connect);
+    pmodule_SendSVSHOLD(solidircd_cmd_svshold);
+    pmodule_SendSVSHOLDDel(solidircd_cmd_release_svshold);
+    pmodule_SendSGLineDel(solidircd_cmd_unsgline);
+    pmodule_SendSZLineDel(solidircd_cmd_unszline);
+    pmodule_SendSZLine(solidircd_cmd_szline);
+    pmodule_SendSGLine(solidircd_cmd_sgline);
     pmodule_cmd_unban(solidircd_cmd_unban);
     pmodule_SendSVSMode_chan(solidircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(solidircd_cmd_svid_umode);

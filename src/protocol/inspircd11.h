@@ -82,11 +82,11 @@ class InspIRCdProto : public IRCDProto {
 		void SendSQLine(const char *, const char *);
 		void SendSquit(const char *, const char *);
 		void SendVhost(const char *, const char *, const char *);
-		void cmd_connect();
-		void cmd_svshold(const char *);
-		void cmd_release_svshold(const char *);
-		void cmd_unszline(const char *);
-		void cmd_szline(const char *, const char *, const char *);
+		void SendConnect();
+		void SendSVSHOLD(const char *);
+		void SendSVSHOLDDel(const char *);
+		void SendSZLineDel(const char *);
+		void SendSZLine(const char *, const char *, const char *);
 		void cmd_nc_change(User *);
 		void cmd_svid_umode2(User *, const char *);
 		void cmd_svsjoin(const char *, const char *, const char *, const char *);

@@ -713,7 +713,7 @@ void CharybdisProto::SendSQLine(const char *mask, const char *reason)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
-void CharybdisProto::cmd_unsgline(const char *mask)
+void CharybdisProto::SendSGLineDel(const char *mask)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
@@ -723,7 +723,7 @@ void charybdis_cmd_svsadmin(const char *server, int set)
 {
 }
 
-void CharybdisProto::cmd_sgline(const char *mask, const char *reason)
+void CharybdisProto::SendSGLine(const char *mask, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
@@ -845,7 +845,7 @@ void CharybdisProto::cmd_server(const char *servname, int hop, const char *descr
 	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
 
-void CharybdisProto::cmd_connect()
+void CharybdisProto::SendConnect()
 {
 	/* Make myself known to myself in the serverlist */
 	if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
@@ -1183,13 +1183,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void CharybdisProto::cmd_svshold(const char *nick)
+void CharybdisProto::SendSVSHOLD(const char *nick)
 {
 	send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
 }
 
 /* SVSHOLD - release */
-void CharybdisProto::cmd_release_svshold(const char *nick)
+void CharybdisProto::SendSVSHOLDDel(const char *nick)
 {
 	send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
 }

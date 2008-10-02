@@ -759,19 +759,19 @@ plexus_SendSQLine (const char *mask, const char *reason)
 }
 
 void
-plexus_cmd_unsgline (const char *mask)
+plexus_SendSGLineDel (const char *mask)
 {
   send_cmd (s_OperServ, "UNXLINE * %s", mask);
 }
 
 void
-plexus_cmd_unszline (const char *mask)
+plexus_SendSZLineDel (const char *mask)
 {
   /* Does not support */
 }
 
 void
-plexus_cmd_szline (const char *mask, const char *reason, const char *whom)
+plexus_SendSZLine (const char *mask, const char *reason, const char *whom)
 {
   /* Does not support */
 }
@@ -788,7 +788,7 @@ plexus_cmd_svsadmin (const char *server, int set)
 }
 
 void
-plexus_cmd_sgline (const char *mask, const char *reason)
+plexus_SendSGLine (const char *mask, const char *reason)
 {
   send_cmd (s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
@@ -944,7 +944,7 @@ plexus_cmd_server (const char *servname, int hop, const char *descript)
 }
 
 void
-plexus_cmd_connect (int servernum)
+plexus_SendConnect (int servernum)
 {
   me_server = new_server (NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
@@ -1481,7 +1481,7 @@ anope_event_capab (const char *source, int ac, const char **av)
 
 /* SVSHOLD - set */
 void
-plexus_cmd_svshold (const char *nick)
+plexus_SendSVSHOLD (const char *nick)
 {
   send_cmd (s_OperServ, "ENCAP * RESV %d %s 0 :%s", NSReleaseTimeout, nick,
 	    "This nick is being held for a registered user. "
@@ -1490,7 +1490,7 @@ plexus_cmd_svshold (const char *nick)
 
 /* SVSHOLD - release */
 void
-plexus_cmd_release_svshold (const char *nick)
+plexus_SendSVSHOLDDel (const char *nick)
 {
   send_cmd (s_OperServ, "UNRESV * %s", nick);
 }
@@ -1786,13 +1786,13 @@ moduleAddAnopeCmds ()
   pmodule_SendChangeBotNick (plexus_cmd_chg_nick);
   pmodule_SendForceNickChange (plexus_cmd_svsnick);
   pmodule_SendVhost (plexus_cmd_vhost_on);
-  pmodule_cmd_connect (plexus_cmd_connect);
-  pmodule_cmd_svshold (plexus_cmd_svshold);
-  pmodule_cmd_release_svshold (plexus_cmd_release_svshold);
-  pmodule_cmd_unsgline (plexus_cmd_unsgline);
-  pmodule_cmd_unszline (plexus_cmd_unszline);
-  pmodule_cmd_szline (plexus_cmd_szline);
-  pmodule_cmd_sgline (plexus_cmd_sgline);
+  pmodule_SendConnect (plexus_cmd_connect);
+  pmodule_SendSVSHOLD (plexus_cmd_svshold);
+  pmodule_SendSVSHOLDDel (plexus_cmd_release_svshold);
+  pmodule_SendSGLineDel (plexus_cmd_unsgline);
+  pmodule_SendSZLineDel (plexus_cmd_unszline);
+  pmodule_SendSZLine (plexus_cmd_szline);
+  pmodule_SendSGLine (plexus_cmd_sgline);
   pmodule_cmd_unban (plexus_cmd_unban);
   pmodule_SendSVSMode_chan (plexus_cmd_svsmode_chan);
   pmodule_cmd_svid_umode (plexus_cmd_svid_umode);

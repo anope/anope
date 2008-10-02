@@ -1121,7 +1121,7 @@ E void anope_cmd_chghost(const char *nick, const char *vhost);                  
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
 E void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_SendVhostDel(User *u);
-E void anope_cmd_connect();                             	           	  /* Connect */
+E void anope_SendConnect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
 E void anope_SendGlobops(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */
 E void anope_SendInvite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */
@@ -1148,14 +1148,14 @@ E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char 
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendQuit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
 E void anope_SendAkillDel(const char *user, const char *host);			  		  /* RAKILL */
-E void anope_cmd_sgline(const char *mask, const char *reason);			  	  		  /* SGLINE */
+E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGLINE */
 E void anope_SendSQLine(const char *mask, const char *reason);                   	  		  /* SQLINE */
-E void anope_cmd_szline(const char *mask, const char *reason, const char *whom);				  /* SZLINE */
+E void anope_SendSZLine(const char *mask, const char *reason, const char *whom);				  /* SZLINE */
 E void anope_SendSquit(const char *servname, const char *message);               	  		  /* SQUIT  */
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
-E void anope_cmd_svshold(const char *nick);				  	  		  /* SVSHOLD */
-E void anope_cmd_release_svshold(const char *nick);				  		  /* SVSHOLD */
+E void anope_SendSVSHOLD(const char *nick);				  	  		  /* SVSHOLD */
+E void anope_SendSVSHOLDDel(const char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_cmd_svsjoin(const char *source, const char *nick,const char *chan, const char *param);          	  /* SVSJOIN */
 E void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ...);     		  /* SVSKILL */
@@ -1167,9 +1167,9 @@ E void anope_SendSVSO(const char *source,const char *nick, const char *flag);   
 E void anope_cmd_svspart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_cmd_swhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */
-E void anope_cmd_unsgline(const char *mask);				  	  		  /* UNSGLINE */
+E void anope_SendSGLineDel(const char *mask);				  	  		  /* UNSGLINE */
 E void anope_SendSQLineDel(const char *user);                               	  		  /* UNSQLINE */
-E void anope_cmd_unszline(const char *mask);				  	  		  /* UNSZLINE */
+E void anope_SendSZLineDel(const char *mask);				  	  		  /* UNSZLINE */
 E void anope_cmd_eob();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);

@@ -751,17 +751,17 @@ void viagra_SendSQLine(const char *mask, const char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void viagra_cmd_unsgline(const char *mask)
+void viagra_SendSGLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
-void viagra_cmd_unszline(const char *mask)
+void viagra_SendSZLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
-void viagra_cmd_szline(const char *mask, const char *reason, const char *whom)
+void viagra_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
@@ -776,7 +776,7 @@ void viagra_cmd_svsadmin(const char *server, int set)
 	ircd_proto.SendSVSNOOP(server, set);
 }
 
-void viagra_cmd_sgline(const char *mask, const char *reason)
+void viagra_SendSGLine(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
@@ -963,7 +963,7 @@ void viagra_cmd_burst()
     send_cmd(NULL, "BURST");
 }
 
-void viagra_cmd_connect(int servernum)
+void viagra_SendConnect(int servernum)
 {
     me_server =
         new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1394,13 +1394,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void viagra_cmd_svshold(const char *nick)
+void viagra_SendSVSHOLD(const char *nick)
 {
     /* Not supported by this IRCD */
 }
 
 /* SVSHOLD - release */
-void viagra_cmd_release_svshold(const char *nick)
+void viagra_SendSVSHOLDDel(const char *nick)
 {
     /* Not Supported by this IRCD */
 }
@@ -1651,13 +1651,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(viagra_cmd_chg_nick);
     pmodule_SendForceNickChange(viagra_cmd_svsnick);
     pmodule_SendVhost(viagra_cmd_vhost_on);
-    pmodule_cmd_connect(viagra_cmd_connect);
-    pmodule_cmd_svshold(viagra_cmd_svshold);
-    pmodule_cmd_release_svshold(viagra_cmd_release_svshold);
-    pmodule_cmd_unsgline(viagra_cmd_unsgline);
-    pmodule_cmd_unszline(viagra_cmd_unszline);
-    pmodule_cmd_szline(viagra_cmd_szline);
-    pmodule_cmd_sgline(viagra_cmd_sgline);
+    pmodule_SendConnect(viagra_cmd_connect);
+    pmodule_SendSVSHOLD(viagra_cmd_svshold);
+    pmodule_SendSVSHOLDDel(viagra_cmd_release_svshold);
+    pmodule_SendSGLineDel(viagra_cmd_unsgline);
+    pmodule_SendSZLineDel(viagra_cmd_unszline);
+    pmodule_SendSZLine(viagra_cmd_szline);
+    pmodule_SendSGLine(viagra_cmd_sgline);
     pmodule_cmd_unban(viagra_cmd_unban);
     pmodule_SendSVSMode_chan(viagra_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(viagra_cmd_svid_umode);

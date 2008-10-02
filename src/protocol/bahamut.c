@@ -460,13 +460,13 @@ void BahamutIRCdProto::SendMode(const char *source, const char *dest, const char
 }
 
 /* SVSHOLD - set */
-void BahamutIRCdProto::cmd_svshold(const char *nick)
+void BahamutIRCdProto::SendSVSHOLD(const char *nick)
 {
 	send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
 }
 
 /* SVSHOLD - release */
-void BahamutIRCdProto::cmd_release_svshold(const char *nick)
+void BahamutIRCdProto::SendSVSHOLDDel(const char *nick)
 {
 	send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
@@ -670,13 +670,13 @@ void BahamutIRCdProto::SendSQLine(const char *mask, const char *reason)
 }
 
 /* UNSGLINE */
-void BahamutIRCdProto::cmd_unsgline(const char *mask)
+void BahamutIRCdProto::SendSGLineDel(const char *mask)
 {
 	send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
 /* UNSZLINE */
-void BahamutIRCdProto::cmd_unszline(const char *mask)
+void BahamutIRCdProto::SendSZLineDel(const char *mask)
 {
 	/* this will likely fail so its only here for legacy */
 	send_cmd(NULL, "UNSZLINE 0 %s", mask);
@@ -685,7 +685,7 @@ void BahamutIRCdProto::cmd_unszline(const char *mask)
 }
 
 /* SZLINE */
-void BahamutIRCdProto::cmd_szline(const char *mask, const char *reason, const char *whom)
+void BahamutIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
 {
 	/* this will likely fail so its only here for legacy */
 	send_cmd(NULL, "SZLINE %s :%s", mask, reason);
@@ -705,7 +705,7 @@ void bahamut_cmd_svsadmin(const char *server, int set)
 }
 
 /* SGLINE */
-void BahamutIRCdProto::cmd_sgline(const char *mask, const char *reason)
+void BahamutIRCdProto::SendSGLine(const char *mask, const char *reason)
 {
 	send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(mask)), mask, reason);
 }
@@ -814,7 +814,7 @@ void bahamut_cmd_capab()
              "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
 }
 
-void BahamutIRCdProto::cmd_connect()
+void BahamutIRCdProto::SendConnect()
 {
 	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 	if (servernum == 1) bahamut_cmd_pass(RemotePassword);

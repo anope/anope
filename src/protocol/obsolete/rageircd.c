@@ -605,17 +605,17 @@ void rageircd_SendSQLine(const char *mask, const char *reason)
     send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
-void rageircd_cmd_unsgline(const char *mask)
+void rageircd_SendSGLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
-void rageircd_cmd_unszline(const char *mask)
+void rageircd_SendSZLineDel(const char *mask)
 {
     send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
-void rageircd_cmd_szline(const char *mask, const char *reason, const char *whom)
+void rageircd_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
     send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
@@ -630,7 +630,7 @@ void rageircd_cmd_svsadmin(const char *server, int set)
 	ircd_proto.SendSVSNOOP(server, set);
 }
 
-void rageircd_cmd_sgline(const char *mask, const char *reason)
+void rageircd_SendSGLine(const char *mask, const char *reason)
 {
     send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 
@@ -758,7 +758,7 @@ void rageircd_cmd_burst()
     send_cmd(NULL, "BURST");
 }
 
-void rageircd_cmd_connect(int servernum)
+void rageircd_SendConnect(int servernum)
 {
     if (Numeric) {
         me_server =
@@ -1331,14 +1331,14 @@ int anope_event_motd(const char *source, int ac, const char **av)
 }
 
 /* SVSHOLD - set */
-void rageircd_cmd_svshold(const char *nick)
+void rageircd_SendSVSHOLD(const char *nick)
 {
     send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
              "Being held for registered user");
 }
 
 /* SVSHOLD - release */
-void rageircd_cmd_release_svshold(const char *nick)
+void rageircd_SendSVSHOLDDel(const char *nick)
 {
     send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
@@ -1611,13 +1611,13 @@ void moduleAddAnopeCmds()
     pmodule_SendChangeBotNick(rageircd_cmd_chg_nick);
     pmodule_SendForceNickChange(rageircd_cmd_svsnick);
     pmodule_SendVhost(rageircd_cmd_vhost_on);
-    pmodule_cmd_connect(rageircd_cmd_connect);
-    pmodule_cmd_svshold(rageircd_cmd_svshold);
-    pmodule_cmd_release_svshold(rageircd_cmd_release_svshold);
-    pmodule_cmd_unsgline(rageircd_cmd_unsgline);
-    pmodule_cmd_unszline(rageircd_cmd_unszline);
-    pmodule_cmd_szline(rageircd_cmd_szline);
-    pmodule_cmd_sgline(rageircd_cmd_sgline);
+    pmodule_SendConnect(rageircd_cmd_connect);
+    pmodule_SendSVSHOLD(rageircd_cmd_svshold);
+    pmodule_SendSVSHOLDDel(rageircd_cmd_release_svshold);
+    pmodule_SendSGLineDel(rageircd_cmd_unsgline);
+    pmodule_SendSZLineDel(rageircd_cmd_unszline);
+    pmodule_SendSZLine(rageircd_cmd_szline);
+    pmodule_SendSGLine(rageircd_cmd_sgline);
     pmodule_cmd_unban(rageircd_cmd_unban);
     pmodule_SendSVSMode_chan(rageircd_cmd_svsmode_chan);
     pmodule_cmd_svid_umode(rageircd_cmd_svid_umode);

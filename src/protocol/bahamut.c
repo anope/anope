@@ -486,7 +486,7 @@ void BahamutIRCdProto::SendSVSMode_chan(const char *name, const char *mode, cons
 	else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
 }
 
-void BahamutIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
+void BahamutIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
 	anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }

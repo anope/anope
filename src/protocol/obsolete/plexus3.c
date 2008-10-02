@@ -1356,7 +1356,7 @@ plexus_SendNoticeChanops (const char *source, const char *dest, const char *buf)
 }
 
 void
-plexus_cmd_bot_chan_mode (const char *nick, const char *chan)
+plexus_SendBotOp (const char *nick, const char *chan)
 {
   anope_SendMode (nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }
@@ -1758,7 +1758,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_privmsg2 (plexus_cmd_privmsg2);
   pmodule_cmd_serv_notice (plexus_cmd_serv_notice);
   pmodule_cmd_serv_privmsg (plexus_cmd_serv_privmsg);
-  pmodule_cmd_bot_chan_mode (plexus_cmd_bot_chan_mode);
+  pmodule_SendBotOp (plexus_cmd_bot_chan_mode);
   pmodule_cmd_351 (plexus_cmd_351);
   pmodule_cmd_quit (plexus_cmd_quit);
   pmodule_cmd_pong (plexus_cmd_pong);

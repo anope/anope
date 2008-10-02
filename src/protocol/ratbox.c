@@ -1039,7 +1039,7 @@ void RatboxProto::SendNoticeChanops(const char *source, const char *dest, const 
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void RatboxProto::cmd_bot_chan_mode(const char *nick, const char *chan)
+void RatboxProto::SendBotOp(const char *nick, const char *chan)
 {
 	if (UseTS6) {
 		Uid *u = find_uid(nick);

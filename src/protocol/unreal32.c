@@ -574,7 +574,7 @@ void UnrealIRCdProto::SendNoticeChanops(const char *source, const char *dest, co
 }
 
 
-void UnrealIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
+void UnrealIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
 	anope_SendMode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }

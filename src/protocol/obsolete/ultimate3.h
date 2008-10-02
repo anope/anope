@@ -73,7 +73,7 @@ void ultimate3_cmd_privmsg(const char *source, const char *dest, const char *buf
 void ultimate3_cmd_privmsg2(const char *source, const char *dest, const char *msg);
 void ultimate3_cmd_serv_notice(const char *source, const char *dest, const char *msg);
 void ultimate3_cmd_serv_privmsg(const char *source, const char *dest, const char *msg);
-void ultimate3_cmd_bot_chan_mode(const char *nick, const char *chan);
+void ultimate3_SendBotOp(const char *nick, const char *chan);
 void ultimate3_cmd_351(const char *source);
 void ultimate3_cmd_quit(const char *source, const char *buf);
 void ultimate3_cmd_pong(const char *servname, const char *who);

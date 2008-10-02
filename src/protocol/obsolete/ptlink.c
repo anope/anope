@@ -385,7 +385,7 @@ CUMode myCumodes[128] = {
 
 
 
-void ptlink_cmd_bot_chan_mode(const char *nick, const char *chan)
+void ptlink_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(s_ChanServ, chan, "%s %s %s", ircd->botchanumode, nick,
                    nick);
@@ -1703,7 +1703,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(ptlink_cmd_privmsg2);
     pmodule_cmd_serv_notice(ptlink_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(ptlink_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(ptlink_cmd_bot_chan_mode);
+    pmodule_SendBotOp(ptlink_cmd_bot_chan_mode);
     pmodule_cmd_351(ptlink_cmd_351);
     pmodule_cmd_quit(ptlink_cmd_quit);
     pmodule_cmd_pong(ptlink_cmd_pong);

@@ -1267,7 +1267,7 @@ class IRCDProto {
 		{
 			send_cmd(source, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
-		virtual void cmd_bot_chan_mode(const char *, const char *) = 0;
+		virtual void SendBotOp(const char *, const char *) = 0;
 		virtual void cmd_quit(const char *source, const char *buf)
 		{
 			if (buf) send_cmd(source, "QUIT :%s", buf);

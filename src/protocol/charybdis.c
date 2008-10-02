@@ -1083,7 +1083,7 @@ void CharybdisProto::SendNoticeChanops(const char *source, const char *dest, con
 	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE @%s :%s", dest, buf);
 }
 
-void CharybdisProto::cmd_bot_chan_mode(const char *nick, const char *chan)
+void CharybdisProto::SendBotOp(const char *nick, const char *chan)
 {
 	if (UseTS6) {
 		Uid *u = find_uid(nick);

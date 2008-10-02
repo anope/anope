@@ -1148,7 +1148,7 @@ void ultimate3_cmd_serv_privmsg(const char *source, const char *dest, const char
     send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
-void ultimate3_cmd_bot_chan_mode(const char *nick, const char *chan)
+void ultimate3_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
@@ -1724,7 +1724,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(ultimate3_cmd_privmsg2);
     pmodule_cmd_serv_notice(ultimate3_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(ultimate3_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(ultimate3_cmd_bot_chan_mode);
+    pmodule_SendBotOp(ultimate3_cmd_bot_chan_mode);
     pmodule_cmd_351(ultimate3_cmd_351);
     pmodule_cmd_quit(ultimate3_cmd_quit);
     pmodule_cmd_pong(ultimate3_cmd_pong);

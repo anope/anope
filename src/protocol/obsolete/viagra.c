@@ -1382,7 +1382,7 @@ void viagra_cmd_invite(const char *source, const char *chan, const char *nick)
     send_cmd(source, "INVITE %s %s", nick, chan);
 }
 
-void viagra_cmd_bot_chan_mode(const char *nick, const char *chan)
+void viagra_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
@@ -1623,7 +1623,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(viagra_cmd_privmsg2);
     pmodule_cmd_serv_notice(viagra_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(viagra_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(viagra_cmd_bot_chan_mode);
+    pmodule_SendBotOp(viagra_cmd_bot_chan_mode);
     pmodule_cmd_351(viagra_cmd_351);
     pmodule_cmd_quit(viagra_cmd_quit);
     pmodule_cmd_pong(viagra_cmd_pong);

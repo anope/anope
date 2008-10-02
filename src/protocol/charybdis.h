@@ -57,7 +57,7 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendKick(const char *, const char *, const char *, const char *);
 		void SendNoticeChanops(const char *, const char *, const char *);
-		void cmd_bot_chan_mode(const char *, const char *);
+		void SendBotOp(const char *, const char *);
 		void cmd_quit(const char *, const char *);
 		void cmd_pong(const char *, const char *);
 		void cmd_join(const char *, const char *, time_t);

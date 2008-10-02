@@ -185,9 +185,9 @@ void anope_cmd_serv_privmsg(const char *source, const char *dest, const char *ms
 	ircdproto->cmd_serv_privmsg(source, dest, msg);
 }
 
-void anope_cmd_bot_chan_mode(const char *nick, const char *chan)
+void anope_SendBotOp(const char *nick, const char *chan)
 {
-	ircdproto->cmd_bot_chan_mode(nick, chan);
+	ircdproto->SendBotOp(nick, chan);
 }
 
 void anope_cmd_quit(const char *source, const char *fmt, ...)

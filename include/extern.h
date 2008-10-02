@@ -1130,7 +1130,7 @@ E void anope_SendKick(const char *source, const char *chan, const char *user, co
 E void anope_SendMode(const char *source, const char *dest, const char *fmt, ...);   	  		  /* MODE */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_cmd_unban(const char *name, const char *nick);				  		  			      /* MODE -b */
-E void anope_cmd_bot_chan_mode(const char *nick, const char *chan);			  		  /* MODE BotServ */
+E void anope_SendBotOp(const char *nick, const char *chan);			  		  /* MODE BotServ */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_cmd_chg_nick(const char *oldnick, const char *newnick);             	  		  /* NICK */
 E void anope_SendClientIntroduction(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */

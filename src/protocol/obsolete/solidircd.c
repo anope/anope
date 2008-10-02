@@ -528,7 +528,7 @@ void solidircd_SendSVSMode_chan(const char *name, const char *mode, const char *
     }
 }
 
-void solidircd_cmd_bot_chan_mode(const char *nick, const char *chan)
+void solidircd_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
@@ -1616,7 +1616,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(solidircd_cmd_privmsg2);
     pmodule_cmd_serv_notice(solidircd_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(solidircd_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(solidircd_cmd_bot_chan_mode);
+    pmodule_SendBotOp(solidircd_cmd_bot_chan_mode);
     pmodule_cmd_351(solidircd_cmd_351);
     pmodule_cmd_quit(solidircd_cmd_quit);
     pmodule_cmd_pong(solidircd_cmd_pong);

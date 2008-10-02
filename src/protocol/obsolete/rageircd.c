@@ -1210,7 +1210,7 @@ void rageircd_SendSVSMode_chan(const char *name, const char *mode, const char *n
     }
 }
 
-void rageircd_cmd_bot_chan_mode(const char *nick, const char *chan)
+void rageircd_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
@@ -1583,7 +1583,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(rageircd_cmd_privmsg2);
     pmodule_cmd_serv_notice(rageircd_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(rageircd_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(rageircd_cmd_bot_chan_mode);
+    pmodule_SendBotOp(rageircd_cmd_bot_chan_mode);
     pmodule_cmd_351(rageircd_cmd_351);
     pmodule_cmd_quit(rageircd_cmd_quit);
     pmodule_cmd_pong(rageircd_cmd_pong);

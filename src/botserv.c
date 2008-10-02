@@ -751,7 +751,7 @@ void bot_join(ChannelInfo * ci)
                                  ci->bi->nick, ci->bi->nick);
     }
     anope_cmd_join(ci->bi->nick, ci->c->name, ci->c->creation_time);
-    anope_cmd_bot_chan_mode(ci->bi->nick, ci->c->name);
+    anope_SendBotOp(ci->bi->nick, ci->c->name);
     send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
 }
 

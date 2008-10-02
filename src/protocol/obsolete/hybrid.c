@@ -1160,7 +1160,7 @@ void hybrid_SendNoticeChanops(const char *source, const char *dest, const char *
     send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void hybrid_cmd_bot_chan_mode(const char *nick, const char *chan)
+void hybrid_SendBotOp(const char *nick, const char *chan)
 {
     anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
@@ -1474,7 +1474,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_privmsg2(hybrid_cmd_privmsg2);
     pmodule_cmd_serv_notice(hybrid_cmd_serv_notice);
     pmodule_cmd_serv_privmsg(hybrid_cmd_serv_privmsg);
-    pmodule_cmd_bot_chan_mode(hybrid_cmd_bot_chan_mode);
+    pmodule_SendBotOp(hybrid_cmd_bot_chan_mode);
     pmodule_cmd_351(hybrid_cmd_351);
     pmodule_cmd_quit(hybrid_cmd_quit);
     pmodule_cmd_pong(hybrid_cmd_pong);

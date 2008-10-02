@@ -734,7 +734,7 @@ void InspIRCdProto::SendNoticeChanops(const char *source, const char *dest, cons
 	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
 }
 
-void InspIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
+void InspIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
 	anope_SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }

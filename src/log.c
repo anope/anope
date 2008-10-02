@@ -177,7 +177,7 @@ void alog(const char *fmt, ...)
         fprintf(stderr, "%s %s\n", buf, str);
     }
     if (LogChannel && logchan && !debug && findchan(LogChannel)) {
-        ircdproto->SendPrivmsg(s_GlobalNoticer, LogChannel, "%s", str);
+        ircdproto->SendPrivmsg(findbot(s_GlobalNoticer), LogChannel, "%s", str);
     }
     errno = errno_save;
 }

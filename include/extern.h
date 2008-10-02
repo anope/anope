@@ -1120,7 +1120,6 @@ E void anope_cmd_capab();						  	  		  /* CAPAB */
 E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
 E void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
-E void anope_SendVhostDel(User *u);
 E void anope_SendConnect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
 E void anope_SendGlobops(const char *source, const char *fmt, ...);         	  		  /* GLOBOPS */

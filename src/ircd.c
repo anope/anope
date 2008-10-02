@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendVhostDel(User *u)
-{
-	ircdproto->SendVhostDel(u);
-}
-
 void anope_SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
 	ircdproto->SendAkill(user, host, who, when, expires, reason);

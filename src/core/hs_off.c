@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -76,7 +76,7 @@ int do_off(User * u)
             if (vhost == NULL && vident == NULL)
                 notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
             else
-                anope_SendVhostDel(u);
+                ircdproto->SendVhostDel(u);
         } else {
             notice_lang(s_HostServ, u, HOST_ID);
         }

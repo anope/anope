@@ -1165,13 +1165,13 @@ void UnrealIRCdProto::SendSGLine(const char *mask, const char *reason)
 /* SVSMODE -b */
 void UnrealIRCdProto::SendBanDel(const char *name, const char *nick)
 {
-	SendSVSMode_chan(name, "-b", nick);
+	SendSVSModeChan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void UnrealIRCdProto::SendSVSMode_chan(const char *name, const char *mode, const char *nick)
+void UnrealIRCdProto::SendSVSModeChan(const char *name, const char *mode, const char *nick)
 {
 	if (nick) send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"), name, mode, nick);
 	else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name, mode);

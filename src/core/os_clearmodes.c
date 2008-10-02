@@ -105,7 +105,7 @@ int do_clearmodes(User * u)
         if (all) {
             /* Clear mode +o */
             if (ircd->svsmode_ucmode) {
-                anope_SendSVSMode_chan(c->name, "-o", NULL);
+                ircdproto->SendSVSModeChan(c->name, "-o", NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_OP)) {
@@ -129,7 +129,7 @@ int do_clearmodes(User * u)
             }
 
             if (ircd->svsmode_ucmode) {
-                anope_SendSVSMode_chan(c->name, "-v", NULL);
+                ircdproto->SendSVSModeChan(c->name, "-v", NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_VOICE)) {
@@ -155,7 +155,7 @@ int do_clearmodes(User * u)
 
             /* Clear mode +h */
             if (ircd->svsmode_ucmode && ircd->halfop) {
-                anope_SendSVSMode_chan(c->name, "-h", NULL);
+                ircdproto->SendSVSModeChan(c->name, "-h", NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
@@ -179,7 +179,7 @@ int do_clearmodes(User * u)
             }
             /* Clear mode Owners */
             if (ircd->svsmode_ucmode && ircd->owner) {
-                anope_SendSVSMode_chan(c->name, ircd->ownerunset, NULL);
+                ircdproto->SendSVSModeChan(c->name, ircd->ownerunset, NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {
@@ -204,7 +204,7 @@ int do_clearmodes(User * u)
             /* Clear mode protected or admins */
             if (ircd->svsmode_ucmode && (ircd->protect || ircd->admin)) {
 
-                anope_SendSVSMode_chan(c->name, ircd->adminunset, NULL);
+                ircdproto->SendSVSModeChan(c->name, ircd->adminunset, NULL);
                 for (cu = c->users; cu; cu = next) {
                     next = cu->next;
                     if (!chan_has_user_status(c, cu->user, CUS_HALFOP)) {

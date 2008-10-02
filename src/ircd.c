@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
-{
-	ircdproto->SendSVSMode_chan(name, mode, nick);
-}
-
 void anope_SendSVID(const char *nick, time_t ts)
 {
 	ircdproto->SendSVID(nick, ts);

@@ -1452,7 +1452,7 @@ class IRCDProto {
 		virtual void SendSZLine(const char *, const char *, const char *) { }
 		virtual void SendSGLine(const char *, const char *) { }
 		virtual void SendBanDel(const char *, const char *) { }
-		virtual void SendSVSMode_chan(const char *, const char *, const char *) { }
+		virtual void SendSVSModeChan(const char *, const char *, const char *) { }
 		virtual void SendSVID(const char *, time_t) { }
 		virtual void SendUnregisteredNick(User *) { }
 		virtual void SendSVID2(User *, const char *) { }

@@ -83,7 +83,7 @@ class BahamutIRCdProto : public IRCDProto {
 		void SendSZLine(const char *, const char *, const char *);
 		void SendSGLine(const char *, const char *);
 		void SendBanDel(const char *, const char *);
-		void SendSVSMode_chan(const char *, const char *, const char *);
+		void SendSVSModeChan(const char *, const char *, const char *);
 		void SendSVID(const char *, time_t);
 		void SendUnregisteredNick(User *);
 		void SendSVID3(User *, const char *);

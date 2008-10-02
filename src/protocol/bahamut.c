@@ -474,13 +474,13 @@ void BahamutIRCdProto::SendSVSHoldDel(const char *nick)
 /* SVSMODE -b */
 void BahamutIRCdProto::SendBanDel(const char *name, const char *nick)
 {
-	SendSVSMode_chan(name, "-b", nick);
+	SendSVSModeChan(name, "-b", nick);
 }
 
 
 /* SVSMODE channel modes */
 
-void BahamutIRCdProto::SendSVSMode_chan(const char *name, const char *mode, const char *nick)
+void BahamutIRCdProto::SendSVSModeChan(const char *name, const char *mode, const char *nick)
 {
 	if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
 	else send_cmd(ServerName, "SVSMODE %s %s", name, mode);

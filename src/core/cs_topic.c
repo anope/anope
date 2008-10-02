@@ -102,16 +102,16 @@ int do_cs_topic(User * u)
             alog("%s: %s!%s@%s changed topic of %s as services admin.",
                  s_ChanServ, u->nick, u->username, u->host, c->name);
         if (ircd->join2set) {
-            if (whosends(ci) == s_ChanServ) {
-                ircdproto->SendJoin(s_ChanServ, c->name, c->creation_time);
+            if (whosends(ci) == findbot(s_ChanServ)) {
+                ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
                 ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
         ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic ? topic : "",
                         c->topic_time);
         if (ircd->join2set) {
-            if (whosends(ci) == s_ChanServ) {
-                ircdproto->SendPart(s_ChanServ, c->name, NULL);
+            if (whosends(ci) == findbot(s_ChanServ)) {
+                ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
             }
         }
     }

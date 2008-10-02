@@ -1576,10 +1576,10 @@ void release(NickAlias * na, int from_timeout)
         if (UseSVSHOLD) {
             anope_SendSVSHOLDDel(na->nick);
         } else {
-            anope_SendQuit(na->nick, NULL);
+            ircdproto->SendQuit(na->nick, NULL);
         }
     } else {
-        anope_SendQuit(na->nick, NULL);
+        ircdproto->SendQuit(na->nick, NULL);
     }
     na->status &= ~NS_KILL_HELD;
 }

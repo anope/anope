@@ -297,7 +297,7 @@ int do_bot(User * u)
                 anope_SendChangeBotNick(oldnick, bi->nick);
 				anope_SendSQLine(bi->nick, "Reserved for services");
             } else {
-                anope_SendQuit(oldnick, "Quit: Be right back");
+                ircdproto->SendQuit(oldnick, "Quit: Be right back");
 
                 ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
@@ -320,7 +320,7 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
         else {
             send_event(EVENT_BOT_DEL, 1, bi->nick);
-            anope_SendQuit(bi->nick,
+            ircdproto->SendQuit(bi->nick,
                            "Quit: Help! I'm being deleted by %s!",
                            u->nick);
             if (ircd->sqline) {

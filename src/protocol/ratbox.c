@@ -965,7 +965,7 @@ void RatboxProto::SendBotOp(const char *nick, const char *chan)
 }
 
 /* QUIT */
-void RatboxProto::SendQuit(const char *source, const char *buf)
+void RatboxProto::SendQuitInternal(const char *source, const char *buf)
 {
 	Uid *ud = find_uid(source);
 	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT :%s", buf);

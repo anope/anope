@@ -43,18 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendQuit(const char *source, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	ircdproto->SendQuit(source, buf);
-}
-
 void anope_SendPong(const char *servname, const char *who)
 {
 	ircdproto->SendPong(servname, who);

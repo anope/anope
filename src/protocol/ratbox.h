@@ -50,13 +50,13 @@ class RatboxProto : public IRCDTS6Proto {
 		void SendModeInternal(const char *, const char *, const char *);
 		void SendKickInternal(const char *, const char *, const char *, const char *);
 		void SendNoticeChanopsInternal(const char *, const char *, const char *);
+		void SendQuitInternal(const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSMode(User *, int, const char **);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
-		void SendQuit(const char *, const char *);
 		void SendPong(const char *, const char *);
 		void SendJoin(const char *, const char *, time_t);
 		void SendSQLineDel(const char *);

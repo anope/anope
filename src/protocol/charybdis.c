@@ -1036,7 +1036,7 @@ void CharybdisProto::SendBotOp(const char *nick, const char *chan)
 }
 
 /* QUIT */
-void CharybdisProto::SendQuit(const char *source, const char *buf)
+void CharybdisProto::SendQuitInternal(const char *source, const char *buf)
 {
 	BotInfo *bi = findbot(source);
 	if (buf) send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "QUIT :%s", buf);

@@ -1032,7 +1032,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 
     slist_add(&sglines, entry);
 
-    anope_SendSGLine(entry->mask, entry->reason);
+    ircdproto->SendSGLine(entry->mask, entry->reason);
 
     if (KillonSGline && !ircd->sglineenforce) {
         snprintf(buf, (BUFSIZE - 1), "G-Lined: %s", entry->reason);
@@ -1066,7 +1066,7 @@ int check_sgline(const char *nick, const char *realname)
             continue;
 
         if (match_wild_nocase(sx->mask, realname)) {
-            anope_SendSGLine(sx->mask, sx->reason);
+            ircdproto->SendSGLine(sx->mask, sx->reason);
             /* We kill nick since s_sgline can't */
             ircdproto->SendSVSKill(ServerName, nick, "G-Lined: %s", sx->reason);
             return 1;

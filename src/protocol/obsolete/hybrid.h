@@ -106,9 +106,9 @@ void hybrid_SendSVID(const char *nick, time_t ts);
 void hybrid_SendUnregisteredNick(User * u);
 void hybrid_SendSVID2(User * u, const char *ts);
 void hybrid_SendSVID3(User * u, const char *ts);
-void hybrid_cmd_eob();
+void hybrid_SendEOB();
 int hybrid_flood_mode_check(const char *value);
-void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void hybrid_SendJupe(const char *jserver, const char *who, const char *reason);
 int hybrid_valid_nick(const char *nick);
 void hybrid_SendCTCP(const char *source, const char *dest, const char *buf);
 

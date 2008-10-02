@@ -742,7 +742,7 @@ void rageircd_cmd_capab()
     send_cmd(NULL, "CAPAB BURST UNCONNECT SSJ3 SN2 VHOST TSMODE");
 }
 
-void rageircd_cmd_server(const char *servname, int hop, const char *descript)
+void rageircd_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -778,7 +778,7 @@ void rageircd_SendConnect(int servernum)
     if (Numeric) {
         send_cmd(NULL, "MYID !%s", Numeric);
     }
-    rageircd_cmd_server(ServerName, 1, ServerDesc);
+    rageircd_SendServer(ServerName, 1, ServerDesc);
     rageircd_cmd_svinfo();
     rageircd_cmd_burst();
 }
@@ -1466,7 +1466,7 @@ void rageircd_SendSVSPart(const char *source, const char *nick, const char *chan
     /* Find no reference to it in the code and docs */
 }
 
-void rageircd_cmd_swhois(const char *source, const char *who, const char *mask)
+void rageircd_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
@@ -1496,12 +1496,12 @@ int rageircd_flood_mode_check(const char *value)
     return 0;
 }
 
-void rageircd_cmd_eob()
+void rageircd_SendEOB()
 {
     send_cmd(NULL, "BURST 0");
 }
 
-void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void rageircd_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1510,7 +1510,7 @@ void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         rageircd_SendSquit(jserver, rbuf);
-    rageircd_cmd_server(jserver, 2, rbuf);
+    rageircd_SendServer(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1626,10 +1626,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(rageircd_cmd_svid_umode3);
     pmodule_SendSVSJoin(rageircd_cmd_svsjoin);
     pmodule_SendSVSPart(rageircd_cmd_svspart);
-    pmodule_cmd_swhois(rageircd_cmd_swhois);
-    pmodule_cmd_eob(rageircd_cmd_eob);
+    pmodule_SendSWhois(rageircd_cmd_swhois);
+    pmodule_SendEOB(rageircd_cmd_eob);
     pmodule_flood_mode_check(rageircd_flood_mode_check);
-    pmodule_cmd_jupe(rageircd_cmd_jupe);
+    pmodule_SendJupe(rageircd_cmd_jupe);
     pmodule_valid_nick(rageircd_valid_nick);
     pmodule_valid_chan(rageircd_valid_chan);
     pmodule_SendCTCP(rageircd_cmd_ctcp);

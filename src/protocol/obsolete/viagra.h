@@ -123,9 +123,9 @@ void viagra_SendSVID(const char *nick, time_t ts);
 void viagra_SendUnregisteredNick(User * u);
 void viagra_SendSVID2(User * u, const char *ts);
 void viagra_SendSVID3(User * u, const char *ts);
-void viagra_cmd_eob();
+void viagra_SendEOB();
 int viagra_flood_mode_check(const char *value);
-void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void viagra_SendJupe(const char *jserver, const char *who, const char *reason);
 int viagra_valid_nick(const char *nick);
 void viagra_SendCTCP(const char *source, const char *dest, const char *buf);
 

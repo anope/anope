@@ -1165,12 +1165,12 @@ E void anope_SendForceNickChange(const char *nick,const char *newnick, time_t wh
 E void anope_SendSVSNOOP(const char *server, int set);			  	  		  /* SVSNOOP */
 E void anope_SendSVSO(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
-E void anope_cmd_swhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
+E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */
 E void anope_SendSGLineDel(const char *mask);				  	  		  /* UNSGLINE */
 E void anope_SendSQLineDel(const char *user);                               	  		  /* UNSQLINE */
 E void anope_SendSZLineDel(const char *mask);				  	  		  /* UNSZLINE */
-E void anope_cmd_eob();									  /* EOB - end of burst */
+E void anope_SendEOB();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);
 E void anope_SendCTCP(const char *source, const char *dest,  const char *fmt, ...);   	  		  /* CTCP */
@@ -1251,7 +1251,7 @@ E void anope_SendSVID3(User *u, const char *ts);
 E void anope_SendUnregisteredNick(User *u);
 E int anope_flood_mode_check(const char *value);
 
-E void anope_cmd_jupe(const char *jserver, const char *who, const char *reason);
+E void anope_SendJupe(const char *jserver, const char *who, const char *reason);
 
 E int anope_valid_nick(const char *nick);
 E int anope_valid_chan(const char *chan);

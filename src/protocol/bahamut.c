@@ -802,7 +802,7 @@ void bahamut_cmd_pass(const char *pass)
 }
 
 /* SERVER */
-void BahamutIRCdProto::cmd_server(const char *servname, int hop, const char *descript)
+void BahamutIRCdProto::SendServer(const char *servname, int hop, const char *descript)
 {
 	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -821,7 +821,7 @@ void BahamutIRCdProto::SendConnect()
 	else if (servernum == 2) bahamut_cmd_pass(RemotePassword2);
 	else if (servernum == 3) bahamut_cmd_pass(RemotePassword3);
 	bahamut_cmd_capab();
-	cmd_server(ServerName, 1, ServerDesc);
+	SendServer(ServerName, 1, ServerDesc);
 	bahamut_cmd_svinfo();
 	bahamut_cmd_burst();
 }
@@ -1050,7 +1050,7 @@ int anope_event_pass(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void BahamutIRCdProto::cmd_eob()
+void BahamutIRCdProto::SendEOB()
 {
 	send_cmd(NULL, "BURST 0");
 }

@@ -902,7 +902,7 @@ void solidircd_cmd_pass(const char *pass)
 }
 
 /* SERVER */
-void solidircd_cmd_server(const char *servname, int hop, const char *descript)
+void solidircd_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
 }
@@ -927,7 +927,7 @@ void solidircd_SendConnect(int servernum)
         solidircd_cmd_pass(RemotePassword3);
     }
     solidircd_cmd_capab();
-    solidircd_cmd_server(ServerName, 1, ServerDesc);
+    solidircd_SendServer(ServerName, 1, ServerDesc);
     solidircd_cmd_svinfo();
     solidircd_cmd_burst();
 }
@@ -1472,12 +1472,12 @@ void solidircd_SendSVSPart(const char *source, const char *nick, const char *cha
     /* Can not find any reference to these in Bahamut */
 }
 
-void solidircd_cmd_swhois(const char *source, const char *who, const char *mask)
+void solidircd_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
-void solidircd_cmd_eob()
+void solidircd_SendEOB()
 {
     send_cmd(NULL, "BURST 0");
 }
@@ -1534,7 +1534,7 @@ int solidircd_flood_mode_check(const char *value)
     }
 }
 
-void solidircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void solidircd_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1543,7 +1543,7 @@ void solidircd_cmd_jupe(const char *jserver, const char *who, const char *reason
 
     if (findserver(servlist, jserver))
         solidircd_SendSquit(jserver, rbuf);
-    solidircd_cmd_server(jserver, 2, rbuf);
+    solidircd_SendServer(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1659,10 +1659,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(solidircd_cmd_svid_umode3);
     pmodule_SendSVSJoin(solidircd_cmd_svsjoin);
     pmodule_SendSVSPart(solidircd_cmd_svspart);
-    pmodule_cmd_swhois(solidircd_cmd_swhois);
-    pmodule_cmd_eob(solidircd_cmd_eob);
+    pmodule_SendSWhois(solidircd_cmd_swhois);
+    pmodule_SendEOB(solidircd_cmd_eob);
     pmodule_flood_mode_check(solidircd_flood_mode_check);
-    pmodule_cmd_jupe(solidircd_cmd_jupe);
+    pmodule_SendJupe(solidircd_cmd_jupe);
     pmodule_valid_nick(solidircd_valid_nick);
     pmodule_valid_chan(solidircd_valid_chan);
     pmodule_SendCTCP(solidircd_cmd_ctcp);

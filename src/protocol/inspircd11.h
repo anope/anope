@@ -91,8 +91,8 @@ class InspIRCdProto : public IRCDProto {
 		void SendSVID2(User *, const char *);
 		void SendSVSJoin(const char *, const char *, const char *, const char *);
 		void SendSVSPart(const char *, const char *, const char *);
-		void cmd_eob();
-		void cmd_server(const char *, int, const char *);
+		void SendEOB();
+		void SendServer(const char *, int, const char *);
 		void set_umode(User *, int, const char **);
 		int flood_mode_check(const char *);
 		void cmd_numeric(const char *, int, const char *, const char *);

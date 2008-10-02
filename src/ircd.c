@@ -352,14 +352,14 @@ void anope_SendSVSPart(const char *source, const char *nick, const char *chan)
 	ircdproto->SendSVSPart(source, nick, chan);
 }
 
-void anope_cmd_swhois(const char *source, const char *who, const char *mask)
+void anope_SendSWhois(const char *source, const char *who, const char *mask)
 {
-	ircdproto->cmd_swhois(source, who, mask);
+	ircdproto->SendSWhois(source, who, mask);
 }
 
-void anope_cmd_eob()
+void anope_SendEOB()
 {
-	ircdproto->cmd_eob();
+	ircdproto->SendEOB();
 }
 
 int anope_flood_mode_check(const char *value)
@@ -367,9 +367,9 @@ int anope_flood_mode_check(const char *value)
 	return ircdproto->flood_mode_check(value);
 }
 
-void anope_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void anope_SendJupe(const char *jserver, const char *who, const char *reason)
 {
-	ircdproto->cmd_jupe(jserver, who, reason);
+	ircdproto->SendJupe(jserver, who, reason);
 }
 
 int anope_valid_nick(const char *nick)

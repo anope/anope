@@ -1190,7 +1190,7 @@ void ultimate3_cmd_pass(const char *pass)
 
 /* SERVER name hop descript */
 /* Unreal 3.2 actually sends some info about itself in the descript area */
-void ultimate3_cmd_server(const char *servname, int hop, const char *descript)
+void ultimate3_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -1460,7 +1460,7 @@ void ultimate3_SendConnect(int servernum)
         ultimate3_cmd_pass(RemotePassword3);
     }
     ultimate3_cmd_capab();
-    ultimate3_cmd_server(ServerName, 1, ServerDesc);
+    ultimate3_SendServer(ServerName, 1, ServerDesc);
     ultimate3_cmd_svinfo();
     ultimate3_cmd_burst();
 }
@@ -1554,13 +1554,13 @@ void ultimate3_SendSVSPart(const char *source, const char *nick, const char *cha
     /* Not Supported by this IRCD */
 }
 
-void ultimate3_cmd_swhois(const char *source, const char *who, const char *mask)
+void ultimate3_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
 
 
-void ultimate3_cmd_eob()
+void ultimate3_SendEOB()
 {
     send_cmd(NULL, "BURST 0");
 }
@@ -1642,7 +1642,7 @@ int ultiamte3_flood_mode_check(const char *value)
     return 0;
 }
 
-void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void ultimate3_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1651,7 +1651,7 @@ void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason
 
     if (findserver(servlist, jserver))
         ultimate3_SendSquit(jserver, rbuf);
-    ultimate3_cmd_server(jserver, 2, rbuf);
+    ultimate3_SendServer(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1767,10 +1767,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(ultimate3_cmd_svid_umode3);
     pmodule_SendSVSJoin(ultimate3_cmd_svsjoin);
     pmodule_SendSVSPart(ultimate3_cmd_svspart);
-    pmodule_cmd_swhois(ultimate3_cmd_swhois);
-    pmodule_cmd_eob(ultimate3_cmd_eob);
+    pmodule_SendSWhois(ultimate3_cmd_swhois);
+    pmodule_SendEOB(ultimate3_cmd_eob);
     pmodule_flood_mode_check(ultiamte3_flood_mode_check);
-    pmodule_cmd_jupe(ultimate3_cmd_jupe);
+    pmodule_SendJupe(ultimate3_cmd_jupe);
     pmodule_valid_nick(ultiamte3_valid_nick);
     pmodule_valid_chan(ultiamte3_valid_chan);
     pmodule_SendCTCP(ultimate3_cmd_ctcp);

@@ -856,7 +856,7 @@ void ptlink_cmd_capab()
 }
 
 
-void ptlink_cmd_server(const char *servname, int hop, const char *descript)
+void ptlink_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d Anope.Services%s :%s", servname, hop,
              version_number_dotted, descript);
@@ -874,7 +874,7 @@ void ptlink_SendConnect(int servernum)
         ptlink_cmd_pass(RemotePassword3);
 
     ptlink_cmd_capab();
-    ptlink_cmd_server(ServerName, 1, ServerDesc);
+    ptlink_SendServer(ServerName, 1, ServerDesc);
     ptlink_cmd_svinfo();
     ptlink_cmd_svsinfo();
 }
@@ -1567,7 +1567,7 @@ void ptlink_SendSVSPart(const char *source, const char *nick, const char *chan)
     send_cmd(source, "SVSPART %s :%s", nick, chan);
 }
 
-void ptlink_cmd_swhois(const char *source, const char *who, const char *mask)
+void ptlink_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
@@ -1616,12 +1616,12 @@ int ptlink_flood_mode_check(const char *value)
     }
 }
 
-void ptlink_cmd_eob()
+void ptlink_SendEOB()
 {
     /* not supported  */
 }
 
-void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void ptlink_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1630,7 +1630,7 @@ void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         ptlink_SendSquit(jserver, rbuf);
-    ptlink_cmd_server(jserver, 1, rbuf);
+    ptlink_SendServer(jserver, 1, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1746,10 +1746,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(ptlink_cmd_svid_umode3);
     pmodule_SendSVSJoin(ptlink_cmd_svsjoin);
     pmodule_SendSVSPart(ptlink_cmd_svspart);
-    pmodule_cmd_swhois(ptlink_cmd_swhois);
-    pmodule_cmd_eob(ptlink_cmd_eob);
+    pmodule_SendSWhois(ptlink_cmd_swhois);
+    pmodule_SendEOB(ptlink_cmd_eob);
     pmodule_flood_mode_check(ptlink_flood_mode_check);
-    pmodule_cmd_jupe(ptlink_cmd_jupe);
+    pmodule_SendJupe(ptlink_cmd_jupe);
     pmodule_valid_nick(ptlink_valid_nick);
     pmodule_valid_chan(ptlink_valid_chan);
     pmodule_SendCTCP(ptlink_cmd_ctcp);

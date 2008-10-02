@@ -128,9 +128,9 @@ void solidircd_SendSVID(const char *nick, time_t ts);
 void solidircd_SendUnregisteredNick(User * u);
 void solidircd_SendSVID2(User * u, const char *ts);
 void solidircd_SendSVID3(User * u, const char *ts);
-void solidircd_cmd_eob();
+void solidircd_SendEOB();
 int solidircd_flood_mode_check(const char *value);
-void solidircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void solidircd_SendJupe(const char *jserver, const char *who, const char *reason);
 int solidircd_valid_nick(const char *nick);
 void solidircd_SendCTCP(const char *source, const char *dest, const char *buf);
 

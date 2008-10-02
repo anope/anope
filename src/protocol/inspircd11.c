@@ -753,7 +753,7 @@ void inspircd_cmd_pass(const char *pass)
 }
 
 /* SERVER services-dev.chatspike.net password 0 :Description here */
-void InspIRCdProto::cmd_server(const char *servname, int hop, const char *descript)
+void InspIRCdProto::SendServer(const char *servname, int hop, const char *descript)
 {
 	send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
 }
@@ -812,7 +812,7 @@ void InspIRCdProto::SendConnect()
 	if (servernum == 1) inspircd_cmd_pass(RemotePassword);
 	else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
 	else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
-	cmd_server(ServerName, 0, ServerDesc);
+	SendServer(ServerName, 0, ServerDesc);
 	send_cmd(NULL, "BURST");
 	send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
 	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
@@ -1325,7 +1325,7 @@ void InspIRCdProto::SendSVSPart(const char *source, const char *nick, const char
 	send_cmd(source, "SVSPART %s %s", nick, chan);
 }
 
-void InspIRCdProto::cmd_eob()
+void InspIRCdProto::SendEOB()
 {
 	send_cmd(NULL, "ENDBURST");
 }

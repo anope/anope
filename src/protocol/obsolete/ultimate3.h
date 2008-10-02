@@ -114,9 +114,9 @@ void ultimate3_SendSVID(const char *nick, time_t ts);
 void ultimate3_SendUnregisteredNick(User * u);
 void ultimate3_SendSVID2(User * u, const char *ts);
 void ultimate3_SendSVID3(User * u, const char *ts);
-void ultimate3_cmd_eob();
+void ultimate3_SendEOB();
 int ultimate3_flood_mode_check(const char *value);
-void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void ultimate3_SendJupe(const char *jserver, const char *who, const char *reason);
 int ultimate3_valid_nick(const char *nick);
 void ultimate3_SendCTCP(const char *source, const char *dest, const char *buf);
 

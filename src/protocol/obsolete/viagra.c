@@ -953,7 +953,7 @@ void viagra_cmd_pass(const char *pass)
 }
 
 /* SERVER */
-void viagra_cmd_server(const char *servname, int hop, const char *descript)
+void viagra_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -976,7 +976,7 @@ void viagra_SendConnect(int servernum)
         viagra_cmd_pass(RemotePassword3);
     }
     viagra_cmd_capab();
-    viagra_cmd_server(ServerName, 1, ServerDesc);
+    viagra_SendServer(ServerName, 1, ServerDesc);
     viagra_cmd_svinfo();
     viagra_cmd_burst();
 }
@@ -1506,7 +1506,7 @@ void viagra_SendSVSPart(const char *source, const char *nick, const char *chan)
     send_cmd(source, "SVSPART %s :%s", nick, chan);
 }
 
-void viagra_cmd_swhois(const char *source, const char *who, const char *mask)
+void viagra_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
@@ -1536,12 +1536,12 @@ int anope_event_invite(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void viagra_cmd_eob()
+void viagra_SendEOB()
 {
     send_cmd(NULL, "BURST 0");
 }
 
-void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void viagra_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1550,7 +1550,7 @@ void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         viagra_SendSquit(jserver, rbuf);
-    viagra_cmd_server(jserver, 2, rbuf);
+    viagra_SendServer(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1666,10 +1666,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(viagra_cmd_svid_umode3);
     pmodule_SendSVSJoin(viagra_cmd_svsjoin);
     pmodule_SendSVSPart(viagra_cmd_svspart);
-    pmodule_cmd_swhois(viagra_cmd_swhois);
-    pmodule_cmd_eob(viagra_cmd_eob);
+    pmodule_SendSWhois(viagra_cmd_swhois);
+    pmodule_SendEOB(viagra_cmd_eob);
     pmodule_flood_mode_check(viagra_flood_mode_check);
-    pmodule_cmd_jupe(viagra_cmd_jupe);
+    pmodule_SendJupe(viagra_cmd_jupe);
     pmodule_valid_nick(viagra_valid_nick);
     pmodule_valid_chan(viagra_valid_chan);
     pmodule_SendCTCP(viagra_cmd_ctcp);

@@ -1335,15 +1335,16 @@ class IRCDProto {
 		}
 		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
 		virtual void SendSVSPart(const char *, const char *, const char *) { }
-		virtual void cmd_swhois(const char *, const char *, const char *) { }
-		virtual void cmd_eob() { }
-		virtual void cmd_server(const char *, int, const char *) = 0;
-		virtual void cmd_jupe(const char *jserver, const char *who, const char *reason)
+		virtual void SendSWhois(const char *, const char *, const char *) { }
+		virtual void SendEOB() { }
+		virtual void SendServer(const char *, int, const char *) = 0;
+		virtual void SendJupe(const char *jserver, const char *who, const char *reason)
 		{
+			// XXX: this should NOT be done here. protocol modules are *only* for protocol. -- w00t
 			char rbuf[256];
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who, reason ? ": " : "", reason ? reason : "");
 			if (findserver(servlist, jserver)) SendSquit(jserver, rbuf);
-			cmd_server(jserver, 2, rbuf);
+			SendServer(jserver, 2, rbuf);
 			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 		}
 		virtual void set_umode(User *, int, const char **) = 0;

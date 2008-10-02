@@ -623,7 +623,7 @@ void unreal_cmd_pass(const char *pass)
 
 /* SERVER name hop descript */
 /* Unreal 3.2 actually sends some info about itself in the descript area */
-void UnrealIRCdProto::cmd_server(const char *servname, int hop, const char *descript)
+void UnrealIRCdProto::SendServer(const char *servname, int hop, const char *descript)
 {
 	if (Numeric) send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric, descript);
 	else send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
@@ -717,7 +717,7 @@ void UnrealIRCdProto::SendConnect()
 	if (servernum == 1) unreal_cmd_pass(RemotePassword);
 	else if (servernum == 2) unreal_cmd_pass(RemotePassword2);
 	else if (servernum == 3) unreal_cmd_pass(RemotePassword3);
-	cmd_server(ServerName, 1, ServerDesc);
+	SendServer(ServerName, 1, ServerDesc);
 }
 
 /* Events */
@@ -1322,12 +1322,12 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void UnrealIRCdProto::cmd_swhois(const char *source, const char *who, const char *mask)
+void UnrealIRCdProto::SendSWhois(const char *source, const char *who, const char *mask)
 {
 	send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
 }
 
-void UnrealIRCdProto::cmd_eob()
+void UnrealIRCdProto::SendEOB()
 {
 	send_cmd(ServerName, "%s", send_token("EOS", "ES"));
 }

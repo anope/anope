@@ -840,7 +840,7 @@ void charybdis_cmd_pass(const char *pass)
 }
 
 /* SERVER name hop descript */
-void CharybdisProto::cmd_server(const char *servname, int hop, const char *descript)
+void CharybdisProto::SendServer(const char *servname, int hop, const char *descript)
 {
 	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -854,7 +854,7 @@ void CharybdisProto::SendConnect()
 	else if (servernum == 2) charybdis_cmd_pass(RemotePassword2);
 	else if (servernum == 3) charybdis_cmd_pass(RemotePassword3);
 	charybdis_cmd_capab();
-	cmd_server(ServerName, 1, ServerDesc);
+	SendServer(ServerName, 1, ServerDesc);
 	charybdis_cmd_svinfo();
 }
 

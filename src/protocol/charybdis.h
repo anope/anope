@@ -73,7 +73,7 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendSVSHOLDDel(const char *);
 		void SendSGLineDel(const char *);
 		void SendSGLine(const char *, const char *);
-		void cmd_server(const char *, int, const char *);
+		void SendServer(const char *, int, const char *);
 		void set_umode(User *, int, const char **);
 		int valid_nick(const char *);
 		int flood_mode_check(const char *);

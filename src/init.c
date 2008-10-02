@@ -739,7 +739,7 @@ int init_secondary(int ac, char **av)
         anope_SendJoin(s_GlobalNoticer, LogChannel, time(NULL));
     }
 
-    anope_cmd_eob();
+    anope_SendEOB();
 
     /**
       * Load our delayed modeles - modules that are planing on making clients need to wait till now

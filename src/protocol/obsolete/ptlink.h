@@ -141,9 +141,9 @@ void ptlink_SendSVID(const char *nick, time_t ts);
 void ptlink_SendUnregisteredNick(User * u);
 void ptlink_SendSVID2(User * u, const char *ts);
 void ptlink_SendSVID3(User * u, const char *ts);
-void ptlink_cmd_eob();
+void ptlink_SendEOB();
 int ptlink_flood_mode_check(const char *value);
-void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void ptlink_SendJupe(const char *jserver, const char *who, const char *reason);
 int ptlink_valid_nick(const char *nick);
 void ptlink_SendCTCP(const char *source, const char *dest, const char *buf);
 

@@ -104,9 +104,9 @@ void rageircd_SendSVID(const char *nick, time_t ts);
 void rageircd_SendUnregisteredNick(User * u);
 void rageircd_SendSVID2(User * u, const char *ts);
 void rageircd_SendSVID3(User * u, const char *ts);
-void rageircd_cmd_eob();
+void rageircd_SendEOB();
 int rageircd_flood_mode_check(const char *value);
-void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason);
+void rageircd_SendJupe(const char *jserver, const char *who, const char *reason);
 int rageircd_valid_nick(const char *nick);
 void rageircd_SendCTCP(const char *source, const char *dest, const char *buf);
 

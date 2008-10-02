@@ -938,7 +938,7 @@ plexus_cmd_pass (const char *pass)
 
 /* SERVER name hop descript */
 void
-plexus_cmd_server (const char *servname, int hop, const char *descript)
+plexus_SendServer (const char *servname, int hop, const char *descript)
 {
   send_cmd (NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -956,7 +956,7 @@ plexus_SendConnect (int servernum)
     plexus_cmd_pass (RemotePassword3);
 
   plexus_cmd_capab ();
-  plexus_cmd_server (ServerName, 1, ServerDesc);
+  plexus_SendServer (ServerName, 1, ServerDesc);
   plexus_cmd_svinfo ();
 }
 
@@ -1049,7 +1049,7 @@ anope_event_eob (const char *source, int ac, const char **av)
 }
 
 void
-plexus_cmd_eob ()
+plexus_SendEOB ()
 {
   send_cmd (ServerName, "EOB");
 }
@@ -1632,7 +1632,7 @@ plexus_SendSVSPart (const char *source, const char *nick, const char *chan)
 }
 
 void
-plexus_cmd_swhois (const char *source, const char *who, const char *mask)
+plexus_SendSWhois (const char *source, const char *who, const char *mask)
 {
   /* not supported */
 }
@@ -1675,7 +1675,7 @@ anope_event_error (const char *source, int ac, const char **av)
 }
 
 void
-plexus_cmd_jupe (const char *jserver, const char *who, const char *reason)
+plexus_SendJupe (const char *jserver, const char *who, const char *reason)
 {
   char rbuf[256];
 
@@ -1684,7 +1684,7 @@ plexus_cmd_jupe (const char *jserver, const char *who, const char *reason)
 
   if (findserver(servlist, jserver))
     plexus_SendSquit (jserver, rbuf);
-  plexus_cmd_server (jserver, 2, rbuf);
+  plexus_SendServer (jserver, 2, rbuf);
   new_server (me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1801,10 +1801,10 @@ moduleAddAnopeCmds ()
   pmodule_SendSVID3 (plexus_cmd_svid_umode3);
   pmodule_SendSVSJoin (plexus_cmd_svsjoin);
   pmodule_SendSVSPart (plexus_cmd_svspart);
-  pmodule_cmd_swhois (plexus_cmd_swhois);
-  pmodule_cmd_eob (plexus_cmd_eob);
+  pmodule_SendSWhois (plexus_cmd_swhois);
+  pmodule_SendEOB (plexus_cmd_eob);
   pmodule_flood_mode_check (plexus_flood_mode_check);
-  pmodule_cmd_jupe (plexus_cmd_jupe);
+  pmodule_SendJupe (plexus_cmd_jupe);
   pmodule_valid_nick (plexus_valid_nick);
   pmodule_valid_chan (plexus_valid_chan);
   pmodule_SendCTCP (plexus_cmd_ctcp);

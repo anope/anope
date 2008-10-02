@@ -811,7 +811,7 @@ void hybrid_cmd_pass(const char *pass)
 }
 
 /* SERVER name hop descript */
-void hybrid_cmd_server(const char *servname, int hop, const char *descript)
+void hybrid_SendServer(const char *servname, int hop, const char *descript)
 {
     send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
 }
@@ -828,7 +828,7 @@ void hybrid_SendConnect(int servernum)
         hybrid_cmd_pass(RemotePassword3);
 
     hybrid_cmd_capab();
-    hybrid_cmd_server(ServerName, 1, ServerDesc);
+    hybrid_SendServer(ServerName, 1, ServerDesc);
     hybrid_cmd_svinfo();
 }
 
@@ -906,7 +906,7 @@ int anope_event_eob(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_eob()
+void hybrid_SendEOB()
 {
 /*    send_cmd(ServerName, "EOB"); */
 }
@@ -1363,7 +1363,7 @@ void hybrid_SendSVSPart(const char *source, const char *nick, const char *chan)
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_swhois(const char *source, const char *who, const char *mask)
+void hybrid_SendSWhois(const char *source, const char *who, const char *mask)
 {
     /* not supported */
 }
@@ -1398,7 +1398,7 @@ int anope_event_error(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason)
+void hybrid_SendJupe(const char *jserver, const char *who, const char *reason)
 {
     char rbuf[256];
 
@@ -1407,7 +1407,7 @@ void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason)
 
     if (findserver(servlist, jserver))
         hybrid_SendSquit(jserver, rbuf);
-    hybrid_cmd_server(jserver, 2, rbuf);
+    hybrid_SendServer(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
@@ -1517,10 +1517,10 @@ void moduleAddAnopeCmds()
     pmodule_SendSVID3(hybrid_cmd_svid_umode3);
     pmodule_SendSVSJoin(hybrid_cmd_svsjoin);
     pmodule_SendSVSPart(hybrid_cmd_svspart);
-    pmodule_cmd_swhois(hybrid_cmd_swhois);
-    pmodule_cmd_eob(hybrid_cmd_eob);
+    pmodule_SendSWhois(hybrid_cmd_swhois);
+    pmodule_SendEOB(hybrid_cmd_eob);
     pmodule_flood_mode_check(hybrid_flood_mode_check);
-    pmodule_cmd_jupe(hybrid_cmd_jupe);
+    pmodule_SendJupe(hybrid_cmd_jupe);
     pmodule_valid_nick(hybrid_valid_nick);
     pmodule_valid_chan(hybrid_valid_chan);
     pmodule_SendCTCP(hybrid_cmd_ctcp);

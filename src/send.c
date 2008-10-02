@@ -102,9 +102,9 @@ void notice_server(char *source, Server * s, char *fmt, ...)
         vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
         if (NSDefFlags & NI_MSG) {
-            ircdproto->SendGlobalPrivmsg(source, s->name, buf);
+            ircdproto->SendGlobalPrivmsg(findbot(source), s->name, buf);
         } else {
-            ircdproto->SendGlobalNotice(source, s->name, buf);
+            ircdproto->SendGlobalNotice(findbot(source), s->name, buf);
         }
         va_end(args);
     }
@@ -153,9 +153,9 @@ void notice_list(char *source, char *dest, char **text)
          * with a single space.
          */
         if (**text) {
-            ircdproto->SendNotice(source, dest, *text);
+            ircdproto->SendNotice(findbot(source), dest, *text);
         } else {
-            ircdproto->SendNotice(source, dest, " ");
+            ircdproto->SendNotice(findbot(source), dest, " ");
         }
         text++;
     }
@@ -202,9 +202,9 @@ void notice_lang(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            ircdproto->SendPrivmsg(source, dest->nick, *t ? t : " ");
+            ircdproto->SendPrivmsg(findbot(source), dest->nick, *t ? t : " ");
         } else {
-            ircdproto->SendNotice(source, dest->nick, *t ? t : " ");
+            ircdproto->SendNotice(findbot(source), dest->nick, *t ? t : " ");
         }
     }
     va_end(args);
@@ -258,9 +258,9 @@ void notice_help(const char *source, User * dest, int message, ...)
         if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
                            || (dest->na
                                && (dest->na->nc->flags & NI_MSG)))) {
-            ircdproto->SendPrivmsg(source, dest->nick, *outbuf ? outbuf : " ");
+            ircdproto->SendPrivmsg(findbot(source), dest->nick, *outbuf ? outbuf : " ");
         } else {
-            ircdproto->SendNotice(source, dest->nick, *outbuf ? outbuf : " ");
+            ircdproto->SendNotice(findbot(source), dest->nick, *outbuf ? outbuf : " ");
         }
     }
     va_end(args);

@@ -107,7 +107,7 @@ void anope_SendClientIntroduction(const char *nick, const char *user, const char
 	ircdproto->SendClientIntroduction(nick, user, host, real, modes);
 }
 
-void anope_cmd_kick(const char *source, const char *chan, const char *user, const char *fmt, ...)
+void anope_SendKick(const char *source, const char *chan, const char *user, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -116,10 +116,10 @@ void anope_cmd_kick(const char *source, const char *chan, const char *user, cons
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_kick(source, chan, user, buf);
+	ircdproto->SendKick(source, chan, user, buf);
 }
 
-void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...)
+void anope_SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -128,7 +128,7 @@ void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt,
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_notice_ops(source, dest, buf);
+	ircdproto->SendNoticeChanops(source, dest, buf);
 }
 
 void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...)

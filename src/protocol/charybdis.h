@@ -55,8 +55,8 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendSVSMode(User *, int, const char **);
 		void SendMode(const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
-		void cmd_kick(const char *, const char *, const char *, const char *);
-		void cmd_notice_ops(const char *, const char *, const char *);
+		void SendKick(const char *, const char *, const char *, const char *);
+		void SendNoticeChanops(const char *, const char *, const char *);
 		void cmd_bot_chan_mode(const char *, const char *);
 		void cmd_quit(const char *, const char *);
 		void cmd_pong(const char *, const char *);

@@ -1061,7 +1061,7 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void solidircd_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void solidircd_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 
     if (!buf) {
@@ -1255,7 +1255,7 @@ void solidircd_cmd_nick(const char *nick, const char *name, const char *modes)
     solidircd_cmd_sqline(nick, "Reserved for services");
 }
 
-void solidircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void solidircd_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1608,8 +1608,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(solidircd_cmd_guest_nick);
     pmodule_SendMode(solidircd_cmd_mode);
     pmodule_SendClientIntroduction(solidircd_cmd_bot_nick);
-    pmodule_cmd_kick(solidircd_cmd_kick);
-    pmodule_cmd_notice_ops(solidircd_cmd_notice_ops);
+    pmodule_SendKick(solidircd_cmd_kick);
+    pmodule_SendNoticeChanops(solidircd_cmd_notice_ops);
     pmodule_cmd_notice(solidircd_cmd_notice);
     pmodule_cmd_notice2(solidircd_cmd_notice2);
     pmodule_cmd_privmsg(solidircd_cmd_privmsg);

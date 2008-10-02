@@ -746,7 +746,7 @@ void bot_join(ChannelInfo * ci)
         /* Should we be invited? */
         if ((ci->c->mode & anope_get_invite_mode())
             || (ci->c->limit && ci->c->usercount >= ci->c->limit))
-            anope_cmd_notice_ops(NULL, ci->c->name,
+            anope_SendNoticeChanops(NULL, ci->c->name,
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);
     }
@@ -822,7 +822,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     av[0] = ci->name;
     av[1] = u->nick;
     av[2] = buf;
-    anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+    anope_SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, u->nick, ci->name, buf);
 }
@@ -898,10 +898,10 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        anope_cmd_kick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
+        anope_SendKick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
                        requester->nick);
     else
-        anope_cmd_kick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
+        anope_SendKick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
 
     do_kick(ci->bi->nick, 3, kav);
     send_event(EVENT_BOT_KICK, 3, kav[1], kav[0], kav[2]);
@@ -946,10 +946,10 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+        anope_SendKick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
                        requester->nick);
     else
-        anope_cmd_kick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+        anope_SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
 }

@@ -957,13 +957,13 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void BahamutIRCdProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void BahamutIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void BahamutIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
 	else send_cmd(source, "KICK %s %s", chan, user);

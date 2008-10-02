@@ -561,13 +561,13 @@ void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user,
 	cmd_sqline(nick, "Reserved for services");
 }
 
-void UnrealIRCdProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void UnrealIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
 	else send_cmd(source, "%s %s %s", send_token("KICK", "H"), chan, user);
 }
 
-void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);

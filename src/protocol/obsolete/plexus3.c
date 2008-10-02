@@ -1332,7 +1332,7 @@ plexus_cmd_nick (const char *nick, const char *name, const char *mode)
 }
 
 void
-plexus_cmd_kick (const char *source, const char *chan, const char *user, const char *buf)
+plexus_SendKick (const char *source, const char *chan, const char *user, const char *buf)
 {
   if (buf)
     {
@@ -1345,7 +1345,7 @@ plexus_cmd_kick (const char *source, const char *chan, const char *user, const c
 }
 
 void
-plexus_cmd_notice_ops (const char *source, const char *dest, const char *buf)
+plexus_SendNoticeChanops (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
     {
@@ -1750,8 +1750,8 @@ moduleAddAnopeCmds ()
   pmodule_SendGuestNick (plexus_cmd_guest_nick);
   pmodule_SendMode (plexus_cmd_mode);
   pmodule_SendClientIntroduction (plexus_cmd_bot_nick);
-  pmodule_cmd_kick (plexus_cmd_kick);
-  pmodule_cmd_notice_ops (plexus_cmd_notice_ops);
+  pmodule_SendKick (plexus_cmd_kick);
+  pmodule_SendNoticeChanops (plexus_cmd_notice_ops);
   pmodule_cmd_notice (plexus_cmd_notice);
   pmodule_cmd_notice2 (plexus_cmd_notice2);
   pmodule_cmd_privmsg (plexus_cmd_privmsg);

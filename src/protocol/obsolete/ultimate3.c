@@ -1087,7 +1087,7 @@ void ultimate3_SendClientIntroduction(const char *nick, const char *user, const 
     ultimate3_cmd_sqline(nick, "Reserved for services");
 }
 
-void ultimate3_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void ultimate3_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1096,7 +1096,7 @@ void ultimate3_cmd_kick(const char *source, const char *chan, const char *user, 
     }
 }
 
-void ultimate3_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void ultimate3_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1716,8 +1716,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(ultimate3_cmd_guest_nick);
     pmodule_SendMode(ultimate3_cmd_mode);
     pmodule_SendClientIntroduction(ultimate3_cmd_bot_nick);
-    pmodule_cmd_kick(ultimate3_cmd_kick);
-    pmodule_cmd_notice_ops(ultimate3_cmd_notice_ops);
+    pmodule_SendKick(ultimate3_cmd_kick);
+    pmodule_SendNoticeChanops(ultimate3_cmd_notice_ops);
     pmodule_cmd_notice(ultimate3_cmd_notice);
     pmodule_cmd_notice2(ultimate3_cmd_notice2);
     pmodule_cmd_privmsg(ultimate3_cmd_privmsg);

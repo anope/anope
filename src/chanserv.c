@@ -1381,7 +1381,7 @@ int check_kick(User * user, const char *chan, time_t chants)
     }
 
     anope_SendMode(whosends(ci), chan, "+b %s", mask);
-    anope_cmd_kick(whosends(ci), chan, user->nick, "%s", reason);
+    anope_SendKick(whosends(ci), chan, user->nick, "%s", reason);
 
     return 1;
 }

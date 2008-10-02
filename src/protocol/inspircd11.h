@@ -74,8 +74,8 @@ class InspIRCdProto : public IRCDProto {
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
 		void SendMode(const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
-		void cmd_kick(const char *, const char *, const char *, const char *);
-		void cmd_notice_ops(const char *, const char *, const char *);
+		void SendKick(const char *, const char *, const char *, const char *);
+		void SendNoticeChanops(const char *, const char *, const char *);
 		void cmd_bot_chan_mode(const char *, const char *);
 		void cmd_join(const char *, const char *, time_t);
 		void cmd_unsqline(const char *);

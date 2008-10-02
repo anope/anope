@@ -1133,7 +1133,7 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void viagra_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void viagra_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
     if (buf) {
         send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
@@ -1332,7 +1332,7 @@ void viagra_SendClientIntroduction(const char *nick, const char *user, const cha
     viagra_cmd_sqline(nick, "Reserved for services");
 }
 
-void viagra_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void viagra_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1615,8 +1615,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(viagra_cmd_guest_nick);
     pmodule_SendMode(viagra_cmd_mode);
     pmodule_SendClientIntroduction(viagra_cmd_bot_nick);
-    pmodule_cmd_kick(viagra_cmd_kick);
-    pmodule_cmd_notice_ops(viagra_cmd_notice_ops);
+    pmodule_SendKick(viagra_cmd_kick);
+    pmodule_SendNoticeChanops(viagra_cmd_notice_ops);
     pmodule_cmd_notice(viagra_cmd_notice);
     pmodule_cmd_notice2(viagra_cmd_notice2);
     pmodule_cmd_privmsg(viagra_cmd_privmsg);

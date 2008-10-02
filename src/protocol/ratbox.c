@@ -1025,7 +1025,7 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void RatboxProto::cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void RatboxProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
 	Uid *ud = find_uid(source);
 	User *u = finduser(user);
@@ -1033,7 +1033,7 @@ void RatboxProto::cmd_kick(const char *source, const char *chan, const char *use
 	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void RatboxProto::cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void RatboxProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);

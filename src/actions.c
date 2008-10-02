@@ -106,7 +106,7 @@ void sqline(char *mask, char *reason)
                         av[0] = c->name;
                         av[1] = cu->user->nick;
                         av[2] = reason;
-                        anope_cmd_kick(s_OperServ, av[0], av[1],
+                        anope_SendKick(s_OperServ, av[0], av[1],
                                        "Q-Lined: %s", av[2]);
                         do_kick(s_ChanServ, 3, av);
                     }

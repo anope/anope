@@ -1142,7 +1142,7 @@ void hybrid_cmd_nick(const char *nick, const char *name, const char *mode)
              ServerName, (name));
 }
 
-void hybrid_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void hybrid_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1151,7 +1151,7 @@ void hybrid_cmd_kick(const char *source, const char *chan, const char *user, con
     }
 }
 
-void hybrid_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void hybrid_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1466,8 +1466,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(hybrid_cmd_guest_nick);
     pmodule_SendMode(hybrid_cmd_mode);
     pmodule_SendClientIntroduction(hybrid_cmd_bot_nick);
-    pmodule_cmd_kick(hybrid_cmd_kick);
-    pmodule_cmd_notice_ops(hybrid_cmd_notice_ops);
+    pmodule_SendKick(hybrid_cmd_kick);
+    pmodule_SendNoticeChanops(hybrid_cmd_notice_ops);
     pmodule_cmd_notice(hybrid_cmd_notice);
     pmodule_cmd_notice2(hybrid_cmd_notice2);
     pmodule_cmd_privmsg(hybrid_cmd_privmsg);

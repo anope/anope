@@ -861,7 +861,7 @@ void rageircd_cmd_global(const char *source, const char *buf)
     send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }
 
-void rageircd_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void rageircd_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -955,7 +955,7 @@ void rageircd_SendMode(const char *source, const char *dest, const char *buf)
 }
 
 
-void rageircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void rageircd_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (buf) {
         send_cmd(source, "KICK %s %s :%s", chan, user, buf);
@@ -1575,8 +1575,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(rageircd_cmd_guest_nick);
     pmodule_SendMode(rageircd_cmd_mode);
     pmodule_SendClientIntroduction(rageircd_cmd_bot_nick);
-    pmodule_cmd_kick(rageircd_cmd_kick);
-    pmodule_cmd_notice_ops(rageircd_cmd_notice_ops);
+    pmodule_SendKick(rageircd_cmd_kick);
+    pmodule_SendNoticeChanops(rageircd_cmd_notice_ops);
     pmodule_cmd_notice(rageircd_cmd_notice);
     pmodule_cmd_notice2(rageircd_cmd_notice2);
     pmodule_cmd_privmsg(rageircd_cmd_privmsg);

@@ -1241,8 +1241,8 @@ class IRCDProto {
 		virtual void SendGuestNick(const char *, const char *, const char *, const char *, const char *) { }
 		virtual void SendMode(const char *, const char *, const char *) = 0;
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *) = 0;
-		virtual void cmd_kick(const char *, const char *, const char *, const char *) = 0;
-		virtual void cmd_notice_ops(const char *, const char *, const char *) = 0;
+		virtual void SendKick(const char *, const char *, const char *, const char *) = 0;
+		virtual void SendNoticeChanops(const char *, const char *, const char *) = 0;
 		virtual void SendMessage(BotInfo *bi, const char *dest, const char *buf)
 		{
 			if (NSDefFlags & NI_MSG)

@@ -125,10 +125,10 @@ int do_ban(User * u)
                 if ((ci->flags & CI_SIGNKICK)
                     || ((ci->flags & CI_SIGNKICK_LEVEL)
                         && !check_access(u, ci, CA_SIGNKICK)))
-                    anope_cmd_kick(whosends(ci), ci->name, u->nick,
+                    anope_SendKick(whosends(ci), ci->name, u->nick,
                                    "%s (%s)", reason, u->nick);
                 else
-                    anope_cmd_kick(whosends(ci), ci->name, u->nick, "%s",
+                    anope_SendKick(whosends(ci), ci->name, u->nick, "%s",
                                    reason);
 
 		const char *kav[4];
@@ -185,10 +185,10 @@ int do_ban(User * u)
         if ((ci->flags & CI_SIGNKICK)
             || ((ci->flags & CI_SIGNKICK_LEVEL)
                 && !check_access(u, ci, CA_SIGNKICK)))
-            anope_cmd_kick(whosends(ci), ci->name, params, "%s (%s)",
+            anope_SendKick(whosends(ci), ci->name, params, "%s (%s)",
                            reason, u->nick);
         else
-            anope_cmd_kick(whosends(ci), ci->name, params, "%s", reason);
+            anope_SendKick(whosends(ci), ci->name, params, "%s", reason);
 
 	const char *kav[4];
         kav[0] = ci->name;

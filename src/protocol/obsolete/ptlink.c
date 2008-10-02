@@ -993,7 +993,7 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ptlink_cmd_notice_ops(const char *source, const char *dest, const char *buf)
+void ptlink_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1208,7 +1208,7 @@ void ptlink_cmd_nick(const char *nick, const char *name, const char *mode)
     ptlink_cmd_sqline(nick, "Reserved for services");
 }
 
-void ptlink_cmd_kick(const char *source, const char *chan, const char *user, const char *buf)
+void ptlink_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
     if (!buf) {
         return;
@@ -1695,8 +1695,8 @@ void moduleAddAnopeCmds()
     pmodule_SendGuestNick(ptlink_cmd_guest_nick);
     pmodule_SendMode(ptlink_cmd_mode);
     pmodule_SendClientIntroduction(ptlink_cmd_bot_nick);
-    pmodule_cmd_kick(ptlink_cmd_kick);
-    pmodule_cmd_notice_ops(ptlink_cmd_notice_ops);
+    pmodule_SendKick(ptlink_cmd_kick);
+    pmodule_SendNoticeChanops(ptlink_cmd_notice_ops);
     pmodule_cmd_notice(ptlink_cmd_notice);
     pmodule_cmd_notice2(ptlink_cmd_notice2);
     pmodule_cmd_privmsg(ptlink_cmd_privmsg);

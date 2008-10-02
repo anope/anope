@@ -1256,6 +1256,13 @@ class IRCDProto {
 			else
 				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT");
 		}
+		virtual void SendPartInternal(const char *nick, const char *chan, const char *buf)
+		{
+			if (buf)
+				send_cmd(nick, "PART %s :%s", chan, buf);
+			else
+				send_cmd(nick, "PART %s", chan);
+		}
 	public:
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
@@ -1390,12 +1397,17 @@ class IRCDProto {
 		{
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
 		}
-		virtual void SendPart(const char *nick, const char *chan, const char *buf)
+		virtual void SendPart(const char *nick, const char *chan, const char *fmt, ...)
 		{
-			if (buf)
-				send_cmd(nick, "PART %s :%s", chan, buf);
-			else
-				send_cmd(nick, "PART %s", chan);
+			if (fmt) {
+				va_list args;
+				char buf[BUFSIZE] = "";
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+				SendPartInternal(nick, chan, buf);
+			}
+			else SendPartInternal(nick, chan, NULL);
 		}
 		virtual void SendGlobops(const char *source, const char *buf)
 		{

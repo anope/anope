@@ -750,7 +750,7 @@ void RatboxProto::SendClientIntroduction(const char *nick, const char *user, con
 	SendSQLine(nick, "Reserved for services");
 }
 
-void RatboxProto::SendPart(const char *nick, const char *chan, const char *buf)
+void RatboxProto::SendPartInternal(const char *nick, const char *chan, const char *buf)
 {
 	Uid *ud = find_uid(nick);
 	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);

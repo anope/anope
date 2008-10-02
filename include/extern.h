@@ -1123,7 +1123,6 @@ E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ..
 E void anope_SendBanDel(const char *name, const char *nick);				  		  			      /* MODE -b */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_SendChangeBotNick(const char *oldnick, const char *newnick);             	  		  /* NICK */
-E void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendSGLine(const char *mask, const char *reason);			  	  		  /* SGLINE */

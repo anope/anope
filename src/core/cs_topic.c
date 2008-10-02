@@ -111,7 +111,7 @@ int do_cs_topic(User * u)
                         c->topic_time);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
-                anope_SendPart(s_ChanServ, c->name, NULL);
+                ircdproto->SendPart(s_ChanServ, c->name, NULL);
             }
         }
     }

@@ -1244,7 +1244,7 @@ static void timeout_leave(Timeout * to)
     if (ci)                     /* Check cos the channel may be dropped in the meantime */
         ci->flags &= ~CI_INHABIT;
 
-    anope_SendPart(s_ChanServ, chan, NULL);
+    ircdproto->SendPart(s_ChanServ, chan, NULL);
     free(to->data);
 }
 
@@ -1456,7 +1456,7 @@ void restore_topic(const char *chan)
                     c->topic ? c->topic : "", c->topic_time);
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_SendPart(s_ChanServ, c->name, NULL);
+            ircdproto->SendPart(s_ChanServ, c->name, NULL);
         }
     }
 }
@@ -1520,7 +1520,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
-            anope_SendPart(s_ChanServ, c->ci->name, NULL);
+            ircdproto->SendPart(s_ChanServ, c->ci->name, NULL);
         }
     }
     return 1;
@@ -1778,7 +1778,7 @@ int delchan(ChannelInfo * ci)
     }
     if (ci->c) {
         if (ci->bi && ci->c->usercount >= BSMinUsers) {
-            anope_SendPart(ci->bi->nick, ci->c->name, NULL);
+            ircdproto->SendPart(ci->bi->nick, ci->c->name, NULL);
         }
         ci->c->ci = NULL;
     }

@@ -52,6 +52,7 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendKickInternal(const char *, const char *, const char *, const char *);
 		void SendNoticeChanopsInternal(const char *, const char *, const char *);
 		void SendQuitInternal(const char *, const char *);
+		void SendPartInternal(const char *, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendVhostDel(User *);
@@ -63,7 +64,6 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendJoin(const char *, const char *, time_t);
 		void SendSQLineDel(const char *);
 		void SendInvite(const char *, const char *, const char *);
-		void SendPart(const char *, const char *, const char *);
 		void SendGlobops(const char *, const char *);
 		void SendSQLine(const char *, const char *);
 		void SendForceNickChange(const char *, const char *, time_t);

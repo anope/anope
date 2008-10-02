@@ -43,19 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...)
-{
-	if (fmt) {
-		va_list args;
-		char buf[BUFSIZE] = "";
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-		ircdproto->SendPart(nick, chan, buf);
-	}
-	else ircdproto->SendPart(nick, chan, NULL);
-}
-
 void anope_SendGlobops(const char *source, const char *fmt, ...)
 {
 	va_list args;

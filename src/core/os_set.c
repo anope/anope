@@ -195,7 +195,7 @@ int do_set(User * u)
         } else if (LogChannel && (stricmp(setting, "off") == 0)) {
             alog("No longer sending log messages to a channel");
             if (ircd->join2msg) {
-                anope_SendPart(s_GlobalNoticer, LogChannel, NULL);
+                ircdproto->SendPart(s_GlobalNoticer, LogChannel, NULL);
             }
             logchan = 0;
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);

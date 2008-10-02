@@ -154,7 +154,7 @@ int my_cs_appendtopic(User * u)
         ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
-                anope_SendPart(s_ChanServ, c->name, NULL);
+                ircdproto->SendPart(s_ChanServ, c->name, NULL);
             }
         }
     }

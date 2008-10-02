@@ -813,7 +813,7 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 	SendSQLine(nick, "Reserved for services");
 }
 
-void CharybdisProto::SendPart(const char *nick, const char *chan, const char *buf)
+void CharybdisProto::SendPartInternal(const char *nick, const char *chan, const char *buf)
 {
 	User *u = finduser(nick);
 	if (buf) send_cmd(UseTS6 ? u->uid : nick, "PART %s :%s", chan, buf);

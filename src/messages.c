@@ -120,8 +120,12 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
     if (!u) {
         alog("%s: user record for %s not found", msg, source);
-        ircdproto->SendMessage(receiver, source,
+		/* Two lookups naughty, however, this won't happen often. -- w00t */
+		if (findbot(receiver))
+		{
+        	ircdproto->SendMessage(findbot(receiver), source,
                          getstring(NULL, USER_RECORD_NOT_FOUND));
+		}
         return MOD_CONT;
     }
 

@@ -1384,7 +1384,7 @@ class IRCDProto {
 			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
-		virtual void SendQuit(BotInfo *bi, const char *fmt, ...)
+		virtual void SendQuit(BotInfo *bi, const char *fmt, ...);
 		virtual void SendQuit(const char *source, const char *fmt, ...)
 		{
 			va_list args;

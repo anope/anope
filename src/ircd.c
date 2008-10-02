@@ -102,9 +102,9 @@ void anope_SendMode(const char *source, const char *dest, const char *fmt, ...)
 	ircdproto->SendMode(source, dest, buf);
 }
 
-void anope_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void anope_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-	ircdproto->cmd_bot_nick(nick, user, host, real, modes);
+	ircdproto->SendClientIntroduction(nick, user, host, real, modes);
 }
 
 void anope_cmd_kick(const char *source, const char *chan, const char *user, const char *fmt, ...)

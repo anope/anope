@@ -969,7 +969,7 @@ plexus_cmd_svsinfo ()
 
 
 void
-plexus_cmd_bot_nick (const char *nick, const char *user, const char *host, const char *real,
+plexus_SendClientIntroduction (const char *nick, const char *user, const char *host, const char *real,
 		     const char *modes)
 {
   EnforceQlinedNick (nick, NULL);
@@ -1749,7 +1749,7 @@ moduleAddAnopeCmds ()
   pmodule_cmd_nick (plexus_cmd_nick);
   pmodule_SendGuestNick (plexus_cmd_guest_nick);
   pmodule_SendMode (plexus_cmd_mode);
-  pmodule_cmd_bot_nick (plexus_cmd_bot_nick);
+  pmodule_SendClientIntroduction (plexus_cmd_bot_nick);
   pmodule_cmd_kick (plexus_cmd_kick);
   pmodule_cmd_notice_ops (plexus_cmd_notice_ops);
   pmodule_cmd_notice (plexus_cmd_notice);

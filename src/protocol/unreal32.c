@@ -553,7 +553,7 @@ void UnrealIRCdProto::SendMode(const char *source, const char *dest, const char 
 	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
 }
 
-void UnrealIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	EnforceQlinedNick(nick, s_BotServ);
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,

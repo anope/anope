@@ -1323,7 +1323,7 @@ void viagra_cmd_351(const char *source)
              EncModule, version_build);
 }
 
-void viagra_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void viagra_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                          const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1614,7 +1614,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(viagra_cmd_nick);
     pmodule_SendGuestNick(viagra_cmd_guest_nick);
     pmodule_SendMode(viagra_cmd_mode);
-    pmodule_cmd_bot_nick(viagra_cmd_bot_nick);
+    pmodule_SendClientIntroduction(viagra_cmd_bot_nick);
     pmodule_cmd_kick(viagra_cmd_kick);
     pmodule_cmd_notice_ops(viagra_cmd_notice_ops);
     pmodule_cmd_notice(viagra_cmd_notice);

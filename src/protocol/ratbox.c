@@ -822,7 +822,7 @@ void RatboxProto::cmd_connect()
 	ratbox_cmd_svinfo();
 }
 
-void RatboxProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void RatboxProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	EnforceQlinedNick(nick, NULL);
 	if (UseTS6) {

@@ -64,7 +64,7 @@ void ultimate3_cmd_376(const char *source);
 void ultimate3_cmd_nick(const char *nick, const char *name, const char *modes);
 void ultimate3_SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes);
 void ultimate3_SendMode(const char *source, const char *dest, const char *buf);
-void ultimate3_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes);
+void ultimate3_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes);
 void ultimate3_cmd_kick(const char *source, const char *chan, const char *user, const char *buf);
 void ultimate3_cmd_notice_ops(const char *source, const char *dest, const char *buf);
 void ultimate3_cmd_notice(const char *source, const char *dest, const char *buf);

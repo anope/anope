@@ -164,7 +164,7 @@ int do_bot(User * u)
             EnforceQlinedNick(nick, s_BotServ);
 
             /* We make the bot online, ready to serve */
-            anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
+            anope_SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                ircd->botserv_bot_mode);
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
@@ -292,14 +292,14 @@ int do_bot(User * u)
 
             /* If only the nick changes, we just make the bot change his nick,
                else we must make it quit and rejoin. We must not forget to set
-			   the Q:Line either (it's otherwise set in anope_cmd_bot_nick) */
+			   the Q:Line either (it's otherwise set in anope_SendClientIntroduction) */
             if (!user) {
                 anope_cmd_chg_nick(oldnick, bi->nick);
 				anope_cmd_sqline(bi->nick, "Reserved for services");
             } else {
                 anope_cmd_quit(oldnick, "Quit: Be right back");
 
-                anope_cmd_bot_nick(bi->nick, bi->user, bi->host, bi->real,
+                anope_SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
                 bi->RejoinAll();
             }

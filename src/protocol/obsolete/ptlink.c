@@ -1379,7 +1379,7 @@ int anope_event_away(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ptlink_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void ptlink_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                          char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1694,7 +1694,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(ptlink_cmd_nick);
     pmodule_SendGuestNick(ptlink_cmd_guest_nick);
     pmodule_SendMode(ptlink_cmd_mode);
-    pmodule_cmd_bot_nick(ptlink_cmd_bot_nick);
+    pmodule_SendClientIntroduction(ptlink_cmd_bot_nick);
     pmodule_cmd_kick(ptlink_cmd_kick);
     pmodule_cmd_notice_ops(ptlink_cmd_notice_ops);
     pmodule_cmd_notice(ptlink_cmd_notice);

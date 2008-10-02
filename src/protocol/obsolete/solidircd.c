@@ -1333,7 +1333,7 @@ void solidircd_cmd_351(const char *source)
 
 }
 
-void solidircd_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void solidircd_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                             const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1607,7 +1607,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(solidircd_cmd_nick);
     pmodule_SendGuestNick(solidircd_cmd_guest_nick);
     pmodule_SendMode(solidircd_cmd_mode);
-    pmodule_cmd_bot_nick(solidircd_cmd_bot_nick);
+    pmodule_SendClientIntroduction(solidircd_cmd_bot_nick);
     pmodule_cmd_kick(solidircd_cmd_kick);
     pmodule_cmd_notice_ops(solidircd_cmd_notice_ops);
     pmodule_cmd_notice(solidircd_cmd_notice);

@@ -839,7 +839,7 @@ void hybrid_cmd_svsinfo()
 
 
 
-void hybrid_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void hybrid_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                          const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1465,7 +1465,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(hybrid_cmd_nick);
     pmodule_SendGuestNick(hybrid_cmd_guest_nick);
     pmodule_SendMode(hybrid_cmd_mode);
-    pmodule_cmd_bot_nick(hybrid_cmd_bot_nick);
+    pmodule_SendClientIntroduction(hybrid_cmd_bot_nick);
     pmodule_cmd_kick(hybrid_cmd_kick);
     pmodule_cmd_notice_ops(hybrid_cmd_notice_ops);
     pmodule_cmd_notice(hybrid_cmd_notice);

@@ -1078,7 +1078,7 @@ void ultimate3_SendMode(const char *source, const char *dest, const char *buf)
     send_cmd(source, "MODE %s %s", dest, buf);
 }
 
-void ultimate3_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void ultimate3_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                             const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1715,7 +1715,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(ultimate3_cmd_nick);
     pmodule_SendGuestNick(ultimate3_cmd_guest_nick);
     pmodule_SendMode(ultimate3_cmd_mode);
-    pmodule_cmd_bot_nick(ultimate3_cmd_bot_nick);
+    pmodule_SendClientIntroduction(ultimate3_cmd_bot_nick);
     pmodule_cmd_kick(ultimate3_cmd_kick);
     pmodule_cmd_notice_ops(ultimate3_cmd_notice_ops);
     pmodule_cmd_notice(ultimate3_cmd_notice);

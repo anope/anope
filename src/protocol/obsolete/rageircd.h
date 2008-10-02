@@ -54,7 +54,7 @@ void rageircd_cmd_376(const char *source);
 void rageircd_cmd_nick(const char *nick, const char *name, const char *modes);
 void rageircd_SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes);
 void rageircd_SendMode(const char *source, const char *dest, const char *buf);
-void rageircd_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes);
+void rageircd_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes);
 void rageircd_cmd_kick(const char *source, const char *chan, const char *user, const char *buf);
 void rageircd_cmd_notice_ops(const char *source, const char *dest, const char *buf);
 void rageircd_cmd_notice(const char *source, const char *dest, const char *buf);

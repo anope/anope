@@ -21,7 +21,7 @@
 #define GetHost(x) common_get_vhost(x)
 
 #define NEWNICK(nick,user,host,real,modes,qline) \
-   anope_cmd_bot_nick(nick,user,host,real,modes)
+   anope_SendClientIntroduction(nick,user,host,real,modes)
 
 #define s_akill(user, host, who, when, expires, reason) \
   anope_SendAkill(user, host, who, when, expires, reason)

@@ -858,7 +858,7 @@ void CharybdisProto::cmd_connect()
 	charybdis_cmd_svinfo();
 }
 
-void CharybdisProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	EnforceQlinedNick(nick, NULL);
 	if (UseTS6) {

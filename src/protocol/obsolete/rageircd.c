@@ -1183,7 +1183,7 @@ void rageircd_cmd_quit(const char *source, const char *buf)
     }
 }
 
-void rageircd_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real,
+void rageircd_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
                            const char *modes)
 {
     EnforceQlinedNick(nick, s_BotServ);
@@ -1574,7 +1574,7 @@ void moduleAddAnopeCmds()
     pmodule_cmd_nick(rageircd_cmd_nick);
     pmodule_SendGuestNick(rageircd_cmd_guest_nick);
     pmodule_SendMode(rageircd_cmd_mode);
-    pmodule_cmd_bot_nick(rageircd_cmd_bot_nick);
+    pmodule_SendClientIntroduction(rageircd_cmd_bot_nick);
     pmodule_cmd_kick(rageircd_cmd_kick);
     pmodule_cmd_notice_ops(rageircd_cmd_notice_ops);
     pmodule_cmd_notice(rageircd_cmd_notice);

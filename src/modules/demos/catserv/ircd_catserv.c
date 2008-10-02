@@ -81,7 +81,7 @@ int my_privmsg(char *source, int ac, char **av)
 
 void addClient(char *nick, char *realname)
 {
-    anope_cmd_bot_nick(nick, "catserv", "meow.meow.land", realname, "+");
+    anope_SendClientIntroduction(nick, "catserv", "meow.meow.land", realname, "+");
 }
 
 void delClient(void)

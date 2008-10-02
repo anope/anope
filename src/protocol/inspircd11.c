@@ -716,7 +716,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void InspIRCdProto::cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void InspIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 	send_cmd(nick, "OPERTYPE Service");

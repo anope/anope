@@ -30,7 +30,7 @@
 
 #define s_svsnoop(server, set) anope_SendSVSNOOP(server, set)
 
-#define s_sqline(mask, reason) anope_cmd_sqline(mask, reason)
+#define s_sqline(mask, reason) anope_SendSQLine(mask, reason)
 
 #define s_sgline(mask, reason) anope_cmd_sgline(mask, reason)
 #define s_szline(mask, reason) anope_cmd_szline(mask, reason)

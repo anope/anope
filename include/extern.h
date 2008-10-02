@@ -1119,7 +1119,7 @@ E void anope_SendAkill(const char *user, const char *host, const char *who, time
 E void anope_cmd_capab();						  	  		  /* CAPAB */
 E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
-E void anope_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
+E void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost);    			  /* CHGHOST + CHGIDENT */
 E void anope_SendVhostDel(User *u);
 E void anope_cmd_connect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
@@ -1132,7 +1132,7 @@ E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ..
 E void anope_cmd_unban(const char *name, const char *nick);				  		  			      /* MODE -b */
 E void anope_SendBotOp(const char *nick, const char *chan);			  		  /* MODE BotServ */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
-E void anope_cmd_chg_nick(const char *oldnick, const char *newnick);             	  		  /* NICK */
+E void anope_SendChangeBotNick(const char *oldnick, const char *newnick);             	  		  /* NICK */
 E void anope_SendClientIntroduction(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
 E void anope_SendGuestNick(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
 E void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
@@ -1149,9 +1149,9 @@ E void anope_cmd_protoctl();                                         			  /* PRO
 E void anope_SendQuit(const char *source, const char *fmt, ...);           	  		  /* QUIT */
 E void anope_SendAkillDel(const char *user, const char *host);			  		  /* RAKILL */
 E void anope_cmd_sgline(const char *mask, const char *reason);			  	  		  /* SGLINE */
-E void anope_cmd_sqline(const char *mask, const char *reason);                   	  		  /* SQLINE */
+E void anope_SendSQLine(const char *mask, const char *reason);                   	  		  /* SQLINE */
 E void anope_cmd_szline(const char *mask, const char *reason, const char *whom);				  /* SZLINE */
-E void anope_cmd_squit(const char *servname, const char *message);               	  		  /* SQUIT  */
+E void anope_SendSquit(const char *servname, const char *message);               	  		  /* SQUIT  */
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svshold(const char *nick);				  	  		  /* SVSHOLD */
@@ -1161,9 +1161,9 @@ E void anope_cmd_svsjoin(const char *source, const char *nick,const char *chan, 
 E void anope_SendSVSKill(const char *source, const char *user, const char *fmt, ...);     		  /* SVSKILL */
 E void anope_SendSVSMode(User * u, int ac, const char **av);   	        	  		  /* SVSMODE */
 E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
-E void anope_cmd_svsnick(const char *nick,const char *newnick, time_t when);     	  		  /* SVSNICK */
+E void anope_SendForceNickChange(const char *nick,const char *newnick, time_t when);     	  		  /* SVSNICK */
 E void anope_SendSVSNOOP(const char *server, int set);			  	  		  /* SVSNOOP */
-E void anope_cmd_svso(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */
+E void anope_SendSVSO(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */
 E void anope_cmd_svspart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_cmd_swhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */

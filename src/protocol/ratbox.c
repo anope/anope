@@ -677,7 +677,7 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void RatboxProto::cmd_sqline(const char *mask, const char *reason)
+void RatboxProto::SendSQLine(const char *mask, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
@@ -831,7 +831,7 @@ void RatboxProto::SendClientIntroduction(const char *nick, const char *user, con
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	cmd_sqline(nick, "Reserved for services");
+	SendSQLine(nick, "Reserved for services");
 }
 
 void RatboxProto::SendPart(const char *nick, const char *chan, const char *buf)

@@ -247,34 +247,34 @@ void anope_SendGlobops(const char *source, const char *fmt, ...)
 	ircdproto->SendGlobops(source, buf);
 }
 
-void anope_cmd_sqline(const char *mask, const char *reason)
+void anope_SendSQLine(const char *mask, const char *reason)
 {
-	ircdproto->cmd_sqline(mask, reason);
+	ircdproto->SendSQLine(mask, reason);
 }
 
-void anope_cmd_squit(const char *servname, const char *message)
+void anope_SendSquit(const char *servname, const char *message)
 {
-	ircdproto->cmd_squit(servname, message);
+	ircdproto->SendSquit(servname, message);
 }
 
-void anope_cmd_svso(const char *source, const char *nick, const char *flag)
+void anope_SendSVSO(const char *source, const char *nick, const char *flag)
 {
-	ircdproto->cmd_svso(source, nick, flag);
+	ircdproto->SendSVSO(source, nick, flag);
 }
 
-void anope_cmd_chg_nick(const char *oldnick, const char *newnick)
+void anope_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
-	ircdproto->cmd_chg_nick(oldnick, newnick);
+	ircdproto->SendChangeBotNick(oldnick, newnick);
 }
 
-void anope_cmd_svsnick(const char *source, const char *guest, time_t when)
+void anope_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
-	ircdproto->cmd_svsnick(source, guest, when);
+	ircdproto->SendForceNickChange(source, guest, when);
 }
 
-void anope_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void anope_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
-	ircdproto->cmd_vhost_on(nick, vIdent, vhost);
+	ircdproto->SendVhost(nick, vIdent, vhost);
 }
 
 void anope_cmd_connect()

@@ -119,7 +119,7 @@ int do_svsnick(User * u)
         notice_lang(s_OperServ, u, OPER_SVSNICK_NEWNICK, nick, newnick);
         anope_SendGlobops(s_OperServ, "%s used SVSNICK to change %s to %s",
                          u->nick, nick, newnick);
-        anope_cmd_svsnick(nick, newnick, time(NULL));
+        anope_SendForceNickChange(nick, newnick, time(NULL));
     }
     return MOD_CONT;
 }

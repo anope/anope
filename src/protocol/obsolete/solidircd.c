@@ -727,7 +727,7 @@ int anope_event_vs(const char *source, int ac, const char **av)
 }
 
 /* SQLINE */
-void solidircd_cmd_sqline(const char *mask, const char *reason)
+void solidircd_SendSQLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -865,7 +865,7 @@ void solidircd_SendSVSMode(User * u, int ac, const char **av)
  *        parv[1] = server name
  *        parv[2] = comment
 */
-void solidircd_cmd_squit(const char *servname, const char *message)
+void solidircd_SendSquit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -1252,7 +1252,7 @@ void solidircd_cmd_nick(const char *nick, const char *name, const char *modes)
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
              (long int) time(NULL), modes, ServiceUser, ServiceHost,
              ServerName, name);
-    solidircd_cmd_sqline(nick, "Reserved for services");
+    solidircd_SendSQLine(nick, "Reserved for services");
 }
 
 void solidircd_SendKick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1339,7 +1339,7 @@ void solidircd_SendClientIntroduction(const char *nick, const char *user, const 
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
-    solidircd_cmd_sqline(nick, "Reserved for services");
+    solidircd_SendSQLine(nick, "Reserved for services");
 }
 
 /* SVSNICK */
@@ -1348,7 +1348,7 @@ void solidircd_SendClientIntroduction(const char *nick, const char *user, const 
  * parv[2] = new nickname
  * parv[3] = timestamp
  */
-void solidircd_cmd_svsnick(const char *source, const char *guest, time_t when)
+void solidircd_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1363,7 +1363,7 @@ void solidircd_SendGuestNick(const char *nick, const char *user, const char *hos
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void solidircd_cmd_svso(const char *source, const char *nick, const char *flag)
+void solidircd_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
@@ -1377,7 +1377,7 @@ void solidircd_cmd_chghost(const char *nick, const char *vhost)
 }
 
 
-void solidircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void solidircd_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     send_cmd(s_HostServ, "SVSMODE %s +v", nick);
     solidircd_cmd_chghost(nick, vhost);
@@ -1422,7 +1422,7 @@ void solidircd_cmd_svid_umode3(User * u, const char *ts)
 }
 
 /* NICK <newnick>  */
-void solidircd_cmd_chg_nick(const char *oldnick, const char *newnick)
+void solidircd_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1542,7 +1542,7 @@ void solidircd_cmd_jupe(const char *jserver, const char *who, const char *reason
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        solidircd_cmd_squit(jserver, rbuf);
+        solidircd_SendSquit(jserver, rbuf);
     solidircd_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1638,12 +1638,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(solidircd_cmd_211);
     pmodule_SendGlobops(solidircd_cmd_global);
     pmodule_SendGlobops_legacy(solidircd_cmd_global_legacy);
-    pmodule_cmd_sqline(solidircd_cmd_sqline);
-    pmodule_cmd_squit(solidircd_cmd_squit);
-    pmodule_cmd_svso(solidircd_cmd_svso);
-    pmodule_cmd_chg_nick(solidircd_cmd_chg_nick);
-    pmodule_cmd_svsnick(solidircd_cmd_svsnick);
-    pmodule_cmd_vhost_on(solidircd_cmd_vhost_on);
+    pmodule_SendSQLine(solidircd_cmd_sqline);
+    pmodule_SendSquit(solidircd_cmd_squit);
+    pmodule_SendSVSO(solidircd_cmd_svso);
+    pmodule_SendChangeBotNick(solidircd_cmd_chg_nick);
+    pmodule_SendForceNickChange(solidircd_cmd_svsnick);
+    pmodule_SendVhost(solidircd_cmd_vhost_on);
     pmodule_cmd_connect(solidircd_cmd_connect);
     pmodule_cmd_svshold(solidircd_cmd_svshold);
     pmodule_cmd_release_svshold(solidircd_cmd_release_svshold);

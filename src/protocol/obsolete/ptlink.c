@@ -667,7 +667,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 	parv[1] = sqlined nick/mask
 	parv[2] = reason
 */
-void ptlink_cmd_sqline(const char *mask, const char *reason)
+void ptlink_SendSQLine(const char *mask, const char *reason)
 {
     send_cmd(ServerName, "SQLINE %s :%s", mask, reason);
 }
@@ -792,7 +792,7 @@ int anope_event_error(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void ptlink_cmd_squit(const char *servname, const char *message)
+void ptlink_SendSquit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -1205,7 +1205,7 @@ void ptlink_cmd_nick(const char *nick, const char *name, const char *mode)
     send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", nick,
              (unsigned long int) time(NULL), mode, ServiceUser,
              ServiceHost, ServiceHost, ServerName, name);
-    ptlink_cmd_sqline(nick, "Reserved for services");
+    ptlink_SendSQLine(nick, "Reserved for services");
 }
 
 void ptlink_SendKick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1260,7 +1260,7 @@ void ptlink_SendVhostDel(User * u)
     /* does not support vhosting */
 }
 
-void ptlink_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void ptlink_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     User *u;
 
@@ -1386,7 +1386,7 @@ void ptlink_SendClientIntroduction(const char *nick, const char *user, const cha
     send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", nick,
              (unsigned long int) time(NULL), modes, user, host, host,
              ServerName, real);
-    ptlink_cmd_sqline(nick, "Reserved for services");
+    ptlink_SendSQLine(nick, "Reserved for services");
 
 }
 
@@ -1466,7 +1466,7 @@ void ptlink_cmd_sgline(const char *mask, const char *reason)
 	parv[2] = new nick
   e.g.:	:NickServ SVSNICK Smiler 67455223 _Smiler-
 */
-void ptlink_cmd_svsnick(const char *source, const char *guest, time_t when)
+void ptlink_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1495,7 +1495,7 @@ void ptlink_SendSVSMode_chan(const char *name, const char *mode, const char *nic
     /* Not Supported by this IRCD */
 }
 
-void ptlink_cmd_svso(const char *source, const char *nick, const char *flag)
+void ptlink_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
@@ -1534,7 +1534,7 @@ void ptlink_cmd_svid_umode3(User * u, const char *ts)
 	parv[1] = new nick
 	parv[2] = TS (timestamp from user's server when nick changed was received)
 */
-void ptlink_cmd_chg_nick(const char *oldnick, const char *newnick)
+void ptlink_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1629,7 +1629,7 @@ void ptlink_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        ptlink_cmd_squit(jserver, rbuf);
+        ptlink_SendSquit(jserver, rbuf);
     ptlink_cmd_server(jserver, 1, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1725,12 +1725,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(ptlink_cmd_211);
     pmodule_SendGlobops(ptlink_cmd_global);
     pmodule_SendGlobops_legacy(ptlink_cmd_global_legacy);
-    pmodule_cmd_sqline(ptlink_cmd_sqline);
-    pmodule_cmd_squit(ptlink_cmd_squit);
-    pmodule_cmd_svso(ptlink_cmd_svso);
-    pmodule_cmd_chg_nick(ptlink_cmd_chg_nick);
-    pmodule_cmd_svsnick(ptlink_cmd_svsnick);
-    pmodule_cmd_vhost_on(ptlink_cmd_vhost_on);
+    pmodule_SendSQLine(ptlink_cmd_sqline);
+    pmodule_SendSquit(ptlink_cmd_squit);
+    pmodule_SendSVSO(ptlink_cmd_svso);
+    pmodule_SendChangeBotNick(ptlink_cmd_chg_nick);
+    pmodule_SendForceNickChange(ptlink_cmd_svsnick);
+    pmodule_SendVhost(ptlink_cmd_vhost_on);
     pmodule_cmd_connect(ptlink_cmd_connect);
     pmodule_cmd_svshold(ptlink_cmd_svshold);
     pmodule_cmd_release_svshold(ptlink_cmd_release_svshold);

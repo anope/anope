@@ -115,7 +115,7 @@ int do_forbid(User * u)
 
 
         if (ircd->sqline) {
-            anope_cmd_sqline(na->nick, ((reason) ? reason : "Forbidden"));
+            anope_SendSQLine(na->nick, ((reason) ? reason : "Forbidden"));
         }
 
         if (WallForbid)

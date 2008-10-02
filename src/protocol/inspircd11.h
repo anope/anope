@@ -79,9 +79,9 @@ class InspIRCdProto : public IRCDProto {
 		void SendBotOp(const char *, const char *);
 		void SendJoin(const char *, const char *, time_t);
 		void SendSQLineDel(const char *);
-		void cmd_sqline(const char *, const char *);
-		void cmd_squit(const char *, const char *);
-		void cmd_vhost_on(const char *, const char *, const char *);
+		void SendSQLine(const char *, const char *);
+		void SendSquit(const char *, const char *);
+		void SendVhost(const char *, const char *, const char *);
 		void cmd_connect();
 		void cmd_svshold(const char *);
 		void cmd_release_svshold(const char *);

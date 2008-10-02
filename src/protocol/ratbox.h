@@ -67,8 +67,8 @@ class RatboxProto : public IRCDProto {
 		void SendInvite(const char *, const char *, const char *);
 		void SendPart(const char *, const char *, const char *);
 		void SendGlobops(const char *, const char *);
-		void cmd_sqline(const char *, const char *);
-		void cmd_svsnick(const char *, const char *, time_t) { } // Ratbox doesn't have an SVSNICK command
+		void SendSQLine(const char *, const char *);
+		void SendForceNickChange(const char *, const char *, time_t) { } // Ratbox doesn't have an SVSNICK command
 		void cmd_connect();
 		void cmd_unsgline(const char *);
 		void cmd_sgline(const char *, const char *);

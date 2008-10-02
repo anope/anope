@@ -653,7 +653,7 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 
-void hybrid_cmd_sqline(const char *mask, const char *reason)
+void hybrid_SendSQLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -709,7 +709,7 @@ void hybrid_SendVhostDel(User * u)
     /* does not support vhosting */
 }
 
-void hybrid_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void hybrid_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     /* does not support vhosting */
 }
@@ -1192,7 +1192,7 @@ void hybrid_SendInvite(const char *source, const char *chan, const char *nick)
 }
 
 /* SQUIT */
-void hybrid_cmd_squit(const char *servname, const char *message)
+void hybrid_SendSquit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1268,7 +1268,7 @@ void hybrid_cmd_release_svshold(const char *nick)
 }
 
 /* SVSNICK */
-void hybrid_cmd_svsnick(const char *nick, const char *newnick, time_t when)
+void hybrid_SendForceNickChange(const char *nick, const char *newnick, time_t when)
 {
     /* Not Supported by this IRCD */
 }
@@ -1280,7 +1280,7 @@ void hybrid_SendGuestNick(const char *nick, const char *user, const char *host, 
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void hybrid_cmd_svso(const char *source, const char *nick, const char *flag)
+void hybrid_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
@@ -1324,7 +1324,7 @@ void hybrid_cmd_svid_umode3(User * u, const char *ts)
 }
 
 /* NICK <newnick>  */
-void hybrid_cmd_chg_nick(const char *oldnick, const char *newnick)
+void hybrid_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1406,7 +1406,7 @@ void hybrid_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        hybrid_cmd_squit(jserver, rbuf);
+        hybrid_SendSquit(jserver, rbuf);
     hybrid_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1496,12 +1496,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(hybrid_cmd_211);
     pmodule_SendGlobops(hybrid_cmd_global);
     pmodule_SendGlobops_legacy(hybrid_cmd_global_legacy);
-    pmodule_cmd_sqline(hybrid_cmd_sqline);
-    pmodule_cmd_squit(hybrid_cmd_squit);
-    pmodule_cmd_svso(hybrid_cmd_svso);
-    pmodule_cmd_chg_nick(hybrid_cmd_chg_nick);
-    pmodule_cmd_svsnick(hybrid_cmd_svsnick);
-    pmodule_cmd_vhost_on(hybrid_cmd_vhost_on);
+    pmodule_SendSQLine(hybrid_cmd_sqline);
+    pmodule_SendSquit(hybrid_cmd_squit);
+    pmodule_SendSVSO(hybrid_cmd_svso);
+    pmodule_SendChangeBotNick(hybrid_cmd_chg_nick);
+    pmodule_SendForceNickChange(hybrid_cmd_svsnick);
+    pmodule_SendVhost(hybrid_cmd_vhost_on);
     pmodule_cmd_connect(hybrid_cmd_connect);
     pmodule_cmd_svshold(hybrid_cmd_svshold);
     pmodule_cmd_release_svshold(hybrid_cmd_release_svshold);

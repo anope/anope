@@ -707,7 +707,7 @@ void moduleAddIRCDMsgs(void)
 /* *INDENT-ON* */
 
 
-void CharybdisProto::cmd_sqline(const char *mask, const char *reason)
+void CharybdisProto::SendSQLine(const char *mask, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
@@ -740,7 +740,7 @@ void CharybdisProto::SendVhostDel(User *u)
 	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
 }
 
-void CharybdisProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void CharybdisProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
 	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", nick, vhost);
 }
@@ -867,7 +867,7 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	cmd_sqline(nick, "Reserved for services");
+	SendSQLine(nick, "Reserved for services");
 }
 
 void CharybdisProto::SendPart(const char *nick, const char *chan, const char *buf)
@@ -1195,7 +1195,7 @@ void CharybdisProto::cmd_release_svshold(const char *nick)
 }
 
 /* SVSNICK */
-void CharybdisProto::cmd_svsnick(const char *oldnick, const char *newnick, time_t when)
+void CharybdisProto::SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
 {
 	if (!oldnick || !newnick) return;
 	User *u = finduser(oldnick);

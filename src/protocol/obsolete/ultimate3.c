@@ -663,7 +663,7 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 
-void ultimate3_cmd_sqline(const char *mask, const char *reason)
+void ultimate3_SendSQLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -721,7 +721,7 @@ void ultimate3_SendVhostDel(User * u)
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
-void ultimate3_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void ultimate3_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     send_cmd(s_HostServ, "SVSMODE %s +x", nick);
     send_cmd(ServerName, "SETHOST %s %s", nick, vhost);
@@ -1059,7 +1059,7 @@ void ultimate3_cmd_nick(const char *nick, const char *name, const char *modes)
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
              (long int) time(NULL), modes, ServiceUser, ServiceHost,
              ServerName, name);
-    ultimate3_cmd_sqline(nick, "Reserved for services");
+    ultimate3_SendSQLine(nick, "Reserved for services");
 }
 
 void ultimate3_SendGuestNick(const char *nick, const char *user, const char *host,
@@ -1084,7 +1084,7 @@ void ultimate3_SendClientIntroduction(const char *nick, const char *user, const 
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
-    ultimate3_cmd_sqline(nick, "Reserved for services");
+    ultimate3_SendSQLine(nick, "Reserved for services");
 }
 
 void ultimate3_SendKick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1387,7 +1387,7 @@ void ultimate3_SendGlobops(const char *source, const char *buf)
 }
 
 /* SQUIT */
-void ultimate3_cmd_squit(const char *servname, const char *message)
+void ultimate3_SendSquit(const char *servname, const char *message)
 {
     if (!servname || !message) {
         return;
@@ -1397,7 +1397,7 @@ void ultimate3_cmd_squit(const char *servname, const char *message)
 }
 
 /* SVSO */
-void ultimate3_cmd_svso(const char *source, const char *nick, const char *flag)
+void ultimate3_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     if (!source || !nick || !flag) {
         return;
@@ -1407,7 +1407,7 @@ void ultimate3_cmd_svso(const char *source, const char *nick, const char *flag)
 }
 
 /* NICK <newnick>  */
-void ultimate3_cmd_chg_nick(const char *oldnick, const char *newnick)
+void ultimate3_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1417,7 +1417,7 @@ void ultimate3_cmd_chg_nick(const char *oldnick, const char *newnick)
 }
 
 /* SVSNICK */
-void ultimate3_cmd_svsnick(const char *source, const char *guest, time_t when)
+void ultimate3_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1650,7 +1650,7 @@ void ultimate3_cmd_jupe(const char *jserver, const char *who, const char *reason
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        ultimate3_cmd_squit(jserver, rbuf);
+        ultimate3_SendSquit(jserver, rbuf);
     ultimate3_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1746,12 +1746,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(ultimate3_cmd_211);
     pmodule_SendGlobops(ultimate3_cmd_global);
     pmodule_SendGlobops_legacy(ultimate3_cmd_global_legacy);
-    pmodule_cmd_sqline(ultimate3_cmd_sqline);
-    pmodule_cmd_squit(ultimate3_cmd_squit);
-    pmodule_cmd_svso(ultimate3_cmd_svso);
-    pmodule_cmd_chg_nick(ultimate3_cmd_chg_nick);
-    pmodule_cmd_svsnick(ultimate3_cmd_svsnick);
-    pmodule_cmd_vhost_on(ultimate3_cmd_vhost_on);
+    pmodule_SendSQLine(ultimate3_cmd_sqline);
+    pmodule_SendSquit(ultimate3_cmd_squit);
+    pmodule_SendSVSO(ultimate3_cmd_svso);
+    pmodule_SendChangeBotNick(ultimate3_cmd_chg_nick);
+    pmodule_SendForceNickChange(ultimate3_cmd_svsnick);
+    pmodule_SendVhost(ultimate3_cmd_vhost_on);
     pmodule_cmd_connect(ultimate3_cmd_connect);
     pmodule_cmd_svshold(ultimate3_cmd_svshold);
     pmodule_cmd_release_svshold(ultimate3_cmd_release_svshold);

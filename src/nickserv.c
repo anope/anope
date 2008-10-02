@@ -1542,7 +1542,7 @@ void collide(NickAlias * na, int from_timeout)
         } while (finduser(guestnick));
         notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
                     guestnick);
-        anope_cmd_svsnick(na->nick, guestnick, time(NULL));
+        anope_SendForceNickChange(na->nick, guestnick, time(NULL));
         na->status |= NS_GUESTED;
     } else {
         kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");

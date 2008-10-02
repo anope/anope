@@ -558,7 +558,7 @@ void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user,
 	EnforceQlinedNick(nick, s_BotServ);
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
 		myIrcd->nickip ? " *" : " ", real);
-	cmd_sqline(nick, "Reserved for services");
+	SendSQLine(nick, "Reserved for services");
 }
 
 void UnrealIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
@@ -675,7 +675,7 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
 ** - Unreal will translate this to TKL for us
 **
 */
-void UnrealIRCdProto::cmd_sqline(const char *mask, const char *reason)
+void UnrealIRCdProto::SendSQLine(const char *mask, const char *reason)
 {
 	if (!mask || !reason) return;
 	send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
@@ -687,14 +687,14 @@ void UnrealIRCdProto::cmd_sqline(const char *mask, const char *reason)
 **      parv[1] = nick
 **      parv[2] = options
 */
-void UnrealIRCdProto::cmd_svso(const char *source, const char *nick, const char *flag)
+void UnrealIRCdProto::SendSVSO(const char *source, const char *nick, const char *flag)
 {
 	if (!source || !nick || !flag) return;
 	send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
 }
 
 /* NICK <newnick>  */
-void UnrealIRCdProto::cmd_chg_nick(const char *oldnick, const char *newnick)
+void UnrealIRCdProto::SendChangeBotNick(const char *oldnick, const char *newnick)
 {
 	if (!oldnick || !newnick) return;
 	send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
@@ -702,7 +702,7 @@ void UnrealIRCdProto::cmd_chg_nick(const char *oldnick, const char *newnick)
 
 /* Functions that use serval cmd functions */
 
-void UnrealIRCdProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void UnrealIRCdProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
 	if (!nick) return;
 	if (vIdent) unreal_cmd_chgident(nick, vIdent);

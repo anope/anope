@@ -785,14 +785,14 @@ void inspircd_cmd_chgident(const char *nick, const char *vIdent)
 }
 
 /* SQLINE */
-void InspIRCdProto::cmd_sqline(const char *mask, const char *reason)
+void InspIRCdProto::SendSQLine(const char *mask, const char *reason)
 {
 	if (!mask || !reason) return;
 	send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
 }
 
 /* SQUIT */
-void InspIRCdProto::cmd_squit(const char *servname, const char *message)
+void InspIRCdProto::SendSquit(const char *servname, const char *message)
 {
 	if (!servname || !message) return;
 	send_cmd(ServerName, "SQUIT %s :%s", servname, message);
@@ -800,7 +800,7 @@ void InspIRCdProto::cmd_squit(const char *servname, const char *message)
 
 /* Functions that use serval cmd functions */
 
-void InspIRCdProto::cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void InspIRCdProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
 	if (!nick) return;
 	if (vIdent) inspircd_cmd_chgident(nick, vIdent);

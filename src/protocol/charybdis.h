@@ -65,9 +65,9 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendInvite(const char *, const char *, const char *);
 		void SendPart(const char *, const char *, const char *);
 		void SendGlobops(const char *, const char *);
-		void cmd_sqline(const char *, const char *);
-		void cmd_svsnick(const char *, const char *, time_t);
-		void cmd_vhost_on(const char *, const char *, const char *);
+		void SendSQLine(const char *, const char *);
+		void SendForceNickChange(const char *, const char *, time_t);
+		void SendVhost(const char *, const char *, const char *);
 		void cmd_connect();
 		void cmd_svshold(const char *);
 		void cmd_release_svshold(const char *);

@@ -753,7 +753,7 @@ moduleAddIRCDMsgs (void)
 }
 
 void
-plexus_cmd_sqline (const char *mask, const char *reason)
+plexus_SendSQLine (const char *mask, const char *reason)
 {
   send_cmd (s_OperServ, "RESV * %s :%s", mask, reason);
 }
@@ -813,7 +813,7 @@ plexus_SendVhostDel (User * u)
 }
 
 void
-plexus_cmd_vhost_on (const char *nick, const char *vIdent, const char *vhost)
+plexus_SendVhost (const char *nick, const char *vIdent, const char *vhost)
 {
   User *u;
 
@@ -976,7 +976,7 @@ plexus_SendClientIntroduction (const char *nick, const char *user, const char *h
   send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s 0 %s :%s", nick,
 	    (long int) time (NULL), modes, user, host, ServerName, host,
 	    real);
-  plexus_cmd_sqline (nick, "Reserved for services");
+  plexus_SendSQLine (nick, "Reserved for services");
 
 }
 
@@ -1396,7 +1396,7 @@ plexus_SendInvite (const char *source, const char *chan, const char *nick)
 
 /* SQUIT */
 void
-plexus_cmd_squit (const char *servname, const char *message)
+plexus_SendSquit (const char *servname, const char *message)
 {
   if (!servname || !message)
     {
@@ -1497,7 +1497,7 @@ plexus_cmd_release_svshold (const char *nick)
 
 /* SVSNICK */
 void
-plexus_cmd_svsnick (const char *nick, const char *newnick, time_t when)
+plexus_SendForceNickChange (const char *nick, const char *newnick, time_t when)
 {
   User *u;
 
@@ -1520,7 +1520,7 @@ plexus_SendGuestNick (const char *nick, const char *user, const char *host, cons
 }
 
 void
-plexus_cmd_svso (const char *source, const char *nick, const char *flag)
+plexus_SendSVSO (const char *source, const char *nick, const char *flag)
 {
   /* Not Supported by this IRCD */
 }
@@ -1587,7 +1587,7 @@ plexus_cmd_svid_umode3 (User * u, const char *ts)
 
 /* NICK <newnick>  */
 void
-plexus_cmd_chg_nick (const char *oldnick, const char *newnick)
+plexus_SendChangeBotNick (const char *oldnick, const char *newnick)
 {
   if (!oldnick || !newnick)
     {
@@ -1683,7 +1683,7 @@ plexus_cmd_jupe (const char *jserver, const char *who, const char *reason)
 	    reason ? ": " : "", reason ? reason : "");
 
   if (findserver(servlist, jserver))
-    plexus_cmd_squit (jserver, rbuf);
+    plexus_SendSquit (jserver, rbuf);
   plexus_cmd_server (jserver, 2, rbuf);
   new_server (me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1780,12 +1780,12 @@ moduleAddAnopeCmds ()
   pmodule_cmd_211 (plexus_cmd_211);
   pmodule_SendGlobops (plexus_cmd_global);
   pmodule_SendGlobops_legacy (plexus_cmd_global_legacy);
-  pmodule_cmd_sqline (plexus_cmd_sqline);
-  pmodule_cmd_squit (plexus_cmd_squit);
-  pmodule_cmd_svso (plexus_cmd_svso);
-  pmodule_cmd_chg_nick (plexus_cmd_chg_nick);
-  pmodule_cmd_svsnick (plexus_cmd_svsnick);
-  pmodule_cmd_vhost_on (plexus_cmd_vhost_on);
+  pmodule_SendSQLine (plexus_cmd_sqline);
+  pmodule_SendSquit (plexus_cmd_squit);
+  pmodule_SendSVSO (plexus_cmd_svso);
+  pmodule_SendChangeBotNick (plexus_cmd_chg_nick);
+  pmodule_SendForceNickChange (plexus_cmd_svsnick);
+  pmodule_SendVhost (plexus_cmd_vhost_on);
   pmodule_cmd_connect (plexus_cmd_connect);
   pmodule_cmd_svshold (plexus_cmd_svshold);
   pmodule_cmd_release_svshold (plexus_cmd_release_svshold);

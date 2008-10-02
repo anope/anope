@@ -596,7 +596,7 @@ int anope_event_burst(const char *source, int ac, const char **av)
 return MOD_CONT;
 }
 
-void rageircd_cmd_sqline(const char *mask, const char *reason)
+void rageircd_SendSQLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -677,7 +677,7 @@ void rageircd_cmd_chghost(const char *nick, const char *vhost)
     send_cmd(ServerName, "VHOST %s %s", nick, vhost);
 }
 
-void rageircd_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void rageircd_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     send_cmd(s_HostServ, "SVSMODE %s +x", nick);
     rageircd_cmd_chghost(nick, vhost);
@@ -720,7 +720,7 @@ void rageircd_SendSVSMode(User * u, int ac, const char **av)
              (ac == 2 ? av[1] : ""));
 }
 
-void rageircd_cmd_squit(const char *servname, const char *message)
+void rageircd_SendSquit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -1125,7 +1125,7 @@ void rageircd_cmd_nick(const char *nick, const char *name, const char *modes)
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
              (long int) time(NULL), ServiceUser, ServiceHost, ServerName,
              modes, name);
-    rageircd_cmd_sqline(nick, "Reserved for services");
+    rageircd_SendSQLine(nick, "Reserved for services");
 }
 
 /* EVENT : OS */
@@ -1189,7 +1189,7 @@ void rageircd_SendClientIntroduction(const char *nick, const char *user, const c
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
              (long int) time(NULL), user, host, ServerName, modes, real);
-    rageircd_cmd_sqline(nick, "Reserved for services");
+    rageircd_SendSQLine(nick, "Reserved for services");
 }
 
 /* SVSMODE -b */
@@ -1343,7 +1343,7 @@ void rageircd_cmd_release_svshold(const char *nick)
     send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
 
-void rageircd_cmd_svsnick(const char *source, const char *guest, time_t when)
+void rageircd_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1359,7 +1359,7 @@ void rageircd_SendGuestNick(const char *nick, const char *user, const char *host
 }
 
 
-void rageircd_cmd_svso(const char *source, const char *nick, const char *flag)
+void rageircd_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
@@ -1396,7 +1396,7 @@ void rageircd_cmd_svid_umode3(User * u, const char *ts)
 }
 
 /* NICK <newnick>  */
-void rageircd_cmd_chg_nick(const char *oldnick, const char *newnick)
+void rageircd_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1509,7 +1509,7 @@ void rageircd_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        rageircd_cmd_squit(jserver, rbuf);
+        rageircd_SendSquit(jserver, rbuf);
     rageircd_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1605,12 +1605,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(rageircd_cmd_211);
     pmodule_SendGlobops(rageircd_cmd_global);
     pmodule_SendGlobops_legacy(rageircd_cmd_global_legacy);
-    pmodule_cmd_sqline(rageircd_cmd_sqline);
-    pmodule_cmd_squit(rageircd_cmd_squit);
-    pmodule_cmd_svso(rageircd_cmd_svso);
-    pmodule_cmd_chg_nick(rageircd_cmd_chg_nick);
-    pmodule_cmd_svsnick(rageircd_cmd_svsnick);
-    pmodule_cmd_vhost_on(rageircd_cmd_vhost_on);
+    pmodule_SendSQLine(rageircd_cmd_sqline);
+    pmodule_SendSquit(rageircd_cmd_squit);
+    pmodule_SendSVSO(rageircd_cmd_svso);
+    pmodule_SendChangeBotNick(rageircd_cmd_chg_nick);
+    pmodule_SendForceNickChange(rageircd_cmd_svsnick);
+    pmodule_SendVhost(rageircd_cmd_vhost_on);
     pmodule_cmd_connect(rageircd_cmd_connect);
     pmodule_cmd_svshold(rageircd_cmd_svshold);
     pmodule_cmd_release_svshold(rageircd_cmd_release_svshold);

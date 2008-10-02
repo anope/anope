@@ -1295,24 +1295,24 @@ class IRCDProto {
 			if (!buf) return;
 			send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 		}
-		virtual void cmd_sqline(const char *, const char *) = 0;
-		virtual void cmd_squit(const char *servname, const char *message)
+		virtual void SendSQLine(const char *, const char *) = 0;
+		virtual void SendSquit(const char *servname, const char *message)
 		{
 			if (!servname || !message) return;
 			send_cmd(NULL, "SQUIT %s :%s", servname, message);
 		}
-		virtual void cmd_svso(const char *, const char *, const char *) { }
-		virtual void cmd_chg_nick(const char *oldnick, const char *newnick)
+		virtual void SendSVSO(const char *, const char *, const char *) { }
+		virtual void SendChangeBotNick(const char *oldnick, const char *newnick)
 		{
 			if (!oldnick || !newnick) return;
 			send_cmd(oldnick, "NICK %s", newnick);
 		}
-		virtual void cmd_svsnick(const char *oldnick, const char *newnick, time_t when)
+		virtual void SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
 		{
 			if (!oldnick || !newnick) return;
 			send_cmd(NULL, "SVSNICK %s %s :%ld", oldnick, newnick, static_cast<long>(when));
 		}
-		virtual void cmd_vhost_on(const char *, const char *, const char *) { }
+		virtual void SendVhost(const char *, const char *, const char *) { }
 		virtual void cmd_connect() = 0;
 		virtual void cmd_svshold(const char *) { }
 		virtual void cmd_release_svshold(const char *) { }
@@ -1342,7 +1342,7 @@ class IRCDProto {
 		{
 			char rbuf[256];
 			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who, reason ? ": " : "", reason ? reason : "");
-			if (findserver(servlist, jserver)) cmd_squit(jserver, rbuf);
+			if (findserver(servlist, jserver)) SendSquit(jserver, rbuf);
 			cmd_server(jserver, 2, rbuf);
 			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 		}

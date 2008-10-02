@@ -663,7 +663,7 @@ void moduleAddIRCDMsgs(void) {
 /* *INDENT-ON* */
 
 /* SQLINE */
-void BahamutIRCdProto::cmd_sqline(const char *mask, const char *reason)
+void BahamutIRCdProto::SendSQLine(const char *mask, const char *reason)
 {
 	if (!mask || !reason) return;
 	send_cmd(NULL, "SQLINE %s :%s", mask, reason);
@@ -990,7 +990,7 @@ void BahamutIRCdProto::SendClientIntroduction(const char *nick, const char *user
 {
 	EnforceQlinedNick(nick, s_BotServ);
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	cmd_sqline(nick, "Reserved for services");
+	SendSQLine(nick, "Reserved for services");
 }
 
 void BahamutIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)

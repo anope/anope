@@ -89,7 +89,7 @@ int do_operoline(User * u)
         if (!(u2 = finduser(nick))) {
             notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
         } else if (u2 && flags[0] == '+') {
-            anope_cmd_svso(s_OperServ, nick, flags);
+            anope_SendSVSO(s_OperServ, nick, flags);
             anope_SendMode(s_OperServ, nick, "+o");
             common_svsmode(u2, "+o", NULL);
             notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
@@ -97,7 +97,7 @@ int do_operoline(User * u)
             anope_SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
                              u->nick, nick);
         } else if (u2 && flags[0] == '-') {
-            anope_cmd_svso(s_OperServ, nick, flags);
+            anope_SendSVSO(s_OperServ, nick, flags);
             notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
             anope_SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
                              u->nick, nick);

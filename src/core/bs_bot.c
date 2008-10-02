@@ -294,8 +294,8 @@ int do_bot(User * u)
                else we must make it quit and rejoin. We must not forget to set
 			   the Q:Line either (it's otherwise set in anope_SendClientIntroduction) */
             if (!user) {
-                anope_cmd_chg_nick(oldnick, bi->nick);
-				anope_cmd_sqline(bi->nick, "Reserved for services");
+                anope_SendChangeBotNick(oldnick, bi->nick);
+				anope_SendSQLine(bi->nick, "Reserved for services");
             } else {
                 anope_SendQuit(oldnick, "Quit: Be right back");
 

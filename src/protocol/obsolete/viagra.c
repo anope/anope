@@ -742,7 +742,7 @@ void moduleAddIRCDMsgs(void) {
 
 
 /* SQLINE */
-void viagra_cmd_sqline(const char *mask, const char *reason)
+void viagra_SendSQLine(const char *mask, const char *reason)
 {
     if (!mask || !reason) {
         return;
@@ -813,7 +813,7 @@ void viagra_SendVhostDel(User * u)
     notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
-void viagra_cmd_vhost_on(const char *nick, const char *vIdent, const char *vhost)
+void viagra_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
     if (vIdent) {
         send_cmd(NULL, "CHGIDENT %s %s", nick, vIdent);
@@ -916,7 +916,7 @@ void viagra_SendSVSMode(User * u, int ac, const char **av)
              (ac == 2 ? av[1] : ""));
 }
 
-void viagra_cmd_squit(const char *servname, const char *message)
+void viagra_SendSquit(const char *servname, const char *message)
 {
     send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
@@ -1329,7 +1329,7 @@ void viagra_SendClientIntroduction(const char *nick, const char *user, const cha
     EnforceQlinedNick(nick, s_BotServ);
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
-    viagra_cmd_sqline(nick, "Reserved for services");
+    viagra_SendSQLine(nick, "Reserved for services");
 }
 
 void viagra_SendKick(const char *source, const char *chan, const char *user, const char *buf)
@@ -1347,7 +1347,7 @@ void viagra_cmd_nick(const char *nick, const char *name, const char *modes)
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
              (long int) time(NULL), modes, ServiceUser, ServiceHost,
              ServerName, name);
-    viagra_cmd_sqline(nick, "Reserved for services");
+    viagra_SendSQLine(nick, "Reserved for services");
 }
 
 void viagra_cmd_372(const char *source, const char *msg)
@@ -1406,7 +1406,7 @@ void viagra_cmd_release_svshold(const char *nick)
 }
 
 /* SVSNICK */
-void viagra_cmd_svsnick(const char *source, const char *guest, time_t when)
+void viagra_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
     if (!source || !guest) {
         return;
@@ -1421,7 +1421,7 @@ void viagra_SendGuestNick(const char *nick, const char *user, const char *host, 
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void viagra_cmd_svso(const char *source, const char *nick, const char *flag)
+void viagra_SendSVSO(const char *source, const char *nick, const char *flag)
 {
     /* Not Supported by this IRCD */
 }
@@ -1475,7 +1475,7 @@ void viagra_cmd_svid_umode3(User * u, const char *ts)
 }
 
 /* NICK <newnick>  */
-void viagra_cmd_chg_nick(const char *oldnick, const char *newnick)
+void viagra_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
     if (!oldnick || !newnick) {
         return;
@@ -1549,7 +1549,7 @@ void viagra_cmd_jupe(const char *jserver, const char *who, const char *reason)
              reason ? ": " : "", reason ? reason : "");
 
     if (findserver(servlist, jserver))
-        viagra_cmd_squit(jserver, rbuf);
+        viagra_SendSquit(jserver, rbuf);
     viagra_cmd_server(jserver, 2, rbuf);
     new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1645,12 +1645,12 @@ void moduleAddAnopeCmds()
     pmodule_cmd_211(viagra_cmd_211);
     pmodule_SendGlobops(viagra_cmd_global);
     pmodule_SendGlobops_legacy(viagra_cmd_global_legacy);
-    pmodule_cmd_sqline(viagra_cmd_sqline);
-    pmodule_cmd_squit(viagra_cmd_squit);
-    pmodule_cmd_svso(viagra_cmd_svso);
-    pmodule_cmd_chg_nick(viagra_cmd_chg_nick);
-    pmodule_cmd_svsnick(viagra_cmd_svsnick);
-    pmodule_cmd_vhost_on(viagra_cmd_vhost_on);
+    pmodule_SendSQLine(viagra_cmd_sqline);
+    pmodule_SendSquit(viagra_cmd_squit);
+    pmodule_SendSVSO(viagra_cmd_svso);
+    pmodule_SendChangeBotNick(viagra_cmd_chg_nick);
+    pmodule_SendForceNickChange(viagra_cmd_svsnick);
+    pmodule_SendVhost(viagra_cmd_vhost_on);
     pmodule_cmd_connect(viagra_cmd_connect);
     pmodule_cmd_svshold(viagra_cmd_svshold);
     pmodule_cmd_release_svshold(viagra_cmd_release_svshold);

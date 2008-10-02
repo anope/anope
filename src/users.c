@@ -662,7 +662,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             /* Resets the svid because it doesn't match */
             user->svid = 1;
 
-            anope_SendSVID(user->nick, user->timestamp);
+            ircdproto->SendSVID(user->nick, user->timestamp);
 
         } else {
             user->svid = 1;

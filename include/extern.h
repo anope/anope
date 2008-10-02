@@ -1133,7 +1133,6 @@ E void anope_SendCTCP(const char *source, const char *dest,  const char *fmt, ..
 E void anope_SendNumeric(const char *, int, const char *, const char *, ...) FORMAT(printf, 4, 5); /* Numerics */
 
 E void anope_ProcessUsermodes(User * user, int ac, const char **av);
-E void anope_SendSVID(const char *nick, time_t ts);
 E void anope_SendSVID2(User *u, const char *ts);
 E void anope_SendSVID3(User *u, const char *ts);
 E void anope_SendUnregisteredNick(User *u);

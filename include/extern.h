@@ -1115,7 +1115,6 @@ E unsigned int mysql_rand(void);
 E void anope_cmd_capab();						  	  		  /* CAPAB */
 E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
 E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
-E void anope_SendConnect();                             	           	  /* Connect */
 E void anope_cmd_ea();									  /* EA      */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_SendBanDel(const char *name, const char *nick);				  		  			      /* MODE -b */

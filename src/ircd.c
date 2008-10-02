@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendConnect()
-{
-	ircdproto->SendConnect();
-}
-
 void anope_SendSVSHOLD(const char *nick)
 {
 	ircdproto->SendSVSHOLD(nick);

@@ -358,7 +358,7 @@ int do_clear(User * u)
             av[0] = sstrdup(chan);
             av[1] = sstrdup(cu->user->nick);
             av[2] = sstrdup(buf);
-            anope_SendKick(whosends(ci), av[0], av[1], av[2]);
+            ircdproto->SendKick(whosends(ci), av[0], av[1], av[2]);
             do_kick(s_ChanServ, 3, av);
             free((void *)av[2]);
             free((void *)av[1]);

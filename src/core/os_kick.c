@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -85,7 +85,7 @@ int do_os_kick(User * u)
         notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
         return MOD_CONT;
     }
-    anope_SendKick(s_OperServ, chan, nick, "%s (%s)", u->nick, s);
+    ircdproto->SendKick(s_OperServ, chan, nick, "%s (%s)", u->nick, s);
     if (WallOSKick)
         anope_SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick,
                          nick, chan);

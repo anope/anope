@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -92,7 +92,7 @@ int do_suspend(User * u)
         notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_ERROR);
         return MOD_CONT;
     }
-    
+
     /* Only SUSPEND existing channels, otherwise use FORBID (bug #54) */
     if ((ci = cs_findchan(chan)) == NULL) {
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
@@ -127,7 +127,7 @@ int do_suspend(User * u)
                 av[0] = c->name;
                 av[1] = cu->user->nick;
                 av[2] = reason ? reason : "CHAN_SUSPEND_REASON";
-                anope_SendKick(s_ChanServ, av[0], av[1], av[2]);
+                ircdproto->SendKick(s_ChanServ, av[0], av[1], av[2]);
                 do_kick(s_ChanServ, 3, av);
             }
         }
@@ -173,7 +173,7 @@ int do_unsuspend(User * u)
         notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
         return MOD_CONT;
     }
-    
+
     if (!(ci->flags & CI_SUSPENDED))
     {
         notice_lang(s_ChanServ, u, CHAN_UNSUSPEND_FAILED, chan);

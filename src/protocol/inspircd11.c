@@ -733,7 +733,7 @@ void InspIRCdProto::SendClientIntroduction(const char *nick, const char *user, c
 	send_cmd(nick, "OPERTYPE Service");
 }
 
-void InspIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
+void InspIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
 	else send_cmd(source, "KICK %s %s :%s", chan, user, user);

@@ -556,7 +556,7 @@ void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user,
 	SendSQLine(nick, "Reserved for services");
 }
 
-void UnrealIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
+void UnrealIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
 	else send_cmd(source, "%s %s %s", send_token("KICK", "H"), chan, user);

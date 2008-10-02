@@ -122,7 +122,7 @@ void do_enforce_restricted(Channel * c)
             reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
             ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
                            time(NULL));
-            anope_SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+            ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
             av[0] = ci->name;
             av[1] = u->nick;
             av[2] = reason;
@@ -162,7 +162,7 @@ void do_enforce_cmode_R(Channel * c)
                 || !(c->mode & cbm->flag))
                 ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
                                time(NULL));
-            anope_SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+            ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
             av[0] = ci->name;
             av[1] = u->nick;
             av[2] = reason;

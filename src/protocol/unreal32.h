@@ -83,6 +83,7 @@
 class UnrealIRCdProto : public IRCDProto {
 		void SendSVSKillInternal(const char *, const char *, const char *);
 		void SendModeInternal(const char *, const char *, const char *);
+		void SendKickInternal(const char *, const char *, const char *, const char *);
 	public:
 		void SendSVSNOOP(const char *, int);
 		void SendAkillDel(const char *, const char *);
@@ -92,7 +93,6 @@ class UnrealIRCdProto : public IRCDProto {
 		void SendSVSMode(User *, int, const char **);
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
-		void SendKick(const char *, const char *, const char *, const char *);
 		void SendNoticeChanops(const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
 		void SendJoin(const char *, const char *, time_t);

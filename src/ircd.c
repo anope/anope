@@ -43,18 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendKick(const char *source, const char *chan, const char *user, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	ircdproto->SendKick(source, chan, user, buf);
-}
-
 void anope_SendNoticeChanops(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;

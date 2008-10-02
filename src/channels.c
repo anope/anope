@@ -872,7 +872,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                anope_SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -957,7 +957,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                anope_SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -1032,7 +1032,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                anope_SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -1093,7 +1093,7 @@ void do_sjoin(const char *source, int ac, const char **av)
         }
 
         if (is_sqlined && !is_oper(user)) {
-            anope_SendKick(s_OperServ, av[1], user->nick, "Q-Lined");
+            ircdproto->SendKick(s_OperServ, av[1], user->nick, "Q-Lined");
         } else {
             send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, user->nick,
                        av[1]);

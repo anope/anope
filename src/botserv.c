@@ -822,7 +822,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     av[0] = ci->name;
     av[1] = u->nick;
     av[2] = buf;
-    anope_SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+    ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, u->nick, ci->name, buf);
 }
@@ -898,10 +898,10 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        anope_SendKick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
+        ircdproto->SendKick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
                        requester->nick);
     else
-        anope_SendKick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
+        ircdproto->SendKick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
 
     do_kick(ci->bi->nick, 3, kav);
     send_event(EVENT_BOT_KICK, 3, kav[1], kav[0], kav[2]);
@@ -946,10 +946,10 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        anope_SendKick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+        ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
                        requester->nick);
     else
-        anope_SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+        ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
 }

@@ -878,7 +878,7 @@ void BahamutIRCdProto::SendNoticeChanops(const char *source, const char *dest, c
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void BahamutIRCdProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
+void BahamutIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
 {
 	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
 	else send_cmd(source, "KICK %s %s", chan, user);

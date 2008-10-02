@@ -941,7 +941,7 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void RatboxProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
+void RatboxProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
 {
 	Uid *ud = find_uid(source);
 	User *u = finduser(user);

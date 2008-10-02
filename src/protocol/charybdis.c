@@ -1011,7 +1011,7 @@ void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, 
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void CharybdisProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
+void CharybdisProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
 {
 	BotInfo *bi = findbot(source);
 	User *u = finduser(user);

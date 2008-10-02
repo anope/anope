@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -96,10 +96,10 @@ int do_cs_kick(User * u)
                 if ((ci->flags & CI_SIGNKICK)
                     || ((ci->flags & CI_SIGNKICK_LEVEL)
                         && !check_access(u, ci, CA_SIGNKICK)))
-                    anope_SendKick(whosends(ci), ci->name, u->nick,
+                    ircdproto->SendKick(whosends(ci), ci->name, u->nick,
                                    "%s (%s)", reason, u->nick);
                 else
-                    anope_SendKick(whosends(ci), ci->name, u->nick, "%s",
+                    ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s",
                                    reason);
                 av[0] = ci->name;
                 av[1] = u->nick;
@@ -139,10 +139,10 @@ int do_cs_kick(User * u)
         if ((ci->flags & CI_SIGNKICK)
             || ((ci->flags & CI_SIGNKICK_LEVEL)
                 && !check_access(u, ci, CA_SIGNKICK)))
-            anope_SendKick(whosends(ci), ci->name, params, "%s (%s)",
+            ircdproto->SendKick(whosends(ci), ci->name, params, "%s (%s)",
                            reason, u->nick);
         else
-            anope_SendKick(whosends(ci), ci->name, params, "%s", reason);
+            ircdproto->SendKick(whosends(ci), ci->name, params, "%s", reason);
         av[0] = ci->name;
         av[1] = params;
         av[2] = reason;

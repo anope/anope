@@ -1381,7 +1381,7 @@ int check_kick(User * user, const char *chan, time_t chants)
     }
 
     ircdproto->SendMode(whosends(ci), chan, "+b %s", mask);
-    anope_SendKick(whosends(ci), chan, user->nick, "%s", reason);
+    ircdproto->SendKick(whosends(ci), chan, user->nick, "%s", reason);
 
     return 1;
 }

@@ -50,6 +50,7 @@ w00t's CHRISTMAS LIST
 - Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 - prevent deletion of core services via /bs bot
 - Redo database insanity.
+- burn do_sjoin with fire
 
 -------
 anopeng-uid branch TODO
@@ -68,4 +69,3 @@ The following (at least, maybe more) need to take BotInfo pointers instead of st
 
 - add overridden form of SendGlobops accepting BotInfo
 - SendAkill should just take a pointer to the Akill class instead of millions of fields
-

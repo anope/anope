@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	ircdproto->SendGuestNick(nick, user, host, real, modes);
-}
-
 void anope_SendMode(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;

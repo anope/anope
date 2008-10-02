@@ -957,7 +957,7 @@ void cancel_user(User * u)
                     anope_SendSVSHOLD(na->nick);
                 } else {
                     if (ircd->svsnick) {
-                        anope_SendGuestNick(u->nick, NSEnforcerUser,
+                        ircdproto->SendGuestNick(u->nick, NSEnforcerUser,
                                              NSEnforcerHost,
                                              "Services Enforcer", "+");
                         add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
@@ -968,7 +968,7 @@ void cancel_user(User * u)
                 }
             } else {
                 if (ircd->svsnick) {
-                    anope_SendGuestNick(u->nick, NSEnforcerUser,
+                    ircdproto->SendGuestNick(u->nick, NSEnforcerUser,
                                          NSEnforcerHost,
                                          "Services Enforcer", "+");
                     add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);

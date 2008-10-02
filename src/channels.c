@@ -49,7 +49,7 @@ void chan_deluser(User * user, Channel * c)
     c->usercount--;
 
     if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1) {
-        ircdproto->SendPart(c->ci->bi->nick, c->name, NULL);
+        ircdproto->SendPart(c->ci->bi, c->name, NULL);
     }
 
     if (!c->users)
@@ -225,7 +225,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
             if ((cum->flags & CUF_PROTECT_BOTSERV) && !add) {
                 if ((bi = findbot(*av))) {
                     if (!botmode || botmode != mode) {
-                        ircdproto->SendMode(bi->nick, chan->name, "+%c %s",
+                        ircdproto->SendMode(bi, chan->name, "+%c %s",
                                        mode, bi->nick);
                         botmode = mode;
                         continue;
@@ -790,7 +790,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
             if (c->ci && c->ci->bi) {
                 /* This is ugly, but it always works */
-                ircdproto->SendPart(c->ci->bi->nick, c->name, "TS reop");
+                ircdproto->SendPart(c->ci->bi, c->name, "TS reop");
                 bot_join(c->ci);
             }
             /* XXX simple modes and bans */
@@ -872,7 +872,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -957,7 +957,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -1032,7 +1032,7 @@ void do_sjoin(const char *source, int ac, const char **av)
             }
 
             if (is_sqlined && !is_oper(user)) {
-                ircdproto->SendKick(s_OperServ, av[1], s, "Q-Lined");
+                ircdproto->SendKick(findbot(s_OperServ), av[1], s, "Q-Lined");
             } else {
                 if (!check_kick(user, av[1], ts)) {
                     send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START,
@@ -1093,7 +1093,7 @@ void do_sjoin(const char *source, int ac, const char **av)
         }
 
         if (is_sqlined && !is_oper(user)) {
-            ircdproto->SendKick(s_OperServ, av[1], user->nick, "Q-Lined");
+            ircdproto->SendKick(findbot(s_OperServ), av[1], user->nick, "Q-Lined");
         } else {
             send_event(EVENT_JOIN_CHANNEL, 3, EVENT_START, user->nick,
                        av[1]);
@@ -1285,7 +1285,7 @@ void add_ban(Channel * chan, const char *mask)
         BotInfo *bi = chan->ci->bi;
 
         if (entry_match(ban, bi->nick, bi->user, bi->host, 0)) {
-            ircdproto->SendMode(bi->nick, chan->name, "-b %s", mask);
+            ircdproto->SendMode(bi, chan->name, "-b %s", mask);
             entry_delete(chan->bans, ban);
             return;
         }
@@ -1569,7 +1569,7 @@ void chan_adduser2(User * user, Channel * c)
              * recovers from a netsplit. -GD
              */
             if (is_sync(user->server)) {
-                ircdproto->SendPrivmsg(c->ci->bi->nick, c->name, "[%s] %s",
+                ircdproto->SendPrivmsg(c->ci->bi, c->name, "[%s] %s",
                                   user->na->nick, user->na->nc->greet);
                 c->ci->bi->lastmsg = time(NULL);
             }
@@ -1883,7 +1883,7 @@ void do_mass_mode(char *modes)
             free(myModes);
             return;
         } else {
-            ircdproto->SendMode(s_OperServ, c->name, "%s", modes);
+            ircdproto->SendMode(findbot(s_OperServ), c->name, "%s", modes);
             chan_set_modes(s_OperServ, c, ac, av, 1);
         }
     }

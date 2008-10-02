@@ -84,10 +84,10 @@ int do_say(User * u)
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
         if (text[0] != '\001') {
-            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s", text);
+            ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", text);
             ci->bi->lastmsg = time(NULL);
 	        if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
-                ircdproto->SendPrivmsg(ci->bi->nick, LogChannel,
+                ircdproto->SendPrivmsg(ci->bi, LogChannel,
                                   "SAY %s %s %s", u->nick, ci->name, text);
         } else {
             syntax_error(s_BotServ, u, "SAY", BOT_SAY_SYNTAX);

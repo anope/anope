@@ -294,10 +294,10 @@ int do_bot(User * u)
                else we must make it quit and rejoin. We must not forget to set
 			   the Q:Line either (it's otherwise set in SendClientIntroduction) */
             if (!user) {
-                ircdproto->SendChangeBotNick(oldnick, bi->nick);
+                ircdproto->SendChangeBotNick(bi, bi->nick);
 				ircdproto->SendSQLine(bi->nick, "Reserved for services");
             } else {
-                ircdproto->SendQuit(oldnick, "Quit: Be right back");
+                ircdproto->SendQuit(bi, "Quit: Be right back");
 
                 ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
                                    ircd->botserv_bot_mode);
@@ -320,7 +320,7 @@ int do_bot(User * u)
             notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
         else {
             send_event(EVENT_BOT_DEL, 1, bi->nick);
-            ircdproto->SendQuit(bi->nick,
+            ircdproto->SendQuit(bi,
                            "Quit: Help! I'm being deleted by %s!",
                            u->nick);
             if (ircd->sqline) {

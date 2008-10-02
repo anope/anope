@@ -25,10 +25,10 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'RDB=${RDB}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
 
 .c.o:
-	$(CC) $(CFLAGS) -I../include/ -c $<
+	@../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
 
 .cpp.o:
-	$(CC) $(CFLAGS) -I../include/ -c $<
+	@../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
 
 all: services
 

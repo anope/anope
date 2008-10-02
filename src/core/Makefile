@@ -21,10 +21,10 @@ install:
 distclean: spotless
 
 .c.o:
-	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+	@../../run-cc.pl $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
 .o.s:
-	$(CC) ${SHARED} ../mod_version.o $< -o $*.so ${PROFILE}
+	@../../run-cc.pl $(CC) ${SHARED} ../mod_version.o $< -o $*.so ${PROFILE}
 	@$(TOUCH) $*.s
 
 subs:

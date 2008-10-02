@@ -2160,7 +2160,7 @@ void cs_set_flood(ChannelInfo * ci, const char *value)
         free(ci->mlock_flood);
 
     /* This looks ugly, but it works ;) */
-    if (anope_flood_mode_check(value)) {
+    if (anope_IsFloodModeParamValid(value)) {
         ci->mlock_flood = sstrdup(value);
     } else {
         ci->mlock_on &= ~ircd->chan_fmode;

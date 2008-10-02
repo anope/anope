@@ -1656,7 +1656,7 @@ anope_event_invite (const char *source, int ac, const char **av)
 }
 
 int
-plexus_flood_mode_check (const char *value)
+plexus_IsFloodModeParamValid (const char *value)
 {
   return 0;
 }
@@ -1803,7 +1803,7 @@ moduleAddAnopeCmds ()
   pmodule_SendSVSPart (plexus_cmd_svspart);
   pmodule_SendSWhois (plexus_cmd_swhois);
   pmodule_SendEOB (plexus_cmd_eob);
-  pmodule_flood_mode_check (plexus_flood_mode_check);
+  pmodule_IsFloodModeParamValid (plexus_flood_mode_check);
   pmodule_SendJupe (plexus_cmd_jupe);
   pmodule_IsNickValid (plexus_valid_nick);
   pmodule_IsChannelValid (plexus_valid_chan);

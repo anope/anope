@@ -1637,7 +1637,7 @@ int anope_event_invite(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int ultiamte3_flood_mode_check(const char *value)
+int ultiamte3_IsFloodModeParamValid(const char *value)
 {
     return 0;
 }
@@ -1769,7 +1769,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(ultimate3_cmd_svspart);
     pmodule_SendSWhois(ultimate3_cmd_swhois);
     pmodule_SendEOB(ultimate3_cmd_eob);
-    pmodule_flood_mode_check(ultiamte3_flood_mode_check);
+    pmodule_IsFloodModeParamValid(ultiamte3_flood_mode_check);
     pmodule_SendJupe(ultimate3_cmd_jupe);
     pmodule_IsNickValid(ultiamte3_valid_nick);
     pmodule_IsChannelValid(ultiamte3_valid_chan);

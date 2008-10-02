@@ -1383,7 +1383,7 @@ int anope_event_invite(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int hybrid_flood_mode_check(const char *value)
+int hybrid_IsFloodModeParamValid(const char *value)
 {
     return 0;
 }
@@ -1519,7 +1519,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(hybrid_cmd_svspart);
     pmodule_SendSWhois(hybrid_cmd_swhois);
     pmodule_SendEOB(hybrid_cmd_eob);
-    pmodule_flood_mode_check(hybrid_flood_mode_check);
+    pmodule_IsFloodModeParamValid(hybrid_flood_mode_check);
     pmodule_SendJupe(hybrid_cmd_jupe);
     pmodule_IsNickValid(hybrid_valid_nick);
     pmodule_IsChannelValid(hybrid_valid_chan);

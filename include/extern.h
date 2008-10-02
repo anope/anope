@@ -1174,7 +1174,7 @@ E void anope_SendEOB();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);
 E void anope_SendCTCP(const char *source, const char *dest,  const char *fmt, ...);   	  		  /* CTCP */
-E void anope_cmd_numeric(const char *, int, const char *, const char *, ...) FORMAT(printf, 4, 5); /* Numerics */
+E void anope_SendNumeric(const char *, int, const char *, const char *, ...) FORMAT(printf, 4, 5); /* Numerics */
 
 EI int anope_event_482(const char *source, int ac, const char **av);
 EI int anope_event_436(const char *source, int ac, const char **av);
@@ -1249,7 +1249,7 @@ E void anope_SendSVID(const char *nick, time_t ts);
 E void anope_SendSVID2(User *u, const char *ts);
 E void anope_SendSVID3(User *u, const char *ts);
 E void anope_SendUnregisteredNick(User *u);
-E int anope_flood_mode_check(const char *value);
+E int anope_IsFloodModeParamValid(const char *value);
 
 E void anope_SendJupe(const char *jserver, const char *who, const char *reason);
 

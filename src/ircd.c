@@ -362,9 +362,9 @@ void anope_SendEOB()
 	ircdproto->SendEOB();
 }
 
-int anope_flood_mode_check(const char *value)
+int anope_IsFloodModeParamValid(const char *value)
 {
-	return ircdproto->flood_mode_check(value);
+	return ircdproto->IsFloodModeParamValid(value);
 }
 
 void anope_SendJupe(const char *jserver, const char *who, const char *reason)
@@ -395,7 +395,7 @@ void anope_SendCTCP(const char *source, const char *dest, const char *fmt, ...)
 	ircdproto->SendCTCP(source, dest, buf);
 }
 
-void anope_cmd_numeric(const char *source, int numeric, const char *dest, const char *fmt, ...)
+void anope_SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -404,7 +404,7 @@ void anope_cmd_numeric(const char *source, int numeric, const char *dest, const 
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_numeric(source, numeric, dest, *buf ? buf : NULL);
+	ircdproto->SendNumeric(source, numeric, dest, *buf ? buf : NULL);
 }
 
 /**

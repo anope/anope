@@ -1093,7 +1093,7 @@ int anope_event_admin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int BahamutIRCdProto::flood_mode_check(const char *value)
+int BahamutIRCdProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
 	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;

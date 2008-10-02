@@ -124,7 +124,7 @@ void viagra_SendUnregisteredNick(User * u);
 void viagra_SendSVID2(User * u, const char *ts);
 void viagra_SendSVID3(User * u, const char *ts);
 void viagra_SendEOB();
-int viagra_flood_mode_check(const char *value);
+int viagra_IsFloodModeParamValid(const char *value);
 void viagra_SendJupe(const char *jserver, const char *who, const char *reason);
 int viagra_IsNickValid(const char *nick);
 void viagra_SendCTCP(const char *source, const char *dest, const char *buf);

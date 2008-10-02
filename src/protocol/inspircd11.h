@@ -94,6 +94,6 @@ class InspIRCdProto : public IRCDProto {
 		void SendEOB();
 		void SendServer(const char *, int, const char *);
 		void ProcessUsermodes(User *, int, const char **);
-		int flood_mode_check(const char *);
-		void cmd_numeric(const char *, int, const char *, const char *);
+		int IsFloodModeParamValid(const char *);
+		void SendNumeric(const char *, int, const char *, const char *);
 } ircd_proto;

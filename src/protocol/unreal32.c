@@ -1345,7 +1345,7 @@ void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 
 /* check if +f mode is valid for the ircd */
 /* borrowed part of the new check from channels.c in Unreal */
-int UnrealIRCdProto::flood_mode_check(const char *value)
+int UnrealIRCdProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
 	/* NEW +F */

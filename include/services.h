@@ -1350,8 +1350,8 @@ class IRCDProto {
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
 		virtual int IsChannelValid(const char *) { return 1; }
-		virtual int flood_mode_check(const char *) { return 0; }
-		virtual void cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
+		virtual int IsFloodModeParamValid(const char *) { return 0; }
+		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
 		{
 			send_cmd(source, "%03d %s %s", numeric, dest, buf);
 		}

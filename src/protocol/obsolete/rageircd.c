@@ -1491,7 +1491,7 @@ int anope_event_globops(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int rageircd_flood_mode_check(const char *value)
+int rageircd_IsFloodModeParamValid(const char *value)
 {
     return 0;
 }
@@ -1628,7 +1628,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(rageircd_cmd_svspart);
     pmodule_SendSWhois(rageircd_cmd_swhois);
     pmodule_SendEOB(rageircd_cmd_eob);
-    pmodule_flood_mode_check(rageircd_flood_mode_check);
+    pmodule_IsFloodModeParamValid(rageircd_flood_mode_check);
     pmodule_SendJupe(rageircd_cmd_jupe);
     pmodule_IsNickValid(rageircd_valid_nick);
     pmodule_IsChannelValid(rageircd_valid_chan);

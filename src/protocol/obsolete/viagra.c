@@ -1511,7 +1511,7 @@ void viagra_SendSWhois(const char *source, const char *who, const char *mask)
     /* not supported */
 }
 
-int viagra_flood_mode_check(const char *value)
+int viagra_IsFloodModeParamValid(const char *value)
 {
     return 0;
 }
@@ -1668,7 +1668,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(viagra_cmd_svspart);
     pmodule_SendSWhois(viagra_cmd_swhois);
     pmodule_SendEOB(viagra_cmd_eob);
-    pmodule_flood_mode_check(viagra_flood_mode_check);
+    pmodule_IsFloodModeParamValid(viagra_flood_mode_check);
     pmodule_SendJupe(viagra_cmd_jupe);
     pmodule_IsNickValid(viagra_valid_nick);
     pmodule_IsChannelValid(viagra_valid_chan);

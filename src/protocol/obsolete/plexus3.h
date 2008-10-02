@@ -103,7 +103,7 @@ void plexus_SendUnregisteredNick(User * u);
 void plexus_SendSVID2(User * u, const char *ts);
 void plexus_SendSVID3(User * u, const char *ts);
 void plexus_SendEOB();
-int plexus_flood_mode_check(const char *value);
+int plexus_IsFloodModeParamValid(const char *value);
 void plexus_SendJupe(const char *jserver, const char *who, const char *reason);
 int plexus_IsNickValid(const char *nick);
 void plexus_SendCTCP(const char *source, const char *dest, const char *buf);

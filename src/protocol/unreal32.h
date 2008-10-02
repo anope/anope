@@ -121,5 +121,5 @@ class UnrealIRCdProto : public IRCDProto {
 		void ProcessUsermodes(User *, int, const char **);
 		int IsNickValid(const char *);
 		int IsChannelValid(const char *);
-		int flood_mode_check(const char *);
+		int IsFloodModeParamValid(const char *);
 } ircd_proto;

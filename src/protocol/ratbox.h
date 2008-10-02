@@ -75,5 +75,5 @@ class RatboxProto : public IRCDProto {
 		void SendServer(const char *, int, const char *);
 		void ProcessUsermodes(User *, int, const char **);
 		int IsNickValid(const char *);
-		void cmd_numeric(const char *, int, const char *, const char *);
+		void SendNumeric(const char *, int, const char *, const char *);
 } ircd_proto;

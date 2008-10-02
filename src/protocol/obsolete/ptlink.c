@@ -1602,7 +1602,7 @@ int anope_event_invite(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int ptlink_flood_mode_check(const char *value)
+int ptlink_IsFloodModeParamValid(const char *value)
 {
     char *dp, *end;
 
@@ -1748,7 +1748,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(ptlink_cmd_svspart);
     pmodule_SendSWhois(ptlink_cmd_swhois);
     pmodule_SendEOB(ptlink_cmd_eob);
-    pmodule_flood_mode_check(ptlink_flood_mode_check);
+    pmodule_IsFloodModeParamValid(ptlink_flood_mode_check);
     pmodule_SendJupe(ptlink_cmd_jupe);
     pmodule_IsNickValid(ptlink_valid_nick);
     pmodule_IsChannelValid(ptlink_valid_chan);

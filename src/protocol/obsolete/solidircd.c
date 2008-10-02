@@ -1520,7 +1520,7 @@ int anope_event_admin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int solidircd_flood_mode_check(const char *value)
+int solidircd_IsFloodModeParamValid(const char *value)
 {
     char *dp, *end;
 
@@ -1661,7 +1661,7 @@ void moduleAddAnopeCmds()
     pmodule_SendSVSPart(solidircd_cmd_svspart);
     pmodule_SendSWhois(solidircd_cmd_swhois);
     pmodule_SendEOB(solidircd_cmd_eob);
-    pmodule_flood_mode_check(solidircd_flood_mode_check);
+    pmodule_IsFloodModeParamValid(solidircd_flood_mode_check);
     pmodule_SendJupe(solidircd_cmd_jupe);
     pmodule_IsNickValid(solidircd_valid_nick);
     pmodule_IsChannelValid(solidircd_valid_chan);

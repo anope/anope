@@ -1034,9 +1034,9 @@ int anope_event_quit(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void CharybdisProto::cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
+void CharybdisProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
 {
-	// This might need to be set in the call to cmd_numeric instead of here, will review later -- CyberBotX
+	// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
 	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 
@@ -1273,7 +1273,7 @@ int anope_event_bmask(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int CharybdisProto::flood_mode_check(const char *value)
+int CharybdisProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
 	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;

@@ -991,9 +991,9 @@ int anope_event_quit(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void RatboxProto::cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
+void RatboxProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
 {
-	// This might need to be set in the call to cmd_numeric instead of here, will review later -- CyberBotX
+	// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
 	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 

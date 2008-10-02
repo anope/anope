@@ -560,7 +560,7 @@ void InspIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 	send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 }
 
-void InspIRCdProto::cmd_numeric(const char *source, int numeric, const char *dest, const char *buf)
+void InspIRCdProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
 {
 	send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
 }
@@ -1346,7 +1346,7 @@ int anope_event_admin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int InspIRCdProto::flood_mode_check(const char *value)
+int InspIRCdProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
 	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;

@@ -52,12 +52,12 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 class InspIRCdProto : public IRCDProto {
+		void SendSVSKillInternal(const char *, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
 		void SendVhostDel(User *);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
-		void SendSVSKill(const char *, const char *, const char *);
 		void SendSVSMode(User *, int, const char **);
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
 		void SendMode(const char *, const char *, const char *);

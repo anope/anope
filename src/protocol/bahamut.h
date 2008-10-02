@@ -59,12 +59,12 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 class BahamutIRCdProto : public IRCDProto {
+		void SendSVSKillInternal(const char *, const char *, const char *);
 	public:
 		void SendSVSNOOP(const char *, int);
 		void SendAkillDel(const char *, const char *);
 		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
-		void SendSVSKill(const char *, const char *, const char *);
 		void SendSVSMode(User *, int, const char **);
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
 		void SendMode(const char *, const char *, const char *);

@@ -65,7 +65,7 @@ void kill_user(const char *source, const char *user, const char *reason)
 
     snprintf(buf, sizeof(buf), "%s (%s)", source, reason);
 
-    anope_SendSVSKill(source, user, buf);
+    ircdproto->SendSVSKill(source, user, buf);
 
     if (!ircd->quitonkill && finduser(user)) {
         do_kill(user, buf);

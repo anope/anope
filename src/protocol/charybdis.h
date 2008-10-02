@@ -47,11 +47,11 @@
 
 
 class CharybdisProto : public IRCDTS6Proto {
+		void SendSVSKillInternal(const char *, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendVhostDel(User *);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
-		void SendSVSKill(const char *, const char *, const char *);
 		void SendSVSMode(User *, int, const char **);
 		void SendMode(const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);

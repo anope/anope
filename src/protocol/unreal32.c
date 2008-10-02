@@ -514,7 +514,7 @@ void UnrealIRCdProto::SendAkill(const char *user, const char *host, const char *
 **	parv[1] = client
 **	parv[2] = kill message
 */
-void UnrealIRCdProto::SendSVSKill(const char *source, const char *user, const char *buf)
+void UnrealIRCdProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
 {
 	if (!source || !user || !buf) return;
 	send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);

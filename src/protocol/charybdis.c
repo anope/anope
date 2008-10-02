@@ -715,7 +715,7 @@ void CharybdisProto::SendAkill(const char *user, const char *host, const char *w
 	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
-void CharybdisProto::SendSVSKill(const char *source, const char *user, const char *buf)
+void CharybdisProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
 {
 	if (!source || !user || !buf) return;
 	BotInfo *bi = findbot(source);

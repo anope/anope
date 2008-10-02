@@ -7,8 +7,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -962,7 +962,7 @@ void cancel_user(User * u)
                                              "Services Enforcer", "+");
                         add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                     } else {
-                        anope_SendSVSKill(s_NickServ, u->nick,
+                        ircdproto->SendSVSKill(s_NickServ, u->nick,
                                           "Killing to enforce nick");
                     }
                 }
@@ -973,7 +973,7 @@ void cancel_user(User * u)
                                          "Services Enforcer", "+");
                     add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                 } else {
-                    anope_SendSVSKill(s_NickServ, u->nick,
+                    ircdproto->SendSVSKill(s_NickServ, u->nick,
                                       "Killing to enforce nick");
                 }
             }
@@ -1817,7 +1817,7 @@ int do_setmodes(User * u)
 }
 
 /*************************************************************************/
-/*               
+/*
  * Nick tracking
  */
 

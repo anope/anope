@@ -1230,13 +1230,24 @@ class IRCDProto;
 #include "extern.h"
 
 class IRCDProto {
+		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
 	public:
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;
 		virtual void SendVhostDel(User *) { }
 		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
-		virtual void SendSVSKill(const char *, const char *, const char *) = 0;
+		virtual void SendSVSKill(const char *source, const char *user, const char *fmt, ...)
+		{
+			va_list args;
+			char buf[BUFSIZE] = "";
+			if (fmt) {
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+			}
+			SendSVSKillInternal(source, user, buf);
+		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendGuestNick(const char *, const char *, const char *, const char *, const char *) { }
 		virtual void SendMode(const char *, const char *, const char *) = 0;

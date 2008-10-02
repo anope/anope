@@ -693,7 +693,7 @@ void BahamutIRCdProto::SendAkill(const char *user, const char *host, const char 
 /*
   Note: if the stamp is null 0, the below usage is correct of Bahamut
 */
-void BahamutIRCdProto::SendSVSKill(const char *source, const char *user, const char *buf)
+void BahamutIRCdProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
 {
 	if (!source || !user || !buf) return;
 	send_cmd(source, "SVSKILL %s :%s", user, buf);

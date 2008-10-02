@@ -112,7 +112,7 @@ int do_forbid(User * u)
                 av[0] = c->name;
                 av[1] = cu->user->nick;
                 av[2] = reason ? reason : "CHAN_FORBID_REASON";
-                ircdproto->SendKick(s_ChanServ, av[0], av[1], av[2]);
+                ircdproto->SendKick(findbot(s_ChanServ), av[0], av[1], av[2]);
                 do_kick(s_ChanServ, 3, av);
             }
         }

@@ -43,35 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "";
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	BotInfo *bi = findbot(source);
-	ircdproto->SendMessage(bi, dest, buf);
-}
-
-void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...)
-{
-	va_list args;
-	char buf[BUFSIZE] = "", actionbuf[BUFSIZE] = "";
-	if (fmt) {
-		va_start(args, fmt);
-		vsnprintf(buf, BUFSIZE - 1, fmt, args);
-		va_end(args);
-	}
-	else return;
-	if (!*buf) return;
-	snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s%c", 1, buf, 1);
-	BotInfo *bi = findbot(source);
-	ircdproto->SendPrivmsg(bi, dest, actionbuf);
-}
-
 void anope_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
 	ircdproto->SendGlobalNotice(source, dest, msg);

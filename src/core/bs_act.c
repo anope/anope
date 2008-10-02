@@ -82,7 +82,7 @@ int do_act(User * u)
         notice_lang(s_BotServ, u, ACCESS_DENIED);
     else {
         strnrepl(text, BUFSIZE, "\001", "");
-        anope_cmd_action(ci->bi->nick, ci->name, "%s", text);
+        ircdproto->SendAction(ci->bi->nick, ci->name, "%s", text);
         ci->bi->lastmsg = time(NULL);
         if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
             ircdproto->SendPrivmsg(ci->bi->nick, LogChannel, "ACT %s %s %s",

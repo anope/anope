@@ -1326,6 +1326,21 @@ class IRCDProto {
 			BotInfo *bi = findbot(source);
 			SendNoticeInternal(bi, dest, buf);
 		}
+		virtual void SendAction(const char *source, const char *dest, const char *fmt, ...)
+		{
+			va_list args;
+			char buf[BUFSIZE] = "", actionbuf[BUFSIZE] = "";
+			if (fmt) {
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+			}
+			else return;
+			if (!*buf) return;
+			snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s%c", 1, buf, 1);
+			BotInfo *bi = findbot(source);
+			SendPrivmsgInternal(bi, dest, actionbuf);
+		}
 		virtual void SendPrivmsg(const char *source, const char *dest, const char *fmt, ...)
 		{
 			va_list args;

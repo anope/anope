@@ -1130,7 +1130,6 @@ E void anope_SendGlobalNotice(const char *source, const char *dest, const char *
 E void anope_SendPart(const char *nick, const char *chan, const char *fmt, ...); 	  		  /* PART */
 E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
 E void anope_SendPong(const char *servname, const char *who);                    	  		  /* PONG */
-E void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...);    		  /* PRIVMSG */
 E void anope_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg);	  		  /* PRIVMSG */
 E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
 E void anope_SendQuit(const char *source, const char *fmt, ...);           	  		  /* QUIT */

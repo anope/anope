@@ -1062,14 +1062,14 @@ void ultimate3_cmd_nick(const char *nick, const char *name, const char *modes)
     ultimate3_cmd_sqline(nick, "Reserved for services");
 }
 
-void ultimate3_cmd_guest_nick(const char *nick, const char *user, const char *host,
+void ultimate3_SendGuestNick(const char *nick, const char *user, const char *host,
                               const char *real, const char *modes)
 {
     send_cmd(NULL, "CLIENT %s 1 %ld %s + %s %s * %s 0 0 :%s", nick,
              (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
-void ultimate3_cmd_mode(const char *source, const char *dest, const char *buf)
+void ultimate3_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1150,7 +1150,7 @@ void ultimate3_cmd_serv_privmsg(const char *source, const char *dest, const char
 
 void ultimate3_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
+    anope_SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
 void ultimate3_cmd_351(const char *source)
@@ -1713,8 +1713,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ultimate3_cmd_375);
     pmodule_cmd_376(ultimate3_cmd_376);
     pmodule_cmd_nick(ultimate3_cmd_nick);
-    pmodule_cmd_guest_nick(ultimate3_cmd_guest_nick);
-    pmodule_cmd_mode(ultimate3_cmd_mode);
+    pmodule_SendGuestNick(ultimate3_cmd_guest_nick);
+    pmodule_SendMode(ultimate3_cmd_mode);
     pmodule_cmd_bot_nick(ultimate3_cmd_bot_nick);
     pmodule_cmd_kick(ultimate3_cmd_kick);
     pmodule_cmd_notice_ops(ultimate3_cmd_notice_ops);

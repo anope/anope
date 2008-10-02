@@ -565,12 +565,12 @@ void InspIRCdProto::cmd_numeric(const char *source, int numeric, const char *des
 	send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
 }
 
-void InspIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void InspIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 }
 
-void InspIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	Channel *c = findchan(dest);
@@ -736,7 +736,7 @@ void InspIRCdProto::cmd_notice_ops(const char *source, const char *dest, const c
 
 void InspIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-	anope_cmd_mode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
+	anope_SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */

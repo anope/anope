@@ -541,13 +541,13 @@ void UnrealIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 	}
 }
 
-void UnrealIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void UnrealIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
 		myIrcd->nickip ? " *" : " ", real);
 }
 
-void UnrealIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
@@ -576,7 +576,7 @@ void UnrealIRCdProto::cmd_notice_ops(const char *source, const char *dest, const
 
 void UnrealIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-	anope_cmd_mode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
+	anope_SendMode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */

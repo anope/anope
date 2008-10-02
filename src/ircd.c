@@ -85,12 +85,12 @@ void anope_SendSVSMode(User *u, int ac, const char **av)
 	ircdproto->SendSVSMode(u, ac, av);
 }
 
-void anope_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void anope_SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
-	ircdproto->cmd_guest_nick(nick, user, host, real, modes);
+	ircdproto->SendGuestNick(nick, user, host, real, modes);
 }
 
-void anope_cmd_mode(const char *source, const char *dest, const char *fmt, ...)
+void anope_SendMode(const char *source, const char *dest, const char *fmt, ...)
 {
 	va_list args;
 	char buf[BUFSIZE] = "";
@@ -99,7 +99,7 @@ void anope_cmd_mode(const char *source, const char *dest, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_mode(source, dest, buf);
+	ircdproto->SendMode(source, dest, buf);
 }
 
 void anope_cmd_bot_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)

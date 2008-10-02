@@ -101,7 +101,7 @@ int do_operumodes(User * u)
     if (!(u2 = finduser(nick))) {
         notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
     } else {
-        anope_cmd_mode(s_OperServ, nick, "%s", modes);
+        anope_SendMode(s_OperServ, nick, "%s", modes);
 
         common_svsmode(u2, modes, NULL);
 

@@ -731,7 +731,7 @@ void bot_join(ChannelInfo * ci)
                 next = ban->next;
                 if (entry_match
                     (ban, ci->bi->nick, ci->bi->user, ci->bi->host, 0)) {
-                    anope_cmd_mode(whosends(ci), ci->name, "-b %s",
+                    anope_SendMode(whosends(ci), ci->name, "-b %s",
                                    ban->mask);
                     if (ircdcap->tsmode)
                         av[3] = ban->mask;
@@ -792,7 +792,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
             ac = 3;
         }
 
-        anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
+        anope_SendMode(ci->bi->nick, ci->name, "+b %s", mask);
         do_cmode(ci->bi->nick, ac, av);
         send_event(EVENT_BOT_BAN, 3, u->nick, ci->name, mask);
     }
@@ -880,7 +880,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         ac = 3;
     }
 
-    anope_cmd_mode(ci->bi->nick, ci->name, "+b %s", mask);
+    anope_SendMode(ci->bi->nick, ci->name, "+b %s", mask);
     do_cmode(ci->bi->nick, ac, av);
 
     kav[0] = ci->name;
@@ -993,13 +993,13 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
         av[2] = mode;
         av[3] = nick;
         ac = 4;
-        anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[2], av[3]);
+        anope_SendMode(ci->bi->nick, av[0], "%s %s", av[2], av[3]);
     } else {
         av[0] = ci->name;
         av[1] = mode;
         av[2] = nick;
         ac = 3;
-        anope_cmd_mode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
+        anope_SendMode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
     }
 
     do_cmode(ci->bi->nick, ac, av);

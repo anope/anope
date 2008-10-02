@@ -937,7 +937,7 @@ void rageircd_cmd_351(const char *source)
              EncModule, version_build);
 }
 
-void rageircd_cmd_mode(const char *source, const char *dest, const char *buf)
+void rageircd_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1212,7 +1212,7 @@ void rageircd_SendSVSMode_chan(const char *name, const char *mode, const char *n
 
 void rageircd_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 int anope_event_server(const char *source, int ac, const char **av)
@@ -1351,7 +1351,7 @@ void rageircd_cmd_svsnick(const char *source, const char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void rageircd_cmd_guest_nick(const char *nick, const char *user, const char *host,
+void rageircd_SendGuestNick(const char *nick, const char *user, const char *host,
                              const char *real, const char *modes)
 {
     send_cmd(NULL, "SNICK %s %ld 1 %s %s 0 * %s 0 %s :%s", nick,
@@ -1572,8 +1572,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(rageircd_cmd_375);
     pmodule_cmd_376(rageircd_cmd_376);
     pmodule_cmd_nick(rageircd_cmd_nick);
-    pmodule_cmd_guest_nick(rageircd_cmd_guest_nick);
-    pmodule_cmd_mode(rageircd_cmd_mode);
+    pmodule_SendGuestNick(rageircd_cmd_guest_nick);
+    pmodule_SendMode(rageircd_cmd_mode);
     pmodule_cmd_bot_nick(rageircd_cmd_bot_nick);
     pmodule_cmd_kick(rageircd_cmd_kick);
     pmodule_cmd_notice_ops(rageircd_cmd_notice_ops);

@@ -99,7 +99,7 @@ int do_drop(User * u)
         if (ci->c) {
             if (ircd->regmode) {
                 ci->c->mode &= ~ircd->regmode;
-                anope_cmd_mode(whosends(ci), ci->name, "-r");
+                anope_SendMode(whosends(ci), ci->name, "-r");
             }
         }
 

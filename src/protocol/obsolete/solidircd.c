@@ -480,7 +480,7 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
-void solidircd_cmd_mode(const char *source, const char *dest, const char *buf)
+void solidircd_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -530,7 +530,7 @@ void solidircd_SendSVSMode_chan(const char *name, const char *mode, const char *
 
 void solidircd_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */
@@ -1356,7 +1356,7 @@ void solidircd_cmd_svsnick(const char *source, const char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void solidircd_cmd_guest_nick(const char *nick, const char *user, const char *host,
+void solidircd_SendGuestNick(const char *nick, const char *user, const char *host,
                               const char *real, const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
@@ -1605,8 +1605,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(solidircd_cmd_375);
     pmodule_cmd_376(solidircd_cmd_376);
     pmodule_cmd_nick(solidircd_cmd_nick);
-    pmodule_cmd_guest_nick(solidircd_cmd_guest_nick);
-    pmodule_cmd_mode(solidircd_cmd_mode);
+    pmodule_SendGuestNick(solidircd_cmd_guest_nick);
+    pmodule_SendMode(solidircd_cmd_mode);
     pmodule_cmd_bot_nick(solidircd_cmd_bot_nick);
     pmodule_cmd_kick(solidircd_cmd_kick);
     pmodule_cmd_notice_ops(solidircd_cmd_notice_ops);

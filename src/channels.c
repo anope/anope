@@ -190,7 +190,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
         }
 
         /* Set the resulting mode buffer */
-        anope_cmd_mode(whosends(chan->ci), chan->name, merge_args(ac, av));
+        anope_SendMode(whosends(chan->ci), chan->name, merge_args(ac, av));
 
         return;
     }
@@ -225,7 +225,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
             if ((cum->flags & CUF_PROTECT_BOTSERV) && !add) {
                 if ((bi = findbot(*av))) {
                     if (!botmode || botmode != mode) {
-                        anope_cmd_mode(bi->nick, chan->name, "+%c %s",
+                        anope_SendMode(bi->nick, chan->name, "+%c %s",
                                        mode, bi->nick);
                         botmode = mode;
                         continue;
@@ -1285,7 +1285,7 @@ void add_ban(Channel * chan, const char *mask)
         BotInfo *bi = chan->ci->bi;
 
         if (entry_match(ban, bi->nick, bi->user, bi->host, 0)) {
-            anope_cmd_mode(bi->nick, chan->name, "-b %s", mask);
+            anope_SendMode(bi->nick, chan->name, "-b %s", mask);
             entry_delete(chan->bans, ban);
             return;
         }
@@ -1508,7 +1508,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
     if (!add_modes && !rem_modes)
         return;
 
-    anope_cmd_mode(whosends(ci), c->name, "%s%s", modebuf, userbuf);
+    anope_SendMode(whosends(ci), c->name, "%s%s", modebuf, userbuf);
     if (add_modes > 0)
         chan_set_user_status(c, user, add_modes);
     if (rem_modes > 0)
@@ -1883,7 +1883,7 @@ void do_mass_mode(char *modes)
             free(myModes);
             return;
         } else {
-            anope_cmd_mode(s_OperServ, c->name, "%s", modes);
+            anope_SendMode(s_OperServ, c->name, "%s", modes);
             chan_set_modes(s_OperServ, c, ac, av, 1);
         }
     }

@@ -387,7 +387,7 @@ CUMode myCumodes[128] = {
 
 void ptlink_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(s_ChanServ, chan, "%s %s %s", ircd->botchanumode, nick,
+    anope_SendMode(s_ChanServ, chan, "%s %s %s", ircd->botchanumode, nick,
                    nick);
 }
 
@@ -1178,7 +1178,7 @@ void ptlink_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void ptlink_cmd_mode(const char *source, const char *dest, const char *buf)
+void ptlink_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1474,7 +1474,7 @@ void ptlink_cmd_svsnick(const char *source, const char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void ptlink_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+void ptlink_SendGuestNick(const char *nick, const char *user, const char *host, const char *real,
                            const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %lu %s %s %s %s %s :%s", nick,
@@ -1692,8 +1692,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(ptlink_cmd_375);
     pmodule_cmd_376(ptlink_cmd_376);
     pmodule_cmd_nick(ptlink_cmd_nick);
-    pmodule_cmd_guest_nick(ptlink_cmd_guest_nick);
-    pmodule_cmd_mode(ptlink_cmd_mode);
+    pmodule_SendGuestNick(ptlink_cmd_guest_nick);
+    pmodule_SendMode(ptlink_cmd_mode);
     pmodule_cmd_bot_nick(ptlink_cmd_bot_nick);
     pmodule_cmd_kick(ptlink_cmd_kick);
     pmodule_cmd_notice_ops(ptlink_cmd_notice_ops);

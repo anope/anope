@@ -1125,7 +1125,7 @@ void hybrid_cmd_211(const char *buf)
     send_cmd(NULL, "211 %s", buf);
 }
 
-void hybrid_cmd_mode(const char *source, const char *dest, const char *buf)
+void hybrid_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1162,7 +1162,7 @@ void hybrid_cmd_notice_ops(const char *source, const char *dest, const char *buf
 
 void hybrid_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
@@ -1273,7 +1273,7 @@ void hybrid_cmd_svsnick(const char *nick, const char *newnick, time_t when)
     /* Not Supported by this IRCD */
 }
 
-void hybrid_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+void hybrid_SendGuestNick(const char *nick, const char *user, const char *host, const char *real,
                            const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick,
@@ -1463,8 +1463,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(hybrid_cmd_375);
     pmodule_cmd_376(hybrid_cmd_376);
     pmodule_cmd_nick(hybrid_cmd_nick);
-    pmodule_cmd_guest_nick(hybrid_cmd_guest_nick);
-    pmodule_cmd_mode(hybrid_cmd_mode);
+    pmodule_SendGuestNick(hybrid_cmd_guest_nick);
+    pmodule_SendMode(hybrid_cmd_mode);
     pmodule_cmd_bot_nick(hybrid_cmd_bot_nick);
     pmodule_cmd_kick(hybrid_cmd_kick);
     pmodule_cmd_notice_ops(hybrid_cmd_notice_ops);

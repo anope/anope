@@ -118,7 +118,7 @@ int do_ban(User * u)
                 av[0] = "+b";
                 get_idealban(ci, u, mask, sizeof(mask));
                 av[1] = mask;
-                anope_cmd_mode(whosends(ci), uc->chan->name, "+b %s",
+                anope_SendMode(whosends(ci), uc->chan->name, "+b %s",
                                av[1]);
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
 
@@ -175,7 +175,7 @@ int do_ban(User * u)
         av[0] = "+b";
         get_idealban(ci, u2, mask, sizeof(mask));
         av[1] = mask;
-        anope_cmd_mode(whosends(ci), c->name, "+b %s", av[1]);
+        anope_SendMode(whosends(ci), c->name, "+b %s", av[1]);
         chan_set_modes(s_ChanServ, c, 2, av, 1);
 
         /* We still allow host banning while not allowing to kick */

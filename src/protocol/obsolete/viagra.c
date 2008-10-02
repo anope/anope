@@ -865,7 +865,7 @@ void viagra_SendSVSKill(const char *source, const char *user, const char *buf)
     return;
 }
 
-void viagra_cmd_mode(const char *source, const char *dest, const char *buf)
+void viagra_SendMode(const char *source, const char *dest, const char *buf)
 {
     if (!buf) {
         return;
@@ -1384,7 +1384,7 @@ void viagra_cmd_invite(const char *source, const char *chan, const char *nick)
 
 void viagra_cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-    anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+    anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 int anope_event_capab(const char *source, int ac, const char **av)
@@ -1414,7 +1414,7 @@ void viagra_cmd_svsnick(const char *source, const char *guest, time_t when)
     send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
-void viagra_cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real,
+void viagra_SendGuestNick(const char *nick, const char *user, const char *host, const char *real,
                            const char *modes)
 {
     send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
@@ -1612,8 +1612,8 @@ void moduleAddAnopeCmds()
     pmodule_cmd_375(viagra_cmd_375);
     pmodule_cmd_376(viagra_cmd_376);
     pmodule_cmd_nick(viagra_cmd_nick);
-    pmodule_cmd_guest_nick(viagra_cmd_guest_nick);
-    pmodule_cmd_mode(viagra_cmd_mode);
+    pmodule_SendGuestNick(viagra_cmd_guest_nick);
+    pmodule_SendMode(viagra_cmd_mode);
     pmodule_cmd_bot_nick(viagra_cmd_bot_nick);
     pmodule_cmd_kick(viagra_cmd_kick);
     pmodule_cmd_notice_ops(viagra_cmd_notice_ops);

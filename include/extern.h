@@ -1127,14 +1127,14 @@ E void anope_cmd_global(const char *source, const char *fmt, ...);         	  		
 E void anope_cmd_invite(const char *source, const char *chan, const char *nick);       	  		  /* INVITE */
 E void anope_cmd_join(const char *user, const char *channel, time_t chantime);   	  		  /* JOIN */
 E void anope_cmd_kick(const char *source, const char *chan, const char *user, const char *fmt, ...);		  /* KICK */
-E void anope_cmd_mode(const char *source, const char *dest, const char *fmt, ...);   	  		  /* MODE */
+E void anope_SendMode(const char *source, const char *dest, const char *fmt, ...);   	  		  /* MODE */
 E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
 E void anope_cmd_unban(const char *name, const char *nick);				  		  			      /* MODE -b */
 E void anope_cmd_bot_chan_mode(const char *nick, const char *chan);			  		  /* MODE BotServ */
 E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
 E void anope_cmd_chg_nick(const char *oldnick, const char *newnick);             	  		  /* NICK */
 E void anope_cmd_bot_nick(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
-E void anope_cmd_guest_nick(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
+E void anope_SendGuestNick(const char *nick, const char *user,const char *host,const char *real,const char *modes);	  /* NICK */
 E void anope_cmd_message(const char *source, const char *dest, const char *fmt, ...);     		  /* NOTICE */
 E void anope_cmd_notice_ops(const char *source, const char *dest, const char *fmt, ...); 		  /* NOTICE */
 E void anope_cmd_notice(const char *source, const char *dest, const char *msg);		  		  /* NOTICE */

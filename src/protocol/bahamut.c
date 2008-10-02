@@ -452,7 +452,7 @@ CUMode myCumodes[128] = {
 
 
 
-void BahamutIRCdProto::cmd_mode(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendMode(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source, "MODE %s 0 %s", dest, buf);
@@ -488,7 +488,7 @@ void BahamutIRCdProto::SendSVSMode_chan(const char *name, const char *mode, cons
 
 void BahamutIRCdProto::cmd_bot_chan_mode(const char *nick, const char *chan)
 {
-	anope_cmd_mode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */
@@ -993,7 +993,7 @@ void BahamutIRCdProto::cmd_bot_nick(const char *nick, const char *user, const ch
 	cmd_sqline(nick, "Reserved for services");
 }
 
-void BahamutIRCdProto::cmd_guest_nick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void BahamutIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
 {
 	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
 }

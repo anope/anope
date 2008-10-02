@@ -148,7 +148,7 @@ int my_cs_appendtopic(User * u)
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_cmd_join(s_ChanServ, c->name, c->creation_time);
-                anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
+                anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
         anope_cmd_topic(whosends(ci), c->name, u->nick, topic, c->topic_time);

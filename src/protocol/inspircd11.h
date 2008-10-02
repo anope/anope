@@ -71,8 +71,8 @@ class InspIRCdProto : public IRCDProto {
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);
 		void SendSVSMode(User *, int, const char **);
-		void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *);
-		void cmd_mode(const char *, const char *, const char *);
+		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
+		void SendMode(const char *, const char *, const char *);
 		void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *);
 		void cmd_kick(const char *, const char *, const char *, const char *);
 		void cmd_notice_ops(const char *, const char *, const char *);

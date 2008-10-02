@@ -896,7 +896,7 @@ void check_modes(Channel * c)
         if (ircd->regmode) {
             if (c->mode & ircd->regmode) {
                 c->mode &= ~ircd->regmode;
-                anope_cmd_mode(whosends(ci), c->name, "-r");
+                anope_SendMode(whosends(ci), c->name, "-r");
             }
         }
         return;
@@ -1005,7 +1005,7 @@ void check_modes(Channel * c)
     *end = 0;
     *end2 = 0;
 
-    anope_cmd_mode(whosends(ci), c->name, "%s%s", modebuf,
+    anope_SendMode(whosends(ci), c->name, "%s%s", modebuf,
                    (end2 == argbuf ? "" : argbuf));
 }
 
@@ -1026,13 +1026,13 @@ int check_valid_admin(User * user, Channel * chan, int servermode)
 
     if (servermode && !check_access(user, chan->ci, CA_AUTOPROTECT)) {
         notice_lang(s_ChanServ, user, CHAN_IS_REGISTERED, s_ChanServ);
-        anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
+        anope_SendMode(whosends(chan->ci), chan->name, "%s %s",
                        ircd->adminunset, user->nick);
         return 0;
     }
 
     if (check_access(user, chan->ci, CA_AUTODEOP)) {
-        anope_cmd_mode(whosends(chan->ci), chan->name, "%s %s",
+        anope_SendMode(whosends(chan->ci), chan->name, "%s %s",
                        ircd->adminunset, user->nick);
         return 0;
     }
@@ -1062,14 +1062,14 @@ int check_valid_op(User * user, Channel * chan, int servermode)
             if (ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
                     tmp = stripModePrefix(ircd->ownerunset);
-                    anope_cmd_mode(whosends(chan->ci), chan->name,
+                    anope_SendMode(whosends(chan->ci), chan->name,
                                    "%so%s %s %s %s", ircd->adminunset,
                                    tmp, user->nick,
                                    user->nick, user->nick);
                     free(tmp);
                 } else {
                     tmp = stripModePrefix(ircd->ownerunset);
-                    anope_cmd_mode(whosends(chan->ci), chan->name,
+                    anope_SendMode(whosends(chan->ci), chan->name,
                                    "%sho%s %s %s %s %s",
                                    ircd->adminunset, tmp,
                                    user->nick, user->nick, user->nick,
@@ -1078,25 +1078,25 @@ int check_valid_op(User * user, Channel * chan, int servermode)
                 }
             } else if (!ircd->owner && ircd->protect) {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-                    anope_cmd_mode(whosends(chan->ci), chan->name,
+                    anope_SendMode(whosends(chan->ci), chan->name,
                                    "%so %s %s", ircd->adminunset,
                                    user->nick, user->nick);
                 } else {
-                    anope_cmd_mode(whosends(chan->ci), chan->name,
+                    anope_SendMode(whosends(chan->ci), chan->name,
                                    "%soh %s %s %s", ircd->adminunset,
                                    user->nick, user->nick, user->nick);
                 }
             } else {
                 if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
-                    anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
+                    anope_SendMode(whosends(chan->ci), chan->name, "-o %s",
                                    user->nick);
                 } else {
-                    anope_cmd_mode(whosends(chan->ci), chan->name,
+                    anope_SendMode(whosends(chan->ci), chan->name,
                                    "-ho %s %s", user->nick, user->nick);
                 }
             }
         } else {
-            anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
+            anope_SendMode(whosends(chan->ci), chan->name, "-o %s",
                            user->nick);
         }
         return 0;
@@ -1106,17 +1106,17 @@ int check_valid_op(User * user, Channel * chan, int servermode)
         if (ircd->halfop) {
             if (ircd->owner && ircd->protect) {
                 tmp = stripModePrefix(ircd->ownerunset);
-                anope_cmd_mode(whosends(chan->ci), chan->name,
+                anope_SendMode(whosends(chan->ci), chan->name,
                                "%sho%s %s %s %s %s", ircd->adminunset,
                                tmp, user->nick, user->nick,
                                user->nick, user->nick);
                 free(tmp);
             } else {
-                anope_cmd_mode(whosends(chan->ci), chan->name, "-ho %s %s",
+                anope_SendMode(whosends(chan->ci), chan->name, "-ho %s %s",
                                user->nick, user->nick);
             }
         } else {
-            anope_cmd_mode(whosends(chan->ci), chan->name, "-o %s",
+            anope_SendMode(whosends(chan->ci), chan->name, "-o %s",
                            user->nick);
         }
         return 0;
@@ -1142,7 +1142,7 @@ int check_should_op(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOOP)) {
-        anope_cmd_mode(whosends(ci), chan, "+o %s", user->nick);
+        anope_SendMode(whosends(ci), chan, "+o %s", user->nick);
         return 1;
     }
 
@@ -1165,7 +1165,7 @@ int check_should_voice(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOVOICE)) {
-        anope_cmd_mode(whosends(ci), chan, "+v %s", user->nick);
+        anope_SendMode(whosends(ci), chan, "+v %s", user->nick);
         return 1;
     }
 
@@ -1182,7 +1182,7 @@ int check_should_halfop(User * user, char *chan)
         return 0;
 
     if (check_access(user, ci, CA_AUTOHALFOP)) {
-        anope_cmd_mode(whosends(ci), chan, "+h %s", user->nick);
+        anope_SendMode(whosends(ci), chan, "+h %s", user->nick);
         return 1;
     }
 
@@ -1202,7 +1202,7 @@ int check_should_owner(User * user, char *chan)
     if (((ci->flags & CI_SECUREFOUNDER) && is_real_founder(user, ci))
         || (!(ci->flags & CI_SECUREFOUNDER) && is_founder(user, ci))) {
         tmp = stripModePrefix(ircd->ownerset);
-        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
+        anope_SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
         free(tmp);
         return 1;
@@ -1223,7 +1223,7 @@ int check_should_protect(User * user, char *chan)
 
     if (check_access(user, ci, CA_AUTOPROTECT)) {
         tmp = stripModePrefix(ircd->adminset);
-        anope_cmd_mode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
+        anope_SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
                        user->nick);
         free(tmp);
         return 1;
@@ -1356,7 +1356,7 @@ int check_kick(User * user, const char *chan, time_t chants)
         /* Lets hide the channel from /list just incase someone does /list
          * while we are here. - katsklaw
          */
-        anope_cmd_mode(s_ChanServ, chan, "+ntsi");
+        anope_SendMode(s_ChanServ, chan, "+ntsi");
         t = add_timeout(CSInhabit, timeout_leave, 0);
         t->data = sstrdup(chan);
         ci->flags |= CI_INHABIT;
@@ -1380,7 +1380,7 @@ int check_kick(User * user, const char *chan, time_t chants)
         do_cmode(whosends(ci), ac, av);
     }
 
-    anope_cmd_mode(whosends(ci), chan, "+b %s", mask);
+    anope_SendMode(whosends(ci), chan, "+b %s", mask);
     anope_cmd_kick(whosends(ci), chan, user->nick, "%s", reason);
 
     return 1;
@@ -1449,7 +1449,7 @@ void restore_topic(const char *chan)
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
             anope_cmd_join(s_ChanServ, chan, c->creation_time);
-            anope_cmd_mode(NULL, chan, "+o %s", s_ChanServ);
+            anope_SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
     anope_cmd_topic(whosends(ci), c->name, c->topic_setter,
@@ -1511,7 +1511,7 @@ int check_topiclock(Channel * c, time_t topic_time)
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
             anope_cmd_join(s_ChanServ, c->name, c->creation_time);
-            anope_cmd_mode(NULL, c->name, "+o %s", s_ChanServ);
+            anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
         }
     }
 
@@ -1589,7 +1589,7 @@ void cs_remove_nick(const NickCore * nc)
                         /* Maybe move this to delchan() ? */
                         if ((ci->c) && (ci->c->mode & ircd->regmode)) {
                             ci->c->mode &= ~ircd->regmode;
-                            anope_cmd_mode(whosends(ci), ci->name, "-r");
+                            anope_SendMode(whosends(ci), ci->name, "-r");
                         }
                     }
 
@@ -2343,7 +2343,7 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
     /* Falling there means set the ban */
     av[0] = "+b";
     av[1] = akick->u.mask;
-    anope_cmd_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
+    anope_SendMode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
     chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
 }
 
@@ -2366,7 +2366,7 @@ void stick_all(ChannelInfo * ci)
 
         av[0] = "+b";
         av[1] = akick->u.mask;
-        anope_cmd_mode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
+        anope_SendMode(whosends(ci), ci->c->name, "+b %s", akick->u.mask);
         chan_set_modes(s_ChanServ, ci->c, 2, av, 1);
     }
 }

@@ -91,7 +91,7 @@ int do_clear(User * u)
                 next = ban->next;
                 av[0] = "-b";
                 av[1] = ban->mask;
-                anope_cmd_mode(whosends(ci), chan, "-b %s", ban->mask);
+                anope_SendMode(whosends(ci), chan, "-b %s", ban->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
             }
         }
@@ -106,7 +106,7 @@ int do_clear(User * u)
                 next = except->next;
                 av[0] = "-e";
                 av[1] = except->mask;
-                anope_cmd_mode(whosends(ci), chan, "-e %s", except->mask);
+                anope_SendMode(whosends(ci), chan, "-e %s", except->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
             }
         }
@@ -121,7 +121,7 @@ int do_clear(User * u)
                 next = invite->next;
                 av[0] = "-I";
                 av[1] = invite->mask;
-                anope_cmd_mode(whosends(ci), chan, "-I %s", invite->mask);
+                anope_SendMode(whosends(ci), chan, "-I %s", invite->mask);
                 chan_set_modes(whosends(ci), c, 2, av, 0);
             }
         }
@@ -132,7 +132,7 @@ int do_clear(User * u)
 
         if (c->mode) {
             /* Clear modes the bulk of the modes */
-            anope_cmd_mode(whosends(ci), c->name, "%s",
+            anope_SendMode(whosends(ci), c->name, "%s",
                            ircd->modestoremove);
             argv[0] = ircd->modestoremove;
             chan_set_modes(whosends(ci), c, 1, argv, 0);
@@ -140,13 +140,13 @@ int do_clear(User * u)
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
                to send them - TSL */
             if (c->key) {
-                anope_cmd_mode(whosends(ci), c->name, "-k %s", c->key);
+                anope_SendMode(whosends(ci), c->name, "-k %s", c->key);
                 argv[0] = "-k";
                 argv[1] = c->key;
                 chan_set_modes(whosends(ci), c, 2, argv, 0);
             }
             if (ircd->Lmode && c->redirect) {
-                anope_cmd_mode(whosends(ci), c->name, "-L %s",
+                anope_SendMode(whosends(ci), c->name, "-L %s",
                                c->redirect);
                 argv[0] = "-L";
                 argv[1] = c->redirect;
@@ -154,7 +154,7 @@ int do_clear(User * u)
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
-                    anope_cmd_mode(whosends(ci), c->name, "%s %s",
+                    anope_SendMode(whosends(ci), c->name, "%s %s",
                                    flood_mode_char_remove, c->flood);
                     argv[0] = flood_mode_char_remove;
                     argv[1] = c->flood;
@@ -242,7 +242,7 @@ int do_clear(User * u)
                         av[i+3] = cu->user->nick;
                     ac = 3 + i;
 
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2], tmp2);
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[2], tmp2);
                 } else {
                     av[1] = tmp;
                     /* We have to give as much nicks as modes.. - Viper */
@@ -250,7 +250,7 @@ int do_clear(User * u)
                         av[i+2] = cu->user->nick;
                     ac = 2 + i;
 
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1], tmp2);
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[1], tmp2);
                 }
 
                 do_cmode(s_ChanServ, ac, av);
@@ -292,10 +292,10 @@ int do_clear(User * u)
                 break;
             } else {
                 if (ircdcap->tsmode)
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[2],
                                    av[3]);
                 else
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[1],
                                    av[2]);
             }
             do_cmode(s_ChanServ, ac, av);
@@ -336,10 +336,10 @@ int do_clear(User * u)
                 break;
             } else {
                 if (ircdcap->tsmode) {
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[2],
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[2],
                                    av[3]);
                 } else {
-                    anope_cmd_mode(whosends(ci), av[0], "%s %s", av[1],
+                    anope_SendMode(whosends(ci), av[0], "%s %s", av[1],
                                    av[2]);
                 }
             }

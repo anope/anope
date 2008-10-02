@@ -1311,7 +1311,7 @@ plexus_cmd_211 (const char *buf)
 }
 
 void
-plexus_cmd_mode (const char *source, const char *dest, const char *buf)
+plexus_SendMode (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
     {
@@ -1358,7 +1358,7 @@ plexus_cmd_notice_ops (const char *source, const char *dest, const char *buf)
 void
 plexus_cmd_bot_chan_mode (const char *nick, const char *chan)
 {
-  anope_cmd_mode (nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
+  anope_SendMode (nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }
 
 /* QUIT */
@@ -1511,7 +1511,7 @@ plexus_cmd_svsnick (const char *nick, const char *newnick, time_t when)
 }
 
 void
-plexus_cmd_guest_nick (const char *nick, const char *user, const char *host, const char *real,
+plexus_SendGuestNick (const char *nick, const char *user, const char *host, const char *real,
 		       const char *modes)
 {
   send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s 0 %s :%s", nick,
@@ -1747,8 +1747,8 @@ moduleAddAnopeCmds ()
   pmodule_cmd_375 (plexus_cmd_375);
   pmodule_cmd_376 (plexus_cmd_376);
   pmodule_cmd_nick (plexus_cmd_nick);
-  pmodule_cmd_guest_nick (plexus_cmd_guest_nick);
-  pmodule_cmd_mode (plexus_cmd_mode);
+  pmodule_SendGuestNick (plexus_cmd_guest_nick);
+  pmodule_SendMode (plexus_cmd_mode);
   pmodule_cmd_bot_nick (plexus_cmd_bot_nick);
   pmodule_cmd_kick (plexus_cmd_kick);
   pmodule_cmd_notice_ops (plexus_cmd_notice_ops);

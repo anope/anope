@@ -1238,8 +1238,8 @@ class IRCDProto {
 		virtual void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *) = 0;
 		virtual void SendSVSKill(const char *, const char *, const char *) = 0;
 		virtual void SendSVSMode(User *, int, const char **) = 0;
-		virtual void cmd_guest_nick(const char *, const char *, const char *, const char *, const char *) { }
-		virtual void cmd_mode(const char *, const char *, const char *) = 0;
+		virtual void SendGuestNick(const char *, const char *, const char *, const char *, const char *) { }
+		virtual void SendMode(const char *, const char *, const char *) = 0;
 		virtual void cmd_bot_nick(const char *, const char *, const char *, const char *, const char *) = 0;
 		virtual void cmd_kick(const char *, const char *, const char *, const char *) = 0;
 		virtual void cmd_notice_ops(const char *, const char *, const char *) = 0;

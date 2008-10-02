@@ -234,7 +234,7 @@ static void services_restart(void)
     send_event(EVENT_RESTART, 1, EVENT_START);
     if (!quitmsg)
         quitmsg = "Restarting";
-    anope_SendSquit(ServerName, quitmsg);
+    ircdproto->SendSquit(ServerName, quitmsg);
     disconn(servsock);
     close_log();
     /* First don't unload protocol module, then do so */
@@ -283,7 +283,7 @@ static void services_shutdown(void)
         quitmsg = "Terminating, reason unknown";
     alog("%s", quitmsg);
     if (started) {
-        anope_SendSquit(ServerName, quitmsg);
+        ircdproto->SendSquit(ServerName, quitmsg);
         Anope_Free(uplink);
         Anope_Free(mod_current_buffer);
         if (ircd->chanmodes) {
@@ -647,7 +647,7 @@ int main(int ac, char **av, char **envp)
         alog("Restarting");
         if (!quitmsg)
             quitmsg = "Restarting";
-        anope_SendSquit(ServerName, quitmsg);
+        ircdproto->SendSquit(ServerName, quitmsg);
         disconn(servsock);
         close_log();
 #ifdef _WIN32

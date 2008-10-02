@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendSquit(const char *servname, const char *message)
-{
-	ircdproto->SendSquit(servname, message);
-}
-
 void anope_SendSVSO(const char *source, const char *nick, const char *flag)
 {
 	ircdproto->SendSVSO(source, nick, flag);

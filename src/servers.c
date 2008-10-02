@@ -421,7 +421,7 @@ void do_squit(const char *source, int ac, const char **av)
                 alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
             }
             /* need to fix */
-            anope_SendSquit(s->name, buf);
+            ircdproto->SendSquit(s->name, buf);
         }
     }
 

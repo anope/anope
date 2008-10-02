@@ -218,7 +218,7 @@ void common_svsmode(User * u, const char *modes, const char *arg)
         ac++;
     }
 
-    anope_SendSVSMode(u, ac, av);
+    ircdproto->SendSVSMode(u, ac, av);
     anope_ProcessUsermodes(u, ac, av);
 }
 

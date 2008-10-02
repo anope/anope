@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -107,7 +107,7 @@ int do_cs_topic(User * u)
                 anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
-        anope_cmd_topic(whosends(ci), c->name, u->nick, topic ? topic : "",
+        ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic ? topic : "",
                         c->topic_time);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {

@@ -1452,7 +1452,7 @@ void restore_topic(const char *chan)
             anope_SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
-    anope_cmd_topic(whosends(ci)->nick, c->name, c->topic_setter,
+    ircdproto->SendTopic(whosends(ci)->nick, c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
@@ -1515,7 +1515,7 @@ int check_topiclock(Channel * c, time_t topic_time)
         }
     }
 
-    anope_cmd_topic(whosends(ci)->nick, c->name, c->topic_setter,
+    ircdproto->SendTopic(whosends(ci)->nick, c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
 
     if (ircd->join2set) {

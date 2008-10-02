@@ -1164,7 +1164,6 @@ E void anope_SendForceNickChange(const char *nick,const char *newnick, time_t wh
 E void anope_SendSVSO(const char *source,const char *nick, const char *flag);          	  		  /* SVSO   */
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
-E void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when); /* TOPIC */
 E void anope_SendSGLineDel(const char *mask);				  	  		  /* UNSGLINE */
 E void anope_SendSQLineDel(const char *user);                               	  		  /* UNSQLINE */
 E void anope_SendSZLineDel(const char *mask);				  	  		  /* UNSZLINE */

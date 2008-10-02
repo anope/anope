@@ -26,15 +26,15 @@
    * Author: SGR <Alex_SGR@ntlworld.com>
    * Date: 31/08/2003
    * ------------------------------------------------------------
-   * 
+   *
    * This module has no configurable options. For information on
    * this module, load it and refer to /ChanServ APPENDTOPIC HELP
-   * 
-   * Thanks to dengel, Rob and Certus for all there support. 
-   * Especially Rob, who always manages to show me where I have 
+   *
+   * Thanks to dengel, Rob and Certus for all there support.
+   * Especially Rob, who always manages to show me where I have
    * not allocated any memory. Even if it takes a few weeks of
    * pestering to get him to look at it.
-   * 
+   *
    * ------------------------------------------------------------
    */
 
@@ -151,7 +151,7 @@ int my_cs_appendtopic(User * u)
                 anope_SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }
-        anope_cmd_topic(whosends(ci), c->name, u->nick, topic, c->topic_time);
+        ircdproto->SendTopic(whosends(ci), c->name, u->nick, topic, c->topic_time);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
                 anope_SendPart(s_ChanServ, c->name, NULL);

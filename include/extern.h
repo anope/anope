@@ -1132,7 +1132,6 @@ E void anope_SendSVSHOLDDel(const char *nick);				  		  /* SVSHOLD */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
 E void anope_SendSVSJoin(const char *source, const char *nick,const char *chan, const char *param);          	  /* SVSJOIN */
 E void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick);				  /* SVSMODE */
-E void anope_SendForceNickChange(const char *nick,const char *newnick, time_t when);     	  		  /* SVSNICK */
 E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
 E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
 E void anope_SendSGLineDel(const char *mask);				  	  		  /* UNSGLINE */

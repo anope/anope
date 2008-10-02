@@ -1244,7 +1244,7 @@ static void timeout_leave(Timeout * to)
     if (ci)                     /* Check cos the channel may be dropped in the meantime */
         ci->flags &= ~CI_INHABIT;
 
-    ircdproto->SendPart(s_ChanServ, chan, NULL);
+    ircdproto->SendPart(findbot(s_ChanServ), chan, NULL);
     free(to->data);
 }
 
@@ -1352,11 +1352,11 @@ int check_kick(User * user, const char *chan, time_t chants)
      * c may be NULL even if it exists */
     if ((!(c = findchan(chan)) || c->usercount == 0)
         && !(ci->flags & CI_INHABIT)) {
-        ircdproto->SendJoin(s_ChanServ, chan, (c ? c->creation_time : chants));
+        ircdproto->SendJoin(findbot(s_ChanServ), chan, (c ? c->creation_time : chants));
         /* Lets hide the channel from /list just incase someone does /list
          * while we are here. - katsklaw
          */
-        ircdproto->SendMode(s_ChanServ, chan, "+ntsi");
+        ircdproto->SendMode(findbot(s_ChanServ), chan, "+ntsi");
         t = add_timeout(CSInhabit, timeout_leave, 0);
         t->data = sstrdup(chan);
         ci->flags |= CI_INHABIT;
@@ -1447,16 +1447,16 @@ void restore_topic(const char *chan)
         strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
     }
     if (ircd->join2set) {
-        if (whosends(ci) == s_ChanServ) {
-            ircdproto->SendJoin(s_ChanServ, chan, c->creation_time);
+        if (whosends(ci) == findbot(s_ChanServ)) {
+            ircdproto->SendJoin(findbot(s_ChanServ), chan, c->creation_time);
             ircdproto->SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
-    ircdproto->SendTopic(whosends(ci)->nick, c->name, c->topic_setter,
+    ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
     if (ircd->join2set) {
-        if (whosends(ci) == s_ChanServ) {
-            ircdproto->SendPart(s_ChanServ, c->name, NULL);
+        if (whosends(ci) == findbot(s_ChanServ)) {
+            ircdproto->SendPart(findbot(s_ChanServ), c->name, NULL);
         }
     }
 }
@@ -1509,18 +1509,18 @@ int check_topiclock(Channel * c, time_t topic_time)
     }
 
     if (ircd->join2set) {
-        if (whosends(ci) == s_ChanServ) {
-            ircdproto->SendJoin(s_ChanServ, c->name, c->creation_time);
+        if (whosends(ci) == findbot(s_ChanServ)) {
+            ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
             ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
         }
     }
 
-    ircdproto->SendTopic(whosends(ci)->nick, c->name, c->topic_setter,
+    ircdproto->SendTopic(whosends(ci), c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
 
     if (ircd->join2set) {
-        if (whosends(ci) == s_ChanServ) {
-            ircdproto->SendPart(s_ChanServ, c->ci->name, NULL);
+        if (whosends(ci) == findbot(s_ChanServ)) {
+            ircdproto->SendPart(findbot(s_ChanServ), c->ci->name, NULL);
         }
     }
     return 1;
@@ -1778,7 +1778,7 @@ int delchan(ChannelInfo * ci)
     }
     if (ci->c) {
         if (ci->bi && ci->c->usercount >= BSMinUsers) {
-            ircdproto->SendPart(ci->bi->nick, ci->c->name, NULL);
+            ircdproto->SendPart(ci->bi, ci->c->name, NULL);
         }
         ci->c->ci = NULL;
     }

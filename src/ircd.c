@@ -108,7 +108,8 @@ void anope_SendCTCP(const char *source, const char *dest, const char *fmt, ...)
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->SendCTCP(source, dest, buf);
+	// XXX: CBX, when you move this to ircdproto, please make it take BotInfo * directly, thx :)
+	ircdproto->SendCTCP(findbot(source), dest, buf);
 }
 
 void anope_SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...)

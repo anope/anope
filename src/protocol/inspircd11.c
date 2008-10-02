@@ -505,19 +505,14 @@ void moduleAddIRCDMsgs(void) {
 
 /* *INDENT-ON* */
 
-void inspircd_cmd_svsadmin(const char *server, int set)
-{
-    /* Not Supported by this IRCD */
-}
-
 void InspIRCdProto::SendAkillDel(const char *user, const char *host)
 {
 	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
 }
 
-void InspIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+void InspIRCdProto::SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-	send_cmd(whosets, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
+	send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
 }
 
 /* CHGHOST */
@@ -577,11 +572,6 @@ void InspIRCdProto::SendMode(const char *source, const char *dest, const char *b
 	send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 }
 
-int anope_event_version(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
 int anope_event_idle(const char *source, int ac, const char **av)
 {
     if (ac == 1) {
@@ -600,6 +590,27 @@ int anope_event_ftopic(const char *source, int ac, const char **av)
     av[1] = av[2];              /* av[1] now holds set by */
     av[2] = temp;               /* av[2] now holds ts */
     do_topic(source, ac, av);
+    return MOD_CONT;
+}
+
+int anope_event_mode(const char *source, int ac, const char **av)
+{
+    if (ac < 2)
+        return MOD_CONT;
+
+    if (*av[0] == '#' || *av[0] == '&') {
+        do_cmode(source, ac, av);
+    } else {
+        /* InspIRCd lets opers change another
+           users modes, we have to kludge this
+           as it slightly breaks RFC1459
+         */
+        if (!strcasecmp(source, av[0])) {
+            do_umode(source, ac, av);
+        } else {
+            do_umode(av[0], ac, av);
+        }
+    }
     return MOD_CONT;
 }
 
@@ -912,28 +923,6 @@ int anope_event_quit(const char *source, int ac, const char **av)
     if (ac != 1)
         return MOD_CONT;
     do_quit(source, ac, av);
-    return MOD_CONT;
-}
-
-
-int anope_event_mode(const char *source, int ac, const char **av)
-{
-    if (ac < 2)
-        return MOD_CONT;
-
-    if (*av[0] == '#' || *av[0] == '&') {
-        do_cmode(source, ac, av);
-    } else {
-        /* InspIRCd lets opers change another
-           users modes, we have to kludge this
-           as it slightly breaks RFC1459
-         */
-        if (!strcasecmp(source, av[0])) {
-            do_umode(source, ac, av);
-        } else {
-            do_umode(av[0], ac, av);
-        }
-    }
     return MOD_CONT;
 }
 
@@ -1330,28 +1319,52 @@ void InspIRCdProto::SendEOB()
 	send_cmd(NULL, "ENDBURST");
 }
 
-
-int anope_event_rehash(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_credits(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_admin(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
 int InspIRCdProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
 	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 	else return 0;
 }
+
+/* *INDENT-OFF* */
+void moduleAddIRCDMsgs(void) {
+    Message *m;
+
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
+
+    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("RSQUIT",    anope_event_rsquit); addCoreMessage(IRCD,m);
+    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
+    m = createMessage("FHOST",     anope_event_chghost); addCoreMessage(IRCD,m);
+    m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
+    m = createMessage("FNAME",     anope_event_chgname); addCoreMessage(IRCD,m);
+    m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
+    m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
+    m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
+    m = createMessage("FJOIN",     anope_event_fjoin); addCoreMessage(IRCD,m);
+    m = createMessage("FMODE",     anope_event_fmode); addCoreMessage(IRCD,m);
+    m = createMessage("FTOPIC",    anope_event_ftopic); addCoreMessage(IRCD,m);
+    m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
+    m = createMessage("IDLE",      anope_event_idle); addCoreMessage(IRCD,m);
+}
+
+/* *INDENT-ON* */
 
 /**
  * Now tell anope how to use us.

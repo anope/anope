@@ -738,7 +738,7 @@ void bot_join(ChannelInfo * ci)
                     else
                         av[2] = ban->mask;
 
-                    do_cmode(whosends(ci), ac, av);
+                    do_cmode(whosends(ci)->nick, ac, av);
                 }
             }
         }

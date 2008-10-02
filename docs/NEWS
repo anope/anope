@@ -41,6 +41,9 @@ Highlighted News in Anope 1.7 (and soon 1.8)
   * Removed proxy detector (see docs/PROXY).
   * Fixed various exploits and vulnerabilities.
   * Fixed various language typos and inconsistencies.
+  * Fixed a bug in the database system causing nickserv passwords
+      to be saved incorrectly. Note that this breaks backwards
+      compatibility on nick.db !!!
 
 Highlighted News in Anope 1.6
 =============================

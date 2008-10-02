@@ -1377,7 +1377,7 @@ int check_kick(User * user, const char *chan, time_t chants)
             ac = 3;
         }
 
-        do_cmode(whosends(ci), ac, av);
+        do_cmode(whosends(ci)->nick, ac, av);
     }
 
     anope_SendMode(whosends(ci), chan, "+b %s", mask);
@@ -1432,7 +1432,7 @@ void restore_topic(const char *chan)
          * should be updated with a TOPIC from the IRCd soon. -GD
          */
         ci->last_topic = NULL;
-        strscpy(ci->last_topic_setter, whosends(ci), NICKMAX);
+        strscpy(ci->last_topic_setter, whosends(ci)->nick, NICKMAX);
         ci->last_topic_time = time(NULL);
         return;
     }
@@ -1444,7 +1444,7 @@ void restore_topic(const char *chan)
         c->topic_time = ci->last_topic_time;
     } else {
         c->topic = NULL;
-        strscpy(c->topic_setter, whosends(ci), NICKMAX);
+        strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
     }
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
@@ -1452,7 +1452,7 @@ void restore_topic(const char *chan)
             anope_SendMode(NULL, chan, "+o %s", s_ChanServ);
         }
     }
-    anope_cmd_topic(whosends(ci), c->name, c->topic_setter,
+    anope_cmd_topic(whosends(ci)->nick, c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
     if (ircd->join2set) {
         if (whosends(ci) == s_ChanServ) {
@@ -1489,7 +1489,7 @@ int check_topiclock(Channel * c, time_t topic_time)
         c->topic = NULL;
         /* Bot assigned & Symbiosis ON?, the bot will set the topic - doc */
         /* Altough whosends() also checks for BSMinUsers -GD */
-        strscpy(c->topic_setter, whosends(ci), NICKMAX);
+        strscpy(c->topic_setter, whosends(ci)->nick, NICKMAX);
     }
 
     if (ircd->topictsforward) {
@@ -1515,7 +1515,7 @@ int check_topiclock(Channel * c, time_t topic_time)
         }
     }
 
-    anope_cmd_topic(whosends(ci), c->name, c->topic_setter,
+    anope_cmd_topic(whosends(ci)->nick, c->name, c->topic_setter,
                     c->topic ? c->topic : "", c->topic_time);
 
     if (ircd->join2set) {

@@ -9,9 +9,13 @@ VERSION_MAJOR="1"
 VERSION_MINOR="7"
 VERSION_PATCH="22"
 VERSION_EXTRA="-svn"
-VERSION_BUILD="1461"
+VERSION_BUILD="1462"
 
 # $Log$
+#
+# BUILD : 1.7.22 (1462)
+# BUGS  : 940 
+# NOTES : Fixed a bug in the database system causing certain nickserv password hashes to be stored incorrectly. Note that THIS BREAKS BACKWARDS COMPATIBILITY !!! As of now nick.db is no longer backwards compatible.
 #
 # BUILD : 1.7.22 (1461)
 # BUGS  : 

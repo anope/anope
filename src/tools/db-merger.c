@@ -198,7 +198,7 @@ struct nickcore_ {
 	NickCore *next, *prev;
 
     char *display;           /* How the nick is displayed */
-    char *pass;               /* Password of the nicks */
+    char pass[32];               /* Password of the nicks */
     char *email;              /* E-mail associated to the nick */
     char *greet;              /* Greet associated to the nick */
     uint32 icq;                 /* ICQ # associated to the nick */
@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 
     /* Section I: Nicks */
     /* Ia: First database */
-    if ((f = open_db_read("NickServ", NICK_DB_1, 13))) {
+    if ((f = open_db_read("NickServ", NICK_DB_1, 14))) {
 
         NickAlias *na, **nalast, *naprev;
         NickCore *nc, **nclast, *ncprev;
@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
                 ncprev = nc;
 
                 READ(read_string(&nc->display, f));
-                READ(read_string(&nc->pass, f));
+                READ(read_buffer(nc->pass, f));
                 READ(read_string(&nc->email, f));
                 READ(read_string(&nc->greet, f));
                 READ(read_uint32(&nc->icq, f));
@@ -451,7 +451,7 @@ int main(int argc, char *argv[])
 
     /* Ib: Second database */
     if (!nonick) {
-        if ((f = open_db_read("NickServ", NICK_DB_2, 13))) {
+        if ((f = open_db_read("NickServ", NICK_DB_2, 14))) {
 
             NickAlias *na, *naptr;
             NickCore *nc;
@@ -470,7 +470,7 @@ int main(int argc, char *argv[])
 
                     nc = (NickCore *)calloc(1, sizeof(NickCore));
                     READ(read_string(&nc->display, f));
-                    READ(read_string(&nc->pass, f));
+                    READ(read_buffer(nc->pass, f));
                     READ(read_string(&nc->email, f));
 
                     naptr = findnick(nc->display);
@@ -640,7 +640,7 @@ int main(int argc, char *argv[])
 
     /* Ic: Saving */
     if (!nonick) {
-        if ((f = open_db_write("NickServ", NICK_DB_NEW, 13))) {
+        if ((f = open_db_write("NickServ", NICK_DB_NEW, 14))) {
 
             NickAlias *na;
             NickCore *nc;
@@ -653,7 +653,7 @@ int main(int argc, char *argv[])
                 for (nc = nclists[i]; nc; nc = nc->next) {
                     SAFE(write_int8(1, f));
                     SAFE(write_string(nc->display, f));
-                    SAFE(write_string(nc->pass, f));
+                    SAFE(write_buffer(nc->pass, f));
                     SAFE(write_string(nc->email, f));
                     SAFE(write_string(nc->greet, f));
                     SAFE(write_int32(nc->icq, f));

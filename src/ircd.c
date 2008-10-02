@@ -55,7 +55,8 @@ void anope_SendAkillDel(const char *user, const char *host)
 
 void anope_cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-	ircdproto->cmd_topic(whosets, chan, whosetit, topic, when);
+	BotInfo *bi = findbot(whosets);
+	ircdproto->SendTopic(bi, chan, whosetit, topic, when);
 }
 
 void anope_SendVhostDel(User *u)
@@ -140,12 +141,14 @@ void anope_cmd_message(const char *source, const char *dest, const char *fmt, ..
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_message(source, dest, buf);
+	BotInfo *bi = findbot(source);
+	ircdproto->SendMessage(bi, dest, buf);
 }
 
 void anope_cmd_notice(const char *source, const char *dest, const char *msg)
 {
-	ircdproto->cmd_notice(source, dest, msg);
+	BotInfo *bi = findbot(source);
+	ircdproto->SendNotice(bi, dest, msg);
 }
 
 void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...)
@@ -160,7 +163,8 @@ void anope_cmd_action(const char *source, const char *dest, const char *fmt, ...
 	else return;
 	if (!*buf) return;
 	snprintf(actionbuf, BUFSIZE - 1, "%cACTION %s%c", 1, buf, 1);
-	ircdproto->cmd_privmsg(source, dest, actionbuf);
+	BotInfo *bi = findbot(source);
+	ircdproto->SendPrivmsg(bi, dest, actionbuf);
 }
 
 void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ...)
@@ -172,7 +176,8 @@ void anope_cmd_privmsg(const char *source, const char *dest, const char *fmt, ..
 		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 		va_end(args);
 	}
-	ircdproto->cmd_privmsg(source, dest, buf);
+	BotInfo *bi = findbot(source);
+	ircdproto->SendPrivmsg(bi, dest, buf);
 }
 
 void anope_SendGlobalNotice(const char *source, const char *dest, const char *msg)

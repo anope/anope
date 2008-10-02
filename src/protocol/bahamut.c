@@ -595,72 +595,6 @@ int anope_event_436(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
-    Message *m;
-
-
-    /* first update the cs protect info about this ircd */
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
-
-    /* now add the commands */
-    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   anope_event_gnotice); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("CS",        anope_event_cs); addCoreMessage(IRCD,m);
-    m = createMessage("HS",        anope_event_hs); addCoreMessage(IRCD,m);
-    m = createMessage("MS",        anope_event_ms); addCoreMessage(IRCD,m);
-    m = createMessage("NS",        anope_event_ns); addCoreMessage(IRCD,m);
-    m = createMessage("OS",        anope_event_os); addCoreMessage(IRCD,m);
-    m = createMessage("RS",        anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SGLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SS",        anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("SZLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSGLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSZLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
-    m = createMessage("LUSERSLOCK",anope_event_luserslock); addCoreMessage(IRCD,m);
-    m = createMessage("BURST",     anope_event_burst); addCoreMessage(IRCD,m);
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-
-}
-
-/* *INDENT-ON* */
 
 /* SQLINE */
 void BahamutIRCdProto::SendSQLine(const char *mask, const char *reason)
@@ -699,11 +633,6 @@ void BahamutIRCdProto::SendSVSNOOP(const char *server, int set)
 	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
 }
 
-void bahamut_cmd_svsadmin(const char *server, int set)
-{
-	ircd_proto.SendSVSNOOP(server, set);
-}
-
 /* SGLINE */
 void BahamutIRCdProto::SendSGLine(const char *mask, const char *reason)
 {
@@ -717,9 +646,9 @@ void BahamutIRCdProto::SendAkillDel(const char *user, const char *host)
 }
 
 /* TOPIC */
-void BahamutIRCdProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+void BahamutIRCdProto::SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 {
-	send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
+	send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
 }
 
 /* UNSQLINE */
@@ -849,20 +778,6 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
     m_privmsg(source, av[0], av[1]);
     return MOD_CONT;
 }
-
-/* EVENT : SVINFO */
-/*
- *       parv[0] = sender prefix
- *       parv[1] = TS_CURRENT for the server
- *       parv[2] = TS_MIN for the server
- *       parv[3] = server is standalone or connected to non-TS only
- *       parv[4] = server's idea of UTC time
- */
-int anope_event_svinfo(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
 
 int anope_event_part(const char *source, int ac, const char **av)
 {
@@ -1029,27 +944,6 @@ int anope_event_error(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int anope_event_notice(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_sqline(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-
-int anope_event_gnotice(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_pass(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
 void BahamutIRCdProto::SendEOB()
 {
 	send_cmd(NULL, "BURST 0");
@@ -1073,26 +967,6 @@ int anope_event_burst(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int anope_event_luserslock(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_rehash(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_credits(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_admin(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
 int BahamutIRCdProto::IsFloodModeParamValid(const char *value)
 {
 	char *dp, *end;
@@ -1108,6 +982,45 @@ void bahamut_cmd_chghost(const char *nick, const char *vhost)
         alog("debug: This IRCD does not support vhosting");
     }
 }
+
+/* *INDENT-OFF* */
+void moduleAddIRCDMsgs(void) {
+    Message *m;
+
+
+    /* first update the cs protect info about this ircd */
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
+
+    /* now add the commands */
+    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("CS",        anope_event_cs); addCoreMessage(IRCD,m);
+    m = createMessage("HS",        anope_event_hs); addCoreMessage(IRCD,m);
+    m = createMessage("MS",        anope_event_ms); addCoreMessage(IRCD,m);
+    m = createMessage("NS",        anope_event_ns); addCoreMessage(IRCD,m);
+    m = createMessage("OS",        anope_event_os); addCoreMessage(IRCD,m);
+    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("BURST",     anope_event_burst); addCoreMessage(IRCD,m);
+}
+
+/* *INDENT-ON* */
 
 /**
  * Now tell anope how to use us.

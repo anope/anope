@@ -51,22 +51,10 @@
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
-int anope_event_fjoin(const char *source, int ac, const char **av);
-int anope_event_fmode(const char *source, int ac, const char **av);
-int anope_event_ftopic(const char *source, int ac, const char **av);
-int anope_event_sanick(const char *source, int ac, const char **av);
-int anope_event_samode(const char *source, int ac, const char **av);
-int anope_event_sajoin(const char *source, int ac, const char **av);
-int anope_event_sapart(const char *source, int ac, const char **av);
-int anope_event_version(const char *source, int ac, const char **av);
-int anope_event_opertype(const char *source, int ac, const char **av);
-int anope_event_idle(const char *source, int ac, const char **av);
-int anope_event_rsquit(const char *source, int ac, const char **av);
-
 class InspIRCdProto : public IRCDProto {
 	public:
 		void SendAkillDel(const char *, const char *);
-		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
+		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
 		void SendVhostDel(User *);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);

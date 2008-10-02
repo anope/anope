@@ -240,10 +240,6 @@ int do_saset_password(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
 
-    if (nc->pass)
-        free(nc->pass);
-
-    nc->pass = (char *)smalloc(PASSMAX);
     if (enc_encrypt(param, len, nc->pass, PASSMAX - 1) < 0) {
         memset(param, 0, len);
         alog("%s: Failed to encrypt password for %s (set)", s_NickServ,
@@ -253,7 +249,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
         return MOD_CONT;
     }
     memset(param, 0, len);
-    
+
     if(enc_decrypt(nc->pass,tmp_pass,PASSMAX - 1)==1) {
         notice_lang(s_NickServ, u, NICK_SASET_PASSWORD_CHANGED_TO, nc->display,
                     tmp_pass);

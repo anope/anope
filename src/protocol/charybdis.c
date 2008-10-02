@@ -438,9 +438,9 @@ void CharybdisProto::SendGlobops(const char *source, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
-		Uid *u = find_uid(source);
-		if (u) {
-			send_cmd(UseTS6 ? u->uid : source, "OPERWALL :%s", buf);
+		BotInfo *bi = findbot(source);
+		if (bi) {
+			send_cmd(UseTS6 ? bi->uid.c_str() : source, "OPERWALL :%s", buf);
 			return;
 		}
 	}
@@ -653,86 +653,29 @@ int anope_event_436(const char *source, int ac, const char **av)
 }
 
 
-/* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void)
-{
-    Message *m;
-
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
-
-    if (UseTS6) {
-        TS6SID = sstrdup(Numeric);
-    }
-
-    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_invite); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("BMASK",     anope_event_bmask); addCoreMessage(IRCD,m);
-    m = createMessage("UID",       anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
-    m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
-    m = createMessage("EUID",      anope_event_euid); addCoreMessage(IRCD,m);
-}
-
-/* *INDENT-ON* */
-
 
 void CharybdisProto::SendSQLine(const char *mask, const char *reason)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
 }
 
 void CharybdisProto::SendSGLineDel(const char *mask)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
-}
-
-void charybdis_cmd_svsadmin(const char *server, int set)
-{
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
 }
 
 void CharybdisProto::SendSGLine(const char *mask, const char *reason)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 }
 
 void CharybdisProto::SendAkillDel(const char *user, const char *host)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
 }
 
 void CharybdisProto::SendVhostDel(User *u)
@@ -747,14 +690,14 @@ void CharybdisProto::SendVhost(const char *nick, const char *vIdent, const char 
 
 void CharybdisProto::SendSQLineDel(const char *user)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
 void CharybdisProto::SendJoin(const char *user, const char *channel, time_t chantime)
 {
-	Uid *ud = find_uid(user);
-	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
+	User *u = finduser(user);
+	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (u ? u->uid : user) : user);
 }
 
 /*
@@ -768,15 +711,16 @@ reason:		the reason for the kline.
 
 void CharybdisProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 {
-	Uid *ud = find_uid(s_OperServ);
-	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
+	BotInfo *bi = findbot(s_OperServ);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 }
 
 void CharybdisProto::SendSVSKill(const char *source, const char *user, const char *buf)
 {
 	if (!source || !user || !buf) return;
-	Uid *ud = find_uid(source), *ud2 = find_uid(user);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KILL %s :%s", UseTS6 ? (ud2 ? ud2->uid : user) : user, buf);
+	BotInfo *bi = findbot(source);
+	User *u = finduser(user);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KILL %s :%s", UseTS6 ? (u ? u->uid : user) : user, buf);
 }
 
 void CharybdisProto::SendSVSMode(User *u, int ac, const char **av)
@@ -864,7 +808,6 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 	if (UseTS6) {
 		char *uidbuf = ts6_uid_retrieve();
 		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
-		new_uid(nick, uidbuf);
 	}
 	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
 	SendSQLine(nick, "Reserved for services");
@@ -872,9 +815,9 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 
 void CharybdisProto::SendPart(const char *nick, const char *chan, const char *buf)
 {
-	Uid *ud = find_uid(nick);
-	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
-	else send_cmd(UseTS6 ? ud->uid : nick, "PART %s", chan);
+	User *u = finduser(nick);
+	if (buf) send_cmd(UseTS6 ? u->uid : nick, "PART %s :%s", chan, buf);
+	else send_cmd(UseTS6 ? u->uid : nick, "PART %s", chan);
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
@@ -1044,8 +987,8 @@ void CharybdisProto::SendMode(const char *source, const char *dest, const char *
 {
 	if (!buf) return;
 	if (source) {
-		Uid *ud = find_uid(source);
-		send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "MODE %s %s", dest, buf);
+		BotInfo *bi = findbot(source);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "MODE %s %s", dest, buf);
 	}
 	else send_cmd(source, "MODE %s %s", dest, buf);
 }
@@ -1070,23 +1013,23 @@ void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, 
 
 void CharybdisProto::SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
-	Uid *ud = find_uid(source);
+	BotInfo *bi = findbot(source);
 	User *u = finduser(user);
-	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
-	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
+	if (buf) send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
+	else send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
 void CharybdisProto::SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
-	Uid *ud = find_uid(source);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE @%s :%s", dest, buf);
+	BotInfo *bi = findbot(source);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "NOTICE @%s :%s", dest, buf);
 }
 
 void CharybdisProto::SendBotOp(const char *nick, const char *chan)
 {
 	if (UseTS6) {
-		Uid *u = find_uid(nick);
+		User *u = finduser(nick);
 		charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
 	}
 	else anope_SendMode(ServerName, chan, "%s %s", ircd->botchanumode, nick);
@@ -1095,9 +1038,9 @@ void CharybdisProto::SendBotOp(const char *nick, const char *chan)
 /* QUIT */
 void CharybdisProto::SendQuit(const char *source, const char *buf)
 {
-	Uid *ud = find_uid(source);
-	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT :%s", buf);
-	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT");
+	BotInfo *bi = findbot(source);
+	if (buf) send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "QUIT :%s", buf);
+	else send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "QUIT");
 }
 
 /* PONG */
@@ -1112,9 +1055,9 @@ void CharybdisProto::SendPong(const char *servname, const char *who)
 void CharybdisProto::SendInvite(const char *source, const char *chan, const char *nick)
 {
 	if (!source || !chan || !nick) return;
-	Uid *ud = find_uid(source);
+	BotInfo *bi = findbot(source);
 	User *u = finduser(nick);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
+	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 int anope_event_mode(const char *source, int ac, const char **av)
@@ -1203,40 +1146,11 @@ void CharybdisProto::SendForceNickChange(const char *oldnick, const char *newnic
 	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
 }
 
-/*
- * SVINFO
- *      parv[0] = sender prefix
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = server is standalone or connected to non-TS only
- *      parv[4] = server's idea of UTC time
- */
-int anope_event_svinfo(const char *source, int ac, const char **av)
-{
-    /* currently not used but removes the message : unknown message from server */
-    return MOD_CONT;
-}
-
 int anope_event_pass(const char *source, int ac, const char **av)
 {
     if (UseTS6) {
         TS6UPLINK = sstrdup(av[3]);
     }
-    return MOD_CONT;
-}
-
-int anope_event_notice(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_admin(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_invite(const char *source, int ac, const char **av)
-{
     return MOD_CONT;
 }
 
@@ -1318,6 +1232,47 @@ int charybdis_send_deaccount(int argc, char **argv)
 
     return MOD_CONT;
 }
+
+/* *INDENT-OFF* */
+void moduleAddIRCDMsgs(void)
+{
+    Message *m;
+
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
+
+    if (UseTS6) {
+        TS6SID = sstrdup(Numeric);
+    }
+
+    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
+    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("BMASK",     anope_event_bmask); addCoreMessage(IRCD,m);
+    m = createMessage("UID",       anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
+    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
+    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
+    m = createMessage("EUID",      anope_event_euid); addCoreMessage(IRCD,m);
+}
+
+/* *INDENT-ON* */
 
 /**
  * Now tell anope how to use us.

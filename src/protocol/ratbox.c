@@ -425,27 +425,6 @@ CUMode myCumodes[128] = {
 
 
 
-void RatboxProto::cmd_message(const char *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	if (NSDefFlags & NI_MSG) cmd_privmsg(source, dest, buf);
-	else cmd_notice(source, dest, buf);
-}
-
-void RatboxProto::cmd_notice(const char *source, const char *dest, const char *msg)
-{
-	Uid *ud = find_uid(source);
-	User *u = finduser(dest);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "NOTICE %s :%s", UseTS6 ? (u ? u->uid : dest) : dest, msg);
-}
-
-void RatboxProto::cmd_privmsg(const char *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	Uid *ud = find_uid(source), *ud2 = find_uid(dest);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "PRIVMSG %s :%s", UseTS6 ? (ud2 ? ud2->uid : dest) : dest, buf);
-}
-
 void RatboxProto::SendGlobops(const char *source, const char *buf)
 {
 	if (!buf) return;
@@ -623,59 +602,6 @@ int anope_event_436(const char *source, int ac, const char **av)
 }
 
 
-/* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void)
-{
-    Message *m;
-
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
-
-    if (UseTS6) {
-        TS6SID = sstrdup(Numeric);
-        UseTSMODE = 1;  /* TMODE */
-    }
-
-    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_invite); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("BMASK",     anope_event_bmask); addCoreMessage(IRCD,m);
-    m = createMessage("UID",       anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
-    m = createMessage("421",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENCAP",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
-}
-
-/* *INDENT-ON* */
-
 
 void RatboxProto::SendSQLine(const char *mask, const char *reason)
 {
@@ -689,10 +615,6 @@ void RatboxProto::SendSGLineDel(const char *mask)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
 }
 
-void ratbox_cmd_svsadmin(const char *server, int set)
-{
-}
-
 void RatboxProto::SendSGLine(const char *mask, const char *reason)
 {
 	Uid *ud = find_uid(s_OperServ);
@@ -703,12 +625,6 @@ void RatboxProto::SendAkillDel(const char *user, const char *host)
 {
 	Uid *ud = find_uid(s_OperServ);
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
-}
-
-void RatboxProto::cmd_topic(const char *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-{
-	Uid *ud = find_uid(whosets);
-	send_cmd(UseTS6 ? (ud ? ud->uid : whosets) : whosets, "TOPIC %s :%s", chan, topic);
 }
 
 void RatboxProto::SendSQLineDel(const char *user)
@@ -1137,40 +1053,11 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/*
- * SVINFO
- *      parv[0] = sender prefix
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = server is standalone or connected to non-TS only
- *      parv[4] = server's idea of UTC time
- */
-int anope_event_svinfo(const char *source, int ac, const char **av)
-{
-    /* currently not used but removes the message : unknown message from server */
-    return MOD_CONT;
-}
-
 int anope_event_pass(const char *source, int ac, const char **av)
 {
     if (UseTS6) {
         TS6UPLINK = sstrdup(av[3]);
     }
-    return MOD_CONT;
-}
-
-int anope_event_notice(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_admin(const char *source, int ac, const char **av)
-{
-    return MOD_CONT;
-}
-
-int anope_event_invite(const char *source, int ac, const char **av)
-{
     return MOD_CONT;
 }
 
@@ -1227,6 +1114,47 @@ int RatboxProto::IsNickValid(const char *nick)
 	if (isdigit(*nick)) return 0;
 	return 1;
 }
+
+/* *INDENT-OFF* */
+void moduleAddIRCDMsgs(void)
+{
+    Message *m;
+
+    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
+
+    if (UseTS6) {
+        TS6SID = sstrdup(Numeric);
+        UseTSMODE = 1;  /* TMODE */
+    }
+
+    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
+    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
+    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
+    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
+    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
+    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
+    m = createMessage("TMODE",     anope_event_tmode); addCoreMessage(IRCD,m);
+    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
+    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("BMASK",     anope_event_bmask); addCoreMessage(IRCD,m);
+    m = createMessage("UID",       anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
+    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
+    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
+    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
+    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
+    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
+    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
+    m = createMessage("TB",        anope_event_tburst); addCoreMessage(IRCD,m);
+    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
+    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
+    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
+    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
+    m = createMessage("SID",       anope_event_sid); addCoreMessage(IRCD,m);
+}
+
+/* *INDENT-ON* */
 
 /**
  * Now tell anope how to use us.

@@ -45,10 +45,9 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 
-class RatboxProto : public IRCDProto {
+class RatboxProto : public IRCDTS6Proto {
 	public:
 		void SendAkillDel(const char *, const char *);
-		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);
 		void SendSVSMode(User *, int, const char **);
@@ -56,9 +55,6 @@ class RatboxProto : public IRCDProto {
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendKick(const char *, const char *, const char *, const char *);
 		void SendNoticeChanops(const char *, const char *, const char *);
-		void cmd_message(const char *, const char *, const char *);
-		void cmd_notice(const char *, const char *, const char *);
-		void cmd_privmsg(const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
 		void SendQuit(const char *, const char *);
 		void SendPong(const char *, const char *);

@@ -84,7 +84,7 @@ class UnrealIRCdProto : public IRCDProto {
 	public:
 		void SendSVSNOOP(const char *, int);
 		void SendAkillDel(const char *, const char *);
-		void cmd_topic(const char *, const char *, const char *, const char *, time_t);
+		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
 		void SendVhostDel(User *);
 		void SendAkill(const char *, const char *, const char *, time_t, time_t, const char *);
 		void SendSVSKill(const char *, const char *, const char *);

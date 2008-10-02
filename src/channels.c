@@ -1548,7 +1548,7 @@ void chan_adduser2(User * user, Channel * c)
         /* Added channelname to entrymsg - 30.03.2004, Certus */
         /* Also, don't send the entrymsg when bursting -GD */
         if (c->ci && c->ci->entry_message && is_sync(user->server))
-            notice_user(whosends(c->ci), user, "[%s] %s", c->name,
+            notice_user(whosends(c->ci)->nick, user, "[%s] %s", c->name,
                         c->ci->entry_message);
     }
 

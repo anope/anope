@@ -198,7 +198,11 @@ int do_register(User * u)
         } passcode[idx] = '\0';
         nr = makerequest(u->nick);
         nr->passcode = sstrdup(passcode);
-        nr->password = sstrdup(pass);
+        strscpy(nr->password, pass, PASSMAX);
+        memset(pass, 0, strlen(pass));
+        /* We are paranoid about keeping a plain text pass in memory, yet we would write
+         * it to a database.. - Viper */
+        enc_encrypt_in_place(nr->password, PASSMAX);
         if (email) {
             nr->email = sstrdup(email);
         }
@@ -238,7 +242,6 @@ int do_confirm(User * u)
     NickRequest *nr = NULL;
     NickAlias *na = NULL;
     char *passcode = strtok(NULL, " ");
-    char *pass = NULL;
     char *email = NULL;
     int forced = 0;
     User *utmp = NULL;
@@ -255,7 +258,7 @@ int do_confirm(User * u)
 
         if (!nr) {
             if (is_services_admin(u)) {
-/* If an admin, thier nick is obviously already regged, so look at the passcode to get the nick
+/* If an admin, their nick is obviously already regged, so look at the passcode to get the nick
    of the user they are trying to validate, and push that user through regardless of passcode */
                 nr = findrequestnick(passcode);
                 if (nr) {
@@ -295,7 +298,6 @@ int do_confirm(User * u)
         notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
         return MOD_CONT;
     }
-    pass = sstrdup(nr->password);
 
     if (nr->email) {
         email = sstrdup(nr->email);
@@ -307,16 +309,7 @@ int do_confirm(User * u)
         char tsbuf[16];
         char tmp_pass[PASSMAX];
 
-        len = strlen(pass);
-        na->nc->pass = (char *)smalloc(PASSMAX);
-        if (enc_encrypt(pass, len, na->nc->pass, PASSMAX - 1) < 0) {
-            memset(pass, 0, strlen(pass));
-            alog("%s: Failed to encrypt password for %s (register)",
-                 s_NickServ, nr->nick);
-            notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
-            return MOD_CONT;
-        }
-        memset(pass, 0, strlen(pass));
+        memcpy(na->nc->pass, nr->password, PASSMAX);
         na->status = (int16) (NS_IDENTIFIED | NS_RECOGNIZED);
 /*        na->nc->flags |= NI_ENCRYPTEDPW; */
 

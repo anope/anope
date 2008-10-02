@@ -1669,7 +1669,7 @@ int db_mysql_load_ns_req_dbase(void)
 
             nr->nick = sstrdup(mysql_row[0]);
             nr->passcode = sstrdup(mysql_row[1]);
-            nr->password = sstrdup(mysql_row[2]);
+            snprintf(nr->password, PASSMAX, "%s", mysql_row[2]);
             nr->email = sstrdup(mysql_row[3]);
             nr->requested = strtol(mysql_row[4], (char **) NULL, 10);
 
@@ -1712,7 +1712,7 @@ int db_mysql_load_ns_dbase(void)
 
         /* Display, password, email, ICQ, URL, flags */
         nc->display = sstrdup(mysql_row[0]);
-        nc->pass = sstrdup(mysql_row[1]);
+        snprintf(nc->pass, PASSMAX, "%s", mysql_row[1]);
         nc->email = sstrdup(mysql_row[2]);
         nc->icq = strtol(mysql_row[3], (char **) NULL, 10);
         nc->url = sstrdup(mysql_row[4]);

@@ -435,8 +435,8 @@ typedef struct {
 #define CHAN_VERSION 		16
 #define EXCEPTION_VERSION 	9
 #define NEWS_VERSION 		9
-#define NICK_VERSION 		13
-#define PRE_NICK_VERSION 	1
+#define NICK_VERSION 		14
+#define PRE_NICK_VERSION 	2
 #define OPER_VERSION 		13
 #define HELP_VERSION 		1
 #define HOST_VERSION 		3
@@ -486,7 +486,7 @@ struct nickrequest_ {
 	NickRequest *next, *prev;
 	char *nick;
 	char *passcode;
-	char *password;
+	char password[PASSMAX];
 	char *email;
 	time_t requested;
 	time_t lastmail;			/* Unsaved */
@@ -511,7 +511,7 @@ struct nickcore_ {
 	NickCore *next, *prev;
 
 	char *display;				/* How the nick is displayed */
-	char *pass;				/* Password of the nicks */
+	char pass[PASSMAX];				/* Password of the nicks */
 	char *email;				/* E-mail associated to the nick */
 	char *greet;				/* Greet associated to the nick */
 	uint32 icq;				/* ICQ # associated to the nick */
@@ -1246,9 +1246,9 @@ class IRCDProto {
 		virtual void SendMessage(BotInfo *bi, const char *dest, const char *buf)
 		{
 			if (NSDefFlags & NI_MSG)
-				cmd_privmsg(bi, dest, buf);
+				SendPrivmsg(bi, dest, buf);
 			else
-				cmd_notice(bi, dest, buf);
+				SendNotice(bi, dest, buf);
 		}
 		virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
 		{
@@ -1361,9 +1361,9 @@ class IRCDProto {
 		}
 };
 
-class IRCdProtoTS6 : public IRCdProto
+class IRCDTS6Proto : public IRCDProto
 {
-}
+};
 
 /*************************************************************************/
 

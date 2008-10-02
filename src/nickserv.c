@@ -276,9 +276,9 @@ void load_old_ns_dbase(void)
 
                 /* We grabbed info before; fill the appropriate fields now */
                 if (*bufp)
-                    nc->pass = sstrdup(bufp);
+                    memcpy(nc->pass, bufp, PASSMAX);
                 else
-                    nc->pass = NULL;    /* Which may be the case for forbidden nicks .. */
+                    memset(nc->pass, 0, PASSMAX);       /* Which may be the case for forbidden nicks .. */
 
                 nc->email = email;
                 nc->greet = greet;
@@ -419,7 +419,8 @@ void load_ns_req_db(void)
     int i, c, ver;
     NickRequest *nr;
     uint32 tmp32;
-    int failed = 0;
+    int failed = 0, len;
+    char *pass;
 
     if (!(f = open_db(s_NickServ, PreNickDBName, "r", PRE_NICK_VERSION)))
         return;
@@ -431,7 +432,14 @@ void load_ns_req_db(void)
             nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
             SAFE(read_string(&nr->nick, f));
             SAFE(read_string(&nr->passcode, f));
-            SAFE(read_string(&nr->password, f));
+            if (ver < 2) {
+                SAFE(read_string(&pass, f));
+                len = strlen(pass);
+                enc_encrypt(pass, len, nr->password, PASSMAX);
+                memset(pass, 0, len);
+                free(pass);
+            } else
+                SAFE(read_buffer(nr->password, f));
             SAFE(read_string(&nr->email, f));
             SAFE(read_int32(&tmp32, f));
             nr->requested = tmp32;
@@ -447,10 +455,10 @@ void load_ns_dbase(void)
     int ver, i, j, c;
     NickAlias *na, **nalast, *naprev;
     NickCore *nc, **nclast, *ncprev;
-    int failed = 0;
+    int failed = 0, len;
     uint16 tmp16;
     uint32 tmp32;
-    char *s;
+    char *s, *pass;
 
     if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
         return;
@@ -481,7 +489,18 @@ void load_ns_dbase(void)
             slist_init(&nc->aliases);
 
             SAFE(read_string(&nc->display, f));
-            SAFE(read_string(&nc->pass, f));
+            if (ver < 14) {
+                SAFE(read_string(&pass, f));
+                if (pass) {
+                    len = strlen(pass);
+                    enc_encrypt(pass, len, nc->pass, PASSMAX);
+                    memset(pass, 0, len);
+                    free(pass);
+                } else
+                    memset(nc->pass, 0, PASSMAX);
+            } else
+                SAFE(read_buffer(nc->pass, f));
+
             SAFE(read_string(&nc->email, f));
             SAFE(read_string(&nc->greet, f));
             SAFE(read_int32(&nc->icq, f));
@@ -649,7 +668,7 @@ void save_ns_dbase(void)
             SAFE(write_int8(1, f));
 
             SAFE(write_string(nc->display, f));
-            SAFE(write_string(nc->pass, f));
+            SAFE(write_buffer(nc->pass, f));
 
             SAFE(write_string(nc->email, f));
             SAFE(write_string(nc->greet, f));
@@ -724,7 +743,7 @@ void save_ns_req_dbase(void)
             SAFE(write_int8(1, f));
             SAFE(write_string(nr->nick, f));
             SAFE(write_string(nr->passcode, f));
-            SAFE(write_string(nr->password, f));
+            SAFE(write_buffer(nr->password, f));
             SAFE(write_string(nr->email, f));
             SAFE(write_int32(nr->requested, f));
             SAFE(write_int8(0, f));
@@ -1370,8 +1389,6 @@ static int delcore(NickCore * nc)
 
     /* Now we can safely free it. */
     free(nc->display);
-    if (nc->pass)
-        free(nc->pass);
 
     if (nc->email)
         free(nc->email);
@@ -1414,8 +1431,6 @@ int delnickrequest(NickRequest * nr)
             free(nr->nick);
         if (nr->passcode)
             free(nr->passcode);
-        if (nr->password)
-            free(nr->password);
         if (nr->email)
             free(nr->email);
         free(nr);

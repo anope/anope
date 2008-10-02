@@ -187,7 +187,7 @@ int do_set(User * u)
         if (LogChannel && (stricmp(setting, "on") == 0)) {
             if (ircd->join2msg) {
                 c = findchan(LogChannel);
-                ircdproto->SendJoin(s_GlobalNoticer, LogChannel, c ? c->creation_time : time(NULL));
+                ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, c ? c->creation_time : time(NULL));
             }
             logchan = 1;
             alog("Now sending log messages to %s", LogChannel);
@@ -195,7 +195,7 @@ int do_set(User * u)
         } else if (LogChannel && (stricmp(setting, "off") == 0)) {
             alog("No longer sending log messages to a channel");
             if (ircd->join2msg) {
-                ircdproto->SendPart(s_GlobalNoticer, LogChannel, NULL);
+                ircdproto->SendPart(findbot(s_GlobalNoticer), LogChannel, NULL);
             }
             logchan = 0;
             notice_lang(s_OperServ, u, OPER_SET_LOGCHAN_OFF);

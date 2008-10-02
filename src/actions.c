@@ -164,7 +164,7 @@ void common_unban(ChannelInfo * ci, char *nick)
         ip = str_is_ip(host);
 
     if (ircd->svsmode_unban) {
-        anope_SendBanDel(ci->name, nick);
+        ircdproto->SendBanDel(ci->name, nick);
     } else {
         if (ircdcap->tsmode) {
             snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));

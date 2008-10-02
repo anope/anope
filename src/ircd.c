@@ -43,11 +43,6 @@ void anope_ProcessUsermodes(User *user, int ac, const char **av)
 	ircdproto->ProcessUsermodes(user, ac, av);
 }
 
-void anope_SendBanDel(const char *name, const char *nick)
-{
-	ircdproto->SendBanDel(name, nick);
-}
-
 void anope_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
 	ircdproto->SendSVSMode_chan(name, mode, nick);

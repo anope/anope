@@ -120,7 +120,7 @@ int m_privmsg(const char *source, const char *receiver, const char *msg)
 
     if (!u) {
         alog("%s: user record for %s not found", msg, source);
-        anope_cmd_message(receiver, source,
+        ircdproto->SendMessage(receiver, source,
                          getstring(NULL, USER_RECORD_NOT_FOUND));
         return MOD_CONT;
     }

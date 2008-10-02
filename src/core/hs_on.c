@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -82,7 +82,7 @@ int do_on(User * u)
                 } else {
                     notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
                 }
-                anope_SendVhost(u->nick, vIdent, vHost);
+                ircdproto->SendVhost(u->nick, vIdent, vHost);
                 if (ircd->vhost) {
                     u->vhost = sstrdup(vHost);
                 }

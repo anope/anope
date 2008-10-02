@@ -122,7 +122,7 @@ int do_clearmodes(User * u)
                         continue;
                     argv[0] = "-o";
                     argv[1] = cu->user->nick;
-                    ircdproto->SendMode(s_OperServ, c->name, "-o %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "-o %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                 }
@@ -147,7 +147,7 @@ int do_clearmodes(User * u)
                         continue;
                     argv[0] = "-v";
                     argv[1] = cu->user->nick;
-                    ircdproto->SendMode(s_OperServ, c->name, "-v %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "-v %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                 }
@@ -172,7 +172,7 @@ int do_clearmodes(User * u)
                         continue;
                     argv[0] = "-h";
                     argv[1] = cu->user->nick;
-                    ircdproto->SendMode(s_OperServ, c->name, "-h %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "-h %s",
                                    cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                 }
@@ -196,7 +196,7 @@ int do_clearmodes(User * u)
                         continue;
                     argv[0] = ircd->ownerunset;
                     argv[1] = cu->user->nick;
-                    ircdproto->SendMode(s_OperServ, c->name, "%s %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "%s %s",
                                    ircd->ownerunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                 }
@@ -221,7 +221,7 @@ int do_clearmodes(User * u)
                         continue;
                     argv[0] = ircd->adminunset;
                     argv[1] = cu->user->nick;
-                    ircdproto->SendMode(s_OperServ, c->name, "%s %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "%s %s",
                                    ircd->adminunset, cu->user->nick);
                     chan_set_modes(s_OperServ, c, 2, argv, 0);
                 }
@@ -232,27 +232,27 @@ int do_clearmodes(User * u)
 
         if (c->mode) {
             /* Clear modes the bulk of the modes */
-            ircdproto->SendMode(s_OperServ, c->name, "%s", ircd->modestoremove);
+            ircdproto->SendMode(findbot(s_OperServ), c->name, "%s", ircd->modestoremove);
             argv[0] = ircd->modestoremove;
             chan_set_modes(s_OperServ, c, 1, argv, 0);
 
             /* to prevent the internals from complaining send -k, -L, -f by themselves if we need
                to send them - TSL */
             if (c->key) {
-                ircdproto->SendMode(s_OperServ, c->name, "-k %s", c->key);
+                ircdproto->SendMode(findbot(s_OperServ), c->name, "-k %s", c->key);
                 argv[0] = "-k";
                 argv[1] = c->key;
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
             }
             if (ircd->Lmode && c->redirect) {
-                ircdproto->SendMode(s_OperServ, c->name, "-L %s", c->redirect);
+                ircdproto->SendMode(findbot(s_OperServ), c->name, "-L %s", c->redirect);
                 argv[0] = "-L";
                 argv[1] = c->redirect;
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
             }
             if (ircd->fmode && c->flood) {
                 if (flood_mode_char_remove) {
-                    ircdproto->SendMode(s_OperServ, c->name, "%s %s",
+                    ircdproto->SendMode(findbot(s_OperServ), c->name, "%s %s",
                                    flood_mode_char_remove, c->flood);
                     argv[0] = flood_mode_char_remove;
                     argv[1] = c->flood;
@@ -271,7 +271,7 @@ int do_clearmodes(User * u)
                 nexte = entry->next;
                 argv[0] = "-b";
                 argv[1] = entry->mask;
-                ircdproto->SendMode(s_OperServ, c->name, "-b %s", entry->mask);
+                ircdproto->SendMode(findbot(s_OperServ), c->name, "-b %s", entry->mask);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
             }
         }
@@ -282,7 +282,7 @@ int do_clearmodes(User * u)
                 nexte = entry->next;
                 argv[0] = "-e";
                 argv[1] = entry->mask;
-                ircdproto->SendMode(s_OperServ, c->name, "-e %s", entry->mask);
+                ircdproto->SendMode(findbot(s_OperServ), c->name, "-e %s", entry->mask);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
             }
         }
@@ -293,7 +293,7 @@ int do_clearmodes(User * u)
                 nexte = entry->next;
                 argv[0] = "-I";
                 argv[1] = entry->mask;
-                ircdproto->SendMode(s_OperServ, c->name, "-I %s", entry->mask);
+                ircdproto->SendMode(findbot(s_OperServ), c->name, "-I %s", entry->mask);
                 chan_set_modes(s_OperServ, c, 2, argv, 0);
             }
         }

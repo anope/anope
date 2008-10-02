@@ -1231,7 +1231,7 @@ class IRCDProto;
 
 class IRCDProto {
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
-		virtual void SendModeInternal(const char *, const char *, const char *) = 0;
+		virtual void SendModeInternal(BotInfo *, const char *, const char *) = 0;
 		virtual void SendKickInternal(BotInfo *bi, const char *, const char *, const char *) = 0;
 		virtual void SendNoticeChanopsInternal(BotInfo *bi, const char *, const char *) = 0;
 		virtual void SendMessageInternal(BotInfo *bi, const char *dest, const char *buf)
@@ -1288,14 +1288,14 @@ class IRCDProto {
 		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
 		virtual void SendGuestNick(const char *, const char *, const char *, const char *, const char *) { }
-		virtual void SendMode(const char *source, const char *dest, const char *fmt, ...)
+		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;
 			char buf[BUFSIZE] = "";
 			va_start(args, fmt);
 			vsnprintf(buf, BUFSIZE - 1, fmt, args);
 			va_end(args);
-			SendModeInternal(source, dest, buf);
+			SendModeInternal(bi, dest, buf);
 		}
 		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *) = 0;
 		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)

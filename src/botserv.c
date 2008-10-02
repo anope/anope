@@ -750,7 +750,7 @@ void bot_join(ChannelInfo * ci)
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);
     }
-    ircdproto->SendJoin(ci->bi->nick, ci->c->name, ci->c->creation_time);
+    ircdproto->SendJoin(ci->bi, ci->c->name, ci->c->creation_time);
     ircdproto->SendBotOp(ci->bi->nick, ci->c->name);
     send_event(EVENT_BOT_JOIN, 2, ci->name, ci->bi->nick);
 }
@@ -792,7 +792,7 @@ static void check_ban(ChannelInfo * ci, User * u, int ttbtype)
             ac = 3;
         }
 
-        ircdproto->SendMode(ci->bi->nick, ci->name, "+b %s", mask);
+        ircdproto->SendMode(ci->bi, ci->name, "+b %s", mask);
         do_cmode(ci->bi->nick, ac, av);
         send_event(EVENT_BOT_BAN, 3, u->nick, ci->name, mask);
     }
@@ -822,7 +822,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
     av[0] = ci->name;
     av[1] = u->nick;
     av[2] = buf;
-    ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+    ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, u->nick, ci->name, buf);
 }
@@ -846,7 +846,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && (requester != u)) {
-            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }
@@ -858,7 +858,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->except) {
         if (is_excepted(ci, u) == 1) {
-            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
                               getstring2(NULL, BOT_EXCEPT));
             return;
         }
@@ -880,7 +880,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         ac = 3;
     }
 
-    ircdproto->SendMode(ci->bi->nick, ci->name, "+b %s", mask);
+    ircdproto->SendMode(ci->bi, ci->name, "+b %s", mask);
     do_cmode(ci->bi->nick, ac, av);
 
     kav[0] = ci->name;
@@ -898,10 +898,10 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        ircdproto->SendKick(ci->bi->nick, kav[0], kav[1], "%s (%s)", kav[2],
+        ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s (%s)", kav[2],
                        requester->nick);
     else
-        ircdproto->SendKick(ci->bi->nick, kav[0], kav[1], "%s", kav[2]);
+        ircdproto->SendKick(ci->bi, kav[0], kav[1], "%s", kav[2]);
 
     do_kick(ci->bi->nick, 3, kav);
     send_event(EVENT_BOT_KICK, 3, kav[1], kav[0], kav[2]);
@@ -922,7 +922,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && (requester != u)) {
-            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }
@@ -946,10 +946,10 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
     if ((ci->flags & CI_SIGNKICK)
         || ((ci->flags & CI_SIGNKICK_LEVEL)
             && !check_access(requester, ci, CA_SIGNKICK)))
-        ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s (%s)", av[2],
+        ircdproto->SendKick(ci->bi, av[0], av[1], "%s (%s)", av[2],
                        requester->nick);
     else
-        ircdproto->SendKick(ci->bi->nick, av[0], av[1], "%s", av[2]);
+        ircdproto->SendKick(ci->bi, av[0], av[1], "%s", av[2]);
     do_kick(ci->bi->nick, 3, av);
     send_event(EVENT_BOT_KICK, 3, av[1], av[0], av[2]);
 }
@@ -976,7 +976,7 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
 
     if (ircd->protectedumode) {
         if (is_protected(u) && *mode == '-' && (requester != u)) {
-            ircdproto->SendPrivmsg(ci->bi->nick, ci->name, "%s",
+            ircdproto->SendPrivmsg(ci->bi, ci->name, "%s",
                               getstring2(NULL, PERMISSION_DENIED));
             return;
         }
@@ -993,13 +993,13 @@ void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
         av[2] = mode;
         av[3] = nick;
         ac = 4;
-        ircdproto->SendMode(ci->bi->nick, av[0], "%s %s", av[2], av[3]);
+        ircdproto->SendMode(ci->bi, av[0], "%s %s", av[2], av[3]);
     } else {
         av[0] = ci->name;
         av[1] = mode;
         av[2] = nick;
         ac = 3;
-        ircdproto->SendMode(ci->bi->nick, av[0], "%s %s", av[1], av[2]);
+        ircdproto->SendMode(ci->bi, av[0], "%s %s", av[1], av[2]);
     }
 
     do_cmode(ci->bi->nick, ac, av);

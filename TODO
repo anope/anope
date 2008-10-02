@@ -50,4 +50,3 @@ w00t's CHRISTMAS LIST
 - Move a (lot) of stuff to class members as a defined interface rather than copypasta everywhere (ns_set, ns_saset!)
 - prevent deletion of core services via /bs bot
 - Redo database insanity.
-

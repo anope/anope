@@ -529,7 +529,7 @@ void show_list(User * u)
 int hs_help_request(User * u)
 {
     moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-    notice(s_HostServ, u->nick, " ");
+    ircdproto->SendMessage(s_HostServ, u->nick, " ");
     moduleNoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
 
     return MOD_CONT;
@@ -539,7 +539,7 @@ int hs_help_activate(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-        notice(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(s_HostServ, u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
         if (HSRequestMemoUser)
             moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
@@ -554,7 +554,7 @@ int hs_help_reject(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-        notice(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(s_HostServ, u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT);
         if (HSRequestMemoUser)
             moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
@@ -569,7 +569,7 @@ int hs_help_waiting(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
-        notice(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(s_HostServ, u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_WAITING);
     } else {
         notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
@@ -692,7 +692,7 @@ int hsreqevt_db_backup(int argc, char **argv)
 	    else
     	    ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
 	}
-	
+
     return MOD_CONT;
 }
 

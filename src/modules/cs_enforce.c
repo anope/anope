@@ -254,9 +254,9 @@ void my_cs_help(User * u)
 int my_cs_help_enforce(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-    notice(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-    notice(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
     if (cbmodes['R'].flag != 0)
         moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
     else

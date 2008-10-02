@@ -1239,7 +1239,11 @@ class IRCDProto {
 			if (NSDefFlags & NI_MSG)
 				SendPrivmsgInternal(bi, dest, buf);
 			else
-				SendNotice(bi, dest, buf);
+				SendNoticeInternal(bi, dest, buf);
+		}
+		virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg)
+		{
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
 		}
 		virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf)
 		{
@@ -1310,9 +1314,17 @@ class IRCDProto {
 			BotInfo *bi = findbot(source);
 			SendMessageInternal(bi, dest, buf);
 		}
-		virtual void SendNotice(BotInfo *bi, const char *dest, const char *msg)
+		virtual void SendNotice(const char *source, const char *dest, const char *fmt, ...)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
+			va_list args;
+			char buf[BUFSIZE] = "";
+			if (fmt) {
+				va_start(args, fmt);
+				vsnprintf(buf, BUFSIZE - 1, fmt, args);
+				va_end(args);
+			}
+			BotInfo *bi = findbot(source);
+			SendNoticeInternal(bi, dest, buf);
 		}
 		virtual void SendPrivmsg(const char *source, const char *dest, const char *fmt, ...)
 		{

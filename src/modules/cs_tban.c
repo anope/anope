@@ -79,7 +79,7 @@ void myFullHelpSyntax(User * u)
 int myFullHelp(User * u)
 {
     myFullHelpSyntax(u);
-    notice(s_ChanServ, u->nick, "");
+    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
     return MOD_CONT;
 }

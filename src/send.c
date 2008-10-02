@@ -265,32 +265,3 @@ void notice_help(const char *source, User * dest, int message, ...)
     }
     va_end(args);
 }
-
-/*************************************************************************/
-
-/**
- * Send a NOTICE from the given source to the given nick.
- * @param source Orgin of the Message
- * @param dest Destination of the Message
- * @param fmt Format of the Message
- * @param ... any number of parameters
- * @return void
- */
-void notice(char *source, const char *dest, const char *fmt, ...)
-{
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-
-        if (NSDefFlags & NI_MSG) {
-            ircdproto->SendPrivmsg(source, dest, buf);
-        } else {
-            ircdproto->SendNotice(source, dest, buf);
-        }
-        va_end(args);
-    }
-}

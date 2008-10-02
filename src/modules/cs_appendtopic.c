@@ -92,7 +92,7 @@ void my_cs_help(User * u)
 int my_cs_help_appendtopic(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_APPENDTOPIC_SYNTAX);
-    notice(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_APPENDTOPIC);
     return MOD_STOP;
 }

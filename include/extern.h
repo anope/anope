@@ -1110,8 +1110,6 @@ E int db_mysql_load_news(void);
 E unsigned int mysql_rand(void);
 #endif
 
-E void notice(char *source, const char *dest, const char *fmt, ...);
-
 /******************************************************************************/
 
 E void anope_cmd_capab();						  	  		  /* CAPAB */

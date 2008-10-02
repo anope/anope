@@ -341,7 +341,7 @@ int do_util(User * u, CSModeUtil * util)
                 chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
 
                 if (util->notice && ci->flags & util->notice)
-                    notice(whosends(ci), uc->chan->name,
+                    ircdproto->SendMessage(whosends(ci), uc->chan->name,
                            "%s command used for %s by %s", util->name,
                            u->nick, u->nick);
             }
@@ -381,7 +381,7 @@ int do_util(User * u, CSModeUtil * util)
         chan_set_modes(s_ChanServ, c, 2, av, 2);
 
         if (util->notice && ci->flags & util->notice)
-            notice(whosends(ci), c->name, "%s command used for %s by %s",
+            ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
                    util->name, u2->nick, u->nick);
     }
     return MOD_CONT;

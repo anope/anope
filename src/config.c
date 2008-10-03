@@ -497,7 +497,7 @@ int ServerConfig::Read(bool bail)
 	static const char *Once[] = {NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
-		{"coremodules", "ircd", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
+		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them

@@ -126,6 +126,7 @@
 # include <mysql/mysql.h>
 # include <mysql/errmsg.h>
 #else
+# define NO_CLIENT_LONG_LONG
 # include <mysql.h>
 # include <errmsg.h>
 #endif
@@ -401,7 +402,7 @@ struct ircdcapab_ {
 /* Configuration directives */
 
 typedef struct {
-    char *name;
+    const char *name;
     struct {
         int type;               /* PARAM_* below */
         int flags;              /* Same */
@@ -772,8 +773,8 @@ struct chaninfo_ {
 /* ChanServ mode utilities commands */
 
 struct csmodeutil_ {
-	char *name;			/* Name of the ChanServ command */
-	char *bsname;			/* Name of the BotServ fantasy command */
+	const char *name;			/* Name of the ChanServ command */
+	const char *bsname;			/* Name of the BotServ fantasy command */
 	char *mode;			/* Mode (ie. +o) */
 	int32 notice;			/* Notice flag (for the damn OPNOTICE) */
 	int level;			/* Level required to use the command */
@@ -782,7 +783,7 @@ struct csmodeutil_ {
 
 typedef struct {
     int what;
-    char *name;
+    const char *name;
     int desc;
 } LevelInfo;
 

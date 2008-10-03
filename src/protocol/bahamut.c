@@ -15,7 +15,52 @@
 
 #include "services.h"
 #include "pseudo.h"
-#include "bahamut.h"
+
+#define UMODE_a 0x00000001  /* umode +a - Services Admin */
+#define UMODE_h 0x00000002  /* umode +h - Helper */
+#define UMODE_i 0x00000004  /* umode +i - Invisible */
+#define UMODE_o 0x00000008  /* umode +o - Oper */
+#define UMODE_r 0x00000010  /* umode +r - registered nick */
+#define UMODE_w 0x00000020  /* umode +w - Get wallops */
+#define UMODE_A 0x00000040  /* umode +A - Server Admin */
+#define UMODE_x 0x00000080  /* umode +x - Squelch with notice */
+#define UMODE_X 0x00000100  /* umode +X - Squelch without notice */
+#define UMODE_F 0x00000200  /* umode +F - no cptr->since message rate throttle */
+#define UMODE_j 0x00000400  /* umode +j - client rejection notices */
+#define UMODE_K 0x00000800  /* umode +K - U: lined server kill messages */
+#define UMODE_O 0x00001000  /* umode +O - Local Oper */
+#define UMODE_s 0x00002000  /* umode +s - Server notices */
+#define UMODE_c 0x00004000  /* umode +c - Client connections/exits */
+#define UMODE_k 0x00008000  /* umode +k - Server kill messages */
+#define UMODE_f 0x00010000  /* umode +f - Server flood messages */
+#define UMODE_y 0x00020000  /* umode +y - Stats/links */
+#define UMODE_d 0x00040000  /* umode +d - Debug info */
+#define UMODE_g 0x00080000  /* umode +g - Globops */
+#define UMODE_b 0x00100000  /* umode +b - Chatops */
+#define UMODE_n 0x00200000  /* umode +n - Routing Notices */
+#define UMODE_m 0x00400000  /* umode +m - spambot notices */
+#define UMODE_e 0x00800000  /* umode +e - oper notices for the above +D */
+#define UMODE_D 0x01000000  /* umode +D - Hidden dccallow umode */
+#define UMODE_I 0x02000000  /* umode +I - invisible oper (masked) */
+#define UMODE_R 0x80000000  /* unmode +R - No non registered msgs */
+
+#define CMODE_i 0x00000001
+#define CMODE_m 0x00000002
+#define CMODE_n 0x00000004
+#define CMODE_p 0x00000008
+#define CMODE_s 0x00000010
+#define CMODE_t 0x00000020
+#define CMODE_k 0x00000040	/* These two used only by ChanServ */
+#define CMODE_l 0x00000080
+#define CMODE_R 0x00000100	/* Only identified users can join */
+#define CMODE_r 0x00000200	/* Set for all registered channels */
+#define CMODE_c 0x00000400	/* Colors can't be used */
+#define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
+#define CMODE_j 0x00001000      /* join throttle */
+#define CMODE_O 0x00008000	/* Only opers can join */
+
+#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
+
 
 IRCDVar myIrcd[] = {
     {"BahamutIRCd 1.4.*/1.8.*", /* ircd name */
@@ -146,58 +191,6 @@ IRCDCAPAB myIrcdcap[] = {
      CAPAB_DOZIP,               /* DOZIP        */
      0, 0, 0}
 };
-
-
-void BahamutIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
-{
-	int add = 1; /* 1 if adding modes, 0 if deleting */
-	const char *modes = av[0];
-	--ac;
-	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-	while (*modes) {
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		 * At least this is readable without paying much attention :) -GD */
-		if (add) user->mode |= umodes[static_cast<int>(*modes)];
-		else user->mode &= ~umodes[static_cast<int>(*modes)];
-		switch (*modes++) {
-			case '+':
-				add = 1;
-				break;
-			case '-':
-				add = 0;
-				break;
-			case 'a':
-				if (UnRestrictSAdmin) break;
-				if (add && !is_services_admin(user)) {
-					common_svsmode(user, "-a", NULL);
-					user->mode &= ~UMODE_a;
-				}
-				break;
-			case 'd':
-				if (!ac) {
-					alog("user: umode +d with no parameter (?) for user %s", user->nick);
-					break;
-				}
-				--ac;
-				++av;
-				user->svid = strtoul(*av, NULL, 0);
-				break;
-			case 'o':
-				if (add) {
-					++opcnt;
-					if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					display_news(user, NEWS_OPER);
-				}
-				else --opcnt;
-				break;
-			case 'r':
-				if (add && !nick_identified(user)) {
-					common_svsmode(user, "-r", NULL);
-					user->mode &= ~UMODE_r;
-				}
-		}
-	}
-}
 
 
 unsigned long umodes[128] = {
@@ -452,44 +445,323 @@ CUMode myCumodes[128] = {
 
 
 
-void BahamutIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+void bahamut_cmd_burst()
 {
-	if (!buf) return;
-	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest, buf);
-	else send_cmd(source->nick, "MODE %s %s", dest, buf);
+    send_cmd(NULL, "BURST");
 }
 
-/* SVSHOLD - set */
-void BahamutIRCdProto::SendSVSHold(const char *nick)
+/*
+ * SVINFO
+ *       parv[0] = sender prefix
+ *       parv[1] = TS_CURRENT for the server
+ *       parv[2] = TS_MIN for the server
+ *       parv[3] = server is standalone or connected to non-TS only
+ *       parv[4] = server's idea of UTC time
+ */
+void bahamut_cmd_svinfo()
 {
-	send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
+    send_cmd(NULL, "SVINFO 3 1 0 :%ld", (long int) time(NULL));
 }
 
-/* SVSHOLD - release */
-void BahamutIRCdProto::SendSVSHoldDel(const char *nick)
+/* PASS */
+void bahamut_cmd_pass(const char *pass)
 {
-	send_cmd(ServerName, "SVSHOLD %s 0", nick);
+    send_cmd(NULL, "PASS %s :TS", pass);
 }
 
-/* SVSMODE -b */
-void BahamutIRCdProto::SendBanDel(const char *name, const char *nick)
+/* CAPAB */
+void bahamut_cmd_capab()
 {
-	SendSVSModeChan(name, "-b", nick);
+    send_cmd(NULL,
+             "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
+}
+
+/* this avoids "undefined symbol" messages of those whom try to load mods that
+   call on this function */
+void bahamut_cmd_chghost(const char *nick, const char *vhost)
+{
+    if (debug) {
+        alog("debug: This IRCD does not support vhosting");
+    }
 }
 
 
-/* SVSMODE channel modes */
 
-void BahamutIRCdProto::SendSVSModeChan(const char *name, const char *mode, const char *nick)
+class BahamutIRCdProto : public IRCDProto
 {
-	if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
-	else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
-}
+	void ProcessUsermodes(User *user, int ac, const char **av)
+	{
+		int add = 1; /* 1 if adding modes, 0 if deleting */
+		const char *modes = av[0];
+		--ac;
+		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+		while (*modes) {
+			/* This looks better, much better than "add ? (do_add) : (do_remove)".
+			 * At least this is readable without paying much attention :) -GD */
+			if (add) user->mode |= umodes[static_cast<int>(*modes)];
+			else user->mode &= ~umodes[static_cast<int>(*modes)];
+			switch (*modes++) {
+				case '+':
+					add = 1;
+					break;
+				case '-':
+					add = 0;
+					break;
+				case 'a':
+					if (UnRestrictSAdmin) break;
+					if (add && !is_services_admin(user)) {
+						common_svsmode(user, "-a", NULL);
+						user->mode &= ~UMODE_a;
+					}
+					break;
+				case 'd':
+					if (!ac) {
+						alog("user: umode +d with no parameter (?) for user %s", user->nick);
+						break;
+					}
+					--ac;
+					++av;
+					user->svid = strtoul(*av, NULL, 0);
+					break;
+				case 'o':
+					if (add) {
+						++opcnt;
+						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						display_news(user, NEWS_OPER);
+					}
+					else --opcnt;
+					break;
+				case 'r':
+					if (add && !nick_identified(user)) {
+						common_svsmode(user, "-r", NULL);
+						user->mode &= ~UMODE_r;
+					}
+			}
+		}
+	}
 
-void BahamutIRCdProto::SendBotOp(const char *nick, const char *chan)
-{
-	SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
-}
+	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest, buf);
+		else send_cmd(source->nick, "MODE %s %s", dest, buf);
+	}
+
+	/* SVSHOLD - set */
+	void SendSVSHold(const char *nick)
+	{
+		send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
+	}
+
+	/* SVSHOLD - release */
+	void SendSVSHoldDel(const char *nick)
+	{
+		send_cmd(ServerName, "SVSHOLD %s 0", nick);
+	}
+
+	/* SVSMODE -b */
+	void SendBanDel(const char *name, const char *nick)
+	{
+		SendSVSModeChan(name, "-b", nick);
+	}
+
+	/* SVSMODE channel modes */
+	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
+	{
+		if (nick) send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
+		else send_cmd(ServerName, "SVSMODE %s %s", name, mode);
+	}
+
+	void SendBotOp(const char *nick, const char *chan)
+	{
+		SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
+	}
+
+	/* SQLINE */
+	void SendSQLine(const char *mask, const char *reason)
+	{
+		if (!mask || !reason) return;
+		send_cmd(NULL, "SQLINE %s :%s", mask, reason);
+	}
+
+	/* UNSGLINE */
+	void SendSGLineDel(const char *mask)
+	{
+		send_cmd(NULL, "UNSGLINE 0 :%s", mask);
+	}
+
+	/* UNSZLINE */
+	void SendSZLineDel(const char *mask)
+	{
+		/* this will likely fail so its only here for legacy */
+		send_cmd(NULL, "UNSZLINE 0 %s", mask);
+		/* this is how we are supposed to deal with it */
+		send_cmd(NULL, "RAKILL %s *", mask);
+	}
+
+	/* SZLINE */
+	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	{
+		/* this will likely fail so its only here for legacy */
+		send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+		/* this is how we are supposed to deal with it */
+		send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 172800, whom, static_cast<long>(time(NULL)), reason);
+	}
+
+	/* SVSNOOP */
+	void SendSVSNOOP(const char *server, int set)
+	{
+		send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
+	}
+
+	/* SGLINE */
+	void SendSGLine(const char *mask, const char *reason)
+	{
+		send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(mask)), mask, reason);
+	}
+
+	/* RAKILL */
+	void SendAkillDel(const char *user, const char *host)
+	{
+		send_cmd(NULL, "RAKILL %s %s", host, user);
+	}
+
+	/* TOPIC */
+	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	{
+		send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
+	}
+
+	/* UNSQLINE */
+	void SendSQLineDel(const char *user)
+	{
+		send_cmd(NULL, "UNSQLINE %s", user);
+	}
+
+	/* JOIN - SJOIN */
+	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
+	{
+		send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
+	}
+
+	/* AKILL
+	 * parv[1]=host
+	 * parv[2]=user
+	 * parv[3]=length
+	 * parv[4]=akiller
+	 * parv[5]=time set
+	 * parv[6]=reason
+	 */
+	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	{
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = expires - time(NULL);
+		if (timeleft > 172800) timeleft = 172800;
+		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, timeleft, who, static_cast<long>(time(NULL)), reason);
+	}
+
+	/* SVSKILL */
+	/* parv[0] = servername
+	 * parv[1] = client
+	 * parv[2] = nick stamp
+	 * parv[3] = kill message
+	 */
+	/*
+	  Note: if the stamp is null 0, the below usage is correct of Bahamut
+	*/
+	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	{
+		if (!source || !user || !buf) return;
+		send_cmd(source, "SVSKILL %s :%s", user, buf);
+	}
+
+	/* SVSMODE */
+	/* parv[0] - sender
+	 * parv[1] - nick
+	 * parv[2] - TS (or mode, depending on svs version)
+	 * parv[3] - mode (or services id if old svs version)
+	 * parv[4] - optional arguement (services id)
+	 */
+	void SendSVSMode(User *u, int ac, const char **av)
+	{
+		send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
+	}
+
+	void SendEOB()
+	{
+		send_cmd(NULL, "BURST 0");
+	}
+
+	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+	}
+
+	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	{
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
+		else send_cmd(source->nick, "KICK %s %s", chan, user);
+	}
+
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		EnforceQlinedNick(nick, s_BotServ);
+		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+		SendSQLine(nick, "Reserved for services");
+	}
+
+	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+	}
+
+	/* SVSMODE +d */
+	/* sent if svid is something weird */
+	void SendSVID(const char *nick, time_t ts)
+	{
+		send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, static_cast<unsigned long>(ts));
+	}
+
+	/* SVSMODE +d */
+	/* nc_change was = 1, and there is no na->status */
+	void SendUnregisteredNick(User *u)
+	{
+		common_svsmode(u, "+d", "1");
+	}
+
+	void SendSVID3(User *u, const char *ts)
+	{
+		if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
+		else common_svsmode(u, "+r", NULL);
+	}
+
+	int IsFloodModeParamValid(const char *value)
+	{
+		char *dp, *end;
+		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+		else return 0;
+	}
+
+	/* SERVER */
+	void SendServer(const char *servname, int hop, const char *descript)
+	{
+		send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+	}
+
+	void SendConnect()
+	{
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		if (servernum == 1) bahamut_cmd_pass(RemotePassword);
+		else if (servernum == 2) bahamut_cmd_pass(RemotePassword2);
+		else if (servernum == 3) bahamut_cmd_pass(RemotePassword3);
+		bahamut_cmd_capab();
+		SendServer(ServerName, 1, ServerDesc);
+		bahamut_cmd_svinfo();
+		bahamut_cmd_burst();
+	}
+} ircd_proto;
+
 
 /* EVENT: SJOIN */
 int anope_event_sjoin(const char *source, int ac, const char **av)
@@ -594,170 +866,6 @@ int anope_event_436(const char *source, int ac, const char **av)
     m_nickcoll(av[0]);
     return MOD_CONT;
 }
-
-
-/* SQLINE */
-void BahamutIRCdProto::SendSQLine(const char *mask, const char *reason)
-{
-	if (!mask || !reason) return;
-	send_cmd(NULL, "SQLINE %s :%s", mask, reason);
-}
-
-/* UNSGLINE */
-void BahamutIRCdProto::SendSGLineDel(const char *mask)
-{
-	send_cmd(NULL, "UNSGLINE 0 :%s", mask);
-}
-
-/* UNSZLINE */
-void BahamutIRCdProto::SendSZLineDel(const char *mask)
-{
-	/* this will likely fail so its only here for legacy */
-	send_cmd(NULL, "UNSZLINE 0 %s", mask);
-	/* this is how we are supposed to deal with it */
-	send_cmd(NULL, "RAKILL %s *", mask);
-}
-
-/* SZLINE */
-void BahamutIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
-{
-	/* this will likely fail so its only here for legacy */
-	send_cmd(NULL, "SZLINE %s :%s", mask, reason);
-	/* this is how we are supposed to deal with it */
-	send_cmd(NULL, "AKILL %s * %d %s %ld :%s", mask, 172800, whom, static_cast<long>(time(NULL)), reason);
-}
-
-/* SVSNOOP */
-void BahamutIRCdProto::SendSVSNOOP(const char *server, int set)
-{
-	send_cmd(NULL, "SVSNOOP %s %s", server, set ? "+" : "-");
-}
-
-/* SGLINE */
-void BahamutIRCdProto::SendSGLine(const char *mask, const char *reason)
-{
-	send_cmd(NULL, "SGLINE %d :%s:%s", static_cast<int>(strlen(mask)), mask, reason);
-}
-
-/* RAKILL */
-void BahamutIRCdProto::SendAkillDel(const char *user, const char *host)
-{
-	send_cmd(NULL, "RAKILL %s %s", host, user);
-}
-
-/* TOPIC */
-void BahamutIRCdProto::SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-{
-	send_cmd(whosets->nick, "TOPIC %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
-}
-
-/* UNSQLINE */
-void BahamutIRCdProto::SendSQLineDel(const char *user)
-{
-	send_cmd(NULL, "UNSQLINE %s", user);
-}
-
-/* JOIN - SJOIN */
-void BahamutIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
-{
-	send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
-}
-
-void bahamut_cmd_burst()
-{
-    send_cmd(NULL, "BURST");
-}
-
-/* AKILL */
-/* parv[1]=host
- * parv[2]=user
- * parv[3]=length
- * parv[4]=akiller
- * parv[5]=time set
- * parv[6]=reason
- */
-void BahamutIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
-{
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = expires - time(NULL);
-	if (timeleft > 172800) timeleft = 172800;
-	send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, timeleft, who, static_cast<long>(time(NULL)), reason);
-}
-
-/* SVSKILL */
-/* parv[0] = servername
- * parv[1] = client
- * parv[2] = nick stamp
- * parv[3] = kill message
- */
-/*
-  Note: if the stamp is null 0, the below usage is correct of Bahamut
-*/
-void BahamutIRCdProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
-{
-	if (!source || !user || !buf) return;
-	send_cmd(source, "SVSKILL %s :%s", user, buf);
-}
-
-/* SVSMODE */
-/* parv[0] - sender
- * parv[1] - nick
- * parv[2] - TS (or mode, depending on svs version)
- * parv[3] - mode (or services id if old svs version)
- * parv[4] - optional arguement (services id)
- */
-void BahamutIRCdProto::SendSVSMode(User *u, int ac, const char **av)
-{
-	send_cmd(ServerName, "SVSMODE %s %ld %s", u->nick, static_cast<long>(u->timestamp), merge_args(ac, av));
-}
-
-/*
- * SVINFO
- *       parv[0] = sender prefix
- *       parv[1] = TS_CURRENT for the server
- *       parv[2] = TS_MIN for the server
- *       parv[3] = server is standalone or connected to non-TS only
- *       parv[4] = server's idea of UTC time
- */
-void bahamut_cmd_svinfo()
-{
-    send_cmd(NULL, "SVINFO 3 1 0 :%ld", (long int) time(NULL));
-}
-
-/* PASS */
-void bahamut_cmd_pass(const char *pass)
-{
-    send_cmd(NULL, "PASS %s :TS", pass);
-}
-
-/* SERVER */
-void BahamutIRCdProto::SendServer(const char *servname, int hop, const char *descript)
-{
-	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
-}
-
-/* CAPAB */
-void bahamut_cmd_capab()
-{
-    send_cmd(NULL,
-             "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE TS3");
-}
-
-void BahamutIRCdProto::SendConnect()
-{
-	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-	if (servernum == 1) bahamut_cmd_pass(RemotePassword);
-	else if (servernum == 2) bahamut_cmd_pass(RemotePassword2);
-	else if (servernum == 3) bahamut_cmd_pass(RemotePassword3);
-	bahamut_cmd_capab();
-	SendServer(ServerName, 1, ServerDesc);
-	bahamut_cmd_svinfo();
-	bahamut_cmd_burst();
-}
-
-
-
-
 
 /* EVENT : SERVER */
 int anope_event_server(const char *source, int ac, const char **av)
@@ -872,18 +980,6 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void BahamutIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
-}
-
-void BahamutIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
-{
-	if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
-	else send_cmd(source->nick, "KICK %s %s", chan, user);
-}
-
 int anope_event_away(const char *source, int ac, const char **av)
 {
     if (!source) {
@@ -897,41 +993,8 @@ int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
-}
-
-void BahamutIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	EnforceQlinedNick(nick, s_BotServ);
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	SendSQLine(nick, "Reserved for services");
-}
-
-void BahamutIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-}
-
-/* SVSMODE +d */
-/* sent if svid is something weird */
-void BahamutIRCdProto::SendSVID(const char *nick, time_t ts)
-{
-	send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick, static_cast<unsigned long>(ts));
-}
-
-
-/* SVSMODE +d */
-/* nc_change was = 1, and there is no na->status */
-void BahamutIRCdProto::SendUnregisteredNick(User *u)
-{
-	common_svsmode(u, "+d", "1");
-}
-
-void BahamutIRCdProto::SendSVID3(User *u, const char *ts)
-{
-	if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
-	else common_svsmode(u, "+r", NULL);
 }
 
 int anope_event_error(const char *source, int ac, const char **av)
@@ -942,11 +1005,6 @@ int anope_event_error(const char *source, int ac, const char **av)
         }
     }
     return MOD_CONT;
-}
-
-void BahamutIRCdProto::SendEOB()
-{
-	send_cmd(NULL, "BURST 0");
 }
 
 int anope_event_burst(const char *source, int ac, const char **av)
@@ -967,21 +1025,6 @@ int anope_event_burst(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int BahamutIRCdProto::IsFloodModeParamValid(const char *value)
-{
-	char *dp, *end;
-	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-	else return 0;
-}
-
-/* this avoids "undefined symbol" messages of those whom try to load mods that
-   call on this function */
-void bahamut_cmd_chghost(const char *nick, const char *vhost)
-{
-    if (debug) {
-        alog("debug: This IRCD does not support vhosting");
-    }
-}
 
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {

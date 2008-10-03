@@ -2543,7 +2543,7 @@ int moduleGetConfigDirective(Directive * d)
  * @param ac The language count for the strings
  * @param av The language sring list.
  **/
-void moduleInsertLanguage(int langNumber, int ac, char **av)
+void moduleInsertLanguage(int langNumber, int ac, const char **av)
 {
     int i;
 

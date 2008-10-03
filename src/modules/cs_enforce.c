@@ -254,9 +254,9 @@ void my_cs_help(User * u)
 int my_cs_help_enforce(User * u)
 {
     moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
     if (cbmodes['R'].flag != 0)
         moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
     else
@@ -268,7 +268,7 @@ int my_cs_help_enforce(User * u)
 void my_add_languages(void)
 {
     /* English (US) */
-    char *langtable_en_us[] = {
+    const char* langtable_en_us[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Enforce various channel modes and set options",
         /* LNG_ENFORCE_SYNTAX */
@@ -302,7 +302,7 @@ void my_add_languages(void)
     };
 
     /* Dutch (NL) */
-    char *langtable_nl[] = {
+    const char* langtable_nl[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Forceer enkele kanaalmodes en set-opties",
         /* LNG_ENFORCE_SYNTAX */
@@ -338,7 +338,7 @@ void my_add_languages(void)
     };
 
    /* German (DE) */
-   char *langtable_de[] = {
+   const char* langtable_de[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE   Erzwingt verschieden Modes und SET Optionen",
         /* LNG_ENFORCE_SYNTAX */
@@ -371,7 +371,7 @@ void my_add_languages(void)
     };
 
     /* Portuguese (PT) */
-    char *langtable_pt[] = {
+    const char* langtable_pt[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
         /* LNG_ENFORCE_SYNTAX */
@@ -404,7 +404,7 @@ void my_add_languages(void)
     };
 
     /* Russian (RU) */
-    char *langtable_ru[] = {
+    const char* langtable_ru[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Перепроверка и установка различных режимов и опций канала",
         /* LNG_ENFORCE_SYNTAX */
@@ -436,7 +436,7 @@ void my_add_languages(void)
     };
 
     /* Italian (IT) */
-    char *langtable_it[] = {
+    const char* langtable_it[] = {
         /* LNG_CHAN_HELP */
         "    ENFORCE    Forza diversi modi di canale ed opzioni SET",
         /* LNG_ENFORCE_SYNTAX */

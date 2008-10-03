@@ -523,7 +523,7 @@ int mEventReload(int argc, char **argv)
  **/
 void m_AddLanguages(void)
 {
-    char *langtable_en_us[] = {
+    const char* langtable_en_us[] = {
         /* OINFO_SYNTAX */
         "Syntax: OINFO [ADD|DEL] nick <info>",
         /* OINFO_ADD_SUCCESS */
@@ -552,7 +552,7 @@ void m_AddLanguages(void)
         "    OINFO         Add / Del an OperInfo line to a channel"
     };
 
-    char *langtable_es[] = {
+    const char* langtable_es[] = {
         /* OINFO_SYNTAX */
         "Sintaxis: OINFO [ADD|DEL] nick <info>",
         /* OINFO_ADD_SUCCESS */
@@ -581,7 +581,7 @@ void m_AddLanguages(void)
         "    OINFO         Agrega / Elimina una linea OperInfo al canal"
     };
 
-    char *langtable_nl[] = {
+    const char* langtable_nl[] = {
         /* OINFO_SYNTAX */
         "Gebruik: OINFO [ADD|DEL] nick <info>",
         /* OINFO_ADD_SUCCESS */
@@ -612,7 +612,7 @@ void m_AddLanguages(void)
         "    OINFO         Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
     };
 
-    char *langtable_de[] = {
+    const char* langtable_de[] = {
         /* OINFO_SYNTAX */
         "Syntax: OINFO [ADD|DEL] Nickname <Information>",
         /* OINFO_ADD_SUCCESS */
@@ -641,7 +641,7 @@ void m_AddLanguages(void)
         "    OINFO         Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
     };
 
-    char *langtable_pt[] = {
+    const char* langtable_pt[] = {
         /* OINFO_SYNTAX */
         "Sintaxe: OINFO [ADD|DEL] nick <informaзгo>",
         /* OINFO_ADD_SUCCESS */
@@ -670,7 +670,7 @@ void m_AddLanguages(void)
         "    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
     };
 
-    char *langtable_ru[] = {
+    const char* langtable_ru[] = {
         /* OINFO_SYNTAX */
         "Синтаксис: OINFO ADD|DEL ник тест",
         /* OINFO_ADD_SUCCESS */
@@ -699,7 +699,7 @@ void m_AddLanguages(void)
         "    OINFO      Добавляет/Удаляет опер-инфо для канала"
     };
 
-	char *langtable_it[] = {
+	const char* langtable_it[] = {
         /* OINFO_SYNTAX */
         "Sintassi: OINFO [ADD|DEL] nick <info>",
         /* OINFO_ADD_SUCCESS */

@@ -79,7 +79,7 @@ void myFullHelpSyntax(User * u)
 int myFullHelp(User * u)
 {
     myFullHelpSyntax(u);
-    ircdproto->SendMessage(s_ChanServ, u->nick, " ");
+    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
     moduleNoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
     return MOD_CONT;
 }
@@ -187,7 +187,7 @@ int canBanUser(Channel * c, User * u, User * u2)
 
 void mAddLanguages(void)
 {
-    char *langtable_en_us[] = {
+    const char* langtable_en_us[] = {
         "    TBAN       Bans the user for a given length of time",
         "Syntax: TBAN channel nick time",
         "Bans the given user from a channel for a specified length of\n"
@@ -195,7 +195,7 @@ void mAddLanguages(void)
         "%s banned from %s, will auto-expire in %s"
     };
 
-    char *langtable_nl[] = {
+    const char* langtable_nl[] = {
         "    TBAN       Verban een gebruiker voor een bepaalde tijd",
         "Syntax: TBAN kanaal nick tijd",
         "Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
@@ -204,7 +204,7 @@ void mAddLanguages(void)
         "%s verbannen van %s, zal verlopen in %s"
     };
 
-    char *langtable_de[] = {
+    const char* langtable_de[] = {
         "    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
         "Syntax: TBAN Channel Nickname Zeit",
         "Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
@@ -212,7 +212,7 @@ void mAddLanguages(void)
         "%s gebannt von %s, wird auto-auslaufen in %s"
     };
 
-    char *langtable_pt[] = {
+    const char* langtable_pt[] = {
         "    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
         "Sintaxe: TBAN canal nick tempo",
         "Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
@@ -220,7 +220,7 @@ void mAddLanguages(void)
         "%s foi banido do %s, irб auto-expirar em %s"
     };
 
-    char *langtable_ru[] = {
+    const char* langtable_ru[] = {
         "    TBAN       Банит пользователя на указанный промежуток времени",
         "Синтаксис: TBAN #канал ник время",
         "Банит пользователя на указанный промежуток времени в секундах\n"
@@ -229,7 +229,7 @@ void mAddLanguages(void)
         "Установленный бан %s на канале %s истечет через %s секунд"
     };
 
-	char *langtable_it[] = {
+	const char* langtable_it[] = {
         "    TBAN       Banna l'utente per un periodo di tempo specificato",
         "Sintassi: TBAN canale nick tempo",
         "Banna l'utente specificato da un canale per un periodo di tempo\n"

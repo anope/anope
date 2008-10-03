@@ -529,7 +529,7 @@ void show_list(User * u)
 int hs_help_request(User * u)
 {
     moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-    ircdproto->SendMessage(s_HostServ, u->nick, " ");
+    ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
     moduleNoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
 
     return MOD_CONT;
@@ -539,7 +539,7 @@ int hs_help_activate(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-        ircdproto->SendMessage(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
         if (HSRequestMemoUser)
             moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
@@ -554,7 +554,7 @@ int hs_help_reject(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-        ircdproto->SendMessage(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT);
         if (HSRequestMemoUser)
             moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
@@ -569,7 +569,7 @@ int hs_help_waiting(User * u)
 {
     if (is_host_setter(u)) {
         moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
-        ircdproto->SendMessage(s_HostServ, u->nick, " ");
+        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
         moduleNoticeLang(s_HostServ, u, LNG_HELP_WAITING);
     } else {
         notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
@@ -728,7 +728,7 @@ void my_load_config(void)
 
 void my_add_languages(void)
 {
-    char *langtable_en_us[] = {
+    const char* langtable_en_us[] = {
         /* LNG_REQUEST_SYNTAX */
         "Syntax: \002REQUEST \037vhost\037\002",
         /* LNG_REQUESTED */
@@ -778,7 +778,7 @@ void my_add_languages(void)
             "the same as performing a LIST +req ."
     };
 
-    char *langtable_nl[] = {
+    const char* langtable_nl[] = {
         /* LNG_REQUEST_SYNTAX */
         "Gebruik: \002REQUEST \037vhost\037\002",
         /* LNG_REQUESTED */
@@ -828,7 +828,7 @@ void my_add_languages(void)
             "hetzelfde als LIST +req ."
     };
 
-    char *langtable_pt[] = {
+    const char* langtable_pt[] = {
         /* LNG_REQUEST_SYNTAX */
         "Sintaxe: \002REQUEST \037vhost\037\002",
         /* LNG_REQUESTED */
@@ -878,7 +878,7 @@ void my_add_languages(void)
             "o mesmo que fazer um LIST +req"
     };
 
-    char *langtable_ru[] = {
+    const char* langtable_ru[] = {
         /* LNG_REQUEST_SYNTAX */
         "Синтаксис: \002REQUEST \037vHost\037\002",
         /* LNG_REQUESTED */
@@ -928,7 +928,7 @@ void my_add_languages(void)
             "ожидающих обработки. Аналогичная команда: LIST +req ."
     };
 
-    char *langtable_it[] = {
+    const char* langtable_it[] = {
         /* LNG_REQUEST_SYNTAX */
         "Sintassi: \002REQUEST \037vhost\037\002",
         /* LNG_REQUESTED */

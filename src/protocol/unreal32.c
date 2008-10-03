@@ -15,7 +15,74 @@
 
 #include "services.h"
 #include "pseudo.h"
-#include "unreal32.h"
+
+
+/* User Modes */
+#define UMODE_a 0x00000001  /* a Services Admin */
+#define UMODE_h 0x00000002  /* h Available for help (HelpOp) */
+#define UMODE_i 0x00000004  /* i Invisible (not shown in /who) */
+#define UMODE_o 0x00000008  /* o Global IRC Operator */
+#define UMODE_r 0x00000010  /* r Identifies the nick as being registered  */
+#define UMODE_w 0x00000020  /* w Can listen to wallop messages */
+#define UMODE_A 0x00000040  /* A Server Admin */
+#define UMODE_N 0x00000080  /* N Network Administrator */
+#define UMODE_O 0x00000100  /* O Local IRC Operator */
+#define UMODE_C 0x00000200  /* C Co-Admin */
+#define UMODE_d 0x00000400  /* d Makes it so you can not receive channel PRIVMSGs */
+#define UMODE_p 0x00000800  /* Hides the channels you are in in a /whois reply  */
+#define UMODE_q 0x00001000  /* q Only U:Lines can kick you (Services Admins Only) */
+#define UMODE_s 0x00002000  /* s Can listen to server notices  */
+#define UMODE_t 0x00004000  /* t Says you are using a /vhost  */
+#define UMODE_v 0x00008000  /* v Receives infected DCC Send Rejection notices */
+#define UMODE_z 0x00010000  /* z Indicates that you are an SSL client */
+#define UMODE_B 0x00020000  /* B Marks you as being a Bot */
+#define UMODE_G 0x00040000  /* G Filters out all the bad words per configuration */
+#define UMODE_H 0x00080000  /* H Hide IRCop Status (IRCop Only) */
+#define UMODE_S 0x00100000  /* S services client */
+#define UMODE_V 0x00200000  /* V Marks you as a WebTV user */
+#define UMODE_W 0x00400000  /* W Lets you see when people do a /whois on you */
+#define UMODE_T 0x00800000  /* T Prevents you from receiving CTCPs  */
+#define UMODE_g 0x20000000  /* g Can send & read globops and locops */
+#define UMODE_x 0x40000000  /* x Gives user a hidden hostname */
+#define UMODE_R 0x80000000  /* Allows you to only receive PRIVMSGs/NOTICEs from registered (+r) users */
+
+
+/*************************************************************************/
+
+/* Channel Modes */
+
+#define CMODE_i 0x00000001
+#define CMODE_m 0x00000002
+#define CMODE_n 0x00000004
+#define CMODE_p 0x00000008
+#define CMODE_s 0x00000010
+#define CMODE_t 0x00000020
+#define CMODE_k 0x00000040		/* These two used only by ChanServ */
+#define CMODE_l 0x00000080
+#define CMODE_R 0x00000100		/* Only identified users can join */
+#define CMODE_r 0x00000200		/* Set for all registered channels */
+#define CMODE_c 0x00000400
+#define CMODE_A 0x00000800
+/* #define CMODE_H 0x00001000   Was now +I may not join, but Unreal Removed it and it will not set in 3.2 */
+#define CMODE_K 0x00002000
+#define CMODE_L 0x00004000
+#define CMODE_O 0x00008000
+#define CMODE_Q 0x00010000
+#define CMODE_S 0x00020000
+#define CMODE_V 0x00040000
+#define CMODE_f 0x00080000
+#define CMODE_G 0x00100000
+#define CMODE_C 0x00200000
+#define CMODE_u 0x00400000
+#define CMODE_z 0x00800000
+#define CMODE_N 0x01000000
+#define CMODE_T 0x02000000
+#define CMODE_M 0x04000000
+
+
+/* Default Modes with MLOCK */
+
+#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 IRCDVar myIrcd[] = {
     {"UnrealIRCd 3.2.x",        /* ircd name */
@@ -415,165 +482,23 @@ CUMode myCumodes[128] = {
 };
 
 
-void UnrealIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
-{
-	int add = 1; /* 1 if adding modes, 0 if deleting */
-	const char *modes = av[0];
-	--ac;
-	if (!user || !modes) return; /* Prevent NULLs from doing bad things */
-	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-	while (*modes) {
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		 * At least this is readable without paying much attention :) -GD */
-		if (add) user->mode |= umodes[static_cast<int>(*modes)];
-		else user->mode &= ~umodes[static_cast<int>(*modes)];
-		switch (*modes++) {
-			case '+':
-				add = 1;
-				break;
-			case '-':
-				add = 0;
-				break;
-			case 'd':
-				if (ac <= 0) break;
-				--ac;
-				++av;
-				if (av) user->svid = strtoul(*av, NULL, 0);
-				break;
-			case 'o':
-				if (add) {
-					++opcnt;
-					if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					display_news(user, NEWS_OPER);
-				}
-				else --opcnt;
-				break;
-			case 'a':
-				if (UnRestrictSAdmin) break;
-				if (add && !is_services_admin(user)) {
-					common_svsmode(user, "-a", NULL);
-					user->mode &= ~UMODE_a;
-				}
-				break;
-			case 'r':
-				if (add && !nick_identified(user)) {
-					common_svsmode(user, "-r", NULL);
-					user->mode &= ~UMODE_r;
-				}
-				break;
-			case 'x':
-				update_host(user);
-		}
-	}
-}
-
-
-
-
-/* Event: PROTOCTL */
-int anope_event_capab(const char *source, int ac, const char **av)
-{
-    capab_parse(ac, av);
-    return MOD_CONT;
-}
-
-/* SVSNOOP */
-void UnrealIRCdProto::SendSVSNOOP(const char *server, int set)
-{
-	send_cmd(NULL, "%s %s %s", send_token("SVSNOOP", "f"), server, set ? "+" : "-");
-}
-
-void UnrealIRCdProto::SendAkillDel(const char *user, const char *host)
-{
-	send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
-}
-
-void UnrealIRCdProto::SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-{
-	send_cmd(whosets->nick, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
-}
-
-void UnrealIRCdProto::SendVhostDel(User *u)
-{
-	if (UseSVS2MODE) send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"), u->nick);
-	else send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"), u->nick);
-	notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
-}
-
-void UnrealIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
-{
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = expires - time(NULL);
-	if (timeleft > 172800) timeleft = 172800;
-	send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"), user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
-}
-
-/*
-** svskill
-**	parv[0] = servername
-**	parv[1] = client
-**	parv[2] = kill message
-*/
-void UnrealIRCdProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
-{
-	if (!source || !user || !buf) return;
-	send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);
-}
-
-/*
- * m_svsmode() added by taz
+/* svswatch
  * parv[0] - sender
- * parv[1] - username to change mode for
- * parv[2] - modes to change
- * parv[3] - Service Stamp (if mode == d)
+ * parv[1] - target nick
+ * parv[2] - parameters
  */
-void UnrealIRCdProto::SendSVSMode(User *u, int ac, const char **av)
+void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 {
-	if (ac >= 1) {
-		if (!u || !av[0]) return;
-		if (UseSVS2MODE) send_cmd(ServerName, "%s %s %s", send_token("SVS2MODE", "v"), u->nick, merge_args(ac, av));
-		else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), u->nick, merge_args(ac, av));
-	}
+    send_cmd(sender, "%s %s :%s", send_token("SVSWATCH", "Bw"), nick,
+             parm);
 }
 
-void UnrealIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+void unreal_cmd_netinfo(int ac, const char **av)
 {
-	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
-		myIrcd->nickip ? " *" : " ", real);
+    send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
+             send_token("NETINFO", "AO"), (long int) maxusercnt,
+             (long int) time(NULL), atoi(av[2]), av[3], av[7]);
 }
-
-void UnrealIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	send_cmd(source->nick, "%s %s %s", send_token("MODE", "G"), dest, buf);
-}
-
-void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	EnforceQlinedNick(nick, s_BotServ);
-	send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
-		myIrcd->nickip ? " *" : " ", real);
-	SendSQLine(nick, "Reserved for services");
-}
-
-void UnrealIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
-{
-	if (buf) send_cmd(source->nick, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
-	else send_cmd(source->nick, "%s %s %s", send_token("KICK", "H"), chan, user);
-}
-
-void UnrealIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	send_cmd(source->nick, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
-}
-
-
-void UnrealIRCdProto::SendBotOp(const char *nick, const char *chan)
-{
-	SendMode(findbot(nick), chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
-}
-
 /* PROTOCTL */
 /*
    NICKv2 = Nick Version 2
@@ -616,31 +541,6 @@ void unreal_cmd_pass(const char *pass)
     send_cmd(NULL, "PASS :%s", pass);
 }
 
-/* SERVER name hop descript */
-/* Unreal 3.2 actually sends some info about itself in the descript area */
-void UnrealIRCdProto::SendServer(const char *servname, int hop, const char *descript)
-{
-	if (Numeric) send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric, descript);
-	else send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
-}
-
-/* JOIN */
-void UnrealIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
-{
-	send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user->nick);
-	/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
-}
-
-/* unsqline
-**	parv[0] = sender
-**	parv[1] = nickmask
-*/
-void UnrealIRCdProto::SendSQLineDel(const char *user)
-{
-	if (!user) return;
-	send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
-}
-
 /* CHGHOST */
 void unreal_cmd_chghost(const char *nick, const char *vhost)
 {
@@ -661,75 +561,426 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
              vIdent);
 }
 
-/* SQLINE */
-/*
-**	parv[0] = sender
-**	parv[1] = nickmask
-**	parv[2] = reason
-**
-** - Unreal will translate this to TKL for us
-**
-*/
-void UnrealIRCdProto::SendSQLine(const char *mask, const char *reason)
-{
-	if (!mask || !reason) return;
-	send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
-}
 
-/*
-** svso
-**      parv[0] = sender prefix
-**      parv[1] = nick
-**      parv[2] = options
-*/
-void UnrealIRCdProto::SendSVSO(const char *source, const char *nick, const char *flag)
-{
-	if (!source || !nick || !flag) return;
-	send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
-}
 
-/* NICK <newnick>  */
-void UnrealIRCdProto::SendChangeBotNick(BotInfo *oldnick, const char *newnick)
+class UnrealIRCdProto : public IRCDProto
 {
-	if (!oldnick || !newnick) return;
-	send_cmd(oldnick->nick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
-}
+	void ProcessUsermodes(User *user, int ac, const char **av)
+	{
+		int add = 1; /* 1 if adding modes, 0 if deleting */
+		const char *modes = av[0];
+		--ac;
+		if (!user || !modes) return; /* Prevent NULLs from doing bad things */
+		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+		while (*modes) {
+			/* This looks better, much better than "add ? (do_add) : (do_remove)".
+			 * At least this is readable without paying much attention :) -GD */
+			if (add) user->mode |= umodes[static_cast<int>(*modes)];
+			else user->mode &= ~umodes[static_cast<int>(*modes)];
+			switch (*modes++) {
+				case '+':
+					add = 1;
+					break;
+				case '-':
+					add = 0;
+					break;
+				case 'd':
+					if (ac <= 0) break;
+					--ac;
+					++av;
+					if (av) user->svid = strtoul(*av, NULL, 0);
+					break;
+				case 'o':
+					if (add) {
+						++opcnt;
+						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						display_news(user, NEWS_OPER);
+					}
+					else --opcnt;
+					break;
+				case 'a':
+					if (UnRestrictSAdmin) break;
+					if (add && !is_services_admin(user)) {
+						common_svsmode(user, "-a", NULL);
+						user->mode &= ~UMODE_a;
+					}
+					break;
+				case 'r':
+					if (add && !nick_identified(user)) {
+						common_svsmode(user, "-r", NULL);
+						user->mode &= ~UMODE_r;
+					}
+					break;
+				case 'x':
+					update_host(user);
+			}
+		}
+	}
 
-/* Functions that use serval cmd functions */
 
-void UnrealIRCdProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	/* SVSNOOP */
+	void SendSVSNOOP(const char *server, int set)
+	{
+		send_cmd(NULL, "%s %s %s", send_token("SVSNOOP", "f"), server, set ? "+" : "-");
+	}
+
+	void SendAkillDel(const char *user, const char *host)
+	{
+		send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
+	}
+
+	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	{
+		send_cmd(whosets->nick, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
+	}
+
+	void SendVhostDel(User *u)
+	{
+		if (UseSVS2MODE) send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"), u->nick);
+		else send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"), u->nick);
+		notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
+	}
+
+	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	{
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = expires - time(NULL);
+		if (timeleft > 172800) timeleft = 172800;
+		send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"), user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
+	}
+
+	/*
+	** svskill
+	**	parv[0] = servername
+	**	parv[1] = client
+	**	parv[2] = kill message
+	*/
+	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	{
+		if (!source || !user || !buf) return;
+		send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);
+	}
+
+	/*
+	 * m_svsmode() added by taz
+	 * parv[0] - sender
+	 * parv[1] - username to change mode for
+	 * parv[2] - modes to change
+	 * parv[3] - Service Stamp (if mode == d)
+	 */
+	void SendSVSMode(User *u, int ac, const char **av)
+	{
+		if (ac >= 1) {
+			if (!u || !av[0]) return;
+			if (UseSVS2MODE) send_cmd(ServerName, "%s %s %s", send_token("SVS2MODE", "v"), u->nick, merge_args(ac, av));
+			else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), u->nick, merge_args(ac, av));
+		}
+	}
+
+	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
+			myIrcd->nickip ? " *" : " ", real);
+	}
+
+	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(source->nick, "%s %s %s", send_token("MODE", "G"), dest, buf);
+	}
+
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		EnforceQlinedNick(nick, s_BotServ);
+		send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
+			myIrcd->nickip ? " *" : " ", real);
+		SendSQLine(nick, "Reserved for services");
+	}
+
+	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	{
+		if (buf) send_cmd(source->nick, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
+		else send_cmd(source->nick, "%s %s %s", send_token("KICK", "H"), chan, user);
+	}
+
+	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(source->nick, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
+	}
+
+	void SendBotOp(const char *nick, const char *chan)
+	{
+		SendMode(findbot(nick), chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
+	}
+
+	/* SERVER name hop descript */
+	/* Unreal 3.2 actually sends some info about itself in the descript area */
+	void SendServer(const char *servname, int hop, const char *descript)
+	{
+		if (Numeric) send_cmd(NULL, "SERVER %s %d :U0-*-%s %s", servname, hop, Numeric, descript);
+		else send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+	}
+
+	/* JOIN */
+	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
+	{
+		send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user->nick);
+		/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
+	}
+
+	/* unsqline
+	**	parv[0] = sender
+	**	parv[1] = nickmask
+	*/
+	void SendSQLineDel(const char *user)
+	{
+		if (!user) return;
+		send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
+	}
+
+
+	/* SQLINE */
+	/*
+	**	parv[0] = sender
+	**	parv[1] = nickmask
+	**	parv[2] = reason
+	**
+	** - Unreal will translate this to TKL for us
+	**
+	*/
+	void SendSQLine(const char *mask, const char *reason)
+	{
+		if (!mask || !reason) return;
+		send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
+	}
+
+	/*
+	** svso
+	**      parv[0] = sender prefix
+	**      parv[1] = nick
+	**      parv[2] = options
+	*/
+	void SendSVSO(const char *source, const char *nick, const char *flag)
+	{
+		if (!source || !nick || !flag) return;
+		send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
+	}
+
+	/* NICK <newnick>  */
+	void SendChangeBotNick(BotInfo *oldnick, const char *newnick)
+	{
+		if (!oldnick || !newnick) return;
+		send_cmd(oldnick->nick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
+	}
+
+	/* Functions that use serval cmd functions */
+
+	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	{
+		if (!nick) return;
+		if (vIdent) unreal_cmd_chgident(nick, vIdent);
+		unreal_cmd_chghost(nick, vhost);
+	}
+
+	void SendConnect()
+	{
+		if (Numeric) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
+		else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		unreal_cmd_capab();
+		if (servernum == 1) unreal_cmd_pass(RemotePassword);
+		else if (servernum == 2) unreal_cmd_pass(RemotePassword2);
+		else if (servernum == 3) unreal_cmd_pass(RemotePassword3);
+		SendServer(ServerName, 1, ServerDesc);
+	}
+
+	/* SVSHOLD - set */
+	void SendSVSHold(const char *nick)
+	{
+		send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
+			static_cast<long>(time(NULL)), "Being held for registered user");
+	}
+
+	/* SVSHOLD - release */
+	void SendSVSHoldDel(const char *nick)
+	{
+		send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
+	}
+
+	/* UNSGLINE */
+	/*
+	 * SVSNLINE - :realname mask
+	*/
+	void SendSGLineDel(const char *mask)
+	{
+		send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
+	}
+
+	/* UNSZLINE */
+	void SendSZLineDel(const char *mask)
+	{
+		send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask, s_OperServ);
+	}
+
+	/* SZLINE */
+	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	{
+		send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"), mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
+	}
+
+	/* SGLINE */
+	/*
+	 * SVSNLINE + reason_where_is_space :realname mask with spaces
+	*/
+	void SendSGLine(const char *mask, const char *reason)
+	{
+		char edited_reason[BUFSIZE];
+		strlcpy(edited_reason, reason, BUFSIZE);
+		strnrepl(edited_reason, BUFSIZE, " ", "_");
+		send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason, mask);
+	}
+
+	/* SVSMODE -b */
+	void SendBanDel(const char *name, const char *nick)
+	{
+		SendSVSModeChan(name, "-b", nick);
+	}
+
+
+	/* SVSMODE channel modes */
+
+	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
+	{
+		if (nick) send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"), name, mode, nick);
+		else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name, mode);
+	}
+
+
+	/* SVSMODE +d */
+	/* sent if svid is something weird */
+	void SendSVID(const char *nick, time_t ts)
+	{
+		if (UseSVS2MODE) send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"), nick);
+		else send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"), nick);
+	}
+
+	/* SVSMODE +d */
+	/* nc_change was = 1, and there is no na->status */
+	void SendUnregisteredNick(User *u)
+	{
+		common_svsmode(u, "-r+d", "1");
+	}
+
+	/* SVSMODE +r */
+	void SendSVID2(User *u, const char *ts)
+	{
+		if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
+		else common_svsmode(u, "+r", NULL);
+	}
+
+
+	/* svsjoin
+		parv[0] - sender
+		parv[1] - nick to make join
+		parv[2] - channel to join
+		parv[3] - (optional) channel key(s)
+	*/
+	/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
+	   when coming from a none TOKEN'd server
+	*/
+	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
+	{
+		if (param) send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
+		else send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
+	}
+
+	/* svspart
+		parv[0] - sender
+		parv[1] - nick to make part
+		parv[2] - channel(s) to part
+	*/
+	void SendSVSPart(const char *source, const char *nick, const char *chan)
+	{
+		send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
+	}
+
+	void SendSWhois(const char *source, const char *who, const char *mask)
+	{
+		send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
+	}
+
+	void SendEOB()
+	{
+		send_cmd(ServerName, "%s", send_token("EOS", "ES"));
+	}
+
+
+	/* check if +f mode is valid for the ircd */
+	/* borrowed part of the new check from channels.c in Unreal */
+	int IsFloodModeParamValid(const char *value)
+	{
+		char *dp, *end;
+		/* NEW +F */
+		char xbuf[256], *p, *p2, *x = xbuf + 1;
+		int v;
+		if (!value) return 0;
+		if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+		else {
+			/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
+			strncpy(xbuf, value, sizeof(xbuf));
+			p2 = strchr(xbuf + 1, ']');
+			if (!p2) return 0;
+			*p2 = '\0';
+			if (*(p2 + 1) != ':') return 0;
+			for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
+				/* <number><1 letter>[optional: '#'+1 letter] */
+				p = x;
+				while (isdigit(*p)) ++p;
+				if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
+				*p = '\0';
+				v = atoi(x);
+				if (v < 1 || v > 999) return 0;
+				++p;
+			}
+			return 1;
+		}
+	}
+
+	/*
+	  1 = valid nick
+	  0 = nick is in valid
+	*/
+	int IsNickValid(const char *nick)
+	{
+		if (!stricmp("ircd", nick) || !stricmp("irc", nick))
+			return 0;
+		return 1;
+	}
+
+	int IsChannelValid(const char *chan)
+	{
+		if (strchr(chan, ':')) return 0;
+		return 1;
+	}
+
+} ircd_proto;
+
+
+
+/* Event: PROTOCTL */
+int anope_event_capab(const char *source, int ac, const char **av)
 {
-	if (!nick) return;
-	if (vIdent) unreal_cmd_chgident(nick, vIdent);
-	unreal_cmd_chghost(nick, vhost);
-}
-
-void UnrealIRCdProto::SendConnect()
-{
-	if (Numeric) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
-	else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-	unreal_cmd_capab();
-	if (servernum == 1) unreal_cmd_pass(RemotePassword);
-	else if (servernum == 2) unreal_cmd_pass(RemotePassword2);
-	else if (servernum == 3) unreal_cmd_pass(RemotePassword3);
-	SendServer(ServerName, 1, ServerDesc);
+    capab_parse(ac, av);
+    return MOD_CONT;
 }
 
 /* Events */
-
 int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
-}
-
-void unreal_cmd_netinfo(int ac, const char **av)
-{
-    send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
-             send_token("NETINFO", "AO"), (long int) maxusercnt,
-             (long int) time(NULL), atoi(av[2]), av[3], av[7]);
 }
 
 /* netinfo
@@ -1116,89 +1367,6 @@ int anope_event_whois(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* SVSHOLD - set */
-void UnrealIRCdProto::SendSVSHold(const char *nick)
-{
-	send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
-		static_cast<long>(time(NULL)), "Being held for registered user");
-}
-
-/* SVSHOLD - release */
-void UnrealIRCdProto::SendSVSHoldDel(const char *nick)
-{
-	send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
-}
-
-/* UNSGLINE */
-/*
- * SVSNLINE - :realname mask
-*/
-void UnrealIRCdProto::SendSGLineDel(const char *mask)
-{
-	send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
-}
-
-/* UNSZLINE */
-void UnrealIRCdProto::SendSZLineDel(const char *mask)
-{
-	send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask, s_OperServ);
-}
-
-/* SZLINE */
-void UnrealIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
-{
-	send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"), mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
-}
-
-/* SGLINE */
-/*
- * SVSNLINE + reason_where_is_space :realname mask with spaces
-*/
-void UnrealIRCdProto::SendSGLine(const char *mask, const char *reason)
-{
-	char edited_reason[BUFSIZE];
-	strlcpy(edited_reason, reason, BUFSIZE);
-	strnrepl(edited_reason, BUFSIZE, " ", "_");
-	send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason, mask);
-}
-
-/* SVSMODE -b */
-void UnrealIRCdProto::SendBanDel(const char *name, const char *nick)
-{
-	SendSVSModeChan(name, "-b", nick);
-}
-
-
-/* SVSMODE channel modes */
-
-void UnrealIRCdProto::SendSVSModeChan(const char *name, const char *mode, const char *nick)
-{
-	if (nick) send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"), name, mode, nick);
-	else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name, mode);
-}
-
-
-/* SVSMODE +d */
-/* sent if svid is something weird */
-void UnrealIRCdProto::SendSVID(const char *nick, time_t ts)
-{
-	if (UseSVS2MODE) send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"), nick);
-	else send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"), nick);
-}
-
-/* SVSMODE +d */
-/* nc_change was = 1, and there is no na->status */
-void UnrealIRCdProto::SendUnregisteredNick(User *u)
-{
-	common_svsmode(u, "-r+d", "1");
-}
-
-/* SVSMODE +r */
-void UnrealIRCdProto::SendSVID2(User *u, const char *ts)
-{
-	if (u->svid != u->timestamp) common_svsmode(u, "+rd", ts);
-	else common_svsmode(u, "+r", NULL);
-}
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
@@ -1211,31 +1379,6 @@ int anope_event_error(const char *source, int ac, const char **av)
 	}
     }
     return MOD_CONT;
-}
-
-/* svsjoin
-	parv[0] - sender
-	parv[1] - nick to make join
-	parv[2] - channel to join
-	parv[3] - (optional) channel key(s)
-*/
-/* In older Unreal SVSJOIN and SVSNLINE tokens were mixed so SVSJOIN and SVSNLINE are broken
-   when coming from a none TOKEN'd server
-*/
-void UnrealIRCdProto::SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
-{
-	if (param) send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
-	else send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
-}
-
-/* svspart
-	parv[0] - sender
-	parv[1] - nick to make part
-	parv[2] - channel(s) to part
-*/
-void UnrealIRCdProto::SendSVSPart(const char *source, const char *nick, const char *chan)
-{
-	send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
 }
 
 int anope_event_sdesc(const char *source, int ac, const char **av)
@@ -1254,74 +1397,6 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
 {
     do_sjoin(source, ac, av);
     return MOD_CONT;
-}
-
-void UnrealIRCdProto::SendSWhois(const char *source, const char *who, const char *mask)
-{
-	send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
-}
-
-void UnrealIRCdProto::SendEOB()
-{
-	send_cmd(ServerName, "%s", send_token("EOS", "ES"));
-}
-
-/* svswatch
- * parv[0] - sender
- * parv[1] - target nick
- * parv[2] - parameters
- */
-void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
-{
-    send_cmd(sender, "%s %s :%s", send_token("SVSWATCH", "Bw"), nick,
-             parm);
-}
-
-/* check if +f mode is valid for the ircd */
-/* borrowed part of the new check from channels.c in Unreal */
-int UnrealIRCdProto::IsFloodModeParamValid(const char *value)
-{
-	char *dp, *end;
-	/* NEW +F */
-	char xbuf[256], *p, *p2, *x = xbuf + 1;
-	int v;
-	if (!value) return 0;
-	if (*value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-	else {
-		/* '['<number><1 letter>[optional: '#'+1 letter],[next..]']'':'<number> */
-		strncpy(xbuf, value, sizeof(xbuf));
-		p2 = strchr(xbuf + 1, ']');
-		if (!p2) return 0;
-		*p2 = '\0';
-		if (*(p2 + 1) != ':') return 0;
-		for (x = strtok(xbuf + 1, ","); x; x = strtok(NULL, ",")) {
-			/* <number><1 letter>[optional: '#'+1 letter] */
-			p = x;
-			while (isdigit(*p)) ++p;
-			if (!*p || !(*p == 'c' || *p == 'j' || *p == 'k' || *p == 'm' || *p == 'n' || *p == 't')) continue; /* continue instead of break for forward compatability. */
-			*p = '\0';
-			v = atoi(x);
-			if (v < 1 || v > 999) return 0;
-			++p;
-		}
-		return 1;
-	}
-}
-
-/*
-  1 = valid nick
-  0 = nick is in valid
-*/
-int UnrealIRCdProto::IsNickValid(const char *nick)
-{
-	if (!stricmp("ircd", nick) || !stricmp("irc", nick)) return 0;
-	return 1;
-}
-
-int UnrealIRCdProto::IsChannelValid(const char *chan)
-{
-	if (strchr(chan, ':')) return 0;
-	return 1;
 }
 
 /* *INDENT-OFF* */

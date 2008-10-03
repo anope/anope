@@ -175,42 +175,42 @@ void my_load_config(void)
 
 void my_add_languages(void)
 {
-    char *langtable_en_us[] = {
+    const char *langtable_en_us[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "The given email address has reached it's usage limit of %d users.",
         /* LNG_NSEMAILMAX_REACHED_ONE */
         "The given email address has reached it's usage limit of 1 user."
     };
 
-    char *langtable_nl[] = {
+    const char *langtable_nl[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
         /* LNG_NSEMAILMAX_REACHED_ONE */
         "Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
     };
 
-   char *langtable_de[] = {
+   const char *langtable_de[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
         /* LNG_NSEMAILMAX_REACHED_ONE */
         "Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
    };
 
-    char *langtable_pt[] = {
+    const char *langtable_pt[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "O endereзo de email fornecido alcanзou seu limite de uso de %d usuбrios.",
         /* LNG_NSEMAILMAX_REACHED_ONE */
         "O endereзo de email fornecido alcanзou seu limite de uso de 1 usuбrio."
     };
 
-    char *langtable_ru[] = {
+    const char *langtable_ru[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "Указанный вами email-адрес используется максимально допустимое кол-во раз: %d",
         /* LNG_NSEMAILMAX_REACHED_ONE */
         "Указанный вами email-адрес уже кем-то используется."
     };
 
-    char *langtable_it[] = {
+    const char *langtable_it[] = {
         /* LNG_NSEMAILMAX_REACHED */
         "L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
         /* LNG_NSEMAILMAX_REACHED_ONE */

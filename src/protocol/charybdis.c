@@ -12,7 +12,41 @@
 
 #include "services.h"
 #include "pseudo.h"
-#include "charybdis.h"
+
+
+#define UMODE_a 0x00000001 /* umode a - admin */
+#define UMODE_g 0x00000002 /* umode g - caller ID */
+#define UMODE_i 0x00000004 /* umode i - invisible */
+#define UMODE_o 0x00000008 /* umode o - operator */
+#define UMODE_z 0x00000010 /* umode u - operwall */
+#define UMODE_w 0x00000020 /* umode w - wallops */
+#define UMODE_s 0x00000040 /* umode s - server notices */
+#define UMODE_Q 0x00000080 /* umode Q - block forwarding */
+#define UMODE_R 0x00000200 /* umode R - reject messages from unauthenticated users */
+#define UMODE_S 0x00000400 /* umode S - network service */
+#define UMODE_l 0x00020000 /* umode l - locops */
+
+
+#define CMODE_i 0x00000001
+#define CMODE_m 0x00000002
+#define CMODE_n 0x00000004
+#define CMODE_p 0x00000008
+#define CMODE_s 0x00000010
+#define CMODE_t 0x00000020
+#define CMODE_k 0x00000040
+#define CMODE_l 0x00000080
+#define CMODE_f 0x00000100
+#define CMODE_c 0x00000200
+#define CMODE_r 0x00000400
+#define CMODE_P 0x00000800
+#define CMODE_g 0x00001000
+#define CMODE_z 0x00002000
+#define CMODE_j 0x00004000
+#define CMODE_F 0x00008000
+#define CMODE_L 0x00010000
+#define CMODE_Q 0x00020000
+
+#define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 IRCDVar myIrcd[] = {
     {"Charybdis 1.0+",           /* ircd name */
@@ -143,37 +177,6 @@ IRCDCAPAB myIrcdcap[] = {
      0,                         /* DOZIP        */
      0, 0, 0}
 };
-
-/*******************************************************************/
-
-void CharybdisProto::ProcessUsermodes(User *user, int ac, const char **av)
-{
-	int add = 1; /* 1 if adding modes, 0 if deleting */
-	const char *modes = av[0];
-	--ac;
-	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-	while (*modes) {
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		 * At least this is readable without paying much attention :) -GD */
-		if (add) user->mode |= umodes[static_cast<int>(*modes)];
-		else user->mode &= ~umodes[static_cast<int>(*modes)];
-		switch (*modes++) {
-			case '+':
-				add = 1;
-				break;
-			case '-':
-				add = 0;
-				break;
-			case 'o':
-				if (add) {
-					++opcnt;
-					if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					display_news(user, NEWS_OPER);
-				}
-				else --opcnt;
-		}
-	}
-}
 
 unsigned long umodes[128] = {
     0, 0, 0,                    /* Unused */
@@ -434,19 +437,344 @@ CUMode myCumodes[128] = {
     {0}, {0}, {0}, {0}, {0}
 };
 
-void CharybdisProto::SendGlobopsInternal(const char *source, const char *buf)
+/*******************************************************************/
+
+
+
+/*
+ * SVINFO
+ *      parv[0] = sender prefix
+ *      parv[1] = TS_CURRENT for the server
+ *      parv[2] = TS_MIN for the server
+ *      parv[3] = server is standalone or connected to non-TS only
+ *      parv[4] = server's idea of UTC time
+ */
+void charybdis_cmd_svinfo()
 {
-	if (!buf) return;
-	if (source) {
-		BotInfo *bi = findbot(source);
-		if (bi) {
-			send_cmd(UseTS6 ? bi->uid.c_str() : source, "OPERWALL :%s", buf);
-			return;
+    send_cmd(NULL, "SVINFO 6 3 0 :%ld", (long int) time(NULL));
+}
+
+void charybdis_cmd_svsinfo()
+{
+
+}
+
+/* CAPAB */
+/*
+  QS       - Can handle quit storm removal
+  EX       - Can do channel +e exemptions
+  CHW      - Can do channel wall @#
+  LL       - Can do lazy links
+  IE       - Can do invite exceptions
+  EOB      - Can do EOB message
+  KLN      - Can do KLINE message
+  GLN      - Can do GLINE message
+  HUB      - This server is a HUB
+  UID      - Can do UIDs
+  ZIP      - Can do ZIPlinks
+  ENC      - Can do ENCrypted links
+  KNOCK    - supports KNOCK
+  TBURST   - supports TBURST
+  PARA	   - supports invite broadcasting for +p
+  ENCAP	   - supports message encapsulation
+  SERVICES - supports services-oriented TS6 extensions
+  EUID     - supports EUID and non-ENCAP CHGHOST
+*/
+void charybdis_cmd_capab()
+{
+    send_cmd(NULL,
+             "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES EUID");
+}
+
+/* PASS */
+void charybdis_cmd_pass(const char *pass)
+{
+    if (UseTS6) {
+        send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
+    } else {
+        send_cmd(NULL, "PASS %s :TS", pass);
+    }
+}
+
+void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
+{
+    va_list args;
+    char buf[BUFSIZE];
+    *buf = '\0';
+
+    if (fmt) {
+        va_start(args, fmt);
+        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+        va_end(args);
+    }
+    if (!*buf) {
+        return;
+    }
+
+    send_cmd(NULL, "MODE %s %s", dest, buf);
+}
+
+class CharybdisProto : public IRCDProto
+{
+	void ProcessUsermodes(User *user, int ac, const char **av)
+	{
+		int add = 1; /* 1 if adding modes, 0 if deleting */
+		const char *modes = av[0];
+		--ac;
+		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+		while (*modes) {
+			/* This looks better, much better than "add ? (do_add) : (do_remove)".
+			 * At least this is readable without paying much attention :) -GD */
+			if (add) user->mode |= umodes[static_cast<int>(*modes)];
+			else user->mode &= ~umodes[static_cast<int>(*modes)];
+			switch (*modes++) {
+				case '+':
+					add = 1;
+					break;
+				case '-':
+					add = 0;
+					break;
+				case 'o':
+					if (add) {
+						++opcnt;
+						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						display_news(user, NEWS_OPER);
+					}
+					else --opcnt;
+			}
 		}
 	}
-	// The original code uses WALLOPS here, but above is OPERWALL, Ratbox uses OPERWALL as well, so I changed this one as well -- CyberBotX
-	send_cmd(UseTS6 ? TS6SID : ServerName, "OPERWALL :%s", buf);
-}
+
+	void SendGlobopsInternal(const char *source, const char *buf)
+	{
+		if (!buf) return;
+		if (source) {
+			BotInfo *bi = findbot(source);
+			if (bi) {
+				send_cmd(UseTS6 ? bi->uid.c_str() : source, "OPERWALL :%s", buf);
+				return;
+			}
+		}
+		// The original code uses WALLOPS here, but above is OPERWALL, Ratbox uses OPERWALL as well, so I changed this one as well -- CyberBotX
+		send_cmd(UseTS6 ? TS6SID : ServerName, "OPERWALL :%s", buf);
+	}
+
+	void SendSQLine(const char *mask, const char *reason)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
+	}
+
+	void SendSGLineDel(const char *mask)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
+	}
+
+	void SendSGLine(const char *mask, const char *reason)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+	}
+
+	void SendAkillDel(const char *user, const char *host)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
+	}
+
+	void SendVhostDel(User *u)
+	{
+		send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
+	}
+
+	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	{
+		send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", nick, vhost);
+	}
+
+	void SendSQLineDel(const char *user)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNRESV * %s", user);
+	}
+
+	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
+	{
+		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? user->uid.c_str() : user->nick);
+	}
+
+	/*
+	oper:		the nick of the oper performing the kline
+	target.server:	the server(s) this kline is destined for
+	duration:	the duration if a tkline, 0 if permanent.
+	user:		the 'user' portion of the kline
+	host:		the 'host' portion of the kline
+	reason:		the reason for the kline.
+	*/
+
+	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	{
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
+	}
+
+	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	{
+		if (!source || !user || !buf) return;
+		BotInfo *bi = findbot(source);
+		User *u = finduser(user);
+		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KILL %s :%s", UseTS6 ? (u ? u->uid : user) : user, buf);
+	}
+
+	void SendSVSMode(User *u, int ac, const char **av)
+	{
+		send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
+	}
+
+	/* SERVER name hop descript */
+	void SendServer(const char *servname, int hop, const char *descript)
+	{
+		send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
+	}
+
+	void SendConnect()
+	{
+		/* Make myself known to myself in the serverlist */
+		if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
+		else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		if (servernum == 1) charybdis_cmd_pass(RemotePassword);
+		else if (servernum == 2) charybdis_cmd_pass(RemotePassword2);
+		else if (servernum == 3) charybdis_cmd_pass(RemotePassword3);
+		charybdis_cmd_capab();
+		SendServer(ServerName, 1, ServerDesc);
+		charybdis_cmd_svinfo();
+	}
+
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		EnforceQlinedNick(nick, NULL);
+		if (UseTS6) {
+			char *uidbuf = ts6_uid_retrieve();
+			send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
+		}
+		else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+		SendSQLine(nick, "Reserved for services");
+	}
+
+	void SendPartInternal(BotInfo *nick, const char *chan, const char *buf)
+	{
+		if (buf) send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s :%s", chan, buf);
+		else send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s", chan);
+	}
+
+	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
+	{
+		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
+		send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
+	}
+
+	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		if (source) {
+			send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "MODE %s %s", dest, buf);
+		}
+		else send_cmd(source->nick, "MODE %s %s", dest, buf);
+	}
+
+	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	{
+		User *u = finduser(user);
+		if (buf) send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
+		else send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
+	}
+
+	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "NOTICE @%s :%s", dest, buf);
+	}
+
+	void SendBotOp(const char *nick, const char *chan)
+	{
+		if (UseTS6) {
+			User *u = finduser(nick);
+			charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
+		}
+		else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
+	}
+
+	/* QUIT */
+	void SendQuitInternal(BotInfo *source, const char *buf)
+	{
+		if (buf) send_cmd(UseTS6 ? source->uid : source->nick, "QUIT :%s", buf);
+		else send_cmd(UseTS6 ? source->uid : source->nick, "QUIT");
+	}
+
+	/* PONG */
+	void SendPong(const char *servname, const char *who)
+	{
+		/* deliberately no SID in the first parameter -- jilles */
+		if (UseTS6) send_cmd(TS6SID, "PONG %s :%s", servname, who);
+		else send_cmd(servname, "PONG %s :%s", servname, who);
+	}
+
+	/* INVITE */
+	void SendInvite(BotInfo *source, const char *chan, const char *nick)
+	{
+		if (!source || !chan || !nick) return;
+		User *u = finduser(nick);
+		send_cmd(UseTS6 ? source->uid : source->nick, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
+	}
+
+	/* SVSHOLD - set */
+	void SendSVSHold(const char *nick)
+	{
+		send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
+	}
+
+	/* SVSHOLD - release */
+	void SendSVSHoldDel(const char *nick)
+	{
+		send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
+	}
+
+	/* SVSNICK */
+	void SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
+	{
+		if (!oldnick || !newnick) return;
+		User *u = finduser(oldnick);
+		if (!u) return;
+		send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
+	}
+
+	int IsFloodModeParamValid(const char *value)
+	{
+		char *dp, *end;
+		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+		else return 0;
+	}
+
+	/*
+	  1 = valid nick
+	  0 = nick is in valid
+	*/
+	int IsNickValid(const char *nick)
+	{
+		/* TS6 Save extension -Certus */
+		if (isdigit(*nick)) return 0;
+		return 1;
+	}
+
+	void SendTopic(BotInfo *bi, const char *chan, const char *whosetit, const char *topic, time_t when)
+	{
+		send_cmd(UseTS6 ? bi->uid : bi->nick, "TOPIC %s :%s", chan, topic);
+	}
+} ircd_proto;
+
+
+
 
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
@@ -652,177 +980,11 @@ int anope_event_436(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-
-
-void CharybdisProto::SendSQLine(const char *mask, const char *reason)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
-}
-
-void CharybdisProto::SendSGLineDel(const char *mask)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
-}
-
-void CharybdisProto::SendSGLine(const char *mask, const char *reason)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
-}
-
-void CharybdisProto::SendAkillDel(const char *user, const char *host)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
-}
-
-void CharybdisProto::SendVhostDel(User *u)
-{
-	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", u->nick, u->host);
-}
-
-void CharybdisProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
-{
-	send_cmd(UseTS6 ? TS6SID : ServerName, "ENCAP * CHGHOST %s :%s", nick, vhost);
-}
-
-void CharybdisProto::SendSQLineDel(const char *user)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNRESV * %s", user);
-}
-
-void CharybdisProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
-{
-	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? user->uid.c_str() : user->nick);
-}
-
-/*
-oper:		the nick of the oper performing the kline
-target.server:	the server(s) this kline is destined for
-duration:	the duration if a tkline, 0 if permanent.
-user:		the 'user' portion of the kline
-host:		the 'host' portion of the kline
-reason:		the reason for the kline.
-*/
-
-void CharybdisProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
-{
-	BotInfo *bi = findbot(s_OperServ);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
-}
-
-void CharybdisProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
-{
-	if (!source || !user || !buf) return;
-	BotInfo *bi = findbot(source);
-	User *u = finduser(user);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KILL %s :%s", UseTS6 ? (u ? u->uid : user) : user, buf);
-}
-
-void CharybdisProto::SendSVSMode(User *u, int ac, const char **av)
-{
-	send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
-}
-
-/*
- * SVINFO
- *      parv[0] = sender prefix
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = server is standalone or connected to non-TS only
- *      parv[4] = server's idea of UTC time
- */
-void charybdis_cmd_svinfo()
-{
-    send_cmd(NULL, "SVINFO 6 3 0 :%ld", (long int) time(NULL));
-}
-
-void charybdis_cmd_svsinfo()
-{
-
-}
-
-/* CAPAB */
-/*
-  QS       - Can handle quit storm removal
-  EX       - Can do channel +e exemptions
-  CHW      - Can do channel wall @#
-  LL       - Can do lazy links
-  IE       - Can do invite exceptions
-  EOB      - Can do EOB message
-  KLN      - Can do KLINE message
-  GLN      - Can do GLINE message
-  HUB      - This server is a HUB
-  UID      - Can do UIDs
-  ZIP      - Can do ZIPlinks
-  ENC      - Can do ENCrypted links
-  KNOCK    - supports KNOCK
-  TBURST   - supports TBURST
-  PARA	   - supports invite broadcasting for +p
-  ENCAP	   - supports message encapsulation
-  SERVICES - supports services-oriented TS6 extensions
-  EUID     - supports EUID and non-ENCAP CHGHOST
-*/
-void charybdis_cmd_capab()
-{
-    send_cmd(NULL,
-             "CAPAB :QS EX CHW IE KLN GLN KNOCK TB UNKLN CLUSTER ENCAP SERVICES EUID");
-}
-
-/* PASS */
-void charybdis_cmd_pass(const char *pass)
-{
-    if (UseTS6) {
-        send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
-    } else {
-        send_cmd(NULL, "PASS %s :TS", pass);
-    }
-}
-
-/* SERVER name hop descript */
-void CharybdisProto::SendServer(const char *servname, int hop, const char *descript)
-{
-	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, descript);
-}
-
-void CharybdisProto::SendConnect()
-{
-	/* Make myself known to myself in the serverlist */
-	if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
-	else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-	if (servernum == 1) charybdis_cmd_pass(RemotePassword);
-	else if (servernum == 2) charybdis_cmd_pass(RemotePassword2);
-	else if (servernum == 3) charybdis_cmd_pass(RemotePassword3);
-	charybdis_cmd_capab();
-	SendServer(ServerName, 1, ServerDesc);
-	charybdis_cmd_svinfo();
-}
-
-void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	EnforceQlinedNick(nick, NULL);
-	if (UseTS6) {
-		char *uidbuf = ts6_uid_retrieve();
-		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
-	}
-	else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	SendSQLine(nick, "Reserved for services");
-}
-
-void CharybdisProto::SendPartInternal(BotInfo *nick, const char *chan, const char *buf)
-{
-	if (buf) send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s :%s", chan, buf);
-	else send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s", chan);
-}
-
 int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    ircd_proto.SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+    ircdproto->SendPong(ac > 1 ? av[1] : ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -886,18 +1048,18 @@ int anope_event_motd(const char *source, int ac, const char **av)
 
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-    User *u;
-    Uid *ud;
+	User *u;
+	BotInfo *bi;
 
-    if (ac != 2) {
-        return MOD_CONT;
-    }
+	if (ac != 2)
+	{
+		return MOD_CONT;
+	}
 
-    u = find_byuid(source);
-    ud = find_nickuid(av[0]);
-    m_privmsg((UseTS6 ? (u ? u->nick : source) : source),
-              (UseTS6 ? (ud ? ud->nick : av[0]) : av[0]), av[1]);
-    return MOD_CONT;
+	u = find_byuid(source);
+	bi = findbot(av[0]);
+	m_privmsg((UseTS6 ? source : u->nick), (UseTS6 ? bi->uid.c_str() : bi->nick), av[1]);
+	return MOD_CONT;
 }
 
 int anope_event_part(const char *source, int ac, const char **av)
@@ -916,13 +1078,14 @@ int anope_event_part(const char *source, int ac, const char **av)
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-    Uid *ud;
+	BotInfo *bi;
 
-    if (source && ac >= 1) {
-        ud = find_nickuid(av[0]);
-        m_whois(source, (UseTS6 ? (ud ? ud->nick : av[0]) : av[0]));
-    }
-    return MOD_CONT;
+	if (source && ac >= 1)
+	{
+		bi = findbot(av[0]);
+		m_whois(source, bi->uid.c_str());
+	}
+	return MOD_CONT;
 }
 
 /* EVENT: SERVER */
@@ -973,84 +1136,6 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
     do_quit((UseTS6 ? (u ? u->nick : source) : source), ac, av);
     return MOD_CONT;
-}
-
-void CharybdisProto::SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
-{
-	// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
-	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
-}
-
-void CharybdisProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	if (source) {
-		send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "MODE %s %s", dest, buf);
-	}
-	else send_cmd(source->nick, "MODE %s %s", dest, buf);
-}
-
-void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
-{
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
-
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
-        va_end(args);
-    }
-    if (!*buf) {
-        return;
-    }
-
-    send_cmd(NULL, "MODE %s %s", dest, buf);
-}
-
-void CharybdisProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
-{
-	User *u = finduser(user);
-	if (buf) send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
-	else send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
-}
-
-void CharybdisProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "NOTICE @%s :%s", dest, buf);
-}
-
-void CharybdisProto::SendBotOp(const char *nick, const char *chan)
-{
-	if (UseTS6) {
-		User *u = finduser(nick);
-		charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
-	}
-	else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
-}
-
-/* QUIT */
-void CharybdisProto::SendQuitInternal(BotInfo *source, const char *buf)
-{
-	if (buf) send_cmd(UseTS6 ? source->uid : source->nick, "QUIT :%s", buf);
-	else send_cmd(UseTS6 ? source->uid : source->nick, "QUIT");
-}
-
-/* PONG */
-void CharybdisProto::SendPong(const char *servname, const char *who)
-{
-	/* deliberately no SID in the first parameter -- jilles */
-	if (UseTS6) send_cmd(TS6SID, "PONG %s :%s", servname, who);
-	else send_cmd(servname, "PONG %s :%s", servname, who);
-}
-
-/* INVITE */
-void CharybdisProto::SendInvite(BotInfo *source, const char *chan, const char *nick)
-{
-	if (!source || !chan || !nick) return;
-	User *u = finduser(nick);
-	send_cmd(UseTS6 ? source->uid : source->nick, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 int anope_event_mode(const char *source, int ac, const char **av)
@@ -1118,27 +1203,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* SVSHOLD - set */
-void CharybdisProto::SendSVSHold(const char *nick)
-{
-	send_cmd(NULL, "ENCAP * NICKDELAY 300 %s", nick);
-}
-
-/* SVSHOLD - release */
-void CharybdisProto::SendSVSHoldDel(const char *nick)
-{
-	send_cmd(NULL, "ENCAP * NICKDELAY 0 %s", nick);
-}
-
-/* SVSNICK */
-void CharybdisProto::SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
-{
-	if (!oldnick || !newnick) return;
-	User *u = finduser(oldnick);
-	if (!u) return;
-	send_cmd(NULL, "ENCAP %s RSFNC %s %s %ld %ld", u->server->name, u->nick, newnick, static_cast<long>(when), static_cast<long>(u->timestamp));
-}
-
 int anope_event_pass(const char *source, int ac, const char **av)
 {
     if (UseTS6) {
@@ -1180,13 +1244,6 @@ int anope_event_bmask(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-int CharybdisProto::IsFloodModeParamValid(const char *value)
-{
-	char *dp, *end;
-	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-	else return 0;
-}
-
 int anope_event_error(const char *source, int ac, const char **av)
 {
     if (ac >= 1) {
@@ -1195,17 +1252,6 @@ int anope_event_error(const char *source, int ac, const char **av)
         }
     }
     return MOD_CONT;
-}
-
-/*
-  1 = valid nick
-  0 = nick is in valid
-*/
-int CharybdisProto::IsNickValid(const char *nick)
-{
-	/* TS6 Save extension -Certus */
-	if (isdigit(*nick)) return 0;
-	return 1;
 }
 
 int charybdis_send_account(int argc, char **argv)

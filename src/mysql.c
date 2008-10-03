@@ -177,7 +177,7 @@ char *db_mysql_quote(char *sql)
         return sstrdup("");
 
     slen = strlen(sql);
-    quoted = malloc((1 + (slen * 2)) * sizeof(char));
+    quoted = (char*)malloc((1 + (slen * 2)) * sizeof(char));
 
     mysql_real_escape_string(mysql, quoted, sql, slen);
     
@@ -807,7 +807,7 @@ int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
 
     /* Next save all AKILLs */
     for (i = 0; ret && (i < ak->count); i++) {
-        akl = ak->list[i];
+        akl = (Akill*)ak->list[i];
         q_user = db_mysql_quote(akl->user);
         q_host = db_mysql_quote(akl->host);
         q_by = db_mysql_quote(akl->by);
@@ -835,7 +835,7 @@ int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
 
     /* Time to save the SGLINEs */
     for (i = 0; ret && (i < sgl->count); i++) {
-        sl = sgl->list[i];
+        sl = (SXLine*)sgl->list[i];
         q_mask = db_mysql_quote(sl->mask);
         q_by = db_mysql_quote(sl->by);
         q_reason = db_mysql_quote(sl->reason);
@@ -861,7 +861,7 @@ int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
 
     /* Save the SQLINEs */
     for (i = 0; ret && (i < sql->count); i++) {
-        sl = sql->list[i];
+        sl = (SXLine*)sql->list[i];
 
         q_mask = db_mysql_quote(sl->mask);
         q_by = db_mysql_quote(sl->by);
@@ -888,7 +888,7 @@ int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
 
     /* Now save the SZLINEs */
     for (i = 0; ret && (i < szl->count); i++) {
-        sl = szl->list[i];
+        sl = (SXLine*)szl->list[i];
 
         q_mask = db_mysql_quote(sl->mask);
         q_by = db_mysql_quote(sl->by);
@@ -1105,7 +1105,7 @@ int db_mysql_load_bs_dbase(void)
     mysql_res = mysql_use_result(mysql);
         
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        bi = makebot(mysql_row[0]);
+        bi = new BotInfo(mysql_row[0]);
         bi->user = sstrdup(mysql_row[1]);
         bi->host = sstrdup(mysql_row[2]);
         bi->real = sstrdup(mysql_row[3]);
@@ -1172,7 +1172,7 @@ int db_mysql_load_news(void)
     else
         news_size = 2 * nnews;
 
-    news = scalloc(news_size, sizeof(*news));
+    news = (NewsItem*)scalloc(news_size, sizeof(*news));
 
     i = 0;
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1206,7 +1206,7 @@ int db_mysql_load_exceptions(void)
     
     mysql_res = mysql_store_result(mysql);
     nexceptions = mysql_num_rows(mysql_res);
-    exceptions = scalloc(nexceptions, sizeof(Exception));
+    exceptions = (Exception*)scalloc(nexceptions, sizeof(Exception));
 
     i = 0;
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
@@ -1280,7 +1280,7 @@ int db_mysql_load_os_dbase(void)
     slist_setcapacity(&akills, akc);
 
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        ak = scalloc(1, sizeof(Akill));
+        ak = (Akill*)scalloc(1, sizeof(Akill));
         ak->user = sstrdup(mysql_row[0]);
         ak->host = sstrdup(mysql_row[1]);
         ak->by = sstrdup(mysql_row[2]);
@@ -1306,7 +1306,7 @@ int db_mysql_load_os_dbase(void)
     slist_setcapacity(&sglines, sglc);
 
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        sl = scalloc(1, sizeof(SXLine));
+        sl = (SXLine*)scalloc(1, sizeof(SXLine));
         sl->mask = sstrdup(mysql_row[0]);
         sl->by = sstrdup(mysql_row[1]);
         sl->reason = sstrdup(mysql_row[2]);
@@ -1331,7 +1331,7 @@ int db_mysql_load_os_dbase(void)
     slist_setcapacity(&sqlines, sqlc);
 
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        sl = scalloc(1, sizeof(SXLine));
+        sl = (SXLine*)scalloc(1, sizeof(SXLine));
         sl->mask = sstrdup(mysql_row[0]);
         sl->by = sstrdup(mysql_row[1]);
         sl->reason = sstrdup(mysql_row[2]);
@@ -1356,7 +1356,7 @@ int db_mysql_load_os_dbase(void)
     slist_setcapacity(&szlines, szlc);
 
     while ((mysql_row = mysql_fetch_row(mysql_res))) {
-        sl = scalloc(1, sizeof(SXLine));
+        sl = (SXLine*)scalloc(1, sizeof(SXLine));
         sl->mask = sstrdup(mysql_row[0]);
         sl->by = sstrdup(mysql_row[1]);
         sl->reason = sstrdup(mysql_row[2]);
@@ -1398,7 +1398,7 @@ int db_mysql_load_cs_dbase(void)
     mysql_res = mysql_store_result(mysql);
 
     while (ret && (mysql_row = mysql_fetch_row(mysql_res))) {
-        ci = scalloc(1, sizeof(ChannelInfo));
+        ci = (ChannelInfo*)scalloc(1, sizeof(ChannelInfo));
 
         /* Name, founder, successor, password */
         snprintf(ci->name, CHANMAX, "%s", mysql_row[0]);
@@ -1471,7 +1471,7 @@ int db_mysql_load_cs_dbase(void)
 
         if (ret) {
             res = mysql_use_result(mysql);
-            ci->levels = scalloc(CA_SIZE, sizeof(*ci->levels));
+            ci->levels = (int16*)scalloc(CA_SIZE, sizeof(*ci->levels));
             reset_levels(ci);
 
             while ((row = mysql_fetch_row(res))) {
@@ -1484,7 +1484,7 @@ int db_mysql_load_cs_dbase(void)
 
         /* Get the channel ACCESS list */
         if (ret && (ci->accesscount > 0)) {
-            ci->access = scalloc(ci->accesscount, sizeof(ChanAccess));
+            ci->access = (ChanAccess*)scalloc(ci->accesscount, sizeof(ChanAccess));
 
             ret = db_mysql_try("SELECT level, display, last_seen "
                                "FROM anope_cs_access "
@@ -1512,7 +1512,7 @@ int db_mysql_load_cs_dbase(void)
 
         /* Get the channel AKICK list */
         if (ret && (ci->akickcount > 0)) {
-            ci->akick = scalloc(ci->akickcount, sizeof(AutoKick));
+            ci->akick = (AutoKick*)scalloc(ci->akickcount, sizeof(AutoKick));
 
             ret = db_mysql_try("SELECT flags, dmask, reason, creator, addtime "
                                "FROM anope_cs_akicks "
@@ -1556,7 +1556,7 @@ int db_mysql_load_cs_dbase(void)
                 if (ci->memos.memocount > 0) {
                     Memo *memos;
 
-                    memos = scalloc(ci->memos.memocount, sizeof(Memo));
+                    memos = (Memo*)scalloc(ci->memos.memocount, sizeof(Memo));
                     ci->memos.memos = memos;
 
                     i = 0;
@@ -1577,7 +1577,7 @@ int db_mysql_load_cs_dbase(void)
 
         /* Get the TTB data */
         if (ret) {
-            ci->ttb = scalloc(TTB_SIZE, sizeof(*ci->ttb));
+            ci->ttb = (int16*)scalloc(TTB_SIZE, sizeof(*ci->ttb));
 
             ret = db_mysql_try("SELECT ttb_id, value "
                                "FROM anope_cs_ttb "
@@ -1599,7 +1599,7 @@ int db_mysql_load_cs_dbase(void)
 
         /* Get the badwords */
         if (ret && (ci->bwcount > 0)) {
-            ci->badwords = scalloc(ci->bwcount, sizeof(BadWord));
+            ci->badwords = (BadWord*)scalloc(ci->bwcount, sizeof(BadWord));
 
             ret = db_mysql_try("SELECT word, type "
                                "FROM anope_cs_badwords "
@@ -1665,7 +1665,7 @@ int db_mysql_load_ns_req_dbase(void)
         mysql_res = mysql_use_result(mysql);
 
         while ((mysql_row = mysql_fetch_row(mysql_res))) {
-            nr = scalloc(1, sizeof(NickRequest));
+            nr = (NickRequest*)scalloc(1, sizeof(NickRequest));
 
             nr->nick = sstrdup(mysql_row[0]);
             nr->passcode = sstrdup(mysql_row[1]);
@@ -1708,7 +1708,7 @@ int db_mysql_load_ns_dbase(void)
     mysql_res = mysql_store_result(mysql);
 
     while (ret && (mysql_row = mysql_fetch_row(mysql_res))) {
-        nc = scalloc(1, sizeof(NickCore));
+        nc = (NickCore*)scalloc(1, sizeof(NickCore));
 
         /* Display, password, email, ICQ, URL, flags */
         nc->display = sstrdup(mysql_row[0]);
@@ -1752,7 +1752,7 @@ int db_mysql_load_ns_dbase(void)
 
         /* Fill the accesslist */
         if (ret && (nc->accesscount > 0)) {
-            nc->access = scalloc(nc->accesscount, sizeof(char *));
+            nc->access = (char**)scalloc(nc->accesscount, sizeof(char *));
 
             ret = db_mysql_try("SELECT access "
                                "FROM anope_ns_access "
@@ -1776,7 +1776,7 @@ int db_mysql_load_ns_dbase(void)
 
         /* Load the memos */
         if (ret && (nc->memos.memocount > 0)) {
-            nc->memos.memos = scalloc(nc->memos.memocount, sizeof(Memo));
+            nc->memos.memos = (Memo*)scalloc(nc->memos.memocount, sizeof(Memo));
 
             ret = db_mysql_try("SELECT nm_id, number, flags, time, sender, text "
                                "FROM anope_ms_info "
@@ -1831,7 +1831,7 @@ int db_mysql_load_ns_dbase(void)
         if (!(nc = findcore(mysql_row[1])))
             continue;
 
-        na = scalloc(1, sizeof(NickAlias));
+        na = (NickAlias*)scalloc(1, sizeof(NickAlias));
 
         /* nick, time_registered, last_seen, status
          * NOTE: remove NS_TEMPORARY from status on load

@@ -6,13 +6,14 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
 #include "services.h"
+#include "configreader.h"
 
 /*************************************************************************/
 
@@ -277,7 +278,7 @@ int ModulesDelayedNumber;
 char **ModulesDelayedAutoload;
 
 /**
- * Core Module Stuff 
+ * Core Module Stuff
  **/
 char *HostCoreModules;
 char **HostServCoreModules;
@@ -350,6 +351,702 @@ int NumUlines;
 
 int UseTS6;
 
+
+/*************************************************************************/
+
+ServerConfig::ServerConfig() : include_stack(), errstr(""), newconfig(), config_data()
+{
+	this->ClearStack();
+}
+
+void ServerConfig::ClearStack()
+{
+	include_stack.clear();
+}
+
+bool ServerConfig::CheckOnce(const char *tag)
+{
+	int count = ConfValueEnum(config_data, tag);
+	if (count > 1) {
+		throw ConfigException(static_cast<std::string>("You have more than one <") + tag + "> tag, this is not permitted.");
+	}
+	if (count < 1) {
+		throw ConfigException(static_cast<std::string>("You have not defined a <") + tag + "> tag, this is required.");
+	}
+	return true;
+}
+
+bool NoValidation(ServerConfig *, const char *, const char *, ValueItem &)
+{
+	return true;
+}
+
+bool DoneConfItem(ServerConfig *, const char *)
+{
+	return true;
+}
+
+void ServerConfig::ValidateNoSpaces(const char *p, const std::string &tag, const std::string &val)
+{
+	for (const char *ptr = p; *ptr; ++ptr) if (*ptr == ' ') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+		"> cannot contain spaces");
+}
+
+/* NOTE: Before anyone asks why we're not using inet_pton for this, it is because inet_pton and friends do not return so much detail,
+ * even in strerror(errno). They just return 'yes' or 'no' to an address without such detail as to whats WRONG with the address.
+ * Because ircd users arent as technical as they used to be (;)) we are going to give more of a useful error message.
+ */
+void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::string &val, bool wild)
+{
+	int num_dots = 0, num_seps = 0;
+	bool not_numbers = false, not_hex = false;
+	if (*p) {
+		if (*p == '.') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not an IP address");
+		for (const char *ptr = p; *ptr; ++ptr) {
+			if (wild && (*ptr == '*' || *ptr == '?' || *ptr == '/')) continue;
+			if (*ptr != ':' && *ptr != '.') {
+				if (*ptr < '0' || *ptr > '9') {
+					not_numbers = true;
+					if (toupper(*ptr) < 'A' || toupper(*ptr) > 'F') not_hex = true;
+				}
+			}
+			switch (*ptr) {
+				case ' ':
+					throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not an IP address");
+				case '.':
+					++num_dots;
+					break;
+				case ':':
+					++num_seps;
+			}
+		}
+		if (num_dots > 3) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> is an IPv4 address with too many fields!");
+		if (num_seps > 8) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> is an IPv6 address with too many fields!");
+		if (!num_seps && num_dots < 3 && !wild) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> looks to be a malformed IPv4 address");
+		if (!num_seps && num_dots == 3 && not_numbers) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> contains non-numeric characters in an IPv4 address");
+		if (num_seps && not_hex) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> contains non-hexdecimal characters in an IPv6 address");
+		if (num_seps && num_dots != 3 && num_dots && !wild) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val +
+			"> is a malformed IPv6 4in6 address");
+	}
+}
+
+void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const std::string &val)
+{
+	int num_dots = 0;
+	if (*p) {
+		if (*p == '.') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
+		for (const char *ptr = p; *ptr; ++ptr) {
+			switch (*ptr) {
+				case ' ':
+					throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
+				case '.':
+					++num_dots;
+			}
+		}
+		if (!num_dots) throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");
+	}
+}
+
+bool ValidateMaxTargets(ServerConfig *, const char *, const char *, ValueItem &data)
+{
+	if (data.GetInteger() < 0 || data.GetInteger() > 31) {
+		alog("WARNING: <options:maxtargets> value is greater than 31 or less than 0, set to 20.");
+		data.Set(20);
+	}
+	return true;
+}
+
+bool ValidateNotEmpty(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty!");
+	return true;
+}
+
+bool ValidatePort(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	int port = data.GetInteger();
+	if (!port) return true;
+	if (port < 1 || port > 65535) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value +
+		"> is not a value port, it must be between 1 and 65535!");
+	return true;
+}
+
+void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
+{
+	alog("There were errors in your configuration file: %s", errormessage.c_str());
+	if (bail) {
+		// TODO -- Need a way to stop loading in a safe way -- CyberBotX
+		//ServerInstance->Exit(EXIT_STATUS_CONFIG);
+	}
+}
+
+int ServerConfig::Read(bool bail)
+{
+	errstr.clear();
+	// These tags MUST occur and must ONLY occur once in the config file
+	static const char *Once[] = {NULL};
+	// These tags can occur ONCE or not at all
+	InitialConfig Values[] = {
+		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
+	};
+	/* These tags can occur multiple times, and therefore they have special code to read them
+	 * which is different to the code for reading the singular tags listed above. */
+	MultiConfig MultiValues[] = {
+		{NULL,
+			{NULL},
+			{NULL},
+			{0},
+			NULL, NULL, NULL}
+	};
+	// Load and parse the config file, if there are any errors then explode
+	// Make a copy here so if it fails then we can carry on running with an unaffected config
+	newconfig.clear();
+	if (LoadConf(newconfig, SERVICES_CONF, errstr)) {
+		// If we succeeded, set the ircd config to the new one
+		config_data = newconfig;
+	}
+	else {
+		ReportConfigError(errstr.str(), bail);
+		return 0;
+	}
+	// The stuff in here may throw CoreException, be sure we're in a position to catch it.
+	try {
+		// Read the values of all the tags which occur once or not at all, and call their callbacks.
+		for (int Index = 0; Values[Index].tag; ++Index) {
+			char item[BUFSIZE];
+			int dt = Values[Index].datatype;
+			bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD;
+			dt &= ~DT_ALLOW_NEWLINE;
+			dt &= ~DT_ALLOW_WILD;
+			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
+			ValueItem vi(item);
+			if (!Values[Index].validation_function(this, Values[Index].tag, Values[Index].value, vi))
+				throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+			switch (dt) {
+				case DT_NOSPACES: {
+					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+					ValidateNoSpaces(vi.GetString(), Values[Index].tag, Values[Index].value);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+				}
+				break;
+				case DT_HOSTNAME: {
+					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+					ValidateHostname(vi.GetString(), Values[Index].tag, Values[Index].value);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+				}
+				break;
+				case DT_IPADDRESS: {
+					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+					ValidateIP(vi.GetString(), Values[Index].tag, Values[Index].value, allow_wild);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+				}
+				break;
+				case DT_CHARPTR: {
+					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
+					// Make sure we also copy the null terminator
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+				}
+				break;
+				case DT_STRING: {
+					ValueContainerString *vcs = dynamic_cast<ValueContainerString *>(Values[Index].val);
+					vcs->Set(vi.GetString());
+				}
+				break;
+				case DT_INTEGER: {
+					int val = vi.GetInteger();
+					ValueContainerInt *vci = dynamic_cast<ValueContainerInt *>(Values[Index].val);
+					vci->Set(&val, sizeof(int));
+				}
+				break;
+				case DT_UINTEGER: {
+					unsigned val = vi.GetInteger();
+					ValueContainerUInt *vci = dynamic_cast<ValueContainerUInt *>(Values[Index].val);
+					vci->Set(&val, sizeof(int));
+				}
+				break;
+				case DT_TIME: {
+					time_t time = dotime(vi.GetString());
+					ValueContainerTime *vci = dynamic_cast<ValueContainerTime *>(Values[Index].val);
+					vci->Set(&time, sizeof(time_t));
+				}
+				break;
+				case DT_BOOLEAN: {
+					bool val = vi.GetBool();
+					ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
+					vcb->Set(&val, sizeof(bool));
+				}
+				break;
+				default:
+					break;
+			}
+			// We're done with this now
+			delete Values[Index].val;
+		}
+		/* Read the multiple-tag items (class tags, connect tags, etc)
+		 * and call the callbacks associated with them. We have three
+		 * callbacks for these, a 'start', 'item' and 'end' callback. */
+		for (int Index = 0; MultiValues[Index].tag; ++Index) {
+			MultiValues[Index].init_function(this, MultiValues[Index].tag);
+			int number_of_tags = ConfValueEnum(config_data, MultiValues[Index].tag);
+			for (int tagnum = 0; tagnum < number_of_tags; ++tagnum) {
+				ValueList vl;
+				for (int valuenum = 0; MultiValues[Index].items[valuenum]; ++valuenum) {
+					int dt = MultiValues[Index].datatype[valuenum];
+					bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD;
+					dt &= ~DT_ALLOW_NEWLINE;
+					dt &= ~DT_ALLOW_WILD;
+					switch (dt) {
+						case DT_NOSPACES: {
+							char item[BUFSIZE];
+							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
+								vl.push_back(ValueItem(item));
+							}
+							else vl.push_back(ValueItem(""));
+							ValidateNoSpaces(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
+						}
+						break;
+						case DT_HOSTNAME: {
+							char item[BUFSIZE];
+							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
+								vl.push_back(ValueItem(item));
+							}
+							else vl.push_back(ValueItem(""));
+							ValidateHostname(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum]);
+						}
+						break;
+						case DT_IPADDRESS: {
+							char item[BUFSIZE];
+							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
+								vl.push_back(ValueItem(item));
+							}
+							else vl.push_back(ValueItem(""));
+							ValidateIP(vl[vl.size() - 1].GetString(), MultiValues[Index].tag, MultiValues[Index].items[valuenum], allow_wild);
+						}
+						break;
+						case DT_CHARPTR: {
+							char item[BUFSIZE];
+							if (ConfValue(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum, item, BUFSIZE, allow_newlines)) {
+								vl.push_back(ValueItem(item));
+							}
+							else vl.push_back(ValueItem(""));
+						}
+						break;
+						case DT_STRING: {
+							std::string item;
+							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
+								static_cast<std::string>(MultiValues[Index].items[valuenum]),
+								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
+								vl.push_back(ValueItem(item));
+							}
+							else vl.push_back(ValueItem(""));
+						}
+						break;
+						case DT_INTEGER:
+						case DT_UINTEGER: {
+							int item = 0;
+							if (ConfValueInteger(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum, item)) vl.push_back(ValueItem(item));
+							else vl.push_back(ValueItem(0));
+						}
+						break;
+						case DT_TIME: {
+							std::string item;
+							if (ConfValue(config_data, static_cast<std::string>(MultiValues[Index].tag),
+								static_cast<std::string>(MultiValues[Index].items[valuenum]),
+								static_cast<std::string>(MultiValues[Index].items_default[valuenum]), tagnum, item, allow_newlines)) {
+								int time = dotime(item.c_str());
+								vl.push_back(ValueItem(time));
+							}
+							else vl.push_back(ValueItem(0));
+						}
+						break;
+						case DT_BOOLEAN: {
+							bool item = ConfValueBool(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
+								MultiValues[Index].items_default[valuenum], tagnum);
+							vl.push_back(ValueItem(item));
+						}
+					}
+				}
+				MultiValues[Index].validation_function(this, MultiValues[Index].tag, static_cast<const char **>(MultiValues[Index].items), vl,
+					MultiValues[Index].datatype);
+			}
+			MultiValues[Index].finish_function(this, MultiValues[Index].tag);
+		}
+	}
+	catch (ConfigException &ce) {
+		ReportConfigError(ce.GetReason(), bail);
+		return 0;
+	}
+	if (debug) alog("End config");
+	for (int Index = 0; Once[Index]; ++Index) if (!CheckOnce(Once[Index])) return 0;
+	alog("Done reading configuration file.");
+	return 1;
+}
+
+bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::ostringstream &errorstream)
+{
+	std::string line, wordbuffer, section, itemname;
+	std::ifstream conf(filename);
+	int linenumber = 0;
+	bool in_word = false, in_quote = false, in_ml_comment = false;
+	KeyValList sectiondata;
+	if (conf.fail()) {
+		errorstream << "File " << filename << " could not be opened." << std::endl;
+		return false;
+	}
+	if (debug) alog("Start to read conf %s", filename);
+	// Start reading characters...
+	while (getline(conf, line)) {
+		++linenumber;
+		unsigned c = 0, len = line.size();
+		for (; c < len; ++c) {
+			char ch = line[c];
+			if (in_quote) {
+				if (ch == '"') {
+					in_quote = in_word = false;
+					continue;
+				}
+				wordbuffer += ch;
+				continue;
+			}
+			if (in_ml_comment) {
+				if (ch == '*' && c + 1 < len && line[c + 1] == '/') {
+					in_ml_comment = false;
+					++c;
+				}
+				continue;
+			}
+			if (ch == '#' || (ch == '/' && c + 1 < len && line[c + 1] == '/')) break; // Line comment, ignore the rest of the line (much like this one!)
+			else if (ch == '/' && c + 1 < len && line[c + 1] == '*') {
+				// Multiline (or less than one line) comment
+				in_ml_comment = true;
+				++c;
+				continue;
+			}
+			else if (ch == '"') {
+				// Quotes are valid only in the value position
+				if (section.empty() || itemname.empty()) {
+					errorstream << "Unexpected quoted string: " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (in_word || !wordbuffer.empty()) {
+					errorstream << "Unexpected quoted string (prior unhandled words): " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				in_quote = in_word = true;
+				continue;
+			}
+			else if (ch == '=') {
+				if (section.empty()) {
+					errorstream << "Config item outside of section (or stray '='): " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (!itemname.empty()) {
+					errorstream << "Stray '=' sign or item without value: " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (in_word) in_word = false;
+				itemname = wordbuffer;
+				wordbuffer.clear();
+			}
+			else if (ch == '{') {
+				if (!section.empty()) {
+					errorstream << "Section inside another section: " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (wordbuffer.empty()) {
+					errorstream << "Section without a name or unexpected '{': " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (in_word) in_word = false;
+				section = wordbuffer;
+				wordbuffer.clear();
+			}
+			else if (ch == '}') {
+				if (section.empty()) {
+					errorstream << "Stray '}': " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				if (!wordbuffer.empty() || !itemname.empty()) {
+					errorstream << "Unexpected end of section: " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				target.insert(std::pair<std::string, KeyValList>(section, sectiondata));
+				section.clear();
+				sectiondata.clear();
+			}
+			else if (ch == ';' || ch == '\r') continue; // Ignore
+			else if (ch == ' ' || ch == '\t') {
+				// Terminate word
+				if (in_word) in_word = false;
+			}
+			else {
+				if (!in_word && !wordbuffer.empty()) {
+					errorstream << "Unexpected word: " << filename << ":" << linenumber << std::endl;
+					return false;
+				}
+				wordbuffer += ch;
+				in_word = true;
+			}
+		}
+		if (in_quote) {
+			// Quotes can span multiple lines; all we need to do is go to the next line without clearing things
+			wordbuffer += "\n";
+			continue;
+		}
+		in_word = false;
+		if (!itemname.empty()) {
+			if (wordbuffer.empty()) {
+				errorstream << "Item without value: " << filename << ":" << linenumber << std::endl;
+				return false;
+			}
+			if (debug) alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+			sectiondata.push_back(KeyVal(itemname, wordbuffer));
+			wordbuffer.clear();
+			itemname.clear();
+		}
+	}
+	if (in_ml_comment) {
+		errorstream << "Unterminated multiline comment at end of file: " << filename << std::endl;
+		return false;
+	}
+	if (in_quote) {
+		errorstream << "Unterminated quote at end of file: " << filename << std::endl;
+		return false;
+	}
+	if (!itemname.empty() || !wordbuffer.empty()) {
+		errorstream << "Unexpected garbage at end of file: " << filename << std::endl;
+		return false;
+	}
+	if (!section.empty()) {
+		errorstream << "Unterminated section at end of file: " << filename << std::endl;
+		return false;
+	}
+	return true;
+}
+
+bool ServerConfig::LoadConf(ConfigDataHash &target, const std::string &filename, std::ostringstream &errorstream)
+{
+	return LoadConf(target, filename.c_str(), errorstream);
+}
+
+bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, int index, char *result, int length, bool allow_linefeeds)
+{
+	return ConfValue(target, tag, var, "", index, result, length, allow_linefeeds);
+}
+
+bool ServerConfig::ConfValue(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, char *result,
+	int length, bool allow_linefeeds)
+{
+	std::string value;
+	bool r = ConfValue(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index, value,
+		allow_linefeeds);
+	strlcpy(result, value.c_str(), length);
+	return r;
+}
+
+bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, std::string &result,
+	bool allow_linefeeds)
+{
+	return ConfValue(target, tag, var, "", index, result, allow_linefeeds);
+}
+
+bool ServerConfig::ConfValue(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index,
+	std::string &result, bool allow_linefeeds)
+{
+	ConfigDataHash::size_type pos = index;
+	if (pos < target.count(tag)) {
+		ConfigDataHash::iterator iter = target.find(tag);
+		for (int i = 0; i < index; ++i) ++iter;
+		KeyValList::iterator j = iter->second.begin(), jend = iter->second.end();
+		for (; j != jend; ++j) {
+			if (j->first == var) {
+				if (!allow_linefeeds && j->second.find('\n') != std::string::npos) {
+					alog("Value of <%s:%s> contains a linefeed, and linefeeds in this value are not permitted -- stripped to spaces.", tag.c_str(), var.c_str());
+					std::string::iterator n = j->second.begin(), nend = j->second.end();
+					for (; n != nend; ++n) if (*n == '\n') *n = ' ';
+				}
+				else {
+					result = j->second;
+					return true;
+				}
+			}
+		}
+		if (!default_value.empty()) {
+			result = default_value;
+			return true;
+		}
+	}
+	else if (!pos) {
+		if (!default_value.empty()) {
+			result = default_value;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, int index, int &result)
+{
+	return ConfValueInteger(target, static_cast<std::string>(tag), static_cast<std::string>(var), "", index, result);
+}
+
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index, int &result)
+{
+	return ConfValueInteger(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index,
+		result);
+}
+
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &tag, const std::string &var, int index, int &result)
+{
+	return ConfValueInteger(target, tag, var, "", index, result);
+}
+
+bool ServerConfig::ConfValueInteger(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index, int &result)
+{
+	std::string value;
+	std::istringstream stream;
+	bool r = ConfValue(target, tag, var, default_value, index, value);
+	stream.str(value);
+	if (!(stream >> result)) return false;
+	else {
+		if (!value.empty()) {
+			if (value.substr(0, 2) == "0x") {
+				char *endptr;
+				value.erase(0, 2);
+				result = strtol(value.c_str(), &endptr, 16);
+				/* No digits found */
+				if (endptr == value.c_str()) return false;
+			}
+			else {
+				char denominator = *(value.end() - 1);
+				switch (toupper(denominator)) {
+					case 'K':
+						// Kilobytes -> bytes
+						result = result * 1024;
+						break;
+					case 'M':
+						// Megabytes -> bytes
+						result = result * 1048576;
+						break;
+					case 'G':
+						// Gigabytes -> bytes
+						result = result * 1073741824;
+						break;
+				}
+			}
+		}
+	}
+	return r;
+}
+
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, int index)
+{
+	return ConfValueBool(target, static_cast<std::string>(tag), static_cast<std::string>(var), "", index);
+}
+
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const char *tag, const char *var, const char *default_value, int index)
+{
+	return ConfValueBool(target, static_cast<std::string>(tag), static_cast<std::string>(var), static_cast<std::string>(default_value), index);
+}
+
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, int index)
+{
+	return ConfValueBool(target, tag, var, "", index);
+}
+
+bool ServerConfig::ConfValueBool(ConfigDataHash &target, const std::string &tag, const std::string &var, const std::string &default_value, int index)
+{
+	std::string result;
+	if (!ConfValue(target, tag, var, default_value, index, result)) return false;
+	return result == "yes" || result == "true" || result == "1";
+}
+
+int ServerConfig::ConfValueEnum(ConfigDataHash &target, const char *tag)
+{
+	return target.count(tag);
+}
+
+int ServerConfig::ConfValueEnum(ConfigDataHash &target, const std::string &tag)
+{
+	return target.count(tag);
+}
+
+int ServerConfig::ConfVarEnum(ConfigDataHash &target, const char *tag, int index)
+{
+	return ConfVarEnum(target, static_cast<std::string>(tag), index);
+}
+
+int ServerConfig::ConfVarEnum(ConfigDataHash &target, const std::string &tag, int index)
+{
+	ConfigDataHash::size_type pos = index;
+	if (pos < target.count(tag)) {
+		ConfigDataHash::const_iterator iter = target.find(tag);
+		for (int i = 0; i < index; ++i) ++iter;
+		return iter->second.size();
+	}
+	return 0;
+}
+
+ValueItem::ValueItem(int value) : v("")
+{
+	std::stringstream n;
+	n << value;
+	v = n.str();
+}
+
+ValueItem::ValueItem(bool value) : v("")
+{
+	std::stringstream n;
+	n << value;
+	v = n.str();
+}
+
+ValueItem::ValueItem(const char *value) : v(value) { }
+
+ValueItem::ValueItem(const std::string &value) : v(value) { }
+
+void ValueItem::Set(const char *value)
+{
+	v = value;
+}
+
+void ValueItem::Set(const std::string &value)
+{
+	v = value;
+}
+
+void ValueItem::Set(int value)
+{
+	std::stringstream n;
+	n << value;
+	v = n.str();
+}
+
+int ValueItem::GetInteger()
+{
+	if (v.empty()) return 0;
+	return atoi(v.c_str());
+}
+
+char *ValueItem::GetString()
+{
+	return const_cast<char *>(v.c_str());
+}
+
+bool ValueItem::GetBool()
+{
+	return GetInteger() || v == "yes" || v == "true";
+}
 
 /*************************************************************************/
 

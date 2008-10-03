@@ -22,7 +22,10 @@ extern "C"
 
 	int getAnopeBuildVersion()
 	{
+#if 0
 		return VERSION_BUILD;
+#endif
+		return 0; // XXX
 	}
 
 	int getAnopeMajorVersion()

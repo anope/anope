@@ -618,6 +618,12 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     if (func) {
+
+/*
+ * Commented out, as VERSION_BUILD doesn't currently actually work.
+ * We need a nicer way to do this. -- w00t
+ */
+#if 0
 	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
 	if (version) {
         if (version() >= VERSION_BUILD ) {
@@ -631,6 +637,10 @@ int loadModule(Module * m, User * u)
             ano_modclearerr();
             return MOD_ERR_NOLOAD;
         }
+#else
+	// hack.
+	if (1) {
+#endif
     } else {
         ano_modclose(m->handle);
         ano_modclearerr();
@@ -2379,12 +2389,15 @@ bool moduleMinVersion(int major, int minor, int patch, int build)
             if (VERSION_PATCH > patch) {
                 ret = true;
             } else if (VERSION_PATCH == patch) {
+#if 0
+// XXX
                 if (build == -1) {
                     return true;
                 }               /* They dont care about build */
                 if (VERSION_BUILD >= build) {
                     ret = true;
                 }
+#endif
             }
         }
     }

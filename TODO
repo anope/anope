@@ -59,3 +59,4 @@ anopeng-uid branch TODO
 - SendAkill should just take a pointer to the Akill class instead of millions of fields
 		(same for some other stuff)
  - chan_set_modes should take BotInfo, possibly with override for User *?
+- SendClientIntroduction should take a UID param, rather than generating one(?)

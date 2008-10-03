@@ -489,14 +489,14 @@ int anope_event_nick(const char *source, int ac, const char **av)
         user = do_nick("", av[0], av[4], av[5], s->name, av[8],
                        strtoul(av[2], NULL, 10), 0, 0, NULL, av[7]);
         if (user) {
-            anope_ProcessUsermodes(user, 1, &av[3]);
+            ircdproto->ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         if (ac != 2) {
             user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
                            strtoul(av[2], NULL, 10), 0, 0, NULL, NULL);
             if (user)
-                anope_ProcessUsermodes(user, 1, &av[3]);
+                ircdproto->ProcessUsermodes(user, 1, &av[3]);
         } else {
             do_nick(source, av[0], NULL, NULL, NULL, NULL,
                     strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
@@ -533,7 +533,7 @@ int anope_event_euid(const char *source, int ac, const char **av)
         user = do_nick("", av[0], av[4], !strcmp(av[8], "*") ? av[5] : av[8], s->name, av[10],
                        ts, !stricmp(av[0], av[9]) ? ts : 0, 0, av[5], av[7]);
         if (user) {
-            anope_ProcessUsermodes(user, 1, &av[3]);
+            ircdproto->ProcessUsermodes(user, 1, &av[3]);
         }
     }
     return MOD_CONT;
@@ -694,10 +694,9 @@ void CharybdisProto::SendSQLineDel(const char *user)
 	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
-void CharybdisProto::SendJoin(const char *user, const char *channel, time_t chantime)
+void CharybdisProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
 {
-	User *u = finduser(user);
-	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (u ? u->uid : user) : user);
+	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? user->uid.c_str() : user->nick);
 }
 
 /*
@@ -813,11 +812,10 @@ void CharybdisProto::SendClientIntroduction(const char *nick, const char *user, 
 	SendSQLine(nick, "Reserved for services");
 }
 
-void CharybdisProto::SendPartInternal(const char *nick, const char *chan, const char *buf)
+void CharybdisProto::SendPartInternal(BotInfo *nick, const char *chan, const char *buf)
 {
-	User *u = finduser(nick);
-	if (buf) send_cmd(UseTS6 ? u->uid : nick, "PART %s :%s", chan, buf);
-	else send_cmd(UseTS6 ? u->uid : nick, "PART %s", chan);
+	if (buf) send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s :%s", chan, buf);
+	else send_cmd(UseTS6 ? nick->uid : nick->nick, "PART %s", chan);
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
@@ -977,20 +975,19 @@ int anope_event_quit(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void CharybdisProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
+void CharybdisProto::SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 {
 	// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
 	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 
-void CharybdisProto::SendModeInternal(const char *source, const char *dest, const char *buf)
+void CharybdisProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
-		BotInfo *bi = findbot(source);
-		send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "MODE %s %s", dest, buf);
+		send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "MODE %s %s", dest, buf);
 	}
-	else send_cmd(source, "MODE %s %s", dest, buf);
+	else send_cmd(source->nick, "MODE %s %s", dest, buf);
 }
 
 void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
@@ -1011,19 +1008,17 @@ void charybdis_cmd_tmode(const char *source, const char *dest, const char *fmt, 
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void CharybdisProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
+void CharybdisProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 {
-	BotInfo *bi = findbot(source);
 	User *u = finduser(user);
-	if (buf) send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
-	else send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
+	if (buf) send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
+	else send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void CharybdisProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
+void CharybdisProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
-	BotInfo *bi = findbot(source);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "NOTICE @%s :%s", dest, buf);
+	send_cmd(UseTS6 ? source->uid.c_str() : source->nick, "NOTICE @%s :%s", dest, buf);
 }
 
 void CharybdisProto::SendBotOp(const char *nick, const char *chan)
@@ -1032,15 +1027,14 @@ void CharybdisProto::SendBotOp(const char *nick, const char *chan)
 		User *u = finduser(nick);
 		charybdis_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
 	}
-	else SendMode(ServerName, chan, "%s %s", ircd->botchanumode, nick);
+	else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
-void CharybdisProto::SendQuitInternal(const char *source, const char *buf)
+void CharybdisProto::SendQuitInternal(BotInfo *source, const char *buf)
 {
-	BotInfo *bi = findbot(source);
-	if (buf) send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "QUIT :%s", buf);
-	else send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "QUIT");
+	if (buf) send_cmd(UseTS6 ? source->uid : source->nick, "QUIT :%s", buf);
+	else send_cmd(UseTS6 ? source->uid : source->nick, "QUIT");
 }
 
 /* PONG */
@@ -1052,12 +1046,11 @@ void CharybdisProto::SendPong(const char *servname, const char *who)
 }
 
 /* INVITE */
-void CharybdisProto::SendInvite(const char *source, const char *chan, const char *nick)
+void CharybdisProto::SendInvite(BotInfo *source, const char *chan, const char *nick)
 {
 	if (!source || !chan || !nick) return;
-	BotInfo *bi = findbot(source);
 	User *u = finduser(nick);
-	send_cmd(UseTS6 ? (bi ? bi->uid.c_str() : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
+	send_cmd(UseTS6 ? source->uid : source->nick, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 int anope_event_mode(const char *source, int ac, const char **av)

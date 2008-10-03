@@ -111,7 +111,7 @@ int do_bot(User * u)
             }
 
             /* check for hardcored ircd forbidden nicks */
-            if (!anope_IsNickValid(nick)) {
+            if (!ircdproto->IsNickValid(nick)) {
                 notice_lang(s_BotServ, u, BOT_BAD_NICK);
                 return MOD_CONT;
             }
@@ -229,7 +229,7 @@ int do_bot(User * u)
             }
 
             /* check for hardcored ircd forbidden nicks */
-            if (!anope_IsNickValid(nick)) {
+            if (!ircdproto->IsNickValid(nick)) {
                 notice_lang(s_BotServ, u, BOT_BAD_NICK);
                 return MOD_CONT;
             }

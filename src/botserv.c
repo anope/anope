@@ -92,7 +92,7 @@ void botserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(s_BotServ, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(findbot(s_BotServ), u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_BotServ, u, BOTSERV, cmd);
     }
@@ -115,7 +115,7 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(bi->nick, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(bi, u->nick, "PING %s", s);
     }
 }
 
@@ -139,7 +139,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
     /* Answer to ping if needed, without breaking the buffer. */
     if (!strnicmp(buf, "\1PING", 5)) {
-        anope_SendCTCP(ci->bi->nick, u->nick, "PING %s", buf);
+        ircdproto->SendCTCP(ci->bi, u->nick, "PING %s", buf);
     }
 
     /* If it's a /me, cut the CTCP part at the beginning (not

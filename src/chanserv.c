@@ -276,7 +276,7 @@ void chanserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(s_ChanServ, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(findbot(s_ChanServ), u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_ChanServ, u, CHANSERV, cmd);
     }
@@ -2160,7 +2160,7 @@ void cs_set_flood(ChannelInfo * ci, const char *value)
         free(ci->mlock_flood);
 
     /* This looks ugly, but it works ;) */
-    if (anope_IsFloodModeParamValid(value)) {
+    if (ircdproto->IsFloodModeParamValid(value)) {
         ci->mlock_flood = sstrdup(value);
     } else {
         ci->mlock_on &= ~ircd->chan_fmode;

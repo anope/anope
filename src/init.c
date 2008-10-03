@@ -739,7 +739,7 @@ int init_secondary(int ac, char **av)
         ircdproto->SendJoin(findbot(s_GlobalNoticer), LogChannel, time(NULL));
     }
 
-    anope_SendEOB();
+    ircdproto->SendEOB();
 
     /**
       * Load our delayed modeles - modules that are planing on making clients need to wait till now

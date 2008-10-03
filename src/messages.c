@@ -71,7 +71,7 @@ int m_time(const char *source, int ac, const char **av)
     time(&t);
     tm = localtime(&t);
     strftime(buf, sizeof(buf), "%a %b %d %H:%M:%S %Y %Z", tm);
-	anope_SendNumeric(ServerName, 391, source, "%s :%s", ServerName, buf);
+	ircdproto->SendNumeric(ServerName, 391, source, "%s :%s", ServerName, buf);
     return MOD_CONT;
 }
 
@@ -88,15 +88,15 @@ int m_motd(const char *source)
 
     f = fopen(MOTDFilename, "r");
     if (f) {
-		anope_SendNumeric(ServerName, 375, source, ":- %s Message of the Day", ServerName);
+		ircdproto->SendNumeric(ServerName, 375, source, ":- %s Message of the Day", ServerName);
         while (fgets(buf, sizeof(buf), f)) {
             buf[strlen(buf) - 1] = 0;
-			anope_SendNumeric(ServerName, 372, source, ":- %s", buf);
+			ircdproto->SendNumeric(ServerName, 372, source, ":- %s", buf);
         }
         fclose(f);
-		anope_SendNumeric(ServerName, 376, source, ":End of /MOTD command.");
+		ircdproto->SendNumeric(ServerName, 376, source, ":End of /MOTD command.");
     } else {
-		anope_SendNumeric(ServerName, 422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
+		ircdproto->SendNumeric(ServerName, 422, source, ":- MOTD file not found!  Please contact your IRC administrator.");
     }
     return MOD_CONT;
 }
@@ -241,54 +241,54 @@ int m_stats(const char *source, int ac, const char **av)
         if (u && is_oper(u)) {
 
             if (servernum == 1) {
-				anope_SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				anope_SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer, write_buffer_len(), total_written, -1, read_buffer_len(),
+				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer, write_buffer_len(), total_written, -1, read_buffer_len(),
 					total_read, -1, time(NULL) - start_time);
             } else if (servernum == 2) {
-				anope_SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				anope_SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer2, write_buffer_len(), total_written, -1, read_buffer_len(),
+				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer2, write_buffer_len(), total_written, -1, read_buffer_len(),
 					total_read, -1, time(NULL) - start_time);
             } else if (servernum == 3) {
-				anope_SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				anope_SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer3, write_buffer_len(), total_written, -1, read_buffer_len(),
+				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer3, write_buffer_len(), total_written, -1, read_buffer_len(),
 					total_read, -1, time(NULL) - start_time);
             }
         }
 
-		anope_SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+		ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
         break;
     case 'o':
     case 'O':
 /* Check whether the user is an operator */
         u = finduser(source);
         if (u && !is_oper(u) && HideStatsO) {
-			anope_SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
         } else {
             for (i = 0; i < RootNumber; i++)
-				anope_SendNumeric(ServerName, 243, source, "O * * %s Root 0", ServicesRoots[i]);
+				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Root 0", ServicesRoots[i]);
             for (i = 0; i < servadmins.count && (nc = (NickCore *)servadmins.list[i]);
                  i++)
-				anope_SendNumeric(ServerName, 243, source, "O * * %s Admin 0", nc->display);
+				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Admin 0", nc->display);
             for (i = 0; i < servopers.count && (nc = (NickCore *)servopers.list[i]);
                  i++)
-				anope_SendNumeric(ServerName, 243, source, "O * * %s Oper 0", nc->display);
+				ircdproto->SendNumeric(ServerName, 243, source, "O * * %s Oper 0", nc->display);
 
-			anope_SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
         }
 
         break;
 
     case 'u':{
             int uptime = time(NULL) - start_time;
-			anope_SendNumeric(ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s",
+			ircdproto->SendNumeric(ServerName, 242, source, ":Services up %d day%s, %02d:%02d:%02d", uptime / 86400, uptime / 86400 == 1 ? "" : "s",
 				(uptime / 3600) % 24, (uptime / 60) % 60, uptime % 60);
-			anope_SendNumeric(ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
-			anope_SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+			ircdproto->SendNumeric(ServerName, 250, source, ":Current users: %d (%d ops); maximum %d", usercnt, opcnt, maxusercnt);
+			ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
             break;
         }                       /* case 'u' */
 
     default:
-		anope_SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
+		ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');
         break;
     }
     return MOD_CONT;
@@ -298,7 +298,7 @@ int m_stats(const char *source, int ac, const char **av)
 
 int m_version(const char *source, int ac, const char **av)
 {
-	if (source) anope_SendNumeric(ServerName, 351, source, "Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags,
+	if (source) ircdproto->SendNumeric(ServerName, 351, source, "Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags,
 		EncModule, version_build);
 	return MOD_CONT;
 }
@@ -333,11 +333,11 @@ int m_whois(const char *source, const char *who)
             clientdesc = desc_DevNull;
         else if (s_BotServ && (bi = findbot(who))) {
             /* Bots are handled separately */
-			anope_SendNumeric(ServerName, 311, source, "%s %s %s * :%s", bi->nick, bi->user, bi->host, bi->real);
-			anope_SendNumeric(ServerName, 307, source, "%s :is a registered nick", bi->nick);
-			anope_SendNumeric(ServerName, 312, source, "%s %s :%s", bi->nick, ServerName, ServerDesc);
-			anope_SendNumeric(ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick, time(NULL) - bi->lastmsg, start_time);
-			anope_SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
+			ircdproto->SendNumeric(ServerName, 311, source, "%s %s %s * :%s", bi->nick, bi->user, bi->host, bi->real);
+			ircdproto->SendNumeric(ServerName, 307, source, "%s :is a registered nick", bi->nick);
+			ircdproto->SendNumeric(ServerName, 312, source, "%s %s :%s", bi->nick, ServerName, ServerDesc);
+			ircdproto->SendNumeric(ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", bi->nick, time(NULL) - bi->lastmsg, start_time);
+			ircdproto->SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
             return MOD_CONT;
         } else if (!(ircd->svshold && UseSVSHOLD) && (na = findnick(who))
                    && (na->status & NS_KILL_HELD)) {
@@ -345,18 +345,18 @@ int m_whois(const char *source, const char *who)
              * We can't just say it doesn't exist here, even tho it does for
              * other servers :) -GD
              */
-			anope_SendNumeric(ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick, NSEnforcerUser, NSEnforcerHost);
-			anope_SendNumeric(ServerName, 312, source, "%s %s :%s", na->nick, ServerName, ServerDesc);
-			anope_SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
+			ircdproto->SendNumeric(ServerName, 311, source, "%s %s %s * :Services Enforcer", na->nick, NSEnforcerUser, NSEnforcerHost);
+			ircdproto->SendNumeric(ServerName, 312, source, "%s %s :%s", na->nick, ServerName, ServerDesc);
+			ircdproto->SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
             return MOD_CONT;
         } else {
-			anope_SendNumeric(ServerName, 401, source, "%s :No such service.", who);
+			ircdproto->SendNumeric(ServerName, 401, source, "%s :No such service.", who);
             return MOD_CONT;
         }
-		anope_SendNumeric(ServerName, 311, source, "%s %s %s * :%s", who, ServiceUser, ServiceHost, clientdesc);
-		anope_SendNumeric(ServerName, 312, source, "%s %s :%s", who, ServerName, ServerDesc);
-		anope_SendNumeric(ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", who, time(NULL) - start_time, start_time);
-		anope_SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
+		ircdproto->SendNumeric(ServerName, 311, source, "%s %s %s * :%s", who, ServiceUser, ServiceHost, clientdesc);
+		ircdproto->SendNumeric(ServerName, 312, source, "%s %s :%s", who, ServerName, ServerDesc);
+		ircdproto->SendNumeric(ServerName, 317, source, "%s %ld %ld :seconds idle, signon time", who, time(NULL) - start_time, start_time);
+		ircdproto->SendNumeric(ServerName, 318, source, "%s :End of /WHOIS list.", who);
     }
     return MOD_CONT;
 }

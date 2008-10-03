@@ -84,7 +84,7 @@ int do_forbid(User * u)
     if (*chan != '#') {
         notice_lang(s_ChanServ, u, CHAN_SYMBOL_REQUIRED);
         return MOD_CONT;
-    } else if (!anope_IsChannelValid(chan)) {
+    } else if (!ircdproto->IsChannelValid(chan)) {
         notice_lang(s_ChanServ, u, CHAN_X_INVALID, chan);
         return MOD_CONT;
     }

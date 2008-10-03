@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -60,7 +60,7 @@ void helpserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(s_HelpServ, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(findbot(s_HelpServ), u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_HelpServ, u, HELPSERV, cmd);
     }

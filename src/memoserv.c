@@ -6,8 +6,8 @@
 * Please read COPYING and README for further details.
 *
 * Based on the original code of Epona by Lara.
-* Based on the original code of Services by Andy Church. 
-* 
+* Based on the original code of Services by Andy Church.
+*
 * $Id$
 *
 */
@@ -63,7 +63,7 @@ void memoserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(s_MemoServ, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(findbot(s_MemoServ), u->nick, "PING %s", s);
     } else {
         if (!u->na && stricmp(cmd, "HELP") != 0)
             notice_lang(s_MemoServ, u, NICK_NOT_REGISTERED_HELP,

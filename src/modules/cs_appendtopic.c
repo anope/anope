@@ -147,7 +147,7 @@ int my_cs_appendtopic(User * u)
                  s_ChanServ, u->nick, u->username, u->host, c->name);
         if (ircd->join2set) {
             if (whosends(ci) == s_ChanServ) {
-                ircdproto->SendJoin(s_ChanServ, c->name, c->creation_time);
+                ircdproto->SendJoin(findbot(s_ChanServ), c->name, c->creation_time);
                 ircdproto->SendMode(NULL, c->name, "+o %s", s_ChanServ);
             }
         }

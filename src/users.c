@@ -727,7 +727,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             if (!nc_changed && (user->na))
                 user->na->status |= status;
             else {
-                anope_SendUnregisteredNick(user);
+                ircdproto->SendUnregisteredNick(user);
             }
         }
 
@@ -763,7 +763,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 
             snprintf(tsbuf, sizeof(tsbuf), "%lu",
                      (unsigned long int) user->timestamp);
-            anope_SendSVID2(user, tsbuf);
+            ircdproto->SendSVID2(user, tsbuf);
 
             alog("%s: %s!%s@%s automatically identified for nick %s",
                  s_NickServ, user->nick, user->username,
@@ -777,7 +777,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             char tsbuf[16];
             snprintf(tsbuf, sizeof(tsbuf), "%lu",
                      (unsigned long int) user->timestamp);
-            anope_SendSVID3(user, tsbuf);
+            ircdproto->SendSVID3(user, tsbuf);
         }
     }
 
@@ -802,7 +802,7 @@ void do_umode(const char *source, int ac, const char **av)
         return;
     }
 
-    anope_ProcessUsermodes(user, ac - 1, &av[1]);
+    ircdproto->ProcessUsermodes(user, ac - 1, &av[1]);
 }
 
 /* Handle a UMODE2 command for a user.
@@ -820,7 +820,7 @@ void do_umode2(const char *source, int ac, const char **av)
         return;
     }
 
-    anope_ProcessUsermodes(user, ac, &av[0]);
+    ircdproto->ProcessUsermodes(user, ac, &av[0]);
 }
 
 /*************************************************************************/

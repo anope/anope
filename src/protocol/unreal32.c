@@ -542,10 +542,10 @@ void UnrealIRCdProto::SendGuestNick(const char *nick, const char *user, const ch
 		myIrcd->nickip ? " *" : " ", real);
 }
 
-void UnrealIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
-	send_cmd(source, "%s %s %s", send_token("MODE", "G"), dest, buf);
+	send_cmd(source->nick, "%s %s %s", send_token("MODE", "G"), dest, buf);
 }
 
 void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -556,22 +556,22 @@ void UnrealIRCdProto::SendClientIntroduction(const char *nick, const char *user,
 	SendSQLine(nick, "Reserved for services");
 }
 
-void UnrealIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
+void UnrealIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 {
-	if (buf) send_cmd(source, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
-	else send_cmd(source, "%s %s %s", send_token("KICK", "H"), chan, user);
+	if (buf) send_cmd(source->nick, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
+	else send_cmd(source->nick, "%s %s %s", send_token("KICK", "H"), chan, user);
 }
 
-void UnrealIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
+void UnrealIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
-	send_cmd(source, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
+	send_cmd(source->nick, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
 }
 
 
 void UnrealIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	SendMode(nick, chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
+	SendMode(findbot(nick), chan, "%s %s %s", myIrcd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */
@@ -625,9 +625,9 @@ void UnrealIRCdProto::SendServer(const char *servname, int hop, const char *desc
 }
 
 /* JOIN */
-void UnrealIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
+void UnrealIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
 {
-	send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user);
+	send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user->nick);
 	/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
 }
 
@@ -689,10 +689,10 @@ void UnrealIRCdProto::SendSVSO(const char *source, const char *nick, const char 
 }
 
 /* NICK <newnick>  */
-void UnrealIRCdProto::SendChangeBotNick(const char *oldnick, const char *newnick)
+void UnrealIRCdProto::SendChangeBotNick(BotInfo *oldnick, const char *newnick)
 {
 	if (!oldnick || !newnick) return;
-	send_cmd(oldnick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
+	send_cmd(oldnick->nick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
 }
 
 /* Functions that use serval cmd functions */
@@ -1031,7 +1031,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                                                              0),
                            ntohl(decode_ip(av[9])), av[8], NULL);
             if (user)
-                anope_ProcessUsermodes(user, 1, &av[7]);
+                ircdproto->ProcessUsermodes(user, 1, &av[7]);
 
         } else {
             /* NON NICKIP */
@@ -1040,7 +1040,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                                                              0), 0, av[8],
                            NULL);
             if (user)
-                anope_ProcessUsermodes(user, 1, &av[7]);
+                ircdproto->ProcessUsermodes(user, 1, &av[7]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,

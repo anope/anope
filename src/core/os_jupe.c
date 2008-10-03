@@ -77,7 +77,11 @@ int do_jupe(User * u)
         if (!isValidHost(jserver, 3)) {
             notice_lang(s_OperServ, u, OPER_JUPE_HOST_ERROR);
         } else {
-            anope_SendJupe(jserver, u->nick, reason);
+			char rbuf[256];
+			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", u->nick, reason ? ": " : "", reason ? reason : "");
+			if (findserver(servlist, jserver)) ircdproto->SendSquit(jserver, rbuf);
+			ircdproto->SendServer(jserver, 2, rbuf);
+			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 
             if (WallOSJupe)
                 ircdproto->SendGlobops(s_OperServ, "\2%s\2 used JUPE on \2%s\2",

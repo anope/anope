@@ -1123,25 +1123,8 @@ E void anope_cmd_protoctl();                                         			  /* PRO
 E void anope_cmd_svinfo();						  	  		  /* SVINFO */
 E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
 E void anope_cmd_svsinfo();								  /* SVSINFO */
-E void anope_SendSVSJoin(const char *source, const char *nick,const char *chan, const char *param);          	  /* SVSJOIN */
-E void anope_SendSVSPart(const char *source, const char *nick,const char *chan);          	  		  /* SVSPART   */
-E void anope_SendSWhois(const char *source, const char *who, const char *mask);	  	  		  /* SWHOIS */
-E void anope_SendEOB();									  /* EOB - end of burst */
 E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
 E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);
-E void anope_SendCTCP(const char *source, const char *dest,  const char *fmt, ...);   	  		  /* CTCP */
-E void anope_SendNumeric(const char *, int, const char *, const char *, ...) FORMAT(printf, 4, 5); /* Numerics */
-
-E void anope_ProcessUsermodes(User * user, int ac, const char **av);
-E void anope_SendSVID2(User *u, const char *ts);
-E void anope_SendSVID3(User *u, const char *ts);
-E void anope_SendUnregisteredNick(User *u);
-E int anope_IsFloodModeParamValid(const char *value);
-
-E void anope_SendJupe(const char *jserver, const char *who, const char *reason);
-
-E int anope_IsNickValid(const char *nick);
-E int anope_IsChannelValid(const char *chan);
 
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);

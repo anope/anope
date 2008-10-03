@@ -452,11 +452,11 @@ CUMode myCumodes[128] = {
 
 
 
-void BahamutIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
-	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source, "MODE %s 0 %s", dest, buf);
-	else send_cmd(source, "MODE %s %s", dest, buf);
+	if (ircdcap->tsmode && (uplink_capab & ircdcap->tsmode)) send_cmd(source->nick, "MODE %s 0 %s", dest, buf);
+	else send_cmd(source->nick, "MODE %s %s", dest, buf);
 }
 
 /* SVSHOLD - set */
@@ -488,7 +488,7 @@ void BahamutIRCdProto::SendSVSModeChan(const char *name, const char *mode, const
 
 void BahamutIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */
@@ -525,7 +525,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                        strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
                        strtoul(av[8], NULL, 0), NULL, NULL);
         if (user) {
-            anope_ProcessUsermodes(user, 1, &av[3]);
+            ircdproto->ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         do_nick(source, av[0], NULL, NULL, NULL, NULL,
@@ -658,9 +658,9 @@ void BahamutIRCdProto::SendSQLineDel(const char *user)
 }
 
 /* JOIN - SJOIN */
-void BahamutIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
+void BahamutIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
 {
-	send_cmd(user, "SJOIN %ld %s", static_cast<long>(chantime), channel);
+	send_cmd(user->nick, "SJOIN %ld %s", static_cast<long>(chantime), channel);
 }
 
 void bahamut_cmd_burst()
@@ -872,16 +872,16 @@ int anope_event_motd(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void BahamutIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
+void BahamutIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
-void BahamutIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
+void BahamutIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 {
-	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-	else send_cmd(source, "KICK %s %s", chan, user);
+	if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
+	else send_cmd(source->nick, "KICK %s %s", chan, user);
 }
 
 int anope_event_away(const char *source, int ac, const char **av)

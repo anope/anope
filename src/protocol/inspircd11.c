@@ -555,7 +555,7 @@ void InspIRCdProto::SendSVSMode(User *u, int ac, const char **av)
 	send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
 }
 
-void InspIRCdProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
+void InspIRCdProto::SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 {
 	send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
 }
@@ -565,11 +565,11 @@ void InspIRCdProto::SendGuestNick(const char *nick, const char *user, const char
 	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 }
 
-void InspIRCdProto::SendModeInternal(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	Channel *c = findchan(dest);
-	send_cmd(source ? source : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+	send_cmd(source ? source->nick : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 }
 
 int anope_event_idle(const char *source, int ac, const char **av)
@@ -733,13 +733,13 @@ void InspIRCdProto::SendClientIntroduction(const char *nick, const char *user, c
 	send_cmd(nick, "OPERTYPE Service");
 }
 
-void InspIRCdProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
+void InspIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 {
-	if (buf) send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-	else send_cmd(source, "KICK %s %s :%s", chan, user, user);
+	if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
+	else send_cmd(source->nick, "KICK %s %s :%s", chan, user, user);
 }
 
-void InspIRCdProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
+void InspIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
@@ -747,7 +747,7 @@ void InspIRCdProto::SendNoticeChanopsInternal(const char *source, const char *de
 
 void InspIRCdProto::SendBotOp(const char *nick, const char *chan)
 {
-	SendMode(nick, chan, "%s %s %s", ircd->botchanumode, nick, nick);
+	SendMode(findbot(nick), chan, "%s %s %s", ircd->botchanumode, nick, nick);
 }
 
 /* PROTOCTL */
@@ -770,9 +770,9 @@ void InspIRCdProto::SendServer(const char *servname, int hop, const char *descri
 }
 
 /* JOIN */
-void InspIRCdProto::SendJoin(const char *user, const char *channel, time_t chantime)
+void InspIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
 {
-	send_cmd(user, "JOIN %s", channel);
+	send_cmd(user->nick, "JOIN %s", channel);
 }
 
 /* UNSQLINE */
@@ -1081,7 +1081,7 @@ int anope_event_nick(const char *source, int ac, const char **av)
                            av[7],   /* realname */
                            ts, svid, htonl(*ad), av[3], NULL);
             if (user) {
-                anope_ProcessUsermodes(user, 1, &av[5]);
+                ircdproto->ProcessUsermodes(user, 1, &av[5]);
 				user->chost = av[3];
 			}
         }

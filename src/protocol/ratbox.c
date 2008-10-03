@@ -479,14 +479,14 @@ int anope_event_nick(const char *source, int ac, const char **av)
         user = do_nick("", av[0], av[4], av[5], s->name, av[8],
                        strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
         if (user) {
-            anope_ProcessUsermodes(user, 1, &av[3]);
+            ircdproto->ProcessUsermodes(user, 1, &av[3]);
         }
     } else {
         if (ac != 2) {
             user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
                            strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
             if (user)
-                anope_ProcessUsermodes(user, 1, &av[3]);
+                ircdproto->ProcessUsermodes(user, 1, &av[3]);
         } else {
             do_nick(source, av[0], NULL, NULL, NULL, NULL,
                     strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
@@ -633,10 +633,9 @@ void RatboxProto::SendSQLineDel(const char *user)
 	send_cmd(UseTS6 ? (ud ? ud->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
 }
 
-void RatboxProto::SendJoin(const char *user, const char *channel, time_t chantime)
+void RatboxProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
 {
-	Uid *ud = find_uid(user);
-	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? (ud ? ud->uid : user) : user);
+	send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? user->uid : user->nick);
 }
 
 /*
@@ -750,11 +749,11 @@ void RatboxProto::SendClientIntroduction(const char *nick, const char *user, con
 	SendSQLine(nick, "Reserved for services");
 }
 
-void RatboxProto::SendPartInternal(const char *nick, const char *chan, const char *buf)
+void RatboxProto::SendPartInternal(BotInfo *nick, const char *chan, const char *buf)
 {
 	Uid *ud = find_uid(nick);
-	if (buf) send_cmd(UseTS6 ? ud->uid : nick, "PART %s :%s", chan, buf);
-	else send_cmd(UseTS6 ? ud->uid : nick, "PART %s", chan);
+	if (buf) send_cmd(UseTS6 ? ud->uid : nick->nick, "PART %s :%s", chan, buf);
+	else send_cmd(UseTS6 ? ud->uid : nick->nick, "PART %s", chan);
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
@@ -907,20 +906,20 @@ int anope_event_quit(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void RatboxProto::SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
+void RatboxProto::SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 {
 	// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
 	send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
 }
 
-void RatboxProto::SendModeInternal(const char *source, const char *dest, const char *buf)
+void RatboxProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	if (source) {
 		Uid *ud = find_uid(source);
-		send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "MODE %s %s", dest, buf);
+		send_cmd(UseTS6 ? (ud ? ud->uid : source->nick) : source->nick, "MODE %s %s", dest, buf);
 	}
-	else send_cmd(source, "MODE %s %s", dest, buf);
+	else send_cmd(source->nick, "MODE %s %s", dest, buf);
 }
 
 void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...)
@@ -941,15 +940,15 @@ void ratbox_cmd_tmode(const char *source, const char *dest, const char *fmt, ...
     send_cmd(NULL, "MODE %s %s", dest, buf);
 }
 
-void RatboxProto::SendKickInternal(const char *source, const char *chan, const char *user, const char *buf)
+void RatboxProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 {
 	Uid *ud = find_uid(source);
 	User *u = finduser(user);
-	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
-	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
+	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source->nick) : source->nick, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
+	else send_cmd(UseTS6 ? (ud ? ud->uid : source->nick) : source->nick, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
 }
 
-void RatboxProto::SendNoticeChanopsInternal(const char *source, const char *dest, const char *buf)
+void RatboxProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 {
 	if (!buf) return;
 	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
@@ -961,15 +960,15 @@ void RatboxProto::SendBotOp(const char *nick, const char *chan)
 		Uid *u = find_uid(nick);
 		ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, u ? u->uid : nick);
 	}
-	else SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* QUIT */
-void RatboxProto::SendQuitInternal(const char *source, const char *buf)
+void RatboxProto::SendQuitInternal(BotInfo *source, const char *buf)
 {
 	Uid *ud = find_uid(source);
-	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT :%s", buf);
-	else send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "QUIT");
+	if (buf) send_cmd(UseTS6 ? (ud ? ud->uid : source->nick) : source->nick, "QUIT :%s", buf);
+	else send_cmd(UseTS6 ? (ud ? ud->uid : source->nick) : source->nick, "QUIT");
 }
 
 /* PONG */
@@ -980,12 +979,11 @@ void RatboxProto::SendPong(const char *servname, const char *who)
 }
 
 /* INVITE */
-void RatboxProto::SendInvite(const char *source, const char *chan, const char *nick)
+void RatboxProto::SendInvite(BotInfo *source, const char *chan, const char *nick)
 {
 	if (!source || !chan || !nick) return;
-	Uid *ud = find_uid(source);
 	User *u = finduser(nick);
-	send_cmd(UseTS6 ? (ud ? ud->uid : source) : source, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
+	send_cmd(UseTS6 ? source->uid : source->nick, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
 }
 
 int anope_event_mode(const char *source, int ac, const char **av)

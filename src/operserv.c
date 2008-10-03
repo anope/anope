@@ -141,7 +141,7 @@ void operserv(User * u, char *buf)
         if (!(s = strtok(NULL, ""))) {
             s = "";
         }
-        anope_SendCTCP(s_OperServ, u->nick, "PING %s", s);
+        ircdproto->SendCTCP(findbot(s_OperServ), u->nick, "PING %s", s);
     } else {
         mod_run_cmd(s_OperServ, u, OPERSERV, cmd);
     }

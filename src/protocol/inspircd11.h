@@ -53,9 +53,10 @@
 
 class InspIRCdProto : public IRCDProto {
 		void SendSVSKillInternal(const char *, const char *, const char *);
-		void SendModeInternal(const char *, const char *, const char *);
-		void SendKickInternal(const char *, const char *, const char *, const char *);
-		void SendNoticeChanopsInternal(const char *, const char *, const char *);
+		void SendModeInternal(BotInfo *, const char *, const char *);
+		void SendKickInternal(BotInfo *, const char *, const char *, const char *);
+		void SendNoticeChanopsInternal(BotInfo *, const char *, const char *);
+		void SendNumericInternal(const char *, int, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendTopic(BotInfo *, const char *, const char *, const char *, time_t);
@@ -65,7 +66,7 @@ class InspIRCdProto : public IRCDProto {
 		void SendGuestNick(const char *, const char *, const char *, const char *, const char *);
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
-		void SendJoin(const char *, const char *, time_t);
+		void SendJoin(BotInfo *, const char *, time_t);
 		void SendSQLineDel(const char *);
 		void SendSQLine(const char *, const char *);
 		void SendSquit(const char *, const char *);
@@ -83,5 +84,4 @@ class InspIRCdProto : public IRCDProto {
 		void SendServer(const char *, int, const char *);
 		void ProcessUsermodes(User *, int, const char **);
 		int IsFloodModeParamValid(const char *);
-		void SendNumeric(const char *, int, const char *, const char *);
 } ircd_proto;

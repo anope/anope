@@ -1272,6 +1272,16 @@ class IRCDProto {
 			else
 				send_cmd(ServerName, "GLOBOPS :%s", buf);
 		}
+		virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf)
+		{
+			char *s = normalizeBuffer(buf);
+			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
+			free(s);
+		}
+		virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
+		{
+			send_cmd(source, "%03d %s %s", numeric, dest, buf);
+		}
 	public:
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
@@ -1441,33 +1451,32 @@ class IRCDProto {
 		virtual void SendUnregisteredNick(User *) { }
 		virtual void SendSVID2(User *, const char *) { }
 		virtual void SendSVID3(User *, const char *) { }
-		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *buf)
+		virtual void SendCTCP(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
-			char *s = normalizeBuffer(buf);
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
-			free(s);
+			va_list args;
+			char buf[BUFSIZE] = "";
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
+			SendCTCPInternal(bi, dest, buf);
 		}
 		virtual void SendSVSJoin(const char *, const char *, const char *, const char *) { }
 		virtual void SendSVSPart(const char *, const char *, const char *) { }
 		virtual void SendSWhois(const char *, const char *, const char *) { }
 		virtual void SendEOB() { }
 		virtual void SendServer(const char *, int, const char *) = 0;
-		virtual void SendJupe(const char *jserver, const char *who, const char *reason)
-		{
-			// XXX: this should NOT be done here. protocol modules are *only* for protocol. -- w00t
-			char rbuf[256];
-			snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who, reason ? ": " : "", reason ? reason : "");
-			if (findserver(servlist, jserver)) SendSquit(jserver, rbuf);
-			SendServer(jserver, 2, rbuf);
-			new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
-		}
 		virtual void ProcessUsermodes(User *, int, const char **) = 0;
 		virtual int IsNickValid(const char *) { return 1; }
 		virtual int IsChannelValid(const char *) { return 1; }
 		virtual int IsFloodModeParamValid(const char *) { return 0; }
-		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *buf)
+		virtual void SendNumeric(const char *source, int numeric, const char *dest, const char *fmt, ...)
 		{
-			send_cmd(source, "%03d %s %s", numeric, dest, buf);
+			va_list args;
+			char buf[BUFSIZE] = "";
+			va_start(args, fmt);
+			vsnprintf(buf, BUFSIZE - 1, fmt, args);
+			va_end(args);
+			SendNumericInternal(source, numeric, dest, *buf ? buf : NULL);
 		}
 };
 

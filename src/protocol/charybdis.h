@@ -48,12 +48,13 @@
 
 class CharybdisProto : public IRCDTS6Proto {
 		void SendSVSKillInternal(const char *, const char *, const char *);
-		void SendModeInternal(const char *, const char *, const char *);
-		void SendKickInternal(const char *, const char *, const char *, const char *);
-		void SendNoticeChanopsInternal(const char *, const char *, const char *);
-		void SendQuitInternal(const char *, const char *);
-		void SendPartInternal(const char *, const char *, const char *);
+		void SendModeInternal(BotInfo *, const char *, const char *);
+		void SendKickInternal(BotInfo *, const char *, const char *, const char *);
+		void SendNoticeChanopsInternal(BotInfo *, const char *, const char *);
+		void SendQuitInternal(BotInfo *, const char *);
+		void SendPartInternal(BotInfo *, const char *, const char *);
 		void SendGlobopsInternal(const char *, const char *);
+		void SendNumericInternal(const char *, int, const char *, const char *);
 	public:
 		void SendAkillDel(const char *, const char *);
 		void SendVhostDel(User *);
@@ -62,9 +63,9 @@ class CharybdisProto : public IRCDTS6Proto {
 		void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *);
 		void SendBotOp(const char *, const char *);
 		void SendPong(const char *, const char *);
-		void SendJoin(const char *, const char *, time_t);
+		void SendJoin(BotInfo *, const char *, time_t);
 		void SendSQLineDel(const char *);
-		void SendInvite(const char *, const char *, const char *);
+		void SendInvite(BotInfo *, const char *, const char *);
 		void SendSQLine(const char *, const char *);
 		void SendForceNickChange(const char *, const char *, time_t);
 		void SendVhost(const char *, const char *, const char *);
@@ -77,5 +78,4 @@ class CharybdisProto : public IRCDTS6Proto {
 		void ProcessUsermodes(User *, int, const char **);
 		int IsNickValid(const char *);
 		int IsFloodModeParamValid(const char *);
-		void SendNumeric(const char *, int, const char *, const char *);
 } ircd_proto;

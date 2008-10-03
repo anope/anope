@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -499,7 +499,7 @@ int sputs(char *str, ano_socket_t s)
  * @param ... various args
  * @return int
  */
-int sockprintf(ano_socket_t s, char *fmt, ...)
+int sockprintf(ano_socket_t s, const char *fmt, ...)
 {
     va_list args;
     char buf[16384];            /* Really huge, to try and avoid truncation */
@@ -713,7 +713,7 @@ char *ano_sockstrerror(int error)
 
     /* Microsoft decided not to use sequential numbers for the error codes,
      * so we can't just use the array index for the code. But, at least
-     * use a binary search to make it as fast as possible. 
+     * use a binary search to make it as fast as possible.
      */
     while (start <= stop) {
         mid = (start + stop) / 2;

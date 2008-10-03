@@ -34,8 +34,8 @@
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
-char *services_dir = SERVICES_DIR;      /* -dir dirname */
-char *log_filename = LOG_FILENAME;      /* -log filename */
+const char *services_dir = SERVICES_DIR;      /* -dir dirname */
+const char *log_filename = LOG_FILENAME;      /* -log filename */
 int debug = 0;                  /* -debug */
 int readonly = 0;               /* -readonly */
 int logchan = 0;                /* -logchan */

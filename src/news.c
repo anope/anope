@@ -42,7 +42,7 @@ NewsItem *news = NULL;
 
 struct newsmsgs {
     int16 type;
-    char *name;
+    const char *name;
     int msgs[MSG_MAX + 1];
 };
 
@@ -91,7 +91,7 @@ struct newsmsgs msgarray[] = {
      }
 };
 
-static int *findmsgs(int16 type, char **type_name)
+static int *findmsgs(int16 type, const char **type_name)
 {
     int i;
     for (i = 0; i < lenof(msgarray); i++) {
@@ -362,7 +362,7 @@ void do_news(User * u, short type)
 {
     int is_servadmin = is_services_admin(u);
     char *cmd = strtok(NULL, " ");
-    char *type_name;
+    const char *type_name;
     int *msgs;
 
     msgs = findmsgs(type, &type_name);

@@ -76,9 +76,9 @@ E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
 E void insert_bot(BotInfo * bi);
 
-E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, char *reason);
-E void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, char *reason);
-E void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode, char *nick);
+E void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick, const char *reason);
+E void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick, const char *reason);
+E void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode, char *nick);
 
 /**** channels.c ****/
 
@@ -583,15 +583,15 @@ E void helpserv_init(void);
 
 /**** hostserv.c  ****/
 E void hostserv_init(void);
-E void addHostCore(char *nick, char *vIdent, char *vhost, char *creator, int32 tmp_time);
+E void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
 E char *getvHost(char *nick);
 E int is_host_remover(User * u);
 E int is_host_setter(User *u);
 E HostCore *hostCoreListHead();
 E HostCore *findHostCore(HostCore * head, char *nick, bool *found);
-E HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
-E HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick, char *vIdent, char *vHost, char *creator, int32 tmp_time);
+E HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
+E HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick, char *vIdent, char *vHost, const char *creator, int32 tmp_time);
 E HostCore *deleteHostCore(HostCore * head, HostCore * prev);
 E void set_lastmask(User * u);
 
@@ -674,8 +674,8 @@ E const char version_build[];
 E char *version_protocol;
 E const char version_flags[];
 
-E char *services_dir;
-E char *log_filename;
+E const char *services_dir;
+E const char *log_filename;
 E int   debug;
 E int   readonly;
 E int   logchan;
@@ -804,8 +804,8 @@ E void modules_core_init(int number, char **list);
 E void modules_unload_all(bool fini, bool unload_proto);	/* Read warnings near function source */
 E void moduleCallBackRun(void);
 E void moduleCleanStruct(ModuleData **moduleData);
-E void ModuleDatabaseBackup(char *dbname);
-E void ModuleRemoveBackups(char *dbname);
+E void ModuleDatabaseBackup(const char *dbname);
+E void ModuleRemoveBackups(const char *dbname);
 
 /**** news.c ****/
 
@@ -895,7 +895,7 @@ E int nick_is_services_oper(NickCore *nc);
 E int add_akill(User *u, char *mask, const char *by, const time_t expires, const char *reason);
 E int check_akill(const char *nick, const char *username, const char *host, const char *vhost, const char *ip);
 E void expire_akills(void);
-E void oper_global(char *nick, char *fmt, ...);
+E void oper_global(char *nick, const char *fmt, ...);
 
 E int add_sgline(User *u, char *mask, const char *by, const time_t expires, const char *reason);
 E int check_sgline(const char *nick, const char *realname);
@@ -936,7 +936,7 @@ E void process(void);
 E void send_cmd(const char *source, const char *fmt, ...) FORMAT(printf,2,3);
 E void send_cmd(const std::string &source, const char *fmt, ...) FORMAT(printf,2,3);
 
-E void notice_server(char *source, Server * s, char *fmt, ...)
+E void notice_server(char *source, Server * s, const char *fmt, ...)
 	FORMAT(printf,3,4);
 E void notice_user(char *source, User *u, const char *fmt, ...)
 	FORMAT(printf,3,4);
@@ -1029,7 +1029,7 @@ E char *sgets(char *buf, int len, ano_socket_t s);
 E char *sgets2(char *buf, int len, ano_socket_t s);
 E int sread(ano_socket_t s, char *buf, int len);
 E int sputs(char *str, ano_socket_t s);
-E int sockprintf(ano_socket_t s, char *fmt, ...);
+E int sockprintf(ano_socket_t s, const char *fmt, ...);
 E int conn(const char *host, int port, const char *lhost, int lport);
 E void disconn(ano_socket_t s);
 
@@ -1128,7 +1128,7 @@ E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm
 
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);
-E char *send_token(char *token1, char *token2);
+E const char *send_token(const char *token1, const char *token2);
 E char *base64enc(long i);
 E long base64dec(char *b64);
 E long base64dects(const char *ts);

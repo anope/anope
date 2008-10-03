@@ -99,7 +99,7 @@ HostCore *hostCoreListHead()
  * @return HostCore
  */
 HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
-                             char *vHost, char *creator, int32 tmp_time)
+                             char *vHost, const char *creator, int32 tmp_time)
 {
 
     next = (HostCore *)malloc(sizeof(HostCore));
@@ -180,7 +180,7 @@ HostCore *findHostCore(HostCore * head, char *nick, bool* found)
 
 /*************************************************************************/
 HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
-                         char *vIdent, char *vHost, char *creator,
+                         char *vIdent, char *vHost, const char *creator,
                          int32 tmp_time)
 {
 
@@ -258,7 +258,7 @@ HostCore *deleteHostCore(HostCore * head, HostCore * prev)
 }
 
 /*************************************************************************/
-void addHostCore(char *nick, char *vIdent, char *vhost, char *creator,
+void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator,
                  int32 tmp_time)
 {
     HostCore *tmp;

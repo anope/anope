@@ -264,42 +264,42 @@ typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
 
 struct ircdvars_ {
-	char *name;				/* Name of the ChanServ command */
-	char *nickservmode;			/* Mode used by NickServ	*/
-	char *chanservmode;			/* Mode used by ChanServ	*/
-	char *memoservmode;			/* Mode used by MemoServ	*/
-	char *hostservmode;			/* Mode used by HostServ	*/
-	char *operservmode;			/* Mode used by OperServ	*/
-	char *botservmode;			/* Mode used by BotServ		*/
-	char *helpservmode;			/* Mode used by HelpServ	*/
-	char *devnullmode;			/* Mode used by Dev/Null	*/
-	char *globalmode;			/* Mode used by Global		*/
-	char *nickservaliasmode;		/* Mode used by NickServ Alias	*/
-	char *chanservaliasmode;		/* Mode used by ChanServ Alias	*/
-	char *memoservaliasmode;		/* Mode used by MemoServ Alias	*/
-	char *hostservaliasmode;		/* Mode used by HostServ Alias	*/
-	char *operservaliasmode;		/* Mode used by OperServ Alias	*/
-	char *botservaliasmode;			/* Mode used by BotServ	 Alias	*/
-	char *helpservaliasmode;		/* Mode used by HelpServ Alias	*/
-	char *devnullvaliasmode;		/* Mode used by Dev/Null Alias	*/
-	char *globalaliasmode;			/* Mode used by Global	 Alias	*/
-	char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
+	const char *name;				/* Name of the ChanServ command */
+	const char *nickservmode;			/* Mode used by NickServ	*/
+	const char *chanservmode;			/* Mode used by ChanServ	*/
+	const char *memoservmode;			/* Mode used by MemoServ	*/
+	const char *hostservmode;			/* Mode used by HostServ	*/
+	const char *operservmode;			/* Mode used by OperServ	*/
+	const char *botservmode;			/* Mode used by BotServ		*/
+	const char *helpservmode;			/* Mode used by HelpServ	*/
+	const char *devnullmode;			/* Mode used by Dev/Null	*/
+	const char *globalmode;			/* Mode used by Global		*/
+	const char *nickservaliasmode;		/* Mode used by NickServ Alias	*/
+	const char *chanservaliasmode;		/* Mode used by ChanServ Alias	*/
+	const char *memoservaliasmode;		/* Mode used by MemoServ Alias	*/
+	const char *hostservaliasmode;		/* Mode used by HostServ Alias	*/
+	const char *operservaliasmode;		/* Mode used by OperServ Alias	*/
+	const char *botservaliasmode;			/* Mode used by BotServ	 Alias	*/
+	const char *helpservaliasmode;		/* Mode used by HelpServ Alias	*/
+	const char *devnullvaliasmode;		/* Mode used by Dev/Null Alias	*/
+	const char *globalaliasmode;			/* Mode used by Global	 Alias	*/
+	const char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
 	int max_symbols;			/* Chan Max Symbols		*/
-	char *modestoremove;			/* Channel Modes to remove	*/
-	char *botchanumode;			/* Modes set when botserv joins a channel */
+	const char *modestoremove;			/* Channel Modes to remove	*/
+	const char *botchanumode;			/* Modes set when botserv joins a channel */
 	int svsnick;				/* Supports SVSNICK		*/
 	int vhost;				/* Supports vhost		*/
 	int owner;				/* Supports Owner		*/
-	char *ownerset;				/* Mode to set for owner	*/
-	char *ownerunset;			/* Mode to unset for a owner	*/
-	char *adminset;				/* Mode to set for admin	*/
-	char *adminunset;			/* Mode to unset for admin	*/
-	char *modeonreg;			/* Mode on Register		*/
-	char *rootmodeonid;                     /* Mode on ID for ROOTS         */
-	char *adminmodeonid;                    /* Mode on ID for ADMINS        */
-	char *opermodeonid;                     /* Mode on ID for OPERS         */
-	char *modeonunreg;			/* Mode on Unregister		*/
-	char *modeonnick;			/* Mode on nick change		*/
+	const char *ownerset;				/* Mode to set for owner	*/
+	const char *ownerunset;			/* Mode to unset for a owner	*/
+	const char *adminset;				/* Mode to set for admin	*/
+	const char *adminunset;			/* Mode to unset for admin	*/
+	const char *modeonreg;			/* Mode on Register		*/
+	const char *rootmodeonid;                     /* Mode on ID for ROOTS         */
+	const char *adminmodeonid;                    /* Mode on ID for ADMINS        */
+	const char *opermodeonid;                     /* Mode on ID for OPERS         */
+	const char *modeonunreg;			/* Mode on Unregister		*/
+	const char *modeonnick;			/* Mode on nick change		*/
 	int sgline;				/* Supports SGline		*/
 	int sqline;				/* Supports SQline		*/
 	int szline;				/* Supports SZline		*/
@@ -347,7 +347,7 @@ struct ircdvars_ {
     int sjoininvchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
-	char *vhostchar;			/* char used for vhosting */
+	const char *vhostchar;			/* char used for vhosting */
 	int ts6;					/* ircd is TS6 */
 	int supporthelper;			/* +h helper umodes */
 	int p10;					/* ircd is P10  */
@@ -356,7 +356,7 @@ struct ircdvars_ {
 	int cidrchanbei;			/* channel bans/excepts/invites support CIDR (syntax: +b *!*@192.168.0.0/15)
 							 * 0 for no support, 1 for strict cidr support, anything else
 							 * for ircd specific support (nefarious only cares about first /mask) */
-	char *globaltldprefix;		/* TLD prefix used for Global */
+	const char *globaltldprefix;		/* TLD prefix used for Global */
 };
 
 struct ircdcapab_ {
@@ -775,7 +775,7 @@ struct chaninfo_ {
 struct csmodeutil_ {
 	const char *name;			/* Name of the ChanServ command */
 	const char *bsname;			/* Name of the BotServ fantasy command */
-	char *mode;			/* Mode (ie. +o) */
+	const char *mode;			/* Mode (ie. +o) */
 	int32 notice;			/* Notice flag (for the damn OPNOTICE) */
 	int level;			/* Level required to use the command */
 	int levelself;			/* Level required to use the command for himself */
@@ -1174,7 +1174,7 @@ typedef struct ircd_modes_ {
 
 typedef struct capabinfo_ CapabInfo;
 struct capabinfo_ {
-	char *token;
+	const char *token;
 	uint32 flag;
 };
 

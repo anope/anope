@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -15,7 +15,7 @@
 
 #include "module.h"
 
-int do_xop(User * u, char *xname, int xlev, int *xmsgs);
+int do_xop(User * u, const char *xname, int xlev, int *xmsgs);
 int do_aop(User * u);
 int do_hop(User * u);
 int do_sop(User * u);
@@ -235,7 +235,7 @@ int xop_list_callback(User * u, int num, va_list args)
 }
 
 
-int do_xop(User * u, char *xname, int xlev, int *xmsgs)
+int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 {
     char *chan = strtok(NULL, " ");
     char *cmd = strtok(NULL, " ");
@@ -500,7 +500,7 @@ int do_xop(User * u, char *xname, int xlev, int *xmsgs)
         }
 
         send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
-        
+
         notice_lang(s_ChanServ, u, xmsgs[13], ci->name);
     } else {
         syntax_error(s_ChanServ, u, xname, xmsgs[0]);

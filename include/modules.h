@@ -269,7 +269,7 @@ MDE Module *createModule(char *filename);        /* Create a new module, using t
 int destroyModule(Module *m);		/* Delete the module */
 int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
-MDE Module *findModule(char *name);                /* Find a module */
+MDE Module *findModule(const char *name);                /* Find a module */
 int loadModule(Module *m,User *u);	/* Load the given module into the program */
 int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
@@ -338,7 +338,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, char *mod_
 int destroyEventHandler(EvtMessage * evm);
 int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 
-MDE EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv));
+MDE EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv));
 EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
 int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
 MDE int moduleAddEventHook(EvtHook * evh);
@@ -354,12 +354,12 @@ MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/
 
-MDE int moduleAddCallback(char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
+MDE int moduleAddCallback(const char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
 MDE void moduleDelCallback(char *name);
 
-MDE char *moduleGetData(ModuleData **md, char *key);			/* Get the value for this key from this struct */
-MDE int moduleAddData(ModuleData **md, char *key, char *value);		/* Set the value for this key for this struct */
-MDE void moduleDelData(ModuleData **md, char *key);				/* Delete this key/value pair */
+MDE char *moduleGetData(ModuleData **md, const char *key);			/* Get the value for this key from this struct */
+MDE int moduleAddData(ModuleData **md, const char *key, char *value);		/* Set the value for this key for this struct */
+MDE void moduleDelData(ModuleData **md, const char *key);				/* Delete this key/value pair */
 MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
@@ -375,7 +375,7 @@ MDE void handleModuleOperationQueue(void);
 /* Some IRCD protocol module support functions */
 
 /** Update the protect deatials, could be either protect or admin etc.. */
-MDE void updateProtectDetails(char *level_info_protect_word, char *level_info_protectme_word, char *fant_protect_add, char *fant_protect_del, char *level_protect_word, char *protect_set_mode, char *protect_unset_mode);
+MDE void updateProtectDetails(const char *level_info_protect_word, const char *level_info_protectme_word, const char *fant_protect_add, const char *fant_protect_del, const char *level_protect_word, const char *protect_set_mode, const char *protect_unset_mode);
 
 /************************************************************************/
 

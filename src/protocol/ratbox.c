@@ -678,7 +678,7 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		if (UseTS6) {
 			BotInfo *bi = findbot(nick);
-			ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, bi ? bi->uid : nick);
+			ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, bi ? bi->uid.c_str() : nick);
 		}
 		else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
 	}

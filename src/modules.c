@@ -435,7 +435,7 @@ int delModule(Module * m)
  * @param name the name of the module to find
  * @return a pointer to the module found, or NULL
  */
-Module *findModule(char *name)
+Module *findModule(const char *name)
 {
     int idx;
     ModuleHash *current = NULL;
@@ -1695,7 +1695,7 @@ void moduleAddAuthor(const char *author)
   * @return MOD_ERR_OK on success, anything else on fail.
   * @see moduleDelCallBack
   **/
-int moduleAddCallback(char *name, time_t when,
+int moduleAddCallback(const char *name, time_t when,
                       int (*func) (int argc, char *argv[]), int argc,
                       char **argv)
 {
@@ -2121,7 +2121,7 @@ int moduleDataDebug(ModuleData ** md)
  * @param value The value for the key/value pair, this is what will be stored for you
  * @return MOD_ERR_OK will be returned on success
  **/
-int moduleAddData(ModuleData ** md, char *key, char *value)
+int moduleAddData(ModuleData ** md, const char *key, char *value)
 {
     ModuleData *newData = NULL;
 
@@ -2162,7 +2162,7 @@ int moduleAddData(ModuleData ** md, char *key, char *value)
  * @param key The key to find the data for
  * @return the value paired to the given key will be returned, or NULL
  **/
-char *moduleGetData(ModuleData ** md, char *key)
+char *moduleGetData(ModuleData ** md, const char *key)
 {
     /* See comment in moduleAddData... -GD */
     char *mod_name = sstrdup(mod_current_module_name);
@@ -2197,7 +2197,7 @@ char *moduleGetData(ModuleData ** md, char *key)
  * @param md The module data for the struct to be used
  * @param key The key to delete the key/value pair for
  **/
-void moduleDelData(ModuleData ** md, char *key)
+void moduleDelData(ModuleData ** md, const char *key)
 {
     /* See comment in moduleAddData... -GD */
     char *mod_name = sstrdup(mod_current_module_name);
@@ -2408,11 +2408,11 @@ const char *ano_moderr(void)
 /**
  * Allow ircd protocol files to update the protect level info tables.
  **/
-void updateProtectDetails(char *level_info_protect_word,
-                          char *level_info_protectme_word,
-                          char *fant_protect_add, char *fant_protect_del,
-                          char *level_protect_word, char *protect_set_mode,
-                          char *protect_unset_mode)
+void updateProtectDetails(const char *level_info_protect_word,
+                          const char *level_info_protectme_word,
+                          const char *fant_protect_add, const char *fant_protect_del,
+                          const char *level_protect_word, const char *protect_set_mode,
+                          const char *protect_unset_mode)
 {
     int i = 0;
     CSModeUtil ptr;

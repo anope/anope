@@ -579,7 +579,7 @@ int write_string(const char *s, dbFILE * f)
  * @param ext Extention
  * @return void
  */
-static void rename_database(char *name, char *ext)
+static void rename_database(const char *name, char *ext)
 {
 
     char destpath[PATH_MAX];
@@ -728,7 +728,7 @@ void backup_databases(void)
 
 /*************************************************************************/
 
-void ModuleDatabaseBackup(char *dbname)
+void ModuleDatabaseBackup(const char *dbname)
 {
 
     time_t t;
@@ -762,7 +762,7 @@ void ModuleDatabaseBackup(char *dbname)
 
 /*************************************************************************/
 
-void ModuleRemoveBackups(char *dbname)
+void ModuleRemoveBackups(const char *dbname)
 {
     char ext[9];
     char path[PATH_MAX];

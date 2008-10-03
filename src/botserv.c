@@ -413,7 +413,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 
         if (cmd && (cmd[0] == *BSFantasyCharacter)) {
             char *params = strtok(NULL, "");
-            char *event_name = EVENT_BOT_FANTASY_NO_ACCESS;
+            const char *event_name = EVENT_BOT_FANTASY_NO_ACCESS;
 
             /* Strip off the fantasy character */
             cmd++;
@@ -832,7 +832,7 @@ static void bot_kick(ChannelInfo * ci, User * u, int message, ...)
 /* Makes a simple ban and kicks the target */
 
 void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
-                 char *reason)
+                 const char *reason)
 {
     int ac;
     const char *av[4];
@@ -890,7 +890,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
         kav[2] = ci->bi->nick;
     } else {
         if (strlen(reason) > 200)
-            reason[200] = '\0';
+            *((char **)&reason[200]) = '\0'; // Unsafe cast -- will review later -- CyberBotX
         kav[2] = reason;
     }
 
@@ -912,7 +912,7 @@ void bot_raw_ban(User * requester, ChannelInfo * ci, char *nick,
 /* Makes a kick with a "dynamic" reason ;) */
 
 void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
-                  char *reason)
+                  const char *reason)
 {
     const char *av[3];
     User *u = finduser(nick);
@@ -939,7 +939,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
         av[2] = ci->bi->nick;
     } else {
         if (strlen(reason) > 200)
-            reason[200] = '\0';
+            *((char **)&reason[200]) = '\0'; // Unsafe cast -- will review later -- CyberBotX
         av[2] = reason;
     }
 
@@ -958,7 +958,7 @@ void bot_raw_kick(User * requester, ChannelInfo * ci, char *nick,
 
 /* Makes a mode operation on a channel for a nick */
 
-void bot_raw_mode(User * requester, ChannelInfo * ci, char *mode,
+void bot_raw_mode(User * requester, ChannelInfo * ci, const char *mode,
                   char *nick)
 {
     const char *av[4];

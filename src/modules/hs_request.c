@@ -587,7 +587,7 @@ void hs_help(User * u)
 void hsreq_load_db(void)
 {
     FILE *fp;
-    char *filename;
+    const char *filename;
     char readbuf[1024];
     char *nick, *vident, *vhost, *creator, *tmp;
     int32 tmp_time;
@@ -646,7 +646,7 @@ void hsreq_load_db(void)
 void hsreq_save_db(void)
 {
     FILE *fp;
-    char *filename;
+    const char *filename;
     const char *vident;
     HostCore *current;
 

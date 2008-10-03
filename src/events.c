@@ -294,7 +294,7 @@ EvtMessage *createEventHandler(char *name,
   * @param func a pointer to the function to call when we recive this message
   * @return a new Message object
   **/
-EvtHook *createEventHook(char *name, int (*func) (int argc, char **argv))
+EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv))
 {
     EvtHook *evh = NULL;
     if (!func) {

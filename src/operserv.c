@@ -687,7 +687,7 @@ Server *server_global(Server * s, char *msg)
 
 }
 
-void oper_global(char *nick, char *fmt, ...)
+void oper_global(char *nick, const char *fmt, ...)
 {
     va_list args;
     char msg[2048];             /* largest valid message is 512, this should cover any global */

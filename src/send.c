@@ -54,6 +54,7 @@ void send_cmd(const char *source, const char *fmt, ...)
 
 /*
  * Copypasta version that accepts std::string source.
+ */
 void send_cmd(const std::string &source, const char *fmt, ...)
 {
 	va_list args;
@@ -91,7 +92,7 @@ void send_cmd(const std::string &source, const char *fmt, ...)
  * @param ... any number of parameters
  * @return void
  */
-void notice_server(char *source, Server * s, char *fmt, ...)
+void notice_server(char *source, Server * s, const char *fmt, ...)
 {
     va_list args;
     char buf[BUFSIZE];

@@ -1088,7 +1088,7 @@ u_int32_t getrandom32(void)
  * @param token2
  * @return token to send
  */
-char *send_token(char *token1, char *token2)
+const char *send_token(const char *token1, const char *token2)
 {
     if (UseTokens && ircd->token && ircdcap->token) {
         return token2;

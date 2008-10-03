@@ -17,6 +17,11 @@
 
 /*************************************************************************/
 
+ServerConfig serverConfig;
+
+// This is temporary while directives are transitioned from the old config to the new one -- CyberBotX
+static const char *SERVICES_CONF_NEW = "services_new.conf";
+
 /* Configurable variables: */
 
 char *IRCDModule;
@@ -492,6 +497,7 @@ int ServerConfig::Read(bool bail)
 	static const char *Once[] = {NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
+		{"coremodules", "ircd", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -506,7 +512,7 @@ int ServerConfig::Read(bool bail)
 	// Load and parse the config file, if there are any errors then explode
 	// Make a copy here so if it fails then we can carry on running with an unaffected config
 	newconfig.clear();
-	if (LoadConf(newconfig, SERVICES_CONF, errstr)) {
+	if (LoadConf(newconfig, SERVICES_CONF_NEW, errstr)) {
 		// If we succeeded, set the ircd config to the new one
 		config_data = newconfig;
 	}
@@ -1612,6 +1618,8 @@ int read_config(int reload)
         }
     }
 
+	retval = serverConfig.Read(reload);
+	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
     config = fopen(SERVICES_CONF, "r");
     if (!config) {
 #ifndef NOT_MAIN

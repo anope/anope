@@ -1,6 +1,5 @@
 /* inspircd 1.1 beta 6+ functions
  *
- * (C) 2005-2007 Craig Edwards <brain@inspircd.org>
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
  *
@@ -16,7 +15,44 @@
 
 #include "services.h"
 #include "pseudo.h"
-#include "inspircd11.h"
+
+#define UMODE_a 0x00000001
+#define UMODE_h 0x00000002
+#define UMODE_i 0x00000004
+#define UMODE_o 0x00000008
+#define UMODE_r 0x00000010
+#define UMODE_w 0x00000020
+#define UMODE_A 0x00000040
+#define UMODE_g 0x80000000
+#define UMODE_x 0x40000000
+
+#define CMODE_i 0x00000001
+#define CMODE_m 0x00000002
+#define CMODE_n 0x00000004
+#define CMODE_p 0x00000008
+#define CMODE_s 0x00000010
+#define CMODE_t 0x00000020
+#define CMODE_k 0x00000040		/* These two used only by ChanServ */
+#define CMODE_l 0x00000080
+#define CMODE_c 0x00000400
+#define CMODE_A 0x00000800
+#define CMODE_H 0x00001000
+#define CMODE_K 0x00002000
+#define CMODE_L 0x00004000
+#define CMODE_O 0x00008000
+#define CMODE_Q 0x00010000
+#define CMODE_S 0x00020000
+#define CMODE_V 0x00040000
+#define CMODE_f 0x00080000
+#define CMODE_G 0x00100000
+#define CMODE_C 0x00200000
+#define CMODE_u 0x00400000
+#define CMODE_z 0x00800000
+#define CMODE_N 0x01000000
+#define CMODE_R 0x00000100		/* Only identified users can join */
+#define CMODE_r 0x00000200		/* Set for all registered channels */
+
+#define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 
 #ifndef _WIN32
 #include <sys/socket.h>
@@ -394,126 +430,6 @@ static int has_messagefloodmod = 0;
 static int has_banexceptionmod = 0;
 static int has_inviteexceptionmod = 0;
 
-void InspIRCdProto::ProcessUsermodes(User *user, int ac, const char **av)
-{
-	int add = 1; /* 1 if adding modes, 0 if deleting */
-	const char *modes = av[0];
-	--ac;
-	if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
-	while (*modes) {
-		/* This looks better, much better than "add ? (do_add) : (do_remove)".
-		 * At least this is readable without paying much attention :) -GD */
-		if (add) user->mode |= umodes[static_cast<int>(*modes)];
-		else user->mode &= ~umodes[static_cast<int>(*modes)];
-		switch (*modes++) {
-			case '+':
-				add = 1;
-				break;
-			case '-':
-				add = 0;
-				break;
-			case 'd':
-				if (!ac) break;
-				--ac;
-				++av;
-				user->svid = strtoul(*av, NULL, 0);
-				break;
-			case 'o':
-				if (add) {
-					++opcnt;
-					if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
-					display_news(user, NEWS_OPER);
-				}
-				else --opcnt;
-				break;
-			case 'a':
-				if (UnRestrictSAdmin) break;
-				if (add && !is_services_admin(user)) {
-					common_svsmode(user, "-a", NULL);
-					user->mode &= ~UMODE_a;
-				}
-				break;
-			case 'r':
-				user->svid = add ? user->timestamp : 0;
-				if (add && !nick_identified(user)) {
-					common_svsmode(user, "-r", NULL);
-					user->mode &= ~UMODE_r;
-				}
-				break;
-			case 'x':
-				if (add) user->chost = user->vhost;
-				update_host(user);
-		}
-	}
-}
-
-
-/* *INDENT-OFF* */
-void moduleAddIRCDMsgs(void) {
-    Message *m;
-
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+a","-a");
-
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("BURST",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ENDBURST",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("RSQUIT",    anope_event_rsquit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_mode) ;addCoreMessage(IRCD,m);
-    m = createMessage("QLINE",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLINE",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ELINE",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ZLINE",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ADDLINE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("FHOST",     anope_event_chghost); addCoreMessage(IRCD,m);
-    m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-    m = createMessage("FNAME",     anope_event_chgname); addCoreMessage(IRCD,m);
-    m = createMessage("METADATA",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
-    m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
-    m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-    m = createMessage("REHASH",    anope_event_rehash); addCoreMessage(IRCD,m);
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-    m = createMessage("CREDITS",   anope_event_credits); addCoreMessage(IRCD,m);
-    m = createMessage("FJOIN",     anope_event_fjoin); addCoreMessage(IRCD,m);
-    m = createMessage("FMODE",     anope_event_fmode); addCoreMessage(IRCD,m);
-    m = createMessage("FTOPIC",    anope_event_ftopic); addCoreMessage(IRCD,m);
-    m = createMessage("VERSION",   anope_event_version); addCoreMessage(IRCD,m);
-    m = createMessage("OPERTYPE",  anope_event_opertype); addCoreMessage(IRCD,m);
-    m = createMessage("IDLE",      anope_event_idle); addCoreMessage(IRCD,m);
-}
-
-/* *INDENT-ON* */
-
-void InspIRCdProto::SendAkillDel(const char *user, const char *host)
-{
-	send_cmd(s_OperServ, "GLINE %s@%s", user, host);
-}
-
-void InspIRCdProto::SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
-{
-	send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
-}
 
 /* CHGHOST */
 void inspircd_cmd_chghost(const char *nick, const char *vhost)
@@ -528,50 +444,6 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
     }
 }
 
-void InspIRCdProto::SendVhostDel(User *u)
-{
-	inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
-}
-
-void InspIRCdProto::SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
-{
-	// Calculate the time left before this would expire, capping it at 2 days
-	time_t timeleft = expires - time(NULL);
-	if (timeleft > 172800) timeleft = 172800;
-	send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
-}
-
-void InspIRCdProto::SendSVSKillInternal(const char *source, const char *user, const char *buf)
-{
-	if (!buf || !source || !user) return;
-	send_cmd(source, "KILL %s :%s", user, buf);
-}
-
-void InspIRCdProto::SendSVSMode(User *u, int ac, const char **av)
-{
-	/* This was originally done using this:
-	   send_cmd(s_NickServ, "MODE %s %s%s%s", u->nick, av[0], (ac == 2 ? " " : ""), (ac == 2 ? av[1] : ""));
-	   * but that's the dirty way of doing things... */
-	send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
-}
-
-void InspIRCdProto::SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
-{
-	send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
-}
-
-void InspIRCdProto::SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
-}
-
-void InspIRCdProto::SendModeInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	Channel *c = findchan(dest);
-	send_cmd(source ? source->nick : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
-}
-
 int anope_event_idle(const char *source, int ac, const char **av)
 {
     if (ac == 1) {
@@ -579,6 +451,284 @@ int anope_event_idle(const char *source, int ac, const char **av)
     }
     return MOD_CONT;
 }
+
+/* PROTOCTL */
+void inspircd_cmd_protoctl()
+{
+}
+
+static char currentpass[1024];
+
+/* PASS */
+void inspircd_cmd_pass(const char *pass)
+{
+    strncpy(currentpass, pass, 1024);
+}
+
+
+class InspIRCdProto : public IRCDProto
+{
+
+	void ProcessUsermodes(User *user, int ac, const char **av)
+	{
+		int add = 1; /* 1 if adding modes, 0 if deleting */
+		const char *modes = av[0];
+		--ac;
+		if (debug) alog("debug: Changing mode for %s to %s", user->nick, modes);
+		while (*modes) {
+			/* This looks better, much better than "add ? (do_add) : (do_remove)".
+			 * At least this is readable without paying much attention :) -GD */
+			if (add) user->mode |= umodes[static_cast<int>(*modes)];
+			else user->mode &= ~umodes[static_cast<int>(*modes)];
+			switch (*modes++) {
+				case '+':
+					add = 1;
+					break;
+				case '-':
+					add = 0;
+					break;
+				case 'd':
+					if (!ac) break;
+					--ac;
+					++av;
+					user->svid = strtoul(*av, NULL, 0);
+					break;
+				case 'o':
+					if (add) {
+						++opcnt;
+						if (WallOper) ircdproto->SendGlobops(s_OperServ, "\2%s\2 is now an IRC operator.", user->nick);
+						display_news(user, NEWS_OPER);
+					}
+					else --opcnt;
+					break;
+				case 'a':
+					if (UnRestrictSAdmin) break;
+					if (add && !is_services_admin(user)) {
+						common_svsmode(user, "-a", NULL);
+						user->mode &= ~UMODE_a;
+					}
+					break;
+				case 'r':
+					user->svid = add ? user->timestamp : 0;
+					if (add && !nick_identified(user)) {
+						common_svsmode(user, "-r", NULL);
+						user->mode &= ~UMODE_r;
+					}
+					break;
+				case 'x':
+					if (add) user->chost = user->vhost;
+					update_host(user);
+			}
+		}
+	}
+
+	/* *INDENT-ON* */
+
+	void SendAkillDel(const char *user, const char *host)
+	{
+		send_cmd(s_OperServ, "GLINE %s@%s", user, host);
+	}
+
+	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
+	{
+		send_cmd(whosets->nick, "FTOPIC %s %lu %s :%s", chan, static_cast<unsigned long>(when), whosetit, topic);
+	}
+
+	void SendVhostDel(User *u)
+	{
+		inspircd_cmd_chghost(u->nick, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
+	}
+
+	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
+	{
+		// Calculate the time left before this would expire, capping it at 2 days
+		time_t timeleft = expires - time(NULL);
+		if (timeleft > 172800) timeleft = 172800;
+		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
+	}
+
+	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
+	{
+		if (!buf || !source || !user) return;
+		send_cmd(source, "KILL %s :%s", user, buf);
+	}
+
+	void SendSVSMode(User *u, int ac, const char **av)
+	{
+		send_cmd(s_NickServ, "MODE %s %s", u->nick, merge_args(ac, av));
+	}
+
+	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
+	{
+		send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
+	}
+
+	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+	}
+
+	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		Channel *c = findchan(dest);
+		send_cmd(source ? source->nick : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+	}
+
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	{
+		send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+		send_cmd(nick, "OPERTYPE Service");
+	}
+
+	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
+	{
+		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
+		else send_cmd(source->nick, "KICK %s %s :%s", chan, user, user);
+	}
+
+	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
+	{
+		if (!buf) return;
+		send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
+	}
+
+	void SendBotOp(const char *nick, const char *chan)
+	{
+		SendMode(findbot(nick), chan, "%s %s %s", ircd->botchanumode, nick, nick);
+	}
+
+
+	/* SERVER services-dev.chatspike.net password 0 :Description here */
+	void SendServer(const char *servname, int hop, const char *descript)
+	{
+		send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
+	}
+
+	/* JOIN */
+	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
+	{
+		send_cmd(user->nick, "JOIN %s", channel);
+	}
+
+	/* UNSQLINE */
+	void SendSQLineDel(const char *user)
+	{
+		if (!user) return;
+		send_cmd(s_OperServ, "QLINE %s", user);
+	}
+
+	/* SQLINE */
+	void SendSQLine(const char *mask, const char *reason)
+	{
+		if (!mask || !reason) return;
+		send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
+	}
+
+	/* SQUIT */
+	void SendSquit(const char *servname, const char *message)
+	{
+		if (!servname || !message) return;
+		send_cmd(ServerName, "SQUIT %s :%s", servname, message);
+	}
+
+	/* Functions that use serval cmd functions */
+
+	void SendVhost(const char *nick, const char *vIdent, const char *vhost)
+	{
+		if (!nick) return;
+		if (vIdent) inspircd_cmd_chgident(nick, vIdent);
+		inspircd_cmd_chghost(nick, vhost);
+	}
+
+	void SendConnect()
+	{
+		if (servernum == 1) inspircd_cmd_pass(RemotePassword);
+		else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
+		else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
+		SendServer(ServerName, 0, ServerDesc);
+		send_cmd(NULL, "BURST");
+		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+	}
+
+	/* CHGIDENT */
+	void inspircd_cmd_chgident(const char *nick, const char *vIdent)
+	{
+		if (has_chgidentmod == 1) {
+			if (!nick || !vIdent || !*vIdent) {
+				return;
+			}
+			send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
+		} else {
+			ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
+		}
+	}
+
+	/* SVSHOLD - set */
+	void SendSVSHold(const char *nick)
+	{
+		send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
+	}
+
+	/* SVSHOLD - release */
+	void SendSVSHoldDel(const char *nick)
+	{
+		send_cmd(s_OperServ, "SVSHOLD %s", nick);
+	}
+
+	/* UNSZLINE */
+	void SendSZLineDel(const char *mask)
+	{
+		send_cmd(s_OperServ, "ZLINE %s", mask);
+	}
+
+	/* SZLINE */
+	void SendSZLine(const char *mask, const char *reason, const char *whom)
+	{
+		send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
+	}
+
+	/* SVSMODE +d */
+	/* nc_change was = 1, and there is no na->status */
+	void SendUnregisteredNick(User *u)
+	{
+		common_svsmode(u, "-r", NULL);
+	}
+
+	/* SVSMODE +r */
+	void SendSVID2(User *u, const char *ts)
+	{
+		common_svsmode(u, "+r", NULL);
+	}
+
+	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
+	{
+		send_cmd(source, "SVSJOIN %s %s", nick, chan);
+	}
+
+	void SendSVSPart(const char *source, const char *nick, const char *chan)
+	{
+		send_cmd(source, "SVSPART %s %s", nick, chan);
+	}
+
+	void SendEOB()
+	{
+		send_cmd(NULL, "ENDBURST");
+	}
+
+	int IsFloodModeParamValid(const char *value)
+	{
+		char *dp, *end;
+		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
+		else return 0;
+	}
+} ircd_proto;
+
+
+
+
+
 
 int anope_event_ftopic(const char *source, int ac, const char **av)
 {
@@ -727,116 +877,12 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-void InspIRCdProto::SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-{
-	send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
-	send_cmd(nick, "OPERTYPE Service");
-}
-
-void InspIRCdProto::SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
-{
-	if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
-	else send_cmd(source->nick, "KICK %s %s :%s", chan, user, user);
-}
-
-void InspIRCdProto::SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
-{
-	if (!buf) return;
-	send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
-}
-
-void InspIRCdProto::SendBotOp(const char *nick, const char *chan)
-{
-	SendMode(findbot(nick), chan, "%s %s %s", ircd->botchanumode, nick, nick);
-}
-
-/* PROTOCTL */
-void inspircd_cmd_protoctl()
-{
-}
-
-static char currentpass[1024];
-
-/* PASS */
-void inspircd_cmd_pass(const char *pass)
-{
-    strncpy(currentpass, pass, 1024);
-}
-
-/* SERVER services-dev.chatspike.net password 0 :Description here */
-void InspIRCdProto::SendServer(const char *servname, int hop, const char *descript)
-{
-	send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
-}
-
-/* JOIN */
-void InspIRCdProto::SendJoin(BotInfo *user, const char *channel, time_t chantime)
-{
-	send_cmd(user->nick, "JOIN %s", channel);
-}
-
-/* UNSQLINE */
-void InspIRCdProto::SendSQLineDel(const char *user)
-{
-	if (!user) return;
-	send_cmd(s_OperServ, "QLINE %s", user);
-}
-
-/* CHGIDENT */
-void inspircd_cmd_chgident(const char *nick, const char *vIdent)
-{
-	if (has_chgidentmod == 1) {
-		if (!nick || !vIdent || !*vIdent) {
-        	return;
-    	}
-    	send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
-    } else {
-		ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
-    }
-}
-
-/* SQLINE */
-void InspIRCdProto::SendSQLine(const char *mask, const char *reason)
-{
-	if (!mask || !reason) return;
-	send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
-}
-
-/* SQUIT */
-void InspIRCdProto::SendSquit(const char *servname, const char *message)
-{
-	if (!servname || !message) return;
-	send_cmd(ServerName, "SQUIT %s :%s", servname, message);
-}
-
-/* Functions that use serval cmd functions */
-
-void InspIRCdProto::SendVhost(const char *nick, const char *vIdent, const char *vhost)
-{
-	if (!nick) return;
-	if (vIdent) inspircd_cmd_chgident(nick, vIdent);
-	inspircd_cmd_chghost(nick, vhost);
-}
-
-void InspIRCdProto::SendConnect()
-{
-	if (servernum == 1) inspircd_cmd_pass(RemotePassword);
-	else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
-	else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
-	SendServer(ServerName, 0, ServerDesc);
-	send_cmd(NULL, "BURST");
-	send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
-	me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-}
-
 /* Events */
-
 int anope_event_ping(const char *source, int ac, const char **av)
 {
     if (ac < 1)
         return MOD_CONT;
-    /* ((ac > 1) ? av[1] : ServerName) */
-    ircd_proto.SendPong(ServerName, av[0]);
+    ircdproto->SendPong(ServerName, av[0]);
     return MOD_CONT;
 }
 
@@ -1267,64 +1313,8 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* SVSHOLD - set */
-void InspIRCdProto::SendSVSHold(const char *nick)
-{
-	send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
-}
 
-/* SVSHOLD - release */
-void InspIRCdProto::SendSVSHoldDel(const char *nick)
-{
-	send_cmd(s_OperServ, "SVSHOLD %s", nick);
-}
 
-/* UNSZLINE */
-void InspIRCdProto::SendSZLineDel(const char *mask)
-{
-	send_cmd(s_OperServ, "ZLINE %s", mask);
-}
-
-/* SZLINE */
-void InspIRCdProto::SendSZLine(const char *mask, const char *reason, const char *whom)
-{
-	send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
-}
-
-/* SVSMODE +d */
-/* nc_change was = 1, and there is no na->status */
-void InspIRCdProto::SendUnregisteredNick(User *u)
-{
-	common_svsmode(u, "-r", NULL);
-}
-
-/* SVSMODE +r */
-void InspIRCdProto::SendSVID2(User *u, const char *ts)
-{
-	common_svsmode(u, "+r", NULL);
-}
-
-void InspIRCdProto::SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
-{
-	send_cmd(source, "SVSJOIN %s %s", nick, chan);
-}
-
-void InspIRCdProto::SendSVSPart(const char *source, const char *nick, const char *chan)
-{
-	send_cmd(source, "SVSPART %s %s", nick, chan);
-}
-
-void InspIRCdProto::SendEOB()
-{
-	send_cmd(NULL, "ENDBURST");
-}
-
-int InspIRCdProto::IsFloodModeParamValid(const char *value)
-{
-	char *dp, *end;
-	if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
-	else return 0;
-}
 
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {

@@ -497,9 +497,58 @@ int ServerConfig::Read(bool bail)
 	static const char *Once[] = {NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
+		/* The following comments are from CyberBotX to w00t as examples to use:
+		 *
+		 * The last argument, for validation, must use one of the functions with the following signature:
+		 * bool <function>(ServerConfig *, const char *, const char *, ValueItem &)
+		 * Examples are: NoValidation, ValidateNotEmpty, etc.
+		 *
+		 * If you want to create a directive using an integer:
+		 * int blarg;
+		 * {"tag", "value", "0", new ValueContainerInt(&blarg), DT_INTEGER, <validation>},
+		 *
+		 * If you want to create a directive using an unsigned integer:
+		 * unsigned blarg;
+		 * {"tag", "value", "0", new ValueContainerUInt(&blarg), DT_UINTEGER, <validation>},
+		 *
+		 * If you want to create a directive using a character pointer without additional validation (see below for hostnames, fields with no spaces, and IP addresses):
+		 * char *blarg;
+		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_CHARPTR, <validation>},
+		 *
+		 * If you want to create a directive using a string:
+		 * std::string blarg;
+		 * {"tag", "value", "", new ValueContainerString(&blarg), DT_STRING, <validation>},
+		 *
+		 * If you want to create a directive using a boolean:
+		 * bool blarg;
+		 * {"tag", "value", "no", new ValueContainerBool(&blarg), DT_BOOLEAN, <validation>},
+		 *
+		 * If you want to create a directive using a character pointer specifically to hold a hostname (this will call ValidateHostname automatically):
+		 * char *blarg;
+		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_HOSTNAME, <validation>},
+		 *
+		 * If you want to create a directive using a character pointer that specifically can not have spaces in it (this will call ValidateNoSpaces automatically):
+		 * char *blarg;
+		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_NOSPACES, <validation>},
+		 *
+		 * If you want to create a directive using a character pointer specifically to hold an IP address (this will call ValidateIP automatically):
+		 * char *blarg;
+		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_IPADDRESS, <validation>},
+		 *
+		 * If you want to create a directive using a time (a time_t variable converted from a string):
+		 * time_t blarg;
+		 * {"tag", "value", "", new ValueContainterTime(&blarg), DT_TIME, <validation>},
+		 *
+		 * For the second-to-last argument, you can or (|) in the following values:
+		 * DT_NORELOAD - The variable can't be changed on a reload of the configuration (CURRENTLY NOT SET UP TO WORK YET)
+		 * DT_ALLOW_WILD - Allows wildcards/CIDR in DT_IPADDRESS
+		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_CHARPTR and DT_STRING
+		 *
+		 * We may need to add some other validation functions to handle certain things, we can handle that later.
+		 * Any questions about these, w00t, feel free to ask. */
 		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
 		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_HOSTNAME, ValidateNotEmpty},
-		{"uplink", "port", "", new ValueContainerInt(&RemotePort), DT_INTEGER, ValidatePort},
+		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER, ValidatePort},
 		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_NOSPACES, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};

@@ -498,6 +498,9 @@ int ServerConfig::Read(bool bail)
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
+		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_CHARPTR, ValidateHostname},
+		{"uplink", "port", "", new ValueContainerInt(&RemotePort), DT_CHARPTR, ValidatePort},
+		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_CHARPTR, ValidateNoSpaces},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them

@@ -494,7 +494,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {NULL};
+	static const char *Once[] = {"nickserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -550,6 +550,8 @@ int ServerConfig::Read(bool bail)
 		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_HOSTNAME, ValidateNotEmpty},
 		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER, ValidatePort},
 		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_NOSPACES, ValidateNotEmpty},
+		{"nickserv", "nick", "NickServ", new ValueContainerChar(s_NickServ), DT_CHARPTR, ValidateNotEmpty},
+		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(desc_NickServ), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them

@@ -381,6 +381,8 @@ int init_primary(int ac, char **av)
 
     /* Parse command line for -dir and -version options. */
     parse_dir_options(ac, av);
+    /* Parse all remaining command-line options. */
+    parse_options(ac, av);
 
     /* Chdir to Services data directory. */
     if (chdir(services_dir) < 0) {
@@ -423,9 +425,6 @@ int init_secondary(int ac, char **av)
 
     /* Add Core MSG handles */
     moduleAddMsgs();
-
-    /* Parse all remaining command-line options. */
-    parse_options(ac, av);
 
     /* Parse the defcon mode string if needed */
     if (DefConLevel) {

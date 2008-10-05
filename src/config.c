@@ -442,6 +442,7 @@ void ServerConfig::ValidateIP(const char *p, const std::string &tag, const std::
 
 void ServerConfig::ValidateHostname(const char *p, const std::string &tag, const std::string &val)
 {
+	if (!strcasecmp(p, "localhost")) return;
 	int num_dots = 0;
 	if (*p) {
 		if (*p == '.') throw ConfigException(static_cast<std::string>("The value of <") + tag + ":" + val + "> is not a valid hostname");

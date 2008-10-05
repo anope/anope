@@ -596,29 +596,25 @@ int ServerConfig::Read(bool bail)
 				case DT_NOSPACES: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateNoSpaces(vi.GetString(), Values[Index].tag, Values[Index].value);
-					char *tmp = vi.GetString();
-					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_HOSTNAME: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateHostname(vi.GetString(), Values[Index].tag, Values[Index].value);
-					char *tmp = vi.GetString();
-					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_IPADDRESS: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateIP(vi.GetString(), Values[Index].tag, Values[Index].value, allow_wild);
-					char *tmp = vi.GetString();
-					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_CHARPTR: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					// Make sure we also copy the null terminator
-					char *tmp = vi.GetString();
-					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
+					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_STRING: {

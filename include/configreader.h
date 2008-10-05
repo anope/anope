@@ -119,6 +119,32 @@ template<typename T> class ValueContainer : public ValueContainerBase
 		}
 };
 
+/** This a specific version of ValueContainer to handle character arrays specially
+ */
+template<> class ValueContainer<char **> : public ValueContainerBase
+{
+		/** Contained item */
+		char **val;
+	public:
+		/** Initialize with nothing */
+		ValueContainer() : ValueContainerBase(), val(NULL) { }
+		/** Initialize with a value of type T */
+		ValueContainer(char **Val) : ValueContainerBase(), val(Val) { }
+		/** Initialize with a copy */
+		ValueContainer(const ValueContainer &Val) : ValueContainerBase(), val(Val.val) { }
+		ValueContainer &operator=(const ValueContainer &Val)
+		{
+			val = Val.val;
+			return *this;
+		}
+		/** Change value to type T of size s */
+		void Set(const char *newval, size_t s)
+		{
+			*val = new char[s];
+			strlcpy(*val, newval, s);
+		}
+};
+
 /** This a specific version of ValueContainer to handle std::string specially
  */
 template<> class ValueContainer<std::string *> : public ValueContainerBase

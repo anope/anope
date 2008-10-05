@@ -13,6 +13,14 @@ VERSION_BUILD=""
 
 # $Log$
 #
+# BUILD : 1.7.22 (1464)
+# BUGS  : 951 
+# NOTES : Applied patch by katsklaw to add missing optional parameters to OS MODLIST help.
+#
+# BUILD : 1.7.22 (1463)
+# BUGS  : 941 
+# NOTES : Applied patches by chaz and katsklaw to fix issues with CS LOGOUT documentation.
+#
 # BUILD : 1.7.22 (1462)
 # BUGS  : 940 
 # NOTES : Fixed a bug in the database system causing certain nickserv password hashes to be stored incorrectly. Note that THIS BREAKS BACKWARDS COMPATIBILITY !!! As of now nick.db is no longer backwards compatible.

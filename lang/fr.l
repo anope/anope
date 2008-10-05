@@ -1127,7 +1127,9 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	L'utilisateur %s n'est plus identifié pour le canal %s.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Tous les utilisateurs identifiés au canal %s ne le sont plus.
+	Tous les utilisateurs identifiés au canal %s ne le sont plus (except the channel founder).
+CHAN_LOGOUT_FOUNDER_FAILED
+	You may not log out of %s (you are founder).
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -6367,7 +6369,7 @@ OPER_HELP_MODINFO
 	Limité aux Services Roots.
 
 OPER_HELP_MODLIST
-	Syntaxe: MODLIST
+	Syntaxe: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 
 	Liste les modules actuelement chargés.
 

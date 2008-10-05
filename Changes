@@ -12,6 +12,8 @@ Anope Version  S V N
 09/30 F Fixed error in the SASET help.                                    [#950]
 10/01 F Fixed an error in the OS IGNORE documentation.                    [#948]
 10/01 F Fixed DB routines not storing nick passwords properly.            [#940]
+10/04 F Fixed errors in CS LOGOUT documentation.                          [#941]
+10/04 F Fixed missing optional params in MODLIST help.                    [#951]
 
 Provided by Robin Burchell <w00t@inspircd.org> - 2008
 09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]

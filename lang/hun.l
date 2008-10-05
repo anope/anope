@@ -1107,7 +1107,9 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	%s felhasználó kijelentkezett a %s csatornáról.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Minden felhasználó kijelentkezett a %s csatornáról.
+	Minden felhasználó kijelentkezett a %s csatornáról (except the channel founder).
+CHAN_LOGOUT_FOUNDER_FAILED
+	You may not log out of %s (you are founder).
 
 # DROP válaszok
 CHAN_DROP_SYNTAX
@@ -6129,7 +6131,7 @@ OPER_HELP_MODINFO
 	Korlátozva Szervíz Rootnak.
 	
 OPER_HELP_MODLIST
-	Syntax: MODLIST
+	Syntax: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 	
 	Listázza az összes betöltött aktív modult.
 	

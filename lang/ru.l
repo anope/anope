@@ -1093,7 +1093,9 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	Пользователь %s был деидентифицирован от канала %s.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Все идентифицированные пользователи были деидентифицированы от канала %s.
+	Все идентифицированные пользователи были деидентифицированы от канала %s (except the channel founder).
+CHAN_LOGOUT_FOUNDER_FAILED
+	You may not log out of %s (you are founder).
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -6001,7 +6003,7 @@ OPER_HELP_MODINFO
 	Эта команда покажет информацию об указанном загруженом модуле
 
 OPER_HELP_MODLIST
-	Синтаксис: MODLIST
+	Синтаксис: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 
 	Список всех загруженных модулей
 

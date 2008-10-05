@@ -87,6 +87,9 @@ int do_logout(User * u)
         notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
     } else if (!is_servadmin && u2 != u && !is_real_founder(u, ci)) {
         notice_lang(s_ChanServ, u, ACCESS_DENIED);
+	/* Since founders can not logout we should tell them -katsklaw */
+    } else if (u2 == u && is_real_founder(u, ci)) {
+	notice_lang(s_ChanServ, u, CHAN_LOGOUT_FOUNDER_FAILED, chan);
     } else {
         if (u2) {
             make_unidentified(u2, ci);

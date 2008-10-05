@@ -20,14 +20,14 @@
 static char *int_to_base64(long);
 static long base64_to_int(char *);
 
-char *base64enc(long i)
+const char* base64enc(long i)
 {
     if (i < 0)
         return ("0");
     return int_to_base64(i);
 }
 
-long base64dec(char *b64)
+long base64dec(char* b64)
 {
     if (b64)
         return base64_to_int(b64);
@@ -280,7 +280,7 @@ int b64_decode(const char *src, char *target, size_t targsize)
     return (tarindex);
 }
 
-char *encode_ip(unsigned char *ip)
+const char* encode_ip(unsigned char *ip)
 {
     static char buf[25];
     unsigned char *cp;

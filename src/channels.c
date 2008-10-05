@@ -68,7 +68,7 @@ char *chan_get_modes(Channel * chan, int complete, int plus)
     char *end = res;
 
     if (chan->mode) {
-        int n = 0;
+        unsigned int n = 0;
         CBModeInfo *cbmi = cbmodeinfos;
 
         do {
@@ -762,7 +762,7 @@ void do_sjoin(const char *source, int ac, const char **av)
     struct c_userlist *cu;
     const char *s = NULL;
     char *end, cubuf[7], *end2;
-	const char *cumodes[6];
+	const char *modes[6];
     int is_sqlined = 0;
     int ts = 0;
     int is_created = 0;
@@ -783,10 +783,10 @@ void do_sjoin(const char *source, int ac, const char **av)
             c->creation_time = ts;
             for (cu = c->users; cu; cu = cu->next) {
                 /* XXX */
-                cumodes[0] = "-ov";
-                cumodes[1] = cu->user->nick;
-                cumodes[2] = cu->user->nick;
-                chan_set_modes(source, c, 3, cumodes, 2);
+                modes[0] = "-ov";
+                modes[1] = cu->user->nick;
+                modes[2] = cu->user->nick;
+                chan_set_modes(source, c, 3, modes, 2);
             }
             if (c->ci && c->ci->bi) {
                 /* This is ugly, but it always works */
@@ -807,7 +807,7 @@ void do_sjoin(const char *source, int ac, const char **av)
         }
 
         cubuf[0] = '+';
-        cumodes[0] = cubuf;
+        modes[0] = cubuf;
 
         /* We make all the users join */
         s = av[ac - 1];         /* Users are always the last element */
@@ -891,9 +891,9 @@ void do_sjoin(const char *source, int ac, const char **av)
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
-                            cumodes[i] = user->nick;
+                            modes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 2);
+                                       modes, 2);
                     }
 
                     if (c->ci && (!serv || is_sync(serv))
@@ -924,7 +924,7 @@ void do_sjoin(const char *source, int ac, const char **av)
         }
 
         cubuf[0] = '+';
-        cumodes[0] = cubuf;
+        modes[0] = cubuf;
 
         /* We make all the users join */
         s = av[2];              /* Users are always the last element */
@@ -976,9 +976,9 @@ void do_sjoin(const char *source, int ac, const char **av)
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
-                            cumodes[i] = user->nick;
+                            modes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 2);
+                                       modes, 2);
                     }
 
                     chan_set_correct_modes(user, c, 1);
@@ -999,7 +999,7 @@ void do_sjoin(const char *source, int ac, const char **av)
         }
 
         cubuf[0] = '+';
-        cumodes[0] = cubuf;
+        modes[0] = cubuf;
 
         /* We make all the users join */
         s = sstrdup(source);    /* Users are always the last element */
@@ -1051,9 +1051,9 @@ void do_sjoin(const char *source, int ac, const char **av)
                         int i;
 
                         for (i = 1; i < end2 - cubuf; i++)
-                            cumodes[i] = user->nick;
+                            modes[i] = user->nick;
                         chan_set_modes(source, c, 1 + (end2 - cubuf - 1),
-                                       cumodes, 2);
+                                       modes, 2);
                     }
 
                     chan_set_correct_modes(user, c, 1);
@@ -1118,7 +1118,7 @@ void do_cmode(const char *source, int ac, const char **av)
 {
     Channel *chan;
     ChannelInfo *ci = NULL;
-    int i;
+    unsigned int i;
     const char *t;
 
     if (ircdcap->tsmode) {

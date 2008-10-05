@@ -135,7 +135,7 @@ char *get_mlock_modes(ChannelInfo * ci, int complete)
     char *end = res;
 
     if (ci->mlock_on || ci->mlock_off) {
-        int n = 0;
+        unsigned int n = 0;
         CBModeInfo *cbmi = cbmodeinfos;
 
         if (ci->mlock_on) {
@@ -274,7 +274,7 @@ void chanserv(User * u, char *buf)
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
         if (!(s = strtok(NULL, ""))) {
-            s = "";
+            *s = 0;
         }
         ircdproto->SendCTCP(findbot(s_ChanServ), u->nick, "PING %s", s);
     } else {
@@ -314,6 +314,7 @@ void load_cs_dbase(void)
     for (i = 0; i < 256 && !failed; i++) {
         uint16 tmp16;
         uint32 tmp32;
+        unsigned int read;
         int n_levels;
         char *s;
         NickAlias *na;
@@ -328,7 +329,7 @@ void load_cs_dbase(void)
             last = &ci->next;
             ci->prev = prev;
             prev = ci;
-            SAFE(read_buffer(ci->name, f));
+            SAFE(read = read_buffer(ci->name, f));
             SAFE(read_string(&s, f));
             if (s) {
                 ci->founder = findcore(s);
@@ -353,7 +354,7 @@ void load_cs_dbase(void)
             } else {
                 ci->successor = NULL;
             }
-            SAFE(read_buffer(ci->founderpass, f));
+            SAFE(read = read_buffer(ci->founderpass, f));
             SAFE(read_string(&ci->desc, f));
             if (!ci->desc)
                 ci->desc = sstrdup("");
@@ -364,7 +365,7 @@ void load_cs_dbase(void)
             SAFE(read_int32(&tmp32, f));
             ci->last_used = tmp32;
             SAFE(read_string(&ci->last_topic, f));
-            SAFE(read_buffer(ci->last_topic_setter, f));
+            SAFE(read = read_buffer(ci->last_topic_setter, f));
             SAFE(read_int32(&tmp32, f));
             ci->last_topic_time = tmp32;
             SAFE(read_int32(&ci->flags, f));
@@ -479,7 +480,7 @@ void load_cs_dbase(void)
                     SAFE(read_int16(&memos->flags, f));
                     SAFE(read_int32(&tmp32, f));
                     memos->time = tmp32;
-                    SAFE(read_buffer(memos->sender, f));
+                    SAFE(read = read_buffer(memos->sender, f));
                     SAFE(read_string(&memos->text, f));
                     memos->moduleData = NULL;
                 }
@@ -632,10 +633,11 @@ void save_cs_dbase(void)
 
     for (i = 0; i < 256; i++) {
         int16 tmp16;
+        unsigned int written;
 
         for (ci = chanlists[i]; ci; ci = ci->next) {
             SAFE(write_int8(1, f));
-            SAFE(write_buffer(ci->name, f));
+            SAFE(written = write_buffer(ci->name, f));
             if (ci->founder)
                 SAFE(write_string(ci->founder->display, f));
             else
@@ -644,14 +646,14 @@ void save_cs_dbase(void)
                 SAFE(write_string(ci->successor->display, f));
             else
                 SAFE(write_string(NULL, f));
-            SAFE(write_buffer(ci->founderpass, f));
+            SAFE(written = write_buffer(ci->founderpass, f));
             SAFE(write_string(ci->desc, f));
             SAFE(write_string(ci->url, f));
             SAFE(write_string(ci->email, f));
             SAFE(write_int32(ci->time_registered, f));
             SAFE(write_int32(ci->last_used, f));
             SAFE(write_string(ci->last_topic, f));
-            SAFE(write_buffer(ci->last_topic_setter, f));
+            SAFE(written = write_buffer(ci->last_topic_setter, f));
             SAFE(write_int32(ci->last_topic_time, f));
             SAFE(write_int32(ci->flags, f));
             SAFE(write_string(ci->forbidby, f));
@@ -708,7 +710,7 @@ void save_cs_dbase(void)
                 SAFE(write_int32(memos->number, f));
                 SAFE(write_int16(memos->flags, f));
                 SAFE(write_int32(memos->time, f));
-                SAFE(write_buffer(memos->sender, f));
+                SAFE(written = write_buffer(memos->sender, f));
                 SAFE(write_string(memos->text, f));
             }
 

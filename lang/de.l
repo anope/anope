@@ -1129,7 +1129,7 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	Der User %s wurde vom Channel %s ausgeloggt.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	Alle identifizierten User wurden vom Channel ausgeloggt %s.
+	Alle identifizierten User wurden vom Channel ausgeloggt %s (except the channel founder).
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -6333,7 +6333,7 @@ OPER_HELP_MODINFO
 	Module auf.
 
 OPER_HELP_MODLIST
-	Syntax: MODLIST
+	Syntax: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 
 	Listet alle derzeit geladenen Module auf.
 

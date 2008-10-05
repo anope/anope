@@ -90,7 +90,7 @@ void botserv(User * u, char *buf)
         return;
     } else if (stricmp(cmd, "\1PING") == 0) {
         if (!(s = strtok(NULL, ""))) {
-            s = "";
+            *s = 0;
         }
         ircdproto->SendCTCP(findbot(s_BotServ), u->nick, "PING %s", s);
     } else {
@@ -113,7 +113,7 @@ void botmsgs(User * u, BotInfo * bi, char *buf)
 
     if (!stricmp(cmd, "\1PING")) {
         if (!(s = strtok(NULL, ""))) {
-            s = "";
+            *s = 0;
         }
         ircdproto->SendCTCP(bi, u->nick, "PING %s", s);
     }
@@ -745,7 +745,7 @@ void bot_join(ChannelInfo * ci)
 
         /* Should we be invited? */
         if ((ci->c->mode & anope_get_invite_mode())
-            || (ci->c->limit && ci->c->usercount >= ci->c->limit))
+            || (ci->c->limit && (unsigned int)ci->c->usercount >= ci->c->limit))
             ircdproto->SendNoticeChanops(NULL, ci->c->name,
                                  "%s invited %s into the channel.",
                                  ci->bi->nick, ci->bi->nick);

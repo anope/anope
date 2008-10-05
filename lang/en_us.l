@@ -1093,7 +1093,9 @@ CHAN_LOGOUT_SERVADMIN_SYNTAX
 CHAN_LOGOUT_SUCCEEDED
 	User %s has been logged out of channel %s.
 CHAN_LOGOUT_ALL_SUCCEEDED
-	All users identified have been logged out of channel %s.
+	All users identified have been logged out of channel %s (except the channel founder).
+CHAN_LOGOUT_FOUNDER_FAILED
+	You may not log out of %s (you are founder).
 
 # DROP responses
 CHAN_DROP_SYNTAX
@@ -5974,7 +5976,7 @@ OPER_HELP_MODINFO
 	This command lists information about the specified loaded module
 
 OPER_HELP_MODLIST
-	Syntax: MODLIST
+	Syntax: MODLIST [Core|3rd|protocol|encryption|supported|qatested]
 	
 	Lists all currently loaded modules.
 

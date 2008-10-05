@@ -502,12 +502,12 @@ E int rdb_init();
 E int rdb_open();
 E int rdb_close();
 E char *rdb_quote(char *str);
-E int rdb_tag_table(char *table);
-E int rdb_tag_table_where(char *table, char *clause);
-E int rdb_empty_table(char *table);
-E int rdb_clean_table(char *table);
-E int rdb_clean_table_where(char *table, char *clause);
-E int rdb_scrub_table(char *table, char *clause);
+E int rdb_tag_table(const char* table);
+E int rdb_tag_table_where(const char* table, const char* clause);
+E int rdb_empty_table(const char* table);
+E int rdb_clean_table(const char* table);
+E int rdb_clean_table_where(const char* table, const char* clause);
+E int rdb_scrub_table(const char* table, const char* clause);
 E int rdb_direct_query(char *query);
 E int rdb_ns_set_display(char *newnick, char *oldnick);
 E int rdb_save_ns_core(NickCore * nc);
@@ -1129,12 +1129,12 @@ E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);
 E const char *send_token(const char *token1, const char *token2);
-E char *base64enc(long i);
+E const char* base64enc(long i);
 E long base64dec(char *b64);
 E long base64dects(const char *ts);
 E int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
 E int b64_decode(const char *src, char *target, size_t targsize);
-E char *encode_ip(unsigned char *ip);
+E const char* encode_ip(unsigned char *ip);
 E int decode_ip(const char *buf);
 
 #define Anope_Free(x)       if ((x) != NULL) free(x)

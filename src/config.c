@@ -546,12 +546,12 @@ int ServerConfig::Read(bool bail)
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
-		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR, ValidateNotEmpty},
-		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_HOSTNAME, ValidateNotEmpty},
-		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER, ValidatePort},
-		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_NOSPACES, ValidateNotEmpty},
-		{"nickserv", "nick", "NickServ", new ValueContainerChar(s_NickServ), DT_CHARPTR, ValidateNotEmpty},
-		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(desc_NickServ), DT_CHARPTR, ValidateNotEmpty},
+		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER | DT_NORELOAD, ValidatePort},
+		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "nick", "NickServ", new ValueContainerChar(s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -580,9 +580,13 @@ int ServerConfig::Read(bool bail)
 		for (int Index = 0; Values[Index].tag; ++Index) {
 			char item[BUFSIZE];
 			int dt = Values[Index].datatype;
-			bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD;
+			bool allow_newlines = dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
 			dt &= ~DT_ALLOW_NEWLINE;
 			dt &= ~DT_ALLOW_WILD;
+			dt &= ~DT_NORELOAD;
+			// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
+			if (noreload && !bail)
+				continue;
 			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
 			ValueItem vi(item);
 			if (!Values[Index].validation_function(this, Values[Index].tag, Values[Index].value, vi))
@@ -657,9 +661,13 @@ int ServerConfig::Read(bool bail)
 				ValueList vl;
 				for (int valuenum = 0; MultiValues[Index].items[valuenum]; ++valuenum) {
 					int dt = MultiValues[Index].datatype[valuenum];
-					bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD;
+					bool allow_newlines =  dt & DT_ALLOW_NEWLINE, allow_wild = dt & DT_ALLOW_WILD, noreload = dt & DT_NORELOAD;
 					dt &= ~DT_ALLOW_NEWLINE;
 					dt &= ~DT_ALLOW_WILD;
+					dt &= ~DT_NORELOAD;
+					// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
+					if (noreload && !bail)
+						continue;
 					switch (dt) {
 						case DT_NOSPACES: {
 							char item[BUFSIZE];
@@ -1217,7 +1225,6 @@ Directive directives[] = {
     {"HostServAlias", {{PARAM_STRING, 0, &s_HostServAlias},
                        {PARAM_STRING, 0, &desc_HostServAlias}}},
     {"HostSetters", {{PARAM_STRING, PARAM_RELOAD, &HostSetter}}},
-    {"IRCDModule", {{PARAM_STRING, 0, &IRCDModule}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"HelpServName", {{PARAM_STRING, 0, &s_HelpServ},
@@ -1271,8 +1278,6 @@ Directive directives[] = {
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
     {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
-    {"NickServName", {{PARAM_STRING, 0, &s_NickServ},
-                      {PARAM_STRING, 0, &desc_NickServ}}},
     {"NickServAlias", {{PARAM_STRING, 0, &s_NickServAlias},
                        {PARAM_STRING, 0, &desc_NickServAlias}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
@@ -1319,9 +1324,6 @@ Directive directives[] = {
                        {PARAM_STRING, 0, &desc_OperServAlias}}},
     {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
-    {"RemoteServer", {{PARAM_STRING, 0, &RemoteServer},
-                      {PARAM_PORT, 0, &RemotePort},
-                      {PARAM_STRING, 0, &RemotePassword}}},
     {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
                        {PARAM_PORT, 0, &RemotePort2},
                        {PARAM_STRING, 0, &RemotePassword2}}},
@@ -1697,7 +1699,6 @@ int read_config(int reload)
     fclose(config);
 
     if (!reload) {
-        CHECK(RemoteServer);
         CHECK(ServerName);
         CHECK(ServerDesc);
 
@@ -1727,13 +1728,11 @@ int read_config(int reload)
         }
     }
 
-    CHECK(IRCDModule);
     CHECK(EncModule);
 
     CHECK(NetworkName);
     if (!reload) {
         CHEK2(temp_userhost, ServiceUser);
-        CHEK2(s_NickServ, NickServName);
         CHEK2(s_ChanServ, ChanServName);
         CHEK2(s_MemoServ, MemoServName);
         CHEK2(s_HelpServ, HelpServName);

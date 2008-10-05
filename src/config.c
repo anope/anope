@@ -584,8 +584,8 @@ int ServerConfig::Read(bool bail)
 			dt &= ~DT_ALLOW_NEWLINE;
 			dt &= ~DT_ALLOW_WILD;
 			dt &= ~DT_NORELOAD;
-			// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
-			if (noreload && !bail)
+			// If the value is set to not allow reloading and we are reloading (bail will be true), skip the item
+			if (noreload && bail)
 				continue;
 			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
 			ValueItem vi(item);
@@ -665,8 +665,8 @@ int ServerConfig::Read(bool bail)
 					dt &= ~DT_ALLOW_NEWLINE;
 					dt &= ~DT_ALLOW_WILD;
 					dt &= ~DT_NORELOAD;
-					// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
-					if (noreload && !bail)
+					// If the value is set to not allow reloading and we are reloading (bail will be true), skip the item
+					if (noreload && bail)
 						continue;
 					switch (dt) {
 						case DT_NOSPACES: {

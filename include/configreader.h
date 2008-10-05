@@ -161,7 +161,7 @@ typedef ValueContainer<unsigned *> ValueContainerUInt;
 /** A specialization of ValueContainer to hold a pointer to
  * a char array.
  */
-typedef ValueContainer<char *> ValueContainerChar;
+typedef ValueContainer<char **> ValueContainerChar;
 
 /** A specialization of ValueContainer to hold a pointer to
  * an int

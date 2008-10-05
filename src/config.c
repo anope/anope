@@ -513,7 +513,7 @@ int ServerConfig::Read(bool bail)
 		 *
 		 * If you want to create a directive using a character pointer without additional validation (see below for hostnames, fields with no spaces, and IP addresses):
 		 * char *blarg;
-		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_CHARPTR, <validation>},
+		 * {"tag", "value", "", new ValueContainerChar(&blarg), DT_CHARPTR, <validation>},
 		 *
 		 * If you want to create a directive using a string:
 		 * std::string blarg;
@@ -546,12 +546,12 @@ int ServerConfig::Read(bool bail)
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
-		{"uplink", "type", "", new ValueContainerChar(IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"uplink", "host", "", new ValueContainerChar(RemoteServer), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "host", "", new ValueContainerChar(&RemoteServer), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER | DT_NORELOAD, ValidatePort},
-		{"uplink", "password", "", new ValueContainerChar(RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "nick", "NickServ", new ValueContainerChar(s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "password", "", new ValueContainerChar(&RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -595,25 +595,29 @@ int ServerConfig::Read(bool bail)
 				case DT_NOSPACES: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateNoSpaces(vi.GetString(), Values[Index].tag, Values[Index].value);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					char *tmp = vi.GetString();
+					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_HOSTNAME: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateHostname(vi.GetString(), Values[Index].tag, Values[Index].value);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					char *tmp = vi.GetString();
+					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_IPADDRESS: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					ValidateIP(vi.GetString(), Values[Index].tag, Values[Index].value, allow_wild);
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					char *tmp = vi.GetString();
+					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_CHARPTR: {
 					ValueContainerChar *vcc = dynamic_cast<ValueContainerChar *>(Values[Index].val);
 					// Make sure we also copy the null terminator
-					vcc->Set(vi.GetString(), strlen(vi.GetString()) + 1);
+					char *tmp = vi.GetString();
+					vcc->Set(&tmp, strlen(vi.GetString()) + 1);
 				}
 				break;
 				case DT_STRING: {

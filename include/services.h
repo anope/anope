@@ -274,15 +274,6 @@ struct ircdvars_ {
 	const char *helpservmode;			/* Mode used by HelpServ	*/
 	const char *devnullmode;			/* Mode used by Dev/Null	*/
 	const char *globalmode;			/* Mode used by Global		*/
-	const char *nickservaliasmode;		/* Mode used by NickServ Alias	*/
-	const char *chanservaliasmode;		/* Mode used by ChanServ Alias	*/
-	const char *memoservaliasmode;		/* Mode used by MemoServ Alias	*/
-	const char *hostservaliasmode;		/* Mode used by HostServ Alias	*/
-	const char *operservaliasmode;		/* Mode used by OperServ Alias	*/
-	const char *botservaliasmode;			/* Mode used by BotServ	 Alias	*/
-	const char *helpservaliasmode;		/* Mode used by HelpServ Alias	*/
-	const char *devnullvaliasmode;		/* Mode used by Dev/Null Alias	*/
-	const char *globalaliasmode;			/* Mode used by Global	 Alias	*/
 	const char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
 	int max_symbols;			/* Chan Max Symbols		*/
 	const char *modestoremove;			/* Channel Modes to remove	*/

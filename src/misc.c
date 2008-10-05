@@ -883,28 +883,7 @@ int nickIsServices(const char *tempnick, int bot)
         found++;
     else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
         found++;
-    else if (s_DevNull && (stricmp(nick, s_DevNull) == 0))
-        found++;
     else if (s_GlobalNoticer && (stricmp(nick, s_GlobalNoticer) == 0))
-        found++;
-    else if (s_NickServAlias && (stricmp(nick, s_NickServAlias) == 0))
-        found++;
-    else if (s_ChanServAlias && (stricmp(nick, s_ChanServAlias) == 0))
-        found++;
-    else if (s_MemoServAlias && (stricmp(nick, s_MemoServAlias) == 0))
-        found++;
-    else if (s_BotServAlias && (stricmp(nick, s_BotServAlias) == 0))
-        found++;
-    else if (s_HelpServAlias && (stricmp(nick, s_HelpServAlias) == 0))
-        found++;
-    else if (s_OperServAlias && (stricmp(nick, s_OperServAlias) == 0))
-        found++;
-    else if (s_DevNullAlias && (stricmp(nick, s_DevNullAlias) == 0))
-        found++;
-    else if (s_HostServAlias && (stricmp(nick, s_HostServAlias) == 0))
-        found++;
-    else if (s_GlobalNoticerAlias
-             && (stricmp(nick, s_GlobalNoticerAlias) == 0))
         found++;
     else if (s_BotServ && bot) {
         BotInfo *bi;

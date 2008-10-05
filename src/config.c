@@ -59,7 +59,6 @@ char *s_BotServ;
 char *s_HelpServ;
 char *s_OperServ;
 char *s_GlobalNoticer;
-char *s_DevNull;
 char *desc_NickServ;
 char *desc_ChanServ;
 char *desc_MemoServ;
@@ -67,30 +66,10 @@ char *desc_BotServ;
 char *desc_HelpServ;
 char *desc_OperServ;
 char *desc_GlobalNoticer;
-char *desc_DevNull;
 
 char *HostDBName;               /* Name of HostServ DB File */
 char *s_HostServ;               /* HostServ Name */
 char *desc_HostServ;            /* HostServ Description */
-
-char *s_NickServAlias;
-char *s_ChanServAlias;
-char *s_MemoServAlias;
-char *s_BotServAlias;
-char *s_HelpServAlias;
-char *s_OperServAlias;
-char *s_GlobalNoticerAlias;
-char *s_DevNullAlias;
-char *s_HostServAlias;
-char *desc_NickServAlias;
-char *desc_ChanServAlias;
-char *desc_MemoServAlias;
-char *desc_BotServAlias;
-char *desc_HelpServAlias;
-char *desc_OperServAlias;
-char *desc_GlobalNoticerAlias;
-char *desc_DevNullAlias;
-char *desc_HostServAlias;
 
 char *PIDFilename;
 char *MOTDFilename;
@@ -1136,8 +1115,6 @@ Directive directives[] = {
     {"BotServDB", {{PARAM_STRING, PARAM_RELOAD, &BotDBName}}},
     {"BotServName", {{PARAM_STRING, 0, &s_BotServ},
                      {PARAM_STRING, 0, &desc_BotServ}}},
-    {"BotServAlias", {{PARAM_STRING, 0, &s_BotServAlias},
-                      {PARAM_STRING, 0, &desc_BotServAlias}}},
     {"BSBadWordsMax", {{PARAM_POSINT, PARAM_RELOAD, &BSBadWordsMax}}},
     {"BSDefDontKickOps", {{PARAM_SET, PARAM_RELOAD, &BSDefDontKickOps}}},
     {"BSDefDontKickVoices",
@@ -1159,8 +1136,6 @@ Directive directives[] = {
     {"ChanServDB", {{PARAM_STRING, PARAM_RELOAD, &ChanDBName}}},
     {"ChanServName", {{PARAM_STRING, 0, &s_ChanServ},
                       {PARAM_STRING, 0, &desc_ChanServ}}},
-    {"ChanServAlias", {{PARAM_STRING, 0, &s_ChanServAlias},
-                       {PARAM_STRING, 0, &desc_ChanServAlias}}},
     {"CSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAccessMax}}},
     {"CSAutokickMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAutokickMax}}},
     {"CSAutokickReason",
@@ -1189,10 +1164,6 @@ Directive directives[] = {
     {"CSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &CSRestrictGetPass}}},
     {"CSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSOpersOnly}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
-    {"DevNullName", {{PARAM_STRING, 0, &s_DevNull},
-                     {PARAM_STRING, 0, &desc_DevNull}}},
-    {"DevNullAlias", {{PARAM_STRING, 0, &s_DevNullAlias},
-                      {PARAM_STRING, 0, &desc_DevNullAlias}}},
     {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
@@ -1218,20 +1189,14 @@ Directive directives[] = {
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
     {"GlobalName", {{PARAM_STRING, 0, &s_GlobalNoticer},
                     {PARAM_STRING, 0, &desc_GlobalNoticer}}},
-    {"GlobalAlias", {{PARAM_STRING, 0, &s_GlobalNoticerAlias},
-                     {PARAM_STRING, 0, &desc_GlobalNoticerAlias}}},
     {"HelpCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HelpCoreModules}}},
     {"HelpChannel", {{PARAM_STRING, PARAM_RELOAD, &HelpChannel}}},
     {"HostCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HostCoreModules}}},
-    {"HostServAlias", {{PARAM_STRING, 0, &s_HostServAlias},
-                       {PARAM_STRING, 0, &desc_HostServAlias}}},
     {"HostSetters", {{PARAM_STRING, PARAM_RELOAD, &HostSetter}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"HelpServName", {{PARAM_STRING, 0, &s_HelpServ},
                       {PARAM_STRING, 0, &desc_HelpServ}}},
-    {"HelpServAlias", {{PARAM_STRING, 0, &s_HelpServAlias},
-                       {PARAM_STRING, 0, &desc_HelpServAlias}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
     {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
@@ -1249,8 +1214,6 @@ Directive directives[] = {
     {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
     {"MemoServName", {{PARAM_STRING, 0, &s_MemoServ},
                       {PARAM_STRING, 0, &desc_MemoServ}}},
-    {"MemoServAlias", {{PARAM_STRING, 0, &s_MemoServAlias},
-                       {PARAM_STRING, 0, &desc_MemoServAlias}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
     {"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},
@@ -1279,8 +1242,6 @@ Directive directives[] = {
     {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
     {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
-    {"NickServAlias", {{PARAM_STRING, 0, &s_NickServAlias},
-                       {PARAM_STRING, 0, &desc_NickServAlias}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
     {"NSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &NSAccessMax}}},
     {"NSAllowKillImmed", {{PARAM_SET, 0, &NSAllowKillImmed}}},
@@ -1321,8 +1282,6 @@ Directive directives[] = {
     {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
     {"OperServName", {{PARAM_STRING, 0, &s_OperServ},
                       {PARAM_STRING, 0, &desc_OperServ}}},
-    {"OperServAlias", {{PARAM_STRING, 0, &s_OperServAlias},
-                       {PARAM_STRING, 0, &desc_OperServAlias}}},
     {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
     {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
@@ -1742,55 +1701,6 @@ int read_config(int reload)
         CHEK2(PIDFilename, PIDFile);
     }
 
-    if (s_ChanServAlias) {
-        if (!stricmp(s_ChanServ, s_ChanServAlias)) {
-            printf
-                ("\n*** ChanServ and ChanServ Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-    if (s_NickServAlias) {
-        if (!stricmp(s_NickServ, s_NickServAlias)) {
-            printf
-                ("\n*** NickServ and NickServ Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-    if (s_OperServAlias) {
-        if (!stricmp(s_OperServ, s_OperServAlias)) {
-            printf
-                ("\n*** OperServ and OperServ Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-    if (s_MemoServAlias) {
-        if (!stricmp(s_MemoServ, s_MemoServAlias)) {
-            printf
-                ("\n*** MemoServ and MemoServ Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-    if (s_HelpServAlias) {
-        if (!stricmp(s_HelpServ, s_HelpServAlias)) {
-            printf
-                ("\n*** HelpServ and HelpServ Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-    if (s_GlobalNoticerAlias) {
-        if (!stricmp(s_GlobalNoticer, s_GlobalNoticerAlias)) {
-            printf
-                ("\n*** GlobalNoticer and GlobalNoticer Alias are the same, this will cause errors\n");
-            retval = 0;
-        }
-    }
-
-
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
         CHEK2(NickDBName, NickServDB);
@@ -2071,13 +1981,6 @@ int read_config(int reload)
         CHECK(BSBadWordsMax);
         CHECK(BSMinUsers);
         CHECK(BSKeepData);
-        if (s_BotServAlias) {
-            if (!stricmp(s_BotServ, s_BotServAlias)) {
-                printf
-                    ("\n*** BotServ and BotServ Alias are the same, this will cause errors\n");
-                retval = 0;
-            }
-        }
         if (!BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");
         if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
@@ -2091,14 +1994,6 @@ int read_config(int reload)
     if (s_HostServ) {
         CHEK2(s_HostServ, HostServName);
         CHEK2(HostDBName, HostServDB);
-
-        if (s_HostServAlias) {
-            if (!stricmp(s_HostServ, s_HostServAlias)) {
-                printf
-                    ("\n*** HostServ and HostServ Alias are the same, this will cause errors\n");
-                retval = 0;
-            }
-        }
     }
 
     if (UseMail) {

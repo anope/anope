@@ -59,15 +59,6 @@ IRCDVar myIrcd[] = {
      "+oiS",                     /* helpserv mode */
      "+oiS",                     /* Dev/Null mode */
      "+oiS",                     /* Global mode   */
-     "+oiS",                     /* nickserv alias mode */
-     "+oiS",                     /* chanserv alias mode */
-     "+oiS",                     /* memoserv alias mode */
-     "+oiS",                     /* hostserv alias mode */
-     "+oaiS",                    /* operserv alias mode */
-     "+oiS",                     /* botserv alias mode  */
-     "+oiS",                     /* helpserv alias mode */
-     "+oiS",                     /* Dev/Null alias mode */
-     "+oiS",                     /* Global alias mode   */
      "+oiS",                     /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */
      "-cilmnpstrgzQF",          /* Modes to Remove */

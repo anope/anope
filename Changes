@@ -1,4 +1,4 @@
-Anope Version  S V N
+Anope Version 1.7.23
 --------------------
 10/01 A Added modular database back-end for IGNORE.                       [#948]
 09/18 R Removed password truncating.                                      [ #00]

@@ -73,7 +73,7 @@ char *rdb_quote(char *str)
  * update, all rows with active still 0 will be deleted; this is done to
  * easily delete old entries from the database.
  */
-int rdb_tag_table(char *table)
+int rdb_tag_table(const char* table)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("UPDATE %s SET active = 0", table);
@@ -84,7 +84,7 @@ int rdb_tag_table(char *table)
 }
 
 /* Be sure to quote all user input in the clause! */
-int rdb_tag_table_where(char *table, char *clause)
+int rdb_tag_table_where(const char* table, const char* clause)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("UPDATE %s SET active = 0 WHERE %s", table,
@@ -98,7 +98,7 @@ int rdb_tag_table_where(char *table, char *clause)
 /*************************************************************************/
 
 /* Empty an entire database table */
-int rdb_empty_table(char *table)
+int rdb_empty_table(const char* table)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("TRUNCATE TABLE %s", table);
@@ -111,7 +111,7 @@ int rdb_empty_table(char *table)
 /*************************************************************************/
 
 /* Clean up a table with 'dirty' records (active = 0) */
-int rdb_clean_table(char *table)
+int rdb_clean_table(const char* table)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("DELETE FROM %s WHERE active = 0", table);
@@ -121,7 +121,7 @@ int rdb_clean_table(char *table)
 }
 
 /* Be sure to quote user input in the clause! */
-int rdb_clean_table_where(char *table, char *clause)
+int rdb_clean_table_where(const char* table, const char* clause)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("DELETE FROM %s WHERE active = 0 AND (%s)", table,
@@ -136,7 +136,7 @@ int rdb_clean_table_where(char *table, char *clause)
 /* Delete specific records from a table. The clause is MySQL syntax, and
  * should be all quoted up nicely in the calling code.
  */
-int rdb_scrub_table(char *table, char *clause)
+int rdb_scrub_table(const char* table, const char* clause)
 {
 #ifdef USE_MYSQL
     return db_mysql_try("DELETE FROM %s WHERE %s", table, clause);

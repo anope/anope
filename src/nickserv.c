@@ -492,10 +492,8 @@ void load_ns_dbase(void)
             if (ver < 14) {
                 SAFE(read_string(&pass, f));
                 if (pass) {
-                    len = strlen(pass);
-                    enc_encrypt(pass, len, nc->pass, PASSMAX);
-                    memset(pass, 0, len);
-                    free(pass);
+                    memset(nc->pass, 0, PASSMAX);
+                    memcpy(nc->pass, pass, strlen(pass));
                 } else
                     memset(nc->pass, 0, PASSMAX);
             } else

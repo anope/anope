@@ -1,3 +1,10 @@
+Anope Version SVN
+--------------------
+
+Anope Version 1.7.23b
+--------------------
+10/06 F Fixed issue with encrypted nick databases                         [ #00]
+
 Anope Version 1.7.23
 --------------------
 10/01 A Added modular database back-end for IGNORE.                       [#948]

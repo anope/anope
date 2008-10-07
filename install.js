@@ -147,11 +147,11 @@ var buildPackages = [
                                                         'name' : 'Microsoft Visual Studio .NET 2003',
                                                         'libpaths' : [
                                                                                 'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Lib',
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\PlatformSDK\\Lib'
+                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\PlatformSDK\\Lib'
                                                                          ],
                                                         'incpaths' : [
                                                                                 'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Include',
-                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\PlatformSDK\\Include'
+                                                                                'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\PlatformSDK\\Include'
                                                                          ],
                                                         'nmake' : [
                                                                                 'Program Files\\Microsoft Visual Studio .NET 2003\\VC7\\Bin',
@@ -368,7 +368,7 @@ var buildPackages = [
                 f.WriteLine("CC=cl");
                 f.WriteLine("RC=rc");
                 f.WriteLine("MAKE=nmake -f Makefile.win32");
-                f.WriteLine("BASE_CFLAGS=$(VC6) /O2 /MD $(INCFLAGS)");
+                f.WriteLine("BASE_CFLAGS=$(VC6) /O2 /MD /TP /EHsc $(INCFLAGS)");
                 f.WriteLine("RC_FLAGS="+path_line_rc);
                 f.WriteLine("LIBS=wsock32.lib advapi32.lib /NODEFAULTLIB:libcmtd.lib");
                 f.WriteLine("LFLAGS=$(LIBPATH)");               

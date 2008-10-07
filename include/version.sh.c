@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <cstdlib>
+#include <cctype>
 
 #define CTRL "version.log"
 
@@ -46,10 +48,10 @@ int main()
     load_ctrl(fd);
     fclose(fd);
 
-    _snprintf(version, 1024, "%d.%d.%d%s (%d)", version_major, version_minor,
+    _snprintf(version, 1024, "%ld.%ld.%ld%s (%ld)", version_major, version_minor,
               version_patch, (version_extra ? version_extra : ""), version_build);
 
-    _snprintf(version_dotted, 1024, "%d.%d.%d%s.%d", version_major, version_minor,
+    _snprintf(version_dotted, 1024, "%ld.%ld.%ld%s.%ld", version_major, version_minor,
               version_patch, (version_extra ? version_extra : ""), version_build);
 
     fd = fopen("version.h", "r");
@@ -106,7 +108,11 @@ char *strip(char *str)
 
 long get_value(char *string)
 {
-    return atol(get_value_str(string));
+	// XXX : if the fields in version.log are empty strtok returns a double quote, dont try to atol it then
+	if (*string != '"')
+	    return atol(get_value_str(string));
+	else
+		return 0;
 }
 
 char *get_value_str(char *string)
@@ -165,10 +171,12 @@ void write_version(FILE * fd)
         strip(buf);
 
         if (until_eof)
+        {
             if (!strcmp(buf, "EOF"))
                 break;
             else
                 parse_line(fd, buf);
+        }
 
         if (!strcmp(buf, "cat >version.h <<EOF"))
             until_eof = 1;
@@ -197,18 +205,18 @@ void parse_line(FILE * fd, char *line)
 
                 *var = 0;
                 if (!strcmp(varbegin, "VERSION_MAJOR"))
-                    fprintf(fd, "%d", version_major);
+                    fprintf(fd, "%ld", version_major);
                 else if (!strcmp(varbegin, "VERSION_MINOR"))
-                    fprintf(fd, "%d", version_minor);
+                    fprintf(fd, "%ld", version_minor);
                 else if (!strcmp(varbegin, "VERSION_PATCH"))
-                    fprintf(fd, "%d", version_patch);
+                    fprintf(fd, "%ld", version_patch);
                 else if (!strcmp(varbegin, "VERSION_EXTRA")) {
                     if (version_extra)
                         fprintf(fd, "%s", version_extra);
                 } else if (!strcmp(varbegin, "VERSION_BUILD"))
-                    fprintf(fd, "%d", version_build);
+                    fprintf(fd, "%ld", version_build);
                 else if (!strcmp(varbegin, "BUILD"))
-                    fprintf(fd, "%d", build);
+                    fprintf(fd, "%ld", build);
                 else if (!strcmp(varbegin, "VERSION"))
                     fprintf(fd, "%s", version);
                 else if (!strcmp(varbegin, "VERSIONDOTTED"))

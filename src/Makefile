@@ -36,7 +36,7 @@ distclean: spotless
 distclean_modules: clean_modules spotless
 
 services:  $(OBJS) mod_version
-	$(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
+	@../run-cc.pl $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
 
 $(OBJS): Makefile
 actions.o:      actions.c   $(INCLUDES)
@@ -80,35 +80,39 @@ mysql.o:        mysql.c     $(INCLUDES)
 rdb.o:          rdb.c       $(INCLUDES)
 
 mod_version:	mod_version.c	$(INCLUDES)
-	$(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
-
+	@../run-cc.pl $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
 
 modules: DUMMY
-	(cd modules ; ./configure ; ${MAKE} ${MAKEARGS} all)
+	@modules/configure modules
+	@${MAKE} -C modules ${MAKEARGS} all
 
 protocols: DUMMY
-	(cd protocol ; ./configure ; ${MAKE} ${MAKEARGS} all)
+	@protocol/configure protocol
+	@${MAKE} -C protocol ${MAKEARGS} all
+
 core: DUMMY
-	(cd core ; ./configure ; ${MAKE} ${MAKEARGS} all)
+	@core/configure core
+	@${MAKE} -C core ${MAKEARGS} all
 
 clean: clean_modules clean_protocols clean_core
 	rm -f *.o services a.out
+
 clean_modules:
 	@touch modules/Makefile.inc # Horribly ugly...
-	(cd modules ; ${MAKE} clean)
+	@${MAKE} -C modules clean
 
 clean_protocols:
 	@touch protocol/Makefile.inc
-	(cd protocol ; ${MAKE} clean)
+	@${MAKE} -C protocol clean
 
 clean_core:
 	@touch core/Makefile.inc
-	(cd core ; ${MAKE} clean)
+	@${MAKE} -C core clean
 
 spotless:
-	(cd modules ; ${MAKE} distclean)
-	(cd protocol ; ${MAKE} distclean)
-	(cd core ; ${MAKE} distclean)
+	@${MAKE} -C modules distclean
+	@${MAKE} -C protocol distclean
+	@${MAKE} -C core distclean
 
 install: services
 	test -d ${BINDEST} || mkdir ${BINDEST}

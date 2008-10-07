@@ -461,8 +461,8 @@ void sighandler(int signum)
             default:
                 snprintf(buf, sizeof(buf), "waiting=%d", waiting);
             }
-            ircdproto->SendGlobops(NULL, "PANIC! %s (%s)", buf, strsignal(signum));
-            alog("PANIC! %s (%s)", buf, strsignal(signum));
+            ircdproto->SendGlobops(NULL, "PANIC! %s (caught signal %d)", buf, signum);
+            alog("PANIC! %s (caught signal %d)", buf, signum);
             modules_unload_all(false, true);
         }
     }
@@ -474,13 +474,7 @@ void sighandler(int signum)
            !(quitmsg = (const char *)calloc(BUFSIZE, 1))) {
         quitmsg = "Out of memory!";
     } else {
-
-	// Yes, this isn't the "nicest" of ideas, but we know it's safe, if bad practice. -- w00t
-#if HAVE_STRSIGNAL
-        snprintf((char *)quitmsg, BUFSIZE, "Services terminating: %s", strsignal(signum));
-#else
         snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
-#endif
     }
 
     if (signum == SIGSEGV) {

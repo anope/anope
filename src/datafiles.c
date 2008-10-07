@@ -329,7 +329,7 @@ void restore_db(dbFILE * f)
         }
         if (!ok && f->backupfp) {
             char buf[1024];
-            int i;
+            unsigned int i;
             ok = 1;
             if (fseek(f->fp, 0, SEEK_SET) < 0)
                 ok = 0;

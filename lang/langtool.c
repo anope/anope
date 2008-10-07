@@ -14,6 +14,8 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <cstdlib>
+#include <cctype>
 
 char *strip(char *str)
 {

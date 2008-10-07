@@ -61,3 +61,7 @@ anopeng-uid branch TODO
  - chan_set_modes should take BotInfo, possibly with override for User *?
 - SendClientIntroduction should take a UID param, rather than generating one(?)
 
+
+anopeng-config branch TODO
+
+- remove old config, replace with insp-inspired (albeit bind format) config

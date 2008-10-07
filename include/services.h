@@ -23,12 +23,6 @@
 #define MAX_CMD_HASH 1024
 #endif
 
-/* Some Linux boxes (or maybe glibc includes) require this for the
- * prototype of strsignal(). */
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE
-#endif
-
 /* Some SUN fixs */
 #ifdef __sun
 /* Solaris specific code, types that do not exist in Solaris'

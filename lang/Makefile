@@ -44,39 +44,39 @@ spotless: clean
 
 
 cat:      cat.l      langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 de:       de.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 en_us:    en_us.l    langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 es:       es.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 fr:       fr.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 gr:       gr.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 hun:      hun.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 it:       it.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 nl:       nl.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 pl:       pl.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 pt:       pt.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 ru:       ru.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 tr:       tr.l       langcomp index
-	./langcomp $@.l
+	@./langcomp $@.l
 
 langcomp: langcomp.c
-	$(CC) $(CFLAGS) langcomp.c -o $@
+	@../run-cc.pl $(CC) $(CFLAGS) langcomp.c -o $@
 
 
 language.h: index Makefile
 	@perl -e <index >$@ 'print STDERR "Generating language.h... "; $$i=0; while (<>) { chop; printf "#define %-32s %d\n", $$_, $$i++; } print "\n#define NUM_STRINGS $$i\n"; print STDERR "$$i strings\n";'
-	cp language.h ../include
+	@cp language.h ../include
 
 index: en_us.l
-	grep '^[A-Z]' en_us.l >index
+	@grep '^[A-Z]' en_us.l >index

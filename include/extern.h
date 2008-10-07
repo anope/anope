@@ -213,14 +213,6 @@ E char *get_mlock_modes(ChannelInfo * ci, int complete);
 
 /**** compat.c ****/
 
-#if !HAVE_SNPRINTF
-# if BAD_SNPRINTF
-#  define snprintf my_snprintf
-# endif
-# define vsnprintf my_vsnprintf
-E int vsnprintf(char *buf, size_t size, const char *fmt, va_list args);
-E int snprintf(char *buf, size_t size, const char *fmt, ...);
-#endif
 #if !HAVE_STRICMP && !HAVE_STRCASECMP
 E int stricmp(const char *s1, const char *s2);
 E int strnicmp(const char *s1, const char *s2, size_t len);
@@ -230,12 +222,6 @@ E char *strdup(const char *s);
 #endif
 #if !HAVE_STRSPN
 E size_t strspn(const char *s, const char *accept);
-#endif
-#if !HAVE_STRERROR
-E char *strerror(int errnum);
-#endif
-#if !HAVE_STRSIGNAL
-char *strsignal(int signum);
 #endif
 #ifdef _WIN32
 char *sockstrerror(int error);

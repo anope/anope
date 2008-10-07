@@ -188,7 +188,7 @@ int main(int ac, char **av)
     s = strrchr(filename, '.');
     if (!s)
 	s = filename + strlen(filename);
-    if (s-filename > sizeof(langname)-3)
+    if (s-filename > (int)sizeof(langname)-3)
 	s = filename + sizeof(langname)-1;
     strncpy(langname, filename, s-filename);
     langname[s-filename] = '\0';

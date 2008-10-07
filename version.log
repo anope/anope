@@ -13,6 +13,22 @@ VERSION_BUILD=""
 
 # $Log$
 #
+# BUILD : 1.7.23 (1471)
+# BUGS  : 
+# NOTES : Development Framework 
+#
+# BUILD : 1.7.23 (1469)
+# BUGS  : 
+# NOTES : 1.7.23b Release (fixes encrypted nick.db issue on .23)
+#
+# BUILD : 1.7.23 (1468)
+# BUGS  : 
+# NOTES : Fixed fuckup in nickserv.c. Passwords should not be encrypted when loading an old nick.db, only when loading pre-nick.db. 
+#
+# BUILD : 1.7.23 (1467)
+# BUGS  : 
+# NOTES : Development Framework 
+#
 # BUILD : 1.7.23 (1465)
 # BUGS  : 
 # NOTES : Anope 1.7.23 Release

@@ -1,5 +1,11 @@
 #!/bin/sh
 
+oldpath=`pwd`
+
+if [ $1 ]; then
+	cd $1
+fi
+
 echo2 () {
     $ECHO2 "$*$ECHO2SUF"    # these are defined later
 }
@@ -49,5 +55,6 @@ do
 	fi
 done
 
-exit 0
+cd $oldpath
 
+exit 0

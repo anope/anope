@@ -586,6 +586,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
+		{"chanserv", "accessmax", "0", new ValueContainerInt(&CSAccessMax), DT_INTEGER, ValidateNotZero},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1187,7 +1188,6 @@ Directive directives[] = {
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
-    {"CSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAccessMax}}},
     {"CSAutokickMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAutokickMax}}},
     {"CSAutokickReason",
      {{PARAM_STRING, PARAM_RELOAD, &CSAutokickReason}}},
@@ -1693,7 +1693,6 @@ int read_config(int reload)
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-    CHECK(CSAccessMax);
     CHECK(CSAutokickMax);
     CHECK(CSAutokickReason);
     CHECK(CSInhabit);

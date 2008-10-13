@@ -154,7 +154,7 @@ time_t CSInhabit;
 bool CSListOpersOnly;
 int CSListMax;
 bool CSRestrictGetPass;
-int CSOpersOnly;
+bool CSOpersOnly;
 
 int MSMaxMemos;
 int MSSendDelay;
@@ -593,6 +593,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "listopersonly", "no", new ValueContainerBool(&CSListOpersOnly), DT_BOOLEAN, NoValidation},
 		{"chanserv", "listmax", "0", new ValueContainerInt(&CSListMax), DT_INTEGER, ValidateNotZero},
 		{"chanserv", "restrictgetpass", "no", new ValueContainerBool(&CSRestrictGetPass), DT_BOOLEAN, NoValidation},
+		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1194,7 +1195,6 @@ Directive directives[] = {
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
-    {"CSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSOpersOnly}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
     {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
     {"DontQuoteAddresses",

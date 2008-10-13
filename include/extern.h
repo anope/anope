@@ -352,7 +352,7 @@ E time_t CSInhabit;
 E bool  CSListOpersOnly;
 E int   CSListMax;
 E bool  CSRestrictGetPass;
-E int   CSOpersOnly;
+E bool  CSOpersOnly;
 
 E int   MSMaxMemos;
 E int   MSSendDelay;

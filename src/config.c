@@ -151,7 +151,7 @@ int CSAccessMax;
 int CSAutokickMax;
 char *CSAutokickReason;
 time_t CSInhabit;
-int CSListOpersOnly;
+bool CSListOpersOnly;
 int CSListMax;
 int CSRestrictGetPass;
 int CSOpersOnly;
@@ -590,6 +590,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "autokickmax", "0", new ValueContainerInt(&CSAutokickMax), DT_INTEGER, ValidateNotZero},
 		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerChar(&CSAutokickReason), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "inhabit", "0", new ValueContainerTime(&CSInhabit), DT_TIME, ValidateNotZero},
+		{"chanserv", "listopersonly", "no", new ValueContainerBool(&CSListOpersOnly), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1192,7 +1193,6 @@ Directive directives[] = {
                       {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
-    {"CSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSListOpersOnly}}},
     {"CSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &CSRestrictGetPass}}},
     {"CSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSOpersOnly}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},

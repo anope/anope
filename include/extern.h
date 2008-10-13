@@ -349,7 +349,7 @@ E int   CSAccessMax;
 E int   CSAutokickMax;
 E char *CSAutokickReason;
 E time_t CSInhabit;
-E int   CSListOpersOnly;
+E bool  CSListOpersOnly;
 E int   CSListMax;
 E int   CSRestrictGetPass;
 E int   CSOpersOnly;

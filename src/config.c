@@ -576,6 +576,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_BOOLEAN, NoValidation},
+		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1186,7 +1187,6 @@ Directive directives[] = {
     {"CSInhabit", {{PARAM_TIME, PARAM_RELOAD, &CSInhabit}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
     {"CSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSListOpersOnly}}},
-    {"CSMaxReg", {{PARAM_POSINT, 0, &CSMaxReg}}},
     {"CSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &CSRestrictGetPass}}},
     {"CSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSOpersOnly}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},

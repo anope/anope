@@ -476,6 +476,13 @@ bool ValidateGuestPrefix(ServerConfig *conf, const char *tag, const char *value,
 	return true;
 }
 
+bool ValidateBantype(ServerConfig *, const char *, const char *, ValueItem &data)
+{
+	int bantype = data.GetInteger();
+	if (bantype < 0 || bantype > 3) throw ConfigException("The value for <chanserv:defbantype> must be between 0 and 3!");
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -578,6 +585,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_BOOLEAN, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
+		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1183,7 +1191,6 @@ Directive directives[] = {
     {"CSAutokickMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAutokickMax}}},
     {"CSAutokickReason",
      {{PARAM_STRING, PARAM_RELOAD, &CSAutokickReason}}},
-    {"CSDefBantype", {{PARAM_INT, PARAM_RELOAD, &CSDefBantype}}},
     {"CSInhabit", {{PARAM_TIME, PARAM_RELOAD, &CSInhabit}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
     {"CSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSListOpersOnly}}},

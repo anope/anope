@@ -586,6 +586,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1187,7 +1188,6 @@ Directive directives[] = {
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
-    {"ChanServDB", {{PARAM_STRING, PARAM_RELOAD, &ChanDBName}}},
     {"CSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAccessMax}}},
     {"CSAutokickMax", {{PARAM_POSINT, PARAM_RELOAD, &CSAutokickMax}}},
     {"CSAutokickReason",
@@ -1703,7 +1703,6 @@ int read_config(int reload)
 
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
-        CHEK2(ChanDBName, ChanServDB);
         CHEK2(OperDBName, OperServDB);
         CHEK2(NewsDBName, NewsDB);
         CHEK2(ExceptionDBName, ExceptionDB);

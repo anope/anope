@@ -142,19 +142,7 @@ bool NSRestrictGetPass;
 bool NSNickTracking;
 bool NSAddAccessOnReg;
 
-int CSDefNone;
-int CSDefKeepTopic;
-int CSDefOpNotice;
-int CSDefPeace;
-int CSDefPrivate;
-int CSDefRestricted;
-int CSDefSecure;
-int CSDefSecureOps;
-int CSDefSecureFounder;
-int CSDefSignKick;
-int CSDefSignKickLevel;
-int CSDefTopicLock;
-int CSDefXOP;
+static std::string CSDefaults;
 int CSDefFlags;
 int CSMaxReg;
 int CSExpire;
@@ -587,6 +575,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1193,21 +1182,6 @@ Directive directives[] = {
     {"CSAutokickReason",
      {{PARAM_STRING, PARAM_RELOAD, &CSAutokickReason}}},
     {"CSDefBantype", {{PARAM_INT, PARAM_RELOAD, &CSDefBantype}}},
-    {"CSDefNone", {{PARAM_SET, PARAM_RELOAD, &CSDefNone}}},
-    {"CSDefKeepTopic", {{PARAM_SET, PARAM_RELOAD, &CSDefKeepTopic}}},
-    {"CSDefOpNotice", {{PARAM_SET, PARAM_RELOAD, &CSDefOpNotice}}},
-    {"CSDefPeace", {{PARAM_SET, PARAM_RELOAD, &CSDefPeace}}},
-    {"CSDefPrivate", {{PARAM_SET, PARAM_RELOAD, &CSDefPrivate}}},
-    {"CSDefRestricted", {{PARAM_SET, PARAM_RELOAD, &CSDefRestricted}}},
-    {"CSDefSecure", {{PARAM_SET, PARAM_RELOAD, &CSDefSecure}}},
-    {"CSDefSecureOps", {{PARAM_SET, PARAM_RELOAD, &CSDefSecureOps}}},
-    {"CSDefSecureFounder",
-     {{PARAM_SET, PARAM_RELOAD, &CSDefSecureFounder}}},
-    {"CSDefSignKick", {{PARAM_SET, PARAM_RELOAD, &CSDefSignKick}}},
-    {"CSDefSignKickLevel",
-     {{PARAM_SET, PARAM_RELOAD, &CSDefSignKickLevel}}},
-    {"CSDefTopicLock", {{PARAM_SET, PARAM_RELOAD, &CSDefTopicLock}}},
-    {"CSDefXOP", {{PARAM_SET, PARAM_RELOAD, &CSDefXOP}}},
     {"CSExpire", {{PARAM_TIME, PARAM_RELOAD, &CSExpire}}},
     {"CSInhabit", {{PARAM_TIME, PARAM_RELOAD, &CSInhabit}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
@@ -1749,30 +1723,30 @@ int read_config(int reload)
         }
     }
 
-		NSDefFlags = 0;
-		if (NSDefaults.empty()) NSDefFlags = NI_SECURE | NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
-		else if (NSDefaults != "none") {
-			bool hadAutoop = false;
-			spacesepstream options(NSDefaults);
-			std::string option;
-			while (options.GetToken(option)) {
-				if (option == "kill") NSDefFlags |= NI_KILLPROTECT;
-				else if (option == "killquick") NSDefFlags |= NI_KILL_QUICK;
-				else if (option == "secure") NSDefFlags |= NI_SECURE;
-				else if (option == "private") NSDefFlags |= NI_PRIVATE;
-				else if (option == "msg") {
-					if (!UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
-					else NSDefFlags |= NI_MSG;
-				}
-				else if (option == "hideemail") NSDefFlags |= NI_HIDE_EMAIL;
-				else if (option == "hideusermask") NSDefFlags |= NI_HIDE_MASK;
-				else if (option == "hidequit") NSDefFlags |= NI_HIDE_QUIT;
-				else if (option == "memosignon") NSDefFlags |= NI_MEMO_SIGNON;
-				else if (option == "memoreceive") NSDefFlags |= NI_MEMO_RECEIVE;
-				else if (option == "autoop") hadAutoop = true;
+	NSDefFlags = 0;
+	if (NSDefaults.empty()) NSDefFlags = NI_SECURE | NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+	else if (NSDefaults != "none") {
+		bool hadAutoop = false;
+		spacesepstream options(NSDefaults);
+		std::string option;
+		while (options.GetToken(option)) {
+			if (option == "kill") NSDefFlags |= NI_KILLPROTECT;
+			else if (option == "killquick") NSDefFlags |= NI_KILL_QUICK;
+			else if (option == "secure") NSDefFlags |= NI_SECURE;
+			else if (option == "private") NSDefFlags |= NI_PRIVATE;
+			else if (option == "msg") {
+				if (!UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
+				else NSDefFlags |= NI_MSG;
 			}
-			if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
+			else if (option == "hideemail") NSDefFlags |= NI_HIDE_EMAIL;
+			else if (option == "hideusermask") NSDefFlags |= NI_HIDE_MASK;
+			else if (option == "hidequit") NSDefFlags |= NI_HIDE_QUIT;
+			else if (option == "memosignon") NSDefFlags |= NI_MEMO_SIGNON;
+			else if (option == "memoreceive") NSDefFlags |= NI_MEMO_RECEIVE;
+			else if (option == "autoop") hadAutoop = true;
 		}
+		if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
+	}
 
     if (!ServicesRoot) {
         error(0,
@@ -1809,48 +1783,26 @@ int read_config(int reload)
         MysqlRetryGap = 1;
     }
 
-    if (!CSDefNone &&
-        !CSDefKeepTopic &&
-        !CSDefTopicLock &&
-        !CSDefPrivate &&
-        !CSDefRestricted &&
-        !CSDefSecure &&
-        !CSDefSecureOps &&
-        !CSDefSecureFounder &&
-        !CSDefSignKick && !CSDefSignKickLevel && !CSDefOpNotice) {
-        CSDefKeepTopic = 1;
-        CSDefSecure = 1;
-        CSDefSecureFounder = 1;
-        CSDefSignKick = 1;
-    }
-
-    CSDefFlags = 0;
-    if (!CSDefNone) {
-        if (CSDefKeepTopic)
-            CSDefFlags |= CI_KEEPTOPIC;
-        if (CSDefTopicLock)
-            CSDefFlags |= CI_TOPICLOCK;
-        if (CSDefPrivate)
-            CSDefFlags |= CI_PRIVATE;
-        if (CSDefRestricted)
-            CSDefFlags |= CI_RESTRICTED;
-        if (CSDefSecure)
-            CSDefFlags |= CI_SECURE;
-        if (CSDefSecureOps)
-            CSDefFlags |= CI_SECUREOPS;
-        if (CSDefSecureFounder)
-            CSDefFlags |= CI_SECUREFOUNDER;
-        if (CSDefSignKick)
-            CSDefFlags |= CI_SIGNKICK;
-        if (CSDefSignKickLevel)
-            CSDefFlags |= CI_SIGNKICK_LEVEL;
-        if (CSDefOpNotice)
-            CSDefFlags |= CI_OPNOTICE;
-        if (CSDefXOP)
-            CSDefFlags |= CI_XOP;
-        if (CSDefPeace)
-            CSDefFlags |= CI_PEACE;
-    }
+	CSDefFlags = 0;
+	if (CSDefaults.empty()) CSDefFlags = CI_KEEPTOPIC | CI_SECURE | CI_SECUREFOUNDER | CI_SIGNKICK;
+	else if (CSDefaults != "none") {
+		spacesepstream options(CSDefaults);
+		std::string option;
+		while (options.GetToken(option)) {
+			if (option == "keeptopic") CSDefFlags |= CI_KEEPTOPIC;
+			else if (option == "topiclock") CSDefFlags |= CI_TOPICLOCK;
+			else if (option == "private") CSDefFlags |= CI_PRIVATE;
+			else if (option == "restricted") CSDefFlags |= CI_RESTRICTED;
+			else if (option == "secure") CSDefFlags |= CI_SECURE;
+			else if (option == "secureops") CSDefFlags |= CI_SECUREOPS;
+			else if (option == "securefounder") CSDefFlags |= CI_SECUREFOUNDER;
+			else if (option == "signkick") CSDefFlags |= CI_SIGNKICK;
+			else if (option == "signkicklevel") CSDefFlags |= CI_SIGNKICK_LEVEL;
+			else if (option == "opnotice") CSDefFlags |= CI_OPNOTICE;
+			else if (option == "xop") CSDefFlags |= CI_XOP;
+			else if (option == "peace") CSDefFlags |= CI_PEACE;
+		}
+	}
 
     BSDefFlags = 0;
     if (BSDefDontKickOps)

@@ -343,7 +343,7 @@ E bool  NSAddAccessOnReg;
 
 E int   CSDefFlags;
 E int   CSMaxReg;
-E int   CSExpire;
+E time_t CSExpire;
 E int   CSDefBantype;
 E int   CSAccessMax;
 E int   CSAutokickMax;

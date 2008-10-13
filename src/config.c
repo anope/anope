@@ -145,7 +145,7 @@ bool NSAddAccessOnReg;
 static std::string CSDefaults;
 int CSDefFlags;
 int CSMaxReg;
-int CSExpire;
+time_t CSExpire;
 int CSDefBantype;
 int CSAccessMax;
 int CSAutokickMax;
@@ -555,7 +555,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "defaultlanguage", "0", new ValueContainerInt(&NSDefLanguage), DT_INTEGER, ValidateLanguage},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&NSRegDelay), DT_TIME, NoValidation},
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&NSResendDelay), DT_TIME, NoValidation},
-		{"nickserv", "expire", "21d", new ValueContainerTime(&NSExpire), DT_TIME, ValidateNotZero},
+		{"nickserv", "expire", "21d", new ValueContainerTime(&NSExpire), DT_TIME, NoValidation},
 		{"nickserv", "preregexpire", "0", new ValueContainerTime(&NSRExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerInt(&NSMaxAliases), DT_INTEGER, NoValidation},
 		{"nickserv", "accessmax", "0", new ValueContainerInt(&NSAccessMax), DT_INTEGER, ValidateNotZero},
@@ -577,6 +577,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_BOOLEAN, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
+		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1183,7 +1184,6 @@ Directive directives[] = {
     {"CSAutokickReason",
      {{PARAM_STRING, PARAM_RELOAD, &CSAutokickReason}}},
     {"CSDefBantype", {{PARAM_INT, PARAM_RELOAD, &CSDefBantype}}},
-    {"CSExpire", {{PARAM_TIME, PARAM_RELOAD, &CSExpire}}},
     {"CSInhabit", {{PARAM_TIME, PARAM_RELOAD, &CSInhabit}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
     {"CSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSListOpersOnly}}},

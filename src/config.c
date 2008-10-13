@@ -588,6 +588,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
 		{"chanserv", "accessmax", "0", new ValueContainerInt(&CSAccessMax), DT_INTEGER, ValidateNotZero},
 		{"chanserv", "autokickmax", "0", new ValueContainerInt(&CSAutokickMax), DT_INTEGER, ValidateNotZero},
+		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerChar(&CSAutokickReason), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1189,8 +1190,6 @@ Directive directives[] = {
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
-    {"CSAutokickReason",
-     {{PARAM_STRING, PARAM_RELOAD, &CSAutokickReason}}},
     {"CSInhabit", {{PARAM_TIME, PARAM_RELOAD, &CSInhabit}}},
     {"CSListMax", {{PARAM_POSINT, PARAM_RELOAD, &CSListMax}}},
     {"CSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &CSListOpersOnly}}},
@@ -1693,7 +1692,6 @@ int read_config(int reload)
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-    CHECK(CSAutokickReason);
     CHECK(CSInhabit);
     CHECK(CSListMax);
     CHECK(ServicesRoot);

@@ -87,7 +87,6 @@ BASE_CFLAGS=/D USE_ENCRYPTION /D ENCRYPT_MD5 $(BASE_CFLAGS)
 # Compilation options:
 #        -DCLEAN_COMPILE         Attempt to compile without any warnings (note that
 #                            this may reduce performance)
-#        -DSTREAMLINED    Leave out "fancy" options to enhance performance
 
 CDEFS =
 

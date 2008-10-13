@@ -18,8 +18,6 @@ typedef unsigned __int8 u_int8_t;
 
 #define HAVE_STRICMP		1
 #define HAVE_STRCASECMP		0
-#define HAVE_STRDUP		1
-#define HAVE_STRSPN		1
 #define HAVE_STRSIGNAL		0
 #define HAVE_GETTIMEOFDAY	0
 #define HAVE_SETGRENT		0

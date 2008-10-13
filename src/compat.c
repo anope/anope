@@ -57,27 +57,3 @@ int strnicmp(const char *s1, const char *s2, size_t len)
 
 /*************************************************************************/
 
-#if !HAVE_STRDUP
-char *strdup(const char *s)
-{
-    char *new = calloc(strlen(s) + 1, 1);
-    if (new)
-        strcpy(new, s);
-    return new;
-}
-#endif
-
-/*************************************************************************/
-
-#if !HAVE_STRSPN
-size_t strspn(const char *s, const char *accept)
-{
-    size_t i = 0;
-
-    while (*s && strchr(accept, *s))
-        ++i, ++s;
-    return i;
-}
-#endif
-
-/*************************************************************************/

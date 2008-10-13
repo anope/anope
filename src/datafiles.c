@@ -34,20 +34,14 @@ int get_file_version(dbFILE * f)
     int version =
         fgetc(fp) << 24 | fgetc(fp) << 16 | fgetc(fp) << 8 | fgetc(fp);
     if (ferror(fp)) {
-#ifndef NOT_MAIN
         log_perror("Error reading version number on %s", f->filename);
-#endif
         return 0;
     } else if (feof(fp)) {
-#ifndef NOT_MAIN
         alog("Error reading version number on %s: End of file detected",
              f->filename);
-#endif
         return 0;
     } else if (version < 1) {
-#ifndef NOT_MAIN
         alog("Invalid version number (%d) on %s", version, f->filename);
-#endif
         return 0;
     }
     return version;
@@ -67,9 +61,7 @@ int write_file_version(dbFILE * f, uint32 version)
         fputc(version >> 16 & 0xFF, fp) < 0 ||
         fputc(version >> 8 & 0xFF, fp) < 0 ||
         fputc(version & 0xFF, fp) < 0) {
-#ifndef NOT_MAIN
         log_perror("Error writing version number on %s", f->filename);
-#endif
         return 0;
     }
     return 1;
@@ -90,7 +82,6 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 
     f = (dbFILE *)scalloc(sizeof(*f), 1);
     if (!f) {
-#ifndef NOT_MAIN
         log_perror("Can't read %s database %s", service, filename);
         if (time(NULL) - lastwarn > WarningTimeout) {
             ircdproto->SendGlobops(NULL,
@@ -98,7 +89,6 @@ static dbFILE *open_db_read(const char *service, const char *filename)
                              filename);
             lastwarn = time(NULL);
         }
-#endif
         return NULL;
     }
     strscpy(f->filename, filename, sizeof(f->filename));
@@ -106,7 +96,6 @@ static dbFILE *open_db_read(const char *service, const char *filename)
     fp = fopen(f->filename, "rb");
     if (!fp) {
         int errno_save = errno;
-#ifndef NOT_MAIN
         if (errno != ENOENT)
             log_perror("Can not read %s database %s", service,
                        f->filename);
@@ -115,7 +104,6 @@ static dbFILE *open_db_read(const char *service, const char *filename)
                              strerror(errno));
             lastwarn = time(NULL);
         }
-#endif
         free(f);
         errno = errno_save;
         return NULL;
@@ -151,11 +139,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 
     f = (dbFILE *)scalloc(sizeof(*f), 1);
     if (!f) {
-#ifndef NOT_MAIN
         log_perror("Can not read %s database %s", service, filename);
-#else
-        alog("Can not read %s database %s", service, filename);
-#endif
         return NULL;
     }
     strscpy(f->filename, filename, sizeof(f->filename));
@@ -172,10 +156,8 @@ static dbFILE *open_db_write(const char *service, const char *filename,
     snprintf(f->backupname, sizeof(f->backupname), "%s.save", filename);
     if (!*f->backupname || strcmp(f->backupname, filename) == 0) {
         int errno_save = errno;
-#ifndef NOT_MAIN
         alog("Opening %s database %s for write: Filename too long",
              service, filename);
-#endif
         free(f);
         errno = errno_save;
         return NULL;
@@ -194,7 +176,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
     if (rename(filename, f->backupname) < 0 && errno != ENOENT) {
         int errno_save = errno;
 #endif
-#ifndef NOT_MAIN
+
         static int walloped = 0;
         if (!walloped) {
             walloped++;
@@ -219,15 +201,12 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         errno = errno_save;
         log_perror("Can not back up %s database %s", service, filename);
         if (!NoBackupOkay) {
-#endif
             if (f->backupfp)
                 fclose(f->backupfp);
             free(f);
             errno = errno_save;
             return NULL;
-#ifndef NOT_MAIN
         }
-#endif
         *f->backupname = 0;
     }
 #ifndef _WIN32
@@ -244,7 +223,6 @@ static dbFILE *open_db_write(const char *service, const char *filename,
     f->fp = fdopen(fd, "wb");   /* will fail and return NULL if fd < 0 */
     if (!f->fp || !write_file_version(f, version)) {
         int errno_save = errno;
-#ifndef NOT_MAIN
         static int walloped = 0;
         if (!walloped) {
             walloped++;
@@ -253,7 +231,6 @@ static dbFILE *open_db_write(const char *service, const char *filename,
         }
         errno = errno_save;
         log_perror("Can't write to %s database %s", service, filename);
-#endif
         if (f->fp) {
             fclose(f->fp);
 #ifndef _WIN32
@@ -263,12 +240,9 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 #endif
         }
         if (*f->backupname && rename(f->backupname, filename) < 0)
-#ifndef NOT_MAIN
             log_perror("Cannot restore backup copy of %s", filename);
-#else
-            ;
-#endif
-        /* Then the Lord said unto Moses, thou shalt free what thou hast malloced
+
+		/* Then the Lord said unto Moses, thou shalt free what thou hast malloced
          * -- codemastr */
         free(f);
         errno = errno_save;
@@ -342,10 +316,8 @@ void restore_db(dbFILE * f)
                 ftruncate(fileno(f->fp), ftell(f->fp));
             }
         }
-#ifndef NOT_MAIN
         if (!ok && errno > 0)
             log_perror("Unable to restore backup of %s", f->filename);
-#endif
         errno_save = errno;
         if (f->backupfp)
             fclose(f->backupfp);

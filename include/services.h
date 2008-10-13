@@ -266,7 +266,6 @@ struct ircdvars_ {
 	const char *operservmode;			/* Mode used by OperServ	*/
 	const char *botservmode;			/* Mode used by BotServ		*/
 	const char *helpservmode;			/* Mode used by HelpServ	*/
-	const char *devnullmode;			/* Mode used by Dev/Null	*/
 	const char *globalmode;			/* Mode used by Global		*/
 	const char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
 	int max_symbols;			/* Chan Max Symbols		*/
@@ -409,7 +408,7 @@ typedef struct {
 
 /* Flags: */
 #define PARAM_OPTIONAL	0x01
-#define PARAM_FULLONLY	0x02    /* Directive only allowed if !STREAMLINED */
+/*#define PARAM_FULLONLY	0x02   unused */
 #define PARAM_RELOAD    0x04    /* Directive is reloadable */
 
 /*************************************************************************/

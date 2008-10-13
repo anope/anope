@@ -14,6 +14,7 @@
 
 #include "services.h"
 #include "configreader.h"
+#include "hashcomp.h" // If this gets added to services.h or someplace else later, remove it from here -- CyberBotX
 
 /*************************************************************************/
 
@@ -114,43 +115,32 @@ int RestrictMail;
 int MailDelay;
 int DontQuoteAddresses;
 
-static int NSDefNone;
+static std::string NSDefaults;
 char *NSGuestNickPrefix;
-int NSAllowKillImmed;
-int NSNoGroupChange;
-int NSDefKill;
-int NSDefKillQuick;
-int NSDefSecure;
-int NSDefPrivate;
-int NSDefMsg;
-int NSDefHideEmail;
-int NSDefHideUsermask;
-int NSDefHideQuit;
-int NSDefMemoSignon;
-int NSDefMemoReceive;
+bool NSAllowKillImmed;
+bool NSNoGroupChange;
 int NSDefFlags;
 int NSDefLanguage;
-int NSDefAutoop;
-int NSRegDelay;
-int NSResendDelay;
-int NSExpire;
-int NSRExpire;
-int NSForceEmail;
+time_t NSRegDelay;
+time_t NSResendDelay;
+time_t NSExpire;
+time_t NSRExpire;
+bool NSForceEmail;
 int NSMaxAliases;
 int NSAccessMax;
 char *NSEnforcerUser;
 char *NSEnforcerHost;
 static char *temp_nsuserhost;
-int NSReleaseTimeout;
-int NSListOpersOnly;
+time_t NSReleaseTimeout;
+bool NSListOpersOnly;
 int NSListMax;
-int NSSecureAdmins;
-int NSStrictPrivileges;
-int NSEmailReg;
-int NSModeOnID;
-int NSRestrictGetPass;
-int NSNickTracking;
-int NSAddAccessOnReg;
+bool NSSecureAdmins;
+bool NSStrictPrivileges;
+bool NSEmailReg;
+bool NSModeOnID;
+bool NSRestrictGetPass;
+bool NSNickTracking;
+bool NSAddAccessOnReg;
 
 int CSDefNone;
 int CSDefKeepTopic;
@@ -452,12 +442,49 @@ bool ValidateNotEmpty(ServerConfig *, const char *tag, const char *value, ValueI
 	return true;
 }
 
+bool ValidateNotZero(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero!");
+	return true;
+}
+
+bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (static_cast<std::string>(value) == "prenickdatabase") {
+		if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
+	}
+	else if (static_cast<std::string>(value) == "preregexpire") {
+		if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
+	}
+	else {
+		if (!data.GetBool()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
+	}
+	return true;
+}
+
 bool ValidatePort(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
 	int port = data.GetInteger();
 	if (!port) return true;
 	if (port < 1 || port > 65535) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value +
 		"> is not a value port, it must be between 1 and 65535!");
+	return true;
+}
+
+bool ValidateLanguage(ServerConfig *, const char *, const char *, ValueItem &data)
+{
+	int language = data.GetInteger();
+	char maxlang[3];
+	snprintf(maxlang, 3, "%d", USED_LANGS);
+	if (language < 1 || language > USED_LANGS) throw ConfigException(static_cast<std::string>("The value for <nickserv:defaultlanguage> must be between 1 and ") + maxlang + "!");
+	data.Set(--language);
+	return true;
+}
+
+bool ValidateGuestPrefix(ServerConfig *conf, const char *tag, const char *value, ValueItem &data)
+{
+	ValidateNotEmpty(conf, tag, value, data);
+	if (strlen(data.GetString()) > 21) throw ConfigException("The value for <nickserv:guestnickprefix> cannot exceed 21 characters in length!");
 	return true;
 }
 
@@ -532,6 +559,31 @@ int ServerConfig::Read(bool bail)
 		{"uplink", "password", "", new ValueContainerChar(&RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "descrption", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"nickserv", "emailregistration", "no", new ValueContainerBool(&NSEmailReg), DT_BOOLEAN, NoValidation},
+		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&PreNickDBName), DT_CHARPTR, ValidateEmailReg},
+		{"nickserv", "forceemail", "no", new ValueContainerBool(&NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
+		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_BOOLEAN, NoValidation},
+		{"nickserv", "defaultlanguage", "0", new ValueContainerInt(&NSDefLanguage), DT_INTEGER, ValidateLanguage},
+		{"nickserv", "regdelay", "0", new ValueContainerTime(&NSRegDelay), DT_TIME, NoValidation},
+		{"nickserv", "resenddelay", "0", new ValueContainerTime(&NSResendDelay), DT_TIME, NoValidation},
+		{"nickserv", "expire", "21d", new ValueContainerTime(&NSExpire), DT_TIME, ValidateNotZero},
+		{"nickserv", "preregexpire", "0", new ValueContainerTime(&NSRExpire), DT_TIME, ValidateEmailReg},
+		{"nickserv", "maxaliases", "0", new ValueContainerInt(&NSMaxAliases), DT_INTEGER, NoValidation},
+		{"nickserv", "accessmax", "0", new ValueContainerInt(&NSAccessMax), DT_INTEGER, ValidateNotZero},
+		{"nickserv", "enforceruser", "", new ValueContainerChar(&temp_nsuserhost), DT_CHARPTR, ValidateNotEmpty},
+		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&NSReleaseTimeout), DT_TIME, ValidateNotZero},
+		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&NSNoGroupChange), DT_BOOLEAN, NoValidation},
+		{"nickserv", "listopersonly", "no", new ValueContainerBool(&NSListOpersOnly), DT_BOOLEAN, NoValidation},
+		{"nickserv", "listmax", "0", new ValueContainerInt(&NSListMax), DT_INTEGER, ValidateNotZero},
+		{"nickserv", "guestnickprefix", "", new ValueContainerChar(&NSGuestNickPrefix), DT_CHARPTR, ValidateGuestPrefix},
+		{"nickserv", "secureadmins", "no", new ValueContainerBool(&NSSecureAdmins), DT_BOOLEAN, NoValidation},
+		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&NSStrictPrivileges), DT_BOOLEAN, NoValidation},
+		{"nickserv", "modeonid", "no", new ValueContainerBool(&NSModeOnID), DT_BOOLEAN, NoValidation},
+		{"nickserv", "restrictgetpass", "no", new ValueContainerBool(&NSRestrictGetPass), DT_BOOLEAN, NoValidation},
+		{"nickserv", "nicktracking", "no", new ValueContainerBool(&NSNickTracking), DT_BOOLEAN, NoValidation},
+		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1202,7 +1254,7 @@ Directive directives[] = {
     {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
     {"KillonSQline", {{PARAM_SET, PARAM_RELOAD, &KillonSQline}}},
     {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
-    {"LimitSessions", {{PARAM_SET, PARAM_FULLONLY, &LimitSessions}}},
+    {"LimitSessions", {{PARAM_SET, 0, &LimitSessions}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
@@ -1236,48 +1288,10 @@ Directive directives[] = {
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
     {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
-    {"NickservDB", {{PARAM_STRING, PARAM_RELOAD, &NickDBName}}},
     {"Numeric", {{PARAM_STRING, PARAM_RELOAD, &Numeric}}},
-    {"PreNickServDB", {{PARAM_STRING, PARAM_RELOAD, &PreNickDBName}}},
-    {"NSEmailReg", {{PARAM_SET, PARAM_RELOAD, &NSEmailReg}}},
     {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
-    {"NSAccessMax", {{PARAM_POSINT, PARAM_RELOAD, &NSAccessMax}}},
-    {"NSAllowKillImmed", {{PARAM_SET, 0, &NSAllowKillImmed}}},
-    {"NSDefHideEmail", {{PARAM_SET, PARAM_RELOAD, &NSDefHideEmail}}},
-    {"NSDefHideQuit", {{PARAM_SET, PARAM_RELOAD, &NSDefHideQuit}}},
-    {"NSDefHideUsermask", {{PARAM_SET, PARAM_RELOAD, &NSDefHideUsermask}}},
-    {"NSDefKill", {{PARAM_SET, PARAM_RELOAD, &NSDefKill}}},
-    {"NSDefKillQuick", {{PARAM_SET, PARAM_RELOAD, &NSDefKillQuick}}},
-    {"NSDefLanguage", {{PARAM_POSINT, PARAM_RELOAD, &NSDefLanguage}}},
-    {"NSDefMemoReceive", {{PARAM_SET, PARAM_RELOAD, &NSDefMemoReceive}}},
-    {"NSDefMemoSignon", {{PARAM_SET, PARAM_RELOAD, &NSDefMemoSignon}}},
-    {"NSDefMsg", {{PARAM_SET, PARAM_RELOAD, &NSDefMsg}}},
-    {"NSDefNone", {{PARAM_SET, PARAM_RELOAD, &NSDefNone}}},
-    {"NSDefPrivate", {{PARAM_SET, PARAM_RELOAD, &NSDefPrivate}}},
-    {"NSDefSecure", {{PARAM_SET, PARAM_RELOAD, &NSDefSecure}}},
-    {"NSDefAutoop", {{PARAM_SET, PARAM_RELOAD, &NSDefAutoop}}},
-    {"NSEnforcerUser", {{PARAM_STRING, PARAM_RELOAD, &temp_nsuserhost}}},
-    {"NSExpire", {{PARAM_TIME, PARAM_RELOAD, &NSExpire}}},
-    {"NSRExpire", {{PARAM_TIME, PARAM_RELOAD, &NSRExpire}}},
-    {"NSModeOnID", {{PARAM_SET, PARAM_RELOAD, &NSModeOnID}}},
-    {"NSForceEmail", {{PARAM_SET, PARAM_RELOAD, &NSForceEmail}}},
-    {"NSGuestNickPrefix",
-     {{PARAM_STRING, PARAM_RELOAD, &NSGuestNickPrefix}}},
-    {"NSListMax", {{PARAM_POSINT, PARAM_RELOAD, &NSListMax}}},
-    {"NSListOpersOnly", {{PARAM_SET, PARAM_RELOAD, &NSListOpersOnly}}},
-    {"NSMaxAliases", {{PARAM_INT, PARAM_RELOAD, &NSMaxAliases}}},
-    {"NSNoGroupChange", {{PARAM_SET, PARAM_RELOAD, &NSNoGroupChange}}},
-    {"NSRegDelay", {{PARAM_TIME, PARAM_RELOAD, &NSRegDelay}}},
-    {"NSResendDelay", {{PARAM_TIME, PARAM_RELOAD, &NSResendDelay}}},
-    {"NSReleaseTimeout", {{PARAM_TIME, PARAM_RELOAD, &NSReleaseTimeout}}},
-    {"NSSecureAdmins", {{PARAM_SET, PARAM_RELOAD, &NSSecureAdmins}}},
-    {"NSStrictPrivileges",
-     {{PARAM_SET, PARAM_RELOAD, &NSStrictPrivileges}}},
-    {"NSRestrictGetPass", {{PARAM_SET, PARAM_RELOAD, &NSRestrictGetPass}}},
-    {"NSNickTracking", {{PARAM_SET, PARAM_RELOAD, &NSNickTracking}}},
-    {"NSAddAccessOnReg", {{PARAM_SET, PARAM_RELOAD, &NSAddAccessOnReg}}},
     {"OperCoreModules", {{PARAM_STRING, PARAM_RELOAD, &OperCoreModules}}},
     {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
     {"OperServName", {{PARAM_STRING, 0, &s_OperServ},
@@ -1372,20 +1386,17 @@ void error(int linenum, const char *message, ...)
     vsnprintf(buf, sizeof(buf), message, args);
     va_end(args);
 
-#ifndef NOT_MAIN
     if (linenum)
         alog("%s:%d: %s", SERVICES_CONF, linenum, buf);
     else
         alog("%s: %s", SERVICES_CONF, buf);
-    if (!nofork && isatty(2)) {
-#endif
+
+	if (!nofork && isatty(2)) {
         if (linenum)
             fprintf(stderr, "%s:%d: %s\n", SERVICES_CONF, linenum, buf);
         else
             fprintf(stderr, "%s: %s\n", SERVICES_CONF, buf);
-#ifndef NOT_MAIN
     }
-#endif
 }
 
 /*************************************************************************/
@@ -1414,14 +1425,6 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             *(int *) d->params[i].ptr = 1;
             continue;
         }
-#ifdef STREAMLINED
-        if (d->params[i].flags & PARAM_FULLONLY) {
-            error(linenum,
-                  "Directive `%s' not available in STREAMLINED mode",
-                  d->name);
-            break;
-        }
-#endif
 
         /* Should we remove PARAM_DEPRECATED because it's
          * useless right now? -GD */
@@ -1638,10 +1641,8 @@ int read_config(int reload)
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
     config = fopen(SERVICES_CONF, "r");
     if (!config) {
-#ifndef NOT_MAIN
         log_perror("Can't open " SERVICES_CONF);
         if (!nofork && isatty(2)) {
-#endif
             if (!reload)
                 perror("Can't open " SERVICES_CONF);
             else
@@ -1703,7 +1704,6 @@ int read_config(int reload)
 
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
-        CHEK2(NickDBName, NickServDB);
         CHEK2(ChanDBName, ChanServDB);
         CHEK2(OperDBName, OperServDB);
         CHEK2(NewsDBName, NewsDB);
@@ -1714,10 +1714,6 @@ int read_config(int reload)
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-    CHECK(NSAccessMax);
-    CHEK2(temp_nsuserhost, NSEnforcerUser);
-    CHECK(NSReleaseTimeout);
-    CHECK(NSListMax);
     CHECK(CSAccessMax);
     CHECK(CSAutokickMax);
     CHECK(CSAutokickReason);
@@ -1755,48 +1751,30 @@ int read_config(int reload)
         }
     }
 
-    if (!NSDefNone &&
-        !NSDefKill &&
-        !NSDefKillQuick &&
-        !NSDefSecure &&
-        !NSDefPrivate &&
-        !NSDefHideEmail &&
-        !NSDefHideUsermask &&
-        !NSDefHideQuit && !NSDefMemoSignon && !NSDefMemoReceive) {
-        NSDefSecure = 1;
-        NSDefMemoSignon = 1;
-        NSDefMemoReceive = 1;
-    }
-
-    NSDefFlags = 0;
-    if (!NSDefNone) {
-        if (NSDefKill)
-            NSDefFlags |= NI_KILLPROTECT;
-        if (NSDefKillQuick)
-            NSDefFlags |= NI_KILL_QUICK;
-        if (NSDefSecure)
-            NSDefFlags |= NI_SECURE;
-        if (NSDefPrivate)
-            NSDefFlags |= NI_PRIVATE;
-        if (NSDefMsg) {
-            if (!UsePrivmsg)
-                alog("NSDefMsg can only be used when UsePrivmsg is set - unsetting NSDefMsg");
-            else
-                NSDefFlags |= NI_MSG;
-        }
-        if (NSDefHideEmail)
-            NSDefFlags |= NI_HIDE_EMAIL;
-        if (NSDefHideUsermask)
-            NSDefFlags |= NI_HIDE_MASK;
-        if (NSDefHideQuit)
-            NSDefFlags |= NI_HIDE_QUIT;
-        if (NSDefMemoSignon)
-            NSDefFlags |= NI_MEMO_SIGNON;
-        if (NSDefMemoReceive)
-            NSDefFlags |= NI_MEMO_RECEIVE;
-        if (!NSDefAutoop)
-            NSDefFlags |= NI_AUTOOP;
-    }
+		NSDefFlags = 0;
+		if (NSDefaults.empty()) NSDefFlags = NI_SECURE | NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
+		else if (NSDefaults != "none") {
+			bool hadAutoop = false;
+			spacesepstream options(NSDefaults);
+			std::string option;
+			while (options.GetToken(option)) {
+				if (option == "kill") NSDefFlags |= NI_KILLPROTECT;
+				else if (option == "killquick") NSDefFlags |= NI_KILL_QUICK;
+				else if (option == "secure") NSDefFlags |= NI_SECURE;
+				else if (option == "private") NSDefFlags |= NI_PRIVATE;
+				else if (option == "msg") {
+					if (!UsePrivmsg) alog("msg in <nickserv:defaults> can only be used when UsePrivmsg is set");
+					else NSDefFlags |= NI_MSG;
+				}
+				else if (option == "hideemail") NSDefFlags |= NI_HIDE_EMAIL;
+				else if (option == "hideusermask") NSDefFlags |= NI_HIDE_MASK;
+				else if (option == "hidequit") NSDefFlags |= NI_HIDE_QUIT;
+				else if (option == "memosignon") NSDefFlags |= NI_MEMO_SIGNON;
+				else if (option == "memoreceive") NSDefFlags |= NI_MEMO_RECEIVE;
+				else if (option == "autoop") hadAutoop = true;
+			}
+			if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
+		}
 
     if (!ServicesRoot) {
         error(0,
@@ -1806,22 +1784,6 @@ int read_config(int reload)
         error(0,
               "defines the main Administrative nick(s) Anope will obey.");
         retval = 0;
-    }
-
-    CHECK(NSGuestNickPrefix);   /* Add safety check */
-    if (NSGuestNickPrefix && (strlen(NSGuestNickPrefix) > 21)) {
-        error(0, "Value of NSGuestNickPrefix must be between 1 and 21");
-        retval = 0;
-    }
-
-    CHECK(NSDefLanguage);
-    if (NSDefLanguage) {
-        NSDefLanguage--;
-        if (NSDefLanguage < 0 || NSDefLanguage >= NUM_LANGS) {
-            error(0, "Value of NSDefLanguage must be between 1 and %d",
-                  USED_LANGS);
-            retval = 0;
-        }
     }
 
     if (!NewsCount) {
@@ -2052,12 +2014,9 @@ int read_config(int reload)
      * rob
      **/
     if (NSEmailReg) {
-        CHEK2(PreNickDBName, PreNickServDB);
-        CHECK(NSEmailReg);
-        CHECK(NSRExpire);
         CHECK(UseMail);
-        CHECK(NSForceEmail);
     } else {
+		delete [] PreNickDBName;
         PreNickDBName = NULL;
         NSRExpire = 0;
     }

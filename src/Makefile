@@ -1,21 +1,21 @@
 MYSQL_OBJ = $(MYSQL:.c=.o)
 RDB_OBJ = $(RDB:.c=.o)
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
-		config.o datafiles.o encrypt.o events.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
+		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
 		process.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o  \
-		$(RDB_OBJ) $(MYSQL_OBJ) 
+		$(RDB_OBJ) $(MYSQL_OBJ)
 SRCS =  actions.c base64.c bots.cpp botserv.c channels.c chanserv.c commands.c compat.c \
-		config.c datafiles.c encrypt.c events.c helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
+		config.c datafiles.c encrypt.c events.c hashcomp.c helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
 		memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
 		process.c send.c servers.c sessions.c s sockutil.c timeout.c users.c \
-		$(RDB) $(MYSQL) 
+		$(RDB) $(MYSQL)
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
 	../include/encrypt.h ../include/messages.h ../include/services.h \
 	../include/timeout.h ../include/datafiles.h ../include/extern.h \
-	../include/modules.h ../include/slist.h 
+	../include/modules.h ../include/slist.h ../include/hashcomp.h
 
 MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
@@ -36,26 +36,26 @@ distclean: spotless
 distclean_modules: clean_modules spotless
 
 services:  $(OBJS) mod_version
-	@../run-cc.pl $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS) 
+	@../run-cc.pl $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
 actions.o:      actions.c   $(INCLUDES)
-base64.o:       base64.c    $(INCLUDES)    
+base64.o:       base64.c    $(INCLUDES)
 bots.o:         bots.cpp    $(INCLUDES)
-botserv.o:      botserv.c   $(INCLUDES)    
-channels.o:     channels.c  $(INCLUDES) 
-chanserv.o:     chanserv.c  $(INCLUDES)   
-commands.o:     commands.c  $(INCLUDES)   
+botserv.o:      botserv.c   $(INCLUDES)
+channels.o:     channels.c  $(INCLUDES)
+chanserv.o:     chanserv.c  $(INCLUDES)
+commands.o:     commands.c  $(INCLUDES)
 compat.o:       compat.c    $(INCLUDES)
-config.o:       config.c    $(INCLUDES) 
+config.o:       config.c    $(INCLUDES)
 datafiles.o:    datafiles.c $(INCLUDES)
-encrypt.o:      encrypt.c   $(INCLUDES) 
+encrypt.o:      encrypt.c   $(INCLUDES)
 events.o:       events.c    $(INCLUDES)
 init.o:         init.c      $(INCLUDES)
 ircd.o:         ircd.c      $(INCLUDES)
-helpserv.o:     helpserv.c  $(INCLUDES)   
-hostserv.o:     hostserv.c  $(INCLUDES)   
-language.o:     language.c  $(INCLUDES)   
+helpserv.o:     helpserv.c  $(INCLUDES)
+hostserv.o:     hostserv.c  $(INCLUDES)
+language.o:     language.c  $(INCLUDES)
 log.o:          log.c       $(INCLUDES)
 mail.o:         mail.c      $(INCLUDES)
 main.o:         main.c      $(INCLUDES)

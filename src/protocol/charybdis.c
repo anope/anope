@@ -57,7 +57,6 @@ IRCDVar myIrcd[] = {
      "+oaiS",                    /* operserv mode */
      "+oiS",                     /* botserv mode  */
      "+oiS",                     /* helpserv mode */
-     "+oiS",                     /* Dev/Null mode */
      "+oiS",                     /* Global mode   */
      "+oiS",                     /* Used by BotServ Bots */
      2,                         /* Chan Max Symbols     */

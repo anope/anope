@@ -217,12 +217,6 @@ E char *get_mlock_modes(ChannelInfo * ci, int complete);
 E int stricmp(const char *s1, const char *s2);
 E int strnicmp(const char *s1, const char *s2, size_t len);
 #endif
-#if !HAVE_STRDUP
-E char *strdup(const char *s);
-#endif
-#if !HAVE_STRSPN
-E size_t strspn(const char *s, const char *accept);
-#endif
 #ifdef _WIN32
 char *sockstrerror(int error);
 #endif
@@ -324,28 +318,28 @@ E int  DontQuoteAddresses;
 
 E int   NSDefFlags;
 E int   NSDefLanguage;
-E int   NSRegDelay;
-E int   NSResendDelay;
-E int   NSExpire;
-E int   NSRExpire;
-E int   NSForceEmail;
+E time_t NSRegDelay;
+E time_t NSResendDelay;
+E time_t NSExpire;
+E time_t NSRExpire;
+E bool  NSForceEmail;
 E int   NSMaxAliases;
 E int   NSAccessMax;
 E char *NSEnforcerUser;
 E char *NSEnforcerHost;
-E int   NSReleaseTimeout;
-E int   NSAllowKillImmed;
-E int   NSNoGroupChange;
-E int   NSListOpersOnly;
+E time_t NSReleaseTimeout;
+E bool  NSAllowKillImmed;
+E bool  NSNoGroupChange;
+E bool  NSListOpersOnly;
 E int   NSListMax;
 E char *NSGuestNickPrefix;
-E int   NSSecureAdmins;
-E int   NSStrictPrivileges;
-E int   NSEmailReg;
-E int   NSModeOnID;
-E int   NSRestrictGetPass;
-E int   NSNickTracking;
-E int   NSAddAccessOnReg;
+E bool  NSSecureAdmins;
+E bool  NSStrictPrivileges;
+E bool  NSEmailReg;
+E bool  NSModeOnID;
+E bool  NSRestrictGetPass;
+E bool  NSNickTracking;
+E bool  NSAddAccessOnReg;
 
 E int   CSDefFlags;
 E int   CSMaxReg;

@@ -42,9 +42,6 @@
 /* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define to 1 if you have the `strdup' function. */
-#undef HAVE_STRDUP
-
 /* Define to 1 if you have the `stricmp' function. */
 #undef HAVE_STRICMP
 
@@ -59,9 +56,6 @@
 
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
-
-/* Define to 1 if you have the `strspn' function. */
-#undef HAVE_STRSPN
 
 /* "" */
 #undef HAVE_SYS_SELECT_H

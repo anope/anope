@@ -351,7 +351,7 @@ E char *CSAutokickReason;
 E time_t CSInhabit;
 E bool  CSListOpersOnly;
 E int   CSListMax;
-E int   CSRestrictGetPass;
+E bool  CSRestrictGetPass;
 E int   CSOpersOnly;
 
 E int   MSMaxMemos;

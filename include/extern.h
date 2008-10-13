@@ -348,7 +348,7 @@ E int   CSDefBantype;
 E int   CSAccessMax;
 E int   CSAutokickMax;
 E char *CSAutokickReason;
-E int   CSInhabit;
+E time_t CSInhabit;
 E int   CSListOpersOnly;
 E int   CSListMax;
 E int   CSRestrictGetPass;

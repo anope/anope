@@ -496,7 +496,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"nickserv", "chanserv", NULL};
+	static const char *Once[] = {"nickserv", "chanserv", "memoserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -596,6 +596,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1260,7 +1261,6 @@ Directive directives[] = {
     {"ModuleDelayedAutoload",
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
     {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
-    {"MSMaxMemos", {{PARAM_POSINT, PARAM_RELOAD, &MSMaxMemos}}},
     {"MSNotifyAll", {{PARAM_SET, PARAM_RELOAD, &MSNotifyAll}}},
     {"MSSendDelay", {{PARAM_TIME, PARAM_RELOAD, &MSSendDelay}}},
     {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},

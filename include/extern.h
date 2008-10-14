@@ -356,7 +356,7 @@ E bool  CSOpersOnly;
 
 E int   MSMaxMemos;
 E time_t MSSendDelay;
-E int   MSNotifyAll;
+E bool  MSNotifyAll;
 E int   MSMemoReceipt;
 
 E int   BSDefFlags;

@@ -158,7 +158,7 @@ bool CSOpersOnly;
 
 int MSMaxMemos;
 time_t MSSendDelay;
-int MSNotifyAll;
+bool MSNotifyAll;
 int MSMemoReceipt;
 
 int BSDefDontKickOps;
@@ -598,6 +598,7 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
+		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1262,7 +1263,6 @@ Directive directives[] = {
     {"ModuleDelayedAutoload",
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
     {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
-    {"MSNotifyAll", {{PARAM_SET, PARAM_RELOAD, &MSNotifyAll}}},
     {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},

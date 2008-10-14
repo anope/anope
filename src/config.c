@@ -599,6 +599,7 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
+		{"memoserv", "memoreceipt", "0", new ValueContainerInt(&MSMemoReceipt), DT_INTEGER, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1263,7 +1264,6 @@ Directive directives[] = {
     {"ModuleDelayedAutoload",
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
     {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
-    {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},

@@ -355,7 +355,7 @@ E bool  CSRestrictGetPass;
 E bool  CSOpersOnly;
 
 E int   MSMaxMemos;
-E int   MSSendDelay;
+E time_t MSSendDelay;
 E int   MSNotifyAll;
 E int   MSMemoReceipt;
 

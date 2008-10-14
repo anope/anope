@@ -157,7 +157,7 @@ bool CSRestrictGetPass;
 bool CSOpersOnly;
 
 int MSMaxMemos;
-int MSSendDelay;
+time_t MSSendDelay;
 int MSNotifyAll;
 int MSMemoReceipt;
 
@@ -597,6 +597,7 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
+		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1262,7 +1263,6 @@ Directive directives[] = {
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
     {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
     {"MSNotifyAll", {{PARAM_SET, PARAM_RELOAD, &MSNotifyAll}}},
-    {"MSSendDelay", {{PARAM_TIME, PARAM_RELOAD, &MSSendDelay}}},
     {"MSMemoReceipt", {{PARAM_POSINT, PARAM_RELOAD, &MSMemoReceipt}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},

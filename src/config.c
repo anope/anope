@@ -594,6 +594,8 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "listmax", "0", new ValueContainerInt(&CSListMax), DT_INTEGER, ValidateNotZero},
 		{"chanserv", "restrictgetpass", "no", new ValueContainerBool(&CSRestrictGetPass), DT_BOOLEAN, NoValidation},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1244,8 +1246,6 @@ Directive directives[] = {
     {"MaxSessionKill", {{PARAM_INT, PARAM_RELOAD, &MaxSessionKill}}},
     {"MaxSessionLimit", {{PARAM_POSINT, PARAM_RELOAD, &MaxSessionLimit}}},
     {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
-    {"MemoServName", {{PARAM_STRING, 0, &s_MemoServ},
-                      {PARAM_STRING, 0, &desc_MemoServ}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
     {"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},
@@ -1674,7 +1674,6 @@ int read_config(int reload)
     CHECK(NetworkName);
     if (!reload) {
         CHEK2(temp_userhost, ServiceUser);
-        CHEK2(s_MemoServ, MemoServName);
         CHEK2(s_HelpServ, HelpServName);
         CHEK2(s_OperServ, OperServName);
         CHEK2(s_GlobalNoticer, GlobalName);

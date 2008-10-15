@@ -272,7 +272,6 @@ CREATE TABLE anope_ns_core (
   memocount smallint(5) unsigned NOT NULL default '0',
   memomax smallint(5) unsigned NOT NULL default '0',
   channelcount smallint(5) unsigned NOT NULL default '0',
-  channelmax smallint(5) unsigned NOT NULL default '0',
   greet text NOT NULL,
   active tinyint(1) NOT NULL default '1',
   PRIMARY KEY  (nc_id),

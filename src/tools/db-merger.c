@@ -209,7 +209,6 @@ struct nickcore_ {
     char **access;          /* Array of strings */
     MemoInfo memos;     /* Memo information */
     uint16 channelcount;  /* Number of channels currently registered */
-    uint16 channelmax;   /* Maximum number of channels allowed */
     int unused;                /* Used for nick collisions */
     int aliascount;            /* How many aliases link to us? Remove the core if 0 */
 };
@@ -675,7 +674,7 @@ int main(int argc, char *argv[])
                         SAFE(write_string(memos->text, f));
                     }
                     SAFE(write_int16(nc->channelcount, f));
-                    SAFE(write_int16(nc->channelmax, f));
+                    SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
                 } /* for (nc) */
                 SAFE(write_int8(0, f));
             } /* for (i) */

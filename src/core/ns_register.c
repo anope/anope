@@ -320,8 +320,9 @@ int do_confirm(User * u)
                 break;
             }
         }
+
         na->nc->memos.memomax = MSMaxMemos;
-        na->nc->channelmax = CSMaxReg;
+
         if (forced == 1) {
             na->last_usermask = sstrdup("*@*");
             na->last_realname = sstrdup("unknown");

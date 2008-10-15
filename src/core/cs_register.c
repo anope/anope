@@ -116,11 +116,9 @@ int do_register(User * u)
     } else if (!chan_has_user_status(c, u, CUS_OP)) {
         notice_lang(s_ChanServ, u, CHAN_MUST_BE_CHANOP);
 
-    } else if (!is_servadmin && nc->channelmax > 0
-               && nc->channelcount >= nc->channelmax) {
+    } else if (!is_servadmin && CSMaxReg && nc->channelcount >= CSMaxReg) {
         notice_lang(s_ChanServ, u, nc->channelcount >
-                    nc->channelmax ? CHAN_EXCEEDED_CHANNEL_LIMIT :
-                    CHAN_REACHED_CHANNEL_LIMIT, nc->channelmax);
+                    CSMaxReg ? CHAN_EXCEEDED_CHANNEL_LIMIT : CHAN_REACHED_CHANNEL_LIMIT, CSMaxReg);
     } else if (stricmp(u->nick, pass) == 0
                || (StrictPasswords && strlen(pass) < 5)) {
         notice_lang(s_ChanServ, u, MORE_OBSCURE_PASSWORD);

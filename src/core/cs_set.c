@@ -296,8 +296,7 @@ int do_set_founder(User * u, ChannelInfo * ci, char *param)
     }
 
     nc = na->nc;
-    if (nc->channelmax > 0 && nc->channelcount >= nc->channelmax
-        && !is_services_admin(u)) {
+    if (CSMaxReg && nc->channelcount >= CSMaxReg && !is_services_admin(u)) {
         notice_lang(s_ChanServ, u, CHAN_SET_FOUNDER_TOO_MANY_CHANS, param);
         return MOD_CONT;
     }

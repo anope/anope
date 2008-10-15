@@ -1574,8 +1574,7 @@ void cs_remove_nick(const NickCore * nc)
             if (ci->founder == nc) {
                 if (ci->successor) {
                     NickCore *nc2 = ci->successor;
-                    if (!nick_is_services_admin(nc2) && nc2->channelmax > 0
-                        && nc2->channelcount >= nc2->channelmax) {
+                    if (!nick_is_services_admin(nc2) && CSMaxReg && nc2->channelcount >= CSMaxReg) {
                         alog("%s: Successor (%s) of %s owns too many channels, " "deleting channel", s_ChanServ, nc2->display, ci->name);
                         delchan(ci);
                         continue;

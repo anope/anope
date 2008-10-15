@@ -350,10 +350,9 @@ void load_old_ns_dbase(void)
                 /* We read the channel count, but don't take care of it.
                    load_cs_dbase will regenerate it correctly. */
                 SAFE(read_int16(&tmp16, f));
-                SAFE(read_int16(&nc->channelmax, f));
-                if (ver == 5)
-                    nc->channelmax = CSMaxReg;
 
+				/* formerly nc->channelmax, RIP */
+                SAFE(read_int16(&tmp16, f));
                 SAFE(read_int16(&nc->language, f));
 
                 if (ver >= 11 && ver < 13) {
@@ -546,7 +545,6 @@ void load_ns_dbase(void)
 
             SAFE(read_int16(&nc->channelcount, f));
             SAFE(read_int16(&tmp16, f));
-            nc->channelmax = CSMaxReg;
 
             if (ver < 13) {
                 /* Used to be dead authentication system */
@@ -693,7 +691,7 @@ void save_ns_dbase(void)
             }
 
             SAFE(write_int16(nc->channelcount, f));
-            SAFE(write_int16(nc->channelmax, f));
+            SAFE(write_int16(nc->channelcount, f)); // write this twice to avoid having to revbump the NickServ DB from anope 1.7, hack alert XXX
 
         }                       /* for (nc) */
 

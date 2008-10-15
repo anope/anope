@@ -335,22 +335,22 @@ int db_mysql_save_ns_core(NickCore * nc)
     /* Update the existing records */
     ret = db_mysql_try("UPDATE anope_ns_core "
                        "SET pass = %s, email = '%s', greet = '%s', icq = %d, url = '%s', flags = %d, language = %d, accesscount = %d, memocount = %d, "
-                       "    memomax = %d, channelcount = %d, channelmax = %d, active = 1 "
+                       "    memomax = %d, channelcount = %d, active = 1 "
                        "WHERE display = '%s'",
                        epass, q_email, q_greet, nc->icq, q_url, nc->flags,
                        nc->language, nc->accesscount, nc->memos.memocount,
-                       nc->memos.memomax, nc->channelcount, nc->channelmax,
+                       nc->memos.memomax, nc->channelcount,
                        q_display);
 
     /* Our previous UPDATE affected no rows, therefore this is a new record */
     if (ret && (mysql_affected_rows(mysql) == 0)) {
         ret = db_mysql_try("INSERT DELAYED INTO anope_ns_core "
-                           "(display, pass, email, greet, icq, url, flags, language, accesscount, memocount, memomax, channelcount, channelmax, active) "
+                           "(display, pass, email, greet, icq, url, flags, language, accesscount, memocount, memomax, channelcount, active) "
                            "VALUES ('%s', %s, '%s', '%s', %d, '%s', %d, %d, %d, %d, %d, %d, %d, 1)",
                            q_display, epass, q_email, q_greet, nc->icq, q_url,
                            nc->flags, nc->language, nc->accesscount,
                            nc->memos.memocount, nc->memos.memomax,
-                           nc->channelcount, nc->channelmax);
+                           nc->channelcount);
     }
 
     /* Now let's do the access */
@@ -1695,7 +1695,7 @@ int db_mysql_load_ns_dbase(void)
     if (!do_mysql)
         return 0;
 
-    ret = db_mysql_try("SELECT display, pass, email, icq, url, flags, language, accesscount, memocount, memomax, channelcount, channelmax, greet "
+    ret = db_mysql_try("SELECT display, pass, email, icq, url, flags, language, accesscount, memocount, memomax, channelcount, greet "
                        "FROM anope_ns_core "
                        "WHERE active = 1");
 
@@ -1724,9 +1724,8 @@ int db_mysql_load_ns_dbase(void)
         nc->memos.memocount = strtol(mysql_row[8], (char **) NULL, 10);
         nc->memos.memomax = strtol(mysql_row[9], (char **) NULL, 10);
 
-        /* Channelcount, channelmax, greet */
+        /* Channelcount, greet */
         nc->channelcount = strtol(mysql_row[10], (char **) NULL, 10);
-        nc->channelmax = strtol(mysql_row[11], (char **) NULL, 10);
         if (mysql_row[12] && *(mysql_row[12]))
             nc->greet = sstrdup(mysql_row[12]);
 

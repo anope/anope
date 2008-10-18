@@ -15,6 +15,8 @@ class NickRequest
 	time_t lastmail;			/* Unsaved */
 };
 
+class NickCore;
+
 class NickAlias
 {
  public:

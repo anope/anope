@@ -483,6 +483,16 @@ bool ValidateBantype(ServerConfig *, const char *, const char *, ValueItem &data
 	return true;
 }
 
+bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (s_BotServ) {
+		if (static_cast<std::string>(value) == "description") {
+			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
+		}
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -600,6 +610,8 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{"memoserv", "memoreceipt", "0", new ValueContainerInt(&MSMemoReceipt), DT_INTEGER, NoValidation},
+		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR, NoValidation},
+		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR, ValidateBotServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1181,8 +1193,6 @@ Directive directives[] = {
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"BotServDB", {{PARAM_STRING, PARAM_RELOAD, &BotDBName}}},
-    {"BotServName", {{PARAM_STRING, 0, &s_BotServ},
-                     {PARAM_STRING, 0, &desc_BotServ}}},
     {"BSBadWordsMax", {{PARAM_POSINT, PARAM_RELOAD, &BSBadWordsMax}}},
     {"BSDefDontKickOps", {{PARAM_SET, PARAM_RELOAD, &BSDefDontKickOps}}},
     {"BSDefDontKickVoices",

@@ -485,7 +485,7 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
-		else if (static_cast<std::string>(value) == "minusers") {
+		else if (static_cast<std::string>(value) == "minusers" || static_cast<std::string>(value) == "badwordsmax") {
 			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
 		}
 	}
@@ -614,6 +614,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
+		{"botserv", "badwordsmax", "0", new ValueContainerInt(&BSBadWordsMax), DT_INTEGER, ValidateBotServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1194,7 +1195,6 @@ Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
-    {"BSBadWordsMax", {{PARAM_POSINT, PARAM_RELOAD, &BSBadWordsMax}}},
     {"BSCaseSensitive", {{PARAM_SET, PARAM_RELOAD, &BSCaseSensitive}}},
     {"BSFantasyCharacter",
      {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
@@ -1894,7 +1894,6 @@ int read_config(int reload)
     }
 
     if (s_BotServ) {
-        CHECK(BSBadWordsMax);
         CHECK(BSKeepData);
         if (!BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");

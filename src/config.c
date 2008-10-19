@@ -167,7 +167,7 @@ time_t BSKeepData;
 int BSMinUsers;
 int BSBadWordsMax;
 bool BSSmartJoin;
-int BSGentleBWReason;
+bool BSGentleBWReason;
 int BSCaseSensitive;
 char *BSFantasyCharacter;
 
@@ -617,6 +617,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "badwordsmax", "0", new ValueContainerInt(&BSBadWordsMax), DT_INTEGER, ValidateBotServ},
 		{"botserv", "keepdata", "0", new ValueContainerTime(&BSKeepData), DT_TIME, ValidateBotServ},
 		{"botserv", "smartjoin", "no", new ValueContainerBool(&BSSmartJoin), DT_BOOLEAN, NoValidation},
+		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1200,7 +1201,6 @@ Directive directives[] = {
     {"BSCaseSensitive", {{PARAM_SET, PARAM_RELOAD, &BSCaseSensitive}}},
     {"BSFantasyCharacter",
      {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
-    {"BSGentleBWReason", {{PARAM_SET, PARAM_RELOAD, &BSGentleBWReason}}},
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},

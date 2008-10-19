@@ -485,6 +485,9 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
+		else if (static_cast<std::string>(value) == "minusers") {
+			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
+		}
 	}
 	return true;
 }
@@ -610,6 +613,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
+		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1196,7 +1200,6 @@ Directive directives[] = {
      {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
     {"BSGentleBWReason", {{PARAM_SET, PARAM_RELOAD, &BSGentleBWReason}}},
     {"BSKeepData", {{PARAM_TIME, PARAM_RELOAD, &BSKeepData}}},
-    {"BSMinUsers", {{PARAM_POSINT, PARAM_RELOAD, &BSMinUsers}}},
     {"BSSmartJoin", {{PARAM_SET, PARAM_RELOAD, &BSSmartJoin}}},
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
@@ -1892,7 +1895,6 @@ int read_config(int reload)
 
     if (s_BotServ) {
         CHECK(BSBadWordsMax);
-        CHECK(BSMinUsers);
         CHECK(BSKeepData);
         if (!BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");

@@ -365,7 +365,7 @@ E int   BSMinUsers;
 E int   BSBadWordsMax;
 E bool  BSSmartJoin;
 E bool  BSGentleBWReason;
-E int   BSCaseSensitive;
+E bool  BSCaseSensitive;
 E char *BSFantasyCharacter;
 
 E int   HideStatsO;

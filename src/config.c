@@ -619,6 +619,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "smartjoin", "no", new ValueContainerBool(&BSSmartJoin), DT_BOOLEAN, NoValidation},
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&BSCaseSensitive), DT_BOOLEAN, NoValidation},
+		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1199,8 +1200,6 @@ Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
-    {"BSFantasyCharacter",
-     {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
                       {PARAM_STRING, 0, &desc_HostServ}}},
@@ -1894,9 +1893,9 @@ int read_config(int reload)
     }
 
     if (s_BotServ) {
-        if (!BSFantasyCharacter)
+        if (!*BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");
-        if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
+        if (*BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
             printf
                 ("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
                  "*** character ('%c') will be used. The others will be ignored.\n",

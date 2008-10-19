@@ -163,7 +163,7 @@ int MSMemoReceipt;
 
 static std::string BSDefaults;
 int BSDefFlags;
-int BSKeepData;
+time_t BSKeepData;
 int BSMinUsers;
 int BSBadWordsMax;
 int BSSmartJoin;
@@ -485,7 +485,7 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
-		else if (static_cast<std::string>(value) == "minusers" || static_cast<std::string>(value) == "badwordsmax") {
+		else if (static_cast<std::string>(value) == "minusers" || static_cast<std::string>(value) == "badwordsmax" || static_cast<std::string>(value) == "keepdata") {
 			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when BotServ is enabled!");
 		}
 	}
@@ -615,6 +615,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerInt(&BSBadWordsMax), DT_INTEGER, ValidateBotServ},
+		{"botserv", "keepdata", "0", new ValueContainerTime(&BSKeepData), DT_TIME, ValidateBotServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1199,7 +1200,6 @@ Directive directives[] = {
     {"BSFantasyCharacter",
      {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
     {"BSGentleBWReason", {{PARAM_SET, PARAM_RELOAD, &BSGentleBWReason}}},
-    {"BSKeepData", {{PARAM_TIME, PARAM_RELOAD, &BSKeepData}}},
     {"BSSmartJoin", {{PARAM_SET, PARAM_RELOAD, &BSSmartJoin}}},
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
@@ -1894,7 +1894,6 @@ int read_config(int reload)
     }
 
     if (s_BotServ) {
-        CHECK(BSKeepData);
         if (!BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");
         if (BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {

@@ -360,7 +360,7 @@ E bool  MSNotifyAll;
 E int   MSMemoReceipt;
 
 E int   BSDefFlags;
-E int   BSKeepData;
+E time_t BSKeepData;
 E int   BSMinUsers;
 E int   BSBadWordsMax;
 E int   BSSmartJoin;

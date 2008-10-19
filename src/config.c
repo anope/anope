@@ -161,11 +161,7 @@ time_t MSSendDelay;
 bool MSNotifyAll;
 int MSMemoReceipt;
 
-int BSDefDontKickOps;
-int BSDefDontKickVoices;
-int BSDefFantasy;
-int BSDefGreet;
-int BSDefSymbiosis;
+static std::string BSDefaults;
 int BSDefFlags;
 int BSKeepData;
 int BSMinUsers;
@@ -613,6 +609,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
+		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1194,12 +1191,6 @@ Directive directives[] = {
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"BSBadWordsMax", {{PARAM_POSINT, PARAM_RELOAD, &BSBadWordsMax}}},
-    {"BSDefDontKickOps", {{PARAM_SET, PARAM_RELOAD, &BSDefDontKickOps}}},
-    {"BSDefDontKickVoices",
-     {{PARAM_SET, PARAM_RELOAD, &BSDefDontKickVoices}}},
-    {"BSDefGreet", {{PARAM_SET, PARAM_RELOAD, &BSDefGreet}}},
-    {"BSDefFantasy", {{PARAM_SET, PARAM_RELOAD, &BSDefFantasy}}},
-    {"BSDefSymbiosis", {{PARAM_SET, PARAM_RELOAD, &BSDefSymbiosis}}},
     {"BSCaseSensitive", {{PARAM_SET, PARAM_RELOAD, &BSCaseSensitive}}},
     {"BSFantasyCharacter",
      {{PARAM_STRING, PARAM_RELOAD, &BSFantasyCharacter}}},
@@ -1814,17 +1805,18 @@ int read_config(int reload)
 		}
 	}
 
-    BSDefFlags = 0;
-    if (BSDefDontKickOps)
-        BSDefFlags |= BS_DONTKICKOPS;
-    if (BSDefDontKickVoices)
-        BSDefFlags |= BS_DONTKICKVOICES;
-    if (BSDefGreet)
-        BSDefFlags |= BS_GREET;
-    if (BSDefFantasy)
-        BSDefFlags |= BS_FANTASY;
-    if (BSDefSymbiosis)
-        BSDefFlags |= BS_SYMBIOSIS;
+	BSDefFlags = 0;
+	if (!BSDefaults.empty()) {
+		spacesepstream options(BSDefaults);
+		std::string option;
+		while (options.GetToken(option)) {
+			if (option == "dontkickops") BSDefFlags |= BS_DONTKICKOPS;
+			else if (option == "dontkickvoices") BSDefFlags |= BS_DONTKICKVOICES;
+			else if (option == "greet") BSDefFlags |= BS_GREET;
+			else if (option == "fantasy") BSDefFlags |= BS_FANTASY;
+			else if (option == "symbiosis") BSDefFlags |= BS_SYMBIOSIS;
+		}
+	}
 
     /* Services Root building */
 

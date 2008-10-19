@@ -486,7 +486,7 @@ bool ValidateBantype(ServerConfig *, const char *, const char *, ValueItem &data
 bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
 	if (s_BotServ) {
-		if (static_cast<std::string>(value) == "description") {
+		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when BotServ is enabled!");
 		}
 	}
@@ -612,6 +612,7 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "memoreceipt", "0", new ValueContainerInt(&MSMemoReceipt), DT_INTEGER, NoValidation},
 		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR, ValidateBotServ},
+		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1192,7 +1193,6 @@ Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
-    {"BotServDB", {{PARAM_STRING, PARAM_RELOAD, &BotDBName}}},
     {"BSBadWordsMax", {{PARAM_POSINT, PARAM_RELOAD, &BSBadWordsMax}}},
     {"BSDefDontKickOps", {{PARAM_SET, PARAM_RELOAD, &BSDefDontKickOps}}},
     {"BSDefDontKickVoices",
@@ -1899,7 +1899,6 @@ int read_config(int reload)
     }
 
     if (s_BotServ) {
-        CHEK2(BotDBName, BotServDB);
         CHECK(BSBadWordsMax);
         CHECK(BSMinUsers);
         CHECK(BSKeepData);

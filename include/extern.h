@@ -363,7 +363,7 @@ E int   BSDefFlags;
 E time_t BSKeepData;
 E int   BSMinUsers;
 E int   BSBadWordsMax;
-E int   BSSmartJoin;
+E bool  BSSmartJoin;
 E int   BSGentleBWReason;
 E int   BSCaseSensitive;
 E char *BSFantasyCharacter;

@@ -82,7 +82,7 @@ char *OperDBName;
 char *AutokillDBName;
 char *NewsDBName;
 
-char *HostSetter;
+static char *HostSetter;
 char **HostSetters;
 int HostNumber = 0;             /* needs to be set to 0 */
 
@@ -633,6 +633,7 @@ int ServerConfig::Read(bool bail)
 		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
+		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1243,7 +1244,6 @@ Directive directives[] = {
     {"HelpCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HelpCoreModules}}},
     {"HelpChannel", {{PARAM_STRING, PARAM_RELOAD, &HelpChannel}}},
     {"HostCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HostCoreModules}}},
-    {"HostSetters", {{PARAM_STRING, PARAM_RELOAD, &HostSetter}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"HelpServName", {{PARAM_STRING, 0, &s_HelpServ},

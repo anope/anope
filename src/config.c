@@ -632,6 +632,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_BOOLEAN, NoValidation},
 		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR, ValidateHostServ},
+		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1212,7 +1213,6 @@ Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
-    {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
     {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
@@ -1911,10 +1911,6 @@ int read_config(int reload)
                  "*** character ('%c') will be used. The others will be ignored.\n",
                  *BSFantasyCharacter);
         }
-    }
-
-    if (s_HostServ) {
-        CHEK2(HostDBName, HostServDB);
     }
 
     if (UseMail) {

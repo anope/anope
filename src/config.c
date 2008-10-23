@@ -492,6 +492,16 @@ bool ValidateBotServ(ServerConfig *, const char *tag, const char *value, ValueIt
 	return true;
 }
 
+bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (s_HostServ) {
+		if (static_cast<std::string>(value) == "description" || static_cast<std::string>(value) == "database") {
+			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when HostServ is enabled!");
+		}
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -620,6 +630,8 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&BSCaseSensitive), DT_BOOLEAN, NoValidation},
 		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_BOOLEAN, NoValidation},
+		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR, NoValidation},
+		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR, ValidateHostServ},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1201,8 +1213,6 @@ Directive directives[] = {
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"HostServDB", {{PARAM_STRING, PARAM_RELOAD, &HostDBName}}},
-    {"HostServName", {{PARAM_STRING, 0, &s_HostServ},
-                      {PARAM_STRING, 0, &desc_HostServ}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
     {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
@@ -1904,7 +1914,6 @@ int read_config(int reload)
     }
 
     if (s_HostServ) {
-        CHEK2(s_HostServ, HostServName);
         CHEK2(HostDBName, HostServDB);
     }
 

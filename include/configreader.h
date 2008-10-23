@@ -140,6 +140,11 @@ template<> class ValueContainer<char **> : public ValueContainerBase
 		/** Change value to type T of size s */
 		void Set(const char *newval, size_t s)
 		{
+			if (*val) delete [] *val;
+			if (!*newval) {
+				*val = NULL;
+				return;
+			}
 			*val = new char[s];
 			strlcpy(*val, newval, s);
 		}

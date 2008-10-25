@@ -640,6 +640,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1288,7 +1289,6 @@ Directive directives[] = {
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
     {"OperCoreModules", {{PARAM_STRING, PARAM_RELOAD, &OperCoreModules}}},
-    {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
     {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
     {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
@@ -1692,7 +1692,6 @@ int read_config(int reload)
 
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
-        CHEK2(OperDBName, OperServDB);
         CHEK2(NewsDBName, NewsDB);
         CHEK2(ExceptionDBName, ExceptionDB);
     }

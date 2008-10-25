@@ -641,6 +641,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1282,7 +1283,6 @@ Directive directives[] = {
     {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
-    {"NewsDB", {{PARAM_STRING, PARAM_RELOAD, &NewsDBName}}},
     {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
     {"Numeric", {{PARAM_STRING, PARAM_RELOAD, &Numeric}}},
     {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
@@ -1692,7 +1692,6 @@ int read_config(int reload)
 
     CHEK2(MOTDFilename, MOTDFile);
     if (!reload) {
-        CHEK2(NewsDBName, NewsDB);
         CHEK2(ExceptionDBName, ExceptionDB);
     }
     CHECK(UpdateTimeout);

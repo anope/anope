@@ -383,7 +383,7 @@ E time_t ChankillExpiry;
 E time_t SGLineExpiry;
 E time_t SQLineExpiry;
 E time_t SZLineExpiry;
-E int   AkillOnAdd;
+E bool  AkillOnAdd;
 E int   KillonSGline;
 E int   KillonSQline;
 E int   DisableRaw;

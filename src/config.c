@@ -189,7 +189,7 @@ time_t ChankillExpiry;
 time_t SGLineExpiry;
 time_t SQLineExpiry;
 time_t SZLineExpiry;
-int AkillOnAdd;
+bool AkillOnAdd;
 int KillonSGline;
 int KillonSQline;
 int WallOper;
@@ -652,6 +652,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "sglineexpiry", "0", new ValueContainerTime(&SGLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&SQLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&SZLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "akillonadd", "no", new ValueContainerBool(&AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1225,7 +1226,6 @@ bool ValueItem::GetBool()
 /*************************************************************************/
 
 Directive directives[] = {
-    {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},

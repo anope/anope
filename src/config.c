@@ -643,6 +643,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "autokilldatabase", "akill.db", new ValueContainerChar(&AutokillDBName), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1217,7 +1218,6 @@ bool ValueItem::GetBool()
 
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
-    {"AutokillDB", {{PARAM_STRING, PARAM_RELOAD, &AutokillDBName}}},
     {"AutokillExpiry", {{PARAM_TIME, PARAM_RELOAD, &AutokillExpiry}}},
     {"ChankillExpiry", {{PARAM_TIME, PARAM_RELOAD, &ChankillExpiry}}},
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},

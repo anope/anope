@@ -515,7 +515,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"nickserv", "chanserv", "memoserv", "helpserv", NULL};
+	static const char *Once[] = {"nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -636,6 +636,8 @@ int ServerConfig::Read(bool bail)
 		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
 		{"helpserv", "nick", "HelpServ", new ValueContainerChar(&s_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"helpserv", "description", "Help Service", new ValueContainerChar(&desc_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1287,8 +1289,6 @@ Directive directives[] = {
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
     {"OperCoreModules", {{PARAM_STRING, PARAM_RELOAD, &OperCoreModules}}},
     {"OperServDB", {{PARAM_STRING, PARAM_RELOAD, &OperDBName}}},
-    {"OperServName", {{PARAM_STRING, 0, &s_OperServ},
-                      {PARAM_STRING, 0, &desc_OperServ}}},
     {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
     {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
@@ -1687,7 +1687,6 @@ int read_config(int reload)
     CHECK(NetworkName);
     if (!reload) {
         CHEK2(temp_userhost, ServiceUser);
-        CHEK2(s_OperServ, OperServName);
         CHEK2(s_GlobalNoticer, GlobalName);
         CHEK2(PIDFilename, PIDFile);
     }

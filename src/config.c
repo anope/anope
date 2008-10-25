@@ -515,7 +515,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"nickserv", "chanserv", "memoserv", NULL};
+	static const char *Once[] = {"nickserv", "chanserv", "memoserv", "helpserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -619,8 +619,8 @@ int ServerConfig::Read(bool bail)
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
 		{"memoserv", "memoreceipt", "0", new ValueContainerInt(&MSMemoReceipt), DT_INTEGER, NoValidation},
-		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR, NoValidation},
-		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR, ValidateBotServ},
+		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
+		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
@@ -630,10 +630,12 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&BSCaseSensitive), DT_BOOLEAN, NoValidation},
 		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_BOOLEAN, NoValidation},
-		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR, NoValidation},
-		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR, ValidateHostServ},
+		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
+		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
 		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
+		{"helpserv", "nick", "HelpServ", new ValueContainerChar(&s_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"helpserv", "description", "Help Service", new ValueContainerChar(&desc_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1246,8 +1248,6 @@ Directive directives[] = {
     {"HostCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HostCoreModules}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
-    {"HelpServName", {{PARAM_STRING, 0, &s_HelpServ},
-                      {PARAM_STRING, 0, &desc_HelpServ}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
     {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
@@ -1687,7 +1687,6 @@ int read_config(int reload)
     CHECK(NetworkName);
     if (!reload) {
         CHEK2(temp_userhost, ServiceUser);
-        CHEK2(s_HelpServ, HelpServName);
         CHEK2(s_OperServ, OperServName);
         CHEK2(s_GlobalNoticer, GlobalName);
         CHEK2(PIDFilename, PIDFile);

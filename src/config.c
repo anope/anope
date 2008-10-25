@@ -180,7 +180,7 @@ char *GlobalOnCycleUP;
 static char *ServicesRoot;
 char **ServicesRoots;
 int RootNumber;
-int SuperAdmin;
+bool SuperAdmin;
 int LogBot;
 int LogMaxUsers;
 int DisableRaw;
@@ -645,6 +645,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "autokilldatabase", "akill.db", new ValueContainerChar(&AutokillDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1262,7 +1263,6 @@ Directive directives[] = {
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
-    {"SuperAdmin", {{PARAM_SET, PARAM_RELOAD, &SuperAdmin}}},
     {"LogMaxUsers", {{PARAM_SET, PARAM_RELOAD, &LogMaxUsers}}},
     {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
     {"MaxSessionKill", {{PARAM_INT, PARAM_RELOAD, &MaxSessionKill}}},

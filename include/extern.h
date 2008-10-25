@@ -376,7 +376,7 @@ E char *GlobalOnCycleUP;
 E char **ServicesRoots;
 E int   RootNumber;
 E int   LogMaxUsers;
-E int   SuperAdmin;
+E bool  SuperAdmin;
 E int   LogBot;
 E int   AutokillExpiry;
 E int   ChankillExpiry;

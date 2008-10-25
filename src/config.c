@@ -642,6 +642,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "globaldescription", "Global Noticer", new ValueContainerChar(&desc_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1243,7 +1244,6 @@ Directive directives[] = {
     {"DefConOffMessage",
      {{PARAM_STRING, PARAM_RELOAD, &DefConOffMessage}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
-    {"ExceptionDB", {{PARAM_STRING, PARAM_RELOAD, &ExceptionDBName}}},
     {"ExceptionExpiry", {{PARAM_TIME, PARAM_RELOAD, &ExceptionExpiry}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
@@ -1691,9 +1691,6 @@ int read_config(int reload)
     }
 
     CHEK2(MOTDFilename, MOTDFile);
-    if (!reload) {
-        CHEK2(ExceptionDBName, ExceptionDB);
-    }
     CHECK(UpdateTimeout);
     CHECK(ExpireTimeout);
     CHECK(ReadTimeout);

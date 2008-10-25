@@ -177,7 +177,7 @@ int AnonymousGlobal;
 int RestrictOperNicks;
 char *GlobalOnCycleMessage;
 char *GlobalOnCycleUP;
-char *ServicesRoot;
+static char *ServicesRoot;
 char **ServicesRoots;
 int RootNumber;
 int SuperAdmin;
@@ -644,6 +644,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "autokilldatabase", "akill.db", new ValueContainerChar(&AutokillDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1303,7 +1304,6 @@ Directive directives[] = {
     {"SendFrom", {{PARAM_STRING, PARAM_RELOAD, &SendFrom}}},
     {"ServerDesc", {{PARAM_STRING, 0, &ServerDesc}}},
     {"ServerName", {{PARAM_STRING, 0, &ServerName}}},
-    {"ServicesRoot", {{PARAM_STRING, PARAM_RELOAD, &ServicesRoot}}},
     {"ServiceUser", {{PARAM_STRING, 0, &temp_userhost}}},
     {"SessionLimitDetailsLoc",
      {{PARAM_STRING, PARAM_RELOAD, &SessionLimitDetailsLoc}}},
@@ -1696,7 +1696,6 @@ int read_config(int reload)
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-    CHECK(ServicesRoot);
     CHECK(AutokillExpiry);
     CHECK(ChankillExpiry);
     CHECK(SGLineExpiry);
@@ -1752,16 +1751,6 @@ int read_config(int reload)
 		}
 		if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
 	}
-
-    if (!ServicesRoot) {
-        error(0,
-              "You must define the 'ServicesRoot' configuration directive");
-        error(0,
-              "in your services.conf file. This is a required setting that");
-        error(0,
-              "defines the main Administrative nick(s) Anope will obey.");
-        retval = 0;
-    }
 
     if (!NewsCount) {
         NewsCount = 3;

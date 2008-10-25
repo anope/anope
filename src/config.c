@@ -184,11 +184,11 @@ bool SuperAdmin;
 int LogBot;
 bool LogMaxUsers;
 int DisableRaw;
-int AutokillExpiry;
-int ChankillExpiry;
-int SGLineExpiry;
-int SQLineExpiry;
-int SZLineExpiry;
+time_t AutokillExpiry;
+time_t ChankillExpiry;
+time_t SGLineExpiry;
+time_t SQLineExpiry;
+time_t SZLineExpiry;
 int AkillOnAdd;
 int KillonSGline;
 int KillonSQline;
@@ -647,6 +647,11 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&LogMaxUsers), DT_BOOLEAN, NoValidation},
+		{"operserv", "autokillexpiry", "0", new ValueContainerTime(&AutokillExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "chankillexpiry", "0", new ValueContainerTime(&ChankillExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "sglineexpiry", "0", new ValueContainerTime(&SGLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&SQLineExpiry), DT_TIME, ValidateNotZero},
+		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&SZLineExpiry), DT_TIME, ValidateNotZero},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1221,8 +1226,6 @@ bool ValueItem::GetBool()
 
 Directive directives[] = {
     {"AkillOnAdd", {{PARAM_SET, PARAM_RELOAD, &AkillOnAdd}}},
-    {"AutokillExpiry", {{PARAM_TIME, PARAM_RELOAD, &AutokillExpiry}}},
-    {"ChankillExpiry", {{PARAM_TIME, PARAM_RELOAD, &ChankillExpiry}}},
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
@@ -1312,9 +1315,6 @@ Directive directives[] = {
      {{PARAM_STRING, PARAM_RELOAD, &SessionLimitExceeded}}},
     {"SessionAutoKillExpiry",
      {{PARAM_TIME, PARAM_RELOAD, &SessionAutoKillExpiry}}},
-    {"SGLineExpiry", {{PARAM_TIME, PARAM_RELOAD, &SGLineExpiry}}},
-    {"SQLineExpiry", {{PARAM_TIME, PARAM_RELOAD, &SQLineExpiry}}},
-    {"SZLineExpiry", {{PARAM_TIME, PARAM_RELOAD, &SZLineExpiry}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
     {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
@@ -1696,11 +1696,6 @@ int read_config(int reload)
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-    CHECK(AutokillExpiry);
-    CHECK(ChankillExpiry);
-    CHECK(SGLineExpiry);
-    CHECK(SQLineExpiry);
-    CHECK(SZLineExpiry);
 
     if (!reload) {
 

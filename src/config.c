@@ -513,6 +513,18 @@ bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, V
 	return true;
 }
 
+bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (static_cast<std::string>(value) == "defaultlevel") {
+		int level = data.GetInteger();
+		if (!level) return true;
+		if (level > 5) throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
+	}
+	else if (DefConLevel) {
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -678,6 +690,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
 		{"opserver", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
+		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1258,7 +1271,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefConLevel", {{PARAM_INT, PARAM_RELOAD, &DefConLevel}}},
     {"DefCon1", {{PARAM_INT, PARAM_RELOAD, &DefCon1}}},
     {"DefCon2", {{PARAM_INT, PARAM_RELOAD, &DefCon2}}},
     {"DefCon3", {{PARAM_INT, PARAM_RELOAD, &DefCon3}}},

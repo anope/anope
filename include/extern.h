@@ -409,7 +409,7 @@ E bool  WallDrop;
 E bool  WallForbid;
 E bool  WallGetpass;
 E bool  WallSetpass;
-E int   AddAkiller;
+E bool  AddAkiller;
 
 E int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS], int linenum, int reload, char *s);
 

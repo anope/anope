@@ -215,7 +215,7 @@ bool WallDrop;
 bool WallForbid;
 bool WallGetpass;
 bool WallSetpass;
-int AddAkiller;
+bool AddAkiller;
 
 bool LimitSessions;
 int DefSessionLimit;
@@ -676,6 +676,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
 		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
+		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1280,7 +1281,6 @@ Directive directives[] = {
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
-    {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},

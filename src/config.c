@@ -659,6 +659,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
+		{"operserv", "defaultsessionlimit", "0", new ValueContainerInt(&DefSessionLimit), DT_INTEGER, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1236,7 +1237,6 @@ Directive directives[] = {
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
-    {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
@@ -1881,7 +1881,6 @@ int read_config(int reload)
 
 
     if (LimitSessions) {
-        CHECK(DefSessionLimit);
         CHECK(MaxSessionLimit);
         CHECK(ExceptionExpiry);
 

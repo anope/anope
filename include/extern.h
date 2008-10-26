@@ -442,7 +442,7 @@ E int NickServCoreNumber;
 E char **ChanServCoreModules;
 E int ChanServCoreNumber;
 
-E int   LimitSessions;
+E bool  LimitSessions;
 E int   DefSessionLimit;
 E int   ExceptionExpiry;
 E int   MaxSessionKill;

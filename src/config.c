@@ -217,7 +217,7 @@ bool WallGetpass;
 bool WallSetpass;
 int AddAkiller;
 
-int LimitSessions;
+bool LimitSessions;
 int DefSessionLimit;
 int ExceptionExpiry;
 int MaxSessionKill;
@@ -658,6 +658,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&KillonSQline), DT_BOOLEAN, NoValidation},
 		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
+		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1265,7 +1266,6 @@ Directive directives[] = {
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
     {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
-    {"LimitSessions", {{PARAM_SET, 0, &LimitSessions}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},

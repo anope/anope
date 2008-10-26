@@ -872,7 +872,7 @@ E int check_szline(const char *nick, char *ip);
 
 E Server *server_global(Server * s, char *msg);
 
-E int OSOpersOnly;
+E bool OSOpersOnly;
 E time_t DefContimer;
 E void runDefCon(void);
 E int defconParseModeString(const char *str);

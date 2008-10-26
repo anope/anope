@@ -227,7 +227,7 @@ char *ExceptionDBName;
 char *SessionLimitExceeded;
 char *SessionLimitDetailsLoc;
 
-int OSOpersOnly;
+bool OSOpersOnly;
 
 char *Modules;
 char *ModulesDelayed;
@@ -677,6 +677,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
 		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
+		{"opserver", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1323,7 +1324,6 @@ Directive directives[] = {
     {"ServerDesc", {{PARAM_STRING, 0, &ServerDesc}}},
     {"ServerName", {{PARAM_STRING, 0, &ServerName}}},
     {"ServiceUser", {{PARAM_STRING, 0, &temp_userhost}}},
-    {"OSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &OSOpersOnly}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
     {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},

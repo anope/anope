@@ -672,6 +672,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerInt(&DefSessionLimit), DT_INTEGER, NoValidation},
 		{"operserv", "maxsessionlimit", "0", new ValueContainerInt(&MaxSessionLimit), DT_INTEGER, ValidateLimitSessions},
 		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&ExceptionExpiry), DT_TIME, ValidateLimitSessions},
+		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&SessionLimitExceeded), DT_CHARPTR, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1323,8 +1324,6 @@ Directive directives[] = {
     {"SessionLimitDetailsLoc",
      {{PARAM_STRING, PARAM_RELOAD, &SessionLimitDetailsLoc}}},
     {"OSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &OSOpersOnly}}},
-    {"SessionLimitExceeded",
-     {{PARAM_STRING, PARAM_RELOAD, &SessionLimitExceeded}}},
     {"SessionAutoKillExpiry",
      {{PARAM_TIME, PARAM_RELOAD, &SessionAutoKillExpiry}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},

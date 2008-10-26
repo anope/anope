@@ -503,6 +503,16 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 	return true;
 }
 
+bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (LimitSessions) {
+		if (static_cast<std::string>(value) == "maxsessionlimit") {
+			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
+		}
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -660,6 +670,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerInt(&DefSessionLimit), DT_INTEGER, NoValidation},
+		{"operserv", "maxsessionlimit", "0", new ValueContainerInt(&MaxSessionLimit), DT_INTEGER, ValidateLimitSessions},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1271,7 +1282,6 @@ Directive directives[] = {
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
     {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
     {"MaxSessionKill", {{PARAM_INT, PARAM_RELOAD, &MaxSessionKill}}},
-    {"MaxSessionLimit", {{PARAM_POSINT, PARAM_RELOAD, &MaxSessionLimit}}},
     {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
@@ -1881,7 +1891,6 @@ int read_config(int reload)
 
 
     if (LimitSessions) {
-        CHECK(MaxSessionLimit);
         CHECK(ExceptionExpiry);
 
         if (MaxSessionKill && !SessionAutoKillExpiry)

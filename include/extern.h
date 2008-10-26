@@ -384,7 +384,7 @@ E time_t SGLineExpiry;
 E time_t SQLineExpiry;
 E time_t SZLineExpiry;
 E bool  AkillOnAdd;
-E int   KillonSGline;
+E bool  KillonSGline;
 E int   KillonSQline;
 E int   DisableRaw;
 E int   WallOper;

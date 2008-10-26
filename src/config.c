@@ -190,7 +190,7 @@ time_t SGLineExpiry;
 time_t SQLineExpiry;
 time_t SZLineExpiry;
 bool AkillOnAdd;
-int KillonSGline;
+bool KillonSGline;
 int KillonSQline;
 int WallOper;
 int WallBadOS;
@@ -653,6 +653,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "sqlineexpiry", "0", new ValueContainerTime(&SQLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "szlineexpiry", "0", new ValueContainerTime(&SZLineExpiry), DT_TIME, ValidateNotZero},
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&AkillOnAdd), DT_BOOLEAN, NoValidation},
+		{"operserv", "killonsgline", "no", new ValueContainerBool(&KillonSGline), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1260,7 +1261,6 @@ Directive directives[] = {
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
-    {"KillonSGline", {{PARAM_SET, PARAM_RELOAD, &KillonSGline}}},
     {"KillonSQline", {{PARAM_SET, PARAM_RELOAD, &KillonSQline}}},
     {"AddAkiller", {{PARAM_SET, PARAM_RELOAD, &AddAkiller}}},
     {"LimitSessions", {{PARAM_SET, 0, &LimitSessions}}},

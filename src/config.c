@@ -192,28 +192,29 @@ time_t SZLineExpiry;
 bool AkillOnAdd;
 bool KillonSGline;
 bool KillonSQline;
-int WallOper;
-int WallBadOS;
-int WallOSGlobal;
-int WallOSMode;
-int WallOSClearmodes;
-int WallOSKick;
-int WallOSAkill;
-int WallOSSGLine;
-int WallOSSQLine;
-int WallOSSZLine;
-int WallOSNoOp;
-int WallOSJupe;
-int WallOSRaw;
-int WallAkillExpire;
-int WallSGLineExpire;
-int WallSQLineExpire;
-int WallSZLineExpire;
-int WallExceptionExpire;
-int WallDrop;
-int WallForbid;
-int WallGetpass;
-int WallSetpass;
+static std::string OSNotifications;
+bool WallOper;
+bool WallBadOS;
+bool WallOSGlobal;
+bool WallOSMode;
+bool WallOSClearmodes;
+bool WallOSKick;
+bool WallOSAkill;
+bool WallOSSGLine;
+bool WallOSSQLine;
+bool WallOSSZLine;
+bool WallOSNoOp;
+bool WallOSJupe;
+bool WallOSRaw;
+bool WallAkillExpire;
+bool WallSGLineExpire;
+bool WallSQLineExpire;
+bool WallSZLineExpire;
+bool WallExceptionExpire;
+bool WallDrop;
+bool WallForbid;
+bool WallGetpass;
+bool WallSetpass;
 int AddAkiller;
 
 int LimitSessions;
@@ -656,6 +657,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "killonsgline", "no", new ValueContainerBool(&KillonSGline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&KillonSQline), DT_BOOLEAN, NoValidation},
 		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
+		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1335,29 +1337,6 @@ Directive directives[] = {
     {"UseTokens", {{PARAM_SET, 0, &UseTokens}}},
     {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
-    {"WallAkillExpire", {{PARAM_SET, PARAM_RELOAD, &WallAkillExpire}}},
-    {"WallBadOS", {{PARAM_SET, PARAM_RELOAD, &WallBadOS}}},
-    {"WallDrop", {{PARAM_SET, PARAM_RELOAD, &WallDrop}}},
-    {"WallExceptionExpire",
-     {{PARAM_SET, PARAM_RELOAD, &WallExceptionExpire}}},
-    {"WallForbid", {{PARAM_SET, PARAM_RELOAD, &WallForbid}}},
-    {"WallGetpass", {{PARAM_SET, PARAM_RELOAD, &WallGetpass}}},
-    {"WallOper", {{PARAM_SET, PARAM_RELOAD, &WallOper}}},
-    {"WallOSAkill", {{PARAM_SET, PARAM_RELOAD, &WallOSAkill}}},
-    {"WallOSClearmodes", {{PARAM_SET, PARAM_RELOAD, &WallOSClearmodes}}},
-    {"WallOSGlobal", {{PARAM_SET, PARAM_RELOAD, &WallOSGlobal}}},
-    {"WallOSKick", {{PARAM_SET, PARAM_RELOAD, &WallOSKick}}},
-    {"WallOSJupe", {{PARAM_SET, PARAM_RELOAD, &WallOSJupe}}},
-    {"WallOSMode", {{PARAM_SET, PARAM_RELOAD, &WallOSMode}}},
-    {"WallOSNoOp", {{PARAM_SET, PARAM_RELOAD, &WallOSNoOp}}},
-    {"WallOSRaw", {{PARAM_SET, PARAM_RELOAD, &WallOSRaw}}},
-    {"WallOSSGLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSGLine}}},
-    {"WallOSSQLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSQLine}}},
-    {"WallOSSZLine", {{PARAM_SET, PARAM_RELOAD, &WallOSSZLine}}},
-    {"WallSetpass", {{PARAM_SET, PARAM_RELOAD, &WallSetpass}}},
-    {"WallSGLineExpire", {{PARAM_SET, PARAM_RELOAD, &WallSGLineExpire}}},
-    {"WallSQLineExpire", {{PARAM_SET, PARAM_RELOAD, &WallSQLineExpire}}},
-    {"WallSZLineExpire", {{PARAM_SET, PARAM_RELOAD, &WallSZLineExpire}}},
     {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
     {"GlobalOnDefcon", {{PARAM_SET, PARAM_RELOAD, &GlobalOnDefcon}}},
     {"GlobalOnDefconMore",
@@ -1803,6 +1782,38 @@ int read_config(int reload)
 			else if (option == "greet") BSDefFlags |= BS_GREET;
 			else if (option == "fantasy") BSDefFlags |= BS_FANTASY;
 			else if (option == "symbiosis") BSDefFlags |= BS_SYMBIOSIS;
+		}
+	}
+
+	WallOper = WallBadOS = WallOSGlobal = WallOSMode = WallOSClearmodes = WallOSKick = WallOSAkill = WallOSSGLine = WallOSSQLine = WallOSSZLine = WallOSNoOp =
+		WallOSJupe = WallOSRaw = WallAkillExpire = WallSGLineExpire = WallSQLineExpire = WallSZLineExpire = WallExceptionExpire = WallGetpass = WallSetpass =
+		WallForbid = WallDrop = false;
+	if (!OSNotifications.empty()) {
+		spacesepstream notifications(OSNotifications);
+		std::string notice;
+		while (notifications.GetToken(notice)) {
+			if (notice == "oper") WallOper = true;
+			else if (notice == "bados") WallBadOS = true;
+			else if (notice == "osglobal") WallOSGlobal = true;
+			else if (notice == "osmode") WallOSMode = true;
+			else if (notice == "osclearmodes") WallOSClearmodes = true;
+			else if (notice == "oskick") WallOSKick = true;
+			else if (notice == "osakill") WallOSAkill = true;
+			else if (notice == "ossgline") WallOSSGLine = true;
+			else if (notice == "ossqline") WallOSSQLine = true;
+			else if (notice == "osszline") WallOSSZLine = true;
+			else if (notice == "osnoop") WallOSNoOp = true;
+			else if (notice == "osjupe") WallOSJupe = true;
+			else if (notice == "osraw") WallOSRaw = true;
+			else if (notice == "akillexpire") WallAkillExpire = true;
+			else if (notice == "sglineexpire") WallSGLineExpire = true;
+			else if (notice == "sqlineexpire") WallSQLineExpire = true;
+			else if (notice == "szlineexpire") WallSZLineExpire = true;
+			else if (notice == "exceptionexpire") WallExceptionExpire = true;
+			else if (notice == "getpass") WallGetpass = true;
+			else if (notice == "setpass") WallSetpass = true;
+			else if (notice == "forbid") WallForbid = true;
+			else if (notice == "drop") WallDrop = true;
 		}
 	}
 

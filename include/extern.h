@@ -447,7 +447,7 @@ E int   DefSessionLimit;
 E time_t ExceptionExpiry;
 E int   MaxSessionKill;
 E int   MaxSessionLimit;
-E int   SessionAutoKillExpiry;
+E time_t SessionAutoKillExpiry;
 E char *ExceptionDBName;
 E char *SessionLimitDetailsLoc;
 E char *SessionLimitExceeded;

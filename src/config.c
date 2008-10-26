@@ -222,7 +222,7 @@ int DefSessionLimit;
 time_t ExceptionExpiry;
 int MaxSessionKill;
 int MaxSessionLimit;
-int SessionAutoKillExpiry;
+time_t SessionAutoKillExpiry;
 char *ExceptionDBName;
 char *SessionLimitExceeded;
 char *SessionLimitDetailsLoc;
@@ -675,6 +675,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&SessionLimitExceeded), DT_CHARPTR, NoValidation},
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
 		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
+		{"operserv", "sessionautokillexpiry", "0", new ValueContainerTime(&SessionAutoKillExpiry), DT_TIME, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1323,8 +1324,6 @@ Directive directives[] = {
     {"ServerName", {{PARAM_STRING, 0, &ServerName}}},
     {"ServiceUser", {{PARAM_STRING, 0, &temp_userhost}}},
     {"OSOpersOnly", {{PARAM_SET, PARAM_RELOAD, &OSOpersOnly}}},
-    {"SessionAutoKillExpiry",
-     {{PARAM_TIME, PARAM_RELOAD, &SessionAutoKillExpiry}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
     {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},

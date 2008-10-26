@@ -183,7 +183,7 @@ int RootNumber;
 bool SuperAdmin;
 int LogBot;
 bool LogMaxUsers;
-int DisableRaw;
+bool DisableRaw;
 time_t AutokillExpiry;
 time_t ChankillExpiry;
 time_t SGLineExpiry;
@@ -655,6 +655,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "akillonadd", "no", new ValueContainerBool(&AkillOnAdd), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsgline", "no", new ValueContainerBool(&KillonSGline), DT_BOOLEAN, NoValidation},
 		{"operserv", "killonsqline", "no", new ValueContainerBool(&KillonSQline), DT_BOOLEAN, NoValidation},
+		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1233,7 +1234,6 @@ Directive directives[] = {
     {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
     {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"DefSessionLimit", {{PARAM_POSINT, 0, &DefSessionLimit}}},
-    {"DisableRaw", {{PARAM_SET, PARAM_RELOAD, &DisableRaw}}},
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},

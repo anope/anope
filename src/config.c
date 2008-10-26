@@ -219,7 +219,7 @@ int AddAkiller;
 
 bool LimitSessions;
 int DefSessionLimit;
-int ExceptionExpiry;
+time_t ExceptionExpiry;
 int MaxSessionKill;
 int MaxSessionLimit;
 int SessionAutoKillExpiry;
@@ -506,7 +506,7 @@ bool ValidateHostServ(ServerConfig *, const char *tag, const char *value, ValueI
 bool ValidateLimitSessions(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
 	if (LimitSessions) {
-		if (static_cast<std::string>(value) == "maxsessionlimit") {
+		if (static_cast<std::string>(value) == "maxsessionlimit" || static_cast<std::string>(value) == "exceptionexpiry") {
 			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when session limiting is enabled!");
 		}
 	}
@@ -671,6 +671,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
 		{"operserv", "defaultsessionlimit", "0", new ValueContainerInt(&DefSessionLimit), DT_INTEGER, NoValidation},
 		{"operserv", "maxsessionlimit", "0", new ValueContainerInt(&MaxSessionLimit), DT_INTEGER, ValidateLimitSessions},
+		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&ExceptionExpiry), DT_TIME, ValidateLimitSessions},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1266,7 +1267,6 @@ Directive directives[] = {
     {"DefConOffMessage",
      {{PARAM_STRING, PARAM_RELOAD, &DefConOffMessage}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
-    {"ExceptionExpiry", {{PARAM_TIME, PARAM_RELOAD, &ExceptionExpiry}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
     {"HelpCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HelpCoreModules}}},
@@ -1891,8 +1891,6 @@ int read_config(int reload)
 
 
     if (LimitSessions) {
-        CHECK(ExceptionExpiry);
-
         if (MaxSessionKill && !SessionAutoKillExpiry)
             SessionAutoKillExpiry = 30 * 60;    /* 30 minutes */
     }

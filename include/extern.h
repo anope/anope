@@ -444,7 +444,7 @@ E int ChanServCoreNumber;
 
 E bool  LimitSessions;
 E int   DefSessionLimit;
-E int   ExceptionExpiry;
+E time_t ExceptionExpiry;
 E int   MaxSessionKill;
 E int   MaxSessionLimit;
 E int   SessionAutoKillExpiry;

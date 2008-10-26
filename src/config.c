@@ -674,6 +674,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&ExceptionExpiry), DT_TIME, ValidateLimitSessions},
 		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&SessionLimitExceeded), DT_CHARPTR, NoValidation},
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
+		{"operserv", "maxsessionkill", "0", new ValueContainerInt(&MaxSessionKill), DT_INTEGER, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1283,7 +1284,6 @@ Directive directives[] = {
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
     {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
-    {"MaxSessionKill", {{PARAM_INT, PARAM_RELOAD, &MaxSessionKill}}},
     {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
@@ -1890,7 +1890,7 @@ int read_config(int reload)
 
     if (LimitSessions) {
         if (MaxSessionKill && !SessionAutoKillExpiry)
-            SessionAutoKillExpiry = 30 * 60;    /* 30 minutes */
+            SessionAutoKillExpiry = 1800;    /* 30 minutes */
     }
 
     if (s_BotServ) {

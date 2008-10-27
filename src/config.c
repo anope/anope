@@ -290,7 +290,7 @@ int DefConSessionLimit;
 time_t DefConAKILL;
 char *DefConChanModes;
 bool GlobalOnDefcon;
-int GlobalOnDefconMore;
+bool GlobalOnDefconMore;
 char *DefConOffMessage;
 char *DefconMessage;
 char *DefConAkillReason;
@@ -705,6 +705,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "chanmodes", "", new ValueContainerChar(&DefConChanModes), DT_CHARPTR, ValidateDefCon},
 		{"defcon", "timeout", "0", new ValueContainerTime(&DefConTimeOut), DT_TIME, NoValidation},
 		{"defcon", "globalondefcon", "no", new ValueContainerBool(&GlobalOnDefcon), DT_BOOLEAN, NoValidation},
+		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1362,8 +1363,6 @@ Directive directives[] = {
     {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
-    {"GlobalOnDefconMore",
-     {{PARAM_SET, PARAM_RELOAD, &GlobalOnDefconMore}}},
     {"DefconMessage", {{PARAM_STRING, PARAM_RELOAD, &DefconMessage}}},
     {"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };

@@ -510,7 +510,7 @@ E time_t DefConTimeOut;
 E time_t DefConAKILL;
 E char *DefConChanModes;
 E bool GlobalOnDefcon;
-E int GlobalOnDefconMore;
+E bool GlobalOnDefconMore;
 E char *DefconMessage;
 E char *DefConAkillReason;
 E char *DefConOffMessage;

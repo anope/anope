@@ -520,7 +520,7 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if (level > 5) throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
 	}
 	else if (DefConLevel) {
-		if (static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) {
+		if ((static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) || static_cast<std::string>(value) == "chanmodes") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
 		else if (static_cast<std::string>(value) == "sessionlimit" || static_cast<std::string>(value) == "akillexpire") {
@@ -702,6 +702,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
 		{"defcon", "sessionlimit", "0", new ValueContainerInt(&DefConSessionLimit), DT_INTEGER, ValidateDefCon},
 		{"defcon", "akillexpire", "0", new ValueContainerTime(&DefConAKILL), DT_TIME, ValidateDefCon},
+		{"defcon", "chanmodes", "", new ValueContainerChar(&DefConChanModes), DT_CHARPTR, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1282,7 +1283,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefConChanModes", {{PARAM_STRING, PARAM_RELOAD, &DefConChanModes}}},
     {"DefConTimeOut", {{PARAM_STRING, PARAM_RELOAD, &DefConTimeOut}}},
     {"DefConAkillReason",
      {{PARAM_STRING, PARAM_RELOAD, &DefConAkillReason}}},

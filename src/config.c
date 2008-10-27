@@ -285,7 +285,7 @@ static std::string DefCon2;
 static std::string DefCon3;
 static std::string DefCon4;
 int DefCon[6];
-char *DefConTimeOut;
+time_t DefConTimeOut;
 int DefConSessionLimit;
 time_t DefConAKILL;
 char *DefConChanModes;
@@ -703,6 +703,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "sessionlimit", "0", new ValueContainerInt(&DefConSessionLimit), DT_INTEGER, ValidateDefCon},
 		{"defcon", "akillexpire", "0", new ValueContainerTime(&DefConAKILL), DT_TIME, ValidateDefCon},
 		{"defcon", "chanmodes", "", new ValueContainerChar(&DefConChanModes), DT_CHARPTR, ValidateDefCon},
+		{"defcon", "timeout", "0", new ValueContainerTime(&DefConTimeOut), DT_TIME, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1283,7 +1284,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefConTimeOut", {{PARAM_STRING, PARAM_RELOAD, &DefConTimeOut}}},
     {"DefConAkillReason",
      {{PARAM_STRING, PARAM_RELOAD, &DefConAkillReason}}},
     {"DefConOffMessage",

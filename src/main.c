@@ -591,7 +591,7 @@ int main(int ac, char **av, char **envp)
             last_update = t;
         }
 
-        if ((DefConTimeOut) && (t - last_DefCon >= dotime(DefConTimeOut))) {
+        if ((DefConTimeOut) && (t - last_DefCon >= DefConTimeOut)) {
             resetDefCon(5);
             last_DefCon = t;
         }

@@ -1594,7 +1594,7 @@ void resetDefCon(int level)
     snprintf(strLevel, 4, "%d", level);
     if (DefConLevel != level) {
         if ((DefContimer)
-            && (time(NULL) - DefContimer >= dotime(DefConTimeOut))) {
+            && (time(NULL) - DefContimer >= DefConTimeOut)) {
             DefConLevel = level;
             send_event(EVENT_DEFCON_LEVEL, 1, strLevel);
             alog("Defcon level timeout, returning to lvl %d", level);

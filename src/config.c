@@ -520,7 +520,7 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if (level > 5) throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
 	}
 	else if (DefConLevel) {
-		if ((static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) || static_cast<std::string>(value) == "chanmodes") {
+		if ((static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) || static_cast<std::string>(value) == "chanmodes" || static_cast<std::string>(value) == "akillreason") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
 		else if (static_cast<std::string>(value) == "message" && GlobalOnDefconMore) {
@@ -711,6 +711,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
 		{"defcon", "message", "", new ValueContainerChar(&DefconMessage), DT_CHARPTR, ValidateDefCon},
 		{"defcon", "offmessage", "", new ValueContainerChar(&DefConOffMessage), DT_CHARPTR, NoValidation},
+		{"defcon", "akillreason", "", new ValueContainerChar(&DefConAkillReason), DT_CHARPTR, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1291,8 +1292,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefConAkillReason",
-     {{PARAM_STRING, PARAM_RELOAD, &DefConAkillReason}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},

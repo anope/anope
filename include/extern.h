@@ -509,7 +509,7 @@ E int DefConSessionLimit;
 E time_t DefConTimeOut;
 E time_t DefConAKILL;
 E char *DefConChanModes;
-E int GlobalOnDefcon;
+E bool GlobalOnDefcon;
 E int GlobalOnDefconMore;
 E char *DefconMessage;
 E char *DefConAkillReason;

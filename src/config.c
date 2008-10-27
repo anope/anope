@@ -289,7 +289,7 @@ time_t DefConTimeOut;
 int DefConSessionLimit;
 time_t DefConAKILL;
 char *DefConChanModes;
-int GlobalOnDefcon;
+bool GlobalOnDefcon;
 int GlobalOnDefconMore;
 char *DefConOffMessage;
 char *DefconMessage;
@@ -704,6 +704,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "akillexpire", "0", new ValueContainerTime(&DefConAKILL), DT_TIME, ValidateDefCon},
 		{"defcon", "chanmodes", "", new ValueContainerChar(&DefConChanModes), DT_CHARPTR, ValidateDefCon},
 		{"defcon", "timeout", "0", new ValueContainerTime(&DefConTimeOut), DT_TIME, NoValidation},
+		{"defcon", "globalondefcon", "no", new ValueContainerBool(&GlobalOnDefcon), DT_BOOLEAN, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1361,7 +1362,6 @@ Directive directives[] = {
     {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
-    {"GlobalOnDefcon", {{PARAM_SET, PARAM_RELOAD, &GlobalOnDefcon}}},
     {"GlobalOnDefconMore",
      {{PARAM_SET, PARAM_RELOAD, &GlobalOnDefconMore}}},
     {"DefconMessage", {{PARAM_STRING, PARAM_RELOAD, &DefconMessage}}},

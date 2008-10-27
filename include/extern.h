@@ -507,7 +507,7 @@ E int checkDefCon(int level);
 E void resetDefCon(int level);
 E int DefConSessionLimit;
 E char *DefConTimeOut;
-E char *DefConAKILL;
+E time_t DefConAKILL;
 E char *DefConChanModes;
 E int GlobalOnDefcon;
 E int GlobalOnDefconMore;

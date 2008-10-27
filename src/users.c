@@ -589,7 +589,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
             strncat(mask, host, HOSTMAX);
             alog("DEFCON: adding akill for %s", mask);
             add_akill(NULL, mask, s_OperServ,
-                      time(NULL) + dotime(DefConAKILL),
+                      time(NULL) + DefConAKILL,
                       DefConAkillReason ? DefConAkillReason :
                       "DEFCON AKILL");
             if (check_akill(nick, username, host, vhost, ipbuf)) {

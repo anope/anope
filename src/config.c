@@ -710,6 +710,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "globalondefcon", "no", new ValueContainerBool(&GlobalOnDefcon), DT_BOOLEAN, NoValidation},
 		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
 		{"defcon", "message", "", new ValueContainerChar(&DefconMessage), DT_CHARPTR, ValidateDefCon},
+		{"defcon", "offmessage", "", new ValueContainerChar(&DefConOffMessage), DT_CHARPTR, NoValidation},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1292,8 +1293,6 @@ Directive directives[] = {
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
     {"DefConAkillReason",
      {{PARAM_STRING, PARAM_RELOAD, &DefConAkillReason}}},
-    {"DefConOffMessage",
-     {{PARAM_STRING, PARAM_RELOAD, &DefConOffMessage}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},

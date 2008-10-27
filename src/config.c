@@ -280,11 +280,10 @@ int MysqlRetryGap = 0;
 int UseRDB = 0;
 
 int DefConLevel;
-int DefCon1;
-int DefCon2;
-int DefCon3;
-int DefCon4;
-int DefCon5;
+static std::string DefCon1;
+static std::string DefCon2;
+static std::string DefCon3;
+static std::string DefCon4;
 int DefCon[6];
 char *DefConTimeOut;
 int DefConSessionLimit;
@@ -521,6 +520,9 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if (level > 5) throw ConfigException("The value for <defcon:defaultlevel> must be between 1 through 5 if you wish to use DefCon or 0 if you wish to disable it!");
 	}
 	else if (DefConLevel) {
+		if (static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) {
+			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
+		}
 	}
 	return true;
 }
@@ -691,6 +693,10 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "addakiller", "no", new ValueContainerBool(&AddAkiller), DT_BOOLEAN, NoValidation},
 		{"opserver", "opersonly", "no", new ValueContainerBool(&OSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"defcon", "defaultlevel", "0", new ValueContainerInt(&DefConLevel), DT_INTEGER, ValidateDefCon},
+		{"defcon", "level4", "", new ValueContainerString(&DefCon4), DT_STRING, ValidateDefCon},
+		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},
+		{"defcon", "level2", "", new ValueContainerString(&DefCon2), DT_STRING, ValidateDefCon},
+		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1271,10 +1277,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefCon1", {{PARAM_INT, PARAM_RELOAD, &DefCon1}}},
-    {"DefCon2", {{PARAM_INT, PARAM_RELOAD, &DefCon2}}},
-    {"DefCon3", {{PARAM_INT, PARAM_RELOAD, &DefCon3}}},
-    {"DefCon4", {{PARAM_INT, PARAM_RELOAD, &DefCon4}}},
     {"DefConSessionLimit",
      {{PARAM_INT, PARAM_RELOAD, &DefConSessionLimit}}},
     {"DefConAkillExpire", {{PARAM_STRING, PARAM_RELOAD, &DefConAKILL}}},
@@ -1936,18 +1938,40 @@ int read_config(int reload)
      * Check all DEFCON dependiencies...
      **/
     if (DefConLevel) {
-        CHECK(DefCon1);
-        CHECK(DefCon2);
-        CHECK(DefCon3);
-        CHECK(DefCon4);
-        DefCon5 = 0;            /* ALWAYS have defcon 5 as normal operation */
         /* Build DefCon's */
         DefCon[0] = 0;
-        DefCon[1] = DefCon1;
-        DefCon[2] = DefCon2;
-        DefCon[3] = DefCon3;
-        DefCon[4] = DefCon4;
-        DefCon[5] = DefCon5;
+		for (int level = 1; level < 5; ++level) {
+			DefCon[level] = 0;
+			std::string *levelDefinition;
+			switch (level) {
+				case 1:
+					levelDefinition = &DefCon1;
+					break;
+				case 2:
+					levelDefinition = &DefCon2;
+					break;
+				case 3:
+					levelDefinition = &DefCon3;
+					break;
+				case 4:
+					levelDefinition = &DefCon4;
+			}
+			spacesepstream operations(*levelDefinition);
+			std::string operation;
+			while (operations.GetToken(operation)) {
+				if (operation == "nonewchannels") DefCon[level] |= DEFCON_NO_NEW_CHANNELS;
+				else if (operation == "nonewnicks") DefCon[level] |= DEFCON_NO_NEW_NICKS;
+				else if (operation == "nomlockchanges") DefCon[level] |= DEFCON_NO_MLOCK_CHANGE;
+				else if (operation == "forcechanmodes") DefCon[level] |= DEFCON_FORCE_CHAN_MODES;
+				else if (operation == "reducedsessions") DefCon[level] |= DEFCON_REDUCE_SESSION;
+				else if (operation == "nonewclients") DefCon[level] |= DEFCON_NO_NEW_CLIENTS;
+				else if (operation == "operonly") DefCon[level] |= DEFCON_OPER_ONLY;
+				else if (operation == "silentoperonly") DefCon[level] |= DEFCON_SILENT_OPER_ONLY;
+				else if (operation == "akillnewclients") DefCon[level] |= DEFCON_AKILL_NEW_CLIENTS;
+				else if (operation == "nonewmemos") DefCon[level] |= DEFCON_NO_NEW_MEMOS;
+			}
+		}
+        DefCon[5] = 0; /* DefCon level 5 is always normal operation */
         for (defconCount = 1; defconCount <= 5; defconCount++) {        /* Check any defcon needed settings */
             if (DefCon[defconCount] & DEFCON_REDUCE_SESSION) {
                 CHECK(DefConSessionLimit);

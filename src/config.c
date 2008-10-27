@@ -523,6 +523,9 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if ((static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) || static_cast<std::string>(value) == "chanmodes") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
+		else if (static_cast<std::string>(value) == "message" && GlobalOnDefconMore) {
+			if (!*data.GetString()) throw ConfigException("The value for <defcon:message> cannot be empty when globalondefconmore is enabled!");
+		}
 		else if (static_cast<std::string>(value) == "sessionlimit" || static_cast<std::string>(value) == "akillexpire") {
 			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
 		}
@@ -706,6 +709,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "timeout", "0", new ValueContainerTime(&DefConTimeOut), DT_TIME, NoValidation},
 		{"defcon", "globalondefcon", "no", new ValueContainerBool(&GlobalOnDefcon), DT_BOOLEAN, NoValidation},
 		{"defcon", "globalondefconmore", "no", new ValueContainerBool(&GlobalOnDefconMore), DT_BOOLEAN, NoValidation},
+		{"defcon", "message", "", new ValueContainerChar(&DefconMessage), DT_CHARPTR, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1363,7 +1367,6 @@ Directive directives[] = {
     {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
-    {"DefconMessage", {{PARAM_STRING, PARAM_RELOAD, &DefconMessage}}},
     {"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
@@ -1985,8 +1988,6 @@ int read_config(int reload)
                 CHECK(DefConChanModes);
             }
         }
-        if (GlobalOnDefconMore)
-            CHECK(DefconMessage);
     }
 
     /**

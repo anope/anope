@@ -523,6 +523,9 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 		if (static_cast<std::string>(value).substr(0, 5) == "level" && isdigit(value[5])) {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when DefCon is enabled!");
 		}
+		else if (static_cast<std::string>(value) == "sessionlimit") {
+			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when DefCon is enabled!");
+		}
 	}
 	return true;
 }
@@ -697,6 +700,7 @@ int ServerConfig::Read(bool bail)
 		{"defcon", "level3", "", new ValueContainerString(&DefCon3), DT_STRING, ValidateDefCon},
 		{"defcon", "level2", "", new ValueContainerString(&DefCon2), DT_STRING, ValidateDefCon},
 		{"defcon", "level1", "", new ValueContainerString(&DefCon1), DT_STRING, ValidateDefCon},
+		{"defcon", "sessionlimit", "0", new ValueContainerInt(&DefConSessionLimit), DT_INTEGER, ValidateDefCon},
 		{NULL, NULL, NULL, NULL, DT_NOTHING, NoValidation}
 	};
 	/* These tags can occur multiple times, and therefore they have special code to read them
@@ -1277,8 +1281,6 @@ Directive directives[] = {
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"DefConSessionLimit",
-     {{PARAM_INT, PARAM_RELOAD, &DefConSessionLimit}}},
     {"DefConAkillExpire", {{PARAM_STRING, PARAM_RELOAD, &DefConAKILL}}},
     {"DefConChanModes", {{PARAM_STRING, PARAM_RELOAD, &DefConChanModes}}},
     {"DefConTimeOut", {{PARAM_STRING, PARAM_RELOAD, &DefConTimeOut}}},

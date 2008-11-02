@@ -477,12 +477,6 @@ class InspIRCdProto : public IRCDProto
 				case '-':
 					add = 0;
 					break;
-				case 'd':
-					if (!ac) break;
-					--ac;
-					++av;
-					user->svid = strtoul(*av, NULL, 0);
-					break;
 				case 'o':
 					if (add) {
 						++opcnt;

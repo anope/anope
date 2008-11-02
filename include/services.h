@@ -108,24 +108,6 @@
 #define vsnprintf               _vsnprintf
 #endif
 
-#ifdef USE_RDB
-# define MAX_SQL_BUF   4096
-#endif
-
-#ifdef USE_MYSQL
-# define MYSQL_WARNING 2
-# define MYSQL_ERROR   4
-# define MYSQL_DEFAULT_PORT 3306
-#ifdef MYSQL_HEADER_PREFIX
-# include <mysql/mysql.h>
-# include <mysql/errmsg.h>
-#else
-# define NO_CLIENT_LONG_LONG
-# include <mysql.h>
-# include <errmsg.h>
-#endif
-#endif
-
 #if HAVE_STRINGS_H
 # include <strings.h>
 #endif

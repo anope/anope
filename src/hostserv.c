@@ -314,28 +314,11 @@ char *getvIdent(char *nick)
 /*************************************************************************/
 void delHostCore(char *nick)
 {
-#ifdef USE_RDB
-    static char clause[128];
-    char *q_nick;
-#endif
     HostCore *tmp;
     bool found = false;
     tmp = findHostCore(head, nick, &found);
     if (found) {
         head = deleteHostCore(head, tmp);
-
-#ifdef USE_RDB
-        /* Reflect this change in the database right away. */
-        if (rdb_open()) {
-            q_nick = rdb_quote(nick);
-            snprintf(clause, sizeof(clause), "nick='%s'", q_nick);
-            if (rdb_scrub_table("anope_hs_core", clause) == 0)
-                alog("Unable to scrub table 'anope_hs_core' - HostServ RDB update failed.");
-            rdb_close();
-            free(q_nick);
-        }
-#endif
-
     }
 
 }
@@ -496,37 +479,6 @@ void save_hs_dbase(void)
 }
 
 #undef SAFE
-
-void save_hs_rdb_dbase(void)
-{
-#ifdef USE_RDB
-    HostCore *current;
-
-    if (!rdb_open())
-        return;
-
-    if (rdb_tag_table("anope_hs_core") == 0) {
-        alog("Unable to tag table 'anope_hs_core' - HostServ RDB save failed.");
-        rdb_close();
-        return;
-    }
-
-    current = head;
-    while (current != NULL) {
-        if (rdb_save_hs_core(current) == 0) {
-            alog("Unable to save HostCore for %s - HostServ RDB save failed.", current->nick);
-            rdb_close();
-            return;
-        }
-        current = current->next;
-    }
-
-    if (rdb_clean_table("anope_hs_core") == 0)
-        alog("Unable to clean table 'anope_hs_core' - HostServ RDB save failed.");
-
-    rdb_close();
-#endif
-}
 
 /*************************************************************************/
 /*	End of Load/Save Functions					 */

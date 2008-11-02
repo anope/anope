@@ -528,20 +528,6 @@ int init_secondary(int ac, char **av)
     hostserv_init();
     helpserv_init();
 
-#ifdef USE_RDB
-    if (!rdb_init()) {
-        if (UseRDB) {
-            UseRDB = 0;
-            alog("Error: Disabling UseRDB due to errors with SQL");
-        }
-    } else {
-        if (MysqlSecure && UseRDB) {
-            UseRDB = 0;
-            alog("Error: MySQL password are encrypted using method in MysqlSecure disabling UseRDB");
-        }
-    }
-#endif
-
     /* load any custom modules */
     modules_init();
 
@@ -550,56 +536,47 @@ int init_secondary(int ac, char **av)
     add_entropy_userkeys();
 
     /* Load up databases */
-#ifdef USE_RDB
-    if (UseRDB)
-        rdb_load_dbases();
-    /* Need a better way to handle this -dane */
-    if (!UseRDB) {
-#endif
-        load_ns_dbase();
-        if (debug)
-            alog("debug: Loaded %s database (1/%d)", s_NickServ,
-                 (PreNickDBName ? 8 : 7));
-        if (s_HostServ) {
-            load_hs_dbase();
-            if (debug)
-                alog("debug: Loaded %s database (2/%d)", s_HostServ,
-                     (PreNickDBName ? 8 : 7));
-        } else if (debug) {
-            alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
-        }
-        if (s_BotServ) {
-            load_bs_dbase();
-            if (debug)
-                alog("debug: Loaded %s database (3/%d)", s_BotServ,
-                     (PreNickDBName ? 8 : 7));
-        } else if (debug) {
-            alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
-        }
-        load_cs_dbase();
-        if (debug)
-            alog("debug: Loaded %s database (4/%d)", s_ChanServ,
-                 (PreNickDBName ? 8 : 7));
-        load_os_dbase();
-        if (debug)
-            alog("debug: Loaded %s database (5/%d)", s_OperServ,
-                 (PreNickDBName ? 8 : 7));
-        load_news();
-        if (debug)
-            alog("debug: Loaded news database (6/%d)",
-                 (PreNickDBName ? 8 : 7));
-        load_exceptions();
-        if (debug)
-            alog("debug: Loaded exception database (7/%d)",
-                 (PreNickDBName ? 8 : 7));
-        if (PreNickDBName) {
-            load_ns_req_db();
-            if (debug)
-                alog("debug: Loaded PreNick database (8/8)");
-        }
-#ifdef USE_RDB
-    }
-#endif
+	load_ns_dbase();
+	if (debug)
+	    alog("debug: Loaded %s database (1/%d)", s_NickServ,
+		 (PreNickDBName ? 8 : 7));
+	if (s_HostServ) {
+	    load_hs_dbase();
+	    if (debug)
+		alog("debug: Loaded %s database (2/%d)", s_HostServ,
+		     (PreNickDBName ? 8 : 7));
+	} else if (debug) {
+	    alog("debug: HostServ database (2/%d) not loaded because HostServ is disabled", (PreNickDBName ? 8 : 7));
+	}
+	if (s_BotServ) {
+	    load_bs_dbase();
+	    if (debug)
+		alog("debug: Loaded %s database (3/%d)", s_BotServ,
+		     (PreNickDBName ? 8 : 7));
+	} else if (debug) {
+	    alog("debug: BotServ database (3/%d) not loaded because BotServ is disabled", (PreNickDBName ? 8 : 7));
+	}
+	load_cs_dbase();
+	if (debug)
+	    alog("debug: Loaded %s database (4/%d)", s_ChanServ,
+		 (PreNickDBName ? 8 : 7));
+	load_os_dbase();
+	if (debug)
+	    alog("debug: Loaded %s database (5/%d)", s_OperServ,
+		 (PreNickDBName ? 8 : 7));
+	load_news();
+	if (debug)
+	    alog("debug: Loaded news database (6/%d)",
+		 (PreNickDBName ? 8 : 7));
+	load_exceptions();
+	if (debug)
+	    alog("debug: Loaded exception database (7/%d)",
+		 (PreNickDBName ? 8 : 7));
+	if (PreNickDBName) {
+	    load_ns_req_db();
+	    if (debug)
+		alog("debug: Loaded PreNick database (8/8)");
+	}
     alog("Databases loaded");
 
 
@@ -626,19 +603,8 @@ int init_secondary(int ac, char **av)
 	}
 
     /* Save the databases back to file/mysql to reflect any changes */
-#ifdef USE_RDB
-    if (!UseRDB) {              /* Only save if we are not using remote databases
-                                 * to avoid floods. As a side effects our nice
-                                 * FFF databases won't get overwritten if the
-                                 * mysql db is broken (empty etc.) */
-#endif
         alog("Info: Reflecting database records.");
         save_databases();
-#ifdef USE_RDB
-    } else {
-        alog("Info: Not reflecting database records.");
-    }
-#endif
     send_event(EVENT_CONNECT, 1, EVENT_START);
 
     /* Connect to the remote server */

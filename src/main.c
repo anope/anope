@@ -49,10 +49,6 @@ int protocoldebug = 0;          /* -protocoldebug */
 char *binary_dir;               /* Used to store base path for win32 restart */
 #endif
 
-#ifdef USE_RDB
-int do_mysql = 0;               /* use mysql ? */
-#endif
-
 /* Set to 1 if we are to quit */
 int quitting = 0;
 
@@ -165,61 +161,6 @@ void save_databases(void)
     save_news();
     waiting = -18;
     save_exceptions();
-
-#ifdef USE_RDB
-    if (do_mysql) {
-        if (debug)
-            alog("debug: Saving RDB databases");
-        waiting = -10;
-        waiting = -11;
-        save_ns_rdb_dbase();
-        /* We send these PONG's when we're not syncing to avoid timeouts.
-         * If we send them during the sync, we fuck something up there and
-         * break the syncing process, resulting in lost (literally lost)
-         * data. -GD
-         * This used is_sync(serv_uplink) to check for sync states. There's
-         * only a minor error with this: serv_uplink doesn't exist during
-         * the first save. So now we check for serv_uplink only; if it
-         * exists we're safe. -GD
-         */
-        if (serv_uplink)
-            ircdproto->SendPong(ServerName, ServerName);
-        waiting = -12;
-        save_cs_rdb_dbase();
-        if (serv_uplink)
-            ircdproto->SendPong(ServerName, ServerName);
-        if (PreNickDBName) {
-            save_ns_req_rdb_dbase();
-            if (serv_uplink)
-                ircdproto->SendPong(ServerName, ServerName);
-            waiting = -13;
-        }
-        if (s_BotServ) {
-            waiting = -14;
-            save_bs_rdb_dbase();
-            if (serv_uplink)
-                ircdproto->SendPong(ServerName, ServerName);
-        }
-        if (s_HostServ) {
-            waiting = -15;
-            save_hs_rdb_dbase();
-            if (serv_uplink)
-                ircdproto->SendPong(ServerName, ServerName);
-        }
-        waiting = -16;
-        save_os_rdb_dbase();
-        if (serv_uplink)
-            ircdproto->SendPong(ServerName, ServerName);
-        waiting = -17;
-        save_rdb_news();
-        if (serv_uplink)
-            ircdproto->SendPong(ServerName, ServerName);
-        waiting = -18;
-        save_rdb_exceptions();
-        if (serv_uplink)
-            ircdproto->SendPong(ServerName, ServerName);
-    }
-#endif
     waiting = -20;
     send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }

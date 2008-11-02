@@ -531,40 +531,6 @@ void save_bs_dbase(void)
 
 /*************************************************************************/
 
-void save_bs_rdb_dbase(void)
-{
-#ifdef USE_RDB
-    int i;
-    BotInfo *bi;
-
-    if (!rdb_open())
-        return;
-
-    if (rdb_tag_table("anope_bs_core") == 0) {
-        alog("Unable to tag table 'anope_bs_core' - BotServ RDB save failed.");
-        rdb_close();
-        return;
-    }
-
-    for (i = 0; i < 256; i++) {
-        for (bi = botlists[i]; bi; bi = bi->next) {
-            if (rdb_save_bs_core(bi) == 0) {
-                alog("Unable to save BotInfo for %s - BotServ RDB save failed.", bi->nick);
-                rdb_close();
-                return;
-            }
-        }
-    }
-
-    if (rdb_clean_table("anope_bs_core") == 0)
-        alog("Unable to clean table 'anope_bs_core' - BotServ RDB save failed.");
-
-    rdb_close();
-#endif
-}
-
-/*************************************************************************/
-
 /* Inserts a bot in the bot list. I can't be much explicit mh? */
 
 void insert_bot(BotInfo * bi)

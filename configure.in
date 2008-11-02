@@ -112,12 +112,6 @@ int main()
 		], ac_cv_mysql_valid=yes, ac_cv_mysql_valid=no)
 		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
-			AC_DEFINE_UNQUOTED(USE_MYSQL,1,"Use Mysql")
-			AC_DEFINE_UNQUOTED(USE_RDB,1,"Use RDB")
-			MYSQL=" mysql.c "
-			RDB=" rdb.c "
-			AC_SUBST(MYSQL)
-			AC_SUBST(RDB)
 			 DIS_MYSQL="  MySQL: Yes"
 		else
 			CFLAGS="$hold_cflags"

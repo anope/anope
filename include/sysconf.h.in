@@ -120,12 +120,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* "Use Mysql" */
-#undef USE_MYSQL
-
-/* "Use RDB" */
-#undef USE_RDB
-
 /* Define to `short' if <sys/types.h> does not define. */
 #undef int16_t
 

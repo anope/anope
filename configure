@@ -662,8 +662,6 @@ CP
 TOUCH
 INSTALL
 MYSQLCONF
-MYSQL
-RDB
 ANOPELIBS
 CPP
 GREP
@@ -3321,20 +3319,6 @@ fi
 
 		echo $ac_cv_mysql_valid >&6
 		if test "$ac_cv_mysql_valid" = "yes"; then
-
-cat >>confdefs.h <<_ACEOF
-#define USE_MYSQL 1
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
-#define USE_RDB 1
-_ACEOF
-
-			MYSQL=" mysql.c "
-			RDB=" rdb.c "
-
-
 			 DIS_MYSQL="  MySQL: Yes"
 		else
 			CFLAGS="$hold_cflags"
@@ -8473,8 +8457,6 @@ CP!$CP$ac_delim
 TOUCH!$TOUCH$ac_delim
 INSTALL!$INSTALL$ac_delim
 MYSQLCONF!$MYSQLCONF$ac_delim
-MYSQL!$MYSQL$ac_delim
-RDB!$RDB$ac_delim
 ANOPELIBS!$ANOPELIBS$ac_delim
 CPP!$CPP$ac_delim
 GREP!$GREP$ac_delim
@@ -8489,7 +8471,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 63; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 61; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

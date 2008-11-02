@@ -213,16 +213,6 @@ int do_group(User * u)
             u->na = na;
             na->u = u;
 
-#ifdef USE_RDB
-            /* Is this really needed? Since this is a new alias it will get
-             * its unique id on the next update, since it was previously
-             * deleted by delnick. Must observe...
-             */
-            if (rdb_open()) {
-                rdb_save_ns_alias(na);
-                rdb_close();
-            }
-#endif
             send_event(EVENT_GROUP, 1, u->nick);
             alog("%s: %s!%s@%s makes %s join group of %s (%s) (e-mail: %s)", s_NickServ, u->nick, u->username, u->host, u->nick, target->nick, target->nc->display, (target->nc->email ? target->nc->email : "none"));
             notice_lang(s_NickServ, u, NICK_GROUP_JOINED, target->nick);

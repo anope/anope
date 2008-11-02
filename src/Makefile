@@ -1,15 +1,11 @@
-MYSQL_OBJ = $(MYSQL:.c=.o)
-RDB_OBJ = $(RDB:.c=.o)
 OBJS =  actions.o base64.o bots.o botserv.o channels.o chanserv.o commands.o compat.o \
 		config.o datafiles.o encrypt.o events.o hashcomp.o helpserv.o hostserv.o init.o ircd.o language.o log.o mail.o main.o \
 		memory.o memoserv.o messages.o misc.o modules.o news.o nickserv.o operserv.o \
-		process.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o  \
-		$(RDB_OBJ) $(MYSQL_OBJ)
+		process.o send.o servers.o sessions.o slist.o sockutil.o timeout.o users.o 
 SRCS =  actions.c base64.c bots.cpp botserv.c channels.c chanserv.c commands.c compat.c \
-		config.c datafiles.c encrypt.c events.c hashcomp.c helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
+		config.c datafiles.c encrypt.c events.c hashcomp.cpp helpserv.c hostserv.c init.c ircd.c language.c log.c mail.c main.c \
 		memory.c memoserv.c messages.c misc.c modules.c news.c nickserv.c operserv.c \
-		process.c send.c servers.c sessions.c s sockutil.c timeout.c users.c \
-		$(RDB) $(MYSQL)
+		process.c send.c servers.c sessions.c s sockutil.c timeout.c users.c
 
 INCLUDES = ../include/commands.h ../include/defs.h  ../include/language.h \
 	../include/pseudo.h ../include/sysconf.h ../include/config.h \
@@ -21,8 +17,8 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' 'MYSQL=${MYSQL}'\
-	   'RDB=${RDB}' 'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
+   	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
+	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
 
 .c.o:
 	@../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
@@ -76,8 +72,6 @@ sockutil.o:     sockutil.c  $(INCLUDES)
 timeout.o:      timeout.c   $(INCLUDES)
 users.o:        users.c     $(INCLUDES)
 vsnprintf.o:    vsnprintf.c $(INCLUDES)
-mysql.o:        mysql.c     $(INCLUDES)
-rdb.o:          rdb.c       $(INCLUDES)
 
 mod_version:	mod_version.c	$(INCLUDES)
 	@../run-cc.pl $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c

@@ -145,7 +145,7 @@ IRCDVar myIrcd[] = {
      0,                         /* Can remove User Channel Modes with SVSMODE */
      0,                         /* Sglines are not enforced until user reconnects */
      "x",                       /* vhost char */
-     0,                         /* ts6 */
+     1,                         /* ts6 */
      1,                         /* support helper umode */
      0,                         /* p10 */
      NULL,                      /* character set */
@@ -1283,11 +1283,12 @@ int AnopeInit(int argc, char **argv)
 {
 
 	moduleAddAuthor("Anope");
-	moduleAddVersion
-		("$Id$");
+	moduleAddVersion("$Id$");
 	moduleSetType(PROTOCOL);
 
-	pmodule_ircd_version("inspircdIRCd 1.1");
+	TS6SID = sstrdup(Numeric);
+
+	pmodule_ircd_version("InspIRCd 1.1");
 	pmodule_ircd_cap(myIrcdcap);
 	pmodule_ircd_var(myIrcd);
 	pmodule_ircd_cbmodeinfos(myCbmodeinfos);

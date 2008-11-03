@@ -608,7 +608,10 @@ void ts6_uid_increment(unsigned int slot)
 char *ts6_uid_retrieve(void)
 {
 	if (UseTS6 == 0)
+	{
+		alog("TS6 disabled, returning nothing");
 		return "";
+	}
 
     if (ts6_uid_initted != 1)
         ts6_uid_init();

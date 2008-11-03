@@ -23,6 +23,9 @@ distclean: clean spotless
 .c.o:
 	@../../run-cc.pl $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
 
+.cpp.o:
+	@../../run-cc.pl $(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../${INCLUDEDIR} -c $<
+
 .o.s:
 	@../../run-cc.pl $(CC) ${SHARED} ../mod_version.o  $< -o $*.so ${PROFILE}
 	@$(TOUCH) $*.s

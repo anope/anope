@@ -1,6 +1,6 @@
 include ../../Makefile.inc.win32
 
-SRCS=bahamut.c charybdis.c inspircd11.c \
+SRCS=bahamut.c charybdis.c inspircd11.c inspircd12.cpp \
      ratbox.c shadowircd.c unreal32.c
 
 OBJECTS= $(SRCS:.c=.dll)
@@ -12,6 +12,9 @@ all: $(OBJECTS)
 distclean: clean spotless
 
 .c.dll:
+        $(CC) $(CFLAGS) $< ..\mod_version.c $(LFLAGS)
+
+.cpp.dll:
         $(CC) $(CFLAGS) $< ..\mod_version.c $(LFLAGS)
 
 clean:

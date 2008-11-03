@@ -18,6 +18,9 @@ distclean: spotless
 .c.o:
 	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
 
+.cpp.o:
+	$(CC) ${CFLAGS} ${CDEFS} ${MODULEFLAGS} -I../ -I../../${INCLUDEDIR} -c $<
+
 so:
 	$(CC) ${SHARED} $(OBJECTS) -o ../$(TARGET).so ${PROFILE}
 

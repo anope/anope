@@ -80,7 +80,7 @@ IRCDVar myIrcd[] = {
      "+oI",                     /* botserv mode  */
      "+oI",                     /* helpserv mode */
      "+ioI",                    /* Global mode   */
-     "+sI",                     /* Used by BotServ Bots */
+     "+I",                     /* Used by BotServ Bots */
      5,                         /* Chan Max Symbols     */
      "-cilmnpstuzACGHKNOQRSV",  /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */

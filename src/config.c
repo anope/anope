@@ -800,7 +800,7 @@ int ServerConfig::Read(bool bail)
 				break;
 				case DT_BOOLEAN: {
 					bool val = vi.GetBool();
-					ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
+					ValueContainerBool *vcb = (ValueContainerBool *)Values[Index].val;
 					vcb->Set(&val, sizeof(bool));
 				}
 				break;
@@ -1907,7 +1907,7 @@ int read_config(int reload)
     }
 
     if (s_BotServ) {
-        if (!*BSFantasyCharacter)
+        if (!BSFantasyCharacter || !*BSFantasyCharacter)
             BSFantasyCharacter = sstrdup("!");
         if (*BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
             printf

@@ -148,15 +148,16 @@ void notice_user(char *source, User * u, const char *fmt, ...)
  */
 void notice_list(char *source, char *dest, char **text)
 {
+	User *u = finduser(dest);
     while (*text) {
         /* Have to kludge around an ircII bug here: if a notice includes
          * no text, it is ignored, so we replace blank lines by lines
          * with a single space.
          */
         if (**text) {
-            ircdproto->SendNotice(findbot(source), dest, *text);
+            u->SendMessage(source, *text);
         } else {
-            ircdproto->SendNotice(findbot(source), dest, " ");
+            u->SendMessage(source, " ");
         }
         text++;
     }
@@ -195,18 +196,8 @@ void notice_lang(const char *source, User * dest, int message, ...)
         s += strcspn(s, "\n");
         if (*s)
             *s++ = 0;
-        /* Send privmsg instead of notice if:
-         * - UsePrivmsg is enabled
-         * - The user is not registered and NSDefMsg is enabled
-         * - The user is registered and has set /ns set msg on
-         */
-        if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
-                           || (dest->na
-                               && (dest->na->nc->flags & NI_MSG)))) {
-            ircdproto->SendPrivmsg(findbot(source), dest->nick, *t ? t : " ");
-        } else {
-            ircdproto->SendNotice(findbot(source), dest->nick, *t ? t : " ");
-        }
+
+	dest->SendMessage(source, *t ? t : " ");
     }
     va_end(args);
 }
@@ -251,18 +242,8 @@ void notice_help(const char *source, User * dest, int message, ...)
             *s++ = 0;
         strscpy(outbuf, t, sizeof(outbuf));
         strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
-        /* Send privmsg instead of notice if:
-         * - UsePrivmsg is enabled
-         * - The user is not registered and NSDefMsg is enabled
-         * - The user is registered and has set /ns set msg on
-         */
-        if (UsePrivmsg && ((!dest->na && (NSDefFlags & NI_MSG))
-                           || (dest->na
-                               && (dest->na->nc->flags & NI_MSG)))) {
-            ircdproto->SendPrivmsg(findbot(source), dest->nick, *outbuf ? outbuf : " ");
-        } else {
-            ircdproto->SendNotice(findbot(source), dest->nick, *outbuf ? outbuf : " ");
-        }
+
+	dest->SendMessage(source, *outbuf ? outbuf : " ");
     }
     va_end(args);
 }

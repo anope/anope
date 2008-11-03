@@ -1036,37 +1036,52 @@ int anope_event_sethost(const char *source, int ac, const char **av)
 
 int anope_event_nick(const char *source, int ac, const char **av)
 {
-    User *user;
-    struct in_addr addy;
-    uint32 *ad = (uint32 *) & addy;
-
-    if (ac != 1) {
-        if (ac == 8) {
-			int svid = 0;
-			int ts = strtoul(av[0], NULL, 10);
-
-			if (strchr(av[5], 'r') != NULL)
-				svid = ts;
-
-            inet_aton(av[6], &addy);
-            user = do_nick("", av[1],   /* nick */
-                           av[4],   /* username */
-                           av[2],   /* realhost */
-                           source,  /* server */
-                           av[7],   /* realname */
-                           ts, svid, htonl(*ad), av[3], NULL);
-            if (user) {
-                ircdproto->ProcessUsermodes(user, 1, &av[5]);
-				user->chost = av[3];
-			}
-        }
-    } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL,
-                NULL);
-    }
+    do_nick(source, av[0], NULL, NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
     return MOD_CONT;
 }
 
+
+/*
+ * [Nov 03 22:09:58.176252 2008] debug: Received: :964 UID 964AAAAAC 1225746297 w00t2 localhost testnet.user w00t 127.0.0.1 1225746302 +iosw +ACGJKLNOQcdfgjklnoqtx :Robin Burchell <w00t@inspircd.org>
+ * 0: uid
+ * 1: ts
+ * 2: nick
+ * 3: host
+ * 4: dhost
+ * 5: ident
+ * 6: ip
+ * 7: signon
+ * 8+: modes and params -- IMPORTANT, some modes (e.g. +s) may have parameters. So don't assume a fixed position of realname!
+ * last: realname
+*/
+
+int anope_event_uid(const char *source, int ac, const char **av)
+{
+	User *user;
+	struct in_addr addy;
+	Server *s = findserver_uid(servlist, source);
+	uint32 *ad = (uint32 *) &addy;
+	int svid = 0;
+	int ts = strtoul(av[1], NULL, 10);
+
+	if (strchr(av[8], 'r') != NULL)
+		svid = ts;
+
+	inet_aton(av[6], &addy);
+	user = do_nick("", av[2],   /* nick */
+			av[5],   /* username */
+			av[3],   /* realhost */
+			s->name,  /* server */
+			av[ac - 1],   /* realname */
+			ts, svid, htonl(*ad), av[4], av[0]);
+	if (user)
+	{
+		ircdproto->ProcessUsermodes(user, 1, &av[8]);
+		user->chost = av[4];
+	}
+
+	return MOD_CONT;
+}
 
 int anope_event_chghost(const char *source, int ac, const char **av)
 {
@@ -1097,8 +1112,10 @@ int anope_event_server(const char *source, int ac, const char **av)
 
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-    m_privmsg(source, av[0], av[1]);
-    return MOD_CONT;
+	User *u = find_byuid(source);
+	BotInfo *bi = findbot(av[0]);
+	m_privmsg(u->nick, bi->nick, av[1]);
+	return MOD_CONT;
 }
 
 int anope_event_part(const char *source, int ac, const char **av)
@@ -1250,6 +1267,7 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
+    m = createMessage("UID",      anope_event_uid); addCoreMessage(IRCD,m);
     m = createMessage("CAPAB",     anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);

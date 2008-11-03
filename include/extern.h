@@ -71,6 +71,12 @@ E void botchanmsgs(User *u, ChannelInfo *ci, char *buf);
 E void load_bs_dbase(void);
 E void save_bs_dbase(void);
 E BotInfo *findbot(const char *nick);
+
+/** Finds a pseudoclient, given a UID. Useful for TS6 protocol modules.
+ * @param uid The UID to search for
+ * @return The pseudoclient structure, or NULL if one could not be found
+ */
+E BotInfo *findbot_byuid(const char *uid);
 E void bot_join(ChannelInfo *ci);
 E char *normalizeBuffer(const char *);
 E void insert_bot(BotInfo * bi);

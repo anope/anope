@@ -558,19 +558,26 @@ BotInfo *findbot(const char *nick)
 	BotInfo *bi;
 
 	if (!nick || !*nick)
-	return NULL;
+		return NULL;
 
-	for (bi = botlists[tolower(*nick)]; bi; bi = bi->next)
+	/*
+	 * XXX Less than efficient, but we need to do this for good TS6 support currently. This *will* improve. -- w00t
+	 */
+	for (int i = 0; i < 256; i++)
 	{
-		if (!stricmp(nick, bi->nick))
-			return bi;
+		for (bi = botlists[i]; bi; bi = bi->next)
+		{
+			if (!stricmp(nick, bi->nick))
+				return bi;
 
-		if (nick == bi->uid)
-			return bi;
+			if (nick == bi->uid)
+				return bi;
+		}
 	}
 
 	return NULL;
 }
+
 
 /*************************************************************************/
 

@@ -848,7 +848,7 @@ void cancel_user(User * u)
                     if (ircd->svsnick) {
                         ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
                                              NSEnforcerHost,
-                                             "Services Enforcer", "+");
+                                             "Services Enforcer", "+", ts6_uid_retrieve());
                         add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                     } else {
                         ircdproto->SendSVSKill(s_NickServ, u->nick,
@@ -859,7 +859,7 @@ void cancel_user(User * u)
                 if (ircd->svsnick) {
                     ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
                                          NSEnforcerHost,
-                                         "Services Enforcer", "+");
+                                         "Services Enforcer", "+", ts6_uid_retrieve());
                     add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
                 } else {
                     ircdproto->SendSVSKill(s_NickServ, u->nick,

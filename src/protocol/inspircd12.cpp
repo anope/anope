@@ -794,63 +794,84 @@ int anope_event_fmode(const char *source, int ac, const char **av)
     return anope_event_mode(source, ac - 1, newav);
 }
 
+/*
+ * [Nov 03 22:31:57.695076 2008] debug: Received: :964 FJOIN #test 1223763723 +BPSnt :,964AAAAAB ,964AAAAAC ,966AAAAAA
+ *
+ * 0: name
+ * 1: channel ts (when it was created, see protocol docs for more info)
+ * 2: channel modes + params (NOTEL this may definitely be more than one param!)
+ * last: users
+ */
 int anope_event_fjoin(const char *source, int ac, const char **av)
 {
-    const char *newav[10];
+	const char *newav[10];
 
-    /* value used for myStrGetToken */
-    int curtoken = 0;
+	/* value used for myStrGetToken */
+	int curtoken = 0;
 
-    /* storing the current nick */
-    char *curnick;
+	/* storing the current nick */
+	char *curnick;
 
-    /* these are used to generate the final string that is passed to ircservices' core */
-    int nlen = 0;
-    char nicklist[514];
+	/* these are used to generate the final string that is passed to ircservices' core */
+	int nlen = 0;
+	char nicklist[514];
 
-    /* temporary buffer */
-    char prefixandnick[60];
+	/* temporary buffer */
+	char prefixandnick[60];
 
-    *nicklist = '\0';
-    *prefixandnick = '\0';
+	*nicklist = '\0';
+	*prefixandnick = '\0';
 
-    if (ac < 3)
-        return MOD_CONT;
+	curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
+	while (curnick != NULL)
+	{
+		for (; *curnick; curnick++)
+		{
+			/* XXX: bleagh! -- w00t */
+			switch (*curnick)
+			{
+				case 'q':
+					prefixandnick[nlen++] = '~';
+					break;
+				case 'a':
+					prefixandnick[nlen++] = '&';
+					break;
+				case 'o':
+					prefixandnick[nlen++] = '@';
+					break;
+				case 'h':
+					prefixandnick[nlen++] = '%';
+					break;
+				case 'v':
+					prefixandnick[nlen++] = '+';
+					break;
+				case ',':
+					curnick++;
+					strncpy(prefixandnick + nlen, curnick, sizeof(prefixandnick) - nlen);
+					goto endnick;
+					break;
+				default:
+					alog("fjoin: unrecognised prefix: %c", *curnick);
+					break;
+			}
+		}
 
-    curnick = myStrGetToken(av[2], ' ', curtoken);
-    while (curnick != NULL) {
-        for (; *curnick; curnick++) {
-            /* I bet theres a better way to do this... */
-            if ((*curnick == '&') ||
-                (*curnick == '~') || (*curnick == '@') || (*curnick == '%')
-                || (*curnick == '+')) {
-                prefixandnick[nlen++] = *curnick;
-                continue;
-            } else {
-                if (*curnick == ',') {
-                    curnick++;
-                    strncpy(prefixandnick + nlen, curnick,
-                            sizeof(prefixandnick) - nlen);
-                    break;
-                } else {
-                    alog("fjoin: unrecognised prefix: %c", *curnick);
-                }
-            }
-        }
-        strncat(nicklist, prefixandnick, 513);
-        strncat(nicklist, " ", 513);
-        curtoken++;
-        curnick = myStrGetToken(av[2], ' ', curtoken);
-        nlen = 0;
-    }
+// Much as I hate goto.. I can't `break 2' to get here.. XXX ugly
+endnick:
+		strncat(nicklist, prefixandnick, 513);
+		strncat(nicklist, " ", 513);
+		curtoken++;
+		curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
+		nlen = 0;
+	}
 
-    newav[0] = av[1];           /* timestamp */
-    newav[1] = av[0];           /* channel name */
-    newav[2] = "+";             /* channel modes */
-    newav[3] = nicklist;
-    do_sjoin(source, 4, newav);
+	newav[0] = av[1];           /* timestamp */
+	newav[1] = av[0];           /* channel name */
+	newav[2] = av[2];             /* channel modes */ // XXX: this is incorrect, it doesn't take into account +L etc, modes which require params.. call FMODE instead? -- w00t
+	newav[3] = nicklist;
+	do_sjoin(source, 4, newav);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 /* Events */

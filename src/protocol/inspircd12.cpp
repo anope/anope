@@ -512,7 +512,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		inspircd_cmd_chghost(u->uid.c_str(), (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
+		inspircd_cmd_chghost(u->uid, (u->mode & umodes['x']) ? u->chost.c_str() : u->host);
 	}
 
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
@@ -527,13 +527,13 @@ class InspIRCdProto : public IRCDProto
 	{
 		BotInfo *bi = findbot(source);
 		User *u = finduser(user);
-		send_cmd(bi ? bi->uid, TS6SID, "KILL %s :%s", u ? u->uid.c_str() : user, buf);
+		send_cmd(bi ? bi->uid : TS6SID, "KILL %s :%s", u ? u->uid : user, buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		BotInfo *bi = findbot(source);
-		send_cmd(bi->uid, "MODE %s %s", u->uid.c_str(), merge_args(ac, av));
+		BotInfo *bi = findbot(s_NickServ);
+		send_cmd(bi->uid, "MODE %s %s", u->uid, merge_args(ac, av));
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -549,7 +549,7 @@ class InspIRCdProto : public IRCDProto
 	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		Channel *c = findchan(dest);
-		send_cmd(source ? source->uid, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
+		send_cmd(source ? source->uid : TS6SID, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
@@ -640,7 +640,7 @@ class InspIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s %ds :%s", nick, NSReleaseTimeout, "Being held for registered user");
+		send_cmd(s_OperServ, "SVSHOLD %s %ud :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */

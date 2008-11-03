@@ -49,16 +49,8 @@
 #define DEFAULT_MLOCK CMODE_n | CMODE_t
 
 IRCDVar myIrcd[] = {
-    {"Charybdis 1.0+",           /* ircd name */
-     "+oiS",                     /* nickserv mode */
-     "+oiS",                     /* chanserv mode */
-     "+oiS",                     /* memoserv mode */
-     "+oiS",                     /* hostserv mode */
-     "+oaiS",                    /* operserv mode */
-     "+oiS",                     /* botserv mode  */
-     "+oiS",                     /* helpserv mode */
-     "+oiS",                     /* Global mode   */
-     "+oiS",                     /* Used by BotServ Bots */
+    {"Charybdis 1.0+",          /* ircd name */
+     "+oiS",                    /* Modes used by pseudoclients */
      2,                         /* Chan Max Symbols     */
      "-cilmnpstrgzQF",          /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */

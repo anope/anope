@@ -63,16 +63,8 @@
 
 
 IRCDVar myIrcd[] = {
-    {"BahamutIRCd 1.4.*/1.8.*", /* ircd name */
-     "+o",                      /* nickserv mode */
-     "+o",                      /* chanserv mode */
-     "+o",                      /* memoserv mode */
-     "+",                       /* hostserv mode */
-     "+io",                     /* operserv mode */
-     "+o",                      /* botserv mode  */
-     "+h",                      /* helpserv mode */
-     "+io",                     /* Global mode   */
-     "+",                       /* Used by BotServ Bots */
+    {"Bahamut 1.8.x", /* ircd name */
+     "+",                       /* Modes used by pseudoclients */
      2,                         /* Chan Max Symbols     */
      "-cilmnpstOR",             /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */

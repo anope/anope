@@ -165,7 +165,7 @@ int do_bot(User * u)
 
             /* We make the bot online, ready to serve */
             ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
-                               ircd->botserv_bot_mode, bi->uid.c_str());
+                               ircd->pseudoclient_mode, bi->uid.c_str());
 
             notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
                         bi->host, bi->real);
@@ -300,7 +300,7 @@ int do_bot(User * u)
                 ircdproto->SendQuit(bi, "Quit: Be right back");
 
                 ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
-                                   ircd->botserv_bot_mode, bi->uid.c_str());
+                                   ircd->pseudoclient_mode, bi->uid.c_str());
                 bi->RejoinAll();
             }
 

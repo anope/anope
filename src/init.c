@@ -42,7 +42,7 @@ void introduce_user(const char *user)
 		for (bi = botlists[i]; bi; bi = bi->next)
 		{
 			if (!user || !stricmp(user, bi->nick))
-				ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->botserv_bot_mode, bi->uid.c_str());
+				ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, ircd->pseudoclient_mode, bi->uid.c_str());
 		}
 	}
 }

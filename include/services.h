@@ -238,15 +238,7 @@ typedef struct ircdcapab_ IRCDCAPAB;
 
 struct ircdvars_ {
 	const char *name;				/* Name of the IRCd command */
-	const char *nickservmode;			/* Mode used by NickServ	*/
-	const char *chanservmode;			/* Mode used by ChanServ	*/
-	const char *memoservmode;			/* Mode used by MemoServ	*/
-	const char *hostservmode;			/* Mode used by HostServ	*/
-	const char *operservmode;			/* Mode used by OperServ	*/
-	const char *botservmode;			/* Mode used by BotServ		*/
-	const char *helpservmode;			/* Mode used by HelpServ	*/
-	const char *globalmode;			/* Mode used by Global		*/
-	const char *botserv_bot_mode;			/* Mode used by BotServ Bots	*/
+	const char *pseudoclient_mode;			/* Mode used by BotServ Bots	*/
 	int max_symbols;			/* Chan Max Symbols		*/
 	const char *modestoremove;			/* Channel Modes to remove	*/
 	const char *botchanumode;			/* Modes set when botserv joins a channel */

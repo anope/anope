@@ -72,15 +72,7 @@ int inet_aton(const char *name, struct in_addr *addr)
 
 IRCDVar myIrcd[] = {
     {"InspIRCd 1.1",            /* ircd name */
-     "+oI",                     /* nickserv mode */
-     "+oI",                     /* chanserv mode */
-     "+oI",                     /* memoserv mode */
-     "+oI",                     /* hostserv mode */
-     "+ioI",                    /* operserv mode */
-     "+oI",                     /* botserv mode  */
-     "+oI",                     /* helpserv mode */
-     "+ioI",                    /* Global mode   */
-     "+sI",                     /* Used by BotServ Bots */
+     "+I",                      /* Modes used by pseudoclients */
      5,                         /* Chan Max Symbols     */
      "-cilmnpstuzACGHKNOQRSV",  /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */

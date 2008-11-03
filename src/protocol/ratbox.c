@@ -49,15 +49,7 @@
 
 IRCDVar myIrcd[] = {
     {"Ratbox 2.0+",             /* ircd name */
-     "+oi",                     /* nickserv mode */
-     "+oi",                     /* chanserv mode */
-     "+oi",                     /* memoserv mode */
-     "+oi",                     /* hostserv mode */
-     "+oai",                    /* operserv mode */
-     "+oi",                     /* botserv mode  */
-     "+oi",                     /* helpserv mode */
-     "+oi",                     /* Global mode   */
-     "+oi",                     /* Used by BotServ Bots */
+     "+oi",                     /* Modes used by pseudoclients */
      2,                         /* Chan Max Symbols     */
      "-acilmnpst",              /* Modes to Remove */
      "+o",                      /* Channel Umode used by Botserv bots */

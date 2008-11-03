@@ -1130,7 +1130,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
         if (strstr(av[1], "m_globops.so")) {
             has_globopsmod = 1;
         }
-        if (strstr(av[1], "m_services.so")) {
+        if (strstr(av[1], "m_services_account.so")) {
             has_servicesmod = 1;
         }
 	if (strstr(av[1], "m_svshold.so")) {

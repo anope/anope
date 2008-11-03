@@ -559,14 +559,16 @@ class InspIRCdProto : public IRCDProto
 
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "KICK %s %s :%s", chan, user, buf);
-		else send_cmd(source->nick, "KICK %s %s :%s", chan, user, user);
+		User *u = finduser(user);
+		if (buf)
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->uid, buf);
+		else
+			send_cmd(source->uid, "KICK %s %s :%s", chan, u->uid, user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 	{
-		if (!buf) return;
-		send_cmd(ServerName, "NOTICE @%s :%s", dest, buf);
+		send_cmd(TS6SID, "NOTICE @%s :%s", dest, buf);
 	}
 
 	void SendBotOp(const char *nick, const char *chan)
@@ -574,35 +576,34 @@ class InspIRCdProto : public IRCDProto
 		SendMode(findbot(nick), chan, "%s %s %s", ircd->botchanumode, nick, nick);
 	}
 
-
 	/* SERVER services-dev.chatspike.net password 0 :Description here */
 	void SendServer(const char *servname, int hop, const char *descript)
 	{
-		send_cmd(ServerName, "SERVER %s %s %d :%s", servname, currentpass, hop, descript);
+		send_cmd(NULL, "SERVER %s %s %d %s :%s", servname, currentpass, hop, TS6SID, descript);
 	}
 
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(user->uid, "JOIN %s", channel);
+		send_cmd(NULL, "FJOIN %s %ld + :%s", channel, static_cast<long>(chantime), user->uid.c_str());
 	}
 
 	/* UNSQLINE */
 	void SendSQLineDel(const char *user)
 	{
-		send_cmd(s_OperServ, "QLINE %s", user);
+		send_cmd(TS6SID, "DELLINE Q %s", user);
 	}
 
 	/* SQLINE */
 	void SendSQLine(const char *mask, const char *reason)
 	{
-		send_cmd(ServerName, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
+		send_cmd(TS6SID, "ADDLINE Q %s %s %ld 0 :%s", mask, s_OperServ, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SQUIT */
 	void SendSquit(const char *servname, const char *message)
 	{
-		send_cmd(ServerName, "SQUIT %s :%s", servname, message);
+		send_cmd(TS6SID, "SQUIT %s :%s", servname, message);
 	}
 
 	/* Functions that use serval cmd functions */
@@ -621,8 +622,8 @@ class InspIRCdProto : public IRCDProto
 		else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
 		SendServer(ServerName, 0, ServerDesc);
 		send_cmd(NULL, "BURST");
-		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
-		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
 	}
 
 	/* CHGIDENT */
@@ -633,25 +634,28 @@ class InspIRCdProto : public IRCDProto
 			ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
 		}
 
-		send_cmd(s_OperServ, "CHGIDENT %s %s", nick, vIdent);
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
 	}
 
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s %ud :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(bi->uid, "SVSHOLD %s %ud :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		send_cmd(s_OperServ, "SVSHOLD %s", nick);
+		BotInfo *bi = findbot(s_OperServ);
+		send_cmd(bi->uid, "SVSHOLD %s", nick);
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const char *mask)
 	{
-		send_cmd(s_OperServ, "ZLINE %s", mask);
+		send_cmd(TS6SID, "DELLINE Z %s", mask);
 	}
 
 	/* SZLINE */
@@ -675,12 +679,16 @@ class InspIRCdProto : public IRCDProto
 
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 	{
-		send_cmd(source, "SVSJOIN %s %s", nick, chan);
+		User *u = finduser(nick);
+		BotInfo *bi = findbot(source);
+		send_cmd(bi->uid, "SVSJOIN %s %s", u->uid, chan);
 	}
 
 	void SendSVSPart(const char *source, const char *nick, const char *chan)
 	{
-		send_cmd(source, "SVSPART %s %s", nick, chan);
+		User *u = finduser(nick);
+		BotInfo *bi = findbot(source);
+		send_cmd(bi->uid, "SVSPART %s %s", u->uid, chan);
 	}
 
 	void SendEOB()

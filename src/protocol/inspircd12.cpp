@@ -440,11 +440,6 @@ int anope_event_idle(const char *source, int ac, const char **av)
 	return MOD_CONT;
 }
 
-/* PROTOCTL */
-void inspircd_cmd_protoctl()
-{
-}
-
 static char currentpass[1024];
 
 /* PASS */
@@ -658,7 +653,7 @@ class InspIRCdProto : public IRCDProto
 	/* SZLINE */
 	void SendSZLine(const char *mask, const char *reason, const char *whom)
 	{
-		send_cmd(ServerName, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
+		send_cmd(TS6SID, "ADDLINE Z %s %s %ld 0 :%s", mask, whom, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SVSMODE +d */
@@ -717,9 +712,6 @@ int anope_event_ftopic(const char *source, int ac, const char **av)
 
 int anope_event_mode(const char *source, int ac, const char **av)
 {
-    if (ac < 2)
-        return MOD_CONT;
-
     if (*av[0] == '#' || *av[0] == '&') {
         do_cmode(source, ac, av);
     } else {
@@ -852,32 +844,23 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 /* Events */
 int anope_event_ping(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    ircdproto->SendPong(ServerName, av[0]);
-    return MOD_CONT;
+	ircdproto->SendPong(TS6SID, av[0]);
+	return MOD_CONT;
 }
 
 int anope_event_436(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-
     m_nickcoll(av[0]);
     return MOD_CONT;
 }
 
 int anope_event_away(const char *source, int ac, const char **av)
 {
-    if (!source) {
-        return MOD_CONT;
-    }
     m_away(source, (ac ? av[0] : NULL));
     return MOD_CONT;
 }
 
 /* Taken from hybrid.c, topic syntax is identical */
-
 int anope_event_topic(const char *source, int ac, const char **av)
 {
     Channel *c = findchan(av[0]);
@@ -916,30 +899,18 @@ int anope_event_topic(const char *source, int ac, const char **av)
 
 int anope_event_squit(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
     do_squit(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_rsquit(const char *source, int ac, const char **av)
 {
-    if (ac < 1 || ac > 3)
-        return MOD_CONT;
-
-    /* Horrible workaround to an insp bug (#) in how RSQUITs are sent - mark */
-    if (ac > 1 && strcmp(ServerName, av[0]) == 0)
-        do_squit(source, ac - 1, av + 1);
-    else
-        do_squit(source, ac, av);
-
-    return MOD_CONT;
+	do_squit(source, ac, av);
+	return MOD_CONT;
 }
 
 int anope_event_quit(const char *source, int ac, const char **av)
 {
-    if (ac != 1)
-        return MOD_CONT;
     do_quit(source, ac, av);
     return MOD_CONT;
 }
@@ -947,17 +918,12 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 int anope_event_kill(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
-
     m_kill(av[0], av[1]);
     return MOD_CONT;
 }
 
 int anope_event_kick(const char *source, int ac, const char **av)
 {
-    if (ac != 3)
-        return MOD_CONT;
     do_kick(source, ac, av);
     return MOD_CONT;
 }
@@ -965,18 +931,12 @@ int anope_event_kick(const char *source, int ac, const char **av)
 
 int anope_event_join(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
     do_join(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-    if (!source) {
-        return MOD_CONT;
-    }
-
     m_motd(source);
     return MOD_CONT;
 }
@@ -984,9 +944,6 @@ int anope_event_motd(const char *source, int ac, const char **av)
 int anope_event_setname(const char *source, int ac, const char **av)
 {
     User *u;
-
-    if (ac != 1)
-        return MOD_CONT;
 
     u = finduser(source);
     if (!u) {
@@ -1004,9 +961,6 @@ int anope_event_chgname(const char *source, int ac, const char **av)
 {
     User *u;
 
-    if (ac != 2)
-        return MOD_CONT;
-
     u = finduser(source);
     if (!u) {
         if (debug) {
@@ -1022,9 +976,6 @@ int anope_event_chgname(const char *source, int ac, const char **av)
 int anope_event_setident(const char *source, int ac, const char **av)
 {
     User *u;
-
-    if (ac != 1)
-        return MOD_CONT;
 
     u = finduser(source);
     if (!u) {
@@ -1042,9 +993,6 @@ int anope_event_chgident(const char *source, int ac, const char **av)
 {
     User *u;
 
-    if (ac != 2)
-        return MOD_CONT;
-
     u = finduser(av[0]);
     if (!u) {
         if (debug) {
@@ -1060,9 +1008,6 @@ int anope_event_chgident(const char *source, int ac, const char **av)
 int anope_event_sethost(const char *source, int ac, const char **av)
 {
     User *u;
-
-    if (ac != 1)
-        return MOD_CONT;
 
     u = finduser(source);
     if (!u) {
@@ -1115,9 +1060,6 @@ int anope_event_chghost(const char *source, int ac, const char **av)
 {
     User *u;
 
-    if (ac != 1)
-        return MOD_CONT;
-
     u = finduser(source);
     if (!u) {
         if (debug) {
@@ -1143,25 +1085,19 @@ int anope_event_server(const char *source, int ac, const char **av)
 
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
     m_privmsg(source, av[0], av[1]);
     return MOD_CONT;
 }
 
 int anope_event_part(const char *source, int ac, const char **av)
 {
-    if (ac < 1 || ac > 2)
-        return MOD_CONT;
     do_part(source, ac, av);
     return MOD_CONT;
 }
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-    if (source && ac >= 1) {
-        m_whois(source, av[0]);
-    }
+    m_whois(source, av[0]);
     return MOD_CONT;
 }
 

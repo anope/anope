@@ -442,11 +442,6 @@ int anope_event_idle(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* PROTOCTL */
-void inspircd_cmd_protoctl()
-{
-}
-
 static char currentpass[1024];
 
 /* PASS */

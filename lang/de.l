@@ -49,7 +49,7 @@
 # (including empty lines).  This has to be a tab, not spaces.
 ##########################################################################
 #
-# INFO ::: Letzte Änderung:	07.05.2005	-- crazy --
+# INFO ::: Letzte Änderung:	19.10.2008	-- Han` --
 #
 ##########################################################################
 
@@ -184,7 +184,7 @@ READ_ONLY_MODE
 PASSWORD_INCORRECT
 	Falsches Passwort.
 INVALID_TARGET
-	"/msg %s" is no longer supported.  Use "/msg %s@%s" or "/%s" instead.
+	"/msg %s" wird nicht mehr unterstützt.  Benutze "/msg %s@%s" oder "/%s" stattdessen.
 
 # What's the difference between "Access denied" and "Permission denied"?
 # Very little; you can safely make them the same message with no real loss
@@ -206,7 +206,7 @@ MORE_OBSCURE_PASSWORD
 	kann keine Leer oder Tabulatortaste enthalten sein.
 
 PASSWORD_TOO_LONG
-	Your password is too long. Please try again with a shorter password.
+	Dein Passwort ist zu lang. Versuche es erneut mit einen kürzeren Passwort.
 
 NICK_NOT_REGISTERED
 	Dein Nickname ist nicht registriert.
@@ -388,7 +388,7 @@ NICK_ALREADY_REGISTERED
 NICK_REGISTERED
 	Dein Nickname %s ist unter deinem Host registriert worden: %s
 NICK_REGISTERED_NO_MASK
-	Der Nickname %s ist registriert.
+	Der Nickname %s wurde erfolgreich registriert.
 NICK_PASSWORD_IS
 	Dein Passwort ist %s - behalte es für spätere Benutzung.
 NICK_REG_DELAY
@@ -583,9 +583,9 @@ NICK_SET_MSG_OFF
 NICK_SET_AUTOOP_SYNTAX
 	SET AUTOOP {ON | OFF}
 NICK_SET_AUTOOP_ON
-	Services will now autoop you in channels.
+	Die Services werden Dir jetzt automatisch Op-Status geben in den Channels.
 NICK_SET_AUTOOP_OFF
-	Services will no longer autoop you in channels.
+	Die Services werden Dir jetzt nicht mehr automatisch Op-Status geben in den Channels.
 
 # SET NOEXPIRE responses
 NICK_SASET_SYNTAX
@@ -713,17 +713,18 @@ NICK_SASET_NOEXPIRE_OFF
 NICK_SASET_AUTOOP_SYNTAX
 	SASET nickname AUTOOP {ON | OFF}
 NICK_SASET_AUTOOP_ON
-	Services will now autoop %s in channels.
+	Die Services werden %s jetzt automatisch Op-Status geben in den Channels.
 NICK_SASET_AUTOOP_OFF
-	Services will no longer autoop %s in channels.
+	Die Services werden %s jetzt nicht mehr automatisch Op-Status geben in den Channels.
 
 # SASET LANGUAGE responses
 NICK_SASET_LANGUAGE_SYNTAX
 	SASET nickname LANGUAGE number
 NICK_SASET_LANGUAGE_UNKNOWN
-	Unknown language number %d.  Type %R%s HELP SET LANGUAGE for a list of languages.
+	Unbekannte Sprachen-Nummer %d. 
+	Tippe %R%s HELP SET LANGUAGE um eine Liste aller verfügbaren Sprachen zu erhalten.
 NICK_SASET_LANGUAGE_CHANGED
-	Language changed to German.
+	Sprache wurde geändert zu Deutsch.
 
 
 # ACCESS responses
@@ -927,17 +928,17 @@ NICK_SENDPASS_OK
 NICK_SUSPEND_SYNTAX
 	SUSPEND Nickname Grund
 NICK_SUSPEND_SUCCEEDED
-	Der Nickname %s ist jetzt suspended.
+	Der Nickname %s ist jetzt suspendiert.
 NICK_SUSPEND_FAILED
-	Konnte den Nicknamen %s nicht suspenden!
+	Konnte den Nicknamen %s nicht suspendieren!
 
 # UNSUSPEND responses
 NICK_UNSUSPEND_SYNTAX
 	UNSUSPEND Nickname
 NICK_UNSUSPEND_SUCCEEDED
-	Der Nickname %s ist jetzt released.
+	Der Nickname %s ist jetzt freigegeben.
 NICK_UNSUSPEND_FAILED
-	Konnte den Nicknamen %s nicht releasen!
+	Konnte den Nicknamen %s nicht freigeben!
 
 # FORBID responses
 NICK_FORBID_SYNTAX
@@ -1296,9 +1297,9 @@ CHAN_SET_OPNOTICE_OFF
 CHAN_SET_XOP_SYNTAX
 	SET Channel XOP {ON | OFF}
 CHAN_SET_XOP_ON
-	xOP System für %s ist jetzt ON.
+	XOP System für %s ist jetzt ON.
 CHAN_SET_XOP_OFF
-	xOP System für %s ist jetzt OFF.
+	XOP System für %s ist jetzt OFF.
 
 # SET NOEXPIRE responses
 CHAN_SET_NOEXPIRE_SYNTAX
@@ -1317,7 +1318,7 @@ CHAN_XOP_ACCESS
 	Du kannst diesen Befehl nicht benutzen. Benutze Stattdessen ACCESS.
 	Tippe %R%s HELP ACCESS für weitere Informationen.
 CHAN_XOP_NOT_AVAILABLE
-	xOP system is not available.
+	XOP System ist nicht verfügbar.
 
 # AOP messages
 CHAN_AOP_SYNTAX
@@ -1451,9 +1452,9 @@ CHAN_ACCESS_XOP
 	Nutze stattdessen die AOP, SOP und VOP Befehle.
 	Tippe %R%s HELP Befehl für weitere Informationen.
 CHAN_ACCESS_XOP_HOP
-	You can't use this command. 
-	Use the AOP, SOP, HOP and VOP commands instead.
-	Type %R%s HELP command for more information.
+	Du kannst dieses Befehl nicht nutzen.
+	Nutze stattdessen die AOP, SOP, HOP und VOP Befehle.
+	Tippe %R%s HELP Befehl für weitere Informationen.
 CHAN_ACCESS_DISABLED
 	Das Ändern der Channel-Access-Liste wurde zwischenzeitig deaktiviert.
 CHAN_ACCESS_LEVEL_NONZERO
@@ -1672,7 +1673,7 @@ CHAN_CLEAR_SYNTAX
 CHAN_CLEARED_BANS
 	Alle Bans in %s wurden entfernt.
 CHAN_CLEARED_EXCEPTS
-	Alle Excepts in %s wurden entfernt.
+	Alle Ausnahmen in %s wurden entfernt.
 CHAN_CLEARED_MODES
 	Alle Channel-Modes von %s wurden zurückgesetzt.
 CHAN_CLEARED_OPS
@@ -1762,7 +1763,7 @@ CHAN_UNSUSPEND_FAILED
 
 # Misc responses
 CHAN_EXCEPTED
-	%s passt zur Exception von %s und kann nicht gebannt werden, solange die Exception nicht gelöscht wird.
+	%s passt zur Ausnahme von %s und kann nicht gebannt werden, solange die Ausnahme nicht gelöscht wird.
 
 ###########################################################################
 #
@@ -2489,6 +2490,8 @@ OPER_STATS_CHANSERV_MEM
 	ChanServ          : %6d Einträge, %5d kB
 OPER_STATS_BOTSERV_MEM
 	BotServ           : %6d Einträge, %5d kB
+OPER_STATS_HOSTSERV_MEM
+	HostServ          : %6d Einträge, %5d kB
 OPER_STATS_OPERSERV_MEM
 	OperServ          : %6d Einträge, %5d kB
 OPER_STATS_SESSIONS_MEM
@@ -3160,8 +3163,8 @@ OPER_HELP_EXCEPTION
 	einschränkungen zu bearbeiten.Dadurch ist es möglich
 	bestimmte Hosts, z.b. Shell-Server, auf eine bestimmte 
 	Anzahl von gleichzeitigen Verbindungen einschränken.Hat 
-	eine Host dieses Limit erreicht, wir jede neue Verbindung
-	(von der Host) nicht mehr akzeptiert. Der betroffene User 
+	ein Host dieses Limit erreicht, wird jede neue Verbindung
+	(vom gleichen Host) nicht mehr akzeptiert. Der betroffene User 
 	wird entfernt (gekilled) und via Notice vom %S informiert
 	warum er vom Netzwerk getrennt wurden.
 	
@@ -3644,7 +3647,7 @@ NICK_HELP_ACCESS
 	        ACCESS DEL Maske
 	        ACCESS LIST
 	
-	Zeit oder bearbeitet die Zugriffsliste für deinen 
+	Zeigt oder bearbeitet die Zugriffsliste für deinen 
 	Nicknamen. Durch diese Liste erkennt %S dich 
 	automatisch als berechtigt, diesen Nicknamen zu 
 	nutzen. Wenn du den Nicknamen von anderen Adressen
@@ -3690,7 +3693,8 @@ NICK_HELP_SET
 	                 auf der Liste von %R%S LIST
 	    HIDE         Versteckt bestimmte Informationen deines
 	                 Nicknamens
-	    AUTOOP       Should services op you automatically.    
+	    AUTOOP       Sollten Dir die Services automatisch
+	                 Op-Status geben.    
 	
 	Wenn du eines dieser Optionen nutzen willst, musst du dich
 	vorher identifizeren. 
@@ -3700,10 +3704,10 @@ NICK_HELP_SET
 	zu einer bestimmten oben genannten Option.
 
 NICK_HELP_SET_DISPLAY
-	Syntax: SET DISPLAY new-display
+	Syntax: SET DISPLAY Neues-Display
 	
 	Ändert den virtuellen "Anführer" deiner Gruppe in den
-	Services. Der wert von new-display MUSS ein Nickname
+	Services. Der wert von Neues-Display MUSS ein Nickname
 	in deiner Gruppe sein.
 	
 	Hinweis: Dieser Befehl ändert keine Zugriffsrechte
@@ -3711,7 +3715,7 @@ NICK_HELP_SET_DISPLAY
 	Gruppe in der Liste aufgeführt.
 	
 NICK_HELP_SET_PASSWORD
-	Syntax: SET PASSWORD Neuer-Passwort
+	Syntax: SET PASSWORD Neues-Passwort
 	
 	Ändert das Passwort, mit dem du dich als Besitzer des
 	Nicknamen identifizierst.
@@ -3823,8 +3827,9 @@ NICK_HELP_SET_MSG
 NICK_HELP_SET_AUTOOP
 	Syntax: SET AUTOOP {ON | OFF}
 	
-	Sets whether you will be opped automatically. Set to ON to 
-	allow ChanServ to op you automatically when entering channels.
+	Bestimmt ob Du automatisch Op-Status erhälst. Auf ON gestellt
+	erlaubt es ChanServ Dir automatisch Op-Status zu geben,
+	wenn Du die Channels betrittst.
 
 NICK_HELP_SASET
 	Syntax: SASET nickname option parameters.
@@ -3839,22 +3844,24 @@ NICK_HELP_SASET
 	    GREET      Fügt eine Begrüssungsnachricht dem Nicknamen hinzu
 	    KILL       Schützt den Nicknamen durch Identifikationszwang
 	    SECURE     Schaltet die Identifikationssicherheitsfunktion 
-	    							an oder aus
+	               an oder aus
 	    PRIVATE    Verhindert, dass der Nickname im Befehl
-	                   %R%S LIST auftaucht
+	               %R%S LIST auftaucht
 	    HIDE       Versteckt bestimmte, dem Nicknamen zugeordnete, 
-	    							Informationen
+	               Informationen
 	    MSG        Bestimmt die Art wie die Services Nachrichten senden
 	    NOEXPIRE   Verhindert, dass der Nickname nach einer bestimmten
-	    							Zeit verfällt
-	    LANGUAGE   Set the language Services will use when
-	               sending messages to nickname
+	               Zeit verfällt
+	    LANGUAGE   Stellt die Sprache ein, in der die Services
+	               dem Nicknamen antworten sollen.
+	    AUTOOP     Sollten die Services dem Nick automatisch seinen
+	               Op-Status geben.
 	
 	Mit %R%S HELP SASET option können mehr Informationen zu 
 	den Einstellungen angefordert werden. Die Einstellungen betreffen den
 	angegebenen Nicknamen. 
 	
-	Die Befehle sind nur für Services admins verfügbar.
+	Die Befehle sind nur für Services Admins verfügbar.
 
 NICK_HELP_SASET_DISPLAY
 	Syntax: SASET nickname DISPLAY new-display
@@ -3971,17 +3978,19 @@ NICK_HELP_SASET_NOEXPIRE
 NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
 	
-	Sets whether the given nickname will be opped automatically.
-	Set to ON to allow ChanServ to op you automatically when joining
-	channels.
+	Bestimmt ob der angegebene Nickname automatisch Op-Status erhält.
+	Wird AUTOOP auf ON gestellt erlaubt es ChanServ den
+	angegebenen Nicknamen automatisch Op-Status zu geben,
+	wenn der Nick die Channels betritt.
 
 NICK_HELP_SASET_LANGUAGE
 	Syntax: SASET nickname LANGUAGE number
 	
-	Changes the language Services uses when sending messages to
-	nickname (for example, when responding to a command he sends).
-	number should be chosen from a list of supported languages
-	that you can get by typing %R%S HELP SET LANGUAGE.
+	Wechselt die Sprache der Services, wenn Meldungen an den
+	Nicknamen gesendet werden.
+	(Zum Beispiel in einer Antwort auf einen Befehl den der User gesendet hat).
+	Die Nummer sollte aus der Liste der unterstützten Sprachen gewählt 
+	werden, die man mit tippen des Befehls %R%S HELP SET LANGUAGE bekommt.
 
 NICK_HELP_RECOVER
 	Syntax: RECOVER Nickname [Passwort]
@@ -4074,28 +4083,6 @@ NICK_HELP_LIST
 	    LIST *!*@*.bar.org
 	    Listet alle Nicknamen von Usern in der bar.org Domain.
 
-
-	NICK_HELP_ALIST
-	Syntax: ALIST [Level]
-	
-	Listet dir alle Channels auf, auf die du Zugriff hast. Zusätzlich
-	kannst du ein Level im XOP oder ACCESS Format angeben. Es werden 
-	dann nur Channels aufgelistet, in denen du dieses Level hast.
-
-	Beispiele:
-	    ALIST Founder
-	        Listet alle Chans auf, in denen du Founder Access hast.
-
-	    ALIST AOP
-	        Listet alle Chans auf, in denen dein Zugriffslevel AOP 
-	        oder höher beträgt.
-
-	    ALIST 10
-	        Listet alle Chans auf, in dnen dein Zugriffslevel 10 
-	        oder höher beträgt.
-	
-	Channels mit der NOEXPIRE Option sind mit einem Ausrufezeichen markiert.
-
 NICK_HELP_ALIST
 	Syntax: ALIST [Level]
 	
@@ -4103,20 +4090,21 @@ NICK_HELP_ALIST
 	das Level-Format (XOP oder ACCESS) bestimmen. Die daraus resultierende 
 	liste wird nur Channels enthalten, wo du den entsprechenden 
 	Zugriffslevel hast.
-
-	Examples:
+	
+	Beispiele:
+	
 	    ALIST Founder
 	        Listet alle Channels auf, in denen du Founder-Access hast.
-
+	
 	    ALIST AOP
 	        Listet alle Channels auf, in denen du AOP-Access oder höher
 	        hast.
-
+	
 	    ALIST 10
 	        Listet alle Channels auf, in denen du das Zugriffs-Level 10 
 	        oder höher hast..
 	
-	Channels, die die NOEXPIRE Option gesetztist, haben ein Ausrufezeiche als Prefix.
+	Channels mit der NOEXPIRE Option sind mit einem Ausrufezeichen markiert.
 
 NICK_HELP_GLIST
 	Syntax: GLIST
@@ -4163,18 +4151,19 @@ NICK_HELP_SENDPASS
 NICK_HELP_CONFIRM
 	Syntax: CONFIRM passcode
 	
-	This is the second step of nickname registration process.
-	You must perform this command in order to get your nickname
-	registered with %S. The passcode (or called auth code also)
-	is sent to your e-mail address in the first step of the
-	registration process. For more information about the first
-	stage of the registration process, type: %R%S HELP REGISTER
+	Dies ist der zweite Schritt beim Registrieren des Nicknamens.
+	Du mußt diesen Befehl ausführen, um ihn mit %S zu registrieren.
+	Der Passcode (oder auch Authentifizierungscode genannt) wird
+	an Deine email-adresse gesendet beim ersten Schritt des
+	Registrationsprozesses. Für mehr Informationen über die erste
+	Stufe des Registrationsprozesses tippe: %R%S HELP REGISTER
 
 NICK_HELP_RESEND
 	Syntax: RESEND
 	
-	This command will re-send the auth code (also called passcode)
-	to the e-mail address of the user whom is performing it.
+	Dieser Befehl löst das Versenden des Authentifizierungscodes
+	(auch Passcode genannt) erneut an die gespeicherte Emailadresse
+	des Users, sobald der User ihn ausführt.
 
 NICK_SERVADMIN_HELP
 	Services Administratoren können auch registrierte Nicknamen
@@ -4219,7 +4208,7 @@ NICK_SERVADMIN_HELP_INFO
 
 NICK_SERVADMIN_HELP_LIST
 	Syntax: LIST Muster [FORBIDDEN] [SUSPENDED] [NOEXPIRE] [UNCONFIRMED]
-
+	
 	Zeigt alle registrierten Nicknamen an, die einem bestimmten
 	Muster, nickname!user@host, entsprechen. Nicknamen mit 
 	aktivierter PRIVATE und NOEXPIRE Option werden nur 
@@ -4306,7 +4295,7 @@ NICK_SERVADMIN_HELP_SUSPEND
 NICK_SERVADMIN_HELP_UNSUSPEND
 	Syntax: UNSUSPEND Nickname
 
-	Gibt ein Nickname der SUSPENDED ist wieder frei.
+	Gibt einen Nicknamen der SUSPENDED ist wieder frei.
 
 ###########################################################################
 #
@@ -4388,7 +4377,7 @@ CHAN_HELP_CMD_DEHALFOP
 CHAN_HELP_CMD_DEOWNER
 	    DEOWNER    Entfernt dein Gründer Status in einen Channel
 CHAN_HELP_CMD_DEPROTECT
-	    DEPROTECT  Entfern den schutz des angegebenen Nicknamens 
+	    DEPROTECT  Entfernt den schutz des angegebenen Nicknamens 
 	               in einen Channel
 CHAN_HELP_CMD_HALFOP
 	    HALFOP     Gibt den angegebenen User HalfOP-Status in einen Channel
@@ -4401,7 +4390,7 @@ CHAN_HELP_CMD_PROTECT
 CHAN_HELP_CMD_ADMIN
 	    ADMIN      Schützt den angegebenen Nicknamen in einen Channel
 CHAN_HELP_CMD_DEADMIN
-	    DEADMIN    Entfern den schutz des angegebenen Nicknamens 
+	    DEADMIN    Entfernt den Schutz des angegebenen Nicknamens 
 	               in einen Channel
 CHAN_HELP_CMD_DEOP
 	    DEOP       Enfernt den OP-Status des angegebenen Nicknamens
@@ -4771,7 +4760,7 @@ CHAN_HELP_AOP
 	Dieser Befehl kann für deinen Channel ausgeschaltet sein, in
 	diesem Fall nutze bitte die Access Liste. Für weitere Infos zur
 	Access Liste, tippe bitte %R%S HELP ACCESS und
-	%R%S HELP SET XOP für Infos über den Wechsel vom xOP und 
+	%R%S HELP SET XOP für Infos über den Wechsel vom XOP und 
 	vom Access System.
 
 CHAN_HELP_HOP
@@ -4975,9 +4964,10 @@ CHAN_HELP_AKICK
 	Befehl angegeben, wird dieser als Kick-Grund für den
 	User genutzt, ohne Reason wird standardmässig 
 	"You have been banned from the channel" verwendet.
-	When akicking a registered nick the nickserv account
-	will be added to the akick list instead of the mask.
-	All users within that nickgroup will then be akicked.
+	Wird ein registrierter Nick gekickt, so wird der
+	registrierte Nickname zur Kickliste hinzugefügt,
+	anstatt der Hostmaske. Alle Nicknamen die dieser Gruppe
+	angehören werden ebenfalls gekickt.
 	
 	Durch den AKICK DEL Befehls wird ein Eintrag von der
 	AutoKick-Liste entfernt. Es entfernt jedoch nicht die Bans,
@@ -5194,7 +5184,8 @@ CHAN_HELP_INVITE
 	Diese Funktion erlaubt es dir, dich durch %S in den
 	angegebenen Channel einladen zu lassen. Standardmässig
 	wird dies nur ausgeführt, wenn den Nickname auf der 
-	Zugriffsliste des Channels einen Level grösser 0 hat.
+	Zugriffsliste des Channels einen Level grösser 5 
+	(oder INVITE) hat.
 
 CHAN_HELP_UNBAN
 	Syntax: UNBAN Channel
@@ -5202,7 +5193,7 @@ CHAN_HELP_UNBAN
 	Durch %S werden alle Bans entfernt, die dich am joinen
 	des Channels hindern. Eine Vorraussetzung dafür ist
 	allerdings, dass dein Level in dem Channel grösser als
-	0 ist.
+	5 (oder UNBAN)ist.
 	
 CHAN_HELP_KICK
 	Syntax: KICK [Channel [Nickname [Grund]]]
@@ -5853,18 +5844,22 @@ OPER_HELP_ADMIN
 OPER_HELP_IGNORE
 	Syntax: IGNORE {ADD|DEL|LIST|CLEAR} [time] [nick | mask]
 	
-	Allows Services Admins to make Services ignore a nick or mask
-	for a certain time or until the next restart. The default
-	time format is seconds. You can specify it by using units.
-	Valid units are: s for seconds, m for minutes, 
-	h for hours and d for days. 
-	Combinations of these units are not permitted. To make
-	Services permanently ignore the user, type 0 as time.
-	When adding a mask, it should be in the format user@host
-	or nick!user@host, everything else will be considered a nick.
-	Wildcards are permitted.
+	Erlaubt Services Admins den Services einen Nick oder eine
+	Hostmaske für eine bestimmte Zeit oder bis zum nächsten
+	Neustart zu ignorieren. Mit Hilfe von Zeit lässt sich eine
+	bestimmte Auslaufzeit dieses Eintrags definieren.
+	Zeit wird durch eine Ganzzahl angegeben, gefolgt von einem
+	Buchstaben: s (Sekunden), m (Minuten), h (Stunden)
+	oder d (Tage).
+	Kombinationen (wie zum Beispiel 1h30m) sind nicht zulässig.
+	Wird kein Buchstabe angegeben, wird von Sekunden ausgegangen
+	(also 30 bedeutet dann z.B. 30 Sekunden). Um einen 
+	IGNORE-Eintrag zu erstellen, der nicht ausläuft, benutze 0.
+	Wenn eine Hostmaske hinzugefügt wird sollte es in dem Format
+	user@host oder nick!user@host erfolgen, ansonsten wird es als
+	Nick angesehen. Wildcards sind erlaubt.
 	
-	Ignores will not be enforced on IRC Operators.
+	Ignores werden nicht bei IRC Operatoren erzwungen.
 
 OPER_HELP_MODE
 	Syntax: MODE Channel Modi

@@ -63,6 +63,7 @@ Table of Contents
          files.  What should I do?
     4.4) My FreeBSD box complains about 'Shared object "nss_dns.so.1" not
          found'
+    4.5) Anope and long (more then 30 character) nicknames.
 
 5) ChanServ
     5.1) Anope's channel mode setting doesn't work.  I can't set modes with
@@ -370,6 +371,22 @@ Table of Contents
     delete the /etc/nsswitch.conf file. Please keep in mind that removing a
     configuration file can be dangerous, so only do this if you know what you
     are doing.
+
+4.5) Anope and long (more then 30 character) nicknames.
+
+    By default anope only supports nicknames up to 30 characters (NICKLEN=30).
+    If your IRCd allows for longer nicknames or has been modified to do so 
+    anope will start logging a lot of ("NICK from nonexistent nick") messages.
+    This is because once a user uses a nick that is too long for anope to handle, 
+    anope loses track of the user for the remainder of the session.
+    It is POSSIBLE but not NOT RECOMMENDED to extend the maximum length of nicknames
+    anope can track, however this will also break database compatibility. DBs saved
+    with anope set to allow for example 40 chars cannot be read by a default anope
+    and vice versa. So changing the maximum nick length is only possible
+    when starting with fresh databases and even then the consequences of this are
+    UNTESTED.
+    In order to change the maximum internal nick length, change the NICKMAX setting
+    in include/config.h, recompile anope and start without databases.
 
 
 5) ChanServ

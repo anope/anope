@@ -1,9 +1,31 @@
-Anope Version SVN
+Anope Version 1.8.0
+-------------------
+10/19 F Updated Anope Credits                                             [ #00]
+
+Provided by Szymek <szymek@adres.pl> - 2008
+10/25 F Updated Polish language file translation.                         [ #00]
+
+Provided by Kein <kein-of@yandex.ru> - 2008
+10/25 F Updated Russian language file translation                         [#959]
+
+Anope Version 1.7.24
 --------------------
+10/14 F Fixed minor error in German language file.                        [#958]
+10/12 F Fixed language error in saset help.                               [ #00]
+10/12 F Fixed MySQL DB routines not storing passwords properly.           [#940]
+10/12 F Fixed OS STATS missing HS and showing disabled clients.           [#956]
+10/19 F Added warning regarding combined use of MySQL and skeleton mode.  [#957] 
+
+Provided by Szymek <szymek@adres.pl> - 2008
+10/14 F Updated Polish language file translation.                         [ #00]
+
+Provided by Han` <Han@mefalcon.org> - 2008
+10/19 F Updated German language file.                                     [ #00]
+
 
 Anope Version 1.7.23b
 --------------------
-10/06 F Fixed issue with encrypted nick databases                         [ #00]
+10/06 F Fixed issue with encrypted nick databases.                        [ #00]
 
 Anope Version 1.7.23
 --------------------

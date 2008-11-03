@@ -74,6 +74,8 @@ Table of Contents
 
         * Adam Kramer <ribosome@anope.org>
         * Alvaro Toledo <atoledo@keldon.org>
+        * Amanda Folson <amanda@anope.org>
+        * Andrew Berquist <vash@anope.org> 
         * Björn Stiddien <keeper@anope.org>
         * Charles Kingsley <chaz@anope.org>
         * Chris Hogben <heinz@anope.org>
@@ -89,6 +91,7 @@ Table of Contents
         * Joris Vink <joris@anope.org>
         * Lucas Nussbaum <lucas@lucas-nussbaum.net>
         * Mark Summers <mark@goopler.net>
+        * Matthew Beeching <jobe@invictachat.net>
         * Pieter Bootsma <geniusdex@anope.org>
         * Thomas Juberg Stensås <ShadowMaster@Shadow-Realm.org>
         * Trystan .S Lee <trystan@nomadirc.net>
@@ -97,12 +100,11 @@ Table of Contents
     Anope Translations:
 
         * GeniusDex <geniusdex@anope.org> (nl.l)
-        * Oleg Nikolaev aka Isot <isot@complife.ru> (ru.l)
+        * Kein <kein-of@yandex.ru> (ru.l)
         * Stuff <the.stuff@gmx.de> (de.l)
         * Gabriel Acevedo H. <drstein@anope.org> (es.l)
         * Janos Kapitany <sarkanyka@cjbchat.hu>  (hun.l)
-        * Mateusz Szczyrzyca <annihilator@ircnet.pl> (pl.l)
-
+        * Szymon S'wierkosz <szymek@adres.pl> (pl.l)
 
     Anope uses the strlcat() and strlcpy() functions from OpenSSH 2.5.1p2.
     These functions are copyrighted by Todd C. Miller:

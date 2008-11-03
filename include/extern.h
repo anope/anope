@@ -495,6 +495,7 @@ E void helpserv(User * u, char *buf);
 E void helpserv_init(void);
 
 /**** hostserv.c  ****/
+E void get_hostserv_stats(long *nrec, long *memuse);
 E void hostserv_init(void);
 E void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator, int32 tmp_time);
 E char *getvIdent(char *nick);
@@ -991,6 +992,7 @@ E int db_mysql_open();
 E int db_mysql_close();
 E int db_mysql_query(char *sql);
 E char *db_mysql_quote(char *sql);
+E char *db_mysql_quote_buffer(char *sql, int size);
 E int db_mysql_try(const char *fmt, ...);
 E int db_mysql_save_ns_core(NickCore * nc);
 E int db_mysql_save_ns_alias(NickAlias * na);

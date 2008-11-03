@@ -13,6 +13,78 @@ VERSION_BUILD=""
 
 # $Log$
 #
+# BUILD : 1.8.0 (1489)
+# BUGS  : 
+# NOTES : Anope 1.8.0-rc1
+#
+# BUILD : 1.7.24 (1488)
+# BUGS  : 959
+# NOTES : Updated russian language file. Update provided by Kein.
+#
+# BUILD : 1.7.24 (1487)
+# BUGS  : 
+# NOTES : Updated polish language file. Update provided by Syzmek.
+#
+# BUILD : 1.7.24 (1486)
+# BUGS  : 
+# NOTES : Fixed Changes from my last commit.
+#
+# BUILD : 1.7.24 (1485)
+# BUGS  : 
+# NOTES : Update Anope Credits
+#
+# BUILD : 1.7.24 (1484)
+# BUGS  : 
+# NOTES : Development Framework
+#
+# BUILD : 1.7.24 (1483)
+# BUGS  : 
+# NOTES : 1.7.24 Release
+#
+# BUILD : 1.7.23 (1482)
+# BUGS  : 
+# NOTES : Added entry to the FAQ regarding anopes max nicklength. 
+#
+# BUILD : 1.7.23 (1481)
+# BUGS  : 957 
+# NOTES : Added a warning message in the logs regarding the combined usage of MySQL and skeleton mode.
+#
+# BUILD : 1.7.23 (1480)
+# BUGS  : 
+# NOTES : Updated german language file. Update provided by Han`.
+#
+# BUILD : 1.7.23 (1479)
+# BUGS  : 958
+# NOTES : Fixed minor German langfile errors.
+#
+# BUILD : 1.7.23 (1478)
+# BUGS  : 
+# NOTES : updated langfile for pl.l
+#
+# BUILD : 1.7.23 (1477)
+# BUGS  : 956 
+# NOTES : Fixed OS STATS missing HostServ and showing disabled optional client(s). 
+#
+# BUILD : 1.7.23 (1476)
+# BUGS  : 
+# NOTES : Fixed fuckup in earlier commit message... No more multitasking for me.. 
+#
+# BUILD : 1.7.23 (1475)
+# BUGS  : 
+# NOTES : Fixed compile warning in nickserv.c. 
+#
+# BUILD : 1.7.23 (1474)
+# BUGS  : 
+# NOTES : Added missing SVN tag to version string. 
+#
+# BUILD : 1.7.23 (1473)
+# BUGS  : 940 
+# NOTES : Rewrote MySQL password storing and loading to properly handle hashes. Note that Anope should not be started with UseRDB if the MySQL DB was dumped by an older version.
+#
+# BUILD : 1.7.23 (1472)
+# BUGS  : 
+# NOTES : Fixed language error in SASET AUTOOP help. 
+#
 # BUILD : 1.7.23 (1471)
 # BUGS  : 
 # NOTES : Development Framework 

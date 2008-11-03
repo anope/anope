@@ -454,7 +454,7 @@ void load_ns_dbase(void)
     int ver, i, j, c;
     NickAlias *na, **nalast, *naprev;
     NickCore *nc, **nclast, *ncprev;
-    int failed = 0, len;
+    int failed = 0;
     uint16 tmp16;
     uint32 tmp32;
     char *s, *pass;

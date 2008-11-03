@@ -39,6 +39,36 @@ void moduleAddHostServCmds(void)
 /*************************************************************************/
 
 /**
+ * Return information on memory use.
+ * Assumes pointers are valid. 
+ **/
+
+void get_hostserv_stats(long *nrec, long *memuse)
+{
+    long count = 0, mem = 0;
+    int i;
+    HostCore *hc;
+
+    for (hc = head; hc; hc = hc->next) {
+        count++;
+        mem += sizeof(*hc);
+        if (hc->nick)
+            mem += strlen(hc->nick) + 1;
+        if (hc->vIdent)
+            mem += strlen(hc->vIdent) + 1;
+        if (hc->vHost)
+            mem += strlen(hc->vHost) + 1;
+        if (hc->creator)
+            mem += strlen(hc->creator) + 1;
+    }
+
+    *nrec = count;
+    *memuse = mem;
+}
+
+/*************************************************************************/
+
+/**
  * HostServ initialization.
  * @return void
  */

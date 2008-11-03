@@ -1,8 +1,18 @@
-Anope Version SVN
---------------------
+Anope Version 1.8.0
+-------------------
 *** New Strings:
 
 *** Mod Strings:
+
+*** Del Strings:
+
+Anope Version 1.7.24
+--------------------
+*** New Strings:
+	OPER_STATS_HOSTSERV_MEM
+
+*** Mod Strings:
+	NICK_HELP_SASET_AUTOOP
 
 *** Del Strings:
 

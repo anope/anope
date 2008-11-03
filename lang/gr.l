@@ -2525,6 +2525,8 @@ OPER_STATS_CHANSERV_MEM
 	ChanServ      : %6d в№уейт, %5d kB
 OPER_STATS_BOTSERV_MEM
 	BotServ       : %6d в№уейт, %5d kB
+OPER_STATS_HOSTSERV_MEM
+	HostServ      : %6d records, %5d kB
 OPER_STATS_OPERSERV_MEM
 	OperServ      : %6d в№уейт, %5d kB
 OPER_STATS_SESSIONS_MEM
@@ -3983,10 +3985,8 @@ NICK_HELP_SASET_AUTOOP
 	Syntax: SASET nickname AUTOOP {ON | OFF}
 	
 	Sets whether the given nickname will be opped automatically.
-	Set to ON to allow ChanServ to op you automatically when joining
-	channels.
-	
-	Limited to Services admins.
+	Set to ON to allow ChanServ to op the given nickname 
+	automatically when joining channels.
 
 NICK_HELP_SASET_LANGUAGE
 	Syntax: SASET nickname LANGUAGE number

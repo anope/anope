@@ -364,9 +364,16 @@ int do_stats(User * u)
         get_chanserv_stats(&count, &mem);
         notice_lang(s_OperServ, u, OPER_STATS_CHANSERV_MEM, count,
                     (mem + 512) / 1024);
-        get_botserv_stats(&count, &mem);
-        notice_lang(s_OperServ, u, OPER_STATS_BOTSERV_MEM, count,
+        if (s_BotServ) {
+            get_botserv_stats(&count, &mem);
+            notice_lang(s_OperServ, u, OPER_STATS_BOTSERV_MEM, count,
                     (mem + 512) / 1024);
+        }
+        if (s_HostServ) {
+            get_hostserv_stats(&count, &mem);
+            notice_lang(s_OperServ, u, OPER_STATS_HOSTSERV_MEM, count,
+                    (mem + 512) / 1024);
+        }
         get_operserv_stats(&count, &mem);
         notice_lang(s_OperServ, u, OPER_STATS_OPERSERV_MEM, count,
                     (mem + 512) / 1024);

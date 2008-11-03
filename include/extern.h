@@ -1018,20 +1018,6 @@ E unsigned int mysql_rand(void);
 
 /******************************************************************************/
 
-E void anope_cmd_capab();						  	  		  /* CAPAB */
-E void anope_cmd_chghost(const char *nick, const char *vhost);                   			  /* CHGHOST */
-E void anope_cmd_chgident(const char *nick, const char *vIdent);                 			  /* CHGIDENT */
-E void anope_cmd_ea();									  /* EA      */
-E void anope_cmd_tmode(const char *source, const char *dest, const char *fmt, ...);				  /* TMODE */
-E void anope_cmd_netinfo(int ac, const char **av);						  /* NETINFO */
-E void anope_cmd_pass(const char *pass);                                   	  		  /* PASS */
-E void anope_cmd_protoctl();                                         			  /* PROTOCTL */
-E void anope_cmd_svinfo();						  	  		  /* SVINFO */
-E void anope_cmd_svsadmin(const char *server, int set);						  /* SVSADMIN */
-E void anope_cmd_svsinfo();								  /* SVSINFO */
-E void anope_cmd_burst();									  /* BURST  - use eob to send burst 0 */
-E void anope_cmd_svswatch(const char *sender, const char *nick, const char *parm);
-
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);
 E const char *send_token(const char *token1, const char *token2);

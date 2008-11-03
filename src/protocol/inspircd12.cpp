@@ -553,7 +553,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
-		send_cmd(ServerName, "UID %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
+		send_cmd(ServerName, "UID %s %ld %s %s %s %s 0.0.0.0 %ld +%s :%s", uid, static_cast<long>(time(NULL)), nick, host, host, user, static_cast<long>(time(NULL)), modes, real);
 		send_cmd(nick, "OPERTYPE Service");
 	}
 

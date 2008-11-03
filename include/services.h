@@ -237,7 +237,7 @@ typedef struct ircdvars_ IRCDVar;
 typedef struct ircdcapab_ IRCDCAPAB;
 
 struct ircdvars_ {
-	const char *name;				/* Name of the ChanServ command */
+	const char *name;				/* Name of the IRCd command */
 	const char *nickservmode;			/* Mode used by NickServ	*/
 	const char *chanservmode;			/* Mode used by ChanServ	*/
 	const char *memoservmode;			/* Mode used by MemoServ	*/

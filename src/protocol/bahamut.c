@@ -701,11 +701,6 @@ class BahamutIRCdProto : public IRCDProto
 		SendSQLine(nick, "Reserved for services");
 	}
 
-	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-	{
-		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
-	}
-
 	/* SVSMODE +d */
 	/* sent if svid is something weird */
 	void SendSVID(const char *nick, time_t ts)

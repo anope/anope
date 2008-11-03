@@ -846,7 +846,7 @@ void cancel_user(User * u)
                     ircdproto->SendSVSHold(na->nick);
                 } else {
                     if (ircd->svsnick) {
-                        ircdproto->SendGuestNick(u->nick, NSEnforcerUser,
+                        ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
                                              NSEnforcerHost,
                                              "Services Enforcer", "+");
                         add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
@@ -857,7 +857,7 @@ void cancel_user(User * u)
                 }
             } else {
                 if (ircd->svsnick) {
-                    ircdproto->SendGuestNick(u->nick, NSEnforcerUser,
+                    ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
                                          NSEnforcerHost,
                                          "Services Enforcer", "+");
                     add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);

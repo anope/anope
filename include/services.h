@@ -1214,7 +1214,6 @@ class IRCDProto {
 			SendSVSKillInternal(source, user, buf);
 		}
 		virtual void SendSVSMode(User *, int, const char **) = 0;
-		virtual void SendGuestNick(const char *, const char *, const char *, const char *, const char *) { }
 		virtual void SendMode(BotInfo *bi, const char *dest, const char *fmt, ...)
 		{
 			va_list args;

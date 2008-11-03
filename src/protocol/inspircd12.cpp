@@ -436,7 +436,11 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 
 int anope_event_idle(const char *source, int ac, const char **av)
 {
-	send_cmd(av[0], "IDLE %s %ld 0", source, (long int) time(NULL));
+	BotInfo *bi = findbot(s_OperServ);
+	if (!bi)
+		return MOD_CONT;
+
+	send_cmd(bi->uid, "IDLE %s %ld 0", source, (long int) time(NULL));
 	return MOD_CONT;
 }
 
@@ -533,7 +537,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 	{
-		send_cmd(source, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
+		send_cmd(TS6SID, "PUSH %s ::%s %03d %s %s", dest, source, numeric, dest, buf);
 	}
 
 	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)

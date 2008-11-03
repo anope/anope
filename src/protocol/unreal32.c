@@ -667,12 +667,6 @@ class UnrealIRCdProto : public IRCDProto
 		}
 	}
 
-	void SendGuestNick(const char *nick, const char *user, const char *host, const char *real, const char *modes)
-	{
-		send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
-			myIrcd->nickip ? " *" : " ", real);
-	}
-
 	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;

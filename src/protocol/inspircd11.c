@@ -547,7 +547,7 @@ class InspIRCdProto : public IRCDProto
 		send_cmd(source ? source->nick : s_OperServ, "FMODE %s %u %s", dest, static_cast<unsigned>(c ? c->creation_time : time(NULL)), buf);
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		send_cmd(ServerName, "NICK %ld %s %s %s %s +%s 0.0.0.0 :%s", static_cast<long>(time(NULL)), nick, host, host, user, modes, real);
 		send_cmd(nick, "OPERTYPE Service");

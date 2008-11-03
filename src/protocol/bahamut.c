@@ -694,7 +694,7 @@ class BahamutIRCdProto : public IRCDProto
 		else send_cmd(source->nick, "KICK %s %s", chan, user);
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		EnforceQlinedNick(nick, s_BotServ);
 		send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);

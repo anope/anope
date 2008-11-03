@@ -617,7 +617,7 @@ class RatboxProto : public IRCDTS6Proto
 		ratbox_cmd_svinfo();
 	}
 
-	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes)
+	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		EnforceQlinedNick(nick, NULL);
 		if (UseTS6) {

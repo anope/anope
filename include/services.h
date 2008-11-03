@@ -1223,7 +1223,7 @@ class IRCDProto {
 			va_end(args);
 			SendModeInternal(bi, dest, buf);
 		}
-		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *) = 0;
+		virtual void SendClientIntroduction(const char *, const char *, const char *, const char *, const char *, const char *uid = ts6_uid_retrieve()) = 0;
 		virtual void SendKick(BotInfo *bi, const char *chan, const char *user, const char *fmt, ...)
 		{
 			va_list args;

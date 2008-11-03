@@ -1135,7 +1135,7 @@ int anope_event_privmsg(const char *source, int ac, const char **av)
 {
 	User *u = find_byuid(source);
 	BotInfo *bi = findbot(av[0]);
-	m_privmsg(u->nick, bi->nick, av[1]);
+	m_privmsg(u->nick, bi ? bi->nick: av[0], av[1]);
 	return MOD_CONT;
 }
 

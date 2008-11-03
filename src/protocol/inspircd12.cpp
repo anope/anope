@@ -436,7 +436,7 @@ void inspircd_cmd_chghost(const char *nick, const char *vhost)
 
 int anope_event_idle(const char *source, int ac, const char **av)
 {
-	BotInfo *bi = findbot(s_OperServ);
+	BotInfo *bi = findbot(av[0]);
 	if (!bi)
 		return MOD_CONT;
 

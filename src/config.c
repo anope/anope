@@ -1405,11 +1405,11 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
     int retval = 1;
     int i;
     long val;
-    int optind;
+    int myoptind;
 
     if (stricmp(dir, d->name) != 0)
         return 1;
-    optind = 0;
+    myoptind = 0;
     for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
         if (reload && !(d->params[i].flags & PARAM_RELOAD))
             continue;
@@ -1428,7 +1428,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
             func();             /* For clarity */
             continue;
         }
-        if (optind >= ac) {
+        if (myoptind >= ac) {
             if (!(d->params[i].flags & PARAM_OPTIONAL)) {
                 error(linenum, "Not enough parameters for `%s'", d->name);
                 retval = 0;
@@ -1437,22 +1437,22 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
         }
         switch (d->params[i].type) {
         case PARAM_INT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[myoptind++], &s, 0);
             if (*s) {
                 error(linenum,
                       "%s: Expected an integer for parameter %d",
-                      d->name, optind);
+                      d->name, myoptind);
                 retval = 0;
                 break;
             }
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_POSINT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[myoptind++], &s, 0);
             if (*s || val <= 0) {
                 error(linenum,
                       "%s: Expected a positive integer for parameter %d",
-                      d->name, optind);
+                      d->name, myoptind);
                 retval = 0;
                 break;
             }
@@ -1460,16 +1460,16 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
                 /* well the true top off is 2,147,483,647 but lets not give them the real top */
                 error(linenum,
                       "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
-                      d->name, optind);
+                      d->name, myoptind);
             }
             *(int *) d->params[i].ptr = val;
             break;
         case PARAM_PORT:
-            val = strtol(av[optind++], &s, 0);
+            val = strtol(av[myoptind++], &s, 0);
             if (*s) {
                 error(linenum,
                       "%s: Expected a port number for parameter %d",
-                      d->name, optind);
+                      d->name, myoptind);
                 retval = 0;
                 break;
             }
@@ -1484,18 +1484,18 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
         case PARAM_STRING:
 /*	      if (reload && *(char **)d->params[i].ptr)
 	      	free(*(char **)d->params[i].ptr); */
-            *(char **) d->params[i].ptr = sstrdup(av[optind++]);
+            *(char **) d->params[i].ptr = sstrdup(av[myoptind++]);
             if (!d->params[i].ptr) {
                 error(linenum, "%s: Out of memory", d->name);
                 return 0;
             }
             break;
         case PARAM_TIME:
-            val = dotime(av[optind++]);
+            val = dotime(av[myoptind++]);
             if (val < 0) {
                 error(linenum,
                       "%s: Expected a time value for parameter %d",
-                      d->name, optind);
+                      d->name, myoptind);
                 retval = 0;
                 break;
             }

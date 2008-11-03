@@ -310,26 +310,37 @@ int do_bot(User * u)
             send_event(EVENT_BOT_CHANGE, 1, bi->nick);
         }
     } else if (!stricmp(cmd, "DEL")) {
-        char *nick = strtok(NULL, " ");
+		char *nick = strtok(NULL, " ");
 
-        if (!nick)
-            syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
-        else if (readonly)
-            notice_lang(s_BotServ, u, BOT_BOT_READONLY);
-        else if (!(bi = findbot(nick)))
-            notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
-        else {
-            send_event(EVENT_BOT_DEL, 1, bi->nick);
-            ircdproto->SendQuit(bi,
-                           "Quit: Help! I'm being deleted by %s!",
-                           u->nick);
-            if (ircd->sqline) {
-                ircdproto->SendSQLineDel(bi->nick);
-            }
-            delete bi;
+		if (!nick)
+		{
+			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+			return MOD_CONT;
+		}
+		
+		if (readonly)
+		{
+			notice_lang(s_BotServ, u, BOT_BOT_READONLY);
+			return MOD_CONT;
+		}
+		
+		if (!(bi = findbot(nick)))
+		{
+			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
+			return MOD_CONT;
+		}
 
-            notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
-        }
+		if (nickIsServices(nick, 0))
+		{
+			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST);
+			return MOD_CONT;
+		}
+
+		send_event(EVENT_BOT_DEL, 1, bi->nick);
+		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick);
+		ircdproto->SendSQLineDel(bi->nick);
+		delete bi;
+		notice_lang(s_BotServ, u, BOT_BOT_DELETED, nick);
     } else
         syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 

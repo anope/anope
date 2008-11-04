@@ -52,5 +52,6 @@ Future
   [ ] Modules should also have a way to add strings programatically
   [ ] Should be able to add many strings by dropping a file in a set location.
   [ ] I forsee this working via a function rather than defines, as it seems to do now: e.g. _("NS_NICK_IS_REGISTERED").
+[?] Mail memos? think on consequences of this
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN

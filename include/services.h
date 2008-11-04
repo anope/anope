@@ -179,15 +179,35 @@ extern int strncasecmp(const char *, const char *, size_t);
 #endif
 
 
-#ifndef _WIN32
-	#define MODULE_INIT(x) \
-		extern "C" int anope_modinit(int argc, char **argv) \
+
+/** This definition is used as shorthand for the various classes
+ * and functions needed to make a module loadable by the OS.
+ * It defines the class factory and external init_module function.
+ */
+#ifdef _WIN32
+	#define MODULE_INIT(y) \
+		extern "C" DllExport Module *init_module(const std::string &creator) \
 		{ \
-			return AnopeInit(argc, argv); \
+			return new y(creator); \
+		} \
+		BOOLEAN WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved) \
+		{ \
+			switch ( nReason ) \
+			{ \
+				case DLL_PROCESS_ATTACH: \
+				case DLL_PROCESS_DETACH: \
+					break; \
+			} \
+			return TRUE; \
 		}
 #else
-	#error Not yet supported on Windows, XXX
+	#define MODULE_INIT(y) \
+		extern "C" DllExport Module *init_module(const std::string &creator) \
+		{ \
+			return new y(creator); \
+		}
 #endif
+
 
 /* Miscellaneous definitions. */
 #include "defs.h"

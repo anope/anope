@@ -105,7 +105,6 @@ typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;
 
 typedef struct Command_ Command;
 typedef struct CommandHash_ CommandHash;
-typedef struct Module_ Module;
 typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
 typedef struct ModuleQueue_ ModuleQueue;
@@ -134,7 +133,10 @@ struct ModuleLang_ {
     char **argv;
 };
 
-struct Module_ {
+class Module
+{
+ public:
+	// XXX :(
 	char *name;
 	char *filename;
 	void *handle;
@@ -152,9 +154,17 @@ struct Module_ {
 	void (*hostHelp)(User *u); /* 6 */
 	void (*helpHelp)(User *u); /* 7 */
 
-/*	CommandHash *cmdList[MAX_CMD_HASH]; */
 	MessageHash *msgList[MAX_CMD_HASH];
 	ModuleLang lang[NUM_LANGS];
+
+	/** Creates and initialises a new module.
+	 * @param loadernick The nickname of the user loading the module.
+	 */
+	Module(const std::string &loadernick);
+
+	/** Destroys a module, freeing resources it has allocated.
+	 */
+	~Module();
 };
 
 struct ModuleHash_ {

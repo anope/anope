@@ -46,5 +46,7 @@ Future
 [ ] add overridden form of SendGlobops accepting BotInfo
 [ ] SendAkill should just take a pointer to the Akill class instead of millions of fields (same for some other stuff)
 [ ] chan_set_modes should take BotInfo, possibly with override for User *?
-
-
+[ ] Language system is disgusting, it must die.
+  [ ] Modules should also have a way to add strings programatically
+  [ ] Should be able to add many strings by dropping a file in a set location.
+  [ ] I forsee this working via a function rather than defines, as it seems to do now: e.g. _("NS_NICK_IS_REGISTERED").

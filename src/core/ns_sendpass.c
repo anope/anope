@@ -19,39 +19,27 @@ int do_sendpass(User * u);
 
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSSendPass : public Module
 {
-    Command *c;
+ public:
+	NSSendPass(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SENDPASS", do_sendpass, NULL, NICK_HELP_SENDPASS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SENDPASS", do_sendpass, NULL, NICK_HELP_SENDPASS, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-    if (!UseMail) {
-        return MOD_STOP;
-    }
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+		if (!UseMail)
+		{
+			throw ModuleException("Not using mail, whut.");
+		}
+	}
+};
 
 /**
  * Add the help response to anopes /ns help output.
@@ -121,4 +109,4 @@ int do_sendpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_sendpass")
+MODULE_INIT(NSSendPass)

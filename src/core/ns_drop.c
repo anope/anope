@@ -19,39 +19,25 @@ int do_drop(User * u);
 int do_unlink(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSDrop : public Module
 {
-    Command *c;
+ public:
+	NSDrop(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("DROP", do_drop, NULL, -1, NICK_HELP_DROP, -1,
-                      NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("UNLINK", do_unlink, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("DROP", do_drop, NULL, -1, NICK_HELP_DROP, -1, NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("UNLINK", do_unlink, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 /**
@@ -155,4 +141,4 @@ int do_unlink(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_drop")
+MODULE_INIT(NSDrop)

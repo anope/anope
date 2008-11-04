@@ -21,42 +21,29 @@
 int do_identify(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+
+class NSIdentify : public Module
 {
-    Command *c;
+ public:
+	NSIdentify(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("ID", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("IDENTIFY", do_identify, NULL, NICK_HELP_IDENTIFY,
-                      -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SIDENTIFY", do_identify, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("ID", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("IDENTIFY", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SIDENTIFY", do_identify, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 /**
  * Add the help response to anopes /ns help output.
@@ -170,4 +157,4 @@ int do_identify(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_identify")
+MODULE_INIT(NSIdentify)

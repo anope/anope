@@ -19,37 +19,23 @@ int do_forbid(User * u);
 void myNickServHelp(User * u);
 NickAlias *makenick(const char *nick);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSForbid : public Module
 {
-    Command *c;
+ public:
+	NSForbid(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1,
-                      NICK_SERVADMIN_HELP_FORBID,
-                      NICK_SERVADMIN_HELP_FORBID);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -154,4 +140,4 @@ NickAlias *makenick(const char *nick)
     return na;
 }
 
-MODULE_INIT("ns_forbid")
+MODULE_INIT(NSForbid)

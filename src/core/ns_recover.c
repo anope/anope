@@ -21,34 +21,23 @@ int do_recover(User * u);
 void myNickServHelp(User * u);
 int myHelpResonse(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSRecover : public Module
 {
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+ public:
+	NSRecover(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("RECOVER", do_recover, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    moduleAddHelp(c, myHelpResonse);
+		c = createCommand("RECOVER", do_recover, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		moduleAddHelp(c, myHelpResonse);
 
-    moduleSetNickHelp(myNickServHelp);
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 /**
  * Add the help response to anopes /ns help output.
@@ -136,4 +125,4 @@ int do_recover(User * u)
 
 /* EOF */
 
-MODULE_INIT("ns_recover")
+MODULE_INIT(NSRecover)

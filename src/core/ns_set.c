@@ -32,71 +32,47 @@ int do_set_hide(User * u, NickCore * nc, char *param);
 int do_set_autoop(User *u, NickCore *nc, char *param);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSSet : public Module
 {
-    Command *c;
+ public:
+	NSSet(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET DISPLAY", NULL, NULL, NICK_HELP_SET_DISPLAY, -1,
-                      -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET PASSWORD", NULL, NULL, NICK_HELP_SET_PASSWORD,
-                      -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET URL", NULL, NULL, NICK_HELP_SET_URL, -1, -1, -1,
-                      -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET EMAIL", NULL, NULL, NICK_HELP_SET_EMAIL, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET ICQ", NULL, NULL, NICK_HELP_SET_ICQ, -1, -1, -1,
-                      -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET GREET", NULL, NULL, NICK_HELP_SET_GREET, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET KILL", NULL, NULL, NICK_HELP_SET_KILL, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SECURE", NULL, NULL, NICK_HELP_SET_SECURE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET PRIVATE", NULL, NULL, NICK_HELP_SET_PRIVATE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET MSG", NULL, NULL, NICK_HELP_SET_MSG, -1, -1, -1,
-                      -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET HIDE", NULL, NULL, NICK_HELP_SET_HIDE, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("SET AUTOOP", NULL, NULL, NICK_HELP_SET_AUTOOP, -1, -1,
-                      -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET DISPLAY", NULL, NULL, NICK_HELP_SET_DISPLAY, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET PASSWORD", NULL, NULL, NICK_HELP_SET_PASSWORD, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET URL", NULL, NULL, NICK_HELP_SET_URL, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET EMAIL", NULL, NULL, NICK_HELP_SET_EMAIL, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET ICQ", NULL, NULL, NICK_HELP_SET_ICQ, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET GREET", NULL, NULL, NICK_HELP_SET_GREET, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET KILL", NULL, NULL, NICK_HELP_SET_KILL, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SECURE", NULL, NULL, NICK_HELP_SET_SECURE, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET PRIVATE", NULL, NULL, NICK_HELP_SET_PRIVATE, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET MSG", NULL, NULL, NICK_HELP_SET_MSG, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET HIDE", NULL, NULL, NICK_HELP_SET_HIDE, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SET AUTOOP", NULL, NULL, NICK_HELP_SET_AUTOOP, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -474,4 +450,4 @@ int do_set_autoop(User *u, NickCore *nc, char *param) {
 
 /* EOF */
 
-MODULE_INIT("ns_set")
+MODULE_INIT(NSSet)

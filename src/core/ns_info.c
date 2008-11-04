@@ -18,38 +18,25 @@
 static int do_info(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSInfo : public Module
 {
-    Command *c;
+ public:
+	NSInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion
+		("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("INFO", do_info, NULL, NICK_HELP_INFO, -1,
-                      NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO,
-                      NICK_SERVADMIN_HELP_INFO);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("INFO", do_info, NULL, NICK_HELP_INFO, -1, NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO, NICK_SERVADMIN_HELP_INFO);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -283,4 +270,4 @@ int do_info(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_info")
+MODULE_INIT(NSInfo)

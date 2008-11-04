@@ -18,36 +18,23 @@
 int do_nickupdate(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSUpdate : public Module
 {
-    Command *c;
+ public:
+	NSUpdate(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("UPDATE", do_nickupdate, NULL, NICK_HELP_UPDATE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("UPDATE", do_nickupdate, NULL, NICK_HELP_UPDATE, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -89,4 +76,4 @@ int do_nickupdate(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_update")
+MODULE_INIT(NSUpdate)

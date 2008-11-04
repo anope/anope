@@ -25,43 +25,30 @@ NickAlias *makenick(const char *nick);
 int do_sendregmail(User * u, NickRequest * nr);
 int ns_do_register(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSRegister : public Module
 {
-    Command *c;
+ public:
+	NSRegister(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("REGISTER", do_register, NULL, NICK_HELP_REGISTER,
-                      -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("REGISTER", do_register, NULL, NICK_HELP_REGISTER, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("CONFIRM", do_confirm, NULL, NICK_HELP_CONFIRM, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("CONFIRM", do_confirm, NULL, NICK_HELP_CONFIRM, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("RESEND", do_resend, NULL, NICK_HELP_RESEND, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("RESEND", do_resend, NULL, NICK_HELP_RESEND, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -490,4 +477,4 @@ int do_sendregmail(User * u, NickRequest * nr)
 }
 
 
-MODULE_INIT("ns_register")
+MODULE_INIT(NSRegister)

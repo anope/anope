@@ -25,47 +25,32 @@ NickAlias *makealias(const char *nick, NickCore * nc);
 /* Obsolete commands */
 int do_link(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSGroup : public Module
 {
-    Command *c;
+ public:
+	NSGroup(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("GROUP", do_group, NULL, NICK_HELP_GROUP, -1, -1, -1,
-                      -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("GROUP", do_group, NULL, NICK_HELP_GROUP, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("LINK", do_link, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("LINK", do_link, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("GLIST", do_glist, NULL, -1, NICK_HELP_GLIST, -1,
-                      NICK_SERVADMIN_HELP_GLIST,
-                      NICK_SERVADMIN_HELP_GLIST);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("GLIST", do_glist, NULL, -1, NICK_HELP_GLIST, -1, NICK_SERVADMIN_HELP_GLIST, NICK_SERVADMIN_HELP_GLIST);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    c = createCommand("LISTLINKS", do_listlinks, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("LISTLINKS", do_listlinks, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -326,4 +311,4 @@ int do_listlinks(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_group")
+MODULE_INIT(NSGroup)

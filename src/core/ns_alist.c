@@ -18,37 +18,23 @@
 int do_alist(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSAList : public Module
 {
-    Command *c;
+ public:
+	NSAList(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("ALIST", do_alist, NULL, -1, NICK_HELP_ALIST, -1,
-                      NICK_SERVADMIN_HELP_ALIST,
-                      NICK_SERVADMIN_HELP_ALIST);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("ALIST", do_alist, NULL, -1, NICK_HELP_ALIST, -1, NICK_SERVADMIN_HELP_ALIST, NICK_SERVADMIN_HELP_ALIST);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -185,4 +171,4 @@ int do_alist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_alist")
+MODULE_INIT(NSAList)

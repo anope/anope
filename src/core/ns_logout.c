@@ -21,37 +21,23 @@
 int do_logout(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSLogout : public Module
 {
-    Command *c;
+ public:
+	NSLogout(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1,
-                      NICK_SERVADMIN_HELP_LOGOUT,
-                      NICK_SERVADMIN_HELP_LOGOUT);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1, NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 
 
@@ -127,4 +113,4 @@ int do_logout(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_logout")
+MODULE_INIT(NSLogout)

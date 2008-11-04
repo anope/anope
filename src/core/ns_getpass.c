@@ -18,37 +18,23 @@
 int do_getpass(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSGetPass : public Module
 {
-    Command *c;
+ public:
+	NSGetPass(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1,
-                      NICK_SERVADMIN_HELP_GETPASS,
-                      NICK_SERVADMIN_HELP_GETPASS);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_GETPASS, NICK_SERVADMIN_HELP_GETPASS);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 /**
  * Add the help response to anopes /ns help output.
@@ -111,4 +97,4 @@ int do_getpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ns_getpass")
+MODULE_INIT(NSGetPass)

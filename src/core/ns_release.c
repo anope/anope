@@ -21,34 +21,23 @@ int do_release(User * u);
 void myNickServHelp(User * u);
 int myHelpResonse(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSRelease : public Module
 {
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+ public:
+	NSRelease(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    moduleAddHelp(c, myHelpResonse);
+		c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		moduleAddHelp(c, myHelpResonse);
 
-    moduleSetNickHelp(myNickServHelp);
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -126,4 +115,4 @@ int do_release(User * u)
 
 /* EOF */
 
-MODULE_INIT("ns_release")
+MODULE_INIT(NSRelease)

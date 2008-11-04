@@ -19,41 +19,25 @@ int do_suspend(User * u);
 int do_unsuspend(User * u);
 void myNickServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSSuspend : public Module
 {
-    Command *c;
+ public:
+	NSSuspend(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1,
-                      NICK_SERVADMIN_HELP_SUSPEND,
-                      NICK_SERVADMIN_HELP_SUSPEND);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
-    c = createCommand("UNSUSPEND", do_unsuspend, is_services_oper, -1, -1,
-                      -1, NICK_SERVADMIN_HELP_UNSUSPEND,
-                      NICK_SERVADMIN_HELP_UNSUSPEND);
-    moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1, NICK_SERVADMIN_HELP_SUSPEND, NICK_SERVADMIN_HELP_SUSPEND);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		c = createCommand("UNSUSPEND", do_unsuspend, is_services_oper, -1, -1, -1, NICK_SERVADMIN_HELP_UNSUSPEND, NICK_SERVADMIN_HELP_UNSUSPEND);
+		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
 
-    moduleSetNickHelp(myNickServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetNickHelp(myNickServHelp);
+	}
+};
 
 /**
  * Add the help response to anopes /ns help output.
@@ -192,4 +176,4 @@ int do_unsuspend(User * u)
 
 }
 
-MODULE_INIT("ns_suspend")
+MODULE_INIT(NSSuspend)

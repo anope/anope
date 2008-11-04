@@ -18,6 +18,7 @@ Legend:
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
+[+] Move modules to use classes somewhat (AnopeInit, AnopeFini)
 
 1.9.1
 -----

@@ -21,37 +21,23 @@ int badwords_del_callback(User * u, int num, va_list args);
 int badwords_list(User * u, int index, ChannelInfo * ci, int *sent_header);
 int badwords_list_callback(User * u, int num, va_list args);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSBadwords : public Module
 {
-    Command *c;
+ public:
+	BSBadwords(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("BADWORDS", do_badwords, NULL, BOT_HELP_BADWORDS, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("BADWORDS", do_badwords, NULL, BOT_HELP_BADWORDS, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-    moduleSetBotHelp(myBotServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetBotHelp(myBotServHelp);
+	}
+};
 
 
 /**
@@ -325,4 +311,4 @@ int badwords_list_callback(User * u, int num, va_list args)
     return badwords_list(u, num - 1, ci, sent_header);
 }
 
-MODULE_INIT("bs_badwords")
+MODULE_INIT(BSBadwords)

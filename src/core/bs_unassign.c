@@ -18,35 +18,22 @@
 int do_unassign(User * u);
 void myBotServHelp(User * u);
 
-/**
- * Create the unassign command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSUnassign : public Module
 {
-    Command *c;
+ public:
+	BSUnassign(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("UNASSIGN", do_unassign, NULL, BOT_HELP_UNASSIGN, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("UNASSIGN", do_unassign, NULL, BOT_HELP_UNASSIGN, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-    moduleSetBotHelp(myBotServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetBotHelp(myBotServHelp);
+	}
+};
 
 
 
@@ -88,4 +75,4 @@ int do_unassign(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_unassign")
+MODULE_INIT(BSUnassign)

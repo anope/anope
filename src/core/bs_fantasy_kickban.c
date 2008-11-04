@@ -17,34 +17,22 @@
 
 int do_fantasy(int argc, char **argv);
 
-/**
- * Create the hook, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSFantasyKickBan : public Module
 {
-    EvtHook *hook;
+ public:
+	BSFantasyKickBan(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hook;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
-    moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
+		moduleAddEventHook(hook);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 /**
  * Handle kickban/kb fantasy commands.
@@ -98,4 +86,4 @@ int do_fantasy(int argc, char **argv)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_fantasy_kickban")
+MODULE_INIT(BSFantasyKickBan)

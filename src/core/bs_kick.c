@@ -19,61 +19,38 @@ int do_kickcmd(User * u);
 
 void myBotServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSKick : public Module
 {
-    Command *c;
+ public:
+	BSKick(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("KICK", do_kickcmd, NULL, BOT_HELP_KICK, -1, -1, -1,
-                      -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK BADWORDS", NULL, NULL, BOT_HELP_KICK_BADWORDS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK BOLDS", NULL, NULL, BOT_HELP_KICK_BOLDS, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK CAPS", NULL, NULL, BOT_HELP_KICK_CAPS, -1, -1,
-                      -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK COLORS", NULL, NULL, BOT_HELP_KICK_COLORS, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK FLOOD", NULL, NULL, BOT_HELP_KICK_FLOOD, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK REPEAT", NULL, NULL, BOT_HELP_KICK_REPEAT, -1,
-                      -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK REVERSES", NULL, NULL, BOT_HELP_KICK_REVERSES,
-                      -1, -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
-    c = createCommand("KICK UNDERLINES", NULL, NULL,
-                      BOT_HELP_KICK_UNDERLINES, -1, -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("KICK", do_kickcmd, NULL, BOT_HELP_KICK, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK BADWORDS", NULL, NULL, BOT_HELP_KICK_BADWORDS, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK BOLDS", NULL, NULL, BOT_HELP_KICK_BOLDS, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK CAPS", NULL, NULL, BOT_HELP_KICK_CAPS, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK COLORS", NULL, NULL, BOT_HELP_KICK_COLORS, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK FLOOD", NULL, NULL, BOT_HELP_KICK_FLOOD, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK REPEAT", NULL, NULL, BOT_HELP_KICK_REPEAT, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK REVERSES", NULL, NULL, BOT_HELP_KICK_REVERSES, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		c = createCommand("KICK UNDERLINES", NULL, NULL, BOT_HELP_KICK_UNDERLINES, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-
-    moduleSetBotHelp(myBotServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetBotHelp(myBotServHelp);
+	}
+};
 
 
 /**
@@ -378,4 +355,4 @@ int do_kickcmd(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_kick")
+MODULE_INIT(BSKick)

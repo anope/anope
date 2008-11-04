@@ -19,36 +19,22 @@ int do_info(User * u);
 void send_bot_channels(User * u, BotInfo * bi);
 void myBotServHelp(User * u);
 
-/**
- * Create the info command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSInfo : public Module
 {
-    Command *c;
+ public:
+	BSInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("INFO", do_info, NULL, BOT_HELP_INFO, -1, -1, -1,
-                      -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("INFO", do_info, NULL, BOT_HELP_INFO, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-    moduleSetBotHelp(myBotServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetBotHelp(myBotServHelp);
+	}
+};
 
 
 /**
@@ -281,4 +267,4 @@ void send_bot_channels(User * u, BotInfo * bi)
     return;
 }
 
-MODULE_INIT("bs_info")
+MODULE_INIT(BSInfo)

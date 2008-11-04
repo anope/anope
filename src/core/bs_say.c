@@ -18,35 +18,22 @@
 int do_say(User * u);
 void myBotServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSSay : public Module
 {
-    Command *c;
+ public:
+	BSSay(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("SAY", do_say, NULL, BOT_HELP_SAY, -1, -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("SAY", do_say, NULL, BOT_HELP_SAY, -1, -1, -1, -1);
+		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-    moduleSetBotHelp(myBotServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetBotHelp(myBotServHelp);
+	}
+};
 
 
 /**
@@ -96,4 +83,4 @@ int do_say(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_say")
+MODULE_INIT(BSSay)

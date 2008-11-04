@@ -17,24 +17,20 @@
 
 int do_fantasy(int argc, char **argv);
 
-/**
- * Create the hook, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSFantasy : public Module
 {
-    EvtHook *hook;
+ public:
+	BSFantasy(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hook;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
-    moduleAddEventHook(hook);
-
-    return MOD_CONT;
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
+		moduleAddEventHook(hook);
+	}
+};
 
 /**
  * Unload the module
@@ -88,4 +84,4 @@ int do_fantasy(int argc, char **argv)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_fantasy")
+MODULE_INIT(BSFantasy)

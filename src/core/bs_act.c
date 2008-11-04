@@ -33,11 +33,6 @@ class BSAct : public Module
 
 	    moduleSetBotHelp(myBotServHelp);
 	}
-
-	~BSAct()
-	{
-
-	}
 };
 
 

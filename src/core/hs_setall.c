@@ -20,35 +20,22 @@ void myHostServHelp(User * u);
 extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
                       char *creator, time_t time);
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class HSSetAll : public Module
 {
-    Command *c;
+ public:
+	HSSetAll(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SETALL", do_setall, is_host_setter,
-                      HOST_HELP_SETALL, -1, -1, -1, -1);
-    moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
-    moduleSetHostHelp(myHostServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		c = createCommand("SETALL", do_setall, is_host_setter, HOST_HELP_SETALL, -1, -1, -1, -1);
+		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		moduleSetHostHelp(myHostServHelp);
+	}
+};
 
 
 
@@ -70,7 +57,6 @@ void myHostServHelp(User * u)
  **/
 int do_setall(User * u)
 {
-
     char *nick = (char *)strtok(NULL, " ");
     char *rawhostmask = strtok(NULL, " ");
     char *hostmask = (char *)smalloc(HOSTMAX);
@@ -179,4 +165,4 @@ int do_setall(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("hs_setall")
+MODULE_INIT(HSSetAll)

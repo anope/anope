@@ -18,36 +18,24 @@
 int do_del(User * u);
 void myHostServHelp(User * u);
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class HSDel : public Module
 {
-    Command *c;
+ public:
+	HSDel(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1,
-                      -1, -1, -1);
-    moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);
+		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
 
-    moduleSetHostHelp(myHostServHelp);
+		moduleSetHostHelp(myHostServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -90,4 +78,4 @@ int do_del(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("hs_del")
+MODULE_INIT(HSDel)

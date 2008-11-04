@@ -18,35 +18,23 @@
 int do_on(User * u);
 void myHostServHelp(User * u);
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class HSOn : public Module
 {
-    Command *c;
+ public:
+	HSOn(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("ON", do_on, NULL, HOST_HELP_ON, -1, -1, -1, -1);
-    moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		c = createCommand("ON", do_on, NULL, HOST_HELP_ON, -1, -1, -1, -1);
+		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
 
-    moduleSetHostHelp(myHostServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetHostHelp(myHostServHelp);
+	}
+};
 
 
 
@@ -101,4 +89,4 @@ int do_on(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("hs_on")
+MODULE_INIT(HSOn)

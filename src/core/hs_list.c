@@ -18,35 +18,22 @@
 int listOut(User * u);
 void myHostServHelp(User * u);
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class HSList : public Module
 {
-    Command *c;
+ public:
+	HSList(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("LIST", listOut, is_services_oper, -1, -1,
-                      HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
-    moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
-    moduleSetHostHelp(myHostServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		c = createCommand("LIST", listOut, is_services_oper, -1, -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
+		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		moduleSetHostHelp(myHostServHelp);
+	}
+};
 
 
 
@@ -186,4 +173,4 @@ int listOut(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("hs_list")
+MODULE_INIT(HSList)

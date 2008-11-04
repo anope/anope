@@ -21,36 +21,23 @@ extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
                       char *creator, time_t time);
 
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class HSGroup : public Module
 {
-    Command *c;
+ public:
+	HSGroup(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1,
-                      -1);
-    moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1, -1);
+		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
 
-    moduleSetHostHelp(myHostServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetHostHelp(myHostServHelp);
+	}
+};
 
 
 
@@ -123,4 +110,4 @@ int do_group(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("hs_group")
+MODULE_INIT(HSGroup)

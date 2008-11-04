@@ -27,6 +27,8 @@ Legend:
   [ ] Move database load/save to a module
     [ ] realtime SQL/whatever module using events
     [ ] flatfile save on a periodic timer
+    [ ] SANE password encryption - prefix password with the method it was encrypted with, allowing for *seamless* upgrading to different methods
+    [ ] Salted SHA256 (contact Special for this)
   [ ] New database format (text, not binary - works very well for merging and so on)
 [ ] burn do_sjoin with fire
 [ ] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*

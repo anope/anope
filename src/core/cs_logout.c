@@ -19,38 +19,23 @@ int do_logout(User * u);
 void myChanServHelp(User * u);
 void make_unidentified(User * u, ChannelInfo * ci);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSLogout : public Module
 {
-    Command *c;
+ public:
+	CSLogout(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("LOGOUT", do_logout, NULL, -1, CHAN_HELP_LOGOUT, -1,
-                      CHAN_SERVADMIN_HELP_LOGOUT,
-                      CHAN_SERVADMIN_HELP_LOGOUT);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("LOGOUT", do_logout, NULL, -1, CHAN_HELP_LOGOUT, -1, CHAN_SERVADMIN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 /**
@@ -130,4 +115,4 @@ void make_unidentified(User * u, ChannelInfo * ci)
     }
 }
 
-MODULE_INIT("cs_logout")
+MODULE_INIT(CSLogout)

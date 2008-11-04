@@ -18,37 +18,24 @@
 int do_register(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the off command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSRegister : public Module
 {
-    Command *c;
+ public:
+	CSRegister(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("REGISTER", do_register, NULL, CHAN_HELP_REGISTER,
-                      -1, -1, -1, -1);
-    c->help_param1 = s_NickServ;
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("REGISTER", do_register, NULL, CHAN_HELP_REGISTER, -1, -1, -1, -1);
+		c->help_param1 = s_NickServ;
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -189,4 +176,4 @@ int do_register(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_register")
+MODULE_INIT(CSRegister)

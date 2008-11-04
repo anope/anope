@@ -18,40 +18,26 @@
 int do_identify(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSIdentify : public Module
 {
-    Command *c;
+ public:
+	CSIdentify(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("IDENTIFY", do_identify, NULL, CHAN_HELP_IDENTIFY,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("IDENTIFY", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    c = createCommand("ID", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("ID", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -116,4 +102,4 @@ int do_identify(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_identify")
+MODULE_INIT(CSIdentify)

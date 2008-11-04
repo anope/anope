@@ -28,76 +28,57 @@ int do_deprotect(User * u);
 int do_owner(User * u);
 int do_deowner(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSModes : public Module
 {
-    Command *c;
+ public:
+	CSModes(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("OP", do_op, NULL, CHAN_HELP_OP, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("DEOP", do_deop, NULL, CHAN_HELP_DEOP, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("VOICE", do_voice, NULL, CHAN_HELP_VOICE, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("DEVOICE", do_devoice, NULL, CHAN_HELP_DEVOICE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    if (ircd->halfop) {
-        c = createCommand("HALFOP", do_halfop, NULL, CHAN_HELP_HALFOP, -1,
-                          -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-        c = createCommand("DEHALFOP", do_dehalfop, NULL,
-                          CHAN_HELP_DEHALFOP, -1, -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
-    if (ircd->protect) {
-        c = createCommand("PROTECT", do_protect, NULL, CHAN_HELP_PROTECT,
-                          -1, -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-        c = createCommand("DEPROTECT", do_deprotect, NULL,
-                          CHAN_HELP_DEPROTECT, -1, -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
-    if (ircd->owner) {
-        c = createCommand("OWNER", do_owner, NULL, CHAN_HELP_OWNER, -1, -1,
-                          -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-        c = createCommand("DEOWNER", do_deowner, NULL, CHAN_HELP_DEOWNER,
-                          -1, -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
-    if (ircd->admin) {
-        c = createCommand("ADMIN", do_protect, NULL, CHAN_HELP_PROTECT, -1,
-                          -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-        c = createCommand("DEADMIN", do_deprotect, NULL,
-                          CHAN_HELP_DEPROTECT, -1, -1, -1, -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
+		c = createCommand("OP", do_op, NULL, CHAN_HELP_OP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("DEOP", do_deop, NULL, CHAN_HELP_DEOP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("VOICE", do_voice, NULL, CHAN_HELP_VOICE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("DEVOICE", do_devoice, NULL, CHAN_HELP_DEVOICE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		if (ircd->halfop)
+		{
+			c = createCommand("HALFOP", do_halfop, NULL, CHAN_HELP_HALFOP, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+			c = createCommand("DEHALFOP", do_dehalfop, NULL, CHAN_HELP_DEHALFOP, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		}
+		if (ircd->protect)
+		{
+			c = createCommand("PROTECT", do_protect, NULL, CHAN_HELP_PROTECT, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+			c = createCommand("DEPROTECT", do_deprotect, NULL, CHAN_HELP_DEPROTECT, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		}
+		if (ircd->owner)
+		{
+			c = createCommand("OWNER", do_owner, NULL, CHAN_HELP_OWNER, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+			c = createCommand("DEOWNER", do_deowner, NULL, CHAN_HELP_DEOWNER, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		}
+		if (ircd->admin)
+		{
+			c = createCommand("ADMIN", do_protect, NULL, CHAN_HELP_PROTECT, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+			c = createCommand("DEADMIN", do_deprotect, NULL, CHAN_HELP_DEPROTECT, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		}
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 /**
  * Add the help response to anopes /cs help output.
@@ -387,4 +368,4 @@ int do_util(User * u, CSModeUtil * util)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_modes")
+MODULE_INIT(CSModes)

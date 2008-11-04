@@ -21,42 +21,27 @@ int do_levels(User * u);
 
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSAccess : public Module
 {
-    Command *c;
+ public:
+	CSAccess(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion
+		("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("ACCESS", do_access, NULL, CHAN_HELP_ACCESS, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("ACCESS LEVELS", NULL, NULL, CHAN_HELP_ACCESS_LEVELS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("LEVELS", do_levels, NULL, CHAN_HELP_LEVELS, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		c = createCommand("ACCESS", do_access, NULL, CHAN_HELP_ACCESS, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("ACCESS LEVELS", NULL, NULL, CHAN_HELP_ACCESS_LEVELS, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("LEVELS", do_levels, NULL, CHAN_HELP_LEVELS, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -542,4 +527,4 @@ int do_levels(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_access")
+MODULE_INIT(CSAccess)

@@ -82,44 +82,32 @@ int xop_msgs[4][14] = {
      CHAN_HOP_CLEAR}
 };
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSXOP : public Module
 {
-    Command *c;
+ public:
+	CSXOP(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    if (ircd->halfop) {
-        c = createCommand("HOP", do_hop, NULL, CHAN_HELP_HOP, -1, -1, -1,
-                          -1);
-        moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    }
-    c = createCommand("SOP", do_sop, NULL, CHAN_HELP_SOP, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("VOP", do_vop, NULL, CHAN_HELP_VOP, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		if (ircd->halfop)
+		{
+			c = createCommand("HOP", do_hop, NULL, CHAN_HELP_HOP, -1, -1, -1, -1);
+			moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		}
+		c = createCommand("SOP", do_sop, NULL, CHAN_HELP_SOP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("VOP", do_vop, NULL, CHAN_HELP_VOP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -508,4 +496,4 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_xop")
+MODULE_INIT(CSXOP)

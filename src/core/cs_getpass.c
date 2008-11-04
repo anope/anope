@@ -18,37 +18,23 @@
 int do_getpass(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSGetPass : public Module
 {
-    Command *c;
+ public:
+	CSGetPass(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1,
-                      CHAN_SERVADMIN_HELP_GETPASS,
-                      CHAN_SERVADMIN_HELP_GETPASS);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_GETPASS, CHAN_SERVADMIN_HELP_GETPASS);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -101,4 +87,4 @@ int do_getpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_getpass")
+MODULE_INIT(CSGetPass)

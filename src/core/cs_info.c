@@ -18,37 +18,23 @@
 int do_info(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSInfo : public Module
 {
-    Command *c;
+ public:
+	CSInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("INFO", do_info, NULL, CHAN_HELP_INFO, -1,
-                      CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO,
-                      CHAN_SERVADMIN_HELP_INFO);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("INFO", do_info, NULL, CHAN_HELP_INFO, -1, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -248,4 +234,4 @@ int do_info(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_info")
+MODULE_INIT(CSInfo)

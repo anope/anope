@@ -20,36 +20,23 @@ int do_akick(User * u);
 void myChanServHelp(User * u);
 int get_access_nc(NickCore *nc, ChannelInfo *ci);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSAKick : public Module
 {
-    Command *c;
+ public:
+	CSAKick(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -666,6 +653,5 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci)
     return 0;
 }
 
-/* EOF */
 
-MODULE_INIT("cs_akick")
+MODULE_INIT(CSAKick)

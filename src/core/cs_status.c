@@ -18,37 +18,23 @@
 int do_status(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSStatus : public Module
 {
-    Command *c;
+ public:
+	CSStatus(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("STATUS", do_status, is_services_admin, -1, -1, -1,
-                      CHAN_SERVADMIN_HELP_STATUS,
-                      CHAN_SERVADMIN_HELP_STATUS);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("STATUS", do_status, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_STATUS, CHAN_SERVADMIN_HELP_STATUS);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 
@@ -101,4 +87,4 @@ int do_status(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_status")
+MODULE_INIT(CSStatus)

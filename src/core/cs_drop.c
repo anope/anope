@@ -18,36 +18,24 @@
 int do_drop(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSDrop : public Module
 {
-    Command *c;
+ public:
+	CSDrop(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("DROP", do_drop, NULL, -1, CHAN_HELP_DROP, -1,
-                      CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("DROP", do_drop, NULL, -1, CHAN_HELP_DROP, -1, CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -127,4 +115,4 @@ int do_drop(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_drop")
+MODULE_INIT(CSDrop)

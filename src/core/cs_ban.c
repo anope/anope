@@ -19,39 +19,25 @@ int do_unban(User * u);
 int do_ban(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSBan : public Module
 {
-    Command *c;
+ public:
+	CSBan(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("BAN", do_ban, NULL, CHAN_HELP_BAN, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("UNBAN", do_unban, NULL, CHAN_HELP_UNBAN, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("BAN", do_ban, NULL, CHAN_HELP_BAN, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("UNBAN", do_unban, NULL, CHAN_HELP_UNBAN, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
-
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
 
 /**
@@ -227,4 +213,4 @@ int do_unban(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_ban")
+MODULE_INIT(CSBan)

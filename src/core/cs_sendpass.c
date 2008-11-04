@@ -18,40 +18,30 @@
 int do_sendpass(User * u);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSSendPass : public Module
 {
-    Command *c;
+ public:
+	CSSendPass(const std::string &creator) : Module(creator)
+	{
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		Command *c;
 
-    c = createCommand("SENDPASS", do_sendpass, NULL, CHAN_HELP_SENDPASS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    moduleSetChanHelp(myChanServHelp);
+		c = createCommand("SENDPASS", do_sendpass, NULL, CHAN_HELP_SENDPASS,
+		-1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    if (UseMail) {
-        return MOD_CONT;
-    } else {
-        return MOD_STOP;
-    }
-}
+		moduleSetChanHelp(myChanServHelp);
 
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		if (!UseMail)
+		{
+			throw ModuleException("sendpass may not be loaded if UseMail is loaded");
+		}
+	}
+};
 
 
 
@@ -124,4 +114,4 @@ int do_sendpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_sendpass")
+MODULE_INIT(CSSendPass)

@@ -40,102 +40,68 @@ int do_set_peace(User * u, ChannelInfo * ci, char *param);
 int do_set_noexpire(User * u, ChannelInfo * ci, char *param);
 void myChanServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class CSSet : public Module
 {
-    Command *c;
+ public:
+	CSSet(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SET", do_set, NULL, CHAN_HELP_SET, -1, -1,
-                      CHAN_SERVADMIN_HELP_SET, CHAN_SERVADMIN_HELP_SET);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET FOUNDER", NULL, NULL, CHAN_HELP_SET_FOUNDER, -1,
-                      -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SUCCESSOR", NULL, NULL, CHAN_HELP_SET_SUCCESSOR,
-                      -1, -1, -1, -1);
-    c->help_param1 = (char *) (long) CSMaxReg;
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET PASSWORD", NULL, NULL, CHAN_HELP_SET_PASSWORD,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET DESC", NULL, NULL, CHAN_HELP_SET_DESC, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET URL", NULL, NULL, CHAN_HELP_SET_URL, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET EMAIL", NULL, NULL, CHAN_HELP_SET_EMAIL, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET ENTRYMSG", NULL, NULL, CHAN_HELP_SET_ENTRYMSG,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET BANTYPE", NULL, NULL, CHAN_HELP_SET_BANTYPE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET PRIVATE", NULL, NULL, CHAN_HELP_SET_PRIVATE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET KEEPTOPIC", NULL, NULL, CHAN_HELP_SET_KEEPTOPIC,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET TOPICLOCK", NULL, NULL, CHAN_HELP_SET_TOPICLOCK,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET MLOCK", NULL, NULL, CHAN_HELP_SET_MLOCK, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET RESTRICTED", NULL, NULL,
-                      CHAN_HELP_SET_RESTRICTED, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SECURE", NULL, NULL, CHAN_HELP_SET_SECURE, -1,
-                      -1, -1, -1);
-    c->help_param1 = s_NickServ;
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SECUREOPS", NULL, NULL, CHAN_HELP_SET_SECUREOPS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SECUREFOUNDER", NULL, NULL,
-                      CHAN_HELP_SET_SECUREFOUNDER, -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SIGNKICK", NULL, NULL, CHAN_HELP_SET_SIGNKICK,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET OPNOTICE", NULL, NULL, CHAN_HELP_SET_OPNOTICE,
-                      -1, -1, -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET XOP", NULL, NULL, CHAN_HELP_SET_XOP, -1, -1, -1,
-                      -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET PEACE", NULL, NULL, CHAN_HELP_SET_PEACE, -1, -1,
-                      -1, -1);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
-    c = createCommand("SET NOEXPIRE", NULL, NULL, -1, -1, -1,
-                      CHAN_SERVADMIN_HELP_SET_NOEXPIRE,
-                      CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
-    moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET", do_set, NULL, CHAN_HELP_SET, -1, -1, CHAN_SERVADMIN_HELP_SET, CHAN_SERVADMIN_HELP_SET);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET FOUNDER", NULL, NULL, CHAN_HELP_SET_FOUNDER, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SUCCESSOR", NULL, NULL, CHAN_HELP_SET_SUCCESSOR, -1, -1, -1, -1);
+		c->help_param1 = (char *) (long) CSMaxReg;
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET PASSWORD", NULL, NULL, CHAN_HELP_SET_PASSWORD, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET DESC", NULL, NULL, CHAN_HELP_SET_DESC, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET URL", NULL, NULL, CHAN_HELP_SET_URL, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET EMAIL", NULL, NULL, CHAN_HELP_SET_EMAIL, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET ENTRYMSG", NULL, NULL, CHAN_HELP_SET_ENTRYMSG, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET BANTYPE", NULL, NULL, CHAN_HELP_SET_BANTYPE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET PRIVATE", NULL, NULL, CHAN_HELP_SET_PRIVATE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET KEEPTOPIC", NULL, NULL, CHAN_HELP_SET_KEEPTOPIC, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET TOPICLOCK", NULL, NULL, CHAN_HELP_SET_TOPICLOCK, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET MLOCK", NULL, NULL, CHAN_HELP_SET_MLOCK, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET RESTRICTED", NULL, NULL, CHAN_HELP_SET_RESTRICTED, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SECURE", NULL, NULL, CHAN_HELP_SET_SECURE, -1, -1, -1, -1);
+		c->help_param1 = s_NickServ;
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SECUREOPS", NULL, NULL, CHAN_HELP_SET_SECUREOPS, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SECUREFOUNDER", NULL, NULL, CHAN_HELP_SET_SECUREFOUNDER, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SIGNKICK", NULL, NULL, CHAN_HELP_SET_SIGNKICK, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET OPNOTICE", NULL, NULL, CHAN_HELP_SET_OPNOTICE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET XOP", NULL, NULL, CHAN_HELP_SET_XOP, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET PEACE", NULL, NULL, CHAN_HELP_SET_PEACE, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		c = createCommand("SET NOEXPIRE", NULL, NULL, -1, -1, -1, CHAN_SERVADMIN_HELP_SET_NOEXPIRE, CHAN_SERVADMIN_HELP_SET_NOEXPIRE);
+		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
 
-    moduleSetChanHelp(myChanServHelp);
+		moduleSetChanHelp(myChanServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 /**
  * Add the help response to anopes /cs help output.
@@ -835,4 +801,4 @@ int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
     return MOD_CONT;
 }
 
-MODULE_INIT("cs_set")
+MODULE_INIT(CSSet)

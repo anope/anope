@@ -1112,13 +1112,21 @@ int anope_event_chghost(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* EVENT: SERVER */
+/*
+ * [Nov 04 00:08:46.308435 2008] debug: Received: SERVER irc.inspircd.com pass 0 964 :Testnet Central!
+ * 0: name
+ * 1: pass
+ * 2: hops
+ * 3: numeric
+ * 4: desc
+ */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-    if (!stricmp(av[1], "1")) {
-        uplink = sstrdup(av[0]);
-    }
-    do_server(source, av[0], av[1], av[2], NULL);
+	if (!stricmp(av[2], "0"))
+	{
+		uplink = sstrdup(av[0]);
+	}
+    do_server(source, av[0], av[2], av[4], av[3]);
     return MOD_CONT;
 }
 

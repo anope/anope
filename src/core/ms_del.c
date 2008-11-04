@@ -19,33 +19,21 @@ int do_del(User * u);
 int del_memo_callback(User * u, int num, va_list args);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSDel : public Module
 {
-    Command *c;
+ public:
+	MSDel(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("DEL", do_del, NULL, MEMO_HELP_DEL, -1, -1, -1, -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("DEL", do_del, NULL, MEMO_HELP_DEL, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -201,4 +189,4 @@ int del_memo_callback(User * u, int num, va_list args)
     }
 }
 
-MODULE_INIT("ms_del")
+MODULE_INIT(MSDel)

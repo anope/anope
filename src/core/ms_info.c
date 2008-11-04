@@ -18,34 +18,21 @@
 int do_info(User * u);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSInfo : public Module
 {
-    Command *c;
+ public:
+	MSInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("INFO", do_info, NULL, -1, MEMO_HELP_INFO, -1,
-                      MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("INFO", do_info, NULL, -1, MEMO_HELP_INFO, -1, MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -230,4 +217,4 @@ int do_info(User * u)
     return MOD_CONT;            /* if (name && (ci || na->nc != u->na->nc)) */
 }
 
-MODULE_INIT("ms_info")
+MODULE_INIT(MSInfo)

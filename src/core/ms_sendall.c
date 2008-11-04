@@ -18,35 +18,21 @@
 int do_sendall(User * u);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSSendAll : public Module
 {
-    Command *c;
+ public:
+	MSSendAll(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("SENDALL", do_sendall, is_services_admin, -1, -1, -1,
-                      MEMO_HELP_SENDALL, MEMO_HELP_SENDALL);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("SENDALL", do_sendall, is_services_admin, -1, -1, -1, MEMO_HELP_SENDALL, MEMO_HELP_SENDALL);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -95,4 +81,4 @@ int do_sendall(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ms_sendall")
+MODULE_INIT(MSSendAll)

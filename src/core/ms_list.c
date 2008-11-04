@@ -19,34 +19,22 @@ int list_memo_callback(User * u, int num, va_list args);
 int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, const char *chan);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSList : public Module
 {
-    Command *c;
+ public:
+	MSList(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("LIST", do_list, NULL, MEMO_HELP_LIST, -1, -1, -1,
-                      -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("LIST", do_list, NULL, MEMO_HELP_LIST, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -194,4 +182,4 @@ int list_memo(User * u, int index, MemoInfo * mi, int *sent_header, int newi, co
     return 1;
 }
 
-MODULE_INIT("ms_list")
+MODULE_INIT(MSList)

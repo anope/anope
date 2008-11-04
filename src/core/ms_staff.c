@@ -18,35 +18,21 @@
 int do_staff(User * u);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSStaff : public Module
 {
-    Command *c;
+ public:
+	MSStaff(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("STAFF", do_staff, is_services_oper, -1, -1,
-                      MEMO_HELP_STAFF, MEMO_HELP_STAFF, MEMO_HELP_STAFF);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("STAFF", do_staff, is_services_oper, -1, -1, MEMO_HELP_STAFF, MEMO_HELP_STAFF, MEMO_HELP_STAFF);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -92,4 +78,4 @@ int do_staff(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ms_staff")
+MODULE_INIT(MSStaff)

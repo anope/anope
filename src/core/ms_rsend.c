@@ -18,31 +18,24 @@
 int do_rsend(User * u);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSRSend : public Module
 {
-    Command *c;
+ public:
+	MSRSend(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("RSEND", do_rsend, NULL, MEMO_HELP_RSEND, -1, -1, -1,
-                      -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("RSEND", do_rsend, NULL, MEMO_HELP_RSEND, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
 
-    if (!MSMemoReceipt) {
-        return MOD_STOP;
-    }
-
-    return MOD_CONT;
-}
+		if (!MSMemoReceipt)
+			throw ModuleException("Don't like memo reciepts, or something.");
+	}
+};
 
 /**
  * Unload the module
@@ -119,4 +112,4 @@ int do_rsend(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ms_rsend")
+MODULE_INIT(MSRSend)

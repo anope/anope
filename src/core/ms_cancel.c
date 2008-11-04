@@ -18,34 +18,21 @@
 int do_cancel(User * u);
 void myMemoServHelp(User * u);
 
-/**
- * Create the cancel command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSCancel : public Module
 {
-    Command *c;
+ public:
+	MSCancel(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("CANCEL", do_cancel, NULL, MEMO_HELP_CANCEL, -1, -1,
-                      -1, -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("CANCEL", do_cancel, NULL, MEMO_HELP_CANCEL, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -104,4 +91,4 @@ int do_cancel(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("ms_cancel")
+MODULE_INIT(MSCancel)

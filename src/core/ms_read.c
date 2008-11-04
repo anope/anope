@@ -22,34 +22,21 @@ void myMemoServHelp(User * u);
 extern void rsend_notify(User * u, Memo * m, const char *chan);
 
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSRead : public Module
 {
-    Command *c;
+ public:
+	MSRead(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("READ", do_read, NULL, MEMO_HELP_READ, -1, -1, -1,
-                      -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("READ", do_read, NULL, MEMO_HELP_READ, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -202,4 +189,4 @@ int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
     return 1;
 }
 
-MODULE_INIT("ms_read")
+MODULE_INIT(MSRead)

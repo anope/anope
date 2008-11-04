@@ -20,46 +20,30 @@ int do_set_notify(User * u, MemoInfo * mi, char *param);
 int do_set_limit(User * u, MemoInfo * mi, char *param);
 void myMemoServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class MSSet : public Module
 {
-    Command *c;
+ public:
+	MSSet(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SET", do_set, NULL, MEMO_HELP_SET, -1, -1, -1, -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		c = createCommand("SET", do_set, NULL, MEMO_HELP_SET, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 
-    c = createCommand("SET NOTIFY", NULL, NULL, MEMO_HELP_SET_NOTIFY, -1,
-                      -1, -1, -1);
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		c = createCommand("SET NOTIFY", NULL, NULL, MEMO_HELP_SET_NOTIFY, -1, -1, -1, -1);
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 
-    c = createCommand("SET LIMIT", NULL, NULL, -1, MEMO_HELP_SET_LIMIT,
-                      MEMO_SERVADMIN_HELP_SET_LIMIT,
-                      MEMO_SERVADMIN_HELP_SET_LIMIT,
-                      MEMO_SERVADMIN_HELP_SET_LIMIT);
-    c->help_param1 = (char *) (long) MSMaxMemos;
-    moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		c = createCommand("SET LIMIT", NULL, NULL, -1, MEMO_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT);
+		c->help_param1 = (char *) (long) MSMaxMemos;
+		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 
-    moduleSetMemoHelp(myMemoServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetMemoHelp(myMemoServHelp);
+	}
+};
 
 
 
@@ -265,4 +249,4 @@ int do_set_limit(User * u, MemoInfo * mi, char *param)
     return MOD_CONT;
 }
 
-MODULE_INIT("ms_set")
+MODULE_INIT(MSSet)

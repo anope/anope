@@ -18,34 +18,28 @@
 int do_act(User * u);
 void myBotServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class BSAct : public Module
 {
-    Command *c;
+ public:
+	BSAct(const std::string &creator) : Module(creator)
+	{
+	    Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
-    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+	    moduleAddAuthor("Anope");
+	    moduleAddVersion("$Id$");
+	    moduleSetType(CORE);
+	    c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
+	    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 
-    moduleSetBotHelp(myBotServHelp);
+	    moduleSetBotHelp(myBotServHelp);
+	}
 
-    return MOD_CONT;
-}
+	~BSAct()
+	{
 
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
+	}
+};
 
-}
 
 /**
  * Add the help response to Anopes /bs help output.
@@ -91,4 +85,4 @@ int do_act(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("bs_act")
+MODULE_INIT(BSAct)

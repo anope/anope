@@ -178,7 +178,10 @@ extern int strncasecmp(const char *, const char *, size_t);
 	#define MARK_DEPRECATED
 #endif
 
-
+/** XXX: we need to grab these from inspircd -- w00t
+ */
+#define DllExport
+#define CoreExport
 
 /** This definition is used as shorthand for the various classes
  * and functions needed to make a module loadable by the OS.

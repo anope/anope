@@ -30,6 +30,15 @@ Legend:
 [ ] burn do_sjoin with fire
 [ ] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
 
+1.9.2
+-----
+[ ] Socket subsystem needs some serious loving
+  [ ] Multiple sockets
+  [ ] Asynchronous, using select() (multiple engines? not really needed..)
+  [ ] Callbacks, event style, see also inspircd
+  [ ] Asynchronous DNS?
+
+
 Future
 ------
 [ ] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..

@@ -383,33 +383,35 @@ int md5_check_password(const char *plaintext, const char *password)
 
 /* Module stuff. */
 
-int AnopeInit(int argc, char **argv) {
+class EMD5 : public Module
+{
+ public:
+	EMD5(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(ENCRYPTION);
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(ENCRYPTION);
- 
-    encmodule_encrypt(md5_encrypt);
-    encmodule_encrypt_in_place(md5_encrypt_in_place);
-    encmodule_encrypt_check_len(md5_encrypt_check_len);
-    encmodule_decrypt(md5_decrypt);
-    encmodule_check_password(md5_check_password);
+		encmodule_encrypt(md5_encrypt);
+		encmodule_encrypt_in_place(md5_encrypt_in_place);
+		encmodule_encrypt_check_len(md5_encrypt_check_len);
+		encmodule_decrypt(md5_decrypt);
+		encmodule_check_password(md5_check_password);
+	}
 
-    return MOD_CONT;
-}
-
-void AnopeFini(void) {
-    encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
-    encmodule_encrypt_check_len(NULL);
-    encmodule_decrypt(NULL);
-    encmodule_check_password(NULL);
-}
-
+	~EMD5()
+	{
+		encmodule_encrypt(NULL);
+		encmodule_encrypt_in_place(NULL);
+		encmodule_encrypt_check_len(NULL);
+		encmodule_decrypt(NULL);
+		encmodule_check_password(NULL);
+	}
+};
 
 
 
 /*************************************************************************/
 
 
-MODULE_INIT("enc_md5")
+MODULE_INIT(EMD5)

@@ -15,29 +15,31 @@ int plain_encrypt_check_len(int passlen, int bufsize);
 int plain_decrypt(const char *src, char *dest, int size);
 int plain_check_password(const char *plaintext, const char *password);
 
+class ENone : public Module
+{
+ public:
+	ENone(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(ENCRYPTION);
 
-int AnopeInit(int argc, char **argv) {
+		encmodule_encrypt(plain_encrypt);
+		encmodule_encrypt_in_place(plain_encrypt_in_place);
+		encmodule_encrypt_check_len(plain_encrypt_check_len);
+		encmodule_decrypt(plain_decrypt);
+		encmodule_check_password(plain_check_password);
+	}
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(ENCRYPTION);
- 
-    encmodule_encrypt(plain_encrypt);
-    encmodule_encrypt_in_place(plain_encrypt_in_place);
-    encmodule_encrypt_check_len(plain_encrypt_check_len);
-    encmodule_decrypt(plain_decrypt);
-    encmodule_check_password(plain_check_password);
-
-    return MOD_CONT;
-}
-
-void AnopeFini(void) {
-    encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
-    encmodule_encrypt_check_len(NULL);
-    encmodule_decrypt(NULL);
-    encmodule_check_password(NULL);
-}
+	~ENone()
+	{
+		encmodule_encrypt(NULL);
+		encmodule_encrypt_in_place(NULL);
+		encmodule_encrypt_check_len(NULL);
+		encmodule_decrypt(NULL);
+		encmodule_check_password(NULL);
+	}
+};
 
 int plain_encrypt(const char *src,int len,char *dest,int size) {
     if(size>=len) {
@@ -77,4 +79,4 @@ int plain_check_password(const char *plaintext, const char *password) {
 /* EOF */
 
 
-MODULE_INIT("enc_none")
+MODULE_INIT(ENone)

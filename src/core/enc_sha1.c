@@ -248,30 +248,31 @@ int sha1_check_password(const char *plaintext, const char *password)
 
 /* Module stuff. */
 
-int AnopeInit(int argc, char **argv) {
+class ESHA1 : public Module
+{
+ public:
+	ESHA1(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(ENCRYPTION);
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(ENCRYPTION);
- 
-    encmodule_encrypt(sha1_encrypt);
-    encmodule_encrypt_in_place(sha1_encrypt_in_place);
-    encmodule_encrypt_check_len(sha1_encrypt_check_len);
-    encmodule_decrypt(sha1_decrypt);
-    encmodule_check_password(sha1_check_password);
+		encmodule_encrypt(sha1_encrypt);
+		encmodule_encrypt_in_place(sha1_encrypt_in_place);
+		encmodule_encrypt_check_len(sha1_encrypt_check_len);
+		encmodule_decrypt(sha1_decrypt);
+		encmodule_check_password(sha1_check_password);
+	}
 
-    return MOD_CONT;
-}
-
-void AnopeFini(void) {
-    encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
-    encmodule_encrypt_check_len(NULL);
-    encmodule_decrypt(NULL);
-    encmodule_check_password(NULL);
-}
-
-/* EOF */
+	~ESHA1()
+	{
+		encmodule_encrypt(NULL);
+		encmodule_encrypt_in_place(NULL);
+		encmodule_encrypt_check_len(NULL);
+		encmodule_decrypt(NULL);
+		encmodule_check_password(NULL);
+	}
+};
 
 
-MODULE_INIT("enc_sha1")
+MODULE_INIT(ESHA1)

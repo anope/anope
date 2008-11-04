@@ -410,30 +410,33 @@ int old_decrypt(const char *src, char *dest, int size)
     return 0;
 }
 
-int AnopeInit(int argc, char **argv) {
+class EOld : public Module
+{
+ public:
+	EOld(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(ENCRYPTION);
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(ENCRYPTION);
+		encmodule_encrypt(old_encrypt);
+		encmodule_encrypt_in_place(old_encrypt_in_place);
+		encmodule_encrypt_check_len(old_encrypt_check_len);
+		encmodule_decrypt(old_decrypt);
+		encmodule_check_password(old_check_password);
+	}
 
-    encmodule_encrypt(old_encrypt);
-    encmodule_encrypt_in_place(old_encrypt_in_place);
-    encmodule_encrypt_check_len(old_encrypt_check_len);
-    encmodule_decrypt(old_decrypt);
-    encmodule_check_password(old_check_password);
-
-    return MOD_CONT;
-}
-
-void AnopeFini(void) {
-    encmodule_encrypt(NULL);
-    encmodule_encrypt_in_place(NULL);
-    encmodule_encrypt_check_len(NULL);
-    encmodule_decrypt(NULL);
-    encmodule_check_password(NULL);
-}
+	~EOld()
+	{
+		encmodule_encrypt(NULL);
+		encmodule_encrypt_in_place(NULL);
+		encmodule_encrypt_check_len(NULL);
+		encmodule_decrypt(NULL);
+		encmodule_check_password(NULL);
+	}
+};
 
 /*************************************************************************/
 
 
-MODULE_INIT("enc_old")
+MODULE_INIT(EOld)

@@ -1271,10 +1271,6 @@ int anope_event_capab(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-
-
-
-/* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
@@ -1313,45 +1309,46 @@ void moduleAddIRCDMsgs(void) {
     m = createMessage("IDLE",      anope_event_idle); addCoreMessage(IRCD,m);
 }
 
-/* *INDENT-ON* */
-
-/**
- * Now tell anope how to use us.
- **/
-int AnopeInit(int argc, char **argv)
+class ProtoInspIRCd : public Module
 {
+ public:
+	ProtoInspIRCd(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(PROTOCOL);
 
-	moduleAddAuthor("Anope");
-	moduleAddVersion("$Id$");
-	moduleSetType(PROTOCOL);
+		TS6SID = sstrdup(Numeric);
 
-	TS6SID = sstrdup(Numeric);
+		pmodule_ircd_version("InspIRCd 1.1");
+		pmodule_ircd_cap(myIrcdcap);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+		pmodule_ircd_cumodes(myCumodes);
+		pmodule_ircd_flood_mode_char_set("+f");
+		pmodule_ircd_flood_mode_char_remove("-f");
+		pmodule_ircd_cbmodes(myCbmodes);
+		pmodule_ircd_cmmodes(myCmmodes);
+		pmodule_ircd_csmodes(myCsmodes);
+		pmodule_ircd_useTSMode(0);
 
-	pmodule_ircd_version("InspIRCd 1.1");
-	pmodule_ircd_cap(myIrcdcap);
-	pmodule_ircd_var(myIrcd);
-	pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-	pmodule_ircd_cumodes(myCumodes);
-	pmodule_ircd_flood_mode_char_set("+f");
-	pmodule_ircd_flood_mode_char_remove("-f");
-	pmodule_ircd_cbmodes(myCbmodes);
-	pmodule_ircd_cmmodes(myCmmodes);
-	pmodule_ircd_csmodes(myCsmodes);
-	pmodule_ircd_useTSMode(0);
+		/** Deal with modes anope _needs_ to know **/
+		pmodule_invis_umode(UMODE_i);
+		pmodule_oper_umode(UMODE_o);
+		pmodule_invite_cmode(CMODE_i);
+		pmodule_secret_cmode(CMODE_s);
+		pmodule_private_cmode(CMODE_p);
+		pmodule_key_mode(CMODE_k);
+		pmodule_limit_mode(CMODE_l);
 
-	/** Deal with modes anope _needs_ to know **/
-	pmodule_invis_umode(UMODE_i);
-	pmodule_oper_umode(UMODE_o);
-	pmodule_invite_cmode(CMODE_i);
-	pmodule_secret_cmode(CMODE_s);
-	pmodule_private_cmode(CMODE_p);
-	pmodule_key_mode(CMODE_k);
-	pmodule_limit_mode(CMODE_l);
+		pmodule_ircd_proto(&ircd_proto);
+		moduleAddIRCDMsgs();
+	}
 
-	pmodule_ircd_proto(&ircd_proto);
-	moduleAddIRCDMsgs();
+	~ProtoInspIRCd()
+	{
+		free(TS6SID);
+	}
+};
 
-	return MOD_CONT;
-}
-
-MODULE_INIT("inspircd11")
+MODULE_INIT(ProtoInspIRCd)

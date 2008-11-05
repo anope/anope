@@ -1295,62 +1295,61 @@ void moduleAddIRCDMsgs(void)
 
 /* *INDENT-ON* */
 
-/**
- * Now tell anope how to use us.
- **/
-int AnopeInit(int argc, char **argv)
+class ProtoCharybdis : public Module
 {
-    EvtHook *hk;
+ public:
+	ProtoCharybdis(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hk;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id: charybdis.c 953 2006-01-14 11:36:29Z certus $");
-    moduleSetType(PROTOCOL);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id: charybdis.c 953 2006-01-14 11:36:29Z certus $");
+		moduleSetType(PROTOCOL);
 
-    pmodule_ircd_version("Charybdis 1.0/1.1+");
-    pmodule_ircd_cap(myIrcdcap);
-    pmodule_ircd_var(myIrcd);
-    pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-    pmodule_ircd_cumodes(myCumodes);
-    pmodule_ircd_flood_mode_char_set("");
-    pmodule_ircd_flood_mode_char_remove("");
-    pmodule_ircd_cbmodes(myCbmodes);
-    pmodule_ircd_cmmodes(myCmmodes);
-    pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+		pmodule_ircd_version("Charybdis 1.0/1.1+");
+		pmodule_ircd_cap(myIrcdcap);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+		pmodule_ircd_cumodes(myCumodes);
+		pmodule_ircd_flood_mode_char_set("");
+		pmodule_ircd_flood_mode_char_remove("");
+		pmodule_ircd_cbmodes(myCbmodes);
+		pmodule_ircd_cmmodes(myCmmodes);
+		pmodule_ircd_csmodes(myCsmodes);
+		pmodule_ircd_useTSMode(0);
 
-        /** Deal with modes anope _needs_ to know **/
-    pmodule_invis_umode(UMODE_i);
-    pmodule_oper_umode(UMODE_o);
-    pmodule_invite_cmode(CMODE_i);
-    pmodule_secret_cmode(CMODE_s);
-    pmodule_private_cmode(CMODE_p);
-    pmodule_key_mode(CMODE_k);
-    pmodule_limit_mode(CMODE_l);
+		/** Deal with modes anope _needs_ to know **/
+		pmodule_invis_umode(UMODE_i);
+		pmodule_oper_umode(UMODE_o);
+		pmodule_invite_cmode(CMODE_i);
+		pmodule_secret_cmode(CMODE_s);
+		pmodule_private_cmode(CMODE_p);
+		pmodule_key_mode(CMODE_k);
+		pmodule_limit_mode(CMODE_l);
 
-	pmodule_ircd_proto(&ircd_proto);
-    moduleAddIRCDMsgs();
+		pmodule_ircd_proto(&ircd_proto);
+		moduleAddIRCDMsgs();
 
-    hk = createEventHook(EVENT_NICK_IDENTIFY, charybdis_send_account);
-    moduleAddEventHook(hk);
+		hk = createEventHook(EVENT_NICK_IDENTIFY, charybdis_send_account);
+		moduleAddEventHook(hk);
 
-    hk = createEventHook(EVENT_NICK_REGISTERED, charybdis_send_account);
-    moduleAddEventHook(hk);
+		hk = createEventHook(EVENT_NICK_REGISTERED, charybdis_send_account);
+		moduleAddEventHook(hk);
 
-    /* XXX: It'd be nice if we could have an event like this, but it's not there yet :( */
-	/* It's there now! Trystan said so! -GD */
-    hk = createEventHook(EVENT_NICK_LOGOUT, charybdis_send_deaccount);
-    moduleAddEventHook(hk);
+		/* XXX: It'd be nice if we could have an event like this, but it's not there yet :( */
+		/* It's there now! Trystan said so! -GD */
+		hk = createEventHook(EVENT_NICK_LOGOUT, charybdis_send_deaccount);
+		moduleAddEventHook(hk);
+	}
 
-    return MOD_CONT;
-}
+	~ProtoCharybdis()
+	{
+		if (UseTS6)
+			free(TS6SID);
+	}
+};
 
-/* Clean up allocated things in here */
-void AnopeFini(void)
-{
-	if (UseTS6)
-		free(TS6SID);
-}
 
 /* EOF */
 
-MODULE_INIT("charybdis")
+MODULE_INIT(ProtoCharybdis)

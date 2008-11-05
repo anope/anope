@@ -1383,7 +1383,6 @@ int anope_event_sjoin(const char *source, int ac, const char **av)
     return MOD_CONT;
 }
 
-/* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
     Message *m;
 
@@ -1519,43 +1518,40 @@ void moduleAddIRCDMsgs(void) {
     }
 }
 
-/* *INDENT-ON* */
 
-/**
- * Now tell anope how to use us.
- **/
-int AnopeInit(int argc, char **argv)
+class ProtoUnreal : public Module
 {
+ public:
+	ProtoUnreal(const std::string &creator) : Module(creator)
+	{
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(PROTOCOL);
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(PROTOCOL);
+		pmodule_ircd_version("UnrealIRCd 3.2+");
+		pmodule_ircd_cap(myIrcdcap);
+		pmodule_ircd_var(myIrcd);
+		pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+		pmodule_ircd_cumodes(myCumodes);
+		pmodule_ircd_flood_mode_char_set("+f");
+		pmodule_ircd_flood_mode_char_remove("-f");
+		pmodule_ircd_cbmodes(myCbmodes);
+		pmodule_ircd_cmmodes(myCmmodes);
+		pmodule_ircd_csmodes(myCsmodes);
+		pmodule_ircd_useTSMode(0);
 
-    pmodule_ircd_version("UnrealIRCd 3.2+");
-    pmodule_ircd_cap(myIrcdcap);
-    pmodule_ircd_var(myIrcd);
-    pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-    pmodule_ircd_cumodes(myCumodes);
-    pmodule_ircd_flood_mode_char_set("+f");
-    pmodule_ircd_flood_mode_char_remove("-f");
-    pmodule_ircd_cbmodes(myCbmodes);
-    pmodule_ircd_cmmodes(myCmmodes);
-    pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+		/** Deal with modes anope _needs_ to know **/
+		pmodule_invis_umode(UMODE_i);
+		pmodule_oper_umode(UMODE_o);
+		pmodule_invite_cmode(CMODE_i);
+		pmodule_secret_cmode(CMODE_s);
+		pmodule_private_cmode(CMODE_p);
+		pmodule_key_mode(CMODE_k);
+		pmodule_limit_mode(CMODE_l);
 
-        /** Deal with modes anope _needs_ to know **/
-    pmodule_invis_umode(UMODE_i);
-    pmodule_oper_umode(UMODE_o);
-    pmodule_invite_cmode(CMODE_i);
-    pmodule_secret_cmode(CMODE_s);
-    pmodule_private_cmode(CMODE_p);
-    pmodule_key_mode(CMODE_k);
-    pmodule_limit_mode(CMODE_l);
+		pmodule_ircd_proto(&ircd_proto);
+		moduleAddIRCDMsgs();
+	}
+};
 
-	pmodule_ircd_proto(&ircd_proto);
-    moduleAddIRCDMsgs();
-
-    return MOD_CONT;
-}
-
-MODULE_INIT("unreal32")
+MODULE_INIT(ProtoUnreal)

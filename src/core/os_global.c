@@ -18,36 +18,24 @@
 int do_global(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSGlobal : public Module
 {
-    Command *c;
+ public:
+	OSGlobal(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("GLOBAL", do_global, is_services_admin,
-                      OPER_HELP_GLOBAL, -1, -1, -1, -1);
-    c->help_param1 = s_GlobalNoticer;
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    moduleSetOperHelp(myOperServHelp);
+		c = createCommand("GLOBAL", do_global, is_services_admin, OPER_HELP_GLOBAL, -1, -1, -1, -1);
+		c->help_param1 = s_GlobalNoticer;
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 /**
@@ -81,4 +69,4 @@ int do_global(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_global")
+MODULE_INIT(OSGlobal)

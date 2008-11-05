@@ -17,41 +17,27 @@
 
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSRandomNews : public Module
 {
-    Command *c;
+ public:
+	OSRandomNews(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion
+		("$Id$");
+		moduleSetType(CORE);
 
-    /** 
-     * For some unknown reason, do_randomnews is actaully defined in news.c
-     * we can look at moving it here later
-     **/
-    c = createCommand("RANDOMNEWS", do_randomnews, is_services_admin,
-                      NEWS_HELP_RANDOM, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		/** XXX: For some unknown reason, do_randomnews is actaully defined in news.c
+		 * we can look at moving it here later
+		 **/
+		c = createCommand("RANDOMNEWS", do_randomnews, is_services_admin, NEWS_HELP_RANDOM, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -65,4 +51,4 @@ void myOperServHelp(User * u)
     }
 }
 
-MODULE_INIT("os_randomnews")
+MODULE_INIT(OSRandomNews)

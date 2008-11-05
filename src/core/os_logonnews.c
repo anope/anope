@@ -21,49 +21,43 @@ void myOperServHelp(User * u);
 int load_config(void);
 int reload_config(int argc, char **argv);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSLogonNews : public Module
 {
-    EvtHook *hook;
-    char buf[BUFSIZE];
+ public:
+	OSLogonNews(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hook;
+		char buf[BUFSIZE];
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    /** 
-     * For some unknown reason, do_logonnews is actaully defined in news.c
-     * we can look at moving it here later
-     **/
-    c = createCommand("LOGONNEWS", do_logonnews, is_services_admin,
-                      NEWS_HELP_LOGON, -1, -1, -1, -1);
-    snprintf(buf, BUFSIZE, "%d", NewsCount),
-    c->help_param1 = sstrdup(buf);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		/** 
+		* For some unknown reason, do_logonnews is actaully defined in news.c
+		* we can look at moving it here later
+		**/
+		c = createCommand("LOGONNEWS", do_logonnews, is_services_admin,
+		NEWS_HELP_LOGON, -1, -1, -1, -1);
+		snprintf(buf, BUFSIZE, "%d", NewsCount),
+		c->help_param1 = sstrdup(buf);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
+		moduleSetOperHelp(myOperServHelp);
 
-    hook = createEventHook(EVENT_RELOAD, reload_config);
-    if (moduleAddEventHook(hook) != MOD_ERR_OK) {
-        alog("[\002os_logonnews\002] Can't hook to EVENT_RELOAD event");
-        return MOD_STOP;
-    }
+		hook = createEventHook(EVENT_RELOAD, reload_config);
+		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+		{
+			throw ModuleException("os_logonnews: Can't hook to EVENT_RELOAD event");
+		}
+	}
 
-    return MOD_CONT;
-}
+	~OSLogonNews()
+	{
+		free(c->help_param1);
+	}
+};
 
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-	free(c->help_param1);
-}
 
 
 /**
@@ -97,4 +91,4 @@ int reload_config(int argc, char **argv) {
 
 /* EOF */
 
-MODULE_INIT("os_logonnews")
+MODULE_INIT(OSLogonNews)

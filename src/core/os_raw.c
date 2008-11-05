@@ -17,38 +17,24 @@
 
 int do_raw(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSRaw : public Module
 {
-    Command *c;
+ public:
+	OSRaw(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(THIRD);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(THIRD);
 
-    c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1,
-                      -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    if (DisableRaw) {
-		alog("[os_raw] Unloading because DisableRaw is enabled");
-        return MOD_STOP;
-    }
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		if (DisableRaw)
+			throw ModuleException("os_raw: Not loading because you probably shouldn't be loading me");
+	}
+};
 
 
 /**
@@ -77,4 +63,4 @@ int do_raw(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_raw")
+MODULE_INIT(OSRaw)

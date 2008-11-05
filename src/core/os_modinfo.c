@@ -20,35 +20,22 @@ void myOperServHelp(User * u);
 int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u);
 int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSModInfo : public Module
 {
-    Command *c;
+ public:
+	OSModInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1,
-                      OPER_HELP_MODINFO);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1, OPER_HELP_MODINFO);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -138,4 +125,4 @@ int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u)
     return display;
 }
 
-MODULE_INIT("os_modinfo")
+MODULE_INIT(OSModInfo)

@@ -21,37 +21,24 @@ void myOperServHelp(User * u);
 extern MDE int anope_get_private_mode();
 #endif
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSChanList : public Module
 {
-    Command *c;
+ public:
+	OSChanList(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("CHANLIST", do_chanlist, is_services_oper,
-                      OPER_HELP_CHANLIST, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("CHANLIST", do_chanlist, is_services_oper, OPER_HELP_CHANLIST, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 /**
@@ -115,4 +102,4 @@ int do_chanlist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_chanlist")
+MODULE_INIT(OSChanList)

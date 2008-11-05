@@ -21,37 +21,25 @@ int admin_list_callback(SList * slist, int number, void *item,
 int admin_list(int number, NickCore * nc, User * u, int *sent_header);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSAdmin : public Module
 {
-    Command *c;
+ public:
+	OSAdmin(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("ADMIN", do_admin, NULL, OPER_HELP_ADMIN, -1, -1,
-                      -1, -1);
-    c->help_param1 = s_NickServ;
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("ADMIN", do_admin, NULL, OPER_HELP_ADMIN, -1, -1, -1, -1);
+		c->help_param1 = s_NickServ;
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
 
 
 
@@ -243,4 +231,4 @@ int admin_list(int number, NickCore * nc, User * u, int *sent_header)
     return 1;
 }
 
-MODULE_INIT("os_admin")
+MODULE_INIT(OSAdmin)

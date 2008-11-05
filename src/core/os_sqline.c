@@ -25,38 +25,26 @@ int sqline_list(int number, SXLine * sx, User * u, int *sent_header);
 
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSSQLine : public Module
 {
-    Command *c;
+ public:
+	OSSQLine(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SQLINE", do_sqline, is_services_oper,
-                      OPER_HELP_SQLINE, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SQLINE", do_sqline, is_services_oper,
+		OPER_HELP_SQLINE, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-    if (!ircd->sqline) {
-        return MOD_STOP;
-    }
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+		if (!ircd->sqline)
+			throw ModuleException("Your IRCd does not support QLines.");
+	}
+};
 
 
 /**
@@ -354,4 +342,4 @@ int sqline_list_callback(SList * slist, int number, void *item,
     return sqline_list(number, (SXLine *)item, u, sent_header);
 }
 
-MODULE_INIT("os_sqline")
+MODULE_INIT(OSSQLine)

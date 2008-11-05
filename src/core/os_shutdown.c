@@ -18,36 +18,23 @@
 int do_shutdown(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSShutdown : public Module
 {
-    Command *c;
+ public:
+	OSShutdown(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SHUTDOWN", do_shutdown, is_services_root,
-                      OPER_HELP_SHUTDOWN, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SHUTDOWN", do_shutdown, is_services_root, OPER_HELP_SHUTDOWN, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -82,4 +69,4 @@ int do_shutdown(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_shutdown")
+MODULE_INIT(OSShutdown)

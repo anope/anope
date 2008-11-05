@@ -23,36 +23,23 @@ extern MDE int anope_get_invis_mode();
 int do_userlist(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSUserList : public Module
 {
-    Command *c;
+ public:
+	OSUserList(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("USERLIST", do_userlist, NULL,
-                      OPER_HELP_USERLIST, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("USERLIST", do_userlist, NULL, OPER_HELP_USERLIST, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -120,4 +107,4 @@ int do_userlist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_userlist")
+MODULE_INIT(OSUserList)

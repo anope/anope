@@ -17,32 +17,20 @@
 
 int do_help(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSHelp : public Module
 {
-    Command *c;
+ public:
+	OSHelp(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+	}
+};
 
 
 
@@ -65,4 +53,4 @@ int do_help(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_help")
+MODULE_INIT(OSHelp)

@@ -24,38 +24,26 @@ int szline_list_callback(SList * slist, int number, void *item,
 int szline_view(int number, SXLine * sx, User * u, int *sent_header);
 int szline_list(int number, SXLine * sx, User * u, int *sent_header);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSSZLine : public Module
 {
-    Command *c;
+ public:
+	OSSZLine(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SZLINE", do_szline, is_services_oper,
-                      OPER_HELP_SZLINE, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SZLINE", do_szline, is_services_oper,
+		OPER_HELP_SZLINE, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-    if (!ircd->szline) {
-        return MOD_STOP;
-    }
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+		if (!ircd->szline)
+			throw ModuleException("Your IRCd does not support ZLINEs");
+	}
+};
 
 
 /**
@@ -349,4 +337,4 @@ int szline_list(int number, SXLine * sx, User * u, int *sent_header)
     return 1;
 }
 
-MODULE_INIT("os_szline")
+MODULE_INIT(OSSZLine)

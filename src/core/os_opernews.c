@@ -21,49 +21,38 @@ void myOperServHelp(User * u);
 int load_config(void);
 int reload_config(int argc, char **argv);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSOperNews : public Module
 {
-    EvtHook *hook;
-    char buf[BUFSIZE];
+ public:
+	OSOperNews(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hook;
+		char buf[BUFSIZE];
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    /** 
-     * For some unknown reason, do_opernews is actaully defined in news.c
-     * we can look at moving it here later
-     **/
-    c = createCommand("OPERNEWS", do_opernews, is_services_admin,
-                      NEWS_HELP_OPER, -1, -1, -1, -1);
-    snprintf(buf, BUFSIZE, "%d", NewsCount),
-    c->help_param1 = sstrdup(buf);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		/** XXX: For some unknown reason, do_opernews is actaully defined in news.c
+		 * we can look at moving it here later
+		 **/
+		c = createCommand("OPERNEWS", do_opernews, is_services_admin, NEWS_HELP_OPER, -1, -1, -1, -1);
+		snprintf(buf, BUFSIZE, "%d", NewsCount),
+		c->help_param1 = sstrdup(buf);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
+		moduleSetOperHelp(myOperServHelp);
 
-    hook = createEventHook(EVENT_RELOAD, reload_config);
-    if (moduleAddEventHook(hook) != MOD_ERR_OK) {
-        alog("[\002os_opernews\002] Can't hook to EVENT_RELOAD event");
-        return MOD_STOP;
-    }
+		hook = createEventHook(EVENT_RELOAD, reload_config);
+		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+			throw ModuleException("os_opernews: Can't hook to EVENT_RELOAD event");
+	}
 
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-    free(c->help_param1);
-}
+	~OSOperNews()
+	{
+	    free(c->help_param1);
+	}
+};
 
 
 /**
@@ -94,6 +83,5 @@ int reload_config(int argc, char **argv) {
     return MOD_CONT;
 }
 
-/* EOF */
 
-MODULE_INIT("os_opernews")
+MODULE_INIT(OSOperNews)

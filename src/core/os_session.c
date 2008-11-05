@@ -17,42 +17,28 @@
 
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSSession : public Module
 {
-    Command *c;
+ public:
+	OSSession(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    /**
-     * do_session/do_exception are exported from sessions.c - we just want to provide an interface.
-     **/
-    c = createCommand("SESSION", do_session, is_services_oper,
-                      OPER_HELP_SESSION, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("EXCEPTION", do_exception, is_services_oper,
-                      OPER_HELP_EXCEPTION, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		/**
+		* do_session/do_exception are exported from sessions.c - we just want to provide an interface.
+		**/
+		c = createCommand("SESSION", do_session, is_services_oper, OPER_HELP_SESSION, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("EXCEPTION", do_exception, is_services_oper, OPER_HELP_EXCEPTION, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -67,4 +53,4 @@ void myOperServHelp(User * u)
     }
 }
 
-MODULE_INIT("os_session")
+MODULE_INIT(OSSession)

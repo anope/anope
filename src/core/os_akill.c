@@ -24,36 +24,22 @@ int akill_list_callback(SList * slist, int number, void *item,
 int akill_list(int number, Akill * ak, User * u, int *sent_header);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSAKill : public Module
 {
-    Command *c;
+ public:
+	OSAKill(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL,
-                      -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 
@@ -388,4 +374,4 @@ int akill_list(int number, Akill * ak, User * u, int *sent_header)
     return 1;
 }
 
-MODULE_INIT("os_akill")
+MODULE_INIT(OSAKill)

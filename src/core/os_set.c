@@ -18,62 +18,37 @@
 int do_set(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSSet : public Module
 {
-    Command *c;
+ public:
+	OSSet(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SET", do_set, is_services_root, OPER_HELP_SET, -1,
-                      -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET LIST", NULL, NULL, OPER_HELP_SET_LIST, -1, -1,
-                      -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET READONLY", NULL, NULL, OPER_HELP_SET_READONLY,
-                      -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET LOGCHAN", NULL, NULL, OPER_HELP_SET_LOGCHAN, -1,
-                      -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET DEBUG", NULL, NULL, OPER_HELP_SET_DEBUG, -1, -1,
-                      -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET NOEXPIRE", NULL, NULL, OPER_HELP_SET_NOEXPIRE,
-                      -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET IGNORE", NULL, NULL, OPER_HELP_SET_IGNORE, -1,
-                      -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("SET SUPERADMIN", NULL, NULL,
-                      OPER_HELP_SET_SUPERADMIN, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-#ifdef USE_MYSQL
-    c = createCommand("SET SQL", NULL, NULL, OPER_HELP_SET_SQL, -1, -1, -1,
-                      -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-#endif
+		c = createCommand("SET", do_set, is_services_root, OPER_HELP_SET, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET LIST", NULL, NULL, OPER_HELP_SET_LIST, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET READONLY", NULL, NULL, OPER_HELP_SET_READONLY, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET LOGCHAN", NULL, NULL, OPER_HELP_SET_LOGCHAN, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET DEBUG", NULL, NULL, OPER_HELP_SET_DEBUG, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET NOEXPIRE", NULL, NULL, OPER_HELP_SET_NOEXPIRE, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET IGNORE", NULL, NULL, OPER_HELP_SET_IGNORE, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SET SUPERADMIN", NULL, NULL, OPER_HELP_SET_SUPERADMIN, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -263,4 +238,4 @@ int do_set(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_set")
+MODULE_INIT(OSSet)

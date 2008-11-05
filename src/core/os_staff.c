@@ -21,36 +21,23 @@ int opers_list_callback(SList * slist, int number, void *item,
                         va_list args);
 int opers_list(int number, NickCore * nc, User * u, char *level);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSStaff : public Module
 {
-    Command *c;
+ public:
+	OSStaff(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1,
-                      -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -155,4 +142,4 @@ int opers_list(int number, NickCore * nc, User * u, char *level)
     return 1;
 }
 
-MODULE_INIT("os_staff")
+MODULE_INIT(OSStaff)

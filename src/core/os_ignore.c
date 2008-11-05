@@ -19,35 +19,22 @@ int do_ignorelist(User * u);
 void myOperServHelp(User * u);
 int do_ignoreuser(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSIgnore : public Module
 {
-    Command *c;
+ public:
+	OSIgnore(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
-    c = createCommand("IGNORE", do_ignoreuser, is_services_admin,
-                      OPER_HELP_IGNORE, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
+		c = createCommand("IGNORE", do_ignoreuser, is_services_admin, OPER_HELP_IGNORE, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -143,6 +130,4 @@ int do_ignorelist(User * u)
     return MOD_CONT;
 }
 
-/* EOF */
-
-MODULE_INIT("os_ignore")
+MODULE_INIT(OSIgnore)

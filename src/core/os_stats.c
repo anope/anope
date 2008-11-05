@@ -21,39 +21,25 @@ int do_stats(User * u);
 void get_operserv_stats(long *nrec, long *memuse);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSStats : public Module
 {
-    Command *c;
+ public:
+	OSStats(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("STATS", do_stats, NULL, OPER_HELP_STATS,
-                      -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
-    c = createCommand("UPTIME", do_stats, NULL,
-                      OPER_HELP_STATS, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("STATS", do_stats, NULL, OPER_HELP_STATS, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("UPTIME", do_stats, NULL, OPER_HELP_STATS, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -452,4 +438,4 @@ void get_operserv_stats(long *nrec, long *memuse)
     *memuse = mem;
 }
 
-MODULE_INIT("os_stats")
+MODULE_INIT(OSStats)

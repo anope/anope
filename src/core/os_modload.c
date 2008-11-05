@@ -18,37 +18,23 @@
 int do_modload(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSModLoad : public Module
 {
-    Command *c;
+ public:
+	OSModLoad(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
-        ("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("MODLOAD", do_modload, is_services_root, -1, -1, -1,
-                      -1, OPER_HELP_MODLOAD);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("MODLOAD", do_modload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODLOAD);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+	}
+};
 
 
 /**
@@ -82,4 +68,4 @@ int do_modload(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_modload")
+MODULE_INIT(OSModLoad)

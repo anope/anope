@@ -18,38 +18,26 @@
 int do_svsnick(User * u);
 void myOperServHelp(User * u);
 
-/**
- * Create the command, and tell anope about it.
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSSVSNick : public Module
 {
-    Command *c;
+ public:
+	OSSVSNick(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion("$Id$");
-    moduleSetType(CORE);
+		moduleAddAuthor("Anope");
+		moduleAddVersion("$Id$");
+		moduleSetType(CORE);
 
-    c = createCommand("SVSNICK", do_svsnick, is_services_root,
-                      OPER_HELP_SVSNICK, -1, -1, -1, -1);
-    moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		c = createCommand("SVSNICK", do_svsnick, is_services_root,
+		OPER_HELP_SVSNICK, -1, -1, -1, -1);
+		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 
-    moduleSetOperHelp(myOperServHelp);
-    if (!ircd->svsnick) {
-        return MOD_STOP;
-    }
-    return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-
-}
+		moduleSetOperHelp(myOperServHelp);
+		if (!ircd->svsnick)
+			throw ModuleException("Your IRCd does not support SVSNICK");
+	}
+};
 
 
 /**
@@ -124,4 +112,4 @@ int do_svsnick(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT("os_svsnick")
+MODULE_INIT(OSSVSNick)

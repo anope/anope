@@ -39,32 +39,27 @@ void mAddLanguages(void);
 #define TBAN_HELP_DETAIL    2
 #define TBAN_RESPONSE       3
 
-int AnopeInit(int argc, char **argv)
+class CSTBan : public Module
 {
-    Command *c;
-    int status = 0;
+ public:
+	CSTBan(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleSetChanHelp(myHelp);
-    c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
-    moduleAddHelp(c, myFullHelp);
-    status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		moduleSetChanHelp(myHelp);
+		c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, myFullHelp);
+		moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
-    mAddLanguages();
+		mAddLanguages();
 
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
+	}
+};
 
-    if (status != MOD_ERR_OK) {
-        return MOD_STOP;
-    }
-    return MOD_CONT;
-}
 
-void AnopeFini(void)
-{
-    /* module is unloading */
-}
 
 void myHelp(User * u)
 {
@@ -249,4 +244,4 @@ void mAddLanguages(void)
 
 /* EOF */
 
-MODULE_INIT("cs_tban")
+MODULE_INIT(CSTBan)

@@ -30,46 +30,33 @@ int NSEmailMax = 0;
 #define LNG_NSEMAILMAX_REACHED		0
 #define LNG_NSEMAILMAX_REACHED_ONE	1
 
-int AnopeInit(int argc, char **argv)
+class NSMaxEmail : public Module
 {
-    Command *c;
-    EvtHook *evt;
-    int status;
+ public:
+	NSMaxEmail(const std::string &creator) : Module(creator)
+	{
+		Command *c;
+		EvtHook *evt;
+		int status;
 
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-    c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1,
-                      -1);
-    if ((status = moduleAddCommand(NICKSERV, c, MOD_HEAD))) {
-        alog("[ns_maxemail] Unable to create REGISTER command: %d",
-             status);
-        return MOD_STOP;
-    }
+		c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		c = createCommand("SET", my_ns_set, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
-    c = createCommand("SET", my_ns_set, NULL, -1, -1, -1, -1, -1);
-    if ((status = moduleAddCommand(NICKSERV, c, MOD_HEAD))) {
-        alog("[ns_maxemail] Unable to create SET command: %d", status);
-        return MOD_STOP;
-    }
+		evt = createEventHook(EVENT_RELOAD, my_event_reload);
+		if ((status = moduleAddEventHook(evt)))
+		throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
 
-    evt = createEventHook(EVENT_RELOAD, my_event_reload);
-    if ((status = moduleAddEventHook(evt))) {
-        alog("[ns_maxemail] Unable to hook to EVENT_RELOAD: %d", status);
-        return MOD_STOP;
-    }
+		my_load_config();
+		my_add_languages();
+	}
+};
 
-    my_load_config();
-    my_add_languages();
-
-    return MOD_CONT;
-}
-
-void AnopeFini(void)
-{
-    /* Nothing to do while unloading */
-}
 
 int count_email_in_use(char *email, User * u)
 {
@@ -227,4 +214,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT("ns_maxemail")
+MODULE_INIT(NSMaxEmail)

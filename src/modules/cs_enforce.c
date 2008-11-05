@@ -32,33 +32,28 @@ void my_add_languages(void);
 #define LNG_CHAN_HELP_ENFORCE_R_DISABLED        4
 #define LNG_CHAN_RESPONSE                       5
 
-int AnopeInit(int argc, char **argv)
+class CSEnforce : public Module
 {
-    Command *c;
-    int status;
+ public:
+	CSEnforce(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-    c = createCommand("ENFORCE", my_cs_enforce, NULL, -1, -1, -1, -1, -1);
-    if ((status = moduleAddCommand(CHANSERV, c, MOD_HEAD))) {
-        alog("[cs_enforce] Unable to create ENFORCE command: %d", status);
-        return MOD_STOP;
-    }
+		c = createCommand("ENFORCE", my_cs_enforce, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
-    moduleAddHelp(c, my_cs_help_enforce);
-    moduleSetChanHelp(my_cs_help);
+		moduleAddHelp(c, my_cs_help_enforce);
+		moduleSetChanHelp(my_cs_help);
 
-    my_add_languages();
+		my_add_languages();
+	}
+};
 
-    return MOD_CONT;
-}
 
-void AnopeFini(void)
-{
-    /* Nothing to clean up */
-}
 
 /* Enforcing functions */
 void do_enforce_secureops(Channel * c)
@@ -478,4 +473,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT("cs_enforce")
+MODULE_INIT(CSEnforce)

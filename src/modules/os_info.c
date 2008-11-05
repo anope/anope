@@ -61,74 +61,68 @@ int mEventReload(int argc, char **argv);
 
 /*************************************************************************/
 
-/**
- * AnopeInit is called when the module is loaded
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class OSInfo : public Module
 {
-    Command *c;
-    EvtHook *hook = NULL;
+ public:
+	OSInfo(const std::string &creator) : Module(creator)
+	{
+		Command *c;
+		EvtHook *hook = NULL;
 
-    int status;
+		int status;
 
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-    alog("os_info: Loading configuration directives...");
-    if (mLoadConfig()) {
-        return MOD_STOP;
-    }
+		if (mLoadConfig())
+			throw ModuleException("Unable to load config");
 
-    c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
-    moduleAddHelp(c, mNickHelp);
-    status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, mNickHelp);
+		status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
-    c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
+		c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
+		status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
 
-    c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
-    moduleAddHelp(c, mChanHelp);
-    status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, mChanHelp);
+		status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
-    c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
-    status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
+		c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
+		status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
-    hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-    status = moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_DB_SAVING, mSaveData);
+		status = moduleAddEventHook(hook);
 
-    hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-    status = moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
+		status = moduleAddEventHook(hook);
 
-    hook = createEventHook(EVENT_RELOAD, mEventReload);
-    status = moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_RELOAD, mEventReload);
+		status = moduleAddEventHook(hook);
 
-    moduleSetNickHelp(mMainNickHelp);
-    moduleSetChanHelp(mMainChanHelp);
+		moduleSetNickHelp(mMainNickHelp);
+		moduleSetChanHelp(mMainChanHelp);
 
-    mLoadData();
-    m_AddLanguages();
+		mLoadData();
+		m_AddLanguages();
+	}
 
-    return MOD_CONT;
-}
+	~OSInfo()
+	{
+		char *av[1];
 
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-    char *av[1];
+		av[0] = sstrdup(EVENT_START);
+		mSaveData(1, av);
+		free(av[0]);
 
-    av[0] = sstrdup(EVENT_START);
-    mSaveData(1, av);
-    free(av[0]);
+		if (OSInfoDBName)
+			free(OSInfoDBName);
+	}
+};
 
-    if (OSInfoDBName)
-        free(OSInfoDBName);
-}
+
+
 
 /*************************************************************************/
 
@@ -779,4 +773,4 @@ void mMainChanHelp(User * u)
 
 /* EOF */
 
-MODULE_INIT("os_info")
+MODULE_INIT(OSInfo)

@@ -76,55 +76,47 @@ int reload_config(int argc, char **argv);
 
 /* ------------------------------------------------------------------------------- */
 
-/**
- * AnopeInit is called when the module is loaded
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv) {
-	EvtHook *hook;
-	IgnoreDB = NULL;
+class OSIgnoreDB : public Module
+{
+ public:
+	OSIgnoreDB(const std::string &creator) : Module(creator)
+	{
+		EvtHook *hook;
+		IgnoreDB = NULL;
 
-	moduleAddAuthor(AUTHOR);
-	moduleAddVersion(VERSION);
-	moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-	hook = createEventHook(EVENT_RELOAD, reload_config);
-	if (moduleAddEventHook(hook) != MOD_ERR_OK) {
-		alog("[\002os_ignore_db\002] Can't hook to EVENT_RELOAD event");
-		return MOD_STOP;
+		hook = createEventHook(EVENT_RELOAD, reload_config);
+		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+			throw ModuleException("os_ignore_db: Can't hook to EVENT_RELOAD event");
+
+		hook = createEventHook(EVENT_DB_SAVING, save_ignoredb);
+		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+			throw ModuleException("os_ignore_db: Can't hook to EVENT_DB_SAVING event");
+
+		hook = createEventHook(EVENT_DB_BACKUP, backup_ignoredb);
+		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+			throw ModuleException("os_ignore_db: Can't hook to EVENT_DB_BACKUP event");
+
+		load_config();
+		/* Load the ignore database and re-add them to anopes ignorelist. */
+		load_ignore_db();
 	}
 
-	hook = createEventHook(EVENT_DB_SAVING, save_ignoredb);
-	if (moduleAddEventHook(hook) != MOD_ERR_OK) {
-		alog("[\002os_ignore_db\002] Can't hook to EVENT_DB_SAVING event");
-		return MOD_STOP;
+	~OSIgnoreDB()
+	{
+		/* Save the ignore database before bailing out.. */
+		save_ignore_db();
+
+		if (IgnoreDB)
+			free(IgnoreDB);
 	}
+};
 
-	hook = createEventHook(EVENT_DB_BACKUP, backup_ignoredb);
-	if (moduleAddEventHook(hook) != MOD_ERR_OK) {
-		alog("[\002os_ignore_db\002] Can't hook to EVENT_DB_BACKUP event");
-		return MOD_STOP;
-	}
 
-	load_config();
-	/* Load the ignore database and re-add them to anopes ignorelist. */
-	load_ignore_db();
 
-	return MOD_CONT;
-}
-
-/**
- * Unload the module
- **/
-void AnopeFini(void) {
-	/* Save the ignore database before bailing out.. */
-	save_ignore_db();
-	
-	if (IgnoreDB)
-		free(IgnoreDB);
-}
 
 /* ------------------------------------------------------------------------------- */
 
@@ -542,4 +534,4 @@ void fill_db_ptr(DBFile *dbptr, int version, int core_version,
 	return;
 }
 
-/* EOF */
+MODULE_INIT(OSIgnoreDB)

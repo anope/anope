@@ -59,39 +59,32 @@ void m_AddLanguages(void);
 
 /*************************************************************************/
 
-/**
- * AnopeInit is called when the module is loaded
- * @param argc Argument count
- * @param argv Argument list
- * @return MOD_CONT to allow the module, MOD_STOP to stop it
- **/
-int AnopeInit(int argc, char **argv)
+class NSNOOPConvert : public Module
 {
-    NSAutoOPDBName = NULL;
+ public:
+	NSNOOPConvert(const std::string &creator) : Module(creator)
+	{
+		NSAutoOPDBName = NULL;
 
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-    if (mLoadConfig(0, NULL))
-        return MOD_STOP;
+		if (mLoadConfig(0, NULL))
+			throw ModuleException("Couldn't load config?");
 
-    mLoadData();
-	
-    alog("ns_noop_convert: Your auto-op database has been converted and this module will now");
-    alog("ns_noop_convert: unload itself.  You can now remove this module from your config");
+		mLoadData();
 
-    return MOD_STOP;
-}
+		alog("ns_noop_convert: Your auto-op database has been converted and this module will now");
+		alog("ns_noop_convert: unload itself.  You can now remove this module from your config");
+	}
 
-/**
- * Unload the module
- **/
-void AnopeFini(void)
-{
-    if (NSAutoOPDBName)
-        free(NSAutoOPDBName);
-}
+	~NSNOOPConvert()
+	{
+		if (NSAutoOPDBName)
+			free(NSAutoOPDBName);
+	}
+};
 
 /*************************************************************************/
 
@@ -172,4 +165,4 @@ int mLoadConfig(int argc, char **argv)
 
 /* EOF */
 
-MODULE_INIT("ns_noop_convert")
+MODULE_INIT(NSNOOPConvert)

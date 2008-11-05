@@ -83,73 +83,66 @@ void my_add_languages(void);
 
 HostCore *hs_request_head;
 
-int AnopeInit(int argc, char **argv)
+class HSRequest : public Module
 {
-    Command *c;
-    EvtHook *hook;
+ public:
+	HSRequest(const std::string &creator) : Module(creator)
+	{
+		Command *c;
+		EvtHook *hook;
 
-    c = createCommand("request", hs_do_request, nick_identified, -1, -1,
-                      -1, -1, -1);
-    moduleAddHelp(c, hs_help_request);
-    moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		c = createCommand("request", hs_do_request, nick_identified, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, hs_help_request);
+		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("activate", hs_do_activate, is_host_setter, -1, -1,
-                      -1, -1, -1);
-    moduleAddHelp(c, hs_help_activate);
-    moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		c = createCommand("activate", hs_do_activate, is_host_setter, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, hs_help_activate);
+		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("reject", hs_do_reject, is_host_setter, -1, -1, -1,
-                      -1, -1);
-    moduleAddHelp(c, hs_help_reject);
-    moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		c = createCommand("reject", hs_do_reject, is_host_setter, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, hs_help_reject);
+		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("waiting", hs_do_waiting, is_host_setter, -1, -1, -1,
-                      -1, -1);
-    moduleAddHelp(c, hs_help_waiting);
-    moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		c = createCommand("waiting", hs_do_waiting, is_host_setter, -1, -1, -1, -1, -1);
+		moduleAddHelp(c, hs_help_waiting);
+		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("list", hs_do_list_out, is_services_oper, -1, -1, -1,
-                      -1, -1);
-    moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		c = createCommand("list", hs_do_list_out, is_services_oper, -1, -1, -1, -1, -1);
+		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
-    c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1);
-    moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1); 
+		moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
-    hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
-    moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
+		moduleAddEventHook(hook);
 
-    hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
-    moduleAddEventHook(hook);
+		hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
+		moduleAddEventHook(hook);
 
-    moduleSetHostHelp(hs_help);
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
-    moduleSetType(SUPPORTED);
+		moduleSetHostHelp(hs_help);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-    my_load_config();
-    my_add_languages();
-    hs_request_head = NULL;
+		my_load_config();
+		my_add_languages();
+		hs_request_head = NULL;
 
-    if (debug)
-        alog("[hs_request] Loading database...");
-    hsreq_load_db();
-    alog("hs_request loaded");
-    return MOD_CONT;
-}
+		hsreq_load_db();
+	}
 
-void AnopeFini(void)
-{
-    if (debug)
-        alog("[hs_request] Saving database...");
-    hsreq_save_db();
+	~HSRequest()
+	{
+		hsreq_save_db();
 
-    /* Clean up all open host requests */
-    while (hs_request_head)
-        hs_request_head = deleteHostCore(hs_request_head, NULL);
+		/* Clean up all open host requests */
+		while (hs_request_head)
+			hs_request_head = deleteHostCore(hs_request_head, NULL);
 
-    free(HSRequestDBName);
-    alog("hs_request un-loaded");
-}
+		free(HSRequestDBName);
+	}
+};
+
 
 int hs_do_request(User * u)
 {
@@ -986,4 +979,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT("hs_request")
+MODULE_INIT(HSRequest)

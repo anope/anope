@@ -21,22 +21,22 @@
 #define AUTHOR "SGR"
 #define VERSION "$Id$"
 
-  /* ------------------------------------------------------------
-   * Name: cs_appendtopic
-   * Author: SGR <Alex_SGR@ntlworld.com>
-   * Date: 31/08/2003
-   * ------------------------------------------------------------
-   *
-   * This module has no configurable options. For information on
-   * this module, load it and refer to /ChanServ APPENDTOPIC HELP
-   *
-   * Thanks to dengel, Rob and Certus for all there support.
-   * Especially Rob, who always manages to show me where I have
-   * not allocated any memory. Even if it takes a few weeks of
-   * pestering to get him to look at it.
-   *
-   * ------------------------------------------------------------
-   */
+/* ------------------------------------------------------------
+ * Name: cs_appendtopic
+ * Author: SGR <Alex_SGR@ntlworld.com>
+ * Date: 31/08/2003
+ * ------------------------------------------------------------
+ *
+ * This module has no configurable options. For information on
+ * this module, load it and refer to /ChanServ APPENDTOPIC HELP
+ *
+ * Thanks to dengel, Rob and Certus for all there support.
+ * Especially Rob, who always manages to show me where I have
+ * not allocated any memory. Even if it takes a few weeks of
+ * pestering to get him to look at it.
+ *
+ * ------------------------------------------------------------
+ */
 
 /* ---------------------------------------------------------------------- */
 /* DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING		  */
@@ -53,36 +53,25 @@ void my_cs_help(User * u);
 int my_cs_help_appendtopic(User * u);
 void my_add_languages(void);
 
-int AnopeInit(int argc, char **argv)
+class CSAppendTopic : public Module
 {
-	Command *c;
-	int status;
+ public:
+	CSAppendTopic(const std::string &creator) : Module(creator)
+	{
+		Command *c;
 
-	moduleAddAuthor(AUTHOR);
-	moduleAddVersion(VERSION);
-	moduleSetType(SUPPORTED);
+		moduleAddAuthor(AUTHOR);
+		moduleAddVersion(VERSION);
+		moduleSetType(SUPPORTED);
 
-	c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1,
-					  -1, -1);
-	if ((status = moduleAddCommand(CHANSERV, c, MOD_HEAD))) {
-		alog("[cs_appendtopic] Unable to create APPENDTOPIC command: %d",
-			 status);
-		return MOD_STOP;
+		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);
+		moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		moduleAddHelp(c, my_cs_help_appendtopic);
+		moduleSetChanHelp(my_cs_help);
+
+		my_add_languages();
 	}
-	moduleAddHelp(c, my_cs_help_appendtopic);
-	moduleSetChanHelp(my_cs_help);
-
-	my_add_languages();
-
-	alog("[cs_appendtopic] Loaded successfully");
-
-	return MOD_CONT;
-}
-
-void AnopeFini(void)
-{
-	alog("[cs_appendtopic] Unloaded successfully");
-}
+};
 
 void my_cs_help(User * u)
 {
@@ -246,4 +235,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT("cs_appendtopic")
+MODULE_INIT(CSAppendTopic)

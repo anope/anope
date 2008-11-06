@@ -189,7 +189,7 @@ extern int strncasecmp(const char *, const char *, size_t);
  */
 #ifdef _WIN32
 	#define MODULE_INIT(y) \
-		extern "C" DllExport Module *init_module(const std::string &creator) \
+		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
 			return new y(creator); \
 		} \
@@ -205,7 +205,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 		}
 #else
 	#define MODULE_INIT(y) \
-		extern "C" DllExport Module *init_module(const std::string &creator) \
+		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
 			return new y(creator); \
 		}

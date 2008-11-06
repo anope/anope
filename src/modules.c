@@ -102,7 +102,7 @@ void modules_init(void)
             m = createModule(ModulesAutoload[idx]);
             mod_current_module = m;
             mod_current_user = NULL;
-            alog("trying to load [%s]", mod_current_module->name);
+            alog("trying to load [%s]", mod_current_module->name.c_str());
 			ret = loadModule(mod_current_module, NULL);
             alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
 			if (ret != MOD_ERR_OK)
@@ -132,7 +132,7 @@ void modules_core_init(int number, char **list)
             status = loadModule(mod_current_module, NULL);
             if (debug || status) {
                 alog("debug: trying to load core module [%s]",
-                     mod_current_module->name);
+                     mod_current_module->name.c_str());
                 alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
 				if (status != MOD_ERR_OK)
 					destroyModule(mod_current_module);
@@ -152,7 +152,7 @@ int encryption_module_init(void) {
     m = createModule(EncModule);
     mod_current_module = m;
     mod_current_user = NULL;
-    alog("Loading Encryption Module: [%s]", mod_current_module->name);
+    alog("Loading Encryption Module: [%s]", mod_current_module->name.c_str());
     ret = loadModule(mod_current_module, NULL);
     moduleSetType(ENCRYPTION);
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
@@ -174,7 +174,7 @@ int protocol_module_init(void)
     m = createModule(IRCDModule);
     mod_current_module = m;
     mod_current_user = NULL;
-    alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name);
+    alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name.c_str());
     ret = loadModule(mod_current_module, NULL);
     moduleSetType(PROTOCOL);
     alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
@@ -228,7 +228,7 @@ void modules_delayed_init(void)
             m = createModule(ModulesDelayedAutoload[idx]);
             mod_current_module = m;
             mod_current_user = NULL;
-            alog("trying to load [%s]", mod_current_module->name);
+            alog("trying to load [%s]", mod_current_module->name.c_str());
 			ret = loadModule(mod_current_module, NULL);
             alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
@@ -264,7 +264,7 @@ void modules_unload_all(bool fini, bool unload_proto)
 			    if(fini) {
 			        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
 		    	    if (func) {
-		        	    mod_current_module_name = mh->m->name;
+		        	    mod_current_module_name = mh->m->name.c_str();
 		            	func();                 /* exec AnopeFini */
 			            mod_current_module_name = NULL;
 			        }
@@ -287,9 +287,9 @@ void modules_unload_all(bool fini, bool unload_proto)
 	}
 }
 
-Module::Module(const std::string &creator)
+Module::Module(const std::string &mname, const std::string &creator)
 {
-	this->name = NULL; //XXX: we need another param on module constructors sstrdup(filename);        /* Our Name */
+	this->name = mname;				/* Our name */
 	this->handle = NULL;           /* Handle */
 	this->version = NULL;
 	this->author = NULL;
@@ -302,7 +302,7 @@ Module::Module(const std::string &creator)
 	this->helpHelp = NULL;
 	this->type = THIRD;
 
-	for (i = 0; i < NUM_LANGS; i++)
+	for (int i = 0; i < NUM_LANGS; i++)
 	{
 		this->lang[i].argc = 0;
 	}
@@ -354,7 +354,7 @@ int addModule(Module * m)
     index = CMD_HASH(m->name);
 
     for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (stricmp(m->name, current->name) == 0)
+        if (m->name ==current->name)
             return MOD_ERR_EXISTS;
         lastHash = current;
     }
@@ -364,7 +364,7 @@ int addModule(Module * m)
     }
     m->time = time(NULL);
     newHash->next = NULL;
-    newHash->name = sstrdup(m->name);
+    newHash->name = sstrdup(m->name.c_str());
     newHash->m = m;
 
     if (lastHash == NULL)
@@ -392,7 +392,7 @@ int delModule(Module * m)
     index = CMD_HASH(m->name);
 
     for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (stricmp(m->name, current->name) == 0) {
+        if (m->name == current->name) {
             if (!lastHash) {
                 MODULE_HASH[index] = current->next;
             } else {
@@ -542,19 +542,16 @@ int loadModule(Module * m, User * u)
     int len;
     const char *err;
     Module * (*func) (const std::string &);
-    int (*version)();
     int ret = 0;
-    char *argv[1];
-    int argc = 0;
 
     Module *m2;
-    if (!m || !m->name) {
+    if (!m || m->name.empty()) {
         return MOD_ERR_PARAMS;
     }
     if (m->handle) {
         return MOD_ERR_EXISTS;
     }
-    if ((m2 = findModule(m->name)) != NULL) {
+    if ((m2 = findModule(m->name.c_str())) != NULL) {
         return MOD_ERR_EXISTS;
     }
 
@@ -567,7 +564,7 @@ int loadModule(Module * m, User * u)
     strncat(buf, "runtime\\", 4095 - len);
 #endif
     len = strlen(buf);
-    strncat(buf, m->name, 4095 - len);
+    strncat(buf, m->name.c_str(), 4095 - len);
     len = strlen(buf);
     strncat(buf, MODULE_EXT, 4095 - len);
 	len = strlen(buf);
@@ -576,7 +573,7 @@ int loadModule(Module * m, User * u)
 	strncat(buf, "XXXXXX", 4095 - len);
     buf[4095] = '\0';
 	/* Don't skip return value checking! -GD */
-    if ((ret = moduleCopyFile(m->name, buf)) != MOD_ERR_OK) {
+    if ((ret = moduleCopyFile(m->name.c_str(), buf)) != MOD_ERR_OK) {
         m->filename = sstrdup(buf);
 	return ret;
 	}
@@ -596,38 +593,7 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     if (func) {
-
-/*
- * Commented out, as VERSION_BUILD doesn't currently actually work.
- * We need a nicer way to do this. -- w00t
- */
-#if 0
-	version = (int (*)())ano_modsym(m->handle,"getAnopeBuildVersion");
-	if (version) {
-        if (version() >= VERSION_BUILD ) {
-            if(debug) {
-                alog("Module %s compiled against current or newer anope revision %d, this is %d",m->name,version(),VERSION_BUILD);
-            }
-        } else {
-            alog("Module %s is compiled against an old version of anope (%d) current is %d", m->name, version(), VERSION_BUILD);
-            alog("Rebuild module %s against the current version to resolve this error", m->name);
-            ano_modclose(m->handle);
-            ano_modclearerr();
-            return MOD_ERR_NOLOAD;
-        }
-#else
-	// hack.
-	if (1) {
-#endif
-    } else {
-        ano_modclose(m->handle);
-        ano_modclearerr();
-        alog("Module %s is compiled against an older version of anope (unknown)", m->name);
-        alog("Rebuild module %s against the current version to resolve this error", m->name);
-        return MOD_ERR_NOLOAD;
-	}
-	/* TODO */
-        mod_current_module_name = m->name;
+        mod_current_module_name = m->name.c_str();
 
 		/* Create module.
 		 * XXX: we need to handle ModuleException throws here.
@@ -659,9 +625,8 @@ int loadModule(Module * m, User * u)
     }
 
     if (u) {
-        ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick,
-                         m->name);
-        notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name);
+        ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, m->name.c_str());
+        notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name.c_str());
     }
     addModule(m);
     return MOD_ERR_OK;
@@ -679,7 +644,7 @@ int unloadModule(Module * m, User * u)
 
     if (!m || !m->handle) {
         if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
+            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
         }
         return MOD_ERR_PARAMS;
     }
@@ -698,7 +663,7 @@ int unloadModule(Module * m, User * u)
 
     func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
     if (func) {
-        mod_current_module_name = m->name;
+        mod_current_module_name = m->name.c_str();
         func();                 /* exec AnopeFini */
         mod_current_module_name = NULL;
     }
@@ -710,14 +675,14 @@ int unloadModule(Module * m, User * u)
     if ((ano_modclose(m->handle)) != 0) {
         alog(ano_moderr());
         if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name);
+            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
         }
         return MOD_ERR_NOUNLOAD;
     } else {
         if (u) {
             ircdproto->SendGlobops(s_OperServ, "%s unloaded module %s", u->nick,
-                             m->name);
-            notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name);
+                             m->name.c_str());
+            notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
         }
         delModule(m);
         return MOD_ERR_OK;
@@ -762,7 +727,7 @@ int prepForUnload(Module * m)
     }
 
     /* Kill any active callbacks this module has */
-    moduleCallBackPrepForUnload(m->name);
+    moduleCallBackPrepForUnload(m->name.c_str());
 
     /* Remove any stored data this module has */
     moduleDelAllDataMod(m);
@@ -773,7 +738,7 @@ int prepForUnload(Module * m)
     for (idx = 0; idx < MAX_CMD_HASH; idx++) {
         for (current = HS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(HOSTSERV, c->name);
                 }
             }
@@ -781,7 +746,7 @@ int prepForUnload(Module * m)
 
         for (current = BS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(BOTSERV, c->name);
                 }
             }
@@ -789,7 +754,7 @@ int prepForUnload(Module * m)
 
         for (current = MS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(MEMOSERV, c->name);
                 }
             }
@@ -797,7 +762,7 @@ int prepForUnload(Module * m)
 
         for (current = NS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(NICKSERV, c->name);
                 }
             }
@@ -805,7 +770,7 @@ int prepForUnload(Module * m)
 
         for (current = CS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(CHANSERV, c->name);
                 }
             }
@@ -813,7 +778,7 @@ int prepForUnload(Module * m)
 
         for (current = HE_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (strcmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(HELPSERV, c->name);
                 }
             }
@@ -821,7 +786,7 @@ int prepForUnload(Module * m)
 
         for (current = OS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
-                if ((c->mod_name) && (stricmp(c->mod_name, m->name) == 0)) {
+                if ((c->mod_name) && (stricmp(c->mod_name, m->name.c_str()) == 0)) {
                     moduleDelCommand(OPERSERV, c->name);
                 }
             }
@@ -830,7 +795,7 @@ int prepForUnload(Module * m)
         for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent->next) {
             for (msg = mcurrent->m; msg; msg = msg->next) {
                 if ((msg->mod_name)
-                    && (stricmp(msg->mod_name, m->name) == 0)) {
+                    && (stricmp(msg->mod_name, m->name.c_str()) == 0)) {
                     moduleDelMessage(msg->name);
                 }
             }
@@ -839,8 +804,8 @@ int prepForUnload(Module * m)
         for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent->next) {
             for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
                 if ((eMsg->mod_name)
-                    && (stricmp(eMsg->mod_name, m->name) == 0)) {
-                    status = delEventHandler(EVENT, eMsg, m->name);
+                    && (stricmp(eMsg->mod_name, m->name.c_str()) == 0)) {
+                    status = delEventHandler(EVENT, eMsg, m->name.c_str());
                 }
             }
         }
@@ -848,8 +813,8 @@ int prepForUnload(Module * m)
              ehcurrent = ehcurrent->next) {
             for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {
                 if ((eHook->mod_name)
-                    && (stricmp(eHook->mod_name, m->name) == 0)) {
-                    status = delEventHook(EVENTHOOKS, eHook, m->name);
+                    && (stricmp(eHook->mod_name, m->name.c_str()) == 0)) {
+                    status = delEventHook(EVENTHOOKS, eHook, m->name.c_str());
                 }
             }
         }
@@ -997,7 +962,7 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
     }                           /* shouldnt happen */
     c->core = 0;
     if (!c->mod_name) {
-        c->mod_name = sstrdup(mod_current_module->name);
+        c->mod_name = sstrdup(mod_current_module->name.c_str());
     }
 
 
@@ -1081,11 +1046,11 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
 
     for (cmd = c; cmd; cmd = cmd->next) {
         if (cmd->mod_name
-            && stricmp(cmd->mod_name, mod_current_module->name) == 0) {
+            && cmd->mod_name == mod_current_module->name) {
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
-            status = delCommand(cmdTable, cmd, mod_current_module->name);
+            status = delCommand(cmdTable, cmd, mod_current_module->name.c_str());
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
@@ -1521,7 +1486,7 @@ int moduleAddMessage(Message * m, int pos)
     }                           /* shouldnt happen */
     m->core = 0;
     if (!m->mod_name) {
-        m->mod_name = sstrdup(mod_current_module->name);
+        m->mod_name = sstrdup(mod_current_module->name.c_str());
     }
 
     status = addMessage(IRCD, m, pos);
@@ -1549,7 +1514,7 @@ int moduleDelMessage(char *name)
         return MOD_ERR_NOEXIST;
     }
 
-    status = delMessage(IRCD, m, mod_current_module->name);
+    status = delMessage(IRCD, m, mod_current_module->name.c_str());
     if (debug) {
         displayMessageFromHash(m->name);
     }
@@ -2279,7 +2244,7 @@ void moduleDelAllDataMod(Module * m)
     ChannelInfo *ci;
 
     if (!mod_current_module_name) {
-        mod_current_module_name = sstrdup(m->name);
+        mod_current_module_name = sstrdup(m->name.c_str());
         freeme = true;
     }
 
@@ -2539,12 +2504,12 @@ void moduleInsertLanguage(int langNumber, int ac, const char **av)
 {
     int i;
 
-    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
+    if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
         mod_current_module = findModule(mod_current_module_name);
     }
 
 	if (debug)
-		alog("debug: %s Adding %d texts for language %d", mod_current_module->name, ac, langNumber);
+		alog("debug: %s Adding %d texts for language %d", mod_current_module->name.c_str(), ac, langNumber);
 
     if (mod_current_module->lang[langNumber].argc > 0) {
         moduleDeleteLanguage(langNumber);
@@ -2573,7 +2538,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
     int lang = NSDefLanguage;
     char *s, *t, *buf;
 
-    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
+    if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
         mod_current_module = findModule(mod_current_module_name);
     }
 
@@ -2606,7 +2571,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
         }
 		free(buf);
     } else {
-        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
+        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
     }
 }
 
@@ -2620,7 +2585,7 @@ char *moduleGetLangString(User * u, int number)
 {
     int lang = NSDefLanguage;
 
-    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name)))
+    if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name))
         mod_current_module = findModule(mod_current_module_name);
 
     /* Find the users lang, and use it if we can */
@@ -2639,7 +2604,7 @@ char *moduleGetLangString(User * u, int number)
 	 * would happen!
 	 */
 	} else {
-        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
+        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
 		return "";
     }
 }
@@ -2651,7 +2616,7 @@ char *moduleGetLangString(User * u, int number)
 void moduleDeleteLanguage(int langNumber)
 {
     int idx = 0;
-    if ((mod_current_module_name) && (!mod_current_module || strcmp(mod_current_module_name, mod_current_module->name))) {
+    if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
         mod_current_module = findModule(mod_current_module_name);
     }
     for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {

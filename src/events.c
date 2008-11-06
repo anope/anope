@@ -501,7 +501,7 @@ int moduleAddEventHandler(EvtMessage * evm)
     }                           /* shouldnt happen */
     evm->core = 0;
     if (!evm->mod_name) {
-        evm->mod_name = sstrdup(mod_current_module->name);
+        evm->mod_name = sstrdup(mod_current_module->name.c_str());
     }
 
     status = addEventHandler(EVENT, evm);
@@ -534,7 +534,7 @@ int moduleAddEventHook(EvtHook * evh)
     }                           /* shouldnt happen */
     evh->core = 0;
     if (!evh->mod_name) {
-        evh->mod_name = sstrdup(mod_current_module->name);
+        evh->mod_name = sstrdup(mod_current_module->name.c_str());
     }
 
     status = addEventHook(EVENTHOOKS, evh);
@@ -562,7 +562,7 @@ int moduleEventDelHandler(char *name)
         return MOD_ERR_NOEXIST;
     }
 
-    status = delEventHandler(EVENT, evm, mod_current_module->name);
+    status = delEventHandler(EVENT, evm, mod_current_module->name.c_str());
     if (debug) {
         displayEvtMessageFromHash(evm->name);
     }
@@ -587,7 +587,7 @@ int moduleEventDelHook(const char *name)
         return MOD_ERR_NOEXIST;
     }
 
-    status = delEventHook(EVENTHOOKS, evh, mod_current_module->name);
+    status = delEventHook(EVENTHOOKS, evh, mod_current_module->name.c_str());
     if (debug) {
         displayHookFromHash(evh->name);
     }
@@ -602,7 +602,7 @@ int moduleEventDelHook(const char *name)
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
 int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
-                    char *mod_name)
+                    const char *mod_name)
 {
     int index = 0;
     EvtMessageHash *current = NULL;
@@ -675,7 +675,7 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
 int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
-                 char *mod_name)
+                 const char *mod_name)
 {
     int index = 0;
     EvtHookHash *current = NULL;

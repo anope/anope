@@ -136,7 +136,7 @@ class Module
 {
  public:
 	// XXX :(
-	char *name;
+	std::string name;
 	char *filename;
 	void *handle;
 	time_t time;
@@ -159,7 +159,7 @@ class Module
 	/** Creates and initialises a new module.
 	 * @param loadernick The nickname of the user loading the module.
 	 */
-	Module(const std::string &loadernick);
+	Module(const std::string &modname, const std::string &loadernick);
 
 	/** Destroys a module, freeing resources it has allocated.
 	 */
@@ -333,7 +333,7 @@ EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
 int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 MDE int moduleAddEventHandler(EvtMessage * evm);
 MDE int moduleEventDelHandler(char *name);
-int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, char *mod_name);
+int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, const char *mod_name);
 int destroyEventHandler(EvtMessage * evm);
 int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 
@@ -342,7 +342,7 @@ EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
 int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
 MDE int moduleAddEventHook(EvtHook * evh);
 MDE int moduleEventDelHook(const char *name);
-int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, char *mod_name);
+int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_name);
 int destroyEventHook(EvtHook * evh);
 
 MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);

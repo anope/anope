@@ -133,4 +133,4 @@ int do_fantasy(int argc, char **argv)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSFantasySeen)
+MODULE_INIT("bs_fantasy_seen", BSFantasySeen)

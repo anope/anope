@@ -106,4 +106,4 @@ int do_cs_topic(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSTopic)
+MODULE_INIT("cs_topic", CSTopic)

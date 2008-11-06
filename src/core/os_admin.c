@@ -231,4 +231,4 @@ int admin_list(int number, NickCore * nc, User * u, int *sent_header)
     return 1;
 }
 
-MODULE_INIT(OSAdmin)
+MODULE_INIT("os_admin", OSAdmin)

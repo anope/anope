@@ -654,4 +654,4 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci)
 }
 
 
-MODULE_INIT(CSAKick)
+MODULE_INIT("cs_akick", CSAKick)

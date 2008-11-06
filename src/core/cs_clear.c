@@ -358,4 +358,4 @@ int do_clear(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSClear)
+MODULE_INIT("cs_clear", CSClear)

@@ -233,4 +233,4 @@ int do_list(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSList)
+MODULE_INIT("ns_list", NSList)

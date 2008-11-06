@@ -119,4 +119,4 @@ int do_chankill(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSChanKill)
+MODULE_INIT("os_chankill", OSChanKill)

@@ -75,4 +75,4 @@ int do_unassign(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSUnassign)
+MODULE_INIT("bs_unassign", BSUnassign)

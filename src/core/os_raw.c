@@ -63,4 +63,4 @@ int do_raw(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSRaw)
+MODULE_INIT("os_raw", OSRaw)

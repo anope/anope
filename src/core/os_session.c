@@ -53,4 +53,4 @@ void myOperServHelp(User * u)
     }
 }
 
-MODULE_INIT(OSSession)
+MODULE_INIT("os_session", OSSession)

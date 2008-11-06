@@ -86,4 +86,4 @@ int do_os_kick(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSKick)
+MODULE_INIT("os_kick", OSKick)

@@ -76,4 +76,4 @@ int do_invite(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSInvite)
+MODULE_INIT("cs_invite", CSInvite)

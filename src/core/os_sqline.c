@@ -342,4 +342,4 @@ int sqline_list_callback(SList * slist, int number, void *item,
     return sqline_list(number, (SXLine *)item, u, sent_header);
 }
 
-MODULE_INIT(OSSQLine)
+MODULE_INIT("os_sqline", OSSQLine)

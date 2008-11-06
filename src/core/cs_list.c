@@ -184,4 +184,4 @@ int do_list(User * u)
 
 }
 
-MODULE_INIT(CSList)
+MODULE_INIT("cs_list", CSList)

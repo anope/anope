@@ -84,4 +84,4 @@ int reload_config(int argc, char **argv) {
 }
 
 
-MODULE_INIT(OSOperNews)
+MODULE_INIT("os_opernews", OSOperNews)

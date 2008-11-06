@@ -165,4 +165,4 @@ int do_setall(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSSetAll)
+MODULE_INIT("hs_setall", HSSetAll)

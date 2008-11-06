@@ -78,4 +78,4 @@ int do_jupe(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSJupe)
+MODULE_INIT("os_jupe", OSJupe)

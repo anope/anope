@@ -270,4 +270,4 @@ int do_info(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSInfo)
+MODULE_INIT("ns_info", NSInfo)

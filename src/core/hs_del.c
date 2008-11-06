@@ -78,4 +78,4 @@ int do_del(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSDel)
+MODULE_INIT("hs_del", HSDel)

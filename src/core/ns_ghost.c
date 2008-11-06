@@ -108,4 +108,4 @@ int do_ghost(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSGhost)
+MODULE_INIT("ns_ghost", NSGhost)

@@ -115,4 +115,4 @@ int do_drop(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSDrop)
+MODULE_INIT("cs_drop", CSDrop)

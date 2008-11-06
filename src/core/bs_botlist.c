@@ -93,4 +93,4 @@ int do_botlist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSBotList)
+MODULE_INIT("bs_botlist", BSBotList)

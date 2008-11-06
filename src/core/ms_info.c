@@ -217,4 +217,4 @@ int do_info(User * u)
     return MOD_CONT;            /* if (name && (ci || na->nc != u->na->nc)) */
 }
 
-MODULE_INIT(MSInfo)
+MODULE_INIT("ms_info", MSInfo)

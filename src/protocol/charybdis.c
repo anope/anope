@@ -1352,4 +1352,4 @@ class ProtoCharybdis : public Module
 
 /* EOF */
 
-MODULE_INIT(ProtoCharybdis)
+MODULE_INIT("charybdis", ProtoCharybdis)

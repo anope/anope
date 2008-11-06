@@ -84,4 +84,4 @@ int do_fantasy(int argc, char **argv)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSFantasyKick)
+MODULE_INIT("bs_fantasy_kick", BSFantasyKick)

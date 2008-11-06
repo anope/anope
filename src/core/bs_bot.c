@@ -334,4 +334,4 @@ int do_bot(User * u)
 }
 
 
-MODULE_INIT(BSBot)
+MODULE_INIT("bs_bot", BSBot)

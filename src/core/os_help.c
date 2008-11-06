@@ -53,4 +53,4 @@ int do_help(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSHelp)
+MODULE_INIT("os_help", OSHelp)

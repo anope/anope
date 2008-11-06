@@ -349,4 +349,4 @@ int sgline_list_callback(SList * slist, int number, void *item,
     return sgline_list(number, (SXLine *)item, u, sent_header);
 }
 
-MODULE_INIT(OSSGLine)
+MODULE_INIT("os_sgline", OSSGLine)

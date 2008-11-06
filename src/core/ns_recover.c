@@ -125,4 +125,4 @@ int do_recover(User * u)
 
 /* EOF */
 
-MODULE_INIT(NSRecover)
+MODULE_INIT("ns_recover", NSRecover)

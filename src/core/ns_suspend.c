@@ -176,4 +176,4 @@ int do_unsuspend(User * u)
 
 }
 
-MODULE_INIT(NSSuspend)
+MODULE_INIT("ns_suspend", NSSuspend)

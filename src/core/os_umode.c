@@ -110,4 +110,4 @@ int do_operumodes(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSUMode)
+MODULE_INIT("os_umode", OSUMode)

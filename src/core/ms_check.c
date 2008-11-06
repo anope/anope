@@ -104,4 +104,4 @@ int do_memocheck(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(MSCheck)
+MODULE_INIT("ms_check", MSCheck)

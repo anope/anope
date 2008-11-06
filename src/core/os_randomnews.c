@@ -51,4 +51,4 @@ void myOperServHelp(User * u)
     }
 }
 
-MODULE_INIT(OSRandomNews)
+MODULE_INIT("os_randomnews", OSRandomNews)

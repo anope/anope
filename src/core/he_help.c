@@ -63,4 +63,4 @@ int do_help(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HEHelp)
+MODULE_INIT("he_help", HEHelp)

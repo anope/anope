@@ -214,4 +214,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT(NSMaxEmail)
+MODULE_INIT("ns_maxemail", NSMaxEmail)

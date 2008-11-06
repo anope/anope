@@ -238,4 +238,4 @@ int do_set(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSSet)
+MODULE_INIT("os_set", OSSet)

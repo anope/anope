@@ -130,4 +130,4 @@ int do_ignorelist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSIgnore)
+MODULE_INIT("os_ignore", OSIgnore)

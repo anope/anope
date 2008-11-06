@@ -102,4 +102,4 @@ int do_identify(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSIdentify)
+MODULE_INIT("cs_identify", CSIdentify)

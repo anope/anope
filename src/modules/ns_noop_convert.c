@@ -165,4 +165,4 @@ int mLoadConfig(int argc, char **argv)
 
 /* EOF */
 
-MODULE_INIT(NSNOOPConvert)
+MODULE_INIT("ns_noop_convert", NSNOOPConvert)

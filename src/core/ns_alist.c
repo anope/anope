@@ -171,4 +171,4 @@ int do_alist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSAList)
+MODULE_INIT("ns_alist", NSAList)

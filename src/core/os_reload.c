@@ -70,4 +70,4 @@ int do_reload(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSReload)
+MODULE_INIT("os_reload", OSReload)

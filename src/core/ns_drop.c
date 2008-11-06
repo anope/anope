@@ -141,4 +141,4 @@ int do_unlink(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSDrop)
+MODULE_INIT("ns_drop", NSDrop)

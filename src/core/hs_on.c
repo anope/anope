@@ -89,4 +89,4 @@ int do_on(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSOn)
+MODULE_INIT("hs_on", HSOn)

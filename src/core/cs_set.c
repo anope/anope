@@ -801,4 +801,4 @@ int do_set_noexpire(User * u, ChannelInfo * ci, char *param)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSSet)
+MODULE_INIT("cs_set", CSSet)

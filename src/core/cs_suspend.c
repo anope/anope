@@ -195,4 +195,4 @@ int do_unsuspend(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSSuspend)
+MODULE_INIT("cs_suspend", CSSuspend)

@@ -59,4 +59,4 @@ int do_send(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(MSSend)
+MODULE_INIT("ms_send", MSSend)

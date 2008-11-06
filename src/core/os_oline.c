@@ -95,4 +95,4 @@ int do_operoline(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSOLine)
+MODULE_INIT("os_oline", OSOLine)

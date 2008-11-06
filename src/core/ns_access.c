@@ -175,4 +175,4 @@ int do_access(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSAccess)
+MODULE_INIT("ns_access", NSAccess)

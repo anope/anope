@@ -52,4 +52,4 @@ int do_help(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSHelp)
+MODULE_INIT("bs_help", BSHelp)

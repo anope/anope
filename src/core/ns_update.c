@@ -76,4 +76,4 @@ int do_nickupdate(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSUpdate)
+MODULE_INIT("ns_update", NSUpdate)

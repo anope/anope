@@ -86,4 +86,4 @@ int do_fantasy(int argc, char **argv)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSFantasyKickBan)
+MODULE_INIT("bs_fantasy_kickban", BSFantasyKickBan)

@@ -235,4 +235,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT(CSAppendTopic)
+MODULE_INIT("cs_appendtopic", CSAppendTopic)

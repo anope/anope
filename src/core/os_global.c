@@ -69,4 +69,4 @@ int do_global(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSGlobal)
+MODULE_INIT("os_global", OSGlobal)

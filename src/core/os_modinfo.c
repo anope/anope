@@ -125,4 +125,4 @@ int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u)
     return display;
 }
 
-MODULE_INIT(OSModInfo)
+MODULE_INIT("os_modinfo", OSModInfo)

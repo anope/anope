@@ -84,4 +84,4 @@ int do_modload(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSModLoad)
+MODULE_INIT("os_modload", OSModLoad)

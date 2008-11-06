@@ -60,4 +60,4 @@ int do_update(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSUpdate)
+MODULE_INIT("os_update", OSUpdate)

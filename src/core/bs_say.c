@@ -83,4 +83,4 @@ int do_say(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSSay)
+MODULE_INIT("bs_say", BSSay)

@@ -244,4 +244,4 @@ void mAddLanguages(void)
 
 /* EOF */
 
-MODULE_INIT(CSTBan)
+MODULE_INIT("cs_tban", CSTBan)

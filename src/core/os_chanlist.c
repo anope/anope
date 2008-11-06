@@ -102,4 +102,4 @@ int do_chanlist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSChanList)
+MODULE_INIT("os_chanlist", OSChanList)

@@ -267,4 +267,4 @@ void send_bot_channels(User * u, BotInfo * bi)
     return;
 }
 
-MODULE_INIT(BSInfo)
+MODULE_INIT("bs_info", BSInfo)

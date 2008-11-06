@@ -115,4 +115,4 @@ void make_unidentified(User * u, ChannelInfo * ci)
     }
 }
 
-MODULE_INIT(CSLogout)
+MODULE_INIT("cs_logout", CSLogout)

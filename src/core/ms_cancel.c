@@ -91,4 +91,4 @@ int do_cancel(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(MSCancel)
+MODULE_INIT("ms_cancel", MSCancel)

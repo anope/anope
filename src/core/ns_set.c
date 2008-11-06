@@ -450,4 +450,4 @@ int do_set_autoop(User *u, NickCore *nc, char *param) {
 
 /* EOF */
 
-MODULE_INIT(NSSet)
+MODULE_INIT("ns_set", NSSet)

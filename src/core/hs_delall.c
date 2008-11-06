@@ -83,4 +83,4 @@ int do_delall(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSDelAll)
+MODULE_INIT("hs_delall", HSDelAll)

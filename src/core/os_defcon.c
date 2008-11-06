@@ -155,4 +155,4 @@ void defcon_sendlvls(User * u)
     }
 }
 
-MODULE_INIT(OSDEFCON)
+MODULE_INIT("os_defcon", OSDEFCON)

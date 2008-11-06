@@ -185,4 +185,4 @@ int do_set(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSSet)
+MODULE_INIT("bs_set", BSSet)

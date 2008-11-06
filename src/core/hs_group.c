@@ -110,4 +110,4 @@ int do_group(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSGroup)
+MODULE_INIT("hs_group", HSGroup)

@@ -112,4 +112,4 @@ int do_svsnick(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSSVSNick)
+MODULE_INIT("os_svsnick", OSSVSNick)

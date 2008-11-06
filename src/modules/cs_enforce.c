@@ -473,4 +473,4 @@ void my_add_languages(void)
 
 /* EOF */
 
-MODULE_INIT(CSEnforce)
+MODULE_INIT("cs_enforce", CSEnforce)

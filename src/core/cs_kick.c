@@ -138,4 +138,4 @@ int do_cs_kick(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSKick)
+MODULE_INIT("cs_kick", CSKick)

@@ -107,4 +107,4 @@ int do_userlist(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSUserList)
+MODULE_INIT("os_userlist", OSUserList)

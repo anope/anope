@@ -189,4 +189,4 @@ int del_memo_callback(User * u, int num, va_list args)
     }
 }
 
-MODULE_INIT(MSDel)
+MODULE_INIT("ms_del", MSDel)

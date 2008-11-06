@@ -125,4 +125,4 @@ int do_forbid(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSForbid)
+MODULE_INIT("cs_forbid", CSForbid)

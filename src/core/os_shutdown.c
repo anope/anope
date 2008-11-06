@@ -69,4 +69,4 @@ int do_shutdown(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSShutdown)
+MODULE_INIT("os_shutdown", OSShutdown)

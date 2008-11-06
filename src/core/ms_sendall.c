@@ -81,4 +81,4 @@ int do_sendall(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(MSSendAll)
+MODULE_INIT("ms_sendall", MSSendAll)

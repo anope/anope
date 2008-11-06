@@ -176,4 +176,4 @@ int do_register(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSRegister)
+MODULE_INIT("cs_register", CSRegister)

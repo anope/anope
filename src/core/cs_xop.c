@@ -496,4 +496,4 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSXOP)
+MODULE_INIT("cs_xop", CSXOP)

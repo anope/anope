@@ -773,4 +773,4 @@ void mMainChanHelp(User * u)
 
 /* EOF */
 
-MODULE_INIT(OSInfo)
+MODULE_INIT("os_info", OSInfo)

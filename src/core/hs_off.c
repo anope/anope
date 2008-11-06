@@ -74,4 +74,4 @@ int do_off(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSOff)
+MODULE_INIT("hs_off", HSOff)

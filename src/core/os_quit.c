@@ -68,4 +68,4 @@ int do_os_quit(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSQuit)
+MODULE_INIT("os_quit", OSQuit)

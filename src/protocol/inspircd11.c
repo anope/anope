@@ -1353,4 +1353,4 @@ class ProtoInspIRCd : public Module
 	}
 };
 
-MODULE_INIT(ProtoInspIRCd)
+MODULE_INIT("inspircd11", ProtoInspIRCd)

@@ -234,4 +234,4 @@ int do_info(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSInfo)
+MODULE_INIT("cs_info", CSInfo)

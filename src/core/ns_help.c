@@ -67,4 +67,4 @@ int do_help(User * u)
 
 /* EOF */
 
-MODULE_INIT(NSHelp)
+MODULE_INIT("ns_help", NSHelp)

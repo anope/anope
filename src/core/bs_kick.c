@@ -355,4 +355,4 @@ int do_kickcmd(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(BSKick)
+MODULE_INIT("bs_kick", BSKick)

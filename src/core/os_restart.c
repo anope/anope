@@ -77,4 +77,4 @@ int do_restart(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSRestart)
+MODULE_INIT("os_restart", OSRestart)

@@ -97,4 +97,4 @@ int do_getpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSGetPass)
+MODULE_INIT("ns_getpass", NSGetPass)

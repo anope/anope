@@ -503,4 +503,4 @@ int do_saset_language(User * u, NickCore * nc, char *param)
 
 /* EOF */
 
-MODULE_INIT(NSSASet)
+MODULE_INIT("ns_saset", NSSASet)

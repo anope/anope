@@ -311,4 +311,4 @@ int do_listlinks(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(NSGroup)
+MODULE_INIT("ns_group", NSGroup)

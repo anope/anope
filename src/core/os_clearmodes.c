@@ -294,4 +294,4 @@ int do_clearmodes(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(OSClearModes)
+MODULE_INIT("os_clearmodes", OSClearModes)

@@ -87,4 +87,4 @@ int do_getpass(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(CSGetPass)
+MODULE_INIT("cs_getpass", CSGetPass)

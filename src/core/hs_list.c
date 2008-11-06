@@ -173,4 +173,4 @@ int listOut(User * u)
     return MOD_CONT;
 }
 
-MODULE_INIT(HSList)
+MODULE_INIT("hs_list", HSList)

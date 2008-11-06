@@ -288,77 +288,56 @@ void modules_unload_all(bool fini, bool unload_proto)
 	}
 }
 
-/**
- * Create a new module, setting up the default values as needed.
- * @param filename the filename of the new module
- * @return a newly created module struct
- */
-Module *createModule(char *filename)
+Module::Module(const std::string &creator)
 {
-    Module *m;
-    int i = 0;
-    if (!filename) {
-        return NULL;
-    }
-    if ((m = (Module *)malloc(sizeof(Module))) == NULL) {
-        fatal("Out of memory!");
-    }
+	this->name = NULL; //XXX: we need another param on module constructors sstrdup(filename);        /* Our Name */
+	this->handle = NULL;           /* Handle */
+	this->version = NULL;
+	this->author = NULL;
+	this->nickHelp = NULL;
+	this->chanHelp = NULL;
+	this->memoHelp = NULL;
+	this->botHelp = NULL;
+	this->operHelp = NULL;
+	this->hostHelp = NULL;
+	this->helpHelp = NULL;
+	this->type = THIRD;
 
-    m->name = sstrdup(filename);        /* Our Name */
-    m->handle = NULL;           /* Handle */
-    m->version = NULL;
-    m->author = NULL;
-    m->nickHelp = NULL;
-    m->chanHelp = NULL;
-    m->memoHelp = NULL;
-    m->botHelp = NULL;
-    m->operHelp = NULL;
-    m->hostHelp = NULL;
-    m->helpHelp = NULL;
-
-    m->type = THIRD;
-    for (i = 0; i < NUM_LANGS; i++) {
-        m->lang[i].argc = 0;
-    }
-    return m;                   /* return a nice new module */
+	for (i = 0; i < NUM_LANGS; i++)
+	{
+		this->lang[i].argc = 0;
+	}
 }
 
-/**
- * Destory the module.
- * free up all memory used by our module struct.
- * @param m the module to free
- * @return MOD_ERR_OK on success, anything else on fail
- */
-int destroyModule(Module * m)
+Module::~Module()
 {
-    int i = 0;
-    if (!m) {
-        return MOD_ERR_PARAMS;
-    }
+	int i = 0;
+	mod_current_module = m;
 
-    mod_current_module = m;
-    for (i = 0; i < NUM_LANGS; i++) {
-        moduleDeleteLanguage(i);
-    }
+	for (i = 0; i < NUM_LANGS; i++)
+		moduleDeleteLanguage(i);
 
-    if (m->name) {
-        free(m->name);
-    }
-    if (m->filename) {
-        remove(m->filename);
-        free(m->filename);
-    }
-    m->handle = NULL;
-    if (m->author) {
-        free(m->author);
-    }
-    if (m->version) {
-        free(m->version);
-    }
+	if (m->name)
+		free(m->name);
 
-    /* No need to free our cmd/msg list, as they will always be empty by the module is destroyed */
-    free(m);
-    return MOD_ERR_OK;
+	if (m->filename)
+	{
+		remove(m->filename);
+		free(m->filename);
+	}
+
+	m->handle = NULL;
+
+	if (m->author)
+		free(m->author);
+	if (m->version)
+		free(m->version);
+
+	/*
+	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed 
+	* XXX: not sure I like this assumption -- w00t
+	*/
+	free(m);
 }
 
 /**
@@ -563,7 +542,7 @@ int loadModule(Module * m, User * u)
     char buf[4096];
     int len;
     const char *err;
-    int (*func) (int, char **);
+    Module * (*func) (const std::string &);
     int (*version)();
     int ret = 0;
     char *argv[1];
@@ -611,9 +590,9 @@ int loadModule(Module * m, User * u)
         return MOD_ERR_NOLOAD;
     }
     ano_modclearerr();
-    func = (int (*)(int, char **))ano_modsym(m->handle, "anope_modinit");
+    func = (Module *(*)(const std::string &))ano_modsym(m->handle, "init_module");
     if ( func == NULL && (err = ano_moderr()) != NULL) {
-		alog("No magical anope_modinit() found, not an Anope module, or a very old module(?)");
+		alog("No magical init function found, not an Anope module, or a very old module(?)");
         ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
         return MOD_ERR_NOLOAD;
     }
@@ -650,30 +629,31 @@ int loadModule(Module * m, User * u)
 	}
 	/* TODO */
         mod_current_module_name = m->name;
-        /* argv[0] is the user if there was one, or NULL if not */
-        if (u) {
-            argv[0] = sstrdup(u->nick);
-        } else {
-            argv[0] = NULL;
-        }
-        argc++;
 
-        ret = func(argc, argv); /* exec AnopeInit */
-        if (u) {
-            free(argv[0]);
+		/* Create module.
+		 * XXX: we need to handle ModuleException throws here.
+		 */
+		std::string nick;
+		if (u)
+			nick = u->nick;
+		else
+			nick = "";
+
+		Module *mymod = func(nick);
+/*
+        if (ret == MOD_STOP) {
+            alog("%s requested unload...", m->name);
+            unloadModule(m, NULL);
+            mod_current_module_name = NULL;
+            return MOD_ERR_NOLOAD;
         }
+*/
         if (m->type == PROTOCOL && protocolModuleLoaded()) {
             alog("You cannot load two protocol modules");
             ret = MOD_STOP;
         } else if (m->type == ENCRYPTION && encryptionModuleLoaded()) {
             alog("You cannot load two encryption modules");
             ret = MOD_STOP;
-        }
-        if (ret == MOD_STOP) {
-            alog("%s requested unload...", m->name);
-            unloadModule(m, NULL);
-            mod_current_module_name = NULL;
-            return MOD_ERR_NOLOAD;
         }
 
         mod_current_module_name = NULL;

@@ -275,8 +275,6 @@ struct EvtHookHash_ {
 
 /*************************************************************************/
 /* Module Managment Functions */
-MDE Module *createModule(char *filename);        /* Create a new module, using the given name */
-int destroyModule(Module *m);		/* Delete the module */
 int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
 MDE Module *findModule(const char *name);                /* Find a module */

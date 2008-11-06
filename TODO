@@ -45,6 +45,7 @@ Legend:
   [ ] Asynchronous, using select() (multiple engines? not really needed..)
   [ ] Callbacks, event style, see also inspircd
   [ ] Asynchronous DNS?
+[ ] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
 
 
 Future

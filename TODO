@@ -13,7 +13,8 @@ Legend:
   [x] Change MODULE_INIT to return a pointer
   [ ] Remove mod_current_* crap (involves passing Module * around a lot)
   [ ] Remove duplicate module creation.. have loadModule return a pointer rather than creating one
-  [ ] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
+  [x] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
+    [ ] Mark os_modunload permanent.
   [ ] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
   [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)

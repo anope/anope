@@ -55,15 +55,31 @@ void myOperServHelp(User * u)
  **/
 int do_modload(User * u)
 {
-    char *name;
+	char *name;
 
-    name = strtok(NULL, "");
-    if (!name) {
-        syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
-        return MOD_CONT;
-    }
-    if (!queueModuleLoad(name, u))
-        notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
+	name = strtok(NULL, "");
+	if (!name)
+	{
+		syntax_error(s_OperServ, u, "MODLOAD", OPER_MODULE_LOAD_SYNTAX);
+		return MOD_CONT;
+	}
+
+	Module *m = findModule(name);
+	if (m)
+	{
+		notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, name);
+		return MOD_CONT;
+	}
+
+	m = createModule(name);
+	alog("Trying to load module [%s]", mod_operation_queue->m->name);
+	status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
+	alog("Module loading status: %d (%s)", status, ModuleGetErrStr(status));
+	if (status != MOD_ERR_OK)
+	{
+		notice_lang(s_OperServ, user, OPER_MODULE_LOAD_FAIL, m->name);
+		destroyModule(m);
+	}
 
     return MOD_CONT;
 }

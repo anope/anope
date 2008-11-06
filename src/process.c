@@ -427,9 +427,6 @@ void process()
             alog("debug: unknown message from server (%s)", inbuf);
     }
 
-    /* Load/unload modules if needed */
-    handleModuleOperationQueue();
-
     /* Free argument list we created */
     free(av);
 }

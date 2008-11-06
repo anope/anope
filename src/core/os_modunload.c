@@ -54,20 +54,36 @@ void myOperServHelp(User * u)
  * @param u The user who issued the command
  * @param MOD_CONT to continue processing other modules, MOD_STOP to stop processing.
  **/
-int do_modunload(User * u)
+int do_modunload(User *u)
 {
-    char *name;
+	char *name;
+	int status;
 
-    name = strtok(NULL, "");
-    if (!name) {
-        syntax_error(s_OperServ, u, "MODUNLOAD",
-                     OPER_MODULE_UNLOAD_SYNTAX);
-        return MOD_CONT;
-    }
-    if (!queueModuleUnload(name, u))
-        notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
+	name = strtok(NULL, "");
+	if (!name)
+	{
+		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+		return MOD_CONT;
+	}
 
-    return MOD_CONT;
+	Module *m = findModule(name);
+	if (!m)
+	{
+		syntax_error(s_OperServ, u, "MODUNLOAD", OPER_MODULE_UNLOAD_SYNTAX);
+		return MOD_CONT;
+	}
+
+	alog("Trying to unload module [%s]", m->name);
+
+	status = unloadModule(m, u);
+
+	if (!status)
+	{
+		alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
+		notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
+	}
+
+	return MOD_CONT;
 }
 
 MODULE_INIT(OSModUnLoad)

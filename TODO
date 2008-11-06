@@ -15,6 +15,7 @@ Legend:
   [ ] Remove duplicate module creation.. have loadModule return a pointer rather than creating one
   [ ] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
   [ ] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
+  [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
 [x] SendClientIntroduction should take a UID param, rather than generating one(?)
@@ -74,3 +75,4 @@ Future
 [?] Mail memos? think on consequences of this
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
+

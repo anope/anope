@@ -107,7 +107,6 @@ typedef struct Command_ Command;
 typedef struct CommandHash_ CommandHash;
 typedef struct ModuleLang_ ModuleLang;
 typedef struct ModuleHash_ ModuleHash;
-typedef struct ModuleQueue_ ModuleQueue;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
@@ -171,14 +170,6 @@ struct ModuleHash_ {
         char *name;
         Module *m;
         ModuleHash *next;
-};
-
-struct ModuleQueue_ {
-	Module *m;
-	ModuleOperation op;
-	User *u;
-
-	ModuleQueue *next;
 };
 
 struct Command_ {
@@ -371,12 +362,6 @@ MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs fo
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
 int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
 MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
-
-/*************************************************************************/
-/* Module Queue Operations */
-MDE int queueModuleLoad(char *name, User *u);
-MDE int queueModuleUnload(char *name, User *u);
-MDE void handleModuleOperationQueue(void);
 
 /*************************************************************************/
 /* Some IRCD protocol module support functions */

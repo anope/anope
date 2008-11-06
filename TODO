@@ -8,7 +8,13 @@ Legend:
 [x] additional field where users' masked host can be stored so both masked IP and vhost are available instead of just one.
 [x] no struct Uid bollocks. that's insane, and now, unnecessary that we store UID in BotInfo.
 [x] prevent deletion of core services via /bs bot
-[ ] Move AnopeInit and AnopeFini(?) into a derived module class, change MODULE_INIT to return a pointer.
+[ ] Module subsystem cleanup ('modules' branch)
+  [x] Move modules to use classes somewhat (AnopeInit, AnopeFini)
+  [x] Change MODULE_INIT to return a pointer
+  [ ] Remove mod_current_* crap (involves passing Module * around a lot)
+  [ ] Remove duplicate module creation.. have loadModule return a pointer rather than creating one
+  [ ] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
+  [ ] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
 [x] SendClientIntroduction should take a UID param, rather than generating one(?)
@@ -18,7 +24,6 @@ Legend:
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
-[+] Move modules to use classes somewhat (AnopeInit, AnopeFini)
 
 1.9.1
 -----

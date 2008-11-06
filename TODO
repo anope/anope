@@ -76,4 +76,5 @@ Future
 [?] Mail memos? think on consequences of this
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
-
+[ ] Last used time on AKICK/access entries
+[ ] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.

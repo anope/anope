@@ -353,7 +353,6 @@ MDE int moduleAddEventHook(EvtHook * evh);
 MDE int moduleEventDelHook(const char *name);
 int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, char *mod_name);
 int destroyEventHook(EvtHook * evh);
-extern char *mod_current_evtbuffer;
 
 MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);
 MDE void moduleNoticeLang(char *source, User *u, int number, ...);

@@ -15,8 +15,6 @@
 #include "language.h"
 #include "version.h"
 
-char *mod_current_evtbuffer = NULL;
-
 EvtMessageHash *EVENT[MAX_CMD_HASH];
 EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
@@ -151,9 +149,7 @@ void event_process_hook(const char *name, int argc, char **argv)
     int retVal = 0;
     EvtHook *current = NULL;
     EvtHook *evh;
-    if (mod_current_evtbuffer) {
-        free(mod_current_evtbuffer);
-    }
+
     /* Do something with the message. */
     evh = find_eventhook(name);
     if (evh) {

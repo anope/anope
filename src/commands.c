@@ -166,7 +166,7 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
     int cont = MOD_CONT;
     const char *p1 = NULL, *p2 = NULL, *p3 = NULL, *p4 = NULL;
     Module *calling_module = mod_current_module;
-    char *calling_module_name = mod_current_module_name;
+    const char *calling_module_name = mod_current_module_name;
 
     for (current = c; (current) && (cont == MOD_CONT);
          current = current->next) {

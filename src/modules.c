@@ -49,7 +49,7 @@ MessageHash *IRCD[MAX_CMD_HASH];
 ModuleHash *MODULE_HASH[MAX_CMD_HASH];
 
 Module *mod_current_module;
-char *mod_current_module_name = NULL;
+const char *mod_current_module_name = NULL;
 char *mod_current_buffer = NULL;
 User *mod_current_user;
 ModuleCallBack *moduleCallBackHead = NULL;
@@ -99,14 +99,9 @@ void modules_init(void)
     for (idx = 0; idx < ModulesNumber; idx++) {
         m = findModule(ModulesAutoload[idx]);
         if (!m) {
-            m = createModule(ModulesAutoload[idx]);
-            mod_current_module = m;
-            mod_current_user = NULL;
-            alog("trying to load [%s]", mod_current_module->name.c_str());
-			ret = loadModule(mod_current_module, NULL);
-            alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
+			ret = loadModule(ModulesAutoload[idx], NULL);
 			if (ret != MOD_ERR_OK)
-				destroyModule(m);
+	            alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_user = NULL;
         }
@@ -126,17 +121,10 @@ void modules_core_init(int number, char **list)
     for (idx = 0; idx < number; idx++) {
         m = findModule(list[idx]);
         if (!m) {
-            m = createModule(list[idx]);
-            mod_current_module = m;
-            mod_current_user = NULL;
-            status = loadModule(mod_current_module, NULL);
-            if (debug || status) {
-                alog("debug: trying to load core module [%s]",
-                     mod_current_module->name.c_str());
-                alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
-				if (status != MOD_ERR_OK)
-					destroyModule(mod_current_module);
-            }
+            status = loadModule(list[idx], NULL);
+            alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
+			if (status != MOD_ERR_OK)
+	            alog("ERROR: status: [%d][%s]", status, ModuleGetErrStr(status));
             mod_current_module = NULL;
             mod_current_user = NULL;
         }
@@ -147,19 +135,13 @@ void modules_core_init(int number, char **list)
  **/
 int encryption_module_init(void) {
     int ret = 0;
-    Module *m;
 
-    m = createModule(EncModule);
-    mod_current_module = m;
-    mod_current_user = NULL;
-    alog("Loading Encryption Module: [%s]", mod_current_module->name.c_str());
-    ret = loadModule(mod_current_module, NULL);
+    alog("Loading Encryption Module: [%s]", EncModule);
+    ret = loadModule(EncModule, NULL);
     moduleSetType(ENCRYPTION);
-    alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
+    if (ret != MOD_ERR_OK)
+		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
     mod_current_module = NULL;
-    if (ret != MOD_ERR_OK) {
-        destroyModule(m);
-    }
     return ret;
 }
 
@@ -169,18 +151,13 @@ int encryption_module_init(void) {
 int protocol_module_init(void)
 {
     int ret = 0;
-    Module *m;
 
-    m = createModule(IRCDModule);
-    mod_current_module = m;
-    mod_current_user = NULL;
-    alog("Loading IRCD Protocol Module: [%s]", mod_current_module->name.c_str());
-    ret = loadModule(mod_current_module, NULL);
+    alog("Loading IRCD Protocol Module: [%s]", IRCDModule);
+    ret = loadModule(IRCDModule, NULL);
     moduleSetType(PROTOCOL);
-    alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
-    mod_current_module = NULL;
 
-	if (ret == MOD_ERR_OK) {
+	if (ret == MOD_ERR_OK)
+	{
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
@@ -200,10 +177,12 @@ int protocol_module_init(void)
         	alog("UseTS6 requires the setting of Numeric to be enabled.");
 	        ret = -1;
     	}
-	} else {
-		destroyModule(m);
 	}
-
+	else
+	{
+		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
+	}
+	mod_current_module = NULL;
     return ret;
 }
 
@@ -225,16 +204,11 @@ void modules_delayed_init(void)
     for (idx = 0; idx < ModulesDelayedNumber; idx++) {
         m = findModule(ModulesDelayedAutoload[idx]);
         if (!m) {
-            m = createModule(ModulesDelayedAutoload[idx]);
-            mod_current_module = m;
-            mod_current_user = NULL;
-            alog("trying to load [%s]", mod_current_module->name.c_str());
-			ret = loadModule(mod_current_module, NULL);
-            alog("status: [%d][%s]", ret, ModuleGetErrStr(ret));
+			ret = loadModule(ModulesDelayedAutoload[idx], NULL);
+			if (ret != MOD_ERR_OK)
+	            alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_user = NULL;
-			if (ret != MOD_ERR_OK)
-				destroyModule(m);
         }
     }
 }
@@ -253,7 +227,15 @@ void modules_unload_all(bool fini, bool unload_proto)
 {
 	int idx;
 	ModuleHash *mh, *next;
-        void (*func) (void);
+
+	if (!fini)
+	{
+		/*
+		 * XXX: This was used to stop modules from executing destructors, we don't really
+		 * support this now, so just return.. dirty. We need to rewrite the code that uses this param.
+		 */
+		return;
+	}
 
 	for (idx = 0; idx < MAX_CMD_HASH; idx++) {
 		mh = MODULE_HASH[idx];
@@ -261,26 +243,14 @@ void modules_unload_all(bool fini, bool unload_proto)
 			next = mh->next;
 			if (unload_proto || (mh->m->type != PROTOCOL)) {
 				mod_current_module = mh->m;
-			    if(fini) {
-			        func = (void (*)(void))ano_modsym(mh->m->handle, "AnopeFini");
-		    	    if (func) {
-		        	    mod_current_module_name = mh->m->name.c_str();
-		            	func();                 /* exec AnopeFini */
-			            mod_current_module_name = NULL;
-			        }
+        	    mod_current_module_name = mh->m->name.c_str();
+	            mod_current_module_name = NULL;
 
-		    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
-			    		mh = next;
-						continue;
-			        }
-
-		        	if ((ano_modclose(mh->m->handle)) != 0)
-			            alog(ano_moderr());
-			        else
-			            delModule(mh->m);
-		    	} else {
-                	        delModule(mh->m);
-				}
+	    	    if (prepForUnload(mh->m) != MOD_ERR_OK) {
+		    		mh = next;
+					continue;
+		        }
+	            delModule(mh->m);
 		    }
 	   	    mh = next;
 		}
@@ -290,7 +260,6 @@ void modules_unload_all(bool fini, bool unload_proto)
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */
-	this->handle = NULL;           /* Handle */
 	this->version = NULL;
 	this->author = NULL;
 	this->nickHelp = NULL;
@@ -311,32 +280,29 @@ Module::Module(const std::string &mname, const std::string &creator)
 Module::~Module()
 {
 	int i = 0;
-	mod_current_module = m;
+	mod_current_module = this;
 
 	for (i = 0; i < NUM_LANGS; i++)
 		moduleDeleteLanguage(i);
 
-	if (m->name)
-		free(m->name);
-
-	if (m->filename)
+	if (this->filename)
 	{
-		remove(m->filename);
-		free(m->filename);
+		remove(this->filename);
+		free(this->filename);
 	}
 
-	m->handle = NULL;
+	if (this->author)
+		free(this->author);
+	if (this->version)
+		free(this->version);
 
-	if (m->author)
-		free(m->author);
-	if (m->version)
-		free(m->version);
+	if ((ano_modclose(this->handle)) != 0)
+		alog(ano_moderr());
 
 	/*
 	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed 
 	* XXX: not sure I like this assumption -- w00t
 	*/
-	free(m);
 }
 
 /**
@@ -398,7 +364,7 @@ int delModule(Module * m)
             } else {
                 lastHash->next = current->next;
             }
-            destroyModule(current->m);
+            delete current->m;
             free(current->name);
             free(current);
             return MOD_ERR_OK;
@@ -536,75 +502,86 @@ int moduleCopyFile(char *name, char *output)
  * @param u the user who loaded it, NULL for auto-load
  * @return MOD_ERR_OK on success, anything else on fail
  */
-int loadModule(Module * m, User * u)
+int loadModule(const std::string &modname, User * u)
 {
-    char buf[4096];
-    int len;
-    const char *err;
-    Module * (*func) (const std::string &);
-    int ret = 0;
+	char buf[4096];
+	int len;
+	const char *err;
+	Module * (*func) (const std::string &);
+	int ret = 0;
 
-    Module *m2;
-    if (!m || m->name.empty()) {
-        return MOD_ERR_PARAMS;
-    }
-    if (m->handle) {
-        return MOD_ERR_EXISTS;
-    }
-    if ((m2 = findModule(m->name.c_str())) != NULL) {
-        return MOD_ERR_EXISTS;
-    }
+	if (modname.empty())
+		return MOD_ERR_PARAMS;
+
+	if ((m = findModule(modname.c_str())) != NULL)
+		return MOD_ERR_EXISTS;
+
+	alog("trying to load [%s]", modname.c_str());
 
 	/* Generate the filename for the temporary copy of the module */
-    strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
-    len = strlen(buf);
+	strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
+	len = strlen(buf);
 #ifndef _WIN32
-    strncat(buf, "runtime/", 4095 - len);
+	strncat(buf, "runtime/", 4095 - len);
 #else
-    strncat(buf, "runtime\\", 4095 - len);
+	strncat(buf, "runtime\\", 4095 - len);
 #endif
-    len = strlen(buf);
-    strncat(buf, m->name.c_str(), 4095 - len);
-    len = strlen(buf);
-    strncat(buf, MODULE_EXT, 4095 - len);
+	len = strlen(buf);
+	strncat(buf, modname.c_str(), 4095 - len);
+	len = strlen(buf);
+	strncat(buf, MODULE_EXT, 4095 - len);
 	len = strlen(buf);
 	strncat(buf, ".", 4095 - len);
 	len = strlen(buf);
 	strncat(buf, "XXXXXX", 4095 - len);
-    buf[4095] = '\0';
+	buf[4095] = '\0';
 	/* Don't skip return value checking! -GD */
-    if ((ret = moduleCopyFile(m->name.c_str(), buf)) != MOD_ERR_OK) {
-        m->filename = sstrdup(buf);
-	return ret;
+    if ((ret = moduleCopyFile(modname.c_str(), buf)) != MOD_ERR_OK)
+	{
+		/* XXX: This used to assign filename here, but I don't think that was correct..
+		 * even if it was, it makes life very fucking difficult, so.
+		 */
+//		m->filename = sstrdup(buf);
+		return ret;
 	}
 
-    m->filename = sstrdup(buf);
-    ano_modclearerr();
-    m->handle = ano_modopen(m->filename);
-    if ( m->handle == NULL && (err = ano_moderr()) != NULL) {
-        alog(err);
-        return MOD_ERR_NOLOAD;
-    }
-    ano_modclearerr();
-    func = (Module *(*)(const std::string &))ano_modsym(m->handle, "init_module");
-    if ( func == NULL && (err = ano_moderr()) != NULL) {
+	ano_modclearerr();
+
+	void *handle = ano_modopen(buf);
+	if (handle == NULL && (err = ano_moderr()) != NULL)
+	{
+		alog(err);
+		return MOD_ERR_NOLOAD;
+	}
+
+	ano_modclearerr();
+	func = (Module *(*)(const std::string &))ano_modsym(handle, "init_module");
+	if (func == NULL && (err = ano_moderr()) != NULL)
+	{
 		alog("No magical init function found, not an Anope module, or a very old module(?)");
-        ano_modclose(m->handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
-        return MOD_ERR_NOLOAD;
-    }
-    if (func) {
-        mod_current_module_name = m->name.c_str();
+		ano_modclose(handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
+		return MOD_ERR_NOLOAD;
+	}
+
+    if (func)
+	{
+		mod_current_module_name = m->name.c_str();
 
 		/* Create module.
-		 * XXX: we need to handle ModuleException throws here.
-		 */
+		* XXX: we need to handle ModuleException throws here.
+		*/
 		std::string nick;
 		if (u)
 			nick = u->nick;
 		else
 			nick = "";
 
-		Module *mymod = func(nick);
+		Module *m = func(nick);
+		mod_current_module = m;
+		mod_current_user = u;
+		m->filename = sstrdup(buf);
+		m->handle = handle;
+
 /*
         if (ret == MOD_STOP) {
             alog("%s requested unload...", m->name);
@@ -613,23 +590,27 @@ int loadModule(Module * m, User * u)
             return MOD_ERR_NOLOAD;
         }
 */
-        if (m->type == PROTOCOL && protocolModuleLoaded()) {
-            alog("You cannot load two protocol modules");
-            ret = MOD_STOP;
-        } else if (m->type == ENCRYPTION && encryptionModuleLoaded()) {
-            alog("You cannot load two encryption modules");
-            ret = MOD_STOP;
-        }
+		if (m->type == PROTOCOL && protocolModuleLoaded())
+		{
+			alog("You cannot load two protocol modules");
+			ret = MOD_STOP;
+		}
+		else if (m->type == ENCRYPTION && encryptionModuleLoaded())
+		{
+			alog("You cannot load two encryption modules");
+			ret = MOD_STOP;
+		}
 
-        mod_current_module_name = NULL;
-    }
+		mod_current_module_name = NULL;
+	}
 
-    if (u) {
-        ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, m->name.c_str());
-        notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name.c_str());
-    }
-    addModule(m);
-    return MOD_ERR_OK;
+	if (u)
+	{
+		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, m->name.c_str());
+		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name.c_str());
+	}
+	addModule(m);
+	return MOD_ERR_OK;
 }
 
 /**

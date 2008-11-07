@@ -269,7 +269,15 @@ struct EvtHookHash_ {
 int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
 MDE Module *findModule(const char *name);                /* Find a module */
-int loadModule(Module *m,User *u);	/* Load the given module into the program */
+
+/** Loads a given Anope module into the core, initialising relevant structures,
+ * and calls the module's constructor.
+ * @param modname The name of the module to load (e.g. os_modload)
+ * @param u The user loading the module, or NULL for no user.
+ * @return XXX, document me.
+ */
+int loadModule(const std::string &modname, User *u);
+
 int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
@@ -296,7 +304,7 @@ MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
 MDE void moduleSetType(MODType type);
 extern MDE Module *mod_current_module;
-extern MDE char *mod_current_module_name;
+extern MDE const char *mod_current_module_name;
 extern MDE char *mod_current_buffer;
 extern MDE int mod_current_op;
 extern MDE User *mod_current_user;

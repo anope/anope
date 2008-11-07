@@ -101,7 +101,7 @@ Future
   [ ] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
   [ ] Reason
   [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
-[ ] HS ACTIVATE -ALL
+[ ] HS ACTIVATE -ALL (rob sez this all needs reviewing)
 [ ] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
 [ ] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK?
 [ ] General options block, ability to turn LOGCHAN on from the config file..

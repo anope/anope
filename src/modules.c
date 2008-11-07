@@ -444,7 +444,7 @@ int encryptionModuleLoaded()
  * @param output the destination to copy the module to
  * @return MOD_ERR_OK on success
  */
-int moduleCopyFile(char *name, char *output)
+static int moduleCopyFile(const char *name, char *output)
 {
     int ch;
     FILE *source, *target;
@@ -513,7 +513,7 @@ int loadModule(const std::string &modname, User * u)
 	if (modname.empty())
 		return MOD_ERR_PARAMS;
 
-	if ((m = findModule(modname.c_str())) != NULL)
+	if (findModule(modname.c_str()) != NULL)
 		return MOD_ERR_EXISTS;
 
 	alog("trying to load [%s]", modname.c_str());
@@ -563,51 +563,53 @@ int loadModule(const std::string &modname, User * u)
 		return MOD_ERR_NOLOAD;
 	}
 
-    if (func)
+    if (!func)
 	{
-		mod_current_module_name = m->name.c_str();
+		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
+	}
 
-		/* Create module.
-		* XXX: we need to handle ModuleException throws here.
-		*/
-		std::string nick;
-		if (u)
-			nick = u->nick;
-		else
-			nick = "";
+	mod_current_module_name = modname.c_str();
 
-		Module *m = func(nick);
-		mod_current_module = m;
-		mod_current_user = u;
-		m->filename = sstrdup(buf);
-		m->handle = handle;
+	/* Create module.
+	* XXX: we need to handle ModuleException throws here.
+	*/
+	std::string nick;
+	if (u)
+		nick = u->nick;
+	else
+		nick = "";
+
+	Module *m = func(nick);
+	mod_current_module = m;
+	mod_current_user = u;
+	m->filename = sstrdup(buf);
+	m->handle = handle;
 
 /*
-        if (ret == MOD_STOP) {
-            alog("%s requested unload...", m->name);
-            unloadModule(m, NULL);
-            mod_current_module_name = NULL;
-            return MOD_ERR_NOLOAD;
-        }
+    if (ret == MOD_STOP) {
+        alog("%s requested unload...", m->name);
+        unloadModule(m, NULL);
+        mod_current_module_name = NULL;
+        return MOD_ERR_NOLOAD;
+    }
 */
-		if (m->type == PROTOCOL && protocolModuleLoaded())
-		{
-			alog("You cannot load two protocol modules");
-			ret = MOD_STOP;
-		}
-		else if (m->type == ENCRYPTION && encryptionModuleLoaded())
-		{
-			alog("You cannot load two encryption modules");
-			ret = MOD_STOP;
-		}
-
-		mod_current_module_name = NULL;
+	if (m->type == PROTOCOL && protocolModuleLoaded())
+	{
+		alog("You cannot load two protocol modules");
+		ret = MOD_STOP;
 	}
+	else if (m->type == ENCRYPTION && encryptionModuleLoaded())
+	{
+		alog("You cannot load two encryption modules");
+		ret = MOD_STOP;
+	}
+
+	mod_current_module_name = NULL;
 
 	if (u)
 	{
-		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, m->name.c_str());
-		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, m->name.c_str());
+		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
+		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
 	}
 	addModule(m);
 	return MOD_ERR_OK;

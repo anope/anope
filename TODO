@@ -77,4 +77,37 @@ Future
 [ ] Useful/common "third party" modules to core distro
   [ ] NS AJOIN
 [ ] Last used time on AKICK/access entries
-[ ] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
+[ ] Channel access additions
+  [ ] Method to store listmodes (more generically than AKICK, too) for e.g. +beI and extbans, etc.
+  [ ] Setter
+  [ ] Time added
+  [ ] Time modified
+  [ ] Expiry (useful?)
+[ ] Set forbidden channels +s
+[ ] NS INFO: seperate field for last seen realhost, shown to SRA only
+[ ] NS SUSPEND: show suspender and reason, probably to sopers only (see CS SUSPEND)
+  XXX: is SUSPEND overlapping with OS IGNORE functionality?
+[ ] Merge NS INFO blah ALL with NS INFO blah, if you're requesting info, you really want the info anyway.
+? [ ] Channel passwords seem to be of limited use, think of a more appropriate way to handle this
+? [ ] Don't allow soper accounts to expire
+? [ ] Reason for CS SET RESTRICTED
+[ ] NS IDENTIFY changes
+  ? [ ] Last failed identify? Maybe more useful for sopers only, so users don't get unnecessarily worried
+  ? [ ] Last successful login time/ip? perhaps both of these should be a new nick setting
+[ ] AKILL/SGLINE/etc..
+  [ ] Setter
+  [ ] Time added
+  [ ] Time modified (can they be modified?)
+  [ ] Time until expiry/expiry time (YES, time until expiry *instead of* expiry time, more human)
+  [ ] Reason
+  [ ] Unique IDs on each AKILL/blah so that networks may use them as ticket IDs
+[ ] HS ACTIVATE -ALL
+[ ] Settable oper flags (split into types containing privs+commands, allow each oper to be set to a type, like we do with insp?)
+[ ] NS MARK, CS MARK. Allow multiple marks. Combine into OS MARK?
+[ ] General options block, ability to turn LOGCHAN on from the config file..
+[ ] Method to list suspended/forbidden nicks/channels?
+? [ ] MS IGNORE. Make it take nick (accounts) or n!u@h masks. Fake success of memo send still, but send to opers?
+? [ ] More "friendly" date displays of some things like registration time ("November 7th 2006 (2 years, 0 months, 0 days ago)")
+? [ ] Review settings like NSModeOnID for whether they actually have a point existing (Rob says it does not - and that it should probably be a nickname setting)
+? [ ] OS INJECT
+? [ ] Drop CS SET ENTRYMSG, replace with a 'news' type system? (limited to a configured number of items, default 3)

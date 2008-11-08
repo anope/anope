@@ -1176,7 +1176,7 @@ class ProtoRatbox : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, PROTOCOL);
+		this->SetType(PROTOCOL);
 
 		if (UseTS6)
 		{

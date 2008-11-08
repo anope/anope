@@ -417,7 +417,7 @@ class EOld : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, ENCRYPTION);
+		this->SetType(ENCRYPTION);
 
 		encmodule_encrypt(old_encrypt);
 		encmodule_encrypt_in_place(old_encrypt_in_place);

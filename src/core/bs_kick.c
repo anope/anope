@@ -28,7 +28,7 @@ class BSKick : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("KICK", do_kickcmd, NULL, BOT_HELP_KICK, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK BADWORDS", NULL, NULL, BOT_HELP_KICK_BADWORDS, -1, -1, -1, -1);

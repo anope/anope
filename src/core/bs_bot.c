@@ -27,7 +27,7 @@ class BSBot : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("BOT", do_bot, is_services_admin, -1, -1, -1,	BOT_SERVADMIN_HELP_BOT, BOT_SERVADMIN_HELP_BOT);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);

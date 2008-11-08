@@ -29,7 +29,7 @@ class MSSet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, MEMO_HELP_SET, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);

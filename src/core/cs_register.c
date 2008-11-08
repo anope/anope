@@ -27,7 +27,7 @@ class CSRegister : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("REGISTER", do_register, NULL, CHAN_HELP_REGISTER, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;

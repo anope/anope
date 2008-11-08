@@ -27,7 +27,7 @@ class OSSVSNick : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SVSNICK", do_svsnick, is_services_root,
 		OPER_HELP_SVSNICK, -1, -1, -1, -1);

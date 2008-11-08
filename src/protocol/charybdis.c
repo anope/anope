@@ -1304,7 +1304,7 @@ class ProtoCharybdis : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id: charybdis.c 953 2006-01-14 11:36:29Z certus $");
-		moduleSetType(this, PROTOCOL);
+		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("Charybdis 1.0/1.1+");
 		pmodule_ircd_cap(myIrcdcap);

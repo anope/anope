@@ -1049,7 +1049,7 @@ class ProtoBahamut : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, PROTOCOL);
+		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("BahamutIRCd 1.4.*/1.8.*");
 		pmodule_ircd_cap(myIrcdcap);

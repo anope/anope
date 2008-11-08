@@ -235,7 +235,7 @@ int encryption_module_init(void) {
     if (ret != MOD_ERR_OK)
 		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
 	else
-		moduleSetType(findModule(EncModule), ENCRYPTION);
+		findModule(EncModule)->SetType(ENCRYPTION);
     mod_current_module = NULL;
     return ret;
 }
@@ -252,7 +252,7 @@ int protocol_module_init(void)
 
 	if (ret == MOD_ERR_OK)
 	{
-		moduleSetType(findModule(IRCDModule), PROTOCOL);
+		findModule(IRCDModule)->SetType(PROTOCOL);
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
@@ -403,6 +403,12 @@ Module::~Module()
 	* XXX: not sure I like this assumption -- w00t
 	*/
 }
+
+void Module::SetType(MODType type)
+{
+	this->type = type;
+}
+
 
 /**
  * Add the module to the list of currently loaded modules.
@@ -779,11 +785,6 @@ int unloadModule(Module * m, User * u)
         delModule(m);
         return MOD_ERR_OK;
     }
-}
-
-void moduleSetType(Module *m, MODType type)
-{
-	m->type = type;
 }
 
 /**

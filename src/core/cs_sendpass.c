@@ -28,7 +28,7 @@ class CSSendPass : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SENDPASS", do_sendpass, NULL, CHAN_HELP_SENDPASS,
 		-1, -1, -1, -1);

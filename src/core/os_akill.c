@@ -33,7 +33,7 @@ class OSAKill : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 

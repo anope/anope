@@ -49,7 +49,7 @@ class CSSet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, CHAN_HELP_SET, -1, -1, CHAN_SERVADMIN_HELP_SET, CHAN_SERVADMIN_HELP_SET);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

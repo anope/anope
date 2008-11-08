@@ -30,7 +30,7 @@ class OSChanList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("CHANLIST", do_chanlist, is_services_oper, OPER_HELP_CHANLIST, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

@@ -28,7 +28,7 @@ class OSModUnLoad : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODUNLOAD);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

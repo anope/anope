@@ -27,7 +27,7 @@ class MSStaff : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("STAFF", do_staff, is_services_oper, -1, -1, MEMO_HELP_STAFF, MEMO_HELP_STAFF, MEMO_HELP_STAFF);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

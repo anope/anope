@@ -31,7 +31,7 @@ class CSAccess : public Module
 		moduleAddAuthor("Anope");
 		moduleAddVersion
 		("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("ACCESS", do_access, NULL, CHAN_HELP_ACCESS, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

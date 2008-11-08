@@ -27,7 +27,7 @@ class OSRandomNews : public Module
 		moduleAddAuthor("Anope");
 		moduleAddVersion
 		("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		/** XXX: For some unknown reason, do_randomnews is actaully defined in news.c
 		 * we can look at moving it here later

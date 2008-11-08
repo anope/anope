@@ -132,7 +132,7 @@ struct ModuleLang_ {
     char **argv;
 };
 
-class Module
+CoreExport class Module
 {
  public:
 	// XXX :(
@@ -164,6 +164,11 @@ class Module
 	/** Destroys a module, freeing resources it has allocated.
 	 */
 	~Module();
+
+	/** Sets a given type (CORE,PROTOCOL,3RD etc) on a module.
+	 * @param type The type to set the module as.
+	 */
+	void SetType(MODType type);
 };
 
 struct ModuleHash_ {
@@ -302,12 +307,6 @@ MDE int moduleAddRegHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddOperHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddAdminHelp(Command * c, int (*func) (User * u));
 MDE int moduleAddRootHelp(Command * c, int (*func) (User * u));
-
-/** Sets a given type (CORE,PROTOCOL,3RD etc) on a module.
- * @param m The module to set the type for
- * @param type The type to set the module as.
- */
-MDE void moduleSetType(Module *m, MODType type);
 extern MDE Module *mod_current_module;
 extern MDE const char *mod_current_module_name;
 extern MDE char *mod_current_buffer;

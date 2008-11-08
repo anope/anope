@@ -30,7 +30,7 @@ class OSAdmin : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("ADMIN", do_admin, NULL, OPER_HELP_ADMIN, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;

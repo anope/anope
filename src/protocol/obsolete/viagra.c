@@ -1684,7 +1684,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
-    moduleSetType(this, PROTOCOL);
+    this->SetType(PROTOCOL);
 
     pmodule_ircd_version("ViagraIRCd 1.3.x");
     pmodule_ircd_cap(myIrcdcap);

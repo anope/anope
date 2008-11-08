@@ -255,7 +255,7 @@ class ESHA1 : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, ENCRYPTION);
+		this->SetType(ENCRYPTION);
 
 		encmodule_encrypt(sha1_encrypt);
 		encmodule_encrypt_in_place(sha1_encrypt_in_place);

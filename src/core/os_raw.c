@@ -26,7 +26,7 @@ class OSRaw : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, THIRD);
+		this->SetType(THIRD);
 
 		c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

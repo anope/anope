@@ -34,7 +34,7 @@ class OSSGLine : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SGLINE", do_sgline, is_services_oper,
 		OPER_HELP_SGLINE, -1, -1, -1, -1);

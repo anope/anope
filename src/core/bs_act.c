@@ -27,7 +27,7 @@ class BSAct : public Module
 
 	    moduleAddAuthor("Anope");
 	    moduleAddVersion("$Id$");
-	    moduleSetType(this, CORE);
+	    this->SetType(CORE);
 	    c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
 	    moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

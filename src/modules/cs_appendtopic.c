@@ -62,7 +62,7 @@ class CSAppendTopic : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(this, SUPPORTED);
+		this->SetType(SUPPORTED);
 
 		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_HEAD);

@@ -27,7 +27,7 @@ class CSTopic : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("TOPIC", do_cs_topic, NULL, CHAN_HELP_TOPIC, -1, -1,-1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

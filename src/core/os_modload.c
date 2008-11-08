@@ -27,7 +27,7 @@ class OSModLoad : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("MODLOAD", do_modload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODLOAD);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

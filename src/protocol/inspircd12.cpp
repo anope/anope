@@ -1316,7 +1316,7 @@ class ProtoInspIRCd : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, PROTOCOL);
+		this->SetType(PROTOCOL);
 
 		TS6SID = sstrdup(Numeric);
 

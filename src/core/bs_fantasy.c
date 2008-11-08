@@ -26,7 +26,7 @@ class BSFantasy : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
 		moduleAddEventHook(hook);
 	}

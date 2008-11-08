@@ -27,7 +27,7 @@ class MSCancel : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("CANCEL", do_cancel, NULL, MEMO_HELP_CANCEL, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

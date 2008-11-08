@@ -26,7 +26,7 @@ class OSSession : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		/**
 		* do_session/do_exception are exported from sessions.c - we just want to provide an interface.

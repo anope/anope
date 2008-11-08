@@ -73,7 +73,7 @@ class OSInfo : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(this, SUPPORTED);
+		this->SetType(SUPPORTED);
 
 		if (mLoadConfig())
 			throw ModuleException("Unable to load config");

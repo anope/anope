@@ -27,7 +27,7 @@ class MSSendAll : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("SENDALL", do_sendall, is_services_admin, -1, -1, -1, MEMO_HELP_SENDALL, MEMO_HELP_SENDALL);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

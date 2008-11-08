@@ -86,7 +86,7 @@ class OSIgnoreDB : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(this, SUPPORTED);
+		this->SetType(SUPPORTED);
 
 		hook = createEventHook(EVENT_RELOAD, reload_config);
 		if (moduleAddEventHook(hook) != MOD_ERR_OK)

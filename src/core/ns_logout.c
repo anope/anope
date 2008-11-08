@@ -30,7 +30,7 @@ class NSLogout : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1, NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

@@ -29,7 +29,7 @@ class OSModInfo : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 		c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1, OPER_HELP_MODINFO);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
 

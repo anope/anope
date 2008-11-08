@@ -28,7 +28,7 @@ class CSSuspend : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1, CHAN_SERVADMIN_HELP_SUSPEND, CHAN_SERVADMIN_HELP_SUSPEND);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

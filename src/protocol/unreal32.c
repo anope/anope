@@ -1526,7 +1526,7 @@ class ProtoUnreal : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, PROTOCOL);
+		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("UnrealIRCd 3.2+");
 		pmodule_ircd_cap(myIrcdcap);

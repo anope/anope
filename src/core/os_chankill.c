@@ -27,7 +27,7 @@ class OSChanKill : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(this, CORE);
+		this->SetType(CORE);
 
 		c = createCommand("CHANKILL", do_chankill, is_services_admin, OPER_HELP_CHANKILL, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

@@ -41,7 +41,7 @@ class NSMaxEmail : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(this, SUPPORTED);
+		this->SetType(SUPPORTED);
 
 		c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_HEAD);

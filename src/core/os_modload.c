@@ -71,14 +71,10 @@ int do_modload(User * u)
 		return MOD_CONT;
 	}
 
-	m = createModule(name);
-	alog("Trying to load module [%s]", mod_operation_queue->m->name);
-	status = loadModule(mod_operation_queue->m, mod_operation_queue->u);
-	alog("Module loading status: %d (%s)", status, ModuleGetErrStr(status));
+	int status = loadModule(name, u);
 	if (status != MOD_ERR_OK)
 	{
-		notice_lang(s_OperServ, user, OPER_MODULE_LOAD_FAIL, m->name);
-		destroyModule(m);
+		notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name.c_str());
 	}
 
     return MOD_CONT;

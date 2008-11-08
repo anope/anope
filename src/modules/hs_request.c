@@ -256,7 +256,7 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 
     if ((mod_current_module_name)
         && (!mod_current_module
-            || strcmp(mod_current_module_name, mod_current_module->name)))
+            || mod_current_module_name != mod_current_module->name))
         mod_current_module = findModule(mod_current_module_name);
 
     u2 = finduser(name);
@@ -288,7 +288,7 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
         }
         free(buf);
     } else {
-        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name, lang, number);
+        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
     }
 }
 

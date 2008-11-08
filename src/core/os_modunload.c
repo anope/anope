@@ -73,13 +73,12 @@ int do_modunload(User *u)
 		return MOD_CONT;
 	}
 
-	alog("Trying to unload module [%s]", m->name);
+	alog("Trying to unload module [%s]", name);
 
 	status = unloadModule(m, u);
 
 	if (!status)
 	{
-		alog("Module unloading status: %d (%s)", status, ModuleGetErrStr(status));
 		notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, name);
 	}
 

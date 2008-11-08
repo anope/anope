@@ -17,8 +17,8 @@
 
 int do_modinfo(User * u);
 void myOperServHelp(User * u);
-int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u);
-int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
+int showModuleMsgLoaded(MessageHash * msgList, const char *mod_name, User * u);
+int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u);
 
 class OSModInfo : public Module
 {
@@ -70,18 +70,18 @@ int do_modinfo(User * u)
         tm = *localtime(&m->time);
         strftime_lang(timebuf, sizeof(timebuf), u,
                       STRFTIME_DATE_TIME_FORMAT, &tm);
-        notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name,
+        notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(),
                     m->version ? m->version : "?",
                     m->author ? m->author : "?", timebuf);
         for (idx = 0; idx < MAX_CMD_HASH; idx++) {
-            showModuleCmdLoaded(HOSTSERV[idx], m->name, u);
-            showModuleCmdLoaded(OPERSERV[idx], m->name, u);
-            showModuleCmdLoaded(NICKSERV[idx], m->name, u);
-            showModuleCmdLoaded(CHANSERV[idx], m->name, u);
-            showModuleCmdLoaded(BOTSERV[idx], m->name, u);
-            showModuleCmdLoaded(MEMOSERV[idx], m->name, u);
-            showModuleCmdLoaded(HELPSERV[idx], m->name, u);
-            showModuleMsgLoaded(IRCD[idx], m->name, u);
+            showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(OPERSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(NICKSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(CHANSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
+            showModuleCmdLoaded(HELPSERV[idx], m->name.c_str(), u);
+            showModuleMsgLoaded(IRCD[idx], m->name.c_str(), u);
 
         }
     } else {
@@ -90,7 +90,7 @@ int do_modinfo(User * u)
     return MOD_CONT;
 }
 
-int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u)
+int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u)
 {
     Command *c;
     CommandHash *current;
@@ -108,7 +108,7 @@ int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u)
     return display;
 }
 
-int showModuleMsgLoaded(MessageHash * msgList, char *mod_name, User * u)
+int showModuleMsgLoaded(MessageHash * msgList, const char *mod_name, User * u)
 {
     Message *msg;
     MessageHash *mcurrent;

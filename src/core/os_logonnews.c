@@ -46,7 +46,7 @@ class OSLogonNews : public Module
 		moduleSetOperHelp(myOperServHelp);
 
 		hook = createEventHook(EVENT_RELOAD, reload_config);
-		if (moduleAddEventHook(hook) != MOD_ERR_OK)
+		if (this->AddEventHook(hook) != MOD_ERR_OK)
 		{
 			throw ModuleException("os_logonnews: Can't hook to EVENT_RELOAD event");
 		}

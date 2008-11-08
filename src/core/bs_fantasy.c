@@ -28,7 +28,7 @@ class BSFantasy : public Module
 		moduleAddVersion("$Id$");
 		this->SetType(CORE);
 		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
-		moduleAddEventHook(hook);
+		this->AddEventHook(hook);
 	}
 };
 

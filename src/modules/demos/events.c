@@ -24,11 +24,11 @@ int AnopeInit(int argc, char **argv)
     status = moduleAddEventHandler(msg);
 
     hook = createEventHook(EVENT_DB_SAVING, my_save);
-    status = moduleAddEventHook(hook);
+    status = this->AddEventHook(hook);
 
 
     hook = createEventHook(EVENT_BOT_FANTASY, do_moo);
-    status = moduleAddEventHook(hook);
+    status = this->AddEventHook(hook);
     
     moduleAddAuthor(AUTHOR);
     moduleAddVersion(VERSION);

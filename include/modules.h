@@ -185,6 +185,14 @@ CoreExport class Module
 	 *
 	 **/
 	int AddEventHook(EvtHook *evh);
+
+	/**
+	 * Add a module message to the IRCD message hash
+	 * @param m the Message to add
+	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
+	 * @return MOD_ERR_OK on success, althing else on fail.
+	 **/
+	int AddEventHandler(EvtMessage *evm);
 };
 
 struct ModuleHash_ {
@@ -356,7 +364,6 @@ int destroyMessage(Message *m);					/* destroy a Message*/
 MDE EvtMessage *createEventHandler(char *name, int (*func) (const char *source, int ac, const char **av));
 EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
 int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
-MDE int moduleAddEventHandler(EvtMessage * evm);
 MDE int moduleEventDelHandler(char *name);
 int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, const char *mod_name);
 int destroyEventHandler(EvtMessage * evm);
@@ -365,7 +372,6 @@ int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 MDE EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv));
 EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
 int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
-MDE int moduleAddEventHook(EvtHook * evh);
 MDE int moduleEventDelHook(const char *name);
 int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_name);
 int destroyEventHook(EvtHook * evh);

@@ -35,7 +35,7 @@ class BSFantasyOwner : public Module
 		}
 
 		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
-		moduleAddEventHook(hook);
+		this->AddEventHook(hook);
 	}
 };
 

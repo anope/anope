@@ -26,7 +26,7 @@ int AnopeInit(int argc, char **argv) {
     status = moduleAddCommand(HOSTSERV, c, MOD_HEAD);
 
     hook = createEventHook(EVENT_RELOAD, mReadConfig);
-    status = moduleAddEventHook(hook);
+    status = this->AddEventHook(hook);
     
     if(status!=MOD_ERR_OK) {
 	return MOD_STOP;

@@ -49,7 +49,7 @@ class NSMaxEmail : public Module
 		moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
 		evt = createEventHook(EVENT_RELOAD, my_event_reload);
-		if ((status = moduleAddEventHook(evt)))
+		if ((status = this->AddEventHook(evt)))
 		throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
 
 		my_load_config();

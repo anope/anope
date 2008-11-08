@@ -29,7 +29,7 @@ class BSFantasyKick : public Module
 		this->SetType(CORE);
 
 		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
-		moduleAddEventHook(hook);
+		this->AddEventHook(hook);
 	}
 };
 

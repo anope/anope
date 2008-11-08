@@ -1331,15 +1331,15 @@ class ProtoCharybdis : public Module
 		moduleAddIRCDMsgs();
 
 		hk = createEventHook(EVENT_NICK_IDENTIFY, charybdis_send_account);
-		moduleAddEventHook(hk);
+		this->AddEventHook(hk);
 
 		hk = createEventHook(EVENT_NICK_REGISTERED, charybdis_send_account);
-		moduleAddEventHook(hk);
+		this->AddEventHook(hk);
 
 		/* XXX: It'd be nice if we could have an event like this, but it's not there yet :( */
 		/* It's there now! Trystan said so! -GD */
 		hk = createEventHook(EVENT_NICK_LOGOUT, charybdis_send_deaccount);
-		moduleAddEventHook(hk);
+		this->AddEventHook(hk);
 	}
 
 	~ProtoCharybdis()

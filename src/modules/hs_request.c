@@ -114,10 +114,10 @@ class HSRequest : public Module
 		moduleAddCommand(NICKSERV, c, MOD_HEAD);
 
 		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
-		moduleAddEventHook(hook);
+		this->AddEventHook(hook);
 
 		hook = createEventHook(EVENT_DB_BACKUP, hsreqevt_db_backup);
-		moduleAddEventHook(hook);
+		this->AddEventHook(hook);
 
 		moduleSetHostHelp(hs_help);
 		moduleAddAuthor(AUTHOR);

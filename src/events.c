@@ -477,38 +477,21 @@ int addCoreEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
     return addEventHook(hookEvtTable, evh);
 }
 
-/**
- * Add a module message to the IRCD message hash
- * @param m the Message to add
- * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleAddEventHandler(EvtMessage * evm)
+int Module::AddEventHandler(EvtMessage *evm)
 {
-    int status;
+	int status;
 
-    if (!evm) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!evm)
+		return MOD_ERR_PARAMS;
 
-    /* ok, this appears to be a module adding a message from outside of AnopeInit, try to look up its module struct for it */
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
+	evm->core = 0;
+	if (!evm->mod_name)
+		evm->mod_name = sstrdup(this->name.c_str());
 
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }                           /* shouldnt happen */
-    evm->core = 0;
-    if (!evm->mod_name) {
-        evm->mod_name = sstrdup(mod_current_module->name.c_str());
-    }
-
-    status = addEventHandler(EVENT, evm);
-    if (debug) {
-        displayEvtMessageFromHash(evm->name);
-    }
-    return status;
+	status = addEventHandler(EVENT, evm);
+	if (debug)
+		displayEvtMessageFromHash(evm->name);
+	return status;
 }
 
 int Module::AddEventHook(EvtHook *evh)

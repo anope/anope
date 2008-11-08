@@ -93,13 +93,13 @@ class OSInfo : public Module
 		status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
 
 		hook = createEventHook(EVENT_DB_SAVING, mSaveData);
-		status = moduleAddEventHook(hook);
+		status = this->AddEventHook(hook);
 
 		hook = createEventHook(EVENT_DB_BACKUP, mBackupData);
-		status = moduleAddEventHook(hook);
+		status = this->AddEventHook(hook);
 
 		hook = createEventHook(EVENT_RELOAD, mEventReload);
-		status = moduleAddEventHook(hook);
+		status = this->AddEventHook(hook);
 
 		moduleSetNickHelp(mMainNickHelp);
 		moduleSetChanHelp(mMainChanHelp);

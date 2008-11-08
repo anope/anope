@@ -1,4 +1,4 @@
-/* inspircd 1.1 beta 6+ functions
+/* inspircd 1.2 functions
  *
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
@@ -71,7 +71,7 @@ int inet_aton(const char *name, struct in_addr *addr)
 #endif
 
 IRCDVar myIrcd[] = {
-    {"InspIRCd 1.1",            /* ircd name */
+    {"InspIRCd 1.2",            /* ircd name */
      "+I",                      /* Modes used by pseudoclients */
      5,                         /* Chan Max Symbols     */
      "-cilmnpstuzACGHKNOQRSV",  /* Modes to Remove */
@@ -1320,7 +1320,7 @@ class ProtoInspIRCd : public Module
 
 		TS6SID = sstrdup(Numeric);
 
-		pmodule_ircd_version("InspIRCd 1.1");
+		pmodule_ircd_version("InspIRCd 1.2");
 		pmodule_ircd_cap(myIrcdcap);
 		pmodule_ircd_var(myIrcd);
 		pmodule_ircd_cbmodeinfos(myCbmodeinfos);

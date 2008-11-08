@@ -30,23 +30,23 @@ class BSKick : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("KICK", do_kickcmd, NULL, BOT_HELP_KICK, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK BADWORDS", NULL, NULL, BOT_HELP_KICK_BADWORDS, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK BOLDS", NULL, NULL, BOT_HELP_KICK_BOLDS, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK CAPS", NULL, NULL, BOT_HELP_KICK_CAPS, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK COLORS", NULL, NULL, BOT_HELP_KICK_COLORS, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK FLOOD", NULL, NULL, BOT_HELP_KICK_FLOOD, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK REPEAT", NULL, NULL, BOT_HELP_KICK_REPEAT, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK REVERSES", NULL, NULL, BOT_HELP_KICK_REVERSES, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("KICK UNDERLINES", NULL, NULL, BOT_HELP_KICK_UNDERLINES, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

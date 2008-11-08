@@ -32,7 +32,7 @@ class HSSetAll : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SETALL", do_setall, is_host_setter, HOST_HELP_SETALL, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 		moduleSetHostHelp(myHostServHelp);
 	}
 };

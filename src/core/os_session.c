@@ -32,9 +32,9 @@ class OSSession : public Module
 		* do_session/do_exception are exported from sessions.c - we just want to provide an interface.
 		**/
 		c = createCommand("SESSION", do_session, is_services_oper, OPER_HELP_SESSION, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("EXCEPTION", do_exception, is_services_oper, OPER_HELP_EXCEPTION, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

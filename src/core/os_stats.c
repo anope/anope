@@ -33,9 +33,9 @@ class OSStats : public Module
 		this->SetType(CORE);
 
 		c = createCommand("STATS", do_stats, NULL, OPER_HELP_STATS, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("UPTIME", do_stats, NULL, OPER_HELP_STATS, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

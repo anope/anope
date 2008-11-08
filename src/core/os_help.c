@@ -28,7 +28,7 @@ class OSHelp : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 	}
 };
 

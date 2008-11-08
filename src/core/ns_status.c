@@ -30,7 +30,7 @@ class NSStatus : public Module
 		this->SetType(CORE);
 
 		c = createCommand("STATUS", do_status, NULL, NICK_HELP_STATUS, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

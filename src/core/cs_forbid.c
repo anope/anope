@@ -30,7 +30,7 @@ class CSForbid : public Module
 		this->SetType(CORE);
 
 		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_FORBID, CHAN_SERVADMIN_HELP_FORBID);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

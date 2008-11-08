@@ -37,16 +37,16 @@ class NSGroup : public Module
 		this->SetType(CORE);
 
 		c = createCommand("GROUP", do_group, NULL, NICK_HELP_GROUP, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		c = createCommand("LINK", do_link, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		c = createCommand("GLIST", do_glist, NULL, -1, NICK_HELP_GLIST, -1, NICK_SERVADMIN_HELP_GLIST, NICK_SERVADMIN_HELP_GLIST);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		c = createCommand("LISTLINKS", do_listlinks, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

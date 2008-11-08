@@ -837,7 +837,7 @@ int prepForUnload(Module * m)
         for (current = HS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(HOSTSERV, c->name);
+                    m->DelCommand(HOSTSERV, c->name);
                 }
             }
         }
@@ -845,7 +845,7 @@ int prepForUnload(Module * m)
         for (current = BS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(BOTSERV, c->name);
+                    m->DelCommand(BOTSERV, c->name);
                 }
             }
         }
@@ -853,7 +853,7 @@ int prepForUnload(Module * m)
         for (current = MS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(MEMOSERV, c->name);
+                    m->DelCommand(MEMOSERV, c->name);
                 }
             }
         }
@@ -861,7 +861,7 @@ int prepForUnload(Module * m)
         for (current = NS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(NICKSERV, c->name);
+                    m->DelCommand(NICKSERV, c->name);
                 }
             }
         }
@@ -869,7 +869,7 @@ int prepForUnload(Module * m)
         for (current = CS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(CHANSERV, c->name);
+                    m->DelCommand(CHANSERV, c->name);
                 }
             }
         }
@@ -877,7 +877,7 @@ int prepForUnload(Module * m)
         for (current = HE_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (strcmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(HELPSERV, c->name);
+                    m->DelCommand(HELPSERV, c->name);
                 }
             }
         }
@@ -885,7 +885,7 @@ int prepForUnload(Module * m)
         for (current = OS_cmdTable[idx]; current; current = current->next) {
             for (c = current->c; c; c = c->next) {
                 if ((c->mod_name) && (stricmp(c->mod_name, m->name.c_str()) == 0)) {
-                    moduleDelCommand(OPERSERV, c->name);
+                    m->DelCommand(OPERSERV, c->name);
                 }
             }
         }
@@ -1091,33 +1091,16 @@ static int internal_addCommand(CommandHash * cmdTable[], Command * c, int pos)
     return MOD_ERR_OK;
 }
 
-/**
- * Add a module provided command to the given service.
- * e.g. moduleAddCommand(NICKSERV,c,MOD_HEAD);
- * @param cmdTable the services to add the command to
- * @param c the command to add
- * @param pos the position to add to, MOD_HEAD, MOD_TAIL, MOD_UNIQUE
- * @see createCommand
- * @return MOD_ERR_OK on successfully adding the command
- */
-int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
+int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
 {
     int status;
 
     if (!cmdTable || !c) {
         return MOD_ERR_PARAMS;
     }
-    /* ok, this appears to be a module adding a command from outside of AnopeInit, try to look up its module struct for it */
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }                           /* shouldnt happen */
     c->core = 0;
     if (!c->mod_name) {
-        c->mod_name = sstrdup(mod_current_module->name.c_str());
+        c->mod_name = sstrdup(this->name.c_str());
     }
 
 
@@ -1253,15 +1236,11 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
  * @param name the name of the command to delete from the service
  * @return returns MOD_ERR_OK on success
  */
-int moduleDelCommand(CommandHash * cmdTable[], const char *name)
+int Module::DelCommand(CommandHash * cmdTable[], const char *name)
 {
     Command *c = NULL;
     Command *cmd = NULL;
     int status = 0;
-
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }
 
     c = findCommand(cmdTable, name);
     if (!c) {
@@ -1271,11 +1250,11 @@ int moduleDelCommand(CommandHash * cmdTable[], const char *name)
 
     for (cmd = c; cmd; cmd = cmd->next) {
         if (cmd->mod_name
-            && cmd->mod_name == mod_current_module->name) {
+            && cmd->mod_name == this->name) {
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }
-            status = internal_delCommand(cmdTable, cmd, mod_current_module->name.c_str());
+            status = internal_delCommand(cmdTable, cmd, this->name.c_str());
             if (debug >= 2) {
                 displayCommandFromHash(cmdTable, name);
             }

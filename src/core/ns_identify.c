@@ -34,11 +34,11 @@ class NSIdentify : public Module
 		this->SetType(CORE);
 
 		c = createCommand("ID", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("IDENTIFY", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SIDENTIFY", do_identify, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 
 		moduleSetNickHelp(myNickServHelp);

@@ -65,7 +65,7 @@ class CSAppendTopic : public Module
 		this->SetType(SUPPORTED);
 
 		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		this->AddCommand(CHANSERV, c, MOD_HEAD);
 		moduleAddHelp(c, my_cs_help_appendtopic);
 		moduleSetChanHelp(my_cs_help);
 

@@ -49,7 +49,7 @@ class CSTBan : public Module
 		moduleSetChanHelp(myHelp);
 		c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, myFullHelp);
-		moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		this->AddCommand(CHANSERV, c, MOD_HEAD);
 
 		this->SetAuthor(AUTHOR);
 		this->SetVersion(VERSION);

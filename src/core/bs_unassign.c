@@ -29,7 +29,7 @@ class BSUnassign : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("UNASSIGN", do_unassign, NULL, BOT_HELP_UNASSIGN, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

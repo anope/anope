@@ -29,7 +29,7 @@ class MSSend : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("SEND", do_send, NULL, MEMO_HELP_SEND, -1, -1, -1, -1);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);
 	}
 };

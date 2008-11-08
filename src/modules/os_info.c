@@ -80,17 +80,17 @@ class OSInfo : public Module
 
 		c = createCommand("oInfo", myAddNickInfo, is_oper, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, mNickHelp);
-		status = moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		status = this->AddCommand(NICKSERV, c, MOD_HEAD);
 
 		c = createCommand("Info", myNickInfo, NULL, -1, -1, -1, -1, -1);
-		status = moduleAddCommand(NICKSERV, c, MOD_TAIL);
+		status = this->AddCommand(NICKSERV, c, MOD_TAIL);
 
 		c = createCommand("oInfo", myAddChanInfo, is_oper, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, mChanHelp);
-		status = moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		status = this->AddCommand(CHANSERV, c, MOD_HEAD);
 
 		c = createCommand("Info", myChanInfo, NULL, -1, -1, -1, -1, -1);
-		status = moduleAddCommand(CHANSERV, c, MOD_TAIL);
+		status = this->AddCommand(CHANSERV, c, MOD_TAIL);
 
 		hook = createEventHook(EVENT_DB_SAVING, mSaveData);
 		status = this->AddEventHook(hook);

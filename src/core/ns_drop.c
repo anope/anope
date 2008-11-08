@@ -31,9 +31,9 @@ class NSDrop : public Module
 		this->SetType(CORE);
 
 		c = createCommand("DROP", do_drop, NULL, -1, NICK_HELP_DROP, -1, NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("UNLINK", do_unlink, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

@@ -30,7 +30,7 @@ class CSGetKey : public Module
 		this->SetType(CORE);
 
 		c = createCommand("GETKEY", do_getkey, NULL, CHAN_HELP_GETKEY, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

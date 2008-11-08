@@ -33,7 +33,7 @@ class OSChanList : public Module
 		this->SetType(CORE);
 
 		c = createCommand("CHANLIST", do_chanlist, is_services_oper, OPER_HELP_CHANLIST, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -39,7 +39,7 @@ class OSOperNews : public Module
 		c = createCommand("OPERNEWS", do_opernews, is_services_admin, NEWS_HELP_OPER, -1, -1, -1, -1);
 		snprintf(buf, BUFSIZE, "%d", NewsCount),
 		c->help_param1 = sstrdup(buf);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 

@@ -33,7 +33,7 @@ class OSOper : public Module
 		this->SetType(CORE);
 		c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -31,7 +31,7 @@ class OSSVSNick : public Module
 
 		c = createCommand("SVSNICK", do_svsnick, is_services_root,
 		OPER_HELP_SVSNICK, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 		if (!ircd->svsnick)

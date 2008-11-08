@@ -29,7 +29,7 @@ class MSInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("INFO", do_info, NULL, -1, MEMO_HELP_INFO, -1, MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);
 	}
 };

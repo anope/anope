@@ -31,7 +31,7 @@ class NSRecover : public Module
 		this->SetType(CORE);
 
 		c = createCommand("RECOVER", do_recover, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		moduleAddHelp(c, myHelpResonse);
 
 		moduleSetNickHelp(myNickServHelp);

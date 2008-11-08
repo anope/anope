@@ -32,14 +32,14 @@ class MSSet : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, MEMO_HELP_SET, -1, -1, -1, -1);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
 		c = createCommand("SET NOTIFY", NULL, NULL, MEMO_HELP_SET_NOTIFY, -1, -1, -1, -1);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
 		c = createCommand("SET LIMIT", NULL, NULL, -1, MEMO_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT, MEMO_SERVADMIN_HELP_SET_LIMIT);
 		c->help_param1 = (char *) (long) MSMaxMemos;
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 
 		moduleSetMemoHelp(myMemoServHelp);
 	}

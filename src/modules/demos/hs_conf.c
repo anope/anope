@@ -23,7 +23,7 @@ int AnopeInit(int argc, char **argv) {
     mReadConfig(0,NULL);
     
     c = createCommand("SHOW",mShowSetting,NULL,-1,-1,-1,-1,-1);
-    status = moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+    status = this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
     hook = createEventHook(EVENT_RELOAD, mReadConfig);
     status = this->AddEventHook(hook);

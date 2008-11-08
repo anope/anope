@@ -34,7 +34,7 @@ class OSRestart : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("RESTART", do_restart, is_services_root, OPER_HELP_RESTART, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

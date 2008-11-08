@@ -34,7 +34,7 @@ int AnopeInit(int argc, char **argv)							/* This will be executed when the mod
 
     moduleSetHostHelp(myHostServHelp);						/* add us to the .hs help list */
 
-    status = moduleAddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
+    status = this->AddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
 
     /* Check if we have any argv's */
     if(argc>0) {

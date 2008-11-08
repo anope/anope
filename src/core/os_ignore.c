@@ -30,7 +30,7 @@ class OSIgnore : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("IGNORE", do_ignoreuser, is_services_admin, OPER_HELP_IGNORE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -31,7 +31,7 @@ class NSInfo : public Module
 		this->SetType(CORE);
 
 		c = createCommand("INFO", do_info, NULL, NICK_HELP_INFO, -1, NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO, NICK_SERVADMIN_HELP_INFO);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

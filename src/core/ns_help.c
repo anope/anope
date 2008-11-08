@@ -29,7 +29,7 @@ class NSHelp : public Module
 		this->SetType(CORE);
 
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 	}
 };
 

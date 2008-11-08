@@ -30,7 +30,7 @@ class OSUpdate : public Module
 		this->SetType(CORE);
 
 		c = createCommand("UPDATE", do_update, is_services_root, OPER_HELP_UPDATE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

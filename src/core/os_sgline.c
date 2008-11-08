@@ -38,7 +38,7 @@ class OSSGLine : public Module
 
 		c = createCommand("SGLINE", do_sgline, is_services_oper,
 		OPER_HELP_SGLINE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 

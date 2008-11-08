@@ -30,7 +30,7 @@ class HSDelAll : public Module
 		this->SetType(CORE);
 
 		c = createCommand("DELALL", do_delall, is_host_remover, HOST_HELP_DELALL, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
 		moduleSetHostHelp(myHostServHelp);
 	}

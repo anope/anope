@@ -30,7 +30,7 @@ class HSOn : public Module
 		this->SetType(CORE);
 
 		c = createCommand("ON", do_on, NULL, HOST_HELP_ON, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
 		moduleSetHostHelp(myHostServHelp);
 	}

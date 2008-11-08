@@ -30,24 +30,24 @@ class BSSet : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, BOT_HELP_SET, -1, -1, BOT_SERVADMIN_HELP_SET, BOT_SERVADMIN_HELP_SET);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET DONTKICKOPS", NULL, NULL, BOT_HELP_SET_DONTKICKOPS, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET DONTKICKVOICES", NULL, NULL, BOT_HELP_SET_DONTKICKVOICES, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET FANTASY", NULL, NULL, BOT_HELP_SET_FANTASY, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET GREET", NULL, NULL, BOT_HELP_SET_GREET, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET SYMBIOSIS", NULL, NULL, BOT_HELP_SET_SYMBIOSIS, -1, -1, -1, -1);
 		c->help_param1 = s_ChanServ;
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET NOBOT", NULL, NULL, -1, -1, -1, BOT_SERVADMIN_HELP_SET_NOBOT, BOT_SERVADMIN_HELP_SET_NOBOT);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 		c = createCommand("SET PRIVATE", NULL, NULL, -1, -1, -1,
 		BOT_SERVADMIN_HELP_SET_PRIVATE,
 		BOT_SERVADMIN_HELP_SET_PRIVATE);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

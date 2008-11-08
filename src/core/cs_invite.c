@@ -30,7 +30,7 @@ class CSInvite : public Module
 		this->SetType(CORE);
 
 		c = createCommand("INVITE", do_invite, NULL, CHAN_HELP_INVITE, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

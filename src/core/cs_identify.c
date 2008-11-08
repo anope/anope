@@ -30,10 +30,10 @@ class CSIdentify : public Module
 		this->SetType(CORE);
 
 		c = createCommand("IDENTIFY", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		c = createCommand("ID", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

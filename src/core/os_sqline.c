@@ -38,7 +38,7 @@ class OSSQLine : public Module
 
 		c = createCommand("SQLINE", do_sqline, is_services_oper,
 		OPER_HELP_SQLINE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 		if (!ircd->sqline)

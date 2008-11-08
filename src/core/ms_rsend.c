@@ -29,7 +29,7 @@ class MSRSend : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("RSEND", do_rsend, NULL, MEMO_HELP_RSEND, -1, -1, -1, -1);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);
 
 		if (!MSMemoReceipt)

@@ -44,31 +44,31 @@ class NSSet : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET DISPLAY", NULL, NULL, NICK_HELP_SET_DISPLAY, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET PASSWORD", NULL, NULL, NICK_HELP_SET_PASSWORD, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET URL", NULL, NULL, NICK_HELP_SET_URL, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET EMAIL", NULL, NULL, NICK_HELP_SET_EMAIL, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET ICQ", NULL, NULL, NICK_HELP_SET_ICQ, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET GREET", NULL, NULL, NICK_HELP_SET_GREET, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET KILL", NULL, NULL, NICK_HELP_SET_KILL, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET SECURE", NULL, NULL, NICK_HELP_SET_SECURE, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET PRIVATE", NULL, NULL, NICK_HELP_SET_PRIVATE, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET MSG", NULL, NULL, NICK_HELP_SET_MSG, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET HIDE", NULL, NULL, NICK_HELP_SET_HIDE, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 		c = createCommand("SET AUTOOP", NULL, NULL, NICK_HELP_SET_AUTOOP, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

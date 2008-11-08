@@ -31,7 +31,7 @@ class NSList : public Module
 
 		c = createCommand("LIST", do_list, NULL, -1, NICK_HELP_LIST, -1, NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST);
 
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

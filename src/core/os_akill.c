@@ -35,7 +35,7 @@ class OSAKill : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("AKILL", do_akill, is_services_oper, OPER_HELP_AKILL, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

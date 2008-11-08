@@ -32,7 +32,7 @@ class CSAKick : public Module
 		this->SetType(CORE);
 
 		c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

@@ -214,6 +214,25 @@ CoreExport class Module
 	 * @return MOD_ERR_OK on success, althing else on fail.
 	 **/
 	int DelEventHook(const char *name);
+
+	/**
+	 * Add a module provided command to the given service.
+	 * e.g. AddCommand(NICKSERV,c,MOD_HEAD);
+	 * @param cmdTable the services to add the command to
+	 * @param c the command to add
+	 * @param pos the position to add to, MOD_HEAD, MOD_TAIL, MOD_UNIQUE
+	 * @see createCommand
+	 * @return MOD_ERR_OK on successfully adding the command
+	 */
+	int AddCommand(CommandHash *cmdTable[], Command * c, int pos);
+
+	/**
+	 * Delete a command from the service given.
+	 * @param cmdTable the cmdTable for the services to remove the command from
+	 * @param name the name of the command to delete from the service
+	 * @return returns MOD_ERR_OK on success
+	 */
+	int DelCommand(CommandHash * cmdTable[], const char *name);
 };
 
 struct ModuleHash_ {
@@ -362,8 +381,6 @@ MDE int moduleGetConfigDirective(Directive *h);
 /* Command Managment Functions */
 MDE Command *createCommand(const char *name,int (*func)(User *u),int (*has_priv)(User *u),int help_all, int help_reg, int help_oper, int help_admin,int help_root);
 MDE int destroyCommand(Command *c);					/* destroy a command */
-MDE int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
-MDE int moduleDelCommand(CommandHash *cmdTable[], const char *name);		/* Del a command from a cmd table */
 Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 
 /*************************************************************************/

@@ -44,9 +44,9 @@ class NSMaxEmail : public Module
 		this->SetType(SUPPORTED);
 
 		c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		this->AddCommand(NICKSERV, c, MOD_HEAD);
 		c = createCommand("SET", my_ns_set, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		this->AddCommand(NICKSERV, c, MOD_HEAD);
 
 		evt = createEventHook(EVENT_RELOAD, my_event_reload);
 		if ((status = this->AddEventHook(evt)))

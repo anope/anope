@@ -30,7 +30,7 @@ class HSSet : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SET", myDoSet, is_host_setter, HOST_HELP_SET, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
 		moduleSetHostHelp(myHostServHelp);
 	}

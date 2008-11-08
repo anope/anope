@@ -29,7 +29,7 @@ class BSAssign : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("ASSIGN", do_assign, NULL, BOT_HELP_ASSIGN, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

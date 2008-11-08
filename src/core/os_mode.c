@@ -30,7 +30,7 @@ class OSMode : public Module
 		this->SetType(CORE);
 
 		c = createCommand("MODE", do_os_mode, is_services_oper, OPER_HELP_MODE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -44,7 +44,7 @@ class CSEnforce : public Module
 		this->SetType(SUPPORTED);
 
 		c = createCommand("ENFORCE", my_cs_enforce, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_HEAD);
+		this->AddCommand(CHANSERV, c, MOD_HEAD);
 
 		moduleAddHelp(c, my_cs_help_enforce);
 		moduleSetChanHelp(my_cs_help);

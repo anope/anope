@@ -31,7 +31,7 @@ class CSRegister : public Module
 
 		c = createCommand("REGISTER", do_register, NULL, CHAN_HELP_REGISTER, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

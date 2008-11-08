@@ -30,7 +30,7 @@ class HSDel : public Module
 		this->SetType(CORE);
 
 		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
 		moduleSetHostHelp(myHostServHelp);
 	}

@@ -30,7 +30,7 @@ class OSModList : public Module
 		this->SetType(CORE);
 
 		c = createCommand("MODLIST", do_modlist, NULL, -1, -1, -1, -1, OPER_HELP_MODLIST);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -30,7 +30,7 @@ class CSInfo : public Module
 		this->SetType(CORE);
 
 		c = createCommand("INFO", do_info, NULL, CHAN_HELP_INFO, -1, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

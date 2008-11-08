@@ -30,7 +30,7 @@ class BSInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("INFO", do_info, NULL, BOT_HELP_INFO, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

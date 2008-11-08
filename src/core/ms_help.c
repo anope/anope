@@ -28,7 +28,7 @@ class MSHelp : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
+		this->AddCommand(MEMOSERV, c, MOD_UNIQUE);
 	}
 };
 

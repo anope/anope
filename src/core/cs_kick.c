@@ -30,7 +30,7 @@ class CSKick : public Module
 		this->SetType(CORE);
 
 		c = createCommand("KICK", do_cs_kick, NULL, CHAN_HELP_KICK, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

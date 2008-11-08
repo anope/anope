@@ -29,7 +29,7 @@ class HEHelp : public Module
 		this->SetType(CORE);
 
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(HELPSERV, c, MOD_UNIQUE);
+		this->AddCommand(HELPSERV, c, MOD_UNIQUE);
 	}
 };
 

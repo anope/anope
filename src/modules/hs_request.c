@@ -93,25 +93,25 @@ class HSRequest : public Module
 
 		c = createCommand("request", hs_do_request, nick_identified, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, hs_help_request);
-		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
 		c = createCommand("activate", hs_do_activate, is_host_setter, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, hs_help_activate);
-		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
 		c = createCommand("reject", hs_do_reject, is_host_setter, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, hs_help_reject);
-		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
 		c = createCommand("waiting", hs_do_waiting, is_host_setter, -1, -1, -1, -1, -1);
 		moduleAddHelp(c, hs_help_waiting);
-		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
 		c = createCommand("list", hs_do_list_out, is_services_oper, -1, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_HEAD);
+		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
 		c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1); 
-		moduleAddCommand(NICKSERV, c, MOD_HEAD);
+		this->AddCommand(NICKSERV, c, MOD_HEAD);
 
 		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
 		this->AddEventHook(hook);

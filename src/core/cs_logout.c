@@ -31,7 +31,7 @@ class CSLogout : public Module
 		this->SetType(CORE);
 
 		c = createCommand("LOGOUT", do_logout, NULL, -1, CHAN_HELP_LOGOUT, -1, CHAN_SERVADMIN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

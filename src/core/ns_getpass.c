@@ -30,7 +30,7 @@ class NSGetPass : public Module
 		this->SetType(CORE);
 
 		c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_GETPASS, NICK_SERVADMIN_HELP_GETPASS);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

@@ -33,7 +33,7 @@ class HSGroup : public Module
 		this->SetType(CORE);
 
 		c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1, -1);
-		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);
+		this->AddCommand(HOSTSERV, c, MOD_UNIQUE);
 
 		moduleSetHostHelp(myHostServHelp);
 	}

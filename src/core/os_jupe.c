@@ -30,7 +30,7 @@ class OSJupe : public Module
 		this->SetType(CORE);
 
 		c = createCommand("JUPE", do_jupe, is_services_admin, OPER_HELP_JUPE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -36,7 +36,7 @@ class OSDEFCON : public Module
 		this->SetType(CORE);
 
 		c = createCommand("DEFCON", do_defcon, is_services_admin, OPER_HELP_DEFCON, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

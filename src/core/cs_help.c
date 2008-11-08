@@ -29,7 +29,7 @@ class CSHelp : public Module
 		this->SetType(CORE);
 
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 	}
 };
 

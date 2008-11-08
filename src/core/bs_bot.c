@@ -30,7 +30,7 @@ class BSBot : public Module
 		this->SetType(CORE);
 
 		c = createCommand("BOT", do_bot, is_services_admin, -1, -1, -1,	BOT_SERVADMIN_HELP_BOT, BOT_SERVADMIN_HELP_BOT);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

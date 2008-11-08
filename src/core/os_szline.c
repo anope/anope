@@ -37,7 +37,7 @@ class OSSZLine : public Module
 
 		c = createCommand("SZLINE", do_szline, is_services_oper,
 		OPER_HELP_SZLINE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 		if (!ircd->szline)

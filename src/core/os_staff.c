@@ -33,7 +33,7 @@ class OSStaff : public Module
 		this->SetType(CORE);
 
 		c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

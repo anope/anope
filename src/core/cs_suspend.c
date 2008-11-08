@@ -31,9 +31,9 @@ class CSSuspend : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1, CHAN_SERVADMIN_HELP_SUSPEND, CHAN_SERVADMIN_HELP_SUSPEND);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 		c = createCommand("UNSUSPEND", do_unsuspend, is_services_oper, -1, -1, -1, CHAN_SERVADMIN_HELP_UNSUSPEND, CHAN_SERVADMIN_HELP_UNSUSPEND);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

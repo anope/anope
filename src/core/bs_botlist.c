@@ -29,7 +29,7 @@ class BSBotList : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("BOTLIST", do_botlist, NULL, BOT_HELP_BOTLIST, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
 		moduleSetBotHelp(myBotServHelp);
 	}

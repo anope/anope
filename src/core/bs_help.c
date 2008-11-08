@@ -28,7 +28,7 @@ class BSHelp : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
-		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 	}
 };
 

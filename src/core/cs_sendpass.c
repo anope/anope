@@ -32,7 +32,7 @@ class CSSendPass : public Module
 
 		c = createCommand("SENDPASS", do_sendpass, NULL, CHAN_HELP_SENDPASS,
 		-1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 

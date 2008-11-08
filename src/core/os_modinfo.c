@@ -31,7 +31,7 @@ class OSModInfo : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1, OPER_HELP_MODINFO);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

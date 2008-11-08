@@ -31,7 +31,7 @@ class CSList : public Module
 
 		c = createCommand("LIST", do_list, NULL, -1, CHAN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST);
 
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

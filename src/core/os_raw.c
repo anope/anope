@@ -29,7 +29,7 @@ class OSRaw : public Module
 		this->SetType(THIRD);
 
 		c = createCommand("RAW", do_raw, is_services_root, OPER_HELP_RAW, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		if (DisableRaw)
 			throw ModuleException("os_raw: Not loading because you probably shouldn't be loading me");

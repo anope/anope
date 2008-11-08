@@ -31,9 +31,9 @@ class CSBan : public Module
 		this->SetType(CORE);
 
 		c = createCommand("BAN", do_ban, NULL, CHAN_HELP_BAN, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 		c = createCommand("UNBAN", do_unban, NULL, CHAN_HELP_UNBAN, -1, -1, -1, -1);
-		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);
+		this->AddCommand(CHANSERV, c, MOD_UNIQUE);
 
 		moduleSetChanHelp(myChanServHelp);
 	}

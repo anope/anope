@@ -33,7 +33,7 @@ class NSLogout : public Module
 		this->SetType(CORE);
 
 		c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1, NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT);
-		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);
+		this->AddCommand(NICKSERV, c, MOD_UNIQUE);
 
 		moduleSetNickHelp(myNickServHelp);
 	}

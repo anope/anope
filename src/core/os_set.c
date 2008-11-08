@@ -30,21 +30,21 @@ class OSSet : public Module
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, is_services_root, OPER_HELP_SET, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET LIST", NULL, NULL, OPER_HELP_SET_LIST, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET READONLY", NULL, NULL, OPER_HELP_SET_READONLY, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET LOGCHAN", NULL, NULL, OPER_HELP_SET_LOGCHAN, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET DEBUG", NULL, NULL, OPER_HELP_SET_DEBUG, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET NOEXPIRE", NULL, NULL, OPER_HELP_SET_NOEXPIRE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET IGNORE", NULL, NULL, OPER_HELP_SET_IGNORE, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 		c = createCommand("SET SUPERADMIN", NULL, NULL, OPER_HELP_SET_SUPERADMIN, -1, -1, -1, -1);
-		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
+		this->AddCommand(OPERSERV, c, MOD_UNIQUE);
 
 		moduleSetOperHelp(myOperServHelp);
 	}

@@ -86,15 +86,7 @@
 
 IRCDVar myIrcd[] = {
     {"UnrealIRCd 3.2.x",        /* ircd name */
-     "+oS",                     /* nickserv mode */
-     "+oS",                     /* chanserv mode */
-     "+oS",                     /* memoserv mode */
-     "+oS",                     /* hostserv mode */
-     "+ioS",                    /* operserv mode */
-     "+oS",                     /* botserv mode  */
-     "+oS",                     /* helpserv mode */
-     "+ioS",                    /* Global mode   */
-     "+qS",                     /* Used by BotServ Bots */
+     "+Soi",                    /* Modes used by pseudoclients */
      5,                         /* Chan Max Symbols     */
      "-cilmnpstuzACGHKMNOQRSTV",        /* Modes to Remove */
      "+ao",                     /* Channel Umode used by Botserv bots */

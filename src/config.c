@@ -46,7 +46,6 @@ char *ServerName;
 char *ServerDesc;
 char *ServiceUser;
 char *ServiceHost;
-static char *temp_userhost;
 
 char *HelpChannel;
 char *LogChannel;
@@ -239,31 +238,31 @@ char **ModulesDelayedAutoload;
 /**
  * Core Module Stuff
  **/
-char *HostCoreModules;
+static char *HostCoreModules;
 char **HostServCoreModules;
 int HostServCoreNumber;
 
-char *MemoCoreModules;
+static char *MemoCoreModules;
 char **MemoServCoreModules;
 int MemoServCoreNumber;
 
-char *HelpCoreModules;
+static char *HelpCoreModules;
 char **HelpServCoreModules;
 int HelpServCoreNumber;
 
-char *BotCoreModules;
+static char *BotCoreModules;
 char **BotServCoreModules;
 int BotServCoreNumber;
 
-char *OperCoreModules;
+static char *OperCoreModules;
 char **OperServCoreModules;
 int OperServCoreNumber;
 
-char *NickCoreModules;
+static char *NickCoreModules;
 char **NickServCoreModules;
 int NickServCoreNumber;
 
-char *ChanCoreModules;
+static char *ChanCoreModules;
 char **ChanServCoreModules;
 int ChanServCoreNumber;
 
@@ -433,14 +432,16 @@ bool ValidateNotZero(ServerConfig *, const char *tag, const char *value, ValueIt
 
 bool ValidateEmailReg(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
-	if (static_cast<std::string>(value) == "prenickdatabase") {
-		if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
-	}
-	else if (static_cast<std::string>(value) == "preregexpire") {
-		if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
-	}
-	else {
-		if (!data.GetBool()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
+	if (NSEmailReg) {
+		if (static_cast<std::string>(value) == "prenickdatabase") {
+			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail registrations are enabled!");
+		}
+		else if (static_cast<std::string>(value) == "preregexpire") {
+			if (!data.GetInteger()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be non-zero when e-mail registration are enabled!");
+		}
+		else {
+			if (!data.GetBool()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> must be set to yes when e-mail registrations are enabled!");
+		}
 	}
 	return true;
 }
@@ -545,7 +546,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
+	static const char *Once[] = {"serverinfo", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -601,14 +602,21 @@ int ServerConfig::Read(bool bail)
 		{"uplink", "host", "", new ValueContainerChar(&RemoteServer), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER | DT_NORELOAD, ValidatePort},
 		{"uplink", "password", "", new ValueContainerChar(&RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
-		{"uplink", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
+		{"uplink", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
+		{"serverinfo", "name", "", new ValueContainerChar(&ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "description", "", new ValueContainerChar(&ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "ident", "", new ValueContainerChar(&ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "hostname", "", new ValueContainerChar(&ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"nickserv", "emailregistration", "no", new ValueContainerBool(&NSEmailReg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "prenickdatabase", "", new ValueContainerChar(&PreNickDBName), DT_CHARPTR, ValidateEmailReg},
+		{"nickserv", "modules", "", new ValueContainerChar(&NickCoreModules), DT_CHARPTR, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
-		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_BOOLEAN, NoValidation},
+		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
 		{"nickserv", "defaultlanguage", "0", new ValueContainerInt(&NSDefLanguage), DT_INTEGER, ValidateLanguage},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&NSRegDelay), DT_TIME, NoValidation},
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&NSResendDelay), DT_TIME, NoValidation},
@@ -632,7 +640,8 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_BOOLEAN, NoValidation},
+		{"chanserv", "modules", "", new ValueContainerChar(&ChanCoreModules), DT_CHARPTR, NoValidation},
+		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
 		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
@@ -646,6 +655,7 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"memoserv", "modules", "", new ValueContainerChar(&MemoCoreModules), DT_CHARPTR, NoValidation},
 		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
@@ -653,6 +663,7 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
+		{"botserv", "modules", "", new ValueContainerChar(&BotCoreModules), DT_CHARPTR, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
 		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
 		{"botserv", "badwordsmax", "0", new ValueContainerInt(&BSBadWordsMax), DT_INTEGER, ValidateBotServ},
@@ -660,13 +671,15 @@ int ServerConfig::Read(bool bail)
 		{"botserv", "smartjoin", "no", new ValueContainerBool(&BSSmartJoin), DT_BOOLEAN, NoValidation},
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
 		{"botserv", "casesensitive", "no", new ValueContainerBool(&BSCaseSensitive), DT_BOOLEAN, NoValidation},
-		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_BOOLEAN, NoValidation},
+		{"botserv", "fantasycharacter", "!", new ValueContainerChar(&BSFantasyCharacter), DT_CHARPTR, NoValidation},
 		{"hostserv", "nick", "", new ValueContainerChar(&s_HostServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"hostserv", "description", "vHost Service", new ValueContainerChar(&desc_HostServ), DT_CHARPTR | DT_NORELOAD, ValidateHostServ},
 		{"hostserv", "database", "hosts.db", new ValueContainerChar(&HostDBName), DT_CHARPTR, ValidateHostServ},
+		{"hostserv", "modules", "", new ValueContainerChar(&HostCoreModules), DT_CHARPTR, NoValidation},
 		{"hostserv", "hostsetters", "", new ValueContainerChar(&HostSetter), DT_CHARPTR, NoValidation},
 		{"helpserv", "nick", "HelpServ", new ValueContainerChar(&s_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"helpserv", "description", "Help Service", new ValueContainerChar(&desc_HelpServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"helpserv", "modules", "", new ValueContainerChar(&HelpCoreModules), DT_CHARPTR, NoValidation},
 		{"operserv", "nick", "OperServ", new ValueContainerChar(&s_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "description", "Operator Service", new ValueContainerChar(&desc_OperServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"operserv", "globalnick", "Global", new ValueContainerChar(&s_GlobalNoticer), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -675,6 +688,7 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "autokilldatabase", "akill.db", new ValueContainerChar(&AutokillDBName), DT_CHARPTR, ValidateNotEmpty},
+		{"operserv", "modules", "", new ValueContainerChar(&OperCoreModules), DT_CHARPTR, NoValidation},
 		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},
 		{"operserv", "logmaxusers", "no", new ValueContainerBool(&LogMaxUsers), DT_BOOLEAN, NoValidation},
@@ -801,7 +815,7 @@ int ServerConfig::Read(bool bail)
 				break;
 				case DT_BOOLEAN: {
 					bool val = vi.GetBool();
-					ValueContainerBool *vcb = (ValueContainerBool *)Values[Index].val;
+					ValueContainerBool *vcb = dynamic_cast<ValueContainerBool *>(Values[Index].val);
 					vcb->Set(&val, sizeof(bool));
 				}
 				break;
@@ -1287,17 +1301,13 @@ bool ValueItem::GetBool()
 Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
-    {"BotCoreModules", {{PARAM_STRING, PARAM_RELOAD, &BotCoreModules}}},
-    {"ChanCoreModules", {{PARAM_STRING, PARAM_RELOAD, &ChanCoreModules}}},
     {"DontQuoteAddresses",
      {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
-    {"HelpCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HelpCoreModules}}},
     {"HelpChannel", {{PARAM_STRING, PARAM_RELOAD, &HelpChannel}}},
-    {"HostCoreModules", {{PARAM_STRING, PARAM_RELOAD, &HostCoreModules}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
@@ -1306,7 +1316,6 @@ Directive directives[] = {
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
     {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
-    {"MemoCoreModules", {{PARAM_STRING, PARAM_RELOAD, &MemoCoreModules}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
     {"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},
@@ -1319,15 +1328,11 @@ Directive directives[] = {
     {"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
     {"ModuleDelayedAutoload",
      {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
-    {"MOTDFile", {{PARAM_STRING, PARAM_RELOAD, &MOTDFilename}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
-    {"NickCoreModules", {{PARAM_STRING, PARAM_RELOAD, &NickCoreModules}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
-    {"OperCoreModules", {{PARAM_STRING, PARAM_RELOAD, &OperCoreModules}}},
-    {"PIDFile", {{PARAM_STRING, 0, &PIDFilename}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
     {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
                        {PARAM_PORT, 0, &RemotePort2},
@@ -1339,9 +1344,6 @@ Directive directives[] = {
     {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
     {"SendMailPath", {{PARAM_STRING, PARAM_RELOAD, &SendMailPath}}},
     {"SendFrom", {{PARAM_STRING, PARAM_RELOAD, &SendFrom}}},
-    {"ServerDesc", {{PARAM_STRING, 0, &ServerDesc}}},
-    {"ServerName", {{PARAM_STRING, 0, &ServerName}}},
-    {"ServiceUser", {{PARAM_STRING, 0, &temp_userhost}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
     {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
@@ -1653,9 +1655,6 @@ int read_config(int reload)
     fclose(config);
 
     if (!reload) {
-        CHECK(ServerName);
-        CHECK(ServerDesc);
-
         if (RemoteServer3)
             CHECK(RemoteServer2);
 
@@ -1685,31 +1684,12 @@ int read_config(int reload)
     CHECK(EncModule);
 
     CHECK(NetworkName);
-    if (!reload) {
-        CHEK2(temp_userhost, ServiceUser);
-        CHEK2(PIDFilename, PIDFile);
-    }
 
-    CHEK2(MOTDFilename, MOTDFile);
     CHECK(UpdateTimeout);
     CHECK(ExpireTimeout);
     CHECK(ReadTimeout);
     CHECK(WarningTimeout);
     CHECK(TimeoutCheck);
-
-    if (!reload) {
-
-        if (temp_userhost) {
-            if (!(s = strchr(temp_userhost, '@'))) {
-                error(0, "Missing `@' for ServiceUser");
-            } else {
-                *s++ = 0;
-                ServiceUser = temp_userhost;
-                ServiceHost = s;
-            }
-        }
-
-    }
 
     if (temp_nsuserhost) {
         if (!(s = strchr(temp_nsuserhost, '@'))) {

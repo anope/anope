@@ -365,6 +365,7 @@ Module::Module(const std::string &mname, const std::string &creator)
 	this->hostHelp = NULL;
 	this->helpHelp = NULL;
 	this->type = THIRD;
+	this->handle = NULL;
 
 	for (int i = 0; i < NUM_LANGS; i++)
 	{
@@ -391,8 +392,11 @@ Module::~Module()
 	if (this->version)
 		free(this->version);
 
-	if ((ano_modclose(this->handle)) != 0)
-		alog("%s", ano_moderr());
+	if (this->handle)
+	{
+		if ((ano_modclose(this->handle)) != 0)
+			alog("%s", ano_moderr());
+	}
 
 	/*
 	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed 
@@ -666,16 +670,25 @@ int loadModule(const std::string &modname, User * u)
 
 	mod_current_module_name = modname.c_str();
 
-	/* Create module.
-	* XXX: we need to handle ModuleException throws here.
-	*/
+	/* Create module. */
 	std::string nick;
 	if (u)
 		nick = u->nick;
 	else
 		nick = "";
 
-	Module *m = func(nick);
+	Module *m;
+
+	try
+	{
+		m = func(nick);
+	}
+	catch (ModuleException &ex)
+	{
+		alog("Error while loading %s: %s", modname.c_str(), ex.GetReason());
+		return MOD_STOP;
+	}
+
 	mod_current_module = m;
 	mod_current_user = u;
 	m->filename = sstrdup(buf);

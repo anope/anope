@@ -44,23 +44,6 @@ Command *lookup_cmd(Command * list, char *cmd)
  * privilege to do so; if not, print an appropriate error message.
  * @param services Services Client
  * @param u User Struct
- * @param list Command struct
- * @param cmd Command
- * @return void
- */
-void run_cmd(char *service, User * u, Command * list, char *cmd)
-{
-    Command *c = lookup_cmd(list, cmd);
-    do_run_cmd(service, u, c, cmd);
-}
-
-/*************************************************************************/
-
-/**
- * Run the routine for the given command, if it exists and the user has
- * privilege to do so; if not, print an appropriate error message.
- * @param services Services Client
- * @param u User Struct
  * @param Command Hash Table
  * @param cmd Command
  * @return void

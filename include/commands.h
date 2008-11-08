@@ -21,8 +21,6 @@
  */
 
 extern MDE Command *lookup_cmd(Command *list, char *name);
-extern void run_cmd(char *service, User *u, Command *list,
-		char *name);
 extern void help_cmd(char *service, User *u, Command *list,
 		char *name);
 extern void do_run_cmd(char *service, User * u, Command *c,const char *cmd);

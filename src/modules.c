@@ -217,7 +217,6 @@ void modules_core_init(int number, char **list)
         m = findModule(list[idx]);
         if (!m) {
             status = loadModule(list[idx], NULL);
-            alog("debug: status: [%d][%s]", status, ModuleGetErrStr(status));
 			if (status != MOD_ERR_OK)
 	            alog("ERROR: status: [%d][%s]", status, ModuleGetErrStr(status));
             mod_current_module = NULL;
@@ -612,7 +611,8 @@ int loadModule(const std::string &modname, User * u)
 	if (findModule(modname.c_str()) != NULL)
 		return MOD_ERR_EXISTS;
 
-	alog("trying to load [%s]", modname.c_str());
+	if (debug)
+		alog("trying to load [%s]", modname.c_str());
 
 	/* Generate the filename for the temporary copy of the module */
 	strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */

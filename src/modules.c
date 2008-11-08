@@ -409,6 +409,26 @@ void Module::SetType(MODType type)
 	this->type = type;
 }
 
+void Module::InsertLanguage(int langNumber, int ac, const char **av)
+{
+    int i;
+
+	if (debug)
+		alog("debug: %s Adding %d texts for language %d", this->name.c_str(), ac, langNumber);
+
+    if (this->lang[langNumber].argc > 0) {
+        moduleDeleteLanguage(langNumber);
+    }
+
+    this->lang[langNumber].argc = ac;
+    this->lang[langNumber].argv =
+        (char **)malloc(sizeof(char *) * ac);
+    for (i = 0; i < ac; i++) {
+        this->lang[langNumber].argv[i] = sstrdup(av[i]);
+    }
+}
+
+
 
 /**
  * Add the module to the list of currently loaded modules.
@@ -2472,35 +2492,6 @@ int moduleGetConfigDirective(Directive * d)
        free(str);
     fclose(config);
     return retval;
-}
-
-/**
- * Allow a module to add a set of language strings to anope
- * @param langNumber the language number for the strings
- * @param ac The language count for the strings
- * @param av The language sring list.
- **/
-void moduleInsertLanguage(int langNumber, int ac, const char **av)
-{
-    int i;
-
-    if ((mod_current_module_name) && (!mod_current_module || mod_current_module_name != mod_current_module->name)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-
-	if (debug)
-		alog("debug: %s Adding %d texts for language %d", mod_current_module->name.c_str(), ac, langNumber);
-
-    if (mod_current_module->lang[langNumber].argc > 0) {
-        moduleDeleteLanguage(langNumber);
-    }
-
-    mod_current_module->lang[langNumber].argc = ac;
-    mod_current_module->lang[langNumber].argv =
-        (char **)malloc(sizeof(char *) * ac);
-    for (i = 0; i < ac; i++) {
-        mod_current_module->lang[langNumber].argv[i] = sstrdup(av[i]);
-    }
 }
 
 /**

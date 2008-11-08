@@ -53,7 +53,55 @@ class NSMaxEmail : public Module
 		throw ModuleException("ns_maxemail: Unable to hook to EVENT_RELOAD");
 
 		my_load_config();
-		my_add_languages();
+
+		const char *langtable_en_us[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"The given email address has reached it's usage limit of %d users.",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"The given email address has reached it's usage limit of 1 user."
+		};
+
+		const char *langtable_nl[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
+		};
+
+		const char *langtable_de[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
+		};
+
+		const char *langtable_pt[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"O endereзo de email fornecido alcanзou seu limite de uso de %d usuбrios.",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"O endereзo de email fornecido alcanзou seu limite de uso de 1 usuбrio."
+		};
+
+		const char *langtable_ru[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"Указанный вами email-адрес используется максимально допустимое кол-во раз: %d",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"Указанный вами email-адрес уже кем-то используется."
+		};
+
+		const char *langtable_it[] = {
+		/* LNG_NSEMAILMAX_REACHED */
+		"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
+		/* LNG_NSEMAILMAX_REACHED_ONE */
+		"L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
+		};
+
+		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
+		this->InsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
+		this->InsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
+		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 	}
 };
 
@@ -160,58 +208,6 @@ void my_load_config(void)
         alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
 }
 
-void my_add_languages(void)
-{
-    const char *langtable_en_us[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "The given email address has reached it's usage limit of %d users.",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "The given email address has reached it's usage limit of 1 user."
-    };
 
-    const char *langtable_nl[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "Het gegeven email adres heeft de limiet van %d gebruikers bereikt.",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "Het gegeven email adres heeft de limiet van 1 gebruiker bereikt."
-    };
-
-   const char *langtable_de[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "Die angegebene eMail hat die limit Begrenzung von %d User erreicht.",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "Die angegebene eMail hat die limit Begrenzung von 1 User erreicht."
-   };
-
-    const char *langtable_pt[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "O endereзo de email fornecido alcanзou seu limite de uso de %d usuбrios.",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "O endereзo de email fornecido alcanзou seu limite de uso de 1 usuбrio."
-    };
-
-    const char *langtable_ru[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "Указанный вами email-адрес используется максимально допустимое кол-во раз: %d",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "Указанный вами email-адрес уже кем-то используется."
-    };
-
-    const char *langtable_it[] = {
-        /* LNG_NSEMAILMAX_REACHED */
-        "L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di %d utenti.",
-        /* LNG_NSEMAILMAX_REACHED_ONE */
-        "L'indirizzo email specificato ha raggiunto il suo limite d'utilizzo di 1 utente."
-    };
-
-    moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
-    moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
-    moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
-    moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
-    moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
-}
-
-/* EOF */
 
 MODULE_INIT("ns_maxemail", NSMaxEmail)

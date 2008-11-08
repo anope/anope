@@ -69,7 +69,85 @@ class CSAppendTopic : public Module
 		moduleAddHelp(c, my_cs_help_appendtopic);
 		moduleSetChanHelp(my_cs_help);
 
-		my_add_languages();
+		/* English (US) */
+		const char* langtable_en_us[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Add text to a channels topic",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"This command allows users to append text to a currently set\n"
+		"channel topic. When TOPICLOCK is on, the topic is updated and\n"
+		"the new, updated topic is locked.",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Syntax: APPENDTOPIC channel text\n"
+		};
+
+		/* Dutch (NL) */
+		const char* langtable_nl[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Voeg tekst aan een kanaal onderwerp toe",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"Dit command stelt gebruikers in staat om text toe te voegen\n"
+		"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
+		"staat, zal het onderwerp worden bijgewerkt en zal het nieuwe,\n"
+		"bijgewerkte topic worden geforceerd.",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Gebruik: APPENDTOPIC kanaal tekst\n"
+		};
+
+		/* German (DE) */
+		const char* langtable_de[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Fьgt einen Text zu einem Channel-Topic hinzu.",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
+		"hinzuzufьgen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
+		"und das neue, aktualisierte Topic wird gesperrt.",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Syntax: APPENDTOPIC Channel Text\n"
+		};
+
+		/* Portuguese (PT) */
+		const char* langtable_pt[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Adiciona texto ao tуpico de um canal",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"Este comando permite aos usuбrios anexar texto a um tуpico de canal\n"
+		"jб definido. Quando TOPICLOCK estб ativado, o tуpico й atualizado e\n"
+		"o novo tуpico й travado.",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Sintaxe: APPENDTOPIC canal texto\n"
+		};
+
+		/* Russian (RU) */
+		const char* langtable_ru[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Добавляет текст к топику канала",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
+		"канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
+		"Примечание: текст будет ДОБАВЛЕН к топику, то есть старый топик удален НЕ БУДЕТ.\n",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Синтаксис: APPENDTOPIC #канал текст\n"
+		};
+
+		/* Italian (IT) */
+		const char* langtable_it[] = {
+		/* LNG_CHAN_HELP */
+		"	 APPENDTOPIC   Aggiunge del testo al topic di un canale",
+		/* LNG_CHAN_HELP_APPENDTOPIC */
+		"Questo comando permette agli utenti di aggiungere del testo ad un topic di un canale\n"
+		"giа impostato. Se TOPICLOCK и attivato, il topic viene aggiornato e il nuovo topic\n"
+		"viene bloccato.",
+		/* LNG_APPENDTOPIC_SYNTAX */
+		"Sintassi: APPENDTOPIC canale testo\n"
+		};
+
+		this->InsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
+		this->InsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
+		this->InsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
+		this->InsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
+		this->InsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
+		this->InsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
 	}
 };
 
@@ -149,90 +227,5 @@ int my_cs_appendtopic(User * u)
 	}
 	return MOD_CONT;
 }
-
-void my_add_languages(void)
-{
-	/* English (US) */
-	const char* langtable_en_us[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Add text to a channels topic",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"This command allows users to append text to a currently set\n"
-			"channel topic. When TOPICLOCK is on, the topic is updated and\n"
-			"the new, updated topic is locked.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Syntax: APPENDTOPIC channel text\n"
-	};
-
-	/* Dutch (NL) */
-	const char* langtable_nl[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Voeg tekst aan een kanaal onderwerp toe",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Dit command stelt gebruikers in staat om text toe te voegen\n"
-			"achter het huidige onderwerp van een kanaal. Als TOPICLOCK aan\n"
-			"staat, zal het onderwerp worden bijgewerkt en zal het nieuwe,\n"
-			"bijgewerkte topic worden geforceerd.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Gebruik: APPENDTOPIC kanaal tekst\n"
-	};
-
-	/* German (DE) */
-	const char* langtable_de[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Fьgt einen Text zu einem Channel-Topic hinzu.",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Dieser Befehl erlaubt Benutzern, einen Text zu dem vorhandenen Channel-Topic\n"
-			"hinzuzufьgen. Wenn TOPICLOCK gesetzt ist, wird das Topic aktualisiert\n"
-			"und das neue, aktualisierte Topic wird gesperrt.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Syntax: APPENDTOPIC Channel Text\n"
-	};
-
-	/* Portuguese (PT) */
-	const char* langtable_pt[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Adiciona texto ao tуpico de um canal",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Este comando permite aos usuбrios anexar texto a um tуpico de canal\n"
-			"jб definido. Quando TOPICLOCK estб ativado, o tуpico й atualizado e\n"
-			"o novo tуpico й travado.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Sintaxe: APPENDTOPIC canal texto\n"
-	};
-
-	/* Russian (RU) */
-	const char* langtable_ru[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Добавляет текст к топику канала",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Данная команда позволяет добавить текст к топику, который установлен на указанном\n"
-			"канале. Если активирован режим TOPICLOCK, топик будет обновлен и заблокирован.\n"
-			"Примечание: текст будет ДОБАВЛЕН к топику, то есть старый топик удален НЕ БУДЕТ.\n",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Синтаксис: APPENDTOPIC #канал текст\n"
-	};
-
-	/* Italian (IT) */
-	const char* langtable_it[] = {
-		/* LNG_CHAN_HELP */
-		"	 APPENDTOPIC   Aggiunge del testo al topic di un canale",
-		/* LNG_CHAN_HELP_APPENDTOPIC */
-		"Questo comando permette agli utenti di aggiungere del testo ad un topic di un canale\n"
-			"giа impostato. Se TOPICLOCK и attivato, il topic viene aggiornato e il nuovo topic\n"
-			"viene bloccato.",
-		/* LNG_APPENDTOPIC_SYNTAX */
-		"Sintassi: APPENDTOPIC canale testo\n"
-	};
-
-	moduleInsertLanguage(LANG_EN_US, LNG_NUM_STRINGS, langtable_en_us);
-	moduleInsertLanguage(LANG_NL, LNG_NUM_STRINGS, langtable_nl);
-	moduleInsertLanguage(LANG_DE, LNG_NUM_STRINGS, langtable_de);
-	moduleInsertLanguage(LANG_PT, LNG_NUM_STRINGS, langtable_pt);
-	moduleInsertLanguage(LANG_RU, LNG_NUM_STRINGS, langtable_ru);
-	moduleInsertLanguage(LANG_IT, LNG_NUM_STRINGS, langtable_it);
-}
-
-/* EOF */
 
 MODULE_INIT("cs_appendtopic", CSAppendTopic)

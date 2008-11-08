@@ -51,11 +51,66 @@ class CSTBan : public Module
 		moduleAddHelp(c, myFullHelp);
 		moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
-		mAddLanguages();
-
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
 		this->SetType(SUPPORTED);
+
+		const char* langtable_en_us[] = {
+		"    TBAN       Bans the user for a given length of time",
+		"Syntax: TBAN channel nick time",
+		"Bans the given user from a channel for a specified length of\n"
+		"time. If the ban is removed before by hand, it will NOT be replaced.",
+		"%s banned from %s, will auto-expire in %s"
+		};
+
+		const char* langtable_nl[] = {
+		"    TBAN       Verban een gebruiker voor een bepaalde tijd",
+		"Syntax: TBAN kanaal nick tijd",
+		"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
+		"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
+		"zal deze NIET worden vervangen.",
+		"%s verbannen van %s, zal verlopen in %s"
+		};
+
+		const char* langtable_de[] = {
+		"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
+		"Syntax: TBAN Channel Nickname Zeit",
+		"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
+		"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
+		"%s gebannt von %s, wird auto-auslaufen in %s"
+		};
+
+		const char* langtable_pt[] = {
+		"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
+		"Sintaxe: TBAN canal nick tempo",
+		"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
+		"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
+		"%s foi banido do %s, irб auto-expirar em %s"
+		};
+
+		const char* langtable_ru[] = {
+		"    TBAN       Банит пользователя на указанный промежуток времени",
+		"Синтаксис: TBAN #канал ник время",
+		"Банит пользователя на указанный промежуток времени в секундах\n"
+		"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
+		"переустановлен сервисами автоматически!",
+		"Установленный бан %s на канале %s истечет через %s секунд"
+		};
+
+		const char* langtable_it[] = {
+		"    TBAN       Banna l'utente per un periodo di tempo specificato",
+		"Sintassi: TBAN canale nick tempo",
+		"Banna l'utente specificato da un canale per un periodo di tempo\n"
+		"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
+		"%s bannato da %s, scadrа automaticamente tra %s"
+		};
+
+		this->InsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
+		this->InsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
+		this->InsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
+		this->InsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
+		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
+		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 	}
 };
 
@@ -180,68 +235,5 @@ int canBanUser(Channel * c, User * u, User * u2)
 }
 
 
-void mAddLanguages(void)
-{
-    const char* langtable_en_us[] = {
-        "    TBAN       Bans the user for a given length of time",
-        "Syntax: TBAN channel nick time",
-        "Bans the given user from a channel for a specified length of\n"
-            "time. If the ban is removed before by hand, it will NOT be replaced.",
-        "%s banned from %s, will auto-expire in %s"
-    };
-
-    const char* langtable_nl[] = {
-        "    TBAN       Verban een gebruiker voor een bepaalde tijd",
-        "Syntax: TBAN kanaal nick tijd",
-        "Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
-            "gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
-            "zal deze NIET worden vervangen.",
-        "%s verbannen van %s, zal verlopen in %s"
-    };
-
-    const char* langtable_de[] = {
-        "    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
-        "Syntax: TBAN Channel Nickname Zeit",
-        "Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
-            "Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
-        "%s gebannt von %s, wird auto-auslaufen in %s"
-    };
-
-    const char* langtable_pt[] = {
-        "    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
-        "Sintaxe: TBAN canal nick tempo",
-        "Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
-            "tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
-        "%s foi banido do %s, irб auto-expirar em %s"
-    };
-
-    const char* langtable_ru[] = {
-        "    TBAN       Банит пользователя на указанный промежуток времени",
-        "Синтаксис: TBAN #канал ник время",
-        "Банит пользователя на указанный промежуток времени в секундах\n"
-            "Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
-            "переустановлен сервисами автоматически!",
-        "Установленный бан %s на канале %s истечет через %s секунд"
-    };
-
-	const char* langtable_it[] = {
-        "    TBAN       Banna l'utente per un periodo di tempo specificato",
-        "Sintassi: TBAN canale nick tempo",
-        "Banna l'utente specificato da un canale per un periodo di tempo\n"
-            "specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
-        "%s bannato da %s, scadrа automaticamente tra %s"
-    };
-
-    moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
-    moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
-    moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
-    moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
-	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
-
-}
-
-
-/* EOF */
 
 MODULE_INIT("cs_tban", CSTBan)

@@ -105,7 +105,219 @@ class OSInfo : public Module
 		moduleSetChanHelp(mMainChanHelp);
 
 		mLoadData();
-		m_AddLanguages();
+
+		const char* langtable_en_us[] = {
+		/* OINFO_SYNTAX */
+		"Syntax: OINFO [ADD|DEL] nick <info>",
+		/* OINFO_ADD_SUCCESS */
+		"OperInfo line has been added to nick %s",
+		/* OINFO_DEL_SUCCESS */
+		"OperInfo line has been removed from nick %s",
+		/* OCINFO_SYNTAX */
+		"Syntax: OINFO [ADD|DEL] chan <info>",
+		/* OCINFO_ADD_SUCCESS */
+		"OperInfo line has been added to channel %s",
+		/* OCINFO_DEL_SUCCESS */
+		"OperInfo line has been removed from channel %s",
+		/* OINFO_HELP */
+		"Syntax: OINFO [ADD|DEL] nick <info>\n"
+		"Add or Delete Oper information for the given nick\n"
+		"This will show up when any oper /ns info nick's the user.\n"
+		"and can be used for 'tagging' users etc....",
+		/* OCINFO_HELP */
+		"Syntax: OINFO [ADD|DEL] chan <info>\n"
+		"Add or Delete Oper information for the given channel\n"
+		"This will show up when any oper /cs info's the channel.\n"
+		"and can be used for 'tagging' channels etc....",
+		/* OINFO_HELP_CMD */
+		"    OINFO         Add / Del an OperInfo line to a nick",
+		/* OCINFO_HELP_CMD */
+		"    OINFO         Add / Del an OperInfo line to a channel"
+		};
+
+		const char* langtable_es[] = {
+		/* OINFO_SYNTAX */
+		"Sintaxis: OINFO [ADD|DEL] nick <info>",
+		/* OINFO_ADD_SUCCESS */
+		"Una linea OperInfo ha sido agregada al nick %s",
+		/* OINFO_DEL_SUCCESS */
+		"La linea OperInfo ha sido removida del nick %s",
+		/* OCINFO_SYNTAX */
+		"Sintaxis: OINFO [ADD|DEL] chan <info>",
+		/* OCINFO_ADD_SUCCESS */
+		"Linea OperInfo ha sido agregada al canal %s",
+		/* OCINFO_DEL_SUCCESS */
+		"La linea OperInfo ha sido removida del canal %s",
+		/* OINFO_HELP */
+		"Sintaxis: OINFO [ADD|DEL] nick <info>\n"
+		"Agrega o elimina informacion para Operadores al nick dado\n"
+		"Esto se mostrara cuando cualquier operador haga /ns info nick\n"
+		"y puede ser usado para 'marcado' de usuarios, etc....",
+		/* OCINFO_HELP */
+		"Sintaxis: OINFO [ADD|DEL] chan <info>\n"
+		"Agrega o elimina informacion para Operadores al canal dado\n"
+		"Esto se mostrara cuando cualquier operador haga /cs info canal\n"
+		"y puede ser usado para 'marcado' de canales, etc....",
+		/* OINFO_HELP_CMD */
+		"    OINFO         Agrega / Elimina una linea OperInfo al nick",
+		/* OCINFO_HELP_CMD */
+		"    OINFO         Agrega / Elimina una linea OperInfo al canal"
+		};
+
+		const char* langtable_nl[] = {
+		/* OINFO_SYNTAX */
+		"Gebruik: OINFO [ADD|DEL] nick <info>",
+		/* OINFO_ADD_SUCCESS */
+		"OperInfo regel is toegevoegd aan nick %s",
+		/* OINFO_DEL_SUCCESS */
+		"OperInfo regel is weggehaald van nick %s",
+		/* OCINFO_SYNTAX */
+		"Gebruik: OINFO [ADD|DEL] kanaal <info>",
+		/* OCINFO_ADD_SUCCESS */
+		"OperInfo regel is toegevoegd aan kanaal %s",
+		/* OCINFO_DEL_SUCCESS */
+		"OperInfo regel is weggehaald van kanaal %s",
+		/* OINFO_HELP */
+		"Gebruik: OINFO [ADD|DEL] nick <info>\n"
+		"Voeg een Oper informatie regel toe aan de gegeven nick, of\n"
+		"verwijder deze. Deze regel zal worden weergegeven wanneer\n"
+		"een oper /ns info nick doet voor deze gebruiker, en kan worden\n"
+		"gebruikt om een gebruiker te 'markeren' etc...",
+		/* OCINFO_HELP */
+		"Gebruik: OINFO [ADD|DEL] kanaal <info>\n"
+		"Voeg een Oper informatie regel toe aan de gegeven kanaal, of\n"
+		"verwijder deze. Deze regel zal worden weergegeven wanneer\n"
+		"een oper /cs info kanaal doet voor dit kanaal, en kan worden\n"
+		"gebruikt om een kanaal te 'markeren' etc...",
+		/* OINFO_HELP_CMD */
+		"    OINFO         Voeg een OperInfo regel toe aan een nick of verwijder deze",
+		/* OCINFO_HELP_CMD */
+		"    OINFO         Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
+		};
+
+		const char* langtable_de[] = {
+		/* OINFO_SYNTAX */
+		"Syntax: OINFO [ADD|DEL] Nickname <Information>",
+		/* OINFO_ADD_SUCCESS */
+		"Eine OperInfo Linie wurde zu den Nicknamen %s hinzugefьgt",
+		/* OINFO_DEL_SUCCESS */
+		"Die OperInfo Linie wurde von den Nicknamen %s enfernt",
+		/* OCINFO_SYNTAX */
+		"Syntax: OINFO [ADD|DEL] Channel <Information>",
+		/* OCINFO_ADD_SUCCESS */
+		"Eine OperInfo Linie wurde zu den Channel %s hinzugefьgt",
+		/* OCINFO_DEL_SUCCESS */
+		"Die OperInfo Linie wurde von den Channel %s enfernt",
+		/* OINFO_HELP */
+		"Syntax: OINFO [ADD|DEL] Nickname <Information>\n"
+		"Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
+		"Nicknamen.Sie wird angezeigt wenn ein Oper mit /ns info sich\n"
+		"ьber den Nicknamen informiert.",
+		/* OCINFO_HELP */
+		"Syntax: OINFO [ADD|DEL] chan <info>\n"
+		"Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
+		"Channel.Sie wird angezeigt wenn ein Oper mit /cs info sich\n"
+		"ьber den Channel informiert.",
+		/* OINFO_HELP_CMD */
+		"    OINFO         Addiert / Lцscht eine OperInfo Linie zu / von einen Nicknamen",
+		/* OCINFO_HELP_CMD */
+		"    OINFO         Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
+		};
+
+		const char* langtable_pt[] = {
+		/* OINFO_SYNTAX */
+		"Sintaxe: OINFO [ADD|DEL] nick <informaзгo>",
+		/* OINFO_ADD_SUCCESS */
+		"A linha OperInfo foi adicionada ao nick %s",
+		/* OINFO_DEL_SUCCESS */
+		"A linha OperInfo foi removida do nick %s",
+		/* OCINFO_SYNTAX */
+		"Sintaxe: OINFO [ADD|DEL] canal <informaзгo>",
+		/* OCINFO_ADD_SUCCESS */
+		"A linha OperInfo foi adicionada ao canal %s",
+		/* OCINFO_DEL_SUCCESS */
+		"A linha OperInfo foi removida do canal %s",
+		/* OINFO_HELP */
+		"Sintaxe: OINFO [ADD|DEL] nick <informaзгo>\n"
+		"Adiciona ou apaga informaзгo para Operadores ao nick fornecido\n"
+		"Isto serб mostrado quando qualquer Operador usar /ns info nick\n"
+		"e pode ser usado para 'etiquetar' usuбrios etc...",
+		/* OCINFO_HELP */
+		"Sintaxe: OINFO [ADD|DEL] canal <informaзгo>\n"
+		"Adiciona ou apaga informaзгo para Operadores ao canal fornecido\n"
+		"Isto serб mostrado quando qualquer Operador usar /cs info canal\n"
+		"e pode ser usado para 'etiquetar' canais etc...",
+		/* OINFO_HELP_CMD */
+		"    OINFO      Adiciona ou Apaga a linha OperInfo para um nick",
+		/* OCINFO_HELP_CMD */
+		"    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
+		};
+
+		const char* langtable_ru[] = {
+		/* OINFO_SYNTAX */
+		"Синтаксис: OINFO ADD|DEL ник тест",
+		/* OINFO_ADD_SUCCESS */
+		"Опер-Информация для ника %s добавлена",
+		/* OINFO_DEL_SUCCESS */
+		"Опер-Информация для ника %s была удалена",
+		/* OCINFO_SYNTAX */
+		"Синтаксис: OINFO ADD|DEL #канал текст",
+		/* OCINFO_ADD_SUCCESS */
+		"Опер-Информация для канала %s успешно установлена",
+		/* OCINFO_DEL_SUCCESS */
+		"Опер-Информация для канала %s была удалена",
+		/* OINFO_HELP */
+		"Синтаксис: OINFO ADD|DEL ник текст\n"
+		"Устанавливает или удаляет Опер-Информацию для указанного ника,\n"
+		"которая будет показана любому оператору, запрашивающему INFO ника.\n"
+		"Может быть использована для 'пометки' пользователей и т. д...",
+		/* OCINFO_HELP */
+		"Синтаксис: OINFO ADD|DEL #канал текст\n"
+		"Устанавливает или удаляет Опер-Информацию для указанного канала,\n"
+		"которая будет показана любому оператору, запрашивающему INFO канала.\n"
+		"Может быть использована для 'пометки' каналов и т. д...",
+		/* OINFO_HELP_CMD */
+		"    OINFO      Добавляет/Удаляет опер-инфо для ника",
+		/* OCINFO_HELP_CMD */
+		"    OINFO      Добавляет/Удаляет опер-инфо для канала"
+		};
+
+		const char* langtable_it[] = {
+		/* OINFO_SYNTAX */
+		"Sintassi: OINFO [ADD|DEL] nick <info>",
+		/* OINFO_ADD_SUCCESS */
+		"Linea OperInfo aggiunta al nick %s",
+		/* OINFO_DEL_SUCCESS */
+		"Linea OperInfo rimossa dal nick %s",
+		/* OCINFO_SYNTAX */
+		"Sintassi: OINFO [ADD|DEL] chan <info>",
+		/* OCINFO_ADD_SUCCESS */
+		"Linea OperInfo aggiunta al canale %s",
+		/* OCINFO_DEL_SUCCESS */
+		"Linea OperInfo rimossa dal canale %s",
+		/* OINFO_HELP */
+		"Sintassi: OINFO [ADD|DEL] nick <info>\n"
+		"Aggiunge o rimuove informazioni Oper per il nick specificato\n"
+		"Queste vengono mostrate quando un oper esegue il comando /ns info <nick>\n"
+		"e possono essere utilizzate per 'marchiare' gli utenti ecc...",
+		/* OCINFO_HELP */
+		"Sintassi: OINFO [ADD|DEL] chan <info>\n"
+		"Aggiunge o rimuove informazioni Oper per il canale specificato\n"
+		"Queste vengono mostrate quando un oper esegue il comando /cs info <canale>\n"
+		"e possono essere utilizzate per 'marchiare' i canali ecc...",
+		/* OINFO_HELP_CMD */
+		"    OINFO         Aggiunge/Rimuove una linea OperInfo ad/da un nick",
+		/* OCINFO_HELP_CMD */
+		"    OINFO         Aggiunge/Rimuove una linea OperInfo ad/da un canale"
+		};
+
+		this->InsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
+		this->InsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
+		this->InsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
+		this->InsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
+		this->InsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
+		this->InsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
+		this->InsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
 	}
 
 	~OSInfo()
@@ -512,227 +724,6 @@ int mEventReload(int argc, char **argv)
 
 /*************************************************************************/
 
-/**
- * manages the multilanguage stuff
- **/
-void m_AddLanguages(void)
-{
-    const char* langtable_en_us[] = {
-        /* OINFO_SYNTAX */
-        "Syntax: OINFO [ADD|DEL] nick <info>",
-        /* OINFO_ADD_SUCCESS */
-        "OperInfo line has been added to nick %s",
-        /* OINFO_DEL_SUCCESS */
-        "OperInfo line has been removed from nick %s",
-        /* OCINFO_SYNTAX */
-        "Syntax: OINFO [ADD|DEL] chan <info>",
-        /* OCINFO_ADD_SUCCESS */
-        "OperInfo line has been added to channel %s",
-        /* OCINFO_DEL_SUCCESS */
-        "OperInfo line has been removed from channel %s",
-        /* OINFO_HELP */
-        "Syntax: OINFO [ADD|DEL] nick <info>\n"
-            "Add or Delete Oper information for the given nick\n"
-            "This will show up when any oper /ns info nick's the user.\n"
-            "and can be used for 'tagging' users etc....",
-        /* OCINFO_HELP */
-        "Syntax: OINFO [ADD|DEL] chan <info>\n"
-            "Add or Delete Oper information for the given channel\n"
-            "This will show up when any oper /cs info's the channel.\n"
-            "and can be used for 'tagging' channels etc....",
-        /* OINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a nick",
-        /* OCINFO_HELP_CMD */
-        "    OINFO         Add / Del an OperInfo line to a channel"
-    };
-
-    const char* langtable_es[] = {
-        /* OINFO_SYNTAX */
-        "Sintaxis: OINFO [ADD|DEL] nick <info>",
-        /* OINFO_ADD_SUCCESS */
-        "Una linea OperInfo ha sido agregada al nick %s",
-        /* OINFO_DEL_SUCCESS */
-        "La linea OperInfo ha sido removida del nick %s",
-        /* OCINFO_SYNTAX */
-        "Sintaxis: OINFO [ADD|DEL] chan <info>",
-        /* OCINFO_ADD_SUCCESS */
-        "Linea OperInfo ha sido agregada al canal %s",
-        /* OCINFO_DEL_SUCCESS */
-        "La linea OperInfo ha sido removida del canal %s",
-        /* OINFO_HELP */
-        "Sintaxis: OINFO [ADD|DEL] nick <info>\n"
-            "Agrega o elimina informacion para Operadores al nick dado\n"
-            "Esto se mostrara cuando cualquier operador haga /ns info nick\n"
-            "y puede ser usado para 'marcado' de usuarios, etc....",
-        /* OCINFO_HELP */
-        "Sintaxis: OINFO [ADD|DEL] chan <info>\n"
-            "Agrega o elimina informacion para Operadores al canal dado\n"
-            "Esto se mostrara cuando cualquier operador haga /cs info canal\n"
-            "y puede ser usado para 'marcado' de canales, etc....",
-        /* OINFO_HELP_CMD */
-        "    OINFO         Agrega / Elimina una linea OperInfo al nick",
-        /* OCINFO_HELP_CMD */
-        "    OINFO         Agrega / Elimina una linea OperInfo al canal"
-    };
-
-    const char* langtable_nl[] = {
-        /* OINFO_SYNTAX */
-        "Gebruik: OINFO [ADD|DEL] nick <info>",
-        /* OINFO_ADD_SUCCESS */
-        "OperInfo regel is toegevoegd aan nick %s",
-        /* OINFO_DEL_SUCCESS */
-        "OperInfo regel is weggehaald van nick %s",
-        /* OCINFO_SYNTAX */
-        "Gebruik: OINFO [ADD|DEL] kanaal <info>",
-        /* OCINFO_ADD_SUCCESS */
-        "OperInfo regel is toegevoegd aan kanaal %s",
-        /* OCINFO_DEL_SUCCESS */
-        "OperInfo regel is weggehaald van kanaal %s",
-        /* OINFO_HELP */
-        "Gebruik: OINFO [ADD|DEL] nick <info>\n"
-            "Voeg een Oper informatie regel toe aan de gegeven nick, of\n"
-            "verwijder deze. Deze regel zal worden weergegeven wanneer\n"
-            "een oper /ns info nick doet voor deze gebruiker, en kan worden\n"
-            "gebruikt om een gebruiker te 'markeren' etc...",
-        /* OCINFO_HELP */
-        "Gebruik: OINFO [ADD|DEL] kanaal <info>\n"
-            "Voeg een Oper informatie regel toe aan de gegeven kanaal, of\n"
-            "verwijder deze. Deze regel zal worden weergegeven wanneer\n"
-            "een oper /cs info kanaal doet voor dit kanaal, en kan worden\n"
-            "gebruikt om een kanaal te 'markeren' etc...",
-        /* OINFO_HELP_CMD */
-        "    OINFO         Voeg een OperInfo regel toe aan een nick of verwijder deze",
-        /* OCINFO_HELP_CMD */
-        "    OINFO         Voeg een OperInfo regel toe aan een kanaal of verwijder deze"
-    };
-
-    const char* langtable_de[] = {
-        /* OINFO_SYNTAX */
-        "Syntax: OINFO [ADD|DEL] Nickname <Information>",
-        /* OINFO_ADD_SUCCESS */
-        "Eine OperInfo Linie wurde zu den Nicknamen %s hinzugefьgt",
-        /* OINFO_DEL_SUCCESS */
-        "Die OperInfo Linie wurde von den Nicknamen %s enfernt",
-        /* OCINFO_SYNTAX */
-        "Syntax: OINFO [ADD|DEL] Channel <Information>",
-        /* OCINFO_ADD_SUCCESS */
-        "Eine OperInfo Linie wurde zu den Channel %s hinzugefьgt",
-        /* OCINFO_DEL_SUCCESS */
-        "Die OperInfo Linie wurde von den Channel %s enfernt",
-        /* OINFO_HELP */
-        "Syntax: OINFO [ADD|DEL] Nickname <Information>\n"
-            "Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
-            "Nicknamen.Sie wird angezeigt wenn ein Oper mit /ns info sich\n"
-            "ьber den Nicknamen informiert.",
-        /* OCINFO_HELP */
-        "Syntax: OINFO [ADD|DEL] chan <info>\n"
-            "Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
-            "Channel.Sie wird angezeigt wenn ein Oper mit /cs info sich\n"
-            "ьber den Channel informiert.",
-        /* OINFO_HELP_CMD */
-        "    OINFO         Addiert / Lцscht eine OperInfo Linie zu / von einen Nicknamen",
-        /* OCINFO_HELP_CMD */
-        "    OINFO         Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
-    };
-
-    const char* langtable_pt[] = {
-        /* OINFO_SYNTAX */
-        "Sintaxe: OINFO [ADD|DEL] nick <informaзгo>",
-        /* OINFO_ADD_SUCCESS */
-        "A linha OperInfo foi adicionada ao nick %s",
-        /* OINFO_DEL_SUCCESS */
-        "A linha OperInfo foi removida do nick %s",
-        /* OCINFO_SYNTAX */
-        "Sintaxe: OINFO [ADD|DEL] canal <informaзгo>",
-        /* OCINFO_ADD_SUCCESS */
-        "A linha OperInfo foi adicionada ao canal %s",
-        /* OCINFO_DEL_SUCCESS */
-        "A linha OperInfo foi removida do canal %s",
-        /* OINFO_HELP */
-        "Sintaxe: OINFO [ADD|DEL] nick <informaзгo>\n"
-            "Adiciona ou apaga informaзгo para Operadores ao nick fornecido\n"
-            "Isto serб mostrado quando qualquer Operador usar /ns info nick\n"
-            "e pode ser usado para 'etiquetar' usuбrios etc...",
-        /* OCINFO_HELP */
-        "Sintaxe: OINFO [ADD|DEL] canal <informaзгo>\n"
-            "Adiciona ou apaga informaзгo para Operadores ao canal fornecido\n"
-            "Isto serб mostrado quando qualquer Operador usar /cs info canal\n"
-            "e pode ser usado para 'etiquetar' canais etc...",
-        /* OINFO_HELP_CMD */
-        "    OINFO      Adiciona ou Apaga a linha OperInfo para um nick",
-        /* OCINFO_HELP_CMD */
-        "    OINFO      Adiciona ou Apaga a linha OperInfo para um canal"
-    };
-
-    const char* langtable_ru[] = {
-        /* OINFO_SYNTAX */
-        "Синтаксис: OINFO ADD|DEL ник тест",
-        /* OINFO_ADD_SUCCESS */
-        "Опер-Информация для ника %s добавлена",
-        /* OINFO_DEL_SUCCESS */
-        "Опер-Информация для ника %s была удалена",
-        /* OCINFO_SYNTAX */
-        "Синтаксис: OINFO ADD|DEL #канал текст",
-        /* OCINFO_ADD_SUCCESS */
-        "Опер-Информация для канала %s успешно установлена",
-        /* OCINFO_DEL_SUCCESS */
-        "Опер-Информация для канала %s была удалена",
-        /* OINFO_HELP */
-        "Синтаксис: OINFO ADD|DEL ник текст\n"
-            "Устанавливает или удаляет Опер-Информацию для указанного ника,\n"
-            "которая будет показана любому оператору, запрашивающему INFO ника.\n"
-            "Может быть использована для 'пометки' пользователей и т. д...",
-        /* OCINFO_HELP */
-        "Синтаксис: OINFO ADD|DEL #канал текст\n"
-            "Устанавливает или удаляет Опер-Информацию для указанного канала,\n"
-            "которая будет показана любому оператору, запрашивающему INFO канала.\n"
-            "Может быть использована для 'пометки' каналов и т. д...",
-        /* OINFO_HELP_CMD */
-        "    OINFO      Добавляет/Удаляет опер-инфо для ника",
-        /* OCINFO_HELP_CMD */
-        "    OINFO      Добавляет/Удаляет опер-инфо для канала"
-    };
-
-	const char* langtable_it[] = {
-        /* OINFO_SYNTAX */
-        "Sintassi: OINFO [ADD|DEL] nick <info>",
-        /* OINFO_ADD_SUCCESS */
-        "Linea OperInfo aggiunta al nick %s",
-        /* OINFO_DEL_SUCCESS */
-        "Linea OperInfo rimossa dal nick %s",
-        /* OCINFO_SYNTAX */
-        "Sintassi: OINFO [ADD|DEL] chan <info>",
-        /* OCINFO_ADD_SUCCESS */
-        "Linea OperInfo aggiunta al canale %s",
-        /* OCINFO_DEL_SUCCESS */
-        "Linea OperInfo rimossa dal canale %s",
-        /* OINFO_HELP */
-        "Sintassi: OINFO [ADD|DEL] nick <info>\n"
-            "Aggiunge o rimuove informazioni Oper per il nick specificato\n"
-            "Queste vengono mostrate quando un oper esegue il comando /ns info <nick>\n"
-            "e possono essere utilizzate per 'marchiare' gli utenti ecc...",
-        /* OCINFO_HELP */
-        "Sintassi: OINFO [ADD|DEL] chan <info>\n"
-            "Aggiunge o rimuove informazioni Oper per il canale specificato\n"
-            "Queste vengono mostrate quando un oper esegue il comando /cs info <canale>\n"
-            "e possono essere utilizzate per 'marchiare' i canali ecc...",
-        /* OINFO_HELP_CMD */
-        "    OINFO         Aggiunge/Rimuove una linea OperInfo ad/da un nick",
-        /* OCINFO_HELP_CMD */
-        "    OINFO         Aggiunge/Rimuove una linea OperInfo ad/da un canale"
-    };
-
-    moduleInsertLanguage(LANG_EN_US, LANG_NUM_STRINGS, langtable_en_us);
-    moduleInsertLanguage(LANG_ES, LANG_NUM_STRINGS, langtable_es);
-    moduleInsertLanguage(LANG_NL, LANG_NUM_STRINGS, langtable_nl);
-    moduleInsertLanguage(LANG_DE, LANG_NUM_STRINGS, langtable_de);
-    moduleInsertLanguage(LANG_PT, LANG_NUM_STRINGS, langtable_pt);
-    moduleInsertLanguage(LANG_RU, LANG_NUM_STRINGS, langtable_ru);
-	moduleInsertLanguage(LANG_IT, LANG_NUM_STRINGS, langtable_it);
-}
-
-/*************************************************************************/
-
 int mNickHelp(User * u)
 {
     if (is_oper(u)) {
@@ -771,6 +762,5 @@ void mMainChanHelp(User * u)
 
 /*************************************************************************/
 
-/* EOF */
 
 MODULE_INIT("os_info", OSInfo)

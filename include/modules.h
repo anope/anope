@@ -169,6 +169,14 @@ CoreExport class Module
 	 * @param type The type to set the module as.
 	 */
 	void SetType(MODType type);
+
+	/**
+	 * Allow a module to add a set of language strings to anope
+	 * @param langNumber the language number for the strings
+	 * @param ac The language count for the strings
+	 * @param av The language sring list.
+	 **/
+	void InsertLanguage(int langNumber, int ac, const char **av);
 };
 
 struct ModuleHash_ {

@@ -119,15 +119,17 @@ void do_help_limited(char *service, User * u, Command * c)
 /*************************************************************************/
 
 /**
- * Print a help message for the given command.
+ * Prints the help message for a given command.
  * @param services Services Client
  * @param u User Struct
- * @param c Command Struct
+ * @param Command Hash Table
  * @param cmd Command
  * @return void
  */
-void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
+void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
+                  const char *cmd)
 {
+    Command *c = findCommand(cmdTable, cmd);
     Command *current;
     int has_had_help = 0;
     int cont = MOD_CONT;
@@ -200,39 +202,6 @@ void do_help_cmd(char *service, User * u, Command * c, const char *cmd)
 
     mod_current_module = calling_module;
     mod_current_module_name = calling_module_name;
-}
-
-/*************************************************************************/
-
-/**
- * Find the Help Command
- * @param services Services Client
- * @param u User Struct
- * @param c Command Struct
- * @param cmd Command
- * @return void
- */
-void help_cmd(char *service, User * u, Command * list, char *cmd)
-{
-    Command *c = lookup_cmd(list, cmd);
-    do_help_cmd(service, u, c, cmd);
-}
-
-/*************************************************************************/
-
-/**
- * Find the Help Command
- * @param services Services Client
- * @param u User Struct
- * @param Command Hash Table
- * @param cmd Command
- * @return void
- */
-void mod_help_cmd(char *service, User * u, CommandHash * cmdTable[],
-                  const char *cmd)
-{
-    Command *c = findCommand(cmdTable, cmd);
-    do_help_cmd(service, u, c, cmd);
 }
 
 /*************************************************************************/

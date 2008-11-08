@@ -1215,6 +1215,6 @@ class ProtoRatbox : public Module
 			free(TS6SID);
 	}
 
-}
+};
 
 MODULE_INIT("ratbox", ProtoRatbox)

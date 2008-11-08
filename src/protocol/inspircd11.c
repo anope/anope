@@ -1348,8 +1348,6 @@ class ProtoInspIRCd : public Module
 
 		pmodule_ircd_proto(&ircd_proto);
 		moduleAddIRCDMsgs();
-
-		return MOD_CONT;
 	}
 };
 

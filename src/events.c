@@ -511,37 +511,22 @@ int moduleAddEventHandler(EvtMessage * evm)
     return status;
 }
 
-/**
- * Add a module message to the IRCD message hash
- * @param m the Message to add
- * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleAddEventHook(EvtHook * evh)
+int Module::AddEventHook(EvtHook *evh)
 {
-    int status;
+	int status;
 
-    if (!evh) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!evh)
+		return MOD_ERR_PARAMS;
 
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
+	evh->core = 0;
+	if (!evh->mod_name)
+		evh->mod_name = sstrdup(this->name.c_str());
 
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }                           /* shouldnt happen */
-    evh->core = 0;
-    if (!evh->mod_name) {
-        evh->mod_name = sstrdup(mod_current_module->name.c_str());
-    }
+	status = addEventHook(EVENTHOOKS, evh);
+	if (debug)
+		displayHookFromHash(evh->name);
 
-    status = addEventHook(EVENTHOOKS, evh);
-    if (debug) {
-        displayHookFromHash(evh->name);
-    }
-    return status;
+	return status;
 }
 
 /**

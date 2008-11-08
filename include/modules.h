@@ -177,6 +177,14 @@ CoreExport class Module
 	 * @param av The language sring list.
 	 **/
 	void InsertLanguage(int langNumber, int ac, const char **av);
+
+	/** Add a module message to the IRCD message hash
+	 * @param m the Message to add
+	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
+	 * @return MOD_ERR_OK on success, althing else on fail.
+	 *
+	 **/
+	int AddEventHook(EvtHook *evh);
 };
 
 struct ModuleHash_ {

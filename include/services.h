@@ -188,10 +188,10 @@ extern int strncasecmp(const char *, const char *, size_t);
  * It defines the class factory and external init_module function.
  */
 #ifdef _WIN32
-	#define MODULE_INIT(y) \
+	#define MODULE_INIT(x, y) \
 		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
-			return new y(creator); \
+			return new y(x, creator); \
 		} \
 		BOOLEAN WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved) \
 		{ \
@@ -204,10 +204,10 @@ extern int strncasecmp(const char *, const char *, size_t);
 			return TRUE; \
 		}
 #else
-	#define MODULE_INIT(y) \
+	#define MODULE_INIT(x, y) \
 		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
-			return new y(creator); \
+			return new y(x, creator); \
 		}
 #endif
 

@@ -27,6 +27,7 @@ Legend:
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
+  [ ] Fix permanent channels (+P) stuff. Currently it tries to parse modes as users, but that's wrong.. this may rely on killing do_sjoin().
 
 1.9.1
 -----

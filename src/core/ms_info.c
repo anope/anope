@@ -27,7 +27,7 @@ class MSInfo : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("INFO", do_info, NULL, -1, MEMO_HELP_INFO, -1, MEMO_SERVADMIN_HELP_INFO, MEMO_SERVADMIN_HELP_INFO);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

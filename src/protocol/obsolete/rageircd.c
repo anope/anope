@@ -1645,7 +1645,7 @@ int AnopeInit(int argc, char **argv)
     moduleAddAuthor("Anope");
     moduleAddVersion
         ("$Id$");
-    moduleSetType(PROTOCOL);
+    moduleSetType(this, PROTOCOL);
 
     pmodule_ircd_version("RageIRCd 2.0.x");
     pmodule_ircd_cap(myIrcdcap);

@@ -28,7 +28,7 @@ class NSRecover : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("RECOVER", do_recover, NULL, -1, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

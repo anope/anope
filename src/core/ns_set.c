@@ -41,7 +41,7 @@ class NSSet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SET", do_set, NULL, NICK_HELP_SET, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

@@ -27,7 +27,7 @@ class OSGlobal : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("GLOBAL", do_global, is_services_admin, OPER_HELP_GLOBAL, -1, -1, -1, -1);
 		c->help_param1 = s_GlobalNoticer;

@@ -68,7 +68,7 @@ class NSNOOPConvert : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(SUPPORTED);
+		moduleSetType(this, SUPPORTED);
 
 		if (mLoadConfig(0, NULL))
 			throw ModuleException("Couldn't load config?");

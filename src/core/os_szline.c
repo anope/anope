@@ -33,7 +33,7 @@ class OSSZLine : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SZLINE", do_szline, is_services_oper,
 		OPER_HELP_SZLINE, -1, -1, -1, -1);

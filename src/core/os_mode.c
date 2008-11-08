@@ -27,7 +27,7 @@ class OSMode : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("MODE", do_os_mode, is_services_oper, OPER_HELP_MODE, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

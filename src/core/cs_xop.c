@@ -91,7 +91,7 @@ class CSXOP : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

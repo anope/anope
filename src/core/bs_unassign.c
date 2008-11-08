@@ -27,7 +27,7 @@ class BSUnassign : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("UNASSIGN", do_unassign, NULL, BOT_HELP_UNASSIGN, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

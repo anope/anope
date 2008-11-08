@@ -27,7 +27,7 @@ class CSList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("LIST", do_list, NULL, -1, CHAN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST, CHAN_SERVADMIN_HELP_LIST);
 

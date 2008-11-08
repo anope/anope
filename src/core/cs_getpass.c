@@ -27,7 +27,7 @@ class CSGetPass : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("GETPASS", do_getpass, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_GETPASS, CHAN_SERVADMIN_HELP_GETPASS);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

@@ -27,7 +27,7 @@ class BSSay : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("SAY", do_say, NULL, BOT_HELP_SAY, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

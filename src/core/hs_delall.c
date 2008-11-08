@@ -27,7 +27,7 @@ class HSDelAll : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("DELALL", do_delall, is_host_remover, HOST_HELP_DELALL, -1, -1, -1, -1);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

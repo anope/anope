@@ -27,7 +27,7 @@ class OSUpdate : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("UPDATE", do_update, is_services_root, OPER_HELP_UPDATE, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

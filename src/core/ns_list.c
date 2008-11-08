@@ -27,7 +27,7 @@ class NSList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("LIST", do_list, NULL, -1, NICK_HELP_LIST, -1, NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST);
 

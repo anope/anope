@@ -33,7 +33,7 @@ class OSDEFCON : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("DEFCON", do_defcon, is_services_admin, OPER_HELP_DEFCON, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

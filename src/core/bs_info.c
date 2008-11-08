@@ -28,7 +28,7 @@ class BSInfo : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("INFO", do_info, NULL, BOT_HELP_INFO, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

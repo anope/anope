@@ -28,7 +28,7 @@ class NSDrop : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("DROP", do_drop, NULL, -1, NICK_HELP_DROP, -1, NICK_SERVADMIN_HELP_DROP, NICK_SERVADMIN_HELP_DROP);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

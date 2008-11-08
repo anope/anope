@@ -27,7 +27,7 @@ class MSSend : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("SEND", do_send, NULL, MEMO_HELP_SEND, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

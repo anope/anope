@@ -42,7 +42,7 @@ class NSSASet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SASET", do_saset, is_services_oper, -1, -1, -1, NICK_HELP_SASET, NICK_HELP_SASET);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

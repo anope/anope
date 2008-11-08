@@ -27,7 +27,7 @@ class BSAssign : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("ASSIGN", do_assign, NULL, BOT_HELP_ASSIGN, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

@@ -122,7 +122,7 @@ class HSRequest : public Module
 		moduleSetHostHelp(hs_help);
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(SUPPORTED);
+		moduleSetType(this, SUPPORTED);
 
 		my_load_config();
 		my_add_languages();

@@ -27,7 +27,7 @@ class OSShutdown : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SHUTDOWN", do_shutdown, is_services_root, OPER_HELP_SHUTDOWN, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

@@ -22,7 +22,7 @@ class ENone : public Module
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(ENCRYPTION);
+		moduleSetType(this, ENCRYPTION);
 
 		encmodule_encrypt(plain_encrypt);
 		encmodule_encrypt_in_place(plain_encrypt_in_place);

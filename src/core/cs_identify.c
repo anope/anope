@@ -27,7 +27,7 @@ class CSIdentify : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("IDENTIFY", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

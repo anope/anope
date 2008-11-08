@@ -37,7 +37,7 @@ class CSModes : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("OP", do_op, NULL, CHAN_HELP_OP, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

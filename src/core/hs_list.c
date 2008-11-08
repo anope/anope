@@ -27,7 +27,7 @@ class HSList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("LIST", listOut, is_services_oper, -1, -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

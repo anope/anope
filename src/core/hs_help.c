@@ -26,7 +26,7 @@ class HSHelp : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("HELP", do_help, NULL, -1, -1, -1, -1, -1);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

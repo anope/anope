@@ -27,7 +27,7 @@ class OSJupe : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("JUPE", do_jupe, is_services_admin, OPER_HELP_JUPE, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

@@ -34,7 +34,7 @@ class NSGroup : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("GROUP", do_group, NULL, NICK_HELP_GROUP, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

@@ -31,7 +31,7 @@ class MSRead : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("READ", do_read, NULL, MEMO_HELP_READ, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

@@ -27,7 +27,7 @@ class OSModList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("MODLIST", do_modlist, NULL, -1, -1, -1, -1, OPER_HELP_MODLIST);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

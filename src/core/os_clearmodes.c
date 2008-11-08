@@ -28,7 +28,7 @@ class OSClearModes : public Module
 		moduleAddAuthor("Anope");
 		moduleAddVersion
 		("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("CLEARMODES", do_clearmodes, is_services_oper, OPER_HELP_CLEARMODES, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

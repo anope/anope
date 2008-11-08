@@ -27,7 +27,7 @@ class HSSet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SET", myDoSet, is_host_setter, HOST_HELP_SET, -1, -1, -1, -1);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

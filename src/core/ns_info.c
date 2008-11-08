@@ -28,7 +28,7 @@ class NSInfo : public Module
 		moduleAddAuthor("Anope");
 		moduleAddVersion
 		("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("INFO", do_info, NULL, NICK_HELP_INFO, -1, NICK_HELP_INFO, NICK_SERVADMIN_HELP_INFO, NICK_SERVADMIN_HELP_INFO);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

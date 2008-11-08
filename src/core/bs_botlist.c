@@ -27,7 +27,7 @@ class BSBotList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("BOTLIST", do_botlist, NULL, BOT_HELP_BOTLIST, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);
 

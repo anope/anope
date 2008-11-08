@@ -27,7 +27,7 @@ class HSDel : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

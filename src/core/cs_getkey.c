@@ -27,7 +27,7 @@ class CSGetKey : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("GETKEY", do_getkey, NULL, CHAN_HELP_GETKEY, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

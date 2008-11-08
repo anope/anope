@@ -1535,7 +1535,7 @@ int AnopeInit(int argc, char **argv)
 
     moduleAddAuthor("Anope");
     moduleAddVersion("$Id$");
-    moduleSetType(PROTOCOL);
+    moduleSetType(this, PROTOCOL);
 
     pmodule_ircd_version("Hybrid IRCd 7.0");
     pmodule_ircd_cap(myIrcdcap);

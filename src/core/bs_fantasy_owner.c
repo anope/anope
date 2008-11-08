@@ -26,7 +26,7 @@ class BSFantasyOwner : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		/* No need to load of we don't support owner */
 		if (!ircd->owner)

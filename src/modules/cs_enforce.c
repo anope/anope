@@ -41,7 +41,7 @@ class CSEnforce : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(SUPPORTED);
+		moduleSetType(this, SUPPORTED);
 
 		c = createCommand("ENFORCE", my_cs_enforce, NULL, -1, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_HEAD);

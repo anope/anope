@@ -27,7 +27,7 @@ class NSAccess : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("ACCESS", do_access, NULL, NICK_HELP_ACCESS, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

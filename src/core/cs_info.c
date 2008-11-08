@@ -27,7 +27,7 @@ class CSInfo : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("INFO", do_info, NULL, CHAN_HELP_INFO, -1, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO, CHAN_SERVADMIN_HELP_INFO);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

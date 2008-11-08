@@ -27,7 +27,7 @@ class CSDrop : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("DROP", do_drop, NULL, -1, CHAN_HELP_DROP, -1, CHAN_SERVADMIN_HELP_DROP, CHAN_SERVADMIN_HELP_DROP);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

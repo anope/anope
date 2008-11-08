@@ -28,7 +28,7 @@ class NSSuspend : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SUSPEND", do_suspend, is_services_oper, -1, -1, -1, NICK_SERVADMIN_HELP_SUSPEND, NICK_SERVADMIN_HELP_SUSPEND);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

@@ -34,7 +34,7 @@ class OSSQLine : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SQLINE", do_sqline, is_services_oper,
 		OPER_HELP_SQLINE, -1, -1, -1, -1);

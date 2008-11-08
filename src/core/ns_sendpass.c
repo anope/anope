@@ -28,7 +28,7 @@ class NSSendPass : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SENDPASS", do_sendpass, NULL, NICK_HELP_SENDPASS, -1, -1, -1, -1);
 		moduleAddCommand(NICKSERV, c, MOD_UNIQUE);

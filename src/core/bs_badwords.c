@@ -30,7 +30,7 @@ class BSBadwords : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("BADWORDS", do_badwords, NULL, BOT_HELP_BADWORDS, -1, -1, -1, -1);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);

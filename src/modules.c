@@ -233,9 +233,10 @@ int encryption_module_init(void) {
 
     alog("Loading Encryption Module: [%s]", EncModule);
     ret = loadModule(EncModule, NULL);
-    moduleSetType(ENCRYPTION);
     if (ret != MOD_ERR_OK)
 		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
+	else
+		moduleSetType(findModule(EncModule), ENCRYPTION);
     mod_current_module = NULL;
     return ret;
 }
@@ -249,10 +250,10 @@ int protocol_module_init(void)
 
     alog("Loading IRCD Protocol Module: [%s]", IRCDModule);
     ret = loadModule(IRCDModule, NULL);
-    moduleSetType(PROTOCOL);
 
 	if (ret == MOD_ERR_OK)
 	{
+		moduleSetType(findModule(IRCDModule), PROTOCOL);
 		/* This is really NOT the correct place to do config checks, but
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
@@ -767,16 +768,9 @@ int unloadModule(Module * m, User * u)
     }
 }
 
-/**
- * Module setType()
- * Lets the module set a type, CORE,PROTOCOL,3RD etc..
- **/
-void moduleSetType(MODType type)
+void moduleSetType(Module *m, MODType type)
 {
-    if ((mod_current_module_name) && (!mod_current_module)) {
-        mod_current_module = findModule(mod_current_module_name);
-    }
-    mod_current_module->type = type;
+	m->type = type;
 }
 
 /**

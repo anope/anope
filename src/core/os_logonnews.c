@@ -31,7 +31,7 @@ class OSLogonNews : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		/** 
 		* For some unknown reason, do_logonnews is actaully defined in news.c

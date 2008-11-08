@@ -30,7 +30,7 @@ class HSGroup : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1, -1);
 		moduleAddCommand(HOSTSERV, c, MOD_UNIQUE);

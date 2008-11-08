@@ -27,7 +27,7 @@ class CSForbid : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_FORBID, CHAN_SERVADMIN_HELP_FORBID);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

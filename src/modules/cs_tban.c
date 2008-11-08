@@ -55,7 +55,7 @@ class CSTBan : public Module
 
 		moduleAddAuthor(AUTHOR);
 		moduleAddVersion(VERSION);
-		moduleSetType(SUPPORTED);
+		moduleSetType(this, SUPPORTED);
 	}
 };
 

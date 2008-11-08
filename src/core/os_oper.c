@@ -30,7 +30,7 @@ class OSOper : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

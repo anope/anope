@@ -27,7 +27,7 @@ class BSSet : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("SET", do_set, NULL, BOT_HELP_SET, -1, -1, BOT_SERVADMIN_HELP_SET, BOT_SERVADMIN_HELP_SET);
 		moduleAddCommand(BOTSERV, c, MOD_UNIQUE);

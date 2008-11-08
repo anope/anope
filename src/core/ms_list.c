@@ -28,7 +28,7 @@ class MSList : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 		c = createCommand("LIST", do_list, NULL, MEMO_HELP_LIST, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);
 		moduleSetMemoHelp(myMemoServHelp);

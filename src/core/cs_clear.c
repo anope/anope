@@ -27,7 +27,7 @@ class CSClear : public Module
 
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");
-		moduleSetType(CORE);
+		moduleSetType(this, CORE);
 
 		c = createCommand("CLEAR", do_clear, NULL, CHAN_HELP_CLEAR, -1, -1, -1, -1);
 		moduleAddCommand(CHANSERV, c, MOD_UNIQUE);

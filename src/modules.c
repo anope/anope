@@ -344,6 +344,7 @@ void modules_unload_all(bool fini, bool unload_proto)
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */
+	this->filename = NULL;
 	this->nickHelp = NULL;
 	this->chanHelp = NULL;
 	this->memoHelp = NULL;
@@ -381,7 +382,7 @@ Module::~Module()
 	}
 
 	/*
-	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed 
+	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed
 	* XXX: not sure I like this assumption -- w00t
 	*/
 }

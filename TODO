@@ -18,6 +18,10 @@ Legend:
   [ ] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
   [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
   [ ] Remove modules_unload_all fini + hack that goes with it
+  [+] mod_current_* needs to go away also
+    [x] events.c
+    [ ] modules.c
+    [x] commands.c
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
 [x] SendClientIntroduction should take a UID param, rather than generating one(?)

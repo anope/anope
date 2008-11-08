@@ -1045,7 +1045,7 @@ void moduleAddIRCDMsgs(void) {
 class ProtoBahamut : public Module
 {
  public:
-	ProtoBahamut(const std::string &creator) : Module(creator)
+	ProtoBahamut(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

@@ -386,7 +386,7 @@ int md5_check_password(const char *plaintext, const char *password)
 class EMD5 : public Module
 {
  public:
-	EMD5(const std::string &creator) : Module(creator)
+	EMD5(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

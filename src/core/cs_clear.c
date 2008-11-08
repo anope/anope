@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSClear : public Module
 {
  public:
-	CSClear(const std::string &creator) : Module(creator)
+	CSClear(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

@@ -21,7 +21,7 @@ int do_invite(User * u);
 class CSInvite : public Module
 {
  public:
-	CSInvite(const std::string &creator) : Module(creator)
+	CSInvite(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

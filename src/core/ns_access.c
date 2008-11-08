@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSAccess : public Module
 {
  public:
-	NSAccess(const std::string &creator) : Module(creator)
+	NSAccess(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

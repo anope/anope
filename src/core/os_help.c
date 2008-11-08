@@ -20,7 +20,7 @@ int do_help(User * u);
 class OSHelp : public Module
 {
  public:
-	OSHelp(const std::string &creator) : Module(creator)
+	OSHelp(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

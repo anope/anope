@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSSVSNick : public Module
 {
  public:
-	OSSVSNick(const std::string &creator) : Module(creator)
+	OSSVSNick(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

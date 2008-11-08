@@ -24,7 +24,7 @@ extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 class HSGroup : public Module
 {
  public:
-	HSGroup(const std::string &creator) : Module(creator)
+	HSGroup(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

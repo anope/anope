@@ -24,7 +24,7 @@ void myOperServHelp(User * u);
 class OSOper : public Module
 {
  public:
-	OSOper(const std::string &creator) : Module(creator)
+	OSOper(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

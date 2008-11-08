@@ -56,7 +56,7 @@ void my_add_languages(void);
 class CSAppendTopic : public Module
 {
  public:
-	CSAppendTopic(const std::string &creator) : Module(creator)
+	CSAppendTopic(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

@@ -21,7 +21,7 @@ void myBotServHelp(User * u);
 class BSUnassign : public Module
 {
  public:
-	BSUnassign(const std::string &creator) : Module(creator)
+	BSUnassign(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

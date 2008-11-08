@@ -35,7 +35,7 @@ void my_add_languages(void);
 class CSEnforce : public Module
 {
  public:
-	CSEnforce(const std::string &creator) : Module(creator)
+	CSEnforce(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

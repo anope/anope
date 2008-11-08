@@ -20,7 +20,7 @@ void myOperServHelp(User * u);
 class OSSession : public Module
 {
  public:
-	OSSession(const std::string &creator) : Module(creator)
+	OSSession(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

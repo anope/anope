@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSQuit : public Module
 {
  public:
-	OSQuit(const std::string &creator) : Module(creator)
+	OSQuit(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

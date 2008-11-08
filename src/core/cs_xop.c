@@ -85,7 +85,7 @@ int xop_msgs[4][14] = {
 class CSXOP : public Module
 {
  public:
-	CSXOP(const std::string &creator) : Module(creator)
+	CSXOP(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

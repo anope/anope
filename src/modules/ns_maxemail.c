@@ -33,7 +33,7 @@ int NSEmailMax = 0;
 class NSMaxEmail : public Module
 {
  public:
-	NSMaxEmail(const std::string &creator) : Module(creator)
+	NSMaxEmail(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 		EvtHook *evt;

@@ -21,7 +21,7 @@ void myHostServHelp(User * u);
 class HSDelAll : public Module
 {
  public:
-	HSDelAll(const std::string &creator) : Module(creator)
+	HSDelAll(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

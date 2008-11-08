@@ -413,7 +413,7 @@ int old_decrypt(const char *src, char *dest, int size)
 class EOld : public Module
 {
  public:
-	EOld(const std::string &creator) : Module(creator)
+	EOld(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

@@ -26,7 +26,7 @@ void myOperServHelp(User * u);
 class OSRestart : public Module
 {
  public:
-	OSRestart(const std::string &creator) : Module(creator)
+	OSRestart(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

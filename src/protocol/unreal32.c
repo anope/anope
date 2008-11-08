@@ -1522,7 +1522,7 @@ void moduleAddIRCDMsgs(void) {
 class ProtoUnreal : public Module
 {
  public:
-	ProtoUnreal(const std::string &creator) : Module(creator)
+	ProtoUnreal(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

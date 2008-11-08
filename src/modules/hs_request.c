@@ -86,7 +86,7 @@ HostCore *hs_request_head;
 class HSRequest : public Module
 {
  public:
-	HSRequest(const std::string &creator) : Module(creator)
+	HSRequest(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 		EvtHook *hook;

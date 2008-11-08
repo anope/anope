@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSKick : public Module
 {
  public:
-	CSKick(const std::string &creator) : Module(creator)
+	CSKick(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

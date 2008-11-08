@@ -22,7 +22,7 @@ void myOperServHelp(User * u);
 class OSModUnLoad : public Module
 {
  public:
-	OSModUnLoad(const std::string &creator) : Module(creator)
+	OSModUnLoad(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

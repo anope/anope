@@ -25,7 +25,7 @@ void myNickServHelp(User * u);
 class NSIdentify : public Module
 {
  public:
-	NSIdentify(const std::string &creator) : Module(creator)
+	NSIdentify(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

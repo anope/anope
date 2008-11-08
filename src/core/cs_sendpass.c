@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSSendPass : public Module
 {
  public:
-	CSSendPass(const std::string &creator) : Module(creator)
+	CSSendPass(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 
 		Command *c;

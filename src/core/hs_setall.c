@@ -23,7 +23,7 @@ extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
 class HSSetAll : public Module
 {
  public:
-	HSSetAll(const std::string &creator) : Module(creator)
+	HSSetAll(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSUpdate : public Module
 {
  public:
-	NSUpdate(const std::string &creator) : Module(creator)
+	NSUpdate(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

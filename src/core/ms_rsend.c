@@ -21,7 +21,7 @@ void myMemoServHelp(User * u);
 class MSRSend : public Module
 {
  public:
-	MSRSend(const std::string &creator) : Module(creator)
+	MSRSend(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

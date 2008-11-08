@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSJupe : public Module
 {
  public:
-	OSJupe(const std::string &creator) : Module(creator)
+	OSJupe(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

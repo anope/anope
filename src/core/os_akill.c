@@ -27,7 +27,7 @@ void myOperServHelp(User * u);
 class OSAKill : public Module
 {
  public:
-	OSAKill(const std::string &creator) : Module(creator)
+	OSAKill(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

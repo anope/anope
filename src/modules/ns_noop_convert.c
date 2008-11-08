@@ -62,7 +62,7 @@ void m_AddLanguages(void);
 class NSNOOPConvert : public Module
 {
  public:
-	NSNOOPConvert(const std::string &creator) : Module(creator)
+	NSNOOPConvert(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		NSAutoOPDBName = NULL;
 

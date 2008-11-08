@@ -23,7 +23,7 @@ int showModuleCmdLoaded(CommandHash * cmdList, char *mod_name, User * u);
 class OSModInfo : public Module
 {
  public:
-	OSModInfo(const std::string &creator) : Module(creator)
+	OSModInfo(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSRegister : public Module
 {
  public:
-	CSRegister(const std::string &creator) : Module(creator)
+	CSRegister(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

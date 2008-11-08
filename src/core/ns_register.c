@@ -28,7 +28,7 @@ int ns_do_register(User * u);
 class NSRegister : public Module
 {
  public:
-	NSRegister(const std::string &creator) : Module(creator)
+	NSRegister(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

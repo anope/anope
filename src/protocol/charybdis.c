@@ -1298,7 +1298,7 @@ void moduleAddIRCDMsgs(void)
 class ProtoCharybdis : public Module
 {
  public:
-	ProtoCharybdis(const std::string &creator) : Module(creator)
+	ProtoCharybdis(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		EvtHook *hk;
 

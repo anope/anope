@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSNOOP : public Module
 {
  public:
-	OSNOOP(const std::string &creator) : Module(creator)
+	OSNOOP(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

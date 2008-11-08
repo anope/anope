@@ -24,7 +24,7 @@ int myHelpResonse(User * u);
 class NSRelease : public Module
 {
  public:
-	NSRelease(const std::string &creator) : Module(creator)
+	NSRelease(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

@@ -23,7 +23,7 @@ int get_access_nc(NickCore *nc, ChannelInfo *ci);
 class CSAKick : public Module
 {
  public:
-	CSAKick(const std::string &creator) : Module(creator)
+	CSAKick(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

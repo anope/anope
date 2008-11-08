@@ -79,7 +79,7 @@ int reload_config(int argc, char **argv);
 class OSIgnoreDB : public Module
 {
  public:
-	OSIgnoreDB(const std::string &creator) : Module(creator)
+	OSIgnoreDB(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		EvtHook *hook;
 		IgnoreDB = NULL;

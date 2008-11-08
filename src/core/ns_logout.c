@@ -24,7 +24,7 @@ void myNickServHelp(User * u);
 class NSLogout : public Module
 {
  public:
-	NSLogout(const std::string &creator) : Module(creator)
+	NSLogout(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

@@ -28,7 +28,7 @@ void myOperServHelp(User * u);
 class OSSQLine : public Module
 {
  public:
-	OSSQLine(const std::string &creator) : Module(creator)
+	OSSQLine(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

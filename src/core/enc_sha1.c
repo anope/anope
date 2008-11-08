@@ -251,7 +251,7 @@ int sha1_check_password(const char *plaintext, const char *password)
 class ESHA1 : public Module
 {
  public:
-	ESHA1(const std::string &creator) : Module(creator)
+	ESHA1(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

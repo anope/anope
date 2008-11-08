@@ -22,7 +22,7 @@ void myBotServHelp(User * u);
 class BSKick : public Module
 {
  public:
-	BSKick(const std::string &creator) : Module(creator)
+	BSKick(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

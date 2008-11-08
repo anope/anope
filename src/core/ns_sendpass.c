@@ -22,7 +22,7 @@ void myNickServHelp(User * u);
 class NSSendPass : public Module
 {
  public:
-	NSSendPass(const std::string &creator) : Module(creator)
+	NSSendPass(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

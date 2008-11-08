@@ -1172,7 +1172,7 @@ void moduleAddIRCDMsgs(void)
 class ProtoRatbox : public Module
 {
  public:
-	ProtoRatbox(const std::string &creator) : Module(creator)
+	ProtoRatbox(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

@@ -23,7 +23,7 @@ void myMemoServHelp(User * u);
 class MSSet : public Module
 {
  public:
-	MSSet(const std::string &creator) : Module(creator)
+	MSSet(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

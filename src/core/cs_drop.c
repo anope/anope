@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSDrop : public Module
 {
  public:
-	CSDrop(const std::string &creator) : Module(creator)
+	CSDrop(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

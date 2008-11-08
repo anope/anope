@@ -24,7 +24,7 @@ int opers_list(int number, NickCore * nc, User * u, char *level);
 class OSStaff : public Module
 {
  public:
-	OSStaff(const std::string &creator) : Module(creator)
+	OSStaff(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

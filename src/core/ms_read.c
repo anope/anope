@@ -25,7 +25,7 @@ extern void rsend_notify(User * u, Memo * m, const char *chan);
 class MSRead : public Module
 {
  public:
-	MSRead(const std::string &creator) : Module(creator)
+	MSRead(const std::string &modname, const std::string &creator) : Module(creator)
 	{
 		Command *c;
 

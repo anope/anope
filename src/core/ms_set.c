@@ -27,8 +27,8 @@ class MSSet : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, NULL, MEMO_HELP_SET, -1, -1, -1, -1);

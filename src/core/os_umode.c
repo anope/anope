@@ -25,8 +25,8 @@ class OSUMode : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("UMODE", do_operumodes, is_services_root, OPER_HELP_UMODE, -1, -1, -1, -1);

@@ -38,8 +38,8 @@ int AnopeInit(int argc, char **argv)
         addClient(s_CatServ, "meow!");
         addMessageList();
     }
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
+    this->SetAuthor(AUTHOR);
+    this->SetVersion(VERSION);
     alog("ircd_catserv.so: loaded, message status [%d]", status);
     return MOD_CONT;
 }

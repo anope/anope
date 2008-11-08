@@ -28,8 +28,8 @@ class OSStaff : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("STAFF", do_staff, NULL, OPER_HELP_STAFF, -1, -1, -1, -1);

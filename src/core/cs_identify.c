@@ -25,8 +25,8 @@ class CSIdentify : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("IDENTIFY", do_identify, NULL, CHAN_HELP_IDENTIFY, -1, -1, -1, -1);

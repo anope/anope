@@ -25,8 +25,8 @@ class OSSet : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("SET", do_set, is_services_root, OPER_HELP_SET, -1, -1, -1, -1);

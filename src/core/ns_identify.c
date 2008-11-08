@@ -29,8 +29,8 @@ class NSIdentify : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("ID", do_identify, NULL, NICK_HELP_IDENTIFY, -1, -1, -1, -1);

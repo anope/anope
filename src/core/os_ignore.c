@@ -26,8 +26,8 @@ class OSIgnore : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("IGNORE", do_ignoreuser, is_services_admin, OPER_HELP_IGNORE, -1, -1, -1, -1);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);

@@ -50,8 +50,8 @@ int AnopeInit(int argc, char **argv)							/* This will be executed when the mod
          
     moduleAddCallback("test",time(NULL)+dotime("15s"),test,0,NULL);		/* set a call-back function to exec in 3 mins time */
     moduleDelCallback("test");
-    moduleAddAuthor(AUTHOR);								/* tell Anope about the author */
-    moduleAddVersion(VERSION);								/* Tell Anope about the verison */
+    this->SetAuthor(AUTHOR);								/* tell Anope about the author */
+    this->SetVersion(VERSION);								/* Tell Anope about the verison */
 
     if(status!=MOD_ERR_OK) {
 	return MOD_STOP;

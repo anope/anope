@@ -28,8 +28,8 @@ class OSChanList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("CHANLIST", do_chanlist, is_services_oper, OPER_HELP_CHANLIST, -1, -1, -1, -1);

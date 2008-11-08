@@ -27,8 +27,8 @@ class CSAKick : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("AKICK", do_akick, NULL, CHAN_HELP_AKICK, -1, -1, -1, -1);

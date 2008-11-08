@@ -1675,8 +1675,8 @@ void moduleAddAnopeCmds()
 int AnopeInit(int argc, char **argv)
 {
 
-    moduleAddAuthor("Anope");
-    moduleAddVersion
+    this->SetAuthor("Anope");
+    this->SetVersion
         ("$Id$");
     this->SetType(PROTOCOL);
 

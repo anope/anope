@@ -1174,8 +1174,8 @@ class ProtoRatbox : public Module
  public:
 	ProtoRatbox(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
 		if (UseTS6)

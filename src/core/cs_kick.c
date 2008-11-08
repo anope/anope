@@ -25,8 +25,8 @@ class CSKick : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("KICK", do_cs_kick, NULL, CHAN_HELP_KICK, -1, -1, -1, -1);

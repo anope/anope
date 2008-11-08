@@ -32,8 +32,8 @@ class NSRegister : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("REGISTER", do_register, NULL, NICK_HELP_REGISTER, -1, -1, -1, -1);

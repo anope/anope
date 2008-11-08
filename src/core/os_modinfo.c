@@ -27,8 +27,8 @@ class OSModInfo : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("MODINFO", do_modinfo, NULL, -1, -1, -1, -1, OPER_HELP_MODINFO);
 		moduleAddCommand(OPERSERV, c, MOD_UNIQUE);
@@ -71,8 +71,8 @@ int do_modinfo(User * u)
         strftime_lang(timebuf, sizeof(timebuf), u,
                       STRFTIME_DATE_TIME_FORMAT, &tm);
         notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(),
-                    m->version ? m->version : "?",
-                    m->author ? m->author : "?", timebuf);
+                    !m->version.empty() ? m->version.c_str() : "?",
+                    !m->author.empty() ? m->author.c_str() : "?", timebuf);
         for (idx = 0; idx < MAX_CMD_HASH; idx++) {
             showModuleCmdLoaded(HOSTSERV[idx], m->name.c_str(), u);
             showModuleCmdLoaded(OPERSERV[idx], m->name.c_str(), u);

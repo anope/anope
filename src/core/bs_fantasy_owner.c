@@ -24,8 +24,8 @@ class BSFantasyOwner : public Module
 	{
 		EvtHook *hook;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		/* No need to load of we don't support owner */

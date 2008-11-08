@@ -39,8 +39,8 @@ class CSEnforce : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		c = createCommand("ENFORCE", my_cs_enforce, NULL, -1, -1, -1, -1, -1);

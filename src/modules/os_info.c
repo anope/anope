@@ -71,8 +71,8 @@ class OSInfo : public Module
 
 		int status;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		if (mLoadConfig())

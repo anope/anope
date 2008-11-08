@@ -24,8 +24,8 @@ class BSFantasy : public Module
 	{
 		EvtHook *hook;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		hook = createEventHook(EVENT_BOT_FANTASY, do_fantasy);
 		this->AddEventHook(hook);

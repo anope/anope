@@ -25,8 +25,8 @@ class OSGlobal : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("GLOBAL", do_global, is_services_admin, OPER_HELP_GLOBAL, -1, -1, -1, -1);

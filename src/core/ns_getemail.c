@@ -30,8 +30,8 @@ class NSGetEMail : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("GETEMAIL", do_getemail, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_GETEMAIL, NICK_SERVADMIN_HELP_GETEMAIL);

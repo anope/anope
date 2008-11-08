@@ -344,8 +344,6 @@ void modules_unload_all(bool fini, bool unload_proto)
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */
-	this->version = NULL;
-	this->author = NULL;
 	this->nickHelp = NULL;
 	this->chanHelp = NULL;
 	this->memoHelp = NULL;
@@ -376,11 +374,6 @@ Module::~Module()
 		free(this->filename);
 	}
 
-	if (this->author)
-		free(this->author);
-	if (this->version)
-		free(this->version);
-
 	if (this->handle)
 	{
 		if ((ano_modclose(this->handle)) != 0)
@@ -396,6 +389,16 @@ Module::~Module()
 void Module::SetType(MODType type)
 {
 	this->type = type;
+}
+
+void Module::SetVersion(const std::string &version)
+{
+	this->version = version;
+}
+
+void Module::SetAuthor(const std::string &author)
+{
+	this->author = author;
 }
 
 void Module::InsertLanguage(int langNumber, int ac, const char **av)
@@ -1600,28 +1603,6 @@ int destroyMessage(Message * m)
     }
     m->next = NULL;
     return MOD_ERR_OK;
-}
-
-/**
- * Add the modules version info.
- * @param version the version of the current module
- **/
-void moduleAddVersion(const char *version)
-{
-    if (mod_current_module && version) {
-        mod_current_module->version = sstrdup(version);
-    }
-}
-
-/**
- * Add the modules author info
- * @param author the author of the module
- **/
-void moduleAddAuthor(const char *author)
-{
-    if (mod_current_module && author) {
-        mod_current_module->author = sstrdup(author);
-    }
 }
 
 /*******************************************************************************

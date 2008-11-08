@@ -30,8 +30,8 @@ int AnopeInit(int argc, char **argv)
     hook = createEventHook(EVENT_BOT_FANTASY, do_moo);
     status = this->AddEventHook(hook);
     
-    moduleAddAuthor(AUTHOR);
-    moduleAddVersion(VERSION);
+    this->SetAuthor(AUTHOR);
+    this->SetVersion(VERSION);
     return MOD_CONT;
 }
 

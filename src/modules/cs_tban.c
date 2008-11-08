@@ -51,8 +51,8 @@ class CSTBan : public Module
 		moduleAddHelp(c, myFullHelp);
 		moduleAddCommand(CHANSERV, c, MOD_HEAD);
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		const char* langtable_en_us[] = {

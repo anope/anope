@@ -25,8 +25,8 @@ class NSList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("LIST", do_list, NULL, -1, NICK_HELP_LIST, -1, NICK_SERVADMIN_HELP_LIST, NICK_SERVADMIN_HELP_LIST);

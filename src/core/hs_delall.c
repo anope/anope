@@ -25,8 +25,8 @@ class HSDelAll : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("DELALL", do_delall, is_host_remover, HOST_HELP_DELALL, -1, -1, -1, -1);

@@ -25,8 +25,8 @@ class NSGhost : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("GHOST", do_ghost, NULL, NICK_HELP_GHOST, -1, -1, -1, -1);

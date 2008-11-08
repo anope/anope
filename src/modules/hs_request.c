@@ -120,8 +120,8 @@ class HSRequest : public Module
 		this->AddEventHook(hook);
 
 		moduleSetHostHelp(hs_help);
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		my_load_config();

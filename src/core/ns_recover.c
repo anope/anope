@@ -26,8 +26,8 @@ class NSRecover : public Module
  public:
 	NSRecover(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("RECOVER", do_recover, NULL, -1, -1, -1, -1, -1);

@@ -25,8 +25,8 @@ class MSCheck : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("CHECK", do_memocheck, NULL, MEMO_HELP_CHECK, -1, -1, -1, -1);
 		moduleAddCommand(MEMOSERV, c, MOD_UNIQUE);

@@ -25,8 +25,8 @@ class HSDel : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("DEL", do_del, is_host_remover, HOST_HELP_DEL, -1, -1, -1, -1);

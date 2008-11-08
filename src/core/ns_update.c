@@ -25,8 +25,8 @@ class NSUpdate : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("UPDATE", do_nickupdate, NULL, NICK_HELP_UPDATE, -1, -1, -1, -1);

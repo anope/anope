@@ -66,8 +66,8 @@ class NSNOOPConvert : public Module
 	{
 		NSAutoOPDBName = NULL;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		if (mLoadConfig(0, NULL))

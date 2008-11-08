@@ -25,8 +25,8 @@ class NSAList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("ALIST", do_alist, NULL, -1, NICK_HELP_ALIST, -1, NICK_SERVADMIN_HELP_ALIST, NICK_SERVADMIN_HELP_ALIST);

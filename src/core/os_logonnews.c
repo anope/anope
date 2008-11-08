@@ -29,8 +29,8 @@ class OSLogonNews : public Module
 		EvtHook *hook;
 		char buf[BUFSIZE];
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		/** 

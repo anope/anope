@@ -1047,8 +1047,8 @@ class ProtoBahamut : public Module
  public:
 	ProtoBahamut(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("BahamutIRCd 1.4.*/1.8.*");

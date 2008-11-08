@@ -25,8 +25,8 @@ class HSOff : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("OFF", do_off, NULL, HOST_HELP_OFF, -1, -1, -1, -1);

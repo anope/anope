@@ -1524,8 +1524,8 @@ class ProtoUnreal : public Module
  public:
 	ProtoUnreal(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("UnrealIRCd 3.2+");

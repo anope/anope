@@ -26,8 +26,8 @@ class CSLogout : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("LOGOUT", do_logout, NULL, -1, CHAN_HELP_LOGOUT, -1, CHAN_SERVADMIN_HELP_LOGOUT, CHAN_SERVADMIN_HELP_LOGOUT);

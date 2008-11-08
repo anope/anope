@@ -20,8 +20,8 @@ class ENone : public Module
  public:
 	ENone(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
 		encmodule_encrypt(plain_encrypt);

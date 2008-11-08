@@ -28,8 +28,8 @@ class HSGroup : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("GROUP", do_group, NULL, HOST_HELP_GROUP, -1, -1, -1, -1);

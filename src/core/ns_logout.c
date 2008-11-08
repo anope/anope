@@ -28,8 +28,8 @@ class NSLogout : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("LOGOUT", do_logout, NULL, -1, NICK_HELP_LOGOUT, -1, NICK_SERVADMIN_HELP_LOGOUT, NICK_SERVADMIN_HELP_LOGOUT);

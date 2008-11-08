@@ -26,8 +26,8 @@ class NSForbid : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("FORBID", do_forbid, is_services_admin, -1, -1, -1, NICK_SERVADMIN_HELP_FORBID, NICK_SERVADMIN_HELP_FORBID);

@@ -25,8 +25,8 @@ class OSKick : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("KICK", do_os_kick, is_services_oper, OPER_HELP_KICK, -1, -1, -1, -1);

@@ -60,8 +60,8 @@ class CSAppendTopic : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		c = createCommand("APPENDTOPIC", my_cs_appendtopic, NULL, -1, -1, -1, -1, -1);

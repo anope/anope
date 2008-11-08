@@ -25,8 +25,8 @@ class NSStatus : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("STATUS", do_status, NULL, NICK_HELP_STATUS, -1, -1, -1, -1);

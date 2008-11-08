@@ -25,8 +25,8 @@ class NSInfo : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion
+		this->SetAuthor("Anope");
+		this->SetVersion
 		("$Id$");
 		this->SetType(CORE);
 

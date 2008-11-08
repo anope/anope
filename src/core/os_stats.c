@@ -28,8 +28,8 @@ class OSStats : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("STATS", do_stats, NULL, OPER_HELP_STATS, -1, -1, -1, -1);

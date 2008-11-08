@@ -25,8 +25,8 @@ class CSGetKey : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("GETKEY", do_getkey, NULL, CHAN_HELP_GETKEY, -1, -1, -1, -1);

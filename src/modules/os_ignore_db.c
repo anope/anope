@@ -84,8 +84,8 @@ class OSIgnoreDB : public Module
 		EvtHook *hook;
 		IgnoreDB = NULL;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		hook = createEventHook(EVENT_RELOAD, reload_config);

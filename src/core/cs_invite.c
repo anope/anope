@@ -25,8 +25,8 @@ class CSInvite : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("INVITE", do_invite, NULL, CHAN_HELP_INVITE, -1, -1, -1, -1);

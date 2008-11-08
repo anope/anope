@@ -26,8 +26,8 @@ class NSRelease : public Module
  public:
 	NSRelease(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("RELEASE", do_release, NULL, -1, -1, -1, -1, -1);

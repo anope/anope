@@ -388,8 +388,8 @@ class EMD5 : public Module
  public:
 	EMD5(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(ENCRYPTION);
 
 		encmodule_encrypt(md5_encrypt);

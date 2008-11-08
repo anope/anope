@@ -1818,8 +1818,8 @@ int
 AnopeInit (int argc, char **argv)
 {
 
-  moduleAddAuthor ("Anope");
-  moduleAddVersion ("$Id: plexus.c 995 2006-03-01 20:19:11Z rob $");
+  this->SetAuthor ("Anope");
+  this->SetVersion ("$Id: plexus.c 995 2006-03-01 20:19:11Z rob $");
   moduleSetType (PROTOCOL);
 
   pmodule_ircd_version ("hybrid-7.2.1+plexus-3.0.0+");

@@ -28,8 +28,8 @@ class OSOper : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 		c = createCommand("OPER", do_oper, NULL, OPER_HELP_OPER, -1, -1, -1, -1);
 		c->help_param1 = s_NickServ;

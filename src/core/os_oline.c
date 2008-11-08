@@ -25,8 +25,8 @@ class OSOLine : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("OLINE", do_operoline, is_services_root, OPER_HELP_OLINE, -1, -1, -1, -1);

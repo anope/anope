@@ -89,8 +89,8 @@ class CSXOP : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("AOP", do_aop, NULL, CHAN_HELP_AOP, -1, -1, -1, -1);

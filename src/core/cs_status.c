@@ -25,8 +25,8 @@ class CSStatus : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("STATUS", do_status, is_services_admin, -1, -1, -1, CHAN_SERVADMIN_HELP_STATUS, CHAN_SERVADMIN_HELP_STATUS);

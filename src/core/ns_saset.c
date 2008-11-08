@@ -40,8 +40,8 @@ class NSSASet : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id: ns_set.c 850 2005-08-07 14:52:04Z geniusdex $");
 		this->SetType(CORE);
 
 		c = createCommand("SASET", do_saset, is_services_oper, -1, -1, -1, NICK_HELP_SASET, NICK_HELP_SASET);

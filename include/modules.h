@@ -140,8 +140,8 @@ CoreExport class Module
 	char *filename;
 	void *handle;
 	time_t time;
-	char *version;
-	char *author;
+	std::string version;
+	std::string author;
 
 	MODType type;
 
@@ -169,6 +169,16 @@ CoreExport class Module
 	 * @param type The type to set the module as.
 	 */
 	void SetType(MODType type);
+
+	/** Set the modules version info.
+	 * @param version the version of the module
+	 */
+	void SetVersion(const std::string &version);
+
+	/** Set the modules author info
+	 * @param author the author of the module
+	 */
+	void SetAuthor(const std::string &author);
 
 	/**
 	 * Allow a module to add a set of language strings to anope
@@ -311,8 +321,6 @@ int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */
-MDE void moduleAddVersion(const char *version);
-MDE void moduleAddAuthor(const char *author);
 void modules_init(void);
 void modules_delayed_init(void);
 void moduleCallBackPrepForUnload(const char *mod_name);

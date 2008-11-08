@@ -27,8 +27,8 @@ class HSSetAll : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("SETALL", do_setall, is_host_setter, HOST_HELP_SETALL, -1, -1, -1, -1);

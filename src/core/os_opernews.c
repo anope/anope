@@ -29,8 +29,8 @@ class OSOperNews : public Module
 		EvtHook *hook;
 		char buf[BUFSIZE];
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		/** XXX: For some unknown reason, do_opernews is actaully defined in news.c

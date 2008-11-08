@@ -26,8 +26,8 @@ class OSModUnLoad : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("MODUNLOAD", do_modunload, is_services_root, -1, -1, -1, -1, OPER_HELP_MODUNLOAD);

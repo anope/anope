@@ -26,8 +26,8 @@ class CSBan : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("BAN", do_ban, NULL, CHAN_HELP_BAN, -1, -1, -1, -1);

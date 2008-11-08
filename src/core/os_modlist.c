@@ -25,8 +25,8 @@ class OSModList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("MODLIST", do_modlist, NULL, -1, -1, -1, -1, OPER_HELP_MODLIST);
@@ -127,28 +127,28 @@ int do_modlist(User * u)
             case CORE:
                 if (showCore) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version, core);
+                                current->name, current->m->version.c_str(), core);
                     count++;
                 }
                 break;
             case THIRD:
                 if (showThird) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version, third);
+                                current->name, current->m->version.c_str(), third);
                     count++;
                 }
                 break;
             case PROTOCOL:
                 if (showProto) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version, proto);
+                                current->name, current->m->version.c_str(), proto);
                     count++;
                 }
                 break;
             case SUPPORTED:
                 if (showSupported) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version,
+                                current->name, current->m->version.c_str(),
                                 supported);
                     count++;
                 }
@@ -156,14 +156,14 @@ int do_modlist(User * u)
             case QATESTED:
                 if (showQA) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version, qa);
+                                current->name, current->m->version.c_str(), qa);
                     count++;
                 }
                 break;
             case ENCRYPTION:
                 if (showEnc) {
                     notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version, enc);
+                                current->name, current->m->version.c_str(), enc);
                     count++;
                 }
                 break;

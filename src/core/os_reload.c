@@ -25,8 +25,8 @@ class OSReload : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("RELOAD", do_reload, is_services_root, OPER_HELP_RELOAD, -1, -1, -1, -1);

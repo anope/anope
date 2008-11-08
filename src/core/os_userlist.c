@@ -30,8 +30,8 @@ class OSUserList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("USERLIST", do_userlist, NULL, OPER_HELP_USERLIST, -1, -1, -1, -1);

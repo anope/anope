@@ -1302,8 +1302,8 @@ class ProtoCharybdis : public Module
 	{
 		EvtHook *hk;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id: charybdis.c 953 2006-01-14 11:36:29Z certus $");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id: charybdis.c 953 2006-01-14 11:36:29Z certus $");
 		this->SetType(PROTOCOL);
 
 		pmodule_ircd_version("Charybdis 1.0/1.1+");

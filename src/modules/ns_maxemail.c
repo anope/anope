@@ -39,8 +39,8 @@ class NSMaxEmail : public Module
 		EvtHook *evt;
 		int status;
 
-		moduleAddAuthor(AUTHOR);
-		moduleAddVersion(VERSION);
+		this->SetAuthor(AUTHOR);
+		this->SetVersion(VERSION);
 		this->SetType(SUPPORTED);
 
 		c = createCommand("REGISTER", my_ns_register, NULL, -1, -1, -1, -1, -1);

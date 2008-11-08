@@ -25,8 +25,8 @@ class HSList : public Module
 	{
 		Command *c;
 
-		moduleAddAuthor("Anope");
-		moduleAddVersion("$Id$");
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
 		c = createCommand("LIST", listOut, is_services_oper, -1, -1, HOST_HELP_LIST, HOST_HELP_LIST, HOST_HELP_LIST);

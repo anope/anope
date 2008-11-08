@@ -330,8 +330,8 @@ Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Messa
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
 MDE int moduleAddMessage(Message *m, int pos);
-int delMessage(MessageHash *msgTable[], Message *m, char *mod_name);		/* Del a Message from a msg table */
-MDE int moduleDelMessage(char *name);
+int delMessage(MessageHash *msgTable[], Message *m, const char *mod_name);		/* Del a Message from a msg table */
+MDE int moduleDelMessage(const char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
 
 /*************************************************************************/

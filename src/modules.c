@@ -1490,7 +1490,7 @@ int moduleAddMessage(Message * m, int pos)
  * @param name the name of the message to remove
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
-int moduleDelMessage(char *name)
+int moduleDelMessage(const char *name)
 {
     Message *m;
     int status;
@@ -1517,7 +1517,7 @@ int moduleDelMessage(char *name)
  * @mod_name the name of the module we are removing
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
-int delMessage(MessageHash * msgTable[], Message * m, char *mod_name)
+int delMessage(MessageHash * msgTable[], Message * m, const char *mod_name)
 {
     int index = 0;
     MessageHash *current = NULL;
@@ -1742,7 +1742,7 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
  * @param found have we found it?
  * @return a pointer to the ModuleCallBack struct or NULL - dont forget to check the found paramter!
  **/
-ModuleCallBack *moduleCallBackFindEntry(char *mod_name, bool * found)
+static ModuleCallBack *moduleCallBackFindEntry(const char *mod_name, bool * found)
 {
     ModuleCallBack *prev = NULL, *current = NULL;
     *found = false;
@@ -2008,7 +2008,7 @@ void moduleDisplayHelp(int service, User * u)
     int idx;
     ModuleHash *current = NULL;
 	Module *calling_module = mod_current_module;
-	char *calling_module_name = mod_current_module_name;
+	const char *calling_module_name = mod_current_module_name;
 
     for (idx = 0; idx != MAX_CMD_HASH; idx++) {
         for (current = MODULE_HASH[idx]; current; current = current->next) {
@@ -2268,7 +2268,7 @@ void moduleDelAllDataMod(Module * m)
     }
 
     if (freeme) {
-        free(mod_current_module_name);
+        free((void *)mod_current_module_name);
         mod_current_module_name = NULL;
     }
 }

@@ -286,7 +286,7 @@ MDE void moduleAddVersion(const char *version);
 MDE void moduleAddAuthor(const char *author);
 void modules_init(void);
 void modules_delayed_init(void);
-void moduleCallBackPrepForUnload(char *mod_name);
+void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
 MDE char *moduleGetLastBuffer(void);
 MDE void moduleSetHelpHelp(void (*func) (User * u));
@@ -318,8 +318,8 @@ MDE int destroyCommand(Command *c);					/* destroy a command */
 MDE int addCoreCommand(CommandHash *cmdTable[], Command *c);	/* Add a command to a command table */
 MDE int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
 MDE int addCommand(CommandHash *cmdTable[], Command *c,int pos);
-MDE int delCommand(CommandHash *cmdTable[], Command *c,char *mod_name);		/* Del a command from a cmd table */
-MDE int moduleDelCommand(CommandHash *cmdTable[],char *name);		/* Del a command from a cmd table */
+MDE int delCommand(CommandHash *cmdTable[], Command *c, const char *mod_name);		/* Del a command from a cmd table */
+MDE int moduleDelCommand(CommandHash *cmdTable[], const char *name);		/* Del a command from a cmd table */
 Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 
 /*************************************************************************/

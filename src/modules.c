@@ -54,11 +54,6 @@ char *mod_current_buffer = NULL;
 User *mod_current_user;
 ModuleCallBack *moduleCallBackHead = NULL;
 
-int displayCommand(Command * c);
-int displayCommandFromHash(CommandHash * cmdTable[], char *name);
-int displayMessageFromHash(char *name);
-int displayMessage(Message * m);
-char *ModuleGetErrStr(int status);
 
 char *ModuleGetErrStr(int status)
 {
@@ -80,6 +75,106 @@ char *ModuleGetErrStr(int status)
     };
     return (char *) module_err_str[status];
 }
+
+
+/************************************************/
+
+/** XXX. What's all this do, is it necessary? (gdb can do this shit.)
+ */
+
+/**
+ * Output the command stack into the log files.
+ * This will print the call-stack for a given command into the log files, very useful for debugging.
+ * @param c the command struct to print
+ * @return 0 is returned, it has no relevence yet :)
+ */
+static int displayCommand(Command * c)
+{
+    Command *cmd = NULL;
+    int i = 0;
+    alog("Displaying command list for %s", c->name);
+    for (cmd = c; cmd; cmd = cmd->next) {
+        alog("%d:  0x%p", ++i, (void *) cmd);
+    }
+    alog("end");
+    return 0;
+}
+
+/**
+ * Output the command stack into the log files.
+ * This will print the call-stack for a given command into the log files, very useful for debugging.
+ * @param cmdTable the command table to read from
+ * @param name the name of the command to print
+ * @return 0 is returned, it has no relevence yet :)
+ */
+static int displayCommandFromHash(CommandHash * cmdTable[], const char *name)
+{
+    CommandHash *current = NULL;
+    int index = 0;
+    index = CMD_HASH(name);
+    if (debug > 1) {
+        alog("debug: trying to display command %s", name);
+    }
+    for (current = cmdTable[index]; current; current = current->next) {
+        if (stricmp(name, current->name) == 0) {
+            displayCommand(current->c);
+        }
+    }
+    if (debug > 1) {
+        alog("debug: done displaying command %s", name);
+    }
+    return 0;
+}
+
+/**
+ * Displays a message list for a given message.
+ * Again this is of little use other than debugging.
+ * @param m the message to display
+ * @return 0 is returned and has no meaning
+ */
+static int displayMessage(Message * m)
+{
+    Message *msg = NULL;
+    int i = 0;
+    alog("Displaying message list for %s", m->name);
+    for (msg = m; msg; msg = msg->next) {
+        alog("%d: 0x%p", ++i, (void *) msg);
+    }
+    alog("end");
+    return 0;
+}
+
+/**
+ * Display the message call stak.
+ * Prints the call stack for a message based on the message name, again useful for debugging and little lese :)
+ * @param name the name of the message to print info for
+ * @return the return int has no relevence atm :)
+ */
+static int displayMessageFromHash(const char *name)
+{
+    MessageHash *current = NULL;
+    int index = 0;
+    index = CMD_HASH(name);
+    if (debug > 1) {
+        alog("debug: trying to display message %s", name);
+    }
+    for (current = IRCD[index]; current; current = current->next) {
+        if (stricmp(name, current->name) == 0) {
+            displayMessage(current->m);
+        }
+    }
+    if (debug > 1) {
+        alog("debug: done displaying message %s", name);
+    }
+    return 0;
+}
+
+/************************************************/
+
+
+
+
+
 
 /**
  * Automaticaly load modules at startup.
@@ -297,7 +392,7 @@ Module::~Module()
 		free(this->version);
 
 	if ((ano_modclose(this->handle)) != 0)
-		alog(ano_moderr());
+		alog("%s", ano_moderr());
 
 	/*
 	* No need to free our cmd/msg list, as they will always be empty by the module is destroyed 
@@ -550,7 +645,7 @@ int loadModule(const std::string &modname, User * u)
 	void *handle = ano_modopen(buf);
 	if (handle == NULL && (err = ano_moderr()) != NULL)
 	{
-		alog(err);
+		alog("%s", err);
 		return MOD_ERR_NOLOAD;
 	}
 
@@ -656,7 +751,7 @@ int unloadModule(Module * m, User * u)
     }
 
     if ((ano_modclose(m->handle)) != 0) {
-        alog(ano_moderr());
+        alog("%s", ano_moderr());
         if (u) {
             notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
         }
@@ -1011,7 +1106,7 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
  * @param name the name of the command to delete from the service
  * @return returns MOD_ERR_OK on success
  */
-int moduleDelCommand(CommandHash * cmdTable[], char *name)
+int moduleDelCommand(CommandHash * cmdTable[], const char *name)
 {
     Command *c = NULL;
     Command *cmd = NULL;
@@ -1041,95 +1136,6 @@ int moduleDelCommand(CommandHash * cmdTable[], char *name)
     }
     return status;
 }
-
-/**
- * Output the command stack into the log files.
- * This will print the call-stack for a given command into the log files, very useful for debugging.
- * @param cmdTable the command table to read from
- * @param name the name of the command to print
- * @return 0 is returned, it has no relevence yet :)
- */
-int displayCommandFromHash(CommandHash * cmdTable[], char *name)
-{
-    CommandHash *current = NULL;
-    int index = 0;
-    index = CMD_HASH(name);
-    if (debug > 1) {
-        alog("debug: trying to display command %s", name);
-    }
-    for (current = cmdTable[index]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            displayCommand(current->c);
-        }
-    }
-    if (debug > 1) {
-        alog("debug: done displaying command %s", name);
-    }
-    return 0;
-}
-
-/**
- * Output the command stack into the log files.
- * This will print the call-stack for a given command into the log files, very useful for debugging.
- * @param c the command struct to print
- * @return 0 is returned, it has no relevence yet :)
- */
-
-int displayCommand(Command * c)
-{
-    Command *cmd = NULL;
-    int i = 0;
-    alog("Displaying command list for %s", c->name);
-    for (cmd = c; cmd; cmd = cmd->next) {
-        alog("%d:  0x%p", ++i, (void *) cmd);
-    }
-    alog("end");
-    return 0;
-}
-
-/**
- * Display the message call stak.
- * Prints the call stack for a message based on the message name, again useful for debugging and little lese :)
- * @param name the name of the message to print info for
- * @return the return int has no relevence atm :)
- */
-int displayMessageFromHash(char *name)
-{
-    MessageHash *current = NULL;
-    int index = 0;
-    index = CMD_HASH(name);
-    if (debug > 1) {
-        alog("debug: trying to display message %s", name);
-    }
-    for (current = IRCD[index]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            displayMessage(current->m);
-        }
-    }
-    if (debug > 1) {
-        alog("debug: done displaying message %s", name);
-    }
-    return 0;
-}
-
-/**
- * Displays a message list for a given message.
- * Again this is of little use other than debugging.
- * @param m the message to display
- * @return 0 is returned and has no meaning
- */
-int displayMessage(Message * m)
-{
-    Message *msg = NULL;
-    int i = 0;
-    alog("Displaying message list for %s", m->name);
-    for (msg = m; msg; msg = msg->next) {
-        alog("%d: 0x%p", ++i, (void *) msg);
-    }
-    alog("end");
-    return 0;
-}
-
 
 /**
  * Add a command to a command table.
@@ -1212,7 +1218,7 @@ int addCommand(CommandHash * cmdTable[], Command * c, int pos)
  * @param mod_name the name of the module who owns the command
  * @return MOD_ERR_OK will be returned on success
  */
-int delCommand(CommandHash * cmdTable[], Command * c, char *mod_name)
+int delCommand(CommandHash * cmdTable[], Command * c, const char *mod_name)
 {
     int index = 0;
     CommandHash *current = NULL;
@@ -1803,7 +1809,7 @@ void moduleDelCallback(char *name)
  * When a module is unloaded, any callbacks it had outstanding must be removed, else when they attempt to execute the func pointer will no longer be valid, and we'll seg.
  * @param mod_name the name of the module we are preping for unload
  **/
-void moduleCallBackPrepForUnload(char *mod_name)
+void moduleCallBackPrepForUnload(const char *mod_name)
 {
     bool found = false;
     ModuleCallBack *tmp = NULL;

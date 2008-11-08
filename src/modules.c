@@ -195,8 +195,6 @@ void modules_init(void)
         m = findModule(ModulesAutoload[idx]);
         if (!m) {
 			ret = loadModule(ModulesAutoload[idx], NULL);
-			if (ret != MOD_ERR_OK)
-	            alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_user = NULL;
         }
@@ -217,8 +215,6 @@ void modules_core_init(int number, char **list)
         m = findModule(list[idx]);
         if (!m) {
             status = loadModule(list[idx], NULL);
-			if (status != MOD_ERR_OK)
-	            alog("ERROR: status: [%d][%s]", status, ModuleGetErrStr(status));
             mod_current_module = NULL;
             mod_current_user = NULL;
         }
@@ -232,9 +228,7 @@ int encryption_module_init(void) {
 
     alog("Loading Encryption Module: [%s]", EncModule);
     ret = loadModule(EncModule, NULL);
-    if (ret != MOD_ERR_OK)
-		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
-	else
+	if (ret == MOD_ERR_OK)
 		findModule(EncModule)->SetType(ENCRYPTION);
     mod_current_module = NULL;
     return ret;
@@ -273,10 +267,7 @@ int protocol_module_init(void)
 	        ret = -1;
     	}
 	}
-	else
-	{
-		alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
-	}
+
 	mod_current_module = NULL;
     return ret;
 }
@@ -300,8 +291,6 @@ void modules_delayed_init(void)
         m = findModule(ModulesDelayedAutoload[idx]);
         if (!m) {
 			ret = loadModule(ModulesDelayedAutoload[idx], NULL);
-			if (ret != MOD_ERR_OK)
-	            alog("ERROR: status: [%d][%s]", ret, ModuleGetErrStr(ret));
             mod_current_module = NULL;
             mod_current_user = NULL;
         }

@@ -192,17 +192,28 @@ CoreExport class Module
 	 * @param m the Message to add
 	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
 	 * @return MOD_ERR_OK on success, althing else on fail.
-	 *
 	 **/
 	int AddEventHook(EvtHook *evh);
 
-	/**
-	 * Add a module message to the IRCD message hash
+	/** Add a module message to the IRCD message hash
 	 * @param m the Message to add
 	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
 	 * @return MOD_ERR_OK on success, althing else on fail.
 	 **/
 	int AddEventHandler(EvtMessage *evm);
+
+	/** Remove the given message from the IRCD message hash
+	 * @param name the name of the message to remove
+	 * @return MOD_ERR_OK on success, althing else on fail.
+	 **/
+	int DelEventHandler(const char *name);
+
+	/**
+	 * remove the given message from the IRCD message hash
+	 * @param name the name of the message to remove
+	 * @return MOD_ERR_OK on success, althing else on fail.
+	 **/
+	int DelEventHook(const char *name);
 };
 
 struct ModuleHash_ {
@@ -372,7 +383,6 @@ int destroyMessage(Message *m);					/* destroy a Message*/
 MDE EvtMessage *createEventHandler(char *name, int (*func) (const char *source, int ac, const char **av));
 EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
 int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
-MDE int moduleEventDelHandler(char *name);
 int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, const char *mod_name);
 int destroyEventHandler(EvtMessage * evm);
 int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
@@ -380,7 +390,6 @@ int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 MDE EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv));
 EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);
 int addCoreEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh);
-MDE int moduleEventDelHook(const char *name);
 int delEventHook(EvtHookHash * HookEvtTable[], EvtHook * evh, const char *mod_name);
 int destroyEventHook(EvtHook * evh);
 

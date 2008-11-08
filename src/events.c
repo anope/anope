@@ -512,50 +512,34 @@ int Module::AddEventHook(EvtHook *evh)
 	return status;
 }
 
-/**
- * remove the given message from the IRCD message hash
- * @param name the name of the message to remove
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleEventDelHandler(char *name)
+int Module::DelEventHandler(const char *name)
 {
     EvtMessage *evm;
     int status;
 
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }
     evm = findEventHandler(EVENT, name);
     if (!evm) {
         return MOD_ERR_NOEXIST;
     }
 
-    status = delEventHandler(EVENT, evm, mod_current_module->name.c_str());
+    status = delEventHandler(EVENT, evm, this->name.c_str());
     if (debug) {
         displayEvtMessageFromHash(evm->name);
     }
     return status;
 }
 
-/**
- * remove the given message from the IRCD message hash
- * @param name the name of the message to remove
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleEventDelHook(const char *name)
+int Module::DelEventHook(const char *name)
 {
     EvtHook *evh;
     int status;
 
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }
     evh = findEventHook(EVENTHOOKS, name);
     if (!evh) {
         return MOD_ERR_NOEXIST;
     }
 
-    status = delEventHook(EVENTHOOKS, evh, mod_current_module->name.c_str());
+    status = delEventHook(EVENTHOOKS, evh, this->name.c_str());
     if (debug) {
         displayHookFromHash(evh->name);
     }

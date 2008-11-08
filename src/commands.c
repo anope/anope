@@ -52,22 +52,6 @@ void mod_run_cmd(char *service, User * u, CommandHash * cmdTable[],
                  const char *cmd)
 {
     Command *c = findCommand(cmdTable, cmd);
-    do_run_cmd(service, u, c, cmd);
-}
-
-
-/*************************************************************************/
-
-/**
- * Run the given command
- * @param services Services Client
- * @param u User Struct
- * @param c Command Struct
- * @param cmd Command
- * @return void
- */
-void do_run_cmd(char *service, User * u, Command * c, const char *cmd)
-{
     int retVal = 0;
     Command *current;
 

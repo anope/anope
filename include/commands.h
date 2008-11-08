@@ -23,7 +23,6 @@
 extern MDE Command *lookup_cmd(Command *list, char *name);
 extern void help_cmd(char *service, User *u, Command *list,
 		char *name);
-extern void do_run_cmd(char *service, User * u, Command *c,const char *cmd);
 extern MDE void do_help_limited(char *service, User * u, Command * c);
 extern void do_help_cmd(char *service, User * u, Command *c,const char *cmd);
 extern MDE void mod_help_cmd(char *service, User *u, CommandHash *cmdTable[],const char *cmd);

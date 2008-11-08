@@ -22,7 +22,7 @@ void myChanServHelp(User * u);
 class CSSuspend : public Module
 {
  public:
-	CSSuspend(const std::string &modname, const std::string &creator) : Module(creator)
+	CSSuspend(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

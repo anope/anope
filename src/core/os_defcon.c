@@ -27,7 +27,7 @@ void myOperServHelp(User * u);
 class OSDEFCON : public Module
 {
  public:
-	OSDEFCON(const std::string &modname, const std::string &creator) : Module(creator)
+	OSDEFCON(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

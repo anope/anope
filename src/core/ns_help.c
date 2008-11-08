@@ -20,7 +20,7 @@ int do_help(User * u);
 class NSHelp : public Module
 {
  public:
-	NSHelp(const std::string &modname, const std::string &creator) : Module(creator)
+	NSHelp(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

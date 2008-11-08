@@ -24,7 +24,7 @@ void myChanServHelp(User * u);
 class CSAccess : public Module
 {
  public:
-	CSAccess(const std::string &modname, const std::string &creator) : Module(creator)
+	CSAccess(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

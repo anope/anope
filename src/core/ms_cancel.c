@@ -21,7 +21,7 @@ void myMemoServHelp(User * u);
 class MSCancel : public Module
 {
  public:
-	MSCancel(const std::string &modname, const std::string &creator) : Module(creator)
+	MSCancel(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

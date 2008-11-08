@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSChanKill : public Module
 {
  public:
-	OSChanKill(const std::string &modname, const std::string &creator) : Module(creator)
+	OSChanKill(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

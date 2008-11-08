@@ -24,7 +24,7 @@ int badwords_list_callback(User * u, int num, va_list args);
 class BSBadwords : public Module
 {
  public:
-	BSBadwords(const std::string &modname, const std::string &creator) : Module(creator)
+	BSBadwords(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

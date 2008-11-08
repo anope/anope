@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSStatus : public Module
 {
  public:
-	CSStatus(const std::string &modname, const std::string &creator) : Module(creator)
+	CSStatus(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

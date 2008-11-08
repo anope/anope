@@ -22,7 +22,7 @@ void myMemoServHelp(User * u);
 class MSDel : public Module
 {
  public:
-	MSDel(const std::string &modname, const std::string &creator) : Module(creator)
+	MSDel(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

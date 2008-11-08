@@ -22,7 +22,7 @@ void make_unidentified(User * u, ChannelInfo * ci);
 class CSLogout : public Module
 {
  public:
-	CSLogout(const std::string &modname, const std::string &creator) : Module(creator)
+	CSLogout(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

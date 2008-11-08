@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSInfo : public Module
 {
  public:
-	CSInfo(const std::string &modname, const std::string &creator) : Module(creator)
+	CSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

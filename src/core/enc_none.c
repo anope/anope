@@ -18,7 +18,7 @@ int plain_check_password(const char *plaintext, const char *password);
 class ENone : public Module
 {
  public:
-	ENone(const std::string &modname, const std::string &creator) : Module(creator)
+	ENone(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

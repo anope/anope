@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSShutdown : public Module
 {
  public:
-	OSShutdown(const std::string &modname, const std::string &creator) : Module(creator)
+	OSShutdown(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

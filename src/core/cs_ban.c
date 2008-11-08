@@ -22,7 +22,7 @@ void myChanServHelp(User * u);
 class CSBan : public Module
 {
  public:
-	CSBan(const std::string &modname, const std::string &creator) : Module(creator)
+	CSBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

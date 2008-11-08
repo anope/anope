@@ -24,7 +24,7 @@ int reload_config(int argc, char **argv);
 class OSLogonNews : public Module
 {
  public:
-	OSLogonNews(const std::string &modname, const std::string &creator) : Module(creator)
+	OSLogonNews(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		EvtHook *hook;
 		char buf[BUFSIZE];

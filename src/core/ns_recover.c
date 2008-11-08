@@ -24,7 +24,7 @@ int myHelpResonse(User * u);
 class NSRecover : public Module
 {
  public:
-	NSRecover(const std::string &modname, const std::string &creator) : Module(creator)
+	NSRecover(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

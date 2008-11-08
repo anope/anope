@@ -20,7 +20,7 @@ int do_raw(User * u);
 class OSRaw : public Module
 {
  public:
-	OSRaw(const std::string &modname, const std::string &creator) : Module(creator)
+	OSRaw(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

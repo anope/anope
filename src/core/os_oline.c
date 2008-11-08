@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSOLine : public Module
 {
  public:
-	OSOLine(const std::string &modname, const std::string &creator) : Module(creator)
+	OSOLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

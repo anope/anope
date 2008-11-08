@@ -22,7 +22,7 @@ NickAlias *makenick(const char *nick);
 class NSForbid : public Module
 {
  public:
-	NSForbid(const std::string &modname, const std::string &creator) : Module(creator)
+	NSForbid(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

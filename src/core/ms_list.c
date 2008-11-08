@@ -22,7 +22,7 @@ void myMemoServHelp(User * u);
 class MSList : public Module
 {
  public:
-	MSList(const std::string &modname, const std::string &creator) : Module(creator)
+	MSList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

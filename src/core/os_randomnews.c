@@ -20,7 +20,7 @@ void myOperServHelp(User * u);
 class OSRandomNews : public Module
 {
  public:
-	OSRandomNews(const std::string &modname, const std::string &creator) : Module(creator)
+	OSRandomNews(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

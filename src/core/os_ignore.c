@@ -22,7 +22,7 @@ int do_ignoreuser(User * u);
 class OSIgnore : public Module
 {
  public:
-	OSIgnore(const std::string &modname, const std::string &creator) : Module(creator)
+	OSIgnore(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

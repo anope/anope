@@ -21,7 +21,7 @@ void myBotServHelp(User * u);
 class BSBotList : public Module
 {
  public:
-	BSBotList(const std::string &modname, const std::string &creator) : Module(creator)
+	BSBotList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

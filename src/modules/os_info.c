@@ -64,7 +64,7 @@ int mEventReload(int argc, char **argv);
 class OSInfo : public Module
 {
  public:
-	OSInfo(const std::string &modname, const std::string &creator) : Module(creator)
+	OSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 		EvtHook *hook = NULL;

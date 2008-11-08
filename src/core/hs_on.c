@@ -21,7 +21,7 @@ void myHostServHelp(User * u);
 class HSOn : public Module
 {
  public:
-	HSOn(const std::string &modname, const std::string &creator) : Module(creator)
+	HSOn(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

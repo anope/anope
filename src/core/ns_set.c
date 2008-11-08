@@ -35,7 +35,7 @@ void myNickServHelp(User * u);
 class NSSet : public Module
 {
  public:
-	NSSet(const std::string &modname, const std::string &creator) : Module(creator)
+	NSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

@@ -31,7 +31,7 @@ int do_deowner(User * u);
 class CSModes : public Module
 {
  public:
-	CSModes(const std::string &modname, const std::string &creator) : Module(creator)
+	CSModes(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

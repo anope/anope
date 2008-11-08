@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSGetPass : public Module
 {
  public:
-	NSGetPass(const std::string &modname, const std::string &creator) : Module(creator)
+	NSGetPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

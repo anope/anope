@@ -24,7 +24,7 @@ void myOperServHelp(User * u);
 class OSAdmin : public Module
 {
  public:
-	OSAdmin(const std::string &modname, const std::string &creator) : Module(creator)
+	OSAdmin(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

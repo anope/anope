@@ -28,7 +28,7 @@ int do_link(User * u);
 class NSGroup : public Module
 {
  public:
-	NSGroup(const std::string &modname, const std::string &creator) : Module(creator)
+	NSGroup(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

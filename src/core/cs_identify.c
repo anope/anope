@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSIdentify : public Module
 {
  public:
-	CSIdentify(const std::string &modname, const std::string &creator) : Module(creator)
+	CSIdentify(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

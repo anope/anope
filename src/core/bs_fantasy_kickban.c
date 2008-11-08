@@ -20,7 +20,7 @@ int do_fantasy(int argc, char **argv);
 class BSFantasyKickBan : public Module
 {
  public:
-	BSFantasyKickBan(const std::string &modname, const std::string &creator) : Module(creator)
+	BSFantasyKickBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		EvtHook *hook;
 

@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSAList : public Module
 {
  public:
-	NSAList(const std::string &modname, const std::string &creator) : Module(creator)
+	NSAList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

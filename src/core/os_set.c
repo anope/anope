@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSSet : public Module
 {
  public:
-	OSSet(const std::string &modname, const std::string &creator) : Module(creator)
+	OSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

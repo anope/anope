@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSUMode : public Module
 {
  public:
-	OSUMode(const std::string &modname, const std::string &creator) : Module(creator)
+	OSUMode(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

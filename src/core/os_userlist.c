@@ -26,7 +26,7 @@ void myOperServHelp(User * u);
 class OSUserList : public Module
 {
  public:
-	OSUserList(const std::string &modname, const std::string &creator) : Module(creator)
+	OSUserList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

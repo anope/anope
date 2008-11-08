@@ -24,7 +24,7 @@ extern MDE int anope_get_private_mode();
 class OSChanList : public Module
 {
  public:
-	OSChanList(const std::string &modname, const std::string &creator) : Module(creator)
+	OSChanList(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

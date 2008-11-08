@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSGlobal : public Module
 {
  public:
-	OSGlobal(const std::string &modname, const std::string &creator) : Module(creator)
+	OSGlobal(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

@@ -42,7 +42,7 @@ void mAddLanguages(void);
 class CSTBan : public Module
 {
  public:
-	CSTBan(const std::string &modname, const std::string &creator) : Module(creator)
+	CSTBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

@@ -21,7 +21,7 @@ void myChanServHelp(User * u);
 class CSGetPass : public Module
 {
  public:
-	CSGetPass(const std::string &modname, const std::string &creator) : Module(creator)
+	CSGetPass(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

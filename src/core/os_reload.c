@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSReload : public Module
 {
  public:
-	OSReload(const std::string &modname, const std::string &creator) : Module(creator)
+	OSReload(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

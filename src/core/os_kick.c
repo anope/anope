@@ -21,7 +21,7 @@ void myOperServHelp(User * u);
 class OSKick : public Module
 {
  public:
-	OSKick(const std::string &modname, const std::string &creator) : Module(creator)
+	OSKick(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

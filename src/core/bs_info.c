@@ -22,7 +22,7 @@ void myBotServHelp(User * u);
 class BSInfo : public Module
 {
  public:
-	BSInfo(const std::string &modname, const std::string &creator) : Module(creator)
+	BSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

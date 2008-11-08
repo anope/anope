@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSGhost : public Module
 {
  public:
-	NSGhost(const std::string &modname, const std::string &creator) : Module(creator)
+	NSGhost(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

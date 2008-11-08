@@ -24,7 +24,7 @@ void myOperServHelp(User * u);
 class OSStats : public Module
 {
  public:
-	OSStats(const std::string &modname, const std::string &creator) : Module(creator)
+	OSStats(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

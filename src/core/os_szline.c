@@ -27,7 +27,7 @@ int szline_list(int number, SXLine * sx, User * u, int *sent_header);
 class OSSZLine : public Module
 {
  public:
-	OSSZLine(const std::string &modname, const std::string &creator) : Module(creator)
+	OSSZLine(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

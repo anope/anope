@@ -22,7 +22,7 @@ void myNickServHelp(User * u);
 class NSDrop : public Module
 {
  public:
-	NSDrop(const std::string &modname, const std::string &creator) : Module(creator)
+	NSDrop(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

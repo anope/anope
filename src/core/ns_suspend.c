@@ -22,7 +22,7 @@ void myNickServHelp(User * u);
 class NSSuspend : public Module
 {
  public:
-	NSSuspend(const std::string &modname, const std::string &creator) : Module(creator)
+	NSSuspend(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

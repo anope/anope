@@ -1319,7 +1319,7 @@ void moduleAddIRCDMsgs(void) {
 class ProtoInspIRCd : public Module
 {
  public:
-	ProtoInspIRCd(const std::string &modname, const std::string &creator) : Module(creator)
+	ProtoInspIRCd(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		moduleAddAuthor("Anope");
 		moduleAddVersion("$Id$");

@@ -26,7 +26,7 @@ void myNickServHelp(User * u);
 class NSGetEMail : public Module
 {
  public:
-	NSGetEMail(const std::string &modname, const std::string &creator) : Module(creator)
+	NSGetEMail(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

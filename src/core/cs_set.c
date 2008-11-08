@@ -43,7 +43,7 @@ void myChanServHelp(User * u);
 class CSSet : public Module
 {
  public:
-	CSSet(const std::string &modname, const std::string &creator) : Module(creator)
+	CSSet(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

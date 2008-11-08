@@ -21,7 +21,7 @@ void myNickServHelp(User * u);
 class NSInfo : public Module
 {
  public:
-	NSInfo(const std::string &modname, const std::string &creator) : Module(creator)
+	NSInfo(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
 

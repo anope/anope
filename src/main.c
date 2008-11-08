@@ -79,7 +79,7 @@ const char version_number_dotted[] = VERSION_STRING_DOTTED;
 const char version_build[] =
     "build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
-const char version_flags[] = " " VER_DEBUG VER_OS VER_MYSQL VER_MODULE;
+const char version_flags[] = " " VER_OS VER_MYSQL VER_MODULE;
 
 extern char *mod_current_buffer;
 

@@ -52,12 +52,6 @@ cat >version.h <<EOF
 #define VERSION_STRING "$VERSION"
 #define VERSION_STRING_DOTTED "$VERSIONDOTTED"
 
-#ifdef DEBUG_COMMANDS
-# define VER_DEBUG "D"
-#else
-# define VER_DEBUG
-#endif
-
 #if defined(_WIN32)
 # if _MSC_VER >= 1400
 #  define VER_OS "W"

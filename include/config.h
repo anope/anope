@@ -36,10 +36,6 @@
 /* Define this to enable OperServ's svs commands (superadmin only). */
  #define USE_OSSVS 
 
-/* Define this to enable OperServ's debugging commands (Services root
- * only).  These commands are undocumented; "use the source, Luke!" */
-/* #define DEBUG_COMMANDS */
-
 /******************* END OF USER-CONFIGURABLE SECTION ********************/
 
 /* Size of input buffer (note: this is different from BUFSIZ)

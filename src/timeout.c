@@ -19,31 +19,6 @@ static Timeout *timeouts = NULL;
 
 /*************************************************************************/
 
-#ifdef DEBUG_COMMANDS
-
-/* Send the timeout list to the given user. */
-
-int send_timeout_list(User * u)
-{
-    Timeout *to, *last;
-
-    ircdproto->SendMessage(s_OperServ, u->nick, "Now: %ld", (long int) time(NULL));
-    for (to = timeouts, last = NULL; to; last = to, to = to->next) {
-        ircdproto->SendMessage(s_OperServ, u->nick, "0x%p: %ld: 0x%p (0x%p)",
-               (void *) to, (long int) to->timeout, (void *) to->code,
-               (void *) to->data);
-        if (to->prev != last)
-            ircdproto->SendMessage(s_OperServ, u->nick,
-                   "    to->prev incorrect!  expected=0x%p seen=0x%p",
-                   (void *) last, (void *) to->prev);
-    }
-    return MOD_CONT;
-}
-
-#endif                          /* DEBUG_COMMANDS */
-
-/*************************************************************************/
-
 /* Check the timeout list for any pending actions. */
 
 void check_timeouts(void)

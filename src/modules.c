@@ -1006,20 +1006,77 @@ int destroyCommand(Command * c)
     return MOD_ERR_OK;
 }
 
-/**
- * Add a CORE command ot the given command hash
- * @param cmdTable the command table to add the command to
+/** Add a command to a command table. Only for internal use.
+ * only add if were unique, pos = 0;
+ * if we want it at the "head" of that command, pos = 1
+ * at the tail, pos = 2
+ * @param cmdTable the table to add the command to
  * @param c the command to add
- * @return MOD_ERR_OK on success
+ * @param pos the position in the cmd call stack to add the command
+ * @return MOD_ERR_OK will be returned on success.
  */
-int addCoreCommand(CommandHash * cmdTable[], Command * c)
+static int internal_addCommand(CommandHash * cmdTable[], Command * c, int pos)
 {
-    if (!cmdTable || !c) {
+    /* We can assume both param's have been checked by this point.. */
+    int index = 0;
+    CommandHash *current = NULL;
+    CommandHash *newHash = NULL;
+    CommandHash *lastHash = NULL;
+    Command *tail = NULL;
+
+    if (!cmdTable || !c || (pos < 0 || pos > 2)) {
         return MOD_ERR_PARAMS;
     }
-    c->core = 1;
-    c->next = NULL;
-    return addCommand(cmdTable, c, 0);
+
+    if (mod_current_module_name && !c->mod_name)
+        return MOD_ERR_NO_MOD_NAME;
+
+    index = CMD_HASH(c->name);
+
+    for (current = cmdTable[index]; current; current = current->next) {
+        if ((c->service) && (current->c) && (current->c->service)
+            && (!strcmp(c->service, current->c->service) == 0)) {
+            continue;
+        }
+        if ((stricmp(c->name, current->name) == 0)) {   /* the cmd exist's we are a addHead */
+            if (pos == 1) {
+                c->next = current->c;
+                current->c = c;
+                if (debug)
+                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
+                         (void *) c->next, (void *) c);
+                return MOD_ERR_OK;
+            } else if (pos == 2) {
+
+                tail = current->c;
+                while (tail->next)
+                    tail = tail->next;
+                if (debug)
+                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
+                         (void *) tail, (void *) c);
+                tail->next = c;
+                c->next = NULL;
+
+                return MOD_ERR_OK;
+            } else
+                return MOD_ERR_EXISTS;
+        }
+        lastHash = current;
+    }
+
+    if ((newHash = (CommandHash *)malloc(sizeof(CommandHash))) == NULL) {
+        fatal("Out of memory");
+    }
+    newHash->next = NULL;
+    newHash->name = sstrdup(c->name);
+    newHash->c = c;
+
+    if (lastHash == NULL)
+        cmdTable[index] = newHash;
+    else
+        lastHash->next = newHash;
+
+    return MOD_ERR_OK;
 }
 
 /**
@@ -1099,7 +1156,7 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
 
     if (debug >= 2)
         displayCommandFromHash(cmdTable, c->name);
-    status = addCommand(cmdTable, c, pos);
+    status = internal_addCommand(cmdTable, c, pos);
     if (debug >= 2)
         displayCommandFromHash(cmdTable, c->name);
     if (status != MOD_ERR_OK) {
@@ -1108,125 +1165,14 @@ int moduleAddCommand(CommandHash * cmdTable[], Command * c, int pos)
     return status;
 }
 
-/**
- * Delete a command from the service given.
- * @param cmdTable the cmdTable for the services to remove the command from
- * @param name the name of the command to delete from the service
- * @return returns MOD_ERR_OK on success
- */
-int moduleDelCommand(CommandHash * cmdTable[], const char *name)
-{
-    Command *c = NULL;
-    Command *cmd = NULL;
-    int status = 0;
 
-    if (!mod_current_module) {
-        return MOD_ERR_UNKNOWN;
-    }
-
-    c = findCommand(cmdTable, name);
-    if (!c) {
-        return MOD_ERR_NOEXIST;
-    }
-
-
-    for (cmd = c; cmd; cmd = cmd->next) {
-        if (cmd->mod_name
-            && cmd->mod_name == mod_current_module->name) {
-            if (debug >= 2) {
-                displayCommandFromHash(cmdTable, name);
-            }
-            status = delCommand(cmdTable, cmd, mod_current_module->name.c_str());
-            if (debug >= 2) {
-                displayCommandFromHash(cmdTable, name);
-            }
-        }
-    }
-    return status;
-}
-
-/**
- * Add a command to a command table.
- * only add if were unique, pos = 0;
- * if we want it at the "head" of that command, pos = 1
- * at the tail, pos = 2
- * @param cmdTable the table to add the command to
- * @param c the command to add
- * @param pos the position in the cmd call stack to add the command
- * @return MOD_ERR_OK will be returned on success.
- */
-int addCommand(CommandHash * cmdTable[], Command * c, int pos)
-{
-    /* We can assume both param's have been checked by this point.. */
-    int index = 0;
-    CommandHash *current = NULL;
-    CommandHash *newHash = NULL;
-    CommandHash *lastHash = NULL;
-    Command *tail = NULL;
-
-    if (!cmdTable || !c || (pos < 0 || pos > 2)) {
-        return MOD_ERR_PARAMS;
-    }
-
-    if (mod_current_module_name && !c->mod_name)
-        return MOD_ERR_NO_MOD_NAME;
-
-    index = CMD_HASH(c->name);
-
-    for (current = cmdTable[index]; current; current = current->next) {
-        if ((c->service) && (current->c) && (current->c->service)
-            && (!strcmp(c->service, current->c->service) == 0)) {
-            continue;
-        }
-        if ((stricmp(c->name, current->name) == 0)) {   /* the cmd exist's we are a addHead */
-            if (pos == 1) {
-                c->next = current->c;
-                current->c = c;
-                if (debug)
-                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-                         (void *) c->next, (void *) c);
-                return MOD_ERR_OK;
-            } else if (pos == 2) {
-
-                tail = current->c;
-                while (tail->next)
-                    tail = tail->next;
-                if (debug)
-                    alog("debug: existing cmd: (0x%p), new cmd (0x%p)",
-                         (void *) tail, (void *) c);
-                tail->next = c;
-                c->next = NULL;
-
-                return MOD_ERR_OK;
-            } else
-                return MOD_ERR_EXISTS;
-        }
-        lastHash = current;
-    }
-
-    if ((newHash = (CommandHash *)malloc(sizeof(CommandHash))) == NULL) {
-        fatal("Out of memory");
-    }
-    newHash->next = NULL;
-    newHash->name = sstrdup(c->name);
-    newHash->c = c;
-
-    if (lastHash == NULL)
-        cmdTable[index] = newHash;
-    else
-        lastHash->next = newHash;
-
-    return MOD_ERR_OK;
-}
-
-/**
- * Remove a command from the command hash.
+/** Remove a command from the command hash. Only for internal use.
  * @param cmdTable the command table to remove the command from
  * @param c the command to remove
  * @param mod_name the name of the module who owns the command
  * @return MOD_ERR_OK will be returned on success
  */
-int delCommand(CommandHash * cmdTable[], Command * c, const char *mod_name)
+static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char *mod_name)
 {
     int index = 0;
     CommandHash *current = NULL;
@@ -1287,6 +1233,43 @@ int delCommand(CommandHash * cmdTable[], Command * c, const char *mod_name)
         lastHash = current;
     }
     return MOD_ERR_NOEXIST;
+}
+
+/**
+ * Delete a command from the service given.
+ * @param cmdTable the cmdTable for the services to remove the command from
+ * @param name the name of the command to delete from the service
+ * @return returns MOD_ERR_OK on success
+ */
+int moduleDelCommand(CommandHash * cmdTable[], const char *name)
+{
+    Command *c = NULL;
+    Command *cmd = NULL;
+    int status = 0;
+
+    if (!mod_current_module) {
+        return MOD_ERR_UNKNOWN;
+    }
+
+    c = findCommand(cmdTable, name);
+    if (!c) {
+        return MOD_ERR_NOEXIST;
+    }
+
+
+    for (cmd = c; cmd; cmd = cmd->next) {
+        if (cmd->mod_name
+            && cmd->mod_name == mod_current_module->name) {
+            if (debug >= 2) {
+                displayCommandFromHash(cmdTable, name);
+            }
+            status = internal_delCommand(cmdTable, cmd, mod_current_module->name.c_str());
+            if (debug >= 2) {
+                displayCommandFromHash(cmdTable, name);
+            }
+        }
+    }
+    return status;
 }
 
 /**

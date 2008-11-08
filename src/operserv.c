@@ -55,10 +55,6 @@ ChannelInfo DefConModesCI;      /* ChannelInfo containg params for locked modes
                                  */
 
 
-#ifdef DEBUG_COMMANDS
-static int do_matchwild(User * u);
-#endif
-
 void moduleAddOperServCmds(void);
 /*************************************************************************/
 
@@ -78,16 +74,7 @@ SListOpts szopts = { 0, NULL, &is_szline_entry_equal, &free_szline_entry };
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddOperServCmds(void) {
-#ifdef DEBUG_COMMANDS
-    Command *c;
-#endif
-
     modules_core_init(OperServCoreNumber, OperServCoreModules);
-
-#ifdef DEBUG_COMMANDS
-    c = createCommand("LISTTIMERS", send_timeout_list,  is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-    c = createCommand("MATCHWILD",  do_matchwild,       is_services_root, -1,-1,-1,-1,-1); addCoreCommand(OPERSERV,c);
-#endif
 }
 
 /* *INDENT-ON* */
@@ -1496,22 +1483,6 @@ static void free_operlist_entry(SList * slist, void *item)
 
 /*************************************************************************/
 
-#ifdef DEBUG_COMMANDS
-
-static int do_matchwild(User * u)
-{
-    char *pat = strtok(NULL, " ");
-    char *str = strtok(NULL, " ");
-    if (pat && str)
-        notice_user(s_OperServ, u, "%d", match_wild(pat, str));
-    else
-        notice_user(s_OperServ, u, "Syntax error.");
-    return MOD_CONT;
-}
-
-#endif                          /* DEBUG_COMMANDS */
-
-/*************************************************************************/
 /**
  * Returns 1 if the passed level is part of the CURRENT defcon, else 0 is returned
  **/

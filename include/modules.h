@@ -319,10 +319,7 @@ MDE int moduleGetConfigDirective(Directive *h);
 /* Command Managment Functions */
 MDE Command *createCommand(const char *name,int (*func)(User *u),int (*has_priv)(User *u),int help_all, int help_reg, int help_oper, int help_admin,int help_root);
 MDE int destroyCommand(Command *c);					/* destroy a command */
-MDE int addCoreCommand(CommandHash *cmdTable[], Command *c);	/* Add a command to a command table */
 MDE int moduleAddCommand(CommandHash *cmdTable[], Command *c, int pos);
-MDE int addCommand(CommandHash *cmdTable[], Command *c,int pos);
-MDE int delCommand(CommandHash *cmdTable[], Command *c, const char *mod_name);		/* Del a command from a cmd table */
 MDE int moduleDelCommand(CommandHash *cmdTable[], const char *name);		/* Del a command from a cmd table */
 Command *findCommand(CommandHash *cmdTable[], const char *name);	/* Find a command */
 

@@ -26,7 +26,7 @@ void moduleAddHelpServCmds(void);
  */
 void moduleAddHelpServCmds(void)
 {
-    modules_core_init(HelpServCoreNumber, HelpServCoreModules);
+	ModuleManager::LoadModuleList(HelpServCoreNumber, HelpServCoreModules);
 }
 
 /*************************************************************************/

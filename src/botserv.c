@@ -17,7 +17,6 @@
 #include "services.h"
 #include "pseudo.h"
 
-
 /*************************************************************************/
 
 BotInfo *botlists[256];         /* Hash list of bots */
@@ -35,7 +34,7 @@ E void moduleAddBotServCmds(void);
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddBotServCmds(void) {
-    modules_core_init(BotServCoreNumber, BotServCoreModules);
+    ModuleManager::LoadModuleList(BotServCoreNumber, BotServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

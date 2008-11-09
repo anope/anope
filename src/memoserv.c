@@ -25,7 +25,7 @@ E void rsend_notify(User *u, Memo *m, const char *chan);
 /*************************************************************************/
 
 void moduleAddMemoServCmds(void) {
-    modules_core_init(MemoServCoreNumber, MemoServCoreModules);
+	ModuleManager::LoadModuleList(MemoServCoreNumber, MemoServCoreModules);
 }
 
 /*************************************************************************/

@@ -171,25 +171,6 @@ static int displayMessageFromHash(const char *name)
 /************************************************/
 
 /**
- * Load up a list of modules.
- * @param number The number of modules to load
- * @param list The list of modules to load
- **/
-void modules_core_init(int number, char **list)
-{
-    int idx;
-    Module *m;
-    int status = 0;
-    for (idx = 0; idx < number; idx++) {
-        m = findModule(list[idx]);
-        if (!m) {
-            status = loadModule(list[idx], NULL);
-            mod_current_module = NULL;
-            mod_current_user = NULL;
-        }
-    }
-}
-/**
  *
  **/
 int encryption_module_init(void) {

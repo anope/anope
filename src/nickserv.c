@@ -36,7 +36,7 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay);
 /*************************************************************************/
 /* *INDENT-OFF* */
 void moduleAddNickServCmds(void) {
-    modules_core_init(NickServCoreNumber, NickServCoreModules);
+	ModuleManager::LoadModuleList(NickServCoreNumber, NickServCoreModules);
 }
 /* *INDENT-ON* */
 /*************************************************************************/

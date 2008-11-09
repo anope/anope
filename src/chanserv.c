@@ -119,7 +119,7 @@ CSModeUtil csmodeutils[] = {
 /*************************************************************************/
 
 void moduleAddChanServCmds(void) {
-    modules_core_init(ChanServCoreNumber, ChanServCoreModules);
+	ModuleManager::LoadModuleList(ChanServCoreNumber, ChanServCoreModules);
 }
 
 /* *INDENT-ON* */

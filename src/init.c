@@ -529,7 +529,7 @@ int init_secondary(int ac, char **av)
     helpserv_init();
 
     /* load any custom modules */
-	modules_core_init(ModulesNumber, ModulesAutoload);
+	ModuleManager::LoadModuleList(ModulesNumber, ModulesAutoload);
 
     /* Initialize random number generator */
     rand_init();

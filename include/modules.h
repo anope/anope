@@ -136,7 +136,13 @@ struct ModuleLang_ {
  */
 CoreExport class ModuleManager
 {
-
+ public:
+	/**
+	 * Load up a list of modules.
+	 * @param total_modules The number of modules to load
+	 * @param module_list The list of modules to load
+	 **/
+	static void LoadModuleList(int total_modules, char **module_list);
 };
 
 /** Every module in Anope is actually a class.

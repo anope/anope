@@ -541,7 +541,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"serverinfo", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
+	static const char *Once[] = {"serverinfo", "networkinfo", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -604,6 +604,7 @@ int ServerConfig::Read(bool bail)
 		{"serverinfo", "hostname", "", new ValueContainerChar(&ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
+		{"networkinfo", "helpchannel", "", new ValueContainerChar(&HelpChannel), DT_CHARPTR, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1302,7 +1303,6 @@ Directive directives[] = {
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
-    {"HelpChannel", {{PARAM_STRING, PARAM_RELOAD, &HelpChannel}}},
     {"LogChannel", {{PARAM_STRING, PARAM_RELOAD, &LogChannel}}},
     {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},

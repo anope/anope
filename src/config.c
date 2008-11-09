@@ -546,7 +546,7 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem &data)
 {
 	if (UseMail) {
-		if (static_cast<std::string>(value) == "sendmailpath") {
+		if (static_cast<std::string>(value) == "sendmailpath" || static_cast<std::string>(value) == "sendfrom") {
 			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
 		}
 	}
@@ -664,6 +664,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},
+		{"mail", "sendfrom", "", new ValueContainerChar(&SendFrom), DT_CHARPTR, ValidateMail},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1362,7 +1363,6 @@ Directive directives[] = {
                        {PARAM_STRING, 0, &RemotePassword3}}},
     {"RestrictMail", {{PARAM_SET, PARAM_RELOAD, &RestrictMail}}},
     {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-    {"SendFrom", {{PARAM_STRING, PARAM_RELOAD, &SendFrom}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
     {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
@@ -1897,10 +1897,6 @@ int read_config(int reload)
                  "*** character ('%c') will be used. The others will be ignored.\n",
                  *BSFantasyCharacter);
         }
-    }
-
-    if (UseMail) {
-        CHECK(SendFrom);
     }
 
     if (GlobalOnCycle) {

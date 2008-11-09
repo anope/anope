@@ -1062,23 +1062,6 @@ u_int32_t getrandom32(void)
 /*************************************************************************/
 
 /**
- * Determine if we need to send the TOKEN
- * @param token1
- * @param token2
- * @return token to send
- */
-const char *send_token(const char *token1, const char *token2)
-{
-    if (UseTokens && ircd->token && ircdcap->token) {
-        return token2;
-    } else {
-        return token1;
-    }
-}
-
-/*************************************************************************/
-
-/**
  * Number of tokens in a string
  * @param str String
  * @param dilim Dilimiter

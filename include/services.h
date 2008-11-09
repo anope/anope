@@ -381,7 +381,6 @@ struct ircdvars_ {
 	int knock_needs_i;			/* Check if we needed +i when setting NOKNOCK */
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 	int token;					/* Does Anope support the tokens for the ircd */
-	int tokencaseless;			/* TOKEN are not case senstive - most its Unreal that is case senstive */
 	int sjb64;					/* Base 64 encode TIMESTAMP */
     int invitemode;				/* +I  */
     int sjoinbanchar;			/* use single quotes to define it */

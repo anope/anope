@@ -221,11 +221,6 @@ int protocol_module_init(void)
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
 		 */
-	    if (UseTokens && !(ircd->token)) {
-    	    alog("Anope does not support TOKENS for this ircd setting; unsetting UseToken");
-        	UseTokens = 0;
-	    }
-
 		if (UseTS6 && !(ircd->ts6)) {
 			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
 			UseTS6 = 0;
@@ -1277,21 +1272,9 @@ Message *findMessage(MessageHash * msgTable[], const char *name)
     idx = CMD_HASH(name);
 
     for (current = msgTable[idx]; current; current = current->next) {
-        if (UseTokens) {
-            if (ircd->tokencaseless) {
-                if (stricmp(name, current->name) == 0) {
-                    return current->m;
-                }
-            } else {
-                if (strcmp(name, current->name) == 0) {
-                    return current->m;
-                }
-            }
-        } else {
-            if (stricmp(name, current->name) == 0) {
-                return current->m;
-            }
-        }
+		if (stricmp(name, current->name) == 0) {
+			return current->m;
+		}
     }
     return NULL;
 }
@@ -1321,11 +1304,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
     index = CMD_HASH(m->name);
 
     for (current = msgTable[index]; current; current = current->next) {
-        if ((UseTokens) && (!ircd->tokencaseless)) {
-            match = strcmp(m->name, current->name);
-        } else {
-            match = stricmp(m->name, current->name);
-        }
+        match = stricmp(m->name, current->name);
         if (match == 0) {       /* the msg exist's we are a addHead */
             if (pos == 1) {
                 m->next = current->m;

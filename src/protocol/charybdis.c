@@ -106,7 +106,6 @@ IRCDVar myIrcd[] = {
      0,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
      0,                         /* We support TOKENS */
-     1,                         /* TOKENS are CASE inSensitive */
      0,                         /* TIME STAMPS are BASE64 */
      1,                         /* +I support */
      0,                         /* SJOIN ban char */

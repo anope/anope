@@ -303,7 +303,6 @@ E int   NickRegDelay;
 E int   UseSVSHOLD;
 E int   UseSVS2MODE;
 E int   RestrictOperNicks;
-E int   UseTokens;
 E int   NewsCount;
 E char *Numeric;
 E int   UnRestrictSAdmin;
@@ -1026,7 +1025,6 @@ E unsigned int mysql_rand(void);
 
 E char *common_get_vident(User *u);
 E char *common_get_vhost(User *u);
-E const char *send_token(const char *token1, const char *token2);
 E const char* base64enc(long i);
 E long base64dec(char *b64);
 E long base64dects(const char *ts);

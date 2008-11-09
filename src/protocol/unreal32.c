@@ -142,7 +142,6 @@ IRCDVar myIrcd[] = {
      1,                         /* No Knock requires +i */
      NULL,                      /* CAPAB Chan Modes             */
      1,                         /* We support Unreal TOKENS */
-     0,                         /* TOKENS are CASE Sensitive */
      1,                         /* TIME STAMPS are BASE64 */
      1,                         /* +I support */
      '&',                       /* SJOIN ban char */
@@ -471,15 +470,12 @@ CUMode myCumodes[128] = {
  */
 void unreal_cmd_svswatch(const char *sender, const char *nick, const char *parm)
 {
-    send_cmd(sender, "%s %s :%s", send_token("SVSWATCH", "Bw"), nick,
-             parm);
+    send_cmd(sender, "Bw %s :%s", nick, parm);
 }
 
 void unreal_cmd_netinfo(int ac, const char **av)
 {
-    send_cmd(NULL, "%s %ld %ld %d %s 0 0 0 :%s",
-             send_token("NETINFO", "AO"), (long int) maxusercnt,
-             (long int) time(NULL), atoi(av[2]), av[3], av[7]);
+    send_cmd(NULL, "AO %ld %ld %d %s 0 0 0 :%s", (long int) maxusercnt, (long int) time(NULL), atoi(av[2]), av[3], av[7]);
 }
 /* PROTOCTL */
 /*
@@ -498,23 +494,14 @@ void unreal_cmd_netinfo(int ac, const char **av)
 */
 void unreal_cmd_capab()
 {
-    if (UseTokens) {
-        if (Numeric) {
-            send_cmd(NULL,
-                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
-        } else {
-            send_cmd(NULL,
-                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
-        }
-    } else {
-        if (Numeric) {
-            send_cmd(NULL,
-                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
-        } else {
-            send_cmd(NULL,
-                     "PROTOCTL NICKv2 VHP UMODE2 NICKIP SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
-        }
-    }
+	if (Numeric)
+	{
+		send_cmd(NULL, "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64 VL");
+	}
+	else
+	{
+		send_cmd(NULL, "PROTOCTL NICKv2 VHP UMODE2 NICKIP TOKEN SJOIN SJOIN2 SJ3 NOQUIT TKLEXT SJB64");
+	}
 }
 
 /* PASS */
@@ -529,8 +516,7 @@ void unreal_cmd_chghost(const char *nick, const char *vhost)
     if (!nick || !vhost) {
         return;
     }
-    send_cmd(ServerName, "%s %s %s", send_token("CHGHOST", "AL"), nick,
-             vhost);
+    send_cmd(ServerName, "AL %s %s", nick, vhost);
 }
 
 /* CHGIDENT */
@@ -539,8 +525,7 @@ void unreal_cmd_chgident(const char *nick, const char *vIdent)
     if (!nick || !vIdent) {
         return;
     }
-    send_cmd(ServerName, "%s %s %s", send_token("CHGIDENT", "AZ"), nick,
-             vIdent);
+    send_cmd(ServerName, "AZ %s %s", nick, vIdent);
 }
 
 
@@ -603,23 +588,23 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSNOOP */
 	void SendSVSNOOP(const char *server, int set)
 	{
-		send_cmd(NULL, "%s %s %s", send_token("SVSNOOP", "f"), server, set ? "+" : "-");
+		send_cmd(NULL, "f %s %s", server, set ? "+" : "-");
 	}
 
 	void SendAkillDel(const char *user, const char *host)
 	{
-		send_cmd(NULL, "%s - G %s %s %s", send_token("TKL", "BD"), user, host, s_OperServ);
+		send_cmd(NULL, "BD - G %s %s %s", user, host, s_OperServ);
 	}
 
 	void SendTopic(BotInfo *whosets, const char *chan, const char *whosetit, const char *topic, time_t when)
 	{
-		send_cmd(whosets->nick, "%s %s %s %lu :%s", send_token("TOPIC", ")"), chan, whosetit, static_cast<unsigned long>(when), topic);
+		send_cmd(whosets->nick, ") %s %s %lu :%s", chan, whosetit, static_cast<unsigned long>(when), topic);
 	}
 
 	void SendVhostDel(User *u)
 	{
-		if (UseSVS2MODE) send_cmd(s_HostServ, "%s %s -xt", send_token("SVS2MODE", "v"), u->nick);
-		else send_cmd(s_HostServ, "%s %s -xt", send_token("SVSMODE", "n"), u->nick);
+		if (UseSVS2MODE) send_cmd(s_HostServ, "v %s -xt", u->nick);
+		else send_cmd(s_HostServ, "n %s -xt", u->nick);
 		notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
 	}
 
@@ -628,7 +613,7 @@ class UnrealIRCdProto : public IRCDProto
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "%s + G %s %s %s %ld %ld :%s", send_token("TKL", "BD"), user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
+		send_cmd(NULL, "BD + G %s %s %s %ld %ld :%s", user, host, who, static_cast<long>(time(NULL) + timeleft), static_cast<long>(when), reason);
 	}
 
 	/*
@@ -640,7 +625,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
 	{
 		if (!source || !user || !buf) return;
-		send_cmd(source, "%s %s :%s", send_token("SVSKILL", "h"), user, buf);
+		send_cmd(source, "h %s :%s", user, buf);
 	}
 
 	/*
@@ -654,35 +639,35 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (ac >= 1) {
 			if (!u || !av[0]) return;
-			if (UseSVS2MODE) send_cmd(ServerName, "%s %s %s", send_token("SVS2MODE", "v"), u->nick, merge_args(ac, av));
-			else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), u->nick, merge_args(ac, av));
+			if (UseSVS2MODE) send_cmd(ServerName, "v %s %s", u->nick, merge_args(ac, av));
+			else send_cmd(ServerName, "n %s %s", u->nick, merge_args(ac, av));
 		}
 	}
 
 	void SendModeInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "%s %s %s", send_token("MODE", "G"), dest, buf);
+		send_cmd(source->nick, "G %s %s", dest, buf);
 	}
 
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		EnforceQlinedNick(nick, s_BotServ);
-		send_cmd(NULL, "%s %s 1 %ld %s %s %s 0 %s %s%s :%s", send_token("NICK", "&"), nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
+		send_cmd(NULL, "& %s 1 %ld %s %s %s 0 %s %s%s :%s", nick, static_cast<long>(time(NULL)), user, host, ServerName, modes, host,
 			myIrcd->nickip ? " *" : " ", real);
 		SendSQLine(nick, "Reserved for services");
 	}
 
 	void SendKickInternal(BotInfo *source, const char *chan, const char *user, const char *buf)
 	{
-		if (buf) send_cmd(source->nick, "%s %s %s :%s", send_token("KICK", "H"), chan, user, buf);
-		else send_cmd(source->nick, "%s %s %s", send_token("KICK", "H"), chan, user);
+		if (buf) send_cmd(source->nick, "H %s %s :%s", chan, user, buf);
+		else send_cmd(source->nick, "H %s %s", chan, user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 	{
 		if (!buf) return;
-		send_cmd(source->nick, "%s @%s :%s", send_token("NOTICE", "B"), dest, buf);
+		send_cmd(source->nick, "B @%s :%s", dest, buf);
 	}
 
 	void SendBotOp(const char *nick, const char *chan)
@@ -701,8 +686,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* JOIN */
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(ServerName, "%s !%s %s :%s", send_token("SJOIN", "~"), base64enc(static_cast<long>(chantime)), channel, user->nick);
-		/* send_cmd(user, "%s %s", send_token("JOIN", "C"), channel); */
+		send_cmd(ServerName, "~ !%s %s :%s", base64enc(static_cast<long>(chantime)), channel, user->nick);
 	}
 
 	/* unsqline
@@ -712,7 +696,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSQLineDel(const char *user)
 	{
 		if (!user) return;
-		send_cmd(NULL, "%s %s", send_token("UNSQLINE", "d"), user);
+		send_cmd(NULL, "d %s", user);
 	}
 
 
@@ -728,7 +712,7 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSQLine(const char *mask, const char *reason)
 	{
 		if (!mask || !reason) return;
-		send_cmd(NULL, "%s %s :%s", send_token("SQLINE", "c"), mask, reason);
+		send_cmd(NULL, "c %s :%s", mask, reason);
 	}
 
 	/*
@@ -740,14 +724,14 @@ class UnrealIRCdProto : public IRCDProto
 	void SendSVSO(const char *source, const char *nick, const char *flag)
 	{
 		if (!source || !nick || !flag) return;
-		send_cmd(source, "%s %s %s", send_token("SVSO", "BB"), nick, flag);
+		send_cmd(source, "BB %s %s", nick, flag);
 	}
 
 	/* NICK <newnick>  */
 	void SendChangeBotNick(BotInfo *oldnick, const char *newnick)
 	{
 		if (!oldnick || !newnick) return;
-		send_cmd(oldnick->nick, "%s %s %ld", send_token("NICK", "&"), newnick, static_cast<long>(time(NULL)));
+		send_cmd(oldnick->nick, "& %s %ld", newnick, static_cast<long>(time(NULL)));
 	}
 
 	/* Functions that use serval cmd functions */
@@ -773,14 +757,14 @@ class UnrealIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(NULL, "%s + Q H %s %s %ld %ld :%s", send_token("TKL", "BD"), nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
+		send_cmd(NULL, "BD + Q H %s %s %ld %ld :%s", nick, ServerName, static_cast<long>(time(NULL) + NSReleaseTimeout),
 			static_cast<long>(time(NULL)), "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
 	void SendSVSHoldDel(const char *nick)
 	{
-		send_cmd(NULL, "%s - Q * %s %s", send_token("TKL", "BD"), nick, ServerName);
+		send_cmd(NULL, "BD - Q * %s %s", nick, ServerName);
 	}
 
 	/* UNSGLINE */
@@ -789,19 +773,19 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSGLineDel(const char *mask)
 	{
-		send_cmd(NULL, "%s - :%s", send_token("SVSNLINE", "BR"), mask);
+		send_cmd(NULL, "BR - :%s", mask);
 	}
 
 	/* UNSZLINE */
 	void SendSZLineDel(const char *mask)
 	{
-		send_cmd(NULL, "%s - Z * %s %s", send_token("TKL", "BD"), mask, s_OperServ);
+		send_cmd(NULL, "BD - Z * %s %s", mask, s_OperServ);
 	}
 
 	/* SZLINE */
 	void SendSZLine(const char *mask, const char *reason, const char *whom)
 	{
-		send_cmd(NULL, "%s + Z * %s %s %ld %ld :%s", send_token("TKL", "BD"), mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
+		send_cmd(NULL, "BD + Z * %s %s %ld %ld :%s", mask, whom, static_cast<long>(time(NULL) + 172800), static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SGLINE */
@@ -813,7 +797,7 @@ class UnrealIRCdProto : public IRCDProto
 		char edited_reason[BUFSIZE];
 		strlcpy(edited_reason, reason, BUFSIZE);
 		strnrepl(edited_reason, BUFSIZE, " ", "_");
-		send_cmd(NULL, "%s + %s :%s", send_token("SVSNLINE", "BR"), edited_reason, mask);
+		send_cmd(NULL, "BR + %s :%s", edited_reason, mask);
 	}
 
 	/* SVSMODE -b */
@@ -827,8 +811,8 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendSVSModeChan(const char *name, const char *mode, const char *nick)
 	{
-		if (nick) send_cmd(ServerName, "%s %s %s %s", send_token("SVSMODE", "n"), name, mode, nick);
-		else send_cmd(ServerName, "%s %s %s", send_token("SVSMODE", "n"), name, mode);
+		if (nick) send_cmd(ServerName, "n %s %s %s", name, mode, nick);
+		else send_cmd(ServerName, "n %s %s", name, mode);
 	}
 
 
@@ -836,8 +820,8 @@ class UnrealIRCdProto : public IRCDProto
 	/* sent if svid is something weird */
 	void SendSVID(const char *nick, time_t ts)
 	{
-		if (UseSVS2MODE) send_cmd(ServerName, "%s %s +d 1", send_token("SVS2MODE", "v"), nick);
-		else send_cmd(ServerName, "%s %s +d 1", send_token("SVSMODE", "n"), nick);
+		if (UseSVS2MODE) send_cmd(ServerName, "v %s +d 1", nick);
+		else send_cmd(ServerName, "n %s +d 1", nick);
 	}
 
 	/* SVSMODE +d */
@@ -866,8 +850,8 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 	{
-		if (param) send_cmd(source, "%s %s %s :%s", send_token("SVSJOIN", "BX"), nick, chan, param);
-		else send_cmd(source, "%s %s :%s", send_token("SVSJOIN", "BX"), nick, chan);
+		if (param) send_cmd(source, "BX %s %s :%s", nick, chan, param);
+		else send_cmd(source, "BX %s :%s", nick, chan);
 	}
 
 	/* svspart
@@ -877,17 +861,17 @@ class UnrealIRCdProto : public IRCDProto
 	*/
 	void SendSVSPart(const char *source, const char *nick, const char *chan)
 	{
-		send_cmd(source, "%s %s :%s", send_token("SVSPART", "BT"), nick, chan);
+		send_cmd(source, "BT %s :%s", nick, chan);
 	}
 
 	void SendSWhois(const char *source, const char *who, const char *mask)
 	{
-		send_cmd(source, "%s %s :%s", send_token("SWHOIS", "BA"), who, mask);
+		send_cmd(source, "BA %s :%s", who, mask);
 	}
 
 	void SendEOB()
 	{
-		send_cmd(ServerName, "%s", send_token("EOS", "ES"));
+		send_cmd(ServerName, "ES");
 	}
 
 
@@ -1382,132 +1366,70 @@ void moduleAddIRCDMsgs(void) {
 
     m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
     m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("6",        anope_event_away); addCoreMessage(IRCD,m);
     m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("C",        anope_event_join); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("C",        anope_event_join); addCoreMessage(IRCD,m);
     m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("H",        anope_event_kick); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("H",        anope_event_kick); addCoreMessage(IRCD,m);
     m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage(".",        anope_event_kill); addCoreMessage(IRCD,m);
-    }
+    m = createMessage(".",        anope_event_kill); addCoreMessage(IRCD,m);
     m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("G",        anope_event_mode); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("G",        anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("F",        anope_event_motd); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("F",        anope_event_motd); addCoreMessage(IRCD,m);
     m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("&",        anope_event_nick); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("&",        anope_event_nick); addCoreMessage(IRCD,m);
     m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("D",        anope_event_part); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("D",        anope_event_part); addCoreMessage(IRCD,m);
     m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("8",        anope_event_ping); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("8",        anope_event_ping); addCoreMessage(IRCD,m);
     m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("!",        anope_event_privmsg); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("!",        anope_event_privmsg); addCoreMessage(IRCD,m);
     m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage(",",        anope_event_quit); addCoreMessage(IRCD,m);
-    }
+    m = createMessage(",",        anope_event_quit); addCoreMessage(IRCD,m);
     m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("'",        anope_event_server); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("'",        anope_event_server); addCoreMessage(IRCD,m);
     m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("-",        anope_event_squit); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("-",        anope_event_squit); addCoreMessage(IRCD,m);
     m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage(")",        anope_event_topic); addCoreMessage(IRCD,m);
-    }
+    m = createMessage(")",        anope_event_topic); addCoreMessage(IRCD,m);
     m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("n",        anope_event_mode); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("n",        anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("SVS2MODE",   anope_event_mode); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("v",       anope_event_mode); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("v",       anope_event_mode); addCoreMessage(IRCD,m);
     m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("#",        anope_event_whois); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("#",        anope_event_whois); addCoreMessage(IRCD,m);
     m = createMessage("PROTOCTL",  anope_event_capab); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("_",        anope_event_capab); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("_",        anope_event_capab); addCoreMessage(IRCD,m);
     m = createMessage("CHGHOST",   anope_event_chghost); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("AL",        anope_event_chghost); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AL",        anope_event_chghost); addCoreMessage(IRCD,m);
     m = createMessage("CHGIDENT",  anope_event_chgident); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("AZ",        anope_event_chgident); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AZ",        anope_event_chgident); addCoreMessage(IRCD,m);
     m = createMessage("CHGNAME",   anope_event_chgname); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("BK",        anope_event_chgname); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("BK",        anope_event_chgname); addCoreMessage(IRCD,m);
     m = createMessage("NETINFO",   anope_event_netinfo); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("AO",       anope_event_netinfo); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AO",       anope_event_netinfo); addCoreMessage(IRCD,m);
     m = createMessage("SETHOST",   anope_event_sethost); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("AA",        anope_event_sethost); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AA",        anope_event_sethost); addCoreMessage(IRCD,m);
     m = createMessage("SETIDENT",  anope_event_setident); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("AD",        anope_event_setident); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AD",        anope_event_setident); addCoreMessage(IRCD,m);
     m = createMessage("SETNAME",   anope_event_setname); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("AE",        anope_event_setname); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AE",        anope_event_setname); addCoreMessage(IRCD,m);
     m = createMessage("EOS", 	   anope_event_eos); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("ES",       anope_event_eos); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("ES",       anope_event_eos); addCoreMessage(IRCD,m);
     m = createMessage("ERROR", 	   anope_event_error); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("5",        anope_event_error); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("5",        anope_event_error); addCoreMessage(IRCD,m);
     m = createMessage("UMODE2",    anope_event_umode2); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-     m = createMessage("|",        anope_event_umode2); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("|",        anope_event_umode2); addCoreMessage(IRCD,m);
     m = createMessage("SJOIN",      anope_event_sjoin); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("~",        anope_event_sjoin); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("~",        anope_event_sjoin); addCoreMessage(IRCD,m);
     m = createMessage("SDESC",      anope_event_sdesc); addCoreMessage(IRCD,m);
-    if (UseTokens) {
-      m = createMessage("AG",       anope_event_sdesc); addCoreMessage(IRCD,m);
-    }
+    m = createMessage("AG",       anope_event_sdesc); addCoreMessage(IRCD,m);
 
-    /* The none token version of these is in messages.c */
-    if (UseTokens) {
-     m = createMessage("2",         m_stats); addCoreMessage(IRCD,m);
-     m = createMessage(">",         m_time); addCoreMessage(IRCD,m);
-     m = createMessage("+",         m_version); addCoreMessage(IRCD,m);
-    }
+    /* The non token version of these is in messages.c */
+    m = createMessage("2",         m_stats); addCoreMessage(IRCD,m);
+    m = createMessage(">",         m_time); addCoreMessage(IRCD,m);
+    m = createMessage("+",         m_version); addCoreMessage(IRCD,m);
 }
 
 

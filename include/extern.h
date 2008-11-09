@@ -378,7 +378,7 @@ E char **ServicesRoots;
 E int   RootNumber;
 E bool  LogMaxUsers;
 E bool  SuperAdmin;
-E int   LogBot;
+E bool  LogBot;
 E time_t AutokillExpiry;
 E time_t ChankillExpiry;
 E time_t SGLineExpiry;

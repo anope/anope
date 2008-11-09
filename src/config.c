@@ -178,7 +178,7 @@ static char *ServicesRoot;
 char **ServicesRoots;
 int RootNumber;
 bool SuperAdmin;
-int LogBot;
+bool LogBot;
 bool LogMaxUsers;
 bool DisableRaw;
 time_t AutokillExpiry;
@@ -606,6 +606,7 @@ int ServerConfig::Read(bool bail)
 		{"serverinfo", "motd", "services.motd", new ValueContainerChar(&MOTDFilename), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "helpchannel", "", new ValueContainerChar(&HelpChannel), DT_CHARPTR, NoValidation},
 		{"networkinfo", "logchannel", "", new ValueContainerChar(&LogChannel), DT_CHARPTR, NoValidation},
+		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1304,7 +1305,6 @@ Directive directives[] = {
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
     {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
-    {"LogBot", {{PARAM_SET, PARAM_RELOAD, &LogBot}}},
     {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
     {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},

@@ -35,6 +35,32 @@ Module::Module(const std::string &mname, const std::string &creator)
 	{
 		this->lang[i].argc = 0;
 	}
+
+    int index = 0;
+    ModuleHash *current = NULL;
+    ModuleHash *newHash = NULL;
+    ModuleHash *lastHash = NULL;
+
+    index = CMD_HASH(this->name);
+
+    for (current = MODULE_HASH[index]; current; current = current->next) {
+        if (this->name ==current->name)
+			throw CoreException("Module already exists!");
+        lastHash = current;
+    }
+
+    if ((newHash = (ModuleHash *)malloc(sizeof(ModuleHash))) == NULL) {
+        fatal("Out of memory");
+    }
+    this->created = time(NULL);
+    newHash->next = NULL;
+    newHash->name = sstrdup(this->name.c_str());
+    newHash->m = this;
+
+    if (lastHash == NULL)
+        MODULE_HASH[index] = newHash;
+    else
+        lastHash->next = newHash;
 }
 
 Module::~Module()
@@ -157,7 +183,25 @@ Module::~Module()
                 }
             }
         }
+    }
 
+    int index = 0;
+    ModuleHash *lastHash = NULL;
+	ModuleHash *mhash = NULL;
+
+    index = CMD_HASH(this->name);
+
+    for (mhash = MODULE_HASH[index]; mhash; mhash = mhash->next) {
+        if (this->name == mhash->name) {
+            if (!lastHash) {
+                MODULE_HASH[index] = mhash->next;
+            } else {
+                lastHash->next = mhash->next;
+            }
+            free(mhash->name);
+            free(mhash);
+        }
+        lastHash = mhash;
     }
 }
 

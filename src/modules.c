@@ -250,7 +250,7 @@ void modules_unload_all(bool fini, bool unload_proto)
         	    mod_current_module_name = mh->m->name.c_str();
 	            mod_current_module_name = NULL;
 
-	            delModule(mh->m);
+	            delete mh->m;
 		    }
 	   	    mh = next;
 		}
@@ -274,75 +274,6 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
     for (i = 0; i < ac; i++) {
         this->lang[langNumber].argv[i] = sstrdup(av[i]);
     }
-}
-
-/**
- * Add the module to the list of currently loaded modules.
- * @param m the currently loaded module
- * @return MOD_ERR_OK on success, anything else on fail
- */
-int addModule(Module * m)
-{
-    int index = 0;
-    ModuleHash *current = NULL;
-    ModuleHash *newHash = NULL;
-    ModuleHash *lastHash = NULL;
-
-    index = CMD_HASH(m->name);
-
-    for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (m->name ==current->name)
-            return MOD_ERR_EXISTS;
-        lastHash = current;
-    }
-
-    if ((newHash = (ModuleHash *)malloc(sizeof(ModuleHash))) == NULL) {
-        fatal("Out of memory");
-    }
-    m->time = time(NULL);
-    newHash->next = NULL;
-    newHash->name = sstrdup(m->name.c_str());
-    newHash->m = m;
-
-    if (lastHash == NULL)
-        MODULE_HASH[index] = newHash;
-    else
-        lastHash->next = newHash;
-    return MOD_ERR_OK;
-}
-
-/**
- * Remove the module from the list of loaded modules.
- * @param m module to remove
- * @return MOD_ERR_OK on success anything else on fail
- */
-int delModule(Module * m)
-{
-    int index = 0;
-    ModuleHash *current = NULL;
-    ModuleHash *lastHash = NULL;
-
-    if (!m) {
-        return MOD_ERR_PARAMS;
-    }
-
-    index = CMD_HASH(m->name);
-
-    for (current = MODULE_HASH[index]; current; current = current->next) {
-        if (m->name == current->name) {
-            if (!lastHash) {
-                MODULE_HASH[index] = current->next;
-            } else {
-                lastHash->next = current->next;
-            }
-            delete current->m;
-            free(current->name);
-            free(current);
-            return MOD_ERR_OK;
-        }
-        lastHash = current;
-    }
-    return MOD_ERR_NOEXIST;
 }
 
 /**

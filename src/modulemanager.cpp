@@ -221,13 +221,15 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	if (m->type == PROTOCOL && protocolModuleLoaded())
 	{
+		delete m;
 		alog("You cannot load two protocol modules");
-		ret = MOD_STOP;
+		return MOD_STOP;
 	}
 	else if (m->type == ENCRYPTION && encryptionModuleLoaded())
 	{
+		delete m;
 		alog("You cannot load two encryption modules");
-		ret = MOD_STOP;
+		return MOD_STOP;
 	}
 
 	mod_current_module_name = NULL;
@@ -237,7 +239,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
 		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
 	}
-	addModule(m);
+
 	return MOD_ERR_OK;
 }
 
@@ -263,7 +265,7 @@ int ModuleManager::UnloadModule(Module * m, User * u)
 		notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 
-	delModule(m);
+	delete m;
 	return MOD_ERR_OK;
 }
 

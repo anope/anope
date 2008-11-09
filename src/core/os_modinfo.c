@@ -67,7 +67,7 @@ int do_modinfo(User * u)
     }
     m = findModule(file);
     if (m) {
-        tm = *localtime(&m->time);
+        tm = *localtime(&m->created);
         strftime_lang(timebuf, sizeof(timebuf), u,
                       STRFTIME_DATE_TIME_FORMAT, &tm);
         notice_lang(s_OperServ, u, OPER_MODULE_INFO_LIST, m->name.c_str(),

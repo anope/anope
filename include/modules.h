@@ -146,7 +146,7 @@ CoreExport class Module
 	std::string filename;
 
 	void *handle;
-	time_t time;
+	time_t created;
 	std::string version;
 	std::string author;
 
@@ -376,8 +376,6 @@ struct EvtHookHash_ {
 
 /*************************************************************************/
 /* Module Managment Functions */
-int addModule(Module *m);		/* Add a module to the module hash */
-int delModule(Module *m);		/* Remove a module from the module hash */
 MDE Module *findModule(const char *name);                /* Find a module */
 
 int encryption_module_init(void); /* Load the encryption module */

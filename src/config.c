@@ -110,7 +110,7 @@ char *SendMailPath;
 char *SendFrom;
 bool RestrictMail;
 time_t MailDelay;
-int DontQuoteAddresses;
+bool DontQuoteAddresses;
 
 static std::string NSDefaults;
 char *NSGuestNickPrefix;
@@ -667,6 +667,7 @@ int ServerConfig::Read(bool bail)
 		{"mail", "sendfrom", "", new ValueContainerChar(&SendFrom), DT_CHARPTR, ValidateMail},
 		{"mail", "restrict", "no", new ValueContainerBool(&RestrictMail), DT_BOOLEAN, NoValidation},
 		{"mail", "delay", "0", new ValueContainerTime(&MailDelay), DT_TIME, NoValidation},
+		{"mail", "dontquoteaddresses", "no", new ValueContainerBool(&DontQuoteAddresses), DT_BOOLEAN, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1331,8 +1332,6 @@ bool ValueItem::GetBool()
 Directive directives[] = {
     {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
     {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
-    {"DontQuoteAddresses",
-     {{PARAM_SET, PARAM_RELOAD, &DontQuoteAddresses}}},
     {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
     {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
     {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},

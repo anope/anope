@@ -132,6 +132,15 @@ struct ModuleLang_ {
     char **argv;
 };
 
+/** Used to manage modules.
+ */
+CoreExport class ModuleManager
+{
+
+};
+
+/** Every module in Anope is actually a class.
+ */
 CoreExport class Module
 {
  public:

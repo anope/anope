@@ -105,7 +105,7 @@ int NickRegDelay;
 int UseSVSHOLD;
 int NewsCount;
 
-int UseMail;
+bool UseMail;
 char *SendMailPath;
 char *SendFrom;
 int RestrictMail;
@@ -636,6 +636,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "restrictgetpass", "no", new ValueContainerBool(&NSRestrictGetPass), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nicktracking", "no", new ValueContainerBool(&NSNickTracking), DT_BOOLEAN, NoValidation},
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
+		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1346,7 +1347,6 @@ Directive directives[] = {
     {"StrictPasswords", {{PARAM_SET, PARAM_RELOAD, &StrictPasswords}}},
     {"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
     {"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
-    {"UseMail", {{PARAM_SET, PARAM_RELOAD, &UseMail}}},
     {"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
     {"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
     {"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
@@ -1959,9 +1959,7 @@ int read_config(int reload)
      *
      * rob
      **/
-    if (NSEmailReg) {
-        CHECK(UseMail);
-    } else {
+    if (!NSEmailReg) {
 		delete [] PreNickDBName;
         PreNickDBName = NULL;
         NSRExpire = 0;

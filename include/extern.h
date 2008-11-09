@@ -310,7 +310,7 @@ E int   UseTS6;
 E char **HostSetters;
 E int HostNumber;
 
-E int   UseMail;
+E bool  UseMail;
 E char *SendMailPath;
 E char *SendFrom;
 E int   RestrictMail;

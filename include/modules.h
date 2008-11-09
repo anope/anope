@@ -422,7 +422,6 @@ MDE int moduleAddData(ModuleData **md, const char *key, char *value);		/* Set th
 MDE void moduleDelData(ModuleData **md, const char *key);				/* Delete this key/value pair */
 MDE void moduleDelAllData(ModuleData **md);					/* Delete all key/value pairs for this module for this struct */
 void moduleDelAllDataMod(Module *m);					/* remove all module data from all structs for this module */
-int moduleDataDebug(ModuleData **md);					/* Allow for debug output of a moduleData struct */
 MDE bool moduleMinVersion(int major,int minor,int patch,int build);	/* Checks if the current version of anope is before or after a given verison */
 
 /*************************************************************************/

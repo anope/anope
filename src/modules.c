@@ -1880,25 +1880,6 @@ void moduleDisplayHelp(int service, User * u)
 }
 
 /**
- * Output module data information into the log file.
- * This is a vwey "debug only" function to dump the whole contents
- * of a moduleData struct into the log files.
- * @param md The module data for the struct to be used
- * @return 0 is always returned;
- **/
-int moduleDataDebug(ModuleData ** md)
-{
-    ModuleData *current = NULL;
-    alog("Dumping module data....");
-    for (current = *md; current; current = current->next) {
-        alog("Module: [%s]", current->moduleName);
-        alog(" Key [%s]\tValue [%s]", current->key, current->value);
-    }
-    alog("End of module data dump");
-    return 0;
-}
-
-/**
  * Add module data to a struct.
  * This allows module coders to add data to an existing struct
  * @param md The module data for the struct to be used
@@ -1934,9 +1915,6 @@ int moduleAddData(ModuleData ** md, const char *key, char *value)
     newData->next = *md;
     *md = newData;
 
-    if (debug) {
-        moduleDataDebug(md);
-    }
     return MOD_ERR_OK;
 }
 

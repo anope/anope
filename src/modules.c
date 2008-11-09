@@ -712,32 +712,17 @@ int unloadModule(Module * m, User * u)
         return MOD_ERR_NOUNLOAD;
     }
 
-    func = (void (*)(void))ano_modsym(m->handle, "AnopeFini");
-    if (func) {
-        mod_current_module_name = m->name.c_str();
-        func();                 /* exec AnopeFini */
-        mod_current_module_name = NULL;
-    }
-
     if (prepForUnload(m) != MOD_ERR_OK) {
         return MOD_ERR_UNKNOWN;
     }
 
-    if ((ano_modclose(m->handle)) != 0) {
-        alog("%s", ano_moderr());
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
-        }
-        return MOD_ERR_NOUNLOAD;
-    } else {
-        if (u) {
-            ircdproto->SendGlobops(s_OperServ, "%s unloaded module %s", u->nick,
-                             m->name.c_str());
-            notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
-        }
-        delModule(m);
-        return MOD_ERR_OK;
+    if (u) {
+        ircdproto->SendGlobops(s_OperServ, "%s unloaded module %s", u->nick,
+                         m->name.c_str());
+        notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
     }
+    delModule(m);
+    return MOD_ERR_OK;
 }
 
 /**

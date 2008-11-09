@@ -21,7 +21,6 @@
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */
-	this->filename = NULL;
 	this->nickHelp = NULL;
 	this->chanHelp = NULL;
 	this->memoHelp = NULL;
@@ -46,11 +45,7 @@ Module::~Module()
 	for (i = 0; i < NUM_LANGS; i++)
 		moduleDeleteLanguage(i);
 
-	if (this->filename)
-	{
-		remove(this->filename);
-		free(this->filename);
-	}
+	remove(this->filename.c_str());
 
 	if (this->handle)
 	{

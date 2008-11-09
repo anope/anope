@@ -132,27 +132,19 @@ struct ModuleLang_ {
     char **argv;
 };
 
-/** Used to manage modules.
- */
-CoreExport class ModuleManager
-{
- public:
-	/**
-	 * Load up a list of modules.
-	 * @param total_modules The number of modules to load
-	 * @param module_list The list of modules to load
-	 **/
-	static void LoadModuleList(int total_modules, char **module_list);
-};
-
 /** Every module in Anope is actually a class.
  */
 CoreExport class Module
 {
  public:
-	// XXX :(
+	/** The module name (e.g. os_modload)
+	 */
 	std::string name;
-	char *filename;
+
+	/** The temporary path/filename
+	 */
+	std::string filename;
+
 	void *handle;
 	time_t time;
 	std::string version;
@@ -249,6 +241,40 @@ CoreExport class Module
 	 */
 	int DelCommand(CommandHash * cmdTable[], const char *name);
 };
+
+
+
+
+/** Used to manage modules.
+ */
+CoreExport class ModuleManager
+{
+ public:
+	/**
+	 * Load up a list of modules.
+	 * @param total_modules The number of modules to load
+	 * @param module_list The list of modules to load
+	 **/
+	static void LoadModuleList(int total_modules, char **module_list);
+
+	/**
+	 * Loads a given module.
+	 * @param m the module to load
+	 * @param u the user who loaded it, NULL for auto-load
+	 * @return MOD_ERR_OK on success, anything else on fail
+	 */
+	static int LoadModule(const std::string &modname, User * u);
+
+	/**
+	 * Unload the given module.
+	 * @param m the module to unload
+	 * @param u the user who unloaded it
+	 * @return MOD_ERR_OK on success, anything else on fail
+	 */
+	static int UnloadModule(Module *m, User * u);
+};
+
+
 
 struct ModuleHash_ {
         char *name;
@@ -354,17 +380,8 @@ int addModule(Module *m);		/* Add a module to the module hash */
 int delModule(Module *m);		/* Remove a module from the module hash */
 MDE Module *findModule(const char *name);                /* Find a module */
 
-/** Loads a given Anope module into the core, initialising relevant structures,
- * and calls the module's constructor.
- * @param modname The name of the module to load (e.g. os_modload)
- * @param u The user loading the module, or NULL for no user.
- * @return XXX, document me.
- */
-int loadModule(const std::string &modname, User *u);
-
 int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
-int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
 MDE char *moduleGetLastBuffer(void);
@@ -424,7 +441,7 @@ int destroyEventHook(EvtHook * evh);
 
 MDE void moduleInsertLanguage(int langNumber, int ac, const char **av);
 MDE void moduleNoticeLang(char *source, User *u, int number, ...);
-MDE char *moduleGetLangString(User * u, int number);
+MDE const char *moduleGetLangString(User * u, int number);
 MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/

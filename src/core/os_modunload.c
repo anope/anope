@@ -75,7 +75,7 @@ int do_modunload(User *u)
 
 	alog("Trying to unload module [%s]", name);
 
-	status = unloadModule(m, u);
+	status = ModuleManager::UnloadModule(m, u);
 
 	if (!status)
 	{

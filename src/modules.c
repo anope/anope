@@ -177,7 +177,7 @@ int encryption_module_init(void) {
     int ret = 0;
 
     alog("Loading Encryption Module: [%s]", EncModule);
-    ret = loadModule(EncModule, NULL);
+    ret = ModuleManager::LoadModule(EncModule, NULL);
 	if (ret == MOD_ERR_OK)
 		findModule(EncModule)->SetType(ENCRYPTION);
     mod_current_module = NULL;
@@ -192,7 +192,7 @@ int protocol_module_init(void)
     int ret = 0;
 
     alog("Loading IRCD Protocol Module: [%s]", IRCDModule);
-    ret = loadModule(IRCDModule, NULL);
+    ret = ModuleManager::LoadModule(IRCDModule, NULL);
 
 	if (ret == MOD_ERR_OK)
 	{
@@ -366,272 +366,6 @@ Module *findModule(const char *name)
     }
     return NULL;
 
-}
-
-/**
- * Search all loaded modules looking for a protocol module.
- * @return 1 if one is found.
- **/
-int protocolModuleLoaded()
-{
-    int idx = 0;
-    ModuleHash *current = NULL;
-
-    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-        for (current = MODULE_HASH[idx]; current; current = current->next) {
-            if (current->m->type == PROTOCOL) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-/**
- * Search all loaded modules looking for an encryption module.
- * @ return 1 if one is loaded
- **/
-int encryptionModuleLoaded()
-{
-    int idx = 0;
-    ModuleHash *current = NULL;
-
-    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-        for (current = MODULE_HASH[idx]; current; current = current->next) {
-            if (current->m->type == ENCRYPTION) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
-
-/**
- * Copy the module from the modules folder to the runtime folder.
- * This will prevent module updates while the modules is loaded from
- * triggering a segfault, as the actaul file in use will be in the
- * runtime folder.
- * @param name the name of the module to copy
- * @param output the destination to copy the module to
- * @return MOD_ERR_OK on success
- */
-static int moduleCopyFile(const char *name, char *output)
-{
-    int ch;
-    FILE *source, *target;
-	int srcfp;
-    char input[4096];
-    int len;
-
-    strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
-    len = strlen(input);
-    strncat(input, name, 4095 - len);
-    len = strlen(output);
-    strncat(input, MODULE_EXT, 4095 - len);
-
-#ifndef _WIN32
-	if ((srcfp = mkstemp(output)) == -1)
-		return MOD_ERR_FILE_IO;
-#else
-	if (!mktemp(output))
-		return MOD_ERR_FILE_IO;
-#endif
-
-	if (debug)
-		alog("Runtime module location: %s", output);
-
-	/* Linux/UNIX should ignore the b param, why do we still have seperate
-	 * calls for it here? -GD
-	 */
-#ifndef _WIN32
-    if ((source = fopen(input, "r")) == NULL) {
-#else
-    if ((source = fopen(input, "rb")) == NULL) {
-#endif
-        return MOD_ERR_NOEXIST;
-    }
-#ifndef _WIN32
-    if ((target = fdopen(srcfp, "w")) == NULL) {
-#else
-    if ((target = fopen(output, "wb")) == NULL) {
-#endif
-        return MOD_ERR_FILE_IO;
-    }
-    while ((ch = fgetc(source)) != EOF) {
-        fputc(ch, target);
-    }
-    fclose(source);
-    if (fclose(target) != 0) {
-        return MOD_ERR_FILE_IO;
-    }
-    return MOD_ERR_OK;
-}
-
-/**
- * Loads a given module.
- * @param m the module to load
- * @param u the user who loaded it, NULL for auto-load
- * @return MOD_ERR_OK on success, anything else on fail
- */
-int loadModule(const std::string &modname, User * u)
-{
-	char buf[4096];
-	int len;
-	const char *err;
-	Module * (*func) (const std::string &);
-	int ret = 0;
-
-	if (modname.empty())
-		return MOD_ERR_PARAMS;
-
-	if (findModule(modname.c_str()) != NULL)
-		return MOD_ERR_EXISTS;
-
-	if (debug)
-		alog("trying to load [%s]", modname.c_str());
-
-	/* Generate the filename for the temporary copy of the module */
-	strncpy(buf, MODULE_PATH, 4095);    /* Get full path with module extension */
-	len = strlen(buf);
-#ifndef _WIN32
-	strncat(buf, "runtime/", 4095 - len);
-#else
-	strncat(buf, "runtime\\", 4095 - len);
-#endif
-	len = strlen(buf);
-	strncat(buf, modname.c_str(), 4095 - len);
-	len = strlen(buf);
-	strncat(buf, MODULE_EXT, 4095 - len);
-	len = strlen(buf);
-	strncat(buf, ".", 4095 - len);
-	len = strlen(buf);
-	strncat(buf, "XXXXXX", 4095 - len);
-	buf[4095] = '\0';
-	/* Don't skip return value checking! -GD */
-    if ((ret = moduleCopyFile(modname.c_str(), buf)) != MOD_ERR_OK)
-	{
-		/* XXX: This used to assign filename here, but I don't think that was correct..
-		 * even if it was, it makes life very fucking difficult, so.
-		 */
-//		m->filename = sstrdup(buf);
-		return ret;
-	}
-
-	ano_modclearerr();
-
-	void *handle = ano_modopen(buf);
-	if (handle == NULL && (err = ano_moderr()) != NULL)
-	{
-		alog("%s", err);
-		return MOD_ERR_NOLOAD;
-	}
-
-	ano_modclearerr();
-	func = (Module *(*)(const std::string &))ano_modsym(handle, "init_module");
-	if (func == NULL && (err = ano_moderr()) != NULL)
-	{
-		alog("No magical init function found, not an Anope module, or a very old module(?)");
-		ano_modclose(handle);        /* If no AnopeInit - it isnt an Anope Module, close it */
-		return MOD_ERR_NOLOAD;
-	}
-
-    if (!func)
-	{
-		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
-	}
-
-	mod_current_module_name = modname.c_str();
-
-	/* Create module. */
-	std::string nick;
-	if (u)
-		nick = u->nick;
-	else
-		nick = "";
-
-	Module *m;
-
-	try
-	{
-		m = func(nick);
-	}
-	catch (ModuleException &ex)
-	{
-		alog("Error while loading %s: %s", modname.c_str(), ex.GetReason());
-		return MOD_STOP;
-	}
-
-	mod_current_module = m;
-	mod_current_user = u;
-	m->filename = sstrdup(buf);
-	m->handle = handle;
-
-/*
-    if (ret == MOD_STOP) {
-        alog("%s requested unload...", m->name);
-        unloadModule(m, NULL);
-        mod_current_module_name = NULL;
-        return MOD_ERR_NOLOAD;
-    }
-*/
-	if (m->type == PROTOCOL && protocolModuleLoaded())
-	{
-		alog("You cannot load two protocol modules");
-		ret = MOD_STOP;
-	}
-	else if (m->type == ENCRYPTION && encryptionModuleLoaded())
-	{
-		alog("You cannot load two encryption modules");
-		ret = MOD_STOP;
-	}
-
-	mod_current_module_name = NULL;
-
-	if (u)
-	{
-		ircdproto->SendGlobops(s_OperServ, "%s loaded module %s", u->nick, modname.c_str());
-		notice_lang(s_OperServ, u, OPER_MODULE_LOADED, modname.c_str());
-	}
-	addModule(m);
-	return MOD_ERR_OK;
-}
-
-/**
- * Unload the given module.
- * @param m the module to unload
- * @param u the user who unloaded it
- * @return MOD_ERR_OK on success, anything else on fail
- */
-int unloadModule(Module * m, User * u)
-{
-    void (*func) (void);
-
-    if (!m || !m->handle) {
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_REMOVE_FAIL, m->name.c_str());
-        }
-        return MOD_ERR_PARAMS;
-    }
-
-    if (m->type == PROTOCOL) {
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
-        }
-        return MOD_ERR_NOUNLOAD;
-    } else if(m->type == ENCRYPTION) {
-        if (u) {
-            notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);
-        }
-        return MOD_ERR_NOUNLOAD;
-    }
-
-    if (u) {
-        ircdproto->SendGlobops(s_OperServ, "%s unloaded module %s", u->nick,
-                         m->name.c_str());
-        notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
-    }
-    delModule(m);
-    return MOD_ERR_OK;
 }
 
 /*******************************************************************************
@@ -949,13 +683,13 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
  * @param name the name of the command to delete from the service
  * @return returns MOD_ERR_OK on success
  */
-int Module::DelCommand(CommandHash * cmdTable[], const char *name)
+int Module::DelCommand(CommandHash * cmdTable[], const char *dname)
 {
     Command *c = NULL;
     Command *cmd = NULL;
     int status = 0;
 
-    c = findCommand(cmdTable, name);
+    c = findCommand(cmdTable, dname);
     if (!c) {
         return MOD_ERR_NOEXIST;
     }
@@ -965,11 +699,11 @@ int Module::DelCommand(CommandHash * cmdTable[], const char *name)
         if (cmd->mod_name
             && cmd->mod_name == this->name) {
             if (debug >= 2) {
-                displayCommandFromHash(cmdTable, name);
+                displayCommandFromHash(cmdTable, dname);
             }
             status = internal_delCommand(cmdTable, cmd, this->name.c_str());
             if (debug >= 2) {
-                displayCommandFromHash(cmdTable, name);
+                displayCommandFromHash(cmdTable, dname);
             }
         }
     }
@@ -2176,7 +1910,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
  * @param u The user to send the message to
  * @param number The message number
  **/
-char *moduleGetLangString(User * u, int number)
+const char *moduleGetLangString(User * u, int number)
 {
     int lang = NSDefLanguage;
 

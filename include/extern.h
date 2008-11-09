@@ -314,7 +314,7 @@ E bool  UseMail;
 E char *SendMailPath;
 E char *SendFrom;
 E bool  RestrictMail;
-E int   MailDelay;
+E time_t MailDelay;
 E int  DontQuoteAddresses;
 
 E int   NSDefFlags;

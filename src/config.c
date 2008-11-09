@@ -109,7 +109,7 @@ bool UseMail;
 char *SendMailPath;
 char *SendFrom;
 bool RestrictMail;
-int MailDelay;
+time_t MailDelay;
 int DontQuoteAddresses;
 
 static std::string NSDefaults;
@@ -665,7 +665,8 @@ int ServerConfig::Read(bool bail)
 		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},
 		{"mail", "sendfrom", "", new ValueContainerChar(&SendFrom), DT_CHARPTR, ValidateMail},
-		{"mail", "restrictmail", "no", new ValueContainerBool(&RestrictMail), DT_BOOLEAN, NoValidation},
+		{"mail", "restrict", "no", new ValueContainerBool(&RestrictMail), DT_BOOLEAN, NoValidation},
+		{"mail", "delay", "0", new ValueContainerTime(&MailDelay), DT_TIME, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1341,7 +1342,6 @@ Directive directives[] = {
     {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
                       {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
     {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
-    {"MailDelay", {{PARAM_TIME, PARAM_RELOAD, &MailDelay}}},
     {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
     {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
     {"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},

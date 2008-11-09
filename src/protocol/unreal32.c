@@ -603,8 +603,7 @@ class UnrealIRCdProto : public IRCDProto
 
 	void SendVhostDel(User *u)
 	{
-		if (UseSVS2MODE) send_cmd(s_HostServ, "v %s -xt", u->nick);
-		else send_cmd(s_HostServ, "n %s -xt", u->nick);
+		send_cmd(s_HostServ, "v %s -xt", u->nick);
 		notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, myIrcd->vhostchar);
 	}
 
@@ -639,8 +638,7 @@ class UnrealIRCdProto : public IRCDProto
 	{
 		if (ac >= 1) {
 			if (!u || !av[0]) return;
-			if (UseSVS2MODE) send_cmd(ServerName, "v %s %s", u->nick, merge_args(ac, av));
-			else send_cmd(ServerName, "n %s %s", u->nick, merge_args(ac, av));
+			send_cmd(ServerName, "v %s %s", u->nick, merge_args(ac, av));
 		}
 	}
 
@@ -820,8 +818,7 @@ class UnrealIRCdProto : public IRCDProto
 	/* sent if svid is something weird */
 	void SendSVID(const char *nick, time_t ts)
 	{
-		if (UseSVS2MODE) send_cmd(ServerName, "v %s +d 1", nick);
-		else send_cmd(ServerName, "n %s +d 1", nick);
+		send_cmd(ServerName, "v %s +d 1", nick);
 	}
 
 	/* SVSMODE +d */

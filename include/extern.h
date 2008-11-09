@@ -301,7 +301,6 @@ E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;
 E int   UseSVSHOLD;
-E int   UseSVS2MODE;
 E int   RestrictOperNicks;
 E int   NewsCount;
 E char *Numeric;

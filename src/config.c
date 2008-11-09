@@ -103,7 +103,6 @@ int DumpCore;
 int LogUsers;
 int NickRegDelay;
 int UseSVSHOLD;
-int UseSVS2MODE;
 int NewsCount;
 
 int UseMail;
@@ -1354,7 +1353,6 @@ Directive directives[] = {
     {"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
     {"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
     {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
-    {"UseSVS2MODE", {{PARAM_SET, PARAM_RELOAD, &UseSVS2MODE}}},
     {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
     {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
     {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},

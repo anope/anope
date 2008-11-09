@@ -667,12 +667,6 @@ int init_secondary(int ac, char **av)
 
     ircdproto->SendEOB();
 
-    /**
-      * Load our delayed modeles - modules that are planing on making clients need to wait till now
-      * where as modules wanting to modify our ircd connection messages need to load eariler :|
-      **/
-    modules_delayed_init();
-
     /* Success! */
     return 0;
 }

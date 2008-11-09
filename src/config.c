@@ -229,11 +229,8 @@ char *SessionLimitDetailsLoc;
 bool OSOpersOnly;
 
 char *Modules;
-char *ModulesDelayed;
 char **ModulesAutoload;
 int ModulesNumber;
-int ModulesDelayedNumber;
-char **ModulesDelayedAutoload;
 
 /**
  * Core Module Stuff
@@ -1326,8 +1323,6 @@ Directive directives[] = {
     {"MysqlRetries", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetries}}},
     {"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
     {"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
-    {"ModuleDelayedAutoload",
-     {{PARAM_STRING, PARAM_RELOAD, &ModulesDelayed}}},
     {"NetworkName", {{PARAM_STRING, PARAM_RELOAD, &NetworkName}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
     {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
@@ -1859,8 +1854,6 @@ int read_config(int reload)
 
     /* Modules Autoload building... :P */
     ModulesAutoload = buildStringList(Modules, &ModulesNumber);
-    ModulesDelayedAutoload =
-        buildStringList(ModulesDelayed, &ModulesDelayedNumber);
     HostServCoreModules =
         buildStringList(HostCoreModules, &HostServCoreNumber);
     MemoServCoreModules =

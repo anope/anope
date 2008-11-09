@@ -273,31 +273,6 @@ int protocol_module_init(void)
 }
 
 /**
- * Automaticaly load modules at startup, delayed.
- * This function waits until the IRCD link has been made, and then attempts
- * to load the specified modules.
- */
-void modules_delayed_init(void)
-{
-    int idx;
-	int ret;
-    Module *m;
-
-    if(nothird) {
-        return;
-    }
-
-    for (idx = 0; idx < ModulesDelayedNumber; idx++) {
-        m = findModule(ModulesDelayedAutoload[idx]);
-        if (!m) {
-			ret = loadModule(ModulesDelayedAutoload[idx], NULL);
-            mod_current_module = NULL;
-            mod_current_user = NULL;
-        }
-    }
-}
-
-/**
  * Unload ALL loaded modules, no matter what kind of module it is.
  * Do NEVER EVER, and i mean NEVER (and if that isn't clear enough
  * yet, i mean: NEVER AT ALL) call this unless we're shutting down,

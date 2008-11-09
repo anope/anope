@@ -528,6 +528,21 @@ bool ValidateDefCon(ServerConfig *, const char *tag, const char *value, ValueIte
 	return true;
 }
 
+bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data)
+{
+	int nicklen = data.GetInteger();
+	if (!nicklen) {
+		alog("You have not defined the <networkinfo:nicklen> directive. It is strongly");
+		alog("adviced that you do configure this correctly in your services.conf");
+		data.Set(NICKMAX - 1);
+	}
+	else if (nicklen < 1 || nicklen >= NICKMAX) {
+		alog("<networkinfo:nicklen> has an invalid value; setting to %d", NICKMAX - 1);
+		data.Set(NICKMAX - 1);
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -608,6 +623,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logchannel", "", new ValueContainerChar(&LogChannel), DT_CHARPTR, NoValidation},
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
+		{"networkinfo", "nicklen", "0", new ValueContainerInt(&NickLen), DT_INTEGER | DT_NORELOAD, ValidateNickLen},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1324,7 +1340,6 @@ Directive directives[] = {
     {"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
     {"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
     {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
-    {"NickLen", {{PARAM_POSINT, 0, &NickLen}}},
     {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
     {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
     {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
@@ -1659,16 +1674,6 @@ int read_config(int reload)
                      RemoteServer, LocalPort);
                 retval = 0;
             }
-        }
-
-        if (NickLen == 0) {
-            alog("You have not defined the NickLen configuration directive. It is strongly");
-            alog("advised that you do configure this correctly in your services.conf");
-            NickLen = NICKMAX - 1;
-        } else if ((NickLen < 1) || (NickLen >= NICKMAX)) {
-            alog("NickLen has an invalid value; setting to %d",
-                 (NICKMAX - 1));
-            NickLen = NICKMAX - 1;
         }
     }
 

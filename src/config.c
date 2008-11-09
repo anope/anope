@@ -543,6 +543,16 @@ bool ValidateNickLen(ServerConfig *, const char *, const char *, ValueItem &data
 	return true;
 }
 
+bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (UseMail) {
+		if (static_cast<std::string>(value) == "sendmailpath") {
+			if (!*data.GetString()) throw ConfigException(static_cast<std::string>("The value for <") + tag + ":" + value + "> cannot be empty when e-mail is enabled!");
+		}
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -653,6 +663,7 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "nicktracking", "no", new ValueContainerBool(&NSNickTracking), DT_BOOLEAN, NoValidation},
 		{"nickserv", "addaccessonreg", "no", new ValueContainerBool(&NSAddAccessOnReg), DT_BOOLEAN, NoValidation},
 		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
+		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1351,7 +1362,6 @@ Directive directives[] = {
                        {PARAM_STRING, 0, &RemotePassword3}}},
     {"RestrictMail", {{PARAM_SET, PARAM_RELOAD, &RestrictMail}}},
     {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-    {"SendMailPath", {{PARAM_STRING, PARAM_RELOAD, &SendMailPath}}},
     {"SendFrom", {{PARAM_STRING, PARAM_RELOAD, &SendFrom}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
@@ -1890,7 +1900,6 @@ int read_config(int reload)
     }
 
     if (UseMail) {
-        CHECK(SendMailPath);
         CHECK(SendFrom);
     }
 

@@ -108,7 +108,7 @@ int NewsCount;
 bool UseMail;
 char *SendMailPath;
 char *SendFrom;
-int RestrictMail;
+bool RestrictMail;
 int MailDelay;
 int DontQuoteAddresses;
 
@@ -665,6 +665,7 @@ int ServerConfig::Read(bool bail)
 		{"mail", "usemail", "no", new ValueContainerBool(&UseMail), DT_BOOLEAN, ValidateEmailReg},
 		{"mail", "sendmailpath", "", new ValueContainerChar(&SendMailPath), DT_CHARPTR, ValidateMail},
 		{"mail", "sendfrom", "", new ValueContainerChar(&SendFrom), DT_CHARPTR, ValidateMail},
+		{"mail", "restrictmail", "no", new ValueContainerBool(&RestrictMail), DT_BOOLEAN, NoValidation},
 		{"chanserv", "nick", "ChanServ", new ValueContainerChar(&s_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "description", "Channel Registration Service", new ValueContainerChar(&desc_ChanServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1361,7 +1362,6 @@ Directive directives[] = {
     {"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
                        {PARAM_PORT, 0, &RemotePort3},
                        {PARAM_STRING, 0, &RemotePassword3}}},
-    {"RestrictMail", {{PARAM_SET, PARAM_RELOAD, &RestrictMail}}},
     {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
     {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
     {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},

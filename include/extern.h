@@ -313,7 +313,7 @@ E int HostNumber;
 E bool  UseMail;
 E char *SendMailPath;
 E char *SendFrom;
-E int   RestrictMail;
+E bool  RestrictMail;
 E int   MailDelay;
 E int  DontQuoteAddresses;
 

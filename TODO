@@ -44,6 +44,7 @@ Legend:
   [ ] New database format (text, not binary - works very well for merging and so on)
 [ ] burn do_sjoin with fire
 [ ] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
+[ ] HelpServ must die (1.9.1?)
 
 1.9.2
 -----

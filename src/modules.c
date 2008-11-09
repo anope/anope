@@ -171,38 +171,8 @@ static int displayMessageFromHash(const char *name)
 
 /************************************************/
 
-
-
-
-
-
 /**
- * Automaticaly load modules at startup.
- * This will load modules at startup before the IRCD link is attempted, this
- * allows admins to have a module relating to ircd support load
- */
-void modules_init(void)
-{
-    int idx;
-	int ret;
-    Module *m;
-
-    if(nothird) {
-        return;
-    }
-
-    for (idx = 0; idx < ModulesNumber; idx++) {
-        m = findModule(ModulesAutoload[idx]);
-        if (!m) {
-			ret = loadModule(ModulesAutoload[idx], NULL);
-            mod_current_module = NULL;
-            mod_current_user = NULL;
-        }
-    }
-}
-
-/**
- * Load up a list of core modules from the conf.
+ * Load up a list of modules.
  * @param number The number of modules to load
  * @param list The list of modules to load
  **/

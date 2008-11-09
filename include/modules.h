@@ -351,7 +351,6 @@ int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/
 int unloadModule(Module *m, User *u);	/* Unload the given module from the pro */
 int prepForUnload(Module *m);		/* Prepare the module for unload */
-void modules_init(void);
 void moduleCallBackPrepForUnload(const char *mod_name);
 MDE void moduleCallBackDeleteEntry(ModuleCallBack * prev);
 MDE char *moduleGetLastBuffer(void);

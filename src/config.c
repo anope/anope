@@ -1532,7 +1532,7 @@ int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
 int parse(char *buf, int linenum, int reload)
 {
     char *s, *t, *dir;
-    int n;
+    unsigned int n;
     int retval = 1;
     int ac = 0;
     char *av[MAXPARAMS];
@@ -1621,7 +1621,7 @@ int read_config(int reload)
     int defconCount = 0;
 
     if (reload) {
-        int i, n;
+        unsigned int i, n;
 
         /* Reset all the reloadable settings */
 
@@ -1918,7 +1918,7 @@ int read_config(int reload)
         DefCon[0] = 0;
 		for (int level = 1; level < 5; ++level) {
 			DefCon[level] = 0;
-			std::string *levelDefinition;
+			std::string *levelDefinition = NULL;
 			switch (level) {
 				case 1:
 					levelDefinition = &DefCon1;

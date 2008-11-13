@@ -110,14 +110,14 @@ Server *next_server(int flags)
  * places in the linked list if a Server struct to it's uplink if provided.
  * It can also be NULL to indicate it's the uplink and should be first in
  * the server list.
- * @param uplink Server struct
+ * @param server_uplink Server struct
  * @param name Server Name
  * @param desc Server Description
  * @param flags Server Flags, see services.h
  * @param suid Server Universal ID
  * @return Server Struct
  */
-Server *new_server(Server * uplink, const char *name, const char *desc,
+Server *new_server(Server * server_uplink, const char *name, const char *desc,
                    uint16 flags, const char *suid)
 {
     Server *serv;
@@ -128,7 +128,7 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     serv->name = sstrdup(name);
     serv->desc = sstrdup(desc);
     serv->flags = flags;
-    serv->uplink = uplink;
+    serv->uplink = server_uplink;
     if (suid) {
         serv->suid = sstrdup(suid);
     } else {
@@ -141,21 +141,21 @@ Server *new_server(Server * uplink, const char *name, const char *desc,
     serv->links = NULL;
     serv->prev = NULL;
 
-    if (!uplink) {
+    if (!server_uplink) {
         serv->hops = 0;
         serv->next = servlist;
         if (servlist)
             servlist->prev = serv;
         servlist = serv;
     } else {
-        serv->hops = uplink->hops + 1;
-        serv->next = uplink->links;
-        if (uplink->links)
-            uplink->links->prev = serv;
-        uplink->links = serv;
+        serv->hops = server_uplink->hops + 1;
+        serv->next = server_uplink->links;
+        if (server_uplink->links)
+            server_uplink->links->prev = serv;
+        server_uplink->links = serv;
     }
     /* Check if this is our uplink server */
-    if ((uplink == me_server) && !(flags & SERVER_JUPED))
+    if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
         serv_uplink = serv;
 
     /* Write the StartGlobal (to non-juped servers) */
@@ -571,9 +571,6 @@ static unsigned int ts6_uid_index = 9;  /* last slot in uid buf */
 
 void ts6_uid_init(void)
 {
-    unsigned int i;
-    char buf[BUFSIZE];
-
     /* check just in case... you can never be too safe. */
     if (TS6SID != NULL) {
         snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);

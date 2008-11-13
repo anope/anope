@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -221,7 +221,7 @@ void MailReset(User * u, NickCore * nc)
 
 /**
  * Checks whether we have a valid, common e-mail address.
- * This is NOT entirely RFC compliant, and won't be so, because I said 
+ * This is NOT entirely RFC compliant, and won't be so, because I said
  * *common* cases. ;) It is very unlikely that e-mail addresses that
  * are really being used will fail the check.
  *
@@ -231,7 +231,7 @@ void MailReset(User * u, NickCore * nc)
  */
 int MailValidate(const char *email)
 {
-    int i, j, has_period = 0, len;
+    int has_period = 0, len;
     char copy[BUFSIZE], *domain;
 
     static char specials[] =
@@ -254,20 +254,20 @@ int MailValidate(const char *email)
         return 0;
 
     /* Check for forbidden characters in the name */
-    for (i = 0; i < strlen(copy); i++) {
+    for (unsigned int i = 0; i < strlen(copy); i++) {
 
         if (copy[i] <= 31 || copy[i] >= 127)
             return 0;
-        for (j = 0; j < 13; j++)
+        for (unsigned int j = 0; j < 13; j++)
             if (copy[i] == specials[j])
                 return 0;
     }
 
     /* Check for forbidden characters in the domain, and if it seems to be valid. */
-    for (i = 0; i < (len = strlen(domain)); i++) {
+    for (int i = 0; i < (len = strlen(domain)); i++) {
         if (domain[i] <= 31 || domain[i] >= 127)
             return 0;
-        for (j = 0; j < 13; j++)
+        for (unsigned int j = 0; j < 13; j++)
             if (domain[i] == specials[j])
                 return 0;
         if (domain[i] == '.') {

@@ -1225,6 +1225,9 @@ class IRCDProto;
 #include "extern.h"
 
 class IRCDProto {
+
+private:
+
 		virtual void SendSVSKillInternal(const char *, const char *, const char *) = 0;
 		virtual void SendModeInternal(BotInfo *, const char *, const char *) = 0;
 		virtual void SendKickInternal(BotInfo *bi, const char *, const char *, const char *) = 0;
@@ -1277,6 +1280,9 @@ class IRCDProto {
 			send_cmd(source, "%03d %s %s", numeric, dest, buf);
 		}
 	public:
+
+	    virtual ~IRCDProto();
+
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;
 		virtual void SendTopic(BotInfo *, const char *, const char *, const char *, time_t) = 0;

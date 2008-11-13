@@ -6,8 +6,8 @@
  * Please read COPYING and README for furhter details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  *
  */
 
@@ -18,7 +18,9 @@
 
 /* Some Linux boxes (or maybe glibc includes) require this for the
  * prototype of strsignal(). */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <stdarg.h>
 #include <stdio.h>

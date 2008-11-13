@@ -18,13 +18,14 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
    	   'RUNGROUP=${RUNGROUP}' 'MODULE_PATH=${MODULE_PATH}' \
-	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}'
+	   'SHARED=${SHARED}' 'MODULEFLAGS=${MODULEFLAGS}' \
+	   'MAKEBIN=${MAKEBIN}'
 
 .c.o:
-	@../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
+	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
 
 .cpp.o:
-	@../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
+	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
 
 all: services
 
@@ -32,7 +33,7 @@ distclean: spotless
 distclean_modules: clean_modules spotless
 
 services:  $(OBJS) mod_version
-	@../run-cc.pl $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
+	@$(MAKEBIN) $(CC) $(CFLAGS) $(OBJS) $(ANOPELIBS) $(MLIBS) -o $@ $(LDFLAGS)
 
 $(OBJS): Makefile
 actions.o:      actions.c   $(INCLUDES)
@@ -76,7 +77,7 @@ users.o:        users.c     $(INCLUDES)
 vsnprintf.o:    vsnprintf.c $(INCLUDES)
 
 mod_version:	mod_version.c	$(INCLUDES)
-	@../run-cc.pl $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
+	@$(MAKEBIN) $(CC) $(CDEFS) $(CFLAGS) $(MODULEFLAGS) -I../include/ -c mod_version.c
 
 modules: DUMMY
 	@modules/configure modules

@@ -7,10 +7,10 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}' 
+   	   'RUNGROUP=${RUNGROUP}' 'MAKEBIN=${MAKEBIN}'
 
 .c.o:
-	@../../run-cc.pl $(CC) $(CFLAGS) -I../include/ -c $<
+	@$(MAKEBIN) $(CC) $(CFLAGS) -I../include/ -c $<
 
 all: ${OBJS}
 

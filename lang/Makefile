@@ -4,7 +4,7 @@ MAKEARGS = 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'ANOPELIBS=${ANOPELIBS}' \
 	   'LDFLAGS=${LDFLAGS}' 'BINDEST=${BINDEST}' 'INSTALL=${INSTALL}' \
            'INCLUDEDIR=${INCLUDEDIR}' 'RM=${RM}' 'CP=${CP}' \
      	   'TOUCH=${TOUCH}' 'SHELL=${SHELL}' 'DATDEST=${DATDEST}' \
-   	   'RUNGROUP=${RUNGROUP}'
+   	   'RUNGROUP=${RUNGROUP}' 'MAKEBIN=${MAKEBIN}'
 
 LANGOBJS = cat de en_us es fr gr hun it nl pl pt ru tr
 LANGSRCS = cat.l de.l en_us.l es.l fr.l gr.l hun.l it.l nl.l pl.l pt.l ru.l tr.l
@@ -71,7 +71,7 @@ tr:       tr.l       langcomp index
 	@./langcomp $@.l
 
 langcomp: langcomp.c
-	@../run-cc.pl $(CC) $(CFLAGS) langcomp.c -o $@
+	@$(MAKEBIN) $(CC) $(CFLAGS) langcomp.c -o $@
 
 
 language.h: index Makefile

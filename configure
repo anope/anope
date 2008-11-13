@@ -670,6 +670,7 @@ SHARED
 MODULEFLAGS
 RUNGROUP
 BINDEST
+MAKEBIN
 DATDEST
 MODULE_PATH
 LIBOBJS
@@ -1257,6 +1258,7 @@ Optional Packages:
  --with-rungroup=group     Specify the rungroup for anope
  --with-permissions=permissions     Specify the default permissions for anope
  --with-bindir=bindir     Specify the default binary dir for anope
+--with-makebin=run-cc.pl     Specify the default make binary to use
  --with-datadir=datadir   Specify the location of the services data folder
 
 Some influential environment variables:
@@ -7764,6 +7766,16 @@ _ACEOF
 fi
 
 
+MAKEBIN=`pwd`/run-cc.pl
+
+
+# Check whether --with-makebin was given.
+if test "${with_makebin+set}" = set; then
+  withval=$with_makebin; MAKEBIN=$withval
+fi
+
+
+
 
 
 
@@ -8465,13 +8477,14 @@ SHARED!$SHARED$ac_delim
 MODULEFLAGS!$MODULEFLAGS$ac_delim
 RUNGROUP!$RUNGROUP$ac_delim
 BINDEST!$BINDEST$ac_delim
+MAKEBIN!$MAKEBIN$ac_delim
 DATDEST!$DATDEST$ac_delim
 MODULE_PATH!$MODULE_PATH$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 61; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 62; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

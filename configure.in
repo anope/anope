@@ -254,7 +254,12 @@ AC_ARG_WITH(bindir, [ --with-bindir=bindir     Specify the default binary dir fo
     MODULE_PATH=${withval}/modules/
 ])
 
+MAKEBIN=`pwd`/run-cc.pl
+
+AC_ARG_WITH(makebin, [--with-makebin=run-cc.pl     Specify the default make binary to use],[MAKEBIN=$withval]) 
+
 AC_SUBST(BINDEST)
+AC_SUBST(MAKEBIN)
 
 AC_ARG_WITH(datadir, [ --with-datadir=datadir   Specify the location of the services data folder], [
  AC_DEFINE_UNQUOTED(SERVICES_DIR,"$withval","services bin dir")

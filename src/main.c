@@ -34,19 +34,19 @@
 /******** Global variables! ********/
 
 /* Command-line options: (note that configuration variables are in config.c) */
-const char *services_dir = SERVICES_DIR;      /* -dir dirname */
-const char *log_filename = LOG_FILENAME;      /* -log filename */
-int debug = 0;                  /* -debug */
-int readonly = 0;               /* -readonly */
-int logchan = 0;                /* -logchan */
-int nofork = 0;                 /* -nofork */
-int forceload = 0;              /* -forceload */
-int nothird = 0;                /* -nothrid */
-int noexpire = 0;               /* -noexpire */
-int protocoldebug = 0;          /* -protocoldebug */
+const char *services_dir = SERVICES_DIR;	  /* -dir dirname */
+const char *log_filename = LOG_FILENAME;	  /* -log filename */
+int debug = 0;				  /* -debug */
+int readonly = 0;			   /* -readonly */
+int logchan = 0;				/* -logchan */
+int nofork = 0;				 /* -nofork */
+int forceload = 0;			  /* -forceload */
+int nothird = 0;				/* -nothrid */
+int noexpire = 0;			   /* -noexpire */
+int protocoldebug = 0;		  /* -protocoldebug */
 
 #ifdef _WIN32
-char *binary_dir;               /* Used to store base path for win32 restart */
+char *binary_dir;			   /* Used to store base path for win32 restart */
 #endif
 
 /* Set to 1 if we are to quit */
@@ -77,7 +77,7 @@ char **my_av, **my_envp;
 const char version_number[] = VERSION_STRING;
 const char version_number_dotted[] = VERSION_STRING_DOTTED;
 const char version_build[] =
-    "build #" BUILD ", compiled " __DATE__ " " __TIME__;
+	"build #" BUILD ", compiled " __DATE__ " " __TIME__;
 /* the space is needed cause if you build with nothing it will complain */
 const char version_flags[] = " " VER_OS VER_MYSQL VER_MODULE;
 
@@ -97,72 +97,72 @@ static int started = 0;
 
 extern void expire_all(void)
 {
-    waiting = -30;
-    send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
-    waiting = -3;
-    if (debug)
-        alog("debug: Running expire routines");
-    waiting = -21;
-    expire_nicks();
-    waiting = -22;
-    expire_chans();
-    waiting = -23;
-    expire_requests();
-    waiting = -25;
-    expire_akills();
-    if (ircd->sgline) {
-        waiting = -26;
-        expire_sglines();
-    }
-    if (ircd->sqline) {
-        waiting = -28;
-        expire_sqlines();
-    }
-    if (ircd->szline) {
-        waiting = -27;
-        expire_szlines();
-    }
-    waiting = -29;
-    expire_exceptions();
-    waiting = -31;
-    send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
+	waiting = -30;
+	send_event(EVENT_DB_EXPIRE, 1, EVENT_START);
+	waiting = -3;
+	if (debug)
+		alog("debug: Running expire routines");
+	waiting = -21;
+	expire_nicks();
+	waiting = -22;
+	expire_chans();
+	waiting = -23;
+	expire_requests();
+	waiting = -25;
+	expire_akills();
+	if (ircd->sgline) {
+		waiting = -26;
+		expire_sglines();
+	}
+	if (ircd->sqline) {
+		waiting = -28;
+		expire_sqlines();
+	}
+	if (ircd->szline) {
+		waiting = -27;
+		expire_szlines();
+	}
+	waiting = -29;
+	expire_exceptions();
+	waiting = -31;
+	send_event(EVENT_DB_EXPIRE, 1, EVENT_STOP);
 }
 
 /*************************************************************************/
 
 void save_databases(void)
 {
-    waiting = -19;
-    send_event(EVENT_DB_SAVING, 1, EVENT_START);
-    waiting = -2;
-    if (debug)
-        alog("debug: Saving FFF databases");
-    waiting = -10;
-    backup_databases();
-    waiting = -11;
-    save_ns_dbase();
-    waiting = -12;
-    if (PreNickDBName) {
-        save_ns_req_dbase();
-        waiting = -13;
-    }
-    save_cs_dbase();
-    if (s_BotServ) {
-        waiting = -14;
-        save_bs_dbase();
-    }
-    if (s_HostServ) {
-        waiting = -15;
-        save_hs_dbase();
-    }
-    waiting = -16;
-    save_os_dbase();
-    waiting = -17;
-    save_news();
-    waiting = -18;
-    save_exceptions();
-    waiting = -20;
-    send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
+	waiting = -19;
+	send_event(EVENT_DB_SAVING, 1, EVENT_START);
+	waiting = -2;
+	if (debug)
+		alog("debug: Saving FFF databases");
+	waiting = -10;
+	backup_databases();
+	waiting = -11;
+	save_ns_dbase();
+	waiting = -12;
+	if (PreNickDBName) {
+		save_ns_req_dbase();
+		waiting = -13;
+	}
+	save_cs_dbase();
+	if (s_BotServ) {
+		waiting = -14;
+		save_bs_dbase();
+	}
+	if (s_HostServ) {
+		waiting = -15;
+		save_hs_dbase();
+	}
+	waiting = -16;
+	save_os_dbase();
+	waiting = -17;
+	save_news();
+	waiting = -18;
+	save_exceptions();
+	waiting = -20;
+	send_event(EVENT_DB_SAVING, 1, EVENT_STOP);
 }
 
 /*************************************************************************/
@@ -171,28 +171,28 @@ void save_databases(void)
 
 static void services_restart(void)
 {
-    alog("Restarting");
-    send_event(EVENT_RESTART, 1, EVENT_START);
-    if (!quitmsg)
-        quitmsg = "Restarting";
-    ircdproto->SendSquit(ServerName, quitmsg);
-    disconn(servsock);
-    close_log();
-    /* First don't unload protocol module, then do so */
-    modules_unload_all(true, false);
-    modules_unload_all(true, true);
+	alog("Restarting");
+	send_event(EVENT_RESTART, 1, EVENT_START);
+	if (!quitmsg)
+		quitmsg = "Restarting";
+	ircdproto->SendSquit(ServerName, quitmsg);
+	disconn(servsock);
+	close_log();
+	/* First don't unload protocol module, then do so */
+	modules_unload_all(true, false);
+	modules_unload_all(true, true);
 #ifdef _WIN32
-    /* This fixes bug #589 - change to binary directory for restart */
-    /*  -- heinz */
-    if (binary_dir)
-        chdir(binary_dir);
+	/* This fixes bug #589 - change to binary directory for restart */
+	/*  -- heinz */
+	if (binary_dir)
+		chdir(binary_dir);
 #endif
-    execve(SERVICES_BIN, my_av, my_envp);
-    if (!readonly) {
-        open_log();
-        log_perror("Restart failed");
-        close_log();
-    }
+	execve(SERVICES_BIN, my_av, my_envp);
+	if (!readonly) {
+		open_log();
+		log_perror("Restart failed");
+		close_log();
+	}
 }
 
 /*************************************************************************/
@@ -202,12 +202,12 @@ static void services_restart(void)
  **/
 void do_restart_services(void)
 {
-    if (!readonly) {
-        expire_all();
-        save_databases();
-    }
-    services_restart();
-    exit(1);
+	if (!readonly) {
+		expire_all();
+		save_databases();
+	}
+	services_restart();
+	exit(1);
 }
 
 /*************************************************************************/
@@ -216,34 +216,34 @@ void do_restart_services(void)
 
 static void services_shutdown(void)
 {
-    User *u, *next;
+	User *u, *next;
 
-    send_event(EVENT_SHUTDOWN, 1, EVENT_START);
+	send_event(EVENT_SHUTDOWN, 1, EVENT_START);
 
-    if (!quitmsg)
-        quitmsg = "Terminating, reason unknown";
-    alog("%s", quitmsg);
-    if (started) {
-        ircdproto->SendSquit(ServerName, quitmsg);
-        Anope_Free(uplink);
-        Anope_Free(mod_current_buffer);
-        if (ircd->chanmodes) {
-            Anope_Free(ircd->chanmodes);
-        }
-        u = firstuser();
-        while (u) {
-            next = nextuser();
-            delete u;
-            u = next;
-        }
-    }
-    send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
-    disconn(servsock);
-    /* First don't unload protocol module, then do so */
-    modules_unload_all(true, false);
-    modules_unload_all(true, true);
-    /* just in case they weren't all removed at least run once */
-    ModuleRunTimeDirCleanUp();
+	if (!quitmsg)
+		quitmsg = "Terminating, reason unknown";
+	alog("%s", quitmsg);
+	if (started) {
+		ircdproto->SendSquit(ServerName, quitmsg);
+		Anope_Free(uplink);
+		Anope_Free(mod_current_buffer);
+		if (ircd->chanmodes) {
+			Anope_Free(ircd->chanmodes);
+		}
+		u = firstuser();
+		while (u) {
+			next = nextuser();
+			delete u;
+			u = next;
+		}
+	}
+	send_event(EVENT_SHUTDOWN, 1, EVENT_STOP);
+	disconn(servsock);
+	/* First don't unload protocol module, then do so */
+	modules_unload_all(true, false);
+	modules_unload_all(true, true);
+	/* just in case they weren't all removed at least run once */
+	ModuleRunTimeDirCleanUp();
 }
 
 /*************************************************************************/
@@ -252,190 +252,190 @@ static void services_shutdown(void)
 
 void sighandler(int signum)
 {
-    /* We set the quit message to something default, just to be sure it is
-     * always set when we need it. It seems some signals slip through to the
-     * QUIT code without having a valid quitmsg. -GD
-     */
-    quitmsg = sstrdup("Signal Received");
-    if (started) {
+	/* We set the quit message to something default, just to be sure it is
+	 * always set when we need it. It seems some signals slip through to the
+	 * QUIT code without having a valid quitmsg. -GD
+	 */
+	quitmsg = sstrdup("Signal Received");
+	if (started) {
 #ifndef _WIN32
-        if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
-            signal(SIGHUP, SIG_IGN);
-            signal(SIGUSR2, SIG_IGN);
-            alog("Received SIGHUP, restarting.");
+		if (signum == SIGHUP) { /* SIGHUP = save databases and restart */
+			signal(SIGHUP, SIG_IGN);
+			signal(SIGUSR2, SIG_IGN);
+			alog("Received SIGHUP, restarting.");
 
-            expire_all();
-            save_databases();
+			expire_all();
+			save_databases();
 
-            if (!quitmsg)
-                quitmsg = "Restarting on SIGHUP";
+			if (!quitmsg)
+				quitmsg = "Restarting on SIGHUP";
 
 #ifdef SERVICES_BIN
-            services_restart();
-            exit(1);
+			services_restart();
+			exit(1);
 #else
-            quitmsg =
-                "Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
+			quitmsg =
+				"Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
 #endif
-        } else if (signum == SIGQUIT) {
-            /* had to move it to here to make win32 happy */
-        } else if (signum == SIGUSR2) {
+		} else if (signum == SIGQUIT) {
+			/* had to move it to here to make win32 happy */
+		} else if (signum == SIGUSR2) {
 
-            alog("Received SIGUSR2: Saving Databases & Rehash Configuration");
+			alog("Received SIGUSR2: Saving Databases & Rehash Configuration");
 
-            expire_all();
-            save_databases();
+			expire_all();
+			save_databases();
 
-            if (!read_config(1)) {
-                quitmsg = "Error Reading Configuration File (Received SIGUSR2)";
-                quitting = 1;
-            }
-            send_event(EVENT_RELOAD, 1, EVENT_START);
-            return;
+			if (!read_config(1)) {
+				quitmsg = "Error Reading Configuration File (Received SIGUSR2)";
+				quitting = 1;
+			}
+			send_event(EVENT_RELOAD, 1, EVENT_START);
+			return;
 
-        } else
+		} else
 #endif
-        if (signum == SIGTERM) {
-            signal(SIGTERM, SIG_IGN);
+		if (signum == SIGTERM) {
+			signal(SIGTERM, SIG_IGN);
 #ifndef _WIN32
-            signal(SIGHUP, SIG_IGN);
+			signal(SIGHUP, SIG_IGN);
 #endif
 
-            alog("Received SIGTERM, exiting.");
+			alog("Received SIGTERM, exiting.");
 
-            expire_all();
-            save_databases();
-            quitmsg = "Shutting down on SIGTERM";
-            services_shutdown();
-            exit(0);
-        } else if (signum == SIGINT) {
-            if (nofork) {
-                signal(SIGINT, SIG_IGN);
-                alog("Received SIGINT, exiting.");
-                expire_all();
-                save_databases();
-                quitmsg = "Shutting down on SIGINT";
-                services_shutdown();
-                exit(0);
-            }
-        } else if (!waiting) {
-            alog("PANIC! buffer = %s", inbuf);
-            /* Cut off if this would make IRC command >510 characters. */
-            if (strlen(inbuf) > 448) {
-                inbuf[446] = '>';
-                inbuf[447] = '>';
-                inbuf[448] = 0;
-            }
-            ircdproto->SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
-            modules_unload_all(false, true);
-        } else if (waiting < 0) {
-            /* This is static on the off-chance we run low on stack */
-            static char buf[BUFSIZE];
-            switch (waiting) {
-            case -1:
-                snprintf(buf, sizeof(buf), "in timed_update");
-                break;
-            case -10:
-                snprintf(buf, sizeof(buf), "backing up databases");
-                break;
-            case -11:
-                snprintf(buf, sizeof(buf), "saving %s", NickDBName);
-                break;
-            case -12:
-                snprintf(buf, sizeof(buf), "saving %s", ChanDBName);
-                break;
-            case -13:
-                snprintf(buf, sizeof(buf), "saving %s", PreNickDBName);
-                break;
-            case -14:
-                snprintf(buf, sizeof(buf), "saving %s", BotDBName);
-                break;
-            case -15:
-                snprintf(buf, sizeof(buf), "saving %s", HostDBName);
-                break;
-            case -16:
-                snprintf(buf, sizeof(buf), "saving %s", OperDBName);
-                break;
-            case -17:
-                snprintf(buf, sizeof(buf), "saving %s", NewsDBName);
-                break;
-            case -18:
-                snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
-                break;
-            case -19:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
-                         EVENT_DB_SAVING, EVENT_START);
-                break;
-            case -20:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
-                         EVENT_DB_SAVING, EVENT_STOP);
-                break;
-            case -21:
-                snprintf(buf, sizeof(buf), "expiring nicknames");
-                break;
-            case -22:
-                snprintf(buf, sizeof(buf), "expiring channels");
-                break;
-            case -25:
-                snprintf(buf, sizeof(buf), "expiring autokills");
-                break;
-            case -26:
-                snprintf(buf, sizeof(buf), "expiring SGLINEs");
-                break;
-            case -27:
-                snprintf(buf, sizeof(buf), "expiring SZLINEs");
-                break;
-            case -28:
-                snprintf(buf, sizeof(buf), "expiring SQLINEs");
-                break;
-            case -29:
-                snprintf(buf, sizeof(buf), "expiring Exceptions");
-                break;
-            case -30:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
-                         EVENT_DB_EXPIRE, EVENT_START);
-                break;
-            case -31:
-                snprintf(buf, sizeof(buf), "Sending event %s %s",
-                         EVENT_DB_EXPIRE, EVENT_STOP);
-                break;
-            default:
-                snprintf(buf, sizeof(buf), "waiting=%d", waiting);
-            }
-            ircdproto->SendGlobops(NULL, "PANIC! %s (caught signal %d)", buf, signum);
-            alog("PANIC! %s (caught signal %d)", buf, signum);
-            modules_unload_all(false, true);
-        }
-    }
+			expire_all();
+			save_databases();
+			quitmsg = "Shutting down on SIGTERM";
+			services_shutdown();
+			exit(0);
+		} else if (signum == SIGINT) {
+			if (nofork) {
+				signal(SIGINT, SIG_IGN);
+				alog("Received SIGINT, exiting.");
+				expire_all();
+				save_databases();
+				quitmsg = "Shutting down on SIGINT";
+				services_shutdown();
+				exit(0);
+			}
+		} else if (!waiting) {
+			alog("PANIC! buffer = %s", inbuf);
+			/* Cut off if this would make IRC command >510 characters. */
+			if (strlen(inbuf) > 448) {
+				inbuf[446] = '>';
+				inbuf[447] = '>';
+				inbuf[448] = 0;
+			}
+			ircdproto->SendGlobops(NULL, "PANIC! buffer = %s\r\n", inbuf);
+			modules_unload_all(false, true);
+		} else if (waiting < 0) {
+			/* This is static on the off-chance we run low on stack */
+			static char buf[BUFSIZE];
+			switch (waiting) {
+			case -1:
+				snprintf(buf, sizeof(buf), "in timed_update");
+				break;
+			case -10:
+				snprintf(buf, sizeof(buf), "backing up databases");
+				break;
+			case -11:
+				snprintf(buf, sizeof(buf), "saving %s", NickDBName);
+				break;
+			case -12:
+				snprintf(buf, sizeof(buf), "saving %s", ChanDBName);
+				break;
+			case -13:
+				snprintf(buf, sizeof(buf), "saving %s", PreNickDBName);
+				break;
+			case -14:
+				snprintf(buf, sizeof(buf), "saving %s", BotDBName);
+				break;
+			case -15:
+				snprintf(buf, sizeof(buf), "saving %s", HostDBName);
+				break;
+			case -16:
+				snprintf(buf, sizeof(buf), "saving %s", OperDBName);
+				break;
+			case -17:
+				snprintf(buf, sizeof(buf), "saving %s", NewsDBName);
+				break;
+			case -18:
+				snprintf(buf, sizeof(buf), "saving %s", ExceptionDBName);
+				break;
+			case -19:
+				snprintf(buf, sizeof(buf), "Sending event %s %s",
+						 EVENT_DB_SAVING, EVENT_START);
+				break;
+			case -20:
+				snprintf(buf, sizeof(buf), "Sending event %s %s",
+						 EVENT_DB_SAVING, EVENT_STOP);
+				break;
+			case -21:
+				snprintf(buf, sizeof(buf), "expiring nicknames");
+				break;
+			case -22:
+				snprintf(buf, sizeof(buf), "expiring channels");
+				break;
+			case -25:
+				snprintf(buf, sizeof(buf), "expiring autokills");
+				break;
+			case -26:
+				snprintf(buf, sizeof(buf), "expiring SGLINEs");
+				break;
+			case -27:
+				snprintf(buf, sizeof(buf), "expiring SZLINEs");
+				break;
+			case -28:
+				snprintf(buf, sizeof(buf), "expiring SQLINEs");
+				break;
+			case -29:
+				snprintf(buf, sizeof(buf), "expiring Exceptions");
+				break;
+			case -30:
+				snprintf(buf, sizeof(buf), "Sending event %s %s",
+						 EVENT_DB_EXPIRE, EVENT_START);
+				break;
+			case -31:
+				snprintf(buf, sizeof(buf), "Sending event %s %s",
+						 EVENT_DB_EXPIRE, EVENT_STOP);
+				break;
+			default:
+				snprintf(buf, sizeof(buf), "waiting=%d", waiting);
+			}
+			ircdproto->SendGlobops(NULL, "PANIC! %s (caught signal %d)", buf, signum);
+			alog("PANIC! %s (caught signal %d)", buf, signum);
+			modules_unload_all(false, true);
+		}
+	}
 
-    if (
+	if (
 #ifndef _WIN32
-           signum == SIGUSR1 ||
+		   signum == SIGUSR1 ||
 #endif
-           !(quitmsg = (const char *)calloc(BUFSIZE, 1))) {
-        quitmsg = "Out of memory!";
-    } else {
-        snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
-    }
+		   !(quitmsg = (const char *)calloc(BUFSIZE, 1))) {
+		quitmsg = "Out of memory!";
+	} else {
+		snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
+	}
 
-    if (signum == SIGSEGV) {
-        do_backtrace(1);
-        modules_unload_all(false, true);        /* probably cant do this, but might as well try, we have nothing left to loose */
-    }
-    /* Should we send the signum here as well? -GD */
-    send_event(EVENT_SIGNAL, 1, quitmsg);
+	if (signum == SIGSEGV) {
+		do_backtrace(1);
+		modules_unload_all(false, true);		/* probably cant do this, but might as well try, we have nothing left to loose */
+	}
+	/* Should we send the signum here as well? -GD */
+	send_event(EVENT_SIGNAL, 1, quitmsg);
 
-    if (started) {
-        services_shutdown();
-        exit(0);
-    } else {
-        if (isatty(2)) {
-            fprintf(stderr, "%s\n", quitmsg);
-        } else {
-            alog("%s", quitmsg);
-        }
-        exit(1);
-    }
+	if (started) {
+		services_shutdown();
+		exit(0);
+	} else {
+		if (isatty(2)) {
+			fprintf(stderr, "%s\n", quitmsg);
+		} else {
+			alog("%s", quitmsg);
+		}
+		exit(1);
+	}
 }
 
 /*************************************************************************/
@@ -444,175 +444,175 @@ void sighandler(int signum)
 
 int main(int ac, char **av, char **envp)
 {
-    volatile time_t last_update;        /* When did we last update the databases? */
-    volatile time_t last_expire;        /* When did we last expire nicks/channels? */
-    volatile time_t last_check; /* When did we last check timeouts? */
-    volatile time_t last_DefCon;        /* When was DefCon last checked? */
+	volatile time_t last_update;		/* When did we last update the databases? */
+	volatile time_t last_expire;		/* When did we last expire nicks/channels? */
+	volatile time_t last_check; /* When did we last check timeouts? */
+	volatile time_t last_DefCon;		/* When was DefCon last checked? */
 
-    int i;
-    char *progname;
+	int i;
+	char *progname;
 
-    my_av = av;
-    my_envp = envp;
+	my_av = av;
+	my_envp = envp;
 
 #ifndef _WIN32
-    /* If we're root, issue a warning now */
-    if ((getuid() == 0) && (getgid() == 0)) {
-        fprintf(stderr,
-                "WARNING: You are currently running Anope as the root superuser. Anope does not\n");
-        fprintf(stderr,
-                "    require root privileges to run, and it is discouraged that you run Anope\n");
-        fprintf(stderr, "    as the root superuser.\n");
-    }
+	/* If we're root, issue a warning now */
+	if ((getuid() == 0) && (getgid() == 0)) {
+		fprintf(stderr,
+				"WARNING: You are currently running Anope as the root superuser. Anope does not\n");
+		fprintf(stderr,
+				"	require root privileges to run, and it is discouraged that you run Anope\n");
+		fprintf(stderr, "	as the root superuser.\n");
+	}
 #else
-    /*
-     * We need to know which directory we're in for when restart is called.
-     * This only affects Windows as a full path is not specified in services_dir.
-     * This fixes bug #589.
-     * -- heinz
-     */
-    binary_dir = smalloc(MAX_PATH);
-    if (!getcwd(binary_dir, MAX_PATH)) {
-        fprintf(stderr, "error: getcwd() error\n");
-        return -1;
-    }
+	/*
+	 * We need to know which directory we're in for when restart is called.
+	 * This only affects Windows as a full path is not specified in services_dir.
+	 * This fixes bug #589.
+	 * -- heinz
+	 */
+	binary_dir = smalloc(MAX_PATH);
+	if (!getcwd(binary_dir, MAX_PATH)) {
+		fprintf(stderr, "error: getcwd() error\n");
+		return -1;
+	}
 #endif
 
-    /* General initialization first */
-    if ((i = init_primary(ac, av)) != 0)
-        return i;
+	/* General initialization first */
+	if ((i = init_primary(ac, av)) != 0)
+		return i;
 
-    /* Find program name. */
-    if ((progname = strrchr(av[0], '/')) != NULL)
-        progname++;
-    else
-        progname = av[0];
+	/* Find program name. */
+	if ((progname = strrchr(av[0], '/')) != NULL)
+		progname++;
+	else
+		progname = av[0];
 
-    /* Initialization stuff. */
-    if ((i = init_secondary(ac, av)) != 0)
-        return i;
+	/* Initialization stuff. */
+	if ((i = init_secondary(ac, av)) != 0)
+		return i;
 
 
-    /* We have a line left over from earlier, so process it first. */
-    process();
+	/* We have a line left over from earlier, so process it first. */
+	process();
 
-    /* Set up timers. */
-    last_update = time(NULL);
-    last_expire = time(NULL);
-    last_check = time(NULL);
-    last_DefCon = time(NULL);
+	/* Set up timers. */
+	last_update = time(NULL);
+	last_expire = time(NULL);
+	last_check = time(NULL);
+	last_DefCon = time(NULL);
 
-    started = 1;
+	started = 1;
 
-    /*** Main loop. ***/
+	/*** Main loop. ***/
 
-    while (!quitting) {
-        time_t t = time(NULL);
+	while (!quitting) {
+		time_t t = time(NULL);
 
-        if (debug >= 2)
-            alog("debug: Top of main loop");
+		if (debug >= 2)
+			alog("debug: Top of main loop");
 
-        if (!noexpire && !readonly
-            && (save_data || t - last_expire >= ExpireTimeout)) {
-            expire_all();
-            last_expire = t;
-        }
+		if (!noexpire && !readonly
+			&& (save_data || t - last_expire >= ExpireTimeout)) {
+			expire_all();
+			last_expire = t;
+		}
 
-        if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
-            if (delayed_quit)
-                ircdproto->SendGlobops(NULL,
-                                 "Updating databases on shutdown, please wait.");
+		if (!readonly && (save_data || t - last_update >= UpdateTimeout)) {
+			if (delayed_quit)
+				ircdproto->SendGlobops(NULL,
+								 "Updating databases on shutdown, please wait.");
 
-            save_databases();
+			save_databases();
 
-            if (save_data < 0)
-                break;          /* out of main loop */
+			if (save_data < 0)
+				break;		  /* out of main loop */
 
-            save_data = 0;
-            last_update = t;
-        }
+			save_data = 0;
+			last_update = t;
+		}
 
-        if ((DefConTimeOut) && (t - last_DefCon >= DefConTimeOut)) {
-            resetDefCon(5);
-            last_DefCon = t;
-        }
+		if ((DefConTimeOut) && (t - last_DefCon >= DefConTimeOut)) {
+			resetDefCon(5);
+			last_DefCon = t;
+		}
 
-        if (delayed_quit)
-            break;
+		if (delayed_quit)
+			break;
 
-        moduleCallBackRun();
+		moduleCallBackRun();
 
-        waiting = -1;
-        if (t - last_check >= TimeoutCheck) {
-            check_timeouts();
-            last_check = t;
-        }
+		waiting = -1;
+		if (t - last_check >= TimeoutCheck) {
+			check_timeouts();
+			last_check = t;
+		}
 
-        waiting = 1;
-        /* this is a nasty nasty typecast. we need to rewrite the
-           socket stuff -Certus */
-        i = (int) (long) sgets2(inbuf, sizeof(inbuf), servsock);
-        waiting = 0;
-        if ((i > 0) || (i < (-1))) {
-            process();
-        } else if (i == 0) {
-            int errno_save = errno;
-            quitmsg = (const char *)scalloc(BUFSIZE, 1);
-            if (quitmsg) {
+		waiting = 1;
+		/* this is a nasty nasty typecast. we need to rewrite the
+		   socket stuff -Certus */
+		i = (int) (long) sgets2(inbuf, sizeof(inbuf), servsock);
+		waiting = 0;
+		if ((i > 0) || (i < (-1))) {
+			process();
+		} else if (i == 0) {
+			int errno_save = errno;
+			quitmsg = (const char *)scalloc(BUFSIZE, 1);
+			if (quitmsg) {
 		// Naughty, but oh well. :)
-                snprintf((char *)quitmsg, BUFSIZE,
-                         "Read error from server: %s (error num: %d)",
-                         strerror(errno_save), errno_save);
-            } else {
-                quitmsg = "Read error from server";
-            }
-            quitting = 1;
+				snprintf((char *)quitmsg, BUFSIZE,
+						 "Read error from server: %s (error num: %d)",
+						 strerror(errno_save), errno_save);
+			} else {
+				quitmsg = "Read error from server";
+			}
+			quitting = 1;
 
-            /* Save the databases */
-            if (!readonly)
-                save_databases();
-        }
-        waiting = -4;
-    }
+			/* Save the databases */
+			if (!readonly)
+				save_databases();
+		}
+		waiting = -4;
+	}
 
 
-    /* Check for restart instead of exit */
-    if (save_data == -2) {
+	/* Check for restart instead of exit */
+	if (save_data == -2) {
 #ifdef SERVICES_BIN
-        alog("Restarting");
-        if (!quitmsg)
-            quitmsg = "Restarting";
-        ircdproto->SendSquit(ServerName, quitmsg);
-        disconn(servsock);
-        close_log();
+		alog("Restarting");
+		if (!quitmsg)
+			quitmsg = "Restarting";
+		ircdproto->SendSquit(ServerName, quitmsg);
+		disconn(servsock);
+		close_log();
 #ifdef _WIN32
-        /* This fixes bug #589 - change to binary directory for restart */
-        /*  -- heinz */
-        if (binary_dir)
-            chdir(binary_dir);
+		/* This fixes bug #589 - change to binary directory for restart */
+		/*  -- heinz */
+		if (binary_dir)
+			chdir(binary_dir);
 #endif
-        execve(SERVICES_BIN, av, envp);
-        if (!readonly) {
-            open_log();
-            log_perror("Restart failed");
-            close_log();
-        }
-        return 1;
+		execve(SERVICES_BIN, av, envp);
+		if (!readonly) {
+			open_log();
+			log_perror("Restart failed");
+			close_log();
+		}
+		return 1;
 #else
-        quitmsg =
-            "Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
+		quitmsg =
+			"Restart attempt failed--SERVICES_BIN not defined (rerun configure)";
 #endif
-    }
+	}
 
-    /* Disconnect and exit */
-    services_shutdown();
+	/* Disconnect and exit */
+	services_shutdown();
 
 #ifdef _WIN32
-    if (binary_dir)
-        free(binary_dir);
+	if (binary_dir)
+		free(binary_dir);
 #endif
 
-    return 0;
+	return 0;
 }
 
 /*************************************************************************/
@@ -621,32 +621,32 @@ void do_backtrace(int show_segheader)
 {
 #ifndef _WIN32
 #ifdef HAVE_BACKTRACE
-    void *array[50];
-    size_t size;
-    char **strings;
-    int i;
+	void *array[50];
+	size_t size;
+	char **strings;
+	int i;
 
-    if (show_segheader) {
-        alog("Backtrace: Segmentation fault detected");
-        alog("Backtrace: report the following lines");
-    }
-    alog("Backtrace: Anope version %s %s %s", version_number,
-         version_build, version_flags);
-    size = backtrace(array, 10);
-    strings = backtrace_symbols(array, size);
-    for (i = 0; i < size; i++) {
-        alog("Backtrace(%d): %s", i, strings[i]);
-    }
-    free(strings);
-    alog("Backtrace: complete");
+	if (show_segheader) {
+		alog("Backtrace: Segmentation fault detected");
+		alog("Backtrace: report the following lines");
+	}
+	alog("Backtrace: Anope version %s %s %s", version_number,
+		 version_build, version_flags);
+	size = backtrace(array, 10);
+	strings = backtrace_symbols(array, size);
+	for (i = 0; i < size; i++) {
+		alog("Backtrace(%d): %s", i, strings[i]);
+	}
+	free(strings);
+	alog("Backtrace: complete");
 #else
-    alog("Backtrace: not available on this platform");
+	alog("Backtrace: not available on this platform");
 #endif
 #else
-    char *winver;
-    winver = GetWindowsVersion();
-    alog("Backtrace: not available on Windows");
-    alog("Running %S", winver);
-    free(winver);
+	char *winver;
+	winver = GetWindowsVersion();
+	alog("Backtrace: not available on Windows");
+	alog("Running %S", winver);
+	free(winver);
 #endif
 }

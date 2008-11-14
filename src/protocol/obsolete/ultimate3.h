@@ -46,8 +46,8 @@
 #define CMODE_S 0x00002000
 #define CMODE_K 0x00004000
 #define CMODE_O 0x00008000		/* Only opers can join */
-#define CMODE_q 0x00010000      /* No Quit Reason */
-#define CMODE_M 0x00020000      /* Non-regged nicks can't send messages */
+#define CMODE_q 0x00010000	  /* No Quit Reason */
+#define CMODE_M 0x00020000	  /* Non-regged nicks can't send messages */
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t | CMODE_r
 

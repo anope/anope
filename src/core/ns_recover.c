@@ -45,7 +45,7 @@ class NSRecover : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_RECOVER);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_RECOVER);
 }
 
 /**
@@ -54,15 +54,15 @@ void myNickServHelp(User * u)
  **/
 int myHelpResonse(User * u)
 {
-    char relstr[192];
+	char relstr[192];
 
-    /* Convert NSReleaseTimeout seconds to string format */
-    duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
-    
-    notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
-    do_help_limited(s_NickServ, u, c);
+	/* Convert NSReleaseTimeout seconds to string format */
+	duration(u->na, relstr, sizeof(relstr), NSReleaseTimeout);
+	
+	notice_help(s_NickServ, u, NICK_HELP_RECOVER, relstr);
+	do_help_limited(s_NickServ, u, c);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 /**
@@ -72,55 +72,55 @@ int myHelpResonse(User * u)
  **/
 int do_recover(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char *pass = strtok(NULL, " ");
-    NickAlias *na;
-    User *u2;
+	char *nick = strtok(NULL, " ");
+	char *pass = strtok(NULL, " ");
+	NickAlias *na;
+	User *u2;
 
-    if (!nick) {
-        syntax_error(s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
-    } else if (!(u2 = finduser(nick))) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (!(na = u2->na)) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-    } else if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else if (na->nc->flags & NI_SUSPENDED) {
-        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-    } else if (stricmp(nick, u->nick) == 0) {
-        notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
-    } else if (pass) {
-        int res = enc_check_password(pass, na->nc->pass);
+	if (!nick) {
+		syntax_error(s_NickServ, u, "RECOVER", NICK_RECOVER_SYNTAX);
+	} else if (!(u2 = finduser(nick))) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+	} else if (!(na = u2->na)) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+	} else if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+	} else if (na->nc->flags & NI_SUSPENDED) {
+		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+	} else if (stricmp(nick, u->nick) == 0) {
+		notice_lang(s_NickServ, u, NICK_NO_RECOVER_SELF);
+	} else if (pass) {
+		int res = enc_check_password(pass, na->nc->pass);
 
-        if (res == 1) {
-            char relstr[192];
+		if (res == 1) {
+			char relstr[192];
 
-            notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
-            collide(na, 0);
+			notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
+			collide(na, 0);
 
-            /* Convert NSReleaseTimeout seconds to string format */
-            duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
+			/* Convert NSReleaseTimeout seconds to string format */
+			duration(u2->na, relstr, sizeof(relstr), NSReleaseTimeout);
 
-            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
-        } else {
-            notice_lang(s_NickServ, u, ACCESS_DENIED);
-            if (res == 0) {
-                alog("%s: RECOVER: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username, u->host);
-                bad_password(u);
-            }
-        }
-    } else {
-        if (group_identified(u, na->nc)
-            || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
-            notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
-            collide(na, 0);
-            notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick);
-        } else {
-            notice_lang(s_NickServ, u, ACCESS_DENIED);
-        }
-    }
-    return MOD_CONT;
+			notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick, relstr);
+		} else {
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			if (res == 0) {
+				alog("%s: RECOVER: invalid password for %s by %s!%s@%s",
+					 s_NickServ, nick, u->nick, u->username, u->host);
+				bad_password(u);
+			}
+		}
+	} else {
+		if (group_identified(u, na->nc)
+			|| (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
+			notice_lang(s_NickServ, u2, FORCENICKCHANGE_NOW);
+			collide(na, 0);
+			notice_lang(s_NickServ, u, NICK_RECOVERED, s_NickServ, nick);
+		} else {
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
+		}
+	}
+	return MOD_CONT;
 }
 
 /* EOF */

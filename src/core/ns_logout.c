@@ -15,8 +15,8 @@
 
 #include "module.h"
 
-#define TO_COLLIDE   0          /* Collide the user with this nick */
-#define TO_RELEASE   1          /* Release a collided nick */
+#define TO_COLLIDE   0		  /* Collide the user with this nick */
+#define TO_RELEASE   1		  /* Release a collided nick */
 
 int do_logout(User * u);
 void myNickServHelp(User * u);
@@ -47,7 +47,7 @@ class NSLogout : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_LOGOUT);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_LOGOUT);
 }
 
 /**
@@ -57,60 +57,60 @@ void myNickServHelp(User * u)
  **/
 int do_logout(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char *param = strtok(NULL, " ");
-    User *u2;
+	char *nick = strtok(NULL, " ");
+	char *param = strtok(NULL, " ");
+	User *u2;
 
-    if (!is_services_admin(u) && nick) {
-        syntax_error(s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
-    } else if (!(u2 = (nick ? finduser(nick) : u))) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (!u2->na) {
-        if (nick)
-            notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-        else
-            notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
-    } else if (u2->na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u2->na->nick);
-    } else if (!nick && !nick_identified(u)) {
-        notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-    } else if (nick && is_services_admin(u2)) {
-        notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
-    } else {
-        if (nick && param && !stricmp(param, "REVALIDATE")) {
-            cancel_user(u2);
-            validate_user(u2);
-        } else {
-            u2->na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
-        }
+	if (!is_services_admin(u) && nick) {
+		syntax_error(s_NickServ, u, "LOGOUT", NICK_LOGOUT_SYNTAX);
+	} else if (!(u2 = (nick ? finduser(nick) : u))) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+	} else if (!u2->na) {
+		if (nick)
+			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+		else
+			notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+	} else if (u2->na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, u2->na->nick);
+	} else if (!nick && !nick_identified(u)) {
+		notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+	} else if (nick && is_services_admin(u2)) {
+		notice_lang(s_NickServ, u, NICK_LOGOUT_SERVICESADMIN, nick);
+	} else {
+		if (nick && param && !stricmp(param, "REVALIDATE")) {
+			cancel_user(u2);
+			validate_user(u2);
+		} else {
+			u2->na->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+		}
 
-        if (ircd->modeonreg) {
-            common_svsmode(u2, ircd->modeonunreg, "1");
-        }
+		if (ircd->modeonreg) {
+			common_svsmode(u2, ircd->modeonunreg, "1");
+		}
 
-        u->isSuperAdmin = 0;    /* Dont let people logout and remain a SuperAdmin */
-        alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
-             u->username, u->host, u2->nick);
+		u->isSuperAdmin = 0;	/* Dont let people logout and remain a SuperAdmin */
+		alog("%s: %s!%s@%s logged out nickname %s", s_NickServ, u->nick,
+			 u->username, u->host, u2->nick);
 
-        if (nick)
-            notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
-        else
-            notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
+		if (nick)
+			notice_lang(s_NickServ, u, NICK_LOGOUT_X_SUCCEEDED, nick);
+		else
+			notice_lang(s_NickServ, u, NICK_LOGOUT_SUCCEEDED);
 
-        /* Stop nick tracking if enabled */
-        if (NSNickTracking)
+		/* Stop nick tracking if enabled */
+		if (NSNickTracking)
 			/* Shouldn't this be u2? -GD */
-            nsStopNickTracking(u);
+			nsStopNickTracking(u);
 
-        /* Clear any timers again */
-        if (u->na->nc->flags & NI_KILLPROTECT) {
-            del_ns_timeout(u->na, TO_COLLIDE);
-        }
+		/* Clear any timers again */
+		if (u->na->nc->flags & NI_KILLPROTECT) {
+			del_ns_timeout(u->na, TO_COLLIDE);
+		}
 		
 		/* Send out an event */
 		send_event(EVENT_NICK_LOGOUT, 1, u2->nick);
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_logout", NSLogout)

@@ -43,7 +43,7 @@ class BSUnassign : public Module
  **/
 void myBotServHelp(User * u)
 {
-    notice_lang(s_BotServ, u, BOT_HELP_CMD_UNASSIGN);
+	notice_lang(s_BotServ, u, BOT_HELP_CMD_UNASSIGN);
 }
 
 /**
@@ -53,26 +53,26 @@ void myBotServHelp(User * u)
  **/
 int do_unassign(User * u)
 {
-    char *chan = strtok(NULL, " ");
-    ChannelInfo *ci;
+	char *chan = strtok(NULL, " ");
+	ChannelInfo *ci;
 
-    if (readonly)
-        notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
-    else if (!chan)
-        syntax_error(s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
-    else if (!(ci = cs_findchan(chan)))
-        notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-    else if (ci->flags & CI_VERBOTEN)
-        notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-    else if (!is_services_admin(u) && !check_access(u, ci, CA_ASSIGN))
-        notice_lang(s_BotServ, u, ACCESS_DENIED);
-    else if (!ci->bi)
-        notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
-    else {
-        ci->bi->UnAssign(u, ci);
-        notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
-    }
-    return MOD_CONT;
+	if (readonly)
+		notice_lang(s_BotServ, u, BOT_ASSIGN_READONLY);
+	else if (!chan)
+		syntax_error(s_BotServ, u, "UNASSIGN", BOT_UNASSIGN_SYNTAX);
+	else if (!(ci = cs_findchan(chan)))
+		notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
+	else if (ci->flags & CI_VERBOTEN)
+		notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
+	else if (!is_services_admin(u) && !check_access(u, ci, CA_ASSIGN))
+		notice_lang(s_BotServ, u, ACCESS_DENIED);
+	else if (!ci->bi)
+		notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
+	else {
+		ci->bi->UnAssign(u, ci);
+		notice_lang(s_BotServ, u, BOT_UNASSIGN_UNASSIGNED, ci->name);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_unassign", BSUnassign)

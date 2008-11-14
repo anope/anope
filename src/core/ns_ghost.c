@@ -44,7 +44,7 @@ class NSGhost : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_GHOST);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_GHOST);
 }
 
 /**
@@ -54,58 +54,58 @@ void myNickServHelp(User * u)
  **/
 int do_ghost(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char *pass = strtok(NULL, " ");
-    NickAlias *na;
-    User *u2;
+	char *nick = strtok(NULL, " ");
+	char *pass = strtok(NULL, " ");
+	NickAlias *na;
+	User *u2;
 
-    if (!nick) {
-        syntax_error(s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
-    } else if (!(u2 = finduser(nick))) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (!(na = u2->na)) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-    } else if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else if (na->nc->flags & NI_SUSPENDED) {
-        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-    } else if (stricmp(nick, u->nick) == 0) {
-        notice_lang(s_NickServ, u, NICK_NO_GHOST_SELF);
-    } else if (pass) {
-        int res = enc_check_password(pass, na->nc->pass);
-        if (res == 1) {
-            char buf[NICKMAX + 32];
-            snprintf(buf, sizeof(buf), "GHOST command used by %s",
-                     u->nick);
-            if (LimitSessions) {
-                del_session(u2->host);
-            }
-            kill_user(s_NickServ, nick, buf);
-            notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
-        } else {
-            notice_lang(s_NickServ, u, ACCESS_DENIED);
-            if (res == 0) {
-                alog("%s: GHOST: invalid password for %s by %s!%s@%s",
-                     s_NickServ, nick, u->nick, u->username, u->host);
-                bad_password(u);
-            }
-        }
-    } else {
-        if (group_identified(u, na->nc)
-            || (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
-            char buf[NICKMAX + 32];
-            snprintf(buf, sizeof(buf), "GHOST command used by %s",
-                     u->nick);
-            if (LimitSessions) {
-                del_session(u2->host);
-            }
-            kill_user(s_NickServ, nick, buf);
-            notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
-        } else {
-            notice_lang(s_NickServ, u, ACCESS_DENIED);
-        }
-    }
-    return MOD_CONT;
+	if (!nick) {
+		syntax_error(s_NickServ, u, "GHOST", NICK_GHOST_SYNTAX);
+	} else if (!(u2 = finduser(nick))) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_IN_USE, nick);
+	} else if (!(na = u2->na)) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+	} else if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+	} else if (na->nc->flags & NI_SUSPENDED) {
+		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+	} else if (stricmp(nick, u->nick) == 0) {
+		notice_lang(s_NickServ, u, NICK_NO_GHOST_SELF);
+	} else if (pass) {
+		int res = enc_check_password(pass, na->nc->pass);
+		if (res == 1) {
+			char buf[NICKMAX + 32];
+			snprintf(buf, sizeof(buf), "GHOST command used by %s",
+					 u->nick);
+			if (LimitSessions) {
+				del_session(u2->host);
+			}
+			kill_user(s_NickServ, nick, buf);
+			notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
+		} else {
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
+			if (res == 0) {
+				alog("%s: GHOST: invalid password for %s by %s!%s@%s",
+					 s_NickServ, nick, u->nick, u->username, u->host);
+				bad_password(u);
+			}
+		}
+	} else {
+		if (group_identified(u, na->nc)
+			|| (!(na->nc->flags & NI_SECURE) && is_on_access(u, na->nc))) {
+			char buf[NICKMAX + 32];
+			snprintf(buf, sizeof(buf), "GHOST command used by %s",
+					 u->nick);
+			if (LimitSessions) {
+				del_session(u2->host);
+			}
+			kill_user(s_NickServ, nick, buf);
+			notice_lang(s_NickServ, u, NICK_GHOST_KILLED, nick);
+		} else {
+			notice_lang(s_NickServ, u, ACCESS_DENIED);
+		}
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_ghost", NSGhost)

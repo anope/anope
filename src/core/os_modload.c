@@ -43,9 +43,9 @@ class OSModLoad : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLOAD);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLOAD);
+	}
 }
 
 /**
@@ -77,7 +77,7 @@ int do_modload(User * u)
 		notice_lang(s_OperServ, u, OPER_MODULE_LOAD_FAIL, m->name.c_str());
 	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_modload", OSModLoad)

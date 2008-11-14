@@ -45,9 +45,9 @@ class HSDelAll : public Module
  **/
 void myHostServHelp(User * u)
 {
-    if (is_host_remover(u)) {
-        notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
-    }
+	if (is_host_remover(u)) {
+		notice_lang(s_HostServ, u, HOST_HELP_CMD_DELALL);
+	}
 }
 
 /**
@@ -57,30 +57,30 @@ void myHostServHelp(User * u)
  **/
 int do_delall(User * u)
 {
-    int i;
-    char *nick = strtok(NULL, " ");
-    NickAlias *na;
-    NickCore *nc;
-    if (!nick) {
-        notice_lang(s_HostServ, u, HOST_DELALL_SYNTAX, s_HostServ);
-        return MOD_CONT;
-    }
-    if ((na = findnick(nick))) {
-        if (na->status & NS_VERBOTEN) {
-            notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-            return MOD_CONT;
-        }
-        nc = na->nc;
-        for (i = 0; i < nc->aliases.count; i++) {
-            na = (NickAlias *)nc->aliases.list[i];
-            delHostCore(na->nick);
-        }
-        alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);
-        notice_lang(s_HostServ, u, HOST_DELALL, nc->display);
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOREG, nick);
-    }
-    return MOD_CONT;
+	int i;
+	char *nick = strtok(NULL, " ");
+	NickAlias *na;
+	NickCore *nc;
+	if (!nick) {
+		notice_lang(s_HostServ, u, HOST_DELALL_SYNTAX, s_HostServ);
+		return MOD_CONT;
+	}
+	if ((na = findnick(nick))) {
+		if (na->status & NS_VERBOTEN) {
+			notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+			return MOD_CONT;
+		}
+		nc = na->nc;
+		for (i = 0; i < nc->aliases.count; i++) {
+			na = (NickAlias *)nc->aliases.list[i];
+			delHostCore(na->nick);
+		}
+		alog("vHosts for all nicks in group \002%s\002 deleted by oper \002%s\002", nc->display, u->nick);
+		notice_lang(s_HostServ, u, HOST_DELALL, nc->display);
+	} else {
+		notice_lang(s_HostServ, u, HOST_NOREG, nick);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_delall", HSDelAll)

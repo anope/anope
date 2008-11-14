@@ -44,7 +44,7 @@ class HSOff : public Module
  **/
 void myHostServHelp(User * u)
 {
-    notice_lang(s_HostServ, u, HOST_HELP_CMD_OFF);
+	notice_lang(s_HostServ, u, HOST_HELP_CMD_OFF);
 }
 
 /**
@@ -54,24 +54,24 @@ void myHostServHelp(User * u)
  **/
 int do_off(User * u)
 {
-    NickAlias *na;
-    char *vhost;
-    char *vident = NULL;
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
-            vhost = getvHost(u->nick);
-            vident = getvIdent(u->nick);
-            if (vhost == NULL && vident == NULL)
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            else
-                ircdproto->SendVhostDel(u);
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
-    }
-    return MOD_CONT;
+	NickAlias *na;
+	char *vhost;
+	char *vident = NULL;
+	if ((na = findnick(u->nick))) {
+		if (na->status & NS_IDENTIFIED) {
+			vhost = getvHost(u->nick);
+			vident = getvIdent(u->nick);
+			if (vhost == NULL && vident == NULL)
+				notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			else
+				ircdproto->SendVhostDel(u);
+		} else {
+			notice_lang(s_HostServ, u, HOST_ID);
+		}
+	} else {
+		notice_lang(s_HostServ, u, HOST_NOT_REGED);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_off", HSOff)

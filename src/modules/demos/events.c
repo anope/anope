@@ -17,22 +17,22 @@ int do_moo(int argc, char **argv);
 
 int AnopeInit(int argc, char **argv)
 {
-    EvtMessage *msg = NULL;
-    EvtHook    *hook = NULL;
-    int status;
-    msg = createEventHandler("NICK", my_nick);
-    status = moduleAddEventHandler(msg);
+	EvtMessage *msg = NULL;
+	EvtHook	*hook = NULL;
+	int status;
+	msg = createEventHandler("NICK", my_nick);
+	status = moduleAddEventHandler(msg);
 
-    hook = createEventHook(EVENT_DB_SAVING, my_save);
-    status = this->AddEventHook(hook);
+	hook = createEventHook(EVENT_DB_SAVING, my_save);
+	status = this->AddEventHook(hook);
 
 
-    hook = createEventHook(EVENT_BOT_FANTASY, do_moo);
-    status = this->AddEventHook(hook);
-    
-    this->SetAuthor(AUTHOR);
-    this->SetVersion(VERSION);
-    return MOD_CONT;
+	hook = createEventHook(EVENT_BOT_FANTASY, do_moo);
+	status = this->AddEventHook(hook);
+	
+	this->SetAuthor(AUTHOR);
+	this->SetVersion(VERSION);
+	return MOD_CONT;
 }
 
 void AnopeFini(void)
@@ -50,9 +50,9 @@ int my_save(int argc, char **argv)
 {
   if(argc>=1) {
 	  if (!stricmp(argv[0], EVENT_START)) {
-	      alog("Saving the databases! has started");
+		  alog("Saving the databases! has started");
 	  } else {
-	      alog("Saving the databases is complete");
+		  alog("Saving the databases is complete");
 	  }
   }
   return MOD_CONT;
@@ -68,15 +68,15 @@ int my_save(int argc, char **argv)
  * @return MOD_CONT or MOD_STOP
  **/
 int do_moo(int argc, char **argv) {
-    ChannelInfo *ci;
-    if(argc>=3) { /* We need at least 3 arguments */
+	ChannelInfo *ci;
+	if(argc>=3) { /* We need at least 3 arguments */
 	if(stricmp(argv[0],"moo")==0) { /* is it meant for us? */
-            if((ci = cs_findchan(argv[2]))) { /* channel should always exist */
-                anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION moo's at %s %c",1,argv[1],1);
-	        return MOD_STOP; /* We've dealt with it, dont let others */
-            }
+			if((ci = cs_findchan(argv[2]))) { /* channel should always exist */
+				anope_cmd_privmsg(ci->bi->nick, ci->name, "%cACTION moo's at %s %c",1,argv[1],1);
+			return MOD_STOP; /* We've dealt with it, dont let others */
+			}
 	} 
-    }
-    return MOD_CONT; /* guess it wasnt for us, pass it on */
+	}
+	return MOD_CONT; /* guess it wasnt for us, pass it on */
 }
 

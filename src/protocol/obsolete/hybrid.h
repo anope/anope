@@ -30,15 +30,15 @@
 #define UMODE_y 0x00040000  /* See LINKS, STATS (if configured), TRACE notices */
 #define UMODE_z 0x00080000  /* See oper generated WALLOPS */
 
-#define CMODE_i 0x00000001     /* Invite only */
-#define CMODE_m 0x00000002     /* Users without +v/h/o cannot send text to the channel */
-#define CMODE_n 0x00000004     /* Users must be in the channel to send text to it */
-#define CMODE_p 0x00000008     /* Private is obsolete, this now restricts KNOCK */
-#define CMODE_s 0x00000010     /* The channel does not show up on NAMES or LIST */
-#define CMODE_t 0x00000020     /* Only chanops can change the topic */
-#define CMODE_k 0x00000040     /* Key/password for the channel. */
-#define CMODE_l 0x00000080     /* Limit the number of users in a channel */
-#define CMODE_a 0x00000400     /* Anonymous ops, chanops are hidden */
+#define CMODE_i 0x00000001	 /* Invite only */
+#define CMODE_m 0x00000002	 /* Users without +v/h/o cannot send text to the channel */
+#define CMODE_n 0x00000004	 /* Users must be in the channel to send text to it */
+#define CMODE_p 0x00000008	 /* Private is obsolete, this now restricts KNOCK */
+#define CMODE_s 0x00000010	 /* The channel does not show up on NAMES or LIST */
+#define CMODE_t 0x00000020	 /* Only chanops can change the topic */
+#define CMODE_k 0x00000040	 /* Key/password for the channel. */
+#define CMODE_l 0x00000080	 /* Limit the number of users in a channel */
+#define CMODE_a 0x00000400	 /* Anonymous ops, chanops are hidden */
 
 
 #define DEFAULT_MLOCK CMODE_n | CMODE_t

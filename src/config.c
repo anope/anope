@@ -67,9 +67,9 @@ char *desc_HelpServ;
 char *desc_OperServ;
 char *desc_GlobalNoticer;
 
-char *HostDBName;               /* Name of HostServ DB File */
-char *s_HostServ;               /* HostServ Name */
-char *desc_HostServ;            /* HostServ Description */
+char *HostDBName;			   /* Name of HostServ DB File */
+char *s_HostServ;			   /* HostServ Name */
+char *desc_HostServ;			/* HostServ Description */
 
 char *PIDFilename;
 char *MOTDFilename;
@@ -83,7 +83,7 @@ char *NewsDBName;
 
 static char *HostSetter;
 char **HostSetters;
-int HostNumber = 0;             /* needs to be set to 0 */
+int HostNumber = 0;			 /* needs to be set to 0 */
 
 int NoBackupOkay;
 int StrictPasswords;
@@ -1330,57 +1330,57 @@ bool ValueItem::GetBool()
 /*************************************************************************/
 
 Directive directives[] = {
-    {"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
-    {"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
-    {"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-    {"EncModule", {{PARAM_STRING, 0, &EncModule}}},
-    {"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
-    {"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
-    {"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
-    {"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
-    {"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
-                      {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
-    {"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
-    {"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
-    {"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
-    {"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},
-    {"MysqlName", {{PARAM_STRING, PARAM_RELOAD, &MysqlName}}},
-    {"MysqlPort", {{PARAM_PORT, PARAM_RELOAD, &MysqlPort}}},
-    {"MysqlSecure", {{PARAM_STRING, PARAM_RELOAD, &MysqlSecure}}},
-    {"MysqlSock", {{PARAM_STRING, PARAM_RELOAD, &MysqlSock}}},
-    {"MysqlRetries", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetries}}},
-    {"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
-    {"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
-    {"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
-    {"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
-    {"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
-    {"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
-    {"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
-                       {PARAM_PORT, 0, &RemotePort2},
-                       {PARAM_STRING, 0, &RemotePassword2}}},
-    {"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
-                       {PARAM_PORT, 0, &RemotePort3},
-                       {PARAM_STRING, 0, &RemotePassword3}}},
-    {"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-    {"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
-    {"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
-    {"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
-    {"GlobalOnCycleMessage",
-     {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
-    {"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
-    {"StrictPasswords", {{PARAM_SET, PARAM_RELOAD, &StrictPasswords}}},
-    {"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
-    {"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
-    {"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
-    {"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
-    {"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
-    {"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
-    {"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
-    {"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
-    {"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
-    {"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
-    {"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
-    {"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
+	{"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
+	{"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
+	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
+	{"EncModule", {{PARAM_STRING, 0, &EncModule}}},
+	{"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
+	{"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
+	{"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
+	{"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
+	{"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
+					  {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
+	{"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
+	{"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
+	{"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
+	{"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},
+	{"MysqlName", {{PARAM_STRING, PARAM_RELOAD, &MysqlName}}},
+	{"MysqlPort", {{PARAM_PORT, PARAM_RELOAD, &MysqlPort}}},
+	{"MysqlSecure", {{PARAM_STRING, PARAM_RELOAD, &MysqlSecure}}},
+	{"MysqlSock", {{PARAM_STRING, PARAM_RELOAD, &MysqlSock}}},
+	{"MysqlRetries", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetries}}},
+	{"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
+	{"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
+	{"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
+	{"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
+	{"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
+	{"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
+	{"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
+					   {PARAM_PORT, 0, &RemotePort2},
+					   {PARAM_STRING, 0, &RemotePassword2}}},
+	{"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
+					   {PARAM_PORT, 0, &RemotePort3},
+					   {PARAM_STRING, 0, &RemotePassword3}}},
+	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
+	{"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
+	{"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
+	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
+	{"GlobalOnCycleMessage",
+	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
+	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
+	{"StrictPasswords", {{PARAM_SET, PARAM_RELOAD, &StrictPasswords}}},
+	{"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
+	{"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
+	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
+	{"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
+	{"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
+	{"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
+	{"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
+	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
+	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
+	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
+	{"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
+	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
 /*************************************************************************/
@@ -1389,24 +1389,24 @@ Directive directives[] = {
 
 void error(int linenum, const char *message, ...)
 {
-    char buf[4096];
-    va_list args;
+	char buf[4096];
+	va_list args;
 
-    va_start(args, message);
-    vsnprintf(buf, sizeof(buf), message, args);
-    va_end(args);
+	va_start(args, message);
+	vsnprintf(buf, sizeof(buf), message, args);
+	va_end(args);
 
-    if (linenum)
-        alog("%s:%d: %s", SERVICES_CONF, linenum, buf);
-    else
-        alog("%s: %s", SERVICES_CONF, buf);
+	if (linenum)
+		alog("%s:%d: %s", SERVICES_CONF, linenum, buf);
+	else
+		alog("%s: %s", SERVICES_CONF, buf);
 
 	if (!nofork && isatty(2)) {
-        if (linenum)
-            fprintf(stderr, "%s:%d: %s\n", SERVICES_CONF, linenum, buf);
-        else
-            fprintf(stderr, "%s: %s\n", SERVICES_CONF, buf);
-    }
+		if (linenum)
+			fprintf(stderr, "%s:%d: %s\n", SERVICES_CONF, linenum, buf);
+		else
+			fprintf(stderr, "%s: %s\n", SERVICES_CONF, buf);
+	}
 }
 
 /*************************************************************************/
@@ -1417,191 +1417,191 @@ void error(int linenum, const char *message, ...)
  */
 
 int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
-                    int linenum, int reload, char *s)
+					int linenum, int reload, char *s)
 {
-    int retval = 1;
-    int i;
-    long val;
-    int myoptind;
+	int retval = 1;
+	int i;
+	long val;
+	int myoptind;
 
-    if (stricmp(dir, d->name) != 0)
-        return 1;
-    myoptind = 0;
-    for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
-        if (reload && !(d->params[i].flags & PARAM_RELOAD))
-            continue;
+	if (stricmp(dir, d->name) != 0)
+		return 1;
+	myoptind = 0;
+	for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
+		if (reload && !(d->params[i].flags & PARAM_RELOAD))
+			continue;
 
-        if (d->params[i].type == PARAM_SET) {
-            *(int *) d->params[i].ptr = 1;
-            continue;
-        }
+		if (d->params[i].type == PARAM_SET) {
+			*(int *) d->params[i].ptr = 1;
+			continue;
+		}
 
-        /* Should we remove PARAM_DEPRECATED because it's
-         * useless right now? -GD */
-        if (d->params[i].type == PARAM_DEPRECATED) {
-            void (*func) (void);
-            error(linenum, "Deprecated directive `%s' used", d->name);
-            func = (void (*)(void)) (d->params[i].ptr);
-            func();             /* For clarity */
-            continue;
-        }
-        if (myoptind >= ac) {
-            if (!(d->params[i].flags & PARAM_OPTIONAL)) {
-                error(linenum, "Not enough parameters for `%s'", d->name);
-                retval = 0;
-            }
-            break;
-        }
-        switch (d->params[i].type) {
-        case PARAM_INT:
-            val = strtol(av[myoptind++], &s, 0);
-            if (*s) {
-                error(linenum,
-                      "%s: Expected an integer for parameter %d",
-                      d->name, myoptind);
-                retval = 0;
-                break;
-            }
-            *(int *) d->params[i].ptr = val;
-            break;
-        case PARAM_POSINT:
-            val = strtol(av[myoptind++], &s, 0);
-            if (*s || val <= 0) {
-                error(linenum,
-                      "%s: Expected a positive integer for parameter %d",
-                      d->name, myoptind);
-                retval = 0;
-                break;
-            }
-            if (errno == ERANGE && val == LONG_MAX) {
-                /* well the true top off is 2,147,483,647 but lets not give them the real top */
-                error(linenum,
-                      "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
-                      d->name, myoptind);
-            }
-            *(int *) d->params[i].ptr = val;
-            break;
-        case PARAM_PORT:
-            val = strtol(av[myoptind++], &s, 0);
-            if (*s) {
-                error(linenum,
-                      "%s: Expected a port number for parameter %d",
-                      d->name, myoptind);
-                retval = 0;
-                break;
-            }
-            if (val < 1 || val > 65535) {
-                error(linenum,
-                      "Port numbers must be in the range 1..65535");
-                retval = 0;
-                break;
-            }
-            *(int *) d->params[i].ptr = val;
-            break;
-        case PARAM_STRING:
-/*	      if (reload && *(char **)d->params[i].ptr)
-	      	free(*(char **)d->params[i].ptr); */
-            *(char **) d->params[i].ptr = sstrdup(av[myoptind++]);
-            if (!d->params[i].ptr) {
-                error(linenum, "%s: Out of memory", d->name);
-                return 0;
-            }
-            break;
-        case PARAM_TIME:
-            val = dotime(av[myoptind++]);
-            if (val < 0) {
-                error(linenum,
-                      "%s: Expected a time value for parameter %d",
-                      d->name, myoptind);
-                retval = 0;
-                break;
-            }
-            *(int *) d->params[i].ptr = val;
-            break;
-        default:
-            error(linenum, "%s: Unknown type %d for param %d",
-                  d->name, d->params[i].type, i + 1);
-            retval = 0;         /* don't bother continuing--something's bizarre */
-            break;
-        }
-    }
-    return retval;;
+		/* Should we remove PARAM_DEPRECATED because it's
+		 * useless right now? -GD */
+		if (d->params[i].type == PARAM_DEPRECATED) {
+			void (*func) (void);
+			error(linenum, "Deprecated directive `%s' used", d->name);
+			func = (void (*)(void)) (d->params[i].ptr);
+			func();			 /* For clarity */
+			continue;
+		}
+		if (myoptind >= ac) {
+			if (!(d->params[i].flags & PARAM_OPTIONAL)) {
+				error(linenum, "Not enough parameters for `%s'", d->name);
+				retval = 0;
+			}
+			break;
+		}
+		switch (d->params[i].type) {
+		case PARAM_INT:
+			val = strtol(av[myoptind++], &s, 0);
+			if (*s) {
+				error(linenum,
+					  "%s: Expected an integer for parameter %d",
+					  d->name, myoptind);
+				retval = 0;
+				break;
+			}
+			*(int *) d->params[i].ptr = val;
+			break;
+		case PARAM_POSINT:
+			val = strtol(av[myoptind++], &s, 0);
+			if (*s || val <= 0) {
+				error(linenum,
+					  "%s: Expected a positive integer for parameter %d",
+					  d->name, myoptind);
+				retval = 0;
+				break;
+			}
+			if (errno == ERANGE && val == LONG_MAX) {
+				/* well the true top off is 2,147,483,647 but lets not give them the real top */
+				error(linenum,
+					  "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
+					  d->name, myoptind);
+			}
+			*(int *) d->params[i].ptr = val;
+			break;
+		case PARAM_PORT:
+			val = strtol(av[myoptind++], &s, 0);
+			if (*s) {
+				error(linenum,
+					  "%s: Expected a port number for parameter %d",
+					  d->name, myoptind);
+				retval = 0;
+				break;
+			}
+			if (val < 1 || val > 65535) {
+				error(linenum,
+					  "Port numbers must be in the range 1..65535");
+				retval = 0;
+				break;
+			}
+			*(int *) d->params[i].ptr = val;
+			break;
+		case PARAM_STRING:
+/*		  if (reload && *(char **)d->params[i].ptr)
+		  	free(*(char **)d->params[i].ptr); */
+			*(char **) d->params[i].ptr = sstrdup(av[myoptind++]);
+			if (!d->params[i].ptr) {
+				error(linenum, "%s: Out of memory", d->name);
+				return 0;
+			}
+			break;
+		case PARAM_TIME:
+			val = dotime(av[myoptind++]);
+			if (val < 0) {
+				error(linenum,
+					  "%s: Expected a time value for parameter %d",
+					  d->name, myoptind);
+				retval = 0;
+				break;
+			}
+			*(int *) d->params[i].ptr = val;
+			break;
+		default:
+			error(linenum, "%s: Unknown type %d for param %d",
+				  d->name, d->params[i].type, i + 1);
+			retval = 0;		 /* don't bother continuing--something's bizarre */
+			break;
+		}
+	}
+	return retval;;
 }
 
 
 int parse(char *buf, int linenum, int reload)
 {
-    char *s, *t, *dir;
-    unsigned int n;
-    int retval = 1;
-    int ac = 0;
-    char *av[MAXPARAMS];
+	char *s, *t, *dir;
+	unsigned int n;
+	int retval = 1;
+	int ac = 0;
+	char *av[MAXPARAMS];
 
-    dir = strtok(buf, " \t\r\n");
-    s = strtok(NULL, "");
-    if (s) {
-        while (isspace(*s))
-            s++;
-        while (*s) {
-            if (ac >= MAXPARAMS) {
-                error(linenum, "Warning: too many parameters (%d max)",
-                      MAXPARAMS);
-                break;
-            }
-            t = s;
-            if (*s == '"') {
-                t++;
-                s++;
-                while (*s && *s != '"') {
-                    if (*s == '\\' && s[1] != 0)
-                        s++;
-                    s++;
-                }
-                if (!*s)
-                    error(linenum,
-                          "Warning: unterminated double-quoted string");
-                else
-                    *s++ = 0;
-            } else {
-                s += strcspn(s, " \t\r\n");
-                if (*s)
-                    *s++ = 0;
-            }
-            av[ac++] = t;
-            while (isspace(*s))
-                s++;
-        }
-    }
+	dir = strtok(buf, " \t\r\n");
+	s = strtok(NULL, "");
+	if (s) {
+		while (isspace(*s))
+			s++;
+		while (*s) {
+			if (ac >= MAXPARAMS) {
+				error(linenum, "Warning: too many parameters (%d max)",
+					  MAXPARAMS);
+				break;
+			}
+			t = s;
+			if (*s == '"') {
+				t++;
+				s++;
+				while (*s && *s != '"') {
+					if (*s == '\\' && s[1] != 0)
+						s++;
+					s++;
+				}
+				if (!*s)
+					error(linenum,
+						  "Warning: unterminated double-quoted string");
+				else
+					*s++ = 0;
+			} else {
+				s += strcspn(s, " \t\r\n");
+				if (*s)
+					*s++ = 0;
+			}
+			av[ac++] = t;
+			while (isspace(*s))
+				s++;
+		}
+	}
 
-    if (!dir)
-        return 1;
+	if (!dir)
+		return 1;
 
-    for (n = 0; n < lenof(directives); n++) {
-        Directive *d = &directives[n];
-        retval = parse_directive(d, dir, ac, av, linenum, reload, s);
-        if (!retval) {
-            break;
-        }
-    }
+	for (n = 0; n < lenof(directives); n++) {
+		Directive *d = &directives[n];
+		retval = parse_directive(d, dir, ac, av, linenum, reload, s);
+		if (!retval) {
+			break;
+		}
+	}
 
-    return retval;
+	return retval;
 }
 
 
 /*************************************************************************/
 
 #define CHECK(v) do {			\
-    if (!v) {				\
+	if (!v) {				\
 	error(0, #v " missing");	\
 	retval = 0;			\
-    }					\
+	}					\
 } while (0)
 
 #define CHEK2(v,n) do {			\
-    if (!v) {				\
+	if (!v) {				\
 	error(0, #n " missing");	\
 	retval = 0;			\
-    }					\
+	}					\
 } while (0)
 
 /* Read the entire configuration file.  If an error occurs while reading
@@ -1615,95 +1615,95 @@ int parse(char *buf, int linenum, int reload)
 
 int read_config(int reload)
 {
-    FILE *config;
-    int linenum = 0, retval = 1;
-    char buf[1024], *s;
-    int defconCount = 0;
+	FILE *config;
+	int linenum = 0, retval = 1;
+	char buf[1024], *s;
+	int defconCount = 0;
 
-    if (reload) {
-        unsigned int i, n;
+	if (reload) {
+		unsigned int i, n;
 
-        /* Reset all the reloadable settings */
+		/* Reset all the reloadable settings */
 
-        for (n = 0; n < lenof(directives); n++) {
-            Directive *d = &directives[n];
+		for (n = 0; n < lenof(directives); n++) {
+			Directive *d = &directives[n];
 
-            for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE;
-                 i++) {
-                if (!(d->params[i].flags & PARAM_RELOAD))
-                    continue;
+			for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE;
+				 i++) {
+				if (!(d->params[i].flags & PARAM_RELOAD))
+					continue;
 
-                if (d->params[i].type == PARAM_SET
-                    || d->params[i].type == PARAM_INT
-                    || d->params[i].type == PARAM_POSINT
-                    || d->params[i].type == PARAM_TIME) {
-                    *(int *) d->params[i].ptr = 0;
-                } else if (d->params[i].type == PARAM_STRING) {
-                    if (*(char **) d->params[i].ptr)
-                        free(*(char **) d->params[i].ptr);
-                    (*(char **) d->params[i].ptr) = NULL;
-                }
-            }
-        }
-    }
+				if (d->params[i].type == PARAM_SET
+					|| d->params[i].type == PARAM_INT
+					|| d->params[i].type == PARAM_POSINT
+					|| d->params[i].type == PARAM_TIME) {
+					*(int *) d->params[i].ptr = 0;
+				} else if (d->params[i].type == PARAM_STRING) {
+					if (*(char **) d->params[i].ptr)
+						free(*(char **) d->params[i].ptr);
+					(*(char **) d->params[i].ptr) = NULL;
+				}
+			}
+		}
+	}
 
 	retval = serverConfig.Read(reload);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
-    config = fopen(SERVICES_CONF, "r");
-    if (!config) {
-        log_perror("Can't open " SERVICES_CONF);
-        if (!nofork && isatty(2)) {
-            if (!reload)
-                perror("Can't open " SERVICES_CONF);
-            else
-                alog("Can't open %s", SERVICES_CONF);
-        }
-        return 0;
-    }
-    while (fgets(buf, sizeof(buf), config)) {
-        linenum++;
-        if (*buf == '#' || *buf == '\r' || *buf == '\n')
-            continue;
-        if (!parse(buf, linenum, reload))
-            retval = 0;
-    }
-    fclose(config);
+	config = fopen(SERVICES_CONF, "r");
+	if (!config) {
+		log_perror("Can't open " SERVICES_CONF);
+		if (!nofork && isatty(2)) {
+			if (!reload)
+				perror("Can't open " SERVICES_CONF);
+			else
+				alog("Can't open %s", SERVICES_CONF);
+		}
+		return 0;
+	}
+	while (fgets(buf, sizeof(buf), config)) {
+		linenum++;
+		if (*buf == '#' || *buf == '\r' || *buf == '\n')
+			continue;
+		if (!parse(buf, linenum, reload))
+			retval = 0;
+	}
+	fclose(config);
 
-    if (!reload) {
-        if (RemoteServer3)
-            CHECK(RemoteServer2);
+	if (!reload) {
+		if (RemoteServer3)
+			CHECK(RemoteServer2);
 
-        if (LocalHost && RemoteServer) {
-            if ((!stricmp(LocalHost, RemoteServer))
-                && LocalPort == RemotePort) {
-                printf
-                    ("\n*** LocalAddress and RemoteServer are set to use the same IP address\n"
-                     "*** (%s) and port (%d). This would have resulted in errors.\n"
-                     "*** Change the LocalAddress to bind to another port.\n",
-                     RemoteServer, LocalPort);
-                retval = 0;
-            }
-        }
-    }
+		if (LocalHost && RemoteServer) {
+			if ((!stricmp(LocalHost, RemoteServer))
+				&& LocalPort == RemotePort) {
+				printf
+					("\n*** LocalAddress and RemoteServer are set to use the same IP address\n"
+					 "*** (%s) and port (%d). This would have resulted in errors.\n"
+					 "*** Change the LocalAddress to bind to another port.\n",
+					 RemoteServer, LocalPort);
+				retval = 0;
+			}
+		}
+	}
 
-    CHECK(EncModule);
+	CHECK(EncModule);
 
-    CHECK(UpdateTimeout);
-    CHECK(ExpireTimeout);
-    CHECK(ReadTimeout);
-    CHECK(WarningTimeout);
-    CHECK(TimeoutCheck);
+	CHECK(UpdateTimeout);
+	CHECK(ExpireTimeout);
+	CHECK(ReadTimeout);
+	CHECK(WarningTimeout);
+	CHECK(TimeoutCheck);
 
-    if (temp_nsuserhost) {
-        if (!(s = strchr(temp_nsuserhost, '@'))) {
-            NSEnforcerUser = temp_nsuserhost;
-            NSEnforcerHost = ServiceHost;
-        } else {
-            *s++ = 0;
-            NSEnforcerUser = temp_nsuserhost;
-            NSEnforcerHost = s;
-        }
-    }
+	if (temp_nsuserhost) {
+		if (!(s = strchr(temp_nsuserhost, '@'))) {
+			NSEnforcerUser = temp_nsuserhost;
+			NSEnforcerHost = ServiceHost;
+		} else {
+			*s++ = 0;
+			NSEnforcerUser = temp_nsuserhost;
+			NSEnforcerHost = s;
+		}
+	}
 
 	NSDefFlags = 0;
 	if (NSDefaults.empty()) NSDefFlags = NI_SECURE | NI_MEMO_SIGNON | NI_MEMO_RECEIVE;
@@ -1730,30 +1730,30 @@ int read_config(int reload)
 		if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
 	}
 
-    if (!NewsCount) {
-        NewsCount = 3;
-    }
+	if (!NewsCount) {
+		NewsCount = 3;
+	}
 
-    if (reload) {
-        if ((NSDefLanguage = langlist[NSDefLanguage]) < 0)
-            NSDefLanguage = DEF_LANGUAGE;
-    }
+	if (reload) {
+		if ((NSDefLanguage = langlist[NSDefLanguage]) < 0)
+			NSDefLanguage = DEF_LANGUAGE;
+	}
 
-    if (CSDefBantype < 0 || CSDefBantype > 3) {
-        error(0, "Value of CSDefBantype must be between 0 and 3 included");
-        retval = 0;
-    }
+	if (CSDefBantype < 0 || CSDefBantype > 3) {
+		error(0, "Value of CSDefBantype must be between 0 and 3 included");
+		retval = 0;
+	}
 
-    if (!MysqlRetries || !MysqlRetryGap) {
-        MysqlRetries = 5;
-        MysqlRetryGap = 1;
-    } else if (((MysqlRetries * MysqlRetryGap) > 60)
-               || ((MysqlRetries * MysqlRetryGap) < 1)) {
-        error(0,
-              "MysqlRetries * MysqlRetryGap must be between 1 and 60, using standard values.");
-        MysqlRetries = 5;
-        MysqlRetryGap = 1;
-    }
+	if (!MysqlRetries || !MysqlRetryGap) {
+		MysqlRetries = 5;
+		MysqlRetryGap = 1;
+	} else if (((MysqlRetries * MysqlRetryGap) > 60)
+			   || ((MysqlRetries * MysqlRetryGap) < 1)) {
+		error(0,
+			  "MysqlRetries * MysqlRetryGap must be between 1 and 60, using standard values.");
+		MysqlRetries = 5;
+		MysqlRetryGap = 1;
+	}
 
 	CSDefFlags = 0;
 	if (CSDefaults.empty()) CSDefFlags = CI_KEEPTOPIC | CI_SECURE | CI_SECUREFOUNDER | CI_SIGNKICK;
@@ -1821,101 +1821,101 @@ int read_config(int reload)
 		}
 	}
 
-    /* Services Root building */
+	/* Services Root building */
 
-    if (ServicesRoot && !reload) {      /* Check to prevent segmentation fault if it's missing */
-        RootNumber = 0;
+	if (ServicesRoot && !reload) {	  /* Check to prevent segmentation fault if it's missing */
+		RootNumber = 0;
 
-        s = strtok(ServicesRoot, " ");
-        do {
-            if (s) {
-                RootNumber++;
-                ServicesRoots =
-                    (char **)realloc(ServicesRoots, sizeof(char *) * RootNumber);
-                ServicesRoots[RootNumber - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
+		s = strtok(ServicesRoot, " ");
+		do {
+			if (s) {
+				RootNumber++;
+				ServicesRoots =
+					(char **)realloc(ServicesRoots, sizeof(char *) * RootNumber);
+				ServicesRoots[RootNumber - 1] = sstrdup(s);
+			}
+		} while ((s = strtok(NULL, " ")));
+	}
 
-    if (!RootNumber) {
-        error(0, "No ServicesRoot defined");
-        retval = 0;
-    }
+	if (!RootNumber) {
+		error(0, "No ServicesRoot defined");
+		retval = 0;
+	}
 
-    /* Ulines */
+	/* Ulines */
 
-    if (UlineServers) {
-        NumUlines = 0;
+	if (UlineServers) {
+		NumUlines = 0;
 
-        s = strtok(UlineServers, " ");
-        do {
-            if (s) {
-                NumUlines++;
-                Ulines = (char **)realloc(Ulines, sizeof(char *) * NumUlines);
-                Ulines[NumUlines - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
+		s = strtok(UlineServers, " ");
+		do {
+			if (s) {
+				NumUlines++;
+				Ulines = (char **)realloc(Ulines, sizeof(char *) * NumUlines);
+				Ulines[NumUlines - 1] = sstrdup(s);
+			}
+		} while ((s = strtok(NULL, " ")));
+	}
 
-    /* Host Setters building... :P */
-    HostSetters = buildStringList(HostSetter, &HostNumber);
+	/* Host Setters building... :P */
+	HostSetters = buildStringList(HostSetter, &HostNumber);
 
-    /* Modules Autoload building... :P */
-    ModulesAutoload = buildStringList(Modules, &ModulesNumber);
-    HostServCoreModules =
-        buildStringList(HostCoreModules, &HostServCoreNumber);
-    MemoServCoreModules =
-        buildStringList(MemoCoreModules, &MemoServCoreNumber);
-    HelpServCoreModules =
-        buildStringList(HelpCoreModules, &HelpServCoreNumber);
+	/* Modules Autoload building... :P */
+	ModulesAutoload = buildStringList(Modules, &ModulesNumber);
+	HostServCoreModules =
+		buildStringList(HostCoreModules, &HostServCoreNumber);
+	MemoServCoreModules =
+		buildStringList(MemoCoreModules, &MemoServCoreNumber);
+	HelpServCoreModules =
+		buildStringList(HelpCoreModules, &HelpServCoreNumber);
 
-    BotServCoreModules =
-        buildStringList(BotCoreModules, &BotServCoreNumber);
+	BotServCoreModules =
+		buildStringList(BotCoreModules, &BotServCoreNumber);
 
-    OperServCoreModules =
-        buildStringList(OperCoreModules, &OperServCoreNumber);
+	OperServCoreModules =
+		buildStringList(OperCoreModules, &OperServCoreNumber);
 
-    ChanServCoreModules =
-        buildStringList(ChanCoreModules, &ChanServCoreNumber);
+	ChanServCoreModules =
+		buildStringList(ChanCoreModules, &ChanServCoreNumber);
 
-    NickServCoreModules =
-        buildStringList(NickCoreModules, &NickServCoreNumber);
+	NickServCoreModules =
+		buildStringList(NickCoreModules, &NickServCoreNumber);
 
 
-    if (LimitSessions) {
-        if (MaxSessionKill && !SessionAutoKillExpiry)
-            SessionAutoKillExpiry = 1800;    /* 30 minutes */
-    }
+	if (LimitSessions) {
+		if (MaxSessionKill && !SessionAutoKillExpiry)
+			SessionAutoKillExpiry = 1800;	/* 30 minutes */
+	}
 
-    if (s_BotServ) {
-        if (!BSFantasyCharacter || !*BSFantasyCharacter)
-            BSFantasyCharacter = sstrdup("!");
-        if (*BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
-            printf
-                ("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
-                 "*** character ('%c') will be used. The others will be ignored.\n",
-                 *BSFantasyCharacter);
-        }
-    }
+	if (s_BotServ) {
+		if (!BSFantasyCharacter || !*BSFantasyCharacter)
+			BSFantasyCharacter = sstrdup("!");
+		if (*BSFantasyCharacter && (strlen(BSFantasyCharacter) > 1)) {
+			printf
+				("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
+				 "*** character ('%c') will be used. The others will be ignored.\n",
+				 *BSFantasyCharacter);
+		}
+	}
 
-    if (GlobalOnCycle) {
-        if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
-            alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
-            GlobalOnCycle = 0;
-        }
-    }
+	if (GlobalOnCycle) {
+		if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
+			alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
+			GlobalOnCycle = 0;
+		}
+	}
 
-    /* Check the user keys */
-    if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
-        || (UserKey3 == UserKey2))
-        alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
+	/* Check the user keys */
+	if ((UserKey1 == UserKey2) || (UserKey1 == UserKey3)
+		|| (UserKey3 == UserKey2))
+		alog("Every UserKey must be different. It's for YOUR safety! Remember that!");
 
-    /**
-     * Check all DEFCON dependiencies...
-     **/
-    if (DefConLevel) {
-        /* Build DefCon's */
-        DefCon[0] = 0;
+	/**
+	 * Check all DEFCON dependiencies...
+	 **/
+	if (DefConLevel) {
+		/* Build DefCon's */
+		DefCon[0] = 0;
 		for (int level = 1; level < 5; ++level) {
 			DefCon[level] = 0;
 			std::string *levelDefinition = NULL;
@@ -1947,39 +1947,39 @@ int read_config(int reload)
 				else if (operation == "nonewmemos") DefCon[level] |= DEFCON_NO_NEW_MEMOS;
 			}
 		}
-        DefCon[5] = 0; /* DefCon level 5 is always normal operation */
-        for (defconCount = 1; defconCount <= 5; defconCount++) {        /* Check any defcon needed settings */
-            if (DefCon[defconCount] & DEFCON_REDUCE_SESSION) {
-                CHECK(DefConSessionLimit);
-            }
-            if (DefCon[defconCount] & DEFCON_AKILL_NEW_CLIENTS) {
-                CHECK(DefConAKILL);
-                CHECK(DefConAkillReason);
-            }
-            if (DefCon[defconCount] & DEFCON_FORCE_CHAN_MODES) {
-                CHECK(DefConChanModes);
-            }
-        }
-    }
+		DefCon[5] = 0; /* DefCon level 5 is always normal operation */
+		for (defconCount = 1; defconCount <= 5; defconCount++) {		/* Check any defcon needed settings */
+			if (DefCon[defconCount] & DEFCON_REDUCE_SESSION) {
+				CHECK(DefConSessionLimit);
+			}
+			if (DefCon[defconCount] & DEFCON_AKILL_NEW_CLIENTS) {
+				CHECK(DefConAKILL);
+				CHECK(DefConAkillReason);
+			}
+			if (DefCon[defconCount] & DEFCON_FORCE_CHAN_MODES) {
+				CHECK(DefConChanModes);
+			}
+		}
+	}
 
-    /**
-     * If they try to enable any email registration option,
-     * make sure they have everything else they need too...
-     *
-     * rob
-     **/
-    if (!NSEmailReg) {
+	/**
+	 * If they try to enable any email registration option,
+	 * make sure they have everything else they need too...
+	 *
+	 * rob
+	 **/
+	if (!NSEmailReg) {
 		delete [] PreNickDBName;
-        PreNickDBName = NULL;
-        NSRExpire = 0;
-    }
+		PreNickDBName = NULL;
+		NSRExpire = 0;
+	}
 
-    if (!retval) {
-        printf
-            ("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");
-    }
+	if (!retval) {
+		printf
+			("\n*** Support resources: Read through the services.conf self-contained \n*** documentation. Read the documentation files found in the 'docs' \n*** folder. Visit our portal located at http://www.anope.org/. Join \n*** our support channel on /server irc.anope.org channel #anope.\n\n");
+	}
 
-    return retval;
+	return retval;
 }
 
 

@@ -49,9 +49,9 @@ class OSDEFCON : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_DEFCON);
+	}
 }
 
 /**
@@ -66,52 +66,52 @@ void myOperServHelp(User * u)
  **/
 int do_defcon(User * u)
 {
-    char *lvl = strtok(NULL, " ");
-    int newLevel = 0;
-    char *langglobal;
-    langglobal = getstring(NULL, DEFCON_GLOBAL);
+	char *lvl = strtok(NULL, " ");
+	int newLevel = 0;
+	char *langglobal;
+	langglobal = getstring(NULL, DEFCON_GLOBAL);
 
-    if (!DefConLevel) {         /* If we dont have a .conf setting! */
-        notice_lang(s_OperServ, u, OPER_DEFCON_NO_CONF);
-        return MOD_CONT;
-    }
+	if (!DefConLevel) {		 /* If we dont have a .conf setting! */
+		notice_lang(s_OperServ, u, OPER_DEFCON_NO_CONF);
+		return MOD_CONT;
+	}
 
-    if (!lvl) {
-        notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
-        defcon_sendlvls(u);
-        return MOD_CONT;
-    }
-    newLevel = atoi(lvl);
-    if (newLevel < 1 || newLevel > 5) {
-        notice_lang(s_OperServ, u, OPER_DEFCON_SYNTAX);
-        return MOD_CONT;
-    }
-    DefConLevel = newLevel;
-    send_event(EVENT_DEFCON_LEVEL, 1, lvl);
-    DefContimer = time(NULL);
-    notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
-    defcon_sendlvls(u);
-    alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
-    ircdproto->SendGlobops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
-                     u->nick, newLevel);
-    /* Global notice the user what is happening. Also any Message that
-       the Admin would like to add. Set in config file. */
-    if (GlobalOnDefcon) {
-        if ((DefConLevel == 5) && (DefConOffMessage)) {
-            oper_global(NULL, "%s", DefConOffMessage);
-        } else {
-            oper_global(NULL, langglobal, DefConLevel);
-        }
-    }
-    if (GlobalOnDefconMore) {
-        if ((DefConOffMessage) && DefConLevel == 5) {
-        } else {
-            oper_global(NULL, "%s", DefconMessage);
-        }
-    }
-    /* Run any defcon functions, e.g. FORCE CHAN MODE */
-    runDefCon();
-    return MOD_CONT;
+	if (!lvl) {
+		notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
+		defcon_sendlvls(u);
+		return MOD_CONT;
+	}
+	newLevel = atoi(lvl);
+	if (newLevel < 1 || newLevel > 5) {
+		notice_lang(s_OperServ, u, OPER_DEFCON_SYNTAX);
+		return MOD_CONT;
+	}
+	DefConLevel = newLevel;
+	send_event(EVENT_DEFCON_LEVEL, 1, lvl);
+	DefContimer = time(NULL);
+	notice_lang(s_OperServ, u, OPER_DEFCON_CHANGED, DefConLevel);
+	defcon_sendlvls(u);
+	alog("Defcon level changed to %d by Oper %s", newLevel, u->nick);
+	ircdproto->SendGlobops(s_OperServ, getstring2(NULL, OPER_DEFCON_WALL),
+					 u->nick, newLevel);
+	/* Global notice the user what is happening. Also any Message that
+	   the Admin would like to add. Set in config file. */
+	if (GlobalOnDefcon) {
+		if ((DefConLevel == 5) && (DefConOffMessage)) {
+			oper_global(NULL, "%s", DefConOffMessage);
+		} else {
+			oper_global(NULL, langglobal, DefConLevel);
+		}
+	}
+	if (GlobalOnDefconMore) {
+		if ((DefConOffMessage) && DefConLevel == 5) {
+		} else {
+			oper_global(NULL, "%s", DefconMessage);
+		}
+	}
+	/* Run any defcon functions, e.g. FORCE CHAN MODE */
+	runDefCon();
+	return MOD_CONT;
 }
 
 
@@ -121,38 +121,38 @@ int do_defcon(User * u)
  **/
 void defcon_sendlvls(User * u)
 {
-    if (checkDefCon(DEFCON_NO_NEW_CHANNELS)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
-    }
-    if (checkDefCon(DEFCON_NO_NEW_NICKS)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_NICKS);
-    }
-    if (checkDefCon(DEFCON_NO_MLOCK_CHANGE)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
-    }
-    if (checkDefCon(DEFCON_FORCE_CHAN_MODES) && (DefConChanModes)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_FORCE_CHAN_MODES,
-                    DefConChanModes);
-    }
-    if (checkDefCon(DEFCON_REDUCE_SESSION)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_REDUCE_SESSION,
-                    DefConSessionLimit);
-    }
-    if (checkDefCon(DEFCON_NO_NEW_CLIENTS)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
-    }
-    if (checkDefCon(DEFCON_OPER_ONLY)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_OPER_ONLY);
-    }
-    if (checkDefCon(DEFCON_SILENT_OPER_ONLY)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
-    }
-    if (checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
-    }
-    if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
-        notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
-    }
+	if (checkDefCon(DEFCON_NO_NEW_CHANNELS)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CHANNELS);
+	}
+	if (checkDefCon(DEFCON_NO_NEW_NICKS)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_NICKS);
+	}
+	if (checkDefCon(DEFCON_NO_MLOCK_CHANGE)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_MLOCK_CHANGE);
+	}
+	if (checkDefCon(DEFCON_FORCE_CHAN_MODES) && (DefConChanModes)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_FORCE_CHAN_MODES,
+					DefConChanModes);
+	}
+	if (checkDefCon(DEFCON_REDUCE_SESSION)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_REDUCE_SESSION,
+					DefConSessionLimit);
+	}
+	if (checkDefCon(DEFCON_NO_NEW_CLIENTS)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_CLIENTS);
+	}
+	if (checkDefCon(DEFCON_OPER_ONLY)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_OPER_ONLY);
+	}
+	if (checkDefCon(DEFCON_SILENT_OPER_ONLY)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_SILENT_OPER_ONLY);
+	}
+	if (checkDefCon(DEFCON_AKILL_NEW_CLIENTS)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_AKILL_NEW_CLIENTS);
+	}
+	if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
+		notice_lang(s_OperServ, u, OPER_HELP_DEFCON_NO_NEW_MEMOS);
+	}
 }
 
 MODULE_INIT("os_defcon", OSDEFCON)

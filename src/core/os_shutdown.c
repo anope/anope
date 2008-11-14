@@ -43,9 +43,9 @@ class OSShutdown : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_SHUTDOWN);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_SHUTDOWN);
+	}
 }
 
 /**
@@ -55,18 +55,18 @@ void myOperServHelp(User * u)
  **/
 int do_shutdown(User * u)
 {
-    quitmsg = (char *)calloc(32 + strlen(u->nick), 1);
-    if (!quitmsg)
-        quitmsg = "SHUTDOWN command received, but out of memory!";
-    else
-        sprintf((char *)quitmsg, /* XXX */ "SHUTDOWN command received from %s", u->nick);
+	quitmsg = (char *)calloc(32 + strlen(u->nick), 1);
+	if (!quitmsg)
+		quitmsg = "SHUTDOWN command received, but out of memory!";
+	else
+		sprintf((char *)quitmsg, /* XXX */ "SHUTDOWN command received from %s", u->nick);
 
-    if (GlobalOnCycle) {
-        oper_global(NULL, "%s", GlobalOnCycleMessage);
-    }
-    save_data = 1;
-    delayed_quit = 1;
-    return MOD_CONT;
+	if (GlobalOnCycle) {
+		oper_global(NULL, "%s", GlobalOnCycleMessage);
+	}
+	save_data = 1;
+	delayed_quit = 1;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_shutdown", OSShutdown)

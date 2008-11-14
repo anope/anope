@@ -42,7 +42,7 @@ class MSSend : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SEND);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SEND);
 }
 
 /**
@@ -52,11 +52,11 @@ void myMemoServHelp(User * u)
  **/
 int do_send(User * u)
 {
-    char *name = strtok(NULL, " ");
-    char *text = strtok(NULL, "");
-    int z = 0;
-    memo_send(u, name, text, z);
-    return MOD_CONT;
+	char *name = strtok(NULL, " ");
+	char *text = strtok(NULL, "");
+	int z = 0;
+	memo_send(u, name, text, z);
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_send", MSSend)

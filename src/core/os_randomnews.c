@@ -46,9 +46,9 @@ class OSRandomNews : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_RANDOMNEWS);
+	}
 }
 
 MODULE_INIT("os_randomnews", OSRandomNews)

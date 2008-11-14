@@ -44,23 +44,23 @@ class OSRaw : public Module
  **/
 int do_raw(User * u)
 {
-    char *text = strtok(NULL, "");
-    if (!text)
-        syntax_error(s_OperServ, u, "RAW", OPER_RAW_SYNTAX);
-    else {
-        send_cmd(NULL, "%s", text);
-        if (WallOSRaw) {
-            char *kw = strtok(text, " ");
-            while (kw && *kw == ':')
-                kw = strtok(NULL, " ");
-            ircdproto->SendGlobops(s_OperServ,
-                             "\2%s\2 used RAW command for \2%s\2",
-                             u->nick,
-                             (kw ? kw : "\2non RFC compliant message\2"));
-        }
-        alog("%s used RAW command for %s", u->nick, text);
-    }
-    return MOD_CONT;
+	char *text = strtok(NULL, "");
+	if (!text)
+		syntax_error(s_OperServ, u, "RAW", OPER_RAW_SYNTAX);
+	else {
+		send_cmd(NULL, "%s", text);
+		if (WallOSRaw) {
+			char *kw = strtok(text, " ");
+			while (kw && *kw == ':')
+				kw = strtok(NULL, " ");
+			ircdproto->SendGlobops(s_OperServ,
+							 "\2%s\2 used RAW command for \2%s\2",
+							 u->nick,
+							 (kw ? kw : "\2non RFC compliant message\2"));
+		}
+		alog("%s used RAW command for %s", u->nick, text);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_raw", OSRaw)

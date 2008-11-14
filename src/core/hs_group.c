@@ -18,7 +18,7 @@
 int do_group(User * u);
 void myHostServHelp(User * u);
 extern int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
-                      char *creator, time_t time);
+					  char *creator, time_t time);
 
 
 class HSGroup : public Module
@@ -47,7 +47,7 @@ class HSGroup : public Module
  **/
 void myHostServHelp(User * u)
 {
-    notice_lang(s_HostServ, u, HOST_HELP_CMD_GROUP);
+	notice_lang(s_HostServ, u, HOST_HELP_CMD_GROUP);
 }
 
 /**
@@ -57,57 +57,57 @@ void myHostServHelp(User * u)
  **/
 int do_group(User * u)
 {
-    NickAlias *na;
-    HostCore *tmp;
-    char *vHost = NULL;
-    char *vIdent = NULL;
-    char *creator = NULL;
-    HostCore *head = NULL;
-    time_t time;
-    bool found = false;
+	NickAlias *na;
+	HostCore *tmp;
+	char *vHost = NULL;
+	char *vIdent = NULL;
+	char *creator = NULL;
+	HostCore *head = NULL;
+	time_t time;
+	bool found = false;
 
-    head = hostCoreListHead();
+	head = hostCoreListHead();
 
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
+	if ((na = findnick(u->nick))) {
+		if (na->status & NS_IDENTIFIED) {
 
-            tmp = findHostCore(head, u->nick, &found);
-            if (found) {
-                if (tmp == NULL) {
-                    tmp = head; /* incase first in list */
-                } else if (tmp->next) { /* we dont want the previous entry were not inserting! */
-                    tmp = tmp->next;    /* jump to the next */
-                }
+			tmp = findHostCore(head, u->nick, &found);
+			if (found) {
+				if (tmp == NULL) {
+					tmp = head; /* incase first in list */
+				} else if (tmp->next) { /* we dont want the previous entry were not inserting! */
+					tmp = tmp->next;	/* jump to the next */
+				}
 
-                vHost = sstrdup(tmp->vHost);
-                if (tmp->vIdent)
-                    vIdent = sstrdup(tmp->vIdent);
-                creator = sstrdup(tmp->creator);
-                time = tmp->time;
+				vHost = sstrdup(tmp->vHost);
+				if (tmp->vIdent)
+					vIdent = sstrdup(tmp->vIdent);
+				creator = sstrdup(tmp->creator);
+				time = tmp->time;
 
-                do_hs_sync(na->nc, vIdent, vHost, creator, time);
-                if (tmp->vIdent) {
-                    notice_lang(s_HostServ, u, HOST_IDENT_GROUP,
-                                na->nc->display, vIdent, vHost);
-                } else {
-                    notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display,
-                                vHost);
-                }
-                free(vHost);
-                if (vIdent)
-                    free(vIdent);
-                free(creator);
+				do_hs_sync(na->nc, vIdent, vHost, creator, time);
+				if (tmp->vIdent) {
+					notice_lang(s_HostServ, u, HOST_IDENT_GROUP,
+								na->nc->display, vIdent, vHost);
+				} else {
+					notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display,
+								vHost);
+				}
+				free(vHost);
+				if (vIdent)
+					free(vIdent);
+				free(creator);
 
-            } else {
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            }
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
-    }
-    return MOD_CONT;
+			} else {
+				notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			}
+		} else {
+			notice_lang(s_HostServ, u, HOST_ID);
+		}
+	} else {
+		notice_lang(s_HostServ, u, HOST_NOT_REGED);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_group", HSGroup)

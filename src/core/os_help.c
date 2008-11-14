@@ -41,16 +41,16 @@ class OSHelp : public Module
  **/
 int do_help(User * u)
 {
-    const char *cmd = strtok(NULL, "");
+	const char *cmd = strtok(NULL, "");
 
-    if (!cmd) {
-        notice_help(s_OperServ, u, OPER_HELP);
-        moduleDisplayHelp(5, u);
-        notice_help(s_OperServ, u, OPER_HELP_LOGGED);
-    } else {
-        mod_help_cmd(s_OperServ, u, OPERSERV, cmd);
-    }
-    return MOD_CONT;
+	if (!cmd) {
+		notice_help(s_OperServ, u, OPER_HELP);
+		moduleDisplayHelp(5, u);
+		notice_help(s_OperServ, u, OPER_HELP_LOGGED);
+	} else {
+		mod_help_cmd(s_OperServ, u, OPERSERV, cmd);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_help", OSHelp)

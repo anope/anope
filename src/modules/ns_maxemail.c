@@ -1,5 +1,5 @@
 /* ns_maxemail.c - Limit the amount of times an email address
- *                 can be used for a NickServ account.
+ *				 can be used for a NickServ account.
  * 
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
@@ -108,104 +108,104 @@ class NSMaxEmail : public Module
 
 int count_email_in_use(char *email, User * u)
 {
-    NickCore *nc;
-    int i;
-    int count = 0;
+	NickCore *nc;
+	int i;
+	int count = 0;
 
-    if (!email)
-        return 0;
+	if (!email)
+		return 0;
 
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            if (!(u->na && u->na->nc && (u->na->nc == nc)) && nc->email && (stricmp(nc->email, email) == 0))
-                count++;
-        }
-    }
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			if (!(u->na && u->na->nc && (u->na->nc == nc)) && nc->email && (stricmp(nc->email, email) == 0))
+				count++;
+		}
+	}
 
-    return count;
+	return count;
 }
 
 int check_email_limit_reached(char *email, User * u)
 {
-    if ((NSEmailMax < 1) || !email || is_services_admin(u))
-        return MOD_CONT;
+	if ((NSEmailMax < 1) || !email || is_services_admin(u))
+		return MOD_CONT;
 
-    if (count_email_in_use(email, u) < NSEmailMax)
-        return MOD_CONT;
+	if (count_email_in_use(email, u) < NSEmailMax)
+		return MOD_CONT;
 
-    if (NSEmailMax == 1)
-        moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
-    else
-        moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED,
-                         NSEmailMax);
+	if (NSEmailMax == 1)
+		moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED_ONE);
+	else
+		moduleNoticeLang(s_NickServ, u, LNG_NSEMAILMAX_REACHED,
+						 NSEmailMax);
 
-    return MOD_STOP;
+	return MOD_STOP;
 }
 
 int my_ns_register(User * u)
 {
-    char *cur_buffer;
-    char *email;
-    int ret;
+	char *cur_buffer;
+	char *email;
+	int ret;
 
-    cur_buffer = moduleGetLastBuffer();
-    email = myStrGetToken(cur_buffer, ' ', 1);
+	cur_buffer = moduleGetLastBuffer();
+	email = myStrGetToken(cur_buffer, ' ', 1);
 	if (!email)
 		return MOD_CONT;
 
-    ret = check_email_limit_reached(email, u);
-    free(email);
+	ret = check_email_limit_reached(email, u);
+	free(email);
 
-    return ret;
+	return ret;
 }
 
 int my_ns_set(User * u)
 {
-    char *cur_buffer;
-    char *set;
-    char *email;
-    int ret;
+	char *cur_buffer;
+	char *set;
+	char *email;
+	int ret;
 
-    cur_buffer = moduleGetLastBuffer();
-    set = myStrGetToken(cur_buffer, ' ', 0);
+	cur_buffer = moduleGetLastBuffer();
+	set = myStrGetToken(cur_buffer, ' ', 0);
 	
 	if (!set)
 		return MOD_CONT;
 	
-    if (stricmp(set, "email") != 0) {
-        free(set);
-        return MOD_CONT;
-    }
+	if (stricmp(set, "email") != 0) {
+		free(set);
+		return MOD_CONT;
+	}
 
-    free(set);
-    email = myStrGetToken(cur_buffer, ' ', 1);
+	free(set);
+	email = myStrGetToken(cur_buffer, ' ', 1);
 	if (!email)
 		return MOD_CONT;
 
-    ret = check_email_limit_reached(email, u);
-    free(email);
+	ret = check_email_limit_reached(email, u);
+	free(email);
 
-    return ret;
+	return ret;
 }
 
 int my_event_reload(int argc, char **argv)
 {
-    if ((argc > 0) && (stricmp(argv[0], EVENT_START) == 0))
-        my_load_config();
+	if ((argc > 0) && (stricmp(argv[0], EVENT_START) == 0))
+		my_load_config();
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void my_load_config(void)
 {
-    Directive confvalues[] = {
-        {"NSEmailMax", {{PARAM_INT, PARAM_RELOAD, &NSEmailMax}}}
-    };
+	Directive confvalues[] = {
+		{"NSEmailMax", {{PARAM_INT, PARAM_RELOAD, &NSEmailMax}}}
+	};
 
-    moduleGetConfigDirective(confvalues);
+	moduleGetConfigDirective(confvalues);
 
-    if (debug)
-        alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
+	if (debug)
+		alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);
 }
 
 

@@ -21,11 +21,11 @@
 /* Definitions for timeouts: */
 typedef struct timeout_ Timeout;
 struct timeout_ {
-    Timeout *next, *prev;
-    time_t settime, timeout;
-    int repeat;			/* Does this timeout repeat indefinitely? */
-    void (*code)(Timeout *);	/* This structure is passed to the code */
-    void *data;			/* Can be anything */
+	Timeout *next, *prev;
+	time_t settime, timeout;
+	int repeat;			/* Does this timeout repeat indefinitely? */
+	void (*code)(Timeout *);	/* This structure is passed to the code */
+	void *data;			/* Can be anything */
 };
 
 

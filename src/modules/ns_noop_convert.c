@@ -27,14 +27,14 @@
 /* Multi-language stuff */
 #define LANG_NUM_STRINGS  8
 
-#define AUTOOP_SYNTAX     0
+#define AUTOOP_SYNTAX	 0
 #define AUTOOP_STATUS_ON  1
 #define AUTOOP_STATUS_OFF 2
-#define AUTOOP_NO_NICK    3
-#define AUTOOP_ON         4
-#define AUTOOP_OFF        5
-#define AUTOOP_DESC       6
-#define AUTOOP_HELP       7
+#define AUTOOP_NO_NICK	3
+#define AUTOOP_ON		 4
+#define AUTOOP_OFF		5
+#define AUTOOP_DESC	   6
+#define AUTOOP_HELP	   7
 
 /*************************************************************************/
 
@@ -94,34 +94,34 @@ class NSNOOPConvert : public Module
  **/
 int mLoadData(void)
 {
-    int ret = 0;
-    int len = 0;
+	int ret = 0;
+	int len = 0;
 
-    char *name = NULL;
+	char *name = NULL;
 
-    NickAlias *na = NULL;
-    FILE *in;
+	NickAlias *na = NULL;
+	FILE *in;
 
-    /* will _never_ be this big thanks to the 512 limit of a message */
-    char buffer[2000];
-    if ((in = fopen(NSAutoOPDBName, "r")) == NULL) {
-        alog("ns_noop: WARNING: Can not open database file! (it might not exist, this is not fatal)");
-        ret = 1;
-    } else {
-        while (fgets(buffer, 1500, in)) {
-            name = myStrGetToken(buffer, ' ', 0);
-            if (name) {
-                len = strlen(name);
-                /* Take the \n from the end of the line */
-                name[len - 1] = '\0';
-                if ((na = findnick(name))) {
-	    	    na->nc->flags |= NI_AUTOOP;
-                }
-                free(name);
-            }
-        }
-    }
-    return ret;
+	/* will _never_ be this big thanks to the 512 limit of a message */
+	char buffer[2000];
+	if ((in = fopen(NSAutoOPDBName, "r")) == NULL) {
+		alog("ns_noop: WARNING: Can not open database file! (it might not exist, this is not fatal)");
+		ret = 1;
+	} else {
+		while (fgets(buffer, 1500, in)) {
+			name = myStrGetToken(buffer, ' ', 0);
+			if (name) {
+				len = strlen(name);
+				/* Take the \n from the end of the line */
+				name[len - 1] = '\0';
+				if ((na = findnick(name))) {
+				na->nc->flags |= NI_AUTOOP;
+				}
+				free(name);
+			}
+		}
+	}
+	return ret;
 }
 
 /*************************************************************************/
@@ -132,33 +132,33 @@ int mLoadData(void)
  **/
 int mLoadConfig(int argc, char **argv)
 {
-    char *tmp = NULL;
+	char *tmp = NULL;
 
-    Directive d[] = {
-        {"NSAutoOPDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
-    };
+	Directive d[] = {
+		{"NSAutoOPDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
+	};
 
-    moduleGetConfigDirective(d);
+	moduleGetConfigDirective(d);
 
-    if (NSAutoOPDBName)
-        free(NSAutoOPDBName);
+	if (NSAutoOPDBName)
+		free(NSAutoOPDBName);
 
-    if (tmp) {
-        NSAutoOPDBName = tmp;
-    } else {
-        NSAutoOPDBName = sstrdup(DEFAULT_DB_NAME);
-        alog("ns_noop: NSAutoOPDBName is not defined in Services configuration file, using default %s", NSAutoOPDBName);
-    }
+	if (tmp) {
+		NSAutoOPDBName = tmp;
+	} else {
+		NSAutoOPDBName = sstrdup(DEFAULT_DB_NAME);
+		alog("ns_noop: NSAutoOPDBName is not defined in Services configuration file, using default %s", NSAutoOPDBName);
+	}
 
-    if (!NSAutoOPDBName) {
-        alog("ns_noop: FATAL: Can't read required configuration directives!");
-        return MOD_STOP;
-    } else {
-        alog("ns_noop: Directive NSAutoOPDBName loaded (%s)...",
-             NSAutoOPDBName);
-    }
+	if (!NSAutoOPDBName) {
+		alog("ns_noop: FATAL: Can't read required configuration directives!");
+		return MOD_STOP;
+	} else {
+		alog("ns_noop: Directive NSAutoOPDBName loaded (%s)...",
+			 NSAutoOPDBName);
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 /*************************************************************************/

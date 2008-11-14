@@ -19,39 +19,39 @@
 #if !HAVE_STRICMP && !HAVE_STRCASECMP
 
 /* stricmp, strnicmp:  Case-insensitive versions of strcmp() and
- *                     strncmp().
+ *					 strncmp().
  */
 
 int stricmp(const char *s1, const char *s2)
 {
-    register int c;
+	register int c;
 
-    while ((c = tolower(*s1)) == tolower(*s2)) {
-        if (c == 0)
-            return 0;
-        s1++;
-        s2++;
-    }
-    if (c < tolower(*s2))
-        return -1;
-    return 1;
+	while ((c = tolower(*s1)) == tolower(*s2)) {
+		if (c == 0)
+			return 0;
+		s1++;
+		s2++;
+	}
+	if (c < tolower(*s2))
+		return -1;
+	return 1;
 }
 
 int strnicmp(const char *s1, const char *s2, size_t len)
 {
-    register int c;
+	register int c;
 
-    if (!len)
-        return 0;
-    while ((c = tolower(*s1)) == tolower(*s2) && len > 0) {
-        if (c == 0 || --len == 0)
-            return 0;
-        s1++;
-        s2++;
-    }
-    if (c < tolower(*s2))
-        return -1;
-    return 1;
+	if (!len)
+		return 0;
+	while ((c = tolower(*s1)) == tolower(*s2) && len > 0) {
+		if (c == 0 || --len == 0)
+			return 0;
+		s1++;
+		s2++;
+	}
+	if (c < tolower(*s2))
+		return -1;
+	return 1;
 }
 #endif
 

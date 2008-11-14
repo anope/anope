@@ -33,11 +33,11 @@ int canBanUser(Channel * c, User * u, User * u2);
 
 void mAddLanguages(void);
 
-#define LANG_NUM_STRINGS    4
-#define TBAN_HELP           0
-#define TBAN_SYNTAX         1
-#define TBAN_HELP_DETAIL    2
-#define TBAN_RESPONSE       3
+#define LANG_NUM_STRINGS	4
+#define TBAN_HELP		   0
+#define TBAN_SYNTAX		 1
+#define TBAN_HELP_DETAIL	2
+#define TBAN_RESPONSE	   3
 
 class CSTBan : public Module
 {
@@ -56,7 +56,7 @@ class CSTBan : public Module
 		this->SetType(SUPPORTED);
 
 		const char* langtable_en_us[] = {
-		"    TBAN       Bans the user for a given length of time",
+		"	TBAN	   Bans the user for a given length of time",
 		"Syntax: TBAN channel nick time",
 		"Bans the given user from a channel for a specified length of\n"
 		"time. If the ban is removed before by hand, it will NOT be replaced.",
@@ -64,7 +64,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_nl[] = {
-		"    TBAN       Verban een gebruiker voor een bepaalde tijd",
+		"	TBAN	   Verban een gebruiker voor een bepaalde tijd",
 		"Syntax: TBAN kanaal nick tijd",
 		"Verbant de gegeven gebruiken van het gegeven kanaal voor de\n"
 		"gegeven tijdsduur. Als de verbanning eerder wordt verwijderd,\n"
@@ -73,7 +73,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_de[] = {
-		"    TBAN       Bant ein User fьr eine bestimmte Zeit aus ein Channel",
+		"	TBAN	   Bant ein User fьr eine bestimmte Zeit aus ein Channel",
 		"Syntax: TBAN Channel Nickname Zeit",
 		"Bant ein User fьr eine bestimmte Zeit aus ein Channel\n"
 		"Wenn der Ban manuell entfernt wird, wird es NICHT ersetzt.",
@@ -81,7 +81,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_pt[] = {
-		"    TBAN       Bane o usuбrio por um determinado perнodo de tempo",
+		"	TBAN	   Bane o usuбrio por um determinado perнodo de tempo",
 		"Sintaxe: TBAN canal nick tempo",
 		"Bane de um canal o usuбrio especificado por um determinado perнodo de\n"
 		"tempo. Se o ban for removido manualmente antes do tempo, ele nгo serб recolocado.",
@@ -89,7 +89,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_ru[] = {
-		"    TBAN       Банит пользователя на указанный промежуток времени",
+		"	TBAN	   Банит пользователя на указанный промежуток времени",
 		"Синтаксис: TBAN #канал ник время",
 		"Банит пользователя на указанный промежуток времени в секундах\n"
 		"Примечание: удаленный вручную (до своего истечения) бан НЕ БУДЕТ\n"
@@ -98,7 +98,7 @@ class CSTBan : public Module
 		};
 
 		const char* langtable_it[] = {
-		"    TBAN       Banna l'utente per un periodo di tempo specificato",
+		"	TBAN	   Banna l'utente per un periodo di tempo specificato",
 		"Sintassi: TBAN canale nick tempo",
 		"Banna l'utente specificato da un canale per un periodo di tempo\n"
 		"specificato. Se il ban viene rimosso a mano prima della scadenza, NON verrа rimpiazzato.",
@@ -118,120 +118,120 @@ class CSTBan : public Module
 
 void myHelp(User * u)
 {
-    moduleNoticeLang(s_ChanServ, u, TBAN_HELP);
+	moduleNoticeLang(s_ChanServ, u, TBAN_HELP);
 }
 
 void myFullHelpSyntax(User * u)
 {
-    moduleNoticeLang(s_ChanServ, u, TBAN_SYNTAX);
+	moduleNoticeLang(s_ChanServ, u, TBAN_SYNTAX);
 }
 
 int myFullHelp(User * u)
 {
-    myFullHelpSyntax(u);
-    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-    moduleNoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
-    return MOD_CONT;
+	myFullHelpSyntax(u);
+	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+	moduleNoticeLang(s_ChanServ, u, TBAN_HELP_DETAIL);
+	return MOD_CONT;
 }
 
 void mySendResponse(User * u, char *channel, char *mask, char *time)
 {
-    moduleNoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
+	moduleNoticeLang(s_ChanServ, u, TBAN_RESPONSE, mask, channel, time);
 }
 
 int do_tban(User * u)
 {
-    char mask[BUFSIZE];
-    Channel *c;
-    User *u2 = NULL;
+	char mask[BUFSIZE];
+	Channel *c;
+	User *u2 = NULL;
 
-    char *buffer = moduleGetLastBuffer();
-    char *chan;
-    char *nick;
-    char *time;
+	char *buffer = moduleGetLastBuffer();
+	char *chan;
+	char *nick;
+	char *time;
 
-    chan = myStrGetToken(buffer, ' ', 0);
-    nick = myStrGetToken(buffer, ' ', 1);
-    time = myStrGetToken(buffer, ' ', 2);
+	chan = myStrGetToken(buffer, ' ', 0);
+	nick = myStrGetToken(buffer, ' ', 1);
+	time = myStrGetToken(buffer, ' ', 2);
 
-    if (time && chan && nick) {
+	if (time && chan && nick) {
 
-        if (!(c = findchan(chan))) {
-            notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-        } else if (!(u2 = finduser(nick))) {
-            notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-        } else {
-            if (canBanUser(c, u, u2)) {
-                get_idealban(c->ci, u2, mask, sizeof(mask));
-                addBan(c, dotime(time), mask);
-                mySendResponse(u, chan, mask, time);
-            }
-        }
-    } else {
-        myFullHelpSyntax(u);
-    }
-    if (time)
-        free(time);
-    if (nick)
-        free(nick);
-    if (chan)
-        free(chan);
+		if (!(c = findchan(chan))) {
+			notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+		} else if (!(u2 = finduser(nick))) {
+			notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+		} else {
+			if (canBanUser(c, u, u2)) {
+				get_idealban(c->ci, u2, mask, sizeof(mask));
+				addBan(c, dotime(time), mask);
+				mySendResponse(u, chan, mask, time);
+			}
+		}
+	} else {
+		myFullHelpSyntax(u);
+	}
+	if (time)
+		free(time);
+	if (nick)
+		free(nick);
+	if (chan)
+		free(chan);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void addBan(Channel * c, time_t timeout, char *banmask)
 {
-    const char *av[3];
-    char *cb[2];
+	const char *av[3];
+	char *cb[2];
 
-    cb[0] = c->name;
-    cb[1] = banmask;
+	cb[0] = c->name;
+	cb[1] = banmask;
 
-    av[0] = "+b";
-    av[1] = banmask;
+	av[0] = "+b";
+	av[1] = banmask;
 
-    ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
-    chan_set_modes(s_ChanServ, c, 2, av, 1);
+	ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
+	chan_set_modes(s_ChanServ, c, 2, av, 1);
 
-    moduleAddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
+	moduleAddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
 }
 
 int delBan(int argc, char **argv)
 {
-    const char *av[3];
-    Channel *c;
+	const char *av[3];
+	Channel *c;
 
-    av[0] = "-b";
-    av[1] = argv[1];
+	av[0] = "-b";
+	av[1] = argv[1];
 
-    if ((c = findchan(argv[0])) && c->ci) {
-        ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
-        chan_set_modes(s_ChanServ, c, 2, av, 1);
-    }
+	if ((c = findchan(argv[0])) && c->ci) {
+		ircdproto->SendMode(whosends(c->ci), c->name, "-b %s", av[1]);
+		chan_set_modes(s_ChanServ, c, 2, av, 1);
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int canBanUser(Channel * c, User * u, User * u2)
 {
-    ChannelInfo *ci;
-    int ok = 0;
-    if (!(ci = c->ci)) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, c->name);
-    } else if (!check_access(u, ci, CA_BAN)) {
-        notice_lang(s_ChanServ, u, ACCESS_DENIED);
-    } else if (ircd->except && is_excepted(ci, u2)) {
-        notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
-    } else if (ircd->protectedumode && is_protected(u2)) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-    } else {
-        ok = 1;
-    }
+	ChannelInfo *ci;
+	int ok = 0;
+	if (!(ci = c->ci)) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, c->name);
+	} else if (!check_access(u, ci, CA_BAN)) {
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+	} else if (ircd->except && is_excepted(ci, u2)) {
+		notice_lang(s_ChanServ, u, CHAN_EXCEPTED, u2->nick, ci->name);
+	} else if (ircd->protectedumode && is_protected(u2)) {
+		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+	} else {
+		ok = 1;
+	}
 
-    return ok;
+	return ok;
 }
 
 

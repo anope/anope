@@ -1,5 +1,5 @@
 /* cs_enforce - Add a /cs ENFORCE command to enforce various set
- *              options and channelmodes on a channel.
+ *			  options and channelmodes on a channel.
  *
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
@@ -23,14 +23,14 @@ void my_cs_help(User * u);
 int my_cs_help_enforce(User * u);
 void my_add_languages(void);
 
-#define LNG_NUM_STRINGS    6
+#define LNG_NUM_STRINGS	6
 
-#define LNG_CHAN_HELP                           0
-#define LNG_ENFORCE_SYNTAX                      1
-#define LNG_CHAN_HELP_ENFORCE                   2
-#define LNG_CHAN_HELP_ENFORCE_R_ENABLED         3
-#define LNG_CHAN_HELP_ENFORCE_R_DISABLED        4
-#define LNG_CHAN_RESPONSE                       5
+#define LNG_CHAN_HELP						   0
+#define LNG_ENFORCE_SYNTAX					  1
+#define LNG_CHAN_HELP_ENFORCE				   2
+#define LNG_CHAN_HELP_ENFORCE_R_ENABLED		 3
+#define LNG_CHAN_HELP_ENFORCE_R_DISABLED		4
+#define LNG_CHAN_RESPONSE					   5
 
 class CSEnforce : public Module
 {
@@ -52,7 +52,7 @@ class CSEnforce : public Module
 		/* English (US) */
 		const char* langtable_en_us[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE    Enforce various channel modes and set options",
+		"	ENFORCE	Enforce various channel modes and set options",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037channel\037 [\037what\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -86,7 +86,7 @@ class CSEnforce : public Module
 		/* Dutch (NL) */
 		const char* langtable_nl[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE    Forceer enkele kanaalmodes en set-opties",
+		"	ENFORCE	Forceer enkele kanaalmodes en set-opties",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037kanaal\037 [\037wat\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -122,7 +122,7 @@ class CSEnforce : public Module
 		/* German (DE) */
 		const char* langtable_de[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE   Erzwingt verschieden Modes und SET Optionen",
+		"	ENFORCE   Erzwingt verschieden Modes und SET Optionen",
 		/* LNG_ENFORCE_SYNTAX */
 		"Syntax: \002ENFORCE \037Channel\037 [\037was\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -155,7 +155,7 @@ class CSEnforce : public Module
 		/* Portuguese (PT) */
 		const char* langtable_pt[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE    Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
+		"	ENFORCE	Verifica o cumprimento de vбrios modos de canal e opзхes ajustadas",
 		/* LNG_ENFORCE_SYNTAX */
 		"Sintaxe: \002ENFORCE \037canal\037 [\037opзгo\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -188,7 +188,7 @@ class CSEnforce : public Module
 		/* Russian (RU) */
 		const char* langtable_ru[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE    Перепроверка и установка различных режимов и опций канала",
+		"	ENFORCE	Перепроверка и установка различных режимов и опций канала",
 		/* LNG_ENFORCE_SYNTAX */
 		"Синтаксис: \002ENFORCE \037#канал\037 \037параметр\037\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -220,7 +220,7 @@ class CSEnforce : public Module
 		/* Italian (IT) */
 		const char* langtable_it[] = {
 		/* LNG_CHAN_HELP */
-		"    ENFORCE    Forza diversi modi di canale ed opzioni SET",
+		"	ENFORCE	Forza diversi modi di canale ed opzioni SET",
 		/* LNG_ENFORCE_SYNTAX */
 		"Sintassi: \002ENFORCE \037canale\037 [\037cosa\037]\002",
 		/* LNG_CHAN_HELP_ENFORCE */
@@ -264,206 +264,206 @@ class CSEnforce : public Module
 /* Enforcing functions */
 void do_enforce_secureops(Channel * c)
 {
-    struct c_userlist *user;
-    struct c_userlist *next;
-    ChannelInfo *ci;
-    uint32 flags;
+	struct c_userlist *user;
+	struct c_userlist *next;
+	ChannelInfo *ci;
+	uint32 flags;
 
-    if (!(ci = c->ci))
-        return;
+	if (!(ci = c->ci))
+		return;
 
-    if (debug)
-        alog("debug: cs_enforce: Enforcing SECUREOPS on %s", c->name);
+	if (debug)
+		alog("debug: cs_enforce: Enforcing SECUREOPS on %s", c->name);
 
-    /* Dirty hack to allow chan_set_correct_modes to work ok.
-     * We pretend like SECUREOPS is on so it doesn't ignore that
-     * part of the code. This way we can enforce SECUREOPS even
-     * if it's off.
-     */
-    flags = ci->flags;
-    ci->flags |= CI_SECUREOPS;
+	/* Dirty hack to allow chan_set_correct_modes to work ok.
+	 * We pretend like SECUREOPS is on so it doesn't ignore that
+	 * part of the code. This way we can enforce SECUREOPS even
+	 * if it's off.
+	 */
+	flags = ci->flags;
+	ci->flags |= CI_SECUREOPS;
 
-    user = c->users;
-    do {
-        next = user->next;
-        chan_set_correct_modes(user->user, c, 0);
-        user = next;
-    } while (user);
+	user = c->users;
+	do {
+		next = user->next;
+		chan_set_correct_modes(user->user, c, 0);
+		user = next;
+	} while (user);
 
-    ci->flags = flags;
+	ci->flags = flags;
 }
 
 void do_enforce_restricted(Channel * c)
 {
-    struct c_userlist *user;
-    struct c_userlist *next;
-    ChannelInfo *ci;
-    int16 old_nojoin_level;
-    char mask[BUFSIZE];
-    char *reason;
-    const char *av[3];
-    User *u;
+	struct c_userlist *user;
+	struct c_userlist *next;
+	ChannelInfo *ci;
+	int16 old_nojoin_level;
+	char mask[BUFSIZE];
+	char *reason;
+	const char *av[3];
+	User *u;
 
-    if (!(ci = c->ci))
-        return;
+	if (!(ci = c->ci))
+		return;
 
-    if (debug)
-        alog("debug: cs_enforce: Enforcing RESTRICTED on %s", c->name);
+	if (debug)
+		alog("debug: cs_enforce: Enforcing RESTRICTED on %s", c->name);
 
-    old_nojoin_level = ci->levels[CA_NOJOIN];
-    if (ci->levels[CA_NOJOIN] < 0)
-        ci->levels[CA_NOJOIN] = 0;
+	old_nojoin_level = ci->levels[CA_NOJOIN];
+	if (ci->levels[CA_NOJOIN] < 0)
+		ci->levels[CA_NOJOIN] = 0;
 
-    user = c->users;
-    do {
-        next = user->next;
-        u = user->user;
-        if (check_access(u, c->ci, CA_NOJOIN)) {
-            get_idealban(ci, u, mask, sizeof(mask));
-            reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
-            ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
-                           time(NULL));
-            ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
-            av[0] = ci->name;
-            av[1] = u->nick;
-            av[2] = reason;
-            do_kick(s_ChanServ, 3, av);
-        }
-        user = next;
-    } while (user);
+	user = c->users;
+	do {
+		next = user->next;
+		u = user->user;
+		if (check_access(u, c->ci, CA_NOJOIN)) {
+			get_idealban(ci, u, mask, sizeof(mask));
+			reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
+			ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
+						   time(NULL));
+			ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+			av[0] = ci->name;
+			av[1] = u->nick;
+			av[2] = reason;
+			do_kick(s_ChanServ, 3, av);
+		}
+		user = next;
+	} while (user);
 
-    ci->levels[CA_NOJOIN] = old_nojoin_level;
+	ci->levels[CA_NOJOIN] = old_nojoin_level;
 }
 
 void do_enforce_cmode_R(Channel * c)
 {
-    struct c_userlist *user;
-    struct c_userlist *next;
-    ChannelInfo *ci;
-    char mask[BUFSIZE];
-    char *reason;
-    const char *av[3];
-    User *u;
-    CBMode *cbm;
+	struct c_userlist *user;
+	struct c_userlist *next;
+	ChannelInfo *ci;
+	char mask[BUFSIZE];
+	char *reason;
+	const char *av[3];
+	User *u;
+	CBMode *cbm;
 
-    if (!(ci = c->ci))
-        return;
+	if (!(ci = c->ci))
+		return;
 
-    if (debug)
-        alog("debug: cs_enforce: Enforcing mode +R on %s", c->name);
+	if (debug)
+		alog("debug: cs_enforce: Enforcing mode +R on %s", c->name);
 
-    user = c->users;
-    do {
-        next = user->next;
-        u = user->user;
-        if (!nick_identified(u)) {
-            get_idealban(ci, u, mask, sizeof(mask));
-            reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
-            if (((cbm = &cbmodes['R'])->flag == 0)
-                || !(c->mode & cbm->flag))
-                ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
-                               time(NULL));
-            ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
-            av[0] = ci->name;
-            av[1] = u->nick;
-            av[2] = reason;
-            do_kick(s_ChanServ, 3, av);
-        }
-        user = next;
-    } while (user);
+	user = c->users;
+	do {
+		next = user->next;
+		u = user->user;
+		if (!nick_identified(u)) {
+			get_idealban(ci, u, mask, sizeof(mask));
+			reason = getstring(u->na, CHAN_NOT_ALLOWED_TO_JOIN);
+			if (((cbm = &cbmodes['R'])->flag == 0)
+				|| !(c->mode & cbm->flag))
+				ircdproto->SendMode(whosends(ci), ci->name, "+b %s %lu", mask,
+							   time(NULL));
+			ircdproto->SendKick(whosends(ci), ci->name, u->nick, "%s", reason);
+			av[0] = ci->name;
+			av[1] = u->nick;
+			av[2] = reason;
+			do_kick(s_ChanServ, 3, av);
+		}
+		user = next;
+	} while (user);
 }
 
 /* Enforcing Group Functions */
 void do_enforce_set(Channel * c)
 {
-    ChannelInfo *ci;
+	ChannelInfo *ci;
 
-    if (!(ci = c->ci))
-        return;
+	if (!(ci = c->ci))
+		return;
 
-    if (ci->flags & CI_SECUREOPS)
-        do_enforce_secureops(c);
-    if (ci->flags & CI_RESTRICTED)
-        do_enforce_restricted(c);
+	if (ci->flags & CI_SECUREOPS)
+		do_enforce_secureops(c);
+	if (ci->flags & CI_RESTRICTED)
+		do_enforce_restricted(c);
 }
 
 void do_enforce_modes(Channel * c)
 {
-    CBMode *cbm;
+	CBMode *cbm;
 
-    if (((cbm = &cbmodes['R'])->flag != 0) && (c->mode & cbm->flag))
-        do_enforce_cmode_R(c);
+	if (((cbm = &cbmodes['R'])->flag != 0) && (c->mode & cbm->flag))
+		do_enforce_cmode_R(c);
 }
 
 /* End of enforcing functions */
 
 int my_cs_enforce(User * u)
 {
-    char *cur_buffer;
-    char *chan=NULL;
-    char *what=NULL;
-    Channel *c;
-    ChannelInfo *ci;
+	char *cur_buffer;
+	char *chan=NULL;
+	char *what=NULL;
+	Channel *c;
+	ChannelInfo *ci;
 
-    cur_buffer = moduleGetLastBuffer();
-    chan = myStrGetToken(cur_buffer, ' ', 0);
+	cur_buffer = moduleGetLastBuffer();
+	chan = myStrGetToken(cur_buffer, ' ', 0);
 
-    if (!chan) {
-        moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-    } else if (!(c = findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-    } else if (!(ci = c->ci)) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (!is_services_admin(u) && !check_access(u, ci, CA_AKICK)) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-    } else {
-        what = myStrGetToken(cur_buffer, ' ', 1);
-        if (!what || (stricmp(what, "SET") == 0)) {
-            do_enforce_set(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
-        } else if (stricmp(what, "MODES") == 0) {
-            do_enforce_modes(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
-        } else if (stricmp(what, "SECUREOPS") == 0) {
-            do_enforce_secureops(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
-        } else if (stricmp(what, "RESTRICTED") == 0) {
-            do_enforce_restricted(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
-        } else if (stricmp(what, "+R") == 0) {
-            do_enforce_cmode_R(c);
-            moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
-        } else {
-            moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-        }
-    }
+	if (!chan) {
+		moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+	} else if (!(c = findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+	} else if (!(ci = c->ci)) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
+	} else if (!is_services_admin(u) && !check_access(u, ci, CA_AKICK)) {
+		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+	} else {
+		what = myStrGetToken(cur_buffer, ' ', 1);
+		if (!what || (stricmp(what, "SET") == 0)) {
+			do_enforce_set(c);
+			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+		} else if (stricmp(what, "MODES") == 0) {
+			do_enforce_modes(c);
+			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+		} else if (stricmp(what, "SECUREOPS") == 0) {
+			do_enforce_secureops(c);
+			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+		} else if (stricmp(what, "RESTRICTED") == 0) {
+			do_enforce_restricted(c);
+			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+		} else if (stricmp(what, "+R") == 0) {
+			do_enforce_cmode_R(c);
+			moduleNoticeLang(s_ChanServ,u,LNG_CHAN_RESPONSE,what);
+		} else {
+			moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+		}
+	}
 
-    if(chan) free(chan);
-    if(what) free(what);
+	if(chan) free(chan);
+	if(what) free(what);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 /* Language and response stuff */
 void my_cs_help(User * u)
 {
-    moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
+	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP);
 }
 
 int my_cs_help_enforce(User * u)
 {
-    moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
-    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-    moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
-    ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
-    if (cbmodes['R'].flag != 0)
-        moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
-    else
-        moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
+	moduleNoticeLang(s_ChanServ, u, LNG_ENFORCE_SYNTAX);
+	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+	moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE);
+	ircdproto->SendMessage(findbot(s_ChanServ), u->nick, " ");
+	if (cbmodes['R'].flag != 0)
+		moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_ENABLED);
+	else
+		moduleNoticeLang(s_ChanServ, u, LNG_CHAN_HELP_ENFORCE_R_DISABLED);
 
-    return MOD_STOP;
+	return MOD_STOP;
 }
 
 MODULE_INIT("cs_enforce", CSEnforce)

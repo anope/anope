@@ -47,7 +47,7 @@ class NSSendPass : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_SENDPASS);
 }
 
 /**
@@ -58,55 +58,55 @@ void myNickServHelp(User * u)
 int do_sendpass(User * u)
 {
 
-    char *nick = strtok(NULL, " ");
-    NickAlias *na;
+	char *nick = strtok(NULL, " ");
+	NickAlias *na;
 
-    if (!nick) {
-        syntax_error(s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
-    } else if (RestrictMail && !is_services_oper(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-    } else if (!(na = findnick(nick))) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-    } else if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else {
-        char buf[BUFSIZE];
-        char tmp_pass[PASSMAX];
-        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
-            MailInfo *mail;
+	if (!nick) {
+		syntax_error(s_NickServ, u, "SENDPASS", NICK_SENDPASS_SYNTAX);
+	} else if (RestrictMail && !is_services_oper(u)) {
+		notice_lang(s_NickServ, u, PERMISSION_DENIED);
+	} else if (!(na = findnick(nick))) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+	} else if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+	} else {
+		char buf[BUFSIZE];
+		char tmp_pass[PASSMAX];
+		if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
+			MailInfo *mail;
 
-            snprintf(buf, sizeof(buf), getstring(na, NICK_SENDPASS_SUBJECT),
-                     na->nick);
-            mail = MailBegin(u, na->nc, buf, s_NickServ);
-            if (!mail)
-                return MOD_CONT;
+			snprintf(buf, sizeof(buf), getstring(na, NICK_SENDPASS_SUBJECT),
+					 na->nick);
+			mail = MailBegin(u, na->nc, buf, s_NickServ);
+			if (!mail)
+				return MOD_CONT;
 
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_HEAD));
-            fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_1), na->nick);
-            fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2),
-                    tmp_pass);
-            fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_3));
-            fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_4));
-            fprintf(mail->pipe, "\n\n");
-            fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5),
-                    NetworkName);
-            fprintf(mail->pipe, "\n.\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_HEAD));
+			fprintf(mail->pipe, "\n\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_1), na->nick);
+			fprintf(mail->pipe, "\n\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_2),
+					tmp_pass);
+			fprintf(mail->pipe, "\n\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_3));
+			fprintf(mail->pipe, "\n\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_4));
+			fprintf(mail->pipe, "\n\n");
+			fprintf(mail->pipe, getstring(na, NICK_SENDPASS_LINE_5),
+					NetworkName);
+			fprintf(mail->pipe, "\n.\n");
 
-            MailEnd(mail);
+			MailEnd(mail);
 
-            alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick,
-                 u->username, u->host, nick);
-            notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
-        } else {
-            notice_lang(s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
-        }
-    }
+			alog("%s: %s!%s@%s used SENDPASS on %s", s_NickServ, u->nick,
+				 u->username, u->host, nick);
+			notice_lang(s_NickServ, u, NICK_SENDPASS_OK, nick);
+		} else {
+			notice_lang(s_NickServ, u, NICK_SENDPASS_UNAVAILABLE);
+		}
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_sendpass", NSSendPass)

@@ -37,7 +37,7 @@ void moduleAddHelpServCmds(void)
  */
 void helpserv_init(void)
 {
-    moduleAddHelpServCmds();
+	moduleAddHelpServCmds();
 }
 
 /*************************************************************************/
@@ -50,20 +50,20 @@ void helpserv_init(void)
  */
 void helpserv(User * u, char *buf)
 {
-    const char *cmd, *s;
+	const char *cmd, *s;
 
-    cmd = strtok(buf, " ");
+	cmd = strtok(buf, " ");
 
-    if (!cmd) {
-        return;
-    } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, ""))) {
-            s = "";
-        }
-        ircdproto->SendCTCP(findbot(s_HelpServ), u->nick, "PING %s", s);
-    } else {
-        mod_run_cmd(s_HelpServ, u, HELPSERV, cmd);
-    }
+	if (!cmd) {
+		return;
+	} else if (stricmp(cmd, "\1PING") == 0) {
+		if (!(s = strtok(NULL, ""))) {
+			s = "";
+		}
+		ircdproto->SendCTCP(findbot(s_HelpServ), u->nick, "PING %s", s);
+	} else {
+		mod_run_cmd(s_HelpServ, u, HELPSERV, cmd);
+	}
 }
 
 /*************************************************************************/

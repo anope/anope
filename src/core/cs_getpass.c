@@ -44,9 +44,9 @@ class CSGetPass : public Module
  **/
 void myChanServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETPASS);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_GETPASS);
+	}
 }
 
 /**
@@ -57,34 +57,34 @@ void myChanServHelp(User * u)
 
 int do_getpass(User * u)
 {
-    char *chan = strtok(NULL, " ");
-    char tmp_pass[PASSMAX];
-    ChannelInfo *ci;
+	char *chan = strtok(NULL, " ");
+	char tmp_pass[PASSMAX];
+	ChannelInfo *ci;
 
-    if (!chan) {
-        syntax_error(s_ChanServ, u, "GETPASS", CHAN_GETPASS_SYNTAX);
-    } else if (!(ci = cs_findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-    } else if (CSRestrictGetPass && !is_services_root(u)) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-    } else {
-        if(enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1)==1) {
-            alog("%s: %s!%s@%s used GETPASS on %s",
-                 s_ChanServ, u->nick, u->username, u->host, ci->name);
-            if (WallGetpass) {
-                ircdproto->SendGlobops(s_ChanServ,
-                                 "\2%s\2 used GETPASS on channel \2%s\2",
-                                 u->nick, chan);
-            }
-            notice_lang(s_ChanServ, u, CHAN_GETPASS_PASSWORD_IS,
-                        chan, tmp_pass);
-        } else {
-            notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
-        }
-    }
-    return MOD_CONT;
+	if (!chan) {
+		syntax_error(s_ChanServ, u, "GETPASS", CHAN_GETPASS_SYNTAX);
+	} else if (!(ci = cs_findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+	} else if (CSRestrictGetPass && !is_services_root(u)) {
+		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+	} else {
+		if(enc_decrypt(ci->founderpass, tmp_pass, PASSMAX - 1)==1) {
+			alog("%s: %s!%s@%s used GETPASS on %s",
+				 s_ChanServ, u->nick, u->username, u->host, ci->name);
+			if (WallGetpass) {
+				ircdproto->SendGlobops(s_ChanServ,
+								 "\2%s\2 used GETPASS on channel \2%s\2",
+								 u->nick, chan);
+			}
+			notice_lang(s_ChanServ, u, CHAN_GETPASS_PASSWORD_IS,
+						chan, tmp_pass);
+		} else {
+			notice_lang(s_ChanServ, u, CHAN_GETPASS_UNAVAILABLE);
+		}
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("cs_getpass", CSGetPass)

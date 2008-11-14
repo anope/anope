@@ -42,7 +42,7 @@ class MSCancel : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CANCEL);
 }
 
 /**
@@ -52,43 +52,43 @@ void myMemoServHelp(User * u)
  **/
 int do_cancel(User * u)
 {
-    int ischan;
-    int isforbid;
-    char *name = strtok(NULL, " ");
-    MemoInfo *mi;
+	int ischan;
+	int isforbid;
+	char *name = strtok(NULL, " ");
+	MemoInfo *mi;
 
-    if (!name) {
-        syntax_error(s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
+	if (!name) {
+		syntax_error(s_MemoServ, u, "CANCEL", MEMO_CANCEL_SYNTAX);
 
-    } else if (!nick_recognized(u)) {
-        notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+	} else if (!nick_recognized(u)) {
+		notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
 
-    } else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
-        if (isforbid) {
-            notice_lang(s_MemoServ, u,
-                        ischan ? CHAN_X_FORBIDDEN :
-                        NICK_X_FORBIDDEN, name);
-        } else {
-            notice_lang(s_MemoServ, u,
-                        ischan ? CHAN_X_NOT_REGISTERED :
-                        NICK_X_NOT_REGISTERED, name);
-        }
-    } else {
-        int i;
+	} else if (!(mi = getmemoinfo(name, &ischan, &isforbid))) {
+		if (isforbid) {
+			notice_lang(s_MemoServ, u,
+						ischan ? CHAN_X_FORBIDDEN :
+						NICK_X_FORBIDDEN, name);
+		} else {
+			notice_lang(s_MemoServ, u,
+						ischan ? CHAN_X_NOT_REGISTERED :
+						NICK_X_NOT_REGISTERED, name);
+		}
+	} else {
+		int i;
 
-        for (i = mi->memocount - 1; i >= 0; i--) {
-            if ((mi->memos[i].flags & MF_UNREAD)
-                && !stricmp(mi->memos[i].sender, u->na->nc->display)
-                && (!(mi->memos[i].flags & MF_NOTIFYS))) {
-                delmemo(mi, mi->memos[i].number);
-                notice_lang(s_MemoServ, u, MEMO_CANCELLED, name);
-                return MOD_CONT;
-            }
-        }
+		for (i = mi->memocount - 1; i >= 0; i--) {
+			if ((mi->memos[i].flags & MF_UNREAD)
+				&& !stricmp(mi->memos[i].sender, u->na->nc->display)
+				&& (!(mi->memos[i].flags & MF_NOTIFYS))) {
+				delmemo(mi, mi->memos[i].number);
+				notice_lang(s_MemoServ, u, MEMO_CANCELLED, name);
+				return MOD_CONT;
+			}
+		}
 
-        notice_lang(s_MemoServ, u, MEMO_CANCEL_NONE);
-    }
-    return MOD_CONT;
+		notice_lang(s_MemoServ, u, MEMO_CANCEL_NONE);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_cancel", MSCancel)

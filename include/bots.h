@@ -21,10 +21,10 @@ class BotInfo
 	BotInfo *next, *prev;
 
 	std::string uid;		/* required for UID supporting servers, as opposed to the shitty struct Uid. */
-	char *nick;    			/* Nickname of the bot */
-	char *user;    			/* Its user name */
-	char *host;    			/* Its hostname */
-	char *real;     		/* Its real name */
+	char *nick;				/* Nickname of the bot */
+	char *user;				/* Its user name */
+	char *host;				/* Its hostname */
+	char *real;	 		/* Its real name */
 	int16 flags;			/* Bot flags -- see BI_* below */
 	time_t created; 		/* Birth date ;) */
 	int16 chancount;		/* Number of channels that use the bot. */

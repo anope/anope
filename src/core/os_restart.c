@@ -47,9 +47,9 @@ class OSRestart : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_RESTART);
+	}
 }
 
 /**
@@ -60,21 +60,21 @@ void myOperServHelp(User * u)
 int do_restart(User * u)
 {
 #ifdef SERVICES_BIN
-    quitmsg = (char *)calloc(31 + strlen(u->nick), 1);
-    if (!quitmsg)
-        quitmsg = "RESTART command received, but out of memory!";
-    else
-        sprintf((char *)quitmsg, /* XXX */ "RESTART command received from %s", u->nick);
+	quitmsg = (char *)calloc(31 + strlen(u->nick), 1);
+	if (!quitmsg)
+		quitmsg = "RESTART command received, but out of memory!";
+	else
+		sprintf((char *)quitmsg, /* XXX */ "RESTART command received from %s", u->nick);
 
-    if (GlobalOnCycle) {
-        oper_global(NULL, "%s", GlobalOnCycleMessage);
-    }
-    /*    raise(SIGHUP); */
-    do_restart_services();
+	if (GlobalOnCycle) {
+		oper_global(NULL, "%s", GlobalOnCycleMessage);
+	}
+	/*	raise(SIGHUP); */
+	do_restart_services();
 #else
-    notice_lang(s_OperServ, u, OPER_CANNOT_RESTART);
+	notice_lang(s_OperServ, u, OPER_CANNOT_RESTART);
 #endif
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_restart", OSRestart)

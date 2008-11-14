@@ -47,9 +47,9 @@ class OSOLine : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u) && u->isSuperAdmin) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
-    }
+	if (is_services_admin(u) && u->isSuperAdmin) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_OLINE);
+	}
 }
 
 /**
@@ -59,40 +59,40 @@ void myOperServHelp(User * u)
  **/
 int do_operoline(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char *flags = strtok(NULL, "");
-    User *u2 = NULL;
+	char *nick = strtok(NULL, " ");
+	char *flags = strtok(NULL, "");
+	User *u2 = NULL;
 
-    /* Only allow this if SuperAdmin is enabled */
-    if (!u->isSuperAdmin) {
-        notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
-        return MOD_CONT;
-    }
+	/* Only allow this if SuperAdmin is enabled */
+	if (!u->isSuperAdmin) {
+		notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
+		return MOD_CONT;
+	}
 
-    if (!nick || !flags) {
-        syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
-        return MOD_CONT;
-    } else {
-        /* let's check whether the user is online */
-        if (!(u2 = finduser(nick))) {
-            notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-        } else if (u2 && flags[0] == '+') {
-            ircdproto->SendSVSO(s_OperServ, nick, flags);
-            ircdproto->SendMode(findbot(s_OperServ), nick, "+o");
-            common_svsmode(u2, "+o", NULL);
-            notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
-            notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
-            ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
-                             u->nick, nick);
-        } else if (u2 && flags[0] == '-') {
-            ircdproto->SendSVSO(s_OperServ, nick, flags);
-            notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
-            ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
-                             u->nick, nick);
-        } else
-            syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
-    }
-    return MOD_CONT;
+	if (!nick || !flags) {
+		syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
+		return MOD_CONT;
+	} else {
+		/* let's check whether the user is online */
+		if (!(u2 = finduser(nick))) {
+			notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+		} else if (u2 && flags[0] == '+') {
+			ircdproto->SendSVSO(s_OperServ, nick, flags);
+			ircdproto->SendMode(findbot(s_OperServ), nick, "+o");
+			common_svsmode(u2, "+o", NULL);
+			notice_lang(s_OperServ, u2, OPER_OLINE_IRCOP);
+			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
+			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
+							 u->nick, nick);
+		} else if (u2 && flags[0] == '-') {
+			ircdproto->SendSVSO(s_OperServ, nick, flags);
+			notice_lang(s_OperServ, u, OPER_OLINE_SUCCESS, flags, nick);
+			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used OLINE for %s",
+							 u->nick, nick);
+		} else
+			syntax_error(s_OperServ, u, "OLINE", OPER_OLINE_SYNTAX);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_oline", OSOLine)

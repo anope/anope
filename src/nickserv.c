@@ -24,10 +24,10 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 NickRequest *nrlists[1024];
 
-unsigned int guestnum;          /* Current guest number */
+unsigned int guestnum;		  /* Current guest number */
 
-#define TO_COLLIDE   0          /* Collide the user with this nick */
-#define TO_RELEASE   1          /* Release a collided nick */
+#define TO_COLLIDE   0		  /* Collide the user with this nick */
+#define TO_RELEASE   1		  /* Release a collided nick */
 
 /*************************************************************************/
 
@@ -45,26 +45,26 @@ void moduleAddNickServCmds(void) {
 
 void get_aliases_stats(long *nrec, long *memuse)
 {
-    long count = 0, mem = 0;
-    int i;
-    NickAlias *na;
+	long count = 0, mem = 0;
+	int i;
+	NickAlias *na;
 
-    for (i = 0; i < 1024; i++) {
-        for (na = nalists[i]; na; na = na->next) {
-            count++;
-            mem += sizeof(*na);
-            if (na->nick)
-                mem += strlen(na->nick) + 1;
-            if (na->last_usermask)
-                mem += strlen(na->last_usermask) + 1;
-            if (na->last_realname)
-                mem += strlen(na->last_realname) + 1;
-            if (na->last_quit)
-                mem += strlen(na->last_quit) + 1;
-        }
-    }
-    *nrec = count;
-    *memuse = mem;
+	for (i = 0; i < 1024; i++) {
+		for (na = nalists[i]; na; na = na->next) {
+			count++;
+			mem += sizeof(*na);
+			if (na->nick)
+				mem += strlen(na->nick) + 1;
+			if (na->last_usermask)
+				mem += strlen(na->last_usermask) + 1;
+			if (na->last_realname)
+				mem += strlen(na->last_realname) + 1;
+			if (na->last_quit)
+				mem += strlen(na->last_quit) + 1;
+		}
+	}
+	*nrec = count;
+	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -73,46 +73,46 @@ void get_aliases_stats(long *nrec, long *memuse)
 
 void get_core_stats(long *nrec, long *memuse)
 {
-    long count = 0, mem = 0;
-    int i, j;
-    NickCore *nc;
-    char **accptr;
+	long count = 0, mem = 0;
+	int i, j;
+	NickCore *nc;
+	char **accptr;
 
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            count++;
-            mem += sizeof(*nc);
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			count++;
+			mem += sizeof(*nc);
 
-            if (nc->display)
-                mem += strlen(nc->display) + 1;
-            if (nc->pass)
-                mem += strlen(nc->pass) + 1;
+			if (nc->display)
+				mem += strlen(nc->display) + 1;
+			if (nc->pass)
+				mem += strlen(nc->pass) + 1;
 
-            if (nc->url)
-                mem += strlen(nc->url) + 1;
-            if (nc->email)
-                mem += strlen(nc->email) + 1;
-            if (nc->greet)
-                mem += strlen(nc->greet) + 1;
+			if (nc->url)
+				mem += strlen(nc->url) + 1;
+			if (nc->email)
+				mem += strlen(nc->email) + 1;
+			if (nc->greet)
+				mem += strlen(nc->greet) + 1;
 
-            mem += sizeof(char *) * nc->accesscount;
-            for (accptr = nc->access, j = 0; j < nc->accesscount;
-                 accptr++, j++) {
-                if (*accptr)
-                    mem += strlen(*accptr) + 1;
-            }
+			mem += sizeof(char *) * nc->accesscount;
+			for (accptr = nc->access, j = 0; j < nc->accesscount;
+				 accptr++, j++) {
+				if (*accptr)
+					mem += strlen(*accptr) + 1;
+			}
 
-            mem += nc->memos.memocount * sizeof(Memo);
-            for (j = 0; j < nc->memos.memocount; j++) {
-                if (nc->memos.memos[j].text)
-                    mem += strlen(nc->memos.memos[j].text) + 1;
-            }
+			mem += nc->memos.memocount * sizeof(Memo);
+			for (j = 0; j < nc->memos.memocount; j++) {
+				if (nc->memos.memos[j].text)
+					mem += strlen(nc->memos.memos[j].text) + 1;
+			}
 
-            mem += sizeof(void *) * nc->aliases.count;
-        }
-    }
-    *nrec = count;
-    *memuse = mem;
+			mem += sizeof(void *) * nc->aliases.count;
+		}
+	}
+	*nrec = count;
+	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -122,10 +122,10 @@ void get_core_stats(long *nrec, long *memuse)
 
 void ns_init(void)
 {
-    moduleAddNickServCmds();
-    guestnum = time(NULL);
-    while (guestnum > 9999999)
-        guestnum -= 10000000;
+	moduleAddNickServCmds();
+	guestnum = time(NULL);
+	while (guestnum > 9999999)
+		guestnum -= 10000000;
 }
 
 /*************************************************************************/
@@ -134,20 +134,20 @@ void ns_init(void)
 
 void nickserv(User * u, char *buf)
 {
-    const char *cmd, *s;
+	const char *cmd, *s;
 
-    cmd = strtok(buf, " ");
+	cmd = strtok(buf, " ");
 
-    if (!cmd) {
-        return;
-    } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, ""))) {
-            s = "";
-        }
-        ircdproto->SendCTCP(findbot(s_NickServ), u->nick, "PING %s", s);
-    } else {
-        mod_run_cmd(s_NickServ, u, NICKSERV, cmd);
-    }
+	if (!cmd) {
+		return;
+	} else if (stricmp(cmd, "\1PING") == 0) {
+		if (!(s = strtok(NULL, ""))) {
+			s = "";
+		}
+		ircdproto->SendCTCP(findbot(s_NickServ), u->nick, "PING %s", s);
+	} else {
+		mod_run_cmd(s_NickServ, u, NICKSERV, cmd);
+	}
 
 }
 
@@ -157,474 +157,474 @@ void nickserv(User * u, char *buf)
 
 
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	if ((x) < 0) {					\
 	if (!forceload)					\
-	    fatal("Read error on %s", NickDBName);	\
+		fatal("Read error on %s", NickDBName);	\
 	failed = 1;					\
 	break;						\
-    }							\
+	}							\
 } while (0)
 
 /* Loads NickServ database versions 5 to 11 (<= 4 is not supported) */
 
 void load_old_ns_dbase(void)
 {
-    dbFILE *f;
-    int ver, i, j, c;
-    NickAlias *na, *na2, *next;
-    NickCore *nc;
-    int failed = 0;
+	dbFILE *f;
+	int ver, i, j, c;
+	NickAlias *na, *na2, *next;
+	NickCore *nc;
+	int failed = 0;
 
-    uint16 tmp16;
-    uint32 tmp32;
+	uint16 tmp16;
+	uint32 tmp32;
 
-    char bufn[NICKMAX], bufp[PASSMAX];
-    char *email, *greet, *url, *forbidby, *forbidreason;
-    uint32 icq;
+	char bufn[NICKMAX], bufp[PASSMAX];
+	char *email, *greet, *url, *forbidby, *forbidreason;
+	uint32 icq;
 
-    if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
-        return;
+	if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
+		return;
 
-    ver = get_file_version(f);
-    if (ver <= 4) {
-        fatal("Unsupported version number (%d) on %s", ver, NickDBName);
-        close_db(f);
-        return;
-    }
+	ver = get_file_version(f);
+	if (ver <= 4) {
+		fatal("Unsupported version number (%d) on %s", ver, NickDBName);
+		close_db(f);
+		return;
+	}
 
-    for (i = 0; i < 256 && !failed; i++) {
-        while ((c = getc_db(f)) == 1) {
-            if (c != 1)
-                fatal("Invalid format in %s", NickDBName);
+	for (i = 0; i < 256 && !failed; i++) {
+		while ((c = getc_db(f)) == 1) {
+			if (c != 1)
+				fatal("Invalid format in %s", NickDBName);
 
-            na = (NickAlias *)scalloc(sizeof(NickAlias), 1);
+			na = (NickAlias *)scalloc(sizeof(NickAlias), 1);
 
-            SAFE(read_buffer(bufn, f));
-            na->nick = sstrdup(bufn);
-            SAFE(read_buffer(bufp, f)); /* Will be used later if needed */
+			SAFE(read_buffer(bufn, f));
+			na->nick = sstrdup(bufn);
+			SAFE(read_buffer(bufp, f)); /* Will be used later if needed */
 
-            SAFE(read_string(&url, f));
-            SAFE(read_string(&email, f));
-            if (ver >= 10)
-                SAFE(read_int32(&icq, f));
-            else
-                icq = 0;
-            if (ver >= 9)
-                SAFE(read_string(&greet, f));
-            else
-                greet = NULL;
+			SAFE(read_string(&url, f));
+			SAFE(read_string(&email, f));
+			if (ver >= 10)
+				SAFE(read_int32(&icq, f));
+			else
+				icq = 0;
+			if (ver >= 9)
+				SAFE(read_string(&greet, f));
+			else
+				greet = NULL;
 
-            SAFE(read_string(&na->last_usermask, f));
-            SAFE(read_string(&na->last_realname, f));
-            SAFE(read_string(&na->last_quit, f));
+			SAFE(read_string(&na->last_usermask, f));
+			SAFE(read_string(&na->last_realname, f));
+			SAFE(read_string(&na->last_quit, f));
 
-            SAFE(read_int32(&tmp32, f));
-            na->time_registered = tmp32;
-            SAFE(read_int32(&tmp32, f));
-            na->last_seen = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			na->time_registered = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			na->last_seen = tmp32;
 
-            SAFE(read_int16(&na->status, f));
-            na->status &= ~NS_TEMPORARY;
+			SAFE(read_int16(&na->status, f));
+			na->status &= ~NS_TEMPORARY;
 
-            if (ver >= 9) {
-                SAFE(read_string(&forbidby, f));
-                SAFE(read_string(&forbidreason, f));
-                /* Cleanup */
-                if (forbidby && *forbidby == '@') {
-                    free(forbidby);
-                    forbidby = NULL;
-                }
-                if (forbidreason && *forbidreason == 0) {
-                    free(forbidreason);
-                    forbidreason = NULL;
-                }
-            } else {
-                forbidby = NULL;
-                forbidreason = NULL;
-            }
+			if (ver >= 9) {
+				SAFE(read_string(&forbidby, f));
+				SAFE(read_string(&forbidreason, f));
+				/* Cleanup */
+				if (forbidby && *forbidby == '@') {
+					free(forbidby);
+					forbidby = NULL;
+				}
+				if (forbidreason && *forbidreason == 0) {
+					free(forbidreason);
+					forbidreason = NULL;
+				}
+			} else {
+				forbidby = NULL;
+				forbidreason = NULL;
+			}
 
-            if (na->status & NS_VERBOTEN) {
-                if (na->last_usermask)
-                    free(na->last_usermask);
-                if (na->last_realname)
-                    free(na->last_realname);
+			if (na->status & NS_VERBOTEN) {
+				if (na->last_usermask)
+					free(na->last_usermask);
+				if (na->last_realname)
+					free(na->last_realname);
 
-                na->last_usermask = forbidby;
-                na->last_realname = forbidreason;
-            } else {
-                if (!na->last_usermask)
-                    na->last_usermask = sstrdup("");
-                if (!na->last_realname)
-                    na->last_realname = sstrdup("");
-            }
+				na->last_usermask = forbidby;
+				na->last_realname = forbidreason;
+			} else {
+				if (!na->last_usermask)
+					na->last_usermask = sstrdup("");
+				if (!na->last_realname)
+					na->last_realname = sstrdup("");
+			}
 
-            /* Store the reference for later resolving */
-            SAFE(read_string((char **) &na->nc, f));
-            SAFE(read_int16(&tmp16, f));        /* Was linkcount */
+			/* Store the reference for later resolving */
+			SAFE(read_string((char **) &na->nc, f));
+			SAFE(read_int16(&tmp16, f));		/* Was linkcount */
 
-            if (na->nc) {
-                SAFE(read_int16(&tmp16, f));    /* Was channelcount */
-            } else {
-                /* This nick was a master nick, so it also has all the
-                 * core info! =)
-                 */
-                nc = (NickCore *)scalloc(1, sizeof(NickCore));
-                slist_init(&nc->aliases);
+			if (na->nc) {
+				SAFE(read_int16(&tmp16, f));	/* Was channelcount */
+			} else {
+				/* This nick was a master nick, so it also has all the
+				 * core info! =)
+				 */
+				nc = (NickCore *)scalloc(1, sizeof(NickCore));
+				slist_init(&nc->aliases);
 
-                /* The initial display is what used to be the master nick */
-                nc->display = sstrdup(na->nick);
+				/* The initial display is what used to be the master nick */
+				nc->display = sstrdup(na->nick);
 
-                /* We grabbed info before; fill the appropriate fields now */
-                if (*bufp)
-                    memcpy(nc->pass, bufp, PASSMAX);
-                else
-                    memset(nc->pass, 0, PASSMAX);       /* Which may be the case for forbidden nicks .. */
+				/* We grabbed info before; fill the appropriate fields now */
+				if (*bufp)
+					memcpy(nc->pass, bufp, PASSMAX);
+				else
+					memset(nc->pass, 0, PASSMAX);	   /* Which may be the case for forbidden nicks .. */
 
-                nc->email = email;
-                nc->greet = greet;
-                nc->icq = icq;
-                nc->url = url;
+				nc->email = email;
+				nc->greet = greet;
+				nc->icq = icq;
+				nc->url = url;
 
-                /* We check whether the e-mail is valid because it was not tested
-                 * in older versions.
-                 */
-                if (ver <= 10 && nc->email && !MailValidate(nc->email)) {
-                    free(nc->email);
-                    nc->email = NULL;
-                }
+				/* We check whether the e-mail is valid because it was not tested
+				 * in older versions.
+				 */
+				if (ver <= 10 && nc->email && !MailValidate(nc->email)) {
+					free(nc->email);
+					nc->email = NULL;
+				}
 
-                SAFE(read_int32(&nc->flags, f));
-                if (!NSAllowKillImmed)
-                    nc->flags &= ~NI_KILL_IMMED;
+				SAFE(read_int32(&nc->flags, f));
+				if (!NSAllowKillImmed)
+					nc->flags &= ~NI_KILL_IMMED;
 
-                /* Status flags cleanup */
-                if (na->status & NS_OLD_ENCRYPTEDPW) {
-                    nc->flags |= NI_ENCRYPTEDPW;
-                    na->status &= ~NS_OLD_ENCRYPTEDPW;
-                }
+				/* Status flags cleanup */
+				if (na->status & NS_OLD_ENCRYPTEDPW) {
+					nc->flags |= NI_ENCRYPTEDPW;
+					na->status &= ~NS_OLD_ENCRYPTEDPW;
+				}
 
-                /* Add services opers and admins to the appropriate list, but
-                   only if the database version is equal to or more than 10. */
-                if (ver >= 10) {
-                    if (nc->flags & NI_SERVICES_ADMIN)
-                        slist_add(&servadmins, nc);
-                    if (nc->flags & NI_SERVICES_OPER)
-                        slist_add(&servopers, nc);
-                }
+				/* Add services opers and admins to the appropriate list, but
+				   only if the database version is equal to or more than 10. */
+				if (ver >= 10) {
+					if (nc->flags & NI_SERVICES_ADMIN)
+						slist_add(&servadmins, nc);
+					if (nc->flags & NI_SERVICES_OPER)
+						slist_add(&servopers, nc);
+				}
 
-                /* Add the Services root flag if needed. */
-                if (nc)
-                    for (j = 0; j < RootNumber; j++)
-                        if (!stricmp(ServicesRoots[j], na->nick))
-                            nc->flags |= NI_SERVICES_ROOT;
+				/* Add the Services root flag if needed. */
+				if (nc)
+					for (j = 0; j < RootNumber; j++)
+						if (!stricmp(ServicesRoots[j], na->nick))
+							nc->flags |= NI_SERVICES_ROOT;
 
-                SAFE(read_int16(&nc->accesscount, f));
-                if (nc->accesscount) {
-                    char **access;
-                    access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
-                    nc->access = access;
-                    for (j = 0; j < nc->accesscount; j++, access++)
-                        SAFE(read_string(access, f));
-                }
+				SAFE(read_int16(&nc->accesscount, f));
+				if (nc->accesscount) {
+					char **access;
+					access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
+					nc->access = access;
+					for (j = 0; j < nc->accesscount; j++, access++)
+						SAFE(read_string(access, f));
+				}
 
-                SAFE(read_int16(&tmp16, f));
-                nc->memos.memocount = (int16) tmp16;
-                SAFE(read_int16(&tmp16, f));
-                nc->memos.memomax = (int16) tmp16;
-                if (nc->memos.memocount) {
-                    Memo *memos;
-                    memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
-                    nc->memos.memos = memos;
+				SAFE(read_int16(&tmp16, f));
+				nc->memos.memocount = (int16) tmp16;
+				SAFE(read_int16(&tmp16, f));
+				nc->memos.memomax = (int16) tmp16;
+				if (nc->memos.memocount) {
+					Memo *memos;
+					memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
+					nc->memos.memos = memos;
 
-                    for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                        SAFE(read_int32(&memos->number, f));
-                        SAFE(read_int16(&memos->flags, f));
-                        SAFE(read_int32(&tmp32, f));
-                        memos->time = tmp32;
-                        SAFE(read_buffer(memos->sender, f));
-                        SAFE(read_string(&memos->text, f));
-                        memos->moduleData = NULL;
-                    }
-                }
+					for (j = 0; j < nc->memos.memocount; j++, memos++) {
+						SAFE(read_int32(&memos->number, f));
+						SAFE(read_int16(&memos->flags, f));
+						SAFE(read_int32(&tmp32, f));
+						memos->time = tmp32;
+						SAFE(read_buffer(memos->sender, f));
+						SAFE(read_string(&memos->text, f));
+						memos->moduleData = NULL;
+					}
+				}
 
-                /* We read the channel count, but don't take care of it.
-                   load_cs_dbase will regenerate it correctly. */
-                SAFE(read_int16(&tmp16, f));
+				/* We read the channel count, but don't take care of it.
+				   load_cs_dbase will regenerate it correctly. */
+				SAFE(read_int16(&tmp16, f));
 
 				/* formerly nc->channelmax, RIP */
-                SAFE(read_int16(&tmp16, f));
-                SAFE(read_int16(&nc->language, f));
+				SAFE(read_int16(&tmp16, f));
+				SAFE(read_int16(&nc->language, f));
 
-                if (ver >= 11 && ver < 13) {
-                    char *s;
+				if (ver >= 11 && ver < 13) {
+					char *s;
 
-                    SAFE(read_int16(&tmp16, f));
-                    SAFE(read_int32(&tmp32, f));
-                    SAFE(read_int16(&tmp16, f));
-                    SAFE(read_string(&s, f));
-                }
+					SAFE(read_int16(&tmp16, f));
+					SAFE(read_int32(&tmp32, f));
+					SAFE(read_int16(&tmp16, f));
+					SAFE(read_string(&s, f));
+				}
 
-                /* Set us as being a master nick; fill the nc field also.
-                   The NS_MASTER flag will not be cleared in this function. */
-                na->status |= NS_MASTER;
-                na->nc = nc;
-                slist_add(&nc->aliases, na);
+				/* Set us as being a master nick; fill the nc field also.
+				   The NS_MASTER flag will not be cleared in this function. */
+				na->status |= NS_MASTER;
+				na->nc = nc;
+				slist_add(&nc->aliases, na);
 
-                /* Insert our new core in the core list */
-                insert_core(nc);
-            }
+				/* Insert our new core in the core list */
+				insert_core(nc);
+			}
 
-            alpha_insert_alias(na);
+			alpha_insert_alias(na);
 
-        }                       /* while (getc_db(f) != 0) */
-    }                           /* for (i) */
+		}					   /* while (getc_db(f) != 0) */
+	}						   /* for (i) */
 
-    /* Now resolve what were called links */
-    for (i = 0; i < 1024; i++) {
-        for (na = nalists[i]; na; na = next) {
-            next = na->next;
+	/* Now resolve what were called links */
+	for (i = 0; i < 1024; i++) {
+		for (na = nalists[i]; na; na = next) {
+			next = na->next;
 
-            /* Master nicks are already resolved */
-            if (na->status & NS_MASTER)
-                continue;
+			/* Master nicks are already resolved */
+			if (na->status & NS_MASTER)
+				continue;
 
-            na2 = na;
-            /* While the reference resolves and it's not a master nick */
-            while ((na2 = findnick((char *) na2->nc))
-                   && !(na2->status & NS_MASTER));
+			na2 = na;
+			/* While the reference resolves and it's not a master nick */
+			while ((na2 = findnick((char *) na2->nc))
+				   && !(na2->status & NS_MASTER));
 
-            /* It didn't resolve. This is problematic since there is no core. :/
-               We delete the nick. */
-            if (!na2) {
-                alog("%s: while loading database: %s was linked to inexistant %s", s_NickServ, na->nick, (char *) na->nc);
-                delnick(na);
-                continue;
-            }
+			/* It didn't resolve. This is problematic since there is no core. :/
+			   We delete the nick. */
+			if (!na2) {
+				alog("%s: while loading database: %s was linked to inexistant %s", s_NickServ, na->nick, (char *) na->nc);
+				delnick(na);
+				continue;
+			}
 
-            /* OK we have information on the core. We mark the current alias
-               as a master nick because it now contains a valid core. */
-            na->nc = na2->nc;
-            na->status |= NS_MASTER;
-            slist_add(&na->nc->aliases, na);
-        }
-    }
+			/* OK we have information on the core. We mark the current alias
+			   as a master nick because it now contains a valid core. */
+			na->nc = na2->nc;
+			na->status |= NS_MASTER;
+			slist_add(&na->nc->aliases, na);
+		}
+	}
 
-    close_db(f);
+	close_db(f);
 }
 
 void load_ns_req_db(void)
 {
-    dbFILE *f;
-    int i, c, ver;
-    NickRequest *nr;
-    uint32 tmp32;
-    int failed = 0, len;
-    char *pass;
+	dbFILE *f;
+	int i, c, ver;
+	NickRequest *nr;
+	uint32 tmp32;
+	int failed = 0, len;
+	char *pass;
 
-    if (!(f = open_db(s_NickServ, PreNickDBName, "r", PRE_NICK_VERSION)))
-        return;
-    ver = get_file_version(f);
-    for (i = 0; i < 1024 && !failed; i++) {
-        while ((c = getc_db(f)) == 1) {
-            if (c != 1)
-                fatal("Invalid format in %s", PreNickDBName);
-            nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
-            SAFE(read_string(&nr->nick, f));
-            SAFE(read_string(&nr->passcode, f));
-            if (ver < 2) {
-                SAFE(read_string(&pass, f));
-                len = strlen(pass);
-                enc_encrypt(pass, len, nr->password, PASSMAX);
-                memset(pass, 0, len);
-                free(pass);
-            } else
-                SAFE(read_buffer(nr->password, f));
-            SAFE(read_string(&nr->email, f));
-            SAFE(read_int32(&tmp32, f));
-            nr->requested = tmp32;
-            insert_requestnick(nr);
-        }
-    }
-    close_db(f);
+	if (!(f = open_db(s_NickServ, PreNickDBName, "r", PRE_NICK_VERSION)))
+		return;
+	ver = get_file_version(f);
+	for (i = 0; i < 1024 && !failed; i++) {
+		while ((c = getc_db(f)) == 1) {
+			if (c != 1)
+				fatal("Invalid format in %s", PreNickDBName);
+			nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
+			SAFE(read_string(&nr->nick, f));
+			SAFE(read_string(&nr->passcode, f));
+			if (ver < 2) {
+				SAFE(read_string(&pass, f));
+				len = strlen(pass);
+				enc_encrypt(pass, len, nr->password, PASSMAX);
+				memset(pass, 0, len);
+				free(pass);
+			} else
+				SAFE(read_buffer(nr->password, f));
+			SAFE(read_string(&nr->email, f));
+			SAFE(read_int32(&tmp32, f));
+			nr->requested = tmp32;
+			insert_requestnick(nr);
+		}
+	}
+	close_db(f);
 }
 
 void load_ns_dbase(void)
 {
-    dbFILE *f;
-    int ver, i, j, c;
-    NickAlias *na, **nalast, *naprev;
-    NickCore *nc, **nclast, *ncprev;
-    int failed = 0;
-    uint16 tmp16;
-    uint32 tmp32;
-    char *s, *pass;
+	dbFILE *f;
+	int ver, i, j, c;
+	NickAlias *na, **nalast, *naprev;
+	NickCore *nc, **nclast, *ncprev;
+	int failed = 0;
+	uint16 tmp16;
+	uint32 tmp32;
+	char *s, *pass;
 
-    if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
-        return;
+	if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
+		return;
 
-    ver = get_file_version(f);
+	ver = get_file_version(f);
 
-    if (ver <= 11) {
-        close_db(f);
-        load_old_ns_dbase();
-        return;
-    }
+	if (ver <= 11) {
+		close_db(f);
+		load_old_ns_dbase();
+		return;
+	}
 
-    /* First we load nick cores */
-    for (i = 0; i < 1024 && !failed; i++) {
-        nclast = &nclists[i];
-        ncprev = NULL;
+	/* First we load nick cores */
+	for (i = 0; i < 1024 && !failed; i++) {
+		nclast = &nclists[i];
+		ncprev = NULL;
 
-        while ((c = getc_db(f)) == 1) {
-            if (c != 1)
-                fatal("Invalid format in %s", NickDBName);
+		while ((c = getc_db(f)) == 1) {
+			if (c != 1)
+				fatal("Invalid format in %s", NickDBName);
 
-            nc = (NickCore *)scalloc(1, sizeof(NickCore));
-            *nclast = nc;
-            nclast = &nc->next;
-            nc->prev = ncprev;
-            ncprev = nc;
+			nc = (NickCore *)scalloc(1, sizeof(NickCore));
+			*nclast = nc;
+			nclast = &nc->next;
+			nc->prev = ncprev;
+			ncprev = nc;
 
-            slist_init(&nc->aliases);
+			slist_init(&nc->aliases);
 
-            SAFE(read_string(&nc->display, f));
-            if (ver < 14) {
-                SAFE(read_string(&pass, f));
-                if (pass) {
-                    memset(nc->pass, 0, PASSMAX);
-                    memcpy(nc->pass, pass, strlen(pass));
-                } else
-                    memset(nc->pass, 0, PASSMAX);
-            } else
-                SAFE(read_buffer(nc->pass, f));
+			SAFE(read_string(&nc->display, f));
+			if (ver < 14) {
+				SAFE(read_string(&pass, f));
+				if (pass) {
+					memset(nc->pass, 0, PASSMAX);
+					memcpy(nc->pass, pass, strlen(pass));
+				} else
+					memset(nc->pass, 0, PASSMAX);
+			} else
+				SAFE(read_buffer(nc->pass, f));
 
-            SAFE(read_string(&nc->email, f));
-            SAFE(read_string(&nc->greet, f));
-            SAFE(read_int32(&nc->icq, f));
-            SAFE(read_string(&nc->url, f));
+			SAFE(read_string(&nc->email, f));
+			SAFE(read_string(&nc->greet, f));
+			SAFE(read_int32(&nc->icq, f));
+			SAFE(read_string(&nc->url, f));
 
-            SAFE(read_int32(&nc->flags, f));
-            if (!NSAllowKillImmed)
-                nc->flags &= ~NI_KILL_IMMED;
-            SAFE(read_int16(&nc->language, f));
+			SAFE(read_int32(&nc->flags, f));
+			if (!NSAllowKillImmed)
+				nc->flags &= ~NI_KILL_IMMED;
+			SAFE(read_int16(&nc->language, f));
 
-            /* Add services opers and admins to the appropriate list, but
-               only if the database version is more than 10. */
-            if (nc->flags & NI_SERVICES_ADMIN)
-                slist_add(&servadmins, nc);
-            if (nc->flags & NI_SERVICES_OPER)
-                slist_add(&servopers, nc);
+			/* Add services opers and admins to the appropriate list, but
+			   only if the database version is more than 10. */
+			if (nc->flags & NI_SERVICES_ADMIN)
+				slist_add(&servadmins, nc);
+			if (nc->flags & NI_SERVICES_OPER)
+				slist_add(&servopers, nc);
 
-            SAFE(read_int16(&nc->accesscount, f));
-            if (nc->accesscount) {
-                char **access;
-                access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
-                nc->access = access;
-                for (j = 0; j < nc->accesscount; j++, access++)
-                    SAFE(read_string(access, f));
-            }
+			SAFE(read_int16(&nc->accesscount, f));
+			if (nc->accesscount) {
+				char **access;
+				access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
+				nc->access = access;
+				for (j = 0; j < nc->accesscount; j++, access++)
+					SAFE(read_string(access, f));
+			}
 
-            SAFE(read_int16(&tmp16, f));
-            nc->memos.memocount = (int16) tmp16;
-            SAFE(read_int16(&tmp16, f));
-            nc->memos.memomax = (int16) tmp16;
-            if (nc->memos.memocount) {
-                Memo *memos;
-                memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
-                nc->memos.memos = memos;
-                for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                    SAFE(read_int32(&memos->number, f));
-                    SAFE(read_int16(&memos->flags, f));
-                    SAFE(read_int32(&tmp32, f));
-                    memos->time = tmp32;
-                    SAFE(read_buffer(memos->sender, f));
-                    SAFE(read_string(&memos->text, f));
-                    memos->moduleData = NULL;
-                }
-            }
+			SAFE(read_int16(&tmp16, f));
+			nc->memos.memocount = (int16) tmp16;
+			SAFE(read_int16(&tmp16, f));
+			nc->memos.memomax = (int16) tmp16;
+			if (nc->memos.memocount) {
+				Memo *memos;
+				memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
+				nc->memos.memos = memos;
+				for (j = 0; j < nc->memos.memocount; j++, memos++) {
+					SAFE(read_int32(&memos->number, f));
+					SAFE(read_int16(&memos->flags, f));
+					SAFE(read_int32(&tmp32, f));
+					memos->time = tmp32;
+					SAFE(read_buffer(memos->sender, f));
+					SAFE(read_string(&memos->text, f));
+					memos->moduleData = NULL;
+				}
+			}
 
-            SAFE(read_int16(&nc->channelcount, f));
-            SAFE(read_int16(&tmp16, f));
+			SAFE(read_int16(&nc->channelcount, f));
+			SAFE(read_int16(&tmp16, f));
 
-            if (ver < 13) {
-                /* Used to be dead authentication system */
-                SAFE(read_int16(&tmp16, f));
-                SAFE(read_int32(&tmp32, f));
-                SAFE(read_int16(&tmp16, f));
-                SAFE(read_string(&s, f));
-            }
+			if (ver < 13) {
+				/* Used to be dead authentication system */
+				SAFE(read_int16(&tmp16, f));
+				SAFE(read_int32(&tmp32, f));
+				SAFE(read_int16(&tmp16, f));
+				SAFE(read_string(&s, f));
+			}
 
-        }                       /* while (getc_db(f) != 0) */
-        *nclast = NULL;
-    }                           /* for (i) */
+		}					   /* while (getc_db(f) != 0) */
+		*nclast = NULL;
+	}						   /* for (i) */
 
-    for (i = 0; i < 1024 && !failed; i++) {
-        nalast = &nalists[i];
-        naprev = NULL;
-        while ((c = getc_db(f)) == 1) {
-            if (c != 1)
-                fatal("Invalid format in %s", NickDBName);
+	for (i = 0; i < 1024 && !failed; i++) {
+		nalast = &nalists[i];
+		naprev = NULL;
+		while ((c = getc_db(f)) == 1) {
+			if (c != 1)
+				fatal("Invalid format in %s", NickDBName);
 
-            na = (NickAlias *)scalloc(1, sizeof(NickAlias));
+			na = (NickAlias *)scalloc(1, sizeof(NickAlias));
 
-            SAFE(read_string(&na->nick, f));
+			SAFE(read_string(&na->nick, f));
 
-            SAFE(read_string(&na->last_usermask, f));
-            SAFE(read_string(&na->last_realname, f));
-            SAFE(read_string(&na->last_quit, f));
+			SAFE(read_string(&na->last_usermask, f));
+			SAFE(read_string(&na->last_realname, f));
+			SAFE(read_string(&na->last_quit, f));
 
-            SAFE(read_int32(&tmp32, f));
-            na->time_registered = tmp32;
-            SAFE(read_int32(&tmp32, f));
-            na->last_seen = tmp32;
-            SAFE(read_int16(&na->status, f));
-            na->status &= ~NS_TEMPORARY;
+			SAFE(read_int32(&tmp32, f));
+			na->time_registered = tmp32;
+			SAFE(read_int32(&tmp32, f));
+			na->last_seen = tmp32;
+			SAFE(read_int16(&na->status, f));
+			na->status &= ~NS_TEMPORARY;
 
-            SAFE(read_string(&s, f));
-            na->nc = findcore(s);
-            free(s);
+			SAFE(read_string(&s, f));
+			na->nc = findcore(s);
+			free(s);
 
-            slist_add(&na->nc->aliases, na);
+			slist_add(&na->nc->aliases, na);
 
-            if (!(na->status & NS_VERBOTEN)) {
-                if (!na->last_usermask)
-                    na->last_usermask = sstrdup("");
-                if (!na->last_realname)
-                    na->last_realname = sstrdup("");
-            }
+			if (!(na->status & NS_VERBOTEN)) {
+				if (!na->last_usermask)
+					na->last_usermask = sstrdup("");
+				if (!na->last_realname)
+					na->last_realname = sstrdup("");
+			}
 
-            na->nc->flags &= ~NI_SERVICES_ROOT;
+			na->nc->flags &= ~NI_SERVICES_ROOT;
 
-            *nalast = na;
-            nalast = &na->next;
-            na->prev = naprev;
-            naprev = na;
+			*nalast = na;
+			nalast = &na->next;
+			na->prev = naprev;
+			naprev = na;
 
-        }                       /* while (getc_db(f) != 0) */
+		}					   /* while (getc_db(f) != 0) */
 
-        *nalast = NULL;
-    }                           /* for (i) */
+		*nalast = NULL;
+	}						   /* for (i) */
 
-    close_db(f);
+	close_db(f);
 
-    for (i = 0; i < 1024; i++) {
-        NickAlias *next;
+	for (i = 0; i < 1024; i++) {
+		NickAlias *next;
 
-        for (na = nalists[i]; na; na = next) {
-            next = na->next;
-            /* We check for coreless nicks (although it should never happen) */
-            if (!na->nc) {
-                alog("%s: while loading database: %s has no core! We delete it.", s_NickServ, na->nick);
-                delnick(na);
-                continue;
-            }
+		for (na = nalists[i]; na; na = next) {
+			next = na->next;
+			/* We check for coreless nicks (although it should never happen) */
+			if (!na->nc) {
+				alog("%s: while loading database: %s has no core! We delete it.", s_NickServ, na->nick);
+				delnick(na);
+				continue;
+			}
 
-            /* Add the Services root flag if needed. */
-            for (j = 0; j < RootNumber; j++)
-                if (!stricmp(ServicesRoots[j], na->nick))
-                    na->nc->flags |= NI_SERVICES_ROOT;
-        }
-    }
+			/* Add the Services root flag if needed. */
+			for (j = 0; j < RootNumber; j++)
+				if (!stricmp(ServicesRoots[j], na->nick))
+					na->nc->flags |= NI_SERVICES_ROOT;
+		}
+	}
 }
 
 #undef SAFE
@@ -632,120 +632,120 @@ void load_ns_dbase(void)
 /*************************************************************************/
 
 #define SAFE(x) do {						\
-    if ((x) < 0) {						\
+	if ((x) < 0) {						\
 	restore_db(f);						\
 	log_perror("Write error on %s", NickDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", NickDBName,	\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", NickDBName,	\
 			strerror(errno));			\
-	    lastwarn = time(NULL);				\
+		lastwarn = time(NULL);				\
 	}							\
 	return;							\
-    }								\
+	}								\
 } while (0)
 
 
 
 void save_ns_dbase(void)
 {
-    dbFILE *f;
-    int i, j;
-    NickAlias *na;
-    NickCore *nc;
-    char **access;
-    Memo *memos;
-    static time_t lastwarn = 0;
+	dbFILE *f;
+	int i, j;
+	NickAlias *na;
+	NickCore *nc;
+	char **access;
+	Memo *memos;
+	static time_t lastwarn = 0;
 
-    if (!(f = open_db(s_NickServ, NickDBName, "w", NICK_VERSION)))
-        return;
+	if (!(f = open_db(s_NickServ, NickDBName, "w", NICK_VERSION)))
+		return;
 
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            SAFE(write_int8(1, f));
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			SAFE(write_int8(1, f));
 
-            SAFE(write_string(nc->display, f));
-            SAFE(write_buffer(nc->pass, f));
+			SAFE(write_string(nc->display, f));
+			SAFE(write_buffer(nc->pass, f));
 
-            SAFE(write_string(nc->email, f));
-            SAFE(write_string(nc->greet, f));
-            SAFE(write_int32(nc->icq, f));
-            SAFE(write_string(nc->url, f));
+			SAFE(write_string(nc->email, f));
+			SAFE(write_string(nc->greet, f));
+			SAFE(write_int32(nc->icq, f));
+			SAFE(write_string(nc->url, f));
 
-            SAFE(write_int32(nc->flags, f));
-            SAFE(write_int16(nc->language, f));
+			SAFE(write_int32(nc->flags, f));
+			SAFE(write_int16(nc->language, f));
 
-            SAFE(write_int16(nc->accesscount, f));
-            for (j = 0, access = nc->access; j < nc->accesscount;
-                 j++, access++)
-                SAFE(write_string(*access, f));
+			SAFE(write_int16(nc->accesscount, f));
+			for (j = 0, access = nc->access; j < nc->accesscount;
+				 j++, access++)
+				SAFE(write_string(*access, f));
 
-            SAFE(write_int16(nc->memos.memocount, f));
-            SAFE(write_int16(nc->memos.memomax, f));
-            memos = nc->memos.memos;
-            for (j = 0; j < nc->memos.memocount; j++, memos++) {
-                SAFE(write_int32(memos->number, f));
-                SAFE(write_int16(memos->flags, f));
-                SAFE(write_int32(memos->time, f));
-                SAFE(write_buffer(memos->sender, f));
-                SAFE(write_string(memos->text, f));
-            }
+			SAFE(write_int16(nc->memos.memocount, f));
+			SAFE(write_int16(nc->memos.memomax, f));
+			memos = nc->memos.memos;
+			for (j = 0; j < nc->memos.memocount; j++, memos++) {
+				SAFE(write_int32(memos->number, f));
+				SAFE(write_int16(memos->flags, f));
+				SAFE(write_int32(memos->time, f));
+				SAFE(write_buffer(memos->sender, f));
+				SAFE(write_string(memos->text, f));
+			}
 
-            SAFE(write_int16(nc->channelcount, f));
-            SAFE(write_int16(nc->channelcount, f)); // write this twice to avoid having to revbump the NickServ DB from anope 1.7, hack alert XXX
+			SAFE(write_int16(nc->channelcount, f));
+			SAFE(write_int16(nc->channelcount, f)); // write this twice to avoid having to revbump the NickServ DB from anope 1.7, hack alert XXX
 
-        }                       /* for (nc) */
+		}					   /* for (nc) */
 
-        SAFE(write_int8(0, f));
+		SAFE(write_int8(0, f));
 
-    }                           /* for (i) */
+	}						   /* for (i) */
 
-    for (i = 0; i < 1024; i++) {
-        for (na = nalists[i]; na; na = na->next) {
-            SAFE(write_int8(1, f));
+	for (i = 0; i < 1024; i++) {
+		for (na = nalists[i]; na; na = na->next) {
+			SAFE(write_int8(1, f));
 
-            SAFE(write_string(na->nick, f));
+			SAFE(write_string(na->nick, f));
 
-            SAFE(write_string(na->last_usermask, f));
-            SAFE(write_string(na->last_realname, f));
-            SAFE(write_string(na->last_quit, f));
+			SAFE(write_string(na->last_usermask, f));
+			SAFE(write_string(na->last_realname, f));
+			SAFE(write_string(na->last_quit, f));
 
-            SAFE(write_int32(na->time_registered, f));
-            SAFE(write_int32(na->last_seen, f));
+			SAFE(write_int32(na->time_registered, f));
+			SAFE(write_int32(na->last_seen, f));
 
-            SAFE(write_int16(na->status, f));
+			SAFE(write_int16(na->status, f));
 
-            SAFE(write_string(na->nc->display, f));
+			SAFE(write_string(na->nc->display, f));
 
-        }                       /* for (na) */
-        SAFE(write_int8(0, f));
-    }                           /* for (i) */
+		}					   /* for (na) */
+		SAFE(write_int8(0, f));
+	}						   /* for (i) */
 
-    close_db(f);
+	close_db(f);
 
 }
 
 void save_ns_req_dbase(void)
 {
-    dbFILE *f;
-    int i;
-    NickRequest *nr;
-    static time_t lastwarn = 0;
+	dbFILE *f;
+	int i;
+	NickRequest *nr;
+	static time_t lastwarn = 0;
 
-    if (!(f = open_db(s_NickServ, PreNickDBName, "w", PRE_NICK_VERSION)))
-        return;
+	if (!(f = open_db(s_NickServ, PreNickDBName, "w", PRE_NICK_VERSION)))
+		return;
 
-    for (i = 0; i < 1024; i++) {
-        for (nr = nrlists[i]; nr; nr = nr->next) {
-            SAFE(write_int8(1, f));
-            SAFE(write_string(nr->nick, f));
-            SAFE(write_string(nr->passcode, f));
-            SAFE(write_buffer(nr->password, f));
-            SAFE(write_string(nr->email, f));
-            SAFE(write_int32(nr->requested, f));
-            SAFE(write_int8(0, f));
-        }
-    }
-    close_db(f);
+	for (i = 0; i < 1024; i++) {
+		for (nr = nrlists[i]; nr; nr = nr->next) {
+			SAFE(write_int8(1, f));
+			SAFE(write_string(nr->nick, f));
+			SAFE(write_string(nr->passcode, f));
+			SAFE(write_buffer(nr->password, f));
+			SAFE(write_string(nr->email, f));
+			SAFE(write_int32(nr->requested, f));
+			SAFE(write_int8(0, f));
+		}
+	}
+	close_db(f);
 
 }
 
@@ -763,71 +763,71 @@ void save_ns_req_dbase(void)
 
 int validate_user(User * u)
 {
-    NickAlias *na;
-    NickRequest *nr;
+	NickAlias *na;
+	NickRequest *nr;
 
-    int on_access;
+	int on_access;
 
-    if ((nr = findrequestnick(u->nick))) {
-        notice_lang(s_NickServ, u, NICK_IS_PREREG);
-    }
+	if ((nr = findrequestnick(u->nick))) {
+		notice_lang(s_NickServ, u, NICK_IS_PREREG);
+	}
 
-    if (!(na = u->na))
-        return 0;
+	if (!(na = u->na))
+		return 0;
 
-    if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_MAY_NOT_BE_USED);
-        collide(na, 0);
-        return 0;
-    }
+	if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_MAY_NOT_BE_USED);
+		collide(na, 0);
+		return 0;
+	}
 
-    if (na->nc->flags & NI_SUSPENDED) {
-        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
-        collide(na, 0);
-        return 0;
-    }
+	if (na->nc->flags & NI_SUSPENDED) {
+		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, u->nick);
+		collide(na, 0);
+		return 0;
+	}
 
-    on_access = is_on_access(u, na->nc);
-    if (on_access)
-        na->status |= NS_ON_ACCESS;
+	on_access = is_on_access(u, na->nc);
+	if (on_access)
+		na->status |= NS_ON_ACCESS;
 
-    if (!(na->nc->flags & NI_SECURE) && on_access) {
-        na->status |= NS_RECOGNIZED;
-        na->last_seen = time(NULL);
-        if (na->last_usermask)
-            free(na->last_usermask);
-        na->last_usermask =
-            (char *)scalloc(strlen(common_get_vident(u)) +
-                    strlen(common_get_vhost(u)) + 2, 1);
-        sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
-                common_get_vhost(u));
-        if (na->last_realname)
-            free(na->last_realname);
-        na->last_realname = sstrdup(u->realname);
-        return 1;
-    }
+	if (!(na->nc->flags & NI_SECURE) && on_access) {
+		na->status |= NS_RECOGNIZED;
+		na->last_seen = time(NULL);
+		if (na->last_usermask)
+			free(na->last_usermask);
+		na->last_usermask =
+			(char *)scalloc(strlen(common_get_vident(u)) +
+					strlen(common_get_vhost(u)) + 2, 1);
+		sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+				common_get_vhost(u));
+		if (na->last_realname)
+			free(na->last_realname);
+		na->last_realname = sstrdup(u->realname);
+		return 1;
+	}
 
-    if (on_access || !(na->nc->flags & NI_KILL_IMMED)) {
-        if (na->nc->flags & NI_SECURE)
-            notice_lang(s_NickServ, u, NICK_IS_SECURE, s_NickServ);
-        else
-            notice_lang(s_NickServ, u, NICK_IS_REGISTERED, s_NickServ);
-    }
+	if (on_access || !(na->nc->flags & NI_KILL_IMMED)) {
+		if (na->nc->flags & NI_SECURE)
+			notice_lang(s_NickServ, u, NICK_IS_SECURE, s_NickServ);
+		else
+			notice_lang(s_NickServ, u, NICK_IS_REGISTERED, s_NickServ);
+	}
 
-    if ((na->nc->flags & NI_KILLPROTECT) && !on_access) {
-        if (na->nc->flags & NI_KILL_IMMED) {
-            notice_lang(s_NickServ, u, FORCENICKCHANGE_NOW);
-            collide(na, 0);
-        } else if (na->nc->flags & NI_KILL_QUICK) {
-            notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
-            add_ns_timeout(na, TO_COLLIDE, 20);
-        } else {
-            notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
-            add_ns_timeout(na, TO_COLLIDE, 60);
-        }
-    }
+	if ((na->nc->flags & NI_KILLPROTECT) && !on_access) {
+		if (na->nc->flags & NI_KILL_IMMED) {
+			notice_lang(s_NickServ, u, FORCENICKCHANGE_NOW);
+			collide(na, 0);
+		} else if (na->nc->flags & NI_KILL_QUICK) {
+			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_20_SECONDS);
+			add_ns_timeout(na, TO_COLLIDE, 20);
+		} else {
+			notice_lang(s_NickServ, u, FORCENICKCHANGE_IN_1_MINUTE);
+			add_ns_timeout(na, TO_COLLIDE, 60);
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 /*************************************************************************/
@@ -837,42 +837,42 @@ int validate_user(User * u)
 
 void cancel_user(User * u)
 {
-    NickAlias *na = u->na;
+	NickAlias *na = u->na;
 
-    if (na) {
-        if (na->status & NS_GUESTED) {
-            if (ircd->svshold) {
-                if (UseSVSHOLD) {
-                    ircdproto->SendSVSHold(na->nick);
-                } else {
-                    if (ircd->svsnick) {
-                        ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
-                                             NSEnforcerHost,
-                                             "Services Enforcer", "+", ts6_uid_retrieve());
-                        add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-                    } else {
-                        ircdproto->SendSVSKill(s_NickServ, u->nick,
-                                          "Killing to enforce nick");
-                    }
-                }
-            } else {
-                if (ircd->svsnick) {
-                    ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
-                                         NSEnforcerHost,
-                                         "Services Enforcer", "+", ts6_uid_retrieve());
-                    add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-                } else {
-                    ircdproto->SendSVSKill(s_NickServ, u->nick,
-                                      "Killing to enforce nick");
-                }
-            }
-            na->status &= ~NS_TEMPORARY;
-            na->status |= NS_KILL_HELD;
-        } else {
-            na->status &= ~NS_TEMPORARY;
-        }
-        del_ns_timeout(na, TO_COLLIDE);
-    }
+	if (na) {
+		if (na->status & NS_GUESTED) {
+			if (ircd->svshold) {
+				if (UseSVSHOLD) {
+					ircdproto->SendSVSHold(na->nick);
+				} else {
+					if (ircd->svsnick) {
+						ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
+											 NSEnforcerHost,
+											 "Services Enforcer", "+", ts6_uid_retrieve());
+						add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+					} else {
+						ircdproto->SendSVSKill(s_NickServ, u->nick,
+										  "Killing to enforce nick");
+					}
+				}
+			} else {
+				if (ircd->svsnick) {
+					ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
+										 NSEnforcerHost,
+										 "Services Enforcer", "+", ts6_uid_retrieve());
+					add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+				} else {
+					ircdproto->SendSVSKill(s_NickServ, u->nick,
+									  "Killing to enforce nick");
+				}
+			}
+			na->status &= ~NS_TEMPORARY;
+			na->status |= NS_KILL_HELD;
+		} else {
+			na->status &= ~NS_TEMPORARY;
+		}
+		del_ns_timeout(na, TO_COLLIDE);
+	}
 }
 
 /*************************************************************************/
@@ -881,18 +881,18 @@ void cancel_user(User * u)
 
 int nick_identified(User * u)
 {
-    if (u) {
-        if (u->na) {
-            if (u->na->status) {
-                return (u->na->status & NS_IDENTIFIED);
-            } else {
-                return 0;
-            }
-        } else {
-            return 0;
-        }
-    }
-    return 0;
+	if (u) {
+		if (u->na) {
+			if (u->na->status) {
+				return (u->na->status & NS_IDENTIFIED);
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	}
+	return 0;
 }
 
 /*************************************************************************/
@@ -901,18 +901,18 @@ int nick_identified(User * u)
 
 int nick_recognized(User * u)
 {
-    if (u) {
-        if (u->na) {
-            if (u->na->status) {
-                return (u->na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
-            } else {
-                return 0;
-            }
-        } else {
-            return 0;
-        }
-    }
-    return 0;
+	if (u) {
+		if (u->na) {
+			if (u->na->status) {
+				return (u->na->status & (NS_IDENTIFIED | NS_RECOGNIZED));
+			} else {
+				return 0;
+			}
+		} else {
+			return 0;
+		}
+	}
+	return 0;
 }
 
 /*************************************************************************/
@@ -921,7 +921,7 @@ int nick_recognized(User * u)
 
 int group_identified(User * u, NickCore * nc)
 {
-    return nick_identified(u) && u->na->nc == nc;
+	return nick_identified(u) && u->na->nc == nc;
 }
 
 /*************************************************************************/
@@ -932,54 +932,54 @@ int group_identified(User * u, NickCore * nc)
 
 void expire_nicks()
 {
-    int i;
-    NickAlias *na, *next;
-    time_t now = time(NULL);
-    char *tmpnick;
+	int i;
+	NickAlias *na, *next;
+	time_t now = time(NULL);
+	char *tmpnick;
 
-    for (i = 0; i < 1024; i++) {
-        for (na = nalists[i]; na; na = next) {
-            next = na->next;
+	for (i = 0; i < 1024; i++) {
+		for (na = nalists[i]; na; na = next) {
+			next = na->next;
 
-            if (na->u
-                && ((na->nc->flags & NI_SECURE) ? nick_identified(na->u) :
-                    nick_recognized(na->u))) {
-                if (debug >= 2)
-                    alog("debug: NickServ: updating last seen time for %s",
-                         na->nick);
-                na->last_seen = now;
-                continue;
-            }
+			if (na->u
+				&& ((na->nc->flags & NI_SECURE) ? nick_identified(na->u) :
+					nick_recognized(na->u))) {
+				if (debug >= 2)
+					alog("debug: NickServ: updating last seen time for %s",
+						 na->nick);
+				na->last_seen = now;
+				continue;
+			}
 
-            if (NSExpire && now - na->last_seen >= NSExpire
-                && !(na->status & (NS_VERBOTEN | NS_NO_EXPIRE))
-                && !(na->nc->flags & (NI_SUSPENDED))) {
-                alog("Expiring nickname %s (group: %s) (e-mail: %s)",
-                     na->nick, na->nc->display,
-                     (na->nc->email ? na->nc->email : "none"));
-                tmpnick = sstrdup(na->nick);
-                delnick(na);
-                send_event(EVENT_NICK_EXPIRE, 1, tmpnick);
-                free(tmpnick);
-            }
-        }
-    }
+			if (NSExpire && now - na->last_seen >= NSExpire
+				&& !(na->status & (NS_VERBOTEN | NS_NO_EXPIRE))
+				&& !(na->nc->flags & (NI_SUSPENDED))) {
+				alog("Expiring nickname %s (group: %s) (e-mail: %s)",
+					 na->nick, na->nc->display,
+					 (na->nc->email ? na->nc->email : "none"));
+				tmpnick = sstrdup(na->nick);
+				delnick(na);
+				send_event(EVENT_NICK_EXPIRE, 1, tmpnick);
+				free(tmpnick);
+			}
+		}
+	}
 }
 
 void expire_requests()
 {
-    int i;
-    NickRequest *nr, *next;
-    time_t now = time(NULL);
-    for (i = 0; i < 1024; i++) {
-        for (nr = nrlists[i]; nr; nr = next) {
-            next = nr->next;
-            if (NSRExpire && now - nr->requested >= NSRExpire) {
-                alog("Request for nick %s expiring", nr->nick);
-                delnickrequest(nr);
-            }
-        }
-    }
+	int i;
+	NickRequest *nr, *next;
+	time_t now = time(NULL);
+	for (i = 0; i < 1024; i++) {
+		for (nr = nrlists[i]; nr; nr = next) {
+			next = nr->next;
+			if (NSRExpire && now - nr->requested >= NSRExpire) {
+				alog("Request for nick %s expiring", nr->nick);
+				delnickrequest(nr);
+			}
+		}
+	}
 }
 
 /*************************************************************************/
@@ -988,20 +988,20 @@ void expire_requests()
 
 NickRequest *findrequestnick(const char *nick)
 {
-    NickRequest *nr;
+	NickRequest *nr;
 
-    if (!*nick || !nick) {
-        if (debug) {
-            alog("debug: findrequestnick() called with NULL values");
-        }
-        return NULL;
-    }
+	if (!*nick || !nick) {
+		if (debug) {
+			alog("debug: findrequestnick() called with NULL values");
+		}
+		return NULL;
+	}
 
-    for (nr = nrlists[HASH(nick)]; nr; nr = nr->next) {
-        if (stricmp(nr->nick, nick) == 0)
-            return nr;
-    }
-    return NULL;
+	for (nr = nrlists[HASH(nick)]; nr; nr = nr->next) {
+		if (stricmp(nr->nick, nick) == 0)
+			return nr;
+	}
+	return NULL;
 }
 
 /* Return the NickAlias structure for the given nick, or NULL if the nick
@@ -1009,21 +1009,21 @@ NickRequest *findrequestnick(const char *nick)
 
 NickAlias *findnick(const char *nick)
 {
-    NickAlias *na;
+	NickAlias *na;
 
-    if (!nick || !*nick) {
-        if (debug) {
-            alog("debug: findnick() called with NULL values");
-        }
-        return NULL;
-    }
+	if (!nick || !*nick) {
+		if (debug) {
+			alog("debug: findnick() called with NULL values");
+		}
+		return NULL;
+	}
 
-    for (na = nalists[HASH(nick)]; na; na = na->next) {
-        if (stricmp(na->nick, nick) == 0)
-            return na;
-    }
+	for (na = nalists[HASH(nick)]; na; na = na->next) {
+		if (stricmp(na->nick, nick) == 0)
+			return na;
+	}
 
-    return NULL;
+	return NULL;
 }
 
 NickAlias *findnick(const std::string &nick)
@@ -1038,21 +1038,21 @@ NickAlias *findnick(const std::string &nick)
 
 NickCore *findcore(const char *nick)
 {
-    NickCore *nc;
+	NickCore *nc;
 
-    if (!nick || !*nick) {
-        if (debug) {
-            alog("debug: findcore() called with NULL values");
-        }
-        return NULL;
-    }
+	if (!nick || !*nick) {
+		if (debug) {
+			alog("debug: findcore() called with NULL values");
+		}
+		return NULL;
+	}
 
-    for (nc = nclists[HASH(nick)]; nc; nc = nc->next) {
-        if (stricmp(nc->display, nick) == 0)
-            return nc;
-    }
+	for (nc = nclists[HASH(nick)]; nc; nc = nc->next) {
+		if (stricmp(nc->display, nick) == 0)
+			return nc;
+	}
 
-    return NULL;
+	return NULL;
 }
 
 /*************************************************************************/
@@ -1064,39 +1064,39 @@ NickCore *findcore(const char *nick)
 
 int is_on_access(User * u, NickCore * nc)
 {
-    int i;
-    char *buf;
-    char *buf2 = NULL;
+	int i;
+	char *buf;
+	char *buf2 = NULL;
 
-    if (nc->accesscount == 0)
-        return 0;
+	if (nc->accesscount == 0)
+		return 0;
 
-    buf = (char *)scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
-    sprintf(buf, "%s@%s", u->username, u->host);
-    if (ircd->vhost) {
-        if (u->vhost) {
-            buf2 = (char *)scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
-            sprintf(buf2, "%s@%s", u->username, u->vhost);
-        }
-    }
+	buf = (char *)scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
+	sprintf(buf, "%s@%s", u->username, u->host);
+	if (ircd->vhost) {
+		if (u->vhost) {
+			buf2 = (char *)scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
+			sprintf(buf2, "%s@%s", u->username, u->vhost);
+		}
+	}
 
-    for (i = 0; i < nc->accesscount; i++) {
-        if (match_wild_nocase(nc->access[i], buf)
-            || (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
-            free(buf);
-            if (ircd->vhost) {
-                if (u->vhost) {
-                    free(buf2);
-                }
-            }
-            return 1;
-        }
-    }
-    free(buf);
-    if (ircd->vhost) {
-        free(buf2);
-    }
-    return 0;
+	for (i = 0; i < nc->accesscount; i++) {
+		if (match_wild_nocase(nc->access[i], buf)
+			|| (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
+			free(buf);
+			if (ircd->vhost) {
+				if (u->vhost) {
+					free(buf2);
+				}
+			}
+			return 1;
+		}
+	}
+	free(buf);
+	if (ircd->vhost) {
+		free(buf2);
+	}
+	return 0;
 }
 
 /*************************************************************************/
@@ -1105,30 +1105,30 @@ int is_on_access(User * u, NickCore * nc)
 
 void alpha_insert_alias(NickAlias * na)
 {
-    NickAlias *ptr, *prev;
-    char *nick;
-    int index;
+	NickAlias *ptr, *prev;
+	char *nick;
+	int index;
 
-    if (!na) {
-        if (debug) {
-            alog("debug: alpha_insert_alias called with NULL values");
-        }
-        return;
-    }
+	if (!na) {
+		if (debug) {
+			alog("debug: alpha_insert_alias called with NULL values");
+		}
+		return;
+	}
 
-    nick = na->nick;
-    index = HASH(nick);
+	nick = na->nick;
+	index = HASH(nick);
 
-    for (prev = NULL, ptr = nalists[index];
-         ptr && stricmp(ptr->nick, nick) < 0; prev = ptr, ptr = ptr->next);
-    na->prev = prev;
-    na->next = ptr;
-    if (!prev)
-        nalists[index] = na;
-    else
-        prev->next = na;
-    if (ptr)
-        ptr->prev = na;
+	for (prev = NULL, ptr = nalists[index];
+		 ptr && stricmp(ptr->nick, nick) < 0; prev = ptr, ptr = ptr->next);
+	na->prev = prev;
+	na->next = ptr;
+	if (!prev)
+		nalists[index] = na;
+	else
+		prev->next = na;
+	if (ptr)
+		ptr->prev = na;
 }
 
 /*************************************************************************/
@@ -1137,41 +1137,41 @@ void alpha_insert_alias(NickAlias * na)
 
 void insert_core(NickCore * nc)
 {
-    int index;
+	int index;
 
-    if (!nc) {
-        if (debug) {
-            alog("debug: insert_core called with NULL values");
-        }
-        return;
-    }
+	if (!nc) {
+		if (debug) {
+			alog("debug: insert_core called with NULL values");
+		}
+		return;
+	}
 
-    index = HASH(nc->display);
+	index = HASH(nc->display);
 
-    nc->prev = NULL;
-    nc->next = nclists[index];
-    if (nc->next)
-        nc->next->prev = nc;
-    nclists[index] = nc;
+	nc->prev = NULL;
+	nc->next = nclists[index];
+	if (nc->next)
+		nc->next->prev = nc;
+	nclists[index] = nc;
 }
 
 /*************************************************************************/
 void insert_requestnick(NickRequest * nr)
 {
-    int index = HASH(nr->nick);
-    if (!nr) {
-        if (debug) {
-            alog("debug: insert_requestnick called with NULL values");
-        }
-        return;
-    }
+	int index = HASH(nr->nick);
+	if (!nr) {
+		if (debug) {
+			alog("debug: insert_requestnick called with NULL values");
+		}
+		return;
+	}
 
 
-    nr->prev = NULL;
-    nr->next = nrlists[index];
-    if (nr->next)
-        nr->next->prev = nr;
-    nrlists[index] = nr;
+	nr->prev = NULL;
+	nr->next = nrlists[index];
+	if (nr->next)
+		nr->next->prev = nr;
+	nrlists[index] = nr;
 }
 
 /*************************************************************************/
@@ -1182,31 +1182,31 @@ void insert_requestnick(NickRequest * nr)
 
 void change_core_display(NickCore * nc, char *newdisplay)
 {
-    if (!newdisplay) {
-        NickAlias *na;
+	if (!newdisplay) {
+		NickAlias *na;
 
-        if (nc->aliases.count <= 0)
-            return;
+		if (nc->aliases.count <= 0)
+			return;
 
-        na = (NickAlias *)nc->aliases.list[0];
-        newdisplay = na->nick;
-    }
+		na = (NickAlias *)nc->aliases.list[0];
+		newdisplay = na->nick;
+	}
 
-    /* Log ... */
-    alog("%s: changing %s nickname group display to %s", s_NickServ,
-         nc->display, newdisplay);
+	/* Log ... */
+	alog("%s: changing %s nickname group display to %s", s_NickServ,
+		 nc->display, newdisplay);
 
-    /* Remove the core from the list */
-    if (nc->next)
-        nc->next->prev = nc->prev;
-    if (nc->prev)
-        nc->prev->next = nc->next;
-    else
-        nclists[HASH(nc->display)] = nc->next;
+	/* Remove the core from the list */
+	if (nc->next)
+		nc->next->prev = nc->prev;
+	if (nc->prev)
+		nc->prev->next = nc->next;
+	else
+		nclists[HASH(nc->display)] = nc->next;
 
-    free(nc->display);
-    nc->display = sstrdup(newdisplay);
-    insert_core(nc);
+	free(nc->display);
+	nc->display = sstrdup(newdisplay);
+	insert_core(nc);
 
 }
 
@@ -1219,72 +1219,72 @@ void change_core_display(NickCore * nc, char *newdisplay)
 
 static int delcore(NickCore * nc)
 {
-    int i;
-    /* (Hopefully complete) cleanup */
-    cs_remove_nick(nc);
-    os_remove_nick(nc);
+	int i;
+	/* (Hopefully complete) cleanup */
+	cs_remove_nick(nc);
+	os_remove_nick(nc);
 
-    /* Remove the core from the list */
-    if (nc->next)
-        nc->next->prev = nc->prev;
-    if (nc->prev)
-        nc->prev->next = nc->next;
-    else
-        nclists[HASH(nc->display)] = nc->next;
+	/* Remove the core from the list */
+	if (nc->next)
+		nc->next->prev = nc->prev;
+	if (nc->prev)
+		nc->prev->next = nc->next;
+	else
+		nclists[HASH(nc->display)] = nc->next;
 
-    /* Log .. */
-    alog("%s: deleting nickname group %s", s_NickServ, nc->display);
+	/* Log .. */
+	alog("%s: deleting nickname group %s", s_NickServ, nc->display);
 
-    /* Now we can safely free it. */
-    free(nc->display);
+	/* Now we can safely free it. */
+	free(nc->display);
 
-    if (nc->email)
-        free(nc->email);
-    if (nc->greet)
-        free(nc->greet);
-    if (nc->url)
-        free(nc->url);
+	if (nc->email)
+		free(nc->email);
+	if (nc->greet)
+		free(nc->greet);
+	if (nc->url)
+		free(nc->url);
 
-    if (nc->access) {
-        for (i = 0; i < nc->accesscount; i++) {
-            if (nc->access[i])
-                free(nc->access[i]);
-        }
-        free(nc->access);
-    }
+	if (nc->access) {
+		for (i = 0; i < nc->accesscount; i++) {
+			if (nc->access[i])
+				free(nc->access[i]);
+		}
+		free(nc->access);
+	}
 
-    if (nc->memos.memos) {
-        for (i = 0; i < nc->memos.memocount; i++) {
-            if (nc->memos.memos[i].text)
-                free(nc->memos.memos[i].text);
-            moduleCleanStruct(&nc->memos.memos[i].moduleData);
-        }
-        free(nc->memos.memos);
-    }
+	if (nc->memos.memos) {
+		for (i = 0; i < nc->memos.memocount; i++) {
+			if (nc->memos.memos[i].text)
+				free(nc->memos.memos[i].text);
+			moduleCleanStruct(&nc->memos.memos[i].moduleData);
+		}
+		free(nc->memos.memos);
+	}
 
-    moduleCleanStruct(&nc->moduleData);
+	moduleCleanStruct(&nc->moduleData);
 
-    free(nc);
+	free(nc);
 
-    return 1;
+	return 1;
 }
 
 
 /*************************************************************************/
 int delnickrequest(NickRequest * nr)
 {
-    if (nr) {
-        nrlists[HASH(nr->nick)] = nr->next;
-        if (nr->nick)
-            free(nr->nick);
-        if (nr->passcode)
-            free(nr->passcode);
-        if (nr->email)
-            free(nr->email);
-        free(nr);
-    }
+	if (nr) {
+		nrlists[HASH(nr->nick)] = nr->next;
+		if (nr->nick)
+			free(nr->nick);
+		if (nr->passcode)
+			free(nr->passcode);
+		if (nr->email)
+			free(nr->email);
+		free(nr);
+	}
 
-    return 0;
+	return 0;
 }
 
 /*************************************************************************/
@@ -1299,59 +1299,59 @@ int delnickrequest(NickRequest * nr)
 
 int delnick(NickAlias * na)
 {
-    /* First thing to do: remove any timeout belonging to the nick we're deleting */
-    clean_ns_timeouts(na);
+	/* First thing to do: remove any timeout belonging to the nick we're deleting */
+	clean_ns_timeouts(na);
 
-    /* Second thing to do: look for an user using the alias
-     * being deleted, and make appropriate changes */
+	/* Second thing to do: look for an user using the alias
+	 * being deleted, and make appropriate changes */
 
-    if (na->u) {
-        na->u->na = NULL;
+	if (na->u) {
+		na->u->na = NULL;
 
-        if (ircd->modeonunreg)
-            common_svsmode(na->u, ircd->modeonunreg, "1");
+		if (ircd->modeonunreg)
+			common_svsmode(na->u, ircd->modeonunreg, "1");
 
-    }
+	}
 
-    delHostCore(na->nick);      /* delete any vHost's for this nick */
+	delHostCore(na->nick);	  /* delete any vHost's for this nick */
 
-    /* Accept nicks that have no core, because of database load functions */
-    if (na->nc) {
-        /* Next: see if our core is still useful. */
-        slist_remove(&na->nc->aliases, na);
-        if (na->nc->aliases.count == 0) {
-            if (!delcore(na->nc))
-                return 0;
-            na->nc = NULL;
-        } else {
-            /* Display updating stuff */
-            if (!stricmp(na->nick, na->nc->display))
-                change_core_display(na->nc, NULL);
-        }
-    }
+	/* Accept nicks that have no core, because of database load functions */
+	if (na->nc) {
+		/* Next: see if our core is still useful. */
+		slist_remove(&na->nc->aliases, na);
+		if (na->nc->aliases.count == 0) {
+			if (!delcore(na->nc))
+				return 0;
+			na->nc = NULL;
+		} else {
+			/* Display updating stuff */
+			if (!stricmp(na->nick, na->nc->display))
+				change_core_display(na->nc, NULL);
+		}
+	}
 
-    /* Remove us from the aliases list */
-    if (na->next)
-        na->next->prev = na->prev;
-    if (na->prev)
-        na->prev->next = na->next;
-    else
-        nalists[HASH(na->nick)] = na->next;
+	/* Remove us from the aliases list */
+	if (na->next)
+		na->next->prev = na->prev;
+	if (na->prev)
+		na->prev->next = na->next;
+	else
+		nalists[HASH(na->nick)] = na->next;
 
-    free(na->nick);
-    if (na->last_usermask)
-        free(na->last_usermask);
-    if (na->last_realname)
-        free(na->last_realname);
-    if (na->last_quit)
-        free(na->last_quit);
+	free(na->nick);
+	if (na->last_usermask)
+		free(na->last_usermask);
+	if (na->last_realname)
+		free(na->last_realname);
+	if (na->last_quit)
+		free(na->last_quit);
 
-    moduleCleanStruct(&na->moduleData);
+	moduleCleanStruct(&na->moduleData);
 
-    free(na);
+	free(na);
 
 
-    return 1;
+	return 1;
 }
 
 /*************************************************************************/
@@ -1368,32 +1368,32 @@ int delnick(NickAlias * na)
 
 void collide(NickAlias * na, int from_timeout)
 {
-    char guestnick[NICKMAX];
+	char guestnick[NICKMAX];
 
-    if (!from_timeout)
-        del_ns_timeout(na, TO_COLLIDE);
+	if (!from_timeout)
+		del_ns_timeout(na, TO_COLLIDE);
 
-    /* Old system was unsure since there can be more than one collide
-     * per second. So let use another safer method.
-     *          --lara
-     */
-    /* So you should check the length of NSGuestNickPrefix, eh Lara?
-     *          --Certus
-     */
+	/* Old system was unsure since there can be more than one collide
+	 * per second. So let use another safer method.
+	 *		  --lara
+	 */
+	/* So you should check the length of NSGuestNickPrefix, eh Lara?
+	 *		  --Certus
+	 */
 
-    if (ircd->svsnick) {
-        /* We need to make sure the guestnick is free -- heinz */
-        do {
-            snprintf(guestnick, sizeof(guestnick), "%s%d",
-                     NSGuestNickPrefix, getrandom16());
-        } while (finduser(guestnick));
-        notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
-                    guestnick);
-        ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
-        na->status |= NS_GUESTED;
-    } else {
-        kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
-    }
+	if (ircd->svsnick) {
+		/* We need to make sure the guestnick is free -- heinz */
+		do {
+			snprintf(guestnick, sizeof(guestnick), "%s%d",
+					 NSGuestNickPrefix, getrandom16());
+		} while (finduser(guestnick));
+		notice_lang(s_NickServ, na->u, FORCENICKCHANGE_CHANGING,
+					guestnick);
+		ircdproto->SendForceNickChange(na->nick, guestnick, time(NULL));
+		na->status |= NS_GUESTED;
+	} else {
+		kill_user(s_NickServ, na->nick, "Services nickname-enforcer kill");
+	}
 }
 
 /*************************************************************************/
@@ -1402,28 +1402,28 @@ void collide(NickAlias * na, int from_timeout)
 
 void release(NickAlias * na, int from_timeout)
 {
-    if (!from_timeout)
-        del_ns_timeout(na, TO_RELEASE);
-    if (ircd->svshold) {
-        if (UseSVSHOLD) {
-            ircdproto->SendSVSHoldDel(na->nick);
-        } else {
-            ircdproto->SendQuit(na->nick, NULL);
-        }
-    } else {
-        ircdproto->SendQuit(na->nick, NULL);
-    }
-    na->status &= ~NS_KILL_HELD;
+	if (!from_timeout)
+		del_ns_timeout(na, TO_RELEASE);
+	if (ircd->svshold) {
+		if (UseSVSHOLD) {
+			ircdproto->SendSVSHoldDel(na->nick);
+		} else {
+			ircdproto->SendQuit(na->nick, NULL);
+		}
+	} else {
+		ircdproto->SendQuit(na->nick, NULL);
+	}
+	na->status &= ~NS_KILL_HELD;
 }
 
 /*************************************************************************/
 /*************************************************************************/
 
 static struct my_timeout {
-    struct my_timeout *next, *prev;
-    NickAlias *na;
-    Timeout *to;
-    int type;
+	struct my_timeout *next, *prev;
+	NickAlias *na;
+	Timeout *to;
+	int type;
 } *my_timeouts;
 
 /*************************************************************************/
@@ -1432,24 +1432,24 @@ static struct my_timeout {
 
 static void rem_ns_timeout(NickAlias * na, int type)
 {
-    struct my_timeout *t, *t2;
+	struct my_timeout *t, *t2;
 
-    t = my_timeouts;
-    while (t) {
-        if (t->na == na && t->type == type) {
-            t2 = t->next;
-            if (t->next)
-                t->next->prev = t->prev;
-            if (t->prev)
-                t->prev->next = t->next;
-            else
-                my_timeouts = t->next;
-            free(t);
-            t = t2;
-        } else {
-            t = t->next;
-        }
-    }
+	t = my_timeouts;
+	while (t) {
+		if (t->na == na && t->type == type) {
+			t2 = t->next;
+			if (t->next)
+				t->next->prev = t->prev;
+			if (t->prev)
+				t->prev->next = t->next;
+			else
+				my_timeouts = t->next;
+			free(t);
+			t = t2;
+		} else {
+			t = t->next;
+		}
+	}
 }
 
 /*************************************************************************/
@@ -1458,17 +1458,17 @@ static void rem_ns_timeout(NickAlias * na, int type)
 
 static void timeout_collide(Timeout * t)
 {
-    NickAlias *na = (NickAlias *)t->data;
+	NickAlias *na = (NickAlias *)t->data;
 
-    rem_ns_timeout(na, TO_COLLIDE);
-    /* If they identified or don't exist anymore, don't kill them. */
-    if ((na->status & NS_IDENTIFIED) || !na->u
-        || na->u->my_signon > t->settime)
-        return;
-    /* The RELEASE timeout will always add to the beginning of the
-     * list, so we won't see it.  Which is fine because it can't be
-     * triggered yet anyway. */
-    collide(na, 1);
+	rem_ns_timeout(na, TO_COLLIDE);
+	/* If they identified or don't exist anymore, don't kill them. */
+	if ((na->status & NS_IDENTIFIED) || !na->u
+		|| na->u->my_signon > t->settime)
+		return;
+	/* The RELEASE timeout will always add to the beginning of the
+	 * list, so we won't see it.  Which is fine because it can't be
+	 * triggered yet anyway. */
+	collide(na, 1);
 }
 
 /*************************************************************************/
@@ -1477,10 +1477,10 @@ static void timeout_collide(Timeout * t)
 
 static void timeout_release(Timeout * t)
 {
-    NickAlias *na = (NickAlias *)t->data;
+	NickAlias *na = (NickAlias *)t->data;
 
-    rem_ns_timeout(na, TO_RELEASE);
-    release(na, 1);
+	rem_ns_timeout(na, TO_RELEASE);
+	release(na, 1);
 }
 
 /*************************************************************************/
@@ -1489,37 +1489,37 @@ static void timeout_release(Timeout * t)
 
 static void add_ns_timeout(NickAlias * na, int type, time_t delay)
 {
-    Timeout *to;
-    struct my_timeout *t;
-    void (*timeout_routine) (Timeout *);
+	Timeout *to;
+	struct my_timeout *t;
+	void (*timeout_routine) (Timeout *);
 
-    if (type == TO_COLLIDE)
-        timeout_routine = timeout_collide;
-    else if (type == TO_RELEASE)
-        timeout_routine = timeout_release;
-    else {
-        alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
-             type, (void *) na, na->nick, (long int) delay);
-        return;
-    }
+	if (type == TO_COLLIDE)
+		timeout_routine = timeout_collide;
+	else if (type == TO_RELEASE)
+		timeout_routine = timeout_release;
+	else {
+		alog("NickServ: unknown timeout type %d! na=0x%p (%s), delay=%ld",
+			 type, (void *) na, na->nick, (long int) delay);
+		return;
+	}
 
-    to = add_timeout(delay, timeout_routine, 0);
-    to->data = na;
+	to = add_timeout(delay, timeout_routine, 0);
+	to->data = na;
 
-    t = (struct my_timeout *)scalloc(sizeof(struct my_timeout), 1);
-    t->na = na;
-    t->to = to;
-    t->type = type;
+	t = (struct my_timeout *)scalloc(sizeof(struct my_timeout), 1);
+	t->na = na;
+	t->to = to;
+	t->type = type;
 
-    t->prev = NULL;
-    t->next = my_timeouts;
-    my_timeouts = t;
-    /* Andy Church should stop coding while being drunk.
-     * Here's the two lines he forgot that produced the timed_update evil bug
-     * and a *big* memory leak.
-     */
-    if (t->next)
-        t->next->prev = t;
+	t->prev = NULL;
+	t->next = my_timeouts;
+	my_timeouts = t;
+	/* Andy Church should stop coding while being drunk.
+	 * Here's the two lines he forgot that produced the timed_update evil bug
+	 * and a *big* memory leak.
+	 */
+	if (t->next)
+		t->next->prev = t;
 }
 
 /*************************************************************************/
@@ -1528,25 +1528,25 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay)
 
 void del_ns_timeout(NickAlias * na, int type)
 {
-    struct my_timeout *t, *t2;
+	struct my_timeout *t, *t2;
 
-    t = my_timeouts;
-    while (t) {
-        if (t->na == na && t->type == type) {
-            t2 = t->next;
-            if (t->next)
-                t->next->prev = t->prev;
-            if (t->prev)
-                t->prev->next = t->next;
-            else
-                my_timeouts = t->next;
-            del_timeout(t->to);
-            free(t);
-            t = t2;
-        } else {
-            t = t->next;
-        }
-    }
+	t = my_timeouts;
+	while (t) {
+		if (t->na == na && t->type == type) {
+			t2 = t->next;
+			if (t->next)
+				t->next->prev = t->prev;
+			if (t->prev)
+				t->prev->next = t->next;
+			else
+				my_timeouts = t->next;
+			del_timeout(t->to);
+			free(t);
+			t = t2;
+		} else {
+			t = t->next;
+		}
+	}
 }
 
 /*************************************************************************/
@@ -1557,27 +1557,27 @@ void del_ns_timeout(NickAlias * na, int type)
 
 void clean_ns_timeouts(NickAlias * na)
 {
-    struct my_timeout *t, *next;
+	struct my_timeout *t, *next;
 
-    for (t = my_timeouts; t; t = next) {
-        next = t->next;
-        if (t->na == na) {
-            if (debug)
-                alog("debug: %s deleting timeout type %d from %s",
-                     s_NickServ, t->type, t->na->nick);
-            /* If the timeout has the TO_RELEASE type, we should release the user */
-            if (t->type == TO_RELEASE)
-                release(na, 1);
-            if (t->next)
-                t->next->prev = t->prev;
-            if (t->prev)
-                t->prev->next = t->next;
-            else
-                my_timeouts = t->next;
-            del_timeout(t->to);
-            free(t);
-        }
-    }
+	for (t = my_timeouts; t; t = next) {
+		next = t->next;
+		if (t->na == na) {
+			if (debug)
+				alog("debug: %s deleting timeout type %d from %s",
+					 s_NickServ, t->type, t->na->nick);
+			/* If the timeout has the TO_RELEASE type, we should release the user */
+			if (t->type == TO_RELEASE)
+				release(na, 1);
+			if (t->next)
+				t->next->prev = t->prev;
+			if (t->prev)
+				t->prev->next = t->next;
+			else
+				my_timeouts = t->next;
+			del_timeout(t->to);
+			free(t);
+		}
+	}
 }
 
 /*************************************************************************/
@@ -1588,64 +1588,64 @@ void clean_ns_timeouts(NickAlias * na)
 /* We don't use this function but we keep it for module coders -certus */
 int should_mode_change(int16 status, int16 mode)
 {
-    switch (mode) {
-    case CUS_OP:
-        if (status & CUS_OP) {
-            return 0;
-        }
-        break;
-    case CUS_VOICE:
-        if (status & CUS_OP) {
-            return 0;
-        }
-        if (status & CUS_HALFOP) {
-            return 0;
-        }
-        if (status & CUS_VOICE) {
-            return 0;
-        }
-        return 1;
-        break;
-    case CUS_HALFOP:
-        if (status & CUS_OP) {
-            return 0;
-        }
-        if (status & CUS_HALFOP) {
-            return 0;
-        }
-        return 1;
-        break;
-    case CUS_OWNER:
-        if (ircd->owner) {
-            if (status & CUS_OWNER) {
-                return 0;
-            }
-        }
-        break;
-    case CUS_PROTECT:
-        if (ircd->protect) {
-            if (status & CUS_PROTECT) {
-                return 0;
-            }
-        }
-        break;
-    }
-    return 1;
+	switch (mode) {
+	case CUS_OP:
+		if (status & CUS_OP) {
+			return 0;
+		}
+		break;
+	case CUS_VOICE:
+		if (status & CUS_OP) {
+			return 0;
+		}
+		if (status & CUS_HALFOP) {
+			return 0;
+		}
+		if (status & CUS_VOICE) {
+			return 0;
+		}
+		return 1;
+		break;
+	case CUS_HALFOP:
+		if (status & CUS_OP) {
+			return 0;
+		}
+		if (status & CUS_HALFOP) {
+			return 0;
+		}
+		return 1;
+		break;
+	case CUS_OWNER:
+		if (ircd->owner) {
+			if (status & CUS_OWNER) {
+				return 0;
+			}
+		}
+		break;
+	case CUS_PROTECT:
+		if (ircd->protect) {
+			if (status & CUS_PROTECT) {
+				return 0;
+			}
+		}
+		break;
+	}
+	return 1;
 }
 
 /*************************************************************************/
 
 int do_setmodes(User * u)
 {
-    struct u_chanlist *uc;
-    Channel *c;
+	struct u_chanlist *uc;
+	Channel *c;
 
-    /* Walk users current channels */
-    for (uc = u->chans; uc; uc = uc->next) {
-        if ((c = uc->chan))
-            chan_set_correct_modes(u, c, 1);
-    }
-    return MOD_CONT;
+	/* Walk users current channels */
+	for (uc = u->chans; uc; uc = uc->next) {
+		if ((c = uc->chan))
+			chan_set_correct_modes(u, c, 1);
+	}
+	return MOD_CONT;
 }
 
 /*************************************************************************/
@@ -1659,20 +1659,20 @@ int do_setmodes(User * u)
  **/
 void nsStartNickTracking(User * u)
 {
-    NickCore *nc;
+	NickCore *nc;
 
-    /* We only track identified users */
-    if (nick_identified(u)) {
-        nc = u->na->nc;
+	/* We only track identified users */
+	if (nick_identified(u)) {
+		nc = u->na->nc;
 
-        /* Release memory if needed */
-        if (u->nickTrack)
-            free(u->nickTrack);
+		/* Release memory if needed */
+		if (u->nickTrack)
+			free(u->nickTrack);
 
-        /* Copy the nick core displayed nick to
-           the user structure for further checks */
-        u->nickTrack = sstrdup(nc->display);
-    }
+		/* Copy the nick core displayed nick to
+		   the user structure for further checks */
+		u->nickTrack = sstrdup(nc->display);
+	}
 }
 
 /**
@@ -1681,11 +1681,11 @@ void nsStartNickTracking(User * u)
  **/
 void nsStopNickTracking(User * u)
 {
-    /* Simple enough. If its there, release it */
-    if (u->nickTrack) {
-        free(u->nickTrack);
-        u->nickTrack = NULL;
-    }
+	/* Simple enough. If its there, release it */
+	if (u->nickTrack) {
+		free(u->nickTrack);
+		u->nickTrack = NULL;
+	}
 }
 
 /**
@@ -1695,28 +1695,28 @@ void nsStopNickTracking(User * u)
  **/
 int nsCheckNickTracking(User * u)
 {
-    NickCore *nc;
-    NickAlias *na;
-    char *nick;
+	NickCore *nc;
+	NickAlias *na;
+	char *nick;
 
-    /* No nick alias or nick return false by default */
-    if ((!(na = u->na)) || (!(nick = na->nick))) {
-        return 0;
-    }
+	/* No nick alias or nick return false by default */
+	if ((!(na = u->na)) || (!(nick = na->nick))) {
+		return 0;
+	}
 
-    /* nick is forbidden best return 0 */
-    if (na->status & NS_VERBOTEN) {
-        return 0;
-    }
+	/* nick is forbidden best return 0 */
+	if (na->status & NS_VERBOTEN) {
+		return 0;
+	}
 
-    /* Get the core for the requested nick */
-    nc = na->nc;
+	/* Get the core for the requested nick */
+	nc = na->nc;
 
-    /* If the core and the tracking displayed nick are there,
-     * and they match, return true
-     */
-    if (nc && u->nickTrack && (strcmp(nc->display, u->nickTrack) == 0))
-        return 1;
-    else
-        return 0;
+	/* If the core and the tracking displayed nick are there,
+	 * and they match, return true
+	 */
+	if (nc && u->nickTrack && (strcmp(nc->display, u->nickTrack) == 0))
+		return 1;
+	else
+		return 0;
 }

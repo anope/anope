@@ -43,9 +43,9 @@ class OSReload : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_RELOAD);
+	}
 }
 
 /**
@@ -55,19 +55,19 @@ void myOperServHelp(User * u)
  **/
 int do_reload(User * u)
 {
-    if (!read_config(1)) {
-        quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
-        if (!quitmsg)
-            quitmsg =
-                "Error during the reload of the configuration file, but out of memory!";
-        else
-            sprintf((char *)quitmsg, /* XXX */
-                    "Error during the reload of the configuration file!");
-        quitting = 1;
-    }
-    send_event(EVENT_RELOAD, 1, EVENT_START);
-    notice_lang(s_OperServ, u, OPER_RELOAD);
-    return MOD_CONT;
+	if (!read_config(1)) {
+		quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
+		if (!quitmsg)
+			quitmsg =
+				"Error during the reload of the configuration file, but out of memory!";
+		else
+			sprintf((char *)quitmsg, /* XXX */
+					"Error during the reload of the configuration file!");
+		quitting = 1;
+	}
+	send_event(EVENT_RELOAD, 1, EVENT_START);
+	notice_lang(s_OperServ, u, OPER_RELOAD);
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_reload", OSReload)

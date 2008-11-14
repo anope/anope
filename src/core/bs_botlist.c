@@ -42,7 +42,7 @@ class BSBotList : public Module
  **/
 void myBotServHelp(User * u)
 {
-    notice_lang(s_BotServ, u, BOT_HELP_CMD_BOTLIST);
+	notice_lang(s_BotServ, u, BOT_HELP_CMD_BOTLIST);
 }
 
 /**
@@ -52,45 +52,45 @@ void myBotServHelp(User * u)
  **/
 int do_botlist(User * u)
 {
-    int i, count = 0;
-    BotInfo *bi;
+	int i, count = 0;
+	BotInfo *bi;
 
-    if (!nbots) {
-        notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
-        return MOD_CONT;
-    }
+	if (!nbots) {
+		notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
+		return MOD_CONT;
+	}
 
-    for (i = 0; i < 256; i++) {
-        for (bi = botlists[i]; bi; bi = bi->next) {
-            if (!(bi->flags & BI_PRIVATE)) {
-                if (!count)
-                    notice_lang(s_BotServ, u, BOT_BOTLIST_HEADER);
-                count++;
-                notice_user(s_BotServ, u, "   %-15s  (%s@%s)", bi->nick,
-                            bi->user, bi->host);
-            }
-        }
-    }
+	for (i = 0; i < 256; i++) {
+		for (bi = botlists[i]; bi; bi = bi->next) {
+			if (!(bi->flags & BI_PRIVATE)) {
+				if (!count)
+					notice_lang(s_BotServ, u, BOT_BOTLIST_HEADER);
+				count++;
+				notice_user(s_BotServ, u, "   %-15s  (%s@%s)", bi->nick,
+							bi->user, bi->host);
+			}
+		}
+	}
 
-    if (is_oper(u) && count < nbots) {
-        notice_lang(s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
+	if (is_oper(u) && count < nbots) {
+		notice_lang(s_BotServ, u, BOT_BOTLIST_PRIVATE_HEADER);
 
-        for (i = 0; i < 256; i++) {
-            for (bi = botlists[i]; bi; bi = bi->next) {
-                if (bi->flags & BI_PRIVATE) {
-                    notice_user(s_BotServ, u, "   %-15s  (%s@%s)",
-                                bi->nick, bi->user, bi->host);
-                    count++;
-                }
-            }
-        }
-    }
+		for (i = 0; i < 256; i++) {
+			for (bi = botlists[i]; bi; bi = bi->next) {
+				if (bi->flags & BI_PRIVATE) {
+					notice_user(s_BotServ, u, "   %-15s  (%s@%s)",
+								bi->nick, bi->user, bi->host);
+					count++;
+				}
+			}
+		}
+	}
 
-    if (!count)
-        notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
-    else
-        notice_lang(s_BotServ, u, BOT_BOTLIST_FOOTER, count);
-    return MOD_CONT;
+	if (!count)
+		notice_lang(s_BotServ, u, BOT_BOTLIST_EMPTY);
+	else
+		notice_lang(s_BotServ, u, BOT_BOTLIST_FOOTER, count);
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_botlist", BSBotList)

@@ -14,24 +14,24 @@ int mReadConfig(int argc, char **argv);
 char *setting;
 
 int AnopeInit(int argc, char **argv) {
-    Command *c;	
-    EvtHook *hook;
-    int status = 0;
+	Command *c;	
+	EvtHook *hook;
+	int status = 0;
 
-    setting = NULL; 
+	setting = NULL; 
  
-    mReadConfig(0,NULL);
-    
-    c = createCommand("SHOW",mShowSetting,NULL,-1,-1,-1,-1,-1);
-    status = this->AddCommand(HOSTSERV, c, MOD_HEAD);
+	mReadConfig(0,NULL);
+	
+	c = createCommand("SHOW",mShowSetting,NULL,-1,-1,-1,-1,-1);
+	status = this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
-    hook = createEventHook(EVENT_RELOAD, mReadConfig);
-    status = this->AddEventHook(hook);
-    
-    if(status!=MOD_ERR_OK) {
+	hook = createEventHook(EVENT_RELOAD, mReadConfig);
+	status = this->AddEventHook(hook);
+	
+	if(status!=MOD_ERR_OK) {
 	return MOD_STOP;
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 /**
@@ -46,8 +46,8 @@ void AnopeFini(void) {
  * Simple function to show the user the current config setting
  **/
 int mShowSetting(User *u) {
-    notice(s_HostServ,u->nick,"Setting in use is [%s]",setting);
-    return MOD_CONT;
+	notice(s_HostServ,u->nick,"Setting in use is [%s]",setting);
+	return MOD_CONT;
 }
 
 /**
@@ -55,19 +55,19 @@ int mShowSetting(User *u) {
  * the EVENT_RELOAD event is recived.
  **/
 int mReadConfig(int argc, char **argv) {
-    char *tmp=NULL;
-    Directive d[] = {{"HSConfigSetting", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}};
-    moduleGetConfigDirective(d);
+	char *tmp=NULL;
+	Directive d[] = {{"HSConfigSetting", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}};
+	moduleGetConfigDirective(d);
 
-    if(setting) {
-	    free(setting);
-    }
-    if(tmp) {
+	if(setting) {
+		free(setting);
+	}
+	if(tmp) {
 	setting = tmp;
-    } else {
+	} else {
 	setting = sstrdup(DEFAULT_SETTING);
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 

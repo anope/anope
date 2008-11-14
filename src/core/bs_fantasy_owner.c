@@ -48,31 +48,31 @@ class BSFantasyOwner : public Module
  **/
 int do_fantasy(int argc, char **argv)
 {
-    User *u;
-    ChannelInfo *ci;
+	User *u;
+	ChannelInfo *ci;
 
-    if (argc < 3)
-        return MOD_CONT;
+	if (argc < 3)
+		return MOD_CONT;
 
-    if (stricmp(argv[0], "deowner") == 0) {
-        u = finduser(argv[1]);
-        ci = cs_findchan(argv[2]);
-        if (!u || !ci)
-            return MOD_CONT;
+	if (stricmp(argv[0], "deowner") == 0) {
+		u = finduser(argv[1]);
+		ci = cs_findchan(argv[2]);
+		if (!u || !ci)
+			return MOD_CONT;
 
-        if (is_founder(u, ci))
-            bot_raw_mode(u, ci, ircd->ownerunset, u->nick);
-    } else if (stricmp(argv[0], "owner") == 0) {
-        u = finduser(argv[1]);
-        ci = cs_findchan(argv[2]);
-        if (!u || !ci)
-            return MOD_CONT;
+		if (is_founder(u, ci))
+			bot_raw_mode(u, ci, ircd->ownerunset, u->nick);
+	} else if (stricmp(argv[0], "owner") == 0) {
+		u = finduser(argv[1]);
+		ci = cs_findchan(argv[2]);
+		if (!u || !ci)
+			return MOD_CONT;
 
-        if (is_founder(u, ci))
-            bot_raw_mode(u, ci, ircd->ownerset, u->nick);
-    }
+		if (is_founder(u, ci))
+			bot_raw_mode(u, ci, ircd->ownerset, u->nick);
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_fantasy_owner", BSFantasyOwner)

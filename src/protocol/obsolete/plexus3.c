@@ -34,7 +34,7 @@ IRCDVar myIrcd[] = {
    "+i",			/* Dev/Null alias mode */
    "+i",			/* Global alias mode   */
    "+i",			/* Used by BotServ Bots */
-   5,				/* Chan Max Symbols     */
+   5,				/* Chan Max Symbols	 */
    "-cilmnpstBMNORS",		/* Modes to Remove */
    "+ao",			/* Channel Umode used by Botserv bots */
    1,				/* SVSNICK */
@@ -44,50 +44,50 @@ IRCDVar myIrcd[] = {
    "-q",			/* Mode to unset for an owner */
    "+a",			/* Mode to set for chan admin */
    "-a",			/* Mode to unset for chan admin */
-   "+rd",			/* Mode On Reg          */
-   "N",                         /* Mode on ID for Roots */
-   NULL,                        /* Mode on ID for Admins */
-   NULL,                        /* Mode on ID for Opers */
-   "-r+d",			/* Mode on UnReg        */
+   "+rd",			/* Mode On Reg		  */
+   "N",						 /* Mode on ID for Roots */
+   NULL,						/* Mode on ID for Admins */
+   NULL,						/* Mode on ID for Opers */
+   "-r+d",			/* Mode on UnReg		*/
    "+d",			/* Mode on Nick Change  */
-   1,				/* Supports SGlines     */
-   1,				/* Supports SQlines     */
-   0,				/* Supports SZlines     */
+   1,				/* Supports SGlines	 */
+   1,				/* Supports SQlines	 */
+   0,				/* Supports SZlines	 */
    1,				/* Supports Halfop +h   */
    3,				/* Number of server args */
-   0,				/* Join 2 Set           */
-   0,				/* Join 2 Message       */
-   1,				/* Has exceptions +e    */
-   0,				/* TS Topic Forward     */
-   0,				/* TS Topci Backward    */
-   UMODE_N,			/* Protected Umode      */
-   0,				/* Has Admin            */
-   1,				/* Chan SQlines         */
-   0,				/* Quit on Kill         */
-   0,				/* SVSMODE unban        */
-   1,				/* Has Protect          */
-   0,				/* Reverse              */
-   0,				/* Chan Reg             */
-   0,				/* Channel Mode         */
-   0,				/* vidents              */
-   1,				/* svshold              */
+   0,				/* Join 2 Set		   */
+   0,				/* Join 2 Message	   */
+   1,				/* Has exceptions +e	*/
+   0,				/* TS Topic Forward	 */
+   0,				/* TS Topci Backward	*/
+   UMODE_N,			/* Protected Umode	  */
+   0,				/* Has Admin			*/
+   1,				/* Chan SQlines		 */
+   0,				/* Quit on Kill		 */
+   0,				/* SVSMODE unban		*/
+   1,				/* Has Protect		  */
+   0,				/* Reverse			  */
+   0,				/* Chan Reg			 */
+   0,				/* Channel Mode		 */
+   0,				/* vidents			  */
+   1,				/* svshold			  */
    1,				/* time stamp on mode   */
-   0,				/* NICKIP               */
-   0,				/* O:LINE               */
-   1,				/* UMODE                */
-   1,				/* VHOST ON NICK        */
-   0,				/* Change RealName      */
-   CMODE_p,			/* No Knock             */
-   0,				/* Admin Only           */
-   DEFAULT_MLOCK,		/* Default MLOCK        */
-   UMODE_x,			/* Vhost Mode           */
-   0,				/* +f                   */
-   0,				/* +L                   */
-   0,				/* +f Mode                          */
-   0,				/* +L Mode                              */
+   0,				/* NICKIP			   */
+   0,				/* O:LINE			   */
+   1,				/* UMODE				*/
+   1,				/* VHOST ON NICK		*/
+   0,				/* Change RealName	  */
+   CMODE_p,			/* No Knock			 */
+   0,				/* Admin Only		   */
+   DEFAULT_MLOCK,		/* Default MLOCK		*/
+   UMODE_x,			/* Vhost Mode		   */
+   0,				/* +f				   */
+   0,				/* +L				   */
+   0,				/* +f Mode						  */
+   0,				/* +L Mode							  */
    1,				/* On nick change check if they could be identified */
    0,				/* No Knock requires +i */
-   NULL,			/* CAPAB Chan Modes             */
+   NULL,			/* CAPAB Chan Modes			 */
    0,				/* We support TOKENS */
    1,				/* TOKENS are CASE inSensitive */
    0,				/* TIME STAMPS are BASE64 */
@@ -103,7 +103,7 @@ IRCDVar myIrcd[] = {
    0,				/* p10 */
    NULL,			/* character set */
    1,				/* reports sync state */
-   0,               /* CIDR channelbans */
+   0,			   /* CIDR channelbans */
    }
   ,
   {NULL}
@@ -111,34 +111,34 @@ IRCDVar myIrcd[] = {
 
 IRCDCAPAB myIrcdcap[] = {
   {
-   0,				/* NOQUIT       */
-   0,				/* TSMODE       */
-   0,				/* UNCONNECT    */
-   0,				/* NICKIP       */
-   0,				/* SJOIN        */
-   CAPAB_ZIP,			/* ZIP          */
-   0,				/* BURST        */
-   CAPAB_TS5,			/* TS5          */
-   0,				/* TS3          */
-   0,				/* DKEY         */
-   0,				/* PT4          */
-   0,				/* SCS          */
-   CAPAB_QS,			/* QS           */
-   CAPAB_UID,			/* UID          */
-   CAPAB_KNOCK,			/* KNOCK        */
-   0,				/* CLIENT       */
-   0,				/* IPV6         */
-   0,				/* SSJ5         */
-   0,				/* SN2          */
-   0,				/* TOKEN        */
-   0,				/* VHOST        */
-   0,				/* SSJ3         */
-   0,				/* NICK2        */
-   0,				/* UMODE2       */
-   0,				/* VL           */
-   0,				/* TLKEXT       */
-   0,				/* DODKEY       */
-   0,				/* DOZIP        */
+   0,				/* NOQUIT	   */
+   0,				/* TSMODE	   */
+   0,				/* UNCONNECT	*/
+   0,				/* NICKIP	   */
+   0,				/* SJOIN		*/
+   CAPAB_ZIP,			/* ZIP		  */
+   0,				/* BURST		*/
+   CAPAB_TS5,			/* TS5		  */
+   0,				/* TS3		  */
+   0,				/* DKEY		 */
+   0,				/* PT4		  */
+   0,				/* SCS		  */
+   CAPAB_QS,			/* QS		   */
+   CAPAB_UID,			/* UID		  */
+   CAPAB_KNOCK,			/* KNOCK		*/
+   0,				/* CLIENT	   */
+   0,				/* IPV6		 */
+   0,				/* SSJ5		 */
+   0,				/* SN2		  */
+   0,				/* TOKEN		*/
+   0,				/* VHOST		*/
+   0,				/* SSJ3		 */
+   0,				/* NICK2		*/
+   0,				/* UMODE2	   */
+   0,				/* VL		   */
+   0,				/* TLKEXT	   */
+   0,				/* DODKEY	   */
+   0,				/* DOZIP		*/
    0, 0, 0}
 };
 
@@ -153,20 +153,20 @@ plexus_ProcessUsermodes (User * user, int ac, const char **av)
   ac--;
 
   if (debug)
-    alog ("debug: Changing mode for %s to %s", user->nick, modes);
+	alog ("debug: Changing mode for %s to %s", user->nick, modes);
 
   while (*modes)
-    {
+	{
 
-      /* This looks better, much better than "add ? (do_add) : (do_remove)".
-       * At least this is readable without paying much attention :) -GD
-       */
-      if (add)
+	  /* This looks better, much better than "add ? (do_add) : (do_remove)".
+	   * At least this is readable without paying much attention :) -GD
+	   */
+	  if (add)
 	user->mode |= umodes[(int) *modes];
-      else
+	  else
 	user->mode &= ~umodes[(int) *modes];
 
-      switch (*modes++)
+	  switch (*modes++)
 	{
 	case '+':
 	  add = 1;
@@ -176,11 +176,11 @@ plexus_ProcessUsermodes (User * user, int ac, const char **av)
 	  break;
 	case 'd':
 	  if (ac == 0)
-	    {
-	      alog ("user: umode +d with no parameter (?) for user %s",
-		    user->nick);
-	      break;
-	    }
+		{
+		  alog ("user: umode +d with no parameter (?) for user %s",
+			user->nick);
+		  break;
+		}
 
 	  ac--;
 	  av++;
@@ -191,30 +191,30 @@ plexus_ProcessUsermodes (User * user, int ac, const char **av)
 	  break;
 	case 'o':
 	  if (add)
-	    {
-	      opcnt++;
+		{
+		  opcnt++;
 
-	      if (WallOper)
+		  if (WallOper)
 		anope_SendGlobops (s_OperServ,
 				  "\2%s\2 is now an IRC operator.",
 				  user->nick);
-	      display_news (user, NEWS_OPER);
+		  display_news (user, NEWS_OPER);
 
-	    }
+		}
 	  else
-	    {
-	      opcnt--;
-	    }
+		{
+		  opcnt--;
+		}
 	  break;
 	case 'r':
 	  if (add && !nick_identified (user))
-	    {
-	      common_svsmode (user, "-r", NULL);
-	      user->mode &= ~UMODE_r;
-	    }
+		{
+		  common_svsmode (user, "-r", NULL);
+		  user->mode &= ~UMODE_r;
+		}
 	  break;
 	}
-    }
+	}
 }
 
 unsigned long umodes[128] = {
@@ -276,7 +276,7 @@ char myCsmodes[128] = {
   0,
   0,
   0, 0, 0,
-  'h',                  /* (37) % Channel halfops */
+  'h',				  /* (37) % Channel halfops */
   'a',
   0, 0, 0, 0,
 
@@ -479,18 +479,18 @@ void
 plexus_cmd_notice (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   if (NSDefFlags & NI_MSG)
-    {
-      plexus_cmd_privmsg2 (source, dest, buf);
-    }
+	{
+	  plexus_cmd_privmsg2 (source, dest, buf);
+	}
   else
-    {
-      send_cmd (source, "NOTICE %s :%s", dest, buf);
-    }
+	{
+	  send_cmd (source, "NOTICE %s :%s", dest, buf);
+	}
 }
 
 void
@@ -503,9 +503,9 @@ void
 plexus_cmd_privmsg (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (source, "PRIVMSG %s :%s", dest, buf);
 }
@@ -533,9 +533,9 @@ void
 plexus_SendGlobops (const char *source, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (source ? source : ServerName, "OPERWALL :%s", buf);
 }
@@ -558,18 +558,18 @@ int
 anope_event_nick (const char *source, int ac, const char **av)
 {
   if (ac != 2)
-    {
-      User *user = do_nick (source, av[0], av[4], av[8], av[6], av[9],
-			    strtoul (av[2], NULL, 10),
-			    strtoul (av[7], NULL, 0), 0, av[5], NULL);
-      if (user)
+	{
+	  User *user = do_nick (source, av[0], av[4], av[8], av[6], av[9],
+				strtoul (av[2], NULL, 10),
+				strtoul (av[7], NULL, 0), 0, av[5], NULL);
+	  if (user)
 	anope_ProcessUsermodes (user, 1, &av[3]);
-    }
+	}
   else
-    {
-      do_nick (source, av[0], NULL, NULL, NULL, NULL,
-	       strtoul (av[1], NULL, 10), 0, 0, NULL, NULL);
-    }
+	{
+	  do_nick (source, av[0], NULL, NULL, NULL, NULL,
+		   strtoul (av[1], NULL, 10), 0, 0, NULL, NULL);
+	}
   return MOD_CONT;
 }
 
@@ -577,46 +577,46 @@ int
 anope_event_topic (const char *source, int ac, const char **av)
 {
   if (ac == 4)
-    {
-      do_topic (source, ac, av);
-    }
+	{
+	  do_topic (source, ac, av);
+	}
   else
-    {
-      Channel *c = findchan (av[0]);
-      time_t topic_time = time (NULL);
+	{
+	  Channel *c = findchan (av[0]);
+	  time_t topic_time = time (NULL);
 
-      if (!c)
+	  if (!c)
 	{
 	  if (debug)
-	    {
-	      alog ("debug: TOPIC %s for nonexistent channel %s",
-		    merge_args (ac - 1, av + 1), av[0]);
-	    }
+		{
+		  alog ("debug: TOPIC %s for nonexistent channel %s",
+			merge_args (ac - 1, av + 1), av[0]);
+		}
 	  return MOD_CONT;
 	}
 
-      if (check_topiclock (c, topic_time))
+	  if (check_topiclock (c, topic_time))
 	return MOD_CONT;
 
-      if (c->topic)
+	  if (c->topic)
 	{
 	  free (c->topic);
 	  c->topic = NULL;
 	}
-      if (ac > 1 && *av[1])
+	  if (ac > 1 && *av[1])
 	c->topic = sstrdup (av[1]);
 
-      strscpy (c->topic_setter, source, sizeof (c->topic_setter));
-      c->topic_time = topic_time;
+	  strscpy (c->topic_setter, source, sizeof (c->topic_setter));
+	  c->topic_time = topic_time;
 
-      record_topic (av[0]);
+	  record_topic (av[0]);
 
 	  if (ac > 1 && *av[1])
-	      send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
+		  send_event(EVENT_TOPIC_UPDATED, 2, av[0], av[1]);
 	  else
-	      send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
+		  send_event(EVENT_TOPIC_UPDATED, 2, av[0], "");
 
-    }
+	}
   return MOD_CONT;
 }
 
@@ -624,7 +624,7 @@ int
 anope_event_tburst (const char *source, int ac, const char **av)
 {
   if (ac != 5)
-    return MOD_CONT;
+	return MOD_CONT;
 
   av[0] = av[1];
   av[1] = av[3];
@@ -643,28 +643,28 @@ int
 anope_event_encap (const char *source, int ac, const char **av)
 {
   if (ac < 2)
-    return MOD_CONT;
-
-  if (!stricmp (av[1], "CHGHOST"))
-    {
-      User *u;
-
-      if (ac != 4)
 	return MOD_CONT;
 
-      u = finduser (av[2]);
-      if (!u)
+  if (!stricmp (av[1], "CHGHOST"))
+	{
+	  User *u;
+
+	  if (ac != 4)
+	return MOD_CONT;
+
+	  u = finduser (av[2]);
+	  if (!u)
 	{
 	  if (debug)
-	    {
-	      alog ("debug: CHGHOST for nonexistent user %s", av[2]);
-	    }
+		{
+		  alog ("debug: CHGHOST for nonexistent user %s", av[2]);
+		}
 	  return MOD_CONT;
 	}
 
-      u->SetDisplayedHost(av[3]);
-      return MOD_CONT;
-    }
+	  u->SetDisplayedHost(av[3]);
+	  return MOD_CONT;
+	}
   return MOD_CONT;
 }
 
@@ -672,7 +672,7 @@ int
 anope_event_436 (const char *source, int ac, const char **av)
 {
   if (ac < 1)
-    return MOD_CONT;
+	return MOD_CONT;
 
   m_nickcoll (av[0]);
   return MOD_CONT;
@@ -803,7 +803,7 @@ plexus_cmd_topic (const char *whosets, const char *chan, const char *whosetit,
 		  const char *topic, time_t when)
 {
   send_cmd (whosets, "ENCAP * TOPIC %s %s %lu :%s", chan, whosetit,
-	    (unsigned long int) when, topic);
+		(unsigned long int) when, topic);
 }
 
 void
@@ -818,18 +818,18 @@ plexus_SendVhost (const char *nick, const char *vIdent, const char *vhost)
   User *u;
 
   if (!nick)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   u = finduser (nick);
 
   if (u)
-    {
-      send_cmd (ServerName, "ENCAP * CHGHOST %s %s", u->nick, vhost);
-      common_svsmode (u, "+x", NULL);
-      u->mode |= UMODE_x;
-    }
+	{
+	  send_cmd (ServerName, "ENCAP * CHGHOST %s %s", u->nick, vhost);
+	  common_svsmode (u, "+x", NULL);
+	  u->mode |= UMODE_x;
+	}
 }
 
 void
@@ -842,7 +842,7 @@ void
 plexus_SendJoin (const char *user, const char *channel, time_t chantime)
 {
   send_cmd (ServerName, "SJOIN %ld %s + :%s", (long int) chantime, channel,
-	    user);
+		user);
 }
 
 /*
@@ -859,21 +859,21 @@ plexus_SendAkill (const char *user, const char *host, const char *who, time_t wh
 		  time_t expires, const char *reason)
 {
   send_cmd (s_OperServ, "KLINE * %ld %s %s :%s",
-	    (long int) (expires - (long) time (NULL)), user, host, reason);
+		(long int) (expires - (long) time (NULL)), user, host, reason);
 }
 
 void
 plexus_SendSVSKill (const char *source, const char *user, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   if (!source || !user)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (source, "KILL %s :%s", user, buf);
 }
@@ -882,17 +882,17 @@ void
 plexus_SendSVSMode (User * u, int ac, const char **av)
 {
   send_cmd (ServerName, "ENCAP * SVSMODE %s %ld %s%s%s", u->nick,
-	    (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
-	    (ac == 2 ? av[1] : ""));
+		(long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
+		(ac == 2 ? av[1] : ""));
 }
 
 /*
  * SVINFO
- *      parv[0] = sender prefix
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = server is standalone or connected to non-TS only
- *      parv[4] = server's idea of UTC time
+ *	  parv[0] = sender prefix
+ *	  parv[1] = TS_CURRENT for the server
+ *	  parv[2] = TS_MIN for the server
+ *	  parv[3] = server is standalone or connected to non-TS only
+ *	  parv[4] = server's idea of UTC time
  */
 void
 plexus_cmd_svinfo ()
@@ -902,31 +902,31 @@ plexus_cmd_svinfo ()
 
 /* CAPAB */
 /*
-  QS     - Can handle quit storm removal
-  EX     - Can do channel +e exemptions
-  CHW    - Can do channel wall @#
-  LL     - Can do lazy links
-  IE     - Can do invite exceptions
-  EOB    - Can do EOB message
-  KLN    - Can do KLINE message
-  GLN    - Can do GLINE message
+  QS	 - Can handle quit storm removal
+  EX	 - Can do channel +e exemptions
+  CHW	- Can do channel wall @#
+  LL	 - Can do lazy links
+  IE	 - Can do invite exceptions
+  EOB	- Can do EOB message
+  KLN	- Can do KLINE message
+  GLN	- Can do GLINE message
   HOPS   - can do half ops (+h)
-  HUB    - This server is a HUB
+  HUB	- This server is a HUB
   AOPS   - Can do anon ops (+a)
-  UID    - Can do UIDs
-  ZIP    - Can do ZIPlinks
-  ENC    - Can do ENCrypted links
+  UID	- Can do UIDs
+  ZIP	- Can do ZIPlinks
+  ENC	- Can do ENCrypted links
   KNOCK  -  supports KNOCK
   TBURST - supports TBURST
   PARA	 - supports invite broadcasting for +p
   ENCAP	 - supports encapsulization of protocol messages
-  SVS    - supports services protocol extensions
+  SVS	- supports services protocol extensions
 */
 void
 plexus_cmd_capab ()
 {
   send_cmd (NULL,
-	    "CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
+		"CAPAB :QS EX CHW IE EOB KLN UNKLN GLN HUB KNOCK TBURST PARA ENCAP SVS");
 }
 
 /* PASS */
@@ -949,11 +949,11 @@ plexus_SendConnect (int servernum)
   me_server = new_server (NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
   if (servernum == 1)
-    plexus_cmd_pass (RemotePassword);
+	plexus_cmd_pass (RemotePassword);
   else if (servernum == 2)
-    plexus_cmd_pass (RemotePassword2);
+	plexus_cmd_pass (RemotePassword2);
   else if (servernum == 3)
-    plexus_cmd_pass (RemotePassword3);
+	plexus_cmd_pass (RemotePassword3);
 
   plexus_cmd_capab ();
   plexus_SendServer (ServerName, 1, ServerDesc);
@@ -970,12 +970,12 @@ plexus_cmd_svsinfo ()
 
 void
 plexus_SendClientIntroduction (const char *nick, const char *user, const char *host, const char *real,
-		     const char *modes)
+			 const char *modes)
 {
   EnforceQlinedNick (nick, NULL);
   send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s 0 %s :%s", nick,
-	    (long int) time (NULL), modes, user, host, ServerName, host,
-	    real);
+		(long int) time (NULL), modes, user, host, ServerName, host,
+		real);
   plexus_SendSQLine (nick, "Reserved for services");
 
 }
@@ -984,20 +984,20 @@ void
 plexus_SendPart (const char *nick, const char *chan, const char *buf)
 {
   if (buf)
-    {
-      send_cmd (nick, "PART %s :%s", chan, buf);
-    }
+	{
+	  send_cmd (nick, "PART %s :%s", chan, buf);
+	}
   else
-    {
-      send_cmd (nick, "PART %s", chan);
-    }
+	{
+	  send_cmd (nick, "PART %s", chan);
+	}
 }
 
 int
 anope_event_ping (const char *source, int ac, const char **av)
 {
   if (ac < 1)
-    return MOD_CONT;
+	return MOD_CONT;
   plexus_SendPong (ac > 1 ? av[1] : ServerName, av[0]);
   return MOD_CONT;
 }
@@ -1006,9 +1006,9 @@ int
 anope_event_away (const char *source, int ac, const char **av)
 {
   if (!source)
-    {
-      return MOD_CONT;
-    }
+	{
+	  return MOD_CONT;
+	}
   m_away (source, (ac ? av[0] : NULL));
   return MOD_CONT;
 }
@@ -1017,7 +1017,7 @@ int
 anope_event_kill (const char *source, int ac, const char **av)
 {
   if (ac != 2)
-    return MOD_CONT;
+	return MOD_CONT;
 
   m_kill (av[0], av[1]);
   return MOD_CONT;
@@ -1027,7 +1027,7 @@ int
 anope_event_kick (const char *source, int ac, const char **av)
 {
   if (ac != 3)
-    return MOD_CONT;
+	return MOD_CONT;
   do_kick (source, ac, av);
   return MOD_CONT;
 }
@@ -1042,7 +1042,7 @@ anope_event_eob (const char *source, int ac, const char **av)
    * server finished bursting. -GD
    */
   if (!s && serv_uplink)
-    s = serv_uplink;
+	s = serv_uplink;
   finish_sync (s, 1);
 
   return MOD_CONT;
@@ -1059,7 +1059,7 @@ int
 anope_event_join (const char *source, int ac, const char **av)
 {
   if (ac != 1)
-    return MOD_CONT;
+	return MOD_CONT;
   do_join (source, ac, av);
   return MOD_CONT;
 }
@@ -1068,9 +1068,9 @@ int
 anope_event_motd (const char *source, int ac, const char **av)
 {
   if (!source)
-    {
-      return MOD_CONT;
-    }
+	{
+	  return MOD_CONT;
+	}
 
   m_motd (source);
   return MOD_CONT;
@@ -1080,7 +1080,7 @@ int
 anope_event_privmsg (const char *source, int ac, const char **av)
 {
   if (ac != 2)
-    return MOD_CONT;
+	return MOD_CONT;
   m_privmsg (source, av[0], av[1]);
   return MOD_CONT;
 }
@@ -1089,7 +1089,7 @@ int
 anope_event_part (const char *source, int ac, const char **av)
 {
   if (ac < 1 || ac > 2)
-    return MOD_CONT;
+	return MOD_CONT;
   do_part (source, ac, av);
   return MOD_CONT;
 }
@@ -1098,9 +1098,9 @@ int
 anope_event_whois (const char *source, int ac, const char **av)
 {
   if (source && ac >= 1)
-    {
-      m_whois (source, av[0]);
-    }
+	{
+	  m_whois (source, av[0]);
+	}
   return MOD_CONT;
 }
 
@@ -1109,9 +1109,9 @@ int
 anope_event_server (const char *source, int ac, const char **av)
 {
   if (!stricmp (av[1], "1"))
-    {
-      uplink = sstrdup (av[0]);
-    }
+	{
+	  uplink = sstrdup (av[0]);
+	}
   do_server (source, av[0], av[1], av[2], NULL);
   return MOD_CONT;
 }
@@ -1120,7 +1120,7 @@ int
 anope_event_squit (const char *source, int ac, const char **av)
 {
   if (ac != 2)
-    return MOD_CONT;
+	return MOD_CONT;
   do_squit (source, ac, av);
   return MOD_CONT;
 }
@@ -1129,7 +1129,7 @@ int
 anope_event_quit (const char *source, int ac, const char **av)
 {
   if (ac != 1)
-    return MOD_CONT;
+	return MOD_CONT;
   do_quit (source, ac, av);
   return MOD_CONT;
 }
@@ -1144,14 +1144,14 @@ void
 plexus_cmd_372_error (const char *source)
 {
   send_cmd (ServerName, "422 %s :- MOTD file not found!  Please "
-	    "contact your IRC administrator.", source);
+		"contact your IRC administrator.", source);
 }
 
 void
 plexus_cmd_375 (const char *source)
 {
   send_cmd (ServerName, "375 %s :- %s Message of the Day",
-	    source, ServerName);
+		source, ServerName);
 }
 
 void
@@ -1165,9 +1165,9 @@ void
 plexus_cmd_391 (const char *source, const char *timestr)
 {
   if (!timestr)
-    {
-      return;
-    }
+	{
+	  return;
+	}
   send_cmd (ServerName, "391 :%s %s :%s", source, ServerName, timestr);
 }
 
@@ -1176,9 +1176,9 @@ void
 plexus_cmd_250 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "250 %s", buf);
 }
@@ -1188,9 +1188,9 @@ void
 plexus_cmd_307 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "307 %s", buf);
 }
@@ -1200,9 +1200,9 @@ void
 plexus_cmd_311 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "311 %s", buf);
 }
@@ -1212,9 +1212,9 @@ void
 plexus_cmd_312 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "312 %s", buf);
 }
@@ -1224,9 +1224,9 @@ void
 plexus_cmd_317 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "317 %s", buf);
 }
@@ -1236,19 +1236,19 @@ void
 plexus_cmd_219 (const char *source, const char *letter)
 {
   if (!source)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   if (letter)
-    {
-      send_cmd (ServerName, "219 %s %c :End of /STATS report.", source,
+	{
+	  send_cmd (ServerName, "219 %s %c :End of /STATS report.", source,
 		*letter);
-    }
+	}
   else
-    {
-      send_cmd (ServerName, "219 %s l :End of /STATS report.", source);
-    }
+	{
+	  send_cmd (ServerName, "219 %s l :End of /STATS report.", source);
+	}
 }
 
 /* 401 */
@@ -1256,9 +1256,9 @@ void
 plexus_cmd_401 (const char *source, const char *who)
 {
   if (!source || !who)
-    {
-      return;
-    }
+	{
+	  return;
+	}
   send_cmd (ServerName, "401 %s %s :No such service.", source, who);
 }
 
@@ -1267,9 +1267,9 @@ void
 plexus_cmd_318 (const char *source, const char *who)
 {
   if (!source || !who)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "318 %s %s :End of /WHOIS list.", source, who);
 }
@@ -1279,9 +1279,9 @@ void
 plexus_cmd_242 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "242 %s", buf);
 }
@@ -1291,9 +1291,9 @@ void
 plexus_cmd_243 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "243 %s", buf);
 }
@@ -1303,9 +1303,9 @@ void
 plexus_cmd_211 (const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "211 %s", buf);
 }
@@ -1314,9 +1314,9 @@ void
 plexus_SendMode (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (source, "MODE %s %s", dest, buf);
 }
@@ -1326,8 +1326,8 @@ plexus_cmd_nick (const char *nick, const char *name, const char *mode)
 {
   EnforceQlinedNick (nick, NULL);
   send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s 0 %s :%s", nick,
-	    (long int) time (NULL), mode, ServiceUser, ServiceHost,
-	    ServerName, ServiceHost, (name));
+		(long int) time (NULL), mode, ServiceUser, ServiceHost,
+		ServerName, ServiceHost, (name));
   send_cmd (nick, "RESV * %s :%s", nick, "Reserved for services");
 }
 
@@ -1335,22 +1335,22 @@ void
 plexus_SendKick (const char *source, const char *chan, const char *user, const char *buf)
 {
   if (buf)
-    {
-      send_cmd (source, "KICK %s %s :%s", chan, user, buf);
-    }
+	{
+	  send_cmd (source, "KICK %s %s :%s", chan, user, buf);
+	}
   else
-    {
-      send_cmd (source, "KICK %s %s", chan, user);
-    }
+	{
+	  send_cmd (source, "KICK %s %s", chan, user);
+	}
 }
 
 void
 plexus_SendNoticeChanops (const char *source, const char *dest, const char *buf)
 {
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "NOTICE @%s :%s", dest, buf);
 }
@@ -1366,13 +1366,13 @@ void
 plexus_SendQuit (const char *source, const char *buf)
 {
   if (buf)
-    {
-      send_cmd (source, "QUIT :%s", buf);
-    }
+	{
+	  send_cmd (source, "QUIT :%s", buf);
+	}
   else
-    {
-      send_cmd (source, "QUIT");
-    }
+	{
+	  send_cmd (source, "QUIT");
+	}
 }
 
 /* PONG */
@@ -1387,9 +1387,9 @@ void
 plexus_SendInvite (const char *source, const char *chan, const char *nick)
 {
   if (!source || !chan || !nick)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (source, "INVITE %s %s", nick, chan);
 }
@@ -1399,9 +1399,9 @@ void
 plexus_SendSquit (const char *servname, const char *message)
 {
   if (!servname || !message)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (ServerName, "SQUIT %s :%s", servname, message);
 }
@@ -1410,26 +1410,26 @@ int
 anope_event_mode (const char *source, int ac, const char **av)
 {
   if (ac < 2)
-    return MOD_CONT;
+	return MOD_CONT;
 
   if (*av[0] == '#' || *av[0] == '&')
-    {
-      do_cmode (source, ac, av);
-    }
+	{
+	  do_cmode (source, ac, av);
+	}
   else
-    {
-      Server *s;
-      s = findserver (servlist, source);
+	{
+	  Server *s;
+	  s = findserver (servlist, source);
 
-      if (s && *av[0])
+	  if (s && *av[0])
 	{
 	  do_umode (av[0], ac, av);
 	}
-      else
+	  else
 	{
 	  do_umode (source, ac, av);
 	}
-    }
+	}
   return MOD_CONT;
 }
 
@@ -1437,8 +1437,8 @@ void
 plexus_cmd_351 (const char *source)
 {
   send_cmd (ServerName, "351 %s Anope-%s %s :%s - %s (%s) -- %s",
-	    source, version_number, ServerName, ircd->name, version_flags,
-	    EncModule, version_build);
+		source, version_number, ServerName, ircd->name, version_flags,
+		EncModule, version_build);
 }
 
 /* Event: PROTOCTL */
@@ -1451,29 +1451,29 @@ anope_event_capab (const char *source, int ac, const char **av)
   char *str;
 
   if (ac < 1)
-    return MOD_CONT;
+	return MOD_CONT;
 
   /* We get the params as one arg, we should split it for capab_parse */
   argv = (const char **)scalloc (argvsize, sizeof (const char *));
   argc = 0;
   while ((str = myStrGetToken (av[0], ' ', argc)))
-    {
-      if (argc == argvsize)
+	{
+	  if (argc == argvsize)
 	{
 	  argvsize += 8;
 	  argv = (const char **)srealloc (argv, argvsize * sizeof (const char *));
 	}
-      argv[argc] = str;
-      argc++;
-    }
+	  argv[argc] = str;
+	  argc++;
+	}
 
   capab_parse (argc, argv);
 
   /* Free our built ac/av */
   for (argvsize = 0; argvsize < argc; argvsize++)
-    {
-      free ((char *)argv[argvsize]);
-    }
+	{
+	  free ((char *)argv[argvsize]);
+	}
   free ((char **)argv);
 
   return MOD_CONT;
@@ -1484,8 +1484,8 @@ void
 plexus_SendSVSHOLD (const char *nick)
 {
   send_cmd (s_OperServ, "ENCAP * RESV %d %s 0 :%s", NSReleaseTimeout, nick,
-	    "This nick is being held for a registered user. "
-            "For help with regaining nicknames please see /nickserv help release");
+		"This nick is being held for a registered user. "
+			"For help with regaining nicknames please see /nickserv help release");
 }
 
 /* SVSHOLD - release */
@@ -1502,21 +1502,21 @@ plexus_SendForceNickChange (const char *nick, const char *newnick, time_t when)
   User *u;
 
   if (!nick || !newnick)
-    return;
+	return;
 
   if( (u = finduser (nick))) {
-    send_cmd (ServerName, "ENCAP * SVSNICK %s %ld %s %ld",
-	    u->nick, (long int) u->timestamp, newnick, (long int) when);
+	send_cmd (ServerName, "ENCAP * SVSNICK %s %ld %s %ld",
+		u->nick, (long int) u->timestamp, newnick, (long int) when);
   }
 }
 
 void
 plexus_SendGuestNick (const char *nick, const char *user, const char *host, const char *real,
-		       const char *modes)
+			   const char *modes)
 {
   send_cmd (ServerName, "NICK %s 1 %ld %s %s %s %s 0 %s :%s", nick,
-	    (long int) time (NULL), modes, user, host, ServerName, host,
-	    real);
+		(long int) time (NULL), modes, user, host, ServerName, host,
+		real);
 }
 
 void
@@ -1545,7 +1545,7 @@ void
 plexus_SendSVID (const char *nick, time_t ts)
 {
   send_cmd (ServerName, "ENCAP * SVSMODE %s %lu +d 1", nick,
-	    (unsigned long int) ts);
+		(unsigned long int) ts);
 }
 
 /* SVSMODE +d */
@@ -1571,17 +1571,17 @@ plexus_SendSVID3 (User * u, const char *ts)
   strlcpy(modes, "+r", sizeof(modes));
 
   if(ircd->rootmodeonid && is_services_root(u)) {
-      strlcat(modes, ircd->rootmodeonid, sizeof(modes));
+	  strlcat(modes, ircd->rootmodeonid, sizeof(modes));
   } else if(ircd->adminmodeonid && is_services_admin(u)) {
-      strlcat(modes, ircd->adminmodeonid, sizeof(modes));
+	  strlcat(modes, ircd->adminmodeonid, sizeof(modes));
   } else if(ircd->opermodeonid && is_services_oper(u)) {
-      strlcat(modes, ircd->opermodeonid, sizeof(modes));
+	  strlcat(modes, ircd->opermodeonid, sizeof(modes));
   }
   if (u->svid != u->timestamp) {
-      strlcat(modes, "d", sizeof(modes));
-      common_svsmode (u, modes, ts);
+	  strlcat(modes, "d", sizeof(modes));
+	  common_svsmode (u, modes, ts);
   } else {
-      common_svsmode (u, modes, NULL);
+	  common_svsmode (u, modes, NULL);
   }
 }
 
@@ -1590,20 +1590,20 @@ void
 plexus_SendChangeBotNick (const char *oldnick, const char *newnick)
 {
   if (!oldnick || !newnick)
-    {
-      return;
-    }
+	{
+	  return;
+	}
 
   send_cmd (oldnick, "NICK %s", newnick);
 }
 
 /*
  * SVINFO
- *      parv[0] = sender prefix
- *      parv[1] = TS_CURRENT for the server
- *      parv[2] = TS_MIN for the server
- *      parv[3] = server is standalone or connected to non-TS only
- *      parv[4] = server's idea of UTC time
+ *	  parv[0] = sender prefix
+ *	  parv[1] = TS_CURRENT for the server
+ *	  parv[2] = TS_MIN for the server
+ *	  parv[3] = server is standalone or connected to non-TS only
+ *	  parv[4] = server's idea of UTC time
  */
 int
 anope_event_svinfo (const char *source, int ac, const char **av)
@@ -1665,12 +1665,12 @@ int
 anope_event_error (const char *source, int ac, const char **av)
 {
   if (ac >= 1)
-    {
-      if (debug)
+	{
+	  if (debug)
 	{
 	  alog ("debug: %s", av[0]);
 	}
-    }
+	}
   return MOD_CONT;
 }
 
@@ -1680,10 +1680,10 @@ plexus_SendJupe (const char *jserver, const char *who, const char *reason)
   char rbuf[256];
 
   snprintf (rbuf, sizeof (rbuf), "(H) Juped by %s%s%s", who,
-	    reason ? ": " : "", reason ? reason : "");
+		reason ? ": " : "", reason ? reason : "");
 
   if (findserver(servlist, jserver))
-    plexus_SendSquit (jserver, rbuf);
+	plexus_SendSquit (jserver, rbuf);
   plexus_SendServer (jserver, 2, rbuf);
   new_server (me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
@@ -1717,13 +1717,13 @@ plexus_SendCTCP (const char *source, const char *dest, const char *buf)
   char *s;
 
   if (!buf)
-    {
-      return;
-    }
+	{
+	  return;
+	}
   else
-    {
-      s = normalizeBuffer (buf);
-    }
+	{
+	  s = normalizeBuffer (buf);
+	}
 
   send_cmd (source, "NOTICE %s :\1%s \1", dest, s);
   free (s);

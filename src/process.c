@@ -33,67 +33,67 @@ IgnoreData *ignore;
  */
 void add_ignore(const char *nick, time_t delta)
 {
-    IgnoreData *ign;
-    char tmp[BUFSIZE];
-    char *mask, *user, *host;
-    User *u;
-    time_t now;
-    
+	IgnoreData *ign;
+	char tmp[BUFSIZE];
+	char *mask, *user, *host;
+	User *u;
+	time_t now;
+	
 if (!nick)
-        return;
-    now = time(NULL);
-    
+		return;
+	now = time(NULL);
+	
 
-        /* If it s an existing user, we ignore the hostmask. */ 
-        if ((u = finduser(nick))) {
-        snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
-        mask = sstrdup(tmp);
-        
-            /* Determine whether we get a nick or a mask. */ 
-    } else if ((host = strchr(nick, '@'))) {
-        /* Check whether we have a nick too.. */ 
-            if ((user = strchr(nick, '!'))) {
-            /* this should never happen */ 
-                if (user > host)
-                return;
-            mask = sstrdup(nick);
-        } else {
-            /* We have user@host. Add nick wildcard. */ 
-                snprintf(tmp, sizeof(tmp), "*!%s", nick);
-            mask = sstrdup(tmp);
-        }
-        
-            /* We only got a nick.. */ 
-    } else {
-        
+		/* If it s an existing user, we ignore the hostmask. */ 
+		if ((u = finduser(nick))) {
+		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
+		mask = sstrdup(tmp);
+		
+			/* Determine whether we get a nick or a mask. */ 
+	} else if ((host = strchr(nick, '@'))) {
+		/* Check whether we have a nick too.. */ 
+			if ((user = strchr(nick, '!'))) {
+			/* this should never happen */ 
+				if (user > host)
+				return;
+			mask = sstrdup(nick);
+		} else {
+			/* We have user@host. Add nick wildcard. */ 
+				snprintf(tmp, sizeof(tmp), "*!%s", nick);
+			mask = sstrdup(tmp);
+		}
+		
+			/* We only got a nick.. */ 
+	} else {
+		
 snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
-        mask = sstrdup(tmp);
-    }
-    
-        /* Check if we already got an identical entry. */
-        for (ign = ignore; ign; ign = ign->next)
-        if (stricmp(ign->mask, mask) == 0)
-            break;
+		mask = sstrdup(tmp);
+	}
+	
+		/* Check if we already got an identical entry. */
+		for (ign = ignore; ign; ign = ign->next)
+		if (stricmp(ign->mask, mask) == 0)
+			break;
 
-    /* Found one.. */
-        if (ign) {
-        if (delta == 0)
-            ign->time = 0;
-        else if (ign->time < now + delta)
-            ign->time = now + delta;
-                    /* Create new entry.. */
-    } else {
-        ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
-        ign->mask = mask;
-        ign->time = (delta == 0 ? 0 : now + delta);
-        ign->prev = NULL;
-        ign->next = ignore;
-        if (ignore)
-            ignore->prev = ign;
-        ignore = ign;
-        if (debug)
-            alog("debug: Added new ignore entry for %s", mask);
-    }
+	/* Found one.. */
+		if (ign) {
+		if (delta == 0)
+			ign->time = 0;
+		else if (ign->time < now + delta)
+			ign->time = now + delta;
+					/* Create new entry.. */
+	} else {
+		ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
+		ign->mask = mask;
+		ign->time = (delta == 0 ? 0 : now + delta);
+		ign->prev = NULL;
+		ign->next = ignore;
+		if (ignore)
+			ignore->prev = ign;
+		ignore = ign;
+		if (debug)
+			alog("debug: Added new ignore entry for %s", mask);
+	}
 }
 
 /*************************************************************************/
@@ -107,75 +107,75 @@ snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
  */
 IgnoreData *get_ignore(const char *nick)
 {
-    IgnoreData *ign;
-    char tmp[BUFSIZE];
-    char *user, *host;
-    time_t now;
-    User *u;
-    
+	IgnoreData *ign;
+	char tmp[BUFSIZE];
+	char *user, *host;
+	time_t now;
+	User *u;
+	
 if (!nick)
-        return NULL;
-    
+		return NULL;
+	
 
-        /* User has disabled the IGNORE system */
-        if (!allow_ignore)
-        return NULL;
-    
+		/* User has disabled the IGNORE system */
+		if (!allow_ignore)
+		return NULL;
+	
 now = time(NULL);
-    
+	
 u = finduser(nick);
-    
+	
 
-        /* If we find a real user, match his mask against the ignorelist. */
-        if (u) {
-        /* Opers are not ignored, even if a matching entry may be present. */
-            if (is_oper(u))
-            return NULL;
-        for (ign = ignore; ign; ign = ign->next)
-            if (match_usermask(ign->mask, u))
-                break;
-    
+		/* If we find a real user, match his mask against the ignorelist. */
+		if (u) {
+		/* Opers are not ignored, even if a matching entry may be present. */
+			if (is_oper(u))
+			return NULL;
+		for (ign = ignore; ign; ign = ign->next)
+			if (match_usermask(ign->mask, u))
+				break;
+	
 } else {
-        /* We didn't get a user.. generate a valid mask. */ 
-            if ((host = strchr(nick, '@'))) {
-            if ((user = strchr(nick, '!'))) {
-                /* this should never happen */ 
-                    if (user > host)
-                    return NULL;
-                snprintf(tmp, sizeof(tmp), "%s", nick);
-            } else {
-                /* We have user@host. Add nick wildcard. */ 
-                    snprintf(tmp, sizeof(tmp), "*!%s", nick);
-            }
-            
-                /* We only got a nick.. */ 
-        } else
-            
+		/* We didn't get a user.. generate a valid mask. */ 
+			if ((host = strchr(nick, '@'))) {
+			if ((user = strchr(nick, '!'))) {
+				/* this should never happen */ 
+					if (user > host)
+					return NULL;
+				snprintf(tmp, sizeof(tmp), "%s", nick);
+			} else {
+				/* We have user@host. Add nick wildcard. */ 
+					snprintf(tmp, sizeof(tmp), "*!%s", nick);
+			}
+			
+				/* We only got a nick.. */ 
+		} else
+			
 snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
-        
+		
 for (ign = ignore; ign; ign = ign->next)
-            if (match_wild_nocase(ign->mask, tmp))
-                break;
-    }
-    
-        /* Check whether the entry has timed out */ 
-        if (ign && ign->time != 0 && ign->time <= now) {
-        if (debug)
-            alog("debug: Expiring ignore entry %s", ign->mask);
-        if (ign->prev)
-            ign->prev->next = ign->next;
-        else if (ignore == ign)
-            ignore = ign->next;
-        if (ign->next)
-            ign->next->prev = ign->prev;
-        free(ign->mask);
-        free(ign);
-        ign = NULL;
-    }
-    
+			if (match_wild_nocase(ign->mask, tmp))
+				break;
+	}
+	
+		/* Check whether the entry has timed out */ 
+		if (ign && ign->time != 0 && ign->time <= now) {
+		if (debug)
+			alog("debug: Expiring ignore entry %s", ign->mask);
+		if (ign->prev)
+			ign->prev->next = ign->next;
+		else if (ignore == ign)
+			ignore = ign->next;
+		if (ign->next)
+			ign->next->prev = ign->prev;
+		free(ign->mask);
+		free(ign);
+		ign = NULL;
+	}
+	
 if (ign && debug)
-        alog("debug: Found ignore entry (%s) for %s", ign->mask, nick);
-    return ign;
+		alog("debug: Found ignore entry (%s) for %s", ign->mask, nick);
+	return ign;
 }
 
 
@@ -188,60 +188,60 @@ if (ign && debug)
  */
 int delete_ignore(const char *nick)
 {
-    IgnoreData *ign;
-    char tmp[BUFSIZE];
-    char *user, *host;
-    User *u;
-    
+	IgnoreData *ign;
+	char tmp[BUFSIZE];
+	char *user, *host;
+	User *u;
+	
 if (!nick)
-        return 0;
-    
-        /* If it s an existing user, we ignore the hostmask. */ 
-        if ((u = finduser(nick))) {
-        snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
-        
-            /* Determine whether we get a nick or a mask. */ 
-    } else if ((host = strchr(nick, '@'))) {
-        /* Check whether we have a nick too.. */ 
-            if ((user = strchr(nick, '!'))) {
-            /* this should never happen */ 
-                if (user > host)
-                return 0;
-            snprintf(tmp, sizeof(tmp), "%s", nick);
-        } else {
-            /* We have user@host. Add nick wildcard. */ 
-                snprintf(tmp, sizeof(tmp), "*!%s", nick);
-        }
-        
-            /* We only got a nick.. */ 
-    } else
-        
+		return 0;
+	
+		/* If it s an existing user, we ignore the hostmask. */ 
+		if ((u = finduser(nick))) {
+		snprintf(tmp, sizeof(tmp), "*!*@%s", u->host);
+		
+			/* Determine whether we get a nick or a mask. */ 
+	} else if ((host = strchr(nick, '@'))) {
+		/* Check whether we have a nick too.. */ 
+			if ((user = strchr(nick, '!'))) {
+			/* this should never happen */ 
+				if (user > host)
+				return 0;
+			snprintf(tmp, sizeof(tmp), "%s", nick);
+		} else {
+			/* We have user@host. Add nick wildcard. */ 
+				snprintf(tmp, sizeof(tmp), "*!%s", nick);
+		}
+		
+			/* We only got a nick.. */ 
+	} else
+		
 snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 
-    for (ign = ignore; ign; ign = ign->next)
-        if (stricmp(ign->mask, tmp) == 0)
-            break;
-    
-        /* No matching ignore found. */ 
-        if (!ign)
-        return 0;
-    
+	for (ign = ignore; ign; ign = ign->next)
+		if (stricmp(ign->mask, tmp) == 0)
+			break;
+	
+		/* No matching ignore found. */ 
+		if (!ign)
+		return 0;
+	
 if (debug)
-        alog("Deleting ignore entry %s", ign->mask);
-    
-        /* Delete the entry and all references to it. */ 
-        if (ign->prev)
-        ign->prev->next = ign->next;
-    else if (ignore == ign)
-        ignore = ign->next;
-    if (ign->next)
-        ign->next->prev = ign->prev;
-    
+		alog("Deleting ignore entry %s", ign->mask);
+	
+		/* Delete the entry and all references to it. */ 
+		if (ign->prev)
+		ign->prev->next = ign->next;
+	else if (ignore == ign)
+		ignore = ign->next;
+	if (ign->next)
+		ign->next->prev = ign->prev;
+	
 
 free(ign->mask);
-    free(ign);
-    ign = NULL;
-    
+	free(ign);
+	ign = NULL;
+	
 return 1;
 
 }
@@ -249,129 +249,129 @@ return 1;
 
 
 /*************************************************************************/ 
-    
+	
 /**
  * Clear the ignorelist.
  * @return The number of entries deleted.
  */ 
 int clear_ignores() 
 {
-    IgnoreData *ign, *next;
-    int i = 0;
-    
+	IgnoreData *ign, *next;
+	int i = 0;
+	
 if (!ignore)
-        return 0;
-    
+		return 0;
+	
 for (ign = ignore; ign; ign = next) {
-        next = ign->next;
-        if (debug)
-            alog("Deleting ignore entry %s", ign->mask);
-        free(ign->mask);
-        free(ign);
-        i++;
-    }
-    
+		next = ign->next;
+		if (debug)
+			alog("Deleting ignore entry %s", ign->mask);
+		free(ign->mask);
+		free(ign);
+		i++;
+	}
+	
 ignore = NULL;
-    return i;
+	return i;
 
 }
 
 
 /*************************************************************************/
 /* split_buf:  Split a buffer into arguments and store the arguments in an
- *             argument vector pointed to by argv (which will be malloc'd
- *             as necessary); return the argument count.  If colon_special
- *             is non-zero, then treat a parameter with a leading ':' as
- *             the last parameter of the line, per the IRC RFC.  Destroys
- *             the buffer by side effect.
+ *			 argument vector pointed to by argv (which will be malloc'd
+ *			 as necessary); return the argument count.  If colon_special
+ *			 is non-zero, then treat a parameter with a leading ':' as
+ *			 the last parameter of the line, per the IRC RFC.  Destroys
+ *			 the buffer by side effect.
  */
 int split_buf(char *buf, const char ***argv, int colon_special)
 {
-    int argvsize = 8;
-    int argc;
-    char *s;
+	int argvsize = 8;
+	int argc;
+	char *s;
 
-    *argv = (const char **)scalloc(sizeof(const char *) * argvsize, 1);
-    argc = 0;
-    while (*buf) {
-        if (argc == argvsize) {
-            argvsize += 8;
-            *argv = (const char **)srealloc(*argv, sizeof(const char *) * argvsize);
-        }
-        if (*buf == ':') {
-            (*argv)[argc++] = buf + 1;
-            buf = "";
-        } else {
-            s = strpbrk(buf, " ");
-            if (s) {
-                *s++ = 0;
-                while (*s == ' ')
-                    s++;
-            } else {
-                s = buf + strlen(buf);
-            }
-            (*argv)[argc++] = buf;
-            buf = s;
-        }
-    }
-    return argc;
+	*argv = (const char **)scalloc(sizeof(const char *) * argvsize, 1);
+	argc = 0;
+	while (*buf) {
+		if (argc == argvsize) {
+			argvsize += 8;
+			*argv = (const char **)srealloc(*argv, sizeof(const char *) * argvsize);
+		}
+		if (*buf == ':') {
+			(*argv)[argc++] = buf + 1;
+			buf = "";
+		} else {
+			s = strpbrk(buf, " ");
+			if (s) {
+				*s++ = 0;
+				while (*s == ' ')
+					s++;
+			} else {
+				s = buf + strlen(buf);
+			}
+			(*argv)[argc++] = buf;
+			buf = s;
+		}
+	}
+	return argc;
 }
 
 /*************************************************************************/
 
 /* process:  Main processing routine.  Takes the string in inbuf (global
- *           variable) and does something appropriate with it. */
+ *		   variable) and does something appropriate with it. */
 
 void process()
 {
-    int retVal = 0;
-    Message *current = NULL;
-    char source[64];
-    char cmd[64];
-    char buf[512];              /* Longest legal IRC command line */
-    char *s;
-    int ac;                     /* Parameters for the command */
-    const char **av;
-    Message *m;
+	int retVal = 0;
+	Message *current = NULL;
+	char source[64];
+	char cmd[64];
+	char buf[512];			  /* Longest legal IRC command line */
+	char *s;
+	int ac;					 /* Parameters for the command */
+	const char **av;
+	Message *m;
 
-    /* zero out the buffers before we do much else */
-    *buf = '\0';
-    *source = '\0';
-    *cmd = '\0';
+	/* zero out the buffers before we do much else */
+	*buf = '\0';
+	*source = '\0';
+	*cmd = '\0';
 
-    /* If debugging, log the buffer */
-    if (debug) {
-        alog("debug: Received: %s", inbuf);
-    }
+	/* If debugging, log the buffer */
+	if (debug) {
+		alog("debug: Received: %s", inbuf);
+	}
 
-    /* First make a copy of the buffer so we have the original in case we
-     * crash - in that case, we want to know what we crashed on. */
-    strscpy(buf, inbuf, sizeof(buf));
+	/* First make a copy of the buffer so we have the original in case we
+	 * crash - in that case, we want to know what we crashed on. */
+	strscpy(buf, inbuf, sizeof(buf));
 
-    doCleanBuffer((char *) buf);
+	doCleanBuffer((char *) buf);
 
-    /* Split the buffer into pieces. */
-    if (*buf == ':') {
-        s = strpbrk(buf, " ");
-        if (!s)
-            return;
-        *s = 0;
-        while (isspace(*++s));
-        strscpy(source, buf + 1, sizeof(source));
-        memmove(buf, s, strlen(s) + 1);
-    } else {
-        *source = 0;
-    }
-    if (!*buf)
-        return;
-    s = strpbrk(buf, " ");
-    if (s) {
-        *s = 0;
-        while (isspace(*++s));
-    } else
-        s = buf + strlen(buf);
-    strscpy(cmd, buf, sizeof(cmd));
-    ac = split_buf(s, &av, 1);
+	/* Split the buffer into pieces. */
+	if (*buf == ':') {
+		s = strpbrk(buf, " ");
+		if (!s)
+			return;
+		*s = 0;
+		while (isspace(*++s));
+		strscpy(source, buf + 1, sizeof(source));
+		memmove(buf, s, strlen(s) + 1);
+	} else {
+		*source = 0;
+	}
+	if (!*buf)
+		return;
+	s = strpbrk(buf, " ");
+	if (s) {
+		*s = 0;
+		while (isspace(*++s));
+	} else
+		s = buf + strlen(buf);
+	strscpy(cmd, buf, sizeof(cmd));
+	ac = split_buf(s, &av, 1);
 
 	if (protocoldebug)
 	{
@@ -389,46 +389,46 @@ void process()
 			alog("debug: av[0] = NULL");
 	}
 
-    if (mod_current_buffer) {
-        free(mod_current_buffer);
-    }
+	if (mod_current_buffer) {
+		free(mod_current_buffer);
+	}
 
-    if (ac >= 1) {
-        if (nickIsServices(av[0], 1)) {
-            mod_current_buffer =
-                (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-        } else {
-            mod_current_buffer =
-                (ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
-        }
-    } else {
-        mod_current_buffer = NULL;
-    }
+	if (ac >= 1) {
+		if (nickIsServices(av[0], 1)) {
+			mod_current_buffer =
+				(ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
+		} else {
+			mod_current_buffer =
+				(ac > 1 ? sstrdup(av[1]) : sstrdup(av[0]));
+		}
+	} else {
+		mod_current_buffer = NULL;
+	}
 
-    /* Do something with the message. */
-    m = find_message(cmd);
-    if (m) {
-        if (m->func) {
-            mod_current_module_name = m->mod_name;
-            retVal = m->func(source, ac, av);
-            mod_current_module_name = NULL;
-            if (retVal == MOD_CONT) {
-                current = m->next;
-                while (current && current->func && retVal == MOD_CONT) {
-                    mod_current_module_name = current->mod_name;
-                    retVal = current->func(source, ac, av);
-                    mod_current_module_name = NULL;
-                    current = current->next;
-                }
-            }
-        }
-    } else {
-        if (debug)
-            alog("debug: unknown message from server (%s)", inbuf);
-    }
+	/* Do something with the message. */
+	m = find_message(cmd);
+	if (m) {
+		if (m->func) {
+			mod_current_module_name = m->mod_name;
+			retVal = m->func(source, ac, av);
+			mod_current_module_name = NULL;
+			if (retVal == MOD_CONT) {
+				current = m->next;
+				while (current && current->func && retVal == MOD_CONT) {
+					mod_current_module_name = current->mod_name;
+					retVal = current->func(source, ac, av);
+					mod_current_module_name = NULL;
+					current = current->next;
+				}
+			}
+		}
+	} else {
+		if (debug)
+			alog("debug: unknown message from server (%s)", inbuf);
+	}
 
-    /* Free argument list we created */
-    free(av);
+	/* Free argument list we created */
+	free(av);
 }
 
 /*************************************************************************/

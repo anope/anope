@@ -22,22 +22,22 @@ int myHostServMooRootHelp(User *u);   						 /* Function to display extra help t
 
 int AnopeInit(int argc, char **argv)							/* This will be executed when the module is loaded */
 {
-    Command *c;											/* Pointer to a Command */
-    int status = 0;											/* the status of our new command */
-    c = createCommand("moo", hs_moo_show, NULL, -1, -1, -1, -1, -1);	/* Create a new command "moo" pointing to hs_moo */
+	Command *c;											/* Pointer to a Command */
+	int status = 0;											/* the status of our new command */
+	c = createCommand("moo", hs_moo_show, NULL, -1, -1, -1, -1, -1);	/* Create a new command "moo" pointing to hs_moo */
 
-    moduleAddHelp(c,myHostServMooHelp);						/* add help for all users to this command */
-    moduleAddRegHelp(c,myHostServMooRegHelp);				/* add extra regular-user only help to this command */
-    moduleAddOperHelp(c,myHostServMooOperHelp);				/* add extra oper only help to this command */
-    moduleAddAdminHelp(c,myHostServMooAdminHelp);				/* add extra admin only help to this command */
-    moduleAddRootHelp(c,myHostServMooRootHelp);				/* add extra root only help to this command */
+	moduleAddHelp(c,myHostServMooHelp);						/* add help for all users to this command */
+	moduleAddRegHelp(c,myHostServMooRegHelp);				/* add extra regular-user only help to this command */
+	moduleAddOperHelp(c,myHostServMooOperHelp);				/* add extra oper only help to this command */
+	moduleAddAdminHelp(c,myHostServMooAdminHelp);				/* add extra admin only help to this command */
+	moduleAddRootHelp(c,myHostServMooRootHelp);				/* add extra root only help to this command */
 
-    moduleSetHostHelp(myHostServHelp);						/* add us to the .hs help list */
+	moduleSetHostHelp(myHostServHelp);						/* add us to the .hs help list */
 
-    status = this->AddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
+	status = this->AddCommand(HOSTSERV, c, MOD_HEAD);			/* Add the command to the HOSTSERV cmd table */
 
-    /* Check if we have any argv's */
-    if(argc>0) {
+	/* Check if we have any argv's */
+	if(argc>0) {
 	/* we do, the first will be the nick of the person modload'ing us */
 	/* or NULL if we were auto-loaded */
 	if(argv[0]) {
@@ -45,24 +45,24 @@ int AnopeInit(int argc, char **argv)							/* This will be executed when the mod
 	} else {
 		alog("hs_moo was automatically loaded by anope");
 	}
-    }
-    alog("hs_moo.so: Add Command 'moo' Status: %d",status);			/* Log the command being added */
-         
-    moduleAddCallback("test",time(NULL)+dotime("15s"),test,0,NULL);		/* set a call-back function to exec in 3 mins time */
-    moduleDelCallback("test");
-    this->SetAuthor(AUTHOR);								/* tell Anope about the author */
-    this->SetVersion(VERSION);								/* Tell Anope about the verison */
+	}
+	alog("hs_moo.so: Add Command 'moo' Status: %d",status);			/* Log the command being added */
+		 
+	moduleAddCallback("test",time(NULL)+dotime("15s"),test,0,NULL);		/* set a call-back function to exec in 3 mins time */
+	moduleDelCallback("test");
+	this->SetAuthor(AUTHOR);								/* tell Anope about the author */
+	this->SetVersion(VERSION);								/* Tell Anope about the verison */
 
-    if(status!=MOD_ERR_OK) {
+	if(status!=MOD_ERR_OK) {
 	return MOD_STOP;
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 int hs_moo_show(User * u)
 {
-    notice(s_HostServ, u->nick, "MOO! - This command was loaded via a module!");	/* Just notice the user */
-    return MOD_STOP;										/* MOD_STOP means we will NOT pass control back to other */
+	notice(s_HostServ, u->nick, "MOO! - This command was loaded via a module!");	/* Just notice the user */
+	return MOD_STOP;										/* MOD_STOP means we will NOT pass control back to other */
 }														/* modules waiting to handle the /hs moo command! */
 
 int test(int argc, char **argv) {
@@ -76,11 +76,11 @@ void AnopeFini(void)
 }
 
 /***************************************************************************************************************************************/
-/* The code below here shows various ways of dealing with the module help system                                                      */
+/* The code below here shows various ways of dealing with the module help system													  */
 /***************************************************************************************************************************************/
 
 void myHostServHelp(User *u) {
-	notice(s_HostServ,u->nick, "    MOO         Moo's at the user!");		/* this will appear in the help list */
+	notice(s_HostServ,u->nick, "	MOO		 Moo's at the user!");		/* this will appear in the help list */
 }
 
 int myHostServMooHelp(User *u) {

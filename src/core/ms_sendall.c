@@ -42,9 +42,9 @@ class MSSendAll : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_SENDALL);
+	}
 }
 
 /**
@@ -54,31 +54,31 @@ void myMemoServHelp(User * u)
  **/
 int do_sendall(User * u)
 {
-    int i, z = 1;
-    NickCore *nc;
-    char *text = strtok(NULL, "");
+	int i, z = 1;
+	NickCore *nc;
+	char *text = strtok(NULL, "");
 
-    if (readonly) {
-        notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
-        return MOD_CONT;
-    } else if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
-        notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
-        return MOD_CONT;
-    } else if (!text) {
-        syntax_error(s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
-        return MOD_CONT;
-    }
+	if (readonly) {
+		notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
+		return MOD_CONT;
+	} else if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
+		notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
+		return MOD_CONT;
+	} else if (!text) {
+		syntax_error(s_MemoServ, u, "SENDALL", MEMO_SEND_SYNTAX);
+		return MOD_CONT;
+	}
 
 
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            if (stricmp(u->nick, nc->display) != 0)
-                memo_send(u, nc->display, text, z);
-        }                       /* /nc */
-    }                           /* /i */
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			if (stricmp(u->nick, nc->display) != 0)
+				memo_send(u, nc->display, text, z);
+		}					   /* /nc */
+	}						   /* /i */
 
-    notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
-    return MOD_CONT;
+	notice_lang(s_MemoServ, u, MEMO_MASS_SENT);
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_sendall", MSSendAll)

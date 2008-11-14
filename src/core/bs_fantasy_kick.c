@@ -41,47 +41,47 @@ class BSFantasyKick : public Module
  **/
 int do_fantasy(int argc, char **argv)
 {
-    User *u, *u2;
-    ChannelInfo *ci;
-    char *target = NULL;
-    char *reason = NULL;
+	User *u, *u2;
+	ChannelInfo *ci;
+	char *target = NULL;
+	char *reason = NULL;
 
-    if (argc < 3)
-        return MOD_CONT;
+	if (argc < 3)
+		return MOD_CONT;
 
-    if ((stricmp(argv[0], "kick") == 0) || (stricmp(argv[0], "k") == 0)) {
-        u = finduser(argv[1]);
-        ci = cs_findchan(argv[2]);
-        if (!u || !ci)
-            return MOD_CONT;
+	if ((stricmp(argv[0], "kick") == 0) || (stricmp(argv[0], "k") == 0)) {
+		u = finduser(argv[1]);
+		ci = cs_findchan(argv[2]);
+		if (!u || !ci)
+			return MOD_CONT;
 
-        if (argc >= 4) {
-            target = myStrGetToken(argv[3], ' ', 0);
-            reason = myStrGetTokenRemainder(argv[3], ' ', 1);
-        }
-        if (!target && check_access(u, ci, CA_KICKME)) {
-            bot_raw_kick(u, ci, u->nick, "Requested");
-        } else if (target && check_access(u, ci, CA_KICK)) {
-            if (!stricmp(target, ci->bi->nick))
-                bot_raw_kick(u, ci, u->nick, "Oops!");
-            else {
-                u2 = finduser(target);
-                if (u2 && ci->c && is_on_chan(ci->c, u2)) {
-                    if (!reason && !is_protected(u2))
-                        bot_raw_kick(u, ci, target, "Requested");
-                    else if (!is_protected(u2))
-                        bot_raw_kick(u, ci, target, reason);
-                }
-            }
-        }
-    }
+		if (argc >= 4) {
+			target = myStrGetToken(argv[3], ' ', 0);
+			reason = myStrGetTokenRemainder(argv[3], ' ', 1);
+		}
+		if (!target && check_access(u, ci, CA_KICKME)) {
+			bot_raw_kick(u, ci, u->nick, "Requested");
+		} else if (target && check_access(u, ci, CA_KICK)) {
+			if (!stricmp(target, ci->bi->nick))
+				bot_raw_kick(u, ci, u->nick, "Oops!");
+			else {
+				u2 = finduser(target);
+				if (u2 && ci->c && is_on_chan(ci->c, u2)) {
+					if (!reason && !is_protected(u2))
+						bot_raw_kick(u, ci, target, "Requested");
+					else if (!is_protected(u2))
+						bot_raw_kick(u, ci, target, reason);
+				}
+			}
+		}
+	}
 
-    if (target)
-       free(target);
-    if (reason)
-       free(reason);
+	if (target)
+	   free(target);
+	if (reason)
+	   free(reason);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_fantasy_kick", BSFantasyKick)

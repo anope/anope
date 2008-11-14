@@ -32,7 +32,7 @@
 #define CMODE_R 0x00000100		/* Only identified users can join */
 #define CMODE_r 0x00000200		/* Set for all registered channels */
 #define CMODE_c 0x00000400		/* Colors can't be used */
-#define CMODE_M 0x00000800      /* Non-regged nicks can't send messages */
+#define CMODE_M 0x00000800	  /* Non-regged nicks can't send messages */
 #define CMODE_N 0x00001000
 #define CMODE_S 0x00002000
 #define CMODE_C 0x00004000

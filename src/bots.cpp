@@ -34,27 +34,27 @@ BotInfo::BotInfo(const char *nnick, const char *nuser, const char *nhost, const 
 
 BotInfo::~BotInfo()
 {
-    int i;
-    ChannelInfo *ci;
+	int i;
+	ChannelInfo *ci;
 
-    for (i = 0; i < 256; i++)
-        for (ci = chanlists[i]; ci; ci = ci->next)
-            if (ci->bi == this)
-                ci->bi = NULL;
+	for (i = 0; i < 256; i++)
+		for (ci = chanlists[i]; ci; ci = ci->next)
+			if (ci->bi == this)
+				ci->bi = NULL;
 
-    if (this->next)
-        this->next->prev = this->prev;
-    if (this->prev)
-        this->prev->next = this->next;
-    else
-        botlists[tolower(*this->nick)] = this->next;
+	if (this->next)
+		this->next->prev = this->prev;
+	if (this->prev)
+		this->prev->next = this->next;
+	else
+		botlists[tolower(*this->nick)] = this->next;
 
-    nbots--;
+	nbots--;
 
-    free(this->nick);
-    free(this->user);
-    free(this->host);
-    free(this->real);
+	free(this->nick);
+	free(this->user);
+	free(this->host);
+	free(this->real);
 }
 
 

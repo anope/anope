@@ -42,15 +42,15 @@ class HSHelp : public Module
  **/
 int do_help(User * u)
 {
-    char *cmd = strtok(NULL, "");
+	char *cmd = strtok(NULL, "");
 
-    if (!cmd) {
-        notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
-        moduleDisplayHelp(6, u);
-    } else {
-        mod_help_cmd(s_HostServ, u, HOSTSERV, cmd);
-    }
-    return MOD_CONT;
+	if (!cmd) {
+		notice_help(s_HostServ, u, HOST_HELP, s_HostServ);
+		moduleDisplayHelp(6, u);
+	} else {
+		mod_help_cmd(s_HostServ, u, HOSTSERV, cmd);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_help", HSHelp)

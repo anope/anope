@@ -43,9 +43,9 @@ class OSUpdate : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_UPDATE);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_UPDATE);
+	}
 }
 
 /**
@@ -55,9 +55,9 @@ void myOperServHelp(User * u)
  **/
 int do_update(User * u)
 {
-    notice_lang(s_OperServ, u, OPER_UPDATING);
-    save_data = 1;
-    return MOD_CONT;
+	notice_lang(s_OperServ, u, OPER_UPDATING);
+	save_data = 1;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_update", OSUpdate)

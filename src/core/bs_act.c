@@ -23,15 +23,15 @@ class BSAct : public Module
  public:
 	BSAct(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
-	    Command *c;
+		Command *c;
 
-	    this->SetAuthor("Anope");
-	    this->SetVersion("$Id$");
-	    this->SetType(CORE);
-	    c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
-	    this->AddCommand(BOTSERV, c, MOD_UNIQUE);
+		this->SetAuthor("Anope");
+		this->SetVersion("$Id$");
+		this->SetType(CORE);
+		c = createCommand("ACT", do_act, NULL, BOT_HELP_ACT, -1, -1, -1, -1);
+		this->AddCommand(BOTSERV, c, MOD_UNIQUE);
 
-	    moduleSetBotHelp(myBotServHelp);
+		moduleSetBotHelp(myBotServHelp);
 	}
 };
 
@@ -42,7 +42,7 @@ class BSAct : public Module
  **/
 void myBotServHelp(User * u)
 {
-    notice_lang(s_BotServ, u, BOT_HELP_CMD_ACT);
+	notice_lang(s_BotServ, u, BOT_HELP_CMD_ACT);
 }
 
 /**
@@ -52,32 +52,32 @@ void myBotServHelp(User * u)
  **/
 int do_act(User * u)
 {
-    ChannelInfo *ci;
+	ChannelInfo *ci;
 
-    char *chan = strtok(NULL, " ");
-    char *text = strtok(NULL, "");
+	char *chan = strtok(NULL, " ");
+	char *text = strtok(NULL, "");
 
-    if (!chan || !text)
-        syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
-    else if (!(ci = cs_findchan(chan)))
-        notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
-    else if (ci->flags & CI_VERBOTEN)
-        notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
-    else if (!ci->bi)
-        notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
-    else if (!ci->c || ci->c->usercount < BSMinUsers)
-        notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
-    else if (!check_access(u, ci, CA_SAY))
-        notice_lang(s_BotServ, u, ACCESS_DENIED);
-    else {
-        strnrepl(text, BUFSIZE, "\001", "");
-        ircdproto->SendAction(ci->bi, ci->name, "%s", text);
-        ci->bi->lastmsg = time(NULL);
-        if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
-            ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s",
-                              u->nick, ci->name, text);
-    }
-    return MOD_CONT;
+	if (!chan || !text)
+		syntax_error(s_BotServ, u, "ACT", BOT_ACT_SYNTAX);
+	else if (!(ci = cs_findchan(chan)))
+		notice_lang(s_BotServ, u, CHAN_X_NOT_REGISTERED, chan);
+	else if (ci->flags & CI_VERBOTEN)
+		notice_lang(s_BotServ, u, CHAN_X_FORBIDDEN, chan);
+	else if (!ci->bi)
+		notice_help(s_BotServ, u, BOT_NOT_ASSIGNED);
+	else if (!ci->c || ci->c->usercount < BSMinUsers)
+		notice_lang(s_BotServ, u, BOT_NOT_ON_CHANNEL, ci->name);
+	else if (!check_access(u, ci, CA_SAY))
+		notice_lang(s_BotServ, u, ACCESS_DENIED);
+	else {
+		strnrepl(text, BUFSIZE, "\001", "");
+		ircdproto->SendAction(ci->bi, ci->name, "%s", text);
+		ci->bi->lastmsg = time(NULL);
+		if (LogBot && LogChannel && logchan && !debug && findchan(LogChannel))
+			ircdproto->SendPrivmsg(ci->bi, LogChannel, "ACT %s %s %s",
+							  u->nick, ci->name, text);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_act", BSAct)

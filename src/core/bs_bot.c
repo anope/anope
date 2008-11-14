@@ -43,9 +43,9 @@ class BSBot : public Module
  **/
 void myBotServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_BotServ, u, BOT_HELP_CMD_BOT);
+	}
 }
 
 /**
@@ -61,7 +61,7 @@ int do_bot(User * u)
 	
 	if (!cmd)
 	{
-        	syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
+			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 		return MOD_CONT;
 	}
 

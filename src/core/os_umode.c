@@ -54,9 +54,9 @@ void AnopeFini(void)
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u) && u->isSuperAdmin) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
-    }
+	if (is_services_admin(u) && u->isSuperAdmin) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_UMODE);
+	}
 }
 
 /**
@@ -69,45 +69,45 @@ void myOperServHelp(User * u)
  */
 int do_operumodes(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char *modes = strtok(NULL, "");
+	char *nick = strtok(NULL, " ");
+	char *modes = strtok(NULL, "");
 
-    User *u2;
+	User *u2;
 
-    /* Only allow this if SuperAdmin is enabled */
-    if (!u->isSuperAdmin) {
-        notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
-        return MOD_CONT;
-    }
+	/* Only allow this if SuperAdmin is enabled */
+	if (!u->isSuperAdmin) {
+		notice_lang(s_OperServ, u, OPER_SUPER_ADMIN_ONLY);
+		return MOD_CONT;
+	}
 
-    if (!nick || !modes) {
-        syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
-        return MOD_CONT;
-    }
+	if (!nick || !modes) {
+		syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
+		return MOD_CONT;
+	}
 
-    /**
-     * Only accept a +/- mode string
-     *-rob
-     **/
-    if ((modes[0] != '+') && (modes[0] != '-')) {
-        syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
-        return MOD_CONT;
-    }
-    if (!(u2 = finduser(nick))) {
-        notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
-    } else {
-        ircdproto->SendMode(findbot(s_OperServ), nick, "%s", modes);
+	/**
+	 * Only accept a +/- mode string
+	 *-rob
+	 **/
+	if ((modes[0] != '+') && (modes[0] != '-')) {
+		syntax_error(s_OperServ, u, "UMODE", OPER_UMODE_SYNTAX);
+		return MOD_CONT;
+	}
+	if (!(u2 = finduser(nick))) {
+		notice_lang(s_OperServ, u, NICK_X_NOT_IN_USE, nick);
+	} else {
+		ircdproto->SendMode(findbot(s_OperServ), nick, "%s", modes);
 
-        common_svsmode(u2, modes, NULL);
+		common_svsmode(u2, modes, NULL);
 
-        notice_lang(s_OperServ, u, OPER_UMODE_SUCCESS, nick);
-        notice_lang(s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
+		notice_lang(s_OperServ, u, OPER_UMODE_SUCCESS, nick);
+		notice_lang(s_OperServ, u2, OPER_UMODE_CHANGED, u->nick);
 
-        if (WallOSMode)
-            ircdproto->SendGlobops(s_OperServ, "\2%s\2 used UMODE on %s",
-                             u->nick, nick);
-    }
-    return MOD_CONT;
+		if (WallOSMode)
+			ircdproto->SendGlobops(s_OperServ, "\2%s\2 used UMODE on %s",
+							 u->nick, nick);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_umode", OSUMode)

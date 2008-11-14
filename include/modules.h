@@ -48,7 +48,7 @@ typedef void *	ano_module_t;
 
 
 /*************************************************************************/
-#define CMD_HASH(x)      (((x)[0]&31)<<5 | ((x)[1]&31))	/* Will gen a hash from a string :) */
+#define CMD_HASH(x)	  (((x)[0]&31)<<5 | ((x)[1]&31))	/* Will gen a hash from a string :) */
 #define MAX_CMD_HASH 1024
 
 #define MOD_STOP 1
@@ -69,18 +69,18 @@ typedef void *	ano_module_t;
 /**********************************************************************
  * Module Returns
  **********************************************************************/
- #define MOD_ERR_OK          0
- #define MOD_ERR_MEMORY      1
- #define MOD_ERR_PARAMS      2
- #define MOD_ERR_EXISTS      3
- #define MOD_ERR_NOEXIST     4
- #define MOD_ERR_NOUSER      5
- #define MOD_ERR_NOLOAD      6
- #define MOD_ERR_NOUNLOAD    7
- #define MOD_ERR_SYNTAX      8
- #define MOD_ERR_NODELETE    9
- #define MOD_ERR_UNKNOWN     10
- #define MOD_ERR_FILE_IO     11
+ #define MOD_ERR_OK		  0
+ #define MOD_ERR_MEMORY	  1
+ #define MOD_ERR_PARAMS	  2
+ #define MOD_ERR_EXISTS	  3
+ #define MOD_ERR_NOEXIST	 4
+ #define MOD_ERR_NOUSER	  5
+ #define MOD_ERR_NOLOAD	  6
+ #define MOD_ERR_NOUNLOAD	7
+ #define MOD_ERR_SYNTAX	  8
+ #define MOD_ERR_NODELETE	9
+ #define MOD_ERR_UNKNOWN	 10
+ #define MOD_ERR_FILE_IO	 11
  #define MOD_ERR_NOSERVICE   12
  #define MOD_ERR_NO_MOD_NAME 13
 
@@ -128,8 +128,8 @@ extern MDE EvtMessageHash *EVENT[MAX_CMD_HASH];
 extern MDE EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
 struct ModuleLang_ {
-    int argc;
-    char **argv;
+	int argc;
+	char **argv;
 };
 
 /** Every module in Anope is actually a class.
@@ -293,61 +293,61 @@ CoreExport class ModuleManager
 
 
 struct ModuleHash_ {
-        char *name;
-        Module *m;
-        ModuleHash *next;
+		char *name;
+		Module *m;
+		ModuleHash *next;
 };
 
 struct Command_ {
-    char *name;
-    int (*routine)(User *u);
-    int (*has_priv)(User *u);	/* Returns 1 if user may use command, else 0 */
+	char *name;
+	int (*routine)(User *u);
+	int (*has_priv)(User *u);	/* Returns 1 if user may use command, else 0 */
 
-    /* Regrettably, these are hard-coded to correspond to current privilege
-     * levels (v4.0).  Suggestions for better ways to do this are
-     * appreciated.
-     */
-    int helpmsg_all;	/* Displayed to all users; -1 = no message */
-    int helpmsg_reg;	/* Displayed to regular users only */
-    int helpmsg_oper;	/* Displayed to Services operators only */
-    int helpmsg_admin;	/* Displayed to Services admins only */
-    int helpmsg_root;	/* Displayed to Services root only */
-    char *help_param1;
-    char *help_param2;
-    char *help_param3;
-    char *help_param4;
+	/* Regrettably, these are hard-coded to correspond to current privilege
+	 * levels (v4.0).  Suggestions for better ways to do this are
+	 * appreciated.
+	 */
+	int helpmsg_all;	/* Displayed to all users; -1 = no message */
+	int helpmsg_reg;	/* Displayed to regular users only */
+	int helpmsg_oper;	/* Displayed to Services operators only */
+	int helpmsg_admin;	/* Displayed to Services admins only */
+	int helpmsg_root;	/* Displayed to Services root only */
+	char *help_param1;
+	char *help_param2;
+	char *help_param3;
+	char *help_param4;
 
-    /* Module related stuff */
-    int core;           /* Can this command be deleted? */
-    char *mod_name;	/* Name of the module who owns us, NULL for core's  */
-    char *service;	/* Service we provide this command for */
-    int (*all_help)(User *u);
-    int (*regular_help)(User *u);
-    int (*oper_help)(User *u);
-    int (*admin_help)(User *u);
-    int (*root_help)(User *u);
+	/* Module related stuff */
+	int core;		   /* Can this command be deleted? */
+	char *mod_name;	/* Name of the module who owns us, NULL for core's  */
+	char *service;	/* Service we provide this command for */
+	int (*all_help)(User *u);
+	int (*regular_help)(User *u);
+	int (*oper_help)(User *u);
+	int (*admin_help)(User *u);
+	int (*root_help)(User *u);
 
-    Command *next;	/* Next command responsible for the same command */
+	Command *next;	/* Next command responsible for the same command */
 };
 
 struct CommandHash_ {
-        char *name;	/* Name of the command */
-        Command *c;	/* Actual command */
-        CommandHash *next; /* Next command */
+		char *name;	/* Name of the command */
+		Command *c;	/* Actual command */
+		CommandHash *next; /* Next command */
 };
 
 struct Message_ {
-    char *name;
-    int (*func)(const char *source, int ac, const char **av);
-    int core;
-    char *mod_name;
-    Message *next;
+	char *name;
+	int (*func)(const char *source, int ac, const char **av);
+	int core;
+	char *mod_name;
+	Message *next;
 };
 
 struct MessageHash_ {
-        char *name;
-        Message *m;
-        MessageHash *next;
+		char *name;
+		Message *m;
+		MessageHash *next;
 };
 
 struct ModuleCallBack_ {
@@ -361,38 +361,38 @@ struct ModuleCallBack_ {
 };
 
 struct EvtMessage_ {
-    char *name;
-    int (*func)(const char *source, int ac, const char **av);
-    int core;
-    char *mod_name;
-    EvtMessage *next;
+	char *name;
+	int (*func)(const char *source, int ac, const char **av);
+	int core;
+	char *mod_name;
+	EvtMessage *next;
 };
 
 struct EvtMessageHash_ {
-        char *name;
-        EvtMessage *evm;
-        EvtMessageHash *next;
+		char *name;
+		EvtMessage *evm;
+		EvtMessageHash *next;
 };
 
 
 struct EvtHook_ {
-    int (*func)(int argc, char **argv);
-    int core;
+	int (*func)(int argc, char **argv);
+	int core;
 	char *name;
-    char *mod_name;
-    EvtHook *next;
+	char *mod_name;
+	EvtHook *next;
 };
 
 struct EvtHookHash_ {
-        char *name;
-        EvtHook *evh;
-        EvtHookHash *next;
+		char *name;
+		EvtHook *evh;
+		EvtHookHash *next;
 };
 
 
 /*************************************************************************/
 /* Module Managment Functions */
-MDE Module *findModule(const char *name);                /* Find a module */
+MDE Module *findModule(const char *name);				/* Find a module */
 
 int encryption_module_init(void); /* Load the encryption module */
 int protocol_module_init(void);	/* Load the IRCD Protocol Module up*/

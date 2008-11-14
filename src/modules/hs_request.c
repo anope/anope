@@ -1,5 +1,5 @@
 /* hs_request.c - Add request and activate functionality to HostServ,
- *                along with adding +req as optional param to HostServ list.
+ *				along with adding +req as optional param to HostServ list.
  *
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
@@ -65,7 +65,7 @@ int hs_help_waiting(User * u);
 void hs_help(User * u);
 
 void my_add_host_request(char *nick, char *vIdent, char *vhost,
-                         char *creator, int32 tmp_time);
+						 char *creator, int32 tmp_time);
 int my_isvalidchar(const char c);
 void my_memo_lang(User * u, char *name, int z, int number, ...);
 void req_send_memos(User * u, char *vHost);
@@ -155,11 +155,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"No request for nick %s found.",
 		/* LNG_HELP */
-		"    REQUEST     Request a vHost for your nick",
+		"	REQUEST	 Request a vHost for your nick",
 		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Approve the requested vHost of a user\n"
-		"    REJECT      Reject the requested vHost of a user\n"
-		"    WAITING     Convenience command for LIST +req",
+		"	ACTIVATE	Approve the requested vHost of a user\n"
+		"	REJECT	  Reject the requested vHost of a user\n"
+		"	WAITING	 Convenience command for LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Request the given vHost to be actived for your nick by the\n"
 		"network administrators. Please be patient while your request\n"
@@ -205,11 +205,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Geen aanvraag voor nick %s gevonden.",
 		/* LNG_HELP */
-		"    REQUEST     Vraag een vHost aan voor je nick",
+		"	REQUEST	 Vraag een vHost aan voor je nick",
 		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Activeer de aangevraagde vHost voor een gebruiker\n"
-		"    REJECT      Keur de aangevraagde vHost voor een gebruiker af\n"
-		"    WAITING     Snelkoppeling naar LIST +req",
+		"	ACTIVATE	Activeer de aangevraagde vHost voor een gebruiker\n"
+		"	REJECT	  Keur de aangevraagde vHost voor een gebruiker af\n"
+		"	WAITING	 Snelkoppeling naar LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Verzoek de gegeven vHost te activeren voor jouw nick bij de\n"
 		"netwerk beheerders. Het kan even duren voordat je aanvraag\n"
@@ -255,11 +255,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Nenhum pedido encontrado para o nick %s.",
 		/* LNG_HELP */
-		"    REQUEST     Request a vHost for your nick",
+		"	REQUEST	 Request a vHost for your nick",
 		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Aprova o pedido de vHost de um usuбrio\n"
-		"    REJECT      Recusa o pedido de vHost de um usuбrio\n"
-		"    WAITING     Comando para LISTAR +req",
+		"	ACTIVATE	Aprova o pedido de vHost de um usuбrio\n"
+		"	REJECT	  Recusa o pedido de vHost de um usuбrio\n"
+		"	WAITING	 Comando para LISTAR +req",
 		/* LNG_HELP_REQUEST */
 		"Solicita a ativaзгo do vHost fornecido em seu nick pelos\n"
 		"administradores da rede. Por favor, tenha paciкncia\n"
@@ -305,11 +305,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Запрос на vHost для ника %s не найден.",
 		/* LNG_HELP */
-		"    REQUEST     Запрос на vHost для вашего текущего ника",
+		"	REQUEST	 Запрос на vHost для вашего текущего ника",
 		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Утвердить запрашиваемый пользователем  vHost\n"
-		"    REJECT      Отклонить запрашиваемый пользователем  vHost\n"
-		"    WAITING     Список запросов ожидающих обработки (аналог LIST +req)",
+		"	ACTIVATE	Утвердить запрашиваемый пользователем  vHost\n"
+		"	REJECT	  Отклонить запрашиваемый пользователем  vHost\n"
+		"	WAITING	 Список запросов ожидающих обработки (аналог LIST +req)",
 		/* LNG_HELP_REQUEST */
 		"Отправляет запрос на активацию vHost, который будет рассмотрен одним из\n"
 		"администраторов сети. Просьба проявить терпение, пока запрос\n"
@@ -355,11 +355,11 @@ class HSRequest : public Module
 		/* LNG_NO_REQUEST */
 		"Nessuna richiesta trovata per il nick %s.",
 		/* LNG_HELP */
-		"    REQUEST     Richiede un vHost per il tuo nick",
+		"	REQUEST	 Richiede un vHost per il tuo nick",
 		/* LNG_HELP_SETTER */
-		"    ACTIVATE    Approva il vHost richiesto di un utente\n"
-		"    REJECT      Rifiuta il vHost richiesto di un utente\n"
-		"    WAITING     Comando per LIST +req",
+		"	ACTIVATE	Approva il vHost richiesto di un utente\n"
+		"	REJECT	  Rifiuta il vHost richiesto di un utente\n"
+		"	WAITING	 Comando per LIST +req",
 		/* LNG_HELP_REQUEST */
 		"Richiede l'attivazione del vHost specificato per il tuo nick da parte\n"
 		"degli amministratori di rete. Sei pregato di pazientare finchи la tua\n"
@@ -400,577 +400,577 @@ class HSRequest : public Module
 
 int hs_do_request(User * u)
 {
-    char *cur_buffer;
-    char *nick;
-    char *rawhostmask;
-    char hostmask[HOSTMAX];
-    NickAlias *na;
-    int32 tmp_time;
-    char *s;
-    char *vIdent = NULL;
-    time_t now = time(NULL);
+	char *cur_buffer;
+	char *nick;
+	char *rawhostmask;
+	char hostmask[HOSTMAX];
+	NickAlias *na;
+	int32 tmp_time;
+	char *s;
+	char *vIdent = NULL;
+	time_t now = time(NULL);
 
-    cur_buffer = moduleGetLastBuffer();
-    nick = u->nick;
-    rawhostmask = myStrGetToken(cur_buffer, ' ', 0);
+	cur_buffer = moduleGetLastBuffer();
+	nick = u->nick;
+	rawhostmask = myStrGetToken(cur_buffer, ' ', 0);
 
-    if (!nick || !rawhostmask) {
-        if (rawhostmask)
-            free(rawhostmask);
-        moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-        return MOD_CONT;
-    }
+	if (!nick || !rawhostmask) {
+		if (rawhostmask)
+			free(rawhostmask);
+		moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+		return MOD_CONT;
+	}
 
-    vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);    /* Get the first substring, @ as delimiter */
-    if (vIdent) {
-        rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);      /* get the remaining string */
-        if (!rawhostmask) {
-            moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-            free(vIdent);
-            return MOD_CONT;
-        }
-        if (strlen(vIdent) > USERMAX - 1) {
-            notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-            free(vIdent);
-            free(rawhostmask);
-            return MOD_CONT;
-        } else {
-            for (s = vIdent; *s; s++) {
-                if (!my_isvalidchar(*s)) {
-                    notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-                    free(vIdent);
-                    free(rawhostmask);
-                    return MOD_CONT;
-                }
-            }
-        }
-        if (!ircd->vident) {
-            notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-            free(vIdent);
-            free(rawhostmask);
-            return MOD_CONT;
-        }
-    }
-    if (strlen(rawhostmask) < HOSTMAX - 1) {
-        snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
-    } else {
-        notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
-        if (vIdent)
-            free(vIdent);
-        free(rawhostmask);
-        return MOD_CONT;
-    }
+	vIdent = myStrGetOnlyToken(rawhostmask, '@', 0);	/* Get the first substring, @ as delimiter */
+	if (vIdent) {
+		rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);	  /* get the remaining string */
+		if (!rawhostmask) {
+			moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+			free(vIdent);
+			return MOD_CONT;
+		}
+		if (strlen(vIdent) > USERMAX - 1) {
+			notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
+			free(vIdent);
+			free(rawhostmask);
+			return MOD_CONT;
+		} else {
+			for (s = vIdent; *s; s++) {
+				if (!my_isvalidchar(*s)) {
+					notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
+					free(vIdent);
+					free(rawhostmask);
+					return MOD_CONT;
+				}
+			}
+		}
+		if (!ircd->vident) {
+			notice_lang(s_HostServ, u, HOST_NO_VIDENT);
+			free(vIdent);
+			free(rawhostmask);
+			return MOD_CONT;
+		}
+	}
+	if (strlen(rawhostmask) < HOSTMAX - 1) {
+		snprintf(hostmask, HOSTMAX, "%s", rawhostmask);
+	} else {
+		notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
+		if (vIdent)
+			free(vIdent);
+		free(rawhostmask);
+		return MOD_CONT;
+	}
 
-    if (!isValidHost(hostmask, 3)) {
-        notice_lang(s_HostServ, u, HOST_SET_ERROR);
-        if (vIdent)
-            free(vIdent);
-        free(rawhostmask);
-        return MOD_CONT;
-    }
+	if (!isValidHost(hostmask, 3)) {
+		notice_lang(s_HostServ, u, HOST_SET_ERROR);
+		if (vIdent)
+			free(vIdent);
+		free(rawhostmask);
+		return MOD_CONT;
+	}
 
-    tmp_time = time(NULL);
-    if ((na = findnick(nick))) {
-        if (HSRequestMemoOper || HSRequestMemoSetters) {
-            if (MSSendDelay > 0 && u
-                && u->lastmemosend + MSSendDelay > now) {
-                moduleNoticeLang(s_HostServ, u, LNG_REQUEST_WAIT,
-                                 MSSendDelay);
-                u->lastmemosend = now;
-                if (vIdent)
-                    free(vIdent);
-                free(rawhostmask);
-                return MOD_CONT;
-            }
-        }
-        my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
+	tmp_time = time(NULL);
+	if ((na = findnick(nick))) {
+		if (HSRequestMemoOper || HSRequestMemoSetters) {
+			if (MSSendDelay > 0 && u
+				&& u->lastmemosend + MSSendDelay > now) {
+				moduleNoticeLang(s_HostServ, u, LNG_REQUEST_WAIT,
+								 MSSendDelay);
+				u->lastmemosend = now;
+				if (vIdent)
+					free(vIdent);
+				free(rawhostmask);
+				return MOD_CONT;
+			}
+		}
+		my_add_host_request(nick, vIdent, hostmask, u->nick, tmp_time);
 
-        moduleNoticeLang(s_HostServ, u, LNG_REQUESTED);
-        req_send_memos(u, hostmask);
-        alog("New vHost Requested by %s", nick);
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOREG, nick);
-    }
+		moduleNoticeLang(s_HostServ, u, LNG_REQUESTED);
+		req_send_memos(u, hostmask);
+		alog("New vHost Requested by %s", nick);
+	} else {
+		notice_lang(s_HostServ, u, HOST_NOREG, nick);
+	}
 
-    if (vIdent)
-        free(vIdent);
-    free(rawhostmask);
+	if (vIdent)
+		free(vIdent);
+	free(rawhostmask);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void my_memo_lang(User * u, char *name, int z, int number, ...)
 {
-    va_list va;
-    char buffer[4096], outbuf[4096];
-    char *fmt = NULL;
-    int lang = LANG_EN_US;
-    char *s, *t, *buf;
-    User *u2;
+	va_list va;
+	char buffer[4096], outbuf[4096];
+	char *fmt = NULL;
+	int lang = LANG_EN_US;
+	char *s, *t, *buf;
+	User *u2;
 
-    if ((mod_current_module_name)
-        && (!mod_current_module
-            || mod_current_module_name != mod_current_module->name))
-        mod_current_module = findModule(mod_current_module_name);
+	if ((mod_current_module_name)
+		&& (!mod_current_module
+			|| mod_current_module_name != mod_current_module->name))
+		mod_current_module = findModule(mod_current_module_name);
 
-    u2 = finduser(name);
-    /* Find the users lang, and use it if we cant */
-    if (u2 && u2->na && u2->na->nc)
-        lang = u2->na->nc->language;
+	u2 = finduser(name);
+	/* Find the users lang, and use it if we cant */
+	if (u2 && u2->na && u2->na->nc)
+		lang = u2->na->nc->language;
 
-    /* If the users lang isnt supported, drop back to enlgish */
-    if (mod_current_module->lang[lang].argc == 0)
-        lang = LANG_EN_US;
+	/* If the users lang isnt supported, drop back to enlgish */
+	if (mod_current_module->lang[lang].argc == 0)
+		lang = LANG_EN_US;
 
-    /* If the requested lang string exists for the language */
-    if (mod_current_module->lang[lang].argc > number) {
-        fmt = mod_current_module->lang[lang].argv[number];
+	/* If the requested lang string exists for the language */
+	if (mod_current_module->lang[lang].argc > number) {
+		fmt = mod_current_module->lang[lang].argv[number];
 
-        buf = sstrdup(fmt);
-        s = buf;
-        while (*s) {
-            t = s;
-            s += strcspn(s, "\n");
-            if (*s)
-                *s++ = '\0';
-            strscpy(outbuf, t, sizeof(outbuf));
+		buf = sstrdup(fmt);
+		s = buf;
+		while (*s) {
+			t = s;
+			s += strcspn(s, "\n");
+			if (*s)
+				*s++ = '\0';
+			strscpy(outbuf, t, sizeof(outbuf));
 
-            va_start(va, number);
-            vsnprintf(buffer, 4095, outbuf, va);
-            va_end(va);
-            memo_send(u, name, buffer, z);
-        }
-        free(buf);
-    } else {
-        alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
-    }
+			va_start(va, number);
+			vsnprintf(buffer, 4095, outbuf, va);
+			va_end(va);
+			memo_send(u, name, buffer, z);
+		}
+		free(buf);
+	} else {
+		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
+	}
 }
 
 
 void req_send_memos(User * u, char *vHost)
 {
-    int i;
-    int z = 2;
+	int i;
+	int z = 2;
 
-    if (checkDefCon(DEFCON_NO_NEW_MEMOS))
-        return;
+	if (checkDefCon(DEFCON_NO_NEW_MEMOS))
+		return;
 
-    if (HSRequestMemoOper == 1) {
-        for (i = 0; i < servopers.count; i++) {
-            my_memo_lang(u, (((NickCore *) servopers.list[i])->display), z,
-                         LNG_REQUEST_MEMO, vHost);
-        }
-        for (i = 0; i < servadmins.count; i++) {
-            my_memo_lang(u, (((NickCore *) servadmins.list[i])->display),
-                         z, LNG_REQUEST_MEMO, vHost);
-        }
-        for (i = 0; i < RootNumber; i++) {
-            my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, vHost);
-        }
-    }
-    if (HSRequestMemoSetters == 1) {
-        for (i = 0; i < HostNumber; i++) {
-            my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, vHost);
-        }
-    }
+	if (HSRequestMemoOper == 1) {
+		for (i = 0; i < servopers.count; i++) {
+			my_memo_lang(u, (((NickCore *) servopers.list[i])->display), z,
+						 LNG_REQUEST_MEMO, vHost);
+		}
+		for (i = 0; i < servadmins.count; i++) {
+			my_memo_lang(u, (((NickCore *) servadmins.list[i])->display),
+						 z, LNG_REQUEST_MEMO, vHost);
+		}
+		for (i = 0; i < RootNumber; i++) {
+			my_memo_lang(u, ServicesRoots[i], z, LNG_REQUEST_MEMO, vHost);
+		}
+	}
+	if (HSRequestMemoSetters == 1) {
+		for (i = 0; i < HostNumber; i++) {
+			my_memo_lang(u, HostSetters[i], z, LNG_REQUEST_MEMO, vHost);
+		}
+	}
 }
 
 int ns_do_drop(User * u)
 {
-    HostCore *tmp;
-    bool found = false;
-    NickAlias *na;
+	HostCore *tmp;
+	bool found = false;
+	NickAlias *na;
 
-    na = findnick(u->nick);
-    tmp = findHostCore(hs_request_head, u->nick, &found);
+	na = findnick(u->nick);
+	tmp = findHostCore(hs_request_head, u->nick, &found);
 
-    if (found && na)
-        hs_request_head = deleteHostCore(hs_request_head, tmp);
+	if (found && na)
+		hs_request_head = deleteHostCore(hs_request_head, tmp);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_do_reject(User * u)
 {
-    char *cur_buffer;
-    char *nick;
-    char *reason;
-    HostCore *tmp, *hc;
-    bool found = false;
+	char *cur_buffer;
+	char *nick;
+	char *reason;
+	HostCore *tmp, *hc;
+	bool found = false;
 
-    cur_buffer = moduleGetLastBuffer();
-    nick = myStrGetToken(cur_buffer, ' ', 0);
-    reason = myStrGetTokenRemainder(cur_buffer, ' ', 1);
+	cur_buffer = moduleGetLastBuffer();
+	nick = myStrGetToken(cur_buffer, ' ', 0);
+	reason = myStrGetTokenRemainder(cur_buffer, ' ', 1);
 
-    if (!nick) {
-        moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-        if (reason)
-            free(reason);
-        return MOD_CONT;
-    }
+	if (!nick) {
+		moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		if (reason)
+			free(reason);
+		return MOD_CONT;
+	}
 
-    tmp = findHostCore(hs_request_head, nick, &found);
-    if (found) {
-        if (!tmp)
-            hc = hs_request_head;
-        else
-            hc = tmp->next;
+	tmp = findHostCore(hs_request_head, nick, &found);
+	if (found) {
+		if (!tmp)
+			hc = hs_request_head;
+		else
+			hc = tmp->next;
 
-        if (HSRequestMemoUser) {
-            if (reason)
-                my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON,
-                             reason);
-            else
-                my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
-        }
+		if (HSRequestMemoUser) {
+			if (reason)
+				my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO_REASON,
+							 reason);
+			else
+				my_memo_lang(u, hc->nick, 2, LNG_REJECT_MEMO);
+		}
 
-        hs_request_head = deleteHostCore(hs_request_head, tmp);
-        moduleNoticeLang(s_HostServ, u, LNG_REJECTED, nick);
-        alog("Host Request for %s rejected by %s (%s)", nick, u->nick,
-             reason ? reason : "");
-    } else {
-        moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
-    }
+		hs_request_head = deleteHostCore(hs_request_head, tmp);
+		moduleNoticeLang(s_HostServ, u, LNG_REJECTED, nick);
+		alog("Host Request for %s rejected by %s (%s)", nick, u->nick,
+			 reason ? reason : "");
+	} else {
+		moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+	}
 
-    free(nick);
-    if (reason)
-        free(reason);
+	free(nick);
+	if (reason)
+		free(reason);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_do_activate(User * u)
 {
-    char *cur_buffer;
-    char *nick;
-    NickAlias *na;
-    HostCore *tmp, *hc;
-    bool found = false;
+	char *cur_buffer;
+	char *nick;
+	NickAlias *na;
+	HostCore *tmp, *hc;
+	bool found = false;
 
-    cur_buffer = moduleGetLastBuffer();
-    nick = myStrGetToken(cur_buffer, ' ', 0);
+	cur_buffer = moduleGetLastBuffer();
+	nick = myStrGetToken(cur_buffer, ' ', 0);
 
-    if (!nick) {
-        moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-        return MOD_CONT;
-    }
+	if (!nick) {
+		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		return MOD_CONT;
+	}
 
-    if ((na = findnick(nick))) {
-        tmp = findHostCore(hs_request_head, nick, &found);
-        if (found) {
-            if (!tmp)
-                hc = hs_request_head;
-            else
-                hc = tmp->next;
+	if ((na = findnick(nick))) {
+		tmp = findHostCore(hs_request_head, nick, &found);
+		if (found) {
+			if (!tmp)
+				hc = hs_request_head;
+			else
+				hc = tmp->next;
 
-            addHostCore(hc->nick, hc->vIdent, hc->vHost, u->nick,
-                        time(NULL));
+			addHostCore(hc->nick, hc->vIdent, hc->vHost, u->nick,
+						time(NULL));
 
-            if (HSRequestMemoUser)
-                my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
+			if (HSRequestMemoUser)
+				my_memo_lang(u, hc->nick, 2, LNG_ACTIVATE_MEMO);
 
-            hs_request_head = deleteHostCore(hs_request_head, tmp);
-            moduleNoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
-            alog("Host Request for %s activated by %s", nick, u->nick);
-        } else {
-            moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
-        }
-    } else {
-        /* Should be "User Not Found" instead */
-        moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-    }
+			hs_request_head = deleteHostCore(hs_request_head, tmp);
+			moduleNoticeLang(s_HostServ, u, LNG_ACTIVATED, nick);
+			alog("Host Request for %s activated by %s", nick, u->nick);
+		} else {
+			moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
+		}
+	} else {
+		/* Should be "User Not Found" instead */
+		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+	}
 
-    free(nick);
-    return MOD_CONT;
+	free(nick);
+	return MOD_CONT;
 }
 
 
 void my_add_host_request(char *nick, char *vIdent, char *vhost,
-                         char *creator, int32 tmp_time)
+						 char *creator, int32 tmp_time)
 {
-    HostCore *tmp;
-    bool found = false;
+	HostCore *tmp;
+	bool found = false;
 
-    if (!hs_request_head) {
-        hs_request_head =
-            createHostCorelist(hs_request_head, nick, vIdent, vhost,
-                               creator, tmp_time);
-    } else {
-        tmp = findHostCore(hs_request_head, nick, &found);
-        if (!found) {
-            hs_request_head =
-                insertHostCore(hs_request_head, tmp, nick, vIdent, vhost,
-                               creator, tmp_time);
-        } else {
-            hs_request_head = deleteHostCore(hs_request_head, tmp);     /* delete the old entry */
-            my_add_host_request(nick, vIdent, vhost, creator, tmp_time);        /* recursive call to add new entry */
-        }
-    }
+	if (!hs_request_head) {
+		hs_request_head =
+			createHostCorelist(hs_request_head, nick, vIdent, vhost,
+							   creator, tmp_time);
+	} else {
+		tmp = findHostCore(hs_request_head, nick, &found);
+		if (!found) {
+			hs_request_head =
+				insertHostCore(hs_request_head, tmp, nick, vIdent, vhost,
+							   creator, tmp_time);
+		} else {
+			hs_request_head = deleteHostCore(hs_request_head, tmp);	 /* delete the old entry */
+			my_add_host_request(nick, vIdent, vhost, creator, tmp_time);		/* recursive call to add new entry */
+		}
+	}
 }
 
 int my_isvalidchar(const char c)
 {
-    if (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))
-        || ((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
-        return 1;
-    else
-        return 0;
+	if (((c >= 'A') && (c <= 'Z')) || ((c >= 'a') && (c <= 'z'))
+		|| ((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
+		return 1;
+	else
+		return 0;
 }
 
 int hs_do_list_out(User * u)
 {
-    char *key;
+	char *key;
 
-    key = moduleGetLastBuffer();
-    if (!key)
-        return MOD_CONT;
+	key = moduleGetLastBuffer();
+	if (!key)
+		return MOD_CONT;
 
-    if (stricmp(key, "+req") != 0)
-        return MOD_CONT;
+	if (stricmp(key, "+req") != 0)
+		return MOD_CONT;
 
-    show_list(u);
+	show_list(u);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_do_waiting(User * u)
 {
-    show_list(u);
+	show_list(u);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void show_list(User * u)
 {
-    struct tm *tm;
-    char buf[BUFSIZE];
-    int counter = 1;
-    int from = 0, to = 0;
-    int display_counter = 0;
-    HostCore *current;
+	struct tm *tm;
+	char buf[BUFSIZE];
+	int counter = 1;
+	int from = 0, to = 0;
+	int display_counter = 0;
+	HostCore *current;
 
-    current = hs_request_head;
-    while (current) {
-        if ((((counter >= from) && (counter <= to))
-             || ((from == 0) && (to == 0)))
-            && (display_counter < NSListMax)) {
-            display_counter++;
-            tm = localtime(&current->time);
-            strftime(buf, sizeof(buf),
-                     getstring(NULL, STRFTIME_DATE_TIME_FORMAT), tm);
-            if (current->vIdent)
-                notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter,
-                            current->nick, current->vIdent, current->vHost,
-                            current->creator, buf);
-            else
-                notice_lang(s_HostServ, u, HOST_ENTRY, counter,
-                            current->nick, current->vHost,
-                            current->creator, buf);
-        }
-        counter++;
-        current = current->next;
-    }
-    notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
+	current = hs_request_head;
+	while (current) {
+		if ((((counter >= from) && (counter <= to))
+			 || ((from == 0) && (to == 0)))
+			&& (display_counter < NSListMax)) {
+			display_counter++;
+			tm = localtime(&current->time);
+			strftime(buf, sizeof(buf),
+					 getstring(NULL, STRFTIME_DATE_TIME_FORMAT), tm);
+			if (current->vIdent)
+				notice_lang(s_HostServ, u, HOST_IDENT_ENTRY, counter,
+							current->nick, current->vIdent, current->vHost,
+							current->creator, buf);
+			else
+				notice_lang(s_HostServ, u, HOST_ENTRY, counter,
+							current->nick, current->vHost,
+							current->creator, buf);
+		}
+		counter++;
+		current = current->next;
+	}
+	notice_lang(s_HostServ, u, HOST_LIST_FOOTER, display_counter);
 }
 
 int hs_help_request(User * u)
 {
-    moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-    ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-    moduleNoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
+	moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
+	ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+	moduleNoticeLang(s_HostServ, u, LNG_HELP_REQUEST);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_help_activate(User * u)
 {
-    if (is_host_setter(u)) {
-        moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
-        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-        moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
-        if (HSRequestMemoUser)
-            moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
-    } else {
-        notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "ACTIVATE");
-    }
+	if (is_host_setter(u)) {
+		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE);
+		if (HSRequestMemoUser)
+			moduleNoticeLang(s_HostServ, u, LNG_HELP_ACTIVATE_MEMO);
+	} else {
+		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "ACTIVATE");
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_help_reject(User * u)
 {
-    if (is_host_setter(u)) {
-        moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
-        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-        moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT);
-        if (HSRequestMemoUser)
-            moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
-    } else {
-        notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "REJECT");
-    }
+	if (is_host_setter(u)) {
+		moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT);
+		if (HSRequestMemoUser)
+			moduleNoticeLang(s_HostServ, u, LNG_HELP_REJECT_MEMO);
+	} else {
+		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "REJECT");
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hs_help_waiting(User * u)
 {
-    if (is_host_setter(u)) {
-        moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
-        ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
-        moduleNoticeLang(s_HostServ, u, LNG_HELP_WAITING);
-    } else {
-        notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
-    }
+	if (is_host_setter(u)) {
+		moduleNoticeLang(s_HostServ, u, LNG_WAITING_SYNTAX);
+		ircdproto->SendMessage(findbot(s_HostServ), u->nick, " ");
+		moduleNoticeLang(s_HostServ, u, LNG_HELP_WAITING);
+	} else {
+		notice_lang(s_HostServ, u, NO_HELP_AVAILABLE, "WAITING");
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void hs_help(User * u)
 {
-    moduleNoticeLang(s_HostServ, u, LNG_HELP);
-    if (is_host_setter(u))
-        moduleNoticeLang(s_HostServ, u, LNG_HELP_SETTER);
+	moduleNoticeLang(s_HostServ, u, LNG_HELP);
+	if (is_host_setter(u))
+		moduleNoticeLang(s_HostServ, u, LNG_HELP_SETTER);
 }
 void hsreq_load_db(void)
 {
-    FILE *fp;
-    const char *filename;
-    char readbuf[1024];
-    char *nick, *vident, *vhost, *creator, *tmp;
-    int32 tmp_time;
-    char *buf;
+	FILE *fp;
+	const char *filename;
+	char readbuf[1024];
+	char *nick, *vident, *vhost, *creator, *tmp;
+	int32 tmp_time;
+	char *buf;
 
-    if (HSRequestDBName)
-        filename = HSRequestDBName;
-    else
-        filename = HSREQ_DEFAULT_DBNAME;
+	if (HSRequestDBName)
+		filename = HSRequestDBName;
+	else
+		filename = HSREQ_DEFAULT_DBNAME;
 
-    fp = fopen(filename, "r");
-    if (!fp) {
-        alog("[hs_request] Unable to open database ('%s') for reading",
-             filename);
-        return;
-    }
+	fp = fopen(filename, "r");
+	if (!fp) {
+		alog("[hs_request] Unable to open database ('%s') for reading",
+			 filename);
+		return;
+	}
 
-    while (fgets(readbuf, 1024, fp)) {
-        buf = normalizeBuffer(readbuf);
-        if (buf || *buf) {
-            nick = myStrGetToken(buf, ':', 0);
-            vident = myStrGetToken(buf, ':', 1);
-            vhost = myStrGetToken(buf, ':', 2);
-            tmp = myStrGetToken(buf, ':', 3);
-            if (tmp) {
-                tmp_time = strtol(tmp, (char **) NULL, 16);
-                free(tmp);
-            } else {
-                tmp_time = 0;
-            }
-            creator = myStrGetToken(buf, ':', 4);
-            if (!nick || !vident || !vhost || !creator) {
-                alog("[hs_request] Error while reading database, skipping record");
-                continue;
-            }
-            if (stricmp(vident, "(null)") == 0) {
-                free(vident);
-                vident = NULL;
-            }
-            my_add_host_request(nick, vident, vhost, creator, tmp_time);
-            free(nick);
-            free(vhost);
-            free(creator);
-            if (vident)
-                free(vident);
-        }
-        free(buf);
-    }
+	while (fgets(readbuf, 1024, fp)) {
+		buf = normalizeBuffer(readbuf);
+		if (buf || *buf) {
+			nick = myStrGetToken(buf, ':', 0);
+			vident = myStrGetToken(buf, ':', 1);
+			vhost = myStrGetToken(buf, ':', 2);
+			tmp = myStrGetToken(buf, ':', 3);
+			if (tmp) {
+				tmp_time = strtol(tmp, (char **) NULL, 16);
+				free(tmp);
+			} else {
+				tmp_time = 0;
+			}
+			creator = myStrGetToken(buf, ':', 4);
+			if (!nick || !vident || !vhost || !creator) {
+				alog("[hs_request] Error while reading database, skipping record");
+				continue;
+			}
+			if (stricmp(vident, "(null)") == 0) {
+				free(vident);
+				vident = NULL;
+			}
+			my_add_host_request(nick, vident, vhost, creator, tmp_time);
+			free(nick);
+			free(vhost);
+			free(creator);
+			if (vident)
+				free(vident);
+		}
+		free(buf);
+	}
 
-    fclose(fp);
+	fclose(fp);
 
-    if (debug)
-        alog("[hs_request] Succesfully loaded database");
+	if (debug)
+		alog("[hs_request] Succesfully loaded database");
 }
 
 void hsreq_save_db(void)
 {
-    FILE *fp;
-    const char *filename;
-    const char *vident;
-    HostCore *current;
+	FILE *fp;
+	const char *filename;
+	const char *vident;
+	HostCore *current;
 
-    if (HSRequestDBName)
-        filename = HSRequestDBName;
-    else
-        filename = HSREQ_DEFAULT_DBNAME;
+	if (HSRequestDBName)
+		filename = HSRequestDBName;
+	else
+		filename = HSREQ_DEFAULT_DBNAME;
 
-    fp = fopen(filename, "w");
-    if (!fp) {
-        alog("[hs_request] Unable to open database ('%s') for writing",
-             filename);
-        return;
-    }
+	fp = fopen(filename, "w");
+	if (!fp) {
+		alog("[hs_request] Unable to open database ('%s') for writing",
+			 filename);
+		return;
+	}
 
-    current = hs_request_head;
-    while (current) {
-        vident = (current->vIdent ? current->vIdent : "(null)");
-        fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident,
-                current->vHost, (uint32) current->time, current->creator);
-        current = current->next;
-    }
+	current = hs_request_head;
+	while (current) {
+		vident = (current->vIdent ? current->vIdent : "(null)");
+		fprintf(fp, "%s:%s:%s:%X:%s\n", current->nick, vident,
+				current->vHost, (uint32) current->time, current->creator);
+		current = current->next;
+	}
 
-    fclose(fp);
+	fclose(fp);
 
-    if (debug)
-        alog("[hs_request] Succesfully saved database");
+	if (debug)
+		alog("[hs_request] Succesfully saved database");
 }
 
 int hsreqevt_db_saving(int argc, char **argv)
 {
-    if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
-        hsreq_save_db();
+	if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0))
+		hsreq_save_db();
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int hsreqevt_db_backup(int argc, char **argv)
 {
-    if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0)) {
-	    if (HSRequestDBName)
-    	    ModuleDatabaseBackup(HSRequestDBName);
-	    else
-    	    ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
+	if ((argc >= 1) && (stricmp(argv[0], EVENT_START) == 0)) {
+		if (HSRequestDBName)
+			ModuleDatabaseBackup(HSRequestDBName);
+		else
+			ModuleDatabaseBackup(HSREQ_DEFAULT_DBNAME);
 	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void my_load_config(void)
 {
-    int i;
-    char *tmp = NULL;
+	int i;
+	char *tmp = NULL;
 
-    Directive confvalues[][1] = {
-        {{"HSRequestMemoUser",
-          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoUser}}}},
-        {{"HSRequestMemoOper",
-          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
-        {{"HSRequestMemoSetters",
-          {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
-        {{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
-    };
+	Directive confvalues[][1] = {
+		{{"HSRequestMemoUser",
+		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoUser}}}},
+		{{"HSRequestMemoOper",
+		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
+		{{"HSRequestMemoSetters",
+		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
+		{{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
+	};
 
-    for (i = 0; i < 4; i++)
-        moduleGetConfigDirective(confvalues[i]);
+	for (i = 0; i < 4; i++)
+		moduleGetConfigDirective(confvalues[i]);
 
-    if (tmp) {
-        if (HSRequestDBName)
-            free(HSRequestDBName);
-        HSRequestDBName = sstrdup(tmp);
-    } else {
-        HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
-    }
+	if (tmp) {
+		if (HSRequestDBName)
+			free(HSRequestDBName);
+		HSRequestDBName = sstrdup(tmp);
+	} else {
+		HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
+	}
 
-    if (debug)
-        alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
+	if (debug)
+		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);
 }
 
 MODULE_INIT("hs_request", HSRequest)

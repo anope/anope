@@ -15,8 +15,8 @@
 #include "services.h"
 
 Server *servlist = NULL;
-Server *me_server = NULL;       /* This are we        */
-Server *serv_uplink = NULL;     /* This is our uplink */
+Server *me_server = NULL;	   /* This are we		*/
+Server *serv_uplink = NULL;	 /* This is our uplink */
 uint32 uplink_capab;
 char *uplink;
 char *TS6UPLINK;
@@ -26,33 +26,33 @@ char *TS6SID;
 static Server *server_cur;
 
 CapabInfo capab_info[] = {
-    {"NOQUIT", CAPAB_NOQUIT},
-    {"TSMODE", CAPAB_TSMODE},
-    {"UNCONNECT", CAPAB_UNCONNECT},
-    {"NICKIP", CAPAB_NICKIP},
-    {"SSJOIN", CAPAB_NSJOIN},
-    {"ZIP", CAPAB_ZIP},
-    {"BURST", CAPAB_BURST},
-    {"TS5", CAPAB_TS5},
-    {"TS3", CAPAB_TS3},
-    {"DKEY", CAPAB_DKEY},
-    {"PT4", CAPAB_PT4},
-    {"SCS", CAPAB_SCS},
-    {"QS", CAPAB_QS},
-    {"UID", CAPAB_UID},
-    {"KNOCK", CAPAB_KNOCK},
-    {"CLIENT", CAPAB_CLIENT},
-    {"IPV6", CAPAB_IPV6},
-    {"SSJ5", CAPAB_SSJ5},
-    {"SN2", CAPAB_SN2},
-    {"TOK1", CAPAB_TOKEN},
-    {"TOKEN", CAPAB_TOKEN},
-    {"VHOST", CAPAB_VHOST},
-    {"SSJ3", CAPAB_SSJ3},
-    {"SJB64", CAPAB_SJB64},
-    {"CHANMODES", CAPAB_CHANMODE},
-    {"NICKCHARS", CAPAB_NICKCHARS},
-    {NULL, 0}
+	{"NOQUIT", CAPAB_NOQUIT},
+	{"TSMODE", CAPAB_TSMODE},
+	{"UNCONNECT", CAPAB_UNCONNECT},
+	{"NICKIP", CAPAB_NICKIP},
+	{"SSJOIN", CAPAB_NSJOIN},
+	{"ZIP", CAPAB_ZIP},
+	{"BURST", CAPAB_BURST},
+	{"TS5", CAPAB_TS5},
+	{"TS3", CAPAB_TS3},
+	{"DKEY", CAPAB_DKEY},
+	{"PT4", CAPAB_PT4},
+	{"SCS", CAPAB_SCS},
+	{"QS", CAPAB_QS},
+	{"UID", CAPAB_UID},
+	{"KNOCK", CAPAB_KNOCK},
+	{"CLIENT", CAPAB_CLIENT},
+	{"IPV6", CAPAB_IPV6},
+	{"SSJ5", CAPAB_SSJ5},
+	{"SN2", CAPAB_SN2},
+	{"TOK1", CAPAB_TOKEN},
+	{"TOKEN", CAPAB_TOKEN},
+	{"VHOST", CAPAB_VHOST},
+	{"SSJ3", CAPAB_SSJ3},
+	{"SJB64", CAPAB_SJB64},
+	{"CHANMODES", CAPAB_CHANMODE},
+	{"NICKCHARS", CAPAB_NICKCHARS},
+	{NULL, 0}
 };
 
 /*************************************************************************/
@@ -64,12 +64,12 @@ CapabInfo capab_info[] = {
  */
 Server *first_server(int flags)
 {
-    server_cur = servlist;
-    if (flags > -1) {
-        while (server_cur && (server_cur->flags != flags))
-            server_cur = next_server(flags);
-    }
-    return server_cur;
+	server_cur = servlist;
+	if (flags > -1) {
+		while (server_cur && (server_cur->flags != flags))
+			server_cur = next_server(flags);
+	}
+	return server_cur;
 }
 
 /*************************************************************************/
@@ -81,26 +81,26 @@ Server *first_server(int flags)
  */
 Server *next_server(int flags)
 {
-    if (!server_cur)
-        return NULL;
+	if (!server_cur)
+		return NULL;
 
-    do {
-        if (server_cur->links) {
-            server_cur = server_cur->links;
-        } else if (server_cur->next) {
-            server_cur = server_cur->next;
-        } else {
-            do {
-                server_cur = server_cur->uplink;
-                if (server_cur && server_cur->next) {
-                    server_cur = server_cur->next;
-                    break;
-                }
-            } while (server_cur);
-        }
-    } while (server_cur && ((flags > -1) && (server_cur->flags != flags)));
+	do {
+		if (server_cur->links) {
+			server_cur = server_cur->links;
+		} else if (server_cur->next) {
+			server_cur = server_cur->next;
+		} else {
+			do {
+				server_cur = server_cur->uplink;
+				if (server_cur && server_cur->next) {
+					server_cur = server_cur->next;
+					break;
+				}
+			} while (server_cur);
+		}
+	} while (server_cur && ((flags > -1) && (server_cur->flags != flags)));
 
-    return server_cur;
+	return server_cur;
 }
 
 /*************************************************************************/
@@ -118,51 +118,51 @@ Server *next_server(int flags)
  * @return Server Struct
  */
 Server *new_server(Server * server_uplink, const char *name, const char *desc,
-                   uint16 flags, const char *suid)
+				   uint16 flags, const char *suid)
 {
-    Server *serv;
+	Server *serv;
 
-    serv = (Server *)scalloc(sizeof(Server), 1);
-    if (!name)
-        name = "";
-    serv->name = sstrdup(name);
-    serv->desc = sstrdup(desc);
-    serv->flags = flags;
-    serv->uplink = server_uplink;
-    if (suid) {
-        serv->suid = sstrdup(suid);
-    } else {
-        serv->suid = NULL;
-    }
-    if (ircd->sync)
-        serv->sync = SSYNC_IN_PROGRESS;
-    else
-        serv->sync = SSYNC_UNKNOWN;
-    serv->links = NULL;
-    serv->prev = NULL;
+	serv = (Server *)scalloc(sizeof(Server), 1);
+	if (!name)
+		name = "";
+	serv->name = sstrdup(name);
+	serv->desc = sstrdup(desc);
+	serv->flags = flags;
+	serv->uplink = server_uplink;
+	if (suid) {
+		serv->suid = sstrdup(suid);
+	} else {
+		serv->suid = NULL;
+	}
+	if (ircd->sync)
+		serv->sync = SSYNC_IN_PROGRESS;
+	else
+		serv->sync = SSYNC_UNKNOWN;
+	serv->links = NULL;
+	serv->prev = NULL;
 
-    if (!server_uplink) {
-        serv->hops = 0;
-        serv->next = servlist;
-        if (servlist)
-            servlist->prev = serv;
-        servlist = serv;
-    } else {
-        serv->hops = server_uplink->hops + 1;
-        serv->next = server_uplink->links;
-        if (server_uplink->links)
-            server_uplink->links->prev = serv;
-        server_uplink->links = serv;
-    }
-    /* Check if this is our uplink server */
-    if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
-        serv_uplink = serv;
+	if (!server_uplink) {
+		serv->hops = 0;
+		serv->next = servlist;
+		if (servlist)
+			servlist->prev = serv;
+		servlist = serv;
+	} else {
+		serv->hops = server_uplink->hops + 1;
+		serv->next = server_uplink->links;
+		if (server_uplink->links)
+			server_uplink->links->prev = serv;
+		server_uplink->links = serv;
+	}
+	/* Check if this is our uplink server */
+	if ((server_uplink == me_server) && !(flags & SERVER_JUPED))
+		serv_uplink = serv;
 
-    /* Write the StartGlobal (to non-juped servers) */
-    if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))
-        notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
+	/* Write the StartGlobal (to non-juped servers) */
+	if (GlobalOnCycle && GlobalOnCycleUP && !(flags & SERVER_JUPED))
+		notice_server(s_GlobalNoticer, serv, "%s", GlobalOnCycleUP);
 
-    return serv;
+	return serv;
 }
 
 /*************************************************************************/
@@ -179,69 +179,69 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
  */
 static void delete_server(Server * serv, const char *quitreason)
 {
-    Server *s, *snext;
-    User *u, *unext;
-    NickAlias *na;
+	Server *s, *snext;
+	User *u, *unext;
+	NickAlias *na;
 
-    if (!serv) {
-        if (debug) {
-            alog("debug: delete_server() called with NULL arg!");
-        }
-        return;
-    }
+	if (!serv) {
+		if (debug) {
+			alog("debug: delete_server() called with NULL arg!");
+		}
+		return;
+	}
 
-    if (debug)
-        alog("debug: delete_server() called for %s", serv->name);
+	if (debug)
+		alog("debug: delete_server() called for %s", serv->name);
 
-    if (ircdcap->noquit || ircdcap->qs) {
-        if ((uplink_capab & ircdcap->noquit)
-            || (uplink_capab & ircdcap->qs)) {
-            u = firstuser();
-            while (u) {
-                unext = nextuser();
-                if (u->server == serv) {
-                    if ((na = u->na) && !(na->status & NS_VERBOTEN)
-                        && (!(na->nc->flags & NI_SUSPENDED))
-                        && (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
-                        na->last_seen = time(NULL);
-                        if (na->last_quit)
-                            free(na->last_quit);
-                        na->last_quit =
-                            (quitreason ? sstrdup(quitreason) : NULL);
-                    }
-                    if (LimitSessions) {
-                        del_session(u->host);
-                    }
-                    delete u;
-                }
-                u = unext;
-            }
-            if (debug)
-                alog("debug: delete_server() cleared all users");
-        }
-    }
+	if (ircdcap->noquit || ircdcap->qs) {
+		if ((uplink_capab & ircdcap->noquit)
+			|| (uplink_capab & ircdcap->qs)) {
+			u = firstuser();
+			while (u) {
+				unext = nextuser();
+				if (u->server == serv) {
+					if ((na = u->na) && !(na->status & NS_VERBOTEN)
+						&& (!(na->nc->flags & NI_SUSPENDED))
+						&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
+						na->last_seen = time(NULL);
+						if (na->last_quit)
+							free(na->last_quit);
+						na->last_quit =
+							(quitreason ? sstrdup(quitreason) : NULL);
+					}
+					if (LimitSessions) {
+						del_session(u->host);
+					}
+					delete u;
+				}
+				u = unext;
+			}
+			if (debug)
+				alog("debug: delete_server() cleared all users");
+		}
+	}
 
-    s = serv->links;
-    while (s) {
-        snext = s->next;
-        delete_server(s, quitreason);
-        s = snext;
-    }
+	s = serv->links;
+	while (s) {
+		snext = s->next;
+		delete_server(s, quitreason);
+		s = snext;
+	}
 
-    if (debug)
-        alog("debug: delete_server() cleared all servers");
+	if (debug)
+		alog("debug: delete_server() cleared all servers");
 
-    free(serv->name);
-    free(serv->desc);
-    if (serv->prev)
-        serv->prev->next = serv->next;
-    if (serv->next)
-        serv->next->prev = serv->prev;
-    if (serv->uplink->links == serv)
-        serv->uplink->links = serv->next;
+	free(serv->name);
+	free(serv->desc);
+	if (serv->prev)
+		serv->prev->next = serv->next;
+	if (serv->next)
+		serv->next->prev = serv->prev;
+	if (serv->uplink->links == serv)
+		serv->uplink->links = serv->next;
 
-    if (debug)
-        alog("debug: delete_server() completed");
+	if (debug)
+		alog("debug: delete_server() completed");
 }
 
 /*************************************************************************/
@@ -254,31 +254,31 @@ static void delete_server(Server * serv, const char *quitreason)
  */
 Server *findserver(Server * s, const char *name)
 {
-    Server *sl;
+	Server *sl;
 
-    if (!name || !*name) {
-        return NULL;
-    }
+	if (!name || !*name) {
+		return NULL;
+	}
 
-    if (debug >= 3) {
-        alog("debug: findserver(%p)", name);
-    }
-    while (s && (stricmp(s->name, name) != 0)) {
-        if (s->links) {
-            sl = findserver(s->links, name);
-            if (sl) {
-                s = sl;
-            } else {
-                s = s->next;
-            }
-        } else {
-            s = s->next;
-        }
-    }
-    if (debug >= 3) {
-        alog("debug: findserver(%s) -> %p", name, (void *) s);
-    }
-    return s;
+	if (debug >= 3) {
+		alog("debug: findserver(%p)", name);
+	}
+	while (s && (stricmp(s->name, name) != 0)) {
+		if (s->links) {
+			sl = findserver(s->links, name);
+			if (sl) {
+				s = sl;
+			} else {
+				s = s->next;
+			}
+		} else {
+			s = s->next;
+		}
+	}
+	if (debug >= 3) {
+		alog("debug: findserver(%s) -> %p", name, (void *) s);
+	}
+	return s;
 }
 
 /*************************************************************************/
@@ -291,31 +291,31 @@ Server *findserver(Server * s, const char *name)
  */
 Server *findserver_uid(Server * s, const char *name)
 {
-    Server *sl;
+	Server *sl;
 
-    if (!name || !*name) {
-        return NULL;
-    }
+	if (!name || !*name) {
+		return NULL;
+	}
 
-    if (debug >= 3) {
-        alog("debug: findserver_uid(%p)", name);
-    }
-    while (s && s->suid && (stricmp(s->suid, name) != 0)) {
-        if (s->links) {
-            sl = findserver_uid(s->links, name);
-            if (sl) {
-                s = sl;
-            } else {
-                s = s->next;
-            }
-        } else {
-            s = s->next;
-        }
-    }
-    if (debug >= 3) {
-        alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
-    }
-    return s;
+	if (debug >= 3) {
+		alog("debug: findserver_uid(%p)", name);
+	}
+	while (s && s->suid && (stricmp(s->suid, name) != 0)) {
+		if (s->links) {
+			sl = findserver_uid(s->links, name);
+			if (sl) {
+				s = sl;
+			} else {
+				s = s->next;
+			}
+		} else {
+			s = s->next;
+		}
+	}
+	if (debug >= 3) {
+		alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
+	}
+	return s;
 }
 
 /*************************************************************************/
@@ -328,16 +328,16 @@ Server *findserver_uid(Server * s, const char *name)
  */
 int anope_check_sync(const char *name)
 {
-    Server *s;
-    s = findserver(servlist, name);
+	Server *s;
+	s = findserver(servlist, name);
 
-    if (!s)
-        return 0;
+	if (!s)
+		return 0;
 
-    if (is_sync(s))
-        return 1;
-    else
-        return -1;
+	if (is_sync(s))
+		return 1;
+	else
+		return -1;
 }
 
 /*************************************************************************/
@@ -352,26 +352,26 @@ int anope_check_sync(const char *name)
  * @return void
  */
 void do_server(const char *source, const char *servername, const char *hops,
-               const char *descript, const char *numeric)
+			   const char *descript, const char *numeric)
 {
-    Server *s;
+	Server *s;
 
-    if (debug) {
-        if (!*source) {
-            alog("debug: Server introduced (%s)", servername);
-        } else {
-            alog("debug: Server introduced (%s) from %s", servername,
-                 source);
-        }
-    }
+	if (debug) {
+		if (!*source) {
+			alog("debug: Server introduced (%s)", servername);
+		} else {
+			alog("debug: Server introduced (%s) from %s", servername,
+				 source);
+		}
+	}
 
-    if (source[0] == '\0')
-        s = me_server;
-    else
-        s = findserver(servlist, source);
+	if (source[0] == '\0')
+		s = me_server;
+	else
+		s = findserver(servlist, source);
 
-    new_server(s, servername, descript, 0, numeric);
-    send_event(EVENT_SERVER_CONNECT, 1, servername);
+	new_server(s, servername, descript, 0, numeric);
+	send_event(EVENT_SERVER_CONNECT, 1, servername);
 }
 
 /*************************************************************************/
@@ -385,47 +385,47 @@ void do_server(const char *source, const char *servername, const char *hops,
  */
 void do_squit(const char *source, int ac, const char **av)
 {
-    char buf[BUFSIZE];
-    Server *s;
+	char buf[BUFSIZE];
+	Server *s;
 
-    if (UseTS6 && ircd->ts6) {
-        s = findserver_uid(servlist, av[0]);
-        if (!s) {
-            s = findserver(servlist, av[0]);
-        }
-    } else {
-        s = findserver(servlist, av[0]);
-    }
-    if (!s) {
-        alog("SQUIT for nonexistent server (%s)!!", av[0]);
-        return;
-    }
-    send_event(EVENT_SERVER_SQUIT, 1, s->name);
+	if (UseTS6 && ircd->ts6) {
+		s = findserver_uid(servlist, av[0]);
+		if (!s) {
+			s = findserver(servlist, av[0]);
+		}
+	} else {
+		s = findserver(servlist, av[0]);
+	}
+	if (!s) {
+		alog("SQUIT for nonexistent server (%s)!!", av[0]);
+		return;
+	}
+	send_event(EVENT_SERVER_SQUIT, 1, s->name);
 
-    /* If this is a juped server, send a nice global to inform the online
-     * opers that we received it.
-     */
-    if (s->flags & SERVER_JUPED) {
-        snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
-                 s->name);
-        ircdproto->SendGlobops(s_OperServ, buf);
-    }
+	/* If this is a juped server, send a nice global to inform the online
+	 * opers that we received it.
+	 */
+	if (s->flags & SERVER_JUPED) {
+		snprintf(buf, BUFSIZE, "Received SQUIT for juped server %s",
+				 s->name);
+		ircdproto->SendGlobops(s_OperServ, buf);
+	}
 
-    snprintf(buf, sizeof(buf), "%s %s", s->name,
-             (s->uplink ? s->uplink->name : ""));
+	snprintf(buf, sizeof(buf), "%s %s", s->name,
+			 (s->uplink ? s->uplink->name : ""));
 
-    if (ircdcap->unconnect) {
-        if ((s->uplink == me_server)
-            && (uplink_capab & ircdcap->unconnect)) {
-            if (debug) {
-                alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
-            }
-            /* need to fix */
-            ircdproto->SendSquit(s->name, buf);
-        }
-    }
+	if (ircdcap->unconnect) {
+		if ((s->uplink == me_server)
+			&& (uplink_capab & ircdcap->unconnect)) {
+			if (debug) {
+				alog("debug: Sending UNCONNECT SQUIT for %s", s->name);
+			}
+			/* need to fix */
+			ircdproto->SendSquit(s->name, buf);
+		}
+	}
 
-    delete_server(s, buf);
+	delete_server(s, buf);
 }
 
 /*************************************************************************/
@@ -438,38 +438,38 @@ void do_squit(const char *source, int ac, const char **av)
  */
 void capab_parse(int ac, const char **av)
 {
-    int i;
-    int j;
-    char *s, *tmp;
+	int i;
+	int j;
+	char *s, *tmp;
 
-    const char *temp;
+	const char *temp;
 
-    for (i = 0; i < ac; i++) {
-        temp = av[i];
+	for (i = 0; i < ac; i++) {
+		temp = av[i];
 
-        s = myStrGetToken(temp, '=', 0);
-        tmp = myStrGetTokenRemainder(temp, '=', 1);
+		s = myStrGetToken(temp, '=', 0);
+		tmp = myStrGetTokenRemainder(temp, '=', 1);
 
-        if (!s)
-            continue;
+		if (!s)
+			continue;
 
-        for (j = 0; capab_info[j].token; j++) {
-            if (stricmp(s, capab_info[j].token) == 0)
-                uplink_capab |= capab_info[j].flag;
-            /* Special cases */
-            if ((stricmp(s, "NICKIP") == 0) && !ircd->nickip)
-                ircd->nickip = 1;
-            if ((stricmp(s, "CHANMODES") == 0) && tmp)
-                ircd->chanmodes = sstrdup(tmp);
-            if ((stricmp(s, "NICKCHARS") == 0) && tmp)
-                ircd->nickchars = sstrdup(tmp);
-        }
+		for (j = 0; capab_info[j].token; j++) {
+			if (stricmp(s, capab_info[j].token) == 0)
+				uplink_capab |= capab_info[j].flag;
+			/* Special cases */
+			if ((stricmp(s, "NICKIP") == 0) && !ircd->nickip)
+				ircd->nickip = 1;
+			if ((stricmp(s, "CHANMODES") == 0) && tmp)
+				ircd->chanmodes = sstrdup(tmp);
+			if ((stricmp(s, "NICKCHARS") == 0) && tmp)
+				ircd->nickchars = sstrdup(tmp);
+		}
 
-        if (s)
-            free(s);
-        if (tmp)
-            free(tmp);
-    }
+		if (s)
+			free(s);
+		if (tmp)
+			free(tmp);
+	}
 }
 
 /*************************************************************************/
@@ -482,15 +482,15 @@ void capab_parse(int ac, const char **av)
  */
 int is_ulined(const char *server)
 {
-    int j;
+	int j;
 
-    for (j = 0; j < NumUlines; j++) {
-        if (stricmp(Ulines[j], server) == 0) {
-            return 1;
-        }
-    }
+	for (j = 0; j < NumUlines; j++) {
+		if (stricmp(Ulines[j], server) == 0) {
+			return 1;
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 /*************************************************************************/
@@ -503,9 +503,9 @@ int is_ulined(const char *server)
  */
 int is_sync(Server * server)
 {
-    if ((server->sync == SSYNC_DONE) || (server->sync == SSYNC_UNKNOWN))
-        return 1;
-    return 0;
+	if ((server->sync == SSYNC_DONE) || (server->sync == SSYNC_UNKNOWN))
+		return 1;
+	return 0;
 }
 
 /*************************************************************************/
@@ -518,44 +518,44 @@ int is_sync(Server * server)
  */
 void finish_sync(Server * serv, int sync_links)
 {
-    Server *s;
+	Server *s;
 
-    if (!serv || is_sync(serv))
-        return;
+	if (!serv || is_sync(serv))
+		return;
 
-    /* Mark each server as in sync */
-    s = serv;
-    do {
-        if (!is_sync(s)) {
-            if (debug)
-                alog("debug: Finishing sync for server %s", s->name);
+	/* Mark each server as in sync */
+	s = serv;
+	do {
+		if (!is_sync(s)) {
+			if (debug)
+				alog("debug: Finishing sync for server %s", s->name);
 
-            s->sync = SSYNC_DONE;
-        }
+			s->sync = SSYNC_DONE;
+		}
 
-        if (!sync_links)
-            break;
+		if (!sync_links)
+			break;
 
-        if (s->links) {
-            s = s->links;
-        } else if (s->next) {
-            s = s->next;
-        } else {
-            do {
-                s = s->uplink;
-                if (s == serv)
-                    s = NULL;
-                if (s == me_server)
-                    s = NULL;
-            } while (s && !(s->next));
-            if (s)
-                s = s->next;
-        }
-    } while (s);
+		if (s->links) {
+			s = s->links;
+		} else if (s->next) {
+			s = s->next;
+		} else {
+			do {
+				s = s->uplink;
+				if (s == serv)
+					s = NULL;
+				if (s == me_server)
+					s = NULL;
+			} while (s && !(s->next));
+			if (s)
+				s = s->next;
+		}
+	} while (s);
 
-    /* Do some general stuff which should only be done once */
-    restore_unsynced_topics();
-    alog("Server %s is done syncing", serv->name);
+	/* Do some general stuff which should only be done once */
+	restore_unsynced_topics();
+	alog("Server %s is done syncing", serv->name);
 }
 
 /*******************************************************************/
@@ -563,43 +563,43 @@ void finish_sync(Server * serv, int sync_links)
 /* TS6 UID generator common code.
  *
  * Derived from atheme-services, uid.c (hg 2954:116d46894b4c).
- *         -nenolod
+ *		 -nenolod
  */
 static int ts6_uid_initted = 0;
-static char ts6_new_uid[10];    /* allow for \0 */
+static char ts6_new_uid[10];	/* allow for \0 */
 static unsigned int ts6_uid_index = 9;  /* last slot in uid buf */
 
 void ts6_uid_init(void)
 {
-    /* check just in case... you can never be too safe. */
-    if (TS6SID != NULL) {
-        snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
-        ts6_uid_initted = 1;
-    } else {
-        alog("warning: no TS6SID specified, disabling TS6 support.");
-        UseTS6 = 0;
+	/* check just in case... you can never be too safe. */
+	if (TS6SID != NULL) {
+		snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
+		ts6_uid_initted = 1;
+	} else {
+		alog("warning: no TS6SID specified, disabling TS6 support.");
+		UseTS6 = 0;
 
-        return;
-    }
+		return;
+	}
 }
 
 void ts6_uid_increment(unsigned int slot)
 {
-    if (slot != strlen(TS6SID)) {
-        if (ts6_new_uid[slot] == 'Z')
-            ts6_new_uid[slot] = '0';
-        else if (ts6_new_uid[slot] == '9') {
-            ts6_new_uid[slot] = 'A';
-            ts6_uid_increment(slot - 1);
-        } else
-            ts6_new_uid[slot]++;
-    } else {
-        if (ts6_new_uid[slot] == 'Z')
-            for (slot = 3; slot < 9; slot++)
-                ts6_new_uid[slot] = 'A';
-        else
-            ts6_new_uid[slot]++;
-    }
+	if (slot != strlen(TS6SID)) {
+		if (ts6_new_uid[slot] == 'Z')
+			ts6_new_uid[slot] = '0';
+		else if (ts6_new_uid[slot] == '9') {
+			ts6_new_uid[slot] = 'A';
+			ts6_uid_increment(slot - 1);
+		} else
+			ts6_new_uid[slot]++;
+	} else {
+		if (ts6_new_uid[slot] == 'Z')
+			for (slot = 3; slot < 9; slot++)
+				ts6_new_uid[slot] = 'A';
+		else
+			ts6_new_uid[slot]++;
+	}
 }
 
 const char *ts6_uid_retrieve(void)
@@ -610,12 +610,12 @@ const char *ts6_uid_retrieve(void)
 		return "";
 	}
 
-    if (ts6_uid_initted != 1)
-        ts6_uid_init();
+	if (ts6_uid_initted != 1)
+		ts6_uid_init();
 
-    ts6_uid_increment(ts6_uid_index - 1);
+	ts6_uid_increment(ts6_uid_index - 1);
 
-    return ts6_new_uid;
+	return ts6_new_uid;
 }
 
 /* EOF */

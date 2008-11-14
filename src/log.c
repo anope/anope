@@ -23,45 +23,45 @@ static int curday = 0;
 
 static int get_logname(char *name, int count, struct tm *tm)
 {
-    char timestamp[32];
-    time_t t;
+	char timestamp[32];
+	time_t t;
 
 
-    if (!tm) {
-        time(&t);
-        tm = localtime(&t);
-    }
+	if (!tm) {
+		time(&t);
+		tm = localtime(&t);
+	}
 
-    /* fix bug 577 */
-    strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
-    snprintf(name, count, "logs/%s.%s", log_filename, timestamp);
-    curday = tm->tm_yday;
+	/* fix bug 577 */
+	strftime(timestamp, sizeof(timestamp), "%Y%m%d", tm);
+	snprintf(name, count, "logs/%s.%s", log_filename, timestamp);
+	curday = tm->tm_yday;
 
-    return 1;
+	return 1;
 }
 
 /*************************************************************************/
 
 static void remove_log(void)
 {
-    time_t t;
-    struct tm tm;
+	time_t t;
+	struct tm tm;
 
-    char name[PATH_MAX];
+	char name[PATH_MAX];
 
-    if (!KeepLogs)
-        return;
+	if (!KeepLogs)
+		return;
 
-    time(&t);
-    t -= (60 * 60 * 24 * KeepLogs);
-    tm = *localtime(&t);
+	time(&t);
+	t -= (60 * 60 * 24 * KeepLogs);
+	tm = *localtime(&t);
 
-    /* removed if from here cause get_logchan is always 1 */
-    get_logname(name, sizeof(name), &tm);
+	/* removed if from here cause get_logchan is always 1 */
+	get_logname(name, sizeof(name), &tm);
 #ifndef _WIN32
-    unlink(name);
+	unlink(name);
 #else
-    DeleteFile(name);
+	DeleteFile(name);
 #endif
 }
 
@@ -69,17 +69,17 @@ static void remove_log(void)
 
 static void checkday(void)
 {
-    time_t t;
-    struct tm tm;
+	time_t t;
+	struct tm tm;
 
-    time(&t);
-    tm = *localtime(&t);
+	time(&t);
+	tm = *localtime(&t);
 
-    if (curday != tm.tm_yday) {
-        close_log();
-        remove_log();
-        open_log();
-    }
+	if (curday != tm.tm_yday) {
+		close_log();
+		remove_log();
+		open_log();
+	}
 }
 
 /*************************************************************************/
@@ -89,18 +89,18 @@ static void checkday(void)
 
 int open_log(void)
 {
-    char name[PATH_MAX];
+	char name[PATH_MAX];
 
-    if (logfile)
-        return 0;
+	if (logfile)
+		return 0;
 
-    /* if removed again.. get_logname is always 1 */
-    get_logname(name, sizeof(name), NULL);
-    logfile = fopen(name, "a");
+	/* if removed again.. get_logname is always 1 */
+	get_logname(name, sizeof(name), NULL);
+	logfile = fopen(name, "a");
 
-    if (logfile)
-        setbuf(logfile, NULL);
-    return logfile != NULL ? 0 : -1;
+	if (logfile)
+		setbuf(logfile, NULL);
+	return logfile != NULL ? 0 : -1;
 }
 
 /*************************************************************************/
@@ -109,10 +109,10 @@ int open_log(void)
 
 void close_log(void)
 {
-    if (!logfile)
-        return;
-    fclose(logfile);
-    logfile = NULL;
+	if (!logfile)
+		return;
+	fclose(logfile);
+	logfile = NULL;
 }
 
 /*************************************************************************/
@@ -120,29 +120,29 @@ void close_log(void)
 /* added cause this is used over and over in the code */
 char *log_gettimestamp(void)
 {
-    time_t t;
-    struct tm tm;
-    static char tbuf[256];
+	time_t t;
+	struct tm tm;
+	static char tbuf[256];
 
-    time(&t);
-    tm = *localtime(&t);
+	time(&t);
+	tm = *localtime(&t);
 #if HAVE_GETTIMEOFDAY
-    if (debug) {
-        char *s;
-        struct timeval tv;
-        gettimeofday(&tv, NULL);
-        strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
-        s = tbuf + strlen(tbuf);
-        s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d",
-                      (int) tv.tv_usec);
-        strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
-    } else {
+	if (debug) {
+		char *s;
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S", &tm);
+		s = tbuf + strlen(tbuf);
+		s += snprintf(s, sizeof(tbuf) - (s - tbuf), ".%06d",
+					  (int) tv.tv_usec);
+		strftime(s, sizeof(tbuf) - (s - tbuf) - 1, " %Y]", &tm);
+	} else {
 #endif
-        strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
+		strftime(tbuf, sizeof(tbuf) - 1, "[%b %d %H:%M:%S %Y]", &tm);
 #if HAVE_GETTIMEOFDAY
-    }
+	}
 #endif
-    return tbuf;
+	return tbuf;
 }
 
 /*************************************************************************/
@@ -153,33 +153,33 @@ char *log_gettimestamp(void)
 
 void alog(const char *fmt, ...)
 {
-    va_list args;
-    char *buf;
-    int errno_save = errno;
-    char str[BUFSIZE];
+	va_list args;
+	char *buf;
+	int errno_save = errno;
+	char str[BUFSIZE];
 
-    checkday();
+	checkday();
 
-    if (!fmt) {
-        return;
-    }
+	if (!fmt) {
+		return;
+	}
 
-    va_start(args, fmt);
-    vsnprintf(str, sizeof(str), fmt, args);
-    va_end(args);
+	va_start(args, fmt);
+	vsnprintf(str, sizeof(str), fmt, args);
+	va_end(args);
 
-    buf = log_gettimestamp();
+	buf = log_gettimestamp();
 
-    if (logfile) {
-        fprintf(logfile, "%s %s\n", buf, str);
-    }
-    if (nofork) {
-        fprintf(stderr, "%s %s\n", buf, str);
-    }
-    if (LogChannel && logchan && !debug && findchan(LogChannel)) {
-        ircdproto->SendPrivmsg(findbot(s_GlobalNoticer), LogChannel, "%s", str);
-    }
-    errno = errno_save;
+	if (logfile) {
+		fprintf(logfile, "%s %s\n", buf, str);
+	}
+	if (nofork) {
+		fprintf(stderr, "%s %s\n", buf, str);
+	}
+	if (LogChannel && logchan && !debug && findchan(LogChannel)) {
+		ircdproto->SendPrivmsg(findbot(s_GlobalNoticer), LogChannel, "%s", str);
+	}
+	errno = errno_save;
 }
 
 /*************************************************************************/
@@ -190,30 +190,30 @@ void alog(const char *fmt, ...)
 
 void log_perror(const char *fmt, ...)
 {
-    va_list args;
-    char *buf;
-    int errno_save = errno;
-    char str[BUFSIZE];
+	va_list args;
+	char *buf;
+	int errno_save = errno;
+	char str[BUFSIZE];
 
-    checkday();
+	checkday();
 
-    if (!fmt) {
-        return;
-    }
+	if (!fmt) {
+		return;
+	}
 
-    va_start(args, fmt);
-    vsnprintf(str, sizeof(str), fmt, args);
-    va_end(args);
+	va_start(args, fmt);
+	vsnprintf(str, sizeof(str), fmt, args);
+	va_end(args);
 
-    buf = log_gettimestamp();
+	buf = log_gettimestamp();
 
-    if (logfile) {
-        fprintf(logfile, "%s %s : %s\n", buf, str, strerror(errno_save));
-    }
-    if (nofork) {
-        fprintf(stderr, "%s %s : %s\n", buf, str, strerror(errno_save));
-    }
-    errno = errno_save;
+	if (logfile) {
+		fprintf(logfile, "%s %s : %s\n", buf, str, strerror(errno_save));
+	}
+	if (nofork) {
+		fprintf(stderr, "%s %s : %s\n", buf, str, strerror(errno_save));
+	}
+	errno = errno_save;
 }
 
 /*************************************************************************/
@@ -224,33 +224,33 @@ void log_perror(const char *fmt, ...)
 
 void fatal(const char *fmt, ...)
 {
-    va_list args;
-    char *buf;
-    char buf2[4096];
+	va_list args;
+	char *buf;
+	char buf2[4096];
 
-    checkday();
+	checkday();
 
-    if (!fmt) {
-        return;
-    }
+	if (!fmt) {
+		return;
+	}
 
-    va_start(args, fmt);
-    vsnprintf(buf2, sizeof(buf2), fmt, args);
-    va_end(args);
+	va_start(args, fmt);
+	vsnprintf(buf2, sizeof(buf2), fmt, args);
+	va_end(args);
 
-    buf = log_gettimestamp();
+	buf = log_gettimestamp();
 
-    if (logfile)
-        fprintf(logfile, "%s FATAL: %s\n", buf, buf2);
-    if (nofork)
-        fprintf(stderr, "%s FATAL: %s\n", buf, buf2);
-    if (servsock >= 0)
-        ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s", buf2);
+	if (logfile)
+		fprintf(logfile, "%s FATAL: %s\n", buf, buf2);
+	if (nofork)
+		fprintf(stderr, "%s FATAL: %s\n", buf, buf2);
+	if (servsock >= 0)
+		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s", buf2);
 
-    /* one of the many places this needs to be called from */
-    ModuleRunTimeDirCleanUp();
+	/* one of the many places this needs to be called from */
+	ModuleRunTimeDirCleanUp();
 
-    exit(1);
+	exit(1);
 }
 
 /*************************************************************************/
@@ -259,37 +259,37 @@ void fatal(const char *fmt, ...)
 
 void fatal_perror(const char *fmt, ...)
 {
-    va_list args;
-    char *buf;
-    char buf2[4096];
-    int errno_save = errno;
+	va_list args;
+	char *buf;
+	char buf2[4096];
+	int errno_save = errno;
 
-    checkday();
+	checkday();
 
-    if (!fmt) {
-        return;
-    }
+	if (!fmt) {
+		return;
+	}
 
-    va_start(args, fmt);
-    vsnprintf(buf2, sizeof(buf2), fmt, args);
-    va_end(args);
+	va_start(args, fmt);
+	vsnprintf(buf2, sizeof(buf2), fmt, args);
+	va_end(args);
 
-    buf = log_gettimestamp();
+	buf = log_gettimestamp();
 
-    if (logfile)
-        fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
-                strerror(errno_save));
-    if (nofork)
-        fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
-                strerror(errno_save));
-    if (servsock >= 0)
-        ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
-                         strerror(errno_save));
+	if (logfile)
+		fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
+				strerror(errno_save));
+	if (nofork)
+		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
+				strerror(errno_save));
+	if (servsock >= 0)
+		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
+						 strerror(errno_save));
 
-    /* one of the many places this needs to be called from */
-    ModuleRunTimeDirCleanUp();
+	/* one of the many places this needs to be called from */
+	ModuleRunTimeDirCleanUp();
 
-    exit(1);
+	exit(1);
 }
 
 /*************************************************************************/
@@ -301,36 +301,36 @@ void fatal_perror(const char *fmt, ...)
 
 void fatal_sockerror(const char *fmt, ...)
 {
-    va_list args;
-    char *buf;
-    char buf2[4096];
-    int errno_save = ano_sockgeterr();
+	va_list args;
+	char *buf;
+	char buf2[4096];
+	int errno_save = ano_sockgeterr();
 
-    if (!fmt) {
-        return;
-    }
+	if (!fmt) {
+		return;
+	}
 
-    checkday();
+	checkday();
 
-    /* this will fix 581 */
-    va_start(args, fmt);
-    vsnprintf(buf2, sizeof(buf2), fmt, args);
-    va_end(args);
+	/* this will fix 581 */
+	va_start(args, fmt);
+	vsnprintf(buf2, sizeof(buf2), fmt, args);
+	va_end(args);
 
-    buf = log_gettimestamp();
+	buf = log_gettimestamp();
 
-    if (logfile)
-        fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
-                ano_sockstrerror(errno_save));
-    if (stderr)
-        fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
-                ano_sockstrerror(errno_save));
-    if (servsock >= 0)
-        ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
-                         strerror(errno_save));
+	if (logfile)
+		fprintf(logfile, "%s FATAL: %s: %s\n", buf, buf2,
+				ano_sockstrerror(errno_save));
+	if (stderr)
+		fprintf(stderr, "%s FATAL: %s: %s\n", buf, buf2,
+				ano_sockstrerror(errno_save));
+	if (servsock >= 0)
+		ircdproto->SendGlobops(NULL, "FATAL ERROR!  %s: %s", buf2,
+						 strerror(errno_save));
 
-    /* one of the many places this needs to be called from */
-    ModuleRunTimeDirCleanUp();
+	/* one of the many places this needs to be called from */
+	ModuleRunTimeDirCleanUp();
 
-    exit(1);
+	exit(1);
 }

@@ -3,6 +3,6 @@
 
 int do_purr(User * u)
 {
-    notice(s_CatServ, u->nick, "PURR!");
-    return MOD_STOP;
+	notice(s_CatServ, u->nick, "PURR!");
+	return MOD_STOP;
 }

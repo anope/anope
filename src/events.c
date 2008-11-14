@@ -20,154 +20,154 @@ EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
 EvtMessage *find_event(const char *name)
 {
-    EvtMessage *m;
-    m = findEventHandler(EVENT, name);
-    return m;
+	EvtMessage *m;
+	m = findEventHandler(EVENT, name);
+	return m;
 }
 
 EvtHook *find_eventhook(const char *name)
 {
-    EvtHook *m;
-    m = findEventHook(EVENTHOOKS, name);
-    return m;
+	EvtHook *m;
+	m = findEventHook(EVENTHOOKS, name);
+	return m;
 }
 
 void send_event(const char *name, int argc, ...)
 {
-    va_list va;
-    char *a;
-    int idx = 0;
-    char **argv;
+	va_list va;
+	char *a;
+	int idx = 0;
+	char **argv;
 
-    argv = (char **) malloc(sizeof(char *) * argc);
-    va_start(va, argc);
-    for (idx = 0; idx < argc; idx++) {
-        a = va_arg(va, char *);
-        argv[idx] = sstrdup(a);
-    }
-    va_end(va);
+	argv = (char **) malloc(sizeof(char *) * argc);
+	va_start(va, argc);
+	for (idx = 0; idx < argc; idx++) {
+		a = va_arg(va, char *);
+		argv[idx] = sstrdup(a);
+	}
+	va_end(va);
 
-    if (debug)
-        alog("debug: Emitting event \"%s\" (%d args)", name, argc);
+	if (debug)
+		alog("debug: Emitting event \"%s\" (%d args)", name, argc);
 
-    event_process_hook(name, argc, argv);
+	event_process_hook(name, argc, argv);
 
-    /**
-     * Now that the events have seen the message, free it up
-     **/
-    for (idx = 0; idx < argc; idx++) {
-        free(argv[idx]);
-    }
-    free(argv);
+	/**
+	 * Now that the events have seen the message, free it up
+	 **/
+	for (idx = 0; idx < argc; idx++) {
+		free(argv[idx]);
+	}
+	free(argv);
 }
 
 void eventprintf(char *fmt, ...)
 {
-    va_list args;
-    char buf[16384];            /* Really huge, to try and avoid truncation */
-    char *event;
+	va_list args;
+	char buf[16384];			/* Really huge, to try and avoid truncation */
+	char *event;
 
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    event = sstrdup(buf);
-    event_message_process(event);
-    va_end(args);
-    if (event) {
-        free(event);
-    }
-    return;
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	event = sstrdup(buf);
+	event_message_process(event);
+	va_end(args);
+	if (event) {
+		free(event);
+	}
+	return;
 }
 
 void event_message_process(char *eventbuf)
 {
-    int retVal = 0;
-    EvtMessage *current = NULL;
-    char source[64];
-    char cmd[64];
-    char buf[512];              /* Longest legal IRC command line */
-    char *s;
-    int ac;                     /* Parameters for the command */
-    const char **av;
-    EvtMessage *evm;
+	int retVal = 0;
+	EvtMessage *current = NULL;
+	char source[64];
+	char cmd[64];
+	char buf[512];			  /* Longest legal IRC command line */
+	char *s;
+	int ac;					 /* Parameters for the command */
+	const char **av;
+	EvtMessage *evm;
 
-    /* zero out the buffers before we do much else */
-    *buf = '\0';
-    *source = '\0';
-    *cmd = '\0';
+	/* zero out the buffers before we do much else */
+	*buf = '\0';
+	*source = '\0';
+	*cmd = '\0';
 
-    strscpy(buf, eventbuf, sizeof(buf));
+	strscpy(buf, eventbuf, sizeof(buf));
 
-    doCleanBuffer((char *) buf);
+	doCleanBuffer((char *) buf);
 
-    /* Split the buffer into pieces. */
-    if (*buf == ':') {
-        s = strpbrk(buf, " ");
-        if (!s)
-            return;
-        *s = 0;
-        while (isspace(*++s));
-        strscpy(source, buf + 1, sizeof(source));
-        memmove(buf, s, strlen(s) + 1);
-    } else {
-        *source = 0;
-    }
-    if (!*buf)
-        return;
-    s = strpbrk(buf, " ");
-    if (s) {
-        *s = 0;
-        while (isspace(*++s));
-    } else
-        s = buf + strlen(buf);
-    strscpy(cmd, buf, sizeof(cmd));
-    ac = split_buf(s, &av, 1);
+	/* Split the buffer into pieces. */
+	if (*buf == ':') {
+		s = strpbrk(buf, " ");
+		if (!s)
+			return;
+		*s = 0;
+		while (isspace(*++s));
+		strscpy(source, buf + 1, sizeof(source));
+		memmove(buf, s, strlen(s) + 1);
+	} else {
+		*source = 0;
+	}
+	if (!*buf)
+		return;
+	s = strpbrk(buf, " ");
+	if (s) {
+		*s = 0;
+		while (isspace(*++s));
+	} else
+		s = buf + strlen(buf);
+	strscpy(cmd, buf, sizeof(cmd));
+	ac = split_buf(s, &av, 1);
 
-    /* Do something with the message. */
-    evm = find_event(cmd);
-    if (evm) {
-        if (evm->func) {
-            mod_current_module_name = evm->mod_name;
-            retVal = evm->func(source, ac, av);
-            mod_current_module_name = NULL;
-            if (retVal == MOD_CONT) {
-                current = evm->next;
-                while (current && current->func && retVal == MOD_CONT) {
-                    mod_current_module_name = current->mod_name;
-                    retVal = current->func(source, ac, av);
-                    mod_current_module_name = NULL;
-                    current = current->next;
-                }
-            }
-        }
-    }
-    /* Free argument list we created */
-    free(av);
+	/* Do something with the message. */
+	evm = find_event(cmd);
+	if (evm) {
+		if (evm->func) {
+			mod_current_module_name = evm->mod_name;
+			retVal = evm->func(source, ac, av);
+			mod_current_module_name = NULL;
+			if (retVal == MOD_CONT) {
+				current = evm->next;
+				while (current && current->func && retVal == MOD_CONT) {
+					mod_current_module_name = current->mod_name;
+					retVal = current->func(source, ac, av);
+					mod_current_module_name = NULL;
+					current = current->next;
+				}
+			}
+		}
+	}
+	/* Free argument list we created */
+	free(av);
 }
 
 void event_process_hook(const char *name, int argc, char **argv)
 {
-    int retVal = 0;
-    EvtHook *current = NULL;
-    EvtHook *evh;
+	int retVal = 0;
+	EvtHook *current = NULL;
+	EvtHook *evh;
 
-    /* Do something with the message. */
-    evh = find_eventhook(name);
-    if (evh) {
-        if (evh->func) {
-            mod_current_module_name = evh->mod_name;
-            retVal = evh->func(argc, argv);
-            mod_current_module_name = NULL;
-            if (retVal == MOD_CONT) {
-                current = evh->next;
-                while (current && current->func && retVal == MOD_CONT) {
-                    mod_current_module_name = current->mod_name;
-                    retVal = current->func(argc, argv);
-                    mod_current_module_name = NULL;
-                    current = current->next;
-                }
-            }
-        }
-    }
+	/* Do something with the message. */
+	evh = find_eventhook(name);
+	if (evh) {
+		if (evh->func) {
+			mod_current_module_name = evh->mod_name;
+			retVal = evh->func(argc, argv);
+			mod_current_module_name = NULL;
+			if (retVal == MOD_CONT) {
+				current = evh->next;
+				while (current && current->func && retVal == MOD_CONT) {
+					mod_current_module_name = current->mod_name;
+					retVal = current->func(argc, argv);
+					mod_current_module_name = NULL;
+					current = current->next;
+				}
+			}
+		}
+	}
 }
 
 /**
@@ -178,14 +178,14 @@ void event_process_hook(const char *name, int argc, char **argv)
  */
 int displayEventMessage(EvtMessage * evm)
 {
-    EvtMessage *msg = NULL;
-    int i = 0;
-    alog("Displaying message list for %s", evm->name);
-    for (msg = evm; msg; msg = msg->next) {
-        alog("%d: 0x%p", ++i, (void *) msg);
-    }
-    alog("end");
-    return 0;
+	EvtMessage *msg = NULL;
+	int i = 0;
+	alog("Displaying message list for %s", evm->name);
+	for (msg = evm; msg; msg = msg->next) {
+		alog("%d: 0x%p", ++i, (void *) msg);
+	}
+	alog("end");
+	return 0;
 }
 
 /**
@@ -196,14 +196,14 @@ int displayEventMessage(EvtMessage * evm)
  */
 int displayEventHook(EvtHook * evh)
 {
-    EvtHook *msg = NULL;
-    int i = 0;
-    alog("Displaying message list for %s", evh->name);
-    for (msg = evh; msg; msg = msg->next) {
-        alog("%d: 0x%p", ++i, (void *) msg);
-    }
-    alog("end");
-    return 0;
+	EvtHook *msg = NULL;
+	int i = 0;
+	alog("Displaying message list for %s", evh->name);
+	for (msg = evh; msg; msg = msg->next) {
+		alog("%d: 0x%p", ++i, (void *) msg);
+	}
+	alog("end");
+	return 0;
 }
 
 /**
@@ -214,21 +214,21 @@ int displayEventHook(EvtHook * evh)
  */
 int displayHookFromHash(char *name)
 {
-    EvtHookHash *current = NULL;
-    int index = 0;
-    index = CMD_HASH(name);
-    if (debug > 1) {
-        alog("debug: trying to display message %s", name);
-    }
-    for (current = EVENTHOOKS[index]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            displayEventHook(current->evh);
-        }
-    }
-    if (debug > 1) {
-        alog("debug: done displaying message %s", name);
-    }
-    return 0;
+	EvtHookHash *current = NULL;
+	int index = 0;
+	index = CMD_HASH(name);
+	if (debug > 1) {
+		alog("debug: trying to display message %s", name);
+	}
+	for (current = EVENTHOOKS[index]; current; current = current->next) {
+		if (stricmp(name, current->name) == 0) {
+			displayEventHook(current->evh);
+		}
+	}
+	if (debug > 1) {
+		alog("debug: done displaying message %s", name);
+	}
+	return 0;
 }
 
 /**
@@ -239,21 +239,21 @@ int displayHookFromHash(char *name)
  */
 int displayEvtMessageFromHash(char *name)
 {
-    EvtMessageHash *current = NULL;
-    int index = 0;
-    index = CMD_HASH(name);
-    if (debug > 1) {
-        alog("debug: trying to display message %s", name);
-    }
-    for (current = EVENT[index]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            displayEventMessage(current->evm);
-        }
-    }
-    if (debug > 1) {
-        alog("debug: done displaying message %s", name);
-    }
-    return 0;
+	EvtMessageHash *current = NULL;
+	int index = 0;
+	index = CMD_HASH(name);
+	if (debug > 1) {
+		alog("debug: trying to display message %s", name);
+	}
+	for (current = EVENT[index]; current; current = current->next) {
+		if (stricmp(name, current->name) == 0) {
+			displayEventMessage(current->evm);
+		}
+	}
+	if (debug > 1) {
+		alog("debug: done displaying message %s", name);
+	}
+	return 0;
 }
 
 /*******************************************************************************
@@ -267,21 +267,21 @@ int displayEvtMessageFromHash(char *name)
   * @return a new Message object
   **/
 EvtMessage *createEventHandler(char *name,
-                               int (*func) (const char *source, int ac,
-                                            const char **av))
+							   int (*func) (const char *source, int ac,
+											const char **av))
 {
-    EvtMessage *evm = NULL;
-    if (!func) {
-        return NULL;
-    }
-    if ((evm = (EvtMessage *)malloc(sizeof(EvtMessage))) == NULL) {
-        fatal("Out of memory!");
-    }
-    evm->name = sstrdup(name);
-    evm->func = func;
-    evm->mod_name = NULL;
-    evm->next = NULL;
-    return evm;
+	EvtMessage *evm = NULL;
+	if (!func) {
+		return NULL;
+	}
+	if ((evm = (EvtMessage *)malloc(sizeof(EvtMessage))) == NULL) {
+		fatal("Out of memory!");
+	}
+	evm->name = sstrdup(name);
+	evm->func = func;
+	evm->mod_name = NULL;
+	evm->next = NULL;
+	return evm;
 }
 
  /**
@@ -292,18 +292,18 @@ EvtMessage *createEventHandler(char *name,
   **/
 EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv))
 {
-    EvtHook *evh = NULL;
-    if (!func) {
-        return NULL;
-    }
-    if ((evh = (EvtHook *)malloc(sizeof(EvtHook))) == NULL) {
-        fatal("Out of memory!");
-    }
-    evh->name = sstrdup(name);
-    evh->func = func;
-    evh->mod_name = NULL;
-    evh->next = NULL;
-    return evh;
+	EvtHook *evh = NULL;
+	if (!func) {
+		return NULL;
+	}
+	if ((evh = (EvtHook *)malloc(sizeof(EvtHook))) == NULL) {
+		fatal("Out of memory!");
+	}
+	evh->name = sstrdup(name);
+	evh->func = func;
+	evh->mod_name = NULL;
+	evh->next = NULL;
+	return evh;
 }
 
 /**
@@ -314,21 +314,21 @@ EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv))
  * @return NULL if we cant find it, or a pointer to the Message if we can
  **/
 EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[],
-                             const char *name)
+							 const char *name)
 {
-    int idx;
-    EvtMessageHash *current = NULL;
-    if (!msgEvtTable || !name) {
-        return NULL;
-    }
-    idx = CMD_HASH(name);
+	int idx;
+	EvtMessageHash *current = NULL;
+	if (!msgEvtTable || !name) {
+		return NULL;
+	}
+	idx = CMD_HASH(name);
 
-    for (current = msgEvtTable[idx]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            return current->evm;
-        }
-    }
-    return NULL;
+	for (current = msgEvtTable[idx]; current; current = current->next) {
+		if (stricmp(name, current->name) == 0) {
+			return current->evm;
+		}
+	}
+	return NULL;
 }
 
 /**
@@ -340,19 +340,19 @@ EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[],
  **/
 EvtHook *findEventHook(EvtHookHash * hookEvtTable[], const char *name)
 {
-    int idx;
-    EvtHookHash *current = NULL;
-    if (!hookEvtTable || !name) {
-        return NULL;
-    }
-    idx = CMD_HASH(name);
+	int idx;
+	EvtHookHash *current = NULL;
+	if (!hookEvtTable || !name) {
+		return NULL;
+	}
+	idx = CMD_HASH(name);
 
-    for (current = hookEvtTable[idx]; current; current = current->next) {
-        if (stricmp(name, current->name) == 0) {
-            return current->evh;
-        }
-    }
-    return NULL;
+	for (current = hookEvtTable[idx]; current; current = current->next) {
+		if (stricmp(name, current->name) == 0) {
+			return current->evh;
+		}
+	}
+	return NULL;
 }
 
 /**
@@ -363,11 +363,11 @@ EvtHook *findEventHook(EvtHookHash * hookEvtTable[], const char *name)
  **/
 int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
 {
-    if (!msgEvtTable || !evm) {
-        return MOD_ERR_PARAMS;
-    }
-    evm->core = 1;
-    return addEventHandler(msgEvtTable, evm);
+	if (!msgEvtTable || !evm) {
+		return MOD_ERR_PARAMS;
+	}
+	evm->core = 1;
+	return addEventHandler(msgEvtTable, evm);
 }
 
 /**
@@ -378,42 +378,42 @@ int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
  **/
 int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
 {
-    /* We can assume both param's have been checked by this point.. */
-    int index = 0;
-    EvtMessageHash *current = NULL;
-    EvtMessageHash *newHash = NULL;
-    EvtMessageHash *lastHash = NULL;
+	/* We can assume both param's have been checked by this point.. */
+	int index = 0;
+	EvtMessageHash *current = NULL;
+	EvtMessageHash *newHash = NULL;
+	EvtMessageHash *lastHash = NULL;
 
-    if (!msgEvtTable || !evm) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!msgEvtTable || !evm) {
+		return MOD_ERR_PARAMS;
+	}
 
-    index = CMD_HASH(evm->name);
+	index = CMD_HASH(evm->name);
 
-    for (current = msgEvtTable[index]; current; current = current->next) {
-        if (stricmp(evm->name, current->name) == 0) {   /* the msg exist's we are a addHead */
-            evm->next = current->evm;
-            current->evm = evm;
-            if (debug)
-                alog("debug: existing msg: (0x%p), new msg (0x%p)",
-                     (void *) evm->next, (void *) evm);
-            return MOD_ERR_OK;
-        }
-        lastHash = current;
-    }
+	for (current = msgEvtTable[index]; current; current = current->next) {
+		if (stricmp(evm->name, current->name) == 0) {   /* the msg exist's we are a addHead */
+			evm->next = current->evm;
+			current->evm = evm;
+			if (debug)
+				alog("debug: existing msg: (0x%p), new msg (0x%p)",
+					 (void *) evm->next, (void *) evm);
+			return MOD_ERR_OK;
+		}
+		lastHash = current;
+	}
 
-    if ((newHash = (EvtMessageHash *)malloc(sizeof(EvtMessageHash))) == NULL) {
-        fatal("Out of memory");
-    }
-    newHash->next = NULL;
-    newHash->name = sstrdup(evm->name);
-    newHash->evm = evm;
+	if ((newHash = (EvtMessageHash *)malloc(sizeof(EvtMessageHash))) == NULL) {
+		fatal("Out of memory");
+	}
+	newHash->next = NULL;
+	newHash->name = sstrdup(evm->name);
+	newHash->evm = evm;
 
-    if (lastHash == NULL)
-        msgEvtTable[index] = newHash;
-    else
-        lastHash->next = newHash;
-    return MOD_ERR_OK;
+	if (lastHash == NULL)
+		msgEvtTable[index] = newHash;
+	else
+		lastHash->next = newHash;
+	return MOD_ERR_OK;
 }
 
 /**
@@ -424,42 +424,42 @@ int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm)
  **/
 int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
 {
-    /* We can assume both param's have been checked by this point.. */
-    int index = 0;
-    EvtHookHash *current = NULL;
-    EvtHookHash *newHash = NULL;
-    EvtHookHash *lastHash = NULL;
+	/* We can assume both param's have been checked by this point.. */
+	int index = 0;
+	EvtHookHash *current = NULL;
+	EvtHookHash *newHash = NULL;
+	EvtHookHash *lastHash = NULL;
 
-    if (!hookEvtTable || !evh) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!hookEvtTable || !evh) {
+		return MOD_ERR_PARAMS;
+	}
 
-    index = CMD_HASH(evh->name);
+	index = CMD_HASH(evh->name);
 
-    for (current = hookEvtTable[index]; current; current = current->next) {
-        if (stricmp(evh->name, current->name) == 0) {   /* the msg exist's we are a addHead */
-            evh->next = current->evh;
-            current->evh = evh;
-            if (debug)
-                alog("debug: existing msg: (0x%p), new msg (0x%p)",
-                     (void *) evh->next, (void *) evh);
-            return MOD_ERR_OK;
-        }
-        lastHash = current;
-    }
+	for (current = hookEvtTable[index]; current; current = current->next) {
+		if (stricmp(evh->name, current->name) == 0) {   /* the msg exist's we are a addHead */
+			evh->next = current->evh;
+			current->evh = evh;
+			if (debug)
+				alog("debug: existing msg: (0x%p), new msg (0x%p)",
+					 (void *) evh->next, (void *) evh);
+			return MOD_ERR_OK;
+		}
+		lastHash = current;
+	}
 
-    if ((newHash = (EvtHookHash *)malloc(sizeof(EvtHookHash))) == NULL) {
-        fatal("Out of memory");
-    }
-    newHash->next = NULL;
-    newHash->name = sstrdup(evh->name);
-    newHash->evh = evh;
+	if ((newHash = (EvtHookHash *)malloc(sizeof(EvtHookHash))) == NULL) {
+		fatal("Out of memory");
+	}
+	newHash->next = NULL;
+	newHash->name = sstrdup(evh->name);
+	newHash->evh = evh;
 
-    if (lastHash == NULL)
-        hookEvtTable[index] = newHash;
-    else
-        lastHash->next = newHash;
-    return MOD_ERR_OK;
+	if (lastHash == NULL)
+		hookEvtTable[index] = newHash;
+	else
+		lastHash->next = newHash;
+	return MOD_ERR_OK;
 }
 
 /**
@@ -470,11 +470,11 @@ int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
  **/
 int addCoreEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
 {
-    if (!hookEvtTable || !evh) {
-        return MOD_ERR_PARAMS;
-    }
-    evh->core = 1;
-    return addEventHook(hookEvtTable, evh);
+	if (!hookEvtTable || !evh) {
+		return MOD_ERR_PARAMS;
+	}
+	evh->core = 1;
+	return addEventHook(hookEvtTable, evh);
 }
 
 int Module::AddEventHandler(EvtMessage *evm)
@@ -514,36 +514,36 @@ int Module::AddEventHook(EvtHook *evh)
 
 int Module::DelEventHandler(const char *sname)
 {
-    EvtMessage *evm;
-    int status;
+	EvtMessage *evm;
+	int status;
 
-    evm = findEventHandler(EVENT, sname);
-    if (!evm) {
-        return MOD_ERR_NOEXIST;
-    }
+	evm = findEventHandler(EVENT, sname);
+	if (!evm) {
+		return MOD_ERR_NOEXIST;
+	}
 
-    status = delEventHandler(EVENT, evm, this->name.c_str());
-    if (debug) {
-        displayEvtMessageFromHash(evm->name);
-    }
-    return status;
+	status = delEventHandler(EVENT, evm, this->name.c_str());
+	if (debug) {
+		displayEvtMessageFromHash(evm->name);
+	}
+	return status;
 }
 
 int Module::DelEventHook(const char *sname)
 {
-    EvtHook *evh;
-    int status;
+	EvtHook *evh;
+	int status;
 
-    evh = findEventHook(EVENTHOOKS, sname);
-    if (!evh) {
-        return MOD_ERR_NOEXIST;
-    }
+	evh = findEventHook(EVENTHOOKS, sname);
+	if (!evh) {
+		return MOD_ERR_NOEXIST;
+	}
 
-    status = delEventHook(EVENTHOOKS, evh, this->name.c_str());
-    if (debug) {
-        displayHookFromHash(evh->name);
-    }
-    return status;
+	status = delEventHook(EVENTHOOKS, evh, this->name.c_str());
+	if (debug) {
+		displayHookFromHash(evh->name);
+	}
+	return status;
 }
 
 /**
@@ -554,68 +554,68 @@ int Module::DelEventHook(const char *sname)
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
 int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
-                    const char *mod_name)
+					const char *mod_name)
 {
-    int index = 0;
-    EvtMessageHash *current = NULL;
-    EvtMessageHash *lastHash = NULL;
-    EvtMessage *tail = NULL, *last = NULL;
+	int index = 0;
+	EvtMessageHash *current = NULL;
+	EvtMessageHash *lastHash = NULL;
+	EvtMessage *tail = NULL, *last = NULL;
 
-    if (!evm || !msgEvtTable) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!evm || !msgEvtTable) {
+		return MOD_ERR_PARAMS;
+	}
 
-    index = CMD_HASH(evm->name);
+	index = CMD_HASH(evm->name);
 
-    for (current = msgEvtTable[index]; current; current = current->next) {
-        if (stricmp(evm->name, current->name) == 0) {
-            if (!lastHash) {
-                tail = current->evm;
-                if (tail->next) {
-                    while (tail) {
-                        if (mod_name && tail->mod_name
-                            && (stricmp(mod_name, tail->mod_name) == 0)) {
-                            if (last) {
-                                last->next = tail->next;
-                            } else {
-                                current->evm = tail->next;
-                            }
-                            return MOD_ERR_OK;
-                        }
-                        last = tail;
-                        tail = tail->next;
-                    }
-                } else {
-                    msgEvtTable[index] = current->next;
-                    free(current->name);
-                    return MOD_ERR_OK;
-                }
-            } else {
-                tail = current->evm;
-                if (tail->next) {
-                    while (tail) {
-                        if (mod_name && tail->mod_name
-                            && (stricmp(mod_name, tail->mod_name) == 0)) {
-                            if (last) {
-                                last->next = tail->next;
-                            } else {
-                                current->evm = tail->next;
-                            }
-                            return MOD_ERR_OK;
-                        }
-                        last = tail;
-                        tail = tail->next;
-                    }
-                } else {
-                    lastHash->next = current->next;
-                    free(current->name);
-                    return MOD_ERR_OK;
-                }
-            }
-        }
-        lastHash = current;
-    }
-    return MOD_ERR_NOEXIST;
+	for (current = msgEvtTable[index]; current; current = current->next) {
+		if (stricmp(evm->name, current->name) == 0) {
+			if (!lastHash) {
+				tail = current->evm;
+				if (tail->next) {
+					while (tail) {
+						if (mod_name && tail->mod_name
+							&& (stricmp(mod_name, tail->mod_name) == 0)) {
+							if (last) {
+								last->next = tail->next;
+							} else {
+								current->evm = tail->next;
+							}
+							return MOD_ERR_OK;
+						}
+						last = tail;
+						tail = tail->next;
+					}
+				} else {
+					msgEvtTable[index] = current->next;
+					free(current->name);
+					return MOD_ERR_OK;
+				}
+			} else {
+				tail = current->evm;
+				if (tail->next) {
+					while (tail) {
+						if (mod_name && tail->mod_name
+							&& (stricmp(mod_name, tail->mod_name) == 0)) {
+							if (last) {
+								last->next = tail->next;
+							} else {
+								current->evm = tail->next;
+							}
+							return MOD_ERR_OK;
+						}
+						last = tail;
+						tail = tail->next;
+					}
+				} else {
+					lastHash->next = current->next;
+					free(current->name);
+					return MOD_ERR_OK;
+				}
+			}
+		}
+		lastHash = current;
+	}
+	return MOD_ERR_NOEXIST;
 }
 
 
@@ -627,68 +627,68 @@ int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm,
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
 int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
-                 const char *mod_name)
+				 const char *mod_name)
 {
-    int index = 0;
-    EvtHookHash *current = NULL;
-    EvtHookHash *lastHash = NULL;
-    EvtHook *tail = NULL, *last = NULL;
+	int index = 0;
+	EvtHookHash *current = NULL;
+	EvtHookHash *lastHash = NULL;
+	EvtHook *tail = NULL, *last = NULL;
 
-    if (!evh || !hookEvtTable) {
-        return MOD_ERR_PARAMS;
-    }
+	if (!evh || !hookEvtTable) {
+		return MOD_ERR_PARAMS;
+	}
 
-    index = CMD_HASH(evh->name);
+	index = CMD_HASH(evh->name);
 
-    for (current = hookEvtTable[index]; current; current = current->next) {
-        if (stricmp(evh->name, current->name) == 0) {
-            if (!lastHash) {
-                tail = current->evh;
-                if (tail->next) {
-                    while (tail) {
-                        if (mod_name && tail->mod_name
-                            && (stricmp(mod_name, tail->mod_name) == 0)) {
-                            if (last) {
-                                last->next = tail->next;
-                            } else {
-                                current->evh = tail->next;
-                            }
-                            return MOD_ERR_OK;
-                        }
-                        last = tail;
-                        tail = tail->next;
-                    }
-                } else {
-                    hookEvtTable[index] = current->next;
-                    free(current->name);
-                    return MOD_ERR_OK;
-                }
-            } else {
-                tail = current->evh;
-                if (tail->next) {
-                    while (tail) {
-                        if (mod_name && tail->mod_name
-                            && (stricmp(mod_name, tail->mod_name) == 0)) {
-                            if (last) {
-                                last->next = tail->next;
-                            } else {
-                                current->evh = tail->next;
-                            }
-                            return MOD_ERR_OK;
-                        }
-                        last = tail;
-                        tail = tail->next;
-                    }
-                } else {
-                    lastHash->next = current->next;
-                    free(current->name);
-                    return MOD_ERR_OK;
-                }
-            }
-        }
-        lastHash = current;
-    }
-    return MOD_ERR_NOEXIST;
+	for (current = hookEvtTable[index]; current; current = current->next) {
+		if (stricmp(evh->name, current->name) == 0) {
+			if (!lastHash) {
+				tail = current->evh;
+				if (tail->next) {
+					while (tail) {
+						if (mod_name && tail->mod_name
+							&& (stricmp(mod_name, tail->mod_name) == 0)) {
+							if (last) {
+								last->next = tail->next;
+							} else {
+								current->evh = tail->next;
+							}
+							return MOD_ERR_OK;
+						}
+						last = tail;
+						tail = tail->next;
+					}
+				} else {
+					hookEvtTable[index] = current->next;
+					free(current->name);
+					return MOD_ERR_OK;
+				}
+			} else {
+				tail = current->evh;
+				if (tail->next) {
+					while (tail) {
+						if (mod_name && tail->mod_name
+							&& (stricmp(mod_name, tail->mod_name) == 0)) {
+							if (last) {
+								last->next = tail->next;
+							} else {
+								current->evh = tail->next;
+							}
+							return MOD_ERR_OK;
+						}
+						last = tail;
+						tail = tail->next;
+					}
+				} else {
+					lastHash->next = current->next;
+					free(current->name);
+					return MOD_ERR_OK;
+				}
+			}
+		}
+		lastHash = current;
+	}
+	return MOD_ERR_NOEXIST;
 }
 
 
@@ -699,18 +699,18 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
  **/
 int destroyEventHandler(EvtMessage * evm)
 {
-    if (!evm) {
-        return MOD_ERR_PARAMS;
-    }
-    if (evm->name) {
-        free(evm->name);
-    }
-    evm->func = NULL;
-    if (evm->mod_name) {
-        free(evm->mod_name);
-    }
-    evm->next = NULL;
-    return MOD_ERR_OK;
+	if (!evm) {
+		return MOD_ERR_PARAMS;
+	}
+	if (evm->name) {
+		free(evm->name);
+	}
+	evm->func = NULL;
+	if (evm->mod_name) {
+		free(evm->mod_name);
+	}
+	evm->next = NULL;
+	return MOD_ERR_OK;
 }
 
 /**
@@ -720,16 +720,16 @@ int destroyEventHandler(EvtMessage * evm)
  **/
 int destroyEventHook(EvtHook * evh)
 {
-    if (!evh) {
-        return MOD_ERR_PARAMS;
-    }
-    if (evh->name) {
-        free(evh->name);
-    }
-    evh->func = NULL;
-    if (evh->mod_name) {
-        free(evh->mod_name);
-    }
-    evh->next = NULL;
-    return MOD_ERR_OK;
+	if (!evh) {
+		return MOD_ERR_PARAMS;
+	}
+	if (evh->name) {
+		free(evh->name);
+	}
+	evh->func = NULL;
+	if (evh->mod_name) {
+		free(evh->mod_name);
+	}
+	evh->next = NULL;
+	return MOD_ERR_OK;
 }

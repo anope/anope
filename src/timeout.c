@@ -23,39 +23,39 @@ static Timeout *timeouts = NULL;
 
 void check_timeouts(void)
 {
-    Timeout *to, *to2;
-    time_t t = time(NULL);
+	Timeout *to, *to2;
+	time_t t = time(NULL);
 
-    if (debug >= 2)
-        alog("debug: Checking timeouts at %ld", (long int) t);
+	if (debug >= 2)
+		alog("debug: Checking timeouts at %ld", (long int) t);
 
-    to = timeouts;
-    while (to) {
-        if (t < to->timeout) {
-            to = to->next;
-            continue;
-        }
-        if (debug >= 4) {
-            alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
-                 (void *) to, (void *) to->code, to->repeat);
-        }
-        to->code(to);
-        if (to->repeat) {
-            to = to->next;
-            continue;
-        }
-        to2 = to->next;
-        if (to->next)
-            to->next->prev = to->prev;
-        if (to->prev)
-            to->prev->next = to->next;
-        else
-            timeouts = to->next;
-        free(to);
-        to = to2;
-    }
-    if (debug >= 2)
-        alog("debug: Finished timeout list");
+	to = timeouts;
+	while (to) {
+		if (t < to->timeout) {
+			to = to->next;
+			continue;
+		}
+		if (debug >= 4) {
+			alog("debug: Running timeout 0x%p (code=0x%p repeat=%d)",
+				 (void *) to, (void *) to->code, to->repeat);
+		}
+		to->code(to);
+		if (to->repeat) {
+			to = to->next;
+			continue;
+		}
+		to2 = to->next;
+		if (to->next)
+			to->next->prev = to->prev;
+		if (to->prev)
+			to->prev->next = to->next;
+		else
+			timeouts = to->next;
+		free(to);
+		to = to2;
+	}
+	if (debug >= 2)
+		alog("debug: Finished timeout list");
 }
 
 /*************************************************************************/
@@ -68,17 +68,17 @@ void check_timeouts(void)
 
 Timeout *add_timeout(int delay, void (*code) (Timeout *), int repeat)
 {
-    Timeout *t = (Timeout *)scalloc(sizeof(Timeout), 1);
-    t->settime = time(NULL);
-    t->timeout = t->settime + delay;
-    t->code = code;
-    t->repeat = repeat;
-    t->next = timeouts;
-    t->prev = NULL;
-    if (timeouts)
-        timeouts->prev = t;
-    timeouts = t;
-    return t;
+	Timeout *t = (Timeout *)scalloc(sizeof(Timeout), 1);
+	t->settime = time(NULL);
+	t->timeout = t->settime + delay;
+	t->code = code;
+	t->repeat = repeat;
+	t->next = timeouts;
+	t->prev = NULL;
+	if (timeouts)
+		timeouts->prev = t;
+	timeouts = t;
+	return t;
 }
 
 /*************************************************************************/
@@ -87,21 +87,21 @@ Timeout *add_timeout(int delay, void (*code) (Timeout *), int repeat)
 
 void del_timeout(Timeout * t)
 {
-    Timeout *ptr;
+	Timeout *ptr;
 
-    for (ptr = timeouts; ptr; ptr = ptr->next) {
-        if (ptr == t)
-            break;
-    }
-    if (!ptr)
-        return;
-    if (t->prev)
-        t->prev->next = t->next;
-    else
-        timeouts = t->next;
-    if (t->next)
-        t->next->prev = t->prev;
-    free(t);
+	for (ptr = timeouts; ptr; ptr = ptr->next) {
+		if (ptr == t)
+			break;
+	}
+	if (!ptr)
+		return;
+	if (t->prev)
+		t->prev->next = t->next;
+	else
+		timeouts = t->next;
+	if (t->next)
+		t->next->prev = t->prev;
+	free(t);
 }
 
 /*************************************************************************/

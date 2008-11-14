@@ -86,26 +86,26 @@ class CSModes : public Module
  **/
 void myChanServHelp(User * u)
 {
-    if (ircd->owner) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
-    }
-    if (ircd->protect) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
-    } else if (ircd->admin) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ADMIN);
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEADMIN);
-    }
+	if (ircd->owner) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OWNER);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOWNER);
+	}
+	if (ircd->protect) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_PROTECT);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEPROTECT);
+	} else if (ircd->admin) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_ADMIN);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEADMIN);
+	}
 
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OP);
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOP);
-    if (ircd->halfop) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
-    }
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOICE);
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_OP);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEOP);
+	if (ircd->halfop) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_HALFOP);
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEHALFOP);
+	}
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_VOICE);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_DEVOICE);
 }
 
 /**
@@ -116,256 +116,256 @@ void myChanServHelp(User * u)
 
 int do_op(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_OP]);
+	return do_util(u, &csmodeutils[MUT_OP]);
 }
 
 /*************************************************************************/
 
 int do_deop(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_DEOP]);
+	return do_util(u, &csmodeutils[MUT_DEOP]);
 }
 
 /*************************************************************************/
 
 int do_voice(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_VOICE]);
+	return do_util(u, &csmodeutils[MUT_VOICE]);
 }
 
 /*************************************************************************/
 
 int do_devoice(User * u)
 {
-    return do_util(u, &csmodeutils[MUT_DEVOICE]);
+	return do_util(u, &csmodeutils[MUT_DEVOICE]);
 }
 
 /*************************************************************************/
 
 int do_halfop(User * u)
 {
-    if (ircd->halfop) {
-        return do_util(u, &csmodeutils[MUT_HALFOP]);
-    } else {
-        return MOD_CONT;
-    }
+	if (ircd->halfop) {
+		return do_util(u, &csmodeutils[MUT_HALFOP]);
+	} else {
+		return MOD_CONT;
+	}
 }
 
 /*************************************************************************/
 
 int do_dehalfop(User * u)
 {
-    if (ircd->halfop) {
-        return do_util(u, &csmodeutils[MUT_DEHALFOP]);
-    } else {
-        return MOD_CONT;
-    }
+	if (ircd->halfop) {
+		return do_util(u, &csmodeutils[MUT_DEHALFOP]);
+	} else {
+		return MOD_CONT;
+	}
 }
 
 /*************************************************************************/
 
 int do_protect(User * u)
 {
-    if (ircd->protect || ircd->admin) {
-        return do_util(u, &csmodeutils[MUT_PROTECT]);
-    } else {
-        return MOD_CONT;
-    }
+	if (ircd->protect || ircd->admin) {
+		return do_util(u, &csmodeutils[MUT_PROTECT]);
+	} else {
+		return MOD_CONT;
+	}
 }
 
 /*************************************************************************/
 
 int do_deprotect(User * u)
 {
-    if (ircd->protect || ircd->admin) {
-        return do_util(u, &csmodeutils[MUT_DEPROTECT]);
-    } else {
-        return MOD_CONT;
-    }
+	if (ircd->protect || ircd->admin) {
+		return do_util(u, &csmodeutils[MUT_DEPROTECT]);
+	} else {
+		return MOD_CONT;
+	}
 }
 
 /*************************************************************************/
 
 int do_owner(User * u)
 {
-    const char *av[2];
-    char *chan = strtok(NULL, " ");
+	const char *av[2];
+	char *chan = strtok(NULL, " ");
 
-    Channel *c;
-    ChannelInfo *ci;
-    struct u_chanlist *uc;
+	Channel *c;
+	ChannelInfo *ci;
+	struct u_chanlist *uc;
 
-    if (!ircd->owner) {
-        return MOD_CONT;
-    }
+	if (!ircd->owner) {
+		return MOD_CONT;
+	}
 
-    if (!chan) {
-        av[0] = ircd->ownerset;
-        av[1] = u->nick;
+	if (!chan) {
+		av[0] = ircd->ownerset;
+		av[1] = u->nick;
 
-        /* Sets the mode to the user on every channels he is on. */
+		/* Sets the mode to the user on every channels he is on. */
 
-        for (uc = u->chans; uc; uc = uc->next) {
-            if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
-                && is_founder(u, ci)) {
-                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
-                               av[0], u->nick);
-                chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
-            }
-        }
+		for (uc = u->chans; uc; uc = uc->next) {
+			if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
+				&& is_founder(u, ci)) {
+				ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
+							   av[0], u->nick);
+				chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
+			}
+		}
 
-        return MOD_CONT;
-    }
+		return MOD_CONT;
+	}
 
-    if (!(c = findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-    } else if (!(ci = c->ci)) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (!is_on_chan(c, u)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
-    } else if (!is_founder(u, ci)) {
-        notice_lang(s_ChanServ, u, ACCESS_DENIED);
-    } else {
-        ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerset,
-                       u->nick);
+	if (!(c = findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+	} else if (!(ci = c->ci)) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
+	} else if (!is_on_chan(c, u)) {
+		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
+	} else if (!is_founder(u, ci)) {
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+	} else {
+		ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerset,
+					   u->nick);
 
-        av[0] = ircd->ownerset;
-        av[1] = u->nick;
-        chan_set_modes(s_ChanServ, c, 2, av, 1);
-    }
-    return MOD_CONT;
+		av[0] = ircd->ownerset;
+		av[1] = u->nick;
+		chan_set_modes(s_ChanServ, c, 2, av, 1);
+	}
+	return MOD_CONT;
 }
 
 /*************************************************************************/
 
 int do_deowner(User * u)
 {
-    const char *av[2];
-    char *chan = strtok(NULL, " ");
+	const char *av[2];
+	char *chan = strtok(NULL, " ");
 
-    Channel *c;
-    ChannelInfo *ci;
-    struct u_chanlist *uc;
+	Channel *c;
+	ChannelInfo *ci;
+	struct u_chanlist *uc;
 
-    if (!ircd->owner) {
-        return MOD_CONT;
-    }
+	if (!ircd->owner) {
+		return MOD_CONT;
+	}
 
-    if (!chan) {
-        av[0] = ircd->ownerunset;
-        av[1] = u->nick;
+	if (!chan) {
+		av[0] = ircd->ownerunset;
+		av[1] = u->nick;
 
-        /* Sets the mode to the user on every channels he is on. */
+		/* Sets the mode to the user on every channels he is on. */
 
-        for (uc = u->chans; uc; uc = uc->next) {
-            if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
-                && is_founder(u, ci)) {
-                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
-                               av[0], u->nick);
-                chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
-            }
-        }
+		for (uc = u->chans; uc; uc = uc->next) {
+			if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
+				&& is_founder(u, ci)) {
+				ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
+							   av[0], u->nick);
+				chan_set_modes(s_ChanServ, uc->chan, 2, av, 1);
+			}
+		}
 
-        return MOD_CONT;
-    }
+		return MOD_CONT;
+	}
 
-    if (!(c = findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-    } else if (!(ci = c->ci)) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (!is_on_chan(c, u)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
-    } else if (!is_founder(u, ci)) {
-        notice_lang(s_ChanServ, u, ACCESS_DENIED);
-    } else {
-        ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
-                       u->nick);
+	if (!(c = findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+	} else if (!(ci = c->ci)) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
+	} else if (!is_on_chan(c, u)) {
+		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u->nick, c->name);
+	} else if (!is_founder(u, ci)) {
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+	} else {
+		ircdproto->SendMode(whosends(ci), c->name, "%s %s", ircd->ownerunset,
+					   u->nick);
 
-        av[0] = ircd->ownerunset;
-        av[1] = u->nick;
-        chan_set_modes(s_ChanServ, c, 2, av, 1);
-    }
-    return MOD_CONT;
+		av[0] = ircd->ownerunset;
+		av[1] = u->nick;
+		chan_set_modes(s_ChanServ, c, 2, av, 1);
+	}
+	return MOD_CONT;
 }
 
 /* do_util: not a command, but does the job of other */
 
 int do_util(User * u, CSModeUtil * util)
 {
-    const char *av[2];
-    char *chan = strtok(NULL, " ");
-    char *nick = strtok(NULL, " ");
+	const char *av[2];
+	char *chan = strtok(NULL, " ");
+	char *nick = strtok(NULL, " ");
 
-    Channel *c;
-    ChannelInfo *ci;
-    User *u2;
+	Channel *c;
+	ChannelInfo *ci;
+	User *u2;
 
-    int is_same;
+	int is_same;
 
-    if (!chan) {
-        struct u_chanlist *uc;
+	if (!chan) {
+		struct u_chanlist *uc;
 
-        av[0] = util->mode;
-        av[1] = u->nick;
+		av[0] = util->mode;
+		av[1] = u->nick;
 
-        /* Sets the mode to the user on every channels he is on. */
+		/* Sets the mode to the user on every channels he is on. */
 
-        for (uc = u->chans; uc; uc = uc->next) {
-            if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
-                && check_access(u, ci, util->levelself)) {
-                ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
-                               util->mode, u->nick);
-                chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
+		for (uc = u->chans; uc; uc = uc->next) {
+			if ((ci = uc->chan->ci) && !(ci->flags & CI_VERBOTEN)
+				&& check_access(u, ci, util->levelself)) {
+				ircdproto->SendMode(whosends(ci), uc->chan->name, "%s %s",
+							   util->mode, u->nick);
+				chan_set_modes(s_ChanServ, uc->chan, 2, av, 2);
 
-                if (util->notice && ci->flags & util->notice)
-                    ircdproto->SendMessage(whosends(ci), uc->chan->name,
-                           "%s command used for %s by %s", util->name,
-                           u->nick, u->nick);
-            }
-        }
+				if (util->notice && ci->flags & util->notice)
+					ircdproto->SendMessage(whosends(ci), uc->chan->name,
+						   "%s command used for %s by %s", util->name,
+						   u->nick, u->nick);
+			}
+		}
 
-        return MOD_CONT;
-    } else if (!nick) {
-        nick = u->nick;
-    }
+		return MOD_CONT;
+	} else if (!nick) {
+		nick = u->nick;
+	}
 
-    is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick) == 0);
+	is_same = (nick == u->nick) ? 1 : (stricmp(nick, u->nick) == 0);
 
-    if (!(c = findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
-    } else if (!(ci = c->ci)) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
-    } else if (is_same ? !(u2 = u) : !(u2 = finduser(nick))) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
-    } else if (!is_on_chan(c, u2)) {
-        notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
-    } else if (is_same ? !check_access(u, ci, util->levelself) :
-               !check_access(u, ci, util->level)) {
-        notice_lang(s_ChanServ, u, ACCESS_DENIED);
-    } else if (*util->mode == '-' && !is_same && (ci->flags & CI_PEACE)
-               && (get_access(u2, ci) >= get_access(u, ci))) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-    } else if (*util->mode == '-' && is_protected(u2) && !is_same) {
-        notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-    } else {
-        ircdproto->SendMode(whosends(ci), c->name, "%s %s", util->mode,
-                       u2->nick);
+	if (!(c = findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, chan);
+	} else if (!(ci = c->ci)) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, c->name);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, ci->name);
+	} else if (is_same ? !(u2 = u) : !(u2 = finduser(nick))) {
+		notice_lang(s_ChanServ, u, NICK_X_NOT_IN_USE, nick);
+	} else if (!is_on_chan(c, u2)) {
+		notice_lang(s_ChanServ, u, NICK_X_NOT_ON_CHAN, u2->nick, c->name);
+	} else if (is_same ? !check_access(u, ci, util->levelself) :
+			   !check_access(u, ci, util->level)) {
+		notice_lang(s_ChanServ, u, ACCESS_DENIED);
+	} else if (*util->mode == '-' && !is_same && (ci->flags & CI_PEACE)
+			   && (get_access(u2, ci) >= get_access(u, ci))) {
+		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+	} else if (*util->mode == '-' && is_protected(u2) && !is_same) {
+		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
+	} else {
+		ircdproto->SendMode(whosends(ci), c->name, "%s %s", util->mode,
+					   u2->nick);
 
-        av[0] = util->mode;
-        av[1] = u2->nick;
-        chan_set_modes(s_ChanServ, c, 2, av, 2);
+		av[0] = util->mode;
+		av[1] = u2->nick;
+		chan_set_modes(s_ChanServ, c, 2, av, 2);
 
-        if (util->notice && ci->flags & util->notice)
-            ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
-                   util->name, u2->nick, u->nick);
-    }
-    return MOD_CONT;
+		if (util->notice && ci->flags & util->notice)
+			ircdproto->SendMessage(whosends(ci), c->name, "%s command used for %s by %s",
+				   util->name, u2->nick, u->nick);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("cs_modes", CSModes)

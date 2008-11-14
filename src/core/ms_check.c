@@ -42,7 +42,7 @@ class MSCheck : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CHECK);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_CHECK);
 }
 
 /**
@@ -52,56 +52,56 @@ void myMemoServHelp(User * u)
  **/
 int do_memocheck(User * u)
 {
-    NickAlias *na = NULL;
-    MemoInfo *mi = NULL;
-    int i, found = 0;
-    char *recipient = strtok(NULL, "");
-    struct tm *tm;
-    char timebuf[64];
+	NickAlias *na = NULL;
+	MemoInfo *mi = NULL;
+	int i, found = 0;
+	char *recipient = strtok(NULL, "");
+	struct tm *tm;
+	char timebuf[64];
 
-    if (!recipient) {
-        syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
-        return MOD_CONT;
-    } else if (!nick_recognized(u)) {
-        notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-        return MOD_CONT;
-    } else if (!(na = findnick(recipient))) {
-        notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
-        return MOD_CONT;
-    }
+	if (!recipient) {
+		syntax_error(s_MemoServ, u, "CHECK", MEMO_CHECK_SYNTAX);
+		return MOD_CONT;
+	} else if (!nick_recognized(u)) {
+		notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+		return MOD_CONT;
+	} else if (!(na = findnick(recipient))) {
+		notice_lang(s_MemoServ, u, NICK_X_NOT_REGISTERED, recipient);
+		return MOD_CONT;
+	}
 
-    if ((na->status & NS_VERBOTEN)) {
-        notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
-        return MOD_CONT;
-    }
+	if ((na->status & NS_VERBOTEN)) {
+		notice_lang(s_MemoServ, u, NICK_X_FORBIDDEN, recipient);
+		return MOD_CONT;
+	}
 
-    mi = &na->nc->memos;
+	mi = &na->nc->memos;
 
 /* Okay, I know this looks strange but we wanna get the LAST memo, so we
-    have to loop backwards */
+	have to loop backwards */
 
-    for (i = (mi->memocount - 1); i >= 0; i--) {
-        if (!stricmp(mi->memos[i].sender, u->na->nc->display)) {
-            found = 1;          /* Yes, we've found the memo */
+	for (i = (mi->memocount - 1); i >= 0; i--) {
+		if (!stricmp(mi->memos[i].sender, u->na->nc->display)) {
+			found = 1;		  /* Yes, we've found the memo */
 
-            tm = localtime(&mi->memos[i].time);
-            strftime_lang(timebuf, sizeof(timebuf), u,
-                          STRFTIME_DATE_TIME_FORMAT, tm);
+			tm = localtime(&mi->memos[i].time);
+			strftime_lang(timebuf, sizeof(timebuf), u,
+						  STRFTIME_DATE_TIME_FORMAT, tm);
 
-            if (mi->memos[i].flags & MF_UNREAD)
-                notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
-                            timebuf);
-            else
-                notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick,
-                            timebuf);
-            break;
-        }
-    }
+			if (mi->memos[i].flags & MF_UNREAD)
+				notice_lang(s_MemoServ, u, MEMO_CHECK_NOT_READ, na->nick,
+							timebuf);
+			else
+				notice_lang(s_MemoServ, u, MEMO_CHECK_READ, na->nick,
+							timebuf);
+			break;
+		}
+	}
 
-    if (!found)
-        notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
+	if (!found)
+		notice_lang(s_MemoServ, u, MEMO_CHECK_NO_MEMO, na->nick);
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_check", MSCheck)

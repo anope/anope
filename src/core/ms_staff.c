@@ -42,9 +42,9 @@ class MSStaff : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    if (is_services_oper(u)) {
-        notice_lang(s_MemoServ, u, MEMO_HELP_CMD_STAFF);
-    }
+	if (is_services_oper(u)) {
+		notice_lang(s_MemoServ, u, MEMO_HELP_CMD_STAFF);
+	}
 }
 
 /**
@@ -54,28 +54,28 @@ void myMemoServHelp(User * u)
  **/
 int do_staff(User * u)
 {
-    NickCore *nc;
-    int i, z = 0;
-    char *text = strtok(NULL, "");
+	NickCore *nc;
+	int i, z = 0;
+	char *text = strtok(NULL, "");
 
-    if (readonly) {
-        notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
-        return MOD_CONT;
-    } else if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
-        notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
-        return MOD_CONT;
-    } else if (text == NULL) {
-        syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
-        return MOD_CONT;
-    }
+	if (readonly) {
+		notice_lang(s_MemoServ, u, MEMO_SEND_DISABLED);
+		return MOD_CONT;
+	} else if (checkDefCon(DEFCON_NO_NEW_MEMOS)) {
+		notice_lang(s_MemoServ, u, OPER_DEFCON_DENIED);
+		return MOD_CONT;
+	} else if (text == NULL) {
+		syntax_error(s_MemoServ, u, "SEND", MEMO_SEND_SYNTAX);
+		return MOD_CONT;
+	}
 
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            if (nick_is_services_oper(nc))
-                memo_send(u, nc->display, text, z);
-        }
-    }
-    return MOD_CONT;
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			if (nick_is_services_oper(nc))
+				memo_send(u, nc->display, text, z);
+		}
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_staff", MSStaff)

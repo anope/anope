@@ -43,9 +43,9 @@ class OSKick : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_oper(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
-    }
+	if (is_services_oper(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_KICK);
+	}
 }
 
 /**
@@ -55,35 +55,35 @@ void myOperServHelp(User * u)
  **/
 int do_os_kick(User * u)
 {
-    const char *argv[3];
-    char *chan, *nick, *s;
-    Channel *c;
+	const char *argv[3];
+	char *chan, *nick, *s;
+	Channel *c;
 
-    chan = strtok(NULL, " ");
-    nick = strtok(NULL, " ");
-    s = strtok(NULL, "");
-    if (!chan || !nick || !s) {
-        syntax_error(s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
-        return MOD_CONT;
-    }
-    if (!(c = findchan(chan))) {
-        notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
-    } else if (c->bouncy_modes) {
-        notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
-        return MOD_CONT;
-    }
-    ircdproto->SendKick(findbot(s_OperServ), chan, nick, "%s (%s)", u->nick, s);
-    if (WallOSKick)
-        ircdproto->SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick,
-                         nick, chan);
-    argv[0] = sstrdup(chan);
-    argv[1] = sstrdup(nick);
-    argv[2] = sstrdup(s);
-    do_kick(s_OperServ, 3, argv);
-    free((void *)argv[2]);
-    free((void *)argv[1]);
-    free((void *)argv[0]);
-    return MOD_CONT;
+	chan = strtok(NULL, " ");
+	nick = strtok(NULL, " ");
+	s = strtok(NULL, "");
+	if (!chan || !nick || !s) {
+		syntax_error(s_OperServ, u, "KICK", OPER_KICK_SYNTAX);
+		return MOD_CONT;
+	}
+	if (!(c = findchan(chan))) {
+		notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, chan);
+	} else if (c->bouncy_modes) {
+		notice_lang(s_OperServ, u, OPER_BOUNCY_MODES_U_LINE);
+		return MOD_CONT;
+	}
+	ircdproto->SendKick(findbot(s_OperServ), chan, nick, "%s (%s)", u->nick, s);
+	if (WallOSKick)
+		ircdproto->SendGlobops(s_OperServ, "%s used KICK on %s/%s", u->nick,
+						 nick, chan);
+	argv[0] = sstrdup(chan);
+	argv[1] = sstrdup(nick);
+	argv[2] = sstrdup(s);
+	do_kick(s_OperServ, 3, argv);
+	free((void *)argv[2]);
+	free((void *)argv[1]);
+	free((void *)argv[0]);
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_kick", OSKick)

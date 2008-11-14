@@ -105,7 +105,7 @@
 
 #ifdef _WIN32
 /* VS2008 hates having this define before its own */
-#define vsnprintf               _vsnprintf
+#define vsnprintf			   _vsnprintf
 #endif
 
 #if HAVE_STRINGS_H
@@ -337,9 +337,9 @@ struct ircdvars_ {
 	const char *adminset;				/* Mode to set for admin	*/
 	const char *adminunset;			/* Mode to unset for admin	*/
 	const char *modeonreg;			/* Mode on Register		*/
-	const char *rootmodeonid;                     /* Mode on ID for ROOTS         */
-	const char *adminmodeonid;                    /* Mode on ID for ADMINS        */
-	const char *opermodeonid;                     /* Mode on ID for OPERS         */
+	const char *rootmodeonid;					 /* Mode on ID for ROOTS		 */
+	const char *adminmodeonid;					/* Mode on ID for ADMINS		*/
+	const char *opermodeonid;					 /* Mode on ID for OPERS		 */
 	const char *modeonunreg;			/* Mode on Unregister		*/
 	const char *modeonnick;			/* Mode on nick change		*/
 	int sgline;				/* Supports SGline		*/
@@ -382,10 +382,10 @@ struct ircdvars_ {
 	char *chanmodes;			/* If the ircd sends CHANMODE in CAPAB this is where we store it */
 	int token;					/* Does Anope support the tokens for the ircd */
 	int sjb64;					/* Base 64 encode TIMESTAMP */
-    int invitemode;				/* +I  */
-    int sjoinbanchar;			/* use single quotes to define it */
-    int sjoinexchar;			/* use single quotes to define it */
-    int sjoininvchar;			/* use single quotes to define it */
+	int invitemode;				/* +I  */
+	int sjoinbanchar;			/* use single quotes to define it */
+	int sjoinexchar;			/* use single quotes to define it */
+	int sjoininvchar;			/* use single quotes to define it */
 	int svsmode_ucmode;			/* Can remove User Channel Modes with SVSMODE */
 	int sglineenforce;
 	const char *vhostchar;			/* char used for vhosting */
@@ -443,30 +443,30 @@ struct ircdcapab_ {
 /* Configuration directives */
 
 typedef struct {
-    const char *name;
-    struct {
-        int type;               /* PARAM_* below */
-        int flags;              /* Same */
-        void *ptr;              /* Pointer to where to store the value */
-    } params[MAXPARAMS];
+	const char *name;
+	struct {
+		int type;			   /* PARAM_* below */
+		int flags;			  /* Same */
+		void *ptr;			  /* Pointer to where to store the value */
+	} params[MAXPARAMS];
 } Directive;
 
 #define PARAM_NONE	0
 #define PARAM_INT	1
-#define PARAM_POSINT	2       /* Positive integer only */
-#define PARAM_PORT	3       /* 1..65535 only */
+#define PARAM_POSINT	2	   /* Positive integer only */
+#define PARAM_PORT	3	   /* 1..65535 only */
 #define PARAM_STRING	4
 #define PARAM_TIME	5
-#define PARAM_STRING_ARRAY 6    /* Array of string */
-#define PARAM_SET	-1      /* Not a real parameter; just set the
-                                 *    given integer variable to 1 */
-#define PARAM_DEPRECATED -2     /* Set for deprecated directives; `ptr'
-                                 *    is a function pointer to call */
+#define PARAM_STRING_ARRAY 6	/* Array of string */
+#define PARAM_SET	-1	  /* Not a real parameter; just set the
+								 *	given integer variable to 1 */
+#define PARAM_DEPRECATED -2	 /* Set for deprecated directives; `ptr'
+								 *	is a function pointer to call */
 
 /* Flags: */
 #define PARAM_OPTIONAL	0x01
 /*#define PARAM_FULLONLY	0x02   unused */
-#define PARAM_RELOAD    0x04    /* Directive is reloadable */
+#define PARAM_RELOAD	0x04	/* Directive is reloadable */
 
 /*************************************************************************/
 
@@ -503,20 +503,20 @@ struct ModuleData_ {
  * we encapsulate memo data in a MemoList to make it easier to handle. */
 
 struct memo_ {
-    uint32 number;	/* Index number -- not necessarily array position! */
-    uint16 flags;
-    time_t time;	/* When it was sent */
-    char sender[NICKMAX];
-    char *text;
-    ModuleData *moduleData; 	/* Module saved data attached to the Memo */
+	uint32 number;	/* Index number -- not necessarily array position! */
+	uint16 flags;
+	time_t time;	/* When it was sent */
+	char sender[NICKMAX];
+	char *text;
+	ModuleData *moduleData; 	/* Module saved data attached to the Memo */
 #ifdef USE_MYSQL
 	uint32 id;		/* Database ID; see mysql.c */
 #endif
 };
 
 typedef struct {
-    int16 memocount, memomax;
-    Memo *memos;
+	int16 memocount, memomax;
+	Memo *memos;
 } MemoInfo;
 
 
@@ -535,10 +535,10 @@ typedef struct {
 
 /* Access levels for users. */
 typedef struct {
-    uint16 in_use;	/* 1 if this entry is in use, else 0 */
-    int16 level;
-    NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
-    time_t last_seen;
+	uint16 in_use;	/* 1 if this entry is in use, else 0 */
+	int16 level;
+	NickCore *nc;	/* Guaranteed to be non-NULL if in use, NULL if not */
+	time_t last_seen;
 } ChanAccess;
 
 /* Note that these two levels also serve as exclusive boundaries for valid
@@ -557,28 +557,28 @@ typedef struct {
 /* Levels for xOP */
 
 #define ACCESS_VOP		3
-#define ACCESS_HOP      	4
+#define ACCESS_HOP	  	4
 #define ACCESS_AOP		5
 #define ACCESS_SOP		10
 
 /* AutoKick data. */
 typedef struct {
-    int16 in_use;   /* Always 0 if not in use */
-    int16 is_nick;	/* 1 if a regged nickname, 0 if a nick!user@host mask */
-    uint16 flags;
-    union {
+	int16 in_use;   /* Always 0 if not in use */
+	int16 is_nick;	/* 1 if a regged nickname, 0 if a nick!user@host mask */
+	uint16 flags;
+	union {
 		char *mask;		/* Guaranteed to be non-NULL if in use, NULL if not */
 		NickCore *nc;	/* Same */
-    } u;
-    char *reason;
+	} u;
+	char *reason;
 
-    char *creator;
-    time_t addtime;
+	char *creator;
+	time_t addtime;
 } AutoKick;
 
 #define AK_USED		0x0001
 #define AK_ISNICK	0x0002
-#define AK_STUCK    	0x0004
+#define AK_STUCK		0x0004
 
 /* Structure used to contain bad words. */
 
@@ -595,60 +595,60 @@ struct badword_ {
 
 
 struct chaninfo_ {
-    ChannelInfo *next, *prev;
-    char name[CHANMAX];
-    NickCore *founder;
-    NickCore *successor;		/* Who gets the channel if the founder
+	ChannelInfo *next, *prev;
+	char name[CHANMAX];
+	NickCore *founder;
+	NickCore *successor;		/* Who gets the channel if the founder
 					 			 * nick is dropped or expires */
-    char founderpass[PASSMAX];
-    char *desc;
-    char *url;
-    char *email;
+	char founderpass[PASSMAX];
+	char *desc;
+	char *url;
+	char *email;
 
-    time_t time_registered;
-    time_t last_used;
-    char *last_topic;			/* Last topic on the channel */
-    char last_topic_setter[NICKMAX];	/* Who set the last topic */
-    time_t last_topic_time;		/* When the last topic was set */
+	time_t time_registered;
+	time_t last_used;
+	char *last_topic;			/* Last topic on the channel */
+	char last_topic_setter[NICKMAX];	/* Who set the last topic */
+	time_t last_topic_time;		/* When the last topic was set */
 
-    uint32 flags;				/* See below */
-    char *forbidby;
-    char *forbidreason;
+	uint32 flags;				/* See below */
+	char *forbidby;
+	char *forbidreason;
 
-    int16 bantype;
-    int16 *levels;				/* Access levels for commands */
+	int16 bantype;
+	int16 *levels;				/* Access levels for commands */
 
-    uint16 accesscount;
-    ChanAccess *access;			/* List of authorized users */
-    uint16 akickcount;
-    AutoKick *akick;			/* List of users to kickban */
+	uint16 accesscount;
+	ChanAccess *access;			/* List of authorized users */
+	uint16 akickcount;
+	AutoKick *akick;			/* List of users to kickban */
 
-    uint32 mlock_on, mlock_off;		/* See channel modes below */
-    uint32 mlock_limit;			/* 0 if no limit */
-    char *mlock_key;			/* NULL if no key */
-    char *mlock_flood;			/* NULL if no +f */
-    char *mlock_redirect;		/* NULL if no +L */
+	uint32 mlock_on, mlock_off;		/* See channel modes below */
+	uint32 mlock_limit;			/* 0 if no limit */
+	char *mlock_key;			/* NULL if no key */
+	char *mlock_flood;			/* NULL if no +f */
+	char *mlock_redirect;		/* NULL if no +L */
 
-    char *entry_message;		/* Notice sent on entering channel */
+	char *entry_message;		/* Notice sent on entering channel */
 
-    MemoInfo memos;
+	MemoInfo memos;
 
-    struct channel_ *c;			/* Pointer to channel record (if   *
-					 			 *    channel is currently in use) */
+	struct channel_ *c;			/* Pointer to channel record (if   *
+					 			 *	channel is currently in use) */
 
-    ModuleData *moduleData; 	/* Module saved data attached to the ChannelInfo */
+	ModuleData *moduleData; 	/* Module saved data attached to the ChannelInfo */
 
-    /* For BotServ */
+	/* For BotServ */
 
-    BotInfo *bi;					/* Bot used on this channel */
-    uint32 botflags;				/* BS_* below */
-    int16 *ttb;						/* Times to ban for each kicker */
+	BotInfo *bi;					/* Bot used on this channel */
+	uint32 botflags;				/* BS_* below */
+	int16 *ttb;						/* Times to ban for each kicker */
 
-    uint16 bwcount;
-    BadWord *badwords;				/* For BADWORDS kicker */
-    int16 capsmin, capspercent;		/* For CAPS kicker */
-    int16 floodlines, floodsecs;	/* For FLOOD kicker */
-    int16 repeattimes;				/* For REPEAT kicker */
+	uint16 bwcount;
+	BadWord *badwords;				/* For BADWORDS kicker */
+	int16 capsmin, capspercent;		/* For CAPS kicker */
+	int16 floodlines, floodsecs;	/* For FLOOD kicker */
+	int16 repeattimes;				/* For REPEAT kicker */
 };
 
 /* Retain topic even after last person leaves channel */
@@ -703,43 +703,43 @@ struct chaninfo_ {
 #define CA_NOJOIN			10	/* Maximum */
 #define CA_ACCESS_CHANGE 		11
 #define CA_MEMO				12
-#define CA_ASSIGN       		13  /* BotServ ASSIGN command */
-#define CA_BADWORDS     		14  /* BotServ BADWORDS command */
-#define CA_NOKICK       		15  /* Not kicked by the bot */
+#define CA_ASSIGN	   		13  /* BotServ ASSIGN command */
+#define CA_BADWORDS	 		14  /* BotServ BADWORDS command */
+#define CA_NOKICK	   		15  /* Not kicked by the bot */
 #define CA_FANTASIA   			16
 #define CA_SAY				17
-#define CA_GREET            		18
+#define CA_GREET					18
 #define CA_VOICEME			19
 #define CA_VOICE			20
-#define CA_GETKEY           		21
+#define CA_GETKEY		   		21
 #define CA_AUTOHALFOP			22
 #define CA_AUTOPROTECT			23
-#define CA_OPDEOPME         		24
-#define CA_HALFOPME         		25
-#define CA_HALFOP           		26
-#define CA_PROTECTME        		27
-#define CA_PROTECT          		28
-#define CA_KICKME           		29
-#define CA_KICK             		30
+#define CA_OPDEOPME		 		24
+#define CA_HALFOPME		 		25
+#define CA_HALFOP		   		26
+#define CA_PROTECTME				27
+#define CA_PROTECT		  		28
+#define CA_KICKME		   		29
+#define CA_KICK			 		30
 #define CA_SIGNKICK			31
-/* #define CA_AUTOADMIN        		32
-#define CA_ADMINME          		33
-#define CA_ADMIN            		34 */
+/* #define CA_AUTOADMIN				32
+#define CA_ADMINME		  		33
+#define CA_ADMIN					34 */
 	/* Why are these commented out and not removed? -GD */
-#define CA_BANME            		32
-#define CA_BAN              		33
-#define CA_TOPIC            		34
-#define CA_INFO             		35
+#define CA_BANME					32
+#define CA_BAN			  		33
+#define CA_TOPIC					34
+#define CA_INFO			 		35
 
 #define CA_SIZE		36
 
 /* BotServ SET flags */
-#define BS_DONTKICKOPS      	0x00000001
+#define BS_DONTKICKOPS	  	0x00000001
 #define BS_DONTKICKVOICES   	0x00000002
-#define BS_FANTASY          	0x00000004
-#define BS_SYMBIOSIS        	0x00000008
-#define BS_GREET            	0x00000010
-#define BS_NOBOT            	0x00000020
+#define BS_FANTASY		  	0x00000004
+#define BS_SYMBIOSIS			0x00000008
+#define BS_GREET				0x00000010
+#define BS_NOBOT				0x00000020
 
 /* BotServ Kickers flags */
 #define BS_KICK_BOLDS 		0x80000000
@@ -776,9 +776,9 @@ struct csmodeutil_ {
 };
 
 typedef struct {
-    int what;
-    const char *name;
-    int desc;
+	int what;
+	const char *name;
+	int desc;
 } LevelInfo;
 
 
@@ -787,23 +787,23 @@ typedef struct {
 /* Server data */
 
 typedef enum {
-	SSYNC_UNKNOWN       = 0,	/* We can't get the sync state   */
+	SSYNC_UNKNOWN	   = 0,	/* We can't get the sync state   */
 	SSYNC_IN_PROGRESS   = 1,	/* Sync is currently in progress */
-	SSYNC_DONE          = 2		/* We're in sync                 */
+	SSYNC_DONE		  = 2		/* We're in sync				 */
 } SyncState;
 
 struct server_ {
-    Server *next, *prev;
+	Server *next, *prev;
 
-    char *name;     /* Server name                        */
-    uint16 hops;    /* Hops between services and server   */
-    char *desc;     /* Server description                 */
-    uint16 flags;   /* Some info flags, as defined below  */
-    char *suid;     /* Server Univeral ID                 */
-    SyncState sync; /* Server sync state (see above)      */
+	char *name;	 /* Server name						*/
+	uint16 hops;	/* Hops between services and server   */
+	char *desc;	 /* Server description				 */
+	uint16 flags;   /* Some info flags, as defined below  */
+	char *suid;	 /* Server Univeral ID				 */
+	SyncState sync; /* Server sync state (see above)	  */
 
-    Server *links;	/* Linked list head for linked servers 	  */
-    Server *uplink;	/* Server which pretends to be the uplink */
+	Server *links;	/* Linked list head for linked servers 	  */
+	Server *uplink;	/* Server which pretends to be the uplink */
 };
 
 #define SERVER_ISME  0x0001
@@ -824,7 +824,7 @@ struct cbmode_ {
 
 #define CBM_MINUS_NO_ARG 	0x0001		/* No argument for unset */
 #define CBM_NO_MLOCK		0x0002		/* Can't be MLOCKed */
-#define CBM_NO_USER_MLOCK   	0x0004      	/* Can't be MLOCKed by non-opers */
+#define CBM_NO_USER_MLOCK   	0x0004	  	/* Can't be MLOCKed by non-opers */
 
 struct cbmodeinfo_ {
 	char mode;				/* The mode */
@@ -857,40 +857,40 @@ struct cumode_ {
  */
 
 struct bandata_ {
-    BanData *next, *prev;
+	BanData *next, *prev;
 
-    char *mask;				/* Since a nick is unsure and a User structure
-    					   	   is unsafe */
-    time_t last_use;		/* Since time is the only way to check
-    					   	   whether it's still useful */
-    int16 ttb[TTB_SIZE];
+	char *mask;				/* Since a nick is unsure and a User structure
+						   	   is unsafe */
+	time_t last_use;		/* Since time is the only way to check
+						   	   whether it's still useful */
+	int16 ttb[TTB_SIZE];
 };
 
 /* This structure stocks information on every user that will be used by
  * BotServ. */
 
 struct userdata_ {
-    /* Data validity */
-    time_t last_use;
+	/* Data validity */
+	time_t last_use;
 
-    /* for flood kicker */
-    int16 lines;
-    time_t last_start;
+	/* for flood kicker */
+	int16 lines;
+	time_t last_start;
 
-    /* for repeat kicker */
-    char *lastline;
-    int16 times;
+	/* for repeat kicker */
+	char *lastline;
+	int16 times;
 };
 
 /* Channelban type flags */
-#define ENTRYTYPE_NONE           0x00000000
-#define ENTRYTYPE_CIDR4          0x00000001
-#define ENTRYTYPE_NICK_WILD      0x00000004
-#define ENTRYTYPE_NICK           0x00000008
-#define ENTRYTYPE_USER_WILD      0x00000010
-#define ENTRYTYPE_USER           0x00000020
-#define ENTRYTYPE_HOST_WILD      0x00000040
-#define ENTRYTYPE_HOST           0x00000080
+#define ENTRYTYPE_NONE		   0x00000000
+#define ENTRYTYPE_CIDR4		  0x00000001
+#define ENTRYTYPE_NICK_WILD	  0x00000004
+#define ENTRYTYPE_NICK		   0x00000008
+#define ENTRYTYPE_USER_WILD	  0x00000010
+#define ENTRYTYPE_USER		   0x00000020
+#define ENTRYTYPE_HOST_WILD	  0x00000040
+#define ENTRYTYPE_HOST		   0x00000080
 
 struct c_userlist {
 	struct c_userlist *next, *prev;
@@ -899,33 +899,33 @@ struct c_userlist {
 };
 
 struct channel_ {
-    Channel *next, *prev;
-    char name[CHANMAX];
-    ChannelInfo *ci;			/* Corresponding ChannelInfo */
-    time_t creation_time;		/* When channel was created */
-    char *topic;
-    char topic_setter[NICKMAX];		/* Who set the topic */
-    time_t topic_time;			/* When topic was set */
-    uint32 mode;			/* Binary modes only */
-    uint32 limit;			/* 0 if none */
-    char *key;				/* NULL if none */
-    char *redirect;			/* +L; NULL if none */
-    char *flood;			/* +f; NULL if none */
-    EList *bans;
-    EList *excepts;
-    EList *invites;
+	Channel *next, *prev;
+	char name[CHANMAX];
+	ChannelInfo *ci;			/* Corresponding ChannelInfo */
+	time_t creation_time;		/* When channel was created */
+	char *topic;
+	char topic_setter[NICKMAX];		/* Who set the topic */
+	time_t topic_time;			/* When topic was set */
+	uint32 mode;			/* Binary modes only */
+	uint32 limit;			/* 0 if none */
+	char *key;				/* NULL if none */
+	char *redirect;			/* +L; NULL if none */
+	char *flood;			/* +f; NULL if none */
+	EList *bans;
+	EList *excepts;
+	EList *invites;
 
 	struct c_userlist *users;
-    int16 usercount;
+	int16 usercount;
 
-    BanData *bd;
+	BanData *bd;
 
-    time_t server_modetime;		/* Time of last server MODE */
-    time_t chanserv_modetime;	/* Time of last check_modes() */
-    int16 server_modecount;		/* Number of server MODEs this second */
-    int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
-    int16 bouncy_modes;			/* Did we fail to set modes here? */
-	int16 topic_sync;           /* Is the topic in sync? */
+	time_t server_modetime;		/* Time of last server MODE */
+	time_t chanserv_modetime;	/* Time of last check_modes() */
+	int16 server_modecount;		/* Number of server MODEs this second */
+	int16 chanserv_modecount;	/* Number of check_mode()'s this sec */
+	int16 bouncy_modes;			/* Did we fail to set modes here? */
+	int16 topic_sync;		   /* Is the topic in sync? */
 };
 
 struct c_elist {
@@ -934,11 +934,11 @@ struct c_elist {
 };
 
 struct c_elist_entry {
-    Entry *next, *prev;
-    uint32 type;
-    uint32 cidr_ip;             /* IP mask for CIDR matching */
-    uint32 cidr_mask;           /* Netmask for CIDR matching */
-    char *nick, *user, *host, *mask;
+	Entry *next, *prev;
+	uint32 type;
+	uint32 cidr_ip;			 /* IP mask for CIDR matching */
+	uint32 cidr_mask;		   /* Netmask for CIDR matching */
+	char *nick, *user, *host, *mask;
 };
 
 /*************************************************************************/
@@ -954,9 +954,9 @@ struct c_elist_entry {
 /* Ignorance list data. */
 
 typedef struct ignore_data {
-    struct ignore_data *prev, *next;
-    char *mask;
-    time_t time;	/* When do we stop ignoring them? */
+	struct ignore_data *prev, *next;
+	char *mask;
+	time_t time;	/* When do we stop ignoring them? */
 } IgnoreData;
 
 /*************************************************************************/
@@ -1001,58 +1001,58 @@ struct sxline_ {
 /* Host serv structures */
 
 struct hostcore_ {
-    HostCore *next;
-    char *nick;				/* Owner of the vHost */
-    char *vIdent;			/* vIdent for the user */
-    char *vHost;			/* Vhost for this user */
-    char *creator;			/* Oper Nick of the oper who set the vhost */
-    time_t time;			/* Date/Time vHost was set */
+	HostCore *next;
+	char *nick;				/* Owner of the vHost */
+	char *vIdent;			/* vIdent for the user */
+	char *vHost;			/* Vhost for this user */
+	char *creator;			/* Oper Nick of the oper who set the vhost */
+	time_t time;			/* Date/Time vHost was set */
 };
 
 /*************************************************************************/
 
 struct newsitem_ {
-    uint16 type;
-    uint32 num;                  /* Numbering is separate for login and oper news */
-    char *text;
-    char who[NICKMAX];
-    time_t time;
+	uint16 type;
+	uint32 num;				  /* Numbering is separate for login and oper news */
+	char *text;
+	char who[NICKMAX];
+	time_t time;
 };
 
 /*************************************************************************/
 
 
 struct exception_ {
-    char *mask;                 /* Hosts to which this exception applies */
-    int limit;                  /* Session limit for exception */
-    char who[NICKMAX];          /* Nick of person who added the exception */
-    char *reason;               /* Reason for exception's addition */
-    time_t time;                /* When this exception was added */
-    time_t expires;             /* Time when it expires. 0 == no expiry */
-    int num;                    /* Position in exception list; used to track
-                                 * positions when deleting entries. It is
-                                 * symbolic and used internally. It is
-                                 * calculated at load time and never saved. */
+	char *mask;				 /* Hosts to which this exception applies */
+	int limit;				  /* Session limit for exception */
+	char who[NICKMAX];		  /* Nick of person who added the exception */
+	char *reason;			   /* Reason for exception's addition */
+	time_t time;				/* When this exception was added */
+	time_t expires;			 /* Time when it expires. 0 == no expiry */
+	int num;					/* Position in exception list; used to track
+								 * positions when deleting entries. It is
+								 * symbolic and used internally. It is
+								 * calculated at load time and never saved. */
 };
 
 /*************************************************************************/
 
 struct session_ {
-    Session *prev, *next;
-    char *host;
-    int count;                  /* Number of clients with this host */
-    int hits;                   /* Number of subsequent kills for a host */
+	Session *prev, *next;
+	char *host;
+	int count;				  /* Number of clients with this host */
+	int hits;				   /* Number of subsequent kills for a host */
 };
 
 /*************************************************************************/
 typedef struct ircd_modes_ {
-        int user_invis;
-        int user_oper;
-        int chan_invite;
-        int chan_secret;
-        int chan_private;
-        int chan_key;
-        int chan_limit;
+		int user_invis;
+		int user_oper;
+		int chan_invite;
+		int chan_secret;
+		int chan_private;
+		int chan_key;
+		int chan_limit;
 } IRCDModes;
 
 
@@ -1077,29 +1077,29 @@ typedef struct ircd_modes_ {
 /* Memo Flags */
 #define MF_UNREAD	0x0001	/* Memo has not yet been read */
 #define MF_RECEIPT	0x0002	/* Sender requested receipt */
-#define MF_NOTIFYS      0x0004  /* Memo is a notification of receitp */
+#define MF_NOTIFYS	  0x0004  /* Memo is a notification of receitp */
 
 /* Nickname status flags: */
-#define NS_VERBOTEN	0x0002      /* Nick may not be registered or used */
-#define NS_NO_EXPIRE	0x0004      /* Nick never expires */
-#define NS_IDENTIFIED	0x8000      /* User has IDENTIFY'd */
-#define NS_RECOGNIZED	0x4000      /* ON_ACCESS true && SECURE flag not set */
-#define NS_ON_ACCESS	0x2000      /* User comes from a known address */
-#define NS_KILL_HELD	0x1000      /* Nick is being held after a kill */
-#define NS_GUESTED	0x0100	    /* SVSNICK has been sent but nick has not
-				     				 * yet changed. An enforcer will be
-				     				 * introduced when it does change. */
+#define NS_VERBOTEN	0x0002	  /* Nick may not be registered or used */
+#define NS_NO_EXPIRE	0x0004	  /* Nick never expires */
+#define NS_IDENTIFIED	0x8000	  /* User has IDENTIFY'd */
+#define NS_RECOGNIZED	0x4000	  /* ON_ACCESS true && SECURE flag not set */
+#define NS_ON_ACCESS	0x2000	  /* User comes from a known address */
+#define NS_KILL_HELD	0x1000	  /* Nick is being held after a kill */
+#define NS_GUESTED	0x0100		/* SVSNICK has been sent but nick has not
+					 				 * yet changed. An enforcer will be
+					 				 * introduced when it does change. */
 #define NS_MASTER	0x0200		/* Was a master nick; used to import old databases */
 #define NS_TRANSGROUP	0xC000		/* Status flags that can be passed to a nick of the
 									   same group during nick change */
-#define NS_TEMPORARY	0xFF00      /* All temporary status flags */
+#define NS_TEMPORARY	0xFF00	  /* All temporary status flags */
 /* These two are not used anymore */
 #define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
 
 /* Nickname setting flags: */
 #define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
 #define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
-#define NI_MSG                  0x00000004  /* Use PRIVMSGs instead of NOTICEs */
+#define NI_MSG				  0x00000004  /* Use PRIVMSGs instead of NOTICEs */
 #define NI_MEMO_HARDMAX		0x00000008  /* Don't allow user to change memo limit */
 #define NI_MEMO_SIGNON		0x00000010  /* Notify of memos at signon and un-away */
 #define NI_MEMO_RECEIVE		0x00000020  /* Notify of new memos when sent */
@@ -1112,9 +1112,9 @@ typedef struct ircd_modes_ {
 #define NI_SERVICES_OPER 	0x00001000  /* User is a Services operator */
 #define NI_SERVICES_ADMIN	0x00002000  /* User is a Services admin */
 #define NI_ENCRYPTEDPW		0x00004000  /* Nickname password is encrypted */
-#define NI_SERVICES_ROOT        0x00008000  /* User is a Services root */
-#define NI_MEMO_MAIL            0x00010000  /* User gets email on memo */
-#define NI_HIDE_STATUS          0x00020000  /* Don't show services access status */
+#define NI_SERVICES_ROOT		0x00008000  /* User is a Services root */
+#define NI_MEMO_MAIL			0x00010000  /* User gets email on memo */
+#define NI_HIDE_STATUS		  0x00020000  /* Don't show services access status */
 #define NI_SUSPENDED		0x00040000  /* Nickname is suspended */
 #define NI_AUTOOP		0x00080000  /* Autoop nickname in channels */
 /* Languages.  Never insert anything in the middle of this list, or
@@ -1122,25 +1122,25 @@ typedef struct ircd_modes_ {
  * the order the languages are displayed in for NickServ HELP SET LANGUAGE,
  * do it in language.c.
  */
-#define LANG_EN_US              0	/* United States English */
-#define LANG_JA_JIS             1	/* Japanese (JIS encoding) */
-#define LANG_JA_EUC             2	/* Japanese (EUC encoding) */
-#define LANG_JA_SJIS            3	/* Japanese (SJIS encoding) */
-#define LANG_ES                 4	/* Spanish */
-#define LANG_PT                 5	/* Portugese */
-#define LANG_FR                 6	/* French */
-#define LANG_TR                 7	/* Turkish */
-#define LANG_IT                 8	/* Italian */
-#define LANG_DE                 9   	/* German */
-#define LANG_CAT               10   	/* Catalan */
-#define LANG_GR                11   	/* Greek */
-#define LANG_NL                12   	/* Dutch */
-#define LANG_RU                13   	/* Russian */
-#define LANG_HUN               14   	/* Hungarian */
-#define LANG_PL                15   	/* Polish */
+#define LANG_EN_US			  0	/* United States English */
+#define LANG_JA_JIS			 1	/* Japanese (JIS encoding) */
+#define LANG_JA_EUC			 2	/* Japanese (EUC encoding) */
+#define LANG_JA_SJIS			3	/* Japanese (SJIS encoding) */
+#define LANG_ES				 4	/* Spanish */
+#define LANG_PT				 5	/* Portugese */
+#define LANG_FR				 6	/* French */
+#define LANG_TR				 7	/* Turkish */
+#define LANG_IT				 8	/* Italian */
+#define LANG_DE				 9   	/* German */
+#define LANG_CAT			   10   	/* Catalan */
+#define LANG_GR				11   	/* Greek */
+#define LANG_NL				12   	/* Dutch */
+#define LANG_RU				13   	/* Russian */
+#define LANG_HUN			   14   	/* Hungarian */
+#define LANG_PL				15   	/* Polish */
 
-#define NUM_LANGS              16	/* Number of languages */
-#define USED_LANGS             13	/* Number of languages provided */
+#define NUM_LANGS			  16	/* Number of languages */
+#define USED_LANGS			 13	/* Number of languages provided */
 
 
 #define DEF_LANGUAGE	LANG_EN_US
@@ -1161,7 +1161,7 @@ typedef struct ircd_modes_ {
 #define MUT_DEHALFOP		4
 #define MUT_HALFOP		5
 #define MUT_DEPROTECT   	6
-#define MUT_PROTECT     	7
+#define MUT_PROTECT	 	7
 
 /*************************************************************************/
 /* CAPAB stuffs */
@@ -1172,36 +1172,36 @@ struct capabinfo_ {
 	uint32 flag;
 };
 
-#define CAPAB_NOQUIT    0x00000001
-#define CAPAB_TSMODE    0x00000002
+#define CAPAB_NOQUIT	0x00000001
+#define CAPAB_TSMODE	0x00000002
 #define CAPAB_UNCONNECT 0x00000004
-#define CAPAB_NICKIP    0x00000008
-#define CAPAB_NSJOIN    0x00000010
-#define CAPAB_ZIP       0x00000020
-#define CAPAB_BURST     0x00000040
-#define CAPAB_TS3       0x00000080
-#define CAPAB_TS5       0x00000100
-#define CAPAB_DKEY      0x00000200
-#define CAPAB_DOZIP     0x00000400
-#define CAPAB_DODKEY    0x00000800
-#define CAPAB_QS        0x00001000
-#define CAPAB_SCS       0x00002000
-#define CAPAB_PT4       0x00004000
-#define CAPAB_UID       0x00008000
-#define CAPAB_KNOCK     0x00010000
-#define CAPAB_CLIENT    0x00020000
-#define CAPAB_IPV6      0x00040000
-#define CAPAB_SSJ5      0x00080000
-#define CAPAB_SN2       0x00100000
-#define CAPAB_VHOST     0x00200000
-#define CAPAB_TOKEN     0x00400000
-#define CAPAB_SSJ3      0x00800000
-#define CAPAB_NICK2     0x01000000
-#define CAPAB_UMODE2    0x02000000
-#define CAPAB_VL        0x04000000
-#define CAPAB_TLKEXT    0x08000000
+#define CAPAB_NICKIP	0x00000008
+#define CAPAB_NSJOIN	0x00000010
+#define CAPAB_ZIP	   0x00000020
+#define CAPAB_BURST	 0x00000040
+#define CAPAB_TS3	   0x00000080
+#define CAPAB_TS5	   0x00000100
+#define CAPAB_DKEY	  0x00000200
+#define CAPAB_DOZIP	 0x00000400
+#define CAPAB_DODKEY	0x00000800
+#define CAPAB_QS		0x00001000
+#define CAPAB_SCS	   0x00002000
+#define CAPAB_PT4	   0x00004000
+#define CAPAB_UID	   0x00008000
+#define CAPAB_KNOCK	 0x00010000
+#define CAPAB_CLIENT	0x00020000
+#define CAPAB_IPV6	  0x00040000
+#define CAPAB_SSJ5	  0x00080000
+#define CAPAB_SN2	   0x00100000
+#define CAPAB_VHOST	 0x00200000
+#define CAPAB_TOKEN	 0x00400000
+#define CAPAB_SSJ3	  0x00800000
+#define CAPAB_NICK2	 0x01000000
+#define CAPAB_UMODE2	0x02000000
+#define CAPAB_VL		0x04000000
+#define CAPAB_TLKEXT	0x08000000
 #define CAPAB_CHANMODE  0x10000000
-#define CAPAB_SJB64     0x20000000
+#define CAPAB_SJB64	 0x20000000
 #define CAPAB_NICKCHARS 0x40000000
 
 /*************************************************************************/
@@ -1209,9 +1209,9 @@ struct capabinfo_ {
 /**
  * RFC: defination of a valid nick
  * nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
- * letter     =  %x41-5A / %x61-7A       ; A-Z / a-z
- * digit      =  %x30-39                 ; 0-9
- * special    =  %x5B-60 / %x7B-7D       ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
+ * letter	 =  %x41-5A / %x61-7A	   ; A-Z / a-z
+ * digit	  =  %x30-39				 ; 0-9
+ * special	=  %x5B-60 / %x7B-7D	   ; "[", "]", "\", "`", "_", "^", "{", "|", "}"
  **/
 #define isvalidnick(c) ( isalnum(c) || ((c) >='\x5B' && (c) <='\x60') || ((c) >='\x7B' && (c) <='\x7D') || (c)=='-' )
 
@@ -1281,7 +1281,7 @@ private:
 		}
 	public:
 
-	    virtual ~IRCDProto();
+		virtual ~IRCDProto();
 
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;

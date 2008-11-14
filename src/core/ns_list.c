@@ -45,9 +45,9 @@ class NSList : public Module
  **/
 void myNickServHelp(User * u)
 {
-    if (!NSListOpersOnly || (is_oper(u))) {
-        notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
-    }
+	if (!NSListOpersOnly || (is_oper(u))) {
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_LIST);
+	}
 }
 
 /**
@@ -73,164 +73,164 @@ int do_list(User * u)
  */
 
 
-    char *pattern = strtok(NULL, " ");
-    char *keyword;
-    NickAlias *na;
-    NickCore *mync;
-    int nnicks, i;
-    char buf[BUFSIZE];
-    int is_servadmin = is_services_admin(u);
-    int16 matchflags = 0;
-    NickRequest *nr = NULL;
-    int nronly = 0;
-    int susp_keyword = 0;
-    char noexpire_char = ' ';
-    int count = 0, from = 0, to = 0, tofree = 0;
-    char *tmp = NULL;
-    char *s = NULL;
+	char *pattern = strtok(NULL, " ");
+	char *keyword;
+	NickAlias *na;
+	NickCore *mync;
+	int nnicks, i;
+	char buf[BUFSIZE];
+	int is_servadmin = is_services_admin(u);
+	int16 matchflags = 0;
+	NickRequest *nr = NULL;
+	int nronly = 0;
+	int susp_keyword = 0;
+	char noexpire_char = ' ';
+	int count = 0, from = 0, to = 0, tofree = 0;
+	char *tmp = NULL;
+	char *s = NULL;
 
-    if (!(!NSListOpersOnly || (is_oper(u)))) {  /* reverse the help logic */
-        notice_lang(s_NickServ, u, ACCESS_DENIED);
-        return MOD_STOP;
-    }
+	if (!(!NSListOpersOnly || (is_oper(u)))) {  /* reverse the help logic */
+		notice_lang(s_NickServ, u, ACCESS_DENIED);
+		return MOD_STOP;
+	}
 
-    if (!pattern) {
-        syntax_error(s_NickServ, u, "LIST",
-                     is_servadmin ? NICK_LIST_SERVADMIN_SYNTAX :
-                     NICK_LIST_SYNTAX);
-    } else {
+	if (!pattern) {
+		syntax_error(s_NickServ, u, "LIST",
+					 is_servadmin ? NICK_LIST_SERVADMIN_SYNTAX :
+					 NICK_LIST_SYNTAX);
+	} else {
 
-        if (pattern) {
-            if (pattern[0] == '#') {
-                tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
-                if (!tmp) {
-                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-                    return MOD_CONT;
-                }
-                for (s = tmp; *s; s++) {
-                    if (!isdigit(*s)) {
-                        free(tmp);
-	                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-                        return MOD_CONT;
-                    }
-                }
-                from = atoi(tmp);
-                free(tmp);
-                tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
-                if (!tmp) {
-                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-                    return MOD_CONT;
-                }
-                for (s = tmp; *s; s++) {
-                    if (!isdigit(*s)) {
-                        free(tmp);
-	                	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
-                        return MOD_CONT;
-                    }
-                }
-                to = atoi(tmp);
-                free(tmp);
-                pattern = sstrdup("*");
-                tofree = 1;
-            }
-        }
+		if (pattern) {
+			if (pattern[0] == '#') {
+				tmp = myStrGetOnlyToken((pattern + 1), '-', 0); /* Read FROM out */
+				if (!tmp) {
+					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+					return MOD_CONT;
+				}
+				for (s = tmp; *s; s++) {
+					if (!isdigit(*s)) {
+						free(tmp);
+						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+						return MOD_CONT;
+					}
+				}
+				from = atoi(tmp);
+				free(tmp);
+				tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
+				if (!tmp) {
+					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+					return MOD_CONT;
+				}
+				for (s = tmp; *s; s++) {
+					if (!isdigit(*s)) {
+						free(tmp);
+						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
+						return MOD_CONT;
+					}
+				}
+				to = atoi(tmp);
+				free(tmp);
+				pattern = sstrdup("*");
+				tofree = 1;
+			}
+		}
 
-        nnicks = 0;
+		nnicks = 0;
 
-        while (is_servadmin && (keyword = strtok(NULL, " "))) {
-            if (stricmp(keyword, "FORBIDDEN") == 0)
-                matchflags |= NS_VERBOTEN;
-            if (stricmp(keyword, "NOEXPIRE") == 0)
-                matchflags |= NS_NO_EXPIRE;
-            if (stricmp(keyword, "SUSPENDED") == 0)
-                susp_keyword = 1;
-            if (stricmp(keyword, "UNCONFIRMED") == 0)
-                nronly = 1;
-        }
+		while (is_servadmin && (keyword = strtok(NULL, " "))) {
+			if (stricmp(keyword, "FORBIDDEN") == 0)
+				matchflags |= NS_VERBOTEN;
+			if (stricmp(keyword, "NOEXPIRE") == 0)
+				matchflags |= NS_NO_EXPIRE;
+			if (stricmp(keyword, "SUSPENDED") == 0)
+				susp_keyword = 1;
+			if (stricmp(keyword, "UNCONFIRMED") == 0)
+				nronly = 1;
+		}
 
-        mync = (nick_identified(u) ? u->na->nc : NULL);
+		mync = (nick_identified(u) ? u->na->nc : NULL);
 
-        notice_lang(s_NickServ, u, NICK_LIST_HEADER, pattern);
-        if (nronly != 1) {
-            for (i = 0; i < 1024; i++) {
-                for (na = nalists[i]; na; na = na->next) {
-                    /* Don't show private and forbidden nicks to non-services admins. */
-                    if ((na->status & NS_VERBOTEN) && !is_servadmin)
-                        continue;
-                    if ((na->nc->flags & NI_PRIVATE) && !is_servadmin
-                        && na->nc != mync)
-                        continue;
-                    if ((matchflags != 0) && !(na->status & matchflags) && (susp_keyword == 0))
-                        continue;
-		    else if ((susp_keyword == 1) && !(na->nc->flags & NI_SUSPENDED))
-                        continue;
+		notice_lang(s_NickServ, u, NICK_LIST_HEADER, pattern);
+		if (nronly != 1) {
+			for (i = 0; i < 1024; i++) {
+				for (na = nalists[i]; na; na = na->next) {
+					/* Don't show private and forbidden nicks to non-services admins. */
+					if ((na->status & NS_VERBOTEN) && !is_servadmin)
+						continue;
+					if ((na->nc->flags & NI_PRIVATE) && !is_servadmin
+						&& na->nc != mync)
+						continue;
+					if ((matchflags != 0) && !(na->status & matchflags) && (susp_keyword == 0))
+						continue;
+			else if ((susp_keyword == 1) && !(na->nc->flags & NI_SUSPENDED))
+						continue;
 
-                    /* We no longer compare the pattern against the output buffer.
-                     * Instead we build a nice nick!user@host buffer to compare.
-                     * The output is then generated separately. -TheShadow */
-                    snprintf(buf, sizeof(buf), "%s!%s", na->nick,
-                             (na->last_usermask
-                              && !(na->status & NS_VERBOTEN)) ? na->
-                             last_usermask : "*@*");
-                    if (stricmp(pattern, na->nick) == 0
-                        || match_wild_nocase(pattern, buf)) {
+					/* We no longer compare the pattern against the output buffer.
+					 * Instead we build a nice nick!user@host buffer to compare.
+					 * The output is then generated separately. -TheShadow */
+					snprintf(buf, sizeof(buf), "%s!%s", na->nick,
+							 (na->last_usermask
+							  && !(na->status & NS_VERBOTEN)) ? na->
+							 last_usermask : "*@*");
+					if (stricmp(pattern, na->nick) == 0
+						|| match_wild_nocase(pattern, buf)) {
 
-                        if ((((count + 1 >= from) && (count + 1 <= to))
-                             || ((from == 0) && (to == 0)))
-                            && (++nnicks <= NSListMax)) {
-                            if (is_servadmin
-                                && (na->status & NS_NO_EXPIRE))
-                                noexpire_char = '!';
-                            else {
-                                noexpire_char = ' ';
-                            }
-                            if ((na->nc->flags & NI_HIDE_MASK)
-                                && !is_servadmin && na->nc != mync) {
-                                snprintf(buf, sizeof(buf),
-                                         "%-20s  [Hostname Hidden]",
-                                         na->nick);
-                            } else if (na->status & NS_VERBOTEN) {
-                                snprintf(buf, sizeof(buf),
-                                         "%-20s  [Forbidden]", na->nick);
-                            } else if (na->nc->flags & NI_SUSPENDED) {
-                                snprintf(buf, sizeof(buf),
-                                         "%-20s  [Suspended]", na->nick);
-                            } else {
-                                snprintf(buf, sizeof(buf), "%-20s  %s",
-                                         na->nick, na->last_usermask);
-                            }
-                            notice_user(s_NickServ, u, "   %c%s",
-                                        noexpire_char, buf);
-                        }
-                        count++;
-                    }
-                }
-            }
-        }
+						if ((((count + 1 >= from) && (count + 1 <= to))
+							 || ((from == 0) && (to == 0)))
+							&& (++nnicks <= NSListMax)) {
+							if (is_servadmin
+								&& (na->status & NS_NO_EXPIRE))
+								noexpire_char = '!';
+							else {
+								noexpire_char = ' ';
+							}
+							if ((na->nc->flags & NI_HIDE_MASK)
+								&& !is_servadmin && na->nc != mync) {
+								snprintf(buf, sizeof(buf),
+										 "%-20s  [Hostname Hidden]",
+										 na->nick);
+							} else if (na->status & NS_VERBOTEN) {
+								snprintf(buf, sizeof(buf),
+										 "%-20s  [Forbidden]", na->nick);
+							} else if (na->nc->flags & NI_SUSPENDED) {
+								snprintf(buf, sizeof(buf),
+										 "%-20s  [Suspended]", na->nick);
+							} else {
+								snprintf(buf, sizeof(buf), "%-20s  %s",
+										 na->nick, na->last_usermask);
+							}
+							notice_user(s_NickServ, u, "   %c%s",
+										noexpire_char, buf);
+						}
+						count++;
+					}
+				}
+			}
+		}
 
-        if (nronly == 1 || (is_servadmin && matchflags == 0)) {
-            noexpire_char = ' ';
-            for (i = 0; i < 1024; i++) {
-                for (nr = nrlists[i]; nr; nr = nr->next) {
-                    snprintf(buf, sizeof(buf), "%s!*@*", nr->nick);
-                    if (stricmp(pattern, nr->nick) == 0
-                        || match_wild_nocase(pattern, buf)) {
-                        if (++nnicks <= NSListMax) {
-                            snprintf(buf, sizeof(buf),
-                                     "%-20s  [UNCONFIRMED]", nr->nick);
-                            notice_user(s_NickServ, u, "   %c%s",
-                                        noexpire_char, buf);
-                        }
-                    }
-                }
-            }
-        }
-        notice_lang(s_NickServ, u, NICK_LIST_RESULTS,
-                    nnicks > NSListMax ? NSListMax : nnicks, nnicks);
-    }
-    if (tofree)
-        free(pattern);
-    return MOD_CONT;
+		if (nronly == 1 || (is_servadmin && matchflags == 0)) {
+			noexpire_char = ' ';
+			for (i = 0; i < 1024; i++) {
+				for (nr = nrlists[i]; nr; nr = nr->next) {
+					snprintf(buf, sizeof(buf), "%s!*@*", nr->nick);
+					if (stricmp(pattern, nr->nick) == 0
+						|| match_wild_nocase(pattern, buf)) {
+						if (++nnicks <= NSListMax) {
+							snprintf(buf, sizeof(buf),
+									 "%-20s  [UNCONFIRMED]", nr->nick);
+							notice_user(s_NickServ, u, "   %c%s",
+										noexpire_char, buf);
+						}
+					}
+				}
+			}
+		}
+		notice_lang(s_NickServ, u, NICK_LIST_RESULTS,
+					nnicks > NSListMax ? NSListMax : nnicks, nnicks);
+	}
+	if (tofree)
+		free(pattern);
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_list", NSList)

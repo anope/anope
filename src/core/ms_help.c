@@ -42,16 +42,16 @@ class MSHelp : public Module
  **/
 int do_help(User * u)
 {
-    char *cmd = strtok(NULL, "");
+	char *cmd = strtok(NULL, "");
 
-    if (!cmd) {
-        notice_help(s_MemoServ, u, MEMO_HELP_HEADER);
-        moduleDisplayHelp(3, u);
-        notice_help(s_MemoServ, u, MEMO_HELP_FOOTER, s_ChanServ);
-    } else {
-        mod_help_cmd(s_MemoServ, u, MEMOSERV, cmd);
-    }
-    return MOD_CONT;
+	if (!cmd) {
+		notice_help(s_MemoServ, u, MEMO_HELP_HEADER);
+		moduleDisplayHelp(3, u);
+		notice_help(s_MemoServ, u, MEMO_HELP_FOOTER, s_ChanServ);
+	} else {
+		mod_help_cmd(s_MemoServ, u, MEMOSERV, cmd);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ms_help", MSHelp)

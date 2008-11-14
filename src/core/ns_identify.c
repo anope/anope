@@ -15,8 +15,8 @@
 
 #include "module.h"
 
-#define TO_COLLIDE   0          /* Collide the user with this nick */
-#define TO_RELEASE   1          /* Release a collided nick */
+#define TO_COLLIDE   0		  /* Collide the user with this nick */
+#define TO_RELEASE   1		  /* Release a collided nick */
 
 int do_identify(User * u);
 void myNickServHelp(User * u);
@@ -51,7 +51,7 @@ class NSIdentify : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_IDENTIFY);
 }
 
 /**
@@ -61,100 +61,100 @@ void myNickServHelp(User * u)
  **/
 int do_identify(User * u)
 {
-    char *pass = strtok(NULL, " ");
-    NickAlias *na;
-    NickRequest *nr;
-    int res;
-    char tsbuf[16];
-    char modes[512];
-    int len;
+	char *pass = strtok(NULL, " ");
+	NickAlias *na;
+	NickRequest *nr;
+	int res;
+	char tsbuf[16];
+	char modes[512];
+	int len;
 
-    if (!pass) {
-        syntax_error(s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
-    } else if (!(na = u->na)) {
-        if ((nr = findrequestnick(u->nick))) {
-            notice_lang(s_NickServ, u, NICK_IS_PREREG);
-        } else {
-            notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
-        }
-    } else if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else if (na->nc->flags & NI_SUSPENDED) {
-        notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
-    } else if (nick_identified(u)) {
-        notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
-    } else if (!(res = enc_check_password(pass, na->nc->pass))) {
-        alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
-             u->username, u->host);
-        notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
-        bad_password(u);
-    } else if (res == -1) {
-        notice_lang(s_NickServ, u, NICK_IDENTIFY_FAILED);
-    } else {
-        if (!(na->status & NS_IDENTIFIED) && !(na->status & NS_RECOGNIZED)) {
-            if (na->last_usermask)
-                free(na->last_usermask);
-            na->last_usermask =
-                (char *)scalloc(strlen(common_get_vident(u)) +
-                        strlen(common_get_vhost(u)) + 2, 1);
-            sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
-                    common_get_vhost(u));
-            if (na->last_realname)
-                free(na->last_realname);
-            na->last_realname = sstrdup(u->realname);
-        }
+	if (!pass) {
+		syntax_error(s_NickServ, u, "IDENTIFY", NICK_IDENTIFY_SYNTAX);
+	} else if (!(na = u->na)) {
+		if ((nr = findrequestnick(u->nick))) {
+			notice_lang(s_NickServ, u, NICK_IS_PREREG);
+		} else {
+			notice_lang(s_NickServ, u, NICK_NOT_REGISTERED);
+		}
+	} else if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+	} else if (na->nc->flags & NI_SUSPENDED) {
+		notice_lang(s_NickServ, u, NICK_X_SUSPENDED, na->nick);
+	} else if (nick_identified(u)) {
+		notice_lang(s_NickServ, u, NICK_ALREADY_IDENTIFIED);
+	} else if (!(res = enc_check_password(pass, na->nc->pass))) {
+		alog("%s: Failed IDENTIFY for %s!%s@%s", s_NickServ, u->nick,
+			 u->username, u->host);
+		notice_lang(s_NickServ, u, PASSWORD_INCORRECT);
+		bad_password(u);
+	} else if (res == -1) {
+		notice_lang(s_NickServ, u, NICK_IDENTIFY_FAILED);
+	} else {
+		if (!(na->status & NS_IDENTIFIED) && !(na->status & NS_RECOGNIZED)) {
+			if (na->last_usermask)
+				free(na->last_usermask);
+			na->last_usermask =
+				(char *)scalloc(strlen(common_get_vident(u)) +
+						strlen(common_get_vhost(u)) + 2, 1);
+			sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
+					common_get_vhost(u));
+			if (na->last_realname)
+				free(na->last_realname);
+			na->last_realname = sstrdup(u->realname);
+		}
 
-        na->status |= NS_IDENTIFIED;
-        na->last_seen = time(NULL);
-        snprintf(tsbuf, sizeof(tsbuf), "%lu",
-                 (unsigned long int) u->timestamp);
+		na->status |= NS_IDENTIFIED;
+		na->last_seen = time(NULL);
+		snprintf(tsbuf, sizeof(tsbuf), "%lu",
+				 (unsigned long int) u->timestamp);
 
-        if (ircd->modeonreg) {
-            len = strlen(ircd->modeonreg);
-	    strncpy(modes,ircd->modeonreg,512);
-	    if(ircd->rootmodeonid && is_services_root(u)) { 
-                strncat(modes,ircd->rootmodeonid,512-len);
-	    } else if(ircd->adminmodeonid && is_services_admin(u)) {
-                strncat(modes,ircd->adminmodeonid,512-len);
-	    } else if(ircd->opermodeonid && is_services_oper(u)) {
-                strncat(modes,ircd->opermodeonid,512-len);
-	    }
-            if (ircd->tsonmode) {
-                common_svsmode(u, modes, tsbuf);
-            } else {
-                common_svsmode(u, modes, "");
-            }
-        }
-        send_event(EVENT_NICK_IDENTIFY, 1, u->nick);
-        alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
-             u->username, u->host, u->nick);
-        notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
-        if (ircd->vhost) {
-            do_on_id(u);
-        }
-        if (NSModeOnID) {
-            do_setmodes(u);
-        }
+		if (ircd->modeonreg) {
+			len = strlen(ircd->modeonreg);
+		strncpy(modes,ircd->modeonreg,512);
+		if(ircd->rootmodeonid && is_services_root(u)) { 
+				strncat(modes,ircd->rootmodeonid,512-len);
+		} else if(ircd->adminmodeonid && is_services_admin(u)) {
+				strncat(modes,ircd->adminmodeonid,512-len);
+		} else if(ircd->opermodeonid && is_services_oper(u)) {
+				strncat(modes,ircd->opermodeonid,512-len);
+		}
+			if (ircd->tsonmode) {
+				common_svsmode(u, modes, tsbuf);
+			} else {
+				common_svsmode(u, modes, "");
+			}
+		}
+		send_event(EVENT_NICK_IDENTIFY, 1, u->nick);
+		alog("%s: %s!%s@%s identified for nick %s", s_NickServ, u->nick,
+			 u->username, u->host, u->nick);
+		notice_lang(s_NickServ, u, NICK_IDENTIFY_SUCCEEDED);
+		if (ircd->vhost) {
+			do_on_id(u);
+		}
+		if (NSModeOnID) {
+			do_setmodes(u);
+		}
 
-        if (NSForceEmail && u->na && !u->na->nc->email) {
-            notice_lang(s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
-            notice_help(s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
-        }
+		if (NSForceEmail && u->na && !u->na->nc->email) {
+			notice_lang(s_NickServ, u, NICK_IDENTIFY_EMAIL_REQUIRED);
+			notice_help(s_NickServ, u, NICK_IDENTIFY_EMAIL_HOWTO);
+		}
 
-        if (!(na->status & NS_RECOGNIZED))
-            check_memos(u);
+		if (!(na->status & NS_RECOGNIZED))
+			check_memos(u);
 
-        /* Enable nick tracking if enabled */
-        if (NSNickTracking)
-            nsStartNickTracking(u);
+		/* Enable nick tracking if enabled */
+		if (NSNickTracking)
+			nsStartNickTracking(u);
 
-        /* Clear any timers */
-        if (na->nc->flags & NI_KILLPROTECT) {
-            del_ns_timeout(na, TO_COLLIDE);
-        }
+		/* Clear any timers */
+		if (na->nc->flags & NI_KILLPROTECT) {
+			del_ns_timeout(na, TO_COLLIDE);
+		}
 
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_identify", NSIdentify)

@@ -46,7 +46,7 @@ class MSRead : public Module
  **/
 void myMemoServHelp(User * u)
 {
-    notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
+	notice_lang(s_MemoServ, u, MEMO_HELP_CMD_READ);
 }
 
 /**
@@ -56,78 +56,78 @@ void myMemoServHelp(User * u)
  **/
 int do_read(User * u)
 {
-    MemoInfo *mi;
-    ChannelInfo *ci;
-    char *numstr = strtok(NULL, " "), *chan = NULL;
-    int num, count;
+	MemoInfo *mi;
+	ChannelInfo *ci;
+	char *numstr = strtok(NULL, " "), *chan = NULL;
+	int num, count;
 
-    if (numstr && *numstr == '#') {
-        chan = numstr;
-        numstr = strtok(NULL, " ");
-        if (!(ci = cs_findchan(chan))) {
-            notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
-            return MOD_CONT;
-        } else if (ci->flags & CI_VERBOTEN) {
-            notice_lang(s_MemoServ, u, CHAN_X_FORBIDDEN, chan);
-            return MOD_CONT;
-        } else if (!check_access(u, ci, CA_MEMO)) {
-            notice_lang(s_MemoServ, u, ACCESS_DENIED);
-            return MOD_CONT;
-        }
-        mi = &ci->memos;
-    } else {
-        if (!nick_identified(u)) {
-            notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-            return MOD_CONT;
-        }
-        mi = &u->na->nc->memos;
-    }
-    num = numstr ? atoi(numstr) : -1;
-    if (!numstr
-        || (stricmp(numstr, "LAST") != 0 && stricmp(numstr, "NEW") != 0
-            && num <= 0)) {
-        syntax_error(s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
+	if (numstr && *numstr == '#') {
+		chan = numstr;
+		numstr = strtok(NULL, " ");
+		if (!(ci = cs_findchan(chan))) {
+			notice_lang(s_MemoServ, u, CHAN_X_NOT_REGISTERED, chan);
+			return MOD_CONT;
+		} else if (ci->flags & CI_VERBOTEN) {
+			notice_lang(s_MemoServ, u, CHAN_X_FORBIDDEN, chan);
+			return MOD_CONT;
+		} else if (!check_access(u, ci, CA_MEMO)) {
+			notice_lang(s_MemoServ, u, ACCESS_DENIED);
+			return MOD_CONT;
+		}
+		mi = &ci->memos;
+	} else {
+		if (!nick_identified(u)) {
+			notice_lang(s_MemoServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+			return MOD_CONT;
+		}
+		mi = &u->na->nc->memos;
+	}
+	num = numstr ? atoi(numstr) : -1;
+	if (!numstr
+		|| (stricmp(numstr, "LAST") != 0 && stricmp(numstr, "NEW") != 0
+			&& num <= 0)) {
+		syntax_error(s_MemoServ, u, "READ", MEMO_READ_SYNTAX);
 
-    } else if (mi->memocount == 0) {
-        if (chan)
-            notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
-        else
-            notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
+	} else if (mi->memocount == 0) {
+		if (chan)
+			notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_MEMOS, chan);
+		else
+			notice_lang(s_MemoServ, u, MEMO_HAVE_NO_MEMOS);
 
-    } else {
-        int i;
+	} else {
+		int i;
 
-        if (stricmp(numstr, "NEW") == 0) {
-            int readcount = 0;
-            for (i = 0; i < mi->memocount; i++) {
-                if (mi->memos[i].flags & MF_UNREAD) {
-                    read_memo(u, i, mi, chan);
-                    readcount++;
-                }
-            }
-            if (!readcount) {
-                if (chan)
-                    notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS,
-                                chan);
-                else
-                    notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
-            }
-        } else if (stricmp(numstr, "LAST") == 0) {
-            for (i = 0; i < mi->memocount - 1; i++);
-            read_memo(u, i, mi, chan);
-        } else {                /* number[s] */
-            if (!process_numlist(numstr, &count, read_memo_callback, u,
-                                 mi, chan)) {
-                if (count == 1)
-                    notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
-                else
-                    notice_lang(s_MemoServ, u, MEMO_LIST_NOT_FOUND,
-                                numstr);
-            }
-        }
+		if (stricmp(numstr, "NEW") == 0) {
+			int readcount = 0;
+			for (i = 0; i < mi->memocount; i++) {
+				if (mi->memos[i].flags & MF_UNREAD) {
+					read_memo(u, i, mi, chan);
+					readcount++;
+				}
+			}
+			if (!readcount) {
+				if (chan)
+					notice_lang(s_MemoServ, u, MEMO_X_HAS_NO_NEW_MEMOS,
+								chan);
+				else
+					notice_lang(s_MemoServ, u, MEMO_HAVE_NO_NEW_MEMOS);
+			}
+		} else if (stricmp(numstr, "LAST") == 0) {
+			for (i = 0; i < mi->memocount - 1; i++);
+			read_memo(u, i, mi, chan);
+		} else {				/* number[s] */
+			if (!process_numlist(numstr, &count, read_memo_callback, u,
+								 mi, chan)) {
+				if (count == 1)
+					notice_lang(s_MemoServ, u, MEMO_DOES_NOT_EXIST, num);
+				else
+					notice_lang(s_MemoServ, u, MEMO_LIST_NOT_FOUND,
+								numstr);
+			}
+		}
 
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 /**
@@ -139,16 +139,16 @@ int do_read(User * u)
  */
 int read_memo_callback(User * u, int num, va_list args)
 {
-    MemoInfo *mi = va_arg(args, MemoInfo *);
-    const char *chan = va_arg(args, const char *);
-    int i;
+	MemoInfo *mi = va_arg(args, MemoInfo *);
+	const char *chan = va_arg(args, const char *);
+	int i;
 
-    for (i = 0; i < mi->memocount; i++) {
-        if (mi->memos[i].number == num)
-            break;
-    }
-    /* Range check done in read_memo */
-    return read_memo(u, i, mi, chan);
+	for (i = 0; i < mi->memocount; i++) {
+		if (mi->memos[i].number == num)
+			break;
+	}
+	/* Range check done in read_memo */
+	return read_memo(u, i, mi, chan);
 }
 
 /**
@@ -161,32 +161,32 @@ int read_memo_callback(User * u, int num, va_list args)
  */
 int read_memo(User * u, int index, MemoInfo * mi, const char *chan)
 {
-    Memo *m;
-    char timebuf[64];
-    struct tm tm;
+	Memo *m;
+	char timebuf[64];
+	struct tm tm;
 
-    if (index < 0 || index >= mi->memocount)
-        return 0;
-    m = &mi->memos[index];
-    tm = *localtime(&m->time);
-    strftime_lang(timebuf, sizeof(timebuf),
-                  u, STRFTIME_DATE_TIME_FORMAT, &tm);
-    timebuf[sizeof(timebuf) - 1] = 0;
-    if (chan)
-        notice_lang(s_MemoServ, u, MEMO_CHAN_HEADER, m->number,
-                    m->sender, timebuf, s_MemoServ, chan, m->number);
-    else
-        notice_lang(s_MemoServ, u, MEMO_HEADER, m->number,
-                    m->sender, timebuf, s_MemoServ, m->number);
-    notice_lang(s_MemoServ, u, MEMO_TEXT, m->text);
-    m->flags &= ~MF_UNREAD;
+	if (index < 0 || index >= mi->memocount)
+		return 0;
+	m = &mi->memos[index];
+	tm = *localtime(&m->time);
+	strftime_lang(timebuf, sizeof(timebuf),
+				  u, STRFTIME_DATE_TIME_FORMAT, &tm);
+	timebuf[sizeof(timebuf) - 1] = 0;
+	if (chan)
+		notice_lang(s_MemoServ, u, MEMO_CHAN_HEADER, m->number,
+					m->sender, timebuf, s_MemoServ, chan, m->number);
+	else
+		notice_lang(s_MemoServ, u, MEMO_HEADER, m->number,
+					m->sender, timebuf, s_MemoServ, m->number);
+	notice_lang(s_MemoServ, u, MEMO_TEXT, m->text);
+	m->flags &= ~MF_UNREAD;
 
-    /* Check if a receipt notification was requested */
-    if (m->flags & MF_RECEIPT) {
-        rsend_notify(u, m, chan);
-    }
+	/* Check if a receipt notification was requested */
+	if (m->flags & MF_RECEIPT) {
+		rsend_notify(u, m, chan);
+	}
 
-    return 1;
+	return 1;
 }
 
 MODULE_INIT("ms_read", MSRead)

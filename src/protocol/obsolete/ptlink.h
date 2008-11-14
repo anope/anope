@@ -65,7 +65,7 @@
    that we support.
 
    PTLink 6.14 to 6.17  TS CURRENT is 6  and MIN is 3
-   PTlink 6.18          TS CURRENT is 9  and MIN is 3
+   PTlink 6.18		  TS CURRENT is 9  and MIN is 3
    PTLink 6.19 		TS CURRENT is 10 and MIN is 9
 
    If you are running 6.18 or 6.19 do not touch these values as they will

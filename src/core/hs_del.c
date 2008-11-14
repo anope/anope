@@ -45,9 +45,9 @@ class HSDel : public Module
  **/
 void myHostServHelp(User * u)
 {
-    if (is_host_remover(u)) {
-        notice_lang(s_HostServ, u, HOST_HELP_CMD_DEL);
-    }
+	if (is_host_remover(u)) {
+		notice_lang(s_HostServ, u, HOST_HELP_CMD_DEL);
+	}
 }
 
 /**
@@ -57,25 +57,25 @@ void myHostServHelp(User * u)
  **/
 int do_del(User * u)
 {
-    NickAlias *na;
-    char *nick = strtok(NULL, " ");
-    if (nick) {
-        if ((na = findnick(nick))) {
-            if (na->status & NS_VERBOTEN) {
-                notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
-                return MOD_CONT;
-            }
-            alog("vHost for user \002%s\002 deleted by oper \002%s\002",
-                 nick, u->nick);
-            delHostCore(nick);
-            notice_lang(s_HostServ, u, HOST_DEL, nick);
-        } else {
-            notice_lang(s_HostServ, u, HOST_NOREG, nick);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_DEL_SYNTAX, s_HostServ);
-    }
-    return MOD_CONT;
+	NickAlias *na;
+	char *nick = strtok(NULL, " ");
+	if (nick) {
+		if ((na = findnick(nick))) {
+			if (na->status & NS_VERBOTEN) {
+				notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
+				return MOD_CONT;
+			}
+			alog("vHost for user \002%s\002 deleted by oper \002%s\002",
+				 nick, u->nick);
+			delHostCore(nick);
+			notice_lang(s_HostServ, u, HOST_DEL, nick);
+		} else {
+			notice_lang(s_HostServ, u, HOST_NOREG, nick);
+		}
+	} else {
+		notice_lang(s_HostServ, u, HOST_DEL_SYNTAX, s_HostServ);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_del", HSDel)

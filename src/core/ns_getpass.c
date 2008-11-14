@@ -42,9 +42,9 @@ class NSGetPass : public Module
  **/
 void myNickServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETPASS);
+	}
 }
 
 /**
@@ -54,47 +54,47 @@ void myNickServHelp(User * u)
  **/
 int do_getpass(User * u)
 {
-    char *nick = strtok(NULL, " ");
-    char tmp_pass[PASSMAX];
-    NickAlias *na;
-    NickRequest *nr = NULL;
+	char *nick = strtok(NULL, " ");
+	char tmp_pass[PASSMAX];
+	NickAlias *na;
+	NickRequest *nr = NULL;
 
-    if (!nick) {
-        syntax_error(s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
-    } else if (!(na = findnick(nick))) {
-        if ((nr = findrequestnick(nick))) {
-            alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-                 u->username, u->host, nick);
-            if (WallGetpass)
-                ircdproto->SendGlobops(s_NickServ,
-                                 "\2%s\2 used GETPASS on \2%s\2", u->nick,
-                                 nick);
-            notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick,
-                        nr->passcode);
-        } else {
-            notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-        }
-    } else if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-    } else if (NSSecureAdmins && nick_is_services_admin(na->nc)
-               && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-    } else if (NSRestrictGetPass && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-    } else {
-        if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
-            alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
-                 u->username, u->host, nick);
-            if (WallGetpass)
-                ircdproto->SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
-                                 u->nick, nick);
-            notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick,
-                        tmp_pass);
-        } else {
-            notice_lang(s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
-        }
-    }
-    return MOD_CONT;
+	if (!nick) {
+		syntax_error(s_NickServ, u, "GETPASS", NICK_GETPASS_SYNTAX);
+	} else if (!(na = findnick(nick))) {
+		if ((nr = findrequestnick(nick))) {
+			alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
+				 u->username, u->host, nick);
+			if (WallGetpass)
+				ircdproto->SendGlobops(s_NickServ,
+								 "\2%s\2 used GETPASS on \2%s\2", u->nick,
+								 nick);
+			notice_lang(s_NickServ, u, NICK_GETPASS_PASSCODE_IS, nick,
+						nr->passcode);
+		} else {
+			notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+		}
+	} else if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+	} else if (NSSecureAdmins && nick_is_services_admin(na->nc)
+			   && !is_services_root(u)) {
+		notice_lang(s_NickServ, u, PERMISSION_DENIED);
+	} else if (NSRestrictGetPass && !is_services_root(u)) {
+		notice_lang(s_NickServ, u, PERMISSION_DENIED);
+	} else {
+		if(enc_decrypt(na->nc->pass,tmp_pass,PASSMAX - 1)==1) {
+			alog("%s: %s!%s@%s used GETPASS on %s", s_NickServ, u->nick,
+				 u->username, u->host, nick);
+			if (WallGetpass)
+				ircdproto->SendGlobops(s_NickServ, "\2%s\2 used GETPASS on \2%s\2",
+								 u->nick, nick);
+			notice_lang(s_NickServ, u, NICK_GETPASS_PASSWORD_IS, nick,
+						tmp_pass);
+		} else {
+			notice_lang(s_NickServ, u, NICK_GETPASS_UNAVAILABLE);
+		}
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_getpass", NSGetPass)

@@ -23,12 +23,12 @@
 
 typedef struct dbFILE_ dbFILE;
 struct dbFILE_ {
-    int mode;			/* 'r' for reading, 'w' for writing */
-    FILE *fp;			/* The normal file descriptor */
-    FILE *backupfp;		/* Open file pointer to a backup copy of
-				 *    the database file (if non-NULL) */
-    char filename[MAXPATHLEN];	/* Name of the database file */
-    char backupname[MAXPATHLEN];	/* Name of the backup file */
+	int mode;			/* 'r' for reading, 'w' for writing */
+	FILE *fp;			/* The normal file descriptor */
+	FILE *backupfp;		/* Open file pointer to a backup copy of
+				 *	the database file (if non-NULL) */
+	char filename[MAXPATHLEN];	/* Name of the database file */
+	char backupname[MAXPATHLEN];	/* Name of the backup file */
 };
 
 /*************************************************************************/

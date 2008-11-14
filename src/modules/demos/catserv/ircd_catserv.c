@@ -22,89 +22,89 @@ char *s_CatServ = "CatServ";
 
 int AnopeInit(int argc, char **argv)
 {
-    Message *msg = NULL;
-    int status;
+	Message *msg = NULL;
+	int status;
 #ifdef IRC_UNREAL32
-    if (UseTokens) {
-     msg = createMessage("!", my_privmsg);
-    } else {
-     msg = createMessage("PRIVMSG", my_privmsg);
-    }
+	if (UseTokens) {
+	 msg = createMessage("!", my_privmsg);
+	} else {
+	 msg = createMessage("PRIVMSG", my_privmsg);
+	}
 #else
-    msg = createMessage("PRIVMSG", my_privmsg);
+	msg = createMessage("PRIVMSG", my_privmsg);
 #endif
-    status = moduleAddMessage(msg, MOD_HEAD);
-    if (status == MOD_ERR_OK) {
-        addClient(s_CatServ, "meow!");
-        addMessageList();
-    }
-    this->SetAuthor(AUTHOR);
-    this->SetVersion(VERSION);
-    alog("ircd_catserv.so: loaded, message status [%d]", status);
-    return MOD_CONT;
+	status = moduleAddMessage(msg, MOD_HEAD);
+	if (status == MOD_ERR_OK) {
+		addClient(s_CatServ, "meow!");
+		addMessageList();
+	}
+	this->SetAuthor(AUTHOR);
+	this->SetVersion(VERSION);
+	alog("ircd_catserv.so: loaded, message status [%d]", status);
+	return MOD_CONT;
 }
 
 void AnopeFini(void)
 {
-    delClient();
+	delClient();
 }
 
 int my_privmsg(char *source, int ac, char **av)
 {
-    User *u;
-    char *s;
+	User *u;
+	char *s;
 
-    /* First, some basic checks */
-    if (ac != 2)
-        return MOD_CONT;        /* bleh */
-    if (!(u = finduser(source))) {
-        return MOD_CONT;
-    }                           /* non-user source */
-    if (*av[0] == '#') {
-        return MOD_CONT;
-    }
-    /* Channel message */
-    /* we should prolly honour the ignore list here, but i cba for this... */
-    s = strchr(av[0], '@');
-    if (s) {
-        *s++ = 0;
-        if (stricmp(s, ServerName) != 0)
-            return MOD_CONT;
-    }
-    if ((stricmp(av[0], s_CatServ)) == 0) {     /* its for US! */
-        catserv(u, av[1]);
-        return MOD_STOP;
-    } else {                    /* ok it isnt us, let the old code have it */
-        return MOD_CONT;
-    }
+	/* First, some basic checks */
+	if (ac != 2)
+		return MOD_CONT;		/* bleh */
+	if (!(u = finduser(source))) {
+		return MOD_CONT;
+	}						   /* non-user source */
+	if (*av[0] == '#') {
+		return MOD_CONT;
+	}
+	/* Channel message */
+	/* we should prolly honour the ignore list here, but i cba for this... */
+	s = strchr(av[0], '@');
+	if (s) {
+		*s++ = 0;
+		if (stricmp(s, ServerName) != 0)
+			return MOD_CONT;
+	}
+	if ((stricmp(av[0], s_CatServ)) == 0) {	 /* its for US! */
+		catserv(u, av[1]);
+		return MOD_STOP;
+	} else {					/* ok it isnt us, let the old code have it */
+		return MOD_CONT;
+	}
 }
 
 void addClient(char *nick, char *realname)
 {
-    anope_SendClientIntroduction(nick, "catserv", "meow.meow.land", realname, "+");
+	anope_SendClientIntroduction(nick, "catserv", "meow.meow.land", realname, "+");
 }
 
 void delClient(void)
 {
-    anope_SendQuit(s_CatServ, "QUIT :Module Unloaded!");
+	anope_SendQuit(s_CatServ, "QUIT :Module Unloaded!");
 }
 
 /*****************************************************************************/
 /* Main CatServ routine. */
 void catserv(User * u, char *buf)
 {
-    char *cmd, *s;
+	char *cmd, *s;
 
-    cmd = strtok(buf, " ");
+	cmd = strtok(buf, " ");
 
-    if (!cmd) {
-        return;
-    } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, "")))
-            s = "\1";
-        notice(s_CatServ, u->nick, "\1PING %s", s);
-    } else {
-        mod_run_cmd(s_CatServ, u, Catserv_cmdTable, cmd);
-    }
+	if (!cmd) {
+		return;
+	} else if (stricmp(cmd, "\1PING") == 0) {
+		if (!(s = strtok(NULL, "")))
+			s = "\1";
+		notice(s_CatServ, u->nick, "\1PING %s", s);
+	} else {
+		mod_run_cmd(s_CatServ, u, Catserv_cmdTable, cmd);
+	}
 }
 

@@ -40,16 +40,16 @@ class BSHelp : public Module
  **/
 int do_help(User * u)
 {
-    char *cmd = strtok(NULL, "");
+	char *cmd = strtok(NULL, "");
 
-    if (!cmd) {
-        notice_help(s_BotServ, u, BOT_HELP);
-        moduleDisplayHelp(4, u);
-        notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
-    } else {
-        mod_help_cmd(s_BotServ, u, BOTSERV, cmd);
-    }
-    return MOD_CONT;
+	if (!cmd) {
+		notice_help(s_BotServ, u, BOT_HELP);
+		moduleDisplayHelp(4, u);
+		notice_help(s_BotServ, u, BOT_HELP_FOOTER, BSMinUsers);
+	} else {
+		mod_help_cmd(s_BotServ, u, BOTSERV, cmd);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("bs_help", BSHelp)

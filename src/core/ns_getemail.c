@@ -10,8 +10,8 @@
  *
  *
  * A simple call to check for all emails that a user may have registered 
- * with. It returns the nicks that match the email you provide. Wild     
- * Cards are not excepted. Must use user@email-host.                     
+ * with. It returns the nicks that match the email you provide. Wild	 
+ * Cards are not excepted. Must use user@email-host.					 
  * 
  * $Id$
  *
@@ -47,9 +47,9 @@ class NSGetEMail : public Module
  **/
 void myNickServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_GETEMAIL);
+	}
 }
 
 /**
@@ -59,32 +59,32 @@ void myNickServHelp(User * u)
  **/
 int do_getemail(User * u)
 {
-    char *email = strtok(NULL, " ");
-    int i, j = 0;
-    NickCore *nc;
+	char *email = strtok(NULL, " ");
+	int i, j = 0;
+	NickCore *nc;
 
-    if (!email) {
-        syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
-        return MOD_CONT;
-    }
-    alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick,
-         u->username, u->host, email);
-    for (i = 0; i < 1024; i++) {
-        for (nc = nclists[i]; nc; nc = nc->next) {
-            if (nc->email) {
-                if (stricmp(nc->email, email) == 0) {
-                    j++;
-                    notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE,
-                                nc->display, email);
-                }
-            }
-        }
-    }
-    if (j <= 0) {
-        notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email);
-        return MOD_CONT;
-    }
-    return MOD_CONT;
+	if (!email) {
+		syntax_error(s_NickServ, u, "GETMAIL", NICK_GETEMAIL_SYNTAX);
+		return MOD_CONT;
+	}
+	alog("%s: %s!%s@%s used GETEMAIL on %s", s_NickServ, u->nick,
+		 u->username, u->host, email);
+	for (i = 0; i < 1024; i++) {
+		for (nc = nclists[i]; nc; nc = nc->next) {
+			if (nc->email) {
+				if (stricmp(nc->email, email) == 0) {
+					j++;
+					notice_lang(s_NickServ, u, NICK_GETEMAIL_EMAILS_ARE,
+								nc->display, email);
+				}
+			}
+		}
+	}
+	if (j <= 0) {
+		notice_lang(s_NickServ, u, NICK_GETEMAIL_NOT_USED, email);
+		return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_getemail", NSGetEMail)

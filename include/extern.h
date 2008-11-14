@@ -122,7 +122,7 @@ E User *nc_on_chan(Channel * c, NickCore * nc);
 
 E char *chan_get_modes(Channel * chan, int complete, int plus);
 E void chan_set_modes(const char *source, Channel * chan, int ac,
-                      const char **av, int check);
+					  const char **av, int check);
 
 E int chan_get_user_status(Channel * chan, User * user);
 E int chan_has_user_status(Channel * chan, User * user, int16 status);
@@ -561,9 +561,9 @@ E void lang_init(void);
 #define getstring2(nc,index) \
 	(langtexts[((nc)?((NickCore*)nc)->language:NSDefLanguage)][(index)])
 E int strftime_lang(char *buf, int size, User * u, int format,
-                    struct tm *tm);
+					struct tm *tm);
 E void syntax_error(char *service, User * u, const char *command,
-                    int msgnum);
+					int msgnum);
 
 
 /**** log.c ****/
@@ -673,17 +673,17 @@ E int doValidHost(const char *host, int type);
 
 typedef int (*range_callback_t) (User * u, int num, va_list args);
 E int process_numlist(const char *numstr, int *count_ret,
-                      range_callback_t callback, User * u, ...);
+					  range_callback_t callback, User * u, ...);
 
 E int isValidHost(const char *host, int type);
 E int isvalidchar(const char c);
 
 E char *myStrGetToken(const char *str, const char dilim, int token_number);
 E char *myStrGetOnlyToken(const char *str, const char dilim,
-        int token_number);
+		int token_number);
 E char *myStrSubString(const char *src, int start, int end);
 E char *myStrGetTokenRemainder(const char *str, const char dilim,
-        int token_number);
+		int token_number);
 E char *stripModePrefix(const char *str);
 E int myNumToken(const char *str, const char dilim);
 E void doCleanBuffer(char *str);
@@ -816,7 +816,7 @@ E void expire_sqlines(void);
 E int check_chan_sqline(const char *chan);
 
 E int add_szline(User * u, char *mask, const char *by,
-                 const time_t expires, const char *reason);
+				 const time_t expires, const char *reason);
 E void expire_szlines(void);
 E int check_szline(const char *nick, char *ip);
 
@@ -870,7 +870,7 @@ E int is_ulined(const char *server);
 E int is_sync(Server *server);
 
 E Server *new_server(Server * uplink, const char *name, const char *desc,
-                   uint16 flags, const char *suid);
+				   uint16 flags, const char *suid);
 
 E Server *findserver(Server *s, const char *name);
 
@@ -910,8 +910,8 @@ E Session *findsession(const char *host);
 E Exception *find_host_exception(const char *host);
 E Exception *find_hostip_exception(const char *host, const char *hostip);
 E int exception_add(User * u, const char *mask, const int limit,
-                         const char *reason, const char *who,
-                         const time_t expires);
+						 const char *reason, const char *who,
+						 const time_t expires);
 
 /**** slist.c ****/
 E int slist_add(SList *slist, void *item);
@@ -964,7 +964,7 @@ E char *TS6UPLINK;
 E void update_host(User * user);
 
 E User *do_nick(const char *source, const char *nick, const char *username, const char *host,
-              const char *server, const char *realname, time_t ts, uint32 svid, uint32 ip, const char *vhost, const char *uid);
+			  const char *server, const char *realname, time_t ts, uint32 svid, uint32 ip, const char *vhost, const char *uid);
 
 E void do_umode(const char *source, int ac, const char **av);
 E void do_umode2(const char *source, int ac, const char **av);
@@ -980,12 +980,12 @@ E int is_excepted_mask(ChannelInfo * ci, char *mask);
 E int match_usermask(const char *mask, User * user);
 E int match_userip(const char *mask, User * user, char *host);
 E void split_usermask(const char *mask, char **nick, char **user,
-                      char **host);
+					  char **host);
 E char *create_mask(User * u);
 
 #ifdef USE_MYSQL
 /**** mysql.c ****/
-E MYSQL       *mysql;
+E MYSQL	   *mysql;
 E MYSQL_RES   *mysql_res;
 E MYSQL_FIELD *mysql_fields;
 E MYSQL_ROW   mysql_row;
@@ -1002,8 +1002,8 @@ E int db_mysql_save_ns_alias(NickAlias * na);
 E int db_mysql_save_ns_req(NickRequest * nr);
 E int db_mysql_save_cs_info(ChannelInfo * ci);
 E int db_mysql_save_os_db(unsigned int maxucnt, unsigned int maxutime,
-                           SList * ak, SList * sgl, SList * sql,
-                           SList * szl);
+						   SList * ak, SList * sgl, SList * sql,
+						   SList * szl);
 E int db_mysql_save_news(NewsItem * ni);
 E int db_mysql_save_exceptions(Exception * e);
 E int db_mysql_save_hs_core(HostCore * hc);
@@ -1031,7 +1031,7 @@ E int b64_decode(const char *src, char *target, size_t targsize);
 E const char* encode_ip(unsigned char *ip);
 E int decode_ip(const char *buf);
 
-#define Anope_Free(x)       if ((x) != NULL) free(x)
+#define Anope_Free(x)	   if ((x) != NULL) free(x)
 
 E char *host_resolve(char *host);
 

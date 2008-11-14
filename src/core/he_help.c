@@ -45,22 +45,22 @@ class HEHelp : public Module
  */
 int do_help(User * u)
 {
-    char *cmd = strtok(NULL, "");
+	char *cmd = strtok(NULL, "");
 
-    if (!cmd) {
-        notice_help(s_HelpServ, u, HELP_HELP, s_NickServ, s_ChanServ,
-                    s_MemoServ);
-        if (s_BotServ) {
-            notice_help(s_HelpServ, u, HELP_HELP_BOT, s_BotServ);
-        }
-        if (s_HostServ) {
-            notice_help(s_HelpServ, u, HELP_HELP_HOST, s_HostServ);
-        }
-        moduleDisplayHelp(7, u);
-    } else {
-        mod_help_cmd(s_HelpServ, u, HELPSERV, cmd);
-    }
-    return MOD_CONT;
+	if (!cmd) {
+		notice_help(s_HelpServ, u, HELP_HELP, s_NickServ, s_ChanServ,
+					s_MemoServ);
+		if (s_BotServ) {
+			notice_help(s_HelpServ, u, HELP_HELP_BOT, s_BotServ);
+		}
+		if (s_HostServ) {
+			notice_help(s_HelpServ, u, HELP_HELP_HOST, s_HostServ);
+		}
+		moduleDisplayHelp(7, u);
+	} else {
+		mod_help_cmd(s_HelpServ, u, HELPSERV, cmd);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("he_help", HEHelp)

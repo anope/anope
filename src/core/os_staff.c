@@ -18,7 +18,7 @@
 int do_staff(User * u);
 void myOperServHelp(User * u);
 int opers_list_callback(SList * slist, int number, void *item,
-                        va_list args);
+						va_list args);
 int opers_list(int number, NickCore * nc, User * u, char *level);
 
 class OSStaff : public Module
@@ -46,7 +46,7 @@ class OSStaff : public Module
  **/
 void myOperServHelp(User * u)
 {
-    notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_STAFF);
 }
 
 /**
@@ -56,53 +56,53 @@ void myOperServHelp(User * u)
  **/
 int do_staff(User * u)
 {
-    int idx = 0;
-    User *au = NULL;
-    NickCore *nc;
-    NickAlias *na;
-    int found;
-    int i;
+	int idx = 0;
+	User *au = NULL;
+	NickCore *nc;
+	NickAlias *na;
+	int found;
+	int i;
 
-    notice_lang(s_OperServ, u, OPER_STAFF_LIST_HEADER);
-    slist_enum(&servopers, NULL, &opers_list_callback, u, "OPER");
-    slist_enum(&servadmins, NULL, &opers_list_callback, u, "ADMN");
+	notice_lang(s_OperServ, u, OPER_STAFF_LIST_HEADER);
+	slist_enum(&servopers, NULL, &opers_list_callback, u, "OPER");
+	slist_enum(&servadmins, NULL, &opers_list_callback, u, "ADMN");
 
-    for (idx = 0; idx < RootNumber; idx++) {
-        found = 0;
-        if ((au = finduser(ServicesRoots[idx]))) {      /* see if user is online */
-            found = 1;
-            notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, '*', "ROOT",
-                        ServicesRoots[idx]);
-        } else if ((nc = findcore(ServicesRoots[idx]))) {
-            for (i = 0; i < nc->aliases.count; i++) {   /* check all aliases */
-                na = (NickAlias *)nc->aliases.list[i];
-                if ((au = finduser(na->nick))) {        /* see if user is online */
-                    found = 1;
-                    notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT,
-                                '*', "ROOT", ServicesRoots[idx], na->nick);
-                }
-            }
-        }
+	for (idx = 0; idx < RootNumber; idx++) {
+		found = 0;
+		if ((au = finduser(ServicesRoots[idx]))) {	  /* see if user is online */
+			found = 1;
+			notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, '*', "ROOT",
+						ServicesRoots[idx]);
+		} else if ((nc = findcore(ServicesRoots[idx]))) {
+			for (i = 0; i < nc->aliases.count; i++) {   /* check all aliases */
+				na = (NickAlias *)nc->aliases.list[i];
+				if ((au = finduser(na->nick))) {		/* see if user is online */
+					found = 1;
+					notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT,
+								'*', "ROOT", ServicesRoots[idx], na->nick);
+				}
+			}
+		}
 
-        if (!found)
-            notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, ' ', "ROOT",
-                        ServicesRoots[idx]);
+		if (!found)
+			notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, ' ', "ROOT",
+						ServicesRoots[idx]);
 
-    }
-    notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Staff");
-    return MOD_CONT;
+	}
+	notice_lang(s_OperServ, u, END_OF_ANY_LIST, "Staff");
+	return MOD_CONT;
 }
 
 /**
  * Function for the enumerator to call
  **/
 int opers_list_callback(SList * slist, int number, void *item,
-                        va_list args)
+						va_list args)
 {
-    User *u = va_arg(args, User *);
-    char *level = va_arg(args, char *);
+	User *u = va_arg(args, User *);
+	char *level = va_arg(args, char *);
 
-    return opers_list(number, (NickCore *)item, u, level);
+	return opers_list(number, (NickCore *)item, u, level);
 }
 
 
@@ -111,35 +111,35 @@ int opers_list_callback(SList * slist, int number, void *item,
  **/
 int opers_list(int number, NickCore * nc, User * u, char *level)
 {
-    User *au = NULL;
-    NickAlias *na;
-    int found;
-    int i;
+	User *au = NULL;
+	NickAlias *na;
+	int found;
+	int i;
 
-    if (!nc)
-        return 0;
+	if (!nc)
+		return 0;
 
-    found = 0;
-    if ((au = finduser(nc->display))) { /* see if user is online */
-        found = 1;
-        notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, '*', level,
-                    nc->display);
-    } else {
-        for (i = 0; i < nc->aliases.count; i++) {       /* check all aliases */
-            na = (NickAlias *)nc->aliases.list[i];
-            if ((au = finduser(na->nick))) {    /* see if user is online */
-                found = 1;
-                notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT, '*', level,
-                            nc->display, na->nick);
-            }
-        }
-    }
+	found = 0;
+	if ((au = finduser(nc->display))) { /* see if user is online */
+		found = 1;
+		notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, '*', level,
+					nc->display);
+	} else {
+		for (i = 0; i < nc->aliases.count; i++) {	   /* check all aliases */
+			na = (NickAlias *)nc->aliases.list[i];
+			if ((au = finduser(na->nick))) {	/* see if user is online */
+				found = 1;
+				notice_lang(s_OperServ, u, OPER_STAFF_AFORMAT, '*', level,
+							nc->display, na->nick);
+			}
+		}
+	}
 
-    if (!found)
-        notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, ' ', level,
-                    nc->display);
+	if (!found)
+		notice_lang(s_OperServ, u, OPER_STAFF_FORMAT, ' ', level,
+					nc->display);
 
-    return 1;
+	return 1;
 }
 
 MODULE_INIT("os_staff", OSStaff)

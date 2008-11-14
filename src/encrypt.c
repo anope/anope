@@ -19,31 +19,31 @@ Encryption encryption;
 
 /******************************************************************************/
 void encmodule_encrypt(int (*func)
-                        (const char *src, int len, char *dest, int size))
+						(const char *src, int len, char *dest, int size))
 {
-    encryption.encrypt = func;
+	encryption.encrypt = func;
 }
 
 void encmodule_encrypt_in_place(int (*func) (char *buf, int size))
 {
-    encryption.encrypt_in_place = func;
+	encryption.encrypt_in_place = func;
 }
 
 void encmodule_encrypt_check_len(int (*func) (int passlen, int bufsize))
 {
-    encryption.encrypt_check_len = func;
+	encryption.encrypt_check_len = func;
 }
 
 void encmodule_decrypt(int (*func) (const char *src, char *dest, int size))
 {
-    encryption.decrypt = func;
+	encryption.decrypt = func;
 }
 
 void encmodule_check_password(int (*func)
-                               (const char *plaintext,
-                                const char *password))
+							   (const char *plaintext,
+								const char *password))
 {
-    encryption.check_password = func;
+	encryption.check_password = func;
 }
 
 /******************************************************************************/
@@ -55,10 +55,10 @@ void encmodule_check_password(int (*func)
  **/
 int enc_encrypt(const char *src, int len, char *dest, int size)
 {
-    if (encryption.encrypt) {
-        return encryption.encrypt(src, len, dest, size);
-    }
-    return -1;
+	if (encryption.encrypt) {
+		return encryption.encrypt(src, len, dest, size);
+	}
+	return -1;
 }
 
 /**
@@ -68,10 +68,10 @@ int enc_encrypt(const char *src, int len, char *dest, int size)
  **/
 int enc_encrypt_in_place(char *buf, int size)
 {
-    if (encryption.encrypt_in_place) {
-        return encryption.encrypt_in_place(buf, size);
-    }
-    return -1;
+	if (encryption.encrypt_in_place) {
+		return encryption.encrypt_in_place(buf, size);
+	}
+	return -1;
 }
 
 /** 
@@ -84,10 +84,10 @@ int enc_encrypt_in_place(char *buf, int size)
  **/
 int enc_encrypt_check_len(int passlen, int bufsize)
 {
-    if (encryption.encrypt_check_len) {
-        return encryption.encrypt_check_len(passlen, bufsize);
-    }
-    return -1;
+	if (encryption.encrypt_check_len) {
+		return encryption.encrypt_check_len(passlen, bufsize);
+	}
+	return -1;
 }
 
 /**
@@ -98,10 +98,10 @@ int enc_encrypt_check_len(int passlen, int bufsize)
  **/
 int enc_decrypt(const char *src, char *dest, int size)
 {
-    if (encryption.decrypt) {
-        return encryption.decrypt(src, dest, size);
-    }
-    return -1;
+	if (encryption.decrypt) {
+		return encryption.decrypt(src, dest, size);
+	}
+	return -1;
 }
 
 /**
@@ -113,10 +113,10 @@ int enc_decrypt(const char *src, char *dest, int size)
  **/
 int enc_check_password(const char *plaintext, const char *password)
 {
-    if (encryption.check_password) {
-        return encryption.check_password(plaintext, password);
-    }
-    return -1;
+	if (encryption.check_password) {
+		return encryption.check_password(plaintext, password);
+	}
+	return -1;
 }
 
 /* EOF */

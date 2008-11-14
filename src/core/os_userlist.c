@@ -48,7 +48,7 @@ class OSUserList : public Module
  **/
 void myOperServHelp(User * u)
 {
-    notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_USERLIST);
 }
 
 /**
@@ -59,52 +59,52 @@ void myOperServHelp(User * u)
 
 int do_userlist(User * u)
 {
-    char *pattern = strtok(NULL, " ");
-    char *opt = strtok(NULL, " ");
+	char *pattern = strtok(NULL, " ");
+	char *opt = strtok(NULL, " ");
 
-    Channel *c;
-    int modes = 0;
+	Channel *c;
+	int modes = 0;
 
-    if (opt && !stricmp(opt, "INVISIBLE"))
-        modes |= anope_get_invis_mode();
+	if (opt && !stricmp(opt, "INVISIBLE"))
+		modes |= anope_get_invis_mode();
 
-    if (pattern && (c = findchan(pattern))) {
-        struct c_userlist *cu;
+	if (pattern && (c = findchan(pattern))) {
+		struct c_userlist *cu;
 
-        notice_lang(s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
+		notice_lang(s_OperServ, u, OPER_USERLIST_HEADER_CHAN, pattern);
 
-        for (cu = c->users; cu; cu = cu->next) {
-            if (modes && !(cu->user->mode & modes))
-                continue;
-            notice_lang(s_OperServ, u, OPER_USERLIST_RECORD,
-                        cu->user->nick, common_get_vident(cu->user),
-                        common_get_vhost(cu->user));
-        }
-    } else {
-        char mask[BUFSIZE];
-        int i;
-        User *u2;
+		for (cu = c->users; cu; cu = cu->next) {
+			if (modes && !(cu->user->mode & modes))
+				continue;
+			notice_lang(s_OperServ, u, OPER_USERLIST_RECORD,
+						cu->user->nick, common_get_vident(cu->user),
+						common_get_vhost(cu->user));
+		}
+	} else {
+		char mask[BUFSIZE];
+		int i;
+		User *u2;
 
-        notice_lang(s_OperServ, u, OPER_USERLIST_HEADER);
+		notice_lang(s_OperServ, u, OPER_USERLIST_HEADER);
 
-        for (i = 0; i < 1024; i++) {
-            for (u2 = userlist[i]; u2; u2 = u2->next) {
-                if (pattern) {
-                    snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick,
-                             common_get_vident(u2), common_get_vhost(u2));
-                    if (!match_wild_nocase(pattern, mask))
-                        continue;
-                    if (modes && !(u2->mode & modes))
-                        continue;
-                }
-                notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick,
-                            common_get_vident(u2), common_get_vhost(u2));
-            }
-        }
-    }
+		for (i = 0; i < 1024; i++) {
+			for (u2 = userlist[i]; u2; u2 = u2->next) {
+				if (pattern) {
+					snprintf(mask, sizeof(mask), "%s!%s@%s", u2->nick,
+							 common_get_vident(u2), common_get_vhost(u2));
+					if (!match_wild_nocase(pattern, mask))
+						continue;
+					if (modes && !(u2->mode & modes))
+						continue;
+				}
+				notice_lang(s_OperServ, u, OPER_USERLIST_RECORD, u2->nick,
+							common_get_vident(u2), common_get_vhost(u2));
+			}
+		}
+	}
 
-    notice_lang(s_OperServ, u, OPER_USERLIST_END);
-    return MOD_CONT;
+	notice_lang(s_OperServ, u, OPER_USERLIST_END);
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_userlist", OSUserList)

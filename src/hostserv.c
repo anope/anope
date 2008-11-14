@@ -22,10 +22,10 @@ void load_hs_dbase_v1(dbFILE * f);
 void load_hs_dbase_v2(dbFILE * f);
 void load_hs_dbase_v3(dbFILE * f);
 
-HostCore *head = NULL;          /* head of the HostCore list */
+HostCore *head = NULL;		  /* head of the HostCore list */
 
 E int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask,
-                 char *creator, time_t time);
+				 char *creator, time_t time);
 
 E void moduleAddHostServCmds(void);
 
@@ -45,24 +45,24 @@ void moduleAddHostServCmds(void)
 
 void get_hostserv_stats(long *nrec, long *memuse)
 {
-    long count = 0, mem = 0;
-    HostCore *hc;
+	long count = 0, mem = 0;
+	HostCore *hc;
 
-    for (hc = head; hc; hc = hc->next) {
-        count++;
-        mem += sizeof(*hc);
-        if (hc->nick)
-            mem += strlen(hc->nick) + 1;
-        if (hc->vIdent)
-            mem += strlen(hc->vIdent) + 1;
-        if (hc->vHost)
-            mem += strlen(hc->vHost) + 1;
-        if (hc->creator)
-            mem += strlen(hc->creator) + 1;
-    }
+	for (hc = head; hc; hc = hc->next) {
+		count++;
+		mem += sizeof(*hc);
+		if (hc->nick)
+			mem += strlen(hc->nick) + 1;
+		if (hc->vIdent)
+			mem += strlen(hc->vIdent) + 1;
+		if (hc->vHost)
+			mem += strlen(hc->vHost) + 1;
+		if (hc->creator)
+			mem += strlen(hc->creator) + 1;
+	}
 
-    *nrec = count;
-    *memuse = mem;
+	*nrec = count;
+	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -73,9 +73,9 @@ void get_hostserv_stats(long *nrec, long *memuse)
  */
 void hostserv_init(void)
 {
-    if (s_HostServ) {
-        moduleAddHostServCmds();
-    }
+	if (s_HostServ) {
+		moduleAddHostServCmds();
+	}
 }
 
 /*************************************************************************/
@@ -88,33 +88,33 @@ void hostserv_init(void)
  */
 void hostserv(User * u, char *buf)
 {
-    const char *cmd, *s;
+	const char *cmd, *s;
 
-    cmd = strtok(buf, " ");
+	cmd = strtok(buf, " ");
 
-    if (!cmd) {
-        return;
-    } else if (stricmp(cmd, "\1PING") == 0) {
-        if (!(s = strtok(NULL, ""))) {
-            s = "";
-        }
-        ircdproto->SendCTCP(findbot(s_HostServ), u->nick, "PING %s", s);
-    } else {
-        if (ircd->vhost) {
-            mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);
-        } else {
-            notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
-        }
-    }
+	if (!cmd) {
+		return;
+	} else if (stricmp(cmd, "\1PING") == 0) {
+		if (!(s = strtok(NULL, ""))) {
+			s = "";
+		}
+		ircdproto->SendCTCP(findbot(s_HostServ), u->nick, "PING %s", s);
+	} else {
+		if (ircd->vhost) {
+			mod_run_cmd(s_HostServ, u, HOSTSERV, cmd);
+		} else {
+			notice_lang(s_HostServ, u, SERVICE_OFFLINE, s_HostServ);
+		}
+	}
 }
 
 /*************************************************************************/
-/*	Start of Linked List routines					                     */
+/*	Start of Linked List routines										 */
 /*************************************************************************/
 
 HostCore *hostCoreListHead()
 {
-    return head;
+	return head;
 }
 
 /**
@@ -128,43 +128,43 @@ HostCore *hostCoreListHead()
  * @return HostCore
  */
 HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
-                             char *vHost, const char *creator, int32 tmp_time)
+							 char *vHost, const char *creator, int32 tmp_time)
 {
 
-    next = (HostCore *)malloc(sizeof(HostCore));
-    if (next == NULL) {
-        ircdproto->SendGlobops(s_HostServ,
-                         "Unable to allocate memory to create the vHost LL, problems i sense..");
-    } else {
-        next->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
-        next->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
-        next->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
-        if (vIdent)
-            next->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
-        if ((next->nick == NULL) || (next->vHost == NULL)
-            || (next->creator == NULL)) {
-            ircdproto->SendGlobops(s_HostServ,
-                             "Unable to allocate memory to create the vHost LL, problems i sense..");
-            return NULL;
-        }
-        strcpy(next->nick, nick);
-        strcpy(next->vHost, vHost);
-        strcpy(next->creator, creator);
-        if (vIdent) {
-            if ((next->vIdent == NULL)) {
-                ircdproto->SendGlobops(s_HostServ,
-                                 "Unable to allocate memory to create the vHost LL, problems i sense..");
-                return NULL;
-            }
-            strcpy(next->vIdent, vIdent);
-        } else {
-            next->vIdent = NULL;
-        }
-        next->time = tmp_time;
-        next->next = NULL;
-        return next;
-    }
-    return NULL;
+	next = (HostCore *)malloc(sizeof(HostCore));
+	if (next == NULL) {
+		ircdproto->SendGlobops(s_HostServ,
+						 "Unable to allocate memory to create the vHost LL, problems i sense..");
+	} else {
+		next->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
+		next->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
+		next->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
+		if (vIdent)
+			next->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
+		if ((next->nick == NULL) || (next->vHost == NULL)
+			|| (next->creator == NULL)) {
+			ircdproto->SendGlobops(s_HostServ,
+							 "Unable to allocate memory to create the vHost LL, problems i sense..");
+			return NULL;
+		}
+		strcpy(next->nick, nick);
+		strcpy(next->vHost, vHost);
+		strcpy(next->creator, creator);
+		if (vIdent) {
+			if ((next->vIdent == NULL)) {
+				ircdproto->SendGlobops(s_HostServ,
+								 "Unable to allocate memory to create the vHost LL, problems i sense..");
+				return NULL;
+			}
+			strcpy(next->vIdent, vIdent);
+		} else {
+			next->vIdent = NULL;
+		}
+		next->time = tmp_time;
+		next->next = NULL;
+		return next;
+	}
+	return NULL;
 }
 
 /*************************************************************************/
@@ -178,177 +178,177 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
  */
 HostCore *findHostCore(HostCore * phead, char *nick, bool* found)
 {
-    HostCore *previous, *current;
+	HostCore *previous, *current;
 
-    *found = false;
-    current = phead;
-    previous = current;
+	*found = false;
+	current = phead;
+	previous = current;
 
-    if (!nick) {
-        return NULL;
-    }
+	if (!nick) {
+		return NULL;
+	}
 
-    while (current != NULL) {
-        if (stricmp(nick, current->nick) == 0) {
-            *found = true;
-            break;
-        } else if (stricmp(nick, current->nick) < 0) {
-            /* we know were not gonna find it now.... */
-            break;
-        } else {
-            previous = current;
-            current = current->next;
-        }
-    }
-    if (current == phead) {
-        return NULL;
-    } else {
-        return previous;
-    }
+	while (current != NULL) {
+		if (stricmp(nick, current->nick) == 0) {
+			*found = true;
+			break;
+		} else if (stricmp(nick, current->nick) < 0) {
+			/* we know were not gonna find it now.... */
+			break;
+		} else {
+			previous = current;
+			current = current->next;
+		}
+	}
+	if (current == phead) {
+		return NULL;
+	} else {
+		return previous;
+	}
 }
 
 /*************************************************************************/
 HostCore *insertHostCore(HostCore * phead, HostCore * prev, char *nick,
-                         char *vIdent, char *vHost, const char *creator,
-                         int32 tmp_time)
+						 char *vIdent, char *vHost, const char *creator,
+						 int32 tmp_time)
 {
 
-    HostCore *newCore, *tmp;
+	HostCore *newCore, *tmp;
 
-    if (!nick || !vHost || !creator) {
-        return NULL;
-    }
+	if (!nick || !vHost || !creator) {
+		return NULL;
+	}
 
-    newCore = (HostCore *)malloc(sizeof(HostCore));
-    if (newCore == NULL) {
-        ircdproto->SendGlobops(s_HostServ,
-                         "Unable to allocate memory to insert into the vHost LL, problems i sense..");
-        return NULL;
-    } else {
-        newCore->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
-        newCore->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
-        newCore->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
-        if (vIdent)
-            newCore->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
-        if ((newCore->nick == NULL) || (newCore->vHost == NULL)
-            || (newCore->creator == NULL)) {
-            ircdproto->SendGlobops(s_HostServ,
-                             "Unable to allocate memory to create the vHost LL, problems i sense..");
-            return NULL;
-        }
-        strcpy(newCore->nick, nick);
-        strcpy(newCore->vHost, vHost);
-        strcpy(newCore->creator, creator);
-        if (vIdent) {
-            if ((newCore->vIdent == NULL)) {
-                ircdproto->SendGlobops(s_HostServ,
-                                 "Unable to allocate memory to create the vHost LL, problems i sense..");
-                return NULL;
-            }
-            strcpy(newCore->vIdent, vIdent);
-        } else {
-            newCore->vIdent = NULL;
-        }
-        newCore->time = tmp_time;
-        if (prev == NULL) {
-            tmp = phead;
-            phead = newCore;
-            newCore->next = tmp;
-        } else {
-            tmp = prev->next;
-            prev->next = newCore;
-            newCore->next = tmp;
-        }
-    }
-    return phead;
+	newCore = (HostCore *)malloc(sizeof(HostCore));
+	if (newCore == NULL) {
+		ircdproto->SendGlobops(s_HostServ,
+						 "Unable to allocate memory to insert into the vHost LL, problems i sense..");
+		return NULL;
+	} else {
+		newCore->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
+		newCore->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
+		newCore->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
+		if (vIdent)
+			newCore->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
+		if ((newCore->nick == NULL) || (newCore->vHost == NULL)
+			|| (newCore->creator == NULL)) {
+			ircdproto->SendGlobops(s_HostServ,
+							 "Unable to allocate memory to create the vHost LL, problems i sense..");
+			return NULL;
+		}
+		strcpy(newCore->nick, nick);
+		strcpy(newCore->vHost, vHost);
+		strcpy(newCore->creator, creator);
+		if (vIdent) {
+			if ((newCore->vIdent == NULL)) {
+				ircdproto->SendGlobops(s_HostServ,
+								 "Unable to allocate memory to create the vHost LL, problems i sense..");
+				return NULL;
+			}
+			strcpy(newCore->vIdent, vIdent);
+		} else {
+			newCore->vIdent = NULL;
+		}
+		newCore->time = tmp_time;
+		if (prev == NULL) {
+			tmp = phead;
+			phead = newCore;
+			newCore->next = tmp;
+		} else {
+			tmp = prev->next;
+			prev->next = newCore;
+			newCore->next = tmp;
+		}
+	}
+	return phead;
 }
 
 /*************************************************************************/
 HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
 {
 
-    HostCore *tmp;
+	HostCore *tmp;
 
-    if (prev == NULL) {
-        tmp = phead;
-        phead = phead->next;
-    } else {
-        tmp = prev->next;
-        prev->next = tmp->next;
-    }
-    free(tmp->vHost);
-    free(tmp->nick);
-    free(tmp->creator);
-    if (tmp->vIdent) {
-        free(tmp->vIdent);
-    }
-    free(tmp);
-    return phead;
+	if (prev == NULL) {
+		tmp = phead;
+		phead = phead->next;
+	} else {
+		tmp = prev->next;
+		prev->next = tmp->next;
+	}
+	free(tmp->vHost);
+	free(tmp->nick);
+	free(tmp->creator);
+	if (tmp->vIdent) {
+		free(tmp->vIdent);
+	}
+	free(tmp);
+	return phead;
 }
 
 /*************************************************************************/
 void addHostCore(char *nick, char *vIdent, char *vhost, const char *creator,
-                 int32 tmp_time)
+				 int32 tmp_time)
 {
-    HostCore *tmp;
-    bool found = false;
+	HostCore *tmp;
+	bool found = false;
 
-    if (head == NULL) {
-        head =
-            createHostCorelist(head, nick, vIdent, vhost, creator,
-                               tmp_time);
-    } else {
-        tmp = findHostCore(head, nick, &found);
-        if (!found) {
-            head =
-                insertHostCore(head, tmp, nick, vIdent, vhost, creator,
-                               tmp_time);
-        } else {
-            head = deleteHostCore(head, tmp);   /* delete the old entry */
-            addHostCore(nick, vIdent, vhost, creator, tmp_time);        /* recursive call to add new entry */
-        }
-    }
+	if (head == NULL) {
+		head =
+			createHostCorelist(head, nick, vIdent, vhost, creator,
+							   tmp_time);
+	} else {
+		tmp = findHostCore(head, nick, &found);
+		if (!found) {
+			head =
+				insertHostCore(head, tmp, nick, vIdent, vhost, creator,
+							   tmp_time);
+		} else {
+			head = deleteHostCore(head, tmp);   /* delete the old entry */
+			addHostCore(nick, vIdent, vhost, creator, tmp_time);		/* recursive call to add new entry */
+		}
+	}
 }
 
 /*************************************************************************/
 char *getvHost(char *nick)
 {
-    HostCore *tmp;
-    bool found = false;
-    tmp = findHostCore(head, nick, &found);
-    if (found) {
-        if (tmp == NULL)
-            return head->vHost;
-        else
-            return tmp->next->vHost;
-    }
-    return NULL;
+	HostCore *tmp;
+	bool found = false;
+	tmp = findHostCore(head, nick, &found);
+	if (found) {
+		if (tmp == NULL)
+			return head->vHost;
+		else
+			return tmp->next->vHost;
+	}
+	return NULL;
 }
 
 /*************************************************************************/
 char *getvIdent(char *nick)
 {
-    HostCore *tmp;
-    bool found = false;
-    tmp = findHostCore(head, nick, &found);
-    if (found) {
-        if (tmp == NULL)
-            return head->vIdent;
-        else
-            return tmp->next->vIdent;
-    }
-    return NULL;
+	HostCore *tmp;
+	bool found = false;
+	tmp = findHostCore(head, nick, &found);
+	if (found) {
+		if (tmp == NULL)
+			return head->vIdent;
+		else
+			return tmp->next->vIdent;
+	}
+	return NULL;
 }
 
 /*************************************************************************/
 void delHostCore(char *nick)
 {
-    HostCore *tmp;
-    bool found = false;
-    tmp = findHostCore(head, nick, &found);
-    if (found) {
-        head = deleteHostCore(head, tmp);
-    }
+	HostCore *tmp;
+	bool found = false;
+	tmp = findHostCore(head, nick, &found);
+	if (found) {
+		head = deleteHostCore(head, tmp);
+	}
 
 }
 
@@ -359,151 +359,151 @@ void delHostCore(char *nick)
 /*	Start of Load/Save routines					 */
 /*************************************************************************/
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	if ((x) < 0) {					\
 	if (!forceload)					\
-	    fatal("Read error on %s", HostDBName);	\
+		fatal("Read error on %s", HostDBName);	\
 	failed = 1;					\
 	break;						\
-    }							\
+	}							\
 } while (0)
 
 void load_hs_dbase(void)
 {
-    dbFILE *f;
-    int ver;
+	dbFILE *f;
+	int ver;
 
-    if (!(f = open_db(s_HostServ, HostDBName, "r", HOST_VERSION))) {
-        return;
-    }
-    ver = get_file_version(f);
+	if (!(f = open_db(s_HostServ, HostDBName, "r", HOST_VERSION))) {
+		return;
+	}
+	ver = get_file_version(f);
 
-    if (ver == 1) {
-        load_hs_dbase_v1(f);
-    } else if (ver == 2) {
-        load_hs_dbase_v2(f);
-    } else if (ver == 3) {
-        load_hs_dbase_v3(f);
-    }
-    close_db(f);
+	if (ver == 1) {
+		load_hs_dbase_v1(f);
+	} else if (ver == 2) {
+		load_hs_dbase_v2(f);
+	} else if (ver == 3) {
+		load_hs_dbase_v3(f);
+	}
+	close_db(f);
 }
 
 void load_hs_dbase_v1(dbFILE * f)
 {
-    int c;
-    int failed = 0;
-    int32 tmp;
+	int c;
+	int failed = 0;
+	int32 tmp;
 
-    char *nick;
-    char *vHost;
+	char *nick;
+	char *vHost;
 
-    tmp = time(NULL);
+	tmp = time(NULL);
 
-    while (!failed && (c = getc_db(f)) == 1) {
+	while (!failed && (c = getc_db(f)) == 1) {
 
-        if (c == 1) {
-            SAFE(read_string(&nick, f));
-            SAFE(read_string(&vHost, f));
-            addHostCore(nick, NULL, vHost, "Unknown", tmp);     /* could get a speed increase by not searching the list */
-            free(nick);         /* as we know the db is in alphabetical order... */
-            free(vHost);
-        } else {
-            fatal("Invalid format in %s %d", HostDBName, c);
-        }
-    }
+		if (c == 1) {
+			SAFE(read_string(&nick, f));
+			SAFE(read_string(&vHost, f));
+			addHostCore(nick, NULL, vHost, "Unknown", tmp);	 /* could get a speed increase by not searching the list */
+			free(nick);		 /* as we know the db is in alphabetical order... */
+			free(vHost);
+		} else {
+			fatal("Invalid format in %s %d", HostDBName, c);
+		}
+	}
 }
 
 void load_hs_dbase_v2(dbFILE * f)
 {
-    int c;
-    int failed = 0;
+	int c;
+	int failed = 0;
 
-    char *nick;
-    char *vHost;
-    char *creator;
-    uint32 time;
+	char *nick;
+	char *vHost;
+	char *creator;
+	uint32 time;
 
-    while (!failed && (c = getc_db(f)) == 1) {
+	while (!failed && (c = getc_db(f)) == 1) {
 
-        if (c == 1) {
-            SAFE(read_string(&nick, f));
-            SAFE(read_string(&vHost, f));
-            SAFE(read_string(&creator, f));
-            SAFE(read_int32(&time, f));
-            addHostCore(nick, NULL, vHost, creator, time);      /* could get a speed increase by not searching the list */
-            free(nick);         /* as we know the db is in alphabetical order... */
-            free(vHost);
-            free(creator);
-        } else {
-            fatal("Invalid format in %s %d", HostDBName, c);
-        }
-    }
+		if (c == 1) {
+			SAFE(read_string(&nick, f));
+			SAFE(read_string(&vHost, f));
+			SAFE(read_string(&creator, f));
+			SAFE(read_int32(&time, f));
+			addHostCore(nick, NULL, vHost, creator, time);	  /* could get a speed increase by not searching the list */
+			free(nick);		 /* as we know the db is in alphabetical order... */
+			free(vHost);
+			free(creator);
+		} else {
+			fatal("Invalid format in %s %d", HostDBName, c);
+		}
+	}
 }
 
 void load_hs_dbase_v3(dbFILE * f)
 {
-    int c;
-    int failed = 0;
+	int c;
+	int failed = 0;
 
-    char *nick;
-    char *vHost;
-    char *creator;
-    char *vIdent;
-    uint32 time;
+	char *nick;
+	char *vHost;
+	char *creator;
+	char *vIdent;
+	uint32 time;
 
-    while (!failed && (c = getc_db(f)) == 1) {
-        if (c == 1) {
-            SAFE(read_string(&nick, f));
-            SAFE(read_string(&vIdent, f));
-            SAFE(read_string(&vHost, f));
-            SAFE(read_string(&creator, f));
-            SAFE(read_int32(&time, f));
-            addHostCore(nick, vIdent, vHost, creator, time);    /* could get a speed increase by not searching the list */
-            free(nick);         /* as we know the db is in alphabetical order... */
-            free(vHost);
-            free(creator);
-            free(vIdent);
-        } else {
-            fatal("Invalid format in %s %d", HostDBName, c);
-        }
-    }
+	while (!failed && (c = getc_db(f)) == 1) {
+		if (c == 1) {
+			SAFE(read_string(&nick, f));
+			SAFE(read_string(&vIdent, f));
+			SAFE(read_string(&vHost, f));
+			SAFE(read_string(&creator, f));
+			SAFE(read_int32(&time, f));
+			addHostCore(nick, vIdent, vHost, creator, time);	/* could get a speed increase by not searching the list */
+			free(nick);		 /* as we know the db is in alphabetical order... */
+			free(vHost);
+			free(creator);
+			free(vIdent);
+		} else {
+			fatal("Invalid format in %s %d", HostDBName, c);
+		}
+	}
 }
 
 #undef SAFE
 /*************************************************************************/
 #define SAFE(x) do {						\
-    if ((x) < 0) {						\
+	if ((x) < 0) {						\
 	restore_db(f);						\
 	log_perror("Write error on %s", HostDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", HostDBName,	\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", HostDBName,	\
 			strerror(errno));			\
-	    lastwarn = time(NULL);				\
+		lastwarn = time(NULL);				\
 	}							\
 	return;							\
-    }								\
+	}								\
 } while (0)
 
 void save_hs_dbase(void)
 {
-    dbFILE *f;
-    static time_t lastwarn = 0;
-    HostCore *current;
+	dbFILE *f;
+	static time_t lastwarn = 0;
+	HostCore *current;
 
-    if (!(f = open_db(s_HostServ, HostDBName, "w", HOST_VERSION)))
-        return;
+	if (!(f = open_db(s_HostServ, HostDBName, "w", HOST_VERSION)))
+		return;
 
-    current = head;
-    while (current != NULL) {
-        SAFE(write_int8(1, f));
-        SAFE(write_string(current->nick, f));
-        SAFE(write_string(current->vIdent, f));
-        SAFE(write_string(current->vHost, f));
-        SAFE(write_string(current->creator, f));
-        SAFE(write_int32(current->time, f));
-        current = current->next;
-    }
-    SAFE(write_int8(0, f));
-    close_db(f);
+	current = head;
+	while (current != NULL) {
+		SAFE(write_int8(1, f));
+		SAFE(write_string(current->nick, f));
+		SAFE(write_string(current->vIdent, f));
+		SAFE(write_string(current->vHost, f));
+		SAFE(write_string(current->creator, f));
+		SAFE(write_int32(current->time, f));
+		current = current->next;
+	}
+	SAFE(write_int8(0, f));
+	close_db(f);
 
 }
 
@@ -517,74 +517,74 @@ void save_hs_dbase(void)
 /*************************************************************************/
 
 int do_hs_sync(NickCore * nc, char *vIdent, char *hostmask, char *creator,
-               time_t time)
+			   time_t time)
 {
-    int i;
-    NickAlias *na;
+	int i;
+	NickAlias *na;
 
-    for (i = 0; i < nc->aliases.count; i++) {
-        na = (NickAlias *)nc->aliases.list[i];
-        addHostCore(na->nick, vIdent, hostmask, creator, time);
-    }
-    return MOD_CONT;
+	for (i = 0; i < nc->aliases.count; i++) {
+		na = (NickAlias *)nc->aliases.list[i];
+		addHostCore(na->nick, vIdent, hostmask, creator, time);
+	}
+	return MOD_CONT;
 }
 
 /*************************************************************************/
 int do_on_id(User * u)
-{                               /* we've assumed that the user exists etc.. */
-    char *vHost;                /* as were only gonna call this from nsid routine */
-    char *vIdent;
-    vHost = getvHost(u->nick);
-    vIdent = getvIdent(u->nick);
-    if (vHost != NULL) {
-        if (vIdent) {
-            notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent,
-                        vHost);
-        } else {
-            notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
-        }
-        ircdproto->SendVhost(u->nick, vIdent, vHost);
-        if (ircd->vhost) {
-            u->vhost = sstrdup(vHost);
-        }
-        if (ircd->vident) {
-            if (vIdent)
-                u->vident = sstrdup(vIdent);
-        }
-        set_lastmask(u);
-    }
-    return MOD_CONT;
+{							   /* we've assumed that the user exists etc.. */
+	char *vHost;				/* as were only gonna call this from nsid routine */
+	char *vIdent;
+	vHost = getvHost(u->nick);
+	vIdent = getvIdent(u->nick);
+	if (vHost != NULL) {
+		if (vIdent) {
+			notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED, vIdent,
+						vHost);
+		} else {
+			notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
+		}
+		ircdproto->SendVhost(u->nick, vIdent, vHost);
+		if (ircd->vhost) {
+			u->vhost = sstrdup(vHost);
+		}
+		if (ircd->vident) {
+			if (vIdent)
+				u->vident = sstrdup(vIdent);
+		}
+		set_lastmask(u);
+	}
+	return MOD_CONT;
 }
 
 /*************************************************************************/
 int is_host_setter(User * u)
 {
-    int i, j;
-    NickAlias *na;
+	int i, j;
+	NickAlias *na;
 
-    if (is_services_oper(u)) {
-        return 1;
-    }
-    if (!nick_identified(u)) {
-        return 0;
-    }
+	if (is_services_oper(u)) {
+		return 1;
+	}
+	if (!nick_identified(u)) {
+		return 0;
+	}
 
-    /* Look through all user's aliases (0000412) */
-    for (i = 0; i < u->na->nc->aliases.count; i++) {
-        na = (NickAlias *)u->na->nc->aliases.list[i];
-        for (j = 0; j < HostNumber; j++) {
-            if (stricmp(HostSetters[j], na->nick) == 0) {
-                return 1;
-            }
-        }
-    }
+	/* Look through all user's aliases (0000412) */
+	for (i = 0; i < u->na->nc->aliases.count; i++) {
+		na = (NickAlias *)u->na->nc->aliases.list[i];
+		for (j = 0; j < HostNumber; j++) {
+			if (stricmp(HostSetters[j], na->nick) == 0) {
+				return 1;
+			}
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 int is_host_remover(User * u)
 {
-    return is_host_setter(u);   /* only here incase we want to split them up later */
+	return is_host_setter(u);   /* only here incase we want to split them up later */
 }
 
 /*
@@ -592,13 +592,13 @@ int is_host_remover(User * u)
  */
 void set_lastmask(User * u)
 {
-    if (u->na->last_usermask)
-        free(u->na->last_usermask);
+	if (u->na->last_usermask)
+		free(u->na->last_usermask);
 
-    u->na->last_usermask =
-        (char *)smalloc(strlen(common_get_vident(u)) +
-                strlen(common_get_vhost(u)) + 2);
-    sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
-            common_get_vhost(u));
+	u->na->last_usermask =
+		(char *)smalloc(strlen(common_get_vident(u)) +
+				strlen(common_get_vhost(u)) + 2);
+	sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
+			common_get_vhost(u));
 
 }

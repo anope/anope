@@ -45,10 +45,10 @@ class NSSuspend : public Module
  **/
 void myNickServHelp(User * u)
 {
-    if (is_services_oper(u)) {
-        notice_lang(s_NickServ, u, NICK_HELP_CMD_SUSPEND);
-        notice_lang(s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
-    }
+	if (is_services_oper(u)) {
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_SUSPEND);
+		notice_lang(s_NickServ, u, NICK_HELP_CMD_UNSUSPEND);
+	}
 }
 
 /**
@@ -58,121 +58,121 @@ void myNickServHelp(User * u)
  **/
 int do_suspend(User * u)
 {
-    NickAlias *na, *na2;
-    char *nick = strtok(NULL, " ");
-    char *reason = strtok(NULL, "");
-    int i;
+	NickAlias *na, *na2;
+	char *nick = strtok(NULL, " ");
+	char *reason = strtok(NULL, "");
+	int i;
 
-    if (!nick || !reason) {
-        syntax_error(s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
-        return MOD_CONT;
-    }
+	if (!nick || !reason) {
+		syntax_error(s_NickServ, u, "SUSPEND", NICK_SUSPEND_SYNTAX);
+		return MOD_CONT;
+	}
 
-    if (readonly) {
-        notice_lang(s_NickServ, u, READ_ONLY_MODE);
-        return MOD_CONT;
-    }
+	if (readonly) {
+		notice_lang(s_NickServ, u, READ_ONLY_MODE);
+		return MOD_CONT;
+	}
 
-    if ((na = findnick(nick)) == NULL) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-        return MOD_CONT;
-    }
+	if ((na = findnick(nick)) == NULL) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+		return MOD_CONT;
+	}
 
-    if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-        return MOD_CONT;
-    }
+	if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+		return MOD_CONT;
+	}
 
-    if (NSSecureAdmins && nick_is_services_admin(na->nc)
-        && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-    }
+	if (NSSecureAdmins && nick_is_services_admin(na->nc)
+		&& !is_services_root(u)) {
+		notice_lang(s_NickServ, u, PERMISSION_DENIED);
+		return MOD_CONT;
+	}
 
-    if (na) {
-        na->nc->flags |= NI_SUSPENDED;
-        na->nc->flags |= NI_SECURE;
-        na->nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
+	if (na) {
+		na->nc->flags |= NI_SUSPENDED;
+		na->nc->flags |= NI_SECURE;
+		na->nc->flags &= ~(NI_KILLPROTECT | NI_KILL_QUICK | NI_KILL_IMMED);
 
-        for (i = 0; i < na->nc->aliases.count; i++) {
-            na2 = (NickAlias *)na->nc->aliases.list[i];
-            if (na2->nc == na->nc) {
-                na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
-                na2->last_quit = sstrdup(reason);
-            }
-        }
+		for (i = 0; i < na->nc->aliases.count; i++) {
+			na2 = (NickAlias *)na->nc->aliases.list[i];
+			if (na2->nc == na->nc) {
+				na2->status &= ~(NS_IDENTIFIED | NS_RECOGNIZED);
+				na2->last_quit = sstrdup(reason);
+			}
+		}
 
-        if (WallForbid)
-            ircdproto->SendGlobops(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2",
-                             u->nick, nick);
+		if (WallForbid)
+			ircdproto->SendGlobops(s_NickServ, "\2%s\2 used SUSPEND on \2%s\2",
+							 u->nick, nick);
 
-        alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
-        notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
-        send_event(EVENT_NICK_SUSPENDED, 1, nick);
+		alog("%s: %s set SUSPEND for nick %s", s_NickServ, u->nick, nick);
+		notice_lang(s_NickServ, u, NICK_SUSPEND_SUCCEEDED, nick);
+		send_event(EVENT_NICK_SUSPENDED, 1, nick);
 
-    } else {
+	} else {
 
-        alog("%s: Valid SUSPEND for %s by %s failed", s_NickServ, nick,
-             u->nick);
-        notice_lang(s_NickServ, u, NICK_SUSPEND_FAILED, nick);
+		alog("%s: Valid SUSPEND for %s by %s failed", s_NickServ, nick,
+			 u->nick);
+		notice_lang(s_NickServ, u, NICK_SUSPEND_FAILED, nick);
 
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 /*************************************************************************/
 
 int do_unsuspend(User * u)
 {
-    NickAlias *na;
-    char *nick = strtok(NULL, " ");
+	NickAlias *na;
+	char *nick = strtok(NULL, " ");
 
-    if (!nick) {
-        syntax_error(s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
-        return MOD_CONT;
-    }
+	if (!nick) {
+		syntax_error(s_NickServ, u, "UNSUSPEND", NICK_UNSUSPEND_SYNTAX);
+		return MOD_CONT;
+	}
 
-    if (readonly) {
-        notice_lang(s_NickServ, u, READ_ONLY_MODE);
-        return MOD_CONT;
-    }
+	if (readonly) {
+		notice_lang(s_NickServ, u, READ_ONLY_MODE);
+		return MOD_CONT;
+	}
 
-    if ((na = findnick(nick)) == NULL) {
-        notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
-        return MOD_CONT;
-    }
+	if ((na = findnick(nick)) == NULL) {
+		notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED, nick);
+		return MOD_CONT;
+	}
 
-    if (na->status & NS_VERBOTEN) {
-        notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
-        return MOD_CONT;
-    }
-    if (NSSecureAdmins && nick_is_services_admin(na->nc)
-        && !is_services_root(u)) {
-        notice_lang(s_NickServ, u, PERMISSION_DENIED);
-        return MOD_CONT;
-    }
+	if (na->status & NS_VERBOTEN) {
+		notice_lang(s_NickServ, u, NICK_X_FORBIDDEN, na->nick);
+		return MOD_CONT;
+	}
+	if (NSSecureAdmins && nick_is_services_admin(na->nc)
+		&& !is_services_root(u)) {
+		notice_lang(s_NickServ, u, PERMISSION_DENIED);
+		return MOD_CONT;
+	}
 
-    if (na) {
-        na->nc->flags &= ~NI_SUSPENDED;
+	if (na) {
+		na->nc->flags &= ~NI_SUSPENDED;
 
-        if (WallForbid)
-            ircdproto->SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2",
-                             u->nick, nick);
+		if (WallForbid)
+			ircdproto->SendGlobops(s_NickServ, "\2%s\2 used UNSUSPEND on \2%s\2",
+							 u->nick, nick);
 
-        alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick,
-             nick);
-        notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
-        send_event(EVENT_NICK_UNSUSPEND, 1, nick);
+		alog("%s: %s set UNSUSPEND for nick %s", s_NickServ, u->nick,
+			 nick);
+		notice_lang(s_NickServ, u, NICK_UNSUSPEND_SUCCEEDED, nick);
+		send_event(EVENT_NICK_UNSUSPEND, 1, nick);
 
-    } else {
+	} else {
 
-        alog("%s: Valid UNSUSPEND for %s by %s failed", s_NickServ, nick,
-             u->nick);
-        notice_lang(s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
+		alog("%s: Valid UNSUSPEND for %s by %s failed", s_NickServ, nick,
+			 u->nick);
+		notice_lang(s_NickServ, u, NICK_UNSUSPEND_FAILED, nick);
 
-    }
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 
 }
 

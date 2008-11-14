@@ -20,17 +20,17 @@
 
 void ModuleManager::LoadModuleList(int total_modules, char **module_list)
 {
-    int idx;
-    Module *m;
-    int status = 0;
-    for (idx = 0; idx < total_modules; idx++) {
-        m = findModule(module_list[idx]);
-        if (!m) {
-            status = ModuleManager::LoadModule(module_list[idx], NULL);
-            mod_current_module = NULL;
-            mod_current_user = NULL;
-        }
-    }
+	int idx;
+	Module *m;
+	int status = 0;
+	for (idx = 0; idx < total_modules; idx++) {
+		m = findModule(module_list[idx]);
+		if (!m) {
+			status = ModuleManager::LoadModule(module_list[idx], NULL);
+			mod_current_module = NULL;
+			mod_current_user = NULL;
+		}
+	}
 }
 
 /**
@@ -44,17 +44,17 @@ void ModuleManager::LoadModuleList(int total_modules, char **module_list)
  */
 static int moduleCopyFile(const char *name, const char *output)
 {
-    int ch;
-    FILE *source, *target;
+	int ch;
+	FILE *source, *target;
 	int srcfp;
-    char input[4096];
-    int len;
+	char input[4096];
+	int len;
 
-    strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
-    len = strlen(input);
-    strncat(input, name, 4095 - len);
-    len = strlen(output);
-    strncat(input, MODULE_EXT, 4095 - len);
+	strncpy(input, MODULE_PATH, 4095);  /* Get full path with module extension */
+	len = strlen(input);
+	strncat(input, name, 4095 - len);
+	len = strlen(output);
+	strncat(input, MODULE_EXT, 4095 - len);
 
 #ifndef _WIN32
 	if ((srcfp = mkstemp((char *)output)) == -1)
@@ -71,27 +71,27 @@ static int moduleCopyFile(const char *name, const char *output)
 	 * calls for it here? -GD
 	 */
 #ifndef _WIN32
-    if ((source = fopen(input, "r")) == NULL) {
+	if ((source = fopen(input, "r")) == NULL) {
 #else
-    if ((source = fopen(input, "rb")) == NULL) {
+	if ((source = fopen(input, "rb")) == NULL) {
 #endif
-        return MOD_ERR_NOEXIST;
-    }
+		return MOD_ERR_NOEXIST;
+	}
 #ifndef _WIN32
-    if ((target = fdopen(srcfp, "w")) == NULL) {
+	if ((target = fdopen(srcfp, "w")) == NULL) {
 #else
-    if ((target = fopen(output, "wb")) == NULL) {
+	if ((target = fopen(output, "wb")) == NULL) {
 #endif
-        return MOD_ERR_FILE_IO;
-    }
-    while ((ch = fgetc(source)) != EOF) {
-        fputc(ch, target);
-    }
-    fclose(source);
-    if (fclose(target) != 0) {
-        return MOD_ERR_FILE_IO;
-    }
-    return MOD_ERR_OK;
+		return MOD_ERR_FILE_IO;
+	}
+	while ((ch = fgetc(source)) != EOF) {
+		fputc(ch, target);
+	}
+	fclose(source);
+	if (fclose(target) != 0) {
+		return MOD_ERR_FILE_IO;
+	}
+	return MOD_ERR_OK;
 }
 
 static bool IsOneOfModuleTypeLoaded(MODType mt)
@@ -148,7 +148,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	pbuf += "XXXXXX";
 
 	/* Don't skip return value checking! -GD */
-    if ((ret = moduleCopyFile(modname.c_str(), pbuf.c_str())) != MOD_ERR_OK)
+	if ((ret = moduleCopyFile(modname.c_str(), pbuf.c_str())) != MOD_ERR_OK)
 	{
 		/* XXX: This used to assign filename here, but I don't think that was correct..
 		 * even if it was, it makes life very fucking difficult, so.
@@ -174,7 +174,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 		return MOD_ERR_NOLOAD;
 	}
 
-    if (!func)
+	if (!func)
 	{
 		throw CoreException("Couldn't find constructor, yet moderror wasn't set?");
 	}

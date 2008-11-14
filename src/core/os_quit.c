@@ -43,9 +43,9 @@ class OSQuit : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_root(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
-    }
+	if (is_services_root(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_QUIT);
+	}
 }
 
 /**
@@ -55,17 +55,17 @@ void myOperServHelp(User * u)
  **/
 int do_os_quit(User * u)
 {
-    quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
-    if (!quitmsg)
-        quitmsg = "QUIT command received, but out of memory!";
-    else
-        sprintf((char *)quitmsg, "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
+	quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
+	if (!quitmsg)
+		quitmsg = "QUIT command received, but out of memory!";
+	else
+		sprintf((char *)quitmsg, "QUIT command received from %s", u->nick); // XXX we know this is safe, but..
 
-    if (GlobalOnCycle) {
-        oper_global(NULL, "%s", GlobalOnCycleMessage);
-    }
-    quitting = 1;
-    return MOD_CONT;
+	if (GlobalOnCycle) {
+		oper_global(NULL, "%s", GlobalOnCycleMessage);
+	}
+	quitting = 1;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_quit", OSQuit)

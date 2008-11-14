@@ -43,7 +43,7 @@ class OSModList : public Module
  **/
 void myOperServHelp(User * u)
 {
-    notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLIST);
+	notice_lang(s_OperServ, u, OPER_HELP_CMD_MODLIST);
 }
 
 /**
@@ -53,132 +53,132 @@ void myOperServHelp(User * u)
  **/
 int do_modlist(User * u)
 {
-    int idx;
-    int count = 0;
-    int showCore = 0;
-    int showThird = 1;
-    int showProto = 1;
-    int showEnc = 1;
-    int showSupported = 1;
-    int showQA = 1;
+	int idx;
+	int count = 0;
+	int showCore = 0;
+	int showThird = 1;
+	int showProto = 1;
+	int showEnc = 1;
+	int showSupported = 1;
+	int showQA = 1;
 
-    char *param;
-    ModuleHash *current = NULL;
+	char *param;
+	ModuleHash *current = NULL;
 
-    char core[] = "Core";
-    char third[] = "3rd";
-    char proto[] = "Protocol";
-    char enc[] = "Encryption";
-    char supported[] = "Supported";
-    char qa[] = "QATested";
+	char core[] = "Core";
+	char third[] = "3rd";
+	char proto[] = "Protocol";
+	char enc[] = "Encryption";
+	char supported[] = "Supported";
+	char qa[] = "QATested";
 
-    param = strtok(NULL, "");
-    if (param) {
-        if (stricmp(param, core) == 0) {
-            showCore = 1;
-            showThird = 0;
-            showProto = 0;
-            showEnc = 0;
-            showSupported = 0;
-            showQA = 0;
-        } else if (stricmp(param, third) == 0) {
-            showCore = 0;
-            showThird = 1;
-            showSupported = 0;
-            showQA = 0;
-            showProto = 0;
-            showEnc = 0;
-        } else if (stricmp(param, proto) == 0) {
-            showCore = 0;
-            showThird = 0;
-            showProto = 1;
-            showEnc = 0;
-            showSupported = 0;
-            showQA = 0;
-        } else if (stricmp(param, supported) == 0) {
-            showCore = 0;
-            showThird = 0;
-            showProto = 0;
-            showSupported = 1;
-            showEnc = 0;
-            showQA = 0;
-        } else if (stricmp(param, qa) == 0) {
-            showCore = 0;
-            showThird = 0;
-            showProto = 0;
-            showSupported = 0;
-            showEnc = 0;
-            showQA = 1;
-        } else if (stricmp(param, enc) == 0) {
-            showCore = 0;
-            showThird = 0;
-            showProto = 0;
-            showSupported = 0;
-            showEnc = 1;
-            showQA = 0;
-        }
-    }
+	param = strtok(NULL, "");
+	if (param) {
+		if (stricmp(param, core) == 0) {
+			showCore = 1;
+			showThird = 0;
+			showProto = 0;
+			showEnc = 0;
+			showSupported = 0;
+			showQA = 0;
+		} else if (stricmp(param, third) == 0) {
+			showCore = 0;
+			showThird = 1;
+			showSupported = 0;
+			showQA = 0;
+			showProto = 0;
+			showEnc = 0;
+		} else if (stricmp(param, proto) == 0) {
+			showCore = 0;
+			showThird = 0;
+			showProto = 1;
+			showEnc = 0;
+			showSupported = 0;
+			showQA = 0;
+		} else if (stricmp(param, supported) == 0) {
+			showCore = 0;
+			showThird = 0;
+			showProto = 0;
+			showSupported = 1;
+			showEnc = 0;
+			showQA = 0;
+		} else if (stricmp(param, qa) == 0) {
+			showCore = 0;
+			showThird = 0;
+			showProto = 0;
+			showSupported = 0;
+			showEnc = 0;
+			showQA = 1;
+		} else if (stricmp(param, enc) == 0) {
+			showCore = 0;
+			showThird = 0;
+			showProto = 0;
+			showSupported = 0;
+			showEnc = 1;
+			showQA = 0;
+		}
+	}
 
-    notice_lang(s_OperServ, u, OPER_MODULE_LIST_HEADER);
+	notice_lang(s_OperServ, u, OPER_MODULE_LIST_HEADER);
 
-    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-        for (current = MODULE_HASH[idx]; current; current = current->next) {
-            switch (current->m->type) {
-            case CORE:
-                if (showCore) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(), core);
-                    count++;
-                }
-                break;
-            case THIRD:
-                if (showThird) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(), third);
-                    count++;
-                }
-                break;
-            case PROTOCOL:
-                if (showProto) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(), proto);
-                    count++;
-                }
-                break;
-            case SUPPORTED:
-                if (showSupported) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(),
-                                supported);
-                    count++;
-                }
-                break;
-            case QATESTED:
-                if (showQA) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(), qa);
-                    count++;
-                }
-                break;
-            case ENCRYPTION:
-                if (showEnc) {
-                    notice_lang(s_OperServ, u, OPER_MODULE_LIST,
-                                current->name, current->m->version.c_str(), enc);
-                    count++;
-                }
-                break;
+	for (idx = 0; idx != MAX_CMD_HASH; idx++) {
+		for (current = MODULE_HASH[idx]; current; current = current->next) {
+			switch (current->m->type) {
+			case CORE:
+				if (showCore) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(), core);
+					count++;
+				}
+				break;
+			case THIRD:
+				if (showThird) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(), third);
+					count++;
+				}
+				break;
+			case PROTOCOL:
+				if (showProto) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(), proto);
+					count++;
+				}
+				break;
+			case SUPPORTED:
+				if (showSupported) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(),
+								supported);
+					count++;
+				}
+				break;
+			case QATESTED:
+				if (showQA) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(), qa);
+					count++;
+				}
+				break;
+			case ENCRYPTION:
+				if (showEnc) {
+					notice_lang(s_OperServ, u, OPER_MODULE_LIST,
+								current->name, current->m->version.c_str(), enc);
+					count++;
+				}
+				break;
 
-            }
+			}
 
-        }
-    }
-    if (count == 0) {
-        notice_lang(s_OperServ, u, OPER_MODULE_NO_LIST);
-    } else {
-        notice_lang(s_OperServ, u, OPER_MODULE_LIST_FOOTER, count);
-    }
+		}
+	}
+	if (count == 0) {
+		notice_lang(s_OperServ, u, OPER_MODULE_NO_LIST);
+	} else {
+		notice_lang(s_OperServ, u, OPER_MODULE_LIST_FOOTER, count);
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_modlist", OSModList)

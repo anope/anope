@@ -30,19 +30,19 @@
  */
 void *smalloc(long size)
 {
-    void *buf;
+	void *buf;
 
-    if (!size) {
-        size = 1;
-    }
-    buf = malloc(size);
-    if (!buf)
+	if (!size) {
+		size = 1;
+	}
+	buf = malloc(size);
+	if (!buf)
 #ifndef _WIN32
-        raise(SIGUSR1);
+		raise(SIGUSR1);
 #else
-        abort();
+		abort();
 #endif
-    return buf;
+	return buf;
 }
 
 /*************************************************************************/
@@ -55,19 +55,19 @@ void *smalloc(long size)
  */
 void *scalloc(long elsize, long els)
 {
-    void *buf;
+	void *buf;
 
-    if (!elsize || !els) {
-        elsize = els = 1;
-    }
-    buf = calloc(elsize, els);
-    if (!buf)
+	if (!elsize || !els) {
+		elsize = els = 1;
+	}
+	buf = calloc(elsize, els);
+	if (!buf)
 #ifndef _WIN32
-        raise(SIGUSR1);
+		raise(SIGUSR1);
 #else
-        abort();
+		abort();
 #endif
-    return buf;
+	return buf;
 }
 
 /*************************************************************************/
@@ -80,19 +80,19 @@ void *scalloc(long elsize, long els)
  */
 void *srealloc(void *oldptr, long newsize)
 {
-    void *buf;
+	void *buf;
 
-    if (!newsize) {
-        newsize = 1;
-    }
-    buf = realloc(oldptr, newsize);
-    if (!buf)
+	if (!newsize) {
+		newsize = 1;
+	}
+	buf = realloc(oldptr, newsize);
+	if (!buf)
 #ifndef _WIN32
-        raise(SIGUSR1);
+		raise(SIGUSR1);
 #else
-        abort();
+		abort();
 #endif
-    return buf;
+	return buf;
 }
 
 /*************************************************************************/
@@ -105,28 +105,28 @@ void *srealloc(void *oldptr, long newsize)
  */
 char *sstrdup(const char *src)
 {
-    char *ret = NULL;
-    if (src) {
+	char *ret = NULL;
+	if (src) {
 #ifdef __STRICT_ANSI__
-        if ((ret = (char *) malloc(strlen(src) + 1))) {;
-            strcpy(ret, src);
-        }
+		if ((ret = (char *) malloc(strlen(src) + 1))) {;
+			strcpy(ret, src);
+		}
 #else
-        ret = strdup(src);
+		ret = strdup(src);
 #endif
-        if (!ret)
+		if (!ret)
 #ifndef _WIN32
-            raise(SIGUSR1);
+			raise(SIGUSR1);
 #else
-            abort();
+			abort();
 #endif
-    } else {
-        alog("sstrdup() called with NULL-arg");
-        if (debug)
-            do_backtrace(0);
-    }
+	} else {
+		alog("sstrdup() called with NULL-arg");
+		if (debug)
+			do_backtrace(0);
+	}
 
-    return ret;
+	return ret;
 }
 
 /*************************************************************************/

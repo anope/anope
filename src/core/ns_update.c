@@ -44,7 +44,7 @@ class NSUpdate : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_UPDATE);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_UPDATE);
 }
 
 /**
@@ -54,26 +54,26 @@ void myNickServHelp(User * u)
  **/
 int do_nickupdate(User * u)
 {
-    NickAlias *na;
+	NickAlias *na;
 
-    if (!nick_identified(u)) {
-        notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-    } else {
-        na = u->na;
-        if (NSModeOnID)
-            do_setmodes(u);
-        check_memos(u);
-        if (na->last_realname)
-            free(na->last_realname);
-        na->last_realname = sstrdup(u->realname);
-        na->status |= NS_IDENTIFIED;
-        na->last_seen = time(NULL);
-        if (ircd->vhost) {
-            do_on_id(u);
-        }
-        notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);
-    }
-    return MOD_CONT;
+	if (!nick_identified(u)) {
+		notice_lang(s_NickServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+	} else {
+		na = u->na;
+		if (NSModeOnID)
+			do_setmodes(u);
+		check_memos(u);
+		if (na->last_realname)
+			free(na->last_realname);
+		na->last_realname = sstrdup(u->realname);
+		na->status |= NS_IDENTIFIED;
+		na->last_seen = time(NULL);
+		if (ircd->vhost) {
+			do_on_id(u);
+		}
+		notice_lang(s_NickServ, u, NICK_UPDATE_SUCCESS, s_NickServ);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_update", NSUpdate)

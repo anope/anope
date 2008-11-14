@@ -18,502 +18,502 @@
 #include "solidircd.h"
 
 IRCDVar myIrcd[] = {
-    {"Solid-IRCd 3.4.*",        /* ircd name */
-     "+o",                      /* nickserv mode */
-     "+o",                      /* chanserv mode */
-     "+o",                      /* memoserv mode */
-     "+o",                      /* hostserv mode */
-     "+io",                     /* operserv mode */
-     "+o",                      /* botserv mode  */
-     "+h",                      /* helpserv mode */
-     "+i",                      /* Dev/Null mode */
-     "+io",                     /* Global mode   */
-     "+o",                      /* nickserv alias mode */
-     "+o",                      /* chanserv alias mode */
-     "+o",                      /* memoserv alias mode */
-     "+io",                     /* hostserv alias mode */
-     "+io",                     /* operserv alias mode */
-     "+o",                      /* botserv alias mode  */
-     "+h",                      /* helpserv alias mode */
-     "+i",                      /* Dev/Null alias mode */
-     "+io",                     /* Global alias mode   */
-     "+",                       /* Used by BotServ Bots */
-     2,                         /* Chan Max Symbols     */
-     "-cilmnpstOR",             /* Modes to Remove */
-     "+o",                      /* Channel Umode used by Botserv bots */
-     1,                         /* SVSNICK */
-     1,                         /* Vhost  */
-     0,                         /* Has Owner */
-     NULL,                      /* Mode to set for an owner */
-     NULL,                      /* Mode to unset for an owner */
-     NULL,                      /* Mode to set for chan admin */
-     NULL,                      /* Mode to unset for chan admin */
-     "+rd",                     /* Mode On Reg          */
-     NULL,                      /* Mode on ID for Roots */
-     NULL,                      /* Mode on ID for Admins */
-     NULL,                      /* Mode on ID for Opers */
-     "-r+d",                    /* Mode on UnReg        */
-     "+d",                      /* Mode on Nick Change  */
-     1,                         /* Supports SGlines     */
-     1,                         /* Supports SQlines     */
-     1,                         /* Supports SZlines     */
-     1,                         /* Supports Halfop +h   */
-     3,                         /* Number of server args */
-     0,                         /* Join 2 Set           */
-     0,                         /* Join 2 Message       */
-     1,                         /* Has exceptions +e    */
-     0,                         /* TS Topic Forward     */
-     0,                         /* TS Topci Backward    */
-     0,                         /* Protected Umode      */
-     0,                         /* Has Admin            */
-     1,                         /* Chan SQlines         */
-     1,                         /* Quit on Kill         */
-     1,                         /* SVSMODE unban        */
-     0,                         /* Has Protect          */
-     0,                         /* Reverse              */
-     1,                         /* Chan Reg             */
-     CMODE_r,                   /* Channel Mode         */
-     0,                         /* vidents              */
-     1,                         /* svshold              */
-     1,                         /* time stamp on mode   */
-     1,                         /* NICKIP               */
-     0,                         /* O:LINE               */
-     1,                         /* UMODE               */
-     0,                         /* VHOST ON NICK        */
-     0,                         /* Change RealName      */
-     0,                         /* No Knock             */
-     0,                         /* Admin Only           */
-     DEFAULT_MLOCK,             /* Default MLOCK       */
-     UMODE_v,                   /* Vhost Mode           */
-     1,                         /* +f                   */
-     0,                         /* +L                   */
-     CMODE_j,                   /* Mode */
-     0,                         /* Mode */
-     1,
-     1,                         /* No Knock requires +i */
-     NULL,                      /* CAPAB Chan Modes             */
-     0,                         /* We support TOKENS */
-     1,                         /* TOKENS are CASE inSensitive */
-     0,                         /* TIME STAMPS are BASE64 */
-     1,                         /* +I support */
-     0,                         /* SJOIN ban char */
-     0,                         /* SJOIN except char */
-     0,                         /* SJOIN invite char */
-     0,                         /* Can remove User Channel Modes with SVSMODE */
-     0,                         /* Sglines are not enforced until user reconnects */
-     "v",                       /* vhost char */
-     0,                         /* ts6 */
-     1,                         /* support helper umode */
-     0,                         /* p10 */
-     NULL,                      /* character set */
-     1,                         /* reports sync state */
-     0,                         /* CIDR channelbans */
-     }
-    ,
-    {NULL}
+	{"Solid-IRCd 3.4.*",		/* ircd name */
+	 "+o",					  /* nickserv mode */
+	 "+o",					  /* chanserv mode */
+	 "+o",					  /* memoserv mode */
+	 "+o",					  /* hostserv mode */
+	 "+io",					 /* operserv mode */
+	 "+o",					  /* botserv mode  */
+	 "+h",					  /* helpserv mode */
+	 "+i",					  /* Dev/Null mode */
+	 "+io",					 /* Global mode   */
+	 "+o",					  /* nickserv alias mode */
+	 "+o",					  /* chanserv alias mode */
+	 "+o",					  /* memoserv alias mode */
+	 "+io",					 /* hostserv alias mode */
+	 "+io",					 /* operserv alias mode */
+	 "+o",					  /* botserv alias mode  */
+	 "+h",					  /* helpserv alias mode */
+	 "+i",					  /* Dev/Null alias mode */
+	 "+io",					 /* Global alias mode   */
+	 "+",					   /* Used by BotServ Bots */
+	 2,						 /* Chan Max Symbols	 */
+	 "-cilmnpstOR",			 /* Modes to Remove */
+	 "+o",					  /* Channel Umode used by Botserv bots */
+	 1,						 /* SVSNICK */
+	 1,						 /* Vhost  */
+	 0,						 /* Has Owner */
+	 NULL,					  /* Mode to set for an owner */
+	 NULL,					  /* Mode to unset for an owner */
+	 NULL,					  /* Mode to set for chan admin */
+	 NULL,					  /* Mode to unset for chan admin */
+	 "+rd",					 /* Mode On Reg		  */
+	 NULL,					  /* Mode on ID for Roots */
+	 NULL,					  /* Mode on ID for Admins */
+	 NULL,					  /* Mode on ID for Opers */
+	 "-r+d",					/* Mode on UnReg		*/
+	 "+d",					  /* Mode on Nick Change  */
+	 1,						 /* Supports SGlines	 */
+	 1,						 /* Supports SQlines	 */
+	 1,						 /* Supports SZlines	 */
+	 1,						 /* Supports Halfop +h   */
+	 3,						 /* Number of server args */
+	 0,						 /* Join 2 Set		   */
+	 0,						 /* Join 2 Message	   */
+	 1,						 /* Has exceptions +e	*/
+	 0,						 /* TS Topic Forward	 */
+	 0,						 /* TS Topci Backward	*/
+	 0,						 /* Protected Umode	  */
+	 0,						 /* Has Admin			*/
+	 1,						 /* Chan SQlines		 */
+	 1,						 /* Quit on Kill		 */
+	 1,						 /* SVSMODE unban		*/
+	 0,						 /* Has Protect		  */
+	 0,						 /* Reverse			  */
+	 1,						 /* Chan Reg			 */
+	 CMODE_r,				   /* Channel Mode		 */
+	 0,						 /* vidents			  */
+	 1,						 /* svshold			  */
+	 1,						 /* time stamp on mode   */
+	 1,						 /* NICKIP			   */
+	 0,						 /* O:LINE			   */
+	 1,						 /* UMODE			   */
+	 0,						 /* VHOST ON NICK		*/
+	 0,						 /* Change RealName	  */
+	 0,						 /* No Knock			 */
+	 0,						 /* Admin Only		   */
+	 DEFAULT_MLOCK,			 /* Default MLOCK	   */
+	 UMODE_v,				   /* Vhost Mode		   */
+	 1,						 /* +f				   */
+	 0,						 /* +L				   */
+	 CMODE_j,				   /* Mode */
+	 0,						 /* Mode */
+	 1,
+	 1,						 /* No Knock requires +i */
+	 NULL,					  /* CAPAB Chan Modes			 */
+	 0,						 /* We support TOKENS */
+	 1,						 /* TOKENS are CASE inSensitive */
+	 0,						 /* TIME STAMPS are BASE64 */
+	 1,						 /* +I support */
+	 0,						 /* SJOIN ban char */
+	 0,						 /* SJOIN except char */
+	 0,						 /* SJOIN invite char */
+	 0,						 /* Can remove User Channel Modes with SVSMODE */
+	 0,						 /* Sglines are not enforced until user reconnects */
+	 "v",					   /* vhost char */
+	 0,						 /* ts6 */
+	 1,						 /* support helper umode */
+	 0,						 /* p10 */
+	 NULL,					  /* character set */
+	 1,						 /* reports sync state */
+	 0,						 /* CIDR channelbans */
+	 }
+	,
+	{NULL}
 };
 
 IRCDCAPAB myIrcdcap[] = {
-    {
-     CAPAB_NOQUIT,              /* NOQUIT       */
-     CAPAB_TSMODE,              /* TSMODE       */
-     CAPAB_UNCONNECT,           /* UNCONNECT    */
-     0,                         /* NICKIP       */
-     0,                         /* SJOIN        */
-     0,                         /* ZIP          */
-     CAPAB_BURST,               /* BURST        */
-     0,                         /* TS5          */
-     0,                         /* TS3          */
-     CAPAB_DKEY,                /* DKEY         */
-     0,                         /* PT4          */
-     0,                         /* SCS          */
-     0,                         /* QS           */
-     0,                         /* UID          */
-     0,                         /* KNOCK        */
-     0,                         /* CLIENT       */
-     0,                         /* IPV6         */
-     0,                         /* SSJ5         */
-     0,                         /* SN2          */
-     0,                         /* TOKEN        */
-     0,                         /* VHOST        */
-     0,                         /* SSJ3         */
-     0,                         /* NICK2        */
-     0,                         /* UMODE2       */
-     0,                         /* VL           */
-     0,                         /* TLKEXT       */
-     0,                         /* DODKEY       */
-     CAPAB_DOZIP,               /* DOZIP        */
-     0, 0, 0}
+	{
+	 CAPAB_NOQUIT,			  /* NOQUIT	   */
+	 CAPAB_TSMODE,			  /* TSMODE	   */
+	 CAPAB_UNCONNECT,		   /* UNCONNECT	*/
+	 0,						 /* NICKIP	   */
+	 0,						 /* SJOIN		*/
+	 0,						 /* ZIP		  */
+	 CAPAB_BURST,			   /* BURST		*/
+	 0,						 /* TS5		  */
+	 0,						 /* TS3		  */
+	 CAPAB_DKEY,				/* DKEY		 */
+	 0,						 /* PT4		  */
+	 0,						 /* SCS		  */
+	 0,						 /* QS		   */
+	 0,						 /* UID		  */
+	 0,						 /* KNOCK		*/
+	 0,						 /* CLIENT	   */
+	 0,						 /* IPV6		 */
+	 0,						 /* SSJ5		 */
+	 0,						 /* SN2		  */
+	 0,						 /* TOKEN		*/
+	 0,						 /* VHOST		*/
+	 0,						 /* SSJ3		 */
+	 0,						 /* NICK2		*/
+	 0,						 /* UMODE2	   */
+	 0,						 /* VL		   */
+	 0,						 /* TLKEXT	   */
+	 0,						 /* DODKEY	   */
+	 CAPAB_DOZIP,			   /* DOZIP		*/
+	 0, 0, 0}
 };
 
 
 void solidircd_ProcessUsermodes(User * user, int ac, const char **av)
 {
-    int add = 1;                /* 1 if adding modes, 0 if deleting */
-    const char *modes = av[0];
+	int add = 1;				/* 1 if adding modes, 0 if deleting */
+	const char *modes = av[0];
 
-    ac--;
+	ac--;
 
-    if (debug)
-        alog("debug: Changing mode for %s to %s", user->nick, modes);
+	if (debug)
+		alog("debug: Changing mode for %s to %s", user->nick, modes);
 
-    while (*modes) {
+	while (*modes) {
 
-        /* This looks better, much better than "add ? (do_add) : (do_remove)".
-         * At least this is readable without paying much attention :) -GD
-         */
-        if (add)
-            user->mode |= umodes[(int) *modes];
-        else
-            user->mode &= ~umodes[(int) *modes];
+		/* This looks better, much better than "add ? (do_add) : (do_remove)".
+		 * At least this is readable without paying much attention :) -GD
+		 */
+		if (add)
+			user->mode |= umodes[(int) *modes];
+		else
+			user->mode &= ~umodes[(int) *modes];
 
-        switch (*modes++) {
-        case '+':
-            add = 1;
-            break;
-        case '-':
-            add = 0;
-            break;
-        case 'a':
-            if (UnRestrictSAdmin) {
-                break;
-            }
-            if (add && !is_services_admin(user)) {
-                common_svsmode(user, "-a", NULL);
-                user->mode &= ~UMODE_a;
-            }
-            break;
-        case 'd':
-            if (ac == 0) {
-                alog("user: umode +d with no parameter (?) for user %s",
-                     user->nick);
-                break;
-            }
+		switch (*modes++) {
+		case '+':
+			add = 1;
+			break;
+		case '-':
+			add = 0;
+			break;
+		case 'a':
+			if (UnRestrictSAdmin) {
+				break;
+			}
+			if (add && !is_services_admin(user)) {
+				common_svsmode(user, "-a", NULL);
+				user->mode &= ~UMODE_a;
+			}
+			break;
+		case 'd':
+			if (ac == 0) {
+				alog("user: umode +d with no parameter (?) for user %s",
+					 user->nick);
+				break;
+			}
 
-            ac--;
-            av++;
-            user->svid = strtoul(*av, NULL, 0);
-            break;
-        case 'o':
-            if (add) {
-                opcnt++;
+			ac--;
+			av++;
+			user->svid = strtoul(*av, NULL, 0);
+			break;
+		case 'o':
+			if (add) {
+				opcnt++;
 
-                if (WallOper)
-                    anope_SendGlobops(s_OperServ,
-                                     "\2%s\2 is now an IRC operator.",
-                                     user->nick);
-                display_news(user, NEWS_OPER);
+				if (WallOper)
+					anope_SendGlobops(s_OperServ,
+									 "\2%s\2 is now an IRC operator.",
+									 user->nick);
+				display_news(user, NEWS_OPER);
 
-            } else {
-                opcnt--;
-            }
-            break;
-        case 'r':
-            if (add && !nick_identified(user)) {
-                common_svsmode(user, "-r", NULL);
-                user->mode &= ~UMODE_r;
-            }
-            break;
-        case 'v':
-            update_host(user);
-            break;
-        }
-    }
+			} else {
+				opcnt--;
+			}
+			break;
+		case 'r':
+			if (add && !nick_identified(user)) {
+				common_svsmode(user, "-r", NULL);
+				user->mode &= ~UMODE_r;
+			}
+			break;
+		case 'v':
+			update_host(user);
+			break;
+		}
+	}
 }
 
 
 unsigned long umodes[128] = {
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused, Unused, Horzontal Tab */
-    0, 0, 0,                    /* Line Feed, Unused, Unused */
-    0, 0, 0,                    /* Carriage Return, Unused, Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused */
-    0, 0, 0,                    /* Unused, Unused, Space */
-    0, 0, 0,                    /* ! " #  */
-    0, 0, 0,                    /* $ % &  */
-    0, 0, 0,                    /* ! ( )  */
-    0, 0, 0,                    /* * + ,  */
-    0, 0, 0,                    /* - . /  */
-    0, 0,                       /* 0 1 */
-    0, 0,                       /* 2 3 */
-    0, 0,                       /* 4 5 */
-    0, 0,                       /* 6 7 */
-    0, 0,                       /* 8 9 */
-    0, 0,                       /* : ; */
-    0, 0, 0,                    /* < = > */
-    0, 0,                       /* ? @ */
-    UMODE_A, 0, UMODE_C,        /* A B C */
-    UMODE_D, 0, UMODE_F,        /* D E F */
-    0, UMODE_H, UMODE_I,        /* G H I */
-    0, UMODE_K, 0,              /* J K L */
-    0, 0, UMODE_O,              /* M N O */
-    0, 0, UMODE_R,              /* P Q R */
-    0, 0, 0,                    /* S T U */
-    0, 0, UMODE_X,              /* V W X */
-    0,                          /* Y */
-    0,                          /* Z */
-    0, 0, 0,                    /* [ \ ] */
-    0, 0, 0,                    /* ^ _ ` */
-    UMODE_a, UMODE_b, UMODE_c,  /* a b c */
-    UMODE_d, UMODE_e, UMODE_f,  /* d e f */
-    UMODE_g, UMODE_h, UMODE_i,  /* g h i */
-    UMODE_j, UMODE_k, 0,        /* j k l */
-    UMODE_m, UMODE_n, UMODE_o,  /* m n o */
-    0, 0, UMODE_r,              /* p q r */
-    UMODE_s, 0, 0,              /* s t u */
-    UMODE_v, UMODE_w, UMODE_x,  /* v w x */
-    UMODE_y,                    /* y */
-    UMODE_z,                    /* z */
-    0, 0, 0,                    /* { | } */
-    0, 0                        /* ~ � */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused, Unused, Horzontal Tab */
+	0, 0, 0,					/* Line Feed, Unused, Unused */
+	0, 0, 0,					/* Carriage Return, Unused, Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused */
+	0, 0, 0,					/* Unused, Unused, Space */
+	0, 0, 0,					/* ! " #  */
+	0, 0, 0,					/* $ % &  */
+	0, 0, 0,					/* ! ( )  */
+	0, 0, 0,					/* * + ,  */
+	0, 0, 0,					/* - . /  */
+	0, 0,					   /* 0 1 */
+	0, 0,					   /* 2 3 */
+	0, 0,					   /* 4 5 */
+	0, 0,					   /* 6 7 */
+	0, 0,					   /* 8 9 */
+	0, 0,					   /* : ; */
+	0, 0, 0,					/* < = > */
+	0, 0,					   /* ? @ */
+	UMODE_A, 0, UMODE_C,		/* A B C */
+	UMODE_D, 0, UMODE_F,		/* D E F */
+	0, UMODE_H, UMODE_I,		/* G H I */
+	0, UMODE_K, 0,			  /* J K L */
+	0, 0, UMODE_O,			  /* M N O */
+	0, 0, UMODE_R,			  /* P Q R */
+	0, 0, 0,					/* S T U */
+	0, 0, UMODE_X,			  /* V W X */
+	0,						  /* Y */
+	0,						  /* Z */
+	0, 0, 0,					/* [ \ ] */
+	0, 0, 0,					/* ^ _ ` */
+	UMODE_a, UMODE_b, UMODE_c,  /* a b c */
+	UMODE_d, UMODE_e, UMODE_f,  /* d e f */
+	UMODE_g, UMODE_h, UMODE_i,  /* g h i */
+	UMODE_j, UMODE_k, 0,		/* j k l */
+	UMODE_m, UMODE_n, UMODE_o,  /* m n o */
+	0, 0, UMODE_r,			  /* p q r */
+	UMODE_s, 0, 0,			  /* s t u */
+	UMODE_v, UMODE_w, UMODE_x,  /* v w x */
+	UMODE_y,					/* y */
+	UMODE_z,					/* z */
+	0, 0, 0,					/* { | } */
+	0, 0						/* ~ � */
 };
 
 char myCsmodes[128] = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
-    0,
-    0,
-    0, 0, 0,
-    'h',
-    0, 0, 0, 0,
-    0,
+	0,
+	0,
+	0, 0, 0,
+	'h',
+	0, 0, 0, 0,
+	0,
 
-    'v', 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	'v', 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
-    'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	'o', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
 CMMode myCmmodes[128] = {
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL},     /* BCD */
-    {NULL}, {NULL}, {NULL},     /* EFG */
-    {NULL},                     /* H */
-    {add_invite, del_invite},
-    {NULL},                     /* J */
-    {NULL}, {NULL}, {NULL},     /* KLM */
-    {NULL}, {NULL}, {NULL},     /* NOP */
-    {NULL}, {NULL}, {NULL},     /* QRS */
-    {NULL}, {NULL}, {NULL},     /* TUV */
-    {NULL}, {NULL}, {NULL},     /* WXY */
-    {NULL},                     /* Z */
-    {NULL}, {NULL},             /* (char 91 - 92) */
-    {NULL}, {NULL}, {NULL},     /* (char 93 - 95) */
-    {NULL},                     /* ` (char 96) */
-    {NULL},                     /* a (char 97) */
-    {add_ban, del_ban},
-    {NULL},
-    {NULL},
-    {add_exception, del_exception},
-    {NULL},
-    {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
-    {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL},	 /* BCD */
+	{NULL}, {NULL}, {NULL},	 /* EFG */
+	{NULL},					 /* H */
+	{add_invite, del_invite},
+	{NULL},					 /* J */
+	{NULL}, {NULL}, {NULL},	 /* KLM */
+	{NULL}, {NULL}, {NULL},	 /* NOP */
+	{NULL}, {NULL}, {NULL},	 /* QRS */
+	{NULL}, {NULL}, {NULL},	 /* TUV */
+	{NULL}, {NULL}, {NULL},	 /* WXY */
+	{NULL},					 /* Z */
+	{NULL}, {NULL},			 /* (char 91 - 92) */
+	{NULL}, {NULL}, {NULL},	 /* (char 93 - 95) */
+	{NULL},					 /* ` (char 96) */
+	{NULL},					 /* a (char 97) */
+	{add_ban, del_ban},
+	{NULL},
+	{NULL},
+	{add_exception, del_exception},
+	{NULL},
+	{NULL},
+	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL},
+	{NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}, {NULL}
 };
 
 
 
 CBMode myCbmodes[128] = {
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0},
-    {0},                        /* A */
-    {0},                        /* B */
-    {0},                        /* C */
-    {0},                        /* D */
-    {0},                        /* E */
-    {0},                        /* F */
-    {0},                        /* G */
-    {0},                        /* H */
-    {0},                        /* I */
-    {0},                        /* J */
-    {0},                        /* K */
-    {0},                        /* L */
-    {CMODE_M, 0, NULL, NULL},   /* M */
-    {CMODE_N, 0, NULL, NULL},   /* N */
-    {CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
-    {0},                        /* P */
-    {0},                        /* Q */
-    {CMODE_R, 0, NULL, NULL},   /* R */
-    {CMODE_S, 0, NULL, NULL},   /* S */
-    {0},                        /* T */
-    {0},                        /* U */
-    {0},                        /* V */
-    {0},                        /* W */
-    {0},                        /* X */
-    {0},                        /* Y */
-    {0},                        /* Z */
-    {0}, {0}, {0}, {0}, {0}, {0},
-    {0},                        /* a */
-    {0},                        /* b */
-    {CMODE_c, 0, NULL, NULL},
-    {0},                        /* d */
-    {0},                        /* e */
-    {0},                        /* f */
-    {0},                        /* g */
-    {0},                        /* h */
-    {CMODE_i, 0, NULL, NULL},
-    {CMODE_j, 0, set_flood, cs_set_flood},      /* j */
-    {CMODE_k, 0, chan_set_key, cs_set_key},
-    {CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
-    {CMODE_m, 0, NULL, NULL},
-    {CMODE_n, 0, NULL, NULL},
-    {0},                        /* o */
-    {CMODE_p, 0, NULL, NULL},
-    {0},                        /* q */
-    {CMODE_r, CBM_NO_MLOCK, NULL, NULL},
-    {CMODE_s, 0, NULL, NULL},
-    {CMODE_t, 0, NULL, NULL},
-    {0},
-    {0},                        /* v */
-    {0},                        /* w */
-    {0},                        /* x */
-    {0},                        /* y */
-    {0},                        /* z */
-    {0}, {0}, {0}, {0}
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0},
+	{0},						/* A */
+	{0},						/* B */
+	{0},						/* C */
+	{0},						/* D */
+	{0},						/* E */
+	{0},						/* F */
+	{0},						/* G */
+	{0},						/* H */
+	{0},						/* I */
+	{0},						/* J */
+	{0},						/* K */
+	{0},						/* L */
+	{CMODE_M, 0, NULL, NULL},   /* M */
+	{CMODE_N, 0, NULL, NULL},   /* N */
+	{CMODE_O, CBM_NO_USER_MLOCK, NULL, NULL},
+	{0},						/* P */
+	{0},						/* Q */
+	{CMODE_R, 0, NULL, NULL},   /* R */
+	{CMODE_S, 0, NULL, NULL},   /* S */
+	{0},						/* T */
+	{0},						/* U */
+	{0},						/* V */
+	{0},						/* W */
+	{0},						/* X */
+	{0},						/* Y */
+	{0},						/* Z */
+	{0}, {0}, {0}, {0}, {0}, {0},
+	{0},						/* a */
+	{0},						/* b */
+	{CMODE_c, 0, NULL, NULL},
+	{0},						/* d */
+	{0},						/* e */
+	{0},						/* f */
+	{0},						/* g */
+	{0},						/* h */
+	{CMODE_i, 0, NULL, NULL},
+	{CMODE_j, 0, set_flood, cs_set_flood},	  /* j */
+	{CMODE_k, 0, chan_set_key, cs_set_key},
+	{CMODE_l, CBM_MINUS_NO_ARG, set_limit, cs_set_limit},
+	{CMODE_m, 0, NULL, NULL},
+	{CMODE_n, 0, NULL, NULL},
+	{0},						/* o */
+	{CMODE_p, 0, NULL, NULL},
+	{0},						/* q */
+	{CMODE_r, CBM_NO_MLOCK, NULL, NULL},
+	{CMODE_s, 0, NULL, NULL},
+	{CMODE_t, 0, NULL, NULL},
+	{0},
+	{0},						/* v */
+	{0},						/* w */
+	{0},						/* x */
+	{0},						/* y */
+	{0},						/* z */
+	{0}, {0}, {0}, {0}
 };
 
 CBModeInfo myCbmodeinfos[] = {
-    {'c', CMODE_c, 0, NULL, NULL},
-    {'i', CMODE_i, 0, NULL, NULL},
-    {'j', CMODE_j, 0, get_flood, cs_get_flood},
-    {'k', CMODE_k, 0, get_key, cs_get_key},
-    {'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
-    {'m', CMODE_m, 0, NULL, NULL},
-    {'n', CMODE_n, 0, NULL, NULL},
-    {'p', CMODE_p, 0, NULL, NULL},
-    {'r', CMODE_r, 0, NULL, NULL},
-    {'s', CMODE_s, 0, NULL, NULL},
-    {'t', CMODE_t, 0, NULL, NULL},
-    {'M', CMODE_M, 0, NULL, NULL},
-    {'O', CMODE_O, 0, NULL, NULL},
-    {'R', CMODE_R, 0, NULL, NULL},
-    {'N', CMODE_N, 0, NULL, NULL},
-    {'S', CMODE_S, 0, NULL, NULL},
-    {0}
+	{'c', CMODE_c, 0, NULL, NULL},
+	{'i', CMODE_i, 0, NULL, NULL},
+	{'j', CMODE_j, 0, get_flood, cs_get_flood},
+	{'k', CMODE_k, 0, get_key, cs_get_key},
+	{'l', CMODE_l, CBM_MINUS_NO_ARG, get_limit, cs_get_limit},
+	{'m', CMODE_m, 0, NULL, NULL},
+	{'n', CMODE_n, 0, NULL, NULL},
+	{'p', CMODE_p, 0, NULL, NULL},
+	{'r', CMODE_r, 0, NULL, NULL},
+	{'s', CMODE_s, 0, NULL, NULL},
+	{'t', CMODE_t, 0, NULL, NULL},
+	{'M', CMODE_M, 0, NULL, NULL},
+	{'O', CMODE_O, 0, NULL, NULL},
+	{'R', CMODE_R, 0, NULL, NULL},
+	{'N', CMODE_N, 0, NULL, NULL},
+	{'S', CMODE_S, 0, NULL, NULL},
+	{0}
 };
 
 
 CUMode myCumodes[128] = {
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
 
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
 
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
-    {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
+	{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
 
-    {0},
+	{0},
 
-    {0},                        /* a */
-    {0},                        /* b */
-    {0},                        /* c */
-    {0},                        /* d */
-    {0},                        /* e */
-    {0},                        /* f */
-    {0},                        /* g */
-    {CUS_HALFOP, 0, check_valid_op},
-    {0},                        /* i */
-    {0},                        /* j */
-    {0},                        /* k */
-    {0},                        /* l */
-    {0},                        /* m */
-    {0},                        /* n */
-    {CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op},
-    {0},                        /* p */
-    {0},                        /* q */
-    {0},                        /* r */
-    {0},                        /* s */
-    {0},                        /* t */
-    {0},                        /* u */
-    {CUS_VOICE, 0, NULL},       /* v */
-    {0},                        /* w */
-    {0},                        /* x */
-    {0},                        /* y */
-    {0},                        /* z */
-    {0}, {0}, {0}, {0}, {0}
+	{0},						/* a */
+	{0},						/* b */
+	{0},						/* c */
+	{0},						/* d */
+	{0},						/* e */
+	{0},						/* f */
+	{0},						/* g */
+	{CUS_HALFOP, 0, check_valid_op},
+	{0},						/* i */
+	{0},						/* j */
+	{0},						/* k */
+	{0},						/* l */
+	{0},						/* m */
+	{0},						/* n */
+	{CUS_OP, CUF_PROTECT_BOTSERV, check_valid_op},
+	{0},						/* p */
+	{0},						/* q */
+	{0},						/* r */
+	{0},						/* s */
+	{0},						/* t */
+	{0},						/* u */
+	{CUS_VOICE, 0, NULL},	   /* v */
+	{0},						/* w */
+	{0},						/* x */
+	{0},						/* y */
+	{0},						/* z */
+	{0}, {0}, {0}, {0}, {0}
 };
 
 void solidircd_SendMode(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    if (ircdcap->tsmode) {
-        if (uplink_capab & ircdcap->tsmode) {
-            send_cmd(source, "MODE %s 0 %s", dest, buf);
-        } else {
-            send_cmd(source, "MODE %s %s", dest, buf);
-        }
-    } else {
-        send_cmd(source, "MODE %s %s", dest, buf);
-    }
+	if (ircdcap->tsmode) {
+		if (uplink_capab & ircdcap->tsmode) {
+			send_cmd(source, "MODE %s 0 %s", dest, buf);
+		} else {
+			send_cmd(source, "MODE %s %s", dest, buf);
+		}
+	} else {
+		send_cmd(source, "MODE %s %s", dest, buf);
+	}
 }
 
 /* SVSHOLD - set */
 void solidircd_SendSVSHOLD(const char *nick)
 {
-    send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
-             "Being held for registered user");
+	send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout,
+			 "Being held for registered user");
 }
 
 /* SVSHOLD - release */
 void solidircd_SendSVSHOLDDel(const char *nick)
 {
-    send_cmd(ServerName, "SVSHOLD %s 0", nick);
+	send_cmd(ServerName, "SVSHOLD %s 0", nick);
 }
 
 /* SVSMODE -b */
 void solidircd_SendBanDel(const char *name, const char *nick)
 {
-    solidircd_SendSVSMode_chan(name, "-b", nick);
+	solidircd_SendSVSMode_chan(name, "-b", nick);
 }
 
 
@@ -521,186 +521,186 @@ void solidircd_SendBanDel(const char *name, const char *nick)
 
 void solidircd_SendSVSMode_chan(const char *name, const char *mode, const char *nick)
 {
-    if (nick) {
-        send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
-    } else {
-        send_cmd(ServerName, "SVSMODE %s %s", name, mode);
-    }
+	if (nick) {
+		send_cmd(ServerName, "SVSMODE %s %s %s", name, mode, nick);
+	} else {
+		send_cmd(ServerName, "SVSMODE %s %s", name, mode);
+	}
 }
 
 void solidircd_SendBotOp(const char *nick, const char *chan)
 {
-    anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
+	anope_SendMode(nick, chan, "%s %s", ircd->botchanumode, nick);
 }
 
 /* EVENT: SJOIN */
 int anope_event_sjoin(const char *source, int ac, const char **av)
 {
-    do_sjoin(source, ac, av);
-    return MOD_CONT;
+	do_sjoin(source, ac, av);
+	return MOD_CONT;
 }
 
 /*
 ** NICK - new
-**      source  = NULL
+**	  source  = NULL
 **	parv[0] = nickname
-**      parv[1] = hopcount
-**      parv[2] = timestamp
-**      parv[3] = modes
-**      parv[4] = username
-**      parv[5] = hostname
-**      parv[6] = server
+**	  parv[1] = hopcount
+**	  parv[2] = timestamp
+**	  parv[3] = modes
+**	  parv[4] = username
+**	  parv[5] = hostname
+**	  parv[6] = server
 **	parv[7] = servicestamp
-**      parv[8] = IP
+**	  parv[8] = IP
 **	parv[9] = info
 ** NICK - change
-**      source  = oldnick
+**	  source  = oldnick
 **	parv[0] = new nickname
-**      parv[1] = hopcount
+**	  parv[1] = hopcount
 */
 int anope_event_nick(const char *source, int ac, const char **av)
 {
-    User *user;
+	User *user;
 
-    if (ac != 2) {
-        user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
-                       strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
-                       strtoul(av[8], NULL, 0), NULL, NULL);
-        if (user) {
-            anope_ProcessUsermodes(user, 1, &av[3]);
-        }
-    } else {
-        do_nick(source, av[0], NULL, NULL, NULL, NULL,
-                strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
-    }
-    return MOD_CONT;
+	if (ac != 2) {
+		user = do_nick(source, av[0], av[4], av[5], av[6], av[9],
+					   strtoul(av[2], NULL, 10), strtoul(av[7], NULL, 0),
+					   strtoul(av[8], NULL, 0), NULL, NULL);
+		if (user) {
+			anope_ProcessUsermodes(user, 1, &av[3]);
+		}
+	} else {
+		do_nick(source, av[0], NULL, NULL, NULL, NULL,
+				strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
+	}
+	return MOD_CONT;
 }
 
 /* EVENT : CAPAB */
 int anope_event_capab(const char *source, int ac, const char **av)
 {
-    capab_parse(ac, av);
-    return MOD_CONT;
+	capab_parse(ac, av);
+	return MOD_CONT;
 }
 
 /* EVENT : OS */
 int anope_event_os(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    m_privmsg(source, s_OperServ, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	m_privmsg(source, s_OperServ, av[0]);
+	return MOD_CONT;
 }
 
 /* EVENT : NS */
 int anope_event_ns(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    m_privmsg(source, s_NickServ, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	m_privmsg(source, s_NickServ, av[0]);
+	return MOD_CONT;
 }
 
 /* EVENT : MS */
 int anope_event_ms(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    m_privmsg(source, s_MemoServ, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	m_privmsg(source, s_MemoServ, av[0]);
+	return MOD_CONT;
 }
 
 /* EVENT : HS */
 int anope_event_hs(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    m_privmsg(source, s_HostServ, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	m_privmsg(source, s_HostServ, av[0]);
+	return MOD_CONT;
 }
 
 /* EVENT : CS */
 int anope_event_cs(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    m_privmsg(source, s_ChanServ, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	m_privmsg(source, s_ChanServ, av[0]);
+	return MOD_CONT;
 }
 
 int anope_event_436(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
 
-    m_nickcoll(av[0]);
-    return MOD_CONT;
+	m_nickcoll(av[0]);
+	return MOD_CONT;
 }
 
 /* *INDENT-OFF* */
 void moduleAddIRCDMsgs(void) {
-    Message *m;
+	Message *m;
 
-    updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
+	updateProtectDetails("PROTECT","PROTECTME","protect","deprotect","AUTOPROTECT","+","-");
 
-    m = createMessage("401",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("402",       anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("436",       anope_event_436); addCoreMessage(IRCD,m);
-    m = createMessage("AWAY",      anope_event_away); addCoreMessage(IRCD,m);
-    m = createMessage("INVITE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("JOIN",      anope_event_join); addCoreMessage(IRCD,m);
-    m = createMessage("KICK",      anope_event_kick); addCoreMessage(IRCD,m);
-    m = createMessage("KILL",      anope_event_kill); addCoreMessage(IRCD,m);
-    m = createMessage("MODE",      anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("MOTD",      anope_event_motd); addCoreMessage(IRCD,m);
-    m = createMessage("NICK",      anope_event_nick); addCoreMessage(IRCD,m);
-    m = createMessage("NOTICE",    anope_event_notice); addCoreMessage(IRCD,m);
-    m = createMessage("PART",      anope_event_part); addCoreMessage(IRCD,m);
-    m = createMessage("PASS",      anope_event_pass); addCoreMessage(IRCD,m);
-    m = createMessage("PING",      anope_event_ping); addCoreMessage(IRCD,m);
-    m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
-    m = createMessage("QUIT",      anope_event_quit); addCoreMessage(IRCD,m);
-    m = createMessage("SERVER",    anope_event_server); addCoreMessage(IRCD,m);
-    m = createMessage("SQUIT",     anope_event_squit); addCoreMessage(IRCD,m);
-    m = createMessage("TOPIC",     anope_event_topic); addCoreMessage(IRCD,m);
-    m = createMessage("USER",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("WHOIS",     anope_event_whois); addCoreMessage(IRCD,m);
-    m = createMessage("AKILL",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("GNOTICE",   anope_event_gnotice); addCoreMessage(IRCD,m);
-    m = createMessage("GOPER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("RAKILL",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SQLINE",    anope_event_sqline); addCoreMessage(IRCD,m);
-    m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
-    m = createMessage("CS",        anope_event_cs); addCoreMessage(IRCD,m);
-    m = createMessage("HS",        anope_event_hs); addCoreMessage(IRCD,m);
-    m = createMessage("MS",        anope_event_ms); addCoreMessage(IRCD,m);
-    m = createMessage("NS",        anope_event_ns); addCoreMessage(IRCD,m);
-    m = createMessage("OS",        anope_event_os); addCoreMessage(IRCD,m);
-    m = createMessage("RS",        anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SGLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SJOIN",     anope_event_sjoin); addCoreMessage(IRCD,m);
-    m = createMessage("SS",        anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SVINFO",    anope_event_svinfo); addCoreMessage(IRCD,m);
-    m = createMessage("SZLINE",    anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSGLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("UNSZLINE",  anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("ERROR",     anope_event_error); addCoreMessage(IRCD,m);
-    m = createMessage("LUSERSLOCK",anope_event_luserslock); addCoreMessage(IRCD,m);
-    m = createMessage("BURST",     anope_event_burst); addCoreMessage(IRCD,m);
-    m = createMessage("ADMIN",     anope_event_admin); addCoreMessage(IRCD,m);
-    m = createMessage("SVHOST",    anope_event_vs); addCoreMessage(IRCD,m);
-    m = createMessage("ELMER",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SILLY",     anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("SHUN",      anope_event_null); addCoreMessage(IRCD,m);
-    m = createMessage("NORMAL",    anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("401",	   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("402",	   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("436",	   anope_event_436); addCoreMessage(IRCD,m);
+	m = createMessage("AWAY",	  anope_event_away); addCoreMessage(IRCD,m);
+	m = createMessage("INVITE",	anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("JOIN",	  anope_event_join); addCoreMessage(IRCD,m);
+	m = createMessage("KICK",	  anope_event_kick); addCoreMessage(IRCD,m);
+	m = createMessage("KILL",	  anope_event_kill); addCoreMessage(IRCD,m);
+	m = createMessage("MODE",	  anope_event_mode); addCoreMessage(IRCD,m);
+	m = createMessage("MOTD",	  anope_event_motd); addCoreMessage(IRCD,m);
+	m = createMessage("NICK",	  anope_event_nick); addCoreMessage(IRCD,m);
+	m = createMessage("NOTICE",	anope_event_notice); addCoreMessage(IRCD,m);
+	m = createMessage("PART",	  anope_event_part); addCoreMessage(IRCD,m);
+	m = createMessage("PASS",	  anope_event_pass); addCoreMessage(IRCD,m);
+	m = createMessage("PING",	  anope_event_ping); addCoreMessage(IRCD,m);
+	m = createMessage("PRIVMSG",   anope_event_privmsg); addCoreMessage(IRCD,m);
+	m = createMessage("QUIT",	  anope_event_quit); addCoreMessage(IRCD,m);
+	m = createMessage("SERVER",	anope_event_server); addCoreMessage(IRCD,m);
+	m = createMessage("SQUIT",	 anope_event_squit); addCoreMessage(IRCD,m);
+	m = createMessage("TOPIC",	 anope_event_topic); addCoreMessage(IRCD,m);
+	m = createMessage("USER",	  anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("WALLOPS",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("WHOIS",	 anope_event_whois); addCoreMessage(IRCD,m);
+	m = createMessage("AKILL",	 anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("GLOBOPS",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("GNOTICE",   anope_event_gnotice); addCoreMessage(IRCD,m);
+	m = createMessage("GOPER",	 anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("RAKILL",	anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SILENCE",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SVSKILL",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SVSMODE",   anope_event_mode); addCoreMessage(IRCD,m);
+	m = createMessage("SVSNICK",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SVSNOOP",   anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SQLINE",	anope_event_sqline); addCoreMessage(IRCD,m);
+	m = createMessage("UNSQLINE",  anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("CAPAB", 	   anope_event_capab); addCoreMessage(IRCD,m);
+	m = createMessage("CS",		anope_event_cs); addCoreMessage(IRCD,m);
+	m = createMessage("HS",		anope_event_hs); addCoreMessage(IRCD,m);
+	m = createMessage("MS",		anope_event_ms); addCoreMessage(IRCD,m);
+	m = createMessage("NS",		anope_event_ns); addCoreMessage(IRCD,m);
+	m = createMessage("OS",		anope_event_os); addCoreMessage(IRCD,m);
+	m = createMessage("RS",		anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SGLINE",	anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SJOIN",	 anope_event_sjoin); addCoreMessage(IRCD,m);
+	m = createMessage("SS",		anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SVINFO",	anope_event_svinfo); addCoreMessage(IRCD,m);
+	m = createMessage("SZLINE",	anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("UNSGLINE",  anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("UNSZLINE",  anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("ERROR",	 anope_event_error); addCoreMessage(IRCD,m);
+	m = createMessage("LUSERSLOCK",anope_event_luserslock); addCoreMessage(IRCD,m);
+	m = createMessage("BURST",	 anope_event_burst); addCoreMessage(IRCD,m);
+	m = createMessage("ADMIN",	 anope_event_admin); addCoreMessage(IRCD,m);
+	m = createMessage("SVHOST",	anope_event_vs); addCoreMessage(IRCD,m);
+	m = createMessage("ELMER",	 anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SILLY",	 anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("SHUN",	  anope_event_null); addCoreMessage(IRCD,m);
+	m = createMessage("NORMAL",	anope_event_null); addCoreMessage(IRCD,m);
 }
 
 /* *INDENT-ON* */
@@ -708,50 +708,50 @@ void moduleAddIRCDMsgs(void) {
 
 int anope_event_vs(const char *source, int ac, const char **av)
 {
-    User *u;
+	User *u;
 
-    if (ac != 2)
-        return MOD_CONT;
+	if (ac != 2)
+		return MOD_CONT;
 
-    u = finduser(av[0]);
-    if (!u) {
-        if (debug) {
-            alog("debug: SVHOST for nonexistent user %s", av[0]);
-        }
-        return MOD_CONT;
-    }
+	u = finduser(av[0]);
+	if (!u) {
+		if (debug) {
+			alog("debug: SVHOST for nonexistent user %s", av[0]);
+		}
+		return MOD_CONT;
+	}
 
-    u->SetDisplayedHost(av[1]);
-    return MOD_CONT;
+	u->SetDisplayedHost(av[1]);
+	return MOD_CONT;
 
 }
 
 /* SQLINE */
 void solidircd_SendSQLine(const char *mask, const char *reason)
 {
-    if (!mask || !reason) {
-        return;
-    }
+	if (!mask || !reason) {
+		return;
+	}
 
-    send_cmd(NULL, "SQLINE %s :%s", mask, reason);
+	send_cmd(NULL, "SQLINE %s :%s", mask, reason);
 }
 
 /* UNSGLINE */
 void solidircd_SendSGLineDel(const char *mask)
 {
-    send_cmd(NULL, "UNSGLINE 0 :%s", mask);
+	send_cmd(NULL, "UNSGLINE 0 :%s", mask);
 }
 
 /* UNSZLINE */
 void solidircd_SendSZLineDel(const char *mask)
 {
-    send_cmd(NULL, "UNSZLINE 0 %s", mask);
+	send_cmd(NULL, "UNSZLINE 0 %s", mask);
 }
 
 /* SZLINE */
 void solidircd_SendSZLine(const char *mask, const char *reason, const char *whom)
 {
-    send_cmd(NULL, "SZLINE %s :%s", mask, reason);
+	send_cmd(NULL, "SZLINE %s :%s", mask, reason);
 }
 
 /* SVSNOOP */
@@ -768,7 +768,7 @@ void solidircd_cmd_svsadmin(const char *server, int set)
 /* SGLINE */
 void solidircd_SendSGLine(const char *mask, const char *reason)
 {
-    send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
+	send_cmd(NULL, "SGLINE %d :%s:%s", (int)strlen(mask), mask, reason);
 }
 
 /* RAKILL */
@@ -780,35 +780,35 @@ void SolidIRCdProto::SendAkillDel(const char *user, const char *host)
 /* PART */
 void solidircd_SendPart(const char *nick, const char *chan, const char *buf)
 {
-    if (!nick || !chan) {
-        return;
-    }
+	if (!nick || !chan) {
+		return;
+	}
 
-    if (buf) {
-        send_cmd(nick, "PART %s :%s", chan, buf);
-    } else {
-        send_cmd(nick, "PART %s", chan);
-    }
+	if (buf) {
+		send_cmd(nick, "PART %s :%s", chan, buf);
+	} else {
+		send_cmd(nick, "PART %s", chan);
+	}
 }
 
 /* TOPIC */
 void solidircd_cmd_topic(const char *whosets, const char *chan, const char *whosetit,
-                         const char *topic, time_t when)
+						 const char *topic, time_t when)
 {
-    send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
-             (unsigned long int) when, topic);
+	send_cmd(whosets, "TOPIC %s %s %lu :%s", chan, whosetit,
+			 (unsigned long int) when, topic);
 }
 
 /* UNSQLINE */
 void solidircd_SendSQLineDel(const char *user)
 {
-    send_cmd(NULL, "UNSQLINE %s", user);
+	send_cmd(NULL, "UNSQLINE %s", user);
 }
 
 /* JOIN - SJOIN */
 void solidircd_SendJoin(const char *user, const char *channel, time_t chantime)
 {
-    send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
+	send_cmd(user, "SJOIN %ld %s", (long int) chantime, channel);
 }
 
 /* AKILL */
@@ -820,10 +820,10 @@ void solidircd_SendJoin(const char *user, const char *channel, time_t chantime)
  * parv[6]=reason
  */
 void solidircd_SendAkill(const char *user, const char *host, const char *who, time_t when,
-                         time_t expires, const char *reason)
+						 time_t expires, const char *reason)
 {
-    send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
-             (long int) time(NULL), reason);
+	send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, 86400 * 2, who,
+			 (long int) time(NULL), reason);
 }
 
 /* SVSKILL */
@@ -838,11 +838,11 @@ void solidircd_SendAkill(const char *user, const char *host, const char *who, ti
 void solidircd_SendSVSKill(const char *source, const char *user, const char *buf)
 {
 
-    if (!source || !user || !buf) {
-        return;
-    }
+	if (!source || !user || !buf) {
+		return;
+	}
 
-    send_cmd(source, "SVSKILL %s :%s", user, buf);
+	send_cmd(source, "SVSKILL %s :%s", user, buf);
 }
 
 /* SVSMODE */
@@ -854,492 +854,492 @@ void solidircd_SendSVSKill(const char *source, const char *user, const char *buf
  */
 void solidircd_SendSVSMode(User * u, int ac, const char **av)
 {
-    send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
-             (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
-             (ac == 2 ? av[1] : ""));
+	send_cmd(ServerName, "SVSMODE %s %ld %s%s%s", u->nick,
+			 (long int) u->timestamp, av[0], (ac == 2 ? " " : ""),
+			 (ac == 2 ? av[1] : ""));
 }
 
 /* SQUIT */
 /*
- *        parv[0] = sender prefix
- *        parv[1] = server name
- *        parv[2] = comment
+ *		parv[0] = sender prefix
+ *		parv[1] = server name
+ *		parv[2] = comment
 */
 void solidircd_SendSquit(const char *servname, const char *message)
 {
-    send_cmd(NULL, "SQUIT %s :%s", servname, message);
+	send_cmd(NULL, "SQUIT %s :%s", servname, message);
 }
 
 /* PONG */
 void solidircd_SendPong(const char *servname, const char *who)
 {
-    send_cmd(servname, "PONG %s", who);
+	send_cmd(servname, "PONG %s", who);
 }
 
 void solidircd_cmd_burst()
 {
-    send_cmd(NULL, "BURST");
+	send_cmd(NULL, "BURST");
 }
 
 
 /*
  * SVINFO
- *       parv[0] = sender prefix
- *       parv[1] = TS_CURRENT for the server
- *       parv[2] = TS_MIN for the server
- *       parv[3] = server is standalone or connected to non-TS only
- *       parv[4] = server's idea of UTC time
+ *	   parv[0] = sender prefix
+ *	   parv[1] = TS_CURRENT for the server
+ *	   parv[2] = TS_MIN for the server
+ *	   parv[3] = server is standalone or connected to non-TS only
+ *	   parv[4] = server's idea of UTC time
  */
 void solidircd_cmd_svinfo()
 {
-    send_cmd(NULL, "SVINFO 5 3 0 :%ld", (long int) time(NULL));
+	send_cmd(NULL, "SVINFO 5 3 0 :%ld", (long int) time(NULL));
 }
 
 /* PASS */
 void solidircd_cmd_pass(const char *pass)
 {
-    send_cmd(NULL, "PASS %s :TS", pass);
+	send_cmd(NULL, "PASS %s :TS", pass);
 }
 
 /* SERVER */
 void solidircd_SendServer(const char *servname, int hop, const char *descript)
 {
-    send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
+	send_cmd(NULL, "SERVER %s %d :%s", servname, hop, ServerDesc);
 }
 
 /* CAPAB */
 void solidircd_cmd_capab()
 {
-    /* CAPAB SSJOIN NOQUIT BURST UNCONNECT ZIP NICKIP TSMODE */
-    send_cmd(NULL, "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE");
+	/* CAPAB SSJOIN NOQUIT BURST UNCONNECT ZIP NICKIP TSMODE */
+	send_cmd(NULL, "CAPAB SSJOIN NOQUIT BURST UNCONNECT NICKIP TSMODE");
 }
 
 void solidircd_SendConnect(int servernum)
 {
-    me_server =
-        new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+	me_server =
+		new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 
-    if (servernum == 1) {
-        solidircd_cmd_pass(RemotePassword);
-    } else if (servernum == 2) {
-        solidircd_cmd_pass(RemotePassword2);
-    } else if (servernum == 3) {
-        solidircd_cmd_pass(RemotePassword3);
-    }
-    solidircd_cmd_capab();
-    solidircd_SendServer(ServerName, 1, ServerDesc);
-    solidircd_cmd_svinfo();
-    solidircd_cmd_burst();
+	if (servernum == 1) {
+		solidircd_cmd_pass(RemotePassword);
+	} else if (servernum == 2) {
+		solidircd_cmd_pass(RemotePassword2);
+	} else if (servernum == 3) {
+		solidircd_cmd_pass(RemotePassword3);
+	}
+	solidircd_cmd_capab();
+	solidircd_SendServer(ServerName, 1, ServerDesc);
+	solidircd_cmd_svinfo();
+	solidircd_cmd_burst();
 }
 
 /* EVENT : SERVER */
 int anope_event_server(const char *source, int ac, const char **av)
 {
-    char *uplink;
+	char *uplink;
 
-    if (!stricmp(av[1], "1")) {
-        uplink = sstrdup(av[0]);
-    }
+	if (!stricmp(av[1], "1")) {
+		uplink = sstrdup(av[0]);
+	}
 
-    do_server(source, av[0], av[1], av[2], NULL);
-    return MOD_CONT;
+	do_server(source, av[0], av[1], av[2], NULL);
+	return MOD_CONT;
 }
 
 /* EVENT : PRIVMSG */
 int anope_event_privmsg(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
-    m_privmsg(source, av[0], av[1]);
-    return MOD_CONT;
+	if (ac != 2)
+		return MOD_CONT;
+	m_privmsg(source, av[0], av[1]);
+	return MOD_CONT;
 }
 
 /* EVENT : SVINFO */
 /*
- *       parv[0] = sender prefix
- *       parv[1] = TS_CURRENT for the server
- *       parv[2] = TS_MIN for the server
- *       parv[3] = server is standalone or connected to non-TS only
- *       parv[4] = server's idea of UTC time
+ *	   parv[0] = sender prefix
+ *	   parv[1] = TS_CURRENT for the server
+ *	   parv[2] = TS_MIN for the server
+ *	   parv[3] = server is standalone or connected to non-TS only
+ *	   parv[4] = server's idea of UTC time
  */
 int anope_event_svinfo(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 
 int anope_event_part(const char *source, int ac, const char **av)
 {
-    if (ac < 1 || ac > 2)
-        return MOD_CONT;
-    do_part(source, ac, av);
-    return MOD_CONT;
+	if (ac < 1 || ac > 2)
+		return MOD_CONT;
+	do_part(source, ac, av);
+	return MOD_CONT;
 }
 
 int anope_event_whois(const char *source, int ac, const char **av)
 {
-    if (source && ac >= 1) {
-        m_whois(source, av[0]);
-    }
-    return MOD_CONT;
+	if (source && ac >= 1) {
+		m_whois(source, av[0]);
+	}
+	return MOD_CONT;
 }
 
 int anope_event_topic(const char *source, int ac, const char **av)
 {
-    if (ac != 4)
-        return MOD_CONT;
-    do_topic(source, ac, av);
-    return MOD_CONT;
+	if (ac != 4)
+		return MOD_CONT;
+	do_topic(source, ac, av);
+	return MOD_CONT;
 }
 
 int anope_event_squit(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
-    do_squit(source, ac, av);
-    return MOD_CONT;
+	if (ac != 2)
+		return MOD_CONT;
+	do_squit(source, ac, av);
+	return MOD_CONT;
 }
 
 int anope_event_quit(const char *source, int ac, const char **av)
 {
-    if (ac != 1)
-        return MOD_CONT;
-    do_quit(source, ac, av);
-    return MOD_CONT;
+	if (ac != 1)
+		return MOD_CONT;
+	do_quit(source, ac, av);
+	return MOD_CONT;
 }
 
 /* EVENT: MODE */
 int anope_event_mode(const char *source, int ac, const char **av)
 {
-    if (ac < 2)
-        return MOD_CONT;
+	if (ac < 2)
+		return MOD_CONT;
 
-    if (*av[0] == '#' || *av[0] == '&') {
-        do_cmode(source, ac, av);
-    } else {
-        do_umode(source, ac, av);
-    }
-    return MOD_CONT;
+	if (*av[0] == '#' || *av[0] == '&') {
+		do_cmode(source, ac, av);
+	} else {
+		do_umode(source, ac, av);
+	}
+	return MOD_CONT;
 }
 
 /* EVENT: KILL */
 int anope_event_kill(const char *source, int ac, const char **av)
 {
-    if (ac != 2)
-        return MOD_CONT;
+	if (ac != 2)
+		return MOD_CONT;
 
-    m_kill(av[0], av[1]);
-    return MOD_CONT;
+	m_kill(av[0], av[1]);
+	return MOD_CONT;
 }
 
 /* EVENT: KICK */
 int anope_event_kick(const char *source, int ac, const char **av)
 {
-    if (ac != 3)
-        return MOD_CONT;
-    do_kick(source, ac, av);
-    return MOD_CONT;
+	if (ac != 3)
+		return MOD_CONT;
+	do_kick(source, ac, av);
+	return MOD_CONT;
 }
 
 /* EVENT: JOIN */
 int anope_event_join(const char *source, int ac, const char **av)
 {
-    if (ac != 1)
-        return MOD_CONT;
-    do_join(source, ac, av);
-    return MOD_CONT;
+	if (ac != 1)
+		return MOD_CONT;
+	do_join(source, ac, av);
+	return MOD_CONT;
 }
 
 /* EVENT: MOTD */
 int anope_event_motd(const char *source, int ac, const char **av)
 {
-    if (!source) {
-        return MOD_CONT;
-    }
+	if (!source) {
+		return MOD_CONT;
+	}
 
-    m_motd(source);
-    return MOD_CONT;
+	m_motd(source);
+	return MOD_CONT;
 }
 
 void solidircd_SendNoticeChanops(const char *source, const char *dest, const char *buf)
 {
 
-    if (!buf) {
-        return;
-    }
-    send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
+	if (!buf) {
+		return;
+	}
+	send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 }
 
 /* NOTICE */
 void solidircd_cmd_notice(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    if (NSDefFlags & NI_MSG) {
-        solidircd_cmd_privmsg2(source, dest, buf);
-    } else {
-        send_cmd(source, "NOTICE %s :%s", dest, buf);
-    }
+	if (NSDefFlags & NI_MSG) {
+		solidircd_cmd_privmsg2(source, dest, buf);
+	} else {
+		send_cmd(source, "NOTICE %s :%s", dest, buf);
+	}
 }
 
 void solidircd_cmd_notice2(const char *source, const char *dest, const char *msg)
 {
-    send_cmd(source, "NOTICE %s :%s", dest, msg);
+	send_cmd(source, "NOTICE %s :%s", dest, msg);
 }
 
 void solidircd_cmd_privmsg(const char *source, const char *dest, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(source, "PRIVMSG %s :%s", dest, buf);
+	send_cmd(source, "PRIVMSG %s :%s", dest, buf);
 }
 
 void solidircd_cmd_privmsg2(const char *source, const char *dest, const char *msg)
 {
-    send_cmd(source, "PRIVMSG %s :%s", dest, msg);
+	send_cmd(source, "PRIVMSG %s :%s", dest, msg);
 }
 
 void solidircd_SendGlobalNotice(const char *source, const char *dest, const char *msg)
 {
-    send_cmd(source, "NOTICE $%s :%s", dest, msg);
+	send_cmd(source, "NOTICE $%s :%s", dest, msg);
 }
 
 void solidircd_SendGlobalPrivmsg(const char *source, const char *dest, const char *msg)
 {
-    send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
+	send_cmd(source, "PRIVMSG $%s :%s", dest, msg);
 }
 
 /* GLOBOPS */
 void solidircd_SendGlobops(const char *source, const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
+	send_cmd(source ? source : ServerName, "GLOBOPS :%s", buf);
 }
 
 /* 391 */
 void solidircd_cmd_391(const char *source, const char *timestr)
 {
-    if (!timestr) {
-        return;
-    }
-    send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
+	if (!timestr) {
+		return;
+	}
+	send_cmd(NULL, "391 :%s %s :%s", source, ServerName, timestr);
 }
 
 /* 250 */
 void solidircd_cmd_250(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(NULL, "250 %s", buf);
+	send_cmd(NULL, "250 %s", buf);
 }
 
 /* 307 */
 void solidircd_cmd_307(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(ServerName, "307 %s", buf);
+	send_cmd(ServerName, "307 %s", buf);
 }
 
 /* 311 */
 void solidircd_cmd_311(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(ServerName, "311 %s", buf);
+	send_cmd(ServerName, "311 %s", buf);
 }
 
 /* 312 */
 void solidircd_cmd_312(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(ServerName, "312 %s", buf);
+	send_cmd(ServerName, "312 %s", buf);
 }
 
 /* 317 */
 void solidircd_cmd_317(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(ServerName, "317 %s", buf);
+	send_cmd(ServerName, "317 %s", buf);
 }
 
 /* 219 */
 void solidircd_cmd_219(const char *source, const char *letter)
 {
-    if (!source) {
-        return;
-    }
+	if (!source) {
+		return;
+	}
 
-    if (letter) {
-        send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
-                 *letter);
-    } else {
-        send_cmd(NULL, "219 %s l :End of /STATS report.", source);
-    }
+	if (letter) {
+		send_cmd(NULL, "219 %s %c :End of /STATS report.", source,
+				 *letter);
+	} else {
+		send_cmd(NULL, "219 %s l :End of /STATS report.", source);
+	}
 }
 
 /* 401 */
 void solidircd_cmd_401(const char *source, const char *who)
 {
-    if (!source || !who) {
-        return;
-    }
-    send_cmd(ServerName, "401 %s %s :No such service.", source, who);
+	if (!source || !who) {
+		return;
+	}
+	send_cmd(ServerName, "401 %s %s :No such service.", source, who);
 }
 
 /* 318 */
 void solidircd_cmd_318(const char *source, const char *who)
 {
-    if (!source || !who) {
-        return;
-    }
+	if (!source || !who) {
+		return;
+	}
 
-    send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
+	send_cmd(ServerName, "318 %s %s :End of /WHOIS list.", source, who);
 }
 
 /* 242 */
 void solidircd_cmd_242(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(NULL, "242 %s", buf);
+	send_cmd(NULL, "242 %s", buf);
 }
 
 /* 243 */
 void solidircd_cmd_243(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(NULL, "243 %s", buf);
+	send_cmd(NULL, "243 %s", buf);
 }
 
 /* 211 */
 void solidircd_cmd_211(const char *buf)
 {
-    if (!buf) {
-        return;
-    }
+	if (!buf) {
+		return;
+	}
 
-    send_cmd(NULL, "211 %s", buf);
+	send_cmd(NULL, "211 %s", buf);
 }
 
 void solidircd_cmd_nick(const char *nick, const char *name, const char *modes)
 {
-    EnforceQlinedNick(nick, NULL);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, ServiceUser, ServiceHost,
-             ServerName, name);
-    solidircd_SendSQLine(nick, "Reserved for services");
+	EnforceQlinedNick(nick, NULL);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
+			 (long int) time(NULL), modes, ServiceUser, ServiceHost,
+			 ServerName, name);
+	solidircd_SendSQLine(nick, "Reserved for services");
 }
 
 void solidircd_SendKick(const char *source, const char *chan, const char *user, const char *buf)
 {
-    if (buf) {
-        send_cmd(source, "KICK %s %s :%s", chan, user, buf);
-    } else {
-        send_cmd(source, "KICK %s %s", chan, user);
-    }
+	if (buf) {
+		send_cmd(source, "KICK %s %s :%s", chan, user, buf);
+	} else {
+		send_cmd(source, "KICK %s %s", chan, user);
+	}
 }
 
 void solidircd_cmd_372(const char *source, const char *msg)
 {
-    send_cmd(ServerName, "372 %s :- %s", source, msg);
+	send_cmd(ServerName, "372 %s :- %s", source, msg);
 }
 
 void solidircd_cmd_372_error(const char *source)
 {
-    send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
-             "contact your IRC administrator.", source);
+	send_cmd(ServerName, "422 %s :- MOTD file not found!  Please "
+			 "contact your IRC administrator.", source);
 }
 
 void solidircd_cmd_375(const char *source)
 {
-    send_cmd(ServerName, "375 %s :- %s Message of the Day",
-             source, ServerName);
+	send_cmd(ServerName, "375 %s :- %s Message of the Day",
+			 source, ServerName);
 }
 
 void solidircd_cmd_376(const char *source)
 {
-    send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
+	send_cmd(ServerName, "376 %s :End of /MOTD command.", source);
 }
 
 /* INVITE */
 void solidircd_SendInvite(const char *source, const char *chan, const char *nick)
 {
-    if (!source || !chan || !nick) {
-        return;
-    }
+	if (!source || !chan || !nick) {
+		return;
+	}
 
-    send_cmd(source, "INVITE %s %s", nick, chan);
+	send_cmd(source, "INVITE %s %s", nick, chan);
 }
 
 /* QUIT */
 void solidircd_SendQuit(const char *source, const char *buf)
 {
 
-    if (buf) {
-        send_cmd(source, "QUIT :%s", buf);
-    } else {
-        send_cmd(source, "QUIT");
-    }
+	if (buf) {
+		send_cmd(source, "QUIT :%s", buf);
+	} else {
+		send_cmd(source, "QUIT");
+	}
 }
 
 int anope_event_away(const char *source, int ac, const char **av)
 {
-    if (!source) {
-        return MOD_CONT;
-    }
-    m_away(source, (ac ? av[0] : NULL));
-    return MOD_CONT;
+	if (!source) {
+		return MOD_CONT;
+	}
+	m_away(source, (ac ? av[0] : NULL));
+	return MOD_CONT;
 }
 
 int anope_event_ping(const char *source, int ac, const char **av)
 {
-    if (ac < 1)
-        return MOD_CONT;
-    solidircd_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
-    return MOD_CONT;
+	if (ac < 1)
+		return MOD_CONT;
+	solidircd_SendPong(ac > 1 ? av[1] : ServerName, av[0]);
+	return MOD_CONT;
 }
 
 void solidircd_cmd_351(const char *source)
 {
-    send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s)-- %s",
-             source, version_number, ServerName, ircd->name, version_flags,
-             EncModule, version_build);
+	send_cmd(ServerName, "351 %s Anope-%s %s :%s - %s (%s)-- %s",
+			 source, version_number, ServerName, ircd->name, version_flags,
+			 EncModule, version_build);
 
 
 }
 
 void solidircd_SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real,
-                            const char *modes)
+							const char *modes)
 {
-    EnforceQlinedNick(nick, s_BotServ);
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
-    solidircd_SendSQLine(nick, "Reserved for services");
+	EnforceQlinedNick(nick, s_BotServ);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
+			 (long int) time(NULL), modes, user, host, ServerName, real);
+	solidircd_SendSQLine(nick, "Reserved for services");
 }
 
 /* SVSNICK */
@@ -1350,51 +1350,51 @@ void solidircd_SendClientIntroduction(const char *nick, const char *user, const 
  */
 void solidircd_SendForceNickChange(const char *source, const char *guest, time_t when)
 {
-    if (!source || !guest) {
-        return;
-    }
-    send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
+	if (!source || !guest) {
+		return;
+	}
+	send_cmd(NULL, "SVSNICK %s %s :%ld", source, guest, (long int) when);
 }
 
 void solidircd_SendGuestNick(const char *nick, const char *user, const char *host,
-                              const char *real, const char *modes)
+							  const char *real, const char *modes)
 {
-    send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
-             (long int) time(NULL), modes, user, host, ServerName, real);
+	send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s 0 0 :%s", nick,
+			 (long int) time(NULL), modes, user, host, ServerName, real);
 }
 
 void solidircd_SendSVSO(const char *source, const char *nick, const char *flag)
 {
-    /* Not Supported by this IRCD */
+	/* Not Supported by this IRCD */
 }
 
 void solidircd_cmd_chghost(const char *nick, const char *vhost)
 {
-    if (!nick || !vhost) {
-        return;
-    }
-    send_cmd(ServerName, "SVHOST %s %s", nick, vhost);
+	if (!nick || !vhost) {
+		return;
+	}
+	send_cmd(ServerName, "SVHOST %s %s", nick, vhost);
 }
 
 
 void solidircd_SendVhost(const char *nick, const char *vIdent, const char *vhost)
 {
-    send_cmd(s_HostServ, "SVSMODE %s +v", nick);
-    solidircd_cmd_chghost(nick, vhost);
+	send_cmd(s_HostServ, "SVSMODE %s +v", nick);
+	solidircd_cmd_chghost(nick, vhost);
 }
 
 void solidircd_SendVhostDel(User * u)
 {
-    send_cmd(s_HostServ, "SVSMODE %s -v", u->nick);
-    notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
+	send_cmd(s_HostServ, "SVSMODE %s -v", u->nick);
+	notice_lang(s_HostServ, u, HOST_OFF_UNREAL, u->nick, ircd->vhostchar);
 }
 
 /* SVSMODE +d */
 /* sent if svid is something weird */
 void solidircd_SendSVID(const char *nick, time_t ts)
 {
-    send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
-             (unsigned long int) ts);
+	send_cmd(ServerName, "SVSMODE %s %lu +d 1", nick,
+			 (unsigned long int) ts);
 }
 
 
@@ -1402,155 +1402,155 @@ void solidircd_SendSVID(const char *nick, time_t ts)
 /* nc_change was = 1, and there is no na->status */
 void solidircd_SendUnregisteredNick(User * u)
 {
-    common_svsmode(u, "+d", "1");
+	common_svsmode(u, "+d", "1");
 }
 
 /* SVSMODE +d */
 void solidircd_SendSVID2(User * u, const char *ts)
 {
-    /* not used by bahamut ircds */
+	/* not used by bahamut ircds */
 }
 
 
 void solidircd_SendSVID3(User * u, const char *ts)
 {
-    if (u->svid != u->timestamp) {
-        common_svsmode(u, "+rd", ts);
-    } else {
-        common_svsmode(u, "+r", NULL);
-    }
+	if (u->svid != u->timestamp) {
+		common_svsmode(u, "+rd", ts);
+	} else {
+		common_svsmode(u, "+r", NULL);
+	}
 }
 
 /* NICK <newnick>  */
 void solidircd_SendChangeBotNick(const char *oldnick, const char *newnick)
 {
-    if (!oldnick || !newnick) {
-        return;
-    }
+	if (!oldnick || !newnick) {
+		return;
+	}
 
-    send_cmd(oldnick, "NICK %s :%ld", newnick, (long int) time(NULL));
+	send_cmd(oldnick, "NICK %s :%ld", newnick, (long int) time(NULL));
 }
 
 int anope_event_error(const char *source, int ac, const char **av)
 {
-    if (ac >= 1) {
-        if (debug) {
-            alog("debug: %s", av[0]);
-        }
-    }
-    return MOD_CONT;
+	if (ac >= 1) {
+		if (debug) {
+			alog("debug: %s", av[0]);
+		}
+	}
+	return MOD_CONT;
 }
 
 int anope_event_notice(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int anope_event_sqline(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 
 int anope_event_gnotice(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int anope_event_pass(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 void solidircd_SendSVSJoin(const char *source, const char *nick, const char *chan, const char *param)
 {
-    /* Can not find any reference to these in Bahamut */
+	/* Can not find any reference to these in Bahamut */
 }
 
 void solidircd_SendSVSPart(const char *source, const char *nick, const char *chan)
 {
-    /* Can not find any reference to these in Bahamut */
+	/* Can not find any reference to these in Bahamut */
 }
 
 void solidircd_SendSWhois(const char *source, const char *who, const char *mask)
 {
-    /* not supported */
+	/* not supported */
 }
 
 void solidircd_SendEOB()
 {
-    send_cmd(NULL, "BURST 0");
+	send_cmd(NULL, "BURST 0");
 }
 
 int anope_event_burst(const char *source, int ac, const char **av)
 {
-    Server *s;
-    s = findserver(servlist, source);
-    if (!ac) {
-        /* for future use  - start burst */
-    } else {
-        /* If we found a server with the given source, that one just
-         * finished bursting. If there was no source, then our uplink
-         * server finished bursting. -GD
-         */
-        if (!s && serv_uplink)
-            s = serv_uplink;
-        finish_sync(s, 1);
-    }
-    return MOD_CONT;
+	Server *s;
+	s = findserver(servlist, source);
+	if (!ac) {
+		/* for future use  - start burst */
+	} else {
+		/* If we found a server with the given source, that one just
+		 * finished bursting. If there was no source, then our uplink
+		 * server finished bursting. -GD
+		 */
+		if (!s && serv_uplink)
+			s = serv_uplink;
+		finish_sync(s, 1);
+	}
+	return MOD_CONT;
 }
 
 int anope_event_luserslock(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int anope_event_rehash(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int anope_event_credits(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int anope_event_admin(const char *source, int ac, const char **av)
 {
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 int solidircd_IsFloodModeParamValid(const char *value)
 {
-    char *dp, *end;
+	char *dp, *end;
 
-    if (value && *value != ':'
-        && (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
-        && (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
-        && (*end == 0)) {
-        return 1;
-    } else {
-        return 0;
-    }
+	if (value && *value != ':'
+		&& (strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0)
+		&& (*dp == ':') && (*(++dp) != 0) && (strtoul(dp, &end, 10) > 0)
+		&& (*end == 0)) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 void solidircd_SendJupe(const char *jserver, const char *who, const char *reason)
 {
-    char rbuf[256];
+	char rbuf[256];
 
-    snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
-             reason ? ": " : "", reason ? reason : "");
+	snprintf(rbuf, sizeof(rbuf), "Juped by %s%s%s", who,
+			 reason ? ": " : "", reason ? reason : "");
 
-    if (findserver(servlist, jserver))
-        solidircd_SendSquit(jserver, rbuf);
-    solidircd_SendServer(jserver, 2, rbuf);
-    new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
+	if (findserver(servlist, jserver))
+		solidircd_SendSquit(jserver, rbuf);
+	solidircd_SendServer(jserver, 2, rbuf);
+	new_server(me_server, jserver, rbuf, SERVER_JUPED, NULL);
 }
 
 /* GLOBOPS - to handle old WALLOPS */
 void solidircd_SendGlobops_legacy(const char *source, const char *fmt)
 {
-    send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
+	send_cmd(source ? source : ServerName, "GLOBOPS :%s", fmt);
 }
 
 /*
@@ -1559,8 +1559,8 @@ void solidircd_SendGlobops_legacy(const char *source, const char *fmt)
 */
 int solidircd_IsNickValid(const char *nick)
 {
-    /* no hard coded invalid nicks */
-    return 1;
+	/* no hard coded invalid nicks */
+	return 1;
 }
 
 /*
@@ -1569,23 +1569,23 @@ int solidircd_IsNickValid(const char *nick)
 */
 int solidircd_IsChannelValid(const char *chan)
 {
-    /* no hard coded invalid chan*/
-    return 1;
+	/* no hard coded invalid chan*/
+	return 1;
 }
 
 
 void solidircd_SendCTCP(const char *source, const char *dest, const char *buf)
 {
-    char *s;
+	char *s;
 
-    if (!buf) {
-        return;
-    } else {
-        s = normalizeBuffer(buf);
-    }
+	if (!buf) {
+		return;
+	} else {
+		s = normalizeBuffer(buf);
+	}
 
-    send_cmd(source, "%s NOTICE :\1%s \1", dest, s);
-    free(s);
+	send_cmd(source, "%s NOTICE :\1%s \1", dest, s);
+	free(s);
 }
 
 
@@ -1595,78 +1595,78 @@ void solidircd_SendCTCP(const char *source, const char *dest, const char *buf)
  **/
 void moduleAddAnopeCmds()
 {
-    pmodule_cmd_topic(solidircd_cmd_topic);
-    pmodule_SendVhostDel(solidircd_cmd_vhost_off);
-    pmodule_SendAkill(solidircd_cmd_akill);
-    pmodule_SendSVSKill(solidircd_SendSVSKill);
-    pmodule_SendSVSMode(solidircd_cmd_svsmode);
-    pmodule_cmd_372(solidircd_cmd_372);
-    pmodule_cmd_372_error(solidircd_cmd_372_error);
-    pmodule_cmd_375(solidircd_cmd_375);
-    pmodule_cmd_376(solidircd_cmd_376);
-    pmodule_cmd_nick(solidircd_cmd_nick);
-    pmodule_SendGuestNick(solidircd_cmd_guest_nick);
-    pmodule_SendMode(solidircd_cmd_mode);
-    pmodule_SendClientIntroduction(solidircd_cmd_bot_nick);
-    pmodule_SendKick(solidircd_cmd_kick);
-    pmodule_SendNoticeChanops(solidircd_cmd_notice_ops);
-    pmodule_cmd_notice(solidircd_cmd_notice);
-    pmodule_cmd_notice2(solidircd_cmd_notice2);
-    pmodule_cmd_privmsg(solidircd_cmd_privmsg);
-    pmodule_cmd_privmsg2(solidircd_cmd_privmsg2);
-    pmodule_SendGlobalNotice(solidircd_cmd_serv_notice);
-    pmodule_SendGlobalPrivmsg(solidircd_cmd_serv_privmsg);
-    pmodule_SendBotOp(solidircd_cmd_bot_chan_mode);
-    pmodule_cmd_351(solidircd_cmd_351);
-    pmodule_SendQuit(solidircd_cmd_quit);
-    pmodule_SendPong(solidircd_cmd_pong);
-    pmodule_SendJoin(solidircd_cmd_join);
-    pmodule_SendSQLineDel(solidircd_cmd_unsqline);
-    pmodule_SendInvite(solidircd_cmd_invite);
-    pmodule_SendPart(solidircd_cmd_part);
-    pmodule_cmd_391(solidircd_cmd_391);
-    pmodule_cmd_250(solidircd_cmd_250);
-    pmodule_cmd_307(solidircd_cmd_307);
-    pmodule_cmd_311(solidircd_cmd_311);
-    pmodule_cmd_312(solidircd_cmd_312);
-    pmodule_cmd_317(solidircd_cmd_317);
-    pmodule_cmd_219(solidircd_cmd_219);
-    pmodule_cmd_401(solidircd_cmd_401);
-    pmodule_cmd_318(solidircd_cmd_318);
-    pmodule_cmd_242(solidircd_cmd_242);
-    pmodule_cmd_243(solidircd_cmd_243);
-    pmodule_cmd_211(solidircd_cmd_211);
-    pmodule_SendGlobops(solidircd_cmd_global);
-    pmodule_SendGlobops_legacy(solidircd_cmd_global_legacy);
-    pmodule_SendSQLine(solidircd_cmd_sqline);
-    pmodule_SendSquit(solidircd_cmd_squit);
-    pmodule_SendSVSO(solidircd_cmd_svso);
-    pmodule_SendChangeBotNick(solidircd_cmd_chg_nick);
-    pmodule_SendForceNickChange(solidircd_cmd_svsnick);
-    pmodule_SendVhost(solidircd_cmd_vhost_on);
-    pmodule_SendConnect(solidircd_cmd_connect);
-    pmodule_SendSVSHOLD(solidircd_cmd_svshold);
-    pmodule_SendSVSHOLDDel(solidircd_cmd_release_svshold);
-    pmodule_SendSGLineDel(solidircd_cmd_unsgline);
-    pmodule_SendSZLineDel(solidircd_cmd_unszline);
-    pmodule_SendSZLine(solidircd_cmd_szline);
-    pmodule_SendSGLine(solidircd_cmd_sgline);
-    pmodule_SendBanDel(solidircd_cmd_unban);
-    pmodule_SendSVSMode_chan(solidircd_cmd_svsmode_chan);
-    pmodule_SendSVID(solidircd_cmd_svid_umode);
-    pmodule_SendUnregisteredNick(solidircd_cmd_nc_change);
-    pmodule_SendSVID2(solidircd_cmd_svid_umode2);
-    pmodule_SendSVID3(solidircd_cmd_svid_umode3);
-    pmodule_SendSVSJoin(solidircd_cmd_svsjoin);
-    pmodule_SendSVSPart(solidircd_cmd_svspart);
-    pmodule_SendSWhois(solidircd_cmd_swhois);
-    pmodule_SendEOB(solidircd_cmd_eob);
-    pmodule_IsFloodModeParamValid(solidircd_flood_mode_check);
-    pmodule_SendJupe(solidircd_cmd_jupe);
-    pmodule_IsNickValid(solidircd_valid_nick);
-    pmodule_IsChannelValid(solidircd_valid_chan);
-    pmodule_SendCTCP(solidircd_cmd_ctcp);
-    pmodule_ProcessUsermodes(solidircd_set_umode);
+	pmodule_cmd_topic(solidircd_cmd_topic);
+	pmodule_SendVhostDel(solidircd_cmd_vhost_off);
+	pmodule_SendAkill(solidircd_cmd_akill);
+	pmodule_SendSVSKill(solidircd_SendSVSKill);
+	pmodule_SendSVSMode(solidircd_cmd_svsmode);
+	pmodule_cmd_372(solidircd_cmd_372);
+	pmodule_cmd_372_error(solidircd_cmd_372_error);
+	pmodule_cmd_375(solidircd_cmd_375);
+	pmodule_cmd_376(solidircd_cmd_376);
+	pmodule_cmd_nick(solidircd_cmd_nick);
+	pmodule_SendGuestNick(solidircd_cmd_guest_nick);
+	pmodule_SendMode(solidircd_cmd_mode);
+	pmodule_SendClientIntroduction(solidircd_cmd_bot_nick);
+	pmodule_SendKick(solidircd_cmd_kick);
+	pmodule_SendNoticeChanops(solidircd_cmd_notice_ops);
+	pmodule_cmd_notice(solidircd_cmd_notice);
+	pmodule_cmd_notice2(solidircd_cmd_notice2);
+	pmodule_cmd_privmsg(solidircd_cmd_privmsg);
+	pmodule_cmd_privmsg2(solidircd_cmd_privmsg2);
+	pmodule_SendGlobalNotice(solidircd_cmd_serv_notice);
+	pmodule_SendGlobalPrivmsg(solidircd_cmd_serv_privmsg);
+	pmodule_SendBotOp(solidircd_cmd_bot_chan_mode);
+	pmodule_cmd_351(solidircd_cmd_351);
+	pmodule_SendQuit(solidircd_cmd_quit);
+	pmodule_SendPong(solidircd_cmd_pong);
+	pmodule_SendJoin(solidircd_cmd_join);
+	pmodule_SendSQLineDel(solidircd_cmd_unsqline);
+	pmodule_SendInvite(solidircd_cmd_invite);
+	pmodule_SendPart(solidircd_cmd_part);
+	pmodule_cmd_391(solidircd_cmd_391);
+	pmodule_cmd_250(solidircd_cmd_250);
+	pmodule_cmd_307(solidircd_cmd_307);
+	pmodule_cmd_311(solidircd_cmd_311);
+	pmodule_cmd_312(solidircd_cmd_312);
+	pmodule_cmd_317(solidircd_cmd_317);
+	pmodule_cmd_219(solidircd_cmd_219);
+	pmodule_cmd_401(solidircd_cmd_401);
+	pmodule_cmd_318(solidircd_cmd_318);
+	pmodule_cmd_242(solidircd_cmd_242);
+	pmodule_cmd_243(solidircd_cmd_243);
+	pmodule_cmd_211(solidircd_cmd_211);
+	pmodule_SendGlobops(solidircd_cmd_global);
+	pmodule_SendGlobops_legacy(solidircd_cmd_global_legacy);
+	pmodule_SendSQLine(solidircd_cmd_sqline);
+	pmodule_SendSquit(solidircd_cmd_squit);
+	pmodule_SendSVSO(solidircd_cmd_svso);
+	pmodule_SendChangeBotNick(solidircd_cmd_chg_nick);
+	pmodule_SendForceNickChange(solidircd_cmd_svsnick);
+	pmodule_SendVhost(solidircd_cmd_vhost_on);
+	pmodule_SendConnect(solidircd_cmd_connect);
+	pmodule_SendSVSHOLD(solidircd_cmd_svshold);
+	pmodule_SendSVSHOLDDel(solidircd_cmd_release_svshold);
+	pmodule_SendSGLineDel(solidircd_cmd_unsgline);
+	pmodule_SendSZLineDel(solidircd_cmd_unszline);
+	pmodule_SendSZLine(solidircd_cmd_szline);
+	pmodule_SendSGLine(solidircd_cmd_sgline);
+	pmodule_SendBanDel(solidircd_cmd_unban);
+	pmodule_SendSVSMode_chan(solidircd_cmd_svsmode_chan);
+	pmodule_SendSVID(solidircd_cmd_svid_umode);
+	pmodule_SendUnregisteredNick(solidircd_cmd_nc_change);
+	pmodule_SendSVID2(solidircd_cmd_svid_umode2);
+	pmodule_SendSVID3(solidircd_cmd_svid_umode3);
+	pmodule_SendSVSJoin(solidircd_cmd_svsjoin);
+	pmodule_SendSVSPart(solidircd_cmd_svspart);
+	pmodule_SendSWhois(solidircd_cmd_swhois);
+	pmodule_SendEOB(solidircd_cmd_eob);
+	pmodule_IsFloodModeParamValid(solidircd_flood_mode_check);
+	pmodule_SendJupe(solidircd_cmd_jupe);
+	pmodule_IsNickValid(solidircd_valid_nick);
+	pmodule_IsChannelValid(solidircd_valid_chan);
+	pmodule_SendCTCP(solidircd_cmd_ctcp);
+	pmodule_ProcessUsermodes(solidircd_set_umode);
 }
 
 /**
@@ -1675,35 +1675,35 @@ void moduleAddAnopeCmds()
 int AnopeInit(int argc, char **argv)
 {
 
-    this->SetAuthor("Anope");
-    this->SetVersion
-        ("$Id$");
-    this->SetType(PROTOCOL);
+	this->SetAuthor("Anope");
+	this->SetVersion
+		("$Id$");
+	this->SetType(PROTOCOL);
 
-    pmodule_ircd_version("Solid-IRCd 3.4.*");
-    pmodule_ircd_cap(myIrcdcap);
-    pmodule_ircd_var(myIrcd);
-    pmodule_ircd_cbmodeinfos(myCbmodeinfos);
-    pmodule_ircd_cumodes(myCumodes);
-    pmodule_ircd_flood_mode_char_set("+j");
-    pmodule_ircd_flood_mode_char_remove("-j");
-    pmodule_ircd_cbmodes(myCbmodes);
-    pmodule_ircd_cmmodes(myCmmodes);
-    pmodule_ircd_csmodes(myCsmodes);
-    pmodule_ircd_useTSMode(0);
+	pmodule_ircd_version("Solid-IRCd 3.4.*");
+	pmodule_ircd_cap(myIrcdcap);
+	pmodule_ircd_var(myIrcd);
+	pmodule_ircd_cbmodeinfos(myCbmodeinfos);
+	pmodule_ircd_cumodes(myCumodes);
+	pmodule_ircd_flood_mode_char_set("+j");
+	pmodule_ircd_flood_mode_char_remove("-j");
+	pmodule_ircd_cbmodes(myCbmodes);
+	pmodule_ircd_cmmodes(myCmmodes);
+	pmodule_ircd_csmodes(myCsmodes);
+	pmodule_ircd_useTSMode(0);
 
-        /** Deal with modes anope _needs_ to know **/
-    pmodule_invis_umode(UMODE_i);
-    pmodule_oper_umode(UMODE_o);
-    pmodule_invite_cmode(CMODE_i);
-    pmodule_secret_cmode(CMODE_s);
-    pmodule_private_cmode(CMODE_p);
-    pmodule_key_mode(CMODE_k);
-    pmodule_limit_mode(CMODE_l);
+		/** Deal with modes anope _needs_ to know **/
+	pmodule_invis_umode(UMODE_i);
+	pmodule_oper_umode(UMODE_o);
+	pmodule_invite_cmode(CMODE_i);
+	pmodule_secret_cmode(CMODE_s);
+	pmodule_private_cmode(CMODE_p);
+	pmodule_key_mode(CMODE_k);
+	pmodule_limit_mode(CMODE_l);
 
-    moduleAddAnopeCmds();
+	moduleAddAnopeCmds();
 	pmodule_ircd_proto(&ircd_proto);
-    moduleAddIRCDMsgs();
+	moduleAddIRCDMsgs();
 
-    return MOD_CONT;
+	return MOD_CONT;
 }

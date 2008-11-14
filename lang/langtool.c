@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
 
 		fprintf(stderr, "Generating language.h... ");
 
-        while (fgets(buf, 1023, fd)) {
+		while (fgets(buf, 1023, fd)) {
 			fprintf(fdout, "#define %-32s %d\n", strip(buf), i++);
-        }
+		}
 
 		fprintf(fdout, "#define NUM_STRINGS %d\n", i);
 		fprintf(stderr, "%d strings\n", i);

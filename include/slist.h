@@ -32,7 +32,7 @@ struct slistopts_ {
 	int32 flags;		/* Flags for the list. See below. */
 	
 	int  (*compareitem)	(SList *slist, void *item1, void *item2); 	/* Called to compare two items */
-	int  (*isequal)     (SList *slist, void *item1, void *item2); 	/* Called by slist_indexof. item1 can be an arbitrary pointer. */
+	int  (*isequal)	 (SList *slist, void *item1, void *item2); 	/* Called by slist_indexof. item1 can be an arbitrary pointer. */
 	void (*freeitem) 	(SList *slist, void *item);					/* Called when an item is removed */
 };
 

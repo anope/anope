@@ -107,21 +107,21 @@ typedef	int				ano_socket_t;
 
 /* Data structures */
 struct smtp_header {
-    char *header;
-    struct smtp_header *next;
+	char *header;
+	struct smtp_header *next;
 };
 
 struct smtp_body_line {
-    char *line;
-    struct smtp_body_line *next;
+	char *line;
+	struct smtp_body_line *next;
 };
 
 struct smtp_message {
-    struct smtp_header *smtp_headers, *smtp_headers_tail;
-    struct smtp_body_line *smtp_body, *smtp_body_tail;
-    char *from;
-    char *to;
-    ano_socket_t sock;
+	struct smtp_header *smtp_headers, *smtp_headers_tail;
+	struct smtp_body_line *smtp_body, *smtp_body_tail;
+	char *from;
+	char *to;
+	ano_socket_t sock;
 };
 
 struct smtp_message mail;

@@ -29,7 +29,7 @@ class User
 
 	char *username;		/* ident			*/
 	char *host;		/* User's real hostname 	*/
-	char *hostip;		/* User's IP number             */
+	char *hostip;		/* User's IP number			 */
 	char *vhost;		/* User's virtual hostname 	*/
 	std::string chost;	/* User's cloaked hostname */
 	char *vident;		/* User's virtual ident 	*/

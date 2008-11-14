@@ -42,38 +42,38 @@ class ENone : public Module
 };
 
 int plain_encrypt(const char *src,int len,char *dest,int size) {
-    if(size>=len) {
-        memset(dest,0,size);
-        strncpy(dest,src,len);
-        dest[len] = '\0';
-        return 0;
-    }
-    return -1;
+	if(size>=len) {
+		memset(dest,0,size);
+		strncpy(dest,src,len);
+		dest[len] = '\0';
+		return 0;
+	}
+	return -1;
 }
 
 int plain_encrypt_in_place(char *buf, int size) {
-    return 0;
+	return 0;
 }
 
 int plain_encrypt_check_len(int passlen, int bufsize) {
-    if(bufsize>=passlen) {
-        return 0;
-    }
-    return bufsize;
+	if(bufsize>=passlen) {
+		return 0;
+	}
+	return bufsize;
 }
 
 int plain_decrypt(const char *src, char *dest, int size) {
-    memset(dest,0,size);
-    strncpy(dest,src,size);
-    dest[size] = '\0';
-    return 1;
+	memset(dest,0,size);
+	strncpy(dest,src,size);
+	dest[size] = '\0';
+	return 1;
 }
 
 int plain_check_password(const char *plaintext, const char *password) {
-    if(strcmp(plaintext,password)==0) {
-        return 1;
-    }
-    return 0;
+	if(strcmp(plaintext,password)==0) {
+		return 1;
+	}
+	return 0;
 }
 
 /* EOF */

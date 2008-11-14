@@ -41,67 +41,67 @@ NewsItem *news = NULL;
 #define MSG_MAX		11
 
 struct newsmsgs {
-    int16 type;
-    const char *name;
-    int msgs[MSG_MAX + 1];
+	int16 type;
+	const char *name;
+	int msgs[MSG_MAX + 1];
 };
 
 struct newsmsgs msgarray[] = {
-    {NEWS_LOGON, "LOGON",
-     {NEWS_LOGON_SYNTAX,
-      NEWS_LOGON_LIST_HEADER,
-      NEWS_LOGON_LIST_ENTRY,
-      NEWS_LOGON_LIST_NONE,
-      NEWS_LOGON_ADD_SYNTAX,
-      NEWS_LOGON_ADD_FULL,
-      NEWS_LOGON_ADDED,
-      NEWS_LOGON_DEL_SYNTAX,
-      NEWS_LOGON_DEL_NOT_FOUND,
-      NEWS_LOGON_DELETED,
-      NEWS_LOGON_DEL_NONE,
-      NEWS_LOGON_DELETED_ALL}
-     },
-    {NEWS_OPER, "OPER",
-     {NEWS_OPER_SYNTAX,
-      NEWS_OPER_LIST_HEADER,
-      NEWS_OPER_LIST_ENTRY,
-      NEWS_OPER_LIST_NONE,
-      NEWS_OPER_ADD_SYNTAX,
-      NEWS_OPER_ADD_FULL,
-      NEWS_OPER_ADDED,
-      NEWS_OPER_DEL_SYNTAX,
-      NEWS_OPER_DEL_NOT_FOUND,
-      NEWS_OPER_DELETED,
-      NEWS_OPER_DEL_NONE,
-      NEWS_OPER_DELETED_ALL}
-     },
-    {NEWS_RANDOM, "RANDOM",
-     {NEWS_RANDOM_SYNTAX,
-      NEWS_RANDOM_LIST_HEADER,
-      NEWS_RANDOM_LIST_ENTRY,
-      NEWS_RANDOM_LIST_NONE,
-      NEWS_RANDOM_ADD_SYNTAX,
-      NEWS_RANDOM_ADD_FULL,
-      NEWS_RANDOM_ADDED,
-      NEWS_RANDOM_DEL_SYNTAX,
-      NEWS_RANDOM_DEL_NOT_FOUND,
-      NEWS_RANDOM_DELETED,
-      NEWS_RANDOM_DEL_NONE,
-      NEWS_RANDOM_DELETED_ALL}
-     }
+	{NEWS_LOGON, "LOGON",
+	 {NEWS_LOGON_SYNTAX,
+	  NEWS_LOGON_LIST_HEADER,
+	  NEWS_LOGON_LIST_ENTRY,
+	  NEWS_LOGON_LIST_NONE,
+	  NEWS_LOGON_ADD_SYNTAX,
+	  NEWS_LOGON_ADD_FULL,
+	  NEWS_LOGON_ADDED,
+	  NEWS_LOGON_DEL_SYNTAX,
+	  NEWS_LOGON_DEL_NOT_FOUND,
+	  NEWS_LOGON_DELETED,
+	  NEWS_LOGON_DEL_NONE,
+	  NEWS_LOGON_DELETED_ALL}
+	 },
+	{NEWS_OPER, "OPER",
+	 {NEWS_OPER_SYNTAX,
+	  NEWS_OPER_LIST_HEADER,
+	  NEWS_OPER_LIST_ENTRY,
+	  NEWS_OPER_LIST_NONE,
+	  NEWS_OPER_ADD_SYNTAX,
+	  NEWS_OPER_ADD_FULL,
+	  NEWS_OPER_ADDED,
+	  NEWS_OPER_DEL_SYNTAX,
+	  NEWS_OPER_DEL_NOT_FOUND,
+	  NEWS_OPER_DELETED,
+	  NEWS_OPER_DEL_NONE,
+	  NEWS_OPER_DELETED_ALL}
+	 },
+	{NEWS_RANDOM, "RANDOM",
+	 {NEWS_RANDOM_SYNTAX,
+	  NEWS_RANDOM_LIST_HEADER,
+	  NEWS_RANDOM_LIST_ENTRY,
+	  NEWS_RANDOM_LIST_NONE,
+	  NEWS_RANDOM_ADD_SYNTAX,
+	  NEWS_RANDOM_ADD_FULL,
+	  NEWS_RANDOM_ADDED,
+	  NEWS_RANDOM_DEL_SYNTAX,
+	  NEWS_RANDOM_DEL_NOT_FOUND,
+	  NEWS_RANDOM_DELETED,
+	  NEWS_RANDOM_DEL_NONE,
+	  NEWS_RANDOM_DELETED_ALL}
+	 }
 };
 
 static int *findmsgs(int16 type, const char **type_name)
 {
-    int i;
-    for (i = 0; i < lenof(msgarray); i++) {
-        if (msgarray[i].type == type) {
-            if (type_name)
-                *type_name = msgarray[i].name;
-            return msgarray[i].msgs;
-        }
-    }
-    return NULL;
+	int i;
+	for (i = 0; i < lenof(msgarray); i++) {
+		if (msgarray[i].type == type) {
+			if (type_name)
+				*type_name = msgarray[i].name;
+			return msgarray[i].msgs;
+		}
+	}
+	return NULL;
 }
 
 /*************************************************************************/
@@ -114,12 +114,12 @@ static void do_news_list(User * u, int16 type, int *msgs);
 
 /* Add news items. */
 static void do_news_add(User * u, int16 type, int *msgs,
-                        const char *type_name);
+						const char *type_name);
 static int add_newsitem(User * u, const char *text, int16 type);
 
 /* Delete news items. */
 static void do_news_del(User * u, int16 type, int *msgs,
-                        const char *type_name);
+						const char *type_name);
 static int del_newsitem(int num, int16 type);
 
 /*************************************************************************/
@@ -128,14 +128,14 @@ static int del_newsitem(int num, int16 type);
 
 void get_news_stats(long *nrec, long *memuse)
 {
-    long mem;
-    int i;
+	long mem;
+	int i;
 
-    mem = sizeof(NewsItem) * news_size;
-    for (i = 0; i < nnews; i++)
-        mem += strlen(news[i].text) + 1;
-    *nrec = nnews;
-    *memuse = mem;
+	mem = sizeof(NewsItem) * news_size;
+	for (i = 0; i < nnews; i++)
+		mem += strlen(news[i].text) + 1;
+	*nrec = nnews;
+	*memuse = mem;
 }
 
 /*************************************************************************/
@@ -143,55 +143,55 @@ void get_news_stats(long *nrec, long *memuse)
 /*************************************************************************/
 
 #define SAFE(x) do {					\
-    if ((x) < 0) {					\
+	if ((x) < 0) {					\
 	if (!forceload)					\
-	    fatal("Read error on %s", NewsDBName);	\
+		fatal("Read error on %s", NewsDBName);	\
 	nnews = i;					\
 	break;						\
-    }							\
+	}							\
 } while (0)
 
 void load_news()
 {
-    dbFILE *f;
-    int i;
-    uint16 n;
-    uint32 tmp32;
+	dbFILE *f;
+	int i;
+	uint16 n;
+	uint32 tmp32;
 
-    if (!(f = open_db(s_OperServ, NewsDBName, "r", NEWS_VERSION)))
-        return;
-    switch (i = get_file_version(f)) {
-    case 9:
-    case 8:
-    case 7:
-        SAFE(read_int16(&n, f));
-        nnews = n;
-        if (nnews < 8)
-            news_size = 16;
-        else if (nnews >= 16384)
-            news_size = 32767;
-        else
-            news_size = 2 * nnews;
-        news = (NewsItem *)scalloc(sizeof(*news) * news_size, 1);
-        if (!nnews) {
-            close_db(f);
-            return;
-        }
-        for (i = 0; i < nnews; i++) {
-            SAFE(read_int16(&news[i].type, f));
-            SAFE(read_int32(&news[i].num, f));
-            SAFE(read_string(&news[i].text, f));
-            SAFE(read_buffer(news[i].who, f));
-            SAFE(read_int32(&tmp32, f));
-            news[i].time = tmp32;
-        }
-        break;
+	if (!(f = open_db(s_OperServ, NewsDBName, "r", NEWS_VERSION)))
+		return;
+	switch (i = get_file_version(f)) {
+	case 9:
+	case 8:
+	case 7:
+		SAFE(read_int16(&n, f));
+		nnews = n;
+		if (nnews < 8)
+			news_size = 16;
+		else if (nnews >= 16384)
+			news_size = 32767;
+		else
+			news_size = 2 * nnews;
+		news = (NewsItem *)scalloc(sizeof(*news) * news_size, 1);
+		if (!nnews) {
+			close_db(f);
+			return;
+		}
+		for (i = 0; i < nnews; i++) {
+			SAFE(read_int16(&news[i].type, f));
+			SAFE(read_int32(&news[i].num, f));
+			SAFE(read_string(&news[i].text, f));
+			SAFE(read_buffer(news[i].who, f));
+			SAFE(read_int32(&tmp32, f));
+			news[i].time = tmp32;
+		}
+		break;
 
-    default:
-        fatal("Unsupported version (%d) on %s", i, NewsDBName);
-    }                           /* switch (ver) */
+	default:
+		fatal("Unsupported version (%d) on %s", i, NewsDBName);
+	}						   /* switch (ver) */
 
-    close_db(f);
+	close_db(f);
 }
 
 #undef SAFE
@@ -199,35 +199,35 @@ void load_news()
 /*************************************************************************/
 
 #define SAFE(x) do {						\
-    if ((x) < 0) {						\
+	if ((x) < 0) {						\
 	restore_db(f);						\
 	log_perror("Write error on %s", NewsDBName);		\
 	if (time(NULL) - lastwarn > WarningTimeout) {		\
-	    ircdproto->SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
+		ircdproto->SendGlobops(NULL, "Write error on %s: %s", NewsDBName,	\
 			strerror(errno));			\
-	    lastwarn = time(NULL);				\
+		lastwarn = time(NULL);				\
 	}							\
 	return;							\
-    }								\
+	}								\
 } while (0)
 
 void save_news()
 {
-    dbFILE *f;
-    int i;
-    static time_t lastwarn = 0;
+	dbFILE *f;
+	int i;
+	static time_t lastwarn = 0;
 
-    if (!(f = open_db(s_OperServ, NewsDBName, "w", NEWS_VERSION)))
-        return;
-    SAFE(write_int16(nnews, f));
-    for (i = 0; i < nnews; i++) {
-        SAFE(write_int16(news[i].type, f));
-        SAFE(write_int32(news[i].num, f));
-        SAFE(write_string(news[i].text, f));
-        SAFE(write_buffer(news[i].who, f));
-        SAFE(write_int32(news[i].time, f));
-    }
-    close_db(f);
+	if (!(f = open_db(s_OperServ, NewsDBName, "w", NEWS_VERSION)))
+		return;
+	SAFE(write_int16(nnews, f));
+	for (i = 0; i < nnews; i++) {
+		SAFE(write_int16(news[i].type, f));
+		SAFE(write_int32(news[i].num, f));
+		SAFE(write_string(news[i].text, f));
+		SAFE(write_buffer(news[i].who, f));
+		SAFE(write_int32(news[i].time, f));
+	}
+	close_db(f);
 }
 
 #undef SAFE
@@ -238,65 +238,65 @@ void save_news()
 
 void display_news(User * u, int16 type)
 {
-    int msg;
+	int msg;
 
-    if (type == NEWS_LOGON) {
-        msg = NEWS_LOGON_TEXT;
-    } else if (type == NEWS_OPER) {
-        msg = NEWS_OPER_TEXT;
-    } else if (type == NEWS_RANDOM) {
-        msg = NEWS_RANDOM_TEXT;
-    } else {
-        alog("news: Invalid type (%d) to display_news()", type);
-        return;
-    }
+	if (type == NEWS_LOGON) {
+		msg = NEWS_LOGON_TEXT;
+	} else if (type == NEWS_OPER) {
+		msg = NEWS_OPER_TEXT;
+	} else if (type == NEWS_RANDOM) {
+		msg = NEWS_RANDOM_TEXT;
+	} else {
+		alog("news: Invalid type (%d) to display_news()", type);
+		return;
+	}
 
-    if (type == NEWS_RANDOM) {
-        static int current_news = -1;
-        int count = 0;
+	if (type == NEWS_RANDOM) {
+		static int current_news = -1;
+		int count = 0;
 
-        if (!nnews)
-            return;
+		if (!nnews)
+			return;
 
-        while (count++ < nnews) {
-            if (++current_news >= nnews)
-                current_news = 0;
+		while (count++ < nnews) {
+			if (++current_news >= nnews)
+				current_news = 0;
 
-            if (news[current_news].type == type) {
-                struct tm *tm;
-                char timebuf[64];
+			if (news[current_news].type == type) {
+				struct tm *tm;
+				char timebuf[64];
 
-                tm = localtime(&news[current_news].time);
-                strftime_lang(timebuf, sizeof(timebuf), u,
-                              STRFTIME_SHORT_DATE_FORMAT, tm);
-                notice_lang(s_GlobalNoticer, u, msg, timebuf,
-                            news[current_news].text);
+				tm = localtime(&news[current_news].time);
+				strftime_lang(timebuf, sizeof(timebuf), u,
+							  STRFTIME_SHORT_DATE_FORMAT, tm);
+				notice_lang(s_GlobalNoticer, u, msg, timebuf,
+							news[current_news].text);
 
-                return;
-            }
-        }
-    } else {
-        int i, count = 0;
+				return;
+			}
+		}
+	} else {
+		int i, count = 0;
 
-        for (i = nnews - 1; i >= 0; i--) {
-            if (count >= NewsCount)
-                break;
-            if (news[i].type == type)
-                count++;
-        }
-        while (++i < nnews) {
-            if (news[i].type == type) {
-                struct tm *tm;
-                char timebuf[64];
+		for (i = nnews - 1; i >= 0; i--) {
+			if (count >= NewsCount)
+				break;
+			if (news[i].type == type)
+				count++;
+		}
+		while (++i < nnews) {
+			if (news[i].type == type) {
+				struct tm *tm;
+				char timebuf[64];
 
-                tm = localtime(&news[i].time);
-                strftime_lang(timebuf, sizeof(timebuf), u,
-                              STRFTIME_SHORT_DATE_FORMAT, tm);
-                notice_lang(s_GlobalNoticer, u, msg, timebuf,
-                            news[i].text);
-            }
-        }
-    }
+				tm = localtime(&news[i].time);
+				strftime_lang(timebuf, sizeof(timebuf), u,
+							  STRFTIME_SHORT_DATE_FORMAT, tm);
+				notice_lang(s_GlobalNoticer, u, msg, timebuf,
+							news[i].text);
+			}
+		}
+	}
 }
 
 /*************************************************************************/
@@ -305,23 +305,23 @@ void display_news(User * u, int16 type)
 /* Declared in extern.h */
 int do_logonnews(User * u)
 {
-    do_news(u, NEWS_LOGON);
-    return MOD_CONT;
+	do_news(u, NEWS_LOGON);
+	return MOD_CONT;
 }
 
 
 /* Declared in extern.h */
 int do_opernews(User * u)
 {
-    do_news(u, NEWS_OPER);
-    return MOD_CONT;
+	do_news(u, NEWS_OPER);
+	return MOD_CONT;
 }
 
 /* Declared in extern.h */
 int do_randomnews(User * u)
 {
-    do_news(u, NEWS_RANDOM);
-    return MOD_CONT;
+	do_news(u, NEWS_RANDOM);
+	return MOD_CONT;
 }
 
 /*************************************************************************/
@@ -329,39 +329,39 @@ int do_randomnews(User * u)
 /* Main news command handling routine. */
 void do_news(User * u, short type)
 {
-    int is_servadmin = is_services_admin(u);
-    const char *cmd = strtok(NULL, " ");
-    const char *type_name;
-    int *msgs;
+	int is_servadmin = is_services_admin(u);
+	const char *cmd = strtok(NULL, " ");
+	const char *type_name;
+	int *msgs;
 
-    msgs = findmsgs(type, &type_name);
-    if (!msgs) {
-        alog("news: Invalid type to do_news()");
-        return;
-    }
+	msgs = findmsgs(type, &type_name);
+	if (!msgs) {
+		alog("news: Invalid type to do_news()");
+		return;
+	}
 
-    if (!cmd)
-        cmd = "";
+	if (!cmd)
+		cmd = "";
 
-    if (stricmp(cmd, "LIST") == 0) {
-        do_news_list(u, type, msgs);
-    } else if (stricmp(cmd, "ADD") == 0) {
-        if (is_servadmin)
-            do_news_add(u, type, msgs, type_name);
-        else
-            notice_lang(s_OperServ, u, PERMISSION_DENIED);
+	if (stricmp(cmd, "LIST") == 0) {
+		do_news_list(u, type, msgs);
+	} else if (stricmp(cmd, "ADD") == 0) {
+		if (is_servadmin)
+			do_news_add(u, type, msgs, type_name);
+		else
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 
-    } else if (stricmp(cmd, "DEL") == 0) {
-        if (is_servadmin)
-            do_news_del(u, type, msgs, type_name);
-        else
-            notice_lang(s_OperServ, u, PERMISSION_DENIED);
+	} else if (stricmp(cmd, "DEL") == 0) {
+		if (is_servadmin)
+			do_news_del(u, type, msgs, type_name);
+		else
+			notice_lang(s_OperServ, u, PERMISSION_DENIED);
 
-    } else {
-        char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
-        syntax_error(s_OperServ, u, buf, msgs[MSG_SYNTAX]);
-    }
+	} else {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "%sNEWS", type_name);
+		syntax_error(s_OperServ, u, buf, msgs[MSG_SYNTAX]);
+	}
 }
 
 /*************************************************************************/
@@ -370,29 +370,29 @@ void do_news(User * u, short type)
 
 static void do_news_list(User * u, int16 type, int *msgs)
 {
-    int i, count = 0;
-    char timebuf[64];
-    struct tm *tm;
+	int i, count = 0;
+	char timebuf[64];
+	struct tm *tm;
 
-    for (i = 0; i < nnews; i++) {
-        if (news[i].type == type) {
-            if (count == 0)
-                notice_lang(s_OperServ, u, msgs[MSG_LIST_HEADER]);
-            tm = localtime(&news[i].time);
-            strftime_lang(timebuf, sizeof(timebuf),
-                          u, STRFTIME_DATE_TIME_FORMAT, tm);
-            notice_lang(s_OperServ, u, msgs[MSG_LIST_ENTRY],
-                        news[i].num, timebuf,
-                        *news[i].who ? news[i].who : "<unknown>",
-                        news[i].text);
-            count++;
-        }
-    }
-    if (count == 0)
-        notice_lang(s_OperServ, u, msgs[MSG_LIST_NONE]);
-    else {
-        notice_lang(s_OperServ, u, END_OF_ANY_LIST, "News");
-    }
+	for (i = 0; i < nnews; i++) {
+		if (news[i].type == type) {
+			if (count == 0)
+				notice_lang(s_OperServ, u, msgs[MSG_LIST_HEADER]);
+			tm = localtime(&news[i].time);
+			strftime_lang(timebuf, sizeof(timebuf),
+						  u, STRFTIME_DATE_TIME_FORMAT, tm);
+			notice_lang(s_OperServ, u, msgs[MSG_LIST_ENTRY],
+						news[i].num, timebuf,
+						*news[i].who ? news[i].who : "<unknown>",
+						news[i].text);
+			count++;
+		}
+	}
+	if (count == 0)
+		notice_lang(s_OperServ, u, msgs[MSG_LIST_NONE]);
+	else {
+		notice_lang(s_OperServ, u, END_OF_ANY_LIST, "News");
+	}
 }
 
 /*************************************************************************/
@@ -400,26 +400,26 @@ static void do_news_list(User * u, int16 type, int *msgs)
 /* Handle a {LOGON,OPER}NEWS ADD command. */
 
 static void do_news_add(User * u, int16 type, int *msgs,
-                        const char *type_name)
+						const char *type_name)
 {
-    char *text = strtok(NULL, "");
+	char *text = strtok(NULL, "");
 	int n;
 
-    if (!text) {
-        char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
-        syntax_error(s_OperServ, u, buf, msgs[MSG_ADD_SYNTAX]);
-    } else {
-        if (readonly) {
-            notice_lang(s_OperServ, u, READ_ONLY_MODE);
+	if (!text) {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "%sNEWS", type_name);
+		syntax_error(s_OperServ, u, buf, msgs[MSG_ADD_SYNTAX]);
+	} else {
+		if (readonly) {
+			notice_lang(s_OperServ, u, READ_ONLY_MODE);
 			return;
 		}
-        n = add_newsitem(u, text, type);
-        if (n < 0)
-            notice_lang(s_OperServ, u, msgs[MSG_ADD_FULL]);
-        else
-            notice_lang(s_OperServ, u, msgs[MSG_ADDED], n);
-    }
+		n = add_newsitem(u, text, type);
+		if (n < 0)
+			notice_lang(s_OperServ, u, msgs[MSG_ADD_FULL]);
+		else
+			notice_lang(s_OperServ, u, msgs[MSG_ADDED], n);
+	}
 }
 
 
@@ -429,32 +429,32 @@ static void do_news_add(User * u, int16 type, int *msgs,
 
 static int add_newsitem(User * u, const char *text, short type)
 {
-    int i, num;
+	int i, num;
 
-    if (nnews >= 32767)
-        return -1;
+	if (nnews >= 32767)
+		return -1;
 
-    if (nnews >= news_size) {
-        if (news_size < 8)
-            news_size = 8;
-        else
-            news_size *= 2;
-        news = (NewsItem *)srealloc(news, sizeof(*news) * news_size);
-    }
-    num = 0;
-    for (i = nnews - 1; i >= 0; i--) {
-        if (news[i].type == type) {
-            num = news[i].num;
-            break;
-        }
-    }
-    news[nnews].type = type;
-    news[nnews].num = num + 1;
-    news[nnews].text = sstrdup(text);
-    news[nnews].time = time(NULL);
-    strscpy(news[nnews].who, u->nick, NICKMAX);
-    nnews++;
-    return num + 1;
+	if (nnews >= news_size) {
+		if (news_size < 8)
+			news_size = 8;
+		else
+			news_size *= 2;
+		news = (NewsItem *)srealloc(news, sizeof(*news) * news_size);
+	}
+	num = 0;
+	for (i = nnews - 1; i >= 0; i--) {
+		if (news[i].type == type) {
+			num = news[i].num;
+			break;
+		}
+	}
+	news[nnews].type = type;
+	news[nnews].num = num + 1;
+	news[nnews].text = sstrdup(text);
+	news[nnews].time = time(NULL);
+	strscpy(news[nnews].who, u->nick, NICKMAX);
+	nnews++;
+	return num + 1;
 }
 
 /*************************************************************************/
@@ -462,38 +462,38 @@ static int add_newsitem(User * u, const char *text, short type)
 /* Handle a {LOGON,OPER}NEWS DEL command. */
 
 static void do_news_del(User * u, int16 type, int *msgs,
-                        const char *type_name)
+						const char *type_name)
 {
-    char *text = strtok(NULL, " ");
-    int i, num;
+	char *text = strtok(NULL, " ");
+	int i, num;
 
-    if (!text) {
-        char buf[32];
-        snprintf(buf, sizeof(buf), "%sNEWS", type_name);
-        syntax_error(s_OperServ, u, buf, msgs[MSG_DEL_SYNTAX]);
-    } else {
-        if (readonly) {
-            notice_lang(s_OperServ, u, READ_ONLY_MODE);
+	if (!text) {
+		char buf[32];
+		snprintf(buf, sizeof(buf), "%sNEWS", type_name);
+		syntax_error(s_OperServ, u, buf, msgs[MSG_DEL_SYNTAX]);
+	} else {
+		if (readonly) {
+			notice_lang(s_OperServ, u, READ_ONLY_MODE);
 			return;
 		}
-        if (stricmp(text, "ALL") != 0) {
-            num = atoi(text);
-            if (num > 0 && del_newsitem(num, type)) {
-                notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
-                /* Reset the order - #0000397 */
-                for (i = 0; i < nnews; i++) {
-                    if ((news[i].type == type) && (news[i].num > num))
-                        news[i].num--;
-                }
-            } else
-                notice_lang(s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
-        } else {
-            if (del_newsitem(0, type))
-                notice_lang(s_OperServ, u, msgs[MSG_DELETED_ALL]);
-            else
-                notice_lang(s_OperServ, u, msgs[MSG_DEL_NONE]);
-        }
-    }
+		if (stricmp(text, "ALL") != 0) {
+			num = atoi(text);
+			if (num > 0 && del_newsitem(num, type)) {
+				notice_lang(s_OperServ, u, msgs[MSG_DELETED], num);
+				/* Reset the order - #0000397 */
+				for (i = 0; i < nnews; i++) {
+					if ((news[i].type == type) && (news[i].num > num))
+						news[i].num--;
+				}
+			} else
+				notice_lang(s_OperServ, u, msgs[MSG_DEL_NOT_FOUND], num);
+		} else {
+			if (del_newsitem(0, type))
+				notice_lang(s_OperServ, u, msgs[MSG_DELETED_ALL]);
+			else
+				notice_lang(s_OperServ, u, msgs[MSG_DEL_NONE]);
+		}
+	}
 }
 
 
@@ -503,21 +503,21 @@ static void do_news_del(User * u, int16 type, int *msgs,
 
 static int del_newsitem(int num, short type)
 {
-    int i;
-    int count = 0;
+	int i;
+	int count = 0;
 
-    for (i = 0; i < nnews; i++) {
-        if (news[i].type == type && (num == 0 || news[i].num == num)) {
-            free(news[i].text);
-            count++;
-            nnews--;
-            if (i < nnews)
-                memcpy(news + i, news + i + 1,
-                       sizeof(*news) * (nnews - i));
-            i--;
-        }
-    }
-    return count;
+	for (i = 0; i < nnews; i++) {
+		if (news[i].type == type && (num == 0 || news[i].num == num)) {
+			free(news[i].text);
+			count++;
+			nnews--;
+			if (i < nnews)
+				memcpy(news + i, news + i + 1,
+					   sizeof(*news) * (nnews - i));
+			i--;
+		}
+	}
+	return count;
 }
 
 /*************************************************************************/

@@ -42,7 +42,7 @@ class NSStatus : public Module
  **/
 void myNickServHelp(User * u)
 {
-    notice_lang(s_NickServ, u, NICK_HELP_CMD_STATUS);
+	notice_lang(s_NickServ, u, NICK_HELP_CMD_STATUS);
 }
 
 /**
@@ -52,32 +52,32 @@ void myNickServHelp(User * u)
  **/
 int do_status(User * u)
 {
-    User *u2;
-    NickAlias *na = NULL;
-    int i = 0;
-    char *nick = strtok(NULL, " ");
+	User *u2;
+	NickAlias *na = NULL;
+	int i = 0;
+	char *nick = strtok(NULL, " ");
 
-    /* If no nickname is given, we assume that the user
-     * is asking for himself */
-    if (!nick)
-        nick = u->nick;
+	/* If no nickname is given, we assume that the user
+	 * is asking for himself */
+	if (!nick)
+		nick = u->nick;
 
-    while (nick && (i++ < 16)) {
-        if (!(u2 = finduser(nick)))     /* Nick is not online */
-            notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
-        else if (nick_identified(u2))   /* Nick is identified */
-            notice_lang(s_NickServ, u, NICK_STATUS_3, nick);
-        else if (nick_recognized(u2))   /* Nick is recognised, but NOT identified */
-            notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
-        else if ((na = findnick(nick)) == NULL) /* Nick is online, but NOT a registered */
-            notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
-        else
-            notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
+	while (nick && (i++ < 16)) {
+		if (!(u2 = finduser(nick)))	 /* Nick is not online */
+			notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
+		else if (nick_identified(u2))   /* Nick is identified */
+			notice_lang(s_NickServ, u, NICK_STATUS_3, nick);
+		else if (nick_recognized(u2))   /* Nick is recognised, but NOT identified */
+			notice_lang(s_NickServ, u, NICK_STATUS_2, nick);
+		else if ((na = findnick(nick)) == NULL) /* Nick is online, but NOT a registered */
+			notice_lang(s_NickServ, u, NICK_STATUS_0, nick);
+		else
+			notice_lang(s_NickServ, u, NICK_STATUS_1, nick);
 
-        /* Get the next nickname */
-        nick = strtok(NULL, " ");
-    }
-    return MOD_CONT;
+		/* Get the next nickname */
+		nick = strtok(NULL, " ");
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("ns_status", NSStatus)

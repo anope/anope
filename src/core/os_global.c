@@ -44,9 +44,9 @@ class OSGlobal : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_GLOBAL);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_GLOBAL);
+	}
 }
 
 /**
@@ -56,17 +56,17 @@ void myOperServHelp(User * u)
  **/
 int do_global(User * u)
 {
-    char *msg = strtok(NULL, "");
+	char *msg = strtok(NULL, "");
 
-    if (!msg) {
-        syntax_error(s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
-        return MOD_CONT;
-    }
-    if (WallOSGlobal)
-        ircdproto->SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.",
-                         u->nick);
-    oper_global(u->nick, "%s", msg);
-    return MOD_CONT;
+	if (!msg) {
+		syntax_error(s_OperServ, u, "GLOBAL", OPER_GLOBAL_SYNTAX);
+		return MOD_CONT;
+	}
+	if (WallOSGlobal)
+		ircdproto->SendGlobops(s_OperServ, "\2%s\2 just used GLOBAL command.",
+						 u->nick);
+	oper_global(u->nick, "%s", msg);
+	return MOD_CONT;
 }
 
 MODULE_INIT("os_global", OSGlobal)

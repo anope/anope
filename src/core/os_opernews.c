@@ -50,7 +50,7 @@ class OSOperNews : public Module
 
 	~OSOperNews()
 	{
-	    free(c->help_param1);
+		free(c->help_param1);
 	}
 };
 
@@ -61,26 +61,26 @@ class OSOperNews : public Module
  **/
 void myOperServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_OperServ, u, OPER_HELP_CMD_OPERNEWS);
+	}
 }
 
 /**
  * Upon /os reload refresh the count
  **/
 int reload_config(int argc, char **argv) {
-    char buf[BUFSIZE];
+	char buf[BUFSIZE];
 
-    if (argc >= 1) {
-        if (!stricmp(argv[0], EVENT_START)) {
-            free(c->help_param1);
-            snprintf(buf, BUFSIZE, "%d", NewsCount),
-            c->help_param1 = sstrdup(buf);
-        }
-    }
+	if (argc >= 1) {
+		if (!stricmp(argv[0], EVENT_START)) {
+			free(c->help_param1);
+			snprintf(buf, BUFSIZE, "%d", NewsCount),
+			c->help_param1 = sstrdup(buf);
+		}
+	}
 
-    return MOD_CONT;
+	return MOD_CONT;
 }
 
 

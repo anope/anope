@@ -94,21 +94,21 @@ void send_cmd(const std::string &source, const char *fmt, ...)
  */
 void notice_server(char *source, Server * s, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
+	va_list args;
+	char buf[BUFSIZE];
+	*buf = '\0';
 
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
-        if (NSDefFlags & NI_MSG) {
-            ircdproto->SendGlobalPrivmsg(findbot(source), s->name, buf);
-        } else {
-            ircdproto->SendGlobalNotice(findbot(source), s->name, buf);
-        }
-        va_end(args);
-    }
+		if (NSDefFlags & NI_MSG) {
+			ircdproto->SendGlobalPrivmsg(findbot(source), s->name, buf);
+		} else {
+			ircdproto->SendGlobalNotice(findbot(source), s->name, buf);
+		}
+		va_end(args);
+	}
 }
 
 /*************************************************************************/
@@ -123,18 +123,18 @@ void notice_server(char *source, Server * s, const char *fmt, ...)
  */
 void notice_user(char *source, User * u, const char *fmt, ...)
 {
-    va_list args;
-    char buf[BUFSIZE];
-    *buf = '\0';
+	va_list args;
+	char buf[BUFSIZE];
+	*buf = '\0';
 
-    if (fmt) {
-        va_start(args, fmt);
-        vsnprintf(buf, BUFSIZE - 1, fmt, args);
+	if (fmt) {
+		va_start(args, fmt);
+		vsnprintf(buf, BUFSIZE - 1, fmt, args);
 
 		u->SendMessage(source, buf);
 
-        va_end(args);
-    }
+		va_end(args);
+	}
 }
 
 /*************************************************************************/
@@ -149,18 +149,18 @@ void notice_user(char *source, User * u, const char *fmt, ...)
 void notice_list(char *source, char *dest, char **text)
 {
 	User *u = finduser(dest);
-    while (*text) {
-        /* Have to kludge around an ircII bug here: if a notice includes
-         * no text, it is ignored, so we replace blank lines by lines
-         * with a single space.
-         */
-        if (**text) {
-            u->SendMessage(source, *text);
-        } else {
-            u->SendMessage(source, " ");
-        }
-        text++;
-    }
+	while (*text) {
+		/* Have to kludge around an ircII bug here: if a notice includes
+		 * no text, it is ignored, so we replace blank lines by lines
+		 * with a single space.
+		 */
+		if (**text) {
+			u->SendMessage(source, *text);
+		} else {
+			u->SendMessage(source, " ");
+		}
+		text++;
+	}
 }
 
 /*************************************************************************/
@@ -175,31 +175,31 @@ void notice_list(char *source, char *dest, char **text)
  */
 void notice_lang(const char *source, User * dest, int message, ...)
 {
-    va_list args;
-    char buf[4096];             /* because messages can be really big */
-    char *s, *t;
-    const char *fmt;
+	va_list args;
+	char buf[4096];			 /* because messages can be really big */
+	char *s, *t;
+	const char *fmt;
 
-    if (!dest || !message) {
-        return;
-    }
-    va_start(args, message);
-    fmt = getstring(dest->na, message);
+	if (!dest || !message) {
+		return;
+	}
+	va_start(args, message);
+	fmt = getstring(dest->na, message);
 
-    if (!fmt)
-        return;
-    memset(buf, 0, 4096);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    s = buf;
-    while (*s) {
-        t = s;
-        s += strcspn(s, "\n");
-        if (*s)
-            *s++ = 0;
+	if (!fmt)
+		return;
+	memset(buf, 0, 4096);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	s = buf;
+	while (*s) {
+		t = s;
+		s += strcspn(s, "\n");
+		if (*s)
+			*s++ = 0;
 
 	dest->SendMessage(source, *t ? t : " ");
-    }
-    va_end(args);
+	}
+	va_end(args);
 }
 
 /*************************************************************************/
@@ -216,34 +216,34 @@ void notice_lang(const char *source, User * dest, int message, ...)
  */
 void notice_help(const char *source, User * dest, int message, ...)
 {
-    va_list args;
-    char buf[4096], buf2[4096], outbuf[BUFSIZE];
-    char *s, *t;
-    const char *fmt;
+	va_list args;
+	char buf[4096], buf2[4096], outbuf[BUFSIZE];
+	char *s, *t;
+	const char *fmt;
 
-    if (!dest || !message) {
-        return;
-    }
-    va_start(args, message);
-    fmt = getstring(dest->na, message);
-    if (!fmt)
-        return;
-    /* Some sprintf()'s eat %S or turn it into just S, so change all %S's
-     * into \1\1... we assume this doesn't occur anywhere else in the
-     * string. */
-    strscpy(buf2, fmt, sizeof(buf2));
-    strnrepl(buf2, sizeof(buf2), "%S", "\1\1");
-    vsnprintf(buf, sizeof(buf), buf2, args);
-    s = buf;
-    while (*s) {
-        t = s;
-        s += strcspn(s, "\n");
-        if (*s)
-            *s++ = 0;
-        strscpy(outbuf, t, sizeof(outbuf));
-        strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
+	if (!dest || !message) {
+		return;
+	}
+	va_start(args, message);
+	fmt = getstring(dest->na, message);
+	if (!fmt)
+		return;
+	/* Some sprintf()'s eat %S or turn it into just S, so change all %S's
+	 * into \1\1... we assume this doesn't occur anywhere else in the
+	 * string. */
+	strscpy(buf2, fmt, sizeof(buf2));
+	strnrepl(buf2, sizeof(buf2), "%S", "\1\1");
+	vsnprintf(buf, sizeof(buf), buf2, args);
+	s = buf;
+	while (*s) {
+		t = s;
+		s += strcspn(s, "\n");
+		if (*s)
+			*s++ = 0;
+		strscpy(outbuf, t, sizeof(outbuf));
+		strnrepl(outbuf, sizeof(outbuf), "\1\1", source);
 
 	dest->SendMessage(source, *outbuf ? outbuf : " ");
-    }
-    va_end(args);
+	}
+	va_end(args);
 }

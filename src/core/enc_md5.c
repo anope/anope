@@ -5,7 +5,7 @@
  * Contact us at dev@anope.org
  *
  * Taken from IRC Services and is copyright (c) 1996-2002 Andrew Church.
- *     E-mail: <achurch@achurch.org>
+ *	 E-mail: <achurch@achurch.org>
  * Parts written by Andrew Kempe and others.
  * This program is free but copyrighted software; see the file COPYING for
  * details.
@@ -44,9 +44,9 @@ typedef unsigned int UINT4;
 
 /* MD5 context. */
 typedef struct {
-  UINT4 state[4];                                   /* state (ABCD) */
-  UINT4 count[2];        /* number of bits, modulo 2^64 (lsb first) */
-  unsigned char buffer[64];                         /* input buffer */
+  UINT4 state[4];								   /* state (ABCD) */
+  UINT4 count[2];		/* number of bits, modulo 2^64 (lsb first) */
+  unsigned char buffer[64];						 /* input buffer */
 } MD5_CTX;
 
 /* MD5C.C - RSA Data Security, Inc., MD5 message-digest algorithm
@@ -323,60 +323,60 @@ void Decode (UINT4 *output, unsigned char *input, unsigned int len)
 
 int md5_encrypt(const char *src, int len, char *dest, int size)
 {
-    MD5_CTX context;
-    char tmp[33];
+	MD5_CTX context;
+	char tmp[33];
 
-    if (size < 16)
+	if (size < 16)
 	return -1;
 
-    MD5Init(&context);
-    MD5Update(&context, (unsigned char *)src, len);
-    MD5Final((unsigned char *)dest, &context);
-    
-    if(debug) {
-        memset(tmp,0,33);
-        binary_to_hex((unsigned char *)dest,tmp,16);
+	MD5Init(&context);
+	MD5Update(&context, (unsigned char *)src, len);
+	MD5Final((unsigned char *)dest, &context);
+	
+	if(debug) {
+		memset(tmp,0,33);
+		binary_to_hex((unsigned char *)dest,tmp,16);
 	/* Dont log source if we were encrypting in place :) */
-        if (memcmp(src, dest, 16) != 0) {
-            alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
+		if (memcmp(src, dest, 16) != 0) {
+			alog("enc_md5: hashed from [%s] to [%s]",src,tmp); 
 	} else {
-            alog("enc_md5: hashed password to [%s]",tmp); 
+			alog("enc_md5: hashed password to [%s]",tmp); 
 	}
-    }
-    
-    return 0;
+	}
+	
+	return 0;
 }
 
 
 int md5_encrypt_in_place(char *buf, int size)
 {
-    return md5_encrypt(buf, strlen(buf), buf, size);
+	return md5_encrypt(buf, strlen(buf), buf, size);
 }
 
 
 int md5_encrypt_check_len(int passlen, int bufsize)
 {
-    if (bufsize < 16)
+	if (bufsize < 16)
 	fatal("enc_md5: md5_check_len(): buffer too small (%d)", bufsize);
-    return 0;
+	return 0;
 }
 
 
 int md5_decrypt(const char *src, char *dest, int size)
 {
-    return 0;
+	return 0;
 }
 
 
 int md5_check_password(const char *plaintext, const char *password)
 {
-    char buf[BUFSIZE];
+	char buf[BUFSIZE];
 
-    if (md5_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
+	if (md5_encrypt(plaintext, strlen(plaintext), buf, sizeof(buf)) < 0)
 	return -1;
-    if (memcmp(buf, password, 16) == 0)
+	if (memcmp(buf, password, 16) == 0)
 	return 1;
-    return 0;
+	return 0;
 }
 
 /*************************************************************************/

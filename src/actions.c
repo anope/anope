@@ -24,20 +24,20 @@
  */
 void bad_password(User * u)
 {
-    time_t now = time(NULL);
+	time_t now = time(NULL);
 
-    if (!u || !BadPassLimit) {
-        return;
-    }
+	if (!u || !BadPassLimit) {
+		return;
+	}
 
-    if (BadPassTimeout > 0 && u->invalid_pw_time > 0
-        && u->invalid_pw_time < now - BadPassTimeout)
-        u->invalid_pw_count = 0;
-    u->invalid_pw_count++;
-    u->invalid_pw_time = now;
-    if (u->invalid_pw_count >= BadPassLimit) {
-        kill_user(NULL, u->nick, "Too many invalid passwords");
-    }
+	if (BadPassTimeout > 0 && u->invalid_pw_time > 0
+		&& u->invalid_pw_time < now - BadPassTimeout)
+		u->invalid_pw_count = 0;
+	u->invalid_pw_count++;
+	u->invalid_pw_time = now;
+	if (u->invalid_pw_count >= BadPassLimit) {
+		kill_user(NULL, u->nick, "Too many invalid passwords");
+	}
 }
 
 /*************************************************************************/
@@ -51,25 +51,25 @@ void bad_password(User * u)
  */
 void kill_user(const char *source, const char *user, const char *reason)
 {
-    char buf[BUFSIZE];
+	char buf[BUFSIZE];
 
-    if (!user || !*user) {
-        return;
-    }
-    if (!source || !*source) {
-        source = ServerName;
-    }
-    if (!reason) {
-        reason = "";
-    }
+	if (!user || !*user) {
+		return;
+	}
+	if (!source || !*source) {
+		source = ServerName;
+	}
+	if (!reason) {
+		reason = "";
+	}
 
-    snprintf(buf, sizeof(buf), "%s (%s)", source, reason);
+	snprintf(buf, sizeof(buf), "%s (%s)", source, reason);
 
-    ircdproto->SendSVSKill(source, user, buf);
+	ircdproto->SendSVSKill(source, user, buf);
 
-    if (!ircd->quitonkill && finduser(user)) {
-        do_kill(user, buf);
-    }
+	if (!ircd->quitonkill && finduser(user)) {
+		do_kill(user, buf);
+	}
 }
 
 /*************************************************************************/
@@ -82,42 +82,42 @@ void kill_user(const char *source, const char *user, const char *reason)
  */
 void sqline(char *mask, char *reason)
 {
-    int i;
-    Channel *c, *next;
-    const char *av[3];
-    struct c_userlist *cu, *cunext;
+	int i;
+	Channel *c, *next;
+	const char *av[3];
+	struct c_userlist *cu, *cunext;
 
-    if (ircd->chansqline) {
-        if (*mask == '#') {
-            ircdproto->SendSQLine(mask, reason);
+	if (ircd->chansqline) {
+		if (*mask == '#') {
+			ircdproto->SendSQLine(mask, reason);
 
-            for (i = 0; i < 1024; i++) {
-                for (c = chanlist[i]; c; c = next) {
-                    next = c->next;
+			for (i = 0; i < 1024; i++) {
+				for (c = chanlist[i]; c; c = next) {
+					next = c->next;
 
-                    if (!match_wild_nocase(mask, c->name)) {
-                        continue;
-                    }
-                    for (cu = c->users; cu; cu = cunext) {
-                        cunext = cu->next;
-                        if (is_oper(cu->user)) {
-                            continue;
-                        }
-                        av[0] = c->name;
-                        av[1] = cu->user->nick;
-                        av[2] = reason;
-                        ircdproto->SendKick(findbot(s_OperServ), av[0], av[1],
-                                       "Q-Lined: %s", av[2]);
-                        do_kick(s_ChanServ, 3, av);
-                    }
-                }
-            }
-        } else {
-            ircdproto->SendSQLine(mask, reason);
-        }
-    } else {
-        ircdproto->SendSQLine(mask, reason);
-    }
+					if (!match_wild_nocase(mask, c->name)) {
+						continue;
+					}
+					for (cu = c->users; cu; cu = cunext) {
+						cunext = cu->next;
+						if (is_oper(cu->user)) {
+							continue;
+						}
+						av[0] = c->name;
+						av[1] = cu->user->nick;
+						av[2] = reason;
+						ircdproto->SendKick(findbot(s_OperServ), av[0], av[1],
+									   "Q-Lined: %s", av[2]);
+						do_kick(s_ChanServ, 3, av);
+					}
+				}
+			}
+		} else {
+			ircdproto->SendSQLine(mask, reason);
+		}
+	} else {
+		ircdproto->SendSQLine(mask, reason);
+	}
 }
 
 /*************************************************************************/
@@ -130,72 +130,72 @@ void sqline(char *mask, char *reason)
  */
 void common_unban(ChannelInfo * ci, char *nick)
 {
-    const char *av[4];
-    char *host = NULL;
-    char buf[BUFSIZE];
-    int ac;
-    uint32 ip = 0;
-    User *u;
-    Entry *ban, *next;
+	const char *av[4];
+	char *host = NULL;
+	char buf[BUFSIZE];
+	int ac;
+	uint32 ip = 0;
+	User *u;
+	Entry *ban, *next;
 
-    if (!ci || !ci->c || !nick) {
-        return;
-    }
+	if (!ci || !ci->c || !nick) {
+		return;
+	}
 
-    if (!(u = finduser(nick))) {
-        return;
-    }
+	if (!(u = finduser(nick))) {
+		return;
+	}
 
-    if (!ci->c->bans || (ci->c->bans->count == 0))
-        return;
+	if (!ci->c->bans || (ci->c->bans->count == 0))
+		return;
 
-    if (u->hostip == NULL) {
-        host = host_resolve(u->host);
-        /* we store the just resolved hostname so we don't
-         * need to do this again */
-        if (host) {
-            u->hostip = sstrdup(host);
-        }
-    } else {
-        host = sstrdup(u->hostip);
-    }
-    /* Convert the host to an IP.. */
-    if (host)
-        ip = str_is_ip(host);
+	if (u->hostip == NULL) {
+		host = host_resolve(u->host);
+		/* we store the just resolved hostname so we don't
+		 * need to do this again */
+		if (host) {
+			u->hostip = sstrdup(host);
+		}
+	} else {
+		host = sstrdup(u->hostip);
+	}
+	/* Convert the host to an IP.. */
+	if (host)
+		ip = str_is_ip(host);
 
-    if (ircd->svsmode_unban) {
-        ircdproto->SendBanDel(ci->name, nick);
-    } else {
-        if (ircdcap->tsmode) {
-            snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
-            av[0] = ci->name;
-            av[1] = buf;
-            av[2] = "-b";
-            ac = 4;
-        } else {
-            av[0] = ci->name;
-            av[1] = "-b";
-            ac = 3;
-        }
+	if (ircd->svsmode_unban) {
+		ircdproto->SendBanDel(ci->name, nick);
+	} else {
+		if (ircdcap->tsmode) {
+			snprintf(buf, BUFSIZE - 1, "%ld", (long int) time(NULL));
+			av[0] = ci->name;
+			av[1] = buf;
+			av[2] = "-b";
+			ac = 4;
+		} else {
+			av[0] = ci->name;
+			av[1] = "-b";
+			ac = 3;
+		}
 
-        for (ban = ci->c->bans->entries; ban; ban = next) {
-            next = ban->next;
-            if (entry_match(ban, u->nick, u->username, u->host, ip) ||
-                entry_match(ban, u->nick, u->username, u->vhost, ip)) {
-                ircdproto->SendMode(whosends(ci), ci->name, "-b %s", ban->mask);
-                if (ircdcap->tsmode)
-                    av[3] = ban->mask;
-                else
-                    av[2] = ban->mask;
+		for (ban = ci->c->bans->entries; ban; ban = next) {
+			next = ban->next;
+			if (entry_match(ban, u->nick, u->username, u->host, ip) ||
+				entry_match(ban, u->nick, u->username, u->vhost, ip)) {
+				ircdproto->SendMode(whosends(ci), ci->name, "-b %s", ban->mask);
+				if (ircdcap->tsmode)
+					av[3] = ban->mask;
+				else
+					av[2] = ban->mask;
 
-                do_cmode(whosends(ci)->nick, ac, av);
-            }
-        }
-    }
-    /* host_resolve() sstrdup us this info so we gotta free it */
-    if (host) {
-        free(host);
-    }
+				do_cmode(whosends(ci)->nick, ac, av);
+			}
+		}
+	}
+	/* host_resolve() sstrdup us this info so we gotta free it */
+	if (host) {
+		free(host);
+	}
 }
 
 /*************************************************************************/
@@ -209,17 +209,17 @@ void common_unban(ChannelInfo * ci, char *nick)
  */
 void common_svsmode(User * u, const char *modes, const char *arg)
 {
-    int ac = 1;
-    const char *av[2];
+	int ac = 1;
+	const char *av[2];
 
-    av[0] = modes;
-    if (arg) {
-        av[1] = arg;
-        ac++;
-    }
+	av[0] = modes;
+	if (arg) {
+		av[1] = arg;
+		ac++;
+	}
 
-    ircdproto->SendSVSMode(u, ac, av);
-    ircdproto->ProcessUsermodes(u, ac, av);
+	ircdproto->SendSVSMode(u, ac, av);
+	ircdproto->ProcessUsermodes(u, ac, av);
 }
 
 /*************************************************************************/
@@ -232,15 +232,15 @@ void common_svsmode(User * u, const char *modes, const char *arg)
  */
 char *common_get_vhost(User * u)
 {
-    if (!u)
-        return NULL;
+	if (!u)
+		return NULL;
 
-    if (ircd->vhostmode && (u->mode & ircd->vhostmode))
-        return u->vhost;
-    else if (ircd->vhost && u->vhost)
-        return u->vhost;
-    else
-        return u->host;
+	if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+		return u->vhost;
+	else if (ircd->vhost && u->vhost)
+		return u->vhost;
+	else
+		return u->host;
 }
 
 /*************************************************************************/
@@ -253,13 +253,13 @@ char *common_get_vhost(User * u)
  */
 char *common_get_vident(User * u)
 {
-    if (!u)
-        return NULL;
+	if (!u)
+		return NULL;
 
-    if (ircd->vhostmode && (u->mode & ircd->vhostmode))
-        return u->vident;
-    else if (ircd->vident && u->vident)
-        return u->vident;
-    else
-        return u->username;
+	if (ircd->vhostmode && (u->mode & ircd->vhostmode))
+		return u->vident;
+	else if (ircd->vident && u->vident)
+		return u->vident;
+	else
+		return u->username;
 }

@@ -44,7 +44,7 @@ class HSOn : public Module
  **/
 void myHostServHelp(User * u)
 {
-    notice_lang(s_HostServ, u, HOST_HELP_CMD_ON);
+	notice_lang(s_HostServ, u, HOST_HELP_CMD_ON);
 }
 
 /**
@@ -54,39 +54,39 @@ void myHostServHelp(User * u)
  **/
 int do_on(User * u)
 {
-    NickAlias *na;
-    char *vHost;
-    char *vIdent = NULL;
-    if ((na = findnick(u->nick))) {
-        if (na->status & NS_IDENTIFIED) {
-            vHost = getvHost(u->nick);
-            vIdent = getvIdent(u->nick);
-            if (vHost == NULL) {
-                notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
-            } else {
-                if (vIdent) {
-                    notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED,
-                                vIdent, vHost);
-                } else {
-                    notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
-                }
-                ircdproto->SendVhost(u->nick, vIdent, vHost);
-                if (ircd->vhost) {
-                    u->vhost = sstrdup(vHost);
-                }
-                if (ircd->vident) {
-                    if (vIdent)
-                        u->vident = sstrdup(vIdent);
-                }
-                set_lastmask(u);
-            }
-        } else {
-            notice_lang(s_HostServ, u, HOST_ID);
-        }
-    } else {
-        notice_lang(s_HostServ, u, HOST_NOT_REGED);
-    }
-    return MOD_CONT;
+	NickAlias *na;
+	char *vHost;
+	char *vIdent = NULL;
+	if ((na = findnick(u->nick))) {
+		if (na->status & NS_IDENTIFIED) {
+			vHost = getvHost(u->nick);
+			vIdent = getvIdent(u->nick);
+			if (vHost == NULL) {
+				notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);
+			} else {
+				if (vIdent) {
+					notice_lang(s_HostServ, u, HOST_IDENT_ACTIVATED,
+								vIdent, vHost);
+				} else {
+					notice_lang(s_HostServ, u, HOST_ACTIVATED, vHost);
+				}
+				ircdproto->SendVhost(u->nick, vIdent, vHost);
+				if (ircd->vhost) {
+					u->vhost = sstrdup(vHost);
+				}
+				if (ircd->vident) {
+					if (vIdent)
+						u->vident = sstrdup(vIdent);
+				}
+				set_lastmask(u);
+			}
+		} else {
+			notice_lang(s_HostServ, u, HOST_ID);
+		}
+	} else {
+		notice_lang(s_HostServ, u, HOST_NOT_REGED);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("hs_on", HSOn)

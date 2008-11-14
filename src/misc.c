@@ -20,43 +20,43 @@
 #define issp(c) ((c) == 32)
 
 struct arc4_stream {
-    u_int8_t i;
-    u_int8_t j;
-    u_int8_t s[256];
+	u_int8_t i;
+	u_int8_t j;
+	u_int8_t s[256];
 } rs;
 
 /*************************************************************************/
 
 /**
  * toupper:  Like the ANSI functions, but make sure we return an
- *                   int instead of a (signed) char.
+ *				   int instead of a (signed) char.
  * @param c Char
  * @return int
  */
 int toupper(char c)
 {
-    if (islower(c)) {
-        return (unsigned char) c - ('a' - 'A');
-    } else {
-        return (unsigned char) c;
-    }
+	if (islower(c)) {
+		return (unsigned char) c - ('a' - 'A');
+	} else {
+		return (unsigned char) c;
+	}
 }
 
 /*************************************************************************/
 
 /**
  * tolower:  Like the ANSI functions, but make sure we return an
- *                   int instead of a (signed) char.
+ *				   int instead of a (signed) char.
  * @param c Char
  * @return int
  */
 int tolower(char c)
 {
-    if (isupper(c)) {
-        return (unsigned char) c + ('a' - 'A');
-    } else {
-        return (unsigned char) c;
-    }
+	if (isupper(c)) {
+		return (unsigned char) c + ('a' - 'A');
+	} else {
+		return (unsigned char) c;
+	}
 }
 
 /*************************************************************************/
@@ -67,15 +67,15 @@ int tolower(char c)
  */
 void binary_to_hex(unsigned char *bin, char *hex, int length)
 {
-    static const char trans[] = "0123456789ABCDEF";
-    int i;
+	static const char trans[] = "0123456789ABCDEF";
+	int i;
 
-    for (i = 0; i < length; i++) {
-        hex[i << 1] = trans[bin[i] >> 4];
-        hex[(i << 1) + 1] = trans[bin[i] & 0xf];
-    }
+	for (i = 0; i < length; i++) {
+		hex[i << 1] = trans[bin[i] >> 4];
+		hex[(i << 1) + 1] = trans[bin[i] & 0xf];
+	}
 
-    hex[i << 1] = '\0';
+	hex[i << 1] = '\0';
 }
 
 
@@ -83,7 +83,7 @@ void binary_to_hex(unsigned char *bin, char *hex, int length)
 
 /**
  * strscpy:  Copy at most len-1 characters from a string to a buffer, and
- *           add a null terminator after the last character copied.
+ *		   add a null terminator after the last character copied.
  * @param d Buffer to copy into
  * @param s Data to copy int
  * @param len Length of data
@@ -91,51 +91,51 @@ void binary_to_hex(unsigned char *bin, char *hex, int length)
  */
 char *strscpy(char *d, const char *s, size_t len)
 {
-    char *d_orig = d;
+	char *d_orig = d;
 
-    if (!len) {
-        return d;
-    }
-    while (--len && (*d++ = *s++));
-    *d = '\0';
-    return d_orig;
+	if (!len) {
+		return d;
+	}
+	while (--len && (*d++ = *s++));
+	*d = '\0';
+	return d_orig;
 }
 
 /*************************************************************************/
 
 /**
  * stristr:  Search case-insensitively for string s2 within string s1,
- *           returning the first occurrence of s2 or NULL if s2 was not
- *           found.
+ *		   returning the first occurrence of s2 or NULL if s2 was not
+ *		   found.
  * @param s1 String 1
  * @param s2 String 2
  * @return first occurrence of s2
  */
 char *stristr(char *s1, char *s2)
 {
-    register char *s = s1, *d = s2;
+	register char *s = s1, *d = s2;
 
-    while (*s1) {
-        if (tolower(*s1) == tolower(*d)) {
-            s1++;
-            d++;
-            if (*d == 0)
-                return s;
-        } else {
-            s = ++s1;
-            d = s2;
-        }
-    }
-    return NULL;
+	while (*s1) {
+		if (tolower(*s1) == tolower(*d)) {
+			s1++;
+			d++;
+			if (*d == 0)
+				return s;
+		} else {
+			s = ++s1;
+			d = s2;
+		}
+	}
+	return NULL;
 }
 
 /*************************************************************************/
 
 /**
  * strnrepl:  Replace occurrences of `old' with `new' in string `s'.  Stop
- *            replacing if a replacement would cause the string to exceed
- *            `size' bytes (including the null terminator).  Return the
- *            string.
+ *			replacing if a replacement would cause the string to exceed
+ *			`size' bytes (including the null terminator).  Return the
+ *			string.
  * @param s String
  * @param size size of s
  * @param old character to replace
@@ -144,51 +144,51 @@ char *stristr(char *s1, char *s2)
  */
 char *strnrepl(char *s, int32 size, const char *old, const char *newstr)
 {
-    char *ptr = s;
-    int32 left = strlen(s);
-    int32 avail = size - (left + 1);
-    int32 oldlen = strlen(old);
-    int32 newlen = strlen(newstr);
-    int32 diff = newlen - oldlen;
+	char *ptr = s;
+	int32 left = strlen(s);
+	int32 avail = size - (left + 1);
+	int32 oldlen = strlen(old);
+	int32 newlen = strlen(newstr);
+	int32 diff = newlen - oldlen;
 
-    while (left >= oldlen) {
-        if (strncmp(ptr, old, oldlen) != 0) {
-            left--;
-            ptr++;
-            continue;
-        }
-        if (diff > avail)
-            break;
-        if (diff != 0)
-            memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
-        strncpy(ptr, newstr, newlen);
-        ptr += newlen;
-        left -= oldlen;
-    }
-    return s;
+	while (left >= oldlen) {
+		if (strncmp(ptr, old, oldlen) != 0) {
+			left--;
+			ptr++;
+			continue;
+		}
+		if (diff > avail)
+			break;
+		if (diff != 0)
+			memmove(ptr + oldlen + diff, ptr + oldlen, left + 1 - oldlen);
+		strncpy(ptr, newstr, newlen);
+		ptr += newlen;
+		left -= oldlen;
+	}
+	return s;
 }
 
 /*************************************************************************/
 
 /**
  * merge_args:  Take an argument count and argument vector and merge them
- *              into a single string in which each argument is separated by
- *              a space.
+ *			  into a single string in which each argument is separated by
+ *			  a space.
  * @param int Number of Args
  * @param argv Array
  * @return string of the merged array
  */
 const char *merge_args(int argc, const char **argv)
 {
-    int i;
-    static char s[4096];
-    char *t;
+	int i;
+	static char s[4096];
+	char *t;
 
-    t = s;
-    for (i = 0; i < argc; i++)
-        t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
-                      (i < argc - 1) ? " " : "");
-    return s;
+	t = s;
+	for (i = 0; i < argc; i++)
+		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
+					  (i < argc - 1) ? " " : "");
+	return s;
 }
 
 /*
@@ -196,23 +196,23 @@ const char *merge_args(int argc, const char **argv)
  */
 const char *merge_args(int argc, char **argv)
 {
-    int i;
-    static char s[4096];
-    char *t;
+	int i;
+	static char s[4096];
+	char *t;
 
-    t = s;
-    for (i = 0; i < argc; i++)
-        t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
-                      (i < argc - 1) ? " " : "");
-    return s;
+	t = s;
+	for (i = 0; i < argc; i++)
+		t += snprintf(t, sizeof(s) - (t - s), "%s%s", *argv++,
+					  (i < argc - 1) ? " " : "");
+	return s;
 }
 
 /*************************************************************************/
 
 /**
  * do_match_wild:  Attempt to match a string to a pattern which might contain
- *              '*' or '?' wildcards.  Return 1 if the string matches the
- *              pattern, 0 if not.
+ *			  '*' or '?' wildcards.  Return 1 if the string matches the
+ *			  pattern, 0 if not.
  * @param pattern To be matched
  * @param str String in which the pattern is to be matched
  * @param docase Case In/Senstive
@@ -220,45 +220,45 @@ const char *merge_args(int argc, char **argv)
  */
 static int do_match_wild(const char *pattern, const char *str, int docase)
 {
-    char c;
-    const char *s;
+	char c;
+	const char *s;
 
-    if (!str || !*str || !pattern || !*pattern) {
-        return 0;
-    }
+	if (!str || !*str || !pattern || !*pattern) {
+		return 0;
+	}
 
-    /* This WILL eventually terminate: either by *pattern == 0, or by a
-     * trailing '*'. */
+	/* This WILL eventually terminate: either by *pattern == 0, or by a
+	 * trailing '*'. */
 
-    for (;;) {
-        switch (c = *pattern++) {
-        case 0:
-            if (!*str)
-                return 1;
-            return 0;
-        case '?':
-            if (!*str)
-                return 0;
-            str++;
-            break;
-        case '*':
-            if (!*pattern)
-                return 1;       /* trailing '*' matches everything else */
-            s = str;
-            while (*s) {
-                if ((docase ? (*s == *pattern)
-                     : (tolower(*s) == tolower(*pattern)))
-                    && do_match_wild(pattern, s, docase))
-                    return 1;
-                s++;
-            }
-            break;
-        default:
-            if (docase ? (*str++ != c) : (tolower(*str++) != tolower(c)))
-                return 0;
-            break;
-        }                       /* switch */
-    }
+	for (;;) {
+		switch (c = *pattern++) {
+		case 0:
+			if (!*str)
+				return 1;
+			return 0;
+		case '?':
+			if (!*str)
+				return 0;
+			str++;
+			break;
+		case '*':
+			if (!*pattern)
+				return 1;	   /* trailing '*' matches everything else */
+			s = str;
+			while (*s) {
+				if ((docase ? (*s == *pattern)
+					 : (tolower(*s) == tolower(*pattern)))
+					&& do_match_wild(pattern, s, docase))
+					return 1;
+				s++;
+			}
+			break;
+		default:
+			if (docase ? (*str++ != c) : (tolower(*str++) != tolower(c)))
+				return 0;
+			break;
+		}					   /* switch */
+	}
 }
 
 /*************************************************************************/
@@ -271,7 +271,7 @@ static int do_match_wild(const char *pattern, const char *str, int docase)
  */
 int match_wild(const char *pattern, const char *str)
 {
-    return do_match_wild(pattern, str, 1);
+	return do_match_wild(pattern, str, 1);
 }
 
 /*************************************************************************/
@@ -284,7 +284,7 @@ int match_wild(const char *pattern, const char *str)
  */
 int match_wild_nocase(const char *pattern, const char *str)
 {
-    return do_match_wild(pattern, str, 0);
+	return do_match_wild(pattern, str, 0);
 }
 
 /*************************************************************************/
@@ -307,102 +307,102 @@ int match_wild_nocase(const char *pattern, const char *str)
  * @return int
  */
 int process_numlist(const char *numstr, int *count_ret,
-                    range_callback_t callback, User * u, ...)
+					range_callback_t callback, User * u, ...)
 {
-    int n1, n2, i;
-    int res = 0, retval = 0, count = 0;
-    va_list args, preserve;
+	int n1, n2, i;
+	int res = 0, retval = 0, count = 0;
+	va_list args, preserve;
 
-    if (!numstr || !*numstr) {
-        return -1;
-    }
+	if (!numstr || !*numstr) {
+		return -1;
+	}
 
-    va_start(args, u);
+	va_start(args, u);
 
-    /*
-     * This algorithm ignores invalid characters, ignores a dash
-     * when it precedes a comma, and ignores everything from the
-     * end of a valid number or range to the next comma or null.
-     */
-    for (;;) {
-        n1 = n2 = strtol(numstr, (char **) &numstr, 10);
-        numstr += strcspn(numstr, "0123456789,-");
-        if (*numstr == '-') {
-            numstr++;
-            numstr += strcspn(numstr, "0123456789,");
-            if (isdigit(*numstr)) {
-                n2 = strtol(numstr, (char **) &numstr, 10);
-                numstr += strcspn(numstr, "0123456789,-");
-            }
-        }
-        for (i = n1; i <= n2 && i >= 0; i++) {
-            VA_COPY(preserve, args);
-            res = callback(u, i, preserve);
-            va_end(preserve);
-            count++;
-            if (res < 0)
-                break;
-            retval += res;
-            if (count >= 32767) {
-                if (count_ret)
-                    *count_ret = count;
-                return retval;
-            }
-        }
-        if (res < -1)
-            break;
-        numstr += strcspn(numstr, ",");
-        if (*numstr)
-            numstr++;
-        else
-            break;
-    }
-    if (count_ret)
-        *count_ret = count;
+	/*
+	 * This algorithm ignores invalid characters, ignores a dash
+	 * when it precedes a comma, and ignores everything from the
+	 * end of a valid number or range to the next comma or null.
+	 */
+	for (;;) {
+		n1 = n2 = strtol(numstr, (char **) &numstr, 10);
+		numstr += strcspn(numstr, "0123456789,-");
+		if (*numstr == '-') {
+			numstr++;
+			numstr += strcspn(numstr, "0123456789,");
+			if (isdigit(*numstr)) {
+				n2 = strtol(numstr, (char **) &numstr, 10);
+				numstr += strcspn(numstr, "0123456789,-");
+			}
+		}
+		for (i = n1; i <= n2 && i >= 0; i++) {
+			VA_COPY(preserve, args);
+			res = callback(u, i, preserve);
+			va_end(preserve);
+			count++;
+			if (res < 0)
+				break;
+			retval += res;
+			if (count >= 32767) {
+				if (count_ret)
+					*count_ret = count;
+				return retval;
+			}
+		}
+		if (res < -1)
+			break;
+		numstr += strcspn(numstr, ",");
+		if (*numstr)
+			numstr++;
+		else
+			break;
+	}
+	if (count_ret)
+		*count_ret = count;
 
-    va_end(args);
+	va_end(args);
 
-    return retval;
+	return retval;
 }
 
 /*************************************************************************/
 
 /**
  * dotime:  Return the number of seconds corresponding to the given time
- *          string.  If the given string does not represent a valid time,
- *          return -1.
+ *		  string.  If the given string does not represent a valid time,
+ *		  return -1.
  *
- *          A time string is either a plain integer (representing a number
- *          of seconds), or an integer followed by one of these characters:
- *          "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
+ *		  A time string is either a plain integer (representing a number
+ *		  of seconds), or an integer followed by one of these characters:
+ *		  "s" (seconds), "m" (minutes), "h" (hours), or "d" (days).
  * @param s String to convert
  * @return int
  */
 int dotime(const char *s)
 {
-    int amount;
+	int amount;
 
-    if (!s || !*s) {
-        return -1;
-    }
+	if (!s || !*s) {
+		return -1;
+	}
 
-    amount = strtol(s, (char **) &s, 10);
-    if (*s) {
-        switch (*s) {
-        case 's':
-            return amount;
-        case 'm':
-            return amount * 60;
-        case 'h':
-            return amount * 3600;
-        case 'd':
-            return amount * 86400;
-        default:
-            return -1;
-        }
-    } else {
-        return amount;
-    }
+	amount = strtol(s, (char **) &s, 10);
+	if (*s) {
+		switch (*s) {
+		case 's':
+			return amount;
+		case 'm':
+			return amount * 60;
+		case 'h':
+			return amount * 3600;
+		case 'd':
+			return amount * 86400;
+		default:
+			return -1;
+		}
+	} else {
+		return amount;
+	}
 }
 
 /*************************************************************************/
@@ -418,60 +418,60 @@ int dotime(const char *s)
  */
 char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
 {
-    int days = 0, hours = 0, minutes = 0;
-    int need_comma = 0;
+	int days = 0, hours = 0, minutes = 0;
+	int need_comma = 0;
 
-    char buf2[64], *end;
-    char *comma = getstring(na, COMMA_SPACE);
+	char buf2[64], *end;
+	char *comma = getstring(na, COMMA_SPACE);
 
-    /* We first calculate everything */
-    days = seconds / 86400;
-    seconds -= (days * 86400);
-    hours = seconds / 3600;
-    seconds -= (hours * 3600);
-    minutes = seconds / 60;
+	/* We first calculate everything */
+	days = seconds / 86400;
+	seconds -= (days * 86400);
+	hours = seconds / 3600;
+	seconds -= (hours * 3600);
+	minutes = seconds / 60;
 
-    if (!days && !hours && !minutes) {
-        snprintf(buf, bufsize,
-                 getstring(na,
-                           (seconds <=
-                            1 ? DURATION_SECOND : DURATION_SECONDS)),
-                 seconds);
-    } else {
-        end = buf;
-        if (days) {
-            snprintf(buf2, sizeof(buf2),
-                     getstring(na,
-                               (days == 1 ? DURATION_DAY : DURATION_DAYS)),
-                     days);
-            end += snprintf(end, bufsize - (end - buf), "%s", buf2);
-            need_comma = 1;
-        }
-        if (hours) {
-            snprintf(buf2, sizeof(buf2),
-                     getstring(na,
-                               (hours ==
-                                1 ? DURATION_HOUR : DURATION_HOURS)),
-                     hours);
-            end +=
-                snprintf(end, bufsize - (end - buf), "%s%s",
-                         (need_comma ? comma : ""), buf2);
-            need_comma = 1;
-        }
-        if (minutes) {
-            snprintf(buf2, sizeof(buf2),
-                     getstring(na,
-                               (minutes ==
-                                1 ? DURATION_MINUTE : DURATION_MINUTES)),
-                     minutes);
-            end +=
-                snprintf(end, bufsize - (end - buf), "%s%s",
-                         (need_comma ? comma : ""), buf2);
-            need_comma = 1;
-        }
-    }
+	if (!days && !hours && !minutes) {
+		snprintf(buf, bufsize,
+				 getstring(na,
+						   (seconds <=
+							1 ? DURATION_SECOND : DURATION_SECONDS)),
+				 seconds);
+	} else {
+		end = buf;
+		if (days) {
+			snprintf(buf2, sizeof(buf2),
+					 getstring(na,
+							   (days == 1 ? DURATION_DAY : DURATION_DAYS)),
+					 days);
+			end += snprintf(end, bufsize - (end - buf), "%s", buf2);
+			need_comma = 1;
+		}
+		if (hours) {
+			snprintf(buf2, sizeof(buf2),
+					 getstring(na,
+							   (hours ==
+								1 ? DURATION_HOUR : DURATION_HOURS)),
+					 hours);
+			end +=
+				snprintf(end, bufsize - (end - buf), "%s%s",
+						 (need_comma ? comma : ""), buf2);
+			need_comma = 1;
+		}
+		if (minutes) {
+			snprintf(buf2, sizeof(buf2),
+					 getstring(na,
+							   (minutes ==
+								1 ? DURATION_MINUTE : DURATION_MINUTES)),
+					 minutes);
+			end +=
+				snprintf(end, bufsize - (end - buf), "%s%s",
+						 (need_comma ? comma : ""), buf2);
+			need_comma = 1;
+		}
+	}
 
-    return buf;
+	return buf;
 }
 
 /*************************************************************************/
@@ -486,49 +486,49 @@ char *duration(NickAlias * na, char *buf, int bufsize, time_t seconds)
  */
 char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
 {
-    time_t now = time(NULL);
+	time_t now = time(NULL);
 
-    if (!expires) {
-        strncpy(buf, getstring(na, NO_EXPIRE), len);
-    } else if (expires <= now) {
-        strncpy(buf, getstring(na, EXPIRES_SOON), len);
-    } else {
-        time_t diff = expires - now + 59;
+	if (!expires) {
+		strncpy(buf, getstring(na, NO_EXPIRE), len);
+	} else if (expires <= now) {
+		strncpy(buf, getstring(na, EXPIRES_SOON), len);
+	} else {
+		time_t diff = expires - now + 59;
 
-        if (diff >= 86400) {
-            int days = diff / 86400;
-            snprintf(buf, len,
-                     getstring(na, (days == 1) ? EXPIRES_1D : EXPIRES_D),
-                     days);
-        } else {
-            if (diff <= 3600) {
-                int minutes = diff / 60;
-                snprintf(buf, len,
-                         getstring(na,
-                                   (minutes ==
-                                    1) ? EXPIRES_1M : EXPIRES_M), minutes);
-            } else {
-                int hours = diff / 3600, minutes;
-                diff -= (hours * 3600);
-                minutes = diff / 60;
-                snprintf(buf, len,
-                         getstring(na,
-                                   ((hours == 1
-                                     && minutes ==
-                                     1) ? EXPIRES_1H1M : ((hours == 1
-                                                           && minutes !=
-                                                           1) ? EXPIRES_1HM
-                                                          : ((hours != 1
-                                                              && minutes ==
-                                                              1) ?
-                                                             EXPIRES_H1M :
-                                                             EXPIRES_HM)))),
-                         hours, minutes);
-            }
-        }
-    }
+		if (diff >= 86400) {
+			int days = diff / 86400;
+			snprintf(buf, len,
+					 getstring(na, (days == 1) ? EXPIRES_1D : EXPIRES_D),
+					 days);
+		} else {
+			if (diff <= 3600) {
+				int minutes = diff / 60;
+				snprintf(buf, len,
+						 getstring(na,
+								   (minutes ==
+									1) ? EXPIRES_1M : EXPIRES_M), minutes);
+			} else {
+				int hours = diff / 3600, minutes;
+				diff -= (hours * 3600);
+				minutes = diff / 60;
+				snprintf(buf, len,
+						 getstring(na,
+								   ((hours == 1
+									 && minutes ==
+									 1) ? EXPIRES_1H1M : ((hours == 1
+														   && minutes !=
+														   1) ? EXPIRES_1HM
+														  : ((hours != 1
+															  && minutes ==
+															  1) ?
+															 EXPIRES_H1M :
+															 EXPIRES_HM)))),
+						 hours, minutes);
+			}
+		}
+	}
 
-    return buf;
+	return buf;
 }
 
 
@@ -538,86 +538,86 @@ char *expire_left(NickAlias * na, char *buf, int len, time_t expires)
  * Validate the host
  * shortname  =  ( letter / digit ) *( letter / digit / "-" ) *( letter / digit )
  * hostname   =  shortname *( "." shortname )
- * ip4addr    =  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
+ * ip4addr	=  1*3digit "." 1*3digit "." 1*3digit "." 1*3digit
  * @param host = string to check
  * @param type = format, 1 = ip4addr, 2 = hostname
  * @return 1 if a host is valid, 0 if it isnt.
  */
 int doValidHost(const char *host, int type)
 {
-    int idx = 0;
-    int len = 0;
-    int sec_len = 0;
-    int dots = 1;
-    if (type != 1 && type != 2) {
-        return 0;
-    }
-    if (!host) {
-        return 0;
-    }
+	int idx = 0;
+	int len = 0;
+	int sec_len = 0;
+	int dots = 1;
+	if (type != 1 && type != 2) {
+		return 0;
+	}
+	if (!host) {
+		return 0;
+	}
 
-    len = strlen(host);
+	len = strlen(host);
 
-    if (len > HOSTMAX) {
-        return 0;
-    }
+	if (len > HOSTMAX) {
+		return 0;
+	}
 
-    switch (type) {
-    case 1:
-        for (idx = 0; idx < len; idx++) {
-            if (isdigit(host[idx])) {
-                if (sec_len < 3) {
-                    sec_len++;
-                } else {
-                    return 0;
-                }
-            } else {
-                if (idx == 0) {
-                    return 0;
-                }               /* cant start with a non-digit */
-                if (host[idx] != '.') {
-                    return 0;
-                }               /* only . is a valid non-digit */
-                if (sec_len > 3) {
-                    return 0;
-                }               /* sections cant be more than 3 digits */
-                sec_len = 0;
-                dots++;
-            }
-        }
-        if (dots != 4) {
-            return 0;
-        }
-        break;
-    case 2:
-        dots = 0;
-        for (idx = 0; idx < len; idx++) {
-            if (!isalnum(host[idx])) {
-                if (idx == 0) {
-                    return 0;
-                }
-                if ((host[idx] != '.') && (host[idx] != '-')) {
-                    return 0;
-                }
-                if (host[idx] == '.') {
-                    dots++;
-                }
-            }
-        }
-        if (host[len - 1] == '.') {
-            return 0;
-        }
-        /**
+	switch (type) {
+	case 1:
+		for (idx = 0; idx < len; idx++) {
+			if (isdigit(host[idx])) {
+				if (sec_len < 3) {
+					sec_len++;
+				} else {
+					return 0;
+				}
+			} else {
+				if (idx == 0) {
+					return 0;
+				}			   /* cant start with a non-digit */
+				if (host[idx] != '.') {
+					return 0;
+				}			   /* only . is a valid non-digit */
+				if (sec_len > 3) {
+					return 0;
+				}			   /* sections cant be more than 3 digits */
+				sec_len = 0;
+				dots++;
+			}
+		}
+		if (dots != 4) {
+			return 0;
+		}
+		break;
+	case 2:
+		dots = 0;
+		for (idx = 0; idx < len; idx++) {
+			if (!isalnum(host[idx])) {
+				if (idx == 0) {
+					return 0;
+				}
+				if ((host[idx] != '.') && (host[idx] != '-')) {
+					return 0;
+				}
+				if (host[idx] == '.') {
+					dots++;
+				}
+			}
+		}
+		if (host[len - 1] == '.') {
+			return 0;
+		}
+		/**
 	 * Ultimate3 dosnt like a non-dotted hosts at all, nor does unreal,
 	 * so just dont allow them.
 	 **/
-        if (dots == 0) {
-            return 0;
-        }
+		if (dots == 0) {
+			return 0;
+		}
 
-        break;
-    }
-    return 1;
+		break;
+	}
+	return 1;
 }
 
 /*************************************************************************/
@@ -630,15 +630,15 @@ int doValidHost(const char *host, int type)
  */
 int isValidHost(const char *host, int type)
 {
-    int status = 0;
-    if (type == 3) {
-        if (!(status = doValidHost(host, 1))) {
-            status = doValidHost(host, 2);
-        }
-    } else {
-        status = doValidHost(host, type);
-    }
-    return status;
+	int status = 0;
+	if (type == 3) {
+		if (!(status = doValidHost(host, 1))) {
+			status = doValidHost(host, 2);
+		}
+	} else {
+		status = doValidHost(host, type);
+	}
+	return status;
 }
 
 /*************************************************************************/
@@ -650,12 +650,12 @@ int isValidHost(const char *host, int type)
  */
 int isvalidchar(const char c)
 {
-    if (((c >= 'A') && (c <= 'Z')) ||
-        ((c >= 'a') && (c <= 'z')) ||
-        ((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
-        return 1;
-    else
-        return 0;
+	if (((c >= 'A') && (c <= 'Z')) ||
+		((c >= 'a') && (c <= 'z')) ||
+		((c >= '0') && (c <= '9')) || (c == '.') || (c == '-'))
+		return 1;
+	else
+		return 0;
 }
 
 
@@ -670,24 +670,24 @@ int isvalidchar(const char c)
  */
 char *myStrGetToken(const char *str, const char dilim, int token_number)
 {
-    int len, idx, counter = 0, start_pos = 0;
-    char *substring = NULL;
-    if (!str) {
-        return NULL;
-    }
-    len = strlen(str);
-    for (idx = 0; idx <= len; idx++) {
-        if ((str[idx] == dilim) || (idx == len)) {
-            if (counter == token_number) {
-                substring = myStrSubString(str, start_pos, idx);
-                counter++;
-            } else {
-                start_pos = idx + 1;
-                counter++;
-            }
-        }
-    }
-    return substring;
+	int len, idx, counter = 0, start_pos = 0;
+	char *substring = NULL;
+	if (!str) {
+		return NULL;
+	}
+	len = strlen(str);
+	for (idx = 0; idx <= len; idx++) {
+		if ((str[idx] == dilim) || (idx == len)) {
+			if (counter == token_number) {
+				substring = myStrSubString(str, start_pos, idx);
+				counter++;
+			} else {
+				start_pos = idx + 1;
+				counter++;
+			}
+		}
+	}
+	return substring;
 }
 
 /*************************************************************************/
@@ -700,29 +700,29 @@ char *myStrGetToken(const char *str, const char dilim, int token_number)
  * @return token
  */
 char *myStrGetOnlyToken(const char *str, const char dilim,
-                        int token_number)
+						int token_number)
 {
-    int len, idx, counter = 0, start_pos = 0;
-    char *substring = NULL;
-    if (!str) {
-        return NULL;
-    }
-    len = strlen(str);
-    for (idx = 0; idx <= len; idx++) {
-        if (str[idx] == dilim) {
-            if (counter == token_number) {
-                if (str[idx] == '\r')
-                    substring = myStrSubString(str, start_pos, idx - 1);
-                else
-                    substring = myStrSubString(str, start_pos, idx);
-                counter++;
-            } else {
-                start_pos = idx + 1;
-                counter++;
-            }
-        }
-    }
-    return substring;
+	int len, idx, counter = 0, start_pos = 0;
+	char *substring = NULL;
+	if (!str) {
+		return NULL;
+	}
+	len = strlen(str);
+	for (idx = 0; idx <= len; idx++) {
+		if (str[idx] == dilim) {
+			if (counter == token_number) {
+				if (str[idx] == '\r')
+					substring = myStrSubString(str, start_pos, idx - 1);
+				else
+					substring = myStrSubString(str, start_pos, idx);
+				counter++;
+			} else {
+				start_pos = idx + 1;
+				counter++;
+			}
+		}
+	}
+	return substring;
 }
 
 /*************************************************************************/
@@ -735,27 +735,27 @@ char *myStrGetOnlyToken(const char *str, const char dilim,
  * @return token
  */
 char *myStrGetTokenRemainder(const char *str, const char dilim,
-                             int token_number)
+							 int token_number)
 {
-    int len, idx, counter = 0, start_pos = 0;
-    char *substring = NULL;
-    if (!str) {
-        return NULL;
-    }
-    len = strlen(str);
+	int len, idx, counter = 0, start_pos = 0;
+	char *substring = NULL;
+	if (!str) {
+		return NULL;
+	}
+	len = strlen(str);
 
-    for (idx = 0; idx <= len; idx++) {
-        if ((str[idx] == dilim) || (idx == len)) {
-            if (counter == token_number) {
-                substring = myStrSubString(str, start_pos, len);
-                counter++;
-            } else {
-                start_pos = idx + 1;
-                counter++;
-            }
-        }
-    }
-    return substring;
+	for (idx = 0; idx <= len; idx++) {
+		if ((str[idx] == dilim) || (idx == len)) {
+			if (counter == token_number) {
+				substring = myStrSubString(str, start_pos, len);
+				counter++;
+			} else {
+				start_pos = idx + 1;
+				counter++;
+			}
+		}
+	}
+	return substring;
 }
 
 /*************************************************************************/
@@ -769,20 +769,20 @@ char *myStrGetTokenRemainder(const char *str, const char dilim,
  */
 char *myStrSubString(const char *src, int start, int end)
 {
-    char *substring = NULL;
-    int len, idx;
-    if (!src) {
-        return NULL;
-    }
-    len = strlen(src);
-    if (((start >= 0) && (end <= len)) && (end > start)) {
-        substring = (char *) malloc(sizeof(char) * ((end - start) + 1));
-        for (idx = 0; idx <= end - start; idx++) {
-            substring[idx] = src[start + idx];
-        }
-        substring[end - start] = '\0';
-    }
-    return substring;
+	char *substring = NULL;
+	int len, idx;
+	if (!src) {
+		return NULL;
+	}
+	len = strlen(src);
+	if (((start >= 0) && (end <= len)) && (end > start)) {
+		substring = (char *) malloc(sizeof(char) * ((end - start) + 1));
+		for (idx = 0; idx <= end - start; idx++) {
+			substring[idx] = src[start + idx];
+		}
+		substring[end - start] = '\0';
+	}
+	return substring;
 }
 
 /*************************************************************************/
@@ -794,31 +794,31 @@ char *myStrSubString(const char *src, int start, int end)
  */
 void doCleanBuffer(char *str)
 {
-    char *in, *out;
-    char ch;
+	char *in, *out;
+	char ch;
 
-    if (!str) {
-        return;
-    }
+	if (!str) {
+		return;
+	}
 
-    in = str;
-    out = str;
+	in = str;
+	out = str;
 
-    while (issp(ch = *in++));
-    if (ch != '\0')
-        for (;;) {
-            *out++ = ch;
-            ch = *in++;
-            if (ch == '\0')
-                break;
-            if (!issp(ch))
-                continue;
-            while (issp(ch = *in++));
-            if (ch == '\0')
-                break;
-            *out++ = ' ';
-        }
-    *out = ch;                  /* == '\0' */
+	while (issp(ch = *in++));
+	if (ch != '\0')
+		for (;;) {
+			*out++ = ch;
+			ch = *in++;
+			if (ch == '\0')
+				break;
+			if (!issp(ch))
+				continue;
+			while (issp(ch = *in++));
+			if (ch == '\0')
+				break;
+			*out++ = ' ';
+		}
+	*out = ch;				  /* == '\0' */
 }
 
 /*************************************************************************/
@@ -831,14 +831,14 @@ void doCleanBuffer(char *str)
  */
 void EnforceQlinedNick(const char *nick, const char *killer)
 {
-    User *u2;
+	User *u2;
 
-    if ((u2 = finduser(nick))) {
-        alog("Killed Q-lined nick: %s!%s@%s", u2->nick, u2->username,
-             u2->host);
-        kill_user(killer, u2->nick,
-                  "This nick is reserved for Services. Please use a non Q-Lined nick.");
-    }
+	if ((u2 = finduser(nick))) {
+		alog("Killed Q-lined nick: %s!%s@%s", u2->nick, u2->username,
+			 u2->host);
+		kill_user(killer, u2->nick,
+				  "This nick is reserved for Services. Please use a non Q-Lined nick.");
+	}
 }
 
 /*************************************************************************/
@@ -851,57 +851,57 @@ void EnforceQlinedNick(const char *nick, const char *killer)
  */
 int nickIsServices(const char *tempnick, int bot)
 {
-    int found = 0;
-    char *s, *nick;
+	int found = 0;
+	char *s, *nick;
 
-    if (!tempnick) {
-        return found;
-    }
+	if (!tempnick) {
+		return found;
+	}
 
-    nick = sstrdup(tempnick);
+	nick = sstrdup(tempnick);
 
-    s = strchr(nick, '@');
-    if (s) {
-        *s++ = 0;
-        if (stricmp(s, ServerName) != 0) {
-            free(nick);
-            return found;
-        }
-    }
+	s = strchr(nick, '@');
+	if (s) {
+		*s++ = 0;
+		if (stricmp(s, ServerName) != 0) {
+			free(nick);
+			return found;
+		}
+	}
 
-    if (s_NickServ && (stricmp(nick, s_NickServ) == 0))
-        found++;
-    else if (s_ChanServ && (stricmp(nick, s_ChanServ) == 0))
-        found++;
-    else if (s_HostServ && (stricmp(nick, s_HostServ) == 0))
-        found++;
-    else if (s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
-        found++;
-    else if (s_BotServ && (stricmp(nick, s_BotServ) == 0))
-        found++;
-    else if (s_HelpServ && (stricmp(nick, s_HelpServ) == 0))
-        found++;
-    else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
-        found++;
-    else if (s_GlobalNoticer && (stricmp(nick, s_GlobalNoticer) == 0))
-        found++;
-    else if (s_BotServ && bot) {
-        BotInfo *bi;
-        int i;
-        for (i = 0; i < 256; i++) {
-            for (bi = botlists[i]; bi; bi = bi->next) {
-                if (stricmp(nick, bi->nick) == 0) {
-                    found++;
-                    continue;
-                }
-            }
-        }
-    }
+	if (s_NickServ && (stricmp(nick, s_NickServ) == 0))
+		found++;
+	else if (s_ChanServ && (stricmp(nick, s_ChanServ) == 0))
+		found++;
+	else if (s_HostServ && (stricmp(nick, s_HostServ) == 0))
+		found++;
+	else if (s_MemoServ && (stricmp(nick, s_MemoServ) == 0))
+		found++;
+	else if (s_BotServ && (stricmp(nick, s_BotServ) == 0))
+		found++;
+	else if (s_HelpServ && (stricmp(nick, s_HelpServ) == 0))
+		found++;
+	else if (s_OperServ && (stricmp(nick, s_OperServ) == 0))
+		found++;
+	else if (s_GlobalNoticer && (stricmp(nick, s_GlobalNoticer) == 0))
+		found++;
+	else if (s_BotServ && bot) {
+		BotInfo *bi;
+		int i;
+		for (i = 0; i < 256; i++) {
+			for (bi = botlists[i]; bi; bi = bi->next) {
+				if (stricmp(nick, bi->nick) == 0) {
+					found++;
+					continue;
+				}
+			}
+		}
+	}
 
-    /* Somehow, something tells me we should free this :) -GD */
-    free(nick);
+	/* Somehow, something tells me we should free this :) -GD */
+	free(nick);
 
-    return found;
+	return found;
 }
 
 /*************************************************************************/
@@ -912,11 +912,11 @@ int nickIsServices(const char *tempnick, int bot)
  */
 static void arc4_init(void)
 {
-    int n;
-    for (n = 0; n < 256; n++)
-        rs.s[n] = n;
-    rs.i = 0;
-    rs.j = 0;
+	int n;
+	for (n = 0; n < 256; n++)
+		rs.s[n] = n;
+	rs.i = 0;
+	rs.j = 0;
 }
 
 /*************************************************************************/
@@ -929,17 +929,17 @@ static void arc4_init(void)
  */
 static void arc4_addrandom(void *dat, int datlen)
 {
-    int n;
-    u_int8_t si;
+	int n;
+	u_int8_t si;
 
-    rs.i--;
-    for (n = 0; n < 256; n++) {
-        rs.i = (rs.i + 1);
-        si = rs.s[rs.i];
-        rs.j = (rs.j + si + ((unsigned char *) dat)[n % datlen]);
-        rs.s[rs.i] = rs.s[rs.j];
-        rs.s[rs.j] = si;
-    }
+	rs.i--;
+	for (n = 0; n < 256; n++) {
+		rs.i = (rs.i + 1);
+		si = rs.s[rs.i];
+		rs.j = (rs.j + si + ((unsigned char *) dat)[n % datlen]);
+		rs.s[rs.i] = rs.s[rs.j];
+		rs.s[rs.j] = si;
+	}
 }
 
 /*************************************************************************/
@@ -950,48 +950,48 @@ static void arc4_addrandom(void *dat, int datlen)
  */
 void rand_init(void)
 {
-    int n;
+	int n;
 #ifndef _WIN32
-    int fd;
+	int fd;
 #endif
-    struct {
+	struct {
 #ifdef USE_MYSQL
-        int sqlrand;
+		int sqlrand;
 #endif
 #ifndef _WIN32
-        struct timeval nowt;    /* time */
-        char rnd[32];           /* /dev/urandom */
+		struct timeval nowt;	/* time */
+		char rnd[32];		   /* /dev/urandom */
 #else
-        MEMORYSTATUS mstat;     /* memory status */
-        struct _timeb nowt;     /* time */
+		MEMORYSTATUS mstat;	 /* memory status */
+		struct _timeb nowt;	 /* time */
 #endif
-    } rdat;
+	} rdat;
 
-    arc4_init();
+	arc4_init();
 
-    /* Grab "random" MYSQL data */
+	/* Grab "random" MYSQL data */
 #ifdef USE_MYSQL
-    rdat.sqlrand = mysql_rand();
+	rdat.sqlrand = mysql_rand();
 #endif
 
-    /* Grab OS specific "random" data */
+	/* Grab OS specific "random" data */
 #ifndef _WIN32
-    /* unix/bsd: time */
-    gettimeofday(&rdat.nowt, NULL);
-    /* unix/bsd: /dev/urandom */
-    fd = open("/dev/urandom", O_RDONLY);
-    if (fd) {
-        n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
-        close(fd);
-    }
+	/* unix/bsd: time */
+	gettimeofday(&rdat.nowt, NULL);
+	/* unix/bsd: /dev/urandom */
+	fd = open("/dev/urandom", O_RDONLY);
+	if (fd) {
+		n = read(fd, &rdat.rnd, sizeof(rdat.rnd));
+		close(fd);
+	}
 #else
-    /* win32: time */
-    _ftime(&rdat.nowt);
-    /* win32: memory status */
-    GlobalMemoryStatus(&rdat.mstat);
+	/* win32: time */
+	_ftime(&rdat.nowt);
+	/* win32: memory status */
+	GlobalMemoryStatus(&rdat.mstat);
 #endif
 
-    arc4_addrandom(&rdat, sizeof(rdat));
+	arc4_addrandom(&rdat, sizeof(rdat));
 }
 
 /*************************************************************************/
@@ -1002,10 +1002,10 @@ void rand_init(void)
  */
 void add_entropy_userkeys(void)
 {
-    arc4_addrandom(&UserKey1, sizeof(UserKey1));
-    arc4_addrandom(&UserKey2, sizeof(UserKey2));
-    arc4_addrandom(&UserKey3, sizeof(UserKey3));
-    /* UserKey3 is also used in mysql_rand() */
+	arc4_addrandom(&UserKey1, sizeof(UserKey1));
+	arc4_addrandom(&UserKey2, sizeof(UserKey2));
+	arc4_addrandom(&UserKey3, sizeof(UserKey3));
+	/* UserKey3 is also used in mysql_rand() */
 }
 
 /*************************************************************************/
@@ -1016,15 +1016,15 @@ void add_entropy_userkeys(void)
  */
 unsigned char getrandom8(void)
 {
-    unsigned char si, sj;
+	unsigned char si, sj;
 
-    rs.i = (rs.i + 1);
-    si = rs.s[rs.i];
-    rs.j = (rs.j + si);
-    sj = rs.s[rs.j];
-    rs.s[rs.i] = sj;
-    rs.s[rs.j] = si;
-    return (rs.s[(si + sj) & 0xff]);
+	rs.i = (rs.i + 1);
+	si = rs.s[rs.i];
+	rs.j = (rs.j + si);
+	sj = rs.s[rs.j];
+	rs.s[rs.i] = sj;
+	rs.s[rs.j] = si;
+	return (rs.s[(si + sj) & 0xff]);
 }
 
 /*************************************************************************/
@@ -1035,11 +1035,11 @@ unsigned char getrandom8(void)
  */
 u_int16_t getrandom16(void)
 {
-    u_int16_t val;
+	u_int16_t val;
 
-    val = getrandom8() << 8;
-    val |= getrandom8();
-    return val;
+	val = getrandom8() << 8;
+	val |= getrandom8();
+	return val;
 }
 
 /*************************************************************************/
@@ -1050,13 +1050,13 @@ u_int16_t getrandom16(void)
  */
 u_int32_t getrandom32(void)
 {
-    u_int32_t val;
+	u_int32_t val;
 
-    val = getrandom8() << 24;
-    val |= getrandom8() << 16;
-    val |= getrandom8() << 8;
-    val |= getrandom8();
-    return val;
+	val = getrandom8() << 24;
+	val |= getrandom8() << 16;
+	val |= getrandom8() << 8;
+	val |= getrandom8();
+	return val;
 }
 
 /*************************************************************************/
@@ -1069,18 +1069,18 @@ u_int32_t getrandom32(void)
  */
 int myNumToken(const char *str, const char dilim)
 {
-    int len, idx, counter = 0, start_pos = 0;
-    if (!str) {
-        return 0;
-    }
-    len = strlen(str);
-    for (idx = 0; idx <= len; idx++) {
-        if ((str[idx] == dilim) || (idx == len)) {
-            start_pos = idx + 1;
-            counter++;
-        }
-    }
-    return counter;
+	int len, idx, counter = 0, start_pos = 0;
+	if (!str) {
+		return 0;
+	}
+	len = strlen(str);
+	for (idx = 0; idx <= len; idx++) {
+		if ((str[idx] == dilim) || (idx == len)) {
+			start_pos = idx + 1;
+			counter++;
+		}
+	}
+	return counter;
 }
 
 /*************************************************************************/
@@ -1092,28 +1092,28 @@ int myNumToken(const char *str, const char dilim)
  */
 char *host_resolve(char *host)
 {
-    struct hostent *hentp = NULL;
-    uint32 ip = INADDR_NONE;
-    char ipbuf[16];
-    char *ipreturn;
-    struct in_addr addr;
+	struct hostent *hentp = NULL;
+	uint32 ip = INADDR_NONE;
+	char ipbuf[16];
+	char *ipreturn;
+	struct in_addr addr;
 
-    ipreturn = NULL;
+	ipreturn = NULL;
 
-    hentp = gethostbyname(host);
+	hentp = gethostbyname(host);
 
-    if (hentp) {
-        memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
-        addr.s_addr = ip;
-        ntoa(addr, ipbuf, sizeof(ipbuf));
-        ipreturn = sstrdup(ipbuf);
-        if (debug) {
-            alog("debug: resolved %s to %s", host, ipbuf);
-        }
-        return ipreturn;
-    } else {
-        return ipreturn;
-    }
+	if (hentp) {
+		memcpy(&ip, hentp->h_addr, sizeof(hentp->h_length));
+		addr.s_addr = ip;
+		ntoa(addr, ipbuf, sizeof(ipbuf));
+		ipreturn = sstrdup(ipbuf);
+		if (debug) {
+			alog("debug: resolved %s to %s", host, ipbuf);
+		}
+		return ipreturn;
+	} else {
+		return ipreturn;
+	}
 }
 
 /*************************************************************************/
@@ -1127,16 +1127,16 @@ char *host_resolve(char *host)
 
 char *str_signed(unsigned char *str)
 {
-    char *nstr;
+	char *nstr;
 
-    nstr = (char *) str;
-    while (*str) {
-        *nstr = (char) *str;
-        str++;
-        nstr++;
-    }
+	nstr = (char *) str;
+	while (*str) {
+		*nstr = (char) *str;
+		str++;
+		nstr++;
+	}
 
-    return nstr;
+	return nstr;
 }
 
 /**
@@ -1146,19 +1146,19 @@ char *str_signed(unsigned char *str)
 
 char *stripModePrefix(const char *str)
 {
-    if (str && ((*str == '+') || (*str == '-'))) {
-        return sstrdup(str + 1);
-    }
-    return NULL;
+	if (str && ((*str == '+') || (*str == '-'))) {
+		return sstrdup(str + 1);
+	}
+	return NULL;
 }
 
 /* Equivalent to inet_ntoa */
 
 void ntoa(struct in_addr addr, char *ipaddr, int len)
 {
-    unsigned char *bytes = (unsigned char *) &addr.s_addr;
-    snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
-             bytes[3]);
+	unsigned char *bytes = (unsigned char *) &addr.s_addr;
+	snprintf(ipaddr, len, "%u.%u.%u.%u", bytes[0], bytes[1], bytes[2],
+			 bytes[3]);
 }
 
 /**
@@ -1169,22 +1169,22 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
  **/
 char **buildStringList(char *src, int *number)
 {
-    char *s;
-    int i = 0;
-    char **list = NULL;
+	char *s;
+	int i = 0;
+	char **list = NULL;
 
-    if (src) {
-        s = strtok(src, " ");
-        do {
-            if (s) {
-                i++;
-                list = (char **)realloc(list, sizeof(char *) * i);
-                list[i - 1] = sstrdup(s);
-            }
-        } while ((s = strtok(NULL, " ")));
-    }
-    *number = i;                /* always zero it, even if we have no setters */
-    return list;
+	if (src) {
+		s = strtok(src, " ");
+		do {
+			if (s) {
+				i++;
+				list = (char **)realloc(list, sizeof(char *) * i);
+				list[i - 1] = sstrdup(s);
+			}
+		} while ((s = strtok(NULL, " ")));
+	}
+	*number = i;				/* always zero it, even if we have no setters */
+	return list;
 }
 
 /*
@@ -1199,12 +1199,12 @@ char **buildStringList(char *src, int *number)
 * modification, are permitted provided that the following conditions
 * are met:
 * 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
+*	notice, this list of conditions and the following disclaimer.
 * 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
+*	notice, this list of conditions and the following disclaimer in the
+*	documentation and/or other materials provided with the distribution.
 * 3. The name of the author may not be used to endorse or promote products
-*    derived from this software without specific prior written permission.
+*	derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED `AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
@@ -1221,57 +1221,57 @@ char **buildStringList(char *src, int *number)
 #ifndef HAVE_STRLCAT
 size_t strlcat(char *dst, const char *src, size_t siz)
 {
-    char *d = dst;
-    const char *s = src;
-    size_t n = siz, dlen;
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz, dlen;
 
-    while (n-- != 0 && *d != '\0')
-        d++;
+	while (n-- != 0 && *d != '\0')
+		d++;
 
-    dlen = d - dst;
-    n = siz - dlen;
+	dlen = d - dst;
+	n = siz - dlen;
 
-    if (n == 0)
-        return (dlen + strlen(s));
+	if (n == 0)
+		return (dlen + strlen(s));
 
-    while (*s != '\0') {
-        if (n != 1) {
-            *d++ = *s;
-            n--;
-        }
+	while (*s != '\0') {
+		if (n != 1) {
+			*d++ = *s;
+			n--;
+		}
 
-        s++;
-    }
+		s++;
+	}
 
-    *d = '\0';
-    return dlen + (s - src);    /* count does not include NUL */
+	*d = '\0';
+	return dlen + (s - src);	/* count does not include NUL */
 }
 #endif
 
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t siz)
 {
-    char *d = dst;
-    const char *s = src;
-    size_t n = siz;
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz;
 
-    /* Copy as many bytes as will fit */
-    if (n != 0 && --n != 0) {
-        do {
-            if ((*d++ = *s++) == 0)
-                break;
-        }
-        while (--n != 0);
-    }
+	/* Copy as many bytes as will fit */
+	if (n != 0 && --n != 0) {
+		do {
+			if ((*d++ = *s++) == 0)
+				break;
+		}
+		while (--n != 0);
+	}
 
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0) {
-        if (siz != 0)
-            *d = '\0';          /* NUL-terminate dst */
-        while (*s++);
-    }
+	/* Not enough room in dst, add NUL and traverse rest of src */
+	if (n == 0) {
+		if (siz != 0)
+			*d = '\0';		  /* NUL-terminate dst */
+		while (*s++);
+	}
 
-    return s - src - 1;         /* count does not include NUL */
+	return s - src - 1;		 /* count does not include NUL */
 }
 #endif
 
@@ -1281,169 +1281,169 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
 #ifdef _WIN32
 char *GetWindowsVersion(void)
 {
-    OSVERSIONINFOEX osvi;
-    BOOL bOsVersionInfoEx;
-    char buf[BUFSIZE];
-    char *extra;
-    char *cputype;
-    SYSTEM_INFO si;
+	OSVERSIONINFOEX osvi;
+	BOOL bOsVersionInfoEx;
+	char buf[BUFSIZE];
+	char *extra;
+	char *cputype;
+	SYSTEM_INFO si;
 
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-    ZeroMemory(&si, sizeof(SYSTEM_INFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	ZeroMemory(&si, sizeof(SYSTEM_INFO));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-    if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
-        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
-            return sstrdup("");
-        }
-    }
-    GetSystemInfo(&si);
+	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+			return sstrdup("");
+		}
+	}
+	GetSystemInfo(&si);
 
-    /* Determine CPU type 32 or 64 */
-    if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64 ) {
-       cputype = sstrdup(" 64-bit");
-    } else if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL ) {
-       cputype = sstrdup(" 32-bit");
-    }    else if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_IA64 ) {
-       cputype = sstrdup(" Itanium 64-bit");
-    } else {
+	/* Determine CPU type 32 or 64 */
+	if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64 ) {
+	   cputype = sstrdup(" 64-bit");
+	} else if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL ) {
+	   cputype = sstrdup(" 32-bit");
+	}	else if ( si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_IA64 ) {
+	   cputype = sstrdup(" Itanium 64-bit");
+	} else {
   		cputype = sstrdup(" ");
-    }
+	}
 
-    switch (osvi.dwPlatformId) {
-        /* test for the Windows NT product family. */
-    case VER_PLATFORM_WIN32_NT:
+	switch (osvi.dwPlatformId) {
+		/* test for the Windows NT product family. */
+	case VER_PLATFORM_WIN32_NT:
 	/* Windows Vista or Windows Server 2008 */
-        if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
-            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-                extra = sstrdup("Enterprise Edition");
-            } else if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-                extra = sstrdup("Datacenter Edition");
-            } else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-                extra = sstrdup("Home Premium/Basic");
-            } else {
-                extra = sstrdup(" ");
-            }
-	    if (osvi.wProductType & VER_NT_WORKSTATION) {
-	            snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s",
-        	             cputype, extra);
-	    } else {
-	            snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s",
-        	             cputype, extra);
-	    }
-            free(extra);
-        }
+		if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
+			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				extra = sstrdup("Enterprise Edition");
+			} else if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+				extra = sstrdup("Datacenter Edition");
+			} else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
+				extra = sstrdup("Home Premium/Basic");
+			} else {
+				extra = sstrdup(" ");
+			}
+		if (osvi.wProductType & VER_NT_WORKSTATION) {
+				snprintf(buf, sizeof(buf), "Microsoft Windows Vista %s%s",
+						 cputype, extra);
+		} else {
+				snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s",
+						 cputype, extra);
+		}
+			free(extra);
+		}
 	/* Windows 2003 or Windows XP Pro 64 */
-        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
-            if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-                extra = sstrdup("Datacenter Edition");
-            } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-                extra = sstrdup("Enterprise Edition");
-            } else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
-                extra = sstrdup("Compute Cluster Edition");
-            } else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
-                extra = sstrdup("Web Edition");
-            } else {
-                extra = sstrdup("Standard Edition");
-            }
-	    if ( osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
-	            snprintf(buf, sizeof(buf), "Windows XP Professional x64 Edition %s",
-        	             extra);
-	    } else {
-	            snprintf(buf, sizeof(buf),
-        	             "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
-	    }
-            free(extra);
-        }
-        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
-            if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
-                extra = sstrdup("Embedded");
-            } else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
-                extra = sstrdup("Home Edition");
-            } else {
-                extra = sstrdup(" ");
-            }
-            snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
-            free(extra);
-        }
-        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
-            if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
-                extra = sstrdup("Datacenter Server");
-            } else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-                extra = sstrdup("Advanced Server");
-            } else {
-                extra = sstrdup("Server");
-            }
-            snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
-            free(extra);
-        }
-        if (osvi.dwMajorVersion <= 4) {
-            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
-                extra = sstrdup("Server 4.0, Enterprise Edition");
-            } else {
-                extra = sstrdup("Server 4.0");
-            }
-            snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
-            free(extra);
-        }
-    case VER_PLATFORM_WIN32_WINDOWS:
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
-            if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
-                extra = sstrdup("OSR2");
-            } else {
-                extra = sstrdup(" ");
-            }
-            snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
-            free(extra);
-        }
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
-            if (osvi.szCSDVersion[1] == 'A') {
-                extra = sstrdup("SE");
-            } else {
-                extra = sstrdup(" ");
-            }
-            snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
-            free(extra);
-        }
-        if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
-            snprintf(buf, sizeof(buf),
-                     "Microsoft Windows Millennium Edition");
-        }
-    }
-    free(cputype);
-    return sstrdup(buf);
+		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+				extra = sstrdup("Datacenter Edition");
+			} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				extra = sstrdup("Enterprise Edition");
+			} else if (osvi.wSuiteMask & VER_SUITE_COMPUTE_SERVER) {
+				extra = sstrdup("Compute Cluster Edition");
+			} else if (osvi.wSuiteMask == VER_SUITE_BLADE) {
+				extra = sstrdup("Web Edition");
+			} else {
+				extra = sstrdup("Standard Edition");
+			}
+		if ( osvi.wProductType & VER_NT_WORKSTATION && si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
+				snprintf(buf, sizeof(buf), "Windows XP Professional x64 Edition %s",
+						 extra);
+		} else {
+				snprintf(buf, sizeof(buf),
+						 "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
+		}
+			free(extra);
+		}
+		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
+			if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
+				extra = sstrdup("Embedded");
+			} else if (osvi.wSuiteMask & VER_SUITE_PERSONAL) {
+				extra = sstrdup("Home Edition");
+			} else {
+				extra = sstrdup(" ");
+			}
+			snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
+			free(extra);
+		}
+		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
+			if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
+				extra = sstrdup("Datacenter Server");
+			} else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				extra = sstrdup("Advanced Server");
+			} else {
+				extra = sstrdup("Server");
+			}
+			snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
+			free(extra);
+		}
+		if (osvi.dwMajorVersion <= 4) {
+			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
+				extra = sstrdup("Server 4.0, Enterprise Edition");
+			} else {
+				extra = sstrdup("Server 4.0");
+			}
+			snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
+			free(extra);
+		}
+	case VER_PLATFORM_WIN32_WINDOWS:
+		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
+			if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B') {
+				extra = sstrdup("OSR2");
+			} else {
+				extra = sstrdup(" ");
+			}
+			snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
+			free(extra);
+		}
+		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
+			if (osvi.szCSDVersion[1] == 'A') {
+				extra = sstrdup("SE");
+			} else {
+				extra = sstrdup(" ");
+			}
+			snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
+			free(extra);
+		}
+		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
+			snprintf(buf, sizeof(buf),
+					 "Microsoft Windows Millennium Edition");
+		}
+	}
+	free(cputype);
+	return sstrdup(buf);
 }
 
 int SupportedWindowsVersion(void)
 {
-    OSVERSIONINFOEX osvi;
-    BOOL bOsVersionInfoEx;
+	OSVERSIONINFOEX osvi;
+	BOOL bOsVersionInfoEx;
 
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-    if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
-        osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
-            return 0;
-        }
-    }
+	if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *) & osvi))) {
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+		if (!GetVersionEx((OSVERSIONINFO *) & osvi)) {
+			return 0;
+		}
+	}
 
-    switch (osvi.dwPlatformId) {
-        /* test for the Windows NT product family. */
-    case VER_PLATFORM_WIN32_NT:
-        /* win nt4 */
-        if (osvi.dwMajorVersion <= 4) {
-            return 0;
-        }
-        /* the rest */
-        return 1;
-        /* win95 win98 winME */
-    case VER_PLATFORM_WIN32_WINDOWS:
-        return 0;
-    }
-    return 0;
+	switch (osvi.dwPlatformId) {
+		/* test for the Windows NT product family. */
+	case VER_PLATFORM_WIN32_NT:
+		/* win nt4 */
+		if (osvi.dwMajorVersion <= 4) {
+			return 0;
+		}
+		/* the rest */
+		return 1;
+		/* win95 win98 winME */
+	case VER_PLATFORM_WIN32_WINDOWS:
+		return 0;
+	}
+	return 0;
 }
 
 #endif
@@ -1459,10 +1459,10 @@ int SupportedWindowsVersion(void)
  */
 uint32 cidr_to_netmask(uint16 cidr)
 {
-    if (cidr == 0)
-        return 0;
+	if (cidr == 0)
+		return 0;
 
-    return (0xFFFFFFFF - (1 << (32 - cidr)) + 1);
+	return (0xFFFFFFFF - (1 << (32 - cidr)) + 1);
 }
 
 /**
@@ -1472,12 +1472,12 @@ uint32 cidr_to_netmask(uint16 cidr)
  */
 uint16 netmask_to_cidr(uint32 mask)
 {
-    int tmp = 0;
+	int tmp = 0;
 
-    while (!(mask & (1 << tmp)) && (tmp < 32))
-        tmp++;
+	while (!(mask & (1 << tmp)) && (tmp < 32))
+		tmp++;
 
-    return (32 - tmp);
+	return (32 - tmp);
 }
 
 /*************************************************************************/
@@ -1489,13 +1489,13 @@ uint16 netmask_to_cidr(uint32 mask)
  */
 int str_is_wildcard(const char *str)
 {
-    while (*str) {
-        if ((*str == '*') || (*str == '?'))
-            return 1;
-        str++;
-    }
+	while (*str) {
+		if ((*str == '*') || (*str == '?'))
+			return 1;
+		str++;
+	}
 
-    return 0;
+	return 0;
 }
 
 /**
@@ -1505,13 +1505,13 @@ int str_is_wildcard(const char *str)
  */
 int str_is_pure_wildcard(const char *str)
 {
-    while (*str) {
-        if (*str != '*')
-            return 0;
-        str++;
-    }
+	while (*str) {
+		if (*str != '*')
+			return 0;
+		str++;
+	}
 
-    return 1;
+	return 1;
 }
 
 /*************************************************************************/
@@ -1523,28 +1523,28 @@ int str_is_pure_wildcard(const char *str)
  */
 uint32 str_is_ip(char *str)
 {
-    int i;
-    int octets[4] = { -1, -1, -1, -1 };
-    char *s = str;
-    uint32 ip;
+	int i;
+	int octets[4] = { -1, -1, -1, -1 };
+	char *s = str;
+	uint32 ip;
 
-    for (i = 0; i < 4; i++) {
-        octets[i] = strtol(s, &s, 10);
-        /* Bail out if the octet is invalid or wrongly terminated */
-        if ((octets[i] < 0) || (octets[i] > 255)
-            || ((i < 3) && (*s != '.')))
-            return 0;
-        if (i < 3)
-            s++;
-    }
+	for (i = 0; i < 4; i++) {
+		octets[i] = strtol(s, &s, 10);
+		/* Bail out if the octet is invalid or wrongly terminated */
+		if ((octets[i] < 0) || (octets[i] > 255)
+			|| ((i < 3) && (*s != '.')))
+			return 0;
+		if (i < 3)
+			s++;
+	}
 
-    /* Fill the IP - the dirty way */
-    ip = octets[3];
-    ip += octets[2] * 256;
-    ip += octets[1] * 65536;
-    ip += octets[0] * 16777216;
+	/* Fill the IP - the dirty way */
+	ip = octets[3];
+	ip += octets[2] * 256;
+	ip += octets[1] * 65536;
+	ip += octets[0] * 16777216;
 
-    return ip;
+	return ip;
 }
 
 /*************************************************************************/
@@ -1560,60 +1560,60 @@ uint32 str_is_ip(char *str)
  */
 int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host)
 {
-    int i;
-    int octets[4] = { -1, -1, -1, -1 };
-    char *s = str;
-    char buf[512];
-    uint16 cidr;
+	int i;
+	int octets[4] = { -1, -1, -1, -1 };
+	char *s = str;
+	char buf[512];
+	uint16 cidr;
 
-    for (i = 0; i < 4; i++) {
-        octets[i] = strtol(s, &s, 10);
-        /* Bail out if the octet is invalid or wrongly terminated */
-        if ((octets[i] < 0) || (octets[i] > 255)
-            || ((i < 3) && (*s != '.')))
-            return 0;
-        if (i < 3)
-            s++;
-    }
+	for (i = 0; i < 4; i++) {
+		octets[i] = strtol(s, &s, 10);
+		/* Bail out if the octet is invalid or wrongly terminated */
+		if ((octets[i] < 0) || (octets[i] > 255)
+			|| ((i < 3) && (*s != '.')))
+			return 0;
+		if (i < 3)
+			s++;
+	}
 
-    /* Fill the IP - the dirty way */
-    *ip = octets[3];
-    *ip += octets[2] * 256;
-    *ip += octets[1] * 65536;
-    *ip += octets[0] * 16777216;
+	/* Fill the IP - the dirty way */
+	*ip = octets[3];
+	*ip += octets[2] * 256;
+	*ip += octets[1] * 65536;
+	*ip += octets[0] * 16777216;
 
-    if (*s == '/') {
-        s++;
-        /* There's a CIDR mask here! */
-        cidr = strtol(s, &s, 10);
-        /* Bail out if the CIDR is invalid or the string isn't done yet */
-        if ((cidr > 32) || (*s))
-            return 0;
-    } else {
-        /* No CIDR mask here - use 32 so the whole ip will be matched */
-        cidr = 32;
-    }
+	if (*s == '/') {
+		s++;
+		/* There's a CIDR mask here! */
+		cidr = strtol(s, &s, 10);
+		/* Bail out if the CIDR is invalid or the string isn't done yet */
+		if ((cidr > 32) || (*s))
+			return 0;
+	} else {
+		/* No CIDR mask here - use 32 so the whole ip will be matched */
+		cidr = 32;
+	}
 
-    *mask = cidr_to_netmask(cidr);
-    /* Apply the mask to avoid 255.255.255.255/8 bans */
-    *ip &= *mask;
+	*mask = cidr_to_netmask(cidr);
+	/* Apply the mask to avoid 255.255.255.255/8 bans */
+	*ip &= *mask;
 
-    /* Refill the octets to fill the host */
-    octets[0] = (*ip & 0xFF000000) / 16777216;
-    octets[1] = (*ip & 0x00FF0000) / 65536;
-    octets[2] = (*ip & 0x0000FF00) / 256;
-    octets[3] = (*ip & 0x000000FF);
+	/* Refill the octets to fill the host */
+	octets[0] = (*ip & 0xFF000000) / 16777216;
+	octets[1] = (*ip & 0x00FF0000) / 65536;
+	octets[2] = (*ip & 0x0000FF00) / 256;
+	octets[3] = (*ip & 0x000000FF);
 
-    if (cidr == 32)
-        snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2],
-                 octets[3]);
-    else
-        snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1],
-                 octets[2], octets[3], cidr);
+	if (cidr == 32)
+		snprintf(buf, 512, "%d.%d.%d.%d", octets[0], octets[1], octets[2],
+				 octets[3]);
+	else
+		snprintf(buf, 512, "%d.%d.%d.%d/%d", octets[0], octets[1],
+				 octets[2], octets[3], cidr);
 
-    *host = sstrdup(buf);
+	*host = sstrdup(buf);
 
-    return 1;
+	return 1;
 }
 
 /* EOF */

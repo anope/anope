@@ -48,14 +48,14 @@ class NickCore
 	char *url;				/* URL associated to the nick */
 	uint32 flags;				/* See NI_* below */
 	uint16 language;			/* Language selected by nickname owner (LANG_*) */
-    uint16 accesscount;			/* # of entries */
-    char **access;				/* Array of strings */
-    MemoInfo memos;
-    uint16 channelcount;			/* Number of channels currently registered */
+	uint16 accesscount;			/* # of entries */
+	char **access;				/* Array of strings */
+	MemoInfo memos;
+	uint16 channelcount;			/* Number of channels currently registered */
 
-    /* Unsaved data */
-    ModuleData *moduleData;	  	/* Module saved data attached to the NickCore */
-    time_t lastmail;			/* Last time this nick record got a mail */
-    SList aliases;				/* List of aliases */
+	/* Unsaved data */
+	ModuleData *moduleData;	  	/* Module saved data attached to the NickCore */
+	time_t lastmail;			/* Last time this nick record got a mail */
+	SList aliases;				/* List of aliases */
 };
 

@@ -47,7 +47,7 @@ class CSIdentify : public Module
  **/
 void myChanServHelp(User * u)
 {
-    notice_lang(s_ChanServ, u, CHAN_HELP_CMD_IDENTIFY);
+	notice_lang(s_ChanServ, u, CHAN_HELP_CMD_IDENTIFY);
 }
 
 /**
@@ -57,49 +57,49 @@ void myChanServHelp(User * u)
  **/
 int do_identify(User * u)
 {
-    char *chan = strtok(NULL, " ");
-    char *pass = strtok(NULL, " ");
-    ChannelInfo *ci;
-    struct u_chaninfolist *uc;
+	char *chan = strtok(NULL, " ");
+	char *pass = strtok(NULL, " ");
+	ChannelInfo *ci;
+	struct u_chaninfolist *uc;
 
-    if (!pass) {
-        syntax_error(s_ChanServ, u, "IDENTIFY", CHAN_IDENTIFY_SYNTAX);
-    } else if (!(ci = cs_findchan(chan))) {
-        notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
-    } else if (!nick_identified(u)) {
-        notice_lang(s_ChanServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
-    } else if (is_founder(u, ci)) {
-        notice_lang(s_ChanServ, u, NICK_ALREADY_IDENTIFIED);
-    } else {
-        int res;
+	if (!pass) {
+		syntax_error(s_ChanServ, u, "IDENTIFY", CHAN_IDENTIFY_SYNTAX);
+	} else if (!(ci = cs_findchan(chan))) {
+		notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED, chan);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_X_FORBIDDEN, chan);
+	} else if (!nick_identified(u)) {
+		notice_lang(s_ChanServ, u, NICK_IDENTIFY_REQUIRED, s_NickServ);
+	} else if (is_founder(u, ci)) {
+		notice_lang(s_ChanServ, u, NICK_ALREADY_IDENTIFIED);
+	} else {
+		int res;
 
-        if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
-            if (!is_identified(u, ci)) {
-                uc = (struct u_chaninfolist *)scalloc(sizeof(*uc), 1);
-                uc->next = u->founder_chans;
-                if (u->founder_chans)
-                    u->founder_chans->prev = uc;
-                u->founder_chans = uc;
-                uc->chan = ci;
-                alog("%s: %s!%s@%s identified for %s", s_ChanServ, u->nick,
-                     u->username, u->host, ci->name);
-            }
+		if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
+			if (!is_identified(u, ci)) {
+				uc = (struct u_chaninfolist *)scalloc(sizeof(*uc), 1);
+				uc->next = u->founder_chans;
+				if (u->founder_chans)
+					u->founder_chans->prev = uc;
+				u->founder_chans = uc;
+				uc->chan = ci;
+				alog("%s: %s!%s@%s identified for %s", s_ChanServ, u->nick,
+					 u->username, u->host, ci->name);
+			}
 
-            notice_lang(s_ChanServ, u, CHAN_IDENTIFY_SUCCEEDED, chan);
-        } else if (res < 0) {
-            alog("%s: check_password failed for %s", s_ChanServ, ci->name);
-            notice_lang(s_ChanServ, u, CHAN_IDENTIFY_FAILED);
-        } else {
-            alog("%s: Failed IDENTIFY for %s by %s!%s@%s",
-                 s_ChanServ, ci->name, u->nick, u->username, u->host);
-            notice_lang(s_ChanServ, u, PASSWORD_INCORRECT);
-            bad_password(u);
-        }
+			notice_lang(s_ChanServ, u, CHAN_IDENTIFY_SUCCEEDED, chan);
+		} else if (res < 0) {
+			alog("%s: check_password failed for %s", s_ChanServ, ci->name);
+			notice_lang(s_ChanServ, u, CHAN_IDENTIFY_FAILED);
+		} else {
+			alog("%s: Failed IDENTIFY for %s by %s!%s@%s",
+				 s_ChanServ, ci->name, u->nick, u->username, u->host);
+			notice_lang(s_ChanServ, u, PASSWORD_INCORRECT);
+			bad_password(u);
+		}
 
-    }
-    return MOD_CONT;
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("cs_identify", CSIdentify)

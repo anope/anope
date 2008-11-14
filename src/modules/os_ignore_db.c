@@ -21,22 +21,22 @@
 #define IGNOREDBVERSION 1
 
 /* Database seperators */
-#define SEPARATOR  '^'        /* End of a key, seperates keys from values */
-#define BLOCKEND   '\n'         /* End of a block, e.g. a whole ignore */
-#define VALUEEND   '\000'       /* End of a value */
-#define SUBSTART   '\010'       /* Beginning of a new subblock, closed by a BLOCKEND */
+#define SEPARATOR  '^'		/* End of a key, seperates keys from values */
+#define BLOCKEND   '\n'		 /* End of a block, e.g. a whole ignore */
+#define VALUEEND   '\000'	   /* End of a value */
+#define SUBSTART   '\010'	   /* Beginning of a new subblock, closed by a BLOCKEND */
 
 /* Database reading return values */
 #define DB_READ_SUCCESS   0
-#define DB_READ_ERROR     1
-#define DB_EOF_ERROR      2
+#define DB_READ_ERROR	 1
+#define DB_EOF_ERROR	  2
 #define DB_VERSION_ERROR  3
 #define DB_READ_BLOCKEND  4
 #define DB_READ_SUBSTART  5
 
 #define DB_WRITE_SUCCESS  0
-#define DB_WRITE_ERROR    1
-#define DB_WRITE_NOVAL    2
+#define DB_WRITE_ERROR	1
+#define DB_WRITE_NOVAL	2
 
 /* Database Key, Value max length */
 #define MAXKEYLEN 128
@@ -46,12 +46,12 @@
 typedef struct db_file_ DBFile;
 
 struct db_file_ {
-	FILE *fptr;             /* Pointer to the opened file */
-	int db_version;         /* The db version of the datafiles (only needed for reading) */
-	int core_db_version;    /* The current db version of this anope source */
-	char service[256];      /* StatServ/etc. */
-	char filename[256];     /* Filename of the database */
-	char temp_name[262];    /* Temp filename of the database */
+	FILE *fptr;			 /* Pointer to the opened file */
+	int db_version;		 /* The db version of the datafiles (only needed for reading) */
+	int core_db_version;	/* The current db version of this anope source */
+	char service[256];	  /* StatServ/etc. */
+	char filename[256];	 /* Filename of the database */
+	char temp_name[262];	/* Temp filename of the database */
 };
 
 
@@ -179,7 +179,7 @@ int backup_ignoredb(int argc, char **argv) {
 /* ------------------------------------------------------------------------------- */
 
 /**************************************************************************
- *                DataBase Handling
+ *				DataBase Handling
  **************************************************************************/
 
 void load_ignore_db(void) {
@@ -198,7 +198,7 @@ void load_ignore_db(void) {
 	/* Open the db, fill the rest of dbptr and allocate memory for key and value */
 	if (new_open_db_read(dbptr, &key, &value)) {
 		free(dbptr);
-		return;                 /* Bang, an error occurred */
+		return;				 /* Bang, an error occurred */
 	}
 
 	while (1) {
@@ -214,7 +214,7 @@ void load_ignore_db(void) {
 			new_close_db(dbptr->fptr, &key, &value);
 			free(dbptr);
 			return;
-		} else if (retval == DB_READ_BLOCKEND) {        /* DB_READ_BLOCKEND */
+		} else if (retval == DB_READ_BLOCKEND) {		/* DB_READ_BLOCKEND */
 			/* Check if we have everything to add the ignore.. 
 			 * We shouldn't bother with already expired ignores either.. */
 			if (mask && (expiry_time > time(NULL) || expiry_time == 0)) {
@@ -248,7 +248,7 @@ void load_ignore_db(void) {
 			if (mask) free(mask);
 			mask = NULL;
 			expiry_time = time(NULL);
-		} else {              /* DB_READ_SUCCESS */
+		} else {			  /* DB_READ_SUCCESS */
 			if (!*key || !*value)
 				continue;
 
@@ -290,7 +290,7 @@ void save_ignore_db(void) {
 	if (new_open_db_write(dbptr)) {
 		rename(dbptr->temp_name, IgnoreDB);
 		free(dbptr);
-		return;                /* Bang, an error occurred */
+		return;				/* Bang, an error occurred */
 	}
 
 	/* Store the version of the DB in the DB as well...
@@ -324,8 +324,8 @@ void save_ignore_db(void) {
 
 	if (dbptr) {
 		new_close_db(dbptr->fptr, NULL, NULL);  /* close file */
-		remove(dbptr->temp_name);       /* saved successfully, no need to keep the old one */
-		free(dbptr);           /* free the db struct */
+		remove(dbptr->temp_name);	   /* saved successfully, no need to keep the old one */
+		free(dbptr);		   /* free the db struct */
 	}
 }
 
@@ -333,7 +333,7 @@ void save_ignore_db(void) {
 /* ------------------------------------------------------------------------------- */
 
 /**************************************************************************
- *         Generic DataBase Functions  (Borrowed this from Trystan :-) )
+ *		 Generic DataBase Functions  (Borrowed this from Trystan :-) )
  **************************************************************************/
 
 
@@ -438,21 +438,21 @@ int new_read_db_entry(char **key, char **value, FILE *fptr) {
 			if (ferror(fptr)) {
 				return DB_READ_ERROR;   /* error! */
 			}
-			return DB_EOF_ERROR;        /* end of file */
-		} else if (character == BLOCKEND) {     /* END OF BLOCK */
+			return DB_EOF_ERROR;		/* end of file */
+		} else if (character == BLOCKEND) {	 /* END OF BLOCK */
 			return DB_READ_BLOCKEND;
-		} else if (character == VALUEEND) {     /* END OF VALUE */
+		} else if (character == VALUEEND) {	 /* END OF VALUE */
 			string[i] = '\0';   /* end of value */
 			return DB_READ_SUCCESS;
-		} else if (character == SEPARATOR) {    /* END OF KEY */
+		} else if (character == SEPARATOR) {	/* END OF KEY */
 			string[i] = '\0';   /* end of key */
-			string = *value;    /* beginning of value */
-			i = 0;              /* start with the first character of our value */
+			string = *value;	/* beginning of value */
+			i = 0;			  /* start with the first character of our value */
 		} else {
 			if ((i == (MAXKEYLEN - 1)) && (string == *key)) {   /* max key length reached, continuing with value */
-				string[i] = '\0';       /* end of key */
-				string = *value;        /* beginning of value */
-				i = 0;          /* start with the first character of our value */
+				string[i] = '\0';	   /* end of key */
+				string = *value;		/* beginning of value */
+				i = 0;		  /* start with the first character of our value */
 			} else if ((i == (MAXVALLEN - 1)) && (string == *value)) {  /* max value length reached, returning */
 				string[i] = '\0';
 				return DB_READ_SUCCESS;

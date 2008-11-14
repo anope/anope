@@ -44,9 +44,9 @@ class CSStatus : public Module
  **/
 void myChanServHelp(User * u)
 {
-    if (is_services_admin(u)) {
-        notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
-    }
+	if (is_services_admin(u)) {
+		notice_lang(s_ChanServ, u, CHAN_HELP_CMD_STATUS);
+	}
 }
 
 /**
@@ -56,35 +56,35 @@ void myChanServHelp(User * u)
  **/
 int do_status(User * u)
 {
-    ChannelInfo *ci;
-    User *u2;
-    char *nick, *chan;
-    char *temp = NULL;
+	ChannelInfo *ci;
+	User *u2;
+	char *nick, *chan;
+	char *temp = NULL;
 
-    chan = strtok(NULL, " ");
-    nick = strtok(NULL, " ");
-    if (!nick || strtok(NULL, " ")) {
-        notice_lang(s_ChanServ, u, CHAN_STATUS_SYNTAX);
-        return MOD_CONT;
-    }
-    if (!(ci = cs_findchan(chan))) {
-        temp = chan;
-        chan = nick;
-        nick = temp;
-        ci = cs_findchan(chan);
-    }
-    if (!ci) {
-        notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
-    } else if (ci->flags & CI_VERBOTEN) {
-        notice_lang(s_ChanServ, u, CHAN_STATUS_FORBIDDEN, chan);
-        return MOD_CONT;
-    } else if ((u2 = finduser(nick)) != NULL) {
-        notice_lang(s_ChanServ, u, CHAN_STATUS_INFO, chan, nick,
-                    get_access(u2, ci));
-    } else {                    /* !u2 */
-        notice_lang(s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
-    }
-    return MOD_CONT;
+	chan = strtok(NULL, " ");
+	nick = strtok(NULL, " ");
+	if (!nick || strtok(NULL, " ")) {
+		notice_lang(s_ChanServ, u, CHAN_STATUS_SYNTAX);
+		return MOD_CONT;
+	}
+	if (!(ci = cs_findchan(chan))) {
+		temp = chan;
+		chan = nick;
+		nick = temp;
+		ci = cs_findchan(chan);
+	}
+	if (!ci) {
+		notice_lang(s_ChanServ, u, CHAN_STATUS_NOT_REGGED, temp);
+	} else if (ci->flags & CI_VERBOTEN) {
+		notice_lang(s_ChanServ, u, CHAN_STATUS_FORBIDDEN, chan);
+		return MOD_CONT;
+	} else if ((u2 = finduser(nick)) != NULL) {
+		notice_lang(s_ChanServ, u, CHAN_STATUS_INFO, chan, nick,
+					get_access(u2, ci));
+	} else {					/* !u2 */
+		notice_lang(s_ChanServ, u, CHAN_STATUS_NOTONLINE, nick);
+	}
+	return MOD_CONT;
 }
 
 MODULE_INIT("cs_status", CSStatus)

@@ -38,7 +38,7 @@ class User
 	char *nickTrack;	/* Nick Tracking 		*/
 	time_t timestamp;	/* Timestamp of the nick 	*/
 	time_t my_signon;	/* When did _we_ see the user?  */
-	uint32 svid;		/* Services ID 			*/
+	time_t svid;		/* Services ID 			*/
 	uint32 mode;		/* See below 			*/
 	char *uid;		/* Univeral ID			*/
 

@@ -531,7 +531,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(ServerName, "SVSHOLD %s %d :%s", nick, NSReleaseTimeout, "Being held for registered user");
+		send_cmd(ServerName, "SVSHOLD %s %ld :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */
@@ -638,7 +638,7 @@ class BahamutIRCdProto : public IRCDProto
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = expires - time(NULL);
 		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, timeleft, who, static_cast<long>(time(NULL)), reason);
+		send_cmd(NULL, "AKILL %s %s %d %s %ld :%s", host, user, (unsigned int)timeleft, who, static_cast<long>(time(NULL)), reason);
 	}
 
 	/* SVSKILL */

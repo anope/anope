@@ -134,7 +134,6 @@ static int encryptionModuleLoaded()
 
 int ModuleManager::LoadModule(const std::string &modname, User * u)
 {
-	int len;
 	const char *err;
 	Module * (*func) (const std::string &);
 	int ret = 0;

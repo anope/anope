@@ -64,7 +64,6 @@ int do_info(User * u)
     if (!query)
         syntax_error(s_BotServ, u, "INFO", BOT_INFO_SYNTAX);
     else if ((bi = findbot(query))) {
-        char buf[BUFSIZE];
         struct tm *tm;
 
         notice_lang(s_BotServ, u, BOT_INFO_BOT_HEADER, bi->nick);

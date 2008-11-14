@@ -480,8 +480,6 @@ int do_levels(User * u)
 
         notice_lang(s_ChanServ, u, CHAN_LEVELS_UNKNOWN, what, s_ChanServ);
     } else if (stricmp(cmd, "LIST") == 0) {
-        int i;
-
         notice_lang(s_ChanServ, u, CHAN_LEVELS_LIST_HEADER, chan);
 
         if (!levelinfo_maxwidth) {

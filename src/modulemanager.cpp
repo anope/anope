@@ -94,42 +94,29 @@ static int moduleCopyFile(const char *name, const char *output)
     return MOD_ERR_OK;
 }
 
-/**
- * Search all loaded modules looking for a protocol module.
- * @return 1 if one is found.
- **/
-static int protocolModuleLoaded()
+static bool IsOneOfModuleTypeLoaded(MODType mt)
 {
-    int idx = 0;
-    ModuleHash *current = NULL;
+	int idx = 0;
+	ModuleHash *current = NULL;
+	int pmods = 0;
+	
+	for (idx = 0; idx != MAX_CMD_HASH; idx++)
+	{
+		for (current = MODULE_HASH[idx]; current; current = current->next)
+		{
+			if (current->m->type == mt)
+				pmods++;
+		}
+	}
 
-    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-        for (current = MODULE_HASH[idx]; current; current = current->next) {
-            if (current->m->type == PROTOCOL) {
-                return 1;
-            }
-        }
-    }
-    return 0;
-}
+	/*
+	 * 2, because module constructors now add modules to the hash.. so 1 (original module)
+	 * and 2 (this module). -- w00t
+	 */
+	if (pmods == 2)
+		return true;
 
-/**
- * Search all loaded modules looking for an encryption module.
- * @ return 1 if one is loaded
- **/
-static int encryptionModuleLoaded()
-{
-    int idx = 0;
-    ModuleHash *current = NULL;
-
-    for (idx = 0; idx != MAX_CMD_HASH; idx++) {
-        for (current = MODULE_HASH[idx]; current; current = current->next) {
-            if (current->m->type == ENCRYPTION) {
-                return 1;
-            }
-        }
-    }
-    return 0;
+	return false;
 }
 
 int ModuleManager::LoadModule(const std::string &modname, User * u)
@@ -218,13 +205,13 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	m->filename = pbuf;
 	m->handle = handle;
 
-	if (m->type == PROTOCOL && protocolModuleLoaded())
+	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
 	{
 		delete m;
 		alog("You cannot load two protocol modules");
 		return MOD_STOP;
 	}
-	else if (m->type == ENCRYPTION && encryptionModuleLoaded())
+	else if (m->type == ENCRYPTION && IsOneOfModuleTypeLoaded(ENCRYPTION))
 	{
 		delete m;
 		alog("You cannot load two encryption modules");

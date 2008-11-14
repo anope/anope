@@ -136,6 +136,8 @@ struct ModuleLang_ {
  */
 CoreExport class Module
 {
+ private:
+	bool permanent;
  public:
 	/** The module name (e.g. os_modload)
 	 */
@@ -176,6 +178,20 @@ CoreExport class Module
 	 * @param type The type to set the module as.
 	 */
 	void SetType(MODType type);
+
+	/** Toggles the permanent flag on a module. If a module is permanent,
+	 * then it may not be unloaded.
+	 *
+	 * Naturally, this setting should be used sparingly!
+	 *
+	 * @param state True if this module should be permanent, false else.
+	 */
+	void SetPermanent(bool state);
+
+	/** Retrieves whether or not a given module is permanent.
+	 * @return true if the module is permanent, false else.
+	 */
+	bool GetPermanent();
 
 	/** Set the modules version info.
 	 * @param version the version of the module

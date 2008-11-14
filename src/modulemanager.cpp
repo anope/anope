@@ -229,7 +229,7 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 	return MOD_ERR_OK;
 }
 
-int ModuleManager::UnloadModule(Module * m, User * u)
+int ModuleManager::UnloadModule(Module *m, User *u)
 {
 	if (!m || !m->handle)
 	{
@@ -238,7 +238,7 @@ int ModuleManager::UnloadModule(Module * m, User * u)
 		return MOD_ERR_PARAMS;
 	}
 
-	if (m->type == PROTOCOL || m->type == ENCRYPTION)
+	if (m->GetPermanent() || m->type == PROTOCOL || m->type == ENCRYPTION)
 	{
 		if (u)
 			notice_lang(s_OperServ, u, OPER_MODULE_NO_UNLOAD);

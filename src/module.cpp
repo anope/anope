@@ -31,6 +31,8 @@ Module::Module(const std::string &mname, const std::string &creator)
 	this->type = THIRD;
 	this->handle = NULL;
 
+	this->permanent = false;
+
 	for (int i = 0; i < NUM_LANGS; i++)
 	{
 		this->lang[i].argc = 0;
@@ -208,6 +210,16 @@ Module::~Module()
 void Module::SetType(MODType ntype)
 {
 	this->type = ntype;
+}
+
+void Module::SetPermanent(bool state)
+{
+	this->permanent = state;
+}
+
+bool Module::GetPermanent()
+{
+	return this->permanent;
 }
 
 void Module::SetVersion(const std::string &nversion)

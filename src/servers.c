@@ -602,7 +602,7 @@ void ts6_uid_increment(unsigned int slot)
     }
 }
 
-char *ts6_uid_retrieve(void)
+const char *ts6_uid_retrieve(void)
 {
 	if (UseTS6 == 0)
 	{

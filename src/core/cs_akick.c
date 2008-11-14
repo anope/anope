@@ -138,7 +138,7 @@ int akick_view(User * u, int index, ChannelInfo * ci, int *sent_header)
         strftime_lang(timebuf, sizeof(timebuf), u,
                       STRFTIME_SHORT_DATE_FORMAT, &tm);
     } else {
-        snprintf(timebuf, sizeof(timebuf), getstring(u->na, UNKNOWN));
+        snprintf(timebuf, sizeof(timebuf), "%s", getstring(u->na, UNKNOWN));
     }
 
     notice_lang(s_ChanServ, u,
@@ -439,7 +439,7 @@ int do_akick(User * u)
 
         /* Special case: is it a number/list?  Only do search if it isn't. */
         if (isdigit(*mask) && strspn(mask, "1234567890,-") == strlen(mask)) {
-            int count, last = -1;
+            int last = -1;
             deleted = process_numlist(mask, &count, akick_del_callback, u,
                                       ci, &last);
             if (!deleted) {
@@ -583,11 +583,9 @@ int do_akick(User * u)
             notice_lang(s_ChanServ, u, CHAN_AKICK_NO_MATCH, chan);
 
     } else if (stricmp(cmd, "ENFORCE") == 0) {
-        Channel *c = findchan(ci->name);
-        struct c_userlist *cu = NULL;
-        struct c_userlist *next;
-        const char *argv[3];
-        int count = 0;
+        c = findchan(ci->name);
+        cu = NULL;
+        count = 0;
 
         if (!c) {
             notice_lang(s_ChanServ, u, CHAN_X_NOT_IN_USE, ci->name);

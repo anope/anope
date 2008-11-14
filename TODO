@@ -15,7 +15,6 @@ Legend:
   [x] Remove buffered loading/unloading, this makes os_modunload perm, but who cares
     [ ] Mark os_modunload permanent.
   [x] Remove 'delayed' loading, this is necessary because of before/after connected to ircd (ircd is before, rest after), I'm sure this can be done better.
-  [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
   [ ] Remove modules_unload_all fini + hack that goes with it
   [+] Remove mod_current_* crap (involves passing Module * around a lot)
     [x] events.c
@@ -23,14 +22,15 @@ Legend:
     [x] commands.c
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
-[x] SendClientIntroduction should take a UID param, rather than generating one(?)
 [+] Clean up protocol
   [x] Fix anope_cmd_* stuff to just use IRCdProto methods directly
   [ ] Fix command parsing (TBD)
+  [x] SendClientIntroduction should take a UID param, rather than generating one(?)
+  [ ] Fix permanent channels (+P) stuff. Currently it tries to parse modes as users, but that's wrong.. this may rely on killing do_sjoin().
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
-  [ ] Fix permanent channels (+P) stuff. Currently it tries to parse modes as users, but that's wrong.. this may rely on killing do_sjoin().
+
 
 1.9.1
 -----
@@ -45,6 +45,8 @@ Legend:
 [ ] burn do_sjoin with fire
 [ ] Seamless fantasy support for all ChanServ commands, instead of requiring bs_fantasy_*
 [ ] HelpServ must die (1.9.1?)
+[ ] Command parser cleanup
+  [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 
 1.9.2
 -----

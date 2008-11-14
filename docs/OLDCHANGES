@@ -1,3 +1,1213 @@
+Anope Version 1.8.0
+-------------------
+10/19 F Updated Anope Credits                                             [ #00]
+
+Provided by Szymek <szymek@adres.pl> - 2008
+10/25 F Updated Polish language file translation.                         [ #00]
+
+Provided by Kein <kein-of@yandex.ru> - 2008
+10/25 F Updated Russian language file translation                         [#959]
+
+Anope Version 1.7.24
+--------------------
+10/14 F Fixed minor error in German language file.                        [#958]
+10/12 F Fixed language error in saset help.                               [ #00]
+10/12 F Fixed MySQL DB routines not storing passwords properly.           [#940]
+10/12 F Fixed OS STATS missing HS and showing disabled clients.           [#956]
+10/19 F Added warning regarding combined use of MySQL and skeleton mode.  [#957] 
+
+Provided by Szymek <szymek@adres.pl> - 2008
+10/14 F Updated Polish language file translation.                         [ #00]
+
+Provided by Han` <Han@mefalcon.org> - 2008
+10/19 F Updated German language file.                                     [ #00]
+
+
+Anope Version 1.7.23b
+--------------------
+10/06 F Fixed issue with encrypted nick databases.                        [ #00]
+
+Anope Version 1.7.23
+--------------------
+10/01 A Added modular database back-end for IGNORE.                       [#948]
+09/18 R Removed password truncating.                                      [ #00]
+09/15 F Dealt with the nss_dns.so.1 issue on freebsd 7.                   [ #00]
+09/23 F Fixed numerous possible buffer overflows in NS and CS.            [ #00]
+09/25 F Fixed UnRestrictSAdmin on Unreal and Inspircd.                    [#942]
+09/25 F Fixed menu not properly removed after uninstall on windows.       [#944]
+09/27 F Fixed a buffer overflow in enc_sha1.                              [#947]
+09/30 F Fixed error in OPER help.                                         [#943]
+09/30 F Fixed OS IGNORE behaviour.                                        [#941]
+09/30 F Fixed error in the SASET help.                                    [#950]
+10/01 F Fixed an error in the OS IGNORE documentation.                    [#948]
+10/01 F Fixed DB routines not storing nick passwords properly.            [#940]
+10/04 F Fixed errors in CS LOGOUT documentation.                          [#941]
+10/04 F Fixed missing optional params in MODLIST help.                    [#951]
+
+Provided by Robin Burchell <w00t@inspircd.org> - 2008
+09/22 F Enabled UMODE functionality for InspIRCd 1.1                      [ #00]
+09/22 F Fix pointer comparison on non-ptr in CS CLEAR.                    [ #00]
+09/23 F Possible buffer overflow in NS/CS REGISTER.                       [ #00]
+09/27 F Incorrect maths in strnrepl(), from atheme/denora.                [ #00]
+
+Anope Version 1.7.22
+--------------------
+01/24 A Added a check for hosts too long in BotServs bots.                [ #00]
+02/12 A Added SUSPENDED to NS LIST keywords.                              [#869]
+02/20 A Added NS SASET LANGUAGE.                                          [#872]
+09/03 A Added CIDR support in channel bans/excepts.                       [#876]
+09/03 A Anope on windows now has advanced startup options.                [#931]
+01/15 F BOT_NOT_ASSIGNED language string error.                           [#828]
+01/15 F listchans now shows if a channel is suspended.                    [#825]
+01/15 F listnicks now shows if a nickname is suspended.                   [#825]
+01/15 F Re-assigned access to OS CHANLIST to Services Opers.              [#827]
+01/24 F Several language errors.                                          [ #00]
+01/26 F Various oddities in moduleAddData().                              [#833]
+01/26 F Various oddities in ChanServ suspend code.                        [#834]
+01/26 F Channel walking for mass modes and restoring topics.              [#835]
+01/26 F Memory leaks in OperServ CLEARMODES.                              [#836]
+01/26 F Check for LogChannel when running with -logchan option.           [#837]
+01/26 F Enough LogChannel checks for bs_say and bs_act with LogBot on.    [#838]
+01/26 F Memory leak and old code in ChanServ CLEAR.                       [#839]
+01/26 F Memory leak in ChanServ LIST.                                     [#840]
+01/26 F Memory leaks in HostServ SETALL.                                  [#841]
+01/26 F Memory leak in ChanServ AKICK.                                    [#842]
+01/26 F Removed broken detection of Windows MCE/Tablet edition.           [#845]
+02/04 F Memleak in botchanmsgs(), botserv.c                               [#850]
+02/04 F Memleak in bs_fantasy_seen.c                                      [#851]
+02/04 F Memleak in bs_fantasy_unban.c                                     [#852]
+02/04 F No variable for NSReleaseTimeout in NICK_RECOVERED message.       [#848]
+02/04 F Added missed NickServ HELP for RESEND command.                    [#847]
+02/05 F Updated config.guess and config.sub from upstream.                [#853]
+02/05 F Various small compiler warnings.                                  [#685]
+02/05 F Updated docs/WIN32.txt.                                           [#846]
+02/05 F Removed bs_fantasy_unban from core modules.                       [#854]
+02/05 F Defcon mode parsing breaking when fed with modes with parameters. [#855]
+02/05 F do_cmode() called without passing TS.                             [#820]
+02/07 F do_sjoin() looking for NULL-nick sometimes with TS6.              [#858]
+02/07 F Oddity in do_cmode().                                             [#859]
+02/07 F findchan() debug messages not being logical.                      [#857]
+02/07 F NickServ replying to SVSNICK command when OperServ must.          [#861]
+02/11 F Fixed configure script so it will complain about args.            [#864]
+02/11 F Fixed memory leak in add_akill().                                 [#868]
+02/11 F Fixed memory leak in cs_akick().                                  [#870]
+02/11 F Added missed debug message when HostServ is disabled.             [#863]
+02/12 F rdb_close() where rdb_open() is used in rdb_dbase() functions.    [#862]
+02/12 F Removed extra loop when parsing defcon modes.                     [#867]
+02/21 F Fixed errors in lang files related to NS SASET LANGUAGE           [#881]
+04/30 F Operators can now also use NickServ INFO ALL.                     [ #00]
+05/12 F install.js now works properly on x64 machines                     [#897]
+05/12 F anope_cmd_notice_ops for unreal now includes source.              [ #00]
+05/12 F moduleNoticeLang() now calls notice_user instead of notice().     [ #00]
+08/11 F Updated os_raw.c to show up as a 3rd party module.                [ #00]
+08/15 F CS OP now correctly works if there is only 1 user in the channel. [#922]
+08/16 F Forbidden channels no longer appear in /list when inhabited.      [#924]
+08/17 F Various InspIRCd issues.                                          [#832]
+08/18 F CS GETKEY response.                                               [#880]
+08/21 F Potential issues caused by not setting SO_REUSEADDR on socket.    [ #00]
+08/28 F Fixed several language & help related errors.                     [#875]
+08/28 F Replaced static count in login/opernews help.                     [#882]
+08/28 F Updated help on ChanServ AKICK.                                   [#879]
+09/01 F Fixed crashbug in cs_access.                                      [#932]
+09/02 F Fixed bug in enc_none in combination with truncated pass.         [#934]
+09/03 F Fixed variables not correctly shown in help.                      [#873]
+09/04 F Rewrote the ignore system to fix several issues.                  [#930]
+09/13 F AKICK now respects the PEACE setting.                             [#935]
+09/13 F Fixed bug in ratbox RESV support.                                 [#937]
+09/14 F Fixed CLEAR not always sending correct modes.                     [#938]
+09/14 F Fixed compile warning in os_clearmodes.c.                         [#939]
+
+Provided by Robin Burchell <w00t@inspircd.org> - 2008
+08/08 F Strict warnings in send.c from comparing address of non-ptr       [ #00]
+08/08 F Removed sa-commands from inspircd protocol support.               [ #00]
+08/24 F InspIRCd FMODE timestamp issue.                                   [#927]
+
+Provided by Christian Schroer <Christian.Schroer@coderschlampe.com> - 2008
+07/20 F Updated Deutch language file.                                     [#892]
+
+Provided by Trystan <trystan@nomadirc.net> - 2008
+02/11 F Last part of memory leak in cs_akick()                            [#870]
+
+Provided by Johno Crawford <johno.crawford@gmail.com> - 2008
+02/08 F x86_64 generating improper SHA1 hash values.                      [#856]
+
+Provided by Jan Milants <jan_renee@msn.com> - 2008
+01/16 F Server traversion with next_server() failed to list all servers.  [#831]
+02/08 F Removed excessive free in ChanServ AKICK code.                    [#849]
+07/20 F make install now runs install routine for modules subdirs also.   [#917]
+07/20 F Fixes weird hs_setall behaviour (memory issues).                  [#916]
+07/20 F DEFCON was akilling ulined servers clients.                       [#899]
+07/20 F Botserv replying with /(null).                                    [#894]
+07/20 F Anope will not limit sessions for ulined servers.                 [#909]
+07/20 F EVENT_BOT_KICK not being send under all circumstances             [#910]
+08/17 F Changes.conf updated with forgotten deleted directives.           [#905]
+
+Provided by Martin J. Green <mail@martinjgreen.me.uk> - 2008
+08/17 A SQLINE and SGLINE support for Hybrid.                             [#887]
+
+Provided by Twitch <mitch@zomgirc.net> - 2008
+08/17 F Warnings in users.c.                                              [#925]
+
+Provided by Hal9000 <hal9000@pimpmylinux.org> - 2008
+04/29 F Potential crash in channels.c.                                    [ #00]
+04/29 F TS handling on incoming FMODE with InspIRCd 1.1.                  [ #00]
+05/20 F Possible crash in new TS handling for InspIRCd 1.1.               [#904]
+
+Anope Version 1.7.21
+--------------------
+12/30 F Grouped root nicks could result in loss of power when using MySQL.[#812]
+01/01 F Databases not being saved on quit caused by connection error.     [#811]
+01/05 F Re-idenficiation after netsplit on InspIRCd.                      [#817]
+01/05 F Founder channelmode (+q) not correctly parsed in FJOIN.           [ #00]
+01/06 F Updated documentation where needed.                               [ #00]
+01/06 F InspIRCD +q and +a prefixes were swapped.                         [ #00]
+01/09 F InspIRCd crash on certain FMODE sends.                            [#821]
+01/12 F Nonsensical data appended to some bans.                           [#824]
+
+Provided by Trystan <trystan@nomadirc.net> - 2008
+01/04 F Detection of Windows Vista and Windows Server 2008.               [#815]
+
+Provided by Jan Milants <jan_renee@msn.com> - 2008
+01/04 F EVENT_ACCESS_DEL being sent with NULL-param when using XOP.       [#816]
+
+Provided by Kein <kein-of@yandex.ru> - 2008
+01/04 A Russian translation for bundled modules.                          [ #00]
+01/04 F Updated Russian language file.                                    [ #00]
+
+Anope Version 1.7.20
+--------------------
+12/28 F Some silly logic errors in anope_event_capab() in inspircd11.c    [ #00]
+12/28 F RSQUIT support for InspIRCd 1.1                                   [#692]
+12/24 F inspircd11 module now uses FMODE instead of MODE                  [#724]
+08/29 A Session limit exceptions now support IP numbers as hostmask.      [#723]
+08/29 A Added InspIRCd11 vIdent support.                                  [#684]
+08/30 A Added support for channel keys to UnrealIRCd 3.2 SVSJOIN command. [#774]
+08/31 A Added hostip member to user_ struct so we can now use users' IPs. [ #00]
+12/03 A Support for MS VC++ 2008 Express.                                 [#802]
+06/15 F Non-existing servers being SQUIT'd when they were juped.          [#726]
+06/15 F Back online notice being sent to juped servers.                   [#726]
+06/15 F Not informing opers a SQUIT for a juped server was received.      [#718]
+06/18 F OperServ MODINFO giving misleading errors.                        [#732]
+07/09 F Various access levels for oper-commands.                          [#729]
+07/09 F GlobalOnCycle notices being sent to Anope itself or juped servers.[#737]
+07/09 F Possible buffer overflow in inspircd10.c                          [#741]
+07/09 F Various compile errors with `make strict`.                        [#743]
+07/14 F No longer displaying commands on add/remove in debug mode 1.      [ #00]
+08/05 F ChanServ access level AUTODEOP works again.                       [#750]
+08/08 F Wrong debug notice when killing people due to the session limit.  [#734]
+08/08 F DefCon modes being re-set after mass-unset when leaving DefCon.   [#727]
+08/11 F CAPAB tokens for InspIRCd 1.1 never parsed.                       [#742]
+08/21 F Updated the WIN32.txt document a bit.                             [ #00]
+08/21 F Re-worded the CHAN_LEVELS_XOP string in en_us.                    [ #00]
+08/27 F Functions firstuser and first_uid now don't collide when used.    [#764]
+08/27 F Is not posible to use CS SET XOP when cs_xop is not loaded.       [#747]
+08/27 F Services administrators and opers can be kicked by ChanServ now.  [#753]
+08/27 F Added missing help for NS CONFIRM.                                [#759]
+08/27 F Fixed typo in English language file.                              [#767]
+08/27 F Protocol for InspIRCd 1.1 now uses SVSHOLD.                       [#683]
+08/28 F Bug when truncating passwords to PASSMAX with enc_none.           [#765]
+08/28 F Bug in PTLink protocol where topic time was not being sent.       [#763]
+08/28 F Automatic displaying of 'Limited to ...' lines in help.           [#729]
+08/28 F We now check required commands existance on inspircd11 protocol.  [#773]
+08/28 F SuperAdmin now always overrules channel founder.                  [#770]
+08/29 F InspIRCD11 protocol now uses SVSJOIN/PART instead of SAJOIN/PART. [#772]
+08/29 F OperServ SGLINE ADD now strips a trailing space from the mask.    [#761]
+08/29 F TS6 UID generation for all supported TS6 IRCDs.                   [#731]
+08/31 F is_excepted() now uses match_userip() also.                       [#778]
+08/31 F Wrong reply when deleting entries by number (akick, badwords)     [#776]
+09/01 F Added a note in WIN32.txt about pre-compiled installers           [# 00]
+09/02 F Created MySQL indexes to decrease load on the database.           [# 00]
+09/05 F Removed Limited to... message from os_akill.c and os_modload.c    [#780]
+09/05 F Removed extra bolded commands in OS HELP SET                      [#781]
+09/08 F User being able to set modes on empty channels without permission.[#703]
+09/09 F Undeclared identifiers in module cleaning code on windows.        [#782]
+09/09 F Missing test to check mysql_config sanity in ./configure.         [#757]
+09/24 F Polish language reported itself as English when switching to it.  [#789]
+09/24 F OperServ HELP OPER showing incorrect access levels.               [#788]
+10/05 F Typo in inspircd11.c checking for m_chgident.so loaded.           [#793]
+10/07 F Segfault on missing required InspIRCd11 modules.                  [#794]
+12/02 F Fixed a typo in en_us.l.                                          [#806]
+12/02 F Fixed a typo in install.js.                                       [#804]
+12/02 F Fixed the protect commands in inspircd11.c.                       [#805]
+12/03 F Unregistered users now have access level 0 instead of -1.         [#796]
+12/03 F Malformed command for InspIRCd 1.1.                               [#797]
+12/03 F Updates to various documentation.                                 [ #00]
+12/15 F Inconsistent use of ACESS events.                                 [#791]
+12/27 F Module error strings were outdated.                               [#810]
+
+Provided by Trystan <trystan@nomadirc.net> - 2007
+08/29 F Module runtime directory not always properly cleaned up.          [#768]
+09/24 F ModuleGetConfigDirective having issues with CRLF line-ends.       [#787]
+
+Provided by nenolod <nenolod@nenolod.net> - 2007
+08/29 F TS6 UID generation for Charybdis.                                 [#731]
+
+Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
+12/28 F Wrong TS sometimes sent in SJOIN.                                 [#685]
+
+Anope Version 1.7.19
+--------------------
+01/01 A Support for InspIRCd 1.1.                                         [ #00]
+01/02 F Issues with both InspIRCd protocol modules.                       [ #00]
+01/02 F Error reporting on LIST commands accepting ranges.                [#622]
+01/02 F ChanServ LIST now searches for '#chan' if only 'chan' is given.   [#622]
+01/06 F Missing backtick in SQL query for saving news items.              [ #00]
+01/06 F Some OperServ commands not respecting OSOpersOnly when disabled.  [#657]
+01/06 F MySQL code not always reporting Services Root flags correctly.    [#659]
+01/10 F Minor syntax error in anoperc.                                    [#665]
+01/10 F CHAN_SYMBOL_REQUIRED claimed one can register local (&) channels. [#666]
+01/10 F BotServ kicks now obeys the channel's SignKick option.            [#663]
+01/15 F Only send PONG during MySQL save when we're not syncing.          [#669]
+01/15 F InspIRCD 1.1 protocol module used windows incompatible strtok_r.  [#667]
+01/22 F Crash during first save when MySQL is enabled.                    [#672]
+03/03 F SAs can no longer move other SAs down to ServicesOpers.           [#690]
+03/03 F We now send out UNKLINE on hybrid when /os akill del is issued.   [#656]
+03/14 F /os modunload dosnt clear moduleData before calling AnopeFini.    [ #00]
+03/18 F DefCon's AKILL will now honor the server's sync flag.             [#643]
+03/18 F Password length checking in some cases was out.                   [ #00]
+04/21 F DefCon did not force DefCon modes while in DefCon mode.           [#661]
+04/21 F Event ACCESS_DEL not sent on mass-deleted in cs_xop.              [#706]
+06/04 F prenick database was not backed up.                               [#713]
+06/04 F Typo in SQL query in rdb.c                                        [#719]
+06/04 F remove_backups() did not check that s_Bot/HostServ != NULL.       [ #00]
+06/09 F NSDefMsg can now only be enabled when UsePrivmsg is enabled.      [#671]
+06/09 F NSDefMsg now controls send behaviour for unregistered users.      [#671]
+
+Provided by Jan Milants <jan_renee@msn.com> - 2007
+04/21 F Array count decremention in the ChanServ access lists.            [#662]
+04/21 F Swapped ACCESS_ADD and ACCESS_CHANGE events in cs_xop.            [#705]
+
+Provided by Jilles Tjoelker <jilles+anope@stack.nl> - 2007
+04/21 F Various Charybdis and TS6 related fixes.                          [#707]
+
+Anope Version 1.7.18
+--------------------
+12/09 A Ability to see if AutoOp is enabled in NickServ INFO displays.    [#621]
+12/12 A EVENT_BOT_KICK and EVENT_BOT_BAN added for modules.               [ #00]
+10/17 F Encryption, users can now pick none, old, md5 or sha1.            [ #00]
+10/18 F MLock support for +c was missing on ultimate3.                    [ #00]
+10/20 F Error message when unable to register due to NSRegDelay.          [#616]
+10/21 F SVSPART sends SVSPART instead of EOB.                             [#617]
+11/02 F HostServ REQUEST module no longer returns MOD_STOP.               [ #00]
+11/02 F AnopeRC sends correct signals.                                    [#623]
+12/07 F BotServ KICK incorrectly reported assigned status of bots.        [#632]
+12/07 F Windows install.js script is now able to check multiple drives.   [#634]
+12/09 F Reviewed and updated all of the MySQL code.                       [ #00]
+12/09 F Langfiles had CHANAKILL instead of CHANKILL in syntax lines.      [#640]
+12/10 F NickServ ALIST not accepting Founder as level param.              [#629]
+12/10 F EVENT_TOPIC_UPDATES was not always sent when it should be.        [#641]
+12/24 F anoperc sends SIGTERM for restart and uses command line params.   [#645]
+12/24 F Nickname changes were not recognised on TS6-based IRCd's.         [#646]
+12/24 F Small typo in CHAN_REGISTER_NONE_CHANNEL.                         [#647]
+12/24 F Display error messages when RDB functions fail.                   [ #00]
+12/27 F ModuleNoticeLang was printf'ing twice.                            [#650]
+12/27 F Module (un)loading was only giving error numbers, not messages.   [#652]
+12/29 F Channel joins logged twice on some IRCd's with debug mode on.     [#651]
+12/29 F Botserv incorrectly attempted to remove bans with BSSmartJoin     [#653]
+
+Anope Version 1.7.17
+--------------------
+10/15 F MySQL detection now checks for valid values from mysql_config.    [ #00]
+10/15 F Correctly compiling mod_version with module options now.          [ #00]
+10/16 F MySQL functions did not always escape all values correctly.       [#612]
+10/16 F Made anoperc restart to accepts arguments like anoperc start.     [#611]
+10/16 F MySQL query debug quoted displayed queries just a tad too much.   [ #00]
+10/16 F MySQL query error in RDB functions.                               [ #00]
+10/17 F Erroneous code caused MySQL to store all passwords as blank.      [#614]
+10/17 F Saving of ttb-data when using MySQL.                              [ #00]
+
+Anope Version 1.7.16
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2006
+09/10 A Added SASET AUTOOP to NickServ to match SET AUTOOP.               [#588]
+09/11 A Added detection in install.js for the latest PlatformSDK.         [#596]
+09/29 A Ability for modules to backup their databases.                    [#604]
+10/07 A IRCDs supporting SVSMODE now have it parsed as MODE.              [#603]
+08/09 F Fixed port checking when using command line switches.             [#575]
+08/14 F Fixed db_mysql_query for better robustness.                       [#585]
+08/27 F Fixed mod_current_module being incorrect resulting in segfault.   [#593]
+09/10 F Issues with make strict for the src/tools dir.                    [#579]
+09/10 F Help for NickServ SET AUTOOP was missing.                         [#587]
+09/10 F Added HOP to the /CS ACCESS error when XOP is enabled.            [#598]
+09/10 F MySQL no longer connects again on each query.                     [#595]
+09/10 F Nick Enforcers can now be whois'd on services.                    [#601]
+09/10 F Corrected valid nick characters for /OS SVSNICK.                  [#599]
+09/17 F Small mistakes in Dutch language file.                            [ #00]
+09/23 F Restarting under Windows now works correctly                      [#589]
+09/25 F Make now works with multiple threads.                             [ #00]
+09/28 F We will now process UnrealIRCd's SVS(2)MODE messages.             [#603]
+09/29 F The 'nmake clean' on Windows now uses 'spotless' instead          [ #00]
+09/29 F Fixed a typo in Makefile.win32                                    [ #00]
+10/07 F BotServ KICK CAPS now only counts alphabetic chars for percentage.[#607]
+10/09 F Removed LANGUAGE from the SASET help in most languages.           [#609]
+
+Provided by Trystan <trystan@nomadirc.net> - 2006
+08/20 F Fixed several compiler warnings.                                  [#586]
+08/20 F Fixed several compiler warnings.                                  [#584]
+08/20 F log.c rewrite.                                                    [#582]
+08/20 F Fixed bsd compier warning.                                        [#578]
+09/10 F Fixed mass compiler warnings on FC5 with make strict.             [#583]
+
+Provided by ThaPrince <jon@vile.com> - 2006
+08/22 F Plexus3 svid_mode3 support fixed.                                 [ #00]
+08/23 F Plexus3 syncing after remote netjoins issue.                      [ #00]
+09/08 F Plexus3 noop support.                                             [ #00]
+
+Anope Version 1.7.15
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2006
+06/14 A Indication in the version string if we're running on win32.       [ #00]
+06/20 A Added support for Visual Studio 2005.                             [#408]
+06/22 A Ability for ircd modules to set extra modes on id.                [ #00]
+06/22 A Support startup flag.                                             [ #00]
+06/21 A Module version check.                                             [ #00]
+06/25 A Optional strict privmsg format.                                   [ #00]
+07/15 A Added BOT_LONG_IDENT for too long idents.                         [#538]
+07/10 A Moved ns_noop into core and assigned an NI_ flag.                 [#423]
+08/06 A Option to modules_unload_all() to say if we should unload proto.  [#552]
+07/22 R Removed clone stuff.                                              [ #00]
+04/08 F Fixed Charybdis support on win32.                                 [#487]
+04/08 F Fixed thread stuff on windows.                                    [#488]
+04/08 F Fixed SGLine stuff on inspircd (not supported).                   [#489]
+04/20 F Fixed index of backtrace().                                       [#499]
+04/29 F Added is_on_chan() check for fantasy kick commands.               [#501]
+05/13 F Fixed memleak in moduleGetConfigDirective().                      [#504]
+05/16 F Suspended nicks and chans won't expire from now on.               [ #00]
+05/25 F NICKIP/NICKv2 support on unreal32.                                [#507]
+05/25 F src/bin/register being too case sensitive on YES.                 [#500]
+05/25 F src/bin/register still said ./configured instead of ./Config .    [ #00]
+05/25 F Q:Line not added for bots when only changing nicks.               [#493]
+06/03 F Removed INTTYPE_WORKAROUND stuff which could cause warnings.      [#509]
+06/03 F Fixed compiler warnings.                                          [#511]
+06/10 F Win32 Makefile for plexus3 support.                               [#520]
+06/11 F Two pointers in modules.c weren't NULL-ified by default.          [ #00]
+06/11 F Updated InspIRCd protocol support module.                         [ #00]
+06/11 F Module Clear Error macro was broken on *BSD.                      [#515]
+06/13 F Walking memory using wrong pointer in moduleGetConfigDirective.   [#516]
+06/13 F Added cleanup code to tools/anopesmtp.                            [#464]
+06/13 F Fixed a lot of redundant function declarations.                   [#510]
+06/14 F Removed last traces of threading support.                         [#498]
+06/14 F Changed mysql detection to use mysql_config.                      [ #00]
+06/15 F OpenBSD Config issue.                                             [#519]
+06/15 F langcomp with _GNU_SOURCES defined.                               [ #00]
+06/16 F Fixed several memleaks in ns_noop.c.                              [ #00]
+06/16 F Fixed typo in function name.                                      [#524]
+06/18 F Removed legacy my_vsnprintf code.                                 [#496]
+06/18 F HOP cannot remove VOPs anymore to be consitent with adding.       [#525]
+06/18 F Moduledata was cleared before calling AnopeFini.                  [#523]
+06/20 F Make does not recompile everything even on no change anymore.     [ #00]
+06/20 F Versions in win32.rc are now updated correctly.                   [#526]
+06/21 F Syntax for NickServ SET MSG showed syntax for SET PRIVATE.        [ #00]
+06/26 F A few small bugs with module configure scripts.                   [ #00]
+07/02 F Fixed readonly stuff on memoserv del.                             [#529]
+07/13 F Fixed socket buffering, hopefully should make inspircd play nice. [ #00]
+07/14 F Removed old HAS_RTLD_LOCAL check.                                 [#541]
+07/20 F Removed bold chars from botserv langauge files.                   [#530]
+07/20 F Fixed win32 versions of db-merger.c and epona2anope.c.            [#536]
+07/20 F db-merger.c and epona2anope.c will now properly delete old dbs.   [ #00]
+08/02 F Fixed very nasty typecast. GCC Hardened should now work.          [#557]
+08/03 F Corrected usermodes for ratbox and shadow.                        [#558]
+08/04 F Various small fixes for Charybdis.                                [#561]
+08/04 F Autovoice for unregistered users works again.                     [#569]
+08/05 F Support for SVSJOIN/SVSPART/SWHOIS in protocol modules.           [#566]
+08/05 F os_info save on unload.                                           [#523]
+08/05 F Externed doValidHost call for modules to use.                     [#570]
+08/05 F Lang files now support %R for use with StrictPrivMsg.             [#565]
+08/06 F Segfault when shuting down anope.                                 [#491]
+08/06 F Fixed typos in cs_appendtopic.c.                                  [#571]
+08/06 F TSMode support for ratbox; TS6 works for ratbox now.              [#563]
+08/07 F Increased langauge buffer size.                                   [#572]
+08/08 F Fixed integer types in db-merger.c.                               [#573]
+
+Provided by ThaPrince <jon@vile.com> - 2006
+05/19 A Plexus 3 support.                                                 [ #00]
+08/07 F Plexus 2/3 updates, registered nick format.                       [ #00]
+06/25 F root/admin/oper mode now honours secure.                          [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2006
+06/15 F NS Resend delay.                                                  [ #00]
+07/02 F Fixed module version stuff.                                       [#531]
+07/14 F Another version fix.                                              [#545]
+07/15 F Fixed max param count for SJOINs.                                 [#549]
+07/15 F Fixed !halfop fantasy stuff.                                      [#534]
+07/25 F Fixed /newmask stuff for ptlink.                                  [#560]
+07/14 A Added anope_cmd_action() and new param for EVENT_PART_CHANNEL.    [#550]
+
+Anope Version 1.7.14
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2006
+02/04 A Events for channel kicks and NickServ logout.                     [ #00]
+03/02 A Added support for TS6 Save (FNC) on ratbox, shadow and charybdis. [#424]
+03/07 F Counting issue in /os stats uplink.                               [#468]
+03/02 F BotServ/HostServ are no longer loaded when they are disabled.     [#440]
+03/01 F Added ircd module support for valid_chan.                         [ #00]
+03/01 F Minor issues in ns_saset.                                         [#455]
+02/13 F Yet anotehr 64bit issue.                                          [ #00]
+01/14 F SGLines will now be removed correctly.                            [ #00]
+01/26 F Export buildStringList() for modules.                             [#425]
+02/11 F Fixed a few memleaks.                                             [#420]
+02/17 F cs_getpass will now unload if encryption is enaled.               [ #00]
+02/19 F Fixed position of EVENT_ACCESS_DEL.                               [ #00]
+03/01 F Fixed ident check on /bs bot change.                              [#463]
+03/01 F Fixed # prefix check on /cs forbid.                               [#461]
+03/01 F Fixed events on /join 0.                                          [#417]
+03/01 F Added NULL checks to add_invite and add_exception.                [#419]
+03/01 F Fixed suspend check on /cs invite.                                [#429]
+03/01 F Fixed memleaks in some protocol files.                            [#434]
+03/01 F Fixed bot check on /bs unassign.                                  [#446]
+03/01 F Fixed wasteful finduser() call in os_oline.c.                     [#457]
+03/01 F Fixed memleak in runDefCon().                                     [#451]
+03/01 F Fixed function type of get_xop_level.                             [#459]
+03/01 F Prevented registration of UnrealIRCd's "local" channels.          [#456]
+03/01 F Fixed bug in moduleNoticeLang().                                  [#421]
+03/01 F Made should_mode_change() extern.                                 [#436]
+03/01 F Made add_ns_timeout() static.                                     [#438]
+03/01 F Fixed memleak in os_mode.c.                                       [#444]
+03/01 F Fixed memleak in do_mass_mode().                                  [#450]
+03/01 F Fixed memleaks in cs_list.c, hs_list.c and ns_list.c.             [#447]
+03/01 F Fixed memleaks in hs_set.c.                                       [#441]
+03/02 F Fixed missing TS6 functionality in channels.c.                    [#418]
+03/02 F Fixed possible overflow in process().                             [#445]
+03/02 F Fixed memleak in do_cmode().                                      [#430]
+03/03 F Rage, Bahamut and Viagra will now use the correct server desc.    [#467]
+03/03 F Fixed botserv's mode behaviour with protect umode.                [#333]
+03/18 F Fixed sstrdup() with NULL argument in cs_akick.c.                 [#460]
+03/18 F Fixed charybdis umodes.                                           [#471]
+03/19 F Fixed a gcc4 compiling issue.                                     [#453]
+03/21 F Fixed bot check on /bs kick.                                      [ #00]
+03/23 F Fixed some obsolete defines.                                      [#390]
+
+Provided by nenolod. <nenolod@nenolod.net> - 2006
+02/03 A Support for Charybdis IRCd.                                       [ #00]
+02/12 F more va_list issues for 64bit platforms.                          [ #00]
+01/15 F va_arg issue on various 64bit platforms.                          [#415]
+
+Provided by illu. <illu@rs2i.net> - 2006
+01/25 F Updated the french language file.                                 [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2006
+03/18 A New icon file for anope win32.                                    [#472]
+03/14 A Anope will now terminate on Win98. Added version check.           [#473]
+03/01 A Clarity on module loading status numbers.                         [#435]
+03/24 F Fixed segfault on /bs change.                                     [#483]
+03/22 F Fixed distclean in all Makefiles.                                 [#481]
+03/19 F Fixed some gcc4 compiling issues.                                 [#453]
+03/18 F Fixed closing of file pointer in langtool.c.                      [#478]
+03/14 F Fixed gcc switches for modules.                                   [#474]
+03/12 F moduleGetLastBuffer() returning NULL on alias and pseudo clients  [#476]
+03/12 F nickIsServices() returns correctly for aliases                    [ #00]
+03/05 F Fixed moduleNoteiceLang() issue.                                  [#469]
+03/01 F Applied ultiamte3 chan sqline patch.                              [#412]
+03/01 F Crash when not giving user for moduleGetLangString.               [#454]
+02/23 F Usermatching possible null arg on sstrdup.                        [ #00]
+02/20 F Fixed some TS6 issues with do_cmode() and do_nick()               [#396]
+02/12 F Double unbanning of in certain conditions.                        [ #00]
+01/25 F va_copy issue for various platforms.                              [ #00]
+
+Provided by ThaPrince <jon@vile.com> - 2006
+02/28 F fantasy kick now honours protected, just like cs versions.        [ #00]
+
+Provided by Brain <brain@inspircd.org> - 2006
+03/01 F Updated inspircd protocol files.                                  [#422]
+
+Provided by Monk <monk@mindforge.org> - 2006
+03/22 U Updated de.l.                                                     [#482]
+
+Anope Version 1.7.13
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+12/26 F Generating language.h failed on certain setups.                   [ #00]
+12/11 F First user on HelpChannel always got +h, even without access.     [#405]
+12/02 F Missing quitmessage when catching unknown signals.                [ #00]
+11/14 F Added a check for nickchars before trying to use them in /os stats[ #00]
+11/08 F Remove tmp modules from runtime folder when we can.               [ #00]
+11/02 F !protect/!deprotect no longer work for a number of ircds.         [#403]
+11/02 F segfault when os modloading a non-existing module.                [ #00]
+11/01 F /os reload - BSFantasyChar was not sstrduped if not defined.      [ #00]
+10/30 F Updated docs/FAQ.                                                 [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2005
+11/19 F find_byuid for ircds which didnt give us a uid.                   [ #00]
+01/22 F Updated config.guess and config.sub                               [ #00]
+
+Provided by Vladimir K. <wawaka@gmail.com> - 2005
+12/11 F Enforcers had incorrect user when only user specified.            [#410]
+
+Provided by Brain <brain@inspircd.org> - 2005
+12/26 A InspIRCd 1.0 Beta 6+ support module to replace old (b3) support.  [ #00]
+
+Anope Version 1.7.12
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+10/01 A Information on uplink server can be displayed via OperServ STATS. [ #00]
+09/29 A Configuration option to change fantasy command prefix character.  [ #00]
+09/28 A Event for fantasy commands triggered without channel access.      [ #00]
+10/25 F Memleaks and not removing tempfiles on failed module loading.     [ #00]
+10/25 F Help response for os random news was using opernews text.         [ #00]
+10/05 F Changed NickLen and BSFantasyChar into recommended and optional.  [ #00]
+10/04 F Added missing hs_request to win32 modules makefile.               [ #00]
+10/03 F Changed error on identical userkeys into a warning.               [ #00]
+10/02 F Added check in OperServ stats to avoid segfault without param.    [ #00]
+10/02 F Numeric 219 didn't give correct letter for STATS u.               [ #00]
+10/02 F ChanServ HOP was available on IRCDs without halfop support.       [ #00]
+10/01 F Placed capab tokens and flags into a table for easier handling.   [ #00]
+10/01 F Capab parsing on hybrid/plexus/ratbox failed.                     [ #00]
+10/01 F Typo in example.conf (DevNullAlias was called DevNullName).       [ #00]
+10/01 F UserKeys gave an error without message when missing.              [ #00]
+09/30 F Stripping fantasy character from fantasy commands.                [ #00]
+09/28 F Made module (un)loading code more friendly for modularized core.  [ #00]
+09/28 F NickServ SASET didn't fill the nick in the 'not registered' line. [ #00]
+
+Provided by Hal9000 <hal9000@pimpmylinux.org> - 2005
+09/28 F Updated Italian language file.                                    [ #00]
+
+Provided by Cloud <cloud@shortcut.game-host.org> - 2005
+09/28 F Updated German translation for cs_appendtopic.                    [ #00]
+
+Anope Version  1.7.11
+---------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+09/01 A Function to retrieve a module language string.                    [ #00]
+08/21 A NickServ SASET to set options on other nicks (split from SET).    [ #00]
+08/10 A New Windows installation files.                                   [ #00]
+07/04 A Warning when running Anope as root (DON'T DO THAT! :)).           [ #00]
+07/01 A Events for channel access/xop updates.                            [ #00]
+06/26 A New module pack module: hs_request.                               [ #00]
+06/03 A Protocol files can now fill mod_current_buffer with custom code.  [#389]
+09/25 F Missing End If in install.vbs.                                    [ #00]
+09/24 F Typo in English language file.                                    [ #00]
+09/21 F Segfault when find_byuid() was called with a NULL argument.       [ #00]
+09/20 F Ident length checking when adding a bot was broken.               [ #00]
+09/20 F No response was giving when trying to load a non-existing module. [ #00]
+09/18 F Last host was not always correctly set to a vHost if applied.     [ #00]
+09/14 F Various issues with handling the version identifiers.             [ #00]
+09/13 F make strict/profile now work for core and protocol files.         [ #00]
+09/13 F Unused variables removed from modules.c.                          [ #00]
+09/11 F Disallow botnicks longer than the net's max nick length.          [ #00]
+09/09 F Giving some more error output when opening a database fails.      [ #00]
+09/04 F Protocol module for plexus called wrong UNSGLINE function.        [ #00]
+08/31 F Help for /os modlist had faulty 'limited to' information.         [ #00]
+08/30 F Changed UserKeys to RECOMMENDED instead of REQUIRED.              [ #00]
+08/29 F Pseudo-clients can now part with no instead of an empty reason.   [ #00]
+08/29 F Memory leak when using mysql to save data.                        [ #00]
+08/29 F Organised docs/FAQ a bit more and slightly restyled it.           [ #00]
+08/25 F Compiler warnings in tools with gcc4.                             [ #00]
+08/21 F Default config location in example.conf was wrong.                [ #00]
+08/10 F Few memleaks in bundled os_info module.                           [ #00]
+08/07 F NS SET sometimes seeing options as nicks.                         [ #00]
+08/05 F Bot max nick length limited by NICKMAX now.                       [ #00]
+07/07 F Typing mistake in module error message.                           [ #00]
+07/07 F Clarified comments for SendmailPath regarding -t option.          [ #00]
+07/02 F Module languages now default to NSDefLanguage, not English.       [ #00]
+07/02 F Various compile warnings when using AMD64.                        [ #00]
+07/01 F Modules will now be properly unloaded on shutdown.                [ #00]
+07/01 F Modules now use a more random filename in the runtime folder.     [#400]
+07/01 F Most core compile warnings when using make strict.                [ #00]
+07/01 F Requesting a -version on startup doesn't require a valid config.  [ #00]
+06/04 F Register script now works again.                                  [#394]
+06/04 F Finishing sync for Ultimate3 was not done correctly.              [#398]
+06/03 F Moved checks for UseTokens, UseTS6, and Numeric.                  [#385]
+06/03 F Load protocol module before launching listnicks/listchans.        [#391]
+05/29 F operserv opernews dispalys the correct help now.                  [#386]
+05/27 F Updated docs/FAQ.                                                 [ #00]
+05/25 F Segfault when clearing non-existing nick '0' from ignore list.    [#383]
+05/25 F Removed a double extern definition of rdb_tag_table.              [#381]
+05/25 F Fixed mydbgen so it sends the pass and installs in the data dir.  [ #00]
+05/25 F Not all nick options were displayed in listnicks.                 [#380]
+
+Provided by Ricardo <ricardoltdb@gmail.com> - 2005
+06/25 A Portugese translation for hs_request.                             [ #00]
+05/30 F Updated Portuguese language file. And bundled modules language.   [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2005
+09/21 F Various fixes in hs_request.                                      [ #00]
+09/21 F NormalizeBuffer() strips CR/LF as well now.                       [ #00]
+09/18 F Removed color codes for tools on win32.                           [ #00]
+09/18 F MySQL detection for win32 in install.vbs had issues.              [ #00]
+09/18 F Memleak when AddAkiller was enabled.                              [ #00]
+09/13 F Reduntant IRCD defines removed.                                   [ #00]
+09/13 F Double Makedile generation.                                       [ #00]
+09/06 F Memory for vHosts/vIdents was not (always) being freed.           [ #00]
+06/04 F Removed ircd-file related code from configure(.in)                [#384]
+
+Provided by DrStein <drstein@anope.org> - 2005
+08/30 A anoperc is now configured by the Config script                    [ #00]
+
+Provided by Hal9000 <hal9000@musichat.net> - 2005
+06/27 A Italian translations for modpack modules.                         [ #00]
+06/25 F Updated Italian language file.                                    [ #00]
+
+Provided by ThaPrince <jon@vile.com> - 2005
+09/06 A SGLINE support for plexus.                                        [ #00]
+09/10 F Sending XLINEs with plexus was broken.                            [ #00]
+09/06 F Missing sources and other minor issues with plexus.               [ #00]
+09/04 F SGLINE/SQLINE for ratbox/plexus/etc needs a valid nick.           [ #00]
+
+Provided by Certus <> - 2005
+09/11 F Took care of an overflow and data corruption.                     [ #00]
+
+Anope Version 1.7.10
+--------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+05/23 F Updated install.vbs to detect SDK paths.                          [ #00]
+05/22 F Removed trailing space for whois output.                          [ #00]
+05/17 F Compiling on solaris and amd64 systems.                           [ #00]
+05/13 F Possible segfault with do_part by using freed memory.             [#379]
+05/13 F Long hosts got cut off when setting topic and host was recorded.  [#377]
+05/12 F NSListOpersOnly works correctly.                                  [#375]
+05/12 F Using variable for EVENT_PART_CHANNEL after freeing it.           [#374]
+05/11 F Unable to make when using an old shell.                           [#369]
+05/10 F AnopeFini was called without mod_current_module_name set.         [#371]
+05/10 F Unidentified users now have level -1 instead of 0 again.          [#372]
+05/09 F Segfault in ns_maxemail when user's email not set.                [ #00]
+05/06 F Compiler warnings when using make strict.                         [ #00]
+05/06 F Segfault in os_clearmodes when chan had invites (+I) set.         [#357]
+05/06 F Identified founders are now logged out if the channel is dropped. [#364]
+05/06 F Founders identified by pass can get founder chanmode again.       [#358]
+05/05 F Segfault in ns_maxemail when passing wrong param count.           [ #00]
+05/05 F ULined servers still got their modes removed with SecureOps on.   [ #00]
+05/05 F Missing access checks when removing modes due to SecureOps.       [#366]
+
+Provided by crazytoon <crazy@anope.org> - 2005
+05/08 A Updated German language file.                                     [ #00]
+05/08 A German translation for all modulepack modules                     [ #00]
+05/08 F Removed "IRCDFILE" from the Makefile's                            [ #00]
+05/10 F Removed BOT LIST from BOT_BOT_SYNTAX                              [ #00]
+
+Provided by Sascha Just <bugs.anope@nmg.own-hero.de> - 2005
+05/13 F Nicer used of fgets, dont free the buffer.                        [#378]
+
+Anope Version 1.7.9
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+05/03 A Dutch translation for all modulepack modules, where needed.       [ #00]
+04/30 A Modulepack with a few useful modules which are loaded by default. [ #00]
+04/30 A Modularized all BotServ fantasy commands.                         [ #00]
+04/30 A Event EVENT_PART_CHANNEL for when users part a channel.           [ #00]
+04/30 A Event EVENT_JOIN_CHANNEL for when users join a channel.           [ #00]
+04/25 A Support for multiple lines in module language texts.              [ #00]
+04/25 A Multi language module support.                                    [ #00]
+04/22 A Option to make OperServ configurable oper-only or not.            [ #00]
+04/21 A Events now accept argc/argv making them more useful/expandable.   [ #00]
+04/20 A Fully modular core now in place, including dynamic help.          [ #00]
+04/16 A Module subfolders now check configure executed if it exists.      [ #00]
+04/14 A Added EVENT_BOT_CMD for !commands in a botserv fantasy channel.   [ #00]
+04/14 A Added EVENT_RELOAD for config reloads.                            [ #00]
+04/13 A moduleGetConfigDirective to allow config files access to the conf.[ #00]
+04/12 A IRCD Protocol Module support.                                     [ #00]
+03/25 A Added nickserv suspend/unsuspend command.                         [ #00]
+03/25 A Added check for UID in anoperc. Stops running as root.            [ #00]
+03/11 A Event for database backups.                                       [ #00]
+03/09 A Documentation on the proxy detector in docs/PROXY.                [ #00]
+03/03 A ShadowIRCD 4.0 beta 7 support added.                              [ #00]
+02/27 A Added multi-file module support.                                  [ #00]
+02/13 A Internal Event support, see EVENTS in the doc folder for help     [ #00]
+02/05 A Support for Unreal 3.2 +I channel mode.                           [ #00]
+02/03 A Merged anope-win32 branch into the main, now Win32 ready.         [ #00]
+05/04 F vHost handling with PTlink was broken in a subtle way.            [#352]
+05/04 F Missing check for valid ChannelInfo in topic handling.            [#363]
+05/04 F Module language texts sometimes being mixed.                      [ #00]
+05/04 F Wrong datatype in the config parser for OSInfoDBName.             [ #00]
+05/03 F Wrong variable checking in anope_event_away().                    [ #00]
+05/02 F Wrong use of anope_cmd_mode() for dreamforge and ultimate2.       [#332]
+05/02 F Usermode +R instead of +Z used for services roots with Ultimate3. [#361]
+05/02 F Getting op if you had access to protect and not op on a channel.  [#355]
+05/01 F Typo in include/extern.h with restore_unsynced_topics.            [#354]
+05/01 F Modes with no arguments where required no longer set with OS mode.[#316]
+05/01 F Update win32 documentation and files so it works again.           [ #00]
+04/30 F Removed newline after BOT_SEEN_UNKNOWN in most languages.         [ #00]
+04/30 F Updated docs/EVENTS for change to argc/argv and new events.       [ #00]
+04/27 F Rob's spelling mistakes. It's language, not langauge!             [ #00]
+04/25 F Displaying help texts with module language system.                [ #00]
+04/24 F Call to sstrdup() with NULL-args if empty topic was set.          [ #00]
+04/24 F Event for topic changes only being sent for registered channels.  [ #00]
+04/24 F Buffer normalization not checking allocated memory for errors.    [ #00]
+04/21 F Updated example modules to use id strings as versions.            [ #00]
+04/21 F Renamed EVENT_BOT_CMD to EVENT_BOT_FANTASY.                       [ #00]
+04/19 F Updated docs/FAQ.                                                 [ #00]
+04/19 F Case sensitive tokens for ircd modules actaully work now.         [ #00]
+04/16 F Events no longer cause a segfault after being modunload-ed.       [ #00]
+04/14 F When setting multiple ops, SecureOps will check each user.        [#342]
+04/12 F Users channel modes are correctly set on join.                    [#342]
+04/11 F Make sure nick isn't in use on nickserv collide.                  [#341]
+04/07 F Added channel names to XOP/ACCESS/AKICK CLEAR                     [#346]
+04/07 F Only users with vHost/vIdent can /hostserv off                    [#351]
+04/01 F Sync state for leaf-servers not updated correctly.                [ #00]
+03/30 F ChanServ now sets topic again when channel is re-created.         [#339]
+03/29 F Changed anoperc script to use kill numerics for compliance.       [ #00]
+03/28 F Moved where GlobalOnCycleUP is located so it now works.           [#336]
+03/28 F Fixed the change display name function to update correct db table.[#337]
+03/28 F Changed the ultimate3 usermode for SRA.                           [#326]
+03/28 F Segfault on joining unregistered channels in some cases.          [#327]
+03/28 F Adding and removing modes are now merged per user while syncing.  [#329]
+03/28 F Modes not being correctly removed from all users.                 [#335]
+03/28 F Topics not always set on channel creation.                        [#334]
+03/26 F stripModePrefix not checking if it was stripping a mode prefix.   [ #00]
+03/26 F Memleak in nickIsServices()                                       [ #00]
+03/22 F Wrong behaviour of /ns update for channel founders.               [#323]
+03/21 F Topics being set too often during bursts.                         [ #00]
+03/16 F Send the correct numeric for a missing MOTD file.                 [#315]
+03/16 F Wrong modes being set in certain cases with SJOIN.                [#320]
+03/14 F Two normalized strings not being freed.                           [#314]
+03/14 F Various minor mistakes (see bugreport for full list).             [#313]
+03/14 F Sync state of servers was not recorded reliable enough.           [ #00]
+03/12 F Services setting already set channel modes.                       [ #00]
+03/12 F Not displaying entrymessage/greets on (re-)sync of uplink anymore.[ #00]
+03/12 F Sync state for uplink server not being set correctly.             [ #00]
+03/11 F EVENT_BOT_ASSIGN now reports channel name instead of bot nick.    [ #00]
+03/08 F Display of real host instead of vhost on alog().                  [ #00]
+03/07 F tolower/toupper compiler errors on Win32.                         [ #00]
+03/06 F Services not remove modes correct in some cases.                  [#308]
+03/06 F Protected Umode users are protected from bans.                    [#311]
+03/05 F Added UPDATE to ns help menu                                      [ #00]
+03/05 F Updated Unreal 3.2 token support.                                 [#310]
+03/03 F Numeric in the config is now a string not an int                  [ #00]
+03/02 F Fixed LogUser message, normalizes the "realname" on nick change.  [#306]
+03/02 F ircd protocol support for owner and admin taken from proto. files.[ #00]
+03/02 F /ns alist output.                                                 [#288]
+02/28 F normalizeBuffer() now strips two digit color codes                [#303]
+02/28 F nickIsServices() no longer alters the buffer                      [#304]
+02/22 F Uninitialized variable in NickServ DROP.                          [ #00]
+02/22 F Remote whois sending incorrect numeric back.                      [#301]
+02/22 F Several OperServ commands not respecting NickServ SET MSG.        [#302]
+02/21 F Updated documentation for one style and small fixes.              [ #00]
+02/13 F nickIsServices() works if format is nick@services                 [ #00]
+02/12 F Win32 builds can now build with encryption                        [ #00]
+02/10 F mod_current_buffer was not set in all possible cases              [#296]
+02/07 F Updated userkey information in example.conf.                      [ #00]
+02/06 F Win32 Module Load Errors.                                         [#294]
+02/05 F Change Ident function did not update the vident.                  [#293]
+01/30 F ChanServ help to reflect the avaiable commands.                   [ #00]
+01/30 F ChanServ used some commands that were not valid on all ircds.     [ #00]
+01/30 F Compiling modules under Mac OSX.                                  [#285]
+03/07 R Removed Proxy Detector from core.                                 [ #00]
+
+Provided by Brain <brain@inspircd.org> - 2005
+04/18 A InspIRCd 1.0 Beta 3 support module.                               [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2005
+04/07 F Win32 now includes SVN revision in version                        [#328]
+03/16 F Shadowircd nick handling and vhost changing                       [#321]
+03/14 R Removed some old irc-services convertor ifdef's                   [#317]
+
+Provided by DrStein <drstein@anope.org> - 2005
+04/07 A NickServ's ALIST won't accept invalid access levels for min_level [ #00]
+03/22 A Compiling extra tools (db-merger, epona2anope)                    [ #00]
+03/17 A Improvements on Config script.                                    [ #00]
+03/17 A OS SET SQL ON shall warn about SQL disabled in services.conf      [ #00]
+03/15 A ChanServ will now include the channel name in SET's responses     [#318]
+05/01 F Fixed small typo in data/example.conf for OSInfoDBName.           [ #00]
+05/01 F Updated modpack ns_noop to fix a few bugs.                        [ #00]
+04/21 F alog() in ns_group wich was storing the wrong suspended nick.     [#343]
+04/21 F NS SUSPEND now uses the same reason for the whole group.          [#343]
+04/12 F Introduction text data file was missing.                          [ #00]
+04/07 F NickServ shall give the correct response to GLIST/ALIST           [#345]
+03/15 F ChanServ's do_getkey() function is now using notice_lang()        [#319]
+03/14 F Updated docs/FAQ.                                                 [#312]
+03/09 F Updated Spanish language file (es.l).                             [ #00]
+
+Provided by Scott 'Simba' Garron <simba@anthrochat.net> - 2005
+03/21 F Identical topics still being re-set if TOPICLOCK on.              [ #00]
+
+Provided by Ricardo <ricardoltdb@gmail.com> - 2005
+03/08 F Updated Portuguese language file.                                 [ #00]
+
+Provided by crazytoon <da.crew@gmx.net> - 2005
+04/07 A Updated German language file.                                     [ #00]
+04/30 F gcc4.0 compiler errors.                                           [ #00]
+04/04 F Installation of mydbgen.                                          [ #00]
+04/04 F SolidIRCd code did not recognize channelmodes +S and +N.          [#331]
+
+Provided by BarkerJr <barkerjr@barkerjr.net> - 2005
+02/05 A Setting and Removal of SQLINEs on forbid of Channels and Nicks.   [ #00]
+
+Provided by nenolod <nenolod@gmail.com> - 2005
+04/07 F Numerous ShadowIRCD fixes                                         [ #00]
+
+Anope Version 1.7.8
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2005
+01/23 A Support for Ratbox IRCD (With and Without TS6).                   [ #00]
+01/23 A Support for TS6 protocol.                                         [ #00]
+01/19 A Add simple smtp client, read the README in src/tools for info.    [ #00]
+01/16 A Support for PTlinks VHOST (NEWMASK) command.                      [ #00]
+01/16 A Ulines Servers are now except from NOJOIN bans.                   [#281]
+01/29 F Fixes help for HS HELP LIST.                                      [#290]
+01/29 F Memoserv rsend issue.                                             [#291]
+01/23 F Fixed u_char warnings under OpenBSD.                              [ #00]
+01/23 F anope_cmd_ctcp() fixed it was setup wrong.                        [ #00]
+01/23 F Checks to make sure Services and Services Alias are not the same  [ #00]
+01/23 F SIGINT now shuts down Anope correctly when running with -nofork.  [ #00]
+01/23 F Attempting to set +h (helper) modes on ircd where there is no +h  [ #00]
+01/23 F Fixed problem when dealing with non-existant user privmsg.        [ #00]
+01/23 F Updated IRCD, FAQ, README to be more current.                     [ #00]
+01/23 F Free's memory on shutdown that is in the User and Channel structs [ #00]
+01/20 F Misplaced MEMO_NO_RSEND_SELF in es.l reordered.                   [ #00]
+01/19 F OperServ HELP does not show commands not usable on that ircd.     [ #25]
+01/16 F Help messages restricted to the right access level.               [#272]
+01/16 F Updated IGNORE system to allow ircops past in all areas.          [#275]
+01/16 F Help for /OS SET IGNORE.                                          [#271]
+01/16 F Updated language files to show the correct vhost character.       [#278]
+01/16 F Disables UseRDB when MysqlSecure is enabled.                      [#276]
+01/16 F BS bots no longer flood resetting modes if its the same mode.     [#263]
+01/16 F IRCops are now except from KillonSQline and KillonSGline.         [#274]
+01/16 F BS Badwords had a false positives if BSCaseSensitive wass enabled [#277]
+01/15 F Updated typo in example.conf.                                     [#279]
+
+Provided by Ricardo <ricardoltdb@gmail.com> - 2005
+01/20 F Completely updated pt.l language file.                            [ #00]
+
+Anope Version 1.7.7
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2004/2005
+01/12 A Added make profile to allow for gprof profileing of anope.        [ #00]
+12/30 A Warnings for NULL values with sstrdup/moduleData.                 [#261]
+12/26 A Services can enforce SGLINE/SQLINE by killing the user on set.    [#245]
+12/25 A Flag to tell if we need to enforce SGlines or not.                [ #00]
+12/02 A Support for other Ulines Servers (NeoStats/SolarStats).           [ #00]
+11/28 A Support for Unreal's version of SVSHOLD.                          [ #00]
+11/28 A /OS SET LIST to list the set options.                             [ #00]
+11/27 A Solid IRCD support (Solid IRCD 3.4.6 or later).                   [ #00]
+11/27 A Exceptions now update if the limit is different.                  [ #00]
+11/27 A Segfaults logged to the services log when DumpCore is disabled.   [ #00]
+11/27 A OperServ SET SQL [on|off] disable/enable SQL during run time.     [ #00]
+11/21 A Opened SGLINE to all ircd that support GEOS bans.                 [ #00]
+11/21 A Opened SZLINE to all ircd that support ZLINE's.                   [ #00]
+11/19 A Added anope_cmd_ctcp() to code API, for sending CTCP messages.    [ #00]
+11/18 A Unable to use registered nicknames as bot nicks from now on.      [ #00]
+11/18 A NSAddAccessOnReg to control access list on registration.          [ #00]
+01/08 F /NS Status always returns 0 for unregisterd nicks like help says  [ #00]
+01/07 F Fixed example.conf syntax mistake.                                [ #00]
+01/06 F Possible crash using memoserv.                                    [#269]
+01/05 F Few updates to Dutch language file (nl.l).                        [ #00]
+01/05 F BotServ's banning would trigger a TSMODE error on a capable IRCd. [ #00]
+01/05 F Not resetting the topic on channel creation with KEEPTOPIC off.   [#267]
+01/04 F Fixed up some alog() messages that were incorrect.                [#266]
+01/01 F Ultimate3 channel modes, which had been defined incorrectly.      [ #00]
+12/31 F Fixed integer overflow error with CS ACCESS/LEVELS.               [#262]
+12/30 F Fixed moduleAddData using an old moduleData as list head.         [#261]
+12/30 F List handling of moduleData was bad on deletion.                  [#261]
+12/30 F Few memleaks with moduleData functions returning early.           [ #00]
+12/30 F Modules can no longer add commands with mod_name set.             [#261]
+12/30 F Catserv now uses moduleAddCommand instead of addCommand.          [#261]
+12/27 F Not freeing memory when a channel got deleted.                    [ #00]
+12/27 F Segfaults with enforcing KillonSGline/KillonSQline.               [#260]
+12/26 F Updated IRCD doc to show all the flags currently in the code.     [ #00]
+12/26 F Fixed segfault with some config options if they are set wrong.    [ #00]
+12/26 F Updated PTLink support to be more in line with the ircd protocol. [ #00]
+12/25 F Fixed up user and channel modes for various ircds.                [ #00]
+12/23 F Several compiler errors under make strict.                        [ #00]
+12/21 F Unsetting away would not trigger checking of memos.               [#258]
+12/21 F Dreamforge compile.                                               [ #00]
+12/21 F Moved global about del of non-existant session inside debug() if. [ #00]
+12/19 F Fixed LogUser messages where the nickip is 0.                     [#253]
+12/19 F Segfault if USERDB enabled and tables don't exist.                [#255]
+12/18 F Now only builds the ircd you selected.                            [ #00]
+12/17 F In some cases READONLY was not respected, and data was saved.     [#244]
+12/17 F Corrected a few mistakes in example.conf.                         [#251]
+12/17 F Wrong column type in tables.sql for nick alias status fiag.       [#248]
+12/17 F listchans and listnicks work under Cygwin.                        [#247]
+12/17 F NickRegDelay no longer accepts negative values.                   [#250]
+12/17 F -is44 option not show if converter not built.                     [#249]
+12/11 F Fixed possible crashbug (NULL-free) in nickserv's delcore().      [ #00]
+12/09 F Hybrid crash on unsetting registration mode.                      [ #00]
+12/09 F BotServ !seen not recognizing founder.                            [#167]
+12/08 F ChanServ ACCESS wrong when dealing negative numbers.              [#240]
+12/06 F Fixed misplaced pointer in moduleAddData().                       [ #00]
+12/06 F Fixed infinite loop with moduleGetData().                         [#239]
+12/05 F CS CLEAR OPS strips +a/+q modes, and uses SVSMODE where possible. [ #00]
+12/05 F Ultimate3 not setting +a on channel admins.                       [ #00]
+12/04 F Cleaned up some memory warnings found with Valgrind.              [ #00]
+12/03 F Unreal 391 TIME replies.                                          [ #00]
+12/03 F CS TOPICLOCK setting a maliformed topic in some cases.            [ #00]
+12/03 F Bahamut support +I channel modes.                                 [ #00]
+12/02 F Ultimate3 botserv bots were getting wrong modes.                  [ #00]
+12/01 F ChanServ AKICK DEL (reordering) (pointed to freed memory).        [ #00]
+12/01 F del_session() warning messages when LimitSessions is disabled.    [ #00]
+11/30 F Fixed ircd->chanmodes (pointed to freed memory).                  [ #00]
+11/28 F NSSecureAdmins now restricts /NS SET EMAIL.                       [#218]
+11/27 F Compiles and Runs under CYGWIN again.                             [ #00]
+11/27 F bot_raw_mode() would cause a TSMODE warning.                      [#234]
+11/27 F do_kill() not removing users from the user list.                  [#222]
+11/27 F Unreal3.2 supports SVSMODE -b on clearing bans.                   [ #00]
+11/27 F Removed +d references from the PTlink protocol file.              [ #00]
+11/23 F Rage 2 updated to support BETA 7.                                 [#226]
+11/23 F PTLink anope_cmd_server() message.                                [ #00]
+11/21 F Fixed session decrease on /NS GHOST.                              [#229]
+11/20 F Disables UseRDB if there is an error during SQL init.             [ #00]
+11/20 F MS CHECK now checks if the nick is forbidden.                     [#225]
+11/20 F Removing Sqline on bot nicks change if the nick was registered.	  [#224]
+11/19 F normalizeBuffer() now strips control character 1.                 [ #00]
+11/19 F CTCP Ping replies when UsePrivmsg is enabled.                     [ #00]
+11/19 F Some config options could overflow strtol().                      [ #00]
+11/19 F Wrong string and missing registered nick check in bot change.     [#221]
+11/16 F NickTracking could allow usage of forbidden nick in some cases.   [ #00]
+
+Provided by DrStein <gacevedo@anope.org> - 2004/2005
+01/03 F Duplicated TOPIC sent, when TOPICLOCK is ON.                      [#265]
+01/03 F If SYMBIOSIS ON, BotServ's bot should be the topic setter.        [#265]
+12/23 A NS STATUS will return your status if no nickname is given.        [ #00]
+12/26 F Error message during SQL init even if UseRDB was disabled.        [ #00]
+12/10 F Extra tab in language files, causing bad answer in !seen.         [#243]
+11/28 F Fixes RSEND oddity.                                               [#237]
+11/26 F Memos sent as notification of receipt can't be cancelled.         [#192]
+11/23 F Moving Services Operators to Services Admins and vice-versa.      [#230]
+11/22 F HelpChan +h mode not being given if status was greater then op.   [#223]
+
+Provided by Jens Hoffrichter <joho@nickstories.de> - 2004
+12/17 F Provides clear message of SUPERADMIN is not enabled.              [#246]
+
+Provided by mitch{Xy} <mitch@bondage.com> - 2004
+12/20 F Removed unclear email text from language files.                   [ #00]
+
+Provided by ThaPrince <jon@vile.com> - 2004/2005
+01/13 A Support for plexus SVSID.                                         [ #00]
+12/25 A Support for Hybrid TBURST.                                        [#259]
+12/21 A Support for Hybrid IRCDs QS (Quit Storm).                         [#256]
+12/20 A Added plexus ircd support.                                        [ #00]
+01/13 F halfop support working for plexus.                                [ #00]
+12/22 F Updated the plexus support.                                       [ #00]
+
+Anope Version 1.7.6
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2004
+10/13 A Added argv[0] as nick for AnopeInit.                              [ #00]
+09/20 A Added RestrictOperNicks as new feature in services.conf.          [ #00]
+09/08 A Removed rand() and ported bsd's arc4random() to fit our needs.    [ #00]
+08/24 A New -l option for am script to list possible selectors.           [ #00]
+10/16 F Fixed RestrictOperNicks for /ns group command.                    [#188]
+10/13 F Type in comments on all src files - yay.                          [ #00]
+10/12 F Code Tidy, fixed some error checking.                             [ #00]
+10/09 F Bug in LogChannel possibly causing segfaults.                     [#176]
+10/03 F Changed UserKeys from uint to long uint.                          [ #00]
+09/21 F An option to explicitly not use mysql is added to Config.         [ #00]
+09/19 F Rewrote the internals of moduleData to save lots of memory.       [ #00]
+09/14 F Protection unsetting now does -a instead of +a.                   [ #00]
+09/12 F Updated Dutch language file.                                      [ #00]
+09/10 F Typo in anope_cmd_relase_svshold function name.                   [ #00]
+09/09 F Fixed bug with uninitialized pointer in check_sqline.             [ #00]
+09/08 F Fixed gcc2 support with multiple C++ style comments.              [ #00]
+08/26 F Fixed spelling stuff in the german langfile.                      [#159]
+08/24 F Compile error with gcc2.                                          [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2004
+10/29 A Added UnRestrictSAdmin to allow use of umode +a.                  [ #00]
+10/23 A Added depricated.h, this will allow old mods to work for now.     [ #00]
+10/23 A Add hook for SJOIN for Unreal future +I support.                  [ #00]
+10/06 A Bahamut's channel mode +j (join throttle).                        [ #00]
+10/05 A Globalized CS/NS STATUS messages.                                 [ #00]
+10/02 A Added NewsCount as new feature in services.conf.                  [ #00]
+08/28 A CSupport for +I channel mode.                                     [ #00]
+08/28 A Complete support for Unreal3.2.                                   [ #00]
+08/28 A New BASE64 general library.                                       [ #00]
+09/07 A Unreal32 channel mode +T support.                                 [ #00]
+09/07 A Ircd CHANMODE now trapped and stored.                             [ #00]
+08/23 A New protocol independent design (aka anope-capab).                [ #00]
+08/28 A New IRCD document for adding new ircd support to new design.      [ #00]
+11/11 F OS CLEARMODES now takes +q/+a.                                    [ #00]
+11/11 F Updated PTlink support.                                           [#211]
+11/06 F Fixed syntax error when NSForceEmail is disabled.                 [ #00]
+11/06 F Fixed using "make" under some BSD systems.                        [ #00]
+11/06 F Chanserv taking modes more than once.                             [ #68]
+10/31 F Fixes configure warning on BSD systems.                           [#160]
+10/30 F Fixed OS CLEARMODE, so the correct messages are sent.             [#207]
+10/30 F Fixed MS INFO using the correct message.                          [#205]
+10/29 F Fixed CS CLEAR MODES not resetting the modes.                     [#182]
+10/29 F Fixed LogUser message, now normalizes the "realname" for display. [#199]
+10/29 F Fixed BS ACT, if the string contained control character 1.        [#193]
+10/27 F Fixed hardcored ircd sqlines from taking out services.            [#133]
+10/27 F Fixed TOPIC timestamp not being read correctly.                   [#196]
+10/24 F Fixed OPNOTICE when doing /CS OP.                                 [#198]
+10/20 F Updated Base64 Lib to fix Unreal NICKIP.                          [ #00]
+10/16 F Fixed BS TTB.                                                     [#185]
+10/16 F RestrictOperNicks is no longer case sensitive.                    [#190]
+10/16 F Fixed tsbuf not being sent on registration.                       [#180]
+10/15 F Fixed OS JUPE.                                                    [#147]
+10/14 F Fixed NickServ Logout.                                            [#180]
+10/14 F Fixed HelpChannel with Unreal.                                    [#180]
+10/09 F Bug in MySQL debug, possibly causing segfaults.                   [#149]
+10/09 F Lots of code clean up to prevent segfaults.                       [ #00]
+10/07 F Fixed TSMODE ircds that don't stay this in their CAPAB.           [ #00]
+10/05 F Cleaned up how OS/CS CLEAR MODES works.                           [ #00]
+09/27 F Verbose message for vident.                                       [#173]
+09/27 F Check and trap for forbidden nicks on HS.                         [#172]
+09/27 F Tracking of IP address for simple checks.                         [#166]
+09/27 F Proper deletion of added NS timeouts.                             [#143]
+09/27 F Partial fix for +a compile error.                                 [#147]
+09/27 F Resolved longstanding NICKIP issue on AKILLs.                     [ #17]
+09/07 F Handling of most Unknown Message from Server commands.            [ #00]
+09/07 F Several Hybrid support fixes and improvements.                    [ #00]
+09/07 F Several Unreal support fixes and improvements.                    [ #00]
+09/07 F Several Ultimate support fixes and improvements.                  [ #00]
+08/28 F Channel registration handling for non chanops.                    [#142]
+08/28 F Protection from accessing unavailable struct data.                [#152]
+08/28 F Rage2 mode +M/+A channel support.                                 [#154]
+08/28 F Rage2 Beta6 support.                                              [#155]
+08/28 F Undefined references on botserv.c upon compilation.               [#156]
+08/28 F Memory leaks taken care of.                                       [#157]
+08/28 F Buffer preparation for vsnprintf() call.                          [#158]
+
+Provided by DrStein <gacevedo@anope.org> - 2004
+11/06 A NS ACCESS LIST reports correctly that the list is empty           [ #00]
+10/05 A CS/NS INFO shows the expire time.                                 [ #00]
+10/05 A NS GLIST shows the expire time.                                   [ #00]
+11/06 F Service Admins can now modify the XOP list			  [#170]
+10/29 F ChanServ XOP reordering fix					  [#187]
+10/29 F ChanServ AKICK reordering fix					  [#201]
+10/29 F ChanServ now requires a more obscure password                     [#202]
+10/27 F MS CHECK to look for the correct sender value.                    [#200]
+10/21 F Updated Spanish language file.                                    [ #00]
+10/15 F More Check and trap for forbidden nicks on HS.                    [#183]
+10/07 F NEWS reordering issue						  [ #00]
+10/05 F NS GLIST allows the owner of the nick to use the nickname param.  [ #00]
+09/17 F Fixed MySQL error, whereby checks are only done if mysql is on.   [ #00]
+09/14 F Fixed /os MODE by joining nested ifs into one.                    [ #00]
+
+Provided by crazytoon <da.crew@gmx.net> - 2004
+10/24 A Updated German language file	                                  [ #00]
+
+Provided by Miles Nordin <carton@Ivy.NET> - 2004
+11/06 F Fixes segfault under NetBSD with channel names using i18n symbols [ #00]
+
+
+Anope Version 1.7.5
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2004
+07/17 A Switched to autoconf for configure script.                        [ #00]
+07/05 A Warning when LocalAddress conflicts with RemoteServer.            [#118]
+06/18 A Added proper Bahamut1.8 support.                                  [ #55]
+08/11 F Proper make distclean to leave source spotless.                   [ #00]
+08/11 F Fixed support for Ultimate, Rage and Viagra.                      [#113]
+08/10 F Fixed previous BotServ buffer fix.                                [#131]
+08/10 F Updated documentation to reflect the changed build process.       [ #00]
+08/07 F configure will be ok if you dont have mysqlclient lib file.       [ #00]
+07/23 F Fixed BotServ buffer.                                             [#131]
+07/22 F Free NSNickTracking when a user quits.                            [#126]
+07/22 F NOOP bug with wildcards.                                          [#115]
+07/22 F Removed RESTRICTED from incorrectly labeled lang file entry.      [#111]
+07/15 F Fixed the bug where /ns release didn't work with UseSVSHOLD.      [#125]
+07/15 F Fixed a tiny memleak in the db routine.                           [ #00]
+07/15 F Updated Dutch language file.                                      [ #00]
+07/14 F Added CHECK to the memoserv help menu.                            [ #00]
+07/12 F Bots will join a channel even for ignored users.                  [ #00]
+07/05 F Global now joins LogChan on startup with hybrid.                  [ #97]
+07/04 F Fixed a bug with m_time.                                          [ #00]
+06/30 F Fixed bug which caused failure in anope crontab script.           [ #00]
+06/28 F Fixed compiling bug with UltimateIRCd3, ViagraIRCd, Rage2IRCd.    [ #00]
+06/26 F Removed TSMODE from usermodes for bahamut.                        [#112]
+06/22 F Changed all strcasecmp's to stricmp's.                            [ #00]
+06/20 F PTLink server support.                                            [ #00]
+
+Provided by Trystan <trystan@nomadirc.net> - 2004
+07/22 A Added VIAGRA support for modes +A and +H.                         [ #99]
+08/17 F Rage2 SNICK event handling.                                       [#128]
+08/17 F Included XOP reference to /CS HELP SET.                           [#139]
+08/17 F French language update.                                           [#146]
+08/17 F Ultimate3 channel modes fixed.                                    [#147]
+08/17 F Ultimate3 configuration defines set properly.                     [#148]
+
+Provided by Janos Kapitany <sarkanyka@cjbchat.hu>
+08/04 A New language file hun.l (Hungarian)                               [ #00]
+
+Provided by Mateusz Szczyrzyca <annihilator@ircnet.pl> - 2004
+08/11 A New language file pl.l (Polish)                                   [ #00]
+
+Anope Version 1.7.4
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2004
+06/16 A More verbose error messages for services.conf checking.           [ #00]
+06/10 A Improved handling of /NS INFO for pseudo-clients.                 [ #98]
+06/07 A Added register script in /bin/ for users to register anope.       [ #00]
+05/27 A Better /OS MODLIST output to include version information.         [ #74]
+05/25 A New /CS CLEAR HOPS for ircd's that support halfops.               [ #72]
+05/24 A New NSNickTracking directive to provide nick tracking.            [ #71]
+05/21 A Auto enforce upon AKICK addition.                                 [ #63]
+05/21 A New file docs/OLDCHANGES contains all change history.             [ #65]
+06/17 F Added SQLINE to NICK() on PTlink.                                 [ #96]
+06/16 F Module support for OpenBSD systems                                [#106]
+06/12 F We check now for valid arguments in ModuleAddData().              [ #90]
+06/12 F Unified kill_user function to handle all ircd protocols.          [#101]
+06/10 F Added check to see if MysqlUser and MysqlName were not null.      [ #92]
+06/09 F Corrected a number of spelling errors in en_us.l.                 [ #94]
+06/09 F Corrected a large number of spelling and typing errors in docs.   [ #87]
+06/09 F Corrected compile warning for Hybrid support.                     [ #93]
+06/06 F Fixed a bug with long NSGuestNickPrefixes.                        [ #00]
+06/04 F Buffer initialization for encrypted MySQL passwords.              [ #86]
+06/04 F Rewrite of del_exception() fixing segfault and memory leak.       [ #78]
+06/04 F MemoServ send limit does no longer apply for services operators.  [ #84]
+06/03 F Reversed pthread library detection order on ./configure script.   [ #67]
+06/02 F Fixed bug where people who set memoserv notify off were notified. [ #79]
+05/30 F HostServ functions no longer called for non VHOST capable ircds.  [ #77]
+05/28 F Fixed botserv bug with HAS_EXCEPTION (chmode +e).                 [ #80]
+05/26 F Repaired /NS GROUP for compiled but disabled MySQL support.       [ #73]
+05/24 F Fixed typo in example.conf.                                       [ #70]
+05/24 F Cleaned up compile errors on older compilers.                     [ #69]
+05/21 F Removed threads.c file.                                           [ #64]
+05/21 F Check for VHOST capable ircd on HostServAlias induction.          [ #56]
+05/21 F Allow /CS SUSPEND on registered channels only.                    [ #54]
+05/21 F Reserved nicks (Q-lined) will be KILLed if taken on induction.    [ #50]
+
+Provided by Trystan <trystan@nomadirc.net> - 2004
+06/10 A User customizable pseudo-client modes.                            [ #99]
+06/17 F GlobalOnCycleMessage checked at startup                           [ #91]
+
+Anope Version 1.7.3
+-------------------
+Provided by Anope Dev. <dev@anope.org> - 2004
+05/16 A make install will now move anoperc to bin, fixed anoperc bug
+05/15 A New standard Changes file format.
+05/15 A BSCaseSensitive directive for a cAsE sEnSiTiVe badword kicker.
+05/14 A Support for +a/-a on PTLink ircd.
+05/02 A New moduleAddData support.
+04/29 A MemoServ command CHECK to check whether a memo has been read.
+04/23 A MemoServ command RSEND to send a memo requesting a receipt.
+04/19 A Console control script bin/anoperc.
+05/03 F Always set the right module name when executing mod_tail commands.
+05/14 F Removed some illegal sizeof(void). Thanks to codemastr.
+05/04 F Badwords kicker to ignore control characters and color codes.
+05/12 F Missing RANDOMNEWS entry on /OS HELP                              [ #40]
+05/14 F HELP LIST and LIST SYNTAX help messages                           [ #53]
+05/14 F Globals containing format characters                              [ #52]
+05/14 F Typo in HostServ help                                             [ #51]
+05/12 F Missing RANDOMNEWS entry on /OS HELP                              [ #40]
+05/12 F xOP management inconsistency                                      [ #38]
+05/11 F Bug with module unload / memo moduleData                          [ #43]
+05/05 F Bug with RDB and empty nickserv greet message                     [ #28]
+05/08 F Segfault on MySQL FORBID                                          [ #14]
+04/22 F ALIST bug when being invoked by systems admins                    [ #20]
+
+Provided by Rage IRCD. <rageircd@users.sourceforge.net> - 2004
+05/11 A Rage2 IRCD support accepted feature request.                      [ #46]
+
+Anope Version 1.7.2
+--------------------
+Provided by Anope Dev. <dev@anope.org>
+2004/04/17 Fixed table.sql usage on mydbgen script (Bug #10)
+2004/04/17 Fixed bug where anope_ns_req was being referenced
+2004/04/17 Added SIGUSR2 signal to Rehash Config and Save DBs
+2004/04/16 Fixed broken password saves to MySQL (Bug #11)
+
+Anope Version 1.7.1
+--------------------
+Provided by Anope Dev. <dev@anope.org>
+2004/04/12 Fixed quoted MD5 password for MySQL use (Bug #11)
+2004/04/11 Fixed table.sql detection on mydbgen script (Bug #10)
+2004/04/09 Fixed segfault due to coreless nicks in MySQL db (Bug #8)
+2004/04/08 Added NickRegDelay. Nicks have to be connected longer than X seconds before a /ns register.
+2004/04/08 Added "is a services root administrator" to /ns info.
+2004/04/08 Added option for SOs and above to hide their services access status in /ns info.
+2004/04/07 Added -help arguement for command line parameters.
+2004/04/04 Added -version argument to return version and build info.
+2004/04/04 Fixed moduleAddCommand for a non-existant service.
+2004/04/01 Added memo2mail and /msg memoserv set notify MAIL/NOMAIL.
+2004/03/31 Fixed MySQL double encryption if using MD5.
+2004/03/31 Implemented MySQL Phase2 (see docs/MYSQL file).
+2004/03/31 Modules can now add Commands/Messages from outside of AnopeInit.
+2004/03/31 Fixed a bug with recersive module callbacks.
+2004/03/30 Added channelname to entrymsg.
+2004/03/28 Fixed tables.sql and removed needless tables.
+2004/03/28 Forked 1.7 development stream.
+
 Anope Version 1.6.0
 --------------------
 Provided by Anope Dev.  <dev@anope.org>

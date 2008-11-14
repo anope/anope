@@ -134,7 +134,7 @@ void ns_init(void)
 
 void nickserv(User * u, char *buf)
 {
-    char *cmd, *s;
+    const char *cmd, *s;
 
     cmd = strtok(buf, " ");
 

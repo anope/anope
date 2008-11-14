@@ -116,8 +116,8 @@ void os_init(void)
 
 void operserv(User * u, char *buf)
 {
-    char *cmd;
-    char *s;
+    const char *cmd;
+    const char *s;
 
     alog("%s: %s: %s", s_OperServ, u->nick, buf);
 
@@ -308,7 +308,6 @@ void load_os_dbase(void)
     }
 
     if (ver >= 7) {
-        uint32 tmp32;
         SAFE(read_int32(&maxusercnt, f));
         SAFE(read_int32(&tmp32, f));
         maxusertime = tmp32;

@@ -50,7 +50,7 @@ void helpserv_init(void)
  */
 void helpserv(User * u, char *buf)
 {
-    char *cmd, *s;
+    const char *cmd, *s;
 
     cmd = strtok(buf, " ");
 

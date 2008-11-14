@@ -262,7 +262,7 @@ void send_bot_channels(User * u, BotInfo * bi)
     }
 
     if (*buf)
-        notice_user(s_BotServ, u, buf);
+        notice_user(s_BotServ, u, "%s", buf);
     return;
 }
 

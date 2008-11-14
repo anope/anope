@@ -512,12 +512,12 @@ int Module::AddEventHook(EvtHook *evh)
 	return status;
 }
 
-int Module::DelEventHandler(const char *name)
+int Module::DelEventHandler(const char *sname)
 {
     EvtMessage *evm;
     int status;
 
-    evm = findEventHandler(EVENT, name);
+    evm = findEventHandler(EVENT, sname);
     if (!evm) {
         return MOD_ERR_NOEXIST;
     }
@@ -529,12 +529,12 @@ int Module::DelEventHandler(const char *name)
     return status;
 }
 
-int Module::DelEventHook(const char *name)
+int Module::DelEventHook(const char *sname)
 {
     EvtHook *evh;
     int status;
 
-    evh = findEventHook(EVENTHOOKS, name);
+    evh = findEventHook(EVENTHOOKS, sname);
     if (!evh) {
         return MOD_ERR_NOEXIST;
     }

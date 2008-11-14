@@ -330,7 +330,7 @@ int do_randomnews(User * u)
 void do_news(User * u, short type)
 {
     int is_servadmin = is_services_admin(u);
-    char *cmd = strtok(NULL, " ");
+    const char *cmd = strtok(NULL, " ");
     const char *type_name;
     int *msgs;
 

@@ -46,7 +46,6 @@ void moduleAddHostServCmds(void)
 void get_hostserv_stats(long *nrec, long *memuse)
 {
     long count = 0, mem = 0;
-    int i;
     HostCore *hc;
 
     for (hc = head; hc; hc = hc->next) {
@@ -89,7 +88,7 @@ void hostserv_init(void)
  */
 void hostserv(User * u, char *buf)
 {
-    char *cmd, *s;
+    const char *cmd, *s;
 
     cmd = strtok(buf, " ");
 
@@ -177,12 +176,12 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
  * @param found If found
  * @return HostCore
  */
-HostCore *findHostCore(HostCore * head, char *nick, bool* found)
+HostCore *findHostCore(HostCore * phead, char *nick, bool* found)
 {
     HostCore *previous, *current;
 
     *found = false;
-    current = head;
+    current = phead;
     previous = current;
 
     if (!nick) {
@@ -201,7 +200,7 @@ HostCore *findHostCore(HostCore * head, char *nick, bool* found)
             current = current->next;
         }
     }
-    if (current == head) {
+    if (current == phead) {
         return NULL;
     } else {
         return previous;
@@ -209,7 +208,7 @@ HostCore *findHostCore(HostCore * head, char *nick, bool* found)
 }
 
 /*************************************************************************/
-HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
+HostCore *insertHostCore(HostCore * phead, HostCore * prev, char *nick,
                          char *vIdent, char *vHost, const char *creator,
                          int32 tmp_time)
 {
@@ -252,8 +251,8 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
         }
         newCore->time = tmp_time;
         if (prev == NULL) {
-            tmp = head;
-            head = newCore;
+            tmp = phead;
+            phead = newCore;
             newCore->next = tmp;
         } else {
             tmp = prev->next;
@@ -261,18 +260,18 @@ HostCore *insertHostCore(HostCore * head, HostCore * prev, char *nick,
             newCore->next = tmp;
         }
     }
-    return head;
+    return phead;
 }
 
 /*************************************************************************/
-HostCore *deleteHostCore(HostCore * head, HostCore * prev)
+HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
 {
 
     HostCore *tmp;
 
     if (prev == NULL) {
-        tmp = head;
-        head = head->next;
+        tmp = phead;
+        phead = phead->next;
     } else {
         tmp = prev->next;
         prev->next = tmp->next;
@@ -284,7 +283,7 @@ HostCore *deleteHostCore(HostCore * head, HostCore * prev)
         free(tmp->vIdent);
     }
     free(tmp);
-    return head;
+    return phead;
 }
 
 /*************************************************************************/

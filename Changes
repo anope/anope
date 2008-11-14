@@ -1,0 +1,8 @@
+Anope Version 1.9.0
+--------------------
+09/27 F Modified compile to use g++
+10/01 F Improve protocol modules support (classes, virtual methods, etc)
+10/11 F Move core services to use BotInfo
+10/12 F Move BotInfo and related methods into a class
+11/01 F Move modules into a class
+

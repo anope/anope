@@ -250,7 +250,7 @@ void send_bot_channels(User * u, BotInfo * bi)
         for (ci = chanlists[i]; ci; ci = ci->next) {
             if (ci->bi == bi) {
                 if (strlen(buf) + strlen(ci->name) > 300) {
-                    notice_user(s_BotServ, u, buf);
+                    notice_user(s_BotServ, u, "%s", buf);
                     *buf = 0;
                     end = buf;
                 }

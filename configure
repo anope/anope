@@ -1260,6 +1260,8 @@ Optional Packages:
  --with-bindir=bindir     Specify the default binary dir for anope
 --with-makebin=run-cc.pl     Specify the default make binary to use
  --with-datadir=datadir   Specify the location of the services data folder
+ --with-optimisation=1|2|3|4|5   Specify the optimisation level
+ --with-debugsym    Include debugging symbols
 
 Some influential environment variables:
   CC          C compiler command
@@ -1693,6 +1695,9 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+
+# Clear out any CFLAGS (cept -g) the os is using, usually -g -O2
+CFLAGS="-g"
 
 # If no bindir, we tell him to run ./Config.
 if test "${with_bindir+set}" != set || test "${with_datadir+set}" != set; then
@@ -4174,7 +4179,6 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 fi
-
 
 
 
@@ -7734,6 +7738,7 @@ fi
 
 
 
+
 # Check whether --with-permissions was given.
 if test "${with_permissions+set}" = set; then
   withval=$with_permissions;
@@ -7798,6 +7803,25 @@ _ACEOF
 fi
 
 
+
+
+
+
+# Check whether --with-optimization was given.
+if test "${with_optimization+set}" = set; then
+  withval=$with_optimization;
+    CFLAGS="$CFLAGS -O$withval"
+
+fi
+
+
+
+# Check whether --with-debugsym was given.
+if test "${with_debugsym+set}" = set; then
+  withval=$with_debugsym;
+    CFLAGS="$CFLAGS -g"
+
+fi
 
 
 
@@ -8913,6 +8937,8 @@ cat <<EOT
 
 $DIS_MODULES
 $DIS_MYSQL
+
+
 
 All done!  Now run "make" (or possibly "gmake") to compile Anope.
 See the INSTALL, README and FAQ files if you have any problems.

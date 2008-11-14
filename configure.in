@@ -11,6 +11,9 @@ dnl codemastr from UnrealIRCD.
 
 AC_INIT
 
+# Clear out any CFLAGS (cept -g) the os is using, usually -g -O2
+CFLAGS="-g"
+
 # If no bindir, we tell him to run ./Config.
 if test "${with_bindir+set}" != set || test "${with_datadir+set}" != set; then
   echo "You might want to run ./Config or provide some parameters to this script."
@@ -140,7 +143,6 @@ AC_SUBST(ANOPELIBS)
 AC_SUBST(LDFLAGS)
 
 AC_CHECK_HEADER(sys/types.h,AC_DEFINE(HAS_SYS_TYPES_H,1,"Has sys/types.h"))
-
 dnl module checking based on Unreal's module checking code
 AC_DEFUN(AC_ENABLE_DYN,
 [
@@ -241,6 +243,7 @@ AC_ARG_WITH(rungroup, [ --with-rungroup=group     Specify the rungroup for anope
     AC_DEFINE_UNQUOTED(RUNGROUP,"$withval","Run group")
     RUNGROUP=$withval
 ])
+
 AC_SUBST(RUNGROUP)
 
 dnl AC_DEFINE_UNQUOTED(MYOSNAME,"`uname -a`","uname")
@@ -271,6 +274,15 @@ AC_ARG_WITH(datadir, [ --with-datadir=datadir   Specify the location of the serv
 AC_SUBST(DATDEST)
 AC_SUBST(MODULE_PATH)
 
+AC_ARG_WITH(optimization, [ --with-optimisation=1|2|3|4|5   Specify the optimisation level], [
+    CFLAGS="$CFLAGS -O$withval"
+])
+
+AC_ARG_WITH(debugsym, [ --with-debugsym    Include debugging symbols], [
+    CFLAGS="$CFLAGS -g"
+])
+
+
 AC_CONFIG_FILES(		\
 	Makefile		\
 	src/bin/anoperc	\
@@ -282,6 +294,8 @@ cat <<EOT
 
 $DIS_MODULES
 $DIS_MYSQL
+
+
 
 All done!  Now run "make" (or possibly "gmake") to compile Anope.
 See the INSTALL, README and FAQ files if you have any problems.

@@ -636,7 +636,7 @@ class CharybdisProto : public IRCDProto
 	{
 		EnforceQlinedNick(nick, NULL);
 		if (UseTS6) {
-			char *uidbuf = ts6_uid_retrieve();
+			const char *uidbuf = ts6_uid_retrieve();
 			send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
 		}
 		else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);

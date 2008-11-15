@@ -284,7 +284,7 @@ E char *AutokillDBName;
 E char *NewsDBName;
 
 E bool  NoBackupOkay;
-E int   StrictPasswords;
+E bool  StrictPasswords;
 E int   BadPassLimit;
 E int   BadPassTimeout;
 E int   UpdateTimeout;

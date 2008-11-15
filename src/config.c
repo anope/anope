@@ -86,7 +86,7 @@ char **HostSetters;
 int HostNumber = 0;			 /* needs to be set to 0 */
 
 bool NoBackupOkay;
-int StrictPasswords;
+bool StrictPasswords;
 int BadPassLimit;
 int BadPassTimeout;
 int UpdateTimeout;
@@ -639,6 +639,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
+		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1386,7 +1387,6 @@ Directive directives[] = {
 	{"GlobalOnCycleMessage",
 	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
 	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
-	{"StrictPasswords", {{PARAM_SET, PARAM_RELOAD, &StrictPasswords}}},
 	{"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
 	{"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
 	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},

@@ -566,7 +566,7 @@ int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
 	// These tags MUST occur and must ONLY occur once in the config file
-	static const char *Once[] = {"serverinfo", "networkinfo", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
+	static const char *Once[] = {"serverinfo", "networkinfo", "options", "nickserv", "chanserv", "memoserv", "helpserv", "operserv", NULL};
 	// These tags can occur ONCE or not at all
 	InitialConfig Values[] = {
 		/* The following comments are from CyberBotX to w00t as examples to use:
@@ -634,6 +634,7 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerInt(&NickLen), DT_INTEGER | DT_NORELOAD, ValidateNickLen},
+		{"options", "encryption", "", new ValueContainerChar(&EncModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1342,7 +1343,6 @@ Directive directives[] = {
 	{"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
 	{"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
 	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-	{"EncModule", {{PARAM_STRING, 0, &EncModule}}},
 	{"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
 	{"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
 	{"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
@@ -1694,8 +1694,6 @@ int read_config(int reload)
 			}
 		}
 	}
-
-	CHECK(EncModule);
 
 	CHECK(UpdateTimeout);
 	CHECK(ExpireTimeout);

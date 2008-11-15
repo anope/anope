@@ -259,7 +259,7 @@ CoreExport class Module
 	 * @return returns MOD_ERR_OK on success
 	 */
 	int DelCommand(CommandHash * cmdTable[], const char *name);
-	
+
 	/**
 	 * Adds a timed callback for the current module.
 	 * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
@@ -272,7 +272,7 @@ CoreExport class Module
 	 * @see moduleDelCallBack
 	 **/
 	int AddCallback(const char *name, time_t when, int (*func) (int argc, char *argv[]), int argc, char **argv);
-					  
+
 	/**
 	 * Allow modules to delete a timed callback by name.
 	 * @param name the name of the callback they wish to delete
@@ -307,10 +307,15 @@ CoreExport class ModuleManager
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static int UnloadModule(Module *m, User * u);
-	
+
 	/** Run all pending module timer callbacks.
 	 */
 	static void RunCallbacks();
+private:
+	/** Call the module_delete function to safely delete the module
+	 * @param m the module to delete
+	 */
+	static void DeleteModule(Module *m);
 };
 
 

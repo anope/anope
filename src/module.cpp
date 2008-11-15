@@ -69,12 +69,6 @@ Module::~Module()
 
 	remove(this->filename.c_str());
 
-	if (this->handle)
-	{
-		if ((ano_modclose(this->handle)) != 0)
-			alog("%s", ano_moderr());
-	}
-
 	int idx;
 	CommandHash *current = NULL;
 	EvtHookHash *ehcurrent = NULL;

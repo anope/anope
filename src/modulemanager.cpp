@@ -93,7 +93,7 @@ static bool IsOneOfModuleTypeLoaded(MODType mt)
 	int idx = 0;
 	ModuleHash *current = NULL;
 	int pmods = 0;
-	
+
 	for (idx = 0; idx != MAX_CMD_HASH; idx++)
 	{
 		for (current = MODULE_HASH[idx]; current; current = current->next)
@@ -201,13 +201,13 @@ int ModuleManager::LoadModule(const std::string &modname, User * u)
 
 	if (m->type == PROTOCOL && IsOneOfModuleTypeLoaded(PROTOCOL))
 	{
-		delete m;
+		DeleteModule(m);
 		alog("You cannot load two protocol modules");
 		return MOD_STOP;
 	}
 	else if (m->type == ENCRYPTION && IsOneOfModuleTypeLoaded(ENCRYPTION))
 	{
-		delete m;
+		DeleteModule(m);
 		alog("You cannot load two encryption modules");
 		return MOD_STOP;
 	}
@@ -245,6 +245,38 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 		notice_lang(s_OperServ, u, OPER_MODULE_UNLOADED, m->name.c_str());
 	}
 
-	delete m;
+	DeleteModule(m);
 	return MOD_ERR_OK;
+}
+
+void ModuleManager::DeleteModule(Module *m)
+{
+	const char *err;
+	void (*destroy_func)(Module *m);
+	void *handle;
+
+	if (!m || !m->handle) /* check m is least possibly valid */
+	{
+		return;
+	}
+
+	handle = m->handle;
+
+	ano_modclearerr();
+	destroy_func = (void(*)(Module *m))ano_modsym(m->handle, "destroy_module");
+	if (destroy_func == NULL && (err = ano_moderr()) != NULL)
+	{
+		alog("No magical destroy function found, chancing delete...");
+		delete m; /* we just have to change they haven't overwrote the delete operator then... */
+	}
+	else
+	{
+		destroy_func(m); /* Let the module delete it self, just in case */
+	}
+
+	if (handle)
+	{
+		if ((ano_modclose(handle)) != 0)
+			alog("%s", ano_moderr());
+	}
 }

@@ -202,15 +202,23 @@ extern int strncasecmp(const char *, const char *, size_t);
 					break; \
 			} \
 			return TRUE; \
+		} \
+		extern "C" DllExport void *destroy_module(y *m) \
+		{ \
+		    delete m; \
 		}
+
 #else
 	#define MODULE_INIT(x, y) \
 		extern "C" DllExport Module *init_module(const std::string &modname, const std::string &creator) \
 		{ \
 			return new y(x, creator); \
+		} \
+		extern "C" DllExport void destroy_module(y *m) \
+		{ \
+			delete m; \
 		}
 #endif
-
 
 /* Miscellaneous definitions. */
 #include "defs.h"

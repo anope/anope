@@ -248,4 +248,3 @@ int ModuleManager::UnloadModule(Module *m, User *u)
 	delete m;
 	return MOD_ERR_OK;
 }
-

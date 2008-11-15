@@ -269,28 +269,29 @@ CoreExport class Module
 CoreExport class ModuleManager
 {
  public:
-	/**
-	 * Load up a list of modules.
+	/** Load up a list of modules.
 	 * @param total_modules The number of modules to load
 	 * @param module_list The list of modules to load
 	 **/
 	static void LoadModuleList(int total_modules, char **module_list);
 
-	/**
-	 * Loads a given module.
+	/** Loads a given module.
 	 * @param m the module to load
 	 * @param u the user who loaded it, NULL for auto-load
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static int LoadModule(const std::string &modname, User * u);
 
-	/**
-	 * Unload the given module.
+	/** Unload the given module.
 	 * @param m the module to unload
 	 * @param u the user who unloaded it
 	 * @return MOD_ERR_OK on success, anything else on fail
 	 */
 	static int UnloadModule(Module *m, User * u);
+	
+	/** Run all pending module timer callbacks.
+	 */
+	static void RunCallbacks();
 };
 
 
@@ -421,9 +422,7 @@ MDE Message *createMessage(const char *name,int (*func)(const char *source, int 
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
-MDE int moduleAddMessage(Message *m, int pos);
 int delMessage(MessageHash *msgTable[], Message *m, const char *mod_name);		/* Del a Message from a msg table */
-MDE int moduleDelMessage(const char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
 
 /*************************************************************************/

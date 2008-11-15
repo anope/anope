@@ -30,6 +30,7 @@
 #include "timeout.h"
 #include "version.h"
 #include "datafiles.h"
+#include "modules.h"
 
 /******** Global variables! ********/
 
@@ -540,7 +541,7 @@ int main(int ac, char **av, char **envp)
 		if (delayed_quit)
 			break;
 
-		moduleCallBackRun();
+		ModuleManager::RunCallbacks();
 
 		waiting = -1;
 		if (t - last_check >= TimeoutCheck) {

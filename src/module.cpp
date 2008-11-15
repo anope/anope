@@ -77,11 +77,9 @@ Module::~Module()
 
 	int idx;
 	CommandHash *current = NULL;
-	MessageHash *mcurrent = NULL;
 	EvtHookHash *ehcurrent = NULL;
 
 	Command *c;
-	Message *msg;
 	EvtHook *eHook;
 	int status = 0;
 
@@ -147,15 +145,6 @@ Module::~Module()
 			for (c = current->c; c; c = c->next) {
 				if ((c->mod_name) && (stricmp(c->mod_name, this->name.c_str()) == 0)) {
 					this->DelCommand(OPERSERV, c->name);
-				}
-			}
-		}
-
-		for (mcurrent = IRCD[idx]; mcurrent; mcurrent = mcurrent->next) {
-			for (msg = mcurrent->m; msg; msg = msg->next) {
-				if ((msg->mod_name)
-					&& (stricmp(msg->mod_name, this->name.c_str()) == 0)) {
-					moduleDelMessage(msg->name);
 				}
 			}
 		}

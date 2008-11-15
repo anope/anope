@@ -294,7 +294,7 @@ int destroyCommand(Command * c)
  * @param pos the position in the cmd call stack to add the command
  * @return MOD_ERR_OK will be returned on success.
  */
-static int internal_addCommand(CommandHash * cmdTable[], Command * c, int pos)
+static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c, int pos)
 {
 	/* We can assume both param's have been checked by this point.. */
 	int index = 0;
@@ -306,9 +306,6 @@ static int internal_addCommand(CommandHash * cmdTable[], Command * c, int pos)
 	if (!cmdTable || !c || (pos < 0 || pos > 2)) {
 		return MOD_ERR_PARAMS;
 	}
-
-	if (mod_current_module_name && !c->mod_name)
-		return MOD_ERR_NO_MOD_NAME;
 
 	index = CMD_HASH(c->name);
 
@@ -416,7 +413,7 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
 	} else
 		c->service = sstrdup("Unknown");
 
-	status = internal_addCommand(cmdTable, c, pos);
+	status = internal_addCommand(this, cmdTable, c, pos);
 	if (status != MOD_ERR_OK)
 	{
 		alog("ERROR! [%d]", status);
@@ -677,59 +674,6 @@ int addCoreMessage(MessageHash * msgTable[], Message * m)
 }
 
 /**
- * Add a module message to the IRCD message hash
- * @param m the Message to add
- * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleAddMessage(Message * m, int pos)
-{
-	int status;
-
-	if (!m) {
-		return MOD_ERR_PARAMS;
-	}
-
-	/* ok, this appears to be a module adding a message from outside of AnopeInit, try to look up its module struct for it */
-	if ((mod_current_module_name) && (!mod_current_module)) {
-		mod_current_module = findModule(mod_current_module_name);
-	}
-
-	if (!mod_current_module) {
-		return MOD_ERR_UNKNOWN;
-	}						   /* shouldnt happen */
-	m->core = 0;
-	if (!m->mod_name) {
-		m->mod_name = sstrdup(mod_current_module->name.c_str());
-	}
-
-	status = addMessage(IRCD, m, pos);
-	return status;
-}
-
-/**
- * remove the given message from the IRCD message hash
- * @param name the name of the message to remove
- * @return MOD_ERR_OK on success, althing else on fail.
- **/
-int moduleDelMessage(const char *name)
-{
-	Message *m;
-	int status;
-
-	if (!mod_current_module) {
-		return MOD_ERR_UNKNOWN;
-	}
-	m = findMessage(IRCD, name);
-	if (!m) {
-		return MOD_ERR_NOEXIST;
-	}
-
-	status = delMessage(IRCD, m, mod_current_module->name.c_str());
-	return status;
-}
-
-/**
  * remove the given message from the given message hash, for the given module
  * @param msgTable which MessageHash we are removing from
  * @param m the Message we want to remove
@@ -884,25 +828,6 @@ int moduleAddCallback(const char *name, time_t when,
 		alog("debug: added module CallBack: [%s] due to execute at %ld",
 			 newcb->name ? newcb->name : "?", (long int) newcb->when);
 	return MOD_ERR_OK;
-}
-
-/**
- * Execute a stored call back
- **/
-void moduleCallBackRun(void)
-{
-	ModuleCallBack *tmp;
-
-	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
-		if (debug)
-			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
-		if (tmp->func) {
-			mod_current_module_name = tmp->owner_name;
-			tmp->func(tmp->argc, tmp->argv);
-			mod_current_module = NULL;
-			moduleCallBackDeleteEntry(NULL);
-		}
-	}
 }
 
 /**
@@ -1837,6 +1762,25 @@ void ModuleRunTimeDirCleanUp(void)
 #endif
 	if (debug) {
 		alog("debug: Module run time directory has been cleaned out");
+	}
+}
+
+/**
+ * Execute a stored call back
+ **/
+void ModuleManager::RunCallbacks()
+{
+	ModuleCallBack *tmp;
+
+	while ((tmp = moduleCallBackHead) && (tmp->when <= time(NULL))) {
+		if (debug)
+			alog("debug: executing callback: %s", tmp->name ? tmp->name : "<unknown>");
+		if (tmp->func) {
+			mod_current_module_name = tmp->owner_name;
+			tmp->func(tmp->argc, tmp->argv);
+			mod_current_module = NULL;
+			moduleCallBackDeleteEntry(NULL);
+		}
 	}
 }
 

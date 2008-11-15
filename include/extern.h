@@ -371,7 +371,7 @@ E char *BSFantasyCharacter;
 
 E bool  HideStatsO;
 E bool  GlobalOnCycle;
-E int   AnonymousGlobal;
+E bool  AnonymousGlobal;
 E char *GlobalOnCycleMessage;
 E char *GlobalOnCycleUP;
 E char **ServicesRoots;

@@ -91,7 +91,7 @@ int BadPassLimit;
 time_t BadPassTimeout;
 time_t UpdateTimeout;
 time_t ExpireTimeout;
-int ReadTimeout;
+time_t ReadTimeout;
 int WarningTimeout;
 int TimeoutCheck;
 int KeepLogs;
@@ -644,6 +644,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
 		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
 		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
+		{"options", "readtimeout", "0", new ValueContainerTime(&ReadTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1374,7 +1375,6 @@ Directive directives[] = {
 	{"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
 	{"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
 	{"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
-	{"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
 	{"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
 					   {PARAM_PORT, 0, &RemotePort2},
 					   {PARAM_STRING, 0, &RemotePassword2}}},
@@ -1701,7 +1701,6 @@ int read_config(int reload)
 		}
 	}
 
-	CHECK(ReadTimeout);
 	CHECK(WarningTimeout);
 	CHECK(TimeoutCheck);
 

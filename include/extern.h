@@ -289,7 +289,7 @@ E int   BadPassLimit;
 E time_t BadPassTimeout;
 E time_t UpdateTimeout;
 E time_t ExpireTimeout;
-E int   ReadTimeout;
+E time_t ReadTimeout;
 E int   WarningTimeout;
 E int   TimeoutCheck;
 E int   KeepLogs;

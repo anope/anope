@@ -171,7 +171,7 @@ char *BSFantasyCharacter;
 bool HideStatsO;
 bool GlobalOnCycle;
 bool AnonymousGlobal;
-int RestrictOperNicks;
+bool RestrictOperNicks;
 char *GlobalOnCycleMessage;
 char *GlobalOnCycleUP;
 static char *ServicesRoot;
@@ -671,6 +671,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "globaloncycleup", "", new ValueContainerChar(&GlobalOnCycleUP), DT_CHARPTR, ValidateGlobalOnCycle},
 		{"options", "anonymousglobal", "no", new ValueContainerBool(&AnonymousGlobal), DT_BOOLEAN, NoValidation},
 		{"options", "nickregdelay", "0", new ValueContainerInt(&NickRegDelay), DT_INTEGER, NoValidation},
+		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1401,7 +1402,6 @@ Directive directives[] = {
 	{"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
 					   {PARAM_PORT, 0, &RemotePort3},
 					   {PARAM_STRING, 0, &RemotePassword3}}},
-	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},

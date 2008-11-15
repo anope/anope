@@ -301,7 +301,7 @@ E bool  DumpCore;
 E bool  LogUsers;
 E int   NickRegDelay;
 E int   UseSVSHOLD;
-E int   RestrictOperNicks;
+E bool  RestrictOperNicks;
 E int   NewsCount;
 E char *Numeric;
 E int   UnRestrictSAdmin;

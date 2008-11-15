@@ -93,7 +93,7 @@ time_t UpdateTimeout;
 time_t ExpireTimeout;
 time_t ReadTimeout;
 time_t WarningTimeout;
-int TimeoutCheck;
+time_t TimeoutCheck;
 int KeepLogs;
 int KeepBackups;
 int ForceForbidReason;
@@ -646,6 +646,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
 		{"options", "readtimeout", "0", new ValueContainerTime(&ReadTimeout), DT_TIME, ValidateNotZero},
 		{"options", "warningtimeout", "0", new ValueContainerTime(&WarningTimeout), DT_TIME, ValidateNotZero},
+		{"options", "timeoutcheck", "0", new ValueContainerTime(&TimeoutCheck), DT_TIME, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1389,7 +1390,6 @@ Directive directives[] = {
 	{"GlobalOnCycleMessage",
 	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
 	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
-	{"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
 	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
 	{"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
@@ -1700,8 +1700,6 @@ int read_config(int reload)
 			}
 		}
 	}
-
-	CHECK(TimeoutCheck);
 
 	if (temp_nsuserhost) {
 		if (!(s = strchr(temp_nsuserhost, '@'))) {

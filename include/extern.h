@@ -291,7 +291,7 @@ E time_t UpdateTimeout;
 E time_t ExpireTimeout;
 E time_t ReadTimeout;
 E time_t WarningTimeout;
-E int   TimeoutCheck;
+E time_t TimeoutCheck;
 E int   KeepLogs;
 E int   KeepBackups;
 E int   ForceForbidReason;

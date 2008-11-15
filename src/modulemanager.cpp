@@ -12,12 +12,6 @@
 #include "language.h"
 #include "version.h"
 
-#if !defined(_WIN32)
-	#include <dlfcn.h>
-#else
-	const char *ano_moderr(void);
-#endif
-
 void ModuleManager::LoadModuleList(int total_modules, char **module_list)
 {
 	int idx;

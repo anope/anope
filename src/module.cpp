@@ -12,12 +12,6 @@
 #include "language.h"
 #include "version.h"
 
-#if !defined(_WIN32)
-	#include <dlfcn.h>
-#else
-	const char *ano_moderr(void);
-#endif
-
 Module::Module(const std::string &mname, const std::string &creator)
 {
 	this->name = mname;				/* Our name */

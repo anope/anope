@@ -15,25 +15,6 @@
 #include "language.h"
 #include "version.h"
 
-#if !defined(_WIN32)
-	#include <dlfcn.h>
-	/* Define these for systems without them */
-	#ifndef RTLD_NOW
-		#define RTLD_NOW 0
-	#endif
-	#ifndef RTLD_LAZY
-		#define RTLD_LAZY RTLD_NOW
-	#endif
-	#ifndef RTLD_GLOBAL
-		#define RTLD_GLOBAL 0
-	#endif
-	#ifndef RTLD_LOCAL
-		#define RTLD_LOCAL 0
-	#endif
-#else
-	const char *ano_moderr(void);
-#endif
-
 /**
  * Declare all the list's we want to use here
  **/

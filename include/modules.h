@@ -69,20 +69,20 @@ typedef void *	ano_module_t;
 /**********************************************************************
  * Module Returns
  **********************************************************************/
- #define MOD_ERR_OK		  0
- #define MOD_ERR_MEMORY	  1
- #define MOD_ERR_PARAMS	  2
- #define MOD_ERR_EXISTS	  3
- #define MOD_ERR_NOEXIST	 4
- #define MOD_ERR_NOUSER	  5
- #define MOD_ERR_NOLOAD	  6
- #define MOD_ERR_NOUNLOAD	7
- #define MOD_ERR_SYNTAX	  8
- #define MOD_ERR_NODELETE	9
- #define MOD_ERR_UNKNOWN	 10
- #define MOD_ERR_FILE_IO	 11
- #define MOD_ERR_NOSERVICE   12
- #define MOD_ERR_NO_MOD_NAME 13
+#define MOD_ERR_OK		  0
+#define MOD_ERR_MEMORY	  1
+#define MOD_ERR_PARAMS	  2
+#define MOD_ERR_EXISTS	  3
+#define MOD_ERR_NOEXIST	 4
+#define MOD_ERR_NOUSER	  5
+#define MOD_ERR_NOLOAD	  6
+#define MOD_ERR_NOUNLOAD	7
+#define MOD_ERR_SYNTAX	  8
+#define MOD_ERR_NODELETE	9
+#define MOD_ERR_UNKNOWN	 10
+#define MOD_ERR_FILE_IO	 11
+#define MOD_ERR_NOSERVICE   12
+#define MOD_ERR_NO_MOD_NAME 13
 
 /*************************************************************************/
 /* Macros to export the Module API functions/variables */
@@ -96,6 +96,25 @@ typedef void *	ano_module_t;
 #endif
 #endif
 /*************************************************************************/
+
+#if !defined(_WIN32)
+	#include <dlfcn.h>
+	/* Define these for systems without them */
+	#ifndef RTLD_NOW
+		#define RTLD_NOW 0
+	#endif
+	#ifndef RTLD_LAZY
+		#define RTLD_LAZY RTLD_NOW
+	#endif
+	#ifndef RTLD_GLOBAL
+		#define RTLD_GLOBAL 0
+	#endif
+	#ifndef RTLD_LOCAL
+		#define RTLD_LOCAL 0
+	#endif
+#else
+	const char *ano_moderr(void);
+#endif
 
 typedef enum { CORE,PROTOCOL,THIRD,SUPPORTED,QATESTED,ENCRYPTION } MODType;
 typedef enum { MOD_OP_LOAD, MOD_OP_UNLOAD } ModuleOperation;

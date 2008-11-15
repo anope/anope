@@ -85,7 +85,7 @@ static char *HostSetter;
 char **HostSetters;
 int HostNumber = 0;			 /* needs to be set to 0 */
 
-int NoBackupOkay;
+bool NoBackupOkay;
 int StrictPasswords;
 int BadPassLimit;
 int BadPassTimeout;
@@ -638,6 +638,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
+		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1371,7 +1372,6 @@ Directive directives[] = {
 	{"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
 	{"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
 	{"NickRegDelay", {{PARAM_POSINT, PARAM_RELOAD, &NickRegDelay}}},
-	{"NoBackupOkay", {{PARAM_SET, PARAM_RELOAD, &NoBackupOkay}}},
 	{"ReadTimeout", {{PARAM_TIME, PARAM_RELOAD, &ReadTimeout}}},
 	{"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
 					   {PARAM_PORT, 0, &RemotePort2},

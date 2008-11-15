@@ -283,7 +283,7 @@ E char *OperDBName;
 E char *AutokillDBName;
 E char *NewsDBName;
 
-E int   NoBackupOkay;
+E bool  NoBackupOkay;
 E int   StrictPasswords;
 E int   BadPassLimit;
 E int   BadPassTimeout;

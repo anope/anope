@@ -20,7 +20,7 @@ struct u_chaninfolist {
 };
 
 /* Online user and channel data. */
-class User
+class User : public Extensible
 {
  public: // XXX: exposing a tiny bit too much
 	User *next, *prev;

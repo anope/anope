@@ -97,7 +97,7 @@ time_t TimeoutCheck;
 int KeepLogs;
 int KeepBackups;
 bool ForceForbidReason;
-int UsePrivmsg;
+bool UsePrivmsg;
 int UseStrictPrivMsg;
 int DumpCore;
 int LogUsers;
@@ -650,6 +650,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "keeplogs", "0", new ValueContainerInt(&KeepLogs), DT_INTEGER, NoValidation},
 		{"options", "keepbackups", "0", new ValueContainerInt(&KeepBackups), DT_INTEGER, NoValidation},
 		{"options", "forceforbidreason", "no", new ValueContainerBool(&ForceForbidReason), DT_BOOLEAN, NoValidation},
+		{"options", "useprivmsg", "no", new ValueContainerBool(&UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1390,7 +1391,6 @@ Directive directives[] = {
 	{"GlobalOnCycleMessage",
 	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
 	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
-	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
 	{"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},

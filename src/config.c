@@ -92,7 +92,7 @@ time_t BadPassTimeout;
 time_t UpdateTimeout;
 time_t ExpireTimeout;
 time_t ReadTimeout;
-int WarningTimeout;
+time_t WarningTimeout;
 int TimeoutCheck;
 int KeepLogs;
 int KeepBackups;
@@ -645,6 +645,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
 		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
 		{"options", "readtimeout", "0", new ValueContainerTime(&ReadTimeout), DT_TIME, ValidateNotZero},
+		{"options", "warningtimeout", "0", new ValueContainerTime(&WarningTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1394,7 +1395,6 @@ Directive directives[] = {
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
-	{"WarningTimeout", {{PARAM_TIME, PARAM_RELOAD, &WarningTimeout}}},
 	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
@@ -1701,7 +1701,6 @@ int read_config(int reload)
 		}
 	}
 
-	CHECK(WarningTimeout);
 	CHECK(TimeoutCheck);
 
 	if (temp_nsuserhost) {

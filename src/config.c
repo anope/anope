@@ -553,6 +553,17 @@ bool ValidateMail(ServerConfig *, const char *tag, const char *value, ValueItem 
 	return true;
 }
 
+bool ValidateGlobalOnCycle(ServerConfig *, const char *tag, const char *value, ValueItem &data)
+{
+	if (GlobalOnCycle) {
+		if (!*data.GetString()) {
+			alog("<%s:%s> was undefined, disabling <options:globaloncycle>", tag, value);
+			GlobalOnCycle = false;
+		}
+	}
+	return true;
+}
+
 void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 {
 	alog("There were errors in your configuration file: %s", errormessage.c_str());
@@ -656,6 +667,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycle", "no", new ValueContainerBool(&GlobalOnCycle), DT_BOOLEAN, NoValidation},
+		{"options", "globaloncycledown", "", new ValueContainerChar(&GlobalOnCycleMessage), DT_CHARPTR, ValidateGlobalOnCycle},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1389,8 +1401,6 @@ Directive directives[] = {
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
 	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
-	{"GlobalOnCycleMessage",
-	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
 	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
@@ -1906,8 +1916,8 @@ int read_config(int reload)
 	}
 
 	if (GlobalOnCycle) {
-		if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
-			alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
+		if (!GlobalOnCycleUP) {
+			alog("GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
 			GlobalOnCycle = false;
 		}
 	}

@@ -89,7 +89,7 @@ bool NoBackupOkay;
 bool StrictPasswords;
 int BadPassLimit;
 time_t BadPassTimeout;
-int UpdateTimeout;
+time_t UpdateTimeout;
 int ExpireTimeout;
 int ReadTimeout;
 int WarningTimeout;
@@ -642,6 +642,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
 		{"options", "badpasslimit", "0", new ValueContainerInt(&BadPassLimit), DT_INTEGER, NoValidation},
 		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
+		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1388,7 +1389,6 @@ Directive directives[] = {
 	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
 	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
 	{"TimeoutCheck", {{PARAM_TIME, PARAM_RELOAD, &TimeoutCheck}}},
-	{"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
 	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
 	{"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
@@ -1701,7 +1701,6 @@ int read_config(int reload)
 		}
 	}
 
-	CHECK(UpdateTimeout);
 	CHECK(ExpireTimeout);
 	CHECK(ReadTimeout);
 	CHECK(WarningTimeout);

@@ -28,6 +28,7 @@ Legend:
   [ ] Fix command parsing (TBD)
   [x] SendClientIntroduction should take a UID param, rather than generating one(?)
   [ ] Fix permanent channels (+P) stuff. Currently it tries to parse modes as users, but that's wrong.. this may rely on killing do_sjoin().
+  [ ] Remove UnRestrictSAdmin, UseTS6, UseSVSHOLD
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support

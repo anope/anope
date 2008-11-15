@@ -296,7 +296,7 @@ E int   KeepLogs;
 E int   KeepBackups;
 E bool  ForceForbidReason;
 E bool  UsePrivmsg;
-E int   UseStrictPrivMsg;
+E bool  UseStrictPrivMsg;
 E int   DumpCore;
 E int   LogUsers;
 E int   NickRegDelay;

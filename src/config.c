@@ -1050,8 +1050,17 @@ bool ServerConfig::LoadConf(ConfigDataHash &target, const char *filename, std::o
 					return false;
 				}
 				if (!wordbuffer.empty() || !itemname.empty()) {
-					errorstream << "Unexpected end of section: " << filename << ":" << linenumber << std::endl;
-					return false;
+					// this will allow for the construct:  section { key = value }
+					// but will not allow for anything else, such as:  section { key = value; key = value }
+					if (!sectiondata.empty()) {
+						errorstream << "Unexpected end of section: " << filename << ":" << linenumber << std::endl;
+						return false;
+					}
+					// this is the same as the below section for testing if itemname is non-empty after the loop, but done inside it to allow the above construct
+					if (debug) alog("ln %d EOL: s='%s' '%s' set to '%s'", linenumber, section.c_str(), itemname.c_str(), wordbuffer.c_str());
+					sectiondata.push_back(KeyVal(itemname, wordbuffer));
+					wordbuffer.clear();
+					itemname.clear();
 				}
 				target.insert(std::pair<std::string, KeyValList>(section, sectiondata));
 				section.clear();

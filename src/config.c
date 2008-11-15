@@ -169,7 +169,7 @@ bool BSCaseSensitive;
 char *BSFantasyCharacter;
 
 bool HideStatsO;
-int GlobalOnCycle;
+bool GlobalOnCycle;
 int AnonymousGlobal;
 int RestrictOperNicks;
 char *GlobalOnCycleMessage;
@@ -655,6 +655,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "dumpcore", "no", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
 		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
+		{"options", "globaloncycle", "no", new ValueContainerBool(&GlobalOnCycle), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1387,7 +1388,6 @@ Directive directives[] = {
 					   {PARAM_PORT, 0, &RemotePort3},
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-	{"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
 	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
 	{"GlobalOnCycleMessage",
 	 {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleMessage}}},
@@ -1908,7 +1908,7 @@ int read_config(int reload)
 	if (GlobalOnCycle) {
 		if (!GlobalOnCycleMessage && !GlobalOnCycleUP) {
 			alog("GlobalOnCycleMessage and GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
-			GlobalOnCycle = 0;
+			GlobalOnCycle = false;
 		}
 	}
 

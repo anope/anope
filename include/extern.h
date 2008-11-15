@@ -370,7 +370,7 @@ E bool  BSCaseSensitive;
 E char *BSFantasyCharacter;
 
 E bool  HideStatsO;
-E int   GlobalOnCycle;
+E bool  GlobalOnCycle;
 E int   AnonymousGlobal;
 E char *GlobalOnCycleMessage;
 E char *GlobalOnCycleUP;

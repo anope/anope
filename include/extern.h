@@ -453,7 +453,6 @@ E char *ExceptionDBName;
 E char *SessionLimitDetailsLoc;
 E char *SessionLimitExceeded;
 
-E char *UlineServers;
 E char **Ulines;
 E int NumUlines;
 

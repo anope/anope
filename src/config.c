@@ -296,7 +296,7 @@ char *Numeric;
 
 int UnRestrictSAdmin;
 
-char *UlineServers;
+static char *UlineServers;
 char **Ulines;
 int NumUlines;
 
@@ -673,6 +673,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "nickregdelay", "0", new ValueContainerInt(&NickRegDelay), DT_INTEGER, NoValidation},
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
 		{"options", "newscount", "3", new ValueContainerInt(&NewsCount), DT_INTEGER, NoValidation},
+		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1405,7 +1406,6 @@ Directive directives[] = {
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
-	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
 /*************************************************************************/

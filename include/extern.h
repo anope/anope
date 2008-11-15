@@ -294,7 +294,7 @@ E time_t WarningTimeout;
 E time_t TimeoutCheck;
 E int   KeepLogs;
 E int   KeepBackups;
-E int   ForceForbidReason;
+E bool  ForceForbidReason;
 E int   UsePrivmsg;
 E int   UseStrictPrivMsg;
 E int   DumpCore;

@@ -20,6 +20,7 @@ Legend:
     [x] events.c
     [ ] modules.c
     [x] commands.c
+  [x] Redo moduleAdd|Get|Remove data to use class Extensible, etc.
 [+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
 [+] Clean up protocol
@@ -62,15 +63,6 @@ Future
 ------
 [ ] way for one module to depend on another... not like 2 MOD_HEADs and it being unpredictable which is loaded first..
 	the MOD_HEAD MOD_TAIL allows for too few combinations (interface code of insp, hooks code of insp?)
-[ ] A way for one module to interact with another.. moduleGetData() only works for current module..
-	moduleGetData() needs to die in a fire.
-
-	We should replace this with proper inheritance of a class MetadataObject, which allows Shrink(), Extend(), GetExt().
-	We may also wish to add additional methods for laziness (ShrinkString(), ExtendString(), GetExt()), as most of the use
-	of metadata is strings, but not all.
-
-	This also allows modules to tie whatever data they want onto any object.
-
 [ ] generic database routines modules can use to create their own database
 [ ] generic way to check which modes a user has set (u->HasUmode(UMODE_OPER))
 ? [ ] a way for a module to queue itself (or even another module) for unloading

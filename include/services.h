@@ -1281,7 +1281,7 @@ private:
 		}
 	public:
 
-		virtual ~IRCDProto();
+		virtual ~IRCDProto() { }
 
 		virtual void SendSVSNOOP(const char *, int) { }
 		virtual void SendAkillDel(const char *, const char *) = 0;

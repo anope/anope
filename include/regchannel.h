@@ -90,3 +90,4 @@ class ChannelInfo : public Extensible
 	int16 floodlines, floodsecs;	/* For FLOOD kicker */
 	int16 repeattimes;				/* For REPEAT kicker */
 };
+

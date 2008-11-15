@@ -428,11 +428,11 @@ int do_resend(User * u)
 	if (NSEmailReg) {
 		if ((nr = findrequestnick(u->nick))) {
 			if (time(NULL) < nr->lastmail + NSResendDelay) {
-			   return MOD_CONT;
-			} else {
-				nr->lastmail = time(NULL);
+			    notice_lang(s_NickServ, u, MAIL_LATER);
+			    return MOD_CONT;
 			}
 			if (do_sendregmail(u, nr) == 0) {
+				nr->lastmail = time(NULL);
 				notice_lang(s_NickServ, u, NICK_REG_RESENT, nr->email);
 				alog("%s: re-sent registration verification code for %s to %s", s_NickServ, nr->nick, nr->email);
 			} else {

@@ -30,15 +30,16 @@
 MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
 					   char *service)
 {
+	int timeToWait = 0;
 	if (!u || !nr || !subject || !service) {
 		return NULL;
 	}
 
 	if (!UseMail) {
 		notice_lang(service, u, MAIL_DISABLED);
-	} else if ((time(NULL) - u->lastmail < MailDelay)
-			   || (time(NULL) - nr->lastmail < MailDelay)) {
-		notice_lang(service, u, MAIL_DELAYED, MailDelay);
+	} else if ((time(NULL) - u->lastmail < MailDelay)) {
+	    timeToWait = MailDelay - (time(NULL) - u->lastmail);
+		notice_lang(service, u, MAIL_DELAYED, timeToWait);
 	} else if (!nr->email) {
 		notice_lang(service, u, MAIL_INVALID, nr->nick);
 	} else {

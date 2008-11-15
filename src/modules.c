@@ -38,116 +38,24 @@ ModuleCallBack *moduleCallBackHead = NULL;
 char *ModuleGetErrStr(int status)
 {
 	const char *module_err_str[] = {
-		"Module, Okay - No Error",											 /* MOD_ERR_OK */
-		"Module Error, Allocating memory",									 /* MOD_ERR_MEMORY */
-		"Module Error, Not enough parameters",								 /* MOD_ERR_PARAMS */
-		"Module Error, Already loaded",										/* MOD_ERR_EXISTS */
-		"Module Error, File does not exist",								   /* MOD_ERR_NOEXIST */
-		"Module Error, No User",											   /* MOD_ERR_NOUSER */
+		"Module, Okay - No Error",						/* MOD_ERR_OK */
+		"Module Error, Allocating memory",					/* MOD_ERR_MEMORY */
+		"Module Error, Not enough parameters",					/* MOD_ERR_PARAMS */
+		"Module Error, Already loaded",						/* MOD_ERR_EXISTS */
+		"Module Error, File does not exist",					/* MOD_ERR_NOEXIST */
+		"Module Error, No User",						/* MOD_ERR_NOUSER */
 		"Module Error, Error during load time or module returned MOD_STOP",	/* MOD_ERR_NOLOAD */
-		"Module Error, Unable to unload",									  /* MOD_ERR_NOUNLOAD */
-		"Module Error, Incorrect syntax",									  /* MOD_ERR_SYNTAX */
-		"Module Error, Unable to delete",									  /* MOD_ERR_NODELETE */
-		"Module Error, Unknown Error occuried",								/* MOD_ERR_UNKOWN */
-		"Module Error, File I/O Error",										/* MOD_ERR_FILE_IO */
-		"Module Error, No Service found for request",						  /* MOD_ERR_NOSERVICE */
-		"Module Error, No module name for request"							 /* MOD_ERR_NO_MOD_NAME */
+		"Module Error, Unable to unload",					/* MOD_ERR_NOUNLOAD */
+		"Module Error, Incorrect syntax",					/* MOD_ERR_SYNTAX */
+		"Module Error, Unable to delete",					/* MOD_ERR_NODELETE */
+		"Module Error, Unknown Error occuried",					/* MOD_ERR_UNKOWN */
+		"Module Error, File I/O Error",						/* MOD_ERR_FILE_IO */
+		"Module Error, No Service found for request",				/* MOD_ERR_NOSERVICE */
+		"Module Error, No module name for request"				/* MOD_ERR_NO_MOD_NAME */
 	};
 	return (char *) module_err_str[status];
 }
 
-
-/************************************************/
-
-/** XXX. What's all this do, is it necessary? (gdb can do this shit.)
- */
-
-/**
- * Output the command stack into the log files.
- * This will print the call-stack for a given command into the log files, very useful for debugging.
- * @param c the command struct to print
- * @return 0 is returned, it has no relevence yet :)
- */
-static int displayCommand(Command * c)
-{
-	Command *cmd = NULL;
-	int i = 0;
-	alog("Displaying command list for %s", c->name);
-	for (cmd = c; cmd; cmd = cmd->next) {
-		alog("%d:  0x%p", ++i, (void *) cmd);
-	}
-	alog("end");
-	return 0;
-}
-
-/**
- * Output the command stack into the log files.
- * This will print the call-stack for a given command into the log files, very useful for debugging.
- * @param cmdTable the command table to read from
- * @param name the name of the command to print
- * @return 0 is returned, it has no relevence yet :)
- */
-static int displayCommandFromHash(CommandHash * cmdTable[], const char *name)
-{
-	CommandHash *current = NULL;
-	int index = 0;
-	index = CMD_HASH(name);
-	if (debug > 1) {
-		alog("debug: trying to display command %s", name);
-	}
-	for (current = cmdTable[index]; current; current = current->next) {
-		if (stricmp(name, current->name) == 0) {
-			displayCommand(current->c);
-		}
-	}
-	if (debug > 1) {
-		alog("debug: done displaying command %s", name);
-	}
-	return 0;
-}
-
-/**
- * Displays a message list for a given message.
- * Again this is of little use other than debugging.
- * @param m the message to display
- * @return 0 is returned and has no meaning
- */
-static int displayMessage(Message * m)
-{
-	Message *msg = NULL;
-	int i = 0;
-	alog("Displaying message list for %s", m->name);
-	for (msg = m; msg; msg = msg->next) {
-		alog("%d: 0x%p", ++i, (void *) msg);
-	}
-	alog("end");
-	return 0;
-}
-
-/**
- * Display the message call stak.
- * Prints the call stack for a message based on the message name, again useful for debugging and little lese :)
- * @param name the name of the message to print info for
- * @return the return int has no relevence atm :)
- */
-static int displayMessageFromHash(const char *name)
-{
-	MessageHash *current = NULL;
-	int index = 0;
-	index = CMD_HASH(name);
-	if (debug > 1) {
-		alog("debug: trying to display message %s", name);
-	}
-	for (current = IRCD[index]; current; current = current->next) {
-		if (stricmp(name, current->name) == 0) {
-			displayMessage(current->m);
-		}
-	}
-	if (debug > 1) {
-		alog("debug: done displaying message %s", name);
-	}
-	return 0;
-}
 
 /************************************************/
 
@@ -508,12 +416,9 @@ int Module::AddCommand(CommandHash * cmdTable[], Command * c, int pos)
 	} else
 		c->service = sstrdup("Unknown");
 
-	if (debug >= 2)
-		displayCommandFromHash(cmdTable, c->name);
 	status = internal_addCommand(cmdTable, c, pos);
-	if (debug >= 2)
-		displayCommandFromHash(cmdTable, c->name);
-	if (status != MOD_ERR_OK) {
+	if (status != MOD_ERR_OK)
+	{
 		alog("ERROR! [%d]", status);
 	}
 	return status;
@@ -607,16 +512,11 @@ int Module::DelCommand(CommandHash * cmdTable[], const char *dname)
 	}
 
 
-	for (cmd = c; cmd; cmd = cmd->next) {
-		if (cmd->mod_name
-			&& cmd->mod_name == this->name) {
-			if (debug >= 2) {
-				displayCommandFromHash(cmdTable, dname);
-			}
+	for (cmd = c; cmd; cmd = cmd->next)
+	{
+		if (cmd->mod_name && cmd->mod_name == this->name)
+		{
 			status = internal_delCommand(cmdTable, cmd, this->name.c_str());
-			if (debug >= 2) {
-				displayCommandFromHash(cmdTable, dname);
-			}
 		}
 	}
 	return status;
@@ -804,9 +704,6 @@ int moduleAddMessage(Message * m, int pos)
 	}
 
 	status = addMessage(IRCD, m, pos);
-	if (debug) {
-		displayMessageFromHash(m->name);
-	}
 	return status;
 }
 
@@ -829,9 +726,6 @@ int moduleDelMessage(const char *name)
 	}
 
 	status = delMessage(IRCD, m, mod_current_module->name.c_str());
-	if (debug) {
-		displayMessageFromHash(m->name);
-	}
 	return status;
 }
 

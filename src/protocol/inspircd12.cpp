@@ -509,8 +509,9 @@ class InspIRCdProto : public IRCDProto
 	{
 		// Calculate the time left before this would expire, capping it at 2 days
 		time_t timeleft = expires - time(NULL);
-		if (timeleft > 172800) timeleft = 172800;
-		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long>(when), static_cast<long>(timeleft), reason);
+		if (timeleft > 172800)
+			timeleft = 172800;
+		send_cmd(ServerName, "ADDLINE G %s@%s %s %ld %ld :%s", user, host, who, static_cast<long int>(when), static_cast<long int>(timeleft), reason);
 	}
 
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)

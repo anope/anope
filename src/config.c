@@ -99,8 +99,8 @@ int KeepBackups;
 bool ForceForbidReason;
 bool UsePrivmsg;
 bool UseStrictPrivMsg;
-int DumpCore;
-int LogUsers;
+bool DumpCore;
+bool LogUsers;
 int NickRegDelay;
 int UseSVSHOLD;
 int NewsCount;
@@ -652,6 +652,8 @@ int ServerConfig::Read(bool bail)
 		{"options", "forceforbidreason", "no", new ValueContainerBool(&ForceForbidReason), DT_BOOLEAN, NoValidation},
 		{"options", "useprivmsg", "no", new ValueContainerBool(&UsePrivmsg), DT_BOOLEAN, NoValidation},
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
+		{"options", "dumpcore", "no", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
+		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1363,10 +1365,8 @@ bool ValueItem::GetBool()
 /*************************************************************************/
 
 Directive directives[] = {
-	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
 	{"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
 					  {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
-	{"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},
 	{"MysqlHost", {{PARAM_STRING, PARAM_RELOAD, &MysqlHost}}},
 	{"MysqlUser", {{PARAM_STRING, PARAM_RELOAD, &MysqlUser}}},
 	{"MysqlPass", {{PARAM_STRING, PARAM_RELOAD, &MysqlPass}}},

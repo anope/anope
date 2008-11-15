@@ -88,7 +88,7 @@ int HostNumber = 0;			 /* needs to be set to 0 */
 bool NoBackupOkay;
 bool StrictPasswords;
 int BadPassLimit;
-int BadPassTimeout;
+time_t BadPassTimeout;
 int UpdateTimeout;
 int ExpireTimeout;
 int ReadTimeout;
@@ -641,6 +641,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
 		{"options", "badpasslimit", "0", new ValueContainerInt(&BadPassLimit), DT_INTEGER, NoValidation},
+		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1352,7 +1353,6 @@ bool ValueItem::GetBool()
 /*************************************************************************/
 
 Directive directives[] = {
-	{"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
 	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
 	{"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
 	{"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},

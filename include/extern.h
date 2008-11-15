@@ -286,7 +286,7 @@ E char *NewsDBName;
 E bool  NoBackupOkay;
 E bool  StrictPasswords;
 E int   BadPassLimit;
-E int   BadPassTimeout;
+E time_t BadPassTimeout;
 E int   UpdateTimeout;
 E int   ExpireTimeout;
 E int   ReadTimeout;

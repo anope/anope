@@ -1035,8 +1035,6 @@ E int decode_ip(const char *buf);
 
 E char *host_resolve(char *host);
 
-E void event_message_process(char *eventbuf);
-E void eventprintf(char *fmt, ...);
 E void event_process_hook(const char *name, int argc, char **argv);
 E void send_event(const char *name, int argc, ...);
 

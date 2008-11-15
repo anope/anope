@@ -78,12 +78,10 @@ Module::~Module()
 	int idx;
 	CommandHash *current = NULL;
 	MessageHash *mcurrent = NULL;
-	EvtMessageHash *ecurrent = NULL;
 	EvtHookHash *ehcurrent = NULL;
 
 	Command *c;
 	Message *msg;
-	EvtMessage *eMsg;
 	EvtHook *eHook;
 	int status = 0;
 
@@ -162,14 +160,6 @@ Module::~Module()
 			}
 		}
 
-		for (ecurrent = EVENT[idx]; ecurrent; ecurrent = ecurrent->next) {
-			for (eMsg = ecurrent->evm; eMsg; eMsg = eMsg->next) {
-				if ((eMsg->mod_name)
-					&& (stricmp(eMsg->mod_name, this->name.c_str()) == 0)) {
-					status = delEventHandler(EVENT, eMsg, this->name.c_str());
-				}
-			}
-		}
 		for (ehcurrent = EVENTHOOKS[idx]; ehcurrent;
 			 ehcurrent = ehcurrent->next) {
 			for (eHook = ehcurrent->evh; eHook; eHook = eHook->next) {

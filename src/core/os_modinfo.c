@@ -17,7 +17,6 @@
 
 int do_modinfo(User * u);
 void myOperServHelp(User * u);
-int showModuleMsgLoaded(MessageHash * msgList, const char *mod_name, User * u);
 int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u);
 
 class OSModInfo : public Module
@@ -81,8 +80,6 @@ int do_modinfo(User * u)
 			showModuleCmdLoaded(BOTSERV[idx], m->name.c_str(), u);
 			showModuleCmdLoaded(MEMOSERV[idx], m->name.c_str(), u);
 			showModuleCmdLoaded(HELPSERV[idx], m->name.c_str(), u);
-			showModuleMsgLoaded(IRCD[idx], m->name.c_str(), u);
-
 		}
 	} else {
 		notice_lang(s_OperServ, u, OPER_MODULE_NO_INFO, file);
@@ -101,23 +98,6 @@ int showModuleCmdLoaded(CommandHash * cmdList, const char *mod_name, User * u)
 			if ((c->mod_name) && (stricmp(c->mod_name, mod_name) == 0)) {
 				notice_lang(s_OperServ, u, OPER_MODULE_CMD_LIST,
 							c->service, c->name);
-				display++;
-			}
-		}
-	}
-	return display;
-}
-
-int showModuleMsgLoaded(MessageHash * msgList, const char *mod_name, User * u)
-{
-	Message *msg;
-	MessageHash *mcurrent;
-	int display = 0;
-	for (mcurrent = msgList; mcurrent; mcurrent = mcurrent->next) {
-		for (msg = mcurrent->m; msg; msg = msg->next) {
-			if ((msg->mod_name) && (stricmp(msg->mod_name, mod_name) == 0)) {
-				notice_lang(s_OperServ, u, OPER_MODULE_MSG_LIST,
-							msg->name);
 				display++;
 			}
 		}

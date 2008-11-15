@@ -565,7 +565,6 @@ Message *createMessage(const char *name,
 	}
 	m->name = sstrdup(name);
 	m->func = func;
-	m->mod_name = NULL;
 	m->next = NULL;
 	return m;
 }
@@ -677,10 +676,9 @@ int addCoreMessage(MessageHash * msgTable[], Message * m)
  * remove the given message from the given message hash, for the given module
  * @param msgTable which MessageHash we are removing from
  * @param m the Message we want to remove
- * @mod_name the name of the module we are removing
  * @return MOD_ERR_OK on success, althing else on fail.
  **/
-int delMessage(MessageHash * msgTable[], Message * m, const char *mod_name)
+int delMessage(MessageHash * msgTable[], Message * m)
 {
 	int index = 0;
 	MessageHash *current = NULL;
@@ -699,15 +697,12 @@ int delMessage(MessageHash * msgTable[], Message * m, const char *mod_name)
 				tail = current->m;
 				if (tail->next) {
 					while (tail) {
-						if (mod_name && tail->mod_name
-							&& (stricmp(mod_name, tail->mod_name) == 0)) {
-							if (last) {
-								last->next = tail->next;
-							} else {
-								current->m = tail->next;
-							}
-							return MOD_ERR_OK;
+						if (last) {
+							last->next = tail->next;
+						} else {
+							current->m = tail->next;
 						}
+						return MOD_ERR_OK;
 						last = tail;
 						tail = tail->next;
 					}
@@ -720,15 +715,12 @@ int delMessage(MessageHash * msgTable[], Message * m, const char *mod_name)
 				tail = current->m;
 				if (tail->next) {
 					while (tail) {
-						if (mod_name && tail->mod_name
-							&& (stricmp(mod_name, tail->mod_name) == 0)) {
-							if (last) {
-								last->next = tail->next;
-							} else {
-								current->m = tail->next;
-							}
-							return MOD_ERR_OK;
+						if (last) {
+							last->next = tail->next;
+						} else {
+							current->m = tail->next;
 						}
+						return MOD_ERR_OK;
 						last = tail;
 						tail = tail->next;
 					}
@@ -758,9 +750,6 @@ int destroyMessage(Message * m)
 		free(m->name);
 	}
 	m->func = NULL;
-	if (m->mod_name) {
-		free(m->mod_name);
-	}
 	m->next = NULL;
 	return MOD_ERR_OK;
 }
@@ -768,18 +757,8 @@ int destroyMessage(Message * m)
 /*******************************************************************************
  * Module Callback Functions
  *******************************************************************************/
- /**
-  * Adds a timed callback for the current module.
-  * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
-  * @param name the name of the callback, this is used for refrence mostly, but is needed it you want to delete this particular callback later on
-  * @param when when should the function be executed, this is a time in the future, seconds since 00:00:00 1970-01-01 UTC
-  * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv);
-  * @param argc the argument count for the argv paramter
-  * @param atgv a argument list to be passed to the called function.
-  * @return MOD_ERR_OK on success, anything else on fail.
-  * @see moduleDelCallBack
-  **/
-int moduleAddCallback(const char *name, time_t when,
+
+int Module::AddCallback(const char *name, time_t when,
 					  int (*func) (int argc, char *argv[]), int argc,
 					  char **argv)
 {
@@ -794,11 +773,7 @@ int moduleAddCallback(const char *name, time_t when,
 	else
 		newcb->name = NULL;
 	newcb->when = when;
-	if (mod_current_module_name) {
-		newcb->owner_name = sstrdup(mod_current_module_name);
-	} else {
-		newcb->owner_name = NULL;
-	}
+	newcb->owner_name = sstrdup(this->name.c_str());
 	newcb->func = func;
 	newcb->argc = argc;
 	newcb->argv = (char **)malloc(sizeof(char *) * argc);
@@ -886,29 +861,22 @@ static ModuleCallBack *moduleCallBackFindEntry(const char *mod_name, bool * foun
 	}
 }
 
-/**
- * Allow module coders to delete a callback by name.
- * @param name the name of the callback they wish to delete
- **/
-void moduleDelCallback(char *name)
+void Module::DelCallback(const char *name)
 {
 	ModuleCallBack *current = NULL;
 	ModuleCallBack *prev = NULL, *tmp = NULL;
 	int del = 0;
-	if (!mod_current_module_name) {
-		return;
-	}
 	if (!name) {
 		return;
 	}
 	current = moduleCallBackHead;
 	while (current) {
 		if ((current->owner_name) && (current->name)) {
-			if ((strcmp(mod_current_module_name, current->owner_name) == 0)
+			if ((strcmp(this->name.c_str(), current->owner_name) == 0)
 				&& (strcmp(current->name, name) == 0)) {
 				if (debug) {
 					alog("debug: removing CallBack %s for module %s", name,
-						 mod_current_module_name);
+						 this->name.c_str());
 				}
 				tmp = current->next;	/* get a pointer to the next record, as once we delete this record, we'll lose it :) */
 				moduleCallBackDeleteEntry(prev);		/* delete this record */

@@ -33,6 +33,8 @@ int canBanUser(Channel * c, User * u, User * u2);
 
 void mAddLanguages(void);
 
+static Module *me = NULL;
+
 #define LANG_NUM_STRINGS	4
 #define TBAN_HELP		   0
 #define TBAN_SYNTAX		 1
@@ -45,6 +47,8 @@ class CSTBan : public Module
 	CSTBan(const std::string &modname, const std::string &creator) : Module(modname, creator)
 	{
 		Command *c;
+
+		me = this;
 
 		moduleSetChanHelp(myHelp);
 		c = createCommand("TBAN", do_tban, NULL, -1, -1, -1, -1, -1);
@@ -194,7 +198,7 @@ void addBan(Channel * c, time_t timeout, char *banmask)
 	ircdproto->SendMode(whosends(c->ci), c->name, "+b %s", av[1]);
 	chan_set_modes(s_ChanServ, c, 2, av, 1);
 
-	moduleAddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
+	me->AddCallback("tban", time(NULL) + timeout, delBan, 2, cb);
 }
 
 int delBan(int argc, char **argv)

@@ -259,6 +259,25 @@ CoreExport class Module
 	 * @return returns MOD_ERR_OK on success
 	 */
 	int DelCommand(CommandHash * cmdTable[], const char *name);
+	
+	/**
+	 * Adds a timed callback for the current module.
+	 * This allows modules to request that anope executes one of there functions at a time in the future, without an event to trigger it
+	 * @param name the name of the callback, this is used for refrence mostly, but is needed it you want to delete this particular callback later on
+	 * @param when when should the function be executed, this is a time in the future, seconds since 00:00:00 1970-01-01 UTC
+	 * @param func the function to be executed when the callback is ran, its format MUST be int func(int argc, char **argv);
+	 * @param argc the argument count for the argv paramter
+	 * @param atgv a argument list to be passed to the called function.
+	 * @return MOD_ERR_OK on success, anything else on fail.
+	 * @see moduleDelCallBack
+	 **/
+	int AddCallback(const char *name, time_t when, int (*func) (int argc, char *argv[]), int argc, char **argv);
+					  
+	/**
+	 * Allow modules to delete a timed callback by name.
+	 * @param name the name of the callback they wish to delete
+	 **/
+	void DelCallback(const char *name);
 };
 
 
@@ -344,7 +363,6 @@ struct Message_ {
 	char *name;
 	int (*func)(const char *source, int ac, const char **av);
 	int core;
-	char *mod_name;
 	Message *next;
 };
 
@@ -422,7 +440,7 @@ MDE Message *createMessage(const char *name,int (*func)(const char *source, int 
 Message *findMessage(MessageHash *msgTable[], const char *name);	/* Find a Message */
 MDE int addMessage(MessageHash *msgTable[], Message *m, int pos);		/* Add a Message to a Message table */
 MDE int addCoreMessage(MessageHash *msgTable[], Message *m);		/* Add a Message to a Message table */
-int delMessage(MessageHash *msgTable[], Message *m, const char *mod_name);		/* Del a Message from a msg table */
+int delMessage(MessageHash *msgTable[], Message *m);		/* Del a Message from a msg table */
 int destroyMessage(Message *m);					/* destroy a Message*/
 
 /*************************************************************************/
@@ -439,9 +457,6 @@ MDE const char *moduleGetLangString(User * u, int number);
 MDE void moduleDeleteLanguage(int langNumber);
 
 /*************************************************************************/
-
-MDE int moduleAddCallback(const char *name,time_t when,int (*func)(int argc, char *argv[]),int argc, char **argv);
-MDE void moduleDelCallback(char *name);
 
 MDE char *moduleGetData(ModuleData **md, const char *key);			/* Get the value for this key from this struct */
 MDE int moduleAddData(ModuleData **md, const char *key, char *value);		/* Set the value for this key for this struct */

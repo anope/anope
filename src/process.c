@@ -409,15 +409,11 @@ void process()
 	m = find_message(cmd);
 	if (m) {
 		if (m->func) {
-			mod_current_module_name = m->mod_name;
 			retVal = m->func(source, ac, av);
-			mod_current_module_name = NULL;
 			if (retVal == MOD_CONT) {
 				current = m->next;
 				while (current && current->func && retVal == MOD_CONT) {
-					mod_current_module_name = current->mod_name;
 					retVal = current->func(source, ac, av);
-					mod_current_module_name = NULL;
 					current = current->next;
 				}
 			}

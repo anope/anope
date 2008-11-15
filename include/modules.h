@@ -129,8 +129,6 @@ typedef struct ModuleHash_ ModuleHash;
 typedef struct Message_ Message;
 typedef struct MessageHash_ MessageHash;
 typedef struct ModuleCallBack_ ModuleCallBack;
-typedef struct EvtMessage_ EvtMessage;
-typedef struct EvtMessageHash_ EvtMessageHash;
 typedef struct EvtHook_ EvtHook;
 typedef struct EvtHookHash_ EvtHookHash;
 
@@ -143,7 +141,6 @@ extern MDE CommandHash *HELPSERV[MAX_CMD_HASH];
 extern MDE CommandHash *OPERSERV[MAX_CMD_HASH];
 extern MDE MessageHash *IRCD[MAX_CMD_HASH];
 extern MDE ModuleHash *MODULE_HASH[MAX_CMD_HASH];
-extern MDE EvtMessageHash *EVENT[MAX_CMD_HASH];
 extern MDE EvtHookHash *EVENTHOOKS[MAX_CMD_HASH];
 
 struct ModuleLang_ {
@@ -236,19 +233,6 @@ CoreExport class Module
 	 * @return MOD_ERR_OK on success, althing else on fail.
 	 **/
 	int AddEventHook(EvtHook *evh);
-
-	/** Add a module message to the IRCD message hash
-	 * @param m the Message to add
-	 * @param pos the Position to add the message to, e.g. MOD_HEAD, MOD_TAIL, MOD_UNIQUE
-	 * @return MOD_ERR_OK on success, althing else on fail.
-	 **/
-	int AddEventHandler(EvtMessage *evm);
-
-	/** Remove the given message from the IRCD message hash
-	 * @param name the name of the message to remove
-	 * @return MOD_ERR_OK on success, althing else on fail.
-	 **/
-	int DelEventHandler(const char *name);
 
 	/**
 	 * remove the given message from the IRCD message hash
@@ -379,21 +363,6 @@ struct ModuleCallBack_ {
 	ModuleCallBack *next;
 };
 
-struct EvtMessage_ {
-	char *name;
-	int (*func)(const char *source, int ac, const char **av);
-	int core;
-	char *mod_name;
-	EvtMessage *next;
-};
-
-struct EvtMessageHash_ {
-		char *name;
-		EvtMessage *evm;
-		EvtMessageHash *next;
-};
-
-
 struct EvtHook_ {
 	int (*func)(int argc, char **argv);
 	int core;
@@ -458,13 +427,6 @@ MDE int moduleDelMessage(const char *name);
 int destroyMessage(Message *m);					/* destroy a Message*/
 
 /*************************************************************************/
-
-MDE EvtMessage *createEventHandler(char *name, int (*func) (const char *source, int ac, const char **av));
-EvtMessage *findEventHandler(EvtMessageHash * msgEvtTable[], const char *name);
-int addCoreEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
-int delEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm, const char *mod_name);
-int destroyEventHandler(EvtMessage * evm);
-int addEventHandler(EvtMessageHash * msgEvtTable[], EvtMessage * evm);
 
 MDE EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv));
 EvtHook *findEventHook(EvtHookHash * HookEvtTable[], const char *name);

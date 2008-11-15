@@ -1,4 +1,0 @@
-SRCS=ircd_catserv.c purr.c catserv_messages.c meow.c
-TARGET=ircd_catserv.dll
-
-include ..\Makefile.sub.win32

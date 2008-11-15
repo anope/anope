@@ -197,7 +197,7 @@ void load_old_ns_dbase(void)
 			if (c != 1)
 				fatal("Invalid format in %s", NickDBName);
 
-			na = (NickAlias *)scalloc(sizeof(NickAlias), 1);
+			na = new NickAlias();
 
 			SAFE(read_buffer(bufn, f));
 			na->nick = sstrdup(bufn);
@@ -268,7 +268,7 @@ void load_old_ns_dbase(void)
 				/* This nick was a master nick, so it also has all the
 				 * core info! =)
 				 */
-				nc = (NickCore *)scalloc(1, sizeof(NickCore));
+				nc = new NickCore();
 				slist_init(&nc->aliases);
 
 				/* The initial display is what used to be the master nick */
@@ -479,7 +479,7 @@ void load_ns_dbase(void)
 			if (c != 1)
 				fatal("Invalid format in %s", NickDBName);
 
-			nc = (NickCore *)scalloc(1, sizeof(NickCore));
+			nc = new NickCore();
 			*nclast = nc;
 			nclast = &nc->next;
 			nc->prev = ncprev;
@@ -565,7 +565,7 @@ void load_ns_dbase(void)
 			if (c != 1)
 				fatal("Invalid format in %s", NickDBName);
 
-			na = (NickAlias *)scalloc(1, sizeof(NickAlias));
+			na = new NickAlias();
 
 			SAFE(read_string(&na->nick, f));
 
@@ -1262,10 +1262,7 @@ static int delcore(NickCore * nc)
 		free(nc->memos.memos);
 	}
 
-	moduleCleanStruct(&nc->moduleData);
-
-	free(nc);
-
+	delete nc;
 	return 1;
 }
 
@@ -1346,11 +1343,7 @@ int delnick(NickAlias * na)
 	if (na->last_quit)
 		free(na->last_quit);
 
-	moduleCleanStruct(&na->moduleData);
-
-	free(na);
-
-
+	delete na;
 	return 1;
 }
 

@@ -125,7 +125,7 @@ NickAlias *makenick(const char *nick)
 	NickCore *nc;
 
 	/* First make the core */
-	nc = (NickCore *)scalloc(1, sizeof(NickCore));
+	nc = new NickCore();
 	nc->display = sstrdup(nick);
 	slist_init(&nc->aliases);
 	insert_core(nc);

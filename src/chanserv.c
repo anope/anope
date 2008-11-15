@@ -324,7 +324,7 @@ void load_cs_dbase(void)
 		while ((c = getc_db(f)) != 0) {
 			if (c != 1)
 				fatal("Invalid format in %s", ChanDBName);
-			ci = (ChannelInfo *)scalloc(sizeof(ChannelInfo), 1);
+			ci = new ChannelInfo();
 			*last = ci;
 			last = &ci->next;
 			ci->prev = prev;
@@ -1640,7 +1640,7 @@ ChannelInfo *makechan(const char *chan)
 	int i;
 	ChannelInfo *ci;
 
-	ci = (ChannelInfo *)scalloc(sizeof(ChannelInfo), 1);
+	ci = new ChannelInfo();
 	strscpy(ci->name, chan, CHANMAX);
 	ci->time_registered = time(NULL);
 	reset_levels(ci);
@@ -1806,9 +1806,8 @@ int delchan(ChannelInfo * ci)
 	if (debug >= 2) {
 		alog("debug: delchan() calling on moduleCleanStruct()");
 	}
-	moduleCleanStruct(&ci->moduleData);
 
-	free(ci);
+	delete ci;
 	if (nc)
 		nc->channelcount--;
 

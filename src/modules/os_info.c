@@ -199,53 +199,53 @@ class OSInfo : public Module
 		/* OINFO_SYNTAX */
 		"Syntax: OINFO [ADD|DEL] Nickname <Information>",
 		/* OINFO_ADD_SUCCESS */
-		"Eine OperInfo Linie wurde zu den Nicknamen %s hinzugefьgt",
+		"Eine OperInfo Linie wurde zu den Nicknamen %s hinzugefgt",
 		/* OINFO_DEL_SUCCESS */
 		"Die OperInfo Linie wurde von den Nicknamen %s enfernt",
 		/* OCINFO_SYNTAX */
 		"Syntax: OINFO [ADD|DEL] Channel <Information>",
 		/* OCINFO_ADD_SUCCESS */
-		"Eine OperInfo Linie wurde zu den Channel %s hinzugefьgt",
+		"Eine OperInfo Linie wurde zu den Channel %s hinzugefgt",
 		/* OCINFO_DEL_SUCCESS */
 		"Die OperInfo Linie wurde von den Channel %s enfernt",
 		/* OINFO_HELP */
 		"Syntax: OINFO [ADD|DEL] Nickname <Information>\n"
-		"Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
+		"Addiert oder lscht eine OperInfo Linie zu den angegebenen\n"
 		"Nicknamen.Sie wird angezeigt wenn ein Oper mit /ns info sich\n"
-		"ьber den Nicknamen informiert.",
+		"ber den Nicknamen informiert.",
 		/* OCINFO_HELP */
 		"Syntax: OINFO [ADD|DEL] chan <info>\n"
-		"Addiert oder lцscht eine OperInfo Linie zu den angegebenen\n"
+		"Addiert oder lscht eine OperInfo Linie zu den angegebenen\n"
 		"Channel.Sie wird angezeigt wenn ein Oper mit /cs info sich\n"
-		"ьber den Channel informiert.",
+		"ber den Channel informiert.",
 		/* OINFO_HELP_CMD */
-		"	OINFO		 Addiert / Lцscht eine OperInfo Linie zu / von einen Nicknamen",
+		"	OINFO		 Addiert / Lscht eine OperInfo Linie zu / von einen Nicknamen",
 		/* OCINFO_HELP_CMD */
-		"	OINFO		 Addiert / Lцscht eine OperInfo Linie zu / von einen Channel"
+		"	OINFO		 Addiert / Lscht eine OperInfo Linie zu / von einen Channel"
 		};
 
 		const char* langtable_pt[] = {
 		/* OINFO_SYNTAX */
-		"Sintaxe: OINFO [ADD|DEL] nick <informaзгo>",
+		"Sintaxe: OINFO [ADD|DEL] nick <informao>",
 		/* OINFO_ADD_SUCCESS */
 		"A linha OperInfo foi adicionada ao nick %s",
 		/* OINFO_DEL_SUCCESS */
 		"A linha OperInfo foi removida do nick %s",
 		/* OCINFO_SYNTAX */
-		"Sintaxe: OINFO [ADD|DEL] canal <informaзгo>",
+		"Sintaxe: OINFO [ADD|DEL] canal <informao>",
 		/* OCINFO_ADD_SUCCESS */
 		"A linha OperInfo foi adicionada ao canal %s",
 		/* OCINFO_DEL_SUCCESS */
 		"A linha OperInfo foi removida do canal %s",
 		/* OINFO_HELP */
-		"Sintaxe: OINFO [ADD|DEL] nick <informaзгo>\n"
-		"Adiciona ou apaga informaзгo para Operadores ao nick fornecido\n"
-		"Isto serб mostrado quando qualquer Operador usar /ns info nick\n"
-		"e pode ser usado para 'etiquetar' usuбrios etc...",
+		"Sintaxe: OINFO [ADD|DEL] nick <informao>\n"
+		"Adiciona ou apaga informao para Operadores ao nick fornecido\n"
+		"Isto ser mostrado quando qualquer Operador usar /ns info nick\n"
+		"e pode ser usado para 'etiquetar' usurios etc...",
 		/* OCINFO_HELP */
-		"Sintaxe: OINFO [ADD|DEL] canal <informaзгo>\n"
-		"Adiciona ou apaga informaзгo para Operadores ao canal fornecido\n"
-		"Isto serб mostrado quando qualquer Operador usar /cs info canal\n"
+		"Sintaxe: OINFO [ADD|DEL] canal <informao>\n"
+		"Adiciona ou apaga informao para Operadores ao canal fornecido\n"
+		"Isto ser mostrado quando qualquer Operador usar /cs info canal\n"
 		"e pode ser usado para 'etiquetar' canais etc...",
 		/* OINFO_HELP_CMD */
 		"	OINFO	  Adiciona ou Apaga a linha OperInfo para um nick",
@@ -255,31 +255,31 @@ class OSInfo : public Module
 
 		const char* langtable_ru[] = {
 		/* OINFO_SYNTAX */
-		"Синтаксис: OINFO ADD|DEL ник тест",
+		": OINFO ADD|DEL  ",
 		/* OINFO_ADD_SUCCESS */
-		"Опер-Информация для ника %s добавлена",
+		"-   %s ",
 		/* OINFO_DEL_SUCCESS */
-		"Опер-Информация для ника %s была удалена",
+		"-   %s  ",
 		/* OCINFO_SYNTAX */
-		"Синтаксис: OINFO ADD|DEL #канал текст",
+		": OINFO ADD|DEL # ",
 		/* OCINFO_ADD_SUCCESS */
-		"Опер-Информация для канала %s успешно установлена",
+		"-   %s  ",
 		/* OCINFO_DEL_SUCCESS */
-		"Опер-Информация для канала %s была удалена",
+		"-   %s  ",
 		/* OINFO_HELP */
-		"Синтаксис: OINFO ADD|DEL ник текст\n"
-		"Устанавливает или удаляет Опер-Информацию для указанного ника,\n"
-		"которая будет показана любому оператору, запрашивающему INFO ника.\n"
-		"Может быть использована для 'пометки' пользователей и т. д...",
+		": OINFO ADD|DEL  \n"
+		"   -   ,\n"
+		"    ,  INFO .\n"
+		"    ''   . ...",
 		/* OCINFO_HELP */
-		"Синтаксис: OINFO ADD|DEL #канал текст\n"
-		"Устанавливает или удаляет Опер-Информацию для указанного канала,\n"
-		"которая будет показана любому оператору, запрашивающему INFO канала.\n"
-		"Может быть использована для 'пометки' каналов и т. д...",
+		": OINFO ADD|DEL # \n"
+		"   -   ,\n"
+		"    ,  INFO .\n"
+		"    ''   . ...",
 		/* OINFO_HELP_CMD */
-		"	OINFO	  Добавляет/Удаляет опер-инфо для ника",
+		"	OINFO	  / -  ",
 		/* OCINFO_HELP_CMD */
-		"	OINFO	  Добавляет/Удаляет опер-инфо для канала"
+		"	OINFO	  / -  "
 		};
 
 		const char* langtable_it[] = {
@@ -323,7 +323,20 @@ class OSInfo : public Module
 	~OSInfo()
 	{
 		char *av[1];
-
+		
+		for (int i = 0; i < 1024; i++)
+		{
+			/* Remove the nick Cores */
+			for (NickCore *nc = nclists[i]; nc; nc = nc->next)
+			{
+				char *c;
+				if (nc->GetExt("os_modinfo", c));
+				{
+					free(c);
+					nc->Shrink("os_modinfo");
+				}
+			}
+		}			
 		av[0] = sstrdup(EVENT_START);
 		mSaveData(1, av);
 		free(av[0]);
@@ -369,9 +382,8 @@ int myAddNickInfo(User * u)
 					/* ok we've found the user */
 					if ((na = findnick(nick))) {
 						/* Add the module data to the user */
-						moduleAddData(&na->nc->moduleData, "info", info);
-						moduleNoticeLang(s_NickServ, u,
-										 OINFO_ADD_SUCCESS, nick);
+						na->nc->Extend("os_info", strdup(info));
+						moduleNoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
 						/* NickCore not found! */
 					} else {
 						notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED,
@@ -381,10 +393,16 @@ int myAddNickInfo(User * u)
 				}
 			} else if (strcasecmp(cmd, "DEL") == 0) {
 				/* ok we've found the user */
-				if ((na = findnick(nick))) {
-					moduleDelData(&na->nc->moduleData, "info");
-					moduleNoticeLang(s_NickServ, u,
-									 OINFO_DEL_SUCCESS, nick);
+				if ((na = findnick(nick)))
+				{
+					char *c;
+					if (na->nc->GetExt("os_info", c))
+					{
+						free(c);
+						na->nc->Shrink("os_info");
+					}
+					
+					moduleNoticeLang(s_NickServ, u, OINFO_DEL_SUCCESS, nick);
 					/* NickCore not found! */
 				} else {
 					notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED,
@@ -437,9 +455,8 @@ int myAddChanInfo(User * u)
 				if (info) {
 					if ((ci = cs_findchan(chan))) {
 						/* Add the module data to the channel */
-						moduleAddData(&ci->moduleData, "info", info);
-						moduleNoticeLang(s_ChanServ, u,
-										 OCINFO_ADD_SUCCESS, chan);
+						ci->Extend("os_info", strdup(info));
+						moduleNoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 						/* ChanInfo */
 					} else {
 						notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED,
@@ -450,9 +467,13 @@ int myAddChanInfo(User * u)
 			} else if (strcasecmp(cmd, "DEL") == 0) {
 				if ((ci = cs_findchan(chan))) {
 					/* Del the module data from the channel */
-					moduleDelData(&ci->moduleData, "info");
-					moduleNoticeLang(s_ChanServ, u,
-									 OCINFO_DEL_SUCCESS, chan);
+					char *c;
+					if (ci->GetExt("os_info", c))
+					{
+						free(c);
+						ci->Shrink("os_info");
+					}
+					moduleNoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
 					/* ChanInfo */
 				} else {
 					notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED,
@@ -487,7 +508,6 @@ int myNickInfo(User * u)
 {
 	char *text = NULL;
 	char *nick = NULL;
-	char *info = NULL;
 	NickAlias *na = NULL;
 
 	/* Only show our goodies to opers */
@@ -500,9 +520,10 @@ int myNickInfo(User * u)
 				/* ok we've found the user */
 				if ((na = findnick(nick))) {
 					/* If we have any info on this user */
-					if ((info = moduleGetData(&na->nc->moduleData, "info"))) {
-						notice_user(s_NickServ, u, " OperInfo: %s", info);
-						free(info);
+					char *c;
+					if (na->nc->GetExt("os_info", c))
+					{
+						notice_user(s_NickServ, u, " OperInfo: %s", c);
 					}
 					/* NickCore not found! */
 				} else {
@@ -524,7 +545,6 @@ int myChanInfo(User * u)
 {
 	char *text = NULL;
 	char *chan = NULL;
-	char *info = NULL;
 	ChannelInfo *ci = NULL;
 
 	/* Only show our goodies to opers */
@@ -536,9 +556,10 @@ int myChanInfo(User * u)
 			if (chan) {
 				if ((ci = cs_findchan(chan))) {
 					/* If we have any info on this channel */
-					if ((info = moduleGetData(&ci->moduleData, "info"))) {
-						notice_user(s_ChanServ, u, " OperInfo: %s", info);
-						free(info);
+					char *c;
+					if (ci->GetExt("os_info", c))
+					{
+						notice_user(s_ChanServ, u, " OperInfo: %s", c);
 					}
 				}
 				free(chan);
@@ -584,14 +605,14 @@ int mLoadData(void)
 						/* Take the \n from the end of the line */
 						info[len - 1] = '\0';
 						if (stricmp(type, "C") == 0) {
-							if ((ci = cs_findchan(name))) {
-								moduleAddData(&ci->moduleData, "info",
-											  info);
+							if ((ci = cs_findchan(name)))
+							{
+								ci->Extend("os_info", strdup("info"));
 							}
 						} else if (stricmp(type, "N") == 0) {
-							if ((na = findnick(name))) {
-								moduleAddData(&na->nc->moduleData, "info",
-											  info);
+							if ((na = findnick(name)))
+							{
+								na->nc->Extend("os_info", strdup(info));
 							}
 						}
 						free(info);
@@ -619,7 +640,6 @@ int mSaveData(int argc, char **argv)
 	int i = 0;
 	int ret = 0;
 	FILE *out;
-	char *info = NULL;
 
 	if (argc >= 1) {
 		if (!stricmp(argv[0], EVENT_START)) {
@@ -632,9 +652,10 @@ int mSaveData(int argc, char **argv)
 				for (i = 0; i < 1024; i++) {
 					for (nc = nclists[i]; nc; nc = nc->next) {
 						/* If we have any info on this user */
-						if ((info = moduleGetData(&nc->moduleData, "info"))) {
-							fprintf(out, "N %s %s\n", nc->display, info);
-							free(info);
+						char *c;
+						if (nc->GetExt("os_info", c))
+						{
+							fprintf(out, "N %s %s\n", nc->display, c);
 						}
 					}
 				}
@@ -643,9 +664,10 @@ int mSaveData(int argc, char **argv)
 				for (i = 0; i < 256; i++) {
 					for (ci = chanlists[i]; ci; ci = ci->next) {
 						/* If we have any info on this channel */
-						if ((info = moduleGetData(&ci->moduleData, "info"))) {
-							fprintf(out, "C %s %s\n", ci->name, info);
-							free(info);
+						char *c;
+						if (ci->GetExt("os_info", c))
+						{						
+							fprintf(out, "C %s %s\n", ci->name, c);
 						}
 					}
 				}

@@ -384,6 +384,7 @@ class Extensible
 
 /* forward declarations, mostly used by older code */
 class User;
+class ChannelInfo;
 
 
 typedef struct server_ Server;
@@ -392,7 +393,6 @@ typedef struct c_elist EList;
 typedef struct c_elist_entry Entry;
 typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
 typedef struct memo_ Memo;
-typedef struct chaninfo_ ChannelInfo;
 typedef struct badword_ BadWord;
 typedef struct bandata_ BanData;
 typedef struct userdata_ UserData;
@@ -689,63 +689,7 @@ struct badword_ {
 #define BW_START 	2
 #define BW_END 		3
 
-
-struct chaninfo_ {
-	ChannelInfo *next, *prev;
-	char name[CHANMAX];
-	NickCore *founder;
-	NickCore *successor;		/* Who gets the channel if the founder
-					 			 * nick is dropped or expires */
-	char founderpass[PASSMAX];
-	char *desc;
-	char *url;
-	char *email;
-
-	time_t time_registered;
-	time_t last_used;
-	char *last_topic;			/* Last topic on the channel */
-	char last_topic_setter[NICKMAX];	/* Who set the last topic */
-	time_t last_topic_time;		/* When the last topic was set */
-
-	uint32 flags;				/* See below */
-	char *forbidby;
-	char *forbidreason;
-
-	int16 bantype;
-	int16 *levels;				/* Access levels for commands */
-
-	uint16 accesscount;
-	ChanAccess *access;			/* List of authorized users */
-	uint16 akickcount;
-	AutoKick *akick;			/* List of users to kickban */
-
-	uint32 mlock_on, mlock_off;		/* See channel modes below */
-	uint32 mlock_limit;			/* 0 if no limit */
-	char *mlock_key;			/* NULL if no key */
-	char *mlock_flood;			/* NULL if no +f */
-	char *mlock_redirect;		/* NULL if no +L */
-
-	char *entry_message;		/* Notice sent on entering channel */
-
-	MemoInfo memos;
-
-	struct channel_ *c;			/* Pointer to channel record (if   *
-					 			 *	channel is currently in use) */
-
-	ModuleData *moduleData; 	/* Module saved data attached to the ChannelInfo */
-
-	/* For BotServ */
-
-	BotInfo *bi;					/* Bot used on this channel */
-	uint32 botflags;				/* BS_* below */
-	int16 *ttb;						/* Times to ban for each kicker */
-
-	uint16 bwcount;
-	BadWord *badwords;				/* For BADWORDS kicker */
-	int16 capsmin, capspercent;		/* For CAPS kicker */
-	int16 floodlines, floodsecs;	/* For FLOOD kicker */
-	int16 repeattimes;				/* For REPEAT kicker */
-};
+#include "regchannel.h"
 
 /* Retain topic even after last person leaves channel */
 #define CI_KEEPTOPIC	0x00000001

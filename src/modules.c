@@ -1312,22 +1312,16 @@ void moduleDelAllDataMod(Module * m)
 		}
 		/* Remove the nick Cores */
 		for (nc = nclists[i]; nc; nc = nc->next) {
-			moduleDelAllData(&nc->moduleData);
 			/* Remove any memo data for this nick core */
 			for (j = 0; j < nc->memos.memocount; j++) {
 				moduleCleanStruct(&nc->memos.memos[j].moduleData);
 			}
-		}
-		/* Remove the nick Aliases */
-		for (na = nalists[i]; na; na = na->next) {
-			moduleDelAllData(&na->moduleData);
 		}
 	}
 
 	for (i = 0; i < 256; i++) {
 		/* Remove any chan info data */
 		for (ci = chanlists[i]; ci; ci = ci->next) {
-			moduleDelAllData(&ci->moduleData);
 			/* Remove any memo data for this nick core */
 			for (j = 0; j < ci->memos.memocount; j++) {
 				moduleCleanStruct(&ci->memos.memos[j].moduleData);

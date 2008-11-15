@@ -20,6 +20,16 @@ class NickCore;
 class NickAlias
 {
  public:
+ 	NickAlias()
+ 	{
+ 		next = prev = NULL;
+ 		nick = last_quit = last_realname = last_usermask = NULL;
+ 		time_registered = last_seen = 0;
+ 		status = 0;
+ 		nc = NULL;
+ 		u = NULL;	
+ 	}
+ 	
 	NickAlias *next, *prev;
 	char *nick;				/* Nickname */
 	char *last_quit;			/* Last quit message */
@@ -31,13 +41,22 @@ class NickAlias
 	NickCore *nc;				/* I'm an alias of this */
 
 	/* Not saved */
-	ModuleData *moduleData; 		/* Module saved data attached to the nick alias */
 	User *u;				/* Current online user that has me */
 };
 
-class NickCore
+class NickCore : public Extensible
 {
  public:
+ 	NickCore()
+ 	{
+		next = prev = NULL;
+		display = email = greet = url = NULL;
+		pass[0] = '\0';
+		icq = flags = 0;
+		language = accesscount = channelcount = 0;
+		lastmail = 0; 		
+ 	}
+ 	
 	NickCore *next, *prev;
 
 	char *display;				/* How the nick is displayed */
@@ -54,7 +73,6 @@ class NickCore
 	uint16 channelcount;			/* Number of channels currently registered */
 
 	/* Unsaved data */
-	ModuleData *moduleData;	  	/* Module saved data attached to the NickCore */
 	time_t lastmail;			/* Last time this nick record got a mail */
 	SList aliases;				/* List of aliases */
 };

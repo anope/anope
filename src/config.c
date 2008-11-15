@@ -648,6 +648,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "warningtimeout", "0", new ValueContainerTime(&WarningTimeout), DT_TIME, ValidateNotZero},
 		{"options", "timeoutcheck", "0", new ValueContainerTime(&TimeoutCheck), DT_TIME, NoValidation},
 		{"options", "keeplogs", "0", new ValueContainerInt(&KeepLogs), DT_INTEGER, NoValidation},
+		{"options", "keepbackups", "0", new ValueContainerInt(&KeepBackups), DT_INTEGER, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1361,7 +1362,6 @@ bool ValueItem::GetBool()
 Directive directives[] = {
 	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
 	{"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
-	{"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
 	{"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
 					  {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
 	{"LogUsers", {{PARAM_SET, PARAM_RELOAD, &LogUsers}}},

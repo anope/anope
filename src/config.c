@@ -90,7 +90,7 @@ bool StrictPasswords;
 int BadPassLimit;
 time_t BadPassTimeout;
 time_t UpdateTimeout;
-int ExpireTimeout;
+time_t ExpireTimeout;
 int ReadTimeout;
 int WarningTimeout;
 int TimeoutCheck;
@@ -643,6 +643,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "badpasslimit", "0", new ValueContainerInt(&BadPassLimit), DT_INTEGER, NoValidation},
 		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
 		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
+		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1355,7 +1356,6 @@ bool ValueItem::GetBool()
 
 Directive directives[] = {
 	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
-	{"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},
 	{"ForceForbidReason", {{PARAM_SET, PARAM_RELOAD, &ForceForbidReason}}},
 	{"KeepBackups", {{PARAM_INT, PARAM_RELOAD, &KeepBackups}}},
 	{"KeepLogs", {{PARAM_INT, PARAM_RELOAD, &KeepLogs}}},
@@ -1701,7 +1701,6 @@ int read_config(int reload)
 		}
 	}
 
-	CHECK(ExpireTimeout);
 	CHECK(ReadTimeout);
 	CHECK(WarningTimeout);
 	CHECK(TimeoutCheck);

@@ -288,7 +288,7 @@ E bool  StrictPasswords;
 E int   BadPassLimit;
 E time_t BadPassTimeout;
 E time_t UpdateTimeout;
-E int   ExpireTimeout;
+E time_t ExpireTimeout;
 E int   ReadTimeout;
 E int   WarningTimeout;
 E int   TimeoutCheck;

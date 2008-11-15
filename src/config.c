@@ -635,6 +635,9 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
 		{"networkinfo", "nicklen", "0", new ValueContainerInt(&NickLen), DT_INTEGER | DT_NORELOAD, ValidateNickLen},
 		{"options", "encryption", "", new ValueContainerChar(&EncModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
+		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
+		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -836,7 +839,13 @@ int ServerConfig::Read(bool bail)
 				case DT_UINTEGER: {
 					unsigned val = vi.GetInteger();
 					ValueContainerUInt *vci = dynamic_cast<ValueContainerUInt *>(Values[Index].val);
-					vci->Set(&val, sizeof(int));
+					vci->Set(&val, sizeof(unsigned));
+				}
+				break;
+				case DT_LUINTEGER: {
+					long unsigned val = vi.GetInteger();
+					ValueContainerLUInt *vci = dynamic_cast<ValueContainerLUInt *>(Values[Index].val);
+					vci->Set(&val, sizeof(long unsigned));
 				}
 				break;
 				case DT_TIME: {
@@ -1382,9 +1391,6 @@ Directive directives[] = {
 	{"UpdateTimeout", {{PARAM_TIME, PARAM_RELOAD, &UpdateTimeout}}},
 	{"UsePrivmsg", {{PARAM_SET, PARAM_RELOAD, &UsePrivmsg}}},
 	{"UseStrictPrivMsg", {{PARAM_SET, PARAM_RELOAD, &UseStrictPrivMsg}}},
-	{"UserKey1", {{PARAM_POSINT, PARAM_RELOAD, &UserKey1}}},
-	{"UserKey2", {{PARAM_POSINT, PARAM_RELOAD, &UserKey2}}},
-	{"UserKey3", {{PARAM_POSINT, PARAM_RELOAD, &UserKey3}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},

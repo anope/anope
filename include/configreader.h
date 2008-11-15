@@ -29,6 +29,7 @@ enum ConfigDataType {
 	DT_NOTHING, // No data
 	DT_INTEGER, // Integer
 	DT_UINTEGER, // Unsigned Integer
+	DT_LUINTEGER, // Long Unsigned Integer
 	DT_CHARPTR, // Char pointer
 	DT_STRING, // std::string
 	DT_BOOLEAN, // Boolean
@@ -188,6 +189,11 @@ typedef ValueContainer<bool *> ValueContainerBool;
  * an unsigned int
  */
 typedef ValueContainer<unsigned *> ValueContainerUInt;
+
+/** A specialization of ValueContainer to hold a pointer to
+ * a long unsigned int
+ */
+typedef ValueContainer<long unsigned *> ValueContainerLUInt;
 
 /** A specialization of ValueContainer to hold a pointer to
  * a char array.

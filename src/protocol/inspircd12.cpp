@@ -715,18 +715,21 @@ int anope_event_ftopic(const char *source, int ac, const char **av)
 
 int anope_event_mode(const char *source, int ac, const char **av)
 {
-	if (*av[0] == '#' || *av[0] == '&') {
+	if (*av[0] == '#' || *av[0] == '&')
+	{
 		do_cmode(source, ac, av);
-	} else {
+	}
+	else
+	{
 		/* InspIRCd lets opers change another
 		   users modes, we have to kludge this
 		   as it slightly breaks RFC1459
 		 */
-		if (!strcasecmp(source, av[0])) {
-			do_umode(source, ac, av);
-		} else {
-			do_umode(av[0], ac, av);
-		}
+		User *u = find_byuid(source);
+		User *u2 = find_byuid(av[0]);
+		
+		av[0] = u2->nick;
+		do_umode(u->nick, ac, av);
 	}
 	return MOD_CONT;
 }

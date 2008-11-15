@@ -122,6 +122,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 {
 	Server *serv;
 
+	alog("Creating %s(%s) uplinked to %s", name, suid, server_uplink ? server_uplink->name : "No uplink");
 	serv = (Server *)scalloc(sizeof(Server), 1);
 	if (!name)
 		name = "";
@@ -182,6 +183,8 @@ static void delete_server(Server * serv, const char *quitreason)
 	Server *s, *snext;
 	User *u, *unext;
 	NickAlias *na;
+	
+	alog("Deleting %s(%s) uplinked to %s(%s)", serv->name, serv->suid, serv->uplink ? serv->uplink->name : "NOTHING", serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK");
 
 	if (!serv) {
 		if (debug) {
@@ -260,24 +263,30 @@ Server *findserver(Server * s, const char *name)
 		return NULL;
 	}
 
-	if (debug >= 3) {
-		alog("debug: findserver(%p)", name);
-	}
-	while (s && (stricmp(s->name, name) != 0)) {
-		if (s->links) {
+	alog("findserver(%s)", name);
+
+	while (s && (stricmp(s->name, name) != 0))
+	{
+		alog("Compared %s, not a match", s->name);
+		if (s->links)
+		{
 			sl = findserver(s->links, name);
-			if (sl) {
+			if (sl)
+			{
 				s = sl;
-			} else {
+			}
+			else
+			{
 				s = s->next;
 			}
-		} else {
+		}
+		else
+		{
 			s = s->next;
 		}
 	}
-	if (debug >= 3) {
-		alog("debug: findserver(%s) -> %p", name, (void *) s);
-	}
+	
+	alog("debug: findserver(%s) -> %p", name, (void *) s);
 	return s;
 }
 
@@ -297,24 +306,30 @@ Server *findserver_uid(Server * s, const char *name)
 		return NULL;
 	}
 
-	if (debug >= 3) {
-		alog("debug: findserver_uid(%p)", name);
-	}
-	while (s && s->suid && (stricmp(s->suid, name) != 0)) {
-		if (s->links) {
+	alog("debug: findserver_uid(%s)", name);
+	
+	while (s && s->suid && (stricmp(s->suid, name) != 0))
+	{
+		alog("Compared %s, not a match", s->suid);
+		if (s->links)
+		{
 			sl = findserver_uid(s->links, name);
-			if (sl) {
+			if (sl)
+			{
 				s = sl;
-			} else {
+			}
+			else
+			{
 				s = s->next;
 			}
-		} else {
+		}
+		else
+		{
 			s = s->next;
 		}
 	}
-	if (debug >= 3) {
-		alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
-	}
+
+	alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
 	return s;
 }
 
@@ -369,6 +384,12 @@ void do_server(const char *source, const char *servername, const char *hops,
 		s = me_server;
 	else
 		s = findserver(servlist, source);
+		
+	if (s == NULL)
+		s = findserver_uid(servlist, source);
+	
+	if (s == NULL)
+		throw CoreException("Recieved a server from a nonexistant uplink?");
 
 	new_server(s, servername, descript, 0, numeric);
 	send_event(EVENT_SERVER_CONNECT, 1, servername);

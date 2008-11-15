@@ -685,7 +685,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendEOB()
 	{
-		send_cmd(NULL, "ENDBURST");
+		send_cmd(TS6SID, "ENDBURST");
 	}
 
 	int IsFloodModeParamValid(const char *value)
@@ -728,6 +728,15 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		 */
 		User *u = find_byuid(source);
 		User *u2 = find_byuid(av[0]);
+		
+		// This can happen with server-origin modes.
+		if (u == NULL)
+			u = u2;
+			
+		// drop it like fire.
+		// most likely situation was
+		if (u == NULL || u2 == NULL)
+			return MOD_CONT;
 		
 		av[0] = u2->nick;
 		do_umode(u->nick, ac, av);

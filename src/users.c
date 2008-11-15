@@ -43,7 +43,6 @@ User::User(const std::string &snick)
 	na = NULL;
 	chans = NULL;
 	founder_chans = NULL;
-	moduleData = NULL;
 	timestamp = my_signon = svid = mode = invalid_pw_time = lastmemosend = lastnickreg = lastmail = 0;
 
 	strscpy(this->nick, snick.c_str(), NICKMAX);
@@ -252,8 +251,6 @@ User::~User()
 
 	if (this->nickTrack)
 		free(this->nickTrack);
-
-	moduleCleanStruct(&this->moduleData);
 
 	if (debug >= 2)
 		alog("debug: User::~User(): delete from list");

@@ -482,7 +482,6 @@ void load_cs_dbase(void)
 					memos->time = tmp32;
 					SAFE(read = read_buffer(memos->sender, f));
 					SAFE(read_string(&memos->text, f));
-					memos->moduleData = NULL;
 				}
 			}
 
@@ -1779,7 +1778,6 @@ int delchan(ChannelInfo * ci)
 		for (i = 0; i < ci->memos.memocount; i++) {
 			if (ci->memos.memos[i].text)
 				free(ci->memos.memos[i].text);
-			moduleCleanStruct(&ci->memos.memos[i].moduleData);
 		}
 		free(ci->memos.memos);
 	}

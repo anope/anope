@@ -136,7 +136,6 @@ int do_del(User * u)
 			/* Delete all memos. */
 			for (i = 0; i < mi->memocount; i++) {
 				free(mi->memos[i].text);
-				moduleCleanStruct(&mi->memos[i].moduleData);
 			}
 			free(mi->memos);
 			mi->memos = NULL;

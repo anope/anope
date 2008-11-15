@@ -715,7 +715,6 @@ E int str_is_cidr(char *str, uint32 * ip, uint32 * mask, char **host);
 
 /**** modules.c ****/
 E void modules_unload_all(bool fini, bool unload_proto);	/* Read warnings near function source */
-E void moduleCleanStruct(ModuleData **moduleData);
 E void ModuleDatabaseBackup(const char *dbname);
 E void ModuleRemoveBackups(const char *dbname);
 

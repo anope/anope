@@ -44,8 +44,6 @@ class User : public Extensible
 
 	NickAlias *na;
 
-	ModuleData *moduleData;	/* defined for it, it should allow the module Add/Get */
-
 	int isSuperAdmin;	/* is SuperAdmin on or off? */
 
 	struct u_chanlist *chans;	/* Channels user has joined */

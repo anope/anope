@@ -256,7 +256,6 @@ void memo_send(User * u, char *name, char *text, int z)
 		mi->memos = (Memo *)srealloc(mi->memos, sizeof(Memo) * mi->memocount);
 		m = &mi->memos[mi->memocount - 1];
 		strscpy(m->sender, source, NICKMAX);
-		m->moduleData = NULL;
 		if (mi->memocount > 1) {
 			m->number = m[-1].number + 1;
 			if (m->number < 1) {
@@ -346,7 +345,6 @@ int delmemo(MemoInfo * mi, int num)
 			break;
 	}
 	if (i < mi->memocount) {
-		moduleCleanStruct(&mi->memos[i].moduleData);
 		free(mi->memos[i].text);		/* Deallocate memo text memory */
 		mi->memocount--;		/* One less memo now */
 		if (i < mi->memocount)  /* Move remaining memos down a slot */

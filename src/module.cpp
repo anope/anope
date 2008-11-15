@@ -86,9 +86,6 @@ Module::~Module()
 	/* Kill any active callbacks this module has */
 	moduleCallBackPrepForUnload(this->name.c_str());
 
-	/* Remove any stored data this module has */
-	moduleDelAllDataMod(this);
-
 	/**
 	 * ok, im going to walk every hash looking for commands we own, now, not exactly elegant or efficiant :)
 	 **/

@@ -391,7 +391,6 @@ typedef struct server_ Server;
 typedef struct channel_ Channel;
 typedef struct c_elist EList;
 typedef struct c_elist_entry Entry;
-typedef struct ModuleData_ ModuleData;			/* ModuleData struct */
 typedef struct memo_ Memo;
 typedef struct badword_ BadWord;
 typedef struct bandata_ BanData;
@@ -581,20 +580,6 @@ typedef struct {
 
 /*************************************************************************/
 
-
-/**
- * ModuleData strucs used to allow modules to add / delete module Data from existing structs
- */
-
-struct ModuleData_ {
-	char *moduleName;						/* Which module we belong to */
-	char *key;								/* The key */
-	char *value;							/* The Value */
-	ModuleData *next;						/* The next ModuleData record */
-};
-
- /*************************************************************************/
-
 /* Memo info structures.  Since both nicknames and channels can have memos,
  * we encapsulate memo data in a MemoList to make it easier to handle. */
 
@@ -604,7 +589,6 @@ struct memo_ {
 	time_t time;	/* When it was sent */
 	char sender[NICKMAX];
 	char *text;
-	ModuleData *moduleData; 	/* Module saved data attached to the Memo */
 #ifdef USE_MYSQL
 	uint32 id;		/* Database ID; see mysql.c */
 #endif

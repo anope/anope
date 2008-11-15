@@ -343,7 +343,6 @@ void load_old_ns_dbase(void)
 						memos->time = tmp32;
 						SAFE(read_buffer(memos->sender, f));
 						SAFE(read_string(&memos->text, f));
-						memos->moduleData = NULL;
 					}
 				}
 
@@ -539,7 +538,6 @@ void load_ns_dbase(void)
 					memos->time = tmp32;
 					SAFE(read_buffer(memos->sender, f));
 					SAFE(read_string(&memos->text, f));
-					memos->moduleData = NULL;
 				}
 			}
 
@@ -1257,7 +1255,6 @@ static int delcore(NickCore * nc)
 		for (i = 0; i < nc->memos.memocount; i++) {
 			if (nc->memos.memos[i].text)
 				free(nc->memos.memos[i].text);
-			moduleCleanStruct(&nc->memos.memos[i].moduleData);
 		}
 		free(nc->memos.memos);
 	}

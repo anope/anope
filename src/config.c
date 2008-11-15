@@ -672,6 +672,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "anonymousglobal", "no", new ValueContainerBool(&AnonymousGlobal), DT_BOOLEAN, NoValidation},
 		{"options", "nickregdelay", "0", new ValueContainerInt(&NickRegDelay), DT_INTEGER, NoValidation},
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
+		{"options", "newscount", "3", new ValueContainerInt(&NewsCount), DT_INTEGER, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1395,7 +1396,6 @@ Directive directives[] = {
 	{"MysqlRetries", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetries}}},
 	{"MysqlRetryGap", {{PARAM_POSINT, PARAM_RELOAD, &MysqlRetryGap}}},
 	{"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
-	{"NewsCount", {{PARAM_POSINT, PARAM_RELOAD, &NewsCount}}},
 	{"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
 					   {PARAM_PORT, 0, &RemotePort2},
 					   {PARAM_STRING, 0, &RemotePassword2}}},
@@ -1745,10 +1745,6 @@ int read_config(int reload)
 			else if (option == "autoop") hadAutoop = true;
 		}
 		if (!hadAutoop) NSDefFlags |= NI_AUTOOP;
-	}
-
-	if (!NewsCount) {
-		NewsCount = 3;
 	}
 
 	if (reload) {

@@ -559,7 +559,7 @@ E void lang_init(void);
 #define getstring(na,index) \
 	(langtexts[((na)&&((NickAlias*)na)->nc&&!(((NickAlias*)na)->status & NS_VERBOTEN)?((NickAlias*)na)->nc->language:NSDefLanguage)][(index)])
 #define getstring2(nc,index) \
-	(langtexts[((nc)?((NickCore*)nc)->language:NSDefLanguage)][(index)])
+	(langtexts[(((bool)(nc))?((NickCore*)(nc))->language:NSDefLanguage)][(index)])
 E int strftime_lang(char *buf, int size, User * u, int format,
 					struct tm *tm);
 E void syntax_error(char *service, User * u, const char *command,

@@ -668,6 +668,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycle", "no", new ValueContainerBool(&GlobalOnCycle), DT_BOOLEAN, NoValidation},
 		{"options", "globaloncycledown", "", new ValueContainerChar(&GlobalOnCycleMessage), DT_CHARPTR, ValidateGlobalOnCycle},
+		{"options", "globaloncycleup", "", new ValueContainerChar(&GlobalOnCycleUP), DT_CHARPTR, ValidateGlobalOnCycle},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1401,7 +1402,6 @@ Directive directives[] = {
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
 	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
-	{"GlobalOnCycleUP", {{PARAM_STRING, PARAM_RELOAD, &GlobalOnCycleUP}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
@@ -1912,13 +1912,6 @@ int read_config(int reload)
 				("*** BSFantasyCharacter is more than 1 character long. Only the first\n"
 				 "*** character ('%c') will be used. The others will be ignored.\n",
 				 *BSFantasyCharacter);
-		}
-	}
-
-	if (GlobalOnCycle) {
-		if (!GlobalOnCycleUP) {
-			alog("GlobalOnCycleUP are not defined; disabling GlobalOnCycle");
-			GlobalOnCycle = false;
 		}
 	}
 

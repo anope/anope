@@ -168,7 +168,7 @@ bool BSGentleBWReason;
 bool BSCaseSensitive;
 char *BSFantasyCharacter;
 
-int HideStatsO;
+bool HideStatsO;
 int GlobalOnCycle;
 int AnonymousGlobal;
 int RestrictOperNicks;
@@ -654,6 +654,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "usestrictprivmsg", "no", new ValueContainerBool(&UseStrictPrivMsg), DT_BOOLEAN, NoValidation},
 		{"options", "dumpcore", "no", new ValueContainerBool(&DumpCore), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"options", "logusers", "no", new ValueContainerBool(&LogUsers), DT_BOOLEAN, NoValidation},
+		{"options", "hidestatso", "no", new ValueContainerBool(&HideStatsO), DT_BOOLEAN, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1386,7 +1387,6 @@ Directive directives[] = {
 					   {PARAM_PORT, 0, &RemotePort3},
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-	{"HideStatsO", {{PARAM_SET, PARAM_RELOAD, &HideStatsO}}},
 	{"GlobalOnCycle", {{PARAM_SET, PARAM_RELOAD, &GlobalOnCycle}}},
 	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
 	{"GlobalOnCycleMessage",

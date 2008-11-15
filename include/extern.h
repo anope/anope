@@ -369,7 +369,7 @@ E bool  BSGentleBWReason;
 E bool  BSCaseSensitive;
 E char *BSFantasyCharacter;
 
-E int   HideStatsO;
+E bool  HideStatsO;
 E int   GlobalOnCycle;
 E int   AnonymousGlobal;
 E char *GlobalOnCycleMessage;

@@ -640,6 +640,7 @@ int ServerConfig::Read(bool bail)
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
+		{"options", "badpasslimit", "0", new ValueContainerInt(&BadPassLimit), DT_INTEGER, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "database", "nick.db", new ValueContainerChar(&NickDBName), DT_CHARPTR, ValidateNotEmpty},
@@ -1351,7 +1352,6 @@ bool ValueItem::GetBool()
 /*************************************************************************/
 
 Directive directives[] = {
-	{"BadPassLimit", {{PARAM_POSINT, PARAM_RELOAD, &BadPassLimit}}},
 	{"BadPassTimeout", {{PARAM_TIME, PARAM_RELOAD, &BadPassTimeout}}},
 	{"DumpCore", {{PARAM_SET, 0, &DumpCore}}},
 	{"ExpireTimeout", {{PARAM_TIME, PARAM_RELOAD, &ExpireTimeout}}},

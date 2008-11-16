@@ -14,7 +14,7 @@
 
 #include "services.h"
 #include "pseudo.h"
-int servernum = 0;
+Uplink *uplink_server;
 
 extern void moduleAddMsgs(void);
 extern void moduleAddIRCDMsgs(void);
@@ -142,14 +142,14 @@ static int parse_options(int ac, char **av)
 					*t++ = 0;
 					portnum = atoi(t);
 					if ((portnum > 0) && (portnum < 65535))
-						RemotePort = portnum;
+						/*RemotePort = portnum*/; // Needs fixing to handle the Uplinks list
 					else {
 						fprintf(stderr,
 								"-remote: Port numbers must be in the range 1..65535. Using default.\n");
 						return -1;
 					}
 				}
-				RemoteServer = s;
+				/*RemoteServer = s*/; // Needs fixing to handle the Uplinks list
 			} else if (strcmp(s, "local") == 0) {
 				if (++i >= ac) {
 					fprintf(stderr,
@@ -608,35 +608,17 @@ int init_secondary(int ac, char **av)
 	send_event(EVENT_CONNECT, 1, EVENT_START);
 
 	/* Connect to the remote server */
-	servsock = conn(RemoteServer, RemotePort, LocalHost, LocalPort);
-	if (servsock < 0 && RemoteServer2) {
-		servsock = conn(RemoteServer2, RemotePort2, LocalHost, LocalPort);
-		if (servsock < 0 && RemoteServer3) {
-			servsock =
-				conn(RemoteServer3, RemotePort3, LocalHost, LocalPort);
-			if (servsock < 0) {
-				fatal_perror("Can't connect to server");
-			} else {
-				servernum = 3;
-				alog("Connected to Server %d (%s:%d)", servernum,
-					 RemoteServer3, RemotePort3);
-			}
-		} else {
-			if (servsock < 0) {
-				fatal_perror("Can't connect to server");
-			}
-			servernum = 2;
-			alog("Connected to Server %d (%s:%d)", servernum,
-				 RemoteServer2, RemotePort2);
+	std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+	int servernum = 1;
+	for (; curr_uplink != end_uplink; ++curr_uplink, ++servernum) {
+		uplink_server = *curr_uplink;
+		servsock = conn(uplink_server->host, uplink_server->port, LocalHost, LocalPort);
+		if (servsock >= 0) {
+			alog("Connected to Server %d (%s:%d)", servernum, uplink_server->host, uplink_server->port);
+			break;
 		}
-	} else {
-		if (servsock < 0) {
-			fatal_perror("Can't connect to server");
-		}
-		servernum = 1;
-		alog("Connected to Server %d (%s:%d)", servernum, RemoteServer,
-			 RemotePort);
 	}
+	if (curr_uplink == end_uplink) fatal_perror("Can't connect to any servers");
 
 	ircdproto->SendConnect();
 	send_event(EVENT_CONNECT, 1, EVENT_STOP);

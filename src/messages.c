@@ -221,19 +221,9 @@ int m_stats(const char *source, int ac, const char **av)
 
 		if (u && is_oper(u)) {
 
-			if (servernum == 1) {
-				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer, write_buffer_len(), total_written, -1, read_buffer_len(),
-					total_read, -1, time(NULL) - start_time);
-			} else if (servernum == 2) {
-				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer2, write_buffer_len(), total_written, -1, read_buffer_len(),
-					total_read, -1, time(NULL) - start_time);
-			} else if (servernum == 3) {
-				ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
-				ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", RemoteServer3, write_buffer_len(), total_written, -1, read_buffer_len(),
-					total_read, -1, time(NULL) - start_time);
-			}
+			ircdproto->SendNumeric(ServerName, 211, source, "Server SendBuf SentBytes SentMsgs RecvBuf RecvBytes RecvMsgs ConnTime");
+			ircdproto->SendNumeric(ServerName, 211, source, "%s %d %d %d %d %d %d %ld", uplink_server->host, write_buffer_len(), total_written, -1, read_buffer_len(),
+				total_read, -1, time(NULL) - start_time);
 		}
 
 		ircdproto->SendNumeric(ServerName, 219, source, "%c :End of /STATS report.", *av[0] ? *av[0] : '*');

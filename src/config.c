@@ -27,17 +27,8 @@ static const char *SERVICES_CONF_NEW = "services_new.conf";
 
 char *IRCDModule;
 char *EncModule;
-char *RemoteServer;
-int RemotePort;
-char *RemotePassword;
 
-char *RemoteServer2;
-int RemotePort2;
-char *RemotePassword2;
-
-char *RemoteServer3;
-int RemotePort3;
-char *RemotePassword3;
+std::list<Uplink *> Uplinks;
 
 char *LocalHost;
 int LocalPort;
@@ -566,15 +557,57 @@ void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 	}
 }
 
+bool InitUplinks(ServerConfig *, const char *)
+{
+	if (!Uplinks.empty()) {
+		std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+		for (; curr_uplink != end_uplink; ++curr_uplink) delete *curr_uplink;
+	}
+	Uplinks.clear();
+	return true;
+}
+
+bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values, int *)
+{
+	// Validation variables
+	const char *host = values[0].GetString(), *password = values[2].GetString();
+	int port = values[1].GetInteger();
+	ValueItem vi_host(host), vi_port(port), vi_password(password);
+	// Validate the host to make sure it is not empty
+	if (!ValidateNotEmpty(conf, "uplink", "host", vi_host))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+	// Validate the port to make sure it is a valid port
+	if (!ValidatePort(conf, "uplink", "port", vi_port))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+	// Validate the password to make sure it is not empty
+	if (!ValidateNotEmpty(conf, "uplink", "password", vi_password))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+	// If we get here, all the values are valid, we'll add it to the Uplinks list
+	Uplinks.push_back(new Uplink(host, port, password));
+	return true;
+}
+
+bool DoneUplinks(ServerConfig *, const char *)
+{
+	return true;
+}
+
 bool InitModules(ServerConfig *, const char *)
 {
 	Modules.clear();
 	return true;
 }
 
-bool DoModule(ServerConfig *, const char *, const char **, ValueList &values, int *)
+bool DoModule(ServerConfig *conf, const char *, const char **, ValueList &values, int *)
 {
+	// First we validate that there was a name in the module block
+	const char *module = values[0].GetString();
+	ValueItem vi(module);
+	if (!ValidateNotEmpty(conf, "module", "name", vi))
+		throw ConfigException("One or more values in your configuration file failed to validate. Please see your ircd.log for more information.");
+	// If the string isn't empty, add a space before we add the module name
 	if (!Modules.empty()) Modules += " ";
+	// Add the module name to the string
 	Modules += values[0].GetString();
 	return true;
 }
@@ -619,34 +652,31 @@ int ServerConfig::Read(bool bail)
 		 *
 		 * If you want to create a directive using a character pointer specifically to hold a hostname (this will call ValidateHostname automatically):
 		 * char *blarg;
-		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_HOSTNAME, <validation>},
+		 * {"tag", "value", "", new ValueContainerChar(&blarg), DT_HOSTNAME, <validation>},
 		 *
 		 * If you want to create a directive using a character pointer that specifically can not have spaces in it (this will call ValidateNoSpaces automatically):
 		 * char *blarg;
-		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_NOSPACES, <validation>},
+		 * {"tag", "value", "", new ValueContainerChar(&blarg), DT_NOSPACES, <validation>},
 		 *
 		 * If you want to create a directive using a character pointer specifically to hold an IP address (this will call ValidateIP automatically):
 		 * char *blarg;
-		 * {"tag", "value", "", new ValueContainerChar(blarg), DT_IPADDRESS, <validation>},
+		 * {"tag", "value", "", new ValueContainerChar(&blarg), DT_IPADDRESS, <validation>},
 		 *
 		 * If you want to create a directive using a time (a time_t variable converted from a string):
 		 * time_t blarg;
 		 * {"tag", "value", "", new ValueContainterTime(&blarg), DT_TIME, <validation>},
 		 *
 		 * For the second-to-last argument, you can or (|) in the following values:
-		 * DT_NORELOAD - The variable can't be changed on a reload of the configuration (CURRENTLY NOT SET UP TO WORK YET)
+		 * DT_NORELOAD - The variable can't be changed on a reload of the configuration
 		 * DT_ALLOW_WILD - Allows wildcards/CIDR in DT_IPADDRESS
 		 * DT_ALLOW_NEWLINE - Allows new line characters in DT_CHARPTR and DT_STRING
 		 *
 		 * We may need to add some other validation functions to handle certain things, we can handle that later.
 		 * Any questions about these, w00t, feel free to ask. */
-		{"uplink", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
-		{"uplink", "host", "", new ValueContainerChar(&RemoteServer), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
-		{"uplink", "port", "0", new ValueContainerInt(&RemotePort), DT_INTEGER | DT_NORELOAD, ValidatePort},
-		{"uplink", "password", "", new ValueContainerChar(&RemotePassword), DT_NOSPACES | DT_NORELOAD, ValidateNotEmpty},
-		{"uplink", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "name", "", new ValueContainerChar(&ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "description", "", new ValueContainerChar(&ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "ident", "", new ValueContainerChar(&ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "hostname", "", new ValueContainerChar(&ServiceHost), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "pid", "services.pid", new ValueContainerChar(&PIDFilename), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -813,6 +843,11 @@ int ServerConfig::Read(bool bail)
 	/* These tags can occur multiple times, and therefore they have special code to read them
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiConfig MultiValues[] = {
+		{"uplink",
+			{"host", "port", "password", NULL},
+			{"", "0", "", NULL},
+			{DT_HOSTNAME | DT_NORELOAD, DT_INTEGER | DT_NORELOAD, DT_NOSPACES | DT_NORELOAD},
+			InitUplinks, DoUplink, DoneUplinks},
 		{"module",
 			{"name", NULL},
 			{"", NULL},
@@ -845,8 +880,8 @@ int ServerConfig::Read(bool bail)
 			dt &= ~DT_ALLOW_NEWLINE;
 			dt &= ~DT_ALLOW_WILD;
 			dt &= ~DT_NORELOAD;
-			// If the value is set to not allow reloading and we are reloading (bail will be true), skip the item
-			if (noreload && bail)
+			// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
+			if (noreload && !bail)
 				continue;
 			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
 			ValueItem vi(item);
@@ -932,8 +967,8 @@ int ServerConfig::Read(bool bail)
 					dt &= ~DT_ALLOW_NEWLINE;
 					dt &= ~DT_ALLOW_WILD;
 					dt &= ~DT_NORELOAD;
-					// If the value is set to not allow reloading and we are reloading (bail will be true), skip the item
-					if (noreload && bail)
+					// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
+					if (noreload && !bail)
 						continue;
 					switch (dt) {
 						case DT_NOSPACES: {
@@ -986,7 +1021,8 @@ int ServerConfig::Read(bool bail)
 						}
 						break;
 						case DT_INTEGER:
-						case DT_UINTEGER: {
+						case DT_UINTEGER:
+						case DT_LUINTEGER: {
 							int item = 0;
 							if (ConfValueInteger(config_data, MultiValues[Index].tag, MultiValues[Index].items[valuenum],
 								MultiValues[Index].items_default[valuenum], tagnum, item)) vl.push_back(ValueItem(item));
@@ -1403,13 +1439,6 @@ bool ValueItem::GetBool()
 Directive directives[] = {
 	{"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
 					  {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
-	{"ModuleAutoload", {{PARAM_STRING, PARAM_RELOAD, &Modules}}},
-	{"RemoteServer2", {{PARAM_STRING, 0, &RemoteServer2},
-					   {PARAM_PORT, 0, &RemotePort2},
-					   {PARAM_STRING, 0, &RemotePassword2}}},
-	{"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
-					   {PARAM_PORT, 0, &RemotePort3},
-					   {PARAM_STRING, 0, &RemotePassword3}}},
 };
 
 /*************************************************************************/
@@ -1676,7 +1705,7 @@ int read_config(int reload)
 		}
 	}
 
-	retval = serverConfig.Read(reload);
+	retval = serverConfig.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
 	config = fopen(SERVICES_CONF, "r");
 	if (!config) {
@@ -1698,7 +1727,8 @@ int read_config(int reload)
 	}
 	fclose(config);
 
-	if (!reload) {
+	// This section will need better checking after we get LocalAddress moved to the new config
+	/*if (!reload) {
 		if (RemoteServer3)
 			CHECK(RemoteServer2);
 
@@ -1713,7 +1743,7 @@ int read_config(int reload)
 				retval = 0;
 			}
 		}
-	}
+	}*/
 
 	if (temp_nsuserhost) {
 		if (!(s = strchr(temp_nsuserhost, '@'))) {

@@ -606,9 +606,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		if (servernum == 1) inspircd_cmd_pass(RemotePassword);
-		else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
-		else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
+		inspircd_cmd_pass(uplink_server->password);
 		SendServer(ServerName, 0, ServerDesc);
 		send_cmd(NULL, "BURST");
 		send_cmd(ServerName, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);

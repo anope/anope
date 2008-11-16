@@ -227,15 +227,7 @@ char *sockstrerror(int error);
 
 /**** config.c ****/
 
-E char *RemoteServer;
-E int   RemotePort;
-E char *RemotePassword;
-E char *RemoteServer2;
-E int   RemotePort2;
-E char *RemotePassword2;
-E char *RemoteServer3;
-E int   RemotePort3;
-E char *RemotePassword3;
+E std::list<Uplink *> Uplinks;
 E char *LocalHost;
 E int   LocalPort;
 
@@ -514,7 +506,7 @@ E void set_lastmask(User * u);
 E void introduce_user(const char *user);
 E int init_primary(int ac, char **av);
 E int init_secondary(int ac, char **av);
-E int servernum;
+E Uplink *uplink_server;
 
 /**** ircd.c ****/
 E void pmodule_ircd_proto(IRCDProto *);

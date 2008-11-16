@@ -229,6 +229,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include <string>
 #include <map>
 #include <exception>
+#include <list>
 
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
@@ -351,7 +352,7 @@ class Extensible
 	 * @return Returns true on success.
 	 */
 	bool Shrink(const std::string &key);
-	
+
 	/** Get an extension item.
 	 *
 	 * @param key The key parameter is an arbitary string which identifies the extension data
@@ -372,12 +373,12 @@ class Extensible
 			return false;
 		}
 	}
-	
+
 	/** Get an extension item.
 	 *
 	 * @param key The key parameter is an arbitary string which identifies the extension data
 	 * @return Returns true if the item was found and false if it was not.
-	 * 
+	 *
 	 * This single-parameter version only checks if the key exists, it does nothing with
 	 * the 'data' field and is probably only useful in conjunction with the single-parameter
 	 * version of Extend().
@@ -1249,11 +1250,11 @@ struct capabinfo_ {
 
 /*************************************************************************/
 
-
 /*
  * Forward declaration reqired, because the base IRCDProto class uses some crap from in here.
  */
 class IRCDProto;
+struct Uplink;
 #include "extern.h"
 
 class IRCDProto {
@@ -1513,6 +1514,25 @@ private:
 
 class IRCDTS6Proto : public IRCDProto
 {
+};
+
+/*************************************************************************/
+
+struct Uplink {
+	char *host;
+	int port;
+	char *password;
+	Uplink(const char *_host, int _port, const char *_password)
+	{
+		host = sstrdup(_host);
+		port = _port;
+		password = sstrdup(_password);
+	}
+	~Uplink()
+	{
+		free(host);
+		free(password);
+	}
 };
 
 /*************************************************************************/

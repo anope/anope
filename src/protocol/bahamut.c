@@ -721,9 +721,7 @@ class BahamutIRCdProto : public IRCDProto
 	void SendConnect()
 	{
 		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
-		if (servernum == 1) bahamut_cmd_pass(RemotePassword);
-		else if (servernum == 2) bahamut_cmd_pass(RemotePassword2);
-		else if (servernum == 3) bahamut_cmd_pass(RemotePassword3);
+		bahamut_cmd_pass(uplink_server->password);
 		bahamut_cmd_capab();
 		SendServer(ServerName, 1, ServerDesc);
 		bahamut_cmd_svinfo();

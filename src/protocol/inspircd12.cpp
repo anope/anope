@@ -609,9 +609,7 @@ class InspIRCdProto : public IRCDProto
 
 	void SendConnect()
 	{
-		if (servernum == 1) inspircd_cmd_pass(RemotePassword);
-		else if (servernum == 2) inspircd_cmd_pass(RemotePassword2);
-		else if (servernum == 3) inspircd_cmd_pass(RemotePassword3);
+		inspircd_cmd_pass(uplink_server->password);
 		SendServer(ServerName, 0, ServerDesc);
 		send_cmd(NULL, "BURST");
 		send_cmd(TS6SID, "VERSION :Anope-%s %s :%s - %s (%s) -- %s", version_number, ServerName, ircd->name, version_flags, EncModule, version_build);
@@ -728,16 +726,16 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		 */
 		User *u = find_byuid(source);
 		User *u2 = find_byuid(av[0]);
-		
+
 		// This can happen with server-origin modes.
 		if (u == NULL)
 			u = u2;
-			
+
 		// drop it like fire.
 		// most likely situation was
 		if (u == NULL || u2 == NULL)
 			return MOD_CONT;
-		
+
 		av[0] = u2->nick;
 		do_umode(u->nick, ac, av);
 	}

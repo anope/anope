@@ -595,9 +595,7 @@ class RatboxProto : public IRCDTS6Proto
 	{
 		/* Make myself known to myself in the serverlist */
 		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
-		if (servernum == 1) ratbox_cmd_pass(RemotePassword);
-		else if (servernum == 2) ratbox_cmd_pass(RemotePassword2);
-		else if (servernum == 3) ratbox_cmd_pass(RemotePassword3);
+		ratbox_cmd_pass(uplink_server->password);
 		ratbox_cmd_capab();
 		SendServer(ServerName, 1, ServerDesc);
 		ratbox_cmd_svinfo();

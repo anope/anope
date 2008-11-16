@@ -739,9 +739,7 @@ class UnrealIRCdProto : public IRCDProto
 		if (Numeric) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, Numeric);
 		else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
 		unreal_cmd_capab();
-		if (servernum == 1) unreal_cmd_pass(RemotePassword);
-		else if (servernum == 2) unreal_cmd_pass(RemotePassword2);
-		else if (servernum == 3) unreal_cmd_pass(RemotePassword3);
+		unreal_cmd_pass(uplink_server->password);
 		SendServer(ServerName, 1, ServerDesc);
 	}
 

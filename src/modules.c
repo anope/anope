@@ -90,15 +90,17 @@ int protocol_module_init(void)
 		 * as we only have the ircd struct filled here, we have to over
 		 * here. -GD
 		 */
-		if (UseTS6 && !(ircd->ts6)) {
-			alog("Chosen IRCd does not support TS6, unsetting UseTS6");
-			UseTS6 = 0;
-		}
-
-		/* We can assume the ircd supports TS6 here */
-		if (UseTS6 && !Numeric) {
-			alog("UseTS6 requires the setting of Numeric to be enabled.");
-			ret = -1;
+		if (ircd->ts6)
+		{
+			if (!Numeric)
+			{
+				alog("This IRCd protocol requires a server numeric to be set in Anope's configuration.");
+				ret = -1;
+			}
+			else
+			{
+				ts6_uid_init();
+			}
 		}
 	}
 

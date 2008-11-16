@@ -300,10 +300,9 @@ E bool  UseStrictPrivMsg;
 E bool  DumpCore;
 E bool  LogUsers;
 E int   NickRegDelay;
-E int   RestrictOperNicks;
+E bool   RestrictOperNicks;
 E int   NewsCount;
 E char *Numeric;
-E int   UseTS6;
 
 E char **HostSetters;
 E int HostNumber;

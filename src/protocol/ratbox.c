@@ -475,11 +475,7 @@ void ratbox_cmd_capab()
 /* PASS */
 void ratbox_cmd_pass(const char *pass)
 {
-	if (UseTS6) {
-		send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
-	} else {
-		send_cmd(NULL, "PASS %s :TS", pass);
-	}
+	send_cmd(NULL, "PASS %s TS 6 :%s", pass, TS6SID);
 }
 
 class RatboxProto : public IRCDTS6Proto
@@ -520,46 +516,46 @@ class RatboxProto : public IRCDTS6Proto
 			BotInfo *bi = findbot(source);
 			if (bi)
 			{
-				send_cmd(UseTS6 ? bi->uid : source, "OPERWALL :%s", buf);
+				send_cmd(bi->uid, "OPERWALL :%s", buf);
 				return;
 			}
 		}
-		send_cmd(UseTS6 ? TS6SID : ServerName, "OPERWALL :%s", buf);
+		send_cmd(TS6SID, "OPERWALL :%s", buf);
 	}
 
 	void SendSQLine(const char *mask, const char *reason)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "RESV * %s :%s", mask, reason);
+		send_cmd(bi ? bi->uid : s_OperServ, "RESV * %s :%s", mask, reason);
 	}
 
 	void SendSGLineDel(const char *mask)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "UNXLINE * %s", mask);
+		send_cmd(bi ? bi->uid : s_OperServ, "UNXLINE * %s", mask);
 	}
 
 	void SendSGLine(const char *mask, const char *reason)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
+		send_cmd(bi ? bi->uid : s_OperServ, "XLINE * %s 0 :%s", mask, reason);
 	}
 
 	void SendAkillDel(const char *user, const char *host)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "UNKLINE * %s %s", user, host);
+		send_cmd(bi ? bi->uid : s_OperServ, "UNKLINE * %s %s", user, host);
 	}
 
 	void SendSQLineDel(const char *user)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "UNRESV * %s", user);
+		send_cmd(bi ? bi->uid : s_OperServ, "UNRESV * %s", user);
 	}
 
 	void SendJoin(BotInfo *user, const char *channel, time_t chantime)
 	{
-		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, UseTS6 ? user->uid.c_str() : user->nick);
+		send_cmd(NULL, "SJOIN %ld %s + :%s", static_cast<long>(chantime), channel, user->uid.c_str());
 	}
 
 	/*
@@ -574,19 +570,19 @@ class RatboxProto : public IRCDTS6Proto
 	void SendAkill(const char *user, const char *host, const char *who, time_t when, time_t expires, const char *reason)
 	{
 		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(UseTS6 ? (bi ? bi->uid : s_OperServ) : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
+		send_cmd(bi ? bi->uid : s_OperServ, "KLINE * %ld %s %s :%s", static_cast<long>(expires - time(NULL)), user, host, reason);
 	}
 
 	void SendSVSKillInternal(const char *source, const char *user, const char *buf)
 	{
 		BotInfo *bi = findbot(source);
 		User *u = find_byuid(user);
-		send_cmd(UseTS6 ? (bi ? bi->uid : source) : source, "KILL %s :%s", UseTS6 ? (u ? u->uid : user) : user, buf);
+		send_cmd(bi ? bi->uid : source, "KILL %s :%s", u ? u->uid : user, buf);
 	}
 
 	void SendSVSMode(User *u, int ac, const char **av)
 	{
-		send_cmd(UseTS6 ? TS6SID : ServerName, "SVSMODE %s %s", u->nick, av[0]);
+		send_cmd(TS6SID, "SVSMODE %s %s", u->nick, av[0]);
 	}
 
 	/* SERVER name hop descript */
@@ -598,8 +594,7 @@ class RatboxProto : public IRCDTS6Proto
 	void SendConnect()
 	{
 		/* Make myself known to myself in the serverlist */
-		if (UseTS6) me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
-		else me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, NULL);
+		me_server = new_server(NULL, ServerName, ServerDesc, SERVER_ISME, TS6SID);
 		if (servernum == 1) ratbox_cmd_pass(RemotePassword);
 		else if (servernum == 2) ratbox_cmd_pass(RemotePassword2);
 		else if (servernum == 3) ratbox_cmd_pass(RemotePassword3);
@@ -611,78 +606,70 @@ class RatboxProto : public IRCDTS6Proto
 	void SendClientIntroduction(const char *nick, const char *user, const char *host, const char *real, const char *modes, const char *uid)
 	{
 		EnforceQlinedNick(nick, NULL);
-		if (UseTS6) {
-			const char *uidbuf = ts6_uid_retrieve();
-			send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
-		}
-		else send_cmd(NULL, "NICK %s 1 %ld %s %s %s %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, ServerName, real);
+		const char *uidbuf = ts6_uid_retrieve();
+		send_cmd(TS6SID, "UID %s 1 %ld %s %s %s 0 %s :%s", nick, static_cast<long>(time(NULL)), modes, user, host, uidbuf, real);
 		SendSQLine(nick, "Reserved for services");
 	}
 
 	void SendPartInternal(BotInfo *bi, const char *chan, const char *buf)
 	{
 		if (buf)
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s :%s", chan, buf);
+			send_cmd(bi->uid, "PART %s :%s", chan, buf);
 		else
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s", chan);
+			send_cmd(bi->uid, "PART %s", chan);
 	}
 
 	void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 	{
 		// This might need to be set in the call to SendNumeric instead of here, will review later -- CyberBotX
-		send_cmd(UseTS6 ? TS6SID : source, "%03d %s %s", numeric, dest, buf);
+		send_cmd(TS6SID, "%03d %s %s", numeric, dest, buf);
 	}
 
 	void SendModeInternal(BotInfo *bi, const char *dest, const char *buf)
 	{
 		if (bi)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "MODE %s %s", dest, buf);
+			send_cmd(bi->uid, "MODE %s %s", dest, buf);
 		}
-		else send_cmd(UseTS6 ? TS6SID : ServerName, "MODE %s %s", dest, buf);
+		else send_cmd(TS6SID, "MODE %s %s", dest, buf);
 	}
 
 	void SendKickInternal(BotInfo *bi, const char *chan, const char *user, const char *buf)
 	{
 		User *u = finduser(user);
-		if (buf) send_cmd(UseTS6 ? bi->uid : bi->nick, "KICK %s %s :%s", chan, UseTS6 ? (u ? u->uid : user) : user, buf);
-		else send_cmd(UseTS6 ? bi->uid : bi->nick, "KICK %s %s", chan, UseTS6 ? (u ? u->uid : user) : user);
+		if (buf) send_cmd(bi->uid, "KICK %s %s :%s", chan, u ? u->uid : user, buf);
+		else send_cmd(bi->uid, "KICK %s %s", chan, u ? u->uid : user);
 	}
 
 	void SendNoticeChanopsInternal(BotInfo *source, const char *dest, const char *buf)
 	{
-		if (!buf) return;
 		send_cmd(NULL, "NOTICE @%s :%s", dest, buf);
 	}
 
 	void SendBotOp(const char *nick, const char *chan)
 	{
-		if (UseTS6) {
-			BotInfo *bi = findbot(nick);
-			ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, bi ? bi->uid.c_str() : nick);
-		}
-		else SendMode(findbot(nick), chan, "%s %s", ircd->botchanumode, nick);
+		BotInfo *bi = findbot(nick);
+		ratbox_cmd_tmode(nick, chan, "%s %s", ircd->botchanumode, bi ? bi->uid.c_str() : nick);
 	}
 
 	/* QUIT */
 	void SendQuitInternal(BotInfo *bi, const char *buf)
 	{
-		if (buf) send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT :%s", buf);
-		else send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT");
+		if (buf) send_cmd(bi->uid, "QUIT :%s", buf);
+		else send_cmd(bi->uid, "QUIT");
 	}
 
 	/* PONG */
 	void SendPong(const char *servname, const char *who)
 	{
-		if (UseTS6) send_cmd(TS6SID, "PONG %s", who);
-		else send_cmd(servname, "PONG %s", who);
+		send_cmd(TS6SID, "PONG %s", who);
 	}
 
 	/* INVITE */
 	void SendInvite(BotInfo *source, const char *chan, const char *nick)
 	{
 		User *u = finduser(nick);
-		send_cmd(UseTS6 ? source->uid : source->nick, "INVITE %s %s", UseTS6 ? (u ? u->uid : nick) : nick, chan);
+		send_cmd(source->uid, "INVITE %s %s", u ? u->uid : nick, chan);
 	}
 
 	/*
@@ -698,7 +685,7 @@ class RatboxProto : public IRCDTS6Proto
 
 	void SendTopic(BotInfo *bi, const char *chan, const char *whosetit, const char *topic, time_t when)
 	{
-		send_cmd(UseTS6 ? bi->uid : bi->nick, "TOPIC %s :%s", chan, topic);
+		send_cmd(bi->uid, "TOPIC %s :%s", chan, topic);
 	}
 } ircd_proto;
 
@@ -740,21 +727,19 @@ int anope_event_nick(const char *source, int ac, const char **av)
 	Server *s;
 	User *user;
 
-	if (UseTS6 && ac == 9) {
+	if (ac == 9)
+	{
 		s = findserver_uid(servlist, source);
 		/* Source is always the server */
 		user = do_nick("", av[0], av[4], av[5], s->name, av[8],
 					   strtoul(av[2], NULL, 10), 0, 0, "*", av[7]);
-		if (user) {
+		if (user)
+		{
 			ircdproto->ProcessUsermodes(user, 1, &av[3]);
 		}
 	} else {
-		if (ac != 2) {
-			user = do_nick(source, av[0], av[4], av[5], av[6], av[7],
-						   strtoul(av[2], NULL, 10), 0, 0, "*", NULL);
-			if (user)
-				ircdproto->ProcessUsermodes(user, 1, &av[3]);
-		} else {
+		if (ac == 2)
+		{
 			do_nick(source, av[0], NULL, NULL, NULL, NULL,
 					strtoul(av[1], NULL, 10), 0, 0, NULL, NULL);
 		}
@@ -790,13 +775,9 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		if (ac > 1 && *av[1])
 			c->topic = sstrdup(av[1]);
 
-		if (UseTS6) {
-			u = find_byuid(source);
-			if (u) {
-				strscpy(c->topic_setter, u->nick, sizeof(c->topic_setter));
-			} else {
-				strscpy(c->topic_setter, source, sizeof(c->topic_setter));
-			}
+		u = find_byuid(source);
+		if (u) {
+			strscpy(c->topic_setter, u->nick, sizeof(c->topic_setter));
 		} else {
 			strscpy(c->topic_setter, source, sizeof(c->topic_setter));
 		}
@@ -881,12 +862,8 @@ int anope_event_away(const char *source, int ac, const char **av)
 {
 	User *u = NULL;
 
-	if (UseTS6) {
-		u = find_byuid(source);
-	}
-
-	m_away((UseTS6 ? (u ? u->nick : source) : source),
-		   (ac ? av[0] : NULL));
+	u = find_byuid(source);
+	m_away(u ? u->nick : source, (ac ? av[0] : NULL));
 	return MOD_CONT;
 }
 
@@ -953,7 +930,7 @@ int anope_event_part(const char *source, int ac, const char **av)
 	}
 
 	u = find_byuid(source);
-	do_part((UseTS6 ? (u ? u->nick : source) : source), ac, av);
+	do_part(u ? u->nick : source, ac, av);
 
 	return MOD_CONT;
 }
@@ -964,7 +941,7 @@ int anope_event_whois(const char *source, int ac, const char **av)
 
 	if (source && ac >= 1) {
 		bi = findbot(av[0]);
-		m_whois(source, (UseTS6 ? bi->uid.c_str() : bi->nick));
+		m_whois(source, bi->uid.c_str());
 	}
 	return MOD_CONT;
 }
@@ -974,7 +951,7 @@ int anope_event_server(const char *source, int ac, const char **av)
 {
 	if (!stricmp(av[1], "1")) {
 		uplink = sstrdup(av[0]);
-		if (UseTS6 && TS6UPLINK) {
+		if (TS6UPLINK) {
 			do_server(source, av[0], av[1], av[2], TS6UPLINK);
 		} else {
 			do_server(source, av[0], av[1], av[2], NULL);
@@ -1015,7 +992,7 @@ int anope_event_quit(const char *source, int ac, const char **av)
 
 	u = find_byuid(source);
 
-	do_quit((UseTS6 ? (u ? u->nick : source) : source), ac, av);
+	do_quit(u ? u->nick : source, ac, av);
 	return MOD_CONT;
 }
 
@@ -1030,14 +1007,10 @@ int anope_event_mode(const char *source, int ac, const char **av)
 	if (*av[0] == '#' || *av[0] == '&') {
 		do_cmode(source, ac, av);
 	} else {
-		if (UseTS6) {
-			u = find_byuid(source);
-			u2 = find_byuid(av[0]);
-			av[0] = u2->nick;
-			do_umode(u->nick, ac, av);
-		} else {
-			do_umode(source, ac, av);
-		}
+		u = find_byuid(source);
+		u2 = find_byuid(av[0]);
+		av[0] = u2->nick;
+		do_umode(u->nick, ac, av);
 	}
 	return MOD_CONT;
 }
@@ -1086,9 +1059,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 
 int anope_event_pass(const char *source, int ac, const char **av)
 {
-	if (UseTS6) {
-		TS6UPLINK = sstrdup(av[3]);
-	}
+	TS6UPLINK = sstrdup(av[3]);
 	return MOD_CONT;
 }
 
@@ -1177,11 +1148,8 @@ class ProtoRatbox : public Module
 		this->SetVersion("$Id$");
 		this->SetType(PROTOCOL);
 
-		if (UseTS6)
-		{
-			TS6SID = sstrdup(Numeric);
-			UseTSMODE = 1;  /* TMODE */
-		}
+		TS6SID = sstrdup(Numeric);
+		UseTSMODE = 1;  /* TMODE */
 
 		pmodule_ircd_version("Ratbox IRCD 2.0+");
 		pmodule_ircd_cap(myIrcdcap);
@@ -1210,8 +1178,7 @@ class ProtoRatbox : public Module
 
 	~ProtoRatbox()
 	{
-		if (UseTS6)
-			free(TS6SID);
+		free(TS6SID);
 	}
 
 };

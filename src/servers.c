@@ -409,7 +409,7 @@ void do_squit(const char *source, int ac, const char **av)
 	char buf[BUFSIZE];
 	Server *s;
 
-	if (UseTS6 && ircd->ts6) {
+	if (ircd->ts6) {
 		s = findserver_uid(servlist, av[0]);
 		if (!s) {
 			s = findserver(servlist, av[0]);
@@ -592,16 +592,8 @@ static unsigned int ts6_uid_index = 9;  /* last slot in uid buf */
 
 void ts6_uid_init(void)
 {
-	/* check just in case... you can never be too safe. */
-	if (TS6SID != NULL) {
-		snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
-		ts6_uid_initted = 1;
-	} else {
-		alog("warning: no TS6SID specified, disabling TS6 support.");
-		UseTS6 = 0;
-
-		return;
-	}
+	snprintf(ts6_new_uid, 10, "%sAAAAAA", TS6SID);
+	ts6_uid_initted = 1;
 }
 
 void ts6_uid_increment(unsigned int slot)
@@ -625,17 +617,18 @@ void ts6_uid_increment(unsigned int slot)
 
 const char *ts6_uid_retrieve(void)
 {
-	if (UseTS6 == 0)
+	if (!ircd->ts6 == 0)
 	{
-		alog("TS6 disabled, returning nothing");
+		alog("TS6 not supported on this ircd");
 		return "";
 	}
 
 	if (ts6_uid_initted != 1)
-		ts6_uid_init();
+	{
+		throw CoreException("TS6 IRCd and ts6_uid_init() hasn't been called!");
+	}
 
 	ts6_uid_increment(ts6_uid_index - 1);
-
 	return ts6_new_uid;
 }
 

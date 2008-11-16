@@ -296,9 +296,6 @@ char *UlineServers;
 char **Ulines;
 int NumUlines;
 
-int UseTS6;
-
-
 /*************************************************************************/
 
 ServerConfig::ServerConfig() : include_stack(), errstr(""), newconfig(), config_data()
@@ -1392,7 +1389,6 @@ Directive directives[] = {
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
 	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
-	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
 	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 

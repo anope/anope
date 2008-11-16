@@ -1273,38 +1273,38 @@ private:
 		}
 		virtual void SendNoticeInternal(BotInfo *bi, const char *dest, const char *msg)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s :%s", dest, msg);
 		}
 		virtual void SendPrivmsgInternal(BotInfo *bi, const char *dest, const char *buf)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s :%s", dest, buf);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s :%s", dest, buf);
 		}
 		virtual void SendQuitInternal(BotInfo *bi, const char *buf)
 		{
 			if (buf)
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT :%s", buf);
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "QUIT :%s", buf);
 			else
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "QUIT");
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "QUIT");
 		}
 		virtual void SendPartInternal(BotInfo *bi, const char *chan, const char *buf)
 		{
 			if (buf)
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s :%s", chan, buf);
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s :%s", chan, buf);
 			else
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "PART %s", chan);
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PART %s", chan);
 		}
 		virtual void SendGlobopsInternal(const char *source, const char *buf)
 		{
 			BotInfo *bi = findbot(source);
 			if (bi)
-				send_cmd(UseTS6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "GLOBOPS :%s", buf);
 			else
 				send_cmd(ServerName, "GLOBOPS :%s", buf);
 		}
 		virtual void SendCTCPInternal(BotInfo *bi, const char *dest, const char *buf)
 		{
 			char *s = normalizeBuffer(buf);
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
 			free(s);
 		}
 		virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
@@ -1397,11 +1397,11 @@ private:
 		}
 		virtual void SendGlobalNotice(BotInfo *bi, const char *dest, const char *msg)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendGlobalPrivmsg(BotInfo *bi, const char *dest, const char *msg)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "PRIVMSG %s%s :%s", ircd->globaltldprefix, dest, msg);
 		}
 		virtual void SendBotOp(const char *, const char *) = 0;
 
@@ -1431,7 +1431,7 @@ private:
 		virtual void SendSQLineDel(const char *) = 0;
 		virtual void SendInvite(BotInfo *bi, const char *chan, const char *nick)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "INVITE %s %s", nick, chan);
 		}
 		virtual void SendPart(BotInfo *bi, const char *chan, const char *fmt, ...)
 		{
@@ -1462,7 +1462,7 @@ private:
 		virtual void SendSVSO(const char *, const char *, const char *) { }
 		virtual void SendChangeBotNick(BotInfo *bi, const char *newnick)
 		{
-			send_cmd(UseTS6 ? bi->uid : bi->nick, "NICK %s", newnick);
+			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NICK %s", newnick);
 		}
 		virtual void SendForceNickChange(const char *oldnick, const char *newnick, time_t when)
 		{

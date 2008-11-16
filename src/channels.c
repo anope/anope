@@ -241,7 +241,7 @@ void chan_set_modes(const char *source, Channel * chan, int ac, const char **av,
 			}
 
 			if (!(user = finduser(*av))
-				&& !(UseTS6 && ircd->ts6 && (user = find_byuid(*av)))) {
+				&& !(ircd->ts6 && (user = find_byuid(*av)))) {
 				if (debug) {
 					alog("debug: MODE %s %c%c for nonexistent user %s",
 						 chan->name, (add ? '+' : '-'), mode, *av);
@@ -524,7 +524,7 @@ void do_join(const char *source, int ac, const char **av)
 	char *channame;
 	time_t ts = time(NULL);
 
-	if (UseTS6 && ircd->ts6) {
+	if (ircd->ts6) {
 		user = find_byuid(source);
 		if (!user)
 			user = finduser(source);
@@ -620,7 +620,7 @@ void do_kick(const char *source, int ac, const char **av)
 			continue;
 		}
 
-		if (UseTS6 && ircd->ts6) {
+		if (ircd->ts6) {
 			user = find_byuid(s);
 			if (!user) {
 				user = finduser(s);
@@ -668,7 +668,7 @@ void do_part(const char *source, int ac, const char **av)
 	struct u_chanlist *c;
 	char *channame;
 
-	if (UseTS6 && ircd->ts6) {
+	if (ircd->ts6) {
 		user = find_byuid(source);
 		if (!user)
 			user = finduser(source);
@@ -855,7 +855,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 			*end2 = 0;
 
 
-			if (UseTS6 && ircd->ts6) {
+			if (ircd->ts6) {
 				user = find_byuid(s);
 				if (!user)
 					user = finduser(s);
@@ -940,7 +940,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				*end2++ = csmodes[(int) *s++];
 			*end2 = 0;
 
-			if (UseTS6 && ircd->ts6) {
+			if (ircd->ts6) {
 				user = find_byuid(s);
 				if (!user)
 					user = finduser(s);
@@ -1015,7 +1015,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				*end2++ = csmodes[(int) *s++];
 			*end2 = 0;
 
-			if (UseTS6 && ircd->ts6) {
+			if (ircd->ts6) {
 				user = find_byuid(s);
 				if (!user)
 					user = finduser(s);
@@ -1069,7 +1069,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 		}
 		free((char *)s);
 	} else if (ac == 2) {
-		if (UseTS6 && ircd->ts6) {
+		if (ircd->ts6) {
 			user = find_byuid(source);
 			if (!user)
 				user = finduser(source);
@@ -1144,7 +1144,7 @@ void do_cmode(const char *source, int ac, const char **av)
 	}
 
 	/* :42XAAAAAO TMODE 1106409026 #ircops +b *!*@*.aol.com */
-	if (UseTS6 && ircd->ts6) {
+	if (ircd->ts6) {
 		if (isdigit(av[0][0])) {
 			ac--;
 			av++;

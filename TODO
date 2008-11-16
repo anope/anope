@@ -27,7 +27,7 @@ Legend:
   [x] Fix anope_cmd_* stuff to just use IRCdProto methods directly
   [ ] Fix command parsing (TBD)
   [x] SendClientIntroduction should take a UID param, rather than generating one(?)
-  [ ] Fix permanent channels (+P) stuff. Currently it tries to parse modes as users, but that's wrong.. this may rely on killing do_sjoin().
+  [x] Fix permanent channels (+P) stuff.
   [x] Remove UnRestrictSAdmin, UseTS6, UseSVSHOLD
 [?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
@@ -49,6 +49,7 @@ Legend:
 [ ] HelpServ must die (1.9.1?)
 [ ] Command parser cleanup
   [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
+[ ] Fix permanent channels support properly. This will require removing do_sjoin().
 
 1.9.2
 -----

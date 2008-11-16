@@ -102,7 +102,6 @@ bool UseStrictPrivMsg;
 bool DumpCore;
 bool LogUsers;
 int NickRegDelay;
-int UseSVSHOLD;
 int NewsCount;
 
 bool UseMail;
@@ -1391,13 +1390,10 @@ Directive directives[] = {
 	{"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
 					   {PARAM_PORT, 0, &RemotePort3},
 					   {PARAM_STRING, 0, &RemotePassword3}}},
-	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
+	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
+	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
-<<<<<<< HEAD:src/config.c
-	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
-=======
 	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
->>>>>>> Remove UnRestrictSAdmin.:src/config.c
 };
 
 /*************************************************************************/

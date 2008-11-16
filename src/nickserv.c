@@ -840,7 +840,7 @@ void cancel_user(User * u)
 	if (na) {
 		if (na->status & NS_GUESTED) {
 			if (ircd->svshold) {
-				if (UseSVSHOLD) {
+				if (ircd->svshold) {
 					ircdproto->SendSVSHold(na->nick);
 				} else {
 					if (ircd->svsnick) {
@@ -1395,11 +1395,7 @@ void release(NickAlias * na, int from_timeout)
 	if (!from_timeout)
 		del_ns_timeout(na, TO_RELEASE);
 	if (ircd->svshold) {
-		if (UseSVSHOLD) {
-			ircdproto->SendSVSHoldDel(na->nick);
-		} else {
-			ircdproto->SendQuit(na->nick, NULL);
-		}
+		ircdproto->SendSVSHoldDel(na->nick);
 	} else {
 		ircdproto->SendQuit(na->nick, NULL);
 	}

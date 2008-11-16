@@ -109,7 +109,7 @@ IRCDVar myIrcd[] = {
 	 1,						 /* Chan Reg			 */
 	 CMODE_r,				   /* Channel Mode		 */
 	 1,						 /* vidents			  */
-	 0,						 /* svshold			  */
+	 1,						 /* svshold			  */
 	 0,						 /* time stamp on mode   */
 	 0,						 /* NICKIP			   */
 	 1,						 /* O:LINE			   */

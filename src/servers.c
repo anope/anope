@@ -122,7 +122,8 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 {
 	Server *serv;
 
-	alog("Creating %s(%s) uplinked to %s", name, suid, server_uplink ? server_uplink->name : "No uplink");
+	if (debug)
+		alog("Creating %s(%s) uplinked to %s", name, suid, server_uplink ? server_uplink->name : "No uplink");
 	serv = (Server *)scalloc(sizeof(Server), 1);
 	if (!name)
 		name = "";
@@ -183,8 +184,9 @@ static void delete_server(Server * serv, const char *quitreason)
 	Server *s, *snext;
 	User *u, *unext;
 	NickAlias *na;
-	
-	alog("Deleting %s(%s) uplinked to %s(%s)", serv->name, serv->suid, serv->uplink ? serv->uplink->name : "NOTHING", serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK");
+
+	if (debug)
+		alog("Deleting %s(%s) uplinked to %s(%s)", serv->name, serv->suid, serv->uplink ? serv->uplink->name : "NOTHING", serv->uplink ? serv->uplink->suid : "NOSUIDUPLINK");
 
 	if (!serv) {
 		if (debug) {
@@ -263,11 +265,13 @@ Server *findserver(Server * s, const char *name)
 		return NULL;
 	}
 
-	alog("findserver(%s)", name);
+	if (debug)
+		alog("findserver(%s)", name);
 
 	while (s && (stricmp(s->name, name) != 0))
 	{
-		alog("Compared %s, not a match", s->name);
+		if (debug >= 3)
+			alog("Compared %s, not a match", s->name);
 		if (s->links)
 		{
 			sl = findserver(s->links, name);
@@ -285,8 +289,9 @@ Server *findserver(Server * s, const char *name)
 			s = s->next;
 		}
 	}
-	
-	alog("debug: findserver(%s) -> %p", name, (void *) s);
+
+	if (debug)
+		alog("debug: findserver(%s) -> %p", name, (void *) s);
 	return s;
 }
 
@@ -306,11 +311,13 @@ Server *findserver_uid(Server * s, const char *name)
 		return NULL;
 	}
 
-	alog("debug: findserver_uid(%s)", name);
+	if (debug)
+		alog("debug: findserver_uid(%s)", name);
 	
 	while (s && s->suid && (stricmp(s->suid, name) != 0))
 	{
-		alog("Compared %s, not a match", s->suid);
+		if (debug >= 3)
+			alog("Compared %s, not a match", s->suid);
 		if (s->links)
 		{
 			sl = findserver_uid(s->links, name);
@@ -329,7 +336,8 @@ Server *findserver_uid(Server * s, const char *name)
 		}
 	}
 
-	alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
+	if (debug)
+		alog("debug: findserver_uid(%s) -> %p", name, (void *) s);
 	return s;
 }
 
@@ -617,7 +625,7 @@ void ts6_uid_increment(unsigned int slot)
 
 const char *ts6_uid_retrieve(void)
 {
-	if (!ircd->ts6 == 0)
+	if (ircd->ts6 == 0)
 	{
 		alog("TS6 not supported on this ircd");
 		return "";

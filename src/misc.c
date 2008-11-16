@@ -15,6 +15,7 @@
 
 #include "services.h"
 #include "language.h"
+#include "hashcomp.h" // If this gets added to services.h or someplace else later, remove it from here -- CyberBotX
 
 /* Cheaper than isspace() or isblank() */
 #define issp(c) ((c) == 32)
@@ -1165,23 +1166,18 @@ void ntoa(struct in_addr addr, char *ipaddr, int len)
  * Build a string list from a given source string.
  * This is usually used for parsing out values from the config file, but could
  * be used for other things.
- * NOTE: this function uses strtok(), be aware it will break any buffer you think you have in there ;)
  **/
-char **buildStringList(char *src, int *number)
+char **buildStringList(const std::string &src, int *number)
 {
-	char *s;
 	int i = 0;
 	char **list = NULL;
+	spacesepstream tokens(src);
+	std::string token;
 
-	if (src) {
-		s = strtok(src, " ");
-		do {
-			if (s) {
-				i++;
-				list = (char **)realloc(list, sizeof(char *) * i);
-				list[i - 1] = sstrdup(s);
-			}
-		} while ((s = strtok(NULL, " ")));
+	while (tokens.GetToken(token)) {
+		i++;
+		list = (char **)realloc(list, sizeof(char *) * i);
+		list[i - 1] = sstrdup(token.c_str());
 	}
 	*number = i;				/* always zero it, even if we have no setters */
 	return list;

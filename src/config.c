@@ -225,7 +225,7 @@ char *SessionLimitDetailsLoc;
 
 bool OSOpersOnly;
 
-char *Modules;
+static std::string Modules;
 char **ModulesAutoload;
 int ModulesNumber;
 
@@ -566,6 +566,24 @@ void ServerConfig::ReportConfigError(const std::string &errormessage, bool bail)
 	}
 }
 
+bool InitModules(ServerConfig *, const char *)
+{
+	Modules.clear();
+	return true;
+}
+
+bool DoModule(ServerConfig *, const char *, const char **, ValueList &values, int *)
+{
+	if (!Modules.empty()) Modules += " ";
+	Modules += values[0].GetString();
+	return true;
+}
+
+bool DoneModules(ServerConfig *, const char *)
+{
+	return true;
+}
+
 int ServerConfig::Read(bool bail)
 {
 	errstr.clear();
@@ -795,6 +813,11 @@ int ServerConfig::Read(bool bail)
 	/* These tags can occur multiple times, and therefore they have special code to read them
 	 * which is different to the code for reading the singular tags listed above. */
 	MultiConfig MultiValues[] = {
+		{"module",
+			{"name", NULL},
+			{"", NULL},
+			{DT_CHARPTR},
+			InitModules, DoModule, DoneModules},
 		{NULL,
 			{NULL},
 			{NULL},
@@ -1852,28 +1875,28 @@ int read_config(int reload)
 	}
 
 	/* Host Setters building... :P */
-	HostSetters = buildStringList(HostSetter, &HostNumber);
+	HostSetters = buildStringList(HostSetter ? HostSetter : "", &HostNumber);
 
 	/* Modules Autoload building... :P */
 	ModulesAutoload = buildStringList(Modules, &ModulesNumber);
 	HostServCoreModules =
-		buildStringList(HostCoreModules, &HostServCoreNumber);
+		buildStringList(HostCoreModules ? HostCoreModules : "", &HostServCoreNumber);
 	MemoServCoreModules =
-		buildStringList(MemoCoreModules, &MemoServCoreNumber);
+		buildStringList(MemoCoreModules ? MemoCoreModules : "", &MemoServCoreNumber);
 	HelpServCoreModules =
-		buildStringList(HelpCoreModules, &HelpServCoreNumber);
+		buildStringList(HelpCoreModules ? HelpCoreModules : "", &HelpServCoreNumber);
 
 	BotServCoreModules =
-		buildStringList(BotCoreModules, &BotServCoreNumber);
+		buildStringList(BotCoreModules ? BotCoreModules : "", &BotServCoreNumber);
 
 	OperServCoreModules =
-		buildStringList(OperCoreModules, &OperServCoreNumber);
+		buildStringList(OperCoreModules ? OperCoreModules : "", &OperServCoreNumber);
 
 	ChanServCoreModules =
-		buildStringList(ChanCoreModules, &ChanServCoreNumber);
+		buildStringList(ChanCoreModules ? ChanCoreModules : "", &ChanServCoreNumber);
 
 	NickServCoreModules =
-		buildStringList(NickCoreModules, &NickServCoreNumber);
+		buildStringList(NickCoreModules ? NickCoreModules : "", &NickServCoreNumber);
 
 
 	if (LimitSessions) {

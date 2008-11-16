@@ -696,7 +696,7 @@ E char *str_signed(unsigned char *str);
 
 E void ntoa(struct in_addr addr, char *ipaddr, int len);
 
-E char **buildStringList(char *src, int *number);
+E char **buildStringList(const std::string &src, int *number);
 E void binary_to_hex(unsigned char *bin, char *hex, int length);
 
 E uint32 cidr_to_netmask(uint16 cidr);

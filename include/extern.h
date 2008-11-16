@@ -304,7 +304,6 @@ E int   UseSVSHOLD;
 E bool  RestrictOperNicks;
 E int   NewsCount;
 E char *Numeric;
-E int   UnRestrictSAdmin;
 E int   UseTS6;
 
 E char **HostSetters;

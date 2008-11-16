@@ -488,13 +488,6 @@ class BahamutIRCdProto : public IRCDProto
 				case '-':
 					add = 0;
 					break;
-				case 'a':
-					if (UnRestrictSAdmin) break;
-					if (add && !is_services_admin(user)) {
-						common_svsmode(user, "-a", NULL);
-						user->mode &= ~UMODE_a;
-					}
-					break;
 				case 'd':
 					if (!ac) {
 						alog("user: umode +d with no parameter (?) for user %s", user->nick);

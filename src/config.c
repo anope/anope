@@ -293,10 +293,7 @@ long unsigned int UserKey2;
 long unsigned int UserKey3;
 
 char *Numeric;
-
-int UnRestrictSAdmin;
-
-static char *UlineServers;
+char *UlineServers;
 char **Ulines;
 int NumUlines;
 
@@ -1396,7 +1393,11 @@ Directive directives[] = {
 					   {PARAM_STRING, 0, &RemotePassword3}}},
 	{"UseSVSHOLD", {{PARAM_SET, PARAM_RELOAD, &UseSVSHOLD}}},
 	{"UseTS6", {{PARAM_SET, 0, &UseTS6}}},
+<<<<<<< HEAD:src/config.c
 	{"UnRestrictSAdmin", {{PARAM_SET, PARAM_RELOAD, &UnRestrictSAdmin}}},
+=======
+	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
+>>>>>>> Remove UnRestrictSAdmin.:src/config.c
 };
 
 /*************************************************************************/

@@ -292,7 +292,7 @@ long unsigned int UserKey2;
 long unsigned int UserKey3;
 
 char *Numeric;
-char *UlineServers;
+static char *UlineServers;
 char **Ulines;
 int NumUlines;
 
@@ -1387,9 +1387,6 @@ Directive directives[] = {
 	{"RemoteServer3", {{PARAM_STRING, 0, &RemoteServer3},
 					   {PARAM_PORT, 0, &RemotePort3},
 					   {PARAM_STRING, 0, &RemotePassword3}}},
-	{"RestrictOperNicks", {{PARAM_SET, PARAM_RELOAD, &RestrictOperNicks}}},
-	{"AnonymousGlobal", {{PARAM_SET, PARAM_RELOAD, &AnonymousGlobal}}},
-	{"UlineServers", {{PARAM_STRING, PARAM_RELOAD, &UlineServers}}},
 };
 
 /*************************************************************************/

@@ -837,38 +837,31 @@ void cancel_user(User * u)
 {
 	NickAlias *na = u->na;
 
-	if (na) {
-		if (na->status & NS_GUESTED) {
-			if (ircd->svshold) {
-				if (ircd->svshold) {
-					ircdproto->SendSVSHold(na->nick);
-				} else {
-					if (ircd->svsnick) {
-						ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
-											 NSEnforcerHost,
-											 "Services Enforcer", "+", ts6_uid_retrieve());
-						add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-					} else {
-						ircdproto->SendSVSKill(s_NickServ, u->nick,
-										  "Killing to enforce nick");
-					}
-				}
-			} else {
-				if (ircd->svsnick) {
-					ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser,
-										 NSEnforcerHost,
-										 "Services Enforcer", "+", ts6_uid_retrieve());
-					add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
-				} else {
-					ircdproto->SendSVSKill(s_NickServ, u->nick,
-									  "Killing to enforce nick");
-				}
+	if (na)
+	{
+		if (na->status & NS_GUESTED)
+		{
+			if (ircd->svshold)
+			{
+				ircdproto->SendSVSHold(na->nick);
+			}
+			else if (ircd->svsnick)
+			{
+				ircdproto->SendClientIntroduction(u->nick, NSEnforcerUser, NSEnforcerHost, "Services Enforcer", "+", ts6_uid_retrieve());
+				add_ns_timeout(na, TO_RELEASE, NSReleaseTimeout);
+			}
+			else
+			{
+				ircdproto->SendSVSKill(s_NickServ, u->nick, "Please do not use a registered nickname without identifying");
 			}
 			na->status &= ~NS_TEMPORARY;
 			na->status |= NS_KILL_HELD;
-		} else {
+		}
+		else
+		{
 			na->status &= ~NS_TEMPORARY;
 		}
+
 		del_ns_timeout(na, TO_COLLIDE);
 	}
 }

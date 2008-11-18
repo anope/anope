@@ -316,8 +316,6 @@ int nonick = 0, nochan = 0, nobot = 0, nohost = 0;
 int main(int argc, char *argv[])
 {
 	dbFILE *f;
-	int i;
-	NickCore *nc, *ncnext;
 	HostCore *firsthc = NULL;
 
 	printf("\n"C_LBLUE"DB Merger v0.4 beta for Anope IRC Services by Certus"C_NONE"\n\n");
@@ -523,7 +521,7 @@ int main(int argc, char *argv[])
 			/* Nick aliases */
 			for (i = 0; i < 1024; i++) {
 				char *s = NULL;
-				NickAlias *ptr, *prev, *naptr;
+				NickAlias *ptr, *prev;
 
 				while ((c = getc_db(f)) == 1) {
 					if (c != 1) {
@@ -626,9 +624,10 @@ int main(int argc, char *argv[])
 	}
 
 	/* CLEAN THE CORES */
-
+	int i;
 	for (i = 0; i < 1024; i++) {
-		for (nc = nclists[i]; nc; nc = ncnext) {
+		NickCore *ncnext;
+		for (NickCore *nc = nclists[i]; nc; nc = ncnext) {
 			ncnext = nc->next;
 			if (nc->aliascount < 1) {
 				printf("Deleting core %s (%s).\n", nc->display, nc->email); 
@@ -645,7 +644,7 @@ int main(int argc, char *argv[])
 			NickCore *nc;
 			char **access;
 			Memo *memos;
-			int i, j;
+			int j;
 
 			/* Nick cores */
 			for (i = 0; i < 1024; i++) {
@@ -714,9 +713,6 @@ int main(int argc, char *argv[])
 			int n_levels;
 			char *s;
 			int n_ttb;
-			/* Unused variable - why? -GD
-			int J;
-			*/
 
 			last = &chanlists[i];
 			prev = NULL;
@@ -1111,7 +1107,6 @@ int main(int argc, char *argv[])
 						}
 						if (input[0] == '1') { /* #2 isn't in the list yet, #1 is. -> free() #2 [ci] */
 							NickCore *nc = NULL;
-							int i;
 							printf("Deleting chan %s (#2).\n", ci->name);
 
 							if (ci->founder) {

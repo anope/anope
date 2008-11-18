@@ -95,12 +95,6 @@ int do_set(User * u)
 			(noexpire ? OPER_SET_LIST_OPTION_ON :
 			 OPER_SET_LIST_OPTION_OFF);
 		notice_lang(s_OperServ, u, index, "NOEXPIRE");
-#ifdef USE_MYSQL
-		index =
-			(do_mysql ? OPER_SET_LIST_OPTION_ON :
-			 OPER_SET_LIST_OPTION_OFF);
-		notice_lang(s_OperServ, u, index, "SQL");
-#endif
 	} else if (!setting) {
 		syntax_error(s_OperServ, u, "SET", OPER_SET_SYNTAX);
 	} else if (stricmp(option, "IGNORE") == 0) {
@@ -113,30 +107,6 @@ int do_set(User * u)
 		} else {
 			notice_lang(s_OperServ, u, OPER_SET_IGNORE_ERROR);
 		}
-#ifdef USE_MYSQL
-	} else if (stricmp(option, "SQL") == 0) {
-		if (stricmp(setting, "on") == 0) {
-			if (!MysqlHost) {
-				notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_DISABLED);
-			} else {
-				if (rdb_init()) {
-					notice_lang(s_OperServ, u, OPER_SET_SQL_ON);
-				} else {
-					notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_INIT);
-				}
-			}
-		} else if (stricmp(setting, "off") == 0) {
-			if (!MysqlHost) {
-				notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR_DISABLED);
-			} else {
-				/* could call rdb_close() but that does nothing - TSL */
-				do_mysql = 0;
-				notice_lang(s_OperServ, u, OPER_SET_SQL_OFF);
-			}
-		} else {
-			notice_lang(s_OperServ, u, OPER_SET_SQL_ERROR);
-		}
-#endif
 	} else if (stricmp(option, "READONLY") == 0) {
 		if (stricmp(setting, "on") == 0) {
 			readonly = 1;

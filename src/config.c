@@ -251,17 +251,6 @@ static char *ChanCoreModules;
 char **ChanServCoreModules;
 int ChanServCoreNumber;
 
-
-char *MysqlHost;
-char *MysqlUser;
-char *MysqlPass;
-char *MysqlName;
-int MysqlPort;
-char *MysqlSecure;
-char *MysqlSock;
-int MysqlRetries = 0;
-int MysqlRetryGap = 0;
-
 int DefConLevel;
 static std::string DefCon1;
 static std::string DefCon2;
@@ -589,6 +578,7 @@ bool DoUplink(ServerConfig *conf, const char *, const char **, ValueList &values
 
 bool DoneUplinks(ServerConfig *, const char *)
 {
+	if (Uplinks.empty()) throw ConfigException("You must define at least one uplink block!");
 	return true;
 }
 
@@ -675,6 +665,8 @@ int ServerConfig::Read(bool bail)
 		 * Any questions about these, w00t, feel free to ask. */
 		{"serverinfo", "name", "", new ValueContainerChar(&ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "description", "", new ValueContainerChar(&ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
+		{"serverinfo", "localhost", "", new ValueContainerChar(&LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
+		{"serverinfo", "localport", "0", new ValueContainerInt(&LocalPort), DT_INTEGER | DT_NORELOAD, ValidatePort},
 		{"serverinfo", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "ident", "", new ValueContainerChar(&ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -1436,10 +1428,9 @@ bool ValueItem::GetBool()
 
 /*************************************************************************/
 
+/* Yay, no more core directives using the old config! -- CyberBotX
 Directive directives[] = {
-	{"LocalAddress", {{PARAM_STRING, 0, &LocalHost},
-					  {PARAM_PORT, PARAM_OPTIONAL, &LocalPort}}},
-};
+};*/
 
 /*************************************************************************/
 
@@ -1634,13 +1625,13 @@ int parse(char *buf, int linenum, int reload)
 	if (!dir)
 		return 1;
 
-	for (n = 0; n < lenof(directives); n++) {
+	/*for (n = 0; n < lenof(directives); n++) {
 		Directive *d = &directives[n];
 		retval = parse_directive(d, dir, ac, av, linenum, reload, s);
 		if (!retval) {
 			break;
 		}
-	}
+	}*/
 
 	return retval;
 }
@@ -1678,12 +1669,12 @@ int read_config(int reload)
 	char buf[1024], *s;
 	int defconCount = 0;
 
-	if (reload) {
-		unsigned int i, n;
+	/*if (reload) {
+		unsigned int i, n;*/
 
 		/* Reset all the reloadable settings */
 
-		for (n = 0; n < lenof(directives); n++) {
+		/*for (n = 0; n < lenof(directives); n++) {
 			Directive *d = &directives[n];
 
 			for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE;
@@ -1703,7 +1694,7 @@ int read_config(int reload)
 				}
 			}
 		}
-	}
+	}*/
 
 	retval = serverConfig.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
@@ -1727,23 +1718,20 @@ int read_config(int reload)
 	}
 	fclose(config);
 
-	// This section will need better checking after we get LocalAddress moved to the new config
-	/*if (!reload) {
-		if (RemoteServer3)
-			CHECK(RemoteServer2);
-
-		if (LocalHost && RemoteServer) {
-			if ((!stricmp(LocalHost, RemoteServer))
-				&& LocalPort == RemotePort) {
-				printf
-					("\n*** LocalAddress and RemoteServer are set to use the same IP address\n"
-					 "*** (%s) and port (%d). This would have resulted in errors.\n"
-					 "*** Change the LocalAddress to bind to another port.\n",
-					 RemoteServer, LocalPort);
-				retval = 0;
+	if (!reload) {
+		if (LocalHost) {
+			std::list<Uplink *>::iterator curr_uplink = Uplinks.begin(), end_uplink = Uplinks.end();
+			for (; curr_uplink != end_uplink; ++curr_uplink) {
+				Uplink *this_uplink = *curr_uplink;
+				if (!stricmp(LocalHost, this_uplink->host) && LocalPort == this_uplink->port) {
+					printf("\n<serverinfo:localhost> matches an <uplink:host> entry (%s)\nand <serverinfo:localport> matches an <uplink:port> entry (%s).\nThis will fail, you must make sure they are different.\n", this_uplink->host, this_uplink->port);
+					retval = 0;
+				}
 			}
 		}
-	}*/
+		// Just in case someone put something in for <serverinfo:localport> without defining <serverinfo:localhost> too
+		else LocalPort = 0;
+	}
 
 	if (temp_nsuserhost) {
 		if (!(s = strchr(temp_nsuserhost, '@'))) {
@@ -1789,17 +1777,6 @@ int read_config(int reload)
 	if (CSDefBantype < 0 || CSDefBantype > 3) {
 		error(0, "Value of CSDefBantype must be between 0 and 3 included");
 		retval = 0;
-	}
-
-	if (!MysqlRetries || !MysqlRetryGap) {
-		MysqlRetries = 5;
-		MysqlRetryGap = 1;
-	} else if (((MysqlRetries * MysqlRetryGap) > 60)
-			   || ((MysqlRetries * MysqlRetryGap) < 1)) {
-		error(0,
-			  "MysqlRetries * MysqlRetryGap must be between 1 and 60, using standard values.");
-		MysqlRetries = 5;
-		MysqlRetryGap = 1;
 	}
 
 	CSDefFlags = 0;

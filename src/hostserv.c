@@ -18,9 +18,7 @@
 
 #define HASH(nick)	((tolower((nick)[0])&31)<<5 | (tolower((nick)[1])&31))
 
-void load_hs_dbase_v1(dbFILE * f);
-void load_hs_dbase_v2(dbFILE * f);
-void load_hs_dbase_v3(dbFILE * f);
+void load_hs_dbase(dbFILE * f);
 
 HostCore *head = NULL;		  /* head of the HostCore list */
 
@@ -377,69 +375,17 @@ void load_hs_dbase(void)
 	}
 	ver = get_file_version(f);
 
-	if (ver == 1) {
-		load_hs_dbase_v1(f);
-	} else if (ver == 2) {
-		load_hs_dbase_v2(f);
-	} else if (ver == 3) {
-		load_hs_dbase_v3(f);
+	if (ver != 3) {
+		close_db(f);
+		fatal("DB %s is too old", HostDBName);
+		return;
 	}
+
+	load_hs_dbase(f);
 	close_db(f);
 }
 
-void load_hs_dbase_v1(dbFILE * f)
-{
-	int c;
-	int failed = 0;
-	int32 tmp;
-
-	char *nick;
-	char *vHost;
-
-	tmp = time(NULL);
-
-	while (!failed && (c = getc_db(f)) == 1) {
-
-		if (c == 1) {
-			SAFE(read_string(&nick, f));
-			SAFE(read_string(&vHost, f));
-			addHostCore(nick, NULL, vHost, "Unknown", tmp);	 /* could get a speed increase by not searching the list */
-			free(nick);		 /* as we know the db is in alphabetical order... */
-			free(vHost);
-		} else {
-			fatal("Invalid format in %s %d", HostDBName, c);
-		}
-	}
-}
-
-void load_hs_dbase_v2(dbFILE * f)
-{
-	int c;
-	int failed = 0;
-
-	char *nick;
-	char *vHost;
-	char *creator;
-	uint32 time;
-
-	while (!failed && (c = getc_db(f)) == 1) {
-
-		if (c == 1) {
-			SAFE(read_string(&nick, f));
-			SAFE(read_string(&vHost, f));
-			SAFE(read_string(&creator, f));
-			SAFE(read_int32(&time, f));
-			addHostCore(nick, NULL, vHost, creator, time);	  /* could get a speed increase by not searching the list */
-			free(nick);		 /* as we know the db is in alphabetical order... */
-			free(vHost);
-			free(creator);
-		} else {
-			fatal("Invalid format in %s %d", HostDBName, c);
-		}
-	}
-}
-
-void load_hs_dbase_v3(dbFILE * f)
+void load_hs_dbase(dbFILE * f)
 {
 	int c;
 	int failed = 0;

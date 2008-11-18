@@ -165,252 +165,6 @@ void nickserv(User * u, char *buf)
 	}							\
 } while (0)
 
-/* Loads NickServ database versions 5 to 11 (<= 4 is not supported) */
-
-void load_old_ns_dbase(void)
-{
-	dbFILE *f;
-	int ver, i, j, c;
-	NickAlias *na, *na2, *next;
-	NickCore *nc;
-	int failed = 0;
-
-	uint16 tmp16;
-	uint32 tmp32;
-
-	char bufn[NICKMAX], bufp[PASSMAX];
-	char *email, *greet, *url, *forbidby, *forbidreason;
-	uint32 icq;
-
-	if (!(f = open_db(s_NickServ, NickDBName, "r", NICK_VERSION)))
-		return;
-
-	ver = get_file_version(f);
-	if (ver <= 4) {
-		fatal("Unsupported version number (%d) on %s", ver, NickDBName);
-		close_db(f);
-		return;
-	}
-
-	for (i = 0; i < 256 && !failed; i++) {
-		while ((c = getc_db(f)) == 1) {
-			if (c != 1)
-				fatal("Invalid format in %s", NickDBName);
-
-			na = new NickAlias();
-
-			SAFE(read_buffer(bufn, f));
-			na->nick = sstrdup(bufn);
-			SAFE(read_buffer(bufp, f)); /* Will be used later if needed */
-
-			SAFE(read_string(&url, f));
-			SAFE(read_string(&email, f));
-			if (ver >= 10)
-				SAFE(read_int32(&icq, f));
-			else
-				icq = 0;
-			if (ver >= 9)
-				SAFE(read_string(&greet, f));
-			else
-				greet = NULL;
-
-			SAFE(read_string(&na->last_usermask, f));
-			SAFE(read_string(&na->last_realname, f));
-			SAFE(read_string(&na->last_quit, f));
-
-			SAFE(read_int32(&tmp32, f));
-			na->time_registered = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			na->last_seen = tmp32;
-
-			SAFE(read_int16(&na->status, f));
-			na->status &= ~NS_TEMPORARY;
-
-			if (ver >= 9) {
-				SAFE(read_string(&forbidby, f));
-				SAFE(read_string(&forbidreason, f));
-				/* Cleanup */
-				if (forbidby && *forbidby == '@') {
-					free(forbidby);
-					forbidby = NULL;
-				}
-				if (forbidreason && *forbidreason == 0) {
-					free(forbidreason);
-					forbidreason = NULL;
-				}
-			} else {
-				forbidby = NULL;
-				forbidreason = NULL;
-			}
-
-			if (na->status & NS_VERBOTEN) {
-				if (na->last_usermask)
-					free(na->last_usermask);
-				if (na->last_realname)
-					free(na->last_realname);
-
-				na->last_usermask = forbidby;
-				na->last_realname = forbidreason;
-			} else {
-				if (!na->last_usermask)
-					na->last_usermask = sstrdup("");
-				if (!na->last_realname)
-					na->last_realname = sstrdup("");
-			}
-
-			/* Store the reference for later resolving */
-			SAFE(read_string((char **) &na->nc, f));
-			SAFE(read_int16(&tmp16, f));		/* Was linkcount */
-
-			if (na->nc) {
-				SAFE(read_int16(&tmp16, f));	/* Was channelcount */
-			} else {
-				/* This nick was a master nick, so it also has all the
-				 * core info! =)
-				 */
-				nc = new NickCore();
-				slist_init(&nc->aliases);
-
-				/* The initial display is what used to be the master nick */
-				nc->display = sstrdup(na->nick);
-
-				/* We grabbed info before; fill the appropriate fields now */
-				if (*bufp)
-					memcpy(nc->pass, bufp, PASSMAX);
-				else
-					memset(nc->pass, 0, PASSMAX);	   /* Which may be the case for forbidden nicks .. */
-
-				nc->email = email;
-				nc->greet = greet;
-				nc->icq = icq;
-				nc->url = url;
-
-				/* We check whether the e-mail is valid because it was not tested
-				 * in older versions.
-				 */
-				if (ver <= 10 && nc->email && !MailValidate(nc->email)) {
-					free(nc->email);
-					nc->email = NULL;
-				}
-
-				SAFE(read_int32(&nc->flags, f));
-				if (!NSAllowKillImmed)
-					nc->flags &= ~NI_KILL_IMMED;
-
-				/* Status flags cleanup */
-				if (na->status & NS_OLD_ENCRYPTEDPW) {
-					nc->flags |= NI_ENCRYPTEDPW;
-					na->status &= ~NS_OLD_ENCRYPTEDPW;
-				}
-
-				/* Add services opers and admins to the appropriate list, but
-				   only if the database version is equal to or more than 10. */
-				if (ver >= 10) {
-					if (nc->flags & NI_SERVICES_ADMIN)
-						slist_add(&servadmins, nc);
-					if (nc->flags & NI_SERVICES_OPER)
-						slist_add(&servopers, nc);
-				}
-
-				/* Add the Services root flag if needed. */
-				if (nc)
-					for (j = 0; j < RootNumber; j++)
-						if (!stricmp(ServicesRoots[j], na->nick))
-							nc->flags |= NI_SERVICES_ROOT;
-
-				SAFE(read_int16(&nc->accesscount, f));
-				if (nc->accesscount) {
-					char **access;
-					access = (char **)scalloc(sizeof(char *) * nc->accesscount, 1);
-					nc->access = access;
-					for (j = 0; j < nc->accesscount; j++, access++)
-						SAFE(read_string(access, f));
-				}
-
-				SAFE(read_int16(&tmp16, f));
-				nc->memos.memocount = (int16) tmp16;
-				SAFE(read_int16(&tmp16, f));
-				nc->memos.memomax = (int16) tmp16;
-				if (nc->memos.memocount) {
-					Memo *memos;
-					memos = (Memo *)scalloc(sizeof(Memo) * nc->memos.memocount, 1);
-					nc->memos.memos = memos;
-
-					for (j = 0; j < nc->memos.memocount; j++, memos++) {
-						SAFE(read_int32(&memos->number, f));
-						SAFE(read_int16(&memos->flags, f));
-						SAFE(read_int32(&tmp32, f));
-						memos->time = tmp32;
-						SAFE(read_buffer(memos->sender, f));
-						SAFE(read_string(&memos->text, f));
-					}
-				}
-
-				/* We read the channel count, but don't take care of it.
-				   load_cs_dbase will regenerate it correctly. */
-				SAFE(read_int16(&tmp16, f));
-
-				/* formerly nc->channelmax, RIP */
-				SAFE(read_int16(&tmp16, f));
-				SAFE(read_int16(&nc->language, f));
-
-				if (ver >= 11 && ver < 13) {
-					char *s;
-
-					SAFE(read_int16(&tmp16, f));
-					SAFE(read_int32(&tmp32, f));
-					SAFE(read_int16(&tmp16, f));
-					SAFE(read_string(&s, f));
-				}
-
-				/* Set us as being a master nick; fill the nc field also.
-				   The NS_MASTER flag will not be cleared in this function. */
-				na->status |= NS_MASTER;
-				na->nc = nc;
-				slist_add(&nc->aliases, na);
-
-				/* Insert our new core in the core list */
-				insert_core(nc);
-			}
-
-			alpha_insert_alias(na);
-
-		}					   /* while (getc_db(f) != 0) */
-	}						   /* for (i) */
-
-	/* Now resolve what were called links */
-	for (i = 0; i < 1024; i++) {
-		for (na = nalists[i]; na; na = next) {
-			next = na->next;
-
-			/* Master nicks are already resolved */
-			if (na->status & NS_MASTER)
-				continue;
-
-			na2 = na;
-			/* While the reference resolves and it's not a master nick */
-			while ((na2 = findnick((char *) na2->nc))
-				   && !(na2->status & NS_MASTER));
-
-			/* It didn't resolve. This is problematic since there is no core. :/
-			   We delete the nick. */
-			if (!na2) {
-				alog("%s: while loading database: %s was linked to inexistant %s", s_NickServ, na->nick, (char *) na->nc);
-				delnick(na);
-				continue;
-			}
-
-			/* OK we have information on the core. We mark the current alias
-			   as a master nick because it now contains a valid core. */
-			na->nc = na2->nc;
-			na->status |= NS_MASTER;
-			slist_add(&na->nc->aliases, na);
-		}
-	}
-
-	close_db(f);
-}
-
 void load_ns_req_db(void)
 {
 	dbFILE *f;
@@ -463,9 +217,9 @@ void load_ns_dbase(void)
 
 	ver = get_file_version(f);
 
-	if (ver <= 11) {
+	if (ver != 14) {
 		close_db(f);
-		load_old_ns_dbase();
+		fatal("DB %s is too old", NickDBName);
 		return;
 	}
 
@@ -487,15 +241,7 @@ void load_ns_dbase(void)
 			slist_init(&nc->aliases);
 
 			SAFE(read_string(&nc->display, f));
-			if (ver < 14) {
-				SAFE(read_string(&pass, f));
-				if (pass) {
-					memset(nc->pass, 0, PASSMAX);
-					memcpy(nc->pass, pass, strlen(pass));
-				} else
-					memset(nc->pass, 0, PASSMAX);
-			} else
-				SAFE(read_buffer(nc->pass, f));
+			SAFE(read_buffer(nc->pass, f));
 
 			SAFE(read_string(&nc->email, f));
 			SAFE(read_string(&nc->greet, f));
@@ -543,15 +289,6 @@ void load_ns_dbase(void)
 
 			SAFE(read_int16(&nc->channelcount, f));
 			SAFE(read_int16(&tmp16, f));
-
-			if (ver < 13) {
-				/* Used to be dead authentication system */
-				SAFE(read_int16(&tmp16, f));
-				SAFE(read_int32(&tmp32, f));
-				SAFE(read_int16(&tmp16, f));
-				SAFE(read_string(&s, f));
-			}
-
 		}					   /* while (getc_db(f) != 0) */
 		*nclast = NULL;
 	}						   /* for (i) */

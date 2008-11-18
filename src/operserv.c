@@ -138,118 +138,6 @@ void operserv(User * u, char *buf)
 /**************************** Privilege checks ***************************/
 /*************************************************************************/
 
-/* Load old AKILL data. */
-
-#define SAFE(x) do {					\
-	if ((x) < 0) {					\
-	if (!forceload)					\
-		fatal("Read error on %s", AutokillDBName);	\
-	break;						\
-	}							\
-} while (0)
-
-static void load_old_akill(void)
-{
-	dbFILE *f;
-	int i, j;
-	uint16 tmp16;
-	uint32 tmp32;
-	char buf[NICKMAX], mask2[BUFSIZE], *mask, *s;
-	Akill *ak, *entry;
-
-	if (!
-		(f =
-		 open_db("AKILL", AutokillDBName ? AutokillDBName : "akill.db",
-				 "r", 9)))
-		return;
-
-	get_file_version(f);
-
-	read_int16(&tmp16, f);
-	slist_setcapacity(&akills, tmp16);
-
-	for (j = 0; j < akills.capacity; j++) {
-		ak = (Akill *)scalloc(sizeof(Akill), 1);
-
-		SAFE(read_string(&mask, f));
-		s = strchr(mask, '@');
-		*s = 0;
-		s++;
-		ak->user = sstrdup(mask);
-		ak->host = sstrdup(s);
-		SAFE(read_string(&ak->reason, f));
-		SAFE(read_buffer(buf, f));
-		if (!*buf)
-			ak->by = sstrdup("<unknown>");
-		else
-			ak->by = sstrdup(buf);
-		SAFE(read_int32(&tmp32, f));
-		ak->seton = tmp32 ? tmp32 : time(NULL);
-		SAFE(read_int32(&tmp32, f));
-		ak->expires = tmp32;
-
-		/* Sanity checks *sigh* */
-
-		/* No nicknames allowed! */
-		if (strchr(ak->user, '!')) {
-			ircdproto->SendAkillDel(ak->user, ak->host);
-			free(ak);
-			continue;
-		}
-
-		snprintf(mask2, sizeof(mask2), "%s@%s", ak->user, ak->host);
-
-		/* Is the mask already in the AKILL list? */
-		if (slist_indexof(&akills, mask2) != -1) {
-			free(ak);
-			continue;
-		}
-
-		/* Checks whether there is an AKILL that already covers
-		 * the one we want to add, and whether there are AKILLs
-		 * that would be covered by this one. Expiry time
-		 * does *also* matter.
-		 */
-
-		if (akills.count > 0) {
-
-			for (i = akills.count - 1; i >= 0; i--) {
-
-				char amask[BUFSIZE];
-
-				entry = (Akill *)akills.list[i];
-
-				if (!entry)
-					continue;
-
-				snprintf(amask, sizeof(amask), "%s@%s", entry->user,
-						 entry->host);
-
-				if (match_wild_nocase(amask, mask2)
-					&& (entry->expires >= ak->expires
-						|| entry->expires == 0)) {
-					ircdproto->SendAkillDel(ak->user, ak->host);
-					free(ak);
-					ak = NULL;
-					break;
-				}
-
-				if (match_wild_nocase(mask2, amask)
-					&& (entry->expires <= ak->expires || ak->expires == 0))
-					slist_delete(&akills, i);
-			}
-
-		}
-
-		if (ak)
-			slist_add(&akills, ak);
-	}
-
-	close_db(f);
-}
-
-#undef SAFE
-
 /* Load OperServ data. */
 
 #define SAFE(x) do {					\
@@ -274,124 +162,88 @@ void load_os_dbase(void)
 		return;
 
 	ver = get_file_version(f);
-
-	if (ver <= 9) {
-		NickAlias *na;
-
-		SAFE(read_int16(&n, f));
-		for (i = 0; i < n && !failed; i++) {
-			SAFE(read_string(&s, f));
-			if (s) {
-				na = findnick(s);
-				if (na) {
-					na->nc->flags |= NI_SERVICES_ADMIN;
-					if (slist_indexof(&servadmins, na) == -1)
-						slist_add(&servadmins, na);
-				}
-				free(s);
-			}
-		}
-		if (!failed)
-			SAFE(read_int16(&n, f));
-		for (i = 0; i < n && !failed; i++) {
-			SAFE(read_string(&s, f));
-			if (s) {
-				na = findnick(s);
-				if (na) {
-					na->nc->flags |= NI_SERVICES_OPER;
-					if (slist_indexof(&servopers, na) == -1)
-						slist_add(&servopers, na);
-				}
-				free(s);
-			}
-		}
+	if (ver != 13)
+	{
+		close_db(f);
+		fatal("Read error on %s", ChanDBName);
+		return;
 	}
+	
+	SAFE(read_int32(&maxusercnt, f));
+	SAFE(read_int32(&tmp32, f));
+	maxusertime = tmp32;
 
-	if (ver >= 7) {
-		SAFE(read_int32(&maxusercnt, f));
+	Akill *ak;
+
+	read_int16(&tmp16, f);
+	slist_setcapacity(&akills, tmp16);
+
+	for (i = 0; i < akills.capacity; i++) {
+		ak = (Akill *)scalloc(sizeof(Akill), 1);
+
+		SAFE(read_string(&ak->user, f));
+		SAFE(read_string(&ak->host, f));
+		SAFE(read_string(&ak->by, f));
+		SAFE(read_string(&ak->reason, f));
 		SAFE(read_int32(&tmp32, f));
-		maxusertime = tmp32;
+		ak->seton = tmp32;
+		SAFE(read_int32(&tmp32, f));
+		ak->expires = tmp32;
+
+		slist_add(&akills, ak);
 	}
 
-	if (ver <= 10)
-		load_old_akill();
-	else {
-		Akill *ak;
+	SXLine *sx;
 
-		read_int16(&tmp16, f);
-		slist_setcapacity(&akills, tmp16);
+	read_int16(&tmp16, f);
+	slist_setcapacity(&sglines, tmp16);
 
-		for (i = 0; i < akills.capacity; i++) {
-			ak = (Akill *)scalloc(sizeof(Akill), 1);
+	for (i = 0; i < sglines.capacity; i++) {
+		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
-			SAFE(read_string(&ak->user, f));
-			SAFE(read_string(&ak->host, f));
-			SAFE(read_string(&ak->by, f));
-			SAFE(read_string(&ak->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			ak->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			ak->expires = tmp32;
+		SAFE(read_string(&sx->mask, f));
+		SAFE(read_string(&sx->by, f));
+		SAFE(read_string(&sx->reason, f));
+		SAFE(read_int32(&tmp32, f));
+		sx->seton = tmp32;
+		SAFE(read_int32(&tmp32, f));
+		sx->expires = tmp32;
 
-			slist_add(&akills, ak);
-		}
+		slist_add(&sglines, sx);
 	}
 
-	if (ver >= 11) {
-		SXLine *sx;
+	read_int16(&tmp16, f);
+	slist_setcapacity(&sqlines, tmp16);
 
-		read_int16(&tmp16, f);
-		slist_setcapacity(&sglines, tmp16);
+	for (i = 0; i < sqlines.capacity; i++) {
+		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
-		for (i = 0; i < sglines.capacity; i++) {
-			sx = (SXLine *)scalloc(sizeof(SXLine), 1);
+		SAFE(read_string(&sx->mask, f));
+		SAFE(read_string(&sx->by, f));
+		SAFE(read_string(&sx->reason, f));
+		SAFE(read_int32(&tmp32, f));
+		sx->seton = tmp32;
+		SAFE(read_int32(&tmp32, f));
+		sx->expires = tmp32;
 
-			SAFE(read_string(&sx->mask, f));
-			SAFE(read_string(&sx->by, f));
-			SAFE(read_string(&sx->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			sx->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			sx->expires = tmp32;
+		slist_add(&sqlines, sx);
+	}
 
-			slist_add(&sglines, sx);
-		}
+	read_int16(&tmp16, f);
+	slist_setcapacity(&szlines, tmp16);
 
-		if (ver >= 13) {
-			read_int16(&tmp16, f);
-			slist_setcapacity(&sqlines, tmp16);
+	for (i = 0; i < szlines.capacity; i++) {
+		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
 
-			for (i = 0; i < sqlines.capacity; i++) {
-				sx = (SXLine *)scalloc(sizeof(SXLine), 1);
+		SAFE(read_string(&sx->mask, f));
+		SAFE(read_string(&sx->by, f));
+		SAFE(read_string(&sx->reason, f));
+		SAFE(read_int32(&tmp32, f));
+		sx->seton = tmp32;
+		SAFE(read_int32(&tmp32, f));
+		sx->expires = tmp32;
 
-				SAFE(read_string(&sx->mask, f));
-				SAFE(read_string(&sx->by, f));
-				SAFE(read_string(&sx->reason, f));
-				SAFE(read_int32(&tmp32, f));
-				sx->seton = tmp32;
-				SAFE(read_int32(&tmp32, f));
-				sx->expires = tmp32;
-
-				slist_add(&sqlines, sx);
-			}
-		}
-
-		read_int16(&tmp16, f);
-		slist_setcapacity(&szlines, tmp16);
-
-		for (i = 0; i < szlines.capacity; i++) {
-			sx = (SXLine *)scalloc(sizeof(SXLine), 1);
-
-			SAFE(read_string(&sx->mask, f));
-			SAFE(read_string(&sx->by, f));
-			SAFE(read_string(&sx->reason, f));
-			SAFE(read_int32(&tmp32, f));
-			sx->seton = tmp32;
-			SAFE(read_int32(&tmp32, f));
-			sx->expires = tmp32;
-
-			slist_add(&szlines, sx);
-		}
+		slist_add(&szlines, sx);
 	}
 
 	close_db(f);

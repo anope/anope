@@ -555,49 +555,6 @@ void load_cs_dbase(void)
 				delchan(ci);
 				continue;
 			}
-			if (ver < 13) {
-				ChanAccess *access, *access2;
-				AutoKick *akick, *akick2;
-				int k;
-
-				if (ci->flags & CI_VERBOTEN)
-					continue;
-				/* Need to regenerate the channel count for the founder */
-				ci->founder->channelcount++;
-				/* Check for eventual double entries in access/akick lists. */
-				for (j = 0, access = ci->access; j < ci->accesscount;
-					 j++, access++) {
-					if (!access->in_use)
-						continue;
-					for (k = 0, access2 = ci->access; k < j;
-						 k++, access2++) {
-						if (access2->in_use && access2->nc == access->nc) {
-							alog("%s: deleting %s channel access entry of %s because it is already in the list (this is OK).", s_ChanServ, access->nc->display, ci->name);
-							memset(access, 0, sizeof(ChanAccess));
-							break;
-						}
-					}
-				}
-				for (j = 0, akick = ci->akick; j < ci->akickcount;
-					 j++, akick++) {
-					if (!(akick->flags & AK_USED)
-						|| !(akick->flags & AK_ISNICK))
-						continue;
-					for (k = 0, akick2 = ci->akick; k < j; k++, akick2++) {
-						if ((akick2->flags & AK_USED)
-							&& (akick2->flags & AK_ISNICK)
-							&& akick2->u.nc == akick->u.nc) {
-							alog("%s: deleting %s channel akick entry of %s because it is already in the list (this is OK).", s_ChanServ, akick->u.nc->display, ci->name);
-							if (akick->reason)
-								free(akick->reason);
-							if (akick->creator)
-								free(akick->creator);
-							memset(akick, 0, sizeof(AutoKick));
-							break;
-						}
-					}
-				}
-			}
 		}
 	}
 }

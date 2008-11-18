@@ -69,7 +69,6 @@ char *PreNickDBName;
 char *ChanDBName;
 char *BotDBName;
 char *OperDBName;
-char *AutokillDBName;
 char *NewsDBName;
 
 static char *HostSetter;
@@ -791,7 +790,6 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "database", "oper.db", new ValueContainerChar(&OperDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "newsdatabase", "news.db", new ValueContainerChar(&NewsDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "exceptiondatabase", "exception.db", new ValueContainerChar(&ExceptionDBName), DT_CHARPTR, ValidateNotEmpty},
-		{"operserv", "autokilldatabase", "akill.db", new ValueContainerChar(&AutokillDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "modules", "", new ValueContainerChar(&OperCoreModules), DT_CHARPTR, NoValidation},
 		{"operserv", "servicesroot", "", new ValueContainerChar(&ServicesRoot), DT_CHARPTR, ValidateNotEmpty},
 		{"operserv", "superadmin", "no", new ValueContainerBool(&SuperAdmin), DT_BOOLEAN, NoValidation},

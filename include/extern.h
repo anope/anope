@@ -272,7 +272,6 @@ E char *PreNickDBName;
 E char *ChanDBName;
 E char *BotDBName;
 E char *OperDBName;
-E char *AutokillDBName;
 E char *NewsDBName;
 
 E bool  NoBackupOkay;

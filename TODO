@@ -33,7 +33,7 @@ Legend:
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
 [ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
-[ ] Remove old (prior to 1.8.0) db compat
+[x] Remove old (prior to 1.8.0) db compat
 
 1.9.1
 -----

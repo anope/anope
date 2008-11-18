@@ -227,6 +227,8 @@ char *sockstrerror(int error);
 
 /**** config.c ****/
 
+E ServerConfig serverConfig;
+
 E std::list<Uplink *> Uplinks;
 E char *LocalHost;
 E int   LocalPort;

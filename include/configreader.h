@@ -375,10 +375,6 @@ class ServerConfig
 		void ValidateNoSpaces(const char *, const std::string &, const std::string &);
 };
 
-/** Initialize the disabled commands list
- */
-E bool InitializeDisabledCommands(const char *);
-
 /** This class can be used on its own to represent an exception, or derived to represent a module-specific exception.
  * When a module whishes to abort, e.g. within a constructor, it should throw an exception using ModuleException or
  * a class derived from ModuleException. If a module throws an exception during its constructor, the module will not
@@ -410,6 +406,127 @@ class ConfigException : public std::exception
 		{
 			return err.c_str();
 		}
+};
+
+#define CONF_NO_ERROR 0x000000
+#define CONF_NOT_A_NUMBER 0x000010
+#define CONF_INT_NEGATIVE 0x000080
+#define CONF_VALUE_NOT_FOUND 0x000100
+#define CONF_FILE_NOT_FOUND 0x000200
+
+/** Allows reading of values from configuration files
+ * This class allows a module to read from either the main configuration file (inspircd.conf) or from
+ * a module-specified configuration file. It may either be instantiated with one parameter or none.
+ * Constructing the class using one parameter allows you to specify a path to your own configuration
+ * file, otherwise, inspircd.conf is read.
+ */
+class ConfigReader
+{
+	protected:
+		/** The contents of the configuration file
+		 * This protected member should never be accessed by a module (and cannot be accessed unless the
+		 * core is changed). It will contain a pointer to the configuration file data with unneeded data
+		 * (such as comments) stripped from it.
+		 */
+		ConfigDataHash *data;
+		/** Used to store errors
+		 */
+		std::ostringstream *errorlog;
+		/** If we're using our own config data hash or not
+		 */
+		bool privatehash;
+		/** True if an error occured reading the config file
+		 */
+		bool readerror;
+		/** Error code
+		 */
+		long error;
+	public:
+		/** Default constructor.
+		 * This constructor initialises the ConfigReader class to read services.conf.
+		 */
+		ConfigReader();
+		/** Overloaded constructor.
+		 * This constructor initialises the ConfigReader class to read a user-specified config file
+		 */
+		 ConfigReader(const std::string &);
+		/** Default destructor.
+		 * This method destroys the ConfigReader class.
+		 */
+		~ConfigReader();
+		/** Retrieves a value from the config file.
+		 * This method retrieves a value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve.
+		 */
+		std::string ReadValue(const std::string &, const std::string &, int, bool = false);
+		/** Retrieves a value from the config file.
+		 * This method retrieves a value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve. If the
+		 * tag is not found the default value is returned instead.
+		 */
+		std::string ReadValue(const std::string &, const std::string &, const std::string &, int, bool = false);
+		/** Retrieves a boolean value from the config file.
+		 * This method retrieves a boolean value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve. The values "1", "yes"
+		 * and "true" in the config file count as true to ReadFlag, and any other value counts as false.
+		 */
+		bool ReadFlag(const std::string &, const std::string &, int);
+		/** Retrieves a boolean value from the config file.
+		 * This method retrieves a boolean value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve. The values "1", "yes"
+		 * and "true" in the config file count as true to ReadFlag, and any other value counts as false.
+		 * If the tag is not found, the default value is used instead.
+		 */
+		bool ReadFlag(const std::string &, const std::string &, const std::string &, int);
+		/** Retrieves an integer value from the config file.
+		 * This method retrieves an integer value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve. Any invalid integer
+		 * values in the tag will cause the objects error value to be set, and any call to GetError() will
+		 * return CONF_INVALID_NUMBER to be returned. need_positive is set if the number must be non-negative.
+		 * If a negative number is placed into a tag which is specified positive, 0 will be returned and GetError()
+		 * will return CONF_INT_NEGATIVE. Note that need_positive is not suitable to get an unsigned int - you
+		 * should cast the result to achieve that effect.
+		 */
+		int ReadInteger(const std::string &, const std::string &, int, bool);
+		/** Retrieves an integer value from the config file.
+		 * This method retrieves an integer value from the config file. Where multiple copies of the tag
+		 * exist in the config file, index indicates which of the values to retrieve. Any invalid integer
+		 * values in the tag will cause the objects error value to be set, and any call to GetError() will
+		 * return CONF_INVALID_NUMBER to be returned. needs_unsigned is set if the number must be unsigned.
+		 * If a signed number is placed into a tag which is specified unsigned, 0 will be returned and GetError()
+		 * will return CONF_NOT_UNSIGNED. If the tag is not found, the default value is used instead.
+		 */
+		int ReadInteger(const std::string &, const std::string &, const std::string &, int, bool);
+		/** Returns the last error to occur.
+		 * Valid errors can be found by looking in modules.h. Any nonzero value indicates an error condition.
+		 * A call to GetError() resets the error flag back to 0.
+		 */
+		long GetError();
+		/** Counts the number of times a given tag appears in the config file.
+		 * This method counts the number of times a tag appears in a config file, for use where
+		 * there are several tags of the same kind, e.g. with opers and connect types. It can be
+		 * used with the index value of ConfigReader::ReadValue to loop through all copies of a
+		 * multiple instance tag.
+		 */
+		int Enumerate(const std::string &);
+		/** Returns true if a config file is valid.
+		 * This method is partially implemented and will only return false if the config
+		 * file does not exist or could not be opened.
+		 */
+		bool Verify();
+		/** Dumps the list of errors in a config file to an output location. If bail is true,
+		 * then the program will abort. If bail is false and user points to a valid user
+		 * record, the error report will be spooled to the given user by means of NOTICE.
+		 * if bool is false AND user is false, the error report will be spooled to all opers
+		 * by means of a NOTICE to all opers.
+		 */
+		void DumpErrors(bool);
+		/** Returns the number of items within a tag.
+		 * For example if the tag was &lt;test tag="blah" data="foo"&gt; then this
+		 * function would return 2. Spaces and newlines both qualify as valid seperators
+		 * between values.
+		 */
+		int EnumerateValues(const std::string &, int);
 };
 
 #endif

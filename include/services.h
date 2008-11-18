@@ -224,6 +224,7 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include "defs.h"
 #include "slist.h"
 #include "events.h"
+#include "configreader.h"
 
 /* pull in the various bits of STL to pull in */
 #include <string>

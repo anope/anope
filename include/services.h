@@ -540,40 +540,6 @@ struct ircdcapab_ {
 };
 
 /*************************************************************************/
-/* Config Details */
-/*************************************************************************/
-
-#define MAXPARAMS	8
-
-/* Configuration directives */
-
-typedef struct {
-	const char *name;
-	struct {
-		int type;			   /* PARAM_* below */
-		int flags;			  /* Same */
-		void *ptr;			  /* Pointer to where to store the value */
-	} params[MAXPARAMS];
-} Directive;
-
-#define PARAM_NONE	0
-#define PARAM_INT	1
-#define PARAM_POSINT	2	   /* Positive integer only */
-#define PARAM_PORT	3	   /* 1..65535 only */
-#define PARAM_STRING	4
-#define PARAM_TIME	5
-#define PARAM_STRING_ARRAY 6	/* Array of string */
-#define PARAM_SET	-1	  /* Not a real parameter; just set the
-								 *	given integer variable to 1 */
-#define PARAM_DEPRECATED -2	 /* Set for deprecated directives; `ptr'
-								 *	is a function pointer to call */
-
-/* Flags: */
-#define PARAM_OPTIONAL	0x01
-/*#define PARAM_FULLONLY	0x02   unused */
-#define PARAM_RELOAD	0x04	/* Directive is reloadable */
-
-/*************************************************************************/
 
 /* File version for each database. Was one version for all before but was
    changed so they are now easier to maintain. =) */

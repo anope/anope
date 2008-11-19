@@ -1,12 +1,12 @@
 /* ns_maxemail.c - Limit the amount of times an email address
  *				 can be used for a NickServ account.
- * 
+ *
  * (C) 2003-2008 Anope Team
  * Contact us at info@anope.org
- * 
+ *
  * Included in the Anope module pack since Anope 1.7.9
  * Anope Coder: GeniusDex <geniusdex@anope.org>
- * 
+ *
  * Please read COPYING and README for further details.
  *
  * Send any bug reports to the Anope Coder, as he will be able
@@ -168,10 +168,10 @@ int my_ns_set(User * u)
 
 	cur_buffer = moduleGetLastBuffer();
 	set = myStrGetToken(cur_buffer, ' ', 0);
-	
+
 	if (!set)
 		return MOD_CONT;
-	
+
 	if (stricmp(set, "email") != 0) {
 		free(set);
 		return MOD_CONT;
@@ -198,11 +198,8 @@ int my_event_reload(int argc, char **argv)
 
 void my_load_config(void)
 {
-	Directive confvalues[] = {
-		{"NSEmailMax", {{PARAM_INT, PARAM_RELOAD, &NSEmailMax}}}
-	};
-
-	moduleGetConfigDirective(confvalues);
+	ConfigReader config;
+	NSEmailMax = config.ReadInteger("ns_maxemail", "maxemails", "0", 0, false);
 
 	if (debug)
 		alog("debug: [ns_maxemail] NSEmailMax set to %d", NSEmailMax);

@@ -110,7 +110,7 @@ class HSRequest : public Module
 		c = createCommand("list", hs_do_list_out, is_services_oper, -1, -1, -1, -1, -1);
 		this->AddCommand(HOSTSERV, c, MOD_HEAD);
 
-		c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1); 
+		c = createCommand("drop", ns_do_drop, NULL, -1, -1, -1, -1, -1);
 		this->AddCommand(NICKSERV, c, MOD_HEAD);
 
 		hook = createEventHook(EVENT_DB_SAVING, hsreqevt_db_saving);
@@ -945,29 +945,15 @@ int hsreqevt_db_backup(int argc, char **argv)
 
 void my_load_config(void)
 {
-	int i;
-	char *tmp = NULL;
+	ConfigReader config;
+	HSRequestMemoUser = config.ReadFlag("hs_request", "memouser", "no", 0);
+	HSRequestMemoOper = config.ReadFlag("hs_request", "memooper", "no", 0);
+	HSRequestMemoSetters = config.ReadFlag("hs_request", "memosetters", "no", 0);
+	std::string tmp = config.ReadValue("hs_request", "database", HSREQ_DEFAULT_DBNAME, 0);
 
-	Directive confvalues[][1] = {
-		{{"HSRequestMemoUser",
-		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoUser}}}},
-		{{"HSRequestMemoOper",
-		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoOper}}}},
-		{{"HSRequestMemoSetters",
-		  {{PARAM_SET, PARAM_RELOAD, &HSRequestMemoSetters}}}},
-		{{"HSRequestDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}}}
-	};
-
-	for (i = 0; i < 4; i++)
-		moduleGetConfigDirective(confvalues[i]);
-
-	if (tmp) {
-		if (HSRequestDBName)
-			free(HSRequestDBName);
-		HSRequestDBName = sstrdup(tmp);
-	} else {
-		HSRequestDBName = sstrdup(HSREQ_DEFAULT_DBNAME);
-	}
+	if (HSRequestDBName)
+		free(HSRequestDBName);
+	HSRequestDBName = sstrdup(tmp.c_str());
 
 	if (debug)
 		alog("debug: [hs_request] Set config vars: MemoUser=%d MemoOper=%d MemoSetters=%d DBName='%s'", HSRequestMemoUser, HSRequestMemoOper, HSRequestMemoSetters, HSRequestDBName);

@@ -88,7 +88,7 @@ class NSNOOPConvert : public Module
 
 /*************************************************************************/
 
-/** 
+/**
  * Load data from the db file, and populate the autoop setting
  * @return 0 for success
  **/
@@ -126,31 +126,21 @@ int mLoadData(void)
 
 /*************************************************************************/
 
-/** 
+/**
  * Load the configuration directives from Services configuration file.
  * @return 0 for success
  **/
 int mLoadConfig(int argc, char **argv)
 {
-	char *tmp = NULL;
-
-	Directive d[] = {
-		{"NSAutoOPDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
-	};
-
-	moduleGetConfigDirective(d);
+	ConfigReader config;
+	std::string tmp = config.ReadValue("ns_noop_convert", "database", DEFAULT_DB_NAME, 0);
 
 	if (NSAutoOPDBName)
 		free(NSAutoOPDBName);
 
-	if (tmp) {
-		NSAutoOPDBName = tmp;
-	} else {
-		NSAutoOPDBName = sstrdup(DEFAULT_DB_NAME);
-		alog("ns_noop: NSAutoOPDBName is not defined in Services configuration file, using default %s", NSAutoOPDBName);
-	}
+	NSAutoOPDBName = sstrdup(tmp.c_str());
 
-	if (!NSAutoOPDBName) {
+	if (tmp.empty()) {
 		alog("ns_noop: FATAL: Can't read required configuration directives!");
 		return MOD_STOP;
 	} else {

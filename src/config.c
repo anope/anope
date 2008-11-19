@@ -1420,18 +1420,6 @@ bool ValueItem::GetBool()
 
 /*************************************************************************/
 
-/* Deprecated directive (dep_) and value checking (chk_) functions: */
-
-/* Hey, there are no left! -GD */
-
-/*************************************************************************/
-
-/* Yay, no more core directives using the old config! -- CyberBotX
-Directive directives[] = {
-};*/
-
-/*************************************************************************/
-
 /* Print an error message to the log (and the console, if open). */
 
 void error(int linenum, const char *message, ...)
@@ -1455,185 +1443,6 @@ void error(int linenum, const char *message, ...)
 			fprintf(stderr, "%s: %s\n", SERVICES_CONF, buf);
 	}
 }
-
-/*************************************************************************/
-
-/* Parse a configuration line.  Return 1 on success; otherwise, print an
- * appropriate error message and return 0.  Destroys the buffer by side
- * effect.
- */
-
-int parse_directive(Directive * d, char *dir, int ac, char *av[MAXPARAMS],
-					int linenum, int reload, char *s)
-{
-	int retval = 1;
-	int i;
-	long val;
-	int myoptind;
-
-	if (stricmp(dir, d->name) != 0)
-		return 1;
-	myoptind = 0;
-	for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE; i++) {
-		if (reload && !(d->params[i].flags & PARAM_RELOAD))
-			continue;
-
-		if (d->params[i].type == PARAM_SET) {
-			*(int *) d->params[i].ptr = 1;
-			continue;
-		}
-
-		/* Should we remove PARAM_DEPRECATED because it's
-		 * useless right now? -GD */
-		if (d->params[i].type == PARAM_DEPRECATED) {
-			void (*func) (void);
-			error(linenum, "Deprecated directive `%s' used", d->name);
-			func = (void (*)(void)) (d->params[i].ptr);
-			func();			 /* For clarity */
-			continue;
-		}
-		if (myoptind >= ac) {
-			if (!(d->params[i].flags & PARAM_OPTIONAL)) {
-				error(linenum, "Not enough parameters for `%s'", d->name);
-				retval = 0;
-			}
-			break;
-		}
-		switch (d->params[i].type) {
-		case PARAM_INT:
-			val = strtol(av[myoptind++], &s, 0);
-			if (*s) {
-				error(linenum,
-					  "%s: Expected an integer for parameter %d",
-					  d->name, myoptind);
-				retval = 0;
-				break;
-			}
-			*(int *) d->params[i].ptr = val;
-			break;
-		case PARAM_POSINT:
-			val = strtol(av[myoptind++], &s, 0);
-			if (*s || val <= 0) {
-				error(linenum,
-					  "%s: Expected a positive integer for parameter %d",
-					  d->name, myoptind);
-				retval = 0;
-				break;
-			}
-			if (errno == ERANGE && val == LONG_MAX) {
-				/* well the true top off is 2,147,483,647 but lets not give them the real top */
-				error(linenum,
-					  "%s: paramter %d is to large, reduce this value (0 to 2,147,483,646)",
-					  d->name, myoptind);
-			}
-			*(int *) d->params[i].ptr = val;
-			break;
-		case PARAM_PORT:
-			val = strtol(av[myoptind++], &s, 0);
-			if (*s) {
-				error(linenum,
-					  "%s: Expected a port number for parameter %d",
-					  d->name, myoptind);
-				retval = 0;
-				break;
-			}
-			if (val < 1 || val > 65535) {
-				error(linenum,
-					  "Port numbers must be in the range 1..65535");
-				retval = 0;
-				break;
-			}
-			*(int *) d->params[i].ptr = val;
-			break;
-		case PARAM_STRING:
-/*		  if (reload && *(char **)d->params[i].ptr)
-		  	free(*(char **)d->params[i].ptr); */
-			*(char **) d->params[i].ptr = sstrdup(av[myoptind++]);
-			if (!d->params[i].ptr) {
-				error(linenum, "%s: Out of memory", d->name);
-				return 0;
-			}
-			break;
-		case PARAM_TIME:
-			val = dotime(av[myoptind++]);
-			if (val < 0) {
-				error(linenum,
-					  "%s: Expected a time value for parameter %d",
-					  d->name, myoptind);
-				retval = 0;
-				break;
-			}
-			*(int *) d->params[i].ptr = val;
-			break;
-		default:
-			error(linenum, "%s: Unknown type %d for param %d",
-				  d->name, d->params[i].type, i + 1);
-			retval = 0;		 /* don't bother continuing--something's bizarre */
-			break;
-		}
-	}
-	return retval;;
-}
-
-
-int parse(char *buf, int linenum, int reload)
-{
-	char *s, *t, *dir;
-	unsigned int n;
-	int retval = 1;
-	int ac = 0;
-	char *av[MAXPARAMS];
-
-	dir = strtok(buf, " \t\r\n");
-	s = strtok(NULL, "");
-	if (s) {
-		while (isspace(*s))
-			s++;
-		while (*s) {
-			if (ac >= MAXPARAMS) {
-				error(linenum, "Warning: too many parameters (%d max)",
-					  MAXPARAMS);
-				break;
-			}
-			t = s;
-			if (*s == '"') {
-				t++;
-				s++;
-				while (*s && *s != '"') {
-					if (*s == '\\' && s[1] != 0)
-						s++;
-					s++;
-				}
-				if (!*s)
-					error(linenum,
-						  "Warning: unterminated double-quoted string");
-				else
-					*s++ = 0;
-			} else {
-				s += strcspn(s, " \t\r\n");
-				if (*s)
-					*s++ = 0;
-			}
-			av[ac++] = t;
-			while (isspace(*s))
-				s++;
-		}
-	}
-
-	if (!dir)
-		return 1;
-
-	/*for (n = 0; n < lenof(directives); n++) {
-		Directive *d = &directives[n];
-		retval = parse_directive(d, dir, ac, av, linenum, reload, s);
-		if (!retval) {
-			break;
-		}
-	}*/
-
-	return retval;
-}
-
 
 /*************************************************************************/
 
@@ -1662,59 +1471,12 @@ int parse(char *buf, int linenum, int reload)
 
 int read_config(int reload)
 {
-	FILE *config;
-	int linenum = 0, retval = 1;
-	char buf[1024], *s;
+	int retval = 1;
+	char *s;
 	int defconCount = 0;
-
-	/*if (reload) {
-		unsigned int i, n;*/
-
-		/* Reset all the reloadable settings */
-
-		/*for (n = 0; n < lenof(directives); n++) {
-			Directive *d = &directives[n];
-
-			for (i = 0; i < MAXPARAMS && d->params[i].type != PARAM_NONE;
-				 i++) {
-				if (!(d->params[i].flags & PARAM_RELOAD))
-					continue;
-
-				if (d->params[i].type == PARAM_SET
-					|| d->params[i].type == PARAM_INT
-					|| d->params[i].type == PARAM_POSINT
-					|| d->params[i].type == PARAM_TIME) {
-					*(int *) d->params[i].ptr = 0;
-				} else if (d->params[i].type == PARAM_STRING) {
-					if (*(char **) d->params[i].ptr)
-						free(*(char **) d->params[i].ptr);
-					(*(char **) d->params[i].ptr) = NULL;
-				}
-			}
-		}
-	}*/
 
 	retval = serverConfig.Read(reload ? false : true);
 	if (!retval) return 0; // Temporary until most of the below is modified to use the new parser -- CyberBotX
-	config = fopen(SERVICES_CONF, "r");
-	if (!config) {
-		log_perror("Can't open " SERVICES_CONF);
-		if (!nofork && isatty(2)) {
-			if (!reload)
-				perror("Can't open " SERVICES_CONF);
-			else
-				alog("Can't open %s", SERVICES_CONF);
-		}
-		return 0;
-	}
-	while (fgets(buf, sizeof(buf), config)) {
-		linenum++;
-		if (*buf == '#' || *buf == '\r' || *buf == '\n')
-			continue;
-		if (!parse(buf, linenum, reload))
-			retval = 0;
-	}
-	fclose(config);
 
 	if (!reload) {
 		if (LocalHost) {
@@ -1722,7 +1484,7 @@ int read_config(int reload)
 			for (; curr_uplink != end_uplink; ++curr_uplink) {
 				Uplink *this_uplink = *curr_uplink;
 				if (!stricmp(LocalHost, this_uplink->host) && LocalPort == this_uplink->port) {
-					printf("\n<serverinfo:localhost> matches an <uplink:host> entry (%s)\nand <serverinfo:localport> matches an <uplink:port> entry (%s).\nThis will fail, you must make sure they are different.\n", this_uplink->host, this_uplink->port);
+					printf("\n<serverinfo:localhost> matches an <uplink:host> entry (%s)\nand <serverinfo:localport> matches an <uplink:port> entry (%d).\nThis will fail, you must make sure they are different.\n", this_uplink->host, this_uplink->port);
 					retval = 0;
 				}
 			}

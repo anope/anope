@@ -430,7 +430,6 @@ extern MDE char *mod_current_buffer;
 extern MDE int mod_current_op;
 extern MDE User *mod_current_user;
 
-MDE int moduleGetConfigDirective(Directive *h);
 /*************************************************************************/
 /*************************************************************************/
 /* Command Managment Functions */

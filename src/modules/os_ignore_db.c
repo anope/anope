@@ -121,21 +121,12 @@ class OSIgnoreDB : public Module
 /* ------------------------------------------------------------------------------- */
 
 void load_config(void) {
-	int i;
-
-	Directive confvalues[][1] = {
-		{{"OSIgnoreDBName", {{PARAM_STRING, PARAM_RELOAD, &IgnoreDB}}}},
-	};
+	ConfigReader config;
+	std::string tmp = config.ReadValue("os_ignore", "database", DefIgnoreDB, 0);
 
 	if (IgnoreDB)
 		free(IgnoreDB);
-	IgnoreDB = NULL;
-
-	for (i = 0; i < 1; i++)
-		moduleGetConfigDirective(confvalues[i]);
-
-	if (!IgnoreDB)
-		IgnoreDB = sstrdup(DefIgnoreDB);
+	IgnoreDB = sstrdup(tmp.c_str());
 
 	if (debug)
 		alog("[os_ignore_db] debug: Set config vars: OSIgnoreDBName='%s'", IgnoreDB);
@@ -215,14 +206,14 @@ void load_ignore_db(void) {
 			free(dbptr);
 			return;
 		} else if (retval == DB_READ_BLOCKEND) {		/* DB_READ_BLOCKEND */
-			/* Check if we have everything to add the ignore.. 
+			/* Check if we have everything to add the ignore..
 			 * We shouldn't bother with already expired ignores either.. */
 			if (mask && (expiry_time > time(NULL) || expiry_time == 0)) {
 				/* We should check for double entries.. */
 				for (ign = ignore; ign; ign = ign->next)
 					if (!stricmp(ign->mask, mask))
 						break;
- 
+
  				if (!ign) {
 					/* Create a fresh entry.. */
 					ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
@@ -236,7 +227,7 @@ void load_ignore_db(void) {
 					if (debug)
 						alog("[os_ignore_db] debug: Added new ignore entry for %s", mask);
 				} else {
-					/* Update time on existing entry. 
+					/* Update time on existing entry.
 					 * The longest expiry time survives.. */
 					if (expiry_time == 0 || ign->time == 0)
 						ign->time = 0;
@@ -244,7 +235,7 @@ void load_ignore_db(void) {
 						ign->time = expiry_time;
 				}
 			}
-			
+
 			if (mask) free(mask);
 			mask = NULL;
 			expiry_time = time(NULL);

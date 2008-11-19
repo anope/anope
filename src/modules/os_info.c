@@ -323,7 +323,7 @@ class OSInfo : public Module
 	~OSInfo()
 	{
 		char *av[1];
-		
+
 		for (int i = 0; i < 1024; i++)
 		{
 			/* Remove the nick Cores */
@@ -336,7 +336,7 @@ class OSInfo : public Module
 					nc->Shrink("os_modinfo");
 				}
 			}
-		}			
+		}
 		av[0] = sstrdup(EVENT_START);
 		mSaveData(1, av);
 		free(av[0]);
@@ -401,7 +401,7 @@ int myAddNickInfo(User * u)
 						free(c);
 						na->nc->Shrink("os_info");
 					}
-					
+
 					moduleNoticeLang(s_NickServ, u, OINFO_DEL_SUCCESS, nick);
 					/* NickCore not found! */
 				} else {
@@ -666,7 +666,7 @@ int mSaveData(int argc, char **argv)
 						/* If we have any info on this channel */
 						char *c;
 						if (ci->GetExt("os_info", c))
-						{						
+						{
 							fprintf(out, "C %s %s\n", ci->name, c);
 						}
 					}
@@ -698,24 +698,13 @@ int mBackupData(int argc, char **argv)
  **/
 int mLoadConfig(void)
 {
-	char *tmp = NULL;
-
-	Directive directivas[] = {
-		{"OSInfoDBName", {{PARAM_STRING, PARAM_RELOAD, &tmp}}},
-	};
-
-	Directive *d = &directivas[0];
-	moduleGetConfigDirective(d);
+	ConfigReader config;
+	std::string tmp = config.ReadValue("os_info", "database", DEFAULT_DB_NAME, 0);
 
 	if (OSInfoDBName)
 		free(OSInfoDBName);
 
-	if (tmp) {
-		OSInfoDBName = tmp;
-	} else {
-		OSInfoDBName = sstrdup(DEFAULT_DB_NAME);
-		alog("os_info: OSInfoDBName is not defined in Services configuration file, using default %s", OSInfoDBName);
-	}
+	OSInfoDBName = sstrdup(tmp.c_str());
 
 	alog("os_info: Directive OSInfoDBName loaded (%s)...", OSInfoDBName);
 

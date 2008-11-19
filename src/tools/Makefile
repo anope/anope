@@ -1,4 +1,4 @@
-SRCS =  anopesmtp.c db-merger.c
+SRCS =  anopesmtp.c db-merger.c db-convert.c
 OBJS =  $(SRCS:.c=.o)
 
 INCLUDES = ../../include/services.h
@@ -22,16 +22,18 @@ anopesmpt:  $(OBJS)
 $(OBJS): Makefile
 anopesmtp.o:    anopesmtp.c $(INCLUDES)
 db-merger.o:    db-merger.c $(INCLUDES)
+db-convert.o:	db-convert.c $(INCLUDES)
 
 clean:
-	rm -f *.o anopesmtp a.out db-merger
+	rm -f *.o anopesmtp a.out db-merger db-convert
 
 spotless: clean
 
-install: anopesmtp db-merger
+install: anopesmtp db-merger db-convert
 	test -d ${BINDEST} || mkdir ${BINDEST}
 	test -d $(BINDEST)/tools || mkdir $(BINDEST)/tools
 	$(INSTALL) anopesmtp $(BINDEST)/tools/anopesmtp
 	$(INSTALL) db-merger $(BINDEST)/tools/db-merger
+	$(INSTALL) db-convert $(BINDEST)/tools/db-convert
 
 DUMMY:

@@ -310,35 +310,17 @@ NickAlias *nalists[1024];
 NickCore *nclists[1024];
 BotInfo *botlists[256];
 
-int preferfirst = 0, prefersecond = 0, preferoldest = 0, prefernewest = 0;
-int nonick = 0, nochan = 0, nobot = 0, nohost = 0;
-
 int main(int argc, char *argv[])
 {
 	dbFILE *f;
 	HostCore *firsthc = NULL;
 
-	printf("\n"C_LBLUE"DB Merger v0.4 beta for Anope IRC Services by Certus"C_NONE"\n\n");
-
-	if (argc >= 2) {
-		if (!mystricmp(argv[1], "--PREFEROLDEST")) {
-			printf("Preferring oldest database entries on collision.\n");
-			preferoldest = 1;
-		} else if (!mystricmp(argv[1], "--PREFERFIRST")) {
-			printf("Preferring first database's entries on collision .\n");
-			preferfirst = 1;
-		} else if (!mystricmp(argv[1], "--PREFERSECOND")) {
-			printf("Preferring second database's entries on collision.\n");
-			prefersecond = 1;
-		} else if (!mystricmp(argv[1], "--PREFERNEWEST")) {
-			printf("Preferring newest database entries on collision.\n");
-			prefernewest = 1;
-		}
-	}
+	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.x database converter"C_NONE"\n\n");
 
 	/* Section I: Nicks */
 	/* Ia: First database */
-	if ((f = open_db_read("NickServ", NICK_DB_1, 14))) {
+	if ((f = open_db_read("NickServ", NICK_DB_1, 14)))
+	{
 
 		NickAlias *na, **nalast, *naprev;
 		NickCore *nc, **nclast, *ncprev;
@@ -443,184 +425,6 @@ int main(int argc, char *argv[])
 			*nalast = NULL;
 		} /* for() loop */
 		close_db(f); /* End of section Ia */
-	} else
-		nonick = 1;
-
-	/* Ib: Second database */
-	if (!nonick) {
-		if ((f = open_db_read("NickServ", NICK_DB_2, 14))) {
-
-			NickAlias *na, *naptr;
-			NickCore *nc;
-			int16 tmp16;
-			int32 tmp32;
-			int i, j, index, c;
-
-			/* Nick cores */
-			for (i = 0; i < 1024; i++) {
-
-				while ((c = getc_db(f)) == 1) {
-					if (c != 1) {
-						printf("Invalid format in %s.\n", NICK_DB_2);
-						exit(0);
-					}
-
-					nc = (NickCore *)calloc(1, sizeof(NickCore));
-					READ(read_string(&nc->display, f));
-					READ(read_buffer(nc->pass, f));
-					READ(read_string(&nc->email, f));
-
-					naptr = findnick(nc->display);
-					if (naptr)
-						nc->unused = 1;
-					else
-						nc->unused = 0;
-
-					nc->aliascount = 0;
-
-					index = HASH(nc->display);
-					nc->prev = NULL;
-					nc->next = nclists[index];
-					if (nc->next)
-						nc->next->prev = nc;
-					nclists[index] = nc;
-
-					READ(read_string(&nc->greet, f));
-					READ(read_uint32(&nc->icq, f));
-					READ(read_string(&nc->url, f));
-					READ(read_uint32(&nc->flags, f));
-					READ(read_uint16(&nc->language, f));
-					READ(read_uint16(&nc->accesscount, f));
-					if (nc->accesscount) {
-						char **access;
-						access = (char **)calloc(sizeof(char *) * nc->accesscount, 1);
-						nc->access = access;
-						for (j = 0; j < nc->accesscount; j++, access++)
-							READ(read_string(access, f));
-					}
-					READ(read_int16(&nc->memos.memocount, f));
-					READ(read_int16(&nc->memos.memomax, f));
-					if (nc->memos.memocount) {
-						Memo *memos;
-						memos = (Memo *)calloc(sizeof(Memo) * nc->memos.memocount, 1);
-						nc->memos.memos = memos;
-						for (j = 0; j < nc->memos.memocount; j++, memos++) {
-							READ(read_uint32(&memos->number, f));
-							READ(read_uint16(&memos->flags, f));
-							READ(read_int32(&tmp32, f));
-							memos->time = tmp32;
-							READ(read_buffer(memos->sender, f));
-							READ(read_string(&memos->text, f));
-						}
-					}
-					READ(read_uint16(&nc->channelcount, f));
-					READ(read_int16(&tmp16, f));
-				} /* getc_db() */
-			} /* for() loop */
-
-			/* Nick aliases */
-			for (i = 0; i < 1024; i++) {
-				char *s = NULL;
-				NickAlias *ptr, *prev;
-
-				while ((c = getc_db(f)) == 1) {
-					if (c != 1) {
-						printf("Invalid format in %s.\n", NICK_DB_1);
-						exit(0);
-					}
-
-					na = (NickAlias *)calloc(1, sizeof(NickAlias));
-
-					READ(read_string(&na->nick, f));
-					READ(read_string(&na->last_usermask, f));
-					READ(read_string(&na->last_realname, f));
-					READ(read_string(&na->last_quit, f));
-					READ(read_int32(&tmp32, f));
-					na->time_registered = tmp32;
-					READ(read_int32(&tmp32, f));
-					na->last_seen = tmp32;
-					READ(read_uint16(&na->status, f));
-					READ(read_string(&s, f));
-
-					naptr = findnick(na->nick);
-					if (naptr) { /* COLLISION! na = collision #1 (na->nc doesn't exist yet), naptr = collision #2 (naptr->nc exists) */
-						char input[1024];
-						NickCore *ncptr = findcore(na->nick, 1); /* Find core for #1, ncptr MUST exist since we've read all cores, if it doesn't eixst, we have a malformed db */;
-
-						if (!ncptr) { /* malformed */
-							printf("\n\n	 WARNING! Malformed database. No nickcore for nick %s, droping it.\n\n\n", na->nick);
-							delnick(na, 1);
-						} else { /* not malformed */
-							if (!preferoldest && !preferfirst && !prefersecond && !prefernewest) {
-								printf("Nick collision for nick %s:\n\n", na->nick);
-								printf("Group 1: %s (%s)\n", ncptr->display, ncptr->email);
-								printf("Time registered: %s\n", ctime(&na->time_registered));
-								printf("Group 2: %s (%s)\n", naptr->nc->display, naptr->nc->email);
-								printf("Time registered: %s\n", ctime(&naptr->time_registered));
-								printf("What group do you want to keep? Enter the related group number \"1\" or \"2\".\n");
-							}
-
-							if (preferoldest) {
-								input[0] = (na->time_registered > naptr->time_registered) ? '1' : '2';
-							} else if (prefernewest) {
-								input[0] = (na->time_registered > naptr->time_registered) ? '2' : '1';
-							} else if (preferfirst) {
-								input[0] = '2';
-							} else if (prefersecond) {
-								input[0] = '1';
-							} else {
-								waiting_for_input:
-								scanf("%s", input);
-							}
-							if (input[0] == '1') { /* get alias #2 out of the list, then free() it, then add #1 to the list */
-								printf("Deleting nick alias %s (#2).\n", naptr->nick); 
-								naptr->nc->aliascount--; /* tell the core it has one alias less */
-								delnick(naptr, 0); /* removes the alias from the list and free()s it */
-								na->nc = ncptr;
-								na->nc->aliascount++;
-								index = HASH(na->nick);
-								for (prev = NULL, ptr = nalists[index]; ptr && mystricmp(ptr->nick, na->nick) < 0; prev = ptr, ptr = ptr->next);
-								na->prev = prev;
-								na->next = ptr;
-								if (!prev)
-									nalists[index] = na;
-								else
-									prev->next = na;
-								if (ptr)
-									ptr->prev = na;
-							} else if (input[0] == '2') { /* free() #1 alias */
-								printf("Deleting nick alias %s (#1).\n", na->nick);
-								delnick(na, 1); /* free()s the alias without touching the list since na isn't in the list */
-							} else {
-								printf("Invalid number, give us a valid one (1 or 2).\n");
-								goto waiting_for_input;
-							}
-						} /* not malformed */
-					} else { /* No collision, add the core pointer and put the alias in the list */
-						na->nc = findcore(s, 0);
-						if (!na->nc) {
-							printf("\n\n	 WARNING! Malformed database. No nickcore for nick %s, droping it.\n\n\n", na->nick);
-							delnick(na, 1);
-						} else {
-							na->nc->aliascount++;
-							index = HASH(na->nick);
-							for (prev = NULL, ptr = nalists[index]; ptr && mystricmp(ptr->nick, na->nick) < 0; prev = ptr, ptr = ptr->next);
-							na->prev = prev;
-							na->next = ptr;
-							if (!prev)
-								nalists[index] = na;
-							else
-								prev->next = na;
-							if (ptr)
-								ptr->prev = na;
-						}
-					}
-					free(s);
-				} /* getc_db() */
-			} /* for() loop */
-			close_db(f); /* End of section Ib */   
-		} else
-			nonick = 1;
 	}
 
 	/* CLEAN THE CORES */
@@ -637,67 +441,69 @@ int main(int argc, char *argv[])
 	}
 
 	/* Ic: Saving */
-	if (!nonick) {
-		if ((f = open_db_write("NickServ", NICK_DB_NEW, 14))) {
+	if ((f = open_db_write("NickServ", NICK_DB_NEW, 14))) {
 
-			NickAlias *na;
-			NickCore *nc;
-			char **access;
-			Memo *memos;
-			int j;
+		NickAlias *na;
+		NickCore *nc;
+		char **access;
+		Memo *memos;
+		int j;
 
-			/* Nick cores */
-			for (i = 0; i < 1024; i++) {
-				for (nc = nclists[i]; nc; nc = nc->next) {
-					SAFE(write_int8(1, f));
-					SAFE(write_string(nc->display, f));
-					SAFE(write_buffer(nc->pass, f));
-					SAFE(write_string(nc->email, f));
-					SAFE(write_string(nc->greet, f));
-					SAFE(write_int32(nc->icq, f));
-					SAFE(write_string(nc->url, f));
-					SAFE(write_int32(nc->flags, f));
-					SAFE(write_int16(nc->language, f));
-					SAFE(write_int16(nc->accesscount, f));
-					for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
-						SAFE(write_string(*access, f));
+		/* Nick cores */
+		for (i = 0; i < 1024; i++) {
+			for (nc = nclists[i]; nc; nc = nc->next) {
+				SAFE(write_int8(1, f));
+				SAFE(write_string(nc->display, f));
+				SAFE(write_buffer(nc->pass, f));
+				SAFE(write_string(nc->email, f));
+				SAFE(write_string(nc->greet, f));
+				SAFE(write_int32(nc->icq, f));
+				SAFE(write_string(nc->url, f));
+				SAFE(write_int32(nc->flags, f));
+				SAFE(write_int16(nc->language, f));
+				SAFE(write_int16(nc->accesscount, f));
+				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
+					SAFE(write_string(*access, f));
 
-					SAFE(write_int16(nc->memos.memocount, f));
-					SAFE(write_int16(nc->memos.memomax, f));
-					memos = nc->memos.memos;
-					for (j = 0; j < nc->memos.memocount; j++, memos++) {
-						SAFE(write_int32(memos->number, f));
-						SAFE(write_int16(memos->flags, f));
-						SAFE(write_int32(memos->time, f));
-						SAFE(write_buffer(memos->sender, f));
-						SAFE(write_string(memos->text, f));
-					}
-					SAFE(write_int16(nc->channelcount, f));
-					SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
-				} /* for (nc) */
-				SAFE(write_int8(0, f));
-			} /* for (i) */
+				SAFE(write_int16(nc->memos.memocount, f));
+				SAFE(write_int16(nc->memos.memomax, f));
+				memos = nc->memos.memos;
+				for (j = 0; j < nc->memos.memocount; j++, memos++) {
+					SAFE(write_int32(memos->number, f));
+					SAFE(write_int16(memos->flags, f));
+					SAFE(write_int32(memos->time, f));
+					SAFE(write_buffer(memos->sender, f));
+					SAFE(write_string(memos->text, f));
+				}
+				SAFE(write_int16(nc->channelcount, f));
+				SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
+			} /* for (nc) */
+			SAFE(write_int8(0, f));
+		} /* for (i) */
 
-			/* Nick aliases */
-			for (i = 0; i < 1024; i++) {
-				for (na = nalists[i]; na; na = na->next) {
-					SAFE(write_int8(1, f));
-					SAFE(write_string(na->nick, f));
-					SAFE(write_string(na->last_usermask, f));
-					SAFE(write_string(na->last_realname, f));
-					SAFE(write_string(na->last_quit, f));
-					SAFE(write_int32(na->time_registered, f));
-					SAFE(write_int32(na->last_seen, f));
-					SAFE(write_int16(na->status, f));
-					SAFE(write_string(na->nc->display, f));
+		/* Nick aliases */
+		for (i = 0; i < 1024; i++) {
+			for (na = nalists[i]; na; na = na->next) {
+				SAFE(write_int8(1, f));
+				SAFE(write_string(na->nick, f));
+				SAFE(write_string(na->last_usermask, f));
+				SAFE(write_string(na->last_realname, f));
+				SAFE(write_string(na->last_quit, f));
+				SAFE(write_int32(na->time_registered, f));
+				SAFE(write_int32(na->last_seen, f));
+				SAFE(write_int16(na->status, f));
+				SAFE(write_string(na->nc->display, f));
 
-				} /* for (na) */
-				SAFE(write_int8(0, f));
-			} /* for (i) */
-				close_db(f); /* End of section Ic */
-				printf("Nick merging done. New database saved as %s.\n", NICK_DB_NEW);
-		}
-	} /* End of section I */
+			} /* for (na) */
+			SAFE(write_int8(0, f));
+		} /* for (i) */
+			close_db(f); /* End of section Ic */
+			printf("Nick merging done. New database saved as %s.\n", NICK_DB_NEW);
+	}
+
+
+
+
 
 	/* Section II: Chans */
 	/* IIa: First database */
@@ -884,482 +690,113 @@ int main(int argc, char *argv[])
 			*last = NULL;
 		} /* for() loop */
 		close_db(f);
-	} else
-		nochan = 1;
-
-	/* IIb: Second database */
-	if (!nochan) {
-		if ((f = open_db_read("ChanServ", CHAN_DB_2, 16))) {
-			int c;
-
-			for (i = 0; i < 256; i++) {
-				int16 tmp16;
-				int32 tmp32;
-				int n_levels;
-				char *s;
-				int n_ttb;
-				/* Unused variables - why? -GD
-				char input[1024];
-				NickAlias *na;
-				int J;
-				*/
-
-				while ((c = getc_db(f)) == 1) {
-					ChannelInfo *ci = NULL, *ciptr = NULL;
-					int j;
-
-					if (c != 1) {
-						printf("Invalid format in %s.\n", CHAN_DB_2);
-						exit(0);
-					}
-
-					ci = (ChannelInfo *)calloc(sizeof(ChannelInfo), 1);
-					READ(read_buffer(ci->name, f));
-					READ(read_string(&ci->founder, f));
-					READ(read_string(&ci->successor, f));
-					READ(read_buffer(ci->founderpass, f));
-					READ(read_string(&ci->desc, f));
-					if (!ci->desc)
-						ci->desc = strdup("");
-					READ(read_string(&ci->url, f));
-					READ(read_string(&ci->email, f));
-					READ(read_int32(&tmp32, f));
-					ci->time_registered = tmp32;
-					READ(read_int32(&tmp32, f));
-					ci->last_used = tmp32;
-					READ(read_string(&ci->last_topic, f));
-					READ(read_buffer(ci->last_topic_setter, f));
-					READ(read_int32(&tmp32, f));
-					ci->last_topic_time = tmp32;
-					READ(read_uint32(&ci->flags, f));
-					/* Temporary flags cleanup */
-					ci->flags &= ~0x80000000;
-					READ(read_string(&ci->forbidby, f));
-					READ(read_string(&ci->forbidreason, f));
-					READ(read_int16(&tmp16, f));
-					ci->bantype = tmp16;
-					READ(read_int16(&tmp16, f));
-					n_levels = tmp16;
-					ci->levels = (int16 *)calloc(36 * sizeof(*ci->levels), 1);
-					for (j = 0; j < n_levels; j++) {
-						if (j < 36)
-							READ(read_int16(&ci->levels[j], f));
-						else
-							READ(read_int16(&tmp16, f));
-					}
-					READ(read_uint16(&ci->accesscount, f));
-					if (ci->accesscount) {
-						ci->access = (ChanAccess *)calloc(ci->accesscount, sizeof(ChanAccess));
-						for (j = 0; j < ci->accesscount; j++) {
-							READ(read_uint16(&ci->access[j].in_use, f));
-							if (ci->access[j].in_use) {
-								READ(read_int16(&ci->access[j].level, f));
-								READ(read_string(&s, f));
-								if (s) {
-									ci->access[j].nc = findcore(s, 0);
-									free(s);
-								}
-								if (ci->access[j].nc == NULL)
-									ci->access[j].in_use = 0;
-								READ(read_int32(&tmp32, f));
-								ci->access[j].last_seen = tmp32;
-							}
-						}
-					} else {
-						ci->access = NULL;
-					}
-					READ(read_uint16(&ci->akickcount, f));
-					if (ci->akickcount) {
-						ci->akick = (AutoKick *)calloc(ci->akickcount, sizeof(AutoKick));
-						for (j = 0; j < ci->akickcount; j++) {
-							SAFE(read_uint16(&ci->akick[j].flags, f));
-							if (ci->akick[j].flags & 0x0001) {
-								SAFE(read_string(&s, f));
-								if (ci->akick[j].flags & 0x0002) {
-									ci->akick[j].u.nc = findcore(s, 0);
-									if (!ci->akick[j].u.nc)
-										ci->akick[j].flags &= ~0x0001;
-									free(s);
-								} else {
-									ci->akick[j].u.mask = s;
-								}
-								SAFE(read_string(&s, f));
-								if (ci->akick[j].flags & 0x0001)
-									ci->akick[j].reason = s;
-								else if (s)
-									free(s);
-								SAFE(read_string(&s, f));
-								if (ci->akick[j].flags & 0x0001) {
-									ci->akick[j].creator = s;
-								} else if (s) {
-									free(s);
-								}
-								SAFE(read_int32(&tmp32, f));
-								if (ci->akick[j].flags & 0x0001)
-									ci->akick[j].addtime = tmp32;
-							}
-						}
-					} else {
-						ci->akick = NULL;
-					}
-					READ(read_uint32(&ci->mlock_on, f));
-					READ(read_uint32(&ci->mlock_off, f));
-					READ(read_uint32(&ci->mlock_limit, f));
-					READ(read_string(&ci->mlock_key, f));
-					READ(read_string(&ci->mlock_flood, f));
-					READ(read_string(&ci->mlock_redirect, f));
-					READ(read_int16(&ci->memos.memocount, f));
-					READ(read_int16(&ci->memos.memomax, f));
-					if (ci->memos.memocount) {
-						Memo *memos;
-						memos = (Memo *)calloc(sizeof(Memo) * ci->memos.memocount, 1);
-						ci->memos.memos = memos;
-						for (j = 0; j < ci->memos.memocount; j++, memos++) {
-							READ(read_uint32(&memos->number, f));
-							READ(read_uint16(&memos->flags, f));
-							READ(read_int32(&tmp32, f));
-							memos->time = tmp32;
-							READ(read_buffer(memos->sender, f));
-							READ(read_string(&memos->text, f));
-						}
-					}
-					READ(read_string(&ci->entry_message, f));
-
-					/* BotServ options */
-					READ(read_string(&ci->bi, f));
-					READ(read_int32(&tmp32, f));
-					ci->botflags = tmp32;
-					READ(read_int16(&tmp16, f));
-					n_ttb = tmp16;
-					ci->ttb = (int16 *)calloc(32, 1);
-					for (j = 0; j < n_ttb; j++) {
-						if (j < 8)
-							READ(read_int16(&ci->ttb[j], f));
-						else
-							READ(read_int16(&tmp16, f));
-					}
-					for (j = n_ttb; j < 8; j++)
-						ci->ttb[j] = 0;
-					READ(read_int16(&tmp16, f));
-					ci->capsmin = tmp16;
-					READ(read_int16(&tmp16, f));
-					ci->capspercent = tmp16;
-					READ(read_int16(&tmp16, f));
-					ci->floodlines = tmp16;
-					READ(read_int16(&tmp16, f));
-					ci->floodsecs = tmp16;
-					READ(read_int16(&tmp16, f));
-					ci->repeattimes = tmp16;
-
-					READ(read_uint16(&ci->bwcount, f));
-					if (ci->bwcount) {
-						ci->badwords = (BadWord *)calloc(ci->bwcount, sizeof(BadWord));
-						for (j = 0; j < ci->bwcount; j++) {
-							SAFE(read_uint16(&ci->badwords[j].in_use, f));
-							if (ci->badwords[j].in_use) {
-								SAFE(read_string(&ci->badwords[j].word, f));
-								SAFE(read_uint16(&ci->badwords[j].type, f));
-							}
-						}
-					} else {
-						ci->badwords = NULL;
-					}
-					/* READING DONE */
-					ciptr = cs_findchan(ci->name);
-					if (ciptr) { /* COLLISION! ciptr = old = 1; ci = new = 2*/
-						char input[1024];
-
-						if (!preferoldest && !preferfirst && !prefersecond && !prefernewest) {
-							printf("Chan collision for channel %s:\n\n", ci->name);
-
-							printf("Owner of channel 1: %s (%s)\n", (ciptr->founder) ? ciptr->founder : "none", (ciptr->email) ? ciptr->email : "no valid email");
-							printf("Accesscount: %u\n", ciptr->accesscount);
-							if (ciptr->flags & 0x00000080) {
-								printf("Status: Channel is forbidden");
-							} else if (ciptr->flags & 0x00010000) {
-								printf("Status: Channel is suspended");
-							}
-							printf("Time registered: %s\n", ctime(&ciptr->time_registered));
-
-							printf("Owner of channel 2: %s (%s)\n", (ci->founder) ? ci->founder : "none", (ci->email) ? ci->email : "no valid email");
-							printf("Accesscount: %u\n", ci->accesscount);
-							if (ci->flags & 0x00000080) {
-								printf("Status: Channel is forbidden");
-							} else if (ci->flags & 0x00010000) {
-								printf("Status: Channel is suspended");
-							}
-							printf("Time registered: %s\n", ctime(&ci->time_registered));
-
-							printf("What channel do you want to keep? Enter the related number \"1\" or \"2\".\n");
-						}
-
-						if (preferoldest) {
-							input[0] = (ci->time_registered < ciptr->time_registered) ? '1' : '2';
-						} else if (prefernewest) {
-							input[0] = (ci->time_registered < ciptr->time_registered) ? '2' : '1';
-						} else if (preferfirst) {
-							input[0] = '1';
-						} else if (prefersecond) {
-							input[0] = '2';
-						} else {
-							waiting_for_input4:
-							scanf("%s", input);
-						}
-						if (input[0] == '1') { /* #2 isn't in the list yet, #1 is. -> free() #2 [ci] */
-							NickCore *nc = NULL;
-							printf("Deleting chan %s (#2).\n", ci->name);
-
-							if (ci->founder) {
-								nc = findcore(ci->founder, 0);
-								if (nc)
-									nc->channelcount--;
-							}
-							free(ci->desc);
-							free(ci->founder);
-							free(ci->successor);
-							if (ci->url)
-								free(ci->url);
-							if (ci->email)
-								free(ci->email);
-							if (ci->last_topic)
-								free(ci->last_topic);
-							if (ci->forbidby)
-								free(ci->forbidby);
-							if (ci->forbidreason)
-								free(ci->forbidreason);
-							if (ci->mlock_key)
-								free(ci->mlock_key);
-							if (ci->mlock_flood)
-								free(ci->mlock_flood);
-							if (ci->mlock_redirect)
-								free(ci->mlock_redirect);
-							if (ci->entry_message)
-								free(ci->entry_message);
-							if (ci->access)
-								free(ci->access);
-							for (i = 0; i < ci->akickcount; i++) {
-								if (!(ci->akick[i].flags & 0x0002) && ci->akick[i].u.mask)
-									free(ci->akick[i].u.mask);
-								if (ci->akick[i].reason)
-									free(ci->akick[i].reason);
-								if (ci->akick[i].creator)
-									free(ci->akick[i].creator);
-							}
-							if (ci->akick)
-								free(ci->akick);
-							if (ci->levels)
-								free(ci->levels);
-							if (ci->memos.memos) {
-								for (i = 0; i < ci->memos.memocount; i++) {
-									if (ci->memos.memos[i].text)
-										free(ci->memos.memos[i].text);
-								}
-								free(ci->memos.memos);
-							}
-							if (ci->ttb)
-								free(ci->ttb);
-							for (i = 0; i < ci->bwcount; i++) {
-								if (ci->badwords[i].word)
-									free(ci->badwords[i].word);
-							}
-							if (ci->badwords)
-								free(ci->badwords);
-							if (ci->bi)
-								free(ci->bi);
-							free(ci);
-
-						} else if (input[0] == '2') { /* get #1 out of the list, free() it and add #2 to the list */
-							NickCore *nc = NULL;
-							printf("Deleting chan %s (#1).\n", ciptr->name);
-
-							if (ciptr->next)
-								ciptr->next->prev = ciptr->prev;
-							if (ciptr->prev)
-								ciptr->prev->next = ciptr->next;
-							else
-								chanlists[tolower(ciptr->name[1])] = ciptr->next;
-
-							if (ciptr->founder) {
-								nc = findcore(ci->founder, 0);
-								if (nc)
-									nc->channelcount--;
-							}
-							free(ciptr->desc);
-							if (ciptr->url)
-								free(ciptr->url);
-							if (ciptr->email)
-								free(ciptr->email);
-							if (ciptr->last_topic)
-								free(ciptr->last_topic);
-							if (ciptr->forbidby)
-								free(ciptr->forbidby);
-							if (ciptr->forbidreason)
-								free(ciptr->forbidreason);
-							if (ciptr->mlock_key)
-								free(ciptr->mlock_key);
-							if (ciptr->mlock_flood)
-								free(ciptr->mlock_flood);
-							if (ciptr->mlock_redirect)
-								free(ciptr->mlock_redirect);
-							if (ciptr->entry_message)
-								free(ciptr->entry_message);
-							if (ciptr->access)
-								free(ciptr->access);
-							for (i = 0; i < ciptr->akickcount; i++) {
-								if (!(ciptr->akick[i].flags & 0x0002) && ciptr->akick[i].u.mask)
-									free(ciptr->akick[i].u.mask);
-								if (ciptr->akick[i].reason)
-									free(ciptr->akick[i].reason);
-								if (ciptr->akick[i].creator)
-									free(ciptr->akick[i].creator);
-							}
-							if (ciptr->akick)
-								free(ciptr->akick);
-							if (ciptr->levels)
-								free(ciptr->levels);
-							if (ciptr->memos.memos) {
-								for (i = 0; i < ciptr->memos.memocount; i++) {
-									if (ciptr->memos.memos[i].text)
-										free(ciptr->memos.memos[i].text);
-								}
-								free(ciptr->memos.memos);
-							}
-							if (ciptr->ttb)
-								free(ciptr->ttb);
-							for (i = 0; i < ciptr->bwcount; i++) {
-								if (ciptr->badwords[i].word)
-									free(ciptr->badwords[i].word);
-							}
-							if (ciptr->badwords)
-								free(ciptr->badwords);
-							free(ciptr);
-
-							alpha_insert_chan(ci);
-
-						} else {
-							printf("Invalid number, give us a valid one (1 or 2).\n");
-							goto waiting_for_input4;
-						}
-					} else { /* no collision, put the chan into the list */
-						alpha_insert_chan(ci);
-					}
-				} /* getc_db() */
-			} /* for() loop */
-			close_db(f);
-		} else
-			nochan = 1;
 	}
 
 	/* IIc: Saving */
-	if (!nochan) {
-		if ((f = open_db_write("ChanServ", CHAN_DB_NEW, 16))) {
-			ChannelInfo *ci;
-			Memo *memos;
-			/* Unused variable - why? -GD
-			static time_t lastwarn = 0;
-			*/
+	if ((f = open_db_write("ChanServ", CHAN_DB_NEW, 16))) {
+		ChannelInfo *ci;
+		Memo *memos;
 
-			for (i = 0; i < 256; i++) {
-				int16 tmp16;
-				for (ci = chanlists[i]; ci; ci = ci->next) {
-					int j;
-					SAFE(write_int8(1, f));
-					SAFE(write_buffer(ci->name, f));
-					if (ci->founder)
-						SAFE(write_string(ci->founder, f));
-					else
-						SAFE(write_string(NULL, f));
-					if (ci->successor)
-						SAFE(write_string(ci->successor, f));
-					else
-						SAFE(write_string(NULL, f));
-					SAFE(write_buffer(ci->founderpass, f));
-					SAFE(write_string(ci->desc, f));
-					SAFE(write_string(ci->url, f));
-					SAFE(write_string(ci->email, f));
-					SAFE(write_int32(ci->time_registered, f));
-					SAFE(write_int32(ci->last_used, f));
-					SAFE(write_string(ci->last_topic, f));
-					SAFE(write_buffer(ci->last_topic_setter, f));
-					SAFE(write_int32(ci->last_topic_time, f));
-					SAFE(write_int32(ci->flags, f));
-					SAFE(write_string(ci->forbidby, f));
-					SAFE(write_string(ci->forbidreason, f));
-					SAFE(write_int16(ci->bantype, f));
-					tmp16 = 36;
-					SAFE(write_int16(tmp16, f));
-					for (j = 0; j < 36; j++)
-						SAFE(write_int16(ci->levels[j], f));
+		for (i = 0; i < 256; i++) {
+			int16 tmp16;
+			for (ci = chanlists[i]; ci; ci = ci->next) {
+				int j;
+				SAFE(write_int8(1, f));
+				SAFE(write_buffer(ci->name, f));
+				if (ci->founder)
+					SAFE(write_string(ci->founder, f));
+				else
+					SAFE(write_string(NULL, f));
+				if (ci->successor)
+					SAFE(write_string(ci->successor, f));
+				else
+					SAFE(write_string(NULL, f));
+				SAFE(write_buffer(ci->founderpass, f));
+				SAFE(write_string(ci->desc, f));
+				SAFE(write_string(ci->url, f));
+				SAFE(write_string(ci->email, f));
+				SAFE(write_int32(ci->time_registered, f));
+				SAFE(write_int32(ci->last_used, f));
+				SAFE(write_string(ci->last_topic, f));
+				SAFE(write_buffer(ci->last_topic_setter, f));
+				SAFE(write_int32(ci->last_topic_time, f));
+				SAFE(write_int32(ci->flags, f));
+				SAFE(write_string(ci->forbidby, f));
+				SAFE(write_string(ci->forbidreason, f));
+				SAFE(write_int16(ci->bantype, f));
+				tmp16 = 36;
+				SAFE(write_int16(tmp16, f));
+				for (j = 0; j < 36; j++)
+					SAFE(write_int16(ci->levels[j], f));
 
-					SAFE(write_int16(ci->accesscount, f));
-					for (j = 0; j < ci->accesscount; j++) {
-						SAFE(write_int16(ci->access[j].in_use, f));
-						if (ci->access[j].in_use) {
-							SAFE(write_int16(ci->access[j].level, f));
-							SAFE(write_string(ci->access[j].nc->display, f));
-							SAFE(write_int32(ci->access[j].last_seen, f));
-						}
+				SAFE(write_int16(ci->accesscount, f));
+				for (j = 0; j < ci->accesscount; j++) {
+					SAFE(write_int16(ci->access[j].in_use, f));
+					if (ci->access[j].in_use) {
+						SAFE(write_int16(ci->access[j].level, f));
+						SAFE(write_string(ci->access[j].nc->display, f));
+						SAFE(write_int32(ci->access[j].last_seen, f));
 					}
-					SAFE(write_int16(ci->akickcount, f));
-					for (j = 0; j < ci->akickcount; j++) {
-						SAFE(write_int16(ci->akick[j].flags, f));
-						if (ci->akick[j].flags & 0x0001) {
-							if (ci->akick[j].flags & 0x0002)
-								SAFE(write_string(ci->akick[j].u.nc->display, f));
-							else
-								SAFE(write_string(ci->akick[j].u.mask, f));
-							SAFE(write_string(ci->akick[j].reason, f));
-							SAFE(write_string(ci->akick[j].creator, f));
-							SAFE(write_int32(ci->akick[j].addtime, f));
-						}
+				}
+				SAFE(write_int16(ci->akickcount, f));
+				for (j = 0; j < ci->akickcount; j++) {
+					SAFE(write_int16(ci->akick[j].flags, f));
+					if (ci->akick[j].flags & 0x0001) {
+						if (ci->akick[j].flags & 0x0002)
+							SAFE(write_string(ci->akick[j].u.nc->display, f));
+						else
+							SAFE(write_string(ci->akick[j].u.mask, f));
+						SAFE(write_string(ci->akick[j].reason, f));
+						SAFE(write_string(ci->akick[j].creator, f));
+						SAFE(write_int32(ci->akick[j].addtime, f));
 					}
+				}
 
-					SAFE(write_int32(ci->mlock_on, f));
-					SAFE(write_int32(ci->mlock_off, f));
-					SAFE(write_int32(ci->mlock_limit, f));
-					SAFE(write_string(ci->mlock_key, f));
-					SAFE(write_string(ci->mlock_flood, f));
-					SAFE(write_string(ci->mlock_redirect, f));
-					SAFE(write_int16(ci->memos.memocount, f));
-					SAFE(write_int16(ci->memos.memomax, f));
-					memos = ci->memos.memos;
-					for (j = 0; j < ci->memos.memocount; j++, memos++) {
-						SAFE(write_int32(memos->number, f));
-						SAFE(write_int16(memos->flags, f));
-						SAFE(write_int32(memos->time, f));
-						SAFE(write_buffer(memos->sender, f));
-						SAFE(write_string(memos->text, f));
-					}
-					SAFE(write_string(ci->entry_message, f));
-					if (ci->bi)
-						SAFE(write_string(ci->bi, f));
-					else
-						SAFE(write_string(NULL, f));
-					SAFE(write_int32(ci->botflags, f));
-					tmp16 = 8;
-					SAFE(write_int16(tmp16, f));
-					for (j = 0; j < 8; j++)
-						SAFE(write_int16(ci->ttb[j], f));
-					SAFE(write_int16(ci->capsmin, f));
-					SAFE(write_int16(ci->capspercent, f));
-					SAFE(write_int16(ci->floodlines, f));
-					SAFE(write_int16(ci->floodsecs, f));
-					SAFE(write_int16(ci->repeattimes, f));
+				SAFE(write_int32(ci->mlock_on, f));
+				SAFE(write_int32(ci->mlock_off, f));
+				SAFE(write_int32(ci->mlock_limit, f));
+				SAFE(write_string(ci->mlock_key, f));
+				SAFE(write_string(ci->mlock_flood, f));
+				SAFE(write_string(ci->mlock_redirect, f));
+				SAFE(write_int16(ci->memos.memocount, f));
+				SAFE(write_int16(ci->memos.memomax, f));
+				memos = ci->memos.memos;
+				for (j = 0; j < ci->memos.memocount; j++, memos++) {
+					SAFE(write_int32(memos->number, f));
+					SAFE(write_int16(memos->flags, f));
+					SAFE(write_int32(memos->time, f));
+					SAFE(write_buffer(memos->sender, f));
+					SAFE(write_string(memos->text, f));
+				}
+				SAFE(write_string(ci->entry_message, f));
+				if (ci->bi)
+					SAFE(write_string(ci->bi, f));
+				else
+					SAFE(write_string(NULL, f));
+				SAFE(write_int32(ci->botflags, f));
+				tmp16 = 8;
+				SAFE(write_int16(tmp16, f));
+				for (j = 0; j < 8; j++)
+					SAFE(write_int16(ci->ttb[j], f));
+				SAFE(write_int16(ci->capsmin, f));
+				SAFE(write_int16(ci->capspercent, f));
+				SAFE(write_int16(ci->floodlines, f));
+				SAFE(write_int16(ci->floodsecs, f));
+				SAFE(write_int16(ci->repeattimes, f));
 
-					SAFE(write_int16(ci->bwcount, f));
-					for (j = 0; j < ci->bwcount; j++) {
-						SAFE(write_int16(ci->badwords[j].in_use, f));
-						if (ci->badwords[j].in_use) {
-							SAFE(write_string(ci->badwords[j].word, f));
-							SAFE(write_int16(ci->badwords[j].type, f));
-						}
+				SAFE(write_int16(ci->bwcount, f));
+				for (j = 0; j < ci->bwcount; j++) {
+					SAFE(write_int16(ci->badwords[j].in_use, f));
+					if (ci->badwords[j].in_use) {
+						SAFE(write_string(ci->badwords[j].word, f));
+						SAFE(write_int16(ci->badwords[j].type, f));
 					}
-				} /* for (chanlists[i]) */
-				SAFE(write_int8(0, f));
-			} /* for (i) */
-			close_db(f);
-			printf("Chan merging done. New database saved as %s.\n", CHAN_DB_NEW);
-		}
+				}
+			} /* for (chanlists[i]) */
+			SAFE(write_int8(0, f));
+		} /* for (i) */
+		close_db(f);
+		printf("Chan merging done. New database saved as %s.\n", CHAN_DB_NEW);
 	}
 
 	/* Section III: Bots */
@@ -1391,111 +828,27 @@ int main(int argc, char *argv[])
 			bi->chancount = tmp16;
 			insert_bot(bi);
 		}
-	} else
-		nobot = 1;
-
-	/* IIIb: Second database */
-	if (!nobot) {
-		if ((f = open_db_read("Botserv", BOT_DB_2, 10))) {
-			BotInfo *bi, *biptr;
-			int c;
-			int32 tmp32;
-			int16 tmp16;
-			char input[1024];
-
-			while ((c = getc_db(f)) == 1) {
-				if (c != 1) {
-					printf("Invalid format in %s.\n", BOT_DB_2);
-					exit(0);
-				}
-
-				bi = (BotInfo *)calloc(sizeof(BotInfo), 1);
-				READ(read_string(&bi->nick, f));
-				READ(read_string(&bi->user, f));
-				READ(read_string(&bi->host, f));
-				READ(read_string(&bi->real, f));
-				SAFE(read_int16(&tmp16, f));
-				bi->flags = tmp16;
-				READ(read_int32(&tmp32, f));
-				bi->created = tmp32;
-				READ(read_int16(&tmp16, f));
-				bi->chancount = tmp16;
-				biptr = findbot(bi->nick);
-				if (biptr) { /* BOT COLLISION! #1 is biptr-> (db1), #2 is bi-> (db2) */
-					if (!preferoldest && !preferfirst && !prefersecond && !prefernewest) {
-						printf("Bot collision for botnick %s:\n\n", biptr->nick);
-						printf("Bot 1: %s@%s (%s) is assigned to %d chans\n", biptr->user, biptr->host, biptr->real, biptr->chancount);
-						printf("Time registered: %s\n", ctime(&biptr->created));
-						printf("Bot 2: %s@%s (%s) is assigned to %d chans\n", bi->user, bi->host, bi->real, bi->chancount);
-						printf("Time registered: %s\n", ctime(&bi->created));
-						printf("What bot do you want to keep? Enter the related bot number \"1\" or \"2\".\n");
-					}
-
-					if (preferoldest) {
-						input[0] = (biptr->created > bi->created) ? '1' : '2';
-					} else if (prefernewest) {
-						input[0] = (biptr->created > bi->created) ? '2' : '1';
-					} else if (preferfirst) {
-						input[0] = '2';
-					} else if (prefersecond) {
-						input[0] = '1';
-					} else {
-						waiting_for_input3:
-						scanf("%s", input);
-					}
-					if (input[0] == '1') { /* free() bot #2 (bi) */
-						printf("Deleting Bot %s!%s@%s (%s) (#2).\n", bi->nick, bi->user, bi->host, bi->real);
-						free(bi->nick);
-						free(bi->user);
-						free(bi->host);
-						free(bi->real);
-						free(bi);
-					} else if (input[0] == '2') { /* get bot #1 (biptr) out of the list, free() it and add #2 to the list */
-						printf("Deleting Bot %s!%s@%s (%s) (#1).\n", biptr->nick, biptr->user, biptr->host, biptr->real);
-						if (biptr->next)
-							biptr->next->prev = biptr->prev;
-						if (biptr->prev)
-							biptr->prev->next = biptr->next;
-						else
-							botlists[tolower(*biptr->nick)] = biptr->next;
-						free(biptr->nick);
-						free(biptr->user);
-						free(biptr->host);
-						free(biptr->real);
-						free(biptr);
-						insert_bot(bi);
-					} else {
-						printf("Invalid number, give us a valid one (1 or 2).\n");
-						goto waiting_for_input3;
-					}
-				} /* NO COLLISION (biptr) */
-				insert_bot(bi);
-			}
-		} else
-			nobot = 1;
 	}
 
 	/* IIIc: Saving */
-	if (!nobot) {
-		if ((f = open_db_write("Botserv", BOT_DB_NEW, 10))) {
-			BotInfo *bi;
-			for (i = 0; i < 256; i++) {
-				for (bi = botlists[i]; bi; bi = bi->next) {
-					SAFE(write_int8(1, f));
-					SAFE(write_string(bi->nick, f));
-					SAFE(write_string(bi->user, f));
-					SAFE(write_string(bi->host, f));
-					SAFE(write_string(bi->real, f));
-					SAFE(write_int16(bi->flags, f));
-					SAFE(write_int32(bi->created, f));
-					SAFE(write_int16(bi->chancount, f));
-				}
+	if ((f = open_db_write("Botserv", BOT_DB_NEW, 10))) {
+		BotInfo *bi;
+		for (i = 0; i < 256; i++) {
+			for (bi = botlists[i]; bi; bi = bi->next) {
+				SAFE(write_int8(1, f));
+				SAFE(write_string(bi->nick, f));
+				SAFE(write_string(bi->user, f));
+				SAFE(write_string(bi->host, f));
+				SAFE(write_string(bi->real, f));
+				SAFE(write_int16(bi->flags, f));
+				SAFE(write_int32(bi->created, f));
+				SAFE(write_int16(bi->chancount, f));
 			}
-			SAFE(write_int8(0, f));
-			close_db(f);
-			printf("Bot merging done. New database saved as %s.\n", BOT_DB_NEW);
 		}
-	} /* End of section III */
+		SAFE(write_int8(0, f));
+		close_db(f);
+		printf("Bot merging done. New database saved as %s.\n", BOT_DB_NEW);
+	}
 
 	/* Section IV: Hosts */
 	/* IVa: First database */
@@ -1524,113 +877,22 @@ int main(int argc, char *argv[])
 			hc->last = NULL;
 			firsthc = hc;
 		}
-	} else
-		nohost = 1;
-
-	/* IVb: Second database */
-	if (!nohost) {
-		if ((f = open_db_read("HostServ", HOST_DB_2, 3))) {
-			HostCore *hc, *hcptr;
-			char input[1024];
-			int32 tmp32;
-			int c;
-			int collision = 0;
-
-			while ((c = getc_db(f)) == 1) {
-				if (c != 1) {
-					printf("Invalid format in %s.\n", HOST_DB_2);
-					exit(0);
-				}
-				collision = 0;
-				hc = (HostCore *)calloc(1, sizeof(HostCore));
-				READ(read_string(&hc->nick, f));
-				READ(read_string(&hc->vIdent, f));
-				READ(read_string(&hc->vHost, f));
-				READ(read_string(&hc->creator, f));
-				READ(read_int32(&tmp32, f));
-				hc->time = tmp32;
-
-				for (hcptr = firsthc; hcptr; hcptr = hcptr->next) {
-					if (!mystricmp(hcptr->nick, hc->nick)) { /* COLLISION: #1 is from db1 (hcptr), #2 is from db2 (hc) */
-						collision++;
-						if (!preferoldest && !preferfirst && !prefersecond && !prefernewest) {
-							printf("vHost collision for nick %s:\n\n", hcptr->nick);
-							printf("vHost 1: %s (vIdent: %s)\n", hcptr->vHost, (hcptr->vIdent) ? hcptr->vIdent : "none");
-							printf("Time set: %s\n", ctime(&hcptr->time));
-							printf("vHost 2: %s (vIdent: %s)\n", hc->vHost, (hc->vIdent) ? hc->vIdent : "none");
-							printf("Time set: %s\n", ctime(&hc->time));
-							printf("What vhost do you want to keep? Enter the related number \"1\" or \"2\".\n");
-						}
-						if (preferoldest) {
-							input[0] = (hcptr->time > hc->time) ? '1' : '2';
-						} else if (prefernewest) {
-							input[0] = (hcptr->time > hc->time) ? '2' : '1';
-						} else if (preferfirst) {
-							input[0] = '1';
-						} else if (prefersecond) {
-							input[0] = '2';
-						} else {
-							waiting_for_input2:
-							scanf("%s", input);
-						}
-						if (input[0] == '2') { /* free() hcptr and get it out of the list, put hc into the list */
-							printf("Deleting vHost %s (vIdent: %s) for nick %s (#1).\n", hcptr->vHost, (hcptr->vIdent) ? hcptr->vIdent : "none", hcptr->nick);
-							if (hcptr->last)
-								hcptr->last->next = hcptr->next;
-							if (hcptr->next)
-								hcptr->next->last = hcptr->last;
-							free(hcptr->nick);
-							free(hcptr->vHost);
-							free(hcptr->vIdent);
-							free(hcptr->creator);
-							free(hcptr);
-							hc->next = firsthc;
-							if (firsthc)
-								firsthc->last = hc;
-							hc->last = NULL;
-							firsthc = hc;
-						} else if (input[0] == '1') { /* free() hc */
-							printf("Deleting vHost %s (vIdent: %s) for nick %s (#2).\n", hc->vHost, (hc->vIdent) ? hc->vIdent : "none", hc->nick);
-							free(hc->nick);
-							free(hc->vHost);
-							free(hc->vIdent);
-							free(hc->creator);
-							free(hc);
-						} else {
-							printf("Invalid number, give us a valid one (1 or 2).\n");
-							goto waiting_for_input2;
-						} /* input[0] */
-					} /* mystricmp */
-				} /* for (hcptr...) */
-				if (!collision) { /* No collision */
-					hc->next = firsthc;
-					if (firsthc)
-						firsthc->last = hc;
-					hc->last = NULL;
-					firsthc = hc;
-				}
-			} /* while */
-		} else
-			nohost = 1;
 	}
-
-	/* IVc: Saving */
-	if (!nohost) {
-		if ((f = open_db_write("HostServ", HOST_DB_NEW, 3))) {
-			HostCore *hcptr;
-			for (hcptr = firsthc; hcptr; hcptr = hcptr->next) {
-				SAFE(write_int8(1, f));
-				SAFE(write_string(hcptr->nick, f));
-				SAFE(write_string(hcptr->vIdent, f));
-				SAFE(write_string(hcptr->vHost, f));
-				SAFE(write_string(hcptr->creator, f));
-				SAFE(write_int32(hcptr->time, f));
-			}
-			SAFE(write_int8(0, f));
-			close_db(f);
-			printf("Host merging done. New database saved as %s.\n", HOST_DB_NEW);
+	
+	if ((f = open_db_write("HostServ", HOST_DB_NEW, 3))) {
+		HostCore *hcptr;
+		for (hcptr = firsthc; hcptr; hcptr = hcptr->next) {
+			SAFE(write_int8(1, f));
+			SAFE(write_string(hcptr->nick, f));
+			SAFE(write_string(hcptr->vIdent, f));
+			SAFE(write_string(hcptr->vHost, f));
+			SAFE(write_string(hcptr->creator, f));
+			SAFE(write_int32(hcptr->time, f));
 		}
-	} /* End of section IV */
+		SAFE(write_int8(0, f));
+		close_db(f);
+		printf("Host merging done. New database saved as %s.\n", HOST_DB_NEW);
+	}
 
 	/* MERGING DONE \o/ HURRAY! */
 

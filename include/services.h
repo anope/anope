@@ -1096,6 +1096,9 @@ typedef struct ircd_modes_ {
 /* These two are not used anymore */
 #define NS_OLD_ENCRYPTEDPW	0x0001  /* Nickname password is encrypted */
 
+
+
+
 /* Nickname setting flags: */
 #define NI_KILLPROTECT		0x00000001  /* Kill others who take this nick */
 #define NI_SECURE		0x00000002  /* Don't recognize unless IDENTIFY'd */
@@ -1117,6 +1120,11 @@ typedef struct ircd_modes_ {
 #define NI_HIDE_STATUS		  0x00020000  /* Don't show services access status */
 #define NI_SUSPENDED		0x00040000  /* Nickname is suspended */
 #define NI_AUTOOP		0x00080000  /* Autoop nickname in channels */
+#define NI_NOEXPIRE		0x00100000 /* nicks in this group won't expire */
+
+// Old NS_VERBOTEN, very fucking temporary.
+#define NI_FORBIDDEN	0x80000000 
+
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change
  * the order the languages are displayed in for NickServ HELP SET LANGUAGE,

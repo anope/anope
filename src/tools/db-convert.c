@@ -80,25 +80,7 @@
 #endif
 
 
-/* CONFIGURATION BLOCK */
-
-#define NICK_DB_1	  "nick1.db"
-#define NICK_DB_2	  "nick2.db"
-#define NICK_DB_NEW "nick.db"
-
-#define CHAN_DB_1	  "chan1.db"
-#define CHAN_DB_2	  "chan2.db"
-#define CHAN_DB_NEW "chan.db"
-
-#define BOT_DB_1		"bot1.db"
-#define BOT_DB_2		"bot2.db"
-#define BOT_DB_NEW   "bot.db"
-
-#define HOST_DB_1	  "hosts1.db"
-#define HOST_DB_2	  "hosts2.db"
-#define HOST_DB_NEW "hosts.db"
-
-/* END OF CONFIGURATION BLOCK */
+#include <fstream>
 
 #ifndef _WIN32
 #define C_LBLUE "\033[1;34m"
@@ -185,9 +167,6 @@ typedef struct {
 struct nickalias_ {
 	NickAlias *next, *prev;
 	char *nick;					/* Nickname */
-	char *last_quit;			 /* Last quit message */
-	char *last_realname;	 /* Last realname */
-	char *last_usermask;	 /* Last usermask */
 	time_t time_registered;  /* When the nick was registered */
 	time_t last_seen;		   /* When it was seen online for the last time */
 	uint16 status;				  /* See NS_* below */
@@ -211,6 +190,10 @@ struct nickcore_ {
 	uint16 channelcount;  /* Number of channels currently registered */
 	int unused;				/* Used for nick collisions */
 	int aliascount;			/* How many aliases link to us? Remove the core if 0 */
+
+	char *last_quit;			 /* Last quit message */
+	char *last_realname;	 /* Last realname */
+	char *last_usermask;	 /* Last usermask */
 };
 
 struct chaninfo_ {
@@ -314,12 +297,23 @@ int main(int argc, char *argv[])
 {
 	dbFILE *f;
 	HostCore *firsthc = NULL;
+	std::ofstream fs;
 
 	printf("\n"C_LBLUE"Anope 1.8.x -> 1.9.x database converter"C_NONE"\n\n");
 
+	fs.open("anope.db");
+	if (!fs.is_open())
+	{
+		printf("\n"C_LBLUE"Could not open anope.db for write"C_NONE"\n\n");
+		exit(1);	
+	}
+	
+	// VERSHUN ONE
+	fs << "VER 1" << std::endl;
+
 	/* Section I: Nicks */
 	/* Ia: First database */
-	if ((f = open_db_read("NickServ", NICK_DB_1, 14)))
+	if ((f = open_db_read("NickServ", "nick.db", 14)))
 	{
 
 		NickAlias *na, **nalast, *naprev;
@@ -337,7 +331,7 @@ int main(int argc, char *argv[])
 
 			while ((c = getc_db(f)) == 1) {
 				if (c != 1) {
-					printf("Invalid format in %s.\n", NICK_DB_1);
+					printf("Invalid format in nickserv db.\n");
 					exit(0);
 				}
 
@@ -396,16 +390,19 @@ int main(int argc, char *argv[])
 
 			while ((c = getc_db(f)) == 1) {
 				if (c != 1) {
-					printf("Invalid format in %s.\n", NICK_DB_1);
+					printf("Invalid format in nick db.\n");
 					exit(0);
 				}
 
 				na = (NickAlias *)calloc(1, sizeof(NickAlias));
 
 				READ(read_string(&na->nick, f));
-				READ(read_string(&na->last_usermask, f));
-				READ(read_string(&na->last_realname, f));
-				READ(read_string(&na->last_quit, f));
+				char *mask;
+				char *real;
+				char *quit;
+				READ(read_string(&mask, f));
+				READ(read_string(&real, f));
+				READ(read_string(&quit, f));
 
 				READ(read_int32(&tmp32, f));
 				na->time_registered = tmp32;
@@ -416,6 +413,29 @@ int main(int argc, char *argv[])
 				na->nc = findcore(s, 0);
 				na->nc->aliascount++;
 				free(s);
+				
+				if (!na->nc->last_quit && quit)
+					na->nc->last_quit = strdup(quit);
+				if (!na->nc->last_realname && real)
+					na->nc->last_realname = strdup(real);
+				if (!na->nc->last_usermask && mask)
+					na->nc->last_usermask = strdup(mask);
+				
+				// Convert nick NOEXPIRE to group NOEXPIRE	
+				if (na->status & 0x0004)
+				{
+					na->nc->flags & 0x00100000;
+				}
+				
+				// Convert nick VERBOTEN to group FORBIDDEN
+				if (na->status & 0x0002)
+				{
+					na->nc->flags & 0x80000000;	
+				}
+				
+				free(mask);
+				free(real);
+				free(quit);
 
 				*nalast = na;
 				nalast = &na->next;
@@ -440,74 +460,69 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	/* Ic: Saving */
-	if ((f = open_db_write("NickServ", NICK_DB_NEW, 14))) {
-
+	/* Nick cores */
+	for (i = 0; i < 1024; i++)
+	{
 		NickAlias *na;
 		NickCore *nc;
 		char **access;
 		Memo *memos;
 		int j;
+		for (nc = nclists[i]; nc; nc = nc->next)
+		{
+			fs << "NC " << nc->display << std::endl;
+/*
+			SAFE(write_int8(1, f));
+			SAFE(write_string(nc->display, f));
+			SAFE(write_buffer(nc->pass, f));
+			SAFE(write_string(nc->email, f));
+			SAFE(write_string(nc->greet, f));
+			SAFE(write_int32(nc->icq, f));
+			SAFE(write_string(nc->url, f));
+			SAFE(write_int32(nc->flags, f));
+			SAFE(write_int16(nc->language, f));
+			SAFE(write_int16(nc->accesscount, f));
+			for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
+				SAFE(write_string(*access, f));
 
-		/* Nick cores */
-		for (i = 0; i < 1024; i++) {
-			for (nc = nclists[i]; nc; nc = nc->next) {
-				SAFE(write_int8(1, f));
-				SAFE(write_string(nc->display, f));
-				SAFE(write_buffer(nc->pass, f));
-				SAFE(write_string(nc->email, f));
-				SAFE(write_string(nc->greet, f));
-				SAFE(write_int32(nc->icq, f));
-				SAFE(write_string(nc->url, f));
-				SAFE(write_int32(nc->flags, f));
-				SAFE(write_int16(nc->language, f));
-				SAFE(write_int16(nc->accesscount, f));
-				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
-					SAFE(write_string(*access, f));
+			SAFE(write_int16(nc->memos.memocount, f));
+			SAFE(write_int16(nc->memos.memomax, f));
+			memos = nc->memos.memos;
+			for (j = 0; j < nc->memos.memocount; j++, memos++) {
+				SAFE(write_int32(memos->number, f));
+				SAFE(write_int16(memos->flags, f));
+				SAFE(write_int32(memos->time, f));
+				SAFE(write_buffer(memos->sender, f));
+				SAFE(write_string(memos->text, f));
+			}
+			SAFE(write_int16(nc->channelcount, f));
+			SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
+*/
+		} /* for (nc) */
+	} /* for (i) */
 
-				SAFE(write_int16(nc->memos.memocount, f));
-				SAFE(write_int16(nc->memos.memomax, f));
-				memos = nc->memos.memos;
-				for (j = 0; j < nc->memos.memocount; j++, memos++) {
-					SAFE(write_int32(memos->number, f));
-					SAFE(write_int16(memos->flags, f));
-					SAFE(write_int32(memos->time, f));
-					SAFE(write_buffer(memos->sender, f));
-					SAFE(write_string(memos->text, f));
-				}
-				SAFE(write_int16(nc->channelcount, f));
-				SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
-			} /* for (nc) */
-			SAFE(write_int8(0, f));
-		} /* for (i) */
+	/* Nick aliases */
+	/*for (i = 0; i < 1024; i++) {
+		for (na = nalists[i]; na; na = na->next) {
+			SAFE(write_int8(1, f));
+			SAFE(write_string(na->nick, f));
+			SAFE(write_string(na->last_usermask, f));
+			SAFE(write_string(na->last_realname, f));
+			SAFE(write_string(na->last_quit, f));
+			SAFE(write_int32(na->time_registered, f));
+			SAFE(write_int32(na->last_seen, f));
+			SAFE(write_int16(na->status, f));
+			SAFE(write_string(na->nc->display, f));
 
-		/* Nick aliases */
-		for (i = 0; i < 1024; i++) {
-			for (na = nalists[i]; na; na = na->next) {
-				SAFE(write_int8(1, f));
-				SAFE(write_string(na->nick, f));
-				SAFE(write_string(na->last_usermask, f));
-				SAFE(write_string(na->last_realname, f));
-				SAFE(write_string(na->last_quit, f));
-				SAFE(write_int32(na->time_registered, f));
-				SAFE(write_int32(na->last_seen, f));
-				SAFE(write_int16(na->status, f));
-				SAFE(write_string(na->nc->display, f));
-
-			} /* for (na) */
-			SAFE(write_int8(0, f));
-		} /* for (i) */
-			close_db(f); /* End of section Ic */
-			printf("Nick merging done. New database saved as %s.\n", NICK_DB_NEW);
+		}
 	}
-
-
-
+	*/
 
 
 	/* Section II: Chans */
-	/* IIa: First database */
-	if ((f = open_db_read("ChanServ", CHAN_DB_1, 16))) {
+	/* IIa: First database 
+	if ((f = open_db_read("ChanServ", "chan.db", 16)))
+	{
 		ChannelInfo *ci, **last, *prev;
 		int c;
 
@@ -554,7 +569,7 @@ int main(int argc, char *argv[])
 				READ(read_int32(&tmp32, f));
 				ci->last_topic_time = tmp32;
 				READ(read_uint32(&ci->flags, f));
-				/* Temporary flags cleanup */
+				// Temporary flags cleanup
 				ci->flags &= ~0x80000000;
 				READ(read_string(&ci->forbidby, f));
 				READ(read_string(&ci->forbidreason, f));
@@ -647,7 +662,7 @@ int main(int argc, char *argv[])
 				}
 				READ(read_string(&ci->entry_message, f));
 
-				/* BotServ options */
+				// BotServ options
 				READ(read_string(&ci->bi, f));
 				READ(read_int32(&tmp32, f));
 				ci->botflags = tmp32;
@@ -686,11 +701,13 @@ int main(int argc, char *argv[])
 				} else {
 					ci->badwords = NULL;
 				}
-			} /* getc_db() */
+			}
 			*last = NULL;
-		} /* for() loop */
+		}
 		close_db(f);
-	}
+	}*/
+	
+	#if 0
 
 	/* IIc: Saving */
 	if ((f = open_db_write("ChanServ", CHAN_DB_NEW, 16))) {
@@ -894,6 +911,7 @@ int main(int argc, char *argv[])
 		printf("Host merging done. New database saved as %s.\n", HOST_DB_NEW);
 	}
 
+#endif
 	/* MERGING DONE \o/ HURRAY! */
 
 	printf("\n\nMerging is now done. I give NO guarantee for your DBs.\n");
@@ -1194,12 +1212,6 @@ int delnick(NickAlias *na, int donttouchthelist)
 
 	/* free() us */
 	free(na->nick);
-	if (na->last_usermask)
-		free(na->last_usermask);
-	if (na->last_realname)
-		free(na->last_realname);
-	if (na->last_quit)
-		free(na->last_quit);
 	free(na);
 	return 1;
 }
@@ -1224,6 +1236,12 @@ int delcore(NickCore *nc)
 		free(nc->greet);
 	if (nc->url)
 		free(nc->url);
+	if (nc->last_usermask)
+		free(nc->last_usermask);
+	if (nc->last_realname)
+		free(nc->last_realname);
+	if (nc->last_quit)
+		free(nc->last_quit);
 	if (nc->access) {
 		for (i = 0; i < nc->accesscount; i++) {
 			if (nc->access[i])

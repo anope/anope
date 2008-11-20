@@ -21,7 +21,7 @@ Legend:
     [ ] modules.c
     [x] commands.c
   [x] Redo moduleAdd|Get|Remove data to use class Extensible, etc.
-[+] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
+[x] remove old config, replace with insp-inspired (albeit bind format) config (CBX)
 [ ] burn automake with fire (1.9.1?)
 [+] Clean up protocol
   [x] Fix anope_cmd_* stuff to just use IRCdProto methods directly

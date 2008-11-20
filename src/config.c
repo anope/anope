@@ -28,7 +28,7 @@ char *EncModule;
 std::list<Uplink *> Uplinks;
 
 char *LocalHost;
-int LocalPort;
+unsigned LocalPort;
 
 char *ServerName;
 char *ServerDesc;
@@ -38,7 +38,7 @@ char *ServiceHost;
 char *HelpChannel;
 char *LogChannel;
 char *NetworkName;
-int NickLen;
+unsigned NickLen;
 
 char *s_NickServ;
 char *s_ChanServ;
@@ -74,7 +74,7 @@ int HostNumber = 0;			 /* needs to be set to 0 */
 
 bool NoBackupOkay;
 bool StrictPasswords;
-int BadPassLimit;
+unsigned BadPassLimit;
 time_t BadPassTimeout;
 time_t UpdateTimeout;
 time_t ExpireTimeout;
@@ -88,8 +88,8 @@ bool UsePrivmsg;
 bool UseStrictPrivMsg;
 bool DumpCore;
 bool LogUsers;
-int NickRegDelay;
-int NewsCount;
+unsigned NickRegDelay;
+unsigned NewsCount;
 
 bool UseMail;
 char *SendMailPath;
@@ -103,20 +103,20 @@ char *NSGuestNickPrefix;
 bool NSAllowKillImmed;
 bool NSNoGroupChange;
 int NSDefFlags;
-int NSDefLanguage;
+unsigned NSDefLanguage;
 time_t NSRegDelay;
 time_t NSResendDelay;
 time_t NSExpire;
 time_t NSRExpire;
 bool NSForceEmail;
 int NSMaxAliases;
-int NSAccessMax;
+unsigned NSAccessMax;
 char *NSEnforcerUser;
 char *NSEnforcerHost;
 static char *temp_nsuserhost;
 time_t NSReleaseTimeout;
 bool NSListOpersOnly;
-int NSListMax;
+unsigned NSListMax;
 bool NSSecureAdmins;
 bool NSStrictPrivileges;
 bool NSEmailReg;
@@ -127,28 +127,28 @@ bool NSAddAccessOnReg;
 
 static std::string CSDefaults;
 int CSDefFlags;
-int CSMaxReg;
+unsigned CSMaxReg;
 time_t CSExpire;
 int CSDefBantype;
-int CSAccessMax;
-int CSAutokickMax;
+unsigned CSAccessMax;
+unsigned CSAutokickMax;
 char *CSAutokickReason;
 time_t CSInhabit;
 bool CSListOpersOnly;
-int CSListMax;
+unsigned CSListMax;
 bool CSRestrictGetPass;
 bool CSOpersOnly;
 
-int MSMaxMemos;
+unsigned MSMaxMemos;
 time_t MSSendDelay;
 bool MSNotifyAll;
-int MSMemoReceipt;
+unsigned MSMemoReceipt;
 
 static std::string BSDefaults;
 int BSDefFlags;
 time_t BSKeepData;
-int BSMinUsers;
-int BSBadWordsMax;
+unsigned BSMinUsers;
+unsigned BSBadWordsMax;
 bool BSSmartJoin;
 bool BSGentleBWReason;
 bool BSCaseSensitive;
@@ -201,10 +201,10 @@ bool WallSetpass;
 bool AddAkiller;
 
 bool LimitSessions;
-int DefSessionLimit;
+unsigned DefSessionLimit;
 time_t ExceptionExpiry;
 int MaxSessionKill;
-int MaxSessionLimit;
+unsigned MaxSessionLimit;
 time_t SessionAutoKillExpiry;
 char *ExceptionDBName;
 char *SessionLimitExceeded;
@@ -662,7 +662,7 @@ int ServerConfig::Read(bool bail)
 		{"serverinfo", "name", "", new ValueContainerChar(&ServerName), DT_HOSTNAME | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "description", "", new ValueContainerChar(&ServerDesc), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "localhost", "", new ValueContainerChar(&LocalHost), DT_HOSTNAME | DT_NORELOAD, NoValidation},
-		{"serverinfo", "localport", "0", new ValueContainerInt(&LocalPort), DT_INTEGER | DT_NORELOAD, ValidatePort},
+		{"serverinfo", "localport", "0", new ValueContainerUInt(&LocalPort), DT_UINTEGER | DT_NORELOAD, ValidatePort},
 		{"serverinfo", "type", "", new ValueContainerChar(&IRCDModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"serverinfo", "id", "", new ValueContainerChar(&Numeric), DT_NOSPACES | DT_NORELOAD, NoValidation},
 		{"serverinfo", "ident", "", new ValueContainerChar(&ServiceUser), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -673,14 +673,14 @@ int ServerConfig::Read(bool bail)
 		{"networkinfo", "logchannel", "", new ValueContainerChar(&LogChannel), DT_CHARPTR, NoValidation},
 		{"networkinfo", "logbot", "no", new ValueContainerBool(&LogBot), DT_BOOLEAN, NoValidation},
 		{"networkinfo", "networkname", "", new ValueContainerChar(&NetworkName), DT_CHARPTR, ValidateNotEmpty},
-		{"networkinfo", "nicklen", "0", new ValueContainerInt(&NickLen), DT_INTEGER | DT_NORELOAD, ValidateNickLen},
+		{"networkinfo", "nicklen", "0", new ValueContainerUInt(&NickLen), DT_UINTEGER | DT_NORELOAD, ValidateNickLen},
 		{"options", "encryption", "", new ValueContainerChar(&EncModule), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"options", "userkey1", "0", new ValueContainerLUInt(&UserKey1), DT_LUINTEGER, NoValidation},
 		{"options", "userkey2", "0", new ValueContainerLUInt(&UserKey2), DT_LUINTEGER, NoValidation},
 		{"options", "userkey3", "0", new ValueContainerLUInt(&UserKey3), DT_LUINTEGER, NoValidation},
 		{"options", "nobackupokay", "no", new ValueContainerBool(&NoBackupOkay), DT_BOOLEAN, NoValidation},
 		{"options", "strictpasswords", "no", new ValueContainerBool(&StrictPasswords), DT_BOOLEAN, NoValidation},
-		{"options", "badpasslimit", "0", new ValueContainerInt(&BadPassLimit), DT_INTEGER, NoValidation},
+		{"options", "badpasslimit", "0", new ValueContainerUInt(&BadPassLimit), DT_UINTEGER, NoValidation},
 		{"options", "badpasstimeout", "0", new ValueContainerTime(&BadPassTimeout), DT_TIME, NoValidation},
 		{"options", "updatetimeout", "0", new ValueContainerTime(&UpdateTimeout), DT_TIME, ValidateNotZero},
 		{"options", "expiretimeout", "0", new ValueContainerTime(&ExpireTimeout), DT_TIME, ValidateNotZero},
@@ -699,9 +699,9 @@ int ServerConfig::Read(bool bail)
 		{"options", "globaloncycledown", "", new ValueContainerChar(&GlobalOnCycleMessage), DT_CHARPTR, ValidateGlobalOnCycle},
 		{"options", "globaloncycleup", "", new ValueContainerChar(&GlobalOnCycleUP), DT_CHARPTR, ValidateGlobalOnCycle},
 		{"options", "anonymousglobal", "no", new ValueContainerBool(&AnonymousGlobal), DT_BOOLEAN, NoValidation},
-		{"options", "nickregdelay", "0", new ValueContainerInt(&NickRegDelay), DT_INTEGER, NoValidation},
+		{"options", "nickregdelay", "0", new ValueContainerUInt(&NickRegDelay), DT_UINTEGER, NoValidation},
 		{"options", "restrictopernicks", "no", new ValueContainerBool(&RestrictOperNicks), DT_BOOLEAN, NoValidation},
-		{"options", "newscount", "3", new ValueContainerInt(&NewsCount), DT_INTEGER, NoValidation},
+		{"options", "newscount", "3", new ValueContainerUInt(&NewsCount), DT_UINTEGER, NoValidation},
 		{"options", "ulineservers", "", new ValueContainerChar(&UlineServers), DT_CHARPTR, NoValidation},
 		{"nickserv", "nick", "NickServ", new ValueContainerChar(&s_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"nickserv", "description", "Nickname Registration Service", new ValueContainerChar(&desc_NickServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
@@ -711,19 +711,19 @@ int ServerConfig::Read(bool bail)
 		{"nickserv", "modules", "", new ValueContainerChar(&NickCoreModules), DT_CHARPTR, NoValidation},
 		{"nickserv", "forceemail", "no", new ValueContainerBool(&NSForceEmail), DT_BOOLEAN, ValidateEmailReg},
 		{"nickserv", "defaults", "secure memosignon memoreceive", new ValueContainerString(&NSDefaults), DT_STRING, NoValidation},
-		{"nickserv", "defaultlanguage", "0", new ValueContainerInt(&NSDefLanguage), DT_INTEGER, ValidateLanguage},
+		{"nickserv", "defaultlanguage", "0", new ValueContainerUInt(&NSDefLanguage), DT_UINTEGER, ValidateLanguage},
 		{"nickserv", "regdelay", "0", new ValueContainerTime(&NSRegDelay), DT_TIME, NoValidation},
 		{"nickserv", "resenddelay", "0", new ValueContainerTime(&NSResendDelay), DT_TIME, NoValidation},
 		{"nickserv", "expire", "21d", new ValueContainerTime(&NSExpire), DT_TIME, NoValidation},
 		{"nickserv", "preregexpire", "0", new ValueContainerTime(&NSRExpire), DT_TIME, ValidateEmailReg},
 		{"nickserv", "maxaliases", "0", new ValueContainerInt(&NSMaxAliases), DT_INTEGER, NoValidation},
-		{"nickserv", "accessmax", "0", new ValueContainerInt(&NSAccessMax), DT_INTEGER, ValidateNotZero},
+		{"nickserv", "accessmax", "0", new ValueContainerUInt(&NSAccessMax), DT_UINTEGER, ValidateNotZero},
 		{"nickserv", "enforceruser", "", new ValueContainerChar(&temp_nsuserhost), DT_CHARPTR, ValidateNotEmpty},
 		{"nickserv", "releasetimeout", "0", new ValueContainerTime(&NSReleaseTimeout), DT_TIME, ValidateNotZero},
 		{"nickserv", "allowkillimmed", "no", new ValueContainerBool(&NSAllowKillImmed), DT_BOOLEAN | DT_NORELOAD, NoValidation},
 		{"nickserv", "nogroupchange", "no", new ValueContainerBool(&NSNoGroupChange), DT_BOOLEAN, NoValidation},
 		{"nickserv", "listopersonly", "no", new ValueContainerBool(&NSListOpersOnly), DT_BOOLEAN, NoValidation},
-		{"nickserv", "listmax", "0", new ValueContainerInt(&NSListMax), DT_INTEGER, ValidateNotZero},
+		{"nickserv", "listmax", "0", new ValueContainerUInt(&NSListMax), DT_UINTEGER, ValidateNotZero},
 		{"nickserv", "guestnickprefix", "", new ValueContainerChar(&NSGuestNickPrefix), DT_CHARPTR, ValidateGuestPrefix},
 		{"nickserv", "secureadmins", "no", new ValueContainerBool(&NSSecureAdmins), DT_BOOLEAN, NoValidation},
 		{"nickserv", "strictprivileges", "no", new ValueContainerBool(&NSStrictPrivileges), DT_BOOLEAN, NoValidation},
@@ -742,31 +742,31 @@ int ServerConfig::Read(bool bail)
 		{"chanserv", "database", "chan.db", new ValueContainerChar(&ChanDBName), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "modules", "", new ValueContainerChar(&ChanCoreModules), DT_CHARPTR, NoValidation},
 		{"chanserv", "defaults", "keetopic secure securefounder signkick", new ValueContainerString(&CSDefaults), DT_STRING, NoValidation},
-		{"chanserv", "maxregistered", "0", new ValueContainerInt(&CSMaxReg), DT_INTEGER, NoValidation},
+		{"chanserv", "maxregistered", "0", new ValueContainerUInt(&CSMaxReg), DT_UINTEGER, NoValidation},
 		{"chanserv", "expire", "14d", new ValueContainerTime(&CSExpire), DT_TIME, NoValidation},
 		{"chanserv", "defbantype", "2", new ValueContainerInt(&CSDefBantype), DT_INTEGER, ValidateBantype},
-		{"chanserv", "accessmax", "0", new ValueContainerInt(&CSAccessMax), DT_INTEGER, ValidateNotZero},
-		{"chanserv", "autokickmax", "0", new ValueContainerInt(&CSAutokickMax), DT_INTEGER, ValidateNotZero},
+		{"chanserv", "accessmax", "0", new ValueContainerUInt(&CSAccessMax), DT_UINTEGER, ValidateNotZero},
+		{"chanserv", "autokickmax", "0", new ValueContainerUInt(&CSAutokickMax), DT_UINTEGER, ValidateNotZero},
 		{"chanserv", "autokickreason", "User has been banned from the channel", new ValueContainerChar(&CSAutokickReason), DT_CHARPTR, ValidateNotEmpty},
 		{"chanserv", "inhabit", "0", new ValueContainerTime(&CSInhabit), DT_TIME, ValidateNotZero},
 		{"chanserv", "listopersonly", "no", new ValueContainerBool(&CSListOpersOnly), DT_BOOLEAN, NoValidation},
-		{"chanserv", "listmax", "0", new ValueContainerInt(&CSListMax), DT_INTEGER, ValidateNotZero},
+		{"chanserv", "listmax", "0", new ValueContainerUInt(&CSListMax), DT_UINTEGER, ValidateNotZero},
 		{"chanserv", "restrictgetpass", "no", new ValueContainerBool(&CSRestrictGetPass), DT_BOOLEAN, NoValidation},
 		{"chanserv", "opersonly", "no", new ValueContainerBool(&CSOpersOnly), DT_BOOLEAN, NoValidation},
 		{"memoserv", "nick", "MemoServ", new ValueContainerChar(&s_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "description", "Memo Service", new ValueContainerChar(&desc_MemoServ), DT_CHARPTR | DT_NORELOAD, ValidateNotEmpty},
 		{"memoserv", "modules", "", new ValueContainerChar(&MemoCoreModules), DT_CHARPTR, NoValidation},
-		{"memoserv", "maxmemos", "0", new ValueContainerInt(&MSMaxMemos), DT_INTEGER, NoValidation},
+		{"memoserv", "maxmemos", "0", new ValueContainerUInt(&MSMaxMemos), DT_UINTEGER, NoValidation},
 		{"memoserv", "senddelay", "0", new ValueContainerTime(&MSSendDelay), DT_TIME, NoValidation},
 		{"memoserv", "notifyall", "no", new ValueContainerBool(&MSNotifyAll), DT_BOOLEAN, NoValidation},
-		{"memoserv", "memoreceipt", "0", new ValueContainerInt(&MSMemoReceipt), DT_INTEGER, NoValidation},
+		{"memoserv", "memoreceipt", "0", new ValueContainerUInt(&MSMemoReceipt), DT_UINTEGER, NoValidation},
 		{"botserv", "nick", "", new ValueContainerChar(&s_BotServ), DT_CHARPTR | DT_NORELOAD, NoValidation},
 		{"botserv", "description", "Bot Service", new ValueContainerChar(&desc_BotServ), DT_CHARPTR | DT_NORELOAD, ValidateBotServ},
 		{"botserv", "database", "bot.db", new ValueContainerChar(&BotDBName), DT_CHARPTR, ValidateBotServ},
 		{"botserv", "modules", "", new ValueContainerChar(&BotCoreModules), DT_CHARPTR, NoValidation},
 		{"botserv", "defaults", "", new ValueContainerString(&BSDefaults), DT_STRING, NoValidation},
-		{"botserv", "minusers", "0", new ValueContainerInt(&BSMinUsers), DT_INTEGER, ValidateBotServ},
-		{"botserv", "badwordsmax", "0", new ValueContainerInt(&BSBadWordsMax), DT_INTEGER, ValidateBotServ},
+		{"botserv", "minusers", "0", new ValueContainerUInt(&BSMinUsers), DT_UINTEGER, ValidateBotServ},
+		{"botserv", "badwordsmax", "0", new ValueContainerUInt(&BSBadWordsMax), DT_UINTEGER, ValidateBotServ},
 		{"botserv", "keepdata", "0", new ValueContainerTime(&BSKeepData), DT_TIME, ValidateBotServ},
 		{"botserv", "smartjoin", "no", new ValueContainerBool(&BSSmartJoin), DT_BOOLEAN, NoValidation},
 		{"botserv", "gentlebadwordreason", "no", new ValueContainerBool(&BSGentleBWReason), DT_BOOLEAN, NoValidation},
@@ -802,8 +802,8 @@ int ServerConfig::Read(bool bail)
 		{"operserv", "disableraw", "no", new ValueContainerBool(&DisableRaw), DT_BOOLEAN, NoValidation},
 		{"operserv", "notifications", "", new ValueContainerString(&OSNotifications), DT_STRING, NoValidation},
 		{"operserv", "limitsessions", "no", new ValueContainerBool(&LimitSessions), DT_BOOLEAN, NoValidation},
-		{"operserv", "defaultsessionlimit", "0", new ValueContainerInt(&DefSessionLimit), DT_INTEGER, NoValidation},
-		{"operserv", "maxsessionlimit", "0", new ValueContainerInt(&MaxSessionLimit), DT_INTEGER, ValidateLimitSessions},
+		{"operserv", "defaultsessionlimit", "0", new ValueContainerUInt(&DefSessionLimit), DT_UINTEGER, NoValidation},
+		{"operserv", "maxsessionlimit", "0", new ValueContainerUInt(&MaxSessionLimit), DT_UINTEGER, ValidateLimitSessions},
 		{"operserv", "exceptionexpiry", "0", new ValueContainerTime(&ExceptionExpiry), DT_TIME, ValidateLimitSessions},
 		{"operserv", "sessionlimitexceeded", "", new ValueContainerChar(&SessionLimitExceeded), DT_CHARPTR, NoValidation},
 		{"operserv", "sessionlimitdetailsloc", "", new ValueContainerChar(&SessionLimitDetailsLoc), DT_CHARPTR, NoValidation},
@@ -833,7 +833,7 @@ int ServerConfig::Read(bool bail)
 		{"uplink",
 			{"host", "port", "password", NULL},
 			{"", "0", "", NULL},
-			{DT_HOSTNAME | DT_NORELOAD, DT_INTEGER | DT_NORELOAD, DT_NOSPACES | DT_NORELOAD},
+			{DT_HOSTNAME | DT_NORELOAD, DT_UINTEGER | DT_NORELOAD, DT_NOSPACES | DT_NORELOAD},
 			InitUplinks, DoUplink, DoneUplinks},
 		{"module",
 			{"name", NULL},

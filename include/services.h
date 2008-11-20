@@ -1496,7 +1496,7 @@ class IRCDTS6Proto : public IRCDProto
 
 struct Uplink {
 	char *host;
-	int port;
+	unsigned port;
 	char *password;
 	Uplink(const char *_host, int _port, const char *_password)
 	{

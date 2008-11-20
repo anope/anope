@@ -20,9 +20,6 @@
 
 ServerConfig serverConfig;
 
-// This is temporary while directives are transitioned from the old config to the new one -- CyberBotX
-static const char *SERVICES_CONF_NEW = "services_new.conf";
-
 /* Configurable variables: */
 
 char *IRCDModule;
@@ -852,15 +849,15 @@ int ServerConfig::Read(bool bail)
 	// Load and parse the config file, if there are any errors then explode
 	// Make a copy here so if it fails then we can carry on running with an unaffected config
 	newconfig.clear();
-	if (LoadConf(newconfig, SERVICES_CONF_NEW, errstr)) {
-		// If we succeeded, set the ircd config to the new one
+	if (LoadConf(newconfig, SERVICES_CONF, errstr)) {
+		// If we succeeded, set the config to the new one
 		config_data = newconfig;
 	}
 	else {
 		ReportConfigError(errstr.str(), bail);
 		return 0;
 	}
-	// The stuff in here may throw CoreException, be sure we're in a position to catch it.
+	// The stuff in here may throw ConfigException, be sure we're in a position to catch it.
 	try {
 		// Read the values of all the tags which occur once or not at all, and call their callbacks.
 		for (int Index = 0; Values[Index].tag; ++Index) {

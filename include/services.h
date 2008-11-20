@@ -224,7 +224,6 @@ extern int strncasecmp(const char *, const char *, size_t);
 #include "defs.h"
 #include "slist.h"
 #include "events.h"
-#include "configreader.h"
 
 /* pull in the various bits of STL to pull in */
 #include <string>
@@ -1123,7 +1122,7 @@ typedef struct ircd_modes_ {
 #define NI_NOEXPIRE		0x00100000 /* nicks in this group won't expire */
 
 // Old NS_VERBOTEN, very fucking temporary.
-#define NI_FORBIDDEN	0x80000000 
+#define NI_FORBIDDEN	0x80000000
 
 /* Languages.  Never insert anything in the middle of this list, or
  * everybody will start getting the wrong language!  If you want to change
@@ -1230,7 +1229,9 @@ struct capabinfo_ {
  */
 class IRCDProto;
 struct Uplink;
+class ServerConfig;
 #include "extern.h"
+#include "configreader.h"
 
 class IRCDProto {
 

@@ -915,7 +915,7 @@ struct channel_ {
 	EList *invites;
 
 	struct c_userlist *users;
-	int16 usercount;
+	uint16 usercount;
 
 	BanData *bd;
 

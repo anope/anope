@@ -524,7 +524,7 @@ class BahamutIRCdProto : public IRCDProto
 	/* SVSHOLD - set */
 	void SendSVSHold(const char *nick)
 	{
-		send_cmd(ServerName, "SVSHOLD %s %ld :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
+		send_cmd(ServerName, "SVSHOLD %s %u :%s", nick, (unsigned int)NSReleaseTimeout, "Being held for registered user");
 	}
 
 	/* SVSHOLD - release */

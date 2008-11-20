@@ -234,7 +234,7 @@ int do_xop(User * u, const char *xname, int xlev, int *xmsgs)
 	NickAlias *na;
 	NickCore *nc;
 
-	int i;
+	unsigned i;
 	int change = 0;
 	short ulev;
 	int is_list = (cmd && stricmp(cmd, "LIST") == 0);

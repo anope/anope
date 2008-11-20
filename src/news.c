@@ -276,7 +276,8 @@ void display_news(User * u, int16 type)
 			}
 		}
 	} else {
-		int i, count = 0;
+		int i;
+		unsigned count = 0;
 
 		for (i = nnews - 1; i >= 0; i--) {
 			if (count >= NewsCount)

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -138,7 +138,7 @@ int do_access(User * u)
 	NickCore *nc;
 	ChanAccess *access;
 
-	int i;
+	unsigned i;
 	int level = 0, ulev;
 	int is_list = (cmd && stricmp(cmd, "LIST") == 0);
 	int is_servadmin = is_services_admin(u);
@@ -393,7 +393,7 @@ int do_access(User * u)
 		free(ci->access);
 		ci->access = NULL;
 		ci->accesscount = 0;
-		
+
 		send_event(EVENT_ACCESS_CLEAR, 2, ci->name, u->nick);
 
 		notice_lang(s_ChanServ, u, CHAN_ACCESS_CLEAR, ci->name);

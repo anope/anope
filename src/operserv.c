@@ -168,7 +168,7 @@ void load_os_dbase(void)
 		fatal("Read error on %s", ChanDBName);
 		return;
 	}
-	
+
 	SAFE(read_int32(&maxusercnt, f));
 	SAFE(read_int32(&tmp32, f));
 	maxusertime = tmp32;
@@ -1408,7 +1408,7 @@ void runDefCon(void)
 char *defconReverseModes(const char *modes)
 {
 	char *newmodes = NULL;
-	int i = 0;
+	unsigned i = 0;
 	if (!modes) {
 		return NULL;
 	}

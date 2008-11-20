@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -62,7 +62,7 @@ int listOut(User * u)
 	int from = 0, to = 0;
 	char *tmp = NULL;
 	char *s = NULL;
-	int display_counter = 0;
+	unsigned display_counter = 0;
 	HostCore *head = NULL;
 	HostCore *current;
 

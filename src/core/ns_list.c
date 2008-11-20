@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ int do_list(User * u)
 	char *keyword;
 	NickAlias *na;
 	NickCore *mync;
-	int nnicks, i;
+	unsigned nnicks, i;
 	char buf[BUFSIZE];
 	int is_servadmin = is_services_admin(u);
 	int16 matchflags = 0;

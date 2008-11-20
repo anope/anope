@@ -49,7 +49,7 @@ class User : public Extensible
 	struct u_chanlist *chans;	/* Channels user has joined */
 	struct u_chaninfolist *founder_chans;	/* Channels user has identified for */
 
-	short invalid_pw_count;	/* # of invalid password attempts */
+	unsigned short invalid_pw_count;	/* # of invalid password attempts */
 	time_t invalid_pw_time;	/* Time of last invalid password */
 
 	time_t lastmemosend;	/* Last time MS SEND command used */

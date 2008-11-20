@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -61,7 +61,7 @@ int do_list(User * u)
 	int spattern_size;
 	char *spattern;
 	ChannelInfo *ci;
-	int nchans, i;
+	unsigned nchans, i;
 	char buf[BUFSIZE];
 	int is_servadmin = is_services_admin(u);
 	int count = 0, from = 0, to = 0, tofree = 0;
@@ -130,11 +130,11 @@ int do_list(User * u)
 			if (stricmp(keyword, "NOEXPIRE") == 0)
 				matchflags |= CI_NO_EXPIRE;
 		}
-		
+
 		spattern_size = (strlen(pattern) + 2) * sizeof(char);
 		spattern = (char *)smalloc(spattern_size);
 		snprintf(spattern, spattern_size, "#%s", pattern);
-		
+
 
 		notice_lang(s_ChanServ, u, CHAN_LIST_HEADER, pattern);
 		for (i = 0; i < 256; i++) {

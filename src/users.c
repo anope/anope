@@ -374,15 +374,12 @@ User *finduser(const char *nick)
 {
 	User *user;
 
-	if (!nick || !*nick) {
-		if (debug) {
-			alog("debug: finduser() called with NULL values");
-		}
-		return NULL;
-	}
-
 	if (debug >= 3)
 		alog("debug: finduser(%p)", nick);
+		
+	if (isdigit(*nick) && ircd->ts6)
+		return find_byuid(nick);
+	
 	user = userlist[HASH(nick)];
 	while (user && stricmp(user->nick, nick) != 0)
 		user = user->next;
@@ -428,12 +425,6 @@ User *nextuser(void)
 User *find_byuid(const char *uid)
 {
 	User *u, *next;
-
-	if (!uid) {
-		if (debug)
-			alog("debug: find_byuid() called with NULL-value");
-		return NULL;
-	}
 
 	u = first_uid();
 	while (u) {

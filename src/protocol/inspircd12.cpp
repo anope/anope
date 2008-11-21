@@ -619,13 +619,15 @@ class InspIRCdProto : public IRCDProto
 	/* CHGIDENT */
 	void inspircd_cmd_chgident(const char *nick, const char *vIdent)
 	{
-		if (has_chgidentmod == 1)
+		if (has_chgidentmod == 0)
 		{
 			ircdproto->SendGlobops(s_OperServ, "CHGIDENT not loaded!");
 		}
-
-		BotInfo *bi = findbot(s_OperServ);
-		send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
+		else
+		{
+			BotInfo *bi = findbot(s_OperServ);
+			send_cmd(bi->uid, "CHGIDENT %s %s", nick, vIdent);
+		}
 	}
 
 	/* SVSHOLD - set */

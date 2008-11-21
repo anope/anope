@@ -545,6 +545,8 @@ int main(int argc, char *argv[])
 					fs << "MD NC " << nc->display << " ns_access " << *access << std::endl;
 			}
 
+			fs << "MD NC " << nc->display << " " << nc->memos.memomax;
+
 			if (nc->memos.memocount)
 			{
 				memos = nc->memos.memos;
@@ -556,53 +558,38 @@ int main(int argc, char *argv[])
 
 			fs << "MD NC " << nc->display << " channelfoundercount " << nc->channelcount << std::endl;
 
-			// Ignore memomax, it should be removed XXX
-/*
-			SAFE(write_int8(1, f));
-			SAFE(write_string(nc->display, f)); // xx
-			SAFE(write_buffer(nc->pass, f)); // xx
-			SAFE(write_string(nc->email, f)); // xx
-			SAFE(write_string(nc->greet, f)); // xx
-			SAFE(write_int32(nc->icq, f)); // xx
-			SAFE(write_string(nc->url, f)); // xx
-			SAFE(write_int32(nc->flags, f)); // xx
-			SAFE(write_int16(nc->language, f)); // xx
-			SAFE(write_int16(nc->accesscount, f));
-			for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
-				SAFE(write_string(*access, f));
+			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
+			for (i = 0; i < 1024; i++)
+			{
+				for (na = nalists[i]; na; na = na->next)
+				{
+					if (!na->nc)
+					{
+						std::cout << "Skipping alias with no core (wtf?)" << std::endl;
+						continue;
+					}
 
-			SAFE(write_int16(nc->memos.memocount, f));
-			SAFE(write_int16(nc->memos.memomax, f));
-			memos = nc->memos.memos;
-			for (j = 0; j < nc->memos.memocount; j++, memos++) {
-				SAFE(write_int32(memos->number, f));
-				SAFE(write_int16(memos->flags, f));
-				SAFE(write_int32(memos->time, f));
-				SAFE(write_buffer(memos->sender, f));
-				SAFE(write_string(memos->text, f));
-			}
-			SAFE(write_int16(nc->channelcount, f));
-			SAFE(write_int16(nc->channelcount, f)); // BK with anope1.7, hack alert XXX
+					if (na->nc != nc)
+						continue;
+
+					std::cout << "Writing: " << na->nc->display << "'s nick: " << na->nick << std::endl;
+
+
+					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
+/*				SAFE(write_int8(1, f));
+				SAFE(write_string(na->nick, f));
+				SAFE(write_string(na->last_usermask, f)); // core
+				SAFE(write_string(na->last_realname, f)); // core
+				SAFE(write_string(na->last_quit, f)); // core
+				SAFE(write_int32(na->time_registered, f));
+				SAFE(write_int32(na->last_seen, f));
+				SAFE(write_int16(na->status, f)); // needed?
+				SAFE(write_string(na->nc->display, f));
 */
-		} /* for (nc) */
-	} /* for (i) */
-
-	/* Nick aliases */
-	/*for (i = 0; i < 1024; i++) {
-		for (na = nalists[i]; na; na = na->next) {
-			SAFE(write_int8(1, f));
-			SAFE(write_string(na->nick, f));
-			SAFE(write_string(na->last_usermask, f));
-			SAFE(write_string(na->last_realname, f));
-			SAFE(write_string(na->last_quit, f));
-			SAFE(write_int32(na->time_registered, f));
-			SAFE(write_int32(na->last_seen, f));
-			SAFE(write_int16(na->status, f));
-			SAFE(write_string(na->nc->display, f));
-
+				}
+			}
 		}
 	}
-	*/
 
 
 	/* Section II: Chans */

@@ -29,10 +29,8 @@ Legend:
   [x] SendClientIntroduction should take a UID param, rather than generating one(?)
   [x] Fix permanent channels (+P) stuff.
   [x] Remove UnRestrictSAdmin, UseTS6, UseSVSHOLD
-[?] Remote identification (1.9.1? will this break stuff?)
 [?] Immediate protection enforcement
 [+] InspIRCd 1.2 support
-[ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 [x] Remove old (prior to 1.8.0) db compat
 
 1.9.1
@@ -51,6 +49,7 @@ Legend:
 [ ] Command parser cleanup
   [ ] mod_current_buffer needs to go away and be replaced by a proper parser. Commands should then indicate how they want the buffer split.
 [ ] Fix permanent channels support properly. This will require removing do_sjoin().
+[ ] Make NS ENFORCE/RELEASE stuff more sane, redo timers
 
 1.9.2
 -----
@@ -60,7 +59,8 @@ Legend:
   [ ] Callbacks, event style, see also inspircd
   [ ] Asynchronous DNS?
 [ ] CS SET INHABIT to keep pseudoclient in a channel after it empties to maintain banlists and such
-
+[?] Remote identification (1.9.1? will this break stuff?)
+  [ ] Requires a rejig of how Alias vs Core works
 
 Future
 ------

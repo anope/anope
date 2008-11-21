@@ -670,10 +670,6 @@ class RatboxProto : public IRCDTS6Proto
 		send_cmd(source->uid, "INVITE %s %s", u ? u->uid : nick, chan);
 	}
 
-	/*
-	  1 = valid nick
-	  0 = nick is in valid
-	*/
 	int IsNickValid(const char *nick)
 	{
 		/* TS6 Save extension -Certus */

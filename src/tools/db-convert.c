@@ -1,8 +1,7 @@
 /*
- *   IRC - Internet Relay Chat, db-merger.c
- *   (C) Copyright 2005-2006, Florian Schulze (Certus)
- *
- *   Based on the original code of Anope, (C) 2003-2005 Anope Team
+ *   Copyright (C) 2008 Robin Burchell <w00t@inspircd.org>
+ *   Copyright (C) 2005-2006, Florian Schulze <certus@anope.org>
+ *   Copyright (C) 2003-2005 Anope Team <info@anope.org>
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License (see it online
@@ -13,35 +12,6 @@
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
- *
- *   This program tries to merge two standard anope-1.7.7+ database sets,
- *   that includes chanserv, nickserv, botserv and memoserv databases.
- *
- *   - Certus
- *	  February 11, 2005
- *
- *
- *   0.2 beta:
- *   Fixed some overflows in the ->flags and the ->status fields. Use db-fix
- *   to fix your broken nick dbs.
- *
- *   - Certus
- *	  August 04, 2005
- *
- *
- *   0.3 beta:
- *   Fixed win32 stuff. Merging should now work fine under windows.
- *
- *   - Certus
- *	  July 20, 2006
- *
- *
- *   0.4 beta:
- *   Fixed some compiler warnings about signed/unsigned ints.
- *
- *   - Certus
- *	  August 8, 2006
-
  */
 
 
@@ -57,26 +27,6 @@
 #else
 #include "sysconf.h"
 #include <windows.h>
-#endif
-
-/* Some SUN fixs */
-#ifdef __sun
-/* Solaris specific code, types that do not exist in Solaris'
- * sys/types.h
- **/
-#undef u_int8_t
-#undef u_int16_t
-#undef u_int32_t
-#undef u_int_64_t
-#define u_int8_t uint8_t
-#define u_int16_t uint16_t
-#define u_int32_t uint32_t
-#define u_int64_t uint64_t
-
-#ifndef INADDR_NONE
-#define INADDR_NONE (-1)
-#endif
-
 #endif
 
 #include <string>

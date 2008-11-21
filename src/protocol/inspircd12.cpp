@@ -702,7 +702,14 @@ class InspIRCdProto : public IRCDProto
 				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE A :%s", buf);
 		}
 	}
-
+	
+	int IsNickValid(const char *nick)
+	{
+		/* InspIRCd, like TS6, uses UIDs on collision, so... */
+		if (isdigit(*nick))
+			return 0;
+		return 1;
+	}
 } ircd_proto;
 
 

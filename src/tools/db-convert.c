@@ -296,6 +296,78 @@ BotInfo *botlists[256];
 
 int b64_encode(char *src, size_t srclength, char *target, size_t targsize);
 
+
+#define LANG_EN_US                        0     /* United States English */
+#define LANG_JA_JIS                      1      /* Japanese (JIS encoding) */
+#define LANG_JA_EUC                      2      /* Japanese (EUC encoding) */
+#define LANG_JA_SJIS                    3       /* Japanese (SJIS encoding) */
+#define LANG_ES                          4      /* Spanish */
+#define LANG_PT                          5      /* Portugese */
+#define LANG_FR                          6      /* French */
+#define LANG_TR                          7      /* Turkish */
+#define LANG_IT                          8      /* Italian */
+#define LANG_DE                          9      /* German */
+#define LANG_CAT                           10           /* Catalan */
+#define LANG_GR                         11      /* Greek */
+#define LANG_NL                         12      /* Dutch */
+#define LANG_RU                         13      /* Russian */
+#define LANG_HUN                           14           /* Hungarian */
+#define LANG_PL                         15      /* Polish */
+
+
+const std::string GetLanguageID(int id)
+{
+	switch (id)
+	{
+		case LANG_EN_US:
+			return "en";
+			break;
+		case LANG_JA_JIS:
+		case LANG_JA_EUC:
+		case LANG_JA_SJIS: // these seem to be unused
+			return "en";
+			break;
+		case LANG_ES:
+			return "es";
+			break;
+		case LANG_PT:
+			return "pt";
+			break;
+		case LANG_FR:
+			return "fr";
+			break;
+		case LANG_TR:
+			return "tr";
+			break;
+		case LANG_IT:
+			return "it";
+			break;
+		case LANG_DE:
+			return "de";
+			break;
+		case LANG_CAT:
+			return "ca"; // yes, iso639 defines catalan as CA
+			break;
+		case LANG_GR:
+			return "gr";
+			break;
+		case LANG_NL:
+			return "nl";
+			break;
+		case LANG_RU:
+			return "ru";
+			break;
+		case LANG_HUN:
+			return "hu";
+			break;
+		case LANG_PL:
+			return "pl";
+			break;
+		default:
+			abort();
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	dbFILE *f;
@@ -500,10 +572,12 @@ int main(int argc, char *argv[])
 				continue;	
 			}
 			
-			
+			// Enc pass
 			b64_encode(nc->pass, hashm == "plain" ? strlen(nc->pass) : 32, (char *)cpass, 5000);
+
+			// Get language identifier
 			fs << "NC " << nc->display << " " << hashm << ":" << cpass << " ";
-			fs << nc->email << " " << nc->flags << " " << nc->language << std::endl;
+			fs << nc->email << " " << nc->flags << " " << GetLanguageID(nc->language) << std::endl;
 			
 			std::cout << "Wrote account for " << nc->display << " passlen " << strlen(cpass) << std::endl;
 			

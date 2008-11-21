@@ -559,9 +559,9 @@ int main(int argc, char *argv[])
 			fs << "MD NC " << nc->display << " channelfoundercount " << nc->channelcount << std::endl;
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
-			for (i = 0; i < 1024; i++)
+			for (int f = 0; f < 1024; f++)
 			{
-				for (na = nalists[i]; na; na = na->next)
+				for (na = nalists[f]; na; na = na->next)
 				{
 					if (!na->nc)
 					{
@@ -576,6 +576,7 @@ int main(int argc, char *argv[])
 
 
 					fs <<  "NA " << na->nc->display << " " << na->nick << " " << na->time_registered << " " << na->last_seen << std::endl;
+					
 /*				SAFE(write_int8(1, f));
 				SAFE(write_string(na->nick, f));
 				SAFE(write_string(na->last_usermask, f)); // core
@@ -586,12 +587,12 @@ int main(int argc, char *argv[])
 				SAFE(write_int16(na->status, f)); // needed?
 				SAFE(write_string(na->nc->display, f));
 */
+
 				}
 			}
 		}
 	}
-
-
+	
 	/* Section II: Chans */
 	/* IIa: First database 
 	if ((f = open_db_read("ChanServ", "chan.db", 16)))

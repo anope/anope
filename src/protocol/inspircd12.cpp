@@ -748,9 +748,9 @@ int anope_event_mode(const char *source, int ac, const char **av)
 		if (u == NULL)
 			u = u2;
 
-		// drop it like fire.
-		// most likely situation was
-		if (u == NULL || u2 == NULL)
+		// if it's still null, drop it like fire.
+		// most likely situation was that server introduced a nick which we subsequently akilled
+		if (u == NULL)
 			return MOD_CONT;
 
 		av[0] = u2->nick;

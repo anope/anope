@@ -554,6 +554,8 @@ int main(int argc, char *argv[])
 			}
 
 
+			fs << "MD NC " << nc->display << " channelfoundercount " << nc->channelcount << std::endl;
+
 			// Ignore memomax, it should be removed XXX
 /*
 			SAFE(write_int8(1, f));

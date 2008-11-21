@@ -400,10 +400,6 @@ CUMode myCumodes[128] = {
 
 static int has_servicesmod = 0;
 static int has_globopsmod = 0;
-
-/* These are sanity checks to insure we are supported.
-   The ircd tends to /squit us if we issue unsupported cmds.
-   - katsklaw */
 static int has_svsholdmod = 0;
 static int has_chghostmod = 0;
 static int has_chgidentmod = 0;
@@ -694,6 +690,19 @@ class InspIRCdProto : public IRCDProto
 		if (value && *value != ':' && strtoul((*value == '*' ? value + 1 : value), &dp, 10) > 0 && *dp == ':' && *(++dp) && strtoul(dp, &end, 10) > 0 && !*end) return 1;
 		else return 0;
 	}
+
+	void SendGlobopsInternal(const char *source, const char *buf)
+	{
+		BotInfo *bi = findbot(source);
+		if (bi)
+		{
+			if (has_globopsmod)
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE g :%s", buf);
+			else
+				send_cmd(ircd->ts6 ? bi->uid : bi->nick, "SNONOTICE A :%s", buf);
+		}
+	}
+
 } ircd_proto;
 
 
@@ -1175,9 +1184,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		/* reset CAPAB */
 		has_servicesmod = 0;
 		has_globopsmod = 0;
-	has_svsholdmod = 0;
-	has_chghostmod = 0;
-	has_chgidentmod = 0;
+		has_svsholdmod = 0;
+		has_chghostmod = 0;
+		has_chgidentmod = 0;
 
 	} else if (strcasecmp(av[0], "MODULES") == 0) {
 		if (strstr(av[1], "m_globops.so")) {
@@ -1186,13 +1195,13 @@ int anope_event_capab(const char *source, int ac, const char **av)
 		if (strstr(av[1], "m_services_account.so")) {
 			has_servicesmod = 1;
 		}
-	if (strstr(av[1], "m_svshold.so")) {
+		if (strstr(av[1], "m_svshold.so")) {
 			has_svsholdmod = 1;
 		}
-	if (strstr(av[1], "m_chghost.so")) {
+		if (strstr(av[1], "m_chghost.so")) {
 			has_chghostmod = 1;
 		}
-	if (strstr(av[1], "m_chgident.so")) {
+		if (strstr(av[1], "m_chgident.so")) {
 			has_chgidentmod = 1;
 		}
 		if (strstr(av[1], "m_messageflood.so")) {
@@ -1205,17 +1214,9 @@ int anope_event_capab(const char *source, int ac, const char **av)
 			has_inviteexceptionmod = 1;
 		}
 	} else if (strcasecmp(av[0], "END") == 0) {
-		if (!has_globopsmod) {
-			send_cmd(NULL,
-					 "ERROR :m_globops is not loaded. This is required by Anope");
-			quitmsg = "Remote server does not have the m_globops module loaded, and this is required.";
-			quitting = 1;
-			return MOD_STOP;
-		}
 		if (!has_servicesmod) {
-			send_cmd(NULL,
-					 "ERROR :m_services is not loaded. This is required by Anope");
-			quitmsg = "Remote server does not have the m_services module loaded, and this is required.";
+			send_cmd(NULL, "ERROR :m_services_account.so is not loaded. This is required by Anope");
+			quitmsg = "ERROR: Remote server does not have the m_services_account module loaded, and this is required.";
 			quitting = 1;
 			return MOD_STOP;
 		}

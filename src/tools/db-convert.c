@@ -537,6 +537,24 @@ int main(int argc, char *argv[])
 				fs << "MD NC " << nc->display << " icq :" << nc->icq << std::endl;
 			if (nc->url)
 				fs << "MD NC " << nc->display << " url :" << nc->url << std::endl; 
+
+			if (nc->accesscount)
+			{
+				fs << "MD NC " << nc->display << " obsolete_accesscount :" << nc->accesscount << std::endl; 
+				for (j = 0, access = nc->access; j < nc->accesscount; j++, access++)
+					fs << "MD NC " << nc->display << " ns_access " << *access << std::endl;
+			}
+
+			if (nc->memos.memocount)
+			{
+				memos = nc->memos.memos;
+				fs << "MD NC " << nc->display << " obsolete_memocount :" << nc->memos.memocount << std::endl; 
+				for (j = 0; j < nc->memos.memocount; j++, memos++)
+					fs << "ME " << nc->display << " " << memos->number << " " << memos->flags << " " << memos->time << " " << memos->sender << " :" << memos->text << std::endl;
+			}
+
+
+			// Ignore memomax, it should be removed XXX
 /*
 			SAFE(write_int8(1, f));
 			SAFE(write_string(nc->display, f)); // xx

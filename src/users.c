@@ -217,8 +217,10 @@ User::~User()
 	if (this->uid)
 		delete [] this->uid;
 
-	Anope_Free(this->realname);
-	delete [] this->hostip;
+	if (this->realname)
+		delete [] this->realname;
+	if (this->hostip)
+		delete [] this->hostip;
 
 	if (debug >= 2)
 		alog("debug: User::~User(): remove from channels");

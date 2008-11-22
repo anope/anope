@@ -254,11 +254,13 @@ int add_session(const char *nick, const char *host, char *hostip)
 	session = new Session;
 	session->host = sstrdup(host);
 	list = &sessionlist[HASH(session->host)];
+	session->prev = NULL;
 	session->next = *list;
 	if (*list)
 		(*list)->prev = session;
 	*list = session;
 	session->count = 1;
+	session->hits = 0;
 
 	return 1;
 }
@@ -773,7 +775,7 @@ int do_exception(User * u)
 
 		if ((n1 >= 0 && n1 < nexceptions) && (n2 >= 0 && n2 < nexceptions)
 			&& (n1 != n2)) {
-			exception = new Exception;
+			exception = (Exception *)smalloc(sizeof(Exception));
 			memcpy(exception, &exceptions[n1], sizeof(Exception));
 
 			if (n1 < n2) {
@@ -788,7 +790,7 @@ int do_exception(User * u)
 				memmove(&exceptions[n2], exception, sizeof(Exception));
 			}
 
-			delete exception;
+			free(exception);
 
 			notice_lang(s_OperServ, u, OPER_EXCEPTION_MOVED,
 						exceptions[n1].mask, n1 + 1, n2 + 1);

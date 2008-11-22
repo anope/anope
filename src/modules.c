@@ -229,6 +229,7 @@ Command *createCommand(const char *name, int (*func) (User * u),
 	c->help_param2 = NULL;
 	c->help_param3 = NULL;
 	c->help_param4 = NULL;
+	c->core = 0;
 	c->next = NULL;
 	c->mod_name = NULL;
 	c->service = NULL;
@@ -554,6 +555,7 @@ Message *createMessage(const char *name,
 	}
 	m->name = sstrdup(name);
 	m->func = func;
+	m->core = 0;
 	m->next = NULL;
 	return m;
 }

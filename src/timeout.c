@@ -75,6 +75,7 @@ Timeout *add_timeout(int delay, void (*code) (Timeout *), int repeat)
 	t->repeat = repeat;
 	t->next = timeouts;
 	t->prev = NULL;
+	t->data = NULL;
 	if (timeouts)
 		timeouts->prev = t;
 	timeouts = t;

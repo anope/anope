@@ -620,6 +620,8 @@ static BanData *get_ban_data(Channel * c, User * u)
 	bd = new BanData;
 	bd->mask = sstrdup(mask);
 	bd->last_use = now;
+	for (int x = 0; x < TTB_SIZE; ++x)
+		bd->ttb[x] = 0;
 
 	bd->prev = NULL;
 	bd->next = c->bd;
@@ -662,6 +664,10 @@ static UserData *get_user_data(Channel * c, User * u)
 			} else {
 				user->ud = new UserData;
 				user->ud->last_use = time(NULL);
+				user->ud->lines = 0;
+				user->ud->last_start = 0;
+				user->ud->lastline = NULL;
+				user->ud->times = 0;
 				return user->ud;
 			}
 		}

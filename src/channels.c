@@ -1527,11 +1527,13 @@ void chan_adduser2(User * user, Channel * c)
 	struct c_userlist *u;
 
 	u = new c_userlist;
+	u->prev = NULL;
 	u->next = c->users;
 	if (c->users)
 		c->users->prev = u;
 	c->users = u;
 	u->user = user;
+	u->ud = NULL;
 	c->usercount++;
 
 	if (get_ignore(user->nick) == NULL) {
@@ -1590,15 +1592,26 @@ Channel *chan_create(const char *chan, time_t ts)
 
 	if (debug)
 		alog("debug: Creating channel %s", chan);
-	/* Allocate pre-cleared memory */
 	c = new Channel;
 	strscpy(c->name, chan, sizeof(c->name));
 	list = &chanlist[HASH(c->name)];
+	c->prev = NULL;
 	c->next = *list;
 	if (*list)
 		(*list)->prev = c;
 	*list = c;
 	c->creation_time = ts;
+	c->topic = NULL;
+	*c->topic_setter = 0;
+	c->topic_time = 0;
+	c->mode = c->limit = 0;
+	c->key = c->redirect = c->flood = NULL;
+	c->bans = c->excepts = c->invites = NULL;
+	c->users = NULL;
+	c->usercount = 0;
+	c->bd = NULL;
+	c->server_modetime = c->chanserv_modetime = 0;
+	c->server_modecount = c->chanserv_modecount = c->bouncy_modes = c->topic_sync = 0;
 	/* Store ChannelInfo pointer in channel record */
 	c->ci = cs_findchan(chan);
 	if (c->ci)
@@ -1801,11 +1814,13 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 		alog("debug: %s joins %s", user->nick, chan->name);
 
 	c = new u_chanlist;
+	c->prev = NULL;
 	c->next = user->chans;
 	if (user->chans)
 		user->chans->prev = c;
 	user->chans = c;
 	c->chan = chan;
+	c->status = 0;
 
 	chan_adduser2(user, chan);
 

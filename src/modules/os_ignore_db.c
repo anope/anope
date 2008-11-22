@@ -329,8 +329,8 @@ void save_ignore_db(void) {
 
 
 int new_open_db_read(DBFile *dbptr, char **key, char **value) {
-	*key = new char [MAXKEYLEN];
-	*value = new char [MAXVALLEN];
+	*key = new char[MAXKEYLEN];
+	*value = new char[MAXVALLEN];
 
 	if (!(dbptr->fptr = fopen(dbptr->filename, "rb"))) {
 		if (debug) {

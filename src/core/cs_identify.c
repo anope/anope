@@ -78,6 +78,7 @@ int do_identify(User * u)
 		if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
 			if (!is_identified(u, ci)) {
 				uc = new u_chaninfolist;
+				uc->prev = NULL;
 				uc->next = u->founder_chans;
 				if (u->founder_chans)
 					u->founder_chans->prev = uc;

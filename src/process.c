@@ -58,8 +58,7 @@ void add_ignore(const char *nick, time_t delta)
 				snprintf(tmp, sizeof(tmp), "*!%s", nick);
 			mask = sstrdup(tmp);
 		}
-
-			/* We only got a nick.. */
+	/* We only got a nick.. */
 	} else {
 		snprintf(tmp, sizeof(tmp), "%s!*@*", nick);
 		mask = sstrdup(tmp);

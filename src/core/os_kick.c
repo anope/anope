@@ -80,9 +80,9 @@ int do_os_kick(User * u)
 	argv[1] = sstrdup(nick);
 	argv[2] = sstrdup(s);
 	do_kick(s_OperServ, 3, argv);
-	free((void *)argv[2]);
-	free((void *)argv[1]);
-	free((void *)argv[0]);
+	delete [] argv[2];
+	delete [] argv[1];
+	delete [] argv[0];
 	return MOD_CONT;
 }
 

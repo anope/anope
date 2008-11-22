@@ -45,7 +45,7 @@ Module::Module(const std::string &mname, const std::string &creator)
 		lastHash = current;
 	}
 
-	if ((newHash = (ModuleHash *)malloc(sizeof(ModuleHash))) == NULL) {
+	if (!(newHash = new ModuleHash)) {
 		fatal("Out of memory");
 	}
 	this->created = time(NULL);
@@ -164,8 +164,8 @@ Module::~Module()
 			} else {
 				lastHash->next = mhash->next;
 			}
-			free(mhash->name);
-			free(mhash);
+			delete [] mhash->name;
+			delete mhash;
 		}
 		lastHash = mhash;
 	}

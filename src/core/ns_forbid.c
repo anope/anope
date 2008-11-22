@@ -132,7 +132,7 @@ NickAlias *makenick(const char *nick)
 	alog("%s: group %s has been created", s_NickServ, nc->display);
 
 	/* Then make the alias */
-	na = (NickAlias *)scalloc(1, sizeof(NickAlias));
+	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
 	slist_add(&nc->aliases, na);

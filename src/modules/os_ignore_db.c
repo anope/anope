@@ -111,7 +111,7 @@ class OSIgnoreDB : public Module
 		save_ignore_db();
 
 		if (IgnoreDB)
-			free(IgnoreDB);
+			delete [] IgnoreDB;
 	}
 };
 
@@ -125,7 +125,7 @@ void load_config(void) {
 	std::string tmp = config.ReadValue("os_ignore", "database", DefIgnoreDB, 0);
 
 	if (IgnoreDB)
-		free(IgnoreDB);
+		delete [] IgnoreDB;
 	IgnoreDB = sstrdup(tmp.c_str());
 
 	if (debug)
@@ -174,7 +174,7 @@ int backup_ignoredb(int argc, char **argv) {
  **************************************************************************/
 
 void load_ignore_db(void) {
-	DBFile *dbptr = (DBFile *)scalloc(1, sizeof(DBFile));
+	DBFile *dbptr = new DBFile;
 	char *key, *value, *mask = NULL;
 	int retval = 0;
 	time_t expiry_time;
@@ -188,7 +188,7 @@ void load_ignore_db(void) {
 
 	/* Open the db, fill the rest of dbptr and allocate memory for key and value */
 	if (new_open_db_read(dbptr, &key, &value)) {
-		free(dbptr);
+		delete dbptr;
 		return;				 /* Bang, an error occurred */
 	}
 
@@ -198,12 +198,12 @@ void load_ignore_db(void) {
 
 		if (retval == DB_READ_ERROR) {
 			new_close_db(dbptr->fptr, &key, &value);
-			free(dbptr);
+			delete dbptr;
 			return;
 
 		} else if (retval == DB_EOF_ERROR) {
 			new_close_db(dbptr->fptr, &key, &value);
-			free(dbptr);
+			delete dbptr;
 			return;
 		} else if (retval == DB_READ_BLOCKEND) {		/* DB_READ_BLOCKEND */
 			/* Check if we have everything to add the ignore..
@@ -216,7 +216,7 @@ void load_ignore_db(void) {
 
  				if (!ign) {
 					/* Create a fresh entry.. */
-					ign = (IgnoreData *)scalloc(sizeof(*ign), 1);
+					ign = new IgnoreData;
 					ign->mask = (char *)sstrdup(mask);
 					ign->time = expiry_time;
 					ign->prev = NULL;
@@ -236,7 +236,7 @@ void load_ignore_db(void) {
 				}
 			}
 
-			if (mask) free(mask);
+			if (mask) delete [] mask;
 			mask = NULL;
 			expiry_time = time(NULL);
 		} else {			  /* DB_READ_SUCCESS */
@@ -246,7 +246,7 @@ void load_ignore_db(void) {
 			/* mask */
 			if (!stricmp(key, "m")) {
 				if (mask)
-					free(mask);
+					delete [] mask;
 				mask = sstrdup(value);
 
 			/* expiry time */
@@ -263,12 +263,12 @@ void load_ignore_db(void) {
 		} 					/* else */
 	}					/* while */
 
-	free(dbptr);
+	delete dbptr;
 }
 
 
 void save_ignore_db(void) {
-	DBFile *dbptr = (DBFile *)scalloc(1, sizeof(DBFile));
+	DBFile *dbptr = new DBFile;
 	time_t now;
 	IgnoreData *ign, *next;
 
@@ -280,7 +280,7 @@ void save_ignore_db(void) {
 
 	if (new_open_db_write(dbptr)) {
 		rename(dbptr->temp_name, IgnoreDB);
-		free(dbptr);
+		delete dbptr;
 		return;				/* Bang, an error occurred */
 	}
 
@@ -303,8 +303,8 @@ void save_ignore_db(void) {
 				ignore = ign->next;
 			if (ign->next)
 				ign->next->prev = ign->prev;
-			free(ign->mask);
-			free(ign);
+			delete [] ign->mask;
+			delete ign;
 			ign = NULL;
 		} else {
 			new_write_db_entry("m", dbptr, "%s", ign->mask);
@@ -316,7 +316,7 @@ void save_ignore_db(void) {
 	if (dbptr) {
 		new_close_db(dbptr->fptr, NULL, NULL);  /* close file */
 		remove(dbptr->temp_name);	   /* saved successfully, no need to keep the old one */
-		free(dbptr);		   /* free the db struct */
+		delete dbptr;		   /* free the db struct */
 	}
 }
 
@@ -329,17 +329,17 @@ void save_ignore_db(void) {
 
 
 int new_open_db_read(DBFile *dbptr, char **key, char **value) {
-	*key = (char *)malloc(MAXKEYLEN);
-	*value = (char *)malloc(MAXVALLEN);
+	*key = new char [MAXKEYLEN];
+	*value = new char [MAXVALLEN];
 
 	if (!(dbptr->fptr = fopen(dbptr->filename, "rb"))) {
 		if (debug) {
 			alog("debug: Can't read %s database %s : errno(%d)", dbptr->service,
 				dbptr->filename, errno);
 		}
-		free(*key);
+		delete [] *key;
 		*key = NULL;
-		free(*value);
+		delete [] *value;
 		*value = NULL;
 		return DB_READ_ERROR;
 	}
@@ -350,9 +350,9 @@ int new_open_db_read(DBFile *dbptr, char **key, char **value) {
 		if (debug) {
 			alog("debug: Error reading version number on %s", dbptr->filename);
 		}
-		free(*key);
+		delete [] *key;
 		*key = NULL;
-		free(*value);
+		delete [] *value;
 		*value = NULL;
 		return DB_READ_ERROR;
 	} else if (feof(dbptr->fptr)) {
@@ -360,18 +360,18 @@ int new_open_db_read(DBFile *dbptr, char **key, char **value) {
 			alog("debug: Error reading version number on %s: End of file detected",
 				dbptr->filename);
 		}
-		free(*key);
+		delete [] *key;
 		*key = NULL;
-		free(*value);
+		delete [] *value;
 		*value = NULL;
 		return DB_EOF_ERROR;
 	} else if (dbptr->db_version < 1) {
 		if (debug) {
 			alog("debug: Invalid version number (%d) on %s", dbptr->db_version, dbptr->filename);
 		}
-		free(*key);
+		delete [] *key;
 		*key = NULL;
-		free(*value);
+		delete [] *value;
 		*value = NULL;
 		return DB_VERSION_ERROR;
 	}
@@ -402,11 +402,11 @@ int new_open_db_write(DBFile *dbptr) {
 
 void new_close_db(FILE *fptr, char **key, char **value) {
 	if (key && *key) {
-		free(*key);
+		delete [] *key;
 		*key = NULL;
 	}
 	if (value && *value) {
-		free(*value);
+		delete [] *value;
 		*value = NULL;
 	}
 
@@ -487,7 +487,7 @@ int new_write_db_entry(const char *key, DBFile *dbptr, const char *fmt, ...) {
 		}
 		remove(dbptr->filename);
 		rename(dbptr->temp_name, dbptr->filename);
-		free(dbptr);
+		delete dbptr;
 		dbptr = NULL;
 		return DB_WRITE_ERROR;
 	}

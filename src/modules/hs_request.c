@@ -393,7 +393,7 @@ class HSRequest : public Module
 		while (hs_request_head)
 			hs_request_head = deleteHostCore(hs_request_head, NULL);
 
-		free(HSRequestDBName);
+		delete [] HSRequestDBName;
 	}
 };
 
@@ -416,7 +416,7 @@ int hs_do_request(User * u)
 
 	if (!nick || !rawhostmask) {
 		if (rawhostmask)
-			free(rawhostmask);
+			delete [] rawhostmask;
 		moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
 		return MOD_CONT;
 	}
@@ -426,28 +426,28 @@ int hs_do_request(User * u)
 		rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);	  /* get the remaining string */
 		if (!rawhostmask) {
 			moduleNoticeLang(s_HostServ, u, LNG_REQUEST_SYNTAX);
-			free(vIdent);
+			delete [] vIdent;
 			return MOD_CONT;
 		}
 		if (strlen(vIdent) > USERMAX - 1) {
 			notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-			free(vIdent);
-			free(rawhostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
 			return MOD_CONT;
 		} else {
 			for (s = vIdent; *s; s++) {
 				if (!my_isvalidchar(*s)) {
 					notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-					free(vIdent);
-					free(rawhostmask);
+					delete [] vIdent;
+					delete [] rawhostmask;
 					return MOD_CONT;
 				}
 			}
 		}
 		if (!ircd->vident) {
 			notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-			free(vIdent);
-			free(rawhostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
 			return MOD_CONT;
 		}
 	}
@@ -456,16 +456,16 @@ int hs_do_request(User * u)
 	} else {
 		notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
 		if (vIdent)
-			free(vIdent);
-		free(rawhostmask);
+			delete [] vIdent;
+		delete [] rawhostmask;
 		return MOD_CONT;
 	}
 
 	if (!isValidHost(hostmask, 3)) {
 		notice_lang(s_HostServ, u, HOST_SET_ERROR);
 		if (vIdent)
-			free(vIdent);
-		free(rawhostmask);
+			delete [] vIdent;
+		delete [] rawhostmask;
 		return MOD_CONT;
 	}
 
@@ -478,8 +478,8 @@ int hs_do_request(User * u)
 								 MSSendDelay);
 				u->lastmemosend = now;
 				if (vIdent)
-					free(vIdent);
-				free(rawhostmask);
+					delete [] vIdent;
+				delete [] rawhostmask;
 				return MOD_CONT;
 			}
 		}
@@ -493,8 +493,8 @@ int hs_do_request(User * u)
 	}
 
 	if (vIdent)
-		free(vIdent);
-	free(rawhostmask);
+		delete [] vIdent;
+	delete [] rawhostmask;
 
 	return MOD_CONT;
 }
@@ -540,7 +540,7 @@ void my_memo_lang(User * u, char *name, int z, int number, ...)
 			va_end(va);
 			memo_send(u, name, buffer, z);
 		}
-		free(buf);
+		delete [] buf;
 	} else {
 		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
 	}
@@ -605,7 +605,7 @@ int hs_do_reject(User * u)
 	if (!nick) {
 		moduleNoticeLang(s_HostServ, u, LNG_REJECT_SYNTAX);
 		if (reason)
-			free(reason);
+			delete [] reason;
 		return MOD_CONT;
 	}
 
@@ -632,9 +632,9 @@ int hs_do_reject(User * u)
 		moduleNoticeLang(s_HostServ, u, LNG_NO_REQUEST, nick);
 	}
 
-	free(nick);
+	delete [] nick;
 	if (reason)
-		free(reason);
+		delete [] reason;
 
 	return MOD_CONT;
 }
@@ -680,7 +680,7 @@ int hs_do_activate(User * u)
 		moduleNoticeLang(s_HostServ, u, LNG_ACTIVATE_SYNTAX);
 	}
 
-	free(nick);
+	delete [] nick;
 	return MOD_CONT;
 }
 
@@ -861,7 +861,7 @@ void hsreq_load_db(void)
 			tmp = myStrGetToken(buf, ':', 3);
 			if (tmp) {
 				tmp_time = strtol(tmp, (char **) NULL, 16);
-				free(tmp);
+				delete [] tmp;
 			} else {
 				tmp_time = 0;
 			}
@@ -871,17 +871,17 @@ void hsreq_load_db(void)
 				continue;
 			}
 			if (stricmp(vident, "(null)") == 0) {
-				free(vident);
+				delete [] vident;
 				vident = NULL;
 			}
 			my_add_host_request(nick, vident, vhost, creator, tmp_time);
-			free(nick);
-			free(vhost);
-			free(creator);
+			delete [] nick;
+			delete [] vhost;
+			delete [] creator;
 			if (vident)
-				free(vident);
+				delete [] vident;
 		}
-		free(buf);
+		delete [] buf;
 	}
 
 	fclose(fp);
@@ -952,7 +952,7 @@ void my_load_config(void)
 	std::string tmp = config.ReadValue("hs_request", "database", HSREQ_DEFAULT_DBNAME, 0);
 
 	if (HSRequestDBName)
-		free(HSRequestDBName);
+		delete [] HSRequestDBName;
 	HSRequestDBName = sstrdup(tmp.c_str());
 
 	if (debug)

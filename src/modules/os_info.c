@@ -332,17 +332,17 @@ class OSInfo : public Module
 				char *c;
 				if (nc->GetExt("os_modinfo", c));
 				{
-					free(c);
+					delete [] c;
 					nc->Shrink("os_modinfo");
 				}
 			}
 		}
 		av[0] = sstrdup(EVENT_START);
 		mSaveData(1, av);
-		free(av[0]);
+		delete [] av[0];
 
 		if (OSInfoDBName)
-			free(OSInfoDBName);
+			delete [] OSInfoDBName;
 	}
 };
 
@@ -382,14 +382,14 @@ int myAddNickInfo(User * u)
 					/* ok we've found the user */
 					if ((na = findnick(nick))) {
 						/* Add the module data to the user */
-						na->nc->Extend("os_info", strdup(info));
+						na->nc->Extend("os_info", sstrdup(info));
 						moduleNoticeLang(s_NickServ, u, OINFO_ADD_SUCCESS, nick);
 						/* NickCore not found! */
 					} else {
 						notice_lang(s_NickServ, u, NICK_X_NOT_REGISTERED,
 									nick);
 					}
-					free(info);
+					delete [] info;
 				}
 			} else if (strcasecmp(cmd, "DEL") == 0) {
 				/* ok we've found the user */
@@ -398,7 +398,7 @@ int myAddNickInfo(User * u)
 					char *c;
 					if (na->nc->GetExt("os_info", c))
 					{
-						free(c);
+						delete [] c;
 						na->nc->Shrink("os_info");
 					}
 
@@ -412,12 +412,12 @@ int myAddNickInfo(User * u)
 			} else {
 				moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
 			}
-			free(cmd);
-			free(nick);
+			delete [] cmd;
+			delete [] nick;
 			/* Syntax error */
 		} else if (cmd) {
 			moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
-			free(cmd);
+			delete [] cmd;
 			/* Syntax error */
 		} else {
 			moduleNoticeLang(s_NickServ, u, OINFO_SYNTAX);
@@ -455,14 +455,14 @@ int myAddChanInfo(User * u)
 				if (info) {
 					if ((ci = cs_findchan(chan))) {
 						/* Add the module data to the channel */
-						ci->Extend("os_info", strdup(info));
+						ci->Extend("os_info", sstrdup(info));
 						moduleNoticeLang(s_ChanServ, u, OCINFO_ADD_SUCCESS, chan);
 						/* ChanInfo */
 					} else {
 						notice_lang(s_ChanServ, u, CHAN_X_NOT_REGISTERED,
 									chan);
 					}
-					free(info);
+					delete [] info;
 				}
 			} else if (strcasecmp(cmd, "DEL") == 0) {
 				if ((ci = cs_findchan(chan))) {
@@ -470,7 +470,7 @@ int myAddChanInfo(User * u)
 					char *c;
 					if (ci->GetExt("os_info", c))
 					{
-						free(c);
+						delete [] c;
 						ci->Shrink("os_info");
 					}
 					moduleNoticeLang(s_ChanServ, u, OCINFO_DEL_SUCCESS, chan);
@@ -483,12 +483,12 @@ int myAddChanInfo(User * u)
 			} else {
 				moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
 			}
-			free(cmd);
-			free(chan);
+			delete [] cmd;
+			delete [] chan;
 			/* Syntax error */
 		} else if (cmd) {
 			moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
-			free(cmd);
+			delete [] cmd;
 			/* Syntax error */
 		} else {
 			moduleNoticeLang(s_ChanServ, u, OCINFO_SYNTAX);
@@ -525,11 +525,8 @@ int myNickInfo(User * u)
 					{
 						notice_user(s_NickServ, u, " OperInfo: %s", c);
 					}
-					/* NickCore not found! */
-				} else {
-					/* we dont care! */
 				}
-				free(nick);
+				delete [] nick;
 			}
 		}
 	}
@@ -562,7 +559,7 @@ int myChanInfo(User * u)
 						notice_user(s_ChanServ, u, " OperInfo: %s", c);
 					}
 				}
-				free(chan);
+				delete [] chan;
 			}
 		}
 	}
@@ -615,11 +612,11 @@ int mLoadData(void)
 								na->nc->Extend("os_info", strdup(info));
 							}
 						}
-						free(info);
+						delete [] info;
 					}
-					free(name);
+					delete [] name;
 				}
-				free(type);
+				delete [] type;
 			}
 		}
 	}
@@ -702,7 +699,7 @@ int mLoadConfig(void)
 	std::string tmp = config.ReadValue("os_info", "database", DEFAULT_DB_NAME, 0);
 
 	if (OSInfoDBName)
-		free(OSInfoDBName);
+		delete [] OSInfoDBName;
 
 	OSInfoDBName = sstrdup(tmp.c_str());
 

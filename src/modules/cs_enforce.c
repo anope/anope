@@ -440,8 +440,8 @@ int my_cs_enforce(User * u)
 		}
 	}
 
-	if(chan) free(chan);
-	if(what) free(what);
+	if(chan) delete [] chan;
+	if(what) delete [] what;
 
 	return MOD_CONT;
 }

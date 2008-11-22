@@ -191,7 +191,7 @@ int my_cs_appendtopic(User * u)
 		if (ci->last_topic) {
 			snprintf(topic, sizeof(topic), "%s %s", ci->last_topic,
 					 newtopic);
-			free(ci->last_topic);
+			delete [] ci->last_topic;
 		} else {
 			strscpy(topic, newtopic, sizeof(topic));
 		}
@@ -201,7 +201,7 @@ int my_cs_appendtopic(User * u)
 		ci->last_topic_time = time(NULL);
 
 		if (c->topic)
-			free(c->topic);
+			delete [] c->topic;
 		c->topic = *topic ? sstrdup(topic) : NULL;
 		strscpy(c->topic_setter, u->nick, NICKMAX);
 		if (ircd->topictsbackward)
@@ -225,6 +225,8 @@ int my_cs_appendtopic(User * u)
 			}
 		}
 	}
+	if (newtopic) delete [] newtopic;
+	if (chan) delete [] chan;
 	return MOD_CONT;
 }
 

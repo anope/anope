@@ -154,7 +154,7 @@ int my_ns_register(User * u)
 		return MOD_CONT;
 
 	ret = check_email_limit_reached(email, u);
-	free(email);
+	delete [] email;
 
 	return ret;
 }
@@ -173,17 +173,17 @@ int my_ns_set(User * u)
 		return MOD_CONT;
 
 	if (stricmp(set, "email") != 0) {
-		free(set);
+		delete [] set;
 		return MOD_CONT;
 	}
 
-	free(set);
+	delete [] set;
 	email = myStrGetToken(cur_buffer, ' ', 1);
 	if (!email)
 		return MOD_CONT;
 
 	ret = check_email_limit_reached(email, u);
-	free(email);
+	delete [] email;
 
 	return ret;
 }

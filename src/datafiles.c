@@ -80,7 +80,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 	dbFILE *f;
 	FILE *fp;
 
-	f = (dbFILE *)scalloc(sizeof(*f), 1);
+	f = new dbFILE;
 	if (!f) {
 		log_perror("Can't read %s database %s", service, filename);
 		if (time(NULL) - lastwarn > WarningTimeout) {
@@ -104,7 +104,7 @@ static dbFILE *open_db_read(const char *service, const char *filename)
 							 strerror(errno));
 			lastwarn = time(NULL);
 		}
-		free(f);
+		delete f;
 		errno = errno_save;
 		return NULL;
 	}
@@ -137,7 +137,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 	}
 #endif
 
-	f = (dbFILE *)scalloc(sizeof(*f), 1);
+	f = new dbFILE;
 	if (!f) {
 		log_perror("Can not read %s database %s", service, filename);
 		return NULL;
@@ -158,7 +158,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 		int errno_save = errno;
 		alog("Opening %s database %s for write: Filename too long",
 			 service, filename);
-		free(f);
+		delete f;
 		errno = errno_save;
 		return NULL;
 	}
@@ -203,7 +203,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 		if (!NoBackupOkay) {
 			if (f->backupfp)
 				fclose(f->backupfp);
-			free(f);
+			delete f;
 			errno = errno_save;
 			return NULL;
 		}
@@ -244,7 +244,7 @@ static dbFILE *open_db_write(const char *service, const char *filename,
 
 		/* Then the Lord said unto Moses, thou shalt free what thou hast malloced
 		 * -- codemastr */
-		free(f);
+		delete f;
 		errno = errno_save;
 		return NULL;
 	}
@@ -331,7 +331,7 @@ void restore_db(dbFILE * f)
 	fclose(f->fp);
 	if (!errno_save)
 		errno_save = errno;
-	free(f);
+	delete f;
 	errno = errno_save;
 }
 
@@ -356,7 +356,7 @@ void close_db(dbFILE * f)
 #endif
 	}
 	fclose(f->fp);
-	free(f);
+	delete f;
 }
 
 /*************************************************************************/
@@ -506,9 +506,9 @@ int read_string(char **ret, dbFILE * f)
 		*ret = NULL;
 		return 0;
 	}
-	s = (char *)scalloc(len, 1);
+	s = new char[len];
 	if (len != fread(s, 1, len, f->fp)) {
-		free(s);
+		delete [] s;
 		return -1;
 	}
 	*ret = s;

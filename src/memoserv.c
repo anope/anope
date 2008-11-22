@@ -345,7 +345,7 @@ int delmemo(MemoInfo * mi, int num)
 			break;
 	}
 	if (i < mi->memocount) {
-		free(mi->memos[i].text);		/* Deallocate memo text memory */
+		delete [] mi->memos[i].text;		/* Deallocate memo text memory */
 		mi->memocount--;		/* One less memo now */
 		if (i < mi->memocount)  /* Move remaining memos down a slot */
 			memmove(mi->memos + i, mi->memos + i + 1,

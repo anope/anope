@@ -51,7 +51,7 @@ void check_timeouts(void)
 			to->prev->next = to->next;
 		else
 			timeouts = to->next;
-		free(to);
+		delete to;
 		to = to2;
 	}
 	if (debug >= 2)
@@ -68,7 +68,7 @@ void check_timeouts(void)
 
 Timeout *add_timeout(int delay, void (*code) (Timeout *), int repeat)
 {
-	Timeout *t = (Timeout *)scalloc(sizeof(Timeout), 1);
+	Timeout *t = new Timeout;
 	t->settime = time(NULL);
 	t->timeout = t->settime + delay;
 	t->code = code;
@@ -101,7 +101,7 @@ void del_timeout(Timeout * t)
 		timeouts = t->next;
 	if (t->next)
 		t->next->prev = t->prev;
-	free(t);
+	delete t;
 }
 
 /*************************************************************************/

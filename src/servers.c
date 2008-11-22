@@ -124,7 +124,7 @@ Server *new_server(Server * server_uplink, const char *name, const char *desc,
 
 	if (debug)
 		alog("Creating %s(%s) uplinked to %s", name, suid, server_uplink ? server_uplink->name : "No uplink");
-	serv = (Server *)scalloc(sizeof(Server), 1);
+	serv = new Server;
 	if (!name)
 		name = "";
 	serv->name = sstrdup(name);
@@ -210,7 +210,7 @@ static void delete_server(Server * serv, const char *quitreason)
 						&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 						na->last_seen = time(NULL);
 						if (na->last_quit)
-							free(na->last_quit);
+							delete [] na->last_quit;
 						na->last_quit =
 							(quitreason ? sstrdup(quitreason) : NULL);
 					}
@@ -236,8 +236,8 @@ static void delete_server(Server * serv, const char *quitreason)
 	if (debug)
 		alog("debug: delete_server() cleared all servers");
 
-	free(serv->name);
-	free(serv->desc);
+	delete [] serv->name;
+	delete [] serv->desc;
 	if (serv->prev)
 		serv->prev->next = serv->next;
 	if (serv->next)
@@ -313,7 +313,7 @@ Server *findserver_uid(Server * s, const char *name)
 
 	if (debug)
 		alog("debug: findserver_uid(%s)", name);
-	
+
 	while (s && s->suid && (stricmp(s->suid, name) != 0))
 	{
 		if (debug >= 3)
@@ -392,10 +392,10 @@ void do_server(const char *source, const char *servername, const char *hops,
 		s = me_server;
 	else
 		s = findserver(servlist, source);
-		
+
 	if (s == NULL)
 		s = findserver_uid(servlist, source);
-	
+
 	if (s == NULL)
 		throw CoreException("Recieved a server from a nonexistant uplink?");
 
@@ -494,10 +494,9 @@ void capab_parse(int ac, const char **av)
 				ircd->nickchars = sstrdup(tmp);
 		}
 
-		if (s)
-			free(s);
+		delete [] s;
 		if (tmp)
-			free(tmp);
+			delete [] tmp;
 	}
 }
 

@@ -1016,8 +1016,6 @@ E int b64_decode(const char *src, char *target, size_t targsize);
 E const char* encode_ip(unsigned char *ip);
 E int decode_ip(const char *buf);
 
-#define Anope_Free(x)	   if ((x) != NULL) free(x)
-
 E char *host_resolve(char *host);
 
 E void event_process_hook(const char *name, int argc, char **argv);

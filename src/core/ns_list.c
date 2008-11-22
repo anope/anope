@@ -109,13 +109,13 @@ int do_list(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				from = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 				if (!tmp) {
 					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
@@ -123,13 +123,13 @@ int do_list(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				to = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				pattern = sstrdup("*");
 				tofree = 1;
 			}
@@ -229,7 +229,7 @@ int do_list(User * u)
 					nnicks > NSListMax ? NSListMax : nnicks, nnicks);
 	}
 	if (tofree)
-		free(pattern);
+		delete [] pattern;
 	return MOD_CONT;
 }
 

@@ -153,7 +153,7 @@ int do_register(User * u)
 			notice_lang(s_ChanServ, u, CHAN_PASSWORD_IS, tmp_pass);
 		}
 
-		uc = (struct u_chaninfolist *)scalloc(sizeof(*uc), 1);
+		uc = new u_chaninfolist;
 		uc->next = u->founder_chans;
 		uc->prev = NULL;
 		if (u->founder_chans)

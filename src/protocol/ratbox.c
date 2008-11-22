@@ -763,7 +763,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 			return MOD_CONT;
 
 		if (c->topic) {
-			free(c->topic);
+			delete [] c->topic;
 			c->topic = NULL;
 		}
 		if (ac > 1 && *av[1])
@@ -808,18 +808,18 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 				 merge_args(ac - 1, av + 1), av[0]);
 		}
 		if (setter)
-			free(setter);
+			delete [] setter;
 		return MOD_CONT;
 	}
 
 	if (check_topiclock(c, topic_time)) {
 		if (setter)
-			free(setter);
+			delete [] setter;
 		return MOD_CONT;
 	}
 
 	if (c->topic) {
-		free(c->topic);
+		delete [] c->topic;
 		c->topic = NULL;
 	}
 	if (ac > 1 && *av[3])
@@ -830,7 +830,7 @@ int anope_event_tburst(const char *source, int ac, const char **av)
 
 	record_topic(av[0]);
 	if (setter)
-		free(setter);
+		delete [] setter;
 	return MOD_CONT;
 }
 
@@ -1044,7 +1044,7 @@ int anope_event_capab(const char *source, int ac, const char **av)
 
 	/* Free our built ac/av */
 	for (argvsize = 0; argvsize < argc; argvsize++) {
-		free((char *)argv[argvsize]);
+		delete [] argv[argvsize];
 	}
 	free((char **)argv);
 
@@ -1083,9 +1083,9 @@ int anope_event_bmask(const char *source, int ac, const char **av)
 				add_invite(c, b);
 			}
 			if (b)
-				free(b);
+				delete [] b;
 		}
-		free(bans);
+		delete [] bans;
 	}
 	return MOD_CONT;
 }
@@ -1172,7 +1172,7 @@ class ProtoRatbox : public Module
 
 	~ProtoRatbox()
 	{
-		free(TS6SID);
+		delete [] TS6SID;
 	}
 
 };

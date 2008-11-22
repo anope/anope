@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -107,19 +107,14 @@ char *sstrdup(const char *src)
 {
 	char *ret = NULL;
 	if (src) {
-#ifdef __STRICT_ANSI__
-		if ((ret = (char *) malloc(strlen(src) + 1))) {;
-			strcpy(ret, src);
-		}
-#else
-		ret = strdup(src);
-#endif
+		ret = new char[strlen(src) + 1];
 		if (!ret)
 #ifndef _WIN32
 			raise(SIGUSR1);
 #else
 			abort();
 #endif
+		strcpy(ret, src);
 	} else {
 		alog("sstrdup() called with NULL-arg");
 		if (debug)

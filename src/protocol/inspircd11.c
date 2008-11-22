@@ -824,6 +824,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 		}
 		strncat(nicklist, prefixandnick, 513);
 		strncat(nicklist, " ", 513);
+		delete [] curnick;
 		curtoken++;
 		curnick = myStrGetToken(av[2], ' ', curtoken);
 		nlen = 0;
@@ -884,7 +885,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	if (c->topic) {
-		free(c->topic);
+		delete [] c->topic;
 		c->topic = NULL;
 	}
 	if (ac > 1 && *av[1])

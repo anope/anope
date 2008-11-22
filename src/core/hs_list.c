@@ -85,13 +85,13 @@ int listOut(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				from = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				tmp = myStrGetTokenRemainder(key, '-', 1);	  /* Read TO out */
 				if (!tmp) {
 					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
@@ -99,13 +99,13 @@ int listOut(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				to = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				key = NULL;
 			}
 		}

@@ -241,7 +241,7 @@ int do_saset_password(User * u, NickCore * nc, char *param)
 int do_saset_url(User * u, NickCore * nc, char *param)
 {
 	if (nc->url)
-		free(nc->url);
+		delete [] nc->url;
 
 	if (param) {
 		nc->url = sstrdup(param);
@@ -274,7 +274,7 @@ int do_saset_email(User * u, NickCore * nc, char *param)
 		 (nc->email ? nc->email : "none"));
 
 	if (nc->email)
-		free(nc->email);
+		delete [] nc->email;
 
 	if (param) {
 		nc->email = sstrdup(param);
@@ -308,7 +308,7 @@ int do_saset_icq(User * u, NickCore * nc, char *param)
 int do_saset_greet(User * u, NickCore * nc, char *param)
 {
 	if (nc->greet)
-		free(nc->greet);
+		delete [] nc->greet;
 
 	if (param) {
 		char buf[BUFSIZE];

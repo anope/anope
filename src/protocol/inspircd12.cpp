@@ -882,6 +882,7 @@ int anope_event_fjoin(const char *source, int ac, const char **av)
 endnick:
 		strncat(nicklist, prefixandnick, 513);
 		strncat(nicklist, " ", 513);
+		delete [] curnick;
 		curtoken++;
 		curnick = myStrGetToken(av[ac - 1], ' ', curtoken);
 		nlen = 0;
@@ -933,7 +934,7 @@ int anope_event_topic(const char *source, int ac, const char **av)
 		return MOD_CONT;
 
 	if (c->topic) {
-		free(c->topic);
+		delete [] c->topic;
 		c->topic = NULL;
 	}
 	if (ac > 1 && *av[1])
@@ -1369,7 +1370,7 @@ class ProtoInspIRCd : public Module
 
 	~ProtoInspIRCd()
 	{
-		free(TS6SID);
+		delete [] TS6SID;
 	}
 };
 

@@ -127,7 +127,7 @@ int do_fantasy(int argc, char **argv)
 			ircdproto->SendPrivmsg(ci->bi, ci->name, "%s", buf);
 		}
 		/* free myStrGetToken(ed) variable target (#851) */
-		Anope_Free(target);
+		if (target) delete [] target;
 	}
 
 	return MOD_CONT;

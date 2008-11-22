@@ -79,9 +79,9 @@ int do_fantasy(int argc, char **argv)
 	}
 
 	if (target)
-	   free(target);
+		delete [] target;
 	if (reason)
-	   free(reason);
+		delete [] reason;
 
 	return MOD_CONT;
 }

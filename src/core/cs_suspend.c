@@ -169,12 +169,12 @@ int do_unsuspend(User * u)
 		ci->flags &= ~CI_SUSPENDED;
 		if (ci->forbidreason)
 		{
-			free(ci->forbidreason);
+			delete [] ci->forbidreason;
 			ci->forbidreason = NULL;
 		}
 		if (ci->forbidby)
 		{
-			free(ci->forbidby);
+			delete [] ci->forbidby;
 			ci->forbidby = NULL;
 		}
 

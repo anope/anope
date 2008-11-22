@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -64,7 +64,7 @@ int do_nickupdate(User * u)
 			do_setmodes(u);
 		check_memos(u);
 		if (na->last_realname)
-			free(na->last_realname);
+			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
 		na->status |= NS_IDENTIFIED;
 		na->last_seen = time(NULL);

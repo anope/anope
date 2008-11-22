@@ -82,7 +82,7 @@ class NSNOOPConvert : public Module
 	~NSNOOPConvert()
 	{
 		if (NSAutoOPDBName)
-			free(NSAutoOPDBName);
+			delete [] NSAutoOPDBName;
 	}
 };
 
@@ -117,7 +117,7 @@ int mLoadData(void)
 				if ((na = findnick(name))) {
 				na->nc->flags |= NI_AUTOOP;
 				}
-				free(name);
+				delete [] name;
 			}
 		}
 	}
@@ -136,7 +136,7 @@ int mLoadConfig(int argc, char **argv)
 	std::string tmp = config.ReadValue("ns_noop_convert", "database", DEFAULT_DB_NAME, 0);
 
 	if (NSAutoOPDBName)
-		free(NSAutoOPDBName);
+		delete [] NSAutoOPDBName;
 
 	NSAutoOPDBName = sstrdup(tmp.c_str());
 

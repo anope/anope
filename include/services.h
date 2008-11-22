@@ -1282,7 +1282,7 @@ private:
 		{
 			char *s = normalizeBuffer(buf);
 			send_cmd(ircd->ts6 ? bi->uid : bi->nick, "NOTICE %s :\1%s\1", dest, s);
-			free(s);
+			delete [] s;
 		}
 		virtual void SendNumericInternal(const char *source, int numeric, const char *dest, const char *buf)
 		{
@@ -1506,8 +1506,8 @@ struct Uplink {
 	}
 	~Uplink()
 	{
-		free(host);
-		free(password);
+		delete [] host;
+		delete [] password;
 	}
 };
 

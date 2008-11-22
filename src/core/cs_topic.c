@@ -71,13 +71,13 @@ int do_cs_topic(User * u)
 		notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 	} else {
 		if (ci->last_topic)
-			free(ci->last_topic);
+			delete [] ci->last_topic;
 		ci->last_topic = topic ? sstrdup(topic) : NULL;
 		strscpy(ci->last_topic_setter, u->nick, NICKMAX);
 		ci->last_topic_time = time(NULL);
 
 		if (c->topic)
-			free(c->topic);
+			delete [] c->topic;
 		c->topic = topic ? sstrdup(topic) : NULL;
 		strscpy(c->topic_setter, u->nick, NICKMAX);
 		if (ircd->topictsbackward) {

@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -135,7 +135,7 @@ int do_del(User * u)
 		} else {
 			/* Delete all memos. */
 			for (i = 0; i < mi->memocount; i++) {
-				free(mi->memos[i].text);
+				delete [] mi->memos[i].text;
 			}
 			free(mi->memos);
 			mi->memos = NULL;

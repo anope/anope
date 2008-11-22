@@ -266,7 +266,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 									 nbuf + strlen(nbuf) - len)))) {
 							mustkick = 1;
 						} else {
-							char *wordbuf = (char *)scalloc(len + 3, 1);
+							char *wordbuf = new char[len + 3];
 
 							wordbuf[0] = ' ';
 							wordbuf[len + 1] = ' ';
@@ -281,7 +281,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							}
 
 							/* free previous (sc)allocated memory (#850) */
-							free(wordbuf);
+							delete [] wordbuf;
 						}
 					}
 				} else if (bw->type == BW_START) {
@@ -293,7 +293,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							&& (!strnicmp(nbuf, bw->word, len)))) {
 						mustkick = 1;
 					} else {
-						char *wordbuf = (char *)scalloc(len + 2, 1);
+						char *wordbuf = new char[len + 2];
 
 						memcpy(wordbuf + 1, bw->word, len);
 						wordbuf[0] = ' ';
@@ -304,7 +304,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 								&& (stristr(nbuf, wordbuf))))
 							mustkick = 1;
 
-						free(wordbuf);
+						delete [] wordbuf;
 					}
 				} else if (bw->type == BW_END) {
 					int len = strlen(bw->word);
@@ -320,7 +320,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 							  len)))) {
 						mustkick = 1;
 					} else {
-						char *wordbuf = (char *)scalloc(len + 2, 1);
+						char *wordbuf = new char[len + 2];
 
 						memcpy(wordbuf, bw->word, len);
 						wordbuf[len] = ' ';
@@ -331,7 +331,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 								&& (stristr(nbuf, wordbuf))))
 							mustkick = 1;
 
-						free(wordbuf);
+						delete [] wordbuf;
 					}
 				}
 
@@ -343,14 +343,14 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 						bot_kick(ci, u, BOT_REASON_BADWORD, bw->word);
 
 					/* free the normalized buffer before return (#850) */
-					Anope_Free(nbuf);
+					delete [] nbuf;
 
 					return;
 				}
 			}
 
 			/* Free the normalized buffer */
-			Anope_Free(nbuf);
+			delete [] nbuf;
 		}
 
 		/* Flood kicker */
@@ -382,7 +382,7 @@ void botchanmsgs(User * u, ChannelInfo * ci, char *buf)
 				return;
 			}
 			if (ud->lastline && stricmp(ud->lastline, buf)) {
-				free(ud->lastline);
+				delete [] ud->lastline;
 				ud->lastline = sstrdup(buf);
 				ud->times = 0;
 			} else {
@@ -464,7 +464,7 @@ void load_bs_dbase(void)
 
 		SAFE(read_string(&s, f));
 		bi = new BotInfo(s);
-		free(s);
+		delete [] s;
 		SAFE(read_string(&bi->user, f));
 		SAFE(read_string(&bi->host, f));
 		SAFE(read_string(&bi->real, f));
@@ -604,9 +604,9 @@ static BanData *get_ban_data(Channel * c, User * u)
 			else
 				c->bd = bd->next;
 			if (bd->mask)
-				free(bd->mask);
+				delete [] bd->mask;
 			next = bd->next;
-			free(bd);
+			delete bd;
 			continue;
 		}
 		if (!stricmp(bd->mask, mask)) {
@@ -617,7 +617,7 @@ static BanData *get_ban_data(Channel * c, User * u)
 	}
 
 	/* If we fall here it is that we haven't found the record */
-	bd = (BanData *)scalloc(sizeof(BanData), 1);
+	bd = new BanData;
 	bd->mask = sstrdup(mask);
 	bd->last_use = now;
 
@@ -651,7 +651,7 @@ static UserData *get_user_data(Channel * c, User * u)
 				/* Checks whether data is obsolete */
 				if (now - user->ud->last_use > BSKeepData) {
 					if (user->ud->lastline)
-						free(user->ud->lastline);
+						delete [] user->ud->lastline;
 					/* We should not free and realloc, but reset to 0
 					   instead. */
 					memset(user->ud, 0, sizeof(UserData));
@@ -660,7 +660,7 @@ static UserData *get_user_data(Channel * c, User * u)
 
 				return user->ud;
 			} else {
-				user->ud = (UserData *)scalloc(sizeof(UserData), 1);
+				user->ud = new UserData;
 				user->ud->last_use = time(NULL);
 				return user->ud;
 			}
@@ -989,7 +989,7 @@ char *normalizeBuffer(const char *buf)
 	int i, len, j = 0;
 
 	len = strlen(buf);
-	newbuf = (char *) smalloc(sizeof(char) * len + 1);
+	newbuf = new char[len + 1];
 
 	for (i = 0; i < len; i++) {
 		switch (buf[i]) {

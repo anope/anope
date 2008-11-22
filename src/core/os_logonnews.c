@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -33,7 +33,7 @@ class OSLogonNews : public Module
 		this->SetVersion("$Id$");
 		this->SetType(CORE);
 
-		/** 
+		/**
 		* For some unknown reason, do_logonnews is actaully defined in news.c
 		* we can look at moving it here later
 		**/
@@ -54,7 +54,7 @@ class OSLogonNews : public Module
 
 	~OSLogonNews()
 	{
-		free(c->help_param1);
+		delete [] c->help_param1;
 	}
 };
 
@@ -80,7 +80,7 @@ int reload_config(int argc, char **argv) {
 
 	if (argc >= 1) {
 		if (!stricmp(argv[0], EVENT_START)) {
-			free(c->help_param1);
+			delete [] c->help_param1;
 			snprintf(buf, BUFSIZE, "%d", NewsCount),
 			c->help_param1 = sstrdup(buf);
 		}

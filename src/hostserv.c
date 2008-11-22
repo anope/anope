@@ -38,7 +38,7 @@ void moduleAddHostServCmds(void)
 
 /**
  * Return information on memory use.
- * Assumes pointers are valid. 
+ * Assumes pointers are valid.
  **/
 
 void get_hostserv_stats(long *nrec, long *memuse)
@@ -129,16 +129,16 @@ HostCore *createHostCorelist(HostCore * next, char *nick, char *vIdent,
 							 char *vHost, const char *creator, int32 tmp_time)
 {
 
-	next = (HostCore *)malloc(sizeof(HostCore));
+	next = new HostCore;
 	if (next == NULL) {
 		ircdproto->SendGlobops(s_HostServ,
 						 "Unable to allocate memory to create the vHost LL, problems i sense..");
 	} else {
-		next->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
-		next->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
-		next->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
+		next->nick = new char[strlen(nick) + 1];
+		next->vHost = new char[strlen(vHost) + 1];
+		next->creator = new char[strlen(creator) + 1];
 		if (vIdent)
-			next->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
+			next->vIdent = new char[strlen(vIdent) + 1];
 		if ((next->nick == NULL) || (next->vHost == NULL)
 			|| (next->creator == NULL)) {
 			ircdproto->SendGlobops(s_HostServ,
@@ -217,17 +217,17 @@ HostCore *insertHostCore(HostCore * phead, HostCore * prev, char *nick,
 		return NULL;
 	}
 
-	newCore = (HostCore *)malloc(sizeof(HostCore));
+	newCore = new HostCore;
 	if (newCore == NULL) {
 		ircdproto->SendGlobops(s_HostServ,
 						 "Unable to allocate memory to insert into the vHost LL, problems i sense..");
 		return NULL;
 	} else {
-		newCore->nick = (char *)malloc(sizeof(char) * strlen(nick) + 1);
-		newCore->vHost = (char *)malloc(sizeof(char) * strlen(vHost) + 1);
-		newCore->creator = (char *)malloc(sizeof(char) * strlen(creator) + 1);
+		newCore->nick = new char[strlen(nick) + 1];
+		newCore->vHost = new char[strlen(vHost) + 1];
+		newCore->creator = new char[strlen(creator) + 1];
 		if (vIdent)
-			newCore->vIdent = (char *)malloc(sizeof(char) * strlen(vIdent) + 1);
+			newCore->vIdent = new char[strlen(vIdent) + 1];
 		if ((newCore->nick == NULL) || (newCore->vHost == NULL)
 			|| (newCore->creator == NULL)) {
 			ircdproto->SendGlobops(s_HostServ,
@@ -274,13 +274,13 @@ HostCore *deleteHostCore(HostCore * phead, HostCore * prev)
 		tmp = prev->next;
 		prev->next = tmp->next;
 	}
-	free(tmp->vHost);
-	free(tmp->nick);
-	free(tmp->creator);
+	delete [] tmp->vHost;
+	delete [] tmp->nick;
+	delete [] tmp->creator;
 	if (tmp->vIdent) {
-		free(tmp->vIdent);
+		delete [] tmp->vIdent;
 	}
-	free(tmp);
+	delete tmp;
 	return phead;
 }
 
@@ -404,10 +404,10 @@ void load_hs_dbase(dbFILE * f)
 			SAFE(read_string(&creator, f));
 			SAFE(read_int32(&time, f));
 			addHostCore(nick, vIdent, vHost, creator, time);	/* could get a speed increase by not searching the list */
-			free(nick);		 /* as we know the db is in alphabetical order... */
-			free(vHost);
-			free(creator);
-			free(vIdent);
+			delete [] nick;		 /* as we know the db is in alphabetical order... */
+			delete [] vHost;
+			delete [] creator;
+			delete [] vIdent;
 		} else {
 			fatal("Invalid format in %s %d", HostDBName, c);
 		}
@@ -539,11 +539,9 @@ int is_host_remover(User * u)
 void set_lastmask(User * u)
 {
 	if (u->na->last_usermask)
-		free(u->na->last_usermask);
+		delete [] u->na->last_usermask;
 
-	u->na->last_usermask =
-		(char *)smalloc(strlen(common_get_vident(u)) +
-				strlen(common_get_vhost(u)) + 2);
+	u->na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
 	sprintf(u->na->last_usermask, "%s@%s", common_get_vident(u),
 			common_get_vhost(u));
 

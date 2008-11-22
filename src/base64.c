@@ -405,6 +405,6 @@ long base64dects(const char *ts)
 		return strtoul(ts, NULL, 10);
 	}
 	value = base64dec(token);
-	Anope_Free(token);
+	delete [] token;
 	return value;
 }

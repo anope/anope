@@ -58,7 +58,7 @@ int do_bot(User * u)
 	BotInfo *bi;
 	char *cmd = strtok(NULL, " ");
 	char *ch = NULL;
-	
+
 	if (!cmd)
 	{
 			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
@@ -77,7 +77,7 @@ int do_bot(User * u)
 		char *user = strtok(NULL, " ");
 		char *host = strtok(NULL, " ");
 		char *real = strtok(NULL, "");
-		
+
 		if (!nick || !user || !host || !real)
 		{
 			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
@@ -89,7 +89,7 @@ int do_bot(User * u)
 			notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
 			return MOD_CONT;
 		}
-		
+
 		if (strlen(nick) > NickLen)
 		{
 			notice_lang(s_BotServ, u, BOT_BAD_NICK);
@@ -130,7 +130,7 @@ int do_bot(User * u)
 			notice_lang(s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
-	
+
 		/* Check the host is valid re RFC 2812 */
 		if (!isValidHost(host, 3))
 		{
@@ -146,7 +146,7 @@ int do_bot(User * u)
 				return MOD_CONT;
 			}
 		}
-	
+
 
 		/* We check whether the nick is registered, and inform the user
 		* if so. You need to drop the nick manually before you can use
@@ -157,30 +157,30 @@ int do_bot(User * u)
 			notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
 			return MOD_CONT;
 		}
-	
+
 		bi = new BotInfo(nick);
 		if (!bi)
 		{
 			notice_lang(s_BotServ, u, BOT_BOT_CREATION_FAILED);
 			return MOD_CONT;
 		}
-	
+
 		bi->user = sstrdup(user);
 		bi->host = sstrdup(host);
 		bi->real = sstrdup(real);
 		bi->created = time(NULL);
 		bi->chancount = 0;
-	
+
 		/* We check whether user with this nick is online, and kill it if so */
 		EnforceQlinedNick(nick, s_BotServ);
-	
+
 		/* We make the bot online, ready to serve */
-		ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real, 
+		ircdproto->SendClientIntroduction(bi->nick, bi->user, bi->host, bi->real,
 				ircd->pseudoclient_mode, bi->uid.c_str());
-	
+
 		notice_lang(s_BotServ, u, BOT_BOT_ADDED, bi->nick, bi->user,
 			bi->host, bi->real);
-	
+
 		send_event(EVENT_BOT_CREATE, 1, bi->nick);
 	}
 	else if (!stricmp(cmd, "CHANGE"))
@@ -190,7 +190,7 @@ int do_bot(User * u)
 		char *user = strtok(NULL, " ");
 		char *host = strtok(NULL, " ");
 		char *real = strtok(NULL, "");
-		
+
 		if (!oldnick || !nick)
 		{
 			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
@@ -240,7 +240,7 @@ int do_bot(User * u)
 			notice_lang(s_BotServ, u, BOT_BOT_ANY_CHANGES);
 			return MOD_CONT;
 		}
-	
+
 		/* Check the nick is valid re RFC 2812 */
 		if (isdigit(nick[0]) || nick[0] == '-')
 		{
@@ -256,20 +256,20 @@ int do_bot(User * u)
 				return MOD_CONT;
 			}
 		}
-	
+
 		/* check for hardcored ircd forbidden nicks */
 		if (!ircdproto->IsNickValid(nick))
 		{
 			notice_lang(s_BotServ, u, BOT_BAD_NICK);
 			return MOD_CONT;
 		}
-	
+
 		if (host && !isValidHost(host, 3))
 		{
 			notice_lang(s_BotServ, u, BOT_BAD_HOST);
 			return MOD_CONT;
 		}
-	
+
 		if (user)
 		{
 			for (ch = user; *ch && (ch - user) < USERMAX; ch++)
@@ -281,13 +281,13 @@ int do_bot(User * u)
 				}
 			}
 		}
-	
+
 		if (stricmp(bi->nick, nick) && findbot(nick))
 		{
 			notice_lang(s_BotServ, u, BOT_BOT_ALREADY_EXISTS, nick);
 			return MOD_CONT;
 		}
-	
+
 		if (stricmp(bi->nick, nick))
 		{
 			/* We check whether the nick is registered, and inform the user
@@ -299,37 +299,37 @@ int do_bot(User * u)
 				notice_lang(s_BotServ, u, NICK_ALREADY_REGISTERED, nick);
 				return MOD_CONT;
 			}
-	
+
 			/* The new nick is really different, so we remove the Q line for
 			the old nick. */
 			if (ircd->sqline)
 			{
 				ircdproto->SendSQLineDel(bi->nick);
 			}
-	
+
 			/* We check whether user with this nick is online, and kill it if so */
 			EnforceQlinedNick(nick, s_BotServ);
 		}
-	
+
 		if (strcmp(nick, bi->nick))
 			bi->ChangeNick(nick);
-	
+
 		if (user && strcmp(user, bi->user))
 		{
-			free(bi->user);
+			delete [] bi->user;
 			bi->user = sstrdup(user);
 		}
 		if (host && strcmp(host, bi->host))
 		{
-			free(bi->host);
+			delete [] bi->host;
 			bi->host = sstrdup(host);
 		}
 		if (real && strcmp(real, bi->real))
 		{
-			free(bi->real);
+			delete [] bi->real;
 			bi->real = sstrdup(real);
 		}
-	
+
 		/* If only the nick changes, we just make the bot change his nick,
 		 * else we must make it quit and rejoin. We must not forget to set
 		 * the Q:Line either (it's otherwise set in SendClientIntroduction)
@@ -346,34 +346,34 @@ int do_bot(User * u)
 					ircd->pseudoclient_mode, bi->uid.c_str());
 			bi->RejoinAll();
 		}
-	
+
 		notice_lang(s_BotServ, u, BOT_BOT_CHANGED,
 			oldnick, bi->nick, bi->user, bi->host, bi->real);
-	
+
 		send_event(EVENT_BOT_CHANGE, 1, bi->nick);
 	}
 	else if (!stricmp(cmd, "DEL"))
 	{
 		char *nick = strtok(NULL, " ");
-	
+
 		if (!nick)
 		{
 			syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
 			return MOD_CONT;
 		}
-		
+
 		if (!(bi = findbot(nick)))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST, nick);
 			return MOD_CONT;
 		}
-	
+
 		if (nickIsServices(nick, 0))
 		{
 			notice_lang(s_BotServ, u, BOT_DOES_NOT_EXIST);
 			return MOD_CONT;
 		}
-	
+
 		send_event(EVENT_BOT_DEL, 1, bi->nick);
 		ircdproto->SendQuit(bi, "Quit: Help! I'm being deleted by %s!", u->nick);
 		ircdproto->SendSQLineDel(bi->nick);
@@ -382,7 +382,7 @@ int do_bot(User * u)
 	}
 	else
 		syntax_error(s_BotServ, u, "BOT", BOT_BOT_SYNTAX);
-		
+
 	return MOD_CONT;
 }
 

@@ -6,9 +6,9 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
- * $Id$ 
+ * Based on the original code of Services by Andy Church.
+ *
+ * $Id$
  *
  */
 
@@ -88,7 +88,7 @@ static void load_lang(int index, const char *filename)
 		alog("Warning: Bad number of strings (%d, wanted %d) "
 			 "for language %d (%s)", num, NUM_STRINGS, index, filename);
 	}
-	langtexts[index] = (char **)scalloc(sizeof(char *), NUM_STRINGS);
+	langtexts[index] = new char *[NUM_STRINGS];
 	if (num > NUM_STRINGS)
 		num = NUM_STRINGS;
 	for (i = 0; i < num; i++) {
@@ -99,9 +99,9 @@ static void load_lang(int index, const char *filename)
 				 i, index, filename);
 			while (--i >= 0) {
 				if (langtexts[index][i])
-					free(langtexts[index][i]);
+					delete [] langtexts[index][i];
 			}
-			free(langtexts[index]);
+			delete [] langtexts[index];
 			langtexts[index] = NULL;
 			return;
 		}
@@ -112,9 +112,9 @@ static void load_lang(int index, const char *filename)
 				 "corrupt TOC?", i, index, filename);
 			while (--i >= 0) {
 				if (langtexts[index][i])
-					free(langtexts[index][i]);
+					delete [] langtexts[index][i];
 			}
-			free(langtexts[index]);
+			delete [] langtexts[index];
 			langtexts[index] = NULL;
 			return;
 		} else if (len < 0) {
@@ -122,22 +122,22 @@ static void load_lang(int index, const char *filename)
 				 "corrupt TOC?", i, index, filename);
 			while (--i >= 0) {
 				if (langtexts[index][i])
-					free(langtexts[index][i]);
+					delete [] langtexts[index][i];
 			}
-			free(langtexts[index]);
+			delete [] langtexts[index];
 			langtexts[index] = NULL;
 			return;
 		} else {
-			langtexts[index][i] = (char *)scalloc(len + 1, 1);
+			langtexts[index][i] = new char[len + 1];
 			fseek(f, pos, SEEK_SET);
 			if (fread(langtexts[index][i], 1, len, f) != len) {
 				alog("Failed to read string %d in language %d (%s)",
 					 i, index, filename);
 				while (--i >= 0) {
 					if (langtexts[index][i])
-						free(langtexts[index][i]);
+						delete [] langtexts[index][i];
 				}
-				free(langtexts[index]);
+				delete [] langtexts[index];
 				langtexts[index] = NULL;
 				return;
 			}
@@ -167,7 +167,7 @@ void lang_sanitize()
 					strnrepl(tmp, sizeof(tmp), "%R", "/msg ");
 				}
 				newstr = sstrdup(tmp);
-				free(langtexts[i][j]);
+				delete [] langtexts[i][j];
 				langtexts[i][j] = newstr;
 			}
 		}

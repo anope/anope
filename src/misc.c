@@ -777,7 +777,7 @@ char *myStrSubString(const char *src, int start, int end)
 	}
 	len = strlen(src);
 	if (((start >= 0) && (end <= len)) && (end > start)) {
-		substring = (char *) malloc(sizeof(char) * ((end - start) + 1));
+		substring = new char[(end - start) + 1];
 		for (idx = 0; idx <= end - start; idx++) {
 			substring[idx] = src[start + idx];
 		}
@@ -865,7 +865,7 @@ int nickIsServices(const char *tempnick, int bot)
 	if (s) {
 		*s++ = 0;
 		if (stricmp(s, ServerName) != 0) {
-			free(nick);
+			delete [] nick;
 			return found;
 		}
 	}
@@ -900,7 +900,7 @@ int nickIsServices(const char *tempnick, int bot)
 	}
 
 	/* Somehow, something tells me we should free this :) -GD */
-	free(nick);
+	delete [] nick;
 
 	return found;
 }
@@ -1328,7 +1328,7 @@ char *GetWindowsVersion(void)
 				snprintf(buf, sizeof(buf), "Microsoft Windows Server 2008 %s%s",
 						 cputype, extra);
 		}
-			free(extra);
+			delete [] extra;
 		}
 	/* Windows 2003 or Windows XP Pro 64 */
 		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2) {
@@ -1350,7 +1350,7 @@ char *GetWindowsVersion(void)
 				snprintf(buf, sizeof(buf),
 						 "Microsoft Windows Server 2003 Family %s%s", cputype, extra);
 		}
-			free(extra);
+			delete [] extra;
 		}
 		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
 			if (osvi.wSuiteMask & VER_SUITE_EMBEDDEDNT) {
@@ -1361,7 +1361,7 @@ char *GetWindowsVersion(void)
 				extra = sstrdup(" ");
 			}
 			snprintf(buf, sizeof(buf), "Microsoft Windows XP %s", extra);
-			free(extra);
+			delete [] extra;
 		}
 		if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
 			if (osvi.wSuiteMask & VER_SUITE_DATACENTER) {
@@ -1372,7 +1372,7 @@ char *GetWindowsVersion(void)
 				extra = sstrdup("Server");
 			}
 			snprintf(buf, sizeof(buf), "Microsoft Windows 2000 %s", extra);
-			free(extra);
+			delete [] extra;
 		}
 		if (osvi.dwMajorVersion <= 4) {
 			if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE) {
@@ -1381,7 +1381,7 @@ char *GetWindowsVersion(void)
 				extra = sstrdup("Server 4.0");
 			}
 			snprintf(buf, sizeof(buf), "Microsoft Windows NT %s", extra);
-			free(extra);
+			delete [] extra;
 		}
 	case VER_PLATFORM_WIN32_WINDOWS:
 		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0) {
@@ -1391,7 +1391,7 @@ char *GetWindowsVersion(void)
 				extra = sstrdup(" ");
 			}
 			snprintf(buf, sizeof(buf), "Microsoft Windows 95 %s", extra);
-			free(extra);
+			delete [] extra;
 		}
 		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10) {
 			if (osvi.szCSDVersion[1] == 'A') {
@@ -1400,14 +1400,14 @@ char *GetWindowsVersion(void)
 				extra = sstrdup(" ");
 			}
 			snprintf(buf, sizeof(buf), "Microsoft Windows 98 %s", extra);
-			free(extra);
+			delete [] extra;
 		}
 		if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90) {
 			snprintf(buf, sizeof(buf),
 					 "Microsoft Windows Millennium Edition");
 		}
 	}
-	free(cputype);
+	delete [] cputype;
 	return sstrdup(buf);
 }
 

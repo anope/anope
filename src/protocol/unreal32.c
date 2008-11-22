@@ -1281,9 +1281,9 @@ int anope_event_server(const char *source, int ac, const char **av)
 		upnumeric = myStrGetToken(vl, '-', 2);
 		desc = myStrGetTokenRemainder(av[2], ' ', 1);
 		do_server(source, av[0], av[1], desc, upnumeric);
-		Anope_Free(vl);
-		Anope_Free(desc);
-		Anope_Free(upnumeric);
+		delete [] vl;
+		delete [] desc;
+		delete [] upnumeric;
 	} else {
 		do_server(source, av[0], av[1], av[2], NULL);
 	}

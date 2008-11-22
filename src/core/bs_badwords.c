@@ -176,7 +176,7 @@ int do_badwords(User * u)
 			notice_lang(s_BotServ, u, BOT_BADWORDS_DELETED, bw->word,
 						ci->name);
 			if (bw->word)
-				free(bw->word);
+				delete [] bw->word;
 			bw->word = NULL;
 			bw->in_use = 0;
 			deleted = 1;
@@ -194,7 +194,7 @@ int do_badwords(User * u)
 							ci->badwords[a].type = ci->badwords[b].type;
 							if (ci->badwords[b].word) {
 								ci->badwords[a].word = sstrdup(ci->badwords[b].word);
-								free(ci->badwords[b].word);
+								delete [] ci->badwords[b].word;
 							}
 							ci->badwords[b].word = NULL;
 							ci->badwords[b].in_use = 0;
@@ -246,7 +246,7 @@ int do_badwords(User * u)
 
 		for (i = 0; i < ci->bwcount; i++)
 			if (ci->badwords[i].word)
-				free(ci->badwords[i].word);
+				delete [] ci->badwords[i].word;
 
 		free(ci->badwords);
 		ci->badwords = NULL;
@@ -273,7 +273,7 @@ int badwords_del_callback(User * u, int num, va_list args)
 
 	bw = &ci->badwords[num - 1];
 	if (bw->word)
-		free(bw->word);
+		delete [] bw->word;
 	bw->word = NULL;
 	bw->in_use = 0;
 

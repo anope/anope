@@ -181,7 +181,7 @@ void load_ns_req_db(void)
 		while ((c = getc_db(f)) == 1) {
 			if (c != 1)
 				fatal("Invalid format in %s", PreNickDBName);
-			nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
+			nr = new NickRequest;
 			SAFE(read_string(&nr->nick, f));
 			SAFE(read_string(&nr->passcode, f));
 			if (ver < 2) {
@@ -189,7 +189,7 @@ void load_ns_req_db(void)
 				len = strlen(pass);
 				enc_encrypt(pass, len, nr->password, PASSMAX);
 				memset(pass, 0, len);
-				free(pass);
+				delete [] pass;
 			} else
 				SAFE(read_buffer(nr->password, f));
 			SAFE(read_string(&nr->email, f));
@@ -317,7 +317,7 @@ void load_ns_dbase(void)
 
 			SAFE(read_string(&s, f));
 			na->nc = findcore(s);
-			free(s);
+			delete [] s;
 
 			slist_add(&na->nc->aliases, na);
 
@@ -530,14 +530,12 @@ int validate_user(User * u)
 		na->status |= NS_RECOGNIZED;
 		na->last_seen = time(NULL);
 		if (na->last_usermask)
-			free(na->last_usermask);
-		na->last_usermask =
-			(char *)scalloc(strlen(common_get_vident(u)) +
-					strlen(common_get_vhost(u)) + 2, 1);
+			delete [] na->last_usermask;
+		na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
 		sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
 				common_get_vhost(u));
 		if (na->last_realname)
-			free(na->last_realname);
+			delete [] na->last_realname;
 		na->last_realname = sstrdup(u->realname);
 		return 1;
 	}
@@ -688,7 +686,7 @@ void expire_nicks()
 				tmpnick = sstrdup(na->nick);
 				delnick(na);
 				send_event(EVENT_NICK_EXPIRE, 1, tmpnick);
-				free(tmpnick);
+				delete [] tmpnick;
 			}
 		}
 	}
@@ -799,11 +797,11 @@ int is_on_access(User * u, NickCore * nc)
 	if (nc->accesscount == 0)
 		return 0;
 
-	buf = (char *)scalloc(strlen(u->username) + strlen(u->host) + 2, 1);
+	buf = new char[strlen(u->username) + strlen(u->host) + 2];
 	sprintf(buf, "%s@%s", u->username, u->host);
 	if (ircd->vhost) {
 		if (u->vhost) {
-			buf2 = (char *)scalloc(strlen(u->username) + strlen(u->vhost) + 2, 1);
+			buf2 = new char[strlen(u->username) + strlen(u->vhost) + 2];
 			sprintf(buf2, "%s@%s", u->username, u->vhost);
 		}
 	}
@@ -811,18 +809,18 @@ int is_on_access(User * u, NickCore * nc)
 	for (i = 0; i < nc->accesscount; i++) {
 		if (match_wild_nocase(nc->access[i], buf)
 			|| (ircd->vhost ? match_wild_nocase(nc->access[i], buf2) : 0)) {
-			free(buf);
+			delete [] buf;
 			if (ircd->vhost) {
 				if (u->vhost) {
-					free(buf2);
+					delete [] buf2;
 				}
 			}
 			return 1;
 		}
 	}
-	free(buf);
+	delete [] buf;
 	if (ircd->vhost) {
-		free(buf2);
+		delete [] buf2;
 	}
 	return 0;
 }
@@ -932,7 +930,7 @@ void change_core_display(NickCore * nc, char *newdisplay)
 	else
 		nclists[HASH(nc->display)] = nc->next;
 
-	free(nc->display);
+	delete [] nc->display;
 	nc->display = sstrdup(newdisplay);
 	insert_core(nc);
 
@@ -964,19 +962,19 @@ static int delcore(NickCore * nc)
 	alog("%s: deleting nickname group %s", s_NickServ, nc->display);
 
 	/* Now we can safely free it. */
-	free(nc->display);
+	delete [] nc->display;
 
 	if (nc->email)
-		free(nc->email);
+		delete [] nc->email;
 	if (nc->greet)
-		free(nc->greet);
+		delete [] nc->greet;
 	if (nc->url)
-		free(nc->url);
+		delete [] nc->url;
 
 	if (nc->access) {
 		for (i = 0; i < nc->accesscount; i++) {
 			if (nc->access[i])
-				free(nc->access[i]);
+				delete [] nc->access[i];
 		}
 		free(nc->access);
 	}
@@ -984,7 +982,7 @@ static int delcore(NickCore * nc)
 	if (nc->memos.memos) {
 		for (i = 0; i < nc->memos.memocount; i++) {
 			if (nc->memos.memos[i].text)
-				free(nc->memos.memos[i].text);
+				delete [] nc->memos.memos[i].text;
 		}
 		free(nc->memos.memos);
 	}
@@ -1000,12 +998,12 @@ int delnickrequest(NickRequest * nr)
 	if (nr) {
 		nrlists[HASH(nr->nick)] = nr->next;
 		if (nr->nick)
-			free(nr->nick);
+			delete [] nr->nick;
 		if (nr->passcode)
-			free(nr->passcode);
+			delete [] nr->passcode;
 		if (nr->email)
-			free(nr->email);
-		free(nr);
+			delete [] nr->email;
+		delete nr;
 	}
 
 	return 0;
@@ -1062,13 +1060,13 @@ int delnick(NickAlias * na)
 	else
 		nalists[HASH(na->nick)] = na->next;
 
-	free(na->nick);
+	delete [] na->nick;
 	if (na->last_usermask)
-		free(na->last_usermask);
+		delete [] na->last_usermask;
 	if (na->last_realname)
-		free(na->last_realname);
+		delete [] na->last_realname;
 	if (na->last_quit)
-		free(na->last_quit);
+		delete [] na->last_quit;
 
 	delete na;
 	return 1;
@@ -1160,7 +1158,7 @@ static void rem_ns_timeout(NickAlias * na, int type)
 				t->prev->next = t->next;
 			else
 				my_timeouts = t->next;
-			free(t);
+			delete t;
 			t = t2;
 		} else {
 			t = t->next;
@@ -1222,7 +1220,7 @@ static void add_ns_timeout(NickAlias * na, int type, time_t delay)
 	to = add_timeout(delay, timeout_routine, 0);
 	to->data = na;
 
-	t = (struct my_timeout *)scalloc(sizeof(struct my_timeout), 1);
+	t = new my_timeout;
 	t->na = na;
 	t->to = to;
 	t->type = type;
@@ -1257,7 +1255,7 @@ void del_ns_timeout(NickAlias * na, int type)
 			else
 				my_timeouts = t->next;
 			del_timeout(t->to);
-			free(t);
+			delete t;
 			t = t2;
 		} else {
 			t = t->next;
@@ -1291,7 +1289,7 @@ void clean_ns_timeouts(NickAlias * na)
 			else
 				my_timeouts = t->next;
 			del_timeout(t->to);
-			free(t);
+			delete t;
 		}
 	}
 }
@@ -1383,7 +1381,7 @@ void nsStartNickTracking(User * u)
 
 		/* Release memory if needed */
 		if (u->nickTrack)
-			free(u->nickTrack);
+			delete [] u->nickTrack;
 
 		/* Copy the nick core displayed nick to
 		   the user structure for further checks */
@@ -1399,7 +1397,7 @@ void nsStopNickTracking(User * u)
 {
 	/* Simple enough. If its there, release it */
 	if (u->nickTrack) {
-		free(u->nickTrack);
+		delete [] u->nickTrack;
 		u->nickTrack = NULL;
 	}
 }

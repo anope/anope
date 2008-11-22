@@ -374,7 +374,7 @@ int do_set_password(User * u, ChannelInfo * ci, char *param)
 int do_set_desc(User * u, ChannelInfo * ci, char *param)
 {
 	if (ci->desc)
-		free(ci->desc);
+		delete [] ci->desc;
 	ci->desc = sstrdup(param);
 	notice_lang(s_ChanServ, u, CHAN_DESC_CHANGED, ci->name, param);
 	return MOD_CONT;
@@ -385,7 +385,7 @@ int do_set_desc(User * u, ChannelInfo * ci, char *param)
 int do_set_url(User * u, ChannelInfo * ci, char *param)
 {
 	if (ci->url)
-		free(ci->url);
+		delete [] ci->url;
 	if (param) {
 		ci->url = sstrdup(param);
 		notice_lang(s_ChanServ, u, CHAN_URL_CHANGED, ci->name, param);
@@ -401,7 +401,7 @@ int do_set_url(User * u, ChannelInfo * ci, char *param)
 int do_set_email(User * u, ChannelInfo * ci, char *param)
 {
 	if (ci->email)
-		free(ci->email);
+		delete [] ci->email;
 	if (param) {
 		ci->email = sstrdup(param);
 		notice_lang(s_ChanServ, u, CHAN_EMAIL_CHANGED, ci->name, param);
@@ -417,7 +417,7 @@ int do_set_email(User * u, ChannelInfo * ci, char *param)
 int do_set_entrymsg(User * u, ChannelInfo * ci, char *param)
 {
 	if (ci->entry_message)
-		free(ci->entry_message);
+		delete [] ci->entry_message;
 	if (param) {
 		ci->entry_message = sstrdup(param);
 		notice_lang(s_ChanServ, u, CHAN_ENTRY_MSG_CHANGED, ci->name,
@@ -498,7 +498,7 @@ int do_set_mlock(User * u, ChannelInfo * ci, char *param)
 		if ((ci->mlock_on & ircd->chan_lmode)
 			&& !(ci->mlock_on & anope_get_limit_mode())) {
 			ci->mlock_on &= ~ircd->chan_lmode;
-			free(ci->mlock_redirect);
+			delete [] ci->mlock_redirect;
 			notice_lang(s_ChanServ, u, CHAN_SET_MLOCK_L_REQUIRED);
 		}
 	}

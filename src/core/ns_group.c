@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -177,9 +177,7 @@ int do_group(User * u)
 		na = makealias(u->nick, target->nc);
 
 		if (na) {
-			na->last_usermask =
-				(char *)scalloc(strlen(common_get_vident(u)) +
-						strlen(common_get_vhost(u)) + 2, 1);
+			na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
 			sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
 					common_get_vhost(u));
 			na->last_realname = sstrdup(u->realname);
@@ -208,7 +206,7 @@ int do_group(User * u)
 			if (ircd->modeonreg) {
 				len = strlen(ircd->modeonreg);
 				strncpy(modes,ircd->modeonreg,512);
-		   if(ircd->rootmodeonid && is_services_root(u)) { 
+		   if(ircd->rootmodeonid && is_services_root(u)) {
 					strncat(modes,ircd->rootmodeonid,512-len);
 			} else if(ircd->adminmodeonid && is_services_admin(u)) {
 					strncat(modes,ircd->adminmodeonid,512-len);
@@ -239,7 +237,7 @@ NickAlias *makealias(const char *nick, NickCore * nc)
 	NickAlias *na;
 
 	/* Just need to make the alias */
-	na = (NickAlias *)scalloc(1, sizeof(NickAlias));
+	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
 	slist_add(&nc->aliases, na);

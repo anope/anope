@@ -509,7 +509,7 @@ static int del_newsitem(int num, short type)
 
 	for (i = 0; i < nnews; i++) {
 		if (news[i].type == type && (num == 0 || news[i].num == num)) {
-			free(news[i].text);
+			delete [] news[i].text;
 			count++;
 			nnews--;
 			if (i < nnews)

@@ -111,7 +111,7 @@ int do_chankill(User * u)
 			notice_lang(s_OperServ, u, CHAN_X_NOT_IN_USE, channel);
 		}
 		if (AddAkiller) {
-			free(reason);
+			delete [] reason;
 		}
 	} else {
 		syntax_error(s_OperServ, u, "CHANKILL", OPER_CHANKILL_SYNTAX);

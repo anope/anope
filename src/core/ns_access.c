@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -142,7 +142,7 @@ int do_access(User * u)
 		}
 
 		notice_lang(s_NickServ, u, NICK_ACCESS_DELETED, *access);
-		free(*access);
+		delete [] *access;
 		na->nc->accesscount--;
 		if (i < na->nc->accesscount)	/* if it wasn't the last entry... */
 			memmove(access, access + 1,

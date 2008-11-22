@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -55,7 +55,7 @@ void myOperServHelp(User * u)
  **/
 int do_os_quit(User * u)
 {
-	quitmsg = (char *)calloc(28 + strlen(u->nick), 1);
+	quitmsg = new char[28 + strlen(u->nick)];
 	if (!quitmsg)
 		quitmsg = "QUIT command received, but out of memory!";
 	else

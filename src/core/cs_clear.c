@@ -347,9 +347,9 @@ int do_clear(User * u)
 			av[2] = sstrdup(buf);
 			ircdproto->SendKick(whosends(ci), av[0], av[1], av[2]);
 			do_kick(s_ChanServ, 3, av);
-			free((void *)av[2]);
-			free((void *)av[1]);
-			free((void *)av[0]);
+			delete [] av[2];
+			delete [] av[1];
+			delete [] av[0];
 		}
 		notice_lang(s_ChanServ, u, CHAN_CLEARED_USERS, chan);
 	} else {

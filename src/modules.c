@@ -160,8 +160,7 @@ void Module::InsertLanguage(int langNumber, int ac, const char **av)
 	}
 
 	this->lang[langNumber].argc = ac;
-	this->lang[langNumber].argv =
-		(char **)malloc(sizeof(char *) * ac);
+	this->lang[langNumber].argv = new char *[ac];
 	for (i = 0; i < ac; i++) {
 		this->lang[langNumber].argv[i] = sstrdup(av[i]);
 	}
@@ -215,7 +214,7 @@ Command *createCommand(const char *name, int (*func) (User * u),
 		return NULL;
 	}
 
-	if ((c = (Command *)malloc(sizeof(Command))) == NULL) {
+	if (!(c = new Command)) {
 		fatal("Out of memory!");
 	}
 	c->name = sstrdup(name);
@@ -255,7 +254,7 @@ int destroyCommand(Command * c)
 		return MOD_ERR_UNKNOWN;
 	}
 	if (c->name) {
-		free(c->name);
+		delete [] c->name;
 	}
 	c->routine = NULL;
 	c->has_priv = NULL;
@@ -264,26 +263,14 @@ int destroyCommand(Command * c)
 	c->helpmsg_oper = -1;
 	c->helpmsg_admin = -1;
 	c->helpmsg_root = -1;
-	if (c->help_param1) {
-		free(c->help_param1);
-	}
-	if (c->help_param2) {
-		free(c->help_param2);
-	}
-	if (c->help_param3) {
-		free(c->help_param3);
-	}
-	if (c->help_param4) {
-		free(c->help_param4);
-	}
 	if (c->mod_name) {
-		free(c->mod_name);
+		delete [] c->mod_name;
 	}
 	if (c->service) {
-		free(c->service);
+		delete [] c->service;
 	}
 	c->next = NULL;
-	free(c);
+	delete c;
 	return MOD_ERR_OK;
 }
 
@@ -342,7 +329,7 @@ static int internal_addCommand(Module *m, CommandHash * cmdTable[], Command * c,
 		lastHash = current;
 	}
 
-	if ((newHash = (CommandHash *)malloc(sizeof(CommandHash))) == NULL) {
+	if (!(newHash = new CommandHash)) {
 		fatal("Out of memory");
 	}
 	newHash->next = NULL;
@@ -462,7 +449,7 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
 					}
 				} else {
 					cmdTable[index] = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			} else {
@@ -483,7 +470,7 @@ static int internal_delCommand(CommandHash * cmdTable[], Command * c, const char
 					}
 				} else {
 					lastHash->next = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			}
@@ -562,7 +549,7 @@ Message *createMessage(const char *name,
 	if (!name || !func) {
 		return NULL;
 	}
-	if ((m = (Message *)malloc(sizeof(Message))) == NULL) {
+	if (!(m = new Message)) {
 		fatal("Out of memory!");
 	}
 	m->name = sstrdup(name);
@@ -645,7 +632,7 @@ int addMessage(MessageHash * msgTable[], Message * m, int pos)
 		lastHash = current;
 	}
 
-	if ((newHash = (MessageHash *)malloc(sizeof(MessageHash))) == NULL) {
+	if (!(newHash = new MessageHash)) {
 		fatal("Out of memory");
 	}
 	newHash->next = NULL;
@@ -710,7 +697,7 @@ int delMessage(MessageHash * msgTable[], Message * m)
 					}
 				} else {
 					msgTable[index] = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			} else {
@@ -728,7 +715,7 @@ int delMessage(MessageHash * msgTable[], Message * m)
 					}
 				} else {
 					lastHash->next = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			}
@@ -749,7 +736,7 @@ int destroyMessage(Message * m)
 		return MOD_ERR_PARAMS;
 	}
 	if (m->name) {
-		free(m->name);
+		delete [] m->name;
 	}
 	m->func = NULL;
 	m->next = NULL;
@@ -766,7 +753,7 @@ int Module::AddCallback(const char *name, time_t when,
 {
 	ModuleCallBack *newcb, *tmp, *prev;
 	int i;
-	newcb = (ModuleCallBack *)malloc(sizeof(ModuleCallBack));
+	newcb = new ModuleCallBack;
 	if (!newcb)
 		return MOD_ERR_MEMORY;
 
@@ -778,7 +765,7 @@ int Module::AddCallback(const char *name, time_t when,
 	newcb->owner_name = sstrdup(this->name.c_str());
 	newcb->func = func;
 	newcb->argc = argc;
-	newcb->argv = (char **)malloc(sizeof(char *) * argc);
+	newcb->argv = new char *[argc];
 	for (i = 0; i < argc; i++) {
 		newcb->argv[i] = sstrdup(argv[i]);
 	}
@@ -823,16 +810,17 @@ void moduleCallBackDeleteEntry(ModuleCallBack * prev)
 		prev->next = tmp->next;
 	}
 	if (tmp->name)
-		free(tmp->name);
+		delete [] tmp->name;
 	if (tmp->owner_name)
-		free(tmp->owner_name);
+		delete [] tmp->owner_name;
 	tmp->func = NULL;
 	for (i = 0; i < tmp->argc; i++) {
-		free(tmp->argv[i]);
+		delete [] tmp->argv[i];
 	}
+	delete [] tmp->argv;
 	tmp->argc = 0;
 	tmp->next = NULL;
-	free(tmp);
+	delete tmp;
 }
 
 /**
@@ -1270,7 +1258,7 @@ void moduleNoticeLang(char *source, User * u, int number, ...)
 			strscpy(outbuf, t, sizeof(outbuf));
 			notice_user(source, u, "%s", outbuf);
 		}
-		free(buf);
+		delete [] buf;
 	} else {
 		alog("%s: INVALID language string call, language: [%d], String [%d]", mod_current_module->name.c_str(), lang, number);
 	}
@@ -1321,7 +1309,7 @@ void moduleDeleteLanguage(int langNumber)
 		mod_current_module = findModule(mod_current_module_name);
 	}
 	for (idx = 0; idx > mod_current_module->lang[langNumber].argc; idx++) {
-		free(mod_current_module->lang[langNumber].argv[idx]);
+		delete [] mod_current_module->lang[langNumber].argv[idx];
 	}
 	mod_current_module->lang[langNumber].argc = 0;
 }

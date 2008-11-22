@@ -277,12 +277,16 @@ int do_confirm(User * u)
 
 		if (stricmp(nr->passcode, passcode) != 0) {
 			notice_lang(s_NickServ, u, NICK_CONFIRM_INVALID);
+			if (forced)
+				delete [] passcode;
 			return MOD_CONT;
 		}
 	}
 
 	if (!nr) {
 		notice_lang(s_NickServ, u, NICK_REGISTRATION_FAILED);
+		if (forced)
+			delete [] passcode;
 		return MOD_CONT;
 	}
 
@@ -314,9 +318,7 @@ int do_confirm(User * u)
 			na->last_usermask = sstrdup("*@*");
 			na->last_realname = sstrdup("unknown");
 		} else {
-			na->last_usermask =
-				(char *)scalloc(strlen(common_get_vident(u)) +
-						strlen(common_get_vhost(u)) + 2, 1);
+			na->last_usermask = new char[strlen(common_get_vident(u)) + strlen(common_get_vhost(u)) + 2];
 			sprintf(na->last_usermask, "%s@%s", common_get_vident(u),
 					common_get_vhost(u));
 			na->last_realname = sstrdup(u->realname);
@@ -383,6 +385,11 @@ int do_confirm(User * u)
 	if (NSNickTracking)
 		nsStartNickTracking(u);
 
+	if (forced)
+		delete [] passcode;
+	if (email)
+		delete [] email;
+
 	return MOD_CONT;
 }
 
@@ -390,7 +397,7 @@ NickRequest *makerequest(const char *nick)
 {
 	NickRequest *nr;
 
-	nr = (NickRequest *)scalloc(1, sizeof(NickRequest));
+	nr = new NickRequest;
 	nr->nick = sstrdup(nick);
 	insert_requestnick(nr);
 	alog("%s: Nick %s has been requested", s_NickServ, nr->nick);
@@ -412,7 +419,7 @@ NickAlias *makenick(const char *nick)
 	alog("%s: group %s has been created", s_NickServ, nc->display);
 
 	/* Then make the alias */
-	na = (NickAlias *)scalloc(1, sizeof(NickAlias));
+	na = new NickAlias;
 	na->nick = sstrdup(nick);
 	na->nc = nc;
 	slist_add(&nc->aliases, na);

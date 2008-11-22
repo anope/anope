@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -93,10 +93,10 @@ int do_group(User * u)
 					notice_lang(s_HostServ, u, HOST_GROUP, na->nc->display,
 								vHost);
 				}
-				free(vHost);
+				delete [] vHost;
 				if (vIdent)
-					free(vIdent);
-				free(creator);
+					delete [] vIdent;
+				delete [] creator;
 
 			} else {
 				notice_lang(s_HostServ, u, HOST_NOT_ASSIGNED);

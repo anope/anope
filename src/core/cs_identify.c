@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ int do_identify(User * u)
 
 		if ((res = enc_check_password(pass, ci->founderpass)) == 1) {
 			if (!is_identified(u, ci)) {
-				uc = (struct u_chaninfolist *)scalloc(sizeof(*uc), 1);
+				uc = new u_chaninfolist;
 				uc->next = u->founder_chans;
 				if (u->founder_chans)
 					u->founder_chans->prev = uc;

@@ -130,7 +130,7 @@ int do_akill(User * u)
 			deleted = add_akill(u, mask, u->nick, expires, reason);
 			if (deleted < 0) {
 				if (AddAkiller) {
-					free(reason);
+					delete [] reason;
 				}
 				return MOD_CONT;
 			} else if (deleted) {
@@ -173,7 +173,7 @@ int do_akill(User * u)
 				notice_lang(s_OperServ, u, READ_ONLY_MODE);
 			}
 			if (AddAkiller) {
-				free(reason);
+				delete [] reason;
 			}
 		} else {
 			syntax_error(s_OperServ, u, "AKILL", OPER_AKILL_SYNTAX);

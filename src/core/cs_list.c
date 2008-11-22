@@ -91,14 +91,14 @@ int do_list(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 					   	notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 					   	notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				from = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				tmp = myStrGetTokenRemainder(pattern, '-', 1);  /* Read TO out */
 				if (!tmp) {
 					notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
@@ -107,14 +107,14 @@ int do_list(User * u)
 				}
 				for (s = tmp; *s; s++) {
 					if (!isdigit(*s)) {
-						free(tmp);
+						delete [] tmp;
 						notice_lang(s_ChanServ, u, LIST_INCORRECT_RANGE);
 						notice_lang(s_ChanServ, u, CS_LIST_INCORRECT_RANGE);
 						return MOD_CONT;
 					}
 				}
 				to = atoi(tmp);
-				free(tmp);
+				delete [] tmp;
 				pattern = sstrdup("*");
 				tofree = 1;
 			}
@@ -132,7 +132,7 @@ int do_list(User * u)
 		}
 
 		spattern_size = (strlen(pattern) + 2) * sizeof(char);
-		spattern = (char *)smalloc(spattern_size);
+		spattern = new char[spattern_size];
 		snprintf(spattern, spattern_size, "#%s", pattern);
 
 
@@ -176,10 +176,10 @@ int do_list(User * u)
 		}
 		notice_lang(s_ChanServ, u, CHAN_LIST_END,
 					nchans > CSListMax ? CSListMax : nchans, nchans);
-		free(spattern);
+		delete [] spattern;
 	}
 	if (tofree)
-		free(pattern);
+		delete [] pattern;
 	return MOD_CONT;
 
 }

@@ -251,7 +251,7 @@ int add_session(const char *nick, const char *host, char *hostip)
 	}
 
 	nsessions++;
-	session = (Session *)scalloc(sizeof(Session), 1);
+	session = new Session;
 	session->host = sstrdup(host);
 	list = &sessionlist[HASH(session->host)];
 	session->next = *list;
@@ -312,8 +312,8 @@ void del_session(const char *host)
 	if (debug >= 2)
 		alog("debug: del_session(): free session structure");
 
-	free(session->host);
-	free(session);
+	delete [] session->host;
+	delete session;
 
 	nsessions--;
 
@@ -338,8 +338,8 @@ void expire_exceptions(void)
 			ircdproto->SendGlobops(s_OperServ,
 							 "Session limit exception for %s has expired.",
 							 exceptions[i].mask);
-		free(exceptions[i].mask);
-		free(exceptions[i].reason);
+		delete [] exceptions[i].mask;
+		delete [] exceptions[i].reason;
 		nexceptions--;
 		memmove(exceptions + i, exceptions + i + 1,
 				sizeof(Exception) * (nexceptions - i));
@@ -523,8 +523,8 @@ static int exception_del(const int index)
 	if (index < 0 || index >= nexceptions)
 		return 0;
 
-	free(exceptions[index].mask);
-	free(exceptions[index].reason);
+	delete [] exceptions[index].mask;
+	delete [] exceptions[index].reason;
 	nexceptions--;
 	memmove(exceptions + index, exceptions + index + 1,
 			sizeof(Exception) * (nexceptions - index));
@@ -773,7 +773,7 @@ int do_exception(User * u)
 
 		if ((n1 >= 0 && n1 < nexceptions) && (n2 >= 0 && n2 < nexceptions)
 			&& (n1 != n2)) {
-			exception = (Exception *)scalloc(sizeof(Exception), 1);
+			exception = new Exception;
 			memcpy(exception, &exceptions[n1], sizeof(Exception));
 
 			if (n1 < n2) {
@@ -788,7 +788,7 @@ int do_exception(User * u)
 				memmove(&exceptions[n2], exception, sizeof(Exception));
 			}
 
-			free(exception);
+			delete exception;
 
 			notice_lang(s_OperServ, u, OPER_EXCEPTION_MOVED,
 						exceptions[n1].mask, n1 + 1, n2 + 1);

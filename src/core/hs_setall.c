@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -59,7 +59,7 @@ int do_setall(User * u)
 {
 	char *nick = (char *)strtok(NULL, " ");
 	char *rawhostmask = strtok(NULL, " ");
-	char *hostmask = (char *)smalloc(HOSTMAX);
+	char *hostmask = new char[HOSTMAX];
 
 	NickAlias *na;
 	int32 tmp_time;
@@ -69,7 +69,7 @@ int do_setall(User * u)
 
 	if (!nick || !rawhostmask) {
 		notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
-		free(hostmask);
+		delete [] hostmask;
 		return MOD_CONT;
 	}
 
@@ -78,32 +78,32 @@ int do_setall(User * u)
 		rawhostmask = myStrGetTokenRemainder(rawhostmask, '@', 1);	  /* get the remaining string */
 		if (!rawhostmask) {
 			notice_lang(s_HostServ, u, HOST_SETALL_SYNTAX, s_HostServ);
-			free(vIdent);
-			free(hostmask);
+			delete [] vIdent;
+			delete [] hostmask;
 			return MOD_CONT;
 		}
 		if (strlen(vIdent) > USERMAX - 1) {
 			notice_lang(s_HostServ, u, HOST_SET_IDENTTOOLONG, USERMAX);
-			free(vIdent);
-			free(rawhostmask);
-			free(hostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
+			delete [] hostmask;
 			return MOD_CONT;
 		} else {
 			for (s = vIdent; *s; s++) {
 				if (!isvalidchar(*s)) {
 					notice_lang(s_HostServ, u, HOST_SET_IDENT_ERROR);
-					free(vIdent);
-					free(rawhostmask);
-					free(hostmask);
+					delete [] vIdent;
+					delete [] rawhostmask;
+					delete [] hostmask;
 					return MOD_CONT;
 				}
 			}
 		}
 		if (!ircd->vident) {
 			notice_lang(s_HostServ, u, HOST_NO_VIDENT);
-			free(vIdent);
-			free(rawhostmask);
-			free(hostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
+			delete [] hostmask;
 			return MOD_CONT;
 		}
 	}
@@ -113,20 +113,20 @@ int do_setall(User * u)
 	else {
 		notice_lang(s_HostServ, u, HOST_SET_TOOLONG, HOSTMAX);
 		if (vIdent) {
-			free(vIdent);
-			free(rawhostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
 		}
-		free(hostmask);
+		delete [] hostmask;
 		return MOD_CONT;
 	}
 
 	if (!isValidHost(hostmask, 3)) {
 		notice_lang(s_HostServ, u, HOST_SET_ERROR);
 		if (vIdent) {
-			free(vIdent);
-			free(rawhostmask);
+			delete [] vIdent;
+			delete [] rawhostmask;
 		}
-		free(hostmask);
+		delete [] hostmask;
 		return MOD_CONT;
 	}
 
@@ -136,10 +136,10 @@ int do_setall(User * u)
 		if (na->status & NS_VERBOTEN) {
 			notice_lang(s_HostServ, u, NICK_X_FORBIDDEN, nick);
 			if (vIdent) {
-				free(vIdent);
-				free(rawhostmask);
+				delete [] vIdent;
+				delete [] rawhostmask;
 			}
-			free(hostmask);
+			delete [] hostmask;
 			return MOD_CONT;
 		}
 		if (vIdent && ircd->vident) {
@@ -158,10 +158,10 @@ int do_setall(User * u)
 		notice_lang(s_HostServ, u, HOST_NOREG, nick);
 	}
 	if (vIdent) {
-		free(vIdent);
-		free(rawhostmask);
+		delete [] vIdent;
+		delete [] rawhostmask;
 	}
-	free(hostmask);
+	delete [] hostmask;
 	return MOD_CONT;
 }
 

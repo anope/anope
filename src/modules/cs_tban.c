@@ -175,11 +175,11 @@ int do_tban(User * u)
 		myFullHelpSyntax(u);
 	}
 	if (time)
-		free(time);
+		delete [] time;
 	if (nick)
-		free(nick);
+		delete [] nick;
 	if (chan)
-		free(chan);
+		delete [] chan;
 
 	return MOD_CONT;
 }

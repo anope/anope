@@ -194,7 +194,7 @@ void common_unban(ChannelInfo * ci, char *nick)
 	}
 	/* host_resolve() sstrdup us this info so we gotta free it */
 	if (host) {
-		free(host);
+		delete [] host;
 	}
 }
 

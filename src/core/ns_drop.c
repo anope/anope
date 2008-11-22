@@ -127,7 +127,7 @@ int do_drop(User * u)
 			else
 				notice_lang(s_NickServ, u, NICK_DROPPED);
 			if (my_nick) {
-				free(my_nick);
+				delete [] my_nick;
 			}
 		}
 	}

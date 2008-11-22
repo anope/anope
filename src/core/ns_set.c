@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -233,7 +233,7 @@ int do_set_language(User * u, NickCore * nc, char *param)
 int do_set_url(User * u, NickCore * nc, char *param)
 {
 	if (nc->url)
-		free(nc->url);
+		delete [] nc->url;
 
 	if (param) {
 		nc->url = sstrdup(param);
@@ -260,7 +260,7 @@ int do_set_email(User * u, NickCore * nc, char *param)
 		 (nc->email ? nc->email : "none"), (param ? param : "none"));
 
 	if (nc->email)
-		free(nc->email);
+		delete [] nc->email;
 
 	if (param) {
 		nc->email = sstrdup(param);
@@ -292,7 +292,7 @@ int do_set_icq(User * u, NickCore * nc, char *param)
 int do_set_greet(User * u, NickCore * nc, char *param)
 {
 	if (nc->greet)
-		free(nc->greet);
+		delete [] nc->greet;
 
 	if (param) {
 		char buf[BUFSIZE];

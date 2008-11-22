@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -50,7 +50,7 @@ class OSOperNews : public Module
 
 	~OSOperNews()
 	{
-		free(c->help_param1);
+		delete [] c->help_param1;
 	}
 };
 
@@ -74,7 +74,7 @@ int reload_config(int argc, char **argv) {
 
 	if (argc >= 1) {
 		if (!stricmp(argv[0], EVENT_START)) {
-			free(c->help_param1);
+			delete [] c->help_param1;
 			snprintf(buf, BUFSIZE, "%d", NewsCount),
 			c->help_param1 = sstrdup(buf);
 		}

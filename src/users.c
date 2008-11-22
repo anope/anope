@@ -123,7 +123,7 @@ void User::SetDisplayedHost(const std::string &shost)
 		throw "empty host? in MY services? it seems it's more likely than I thought.";
 
 	if (this->vhost)
-		free(this->vhost);
+		delete [] this->vhost;
 	this->vhost = sstrdup(shost.c_str());
 
 	if (debug)
@@ -138,7 +138,7 @@ void User::SetIdent(const std::string &ident)
 		throw "empty ident in SetIdent";
 
 	if (this->vident)
-		free(this->vident);
+		delete [] this->vident;
 	this->vident = sstrdup(ident.c_str());
 
 	if (debug)
@@ -153,14 +153,14 @@ void User::SetRealname(const std::string &srealname)
 		throw "realname empty in SetRealname";
 
 	if (this->realname)
-		free(this->realname);
+		delete [] this->realname;
 	this->realname = sstrdup(srealname.c_str());
 
 	if (this->na && (nick_identified(this) ||
 			(!(this->na->nc->flags & NI_SECURE) && nick_recognized(this))))
 	{
 		if (this->na->last_realname)
-			free(this->na->last_realname);
+			delete [] this->na->last_realname;
 		this->na->last_realname = sstrdup(srealname.c_str());
 	}
 
@@ -191,7 +191,7 @@ User::~User()
 				srealname, this->server->name);
 		}
 
-		free(srealname);
+		delete [] srealname;
 	}
 
 	send_event(EVENT_USER_LOGOFF, 1, this->nick);
@@ -207,18 +207,18 @@ User::~User()
 	if (debug >= 2)
 		alog("debug: User::~User(): free user data");
 
-	free(this->username);
-	free(this->host);
+	delete [] this->username;
+	delete [] this->host;
 
 	if (this->vhost)
-		free(this->vhost);
+		delete [] this->vhost;
 	if (this->vident)
-		free(this->vident);
+		delete [] this->vident;
 	if (this->uid)
-		free(this->uid);
+		delete [] this->uid;
 
 	Anope_Free(this->realname);
-	Anope_Free(this->hostip);
+	delete [] this->hostip;
 
 	if (debug >= 2)
 		alog("debug: User::~User(): remove from channels");
@@ -229,7 +229,7 @@ User::~User()
 	{
 		c2 = c->next;
 		chan_deluser(this, c->chan);
-		free(c);
+		delete c;
 		c = c2;
 	}
 
@@ -245,12 +245,12 @@ User::~User()
 	while (ci)
 	{
 		ci2 = ci->next;
-		free(ci);
+		delete ci;
 		ci = ci2;
 	}
 
 	if (this->nickTrack)
-		free(this->nickTrack);
+		delete [] this->nickTrack;
 
 	if (debug >= 2)
 		alog("debug: User::~User(): delete from list");
@@ -316,11 +316,9 @@ void update_host(User * user)
 					 || (!(user->na->nc->flags & NI_SECURE)
 						 && nick_recognized(user)))) {
 		if (user->na->last_usermask)
-			free(user->na->last_usermask);
+			delete [] user->na->last_usermask;
 
-		user->na->last_usermask =
-			(char *)smalloc(strlen(common_get_vident(user)) +
-					strlen(common_get_vhost(user)) + 2);
+		user->na->last_usermask = new char[strlen(common_get_vident(user)) + strlen(common_get_vhost(user)) + 2];
 		sprintf(user->na->last_usermask, "%s@%s", common_get_vident(user),
 				common_get_vhost(user));
 	}
@@ -376,10 +374,10 @@ User *finduser(const char *nick)
 
 	if (debug >= 3)
 		alog("debug: finduser(%p)", nick);
-		
+
 	if (isdigit(*nick) && ircd->ts6)
 		return find_byuid(nick);
-	
+
 	user = userlist[HASH(nick)];
 	while (user && stricmp(user->nick, nick) != 0)
 		user = user->next;
@@ -545,7 +543,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 					alog("LOGUSERS: %s (%s@%s) (%s) connected to the network (%s).", nick, username, host, logrealname, server);
 				}
 			}
-			Anope_Free(logrealname);
+			delete [] logrealname;
 		}
 
 		/* We used to ignore the ~ which a lot of ircd's use to indicate no
@@ -683,7 +681,7 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 					 nick, user->server->name);
 			}
 			if (logrealname) {
-				free(logrealname);
+				delete [] logrealname;
 			}
 		}
 
@@ -742,10 +740,8 @@ User *do_nick(const char *source, const char *nick, const char *username, const 
 			user->na->last_seen = time(NULL);
 
 			if (user->na->last_usermask)
-				free(user->na->last_usermask);
-			user->na->last_usermask =
-				(char *)smalloc(strlen(common_get_vident(user)) +
-						strlen(common_get_vhost(user)) + 2);
+				delete [] user->na->last_usermask;
+			user->na->last_usermask = new char[strlen(common_get_vident(user)) + strlen(common_get_vhost(user)) + 2];
 			sprintf(user->na->last_usermask, "%s@%s",
 					common_get_vident(user), common_get_vhost(user));
 
@@ -836,7 +832,7 @@ void do_quit(const char *source, int ac, const char **av)
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
-			free(na->last_quit);
+			delete [] na->last_quit;
 		na->last_quit = *av[0] ? sstrdup(av[0]) : NULL;
 	}
 	if (LimitSessions && !is_ulined(user->server->name)) {
@@ -872,7 +868,7 @@ void do_kill(const char *nick, const char *msg)
 		&& (na->status & (NS_IDENTIFIED | NS_RECOGNIZED))) {
 		na->last_seen = time(NULL);
 		if (na->last_quit)
-			free(na->last_quit);
+			delete [] na->last_quit;
 		na->last_quit = *msg ? sstrdup(msg) : NULL;
 
 	}
@@ -966,7 +962,7 @@ int match_usermask(const char *mask, User * user)
 	}
 	host = strtok(NULL, "");
 	if (!username || !host) {
-		free(mask2);
+		delete [] mask2;
 		return 0;
 	}
 
@@ -981,7 +977,7 @@ int match_usermask(const char *mask, User * user)
 				|| match_wild_nocase(host, user->vhost));
 	}
 
-	free(mask2);
+	delete [] mask2;
 	return result;
 }
 
@@ -1011,7 +1007,7 @@ int match_userip(const char *mask, User * user, char *iphost)
 	}
 	host = strtok(NULL, "");
 	if (!username || !host) {
-		free(mask2);
+		delete [] mask2;
 		return 0;
 	}
 
@@ -1026,7 +1022,7 @@ int match_userip(const char *mask, User * user, char *iphost)
 				|| match_wild_nocase(host, user->vhost));
 	}
 
-	free(mask2);
+	delete [] mask2;
 	return result;
 }
 
@@ -1060,7 +1056,7 @@ void split_usermask(const char *mask, char **nick, char **user,
 	*nick = sstrdup(*nick);
 	*user = sstrdup(*user);
 	*host = sstrdup(*host);
-	free(mask2);
+	delete [] mask2;
 }
 
 /*************************************************************************/
@@ -1083,7 +1079,7 @@ char *create_mask(User * u)
 	 * will never be longer than this (and will often be shorter), thus we
 	 * can use strcpy() and sprintf() safely.
 	 */
-	end = mask = (char *)smalloc(ulen + strlen(common_get_vhost(u)) + 3);
+	end = mask = new char[ulen + strlen(common_get_vhost(u)) + 3];
 	end += sprintf(end, "%s%s@",
 				   (ulen <
 					(*(common_get_vident(u)) ==
@@ -1102,13 +1098,13 @@ char *create_mask(User * u)
 		*strrchr(s, '.') = 0;
 
 		sprintf(end, "%s.*", s);
-		free(s);
+		delete [] s;
 	} else {
 		if ((s = strchr(common_get_vhost(u), '.')) && strchr(s + 1, '.')) {
 			s = sstrdup(strchr(common_get_vhost(u), '.') - 1);
 			*s = '*';
 			strcpy(end, s);
-			free(s);
+			delete [] s;
 		} else {
 			strcpy(end, common_get_vhost(u));
 		}

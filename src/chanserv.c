@@ -333,7 +333,7 @@ void load_cs_dbase(void)
 			SAFE(read_string(&s, f));
 			if (s) {
 				ci->founder = findcore(s);
-				free(s);
+				delete [] s;
 			} else
 				ci->founder = NULL;
 			if (ver >= 7) {
@@ -348,7 +348,7 @@ void load_cs_dbase(void)
 						else
 							ci->successor = NULL;
 					}
-					free(s);
+					delete [] s;
 				} else
 					ci->successor = NULL;
 			} else {
@@ -382,7 +382,7 @@ void load_cs_dbase(void)
 			ci->bantype = tmp16;
 			SAFE(read_int16(&tmp16, f));
 			n_levels = tmp16;
-			ci->levels = (int16 *)scalloc(2 * CA_SIZE, 1);
+			ci->levels = new int16[CA_SIZE];
 			reset_levels(ci);
 			for (j = 0; j < n_levels; j++) {
 				SAFE(read_int16(&tmp16, f));
@@ -401,7 +401,7 @@ void load_cs_dbase(void)
 						SAFE(read_string(&s, f));
 						if (s) {
 							ci->access[j].nc = findcore(s);
-							free(s);
+							delete [] s;
 						}
 						if (ci->access[j].nc == NULL)
 							ci->access[j].in_use = 0;
@@ -424,7 +424,7 @@ void load_cs_dbase(void)
 							ci->akick[j].u.nc = findcore(s);
 							if (!ci->akick[j].u.nc)
 								ci->akick[j].flags &= ~AK_USED;
-							free(s);
+							delete [] s;
 						} else {
 							ci->akick[j].u.mask = s;
 						}
@@ -432,12 +432,12 @@ void load_cs_dbase(void)
 						if (ci->akick[j].flags & AK_USED)
 							ci->akick[j].reason = s;
 						else if (s)
-							free(s);
+							delete [] s;
 						SAFE(read_string(&s, f));
 						if (ci->akick[j].flags & AK_USED) {
 							ci->akick[j].creator = s;
 						} else if (s) {
-							free(s);
+							delete [] s;
 						}
 						SAFE(read_int32(&tmp32, f));
 						if (ci->akick[j].flags & AK_USED)
@@ -457,14 +457,14 @@ void load_cs_dbase(void)
 			} else {
 				SAFE(read_string(&s, f));
 				if (s)
-					free(s);
+					delete [] s;
 			}
 			if (ircd->Lmode) {
 				SAFE(read_string(&ci->mlock_redirect, f));
 			} else {
 				SAFE(read_string(&s, f));
 				if (s)
-					free(s);
+					delete [] s;
 			}
 
 			SAFE(read_int16(&tmp16, f));
@@ -495,7 +495,7 @@ void load_cs_dbase(void)
 			SAFE(read_string(&s, f));
 			if (s) {
 				ci->bi = findbot(s);
-				free(s);
+				delete [] s;
 			} else
 				ci->bi = NULL;
 
@@ -503,7 +503,7 @@ void load_cs_dbase(void)
 			ci->botflags = tmp32;
 			SAFE(read_int16(&tmp16, f));
 			n_ttb = tmp16;
-			ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
+			ci->ttb = new int16[2 * TTB_SIZE];
 			for (j = 0; j < n_ttb; j++) {
 				SAFE(read_int16(&tmp16, f));
 				if (j < TTB_SIZE)
@@ -930,7 +930,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 								   "%so%s %s %s %s", ircd->adminunset,
 								   tmp, user->nick,
 								   user->nick, user->nick);
-					free(tmp);
+					delete [] tmp;
 				} else {
 					tmp = stripModePrefix(ircd->ownerunset);
 					ircdproto->SendMode(whosends(chan->ci), chan->name,
@@ -938,7 +938,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 								   ircd->adminunset, tmp,
 								   user->nick, user->nick, user->nick,
 								   user->nick);
-					free(tmp);
+					delete [] tmp;
 				}
 			} else if (!ircd->owner && ircd->protect) {
 				if (check_access(user, chan->ci, CA_AUTOHALFOP)) {
@@ -974,7 +974,7 @@ int check_valid_op(User * user, Channel * chan, int servermode)
 							   "%sho%s %s %s %s %s", ircd->adminunset,
 							   tmp, user->nick, user->nick,
 							   user->nick, user->nick);
-				free(tmp);
+				delete [] tmp;
 			} else {
 				ircdproto->SendMode(whosends(chan->ci), chan->name, "-ho %s %s",
 							   user->nick, user->nick);
@@ -1068,7 +1068,7 @@ int check_should_owner(User * user, char *chan)
 		tmp = stripModePrefix(ircd->ownerset);
 		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
 					   user->nick);
-		free(tmp);
+		delete [] tmp;
 		return 1;
 	}
 
@@ -1089,7 +1089,7 @@ int check_should_protect(User * user, char *chan)
 		tmp = stripModePrefix(ircd->adminset);
 		ircdproto->SendMode(whosends(ci), chan, "+o%s %s %s", tmp, user->nick,
 					   user->nick);
-		free(tmp);
+		delete [] tmp;
 		return 1;
 	}
 
@@ -1109,7 +1109,7 @@ static void timeout_leave(Timeout * to)
 		ci->flags &= ~CI_INHABIT;
 
 	ircdproto->SendPart(findbot(s_ChanServ), chan, NULL);
-	free(to->data);
+	delete [] (const char *)to->data;
 }
 
 
@@ -1267,7 +1267,7 @@ void record_topic(const char *chan)
 		return;
 
 	if (ci->last_topic)
-		free(ci->last_topic);
+		delete [] ci->last_topic;
 
 	if (c->topic)
 		ci->last_topic = sstrdup(c->topic);
@@ -1301,7 +1301,7 @@ void restore_topic(const char *chan)
 		return;
 	}
 	if (c->topic)
-		free(c->topic);
+		delete [] c->topic;
 	if (ci->last_topic) {
 		c->topic = sstrdup(ci->last_topic);
 		strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
@@ -1345,7 +1345,7 @@ int check_topiclock(Channel * c, time_t topic_time)
 		return 0;
 
 	if (c->topic)
-		free(c->topic);
+		delete [] c->topic;
 	if (ci->last_topic) {
 		c->topic = sstrdup(ci->last_topic);
 		strscpy(c->topic_setter, ci->last_topic_setter, NICKMAX);
@@ -1476,11 +1476,11 @@ void cs_remove_nick(const NickCore * nc)
 				if ((akick->flags & AK_USED) && (akick->flags & AK_ISNICK)
 					&& akick->u.nc == nc) {
 					if (akick->creator) {
-						free(akick->creator);
+						delete [] akick->creator;
 						akick->creator = NULL;
 					}
 					if (akick->reason) {
-						free(akick->reason);
+						delete [] akick->reason;
 						akick->reason = NULL;
 					}
 					akick->flags = 0;
@@ -1600,7 +1600,7 @@ ChannelInfo *makechan(const char *chan)
 	strscpy(ci->name, chan, CHANMAX);
 	ci->time_registered = time(NULL);
 	reset_levels(ci);
-	ci->ttb = (int16 *)scalloc(2 * TTB_SIZE, 1);
+	ci->ttb = new int16[2 * TTB_SIZE];
 	for (i = 0; i < TTB_SIZE; i++)
 		ci->ttb[i] = 0;
 	alpha_insert_chan(ci);
@@ -1667,7 +1667,7 @@ int delchan(ChannelInfo * ci)
 						cilist->prev->next = cilist->next;
 					else
 						u->founder_chans = cilist->next;
-					free(cilist);
+					delete cilist;
 				}
 				cilist = cilist_next;
 			}
@@ -1684,30 +1684,30 @@ int delchan(ChannelInfo * ci)
 	else
 		chanlists[(unsigned char) tolower(ci->name[1])] = ci->next;
 	if (ci->desc)
-		free(ci->desc);
+		delete [] ci->desc;
 	if (ci->url)
-		free(ci->url);
+		delete [] ci->url;
 	if (ci->email)
-		free(ci->email);
+		delete [] ci->email;
 	if (ci->entry_message)
-		free(ci->entry_message);
+		delete [] ci->entry_message;
 
 	if (ci->mlock_key)
-		free(ci->mlock_key);
+		delete [] ci->mlock_key;
 	if (ircd->fmode) {
 		if (ci->mlock_flood)
-			free(ci->mlock_flood);
+			delete [] ci->mlock_flood;
 	}
 	if (ircd->Lmode) {
 		if (ci->mlock_redirect)
-			free(ci->mlock_redirect);
+			delete [] ci->mlock_redirect;
 	}
 	if (ci->last_topic)
-		free(ci->last_topic);
+		delete [] ci->last_topic;
 	if (ci->forbidby)
-		free(ci->forbidby);
+		delete [] ci->forbidby;
 	if (ci->forbidreason)
-		free(ci->forbidreason);
+		delete [] ci->forbidreason;
 	if (ci->access)
 		free(ci->access);
 	if (debug >= 2) {
@@ -1715,11 +1715,11 @@ int delchan(ChannelInfo * ci)
 	}
 	for (i = 0; i < ci->akickcount; i++) {
 		if (!(ci->akick[i].flags & AK_ISNICK) && ci->akick[i].u.mask)
-			free(ci->akick[i].u.mask);
+			delete [] ci->akick[i].u.mask;
 		if (ci->akick[i].reason)
-			free(ci->akick[i].reason);
+			delete [] ci->akick[i].reason;
 		if (ci->akick[i].creator)
-			free(ci->akick[i].creator);
+			delete [] ci->akick[i].creator;
 	}
 	if (debug >= 2) {
 		alog("debug: delchan() done with the akick list");
@@ -1727,14 +1727,14 @@ int delchan(ChannelInfo * ci)
 	if (ci->akick)
 		free(ci->akick);
 	if (ci->levels)
-		free(ci->levels);
+		delete [] ci->levels;
 	if (debug >= 2) {
 		alog("debug: delchan() top of the memo list");
 	}
 	if (ci->memos.memos) {
 		for (i = 0; i < ci->memos.memocount; i++) {
 			if (ci->memos.memos[i].text)
-				free(ci->memos.memos[i].text);
+				delete [] ci->memos.memos[i].text;
 		}
 		free(ci->memos.memos);
 	}
@@ -1742,14 +1742,14 @@ int delchan(ChannelInfo * ci)
 		alog("debug: delchan() done with the memo list");
 	}
 	if (ci->ttb)
-		free(ci->ttb);
+		delete [] ci->ttb;
 
 	if (debug >= 2) {
 		alog("debug: delchan() top of the badword list");
 	}
 	for (i = 0; i < ci->bwcount; i++) {
 		if (ci->badwords[i].word)
-			free(ci->badwords[i].word);
+			delete [] ci->badwords[i].word;
 	}
 	if (ci->badwords)
 		free(ci->badwords);
@@ -1788,8 +1788,8 @@ void reset_levels(ChannelInfo * ci)
 	}
 
 	if (ci->levels)
-		free(ci->levels);
-	ci->levels = (int16 *)scalloc(CA_SIZE * sizeof(*ci->levels), 1);
+		delete [] ci->levels;
+	ci->levels = new int16[CA_SIZE];
 	for (i = 0; def_levels[i][0] >= 0; i++)
 		ci->levels[def_levels[i][0]] = def_levels[i][1];
 }
@@ -1950,7 +1950,7 @@ int get_idealban(ChannelInfo * ci, User * u, char *ret, int retlen)
 	case 3:
 		mask = create_mask(u);
 		snprintf(ret, retlen, "*!%s", mask);
-		free(mask);
+		delete [] mask;
 		return 1;
 
 	default:
@@ -2018,7 +2018,7 @@ void cs_set_flood(ChannelInfo * ci, const char *value)
 	}
 
 	if (ci->mlock_flood)
-		free(ci->mlock_flood);
+		delete [] ci->mlock_flood;
 
 	/* This looks ugly, but it works ;) */
 	if (ircdproto->IsFloodModeParamValid(value)) {
@@ -2038,7 +2038,7 @@ void cs_set_key(ChannelInfo * ci, const char *value)
 	}
 
 	if (ci->mlock_key)
-		free(ci->mlock_key);
+		delete [] ci->mlock_key;
 
 	/* Don't allow keys with a coma */
 	if (value && *value != ':' && !strchr(value, ',')) {
@@ -2072,7 +2072,7 @@ void cs_set_redirect(ChannelInfo * ci, const char *value)
 	}
 
 	if (ci->mlock_redirect)
-		free(ci->mlock_redirect);
+		delete [] ci->mlock_redirect;
 
 	/* Don't allow keys with a coma */
 	if (value && *value == '#') {
@@ -2189,8 +2189,13 @@ void stick_mask(ChannelInfo * ci, AutoKick * akick)
 		for (ban = ci->c->bans->entries; ban; ban = ban->next) {
 			/* If akick is already covered by a wider ban.
 			   Example: c->bans[i] = *!*@*.org and akick->u.mask = *!*@*.epona.org */
-			if (entry_match_mask(ban, sstrdup(akick->u.mask), 0))
+			char *mask = sstrdup(akick->u.mask);
+			if (entry_match_mask(ban, mask, 0))
+			{
+				delete [] mask;
 				return;
+			}
+			delete [] mask;
 
 			if (ircd->reversekickcheck) {
 				/* If akick is wider than a ban already in place.

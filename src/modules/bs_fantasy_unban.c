@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -62,7 +62,7 @@ int do_fantasy(int argc, char **argv)
 			common_unban(ci, target);
 
 		/* free target if needed (#852) */
-		Anope_Free(target);
+		if (target) delete [] target;
 	}
 
 	return MOD_CONT;

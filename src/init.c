@@ -430,7 +430,7 @@ int init_secondary(int ac, char **av)
 
 		alog("%s is not a supported version of Windows", winver);
 
-		free(winver);
+		delete [] winver;
 
 		return -1;
 

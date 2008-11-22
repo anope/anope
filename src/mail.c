@@ -45,13 +45,13 @@ MailInfo *MailRegBegin(User * u, NickRequest * nr, char *subject,
 	} else {
 		MailInfo *mail;
 
-		mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
+		mail = new MailInfo;
 		mail->sender = u;
 		mail->recipient = NULL;
 		mail->recip = nr;
 
 		if (!(mail->pipe = popen(SendMailPath, "w"))) {
-			free(mail);
+			delete mail;
 			notice_lang(service, u, MAIL_LATER);
 			return NULL;
 		}
@@ -98,13 +98,13 @@ MailInfo *MailBegin(User * u, NickCore * nc, char *subject, char *service)
 	} else {
 		MailInfo *mail;
 
-		mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
+		mail = new MailInfo;
 		mail->sender = u;
 		mail->recipient = nc;
 		mail->recip = NULL;
 
 		if (!(mail->pipe = popen(SendMailPath, "w"))) {
-			free(mail);
+			delete mail;
 			notice_lang(service, u, MAIL_LATER);
 			return NULL;
 		}
@@ -143,13 +143,13 @@ MailInfo *MailMemoBegin(NickCore * nc)
 	} else {
 		MailInfo *mail;
 
-		mail = (MailInfo *)scalloc(sizeof(MailInfo), 1);
+		mail = new MailInfo;
 		mail->sender = NULL;
 		mail->recipient = nc;
 		mail->recip = NULL;
 
 		if (!(mail->pipe = popen(SendMailPath, "w"))) {
-			free(mail);
+			delete mail;
 			return NULL;
 		}
 
@@ -199,7 +199,7 @@ void MailEnd(MailInfo * mail)
 		mail->recip->lastmail = time(NULL);
 
 
-	free(mail);
+	delete mail;
 }
 
 /*************************************************************************/

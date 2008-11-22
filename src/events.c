@@ -31,7 +31,7 @@ void send_event(const char *name, int argc, ...)
 	int idx = 0;
 	char **argv;
 
-	argv = (char **) malloc(sizeof(char *) * argc);
+	argv = new char *[argc];
 	va_start(va, argc);
 	for (idx = 0; idx < argc; idx++) {
 		a = va_arg(va, char *);
@@ -48,9 +48,9 @@ void send_event(const char *name, int argc, ...)
 	 * Now that the events have seen the message, free it up
 	 **/
 	for (idx = 0; idx < argc; idx++) {
-		free(argv[idx]);
+		delete [] argv[idx];
 	}
-	free(argv);
+	delete [] argv;
 }
 
 void event_process_hook(const char *name, int argc, char **argv)
@@ -139,7 +139,7 @@ EvtHook *createEventHook(const char *name, int (*func) (int argc, char **argv))
 	if (!func) {
 		return NULL;
 	}
-	if ((evh = (EvtHook *)malloc(sizeof(EvtHook))) == NULL) {
+	if (!(evh = new EvtHook)) {
 		fatal("Out of memory!");
 	}
 	evh->name = sstrdup(name);
@@ -205,7 +205,7 @@ int addEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh)
 		lastHash = current;
 	}
 
-	if ((newHash = (EvtHookHash *)malloc(sizeof(EvtHookHash))) == NULL) {
+	if (!(newHash = new EvtHookHash)) {
 		fatal("Out of memory");
 	}
 	newHash->next = NULL;
@@ -311,7 +311,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
 					}
 				} else {
 					hookEvtTable[index] = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			} else {
@@ -332,7 +332,7 @@ int delEventHook(EvtHookHash * hookEvtTable[], EvtHook * evh,
 					}
 				} else {
 					lastHash->next = current->next;
-					free(current->name);
+					delete [] current->name;
 					return MOD_ERR_OK;
 				}
 			}
@@ -353,11 +353,11 @@ int destroyEventHook(EvtHook * evh)
 		return MOD_ERR_PARAMS;
 	}
 	if (evh->name) {
-		free(evh->name);
+		delete [] evh->name;
 	}
 	evh->func = NULL;
 	if (evh->mod_name) {
-		free(evh->mod_name);
+		delete [] evh->mod_name;
 	}
 	evh->next = NULL;
 	return MOD_ERR_OK;

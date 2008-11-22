@@ -51,10 +51,10 @@ BotInfo::~BotInfo()
 
 	nbots--;
 
-	free(this->nick);
-	free(this->user);
-	free(this->host);
-	free(this->real);
+	delete [] this->nick;
+	delete [] this->user;
+	delete [] this->host;
+	delete [] this->real;
 }
 
 
@@ -68,7 +68,7 @@ void BotInfo::ChangeNick(const char *newnick)
 		botlists[tolower(*this->nick)] = this->next;
 
 	if (this->nick)
-		free(this->nick);
+		delete [] this->nick;
 	this->nick = sstrdup(newnick);
 
 	insert_bot(this);

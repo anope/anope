@@ -6,8 +6,8 @@
  * Please read COPYING and README for further details.
  *
  * Based on the original code of Epona by Lara.
- * Based on the original code of Services by Andy Church. 
- * 
+ * Based on the original code of Services by Andy Church.
+ *
  * $Id$
  *
  */
@@ -62,15 +62,15 @@ int akick_del(User * u, AutoKick * akick)
 	if (akick->flags & AK_ISNICK) {
 		akick->u.nc = NULL;
 	} else {
-		free(akick->u.mask);
+		delete [] akick->u.mask;
 		akick->u.mask = NULL;
 	}
 	if (akick->reason) {
-		free(akick->reason);
+		delete [] akick->reason;
 		akick->reason = NULL;
 	}
 	if (akick->creator) {
-		free(akick->creator);
+		delete [] akick->creator;
 		akick->creator = NULL;
 	}
 	akick->addtime = 0;
@@ -206,13 +206,12 @@ int do_akick(User * u)
 
 		if (!na) {
 			split_usermask(mask, &nick, &user, &host);
-			mask =
-				(char *)scalloc(strlen(nick) + strlen(user) + strlen(host) + 3, 1);
+			mask = new char[strlen(nick) + strlen(user) + strlen(host) + 3];
 			freemask = 1;
 			sprintf(mask, "%s!%s@%s", nick, user, host);
-			free(nick);
-			free(user);
-			free(host);
+			delete [] nick;
+			delete [] user;
+			delete [] host;
 		} else {
 			if (na->status & NS_VERBOTEN) {
 				notice_lang(s_ChanServ, u, NICK_X_FORBIDDEN, mask);
@@ -226,18 +225,18 @@ int do_akick(User * u)
 			if (is_excepted_mask(ci, mask) == 1) {
 				notice_lang(s_ChanServ, u, CHAN_EXCEPTED, mask, chan);
 				if (freemask)
-					free(mask);
+					delete [] mask;
 				return MOD_CONT;
 			}
 		}
 
-		/* Check whether target nick has equal/higher access 
+		/* Check whether target nick has equal/higher access
 		 * or whether the mask matches a user with higher/equal access - Viper */
 		if ((ci->flags & CI_PEACE) && nc) {
 			if ((nc == ci->founder) || (get_access_nc(nc, ci) >= get_access(u, ci))) {
 				notice_lang(s_ChanServ, u, PERMISSION_DENIED);
 				if (freemask)
-					free(mask);
+					delete [] mask;
 				return MOD_CONT;
 			}
 		} else if ((ci->flags & CI_PEACE)) {
@@ -249,7 +248,7 @@ int do_akick(User * u)
 					if (is_founder(u2, ci) || (get_access(u2, ci) >= get_access(u, ci))) {
 						if (match_usermask(mask, u2)) {
 							notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-							free(mask);
+							delete [] mask;
 							return MOD_CONT;
 						}
 					}
@@ -263,12 +262,12 @@ int do_akick(User * u)
 					if (na2->status & NS_VERBOTEN)
 						continue;
 
-					if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci) 
+					if (na2->nc && ((na2->nc == ci->founder) || (get_access_nc(na2->nc, ci)
 							>= get_access(u, ci)))) {
 						snprintf(buf, BUFSIZE, "%s!%s", na2->nick, na2->last_usermask);
 						if (match_wild_nocase(mask, buf)) {
 							notice_lang(s_ChanServ, u, PERMISSION_DENIED);
-							free(mask);
+							delete [] mask;
 							return MOD_CONT;
 						}
 					}
@@ -285,7 +284,7 @@ int do_akick(User * u)
 							(akick->flags & AK_ISNICK) ? akick->u.nc->
 							display : akick->u.mask, chan);
 				if (freemask)
-					free(mask);
+					delete [] mask;
 				return MOD_CONT;
 			}
 		}
@@ -295,7 +294,7 @@ int do_akick(User * u)
 		if (ci->akickcount >= CSAutokickMax) {
 			notice_lang(s_ChanServ, u, CHAN_AKICK_REACHED_LIMIT, CSAutokickMax);
 			if (freemask)
-				free(mask);
+				delete [] mask;
 			return MOD_CONT;
 		}
 		ci->akickcount++;
@@ -335,10 +334,9 @@ int do_akick(User * u)
 
 					do_kick(s_ChanServ, 3, argv);
 
-			// XXX: casting is necessary thanks to strict g++ stuff, really, we should be using std::string here though.
-					free((void *)argv[2]);
-					free((void *)argv[1]);
-					free((void *)argv[0]);
+					delete [] argv[2];
+					delete [] argv[1];
+					delete [] argv[0];
 					count++;
 
 				}
@@ -352,7 +350,7 @@ int do_akick(User * u)
 						count);
 
 		if (freemask)
-			free(mask);
+			delete [] mask;
 
 	} else if (stricmp(cmd, "STICK") == 0) {
 		NickAlias *na;
@@ -603,9 +601,9 @@ int do_akick(User * u)
 
 				do_kick(s_ChanServ, 3, argv);
 
-				free((void *)argv[2]);
-				free((void *)argv[1]);
-				free((void *)argv[0]);
+				delete [] argv[2];
+				delete [] argv[1];
+				delete [] argv[0];
 
 				count++;
 			}

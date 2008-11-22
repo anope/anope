@@ -35,8 +35,8 @@ void chan_deluser(User * user, Channel * c)
 
 	if (u->ud) {
 		if (u->ud->lastline)
-			free(u->ud->lastline);
-		free(u->ud);
+			delete [] u->ud->lastline;
+		delete u->ud;
 	}
 
 	if (u->next)
@@ -45,7 +45,7 @@ void chan_deluser(User * user, Channel * c)
 		u->prev->next = u->next;
 	else
 		c->users = u->next;
-	free(u);
+	delete u;
 	c->usercount--;
 
 	if (s_BotServ && c->ci && c->ci->bi && c->usercount == BSMinUsers - 1) {
@@ -555,8 +555,8 @@ void do_join(const char *source, int ac, const char **av)
 				chan_deluser(user, c->chan);
 				send_event(EVENT_PART_CHANNEL, 3, EVENT_STOP, user->nick,
 						   channame);
-				free(channame);
-				free(c);
+				delete [] channame;
+				delete c;
 				c = nextc;
 			}
 			user->chans = NULL;
@@ -649,7 +649,7 @@ void do_kick(const char *source, int ac, const char **av)
 				c->prev->next = c->next;
 			else
 				user->chans = c->next;
-			free(c);
+			delete c;
 		}
 	}
 }
@@ -707,11 +707,11 @@ void do_part(const char *source, int ac, const char **av)
 				c->prev->next = c->next;
 			else
 				user->chans = c->next;
-			free(c);
+			delete c;
 
 			send_event(EVENT_PART_CHANNEL, (ac >= 2 ? 4 : 3), EVENT_STOP,
 					   user->nick, channame, (ac >= 2 ? av[1] : ""));
-			free(channame);
+			delete [] channame;
 		}
 	}
 }
@@ -1027,7 +1027,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 					alog("debug: SJOIN for nonexistent user %s on %s", s,
 						 av[1]);
 				}
-				free((char *)s);
+				delete [] s;
 				return;
 			}
 
@@ -1067,7 +1067,7 @@ void do_sjoin(const char *source, int ac, const char **av)
 				break;
 			s = end + 1;
 		}
-		free((char *)s);
+		delete [] s;
 	} else if (ac == 2) {
 		if (ircd->ts6) {
 			user = find_byuid(source);
@@ -1224,17 +1224,17 @@ void do_topic(const char *source, int ac, const char **av)
 	if ((ac > 3) && *av[3] && ci && ci->last_topic
 		&& (strcmp(av[3], ci->last_topic) == 0)
 		&& (strcmp(topicsetter, ci->last_topic_setter) == 0)) {
-		free(topicsetter);
+		delete [] topicsetter;
 		return;
 	}
 
 	if (check_topiclock(c, topic_time)) {
-		free(topicsetter);
+		delete [] topicsetter;
 		return;
 	}
 
 	if (c->topic) {
-		free(c->topic);
+		delete [] c->topic;
 		c->topic = NULL;
 	}
 	if (ac > 3 && *av[3]) {
@@ -1243,7 +1243,7 @@ void do_topic(const char *source, int ac, const char **av)
 
 	strscpy(c->topic_setter, topicsetter, sizeof(c->topic_setter));
 	c->topic_time = topic_time;
-	free(topicsetter);
+	delete [] topicsetter;
 
 	record_topic(av[0]);
 
@@ -1435,7 +1435,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		if ((add_modes & CUS_OWNER) && !(status & CUS_OWNER)) {
 			tmp = stripModePrefix(ircd->ownerset);
 			strcat(modebuf, tmp);
-			free(tmp);
+			delete [] tmp;
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
 		} else {
@@ -1444,7 +1444,7 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		if ((add_modes & CUS_PROTECT) && !(status & CUS_PROTECT)) {
 			tmp = stripModePrefix(ircd->adminset);
 			strcat(modebuf, tmp);
-			free(tmp);
+			delete [] tmp;
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
 		} else {
@@ -1478,14 +1478,14 @@ void chan_set_correct_modes(User * user, Channel * c, int give_modes)
 		if (rem_modes & CUS_OWNER) {
 			tmp = stripModePrefix(ircd->ownerset);
 			strcat(modebuf, tmp);
-			free(tmp);
+			delete [] tmp;
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
 		}
 		if (rem_modes & CUS_PROTECT) {
 			tmp = stripModePrefix(ircd->adminset);
 			strcat(modebuf, tmp);
-			free(tmp);
+			delete [] tmp;
 			strcat(userbuf, " ");
 			strcat(userbuf, user->nick);
 		}
@@ -1526,7 +1526,7 @@ void chan_adduser2(User * user, Channel * c)
 {
 	struct c_userlist *u;
 
-	u = (struct c_userlist *)scalloc(sizeof(struct c_userlist), 1);
+	u = new c_userlist;
 	u->next = c->users;
 	if (c->users)
 		c->users->prev = u;
@@ -1591,7 +1591,7 @@ Channel *chan_create(const char *chan, time_t ts)
 	if (debug)
 		alog("debug: Creating channel %s", chan);
 	/* Allocate pre-cleared memory */
-	c = (Channel *)scalloc(sizeof(Channel), 1);
+	c = new Channel;
 	strscpy(c->name, chan, sizeof(c->name));
 	list = &chanlist[HASH(c->name)];
 	c->next = *list;
@@ -1629,26 +1629,26 @@ void chan_delete(Channel * c)
 
 	for (bd = c->bd; bd; bd = next) {
 		if (bd->mask)
-			free(bd->mask);
+			delete [] bd->mask;
 		next = bd->next;
-		free(bd);
+		delete bd;
 	}
 
 	if (c->ci)
 		c->ci->c = NULL;
 
 	if (c->topic)
-		free(c->topic);
+		delete [] c->topic;
 
 	if (c->key)
-		free(c->key);
+		delete [] c->key;
 	if (ircd->fmode) {
 		if (c->flood)
-			free(c->flood);
+			delete [] c->flood;
 	}
 	if (ircd->Lmode) {
 		if (c->redirect)
-			free(c->redirect);
+			delete [] c->redirect;
 	}
 
 	if (c->bans && c->bans->count) {
@@ -1680,7 +1680,7 @@ void chan_delete(Channel * c)
 	else
 		chanlist[HASH(c->name)] = c->next;
 
-	free(c);
+	delete c;
 }
 
 /*************************************************************************/
@@ -1800,7 +1800,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 	if (debug)
 		alog("debug: %s joins %s", user->nick, chan->name);
 
-	c = (u_chanlist *)scalloc(sizeof(*c), 1);
+	c = new u_chanlist;
 	c->next = user->chans;
 	if (user->chans)
 		user->chans->prev = c;
@@ -1817,7 +1817,7 @@ Channel *join_user_update(User * user, Channel * chan, const char *name,
 void set_flood(Channel * chan, const char *value)
 {
 	if (chan->flood)
-		free(chan->flood);
+		delete [] chan->flood;
 	chan->flood = value ? sstrdup(value) : NULL;
 
 	if (debug)
@@ -1830,7 +1830,7 @@ void set_flood(Channel * chan, const char *value)
 void chan_set_key(Channel * chan, const char *value)
 {
 	if (chan->key)
-		free(chan->key);
+		delete [] chan->key;
 	chan->key = value ? sstrdup(value) : NULL;
 
 	if (debug)
@@ -1854,7 +1854,7 @@ void set_limit(Channel * chan, const char *value)
 void set_redirect(Channel * chan, const char *value)
 {
 	if (chan->redirect)
-		free(chan->redirect);
+		delete [] chan->redirect;
 	chan->redirect = value ? sstrdup(value) : NULL;
 
 	if (debug)
@@ -1880,7 +1880,7 @@ void do_mass_mode(char *modes)
 	for (c = firstchan(); c; c = nextchan()) {
 		if (c->bouncy_modes) {
 			free(av);
-			free(myModes);
+			delete [] myModes;
 			return;
 		} else {
 			ircdproto->SendMode(findbot(s_OperServ), c->name, "%s", modes);
@@ -1888,7 +1888,7 @@ void do_mass_mode(char *modes)
 		}
 	}
 	free(av);
-	free(myModes);
+	delete [] myModes;
 }
 
 /*************************************************************************/
@@ -1918,7 +1918,7 @@ Entry *entry_create(char *mask)
 	int do_free;
 	uint32 ip, cidr;
 
-	entry = (Entry *)scalloc(1, sizeof(Entry));
+	entry = new Entry;
 	entry->type = ENTRYTYPE_NONE;
 	entry->prev = NULL;
 	entry->next = NULL;
@@ -2001,7 +2001,9 @@ Entry *entry_create(char *mask)
 				entry->type |= ENTRYTYPE_HOST;
 		}
 	}
-	free(mask);
+	delete [] mask;
+	if (do_free)
+		delete [] host;
 
 	return entry;
 }
@@ -2022,7 +2024,10 @@ Entry *entry_add(EList * list, const char *mask)
 	e = entry_create(hostmask);
 
 	if (!e)
+	{
+		delete [] hostmask;
 		return NULL;
+	}
 
 	e->next = list->entries;
 	e->prev = NULL;
@@ -2031,6 +2036,8 @@ Entry *entry_add(EList * list, const char *mask)
 		list->entries->prev = e;
 	list->entries = e;
 	list->count++;
+
+	delete [] hostmask;
 
 	return e;
 }
@@ -2055,13 +2062,13 @@ void entry_delete(EList * list, Entry * e)
 		list->entries = e->next;
 
 	if (e->nick)
-		free(e->nick);
+		delete [] e->nick;
 	if (e->user)
-		free(e->user);
+		delete [] e->user;
 	if (e->host)
-		free(e->host);
-	free(e->mask);
-	free(e);
+		delete [] e->host;
+	delete [] e->mask;
+	delete e;
 
 	list->count--;
 }
@@ -2075,7 +2082,7 @@ EList *list_create()
 {
 	EList *list;
 
-	list = (EList *)scalloc(1, sizeof(EList));
+	list = new EList;
 	list->entries = NULL;
 	list->count = 0;
 
@@ -2157,7 +2164,7 @@ int entry_match_mask(Entry * e, char *mask, uint32 ip)
 	res = entry_match(e, nick, user, host, ip);
 
 	/* Free the destroyed mask. */
-	free(hostmask);
+	delete [] hostmask;
 
 	return res;
 }
@@ -2225,7 +2232,7 @@ Entry *elist_match_mask(EList * list, char *mask, uint32 ip)
 	res = elist_match(list, nick, user, host, ip);
 
 	/* Free the destroyed mask. */
-	free(hostmask);
+	delete [] hostmask;
 
 	return res;
 }
@@ -2266,7 +2273,7 @@ Entry *elist_match_user(EList * list, User * u)
 		elist_match(list, u->nick, u->username, u->vhost, ip);
 
 	if (host)
-		free(host);
+		delete [] host;
 
 	return res;
 }

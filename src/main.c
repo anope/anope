@@ -226,10 +226,12 @@ static void services_shutdown(void)
 	alog("%s", quitmsg);
 	if (started) {
 		ircdproto->SendSquit(ServerName, quitmsg);
-		Anope_Free(uplink);
-		Anope_Free(mod_current_buffer);
+		if (uplink)
+			delete [] uplink;
+		if (mod_current_buffer)
+			delete [] mod_current_buffer;
 		if (ircd->chanmodes) {
-			Anope_Free(ircd->chanmodes);
+			delete [] ircd->chanmodes;
 		}
 		u = firstuser();
 		while (u) {
@@ -413,7 +415,7 @@ void sighandler(int signum)
 #ifndef _WIN32
 		   signum == SIGUSR1 ||
 #endif
-		   !(quitmsg = (const char *)calloc(BUFSIZE, 1))) {
+		   !(quitmsg = new char[BUFSIZE])) {
 		quitmsg = "Out of memory!";
 	} else {
 		snprintf((char *)quitmsg, BUFSIZE, "Services terminating on signal %d", signum);
@@ -472,7 +474,7 @@ int main(int ac, char **av, char **envp)
 	 * This fixes bug #589.
 	 * -- heinz
 	 */
-	binary_dir = smalloc(MAX_PATH);
+	binary_dir = new char[MAX_PATH];
 	if (!getcwd(binary_dir, MAX_PATH)) {
 		fprintf(stderr, "error: getcwd() error\n");
 		return -1;
@@ -558,7 +560,7 @@ int main(int ac, char **av, char **envp)
 			process();
 		} else if (i == 0) {
 			int errno_save = errno;
-			quitmsg = (const char *)scalloc(BUFSIZE, 1);
+			quitmsg = new char[BUFSIZE];
 			if (quitmsg) {
 		// Naughty, but oh well. :)
 				snprintf((char *)quitmsg, BUFSIZE,
@@ -610,7 +612,7 @@ int main(int ac, char **av, char **envp)
 
 #ifdef _WIN32
 	if (binary_dir)
-		free(binary_dir);
+		delete [] binary_dir;
 #endif
 
 	return 0;
@@ -647,7 +649,7 @@ void do_backtrace(int show_segheader)
 	char *winver;
 	winver = GetWindowsVersion();
 	alog("Backtrace: not available on Windows");
-	alog("Running %S", winver);
-	free(winver);
+	alog("Running %s", winver);
+	delete [] winver;
 #endif
 }

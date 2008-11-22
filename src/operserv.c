@@ -179,7 +179,7 @@ void load_os_dbase(void)
 	slist_setcapacity(&akills, tmp16);
 
 	for (i = 0; i < akills.capacity; i++) {
-		ak = (Akill *)scalloc(sizeof(Akill), 1);
+		ak = new Akill;
 
 		SAFE(read_string(&ak->user, f));
 		SAFE(read_string(&ak->host, f));
@@ -199,7 +199,7 @@ void load_os_dbase(void)
 	slist_setcapacity(&sglines, tmp16);
 
 	for (i = 0; i < sglines.capacity; i++) {
-		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
+		sx = new SXLine;
 
 		SAFE(read_string(&sx->mask, f));
 		SAFE(read_string(&sx->by, f));
@@ -216,7 +216,7 @@ void load_os_dbase(void)
 	slist_setcapacity(&sqlines, tmp16);
 
 	for (i = 0; i < sqlines.capacity; i++) {
-		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
+		sx = new SXLine;
 
 		SAFE(read_string(&sx->mask, f));
 		SAFE(read_string(&sx->by, f));
@@ -233,7 +233,7 @@ void load_os_dbase(void)
 	slist_setcapacity(&szlines, tmp16);
 
 	for (i = 0; i < szlines.capacity; i++) {
-		sx = (SXLine *)scalloc(sizeof(SXLine), 1);
+		sx = new SXLine;
 
 		SAFE(read_string(&sx->mask, f));
 		SAFE(read_string(&sx->by, f));
@@ -573,7 +573,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 	host = strchr(mask2, '@');
 
 	if (!host) {
-		free(mask2);
+		delete [] mask2;
 		return -1;
 	}
 
@@ -581,10 +581,10 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 	*host = 0;
 	host++;
 
-	entry = (Akill *)scalloc(sizeof(Akill), 1);
+	entry = new Akill;
 
 	if (!entry) {
-		free(mask2);
+		delete [] mask2;
 		return -1;
 	}
 
@@ -601,7 +601,7 @@ int add_akill(User * u, char *mask, const char *by, const time_t expires,
 		ircdproto->SendAkill(entry->user, entry->host, entry->by, entry->seton,
 						entry->expires, entry->reason);
 
-	free(mask2);
+	delete [] mask2;
 
 	return deleted;
 }
@@ -690,11 +690,11 @@ static void free_akill_entry(SList * slist, void *item)
 	ircdproto->SendAkillDel(ak->user, ak->host);
 
 	/* Free the structure */
-	free(ak->user);
-	free(ak->host);
-	free(ak->by);
-	free(ak->reason);
-	free(ak);
+	delete [] ak->user;
+	delete [] ak->host;
+	delete [] ak->by;
+	delete [] ak->reason;
+	delete ak;
 }
 
 /* item1 is not an Akill pointer, but a char
@@ -793,7 +793,7 @@ int add_sgline(User * u, char *mask, const char *by, const time_t expires,
 	}
 
 	/* We can now (really) add the SGLINE. */
-	entry = (SXLine *)scalloc(sizeof(SXLine), 1);
+	entry = new SXLine;
 	if (!entry)
 		return -1;
 
@@ -878,10 +878,10 @@ static void free_sgline_entry(SList * slist, void *item)
 	ircdproto->SendSGLineDel(sx->mask);
 
 	/* Free the structure */
-	free(sx->mask);
-	free(sx->by);
-	free(sx->reason);
-	free(sx);
+	delete [] sx->mask;
+	delete [] sx->by;
+	delete [] sx->reason;
+	delete sx;
 }
 
 /* item1 is not an SXLine pointer, but a char */
@@ -980,7 +980,7 @@ int add_sqline(User * u, char *mask, const char *by, const time_t expires,
 	}
 
 	/* We can now (really) add the SQLINE. */
-	entry = (SXLine *)scalloc(sizeof(SXLine), 1);
+	entry = new SXLine;
 	if (!entry)
 		return -1;
 
@@ -1099,10 +1099,10 @@ static void free_sqline_entry(SList * slist, void *item)
 	ircdproto->SendSQLineDel(sx->mask);
 
 	/* Free the structure */
-	free(sx->mask);
-	free(sx->by);
-	free(sx->reason);
-	free(sx);
+	delete [] sx->mask;
+	delete [] sx->by;
+	delete [] sx->reason;
+	delete sx;
 }
 
 /* item1 is not an SXLine pointer, but a char */
@@ -1192,7 +1192,7 @@ int add_szline(User * u, char *mask, const char *by, const time_t expires,
 	}
 
 	/* We can now (really) add the SZLINE. */
-	entry = (SXLine *)scalloc(sizeof(SXLine), 1);
+	entry = new SXLine;
 	if (!entry)
 		return -1;
 
@@ -1267,10 +1267,10 @@ static void free_szline_entry(SList * slist, void *item)
 	ircdproto->SendSZLineDel(sx->mask);
 
 	/* Free the structure */
-	free(sx->mask);
-	free(sx->by);
-	free(sx->reason);
-	free(sx);
+	delete [] sx->mask;
+	delete [] sx->by;
+	delete [] sx->reason;
+	delete sx;
 }
 
 /* item1 is not an SXLine pointer, but a char
@@ -1395,7 +1395,7 @@ void runDefCon(void)
 				if ((newmodes = defconReverseModes(DefConChanModes))) {
 					alog("DEFCON: setting %s on all chan's", newmodes);
 					do_mass_mode(newmodes);
-					free(newmodes);
+					delete [] newmodes;
 				}
 			}
 		}
@@ -1412,7 +1412,7 @@ char *defconReverseModes(const char *modes)
 	if (!modes) {
 		return NULL;
 	}
-	if (!(newmodes = (char *)malloc(sizeof(char) * strlen(modes) + 1))) {
+	if (!(newmodes = new char[strlen(modes) + 1])) {
 		return NULL;
 	}
 	for (i = 0; i < strlen(modes); i++) {
@@ -1468,7 +1468,7 @@ int defconParseModeString(const char *str)
 		if ((int) mode < 128 && (cbm = &cbmodes[(int) mode])->flag != 0) {
 			if (cbm->flags & CBM_NO_MLOCK) {
 				alog("DefConChanModes mode character '%c' cannot be locked", mode);
-				free(str_copy);
+				delete [] str_copy;
 				return 0;
 			} else if (add) {
 				DefConModesOn |= cbm->flag;
@@ -1476,7 +1476,7 @@ int defconParseModeString(const char *str)
 				if (cbm->cssetvalue) {
 					if (!(param = strtok(NULL, " "))) {
 						alog("DefConChanModes mode character '%c' has no parameter while one is expected", mode);
-						free(str_copy);
+						delete [] str_copy;
 						return 0;
 					}
 					cbm->cssetvalue(&DefConModesCI, param);
@@ -1492,19 +1492,19 @@ int defconParseModeString(const char *str)
 			}
 		} else {
 			alog("DefConChanModes unknown mode character '%c'", mode);
-			free(str_copy);
+			delete [] str_copy;
 			return 0;
 		}
 	}						   /* while (*param) */
 
-	free(str_copy);
+	delete [] str_copy;
 
 	if (ircd->Lmode) {
 		/* We can't mlock +L if +l is not mlocked as well. */
 		if ((DefConModesOn & ircd->chan_lmode)
 			&& !(DefConModesOn & anope_get_limit_mode())) {
 			DefConModesOn &= ~ircd->chan_lmode;
-			free(DefConModesCI.mlock_redirect);
+			delete [] DefConModesCI.mlock_redirect;
 			DefConModesCI.mlock_redirect = NULL;
 			alog("DefConChanModes must lock mode +l as well to lock mode +L");
 			return 0;

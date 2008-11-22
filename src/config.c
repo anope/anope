@@ -857,6 +857,9 @@ int ServerConfig::Read(bool bail)
 		ReportConfigError(errstr.str(), bail);
 		return 0;
 	}
+	/* This boolean is set to true when the Values array is completely iterated through, to avoid needing
+	 * to do so inside the catch block to clean up the new'd values from the array. */
+	bool CheckedAllValues = false;
 	// The stuff in here may throw ConfigException, be sure we're in a position to catch it.
 	try {
 		// Read the values of all the tags which occur once or not at all, and call their callbacks.
@@ -869,7 +872,11 @@ int ServerConfig::Read(bool bail)
 			dt &= ~DT_NORELOAD;
 			// If the value is set to not allow reloading and we are reloading (bail will be false), skip the item
 			if (noreload && !bail)
+			{
+				delete Values[Index].val;
+				Values[Index].val = NULL;
 				continue;
+			}
 			ConfValue(config_data, Values[Index].tag, Values[Index].value, Values[Index].default_value, 0, item, BUFSIZE, allow_newlines);
 			ValueItem vi(item);
 			if (!Values[Index].validation_function(this, Values[Index].tag, Values[Index].value, vi))
@@ -939,7 +946,9 @@ int ServerConfig::Read(bool bail)
 			}
 			// We're done with this now
 			delete Values[Index].val;
+			Values[Index].val = NULL;
 		}
+		CheckedAllValues = true;
 		/* Read the multiple-tag items (class tags, connect tags, etc)
 		 * and call the callbacks associated with them. We have three
 		 * callbacks for these, a 'start', 'item' and 'end' callback. */
@@ -1042,6 +1051,12 @@ int ServerConfig::Read(bool bail)
 	}
 	catch (ConfigException &ce) {
 		ReportConfigError(ce.GetReason(), bail);
+		if (!CheckedAllValues) {
+			for (int Index = 0; Values[Index].tag; ++Index) {
+				if (Values[Index].val)
+					delete Values[Index].val;
+			}
+		}
 		return 0;
 	}
 	if (debug) alog("End config");

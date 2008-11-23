@@ -559,9 +559,9 @@ int main(int argc, char *argv[])
 			fs << "MD NC " << nc->display << " channelfoundercount " << nc->channelcount << std::endl;
 
 			/* we could do this in a seperate loop, I'm doing it here for tidiness. */
-			for (int f = 0; f < 1024; f++)
+			for (int tmp = 0; tmp < 1024; tmp++)
 			{
-				for (na = nalists[f]; na; na = na->next)
+				for (na = nalists[tmp]; na; na = na->next)
 				{
 					if (!na->nc)
 					{
@@ -592,9 +592,12 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-	
+
+
+
+
 	/* Section II: Chans */
-	/* IIa: First database 
+	// IIa: First database 
 	if ((f = open_db_read("ChanServ", "chan.db", 16)))
 	{
 		ChannelInfo *ci, **last, *prev;
@@ -602,7 +605,9 @@ int main(int argc, char *argv[])
 
 		printf("Trying to merge channels...\n");
 
-		for (i = 0; i < 256; i++) {
+		for (i = 0; i < 256; i++)
+		{
+			std::cout << "iteration " << i << std::endl;
 			int16 tmp16;
 			int32 tmp32;
 			int n_levels;
@@ -612,11 +617,14 @@ int main(int argc, char *argv[])
 			last = &chanlists[i];
 			prev = NULL;
 		
-			while ((c = getc_db(f)) == 1) {
+			while ((c = getc_db(f)) == 1)
+			{
+				std::cout << "got a channel" << std::endl;
 				int j;
 
-				if (c != 1) {
-					printf("Invalid format in %s.\n", CHAN_DB_1);
+				if (c != 1)
+				{
+					printf("Invalid format in chans.db.\n");
 					exit(0);
 				}
 
@@ -632,6 +640,7 @@ int main(int argc, char *argv[])
 				READ(read_string(&ci->desc, f));
 				if (!ci->desc)
 					ci->desc = strdup("");
+				std::cout << "Read " << ci->name << " founder " << ci->founder << std::endl;
 				READ(read_string(&ci->url, f));
 				READ(read_string(&ci->email, f));
 				READ(read_int32(&tmp32, f));
@@ -652,21 +661,26 @@ int main(int argc, char *argv[])
 				READ(read_int16(&tmp16, f));
 				n_levels = tmp16;
 				ci->levels = (int16 *)calloc(36 * sizeof(*ci->levels), 1);
-				for (j = 0; j < n_levels; j++) {
+				for (j = 0; j < n_levels; j++)
+				{
 					if (j < 36)
 						READ(read_int16(&ci->levels[j], f));
 					else
 						READ(read_int16(&tmp16, f));
 				}
 				READ(read_uint16(&ci->accesscount, f));
-				if (ci->accesscount) {
+				if (ci->accesscount)
+				{
 					ci->access = (ChanAccess *)calloc(ci->accesscount, sizeof(ChanAccess));
-					for (j = 0; j < ci->accesscount; j++) {
+					for (j = 0; j < ci->accesscount; j++)
+					{
 						READ(read_uint16(&ci->access[j].in_use, f));
-						if (ci->access[j].in_use) {
+						if (ci->access[j].in_use)
+						{
 							READ(read_int16(&ci->access[j].level, f));
 							READ(read_string(&s, f));
-							if (s) {
+							if (s)
+							{
 								ci->access[j].nc = findcore(s, 0);
 								free(s);
 							}
@@ -676,22 +690,30 @@ int main(int argc, char *argv[])
 							ci->access[j].last_seen = tmp32;
 						}
 					}
-				} else {
+				}
+				else
+				{
 					ci->access = NULL;
 				}
 				READ(read_uint16(&ci->akickcount, f));
-				if (ci->akickcount) {
+				if (ci->akickcount)
+				{
 					ci->akick = (AutoKick *)calloc(ci->akickcount, sizeof(AutoKick));
-					for (j = 0; j < ci->akickcount; j++) {
+					for (j = 0; j < ci->akickcount; j++)
+					{
 						SAFE(read_uint16(&ci->akick[j].flags, f));
-						if (ci->akick[j].flags & 0x0001) {
+						if (ci->akick[j].flags & 0x0001)
+						{
 							SAFE(read_string(&s, f));
-							if (ci->akick[j].flags & 0x0002) {
+							if (ci->akick[j].flags & 0x0002)
+							{
 								ci->akick[j].u.nc = findcore(s, 0);
 								if (!ci->akick[j].u.nc)
 									ci->akick[j].flags &= ~0x0001;
 								free(s);
-							} else {
+							}
+							else
+							{
 								ci->akick[j].u.mask = s;
 							}
 							SAFE(read_string(&s, f));
@@ -700,9 +722,12 @@ int main(int argc, char *argv[])
 							else if (s)
 								free(s);
 							SAFE(read_string(&s, f));
-							if (ci->akick[j].flags & 0x0001) {
+							if (ci->akick[j].flags & 0x0001)
+							{
 								ci->akick[j].creator = s;
-							} else if (s) {
+							}
+							else if (s)
+							{
 								free(s);
 							}
 							SAFE(read_int32(&tmp32, f));
@@ -710,7 +735,9 @@ int main(int argc, char *argv[])
 								ci->akick[j].addtime = tmp32;
 						}
 					}
-				} else {
+				}
+				else
+				{
 					ci->akick = NULL;
 				}
 				READ(read_uint32(&ci->mlock_on, f));
@@ -721,11 +748,13 @@ int main(int argc, char *argv[])
 				READ(read_string(&ci->mlock_redirect, f));
 				READ(read_int16(&ci->memos.memocount, f));
 				READ(read_int16(&ci->memos.memomax, f));
-				if (ci->memos.memocount) {
+				if (ci->memos.memocount)
+				{
 					Memo *memos;
 					memos = (Memo *)calloc(sizeof(Memo) * ci->memos.memocount, 1);
 					ci->memos.memos = memos;
-					for (j = 0; j < ci->memos.memocount; j++, memos++) {
+					for (j = 0; j < ci->memos.memocount; j++, memos++)
+					{
 						READ(read_uint32(&memos->number, f));
 						READ(read_uint16(&memos->flags, f));
 						READ(read_int32(&tmp32, f));
@@ -743,7 +772,8 @@ int main(int argc, char *argv[])
 				READ(read_int16(&tmp16, f));
 				n_ttb = tmp16;
 				ci->ttb = (int16 *)calloc(2 * 8, 1);
-				for (j = 0; j < n_ttb; j++) {
+				for (j = 0; j < n_ttb; j++)
+				{
 					if (j < 8)
 						READ(read_int16(&ci->ttb[j], f));
 					else
@@ -763,132 +793,135 @@ int main(int argc, char *argv[])
 				ci->repeattimes = tmp16;
 
 				READ(read_uint16(&ci->bwcount, f));
-				if (ci->bwcount) {
+				if (ci->bwcount)
+				{
 					ci->badwords = (BadWord *)calloc(ci->bwcount, sizeof(BadWord));
-					for (j = 0; j < ci->bwcount; j++) {
+					for (j = 0; j < ci->bwcount; j++)
+					{
 						SAFE(read_uint16(&ci->badwords[j].in_use, f));
-						if (ci->badwords[j].in_use) {
+						if (ci->badwords[j].in_use)
+						{
 							SAFE(read_string(&ci->badwords[j].word, f));
 							SAFE(read_uint16(&ci->badwords[j].type, f));
 						}
 					}
-				} else {
+				}
+				else
+				{
 					ci->badwords = NULL;
 				}
 			}
 			*last = NULL;
 		}
-		close_db(f);
-	}*/
-	
-	#if 0
-
-	/* IIc: Saving */
-	if ((f = open_db_write("ChanServ", CHAN_DB_NEW, 16))) {
-		ChannelInfo *ci;
-		Memo *memos;
-
-		for (i = 0; i < 256; i++) {
-			int16 tmp16;
-			for (ci = chanlists[i]; ci; ci = ci->next) {
-				int j;
-				SAFE(write_int8(1, f));
-				SAFE(write_buffer(ci->name, f));
-				if (ci->founder)
-					SAFE(write_string(ci->founder, f));
-				else
-					SAFE(write_string(NULL, f));
-				if (ci->successor)
-					SAFE(write_string(ci->successor, f));
-				else
-					SAFE(write_string(NULL, f));
-				SAFE(write_buffer(ci->founderpass, f));
-				SAFE(write_string(ci->desc, f));
-				SAFE(write_string(ci->url, f));
-				SAFE(write_string(ci->email, f));
-				SAFE(write_int32(ci->time_registered, f));
-				SAFE(write_int32(ci->last_used, f));
-				SAFE(write_string(ci->last_topic, f));
-				SAFE(write_buffer(ci->last_topic_setter, f));
-				SAFE(write_int32(ci->last_topic_time, f));
-				SAFE(write_int32(ci->flags, f));
-				SAFE(write_string(ci->forbidby, f));
-				SAFE(write_string(ci->forbidreason, f));
-				SAFE(write_int16(ci->bantype, f));
-				tmp16 = 36;
-				SAFE(write_int16(tmp16, f));
-				for (j = 0; j < 36; j++)
-					SAFE(write_int16(ci->levels[j], f));
-
-				SAFE(write_int16(ci->accesscount, f));
-				for (j = 0; j < ci->accesscount; j++) {
-					SAFE(write_int16(ci->access[j].in_use, f));
-					if (ci->access[j].in_use) {
-						SAFE(write_int16(ci->access[j].level, f));
-						SAFE(write_string(ci->access[j].nc->display, f));
-						SAFE(write_int32(ci->access[j].last_seen, f));
-					}
-				}
-				SAFE(write_int16(ci->akickcount, f));
-				for (j = 0; j < ci->akickcount; j++) {
-					SAFE(write_int16(ci->akick[j].flags, f));
-					if (ci->akick[j].flags & 0x0001) {
-						if (ci->akick[j].flags & 0x0002)
-							SAFE(write_string(ci->akick[j].u.nc->display, f));
-						else
-							SAFE(write_string(ci->akick[j].u.mask, f));
-						SAFE(write_string(ci->akick[j].reason, f));
-						SAFE(write_string(ci->akick[j].creator, f));
-						SAFE(write_int32(ci->akick[j].addtime, f));
-					}
-				}
-
-				SAFE(write_int32(ci->mlock_on, f));
-				SAFE(write_int32(ci->mlock_off, f));
-				SAFE(write_int32(ci->mlock_limit, f));
-				SAFE(write_string(ci->mlock_key, f));
-				SAFE(write_string(ci->mlock_flood, f));
-				SAFE(write_string(ci->mlock_redirect, f));
-				SAFE(write_int16(ci->memos.memocount, f));
-				SAFE(write_int16(ci->memos.memomax, f));
-				memos = ci->memos.memos;
-				for (j = 0; j < ci->memos.memocount; j++, memos++) {
-					SAFE(write_int32(memos->number, f));
-					SAFE(write_int16(memos->flags, f));
-					SAFE(write_int32(memos->time, f));
-					SAFE(write_buffer(memos->sender, f));
-					SAFE(write_string(memos->text, f));
-				}
-				SAFE(write_string(ci->entry_message, f));
-				if (ci->bi)
-					SAFE(write_string(ci->bi, f));
-				else
-					SAFE(write_string(NULL, f));
-				SAFE(write_int32(ci->botflags, f));
-				tmp16 = 8;
-				SAFE(write_int16(tmp16, f));
-				for (j = 0; j < 8; j++)
-					SAFE(write_int16(ci->ttb[j], f));
-				SAFE(write_int16(ci->capsmin, f));
-				SAFE(write_int16(ci->capspercent, f));
-				SAFE(write_int16(ci->floodlines, f));
-				SAFE(write_int16(ci->floodsecs, f));
-				SAFE(write_int16(ci->repeattimes, f));
-
-				SAFE(write_int16(ci->bwcount, f));
-				for (j = 0; j < ci->bwcount; j++) {
-					SAFE(write_int16(ci->badwords[j].in_use, f));
-					if (ci->badwords[j].in_use) {
-						SAFE(write_string(ci->badwords[j].word, f));
-						SAFE(write_int16(ci->badwords[j].type, f));
-					}
-				}
-			} /* for (chanlists[i]) */
-			SAFE(write_int8(0, f));
-		} /* for (i) */
-		close_db(f);
-		printf("Chan merging done. New database saved as %s.\n", CHAN_DB_NEW);
 	}
+	
+	close_db(f);
+	
+
+	ChannelInfo *ci;
+	Memo *memos;
+
+	for (i = 0; i < 256; i++)
+	{
+		for (ci = chanlists[i]; ci; ci = ci->next)
+		{
+			int j;
+			
+		/*	if (!ci->founder)
+			{
+				std::cout << "Skipping channel with no founder (wtf?)" << std::endl;
+				continue;
+			}*/
+			
+			fs << "CH " << ci->name << " " << ci->founder << " " << ci->successor << " " << ci->time_registered << " " << ci->last_used << " " << ci->flags << std::endl;
+
+			for (j = 0; j < 36; j++)
+			{
+				fs << "CHLVL " << ci->name << " " << j << " " << ci->levels[j] << std::endl;
+			}
+
+			fs << "MD CH " << ci->name << " founderpass " << ci->founderpass << std::endl;
+			fs << "MD CH " << ci->name << " desc " << ci->desc << std::endl;
+			fs << "MD CH " << ci->name << " url " << ci->url << std::endl;
+			fs << "MD CH " << ci->name << " email " << ci->email << std::endl; 
+
+/*
+			SAFE(write_string(ci->last_topic, f));
+			SAFE(write_buffer(ci->last_topic_setter, f));
+			SAFE(write_int32(ci->last_topic_time, f));
+			//SAFE(write_int32(ci->flags, f));
+			SAFE(write_string(ci->forbidby, f));
+			SAFE(write_string(ci->forbidreason, f));
+			SAFE(write_int16(ci->bantype, f));
+
+			SAFE(write_int16(ci->accesscount, f));
+			for (j = 0; j < ci->accesscount; j++) {
+				SAFE(write_int16(ci->access[j].in_use, f));
+				if (ci->access[j].in_use) {
+					SAFE(write_int16(ci->access[j].level, f));
+					SAFE(write_string(ci->access[j].nc->display, f));
+					SAFE(write_int32(ci->access[j].last_seen, f));
+				}
+			}
+			SAFE(write_int16(ci->akickcount, f));
+			for (j = 0; j < ci->akickcount; j++) {
+				SAFE(write_int16(ci->akick[j].flags, f));
+				if (ci->akick[j].flags & 0x0001) {
+					if (ci->akick[j].flags & 0x0002)
+						SAFE(write_string(ci->akick[j].u.nc->display, f));
+					else
+						SAFE(write_string(ci->akick[j].u.mask, f));
+					SAFE(write_string(ci->akick[j].reason, f));
+					SAFE(write_string(ci->akick[j].creator, f));
+					SAFE(write_int32(ci->akick[j].addtime, f));
+				}
+			}
+
+			SAFE(write_int32(ci->mlock_on, f));
+			SAFE(write_int32(ci->mlock_off, f));
+			SAFE(write_int32(ci->mlock_limit, f));
+			SAFE(write_string(ci->mlock_key, f));
+			SAFE(write_string(ci->mlock_flood, f));
+			SAFE(write_string(ci->mlock_redirect, f));
+			SAFE(write_int16(ci->memos.memocount, f));
+			SAFE(write_int16(ci->memos.memomax, f));
+			memos = ci->memos.memos;
+			for (j = 0; j < ci->memos.memocount; j++, memos++) {
+				SAFE(write_int32(memos->number, f));
+				SAFE(write_int16(memos->flags, f));
+				SAFE(write_int32(memos->time, f));
+				SAFE(write_buffer(memos->sender, f));
+				SAFE(write_string(memos->text, f));
+			}
+			SAFE(write_string(ci->entry_message, f));
+			if (ci->bi)
+				SAFE(write_string(ci->bi, f));
+			else
+				SAFE(write_string(NULL, f));
+			SAFE(write_int32(ci->botflags, f));
+			tmp16 = 8;
+			SAFE(write_int16(tmp16, f));
+			for (j = 0; j < 8; j++)
+				SAFE(write_int16(ci->ttb[j], f));
+			SAFE(write_int16(ci->capsmin, f));
+			SAFE(write_int16(ci->capspercent, f));
+			SAFE(write_int16(ci->floodlines, f));
+			SAFE(write_int16(ci->floodsecs, f));
+			SAFE(write_int16(ci->repeattimes, f));
+
+			SAFE(write_int16(ci->bwcount, f));
+			for (j = 0; j < ci->bwcount; j++) {
+				SAFE(write_int16(ci->badwords[j].in_use, f));
+				if (ci->badwords[j].in_use) {
+					SAFE(write_string(ci->badwords[j].word, f));
+					SAFE(write_int16(ci->badwords[j].type, f));
+				}
+			}
+		*/
+		} /* for (chanlists[i]) */
+	} /* for (i) */
+
+#if 0
 
 	/* Section III: Bots */
 	/* IIIa: First database */

@@ -1,0 +1,106 @@
+C++-style Casting
+=================
+
+In C, you can cast in one of two ways:
+
+(type)var
+type(var)
+
+The problem with C-style casting is that it allows a programmer to get away
+with too much, and is also not designed to handle C++ classes.
+
+C++ has 4 types of casting in addition to allowing C-style casting.  They are:
+
+static_cast
+const_cast
+dynamic_cast
+reinterpret_cast
+
+The syntax is usually *_cast<type>(var).
+
+static_cast
+-----------
+
+From my expierence, this cast is closest to C-style casting for non-pointer
+types as well as between some (but not all) pointer types.  This type of cast,
+like C-style casting, is performed at compile-time.  static_cast can also do
+a downcast of a derived class to a base class, but only if the base class is
+not a virtual base class.  Sometimes the result of this cast can become
+undefined.  static_cast is a bit more strict that C-style casting, though.  It
+disallows certain class conversions that would've been allowed with a C-style
+cast.  static_cast also doesn't allow you to cast to an incomplete type.  In
+these cases, I would try either dynamic_cast or reinterpret_cast.
+
+const_cast
+----------
+
+This cast is mainly to add or remove const-ness or volatile-ness from a
+variable.  This is safer than using a C-style cast to change the const-ness
+of a variable.  In most cases if you try to use one of the other casts and it
+complains about const-ness, you will want to either use this cast instead or
+wrap the other cast around this cast.  An example:
+
+const int *a;
+static_cast<void *>(a); <-- This will fail.
+
+To remedy the above, you would might try this:
+
+const int *a;
+const_cast<void *>(a); <-- But this will still fail.
+
+The real solution is this:
+
+const int *a;
+static_cast<void *>(const_cast<int *>(a));
+
+It is not recommended to use const_cast on the this variable within a member
+function of a class that is declared const.  Instead you should use the mutable
+keyword on the variable in the class's definition.
+
+dynamic_cast
+------------
+
+This cast can only be used on pointers or references to classes.  It can cast a
+derived class to a base class, a derived class to another derived class
+(provided that both are children of the same base class), or a base class to a
+derived class.  You can also use this to cast a class to void *.  This cast is
+done at run-time as opposed to the other casts, and relies on C++'s RTTI to be
+enabled.  It is meant to be used on polymorphic classes, so use static_cast on
+non-polymorphic classes.
+
+derived-to-base conversions are actually done statically, so you use either
+dynamic_cast or static_cast on them, regardless of if the classes are
+polymorphic or not.
+
+derived-to-derived or base-to-derived conversions, however, rely on run-time
+type information, and this cast is used on those classes that are polymorphic.
+This is safer than C-style casting in that an invalid pointer conversion will
+return a NULL pointer, and an invalid reference conversion will throw a
+Bad_cast exception.
+
+reinterpret_cast
+----------------
+
+This cast I would use only as a last resort if static_cast isn't allowed on a
+conversion.  It allows for conversions between two unrelated types, such as
+going from char * to int *.  It can also be used to convert a pointer to an
+integral type and vica versa.  The sites I've read mention how the result is
+non-portable, which I assume means the resulting object code is non-portable,
+so since the code is compiled on many systems anyways, I don't see this as
+being a huge issue.  It is recommended to only use this if necessary, though.
+
+Links
+=====
+
+The following links are web sites I've used to get this information, and might
+describe some of the above a bit better than I have. :P
+
+http://www.acm.org/crossroads/xrds3-1/ovp3-1.html
+http://www.cplusplus.com/doc/tutorial/typecasting.html
+http://www.codeguru.com/forum/showthread.php?t=312456
+http://www.cs.umd.edu/class/sum2003/cmsc311/Notes/BitOp/cast.html
+http://msdn.microsoft.com/en-us/library/5f6c9f8h(VS.80).aspx
+http://en.wikibooks.org/wiki/C%2B%2B_Programming/Type_Casting
+http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=134
+
+-- CyberBotX, Nov 23, 2008
